@@ -29,9 +29,7 @@ define([
 
     events: {
       "click #search-clear-icon" : "onSearchClearIconClick",
-      "click #left-menu-profile" : "onClickProfileMenu",
-      // "click #left-menu-repo-section" : "toggleRepoList",
-      // "click #left-menu-users-section" : "togglePrivateChatList"
+      "click #left-menu-profile" : "onClickProfileMenu"
     },
 
     initialize: function() {
@@ -71,6 +69,8 @@ define([
         roomsCollection: troupeCollections.troupes
       }));
 
+      this.$el.find('.nano').nanoScroller();
+
       // search results collection view
       this.searchView = new SearchView({ troupes: troupeCollections.troupes, $input: this.$el.find('#list-search-input') });
       this.search.show(this.searchView);
@@ -83,53 +83,6 @@ define([
       $('#list-search-input').val('');
       this.hideSearch();
     },
-
-    // initHideListeners: function() {
-    //   var self = this;
-    //   // toggler('#unreadTroupesList', troupeCollections.unreadTroupes);
-    //   // toggler('#favTroupesList', troupeCollections.favouriteTroupes);
-    //   // toggler('#recentTroupesList', troupeCollections.recentTroupes);
-    //   // toggler('#UsersList', troupeCollections.peopleTroupes);
-    //   function toggler(element, collection) {
-    //     function toggle() {
-    //       self.$el.find(element).toggle(collection.length > 0);
-    //       self.$el.find('.nano').nanoScroller();
-    //     }
-
-    //     collection.on('all', toggle);
-    //     toggle();
-    //   }
-    // },
-
-    // toggleRepoList: function() {
-    //   if (this.repoList) {
-    //     $("#left-menu-list-repos").slideUp("fast", function () {
-    //       $("#repo-toggle").text("SHOW");
-    //     });
-    //     this.repoList = false;
-    //   }
-    //   else {
-    //     $("#left-menu-list-repos").slideDown("fast" , function() {
-    //       $("#repo-toggle").text("HIDE");
-    //     });
-    //     this.repoList = true;
-    //   }
-    // },
-
-    // togglePrivateChatList: function() {
-    //   if (this.privateChatList) {
-    //     $("#left-menu-list-users").slideUp("fast", function () {
-    //       $("#users-toggle").text("SHOW");
-    //     });
-    //     this.privateChatList = false;
-    //   }
-    //   else {
-    //     $("#left-menu-list-users").slideDown("fast" , function() {
-    //       $("#users-toggle").text("HIDE");
-    //     });
-    //     this.privateChatList = true;
-    //   }
-    // },
 
     activateSearchList: function() {
       this.$el.find('#list-search-input').focus();
