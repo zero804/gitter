@@ -12,9 +12,11 @@ define([
   'cocktail',
   'utils/uservoice',
   'views/widgets/troupeAvatar',
-  './repoInfo'
+  './repoInfo',
+  './activity',
+  'utils/scrollbar-detect'
 ], function($, Backbone, Marionette, TroupeViews, context, /*qq,*/ rightToolbarTemplate, itemCollections,
-  PeopleCollectionView, cocktail, userVoice, TroupeAvatar, repoInfo) {
+  PeopleCollectionView, cocktail, userVoice, TroupeAvatar, repoInfo, activityStream, hasScrollBars) {
   "use strict";
 
   var RightToolbarLayout = Marionette.Layout.extend({
@@ -24,13 +26,56 @@ define([
     regions: {
       people: "#people-roster",
       troupeAvatar: "#troupe-avatar-region",
-      repo_info: "#repo-info"
+      repo_info: "#repo-info",
+      activity: "#activity"
+    },
+
+    events: {
+      'click #upgrade-auth': 'onUpgradeAuthClick',
+      'click .activity-expand' : 'expandActivity',
+      'click #people-header' : 'showPeopleList',
+      'click #info-header' : 'showRepoInfo'
+    },
+
+    showPeopleList: function() {
+      $('#repo-info').hide();
+      $('#people-roster').show();
+
+      $('#people-header').addClass('selected');
+      $('#info-header').removeClass('selected');
+    },
+
+    showRepoInfo: function() {
+      $('#people-roster').hide();
+      $('#repo-info').show();
+      $('#people-header').removeClass('selected');
+      $('#info-header').addClass('selected');
+    },
+
+    serializeData: function() {
+      var isRepo;
+      if (context().troupe.githubType === 'REPO') {
+        isRepo = true;
+      }
+      return {
+        isRepo : isRepo
+      }
+    },
+
+    onShow: function() {
+       if (hasScrollBars()) {
+        $(".trpChatContainer").addClass("scroller");
+        $(".trpChatInputArea").addClass("scrollpush");
+        $("#room-content").addClass("scroller");
+      }
+    },
+
+    expandActivity: function() {
+      $('.activity-expand .commits').slideToggle();
     },
 
     onRender: function() {
-
       $('#toolbar-frame').show();
-      $('#right-panel').show();
 
       userVoice.install(this.$el.find('#help-button'), context.getUser());
 
@@ -58,6 +103,18 @@ define([
         repo.fetch({ data: $.param({repo: context().troupeUri })});
         this.repo_info.show(new repoInfo.view({ model: repo }));
       }
+
+      // Activity
+      this.activity.show(new activityStream({collection: itemCollections.events}));
+
+      itemCollections.events.on('add reset sync', function() {
+        
+        if (itemCollections.events.length >0) {
+          this.$el.find('#activity-header').show();
+          itemCollections.events.off('add reset sync', null, this);
+        }
+      }, this);
+
     },
 
   });

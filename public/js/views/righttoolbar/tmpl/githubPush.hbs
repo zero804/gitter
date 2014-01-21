@@ -1,0 +1,11 @@
+<div class="github-push">
+  <span class="gtrActivityItemText"><a href="https://github.com/{{payload.pusher.name}}" target="_blank"><span class='mention'>{{payload.pusher.name}}</span></a> on {{branch_name}}<br>
+    <div class="activity-commit">
+    {{#if multiple_commits}}
+      {{commits_count}} commits <a href="{{payload.compare}}" target="_blank" style="opacity: 0.6">(compare)</a>
+    {{else}}
+      {{commit_text}} <a href="{{payload.compare}}" target="_blank" style="opacity: 0.6">(compare)</a>
+    {{/if}}
+    </div>
+  </span>
+</div>
