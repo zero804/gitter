@@ -222,7 +222,7 @@ a:hover {
   }
 
   .trpToolbarList {
-    width: 240px;
+    width: 260px;
   }
 
   @media @small {
@@ -718,6 +718,8 @@ body.dragging, body.dragging * {
 
 body.dragging .list-favourites {
   background-color: rgba(255,255,255,0.1);
+  border-top: 1px dashed rgba(255,255,255,0.2);
+  border-bottom: 1px dashed rgba(255,255,255,0.2);
 }
 
 
@@ -780,6 +782,10 @@ ul li.placeholder:before {
 
 .item-close:hover {
   opacity: 0.8;
+}
+
+#list-search .trpLeftMenuItemClose {
+  display: none;
 }
 
 .trpLeftMenuItemClose:before {
