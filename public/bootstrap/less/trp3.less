@@ -47,40 +47,35 @@
   }
 }
 
-.banner-button {
+.banner-button() {
   height: 100%;
-  width: 100%;
   padding: 4px 11px;
-  background-color: fade(@trpGreen, 90%);
   color: white;
-  border-radius: 0 0 4px 4px;
+  background-color: fade(@trpGreen, 90%);
   border-width: 0 0 0 0;
-  border-left-color: darken(@trpGreen, 5%);
-  .trpBodyMedium;
-  text-align: left;
 
   &:hover {
     background-color: darken(@trpGreen, 5%);
   }
 }
 
+.banner-main-button {
+  .banner-button();
+  width: 100%;
+  border-radius: 0 0 4px 4px;
+  .trpBodyMedium;
+  text-align: left;
+}
+
 .banner-side-button {
+  .banner-button();
   position: absolute;
   top: 0;
   right: 0;
-  height: 100%;
-  padding: 4px 11px;
-  background-color: fade(@trpGreen, 90%);
-  color: white;
   border-radius: 0 0 4px 0;
-  border-width: 0 0 0 2px;
+  border-left-width: 2px;
   border-left-color: darken(@trpGreen, 5%);
   .trpBodySmall;
-
-  &:hover {
-    background-color: darken(@trpGreen, 5%);
-  }
-
 }
 
 .hide {
