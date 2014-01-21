@@ -100,7 +100,7 @@ define([
 
           if ($(container.el).parent().attr('id') == 'list-favs') {
             var collectionItem = self.roomsCollection.get(el.dataset.id);
-            collectionItem.unset('favourite').save();
+            collectionItem.set('favourite', false).save();
 
             // do whatever else needs to be done to remove from favourites and store positions
             // TODO: at the moment if you remove all items, the UL takes up space and that makes no sense!
