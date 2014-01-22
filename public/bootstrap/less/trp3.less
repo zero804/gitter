@@ -28,6 +28,10 @@
   .transition(300ms);
 }
 
+.transition100ms() {
+  .transition(100ms);
+}
+
 .transition500ms() {
   .transition(500ms);
 }
@@ -665,7 +669,38 @@ a.trpMiniLeftMenuItem {
 
 
 body.dragging .trpTroupeList {
+  
+}
+
+.list-favourites {
+  .transition300ms;
+}
+
+body.dragging .list-favourites {
   min-height: 25px;
+/*  padding: 20px 0;
+  .transition300ms;*/
+/*  -webkit-transition: all 100ms;*/
+/*  padding-top: 20px;
+  padding-bottom: 20px;*/
+  background-color: rgba(255,255,255,0.1);
+  border-top: 1px dashed rgba(255,255,255,0.2);
+  border-bottom: 1px dashed rgba(255,255,255,0.2);
+  padding: 5px 0;
+  .transition300ms;
+}
+
+body.dragging .list-favourites li:first-child {
+  padding-top: 27px;
+}
+
+body.dragging .list-favourites li:last-child {
+  padding-bottom: 27px;
+}
+
+body.dragging .list-favourites li.placeholder {
+  padding-top: 0px;
+  padding-bottom: 0px;
 }
 
 .trpTroupeList {
@@ -716,13 +751,6 @@ body.dragging, body.dragging * {
   cursor: move !important;
 }
 
-body.dragging .list-favourites {
-  background-color: rgba(255,255,255,0.1);
-  border-top: 1px dashed rgba(255,255,255,0.2);
-  border-bottom: 1px dashed rgba(255,255,255,0.2);
-}
-
-
 .dragged {
   position: absolute;
   opacity: 0.5;
@@ -743,7 +771,7 @@ ul li.placeholder {
   height: 25px;
   background-color: rgba(155,155,155,0.1);
   border-radius: 0 4px 4px 0;
-  border: 1px dashed rgba(255,255,255,0.2);
+  /*border: 1px dashed rgba(255,255,255,0.2);*/
   border-left: 0;
   color: white;
 }
@@ -973,14 +1001,23 @@ ul li.placeholder:before {
 .trpFramePanel {
   position: fixed;
   height: 100%;
-  width: 100%;
   top: 0;
-  left: 0;
+  left: @leftMarginFull;
+  right: 0;
   .transition500ms;
+
+  @media @mid {
+    left: @leftMarginMid;
+  }
+
+  @media @small {
+    left: @leftMarginSmall;
+  }
 
 &.leftCollapse {
   @media @small {
     left: @leftMarginFull;
+    right: -250px;
     transition-delay: 0;
   }
 }
@@ -1213,7 +1250,6 @@ i.favourited:hover:before {
 
 .trpChatPanel {
   display: block;
-	margin-left: @leftMarginFull;
 	margin-right: @rightMarginFull;
 /*	min-height: 600px;
 	height: 100%;*/
@@ -1223,33 +1259,22 @@ i.favourited:hover:before {
   height: 100%;
 
   @media @mid {
-    margin-left: @leftMarginMid;
     margin-right: @rightMarginMid;
   }
 
   @media @small {
-    margin-left: @leftMarginSmall;
     margin-right: @rightMarginSmall
   }
 }
 
 .trpHomePanel {
     display: block;
-    margin-left: @leftMarginFull;
   /*  min-height: 600px;
     height: 100%;*/
     text-align: left;
     text-align: center;
     .transition500ms;
     height: 100%;
-
-    @media @mid {
-      margin-left: @leftMarginMid;
-    }
-
-    @media @small {
-      margin-left: @leftMarginSmall;
-    }
 }
 
 .trpToolbar {
@@ -1682,18 +1707,15 @@ ul.roster {
 
   .trpHeaderArea {
     display: block;
-    margin-left: @leftMarginFull;
     margin-right: @rightMarginFull;
     .transition500ms;
 
     @media @mid {
-      margin-left: @leftMarginMid;
       margin-right: @rightMarginMid;
       padding-right: 12px;
     }
 
     @media @small {
-      margin-left: @leftMarginSmall;
       margin-right: @rightMarginSmall;
       padding-right: 0px;
     }
@@ -1830,18 +1852,15 @@ ul.roster {
   display: block;
   text-align: center;
   max-height: 160px;
-  margin-left: @leftMarginFull;
   margin-right: @rightMarginFull;
   .transition300ms;
 
   @media @mid {
-    margin-left: @leftMarginMid;
     margin-right: @rightMarginMid;
     padding-right: 12px;
   }
 
   @media @small {
-    margin-left: @leftMarginSmall;
     margin-right: @rightMarginSmall;
     padding-right: 0px;
   }
