@@ -79,6 +79,10 @@ define([
         group: 'mega-list',
         pullPlaceholder: false,
         drop: drop,
+        onDrag: function($item, position, _super) {
+          $(".placeholder").html($item.html());
+          $item.css(position);
+        },
         onDrop: function (item, container, _super) {
           var el = item[0];
           if (!cancelDrop) {
