@@ -11,6 +11,6 @@ ulimit -n 1000
 mkdir -p /usr/local/var/mongodb/r0
 mkdir -p /usr/local/var/mongodb/r1
 #mkdir -p /usr/local/var/mongodb/s
-mongod run -replSet troupeSet --journal --port 27017 --dbpath /usr/local/var/mongodb/r0 --rest &
-mongod run -replSet troupeSet --journal --port 27018 --dbpath /usr/local/var/mongodb/r1 --rest &
+mongod run -replSet troupeSet --journal --port 27017 --dbpath /usr/local/var/mongodb/r0 --rest --profile=1 --slowms=15 &
+mongod run -replSet troupeSet --journal --port 27018 --dbpath /usr/local/var/mongodb/r1 --rest --profile=1 --slowms=15 &
 #mongod run --journal --port 27017 --dbpath /usr/local/var/mongodb/s --rest &
