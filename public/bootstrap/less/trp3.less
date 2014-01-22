@@ -28,6 +28,10 @@
   .transition(300ms);
 }
 
+.transition100ms() {
+  .transition(100ms);
+}
+
 .transition500ms() {
   .transition(500ms);
 }
@@ -665,7 +669,34 @@ a.trpMiniLeftMenuItem {
 
 
 body.dragging .trpTroupeList {
+  
+}
+
+body.dragging .list-favourites {
   min-height: 25px;
+/*  padding: 20px 0;
+  .transition300ms;*/
+/*  -webkit-transition: all 100ms;*/
+/*  padding-top: 20px;
+  padding-bottom: 20px;*/
+  background-color: rgba(255,255,255,0.1);
+  border-top: 1px dashed rgba(255,255,255,0.2);
+  border-bottom: 1px dashed rgba(255,255,255,0.2);
+  padding: 5px 0;
+  .transition300ms;
+}
+
+body.dragging .list-favourites li:first-child {
+  padding-top: 20px;
+}
+
+body.dragging .list-favourites li:last-child {
+  padding-bottom: 20px;
+}
+
+body.dragging .list-favourites li.placeholder {
+  padding-top: 0px;
+  padding-bottom: 0px;
 }
 
 .trpTroupeList {
@@ -715,13 +746,6 @@ body.dragging .trpTroupeList {
 body.dragging, body.dragging * {
   cursor: move !important;
 }
-
-body.dragging .list-favourites {
-  background-color: rgba(255,255,255,0.1);
-  border-top: 1px dashed rgba(255,255,255,0.2);
-  border-bottom: 1px dashed rgba(255,255,255,0.2);
-}
-
 
 .dragged {
   position: absolute;
