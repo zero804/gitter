@@ -653,7 +653,7 @@ a.trpMiniLeftMenuItem {
     opacity: 1; 
     font-size: 11px;
     position: absolute;
-    right: 0;
+    right: 4px;
     top: 2px;
     background-color: inherit;
     color: rgba(100,100,100,0.4);
@@ -682,7 +682,7 @@ a.trpMiniLeftMenuItem {
   vertical-align: middle;
   display: inline-block;
   opacity: 0.8;
-  width: 100%;
+  width: 85%;
 }
 
 
@@ -1309,6 +1309,7 @@ i.favourited:hover:before {
   background-color: @trpBgColor;
   z-index: 400;
   .transition500ms;
+  margin-right: -2px;
 
   p {
     font-family: 'Open Sans';
@@ -2100,18 +2101,7 @@ ul.roster {
 
 .trpTroupeRelatedContent {
   @media @mid {
-    position: fixed;
-    right: 88px;
-    width: 0px;
-    top: 0;
-    bottom: 0;
-    background-color: @trpBgColor3;
-    .transition300ms;
-    padding-top: 10px;
-    margin: -10px 0;
-    -webkit-transform: translate3d(0, 0, 0);
-    border-left: 0px solid rgba(211, 223, 211, 0.6);
-    background-clip: padding-box;
+    display: none;
   }
   &.visible {
     @media @mid {
@@ -2137,6 +2127,7 @@ ul.roster {
   cursor: pointer;
   background-color: @trpBgColor;
   padding-bottom: 12px;
+  z-index: 200;
 }
 
 .trpActionsMenuLabel {
