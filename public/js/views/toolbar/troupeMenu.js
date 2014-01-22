@@ -65,7 +65,7 @@ define([
         collection: troupeCollections.recentRoomsNonFavourites,
         rerenderOnSort: true,
         draggable: true,
-        dropTarget: false,
+        dropTarget: true,
         roomsCollection: troupeCollections.troupes
       }));
 
