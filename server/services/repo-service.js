@@ -8,6 +8,7 @@ var persistence     = require("./persistence-service");
 var Q               = require('q');
 var lazy            = require('lazy.js');
 var moment          = require('moment');
+var winston         = require('winston');
 
 var SCORE_STARRED = 50;
 var SCORE_WATCHED = 100;
@@ -100,6 +101,8 @@ function findReposWithRooms(repoList) {
   var orTerms = lazy(repoList)
                   .map(function(r) { return { lcUri: r && r.toLowerCase(), githubType: 'REPO' }; })
                   .toArray();
+
+  winston.info("Querying reposWithRooms for " + orTerms.length + " repositories");
   var roomsPromise = orTerms.length ? persistence.Troupe.findQ({ $or: orTerms }, "uri") : Q.resolve([]);
   return roomsPromise;
 }
@@ -119,7 +122,7 @@ function suggestedReposForUser(user) {
 
   var ghRepo  = new GithubRepo(user);
   return Q.all([
-      ghRepo.getStarredRepos().then(map(SCORE_STARRED)),
+      // ghRepo.getStarredRepos().then(map(SCORE_STARRED)),
       ghRepo.getWatchedRepos().then(map(SCORE_WATCHED)),
       getReposForUser(user).then(map(SCORE_OWN))
     ])
