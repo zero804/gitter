@@ -36,23 +36,23 @@ define([
 
       $banner.html(template({
         unreadCount: unreadCount,
-        isPlural: unreadCount !== 1
+        isSingleUnread: unreadCount === 1
       }));
       if(unreadCount > 0) {
         // dont try and show the banner immediately
         setTimeout(function() {
-          if(unreadCount > 0) {
+          if(model.get('unreadCount') > 0) {
             $banner.show();
-            $banner.animate({height: 35, bottom: -35}, 500);
+            $banner.animate({height: 35, bottom: -35},{queue: false, duration: 500});
           }
         }, 500);
 
       } else {
-        $banner.animate({height: 0, bottom: 0}, 500, function() {
+        $banner.animate({height: 0, bottom: 0}, {queue: false, duration: 500, complete: function() {
           if(model.get('unreadCount') < 1) {
             $banner.hide();
           }
-        });
+        }});
 
       }
     },
