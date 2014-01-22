@@ -82,6 +82,16 @@ define([
         onDrag: function($item, position, _super) {
           $(".placeholder").html($item.html());
           $item.css(position);
+        },  
+        isValidTarget: function($item, container) {
+          if (container.el.parent().attr('id') == 'list-favs') {
+            $('.dragged').hide();
+            return true;
+          }
+          else {
+            $('.dragged').show();
+            return false;
+          }
         },
         onDrop: function (item, container, _super) {
           var el = item[0];
