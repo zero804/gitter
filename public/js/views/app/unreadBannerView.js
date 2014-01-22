@@ -39,8 +39,14 @@ define([
         isPlural: unreadCount !== 1
       }));
       if(unreadCount > 0) {
-        $banner.show();
-        $banner.animate({height: 35, bottom: -35}, 500);
+        // dont try and show the banner immediately
+        setTimeout(function() {
+          if(unreadCount > 0) {
+            $banner.show();
+            $banner.animate({height: 35, bottom: -35}, 500);
+          }
+        }, 500);
+
       } else {
         $banner.animate({height: 0, bottom: 0}, 500, function() {
           if(model.get('unreadCount') < 1) {
