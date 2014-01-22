@@ -626,7 +626,7 @@ a.trpMiniLeftMenuItem {
   }
 
   li:hover {
-    background-color: rgba(100,100,100,0.1);
+    background-color: rgba(230,230,230,1);
     color: black;
 
     .gtrActivityItemText .mention {
@@ -634,6 +634,9 @@ a.trpMiniLeftMenuItem {
       background-color: fade(@trpGrey,30%);
     }
 
+    .activity-time {
+      background-color: rgba(230,230,230,1);
+    }
   }
 
   .activity-detail {
@@ -647,9 +650,17 @@ a.trpMiniLeftMenuItem {
   }
 
   .activity-time {
-    opacity: 0.4; 
-    float: right; 
+    opacity: 1; 
     font-size: 11px;
+    position: absolute;
+    right: 0;
+    top: 2px;
+    background-color: inherit;
+    color: rgba(100,100,100,0.4);
+    padding-left: 5px;
+    background-color: @trpBgColor;
+    z-index: 100;
+
   }
 
 }
@@ -671,8 +682,7 @@ a.trpMiniLeftMenuItem {
   vertical-align: middle;
   display: inline-block;
   opacity: 0.8;
-  float: left;
-  width: 88%;
+  width: 100%;
 }
 
 
