@@ -8,31 +8,35 @@ define([], function() {
     return [new RegExp(':' + f + ':','g'), f];
   });
 
-  var emoticons = [
-    [/(^|\s):-*\)(\s|$)/g, 'blush'],
-    [/(^|\s):-*o(\s|$)/gi, 'scream'],
-    [/(^|\s)(:|;)-*](\s|$)/g, 'smirk'],
-    [/(^|\s)(:|;)-*d(\s|$)/gi, 'smiley'],
-    [/(^|\s)xd(\s|$)/gi, 'stuck_out_tongue_closed_eyes'],
-    [/(^|\s):-*p(\s|$)/gi, 'stuck_out_tongue_winking_eye'],
-    [/(^|\s):-*(\[|@)(\s|$)/g, 'rage'],
-    [/(^|\s):-*\((\s|$)/g, 'disappointed'],
-    [/(^|\s):('|’)-*\((\s|$)/g, 'sob'],
-    [/(^|\s):-*\*(\s|$)/g, 'kissing_heart'  ],
-    [/(^|\s);-*\)(\s|$)/g, 'wink'],
-    [/(^|\s):-*\/(\s|$)/g, 'pensive'],
-    [/(^|\s):-*s(\s|$)/gi, 'confounded'],
-    [/(^|\s):-*\|(\s|$)/g, 'flushed'],
-    [/(^|\s):-*\$(\s|$)/g, 'relaxed'],
-    [/(^|\s):-*x(\s|$)/gi, 'mask'],
-    [/(^|\s)<3(\s|$)/g, 'heart'],
-    [/(^|\s)<\/3(\s|$)/g, 'broken_heart'],
-    [/:\+1:/g, 'thumbsup'],
-    [/:\-1:/g, 'thumbsdown'],
-  ];
+  var emoticons = {
+    /* :-)  */ blush: /:-?\)/g,
+    /* :-o  */ scream: /:-?o/gi,
+    /* :-]  */ smirk: /[:;]-?]/g,
+    /* :-D  */ smiley: /[:;]-?d/gi,
+    /* X-D  */ stuck_out_tongue_closed_eyes: /x-?d/gi,
+    /* ;-p  */ stuck_out_tongue_winking_eye: /[:;]-?p/gi,
+    /* :-[  */ rage: /:-?[\[@](\[|@)/g,
+    /* :-(  */ disappointed: /:-?\(/g,
+    /* :'-( */ sob: /:['’]-?\(/g,
+    /* :-*  */ kissing_heart: /:-?\*/g,
+    /* ;-)  */ wink: /;-?\)/g,
+    /* :-/  */ pensive: /:-?\//g,
+    /* :-s  */ confounded: /:-?s/gi,
+    /* :-|  */ flushed: /:-?\|/g,
+    /* :-$  */ relaxed: /:-*\$/g,
+    /* :-x  */ mask: /:-*x/gi,
+    /* <3   */ heart: /<3/g,
+    /* </3  */ broken_heart: /<\/3/g,
+    /* :+1: */ thumbsup: /:\+1:/g,
+    /* :-1: */ thumbsdown: /:\-1:/g
+  };
+
+  var emoticonsProcessed = Object.keys(emoticons).map(function(key) {
+    return [emoticons[key], key];
+  });
 
   return {
-    regexps: [].concat(emoticons, namedSet),
+    regexps: emoticonsProcessed.concat(namedSet),
     named: namedEmoji
   };
 
