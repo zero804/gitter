@@ -30,18 +30,34 @@ define([
       this.listenTo(this.model, 'change', this.render);
     },
     render: function() {
-      var unreadCount = this.model.get('unreadCount');
+      var model = this.model;
+      var $banner = this.$el;
+      var unreadCount = model.get('unreadCount');
 
-      this.$el.html(template({
+      $banner.html(template({
         unreadCount: unreadCount,
-        isPlural: unreadCount > 1
+        isPlural: unreadCount !== 1
       }));
-      this.$el.toggleClass('hide', !unreadCount);
+      if(unreadCount > 0) {
+        $banner.show();
+        $banner.animate({height: 35, bottom: -35}, 500);
+      } else {
+        $banner.animate({height: 0, bottom: 0}, 500, function() {
+          if(model.get('unreadCount') < 1) {
+            $banner.hide();
+          }
+        });
+
+      }
     },
     scrollToFirstUnread: function() {
+      if(this.model.get('unreadCount') < 1) return;
+
       this.chatCollectionView.scrollToFirstUnread();
     },
     dismissAll: function() {
+      if(this.model.get('unreadCount') < 1) return;
+
       $.ajax({
         url: "/api/v1/troupes/" + context.getTroupeId() + "/unreadItems/all",
         contentType: "application/json",
