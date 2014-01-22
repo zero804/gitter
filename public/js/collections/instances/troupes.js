@@ -100,7 +100,7 @@ define([
     } else return c;
   };
 
-  recentRoomsNonFavourites.on('reset sync change:favourite change:lastAccessTime add remove filter-complete', function() {
+  recentRoomsNonFavourites.on('reset sync change:favourite change:lastAccessTime change:unreadItems add remove filter-complete', function() {
     recentRoomsNonFavourites.sort();
   });
 
