@@ -320,6 +320,7 @@ define([
     // pass in the textarea as el for ChatInputBoxView
     // pass in a scroll delegate
     initialize: function(options) {
+
       if(hasScrollBars()) {
         this.$el.addClass("scroller");
       }
@@ -327,7 +328,7 @@ define([
       var chatResizer = new ChatCollectionResizer({
         compactView: this.compactView,
         el: this.el,
-        editMode: this.options.editMode,
+        editMode: options.editMode,
         rollers: options.rollers
       });
 
