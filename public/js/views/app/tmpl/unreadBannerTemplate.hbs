@@ -1,16 +1,14 @@
-<div>
-  <button class="banner-main-button">
-    {{#if unreadCount}}
-      {{#if isSingleUnread}}
-        1 unread message
-      {{else}}
-        {{unreadCount}} unread messages
-      {{/if}}
+<button class="banner-main-button">
+  {{#if unreadCount}}
+    {{#if isSingleUnread}}
+      1 unread message
     {{else}}
-      no unread messages
+      {{unreadCount}} unread messages
     {{/if}}
-  </button>
-  {{#if showMarkAllButton}}
-    <button class="banner-side-button">mark read</button>
+  {{else}}
+    no unread messages
   {{/if}}
-</div>
+</button>
+{{#if showMarkAllButton}}
+  <button class="banner-side-button">mark read</button>
+{{/if}}
