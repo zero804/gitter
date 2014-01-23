@@ -21,7 +21,14 @@ define([
     model: TroupeModel,
     initialize: function() {
       this.listenTo(this, 'change:favourite', this.reorderFavs);
+      this.listenTo(this, 'change:lastAccessTime', this.resetActivity);
       this.url = "/api/v1/user/" + context.getUserId() + "/troupes";
+    },
+
+    resetActivity: function(model) {
+      if(model.get('lastAccessTime')) {
+        model.unset('activity');
+      }
     },
 
     reorderFavs: function(event) {

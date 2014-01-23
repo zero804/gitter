@@ -19,7 +19,7 @@ define([
     template: troupeListItemTemplate,
     modelEvents: {
       'change:unreadItems': 'render',
-      'change:activity': 'onActivity'
+      'change:activity change:unreadItems': 'onActivity'
     },
     events: {
       click: 'clicked', //WHY DOES THIS LOOK DIFFERENT TO NORMAL?
@@ -36,12 +36,25 @@ define([
       e.stopPropagation();
       this.model.destroy();
     },
+
     onActivity: function() {
+      var a = this.model.get('activity');
       var e = this.$el;
-      e.addClass('chatting chatting-now');
-      setTimeout(function() {
-        e.removeClass('chatting-now');
-      }, 250);
+      var i = this.model.get('unreadItems');
+
+      if(i) {
+        e.removeClass('chatting chatting-now');
+        return;
+      }
+
+      if(a) {
+        e.addClass('chatting chatting-now');
+        setTimeout(function() {
+          e.removeClass('chatting-now');
+        }, 250);
+      } else {
+        e.removeClass('chatting');
+      }
     },
     onRender: function() {
       this.el.dataset.id = this.model.id;
