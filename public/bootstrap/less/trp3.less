@@ -749,6 +749,12 @@ body.dragging .list-favourites li.placeholder {
     }
   }
 
+  @-webkit-keyframes pulse_animation {
+    0% { box-shadow: 0 0 0px #1bee82; color: #1bee82; }
+    50% { box-shadow: 0 0 8px #1bee82; color: @trpGreen; }
+    100% { box-shadow: 0 0 0px #1bee82; color: #1bee82;  }
+  }
+
   li.chatting {
     /*background-color: red;*/
   }
@@ -767,7 +773,10 @@ body.dragging .list-favourites li.placeholder {
   }
 
   li.chatting.chatting-now:after {
-    background-color: red;
+    -webkit-animation-name: 'pulse_animation';
+      -webkit-animation-duration: 800ms;
+      -webkit-animation-iteration-count: infinite;
+      -webkit-animation-timing-function: linear;
   }
 
   span {
