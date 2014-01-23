@@ -121,6 +121,10 @@ define([
 
     },
 
+    scrollToBottom: function() {
+      this.rollers.scrollToBottom();
+    },
+
     findChatToTrack: function() {
       if(this._findingNextUnread) return;
 

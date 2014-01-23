@@ -74,8 +74,14 @@ require([
     chatCollection: itemCollections.chats
   });
 
-  new UnreadBannerView({
+  new UnreadBannerView.Top({
     el: '#unread-banner',
+    model: unreadChatsModel,
+    chatCollectionView: chatCollectionView
+  }).render();
+
+  new UnreadBannerView.Bottom({
+    el: '#bottom-unread-banner',
     model: unreadChatsModel,
     chatCollectionView: chatCollectionView
   }).render();
