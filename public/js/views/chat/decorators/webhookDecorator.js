@@ -22,17 +22,20 @@ define([
 
   "use strict";
 
+  var serviceTemplates = {
+    bitbucket:  bitbucketTemplate,
+    jenkins:    jenkinsTemplate,
+    travis:     travisTemplate,
+    sprintly:   sprintlyTemplate,
+    trello:     trelloTemplate
+  };
+
   function selectServiceView(service) {
-    var serviceTemplates = {
-      bitbucket:  bitbucketTemplate,
-      jenkins:    jenkinsTemplate,
-      travis:     travisTemplate,
-      sprintly:   sprintlyTemplate,
-      trello:     trelloTemplate
-    };
+    var template = serviceTemplates[service];
+    if(!template) return null;
 
     var view = TroupeViews.Base.extend({
-      template: serviceTemplates[service]
+      template: template
     });
 
     return view;
@@ -95,17 +98,18 @@ define([
     viewData.favicon      = favicons[meta.service];
     viewData.human_action = human_actions[meta.event];
 
-    var klass;
+    var Klass;
     switch (meta.service) {
       case 'github':
-        klass = selectGithubView(meta.event);
+        Klass = selectGithubView(meta.event);
         break;
       default:
-        klass = selectServiceView(meta.service);
+        Klass = selectServiceView(meta.service);
         break;
     }
+    if(!Klass) return;
 
-    var webhookView = new klass();
+    var webhookView = new Klass();
 
     webhookView.data = viewData;
     chatItemView.$el.find('.trpChatText').html(webhookView.render().el);

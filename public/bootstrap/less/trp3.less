@@ -28,6 +28,10 @@
   .transition(300ms);
 }
 
+.transition100ms() {
+  .transition(100ms);
+}
+
 .transition500ms() {
   .transition(500ms);
 }
@@ -305,6 +309,34 @@ a:hover {
   }
 }
 
+.item-fav .github-ORG {
+  .prepend-fav-icon;
+  &:before {
+    font-size: 16px;
+  }
+}
+
+.item-fav .github-ONETOONE {
+  .prepend-fav-icon;
+  &:before {
+    font-size: 16px;
+  }
+}
+
+.item-fav .github-REPO {
+  .prepend-fav-icon;
+  &:before {
+    font-size: 16px;
+  }
+}
+
+.item-fav .github-ORG_CHANNEL {
+  .prepend-fav-icon;
+  &:before {
+    font-size: 16px;
+  }
+}
+
 .trpLeftMenuProfile {
   .trpBodyMedium;
   padding: 10px 0 10px 10px;
@@ -369,7 +401,7 @@ a:hover {
 
 .trpLeftMenuProfileName {
   display: inline-block;
-  vertical-align: top; 
+  vertical-align: top;
   padding-top: 4px;
   font-weight: 300;
   font-size: 16px;
@@ -451,8 +483,8 @@ a.trpMiniLeftMenuItem {
 }
 
 .item-unread-badge {
-  float: right; 
-  margin-right: 5px; 
+  float: right;
+  margin-right: 5px;
 }
 
 .trpMiniLeftMenuItem.unread:after {
@@ -594,7 +626,7 @@ a.trpMiniLeftMenuItem {
   }
 
   li:hover {
-    background-color: rgba(100,100,100,0.1);
+    background-color: rgba(230,230,230,1);
     color: black;
 
     .gtrActivityItemText .mention {
@@ -602,6 +634,9 @@ a.trpMiniLeftMenuItem {
       background-color: fade(@trpGrey,30%);
     }
 
+    .activity-time {
+      background-color: rgba(230,230,230,1);
+    }
   }
 
   .activity-detail {
@@ -612,6 +647,20 @@ a.trpMiniLeftMenuItem {
   .activity-commit {
     .activity-detail;
     margin-left: 2px;
+  }
+
+  .activity-time {
+    opacity: 1; 
+    font-size: 11px;
+    position: absolute;
+    right: 4px;
+    top: 2px;
+    background-color: inherit;
+    color: rgba(100,100,100,0.4);
+    padding-left: 5px;
+    background-color: @trpBgColor;
+    z-index: 100;
+
   }
 
 }
@@ -633,12 +682,46 @@ a.trpMiniLeftMenuItem {
   vertical-align: middle;
   display: inline-block;
   opacity: 0.8;
+  width: 85%;
 }
 
 
+body.dragging .trpTroupeList {
+  
+}
+
+.list-favourites {
+  .transition300ms;
+}
+
+body.dragging .list-favourites {
+  min-height: 25px;
+/*  padding: 20px 0;
+  .transition300ms;*/
+/*  -webkit-transition: all 100ms;*/
+/*  padding-top: 20px;
+  padding-bottom: 20px;*/
+  background-color: rgba(255,255,255,0.1);
+  border-top: 1px dashed rgba(255,255,255,0.2);
+  border-bottom: 1px dashed rgba(255,255,255,0.2);
+  padding: 5px 0;
+  .transition300ms;
+}
+
+body.dragging .list-favourites li:first-child {
+  padding-top: 27px;
+}
+
+body.dragging .list-favourites li:last-child {
+  padding-bottom: 27px;
+}
+
+body.dragging .list-favourites li.placeholder {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
 .trpTroupeList {
-  display: inline-block;
-	list-style-type: none;
 	margin: 0;
   width: 100%;
   box-sizing: border-box;
@@ -660,18 +743,16 @@ a.trpMiniLeftMenuItem {
     @media @mobile {
       background-color: transparent;
     }
-
   }
 
   span {
     display: inline-block;
     color: white;
     white-space: nowrap;
-    max-width: 220px;
+    max-width: 180px;
     overflow: hidden;
     text-overflow: ellipsis;
     vertical-align: middle;
-
   }
 
   span.disabled {
@@ -683,6 +764,82 @@ a.trpMiniLeftMenuItem {
 .trpTroupeListSearch {
 	padding-left: 8px;
 }
+
+body.dragging, body.dragging * {
+  cursor: move !important;
+}
+
+.dragged {
+  position: absolute;
+  opacity: 0.5;
+  z-index: 2000;
+  list-style: none;
+}
+
+li:hover.dragged {
+  background-color: transparent;
+}
+
+.dragged .item-close {
+  opacity: 0;
+}
+
+ul li.placeholder {
+  position: relative;
+  height: 25px;
+  background-color: rgba(155,155,155,0.1);
+  border-radius: 0 4px 4px 0;
+  /*border: 1px dashed rgba(255,255,255,0.2);*/
+  border-left: 0;
+  color: white;
+}
+
+ul li.placeholder:before {
+      position: absolute;
+      content: "";
+      width: 0;
+      height: 0;
+      margin-top: -5px;
+      left: -5px;
+      top: -4px;
+      border: 5px solid transparent;
+      border-left-color: red;
+      border-right: none;
+}
+
+.trpTroupeList li .item-close {
+  display: none;
+}
+
+.trpTroupeList li:hover .item-close {
+  display: inline-block;
+}
+
+.trpTroupeList li:hover .item-unread-badge {
+  display: none;
+}
+
+.item-close {
+  float: right;
+  opacity: 0.3;
+  margin-right: 6px;
+  .transition300ms;
+}
+
+.item-close:hover {
+  opacity: 0.8;
+}
+
+#list-search .trpLeftMenuItemClose {
+  display: none;
+}
+
+.trpLeftMenuItemClose:before {
+  font-family: 'troupe-icons';
+  content: '\e827';
+  font-size: 14px;
+}
+
 
 .trpNewPersonButton, .trpNewTroupeButton {
   border: 1px solid rgba(255,255,255,0.6);
@@ -731,11 +888,9 @@ a.trpMiniLeftMenuItem {
   font-size: 12px;
   position: fixed;
   left: -25px;
-  padding-top: 5px;
-  padding-right: 5px;
   top: 110px;
   width: 25px;
-  height: 30px;
+  line-height: 30px;
   z-index: 1000;
   border-radius: 0 2px 2px 0;
   background-color: #1dce73;
@@ -862,14 +1017,23 @@ a.trpMiniLeftMenuItem {
 .trpFramePanel {
   position: fixed;
   height: 100%;
-  width: 100%;
   top: 0;
-  left: 0;
+  left: @leftMarginFull;
+  right: 0;
   .transition500ms;
+
+  @media @mid {
+    left: @leftMarginMid;
+  }
+
+  @media @small {
+    left: @leftMarginSmall;
+  }
 
 &.leftCollapse {
   @media @small {
     left: @leftMarginFull;
+    right: -250px;
     transition-delay: 0;
   }
 }
@@ -881,7 +1045,7 @@ a.trpMiniLeftMenuItem {
   position: fixed;
 	background-color: white;
 	margin-left: 0px;
-/*  height is now specified in the html for as it renders better before the css is loaded*/  
+/*  height is now specified in the html for as it renders better before the css is loaded*/
 	width: 100%;
 	text-align: center;
 /*	padding-top: 40px;*/
@@ -1102,7 +1266,6 @@ i.favourited:hover:before {
 
 .trpChatPanel {
   display: block;
-	margin-left: @leftMarginFull;
 	margin-right: @rightMarginFull;
 /*	min-height: 600px;
 	height: 100%;*/
@@ -1112,33 +1275,22 @@ i.favourited:hover:before {
   height: 100%;
 
   @media @mid {
-    margin-left: @leftMarginMid;
     margin-right: @rightMarginMid;
   }
 
   @media @small {
-    margin-left: @leftMarginSmall;
     margin-right: @rightMarginSmall
   }
 }
 
 .trpHomePanel {
     display: block;
-    margin-left: @leftMarginFull;
   /*  min-height: 600px;
     height: 100%;*/
     text-align: left;
     text-align: center;
     .transition500ms;
     height: 100%;
-
-    @media @mid {
-      margin-left: @leftMarginMid;
-    }
-
-    @media @small {
-      margin-left: @leftMarginSmall;
-    }
 }
 
 .trpToolbar {
@@ -1157,6 +1309,7 @@ i.favourited:hover:before {
   background-color: @trpBgColor;
   z-index: 400;
   .transition500ms;
+  margin-right: -2px;
 
   p {
     font-family: 'Open Sans';
@@ -1269,9 +1422,17 @@ ul.roster {
   background-color: fade(@trpLightBlue, 20%);
   border-radius: 2px;
   padding: 0 4px;
+  margin-right: 8px;
   font-size: 11px;
   .transition300ms;
   margin-bottom: 12px;
+
+  @media @mid {
+    margin-left: -4px;
+    margin-right: -2px;
+    padding: 0 2px;
+  }
+
 }
 
 .trpMoreBadge:hover {
@@ -1447,6 +1608,7 @@ ul.roster {
   vertical-align: top;
   height: 100%;
   overflow: auto;
+  overflow-x: hidden;
 
   table, tr, td {
     border-spacing: 0;
@@ -1456,6 +1618,8 @@ ul.roster {
 
 
   @media @mid {
+
+    padding-left: 4px;
 
     .trpToolbarHeader.divider:first-child {
       border-bottom: 0;
@@ -1571,18 +1735,14 @@ ul.roster {
 
   .trpHeaderArea {
     display: block;
-    margin-left: @leftMarginFull;
     margin-right: @rightMarginFull;
     .transition500ms;
 
     @media @mid {
-      margin-left: @leftMarginMid;
       margin-right: @rightMarginMid;
-      padding-right: 12px;
     }
 
     @media @small {
-      margin-left: @leftMarginSmall;
       margin-right: @rightMarginSmall;
       padding-right: 0px;
     }
@@ -1719,18 +1879,15 @@ ul.roster {
   display: block;
   text-align: center;
   max-height: 160px;
-  margin-left: @leftMarginFull;
   margin-right: @rightMarginFull;
   .transition300ms;
 
   @media @mid {
-    margin-left: @leftMarginMid;
     margin-right: @rightMarginMid;
     padding-right: 12px;
   }
 
   @media @small {
-    margin-left: @leftMarginSmall;
     margin-right: @rightMarginSmall;
     padding-right: 0px;
   }
@@ -1755,7 +1912,7 @@ ul.roster {
     opacity: 0.9;
   }
 
-  .md-help:before { 
+  .md-help:before {
     font-family: 'troupe-icons';
     content: '\e82d';
     margin-right: 8px;
@@ -1944,18 +2101,7 @@ ul.roster {
 
 .trpTroupeRelatedContent {
   @media @mid {
-    position: fixed;
-    right: 88px;
-    width: 0px;
-    top: 0;
-    bottom: 0;
-    background-color: @trpBgColor3;
-    .transition300ms;
-    padding-top: 10px;
-    margin: -10px 0;
-    -webkit-transform: translate3d(0, 0, 0);
-    border-left: 0px solid rgba(211, 223, 211, 0.6);
-    background-clip: padding-box;
+    display: none;
   }
   &.visible {
     @media @mid {
@@ -1981,6 +2127,7 @@ ul.roster {
   cursor: pointer;
   background-color: @trpBgColor;
   padding-bottom: 12px;
+  z-index: 200;
 }
 
 .trpActionsMenuLabel {

@@ -6,6 +6,7 @@ var appEvents         = require("../app-events");
 var bayeux            = require('./bayeux');
 var ent               = require('ent');
 var presenceService   = require("../services/presence-service");
+var restSerializer    = require("../serializers/rest-serializer");
 
 exports.install = function() {
   var bayeuxClient = bayeux.client;
@@ -143,5 +144,6 @@ exports.install = function() {
     });
 
   });
+
 };
 

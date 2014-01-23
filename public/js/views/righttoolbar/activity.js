@@ -158,18 +158,19 @@ define([
       // log(JSON.stringify(payload));
 
       return {
-        meta:           meta,
-        payload:        payload,
-        commits_count:  commits_count,
-        branch_name:    branch_name,
-        repo:           repo,
-        trello_action:  trello_action,
-        sprintly_action: sprintly_action,
-        build_status:   build_status,
+        meta:             meta,
+        payload:          payload,
+        commits_count:    commits_count,
+        branch_name:      branch_name,
+        repo:             repo,
+        trello_action:    trello_action,
+        sprintly_action:  sprintly_action,
+        build_status:     build_status,
         multiple_commits: multiple_commits,
-        commit_text: commit_text,
-        wiki_url: wiki_url,
-        wiki_page: wiki_page,
+        commit_text:      commit_text,
+        wiki_url:         wiki_url,
+        wiki_page:        wiki_page,
+        sent:             this.model.get('sent')
       }
     }
   });

@@ -3,6 +3,8 @@
 
 var troupeService = require("../../services/troupe-service");
 var restSerializer = require("../../serializers/rest-serializer");
+var recentRoomService = require('../../services/recent-room-service');
+var Q = require('q');
 
 module.exports = {
   base: 'troupes',
@@ -34,6 +36,41 @@ module.exports = {
       res.send(serialized);
     });
   },
+
+  update: function(req, res, next) {
+    var troupe = req.userTroupe;
+    var updatedTroupe = req.body;
+    var userId = req.user.id;
+    var troupeId = troupe.id;
+    var promises = [];
+
+    if('favourite' in updatedTroupe) {
+      promises.push(recentRoomService.updateFavourite(userId, troupeId, updatedTroupe.favourite));
+    }
+
+    return Q.all(promises)
+      .then(function() {
+        var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
+
+        return restSerializer.serializeQ(troupeId, strategy);
+      })
+      .then(function(troupe) {
+        res.send(troupe);
+      })
+      .fail(next);
+  },
+
+  destroy: function(req, res, next) {
+    var troupe = req.userTroupe;
+    var userId = req.user.id;
+
+    return recentRoomService.removeRecentRoomForUser(userId, troupe.id)
+      .then(function() {
+        res.send({ success: true });
+      })
+      .fail(next);
+  },
+
 
   load: function(req, id, callback) {
     troupeService.findById(id, function(err, troupe) {

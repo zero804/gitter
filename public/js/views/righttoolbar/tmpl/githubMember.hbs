@@ -1,3 +1,7 @@
 <div class="github-member-add">
+  <div class="activity-time">{{widget "timeago" time=sent compact=true}}</div>
+
   <span class="gtrActivityItemText"><a href="https://github.com/{{payload.member.login}}" target="_blank"><span class='mention'>{{payload.member.login}}</span></a> {{payload.action}} as member</span>
+
+  <div style="clear: both;"></div>
 </div>
