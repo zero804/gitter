@@ -7,24 +7,20 @@ define([
   ], function($, backbone, context, template)  {
   "use strict";
 
-  var Top = backbone.View.extend({
-    events: {
-      'click .banner-main-button': 'scrollToFirstUnread',
-      'click .banner-side-button': 'dismissAll'
-    },
+  var BannerView = backbone.View.extend({
     initialize: function(options) {
       this.chatCollectionView = options.chatCollectionView;
-      this.listenTo(this.model, 'change:unreadAbove', this.render);
+      this.listenTo(this.model, 'change:'+this.unreadPropertyName, this.render);
     },
     render: function() {
       var model = this.model;
       var $banner = this.$el;
-      var unreadCount = model.get('unreadAbove');
+      var unreadCount = model.get(this.unreadPropertyName);
 
       $banner.html(template({
         unreadCount: unreadCount,
         isSingleUnread: unreadCount === 1,
-        showMarkAllButton: true
+        showMarkAllButton: this.showMarkAllButton
       }));
       if(unreadCount > 0) {
         $banner.parent().show();
@@ -34,11 +30,21 @@ define([
       } else {
         $banner.addClass('slide-away');
         setTimeout(function() {
-          if(model.get('unreadAbove') === 0) {
+          if(model.get(this.unreadPropertyName) === 0) {
             $banner.parent().hide();
           }
         }, 500);
       }
+    },
+
+  });
+
+  var Top = BannerView.extend({
+    unreadPropertyName: 'unreadAbove',
+    showMarkAllButton: true,
+    events: {
+      'click .banner-main-button': 'scrollToFirstUnread',
+      'click .banner-side-button': 'dismissAll'
     },
     scrollToFirstUnread: function() {
       if(this.model.get('unreadAbove') < 1) return;
@@ -56,29 +62,11 @@ define([
     }
   });
 
-  var Bottom = backbone.View.extend({
+  var Bottom = BannerView.extend({
+    unreadPropertyName: 'unreadBelow',
+    showMarkAllButton: false,
     events: {
       'click .banner-main-button': 'onMainButtonClick',
-    },
-    initialize: function(options) {
-      this.chatCollectionView = options.chatCollectionView;
-      this.listenTo(this.model, 'change:unreadBelow', this.render);
-    },
-    render: function() {
-      var model = this.model;
-      var $banner = this.$el;
-      var unreadCount = model.get('unreadBelow');
-
-      $banner.html(template({
-        unreadCount: unreadCount,
-        isSingleUnread: unreadCount === 1,
-        showMarkAllButton: false
-      }));
-      if(unreadCount > 0) {
-        $banner.removeClass('slide-away');
-      } else {
-        $banner.addClass('slide-away');
-      }
     },
     onMainButtonClick: function() {
       if(this.model.get('unreadBelow') < 1) return;
