@@ -67,42 +67,65 @@ define(['utils/emoji', 'utils/cdn'], function(emoji, cdn) {
       return false;
     }
 
+    function insertEmojicon(node, match, emojiName) {
+      var emojiImg = document.createElement('img');
+      emojiImg.setAttribute('title', ':' + emojiName + ':');
+      emojiImg.setAttribute('class', 'emoji');
+      emojiImg.setAttribute('src', cdn('images/2/gitter/emoji/' + emojiName + '.png'));
+      emojiImg.setAttribute('align', 'absmiddle');
+
+      node.splitText(match.index);
+      node.nextSibling.nodeValue = node.nextSibling.nodeValue.substr(match[0].length, node.nextSibling.nodeValue.length);
+      emojiImg.appendChild(node.splitText(match.index));
+      node.parentNode.insertBefore(emojiImg, node.nextSibling);
+    }
+
+    var namedEmojiRegExp = /\:(\w+)\:/g;
+
+    var namedMatchHash = emoji.named.reduce(function(memo, v) {
+      memo[v] = true;
+      return memo;
+    }, {});
+
+    function namedMatchValid(named) {
+      return namedMatchHash[named];
+    }
+
     return {
 
       // Main method
       run: function (el) {
-        emoji.regexps.forEach(function(r) {
+        // Search for named emoji
+        findText(el, namedEmojiRegExp, function (node, match) {
+          if(!namedMatchValid(match[1])) {
+            /* Don't match */
+            return match[0];
+          }
+
+          insertEmojicon(node, match, match[1]);
+        });
+
+        // Search for emoticons
+        emoji.emoticons.forEach(function(r) {
           findText(el, r[0], function (node, match) {
-            console.log('RC:', match.rightContext);
-            var emojiName = r[1];
-            var smily = r[2];
-            if(smily) {
-              if(!smileyValid(match)) {
-                /* Don't match */
-                return match[0];
-              }
+            if(!smileyValid(match)) {
+              /* Don't match */
+              return match[0];
             }
 
-            var emojiImg = document.createElement('img');
-            emojiImg.setAttribute('title', ':' + emojiName + ':');
-            emojiImg.setAttribute('class', 'emoji');
-            emojiImg.setAttribute('src', cdn('images/2/gitter/emoji/' + emojiName + '.png'));
-            emojiImg.setAttribute('align', 'absmiddle');
-
-            node.splitText(match.index);
-            node.nextSibling.nodeValue = node.nextSibling.nodeValue.substr(match[0].length, node.nextSibling.nodeValue.length);
-            emojiImg.appendChild(node.splitText(match.index));
-            node.parentNode.insertBefore(emojiImg, node.nextSibling);
+            insertEmojicon(node, match, r[1]);
           });
         });
+
+
       }
     };
   })();
 
   var decorator = {
-  decorate: function(chatItemView) {
-     emojify.run(chatItemView.$el.find('.trpChatText')[0]);
-  }
+    decorate: function(chatItemView) {
+       emojify.run(chatItemView.$el.find('.trpChatText')[0]);
+    }
   };
 
   return decorator;
