@@ -123,6 +123,7 @@ define([
     var troupeId = message.troupeId;
     var model = troupeCollection.get(troupeId);
     if(!model) return;
+    if(model.get('notify')) return;
     var a = model.get('activity');
     if(a) {
       model.set('activity', a + 1);

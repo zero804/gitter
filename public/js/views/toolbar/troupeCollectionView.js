@@ -40,12 +40,6 @@ define([
     onActivity: function() {
       var a = this.model.get('activity');
       var e = this.$el;
-      var i = this.model.get('unreadItems');
-
-      if(i) {
-        e.removeClass('chatting chatting-now');
-        return;
-      }
 
       if(a) {
         e.addClass('chatting chatting-now');
