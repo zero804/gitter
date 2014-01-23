@@ -799,17 +799,36 @@ function GitHubRepoStrategy(options) {
 
 }
 
+function NotifyTroupeForUserStrategy(options) {
+  var currentUserId = options.currentUserId;
+
+  this.preload = function(callback) {
+    callback();
+  };
+
+  this.map = function(troupeUsers) {
+    for(var i = 0; i < troupeUsers.length; i++) {
+      var troupeUser = troupeUsers[i];
+
+      if(troupeUser.userId == currentUserId) {
+        return troupeUser.notify === undefined ? true : !!troupeUser.notify;
+      }
+    }
+
+    return false;
+  };
+
+}
 
 function TroupeStrategy(options) {
   if(!options) options = {};
 
   var currentUserId = options.currentUserId;
 
-
   var unreadItemStategy = currentUserId ? new AllUnreadItemCountStategy(options) : null;
   var lastAccessTimeStategy = currentUserId ? new LastTroupeAccessTimesForUserStrategy(options) : null;
   var favouriteStrategy = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
-
+  var notifyStrategy = currentUserId ? new NotifyTroupeForUserStrategy(options) : null;
   var userIdStategy = new UserIdStrategy(options);
 
   this.preload = function(items, callback) {
@@ -912,6 +931,7 @@ function TroupeStrategy(options) {
       unreadItems: unreadItemStategy ? unreadItemStategy.map(item.id) : undefined,
       lastAccessTime: lastAccessTimeStategy ? lastAccessTimeStategy.map(item.id) : undefined,
       favourite: favouriteStrategy ? favouriteStrategy.map(item.id) : undefined,
+      notify: notifyStrategy ? item.oneToOne || notifyStrategy.map(item.users) : undefined,
       url: troupeUrl,
       githubType: item.githubType,
       v: getVersion(item)
