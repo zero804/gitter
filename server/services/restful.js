@@ -14,17 +14,6 @@ var recentRoomService   = require("./recent-room-service");
 var eventService        = require("./event-service");
 var Q                   = require('q');
 
-// USEFUL function for testing
-// function slow(cb) {
-//   return function(e,r) {
-//     setTimeout(function() {
-//       console.log('SENDING things BACK SLOWLY', r);
-//       cb(e,r);
-//     }, 3000);
-//   };
-// }
-
-
 exports.serializeTroupesForUser = function(userId, callback) {
     troupeService.findAllTroupesForUser(userId, function(err, troupes) {
       if (err) return callback(err);

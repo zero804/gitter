@@ -422,12 +422,32 @@ function rejectRequest(request, callback) {
     .nodeify(callback);
 }
 
+/**
+ * Find the userIds of all the troupe.
+ *
+ * Candidate for redis caching potentially?
+ */
 function findUserIdsForTroupe(troupeId, callback) {
   return persistence.Troupe.findByIdQ(troupeId, 'users')
     .then(function(troupe) {
       return troupe.users.map(function(m) { return m.userId; });
     })
     .nodeify(callback);
+}
+
+/**
+ * Return a hash of users and their notification settings
+ *
+ * Candidate for redis caching potentially?
+ */
+function findUserIdsForTroupeWithNotify(troupeId) {
+  return persistence.Troupe.findByIdQ(troupeId, 'users')
+    .then(function(troupe) {
+      return troupe.users.reduce(function(memo, v) {
+        memo[v.userId] = v.notify === undefined ? 1 : v.notify;
+        return memo;
+      }, {});
+    });
 }
 
 function updateTroupeName(troupeId, troupeName, callback) {
@@ -874,6 +894,7 @@ module.exports = {
 
   findAllUserIdsForTroupes: findAllUserIdsForTroupes,
   findAllUserIdsForTroupe: findAllUserIdsForTroupe,
+  findUserIdsForTroupeWithNotify: findUserIdsForTroupeWithNotify,
   findUserIdsForTroupe: findUserIdsForTroupe,
 
   validateTroupeUrisForUser: validateTroupeUrisForUser,

@@ -13,7 +13,6 @@ var shutdown      = require('../utils/shutdown');
 var Fiber         = require("../utils/fiber");
 var assert        = require("assert");
 
-
 // Install inc and dec number fields in mongoose
 require('mongoose-number')(mongoose);
 
@@ -104,32 +103,11 @@ UnconfirmedEmailSchema.schemaTypeName = 'UserEmailSchema';
 
 var UserSchema = new Schema({
   displayName: { type: String },
-  // email: { type: String },                     // The primary email address
   emails: [String],                            // Secondary email addresses
-  // unconfirmedEmails: [UnconfirmedEmailSchema], // Unconfirmed email addresses
   username: { type: String, required: true },
-  // newEmail: String,
   confirmationCode: {type: String },
-  // status: { type: String, "enum": ['UNCONFIRMED', 'PROFILE_NOT_COMPLETED', 'ACTIVE'], "default": 'UNCONFIRMED'},
-  // passwordHash: { type: String },
-  // passwordResetCode: String,
-  // avatarVersion: { type: Number, "default": 0 },
   gravatarImageUrl: { type: String },
   lastTroupe: ObjectId,
-  // location: {
-  //   timestamp: Date,
-  //   coordinate: {
-  //     lon: Number,
-  //     lat: Number
-  //   },
-  //   speed: Number,
-  //   altitude: Number,
-  //   named: {
-  //     place: String,
-  //     region: String,
-  //     countryCode: String
-  //   }
-  // },
   googleRefreshToken: String,
   githubToken: { type: String },
   githubUserToken: { type: String }, // The scope for this token will always be 'user'
@@ -138,9 +116,9 @@ var UserSchema = new Schema({
     createRoom: { type: Boolean, 'default': false }
   },
   githubScopes: {type: Schema.Types.Mixed },
-  // usernameSuggestion: { type: String },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
+
 // UserSchema.index({ email: 1 }, { unique: true });
 UserSchema.index({ githubId: 1 }, { unique: true, sparse: true });
 UserSchema.index({ username: 1 }, { unique: true /*, sparse: true */});
@@ -308,8 +286,12 @@ UserTroupeFavouritesSchema.schemaTypeName = 'UserTroupeFavourites';
 //
 var TroupeUserSchema = new Schema({
   userId: { type: ObjectId },
-  deactivated: { type: Boolean }
-  // In future: role
+  deactivated: { type: Boolean },
+  notify: { type: Number, 'default': 1 }
+  /** Notify settings
+    *  0: mentions only
+    *  1: track all unread messages
+    */
 });
 TroupeUserSchema.schemaTypeName = 'TroupeUserSchema';
 
