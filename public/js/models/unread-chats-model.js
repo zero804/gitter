@@ -8,7 +8,7 @@ define([
   function getNewUnreadMessageCount(chatCollection) {
     var messages = chatCollection.models;
     var count = 0;
-    while(messages[messages.length - (1+count)].get('unread')) {
+    while(count < messages.length && messages[messages.length - (1+count)].get('unread')) {
       count++;
     }
     return count;
