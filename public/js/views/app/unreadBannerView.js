@@ -13,16 +13,17 @@ define([
       this.listenTo(this.model, 'change:'+this.unreadPropertyName, this.render);
     },
     render: function() {
+      var self = this;
       var model = this.model;
       var $banner = this.$el;
       var unreadCount = model.get(this.unreadPropertyName);
 
-      $banner.html(template({
-        unreadCount: unreadCount,
-        isSingleUnread: unreadCount === 1,
-        showMarkAllButton: this.showMarkAllButton
-      }));
       if(unreadCount > 0) {
+        var message = (unreadCount > 1) ? unreadCount+' unread messages' : '1 unread message';
+        $banner.html(template({
+          message: message,
+          showMarkAllButton: this.showMarkAllButton
+        }));
         $banner.parent().show();
         setTimeout(function() {
           $banner.removeClass('slide-away');
@@ -30,7 +31,7 @@ define([
       } else {
         $banner.addClass('slide-away');
         setTimeout(function() {
-          if(model.get(this.unreadPropertyName) === 0) {
+          if(model.get(self.unreadPropertyName) === 0) {
             $banner.parent().hide();
           }
         }, 500);
