@@ -6,10 +6,8 @@ define([
   'views/base',
   'collections/instances/integrated-items',
   'hbs!./tmpl/troupeSettingsTemplate',
-  'log!troupe-settings-view',
-  'utils/validate-wrapper',
   'components/notifications'
-], function($, _, context, TroupeViews, itemCollections, troupeSettingsTemplate, log, validation, notifications) {
+], function($, _, context, TroupeViews, itemCollections, troupeSettingsTemplate, notifications) {
   "use strict";
 
 
@@ -23,21 +21,12 @@ define([
     initialize: function() {
       this.model = context.troupe();
       this.userCollection = itemCollections.users;
+      this.listenTo(this.model, 'change:notify', this.setNotifyValue);
+    },
 
-      $.ajax({
-        url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
-        type: "GET",
-        context: this,
-        success: function(settings) {
-          this.settings = settings && settings.push || "all";
-          this.$el.find("#notification-options").val(this.settings);
-          // this.trigger('settingsLoaded', settings);
-        },
-        error: function() {
-          log('An error occurred while communicating with notification settings');
-        }
-      });
-
+    setNotifyValue: function() {
+      var notify = this.model.get('notify');
+      this.$el.find("#notification-options").val(notify ? 'all' : 'mention');
     },
 
     closeSettings : function () {
@@ -46,46 +35,17 @@ define([
     },
 
     afterRender: function() {
-      this.validateForm();
-      if (this.settings) {
-        this.$el.find("#notification-options").val(this.settings);
-      }
+      this.setNotifyValue();
     },
 
     getRenderData: function() {
       return _.extend({},
         context.getTroupe(), {
+        notify: this.model.get('notify') ? 'all' : 'mention',
         notificationsBlocked: notifications.hasBeenDenied(),
         isNativeDesktopApp: context().isNativeDesktopApp,
         troupeUrl: '//' + window.location.host + window.location.pathname
       });
-    },
-
-    validateForm : function () {
-      var validateEl = this.$el.find('#troupeSettings');
-      validateEl.validate({
-        rules: {
-          name: validation.rules.troupeName()
-        },
-        messages: {
-          name: validation.messages.troupeName()
-        },
-        showErrors: function(errorMap) {
-          var errors = "";
-
-          _.each(_.keys(errorMap), function(key) {
-            var errorMessage = errorMap[key];
-            errors += errorMessage + "<br>";
-          });
-
-          $('#failure-text').html(errors);
-          if(errors) {
-            $('#request_validation').show();
-          } else {
-             $('#request_validation').hide();
-          }
-        }
-     });
     },
 
 
@@ -93,13 +53,14 @@ define([
       if(e) e.preventDefault();
 
       var self = this;
+      var notify = self.$el.find("#notification-options").val() == 'all';
 
       $.ajax({
-        url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
+        url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId(),
         contentType: "application/json",
         dataType: "json",
         type: "PUT",
-        data: JSON.stringify({ push: self.$el.find("#notification-options").val() }),
+        data: JSON.stringify({ notify: notify }),
         success: function() {
           self.dialog.hide();
           self.dialog = null;
