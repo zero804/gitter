@@ -73,8 +73,19 @@ define([
     return naturalComparator(a.get('name'), b.get('name'));
   };
 
-  favourites.on('reset sync change:favourite add remove', function() {
-    favourites.sort();
+  function inOrder(collection) {
+    var comparator = collection.comparator;
+    for(var i = 1; i < collection.length; i++) {
+      var a = collection.at(i - 1);
+      var b = collection.at(i);
+      if(comparator(a, b) > 0) return false;
+    }
+    return true;
+  }
+  favourites.on('reset sync change:favourite add remove filter-complete', function() {
+    if(!inOrder(favourites)) {
+      favourites.sort();
+    }
   });
 
   var recentRoomsNonFavourites = filterTroupeCollection(function(m) {
@@ -101,8 +112,10 @@ define([
     } else return c;
   };
 
-  recentRoomsNonFavourites.on('reset sync change:favourite change:lastAccessTime change:unreadItems add remove', function() {
-    recentRoomsNonFavourites.sort();
+  recentRoomsNonFavourites.on('reset sync change:favourite change:lastAccessTime change:unreadItems add remove  filter-complete', function() {
+    if(!inOrder(recentRoomsNonFavourites)) {
+      recentRoomsNonFavourites.sort();
+    }
   });
 
   // collection of troupes that are Repos

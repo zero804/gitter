@@ -296,25 +296,25 @@ function indexTroupesByUserIdTroupeId(troupes, userId) {
 
 
 function removeUserFromTroupe(troupeId, userId, callback) {
-  findById(troupeId, function(err, troupe) {
-    if(err) return callback(err);
-    if(!troupe) return callback('Troupe ' + troupeId + ' does not exist.');
+  return findById(troupeId)
+    .then(function(troupe) {
+      if(!troupe) throw 404;
 
-    // TODO: Add the user to a removeUsers collection
-    var deleteRecord = new persistence.TroupeRemovedUser({
-      userId: userId,
-      troupeId: troupeId
-    });
+      // TODO: Add the user to a removeUsers collection
+      var deleteRecord = new persistence.TroupeRemovedUser({
+        userId: userId,
+        troupeId: troupeId
+      });
 
-    deleteRecord.save(function(err) {
-      if(err) return callback(err);
+      return deleteRecord.saveQ()
+        .then(function() {
+          // TODO: Let the user know that they've been removed from the troupe (via email or something)
+          troupe.removeUserById(userId);
 
-      // TODO: Let the user know that they've been removed from the troupe (via email or something)
-      troupe.removeUserById(userId);
-
-      troupe.save(callback);
-    });
-  });
+          return troupe.saveQ();
+        });
+    })
+    .nodeify(callback);
 }
 
 
