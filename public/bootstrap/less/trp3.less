@@ -24,14 +24,14 @@
 
 @import "highlight.less";
 
-.banner() {
+.banner-wrapper {
   position: absolute;
-  // hidden by default
-  display: none;
-  height: 0;
 
   left: 0;
   right: 0;
+  bottom: -35px;
+  overflow: hidden;
+  height: 35px;
   z-index: -1;
 
   margin-left: @leftMarginFull + 45px;
@@ -50,18 +50,25 @@
 }
 
 .top-banner {
-  .banner;
-  bottom: 0;
+  .transition500ms();
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 35px;
+
   .banner-main-button {
     border-radius: 0 0 4px 4px;
   }
   .banner-side-button {
     border-radius: 0 0 4px 0;
   }
+  &.slide-away {
+    top: -35px;
+  }
 }
 
 .bottom-banner {
-  .banner;
   top: 0;
   .banner-main-button {
     border-radius: 4px 4px 0 0;
