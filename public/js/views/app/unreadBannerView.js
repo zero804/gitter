@@ -3,35 +3,9 @@ define([
   'jquery',
   'backbone',
   'utils/context',
-  'utils/appevents',
   'hbs!./tmpl/unreadBannerTemplate'
-  ], function($, backbone, context, appEvents, template)  {
+  ], function($, backbone, context, template)  {
   "use strict";
-
-  function getNewUnreadMessageCount(chatCollection) {
-    var messages = chatCollection.models;
-    var count = 0;
-    while(messages[messages.length - (1+count)].get('unread')) {
-      count++;
-    }
-    return count;
-  }
-
-  var UnreadModel = backbone.Model.extend({
-    defaults: {
-      unreadCount: 0,
-      unreadAbove: 0,
-      unreadBelow: 0
-    },
-    initialize: function(options) {
-      this.listenTo(appEvents, 'unreadItemsCount', function(count) {
-        var newMessageCount = getNewUnreadMessageCount(options.chatCollection);
-        this.set('unreadCount', count);
-        this.set('unreadBelow', newMessageCount);
-        this.set('unreadAbove', count - newMessageCount);
-      }, this);
-    }
-  });
 
   return backbone.View.extend({
     events: {
@@ -40,8 +14,6 @@ define([
     },
     initialize: function(options) {
       this.chatCollectionView = options.chatCollectionView;
-      var chatCollection = options.chatCollection;
-      this.model = new UnreadModel({chatCollection: chatCollection});
       this.listenTo(this.model, 'change', this.render);
     },
     render: function() {
