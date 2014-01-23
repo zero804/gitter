@@ -41,7 +41,7 @@ define([
       e.addClass('chatting chatting-now');
       setTimeout(function() {
         e.removeClass('chatting-now');
-      }, 250);
+      }, 2000);
     },
     onRender: function() {
       this.el.dataset.id = this.model.id;
