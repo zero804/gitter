@@ -18,7 +18,8 @@ define([
     tagName: 'li',
     template: troupeListItemTemplate,
     modelEvents: {
-      change: 'render',
+      'change:unreadItems': 'render',
+      'change:activity': 'onActivity'
     },
     events: {
       click: 'clicked', //WHY DOES THIS LOOK DIFFERENT TO NORMAL?
@@ -34,6 +35,13 @@ define([
       e.preventDefault();
       e.stopPropagation();
       this.model.destroy();
+    },
+    onActivity: function() {
+      var e = this.$el;
+      e.addClass('chatting chatting-now');
+      setTimeout(function() {
+        e.removeClass('chatting-now');
+      }, 250);
     },
     onRender: function() {
       this.el.dataset.id = this.model.id;
@@ -82,7 +90,7 @@ define([
         onDrag: function($item, position, _super) {
           $(".placeholder").html($item.html());
           $item.css(position);
-        },  
+        },
         isValidTarget: function($item, container) {
           if (container.el.parent().attr('id') == 'list-favs') {
             $('.dragged').hide();

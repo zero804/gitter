@@ -48,7 +48,6 @@ define([
       });
     },
 
-
     saveSettings: function(e) {
       if(e) e.preventDefault();
 

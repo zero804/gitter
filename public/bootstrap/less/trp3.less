@@ -650,7 +650,7 @@ a.trpMiniLeftMenuItem {
   }
 
   .activity-time {
-    opacity: 1; 
+    opacity: 1;
     font-size: 11px;
     position: absolute;
     right: 4px;
@@ -687,7 +687,7 @@ a.trpMiniLeftMenuItem {
 
 
 body.dragging .trpTroupeList {
-  
+
 }
 
 .list-favourites {
@@ -743,6 +743,31 @@ body.dragging .list-favourites li.placeholder {
     @media @mobile {
       background-color: transparent;
     }
+
+    &.chatting:after {
+      display: none;
+    }
+  }
+
+  li.chatting {
+    /*background-color: red;*/
+  }
+
+  li.chatting:after {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50em;
+    background-color: #1dce73;
+    position: relative;
+    top: 10px;
+    right: 10px;
+    content: ' ';
+    float: right
+  }
+
+  li.chatting.chatting-now:after {
+    background-color: red;
   }
 
   span {
