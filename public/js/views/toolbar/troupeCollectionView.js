@@ -43,9 +43,16 @@ define([
 
       if(a) {
         e.addClass('chatting chatting-now');
-        setTimeout(function() {
+
+        if(this.timeout) {
+          clearTimeout(this.timeout);
+        }
+
+        this.timeout = setTimeout(function() {
+          delete this.timeout;
           e.removeClass('chatting-now');
-        }, 2000);
+        }, 1600);
+
       } else {
         e.removeClass('chatting');
       }
