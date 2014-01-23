@@ -14,12 +14,12 @@ define([
     },
     initialize: function(options) {
       this.chatCollectionView = options.chatCollectionView;
-      this.listenTo(this.model, 'change', this.render);
+      this.listenTo(this.model, 'change:unreadAbove', this.render);
     },
     render: function() {
       var model = this.model;
       var $banner = this.$el;
-      var unreadCount = model.get('unreadCount');
+      var unreadCount = model.get('unreadAbove');
 
       $banner.html(template({
         unreadCount: unreadCount,
@@ -28,7 +28,7 @@ define([
       if(unreadCount > 0) {
         // dont try and show the banner immediately
         setTimeout(function() {
-          if(model.get('unreadCount') > 0) {
+          if(model.get('unreadAbove') > 0) {
             $banner.show();
             $banner.animate({height: 35, bottom: -35},{queue: false, duration: 500});
           }
@@ -36,7 +36,7 @@ define([
 
       } else {
         $banner.animate({height: 0, bottom: 0}, {queue: false, duration: 500, complete: function() {
-          if(model.get('unreadCount') < 1) {
+          if(model.get('unreadAbove') < 1) {
             $banner.hide();
           }
         }});
@@ -44,12 +44,12 @@ define([
       }
     },
     scrollToFirstUnread: function() {
-      if(this.model.get('unreadCount') < 1) return;
+      if(this.model.get('unreadAbove') < 1) return;
 
       this.chatCollectionView.scrollToFirstUnread();
     },
     dismissAll: function() {
-      if(this.model.get('unreadCount') < 1) return;
+      if(this.model.get('unreadAbove') < 1) return;
 
       $.ajax({
         url: "/api/v1/troupes/" + context.getTroupeId() + "/unreadItems/all",
@@ -65,12 +65,12 @@ define([
     },
     initialize: function(options) {
       this.chatCollectionView = options.chatCollectionView;
-      this.listenTo(this.model, 'change', this.render);
+      this.listenTo(this.model, 'change:unreadBelow', this.render);
     },
     render: function() {
       var model = this.model;
       var $banner = this.$el;
-      var unreadCount = model.get('unreadCount');
+      var unreadCount = model.get('unreadBelow');
 
       $banner.html(template({
         unreadCount: unreadCount,
@@ -79,7 +79,7 @@ define([
       if(unreadCount > 0) {
         // dont try and show the banner immediately
         setTimeout(function() {
-          if(model.get('unreadCount') > 0) {
+          if(model.get('unreadBelow') > 0) {
             $banner.show();
             $banner.animate({height: 35, top: -35},{queue: false, duration: 500});
           }
@@ -87,7 +87,7 @@ define([
 
       } else {
         $banner.animate({height: 0, bottom: 0}, {queue: false, duration: 500, complete: function() {
-          if(model.get('unreadCount') < 1) {
+          if(model.get('unreadBelow') < 1) {
             $banner.hide();
           }
         }});
@@ -95,7 +95,7 @@ define([
       }
     },
     onMainButtonClick: function() {
-      if(this.model.get('unreadCount') < 1) return;
+      if(this.model.get('unreadBelow') < 1) return;
 
       this.chatCollectionView.scrollToBottom();
     }
