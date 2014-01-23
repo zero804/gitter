@@ -48,6 +48,10 @@ module.exports = {
       promises.push(recentRoomService.updateFavourite(userId, troupeId, updatedTroupe.favourite));
     }
 
+    if('notify' in updatedTroupe) {
+      promises.push(troupeService.updateTroupeNotifyForUserId(userId, troupeId, !!updatedTroupe.notify));
+    }
+
     return Q.all(promises)
       .then(function() {
         var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });

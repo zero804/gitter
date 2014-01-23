@@ -710,6 +710,22 @@ function updateTopic(user, troupe, topic) {
     });
 }
 
+function updateTroupeNotifyForUserId(userId, troupeId, notify) {
+  return findById(troupeId)
+    .then(function(troupe) {
+      var troupeUser = troupe.users.filter(function(troupeUser) { return troupeUser.userId == userId; })[0];
+      if(troupeUser) {
+        troupeUser.notify = notify ? 1 : 0;
+      }
+
+      return troupe.saveQ();
+    })
+    .then(function() {
+      // TODO: in future get rid of this but this collection is used by the native clients
+      appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, notify: !!notify });
+    });
+}
+
 
 function findAllUserIdsForTroupes(troupeIds, callback) {
   if(!troupeIds.length) return callback(null, []);
@@ -910,6 +926,7 @@ module.exports = {
   addUserIdToTroupe: addUserIdToTroupe,
   findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe,
 
-  updateTopic: updateTopic
+  updateTopic: updateTopic,
+  updateTroupeNotifyForUserId: updateTroupeNotifyForUserId
 
 };
