@@ -23,7 +23,8 @@ define([
 
       $banner.html(template({
         unreadCount: unreadCount,
-        isSingleUnread: unreadCount === 1
+        isSingleUnread: unreadCount === 1,
+        showMarkAllButton: true
       }));
       if(unreadCount > 0) {
         // dont try and show the banner immediately
@@ -74,7 +75,8 @@ define([
 
       $banner.html(template({
         unreadCount: unreadCount,
-        isSingleUnread: unreadCount === 1
+        isSingleUnread: unreadCount === 1,
+        showMarkAllButton: false
       }));
       if(unreadCount > 0) {
         // dont try and show the banner immediately
