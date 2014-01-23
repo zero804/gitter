@@ -67,21 +67,9 @@ define([
         showMarkAllButton: false
       }));
       if(unreadCount > 0) {
-        // dont try and show the banner immediately
-        setTimeout(function() {
-          if(model.get('unreadBelow') > 0) {
-            $banner.show();
-            $banner.animate({height: 35, top: -35},{queue: false, duration: 500});
-          }
-        }, 500);
-
+        $banner.removeClass('slide-away');
       } else {
-        $banner.animate({height: 0, bottom: 0}, {queue: false, duration: 500, complete: function() {
-          if(model.get('unreadBelow') < 1) {
-            $banner.hide();
-          }
-        }});
-
+        $banner.addClass('slide-away');
       }
     },
     onMainButtonClick: function() {
