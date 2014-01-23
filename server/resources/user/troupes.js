@@ -68,7 +68,7 @@ module.exports = {
     var troupe = req.userTroupe;
     var userId = req.user.id;
 
-    return recentRoomService.removeRecentRoomForUser(userId, troupe.id)
+    return recentRoomService.removeRecentRoomForUser(userId, troupe)
       .then(function() {
         res.send({ success: true });
       })

@@ -63,7 +63,7 @@ define([
         var isFavourite = !context.troupe().get('favourite');
 
         $.ajax({
-          url: '/api/v1/troupes/' + context.getTroupeId(),
+          url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId(),
           contentType: "application/json",
           dataType: "json",
           type: "PUT",

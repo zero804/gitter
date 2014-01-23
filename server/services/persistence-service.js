@@ -327,12 +327,17 @@ TroupeSchema.methods.getUserIds = function() {
   return this.users.map(function(troupeUser) { return troupeUser.userId; });
 };
 
-TroupeSchema.methods.containsUserId = function(userId) {
+TroupeSchema.methods.findTroupeUser = function(userId) {
   var user = _.find(this.users, function(troupeUser) {
     return "" + troupeUser.userId == "" + userId;
   });
 
-  return !!user;
+  return user;
+};
+
+
+TroupeSchema.methods.containsUserId = function(userId) {
+  return !!this.findTroupeUser(userId);
 };
 
 TroupeSchema.methods.getOtherOneToOneUserId = function(knownUserId) {

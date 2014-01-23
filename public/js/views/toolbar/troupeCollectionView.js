@@ -18,11 +18,11 @@ define([
     tagName: 'li',
     template: troupeListItemTemplate,
     modelEvents: {
-      'change:unreadItems': 'render',
+      // 'change:unreadItems': 'render',
       'change:activity change:unreadItems': 'onActivity'
     },
     events: {
-      click: 'clicked', //WHY DOES THIS LOOK DIFFERENT TO NORMAL?
+      'click': 'clicked',
       'click .item-close': 'onItemClose'
     },
     serializeData: function() {
@@ -36,7 +36,21 @@ define([
       e.stopPropagation();
       this.model.destroy();
     },
+    onDomRefresh: function() {
+      var b = this.$el.find('.item-unread-badge');
+      var ui = this.model.get('unreadItems');
 
+      if(ui) {
+        b.find('span').text(ui);
+        b.show();
+      } else {
+        b.hide();
+      }
+
+       // manipulate the `el` here. it's already
+       // been rendered, and is full of the view's
+       // HTML, ready to go.
+     },
     onActivity: function() {
       var a = this.model.get('activity');
       var e = this.$el;
@@ -52,9 +66,8 @@ define([
           delete this.timeout;
           e.removeClass('chatting-now');
         }, 1600);
-
       } else {
-        e.removeClass('chatting');
+        e.removeClass('chatting chatting-now');
       }
     },
     onRender: function() {
@@ -82,9 +95,13 @@ define([
   });
 
   var CollectionView = Marionette.CollectionView.extend({
+    onItemRemoved: function(itemView){
+      console.log('ITEM VIEW REMOVED', itemView && itemView.model && itemView.model.get('name'), itemView.el, this.el);
+    },
     tagName: 'ul',
     className: 'trpTroupeList',
     itemView: TroupeItemView,
+
     initialize: function(options) {
       if(options.rerenderOnSort) {
         this.listenTo(this.collection, 'sort', this.render);
@@ -93,6 +110,9 @@ define([
         this.makeDraggable(options.dropTarget);
       }
       this.roomsCollection = options.roomsCollection;
+      this.listenTo(this, 'all', function() {
+        // console.log('EVENT', arguments);
+      });
     },
     makeDraggable: function(drop) {
       var cancelDrop = false;
@@ -152,15 +172,10 @@ define([
           }
         }
       });
-      // $("ul.list-recents").sortable({
-      //   group: 'mega-list',
-      //   pullPlaceholder: false,
-      //   drop: false,
-      // });
     },
   });
 
-  cocktail.mixin(CollectionView, TroupeViews.SortableMarionetteView);
+  // cocktail.mixin(CollectionView, TroupeViews.SortableMarionetteView);
 
   return CollectionView;
 
