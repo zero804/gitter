@@ -9,8 +9,9 @@ define([
   '../troupes',
   '../orgs',
   'components/unread-items-frame-client',
+  'utils/appevents',
   'filtered-collection' /* no ref */
-], function($, _, Backbone, context, base, realtime, troupeModels, orgModels, unreadItemsClient) {
+], function($, _, Backbone, context, base, realtime, troupeModels, orgModels, unreadItemsClient, appEvents) {
   'use strict';
 
   var orgsCollection = new orgModels.OrgCollection(null, { listen: true });
@@ -72,7 +73,7 @@ define([
     return naturalComparator(a.get('name'), b.get('name'));
   };
 
-  favourites.on('reset sync change:favourite add remove filter-complete', function() {
+  favourites.on('reset sync change:favourite add remove', function() {
     favourites.sort();
   });
 
@@ -100,7 +101,7 @@ define([
     } else return c;
   };
 
-  recentRoomsNonFavourites.on('reset sync change:favourite change:lastAccessTime change:unreadItems add remove filter-complete', function() {
+  recentRoomsNonFavourites.on('reset sync change:favourite change:lastAccessTime change:unreadItems add remove', function() {
     recentRoomsNonFavourites.sort();
   });
 
@@ -115,6 +116,18 @@ define([
       model.on('change', function(model) {
         context.troupe().set(model.changed);
       });
+    }
+  });
+
+  appEvents.on('activity', function(message) {
+    var troupeId = message.troupeId;
+    var model = troupeCollection.get(troupeId);
+    if(!model) return;
+    var a = model.get('activity');
+    if(a) {
+      model.set('activity', a + 1);
+    } else {
+      model.set('activity', 1);
     }
   });
 
