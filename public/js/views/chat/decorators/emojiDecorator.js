@@ -39,14 +39,50 @@ define(['utils/emoji', 'utils/cdn'], function(emoji, cdn) {
       }
     };
 
+    function isWhitespace(s) {
+      return s === ' ' || s === '\t' || s === '\r' || s === '\n' || s === '';
+    }
+
+    function smileyValid(match) {
+      var m = match[0];
+
+      /* Any smiley thats 3 chars long is probably a smiley */
+      if(m.length > 2) return true;
+
+      var index = match.index;
+      var input = match.input;
+
+      /* At the beginning? */
+      if(index === 0) return true;
+
+      /* At the end? */
+      if(input.length === m.length + index) return true;
+
+      /* Has a whitespace before? */
+      if(isWhitespace(input.charAt(index - 1))) return true;
+
+      /* Has a whitespace before? */
+      if(isWhitespace(input.charAt(m.length + index))) return true;
+
+      return false;
+    }
+
     return {
 
       // Main method
       run: function (el) {
-
         emoji.regexps.forEach(function(r) {
           findText(el, r[0], function (node, match) {
+            console.log('RC:', match.rightContext);
             var emojiName = r[1];
+            var smily = r[2];
+            if(smily) {
+              if(!smileyValid(match)) {
+                /* Don't match */
+                return match[0];
+              }
+            }
+
             var emojiImg = document.createElement('img');
             emojiImg.setAttribute('title', ':' + emojiName + ':');
             emojiImg.setAttribute('class', 'emoji');

@@ -10,17 +10,17 @@ define([], function() {
 
   var emoticons = {
     /* :-)  */ blush: /:-?\)/g,
-    /* :-o  */ scream: /:-?o/gi,
+    /* :-o  */ scream: /:-o/gi,
     /* :-]  */ smirk: /[:;]-?]/g,
     /* :-D  */ smiley: /[:;]-?d/gi,
-    /* X-D  */ stuck_out_tongue_closed_eyes: /x-?d/gi,
+    /* X-D  */ stuck_out_tongue_closed_eyes: /x-d/gi,
     /* ;-p  */ stuck_out_tongue_winking_eye: /[:;]-?p/gi,
     /* :-[  */ rage: /:-?[\[@](\[|@)/g,
     /* :-(  */ disappointed: /:-?\(/g,
     /* :'-( */ sob: /:['’]-?\(/g,
     /* :-*  */ kissing_heart: /:-?\*/g,
     /* ;-)  */ wink: /;-?\)/g,
-    /* :-/  */ pensive: /:-\//g,
+    /* :-/  */ pensive: /:-?\//g,
     /* :-s  */ confounded: /:-?s/gi,
     /* :-|  */ flushed: /:-?\|/g,
     /* :-$  */ relaxed: /:-?\$/g,
@@ -32,11 +32,11 @@ define([], function() {
   };
 
   var emoticonsProcessed = Object.keys(emoticons).map(function(key) {
-    return [emoticons[key], key];
+    return [emoticons[key], key, true];
   });
 
   return {
-    regexps: emoticonsProcessed.concat(namedSet),
+    regexps: namedSet.concat(emoticonsProcessed),
     named: namedEmoji
   };
 

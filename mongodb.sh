@@ -7,6 +7,8 @@
 # rs.initiate(config);
 
 # Remember to run ./scripts/init-mongo/init-mongo.sh the first time to init your replica set
+rm /usr/local/var/log/mongodb/mongo.log
+
 ulimit -n 1000
 mkdir -p /usr/local/var/mongodb/r0
 mkdir -p /usr/local/var/mongodb/r1
