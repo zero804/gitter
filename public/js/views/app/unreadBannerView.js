@@ -27,9 +27,17 @@ define([
         showMarkAllButton: true
       }));
       if(unreadCount > 0) {
-        $banner.removeClass('slide-away');
+        $banner.parent().show();
+        setTimeout(function() {
+          $banner.removeClass('slide-away');
+        }, 0);
       } else {
         $banner.addClass('slide-away');
+        setTimeout(function() {
+          if(model.get('unreadAbove') === 0) {
+            $banner.parent().hide();
+          }
+        }, 500);
       }
     },
     scrollToFirstUnread: function() {
