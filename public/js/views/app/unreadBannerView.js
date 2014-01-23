@@ -8,13 +8,27 @@ define([
   ], function($, backbone, context, appEvents, template)  {
   "use strict";
 
+  function getNewUnreadMessageCount(chatCollection) {
+    var messages = chatCollection.models;
+    var count = 0;
+    while(messages[messages.length - (1+count)].get('unread')) {
+      count++;
+    }
+    return count;
+  }
+
   var UnreadModel = backbone.Model.extend({
     defaults: {
-      unreadCount: 0
+      unreadCount: 0,
+      unreadAbove: 0,
+      unreadBelow: 0
     },
-    initialize: function() {
+    initialize: function(options) {
       this.listenTo(appEvents, 'unreadItemsCount', function(count) {
+        var newMessageCount = getNewUnreadMessageCount(options.chatCollection);
         this.set('unreadCount', count);
+        this.set('unreadBelow', newMessageCount);
+        this.set('unreadAbove', count - newMessageCount);
       }, this);
     }
   });
@@ -26,7 +40,8 @@ define([
     },
     initialize: function(options) {
       this.chatCollectionView = options.chatCollectionView;
-      this.model = new UnreadModel();
+      var chatCollection = options.chatCollection;
+      this.model = new UnreadModel({chatCollection: chatCollection});
       this.listenTo(this.model, 'change', this.render);
     },
     render: function() {

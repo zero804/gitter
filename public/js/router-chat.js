@@ -71,7 +71,7 @@ require([
 
   new UnreadBannerView({
     el: '#unread-banner',
-    collection: itemCollections.chats,
+    chatCollection: itemCollections.chats,
     chatCollectionView: chatCollectionView
   }).render();
 
