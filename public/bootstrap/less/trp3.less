@@ -24,11 +24,10 @@
 
 @import "highlight.less";
 
-.banner {
+.banner() {
   position: absolute;
   // hidden by default
   display: none;
-  bottom: 0;
   height: 0;
 
   left: 0;
@@ -50,6 +49,25 @@
   }
 }
 
+.top-banner {
+  .banner;
+  bottom: 0;
+  .banner-main-button {
+    border-radius: 0 0 4px 4px;
+  }
+  .banner-side-button {
+    border-radius: 0 0 4px 0;
+  }
+}
+
+.bottom-banner {
+  .banner;
+  top: 0;
+  .banner-main-button {
+    border-radius: 4px 4px 0 0;
+  }
+}
+
 .banner-button() {
   position: absolute;
   height: 100%;
@@ -67,7 +85,6 @@
   .banner-button();
   left: 0;
   width: 100%;
-  border-radius: 0 0 4px 4px;
   .trpBodyMedium;
   text-align: left;
 }
@@ -75,7 +92,6 @@
 .banner-side-button {
   .banner-button();
   right: 0;
-  border-radius: 0 0 4px 0;
   border-left-width: 2px;
   border-left-color: darken(@trpGreen, 5%);
   .trpBodySmall;
