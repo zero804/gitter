@@ -1,3 +1,7 @@
 <div class="build-{{build_status}}">
+  <div class="activity-time">{{widget "timeago" time=sent compact=true}}</div>
+
   <span class="gtrActivityItemText">Travis <a href="{{payload.compare_url}}" target="_blank">{{payload.repository.owner_name}}/{{payload.repository.name}}</a> <small>({{payload.branch}})</small> {{build_status}}</span>
+
+  <div style="clear: both;"></div>
 </div>
