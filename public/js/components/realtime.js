@@ -252,7 +252,6 @@ define([
     client.publish('/api/v1/ping', { });
   }
 
-
   return {
     getClientId: function() {
       return clientId;

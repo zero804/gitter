@@ -1,3 +1,7 @@
 <div class="github-issue-{{payload.action}}">
+  <div class="activity-time">{{widget "timeago" time=sent compact=true}}</div>
+
   <span class="gtrActivityItemText"><a href="https://github.com/{{payload.sender.login}}" target="_blank"><span class='mention'>{{payload.sender.login}}</span></a> {{payload.action}} <span class="issue {{payload.issue.state}}"><a href="{{payload.issue.html_url}}" target="_blank">#{{payload.issue.number}}</a></span></span>
+
+  <div style="clear: both;"></div>
 </div>

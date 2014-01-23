@@ -52,9 +52,8 @@ module.exports = {
     var userSettings = new Resource('settings', require('./user/troupe-settings'), app);
     userTroupeResource.add(userSettings);
 
-    installUserSubResource('emails',  'emails');
-    installUserSubResource('orgs',  'orgs');
-    installUserSubResource('repos',  'repos');
-
+    installUserSubResource('emails',      'emails');
+    installUserSubResource('orgs',        'orgs');
+    installUserSubResource('repos',       'repos');
   }
 };

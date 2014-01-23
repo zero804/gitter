@@ -6,11 +6,12 @@ var troupeService       = require("./troupe-service");
 var fileService         = require("./file-service");
 var restSerializer      = require("../serializers/rest-serializer");
 var winston             = require('winston');
-var unreadItemService   = require("../services/unread-item-service");
-var fileService         = require("../services/file-service");
-var chatService         = require("../services/chat-service");
-var conversationService = require("../services/conversation-service");
-var eventService        = require("../services/event-service");
+var unreadItemService   = require("./unread-item-service");
+var fileService         = require("./file-service");
+var chatService         = require("./chat-service");
+var conversationService = require("./conversation-service");
+var recentRoomService   = require("./recent-room-service");
+var eventService        = require("./event-service");
 var Q                   = require('q');
 
 // USEFUL function for testing
@@ -152,6 +153,17 @@ exports.serializeReadBysForChat = function(troupeId, chatId, callback) {
     });
 
   });
+
+};
+
+exports.serializeRecentRoomsForUser = function(userId, callback) {
+  return recentRoomService.generateRoomListForUser(userId)
+    .then(function(rooms) {
+      var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
+
+      return restSerializer.serializeQ(rooms, strategy);
+    })
+    .nodeify(callback);
 
 };
 

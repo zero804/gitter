@@ -13,9 +13,10 @@ define([
   'utils/scrollbar-detect',
   'collections/instances/integrated-items',
   'utils/emoji',
+  'components/drafty',
   'jquery-textcomplete', // No ref
 ], function(log, $, _, context, TroupeViews, appEvents, template, listItemTemplate,
-  emojiListItemTemplate, moment, hasScrollBars, itemCollections, emoji) {
+  emojiListItemTemplate, moment, hasScrollBars, itemCollections, emoji, drafty) {
   "use strict";
 
   /** @const */
@@ -40,7 +41,7 @@ define([
         var topicMatch = view.$el.val().match(/^\/topic (.+)/);
         if (topicMatch) {
           var topic = topicMatch[1];
-          view.$el.val('');
+          view.reset();
 
           context.troupe().set('topic', topic);
           $.ajax({
@@ -69,8 +70,7 @@ define([
           data: JSON.stringify({ favourite: isFavourite })
         });
 
-        view.$el.val('');
-
+        view.reset();
       }
     },
     {
@@ -82,9 +82,7 @@ define([
         var userMatch = view.$el.val().match(/\/query @(\w+)/);
         if (!userMatch) return;
         var user = userMatch[1];
-        // this doesn't entire fix the issue of the chat not clearing properly
-        $('#chatInputForm').trigger('reset');
-        view.$el.val('');
+        view.reset();
 
         var url = '/' + user;
         var type = user === context.user().get('username') ? 'home' : 'chat';
@@ -102,7 +100,7 @@ define([
         return !context.inOneToOneTroupeContext();
       },
       action: function(view) {
-        view.$el.val('');
+        view.reset();
 
         $.ajax({
           url: "/api/v1/troupes/" + context.getTroupeId() + "/users/" + context.getUserId(),
@@ -339,6 +337,7 @@ define([
         chatResizer.resizeInput();
       });
 
+      this.drafty = drafty(this.el);
       chatResizer.resetInput(true);
     },
 
@@ -377,8 +376,13 @@ define([
 
     send: function() {
       this.trigger('save', this.$el.val());
+      this.reset();
+    },
+
+    reset: function() {
       $('#chatInputForm').trigger('reset');
-      this.$el.val('');
+      this.el.value = '';
+      this.drafty.reset();
       this.chatResizer.resetInput();
     },
 

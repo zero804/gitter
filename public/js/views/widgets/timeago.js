@@ -6,12 +6,14 @@ define([
   /*jslint browser: true*/
   "use strict";
 
-  var maxDaysBeforeDateDisplay = 3;
+  var maxDaysBeforeDateDisplay = 1;
 
   return TroupeViews.Base.extend({
     tagName: 'span',
     initialize: function(options) {
       this.time = moment(options.time);
+      this.compact = options.compact;
+
       var self = this;
 
       function rerender() {
@@ -47,12 +49,14 @@ define([
     render: function(duration) {
       this.$el.find('[title]').tooltip('destroy');
       if(!duration) duration = moment.duration(Date.now() - this.time.valueOf());
+
       var v;
       if(duration.asDays() >= maxDaysBeforeDateDisplay) {
-        v = this.time.format("LL");
+        v = this.compact ? this.time.format("MMM DDD") : this.time.format("LL");
       } else {
-        v = duration.humanize() + " ago";
+        v = this.compact ? this.time.format("H:mm") : duration.humanize() + " ago";
       }
+
       var fullTime = this.time.format("LLL");
       this.$el.html("<span title='" + fullTime + "'>" + v + "</span>");
       if (!window._troupeCompactView) {

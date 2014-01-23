@@ -7,6 +7,7 @@ var troupeService     = require("../services/troupe-service");
 var fileService       = require("../services/file-service");
 var unreadItemService = require("../services/unread-item-service");
 var presenceService   = require("../services/presence-service");
+var recentRoomService = require('../services/recent-room-service');
 var Q                 = require("q");
 var _                 = require("underscore");
 var handlebars        = require('handlebars');
@@ -498,7 +499,7 @@ function LastTroupeAccessTimesForUserStrategy(options) {
   var userId = options.userId || options.currentUserId;
 
   this.preload = function(data, callback) {
-    userService.getTroupeLastAccessTimesForUser(userId, function(err, times) {
+    recentRoomService.getTroupeLastAccessTimesForUser(userId, function(err, times) {
       if(err) return callback(err);
       self.times = times;
       callback();
@@ -506,7 +507,8 @@ function LastTroupeAccessTimesForUserStrategy(options) {
   };
 
   this.map = function(id) {
-    return self.times[id] ? self.times[id] : undefined;
+    // No idea why, but sometimes these dates are converted to JSON as {}, hence the weirdness below
+    return self.times[id] ? new Date(self.times[id].valueOf()).toISOString() : undefined;
   };
 }
 
@@ -515,7 +517,7 @@ function FavouriteTroupesForUserStrategy(options) {
   var userId = options.userId || options.currentUserId;
 
   this.preload = function(data, callback) {
-    troupeService.findFavouriteTroupesForUser(userId, function(err, favs) {
+    recentRoomService.findFavouriteTroupesForUser(userId, function(err, favs) {
       if(err) return callback(err);
       self.favs = favs;
       callback();
@@ -523,7 +525,10 @@ function FavouriteTroupesForUserStrategy(options) {
   };
 
   this.map = function(id) {
-    return self.favs[id] ? true : undefined;
+    var favs = self.favs[id];
+    if(!favs) return undefined;
+    if(favs === '1') return 1000;
+    return favs;
   };
 }
 

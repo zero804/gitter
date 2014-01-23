@@ -324,6 +324,7 @@ module.exports = function( grunt ) {
       production: {
         options: {
           paths: ["public/bootstrap/less"],
+          compress: true,
           yuicompress: true
         },
         files: {
@@ -487,16 +488,6 @@ module.exports = function( grunt ) {
         },
         exports: 'jQuery'
       },
-      'jquery-sisyphus': {
-        files : {
-          'output/client-libs/sisyphus/jquery.sisyphus-amd.js': ['output/client-libs/sisyphus/sisyphus' + (min ? '.min' : '') + '.js']
-        },
-        modules: {
-          'jquery': 'jQuery'
-        },
-        exports: 'jQuery'
-      },
-
       'scrollfix': {
         files : {
           'output/client-libs/scrollfix/scrollfix-amd.js': ['output/client-libs/scrollfix/scrollfix.js']

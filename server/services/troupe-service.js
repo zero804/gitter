@@ -15,7 +15,11 @@ var ObjectID                 = require('mongodb').ObjectID;
 var _                        = require('underscore');
 var assert                   = require('assert');
 var statsService             = require("../services/stats-service");
-var permissionsModel          = require("./permissions-model");
+var permissionsModel         = require("./permissions-model");
+var lazy                     = require("lazy.js");
+
+/* const */
+var LEGACY_FAV_POSITION = 1000;
 
 function ensureExists(value) {
   if(!value) throw 404;
@@ -671,31 +675,6 @@ function createUniqueUri() {
   return uri;
 }
 
-function updateFavourite(userId, troupeId, isFavourite, callback) {
-  var setOp = {};
-  setOp['favs.' + troupeId] = '1';
-  var updateStatement;
-  var updateOptions;
-
-  if(isFavourite) {
-    updateStatement = { $set: setOp };
-    updateOptions = { upsert: true };
-  } else {
-    updateStatement = { $unset: setOp };
-    updateOptions = { };
-  }
-
-  return persistence.UserTroupeFavourites.updateQ(
-    { userId: userId },
-    updateStatement,
-    updateOptions)
-    .then(function() {
-      // Fire a realtime event
-      appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: isFavourite });
-    })
-    .nodeify(callback);
-}
-
 function updateTopic(user, troupe, topic) {
   /* First check whether the user has permission to work the topic */
   return permissionsModel(user, 'admin', troupe.uri, troupe.githubType)
@@ -711,15 +690,6 @@ function updateTopic(user, troupe, topic) {
     });
 }
 
-function findFavouriteTroupesForUser(userId, callback) {
-  return persistence.UserTroupeFavourites.findOneQ({ userId: userId})
-    .then(function(userTroupeFavourites) {
-      if(!userTroupeFavourites || !userTroupeFavourites.favs) return {};
-
-      return userTroupeFavourites.favs;
-    })
-    .nodeify(callback);
-}
 
 function findAllUserIdsForTroupes(troupeIds, callback) {
   if(!troupeIds.length) return callback(null, []);
@@ -798,68 +768,6 @@ function findAllImplicitContactUserIds(userId, callback) {
     return results
           .map(function(item) { return "" + item._id; })
           .filter(function(item) { return item != userId; });
-
-  }).nodeify(callback);
-
-}
-
-
-
-/**
- * Find the best troupe for a user to access
- * @return promise of a troupe or null
- */
-function findBestTroupeForUser(user, callback) {
-  //
-  // This code is invoked when a user's lastAccessedTroupe is no longer valid (for the user)
-  // or the user doesn't have a last accessed troupe. It looks for all the troupes that the user
-  // DOES have access to (by querying the troupes.users collection in mongo)
-  // If the user has a troupe, it takes them to the last one they accessed. If the user doesn't have
-  // any valid troupes, it returns an error.
-  //
-  var op;
-  if (user.lastTroupe) {
-     op = findById(user.lastTroupe)
-      .then(function(troupe) {
-
-        if(!troupe || troupe.status == 'DELETED' || !userHasAccessToTroupe(user, troupe)) {
-          return findLastAccessedTroupeForUser(user);
-        }
-
-        return troupe;
-      });
-
-  } else {
-    op = findLastAccessedTroupeForUser(user);
-  }
-
-  return op.nodeify(callback);
-}
-
-/**
- * Find the last troupe that a user accessed that the user still has access to
- * that hasn't been deleted
- * @return promise of a troupe (or null)
- */
-function findLastAccessedTroupeForUser(user, callback) {
-  return persistence.Troupe.findQ({ 'users.userId': user.id, 'status': 'ACTIVE' }).then(function(activeTroupes) {
-    if (!activeTroupes || activeTroupes.length === 0) return null;
-
-    return userService.getTroupeLastAccessTimesForUser(user.id).then(function(troupeAccessTimes) {
-      activeTroupes.forEach(function(troupe) {
-        troupe.lastAccessTime = troupeAccessTimes[troupe._id];
-      });
-
-      var troupes = _.sortBy(activeTroupes, function(t) {
-        return (t.lastAccessTime) ? t.lastAccessTime : 0;
-      }).reverse();
-
-      var troupe = _.find(troupes, function(troupe) {
-        return userHasAccessToTroupe(user, troupe);
-      });
-
-      return troupe;
-    });
 
   }).nodeify(callback);
 
@@ -975,9 +883,6 @@ module.exports = {
   createUniqueUri: createUniqueUri,
   deleteTroupe: deleteTroupe,
 
-  updateFavourite: updateFavourite,
-  findFavouriteTroupesForUser: findFavouriteTroupesForUser,
-  findBestTroupeForUser: findBestTroupeForUser,
   // createNewTroupeForExistingUser: createNewTroupeForExistingUser,
   indexTroupesByUserIdTroupeId: indexTroupesByUserIdTroupeId,
 
