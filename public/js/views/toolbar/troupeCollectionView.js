@@ -121,7 +121,8 @@ define([
         group: 'mega-list',
         pullPlaceholder: false,
         drop: drop,
-        onDrag: function($item, position, _super) {
+        distance: 8,
+        onDrag: function($item, position) {
           $(".placeholder").html($item.html());
           $item.css(position);
         },

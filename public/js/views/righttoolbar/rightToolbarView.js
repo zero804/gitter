@@ -11,12 +11,11 @@ define([
   'views/people/peopleCollectionView',
   'cocktail',
   'utils/uservoice',
-  'views/widgets/troupeAvatar',
   './repoInfo',
   './activity',
   'utils/scrollbar-detect'
 ], function($, Backbone, Marionette, TroupeViews, context, /*qq,*/ rightToolbarTemplate, itemCollections,
-  PeopleCollectionView, cocktail, userVoice, TroupeAvatar, repoInfo, activityStream, hasScrollBars) {
+  PeopleCollectionView, cocktail, userVoice, repoInfo, ActivityStream, hasScrollBars) {
   "use strict";
 
   var RightToolbarLayout = Marionette.Layout.extend({
@@ -25,7 +24,6 @@ define([
 
     regions: {
       people: "#people-roster",
-      troupeAvatar: "#troupe-avatar-region",
       repo_info: "#repo-info",
       activity: "#activity"
     },
@@ -79,18 +77,6 @@ define([
 
       userVoice.install(this.$el.find('#help-button'), context.getUser());
 
-      // File View
-      // this.files.show(new FileView({ collection: fileCollection }));
-
-      if (!context.inOneToOneTroupeContext()) {
-        this.troupeAvatar.show(new TroupeAvatar({
-          troupe: context.troupe(),
-          noHref: true,
-          noUnread: true,
-          tooltipPlacement: 'left'
-        }));
-      }
-
       // People View
       this.people.show(new PeopleCollectionView.ExpandableRosterView({
         rosterCollection: itemCollections.roster,
@@ -105,10 +91,10 @@ define([
       }
 
       // Activity
-      this.activity.show(new activityStream({collection: itemCollections.events}));
+      this.activity.show(new ActivityStream({ collection: itemCollections.events }));
 
       itemCollections.events.on('add reset sync', function() {
-        
+
         if (itemCollections.events.length >0) {
           this.$el.find('#activity-header').show();
           itemCollections.events.off('add reset sync', null, this);

@@ -2,14 +2,12 @@
 define([
   'views/base',
   './avatar',
-  './timeago',
-  './troupeAvatar'
-], function(TroupeViews, AvatarWidget, TimeAgoWidget, TroupeAvatarWidget) {
+  './timeago'
+], function(TroupeViews, AvatarWidget, TimeAgoWidget) {
   "use strict";
 
   TroupeViews.preloadWidgets({
     avatar: AvatarWidget,
-    timeago: TimeAgoWidget,
-    troupeAvatar: TroupeAvatarWidget
+    timeago: TimeAgoWidget
   });
 });

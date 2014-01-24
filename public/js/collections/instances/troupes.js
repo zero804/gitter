@@ -10,8 +10,9 @@ define([
   '../orgs',
   'components/unread-items-frame-client',
   'utils/appevents',
+  'backbone-sorted-collection',
   'filtered-collection' /* no ref */
-], function($, _, Backbone, context, base, realtime, troupeModels, orgModels, unreadItemsClient, appEvents) {
+], function($, _, Backbone, context, base, realtime, troupeModels, orgModels, unreadItemsClient, appEvents, Sorted) {
   'use strict';
 
   var orgsCollection = new orgModels.OrgCollection(null, { listen: true });
@@ -58,7 +59,8 @@ define([
   function filterTroupeCollection(filter) {
     var c = new Backbone.FilteredCollection(null, { model: troupeModels.TroupeModel, collection: troupeCollection });
     c.setFilter(filter);
-    return c;
+    var sorted = new Sorted(c);
+    return sorted;
   }
 
   // collection of favourited troupes
@@ -67,25 +69,10 @@ define([
   });
 
   /* Favs are sorted by favourite field in ASC order, with name as a secondary order */
-  favourites.comparator = function(a, b) {
+  favourites.setSort(function(a, b) {
     var c = naturalComparator(a.get('favourite'), b.get('favourite'));
     if(c !== 0) return c;
     return naturalComparator(a.get('name'), b.get('name'));
-  };
-
-  function inOrder(collection) {
-    var comparator = collection.comparator;
-    for(var i = 1; i < collection.length; i++) {
-      var a = collection.at(i - 1);
-      var b = collection.at(i);
-      if(comparator(a, b) > 0) return false;
-    }
-    return true;
-  }
-  favourites.on('reset sync change:favourite add remove filter-complete', function() {
-    if(!inOrder(favourites)) {
-      favourites.sort();
-    }
   });
 
   var recentRoomsNonFavourites = filterTroupeCollection(function(m) {
@@ -98,7 +85,7 @@ define([
    * Unread items first, sorted by name, alphabetically,
    * followed by order of most recent access
    */
-  recentRoomsNonFavourites.comparator = function(a, b) {
+  recentRoomsNonFavourites.setSort(function(a, b) {
     var c = existenceComparator(a.get('unreadItems'), b.get('unreadItems'));
     if(c === 0) {
       /** Both sides have unreadItems, compare by name */
@@ -110,18 +97,7 @@ define([
 
       return reverseNaturalComparator(aLastAccessTime && aLastAccessTime.valueOf(), bLastAccessTime && bLastAccessTime.valueOf());
     } else return c;
-  };
-
-  recentRoomsNonFavourites.on('reset sync change:favourite change:lastAccessTime change:unreadItems add remove  filter-complete', function() {
-    if(!inOrder(recentRoomsNonFavourites)) {
-      recentRoomsNonFavourites.sort();
-    }
   });
-
-  // collection of troupes that are Repos
-  // var repoTroupeCollection = filterTroupeCollection(function(m) {
-  //   return m.get('githubType') == "REPO";
-  // });
 
   // Sync up with the context
   troupeCollection.on("add", function(model) {
