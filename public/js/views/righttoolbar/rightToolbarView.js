@@ -1,7 +1,6 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
-  'backbone',
   'marionette',
   'views/base',
   'utils/context',
@@ -10,12 +9,11 @@ define([
   'collections/instances/integrated-items',
   'views/people/peopleCollectionView',
   'cocktail',
-  'utils/uservoice',
   './repoInfo',
   './activity',
   'utils/scrollbar-detect'
-], function($, Backbone, Marionette, TroupeViews, context, /*qq,*/ rightToolbarTemplate, itemCollections,
-  PeopleCollectionView, cocktail, userVoice, repoInfo, ActivityStream, hasScrollBars) {
+], function($, Marionette, TroupeViews, context, /*qq,*/ rightToolbarTemplate, itemCollections,
+  PeopleCollectionView, cocktail, repoInfo, ActivityStream, hasScrollBars) {
   "use strict";
 
   var RightToolbarLayout = Marionette.Layout.extend({
@@ -55,9 +53,10 @@ define([
       if (context().troupe.githubType === 'REPO') {
         isRepo = true;
       }
+
       return {
         isRepo : isRepo
-      }
+      };
     },
 
     onShow: function() {
@@ -75,7 +74,7 @@ define([
     onRender: function() {
       $('#toolbar-frame').show();
 
-      userVoice.install(this.$el.find('#help-button'), context.getUser());
+      // userVoice.install(this.$el.find('#help-button'), context.getUser());
 
       // People View
       this.people.show(new PeopleCollectionView.ExpandableRosterView({
