@@ -57,7 +57,7 @@ define([
 
       $.ajax({
         url: "/api/v1/troupes/" + context.getTroupeId() + "/unreadItems/all",
-        contentType: "application/json",
+        data: "",
         type: "DELETE",
       });
     }
