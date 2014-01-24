@@ -1877,7 +1877,6 @@ ul.roster {
 
 .banner-wrapper {
   position: absolute;
-
   left: 0;
   right: 0;
   bottom: -35px;
@@ -1885,112 +1884,76 @@ ul.roster {
   height: 35px;
   z-index: -1;
 
+  .transition500ms();
   margin-left: 45px;
   margin-right: @rightMarginFull + 45px;
-  .transition500ms();
-
   @media @mid {
     margin-left: 32px;
     margin-right: @rightMarginMid + 32px;
   }
-
   @media @small {
     margin-left: @leftMarginSmall + 42px;
     margin-right: @rightMarginSmall + 42px;
   }
+
+  .banner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 35px;
+
+    .transition500ms();
+    &.slide-away {
+      top: -35px;
+    }
+
+    button {
+      .trpButton;
+      position: absolute;
+      height: 100%;
+      padding: 4px 11px;
+      color: white;
+      background-color: fade(@trpGreen, 90%);
+      border-width: 0 0 0 0;
+
+      &:hover {
+        background-color: darken(@trpGreen, 5%);
+      }
+
+      &.main {
+        left: 0;
+        width: 100%;
+        .trpBodyMedium;
+        text-align: left;
+        border-radius: 0 0 4px 4px;
+      }
+
+      &.side {
+        right: 0;
+        .trpBodySmall;
+        border-left-width: 2px;
+        border-left-color: darken(@trpGreen, 5%);
+        border-radius: 0 0 4px 0;
+      }
+    }
+  }
 }
 
-.bottom-banner-wrapper {
-  position: absolute;
-
-  left: 0;
-  right: 0;
+.banner-wrapper.bottom {
+  bottom: auto;
   top: -35px;
-  overflow: hidden;
-  height: 35px;
-  z-index: -1;
-
-  margin-left: 45px;
-  margin-right: @rightMarginFull + 45px;
-  .transition500ms();
-
-  @media @mid {
-    margin-left: 32px;
-    margin-right: @rightMarginMid + 32px;
+  .banner {
+    top: auto;
+    bottom: 0;
+    &.slide-away {
+      top: auto;
+      bottom: -35px;
+    }
+    button.main {
+      border-radius: 4px 4px 0 0;
+    }
   }
-
-  @media @small {
-    margin-left: @leftMarginSmall + 42px;
-    margin-right: @rightMarginSmall + 42px;
-  }
-}
-
-.top-banner {
-  .transition500ms();
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 35px;
-
-  .banner-main-button {
-    border-radius: 0 0 4px 4px;
-  }
-  .banner-side-button {
-    border-radius: 0 0 4px 0;
-  }
-  &.slide-away {
-    top: -35px;
-  }
-}
-
-.bottom-banner {
-  .transition500ms();
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 35px;
-
-  .banner-main-button {
-    border-radius: 4px 4px 0 0;
-  }
-  .banner-side-button {
-    border-radius: 0 0 4px 0;
-  }
-  &.slide-away {
-    bottom: -35px;
-  }
-}
-
-.banner-button() {
-  .trpButton;
-  position: absolute;
-  height: 100%;
-  padding: 4px 11px;
-  color: white;
-  background-color: fade(@trpGreen, 90%);
-  border-width: 0 0 0 0;
-
-  &:hover {
-    background-color: darken(@trpGreen, 5%);
-  }
-}
-
-.banner-main-button {
-  .banner-button();
-  left: 0;
-  width: 100%;
-  .trpBodyMedium;
-  text-align: left;
-}
-
-.banner-side-button {
-  .banner-button();
-  right: 0;
-  border-left-width: 2px;
-  border-left-color: darken(@trpGreen, 5%);
-  .trpBodySmall;
 }
 
 .trpChatInputArea {
