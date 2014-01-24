@@ -36,7 +36,7 @@ define([
           }
         }, 500);
       }
-    },
+    }
 
   });
 
@@ -68,6 +68,31 @@ define([
     showMarkAllButton: false,
     events: {
       'click .banner-main-button': 'onMainButtonClick',
+    },
+    render: function() {
+      var self = this;
+      var model = this.model;
+      var $banner = this.$el;
+      var unreadCount = model.get(this.unreadPropertyName);
+
+      if(unreadCount > 0 && !this.chatCollectionView.isScrolledToBottom()) {
+        var message = (unreadCount > 1) ? unreadCount+' unread messages' : '1 unread message';
+        $banner.html(template({
+          message: message,
+          showMarkAllButton: this.showMarkAllButton
+        }));
+        $banner.parent().show();
+        setTimeout(function() {
+          $banner.removeClass('slide-away');
+        }, 0);
+      } else {
+        $banner.addClass('slide-away');
+        setTimeout(function() {
+          if(model.get(self.unreadPropertyName) === 0) {
+            $banner.parent().hide();
+          }
+        }, 500);
+      }
     },
     onMainButtonClick: function() {
       if(this.model.get('unreadBelow') < 1) return;
