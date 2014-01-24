@@ -176,7 +176,7 @@ define([
     },
   });
 
-  // cocktail.mixin(CollectionView, TroupeViews.SortableMarionetteView);
+  cocktail.mixin(CollectionView, TroupeViews.SortableMarionetteView);
 
   return CollectionView;
 
