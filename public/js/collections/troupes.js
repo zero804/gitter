@@ -66,12 +66,13 @@ define([
       }
 
       var self = this;
-      forUpdate.forEach(function(r) {
+      for(var j = forUpdate.length - 1; j >= 0; j--) {
+        var r = forUpdate[j];
         var id = r.id;
         var value = r.favourite;
         var t = self.get(id);
-        t.set('favourite', value);
-      });
+        t.set('favourite', value, { silent: true });
+      }
 
       delete this.reordering;
     }
