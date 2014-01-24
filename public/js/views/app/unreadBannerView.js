@@ -44,8 +44,8 @@ define([
     unreadPropertyName: 'unreadAbove',
     showMarkAllButton: true,
     events: {
-      'click .banner-main-button': 'scrollToFirstUnread',
-      'click .banner-side-button': 'dismissAll'
+      'click button.main': 'scrollToFirstUnread',
+      'click button.side': 'dismissAll'
     },
     scrollToFirstUnread: function() {
       if(this.model.get('unreadAbove') < 1) return;
@@ -67,7 +67,7 @@ define([
     unreadPropertyName: 'unreadBelow',
     showMarkAllButton: false,
     events: {
-      'click .banner-main-button': 'onMainButtonClick',
+      'click button.main': 'onMainButtonClick',
     },
     render: function() {
       var self = this;
