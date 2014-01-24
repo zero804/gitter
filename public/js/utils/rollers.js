@@ -58,10 +58,8 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
 
     /* Specify an element that should not be scrolled past */
     trackUntil: function(element) {
-      if(this._mode != STABLE) {
-        this._nopass = element;
-        this._mode = TRACK_NO_PASS;
-      }
+      this._nopass = element;
+      this._mode = TRACK_NO_PASS;
     },
 
     cancelTrackUntil: function() {
