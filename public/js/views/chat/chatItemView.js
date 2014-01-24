@@ -1,4 +1,4 @@
-/* jshint unused:true, browser:true,  strict:true */
+/* jshint unused:strict, browser:true,  strict:true */
 /* global define:false */
 define([
   'jquery',

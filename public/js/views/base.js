@@ -723,11 +723,9 @@ define([
 
   /* This is a mixin for Marionette.CollectionView */
   TroupeViews.SortableMarionetteView = {
-
     initialize: function() {
-      this.isRendering = false;
-      this.on('before:render', this.onBeforeRenderSort, this);
-      this.on('render', this.onRenderSort, this);
+      this.listenTo(this, 'before:render', this.onBeforeRenderSort);
+      this.listenTo(this, 'render', this.onRenderSort);
     },
 
     onBeforeRenderSort: function() {
@@ -735,7 +733,7 @@ define([
     },
 
     onRenderSort: function() {
-      this.isRendering = false;
+      delete this.isRendering;
     },
 
     appendHtml: function(collectionView, itemView, index) {
