@@ -351,7 +351,7 @@ TroupeSchema.methods.getOtherOneToOneUserId = function(knownUserId) {
   return troupeUser && troupeUser.userId;
 };
 
-TroupeSchema.methods.addUserById = function(userId) {
+TroupeSchema.methods.addUserById = function(userId, options) {
   assert(!this.oneToOne);
 
   var exists = this.users.some(function(user) { return user.userId == userId; });
@@ -359,16 +359,24 @@ TroupeSchema.methods.addUserById = function(userId) {
     throw new Error("User already exists in this troupe.");
   }
 
+  var raw = { userId: userId };
+  if('notify' in options) {
+    raw.notify = options.notify;
+  }
+
   // TODO: disable this methods for one-to-one troupes
-  var troupeUser = new TroupeUser({ userId: userId });
+  var troupeUser = new TroupeUser(raw);
+
   this.post('save', function(postNext) {
     var f = new Fiber();
 
-    var url = "/api/v1/troupes/" + this.id + "/users";
-    serializeEvent(url, "create", troupeUser, postNext);
+    var url = "/troupes/" + this.id + "/users";
+    serializeEvent(url, "create", troupeUser, f.waitor());
 
-    var userUrl = "/api/v1/user/" + userId + "/troupes";
+    var userUrl = "/user/" + userId + "/troupes";
     serializeEvent(userUrl, "create", this, f.waitor());
+
+
 
     f.all().then(function() { postNext(); }).fail(function(err) { postNext(err); });
   });
