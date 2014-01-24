@@ -52,6 +52,8 @@ define([
        // HTML, ready to go.
      },
     onActivity: function() {
+      if(this.model.id === context.getTroupeId()) return;
+
       var a = this.model.get('activity');
       var e = this.$el;
 
