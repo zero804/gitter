@@ -168,7 +168,6 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
  * Makes the troupe reflect the users access to a room
  */
 function ensureAccessControl(user, troupe, access) {
-
   if(troupe) {
     if(access) {
       /* In troupe? */
