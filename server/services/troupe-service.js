@@ -435,18 +435,35 @@ function findUserIdsForTroupe(troupeId, callback) {
     .nodeify(callback);
 }
 
-/**
- * Return a hash of users and their notification settings
- *
- * Candidate for redis caching potentially?
- */
+function mapNotifySettingsForTroupe(troupe) {
+  return troupe.users.reduce(function(memo, v) {
+    memo[v.userId] = v.notify === undefined ? 1 : v.notify;
+    return memo;
+  }, {});
+}
+
+
 function findUserIdsForTroupeWithNotify(troupeId) {
   return persistence.Troupe.findByIdQ(troupeId, 'users')
     .then(function(troupe) {
-      return troupe.users.reduce(function(memo, v) {
-        memo[v.userId] = v.notify === undefined ? 1 : v.notify;
-        return memo;
-      }, {});
+      return mapNotifySettingsForTroupe(troupe);
+    });
+}
+
+/**
+ * Return a hash of a hash of users and their notification settings
+ *
+ * Candidate for redis caching potentially?
+ */
+function findUserIdsForTroupesWithNotify(troupeIds) {
+  return findByIds(troupeIds)
+    .then(function(troupes) {
+      return troupes
+              .reduce(function(memo, troupe) {
+                var troupeUsersMapped = mapNotifySettingsForTroupe(troupe);
+                memo[troupe.id] = troupeUsersMapped;
+                return memo;
+              }, {});
     });
 }
 
@@ -563,22 +580,6 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
 
       });
 
-}
-
-
-/**
- * Find an unused invite from fromUserId to toUserId for toUserId to connect with fromUserId
- * @param  {[type]} fromUserId
- * @param  {[type]} toUserId
- * @return {[type]} promise with invite
- */
-function findUnusedOneToOneInviteFromUserIdToUserId(fromUserId, toUserId) {
-  return persistence.Invite.findOneQ({
-      troupeId: null, // This indicates that it's a one-to-one invite
-      fromUserId: fromUserId,
-      userId: toUserId,
-      status: 'UNUSED'
-    });
 }
 
 /**
@@ -911,6 +912,7 @@ module.exports = {
   findAllUserIdsForTroupes: findAllUserIdsForTroupes,
   findAllUserIdsForTroupe: findAllUserIdsForTroupe,
   findUserIdsForTroupeWithNotify: findUserIdsForTroupeWithNotify,
+  findUserIdsForTroupesWithNotify: findUserIdsForTroupesWithNotify,
   findUserIdsForTroupe: findUserIdsForTroupe,
 
   validateTroupeUrisForUser: validateTroupeUrisForUser,

@@ -4,11 +4,12 @@
 var winston                   = require('winston');
 var Q                         = require('q');
 var handlebars                = require('handlebars');
-var userTroupeSettingsService = require('../user-troupe-settings-service');
 var userService               = require('../user-service');
 var appEvents                 = require('../../app-events');
 var serializer                = require('../../serializers/notification-serializer');
 var collections               = require('../../utils/collections');
+var lazy                      = require('lazy.js');
+var troupeService             = require('../troupe-service');
 
 function compile(map) {
   for(var k in map) {
@@ -183,19 +184,33 @@ function generateNotificationMessages(notificationsItems, callback) {
 function findMentionOnlyUserIds(notifications, notificationSettings) {
   return notifications.filter(function(n) {
 
-    var ns = notificationSettings[n.userId + ':' + n.troupeId];
-    var notificationSetting = ns && ns.push;
-
-    return notificationSetting === 'mention';
+    return notificationSettings[n.userId + ':' + n.troupeId] === 0;
   }).map(function(n) { return n.userId; });
+}
+
+function findNotificationUsers(userTroupes, callback) {
+  var troupeIds = lazy(userTroupes).pluck('troupeId').uniq().toArray();
+
+  return troupeService.findUserIdsForTroupesWithNotify(troupeIds)
+    .then(function(troupesWithNotify) {
+
+      return lazy(userTroupes)
+              .map(function(n) {
+                var troupeWithNotify = troupesWithNotify[n.troupeId];
+                if(!troupeWithNotify) return;
+                return [n.userId + ':' + n.troupeId, troupeWithNotify[n.userId]];
+              })
+              .without(undefined)
+              .toObject();
+    })
+    .nodeify(callback);
 }
 
 // Takes an array of notification items, which looks like
 // [{ userId / itemType / itemId / troupeId }]
 exports.sendOnlineNotifications = function(notifications, callback) {
-  userTroupeSettingsService.getMultiUserTroupeSettings(notifications, 'notifications')
+  return findNotificationUsers(notifications)
     .then(function(notificationSettings) {
-
       var userIdsOnMention = findMentionOnlyUserIds(notifications, notificationSettings);
 
       return userService.findByIds(userIdsOnMention)
@@ -214,10 +229,9 @@ exports.sendOnlineNotifications = function(notifications, callback) {
               var notification = notificationsWithMessage.notification;
               var message = notificationsWithMessage.message;
 
-              var ns = notificationSettings[notification.userId + ':' + notification.troupeId];
-              var notificationSetting = ns && ns.push;
-              if(notificationSetting === 'mute') return;
-              if(notificationSetting === 'mention') {
+              var notificationSetting = notificationSettings[notification.userId + ':' + notification.troupeId];
+              // TODO: add a mute setting if(notificationSetting === 'mute') return;
+              if(notificationSetting === 0 /* mention */) {
                 var user = mentionUsersHash[notification.userId];
 
                 var itemType = notification.itemType;

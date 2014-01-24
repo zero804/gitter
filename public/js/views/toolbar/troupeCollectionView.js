@@ -18,7 +18,7 @@ define([
     tagName: 'li',
     template: troupeListItemTemplate,
     modelEvents: {
-      // 'change:unreadItems': 'render',
+      'change:unreadItems': 'render',
       'change:activity change:unreadItems': 'onActivity'
     },
     events: {
@@ -39,7 +39,6 @@ define([
     onDomRefresh: function() {
       var b = this.$el.find('.item-unread-badge');
       var ui = this.model.get('unreadItems');
-
       if(ui) {
         b.find('span').text(ui);
         b.show();
