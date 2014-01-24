@@ -71,31 +71,58 @@ define([
       this.decorators     = options.decorators || [];
 
       // CODEDEBT: Move unread-item-tracking into it's own module
-      this.findChatToTrack();
+      // this.findChatToTrack();
 
-      this.listenTo(this.collection, 'add', function() {
-        if(this.unreadItemToTrack) return;
-        this.findChatToTrack();
-      });
+      // this.listenTo(this.collection, 'add reset', function() {
+      //   if(this.unreadItemToTrack) return;
+      //   this.findChatToTrack();
+      // });
 
-      this.listenTo(this.collection, 'remove', function(e, model) {
-        if(this.unreadItemToTrack && model === this.unreadItemToTrack) {
-          this.findChatToTrack();
-        }
-      });
+      // this.listenTo(this.collection, 'remove', function(e, model) {
+      //   if(this.unreadItemToTrack && model === this.unreadItemToTrack) {
+      //     this.findChatToTrack();
+      //   }
+      // });
 
-      this.listenTo(this.collection, 'change', function() {
-        if(!this.unreadItemToTrack) return;
-        if(this.unreadItemToTrack.get('unread')) return;
+      // this.listenTo(this.collection, 'change', function() {
+      //   if(!this.unreadItemToTrack) return;
+      //   if(this.unreadItemToTrack.get('unread')) return;
 
-        this.findChatToTrack();
-      });
+      //   this.findChatToTrack();
+      // });
 
       /* Scroll to the bottom when the user sends a new chat */
       this.listenTo(appEvents, 'chat.send', function() {
         this.rollers.scrollToBottom();
       });
 
+    },
+
+    scrollToFirstUnread: function() {
+      var self = this;
+
+      function findFirstUnread(callback) {
+        var firstUnread = self.collection.findWhere({ unread: true });
+        if(!firstUnread) {
+          self.loadMore();
+          self.collection.once('sync', function() {
+            findFirstUnread(callback);
+          });
+        } else {
+          callback(firstUnread);
+        }
+      }
+
+      findFirstUnread(function(firstUnread) {
+        var firstUnreadView = self.children.findByModel(firstUnread);
+        self.rollers.trackUntil(firstUnreadView.el);
+        self.rollers.adjustScrollContinuously(200);
+      });
+
+    },
+
+    scrollToBottom: function() {
+      this.rollers.scrollToBottom();
     },
 
     findChatToTrack: function() {
