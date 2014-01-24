@@ -123,7 +123,11 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
                 _nonce: nonce,
                 githubType: githubType,
                 topic: topic || "",
-                users:  user ? [{ _id: new ObjectID(), userId: user._id }] : []
+                users:  user ? [{
+                  _id: new ObjectID(),
+                  userId: user._id,
+                  notify: 1 /* The creator of the room always has permission */
+                }] : []
               }
             },
             {
@@ -173,7 +177,14 @@ function ensureAccessControl(user, troupe, access) {
       /* In troupe? */
       if(troupe.containsUserId(user.id)) return Q.resolve(troupe);
 
-      troupe.addUserById(user.id);
+      var notify;
+      if(troupe.githubType === 'ORG') {
+        notify = 1;
+      } else {
+        notify = 0;
+      }
+
+      troupe.addUserById(user.id, { notify: notify });
       return troupe.saveQ().thenResolve(troupe);
     } else {
       /* No access */
