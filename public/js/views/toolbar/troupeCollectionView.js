@@ -96,9 +96,6 @@ define([
   });
 
   var CollectionView = Marionette.CollectionView.extend({
-    onItemRemoved: function(itemView){
-      console.log('ITEM VIEW REMOVED', itemView && itemView.model && itemView.model.get('name'), itemView.el, this.el);
-    },
     tagName: 'ul',
     className: 'trpTroupeList',
     itemView: TroupeItemView,
@@ -111,9 +108,6 @@ define([
         this.makeDraggable(options.dropTarget);
       }
       this.roomsCollection = options.roomsCollection;
-      this.listenTo(this, 'all', function() {
-        // console.log('EVENT', arguments);
-      });
     },
     makeDraggable: function(drop) {
       var cancelDrop = false;

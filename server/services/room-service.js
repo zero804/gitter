@@ -13,6 +13,7 @@ var userService = require('./user-service');
 var troupeService = require('./troupe-service');
 var nconf = require('../utils/config');
 var request = require('request');
+var GitHubRepoService  = require('./github/github-repo-service');
 
 function localUriLookup(uri) {
   return uriLookupService.lookupUri(uri)
@@ -126,7 +127,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
                 users:  user ? [{
                   _id: new ObjectID(),
                   userId: user._id,
-                  notify: 1 /* The creator of the room always has permission */
+                  notify: 1 /* The creator of the room always has notify on */
                 }] : []
               }
             },
@@ -167,6 +168,16 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
     });
 }
 
+function determineDefaultNotifyForRoom(user, troupe) {
+  var repoService = new GitHubRepoService(user);
+  return repoService.getRepo(troupe.uri)
+    .then(function(repoInfo) {
+      if(!repoInfo || !repoInfo.permissions) return 0;
+
+      /* Admin or push? Notify */
+      return repoInfo.permissions.admin || repoInfo.permissions.push ? 1 : 0;
+    });
+}
 /**
  * Grant or remove the users access to a room
  * Makes the troupe reflect the users access to a room
@@ -177,15 +188,22 @@ function ensureAccessControl(user, troupe, access) {
       /* In troupe? */
       if(troupe.containsUserId(user.id)) return Q.resolve(troupe);
 
-      var notify;
-      if(troupe.githubType === 'ORG') {
-        notify = 1;
-      } else {
-        notify = 0;
-      }
+      return Q.fcall(function() {
+          switch(troupe.githubType) {
+            case 'ORG':
+              return 1;
+            case 'REPO':
+              return determineDefaultNotifyForRoom(user, troupe);
 
-      troupe.addUserById(user.id, { notify: notify });
-      return troupe.saveQ().thenResolve(troupe);
+            default:
+              throw new Error('Unknown room type: ' + troupe.githubType);
+          }
+        }).then(function(notify) {
+          troupe.addUserById(user.id, { notify: notify });
+          return troupe.saveQ().thenResolve(troupe);
+        });
+
+
     } else {
       /* No access */
       if(!troupe.containsUserId(user.id)) return Q.resolve(null);
