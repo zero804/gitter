@@ -609,6 +609,14 @@ a.trpMiniLeftMenuItem {
   cursor: not-allowed;
 }
 
+.gtrActivityItemText .mention {
+  border: 1px solid transparent;
+  background-color: fade(@trpGrey,20%);
+  border-radius: 2px;
+  padding: 0 4px;
+  font-size: 11px;
+}
+
 .gtrActivityList {
   list-style-type: none;
   margin: 0;
@@ -1107,11 +1115,11 @@ ul li.placeholder:before {
 }
 
 .trpTroupeSettings, .trpTroupeMoreActions, .trpTroupeHelp {
-  padding: 12px 0 12px 20px;
+  padding: 12px 0 12px 10px;
   @media @mid {
     display: inline-block;
     width: 100%;
-    padding-left: 24px;
+    padding-left: 18px;
     opacity: 0.6;
   }
 }
@@ -1356,6 +1364,10 @@ i.favourited:hover:before {
   }
 
   a {
+    color: #333;
+  }
+
+  a:hover {
     color: @trpLightBlue;
   }
 

@@ -97,7 +97,7 @@ function serializeEvent(url, operation, model, callback) {
 // --------------------------------------------------------------------
 var UnconfirmedEmailSchema = new Schema({
   email:            { type: String },
-    confirmationCode: { type: String }
+  confirmationCode: { type: String }
 });
 UnconfirmedEmailSchema.schemaTypeName = 'UserEmailSchema';
 
@@ -364,10 +364,10 @@ TroupeSchema.methods.addUserById = function(userId) {
   this.post('save', function(postNext) {
     var f = new Fiber();
 
-    var url = "/troupes/" + this.id + "/users";
+    var url = "/api/v1/troupes/" + this.id + "/users";
     serializeEvent(url, "create", troupeUser, postNext);
 
-    var userUrl = "/user/" + userId + "/troupes";
+    var userUrl = "/api/v1/user/" + userId + "/troupes";
     serializeEvent(userUrl, "create", this, f.waitor());
 
     f.all().then(function() { postNext(); }).fail(function(err) { postNext(err); });
