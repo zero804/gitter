@@ -24,6 +24,8 @@ require([
   'views/chat/decorators/mentionDecorator',
   'views/chat/decorators/embedDecorator',
   'views/chat/decorators/emojiDecorator',
+  'models/unread-chats-model',
+  'views/app/unreadBannerView',
   'views/app/headerView',
 
   'views/widgets/preload', // No ref
@@ -37,7 +39,7 @@ require([
     ChatCollectionView, itemCollections, RightToolbarView,
     PersonDetailView, inviteView, troupeSettingsView, markdownView, IntegrationSettingsModal,
     Router, unreadItemsClient, webhookDecorator, issueDecorator, mentionDecorator,
-    embedDecorator, emojiDecorator, HeaderView) {
+    embedDecorator, emojiDecorator, UnreadChatsModel, UnreadBannerView, HeaderView) {
   "use strict";
 
   // Make drop down menus drop down
@@ -66,6 +68,22 @@ require([
     collection: itemCollections.chats,
     userCollection: itemCollections.users,
     decorators: [webhookDecorator, issueDecorator, mentionDecorator, embedDecorator, emojiDecorator]
+  }).render();
+
+  var unreadChatsModel = new UnreadChatsModel({
+    chatCollection: itemCollections.chats
+  });
+
+  new UnreadBannerView.Top({
+    el: '#unread-banner',
+    model: unreadChatsModel,
+    chatCollectionView: chatCollectionView
+  }).render();
+
+  new UnreadBannerView.Bottom({
+    el: '#bottom-unread-banner',
+    model: unreadChatsModel,
+    chatCollectionView: chatCollectionView
   }).render();
 
   unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
