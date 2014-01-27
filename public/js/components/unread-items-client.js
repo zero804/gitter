@@ -116,6 +116,8 @@ define([
         this.trigger('newcountvalue', newValue);
         appEvents.trigger('unreadItemsCount', newValue);
       }
+
+      return newValue;
     },
 
     _currentCount: function() {
@@ -341,6 +343,7 @@ define([
 
     this._store = unreadItemStore;
     this._windowScrollLimited = limit(this._windowScroll, this, 50);
+    this._foldCountLimited = limit(this._foldCount, this, 50);
     this._inFocus = true;
 
     appEvents.on('eyeballStateChange', this._eyeballStateChange, this);
@@ -362,10 +365,9 @@ define([
   TroupeUnreadItemsViewportMonitor.prototype = {
     _getBounds: function() {
       if(!this._inFocus) {
+        this._foldCountLimited();
         return;
       }
-
-      log('getbounds was set to ' +  this._scrollTop + ' and ' + this._scrollBottom);
 
       var scrollTop = this._scrollElement.scrollTop;
       var scrollBottom = scrollTop + this._scrollElement.clientHeight;
@@ -377,9 +379,6 @@ define([
       if(!this._scrollBottom || scrollBottom > this._scrollBottom) {
         this._scrollBottom = scrollBottom;
       }
-
-      log('getbounds has set the bounds to ' +  this._scrollTop + ' and ' + this._scrollBottom);
-
 
       this._windowScrollLimited();
     },
@@ -393,8 +392,6 @@ define([
 
       var topBound = this._scrollTop;
       var bottomBound = this._scrollBottom;
-
-      log('Looking for items to mark as read between ' + topBound + ' and ' + bottomBound);
 
       delete this._scrollTop;
       delete this._scrollBottom;
@@ -433,6 +430,47 @@ define([
         }
 
       }
+
+      var total = self._store._recount();
+      var above = total - below;
+      acrossTheFoldModel.set('unreadAbove', above);
+      acrossTheFoldModel.set('unreadBelow', below);
+    },
+
+    _foldCount: function() {
+      var self = this;
+
+      var topBound = this._scrollElement.scrollTop;
+      var bottomBound = topBound + this._scrollElement.clientHeight;
+
+      var unreadItems = this._scrollElement.querySelectorAll('.unread');
+
+      var below = 0, inframe = 0;
+      /* Beware, this is not an array, it's a nodelist. We can't use array methods like forEach  */
+      for(var i = 0; i < unreadItems.length; i++) {
+        var element = unreadItems[i];
+
+        var itemType = element.dataset.itemType;
+        var itemId = element.dataset.itemId;
+
+        if(itemType && itemId) {
+          var top = element.offsetTop;
+
+          if (top >= topBound && top <= bottomBound) {
+            inframe++;
+          } else if(top > bottomBound) {
+            // This item is below the bottom fold
+            below++;
+          }
+        }
+
+      }
+
+
+      var total = self._store._recount();
+      var above = total - below - inframe;
+      acrossTheFoldModel.set('unreadAbove', above);
+      acrossTheFoldModel.set('unreadBelow', below);
     },
 
     _scheduleMarkRead: function() {
@@ -513,7 +551,19 @@ define([
     throw new Error("Unable to create an unread items store without a user");
   }
 
+
+  var acrossTheFoldModel = new Backbone.Model({
+    defaults: {
+      unreadAbove: 0,
+      unreadBelow: 0
+    }
+  });
+
+
   var unreadItemsClient = {
+    acrossTheFold: function() {
+      return acrossTheFoldModel;
+    },
 
     hasItemBeenMarkedAsRead: function(itemType, itemId) {
       var unreadItemStore = getUnreadItemStoreReq();

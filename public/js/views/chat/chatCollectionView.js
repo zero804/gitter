@@ -108,10 +108,11 @@ define([
       var contentFrame = document.querySelector(this.scrollElementSelector);
 
       var unreadItems = contentFrame.querySelectorAll('.unread');
-      var bottom = this.rollers.getScrollBottom() + 1;
-      var firstOffscreenElement = _.sortedIndex(unreadItems, bottom, function(element) {
+      var viewportBottom = this.rollers.getScrollBottom() + 1;
+      var firstOffscreenElement = _.sortedIndex(unreadItems, viewportBottom, function(element) {
         return element.offsetTop;
       });
+
       var element = unreadItems[firstOffscreenElement];
       if(element) {
         this.rollers.scrollToElement(element);
