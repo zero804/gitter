@@ -33,6 +33,11 @@ exports.attachNotificationListenersToSchema = function (schema, options) {
 
       this.get('_tv').increment();
 
+      if(this._skipTroupeMiddleware) {
+        delete this._skipTroupeMiddleware;
+        return next();
+      }
+
       this.post('save', function(postNext) {
 
         if(isNewInstance) {
