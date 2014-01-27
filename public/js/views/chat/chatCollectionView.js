@@ -70,30 +70,12 @@ define([
       this.rollers = new Rollers(contentFrame);
 
       /* Since there may be preloaded stuff */
-      this.rollers.adjustScroll();
+      //this.rollers.adjustScroll();
 
       this.userCollection = options.userCollection;
       this.decorators     = options.decorators || [];
 
-      // CODEDEBT: Move unread-item-tracking into it's own module
-      this.findChatToTrack();
-
-      this.listenTo(this.collection, 'add reset', function() {
-        if(this.unreadItemToTrack) return;
-        this.findChatToTrack();
-      });
-
-      this.listenTo(this.collection, 'remove', function(e, model) {
-        if(this.unreadItemToTrack && model === this.unreadItemToTrack) {
-          this.findChatToTrack();
-        }
-      });
-
-      this.listenTo(this.collection, 'change', function() {
-        if(!this.unreadItemToTrack) return;
-        if(this.unreadItemToTrack.get('unread')) return;
-        this.findChatToTrack();
-      });
+      this.rollers.scrollToBottom();
 
       /* Scroll to the bottom when the user sends a new chat */
       this.listenTo(appEvents, 'chat.send', function() {
@@ -158,37 +140,13 @@ define([
       return this.rollers.isScrolledToBottom();
     },
 
-    findChatToTrack: function() {
-      if(this._findingNextUnread) return;
-
-      var nextUnread = this.collection.findWhere({ unread: true });
-
-      this.unreadItemToTrack = nextUnread;
-
-      if(!nextUnread) {
-        this.rollers.cancelTrackUntil();
-      } else {
-        var view = this.children.findByModel(nextUnread);
-
-        /* Can't find the view, it may not have been generated yet */
-        if(view) {
-          this.rollers.trackUntil(view.el);
-        } else {
-          this._findingNextUnread = true;
-       }
-      }
-    },
-
     onAfterItemAdded: function() {
       if(this.collection.length === 1) {
         this.adjustTopPadding();
       }
 
-      if(!this._findingNextUnread) return;
-
       var view = this.children.findByModel(this.unreadItemToTrack);
       if(view) {
-        this._findingNextUnread = false;
         this.rollers.trackUntil(view.el);
       }
     },
