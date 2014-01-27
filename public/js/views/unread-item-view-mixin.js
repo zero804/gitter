@@ -1,8 +1,8 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'jquery',
-  'components/unread-items-client'
-], function($, unreadItemsClient) {
+  'components/unread-items-client',
+  'utils/appevents'
+], function(unreadItemsClient, appEvents) {
   "use strict";
 
   return {
@@ -25,7 +25,7 @@ define([
           $e.addClass('unread');
           $e.data('itemId', id);
           $e.data('itemType', this.unreadItemType);
-          $(document).trigger('unreadItemDisplayed');
+          appEvents.trigger('unreadItemDisplayed');
         }
       }
 
