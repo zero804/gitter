@@ -8,7 +8,8 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
 
   /** Number of pixels we need to be within before we say we're at the bottom */
   /** @const */ var BOTTOM_MARGIN = 30;
-  /** @const */ var TOP_OFFSET = 200;
+  /** Number of pixels to show above a message that we scroll to. Context FTW!
+  /** @const */ var TOP_OFFSET = 300;
 
   /* Put your scrolling panels on rollers */
   function Rollers(target) {
