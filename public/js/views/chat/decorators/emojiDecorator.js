@@ -4,6 +4,22 @@ define(['utils/emoji', 'utils/cdn'], function(emoji, cdn) {
 
   "use strict";
 
+  var ignoredClasses = {
+    'no-emojify': 1
+  };
+
+  var ignoredTags = {
+    'SCRIPT': 1,
+    'TEXTAREA': 1,
+    'A': 1,
+    'PRE': 1,
+    'CODE': 1
+  };
+
+  function isClassIgnored(c) {
+    return !!ignoredClasses[c];
+  }
+
   var emojify = (function () {
 
     // Helper function to find text within DOM
@@ -12,18 +28,13 @@ define(['utils/emoji', 'utils/cdn'], function(emoji, cdn) {
         var child = element.childNodes[childi];
         if (child.nodeType == 1) {
 
-          // Get tag name and class attribute
-          var tag = child.tagName.toLowerCase(),
-            classname;
-          if (child.hasAttribute('class')) classname = child.getAttribute('class').toLowerCase();
-
-          // Hacky at the minute, needs to be fixed
-          if (classname) {
-            if (tag !== 'script' && tag !== 'style' && tag !== 'textarea' && classname !== 'no-emojify') findText(child, pattern, callback);
-          } else {
-            if (tag !== 'script' && tag !== 'style' && tag !== 'textarea') findText(child, pattern, callback);
+          if(ignoredTags[child.tagName]) continue;
+          if (child.hasAttribute('class')) {
+            var classnames = child.getAttribute('class').toLowerCase().split(/\s+/);
+            if(classnames.some(isClassIgnored)) continue;
           }
 
+          findText(child, pattern, callback);
         } else if (child.nodeType == 3) {
           var matches = [];
           if (typeof pattern === 'string') {
