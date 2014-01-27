@@ -835,25 +835,30 @@
       "dependencies": {
         "redis": {
           "version": "0.7.2",
-          "from": "redis@0.7.2"
+          "from": "redis@0.7.2",
+          "resolved": "https://registry.npmjs.org/redis/-/redis-0.7.2.tgz"
         },
         "jade": {
           "version": "0.26.3",
           "from": "jade@0.26.3",
+          "resolved": "https://registry.npmjs.org/jade/-/jade-0.26.3.tgz",
           "dependencies": {
             "commander": {
               "version": "0.6.1",
-              "from": "commander@0.6.1"
+              "from": "commander@0.6.1",
+              "resolved": "https://registry.npmjs.org/commander/-/commander-0.6.1.tgz"
             },
             "mkdirp": {
               "version": "0.3.0",
-              "from": "mkdirp@0.3.0"
+              "from": "mkdirp@0.3.0",
+              "resolved": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.3.0.tgz"
             }
           }
         },
         "stylus": {
           "version": "0.27.2",
           "from": "stylus@0.27.2",
+          "resolved": "https://registry.npmjs.org/stylus/-/stylus-0.27.2.tgz",
           "dependencies": {
             "cssom": {
               "version": "0.2.5",
@@ -867,15 +872,18 @@
         },
         "nib": {
           "version": "0.5.0",
-          "from": "nib@0.5.0"
+          "from": "nib@0.5.0",
+          "resolved": "https://registry.npmjs.org/nib/-/nib-0.5.0.tgz"
         },
         "reds": {
           "version": "0.1.4",
           "from": "reds@0.1.4",
+          "resolved": "https://registry.npmjs.org/reds/-/reds-0.1.4.tgz",
           "dependencies": {
             "natural": {
               "version": "0.0.69",
               "from": "natural@0.0.69",
+              "resolved": "https://registry.npmjs.org/natural/-/natural-0.0.69.tgz",
               "dependencies": {
                 "sylvester": {
                   "version": "0.0.21",
@@ -1609,9 +1617,9 @@
       "from": "text-filter@~0.1.0"
     },
     "marked": {
-      "version": "0.2.13",
-      "from": "marked@git://github.com/gitterHQ/marked.git#v0.2.13",
-      "resolved": "git://github.com/gitterHQ/marked.git#8219b9bfcd026751f13baaf9e1c43d9cd64d0794",
+      "version": "0.2.14",
+      "from": "marked@git://github.com/gitterHQ/marked.git#v0.2.14",
+      "resolved": "git://github.com/gitterHQ/marked.git#81961377057ccd894d08b1a8f652ed4acefe08d6",
       "dependencies": {
         "xregexp": {
           "version": "2.0.0",
