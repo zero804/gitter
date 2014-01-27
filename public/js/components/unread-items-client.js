@@ -329,7 +329,6 @@ define([
     }
   };
 
-
   // -----------------------------------------------------
   // Monitors the view port and tells the store when things
   // have been read
@@ -403,28 +402,37 @@ define([
       var unreadItems = this._scrollElement.querySelectorAll('.unread');
 
       var timeout = 1000;
-
+      var below = 0;
       /* Beware, this is not an array, it's a nodelist. We can't use array methods like forEach  */
       for(var i = 0; i < unreadItems.length; i++) {
         var element = unreadItems[i];
-        var $e = $(element);
 
-        var itemType = $e.data('itemType');
-        var itemId = $e.data('itemId');
+        // var itemType = $e.data('itemType');
+        // var itemId = $e.data('itemId');
+        var itemType = element.dataset.itemType;
+        var itemId = element.dataset.itemId;
+
         if(itemType && itemId) {
           var top = element.offsetTop;
 
           if (top >= topBound && top <= bottomBound) {
+            var $e = $(element);
+
             self._store._markItemRead(itemType, itemId);
 
             $e.removeClass('unread').addClass('reading');
             this._addToMarkReadQueue($e);
             timeout = timeout + 150;
+          } else if(top > bottomBound) {
+            // This item is below the bottom fold
+            below++;
+          } else if(top < topBound) {
+            // This item is above the top fold
+
           }
         }
 
       }
-
     },
 
     _scheduleMarkRead: function() {
@@ -454,6 +462,7 @@ define([
       }
     }
   };
+
 
   // -----------------------------------------------------
   // Monitors the store and removes the css for items that
