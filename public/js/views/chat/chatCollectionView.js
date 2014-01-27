@@ -69,9 +69,6 @@ define([
 
       this.rollers = new Rollers(contentFrame);
 
-      /* Since there may be preloaded stuff */
-      //this.rollers.adjustScroll();
-
       this.userCollection = options.userCollection;
       this.decorators     = options.decorators || [];
 
@@ -143,11 +140,6 @@ define([
     onAfterItemAdded: function() {
       if(this.collection.length === 1) {
         this.adjustTopPadding();
-      }
-
-      var view = this.children.findByModel(this.unreadItemToTrack);
-      if(view) {
-        this.rollers.trackUntil(view.el);
       }
     },
 
