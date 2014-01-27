@@ -117,6 +117,16 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
       this._postMutateTop = scrollTop;
     },
 
+    /*
+     * Scroll to the bottom and switch the mode to TRACK_BOTTOM
+     */
+    scrollToElement: function(element) {
+      var target = this._target;
+      var scrollTop = element.offsetTop;
+      target.scrollTop = scrollTop;
+
+      this.trackUntil(element);
+    },
 
     /*
      * Scroll to the bottom and switch the mode to TRACK_BOTTOM
@@ -200,6 +210,11 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
       }
 
       return true;
+    },
+
+    getScrollBottom: function() {
+      var scrollTop = this._target.scrollTop;
+      return this._target.clientHeight + scrollTop;
     },
 
     getBottomMostVisibleElement: function() {

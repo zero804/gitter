@@ -97,7 +97,7 @@ define([
     onMainButtonClick: function() {
       if(this.model.get('unreadBelow') < 1) return;
 
-      this.chatCollectionView.scrollToBottom();
+      this.chatCollectionView.scrollToFirstUnreadBelow();
     }
   });
 
