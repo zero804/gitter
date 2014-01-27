@@ -41,13 +41,18 @@ define([
     },
     scrollElementSelector: "#content-frame",
 
+    /* "WHAT THE F" is this nasty thing. Document your codedebt people */
     adjustTopPadding: function() {
-      var size = '';
-      size = $('#header-wrapper').height()+15 + 'px';
-      // this.CCSStylesheetRuleStyle('trp3.css', '.trpChatContainer > div:first-child', 'padding-top', 'size');
-          try { 
-            document.styleSheets[1].insertRule('.trpChatContainer > div:first-child' + ' {'+'padding-top'+':'+size+'}', document.styleSheets[1].cssRules.length);
-          } catch(err) {try { document.styleSheets[1].addRule('.trpChatContainer > div:first-child', 'padding-top'+':'+size)} catch(err) {}}//IE
+      var size = $('#header-wrapper').height() + 15 + 'px';
+      var ss = document.styleSheets[1];
+      try {
+        if(ss.insertRule) {
+          ss.insertRule('.trpChatContainer > div:first-child { padding-top: ' + size + ' }', ss.cssRules.length);
+        } else if(ss.addRule) {
+          ss.addRule('.trpChatContainer > div:first-child', 'padding-top:' + size);
+        }
+      } catch(err) {
+      }
     },
 
     initialize: function(options) {
@@ -71,25 +76,24 @@ define([
       this.decorators     = options.decorators || [];
 
       // CODEDEBT: Move unread-item-tracking into it's own module
-      // this.findChatToTrack();
+      this.findChatToTrack();
 
-      // this.listenTo(this.collection, 'add reset', function() {
-      //   if(this.unreadItemToTrack) return;
-      //   this.findChatToTrack();
-      // });
+      this.listenTo(this.collection, 'add reset', function() {
+        if(this.unreadItemToTrack) return;
+        this.findChatToTrack();
+      });
 
-      // this.listenTo(this.collection, 'remove', function(e, model) {
-      //   if(this.unreadItemToTrack && model === this.unreadItemToTrack) {
-      //     this.findChatToTrack();
-      //   }
-      // });
+      this.listenTo(this.collection, 'remove', function(e, model) {
+        if(this.unreadItemToTrack && model === this.unreadItemToTrack) {
+          this.findChatToTrack();
+        }
+      });
 
-      // this.listenTo(this.collection, 'change', function() {
-      //   if(!this.unreadItemToTrack) return;
-      //   if(this.unreadItemToTrack.get('unread')) return;
-
-      //   this.findChatToTrack();
-      // });
+      this.listenTo(this.collection, 'change', function() {
+        if(!this.unreadItemToTrack) return;
+        if(this.unreadItemToTrack.get('unread')) return;
+        this.findChatToTrack();
+      });
 
       /* Scroll to the bottom when the user sends a new chat */
       this.listenTo(appEvents, 'chat.send', function() {
@@ -115,10 +119,24 @@ define([
 
       findFirstUnread(function(firstUnread) {
         var firstUnreadView = self.children.findByModel(firstUnread);
-        self.rollers.trackUntil(firstUnreadView.el);
+        self.rollers.trackUntil(firstUnreadView.el, true /* force */);
         self.rollers.adjustScrollContinuously(200);
       });
+    },
 
+    scrollToFirstUnreadBelow: function() {
+      var contentFrame = document.querySelector(this.scrollElementSelector);
+
+      var unreadItems = contentFrame.querySelectorAll('.unread');
+      var viewportBottom = this.rollers.getScrollBottom() + 1;
+      var firstOffscreenElement = _.sortedIndex(unreadItems, viewportBottom, function(element) {
+        return element.offsetTop;
+      });
+
+      var element = unreadItems[firstOffscreenElement];
+      if(element) {
+        this.rollers.scrollToElement(element);
+      }
     },
 
     scrollToBottom: function() {

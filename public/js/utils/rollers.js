@@ -57,9 +57,11 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
     },
 
     /* Specify an element that should not be scrolled past */
-    trackUntil: function(element) {
-      this._nopass = element;
-      this._mode = TRACK_NO_PASS;
+    trackUntil: function(element, force) {
+      if(force || this._mode != STABLE) {
+        this._nopass = element;
+        this._mode = TRACK_NO_PASS;
+      }
     },
 
     cancelTrackUntil: function() {
@@ -117,6 +119,16 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
       this._postMutateTop = scrollTop;
     },
 
+    /*
+     * Scroll to the bottom and switch the mode to TRACK_BOTTOM
+     */
+    scrollToElement: function(element) {
+      var target = this._target;
+      var scrollTop = element.offsetTop;
+      target.scrollTop = scrollTop;
+
+      this.trackUntil(element);
+    },
 
     /*
      * Scroll to the bottom and switch the mode to TRACK_BOTTOM
@@ -200,6 +212,11 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
       }
 
       return true;
+    },
+
+    getScrollBottom: function() {
+      var scrollTop = this._target.scrollTop;
+      return this._target.clientHeight + scrollTop;
     },
 
     getBottomMostVisibleElement: function() {

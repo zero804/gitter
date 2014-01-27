@@ -1,8 +1,8 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'jquery',
-  'components/unread-items-client'
-], function($, unreadItemsClient) {
+  'components/unread-items-client',
+  'utils/appevents'
+], function(unreadItemsClient, appEvents) {
   "use strict";
 
   return {
@@ -11,6 +11,7 @@ define([
         var id = this.model.get('id');
         if(!id) id = this.model.cid;
         var $e = this.$el;
+        var e = this.el;
 
         $e.addClass('model-id-' + id);
 
@@ -23,9 +24,9 @@ define([
 
         if(unread) {
           $e.addClass('unread');
-          $e.data('itemId', id);
-          $e.data('itemType', this.unreadItemType);
-          $(document).trigger('unreadItemDisplayed');
+          e.dataset.itemId = id;
+          e.dataset.itemType = this.unreadItemType;
+          appEvents.trigger('unreadItemDisplayed');
         }
       }
 
