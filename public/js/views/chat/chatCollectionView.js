@@ -119,7 +119,7 @@ define([
 
       findFirstUnread(function(firstUnread) {
         var firstUnreadView = self.children.findByModel(firstUnread);
-        self.rollers.trackUntil(firstUnreadView.el);
+        self.rollers.trackUntil(firstUnreadView.el, true /* force */);
         self.rollers.adjustScrollContinuously(200);
       });
     },
