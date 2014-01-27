@@ -23,7 +23,7 @@ define(['utils/emoji', 'utils/cdn'], function(emoji, cdn) {
   var emojify = (function () {
 
     // Helper function to find text within DOM
-    var findText = function (element, pattern, callback) {
+    var findText = function (element, pattern, callback, validator) {
       for (var childi = element.childNodes.length; childi-- > 0;) {
         var child = element.childNodes[childi];
         if (child.nodeType == 1) {
@@ -41,41 +41,21 @@ define(['utils/emoji', 'utils/cdn'], function(emoji, cdn) {
           } else {
             var match;
             while (match = pattern.exec(child.data)) {
-                  matches.push(match);
+              if(!validator || validator(match)) {
+                matches.push(match);
+              }
             }
           }
-          for (var i = matches.length; i-- > 0;)
-          callback.call(window, child, matches[i]);
+
+          for (var i = matches.length; i-- > 0;) {
+            callback.call(window, child, matches[i]);
+          }
         }
       }
     };
 
     function isWhitespace(s) {
       return s === ' ' || s === '\t' || s === '\r' || s === '\n' || s === '';
-    }
-
-    function smileyValid(match) {
-      var m = match[0];
-
-      /* Any smiley thats 3 chars long is probably a smiley */
-      if(m.length > 2) return true;
-
-      var index = match.index;
-      var input = match.input;
-
-      /* At the beginning? */
-      if(index === 0) return true;
-
-      /* At the end? */
-      if(input.length === m.length + index) return true;
-
-      /* Has a whitespace before? */
-      if(isWhitespace(input.charAt(index - 1))) return true;
-
-      /* Has a whitespace before? */
-      if(isWhitespace(input.charAt(m.length + index))) return true;
-
-      return false;
     }
 
     function insertEmojicon(node, match, emojiName) {
@@ -102,30 +82,67 @@ define(['utils/emoji', 'utils/cdn'], function(emoji, cdn) {
       return namedMatchHash[named];
     }
 
+    function getEmojiNameForMatch(match) {
+      for(var i = 1; i < match.length - 1; i++) {
+        if(match[i]) {
+          return emoji.emoticons[i - 1][1];
+        }
+      }
+    }
+
     return {
 
       // Main method
       run: function (el) {
         // Search for named emoji
         findText(el, namedEmojiRegExp, function (node, match) {
-          if(!namedMatchValid(match[1])) {
-            /* Don't match */
-            return match[0];
-          }
-
+          /* Replacer */
           insertEmojicon(node, match, match[1]);
+        }, function(match) {
+          /* Validator */
+          return namedMatchValid(match[1]);
         });
 
-        // Search for emoticons
-        emoji.emoticons.forEach(function(r) {
-          findText(el, r[0], function (node, match) {
-            if(!smileyValid(match)) {
-              /* Don't match */
-              return match[0];
-            }
+        var lastEmojiTerminatedAt = -1;
 
-            insertEmojicon(node, match, r[1]);
-          });
+        // Search for emoticons
+        findText(el, emoji.emojiMegaRe, function (node, match) {
+          /* Replacer */
+          var emojiName = getEmojiNameForMatch(match);
+          insertEmojicon(node, match, emojiName);
+        }, function(match) {
+          /* Validator */
+          var emojiName = getEmojiNameForMatch(match);
+          if(!emojiName) return;
+
+          var m = match[0];
+          var index = match.index;
+          var input = match.input;
+
+          function success() {
+            lastEmojiTerminatedAt = m.length + index;
+            return true;
+          }
+
+          /* Any smiley thats 3 chars long is probably a smiley */
+          if(m.length > 2) return success();
+
+          /* At the beginning? */
+          if(index === 0) return success();
+
+          /* At the end? */
+          if(input.length === m.length + index) return success();
+
+          /* Has a whitespace before? */
+          if(isWhitespace(input.charAt(index - 1))) return success();
+
+          /* Has a whitespace after? */
+          if(isWhitespace(input.charAt(m.length + index))) return success();
+
+          /* Has an emoji before? */
+          if(lastEmojiTerminatedAt === index) return success();
+
+          return false;
         });
 
 
