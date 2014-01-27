@@ -54,6 +54,8 @@ define([
       var self = this;
       var notify = self.$el.find("#notification-options").val() == 'all';
 
+      context.troupe().set('notify', notify);
+
       $.ajax({
         url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId(),
         contentType: "application/json",

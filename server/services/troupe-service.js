@@ -16,10 +16,7 @@ var _                        = require('underscore');
 var assert                   = require('assert');
 var statsService             = require("../services/stats-service");
 var permissionsModel         = require("./permissions-model");
-var lazy                     = require("lazy.js");
 
-/* const */
-var LEGACY_FAV_POSITION = 1000;
 
 function ensureExists(value) {
   if(!value) throw 404;
@@ -68,22 +65,6 @@ function createQ(ModelType, options) {
       return m;
     });
 }
-
-/**
- * Use this instead of createQ as it invokes Mongoose Middleware
- */
-function createTroupeQ(options) {
-  return createQ(persistence.Troupe, options);
-}
-
-function createRequestQ(options) {
-  return createQ(persistence.Request, options);
-}
-
-function createRequestUnconfirmedQ(options) {
-  return createQ(persistence.RequestUnconfirmed, options);
-}
-
 
 function findMemberEmails(id, callback) {
   findById(id, function(err,troupe) {
@@ -589,11 +570,13 @@ function updateTroupeNotifyForUserId(userId, troupeId, notify) {
         troupeUser.notify = notify ? 1 : 0;
       }
 
+      /* Don't send out the traditional updates */
+      troupe._skipTroupeMiddleware = true;
       return troupe.saveQ();
     })
     .then(function() {
       // TODO: in future get rid of this but this collection is used by the native clients
-      appEvents.dataChange2('/api/v1/user/' + userId + '/troupes', 'patch', { id: troupeId, notify: !!notify });
+      appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, notify: !!notify });
     });
 }
 
