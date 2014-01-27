@@ -87,7 +87,10 @@ require([
     chatCollectionView: chatCollectionView
   }).render();
 
-  unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
+  itemCollections.chats.once('sync', function() {
+    unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
+  });
+
   // unreadItemsClient.monitorViewForUnreadItems($('#file-list'));
 
   new chatInputView.ChatInputView({
