@@ -330,8 +330,6 @@ define([
   };
 
 
-
-
   // -----------------------------------------------------
   // Monitors the view port and tells the store when things
   // have been read
@@ -346,9 +344,6 @@ define([
     this._windowScrollLimited = limit(this._windowScroll, this, 50);
     this._inFocus = true;
 
-    this._scrollTop = 1000000000;
-    this._scrollBottom = 0;
-
     appEvents.on('eyeballStateChange', this._eyeballStateChange, this);
 
     this._scrollElement.addEventListener('scroll', this._getBounds, false);
@@ -359,10 +354,10 @@ define([
     // TODO: don't reference this frame directly!
     //$('#toolbar-frame').on('scroll', this._getBounds);
 
-    $(document).on('unreadItemDisplayed', this._getBounds);
+    appEvents.on('unreadItemDisplayed', this._getBounds);
 
     // When the UI changes, rescan
-    $(document).on('appNavigation', this._getBounds);
+    appEvents.on('appNavigation', this._getBounds);
   };
 
   TroupeUnreadItemsViewportMonitor.prototype = {
@@ -371,16 +366,21 @@ define([
         return;
       }
 
+      log('getbounds was set to ' +  this._scrollTop + ' and ' + this._scrollBottom);
+
       var scrollTop = this._scrollElement.scrollTop;
       var scrollBottom = scrollTop + this._scrollElement.clientHeight;
 
-      if(scrollTop < this._scrollTop) {
+      if(!this._scrollTop || scrollTop < this._scrollTop) {
         this._scrollTop = scrollTop;
       }
 
-      if(scrollBottom > this._scrollBottom) {
+      if(!this._scrollBottom || scrollBottom > this._scrollBottom) {
         this._scrollBottom = scrollBottom;
       }
+
+      log('getbounds has set the bounds to ' +  this._scrollTop + ' and ' + this._scrollBottom);
+
 
       this._windowScrollLimited();
     },
@@ -395,10 +395,10 @@ define([
       var topBound = this._scrollTop;
       var bottomBound = this._scrollBottom;
 
-      // log('Looking for items to mark as read between ' + topBound + ' and ' + bottomBound);
+      log('Looking for items to mark as read between ' + topBound + ' and ' + bottomBound);
 
-      this._scrollTop = this._scrollElement.scrollTop;
-      this._scrollBottom = this._scrollTop + this._scrollElement.clientHeight;
+      delete this._scrollTop;
+      delete this._scrollBottom;
 
       var unreadItems = this._scrollElement.querySelectorAll('.unread');
 
