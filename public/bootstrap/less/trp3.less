@@ -221,14 +221,6 @@ a:hover {
     text-decoration: none;
   }
 
-  li {
-    line-height: 22px;
-  }
-
-  .trpToolbarList {
-    width: 260px;
-  }
-
   @media @small {
     left:-250px;
     transition-delay: 0s;
@@ -238,6 +230,47 @@ a:hover {
         left: 0px;
       }
   }
+
+  .trpTroupeList {
+    margin: 0;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    margin-left: 10px;
+
+    li {
+      line-height: 24px;
+      padding-left: 10px;
+      box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      cursor: pointer;
+      padding-bottom: 2px;
+    }
+
+    li:hover {
+      border-radius: 4px 0 0 4px;
+      background-color: rgba(255,255,255,0.2);
+
+      @media @mobile {
+        background-color: transparent;
+      }
+    }
+
+    span {
+      display: inline-block;
+      color: white;
+      white-space: nowrap;
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      vertical-align: middle;
+    }
+
+    span.disabled {
+      color: #ccc;
+    }
+  }
+
+
 }
 
 #people-roster {
@@ -245,7 +278,7 @@ a:hover {
 }
 
 .trpLeftMenu .trpToolbarHeader {
-  margin-left: 9px;
+  margin-left: 12px;
   padding-top: 0;
   padding-bottom: 2px;
   opacity: 0.6;
@@ -727,45 +760,6 @@ body.dragging .list-favourites li:last-child {
 body.dragging .list-favourites li.placeholder {
   padding-top: 0px;
   padding-bottom: 0px;
-}
-
-.trpTroupeList {
-	margin: 0;
-  width: 100%;
-  box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  padding-right: 22px;
-
-  li {
-    padding-left: 10px;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    cursor: pointer;
-    padding-bottom: 2px;
-  }
-
-  li:hover {
-    border-radius: 0 4px 4px 0;
-    background-color: rgba(255,255,255,0.2);
-
-    @media @mobile {
-      background-color: transparent;
-    }
-  }
-
-  span {
-    display: inline-block;
-    color: white;
-    white-space: nowrap;
-    max-width: 180px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    vertical-align: middle;
-  }
-
-  span.disabled {
-    color: #ccc;
-  }
 }
 
 
