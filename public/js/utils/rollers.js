@@ -8,6 +8,7 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
 
   /** Number of pixels we need to be within before we say we're at the bottom */
   /** @const */ var BOTTOM_MARGIN = 30;
+  /** @const */ var TOP_OFFSET = 200;
 
   /* Put your scrolling panels on rollers */
   function Rollers(target) {
@@ -124,7 +125,8 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
      */
     scrollToElement: function(element) {
       var target = this._target;
-      var scrollTop = element.offsetTop;
+      var scrollTop = element.offsetTop - TOP_OFFSET;
+      if(scrollTop < 0) scrollTop = 0;
       target.scrollTop = scrollTop;
 
       this.trackUntil(element);
@@ -147,7 +149,7 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
 
       // Get the offset of the element that we should not pass
       var nopassOffset = this._nopass.offsetTop - target.offsetTop;
-      if(scrollTop < nopassOffset) {
+      if(scrollTop < nopassOffset - TOP_OFFSET) {
         target.scrollTop = scrollTop;
       } else {
         target.scrollTop = nopassOffset;
