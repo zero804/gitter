@@ -4,10 +4,10 @@ define([
   'backbone',
   'utils/context',
   'hbs!./tmpl/unreadBannerTemplate'
-  ], function($, backbone, context, template)  {
+  ], function($, Backbone, context, template)  {
   "use strict";
 
-  var BannerView = backbone.View.extend({
+  var BannerView = Backbone.View.extend({
     initialize: function(options) {
       this.chatCollectionView = options.chatCollectionView;
       this.listenTo(this.model, 'change:'+this.unreadPropertyName, this.render);
