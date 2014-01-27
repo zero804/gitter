@@ -343,6 +343,7 @@ exports.markItemsRead = function(userId, troupeId, items, callback) {
 exports.markAllChatsRead = function(userId, troupeId, callback) {
   exports.getUnreadItems(userId, troupeId, 'chat')
     .then(function(chatIds) {
+      if(!chatIds.length) return;
       return exports.markItemsRead(userId, troupeId, {chat: chatIds});
     })
     .nodeify(callback);

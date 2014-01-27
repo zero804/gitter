@@ -343,7 +343,9 @@ define([
 
     this._store = unreadItemStore;
     this._windowScrollLimited = limit(this._windowScroll, this, 50);
-    this._foldCountLimited = limit(this._foldCount, this, 50);
+
+    var foldCountLimited = limit(this._foldCount, this, 50);
+    this._foldCountLimited = foldCountLimited;
     this._inFocus = true;
 
     appEvents.on('eyeballStateChange', this._eyeballStateChange, this);
@@ -357,6 +359,8 @@ define([
     //$('#toolbar-frame').on('scroll', this._getBounds);
 
     appEvents.on('unreadItemDisplayed', this._getBounds);
+
+    unreadItemStore.on('unreadItemRemoved', foldCountLimited);
 
     // When the UI changes, rescan
     appEvents.on('appNavigation', this._getBounds);
