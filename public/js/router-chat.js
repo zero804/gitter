@@ -71,9 +71,7 @@ require([
     decorators: [new FileDecorator(itemCollections.files), webhookDecorator, issueDecorator, mentionDecorator, embedDecorator, emojiDecorator]
   }).render();
 
-  var unreadChatsModel = new UnreadChatsModel({
-    chatCollection: itemCollections.chats
-  });
+  var unreadChatsModel = unreadItemsClient.acrossTheFold();
 
   new UnreadBannerView.Top({
     el: '#unread-banner',
