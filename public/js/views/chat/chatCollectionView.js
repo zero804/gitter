@@ -104,12 +104,21 @@ define([
 
     scrollToFirstUnread: function() {
       var self = this;
+      var syncCount = 0;
 
       function findFirstUnread(callback) {
         var firstUnread = self.collection.findWhere({ unread: true });
+
+        if(!firstUnread && syncCount > 8) {
+          // stop trying to load so many messages. Have some old message instead.
+          var someOldMessage = self.collection.first();
+          return callback(someOldMessage);
+        }
+
         if(!firstUnread) {
           self.loadMore();
           self.collection.once('sync', function() {
+            syncCount++;
             findFirstUnread(callback);
           });
         } else {
@@ -118,6 +127,8 @@ define([
       }
 
       findFirstUnread(function(firstUnread) {
+        if(!firstUnread) return;
+
         var firstUnreadView = self.children.findByModel(firstUnread);
         self.rollers.trackUntil(firstUnreadView.el, true /* force */);
         self.rollers.adjustScrollContinuously(200);
