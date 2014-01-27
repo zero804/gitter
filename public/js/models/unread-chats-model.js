@@ -2,7 +2,7 @@
 define([
   'backbone',
   'utils/appevents'
-  ], function(backbone, appEvents)  {
+  ], function(Backbone, appEvents)  {
   "use strict";
 
   function getNewUnreadMessageCount(chatCollection) {
@@ -14,7 +14,7 @@ define([
     return count;
   }
 
-  return backbone.Model.extend({
+  return Backbone.Model.extend({
     defaults: {
       unreadCount: 0,
       unreadAbove: 0,
