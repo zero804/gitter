@@ -12,7 +12,7 @@ module.exports = {
     var user = new GithubMe(req.user);
 
     user.getEmail().then(function(email) {
-      res.send([email]);
+      res.send(email ? [email] : []);
     }).fail(next);
   }
 };
