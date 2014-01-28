@@ -12,7 +12,7 @@ define([], function() {
     /* :-D  */ smiley: /[:;]-?d/gi,
     /* X-D  */ stuck_out_tongue_closed_eyes: /x-d/gi,
     /* ;-p  */ stuck_out_tongue_winking_eye: /[:;]-?p/gi,
-    /* :-[  */ rage: /:-?[\[@](\[|@)/g,
+    /* :-[  */ rage: /:-?[\[@]/g,
     /* :-(  */ disappointed: /:-?\(/g,
     /* :'-( */ sob: /:['’]-?\(/g,
     /* :-*  */ kissing_heart: /:-?\*/g,
