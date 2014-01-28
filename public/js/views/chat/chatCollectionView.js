@@ -109,8 +109,8 @@ define([
         if(!firstUnread) return;
 
         var firstUnreadView = self.children.findByModel(firstUnread);
-        self.rollers.trackUntil(firstUnreadView.el, true /* force */);
-        self.rollers.adjustScrollContinuously(200);
+        self.rollers.scrollToElement(firstUnreadView.el);
+
       });
     },
 
