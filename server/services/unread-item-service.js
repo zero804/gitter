@@ -159,10 +159,10 @@ function removeItem(troupeId, itemType, itemId) {
   if(!itemType) { winston.error("newitem failed. itemType cannot be null"); return; }
   if(!itemId) { winston.error("newitem failed. itemId cannot be null"); return; }
 
-  return troupeService.findUserIdsForTroupeWithNotify(troupeId)
-    .then(function(userIdsWithNotify) {
+  return troupeService.findUserIdsForTroupeWithLurk(troupeId)
+    .then(function(userIdsWithLurk) {
 
-      var userIds = Object.keys(userIdsWithNotify);
+      var userIds = Object.keys(userIdsWithLurk);
 
       // Publish out an unread item removed event
       // TODO: we could actually check whether this user thinks this item is UNREAD
@@ -173,7 +173,7 @@ function removeItem(troupeId, itemType, itemId) {
       });
 
       var userIdsForNotify = userIds.filter(function(u) {
-        return userIdsWithNotify[u];
+        return !userIdsWithLurk[u];
       });
 
       // Now talk to redis and do the update
