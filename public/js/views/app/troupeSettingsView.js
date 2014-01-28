@@ -16,15 +16,17 @@ define([
     template: troupeSettingsTemplate,
     events: {
       'click #save-troupe-settings': 'saveSettings',
-      'click #cancel-troupe-settings' : 'closeSettings',
-      'click #enable-lurk-mode' : 'enableLurkMode'
+      'click #close-settings' : 'closeSettings',
+      'click #enable-lurk-mode' : 'enableLurkMode',
+      'change #notification-options' : 'formChange',
+      'change #unread-checkbox' : 'formChange'
     },
 
     initialize: function() {
       this.model = context.troupe();
       this.userCollection = itemCollections.users;
 
-      this.listenTo(this.model, 'change:lurk', this.setLurkValue);
+      this.listenTo(this.model, 'change:lurk', this.setShowUnreadBadgeValue);
 
       $.ajax({
         url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
@@ -34,6 +36,8 @@ define([
           this.settings = settings && settings.push || "all";
           this.$el.find("#notification-options").val(this.settings);
           // this.trigger('settingsLoaded', settings);
+          this.setLurkButton();
+
         },
         error: function() {
           log('An error occurred while communicating with notification settings');
@@ -41,15 +45,31 @@ define([
       });
     },
 
+    formChange: function() {
+      this.saveSettings();
+    },
+
     enableLurkMode: function() {
       this.$el.find('#notification-options').val("mention");
       this.$el.find('#unread-checkbox').prop('checked', true);
       this.saveSettings();
+      this.closeSettings();
     },
 
-    setLurkValue: function() {
+    setShowUnreadBadgeValue: function() {
       var lurk = this.model.get('lurk');
       this.el.querySelector("#unread-checkbox").checked = lurk;
+    },
+
+    setLurkButton: function() {
+      if (this.$el.find('#unread-checkbox').prop('checked') && (this.$el.find('#notification-options').val() == "mention" || this.$el.find('#notification-options').val() == "mute")) {
+        this.$el.find('#enable-lurk-mode').hide();
+        this.$el.find('#is-lurking').show();
+      }
+      else {
+        this.$el.find('#is-lurking').hide();
+        this.$el.find('#enable-lurk-mode').show();
+      }
     },
 
     closeSettings : function () {
@@ -59,6 +79,7 @@ define([
 
     afterRender: function() {
       if (this.settings) {
+        this.setLurkButton();
         this.$el.find("#notification-options").val(this.settings);
       }
     },
@@ -80,13 +101,8 @@ define([
       var push = self.$el.find("#notification-options").val();
       var lurk = self.el.querySelector("#unread-checkbox").checked;
 
-
-      var count = 0;
       function done() {
-        if(++count === 2) {
-          self.dialog.hide();
-          self.dialog = null;
-        }
+        self.setLurkButton();
       }
 
       $.ajax({
