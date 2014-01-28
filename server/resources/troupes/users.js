@@ -18,7 +18,7 @@ module.exports = {
 
     restSerializer.serialize(req.troupe.getUserIds(), strategy, function(err, serialized) {
       if(err) return next(err);
-      res.send(serialized);
+      res.send(serialized.filter(function(f) { return !!f; }));
     });
   },
 

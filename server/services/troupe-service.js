@@ -295,7 +295,7 @@ function mapLurkSettingsForTroupe(troupe) {
 
 
 function findUserIdsForTroupeWithLurk(troupeId) {
-  return findById(troupeId, 'users')
+  return persistence.Troupe.findByIdQ(troupeId, 'users')
     .then(function(troupe) {
       return mapLurkSettingsForTroupe(troupe);
     });
@@ -307,7 +307,10 @@ function findUserIdsForTroupeWithLurk(troupeId) {
  * Candidate for redis caching potentially?
  */
 function findUserIdsForTroupesWithLurk(troupeIds) {
-  return findByIds(troupeIds)
+  return persistence.Troupe
+        .where('_id')['in'](collections.idsIn(troupeIds))
+        .select('users')
+        .execQ()
     .then(function(troupes) {
       return troupes
               .reduce(function(memo, troupe) {
