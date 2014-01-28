@@ -18,12 +18,11 @@ define([
     tagName: 'li',
     template: troupeListItemTemplate,
     modelEvents: {
-      'change:unreadItems': 'render',
-      'change:activity change:unreadItems': 'onActivity'
+      'change:unreadItems change:lurk change:activity': 'render'
     },
     events: {
-      'click': 'clicked',
-      'click .item-close': 'onItemClose'
+      'click':              'clicked',
+      'click .item-close':  'onItemClose'
     },
     serializeData: function() {
       var data = this.model.toJSON();
@@ -36,45 +35,71 @@ define([
       e.stopPropagation();
       this.model.destroy();
     },
-    onDomRefresh: function() {
-      var b = this.$el.find('.item-unread-badge');
-      var ui = this.model.get('unreadItems');
-      if(ui) {
-        b.find('span').text(ui);
-        b.show();
-      } else {
-        b.hide();
-      }
 
-       // manipulate the `el` here. it's already
-       // been rendered, and is full of the view's
-       // HTML, ready to go.
-     },
-    onActivity: function() {
-      if(this.model.id === context.getTroupeId()) return;
-
-      var a = this.model.get('activity');
-      var e = this.$el;
-
-      if(a) {
-        e.addClass('chatting chatting-now');
-
-        if(this.timeout) {
-          clearTimeout(this.timeout);
-        }
-
-        this.timeout = setTimeout(function() {
-          delete this.timeout;
-          e.removeClass('chatting-now');
-        }, 1600);
-      } else {
-        e.removeClass('chatting chatting-now');
-      }
-    },
     onRender: function() {
-      this.el.dataset.id = this.model.id;
-      if (this.model.attributes.favourite) {
-        this.$el.addClass('item-fav');
+      var self = this;
+
+      var m = self.model;
+      self.el.dataset.id = m.id;
+      var e = self.$el;
+
+      var first = !self.initialRender;
+      self.initialRender = true;
+
+      if(!!first && !m.changed) return;
+
+      var unreadBadge = e.find('.item-unread-badge');
+      var lurk = self.model.get('lurk');
+
+      if(first || 'lurk' in m.changed) {
+        if(lurk) {
+          unreadBadge.hide();
+        } else {
+          e.removeClass('chatting chatting-now');
+        }
+      }
+
+      if(first || 'activity' in m.changed) {
+        var activity = self.model.get('activity');
+
+        if(lurk && activity) {
+          e.addClass('chatting chatting-now');
+
+          if(self.timeout) {
+            clearTimeout(self.timeout);
+          }
+
+          self.timeout = setTimeout(function() {
+            delete self.timeout;
+            if(self.model.id === context.getTroupeId()) {
+              e.removeClass('chatting chatting-now');
+            } else {
+              e.removeClass('chatting-now');
+            }
+
+          }, 1600);
+        } else {
+          e.removeClass('chatting chatting-now');
+        }
+      }
+
+      if(first || 'unreadItems' in m.changed) {
+        var ui = self.model.get('unreadItems');
+        if(ui) {
+          unreadBadge.find('span').text(ui);
+          unreadBadge.show();
+        } else {
+          unreadBadge.hide();
+        }
+      }
+
+      if(first || 'favourite' in m.changed) {
+        var f = self.model.get('favourite');
+        if(f) {
+          e.addClass('item-fav');
+        } else {
+          e.removeClass('item-fav');
+        }
       }
     },
     clearSearch: function() {
