@@ -10,20 +10,14 @@
       <option value="mute">Don't notify me at all</option>
     </select>
     <br>
-    <br>
-    <label for="lurk-checkbox" class="trpBodyMedium">
-      <input type="checkbox" id="lurk-checkbox" name="lurk" value="1" style="display:inline" {{#if lurk}}checked{{/if}}/>
-      Lurk Mode
+    <label for="unread-checkbox" class="trpBodyMedium" style="color: black;">
+      <input type="checkbox" id="unread-checkbox" name="lurk" value="1" style="display:inline" {{#if lurk}}checked{{/if}}/>
+      Hide unread message badge
     </label>
-
-    <div class="trpBodySmall" style="color: #999">
-    Enable lurk mode if you don&apos;t want to be notified of individual chat messages in this room.
-    </div>
 
     <br>
     <div class="trpBodySmall" style="color: #999">
       Notification settings only apply to you and not to other users.
-      <br>
       <br>
       {{#if notificationsBlocked}}
         Notifications have beed disabled by your browser. <a href="/apps" target="new">Download Gitter Apps</a> or change your permissions to receive notifications.
@@ -33,8 +27,11 @@
     </div>
   </div>
 
-    <div class="trpRequestSubmit"><br>
-      <button type="submit" class="trpModalButton trpButtonMedium trpBtnGreen" id="save-troupe-settings">Save</button><br><br>
+    <div class="trpRequestSubmit">
+      <button type="button" class="trpModalButon trpButtonMedium trpBtnGrey" id="enable-lurk-mode" style="float:right">Enable lurk mode</button>
+      <button type="submit" class="trpModalButton trpButtonMedium trpBtnGreen" id="save-troupe-settings">Save</button>
+
+      <br><br>
   </div>
   </form>
 </div>
