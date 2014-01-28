@@ -28,24 +28,13 @@ define([], function() {
     /* :-1: */ thumbsdown: /:\-1:/g
   };
 
-
   var emoticonsProcessed = Object.keys(emoticons).map(function(key) {
-    return [emoticons[key], key];
+    return [emoticons[key], key, true];
   });
-
-  var mega = emoticonsProcessed
-    .map(function(v) {
-      var re = v[0];
-      var val = re.source || re;
-      val = val.replace(/(^|[^\[])\^/g, '$1');
-      return "(" + val + ")";
-    })
-    .join('|');
 
   return {
     emoticons: emoticonsProcessed,
-    named: namedEmoji,
-    emojiMegaRe: new RegExp(mega, "gi")
+    named: namedEmoji
   };
 
 });
