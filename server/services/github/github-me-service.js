@@ -30,7 +30,8 @@ GitHubMeService.prototype.getEmail = function() {
     url: 'https://api.github.com/user/emails?access_token='+this.user.githubUserToken,
     headers: {
       'Accept': 'application/vnd.github.v3.full+json',
-      'User-Agent': 'gitter-test'
+      'Content-Type': 'application/json',
+      'User-Agent': 'gitter/0.0 (https://gitter.im) terminal/0.0'
     },
     json: true
   };
