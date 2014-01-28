@@ -10,13 +10,12 @@ define([
   'collections/instances/integrated-items',
   'views/people/peopleCollectionView',
   'cocktail',
-  'utils/uservoice',
   'views/widgets/troupeAvatar',
   './repoInfo',
   './activity',
   'utils/scrollbar-detect'
 ], function($, Backbone, Marionette, TroupeViews, context, /*qq,*/ rightToolbarTemplate, itemCollections,
-  PeopleCollectionView, cocktail, userVoice, TroupeAvatar, repoInfo, activityStream, hasScrollBars) {
+  PeopleCollectionView, cocktail, TroupeAvatar, repoInfo, activityStream, hasScrollBars) {
   "use strict";
 
   var RightToolbarLayout = Marionette.Layout.extend({
@@ -77,7 +76,7 @@ define([
     onRender: function() {
       $('#toolbar-frame').show();
 
-      userVoice.install(this.$el.find('#help-button'), context.getUser());
+      // userVoice.install(this.$el.find('#help-button'), context.getUser());
 
       // File View
       // this.files.show(new FileView({ collection: fileCollection }));

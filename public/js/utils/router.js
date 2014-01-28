@@ -87,7 +87,7 @@ define([
         cv.supportsModelReplacement &&
         cv.supportsModelReplacement()) {
         cv.replaceModel(model);
-        $(document).trigger('appNavigation');
+        appEvents.trigger('appNavigation');
 
         return;
       }
@@ -97,7 +97,7 @@ define([
     var viewOptions = _.extend({ model: model, collection: viewDetails.collection }, viewDetails.viewOptions);
     var view = new viewDetails.viewType(viewOptions);
     region.show(view);
-    $(document).trigger('appNavigation');
+    appEvents.trigger('appNavigation');
   }
 
   var Router = Backbone.Router.extend({

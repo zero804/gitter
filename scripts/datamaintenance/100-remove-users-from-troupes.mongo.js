@@ -21,14 +21,18 @@ function hashTroupeUsers() {
     });
 
     var memo = {};
-
-    allUsers.forEach(function(val) {
-      val.forEach(function(troupeUser) {
-        if(troupeUser.userId.valueOf()) {
-          memo[troupeUser.userId.valueOf()] = true;
+    if(allUsers) {
+      allUsers.forEach(function(val) {
+        if(val) {
+          val.forEach(function(troupeUser) {
+            if(troupeUser.userId.valueOf()) {
+              memo[troupeUser.userId.valueOf()] = true;
+            }
+          });
         }
       });
-    });
+
+    }
 
     return memo;
 }
