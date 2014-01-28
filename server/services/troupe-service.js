@@ -295,7 +295,8 @@ function mapLurkSettingsForTroupe(troupe) {
 
 
 function findUserIdsForTroupeWithLurk(troupeId) {
-  return persistence.Troupe.findByIdQ(troupeId, 'users')
+  console.log('findUserIdsForTroupeWithLurk', troupeId);
+  return findById(troupeId, 'users')
     .then(function(troupe) {
       return mapLurkSettingsForTroupe(troupe);
     });
