@@ -360,7 +360,7 @@ TroupeSchema.methods.addUserById = function(userId, options) {
   }
 
   var raw = { userId: userId };
-  if('lurk' in options) {
+  if(options && 'lurk' in options) {
     raw.lurk = options.lurk;
   }
 
