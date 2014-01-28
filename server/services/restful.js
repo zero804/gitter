@@ -123,10 +123,7 @@ exports.serializeUsersForTroupe = function(troupeId, userId, callback) {
       currentUserId: userId
     });
 
-    restSerializer.serialize(userIds, strategy, function(err, results) {
-      if(err) return callback(err);
-      callback(null, results.filter(function(f) { return !!f; }));
-    });
+    restSerializer.serializeExcludeNulls(userIds, strategy, callback);
   });
 };
 
