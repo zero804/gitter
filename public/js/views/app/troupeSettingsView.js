@@ -6,8 +6,9 @@ define([
   'views/base',
   'collections/instances/integrated-items',
   'hbs!./tmpl/troupeSettingsTemplate',
+  'log!troupe-settings-view',
   'components/notifications'
-], function($, _, context, TroupeViews, itemCollections, troupeSettingsTemplate, notifications) {
+], function($, _, context, TroupeViews, itemCollections, troupeSettingsTemplate, log, notifications) {
   "use strict";
 
 
@@ -21,12 +22,27 @@ define([
     initialize: function() {
       this.model = context.troupe();
       this.userCollection = itemCollections.users;
-      this.listenTo(this.model, 'change:notify', this.setNotifyValue);
+
+      this.listenTo(this.model, 'change:lurk', this.setLurkValue);
+
+      $.ajax({
+        url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
+        type: "GET",
+        context: this,
+        success: function(settings) {
+          this.settings = settings && settings.push || "all";
+          this.$el.find("#notification-options").val(this.settings);
+          // this.trigger('settingsLoaded', settings);
+        },
+        error: function() {
+          log('An error occurred while communicating with notification settings');
+        }
+      });
     },
 
-    setNotifyValue: function() {
-      var notify = this.model.get('notify');
-      this.$el.find("#notification-options").val(notify ? 'all' : 'mention');
+    setLurkValue: function() {
+      var lurk = this.model.get('lurk');
+      this.el.querySelector("#lurk-checkbox").checked = lurk;
     },
 
     closeSettings : function () {
@@ -35,37 +51,54 @@ define([
     },
 
     afterRender: function() {
-      this.setNotifyValue();
+      if (this.settings) {
+        this.$el.find("#notification-options").val(this.settings);
+      }
     },
 
     getRenderData: function() {
       return _.extend({},
         context.getTroupe(), {
-        notify: this.model.get('notify') ? 'all' : 'mention',
-        notificationsBlocked: notifications.hasBeenDenied(),
-        isNativeDesktopApp: context().isNativeDesktopApp,
-        troupeUrl: '//' + window.location.host + window.location.pathname
-      });
+          lurk: context.troupe().get('lurk'),
+          notificationsBlocked: notifications.hasBeenDenied(),
+          isNativeDesktopApp: context().isNativeDesktopApp,
+          troupeUrl: '//' + window.location.host + window.location.pathname
+        });
     },
 
     saveSettings: function(e) {
       if(e) e.preventDefault();
 
       var self = this;
-      var notify = self.$el.find("#notification-options").val() == 'all';
+      var push = self.$el.find("#notification-options").val();
+      var lurk = self.el.querySelector("#lurk-checkbox").checked;
 
-      context.troupe().set('notify', notify);
+
+      var count = 0;
+      function done() {
+        if(++count === 2) {
+          self.dialog.hide();
+          self.dialog = null;
+        }
+      }
+
+      $.ajax({
+        url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
+        contentType: "application/json",
+        dataType: "json",
+        type: "PUT",
+        data: JSON.stringify({ push: push }),
+        success: done
+      });
+
 
       $.ajax({
         url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId(),
         contentType: "application/json",
         dataType: "json",
         type: "PUT",
-        data: JSON.stringify({ notify: notify }),
-        success: function() {
-          self.dialog.hide();
-          self.dialog = null;
-        }
+        data: JSON.stringify({ lurk: lurk }),
+        success: done
       });
     }
   });

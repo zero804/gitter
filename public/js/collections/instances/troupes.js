@@ -109,10 +109,13 @@ define([
   });
 
   appEvents.on('activity', function(message) {
+    /* Lurk mode... */
+
     var troupeId = message.troupeId;
     var model = troupeCollection.get(troupeId);
     if(!model) return;
-    if(model.get('notify')) return;
+
+    if(!model.get('lurk')) return;
     var a = model.get('activity');
     if(a) {
       model.set('activity', a + 1);

@@ -7,11 +7,12 @@
     <select class="trpInput" style="width: 306px; height: 36px" id="notification-options">
       <option value="all">Notify me for all messages</option>
       <option value="mention">Notify me when somebody mentions me</option>
+      <option value="mute">Don't notify me at all</option>
     </select>
     <br>
     <br>
-    <label for="lurk-checkbox" class="trpBodySmall" style="color: #999">
-      <input type="checkbox" id="lurk-checkbox" name="lurk" value="1" style="display:inline"/> Lurk mode
+    <label for="lurk-checkbox" class="trpBodyMedium" style="color: #999">
+      <input type="checkbox" id="lurk-checkbox" name="lurk" value="1" style="display:inline" {{#if lurk}}checked{{/if}}/> Lurk mode
     </label>
     <br>
     <div class="trpBodySmall" style="color: #999">
