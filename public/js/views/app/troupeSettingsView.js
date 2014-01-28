@@ -16,7 +16,8 @@ define([
     template: troupeSettingsTemplate,
     events: {
       'click #save-troupe-settings': 'saveSettings',
-      'click #cancel-troupe-settings' : 'closeSettings'
+      'click #cancel-troupe-settings' : 'closeSettings',
+      'click #enable-lurk-mode' : 'enableLurkMode'
     },
 
     initialize: function() {
@@ -40,9 +41,15 @@ define([
       });
     },
 
+    enableLurkMode: function() {
+      this.$el.find('#notification-options').val("mention");
+      this.$el.find('#unread-checkbox').prop('checked', true);
+      this.saveSettings();
+    },
+
     setLurkValue: function() {
       var lurk = this.model.get('lurk');
-      this.el.querySelector("#lurk-checkbox").checked = lurk;
+      this.el.querySelector("#unread-checkbox").checked = lurk;
     },
 
     closeSettings : function () {
@@ -71,7 +78,7 @@ define([
 
       var self = this;
       var push = self.$el.find("#notification-options").val();
-      var lurk = self.el.querySelector("#lurk-checkbox").checked;
+      var lurk = self.el.querySelector("#unread-checkbox").checked;
 
 
       var count = 0;
