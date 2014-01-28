@@ -27,7 +27,7 @@ var opts = require("nomnom")
    .parse();
 
 function sendMessage(token, troupe, host) {
-  var url = host + '/troupes/' + troupe + '/chatMessages';
+  var url = host + '/api/v1/troupes/' + troupe + '/chatMessages';
   console.log('Chatting to ' + url);
   rest.post(url, {
     data: { text: 'The time is ' + new Date() },
@@ -44,11 +44,11 @@ function error(e) {
   process.exit(1);
 }
 
-userService.findByEmail(opts.user, function(err, user) {
+userService.findByUsername(opts.user, function(err, user) {
   if(err) return error(err);
   if(!user) return error('User not found');
 
-  troupeService.findByUri(opts.troupe, function(err, troupe) {
+  troupeService.findById(opts.troupe, function(err, troupe) {
     if(err) return error(err);
     if(!troupe) return error('Troupe not found');
 

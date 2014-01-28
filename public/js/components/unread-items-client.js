@@ -6,8 +6,9 @@ define([
   './realtime',
   'log!unread-items-client',
   'backbone',
-  'utils/appevents'
-], function($, _, context, realtime, log, Backbone, appEvents) {
+  'utils/appevents',
+  'utils/double-hash'
+], function($, _, context, realtime, log, Backbone, appEvents, DoubleHash) {
   "use strict";
 
   function limit(fn, context, timeout) {
@@ -25,82 +26,6 @@ define([
 
   var ADD_TIMEOUT = 500;
   var REMOVE_TIMEOUT = 600000;
-
-  // -----------------------------------------------------
-  // Stores value pairs
-  // -----------------------------------------------------
-
-  var DoubleHash = function() {
-    this._data = {};
-  };
-
-  DoubleHash.prototype = {
-    // Add an item, return true if it did not exist before
-    _add: function(itemType, itemId) {
-      var substore = this._data[itemType];
-      if(!substore) {
-        substore = this._data[itemType] = {};
-      }
-
-      var exists = substore[itemId];
-      if(exists) return false;
-      substore[itemId] = true;
-
-      if(this._onItemAdded) this._onItemAdded(itemType, itemId);
-
-      return true;
-    },
-
-    // Add an item, return true iff it exists
-    _remove: function(itemType, itemId) {
-       var substore = this._data[itemType];
-      if(!substore) return false;
-      var exists = substore[itemId];
-      if(!exists) return false;
-
-      delete substore[itemId];
-
-      if(_.keys(substore).length === 0) {
-        delete this._data[itemType];
-      }
-
-      if(this._onItemRemoved) this._onItemRemoved(itemType, itemId);
-
-      return true;
-    },
-
-    _contains: function(itemType, itemId) {
-      var substore = this._data[itemType];
-      if(!substore) return false;
-      return !!substore[itemId];
-    },
-
-    _count: function() {
-      var types = _.keys(this._data);
-
-      return _.reduce(types, function(memo, itemType) {
-        var ids = _.keys(this._data[itemType]);
-        return memo + ids.length;
-      }, 0, this);
-    },
-
-    _marshall: function() {
-      var self = this;
-      var r = {};
-      var types = _.keys(self._data);
-      _.each(types, function(itemType) {
-        var array = [];
-
-        _.each(_.keys(self._data[itemType]), function(itemId) {
-          array.push(itemId);
-        });
-
-        r[itemType] = array;
-      });
-
-      return r;
-    }
-  };
 
   // -----------------------------------------------------
   // A doublehash which slows things down
@@ -189,7 +114,10 @@ define([
 
         this._currentCountValue = newValue;
         this.trigger('newcountvalue', newValue);
+        appEvents.trigger('unreadItemsCount', newValue);
       }
+
+      return newValue;
     },
 
     _currentCount: function() {
@@ -403,9 +331,6 @@ define([
     }
   };
 
-
-
-
   // -----------------------------------------------------
   // Monitors the view port and tells the store when things
   // have been read
@@ -418,10 +343,10 @@ define([
 
     this._store = unreadItemStore;
     this._windowScrollLimited = limit(this._windowScroll, this, 50);
-    this._inFocus = true;
 
-    this._scrollTop = 1000000000;
-    this._scrollBottom = 0;
+    var foldCountLimited = limit(this._foldCount, this, 50);
+    this._foldCountLimited = foldCountLimited;
+    this._inFocus = true;
 
     appEvents.on('eyeballStateChange', this._eyeballStateChange, this);
 
@@ -433,26 +358,29 @@ define([
     // TODO: don't reference this frame directly!
     //$('#toolbar-frame').on('scroll', this._getBounds);
 
-    $(document).on('unreadItemDisplayed', this._getBounds);
+    appEvents.on('unreadItemDisplayed', this._getBounds);
+
+    unreadItemStore.on('unreadItemRemoved', foldCountLimited);
 
     // When the UI changes, rescan
-    $(document).on('appNavigation', this._getBounds);
+    appEvents.on('appNavigation', this._getBounds);
   };
 
   TroupeUnreadItemsViewportMonitor.prototype = {
     _getBounds: function() {
       if(!this._inFocus) {
+        this._foldCountLimited();
         return;
       }
 
       var scrollTop = this._scrollElement.scrollTop;
       var scrollBottom = scrollTop + this._scrollElement.clientHeight;
 
-      if(scrollTop < this._scrollTop) {
+      if(!this._scrollTop || scrollTop < this._scrollTop) {
         this._scrollTop = scrollTop;
       }
 
-      if(scrollBottom > this._scrollBottom) {
+      if(!this._scrollBottom || scrollBottom > this._scrollBottom) {
         this._scrollBottom = scrollBottom;
       }
 
@@ -469,36 +397,84 @@ define([
       var topBound = this._scrollTop;
       var bottomBound = this._scrollBottom;
 
-      // log('Looking for items to mark as read between ' + topBound + ' and ' + bottomBound);
-
-      this._scrollTop = this._scrollElement.scrollTop;
-      this._scrollBottom = this._scrollTop + this._scrollElement.clientHeight;
+      delete this._scrollTop;
+      delete this._scrollBottom;
 
       var unreadItems = this._scrollElement.querySelectorAll('.unread');
 
       var timeout = 1000;
-
+      var below = 0;
       /* Beware, this is not an array, it's a nodelist. We can't use array methods like forEach  */
       for(var i = 0; i < unreadItems.length; i++) {
         var element = unreadItems[i];
-        var $e = $(element);
 
-        var itemType = $e.data('itemType');
-        var itemId = $e.data('itemId');
+        // var itemType = $e.data('itemType');
+        // var itemId = $e.data('itemId');
+        var itemType = element.dataset.itemType;
+        var itemId = element.dataset.itemId;
+
         if(itemType && itemId) {
           var top = element.offsetTop;
 
           if (top >= topBound && top <= bottomBound) {
+            var $e = $(element);
+
             self._store._markItemRead(itemType, itemId);
 
             $e.removeClass('unread').addClass('reading');
             this._addToMarkReadQueue($e);
             timeout = timeout + 150;
+          } else if(top > bottomBound) {
+            // This item is below the bottom fold
+            below++;
+          } else if(top < topBound) {
+            // This item is above the top fold
+
           }
         }
 
       }
 
+      var total = self._store._recount();
+      var above = total - below;
+      acrossTheFoldModel.set('unreadAbove', above);
+      acrossTheFoldModel.set('unreadBelow', below);
+    },
+
+    _foldCount: function() {
+      var self = this;
+
+      var topBound = this._scrollElement.scrollTop;
+      var bottomBound = topBound + this._scrollElement.clientHeight;
+
+      var unreadItems = this._scrollElement.querySelectorAll('.unread');
+
+      var below = 0, inframe = 0;
+      /* Beware, this is not an array, it's a nodelist. We can't use array methods like forEach  */
+      for(var i = 0; i < unreadItems.length; i++) {
+        var element = unreadItems[i];
+
+        var itemType = element.dataset.itemType;
+        var itemId = element.dataset.itemId;
+
+        if(itemType && itemId) {
+          var top = element.offsetTop;
+
+          if (top >= topBound && top <= bottomBound) {
+            inframe++;
+          } else if(top > bottomBound) {
+            // This item is below the bottom fold
+            below++;
+          }
+        }
+
+      }
+
+
+      var total = self._store._recount();
+      var above = total - below - inframe;
+      acrossTheFoldModel.set('unreadAbove', above);
+      acrossTheFoldModel.set('unreadBelow', below);
     },
 
     _scheduleMarkRead: function() {
@@ -528,6 +504,7 @@ define([
       }
     }
   };
+
 
   // -----------------------------------------------------
   // Monitors the store and removes the css for items that
@@ -578,7 +555,19 @@ define([
     throw new Error("Unable to create an unread items store without a user");
   }
 
+
+  var acrossTheFoldModel = new Backbone.Model({
+    defaults: {
+      unreadAbove: 0,
+      unreadBelow: 0
+    }
+  });
+
+
   var unreadItemsClient = {
+    acrossTheFold: function() {
+      return acrossTheFoldModel;
+    },
 
     hasItemBeenMarkedAsRead: function(itemType, itemId) {
       var unreadItemStore = getUnreadItemStoreReq();
