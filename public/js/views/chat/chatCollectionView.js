@@ -20,6 +20,8 @@ define([
 
   /** @const */
   var PAGE_SIZE = 15;
+  /** @const */
+  var MAX_IMAGE_EMBED_LOAD_TIME_MS = 1000;
 
   /*
    * View
@@ -73,6 +75,7 @@ define([
       this.decorators     = options.decorators || [];
 
       this.rollers.scrollToBottom();
+      this.rollers.adjustScrollContinuously(MAX_IMAGE_EMBED_LOAD_TIME_MS);
 
       /* Scroll to the bottom when the user sends a new chat */
       this.listenTo(appEvents, 'chat.send', function() {
