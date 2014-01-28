@@ -1051,7 +1051,17 @@ function serialize(items, strat, callback) {
 
     callback(null, pkg(items.map(strat.map).filter(function(f) { return f !== undefined; })));
   });
+}
 
+function serializeExcludeNulls(items, strat, callback) {
+  var single = !Array.isArray(items);
+
+  return serialize(items, strat, function(err, results) {
+    if(err) return callback(err);
+    if(single) return callback(null, results);
+
+    return callback(null, results.filter(function(f) { return !!f; }));
+  });
 }
 
 function serializeQ(items, strat) {
@@ -1162,6 +1172,7 @@ module.exports = {
   getStrategy: getStrategy,
   execPreloads: execPreloads,
   serialize: serialize,
+  serializeExcludeNulls: serializeExcludeNulls,
   serializeQ: serializeQ,
   serializeModel: serializeModel,
   GitHubOrgStrategy: GitHubOrgStrategy,

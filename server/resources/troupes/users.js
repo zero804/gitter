@@ -16,9 +16,9 @@ module.exports = {
       currentUser: req.user
     });
 
-    restSerializer.serialize(req.troupe.getUserIds(), strategy, function(err, serialized) {
+    restSerializer.serializeExcludeNulls(req.troupe.getUserIds(), strategy, function(err, serialized) {
       if(err) return next(err);
-      res.send(serialized.filter(function(f) { return !!f; }));
+      res.send(serialized);
     });
   },
 
