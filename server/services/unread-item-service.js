@@ -126,6 +126,8 @@ function newItem(troupeId, creatorUserId, itemType, itemId) {
         return !userIdsWithLurk[u];
       });
 
+      if(userIdsForNotify.length) return;
+
       // Now talk to redis and do the update
       var keys = getScriptKeysForUserIds(userIdsForNotify, itemType, troupeId);
       return runScript('unread-add-item', keys, [troupeId, itemId])
@@ -175,6 +177,8 @@ function removeItem(troupeId, itemType, itemId) {
       var userIdsForNotify = userIds.filter(function(u) {
         return !userIdsWithLurk[u];
       });
+
+      if(userIdsForNotify.length) return;
 
       // Now talk to redis and do the update
       var keys = getScriptKeysForUserIds(userIdsForNotify, itemType, troupeId);
