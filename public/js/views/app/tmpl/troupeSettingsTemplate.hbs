@@ -1,7 +1,7 @@
 <div class="modal-content">
   <form id="troupeSettings">
     <div class="trpBodyMedium" style="margin-bottom: 6px;">
-        Notification Settings
+        Desktop Notification Settings
     </div>
 
     <select class="trpInput" style="width: 306px; height: 36px" id="notification-options">
@@ -11,9 +11,15 @@
     </select>
     <br>
     <br>
-    <label for="lurk-checkbox" class="trpBodyMedium" style="color: #999">
-      <input type="checkbox" id="lurk-checkbox" name="lurk" value="1" style="display:inline" {{#if lurk}}checked{{/if}}/> Lurk mode
+    <label for="lurk-checkbox" class="trpBodyMedium">
+      <input type="checkbox" id="lurk-checkbox" name="lurk" value="1" style="display:inline" {{#if lurk}}checked{{/if}}/>
+      Lurk Mode
     </label>
+
+    <div class="trpBodySmall" style="color: #999">
+    Enable lurk mode if you don&apos;t want to be notified of individual chat messages in this room.
+    </div>
+
     <br>
     <div class="trpBodySmall" style="color: #999">
       Notification settings only apply to you and not to other users.
