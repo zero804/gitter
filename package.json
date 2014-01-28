@@ -86,7 +86,7 @@
     "async": "~0.2.9",
     "troupe-passport-github": "git://github.com/troupe/passport-github.git#v0.1.8d",
     "text-filter": "~0.1.0",
-    "marked": "git://github.com/gitterHQ/marked.git#v0.2.15",
+    "marked": "git://github.com/gitterHQ/marked.git#v0.2.14",
     "highlight.js": "~7.5.0"
   },
   "devDependencies": {
