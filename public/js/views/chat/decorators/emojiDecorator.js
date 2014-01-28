@@ -16,25 +16,22 @@ define(['utils/emoji', 'utils/cdn'], function(emoji, cdn) {
     'CODE': 1
   };
 
-  function isClassIgnored(c) {
-    return !!ignoredClasses[c];
-  }
-
   var emojify = (function () {
 
     // Helper function to find text within DOM
-    var findText = function (element, pattern, callback, validator) {
+    function findText(element, pattern, callback, validator) {
       for (var childi = element.childNodes.length; childi-- > 0;) {
         var child = element.childNodes[childi];
         if (child.nodeType == 1) {
 
           if(ignoredTags[child.tagName]) continue;
-          if (child.hasAttribute('class')) {
-            var classnames = child.getAttribute('class').toLowerCase().split(/\s+/);
-            if(classnames.some(isClassIgnored)) continue;
+
+          var classList = child.classList;
+          for(var i = 0; i < classList.length; i++) {
+            if(ignoredClasses[classList.item(i).toLowerCase()]) continue;
           }
 
-          findText(child, pattern, callback);
+          findText(child, pattern, callback, validator);
         } else if (child.nodeType == 3) {
           var matches = [];
           if (typeof pattern === 'string') {
