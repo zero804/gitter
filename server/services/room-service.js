@@ -126,8 +126,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
                 topic: topic || "",
                 users:  user ? [{
                   _id: new ObjectID(),
-                  userId: user._id,
-                  notify: 1 /* The creator of the room always has notify on */
+                  userId: user._id
                 }] : []
               }
             },
@@ -188,21 +187,8 @@ function ensureAccessControl(user, troupe, access) {
       /* In troupe? */
       if(troupe.containsUserId(user.id)) return Q.resolve(troupe);
 
-      return Q.fcall(function() {
-          switch(troupe.githubType) {
-            case 'ORG':
-              return 1;
-            case 'REPO':
-              return determineDefaultNotifyForRoom(user, troupe);
-
-            default:
-              throw new Error('Unknown room type: ' + troupe.githubType);
-          }
-        }).then(function(notify) {
-          troupe.addUserById(user.id, { notify: notify });
-          return troupe.saveQ().thenResolve(troupe);
-        });
-
+      troupe.addUserById(user.id);
+      return troupe.saveQ().thenResolve(troupe);
 
     } else {
       /* No access */
