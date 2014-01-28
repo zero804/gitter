@@ -286,18 +286,18 @@ function findUserIdsForTroupe(troupeId, callback) {
     .nodeify(callback);
 }
 
-function mapNotifySettingsForTroupe(troupe) {
+function mapLurkSettingsForTroupe(troupe) {
   return troupe.users.reduce(function(memo, v) {
-    memo[v.userId] = v.notify === undefined ? 1 : v.notify;
+    memo[v.userId] = !!v.lurk;
     return memo;
   }, {});
 }
 
 
-function findUserIdsForTroupeWithNotify(troupeId) {
+function findUserIdsForTroupeWithLurk(troupeId) {
   return persistence.Troupe.findByIdQ(troupeId, 'users')
     .then(function(troupe) {
-      return mapNotifySettingsForTroupe(troupe);
+      return mapLurkSettingsForTroupe(troupe);
     });
 }
 
@@ -306,12 +306,12 @@ function findUserIdsForTroupeWithNotify(troupeId) {
  *
  * Candidate for redis caching potentially?
  */
-function findUserIdsForTroupesWithNotify(troupeIds) {
+function findUserIdsForTroupesWithLurk(troupeIds) {
   return findByIds(troupeIds)
     .then(function(troupes) {
       return troupes
               .reduce(function(memo, troupe) {
-                var troupeUsersMapped = mapNotifySettingsForTroupe(troupe);
+                var troupeUsersMapped = mapLurkSettingsForTroupe(troupe);
                 memo[troupe.id] = troupeUsersMapped;
                 return memo;
               }, {});
@@ -503,38 +503,6 @@ function findOrCreateOneToOneTroupeIfPossible(fromUserId, toUserId) {
 
 }
 
-// /**
-//  * Take a one to one troupe and turn it into a normal troupe with extra invites
-//  * @return promise with new troupe
-//  */
-// function upgradeOneToOneTroupe(options, callback) {
-//   var name = options.name;
-//   var fromUser = options.user;
-//   var origTroupe = options.oneToOneTroupe.toObject();
-
-//   // create a new, normal troupe, with the current users from the one to one troupe
-//   return createTroupeQ({
-//       uri: createUniqueUri(),
-//       name: name,
-//       status: 'ACTIVE',
-//       users: origTroupe.users
-//     })
-//     .then(function(troupe) {
-
-//       statsService.event('new_troupe', {
-//         troupeId: troupe.id,
-//         userId: fromUser.id,
-//         email: fromUser.email,
-//         oneToOneUpgrade: true,
-//         oneToOne: false
-//       });
-
-//       return troupe;
-//     })
-//     .nodeify(callback);
-
-// }
-
 function createUniqueUri() {
   var chars = "0123456789abcdefghiklmnopqrstuvwxyz";
 
@@ -562,21 +530,22 @@ function updateTopic(user, troupe, topic) {
     });
 }
 
-function updateTroupeNotifyForUserId(userId, troupeId, notify) {
+function updateTroupeLurkForUserId(userId, troupeId, lurk) {
   return findById(troupeId)
     .then(function(troupe) {
       var troupeUser = troupe.users.filter(function(troupeUser) { return troupeUser.userId == userId; })[0];
       if(troupeUser) {
-        troupeUser.notify = notify ? 1 : 0;
+        troupeUser.lurk = !!lurk;
       }
 
-      /* Don't send out the traditional updates */
+      /* Don't send out the traditional updates to all users */
       troupe._skipTroupeMiddleware = true;
+
       return troupe.saveQ();
     })
     .then(function() {
       // TODO: in future get rid of this but this collection is used by the native clients
-      appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, notify: !!notify });
+      appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, lurk: !!lurk });
     });
 }
 
@@ -701,8 +670,8 @@ module.exports = {
 
   findAllUserIdsForTroupes: findAllUserIdsForTroupes,
   findAllUserIdsForTroupe: findAllUserIdsForTroupe,
-  findUserIdsForTroupeWithNotify: findUserIdsForTroupeWithNotify,
-  findUserIdsForTroupesWithNotify: findUserIdsForTroupesWithNotify,
+  findUserIdsForTroupeWithLurk: findUserIdsForTroupeWithLurk,
+  findUserIdsForTroupesWithLurk: findUserIdsForTroupesWithLurk,
   findUserIdsForTroupe: findUserIdsForTroupe,
 
   validateTroupeUrisForUser: validateTroupeUrisForUser,
@@ -718,6 +687,6 @@ module.exports = {
   findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe,
 
   updateTopic: updateTopic,
-  updateTroupeNotifyForUserId: updateTroupeNotifyForUserId
+  updateTroupeLurkForUserId: updateTroupeLurkForUserId
 
 };

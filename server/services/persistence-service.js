@@ -287,10 +287,10 @@ UserTroupeFavouritesSchema.schemaTypeName = 'UserTroupeFavourites';
 var TroupeUserSchema = new Schema({
   userId: { type: ObjectId },
   deactivated: { type: Boolean },
-  notify: { type: Number, 'default': 1 }
-  /** Notify settings
-    *  0: mentions only
-    *  1: track all unread messages
+  lurk: { type: Boolean },
+  /** Lurk settings
+    *  false, undefined: no lurking
+    *  true: lurking
     */
 });
 TroupeUserSchema.schemaTypeName = 'TroupeUserSchema';
@@ -360,8 +360,8 @@ TroupeSchema.methods.addUserById = function(userId, options) {
   }
 
   var raw = { userId: userId };
-  if('notify' in options) {
-    raw.notify = options.notify;
+  if('lurk' in options) {
+    raw.lurk = options.lurk;
   }
 
   // TODO: disable this methods for one-to-one troupes

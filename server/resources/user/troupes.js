@@ -48,8 +48,8 @@ module.exports = {
       promises.push(recentRoomService.updateFavourite(userId, troupeId, updatedTroupe.favourite));
     }
 
-    if('notify' in updatedTroupe) {
-      promises.push(troupeService.updateTroupeNotifyForUserId(userId, troupeId, !!updatedTroupe.notify));
+    if('lurk' in updatedTroupe) {
+      promises.push(troupeService.updateTroupeLurkForUserId(userId, troupeId, updatedTroupe.lurk));
     }
 
     return Q.all(promises)

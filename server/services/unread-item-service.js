@@ -105,9 +105,9 @@ function newItem(troupeId, creatorUserId, itemType, itemId) {
   if(!itemType) { winston.error("newitem failed. itemType cannot be null"); return; }
   if(!itemId) { winston.error("newitem failed. itemId cannot be null"); return; }
 
-  return troupeService.findUserIdsForTroupeWithNotify(troupeId)
-    .then(function(userIdsWithNotify) {
-      var userIds = Object.keys(userIdsWithNotify);
+  return troupeService.findUserIdsForTroupeWithLurk(troupeId)
+    .then(function(userIdsWithLurk) {
+      var userIds = Object.keys(userIdsWithLurk);
 
       if(creatorUserId) {
         userIds = userIds.filter(function(userId) {
@@ -123,7 +123,7 @@ function newItem(troupeId, creatorUserId, itemType, itemId) {
       });
 
       var userIdsForNotify = userIds.filter(function(u) {
-        return userIdsWithNotify[u];
+        return !userIdsWithLurk[u];
       });
 
       // Now talk to redis and do the update
