@@ -7,7 +7,6 @@ define([
   "use strict";
 
   function embed(chatItemView) {
-    oEmbed.defaults.maxwidth = 370;
     chatItemView.$el.find('a.link').each(function(index, el) {
       oEmbed.parse(el.href, function(embed) {
         if (embed) {
