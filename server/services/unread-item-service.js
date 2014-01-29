@@ -94,7 +94,7 @@ function getScriptKeysForUserIds(userIds, itemType, troupeId) {
 var runScript = Q.nbind(scriptManager.run, scriptManager);
 var redisClient_smembers = Q.nbind(redisClient.smembers, redisClient);
 
-function upgradeKeyToSortedSet(key, callback) {
+function upgradeKeyToSortedSet(key, userBadgeKey, troupeId, callback) {
   // Use a new client due to the WATCH semantics
   var redisClient = redis.createClient();
 
@@ -103,6 +103,15 @@ function upgradeKeyToSortedSet(key, callback) {
     return callback(err);
   }
 
+  /**
+   * Fairly certain that we don't need the userBadgeKey in the lock.
+   * If we did so, changes to other userTroupes could starve this
+   * transaction. Also all changes to the specific key on the userBadge
+   * that we are changing will always affect the `key` too so we'll
+   * be safe from inconsistencies that way.
+   *
+   * IF WE'RE GETTING INCONSISTENCIES, review this later!
+   */
   redisClient.watch(key, function(err) {
     if(err) return done(err);
 
@@ -148,6 +157,8 @@ function upgradeKeyToSortedSet(key, callback) {
 
         multi.del(key);
         multi.zadd.apply(multi, zaddArgs);
+        multi.zrem(userBadgeKey, troupeId);
+        multi.zadd(userBadgeKey, itemIdsWithScores.length, troupeId);
 
         multi.exec(function(err) {
           if(err) return done(err);
@@ -218,9 +229,10 @@ function newItem(troupeId, creatorUserId, itemType, itemId) {
           upgrades.forEach(function(upgrade) {
             var userId = userIdsForNotify[upgrade];
             var key = "unread:" + itemType + ":" + userId + ":" + troupeId;
+            var userBadgeKey = "ub:" + userId;
 
             // Upgrades can happen asynchoronously
-            upgradeKeyToSortedSet(key, function(err) {
+            upgradeKeyToSortedSet(key, userBadgeKey, troupeId, function(err) {
               if(err) {
                 winston.info('unread-item-key-upgrade: failed. This is not as serious as it sounds, optimistically locked. ' + err, { exception: err });
               }

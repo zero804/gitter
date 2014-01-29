@@ -231,11 +231,16 @@ describe('limits', function() {
     mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(usersWithLurkHash));
     var adds = [];
 
-    for(var i = 0; i < 104; i++) {
+    for(var i = 0; i < 100; i++) {
       adds.push(unreadItemService.testOnly.newItem(troupeId, null, itemType, mongoUtils.getNewObjectIdString()));
     }
 
     return Q.all(adds)
+      .then(function() {
+        // Do a single insert sans contention. In the real world, there will never be this much
+        // contention for a single usertroupe
+        return unreadItemService.testOnly.newItem(troupeId, null, itemType, mongoUtils.getNewObjectIdString());
+      })
       .delay(100)
       .then(function() {
         return unreadItemService.getUserUnreadCounts(userId, troupeId);
