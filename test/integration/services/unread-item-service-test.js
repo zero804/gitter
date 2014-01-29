@@ -67,7 +67,13 @@ describe('unread-item-service', function() {
         '../app-events': appEventsMock
       });
 
-      mockito.when(troupeServiceMock).findUserIdsForTroupe(troupeId).thenReturn(Q.resolve([userId1, userId2, userId3]));
+      var usersWithLurkHash = {};
+      usersWithLurkHash[userId1] = false;
+      usersWithLurkHash[userId2] = false;
+      usersWithLurkHash[userId3] = true;
+
+      mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(usersWithLurkHash));
+
       unreadItemService.testOnly.newItem(troupeId, creatorUserId, itemType, itemId)
         .then(function() {
           // Two calls here, not three
@@ -113,7 +119,13 @@ describe('removeItem', function() {
       '../app-events': appEventsMock
     });
 
-    mockito.when(troupeServiceMock).findUserIdsForTroupe(troupeId).thenReturn(Q.resolve([userId1, userId2, userId3]));
+
+    var usersWithLurkHash = {};
+    usersWithLurkHash[userId1] = false;
+    usersWithLurkHash[userId2] = false;
+    usersWithLurkHash[userId3] = false;
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(usersWithLurkHash));
 
     unreadItemService.testOnly.removeItem(troupeId, itemType, itemId)
       .then(function() {
@@ -157,7 +169,11 @@ describe('markItemsRead', function() {
       './readby-service': readByService
     });
 
-    mockito.when(troupeServiceMock).findUserIdsForTroupe(troupeId).thenReturn(Q.resolve([userId]));
+
+    var usersWithLurkHash = {};
+    usersWithLurkHash[userId] = false;
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(usersWithLurkHash));
 
     return Q.all([
         unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId1),
@@ -281,7 +297,11 @@ describe.skip('emailnotifications', function() {
       './troupe-service': troupeServiceMock
     });
 
-    mockito.when(troupeServiceMock).findUserIdsForTroupe(troupeId).thenReturn(Q.resolve([userId]));
+
+    var usersWithLurkHash = {};
+    usersWithLurkHash[userId] = true;
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(usersWithLurkHash));
 
     return Q.all([
         unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId1),
@@ -318,7 +338,11 @@ describe.skip('emailnotifications', function() {
       './troupe-service': troupeServiceMock
     });
 
-    mockito.when(troupeServiceMock).findUserIdsForTroupe(troupeId).thenReturn(Q.resolve([userId]));
+
+    var usersWithLurkHash = {};
+    usersWithLurkHash[userId] = false;
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(usersWithLurkHash));
 
     return Q.all([
         unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId1),

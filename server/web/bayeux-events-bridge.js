@@ -6,7 +6,6 @@ var appEvents         = require("../app-events");
 var bayeux            = require('./bayeux');
 var ent               = require('ent');
 var presenceService   = require("../services/presence-service");
-var restSerializer    = require("../serializers/rest-serializer");
 
 exports.install = function() {
   var bayeuxClient = bayeux.client;
@@ -125,6 +124,11 @@ exports.install = function() {
     var userId = data.userId;
     var troupeId = data.troupeId;
     var items = data.items;
+
+    bayeuxClient.publish("/api/v1/user/" + userId, {
+      notification: "activity",
+      troupeId: troupeId
+    });
 
     bayeuxClient.publish("/api/v1/user/" + userId + '/troupes/' + troupeId + '/unreadItems', {
       notification: "unread_items",

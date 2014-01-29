@@ -68,10 +68,10 @@ function boost(username, suggestedEmail) {
       } else if(user && user.hasGitHubScope('user:email')) {
         var meService = new GitHubMeService(user);
         console.log("got here");
-        emailPromise = meService.getEmails()
-          .then(function(emails) {
-            if(Array.isArray(emails)) {
-              return emails[0];
+        emailPromise = meService.getEmail()
+          .then(function(email) {
+            if(email) {
+              return email;
             }
           });
       } else {

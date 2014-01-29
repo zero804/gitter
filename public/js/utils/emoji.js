@@ -6,13 +6,14 @@ define([], function() {
   var namedEmoji = namedEmojiString.split(/,/);
 
   var emoticons = {
+    /* :..: */ named: /:(\w+):/,
     /* :-)  */ blush: /:-?\)/g,
     /* :-o  */ scream: /:-o/gi,
     /* :-]  */ smirk: /[:;]-?]/g,
     /* :-D  */ smiley: /[:;]-?d/gi,
     /* X-D  */ stuck_out_tongue_closed_eyes: /x-d/gi,
     /* ;-p  */ stuck_out_tongue_winking_eye: /[:;]-?p/gi,
-    /* :-[  */ rage: /:-?[\[@](\[|@)/g,
+    /* :-[  */ rage: /:-?[\[@]/g,
     /* :-(  */ disappointed: /:-?\(/g,
     /* :'-( */ sob: /:['’]-?\(/g,
     /* :-*  */ kissing_heart: /:-?\*/g,
@@ -28,13 +29,24 @@ define([], function() {
     /* :-1: */ thumbsdown: /:\-1:/g
   };
 
+
   var emoticonsProcessed = Object.keys(emoticons).map(function(key) {
-    return [emoticons[key], key, true];
+    return [emoticons[key], key];
   });
+
+  var mega = emoticonsProcessed
+    .map(function(v) {
+      var re = v[0];
+      var val = re.source || re;
+      val = val.replace(/(^|[^\[])\^/g, '$1');
+      return "(" + val + ")";
+    })
+    .join('|');
 
   return {
     emoticons: emoticonsProcessed,
-    named: namedEmoji
+    named: namedEmoji,
+    emojiMegaRe: new RegExp(mega, "gi")
   };
 
 });

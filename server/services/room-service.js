@@ -13,6 +13,7 @@ var userService = require('./user-service');
 var troupeService = require('./troupe-service');
 var nconf = require('../utils/config');
 var request = require('request');
+var GitHubRepoService  = require('./github/github-repo-service');
 
 function localUriLookup(uri) {
   return uriLookupService.lookupUri(uri)
@@ -123,7 +124,10 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
                 _nonce: nonce,
                 githubType: githubType,
                 topic: topic || "",
-                users:  user ? [{ _id: new ObjectID(), userId: user._id }] : []
+                users:  user ? [{
+                  _id: new ObjectID(),
+                  userId: user._id
+                }] : []
               }
             },
             {
@@ -163,12 +167,21 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
     });
 }
 
+function determineDefaultNotifyForRoom(user, troupe) {
+  var repoService = new GitHubRepoService(user);
+  return repoService.getRepo(troupe.uri)
+    .then(function(repoInfo) {
+      if(!repoInfo || !repoInfo.permissions) return 0;
+
+      /* Admin or push? Notify */
+      return repoInfo.permissions.admin || repoInfo.permissions.push ? 1 : 0;
+    });
+}
 /**
  * Grant or remove the users access to a room
  * Makes the troupe reflect the users access to a room
  */
 function ensureAccessControl(user, troupe, access) {
-
   if(troupe) {
     if(access) {
       /* In troupe? */
@@ -176,6 +189,7 @@ function ensureAccessControl(user, troupe, access) {
 
       troupe.addUserById(user.id);
       return troupe.saveQ().thenResolve(troupe);
+
     } else {
       /* No access */
       if(!troupe.containsUserId(user.id)) return Q.resolve(null);

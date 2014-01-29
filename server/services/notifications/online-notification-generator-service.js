@@ -25,7 +25,7 @@ var templates = compile({
 });
 
 var titleTemplates = compile({
-  "chat": "{{#if troupe.oneToOne}}New chat from {{{fromUser.displayName}}}{{else}}New chat on {{{troupe.name}}}{{/if}}"
+  "chat": "{{#if troupe.oneToOne}}New chat from {{{fromUser.displayName}}}{{else}}New chat on {{{troupe.uri}}}{{/if}}"
 });
 
 var linkTemplates = compile({

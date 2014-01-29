@@ -19,13 +19,11 @@ require([
   'utils/router',
   'components/unread-items-client',
 
-  'views/chat/decorators/fileDecorator',
   'views/chat/decorators/webhookDecorator',
   'views/chat/decorators/issueDecorator',
   'views/chat/decorators/mentionDecorator',
   'views/chat/decorators/embedDecorator',
   'views/chat/decorators/emojiDecorator',
-  'models/unread-chats-model',
   'views/app/unreadBannerView',
   'views/app/headerView',
 
@@ -39,8 +37,8 @@ require([
 ], function($, Backbone, context, liveContext, appEvents, peopleCollectionView, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, RightToolbarView,
     PersonDetailView, inviteView, troupeSettingsView, markdownView, IntegrationSettingsModal,
-    Router, unreadItemsClient, FileDecorator, webhookDecorator, issueDecorator, mentionDecorator,
-    embedDecorator, emojiDecorator, UnreadChatsModel, UnreadBannerView, HeaderView) {
+    Router, unreadItemsClient, webhookDecorator, issueDecorator, mentionDecorator,
+    embedDecorator, emojiDecorator, UnreadBannerView, HeaderView) {
   "use strict";
 
   // Make drop down menus drop down
@@ -68,12 +66,10 @@ require([
     el: $('#content-frame'),
     collection: itemCollections.chats,
     userCollection: itemCollections.users,
-    decorators: [new FileDecorator(itemCollections.files), webhookDecorator, issueDecorator, mentionDecorator, embedDecorator, emojiDecorator]
+    decorators: [webhookDecorator, issueDecorator, mentionDecorator, embedDecorator, emojiDecorator]
   }).render();
 
-  var unreadChatsModel = new UnreadChatsModel({
-    chatCollection: itemCollections.chats
-  });
+  var unreadChatsModel = unreadItemsClient.acrossTheFold();
 
   new UnreadBannerView.Top({
     el: '#unread-banner',

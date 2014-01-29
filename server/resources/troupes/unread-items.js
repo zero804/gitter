@@ -25,7 +25,7 @@ module.exports = {
     },
 
     destroy: function(req, res, next) {
-      if(req.params.unreadItem.toLowerCase() !== 'all') next(404);
+      if(req.params.unreadItem.toLowerCase() !== 'all') return next(404);
 
       unreadItemService.markAllChatsRead(req.user.id, req.troupe.id, function(err) {
         if(err) return next(err);

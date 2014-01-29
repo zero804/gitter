@@ -48,6 +48,10 @@ module.exports = {
       promises.push(recentRoomService.updateFavourite(userId, troupeId, updatedTroupe.favourite));
     }
 
+    if('lurk' in updatedTroupe) {
+      promises.push(troupeService.updateTroupeLurkForUserId(userId, troupeId, updatedTroupe.lurk));
+    }
+
     return Q.all(promises)
       .then(function() {
         var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
@@ -64,7 +68,7 @@ module.exports = {
     var troupe = req.userTroupe;
     var userId = req.user.id;
 
-    return recentRoomService.removeRecentRoomForUser(userId, troupe.id)
+    return recentRoomService.removeRecentRoomForUser(userId, troupe)
       .then(function() {
         res.send({ success: true });
       })

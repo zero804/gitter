@@ -7,53 +7,82 @@ define([
   ], function($, Backbone, context, template)  {
   "use strict";
 
-  var BannerView = Backbone.View.extend({
+  var BottomBannerView = Backbone.View.extend({
+    events: {
+      'click button.main': 'onMainButtonClick'
+    },
     initialize: function(options) {
       this.chatCollectionView = options.chatCollectionView;
-      this.listenTo(this.model, 'change:'+this.unreadPropertyName, this.render);
+      this.listenTo(this.model, 'change:unreadBelow', this.render);
     },
     render: function() {
-      var self = this;
-      var model = this.model;
-      var $banner = this.$el;
-      var unreadCount = model.get(this.unreadPropertyName);
-
-      if(unreadCount > 0) {
-        var message = (unreadCount > 1) ? unreadCount+' unread messages' : '1 unread message';
-        $banner.html(template({
-          message: message,
-          showMarkAllButton: this.showMarkAllButton
-        }));
-        $banner.parent().show();
-        setTimeout(function() {
-          $banner.removeClass('slide-away');
-        }, 0);
+      if(this.getUnreadCount() > 0 && !this.chatCollectionView.isScrolledToBottom()) {
+        this.showBanner();
       } else {
-        $banner.addClass('slide-away');
-        setTimeout(function() {
-          if(model.get(self.unreadPropertyName) === 0) {
-            $banner.parent().hide();
-          }
-        }, 500);
+        this.hideBanner();
       }
-    }
+    },
+    getUnreadCount: function() {
+      return this.model.get('unreadBelow');
+    },
+    showBanner: function() {
+      var $banner = this.$el;
+      var unreadCount = this.getUnreadCount();
+      var message = (unreadCount > 1) ? unreadCount+' unread messages' : '1 unread message';
 
+      $banner.html(template({message: message}));
+      $banner.parent().show();
+
+      // cant have slide away animation on the same render as a display:none change
+      setTimeout(function() {
+        $banner.removeClass('slide-away');
+      }, 0);
+    },
+    hideBanner: function() {
+      var $banner = this.$el;
+      var self = this;
+
+      $banner.addClass('slide-away');
+
+      setTimeout(function() {
+        if(self.getUnreadCount() === 0) {
+          $banner.parent().hide();
+        }
+      }, 500);
+    },
+    onMainButtonClick: function() {
+      if(this.getUnreadCount() < 1) return;
+
+      this.chatCollectionView.scrollToFirstUnreadBelow();
+    }
   });
 
-  var Top = BannerView.extend({
-    unreadPropertyName: 'unreadAbove',
-    showMarkAllButton: true,
+  var TopBannerView = BottomBannerView.extend({
     events: {
-      'click button.main': 'scrollToFirstUnread',
-      'click button.side': 'dismissAll'
+      'click button.main': 'onMainButtonClick',
+      'click button.side': 'onSideButtonClick'
     },
-    scrollToFirstUnread: function() {
-      if(this.model.get('unreadAbove') < 1) return;
+    initialize: function(options) {
+      this.chatCollectionView = options.chatCollectionView;
+      this.listenTo(this.model, 'change:unreadAbove', this.render);
+    },
+    render: function() {
+      if(this.getUnreadCount() > 0) {
+        this.showBanner();
+      } else {
+        this.hideBanner();
+      }
+    },
+    getUnreadCount: function() {
+      return this.model.get('unreadAbove');
+    },
+    onMainButtonClick: function() {
+      if(this.getUnreadCount() < 1) return;
 
       this.chatCollectionView.scrollToFirstUnread();
     },
-    dismissAll: function() {
-      if(this.model.get('unreadAbove') < 1) return;
+    onSideButtonClick: function() {
+      if(this.getUnreadCount() < 1) return;
 
       $.ajax({
         url: "/api/v1/troupes/" + context.getTroupeId() + "/unreadItems/all",
@@ -63,47 +92,9 @@ define([
     }
   });
 
-  var Bottom = BannerView.extend({
-    unreadPropertyName: 'unreadBelow',
-    showMarkAllButton: false,
-    events: {
-      'click button.main': 'onMainButtonClick',
-    },
-    render: function() {
-      var self = this;
-      var model = this.model;
-      var $banner = this.$el;
-      var unreadCount = model.get(this.unreadPropertyName);
-
-      if(unreadCount > 0 && !this.chatCollectionView.isScrolledToBottom()) {
-        var message = (unreadCount > 1) ? unreadCount+' unread messages' : '1 unread message';
-        $banner.html(template({
-          message: message,
-          showMarkAllButton: this.showMarkAllButton
-        }));
-        $banner.parent().show();
-        setTimeout(function() {
-          $banner.removeClass('slide-away');
-        }, 0);
-      } else {
-        $banner.addClass('slide-away');
-        setTimeout(function() {
-          if(model.get(self.unreadPropertyName) === 0) {
-            $banner.parent().hide();
-          }
-        }, 500);
-      }
-    },
-    onMainButtonClick: function() {
-      if(this.model.get('unreadBelow') < 1) return;
-
-      this.chatCollectionView.scrollToBottom();
-    }
-  });
-
   return {
-    Top: Top,
-    Bottom: Bottom
+    Top: TopBannerView,
+    Bottom: BottomBannerView
   };
 
 });

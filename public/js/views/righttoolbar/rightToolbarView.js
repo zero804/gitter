@@ -1,7 +1,6 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
-  'backbone',
   'marionette',
   'views/base',
   'utils/context',
@@ -10,12 +9,11 @@ define([
   'collections/instances/integrated-items',
   'views/people/peopleCollectionView',
   'cocktail',
-  'views/widgets/troupeAvatar',
   './repoInfo',
   './activity',
   'utils/scrollbar-detect'
-], function($, Backbone, Marionette, TroupeViews, context, /*qq,*/ rightToolbarTemplate, itemCollections,
-  PeopleCollectionView, cocktail, TroupeAvatar, repoInfo, activityStream, hasScrollBars) {
+], function($, Marionette, TroupeViews, context, /*qq,*/ rightToolbarTemplate, itemCollections,
+  PeopleCollectionView, cocktail, repoInfo, ActivityStream, hasScrollBars) {
   "use strict";
 
   var RightToolbarLayout = Marionette.Layout.extend({
@@ -24,7 +22,6 @@ define([
 
     regions: {
       people: "#people-roster",
-      troupeAvatar: "#troupe-avatar-region",
       repo_info: "#repo-info",
       activity: "#activity"
     },
@@ -56,9 +53,10 @@ define([
       if (context().troupe.githubType === 'REPO') {
         isRepo = true;
       }
+
       return {
         isRepo : isRepo
-      }
+      };
     },
 
     onShow: function() {
@@ -78,18 +76,6 @@ define([
 
       // userVoice.install(this.$el.find('#help-button'), context.getUser());
 
-      // File View
-      // this.files.show(new FileView({ collection: fileCollection }));
-
-      if (!context.inOneToOneTroupeContext()) {
-        this.troupeAvatar.show(new TroupeAvatar({
-          troupe: context.troupe(),
-          noHref: true,
-          noUnread: true,
-          tooltipPlacement: 'left'
-        }));
-      }
-
       // People View
       this.people.show(new PeopleCollectionView.ExpandableRosterView({
         rosterCollection: itemCollections.roster,
@@ -104,10 +90,10 @@ define([
       }
 
       // Activity
-      this.activity.show(new activityStream({collection: itemCollections.events}));
+      this.activity.show(new ActivityStream({ collection: itemCollections.events }));
 
       itemCollections.events.on('add reset sync', function() {
-        
+
         if (itemCollections.events.length >0) {
           this.$el.find('#activity-header').show();
           itemCollections.events.off('add reset sync', null, this);

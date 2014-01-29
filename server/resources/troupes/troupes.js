@@ -32,29 +32,29 @@ module.exports = {
     });
   },
 
-  create: function(req, res, next) {
-    var newTroupe = req.body;
-    var name = newTroupe.troupeName || newTroupe.name;
-    var oneToOneTroupeId = newTroupe.oneToOneTroupeId;
-    var invites = newTroupe.invites;
+  // create: function(req, res, next) {
+  //   var newTroupe = req.body;
+  //   var name = newTroupe.troupeName || newTroupe.name;
+  //   var oneToOneTroupeId = newTroupe.oneToOneTroupeId;
+  //   var invites = newTroupe.invites;
 
-    troupeService.createNewTroupeForExistingUser({
-      user: req.user,
-      name: name,
-      oneToOneTroupeId: oneToOneTroupeId,
-      invites: invites
-    }, function(err, troupe) {
-      if(err) return next(err);
+  //   troupeService.createNewTroupeForExistingUser({
+  //     user: req.user,
+  //     name: name,
+  //     oneToOneTroupeId: oneToOneTroupeId,
+  //     invites: invites
+  //   }, function(err, troupe) {
+  //     if(err) return next(err);
 
-      var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true });
-      restSerializer.serialize(troupe, strategy, function(err, serialized) {
-        if(err) return next(err);
+  //     var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true });
+  //     restSerializer.serialize(troupe, strategy, function(err, serialized) {
+  //       if(err) return next(err);
 
-        res.send(serialized);
-      });
-    });
+  //       res.send(serialized);
+  //     });
+  //   });
 
-  },
+  // },
 
   update: function(req, res, next) {
     var troupe = req.troupe;
@@ -62,9 +62,9 @@ module.exports = {
 
     var promises = [];
 
-    if(updatedTroupe.hasOwnProperty('favourite')) {
-      promises.push(recentRoomService.updateFavourite(req.user.id, troupe.id, updatedTroupe.favourite));
-    }
+    // if(updatedTroupe.hasOwnProperty('favourite')) {
+    //   promises.push(recentRoomService.updateFavourite(req.user.id, troupe.id, updatedTroupe.favourite));
+    // }
 
     if(updatedTroupe.autoConfigureHooks) {
       promises.push(roomService.applyAutoHooksForRepoRoom(req.user, troupe));
