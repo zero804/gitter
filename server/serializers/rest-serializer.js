@@ -799,17 +799,36 @@ function GitHubRepoStrategy(options) {
 
 }
 
+function LurkTroupeForUserStrategy(options) {
+  var currentUserId = options.currentUserId;
+
+  this.preload = function(callback) {
+    callback();
+  };
+
+  this.map = function(troupeUsers) {
+    for(var i = 0; i < troupeUsers.length; i++) {
+      var troupeUser = troupeUsers[i];
+
+      if(troupeUser.userId == currentUserId) {
+        return !!troupeUser.lurk;
+      }
+    }
+
+    return false;
+  };
+
+}
 
 function TroupeStrategy(options) {
   if(!options) options = {};
 
   var currentUserId = options.currentUserId;
 
-
   var unreadItemStategy = currentUserId ? new AllUnreadItemCountStategy(options) : null;
   var lastAccessTimeStategy = currentUserId ? new LastTroupeAccessTimesForUserStrategy(options) : null;
   var favouriteStrategy = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
-
+  var lurkStrategy = currentUserId ? new LurkTroupeForUserStrategy(options) : null;
   var userIdStategy = new UserIdStrategy(options);
 
   this.preload = function(items, callback) {
@@ -912,6 +931,7 @@ function TroupeStrategy(options) {
       unreadItems: unreadItemStategy ? unreadItemStategy.map(item.id) : undefined,
       lastAccessTime: lastAccessTimeStategy ? lastAccessTimeStategy.map(item.id) : undefined,
       favourite: favouriteStrategy ? favouriteStrategy.map(item.id) : undefined,
+      lurk: lurkStrategy ? item.oneToOne || lurkStrategy.map(item.users) : undefined,
       url: troupeUrl,
       githubType: item.githubType,
       v: getVersion(item)
@@ -1031,7 +1051,17 @@ function serialize(items, strat, callback) {
 
     callback(null, pkg(items.map(strat.map).filter(function(f) { return f !== undefined; })));
   });
+}
 
+function serializeExcludeNulls(items, strat, callback) {
+  var single = !Array.isArray(items);
+
+  return serialize(items, strat, function(err, results) {
+    if(err) return callback(err);
+    if(single) return callback(null, results);
+
+    return callback(null, results.filter(function(f) { return !!f; }));
+  });
 }
 
 function serializeQ(items, strat) {
@@ -1142,6 +1172,7 @@ module.exports = {
   getStrategy: getStrategy,
   execPreloads: execPreloads,
   serialize: serialize,
+  serializeExcludeNulls: serializeExcludeNulls,
   serializeQ: serializeQ,
   serializeModel: serializeModel,
   GitHubOrgStrategy: GitHubOrgStrategy,

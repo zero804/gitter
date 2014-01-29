@@ -63,7 +63,7 @@ define([
         var isFavourite = !context.troupe().get('favourite');
 
         $.ajax({
-          url: '/api/v1/troupes/' + context.getTroupeId(),
+          url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId(),
           contentType: "application/json",
           dataType: "json",
           type: "PUT",
@@ -108,7 +108,50 @@ define([
           type: "DELETE",
         });
       }
-    }
+    },
+    {
+      command: 'lurk',
+      description: 'Lurk in the room',
+      completion: 'lurk',
+      regexp: /^\/lurk/,
+      criteria: function() {
+        return !context.inOneToOneTroupeContext();
+      },
+      action: function(view) {
+        view.reset();
+
+        var c = 0;
+        function done() {
+          if(++c == 2) {
+            appEvents.triggerParent('user_notification', {
+              title: "Lurking",
+              text: "Lurk mode has been enabled for this room"
+            });
+          }
+        }
+
+        $.ajax({
+          url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
+          contentType: "application/json",
+          dataType: "json",
+          type: "PUT",
+          data: JSON.stringify({ push: "mention" }),
+          success: done
+        });
+
+
+        $.ajax({
+          url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId(),
+          contentType: "application/json",
+          dataType: "json",
+          type: "PUT",
+          data: JSON.stringify({ lurk: true }),
+          success: done
+        });
+
+      }
+    },
+
   ];
 
   var ChatInputView = TroupeViews.Base.extend({
@@ -320,6 +363,7 @@ define([
     // pass in the textarea as el for ChatInputBoxView
     // pass in a scroll delegate
     initialize: function(options) {
+
       if(hasScrollBars()) {
         this.$el.addClass("scroller");
       }
@@ -327,7 +371,7 @@ define([
       var chatResizer = new ChatCollectionResizer({
         compactView: this.compactView,
         el: this.el,
-        editMode: this.options.editMode,
+        editMode: options.editMode,
         rollers: options.rollers
       });
 

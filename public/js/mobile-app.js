@@ -6,14 +6,13 @@ require([
   'views/chat/chatCollectionView',
   'views/chat/chatInputView',
   'utils/router',
-  'views/shareSearch/shareSearchView',
   'components/modal-region',
   'components/unread-items-client',
   'backbone',
   'views/toolbar/troupeMenu',
   'views/app/mobileAppView',
   'views/chat/decorators/emojiDecorator'
-  ], function($, appEvents, chatModels, ChatCollectionView, chatInputView, Router, shareSearchView,
+  ], function($, appEvents, chatModels, ChatCollectionView, chatInputView, Router,
     modalRegion, unreadItemsClient, Backbone, TroupeMenu, MobileAppView, emojiDecorator) {
   "use strict";
 
@@ -48,7 +47,6 @@ require([
 
   new Router({
     routes: [
-      { name: "share",            re: /^share$/,                  viewType: shareSearchView.Modal },
     ],
     regions: [null, modalRegion]
   });

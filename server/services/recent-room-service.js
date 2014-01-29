@@ -55,20 +55,22 @@ function generateRoomListForUser(userId) {
 /**
  * Called when the user removes a room from the left hand menu
  */
-function removeRecentRoomForUser(userId, troupeId) {
+function removeRecentRoomForUser(userId, troupe) {
   winston.verbose('recent-rooms: removeRecentRoomForUser');
+
+  var troupeId = troupe.id;
   return Q.all([
       clearFavourite(userId, troupeId),
       clearLastVisitedTroupeforUserId(userId, troupeId)
     ])
     .then(function() {
-      // TODO: remove this debugging only
-      persistence.UserTroupeFavourites.findOne({ userId: userId }, function(err, after) {
-        winston.verbose('recent-rooms: user favourites after: ', after && after.toJSON());
-      });
-
-      // TODO: in future get rid of this but this collection is used by the native clients
-      appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: null, lastAccessTime: null });
+      var troupeUser = troupe.findTroupeUser(userId);
+      if(troupeUser.notify === 0) {
+        return troupeService.removeUserFromTroupe(troupeId, userId);
+      } else {
+        // TODO: in future get rid of this but this collection is used by the native clients
+        appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: null, lastAccessTime: null });
+      }
 
     });
   // TODO: stop double events
@@ -186,11 +188,6 @@ function updateFavourite(userId, troupeId, favouritePosition) {
 
   return op.then(function(position) {
     winston.verbose('recent-rooms: position is now: ' + position);
-
-    // TODO: remove this debugging only
-    persistence.UserTroupeFavourites.findOne({ userId: userId }, function(err, after) {
-      winston.verbose('recent-rooms: user favourites after: ', after && after.toJSON());
-    });
 
     // TODO: in future get rid of this but this collection is used by the native clients
     appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: position });

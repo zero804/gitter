@@ -6,6 +6,9 @@ module.exports = {
     app.get('/api/private/health_check',
         require('./health-check.js'));
 
+    app.get('/api/private/user_email',
+        require('./user-email'));
+
     // No auth for hooks yet
     app.post('/api/private/hook/:hash',
         require('./hooks'));
