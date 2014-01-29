@@ -16,10 +16,7 @@ var _                        = require('underscore');
 var assert                   = require('assert');
 var statsService             = require("../services/stats-service");
 var permissionsModel         = require("./permissions-model");
-var lazy                     = require("lazy.js");
 
-/* const */
-var LEGACY_FAV_POSITION = 1000;
 
 function ensureExists(value) {
   if(!value) throw 404;
@@ -68,22 +65,6 @@ function createQ(ModelType, options) {
       return m;
     });
 }
-
-/**
- * Use this instead of createQ as it invokes Mongoose Middleware
- */
-function createTroupeQ(options) {
-  return createQ(persistence.Troupe, options);
-}
-
-function createRequestQ(options) {
-  return createQ(persistence.Request, options);
-}
-
-function createRequestUnconfirmedQ(options) {
-  return createQ(persistence.RequestUnconfirmed, options);
-}
-
 
 function findMemberEmails(id, callback) {
   findById(id, function(err,troupe) {
@@ -226,32 +207,6 @@ function validateTroupeUrisForUser(userId, uris, callback) {
 }
 
 /**
- * Add the specified user to the troupe,
- * @param {[type]} userId
- * @param {[type]} troupeId
- * returns a promise with the troupe
- */
-function addUserIdToTroupe(userId, troupeId) {
-  assert(mongoUtils.isLikeObjectId(userId));
-  assert(mongoUtils.isLikeObjectId(troupeId));
-
-  return findByIdRequired(troupeId)
-      .then(function(troupe) {
-        if(troupe.status != 'ACTIVE') throw { troupeNoLongerActive: true };
-
-        if(troupe.containsUserId(userId)) {
-          return troupe;
-        }
-
-        appEvents.richMessage({eventName: 'userJoined', troupe: troupe, userId: userId});
-
-        troupe.addUserById(userId);
-        return troupe.saveQ()
-            .then(function() { return troupe; });
-      });
-}
-
-/**
  * Returns the URL a particular user would see if they wish to view a URL.
  * NB: this call has to query the db to get a user's username. Don't call it
  * inside a loop!
@@ -296,138 +251,74 @@ function indexTroupesByUserIdTroupeId(troupes, userId) {
 
 
 function removeUserFromTroupe(troupeId, userId, callback) {
-  findById(troupeId, function(err, troupe) {
-    if(err) return callback(err);
-    if(!troupe) return callback('Troupe ' + troupeId + ' does not exist.');
-
-    // TODO: Add the user to a removeUsers collection
-    var deleteRecord = new persistence.TroupeRemovedUser({
-      userId: userId,
-      troupeId: troupeId
-    });
-
-    deleteRecord.save(function(err) {
-      if(err) return callback(err);
-
-      // TODO: Let the user know that they've been removed from the troupe (via email or something)
-      troupe.removeUserById(userId);
-
-      troupe.save(callback);
-    });
-  });
-}
-
-
-/**
- * Create a request or simply return an existing one
- * returns a promise of a request
- */
-function addRequest(troupe, user) {
-  assert(troupe, 'Troupe parameter is required');
-  assert(user, 'User parameter is required');
-
-  var userId = user.id;
-  assert(user.id, 'User.id parameter is required');
-
-  var collection = user.isConfirmed() ? persistence.Request : persistence.RequestUnconfirmed;
-
-  if(userIdHasAccessToTroupe(userId, troupe)) {
-    throw { memberExists: true };
-  }
-
-  return collection.findOneQ({
-    troupeId: troupe.id,
-    userId: userId,
-    status: 'PENDING' })
-    .then(function(request) {
-      // Request already made....
-      if(request) return request;
-
-      var requestData = {
-        troupeId: troupe.id,
-        userId: userId,
-        status: 'PENDING'
-      };
-
-      return user.isConfirmed() ? createRequestQ(requestData) : createRequestUnconfirmedQ(requestData);
-    });
-}
-
-/*
- * callback is function(err, requests)
- */
-function findAllOutstandingRequestsForTroupe(troupeId, callback) {
-  persistence.Request
-      .where('troupeId', troupeId)
-      .where('status', 'PENDING')
-      .exec(callback);
-}
-
-function findPendingRequestForTroupe(troupeId, id, callback) {
-  persistence.Request.findOne( {
-    troupeId: troupeId,
-    _id: id,
-    status: 'PENDING'
-  }, callback);
-}
-
-
-function findRequestsByIds(requestIds, callback) {
-
-  persistence.Request
-    .where('_id')['in'](requestIds)
-    .exec(callback);
-
-}
-
-/**
- * Accept a request: add the user to the troupe and delete the request
- * @return promise of undefined
- */
-function acceptRequest(request, callback) {
-  assert(request, 'Request parameter required');
-
-  winston.verbose('Accepting request to join ' + request.troupeId);
-
-  var userId = request.userId;
-
-  return findById(request.troupeId)
+  return findById(troupeId)
     .then(function(troupe) {
-      if(!troupe) { winston.error("Unable to find troupe", request.troupeId); throw "Unable to find troupe"; }
+      if(!troupe) throw 404;
 
-      return userService.findById(userId)
-        .then(function(user) {
-          if(!user) { winston.error("Unable to find user", request.userId); throw "Unable to find user"; }
+      // TODO: Add the user to a removeUsers collection
+      var deleteRecord = new persistence.TroupeRemovedUser({
+        userId: userId,
+        troupeId: troupeId
+      });
 
-          emailNotificationService.sendRequestAcceptanceToUser(user, troupe);
-          return addUserIdToTroupe(userId, troupe.id)
-              .then(function() {
-                return request.removeQ();
-              });
+      return deleteRecord.saveQ()
+        .then(function() {
+          // TODO: Let the user know that they've been removed from the troupe (via email or something)
+          troupe.removeUserById(userId);
+
+          return troupe.saveQ();
         });
     })
     .nodeify(callback);
-
 }
 
 
 /**
- * Rjected a request: delete the request
- * @return promise of undefined
+ * Find the userIds of all the troupe.
+ *
+ * Candidate for redis caching potentially?
  */
-function rejectRequest(request, callback) {
-  winston.verbose('Rejecting request to join ' + request.troupeId);
-
-  return request.removeQ()
-    .nodeify(callback);
-}
-
 function findUserIdsForTroupe(troupeId, callback) {
   return persistence.Troupe.findByIdQ(troupeId, 'users')
     .then(function(troupe) {
       return troupe.users.map(function(m) { return m.userId; });
     })
     .nodeify(callback);
+}
+
+function mapLurkSettingsForTroupe(troupe) {
+  return troupe.users.reduce(function(memo, v) {
+    memo[v.userId] = !!v.lurk;
+    return memo;
+  }, {});
+}
+
+
+function findUserIdsForTroupeWithLurk(troupeId) {
+  return persistence.Troupe.findByIdQ(troupeId, 'users')
+    .then(function(troupe) {
+      return mapLurkSettingsForTroupe(troupe);
+    });
+}
+
+/**
+ * Return a hash of a hash of users and their notification settings
+ *
+ * Candidate for redis caching potentially?
+ */
+function findUserIdsForTroupesWithLurk(troupeIds) {
+  return persistence.Troupe
+        .where('_id')['in'](collections.idsIn(troupeIds))
+        .select('users')
+        .execQ()
+    .then(function(troupes) {
+      return troupes
+              .reduce(function(memo, troupe) {
+                var troupeUsersMapped = mapLurkSettingsForTroupe(troupe);
+                memo[troupe.id] = troupeUsersMapped;
+                return memo;
+              }, {});
+    });
 }
 
 function updateTroupeName(troupeId, troupeName, callback) {
@@ -545,22 +436,6 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
 
 }
 
-
-/**
- * Find an unused invite from fromUserId to toUserId for toUserId to connect with fromUserId
- * @param  {[type]} fromUserId
- * @param  {[type]} toUserId
- * @return {[type]} promise with invite
- */
-function findUnusedOneToOneInviteFromUserIdToUserId(fromUserId, toUserId) {
-  return persistence.Invite.findOneQ({
-      troupeId: null, // This indicates that it's a one-to-one invite
-      fromUserId: fromUserId,
-      userId: toUserId,
-      status: 'UNUSED'
-    });
-}
-
 /**
  * Find a one-to-one troupe, otherwise create it if possible (if there is an implicit connection),
  * otherwise return the existing invite if possible
@@ -631,38 +506,6 @@ function findOrCreateOneToOneTroupeIfPossible(fromUserId, toUserId) {
 
 }
 
-// /**
-//  * Take a one to one troupe and turn it into a normal troupe with extra invites
-//  * @return promise with new troupe
-//  */
-// function upgradeOneToOneTroupe(options, callback) {
-//   var name = options.name;
-//   var fromUser = options.user;
-//   var origTroupe = options.oneToOneTroupe.toObject();
-
-//   // create a new, normal troupe, with the current users from the one to one troupe
-//   return createTroupeQ({
-//       uri: createUniqueUri(),
-//       name: name,
-//       status: 'ACTIVE',
-//       users: origTroupe.users
-//     })
-//     .then(function(troupe) {
-
-//       statsService.event('new_troupe', {
-//         troupeId: troupe.id,
-//         userId: fromUser.id,
-//         email: fromUser.email,
-//         oneToOneUpgrade: true,
-//         oneToOne: false
-//       });
-
-//       return troupe;
-//     })
-//     .nodeify(callback);
-
-// }
-
 function createUniqueUri() {
   var chars = "0123456789abcdefghiklmnopqrstuvwxyz";
 
@@ -687,6 +530,25 @@ function updateTopic(user, troupe, topic) {
         .then(function() {
           return troupe;
         });
+    });
+}
+
+function updateTroupeLurkForUserId(userId, troupeId, lurk) {
+  return findById(troupeId)
+    .then(function(troupe) {
+      var troupeUser = troupe.users.filter(function(troupeUser) { return troupeUser.userId == userId; })[0];
+      if(troupeUser) {
+        troupeUser.lurk = !!lurk;
+      }
+
+      /* Don't send out the traditional updates to all users */
+      troupe._skipTroupeMiddleware = true;
+
+      return troupe.saveQ();
+    })
+    .then(function() {
+      // TODO: in future get rid of this but this collection is used by the native clients
+      appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, lurk: !!lurk });
     });
 }
 
@@ -773,63 +635,6 @@ function findAllImplicitContactUserIds(userId, callback) {
 
 }
 
-// //
-// //
-// //
-// /**
-//  * Create a new troupe from a one-to-one troupe and auto-invite users
-//  * @return promise of a troupe
-//  */
-// function createNewTroupeForExistingUser(options, callback) {
-//   return Q.resolve(null).then(function() {
-//     var name = options.name;
-//     // var oneToOneTroupeId = options.oneToOneTroupeId;
-//     var user = options.user;
-
-//     name = name ? name.trim() : '';
-
-//     assert(user, 'user required');
-//     assert(name, 'Please provide a troupe name');
-
-//     // if (oneToOneTroupeId) {
-//     //   // find this 1-1 troupe and create a new normal troupe with the additional person(s) invited
-//     //   return findById(oneToOneTroupeId)
-//     //     .then(function(troupe) {
-//     //       if(!userHasAccessToTroupe(user, troupe)) {
-//     //         throw 403;
-//     //       }
-
-//     //       return upgradeOneToOneTroupe({
-//     //         name: name,
-//     //         oneToOneTroupe: troupe,
-//     //         user: user });
-//     //     });
-//     // }
-
-//     // create a troupe normally
-//     var troupe = new persistence.Troupe({
-//       name: name,
-//       uri: createUniqueUri()
-//     });
-//     troupe.addUserById(user.id);
-//     return troupe.saveQ()
-//       .then(function() {
-//         statsService.event('new_troupe', {
-//           troupeId: troupe.id,
-//           userId: user.id,
-//           email: user.email,
-//           oneToOneUpgrade: true,
-//           oneToOne: false
-//         });
-
-//         return troupe;
-//       });
-
-//   }).nodeify(callback);
-
-// }
-
-
 function deleteTroupe(troupe, callback) {
   if(troupe.status != 'ACTIVE') return callback("Troupe is not active");
   if(troupe.users.length !== 1) return callback("Can only delete troupes that have a single user");
@@ -864,16 +669,12 @@ module.exports = {
   findAllConnectedUserIdsForUserId: findAllConnectedUserIdsForUserId,
   getUrlForTroupeForUserId: getUrlForTroupeForUserId,
 
-  addRequest: addRequest,
-  findRequestsByIds: findRequestsByIds,
-  findAllOutstandingRequestsForTroupe: findAllOutstandingRequestsForTroupe,
-  findPendingRequestForTroupe: findPendingRequestForTroupe,
-  acceptRequest: acceptRequest,
-  rejectRequest: rejectRequest,
   removeUserFromTroupe: removeUserFromTroupe,
 
   findAllUserIdsForTroupes: findAllUserIdsForTroupes,
   findAllUserIdsForTroupe: findAllUserIdsForTroupe,
+  findUserIdsForTroupeWithLurk: findUserIdsForTroupeWithLurk,
+  findUserIdsForTroupesWithLurk: findUserIdsForTroupesWithLurk,
   findUserIdsForTroupe: findUserIdsForTroupe,
 
   validateTroupeUrisForUser: validateTroupeUrisForUser,
@@ -886,9 +687,9 @@ module.exports = {
   // createNewTroupeForExistingUser: createNewTroupeForExistingUser,
   indexTroupesByUserIdTroupeId: indexTroupesByUserIdTroupeId,
 
-  addUserIdToTroupe: addUserIdToTroupe,
   findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe,
 
-  updateTopic: updateTopic
+  updateTopic: updateTopic,
+  updateTroupeLurkForUserId: updateTroupeLurkForUserId
 
 };
