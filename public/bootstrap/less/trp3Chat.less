@@ -340,13 +340,26 @@ pre code {
 }
 
 .trpChatItem iframe {
-  width: 100%;
+  max-width: 100%;
 }
 
 .trpChatItem {
   .embed {
     border: 0px;
     margin-top: 5px;
+
+    h2 {
+      font-size: 1.5em;
+      line-height: normal;
+    }
+    h3 {
+      font-size: 1.17em;
+      line-height: normal;
+    }
+    .gist-file {
+      overflow: auto;
+      max-height: 350px;
+    }
   }
   .rich {
     margin-top: 10px;

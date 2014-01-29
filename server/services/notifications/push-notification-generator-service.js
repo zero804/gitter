@@ -1,6 +1,8 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+--------- CURRENTLY NOT BEING USED ---------
+
 var winston                   = require("winston");
 var pushNotificationService   = require("../push-notification-service");
 var userService               = require("../user-service");

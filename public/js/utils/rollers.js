@@ -8,6 +8,8 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
 
   /** Number of pixels we need to be within before we say we're at the bottom */
   /** @const */ var BOTTOM_MARGIN = 30;
+  /** Number of pixels to show above a message that we scroll to. Context FTW!
+  /** @const */ var TOP_OFFSET = 300;
 
   /* Put your scrolling panels on rollers */
   function Rollers(target) {
@@ -57,9 +59,11 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
     },
 
     /* Specify an element that should not be scrolled past */
-    trackUntil: function(element) {
-      this._nopass = element;
-      this._mode = TRACK_NO_PASS;
+    trackUntil: function(element, force) {
+      if(force || this._mode != STABLE) {
+        this._nopass = element;
+        this._mode = TRACK_NO_PASS;
+      }
     },
 
     cancelTrackUntil: function() {
@@ -117,6 +121,17 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
       this._postMutateTop = scrollTop;
     },
 
+    /*
+     * Scroll to the bottom and switch the mode to TRACK_BOTTOM
+     */
+    scrollToElement: function(element) {
+      var target = this._target;
+      var scrollTop = element.offsetTop - TOP_OFFSET;
+      if(scrollTop < 0) scrollTop = 0;
+      target.scrollTop = scrollTop;
+
+      this.trackUntil(element);
+    },
 
     /*
      * Scroll to the bottom and switch the mode to TRACK_BOTTOM
@@ -135,7 +150,7 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
 
       // Get the offset of the element that we should not pass
       var nopassOffset = this._nopass.offsetTop - target.offsetTop;
-      if(scrollTop < nopassOffset) {
+      if(scrollTop < nopassOffset - TOP_OFFSET) {
         target.scrollTop = scrollTop;
       } else {
         target.scrollTop = nopassOffset;
@@ -200,6 +215,11 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
       }
 
       return true;
+    },
+
+    getScrollBottom: function() {
+      var scrollTop = this._target.scrollTop;
+      return this._target.clientHeight + scrollTop;
     },
 
     getBottomMostVisibleElement: function() {

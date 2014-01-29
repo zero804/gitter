@@ -19,10 +19,12 @@ function repoPermissionsModel(user, right, uri) {
 
       if(right === 'join') return true;
 
-      /* Need admin permission from here on out */
-      if(!repoInfo.permissions || !repoInfo.permissions.admin) {
-        return false;
-      }
+      var perms = repoInfo.permissions;
+
+      /* Need admin or push permission from here on out */
+      if(!perms) return false;
+
+      if(!perms.push && !perms.admin) return false;
 
       if(right === 'create') {
         // If the user isn't wearing the magic hat, refuse them
@@ -33,7 +35,7 @@ function repoPermissionsModel(user, right, uri) {
       }
 
       if(right === 'admin') {
-        return repoInfo.permissions && repoInfo.permissions.push;
+        return perms.admin || perms.push;
       }
 
       assert(false, 'Unknown right ' + right);

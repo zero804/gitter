@@ -18,11 +18,11 @@ define([
     tagName: 'li',
     template: troupeListItemTemplate,
     modelEvents: {
-      change: 'render',
+      'change:unreadItems change:lurk change:activity': 'render'
     },
     events: {
-      click: 'clicked', //WHY DOES THIS LOOK DIFFERENT TO NORMAL?
-      'click .item-close': 'onItemClose'
+      'click':              'clicked',
+      'click .item-close':  'onItemClose'
     },
     serializeData: function() {
       var data = this.model.toJSON();
@@ -35,10 +35,71 @@ define([
       e.stopPropagation();
       this.model.destroy();
     },
+
     onRender: function() {
-      this.el.dataset.id = this.model.id;
-      if (this.model.attributes.favourite) {
-        this.$el.addClass('item-fav');
+      var self = this;
+
+      var m = self.model;
+      self.el.dataset.id = m.id;
+      var e = self.$el;
+
+      var first = !self.initialRender;
+      self.initialRender = true;
+
+      if(!!first && !m.changed) return;
+
+      var unreadBadge = e.find('.item-unread-badge');
+      var lurk = self.model.get('lurk');
+
+      if(first || 'lurk' in m.changed) {
+        if(lurk) {
+          unreadBadge.removeClass('shown');
+        } else {
+          e.removeClass('chatting chatting-now');
+        }
+      }
+
+      if(first || 'activity' in m.changed) {
+        var activity = self.model.get('activity');
+
+        if(lurk && activity) {
+          e.addClass('chatting chatting-now');
+
+          if(self.timeout) {
+            clearTimeout(self.timeout);
+          }
+
+          self.timeout = setTimeout(function() {
+            delete self.timeout;
+            if(self.model.id === context.getTroupeId()) {
+              e.removeClass('chatting chatting-now');
+            } else {
+              e.removeClass('chatting-now');
+            }
+
+          }, 1600);
+        } else {
+          e.removeClass('chatting chatting-now');
+        }
+      }
+
+      if(first || 'unreadItems' in m.changed) {
+        var ui = self.model.get('unreadItems');
+        if(ui) {
+          unreadBadge.find('span').text(ui);
+          unreadBadge.addClass('shown');
+        } else {
+          unreadBadge.removeClass('shown');
+        }
+      }
+
+      if(first || 'favourite' in m.changed) {
+        var f = self.model.get('favourite');
+        if(f) {
+          e.addClass('item-fav');
+        } else {
+          e.removeClass('item-fav');
+        }
       }
     },
     clearSearch: function() {
@@ -63,6 +124,7 @@ define([
     tagName: 'ul',
     className: 'trpTroupeList',
     itemView: TroupeItemView,
+
     initialize: function(options) {
       if(options.rerenderOnSort) {
         this.listenTo(this.collection, 'sort', this.render);
@@ -79,10 +141,11 @@ define([
         group: 'mega-list',
         pullPlaceholder: false,
         drop: drop,
-        onDrag: function($item, position, _super) {
+        distance: 8,
+        onDrag: function($item, position) {
           $(".placeholder").html($item.html());
           $item.css(position);
-        },  
+        },
         isValidTarget: function($item, container) {
           if (container.el.parent().attr('id') == 'list-favs') {
             $('.dragged').hide();
@@ -130,11 +193,6 @@ define([
           }
         }
       });
-      // $("ul.list-recents").sortable({
-      //   group: 'mega-list',
-      //   pullPlaceholder: false,
-      //   drop: false,
-      // });
     },
   });
 

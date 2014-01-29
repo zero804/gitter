@@ -105,8 +105,10 @@ function newItem(troupeId, creatorUserId, itemType, itemId) {
   if(!itemType) { winston.error("newitem failed. itemType cannot be null"); return; }
   if(!itemId) { winston.error("newitem failed. itemId cannot be null"); return; }
 
-  return troupeService.findUserIdsForTroupe(troupeId)
-    .then(function(userIds) {
+  return troupeService.findUserIdsForTroupeWithLurk(troupeId)
+    .then(function(userIdsWithLurk) {
+      var userIds = Object.keys(userIdsWithLurk);
+
       if(creatorUserId) {
         userIds = userIds.filter(function(userId) {
           return ("" + userId) != ("" + creatorUserId);
@@ -120,16 +122,22 @@ function newItem(troupeId, creatorUserId, itemType, itemId) {
         appEvents.newUnreadItem(userId, troupeId, data);
       });
 
+      var userIdsForNotify = userIds.filter(function(u) {
+        return !userIdsWithLurk[u];
+      });
+
+      if(!userIdsForNotify.length) return;
+
       // Now talk to redis and do the update
-      var keys = getScriptKeysForUserIds(userIds, itemType, troupeId);
+      var keys = getScriptKeysForUserIds(userIdsForNotify, itemType, troupeId);
       return runScript('unread-add-item', keys, [troupeId, itemId])
         .then(function(updates) {
-          userIds.forEach(function(userId) {
+          userIdsForNotify.forEach(function(userId) {
             republishUnreadItemCountForUserTroupe(userId, troupeId);
           });
 
           updates.forEach(function(update) {
-            var userId = userIds[update];
+            var userId = userIdsForNotify[update];
             republishBadgeForUser(userId);
           });
 
@@ -138,7 +146,7 @@ function newItem(troupeId, creatorUserId, itemType, itemId) {
            * at a later stage
            */
           var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
-          markUsersForEmailNotification(troupeId, userIds, timestamp);
+          markUsersForEmailNotification(troupeId, userIdsForNotify, timestamp);
         });
 
     });
@@ -153,8 +161,10 @@ function removeItem(troupeId, itemType, itemId) {
   if(!itemType) { winston.error("newitem failed. itemType cannot be null"); return; }
   if(!itemId) { winston.error("newitem failed. itemId cannot be null"); return; }
 
-  return troupeService.findUserIdsForTroupe(troupeId)
-    .then(function(userIds) {
+  return troupeService.findUserIdsForTroupeWithLurk(troupeId)
+    .then(function(userIdsWithLurk) {
+
+      var userIds = Object.keys(userIdsWithLurk);
 
       // Publish out an unread item removed event
       // TODO: we could actually check whether this user thinks this item is UNREAD
@@ -164,16 +174,22 @@ function removeItem(troupeId, itemType, itemId) {
         appEvents.unreadItemsRemoved(userId, troupeId, data);
       });
 
+      var userIdsForNotify = userIds.filter(function(u) {
+        return !userIdsWithLurk[u];
+      });
+
+      if(!userIdsForNotify.length) return;
+
       // Now talk to redis and do the update
-      var keys = getScriptKeysForUserIds(userIds, itemType, troupeId);
+      var keys = getScriptKeysForUserIds(userIdsForNotify, itemType, troupeId);
       return runScript('unread-remove-item', keys, [troupeId, itemId])
         .then(function(updates) {
-          userIds.forEach(function(userId) {
+          userIdsForNotify.forEach(function(userId) {
             republishUnreadItemCountForUserTroupe(userId, troupeId);
           });
 
           updates.forEach(function(update) {
-            var userId = userIds[update];
+            var userId = userIdsForNotify[update];
             republishBadgeForUser(userId);
           });
         });
@@ -331,6 +347,7 @@ exports.markItemsRead = function(userId, troupeId, items, callback) {
 exports.markAllChatsRead = function(userId, troupeId, callback) {
   exports.getUnreadItems(userId, troupeId, 'chat')
     .then(function(chatIds) {
+      if(!chatIds.length) return;
       return exports.markItemsRead(userId, troupeId, {chat: chatIds});
     })
     .nodeify(callback);
