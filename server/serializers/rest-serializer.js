@@ -458,35 +458,19 @@ function UnreadItemStategy(options) {
   };
 }
 
+/**
+ *
+ */
 function AllUnreadItemCountStategy(options) {
   var self = this;
   var userId = options.userId || options.currentUserId;
 
   this.preload = function(troupeIds, callback) {
-    var promises = troupeIds.map(function(i) {
-      var deferred = Q.defer();
-      unreadItemService.getUserUnreadCounts(userId, i, deferred.makeNodeResolver());
-      return deferred.promise;
+    unreadItemService.getUserUnreadCountsForTroupeIds(userId, troupeIds, function(err, result) {
+      if(err) return callback(err);
+      self.unreadCounts = result;
+      callback();
     });
-
-    Q.all(promises)
-        .then(function(results) {
-          self.unreadCounts = {};
-          results.forEach(function(counts, index) {
-            var troupeId = troupeIds[index];
-            var total = 0;
-            _.keys(counts).forEach(function(key) {
-              total = total + counts[key];
-            });
-
-            self.unreadCounts[troupeId] = total;
-          });
-          callback();
-        })
-        .fail(function(err) {
-          callback(err);
-        });
-
   };
 
   this.map = function(id) {
