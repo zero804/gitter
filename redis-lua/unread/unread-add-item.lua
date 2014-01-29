@@ -46,13 +46,15 @@ for i = 1,key_count do
     -- We have a ZSET
     if redis.call("ZADD", user_troupe_key, time_now, item_id) > 0 then
       -- DELETE all items below the last 100 ranked items
-      redis.call("ZREMRANGEBYRANK", user_badge_key, 0, -MAX_ITEMS_PLUS_ONE)
+      local items_removed = redis.call("ZREMRANGEBYRANK", user_badge_key, 0, -MAX_ITEMS_PLUS_ONE)
 
-      redis.call("ZINCRBY", user_badge_key, 1, troupe_id)
+      -- Only if no items have been removed should we increment the badge count.
+      -- If we're removing items, it means that we've hit the max and should
+      -- not be counting
+      if items_removed == 0 then
+        redis.call("ZINCRBY", user_badge_key, 1, troupe_id)
+      end
 
-      -- Incremement the badge count, but this user:troupe will always already have items, so
-      -- theres no need to check if the value returned is one (unlike in the case of a set)
-      redis.call("ZINCRBY", user_badge_key, 1, troupe_id)
     end
   end
 end
