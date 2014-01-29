@@ -207,8 +207,8 @@ define([
 
       if(user.id) {
         userSubscription = client.subscribe('/api/v1/user/' + user.id, function(message) {
-          if (message.notification === 'user_notification') {
-            appEvents.trigger('user_notification', message);
+          if (message.notification === 'user_notification' || message.notification === 'activity') {
+            appEvents.trigger(message.notification, message);
           }
         });
       }

@@ -21,7 +21,18 @@ define([
     model: TroupeModel,
     initialize: function() {
       this.listenTo(this, 'change:favourite', this.reorderFavs);
+      this.listenTo(this, 'change:lastAccessTime change:lurk', this.resetActivity);
       this.url = "/api/v1/user/" + context.getUserId() + "/troupes";
+    },
+
+    resetActivity: function(model) {
+      if(model.changed.lastAccessTime && model.get('lastAccessTime')) {
+        model.unset('activity');
+      }
+
+      if(model.changed.lurk && !model.get('lurk')) {
+        model.unset('activity');
+      }
     },
 
     reorderFavs: function(event) {
@@ -66,12 +77,13 @@ define([
       }
 
       var self = this;
-      forUpdate.forEach(function(r) {
+      for(var j = forUpdate.length - 1; j >= 0; j--) {
+        var r = forUpdate[j];
         var id = r.id;
         var value = r.favourite;
         var t = self.get(id);
-        t.set('favourite', value);
-      });
+        t.set('favourite', value, { silent: true });
+      }
 
       delete this.reordering;
     }

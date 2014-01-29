@@ -6,11 +6,10 @@
   {{/if}}
 {{else}}
     <span class="github-{{githubType}}">{{name}}</span>
-    {{#if unreadItems}}
-    <span class="item-unread-badge">
+    <span class="item-unread-badge" {{#unless unreadItems}}style="display:none"{{/unless}}>
       <span class="trpTroupeUnreadCounter">{{unreadItems}}</span>
     </span>
-    {{/if}}
+
     <span class="item-close {{githubType}}" data-id="{{id}}" title="Remove from list">
       <span class="trpLeftMenuItemClose"></span>
     </span>

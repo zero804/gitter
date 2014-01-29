@@ -1,12 +1,7 @@
 <div class="modal-content">
   <form id="troupeSettings">
-    {{#if hellFreezesOver}}
-    <div class="trpBodyMedium">Troupe name<br></div>
-    <input type="text" name="name" value="{{name}}"/ class="trpInput" style="margin-top: 8px">
-    <br><br>
-    {{/if}}
     <div class="trpBodyMedium" style="margin-bottom: 6px;">
-        Notification Settings
+        Desktop Notification Settings
     </div>
 
     <select class="trpInput" style="width: 306px; height: 36px" id="notification-options">
@@ -15,9 +10,14 @@
       <option value="mute">Don't notify me at all</option>
     </select>
     <br>
+    <label for="unread-checkbox" class="trpBodyMedium" style="color: black;">
+      <input type="checkbox" id="unread-checkbox" name="lurk" value="1" style="display:inline" {{#if lurk}}checked{{/if}}/>
+      Hide unread message badge
+    </label>
+
+    <br>
     <div class="trpBodySmall" style="color: #999">
       Notification settings only apply to you and not to other users.
-      <br>
       <br>
       {{#if notificationsBlocked}}
         Notifications have beed disabled by your browser. <a href="/apps" target="new">Download Gitter Apps</a> or change your permissions to receive notifications.
@@ -27,26 +27,12 @@
     </div>
   </div>
 
-    <div class="trpRequestSubmit"><br>
-      <button type="submit" class="trpModalButton trpButtonMedium trpBtnGreen" id="save-troupe-settings">Save</button><br><br>
-<!--       <button type="button" class="trpModalButton trpButtonMedium trpBtnGrey" id="cancel-troupe-settings">Cancel</button> -->
+    <div class="trpRequestSubmit">
+      <button type="button" class="trpModalButon trpButtonMedium trpBtnGreen" id="enable-lurk-mode" style="float:right; display:none">Enable Lurk Mode</button>
+      <div class="trpModalButon trpButtonMedium trpBtnGrey" id="is-lurking" style="float:right; display:none; cursor: default">Lurk Mode Activated</div>
+      <button type="submit" class="trpModalButton trpButtonMedium trpBtnLightGrey" id="close-settings">Close</button>
 
-      {{#if hellFreezesOver}}
-      {{#if canDelete}}
-      <button type="button" class="trpModalButton trpButtonMedium trpBtnRed" id="delete-troupe">Delete Troupe</button>
-      {{/if}}
-
-      {{#if canLeave}}
-      <button type="button" class="trpModalButton trpButtonMedium trpBtnLightGrey" id="leave-troupe">Leave this Troupe</button>
-      {{/if}}
-      {{#if isNativeDesktopApp}}
-      <a href="{{troupeUrl}}#|integrations" target="_blank" class="trpModalButton trpButtonMedium trpBtnLightGrey">Integrations...</a>
-      {{else}}
-      <a href="#|integrations" class="trpModalButton trpButtonMedium trpBtnLightGrey">Integrations...</a>
-      {{/if}}
       <br><br>
-      <p class="trpBodySmall">You can delete a Troupe once you are the only person left in the Troupe</p>
-      {{/if}}
   </div>
   </form>
 </div>
