@@ -497,6 +497,7 @@ a.trpMiniLeftMenuItem {
 .item-unread-badge {
   float: right;
   margin-right: 5px;
+  display: none;
 }
 
 .trpMiniLeftMenuItem.unread:after {
@@ -869,9 +870,20 @@ ul li.placeholder:before {
   display: inline-block;
 }
 
+.trpTroupeList li .item-unread-badge{
+  float: right;
+  margin-right: 5px;
+  display: none;
+}
+
+.trpTroupeList li .item-unread-badge.shown{
+  display: inline;
+}
+
 .trpTroupeList li:hover .item-unread-badge {
   display: none;
 }
+
 
 .item-close {
   float: right;
