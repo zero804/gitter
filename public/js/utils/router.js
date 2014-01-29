@@ -169,7 +169,8 @@ define([
         }
 
         var viewDetails = this.getViewDetails(update.fragment);
-        if(viewDetails.validationCheck && !viewDetails.validationCheck()) {
+
+        if(viewDetails && viewDetails.validationCheck && !viewDetails.validationCheck()) {
           viewDetails = null;
         }
 

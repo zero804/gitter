@@ -670,7 +670,7 @@ a.trpMiniLeftMenuItem {
   }
 
   .activity-time {
-    opacity: 1; 
+    opacity: 1;
     font-size: 11px;
     position: absolute;
     right: 4px;
@@ -707,7 +707,7 @@ a.trpMiniLeftMenuItem {
 
 
 body.dragging .trpTroupeList {
-  
+
 }
 
 .list-favourites {
@@ -763,6 +763,40 @@ body.dragging .list-favourites li.placeholder {
     @media @mobile {
       background-color: transparent;
     }
+
+    &.chatting:after {
+      display: none;
+    }
+  }
+
+  @-webkit-keyframes pulse_animation {
+    0% { box-shadow: 0 0 0px #1bee82; color: #1bee82; }
+    50% { box-shadow: 0 0 8px #1bee82; color: @trpGreen; }
+    100% { box-shadow: 0 0 0px #1bee82; color: #1bee82;  }
+  }
+
+  li.chatting {
+    /*background-color: red;*/
+  }
+
+  li.chatting:after {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50em;
+    background-color: #1dce73;
+    position: relative;
+    top: 10px;
+    right: 10px;
+    content: ' ';
+    float: right
+  }
+
+  li.chatting.chatting-now:after {
+    -webkit-animation-name: 'pulse_animation';
+      -webkit-animation-duration: 800ms;
+      -webkit-animation-iteration-count: infinite;
+      -webkit-animation-timing-function: linear;
   }
 
   span {
