@@ -6,6 +6,7 @@ define([], function() {
   var namedEmoji = namedEmojiString.split(/,/);
 
   var emoticons = {
+    /* :..: */ named: /:(\w+):/,
     /* :-)  */ blush: /:-?\)/g,
     /* :-o  */ scream: /:-o/gi,
     /* :-]  */ smirk: /[:;]-?]/g,
