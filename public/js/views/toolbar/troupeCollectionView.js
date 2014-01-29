@@ -53,7 +53,7 @@ define([
 
       if(first || 'lurk' in m.changed) {
         if(lurk) {
-          unreadBadge.hide();
+          unreadBadge.removeClass('shown');
         } else {
           e.removeClass('chatting chatting-now');
         }
@@ -87,9 +87,9 @@ define([
         var ui = self.model.get('unreadItems');
         if(ui) {
           unreadBadge.find('span').text(ui);
-          unreadBadge.show();
+          unreadBadge.addClass('shown');
         } else {
-          unreadBadge.hide();
+          unreadBadge.removeClass('shown');
         }
       }
 
