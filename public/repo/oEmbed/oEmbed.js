@@ -80,7 +80,7 @@
   // Native providers
   addProvider("spotify",      ["open.spotify.com/(track|album|user)/"],           "//embed.spotify.com/oembed/");
   addProvider("rdio.com",     ["rd.io/.+","rdio.com"],                            "//www.rdio.com/api/oembed/");
-  addProvider("Soundcloud",   ["soundcloud.com/.+","snd.sc/.+"],                  "//soundcloud.com/oembed", {format: 'js'});
+  addProvider("Soundcloud",   ["soundcloud.com/.+","snd.sc/.+"],                  "//soundcloud.com/oembed", {format: 'js', maxheight: 200});
   addProvider("twitter",      ["twitter.com/.+"],                                 "//api.twitter.com/1/statuses/oembed.json");
   addProvider("meetup",       ["meetup.(com|ps)/.+"],                             "//api.meetup.com/oembed");
   addProvider("vimeo",        ["vimeo.com/groups/.*/videos/.*", "vimeo.com/.*"],  "//vimeo.com/api/oembed.json");
