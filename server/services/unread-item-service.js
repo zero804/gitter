@@ -447,7 +447,7 @@ exports.markAllChatsRead = function(userId, troupeId, callback) {
   exports.getUnreadItems(userId, troupeId, 'chat')
     .then(function(chatIds) {
       if(!chatIds.length) return;
-      return exports.markItemsRead(userId, troupeId, {chat: chatIds});
+      return exports.markItemsRead(userId, troupeId, { chat: chatIds });
     })
     .nodeify(callback);
 };
@@ -514,8 +514,10 @@ exports.findLastReadTimesForUsersForTroupe = function(userIds, troupeId, callbac
 
 
 exports.getUnreadItems = function(userId, troupeId, itemType, callback) {
-  return redisClient_smembers("unread:" + itemType + ":" + userId + ":" + troupeId)
+  var keys = ["unread:" + itemType + ":" + userId + ":" + troupeId];
+  return runScript('unread-item-list', keys)
     .fail(function(err) {
+      console.log(err);
       winston.warn("unreadItemService.getUnreadItems failed", err);
       // Mask error
       return [];
@@ -558,15 +560,13 @@ exports.getFirstUnreadItem = function(userId, troupeId, itemType, callback) {
 };
 
 exports.getUnreadItemsForUser = function(userId, troupeId, callback) {
-  redisClient.smembers("unread:chat:" + userId + ":" + troupeId, function(err, reply) {
-    if(err) return callback(err);
-
-    var result = {
-      'chat': reply
-    };
-
-    callback(null, result);
-  });
+  return exports.getUnreadItems(userId, troupeId, 'chat')
+    .then(function(results) {
+      return {
+        chat: results
+      };
+    })
+    .nodeify(callback);
 };
 
 /**
