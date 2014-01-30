@@ -85,6 +85,8 @@ define([
         }
       }
 
+
+
       if(first || 'unreadItems' in m.changed) {
         var ui = self.model.get('unreadItems');
         if(ui) {
