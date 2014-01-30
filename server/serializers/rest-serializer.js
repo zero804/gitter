@@ -458,35 +458,19 @@ function UnreadItemStategy(options) {
   };
 }
 
+/**
+ *
+ */
 function AllUnreadItemCountStategy(options) {
   var self = this;
   var userId = options.userId || options.currentUserId;
 
   this.preload = function(troupeIds, callback) {
-    var promises = troupeIds.map(function(i) {
-      var deferred = Q.defer();
-      unreadItemService.getUserUnreadCounts(userId, i, deferred.makeNodeResolver());
-      return deferred.promise;
+    unreadItemService.getUserUnreadCountsForTroupeIds(userId, troupeIds, function(err, result) {
+      if(err) return callback(err);
+      self.unreadCounts = result;
+      callback();
     });
-
-    Q.all(promises)
-        .then(function(results) {
-          self.unreadCounts = {};
-          results.forEach(function(counts, index) {
-            var troupeId = troupeIds[index];
-            var total = 0;
-            _.keys(counts).forEach(function(key) {
-              total = total + counts[key];
-            });
-
-            self.unreadCounts[troupeId] = total;
-          });
-          callback();
-        })
-        .fail(function(err) {
-          callback(err);
-        });
-
   };
 
   this.map = function(id) {
@@ -931,7 +915,7 @@ function TroupeStrategy(options) {
       unreadItems: unreadItemStategy ? unreadItemStategy.map(item.id) : undefined,
       lastAccessTime: lastAccessTimeStategy ? lastAccessTimeStategy.map(item.id) : undefined,
       favourite: favouriteStrategy ? favouriteStrategy.map(item.id) : undefined,
-      lurk: lurkStrategy ? item.oneToOne || lurkStrategy.map(item.users) : undefined,
+      lurk: lurkStrategy ? !item.oneToOne && lurkStrategy.map(item.users) : undefined,
       url: troupeUrl,
       githubType: item.githubType,
       v: getVersion(item)
