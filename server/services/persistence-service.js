@@ -541,14 +541,16 @@ var ChatMessageSchema = new Schema({
   toTroupeId: ObjectId,  //TODO: rename to troupeId
   text: String,
   html: String,
-  urls: Array,
-  mentions: Array,
-  issues: Array,
+  urls: Array,  // TODO: schema-ify this
+  mentions: [{
+    screenName: { type: String, required: true },
+    userId: { type: ObjectId }
+  }],
+  issues: Array, // TODO: schema-ify this
   meta: Schema.Types.Mixed,
   sent: { type: Date, "default": Date.now },
   editedAt: { type: Date, "default": null },
   readBy: { type: [ObjectId] },
-  skipAlerts: {type: Boolean, "default": false},
   _tv: { type: 'MongooseNumber', 'default': 0 },
   _md: Number,          // Meta parse version
 });

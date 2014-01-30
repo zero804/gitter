@@ -667,6 +667,23 @@ function getOldestId(ids) {
   });
 }
 
+function detectAndCreateMentions(troupeId, chat) {
+  if(!chat.mentions) return;
+
+  /* Figure out what type of room this is */
+  return troupeService.findById(troupeId)
+    .then(function(troupe) {
+      if(!troupe) return;
+
+    });
+
+}
+
+function detectAndRemoveMentions(troupeId, chat) {
+  if(!chat.mentions) return;
+}
+
+
 exports.install = function() {
 
   appEvents.localOnly.onChat(function(data) {
@@ -685,8 +702,17 @@ exports.install = function() {
     if(operation === 'create') {
       var creatingUserId = model.fromUser && model.fromUser.id;
       promise = newItem(troupeId, creatingUserId, 'chat', modelId);
+
+      promise = promise.then(function() {
+        detectAndCreateMentions(troupeId, model);
+      });
+
     } else if(operation === 'remove') {
       promise = removeItem(troupeId, 'chat', modelId);
+
+      promise = promise.then(function() {
+        detectAndRemoveMentions(troupeId, model);
+      });
     }
 
     if(promise) {

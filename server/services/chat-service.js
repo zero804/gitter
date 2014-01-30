@@ -4,6 +4,7 @@
 var persistence   = require("./persistence-service");
 var collections   = require("../utils/collections");
 var troupeService = require("./troupe-service");
+var userService   = require("./user-service");
 var statsService  = require("./stats-service");
 var unsafeHtml    = require('../utils/unsafe-html');
 var processChat   = require('../utils/process-chat');
@@ -22,34 +23,6 @@ var CURRENT_META_DATA_VERSION = VERSION_SWITCH_TO_SERVER_SIDE_RENDERING;
 var MAX_CHAT_EDIT_AGE_SECONDS = 300;
 
 var ObjectID = require('mongodb').ObjectID;
-
-exports.newRichMessageToTroupe = function(troupe, user, text, meta, callback) {
-  if(!troupe) return callback("Invalid troupe");
-
-  var chatMessage = new persistence.ChatMessage();
-
-  chatMessage.fromUserId = user ? user.id : null;
-
-  chatMessage.toTroupeId = troupe.id;
-  chatMessage.sent = new Date();
-
-  chatMessage.text  = text;
-  var parsedMessage = processChat(text);
-  chatMessage.html  = parsedMessage.html;
-
-  chatMessage._md      = CURRENT_META_DATA_VERSION;
-  chatMessage.meta     = meta;
-
-  // Skip UnreadItems, except when new files are uploaded
-  chatMessage.skipAlerts = meta.type === 'file' ? false : true;
-
-  chatMessage.save(function (err) {
-    if(err) return callback(err);
-
-    return callback(null, chatMessage);
-  });
-};
-
 
 exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   if(!troupe) return callback(404);
