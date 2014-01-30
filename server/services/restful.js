@@ -3,14 +3,9 @@
 
 var troupeService       = require("./troupe-service");
 
-var fileService         = require("./file-service");
 var restSerializer      = require("../serializers/rest-serializer");
-var winston             = require('winston');
 var unreadItemService   = require("./unread-item-service");
-var fileService         = require("./file-service");
 var chatService         = require("./chat-service");
-var conversationService = require("./conversation-service");
-var recentRoomService   = require("./recent-room-service");
 var eventService        = require("./event-service");
 var Q                   = require('q');
 
@@ -24,19 +19,6 @@ exports.serializeTroupesForUser = function(userId, callback) {
 
       restSerializer.serialize(troupes, strategy, callback);
     });
-};
-
-exports.serializeRequestsForTroupe = function(troupeId, userId, callback) {
-
-  troupeService.findAllOutstandingRequestsForTroupe(troupeId, function(err, requests) {
-    if(err) return callback(err);
-
-    var strategy = new restSerializer.RequestStrategy({ currentUserId: userId, troupeId: troupeId });
-    restSerializer.serialize(requests, strategy, callback);
-  });
-
-
-
 };
 
 exports.serializeChatsForTroupe = function(troupeId, userId, options, cb) {
@@ -59,26 +41,6 @@ exports.serializeChatsForTroupe = function(troupeId, userId, options, cb) {
   });
 
   return d;
-};
-
-exports.serializeFilesForTroupe = function(troupeId, userId, callback) {
-  fileService.findByTroupe(troupeId, function(err, files) {
-    if (err) {
-      winston.error("Error in findByTroupe: ", { exception: err });
-      return callback(err);
-    }
-
-    var strategy = new restSerializer.FileStrategy({ currentUserId: userId, troupeId: troupeId });
-    restSerializer.serialize(files, strategy, callback);
-  });
-};
-
-exports.serializeConversationsForTroupe = function(troupeId, userId, callback) {
-  conversationService.findByTroupe(troupeId, function(err, conversations) {
-    if(err) return callback(err);
-
-    restSerializer.serialize(conversations, new restSerializer.ConversationMinStrategy(), callback);
-  });
 };
 
 exports.serializeUsersForTroupe = function(troupeId, userId, callback) {
@@ -110,17 +72,6 @@ exports.serializeReadBysForChat = function(troupeId, chatId, callback) {
     });
 
   });
-
-};
-
-exports.serializeRecentRoomsForUser = function(userId, callback) {
-  return recentRoomService.generateRoomListForUser(userId)
-    .then(function(rooms) {
-      var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
-
-      return restSerializer.serializeQ(rooms, strategy);
-    })
-    .nodeify(callback);
 
 };
 
