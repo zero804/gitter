@@ -38,9 +38,6 @@ module.exports = {
 
     var eventsResource = installTroupeSubResource('events', 'events');
 
-
-    installTroupeSubResource('unreadItems', 'unread-items');
-
     var userResource = app.resource('api/v1/user',  require('./user/user.js'));
     function installUserSubResource(resourceName, moduleName) {
         var r = new Resource(resourceName, require('./user/' + moduleName), app);
@@ -51,6 +48,11 @@ module.exports = {
     var userTroupeResource = installUserSubResource('troupes', 'troupes');
     var userSettings = new Resource('settings', require('./user/troupe-settings'), app);
     userTroupeResource.add(userSettings);
+
+    var unreadItems = new Resource('unreadItems', require('./user/unread-items'), app);
+    userTroupeResource.add(unreadItems);
+
+
 
     installUserSubResource('orgs',        'orgs');
     installUserSubResource('repos',       'repos');

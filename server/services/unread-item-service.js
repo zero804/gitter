@@ -418,7 +418,7 @@ exports.markUserAsEmailNotified = function(userId) {
 /**
  * Mark many items as read, for a single user and troupe
  */
-exports.markItemsRead = function(userId, troupeId, items, callback) {
+exports.markItemsRead = function(userId, troupeId, items, options) {
   var now = Date.now();
 
   appEvents.unreadItemsRemoved(userId, troupeId, items);
@@ -443,10 +443,11 @@ exports.markItemsRead = function(userId, troupeId, items, callback) {
         republishBadgeForUser(userId);
       }
 
+      if(options && options.recordAsRead === false) return;
+
       // For the moment, we're only bothering with chats for this
       return readByService.recordItemsAsRead(userId, troupeId, items);
-    })
-    .nodeify(callback);
+    });
 
 };
 
@@ -454,7 +455,8 @@ exports.markAllChatsRead = function(userId, troupeId, callback) {
   exports.getUnreadItems(userId, troupeId, 'chat')
     .then(function(chatIds) {
       if(!chatIds.length) return;
-      return exports.markItemsRead(userId, troupeId, { chat: chatIds });
+      /* Don't mark the items as read */
+      return exports.markItemsRead(userId, troupeId, { chat: chatIds }, { recordAsRead: false });
     })
     .nodeify(callback);
 };
@@ -667,9 +669,9 @@ function getOldestId(ids) {
 
 exports.install = function() {
 
-  appEvents.localOnly.onDataChange2(function(data) {
-    var url = data.url;
+  appEvents.localOnly.onChat(function(data) {
     var operation = data.operation;
+    var troupeId = data.troupeId;
     var model = data.model;
 
     if(!model) {
@@ -677,30 +679,14 @@ exports.install = function() {
       return;
     }
 
-    if(model.skipAlerts) {
-      winston.warn('model is set to skipAlerts', { data: data});
-      return;
-    }
-
-    if(model.fileName) {
-      winston.warn('Not generating unread items for files', {data: data});
-      return;
-    }
-
     var modelId = model.id;
-
-    var info = generateNotificationForUrl(url);
-    if(!info) {
-      return;
-    }
-
     var promise;
 
     if(operation === 'create') {
-      var creatingUserId = findCreatingUserIdModel(info.modelName, model);
-      promise = newItem(info.troupeId, creatingUserId, info.modelName, modelId);
+      var creatingUserId = model.fromUser && model.fromUser.id;
+      promise = newItem(troupeId, creatingUserId, 'chat', modelId);
     } else if(operation === 'remove') {
-      promise = removeItem(info.troupeId, info.modelName, modelId);
+      promise = removeItem(troupeId, 'chat', modelId);
     }
 
     if(promise) {
