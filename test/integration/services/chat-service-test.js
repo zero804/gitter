@@ -61,26 +61,6 @@ describe('chatService', function() {
     });
   });
 
-  describe('Decorated messages', function() {
-    it('should save meta information on a message for later decoration', function(done) {
-
-      var plainText = 'Mauro uploaded awesome.png';
-      var meta = {
-        type: 'file',
-        action: 'uploaded',
-        fileId: 1234
-      };
-
-      chatService.newRichMessageToTroupe(fixture.troupe1, fixture.user1, plainText, meta, function(err, chatMessage) {
-        if(err) return done(err);
-
-        assert(chatMessage.meta === meta, 'Meta has been altered');
-        done();
-      });
-
-    });
-  });
-
 
   before(fixtureLoader(fixture));
 
