@@ -442,7 +442,6 @@ function UnreadItemStategy(options) {
   this.preload = function(data, callback) {
     unreadItemService.getUnreadItems(data.userId, data.troupeId, itemType, function(err, ids) {
       if(err) return callback(err);
-      console.log('UIS: ', ids);
 
       var hash = {};
       ids.forEach(function(id) {

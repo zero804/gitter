@@ -92,13 +92,20 @@ function getScriptKeysForUserIds(userIds, itemType, troupeId) {
 }
 
 var runScript = Q.nbind(scriptManager.run, scriptManager);
-var redisClient_smembers = Q.nbind(redisClient.smembers, redisClient);
 
 function upgradeKeyToSortedSet(key, userBadgeKey, troupeId, callback) {
+  winston.verbose('unread-item-key-upgrade: attempting to upgrade ' + key);
+
   // Use a new client due to the WATCH semantics
   var redisClient = redis.createClient();
 
   function done(err) {
+    if(err) {
+      winston.verbose('unread-item-key-upgrade: upgrade failed' + err, { exception: err });
+    } else {
+      winston.verbose('unread-item-key-upgrade: upgrade completed successfully');
+    }
+
     redisClient.quit();
     return callback(err);
   }
@@ -517,8 +524,7 @@ exports.getUnreadItems = function(userId, troupeId, itemType, callback) {
   var keys = ["unread:" + itemType + ":" + userId + ":" + troupeId];
   return runScript('unread-item-list', keys)
     .fail(function(err) {
-      console.log(err);
-      winston.warn("unreadItemService.getUnreadItems failed", err);
+      winston.warn("unreadItemService.getUnreadItems failed:" + err, { exception: err });
       // Mask error
       return [];
     })
@@ -545,7 +551,7 @@ exports.getUnreadItemsForUserTroupeSince = getUnreadItemsForUserTroupeSince;
 exports.getFirstUnreadItem = function(userId, troupeId, itemType, callback) {
     exports.getUnreadItems(userId, troupeId, itemType, function(err, members) {
       if(err) {
-        winston.warn("unreadItemService.getUnreadItems failed", err);
+        winston.warn("unreadItemService.getUnreadItems failed: " + err, { exception: err });
 
         // Mask error
         return callback(null, null);

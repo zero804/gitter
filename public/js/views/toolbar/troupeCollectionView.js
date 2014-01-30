@@ -13,6 +13,8 @@ define([
   "use strict";
 
   var createRoom = context.getUser().createRoom;
+  /* @const */
+  var MAX_UNREAD = 99;
 
   var TroupeItemView = Marionette.ItemView.extend({
     tagName: 'li',
@@ -86,6 +88,9 @@ define([
       if(first || 'unreadItems' in m.changed) {
         var ui = self.model.get('unreadItems');
         if(ui) {
+          if(ui > MAX_UNREAD) {
+            ui = "99+";
+          }
           unreadBadge.find('span').text(ui);
           unreadBadge.addClass('shown');
         } else {
