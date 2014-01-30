@@ -2,11 +2,10 @@
 /*global require: true, module: true */
 "use strict";
 
-var persistence = require("./persistence-service"),
-    troupeService = require("./troupe-service"),
-    fileService = require("./file-service"),
-    winston = require("winston"),
-    Fiber = require("../utils/fiber");
+var persistence   = require("./persistence-service");
+var troupeService = require("./troupe-service");
+var winston       = require("winston");
+var Fiber         = require("../utils/fiber");
 
 function deleteTroupe(troupeId, callback) {
   troupeService.findById(troupeId, function(err, troupe) {
@@ -18,21 +17,6 @@ function deleteTroupe(troupeId, callback) {
 
     persistence.ChatMessage.where('toTroupeId').equals(troupeId).remove(f.waitor());
     persistence.TroupeRemovedUser.where('troupeId').equals(troupeId).remove(f.waitor());
-    persistence.Invite.where('troupeId').equals(troupeId).remove(f.waitor());
-    persistence.Request.where('troupeId').equals(troupeId).remove(f.waitor());
-    persistence.Conversation.where('troupeId').equals(troupeId).remove(f.waitor());
-
-    var fileWaitor = f.waitor();
-    persistence.File.where('troupeId').equals(troupeId).exec(function(err, files) {
-      if(err) return fileWaitor(err);
-
-      files.forEach(function(file) {
-        fileService.deleteGridstoreFiles(file, f.waitor());
-        file.remove(f.waitor());
-      });
-
-      return fileWaitor(null, files.length);
-    });
     troupe.remove(f.waitor());
 
     f.all().spread(function(chats, removedUsers, invites, requests, conversations, files) {

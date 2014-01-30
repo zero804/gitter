@@ -193,14 +193,6 @@ function bind(on) {
       on('batchUserBadgeCountUpdate', callback);
     },
 
-    richMessage: function(data) {
-      emit('richMessage', data);
-    },
-
-    onRichMessage: function(callback) {
-      on('richMessage', callback);
-    },
-
     emailConfirmed: function(email, userId) {
       emit('emailConfirmed', { email: email, userId: userId });
     },
