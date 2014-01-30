@@ -27,7 +27,6 @@ Mirror.prototype.get = function(uri) {
   request(options, d.makeNodeResolver());
 
   return d.promise.spread(function(response, body) {
-    console.log(response);
     if(response.statusCode !== 200) {
       return response.statusCode;
     } else {
