@@ -195,9 +195,10 @@ define([
       this._buffer = new DoubleHash();
 
       var async = !options || !options.sync;
+      var url = '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/unreadItems';
 
       $.ajax({
-        url: "/api/v1/troupes/" + context.getTroupeId() + "/unreadItems",
+        url: url,
         contentType: "application/json",
         data: JSON.stringify(queue),
         async: async,

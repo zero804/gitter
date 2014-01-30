@@ -151,6 +151,18 @@ function bind(on) {
       on('dataChange2', callback);
     },
 
+    chat: function(operation, troupeId, model) {
+      emit('chat', {
+        operation: operation,
+        troupeId: troupeId,
+        model: model
+      });
+    },
+
+    onChat: function(callback) {
+      on('chat', callback);
+    },
+
     eyeballSignal: function(userId, troupeId, signal) {
       emit('eyeballSignal', {
         userId: userId,
