@@ -45,23 +45,46 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
 
   chatMessage.html  = parsedMessage.html;
 
-  // Metadata
-  chatMessage.urls      = parsedMessage.urls;
-  chatMessage.mentions  = parsedMessage.mentions;
-  chatMessage.issues    = parsedMessage.issues;
-  chatMessage._md       = CURRENT_META_DATA_VERSION;
+  /* Look through the mentions and attempt to tie the mentions to userIds */
+  var mentionUserNames = parsedMessage.mentions.map(function(mention) {
+    return mention.screenName;
+  });
 
-  chatMessage.save(function (err) {
+  userService.findByUsernames(mentionUserNames, function(err, users) {
     if(err) return callback(err);
 
-    statsService.event("new_chat", {
-      userId: user.id,
-      troupeId: troupe.id,
-      username: user.username
+    var usersIndexed = collections.indexByProperty(users, 'username');
+
+    var mentions = parsedMessage.mentions.map(function(mention) {
+      var user = usersIndexed[mention.screenName];
+      var userId = user && user.id;
+
+      return {
+        screenName: mention.screenName,
+        userId: userId
+      };
     });
 
-    return callback(null, chatMessage);
+    // Metadata
+    chatMessage.urls      = parsedMessage.urls;
+    chatMessage.mentions  = mentions;
+    chatMessage.issues    = parsedMessage.issues;
+    chatMessage._md       = CURRENT_META_DATA_VERSION;
+
+    chatMessage.save(function (err) {
+      if(err) return callback(err);
+
+      statsService.event("new_chat", {
+        userId: user.id,
+        troupeId: troupe.id,
+        username: user.username
+      });
+
+      return callback(null, chatMessage);
+    });
+
   });
+
 };
 
 exports.updateChatMessage = function(troupe, chatMessage, user, newText, callback) {
