@@ -96,6 +96,7 @@ h2 {
   font-size: 12px;
   text-align: center;
   margin-top: 2px;
+  font-weight: 400;
 }
 
 .write-explain a{
@@ -118,7 +119,7 @@ h2 {
     <div class="strip" style="text-align: left">
       <div style="float: right; font-size: 14px; letter-spacing: 0.5px">
 <!--         <a href="/" class="button" id="about" style="text-decoration: none; color: white; opacity: 0.8" >About</a> -->
-        <a href="/login/github" class="button blur" id="signup" style="text-decoration: none; color: white">Existing user login</a><div class="write-explain"><a href="/login/explain" target="_blank">Requires GitHub write access<a></div>
+        <a href="/login/github" class="button blur" id="signup" style="text-decoration: none; color: white">Login with GitHub</a><div class="write-explain"><a href="https://gitter.zendesk.com/hc/articles/200176672-Authenticating-with-GitHub" target="_blank">Requires write access<a></div>
       </div>
       <img src="{{ cdn "images/2/gitter/logo-text-white-64.png" }}" height="64">
     </div>
@@ -126,32 +127,51 @@ h2 {
     <div>
       <div class="strip" style="color:white; text-shadow: 0 0 0 transparent,1px 1px 2px rgba(0,0,0,0.2)"><h1>Chat all the things!</h1></div>
     </div>
-    <div class="strip"><img src="{{ cdn "images/2/gitter/screenshot.jpg" }}" width="920" style="border-radius: 2px 2px 0 0"></div>
+    <div class="strip"><img src="{{ cdn "images/2/gitter/screenshot-small.png" }}" width="920" style="border-radius: 2px 2px 0 0"></div>
   </div>
   <div class="container" style="background-color: #eee; padding-bottom: 20px" >
     <div class="strip feature">
       <div style="display: inline-block; vertical-align: top; max-width: 450px; margin-top: 40px">
         <h2 style="margin-top: 0">Chat rooms for everything</h2>
-        <div style="text-align: left">Free chat rooms for your public repositories. <br>A bit like IRC only <a href="#smart" rel="" id="anchor1" style="color: #1dce73; text-decoration: none" class="scroll-link">smarter</a>. <p>Chats for private repositories as well as organisations. <br>Create private chat channels.</p><p>Infinite, searchable chat history.</p></div>
+        <div style="text-align: left">Free chat rooms for your public repositories. <br>A bit like IRC only <a href="#smart" rel="" id="anchor1" style="color: #1dce73; text-decoration: none" class="scroll-link">smarter</a>. <p>Chats for private repositories as well as organisations.</div>
       </div>
-      <div style="display: inline-block; float: right; vertical-align: top;" style=""><img src="{{ cdn "images/2/gitter/chats.png" }}" width="284" height="284"></div>
+      <div style="display: inline-block; float: right; vertical-align: top;" style=""><img src="{{ cdn "images/2/gitter/rooms.png" }}" width="284" height="284"></div>
     </div>
   </div>
 
   <div class="container" style="background-color: #162e34; padding: 60px 0">
     <div class="strip">
-       <span style="opacity: 0.8; color: white";>Interested? Gitter is in private beta right now. Not all features are available yet.</span><br><br>
-      <a href="/login/github" class="button green" id="signup" style="text-decoration: none; color: white">Join the waiting list</a>
+       <span style="opacity: 0.8; color: white";>Interested? Gitter in private beta right now, but feel free to give it a go. </span><br><br>
+      <a href="/login/github" class="button green" id="signup" style="text-decoration: none; color: white">Sign up with GitHub</a>
     </div>
   </div>
 
   <div class="container" style="background-color: white; padding: 10px 0">
 <a name="smart" id="smart"> </a>
     <div class="strip feature">
-      <h2 style="text-align: center">So smart, it even knows the code</h2><br>
-      <div><img src="{{ cdn "images/2/gitter/files.png" }}" width="700"></div><br><br>
-      <h2 style="text-align: center">As well as the issues</h2><br>
-      <div style="text-align: center"><img src="{{ cdn "images/2/gitter/issue.png" }}" width="600"></div>
+      <h2 style="text-align: center">So smart, it even knows your issues</h2>
+      <div style="text-align: center"><img src="{{ cdn "images/2/gitter/issue.png" }}" width="600"></div><br>
+      <h2 style="text-align: center">And talks markdown, including formatted code</h2>
+      <div><img src="{{ cdn "images/2/gitter/code.png" }}" width="700"></div><br><br>
+    </div>
+  </div>
+
+  <div class="container" style="background-color: #eee">
+    <div class="strip feature">
+      <div style="display: inline-block; vertical-align: top; max-width: 620px; margin-top: 60px">
+        <h2 style="margin-top: 0">Integrated with the products you use</h2>
+        <div style="text-align: left">Webhook integrations with Github, Jenkins, Travis, Trello and Sprintly</p></div>
+      </div>
+      <div style="display: inline-block; float: right; vertical-align: top; margin-right: 80px;" style=""><img src="{{ cdn "images/2/gitter/activity.png" }}" width="250rs"></div>
+    </div>
+  </div>
+
+  <div class="container" style="background-color: #162e34; padding-bottom: 30px">
+    <div class="strip feature" style="text-align: center">
+      <h2 style="text-align: center; color: white">Other awesome features</h2>
+      <span style="color: white; line-height: 150%">Know who's seen any message. <span style="opacity: 0.6">Edit messages after you've sent them. </span>Full emoji support. <span style="opacity: 0.6">Special Lurk Mode.</span><br>
+      <span style="opacity:0.6;">Automatically embeds content like YouTube, pictures of cats and other stuff.</span> Desktop notifications and @mentions.<br>
+      Infinite chat history stored in the cloud. Will soon be searchable too. <span style='opacity: 0.6'>Phew, that's a lot and we're building more constantly</span></span>
     </div>
   </div>
 
@@ -159,26 +179,17 @@ h2 {
     <div class="strip feature">
       <div style="display: inline-block; vertical-align: top; max-width: 620px; margin-top: 60px">
         <h2 style="margin-top: 0">Available everywhere that has internets</h2>
-        <div style="text-align: left">In any browser. Apps coming soon for Mac, Windows, iPhone and Android.<br>
+        <div style="text-align: left">In any browser. Desktop app for Mac. Windows, iPhone and Android coming soon.<br>
           Receive customised notifications.<br><br>Yes, we know, that's a gold iPhone.</p></div>
       </div>
       <div style="display: inline-block; float: right; vertical-align: top; margin-right: 80px; margin-top: 10px" style=""><img src="{{ cdn "images/2/gitter/iphone.png" }}" height="284"></div>
     </div>
   </div>
 
-  <div class="container" style="background-color: #162e34; padding-bottom: 30px">
-    <div class="strip feature" style="text-align: center">
-      <h2 style="text-align: center; color: white">Other awesome features</h2>
-      <span style="color: white; line-height: 150%">Know who's seen any message. <span style="opacity: 0.6">Edit messages after you've sent them.</span> Webhook integrations with Jenkins, Trello and more.<br>
-      <span style="opacity:0.6;">Automatically embeds content like YouTube, pictures of cats and other stuff.</span> Did we mention our smart notifications?<br>
-      @mentions. Batched notifications. Won't annoy you by making your phone beep on every message. <span style='opacity: 0.6'>Awesome emotigifs. <br>Infinite chat history stored in the cloud. </span>Searchable too, naturally. <span style='opacity: 0.6'>Oh, and a unified activity feed.</span> Phew, that's a lot.</span>
-    </div>
-  </div>
-
   <div class="container" style="background-color: white; margin: 20px 0;padding: 40px 0">
     <div class="strip">
-      <span style="opacity: 0.8; color: white";>Interested? Gitter is in private beta right now. </span><br><br>
-      <a href="/login/github" class="button green" id="signup" style="text-decoration: none; color: white">Join the waiting list</a>
+      <span style="opacity: 0.8; color: black";>Interested? Gitter is in beta right now, but don't let that stop you. </span><br><br>
+      <a href="/login/github" class="button green" id="signup" style="text-decoration: none; color: white">My brain can't handle the awesome. Sign me up!</a>
     </div>
   </div>
 

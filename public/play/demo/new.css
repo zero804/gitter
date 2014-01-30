@@ -135,6 +135,124 @@ background-color: rgba(100,100,100, 0.1);
   opacity: 0.5;
 }
 
+/*
+
+Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-license.org/
+
+*/
+
+pre code {
+  display: block;
+  padding: 0.5em;
+  background: #23241f;
+}
+pre .tag,
+pre code {
+  color: #f8f8f2;
+}
+pre .keyword,
+pre .function,
+pre .literal,
+pre .change,
+pre .winutils,
+pre .flow,
+pre .lisp .title,
+pre .clojure .built_in,
+pre .nginx .title,
+pre .tex .special {
+  color: #66d9ef;
+}
+pre .variable,
+pre .params {
+  color: #fd9720;
+}
+pre .constant {
+  color: #66d9ef;
+}
+pre .title,
+pre .class .title,
+pre .css .class {
+  color: #a6e22e;
+}
+pre .attribute,
+pre .symbol,
+pre .symbol .string,
+pre .tag .title,
+pre .value,
+pre .css .tag {
+  color: #f92672;
+}
+pre .number,
+pre .preprocessor,
+pre .pragma,
+pre .regexp {
+  color: #ae81ff;
+}
+pre .tag .value,
+pre .string,
+pre .css .id,
+pre .subst,
+pre .haskell .type,
+pre .ruby .class .parent,
+pre .built_in,
+pre .sql .aggregate,
+pre .django .template_tag,
+pre .django .variable,
+pre .smalltalk .class,
+pre .django .filter .argument,
+pre .smalltalk .localvars,
+pre .smalltalk .array,
+pre .attr_selector,
+pre .pseudo,
+pre .addition,
+pre .stream,
+pre .envvar,
+pre .apache .tag,
+pre .apache .cbracket,
+pre .tex .command,
+pre .prompt {
+  color: #e6db74;
+}
+pre .comment,
+pre .javadoc,
+pre .java .annotation,
+pre .python .decorator,
+pre .template_comment,
+pre .pi,
+pre .doctype,
+pre .deletion,
+pre .shebang,
+pre .apache .sqbracket,
+pre .tex .formula {
+  color: #75715e;
+}
+pre .coffeescript .javascript,
+pre .javascript .xml,
+pre .tex .formula {
+  opacity: 0.5;
+}
+pre .xml .javascript,
+pre .xml .vbscript,
+pre .xml .css,
+pre .xml .cdata {
+  opacity: 0.5;
+}
+
+
+code {
+  border: 1px solid rgba(192,201,200,0.4);
+  background-color: rgba(192,201,200,0.4);
+  border-radius: 2px;
+  padding: 0 4px;
+  font-size: 14px;
+}
+
+pre code {
+  border-radius: 6px;
+  border: none;
+
+}
+
 .open {
   font-family: 'Open Sans';
   font-weight: 300;
@@ -220,9 +338,8 @@ background-color: rgba(100,100,100, 0.1);
   right: 0;
   top: 0;
   bottom: 0;
-  width: 250px;
+  width: 274px;
   background-color: rgba(241,242,244,0.7);
-  padding-left: 20px;
   padding-top: 10px;
   transition:all .5s ease-in-out;
   -o-transition:all .5s ease-in-out;
@@ -272,6 +389,7 @@ background-color: rgba(100,100,100, 0.1);
   overflow: hidden;
   padding-top: 16px;
   cursor: pointer;
+  padding-left: 20px;
 }
 
 #right-menu-expander {
@@ -443,7 +561,7 @@ background-color: rgba(100,100,100, 0.1);
   margin-bottom: 16px;
 }
 
-.title {
+.top-title {
   padding-bottom: 12px;
   padding-left: 74px;
   padding-top: 8px;
@@ -452,7 +570,7 @@ background-color: rgba(100,100,100, 0.1);
   z-index: 1000;
   background-color: rgba(255,255,255,0.95);
   left: 230px;
-   right: 277px;
+   right: 281px;
   transition:all .5s ease-in-out;
   -o-transition:all .5s ease-in-out;
   -moz-transition:all .5s ease-in-out;
@@ -471,7 +589,7 @@ background-color: rgba(100,100,100, 0.1);
   z-index: 1000;
   background-color: rgba(255,255,255,0.95);
   left: 230px;
-  right: 277px;
+  right: 281px;
   transition:all .5s ease-in-out;
   -o-transition:all .5s ease-in-out;
   -moz-transition:all .5s ease-in-out;
@@ -593,7 +711,7 @@ background-color: rgba(100,100,100, 0.1);
   left: 0;
   padding-top: 90px;
   margin-left: 270px;
-  margin-right: 270px;
+  margin-right: 274px;
   box-sizing:border-box;
   transition:all 54s ease-in-out;
   -o-transition:all .5s ease-in-out;
@@ -693,6 +811,7 @@ background-color: rgba(100,100,100, 0.1);
 .people-list {
   margin-top: 12px;
   margin-bottom: 20px;
+  padding-left: 20px
 }
 
 .people-list .chat-avatar {
@@ -720,11 +839,12 @@ background-color: rgba(100,100,100, 0.1);
 }
 
 .activity-item {
-  margin-bottom: 4px;
-  padding: 2px 6px;
+  padding: 8px 6px;
+  padding-left: 26px;
   border-radius: 2px 0 0 2px;
   cursor: pointer;
   margin-left: -6px;
+  border-bottom: 1px dotted rgba(100,100,100,0.1);
 }
 
 .activity-item:hover {
@@ -734,7 +854,8 @@ background-color: rgba(100,100,100, 0.1);
 .date {
   float: right;
   opacity: 0.3;
-  margin-right: 10px
+  margin-right: 10px;
+  margin-top: 3px;
 }
 
 .act-push:before {
@@ -743,6 +864,43 @@ background-color: rgba(100,100,100, 0.1);
   margin-right: 8px;
   opacity: 0.8;
   width: 12px;
+  font-size: 16px;
+}
+
+.act-build-passed:before {
+  font-family: 'troupe-icons';
+  content: '\e824';
+  margin-right: 8px;
+  opacity: 0.8;
+  width: 12px;
+  font-size: 16px;
+}
+
+.act-build-started:before {
+  font-family: 'troupe-icons';
+  content: '\e80c';
+  margin-right: 8px;
+  opacity: 0.8;
+  width: 12px;
+  font-size: 16px;
+}
+
+.act-trello:before {
+  font-family: 'troupe-icons';
+  content: '\e813';
+  margin-right: 8px;
+  opacity: 0.8;
+  width: 12px;
+  font-size: 16px;
+}
+
+.act-issue-comment:before {
+  font-family: 'octicons';
+  content: '\f06f';
+  margin-right: 8px;
+  opacity: 0.8;
+  width: 12px;
+  font-size: 16px;
 }
 
 .act-issue-open:before {
@@ -751,6 +909,7 @@ background-color: rgba(100,100,100, 0.1);
   margin-right: 8px;
   opacity: 0.8;
   width: 12px;
+  font-size: 16px;
 }
 .act-issue-close:before {
   font-family: 'octicons';
@@ -758,6 +917,7 @@ background-color: rgba(100,100,100, 0.1);
   margin-right: 8px;
   opacity: 0.8;
   width: 12px;
+  font-size: 16px;
 }
 
 .file-complete {
@@ -771,12 +931,13 @@ background-color: rgba(100,100,100, 0.1);
 
 .file-suggest {
   display: inline-block;
-  position: relative;
-  top: -68px;
-  left: 85px;
+  position: absolute;
+  top: -40px;
+  left: 234px;
   border: 1px solid rgba(0,0,0,0.1);
   border-radius: 2px 2px 2px 0;
   font-size: 14px;
+  background-color: white;
   
   color: #999;
 }
@@ -913,6 +1074,7 @@ background-color: rgba(100,100,100, 0.1);
   .right-menu .heading {
     width: 0;
     transition-delay: 0.5s;
+    padding-left: 20px;
   }
 
   .activity-list {
