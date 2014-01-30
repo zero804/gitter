@@ -93,7 +93,7 @@ define([
           if(repo.toLowerCase() === roomRepo.toLowerCase()) {
             preparePopover($issue,'/api/v1/troupes/'+context.getTroupeId()+'/issues/'+issueNumber);
           } else {
-            preparePopover($issue,'/api/private/github_mirror/repos/'+repo+'/issues/'+issueNumber);
+            preparePopover($issue,'/api/private/gh/repos/'+repo+'/issues/'+issueNumber);
           }
         }
       });
