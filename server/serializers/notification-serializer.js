@@ -4,7 +4,6 @@
 var userService = require("../services/user-service");
 var chatService = require("../services/chat-service");
 var troupeService = require("../services/troupe-service");
-var fileService = require("../services/file-service");
 var Q = require("q");
 var _ = require("underscore");
 var winston = require("winston");
@@ -45,64 +44,6 @@ function UserStrategy(options) {
     };
   };
 }
-
-function FileStrategy(options) {
-  if(!options) options = {};
-
-  var userStategy = new UserIdStrategy();
-  var troupeStrategy = options.includeTroupe && new TroupeIdStrategy(options);
-
-  this.preload = function(items, callback) {
-    var users = items.map(function(i) { return i.versions[i.versions.length - 1].creatorUserId; });
-    users = _.flatten(users, true);
-    users = _.uniq(users);
-
-
-
-    var strategies = [{
-      strategy: userStategy,
-      data: users
-    }];
-
-    if(troupeStrategy) {
-      var troupeIds = items.map(function(i) { return i.troupeId; });
-      troupeIds = _.uniq(troupeIds);
-
-      strategies.push({
-        strategy: troupeStrategy,
-        data: troupeIds
-      });
-    }
-
-    execPreloads(strategies, callback);
-  };
-
-
-  this.map = function(item) {
-    if(!item) return null;
-    item = item.toObject();
-
-    var versionIndex = 1;
-    function narrowFileVersion(item) {
-      return {
-        versionNumber: versionIndex++,
-        creatorUser: userStategy.map(item.creatorUserId),
-        createdDate: item.createdDate
-      };
-    }
-
-    return {
-      id: item._id,
-      fileName: item.fileName,
-      mimeType: item.mimeType,
-      latestVersion: narrowFileVersion(item.versions[item.versions.length - 1]),
-      url: '/troupes/' + encodeURIComponent(item.troupeId) + '/downloads/' + encodeURIComponent(item.fileName),
-      troupe: troupeStrategy && troupeStrategy.map(item.troupeId)
-    };
-  };
-
-}
-
 
 function ChatStrategy(options)  {
   if(!options) options = {};
@@ -229,42 +170,6 @@ function TroupeStrategy(options) {
   };
 }
 
-function RequestStrategy(options) {
-  if(!options) options = {};
-
-  var userStategy = new UserIdStrategy();
-  var troupeStrategy = options.includeTroupe && new TroupeIdStrategy(options);
-
-  this.preload = function(requests, callback) {
-    var userIds =  requests.map(function(item) { return item.userId; });
-
-    var strategies = [{
-      strategy: userStategy,
-      data: _.uniq(userIds)
-    }];
-
-    if(troupeStrategy) {
-      var troupeIds = requests.map(function(i) { return i.troupeId; });
-      strategies.push({
-        strategy: troupeStrategy,
-        data: troupeIds
-      });
-    }
-
-    execPreloads(strategies, callback);
-
-  };
-
-  this.map = function(item) {
-    return {
-      id: item._id,
-      user: userStategy.map(item.userId),
-      troupe: troupeStrategy && troupeStrategy.map(item.troupeId)
-    };
-  };
-}
-
-
 function idStrategyGenerator(FullObjectStrategy, loaderFunction) {
   return function IdStrategy(options) {
     var strategy = new FullObjectStrategy(options);
@@ -303,10 +208,8 @@ function idStrategyGenerator(FullObjectStrategy, loaderFunction) {
 }
 
 var UserIdStrategy = idStrategyGenerator(UserStrategy, userService.findByIds);
-var FileIdStrategy = idStrategyGenerator(FileStrategy, fileService.findByIds);
 var ChatIdStrategy = idStrategyGenerator(ChatStrategy, chatService.findByIds);
 var TroupeIdStrategy = idStrategyGenerator(TroupeStrategy, troupeService.findByIds);
-var RequestIdStrategy = idStrategyGenerator(RequestStrategy, troupeService.findRequestsByIds);
 
 /* This method should move */
 function serialize(items, strat, callback) {
@@ -345,18 +248,10 @@ function getStrategy(modelName) {
   switch(modelName) {
     case 'troupeId':
       return TroupeIdStrategy;
-    case 'file':
-      return FileStrategy;
-    case 'fileId':
-      return FileIdStrategy;
     case 'chat':
       return ChatStrategy;
     case 'chatId':
       return ChatIdStrategy;
-    case 'request':
-      return RequestStrategy;
-    case 'requestId':
-      return RequestIdStrategy;
   }
 }
 
@@ -377,17 +272,10 @@ function serializeModel(model, callback) {
       strategy = new TroupeStrategy();
       break;
 
-    case 'RequestSchema':
-      strategy = new RequestStrategy();
-      break;
-
     case 'ChatMessageSchema':
       strategy = new ChatStrategy();
       break;
 
-    case 'FileSchema':
-      strategy = new FileStrategy();
-      break;
   }
 
   if(!strategy) return callback("No strategy for " + schema.schemaTypeName);
@@ -399,10 +287,8 @@ function serializeModel(model, callback) {
 module.exports = {
   UserStrategy: UserStrategy,
   UserIdStrategy: UserIdStrategy,
-  FileStrategy: FileStrategy,
   ChatStrategy: ChatStrategy,
   ChatIdStrategy: ChatIdStrategy,
-  RequestStrategy: RequestStrategy,
   TroupeStrategy: TroupeStrategy,
   TroupeIdStrategy: TroupeIdStrategy,
   getStrategy: getStrategy,
