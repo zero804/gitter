@@ -6,9 +6,7 @@ var collections   = require("../utils/collections");
 var troupeService = require("./troupe-service");
 var statsService  = require("./stats-service");
 var unsafeHtml    = require('../utils/unsafe-html');
-var ent           = require('ent');
 var processChat   = require('../utils/process-chat');
-var _             = require('underscore');
 
 /*
  * Hey Trouper!
@@ -16,6 +14,7 @@ var _             = require('underscore');
  */
 var VERSION_INITIAL; /* = undefined; All previous versions are null due to a bug */
 var VERSION_SWITCH_TO_SERVER_SIDE_RENDERING = 5;
+var MAX_CHAT_MESSAGE_LENGTH = 2048;
 
 var CURRENT_META_DATA_VERSION = VERSION_SWITCH_TO_SERVER_SIDE_RENDERING;
 
@@ -53,7 +52,10 @@ exports.newRichMessageToTroupe = function(troupe, user, text, meta, callback) {
 
 
 exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
-  if(!troupe) return callback("Invalid troupe");
+  if(!troupe) return callback(404);
+  /* You have to have text */
+  if(!text && text !== "" /* Allow empty strings for now */) return callback(400);
+  if(text.length > MAX_CHAT_MESSAGE_LENGTH) return callback(400);
 
   if(!troupeService.userHasAccessToTroupe(user, troupe)) return callback(403);
 
@@ -66,6 +68,8 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   chatMessage.text = text;
 
   var parsedMessage = processChat(text);
+  // TODO: validate message
+
   chatMessage.html  = parsedMessage.html;
 
   // Metadata
