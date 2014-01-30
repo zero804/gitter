@@ -9,7 +9,7 @@ module.exports = {
     app.get('/api/private/user_email',
         require('./user-email'));
 
-    app.get('/api/private/github_mirror/*',
+    app.get('/api/private/gh/*',
         require('./github-mirror'));
 
     // No auth for hooks yet
