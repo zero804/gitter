@@ -77,20 +77,6 @@ function newUser(options, callback) {
 }
 
 var userService = {
-  // findOrCreateUserForEmail: function(options, callback) {
-  //   winston.info("Locating or creating user", options);
-
-  //   var email = options.email.toLowerCase();
-
-  //   return userService.findByEmail(email)
-  //     .then(function(user) {
-  //       if(user) return user;
-
-  //       return newUser(options);
-  //     })
-  //     .nodeify(callback);
-  // },
-
   findOrCreateUserForGithubId: function(options, callback) {
     winston.info("Locating or creating user", options);
 
@@ -103,10 +89,7 @@ var userService = {
       .nodeify(callback);
   },
 
-
-
   findByConfirmationCode: function(confirmationCode, callback) {
-
     persistence.User.find().or([{confirmationCode: confirmationCode} /*, {'unconfirmedEmails.confirmationCode': confirmationCode} */]).findOne()
       .execQ()
       .nodeify(callback);
@@ -205,6 +188,12 @@ var userService = {
 
   findByIds: function(ids, callback) {
     return persistence.User.where('_id')['in'](collections.idsIn(ids))
+      .execQ()
+      .nodeify(callback);
+  },
+
+  findByUsernames: function(usernames, callback) {
+    return persistence.User.where('username')['in'](usernames)
       .execQ()
       .nodeify(callback);
   },
