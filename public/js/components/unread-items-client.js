@@ -350,6 +350,7 @@ define([
 
     appEvents.on('eyeballStateChange', this._eyeballStateChange, this);
 
+
     this._scrollElement.addEventListener('scroll', this._getBounds, false);
 
     // this is not a live collection so this will not work inside an SPA
@@ -363,7 +364,8 @@ define([
     unreadItemStore.on('unreadItemRemoved', foldCountLimited);
 
     // When the UI changes, rescan
-    appEvents.on('appNavigation', this._getBounds);
+    // appEvents.on('appNavigation', this._getBounds);
+    setTimeout(this._getBounds, 250);
   };
 
   TroupeUnreadItemsViewportMonitor.prototype = {

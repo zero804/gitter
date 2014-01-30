@@ -14,6 +14,8 @@ var recentRoomService   = require("./recent-room-service");
 var eventService        = require("./event-service");
 var Q                   = require('q');
 
+var DEFAULT_CHAT_COUNT_LIMIT = 30;
+
 exports.serializeTroupesForUser = function(userId, callback) {
     troupeService.findAllTroupesForUser(userId, function(err, troupes) {
       if (err) return callback(err);
@@ -49,45 +51,11 @@ exports.serializeChatsForTroupe = function(troupeId, userId, options, cb) {
   var callback = d.makeNodeResolver();
   d = d.promise.nodeify(cb);
 
-  function serializeChats(err, chatMessages) {
+  chatService.findChatMessagesForTroupe(troupeId, { skip: options.skip || 0, limit: options.limit || DEFAULT_CHAT_COUNT_LIMIT, sort: options.sort }, function(err, chatMessages) {
     if(err) return callback(err);
 
     var strategy = new restSerializer.ChatStrategy({ currentUserId: userId, troupeId: troupeId });
     restSerializer.serialize(chatMessages, strategy, callback);
-  }
-
-  if(options.limit) {
-    chatService.findChatMessagesForTroupe(troupeId, { skip: options.skip || 0, limit: options.limit, sort: options.sort }, serializeChats);
-    return d;
-  }
-
-  unreadItemService.getFirstUnreadItem(userId, troupeId, 'chat', function(err, firstId, totalUnreadItems) {
-    if(firstId) {
-      if(totalUnreadItems > 200) {
-        chatService.findChatMessagesForTroupe(troupeId, { skip: 0, limit: 20 }, serializeChats);
-        return;
-      }
-
-      // No first Id, just return the most recent 20 messages
-      chatService.findChatMessagesForTroupe(troupeId, { startId: firstId }, function(err, chatMessages) {
-        if(err) return callback(err);
-
-        // Just get the last 20 messages instead
-        if(chatMessages.length < 20) {
-          chatService.findChatMessagesForTroupe(troupeId, { skip: 0, limit: 20 }, serializeChats);
-          return;
-        }
-
-        return serializeChats(err, chatMessages);
-
-      });
-
-      return;
-    }
-
-    // No first Id, just return the most recent 20 messages
-    chatService.findChatMessagesForTroupe(troupeId, { skip: 0, limit: 20 }, serializeChats);
-
   });
 
   return d;
