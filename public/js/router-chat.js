@@ -41,6 +41,12 @@ require([
     embedDecorator, emojiDecorator, UnreadBannerView, HeaderView) {
   "use strict";
 
+  $.ajaxSetup({
+    headers: {
+      'x-csrf-token': context().csrfToken
+    }
+  });
+
   // Make drop down menus drop down
   $(document).on("click", ".trpButtonDropdown .trpButtonMenu", function(/*event*/) {
     $(this).parent().next().toggle();

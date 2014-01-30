@@ -132,6 +132,7 @@ module.exports = {
     }));
     app.use(passport.initialize());
     app.use(passport.session());
+    app.use(express.csrf());
     app.use(app.router);
 
 
