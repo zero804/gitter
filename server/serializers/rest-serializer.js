@@ -915,7 +915,7 @@ function TroupeStrategy(options) {
       unreadItems: unreadItemStategy ? unreadItemStategy.map(item.id) : undefined,
       lastAccessTime: lastAccessTimeStategy ? lastAccessTimeStategy.map(item.id) : undefined,
       favourite: favouriteStrategy ? favouriteStrategy.map(item.id) : undefined,
-      lurk: lurkStrategy ? item.oneToOne || lurkStrategy.map(item.users) : undefined,
+      lurk: lurkStrategy ? !item.oneToOne && lurkStrategy.map(item.users) : undefined,
       url: troupeUrl,
       githubType: item.githubType,
       v: getVersion(item)
