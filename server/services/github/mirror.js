@@ -6,7 +6,6 @@ var wrap = require('./github-cache-wrapper');
 var createClient = require('./github-client');
 var badCredentialsCheck = require('./bad-credentials-check');
 var request = require('request');
-var assert = require('assert');
 
 function Mirror(user) {
   this.user = user;
@@ -29,8 +28,11 @@ Mirror.prototype.get = function(uri) {
 
   return d.promise.spread(function(response, body) {
     console.log(response);
-    assert.strictEqual(response.statusCode, 200, 'Github sent an error code '+ response.statusCode);
-    return body;
+    if(response.statusCode !== 200) {
+      return response.statusCode;
+    } else {
+      return body;
+    }
   }).fail(badCredentialsCheck);
 };
 
