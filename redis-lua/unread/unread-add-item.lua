@@ -46,7 +46,7 @@ for i = 1,key_count do
     -- We have a ZSET
     if redis.call("ZADD", user_troupe_key, time_now, item_id) > 0 then
       -- DELETE all items below the last 100 ranked items
-      local items_removed = redis.call("ZREMRANGEBYRANK", user_badge_key, 0, -MAX_ITEMS_PLUS_ONE)
+      local items_removed = redis.call("ZREMRANGEBYRANK", user_troupe_key, 0, -MAX_ITEMS_PLUS_ONE)
 
       -- Only if no items have been removed should we increment the badge count.
       -- If we're removing items, it means that we've hit the max and should
