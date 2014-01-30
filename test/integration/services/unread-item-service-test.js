@@ -211,6 +211,48 @@ describe('markItemsRead', function() {
   });
 });
 
+describe('limits', function() {
+
+  it('should not allow a user to have more than 100 unread items in a room', function(done) {
+    var troupeId = mongoUtils.getNewObjectIdString();
+    var userId = mongoUtils.getNewObjectIdString();
+    var itemType = 'chat';
+
+    var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
+
+    var unreadItemService = testRequire.withProxies("./services/unread-item-service", {
+      './troupe-service': troupeServiceMock
+    });
+
+
+    var usersWithLurkHash = {};
+    usersWithLurkHash[userId] = false;
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(usersWithLurkHash));
+    var adds = [];
+
+    for(var i = 0; i < 100; i++) {
+      adds.push(unreadItemService.testOnly.newItem(troupeId, null, itemType, mongoUtils.getNewObjectIdString()));
+    }
+
+    return Q.all(adds)
+      .then(function() {
+        // Do a single insert sans contention. In the real world, there will never be this much
+        // contention for a single usertroupe
+        return unreadItemService.testOnly.newItem(troupeId, null, itemType, mongoUtils.getNewObjectIdString());
+      })
+      .delay(100)
+      .then(function() {
+        return unreadItemService.getUserUnreadCounts(userId, troupeId);
+      })
+      .then(function(count) {
+        assert.equal(count, 100);
+      })
+      .nodeify(done);
+  });
+
+});
+
 describe.skip('emailnotifications', function() {
   it('should let you know who needs to be notified by email', function(done) {
     var troupeId = mongoUtils.getNewObjectIdString();
@@ -328,9 +370,6 @@ describe.skip('emailnotifications', function() {
     var itemId1 = mongoUtils.getNewObjectIdString();
     var itemId2 = mongoUtils.getNewObjectIdString();
     var itemId3 = mongoUtils.getNewObjectIdString();
-    var items = {
-      'chat': [itemId1]
-    };
 
     var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
 
