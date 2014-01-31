@@ -175,7 +175,6 @@ var userService = {
       .nodeify(callback);
   },
 
-
   findByUnconfirmedEmail: function(email, callback) {
     return persistence.User.findOneQ({ 'unconfirmedEmails.email': email.toLowerCase() })
       .nodeify(callback);
