@@ -20,7 +20,7 @@ define([
     tagName: 'li',
     template: troupeListItemTemplate,
     modelEvents: {
-      'change:unreadItems change:lurk change:activity': 'render'
+      'change:unreadItems change:lurk change:activity change:mentions': 'render'
     },
     events: {
       'click':              'clicked',
@@ -92,19 +92,32 @@ define([
         }
       }
 
+      var mentions = self.model.get('mentions');
+      var ui = self.model.get('unreadItems');
+      var redisplayBadge = false;
 
+      if(first || 'mentions' in m.changed) {
+        redisplayBadge = true;
+        if(mentions > 0) {
+          unreadBadge.find('span').text('@');
+        }
+      }
 
       if(first || 'unreadItems' in m.changed) {
-        var ui = self.model.get('unreadItems');
-        if(ui) {
-          if(ui > MAX_UNREAD) {
-            ui = "99+";
+        if(mentions === 0) {
+          redisplayBadge = true;
+
+          if(ui) {
+            if(ui > MAX_UNREAD) {
+              ui = "99+";
+            }
+            unreadBadge.find('span').text(ui);
           }
-          unreadBadge.find('span').text(ui);
-          unreadBadge.addClass('shown');
-        } else {
-          unreadBadge.removeClass('shown');
         }
+      }
+
+      if(first || redisplayBadge) {
+        unreadBadge.toggleClass('shown', !!(ui || mentions));
       }
 
       if(first || 'favourite' in m.changed) {

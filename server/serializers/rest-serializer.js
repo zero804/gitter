@@ -388,7 +388,12 @@ function ChatStrategy(options)  {
       troupe: troupeStrategy ? troupeStrategy.map(item.toTroupeId) : undefined,
       readBy: item.readBy ? item.readBy.length : undefined,
       urls: item.urls || [],
-      mentions: item.mentions || [],
+      mentions: item.mentions ? item.mentions.map(function(m) {
+          return {
+            screenName: m.screenName,
+            userId: m.userId
+          };
+        }) : [],
       issues: item.issues || [],
       meta: item.meta || {},
       v: getVersion(item)
