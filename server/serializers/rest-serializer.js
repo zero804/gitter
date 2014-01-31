@@ -233,6 +233,27 @@ function AllUnreadItemCountStategy(options) {
   };
 }
 
+/**
+ *
+ */
+function TroupeMentionCountStategy(options) {
+  var self = this;
+  var userId = options.userId || options.currentUserId;
+
+  this.preload = function(troupeIds, callback) {
+    unreadItemService.getUserMentionCountsForTroupeIds(userId, troupeIds, function(err, result) {
+      if(err) return callback(err);
+      self.mentionCounts = result;
+      callback();
+    });
+  };
+
+  this.map = function(id) {
+    return self.mentionCounts[id] ? self.mentionCounts[id] : 0;
+  };
+}
+
+
 function LastTroupeAccessTimesForUserStrategy(options) {
   var self = this;
   var userId = options.userId || options.currentUserId;
@@ -514,6 +535,7 @@ function TroupeStrategy(options) {
   var currentUserId = options.currentUserId;
 
   var unreadItemStategy = currentUserId ? new AllUnreadItemCountStategy(options) : null;
+  var mentionCountStrategy = currentUserId ? new TroupeMentionCountStategy(options) : null;
   var lastAccessTimeStategy = currentUserId ? new LastTroupeAccessTimesForUserStrategy(options) : null;
   var favouriteStrategy = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
   var lurkStrategy = currentUserId ? new LurkTroupeForUserStrategy(options) : null;
@@ -522,12 +544,18 @@ function TroupeStrategy(options) {
   this.preload = function(items, callback) {
 
     var strategies = [];
+    var troupeIds = items.map(function(i) { return i.id; });
 
     if(unreadItemStategy) {
-      var troupeIds = items.map(function(i) { return i.id; });
-
       strategies.push({
         strategy: unreadItemStategy,
+        data: troupeIds
+      });
+    }
+
+    if(mentionCountStrategy) {
+      strategies.push({
+        strategy: mentionCountStrategy,
         data: troupeIds
       });
     }
@@ -617,6 +645,7 @@ function TroupeStrategy(options) {
       users: options.mapUsers && !item.oneToOne ? item.users.map(function(troupeUser) { return userIdStategy.map(troupeUser.userId); }) : undefined,
       user: otherUser,
       unreadItems: unreadItemStategy ? unreadItemStategy.map(item.id) : undefined,
+      mentions: mentionCountStrategy ? mentionCountStrategy.map(item.id) : undefined,
       lastAccessTime: lastAccessTimeStategy ? lastAccessTimeStategy.map(item.id) : undefined,
       favourite: favouriteStrategy ? favouriteStrategy.map(item.id) : undefined,
       lurk: lurkStrategy ? !item.oneToOne && lurkStrategy.map(item.users) : undefined,
