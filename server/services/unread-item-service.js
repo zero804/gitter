@@ -195,59 +195,64 @@ function newItem(troupeId, creatorUserId, itemType, itemId) {
 
       if(!userIdsForNotify.length) return;
 
-      // Now talk to redis and do the update
-      var keys = getScriptKeysForUserIds(userIdsForNotify, itemType, troupeId);
-
-      var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
-
-      return runScript('unread-add-item', keys, [troupeId, itemId, timestamp])
-        .then(function(result) {
-          // Results come back as two items per key in sequence
-          // * 2*n value is the new badge count (or -1 for don't update)
-          // * 2*n+1 value is a bitwise collection, 1 = badge update, 2 = upgrade key
-          for(var i = 0; i < result.length; i = i + 2) {
-            var troupeUnreadCount   = result[i];
-            var flag                = result[i + 1];
-            var badgeUpdate         = flag & 1;
-            var upgradeKey          = flag & 2;
-            var userId              = userIdsForNotify[i >> 2];
-
-            if(troupeUnreadCount >= 0) {
-              // Notify the user
-              appEvents.troupeUnreadCountsChange({
-                userId: userId,
-                troupeId: troupeId,
-                total: troupeUnreadCount
-              });
-            }
-
-            if(badgeUpdate) {
-              republishBadgeForUser(userId);
-            }
-
-            if(upgradeKey) {
-              var key = "unread:" + itemType + ":" + userId + ":" + troupeId;
-              var userBadgeKey = "ub:" + userId;
-
-              // Upgrades can happen asynchoronously
-              upgradeKeyToSortedSet(key, userBadgeKey, troupeId, function(err) {
-                if(err) {
-                  winston.info('unread-item-key-upgrade: failed. This is not as serious as it sounds, optimistically locked. ' + err, { exception: err });
-                }
-              });
-            }
-          }
-
-
-          /**
-           * Put these users on a list of people who may need a reminder email
-           * at a later stage
-           */
-          var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
-          markUsersForEmailNotification(troupeId, userIdsForNotify, timestamp);
-        });
-
+      return newItemForUsers(troupeId, itemType, itemId, userIdsForNotify);
     });
+}
+
+function newItemForUsers(troupeId, itemType, itemId, userIds) {
+  // Now talk to redis and do the update
+  var keys = getScriptKeysForUserIds(userIds, itemType, troupeId);
+
+  var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
+
+  return runScript('unread-add-item', keys, [troupeId, itemId, timestamp])
+    .then(function(result) {
+      // Results come back as two items per key in sequence
+      // * 2*n value is the new badge count (or -1 for don't update)
+      // * 2*n+1 value is a bitwise collection, 1 = badge update, 2 = upgrade key
+      for(var i = 0; i < result.length; i = i + 2) {
+        var troupeUnreadCount   = result[i];
+        var flag                = result[i + 1];
+        var badgeUpdate         = flag & 1;
+        var upgradeKey          = flag & 2;
+        var userId              = userIds[i >> 2];
+
+        if(troupeUnreadCount >= 0) {
+          // Notify the user
+          appEvents.troupeUnreadCountsChange({
+            userId: userId,
+            troupeId: troupeId,
+            total: troupeUnreadCount
+          });
+        }
+
+        if(badgeUpdate) {
+          republishBadgeForUser(userId);
+        }
+
+        if(upgradeKey) {
+          var key = "unread:" + itemType + ":" + userId + ":" + troupeId;
+          var userBadgeKey = "ub:" + userId;
+
+          // Upgrades can happen asynchoronously
+          upgradeKeyToSortedSet(key, userBadgeKey, troupeId, function(err) {
+            if(err) {
+              winston.info('unread-item-key-upgrade: failed. This is not as serious as it sounds, optimistically locked. ' + err, { exception: err });
+            }
+          });
+        }
+      }
+
+
+      /**
+       * Put these users on a list of people who may need a reminder email
+       * at a later stage
+       */
+      var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
+      markUsersForEmailNotification(troupeId, userIds, timestamp);
+    });
+
+
 }
 
 /**
@@ -719,8 +724,6 @@ function removeMentionForUser(userId, troupeId, itemIds) {
   return runScript('unread-remove-user-mentions', [key], itemIds)
     .then(function(mentionCount) {
 
-      console.log('unread-remove-user-mentions',mentionCount);
-
       if(mentionCount >= 0) {
         // Notify the user
         appEvents.troupeMentionCountsChange({
@@ -735,7 +738,7 @@ function removeMentionForUser(userId, troupeId, itemIds) {
 }
 
 function detectAndCreateMentions(troupeId, creatingUserId, chat) {
-  if(!chat.mentions) return;
+  if(!chat.mentions || !chat.mentions.length) return;
 
   /* Figure out what type of room this is */
   return troupeService.findById(troupeId)
@@ -744,26 +747,54 @@ function detectAndCreateMentions(troupeId, creatingUserId, chat) {
 
       // XXX: fix this!!
       var publicRoom = true;
-
-      var userIdsForMention = chat.mentions
+      var userIds = chat.mentions
             .map(function(mention) {
               return mention.userId;
-            })
-            .filter(function(userId) {
-              if(!userId) return false;
-
-              if(userId == creatingUserId) return false;
-
-              if(troupe.containsUserId(userId)) {
-                /* User is in the room? Always mention */
-                return true;
-              }
-
-              /* User isn't in the room. Only mention if the room is public */
-              return publicRoom;
             });
 
-      return newMention(troupeId, chat.id, userIdsForMention);
+      var mentionLurkerAndNonMemberUserIds = [];
+      var userIdsForMention = [];
+
+      userIds.forEach(function(userId) {
+        if(!userId) return;
+
+        if(userId == creatingUserId) return;
+
+        var troupeUser = troupe.findTroupeUser(userId);
+        if(troupeUser) {
+          /* User is in the room? Always mention */
+          if(troupeUser.lurk) {
+            mentionLurkerAndNonMemberUserIds.push(userId);
+          } else {
+            userIdsForMention.push(userId);
+          }
+          return;
+        }
+
+        /** User isn't in the room, still allow them to
+          * receive the mention if it's a public room
+          */
+        if(publicRoom) {
+          mentionLurkerAndNonMemberUserIds.push(userId);
+        }
+
+      });
+
+      /**
+       * Lurkers and non members wont have an unread item, so the first thing
+       * we'll need to do is create an unread item for them. Only then can we push the
+       * mention
+       */
+      if(mentionLurkerAndNonMemberUserIds.length) {
+        return newItemForUsers(troupeId, 'chat', chat.id, mentionLurkerAndNonMemberUserIds)
+          .then(function() {
+            var allUserIds = mentionLurkerAndNonMemberUserIds.concat(userIdsForMention);
+
+            return newMention(troupeId, chat.id, allUserIds);
+          });
+      } else {
+        return newMention(troupeId, chat.id, userIdsForMention);
+      }
 
     });
 
