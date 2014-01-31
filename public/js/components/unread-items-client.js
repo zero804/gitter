@@ -306,19 +306,19 @@ define([
     _subscribe: function() {
        var self = this;
        realtime.subscribe('/api/v1/user/' + context.getUserId(), function(message) {
-        if(message.notification !== 'troupe_unread') return;
-        self._handleIncomingMessage(message);
+        switch(message.notification) {
+          case 'troupe_unread':
+            return self._handleIncomingMessage(message);
+
+          case 'troupe_mention':
+            return self._handleIncomingMention(message);
+        }
       });
     },
 
     _handleIncomingMessage: function(message) {
       var troupeId = message.troupeId;
       var totalUnreadItems = message.totalUnreadItems;
-
-      // This no longer makes sense as this is in a different frame
-      // if(troupeId === context.getTroupeId()) return;
-
-      log('Updating troupeId' + troupeId + ' to ' + totalUnreadItems);
 
       var model = this._collection.get(troupeId);
       if(!model) {
@@ -329,6 +329,21 @@ define([
       // TroupeCollectionSync keeps track of the values
       // for this troupe, so ignore those values
       model.set('unreadItems', totalUnreadItems);
+    },
+
+    _handleIncomingMention: function(message) {
+      var troupeId = message.troupeId;
+      var mentions = message.mentions;
+
+      var model = this._collection.get(troupeId);
+      if(!model) {
+        log("Cannot find model. Refresh might be required....");
+        return;
+      }
+
+      // TroupeCollectionSync keeps track of the values
+      // for this troupe, so ignore those values
+      model.set('mentions', mentions);
     }
   };
 
