@@ -25,6 +25,8 @@ var collections               = require("../utils/collections");
 function newUser(options, callback) {
   var githubId = options.githubId;
 
+  console.log("NEW USER: ", options);
+
   assert(githubId, 'githubId required');
   assert(options.username, 'username required');
 

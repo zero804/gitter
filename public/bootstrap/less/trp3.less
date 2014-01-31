@@ -234,11 +234,7 @@ a:hover {
   }
 
   li {
-    line-height: 22px;
-  }
-
-  .trpToolbarList {
-    width: 260px;
+    line-height: 25px;
   }
 
   @media @small {
@@ -257,7 +253,7 @@ a:hover {
 }
 
 .trpLeftMenu .trpToolbarHeader {
-  margin-left: 9px;
+  margin-left: 12px;
   padding-top: 0;
   padding-bottom: 2px;
   opacity: 0.6;
@@ -351,10 +347,12 @@ a:hover {
 
 .trpLeftMenuProfile {
   .trpBodyMedium;
-  padding: 10px 0 10px 10px;
+  padding: 4px;
+  margin: 8px;
   cursor: pointer;
-  height: 36px;
+  height: 32px;
   overflow: hidden;
+  border-radius: 4px;
 
   .avatar-s {
     width: 32px;
@@ -372,13 +370,12 @@ a:hover {
 }
 
 .trpLeftMenuProfileHeader {
-  padding-bottom: 10px;
+  padding-bottom: 4px;
 }
 
 .trpLeftMenuProfileMenu {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
-  margin-left: -10px;
   padding-bottom: 12px;
   overflow: hidden;
   width: 100%;
@@ -386,7 +383,6 @@ a:hover {
   .trpBodyMedium;
   font-weight: 300;
   line-height: 24px;
-  padding-right: 20px;
   box-sizing: border-box;
   -moz-box-sizing: border-box;
 
@@ -397,12 +393,27 @@ a:hover {
 
   .item {
     padding-left: 10px;
-    margin-right: 10px;
   }
 
   .item:hover {
-    border-radius: 0 4px 4px 0;
+    border-radius: 4px;
     background-color: rgba(255,255,255,0.2);
+  }
+
+  li {
+    list-style: none;
+  }
+
+  li.item .icon-home {
+    .prepend-home-icon()
+  }
+
+  li.item .icon-signout {
+    .prepend-home-signout()
+  }
+
+  li.item .icon-apps {
+    .prepend-home-apps()
   }
 
 }
@@ -426,7 +437,6 @@ a:hover {
 
 .trpLeftMenuContainer {
   height: 100%;
-  width: 260px;
   overflow: hidden;
 }
 
@@ -524,12 +534,12 @@ a.trpMiniLeftMenuItem {
 .trpLeftMenu .nano {
   position: absolute;
   bottom: 10px;
-  top: 114px;
+  top: 100px;
   .transition(200ms);
 }
 
 .trpLeftMenu .nano.pushed {
-  top: 194px;
+  top: 180px;
   .transition(400ms);
 }
 
@@ -589,7 +599,6 @@ a.trpMiniLeftMenuItem {
 }
 
 .trpLeftMenuSearch {
-  margin-top: 8px;
   background-color: transparent;
   border: 1px solid rgba(255,255,255, 0.6);
   border-radius: 6px;
@@ -747,10 +756,10 @@ body.dragging .list-favourites li.placeholder {
   width: 100%;
   box-sizing: border-box;
   -moz-box-sizing: border-box;
-  padding-right: 22px;
 
   li {
-    padding-left: 10px;
+    padding-left: 4px;
+    margin-left: 12px;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     cursor: pointer;
@@ -758,7 +767,7 @@ body.dragging .list-favourites li.placeholder {
   }
 
   li:hover {
-    border-radius: 0 4px 4px 0;
+    border-radius: 4px 0 0 4px;
     background-color: rgba(255,255,255,0.2);
 
     @media @mobile {
@@ -872,7 +881,7 @@ ul li.placeholder:before {
 
 .trpTroupeList li .item-unread-badge{
   float: right;
-  margin-right: 5px;
+  margin-right: 8px;
   display: none;
 }
 
@@ -888,7 +897,7 @@ ul li.placeholder:before {
 .item-close {
   float: right;
   opacity: 0.3;
-  margin-right: 6px;
+  margin-right: 9px;
   .transition300ms;
 }
 
