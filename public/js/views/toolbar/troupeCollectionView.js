@@ -59,11 +59,14 @@ define([
 
       var unreadBadge = e.find('.item-unread-badge');
       var lurk = self.model.get('lurk');
+      var mentions = self.model.get('mentions');
+      var ui = self.model.get('unreadItems');
+      var redisplayBadge = false;
 
       if(first || 'lurk' in m.changed) {
-        if(lurk) {
-          unreadBadge.removeClass('shown');
-        } else {
+        redisplayBadge = true;
+
+        if(!lurk) {
           e.removeClass('chatting chatting-now');
         }
       }
@@ -92,10 +95,6 @@ define([
         }
       }
 
-      var mentions = self.model.get('mentions');
-      var ui = self.model.get('unreadItems');
-      var redisplayBadge = false;
-
       if(first || 'mentions' in m.changed) {
         redisplayBadge = true;
         if(mentions > 0) {
@@ -117,7 +116,8 @@ define([
       }
 
       if(first || redisplayBadge) {
-        unreadBadge.toggleClass('shown', !!(ui || mentions));
+        var shown = !!((lurk && mentions) || (!lurk && !(ui || mentions)));
+        unreadBadge.toggleClass('shown', shown);
       }
 
       if(first || 'favourite' in m.changed) {
