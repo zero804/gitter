@@ -1,15 +1,15 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var redis = require("../utils/redis"),
-    nconf = require("../utils/config"),
-    winston = require('winston'),
-    events = require('events'),
-    assert = require('assert'),
-    Fiber = require('../utils/fiber'),
-    appEvents = require('../app-events.js'),
-    Q = require('q'),
-    _ = require("underscore");
+var redis = require("../utils/redis");
+var nconf = require("../utils/config");
+var winston = require('winston');
+var events = require('events');
+var assert = require('assert');
+var Fiber = require('../utils/fiber');
+var appEvents = require('../app-events.js');
+var Q = require('q');
+var _ = require("underscore");
 
 var presenceService = new events.EventEmitter();
 
