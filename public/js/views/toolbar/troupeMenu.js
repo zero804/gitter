@@ -48,6 +48,10 @@ define([
       });
     },
 
+    initNanoScroller: function() {
+      $('.nano').nanoScroller();
+    },
+
     onRender: function() {
 
       this.profile.show(new ProfileView());
@@ -69,7 +73,7 @@ define([
         roomsCollection: troupeCollections.troupes
       }));
 
-      this.$el.find('.nano').nanoScroller();
+      setTimeout(this.initNanoScroller,500);      
 
       // search results collection view
       this.searchView = new SearchView({ troupes: troupeCollections.troupes, $input: this.$el.find('#list-search-input') });
