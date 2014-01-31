@@ -113,7 +113,7 @@ var UserSchema = new Schema({
   githubUserToken: { type: String }, // The scope for this token will always be 'user'
   githubId: {type: Number },
   permissions: {
-    createRoom: { type: Boolean, 'default': false }
+    createRoom: { type: Boolean, 'default': true }
   },
   githubScopes: {type: Schema.Types.Mixed },
   _tv: { type: 'MongooseNumber', 'default': 0 }
