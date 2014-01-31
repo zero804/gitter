@@ -16,8 +16,10 @@ module.exports = {
 
     create: function(req, res, next) {
       var unreadItems = req.body;
+      if(!unreadItems || !unreadItems.chat) return next(400);
+      if(!unreadItems.chat.length) return res.send(200);
 
-      return unreadItemService.markItemsRead(req.resourceUser.id, req.userTroupe.id, unreadItems)
+      return unreadItemService.markItemsRead(req.resourceUser.id, req.userTroupe.id, unreadItems.chat)
         .then(function() {
           res.send(200);
         })

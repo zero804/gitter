@@ -106,10 +106,7 @@ exports.install = function() {
   appEvents.localOnly.onTroupeUnreadCountsChange(function(data) {
     var userId = data.userId;
     var troupeId = data.troupeId;
-    var counts = data.counts;
-    var total = Object.keys(counts)
-                  .map(function(key) { return counts[key]; })
-                  .reduce(function(a, b) { return a + b; });
+    var total = data.total;
 
     bayeuxClient.publish("/api/v1/user/" + userId, {
       notification: "troupe_unread",
