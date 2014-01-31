@@ -1,6 +1,7 @@
 local user_badge_key = KEYS[1]
 local user_troupe_key = KEYS[2]
 local email_hash_key = KEYS[3]
+local user_mention_key = KEYS[4]
 
 -- Values are lrt timestamp, troupeId followed by itemIds,
 local troupe_id = table.remove(ARGV, 1)
@@ -21,6 +22,11 @@ for i, item_id in ipairs(itemIds) do
     removed = redis.call("SREM", user_troupe_key, item_id)
     if removed > 0 then
       card = redis.call("SCARD", user_troupe_key)
+
+      if card == 0 then
+        redis.call("DEL", user_mention_key)
+      end
+
     end
   elseif key_type == "none" then
     removed = 0;

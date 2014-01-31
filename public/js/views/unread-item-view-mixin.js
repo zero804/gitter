@@ -7,7 +7,7 @@ define([
 
   return {
     onDomRender: function() {
-      if(this.model && this.unreadItemType) {
+      if(this.model) {
         var id = this.model.get('id');
         if(!id) id = this.model.cid;
         var $e = this.$el;
@@ -16,15 +16,20 @@ define([
         $e.addClass('model-id-' + id);
 
         var unread = this.model.get('unread');
+        var mentioned = this.model.get('mentioned');
+
         if(unread) {
           if(unreadItemsClient.hasItemBeenMarkedAsRead(this.unreadItemType, id)) {
             unread = false;
           }
         }
 
+        $e.toggleClass('mention', mentioned);
+
         if(unread) {
           $e.addClass('unread');
           e.dataset.itemId = id;
+          e.dataset.mentioned = mentioned;
           e.dataset.itemType = this.unreadItemType;
           appEvents.trigger('unreadItemDisplayed');
         }

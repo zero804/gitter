@@ -278,8 +278,15 @@ function removeItem(troupeId, itemType, itemId) {
 
       if(!userIdsForNotify.length) return;
 
-      // Now talk to redis and do the update
-      var keys = getScriptKeysForUserIds(userIdsForNotify, itemType, troupeId);
+      var keys = userIdsForNotify.reduce(function(memo, userId) {
+          memo.push(
+            "unread:" + itemType + ":" + userId + ":" + troupeId,
+            "ub:" + userId,
+            "m:" + userId + ":" + troupeId);
+
+          return memo;
+        }, []);
+
       return runScript('unread-remove-item', keys, [troupeId, itemId])
         .then(function(result) {
           // Results come back as two items per key in sequence
@@ -292,7 +299,8 @@ function removeItem(troupeId, itemType, itemId) {
             var userId              = userIdsForNotify[i >> 2];
 
             if(troupeUnreadCount >= 0) {
-              // Notify the user
+              // Notify the user. If the unread count is zero,
+              // the client should zero out it's
               appEvents.troupeUnreadCountsChange({
                 userId: userId,
                 troupeId: troupeId,
@@ -324,7 +332,8 @@ function markItemsOfTypeRead(userId, troupeId, itemType, ids) {
   var keys = [
       "ub:" + userId,
       "unread:" + itemType + ":" + userId + ":" + troupeId,
-      EMAIL_NOTIFICATION_HASH_KEY
+      EMAIL_NOTIFICATION_HASH_KEY,
+      "m:" + userId + ":" + troupeId
     ];
 
   var values = [troupeId, userId].concat(ids);
@@ -443,30 +452,36 @@ exports.markUserAsEmailNotified = function(userId) {
 /**
  * Mark many items as read, for a single user and troupe
  */
-exports.markItemsRead = function(userId, troupeId, itemIds, options) {
+exports.markItemsRead = function(userId, troupeId, itemIds, mentionIds, options) {
   var now = Date.now();
+
+  var allIds = [];
+  if(itemIds) allIds = allIds.concat(itemIds);
+  if(mentionIds) allIds = allIds.concat(mentionIds);
 
   appEvents.unreadItemsRemoved(userId, troupeId, { chat: itemIds }); // TODO: update
 
   return Q.all([
-    markItemsOfTypeRead(userId, troupeId, 'chat', itemIds),
-    setLastReadTimeForUser(userId, troupeId, now)
+    markItemsOfTypeRead(userId, troupeId, 'chat', allIds),
+    setLastReadTimeForUser(userId, troupeId, now),
+    mentionIds && mentionIds.length && removeMentionForUser(userId, troupeId, mentionIds)
     ])
     .then(function() {
       if(options && options.recordAsRead === false) return;
 
       // For the moment, we're only bothering with chats for this
-      return readByService.recordItemsAsRead(userId, troupeId, { chat: itemIds }); // TODO: drop the hash
+      return readByService.recordItemsAsRead(userId, troupeId, { chat: allIds }); // TODO: drop the hash
     });
 
 };
 
 exports.markAllChatsRead = function(userId, troupeId, callback) {
+  // TODO: add in mentions!!
   exports.getUnreadItems(userId, troupeId, 'chat')
     .then(function(chatIds) {
       if(!chatIds.length) return;
       /* Don't mark the items as read */
-      return exports.markItemsRead(userId, troupeId, chatIds, { recordAsRead: false });
+      return exports.markItemsRead(userId, troupeId, chatIds, null, { recordAsRead: false });
     })
     .nodeify(callback);
 };
@@ -669,17 +684,15 @@ function newMention(troupeId, chatId, userIds) {
   // Now talk to redis and do the update
   var keys = getMentionScriptKeysForUserIds(userIds, troupeId);
 
-  return runScript('unread-add-mentions', keys, [troupeId, chatId])
+  return runScript('unread-add-mentions', keys, [chatId])
     .then(function(result) {
 
       // Results come back as two items per key in sequence
       // * 2*n value is the new user troupe count (or -1 for don't update)
       // * 2*n+1 value is a flag. 0 = nothing, 1 = update badge
-      for(var i = 0; i < result.length; i = i + 2) {
+      for(var i = 0; i < result.length; i++) {
         var mentionCount        = result[i];
-        var flag                = result[i + 1];
-        var badgeUpdate         = flag & 1;
-        var userId              = userIds[i >> 2];
+        var userId              = userIds[i];
 
         if(mentionCount >= 0) {
           // Notify the user
@@ -689,13 +702,33 @@ function newMention(troupeId, chatId, userIds) {
             total: mentionCount
           });
         }
-
-        if(badgeUpdate) {
-          republishBadgeForUser(userId);
-        }
       }
 
       // TODO: email users about their mentions.. Look at newItem
+    });
+}
+
+/**
+ * Remove the mentions and decrement counters
+ */
+function removeMentionForUser(userId, troupeId, itemIds) {
+  if(!itemIds.length) return;
+
+  var key = "m:" + userId + ":" + troupeId;
+
+  return runScript('unread-remove-user-mentions', [key], itemIds)
+    .then(function(mentionCount) {
+
+      console.log('unread-remove-user-mentions',mentionCount);
+
+      if(mentionCount >= 0) {
+        // Notify the user
+        appEvents.troupeMentionCountsChange({
+          userId: userId,
+          troupeId: troupeId,
+          total: mentionCount
+        });
+      }
     });
 
 
