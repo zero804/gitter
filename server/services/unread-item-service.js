@@ -22,8 +22,6 @@ scriptManager.loadFromDir(__dirname + '/../../redis-lua/unread');
 
 var EMAIL_NOTIFICATION_HASH_KEY = "unread:email_notify";
 
-var DEFAULT_ITEM_TYPES = ['chat', 'request'];
-
 function sinceFilter(since) {
   return function(id) {
     var date = mongoUtils.getDateFromObjectId(id);
@@ -94,7 +92,93 @@ function getScriptKeysForUserIds(userIds, itemType, troupeId) {
 }
 
 var runScript = Q.nbind(scriptManager.run, scriptManager);
-var redisClient_smembers = Q.nbind(redisClient.smembers, redisClient);
+
+function upgradeKeyToSortedSet(key, userBadgeKey, troupeId, callback) {
+  winston.verbose('unread-item-key-upgrade: attempting to upgrade ' + key);
+
+  // Use a new client due to the WATCH semantics
+  var redisClient = redis.createClient();
+
+  function done(err) {
+    if(err) {
+      winston.verbose('unread-item-key-upgrade: upgrade failed' + err, { exception: err });
+    } else {
+      winston.verbose('unread-item-key-upgrade: upgrade completed successfully');
+    }
+
+    redisClient.quit();
+    return callback(err);
+  }
+
+  /**
+   * Fairly certain that we don't need the userBadgeKey in the lock.
+   * If we did so, changes to other userTroupes could starve this
+   * transaction. Also all changes to the specific key on the userBadge
+   * that we are changing will always affect the `key` too so we'll
+   * be safe from inconsistencies that way.
+   *
+   * IF WE'RE GETTING INCONSISTENCIES, review this later!
+   */
+  redisClient.watch(key, function(err) {
+    if(err) return done(err);
+
+    redisClient.type(key, function(err, keyType) {
+      if(err) return done(err);
+
+      /* Go home redis, you're drunk */
+      keyType = ("" + keyType).trim();
+
+      /* If the key isn't a set our job is done */
+      if(keyType != 'set') {
+        winston.verbose('unread-item-key-upgrade: upgrade already happened: type=' + keyType);
+        return done();
+      }
+
+      redisClient.smembers(key, function(err, itemIds) {
+        if(err) return done(err);
+
+        var multi = redisClient.multi();
+
+        var zaddArgs = [key];
+
+        var itemIdsWithScores = itemIds.map(function(itemId) {
+          var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
+
+          /* ZADD score member */
+          return [timestamp, itemId];
+        });
+
+
+        /* Sort by timestamp */
+        itemIdsWithScores.sort(function(a, b) {
+          return a[0] - b[0];
+        });
+
+        /* Truncate down to 100 */
+        itemIdsWithScores = itemIdsWithScores.slice(-100);
+
+        itemIdsWithScores.forEach(function(itemWithScore) {
+          /* ZADD score member */
+          zaddArgs.push(itemWithScore[0], itemWithScore[1]);
+        });
+
+        multi.del(key);
+        multi.zadd.apply(multi, zaddArgs);
+        multi.zrem(userBadgeKey, troupeId);
+        multi.zadd(userBadgeKey, itemIdsWithScores.length, troupeId);
+
+        multi.exec(function(err) {
+          if(err) return done(err);
+        });
+
+      });
+
+
+    });
+  });
+
+
+}
 
 /**
  * New item added
@@ -130,16 +214,38 @@ function newItem(troupeId, creatorUserId, itemType, itemId) {
 
       // Now talk to redis and do the update
       var keys = getScriptKeysForUserIds(userIdsForNotify, itemType, troupeId);
-      return runScript('unread-add-item', keys, [troupeId, itemId])
-        .then(function(updates) {
+
+      var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
+
+      return runScript('unread-add-item', keys, [troupeId, itemId, timestamp])
+        .then(function(result) {
+
           userIdsForNotify.forEach(function(userId) {
             republishUnreadItemCountForUserTroupe(userId, troupeId);
           });
+
+          var badgeUpdateCount = result[0];
+          var updates = result.slice(1, badgeUpdateCount + 1);
 
           updates.forEach(function(update) {
             var userId = userIdsForNotify[update];
             republishBadgeForUser(userId);
           });
+          var upgrades = result.slice(badgeUpdateCount + 1);
+
+          upgrades.forEach(function(upgrade) {
+            var userId = userIdsForNotify[upgrade];
+            var key = "unread:" + itemType + ":" + userId + ":" + troupeId;
+            var userBadgeKey = "ub:" + userId;
+
+            // Upgrades can happen asynchoronously
+            upgradeKeyToSortedSet(key, userBadgeKey, troupeId, function(err) {
+              if(err) {
+                winston.info('unread-item-key-upgrade: failed. This is not as serious as it sounds, optimistically locked. ' + err, { exception: err });
+              }
+            });
+          });
+
 
           /**
            * Put these users on a list of people who may need a reminder email
@@ -224,9 +330,9 @@ function markUsersForEmailNotification(troupeId, userIds, dateNow) {
   values.push.apply(values, userIds.map(function(f) { return troupeId + ':' + f; }));
 
   return runScript('unread-mark-users-for-email', [EMAIL_NOTIFICATION_HASH_KEY], values)
-  .fail(function(err) {
-    winston.error('unread-mark-users-for-email failed:' + err, { exception: err });
-  });
+    .fail(function(err) {
+      winston.error('unread-mark-users-for-email failed:' + err, { exception: err });
+    });
 
 }
 
@@ -348,34 +454,35 @@ exports.markAllChatsRead = function(userId, troupeId, callback) {
   exports.getUnreadItems(userId, troupeId, 'chat')
     .then(function(chatIds) {
       if(!chatIds.length) return;
-      return exports.markItemsRead(userId, troupeId, {chat: chatIds});
+      return exports.markItemsRead(userId, troupeId, { chat: chatIds });
     })
     .nodeify(callback);
 };
 
 exports.getUserUnreadCounts = function(userId, troupeId, callback) {
-  var multi = redisClient.multi();
+  var key = "unread:chat:" + userId + ":" + troupeId;
+  return runScript('unread-item-count', [key])
+    .then(function(result) {
+      return result || 0;
+    })
+    .nodeify(callback);
+};
 
-  DEFAULT_ITEM_TYPES.forEach(function(itemType) {
-    multi.scard("unread:" + itemType + ":" + userId + ":" + troupeId);
+exports.getUserUnreadCountsForTroupeIds = function(userId, troupeIds, callback) {
+
+  var keys = troupeIds.map(function(troupeId) {
+    return "unread:chat:" + userId + ":" + troupeId;
   });
 
-  multi.exec(function(err, replies) {
-    if(err) {
-      winston.error("unreadItemService.getUserUnreadCounts failed", err);
-      return callback(err);
-    }
+  return runScript('unread-item-count', keys)
+    .then(function(replies) {
+      return troupeIds.reduce(function(memo, troupeId, index) {
+        memo[troupeId] = replies[index];
+        return memo;
+      }, {});
 
-    var result = {};
-
-    DEFAULT_ITEM_TYPES.forEach(function(itemType, index) {
-      var reply = replies[index];
-      result[itemType] = reply;
-    });
-
-    callback(null, result);
-
-  });
+    })
+    .nodeify(callback);
 };
 
 /** Returns hash[userId] = unixTime for each of the queried users */
@@ -414,9 +521,10 @@ exports.findLastReadTimesForUsersForTroupe = function(userIds, troupeId, callbac
 
 
 exports.getUnreadItems = function(userId, troupeId, itemType, callback) {
-  return redisClient_smembers("unread:" + itemType + ":" + userId + ":" + troupeId)
+  var keys = ["unread:" + itemType + ":" + userId + ":" + troupeId];
+  return runScript('unread-item-list', keys)
     .fail(function(err) {
-      winston.warn("unreadItemService.getUnreadItems failed", err);
+      winston.warn("unreadItemService.getUnreadItems failed:" + err, { exception: err });
       // Mask error
       return [];
     })
@@ -443,7 +551,7 @@ exports.getUnreadItemsForUserTroupeSince = getUnreadItemsForUserTroupeSince;
 exports.getFirstUnreadItem = function(userId, troupeId, itemType, callback) {
     exports.getUnreadItems(userId, troupeId, itemType, function(err, members) {
       if(err) {
-        winston.warn("unreadItemService.getUnreadItems failed", err);
+        winston.warn("unreadItemService.getUnreadItems failed: " + err, { exception: err });
 
         // Mask error
         return callback(null, null);
@@ -458,24 +566,13 @@ exports.getFirstUnreadItem = function(userId, troupeId, itemType, callback) {
 };
 
 exports.getUnreadItemsForUser = function(userId, troupeId, callback) {
-  var multi = redisClient.multi();
-
-  DEFAULT_ITEM_TYPES.forEach(function(itemType) {
-    multi.smembers("unread:" + itemType + ":" + userId + ":" + troupeId);
-  });
-
-  multi.exec(function(err, replies) {
-    if(err) return callback(err);
-
-    var result = {};
-
-    DEFAULT_ITEM_TYPES.forEach(function(itemType, index) {
-      var reply = replies[index];
-      result[itemType] = reply;
-    });
-
-    callback(null, result);
-  });
+  return exports.getUnreadItems(userId, troupeId, 'chat')
+    .then(function(results) {
+      return {
+        chat: results
+      };
+    })
+    .nodeify(callback);
 };
 
 /**
