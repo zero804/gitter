@@ -99,6 +99,14 @@ function bind(on) {
       on('troupeUnreadCountsChange', callback);
     },
 
+    troupeMentionCountsChange: function(data) {
+      emit('troupeMentionCountsChange', data);
+    },
+
+    onTroupeMentionCountsChange: function(callback) {
+      on('troupeMentionCountsChange', callback);
+    },
+
     userLoggedIntoTroupe: function(userId, troupeId) {
       emit('userLoggedIntoTroupe', { troupeId: troupeId, userId: userId });
     },

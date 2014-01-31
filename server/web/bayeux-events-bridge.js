@@ -116,6 +116,19 @@ exports.install = function() {
 
   });
 
+  appEvents.localOnly.onTroupeMentionCountsChange(function(data) {
+    var userId = data.userId;
+    var troupeId = data.troupeId;
+    var total = data.total;
+
+    bayeuxClient.publish("/api/v1/user/" + userId, {
+      notification: "troupe_mention",
+      troupeId: troupeId,
+      mentions: total
+    });
+
+  });
+
 
   appEvents.localOnly.onNewUnreadItem(function(data) {
     var userId = data.userId;

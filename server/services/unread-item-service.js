@@ -331,7 +331,6 @@ function markItemsOfTypeRead(userId, troupeId, itemType, ids) {
 
   return runScript('unread-mark-items-read', keys, values)
     .then(function(result) {
-      console.log('>>>>>>>>>', result);
       var troupeUnreadCount   = result[0];
       var flag                = result[1];
       var badgeUpdate         = flag & 1;
@@ -498,6 +497,29 @@ exports.getUserUnreadCountsForTroupeIds = function(userId, troupeIds, callback) 
     .nodeify(callback);
 };
 
+exports.getUserMentionCountsForTroupeIds = function(userId, troupeIds, callback) {
+  var multi = redisClient.multi();
+
+  troupeIds.forEach(function(troupeId) {
+    multi.scard("m:" + userId + ":" + troupeId);
+  });
+
+  var d = Q.defer();
+
+  multi.exec(function(err, replies) {
+    if(err) return d.reject(err);
+
+    var result = troupeIds.reduce(function(memo, troupeId, index) {
+      memo[troupeId] = replies[index];
+      return memo;
+    }, {});
+
+    d.resolve(result);
+  });
+
+  return d.promise.nodeify(callback);
+};
+
 /** Returns hash[userId] = unixTime for each of the queried users */
 exports.findLastReadTimesForUsers = function(userIds, callback) {
   var keysToQuery = userIds.map(function(userId) { return "lrt:" + userId;});
@@ -648,16 +670,30 @@ function newMention(troupeId, chatId, userIds) {
   var keys = getMentionScriptKeysForUserIds(userIds, troupeId);
 
   return runScript('unread-add-mentions', keys, [troupeId, chatId])
-    .then(function(badgeUpdateCount) {
+    .then(function(result) {
 
-      userIds.forEach(function(userId) {
-        republishMentionCountForUserTroupe(userId, troupeId);
-      });
+      // Results come back as two items per key in sequence
+      // * 2*n value is the new user troupe count (or -1 for don't update)
+      // * 2*n+1 value is a flag. 0 = nothing, 1 = update badge
+      for(var i = 0; i < result.length; i = i + 2) {
+        var mentionCount        = result[i];
+        var flag                = result[i + 1];
+        var badgeUpdate         = flag & 1;
+        var userId              = userIds[i >> 2];
 
-      badgeUpdateCount.forEach(function(update) {
-        var userId = userIds[update];
-        republishBadgeForUser(userId);
-      });
+        if(mentionCount >= 0) {
+          // Notify the user
+          appEvents.troupeMentionCountsChange({
+            userId: userId,
+            troupeId: troupeId,
+            total: mentionCount
+          });
+        }
+
+        if(badgeUpdate) {
+          republishBadgeForUser(userId);
+        }
+      }
 
       // TODO: email users about their mentions.. Look at newItem
     });
@@ -702,7 +738,7 @@ function detectAndCreateMentions(troupeId, creatingUserId, chat) {
 
 function detectAndRemoveMentions(troupeId, creatingUserId, chat) {
   if(!chat.mentions) return;
-  // XXX: do something here
+  // XXX: remove the mention
 }
 
 

@@ -15,14 +15,20 @@ for i = 1,key_count do
 	local user_troupe_mention_key = KEYS[i]
 	local user_badge_key = KEYS[i + key_count]
 
+  local count = -1;
+  local flag = 0;
+
 	if redis.call("SADD", user_troupe_mention_key, item_id) > 0 then
+    count = redis.call("SCARD", user_troupe_mention_key);
 
 		-- If this is the first for this troupe for this user, the badge count is going to increment
 		if tonumber(redis.call("ZINCRBY", user_badge_key, 1, troupe_id)) == 1 then
-			table.insert(result, i - 1) -- Remember the minus one for base zero in non-lua world
+      flag = 1
 		end
-
 	end
+
+  table.insert(result, count);
+  table.insert(result, flag);
 end
 
 return result
