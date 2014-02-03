@@ -190,7 +190,6 @@ describe('markItemsRead', function() {
         });
 
         mockito.when(readByService).recordItemsAsRead().then(function(a0, a1, a2) {
-          console.log(arguments);
           assert.equal(a0, userId);
           assert.equal(a1, troupeId);
           assert.equal(a2.chat.length, 2);
@@ -247,7 +246,7 @@ describe('limits', function() {
     mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(usersWithLurkHash));
     var adds = [];
 
-    for(var i = 0; i < 100; i++) {
+    for(var i = 0; i < 99; i++) {
       adds.push(unreadItemService.testOnly.newItem(troupeId, null, itemType, mongoUtils.getNewObjectIdString()));
     }
 
@@ -263,6 +262,50 @@ describe('limits', function() {
       })
       .then(function(count) {
         assert.equal(count, 100);
+      })
+      .nodeify(done);
+  });
+
+});
+
+describe('mentions', function() {
+
+  it('should record when a user is mentioned but not a member of the room', function(done) {
+    var troupeId = mongoUtils.getNewObjectIdString();
+    var userId = mongoUtils.getNewObjectIdString();
+    var chatId = mongoUtils.getNewObjectIdString();
+
+    var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
+
+    var unreadItemService = testRequire.withProxies("./services/unread-item-service", {
+      './troupe-service': troupeServiceMock
+    });
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve({ /* No users */ }));
+
+    // Fake chat
+    var chat = {
+      id: chatId,
+      mentions: [{
+        userId: userId
+      }]
+    };
+
+    return unreadItemService.testOnly.detectAndCreateMentions(troupeId, undefined, chat)
+      .then(function() {
+        return unreadItemService.getRoomIdsMentioningUser(userId);
+      })
+      .then(function(troupeIds) {
+        assert.equal(troupeIds.length, 1);
+        assert.equal(troupeIds[0], troupeId);
+
+        return unreadItemService.markItemsRead(userId, troupeId, undefined, [chatId]);
+      })
+      .then(function() {
+        return unreadItemService.getRoomIdsMentioningUser(userId);
+      })
+      .then(function(troupeIds) {
+        assert.equal(troupeIds.length, 0);
       })
       .nodeify(done);
   });
