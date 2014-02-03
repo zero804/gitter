@@ -47,9 +47,8 @@ module.exports = {
     var unreadItems = new Resource('unreadItems', require('./user/unread-items'), app);
     userTroupeResource.add(unreadItems);
 
-
-
     installUserSubResource('orgs',        'orgs');
     installUserSubResource('repos',       'repos');
+    installUserSubResource('mentions',    'mentions');
   }
 };

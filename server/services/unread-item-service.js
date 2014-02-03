@@ -59,22 +59,8 @@ function getScriptKeysForUserIds(userIds, itemType, troupeId) {
   return unreadKeys.concat(badgeKeys);
 }
 
-/**
- * Returns the key array used by the redis scripts
- */
-function getMentionScriptKeysForUserIds(userIds, troupeId) {
-  var unreadKeys = userIds.map(function(userId) {
-    return "m:" + userId + ":" + troupeId;
-  });
-
-  var badgeKeys = userIds.map(function(userId) {
-    return "ub:" + userId;
-  });
-
-  return unreadKeys.concat(badgeKeys);
-}
-
 var runScript = Q.nbind(scriptManager.run, scriptManager);
+var redisClient_smembers = Q.nbind(redisClient.smembers, redisClient);
 
 function upgradeKeyToSortedSet(key, userBadgeKey, troupeId, callback) {
   winston.verbose('unread-item-key-upgrade: attempting to upgrade ' + key);
@@ -586,6 +572,16 @@ exports.getUnreadItems = function(userId, troupeId, itemType, callback) {
     .nodeify(callback);
 };
 
+exports.getRoomIdsMentioningUser = function(userId, callback) {
+  return redisClient_smembers("m:" + userId)
+    .fail(function(err) {
+      winston.warn("unreadItemService.getRoomIdsMentioningUser failed:" + err, { exception: err });
+      // Mask error
+      return [];
+    })
+    .nodeify(callback);
+};
+
 function getUnreadItemsForUserTroupeSince(userId, troupeId, since, callback) {
   return exports.getUnreadItems(userId, troupeId, 'chat')
     .then(function(chatItems) {
@@ -686,12 +682,23 @@ function newMention(troupeId, chatId, userIds) {
 
   if(!userIds.length) return;
 
-  // Now talk to redis and do the update
-  var keys = getMentionScriptKeysForUserIds(userIds, troupeId);
 
-  return runScript('unread-add-mentions', keys, [chatId])
+  var unreadKeys = userIds.map(function(userId) {
+    return "m:" + userId + ":" + troupeId;
+  });
+
+  var badgeKeys = userIds.map(function(userId) {
+    return "ub:" + userId;
+  });
+
+  var userMentionKeys = userIds.map(function(userId) {
+    return "m:" + userId;
+  });
+
+  var keys = unreadKeys.concat(badgeKeys, userMentionKeys);
+
+  return runScript('unread-add-mentions', keys, [chatId, troupeId])
     .then(function(result) {
-
       // Results come back as two items per key in sequence
       // * 2*n value is the new user troupe count (or -1 for don't update)
       // * 2*n+1 value is a flag. 0 = nothing, 1 = update badge
@@ -718,10 +725,14 @@ function newMention(troupeId, chatId, userIds) {
  */
 function removeMentionForUser(userId, troupeId, itemIds) {
   if(!itemIds.length) return;
+  var keys = [
+      "m:" + userId + ":" + troupeId, // User troupe mention
+      "m:" + userId                   // User mention badge
+    ];
 
-  var key = "m:" + userId + ":" + troupeId;
+  var values = [troupeId].concat(itemIds);
 
-  return runScript('unread-remove-user-mentions', [key], itemIds)
+  return runScript('unread-remove-user-mentions', keys, values)
     .then(function(mentionCount) {
 
       if(mentionCount >= 0) {
@@ -753,7 +764,7 @@ function detectAndCreateMentions(troupeId, creatingUserId, chat) {
             });
 
       var mentionLurkerAndNonMemberUserIds = [];
-      var userIdsForMention = [];
+      var mentionMemberUserIds = [];
 
       userIds.forEach(function(userId) {
         if(!userId) return;
@@ -766,7 +777,7 @@ function detectAndCreateMentions(troupeId, creatingUserId, chat) {
           if(troupeUser.lurk) {
             mentionLurkerAndNonMemberUserIds.push(userId);
           } else {
-            userIdsForMention.push(userId);
+            mentionMemberUserIds.push(userId);
           }
           return;
         }
@@ -788,12 +799,11 @@ function detectAndCreateMentions(troupeId, creatingUserId, chat) {
       if(mentionLurkerAndNonMemberUserIds.length) {
         return newItemForUsers(troupeId, 'chat', chat.id, mentionLurkerAndNonMemberUserIds)
           .then(function() {
-            var allUserIds = mentionLurkerAndNonMemberUserIds.concat(userIdsForMention);
-
+            var allUserIds = mentionLurkerAndNonMemberUserIds.concat(mentionMemberUserIds);
             return newMention(troupeId, chat.id, allUserIds);
           });
       } else {
-        return newMention(troupeId, chat.id, userIdsForMention);
+        return newMention(troupeId, chat.id, mentionMemberUserIds);
       }
 
     });
