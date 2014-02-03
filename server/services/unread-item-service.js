@@ -271,23 +271,25 @@ function removeItem(troupeId, itemType, itemId) {
 
       var keys = userIdsForNotify.reduce(function(memo, userId) {
           memo.push(
-            "unread:" + itemType + ":" + userId + ":" + troupeId,
-            "ub:" + userId,
-            "m:" + userId + ":" + troupeId);
+            "unread:" + itemType + ":" + userId + ":" + troupeId,     // Unread for user
+            "ub:" + userId,                                           // Unread badge for user
+            "m:" + userId + ":" + troupeId,                           // User Troupe mention items
+            "m:" + userId                                             // User mentions
+          );
 
           return memo;
         }, []);
 
       return runScript('unread-remove-item', keys, [troupeId, itemId])
         .then(function(result) {
-          // Results come back as two items per key in sequence
-          // * 2*n value is the new user troupe count (or -1 for don't update)
-          // * 2*n+1 value is a flag. 0 = nothing, 1 = update badge
-          for(var i = 0; i < result.length; i = i + 2) {
-            var troupeUnreadCount   = result[i];
-            var flag                = result[i + 1];
+          // Results come back as three items per key in sequence
+          for(var i = 0; result.length > 0; i++) {
+            var troupeUnreadCount   = result.shift();
+            var flag                = result.shift();
+            var removedLastMention  = result.shift();
+
             var badgeUpdate         = flag & 1;
-            var userId              = userIdsForNotify[i >> 2];
+            var userId              = userIdsForNotify[i];
 
             if(troupeUnreadCount >= 0) {
               // Notify the user. If the unread count is zero,
@@ -296,6 +298,16 @@ function removeItem(troupeId, itemType, itemId) {
                 userId: userId,
                 troupeId: troupeId,
                 total: troupeUnreadCount
+              });
+            }
+
+            if(removedLastMention) {
+              // Notify the user
+              appEvents.troupeMentionCountsChange({
+                userId: userId,
+                troupeId: troupeId,
+                total: 0,
+                op: 'remove'
               });
             }
 
@@ -711,7 +723,8 @@ function newMention(troupeId, chatId, userIds) {
           appEvents.troupeMentionCountsChange({
             userId: userId,
             troupeId: troupeId,
-            total: mentionCount
+            total: mentionCount,
+            op: 'add'
           });
         }
       }
@@ -721,7 +734,7 @@ function newMention(troupeId, chatId, userIds) {
 }
 
 /**
- * Remove the mentions and decrement counters
+ * Remove the mentions and decrement counters. This will be called when a user reads an item
  */
 function removeMentionForUser(userId, troupeId, itemIds) {
   if(!itemIds.length) return;
@@ -731,7 +744,6 @@ function removeMentionForUser(userId, troupeId, itemIds) {
     ];
 
   var values = [troupeId].concat(itemIds);
-
   return runScript('unread-remove-user-mentions', keys, values)
     .then(function(mentionCount) {
 
@@ -740,7 +752,8 @@ function removeMentionForUser(userId, troupeId, itemIds) {
         appEvents.troupeMentionCountsChange({
           userId: userId,
           troupeId: troupeId,
-          total: mentionCount
+          total: mentionCount,
+          op: 'remove'
         });
       }
     });
