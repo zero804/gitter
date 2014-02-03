@@ -336,7 +336,8 @@ function markItemsOfTypeRead(userId, troupeId, itemType, ids) {
       "ub:" + userId,
       "unread:" + itemType + ":" + userId + ":" + troupeId,
       EMAIL_NOTIFICATION_HASH_KEY,
-      "m:" + userId + ":" + troupeId
+      "m:" + userId + ":" + troupeId,
+      "m:" + userId
     ];
 
   var values = [troupeId, userId].concat(ids);
@@ -354,6 +355,16 @@ function markItemsOfTypeRead(userId, troupeId, itemType, ids) {
           troupeId: troupeId,
           total: troupeUnreadCount
         });
+
+        if(troupeUnreadCount === 0) {
+          // Notify the user
+          appEvents.troupeMentionCountsChange({
+            userId: userId,
+            troupeId: troupeId,
+            total: 0,
+            op: 'remove'
+          });
+        }
       }
 
       if(badgeUpdate) {
@@ -682,8 +693,8 @@ function getOldestId(ids) {
  * @return {promise} promise of nothing
  */
 function newMention(troupeId, chatId, userIds) {
-  if(!troupeId) { winston.error("newMention failed. Troupe cannot be null"); return; }
-  if(!chatId) { winston.error("newMention failed. itemId cannot be null"); return; }
+  if(!troupeId) { winston.error("newMention failed. Troupe cannot be null"); return Q.resolve(); }
+  if(!chatId) { winston.error("newMention failed. itemId cannot be null"); return Q.resolve(); }
 
   // Publish out an new item event
   // var data = {};
@@ -746,6 +757,7 @@ function removeMentionForUser(userId, troupeId, itemIds) {
   var values = [troupeId].concat(itemIds);
   return runScript('unread-remove-user-mentions', keys, values)
     .then(function(mentionCount) {
+      console.log('unread-remove-user-mentions', keys, values, mentionCount);
 
       if(mentionCount >= 0) {
         // Notify the user
@@ -761,16 +773,20 @@ function removeMentionForUser(userId, troupeId, itemIds) {
 
 }
 
+/**
+ * Returns a promise of nothing
+ */
 function detectAndCreateMentions(troupeId, creatingUserId, chat) {
-  if(!chat.mentions || !chat.mentions.length) return;
+  if(!chat.mentions || !chat.mentions.length) return Q.resolve();
 
   /* Figure out what type of room this is */
-  return troupeService.findById(troupeId)
-    .then(function(troupe) {
-      if(!troupe) return;
+  return troupeService.findUserIdsForTroupeWithLurk(troupeId)
+    .then(function(usersHash) {
+      if(!usersHash) return;
 
       // XXX: fix this!!
       var publicRoom = true;
+
       var userIds = chat.mentions
             .map(function(mention) {
               return mention.userId;
@@ -782,12 +798,14 @@ function detectAndCreateMentions(troupeId, creatingUserId, chat) {
       userIds.forEach(function(userId) {
         if(!userId) return;
 
+        /* Don't be mentioning yourself yo */
         if(userId == creatingUserId) return;
 
-        var troupeUser = troupe.findTroupeUser(userId);
-        if(troupeUser) {
+        if(userId in usersHash) {
+          var lurk = usersHash[userId];
+
           /* User is in the room? Always mention */
-          if(troupeUser.lurk) {
+          if(lurk) {
             mentionLurkerAndNonMemberUserIds.push(userId);
           } else {
             mentionMemberUserIds.push(userId);
@@ -874,5 +892,6 @@ exports.testOnly = {
   getOldestId: getOldestId,
   sinceFilter: sinceFilter,
   newItem: newItem,
-  removeItem: removeItem
+  removeItem: removeItem,
+  detectAndCreateMentions: detectAndCreateMentions
 };
