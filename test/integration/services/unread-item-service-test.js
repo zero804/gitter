@@ -6,7 +6,7 @@ var testRequire = require('../test-require');
 var mockito = require('jsmockito').JsMockito;
 var Q = require('q');
 var mongoUtils = testRequire('./utils/mongo-utils');
-
+var _ = require('underscore');
 var assert = require('assert');
 
 var times = mockito.Verifiers.times;
@@ -155,13 +155,11 @@ describe('markItemsRead', function() {
     var itemId1 = mongoUtils.getNewObjectIdString();
     var itemId2 = mongoUtils.getNewObjectIdString();
     var itemId3 = mongoUtils.getNewObjectIdString();
-    var items = {
-      'chat': [itemId1, itemId2]
-    };
+    var items = [itemId1, itemId2];
 
     var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
     var appEventsMock = mockito.spy(testRequire('./app-events'));
-    var readByService = mockito.spy(testRequire('./services/readby-service'));
+    var readByService = mockito.mock(testRequire('./services/readby-service'));
 
     var unreadItemService = testRequire.withProxies("./services/unread-item-service", {
       './troupe-service': troupeServiceMock,
@@ -181,11 +179,28 @@ describe('markItemsRead', function() {
         unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId3)
       ])
       .then(function() {
-        unreadItemService.markItemsRead(userId, troupeId, items)
+
+        // Need to use mocks rather than verifiers as we need to do deep equals checking onth
+
+        mockito.when(appEventsMock).unreadItemsRemoved().then(function(a0, a1, a2) {
+          assert.equal(a0, userId);
+          assert.equal(a1, troupeId);
+          assert.equal(a2.chat.length, 2);
+          assert(a2.chat.every(function(itemId) { return _.contains(items, itemId); }));
+        });
+
+        mockito.when(readByService).recordItemsAsRead().then(function(a0, a1, a2) {
+          console.log(arguments);
+          assert.equal(a0, userId);
+          assert.equal(a1, troupeId);
+          assert.equal(a2.chat.length, 2);
+          assert(a2.chat.every(function(itemId) { return _.contains(items, itemId); }));
+        });
+
+        unreadItemService.markItemsRead(userId, troupeId, [itemId1, itemId2])
           .then(function() {
-            // Two calls here, not three
-            mockito.verify(appEventsMock).unreadItemsRemoved(userId, troupeId, items);
-            mockito.verify(readByService).recordItemsAsRead(userId, troupeId, items);
+            mockito.verify(appEventsMock).unreadItemsRemoved();
+            mockito.verify(readByService).recordItemsAsRead();
 
             return unreadItemService.getUnreadItems(userId, troupeId, itemType)
               .then(function(items) {
@@ -202,9 +217,10 @@ describe('markItemsRead', function() {
                   });
 
               });
-          })
-          .nodeify(done);
-      });
+          });
+      })
+      .nodeify(done);
+
 
 
 
