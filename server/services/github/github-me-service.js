@@ -24,10 +24,16 @@ GitHubMeService.prototype.getUser = function() {
 };
 
 GitHubMeService.prototype.getEmail = function() {
+  /** TODO: add this into octonode and use the same pattern as the rest of the github calls!!!!!
+   *  Sort it out.
+   */
   var d = Q.defer();
 
+  /* USE  OCTONODE !!! */
+  var token = this.user.githubUserToken || this.user.githubToken || '';
+
   var options = {
-    url: 'https://api.github.com/user/emails?access_token='+this.user.githubUserToken,
+    url: 'https://api.github.com/user/emails?access_token=' + token,
     headers: {
       'Accept': 'application/vnd.github.v3.full+json',
       'Content-Type': 'application/json',
