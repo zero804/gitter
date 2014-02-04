@@ -50,7 +50,7 @@ require([
     }
     frameUrl += type;
 
-    titlebarUpdater.updateTitlebar(title);
+    titlebarUpdater.setRoomName(title);
 
     window.history.pushState(frameUrl, title, url);
     updateContent(frameUrl);
@@ -68,7 +68,7 @@ require([
     switch(message.type) {
       case 'context.troupeId':
         context.setTroupeId(message.troupeId);
-        titlebarUpdater.updateTitlebar(message.name);
+        titlebarUpdater.setRoomName(message.name);
         break;
       case 'navigation':
         appEvents.trigger('navigation', message.url, message.urlType, message.title);
