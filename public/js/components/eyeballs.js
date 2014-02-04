@@ -28,6 +28,9 @@ define([
         socketId: realtime.getClientId(),
         on: value
       },
+      headers: {
+        'x-csrf-token': context().csrfToken
+      },
       async: !synchronous,
       global: false,
       type: "POST",
