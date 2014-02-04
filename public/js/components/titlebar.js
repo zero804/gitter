@@ -14,6 +14,24 @@ define([
     $('#favicon').attr('href', image);
   }
 
+  // ➀,➁,➂,➃,➄,➅,➆,➇,➈,➉,[11],[12]...
+  function getClearCircleNumber(number) {
+    if(number > 0 && number <= 10) {
+      return String.fromCharCode(0x277F + number);
+    } else {
+      return '['+number+']';
+    }
+  }
+
+  // ➊,➋,➌,➍,➎,➏,➐,➑,➒,➓,[11],[12]...
+  function getSolidCircleNumber(number) {
+    if(number > 0 && number <= 10) {
+      return String.fromCharCode(0x2789 + number);
+    } else {
+      return '['+number+']';
+    }
+  }
+
   function TitlebarUpdater() {
     var self = this;
 
@@ -57,15 +75,11 @@ define([
       return mainTitle;
     }
 
-    if(overall <= 10) {
-      if(current > 0) {
-        return String.fromCharCode(0x2789 + overall) + ' ' + mainTitle;
-      }
-
-      return String.fromCharCode(0x277F + overall) + ' ' + mainTitle;
+    if(current > 0) {
+      return getSolidCircleNumber(overall) + ' ' + mainTitle;
+    } else {
+      return getClearCircleNumber(overall) + ' ' + mainTitle;
     }
-
-    return '[' + overall + '] ' + mainTitle;
   };
 
   return TitlebarUpdater;
