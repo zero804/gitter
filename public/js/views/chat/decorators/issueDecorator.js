@@ -22,8 +22,7 @@ define([
     $el.replaceWith($el.text());
   }
 
-  function preparePopover($issue, issueNumber) {
-    var url = '/api/v1/troupes/' + context.getTroupeId() + '/issues/' + issueNumber;
+  function preparePopover($issue, url) {
     $.get(url, function(issue) {
       if(!issue.state) return;
       var description = issue.body;
@@ -92,7 +91,9 @@ define([
           this.href = "https://github.com/"+repo+"/issues/"+issueNumber;
 
           if(repo.toLowerCase() === roomRepo.toLowerCase()) {
-            preparePopover($issue, issueNumber);
+            preparePopover($issue,'/api/v1/troupes/'+context.getTroupeId()+'/issues/'+issueNumber);
+          } else {
+            preparePopover($issue,'/api/private/gh/repos/'+repo+'/issues/'+issueNumber);
           }
         }
       });
