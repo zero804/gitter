@@ -34,10 +34,12 @@ define([
 
   function TitlebarUpdater() {
     var self = this;
+    this._unreadRoomCount = 0;
+    this._isUnreadInRoom = false;
+    this._roomName = '';
 
     appEvents.on('troupeUnreadTotalChange', function(values) {
-      self._counts = values;
-      self.updateTitlebar(null, values);
+      self.setUnread(values.overall, !!values.current);
 
       var unreadCount = values.overall;
       updateLeftMenuBadge(unreadCount);
@@ -45,41 +47,29 @@ define([
     });
   }
 
-  TitlebarUpdater.prototype.updateTitlebar = function(name, values) {
-    if(!name) {
-      name = this.name;
-    } else {
-      this.name = name;
-    }
-
-    if(!values) {
-      values = this._counts;
-    }
-
-    var title = this.getTitlebar(name, values);
-    document.title = title;
+  TitlebarUpdater.prototype.setUnread = function(roomCount, isUnreadInRoom) {
+    this._unreadRoomCount = roomCount;
+    this._isUnreadInRoom = isUnreadInRoom;
+    this._render();
   };
 
-  TitlebarUpdater.prototype.getTitlebar = function(name, counts) {
-    var mainTitle;
-    if (name) {
-      mainTitle = name + " - Gitter";
-    } else {
-      mainTitle = "Gitter";
+  TitlebarUpdater.prototype.setRoomName = function(roomName) {
+    this._roomName = roomName;
+    this._render();
+  };
+
+  TitlebarUpdater.prototype._render = function() {
+    var title = (this._roomName) ? this._roomName+' - Gitter' : 'Gitter';
+
+    if(this._unreadRoomCount > 0) {
+      if(this._isUnreadInRoom) {
+        title = getSolidCircleNumber(this._unreadRoomCount) + ' ' + title;
+      } else {
+        title = getClearCircleNumber(this._unreadRoomCount) + ' ' + title;
+      }
     }
 
-    // TODO this isn't working properly when updating the troupe name, need to be able to poll unreadItems count not just accept the event
-    var overall = counts.overall;
-    var current = counts.current;
-    if(overall <= 0) {
-      return mainTitle;
-    }
-
-    if(current > 0) {
-      return getSolidCircleNumber(overall) + ' ' + mainTitle;
-    } else {
-      return getClearCircleNumber(overall) + ' ' + mainTitle;
-    }
+    document.title = title;
   };
 
   return TitlebarUpdater;
