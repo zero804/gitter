@@ -60,9 +60,14 @@ module.exports = {
 
   load: function(req, id, callback) {
     if(!req.user) return callback(401);
-    // TODO: can the currently logged in user view information about this other user?
-    // For the moment, you'll only be able to see your own information
-    if(req.user.id != id) return callback(403);
+    if(id === 'me') {
+      id = req.user.id;
+    } else {
+      // TODO: can the currently logged in user view information about this other user?
+      // For the moment, you'll only be able to see your own information
+      if(req.user.id != id) return callback(403);
+    }
+
     userService.findById(id, callback);
   }
 
