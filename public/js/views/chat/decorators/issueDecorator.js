@@ -22,7 +22,7 @@ define([
     $el.replaceWith($el.text());
   }
 
-  function preparePopover($issue, url) {
+  function preparePopover($issue, url, placement) {
     $.get(url, function(issue) {
       if(!issue.state) return;
       var description = issue.body;
@@ -35,7 +35,7 @@ define([
       $issue.popover({
         html: true,
         trigger: 'manual',
-        placement: 'right',
+        placement: placement || 'right',
         container: 'body',
         title: issuePopoverTitleTemplate(issue),
         content: issuePopoverTemplate({
@@ -74,7 +74,9 @@ define([
 
   var decorator = {
 
-    decorate: function(chatItemView) {
+    decorate: function(chatItemView, options) {
+      options = options || {};
+
       var roomRepo = getRoomRepo();
 
       chatItemView.$el.find('*[data-link-type="issue"]').each(function() {
@@ -91,9 +93,9 @@ define([
           this.href = "https://github.com/"+repo+"/issues/"+issueNumber;
 
           if(repo.toLowerCase() === roomRepo.toLowerCase()) {
-            preparePopover($issue,'/api/v1/troupes/'+context.getTroupeId()+'/issues/'+issueNumber);
+            preparePopover($issue,'/api/v1/troupes/'+context.getTroupeId()+'/issues/'+issueNumber, options.placement);
           } else {
-            preparePopover($issue,'/api/private/gh/repos/'+repo+'/issues/'+issueNumber);
+            preparePopover($issue,'/api/private/gh/repos/'+repo+'/issues/'+issueNumber, options.placement);
           }
         }
       });
