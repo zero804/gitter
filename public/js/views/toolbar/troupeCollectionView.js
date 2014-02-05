@@ -103,7 +103,7 @@ define([
       }
 
       if(first || 'unreadItems' in m.changed) {
-        if(mentions === 0) {
+        if(!mentions) {
           redisplayBadge = true;
 
           if(ui) {
@@ -116,8 +116,16 @@ define([
       }
 
       if(first || redisplayBadge) {
-        var shown = !!((lurk && mentions) || (!lurk && !(ui || mentions)));
-        unreadBadge.toggleClass('shown', shown);
+        var shown;
+        if(lurk) {
+          /* In lurk mode, show badge when theres a mention */
+          shown = mentions;
+        } else {
+          /* In non-lurk mode, show badge when theres a mention or unread items */
+          shown =  ui || mentions;
+        }
+
+        unreadBadge.toggleClass('shown', !!shown);
       }
 
       if(first || 'favourite' in m.changed) {
