@@ -3,23 +3,18 @@
 
 var troupeService     = require("../../services/troupe-service");
 var roomService       = require("../../services/room-service");
+var restful           = require("../../services/restful");
 var restSerializer    = require("../../serializers/rest-serializer");
-var recentRoomService = require('../../services/recent-room-service');
 var Q                 = require('q');
 
 module.exports = {
   index: function(req, res, next) {
-    troupeService.findAllTroupesForUser(req.user.id, function(err, troupes) {
-      if (err) return next(err);
 
-      var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id });
-
-      restSerializer.serialize(troupes, strategy, function(err, serialized) {
-        if(err) return next(err);
-
+    restful.serializeTroupesForUser(req.resourceUser.id)
+      .then(function(serialized) {
         res.send(serialized);
-      });
-    });
+      })
+      .fail(next);
   },
 
   show: function(req, res, next) {
