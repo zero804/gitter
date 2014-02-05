@@ -307,7 +307,8 @@ function removeItem(troupeId, itemType, itemId) {
                 userId: userId,
                 troupeId: troupeId,
                 total: 0,
-                op: 'remove'
+                op: 'remove',
+                member: true // XXX: may not always be the case
               });
             }
 
@@ -362,7 +363,8 @@ function markItemsOfTypeRead(userId, troupeId, itemType, ids) {
             userId: userId,
             troupeId: troupeId,
             total: 0,
-            op: 'remove'
+            op: 'remove',
+            member: true // XXX: this may not already be the case
           });
         }
       }
@@ -478,7 +480,7 @@ exports.markItemsRead = function(userId, troupeId, itemIds, mentionIds, options)
   return Q.all([
     markItemsOfTypeRead(userId, troupeId, 'chat', allIds),
     setLastReadTimeForUser(userId, troupeId, now),
-    mentionIds && mentionIds.length && removeMentionForUser(userId, troupeId, mentionIds)
+    mentionIds && mentionIds.length && removeMentionForUser(userId, troupeId, mentionIds, true)
     ])
     .then(function() {
       if(options && options.recordAsRead === false) return;
@@ -692,7 +694,7 @@ function getOldestId(ids) {
  * New item added
  * @return {promise} promise of nothing
  */
-function newMention(troupeId, chatId, userIds) {
+function newMention(troupeId, chatId, userIds, usersHash) {
   if(!troupeId) { winston.error("newMention failed. Troupe cannot be null"); return Q.resolve(); }
   if(!chatId) { winston.error("newMention failed. itemId cannot be null"); return Q.resolve(); }
 
@@ -735,7 +737,8 @@ function newMention(troupeId, chatId, userIds) {
             userId: userId,
             troupeId: troupeId,
             total: mentionCount,
-            op: 'add'
+            op: 'add',
+            member: userId in usersHash /* See bayeux-events-bridge for why we need this  */
           });
         }
       }
@@ -747,7 +750,7 @@ function newMention(troupeId, chatId, userIds) {
 /**
  * Remove the mentions and decrement counters. This will be called when a user reads an item
  */
-function removeMentionForUser(userId, troupeId, itemIds) {
+function removeMentionForUser(userId, troupeId, itemIds, member) {
   if(!itemIds.length) return;
   var keys = [
       "m:" + userId + ":" + troupeId, // User troupe mention
@@ -757,15 +760,14 @@ function removeMentionForUser(userId, troupeId, itemIds) {
   var values = [troupeId].concat(itemIds);
   return runScript('unread-remove-user-mentions', keys, values)
     .then(function(mentionCount) {
-      console.log('unread-remove-user-mentions', keys, values, mentionCount);
-
       if(mentionCount >= 0) {
         // Notify the user
         appEvents.troupeMentionCountsChange({
           userId: userId,
           troupeId: troupeId,
           total: mentionCount,
-          op: 'remove'
+          op: 'remove',
+          member: member
         });
       }
     });
@@ -831,10 +833,10 @@ function detectAndCreateMentions(troupeId, creatingUserId, chat) {
         return newItemForUsers(troupeId, 'chat', chat.id, mentionLurkerAndNonMemberUserIds)
           .then(function() {
             var allUserIds = mentionLurkerAndNonMemberUserIds.concat(mentionMemberUserIds);
-            return newMention(troupeId, chat.id, allUserIds);
+            return newMention(troupeId, chat.id, allUserIds, usersHash);
           });
       } else {
-        return newMention(troupeId, chat.id, mentionMemberUserIds);
+        return newMention(troupeId, chat.id, mentionMemberUserIds, usersHash);
       }
 
     });

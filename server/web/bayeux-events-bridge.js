@@ -6,6 +6,7 @@ var appEvents         = require("../app-events");
 var bayeux            = require('./bayeux');
 var ent               = require('ent');
 var presenceService   = require("../services/presence-service");
+var restSerializer    = require('../serializers/rest-serializer')
 
 exports.install = function() {
   var bayeuxClient = bayeux.client;
@@ -120,12 +121,45 @@ exports.install = function() {
     var userId = data.userId;
     var troupeId = data.troupeId;
     var total = data.total;
+    var member = data.member;
 
     bayeuxClient.publish("/api/v1/user/" + userId, {
       notification: "troupe_mention",
       troupeId: troupeId,
       mentions: total
     });
+
+    var mentionUrl = "/api/v1/user/" + userId + "/troupes";
+    if(data.op === 'add' && total === 1 && !member) {
+      var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
+
+      restSerializer.serializeQ(troupeId, strategy)
+        .then(function(troupe) {
+          // Simulate a create on the mentions resource
+          bayeuxClient.publish(mentionUrl, {
+            operation: 'create',
+            model: troupe
+          });
+        });
+
+    } else if(data.op === 'remove' && total === 0 && !member) {
+      // Simulate a remove
+      bayeuxClient.publish(mentionUrl, {
+        operation: 'remove',
+        model: {
+          id: troupeId
+        }
+      });
+    } else {
+      // Just patch the mention count
+      bayeuxClient.publish(mentionUrl, {
+        operation: 'patch',
+        model: {
+          id: troupeId,
+          mentions: total
+        }
+      });
+    }
 
   });
 

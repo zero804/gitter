@@ -48,6 +48,5 @@ module.exports = {
 
     installUserSubResource('orgs',        'orgs');
     installUserSubResource('repos',       'repos');
-    installUserSubResource('mentions',    'mentions');
   }
 };

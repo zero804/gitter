@@ -20,6 +20,7 @@ define([
   orgsCollection.fetch();
 
   var troupeCollection = new troupeModels.TroupeCollection(null, { listen: true });
+
   unreadItemsClient.installTroupeListener(troupeCollection);
 
   /* Utils for comparators, perhaps this should go somewhere useful? */
