@@ -43,7 +43,7 @@ require([
 
   $.ajaxSetup({
     headers: {
-      'x-csrf-token': context().csrfToken
+      'x-access-token': context().accessToken
     }
   });
 
