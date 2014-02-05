@@ -2,6 +2,7 @@
 "use strict";
 
 var troupeService = require("../../services/troupe-service");
+var restful = require("../../services/restful");
 var restSerializer = require("../../serializers/rest-serializer");
 var recentRoomService = require('../../services/recent-room-service');
 var Q = require('q');
@@ -14,17 +15,11 @@ module.exports = {
       return res.send(403);
     }
 
-    troupeService.findAllTroupesForUser(req.resourceUser.id, function(err, troupes) {
-      if (err) return next(err);
-
-      var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id });
-
-      restSerializer.serialize(troupes, strategy, function(err, serialized) {
-        if(err) return next(err);
-
+    restful.serializeTroupesForUser(req.resourceUser.id)
+      .then(function(serialized) {
         res.send(serialized);
-      });
-    });
+      })
+      .fail(next);
   },
 
   show: function(req, res, next) {

@@ -8,17 +8,18 @@ var unreadItemService   = require("./unread-item-service");
 var chatService         = require("./chat-service");
 var eventService        = require("./event-service");
 var Q                   = require('q');
+var roomService         = require('./room-service');
 
 var DEFAULT_CHAT_COUNT_LIMIT = 30;
 
 exports.serializeTroupesForUser = function(userId, callback) {
-    troupeService.findAllTroupesForUser(userId, function(err, troupes) {
-      if (err) return callback(err);
+  return roomService.findAllRoomsIdsForUserIncludingMentions(userId)
+    .then(function(troupeIds) {
+      var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
 
-      var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
-
-      restSerializer.serialize(troupes, strategy, callback);
-    });
+      return restSerializer.serializeQ(troupeIds, strategy);
+    })
+    .nodeify(callback);
 };
 
 exports.serializeChatsForTroupe = function(troupeId, userId, options, cb) {
