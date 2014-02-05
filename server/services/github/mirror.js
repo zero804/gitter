@@ -37,5 +37,5 @@ Mirror.prototype.get = function(uri) {
 
 // module.exports = Mirror;
 module.exports = wrap(Mirror, function() {
-  return [this.user && (this.user.githubUserToken || this.user.githubToken) || ''];
+  return [this.user && this.user.githubUserToken];
 });
