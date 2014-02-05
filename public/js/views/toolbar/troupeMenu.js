@@ -73,7 +73,7 @@ define([
         roomsCollection: troupeCollections.troupes
       }));
 
-      setTimeout(this.initNanoScroller,500);      
+      setTimeout(this.initNanoScroller,500);
 
       // search results collection view
       this.searchView = new SearchView({ troupes: troupeCollections.troupes, $input: this.$el.find('#list-search-input') });
