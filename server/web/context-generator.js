@@ -180,7 +180,6 @@ function fakeSerializedTroupe(uriContext) {
 }
 
 function createTroupeContext(req, options) {
-  var csrfToken = req.session._csrf;
   var events = req.session.events;
   if(events) { req.session.events = []; }
 
@@ -190,7 +189,6 @@ function createTroupeContext(req, options) {
       homeUser: options.homeUser,
       inUserhome: options.inUserhome,
       accessToken: options.accessToken,
-      csrfToken: csrfToken,
       appVersion: appVersion.getCurrentVersion(),
       desktopNotifications: options.desktopNotifications,
       events: events,

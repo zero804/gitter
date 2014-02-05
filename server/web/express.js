@@ -12,6 +12,7 @@ var fs                            = require('fs');
 var os                            = require('os');
 var responseTime                  = require('./response-time');
 var oauthService                  = require('../services/oauth-service');
+var csrf                          = require('./csrf-middleware');
 
 if(nconf.get('express:showStack')) {
   try {
@@ -132,7 +133,7 @@ module.exports = {
     }));
     app.use(passport.initialize());
     app.use(passport.session());
-    app.use(express.csrf());
+    app.use(csrf);
     app.use(app.router);
 
 

@@ -29,7 +29,7 @@ define([
         on: value
       },
       headers: {
-        'x-csrf-token': context().csrfToken
+        'x-access-token': context().accessToken
       },
       async: !synchronous,
       global: false,
