@@ -45,7 +45,7 @@ GitHubMeService.prototype.getEmail = function() {
   request(options, d.makeNodeResolver());
 
   return d.promise.spread(function(response, emailHashes) {
-    assert.strictEqual(response.statusCode, 200, 'Github sent an error code');
+    assert.strictEqual(response.statusCode, 200, 'Github sent an error code: '+response.statusCode);
 
     var primaryEmails = emailHashes.filter(function(hash) {
       return hash.primary && hash.verified;
