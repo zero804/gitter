@@ -2,21 +2,23 @@
 "use strict";
 
 var Q = require('q');
-var wrap = require('./github-cache-wrapper');
-var createClient = require('./github-client');
-var badCredentialsCheck = require('./bad-credentials-check');
+var wrap = require('../github-cache-wrapper');
+var badCredentialsCheck = require('../bad-credentials-check');
 var request = require('request');
+var assert = require('assert');
 
 function Mirror(user) {
-  this.user = user;
-  this.client = createClient.user(user);
+  assert(user, 'user required');
+  var token = user.githubToken || user.githubUserToken;
+  assert(token, 'token required');
+  this.token = token;
 }
 
 Mirror.prototype.get = function(uri) {
   var d = Q.defer();
 
   var options = {
-    url: 'https://api.github.com/'+uri+'?access_token='+this.user.githubUserToken,
+    url: 'https://api.github.com/'+uri+'?access_token='+this.token,
     headers: {
       'Content-Type': 'application/json',
       'User-Agent': 'gitter/0.0 (https://gitter.im) terminal/0.0'
@@ -37,5 +39,5 @@ Mirror.prototype.get = function(uri) {
 
 // module.exports = Mirror;
 module.exports = wrap(Mirror, function() {
-  return [this.user && (this.user.githubUserToken || this.user.githubToken) || ''];
+  return [this.user && (this.user.githubToken || this.user.githubUserToken) || ''];
 });
