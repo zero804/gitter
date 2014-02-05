@@ -897,26 +897,14 @@
       "resolved": "https://registry.npmjs.org/file/-/file-0.2.1.tgz"
     },
     "cube": {
-      "version": "0.2.4",
-      "from": "cube@0.2.4",
-      "resolved": "https://registry.npmjs.org/cube/-/cube-0.2.4.tgz",
+      "version": "0.2.12",
+      "from": "cube@latest",
+      "resolved": "https://registry.npmjs.org/cube/-/cube-0.2.12.tgz",
       "dependencies": {
-        "mongodb": {
-          "version": "1.0.1",
-          "from": "mongodb@1.0.1",
-          "resolved": "https://registry.npmjs.org/mongodb/-/mongodb-1.0.1.tgz",
-          "dependencies": {
-            "bson": {
-              "version": "0.0.5",
-              "from": "bson@0.0.5",
-              "resolved": "https://registry.npmjs.org/bson/-/bson-0.0.5.tgz"
-            }
-          }
-        },
         "node-static": {
-          "version": "0.6.1",
-          "from": "node-static@0.6.1",
-          "resolved": "https://registry.npmjs.org/node-static/-/node-static-0.6.1.tgz",
+          "version": "0.6.5",
+          "from": "node-static@0.6.5",
+          "resolved": "https://registry.npmjs.org/node-static/-/node-static-0.6.5.tgz",
           "dependencies": {
             "optimist": {
               "version": "0.6.0",
@@ -939,25 +927,29 @@
           }
         },
         "pegjs": {
-          "version": "0.6.2",
-          "from": "pegjs@0.6.2",
-          "resolved": "https://registry.npmjs.org/pegjs/-/pegjs-0.6.2.tgz"
+          "version": "0.7.0",
+          "from": "pegjs@0.7.0",
+          "resolved": "https://registry.npmjs.org/pegjs/-/pegjs-0.7.0.tgz"
         },
         "vows": {
-          "version": "0.5.11",
-          "from": "vows@0.5.11",
-          "resolved": "https://registry.npmjs.org/vows/-/vows-0.5.11.tgz",
+          "version": "0.7.0",
+          "from": "vows@0.7.0",
+          "resolved": "https://registry.npmjs.org/vows/-/vows-0.7.0.tgz",
           "dependencies": {
             "eyes": {
               "version": "0.1.8",
               "from": "eyes@>=0.1.6"
+            },
+            "diff": {
+              "version": "1.0.8",
+              "from": "diff@~1.0.3"
             }
           }
         },
         "websocket": {
-          "version": "1.0.3",
-          "from": "websocket@1.0.3",
-          "resolved": "https://registry.npmjs.org/websocket/-/websocket-1.0.3.tgz"
+          "version": "1.0.8",
+          "from": "websocket@1.0.8",
+          "resolved": "https://registry.npmjs.org/websocket/-/websocket-1.0.8.tgz"
         },
         "websocket-server": {
           "version": "1.4.4",
