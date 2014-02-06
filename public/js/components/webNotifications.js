@@ -64,25 +64,25 @@ define([
     });
   });
 
-  // websocket notifications
-  $(document).on('realtime:persistentOutage', function() {
-    log('realtime:persistentOutage');
-    notifications.notify({
-      id: 'realtime-error',
-      className: 'notification-error',
-      content: "We're having problems with our realtime connection at present.",
-      timeout: Infinity
-      /* TODO: make this persistent and clear it when the persistentOutageCleared event occurs */
-    });
-  });
+  // // websocket notifications
+  // $(document).on('realtime:persistentOutage', function() {
+  //   log('realtime:persistentOutage');
+  //   notifications.notify({
+  //     id: 'realtime-error',
+  //     className: 'notification-error',
+  //     content: "We're having problems with our realtime connection at present.",
+  //     timeout: Infinity
+  //     /* TODO: make this persistent and clear it when the persistentOutageCleared event occurs */
+  //   });
+  // });
 
-  $(document).on('realtime:persistentOutageCleared', function() {
-    log('realtime:persistentOutageCleared');
-    notifications.notify({
-      id: 'realtime-error',
-      action: 'hide'
-    });
-  });
+  // $(document).on('realtime:persistentOutageCleared', function() {
+  //   log('realtime:persistentOutageCleared');
+  //   notifications.notify({
+  //     id: 'realtime-error',
+  //     action: 'hide'
+  //   });
+  // });
 
 
   $(window).on('beforeunload', function(){
