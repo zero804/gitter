@@ -502,12 +502,6 @@ a.trpMiniLeftMenuItem {
   text-decoration: none;
 }
 
-.item-unread-badge {
-  float: right;
-  margin-right: 5px;
-  display: none;
-}
-
 .trpMiniLeftMenuItem.unread:after {
   background-color: @trpGreen;
   content: " ";
@@ -599,7 +593,7 @@ a.trpMiniLeftMenuItem {
 .trpLeftMenuSearch {
   background-color: transparent;
   border: 1px solid rgba(255,255,255, 0.6);
-  border-radius: 6px;
+  border-radius: 4px;
   width: 220px;
   font-size: 15px;
   font-weight: 100;
@@ -881,6 +875,11 @@ ul li.placeholder:before {
   float: right;
   margin-right: 8px;
   display: none;
+}
+
+.trpTroupeList li .item-unread-badge.mention .trpTroupeUnreadCounter {
+  background-color: @trpRed;
+  font-weight: 300;
 }
 
 .trpTroupeList li .item-unread-badge.shown{
