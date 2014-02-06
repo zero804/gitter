@@ -31,12 +31,11 @@ module.exports = {
     destroy: function(req, res, next) {
       if(req.params.unreadItem.toLowerCase() !== 'all') return next(404);
 
-      unreadItemService.markAllChatsRead(req.resourceUser.id, req.userTroupe.id, function(err) {
-        if(err) return next(err);
-
-        res.send(200);
-
-      });
+      return unreadItemService.markAllChatsRead(req.resourceUser.id, req.userTroupe.id, { member: true })
+        .then(function() {
+          res.send(200);
+        })
+        .fail(next);
     }
 
 };

@@ -11,6 +11,7 @@ var assert = require('assert');
 
 var times = mockito.Verifiers.times;
 var once = times(1);
+var twice = times(2);
 
 
 describe('unread-item-service', function() {
@@ -276,9 +277,11 @@ describe('mentions', function() {
     var chatId = mongoUtils.getNewObjectIdString();
 
     var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
+    var appEventsMock = mockito.spy(testRequire('./app-events'));
 
     var unreadItemService = testRequire.withProxies("./services/unread-item-service", {
-      './troupe-service': troupeServiceMock
+      './troupe-service': troupeServiceMock,
+      '../app-events': appEventsMock
     });
 
     mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve({ /* No users */ }));
@@ -291,17 +294,39 @@ describe('mentions', function() {
       }]
     };
 
+
+    var c = 0;
+    mockito.when(appEventsMock).troupeMentionCountsChange().then(function(data) {
+      assert.equal(data.userId, userId);
+      assert.equal(data.troupeId, troupeId);
+      console.log(data);
+      c++;
+      if(c === 1) {
+        assert.equal(data.total, 1);
+        assert.equal(data.op, 'add');
+        assert.equal(data.member, false);
+      } else if(c == 2) {
+        assert.equal(data.total, 0);
+        assert.equal(data.op, 'remove');
+        assert.equal(data.member, false);
+      } else {
+        assert(false, 'Call ' + c);
+      }
+    });
+
     return unreadItemService.testOnly.detectAndCreateMentions(troupeId, undefined, chat)
       .then(function() {
+        assert.equal(c, 1);
         return unreadItemService.getRoomIdsMentioningUser(userId);
       })
       .then(function(troupeIds) {
         assert.equal(troupeIds.length, 1);
         assert.equal(troupeIds[0], troupeId);
 
-        return unreadItemService.markItemsRead(userId, troupeId, undefined, [chatId]);
+        return unreadItemService.markItemsRead(userId, troupeId, undefined, [chatId], { member: false });
       })
       .then(function() {
+        assert.equal(c, 2);
         return unreadItemService.getRoomIdsMentioningUser(userId);
       })
       .then(function(troupeIds) {
@@ -431,11 +456,12 @@ describe.skip('emailnotifications', function() {
     var itemId3 = mongoUtils.getNewObjectIdString();
 
     var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
+    var appEventsMock = mockito.mock(testRequire('./app-events'));
 
     var unreadItemService = testRequire.withProxies("./services/unread-item-service", {
-      './troupe-service': troupeServiceMock
+      './troupe-service': troupeServiceMock,
+      '../app-events': appEventsMock
     });
-
 
     var usersWithLurkHash = {};
     usersWithLurkHash[userId] = false;
