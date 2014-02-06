@@ -27,30 +27,6 @@ module.exports = {
     });
   },
 
-  // create: function(req, res, next) {
-  //   var newTroupe = req.body;
-  //   var name = newTroupe.troupeName || newTroupe.name;
-  //   var oneToOneTroupeId = newTroupe.oneToOneTroupeId;
-  //   var invites = newTroupe.invites;
-
-  //   troupeService.createNewTroupeForExistingUser({
-  //     user: req.user,
-  //     name: name,
-  //     oneToOneTroupeId: oneToOneTroupeId,
-  //     invites: invites
-  //   }, function(err, troupe) {
-  //     if(err) return next(err);
-
-  //     var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true });
-  //     restSerializer.serialize(troupe, strategy, function(err, serialized) {
-  //       if(err) return next(err);
-
-  //       res.send(serialized);
-  //     });
-  //   });
-
-  // },
-
   update: function(req, res, next) {
     var troupe = req.troupe;
     var updatedTroupe = req.body;
@@ -86,14 +62,6 @@ module.exports = {
       })
       .catch(next);
   },
-
-  // destroy: function(req, res, next) {
-  //   troupeService.deleteTroupe(req.troupe, function(err) {
-  //     if(err) return next(err);
-
-  //     res.send({ success: true });
-  //   });
-  // },
 
   load: function(req, id, callback) {
     if(!req.user) return callback(401);
