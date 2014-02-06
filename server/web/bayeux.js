@@ -190,8 +190,6 @@ var authenticator = {
       return callback(message);
     }
 
-    winston.verbose('bayeux: Handshake: ', message);
-
     var ext = message.ext;
 
     if(!ext || !ext.token) {
@@ -458,6 +456,47 @@ var superClient = {
   }
 };
 
+function getClientIp(req) {
+  if(!req) return;
+
+  if(req.headers && req.headers['x-forwarded-for']) {
+    return req.headers['x-forwarded-for'];
+  }
+
+  if(req.connection && req.connection.remoteAddress) {
+    return req.connection.remoteAddress;
+  }
+}
+
+var logging = {
+  incoming: function(message, req, callback) {
+    switch(message.channel) {
+      case '/meta/handshake':
+        var connType = message.ext && message.ext.connType;
+        winston.verbose("bayeux: " + message.channel , { ip: getClientIp(req), connType: connType });
+        break;
+
+      case '/meta/connect':
+        winston.verbose("bayeux: connect" , { ip: getClientIp(req), clientId: message.clientId });
+        break;
+
+      case '/meta/subscribe':
+        winston.verbose("bayeux: subscribe", { clientId: message.clientId, subs: message.subscription });
+        break;
+    }
+    callback(message);
+  },
+
+  outgoing: function(message, req, callback) {
+    if(message.channel === '/meta/handshake' ) {
+      var ip = getClientIp(req);
+      var clientId = message.clientId;
+      winston.verbose("bayeux: handshake complete", { ip: ip, clientId: clientId });
+    }
+    callback(message);
+  }
+};
+
 var server = new faye.NodeAdapter({
   mount: '/faye',
   timeout: nconf.get('ws:fayeTimeout'),
@@ -489,6 +528,17 @@ module.exports = {
     server.addExtension(subscriptionTimestamp);
 
     client.addExtension(superClient);
+
+    server.addExtension(logging);
+
+    /** Some logging */
+    ['handshake', 'disconnect'].forEach(function(event) {
+      server.bind(event, function(clientId) {
+        winston.info("Client " + clientId + ": " + event);
+      });
+    });
+
+
 
     server.bind('disconnect', function(clientId) {
       // Warning, this event is called simulateously on
