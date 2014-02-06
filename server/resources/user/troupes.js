@@ -73,11 +73,15 @@ module.exports = {
 
   load: function(req, id, callback) {
     troupeService.findById(id, function(err, troupe) {
-      if(err) return callback(500);
-      if(!troupe) return callback(404);
+      if(err) return callback(err);
 
+      if(!troupe) return callback();
+
+      /* Some strangeness here as the user may be mentioned */
       if(!troupeService.userHasAccessToTroupe(req.resourceUser, troupe)) {
-        return callback(403);
+        if(req.method !== 'DELETE') {
+          return callback(403);
+        }
       }
 
       return callback(null, troupe);
