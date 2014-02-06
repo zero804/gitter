@@ -52,7 +52,7 @@ define([
 
       var v;
       if(duration.asDays() >= maxDaysBeforeDateDisplay) {
-        v = this.compact ? this.time.format("MMM DDD") : this.time.format("LL");
+        v = this.compact ? this.time.format("MMM DD") : this.time.format("LL");
       } else {
         v = this.compact ? this.time.format("H:mm") : duration.humanize() + " ago";
       }

@@ -7,14 +7,14 @@ var eventEmitter = new events.EventEmitter();
 var Q = require('q');
 var _ = require('underscore');
 
-function shutdownGracefully() {
+function shutdownGracefully(exitCode) {
   winston.info("Starting graceful shutdown procedure");
   var timer = setTimeout(function(err) {
       winston.info("Timeout awaiting graceful shutdown. Forcing shutdown.");
-      process.exit(11);
+      process.exit(exitCode || 11);
   }, 100000);
 
-  performNextShutdownStage();
+  performNextShutdownStage(exitCode);
 }
 
 var handlers = {};
@@ -22,11 +22,11 @@ process.on('SIGTERM', function() {
   shutdownGracefully();
 });
 
-function performNextShutdownStage() {
+function performNextShutdownStage(exitCode) {
   var keys = Object.keys(handlers).map(function(k) { return parseInt(k, 10); });
   if(keys.length === 0) {
     winston.info("Shutdown complete");
-    process.exit(0);
+    process.exit(exitCode || 0);
     return;
   }
 
@@ -53,7 +53,7 @@ function performNextShutdownStage() {
   Q.timeout(all, 30000)
     .then(function () {
       winston.info("Shutdown stage " + nextStage + " complete");
-      performNextShutdownStage();
+      performNextShutdownStage(exitCode);
     }, function (err) {
       stageHandlers.forEach(function(handler, index) {
         if(promises[index]) {
@@ -61,7 +61,7 @@ function performNextShutdownStage() {
         }
       });
 
-      performNextShutdownStage();
+      performNextShutdownStage(exitCode);
     });
 
 }
@@ -85,18 +85,30 @@ exports.installUnhandledExceptionHandler = function() {
 
   //
   process.on('uncaughtException', function(err) {
-    winston.error('----------------------------------------------------------------');
-    winston.error('-- A VeryBadThing has happened.');
-    winston.error('----------------------------------------------------------------');
-    winston.error('Uncaught exception' + err, { message: err.message, name: err.name });
+    try {
+      winston.error('----------------------------------------------------------------');
+      winston.error('-- A VeryBadThing has happened.');
+      winston.error('----------------------------------------------------------------');
+      winston.error('Uncaught exception' + err, { message: err.message, name: err.name });
 
-    if(err.stack) {
-      winston.error('' + err.stack);
+      if(err.stack) {
+        winston.error('' + err.stack);
+      }
+
+      winston.error('Uncaught exception' + err + ' forcing shutdown');
+    } catch(e) {
+      /* This might seem strange, but sometime just logging the error will crash your process a second time */
+      try {
+        console.log('The error handler crashed too');
+      } catch(e) {
+      }
     }
 
-    winston.error('Uncaught exception' + err + ' forcing shutdown');
-    shutdownGracefully();
-
+    try {
+      shutdownGracefully(10);
+    } catch(e) {
+      console.log('The shutdown handler crashed too');
+    }
   });
 
 };
