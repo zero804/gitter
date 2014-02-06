@@ -30,7 +30,11 @@ define([
       // css elipsis overflow cant handle multiline text
       var shortDescription = (description && description.length > 250) ? description.substring(0,250)+'…' : description;
 
-      $issue.removeClass('open closed').addClass(issue.state);
+      // dont change the issue state colouring for the activity feed
+      if(!$issue.hasClass('open') && !$issue.hasClass('closed')) {
+        $issue.addClass(issue.state);
+      }
+
       $issue.popover({
         html: true,
         trigger: 'manual',
