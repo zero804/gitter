@@ -61,79 +61,52 @@ define([
       var mentions = self.model.get('mentions');
       var ui = self.model.get('unreadItems');
       var redisplayBadge = false;
+      var f = self.model.get('favourite');
+      var activity = self.model.get('activity');
 
-      if(first || 'lurk' in m.changed) {
-        redisplayBadge = true;
+      e.toggleClass('item-fav', !!f);
 
-        if(!lurk) {
-          e.removeClass('chatting chatting-now');
+      function getBadgeText() {
+        if(mentions) return "@";
+
+        if(lurk) return;
+
+        if(ui) {
+          if(ui > MAX_UNREAD) return "99+";
+          return ui;
         }
       }
 
-      if(first || 'activity' in m.changed) {
-        var activity = self.model.get('activity');
 
-        if(lurk && activity) {
-          e.addClass('chatting chatting-now');
+      var text = getBadgeText() || "";
+      unreadBadge.find('span').text(text);
+      unreadBadge.toggleClass('shown', !!text);
+      unreadBadge.toggleClass('mention', !!mentions);
 
-          if(self.timeout) {
-            clearTimeout(self.timeout);
+      if(lurk && !mentions) {
+        e.toggleClass('chatting', !!activity);
+
+        if(activity && 'activity' in m.changed) {
+          e.addClass('chatting-now');
+        }
+
+        if(self.timeout) {
+          clearTimeout(self.timeout);
+        }
+
+        self.timeout = setTimeout(function() {
+          delete self.timeout;
+          if(self.model.id === context.getTroupeId()) {
+            e.removeClass('chatting chatting-now');
+          } else {
+            e.removeClass('chatting-now');
           }
 
-          self.timeout = setTimeout(function() {
-            delete self.timeout;
-            if(self.model.id === context.getTroupeId()) {
-              e.removeClass('chatting chatting-now');
-            } else {
-              e.removeClass('chatting-now');
-            }
+        }, 1600);
 
-          }, 1600);
-        } else {
-          e.removeClass('chatting chatting-now');
-        }
-      }
-
-      if(first || 'mentions' in m.changed) {
-        redisplayBadge = true;
-        if(mentions > 0) {
-          unreadBadge.find('span').text('@');
-        }
-      }
-
-      if(first || 'unreadItems' in m.changed) {
-        if(!mentions) {
-          redisplayBadge = true;
-
-          if(ui) {
-            if(ui > MAX_UNREAD) {
-              ui = "99+";
-            }
-            unreadBadge.find('span').text(ui);
-          }
-        }
-      }
-
-      if(first || redisplayBadge) {
-        var shown;
-        if(lurk) {
-          /* In lurk mode, show badge when theres a mention */
-          shown = mentions;
-        } else {
-          /* In non-lurk mode, show badge when theres a mention or unread items */
-          shown =  ui || mentions;
-        }
-
-        unreadBadge.toggleClass('shown', !!shown);
-      }
-
-      if(first || 'favourite' in m.changed) {
-        var f = self.model.get('favourite');
-        if(f) {
-          e.addClass('item-fav');
-        } else {
-          e.removeClass('item-fav');
-        }
+      } else {
+        // Not lurking
+        e.removeClass('chatting chatting-now');
       }
     },
     clearSearch: function() {
