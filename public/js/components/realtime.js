@@ -156,10 +156,12 @@ define([
     var client = new Faye.Client(c.fayeUrl, c.options);
 
     // Disable websocket on Mobile due to iOS crash bug
-    var userAgent = window.navigator.userAgent;
-    if(userAgent.indexOf('Mobile') >= 0) {
+    // var userAgent = window.navigator.userAgent;
+    //
+    // XXX DISABLE WEBSOCKETS AS A TEST
+    // if(userAgent.indexOf('Mobile') >= 0) {
       client.disable('websocket');
-    }
+    // }
 
     client.addExtension(new ClientAuth());
     client.addExtension(snapshotExtension);
