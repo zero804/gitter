@@ -3,43 +3,44 @@
 
 var Q = require('q');
 var winston = require('winston');
-var assert = require('assert');
 var oauthService = require('../services/oauth-service');
 
 module.exports = function(req, res, next){
-  // ignore these methods
-  if ('GET' == req.method || 'HEAD' == req.method || 'OPTIONS' == req.method) return next();
 
-  var clientToken = getClientToken(req);
+  addTokenToSession(req).then(function() {
 
-  getServerTokenQ(req)
-    .then(function(serverToken) {
-      if(!clientToken || clientToken !== serverToken) {
-        return next(403);
-      }
+    // ignore these methods
+    if('GET' == req.method || 'HEAD' == req.method || 'OPTIONS' == req.method) return next();
 
+    if(isInWhitelist(req)) {
+      winston.warn('skipping csrf check for '+req.path);
       return next();
-    })
-    .fail(function(err) {
-      winston.err('couldnt get server auth token', err);
-      next(403);
-    });
+    }
+
+    var clientToken = getClientToken(req);
+    if(!clientToken || clientToken !== req.session.accessToken) {
+      return next(403);
+    } else {
+      return next();
+    }
+
+  }).fail(next);
 };
 
-function getServerTokenQ(req) {
+function addTokenToSession(req) {
   return Q.fcall(function() {
-    assert(req.session, 'session is required');
-
-    if(req.session.accessToken) return req.session.accessToken;
-
-    assert(req.user, 'user is required');
-
-    return oauthService.findOrGenerateWebToken(req.user.id)
-      .then(function(serverToken) {
-        req.session.accessToken = serverToken;
-        return req.session.accessToken;
-      });
+    if(!req.session.accessToken && !!req.user) {
+      return oauthService.findOrGenerateWebToken(req.user.id)
+        .then(function(serverToken) {
+          req.session.accessToken = serverToken;
+        });
+    }
   });
+}
+
+function isInWhitelist(req) {
+  // webhooks handler doesnt send a token, but the uri is hard to guess
+  return (req.path.indexOf('/api/private/hook/') === 0);
 }
 
 function getClientToken(req) {
