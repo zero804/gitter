@@ -1,10 +1,12 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var troupeService  = require("../../services/troupe-service");
-var userService    = require("../../services/user-service");
-var restSerializer = require("../../serializers/rest-serializer");
-var _              = require("underscore");
+var recentRoomService = require('../../services/recent-room-service');
+var troupeService     = require("../../services/troupe-service");
+var userService       = require("../../services/user-service");
+var restSerializer    = require("../../serializers/rest-serializer");
+var _                 = require("underscore");
+var Q                 = require("q");
 
 module.exports = {
   id: 'resourceTroupeUser',
@@ -28,11 +30,17 @@ module.exports = {
       // For now, you can only remove yourself from the room
       return next(401);
     }
+    var troupeId = req.troupe._id;
+    var userId = user.id;
+    Q.all([
+        recentRoomService.updateFavourite(userId, troupeId, false),
+        troupeService.removeUserFromTroupe(troupeId, userId)
+      ])
+      .then(function() {
+        res.send({ success: true });
+      })
+      .fail(next);
 
-    troupeService.removeUserFromTroupe(req.troupe._id, user.id, function (err) {
-    if(err) return next(err);
-      res.send({ success: true });
-    });
   },
 
   load: function(req, id, callback) {
