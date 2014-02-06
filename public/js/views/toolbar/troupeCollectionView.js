@@ -42,7 +42,13 @@ define([
       //may not need this e.preventDefault stuff, had this because of the old <A HREF>
       e.preventDefault();
       e.stopPropagation();
-      this.model.destroy();
+
+      $.ajax({
+        url: "/api/v1/user/" + context.getUserId() + "/troupes/" + this.model.id,
+        data: "",
+        type: "DELETE",
+      });
+
     },
 
     onRender: function() {

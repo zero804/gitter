@@ -326,7 +326,7 @@ function removeItem(troupeId, itemType, itemId) {
  * Mark an item in a troupe as having been read by a user
  * @return {promise} promise of nothing
  */
-function markItemsOfTypeRead(userId, troupeId, itemType, ids) {
+function markItemsOfTypeRead(userId, troupeId, itemType, ids, member) {
   assert(userId, 'Expected userId');
   assert(troupeId, 'Expected troupeId');
   assert(itemType, 'Expected itemType');
@@ -364,7 +364,7 @@ function markItemsOfTypeRead(userId, troupeId, itemType, ids) {
             troupeId: troupeId,
             total: 0,
             op: 'remove',
-            member: true // XXX: this may not already be the case
+            member: member
           });
         }
       }
@@ -472,15 +472,17 @@ exports.markItemsRead = function(userId, troupeId, itemIds, mentionIds, options)
   var now = Date.now();
 
   var allIds = [];
+  var member = options && 'member' in options ? options.member :  true;
+
   if(itemIds) allIds = allIds.concat(itemIds);
   if(mentionIds) allIds = allIds.concat(mentionIds);
 
   appEvents.unreadItemsRemoved(userId, troupeId, { chat: itemIds }); // TODO: update
 
   return Q.all([
-    markItemsOfTypeRead(userId, troupeId, 'chat', allIds),
+    markItemsOfTypeRead(userId, troupeId, 'chat', allIds, member),
     setLastReadTimeForUser(userId, troupeId, now),
-    mentionIds && mentionIds.length && removeMentionForUser(userId, troupeId, mentionIds, true)
+    mentionIds && mentionIds.length && removeMentionForUser(userId, troupeId, mentionIds, member)
     ])
     .then(function() {
       if(options && options.recordAsRead === false) return;
@@ -491,15 +493,15 @@ exports.markItemsRead = function(userId, troupeId, itemIds, mentionIds, options)
 
 };
 
-exports.markAllChatsRead = function(userId, troupeId, callback) {
-  // TODO: add in mentions!!
-  exports.getUnreadItems(userId, troupeId, 'chat')
+exports.markAllChatsRead = function(userId, troupeId, options) {
+  return exports.getUnreadItems(userId, troupeId, 'chat')
     .then(function(chatIds) {
       if(!chatIds.length) return;
+
+      if(!('recordAsRead' in options)) options.recordAsRead = false;
       /* Don't mark the items as read */
-      return exports.markItemsRead(userId, troupeId, chatIds, null, { recordAsRead: false });
-    })
-    .nodeify(callback);
+      return exports.markItemsRead(userId, troupeId, chatIds, null, options);
+    });
 };
 
 exports.getUserUnreadCounts = function(userId, troupeId, callback) {
