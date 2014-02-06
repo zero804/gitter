@@ -25,15 +25,16 @@ header {
   line-height: @header-height;
   text-align: center;
   height: @header-height;
+  .trpTitle {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: normal;
+    color: white;
+    .trpH2;
+  }
 }
 
-.title {
-  display: inline-block;
-  vertical-align: middle;
-  line-height: normal;
-  color: white;
-  .trpH2;
-}
+
 
 #showTroupesButton {
   position: absolute;
@@ -127,6 +128,35 @@ header {
   .prepend-121-icon;
 }
 
+.item-fav .github-ORG {
+  .prepend-fav-icon;
+  &:before {
+    font-size: 16px;
+  }
+}
+
+.item-fav .github-ONETOONE {
+  .prepend-fav-icon;
+  &:before {
+    font-size: 16px;
+  }
+}
+
+.item-fav .github-REPO {
+  .prepend-fav-icon;
+  &:before {
+    font-size: 16px;
+  }
+}
+
+.item-fav .github-ORG_CHANNEL {
+  .prepend-fav-icon;
+  &:before {
+    font-size: 16px;
+  }
+}
+
+
 .trpLeftMenuProfile {
   .trpBodyMedium;
   padding: 10px 0 10px 10px;
@@ -141,7 +171,7 @@ header {
 
 .trpLeftMenuProfileMenu {
   box-sizing: border-box;
-  margin-left: -10px;
+  margin-left: -4px;
   padding-bottom: 12px;
   overflow: hidden;
   width: 100%;
@@ -162,11 +192,31 @@ header {
     margin-right: 10px;
   }
 
-  .item:hover {
+  .item:active {
     border-radius: 0 4px 4px 0;
     background-color: rgba(255,255,255,0.2);
   }
 
+  li {
+    list-style: none;
+  }
+
+  li.item .icon-home {
+    .prepend-home-icon()
+  }
+
+  li.item .icon-signout {
+    .prepend-home-signout()
+  }
+
+  li.item .icon-apps {
+    .prepend-home-apps()
+  }
+
+}
+
+.list-favourites .trpTroupeList {
+  margin-bottom: 0px;
 }
 
 .trpLeftMenuProfileName {
@@ -186,6 +236,6 @@ header {
   position: absolute;
   width: 100%;
   bottom: 10px;
-  top: 130px;
+  top: 110px;
   -webkit-overflow-scrolling: touch;
 }

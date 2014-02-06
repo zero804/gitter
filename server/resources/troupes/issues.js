@@ -28,14 +28,16 @@ function trimDownIssue(issue) {
 
 module.exports = {
   index: function(req, res) {
-    if(req.troupe.githubType != 'REPO') return res.send([]);
+    var query = req.query || {};
+    var repoName = query.repoName || (req.troupe.githubType === 'REPO' && req.troupe.uri);
 
-    var term = req.query.q || '';
+    if(!repoName) return res.send([]);
+
+    var issueNumber = query.issueNumber || '';
     var service = new RepoService(req.user);
-    var repoName = req.troupe.uri;
 
     service.getIssues(repoName).then(function(issues) {
-      var matches = term.length ? getTopEightMatchingIssues(issues, term) : getEightSuggestedIssues(issues);
+      var matches = issueNumber.length ? getTopEightMatchingIssues(issues, issueNumber) : getEightSuggestedIssues(issues);
       res.send(matches);
     })
     .fail(function(err) {

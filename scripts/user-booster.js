@@ -130,19 +130,15 @@ function boostMany(count) {
     .then(function(users) {
       console.log('Boosting ' + users.map(function(f) { return f.username; }).join(', '));
 
-      var p = Q.resolve();
-
-      users.forEach(function(user) {
-        p = p.then(function() {
-          return boost(user.username)
+      return Q.all(users.map(function(user) { 
+        return boost(user.username)
             .then(function() {
               console.log('Boosted ' + user.username);
             })
             .fail(function(err) {
               console.error('Failed to boost ' + user.username + ':', err);
             });
-        });
-      });
+      }));
     })
     .then(function() {
       process.exit(0);

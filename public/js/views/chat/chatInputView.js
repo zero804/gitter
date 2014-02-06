@@ -178,10 +178,18 @@ define([
 
       this.$el.find('textarea').textcomplete([
           {
-            match: /(^|\s)#(\w*)$/,
+            match: /(^|\s)(([\w-_]+\/[\w-_]+)?#(\d*))$/,
             maxCount: 8,
             search: function(term, callback) {
-              $.getJSON('/api/v1/troupes/' + context.getTroupeId() + '/issues', { q: term })
+              var terms = term.split('#');
+              var repoName = terms[0];
+              var issueNumber = terms[1];
+              var query = {};
+
+              if(repoName) query.repoName = repoName;
+              if(issueNumber) query.issueNumber = issueNumber;
+
+              $.getJSON('/api/v1/troupes/' + context.getTroupeId() + '/issues', query)
                 .done(function(resp) {
                   callback(resp);
                 })
@@ -196,7 +204,7 @@ define([
               });
             },
             replace: function(issue) {
-                return '$1#' + issue.number + ' ';
+              return '$1$3#' + issue.number + ' ';
             }
           },
           {
