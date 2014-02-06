@@ -39,8 +39,10 @@ function addTokenToSession(req) {
 }
 
 function isInWhitelist(req) {
-  // webhooks handler doesnt send a token, but the uri is hard to guess
-  return (req.path.indexOf('/api/private/hook/') === 0);
+         // webhooks handler doesnt send a token, but the uri is hard to guess
+  return (req.path.indexOf('/api/private/hook/') === 0) ||
+         // oauth post token endpoint for native login has its own auth
+         (req.path === '/login/oauth/token');
 }
 
 function getClientToken(req) {
