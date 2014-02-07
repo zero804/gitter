@@ -50,10 +50,11 @@ define([
 
   Rate.prototype.cleanup = function(p) {
     var horizon = p - 2;
+    var hash = this.hash;
 
-    Object.keys(this.hash).forEach(function(key) {
+    Object.keys(hash).forEach(function(key) {
       if(parseInt(key, 10) < horizon) {
-        delete this.hash[key];
+        delete hash[key];
       }
     });
   };
