@@ -1,19 +1,28 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var express  = require('express');
-var http     = require('http');
-var nconf    = require('./utils/config');
-var winston  = require('./utils/winston');
-var shutdown = require('./utils/shutdown');
-var bayeux   = require('./web/bayeux');
-var redis    = require('./utils/redis');
+var express    = require('express');
+var nconf      = require('./utils/config');
+var winston    = require('./utils/winston');
+var shutdown   = require('./utils/shutdown');
+var bayeux     = require('./web/bayeux');
+var redis      = require('./utils/redis');
 var appVersion = require('./web/appVersion');
+
+function getHttp() {
+  var http = require('http');
+  var amazonProxyProtocol = nconf.get("ws:amazonProxyProtocol");
+  if(amazonProxyProtocol) {
+    return require('proxywrap').proxy(http);
+  } else {
+    return http;
+  }
+}
 
 winston.info("Starting http/ws service");
 
 var app = express();
-var server = http.createServer(app);
+var server = getHttp().createServer(app);
 
 var RedisStore = require('connect-redis')(express);
 var sessionStore = new RedisStore({
