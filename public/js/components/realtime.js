@@ -74,9 +74,12 @@ define([
 
     if(counter) {
       var rate = counter.event();
-      if(!message.ext) message.ext = {};
-      message.ext.rate = rate;
-      log('Rate of ' + message.channel  + ' is ' + rate + ' per 30s');
+      if(rate) {
+        /* Don't bother if the value is zero */
+        if(!message.ext) message.ext = {};
+        message.ext.rate = rate;
+        log('Rate of ' + message.channel  + ' is ' + rate + ' per 30s');
+      }
     }
 
     callback(message);
