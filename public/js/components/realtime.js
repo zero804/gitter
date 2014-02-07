@@ -8,8 +8,9 @@ define([
 ], function($, context, Faye, appEvents, log) {
   "use strict";
 
-  //Faye.Logging.logLevel = 'debug';
-  //Faye.logger = log;
+  if(window.localStorage.fayeLogging) {
+    Faye.Logging.logLevel = window.localStorage.fayeLogging;
+  }
 
   var connected = false;
   var connectionProblemTimeoutHandle;
