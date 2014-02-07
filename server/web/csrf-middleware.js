@@ -9,8 +9,11 @@ module.exports = function(req, res, next){
 
   addTokenToSession(req).then(function() {
 
-    // ignore these methods
+    // ignore these methods, they shouldnt alter state
     if('GET' == req.method || 'HEAD' == req.method || 'OPTIONS' == req.method) return next();
+
+    // oath strategy has already authenticated these with the bearer token
+    if(hasBearerTokenHeader(req)) return next();
 
     if(isInWhitelist(req)) {
       winston.warn('skipping csrf check for '+req.path);
@@ -36,6 +39,11 @@ function addTokenToSession(req) {
         });
     }
   });
+}
+
+function hasBearerTokenHeader(req) {
+  var authHeader = req.headers['Authorization'] || '';
+  return (authHeader.split(' ')[0] === 'Bearer');
 }
 
 function isInWhitelist(req) {
