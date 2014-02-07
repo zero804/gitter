@@ -1,8 +1,7 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'utils/appevents',
-  './eyeballs',
-], function(appEvents, eyeballs){
+  'utils/appevents'
+], function(appEvents){
   "use strict";
 
   var Notification = window.Notification;
@@ -70,13 +69,11 @@ define([
       if(getPermissionType() === 'granted') {
         // no need to request permission
         appEvents.on('user_notification', function(message) {
-          if(eyeballs.getEyeBalls()) return;
           showNotification(message);
         });
       } else {
         Notification.requestPermission(function() {
           appEvents.on('user_notification', function(message) {
-            if(eyeballs.getEyeBalls()) return;
             showNotification(message);
           });
         });
