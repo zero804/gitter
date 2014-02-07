@@ -93,7 +93,11 @@ define([
           plaintextify($issue);
         } else {
           this.target = "github";
-          this.href = "https://github.com/"+repo+"/issues/"+issueNumber;
+
+          var href = $issue.attr('href');
+          if(!href || href === '#') {
+            $issue.attr('href', 'https://github.com/'+repo+'/issues/'+issueNumber);
+          }
 
           if(repo.toLowerCase() === roomRepo.toLowerCase()) {
             preparePopover($issue,'/api/v1/troupes/'+context.getTroupeId()+'/issues/'+issueNumber, options.placement);
