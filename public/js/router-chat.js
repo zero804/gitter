@@ -164,15 +164,5 @@ require([
     }
   }
 
-
-  if(!window.localStorage.troupeTourApp) {
-    window.localStorage.troupeTourApp = 1;
-    require([
-      'tours/tour-controller'
-    ], function(tourController) {
-      tourController.init({ appIntegratedView: appView });
-    });
-  }
-
   Backbone.history.start();
 });
