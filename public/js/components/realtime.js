@@ -13,33 +13,10 @@ define([
     Faye.logger = log;
   }
 
-  var connected = false;
-  var connectionProblemTimeoutHandle;
-  var persistentOutage = false;
-
   var clientId = null;
 
   function isMobile() {
     return navigator.userAgent.indexOf('Mobile/') >= 0;
-  }
-
-  function connectionProblemTimeout() {
-    connectionProblemTimeoutHandle = null;
-
-    // If there was a timing issue
-    if(connected) {
-      if(persistentOutage) {
-        persistentOutage = false;
-        $(document).trigger('realtime:persistentOutageCleared');
-      }
-
-      return;
-    }
-
-    if(!persistentOutage) {
-      persistentOutage = true;
-      $(document).trigger('realtime:persistentOutage');
-    }
   }
 
   var eyeballState = true;
@@ -49,6 +26,61 @@ define([
     eyeballState = state;
   });
 
+  var Rate = function() {
+    this.hash = {};
+    this.counter = 0;
+  };
+
+  Rate.prototype.event = function() {
+    this.counter++;
+
+    var d = Math.floor(Date.now() / 30000);
+    if(this.hash[d]) {
+      this.hash[d]++;
+    } else {
+      this.hash[d] = 1;
+    }
+
+    if(this.counter % 10 === 0) {
+      this.cleanup(d);
+    }
+
+    return this.hash[d - 1] || 0;
+  };
+
+  Rate.prototype.cleanup = function(p) {
+    var horizon = p - 2;
+
+    Object.keys(this.hash).forEach(function(key) {
+      if(parseInt(key, 10) < horizon) {
+        delete this.hash[key];
+      }
+    });
+  };
+
+  var RateMonitor = function() {
+    this.hRate = new Rate();
+    this.cRate = new Rate();
+  };
+
+  RateMonitor.prototype.outgoing = function(message, callback) {
+    var counter;
+    if(message.channel == '/meta/handshake') {
+      counter = this.hRate;
+    }
+    if(message.channel == '/meta/connect') {
+      counter = this.cRate;
+    }
+
+    if(counter) {
+      var rate = counter.event();
+      if(!message.ext) message.ext = {};
+      message.ext.rate = rate;
+      log('Rate of ' + message.channel  + ' is ' + rate + ' per 30s');
+    }
+
+    callback(message);
+  };
 
   var ClientAuth = function() {};
   ClientAuth.prototype.outgoing = function(message, callback) {
@@ -158,48 +190,15 @@ define([
     var client = new Faye.Client(c.fayeUrl, c.options);
 
     // Disable websocket on Mobile due to iOS crash bug
-    // var userAgent = window.navigator.userAgent;
-    //
-    // XXX DISABLE WEBSOCKETS AS A TEST
-    // if(userAgent.indexOf('Mobile') >= 0) {
+    var userAgent = window.navigator.userAgent;
+    if(userAgent.indexOf('Mobile') >= 0) {
       client.disable('websocket');
-    // }
+    }
 
+    client.addExtension(new RateMonitor());
     client.addExtension(new ClientAuth());
     client.addExtension(snapshotExtension);
     client.addExtension(new AccessTokenFailureExtension());
-
-    client.bind('transport:down', function() {
-      log('transport:down');
-      connected = false;
-
-      if(!connectionProblemTimeoutHandle) {
-        connectionProblemTimeoutHandle = window.setTimeout(connectionProblemTimeout, 5000);
-      }
-
-      // the client is not online
-      $(document).trigger('realtime:down');
-    });
-
-    client.bind('transport:up', function() {
-      log('transport:up');
-      connected = true;
-
-      if(connectionProblemTimeoutHandle) {
-        window.clearTimeout(connectionProblemTimeoutHandle);
-        connectionProblemTimeoutHandle = null;
-      }
-
-      // the client is online
-      $(document).trigger('realtime:up');
-
-      // Long term outage
-      if(persistentOutage) {
-        persistentOutage = false;
-        $(document).trigger('realtime:persistentOutageCleared');
-      }
-    });
-
 
     var userSubscription;
 
@@ -221,10 +220,6 @@ define([
 
     return client;
   }
-
-
-  // Give the initial load 5 seconds to connect before warning the user that there is a problem
-  connectionProblemTimeoutHandle = window.setTimeout(connectionProblemTimeout, 5000);
 
   var client;
   function getOrCreateClient() {
@@ -253,7 +248,11 @@ define([
     /* Only test the connection if one has already been established */
     if(!client) return;
 
-    client.publish('/api/v1/ping', { });
+    client.publish('/api/v1/ping', { })
+      .then(function() {}, function(error) {
+        log('Unable to ping server', error);
+        // We could reinstate the persistant outage concept on this
+      });
   }
 
   return {
