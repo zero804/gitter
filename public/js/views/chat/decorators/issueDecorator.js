@@ -22,7 +22,7 @@ define([
     $el.replaceWith($el.text());
   }
 
-  function preparePopover($issue, url) {
+  function preparePopover($issue, url, placement) {
     $.get(url, function(issue) {
       if(!issue.state) return;
       var description = issue.body;
@@ -30,12 +30,15 @@ define([
       // css elipsis overflow cant handle multiline text
       var shortDescription = (description && description.length > 250) ? description.substring(0,250)+'…' : description;
 
-      $issue.removeClass('open closed').addClass(issue.state);
-      $issue.attr('title', issuePopoverTitleTemplate(issue));
+      // dont change the issue state colouring for the activity feed
+      if(!$issue.hasClass('open') && !$issue.hasClass('closed')) {
+        $issue.addClass(issue.state);
+      }
+
       $issue.popover({
         html: true,
         trigger: 'manual',
-        placement: 'right',
+        placement: placement || 'right',
         container: 'body',
         title: issuePopoverTitleTemplate(issue),
         content: issuePopoverTemplate({
@@ -74,7 +77,9 @@ define([
 
   var decorator = {
 
-    decorate: function(chatItemView) {
+    decorate: function(chatItemView, options) {
+      options = options || {};
+
       var roomRepo = getRoomRepo();
 
       chatItemView.$el.find('*[data-link-type="issue"]').each(function() {
@@ -88,12 +93,16 @@ define([
           plaintextify($issue);
         } else {
           this.target = "github";
-          this.href = "https://github.com/"+repo+"/issues/"+issueNumber;
+
+          var href = $issue.attr('href');
+          if(!href || href === '#') {
+            $issue.attr('href', 'https://github.com/'+repo+'/issues/'+issueNumber);
+          }
 
           if(repo.toLowerCase() === roomRepo.toLowerCase()) {
-            preparePopover($issue,'/api/v1/troupes/'+context.getTroupeId()+'/issues/'+issueNumber);
+            preparePopover($issue,'/api/v1/troupes/'+context.getTroupeId()+'/issues/'+issueNumber, options.placement);
           } else {
-            preparePopover($issue,'/api/private/gh/repos/'+repo+'/issues/'+issueNumber);
+            preparePopover($issue,'/api/private/gh/repos/'+repo+'/issues/'+issueNumber, options.placement);
           }
         }
       });
