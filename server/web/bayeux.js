@@ -472,12 +472,16 @@ var logging = {
   incoming: function(message, req, callback) {
     switch(message.channel) {
       case '/meta/handshake':
+        /* Rate is for the last full 30second period */
         var connType = message.ext && message.ext.connType;
-        winston.verbose("bayeux: " + message.channel , { ip: getClientIp(req), connType: connType });
+        var handshakeRate = message.ext && message.ext.rate;
+        winston.verbose("bayeux: " + message.channel , { ip: getClientIp(req), connType: connType, rate: handshakeRate });
         break;
 
       case '/meta/connect':
-        winston.verbose("bayeux: connect" , { ip: getClientIp(req), clientId: message.clientId });
+        /* Rate is for the last full 30second period */
+        var connectRate = message.ext && message.ext.rate;
+        winston.verbose("bayeux: connect" , { ip: getClientIp(req), clientId: message.clientId, rate: connectRate });
         break;
 
       case '/meta/subscribe':
