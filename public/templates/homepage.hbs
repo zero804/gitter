@@ -68,15 +68,11 @@ img {
   transition:all .2s ease-in-out;
 }
 
-.button.white {
-  background-color: rgba(255,255,255,0.8);
-  border-bottom: 3px solid rgba(255,255,255,1);
-}
-
 .button.green {
   color: white;
   background-color: rgba(29,206,115, 0.9);
   border-bottom: 3px solid rgba(29,206,115, 1);
+  text-decoration: none;
 }
 
 .button.blur {
@@ -145,6 +141,7 @@ img {
       <img src="{{ cdn "images/2/gitter/screenshot-small.png" }}" width="920" style="border-radius: 2px 2px 0 0">
     </div>
   </div>
+
   <div class="container" style="background-color: #eee; padding-bottom: 20px" >
     <div class="strip feature">
       <div style="display: inline-block; vertical-align: top; max-width: 450px; margin-top: 40px">
@@ -159,14 +156,13 @@ img {
 
   <div class="container" style="background-color: #162e34; padding: 60px 0">
     <div class="strip">
-       <span style="opacity: 0.8; color: white";>Interested? Gitter is in beta right now, but feel free to give it a go. </span><br><br>
-      <a href="/login/github" class="button green" id="signup" style="text-decoration: none; color: white">Sign up with GitHub</a>
+       <span style="opacity: 0.8; color: white">Interested? Gitter is in beta right now, but feel free to give it a go. </span><br><br>
+      <a href="/login/github" class="button green" id="signup">Sign up with GitHub</a>
     </div>
   </div>
 
   <div class="container" style="background-color: white; padding: 10px 0">
-    <a name="smart" id="smart"> </a>
-    <div class="strip feature">
+    <div id="smart" class="strip feature">
       <h2 style="text-align: center">So smart, it even knows your issues</h2>
       <div style="text-align: center"><img src="{{ cdn "images/2/gitter/issue.png" }}" width="600"></div><br>
       <h2 style="text-align: center">Talks markdown, including formatted code</h2>
@@ -213,7 +209,7 @@ img {
       <span style="opacity: 0.8; color: black";>Interested? Gitter is in beta right now, but don't let that stop you. </span>
       <br>
       <br>
-      <a href="/login/github" class="button green" id="signup" style="text-decoration: none; color: white">My brain can't handle the awesome. Sign me up!</a>
+      <a href="/login/github" class="button green" id="signup">My brain can't handle the awesome. Sign me up!</a>
     </div>
   </div>
 
