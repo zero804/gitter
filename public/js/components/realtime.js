@@ -9,7 +9,8 @@ define([
   "use strict";
 
   if(window.localStorage.fayeLogging) {
-    Faye.Logging.logLevel = window.localStorage.fayeLogging;
+    Faye.Logging.logLevel = parseInt(window.localStorage.fayeLogging, 10);
+    Faye.logger = log;
   }
 
   var connected = false;
