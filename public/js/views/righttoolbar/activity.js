@@ -3,6 +3,7 @@ define([
   'marionette',
   'utils/context',
   'views/base',
+  'views/chat/decorators/issueDecorator',
   'log!activity',
   'hbs!./tmpl/activityStream',
 
@@ -25,11 +26,12 @@ define([
 
   'cocktail'
 ], function(
-  Marionette, 
+  Marionette,
   context,
-  TroupeViews, 
+  TroupeViews,
+  issueDecorator,
   log,
-  activityStreamTemplate, 
+  activityStreamTemplate,
 
   githubPushTemplate,
   githubIssuesTemplate,
@@ -171,7 +173,10 @@ define([
         wiki_url:         wiki_url,
         wiki_page:        wiki_page,
         sent:             this.model.get('sent')
-      }
+      };
+    },
+    afterRender: function() {
+      issueDecorator.decorate(this, {placement: 'left'});
     }
   });
 
