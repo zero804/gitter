@@ -69,6 +69,7 @@ define([
 
       return {
         isNativeDesktopApp: context().isNativeDesktopApp,
+        troupeUrl: window.location.origin+troupe.url,
         permissions: context().permissions,
         oneToOne: troupe.oneToOne,
         troupeName: troupe.name,
