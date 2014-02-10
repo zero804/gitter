@@ -228,6 +228,15 @@ define([
   function getOrCreateClient() {
     if(client) return client;
     client = createClient();
+
+    client.on('transport:down', function() {
+      log('realtime: transport down');
+    });
+
+    client.on('transport:up', function() {
+      log('realtime: transport up');
+    });
+
     return client;
   }
 
