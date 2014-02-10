@@ -66,7 +66,8 @@ function validateUserForSubTroupeSubscription(options, callback) {
     .nodeify(callback);
 }
 
-// This strategy ensures that a user can access a URL under a /user/ URL
+// This is only used by the native client. The web client publishes to
+// the url
 function validateUserForPingSubscription(options, callback) {
   return callback(null, true);
 }
@@ -190,8 +191,6 @@ var authenticator = {
       return callback(message);
     }
 
-    winston.verbose('bayeux: Handshake: ', message);
-
     var ext = message.ext;
 
     if(!ext || !ext.token) {
@@ -298,17 +297,6 @@ var authorisor = {
     function deny() {
       message.error = '403::Access denied';
       winston.error('Socket authorisation failed. Disconnecting client.', message);
-
-      process.nextTick(function() {
-        var clientId = message.clientId;
-
-        var engine = server._server._engine;
-        engine.destroyClient(clientId, function() {
-          winston.warn('bayeux: client ' + clientId + ' destroyed');
-        });
-
-      });
-
       callback(message);
     }
 
@@ -416,22 +404,16 @@ var authorisor = {
     });
 
   }
-
-};
-
-var subscriptionTimestamp = {
-  outgoing: function(message, callback) {
-    if (message.channel === '/meta/subscribe') {
-      message.timestamp = new Date().toISOString();
-    }
-
-    callback(message);
-  }
 };
 
 var pushOnlyServer = {
   incoming: function(message, callback) {
     if (message.channel.match(/^\/meta\//)) {
+      return callback(message);
+    }
+
+    // Only ping if data is {}
+    if (message.channel == '/api/v1/ping2' && Object.keys(message.data).length === 0) {
       return callback(message);
     }
 
@@ -447,7 +429,43 @@ var pushOnlyServer = {
     if (message.ext) delete message.ext.password;
     callback(message);
   }
+};
 
+var pingResponder = {
+  incoming: function(message, callback) {
+    // Only ping if data is {}
+    if (message.channel != '/api/v1/ping2') {
+      return callback(message);
+    }
+
+    function deny(err) {
+      message.error = '403::Access denied';
+
+      winston.error('Denying ping access' + err);
+      callback(message);
+    }
+
+    var clientId = message.clientId;
+
+    server._server._engine.clientExists(clientId, function(exists) {
+      if(!exists) {
+        return deny("Client does not exist", { clientId: clientId });
+      }
+
+      presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
+        if(err) return deny(err);
+
+        if(!userId) {
+          return deny("Client not authenticated. Denying ping. ", { clientId: clientId });
+        }
+
+        return callback(message);
+      });
+
+    });
+
+
+  }
 };
 
 var superClient = {
@@ -458,6 +476,74 @@ var superClient = {
   }
 };
 
+function getClientIp(req) {
+  if(!req) return;
+
+  if(req.headers && req.headers['x-forwarded-for']) {
+    return req.headers['x-forwarded-for'];
+  }
+
+  if(req.connection && req.connection.remoteAddress) {
+    return req.connection.remoteAddress;
+  }
+}
+
+var logging = {
+  incoming: function(message, req, callback) {
+    switch(message.channel) {
+      case '/meta/handshake':
+        /* Rate is for the last full 30second period */
+        var connType = message.ext && message.ext.connType;
+        var handshakeRate = message.ext && message.ext.rate;
+        winston.verbose("bayeux: " + message.channel , { ip: getClientIp(req), connType: connType, rate: handshakeRate });
+        break;
+
+      case '/meta/connect':
+        /* Rate is for the last full 30second period */
+        var connectRate = message.ext && message.ext.rate;
+        if(connectRate && connectRate > 1) {
+          winston.verbose("bayeux: connect" , { ip: getClientIp(req), clientId: message.clientId, rate: connectRate });
+        }
+        break;
+
+      case '/meta/subscribe':
+        winston.verbose("bayeux: subscribe", { clientId: message.clientId, subs: message.subscription });
+        break;
+    }
+
+    callback(message);
+  },
+
+  outgoing: function(message, req, callback) {
+    if(message.channel === '/meta/handshake' ) {
+      var ip = getClientIp(req);
+      var clientId = message.clientId;
+      winston.verbose("bayeux: handshake complete", { ip: ip, clientId: clientId });
+    }
+    callback(message);
+  }
+};
+
+var adviseAdjuster = {
+  outgoing: function(message, req, callback) {
+    if(message.error && message.error.indexOf("403") === 0) {
+      if(!message.advice) {
+        message.advice = {};
+      }
+
+      if(message.channel == '/meta/handshake') {
+        // If we're unable to handshake, the situation is dire
+        message.advice.reconnect = 'none';
+      } else {
+        message.advice.reconnect = 'handshake';
+      }
+    }
+
+    callback(message);
+  }
+};
+
+
 var server = new faye.NodeAdapter({
   mount: '/faye',
   timeout: nconf.get('ws:fayeTimeout'),
@@ -467,6 +553,7 @@ var server = new faye.NodeAdapter({
     type: fayeRedis,
     host: nconf.get("redis:host"),
     port: nconf.get("redis:port"),
+    database: nconf.get("redis:redisDb"),
     interval: nconf.get('ws:fayeInterval'),
     namespace: 'fr:'
   }
@@ -483,12 +570,25 @@ module.exports = {
   attach: function(httpServer) {
 
     // Attach event handlers
+    server.addExtension(logging);
     server.addExtension(authenticator);
     server.addExtension(authorisor);
     server.addExtension(pushOnlyServer);
-    server.addExtension(subscriptionTimestamp);
+    server.addExtension(pingResponder);
+    server.addExtension(adviseAdjuster);
+
 
     client.addExtension(superClient);
+
+
+    /** Some logging */
+    ['handshake', 'disconnect'].forEach(function(event) {
+      server.bind(event, function(clientId) {
+        winston.info("Client " + clientId + ": " + event);
+      });
+    });
+
+
 
     server.bind('disconnect', function(clientId) {
       // Warning, this event is called simulateously on

@@ -995,7 +995,7 @@
     },
     "faye": {
       "version": "1.0.1",
-      "from": "faye@~1.0.0",
+      "from": "faye@latest",
       "dependencies": {
         "concat-stream": {
           "version": "1.4.1",
@@ -1054,7 +1054,7 @@
     },
     "faye-redis": {
       "version": "0.2.0",
-      "from": "faye-redis@~0.2.0"
+      "from": "faye-redis@latest"
     },
     "geckoboard-push": {
       "version": "0.0.5",

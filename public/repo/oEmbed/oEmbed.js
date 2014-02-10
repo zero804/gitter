@@ -11,7 +11,7 @@
     }
   }
 }(this, function ($) {
-  var oEmbed    = {}
+  var oEmbed    = {};
   var providers = {};
   var lookups   = [];
   var defaults  = {};
@@ -56,9 +56,9 @@
     });
   }
 
-  function parse(url, cb) { 
+  function parse(url, cb) {
     var providerName = supported(url);
-    var imageUrl     = url.match(/https?:\/\/([\w-:\.\/]+)(\.jpe?g|\.gif|\.png)/i);
+    var imageUrl     = url.match(/https?:\/\/([\w-:\.\/%]+)(\.jpe?g|\.gif|\.png)/i);
 
     if (providerName) {
       fetch(providers[providerName], url, cb);
