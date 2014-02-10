@@ -230,7 +230,7 @@ define([
             }
           },
           {
-            match: /(^|\s):(\w*)$/,
+            match: /(^|\s):([\-+\w]*)$/,
             maxCount: 8,
             search: function(term, callback) {
               if(term.length < 1) return callback(SUGGESTED_EMOJI);

@@ -52,6 +52,10 @@ require([
     parent.postMessage(JSON.stringify({ type: "navigation", url: url, urlType: type, title: title}), context.env('basePath'));
   });
 
+  appEvents.on('realtime.testConnection', function() {
+    parent.postMessage(JSON.stringify({ type: "realtime.testConnection" }), context.env('basePath'));
+  });
+
   var appView = new ChatIntegratedView({ el: 'body' });
   appView.rightToolbarRegion.show(new RightToolbarView());
 
@@ -162,16 +166,6 @@ require([
         window.location.hash = "!|inv";
       }, 500);
     }
-  }
-
-
-  if(!window.localStorage.troupeTourApp) {
-    window.localStorage.troupeTourApp = 1;
-    require([
-      'tours/tour-controller'
-    ], function(tourController) {
-      tourController.init({ appIntegratedView: appView });
-    });
   }
 
   Backbone.history.start();
