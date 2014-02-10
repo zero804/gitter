@@ -34,7 +34,7 @@ var routes = [
     populator: populateUserUnreadItemsCollection },
   { re: /^\/api\/v1\/user\/(\w+)$/,
     validator: validateUserForUserSubscription },
-  { re: /^\/api\/v1\/ping$/,
+  { re: /^\/api\/v1\/ping(\/\w+)?$/,
     validator: validateUserForPingSubscription }
 ];
 
@@ -284,6 +284,18 @@ var authenticator = {
 
 };
 
+function destroyClient(clientId) {
+  if(!clientId) return;
+
+  process.nextTick(function() {
+    var engine = server._server._engine;
+    engine.destroyClient(clientId, function() {
+      winston.info('bayeux: client ' + clientId + ' destroyed');
+    });
+
+  });
+
+}
 //
 // Authorisation Extension - decides whether the user
 // is allowed to connect to the subscription channel
@@ -297,6 +309,8 @@ var authorisor = {
     function deny() {
       message.error = '403::Access denied';
       winston.error('Socket authorisation failed. Disconnecting client.', message);
+
+      destroyClient(message.clientId);
       callback(message);
     }
 
@@ -440,7 +454,6 @@ var pingResponder = {
 
     function deny(err) {
       message.error = '403::Access denied';
-
       winston.error('Denying ping access' + err);
       callback(message);
     }
@@ -456,6 +469,7 @@ var pingResponder = {
         if(err) return deny(err);
 
         if(!userId) {
+          destroyClient(message.clientId);
           return deny("Client not authenticated. Denying ping. ", { clientId: clientId });
         }
 
@@ -567,6 +581,7 @@ module.exports = {
   server: server,
   engine: server._server._engine,
   client: client,
+  destroyClient: destroyClient,
   attach: function(httpServer) {
 
     // Attach event handlers
