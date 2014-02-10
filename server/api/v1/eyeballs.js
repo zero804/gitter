@@ -19,6 +19,8 @@ module.exports =  function(req, res, next) {
       if(err) {
         if(err.invalidSocketId) {
           winston.warn('eyeball: socket ' + socketId + ' exists in the faye engine, but not in the presence service.');
+          bayeux.destroyClient(socketId);
+
           return res.send(400);
         }
 
