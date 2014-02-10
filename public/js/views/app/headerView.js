@@ -68,6 +68,7 @@ define([
       }
 
       return {
+        isNativeDesktopApp: context().isNativeDesktopApp,
         permissions: context().permissions,
         oneToOne: troupe.oneToOne,
         troupeName: troupe.name,
