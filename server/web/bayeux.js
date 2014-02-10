@@ -296,17 +296,6 @@ var authorisor = {
     function deny() {
       message.error = '403::Access denied';
       winston.error('Socket authorisation failed. Disconnecting client.', message);
-
-      process.nextTick(function() {
-        var clientId = message.clientId;
-
-        var engine = server._server._engine;
-        engine.destroyClient(clientId, function() {
-          winston.warn('bayeux: client ' + clientId + ' destroyed');
-        });
-
-      });
-
       callback(message);
     }
 
@@ -414,7 +403,6 @@ var authorisor = {
     });
 
   }
-
 };
 
 var subscriptionTimestamp = {
@@ -445,7 +433,6 @@ var pushOnlyServer = {
     if (message.ext) delete message.ext.password;
     callback(message);
   }
-
 };
 
 var superClient = {
@@ -488,6 +475,7 @@ var logging = {
         winston.verbose("bayeux: subscribe", { clientId: message.clientId, subs: message.subscription });
         break;
     }
+
     callback(message);
   },
 
@@ -501,6 +489,20 @@ var logging = {
   }
 };
 
+var adviseAdjuster = {
+  outgoing: function(message, req, callback) {
+    if(message.error && message.error.indexOf("403") === 0) {
+      if(!message.advice) {
+        message.advice = {};
+      }
+      message.advice.reconnect = 'none';
+    }
+
+    callback(message);
+  }
+};
+
+
 var server = new faye.NodeAdapter({
   mount: '/faye',
   timeout: nconf.get('ws:fayeTimeout'),
@@ -510,6 +512,7 @@ var server = new faye.NodeAdapter({
     type: fayeRedis,
     host: nconf.get("redis:host"),
     port: nconf.get("redis:port"),
+    database: nconf.get("redis:redisDb"),
     interval: nconf.get('ws:fayeInterval'),
     namespace: 'fr:'
   }
@@ -526,14 +529,16 @@ module.exports = {
   attach: function(httpServer) {
 
     // Attach event handlers
+    server.addExtension(logging);
     server.addExtension(authenticator);
     server.addExtension(authorisor);
     server.addExtension(pushOnlyServer);
     server.addExtension(subscriptionTimestamp);
+    server.addExtension(adviseAdjuster);
+
 
     client.addExtension(superClient);
 
-    server.addExtension(logging);
 
     /** Some logging */
     ['handshake', 'disconnect'].forEach(function(event) {
