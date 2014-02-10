@@ -73,7 +73,12 @@ describe('unread-item-service', function() {
       usersWithLurkHash[userId2] = false;
       usersWithLurkHash[userId3] = true;
 
-      mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(usersWithLurkHash));
+      var troupe = {
+        githubType: 'REPO',
+        users: usersWithLurkHash
+      };
+
+      mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupe));
 
       unreadItemService.testOnly.newItem(troupeId, creatorUserId, itemType, itemId)
         .then(function() {
@@ -126,7 +131,12 @@ describe('removeItem', function() {
     usersWithLurkHash[userId2] = false;
     usersWithLurkHash[userId3] = false;
 
-    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(usersWithLurkHash));
+    var troupe = {
+      githubType: 'REPO',
+      users: usersWithLurkHash
+    };
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupe));
 
     unreadItemService.testOnly.removeItem(troupeId, itemType, itemId)
       .then(function() {
@@ -172,7 +182,14 @@ describe('markItemsRead', function() {
     var usersWithLurkHash = {};
     usersWithLurkHash[userId] = false;
 
-    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(usersWithLurkHash));
+
+    var troupe = {
+      githubType: 'REPO',
+      users: usersWithLurkHash
+    };
+
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupe));
 
     return Q.all([
         unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId1),
@@ -244,7 +261,13 @@ describe('limits', function() {
     var usersWithLurkHash = {};
     usersWithLurkHash[userId] = false;
 
-    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(usersWithLurkHash));
+
+    var troupe = {
+      githubType: 'REPO',
+      users: usersWithLurkHash
+    };
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupe));
     var adds = [];
 
     for(var i = 0; i < 99; i++) {
@@ -274,32 +297,80 @@ describe('mentions', function() {
   it('should record when a user is mentioned but not a member of the room', function(done) {
     var troupeId = mongoUtils.getNewObjectIdString();
     var userId = mongoUtils.getNewObjectIdString();
+    var userId2 = mongoUtils.getNewObjectIdString();
     var chatId = mongoUtils.getNewObjectIdString();
 
     var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
     var appEventsMock = mockito.spy(testRequire('./app-events'));
+    var userServiceMock = mockito.spy(testRequire('./services/user-service'));
+    var permissionsModelMock = mockito.mockFunction();
 
     var unreadItemService = testRequire.withProxies("./services/unread-item-service", {
       './troupe-service': troupeServiceMock,
-      '../app-events': appEventsMock
+      '../app-events': appEventsMock,
+      './permissions-model': permissionsModelMock,
+      './user-service': userServiceMock
     });
 
-    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve({ /* No users */ }));
+    var troupe = {
+      githubType: 'REPO',
+      users: { /* No users */ },
+      uri: 'gittertestbot/gittertestbot'
+    };
+
+    var nonMemberUserWithAccess = {
+      id: userId
+    };
+
+    var nonMemberUserWithoutAccess = {
+      id: userId2
+    };
 
     // Fake chat
     var chat = {
       id: chatId,
       mentions: [{
         userId: userId
+      }, {
+        userId: userId2
       }]
     };
 
+    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupe));
+    mockito.when(userServiceMock).findByIds().then(function(userIds) {
+      assert.equal(userIds.length, 2);
+      assert(_.find(userIds, function(i) { return i == userId; }));
+      assert(_.find(userIds, function(i) { return i == userId2; }));
+
+      return Q.resolve([nonMemberUserWithAccess, nonMemberUserWithoutAccess]);
+    });
+
+    var y = 0;
+    mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType) {
+      y++;
+      assert.equal(perm, 'join');
+      assert.equal(uri, troupe.uri);
+      assert.equal(githubType, troupe.githubType);
+
+
+      if(y > 2) {
+        assert(false, 'permissions model called more than twice');
+      }
+
+      if(user !== nonMemberUserWithAccess) {
+        assert.equal(user, nonMemberUserWithoutAccess);
+        return Q.resolve(false);
+      } else {
+        return Q.resolve(true);
+
+      }
+
+    });
 
     var c = 0;
     mockito.when(appEventsMock).troupeMentionCountsChange().then(function(data) {
       assert.equal(data.userId, userId);
       assert.equal(data.troupeId, troupeId);
-      console.log(data);
       c++;
       if(c === 1) {
         assert.equal(data.total, 1);
@@ -317,6 +388,7 @@ describe('mentions', function() {
     return unreadItemService.testOnly.detectAndCreateMentions(troupeId, undefined, chat)
       .then(function() {
         assert.equal(c, 1);
+        assert.equal(y, 2);
         return unreadItemService.getRoomIdsMentioningUser(userId);
       })
       .then(function(troupeIds) {
@@ -427,7 +499,12 @@ describe.skip('emailnotifications', function() {
     var usersWithLurkHash = {};
     usersWithLurkHash[userId] = true;
 
-    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(usersWithLurkHash));
+    var troupe = {
+      githubType: 'REPO',
+      users: usersWithLurkHash
+    };
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupe));
 
     return Q.all([
         unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId1),
@@ -466,7 +543,12 @@ describe.skip('emailnotifications', function() {
     var usersWithLurkHash = {};
     usersWithLurkHash[userId] = false;
 
-    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(usersWithLurkHash));
+    var troupe = {
+      users: usersWithLurkHash,
+      githubType: 'REPO'
+    };
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupe));
 
     return Q.all([
         unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId1),
