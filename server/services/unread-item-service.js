@@ -1,20 +1,22 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var troupeService = require("./troupe-service");
-var readByService = require("./readby-service");
-var appEvents     = require("../app-events");
-var _             = require("underscore");
-var redis         = require("../utils/redis");
-var winston       = require("winston");
-var mongoUtils    = require('../utils/mongo-utils');
-var RedisBatcher  = require('../utils/redis-batcher').RedisBatcher;
-var Scripto       = require('redis-scripto');
-var Q             = require('q');
-var assert        = require('assert');
-var redisClient   = redis.createClient();
-var badgeBatcher  = new RedisBatcher('badge', 300);
-var scriptManager = new Scripto(redisClient);
+var troupeService    = require("./troupe-service");
+var readByService    = require("./readby-service");
+var userService      = require("./user-service");
+var permissionsModel = require('./permissions-model');
+var appEvents        = require("../app-events");
+var _                = require("underscore");
+var redis            = require("../utils/redis");
+var winston          = require("winston");
+var mongoUtils       = require('../utils/mongo-utils');
+var RedisBatcher     = require('../utils/redis-batcher').RedisBatcher;
+var Scripto          = require('redis-scripto');
+var Q                = require('q');
+var assert           = require('assert');
+var redisClient      = redis.createClient();
+var badgeBatcher     = new RedisBatcher('badge', 300);
+var scriptManager    = new Scripto(redisClient);
 
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/unread');
 
@@ -159,7 +161,8 @@ function newItem(troupeId, creatorUserId, itemType, itemId) {
   if(!itemId) { winston.error("newitem failed. itemId cannot be null"); return; }
 
   return troupeService.findUserIdsForTroupeWithLurk(troupeId)
-    .then(function(userIdsWithLurk) {
+    .then(function(troupe) {
+      var userIdsWithLurk = troupe.users;
       var userIds = Object.keys(userIdsWithLurk);
 
       if(creatorUserId) {
@@ -251,8 +254,8 @@ function removeItem(troupeId, itemType, itemId) {
   if(!itemId) { winston.error("newitem failed. itemId cannot be null"); return; }
 
   return troupeService.findUserIdsForTroupeWithLurk(troupeId)
-    .then(function(userIdsWithLurk) {
-
+    .then(function(troupe) {
+      var userIdsWithLurk = troupe.users;
       var userIds = Object.keys(userIdsWithLurk);
 
       // Publish out an unread item removed event
@@ -785,11 +788,12 @@ function detectAndCreateMentions(troupeId, creatingUserId, chat) {
 
   /* Figure out what type of room this is */
   return troupeService.findUserIdsForTroupeWithLurk(troupeId)
-    .then(function(usersHash) {
-      if(!usersHash) return;
+    .then(function(troupe) {
 
-      // XXX: fix this!!
-      var publicRoom = true;
+      var oneToOne = troupe.githubType === 'ONETOONE';
+
+      var usersHash = troupe.users;
+      if(!usersHash) return;
 
       var userIds = chat.mentions
             .map(function(mention) {
@@ -798,6 +802,8 @@ function detectAndCreateMentions(troupeId, creatingUserId, chat) {
 
       var mentionLurkerAndNonMemberUserIds = [];
       var mentionMemberUserIds = [];
+
+      var lookupUsers = [];
 
       userIds.forEach(function(userId) {
         if(!userId) return;
@@ -817,29 +823,50 @@ function detectAndCreateMentions(troupeId, creatingUserId, chat) {
           return;
         }
 
-        /** User isn't in the room, still allow them to
-          * receive the mention if it's a public room
-          */
-        if(publicRoom) {
-          mentionLurkerAndNonMemberUserIds.push(userId);
+        if(!oneToOne) {
+          /* We'll need to use the permissions-model to determine if they'll be allowed in */
+          lookupUsers.push(userId);
         }
 
       });
 
-      /**
-       * Lurkers and non members wont have an unread item, so the first thing
-       * we'll need to do is create an unread item for them. Only then can we push the
-       * mention
-       */
-      if(mentionLurkerAndNonMemberUserIds.length) {
-        return newItemForUsers(troupeId, 'chat', chat.id, mentionLurkerAndNonMemberUserIds)
-          .then(function() {
-            var allUserIds = mentionLurkerAndNonMemberUserIds.concat(mentionMemberUserIds);
-            return newMention(troupeId, chat.id, allUserIds, usersHash);
-          });
+      var lookup;
+      if(lookupUsers.length) {
+        lookup = userService.findByIds(lookupUsers);
       } else {
-        return newMention(troupeId, chat.id, mentionMemberUserIds, usersHash);
+        lookup = Q.resolve([]);
       }
+
+      return lookup.then(function(users) {
+        if(!users.length) return;
+
+        return Q.all(users.map(function(user) {
+          return permissionsModel(user, 'join', troupe.uri, troupe.githubType)
+            .then(function(access) {
+              if(access) {
+                mentionLurkerAndNonMemberUserIds.push(user.id);
+              }
+
+            });
+        }));
+
+      }).then(function() {
+        /**
+         * Lurkers and non members wont have an unread item, so the first thing
+         * we'll need to do is create an unread item for them. Only then can we push the
+         * mention
+         */
+        if(mentionLurkerAndNonMemberUserIds.length) {
+          return newItemForUsers(troupeId, 'chat', chat.id, mentionLurkerAndNonMemberUserIds)
+            .then(function() {
+              var allUserIds = mentionLurkerAndNonMemberUserIds.concat(mentionMemberUserIds);
+              return newMention(troupeId, chat.id, allUserIds, usersHash);
+            });
+        } else {
+          return newMention(troupeId, chat.id, mentionMemberUserIds, usersHash);
+        }
+      });
+
 
     });
 
