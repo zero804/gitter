@@ -262,17 +262,6 @@ define([
 
     appEvents.trigger('realtime.testConnection');
 
-    // var r = Date.now() % 100000;
-    // var subscription = client.subscribe('/api/v1/ping/' + r, function() {});
-    // subscription.then(function() {
-    //   log('Server ping succeeded');
-    //   subscription.cancel();
-    // }, function(error) {
-    //   log('Unable to ping server', error);
-    //   subscription.cancel();
-    //   // We could reinstate the persistant outage concept on this
-    // });
-
     client.publish('/api/v1/ping2', { })
       .then(function() {
         log('Server ping succeeded');
