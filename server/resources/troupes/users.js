@@ -1,12 +1,12 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var recentRoomService = require('../../services/recent-room-service');
-var troupeService     = require("../../services/troupe-service");
-var userService       = require("../../services/user-service");
-var restSerializer    = require("../../serializers/rest-serializer");
-var _                 = require("underscore");
-var Q                 = require("q");
+var recentRoomService  = require('../../services/recent-room-service');
+var troupeService      = require("../../services/troupe-service");
+var userService        = require("../../services/user-service");
+var restSerializer     = require("../../serializers/rest-serializer");
+var _                  = require("underscore");
+var Q                  = require("q");
 
 module.exports = {
   id: 'resourceTroupeUser',
@@ -33,7 +33,7 @@ module.exports = {
     var troupeId = req.troupe._id;
     var userId = user.id;
     Q.all([
-        recentRoomService.updateFavourite(userId, troupeId, false),
+        recentRoomService.removeRecentRoomForUser(userId, req.troupe),
         troupeService.removeUserFromTroupe(troupeId, userId)
       ])
       .then(function() {
