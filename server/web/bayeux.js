@@ -439,15 +439,23 @@ var pingResponder = {
 
     var clientId = message.clientId;
 
-    presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
-      if(err) return deny(err);
-
-      if(!userId) {
-        return deny("Client not authenticated. Denying ping. ", { clientId: clientId });
+    server._server._engine.clientExists(clientId, function(exists) {
+      if(!exists) {
+        return deny("Client does not exist", { clientId: clientId });
       }
 
-      return callback(message);
+      presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
+        if(err) return deny(err);
+
+        if(!userId) {
+          return deny("Client not authenticated. Denying ping. ", { clientId: clientId });
+        }
+
+        return callback(message);
+      });
+
     });
+
 
   }
 };
