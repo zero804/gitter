@@ -251,6 +251,8 @@ define([
     /* Only test the connection if one has already been established */
     if(!client) return;
 
+    appEvents.trigger('realtime.testConnection');
+
     client.publish('/api/v1/ping', { })
       .then(function() {
         log('Server ping succeeded');
