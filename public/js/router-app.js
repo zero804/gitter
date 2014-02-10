@@ -6,12 +6,13 @@ require([
   'views/toolbar/troupeMenu',
   'collections/instances/troupes',
   'components/titlebar',
+  'components/realtime',
   'views/widgets/preload', // No ref
   'components/webNotifications', // No ref
   'components/desktopNotifications', // No ref
   'components/errorReporter',  // No ref
   'template/helpers/all', // No ref
-], function(appEvents, context, AppIntegratedView, TroupeMenuView, troupeCollections, TitlebarUpdater) {
+], function(appEvents, context, AppIntegratedView, TroupeMenuView, troupeCollections, TitlebarUpdater, realtime) {
   "use strict";
 
   var appView = new AppIntegratedView({ });
@@ -76,6 +77,9 @@ require([
         break;
       case 'navigation':
         appEvents.trigger('navigation', message.url, message.urlType, message.title);
+        break;
+      case 'realtime.testConnection':
+        realtime.testConnection();
         break;
     }
   });
