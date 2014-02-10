@@ -34,7 +34,7 @@ var routes = [
     populator: populateUserUnreadItemsCollection },
   { re: /^\/api\/v1\/user\/(\w+)$/,
     validator: validateUserForUserSubscription },
-  { re: /^\/api\/v1\/ping$/,
+  { re: /^\/api\/v1\/ping(\/\w+)?$/,
     validator: validateUserForPingSubscription }
 ];
 
