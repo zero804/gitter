@@ -34,7 +34,7 @@ define([
   Rate.prototype.event = function() {
     this.counter++;
 
-    var d = Math.floor(Date.now() / 30000);
+    var d = Math.floor(Date.now() / 10000);
     if(this.hash[d]) {
       this.hash[d]++;
     } else {
@@ -68,8 +68,7 @@ define([
     var counter;
     if(message.channel == '/meta/handshake') {
       counter = this.hRate;
-    }
-    if(message.channel == '/meta/connect') {
+    } else if(message.channel == '/meta/connect') {
       counter = this.cRate;
     }
 
@@ -79,7 +78,7 @@ define([
         /* Don't bother if the value is zero */
         if(!message.ext) message.ext = {};
         message.ext.rate = rate;
-        log('Rate of ' + message.channel  + ' is ' + rate + ' per 30s');
+        log('Rate of ' + message.channel  + ' is ' + rate + ' per 10s');
       }
     }
 
@@ -131,14 +130,6 @@ define([
           $(document).trigger('realtime:newConnectionEstablished');
         }
       }
-    } else if(message.channel == '/meta/subscribe') {
-      if(message.error && message.error.indexOf('403::') === 0) {
-        // More needs to be done here!
-        log('Access denied', message);
-        //window.alert('Realtime communications with the server have been disconnected. Click OK to reload.');
-        window.location.href = "/";
-        //window.location = '/home';
-      }
     }
 
     callback(message);
@@ -176,13 +167,21 @@ define([
   var AccessTokenFailureExtension = function() {
   };
 
+  var terminating = false;
+
   AccessTokenFailureExtension.prototype.incoming = function(message, callback) {
-    if(message.channel == '/meta/handshake' && !message.successful && message.error) {
-      var error = message.error.split('::')[0];
-      if(error === '403') {
-        log('Access denied. Will not retry');
-        //window.location.reload();
-        window.location.href = "/";
+    if(message.error && message.advice && message.advice.reconnect === 'none') {
+      // advice.reconnect == 'none': the server has effectively told us to go away for good
+      if(!terminating) {
+        terminating = true;
+        // More needs to be done here!
+        log('Access denied', message);
+        window.setTimeout(function() {
+          terminating = false;
+          window.alert('Realtime communications with the server have been disconnected. Click OK to reload.');
+          window.parent.location.href = "/" + context.user().get('username');
+        }, 10000);
+
       }
     }
 
@@ -252,8 +251,12 @@ define([
     /* Only test the connection if one has already been established */
     if(!client) return;
 
-    client.publish('/api/v1/ping', { })
-      .then(function() {}, function(error) {
+    appEvents.trigger('realtime.testConnection');
+
+    client.publish('/api/v1/ping2', { })
+      .then(function() {
+        log('Server ping succeeded');
+      }, function(error) {
         log('Unable to ping server', error);
         // We could reinstate the persistant outage concept on this
       });
