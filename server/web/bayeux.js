@@ -33,7 +33,9 @@ var routes = [
     validator: validateUserForUserSubscription,
     populator: populateUserUnreadItemsCollection },
   { re: /^\/api\/v1\/user\/(\w+)$/,
-    validator: validateUserForUserSubscription }
+    validator: validateUserForUserSubscription },
+  { re: /^\/api\/v1\/ping$/,
+    validator: validateUserForPingSubscription }
 ];
 
 var superClientPassword = nconf.get('ws:superClientPassword');
@@ -62,6 +64,12 @@ function validateUserForSubTroupeSubscription(options, callback) {
       return result;
     })
     .nodeify(callback);
+}
+
+// This is only used by the native client. The web client publishes to
+// the url
+function validateUserForPingSubscription(options, callback) {
+  return callback(null, true);
 }
 
 // This strategy ensures that a user can access a URL under a /user/ URL
@@ -405,7 +413,7 @@ var pushOnlyServer = {
     }
 
     // Only ping if data is {}
-    if (message.channel == '/api/v1/ping' && Object.keys(message.data).length === 0) {
+    if (message.channel == '/api/v1/ping2' && Object.keys(message.data).length === 0) {
       return callback(message);
     }
 
@@ -426,7 +434,7 @@ var pushOnlyServer = {
 var pingResponder = {
   incoming: function(message, callback) {
     // Only ping if data is {}
-    if (message.channel != '/api/v1/ping') {
+    if (message.channel != '/api/v1/ping2') {
       return callback(message);
     }
 

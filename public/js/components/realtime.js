@@ -253,7 +253,7 @@ define([
 
     appEvents.trigger('realtime.testConnection');
 
-    client.publish('/api/v1/ping', { })
+    client.publish('/api/v1/ping2', { })
       .then(function() {
         log('Server ping succeeded');
       }, function(error) {
