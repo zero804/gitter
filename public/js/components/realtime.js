@@ -131,14 +131,6 @@ define([
           $(document).trigger('realtime:newConnectionEstablished');
         }
       }
-    } else if(message.channel == '/meta/subscribe') {
-      if(message.error && message.error.indexOf('403::') === 0) {
-        // More needs to be done here!
-        log('Access denied', message);
-        //window.alert('Realtime communications with the server have been disconnected. Click OK to reload.');
-        window.location.href = "/";
-        //window.location = '/home';
-      }
     }
 
     callback(message);
@@ -176,13 +168,25 @@ define([
   var AccessTokenFailureExtension = function() {
   };
 
+  var terminating = false;
+
   AccessTokenFailureExtension.prototype.incoming = function(message, callback) {
-    if(message.channel == '/meta/handshake' && !message.successful && message.error) {
-      var error = message.error.split('::')[0];
-      if(error === '403') {
-        log('Access denied. Will not retry');
-        //window.location.reload();
-        window.location.href = "/";
+    if(message.channel == '/meta/handshake' || message.channel == '/meta/subscribe') {
+      if(message.error && message.error.indexOf('403::') === 0) {
+
+        client.disconnect();
+
+        if(!terminating) {
+          terminating = true;
+          // More needs to be done here!
+          log('Access denied', message);
+          window.setTimeout(function() {
+            terminating = false;
+            window.alert('Realtime communications with the server have been disconnected. Click OK to reload.');
+            window.parent.location.href = "/" + context.user().get('username');
+          }, 10000);
+
+        }
       }
     }
 
