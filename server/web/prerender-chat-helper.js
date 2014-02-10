@@ -57,6 +57,7 @@ var webhookTemplates = ['bitbucket', 'generic', 'github', 'jenkins', 'sprintly',
 module.exports = exports = function(model) {
 
   var displayName;
+  var username;
 
   //data.readByText = this.getReadByText(data.readBy);
   //
@@ -86,6 +87,7 @@ module.exports = exports = function(model) {
 
   var m = _.extend({}, model, {
     displayName: displayName = model.fromUser && model.fromUser.displayName,
+    username: username = model.fromUser && model.fromUser.username,
     text: text,
     html: html,
     webhookClass: webhookClass
