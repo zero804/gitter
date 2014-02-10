@@ -27,18 +27,22 @@ require([
     }
   }
 
+  var titlebarUpdater = new TitlebarUpdater();
+
   var allRoomsCollection = troupeCollections.troupes;
   allRoomsCollection.on("remove", function(model) {
     if(model.id == context.getTroupeId()) {
       var username = context.user().get('username');
       var newLocation = '/' + username;
       var newFrame = newLocation + '/-/home';
-      window.history.pushState(newFrame, "", newLocation);
+      var title = '';
+
+      titlebarUpdater.setRoomName(title);
+
+      window.history.pushState(newFrame, title, newLocation);
       updateContent(newFrame);
     }
   });
-
-  var titlebarUpdater = new TitlebarUpdater();
 
   appEvents.on('navigation', function(url, type, title) {
     // This is a bit hacky..
