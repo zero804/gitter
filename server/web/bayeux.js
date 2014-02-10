@@ -33,9 +33,7 @@ var routes = [
     validator: validateUserForUserSubscription,
     populator: populateUserUnreadItemsCollection },
   { re: /^\/api\/v1\/user\/(\w+)$/,
-    validator: validateUserForUserSubscription },
-  { re: /^\/api\/v1\/ping$/,
-    validator: validateUserForPingSubscription }
+    validator: validateUserForUserSubscription }
 ];
 
 var superClientPassword = nconf.get('ws:superClientPassword');
@@ -64,11 +62,6 @@ function validateUserForSubTroupeSubscription(options, callback) {
       return result;
     })
     .nodeify(callback);
-}
-
-// This strategy ensures that a user can access a URL under a /user/ URL
-function validateUserForPingSubscription(options, callback) {
-  return callback(null, true);
 }
 
 // This strategy ensures that a user can access a URL under a /user/ URL
@@ -405,19 +398,14 @@ var authorisor = {
   }
 };
 
-var subscriptionTimestamp = {
-  outgoing: function(message, callback) {
-    if (message.channel === '/meta/subscribe') {
-      message.timestamp = new Date().toISOString();
-    }
-
-    callback(message);
-  }
-};
-
 var pushOnlyServer = {
   incoming: function(message, callback) {
     if (message.channel.match(/^\/meta\//)) {
+      return callback(message);
+    }
+
+    // Only ping if data is {}
+    if (message.channel == '/api/v1/ping' && Object.keys(message.data).length === 0) {
       return callback(message);
     }
 
@@ -432,6 +420,35 @@ var pushOnlyServer = {
   outgoing: function(message, callback) {
     if (message.ext) delete message.ext.password;
     callback(message);
+  }
+};
+
+var pingResponder = {
+  incoming: function(message, callback) {
+    // Only ping if data is {}
+    if (message.channel != '/api/v1/ping') {
+      return callback(message);
+    }
+
+    function deny(err) {
+      message.error = '403::Access denied';
+
+      winston.error('Denying ping access' + err);
+      callback(message);
+    }
+
+    var clientId = message.clientId;
+
+    presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
+      if(err) return deny(err);
+
+      if(!userId) {
+        return deny("Client not authenticated. Denying ping. ", { clientId: clientId });
+      }
+
+      return callback(message);
+    });
+
   }
 };
 
@@ -468,7 +485,9 @@ var logging = {
       case '/meta/connect':
         /* Rate is for the last full 30second period */
         var connectRate = message.ext && message.ext.rate;
-        winston.verbose("bayeux: connect" , { ip: getClientIp(req), clientId: message.clientId, rate: connectRate });
+        if(connectRate && connectRate > 1) {
+          winston.verbose("bayeux: connect" , { ip: getClientIp(req), clientId: message.clientId, rate: connectRate });
+        }
         break;
 
       case '/meta/subscribe':
@@ -495,7 +514,13 @@ var adviseAdjuster = {
       if(!message.advice) {
         message.advice = {};
       }
-      message.advice.reconnect = 'none';
+
+      if(message.channel == '/meta/handshake') {
+        // If we're unable to handshake, the situation is dire
+        message.advice.reconnect = 'none';
+      } else {
+        message.advice.reconnect = 'handshake';
+      }
     }
 
     callback(message);
@@ -533,7 +558,7 @@ module.exports = {
     server.addExtension(authenticator);
     server.addExtension(authorisor);
     server.addExtension(pushOnlyServer);
-    server.addExtension(subscriptionTimestamp);
+    server.addExtension(pingResponder);
     server.addExtension(adviseAdjuster);
 
 
