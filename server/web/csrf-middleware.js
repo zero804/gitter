@@ -45,8 +45,8 @@ module.exports = function(req, res, next){
 };
 
 function hasBearerTokenHeader(req) {
-  var authHeader = req.headers['Authorization'] || '';
-  return (authHeader.split(' ')[0] === 'Bearer');
+  var authHeader = req.headers.authorization;
+  return authHeader && authHeader.split(' ')[0] === 'Bearer';
 }
 
 function isInWhitelist(req) {
