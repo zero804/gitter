@@ -28,20 +28,20 @@ define([
         socketId: realtime.getClientId(),
         on: value
       },
+      headers: {
+        'x-access-token': context().accessToken
+      },
       async: !synchronous,
       global: false,
       type: "POST",
-      success: function(/*data*/) {
-      },
-      statusCode: {
-        400: function() {
+      error: function(xhr) {
+        if(xhr.status !== 400) {
+          log('An error occurred while communicating eyeballs');
+        } else {
           // The connection is gone...
           log('Eyeballs returned 400. Realtime connection may be dead.');
           realtime.testConnection();
         }
-      },
-      error: function() {
-        log('An error occurred while communicating eyeballs');
       }
     });
   }
