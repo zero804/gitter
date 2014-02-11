@@ -207,6 +207,32 @@ function validateTroupeUrisForUser(userId, uris, callback) {
 }
 
 /**
+ * Add the specified user to the troupe,
+ * @param {[type]} userId
+ * @param {[type]} troupeId
+ * returns a promise with the troupe
+ */
+function addUserIdToTroupe(userId, troupeId) {
+  assert(mongoUtils.isLikeObjectId(userId));
+  assert(mongoUtils.isLikeObjectId(troupeId));
+
+  return findByIdRequired(troupeId)
+      .then(function(troupe) {
+        if(troupe.status != 'ACTIVE') throw { troupeNoLongerActive: true };
+
+        if(troupe.containsUserId(userId)) {
+          return troupe;
+        }
+
+        appEvents.richMessage({eventName: 'userJoined', troupe: troupe, userId: userId, user: user});
+
+        troupe.addUserById(userId);
+        return troupe.saveQ()
+            .then(function() { return troupe; });
+      });
+}
+
+/**
  * Returns the URL a particular user would see if they wish to view a URL.
  * NB: this call has to query the db to get a user's username. Don't call it
  * inside a loop!

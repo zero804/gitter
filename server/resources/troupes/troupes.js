@@ -18,7 +18,7 @@ module.exports = {
   },
 
   show: function(req, res, next) {
-    var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true });
+    var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true, includeRolesForTroupe: req.troupe });
 
     restSerializer.serialize(req.troupe, strategy, function(err, serialized) {
       if(err) return next(err);
@@ -40,7 +40,7 @@ module.exports = {
     if(updatedTroupe.autoConfigureHooks) {
       promises.push(roomService.applyAutoHooksForRepoRoom(req.user, troupe));
     }
-
+  
     if(updatedTroupe.hasOwnProperty('topic')) {
       promises.push(troupeService.updateTopic(req.user, troupe, updatedTroupe.topic));
     }
