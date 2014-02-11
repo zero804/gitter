@@ -2,6 +2,7 @@
 "use strict";
 
 var troupeService = require("../../services/troupe-service");
+var restful = require("../../services/restful");
 var restSerializer = require("../../serializers/rest-serializer");
 var recentRoomService = require('../../services/recent-room-service');
 var Q = require('q');
@@ -14,17 +15,11 @@ module.exports = {
       return res.send(403);
     }
 
-    troupeService.findAllTroupesForUser(req.resourceUser.id, function(err, troupes) {
-      if (err) return next(err);
-
-      var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id });
-
-      restSerializer.serialize(troupes, strategy, function(err, serialized) {
-        if(err) return next(err);
-
+    restful.serializeTroupesForUser(req.resourceUser.id)
+      .then(function(serialized) {
         res.send(serialized);
-      });
-    });
+      })
+      .fail(next);
   },
 
   show: function(req, res, next) {
@@ -78,11 +73,15 @@ module.exports = {
 
   load: function(req, id, callback) {
     troupeService.findById(id, function(err, troupe) {
-      if(err) return callback(500);
-      if(!troupe) return callback(404);
+      if(err) return callback(err);
 
+      if(!troupe) return callback();
+
+      /* Some strangeness here as the user may be mentioned */
       if(!troupeService.userHasAccessToTroupe(req.resourceUser, troupe)) {
-        return callback(403);
+        if(req.method !== 'DELETE') {
+          return callback(403);
+        }
       }
 
       return callback(null, troupe);

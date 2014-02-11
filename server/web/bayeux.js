@@ -506,14 +506,14 @@ var logging = {
   incoming: function(message, req, callback) {
     switch(message.channel) {
       case '/meta/handshake':
-        /* Rate is for the last full 30second period */
+        /* Rate is for the last full 10s period */
         var connType = message.ext && message.ext.connType;
         var handshakeRate = message.ext && message.ext.rate;
         winston.verbose("bayeux: " + message.channel , { ip: getClientIp(req), connType: connType, rate: handshakeRate });
         break;
 
       case '/meta/connect':
-        /* Rate is for the last full 30second period */
+        /* Rate is for the last full 10s period */
         var connectRate = message.ext && message.ext.rate;
         if(connectRate && connectRate > 1) {
           winston.verbose("bayeux: connect" , { ip: getClientIp(req), clientId: message.clientId, rate: connectRate });

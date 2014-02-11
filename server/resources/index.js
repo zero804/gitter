@@ -24,22 +24,13 @@ module.exports = {
     }
 
     installTroupeSubResource('issues', 'issues');
-    installTroupeSubResource('requests', 'requests');
     installTroupeSubResource('users', 'users');
-    installTroupeSubResource('files', 'files');
-    installTroupeSubResource('downloads', 'downloads');
-    installTroupeSubResource('embedded', 'embedded');
-    installTroupeSubResource('thumbnails', 'thumbnails');
-
 
     var chatResource = installTroupeSubResource('chatMessages', 'chat-messages');
     var chatReadBy = new Resource('readBy', require('./troupes/chat-read-by'), app);
     chatResource.add(chatReadBy);
 
     var eventsResource = installTroupeSubResource('events', 'events');
-
-
-    installTroupeSubResource('unreadItems', 'unread-items');
 
     var userResource = app.resource('api/v1/user',  require('./user/user.js'));
     function installUserSubResource(resourceName, moduleName) {
@@ -51,6 +42,9 @@ module.exports = {
     var userTroupeResource = installUserSubResource('troupes', 'troupes');
     var userSettings = new Resource('settings', require('./user/troupe-settings'), app);
     userTroupeResource.add(userSettings);
+
+    var unreadItems = new Resource('unreadItems', require('./user/unread-items'), app);
+    userTroupeResource.add(unreadItems);
 
     installUserSubResource('orgs',        'orgs');
     installUserSubResource('repos',       'repos');
