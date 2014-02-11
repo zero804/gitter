@@ -21,7 +21,7 @@ require([
 
   'views/chat/decorators/webhookDecorator',
   'views/chat/decorators/issueDecorator',
-  'views/chat/decorators/mentionDecorator',
+  // 'views/chat/decorators/mentionDecorator',
   'views/chat/decorators/embedDecorator',
   'views/chat/decorators/emojiDecorator',
   'views/app/unreadBannerView',
@@ -37,7 +37,7 @@ require([
 ], function($, Backbone, context, liveContext, appEvents, peopleCollectionView, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, RightToolbarView,
     PersonDetailView, inviteView, troupeSettingsView, markdownView, IntegrationSettingsModal,
-    Router, unreadItemsClient, webhookDecorator, issueDecorator, mentionDecorator,
+    Router, unreadItemsClient, webhookDecorator, issueDecorator, /*mentionDecorator,*/
     embedDecorator, emojiDecorator, UnreadBannerView, HeaderView) {
   "use strict";
 
@@ -70,7 +70,7 @@ require([
     el: $('#content-frame'),
     collection: itemCollections.chats,
     userCollection: itemCollections.users,
-    decorators: [webhookDecorator, issueDecorator, mentionDecorator, embedDecorator, emojiDecorator]
+    decorators: [webhookDecorator, issueDecorator, /*mentionDecorator,*/ embedDecorator, emojiDecorator]
   }).render();
 
   var unreadChatsModel = unreadItemsClient.acrossTheFold();
