@@ -15,6 +15,10 @@ require([
 ], function(appEvents, context, AppIntegratedView, TroupeMenuView, troupeCollections, TitlebarUpdater, realtime) {
   "use strict";
 
+  if(window.location.hash) {
+    document.getElementById('content-frame').contentWindow.location.hash = window.location.hash;
+  }
+
   var appView = new AppIntegratedView({ });
 
   appView.leftMenuRegion.show(new TroupeMenuView({ }));
