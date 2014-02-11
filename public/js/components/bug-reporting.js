@@ -1,16 +1,19 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'squash',
+  'raven',
   'utils/context'
-], function(squash, context) {
+], function(Raven, context) {
   "use strict";
 
   if(context.env('env') != 'dev') {
-    squash.configure({
-      APIHost: 'https://bugreports.gitter.im',
-      APIKey: '1e69adb3-a471-45e2-b09a-ca2ee9d158e6',
-      environment: context.env('env'),
-      revision: context.env('revision')
+    Raven.config('***REMOVED***', {
+        // # we highly recommend restricting exceptions to a domain in order to filter out clutter
+        // whitelistUrls: ['example.com/scripts/']
+    }).install();
+
+    var user = context.user();
+    Raven.setUser({
+      username: user && user.get('username')
     });
   }
 
