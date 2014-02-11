@@ -27,13 +27,13 @@ require([
   'views/app/unreadBannerView',
   'views/app/headerView',
 
-  'views/widgets/preload', // No ref
-  'components/errorReporter',  // No ref
-  'filtered-collection', // No ref
-  'components/dozy', // Sleep detection No ref
-  'template/helpers/all', // No ref
-  'components/eyeballs', // No ref
-  'bootstrap-dropdown' // No ref
+  'views/widgets/preload',      // No ref
+  'filtered-collection',        // No ref
+  'components/dozy',            // Sleep detection No ref
+  'template/helpers/all',       // No ref
+  'components/eyeballs',        // No ref
+  'bootstrap-dropdown',         // No ref
+  'components/bug-reporting'    // No ref
 ], function($, Backbone, context, liveContext, appEvents, peopleCollectionView, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, RightToolbarView,
     PersonDetailView, inviteView, troupeSettingsView, markdownView, IntegrationSettingsModal,
