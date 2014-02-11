@@ -10,7 +10,7 @@ module.exports = {
     ];
 
     // Secure the REST API
-    ['/troupes', '/user'].forEach(function(path) {
+    ['/api/v1/troupes', '/api/v1/user'].forEach(function(path) {
         app.all(path, auth);
         app.all(path + '/*', auth);
     });
