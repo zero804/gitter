@@ -29,6 +29,13 @@ define([
     serializeData: function() {
       var data = this.model.toJSON();
       data.createRoom = createRoom;
+      if(data.name.length > 25) {
+        var repo = data.name.split('/')[1];
+        if(repo) {
+          data.title = data.name;
+          data.name = repo;
+        }
+      }
       return data;
     },
     onItemClose: function(e) {
