@@ -33,19 +33,14 @@ require([
   'template/helpers/all',       // No ref
   'components/eyeballs',        // No ref
   'bootstrap-dropdown',         // No ref
-  'components/bug-reporting'    // No ref
+  'components/bug-reporting',   // No ref
+  'components/csrf'             // No ref
 ], function($, Backbone, context, liveContext, appEvents, peopleCollectionView, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, RightToolbarView,
     PersonDetailView, inviteView, troupeSettingsView, markdownView, IntegrationSettingsModal,
     Router, unreadItemsClient, webhookDecorator, issueDecorator, /*mentionDecorator,*/
     embedDecorator, emojiDecorator, UnreadBannerView, HeaderView) {
   "use strict";
-
-  $.ajaxSetup({
-    headers: {
-      'x-access-token': context().accessToken
-    }
-  });
 
   // Make drop down menus drop down
   $(document).on("click", ".trpButtonDropdown .trpButtonMenu", function(/*event*/) {

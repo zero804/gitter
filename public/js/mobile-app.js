@@ -11,7 +11,8 @@ require([
   'backbone',
   'views/toolbar/troupeMenu',
   'views/app/mobileAppView',
-  'views/chat/decorators/emojiDecorator'
+  'views/chat/decorators/emojiDecorator',
+  'components/csrf'                             // No ref
   ], function($, appEvents, chatModels, ChatCollectionView, chatInputView, Router,
     modalRegion, unreadItemsClient, Backbone, TroupeMenu, MobileAppView, emojiDecorator) {
   "use strict";
