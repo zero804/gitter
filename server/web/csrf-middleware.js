@@ -22,6 +22,7 @@ module.exports = function(req, res, next){
 
     var clientToken = getClientToken(req);
     if(!clientToken || clientToken !== req.session.accessToken) {
+      winston.error('csrf check failed for '+req.method+' '+req.path+' - request did not have a matching body, query or header token');
       return next(403);
     } else {
       return next();
