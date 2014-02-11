@@ -41,6 +41,12 @@ require([
     embedDecorator, emojiDecorator, UnreadBannerView, HeaderView) {
   "use strict";
 
+  $.ajaxSetup({
+    headers: {
+      'x-access-token': context().accessToken
+    }
+  });
+
   // Make drop down menus drop down
   $(document).on("click", ".trpButtonDropdown .trpButtonMenu", function(/*event*/) {
     $(this).parent().next().toggle();
