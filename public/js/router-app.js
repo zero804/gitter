@@ -11,7 +11,8 @@ require([
   'components/webNotifications',      // No ref
   'components/desktopNotifications',  // No ref
   'template/helpers/all',             // No ref
-  'components/bug-reporting'          // No ref
+  'components/bug-reporting',         // No ref
+  'components/csrf'                   // No ref
 ], function(appEvents, context, AppIntegratedView, TroupeMenuView, troupeCollections, TitlebarUpdater, realtime) {
   "use strict";
 

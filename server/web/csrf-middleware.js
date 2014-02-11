@@ -1,45 +1,48 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 'use strict';
 
-var Q = require('q');
 var winston = require('winston');
 var oauthService = require('../services/oauth-service');
 
 module.exports = function(req, res, next){
 
-  addTokenToSession(req).then(function() {
+  // ignore these methods, they shouldnt alter state
+  if('GET' == req.method || 'HEAD' == req.method || 'OPTIONS' == req.method) return next();
 
-    // ignore these methods, they shouldnt alter state
-    if('GET' == req.method || 'HEAD' == req.method || 'OPTIONS' == req.method) return next();
+  // oath strategy has already authenticated these with the bearer token
+  if(hasBearerTokenHeader(req)) return next();
 
-    // oath strategy has already authenticated these with the bearer token
-    if(hasBearerTokenHeader(req)) return next();
+  if(isInWhitelist(req)) {
+    winston.verbose('skipping csrf check for ' + req.path);
+    return next();
+  }
 
-    if(isInWhitelist(req)) {
-      winston.warn('skipping csrf check for '+req.path);
-      return next();
-    }
+  var clientToken = getClientToken(req);
+  if(!clientToken) {
+    winston.warn('csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they presented no token');
+    return next(403);
+  }
 
-    var clientToken = getClientToken(req);
-    if(!clientToken || clientToken !== req.session.accessToken) {
-      return next(403);
-    } else {
-      return next();
-    }
+  if(req.session.accessToken && req.session.accessToken !== clientToken) {
+    winston.warn('csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they presented an illegal token');
+    return next(403);
+  }
 
-  }).fail(next);
+  if(!req.user) {
+    winston.warn('csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they are not logged in');
+    return next(403);
+  }
+
+  return oauthService.findOrGenerateWebToken(req.user.id)
+    .then(function(serverToken) {
+      req.session.accessToken = serverToken;
+
+      if(clientToken !== serverToken) {
+        winston.warn('csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they presented an illegal token');
+        throw 403;
+      }
+    }).nodeify(next);
 };
-
-function addTokenToSession(req) {
-  return Q.fcall(function() {
-    if(!req.session.accessToken && !!req.user) {
-      return oauthService.findOrGenerateWebToken(req.user.id)
-        .then(function(serverToken) {
-          req.session.accessToken = serverToken;
-        });
-    }
-  });
-}
 
 function hasBearerTokenHeader(req) {
   var authHeader = req.headers['Authorization'] || '';
