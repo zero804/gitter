@@ -8,7 +8,6 @@ exports.installLocalEventListeners = function() {
     require('../web/bayeux-events-bridge').install();
     require('../services/notifications/notification-generator-service').install();
     require('../services/unread-item-service').install();
-    require('../services/rich-message-generator').install();
 
     require('../services/contact-signup-notifier').install();
 

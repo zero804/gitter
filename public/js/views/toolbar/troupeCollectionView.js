@@ -20,7 +20,7 @@ define([
     tagName: 'li',
     template: troupeListItemTemplate,
     modelEvents: {
-      'change:unreadItems change:lurk change:activity': 'render'
+      'change:unreadItems change:lurk change:activity change:mentions': 'render'
     },
     events: {
       'click':              'clicked',
@@ -42,7 +42,13 @@ define([
       //may not need this e.preventDefault stuff, had this because of the old <A HREF>
       e.preventDefault();
       e.stopPropagation();
-      this.model.destroy();
+
+      $.ajax({
+        url: "/api/v1/user/" + context.getUserId() + "/troupes/" + this.model.id,
+        data: "",
+        type: "DELETE",
+      });
+
     },
 
     onRender: function() {
@@ -59,61 +65,55 @@ define([
 
       var unreadBadge = e.find('.item-unread-badge');
       var lurk = self.model.get('lurk');
+      var mentions = self.model.get('mentions');
+      var ui = self.model.get('unreadItems');
+      var redisplayBadge = false;
+      var f = self.model.get('favourite');
+      var activity = self.model.get('activity');
 
-      if(first || 'lurk' in m.changed) {
-        if(lurk) {
-          unreadBadge.removeClass('shown');
-        } else {
-          e.removeClass('chatting chatting-now');
-        }
-      }
+      e.toggleClass('item-fav', !!f);
 
-      if(first || 'activity' in m.changed) {
-        var activity = self.model.get('activity');
+      function getBadgeText() {
+        if(mentions) return "@";
 
-        if(lurk && activity) {
-          e.addClass('chatting chatting-now');
+        if(lurk) return;
 
-          if(self.timeout) {
-            clearTimeout(self.timeout);
-          }
-
-          self.timeout = setTimeout(function() {
-            delete self.timeout;
-            if(self.model.id === context.getTroupeId()) {
-              e.removeClass('chatting chatting-now');
-            } else {
-              e.removeClass('chatting-now');
-            }
-
-          }, 1600);
-        } else {
-          e.removeClass('chatting chatting-now');
-        }
-      }
-
-
-
-      if(first || 'unreadItems' in m.changed) {
-        var ui = self.model.get('unreadItems');
         if(ui) {
-          if(ui > MAX_UNREAD) {
-            ui = "99+";
-          }
-          unreadBadge.find('span').text(ui);
-          unreadBadge.addClass('shown');
-        } else {
-          unreadBadge.removeClass('shown');
+          if(ui > MAX_UNREAD) return "99+";
+          return ui;
         }
       }
 
-      if(first || 'favourite' in m.changed) {
-        var f = self.model.get('favourite');
-        if(f) {
-          e.addClass('item-fav');
-        } else {
-          e.removeClass('item-fav');
+
+      var text = getBadgeText() || "";
+      unreadBadge.find('span').text(text);
+      unreadBadge.toggleClass('shown', !!text);
+      unreadBadge.toggleClass('mention', !!mentions);
+
+      if(lurk && !mentions) {
+        e.toggleClass('chatting', !!activity);
+
+        if(activity && 'activity' in m.changed) {
+          e.addClass('chatting-now');
         }
+
+        if(self.timeout) {
+          clearTimeout(self.timeout);
+        }
+
+        self.timeout = setTimeout(function() {
+          delete self.timeout;
+          if(self.model.id === context.getTroupeId()) {
+            e.removeClass('chatting chatting-now');
+          } else {
+            e.removeClass('chatting-now');
+          }
+
+        }, 1600);
+
+      } else {
+        // Not lurking
+        e.removeClass('chatting chatting-now');
       }
     },
     clearSearch: function() {

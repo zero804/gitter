@@ -103,7 +103,7 @@
     "istanbul": "~0.1.46",
     "mocha-istanbul": "0.2.0",
     "jsmockito": "~1.0.4",
-    "mocha": "~1.14.0",
+    "mocha": "~1.17.1",
     "mocha-phantomjs": "~3.1.6",
     "restler": "~2.0.1",
     "grunt-bower-require-wrapper": "~0.1.0",

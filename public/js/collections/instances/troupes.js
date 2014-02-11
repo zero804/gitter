@@ -20,6 +20,7 @@ define([
   orgsCollection.fetch();
 
   var troupeCollection = new troupeModels.TroupeCollection(null, { listen: true });
+
   unreadItemsClient.installTroupeListener(troupeCollection);
 
   /* Utils for comparators, perhaps this should go somewhere useful? */
@@ -77,7 +78,7 @@ define([
 
   var recentRoomsNonFavourites = filterTroupeCollection(function(m) {
     /* Not a favourite, but has a lastAccessTime */
-    return !m.get('favourite') && (m.get('lastAccessTime') || m.get('unreadItems'));
+    return !m.get('favourite') && (m.get('lastAccessTime') || m.get('unreadItems') || m.get('mentions'));
   });
 
   /**
@@ -86,17 +87,32 @@ define([
    * followed by order of most recent access
    */
   recentRoomsNonFavourites.setSort(function(a, b) {
-    var c = existenceComparator(a.get('unreadItems'), b.get('unreadItems'));
+    var c = existenceComparator(a.get('mentions'), b.get('mentions'));
     if(c === 0) {
-      /** Both sides have unreadItems, compare by name */
+      /** Both sides have mentions, compare by name */
       return naturalComparator(a.get('name'), b.get('name'));
     } else if(c === null) {
-      /* Neither side has unreadItems, compare by lastAccessTime, descending */
-      var aLastAccessTime = a.get('lastAccessTime');
-      var bLastAccessTime = b.get('lastAccessTime');
+      /* Neither side has mentions, compare by lastAccessTime, descending */
 
-      return reverseNaturalComparator(aLastAccessTime && aLastAccessTime.valueOf(), bLastAccessTime && bLastAccessTime.valueOf());
-    } else return c;
+      c = existenceComparator(a.get('unreadItems'), b.get('unreadItems'));
+      if(c === 0) {
+        /** Both sides have unreadItems, compare by name */
+        return naturalComparator(a.get('name'), b.get('name'));
+      } else if(c === null) {
+        /* Neither side has unreadItems, compare by lastAccessTime, descending */
+        var aLastAccessTime = a.get('lastAccessTime');
+        var bLastAccessTime = b.get('lastAccessTime');
+
+        return reverseNaturalComparator(aLastAccessTime && aLastAccessTime.valueOf(), bLastAccessTime && bLastAccessTime.valueOf());
+      } else {
+        return c;
+      }
+
+    } else {
+      return c;
+    }
+
+
   });
 
   // Sync up with the context
