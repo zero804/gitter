@@ -5,6 +5,7 @@ var troupeService = require("../../services/troupe-service");
 var restful = require("../../services/restful");
 var restSerializer = require("../../serializers/rest-serializer");
 var recentRoomService = require('../../services/recent-room-service');
+var roomService = require('../../services/room-service');
 var Q = require('q');
 
 module.exports = {
@@ -40,7 +41,20 @@ module.exports = {
     var promises = [];
 
     if('favourite' in updatedTroupe) {
-      promises.push(recentRoomService.updateFavourite(userId, troupeId, updatedTroupe.favourite));
+      var fav = updatedTroupe.favourite;
+
+      if(!fav || troupeService.userHasAccessToTroupe(req.resourceUser, troupe)) {
+        promises.push(recentRoomService.updateFavourite(userId, troupeId, fav));
+      } else {
+        // The user has added a favourite that they don't belong to
+        // Add them to the room first
+        promises.push(
+          roomService.findOrCreateRoom(req.resourceUser, troupe.uri)
+            .then(function() {
+              return recentRoomService.updateFavourite(userId, troupeId, updatedTroupe.favourite);
+            })
+          );
+      }
     }
 
     if('lurk' in updatedTroupe) {
@@ -77,11 +91,11 @@ module.exports = {
 
       if(!troupe) return callback();
 
+      var nonMembersAllowed = req.method === 'DELETE' || req.method === 'POST';
+
       /* Some strangeness here as the user may be mentioned */
-      if(!troupeService.userHasAccessToTroupe(req.resourceUser, troupe)) {
-        if(req.method !== 'DELETE') {
-          return callback(403);
-        }
+      if(!nonMembersAllowed && troupeService.userHasAccessToTroupe(req.resourceUser, troupe)) {
+        return callback(403);
       }
 
       return callback(null, troupe);
