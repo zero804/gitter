@@ -37,6 +37,7 @@ function getIntegrations(req, res) {
     res.render('integrations', {
       hooks: hooks,
       troupe: req.troupe,
+      accessToken: req.session.accessToken
     });
   });
 }
