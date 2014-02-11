@@ -284,7 +284,7 @@ define(['tracekit'], function (TraceKit) {
 
     })();
 
-  }).call(this);
+  }).call(window);
 
-  return this.SquashJavascript.instance();
+  return window.SquashJavascript.instance();
 });
