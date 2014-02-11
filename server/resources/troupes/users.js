@@ -8,6 +8,9 @@ var restSerializer     = require("../../serializers/rest-serializer");
 var _                  = require("underscore");
 var Q                  = require("q");
 
+var redis = require('../../utils/redis');
+var redisClient = redis.createClient();
+
 module.exports = {
   id: 'resourceTroupeUser',
 
@@ -37,6 +40,10 @@ module.exports = {
         troupeService.removeUserFromTroupe(troupeId, userId)
       ])
       .then(function() {
+
+        var msg_data = {user: req.user, room: req.troupe};
+        redisClient.publish('user_left', JSON.stringify(msg_data));
+
         res.send({ success: true });
       })
       .fail(next);

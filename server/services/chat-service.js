@@ -9,6 +9,9 @@ var statsService  = require("./stats-service");
 var unsafeHtml    = require('../utils/unsafe-html');
 var processChat   = require('../utils/process-chat');
 
+var redis = require('../utils/redis');
+var redisClient = redis.createClient();
+
 /*
  * Hey Trouper!
  * Bump the version if you modify the behaviour of TwitterText.
@@ -49,6 +52,9 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   var mentionUserNames = parsedMessage.mentions.map(function(mention) {
     return mention.screenName;
   });
+
+  var _msg = {username: user.username, room: troupe.uri, text: text};
+  redisClient.publish('chat_messages', JSON.stringify(_msg));
 
   userService.findByUsernames(mentionUserNames, function(err, users) {
     if(err) return callback(err);
