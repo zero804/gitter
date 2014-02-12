@@ -11,7 +11,6 @@ module.exports =  function(req, res, next) {
     var valid = (err || !userId) ? false : true;
     if (valid) {
       userService.findById(userId).then(function(user) {
-        console.log(user);
         res.send({token: token, valid: valid, user: user});
       });
     } else {
