@@ -6,7 +6,7 @@ var restSerializer  = require("../../serializers/rest-serializer");
 
 module.exports =  function(req, res) {
 
-  var roomUri = req.query.room.toLowerCase();
+  var roomUri = req.query.room;
 
   roomService.findOrCreateRoom(req.user, roomUri).then(function(room) {
     if (!room.troupe) {
