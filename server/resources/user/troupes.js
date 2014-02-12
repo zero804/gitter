@@ -94,7 +94,7 @@ module.exports = {
       var nonMembersAllowed = req.method === 'DELETE' || req.method === 'POST';
 
       /* Some strangeness here as the user may be mentioned */
-      if(!nonMembersAllowed && troupeService.userHasAccessToTroupe(req.resourceUser, troupe)) {
+      if(!(nonMembersAllowed || troupeService.userHasAccessToTroupe(req.resourceUser, troupe))) {
         return callback(403);
       }
 
