@@ -5,9 +5,11 @@ var winston                      = require("winston");
 var nconf                        = require('../../utils/config');
 var permissionsModel             = require('../../services/permissions-model');
 var middleware                   = require('../../web/middleware');
+var oauthService                 = require('../../services/oauth-service');
 var request                      = require('request');
 var uriContextResolverMiddleware = require('./middleware').uriContextResolverMiddleware;
 var jwt                          = require('jwt-simple');
+var Q                            = require('q');
 
 var serviceDisplayNames = {
   github: 'GitHub',
@@ -31,13 +33,18 @@ function getIntegrations(req, res) {
       return;
     }
     winston.info('hook list received', { hooks: hooks });
+
     hooks.forEach(function(hook) {
       hook.serviceDisplayName = serviceDisplayNames[hook.service];
     });
-    res.render('integrations', {
-      hooks: hooks,
-      troupe: req.troupe,
-      accessToken: req.session.accessToken
+
+    var promise = req.session.accessToken ? Q.resolve(req.session.accessToken) : oauthService.findOrGenerateWebToken(req.user.id);
+    promise.then(function(accessToken) {
+      res.render('integrations', {
+        hooks: hooks,
+        troupe: req.troupe,
+        accessToken: accessToken
+      });
     });
   });
 }
