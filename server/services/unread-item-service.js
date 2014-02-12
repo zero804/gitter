@@ -204,7 +204,7 @@ function newItemForUsers(troupeId, itemType, itemId, userIds) {
         var flag                = result[i + 1];
         var badgeUpdate         = flag & 1;
         var upgradeKey          = flag & 2;
-        var userId              = userIds[i >> 2];
+        var userId              = userIds[i >> 1];
 
         if(troupeUnreadCount >= 0) {
           // Notify the user
