@@ -28,6 +28,9 @@ define([
         socketId: realtime.getClientId(),
         on: value
       },
+      headers: {
+        'x-access-token': context().accessToken
+      },
       async: !synchronous,
       global: false,
       type: "POST",

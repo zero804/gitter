@@ -3,7 +3,8 @@ require([
   'backbone',
   'utils/router',
   'views/app/appIntegratedView',
-  'views/userhome/userHomeView'
+  'views/userhome/userHomeView',
+  'components/csrf'                             // No ref
 ], function(Backbone, Router, AppIntegratedView, UserHomeView) {
 
   "use strict";

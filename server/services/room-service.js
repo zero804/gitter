@@ -1,19 +1,24 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var persistence = require('./persistence-service');
-var validateUri = require('./github/github-uri-validator');
-var uriLookupService = require("./uri-lookup-service");
-var assert = require("assert");
-var winston = require("winston");
-var ObjectID = require('mongodb').ObjectID;
-var Q = require('q');
-var permissionsModel = require('./permissions-model');
-var userService = require('./user-service');
-var troupeService = require('./troupe-service');
-var nconf = require('../utils/config');
-var request = require('request');
+var persistence        = require('./persistence-service');
+var validateUri        = require('./github/github-uri-validator');
+var uriLookupService   = require("./uri-lookup-service");
+var assert             = require("assert");
+var winston            = require("winston");
+var ObjectID           = require('mongodb').ObjectID;
+var Q                  = require('q');
+var permissionsModel   = require('./permissions-model');
+var userService        = require('./user-service');
+var troupeService      = require('./troupe-service');
+var nconf              = require('../utils/config');
+var request            = require('request');
 var GitHubRepoService  = require('./github/github-repo-service');
+var unreadItemService  = require('./unread-item-service');
+var _                  = require('underscore');
+
+var redis = require('../utils/redis');
+var redisClient = redis.createClient();
 
 function localUriLookup(uri) {
   return uriLookupService.lookupUri(uri)
@@ -188,6 +193,11 @@ function ensureAccessControl(user, troupe, access) {
       if(troupe.containsUserId(user.id)) return Q.resolve(troupe);
 
       troupe.addUserById(user.id);
+
+      // IRC
+      var msg_data = {user: user, room: troupe};
+      redisClient.publish('user_joined', JSON.stringify(msg_data));
+
       return troupe.saveQ().thenResolve(troupe);
 
     } else {
@@ -195,12 +205,30 @@ function ensureAccessControl(user, troupe, access) {
       if(!troupe.containsUserId(user.id)) return Q.resolve(null);
 
       troupe.removeUserById(user.id);
+
+      // IRC
+      var msg_data = {user: user, room: troupe};
+      redisClient.publish('user_left', JSON.stringify(msg_data));
+
       return troupe.saveQ().thenResolve(null);
     }
   }
 
   return Q.resolve(null);
 }
+
+
+function findAllRoomsIdsForUserIncludingMentions(userId, callback) {
+  return Q.all([
+      unreadItemService.getRoomIdsMentioningUser(userId),
+      troupeService.findAllTroupesIdsForUser(userId)
+    ])
+    .spread(function(mentions, memberships) {
+      return _.uniq(mentions.concat(memberships));
+    })
+    .nodeify(callback);
+}
+exports.findAllRoomsIdsForUserIncludingMentions = findAllRoomsIdsForUserIncludingMentions;
 
 /**
  * Add a user to a room.

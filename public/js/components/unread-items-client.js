@@ -87,9 +87,9 @@ define([
       this._recountLimited();
     },
 
-    _markItemRead: function(itemType, itemId) {
+    _markItemRead: function(itemType, itemId, mentioned) {
       this._unreadItemRemoved(itemType, itemId);
-      this.trigger('itemMarkedRead', itemType, itemId);
+      this.trigger('itemMarkedRead', itemType, itemId, mentioned);
     },
 
     _onItemRemoved: function() {
@@ -110,8 +110,6 @@ define([
       var newValue = this._count();
 
       if(this._currentCountValue !== newValue) {
-        // log('Emitting new count oldValue=', this._currentCountValue, ', newValue=', newValue);
-
         this._currentCountValue = newValue;
         this.trigger('newcountvalue', newValue);
         appEvents.trigger('unreadItemsCount', newValue);
@@ -175,7 +173,12 @@ define([
   };
 
   ReadItemSender.prototype = {
-    _onItemMarkedRead: function(itemType, itemId) {
+    _onItemMarkedRead: function(itemType, itemId, mentioned) {
+      // This is a bit of a hack, but seeing as the only itemType is chat, it's forgivable
+      if(mentioned) {
+        itemType = 'mention';
+      }
+
       this._add(itemType, itemId);
     },
 
@@ -195,9 +198,10 @@ define([
       this._buffer = new DoubleHash();
 
       var async = !options || !options.sync;
+      var url = '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/unreadItems';
 
       $.ajax({
-        url: "/api/v1/troupes/" + context.getTroupeId() + "/unreadItems",
+        url: url,
         contentType: "application/json",
         data: JSON.stringify(queue),
         async: async,
@@ -293,45 +297,6 @@ define([
   });
 
   // -----------------------------------------------------
-  // Sync a troupe collection with unread counts (for other troupes)
-  // from the server
-  // -----------------------------------------------------
-
-  var TroupeCollectionRealtimeSync = function(troupeCollection) {
-    this._collection = troupeCollection;
-  };
-
-  TroupeCollectionRealtimeSync.prototype = {
-    _subscribe: function() {
-       var self = this;
-       realtime.subscribe('/api/v1/user/' + context.getUserId(), function(message) {
-        if(message.notification !== 'troupe_unread') return;
-        self._handleIncomingMessage(message);
-      });
-    },
-
-    _handleIncomingMessage: function(message) {
-      var troupeId = message.troupeId;
-      var totalUnreadItems = message.totalUnreadItems;
-
-      // This no longer makes sense as this is in a different frame
-      // if(troupeId === context.getTroupeId()) return;
-
-      log('Updating troupeId' + troupeId + ' to ' + totalUnreadItems);
-
-      var model = this._collection.get(troupeId);
-      if(!model) {
-        log("Cannot find model. Refresh might be required....");
-        return;
-      }
-
-      // TroupeCollectionSync keeps track of the values
-      // for this troupe, so ignore those values
-      model.set('unreadItems', totalUnreadItems);
-    }
-  };
-
-  // -----------------------------------------------------
   // Monitors the view port and tells the store when things
   // have been read
   // -----------------------------------------------------
@@ -410,10 +375,9 @@ define([
       for(var i = 0; i < unreadItems.length; i++) {
         var element = unreadItems[i];
 
-        // var itemType = $e.data('itemType');
-        // var itemId = $e.data('itemId');
         var itemType = element.dataset.itemType;
         var itemId = element.dataset.itemId;
+        var mentioned = element.dataset.mentioned;
 
         if(itemType && itemId) {
           var top = element.offsetTop;
@@ -421,7 +385,7 @@ define([
           if (top >= topBound && top <= bottomBound) {
             var $e = $(element);
 
-            self._store._markItemRead(itemType, itemId);
+            self._store._markItemRead(itemType, itemId, mentioned);
 
             $e.removeClass('unread').addClass('reading');
             this._addToMarkReadQueue($e);
@@ -584,12 +548,13 @@ define([
     syncCollections: function(collections) {
       var unreadItemStore = getUnreadItemStoreReq();
 
-      unreadItemStore.on('itemMarkedRead', function(itemType, itemId) {
+      unreadItemStore.on('itemMarkedRead', function(itemType, itemId, mention) {
         var collection = collections[itemType];
         if(!collection) return;
 
         var item = collection.get(itemId);
         if(item) item.set('unread', false, { silent: true });
+        if(mention) item.set('mentioned', false, { silent: true });
       });
     },
 

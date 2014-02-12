@@ -1,8 +1,15 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var middleware = require('../../web/middleware');
+
 module.exports = {
   install: function(app) {
+    var auth = [
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn()
+    ];
+
     app.get('/api/private/health_check',
         require('./health-check.js'));
 
@@ -15,5 +22,17 @@ module.exports = {
     // No auth for hooks yet
     app.post('/api/private/hook/:hash',
         require('./hooks'));
+
+    app.get('/api/private/irc-token',
+        auth,
+        require('./irc-token.js'));
+
+    app.get('/api/private/validate-token',
+        require('./validate-token.js'));
+
+    app.get('/api/private/room-permission',
+        auth,
+        require('./room-permission.js'));
+
   }
 };

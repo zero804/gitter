@@ -1,10 +1,15 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var troupeService  = require("../../services/troupe-service");
-var userService    = require("../../services/user-service");
-var restSerializer = require("../../serializers/rest-serializer");
-var _              = require("underscore");
+var recentRoomService  = require('../../services/recent-room-service');
+var troupeService      = require("../../services/troupe-service");
+var userService        = require("../../services/user-service");
+var restSerializer     = require("../../serializers/rest-serializer");
+var _                  = require("underscore");
+var Q                  = require("q");
+
+var redis = require('../../utils/redis');
+var redisClient = redis.createClient();
 
 module.exports = {
   id: 'resourceTroupeUser',
@@ -28,11 +33,21 @@ module.exports = {
       // For now, you can only remove yourself from the room
       return next(401);
     }
+    var troupeId = req.troupe._id;
+    var userId = user.id;
+    Q.all([
+        recentRoomService.removeRecentRoomForUser(userId, req.troupe),
+        troupeService.removeUserFromTroupe(troupeId, userId)
+      ])
+      .then(function() {
 
-    troupeService.removeUserFromTroupe(req.troupe._id, user.id, function (err) {
-    if(err) return next(err);
-      res.send({ success: true });
-    });
+        var msg_data = {user: req.user, room: req.troupe};
+        redisClient.publish('user_left', JSON.stringify(msg_data));
+
+        res.send({ success: true });
+      })
+      .fail(next);
+
   },
 
   load: function(req, id, callback) {

@@ -3,27 +3,22 @@
 
 var troupeService     = require("../../services/troupe-service");
 var roomService       = require("../../services/room-service");
+var restful           = require("../../services/restful");
 var restSerializer    = require("../../serializers/rest-serializer");
-var recentRoomService = require('../../services/recent-room-service');
 var Q                 = require('q');
 
 module.exports = {
   index: function(req, res, next) {
-    troupeService.findAllTroupesForUser(req.user.id, function(err, troupes) {
-      if (err) return next(err);
 
-      var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id });
-
-      restSerializer.serialize(troupes, strategy, function(err, serialized) {
-        if(err) return next(err);
-
+    restful.serializeTroupesForUser(req.resourceUser.id)
+      .then(function(serialized) {
         res.send(serialized);
-      });
-    });
+      })
+      .fail(next);
   },
 
   show: function(req, res, next) {
-    var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true });
+    var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true, includeRolesForTroupe: req.troupe });
 
     restSerializer.serialize(req.troupe, strategy, function(err, serialized) {
       if(err) return next(err);
@@ -31,30 +26,6 @@ module.exports = {
       res.send(serialized);
     });
   },
-
-  // create: function(req, res, next) {
-  //   var newTroupe = req.body;
-  //   var name = newTroupe.troupeName || newTroupe.name;
-  //   var oneToOneTroupeId = newTroupe.oneToOneTroupeId;
-  //   var invites = newTroupe.invites;
-
-  //   troupeService.createNewTroupeForExistingUser({
-  //     user: req.user,
-  //     name: name,
-  //     oneToOneTroupeId: oneToOneTroupeId,
-  //     invites: invites
-  //   }, function(err, troupe) {
-  //     if(err) return next(err);
-
-  //     var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true });
-  //     restSerializer.serialize(troupe, strategy, function(err, serialized) {
-  //       if(err) return next(err);
-
-  //       res.send(serialized);
-  //     });
-  //   });
-
-  // },
 
   update: function(req, res, next) {
     var troupe = req.troupe;
@@ -69,7 +40,7 @@ module.exports = {
     if(updatedTroupe.autoConfigureHooks) {
       promises.push(roomService.applyAutoHooksForRepoRoom(req.user, troupe));
     }
-
+  
     if(updatedTroupe.hasOwnProperty('topic')) {
       promises.push(troupeService.updateTopic(req.user, troupe, updatedTroupe.topic));
     }
@@ -91,14 +62,6 @@ module.exports = {
       })
       .catch(next);
   },
-
-  // destroy: function(req, res, next) {
-  //   troupeService.deleteTroupe(req.troupe, function(err) {
-  //     if(err) return next(err);
-
-  //     res.send({ success: true });
-  //   });
-  // },
 
   load: function(req, id, callback) {
     if(!req.user) return callback(401);

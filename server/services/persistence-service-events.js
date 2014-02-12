@@ -27,6 +27,7 @@ exports.install = function(persistenceService) {
     restSerializer.serializeModel(model, function(err, serializedModel) {
       if(err) {
         winston.error("Silently failing model event: ", { exception: err, url: url, operation: operation });
+        if(callback) callback(err);
         return;
       }
 
@@ -37,7 +38,7 @@ exports.install = function(persistenceService) {
       } else {
         appEvents.dataChange2(url, operation, serializedModel);
       }
-      if(callback) callback();
+      if(callback) callback(null, serializedModel);
     });
   }
 
@@ -107,32 +108,73 @@ exports.install = function(persistenceService) {
     statsService.userUpdate(model);
   });
 
-  attachNotificationListenersToSchema(schemas.ConversationSchema, 'conversation');
-  attachNotificationListenersToSchema(schemas.FileSchema, 'file');
+  // attachNotificationListenersToSchema(schemas.ConversationSchema, 'conversation');
+  // attachNotificationListenersToSchema(schemas.FileSchema, 'file');
 
-  attachNotificationListenersToSchema(schemas.InviteSchema, 'invite', function(model) {
-    var urls = [];
+  // attachNotificationListenersToSchema(schemas.InviteSchema, 'invite', function(model) {
+  //   var urls = [];
 
-    if(model.userId) {
-      urls.push("/user/" + model.userId + "/invites");
-    }
+  //   if(model.userId) {
+  //     urls.push("/user/" + model.userId + "/invites");
+  //   }
 
-    // One to one connection invite
-    if(model.fromUserId && !model.troupeId) {
-      urls.push("/user/" + model.fromUserId + "/connectioninvites");
-    }
+  //   // One to one connection invite
+  //   if(model.fromUserId && !model.troupeId) {
+  //     urls.push("/user/" + model.fromUserId + "/connectioninvites");
+  //   }
 
-    if(model.troupeId) {
-      urls.push("/troupes/" + model.troupeId + "/invites");
-    }
+  //   if(model.troupeId) {
+  //     urls.push("/troupes/" + model.troupeId + "/invites");
+  //   }
 
-    return urls.length ? urls : null;
-  });
+  //   return urls.length ? urls : null;
+  // });
 
-  attachNotificationListenersToSchema(schemas.RequestSchema, 'request');
-  attachNotificationListenersToSchema(schemas.ChatMessageSchema, 'chat', function(model) {
+  // attachNotificationListenersToSchema(schemas.RequestSchema, 'request');
+  // attachNotificationListenersToSchema(schemas.ChatMessageSchema, 'chat', function(model) {
+  //   return "/troupes/" + model.toTroupeId + "/chatMessages";
+  // });
+  //
+  function chatUrlExtractor(model) {
     return "/troupes/" + model.toTroupeId + "/chatMessages";
+  }
+  mongooseUtils.attachNotificationListenersToSchema(schemas.ChatMessageSchema, {
+    onCreate: function(model, next) {
+      var url = chatUrlExtractor(model);
+      if(!url) return;
+
+      serializeEvent(url, 'create', model, function(err, serializedModel) {
+        // serializeEvent already reports errors, no need here
+        if(err || !serializedModel) return;
+        appEvents.chat('create', model.toTroupeId, serializedModel);
+      });
+      next();
+    },
+
+    onUpdate: function(model, next) {
+      var url = chatUrlExtractor(model);
+      if(!url) return;
+
+      serializeEvent(url, 'update', model, function(err, serializedModel) {
+        // serializeEvent already reports errors, no need here
+        if(err || !serializedModel) return;
+        appEvents.chat('update', model.toTroupeId, serializedModel);
+      });
+      next();
+    },
+
+    onRemove: function(model) {
+      var url = chatUrlExtractor(model);
+      if(!url) return;
+
+      serializeEvent(url, 'remove', model, function(err, serializedModel) {
+        // serializeEvent already reports errors, no need here
+        if(err || !serializedModel) return;
+        appEvents.chat('remove', model.toTroupeId, serializedModel);
+      });
+    }
   });
+
 
   attachNotificationListenersToSchema(schemas.EventSchema, 'event', function(model) {
     return '/troupes/' + model.toTroupeId + '/events';
