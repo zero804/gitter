@@ -13,6 +13,7 @@
     <div class="trpHookItem">
       <form method="post">
         <input type="hidden" name="_method" value="delete">
+        <input type="hidden" name="accessToken" value="{{../accessToken}}">
         <input type="hidden" name="id" value="{{id}}">
 
         <div class="action">
@@ -50,6 +51,7 @@
   <span class="trpBodyMedium">Add an integration</span><br>
   <form style="display: inline-block; margin-top: 6px" method="post">
     <input type="hidden" name="service" value="github">
+    <input type="hidden" name="accessToken" value="{{accessToken}}">
     <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="margin-left: 0; padding-bottom: 8px"><img src='{{cdn "images/2/icon-github@2x.png"}}' width="16" height="16" style="margin-right: 4px">GitHub</button>
   </form>
 <!--   <form style="display: inline-block;" method="post">
@@ -58,18 +60,22 @@
   </form> -->
   <form style="display: inline-block;" method="post">
     <input type="hidden" name="service" value="jenkins">
+    <input type="hidden" name="accessToken" value="{{accessToken}}">
     <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="padding-bottom: 8px"><img src='{{cdn "images/2/icon-jenkins@2x.png"}}' width="16" height="16" style="margin-right: 4px">Jenkins</button>
   </form>
   <form style="display: inline-block;" method="post">
     <input type="hidden" name="service" value="travis">
+    <input type="hidden" name="accessToken" value="{{accessToken}}">
     <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="padding-bottom: 8px"><img src='{{cdn "images/2/icon-travis@2x.png"}}' width="16" height="16" style="margin-right: 4px">Travis</button>
   </form>
   <form style="display: inline-block;" method="post">
     <input type="hidden" name="service" value="sprintly">
+    <input type="hidden" name="accessToken" value="{{accessToken}}">
     <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="padding-bottom: 8px"><img src='{{cdn "images/2/icon-sprintly@2x.png"}}' width="16" height="16" style="margin-right: 4px">Sprintly</button>
   </form>
   <form style="display: inline-block;" method="post">
     <input type="hidden" name="service" value="trello">
+    <input type="hidden" name="accessToken" value="{{accessToken}}">
     <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="padding-bottom: 8px"><img src='{{cdn "images/2/icon-trello@2x.png"}}' width="16" height="16" style="margin-right: 4px">Trello</button>
   </form>
 

@@ -1,22 +1,22 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var troupeService = require("./troupe-service");
-var readByService = require("./readby-service");
-var appEvents     = require("../app-events");
-var _             = require("underscore");
-var redis         = require("../utils/redis");
-var winston       = require("winston");
-var mongoUtils    = require('../utils/mongo-utils');
-var RedisBatcher  = require('../utils/redis-batcher').RedisBatcher;
-var Scripto       = require('redis-scripto');
-var Q             = require('q');
-var assert        = require('assert');
-
-
-var redisClient   = redis.createClient();
-var badgeBatcher  = new RedisBatcher('badge', 300);
-var scriptManager = new Scripto(redisClient);
+var troupeService    = require("./troupe-service");
+var readByService    = require("./readby-service");
+var userService      = require("./user-service");
+var permissionsModel = require('./permissions-model');
+var appEvents        = require("../app-events");
+var _                = require("underscore");
+var redis            = require("../utils/redis");
+var winston          = require("winston");
+var mongoUtils       = require('../utils/mongo-utils');
+var RedisBatcher     = require('../utils/redis-batcher').RedisBatcher;
+var Scripto          = require('redis-scripto');
+var Q                = require('q');
+var assert           = require('assert');
+var redisClient      = redis.createClient();
+var badgeBatcher     = new RedisBatcher('badge', 300);
+var scriptManager    = new Scripto(redisClient);
 
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/unread');
 
@@ -28,36 +28,6 @@ function sinceFilter(since) {
     return date.getTime() >= since;
   };
 
-}
-
-var workerQueue = require('../utils/worker-queue');
-
-var queue = workerQueue.queue('republish-unread-item-count-for-user-troupe', {}, function() {
-  return function republishUnreadItemCountForUserTroupeWorker(data, callback) {
-    var userId = data.userId;
-    var troupeId = data.troupeId;
-
-    exports.getUserUnreadCounts(userId, troupeId, function(err, counts) {
-      if(err) return callback(err);
-
-      // Notify the user
-      appEvents.troupeUnreadCountsChange({
-        userId: userId,
-        troupeId: troupeId,
-        counts: counts
-      });
-
-      return callback();
-    });
-  };
-});
-
-// TODO: come up with a way to limit the number of republishes happening per user
-function republishUnreadItemCountForUserTroupe(userId, troupeId, callback) {
-  queue.invoke({
-    userId: userId,
-    troupeId: troupeId
-  }, callback);
 }
 
 badgeBatcher.listen(function(key, userIds, done) {
@@ -92,6 +62,7 @@ function getScriptKeysForUserIds(userIds, itemType, troupeId) {
 }
 
 var runScript = Q.nbind(scriptManager.run, scriptManager);
+var redisClient_smembers = Q.nbind(redisClient.smembers, redisClient);
 
 function upgradeKeyToSortedSet(key, userBadgeKey, troupeId, callback) {
   winston.verbose('unread-item-key-upgrade: attempting to upgrade ' + key);
@@ -190,7 +161,8 @@ function newItem(troupeId, creatorUserId, itemType, itemId) {
   if(!itemId) { winston.error("newitem failed. itemId cannot be null"); return; }
 
   return troupeService.findUserIdsForTroupeWithLurk(troupeId)
-    .then(function(userIdsWithLurk) {
+    .then(function(troupe) {
+      var userIdsWithLurk = troupe.users;
       var userIds = Object.keys(userIdsWithLurk);
 
       if(creatorUserId) {
@@ -212,50 +184,64 @@ function newItem(troupeId, creatorUserId, itemType, itemId) {
 
       if(!userIdsForNotify.length) return;
 
-      // Now talk to redis and do the update
-      var keys = getScriptKeysForUserIds(userIdsForNotify, itemType, troupeId);
-
-      var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
-
-      return runScript('unread-add-item', keys, [troupeId, itemId, timestamp])
-        .then(function(result) {
-
-          userIdsForNotify.forEach(function(userId) {
-            republishUnreadItemCountForUserTroupe(userId, troupeId);
-          });
-
-          var badgeUpdateCount = result[0];
-          var updates = result.slice(1, badgeUpdateCount + 1);
-
-          updates.forEach(function(update) {
-            var userId = userIdsForNotify[update];
-            republishBadgeForUser(userId);
-          });
-          var upgrades = result.slice(badgeUpdateCount + 1);
-
-          upgrades.forEach(function(upgrade) {
-            var userId = userIdsForNotify[upgrade];
-            var key = "unread:" + itemType + ":" + userId + ":" + troupeId;
-            var userBadgeKey = "ub:" + userId;
-
-            // Upgrades can happen asynchoronously
-            upgradeKeyToSortedSet(key, userBadgeKey, troupeId, function(err) {
-              if(err) {
-                winston.info('unread-item-key-upgrade: failed. This is not as serious as it sounds, optimistically locked. ' + err, { exception: err });
-              }
-            });
-          });
-
-
-          /**
-           * Put these users on a list of people who may need a reminder email
-           * at a later stage
-           */
-          var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
-          markUsersForEmailNotification(troupeId, userIdsForNotify, timestamp);
-        });
-
+      return newItemForUsers(troupeId, itemType, itemId, userIdsForNotify);
     });
+}
+
+function newItemForUsers(troupeId, itemType, itemId, userIds) {
+  // Now talk to redis and do the update
+  var keys = getScriptKeysForUserIds(userIds, itemType, troupeId);
+
+  var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
+
+  return runScript('unread-add-item', keys, [troupeId, itemId, timestamp])
+    .then(function(result) {
+      // Results come back as two items per key in sequence
+      // * 2*n value is the new badge count (or -1 for don't update)
+      // * 2*n+1 value is a bitwise collection, 1 = badge update, 2 = upgrade key
+      for(var i = 0; i < result.length; i = i + 2) {
+        var troupeUnreadCount   = result[i];
+        var flag                = result[i + 1];
+        var badgeUpdate         = flag & 1;
+        var upgradeKey          = flag & 2;
+        var userId              = userIds[i >> 2];
+
+        if(troupeUnreadCount >= 0) {
+          // Notify the user
+          appEvents.troupeUnreadCountsChange({
+            userId: userId,
+            troupeId: troupeId,
+            total: troupeUnreadCount
+          });
+        }
+
+        if(badgeUpdate) {
+          republishBadgeForUser(userId);
+        }
+
+        if(upgradeKey) {
+          var key = "unread:" + itemType + ":" + userId + ":" + troupeId;
+          var userBadgeKey = "ub:" + userId;
+
+          // Upgrades can happen asynchoronously
+          upgradeKeyToSortedSet(key, userBadgeKey, troupeId, function(err) {
+            if(err) {
+              winston.info('unread-item-key-upgrade: failed. This is not as serious as it sounds, optimistically locked. ' + err, { exception: err });
+            }
+          });
+        }
+      }
+
+
+      /**
+       * Put these users on a list of people who may need a reminder email
+       * at a later stage
+       */
+      var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
+      markUsersForEmailNotification(troupeId, userIds, timestamp);
+    });
+
+
 }
 
 /**
@@ -268,8 +254,8 @@ function removeItem(troupeId, itemType, itemId) {
   if(!itemId) { winston.error("newitem failed. itemId cannot be null"); return; }
 
   return troupeService.findUserIdsForTroupeWithLurk(troupeId)
-    .then(function(userIdsWithLurk) {
-
+    .then(function(troupe) {
+      var userIdsWithLurk = troupe.users;
       var userIds = Object.keys(userIdsWithLurk);
 
       // Publish out an unread item removed event
@@ -286,18 +272,54 @@ function removeItem(troupeId, itemType, itemId) {
 
       if(!userIdsForNotify.length) return;
 
-      // Now talk to redis and do the update
-      var keys = getScriptKeysForUserIds(userIdsForNotify, itemType, troupeId);
-      return runScript('unread-remove-item', keys, [troupeId, itemId])
-        .then(function(updates) {
-          userIdsForNotify.forEach(function(userId) {
-            republishUnreadItemCountForUserTroupe(userId, troupeId);
-          });
+      var keys = userIdsForNotify.reduce(function(memo, userId) {
+          memo.push(
+            "unread:" + itemType + ":" + userId + ":" + troupeId,     // Unread for user
+            "ub:" + userId,                                           // Unread badge for user
+            "m:" + userId + ":" + troupeId,                           // User Troupe mention items
+            "m:" + userId                                             // User mentions
+          );
 
-          updates.forEach(function(update) {
-            var userId = userIdsForNotify[update];
-            republishBadgeForUser(userId);
-          });
+          return memo;
+        }, []);
+
+      return runScript('unread-remove-item', keys, [troupeId, itemId])
+        .then(function(result) {
+          // Results come back as three items per key in sequence
+          for(var i = 0; result.length > 0; i++) {
+            var troupeUnreadCount   = result.shift();
+            var flag                = result.shift();
+            var removedLastMention  = result.shift();
+
+            var badgeUpdate         = flag & 1;
+            var userId              = userIdsForNotify[i];
+
+            if(troupeUnreadCount >= 0) {
+              // Notify the user. If the unread count is zero,
+              // the client should zero out it's
+              appEvents.troupeUnreadCountsChange({
+                userId: userId,
+                troupeId: troupeId,
+                total: troupeUnreadCount
+              });
+            }
+
+            if(removedLastMention) {
+              // Notify the user
+              appEvents.troupeMentionCountsChange({
+                userId: userId,
+                troupeId: troupeId,
+                total: 0,
+                op: 'remove',
+                member: true // XXX: may not always be the case
+              });
+            }
+
+            if(badgeUpdate) {
+              republishBadgeForUser(userId);
+            }
+          }
+
         });
 
   });
@@ -307,7 +329,7 @@ function removeItem(troupeId, itemType, itemId) {
  * Mark an item in a troupe as having been read by a user
  * @return {promise} promise of nothing
  */
-function markItemsOfTypeRead(userId, troupeId, itemType, ids) {
+function markItemsOfTypeRead(userId, troupeId, itemType, ids, member) {
   assert(userId, 'Expected userId');
   assert(troupeId, 'Expected troupeId');
   assert(itemType, 'Expected itemType');
@@ -317,12 +339,43 @@ function markItemsOfTypeRead(userId, troupeId, itemType, ids) {
   var keys = [
       "ub:" + userId,
       "unread:" + itemType + ":" + userId + ":" + troupeId,
-      EMAIL_NOTIFICATION_HASH_KEY
+      EMAIL_NOTIFICATION_HASH_KEY,
+      "m:" + userId + ":" + troupeId,
+      "m:" + userId
     ];
 
   var values = [troupeId, userId].concat(ids);
 
-  return runScript('unread-mark-items-read', keys, values);
+  return runScript('unread-mark-items-read', keys, values)
+    .then(function(result) {
+      var troupeUnreadCount   = result[0];
+      var flag                = result[1];
+      var badgeUpdate         = flag & 1;
+
+      if(troupeUnreadCount >= 0) {
+        // Notify the user
+        appEvents.troupeUnreadCountsChange({
+          userId: userId,
+          troupeId: troupeId,
+          total: troupeUnreadCount
+        });
+
+        if(troupeUnreadCount === 0) {
+          // Notify the user
+          appEvents.troupeMentionCountsChange({
+            userId: userId,
+            troupeId: troupeId,
+            total: 0,
+            op: 'remove',
+            member: member
+          });
+        }
+      }
+
+      if(badgeUpdate) {
+        republishBadgeForUser(userId);
+      }
+    });
 }
 
 function markUsersForEmailNotification(troupeId, userIds, dateNow) {
@@ -418,45 +471,40 @@ exports.markUserAsEmailNotified = function(userId) {
 /**
  * Mark many items as read, for a single user and troupe
  */
-exports.markItemsRead = function(userId, troupeId, items, callback) {
+exports.markItemsRead = function(userId, troupeId, itemIds, mentionIds, options) {
   var now = Date.now();
 
-  appEvents.unreadItemsRemoved(userId, troupeId, items);
+  var allIds = [];
+  var member = options && 'member' in options ? options.member :  true;
 
-  var ops = Object.keys(items).map(function(itemType) {
-      var ids = items[itemType];
-      return markItemsOfTypeRead(userId, troupeId, itemType, ids);
-    });
+  if(itemIds) allIds = allIds.concat(itemIds);
+  if(mentionIds) allIds = allIds.concat(mentionIds);
 
-  // Also set the timestamp for the user
-  ops.push(setLastReadTimeForUser(userId, troupeId, now));
+  appEvents.unreadItemsRemoved(userId, troupeId, { chat: itemIds }); // TODO: update
 
-  return Q.all(ops)
-    .then(function(results) {
-      republishUnreadItemCountForUserTroupe(userId, troupeId);
-
-      var resultsRequiringBadgeCounts = results.filter(function(result, i) {
-        return result > 0 && i != results.length - 1;
-      });
-
-      if(resultsRequiringBadgeCounts.length > 0) {
-        republishBadgeForUser(userId);
-      }
+  return Q.all([
+    markItemsOfTypeRead(userId, troupeId, 'chat', allIds, member),
+    setLastReadTimeForUser(userId, troupeId, now),
+    mentionIds && mentionIds.length && removeMentionForUser(userId, troupeId, mentionIds, member)
+    ])
+    .then(function() {
+      if(options && options.recordAsRead === false) return;
 
       // For the moment, we're only bothering with chats for this
-      return readByService.recordItemsAsRead(userId, troupeId, items);
-    })
-    .nodeify(callback);
+      return readByService.recordItemsAsRead(userId, troupeId, { chat: allIds }); // TODO: drop the hash
+    });
 
 };
 
-exports.markAllChatsRead = function(userId, troupeId, callback) {
-  exports.getUnreadItems(userId, troupeId, 'chat')
+exports.markAllChatsRead = function(userId, troupeId, options) {
+  return exports.getUnreadItems(userId, troupeId, 'chat')
     .then(function(chatIds) {
       if(!chatIds.length) return;
-      return exports.markItemsRead(userId, troupeId, { chat: chatIds });
-    })
-    .nodeify(callback);
+
+      if(!('recordAsRead' in options)) options.recordAsRead = false;
+      /* Don't mark the items as read */
+      return exports.markItemsRead(userId, troupeId, chatIds, null, options);
+    });
 };
 
 exports.getUserUnreadCounts = function(userId, troupeId, callback) {
@@ -483,6 +531,29 @@ exports.getUserUnreadCountsForTroupeIds = function(userId, troupeIds, callback) 
 
     })
     .nodeify(callback);
+};
+
+exports.getUserMentionCountsForTroupeIds = function(userId, troupeIds, callback) {
+  var multi = redisClient.multi();
+
+  troupeIds.forEach(function(troupeId) {
+    multi.scard("m:" + userId + ":" + troupeId);
+  });
+
+  var d = Q.defer();
+
+  multi.exec(function(err, replies) {
+    if(err) return d.reject(err);
+
+    var result = troupeIds.reduce(function(memo, troupeId, index) {
+      memo[troupeId] = replies[index];
+      return memo;
+    }, {});
+
+    d.resolve(result);
+  });
+
+  return d.promise.nodeify(callback);
 };
 
 /** Returns hash[userId] = unixTime for each of the queried users */
@@ -525,6 +596,16 @@ exports.getUnreadItems = function(userId, troupeId, itemType, callback) {
   return runScript('unread-item-list', keys)
     .fail(function(err) {
       winston.warn("unreadItemService.getUnreadItems failed:" + err, { exception: err });
+      // Mask error
+      return [];
+    })
+    .nodeify(callback);
+};
+
+exports.getRoomIdsMentioningUser = function(userId, callback) {
+  return redisClient_smembers("m:" + userId)
+    .fail(function(err) {
+      winston.warn("unreadItemService.getRoomIdsMentioningUser failed:" + err, { exception: err });
       // Mask error
       return [];
     })
@@ -604,58 +685,6 @@ exports.getBadgeCountsForUserIds = function(userIds, callback) {
   return d.promise.nodeify(callback);
 };
 
-/* TODO: make this better, more OO-ey */
-function findCreatingUserIdModel(modelName, model) {
-  switch(modelName) {
-    case "file":
-      var current = model.versions[model.versions.length - 1];
-      if(!current) return null;
-      if(!current.creatorUser) return null;
-      return current.creatorUser.id;
-
-    case "chat":
-      var id = model.fromUser ? model.fromUser.id : null;
-      return id;
-
-    case "request":
-      return null;
-
-    default:
-      winston.warn("unread-items: unknown model type", { modelName: modelName });
-      return null;
-  }
-}
-
-// TODO: Sort this out!
-function generateNotificationForUrl(url) {
-  var match = /^\/troupes\/(\w+)\/(\w+)$/.exec(url);
-  if(!match) return null;
-
-  var model = match[2];
-
-  if(model === 'files') {
-   return {
-      troupeId: match[1],
-      modelName: 'file'
-    };
-  }
-
-  if(model === 'requests') {
-   return {
-      troupeId: match[1],
-      modelName: 'request'
-    };
-  }
-
-  if(model === 'chatMessages') {
-    return {
-      troupeId: match[1],
-      modelName: 'chat'
-    };
-  }
-  return null;
-}
-
 function getOldestId(ids) {
   if(!ids.length) return null;
 
@@ -665,11 +694,195 @@ function getOldestId(ids) {
   });
 }
 
+
+/**
+ * New item added
+ * @return {promise} promise of nothing
+ */
+function newMention(troupeId, chatId, userIds, usersHash) {
+  if(!troupeId) { winston.error("newMention failed. Troupe cannot be null"); return Q.resolve(); }
+  if(!chatId) { winston.error("newMention failed. itemId cannot be null"); return Q.resolve(); }
+
+  // Publish out an new item event
+  // var data = {};
+  // data[itemType] = [itemId];
+  // userIds.forEach(function(userId) {
+  //   appEvents.newUnreadItem(userId, troupeId, data);
+  // });
+
+  if(!userIds.length) return;
+
+
+  var unreadKeys = userIds.map(function(userId) {
+    return "m:" + userId + ":" + troupeId;
+  });
+
+  var badgeKeys = userIds.map(function(userId) {
+    return "ub:" + userId;
+  });
+
+  var userMentionKeys = userIds.map(function(userId) {
+    return "m:" + userId;
+  });
+
+  var keys = unreadKeys.concat(badgeKeys, userMentionKeys);
+
+  return runScript('unread-add-mentions', keys, [chatId, troupeId])
+    .then(function(result) {
+      // Results come back as two items per key in sequence
+      // * 2*n value is the new user troupe count (or -1 for don't update)
+      // * 2*n+1 value is a flag. 0 = nothing, 1 = update badge
+      for(var i = 0; i < result.length; i++) {
+        var mentionCount        = result[i];
+        var userId              = userIds[i];
+
+        if(mentionCount >= 0) {
+          // Notify the user
+          appEvents.troupeMentionCountsChange({
+            userId: userId,
+            troupeId: troupeId,
+            total: mentionCount,
+            op: 'add',
+            member: userId in usersHash /* See bayeux-events-bridge for why we need this  */
+          });
+        }
+      }
+
+      // TODO: email users about their mentions.. Look at newItem
+    });
+}
+
+/**
+ * Remove the mentions and decrement counters. This will be called when a user reads an item
+ */
+function removeMentionForUser(userId, troupeId, itemIds, member) {
+  if(!itemIds.length) return;
+  var keys = [
+      "m:" + userId + ":" + troupeId, // User troupe mention
+      "m:" + userId                   // User mention badge
+    ];
+
+  var values = [troupeId].concat(itemIds);
+  return runScript('unread-remove-user-mentions', keys, values)
+    .then(function(mentionCount) {
+      if(mentionCount >= 0) {
+        // Notify the user
+        appEvents.troupeMentionCountsChange({
+          userId: userId,
+          troupeId: troupeId,
+          total: mentionCount,
+          op: 'remove',
+          member: member
+        });
+      }
+    });
+
+
+}
+
+/**
+ * Returns a promise of nothing
+ */
+function detectAndCreateMentions(troupeId, creatingUserId, chat) {
+  if(!chat.mentions || !chat.mentions.length) return Q.resolve();
+
+  /* Figure out what type of room this is */
+  return troupeService.findUserIdsForTroupeWithLurk(troupeId)
+    .then(function(troupe) {
+
+      var oneToOne = troupe.githubType === 'ONETOONE';
+
+      var usersHash = troupe.users;
+      if(!usersHash) return;
+
+      var userIds = chat.mentions
+            .map(function(mention) {
+              return mention.userId;
+            });
+
+      var mentionLurkerAndNonMemberUserIds = [];
+      var mentionMemberUserIds = [];
+
+      var lookupUsers = [];
+
+      userIds.forEach(function(userId) {
+        if(!userId) return;
+
+        /* Don't be mentioning yourself yo */
+        if(userId == creatingUserId) return;
+
+        if(userId in usersHash) {
+          var lurk = usersHash[userId];
+
+          /* User is in the room? Always mention */
+          if(lurk) {
+            mentionLurkerAndNonMemberUserIds.push(userId);
+          } else {
+            mentionMemberUserIds.push(userId);
+          }
+          return;
+        }
+
+        if(!oneToOne) {
+          /* We'll need to use the permissions-model to determine if they'll be allowed in */
+          lookupUsers.push(userId);
+        }
+
+      });
+
+      var lookup;
+      if(lookupUsers.length) {
+        lookup = userService.findByIds(lookupUsers);
+      } else {
+        lookup = Q.resolve([]);
+      }
+
+      return lookup.then(function(users) {
+        if(!users.length) return;
+
+        return Q.all(users.map(function(user) {
+          return permissionsModel(user, 'join', troupe.uri, troupe.githubType)
+            .then(function(access) {
+              if(access) {
+                mentionLurkerAndNonMemberUserIds.push(user.id);
+              }
+
+            });
+        }));
+
+      }).then(function() {
+        /**
+         * Lurkers and non members wont have an unread item, so the first thing
+         * we'll need to do is create an unread item for them. Only then can we push the
+         * mention
+         */
+        if(mentionLurkerAndNonMemberUserIds.length) {
+          return newItemForUsers(troupeId, 'chat', chat.id, mentionLurkerAndNonMemberUserIds)
+            .then(function() {
+              var allUserIds = mentionLurkerAndNonMemberUserIds.concat(mentionMemberUserIds);
+              return newMention(troupeId, chat.id, allUserIds, usersHash);
+            });
+        } else {
+          return newMention(troupeId, chat.id, mentionMemberUserIds, usersHash);
+        }
+      });
+
+
+    });
+
+}
+
+function detectAndRemoveMentions(troupeId, creatingUserId, chat) {
+  if(!chat.mentions) return;
+  // XXX: remove the mention
+}
+
+
 exports.install = function() {
 
-  appEvents.localOnly.onDataChange2(function(data) {
-    var url = data.url;
+  appEvents.localOnly.onChat(function(data) {
     var operation = data.operation;
+    var troupeId = data.troupeId;
     var model = data.model;
 
     if(!model) {
@@ -677,30 +890,23 @@ exports.install = function() {
       return;
     }
 
-    if(model.skipAlerts) {
-      winston.warn('model is set to skipAlerts', { data: data});
-      return;
-    }
-
-    if(model.fileName) {
-      winston.warn('Not generating unread items for files', {data: data});
-      return;
-    }
-
     var modelId = model.id;
-
-    var info = generateNotificationForUrl(url);
-    if(!info) {
-      return;
-    }
-
+    var creatingUserId = model.fromUser && model.fromUser.id;
     var promise;
 
     if(operation === 'create') {
-      var creatingUserId = findCreatingUserIdModel(info.modelName, model);
-      promise = newItem(info.troupeId, creatingUserId, info.modelName, modelId);
+      promise = newItem(troupeId, creatingUserId, 'chat', modelId);
+
+      promise = promise.then(function() {
+        detectAndCreateMentions(troupeId, creatingUserId, model);
+      });
+
     } else if(operation === 'remove') {
-      promise = removeItem(info.troupeId, info.modelName, modelId);
+      promise = removeItem(troupeId, 'chat', modelId);
+
+      promise = promise.then(function() {
+        detectAndRemoveMentions(troupeId, creatingUserId, model);
+      });
     }
 
     if(promise) {
@@ -717,5 +923,6 @@ exports.testOnly = {
   getOldestId: getOldestId,
   sinceFilter: sinceFilter,
   newItem: newItem,
-  removeItem: removeItem
+  removeItem: removeItem,
+  detectAndCreateMentions: detectAndCreateMentions
 };

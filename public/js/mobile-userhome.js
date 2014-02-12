@@ -4,7 +4,8 @@ require([
   'jquery',
   'utils/appevents',
   'views/toolbar/troupeMenu',
-  'views/app/mobileAppView'
+  'views/app/mobileAppView',
+  'components/csrf'             // No ref
   ], function(UserHomeView, $, appEvents, TroupeMenu, MobileAppView) {
   "use strict";
 

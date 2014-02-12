@@ -1,14 +1,15 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var Q             = require('q');
-var lazy          = require('lazy.js');
-var troupeService = require('./troupe-service');
-var persistence   = require('./persistence-service');
-var appEvents     = require('../app-events');
-var winston       = require('../utils/winston');
-var moment        = require('moment');
-var _             = require('underscore');
+var Q                  = require('q');
+var lazy               = require('lazy.js');
+var troupeService      = require('./troupe-service');
+var persistence        = require('./persistence-service');
+var appEvents          = require('../app-events');
+var winston            = require('../utils/winston');
+var moment             = require('moment');
+var _                  = require('underscore');
+var unreadItemsService = require('./unread-item-service');
 
 /* const */
 var LEGACY_FAV_POSITION = 1000;
@@ -59,21 +60,27 @@ function removeRecentRoomForUser(userId, troupe) {
   winston.verbose('recent-rooms: removeRecentRoomForUser');
 
   var troupeId = troupe.id;
+  var troupeUser = troupe.findTroupeUser(userId);
+
   return Q.all([
       clearFavourite(userId, troupeId),
-      clearLastVisitedTroupeforUserId(userId, troupeId)
+      clearLastVisitedTroupeforUserId(userId, troupeId),
+      unreadItemsService.markAllChatsRead(userId, troupeId, { member: !!troupeUser })
     ])
     .then(function() {
-      var troupeUser = troupe.findTroupeUser(userId);
-      if(troupeUser.notify === 0) {
-        return troupeService.removeUserFromTroupe(troupeId, userId);
+      if(troupeUser) {
+        if(troupeUser.lurk) {
+          return troupeService.removeUserFromTroupe(troupeId, userId);
+        } else {
+          // TODO: in future get rid of this but this collection is used by the native clients
+          appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: null, lastAccessTime: null, mentions: 0, unreadItems: 0 });
+        }
       } else {
-        // TODO: in future get rid of this but this collection is used by the native clients
-        appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: null, lastAccessTime: null });
+        // Must be a mention
+        appEvents.dataChange2('/user/' + userId + '/troupes', 'remove', { id: troupeId });
       }
 
     });
-  // TODO: stop double events
 }
 
 

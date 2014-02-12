@@ -8,6 +8,17 @@ define([
 ], function(_, context, TroupeCollections, moment, cocktail) {
   "use strict";
 
+  var userId = context.getUserId();
+
+  function mentionsUser(message) {
+    var m = message.mentions;
+    if(!m) return false;
+    for(var i = 0; i < m.length; i++) {
+      if(userId && m[i].userId === userId) return true;
+    }
+    return false;
+  }
+
   var ChatModel = TroupeCollections.Model.extend({
     idAttribute: "id",
     parse: function(message) {
@@ -21,9 +32,15 @@ define([
 
       // Check for the special case of messages from the current user
       if(message.unread && message.fromUser) {
-        if(message.fromUser.id === context.getUserId()) {
+        if(message.fromUser.id === userId) {
           message.unread = false;
         }
+      }
+
+      if(mentionsUser(message)) {
+        message.mentioned = true;
+      } else {
+        message.mentioned = false;
       }
 
       return message;

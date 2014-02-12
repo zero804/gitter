@@ -21,23 +21,24 @@ require([
 
   'views/chat/decorators/webhookDecorator',
   'views/chat/decorators/issueDecorator',
-  'views/chat/decorators/mentionDecorator',
+  // 'views/chat/decorators/mentionDecorator',
   'views/chat/decorators/embedDecorator',
   'views/chat/decorators/emojiDecorator',
   'views/app/unreadBannerView',
   'views/app/headerView',
 
-  'views/widgets/preload', // No ref
-  'components/errorReporter',  // No ref
-  'filtered-collection', // No ref
-  'components/dozy', // Sleep detection No ref
-  'template/helpers/all', // No ref
-  'components/eyeballs', // No ref
-  'bootstrap-dropdown' // No ref
+  'views/widgets/preload',      // No ref
+  'filtered-collection',        // No ref
+  'components/dozy',            // Sleep detection No ref
+  'template/helpers/all',       // No ref
+  'components/eyeballs',        // No ref
+  'bootstrap-dropdown',         // No ref
+  'components/bug-reporting',   // No ref
+  'components/csrf'             // No ref
 ], function($, Backbone, context, liveContext, appEvents, peopleCollectionView, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, RightToolbarView,
     PersonDetailView, inviteView, troupeSettingsView, markdownView, IntegrationSettingsModal,
-    Router, unreadItemsClient, webhookDecorator, issueDecorator, mentionDecorator,
+    Router, unreadItemsClient, webhookDecorator, issueDecorator, /*mentionDecorator,*/
     embedDecorator, emojiDecorator, UnreadBannerView, HeaderView) {
   "use strict";
 
@@ -70,7 +71,7 @@ require([
     el: $('#content-frame'),
     collection: itemCollections.chats,
     userCollection: itemCollections.users,
-    decorators: [webhookDecorator, issueDecorator, mentionDecorator, embedDecorator, emojiDecorator]
+    decorators: [webhookDecorator, issueDecorator, /*mentionDecorator,*/ embedDecorator, emojiDecorator]
   }).render();
 
   var unreadChatsModel = unreadItemsClient.acrossTheFold();

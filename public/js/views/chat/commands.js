@@ -1,0 +1,153 @@
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
+define([
+  'underscore',
+  'jquery',
+  'utils/context',
+  'utils/appevents'
+], function(_, $, context, appEvents) {
+  "use strict";
+
+  var commandsList = [
+    {
+      command: 'topic foo',
+      description: 'Set room topic to foo',
+      criteria: function() {
+        return !context.inOneToOneTroupeContext() && context().permissions.admin;
+      },
+      completion: 'topic ',
+      regexp: /^\/topic/,
+      action: function(view) {
+        var topicMatch = view.$el.val().match(/^\/topic (.+)/);
+        if (topicMatch) {
+          var topic = topicMatch[1];
+          view.reset();
+
+          context.troupe().set('topic', topic);
+          $.ajax({
+            url: '/api/v1/troupes/' + context.getTroupeId(),
+            contentType: "application/json",
+            dataType: "json",
+            type: "PUT",
+            data: JSON.stringify({ topic: topic })
+          });
+        }
+      }
+    },
+    {
+      command: 'fav',
+      description: 'Toggle the room as a favourite',
+      completion: 'fav ',
+      regexp: /^\/fav/,
+      action: function(view) {
+        var isFavourite = !context.troupe().get('favourite');
+
+        $.ajax({
+          url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId(),
+          contentType: "application/json",
+          dataType: "json",
+          type: "PUT",
+          data: JSON.stringify({ favourite: isFavourite })
+        });
+
+        view.reset();
+      }
+    },
+    {
+      command: 'query @user',
+      description: 'Go private with @user',
+      completion: 'query @',
+      regexp: /^\/query/,
+      action: function(view) {
+        var userMatch = view.$el.val().match(/\/query @(\w+)/);
+        if (!userMatch) return;
+        var user = userMatch[1];
+        view.reset();
+
+        var url = '/' + user;
+        var type = user === context.user().get('username') ? 'home' : 'chat';
+        var title = user;
+
+        appEvents.trigger('navigation', url, type, title);
+      }
+    },
+    {
+      command: 'leave',
+      description: 'Leave the room',
+      completion: 'leave ',
+      regexp: /^\/leave/,
+      criteria: function() {
+        return !context.inOneToOneTroupeContext();
+      },
+      action: function(view) {
+        view.reset();
+
+        $.ajax({
+          url: "/api/v1/troupes/" + context.getTroupeId() + "/users/" + context.getUserId(),
+          data: "",
+          type: "DELETE",
+        });
+      }
+    },
+    {
+      command: 'lurk',
+      description: 'Lurk in the room',
+      completion: 'lurk',
+      regexp: /^\/lurk/,
+      criteria: function() {
+        return !context.inOneToOneTroupeContext();
+      },
+      action: function(view) {
+        view.reset();
+
+        var c = 0;
+        function done() {
+          if(++c == 2) {
+            appEvents.triggerParent('user_notification', {
+              title: "Lurking",
+              text: "Lurk mode has been enabled for this room"
+            });
+          }
+        }
+
+        $.ajax({
+          url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
+          contentType: "application/json",
+          dataType: "json",
+          type: "PUT",
+          data: JSON.stringify({ push: "mention" }),
+          success: done
+        });
+
+
+        $.ajax({
+          url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId(),
+          contentType: "application/json",
+          dataType: "json",
+          type: "PUT",
+          data: JSON.stringify({ lurk: true }),
+          success: done
+        });
+
+      }
+    }
+
+  ];
+
+  return {
+
+    getSuggestions: function(term) {
+      return commandsList.filter(function(cmd) {
+        var elligible = !cmd.criteria || cmd.criteria();
+        return elligible && cmd.command.indexOf(term) === 0;
+      });
+    },
+
+    findMatch: function(text) {
+      return _.find(commandsList, function(cmd) {
+        return text.match(cmd.regexp);
+      });
+    }
+
+  };
+
+});

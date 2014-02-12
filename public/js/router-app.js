@@ -7,13 +7,18 @@ require([
   'collections/instances/troupes',
   'components/titlebar',
   'components/realtime',
-  'views/widgets/preload', // No ref
-  'components/webNotifications', // No ref
-  'components/desktopNotifications', // No ref
-  'components/errorReporter',  // No ref
-  'template/helpers/all', // No ref
+  'views/widgets/preload',            // No ref
+  'components/webNotifications',      // No ref
+  'components/desktopNotifications',  // No ref
+  'template/helpers/all',             // No ref
+  'components/bug-reporting',         // No ref
+  'components/csrf'                   // No ref
 ], function(appEvents, context, AppIntegratedView, TroupeMenuView, troupeCollections, TitlebarUpdater, realtime) {
   "use strict";
+
+  if(window.location.hash) {
+    document.getElementById('content-frame').contentWindow.location.hash = window.location.hash;
+  }
 
   var appView = new AppIntegratedView({ });
 

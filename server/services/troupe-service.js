@@ -207,6 +207,32 @@ function validateTroupeUrisForUser(userId, uris, callback) {
 }
 
 /**
+ * Add the specified user to the troupe,
+ * @param {[type]} userId
+ * @param {[type]} troupeId
+ * returns a promise with the troupe
+ */
+function addUserIdToTroupe(userId, troupeId) {
+  assert(mongoUtils.isLikeObjectId(userId));
+  assert(mongoUtils.isLikeObjectId(troupeId));
+
+  return findByIdRequired(troupeId)
+      .then(function(troupe) {
+        if(troupe.status != 'ACTIVE') throw { troupeNoLongerActive: true };
+
+        if(troupe.containsUserId(userId)) {
+          return troupe;
+        }
+
+        appEvents.richMessage({eventName: 'userJoined', troupe: troupe, userId: userId, user: user});
+
+        troupe.addUserById(userId);
+        return troupe.saveQ()
+            .then(function() { return troupe; });
+      });
+}
+
+/**
  * Returns the URL a particular user would see if they wish to view a URL.
  * NB: this call has to query the db to get a user's username. Don't call it
  * inside a loop!
@@ -286,38 +312,20 @@ function findUserIdsForTroupe(troupeId, callback) {
     .nodeify(callback);
 }
 
-function mapLurkSettingsForTroupe(troupe) {
-  return troupe.users.reduce(function(memo, v) {
-    memo[v.userId] = !!v.lurk;
-    return memo;
-  }, {});
-}
-
-
-function findUserIdsForTroupeWithLurk(troupeId) {
-  return persistence.Troupe.findByIdQ(troupeId, 'users')
-    .then(function(troupe) {
-      return mapLurkSettingsForTroupe(troupe);
-    });
-}
-
 /**
- * Return a hash of a hash of users and their notification settings
- *
- * Candidate for redis caching potentially?
+ * Returns a promise of the users hashed by lurk status
+ * and githubType
  */
-function findUserIdsForTroupesWithLurk(troupeIds) {
-  return persistence.Troupe
-        .where('_id')['in'](collections.idsIn(troupeIds))
-        .select('users')
-        .execQ()
-    .then(function(troupes) {
-      return troupes
-              .reduce(function(memo, troupe) {
-                var troupeUsersMapped = mapLurkSettingsForTroupe(troupe);
-                memo[troupe.id] = troupeUsersMapped;
-                return memo;
-              }, {});
+function findUserIdsForTroupeWithLurk(troupeId) {
+  return persistence.Troupe.findByIdQ(troupeId, 'users githubType uri', { lean: true })
+    .then(function(troupe) {
+      var users = troupe.users.reduce(function(memo, v) {
+        memo[v.userId] = !!v.lurk;
+        return memo;
+      }, {});
+
+      troupe.users = users;
+      return troupe;
     });
 }
 
@@ -674,7 +682,6 @@ module.exports = {
   findAllUserIdsForTroupes: findAllUserIdsForTroupes,
   findAllUserIdsForTroupe: findAllUserIdsForTroupe,
   findUserIdsForTroupeWithLurk: findUserIdsForTroupeWithLurk,
-  findUserIdsForTroupesWithLurk: findUserIdsForTroupesWithLurk,
   findUserIdsForTroupe: findUserIdsForTroupe,
 
   validateTroupeUrisForUser: validateTroupeUrisForUser,
