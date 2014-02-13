@@ -38,6 +38,7 @@ define([
 
     initialize: function(options) {
       this.rollers = options.rollers;
+      this.chatCollectionView = options.chatCollectionView;
     },
 
     getRenderData: function() {
@@ -161,6 +162,7 @@ define([
 
       this.listenTo(this.inputBox, 'save', this.send);
       this.listenTo(this.inputBox, 'subst', this.subst);
+      this.listenTo(this.inputBox, 'editLast', this.editLast);
     },
 
     send: function(val) {
@@ -175,7 +177,7 @@ define([
       return false;
     },
 
-    subst: function(search, replace, global) {
+    getLastEditableMessage: function() {
       var usersChats = this.collection.filter(function(f) {
         var fromUser = f.get('fromUser');
         return fromUser && fromUser.id === context.getUserId();
@@ -190,7 +192,12 @@ define([
         return bs - as;
       });
 
-      var lastChat = usersChats[0];
+      return usersChats[0];
+    },
+
+    subst: function(search, replace, global) {
+      var lastChat =  this.getLastEditableMessage();
+
       if(lastChat) {
         if(Date.now() - lastChat.get('sent').valueOf() <= EDIT_WINDOW) {
           var reString = search.replace(/(^|[^\[])\^/g, '$1');
@@ -203,6 +210,18 @@ define([
           }).save();
         }
       }
+    },
+
+    editLast: function() {
+      if(!this.chatCollectionView) return;
+
+      var lastChat =  this.getLastEditableMessage();
+      if(!lastChat) return;
+
+      var chatItemView = this.chatCollectionView.children.findByModel(lastChat);
+      if(!chatItemView) return;
+
+      chatItemView.toggleEdit();
     }
   });
 
@@ -311,13 +330,18 @@ define([
     },
 
     onKeyDown: function(e) {
-      if(e.keyCode == 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/)) && !this.isTypeaheadShowing()) {
+      if(e.keyCode === 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/)) && !this.isTypeaheadShowing()) {
         e.stopPropagation();
         e.preventDefault();
 
         this.processInput();
 
         return false;
+      } else if(e.keyCode === 38 && !e.ctrlKey && !e.shiftKey) {
+        /* Up key */
+        if(!this.$el.val()) {
+          this.trigger('editLast');
+        }
       }
     },
 
