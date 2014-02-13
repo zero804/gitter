@@ -46,7 +46,7 @@ define([
   };
 
   Drafty.prototype.reset = function() {
-    delete this.store['drafty_' + this.uniqueId];
+    this.store.removeItem('drafty_' + this.uniqueId);
   };
 
   Drafty.prototype.disconnect = function() {
