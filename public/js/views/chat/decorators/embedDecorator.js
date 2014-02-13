@@ -9,7 +9,7 @@ define([
   function embed(chatItemView) {
     chatItemView.$el.find('a.link').each(function(index, el) {
       oEmbed.parse(el.href, function(embed) {
-        if (embed) {
+        if (embed && embed.html) {
           $(el).after('<div class="embed">' + embed.html + '</div>');
         }
       });
