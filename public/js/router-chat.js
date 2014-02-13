@@ -97,6 +97,7 @@ require([
   new chatInputView.ChatInputView({
     el: $('#chat-input'),
     collection: itemCollections.chats,
+    chatCollectionView: chatCollectionView,
     rollers: chatCollectionView.rollers
   }).render();
 
