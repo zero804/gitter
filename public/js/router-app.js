@@ -16,8 +16,9 @@ require([
 ], function(appEvents, context, AppIntegratedView, TroupeMenuView, troupeCollections, TitlebarUpdater, realtime) {
   "use strict";
 
+  var chatIFrame = document.getElementById('content-frame');
   if(window.location.hash) {
-    document.getElementById('content-frame').contentWindow.location.hash = window.location.hash;
+    chatIFrame.src = chatIFrame.src + window.location.hash;
   }
 
   var appView = new AppIntegratedView({ });
@@ -28,7 +29,7 @@ require([
     if(state) {
       // TODO: update the title....
       context.setTroupeId(undefined);
-      document.getElementById('content-frame').src = state+window.location.hash;
+      chatIFrame.src = state+window.location.hash;
     }
   }
 
