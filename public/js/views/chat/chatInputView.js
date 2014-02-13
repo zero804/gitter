@@ -1,4 +1,4 @@
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false, require:false */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'log!chat-input',
   'jquery',
@@ -15,12 +15,10 @@ define([
   'components/drafty',
   './commands',
   'jquery-textcomplete', // No ref
+  'utils/sisyphus-cleaner' // No ref
 ], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate,
   emojiListItemTemplate, moment, hasScrollBars, itemCollections, emoji, drafty, commands) {
   "use strict";
-
-  // we no longer use sisyphus, so we need to remove any old drafts that it stored
-  require(['utils/sisyphus-cleaner'], function() {});
 
   /** @const */
   // trpChatInputArea max-height in trp3.less needs to be adjusted if this changes
