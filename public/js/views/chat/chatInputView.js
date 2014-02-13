@@ -15,6 +15,7 @@ define([
   'components/drafty',
   './commands',
   'jquery-textcomplete', // No ref
+  'utils/sisyphus-cleaner' // No ref
 ], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate,
   emojiListItemTemplate, moment, hasScrollBars, itemCollections, emoji, drafty, commands) {
   "use strict";
@@ -26,6 +27,10 @@ define([
   /** @const */
   var EXTRA_PADDING = 20;
 
+  /* This value is also in chatItemView! */
+  /** @const */
+  var EDIT_WINDOW = 240000;
+
   var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];
 
   var ChatInputView = TroupeViews.Base.extend({
@@ -33,6 +38,7 @@ define([
 
     initialize: function(options) {
       this.rollers = options.rollers;
+      this.chatCollectionView = options.chatCollectionView;
     },
 
     getRenderData: function() {
@@ -155,6 +161,8 @@ define([
       });
 
       this.listenTo(this.inputBox, 'save', this.send);
+      this.listenTo(this.inputBox, 'subst', this.subst);
+      this.listenTo(this.inputBox, 'editLast', this.editLast);
     },
 
     send: function(val) {
@@ -167,6 +175,53 @@ define([
         appEvents.trigger('chat.send', model);
       }
       return false;
+    },
+
+    getLastEditableMessage: function() {
+      var usersChats = this.collection.filter(function(f) {
+        var fromUser = f.get('fromUser');
+        return fromUser && fromUser.id === context.getUserId();
+      });
+
+      usersChats.sort(function(a, b) {
+        var as = a.get('sent');
+        as = as ? as.valueOf() : 0;
+        var bs = b.get('sent');
+        bs = bs ? bs.valueOf() : 0;
+
+        return bs - as;
+      });
+
+      return usersChats[0];
+    },
+
+    subst: function(search, replace, global) {
+      var lastChat =  this.getLastEditableMessage();
+
+      if(lastChat) {
+        if(Date.now() - lastChat.get('sent').valueOf() <= EDIT_WINDOW) {
+          var reString = search.replace(/(^|[^\[])\^/g, '$1');
+          var re = new RegExp(reString, global ? "gi" : "i");
+          var newText = lastChat.get('text').replace(re, replace);
+
+          lastChat.set({
+            text: newText,
+            html: null
+          }).save();
+        }
+      }
+    },
+
+    editLast: function() {
+      if(!this.chatCollectionView) return;
+
+      var lastChat =  this.getLastEditableMessage();
+      if(!lastChat) return;
+
+      var chatItemView = this.chatCollectionView.children.findByModel(lastChat);
+      if(!chatItemView) return;
+
+      chatItemView.toggleEdit();
     }
   });
 
@@ -275,13 +330,18 @@ define([
     },
 
     onKeyDown: function(e) {
-      if(e.keyCode == 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/)) && !this.isTypeaheadShowing()) {
+      if(e.keyCode === 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/)) && !this.isTypeaheadShowing()) {
         e.stopPropagation();
         e.preventDefault();
 
         this.processInput();
 
         return false;
+      } else if(e.keyCode === 38 && !e.ctrlKey && !e.shiftKey) {
+        /* Up key */
+        if(!this.$el.val()) {
+          this.trigger('editLast');
+        }
       }
     },
 

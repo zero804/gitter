@@ -129,6 +129,20 @@ define([
         });
 
       }
+    },
+
+    {
+      command: 'subst',
+      regexp: /^s\/([^\/]+)\/([^\/]*)\/i?(g?)\s*$/,
+      action: function(view) {
+        var re = this.regexp.exec(view.$el.val());
+        var search = re[1];
+        var replace = re[2];
+        var global = !!re[3];
+        view.trigger('subst', search, replace, global);
+
+        view.reset();
+      }
     }
 
   ];
@@ -137,7 +151,7 @@ define([
 
     getSuggestions: function(term) {
       return commandsList.filter(function(cmd) {
-        var elligible = !cmd.criteria || cmd.criteria();
+        var elligible = (!cmd.criteria || cmd.criteria()) && cmd.completion;
         return elligible && cmd.command.indexOf(term) === 0;
       });
     },

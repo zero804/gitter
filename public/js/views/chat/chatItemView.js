@@ -251,10 +251,6 @@ define([
         if (this.canEdit()) {
           this.isEditing = true;
           this.showInput();
-        } else if (!this.isOwnMessage()) {
-          // window.alert("You cannot edit a messages that wasn't sent by you.");
-        } else if (!this.isInEditablePeriod()) {
-          // window.alert("You cannot edit a message that is older than 5 minutes.");
         }
       }
     },
@@ -277,7 +273,11 @@ define([
       chatInputText.html("<textarea class='trpChatInput'></textarea>");
 
       var unsafeText = this.model.get('text');
-      var textarea = chatInputText.find('textarea').val(unsafeText).select();
+      var textarea = chatInputText.find('textarea').val(unsafeText);
+
+      setTimeout(function() {
+        textarea.select();
+      }, 10);
 
       this.inputBox = new chatInputView.ChatInputBoxView({ el: textarea });
       this.listenTo(this.inputBox, 'save', this.saveChat);
