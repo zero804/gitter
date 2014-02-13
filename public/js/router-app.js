@@ -28,7 +28,7 @@ require([
     if(state) {
       // TODO: update the title....
       context.setTroupeId(undefined);
-      document.getElementById('content-frame').src = state;
+      document.getElementById('content-frame').src = state+window.location.hash;
     }
   }
 
