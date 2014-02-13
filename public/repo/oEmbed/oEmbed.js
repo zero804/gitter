@@ -45,7 +45,7 @@
         data[key] = provider.opts[key];
       }
     }
-    
+
     $.ajax({
       url:          provider.endpoint,
       dataType:     'jsonp',
@@ -94,6 +94,8 @@
   addProvider("youtube",      ["youtube.com/watch"],                              "//noembed.com/embed");
   addProvider("instagram",    ["instagr.?am(.com)?/p/"],                          "//noembed.com/embed");
   addProvider("gist",         ["gist.github.com/.+/.+"],                          "//noembed.com/embed");
+  addProvider("cloudup",      ["cloudup.com"],                                    "//noembed.com/embed");
+  addProvider("dropbox",      ["dropbox.com"],                                    "//noembed.com/embed");
 
   // FIXME Wrong embed size, overflows
   //addProvider("vine",       ["vine.co/v/"],                                     "//noembed.com/embed");
