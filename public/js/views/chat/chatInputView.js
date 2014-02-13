@@ -29,6 +29,10 @@ define([
   /** @const */
   var EXTRA_PADDING = 20;
 
+  /* This value is also in chatItemView! */
+  /** @const */
+  var EDIT_WINDOW = 240000;
+
   var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];
 
   var ChatInputView = TroupeViews.Base.extend({
@@ -158,6 +162,7 @@ define([
       });
 
       this.listenTo(this.inputBox, 'save', this.send);
+      this.listenTo(this.inputBox, 'subst', this.subst);
     },
 
     send: function(val) {
@@ -170,6 +175,36 @@ define([
         appEvents.trigger('chat.send', model);
       }
       return false;
+    },
+
+    subst: function(search, replace, global) {
+      var usersChats = this.collection.filter(function(f) {
+        var fromUser = f.get('fromUser');
+        return fromUser && fromUser.id === context.getUserId();
+      });
+
+      usersChats.sort(function(a, b) {
+        var as = a.get('sent');
+        as = as ? as.valueOf() : 0;
+        var bs = b.get('sent');
+        bs = bs ? bs.valueOf() : 0;
+
+        return bs - as;
+      });
+
+      var lastChat = usersChats[0];
+      if(lastChat) {
+        if(Date.now() - lastChat.get('sent').valueOf() <= EDIT_WINDOW) {
+          var reString = search.replace(/(^|[^\[])\^/g, '$1');
+          var re = new RegExp(reString, global ? "gi" : "i");
+          var newText = lastChat.get('text').replace(re, replace);
+
+          lastChat.set({
+            text: newText,
+            html: null
+          }).save();
+        }
+      }
     }
   });
 
