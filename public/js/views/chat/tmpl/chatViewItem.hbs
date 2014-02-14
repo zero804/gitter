@@ -11,19 +11,14 @@
       {{/if}}
 
       <div class="trpChatTime"> {{#if fromUser}} &bull; {{/if}} {{widget "timeago" time=sent}} </div>
+      {{#if readByText}}
       {{#if compactView}}
-        {{#if readByText}}
-        <span class="trpChatReadBy">{{readByText}}</span>
-        {{else}}
-        <span class="trpChatReadBy" style="display:none"></span>
-        {{/if}}
+        <span class="trpChatReadBy readBySome">{{readByText}}</span>
       {{else}}
-        {{#if readByText}}
-        <div class="trpChatReadBy">{{readByText}}</div>
-        {{else}}
-        <div class="trpChatReadBy" style="display:none"></div>
-        {{/if}}
+        <div class="trpChatReadBy readBySome">{{readByText}}</div>
       {{/if}}
+      {{/if}}
+
       <span class="trpChatEdit"><img src='{{ cdn "images/2/icon-edit.png"}}' width="16" height="16" title=""/ ></span>
 
     </div>
