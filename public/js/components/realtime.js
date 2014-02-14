@@ -127,7 +127,7 @@ define([
         if(clientId !== message.clientId) {
           clientId = message.clientId;
           log("Realtime reestablished. New id is " + message.clientId);
-          $(document).trigger('realtime:newConnectionEstablished');
+          appEvents.trigger('realtime:newConnectionEstablished');
         }
       }
     }
