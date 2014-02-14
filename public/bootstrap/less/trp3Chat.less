@@ -176,37 +176,38 @@ a.issue:hover {
 
 .trpChatReadBy {
   display: inline-block;
+
   text-align: right;
   width: 24px;
   height: 12px;
   color: black;
   margin-left: 2px;
-  opacity: 0;
   background-image: url('../../images/2/icon-read.png');
   background-repeat: no-repeat;
   line-height:9px;
   vertical-align: middle;
   margin-top: 3px;
+  opacity: 0;
+  overflow-x: hidden;
   .trpBodyTiny;
   .trpHand;
-  -webkit-transition: opacity 0.15s ease;
-  -moz-transition: opacity 0.15s ease;
-  -o-transition: opacity 0.15s ease;
-  transition: opacity 0.15s ease;
+  -webkit-transition: opacity 0.2s ease;
+  -moz-transition: opacity 0.2s ease;
+  -o-transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease;
 
-  .trpChatBox:hover & {
+  /* Own and has been read */
+  .isViewers .trpChatBox &.readBySome {
     opacity: 0.3;
   }
 
-  .isViewers & {
-    opacity: 0.3;
-    visibility: visible;
+  /* Hover and has been read */
+  .trpChatBox:hover &.readBySome {
+    opacity: 0.6;
   }
+
 }
 
-.trpChatReadBy:hover {
-  opacity: 0.8;
-}
 
 .popoverReadBy span {
   margin-right: 5px;
@@ -415,7 +416,7 @@ pre code {
     margin-bottom: 0;
     padding-bottom: 0;
     display: none;
-  
+
     li {
       line-height: 18px;
     }
