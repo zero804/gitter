@@ -20,6 +20,7 @@ define([
   'hbs!./tmpl/githubWatch',
 
   'hbs!./tmpl/bitbucket',
+  'hbs!./tmpl/huboard',
   'hbs!./tmpl/jenkins',
   'hbs!./tmpl/travis',
   'hbs!./tmpl/sprintly',
@@ -47,6 +48,7 @@ define([
   githubWatchTemplate,
 
   bitbucketTemplate,
+  huboardTemplate,
   jenkinsTemplate,
   travisTemplate,
   sprintlyTemplate,
@@ -58,6 +60,7 @@ define([
 
   var serviceTemplates = {
     bitbucket:  bitbucketTemplate,
+    huboard:    huboardTemplate,
     jenkins:    jenkinsTemplate,
     travis:     travisTemplate,
     sprintly:   sprintlyTemplate,
