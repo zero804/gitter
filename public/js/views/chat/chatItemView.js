@@ -4,18 +4,21 @@ define([
   'jquery',
   'underscore',
   'utils/context',
+  'log!chat-item-view',
   'collections/chat',
   'views/widgets/avatar',
+  'components/unread-items-client',
   'marionette',
   'views/base',
   'hbs!./tmpl/chatViewItem',
   'views/chat/chatInputView',
   'views/unread-item-view-mixin',
+  'utils/momentWrapper',
   'cocktail',
   'bootstrap_tooltip', // No ref
   'bootstrap-popover' // No ref
-], function($, _, context, chatModels, AvatarView, Marionette, TroupeViews,
-  chatItemTemplate, chatInputView, UnreadItemViewMixin, cocktail /* tooltip, popover*/) {
+], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews,
+  chatItemTemplate, chatInputView, UnreadItemViewMixin, moment, cocktail /* tooltip, popover*/) {
 
   "use strict";
 
@@ -151,26 +154,15 @@ define([
       /* Don't run on the initial (changed=undefined) as its done in the template */
       if(changes && 'readBy' in changes) {
         var readByCount = this.model.get('readBy');
-        var oldValue = this.model.previous('readBy');
-
-
-        if((!!oldValue) !== (!!readByCount)) {
-          var readByLabel = this.$el.find('.trpChatReadBy');
-          if(readByLabel.length === 0) {
-            if(readByCount) {
-             readByLabel = $(document.createElement('div')).addClass('trpChatReadBy');
-             readByLabel.insertBefore(this.$el.find('.trpChatEdit'));
-             setTimeout(function() {
-               readByLabel.addClass('readBySome');
-             }, 10);
-            }
-          } else {
-            // Things have changed
-            readByLabel.toggleClass('readBySome', !!readByCount);
+        var readByLabel = this.$el.find('.trpChatReadBy');
+        if(readByCount) {
+          readByLabel.text(this.getReadByText(readByCount));
+          if(!readByLabel.is(':visible')) {
+            readByLabel.show('fast');
           }
-
-          readByLabel.text(readByCount ? this.getReadByText(readByCount) : '');
-
+        } else {
+          readByLabel.hide();
+          this.$el.find('.trpChatReadBy').text();
         }
       }
     },
