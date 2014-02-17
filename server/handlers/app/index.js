@@ -52,10 +52,18 @@ var chatMiddlewarePipeline = [
 module.exports = {
     install: function(app) {
       [
-        '/:userOrOrg/-/chat',
-        '/:userOrOrg/:repo/chat'
+        /^\/([^\*\/]+)\/\-\/chat$/,             // ORG
+        /^\/([^\*\/]+)\/([^\/\*]+)\/chat$/,     // REPO
+        /^\/([^\*\/]+)\/(?:\*([^\/]+))\/chat$/, // ORG_CHANNEL
+        /^\/([^\/]+)\/([^\/]+)\/(?:\*([^\/]+))\/chat$/  // REPO_CHANNEL
       ].forEach(function(path) {
         app.get(path,
+          function(req, res, next) {
+            req.params.userOrOrg = req.params[0];
+            req.params.repo = req.params[1];
+            req.params.channel = req.params[2];
+            next();
+          },
           chatMiddlewarePipeline);
       });
 
@@ -70,21 +78,19 @@ module.exports = {
 
       require('./integrations').install(app);
 
-      app.get(/\/(?:([^\/]+?))\/(?:([^\/]+?))\/(?:\*([^\/]+))\/?/,
+      app.get(/^\/(?:([^\/]+?))\/(?:([^\/]+?))\/(?:\*([^\/]+))\/?$/,
         function(req, res, next) {
           req.params.userOrOrg = req.params[0];
           req.params.repo = req.params[1];
           req.params.channel = req.params[2];
-          console.log('CHANNEL IS ', req.params);
           next();
         },
         chatFrameMiddlewarePipeline);
 
-      app.get(/\/(?:([^\/]+?))\/(?:\*([^\/]+))/,
+      app.get(/^\/(?:([^\/]+?))\/(?:\*([^\/]+))$/,
         function(req, res, next) {
           req.params.userOrOrg = req.params[0];
           req.params.channel = req.params[1];
-          console.log('WHAT IS THIS!!', req.params);
           next();
         },
         chatFrameMiddlewarePipeline);
