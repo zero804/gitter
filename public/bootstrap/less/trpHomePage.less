@@ -1,5 +1,8 @@
 
 @import "trp3Vars.less";
+@import "icon-mixins.less";
+@import "trpFonts.less";
+@import "trpColours.less";
 
 body {
   margin: 0;
@@ -12,12 +15,12 @@ h1 {
   font-weight: 300;
   font-size: 42px;
   @media @mobile {
-    font-size: 20px;
+    font-size: 30px;
   }
 }
 
 h2 {
-  font-weight: 300;
+  font-weight: 400;
   font-family: 'Open Sans';
   font-size: 30px;
 }
@@ -32,10 +35,61 @@ h3 {
 }
 
 img {
-  height: auto;
   max-width: 100%;
   border: 0;
   -ms-interpolation-mode: bicubic;
+}
+
+
+.hero-container {
+  background-size: cover; 
+  padding-top: 20px; 
+  background-color: #417f6a; 
+  height: 800px;
+  background-image: url("../../images/2/gitter/laptop-smaller.jpg");
+  @media @mobile {
+    height: 620px;
+  }
+  @media @retina {
+    background-image: url("../../images/2/gitter/laptop-smaller@2x.jpg");
+  }
+}
+
+.hero {
+  display: inline-block; 
+  margin-top: 180px;
+  @media @mobile {
+    margin-top: 40px;
+  }
+}
+
+.github-REPO {
+  .prepend-repo-icon;
+  &:before {
+    font-size: 32px;
+  }
+}
+
+.github-PRIVATE {
+  .prepend-lock-icon;
+  &:before {
+    font-size: 32px;
+  }
+}
+
+.circle {
+  border-radius: 50em;
+  display: inline-block;
+  width: 200px;
+  height: 200px;
+}
+
+.circle.green {
+  background-color: @trpGreen;
+}
+
+.circle.other {
+  background-color: #A95A31;
 }
 
 .container {
@@ -85,12 +139,35 @@ img {
   margin-bottom: 40px;
 }
 
+.feature-circle-container {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+.feature-circle {
+  display: inline-block;
+  width: 50%;
+}
+
+
 .button {
   border-radius: 4px;
   display: inline-block;
   padding: 18px 24px;
   text-transform:uppercase;
   transition:all .2s ease-in-out;
+}
+
+.button.text {
+  color: white;
+  opacity: 0.8;
+  @media @mobile {
+    display: none;
+  }
+}
+
+.button.text:hover {
+  opacity: 1;
 }
 
 .button.green {
