@@ -8,9 +8,7 @@ var userService   = require("./user-service");
 var statsService  = require("./stats-service");
 var unsafeHtml    = require('../utils/unsafe-html');
 var processChat   = require('../utils/process-chat');
-
-var redis = require('../utils/redis');
-var redisClient = redis.createClient();
+var appEvents     = require('../app-events');
 
 /*
  * Hey Trouper!
@@ -64,7 +62,7 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
     _msg = {oneToOne: false, username: user.username, room: troupe.uri, text: text};
   }
 
-  redisClient.publish('chat_messages', JSON.stringify(_msg));
+  appEvents.chatMessage(_msg);
 
   userService.findByUsernames(mentionUserNames, function(err, users) {
     if(err) return callback(err);

@@ -16,9 +16,7 @@ var request            = require('request');
 var GitHubRepoService  = require('./github/github-repo-service');
 var unreadItemService  = require('./unread-item-service');
 var _                  = require('underscore');
-
-var redis = require('../utils/redis');
-var redisClient = redis.createClient();
+var appEvents          = require("../app-events");
 
 function localUriLookup(uri) {
   return uriLookupService.lookupUri(uri)
@@ -195,8 +193,7 @@ function ensureAccessControl(user, troupe, access) {
       troupe.addUserById(user.id);
 
       // IRC
-      var msg_data = {user: user, room: troupe};
-      redisClient.publish('user_joined', JSON.stringify(msg_data));
+      appEvents.userJoined({user: user, room: troupe});
 
       return troupe.saveQ().thenResolve(troupe);
 
@@ -207,8 +204,7 @@ function ensureAccessControl(user, troupe, access) {
       troupe.removeUserById(user.id);
 
       // IRC
-      var msg_data = {user: user, room: troupe};
-      redisClient.publish('user_left', JSON.stringify(msg_data));
+      appEvents.userLeft({user: user, room: troupe});
 
       return troupe.saveQ().thenResolve(null);
     }
