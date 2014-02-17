@@ -43,7 +43,6 @@ function getIntegrations(req, res) {
     promise.then(function(accessToken) {
       res.render('integrations', {
         hooks: hooks,
-        services: services,
         troupe: req.troupe,
         accessToken: accessToken
       });
