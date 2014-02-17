@@ -120,6 +120,15 @@ define([
     } else if (meta.service == 'travis') {
       var status = payload.status_message ? payload.status_message.toLowerCase() : '';
       extra.build_status = (status === 'still failing') ? 'failing' : status;
+    } else if(meta.service === 'huboard') {
+
+      var column = meta.column;
+      var previousColumn = meta.previousColumn;
+
+      if(column) {
+        extra.context = previousColumn ? 'from '+previousColumn+' to '+column : 'in '+column;
+      }
+
     }
 
     // Support branch names with slashes, ie: develop/feature/123-foo
