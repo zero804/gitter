@@ -4,12 +4,7 @@
 var persistenceService = require("./persistence-service");
 var statsService = require("./stats-service");
 var nconf = require('../utils/config');
-var Q = require('q');
-
-var crypto = require('crypto');
-var randomBytesQ = Q.denodeify(crypto.randomBytes);
-
-var uuid = require('node-uuid');
+var random = require('../utils/random');
 
 var WEB_INTERNAL_CLIENT_KEY = 'web-internal';
 var webInternalClientId = null;
@@ -89,11 +84,12 @@ exports.findOrGenerateWebToken = function(userId, callback) {
       .then(function(oauthAccessToken) {
         if(oauthAccessToken) return oauthAccessToken.token;
 
-        var token = uuid.v4();
-        return persistenceService.OAuthAccessToken.createQ({ token: token, userId: userId, clientId: webInternalClientId })
-            .then(function() {
-              return token;
-            });
+        return random.generateTokenQ().then(function(token) {
+          return persistenceService.OAuthAccessToken.createQ({ token: token, userId: userId, clientId: webInternalClientId })
+              .then(function() {
+                return token;
+              });
+        });
       })
       .nodeify(callback);
 
@@ -104,10 +100,7 @@ exports.findOrGenerateIRCToken = function(userId, callback) {
       .then(function(oauthAccessToken) {
         if(oauthAccessToken) return oauthAccessToken.token;
 
-        //var token = uuid.v4();
-        return randomBytesQ(20).then(function(buf) {
-          var token = buf.toString('hex');
-          console.log('token: ', token);
+        return random.generateTokenQ().then(function(token) {
           return persistenceService.OAuthAccessToken.createQ({ token: token, userId: userId, clientId: ircClientId })
               .then(function() {
                 return token;
