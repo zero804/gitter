@@ -1,7 +1,6 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//*global require:false */
 require([
-  'jquery',
-  'retina' //noref
+  'jquery'
  ],
   function($) {
     "use strict";

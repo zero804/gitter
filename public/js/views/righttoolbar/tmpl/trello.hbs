@@ -1,0 +1,15 @@
+<div class="trello-card-{{trello_action}}">
+  <div class="activity-time">{{widget "timeago" time=sent compact=true}}</div>
+
+  <span class="gtrActivityItemText">{{payload.action.memberCreator.fullName}} {{trello_action}}<br>
+    <div class="activity-detail">
+    <a href="https://trello.com/c/{{payload.action.data.card.shortLink}}" target="_blank">{{payload.action.data.card.name}}</a>
+    {{#if payload.action.data.listBefore}}
+      <br>
+      <span>({{payload.action.data.listBefore.name}} &rarr; {{payload.action.data.listAfter.name}})</span>
+    {{/if}}
+  </div>
+  </span>
+
+  <div style="clear: both;"></div>
+</div>

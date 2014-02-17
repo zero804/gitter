@@ -63,17 +63,11 @@ function boost(username, suggestedEmail) {
       var emailPromise;
       if(suggestedEmail) {
         emailPromise = Q.resolve(suggestedEmail);
-      } else if(user && user.emails && user.emails.length) {
-        emailPromise = Q.resolve(user.emails[0]);
       } else if(user && user.hasGitHubScope('user:email')) {
         var meService = new GitHubMeService(user);
-        console.log("got here");
-        emailPromise = meService.getEmails()
-          .then(function(emails) {
-            if(Array.isArray(emails)) {
-              return emails[0];
-            }
-          });
+        emailPromise = meService.getEmail();
+      } else if(user && user.emails && user.emails.length) {
+        emailPromise = Q.resolve(user.emails[0]);
       } else {
         emailPromise = Q.resolve(githubUser.email);
       }
@@ -135,21 +129,22 @@ function boostMany(count) {
     .execQ()
     .then(function(users) {
       console.log('Boosting ' + users.map(function(f) { return f.username; }).join(', '));
-      return Q.all(users.map(function(user) {
+
+      return Q.all(users.map(function(user) { 
         return boost(user.username)
-          .then(function() {
-            console.log('Boosted ' + user.username);
-          })
-          .fail(function(err) {
-            console.error('Failed to boost ' + user.username + ':', err);
-          });
-      }))
-      .then(function() {
-        process.exit(0);
-      })
-      .fail(function(err) {
-        die(err);
-      });
+            .then(function() {
+              console.log('Boosted ' + user.username);
+            })
+            .fail(function(err) {
+              console.error('Failed to boost ' + user.username + ':', err);
+            });
+      }));
+    })
+    .then(function() {
+      process.exit(0);
+    })
+    .fail(function(err) {
+      die(err);
     });
 }
 

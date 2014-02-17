@@ -86,98 +86,6 @@ function testRequestAcceptance(email, userStatus, emailNotificationConfirmationM
 describe('troupe-service', function() {
 
 
-  describe('#updateFavourite()', function() {
-    it('should add a troupe to favourites',function(done) {
-
-      var troupeService = testRequire('./services/troupe-service');
-
-
-      function fav(val, callback) {
-        troupeService.updateFavourite(fixture.user1.id, fixture.troupe1.id, val, function(err) {
-          if(err) return done(err);
-
-          troupeService.findFavouriteTroupesForUser(fixture.user1.id, function(err, favs) {
-            if(err) return done(err);
-
-            var isInTroupe = !!favs[fixture.troupe1.id];
-            assert(isInTroupe === val, 'Troupe should ' + (val? '': 'not ') + 'be a favourite');
-            callback();
-          });
-        });
-      }
-
-      fav(true, function() {
-        fav(true, function() {
-          fav(false, function() {
-            fav(false, function() {
-              done();
-            });
-          });
-        });
-      });
-
-
-
-    });
-
-
-  });
-
-  describe('#findBestTroupeForUser', function() {
-    it('#01 should return null when a user has no troupes',function(done) {
-
-      var troupeService = testRequire('./services/troupe-service');
-      var userService = testRequire('./services/user-service');
-
-      userService.saveLastVisitedTroupeforUserId(fixture.userNoTroupes.id, fixture.troupe1.id, function(err) {
-        if(err) return done(err);
-
-
-        troupeService.findBestTroupeForUser(fixture.userNoTroupes, function(err, troupe) {
-          if(err) return done(err);
-          assert(troupe === null, 'Expected the troupe to be null');
-          done();
-        });
-      });
-
-
-    });
-
-    it('#02 should return return the users last troupe when they have one',function(done) {
-      var troupeService = testRequire('./services/troupe-service');
-      var userService = testRequire('./services/user-service');
-
-      userService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id, function(err) {
-        if(err) return done(err);
-
-        troupeService.findBestTroupeForUser(fixture.user1, function(err, troupe) {
-          if(err) return done(err);
-
-          assert(troupe !== null, 'Expected the troupe not to be null');
-          assert(troupe.uri == fixture.troupe1.uri, 'Expected the troupe uri to be testtroupe1');
-          done();
-        });
-
-      });
-
-    });
-
-
-    it('#03 should return the users something when the user has troupes, but no last troupe',function(done) {
-      var troupeService = testRequire('./services/troupe-service');
-
-
-      troupeService.findBestTroupeForUser(fixture.user1, function(err, troupe) {
-        if(err) return done(err);
-
-        assert(troupe !== null, 'Expected the troupe not to be null');
-        done();
-      });
-
-    });
-
-  });
-
   describe('#createNewTroupeForExistingUser', function() {
     var troupeService = testRequire('./services/troupe-service');
 
@@ -289,90 +197,34 @@ describe('troupe-service', function() {
     });
   });
 
-  xdescribe('#findAllUserIdsForUnconnectedImplicitContacts', function() {
-    it('should find users who are implicitly connected to one another', function(done) {
-      var troupeService = testRequire('./services/troupe-service');
-
-      persistence.Troupe.createQ({ displayName: 'Test User 2', email:  'testuser-b' + Date.now() + '@troupetest.local', status: 'ACTIVE' })
-        .then(function(otherUser) {
-
-          return persistence.Troupe.createQ({ displayName: 'Test User', email:  'testuser' + Date.now() + '@troupetest.local', status: 'ACTIVE' })
-            .then(function(user) {
-
-              return troupeService.findOrCreateOneToOneTroupe(otherUser.id, user.id)
-                .then(function() {
-
-                  var troupe = new persistence.Troupe({ status: 'ACTIVE' });
-                  troupe.addUserById(fixture.user1.id);
-                  troupe.addUserById(user.id);
-                  troupe.addUserById(otherUser.id);
-                  return troupe.saveQ()
-                    .then(function() {
-
-                      return troupeService.findAllUserIdsForUnconnectedImplicitContacts(user.id)
-                        .then(function(userIds) {
-                          // The fixture.user1 user should be included as both users share a troupe
-                          // but don't have a explicit connection
-                          // The otherUser user should not be included as they share a troupe but DO
-                          // have an explicit connection (see the createOneToOneTroupe call!)
-                          assert.equal(userIds.length, 1);
-                          assert.equal(userIds[0], fixture.user1.id);
-                        });
-                    });
-
-                });
-
-
-            });
-        })
-        .nodeify(done);
-
-    });
-
-  });
-
   describe('#findAllImplicitContactUserIds', function() {
-    var fixture2 = {};
-
-    before(fixtureLoader(fixture2, { user1: { }, user2: { }, troupe1: { users: ['user1', 'user2' ] } }));
 
     it('should work as expected', function(done) {
       var troupeService = testRequire('./services/troupe-service');
 
-      troupeService.findAllImplicitContactUserIds(fixture2.user1.id)
+      troupeService.findAllImplicitContactUserIds(fixture.user1.id)
         .then(function(userIds) {
           assert.equal(userIds.length, 1);
-          assert.equal(userIds[0], fixture2.user2.id);
+          assert.equal(userIds[0], fixture.user2.id);
         })
         .nodeify(done);
 
-    });
-
-    after(function() {
-      fixture2.cleanup();
     });
 
   });
 
   describe('#findAllConnectedUserIdsForUserId', function() {
-    var fixture2 = {};
-
-    before(fixtureLoader(fixture2, { user1: { }, user2: { }, troupe1: { oneToOne: true, users: ['user1', 'user2' ] } }));
 
     it('should work as expected', function(done) {
       var troupeService = testRequire('./services/troupe-service');
 
-      troupeService.findAllConnectedUserIdsForUserId(fixture2.user1.id)
+      troupeService.findAllConnectedUserIdsForUserId(fixture.user1.id)
         .then(function(userIds) {
           assert.equal(userIds.length, 1);
-          assert.equal(userIds[0], fixture2.user2.id);
+          assert.equal(userIds[0], fixture.user2.id);
         })
         .nodeify(done);
 
-    });
-
-    after(function() {
-      fixture2.cleanup();
     });
 
   });
@@ -432,6 +284,8 @@ describe('troupe-service', function() {
       users: ['user1', 'user2']
     },
     troupe2: {
+    },
+    troupe3: {
     },
     troupeForDeletion: {
       users: ['user1', 'user2']

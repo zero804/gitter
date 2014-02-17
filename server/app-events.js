@@ -99,6 +99,14 @@ function bind(on) {
       on('troupeUnreadCountsChange', callback);
     },
 
+    troupeMentionCountsChange: function(data) {
+      emit('troupeMentionCountsChange', data);
+    },
+
+    onTroupeMentionCountsChange: function(callback) {
+      on('troupeMentionCountsChange', callback);
+    },
+
     userLoggedIntoTroupe: function(userId, troupeId) {
       emit('userLoggedIntoTroupe', { troupeId: troupeId, userId: userId });
     },
@@ -151,6 +159,18 @@ function bind(on) {
       on('dataChange2', callback);
     },
 
+    chat: function(operation, troupeId, model) {
+      emit('chat', {
+        operation: operation,
+        troupeId: troupeId,
+        model: model
+      });
+    },
+
+    onChat: function(callback) {
+      on('chat', callback);
+    },
+
     eyeballSignal: function(userId, troupeId, signal) {
       emit('eyeballSignal', {
         userId: userId,
@@ -179,14 +199,6 @@ function bind(on) {
 
     onBatchUserBadgeCountUpdate: function(callback) {
       on('batchUserBadgeCountUpdate', callback);
-    },
-
-    richMessage: function(data) {
-      emit('richMessage', data);
-    },
-
-    onRichMessage: function(callback) {
-      on('richMessage', callback);
     },
 
     emailConfirmed: function(email, userId) {

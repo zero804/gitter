@@ -4,47 +4,21 @@
   <div class="nano" id="left-menu-scroll">
     <div class="content trpLeftMenuWrapper">
       <div class="trpToolbarList" id="list-mega">
-        <div id="favTroupesList">
-          <div class="trpToolbarHeader">Favourites</div>
-          <div id="left-menu-list-favourites" class="trpLeftMenuList"></div>
-        </div>
-        <div id="unreadTroupesList">
-          <div class="trpToolbarHeader" id="unreadTroupesHeader">Unread Messages</div>
-          <div id="left-menu-list-unread" class="trpLeftMenuList"></div>
-        </div>
         <div id="recentTroupesList" class="trpLeftMenuList">
-          <div class="trpToolbarHeader">Recents</div>
-          <div id="left-menu-list-recent"></div>
+          <div class="trpToolbarHeader">All conversations</div>
+          <div class="list-favourites" id="list-favs"><!-- put filtered favourites in here--></div>
+          <div class="list-recents" id="list-recents"><!-- put filtered recents in here. remember also that notifications will appear in here if they aren't in favourites--></div>
         </div>
         <div id="OrgsList" class="trpLeftMenuList">
           <div class="trpToolbarHeader">Your Organizations</div>
           <div id="left-menu-list-orgs"></div>
         </div>
-        <div id="UsersList" class="trpLeftMenuList">
-          <div class="trpToolbarHeader" id="left-menu-users-section">
-            <span class="list-toggle" id="users-toggle">SHOW</span>
-            Private chats
-          </div>
-          <div id="left-menu-list-users" style="display: none"></div>
-        </div>
-        <div id="ReposList" class="trpLeftMenuList">
-          <div class="trpToolbarHeader" id="left-menu-repo-section">
-            <span class="list-toggle" id="repo-toggle">SHOW</span>
-            Your Rooms
-          </div>
-          <div id="left-menu-list-repos" style="display: none"></div>
-        </div>
       </div>
       <div class="trpToolbarList" style="display:none" id="list-search">
         <div class="trpToolbarHeader">Search Results</div>
-        <ul class="trpTroupeList" id="left-menu-list-search">
+        <div id="left-menu-list-search">
         </ul>
       </div>
     </div>
   </div>
-  {{#if hellFreezesOver}}
-  <div class="trpLeftMenuActions">
-    <a href="#|connect" class="trpNewPersonButton" style="text-decoration: none">New Contact</a><a href="#|create" style="text-decoration: none" class="trpNewTroupeButton" id="left-menu-new-troupe-button">New Troupe</a>
-  </div>
-  {{/if}}
 </div>

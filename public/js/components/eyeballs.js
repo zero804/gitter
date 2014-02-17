@@ -28,30 +28,30 @@ define([
         socketId: realtime.getClientId(),
         on: value
       },
+      headers: {
+        'x-access-token': context().accessToken
+      },
       async: !synchronous,
       global: false,
       type: "POST",
-      success: function(/*data*/) {
-      },
-      statusCode: {
-        400: function() {
+      error: function(xhr) {
+        if(xhr.status !== 400) {
+          log('An error occurred while communicating eyeballs');
+        } else {
           // The connection is gone...
           log('Eyeballs returned 400. Realtime connection may be dead.');
           realtime.testConnection();
         }
-      },
-      error: function() {
-        log('An error occurred while communicating eyeballs');
       }
     });
   }
 
-  function eyeballsOff() {
+  function eyeballsOff(synchronous) {
     if(eyesOnState)  {
       stopInactivityPoller();
 
       eyesOnState = false;
-      send(0, true);
+      send(0, synchronous);
 
       appEvents.trigger('eyeballStateChange', false);
     }
@@ -62,7 +62,6 @@ define([
     inactivity = false;
 
     if(!eyesOnState)  {
-      //log('eyeballsOn');
       startInactivityPoller();
 
       eyesOnState = true;
@@ -72,20 +71,20 @@ define([
     }
   }
 
-  $(window).on('blur', function() {
+  window.addEventListener('blur', function() {
     eyeballsOff();
-  });
+  }, false);
 
-  $(window).on('focus', function() {
+  window.addEventListener('focus', function() {
     eyeballsOn();
-  });
+  }, false);
 
   var cordova = window.cordova;
 
   if(cordova) {
     document.addEventListener("deviceready", function() {
 
-      $(document).on('realtime:newConnectionEstablished', registerSocket);
+      appEvents.on('realtime:newConnectionEstablished', registerSocket);
       registerSocket();
 
       function registerSocket() {
@@ -122,36 +121,50 @@ define([
     // Use this technique only as a failover if the cordova plugin isn't available
     // Unfortunately it's not too good as Safari cuts the request off before it
     // goes back to the server
-    $(window).on('pageshow', function() {
-      // log('pageshow');
+
+    window.addEventListener('pageshow', function() {
       updateLastUserInteraction();
-
       eyeballsOn();
-    });
+    }, false);
 
-    $(window).on('pagehide', function() {
+    window.addEventListener('pagehide', function() {
       // log('pagehide');
       eyeballsOff();
-    });
+    }, false);
 
   }
 
   var lastUserInteraction = Date.now();
   var inactivity = false;
-
+  var interactionUpdateTimer;
   function updateLastUserInteraction() {
-    lastUserInteraction = Date.now();
 
     if(inactivity) {
       // Inactivity has ended.....
       eyeballsOn();
     }
+
+    if(!interactionUpdateTimer) {
+      interactionUpdateTimer = setTimeout(function() {
+        interactionUpdateTimer = null;
+        lastUserInteraction = Date.now();
+      }, 100);
+    }
   }
 
-  $(document).on('keydown', updateLastUserInteraction);
-  $(window).on('scroll', updateLastUserInteraction);
-  $(document).on('mousemove', updateLastUserInteraction);
+  function onBeforeUnload() {
+    eyeballsOff(true);
+  }
 
+  // $(document).on('keydown', updateLastUserInteraction);
+  // $(document).on('mousemove', updateLastUserInteraction);
+  // $(window).on('scroll', updateLastUserInteraction);
+
+  document.addEventListener("keydown", updateLastUserInteraction, false);
+  document.addEventListener("mousemove", updateLastUserInteraction, false);
+  window.addEventListener("scroll", updateLastUserInteraction, false);
+
+  window.addEventListener("beforeunload", onBeforeUnload, false);
 
   startInactivityPoller();
 

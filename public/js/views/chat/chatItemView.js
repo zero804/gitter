@@ -1,24 +1,21 @@
-/* jshint unused:true, browser:true,  strict:true */
+/* jshint unused:strict, browser:true,  strict:true */
 /* global define:false */
 define([
   'jquery',
   'underscore',
   'utils/context',
-  'log!chat-item-view',
   'collections/chat',
   'views/widgets/avatar',
-  'components/unread-items-client',
   'marionette',
   'views/base',
   'hbs!./tmpl/chatViewItem',
   'views/chat/chatInputView',
   'views/unread-item-view-mixin',
-  'utils/momentWrapper',
   'cocktail',
   'bootstrap_tooltip', // No ref
   'bootstrap-popover' // No ref
-], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews,
-  chatItemTemplate, chatInputView, UnreadItemViewMixin, moment, cocktail /* tooltip, popover*/) {
+], function($, _, context, chatModels, AvatarView, Marionette, TroupeViews,
+  chatItemTemplate, chatInputView, UnreadItemViewMixin, cocktail /* tooltip, popover*/) {
 
   "use strict";
 
@@ -39,7 +36,12 @@ define([
     events: {
       'click .trpChatEdit':     'toggleEdit',
       'keydown textarea':       'detectEscape',
-      'click .trpChatReadBy':   'showReadBy'
+      'click .trpChatReadBy':   'showReadBy',
+      'click .webhook': 'expandActivity'
+    },
+
+    expandActivity: function() {
+      $('.webhook .commits').slideToggle("fast");
     },
 
     initialize: function(options) {
@@ -70,10 +72,11 @@ define([
       var isMobile = navigator.userAgent.match(/mobile/i) ? true : false;
 
       if (data.fromUser) {
-        data.displayName = data.fromUser.displayName || data.fromUser.fallbackDisplayName;
-        if (isMobile && data.displayName.length > 13) {
-          data.displayName = data.fromUser.displayName.split(" ").shift();
-        }
+        data.username = data.fromUser.username;
+        // data.displayName = data.fromUser.displayName || data.fromUser.fallbackDisplayName;
+        // if (isMobile && data.displayName.length > 13) {
+        //   data.displayName = data.fromUser.displayName.split(" ").shift();
+        // }
       }
       data.readByText = this.getReadByText(data.readBy);
       if(!data.html) {
@@ -148,15 +151,26 @@ define([
       /* Don't run on the initial (changed=undefined) as its done in the template */
       if(changes && 'readBy' in changes) {
         var readByCount = this.model.get('readBy');
-        var readByLabel = this.$el.find('.trpChatReadBy');
-        if(readByCount) {
-          readByLabel.text(this.getReadByText(readByCount));
-          if(!readByLabel.is(':visible')) {
-            readByLabel.show('fast');
+        var oldValue = this.model.previous('readBy');
+
+
+        if((!!oldValue) !== (!!readByCount)) {
+          var readByLabel = this.$el.find('.trpChatReadBy');
+          if(readByLabel.length === 0) {
+            if(readByCount) {
+             readByLabel = $(document.createElement('div')).addClass('trpChatReadBy');
+             readByLabel.insertBefore(this.$el.find('.trpChatEdit'));
+             setTimeout(function() {
+               readByLabel.addClass('readBySome');
+             }, 10);
+            }
+          } else {
+            // Things have changed
+            readByLabel.toggleClass('readBySome', !!readByCount);
           }
-        } else {
-          readByLabel.hide();
-          this.$el.find('.trpChatReadBy').text();
+
+          readByLabel.text(readByCount ? this.getReadByText(readByCount) : '');
+
         }
       }
     },
@@ -245,10 +259,6 @@ define([
         if (this.canEdit()) {
           this.isEditing = true;
           this.showInput();
-        } else if (!this.isOwnMessage()) {
-          // window.alert("You cannot edit a messages that wasn't sent by you.");
-        } else if (!this.isInEditablePeriod()) {
-          // window.alert("You cannot edit a message that is older than 5 minutes.");
         }
       }
     },
@@ -271,7 +281,11 @@ define([
       chatInputText.html("<textarea class='trpChatInput'></textarea>");
 
       var unsafeText = this.model.get('text');
-      var textarea = chatInputText.find('textarea').val(unsafeText).select();
+      var textarea = chatInputText.find('textarea').val(unsafeText);
+
+      setTimeout(function() {
+        textarea.select();
+      }, 10);
 
       this.inputBox = new chatInputView.ChatInputBoxView({ el: textarea });
       this.listenTo(this.inputBox, 'save', this.saveChat);
@@ -307,6 +321,7 @@ define([
 
   var ReadByView = Marionette.CollectionView.extend({
     itemView: AvatarView,
+    className: 'popoverReadBy',
     initialize: function(options) {
       var c = new chatModels.ReadByCollection(null, { listen: true, chatMessageId: this.model.id, userCollection: options.userCollection });
       c.loading = true;

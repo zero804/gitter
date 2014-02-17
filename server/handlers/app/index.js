@@ -70,11 +70,12 @@ module.exports = {
 
       require('./integrations').install(app);
 
-      app.get(/\/(?:([^\/]+?))\/(?:([^\/]+?))\/(?:\*([^\/]+?))\/?/,
+      app.get(/\/(?:([^\/]+?))\/(?:([^\/]+?))\/(?:\*([^\/]+))\/?/,
         function(req, res, next) {
           req.params.userOrOrg = req.params[0];
           req.params.repo = req.params[1];
           req.params.channel = req.params[2];
+          console.log('CHANNEL IS ', req.params);
           next();
         },
         chatFrameMiddlewarePipeline);

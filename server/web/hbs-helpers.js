@@ -4,10 +4,12 @@
 var nconf = require('../utils/config');
 var cdn = require("./cdn");
 var _ = require('underscore');
+var appVersion = require('./appVersion');
 
 var minifiedDefault = nconf.get("web:minified");
-var appTag = require('./appVersion').getAppTag();
-
+var appTag = appVersion.getAppTag();
+var revision = appVersion.getRevision();
+var env = process.env['NODE_ENV'];
 
 var cdns;
 if(nconf.get("cdn:use")) {
@@ -19,11 +21,14 @@ var troupeEnv = {
   baseServer: nconf.get('web:baseserver'),
   basePath: nconf.get('web:basepath'),
   homeUrl: nconf.get('web:homeurl'),
+  badgeBaseUrl: nconf.get('web:badgeBaseUrl'),
   mixpanelToken: nconf.get("stats:mixpanel:token"),
   googleTrackingId: nconf.get("web:trackingId"),
   goSquaredTrackingId: nconf.get("web:goSquaredId"),
+  env: env,
   cdns: cdns,
   appVersion: appTag,
+  revision: revision,
   logging: nconf.get("web:consoleLogging"),
   websockets: {
     fayeUrl: nconf.get('ws:fayeUrl') || "/faye",

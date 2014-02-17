@@ -6,11 +6,12 @@ var testRequire = require('../test-require');
 var mockito = require('jsmockito').JsMockito;
 var Q = require('q');
 var mongoUtils = testRequire('./utils/mongo-utils');
-
+var _ = require('underscore');
 var assert = require('assert');
 
 var times = mockito.Verifiers.times;
 var once = times(1);
+var twice = times(2);
 
 
 describe('unread-item-service', function() {
@@ -67,7 +68,18 @@ describe('unread-item-service', function() {
         '../app-events': appEventsMock
       });
 
-      mockito.when(troupeServiceMock).findUserIdsForTroupe(troupeId).thenReturn(Q.resolve([userId1, userId2, userId3]));
+      var usersWithLurkHash = {};
+      usersWithLurkHash[userId1] = false;
+      usersWithLurkHash[userId2] = false;
+      usersWithLurkHash[userId3] = true;
+
+      var troupe = {
+        githubType: 'REPO',
+        users: usersWithLurkHash
+      };
+
+      mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupe));
+
       unreadItemService.testOnly.newItem(troupeId, creatorUserId, itemType, itemId)
         .then(function() {
           // Two calls here, not three
@@ -113,7 +125,18 @@ describe('removeItem', function() {
       '../app-events': appEventsMock
     });
 
-    mockito.when(troupeServiceMock).findUserIdsForTroupe(troupeId).thenReturn(Q.resolve([userId1, userId2, userId3]));
+
+    var usersWithLurkHash = {};
+    usersWithLurkHash[userId1] = false;
+    usersWithLurkHash[userId2] = false;
+    usersWithLurkHash[userId3] = false;
+
+    var troupe = {
+      githubType: 'REPO',
+      users: usersWithLurkHash
+    };
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupe));
 
     unreadItemService.testOnly.removeItem(troupeId, itemType, itemId)
       .then(function() {
@@ -143,13 +166,11 @@ describe('markItemsRead', function() {
     var itemId1 = mongoUtils.getNewObjectIdString();
     var itemId2 = mongoUtils.getNewObjectIdString();
     var itemId3 = mongoUtils.getNewObjectIdString();
-    var items = {
-      'chat': [itemId1, itemId2]
-    };
+    var items = [itemId1, itemId2];
 
     var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
     var appEventsMock = mockito.spy(testRequire('./app-events'));
-    var readByService = mockito.spy(testRequire('./services/readby-service'));
+    var readByService = mockito.mock(testRequire('./services/readby-service'));
 
     var unreadItemService = testRequire.withProxies("./services/unread-item-service", {
       './troupe-service': troupeServiceMock,
@@ -157,7 +178,18 @@ describe('markItemsRead', function() {
       './readby-service': readByService
     });
 
-    mockito.when(troupeServiceMock).findUserIdsForTroupe(troupeId).thenReturn(Q.resolve([userId]));
+
+    var usersWithLurkHash = {};
+    usersWithLurkHash[userId] = false;
+
+
+    var troupe = {
+      githubType: 'REPO',
+      users: usersWithLurkHash
+    };
+
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupe));
 
     return Q.all([
         unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId1),
@@ -165,11 +197,27 @@ describe('markItemsRead', function() {
         unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId3)
       ])
       .then(function() {
-        unreadItemService.markItemsRead(userId, troupeId, items)
+
+        // Need to use mocks rather than verifiers as we need to do deep equals checking onth
+
+        mockito.when(appEventsMock).unreadItemsRemoved().then(function(a0, a1, a2) {
+          assert.equal(a0, userId);
+          assert.equal(a1, troupeId);
+          assert.equal(a2.chat.length, 2);
+          assert(a2.chat.every(function(itemId) { return _.contains(items, itemId); }));
+        });
+
+        mockito.when(readByService).recordItemsAsRead().then(function(a0, a1, a2) {
+          assert.equal(a0, userId);
+          assert.equal(a1, troupeId);
+          assert.equal(a2.chat.length, 2);
+          assert(a2.chat.every(function(itemId) { return _.contains(items, itemId); }));
+        });
+
+        unreadItemService.markItemsRead(userId, troupeId, [itemId1, itemId2])
           .then(function() {
-            // Two calls here, not three
-            mockito.verify(appEventsMock).unreadItemsRemoved(userId, troupeId, items);
-            mockito.verify(readByService).recordItemsAsRead(userId, troupeId, items);
+            mockito.verify(appEventsMock).unreadItemsRemoved();
+            mockito.verify(readByService).recordItemsAsRead();
 
             return unreadItemService.getUnreadItems(userId, troupeId, itemType)
               .then(function(items) {
@@ -186,16 +234,182 @@ describe('markItemsRead', function() {
                   });
 
               });
-          })
-          .nodeify(done);
-      });
+          });
+      })
+      .nodeify(done);
+
 
 
 
   });
 });
 
-describe('emailnotifications', function() {
+describe('limits', function() {
+
+  it('should not allow a user to have more than 100 unread items in a room', function(done) {
+    var troupeId = mongoUtils.getNewObjectIdString();
+    var userId = mongoUtils.getNewObjectIdString();
+    var itemType = 'chat';
+
+    var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
+
+    var unreadItemService = testRequire.withProxies("./services/unread-item-service", {
+      './troupe-service': troupeServiceMock
+    });
+
+
+    var usersWithLurkHash = {};
+    usersWithLurkHash[userId] = false;
+
+
+    var troupe = {
+      githubType: 'REPO',
+      users: usersWithLurkHash
+    };
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupe));
+    var adds = [];
+
+    for(var i = 0; i < 99; i++) {
+      adds.push(unreadItemService.testOnly.newItem(troupeId, null, itemType, mongoUtils.getNewObjectIdString()));
+    }
+
+    return Q.all(adds)
+      .then(function() {
+        // Do a single insert sans contention. In the real world, there will never be this much
+        // contention for a single usertroupe
+        return unreadItemService.testOnly.newItem(troupeId, null, itemType, mongoUtils.getNewObjectIdString());
+      })
+      .delay(100)
+      .then(function() {
+        return unreadItemService.getUserUnreadCounts(userId, troupeId);
+      })
+      .then(function(count) {
+        assert.equal(count, 100);
+      })
+      .nodeify(done);
+  });
+
+});
+
+describe('mentions', function() {
+
+  it('should record when a user is mentioned but not a member of the room', function(done) {
+    var troupeId = mongoUtils.getNewObjectIdString();
+    var userId = mongoUtils.getNewObjectIdString();
+    var userId2 = mongoUtils.getNewObjectIdString();
+    var chatId = mongoUtils.getNewObjectIdString();
+
+    var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
+    var appEventsMock = mockito.spy(testRequire('./app-events'));
+    var userServiceMock = mockito.spy(testRequire('./services/user-service'));
+    var permissionsModelMock = mockito.mockFunction();
+
+    var unreadItemService = testRequire.withProxies("./services/unread-item-service", {
+      './troupe-service': troupeServiceMock,
+      '../app-events': appEventsMock,
+      './permissions-model': permissionsModelMock,
+      './user-service': userServiceMock
+    });
+
+    var troupe = {
+      githubType: 'REPO',
+      users: { /* No users */ },
+      uri: 'gittertestbot/gittertestbot'
+    };
+
+    var nonMemberUserWithAccess = {
+      id: userId
+    };
+
+    var nonMemberUserWithoutAccess = {
+      id: userId2
+    };
+
+    // Fake chat
+    var chat = {
+      id: chatId,
+      mentions: [{
+        userId: userId
+      }, {
+        userId: userId2
+      }]
+    };
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupe));
+    mockito.when(userServiceMock).findByIds().then(function(userIds) {
+      assert.equal(userIds.length, 2);
+      assert(_.find(userIds, function(i) { return i == userId; }));
+      assert(_.find(userIds, function(i) { return i == userId2; }));
+
+      return Q.resolve([nonMemberUserWithAccess, nonMemberUserWithoutAccess]);
+    });
+
+    var y = 0;
+    mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType) {
+      y++;
+      assert.equal(perm, 'join');
+      assert.equal(uri, troupe.uri);
+      assert.equal(githubType, troupe.githubType);
+
+
+      if(y > 2) {
+        assert(false, 'permissions model called more than twice');
+      }
+
+      if(user !== nonMemberUserWithAccess) {
+        assert.equal(user, nonMemberUserWithoutAccess);
+        return Q.resolve(false);
+      } else {
+        return Q.resolve(true);
+
+      }
+
+    });
+
+    var c = 0;
+    mockito.when(appEventsMock).troupeMentionCountsChange().then(function(data) {
+      assert.equal(data.userId, userId);
+      assert.equal(data.troupeId, troupeId);
+      c++;
+      if(c === 1) {
+        assert.equal(data.total, 1);
+        assert.equal(data.op, 'add');
+        assert.equal(data.member, false);
+      } else if(c == 2) {
+        assert.equal(data.total, 0);
+        assert.equal(data.op, 'remove');
+        assert.equal(data.member, false);
+      } else {
+        assert(false, 'Call ' + c);
+      }
+    });
+
+    return unreadItemService.testOnly.detectAndCreateMentions(troupeId, undefined, chat)
+      .then(function() {
+        assert.equal(c, 1);
+        assert.equal(y, 2);
+        return unreadItemService.getRoomIdsMentioningUser(userId);
+      })
+      .then(function(troupeIds) {
+        assert.equal(troupeIds.length, 1);
+        assert.equal(troupeIds[0], troupeId);
+
+        return unreadItemService.markItemsRead(userId, troupeId, undefined, [chatId], { member: false });
+      })
+      .then(function() {
+        assert.equal(c, 2);
+        return unreadItemService.getRoomIdsMentioningUser(userId);
+      })
+      .then(function(troupeIds) {
+        assert.equal(troupeIds.length, 0);
+      })
+      .nodeify(done);
+  });
+
+});
+
+describe.skip('emailnotifications', function() {
   it('should let you know who needs to be notified by email', function(done) {
     var troupeId = mongoUtils.getNewObjectIdString();
     var userId = mongoUtils.getNewObjectIdString();
@@ -281,7 +495,16 @@ describe('emailnotifications', function() {
       './troupe-service': troupeServiceMock
     });
 
-    mockito.when(troupeServiceMock).findUserIdsForTroupe(troupeId).thenReturn(Q.resolve([userId]));
+
+    var usersWithLurkHash = {};
+    usersWithLurkHash[userId] = true;
+
+    var troupe = {
+      githubType: 'REPO',
+      users: usersWithLurkHash
+    };
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupe));
 
     return Q.all([
         unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId1),
@@ -308,17 +531,24 @@ describe('emailnotifications', function() {
     var itemId1 = mongoUtils.getNewObjectIdString();
     var itemId2 = mongoUtils.getNewObjectIdString();
     var itemId3 = mongoUtils.getNewObjectIdString();
-    var items = {
-      'chat': [itemId1]
-    };
 
     var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
+    var appEventsMock = mockito.mock(testRequire('./app-events'));
 
     var unreadItemService = testRequire.withProxies("./services/unread-item-service", {
-      './troupe-service': troupeServiceMock
+      './troupe-service': troupeServiceMock,
+      '../app-events': appEventsMock
     });
 
-    mockito.when(troupeServiceMock).findUserIdsForTroupe(troupeId).thenReturn(Q.resolve([userId]));
+    var usersWithLurkHash = {};
+    usersWithLurkHash[userId] = false;
+
+    var troupe = {
+      users: usersWithLurkHash,
+      githubType: 'REPO'
+    };
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupe));
 
     return Q.all([
         unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId1),

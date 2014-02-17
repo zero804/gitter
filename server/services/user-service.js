@@ -77,20 +77,6 @@ function newUser(options, callback) {
 }
 
 var userService = {
-  // findOrCreateUserForEmail: function(options, callback) {
-  //   winston.info("Locating or creating user", options);
-
-  //   var email = options.email.toLowerCase();
-
-  //   return userService.findByEmail(email)
-  //     .then(function(user) {
-  //       if(user) return user;
-
-  //       return newUser(options);
-  //     })
-  //     .nodeify(callback);
-  // },
-
   findOrCreateUserForGithubId: function(options, callback) {
     winston.info("Locating or creating user", options);
 
@@ -103,10 +89,7 @@ var userService = {
       .nodeify(callback);
   },
 
-
-
   findByConfirmationCode: function(confirmationCode, callback) {
-
     persistence.User.find().or([{confirmationCode: confirmationCode} /*, {'unconfirmedEmails.confirmationCode': confirmationCode} */]).findOne()
       .execQ()
       .nodeify(callback);
@@ -192,7 +175,6 @@ var userService = {
       .nodeify(callback);
   },
 
-
   findByUnconfirmedEmail: function(email, callback) {
     return persistence.User.findOneQ({ 'unconfirmedEmails.email': email.toLowerCase() })
       .nodeify(callback);
@@ -205,6 +187,12 @@ var userService = {
 
   findByIds: function(ids, callback) {
     return persistence.User.where('_id')['in'](collections.idsIn(ids))
+      .execQ()
+      .nodeify(callback);
+  },
+
+  findByUsernames: function(usernames, callback) {
+    return persistence.User.where('username')['in'](usernames)
       .execQ()
       .nodeify(callback);
   },
@@ -229,48 +217,6 @@ var userService = {
       .then(function(user) {
         return user && user.username;
       });
-  },
-
-  /**
-   * Update the last visited troupe for the user, sending out appropriate events
-   * Returns a promise of nothing
-   */
-  saveLastVisitedTroupeforUserId: function(userId, troupeId, callback) {
-    winston.verbose("Saving last visited Troupe for user: " + userId+ " to troupe " + troupeId);
-
-    var lastAccessTime = new Date();
-
-    var setOp = {};
-    setOp['troupes.' + troupeId] = lastAccessTime;
-
-    return Q.all([
-        // Update UserTroupeLastAccess
-        persistence.UserTroupeLastAccess.updateQ(
-           { userId: userId },
-           { $set: setOp },
-           { upsert: true }),
-        // Update User
-        persistence.User.updateQ({ _id: userId }, { $set: { lastTroupe: troupeId }})
-      ])
-      .then(function() {
-        // XXX: lastAccessTime should be a date but for some bizarre reason it's not
-        // serializing properly
-        appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() });
-      })
-      .nodeify(callback);
-
-  },
-
-  /**
-   * Get the last access times for a user
-   * @return promise of a hash of { troupeId1: accessDate, troupeId2: accessDate ... }
-   */
-  getTroupeLastAccessTimesForUser: function(userId, callback) {
-    return persistence.UserTroupeLastAccess.findOneQ({ userId: userId }).then(function(userTroupeLastAccess) {
-      if(!userTroupeLastAccess || !userTroupeLastAccess.troupes) return {};
-
-      return userTroupeLastAccess.troupes;
-    }).nodeify(callback);
   },
 
   // setUserLocation: function(userId, location, callback) {

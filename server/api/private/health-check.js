@@ -1,10 +1,11 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var os       = require("os");
-var nconf    = require('../../utils/config');
-var mongoose = require('mongoose');
-var winston  = require('winston');
+var os         = require("os");
+var nconf      = require('../../utils/config');
+var mongoose   = require('mongoose');
+var winston    = require('winston');
+var appVersion = require('../../web/appVersion');
 
 //TODO: remove
 module.exports = [
@@ -32,7 +33,7 @@ module.exports = [
             pingtestCollection.remove({ }, function(err) {
               if(err) return next(err);
 
-              res.send("OK from " + os.hostname() + ":" + nconf.get('PORT'));
+              res.send("OK from " + os.hostname() + ":" + nconf.get('PORT') + ", running " + appVersion.getAppTag());
             });
           });
 

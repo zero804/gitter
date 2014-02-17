@@ -1,6 +1,9 @@
 /* jshint unused:true, browser:true,  strict:true */
 /* global define:false */
-define(['utils/context'], function(context) {
+define([
+  'utils/context',
+  'collections/instances/integrated-items'
+  ], function(context, collections) {
   "use strict";
 
   function highlightMention(chatItemView) {
@@ -20,10 +23,33 @@ define(['utils/context'], function(context) {
     }
   }
 
+  function removeFalseMentions(chatItemView, users) {
+    var usernames = users.map(function(user) {
+      return user.get('username');
+    });
+
+    chatItemView.$el.find('.trpChatText .mention').each(function() {
+      var username = this.dataset.screenName;
+
+      if(usernames.indexOf(username) === -1) {
+        $(this).replaceWith('@'+username);
+      }
+    });
+  }
+
   var decorator = {
 
     decorate: function(chatItemView) {
       highlightMention(chatItemView);
+      var users = collections.users;
+
+      if(users.length) {
+        removeFalseMentions(chatItemView, users);
+      } else {
+        users.once('add', function() {
+          removeFalseMentions(chatItemView, users);
+        });
+      }
     }
 
   };

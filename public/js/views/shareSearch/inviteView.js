@@ -34,27 +34,20 @@ define([
           return false;
     },
 
-    createClipboard : function() {
+    createClipboard : function(ev) {
+
       if(this.clip) return;
 
       ZeroClipboard.setMoviePath( cdn('repo/zeroclipboard/ZeroClipboard.swf') );
       ZeroClipboard.Client.prototype.zIndex = 100000;
       var clip = new ZeroClipboard.Client();
-      clip.setText(this.getShareUrl());
-      clip.glue( 'copy-button');
-      // make your own div with your own css property and not use clip.glue()
-      // var flash_movie = '<div>'+clip.getHTML(width, height)+'</div>';
-      // var width = $("#copy-button").outerWidth()+4;
-      // var height =  $("#copy-button").height()+10;
-      // flash_movie = $(flash_movie).css({
-      //     position: 'relative',
-      //     marginBottom: -height,
-      //     width: width,
-      //     height: height,
-      //     zIndex: 101
-      //     });
-      // $("#copy-button").before(flash_movie);
+      clip.setText($(ev.target).data('copy-text'));
+      clip.glue(ev.target);
       this.clip=clip;
+
+      clip.addEventListener( 'onComplete', function() {
+        $('.close').click();
+      });
     },
 
     getRenderData: function() {
@@ -68,18 +61,20 @@ define([
       if (context.getTroupe().githubType == 'ORG') {
         isOrg = true;
       }
-      // if (context.getTroupe().githubType)
+
 
       return {
         hasFlash: this.detectFlash(),
         isRepo : isRepo,
         isOrg : isOrg,
-        url: this.getShareUrl()
+        url: this.getShareUrl(),
+        badgeUrl: context.env('badgeBaseUrl') + context.getTroupe().url + ".png",
+        badgeMD: "[![Gitter chat](" + context.env('badgeBaseUrl') + context.getTroupe().url + ".png)](" + this.getShareUrl() + ")"
       };
     },
 
     events: {
-      'mouseover #copy-button' :      'createClipboard'
+      'mouseover .copy-button' :      'createClipboard'
     },
 
     afterRender: function() {

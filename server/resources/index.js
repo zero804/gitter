@@ -10,7 +10,7 @@ module.exports = {
     ];
 
     // Secure the REST API
-    ['/troupes', '/user'].forEach(function(path) {
+    ['/api/v1/troupes', '/api/v1/user'].forEach(function(path) {
         app.all(path, auth);
         app.all(path + '/*', auth);
     });
@@ -24,21 +24,14 @@ module.exports = {
     }
 
     installTroupeSubResource('issues', 'issues');
-    installTroupeSubResource('requests', 'requests');
     installTroupeSubResource('users', 'users');
-    installTroupeSubResource('files', 'files');
-    installTroupeSubResource('downloads', 'downloads');
-    installTroupeSubResource('embedded', 'embedded');
-    installTroupeSubResource('thumbnails', 'thumbnails');
     installTroupeSubResource('channels', 'channels');
-
 
     var chatResource = installTroupeSubResource('chatMessages', 'chat-messages');
     var chatReadBy = new Resource('readBy', require('./troupes/chat-read-by'), app);
     chatResource.add(chatReadBy);
 
-
-    installTroupeSubResource('unreadItems', 'unread-items');
+    var eventsResource = installTroupeSubResource('events', 'events');
 
     var userResource = app.resource('api/v1/user',  require('./user/user.js'));
     function installUserSubResource(resourceName, moduleName) {
@@ -51,9 +44,10 @@ module.exports = {
     var userSettings = new Resource('settings', require('./user/troupe-settings'), app);
     userTroupeResource.add(userSettings);
 
-    installUserSubResource('emails',  'emails');
-    installUserSubResource('orgs',  'orgs');
-    installUserSubResource('repos',  'repos');
+    var unreadItems = new Resource('unreadItems', require('./user/unread-items'), app);
+    userTroupeResource.add(unreadItems);
 
+    installUserSubResource('orgs',        'orgs');
+    installUserSubResource('repos',       'repos');
   }
 };

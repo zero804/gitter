@@ -9,46 +9,110 @@ define([
   '../troupes',
   '../orgs',
   'components/unread-items-frame-client',
+  'utils/appevents',
+  'backbone-sorted-collection',
   'filtered-collection' /* no ref */
-], function($, _, Backbone, context, base, realtime, troupeModels, orgModels, unreadItemsClient) {
-  "use strict";
+], function($, _, Backbone, context, base, realtime, troupeModels, orgModels, unreadItemsClient, appEvents, Sorted) {
+  'use strict';
 
   var orgsCollection = new orgModels.OrgCollection(null, { listen: true });
+  // XXX: Why are we doing a fetch on this collection?
   orgsCollection.fetch();
 
   var troupeCollection = new troupeModels.TroupeCollection(null, { listen: true });
+
   unreadItemsClient.installTroupeListener(troupeCollection);
+
+  /* Utils for comparators, perhaps this should go somewhere useful? */
+  function nullish(a) {
+    return a === null || a === undefined || a === 0;
+  }
+
+  function naturalComparator(a, b) {
+    if(a === b) return 0;
+    return a > b ? 1 : -1;
+  }
+
+  function reverseNaturalComparator(a, b) {
+    if(a === b) return 0;
+    return a > b ? -1 : 1;
+  }
+
+  /* Sort, order things that are not null before things that are null */
+  function existenceComparator(a, b) {
+    if(!nullish(a)) {
+      if(!nullish(b)) {
+        return 0;
+      } else {
+        return -1;
+      }
+    } else {
+      if(!nullish(b)) {
+        return 1;
+      } else {
+        return null;
+      }
+    }
+  }
+
+  /* ---- end of comparators ---- */
 
   function filterTroupeCollection(filter) {
     var c = new Backbone.FilteredCollection(null, { model: troupeModels.TroupeModel, collection: troupeCollection });
     c.setFilter(filter);
-    return c;
+    var sorted = new Sorted(c);
+    return sorted;
   }
 
-  // collection of normal troupes only
-  var filteredTroupeCollection = filterTroupeCollection(function(m) {
-    return !m.get('oneToOne') /* || m.get('unreadItems') > 0 */;
-  });
-
-  // collection of one to one troupes only
-  var peopleOnlyTroupeCollection = filterTroupeCollection(function(m) {
-    return m.get('oneToOne');
-  });
-
-  // collection of unread troupes only
-  var unreadTroupeCollection = filterTroupeCollection(function(m) {
-    return m.get('unreadItems') > 0;
-  });
-
   // collection of favourited troupes
-  var favouriteTroupesCollection = filterTroupeCollection(function(m) {
+  var favourites = filterTroupeCollection(function(m) {
     return m.get('favourite');
   });
 
-  // collection of troupes that are Repos
-  var repoTroupeCollection = filterTroupeCollection(function(m) {
-    var githubType = m.get('githubType');
-    return githubType === 'REPO' || githubType === 'ORG_CHANNEL' || githubType === 'REPO_CHANNEL';
+  /* Favs are sorted by favourite field in ASC order, with name as a secondary order */
+  favourites.setSort(function(a, b) {
+    var c = naturalComparator(a.get('favourite'), b.get('favourite'));
+    if(c !== 0) return c;
+    return naturalComparator(a.get('name'), b.get('name'));
+  });
+
+  var recentRoomsNonFavourites = filterTroupeCollection(function(m) {
+    /* Not a favourite, but has a lastAccessTime */
+    return !m.get('favourite') && (m.get('lastAccessTime') || m.get('unreadItems') || m.get('mentions'));
+  });
+
+  /**
+   * Sorting goes like this:
+   * Unread items first, sorted by name, alphabetically,
+   * followed by order of most recent access
+   */
+  recentRoomsNonFavourites.setSort(function(a, b) {
+    var c = existenceComparator(a.get('mentions'), b.get('mentions'));
+    if(c === 0) {
+      /** Both sides have mentions, compare by name */
+      return naturalComparator(a.get('name'), b.get('name'));
+    } else if(c === null) {
+      /* Neither side has mentions, compare by lastAccessTime, descending */
+
+      c = existenceComparator(a.get('unreadItems'), b.get('unreadItems'));
+      if(c === 0) {
+        /** Both sides have unreadItems, compare by name */
+        return naturalComparator(a.get('name'), b.get('name'));
+      } else if(c === null) {
+        /* Neither side has unreadItems, compare by lastAccessTime, descending */
+        var aLastAccessTime = a.get('lastAccessTime');
+        var bLastAccessTime = b.get('lastAccessTime');
+
+        return reverseNaturalComparator(aLastAccessTime && aLastAccessTime.valueOf(), bLastAccessTime && bLastAccessTime.valueOf());
+      } else {
+        return c;
+      }
+
+    } else {
+      return c;
+    }
+
+
   });
 
   // Sync up with the context
@@ -60,51 +124,30 @@ define([
     }
   });
 
+  appEvents.on('activity', function(message) {
+    /* Lurk mode... */
 
-  // collection of recent troupes only, will be empty at first.
-  // doesn't need to be connected to events from the main collection,
-  // because this only changes when the page is refreshed
-  // (TODO actually it changes when another window accesses it as well, but this change doesn't get pushed through faye yet)
-  var recentTroupeCollection = new Backbone.Collection();
+    var troupeId = message.troupeId;
+    var model = troupeCollection.get(troupeId);
+    if(!model) return;
 
-  // when the list of troupes come in filter them and put them in recentTroupeCollection
-  troupeCollection.on('reset sync change:lastAccessTime add remove', function() {
-    // filter out troupes that don't have a last access time
-    var recentTroupeModels = _.filter(troupeCollection.models, function(v) {
-      return !!v.get('lastAccessTime');
-    });
-
-    // sort the troupes by last accessed
-    recentTroupeModels = _.sortBy(recentTroupeModels, function(v) {
-      var lastAccess = v.get('lastAccessTime');
-
-      return lastAccess.valueOf();
-    }).reverse();
-
-    // filter to the most recent 5
-    recentTroupeModels = _.filter(recentTroupeModels, function(v, k) {
-      return k < 5;
-    });
-
-    // set these as the models for recentTroupeCollection and send out a reset on that collection
-    recentTroupeCollection.reset(recentTroupeModels);
-    recentTroupeCollection.trigger('sync');
-
+    if(!model.get('lurk')) return;
+    var a = model.get('activity');
+    if(a) {
+      model.set('activity', a + 1);
+    } else {
+      model.set('activity', 1);
+    }
   });
 
-
-  //var smartCollection = new SmartCollection(null, { troupes: troupeCollection });
-
   return {
+    /* All rooms */
     troupes: troupeCollection,
-    peopleTroupes: peopleOnlyTroupeCollection,
-    normalTroupes: filteredTroupeCollection,
-    recentTroupes: recentTroupeCollection,
-    unreadTroupes: unreadTroupeCollection,
-    favouriteTroupes: favouriteTroupesCollection,
-    //smart: smartCollection,
-    orgs: orgsCollection,
-    repos: repoTroupeCollection
+
+    /* Filtered rooms */
+    favourites: favourites,
+    recentRoomsNonFavourites: recentRoomsNonFavourites,
+    orgs: orgsCollection
   };
 
 });

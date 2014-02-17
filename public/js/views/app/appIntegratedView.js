@@ -19,10 +19,13 @@ define([
   "use strict";
 
   var touchEvents = {
+    "click #menu-toggle-button":        "onMenuToggle",
     "keypress":                         "onKeyPress"
   };
 
   var mouseEvents = {
+    "click #menu-toggle-button":        "onMenuToggle",
+    "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
     "mouseenter #content-frame":        "onMouseEnterContentFrame",
     "mouseenter #left-menu":            "onMouseEnterLeftMenu",
     "mouseenter #toolbar-frame":        "onMouseEnterToolbar",
@@ -60,7 +63,6 @@ define([
         showTooltip: false
       }).render();
 
-      // tooltips for the app-template
       $('#profile-icon, #home-icon').tooltip();
 
       // $('body').append('<span id="fineUploader"></span>');
@@ -117,88 +119,67 @@ define([
     //   }
     // },
 
-    // ensureProfileIsUsernamed: function() {
-    //   var user = context.getUser();
-    //   if (user && !user.username /* if the context has not yet loaded, what do we do? */) {
-    //     new UsernameView.Modal().show();
-    //   }
-    // },
+    showMenu: function() {
+      if (this._menuAnimating) return;
+      this.openLeftMenu();
+      $("#left-menu-icon").addClass("active");
+    },
 
-    // hidePanel: function (whichPanel) {
-    //   $("#chat-frame, #chat-input, #toolbar-frame, #header-area").removeClass('rightCollapse');
-    //   $(whichPanel).removeClass('visible');
-    //   this.rightpanel = false;
-    // },
+    hideMenu: function() {
+      if(this._menuAnimating || this._leftMenuLockCount > 0) return;
+      this.closeLeftMenu();
+      $("#left-menu-icon").removeClass("active");
+    },
 
-    // showPanel: function(whichPanel) {
-    //   if (!this.rightpanel) {
-    //     $("#chat-frame, #chat-input, #toolbar-frame, #header-area").addClass("rightCollapse");
-    //     $(whichPanel).addClass("visible");
-    //     this.rightpanel = true;
-    //   }
-    // },
+    openLeftMenu: function() {
+      if (this.leftmenu) return;
 
-    // showMenu: function() {
-    //   if (this._menuAnimating) return;
-    //   this.openLeftMenu();
-    //   $("#left-menu-icon").addClass("active");
-    // },
+      if (!window._troupeIsTablet) $("#chat-input-textarea").blur();
 
-    // hideMenu: function() {
-    //   if(this._menuAnimating || this._leftMenuLockCount > 0) return;
-    //   this.closeLeftMenu();
-    //   $("#left-menu-icon").removeClass("active");
-    // },
+      if (this.selectedListIcon == "icon-search") {
+        this.activateSearchList();
+      }
 
-    // openLeftMenu: function() {
-    //   if (this.leftmenu) return;
+      var self = this;
+      this._menuAnimating = true;
 
-    //   if (!window._troupeIsTablet) $("#chat-input-textarea").blur();
+      appEvents.trigger('leftMenu:animationStarting');
+      setTimeout(function() {
+        self._menuAnimating = false;
+        appEvents.trigger('leftMenu:showing');
+        appEvents.trigger('leftMenu:animationComplete');
+      }, 350);
 
-    //   if (this.selectedListIcon == "icon-search") {
-    //     this.activateSearchList();
-    //   }
+      $("#left-menu").addClass("visible");
+      $("#mini-left-menu, #mini-left-menu-container").addClass("active");
+      $("#iframe-panel, #menu-toggle-button").addClass("leftCollapse");
 
-    //   var self = this;
-    //   this._menuAnimating = true;
+      this.leftmenu = true;
+    },
 
-    //   appEvents.trigger('leftMenu:animationStarting');
-    //   setTimeout(function() {
-    //     self._menuAnimating = false;
-    //     appEvents.trigger('leftMenu:showing');
-    //     appEvents.trigger('leftMenu:animationComplete');
-    //   }, 350);
+    closeLeftMenu: function() {
+      if(!this.leftmenu) return;
+      this._leftMenuLockCount = 0;
 
-    //   $("#left-menu").addClass("visible");
-    //   $("#mini-left-menu, #mini-left-menu-container").addClass("active");
-    //   $("#content-wrapper, #toolbar-frame, #menu-toggle-button, #header-wrapper, #chat-input-wrapper").addClass("leftCollapse");
+      // refocus chat input in case it's lost focus but don't do that on tablets
+      if (!window._troupeIsTablet) $("#chat-input-textarea").focus();
 
-    //   this.leftmenu = true;
-    // },
+      var self = this;
+      this._menuAnimating = true;
 
-    // closeLeftMenu: function() {
-    //   if(!this.leftmenu) return;
-    //   this._leftMenuLockCount = 0;
+      appEvents.trigger('leftMenu:animationStarting');
+      setTimeout(function() {
+        self._menuAnimating = false;
+        appEvents.trigger('leftMenu:hidden');
+        appEvents.trigger('leftMenu:animationComplete');
+      }, 350);
 
-    //   // refocus chat input in case it's lost focus but don't do that on tablets
-    //   if (!window._troupeIsTablet) $("#chat-input-textarea").focus();
+      $("#mini-left-menu, #mini-left-menu-container").removeClass("active");
+      $("#iframe-panel, #menu-toggle-button").removeClass("leftCollapse");
+      $("#left-menu").removeClass("visible");
 
-    //   var self = this;
-    //   this._menuAnimating = true;
-
-    //   appEvents.trigger('leftMenu:animationStarting');
-    //   setTimeout(function() {
-    //     self._menuAnimating = false;
-    //     appEvents.trigger('leftMenu:hidden');
-    //     appEvents.trigger('leftMenu:animationComplete');
-    //   }, 350);
-
-    //   $("#mini-left-menu, #mini-left-menu-container").removeClass("active");
-    //   $("#content-wrapper, #toolbar-frame, #menu-toggle-button, #header-wrapper, #chat-input-wrapper").removeClass("leftCollapse");
-    //   $("#left-menu").removeClass("visible");
-
-    //   this.leftmenu = false;
-    // },
+      this.leftmenu = false;
+    },
 
 
     // togglePanel: function(whichPanel) {
@@ -232,17 +213,31 @@ define([
     //   }
     // },
 
-    // toggleMenu: function() {
-    //   if (this.leftmenu) {
-    //     this.hideMenu();
-    //   } else {
-    //     this.showMenu();
-    //   }
-    // },
+    toggleMenu: function() {
+      if (this.leftmenu) {
+        this.hideMenu();
+      } else {
+        this.showMenu();
+      }
+    },
 
-    // activateSearchList: function () {
-    //   $("#list-search-input").focus();
-    // },
+    onMenuToggle: function() {
+      this.toggleMenu();
+    },
+
+    onLeftMenuHotspot: function() {
+      this.showMenu();
+    },
+
+    onMouseEnterContentFrame: function() {
+      if (this.leftmenu) {
+        this.hideMenu();
+      }
+    },
+
+    activateSearchList: function () {
+      $("#list-search-input").focus();
+    },
 
     onKeyPress: function(e) {
       //  return if user is copying or pasting

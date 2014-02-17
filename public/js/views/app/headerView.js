@@ -5,8 +5,9 @@ define([
   'marionette',
   'hbs!./tmpl/headerViewTemplate',
   'utils/autolink',
-  'underscore'
-], function($, context, Marionette, headerViewTemplate, autolink, _)  {
+  'underscore',
+  'components/notifications'
+], function($, context, Marionette, headerViewTemplate, autolink, _, notifications)  {
   "use strict";
 
   return Marionette.ItemView.extend({
@@ -16,6 +17,12 @@ define([
     },
     events: {
       'click #leave-room': 'leaveRoom',
+      'click #activity-feed-toggle' : 'toggleActivityFeed',
+      'click #notifications-settings-link': 'enableBrowserNotifications'
+    },
+
+    initialize: function() {
+      this.showActivity = true;
     },
 
     leaveRoom: function() {
@@ -24,6 +31,32 @@ define([
         data: "",
         type: "DELETE",
       });
+    },
+
+    showActivityFeed: function () {
+      $('.webhook').parent().parent().slideDown();
+      $('#activity-feed-toggle').addClass("show-activity");
+    },
+
+    hideActivityFeed: function () {
+      $('.webhook').parent().parent().slideUp();
+      $('#activity-feed-toggle').removeClass("show-activity");
+    },
+
+    toggleActivityFeed: function() {
+      if (this.showActivity) {
+        this.hideActivityFeed();
+        this.showActivity = false;
+      } else {
+        this.showActivityFeed();
+        this.showActivity = true;
+      }
+    },
+
+    enableBrowserNotifications: function() {
+      if(context().desktopNotifications) {
+        notifications.enable();
+      }
     },
 
     serializeData: function() {
@@ -35,10 +68,13 @@ define([
       }
 
       return {
+        isNativeDesktopApp: context().isNativeDesktopApp,
+        troupeUrl: window.location.origin+troupe.url,
         permissions: context().permissions,
         oneToOne: troupe.oneToOne,
         troupeName: troupe.name,
         troupeTopic: topic,
+        troupeUri : troupe.url,
         troupeFavourite: troupe.favourite
       };
     }

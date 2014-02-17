@@ -1,6 +1,6 @@
-Troupe App Server
+Gitter App Server
 
-Copyright Troupe Technology Limited 2012,2013
+Copyright Troupe Technology Limited 2012 - 2014
 All rights reserved.
 
 
@@ -14,7 +14,7 @@ __Getting Started__
 4.	`./redis.sh &`
 5.	`./scripts/mongo/init-dev-mongo.sh`
 6.	`./scripts/upgrade-data.sh`
-7.	`node-dev web.js`
+7.	`nodemon -w public/templates -w server -e js,hbs web.js`
 
 __Run Like Production__
 `node web --web:staticContent=public-processed/ --web:minified=true`

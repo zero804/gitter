@@ -271,7 +271,6 @@ install-client-libs:
 	cp output/client-libs/requirejs/index.js public/repo/requirejs/requirejs.js
 	cp output/client-libs/retina.js-js/src/retina.js public/repo/retina/retina.js
 	cp output/client-libs/scrollfix/scrollfix-amd.js public/repo/scrollfix/scrollfix.js
-	cp output/client-libs/sisyphus/jquery.sisyphus-amd.js public/repo/sisyphus/jquery.sisyphus.js
 	cp output/client-libs/underscore/underscore-amd.js public/repo/underscore/underscore.js
 	# cp output/client-libs/zeroclipboard/ZeroClipboard.js public/repo/zeroclipboard/zeroclipboard.js
 	cp output/client-libs/zeroclipboard/zeroclipboard-amd.js public/repo/zeroclipboard/zeroclipboard.js
