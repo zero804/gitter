@@ -1,7 +1,7 @@
 <div class="huboard">
   <div class="activity-time">{{widget "timeago" time=sent compact=true}}</div>
 
-  <span class="gtrActivityItemText">[H] <a class="issue" href="{{meta.url}}" target="_blank" data-link-type="issue" data-issue="{{meta.number}}" data-issue-repo="{{meta.repo}}">#{{meta.number}}</a> {{meta.action}} from {{meta.previousState}} to {{meta.newState}}</span>
+  <span class="gtrActivityItemText"><span class='mention'>{{meta.user}}</span> {{meta.action}} <a class="issue" href="{{meta.url}}" target="_blank" data-link-type="issue" data-issue="{{meta.number}}" data-issue-repo="{{meta.repo}}">#{{meta.number}}</a> from {{meta.previousState}} to {{meta.newState}}</span>
 
   <div style="clear: both;"></div>
 </div>
