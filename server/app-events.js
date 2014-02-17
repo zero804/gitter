@@ -87,6 +87,8 @@ function bind(on) {
       });
     },
 
+    
+
     onUnreadItemsRemoved: function(callback) {
       on('unreadItemRemoved', callback);
     },
@@ -239,6 +241,22 @@ function bind(on) {
 
     onTroupeDeleted: function(callback) {
       on('troupeDeleted', callback);
+    },
+
+    chatMessage: function(data) {
+      emit('chatMessage', data);
+    },
+
+    hookEvent: function(data) {
+      emit('hookEvent', data);
+    },
+
+    userJoined: function(data) {
+      emit('userJoined', data);
+    },
+
+    userLeft: function(data) {
+      emit('userLeft', data);
     }
 
   };
