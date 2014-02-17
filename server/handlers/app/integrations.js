@@ -13,6 +13,7 @@ var Q                            = require('q');
 
 var serviceDisplayNames = {
   github: 'GitHub',
+  huboard: 'Huboard',
   bitbucket: 'BitBucket',
   jenkins: 'Jenkins',
   travis: 'Travis',
