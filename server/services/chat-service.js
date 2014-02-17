@@ -53,7 +53,17 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
     return mention.screenName;
   });
 
-  var _msg = {username: user.username, room: troupe.uri, text: text};
+  var _msg;
+  if (troupe.oneToOne) {
+    var toUserId;
+    troupe.users.forEach(function(_user) {
+      if (_user.userId.toString() !== user.id.toString()) toUserId = _user.userId;
+    });
+    _msg = {oneToOne: true, username: user.username, toUserId: toUserId, text: text};
+  } else {
+    _msg = {oneToOne: false, username: user.username, room: troupe.uri, text: text};
+  }
+
   redisClient.publish('chat_messages', JSON.stringify(_msg));
 
   userService.findByUsernames(mentionUserNames, function(err, users) {
