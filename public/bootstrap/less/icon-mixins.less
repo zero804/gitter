@@ -108,6 +108,18 @@
   .prepend-gitter-icon('\e813')
 }
 
+.prepend-icon-huboard() {
+  &:before {
+    content: 'H';
+    position: absolute;
+    left: 0;
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+  }
+  position: relative;
+  padding-left: 1.5em;
+}
+
 .prepend-gitter-icon(@charCode) {
     &:before {
       font-family: 'troupe-icons';
