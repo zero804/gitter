@@ -17,6 +17,7 @@ var winston = require('winston');
  */
 function lookupUri(uri) {
   var lcUri = uri.toLowerCase();
+  console.trace();
 
   winston.verbose('URI lookup: ' + uri);
 
@@ -24,7 +25,7 @@ function lookupUri(uri) {
     .then(function(uriLookup) {
       winston.verbose('URI lookup returned a result? ' + !!uriLookup);
 
-      if(uriLookup) return uriLookup;
+      if(uriLookup && (uriLookup.userId || uriLookup.troupeId )) return uriLookup;
 
       winston.verbose('Attempting to search through users and troupes to find ' + uri);
 
@@ -39,14 +40,14 @@ function lookupUri(uri) {
 
         if(user) {
           return persistence.UriLookup.findOneAndUpdateQ(
-            { uri: uri, userId: user._id },
+            { $or: [{ uri: lcUri }, { userId: user._id }] },
             { $set: { uri: lcUri, userId: user._id }, $unset: { troupeId: '' } },
             { upsert: true });
         }
 
         if(troupe) {
           return persistence.UriLookup.findOneAndUpdateQ(
-            { uri: uri, troupeId: troupe._id },
+            { $or: [{ uri: lcUri }, { troupeId: troupe._id }] },
             { $set: { uri: lcUri, troupeId: troupe._id }, $unset: { userId: '' } },
             { upsert: true });
         }

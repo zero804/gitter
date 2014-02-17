@@ -8,36 +8,15 @@ define([
 ], function($, context, Faye, appEvents, log) {
   "use strict";
 
-  //Faye.Logging.logLevel = 'debug';
-  //Faye.logger = log;
-
-  var connected = false;
-  var connectionProblemTimeoutHandle;
-  var persistentOutage = false;
+  if(window.localStorage.fayeLogging) {
+    Faye.Logging.logLevel = parseInt(window.localStorage.fayeLogging, 10);
+    Faye.logger = log;
+  }
 
   var clientId = null;
 
   function isMobile() {
     return navigator.userAgent.indexOf('Mobile/') >= 0;
-  }
-
-  function connectionProblemTimeout() {
-    connectionProblemTimeoutHandle = null;
-
-    // If there was a timing issue
-    if(connected) {
-      if(persistentOutage) {
-        persistentOutage = false;
-        $(document).trigger('realtime:persistentOutageCleared');
-      }
-
-      return;
-    }
-
-    if(!persistentOutage) {
-      persistentOutage = true;
-      $(document).trigger('realtime:persistentOutage');
-    }
   }
 
   var eyeballState = true;
@@ -47,6 +26,64 @@ define([
     eyeballState = state;
   });
 
+  var Rate = function() {
+    this.hash = {};
+    this.counter = 0;
+  };
+
+  Rate.prototype.event = function() {
+    this.counter++;
+
+    var d = Math.floor(Date.now() / 10000);
+    if(this.hash[d]) {
+      this.hash[d]++;
+    } else {
+      this.hash[d] = 1;
+    }
+
+    if(this.counter % 10 === 0) {
+      this.cleanup(d);
+    }
+
+    return this.hash[d - 1] || 0;
+  };
+
+  Rate.prototype.cleanup = function(p) {
+    var horizon = p - 2;
+    var hash = this.hash;
+
+    Object.keys(hash).forEach(function(key) {
+      if(parseInt(key, 10) < horizon) {
+        delete hash[key];
+      }
+    });
+  };
+
+  var RateMonitor = function() {
+    this.hRate = new Rate();
+    this.cRate = new Rate();
+  };
+
+  RateMonitor.prototype.outgoing = function(message, callback) {
+    var counter;
+    if(message.channel == '/meta/handshake') {
+      counter = this.hRate;
+    } else if(message.channel == '/meta/connect') {
+      counter = this.cRate;
+    }
+
+    if(counter) {
+      var rate = counter.event();
+      if(rate) {
+        /* Don't bother if the value is zero */
+        if(!message.ext) message.ext = {};
+        message.ext.rate = rate;
+        log('Rate of ' + message.channel  + ' is ' + rate + ' per 10s');
+      }
+    }
+
+    callback(message);
+  };
 
   var ClientAuth = function() {};
   ClientAuth.prototype.outgoing = function(message, callback) {
@@ -90,16 +127,8 @@ define([
         if(clientId !== message.clientId) {
           clientId = message.clientId;
           log("Realtime reestablished. New id is " + message.clientId);
-          $(document).trigger('realtime:newConnectionEstablished');
+          appEvents.trigger('realtime:newConnectionEstablished');
         }
-      }
-    } else if(message.channel == '/meta/subscribe') {
-      if(message.error && message.error.indexOf('403::') === 0) {
-        // More needs to be done here!
-        log('Access denied', message);
-        //window.alert('Realtime communications with the server have been disconnected. Click OK to reload.');
-        window.location.href = "/";
-        //window.location = '/home';
       }
     }
 
@@ -138,13 +167,21 @@ define([
   var AccessTokenFailureExtension = function() {
   };
 
+  var terminating = false;
+
   AccessTokenFailureExtension.prototype.incoming = function(message, callback) {
-    if(message.channel == '/meta/handshake' && !message.successful && message.error) {
-      var error = message.error.split('::')[0];
-      if(error === '403') {
-        log('Access denied. Will not retry');
-        //window.location.reload();
-        window.location.href = "/";
+    if(message.error && message.advice && message.advice.reconnect === 'none') {
+      // advice.reconnect == 'none': the server has effectively told us to go away for good
+      if(!terminating) {
+        terminating = true;
+        // More needs to be done here!
+        log('Access denied', message);
+        window.setTimeout(function() {
+          terminating = false;
+          window.alert('Realtime communications with the server have been disconnected. Click OK to reload.');
+          window.parent.location.href = "/" + context.user().get('username');
+        }, 10000);
+
       }
     }
 
@@ -161,41 +198,10 @@ define([
       client.disable('websocket');
     }
 
+    client.addExtension(new RateMonitor());
     client.addExtension(new ClientAuth());
     client.addExtension(snapshotExtension);
     client.addExtension(new AccessTokenFailureExtension());
-
-    client.bind('transport:down', function() {
-      log('transport:down');
-      connected = false;
-
-      if(!connectionProblemTimeoutHandle) {
-        connectionProblemTimeoutHandle = window.setTimeout(connectionProblemTimeout, 5000);
-      }
-
-      // the client is not online
-      $(document).trigger('realtime:down');
-    });
-
-    client.bind('transport:up', function() {
-      log('transport:up');
-      connected = true;
-
-      if(connectionProblemTimeoutHandle) {
-        window.clearTimeout(connectionProblemTimeoutHandle);
-        connectionProblemTimeoutHandle = null;
-      }
-
-      // the client is online
-      $(document).trigger('realtime:up');
-
-      // Long term outage
-      if(persistentOutage) {
-        persistentOutage = false;
-        $(document).trigger('realtime:persistentOutageCleared');
-      }
-    });
-
 
     var userSubscription;
 
@@ -207,8 +213,8 @@ define([
 
       if(user.id) {
         userSubscription = client.subscribe('/api/v1/user/' + user.id, function(message) {
-          if (message.notification === 'user_notification') {
-            appEvents.trigger('user_notification', message);
+          if (message.notification === 'user_notification' || message.notification === 'activity') {
+            appEvents.trigger(message.notification, message);
           }
         });
       }
@@ -218,14 +224,19 @@ define([
     return client;
   }
 
-
-  // Give the initial load 5 seconds to connect before warning the user that there is a problem
-  connectionProblemTimeoutHandle = window.setTimeout(connectionProblemTimeout, 5000);
-
   var client;
   function getOrCreateClient() {
     if(client) return client;
     client = createClient();
+
+    client.on('transport:down', function() {
+      log('realtime: transport down');
+    });
+
+    client.on('transport:up', function() {
+      log('realtime: transport up');
+    });
+
     return client;
   }
 
@@ -249,9 +260,16 @@ define([
     /* Only test the connection if one has already been established */
     if(!client) return;
 
-    client.publish('/api/v1/ping', { });
-  }
+    appEvents.trigger('realtime.testConnection');
 
+    client.publish('/api/v1/ping2', { })
+      .then(function() {
+        log('Server ping succeeded');
+      }, function(error) {
+        log('Unable to ping server', error);
+        // We could reinstate the persistant outage concept on this
+      });
+  }
 
   return {
     getClientId: function() {

@@ -26,16 +26,15 @@ define([
       // once this widget has the id of the user,
       // it will listen to changes on the global user collection,
       // so that it knows when to update.
-      var avatarChange = _.bind(function(event, data) {
+      var avatarChange = _.bind(function(event, user) {
+        if(user.id !== self.getUserId()) return;
 
-        if(data.id === self.getUserId()) {
-          if(self.user) {
-            self.user = data;
-          }
-
-          // re-rendering every avatar when the presence changes is excessive, especially for the viewer's own avatars
-          self.update();
+        if(self.user) {
+          self.user = user;
         }
+
+        // re-rendering every avatar when the presence changes is excessive, especially for the viewer's own avatars
+        self.update();
       }, this);
 
       var isModel = !!this.model;
@@ -111,10 +110,11 @@ define([
         userDisplayName: user.displayName,
         avatarUrl: avatarUrl,
         avatarSize: this.avatarSize,
-        tooltip: this.showTooltip && user.displayName + "<br>" + ((user.location) ? user.location.description : ""),
+        showTooltip: this.showTooltip,
         presenceClass: presenceClass,
         online: online,
-        offline: !online
+        offline: !online,
+        role: user.role
       };
     },
 

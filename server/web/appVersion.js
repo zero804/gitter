@@ -6,12 +6,13 @@
 var fs = require("fs");
 var winston = require('winston');
 
-var commit;
+var commit, revision;
 var tagFile = __dirname + '/../../GIT_COMMIT';
 
 try {
   if(fs.existsSync(tagFile)) {
     commit = ('' + fs.readFileSync(tagFile)).trim();
+    revision = commit;
   }
 } catch(e) {
 	winston.error('Unable to read GIT_COMMIT: ' + e);
@@ -19,6 +20,7 @@ try {
 
 if(!commit) {
   commit = 'dev' + Math.floor(Date.now() / 10000);
+  revision = 'develop';
 }
 
 var appTag = commit.substring(0, 6);
@@ -32,5 +34,10 @@ function getAppTag() {
 	return appTag;
 }
 
+function getRevision() {
+  return revision;
+}
+
 exports.getCurrentVersion = getCurrentVersion;
 exports.getAppTag = getAppTag;
+exports.getRevision = getRevision;

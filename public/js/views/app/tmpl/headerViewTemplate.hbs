@@ -6,7 +6,7 @@
       <ul class="dropdown-menu" role="menu">
         <li><a role="menuitem" tabindex="-1" href="#|inv">Share this chat room</a>
         <li role="presentation" class="divider"></li>
-        <li><a role="menuitem" tabindex="-1" href="#|troupeSettings">Notifications</a></li>
+        <li><a id="notifications-settings-link" role="menuitem" tabindex="-1" href="#|troupeSettings">Notifications</a></li>
         {{#if permissions.admin}}
           {{#if isNativeDesktopApp}}
             <li><a role="menuitem" tabindex="-1" href="{{troupeUrl}}#|integrations" target="_blank">Integrations</a></li>
@@ -15,12 +15,13 @@
           {{/if}}
         {{/if}}
         <li role="presentation" class="divider"></li>
-        <li><a role="menuitem" tabindex="-1" href="http://www.github.com/{{troupe.uri}}" target="_blank">Open in GitHub</a></li>
+        <li><a role="menuitem" tabindex="-1" href="http://www.github.com{{troupeUri}}" target="_blank">Open in GitHub</a></li>
         <li role="presentation" class="divider"></li>
-        <li><a role="menuitem" tabindex="-1" href="#" id="leave-room">Leave this room</a></li>
+        <li><a role="menuitem" tabindex="-1" id="leave-room" style="cursor: pointer;">Leave this room</a></li>
       </ul>
     </div>
   </div>
+<!--   <div class="activityFeedToggle show-activity" id="activity-feed-toggle"></div> -->
   {{/unless}}
   <div class="trpTroupeFavourite {{#if troupeFavourite}}favourited{{/if}}" id="favourite-button">
       <div style="display: inline-block; vertical-align: middle">
@@ -29,5 +30,5 @@
       </div>
   </div>
   <h1>{{troupeName}}</h1>
-  <p id="trpTopic">{{#unless oneToOne}}{{{troupeTopic}}}{{/unless}}{{#oneToOne}}<a href="http://github.com{{troupeName}}">github.com/{{troupeName}}</a>{{/oneToOne}}</p>
+  <p id="trpTopic">{{#unless oneToOne}}{{{troupeTopic}}}{{/unless}}{{#oneToOne}}<a href="http://github.com{{troupeUri}}" target="github">github.com{{troupeUri}}</a>{{/oneToOne}}</p>
 </div>

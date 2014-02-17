@@ -1,0 +1,7 @@
+<div class="github-pull-request">
+  <div class="activity-time">{{widget "timeago" time=sent compact=true}}</div>
+
+  <span class="gtrActivityItemText"><a href="https://github.com/{{payload.sender.login}}" target="_blank"><span class='mention'>{{payload.sender.login}}</span></a> {{payload.action}} <a class="issue {{payload.pull_request.state}}" href="{{payload.pull_request.html_url}}" target="_blank" data-link-type="issue" data-issue="{{payload.pull_request.number}}" data-issue-repo="{{payload.repository.full_name}}">#{{payload.pull_request.number}}</a></span>
+
+  <div style="clear: both;"></div>
+</div>

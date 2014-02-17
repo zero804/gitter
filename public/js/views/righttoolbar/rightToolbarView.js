@@ -1,7 +1,6 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
-  'backbone',
   'marionette',
   'views/base',
   'utils/context',
@@ -10,11 +9,11 @@ define([
   'collections/instances/integrated-items',
   'views/people/peopleCollectionView',
   'cocktail',
-  'utils/uservoice',
-  'views/widgets/troupeAvatar',
-  './repoInfo'
-], function($, Backbone, Marionette, TroupeViews, context, /*qq,*/ rightToolbarTemplate, itemCollections,
-  PeopleCollectionView, cocktail, userVoice, TroupeAvatar, repoInfo) {
+  './repoInfo',
+  './activity',
+  'utils/scrollbar-detect'
+], function($, Marionette, TroupeViews, context, /*qq,*/ rightToolbarTemplate, itemCollections,
+  PeopleCollectionView, cocktail, repoInfo, ActivityStream, hasScrollBars) {
   "use strict";
 
   var RightToolbarLayout = Marionette.Layout.extend({
@@ -23,34 +22,63 @@ define([
 
     regions: {
       people: "#people-roster",
-      troupeAvatar: "#troupe-avatar-region",
-      repo_info: "#repo-info"
+      repo_info: "#repo-info",
+      activity: "#activity"
+    },
+
+    events: {
+      'click #upgrade-auth': 'onUpgradeAuthClick',
+      'click .activity-expand' : 'expandActivity',
+      'click #people-header' : 'showPeopleList',
+      'click #info-header' : 'showRepoInfo'
+    },
+
+    showPeopleList: function() {
+      $('#repo-info').hide();
+      $('#people-roster').show();
+
+      $('#people-header').addClass('selected');
+      $('#info-header').removeClass('selected');
+    },
+
+    showRepoInfo: function() {
+      $('#people-roster').hide();
+      $('#repo-info').show();
+      $('#people-header').removeClass('selected');
+      $('#info-header').addClass('selected');
+    },
+
+    serializeData: function() {
+      var isRepo;
+      if (context().troupe.githubType === 'REPO') {
+        isRepo = true;
+      }
+
+      return {
+        isRepo : isRepo
+      };
+    },
+
+    onShow: function() {
+       if (hasScrollBars()) {
+        $(".trpToolbarContent").addClass("scroller");
+      }
+    },
+
+    expandActivity: function() {
+      $('.activity-expand .commits').slideToggle();
     },
 
     onRender: function() {
-
       $('#toolbar-frame').show();
-      $('#right-panel').show();
 
-      userVoice.install(this.$el.find('#help-button'), context.getUser());
-
-      // reference collections
-      var userCollection = itemCollections.users;
-
-      // File View
-      // this.files.show(new FileView({ collection: fileCollection }));
-
-      if (!context.inOneToOneTroupeContext()) {
-        this.troupeAvatar.show(new TroupeAvatar({
-          troupe: context.troupe(),
-          noHref: true,
-          noUnread: true,
-          tooltipPlacement: 'left'
-        }));
-      }
+      // userVoice.install(this.$el.find('#help-button'), context.getUser());
 
       // People View
-      this.people.show(new PeopleCollectionView({ collection: userCollection }));
+      this.people.show(new PeopleCollectionView.ExpandableRosterView({
+        rosterCollection: itemCollections.roster,
+        userCollection: itemCollections.sortedUsers
+      }));
 
       // Repo info
       if (context().troupe.githubType === 'REPO') {
@@ -58,6 +86,18 @@ define([
         repo.fetch({ data: $.param({repo: context().troupeUri })});
         this.repo_info.show(new repoInfo.view({ model: repo }));
       }
+
+      // Activity
+      this.activity.show(new ActivityStream({ collection: itemCollections.events }));
+
+      itemCollections.events.on('add reset sync', function() {
+
+        if (itemCollections.events.length >0) {
+          this.$el.find('#activity-header').show();
+          itemCollections.events.off('add reset sync', null, this);
+        }
+      }, this);
+
     },
 
   });

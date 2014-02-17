@@ -3,13 +3,19 @@
   <div class="trpLeftMenuProfileName">{{displayName}}</div>
 </div>
 <div class="trpLeftMenuProfileMenu" id="profile-menu">
-  <a id="link-home" href="/{{username}}"><div class="item">
-    Home
-  </div></a>
-  <a href="/apps" id="profile-menu-gitter-apps"><div class="item">
-    Get Gitter Apps
-  </div></a>
-  <a href="/signout"><div class="item">
-    Signout
-  </div></a>
+  <a id="link-home" href="/{{username}}">
+    <li class="item">
+      <span class="icon-home">Home</span>
+    </li>
+  </a>
+  <a href="/apps" id="profile-menu-gitter-apps">
+    <li class="item">
+      <span class="icon-apps">Get Gitter Apps</span>
+    </li>
+  </a>
+  <a href="/signout">
+    <li class="item">
+      <span class="icon-signout">Signout</span>
+    </li>
+  </a>
 </div>

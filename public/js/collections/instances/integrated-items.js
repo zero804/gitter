@@ -6,14 +6,18 @@ define([
   '../base',
   '../users',
   '../chat',
+  '../events',
   'utils/appevents',
   'components/unread-items-client',
   'components/realtime-troupe-listener'     // No reference
-], function($, _, Backbone, base, userModels, chatModels, appEvents, unreadItemsClient) {
+], function($, _, Backbone, base, userModels, chatModels, eventModels, appEvents, unreadItemsClient) {
   "use strict";
 
-  var chatCollection         = new chatModels.ChatCollection(null, { listen: true });
-  var userCollection         = new userModels.UserCollection(null, { listen: true });
+  var chatCollection          = new chatModels.ChatCollection(null, { listen: true });
+  var userCollection          = new userModels.UserCollection(null, { listen: true });
+  var rosterCollection        = new userModels.RosterCollection(null, { users: userCollection, limit: 21 });
+  var sortedUserCollection    = new userModels.SortedUserCollection(null, { users: userCollection});
+  var eventCollection         = new eventModels.EventCollection(null,  { listen: true });
 
   function helpers() {
 
@@ -31,7 +35,7 @@ define([
     }
 
     // send out a change event to avatar widgets that are not necessarily connected to a model object.
-    userCollection.on('change', function(model) {
+    userCollection.on('change:username change:displayName change:avatarUrlSmall change:avatarUrlMedium', function(model) {
       $(document).trigger("avatar:change", model.toJSON());
     });
 
@@ -46,7 +50,10 @@ define([
 
   return {
     chats: chatCollection,
-    users: userCollection
+    users: userCollection,
+    sortedUsers: sortedUserCollection,
+    roster: rosterCollection,
+    events: eventCollection
   };
 
 });

@@ -3,6 +3,7 @@
 
 var persistenceService = require("./persistence-service");
 var statsService = require("./stats-service");
+var nconf = require('../utils/config');
 
 var uuid = require('node-uuid');
 
@@ -16,6 +17,18 @@ persistenceService.OAuthClient.findOne({ clientKey: WEB_INTERNAL_CLIENT_KEY }, f
 
   webInternalClientId = oauthClient._id;
 });
+
+var ircClientId;
+
+persistenceService.OAuthClient.findOne({ clientKey: nconf.get('irc:clientKey') }, function(err, oauthClient) {
+  if(err) throw new Error("Unable to load internal client id");
+  if(!oauthClient) throw new Error("Unable to load internal client id. Have you loaded it into mongo?");
+
+  ircClientId = oauthClient._id;
+});
+
+
+
 
 
 exports.findClientById = function(id, callback) {
@@ -82,8 +95,25 @@ exports.findOrGenerateWebToken = function(userId, callback) {
 
 };
 
+exports.findOrGenerateIRCToken = function(userId, callback) {
+  return persistenceService.OAuthAccessToken.findOneQ({ userId: userId, clientId: ircClientId })
+      .then(function(oauthAccessToken) {
+        if(oauthAccessToken) return oauthAccessToken.token;
+
+        var token = uuid.v4();
+        return persistenceService.OAuthAccessToken.createQ({ token: token, userId: userId, clientId: ircClientId })
+            .then(function() {
+              return token;
+            });
+      })
+      .nodeify(callback);
+
+};
+
+
 exports.validateToken = function(token, callback) {
   persistenceService.OAuthAccessToken.findOne({ token: token }, function(err, accessToken) {
+
     if(err) return callback(err);
     if(!accessToken) return callback("Access token not found");
 

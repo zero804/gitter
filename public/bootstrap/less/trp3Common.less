@@ -40,6 +40,8 @@
 .trpDisplayPicture {
 	display: inline-block;
   text-align: center;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
     -webkit-transform: translate3d(0, 0, 0);
   &.unread {
     -webkit-animation: pulsate 3s ease-out;
@@ -93,6 +95,7 @@ a .trpDisplayPicture {
 	border-radius: 4px;
   background-size: cover;
 
+
  .trpTroupeAvatarText {
   .trpBodySmall;
   color: white;
@@ -127,7 +130,6 @@ a .trpDisplayPicture {
 	width: 120px;
   background-size: contain;
   border-radius: 6px;
-  border: 2px solid white;
 }
 
 .trpPadV14 {
@@ -177,12 +179,12 @@ a .trpDisplayPicture {
   left: -6px;
   border-radius: 5em;
   border: 2px solid white;
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   display: block;
 }
 
-.trpDPUnreadCount {
+.DPUnreadCount {
   .defaultHidden;
   position: absolute;
   top: 5px;
@@ -200,7 +202,26 @@ a .trpDisplayPicture {
   display: inline-block
 }
 
-.trpDisplayPicture.online .trpStatus {
+.trpDisplayPicture.admin {
+  border-bottom: 2px solid #34495e;
+}
+
+.trpDisplayPicture.contributor {
+  border-bottom: 2px solid #3498db;
+}
+
+.trpDisplayPicture.admin:before, .trpDisplayPicture.contributor:before {
+    position: absolute; display: block; content: '';
+    border-bottom: 1px solid white;
+    height: 100%; width: 100%;
+    box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;
+}
+
+.trpDisplayPicture {
+  border-bottom: 2px solid transparent;
+}
+
+.trpDisplayPicture.online .trpStatus{
   background-color: #06ff00;
 }
 
@@ -211,6 +232,13 @@ a .trpDisplayPicture {
 .trpDisplayPicture.busy .trpStatus {
   background-color: #ff2400;
 }
+
+/*.trpDisplayPicture.online:before {
+  content: '\e830';
+  font-family: 'troupe-icons';
+  font-size: 9px;
+  -webkit-font-smoothing: antialiased;
+}*/
 
 .trpButtonGreen {
 	.trpBodyMedium;

@@ -2,7 +2,6 @@
 define([
   'log!chat-input',
   'jquery',
-  'underscore',
   'utils/context',
   'views/base',
   'utils/appevents',
@@ -13,10 +12,12 @@ define([
   'utils/scrollbar-detect',
   'collections/instances/integrated-items',
   'utils/emoji',
+  'components/drafty',
+  './commands',
   'jquery-textcomplete', // No ref
-  'jquery-sisyphus' // No ref
-], function(log, $, _, context, TroupeViews, appEvents, template, listItemTemplate,
-  emojiListItemTemplate, moment, hasScrollBars, itemCollections, emoji) {
+  'utils/sisyphus-cleaner' // No ref
+], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate,
+  emojiListItemTemplate, moment, hasScrollBars, itemCollections, emoji, drafty, commands) {
   "use strict";
 
   /** @const */
@@ -26,130 +27,18 @@ define([
   /** @const */
   var EXTRA_PADDING = 20;
 
-  var commandsList = [
-    {
-      command: 'topic foo',
-      description: 'Set room topic to foo',
-      criteria: function() {
-        return !context.inOneToOneTroupeContext() && context().permissions.admin;
-      },
-      completion: 'topic ',
-      regexp: /^\/topic/,
-      action: function(view) {
-        var topicMatch = view.$el.val().match(/^\/topic (.+)/);
-        if (topicMatch) {
-          var topic = topicMatch[1];
-          view.$el.val('');
+  /* This value is also in chatItemView! */
+  /** @const */
+  var EDIT_WINDOW = 240000;
 
-          context.troupe().set('topic', topic);
-          $.ajax({
-            url: '/api/v1/troupes/' + context.getTroupeId(),
-            contentType: "application/json",
-            dataType: "json",
-            type: "PUT",
-            data: JSON.stringify({ topic: topic })
-          });
-        }
-      }
-    },
-    {
-      command: 'fav',
-      description: 'Toggle the room as a favourite',
-      criteria: function() {
-        return !context.inOneToOneTroupeContext() && context().permissions.admin;
-      },
-      completion: 'fav ',
-      regexp: /^\/fav/,
-      action: function(view) {
-        var isFavourite = !context.troupe().get('favourite');
-
-        $.ajax({
-          url: '/api/v1/troupes/' + context.getTroupeId(),
-          contentType: "application/json",
-          dataType: "json",
-          type: "PUT",
-          data: JSON.stringify({ favourite: isFavourite })
-        });
-
-        view.$el.val('');
-
-      }
-    },
-    {
-      command: 'query @user',
-      description: 'Go private with @user',
-      completion: 'query @',
-      regexp: /^\/query/,
-      action: function(view) {
-        var userMatch = view.$el.val().match(/\/query @(\w+)/);
-        if (!userMatch) return;
-        var user = userMatch[1];
-        // this doesn't entire fix the issue of the chat not clearing properly
-        $('#chatInputForm').trigger('reset');
-        view.$el.val('');
-
-        var url = '/' + user;
-        var type = user === context.user().get('username') ? 'home' : 'chat';
-        var title = user;
-
-        appEvents.trigger('navigation', url, type, title);
-      }
-    },
-    {
-      command: 'leave',
-      description: 'Leave the room',
-      completion: 'leave ',
-      regexp: /^\/leave/,
-      criteria: function() {
-        return !context.inOneToOneTroupeContext();
-      },
-      action: function(view) {
-        view.$el.val('');
-
-        $.ajax({
-          url: "/api/v1/troupes/" + context.getTroupeId() + "/users/" + context.getUserId(),
-          data: "",
-          type: "DELETE",
-        });
-      }
-    },
-    {
-      command: 'channel',
-      description: 'Create/join a channel',
-      completion: 'channel ',
-      regexp: /^\/channel/,
-      criteria: function() {
-        var repoType = context.troupe().get('githubType');
-        return repoType === 'REPO' || repoType === 'ORG';
-      },
-      action: function(view) {
-
-        var channelMatch = view.$el.val().match(/\/channel\s+(.*)/);
-        if (!channelMatch) return;
-        var channel = channelMatch[1];
-
-        view.$el.val('');
-
-        $.ajax({
-          url: "/api/v1/troupes/" + context.getTroupeId() + "/channels/",
-          contentType: "application/json",
-          dataType: "json",
-          context: this,
-          data: JSON.stringify({ name: channel }),
-          type: "POST",
-          success: function(channelRoom) {
-            appEvents.trigger('navigation', channelRoom.url, 'chat', channelRoom.name);
-          }
-        });
-      }
-    }
-  ];
+  var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];
 
   var ChatInputView = TroupeViews.Base.extend({
     template: template,
 
     initialize: function(options) {
       this.rollers = options.rollers;
+      this.chatCollectionView = options.chatCollectionView;
     },
 
     getRenderData: function() {
@@ -159,27 +48,28 @@ define([
     },
 
     afterRender: function() {
+      if (!window._troupeIsTablet) $("#chat-input-textarea").focus();
+
       var inputBox = new ChatInputBoxView({
         el: this.$el.find('.trpChatInputBoxTextArea'),
         rollers: this.rollers
       });
       this.inputBox = inputBox;
-      this.$el.find('form').sisyphus({
-        locationBased: true,
-        timeout: 2,
-        customKeySuffix: 'chat-' + context.getTroupeId(),
-        name: 'chat-' + context.getTroupeId(),
-        onRestore: function() {
-          inputBox.trigger('change');
-        }
-      }).restoreAllData();
 
       this.$el.find('textarea').textcomplete([
           {
-            match: /(^|\s)#(\w*)$/,
+            match: /(^|\s)(([\w-_]+\/[\w-_]+)?#(\d*))$/,
             maxCount: 8,
             search: function(term, callback) {
-              $.getJSON('/api/v1/troupes/' + context.getTroupeId() + '/issues', { q: term })
+              var terms = term.split('#');
+              var repoName = terms[0];
+              var issueNumber = terms[1];
+              var query = {};
+
+              if(repoName) query.repoName = repoName;
+              if(issueNumber) query.issueNumber = issueNumber;
+
+              $.getJSON('/api/v1/troupes/' + context.getTroupeId() + '/issues', query)
                 .done(function(resp) {
                   callback(resp);
                 })
@@ -194,7 +84,7 @@ define([
               });
             },
             replace: function(issue) {
-                return '$1#' + issue.number + ' ';
+              return '$1$3#' + issue.number + ' ';
             }
           },
           {
@@ -220,10 +110,10 @@ define([
             }
           },
           {
-            match: /(^|\s):(\w*)$/,
+            match: /(^|\s):([\-+\w]*)$/,
             maxCount: 8,
             search: function(term, callback) {
-              if(term.length < 1) return callback(['+1', '-1', ]);
+              if(term.length < 1) return callback(SUGGESTED_EMOJI);
 
               var matches = emoji.named.filter(function(emoji) {
                 return emoji.indexOf(term) === 0;
@@ -243,10 +133,7 @@ define([
             match: /(^)\/(\w*)$/,
             maxCount: 8,
             search: function(term, callback) {
-              var matches = commandsList.filter(function(cmd) {
-                var elligible = !cmd.criteria || cmd.criteria();
-                return elligible && cmd.command.indexOf(term) === 0;
-              });
+              var matches = commands.getSuggestions(term);
               callback(matches);
             },
             template: function(cmd) {
@@ -274,6 +161,8 @@ define([
       });
 
       this.listenTo(this.inputBox, 'save', this.send);
+      this.listenTo(this.inputBox, 'subst', this.subst);
+      this.listenTo(this.inputBox, 'editLast', this.editLast);
     },
 
     send: function(val) {
@@ -286,6 +175,53 @@ define([
         appEvents.trigger('chat.send', model);
       }
       return false;
+    },
+
+    getLastEditableMessage: function() {
+      var usersChats = this.collection.filter(function(f) {
+        var fromUser = f.get('fromUser');
+        return fromUser && fromUser.id === context.getUserId();
+      });
+
+      usersChats.sort(function(a, b) {
+        var as = a.get('sent');
+        as = as ? as.valueOf() : 0;
+        var bs = b.get('sent');
+        bs = bs ? bs.valueOf() : 0;
+
+        return bs - as;
+      });
+
+      return usersChats[0];
+    },
+
+    subst: function(search, replace, global) {
+      var lastChat =  this.getLastEditableMessage();
+
+      if(lastChat) {
+        if(Date.now() - lastChat.get('sent').valueOf() <= EDIT_WINDOW) {
+          var reString = search.replace(/(^|[^\[])\^/g, '$1');
+          var re = new RegExp(reString, global ? "gi" : "i");
+          var newText = lastChat.get('text').replace(re, replace);
+
+          lastChat.set({
+            text: newText,
+            html: null
+          }).save();
+        }
+      }
+    },
+
+    editLast: function() {
+      if(!this.chatCollectionView) return;
+
+      var lastChat =  this.getLastEditableMessage();
+      if(!lastChat) return;
+
+      var chatItemView = this.chatCollectionView.children.findByModel(lastChat);
+      if(!chatItemView) return;
+
+      chatItemView.toggleEdit();
     }
   });
 
@@ -361,6 +297,7 @@ define([
     // pass in the textarea as el for ChatInputBoxView
     // pass in a scroll delegate
     initialize: function(options) {
+
       if(hasScrollBars()) {
         this.$el.addClass("scroller");
       }
@@ -368,7 +305,7 @@ define([
       var chatResizer = new ChatCollectionResizer({
         compactView: this.compactView,
         el: this.el,
-        editMode: this.options.editMode,
+        editMode: options.editMode,
         rollers: options.rollers
       });
 
@@ -378,6 +315,7 @@ define([
         chatResizer.resizeInput();
       });
 
+      this.drafty = drafty(this.el);
       chatResizer.resetInput(true);
     },
 
@@ -392,32 +330,39 @@ define([
     },
 
     onKeyDown: function(e) {
-      if(e.keyCode == 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/)) && !this.isTypeaheadShowing()) {
+      if(e.keyCode === 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/)) && !this.isTypeaheadShowing()) {
         e.stopPropagation();
         e.preventDefault();
 
         this.processInput();
 
         return false;
+      } else if(e.keyCode === 38 && !e.ctrlKey && !e.shiftKey) {
+        /* Up key */
+        if(!this.$el.val()) {
+          this.trigger('editLast');
+        }
       }
     },
 
     processInput: function() {
-      var cmdsMatched = _.map(commandsList, function(cmd) {
-        if (this.$el.val().match(cmd.regexp)) {
-          cmd.action(this);
-          return true;
-        } else {
-          return false;
-        }
-      }, this);
-      if (!_.some(cmdsMatched)) this.send();
+      var cmd = commands.findMatch(this.$el.val());
+      if(cmd) {
+        cmd.action(this);
+      } else {
+        this.send();
+      }
     },
 
     send: function() {
       this.trigger('save', this.$el.val());
+      this.reset();
+    },
+
+    reset: function() {
       $('#chatInputForm').trigger('reset');
-      this.$el.val('');
+      this.el.value = '';
+      this.drafty.reset();
       this.chatResizer.resetInput();
     },
 

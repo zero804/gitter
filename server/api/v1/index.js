@@ -2,7 +2,6 @@
 "use strict";
 
 var middleware = require('../../web/middleware');
-var expressValidator = require('express-validator');
 
 module.exports = {
   install: function(app) {

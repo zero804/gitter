@@ -5,6 +5,8 @@ var Q = require('q');
 var wrap = require('./github-cache-wrapper');
 var createClient = require('./github-client');
 var badCredentialsCheck = require('./bad-credentials-check');
+var request = require('request');
+var assert = require('assert');
 
 function GitHubMeService(user) {
   this.user = user;
@@ -21,14 +23,38 @@ GitHubMeService.prototype.getUser = function() {
     .fail(badCredentialsCheck);
 };
 
-GitHubMeService.prototype.getEmails = function() {
+GitHubMeService.prototype.getEmail = function() {
+  /** TODO: add this into octonode and use the same pattern as the rest of the github calls!!!!!
+   *  Sort it out.
+   */
   var d = Q.defer();
 
-  var ghme = this.client.me();
-  ghme.emails(d.makeNodeResolver());
+  /* USE  OCTONODE !!! */
+  var token = this.user.githubUserToken || this.user.githubToken || '';
 
-  return d.promise
-    .fail(badCredentialsCheck);
+  var options = {
+    url: 'https://api.github.com/user/emails?access_token=' + token,
+    headers: {
+      'Accept': 'application/vnd.github.v3.full+json',
+      'Content-Type': 'application/json',
+      'User-Agent': 'gitter/0.0 (https://gitter.im) terminal/0.0'
+    },
+    json: true
+  };
+
+  request(options, d.makeNodeResolver());
+
+  return d.promise.spread(function(response, emailHashes) {
+    assert.strictEqual(response.statusCode, 200, 'Github sent an error code: '+response.statusCode);
+
+    var primaryEmails = emailHashes.filter(function(hash) {
+      return hash.primary && hash.verified;
+    }).map(function(hash) {
+      return hash.email;
+    });
+
+    return primaryEmails.length ? primaryEmails[0] : undefined;
+  }).fail(badCredentialsCheck);
 };
 
 GitHubMeService.prototype.getOrgs = function() {

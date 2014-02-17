@@ -15,7 +15,7 @@ function uriContextResolverMiddleware(req, res, next) {
   if(req.params.channel) {
     uri = uri + '/*' + req.params.channel;
   }
-
+  console.log('URI IS ', uri);
   return roomService.findOrCreateRoom(req.user, uri)
     .then(function(uriContext) {
       if(!uriContext.troupe && !uriContext.ownUrl) throw 404;

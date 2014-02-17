@@ -17,6 +17,7 @@ var assert                   = require('assert');
 var statsService             = require("../services/stats-service");
 var permissionsModel         = require("./permissions-model");
 
+
 function ensureExists(value) {
   if(!value) throw 404;
   return value;
@@ -64,22 +65,6 @@ function createQ(ModelType, options) {
       return m;
     });
 }
-
-/**
- * Use this instead of createQ as it invokes Mongoose Middleware
- */
-function createTroupeQ(options) {
-  return createQ(persistence.Troupe, options);
-}
-
-function createRequestQ(options) {
-  return createQ(persistence.Request, options);
-}
-
-function createRequestUnconfirmedQ(options) {
-  return createQ(persistence.RequestUnconfirmed, options);
-}
-
 
 function findMemberEmails(id, callback) {
   findById(id, function(err,troupe) {
@@ -239,7 +224,7 @@ function addUserIdToTroupe(userId, troupeId) {
           return troupe;
         }
 
-        appEvents.richMessage({eventName: 'userJoined', troupe: troupe, userId: userId});
+        appEvents.richMessage({eventName: 'userJoined', troupe: troupe, userId: userId, user: user});
 
         troupe.addUserById(userId);
         return troupe.saveQ()
@@ -292,138 +277,56 @@ function indexTroupesByUserIdTroupeId(troupes, userId) {
 
 
 function removeUserFromTroupe(troupeId, userId, callback) {
-  findById(troupeId, function(err, troupe) {
-    if(err) return callback(err);
-    if(!troupe) return callback('Troupe ' + troupeId + ' does not exist.');
-
-    // TODO: Add the user to a removeUsers collection
-    var deleteRecord = new persistence.TroupeRemovedUser({
-      userId: userId,
-      troupeId: troupeId
-    });
-
-    deleteRecord.save(function(err) {
-      if(err) return callback(err);
-
-      // TODO: Let the user know that they've been removed from the troupe (via email or something)
-      troupe.removeUserById(userId);
-
-      troupe.save(callback);
-    });
-  });
-}
-
-
-/**
- * Create a request or simply return an existing one
- * returns a promise of a request
- */
-function addRequest(troupe, user) {
-  assert(troupe, 'Troupe parameter is required');
-  assert(user, 'User parameter is required');
-
-  var userId = user.id;
-  assert(user.id, 'User.id parameter is required');
-
-  var collection = user.isConfirmed() ? persistence.Request : persistence.RequestUnconfirmed;
-
-  if(userIdHasAccessToTroupe(userId, troupe)) {
-    throw { memberExists: true };
-  }
-
-  return collection.findOneQ({
-    troupeId: troupe.id,
-    userId: userId,
-    status: 'PENDING' })
-    .then(function(request) {
-      // Request already made....
-      if(request) return request;
-
-      var requestData = {
-        troupeId: troupe.id,
-        userId: userId,
-        status: 'PENDING'
-      };
-
-      return user.isConfirmed() ? createRequestQ(requestData) : createRequestUnconfirmedQ(requestData);
-    });
-}
-
-/*
- * callback is function(err, requests)
- */
-function findAllOutstandingRequestsForTroupe(troupeId, callback) {
-  persistence.Request
-      .where('troupeId', troupeId)
-      .where('status', 'PENDING')
-      .exec(callback);
-}
-
-function findPendingRequestForTroupe(troupeId, id, callback) {
-  persistence.Request.findOne( {
-    troupeId: troupeId,
-    _id: id,
-    status: 'PENDING'
-  }, callback);
-}
-
-
-function findRequestsByIds(requestIds, callback) {
-
-  persistence.Request
-    .where('_id')['in'](requestIds)
-    .exec(callback);
-
-}
-
-/**
- * Accept a request: add the user to the troupe and delete the request
- * @return promise of undefined
- */
-function acceptRequest(request, callback) {
-  assert(request, 'Request parameter required');
-
-  winston.verbose('Accepting request to join ' + request.troupeId);
-
-  var userId = request.userId;
-
-  return findById(request.troupeId)
+  return findById(troupeId)
     .then(function(troupe) {
-      if(!troupe) { winston.error("Unable to find troupe", request.troupeId); throw "Unable to find troupe"; }
+      if(!troupe) throw 404;
 
-      return userService.findById(userId)
-        .then(function(user) {
-          if(!user) { winston.error("Unable to find user", request.userId); throw "Unable to find user"; }
+      // TODO: Add the user to a removeUsers collection
+      var deleteRecord = new persistence.TroupeRemovedUser({
+        userId: userId,
+        troupeId: troupeId
+      });
 
-          emailNotificationService.sendRequestAcceptanceToUser(user, troupe);
-          return addUserIdToTroupe(userId, troupe.id)
-              .then(function() {
-                return request.removeQ();
-              });
+      return deleteRecord.saveQ()
+        .then(function() {
+          // TODO: Let the user know that they've been removed from the troupe (via email or something)
+          troupe.removeUserById(userId);
+
+          return troupe.saveQ();
         });
     })
     .nodeify(callback);
-
 }
 
 
 /**
- * Rjected a request: delete the request
- * @return promise of undefined
+ * Find the userIds of all the troupe.
+ *
+ * Candidate for redis caching potentially?
  */
-function rejectRequest(request, callback) {
-  winston.verbose('Rejecting request to join ' + request.troupeId);
-
-  return request.removeQ()
-    .nodeify(callback);
-}
-
 function findUserIdsForTroupe(troupeId, callback) {
   return persistence.Troupe.findByIdQ(troupeId, 'users')
     .then(function(troupe) {
       return troupe.users.map(function(m) { return m.userId; });
     })
     .nodeify(callback);
+}
+
+/**
+ * Returns a promise of the users hashed by lurk status
+ * and githubType
+ */
+function findUserIdsForTroupeWithLurk(troupeId) {
+  return persistence.Troupe.findByIdQ(troupeId, 'users githubType uri', { lean: true })
+    .then(function(troupe) {
+      var users = troupe.users.reduce(function(memo, v) {
+        memo[v.userId] = !!v.lurk;
+        return memo;
+      }, {});
+
+      troupe.users = users;
+      return troupe;
+    });
 }
 
 function updateTroupeName(troupeId, troupeName, callback) {
@@ -611,38 +514,6 @@ function findOrCreateOneToOneTroupeIfPossible(fromUserId, toUserId) {
 
 }
 
-// /**
-//  * Take a one to one troupe and turn it into a normal troupe with extra invites
-//  * @return promise with new troupe
-//  */
-// function upgradeOneToOneTroupe(options, callback) {
-//   var name = options.name;
-//   var fromUser = options.user;
-//   var origTroupe = options.oneToOneTroupe.toObject();
-
-//   // create a new, normal troupe, with the current users from the one to one troupe
-//   return createTroupeQ({
-//       uri: createUniqueUri(),
-//       name: name,
-//       status: 'ACTIVE',
-//       users: origTroupe.users
-//     })
-//     .then(function(troupe) {
-
-//       statsService.event('new_troupe', {
-//         troupeId: troupe.id,
-//         userId: fromUser.id,
-//         email: fromUser.email,
-//         oneToOneUpgrade: true,
-//         oneToOne: false
-//       });
-
-//       return troupe;
-//     })
-//     .nodeify(callback);
-
-// }
-
 function createUniqueUri() {
   var chars = "0123456789abcdefghiklmnopqrstuvwxyz";
 
@@ -653,31 +524,6 @@ function createUniqueUri() {
   }
 
   return uri;
-}
-
-function updateFavourite(userId, troupeId, isFavourite, callback) {
-  var setOp = {};
-  setOp['favs.' + troupeId] = '1';
-  var updateStatement;
-  var updateOptions;
-
-  if(isFavourite) {
-    updateStatement = { $set: setOp };
-    updateOptions = { upsert: true };
-  } else {
-    updateStatement = { $unset: setOp };
-    updateOptions = { };
-  }
-
-  return persistence.UserTroupeFavourites.updateQ(
-    { userId: userId },
-    updateStatement,
-    updateOptions)
-    .then(function() {
-      // Fire a realtime event
-      appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: isFavourite });
-    })
-    .nodeify(callback);
 }
 
 function updateTopic(user, troupe, topic) {
@@ -695,15 +541,25 @@ function updateTopic(user, troupe, topic) {
     });
 }
 
-function findFavouriteTroupesForUser(userId, callback) {
-  return persistence.UserTroupeFavourites.findOneQ({ userId: userId})
-    .then(function(userTroupeFavourites) {
-      if(!userTroupeFavourites || !userTroupeFavourites.favs) return {};
+function updateTroupeLurkForUserId(userId, troupeId, lurk) {
+  return findById(troupeId)
+    .then(function(troupe) {
+      var troupeUser = troupe.users.filter(function(troupeUser) { return troupeUser.userId == userId; })[0];
+      if(troupeUser) {
+        troupeUser.lurk = !!lurk;
+      }
 
-      return userTroupeFavourites.favs;
+      /* Don't send out the traditional updates to all users */
+      troupe._skipTroupeMiddleware = true;
+
+      return troupe.saveQ();
     })
-    .nodeify(callback);
+    .then(function() {
+      // TODO: in future get rid of this but this collection is used by the native clients
+      appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, lurk: !!lurk });
+    });
 }
+
 
 function findAllUserIdsForTroupes(troupeIds, callback) {
   if(!troupeIds.length) return callback(null, []);
@@ -787,125 +643,6 @@ function findAllImplicitContactUserIds(userId, callback) {
 
 }
 
-
-
-/**
- * Find the best troupe for a user to access
- * @return promise of a troupe or null
- */
-function findBestTroupeForUser(user, callback) {
-  //
-  // This code is invoked when a user's lastAccessedTroupe is no longer valid (for the user)
-  // or the user doesn't have a last accessed troupe. It looks for all the troupes that the user
-  // DOES have access to (by querying the troupes.users collection in mongo)
-  // If the user has a troupe, it takes them to the last one they accessed. If the user doesn't have
-  // any valid troupes, it returns an error.
-  //
-  var op;
-  if (user.lastTroupe) {
-     op = findById(user.lastTroupe)
-      .then(function(troupe) {
-
-        if(!troupe || troupe.status == 'DELETED' || !userHasAccessToTroupe(user, troupe)) {
-          return findLastAccessedTroupeForUser(user);
-        }
-
-        return troupe;
-      });
-
-  } else {
-    op = findLastAccessedTroupeForUser(user);
-  }
-
-  return op.nodeify(callback);
-}
-
-/**
- * Find the last troupe that a user accessed that the user still has access to
- * that hasn't been deleted
- * @return promise of a troupe (or null)
- */
-function findLastAccessedTroupeForUser(user, callback) {
-  return persistence.Troupe.findQ({ 'users.userId': user.id, 'status': 'ACTIVE' }).then(function(activeTroupes) {
-    if (!activeTroupes || activeTroupes.length === 0) return null;
-
-    return userService.getTroupeLastAccessTimesForUser(user.id).then(function(troupeAccessTimes) {
-      activeTroupes.forEach(function(troupe) {
-        troupe.lastAccessTime = troupeAccessTimes[troupe._id];
-      });
-
-      var troupes = _.sortBy(activeTroupes, function(t) {
-        return (t.lastAccessTime) ? t.lastAccessTime : 0;
-      }).reverse();
-
-      var troupe = _.find(troupes, function(troupe) {
-        return userHasAccessToTroupe(user, troupe);
-      });
-
-      return troupe;
-    });
-
-  }).nodeify(callback);
-
-}
-
-// //
-// //
-// //
-// /**
-//  * Create a new troupe from a one-to-one troupe and auto-invite users
-//  * @return promise of a troupe
-//  */
-// function createNewTroupeForExistingUser(options, callback) {
-//   return Q.resolve(null).then(function() {
-//     var name = options.name;
-//     // var oneToOneTroupeId = options.oneToOneTroupeId;
-//     var user = options.user;
-
-//     name = name ? name.trim() : '';
-
-//     assert(user, 'user required');
-//     assert(name, 'Please provide a troupe name');
-
-//     // if (oneToOneTroupeId) {
-//     //   // find this 1-1 troupe and create a new normal troupe with the additional person(s) invited
-//     //   return findById(oneToOneTroupeId)
-//     //     .then(function(troupe) {
-//     //       if(!userHasAccessToTroupe(user, troupe)) {
-//     //         throw 403;
-//     //       }
-
-//     //       return upgradeOneToOneTroupe({
-//     //         name: name,
-//     //         oneToOneTroupe: troupe,
-//     //         user: user });
-//     //     });
-//     // }
-
-//     // create a troupe normally
-//     var troupe = new persistence.Troupe({
-//       name: name,
-//       uri: createUniqueUri()
-//     });
-//     troupe.addUserById(user.id);
-//     return troupe.saveQ()
-//       .then(function() {
-//         statsService.event('new_troupe', {
-//           troupeId: troupe.id,
-//           userId: user.id,
-//           email: user.email,
-//           oneToOneUpgrade: true,
-//           oneToOne: false
-//         });
-
-//         return troupe;
-//       });
-
-//   }).nodeify(callback);
-
-// }
-
-
 function deleteTroupe(troupe, callback) {
   if(troupe.status != 'ACTIVE') return callback("Troupe is not active");
   if(troupe.users.length !== 1) return callback("Can only delete troupes that have a single user");
@@ -940,16 +677,11 @@ module.exports = {
   findAllConnectedUserIdsForUserId: findAllConnectedUserIdsForUserId,
   getUrlForTroupeForUserId: getUrlForTroupeForUserId,
 
-  addRequest: addRequest,
-  findRequestsByIds: findRequestsByIds,
-  findAllOutstandingRequestsForTroupe: findAllOutstandingRequestsForTroupe,
-  findPendingRequestForTroupe: findPendingRequestForTroupe,
-  acceptRequest: acceptRequest,
-  rejectRequest: rejectRequest,
   removeUserFromTroupe: removeUserFromTroupe,
 
   findAllUserIdsForTroupes: findAllUserIdsForTroupes,
   findAllUserIdsForTroupe: findAllUserIdsForTroupe,
+  findUserIdsForTroupeWithLurk: findUserIdsForTroupeWithLurk,
   findUserIdsForTroupe: findUserIdsForTroupe,
 
   validateTroupeUrisForUser: validateTroupeUrisForUser,
@@ -959,15 +691,12 @@ module.exports = {
   createUniqueUri: createUniqueUri,
   deleteTroupe: deleteTroupe,
 
-  updateFavourite: updateFavourite,
-  findFavouriteTroupesForUser: findFavouriteTroupesForUser,
-  findBestTroupeForUser: findBestTroupeForUser,
   // createNewTroupeForExistingUser: createNewTroupeForExistingUser,
   indexTroupesByUserIdTroupeId: indexTroupesByUserIdTroupeId,
 
-  addUserIdToTroupe: addUserIdToTroupe,
   findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe,
 
-  updateTopic: updateTopic
+  updateTopic: updateTopic,
+  updateTroupeLurkForUserId: updateTroupeLurkForUserId
 
 };

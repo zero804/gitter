@@ -4,13 +4,13 @@
 var persistence   = require("./persistence-service");
 var collections   = require("../utils/collections");
 var troupeService = require("./troupe-service");
+var userService   = require("./user-service");
 var statsService  = require("./stats-service");
 var unsafeHtml    = require('../utils/unsafe-html');
-var ent           = require('ent');
 var processChat   = require('../utils/process-chat');
-var _             = require('underscore');
-var assert        = require('assert');
-var Q             = require('q');
+
+var redis = require('../utils/redis');
+var redisClient = redis.createClient();
 
 /*
  * Hey Trouper!
@@ -18,6 +18,7 @@ var Q             = require('q');
  */
 var VERSION_INITIAL; /* = undefined; All previous versions are null due to a bug */
 var VERSION_SWITCH_TO_SERVER_SIDE_RENDERING = 5;
+var MAX_CHAT_MESSAGE_LENGTH = 4096;
 
 var CURRENT_META_DATA_VERSION = VERSION_SWITCH_TO_SERVER_SIDE_RENDERING;
 
@@ -26,70 +27,70 @@ var MAX_CHAT_EDIT_AGE_SECONDS = 300;
 
 var ObjectID = require('mongodb').ObjectID;
 
-exports.newRichMessageToTroupe = function(troupe, user, text, meta, callback) {
-  return Q.fcall(function() {
-    assert(troupe, "Invalid troupe");
-
-    var chatMessage = new persistence.ChatMessage();
-
-    chatMessage.fromUserId = user ? user.id : null;
-
-    chatMessage.toTroupeId = troupe.id;
-    chatMessage.sent = new Date();
-
-    // Very important that we decode and re-encode!
-    text = ent.decode(text);
-    text = _.escape(text); // NB don't use ent for encoding as it's a bit overzealous!
-
-    chatMessage.text     = text;
-    chatMessage._md      = CURRENT_META_DATA_VERSION;
-    chatMessage.meta     = meta;
-
-    // Skip UnreadItems, except when new files are uploaded
-    chatMessage.skipAlerts = meta.type === 'file' ? false : true;
-
-    return chatMessage.saveQ()
-      .thenResolve(chatMessage);
-  })
-  .nodeify(callback);
-};
-
-
 exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
-  return Q.fcall(function() {
-    assert(troupe, "Invalid troupe");
+  if(!troupe) return callback(404);
+  /* You have to have text */
+  if(!text && text !== "" /* Allow empty strings for now */) return callback(400);
+  if(text.length > MAX_CHAT_MESSAGE_LENGTH) return callback(400);
 
-    if(!troupeService.userHasAccessToTroupe(user, troupe)) throw 403;
+  if(!troupeService.userHasAccessToTroupe(user, troupe)) return callback(403);
 
-    var chatMessage = new persistence.ChatMessage();
-    chatMessage.fromUserId = user.id;
-    chatMessage.toTroupeId = troupe.id;
-    chatMessage.sent       = new Date();
+  var chatMessage = new persistence.ChatMessage();
+  chatMessage.fromUserId = user.id;
+  chatMessage.toTroupeId = troupe.id;
+  chatMessage.sent = new Date();
 
-    // Keep the raw message.
-    chatMessage.text      = text;
+  // Keep the raw message.
+  chatMessage.text = text;
 
-    var parsedMessage     = processChat(text);
-    chatMessage.html      = parsedMessage.html;
+  var parsedMessage = processChat(text);
+  // TODO: validate message
+
+  chatMessage.html  = parsedMessage.html;
+
+  /* Look through the mentions and attempt to tie the mentions to userIds */
+  var mentionUserNames = parsedMessage.mentions.map(function(mention) {
+    return mention.screenName;
+  });
+
+  var _msg = {username: user.username, room: troupe.uri, text: text};
+  redisClient.publish('chat_messages', JSON.stringify(_msg));
+
+  userService.findByUsernames(mentionUserNames, function(err, users) {
+    if(err) return callback(err);
+
+    var usersIndexed = collections.indexByProperty(users, 'username');
+
+    var mentions = parsedMessage.mentions.map(function(mention) {
+      var user = usersIndexed[mention.screenName];
+      var userId = user && user.id;
+
+      return {
+        screenName: mention.screenName,
+        userId: userId
+      };
+    });
 
     // Metadata
     chatMessage.urls      = parsedMessage.urls;
-    chatMessage.mentions  = parsedMessage.mentions;
+    chatMessage.mentions  = mentions;
     chatMessage.issues    = parsedMessage.issues;
     chatMessage._md       = CURRENT_META_DATA_VERSION;
 
-    return chatMessage.saveQ()
-      .then(function() {
-        statsService.event("new_chat", {
-          userId: user.id,
-          troupeId: troupe.id,
-          username: user.username
-        });
-      })
-      .thenResolve(chatMessage);
+    chatMessage.save(function (err) {
+      if(err) return callback(err);
 
-  })
-  .nodeify(callback);
+      statsService.event("new_chat", {
+        userId: user.id,
+        troupeId: troupe.id,
+        username: user.username
+      });
+
+      return callback(null, chatMessage);
+    });
+
+  });
+
 };
 
 exports.updateChatMessage = function(troupe, chatMessage, user, newText, callback) {
@@ -111,12 +112,12 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
     return callback("Permission to edit this chat message is denied.");
   }
 
-
-  // Very important that we decode and re-encode!
-  newText = ent.decode(newText);
-  newText = _.escape(newText); // NB don't use ent for encoding as it's a bit overzealous!
-
   chatMessage.text = newText;
+
+  var parsedMessage = processChat(newText);
+  chatMessage.html  = parsedMessage.html;
+
+
   chatMessage.editedAt = new Date();
 
   var parsedMessage = processChat(newText);

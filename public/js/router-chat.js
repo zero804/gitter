@@ -3,7 +3,9 @@ require([
   'jquery',
   'backbone',
   'utils/context',
+  'components/live-context',
   'utils/appevents',
+  'views/people/peopleCollectionView',
   'views/app/chatIntegratedView',
   'views/chat/chatInputView',
   'views/chat/chatCollectionView',
@@ -12,30 +14,32 @@ require([
   'views/people/personDetailView',
   'views/shareSearch/inviteView',
   'views/app/troupeSettingsView',
+  'views/app/markdownView',
   'views/app/integrationSettingsModal',
   'utils/router',
   'components/unread-items-client',
 
-  'views/chat/decorators/fileDecorator',
   'views/chat/decorators/webhookDecorator',
   'views/chat/decorators/issueDecorator',
-  'views/chat/decorators/mentionDecorator',
+  // 'views/chat/decorators/mentionDecorator',
   'views/chat/decorators/embedDecorator',
   'views/chat/decorators/emojiDecorator',
+  'views/app/unreadBannerView',
   'views/app/headerView',
 
-  'views/widgets/preload', // No ref
-  'components/errorReporter',  // No ref
-  'filtered-collection', // No ref
-  'components/dozy', // Sleep detection No ref
-  'template/helpers/all', // No ref
-  'components/eyeballs', // No ref
-  'bootstrap-dropdown' // No ref
-], function($, Backbone, context, appEvents, ChatIntegratedView, chatInputView,
+  'views/widgets/preload',      // No ref
+  'filtered-collection',        // No ref
+  'components/dozy',            // Sleep detection No ref
+  'template/helpers/all',       // No ref
+  'components/eyeballs',        // No ref
+  'bootstrap-dropdown',         // No ref
+  'components/bug-reporting',   // No ref
+  'components/csrf'             // No ref
+], function($, Backbone, context, liveContext, appEvents, peopleCollectionView, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, RightToolbarView,
-    PersonDetailView, inviteView, troupeSettingsView, IntegrationSettingsModal,
-    Router, unreadItemsClient, FileDecorator, webhookDecorator, issueDecorator, mentionDecorator,
-    embedDecorator, emojiDecorator, HeaderView) {
+    PersonDetailView, inviteView, troupeSettingsView, markdownView, IntegrationSettingsModal,
+    Router, unreadItemsClient, webhookDecorator, issueDecorator, /*mentionDecorator,*/
+    embedDecorator, emojiDecorator, UnreadBannerView, HeaderView) {
   "use strict";
 
   // Make drop down menus drop down
@@ -47,6 +51,10 @@ require([
 
   appEvents.on('navigation', function(url, type, title) {
     parent.postMessage(JSON.stringify({ type: "navigation", url: url, urlType: type, title: title}), context.env('basePath'));
+  });
+
+  appEvents.on('realtime.testConnection', function() {
+    parent.postMessage(JSON.stringify({ type: "realtime.testConnection" }), context.env('basePath'));
   });
 
   var appView = new ChatIntegratedView({ el: 'body' });
@@ -63,15 +71,33 @@ require([
     el: $('#content-frame'),
     collection: itemCollections.chats,
     userCollection: itemCollections.users,
-    decorators: [new FileDecorator(itemCollections.files), webhookDecorator, issueDecorator, mentionDecorator, embedDecorator, emojiDecorator]
+    decorators: [webhookDecorator, issueDecorator, /*mentionDecorator,*/ embedDecorator, emojiDecorator]
   }).render();
 
-  unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
+  var unreadChatsModel = unreadItemsClient.acrossTheFold();
+
+  new UnreadBannerView.Top({
+    el: '#unread-banner',
+    model: unreadChatsModel,
+    chatCollectionView: chatCollectionView
+  }).render();
+
+  new UnreadBannerView.Bottom({
+    el: '#bottom-unread-banner',
+    model: unreadChatsModel,
+    chatCollectionView: chatCollectionView
+  }).render();
+
+  itemCollections.chats.once('sync', function() {
+    unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
+  });
+
   // unreadItemsClient.monitorViewForUnreadItems($('#file-list'));
 
   new chatInputView.ChatInputView({
     el: $('#chat-input'),
     collection: itemCollections.chats,
+    chatCollectionView: chatCollectionView,
     rollers: chatCollectionView.rollers
   }).render();
 
@@ -83,12 +109,17 @@ require([
   new Router({
     routes: [
       { name: "person",           re: /^person\/(\w+)$/,          viewType: PersonDetailView.Modal,             collection: itemCollections.users },
+      { name: "people",           re: /^people/,                  viewType: peopleCollectionView.Modal,         collection: itemCollections.sortedUsers, skipModelLoad: true },
       { name: "inv",              re: /^inv$/,                    viewType: inviteView.Modal },
       { name: "troupeSettings",   re: /^troupeSettings/,          viewType: troupeSettingsView },
+      { name: "markdown",         re: /^markdown/,                viewType: markdownView },
       { name: "integrations",     re: /^integrations/,            viewType: IntegrationSettingsModal,  validationCheck: integrationsValidationCheck }
     ],
     regions: [appView.rightPanelRegion, appView.dialogRegion]
   });
+
+  // Listen for changes to the room
+  liveContext.syncRoom();
 
   function oauthUpgradeCallback(e) {
     if(e.data !== "oauth_upgrade_complete") return;
@@ -137,16 +168,6 @@ require([
         window.location.hash = "!|inv";
       }, 500);
     }
-  }
-
-
-  if(!window.localStorage.troupeTourApp) {
-    window.localStorage.troupeTourApp = 1;
-    require([
-      'tours/tour-controller'
-    ], function(tourController) {
-      tourController.init({ appIntegratedView: appView });
-    });
   }
 
   Backbone.history.start();

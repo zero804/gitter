@@ -2,6 +2,7 @@
 "use strict";
 
 var troupeService = require("../services/troupe-service");
+var recentRoomService = require('../services/recent-room-service');
 var promiseUtils = require("../utils/promise-utils");
 
 /**
@@ -10,7 +11,7 @@ var promiseUtils = require("../utils/promise-utils");
  */
 exports.whereToNext = function(user, callback) {
 
-  return troupeService.findBestTroupeForUser(user)
+  return recentRoomService.findBestTroupeForUser(user)
     .then(promiseUtils.required)
     .then(function(troupe) {
       return troupeService.getUrlForTroupeForUserId(troupe, user.id)

@@ -13,7 +13,6 @@ var shutdown      = require('../utils/shutdown');
 var Fiber         = require("../utils/fiber");
 var assert        = require("assert");
 
-
 // Install inc and dec number fields in mongoose
 require('mongoose-number')(mongoose);
 
@@ -98,49 +97,28 @@ function serializeEvent(url, operation, model, callback) {
 // --------------------------------------------------------------------
 var UnconfirmedEmailSchema = new Schema({
   email:            { type: String },
-    confirmationCode: { type: String }
+  confirmationCode: { type: String }
 });
 UnconfirmedEmailSchema.schemaTypeName = 'UserEmailSchema';
 
 var UserSchema = new Schema({
   displayName: { type: String },
-  // email: { type: String },                     // The primary email address
   emails: [String],                            // Secondary email addresses
-  // unconfirmedEmails: [UnconfirmedEmailSchema], // Unconfirmed email addresses
   username: { type: String, required: true },
-  // newEmail: String,
   confirmationCode: {type: String },
-  // status: { type: String, "enum": ['UNCONFIRMED', 'PROFILE_NOT_COMPLETED', 'ACTIVE'], "default": 'UNCONFIRMED'},
-  // passwordHash: { type: String },
-  // passwordResetCode: String,
-  // avatarVersion: { type: Number, "default": 0 },
   gravatarImageUrl: { type: String },
   lastTroupe: ObjectId,
-  // location: {
-  //   timestamp: Date,
-  //   coordinate: {
-  //     lon: Number,
-  //     lat: Number
-  //   },
-  //   speed: Number,
-  //   altitude: Number,
-  //   named: {
-  //     place: String,
-  //     region: String,
-  //     countryCode: String
-  //   }
-  // },
   googleRefreshToken: String,
   githubToken: { type: String },
   githubUserToken: { type: String }, // The scope for this token will always be 'user'
   githubId: {type: Number },
   permissions: {
-    createRoom: { type: Boolean, 'default': false }
+    createRoom: { type: Boolean, 'default': true }
   },
   githubScopes: {type: Schema.Types.Mixed },
-  // usernameSuggestion: { type: String },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
+
 // UserSchema.index({ email: 1 }, { unique: true });
 UserSchema.index({ githubId: 1 }, { unique: true, sparse: true });
 UserSchema.index({ username: 1 }, { unique: true /*, sparse: true */});
@@ -308,8 +286,12 @@ UserTroupeFavouritesSchema.schemaTypeName = 'UserTroupeFavourites';
 //
 var TroupeUserSchema = new Schema({
   userId: { type: ObjectId },
-  deactivated: { type: Boolean }
-  // In future: role
+  deactivated: { type: Boolean },
+  lurk: { type: Boolean },
+  /** Lurk settings
+    *  false, undefined: no lurking
+    *  true: lurking
+    */
 });
 TroupeUserSchema.schemaTypeName = 'TroupeUserSchema';
 
@@ -346,12 +328,17 @@ TroupeSchema.methods.getUserIds = function() {
   return this.users.map(function(troupeUser) { return troupeUser.userId; });
 };
 
-TroupeSchema.methods.containsUserId = function(userId) {
+TroupeSchema.methods.findTroupeUser = function(userId) {
   var user = _.find(this.users, function(troupeUser) {
     return "" + troupeUser.userId == "" + userId;
   });
 
-  return !!user;
+  return user;
+};
+
+
+TroupeSchema.methods.containsUserId = function(userId) {
+  return !!this.findTroupeUser(userId);
 };
 
 TroupeSchema.methods.getOtherOneToOneUserId = function(knownUserId) {
@@ -365,7 +352,7 @@ TroupeSchema.methods.getOtherOneToOneUserId = function(knownUserId) {
   return troupeUser && troupeUser.userId;
 };
 
-TroupeSchema.methods.addUserById = function(userId) {
+TroupeSchema.methods.addUserById = function(userId, options) {
   assert(!this.oneToOne);
 
   var exists = this.users.some(function(user) { return user.userId == userId; });
@@ -373,16 +360,24 @@ TroupeSchema.methods.addUserById = function(userId) {
     throw new Error("User already exists in this troupe.");
   }
 
+  var raw = { userId: userId };
+  if(options && 'lurk' in options) {
+    raw.lurk = options.lurk;
+  }
+
   // TODO: disable this methods for one-to-one troupes
-  var troupeUser = new TroupeUser({ userId: userId });
+  var troupeUser = new TroupeUser(raw);
+
   this.post('save', function(postNext) {
     var f = new Fiber();
 
     var url = "/troupes/" + this.id + "/users";
-    serializeEvent(url, "create", troupeUser, postNext);
+    serializeEvent(url, "create", troupeUser, f.waitor());
 
     var userUrl = "/user/" + userId + "/troupes";
     serializeEvent(userUrl, "create", this, f.waitor());
+
+
 
     f.all().then(function() { postNext(); }).fail(function(err) { postNext(err); });
   });
@@ -547,19 +542,40 @@ var ChatMessageSchema = new Schema({
   toTroupeId: ObjectId,  //TODO: rename to troupeId
   text: String,
   html: String,
-  urls: Array,
-  mentions: Array,
-  issues: Array,
+  urls: Array,  // TODO: schema-ify this
+  mentions: [{
+    screenName: { type: String, required: true },
+    userId: { type: ObjectId }
+  }],
+  issues: Array, // TODO: schema-ify this
   meta: Schema.Types.Mixed,
   sent: { type: Date, "default": Date.now },
   editedAt: { type: Date, "default": null },
   readBy: { type: [ObjectId] },
-  skipAlerts: {type: Boolean, "default": false},
   _tv: { type: 'MongooseNumber', 'default': 0 },
   _md: Number,          // Meta parse version
 });
 ChatMessageSchema.index({ toTroupeId: 1, sent: -1 });
 ChatMessageSchema.schemaTypeName = 'ChatMessageSchema';
+
+//
+// A single event
+//
+var EventSchema = new Schema({
+  fromUserId: ObjectId,
+  toTroupeId: ObjectId,  //TODO: rename to troupeId
+  text: String,
+  html: String,
+  meta: Schema.Types.Mixed,
+  payload: Schema.Types.Mixed,
+  sent: { type: Date, "default": Date.now },
+  editedAt: { type: Date, "default": null },
+  _tv: { type: 'MongooseNumber', 'default': 0 },
+  _md: Number,          // Meta parse version
+});
+EventSchema.index({ toTroupeId: 1, sent: -1 });
+EventSchema.schemaTypeName = 'EventSchema';
+
 
 //
 // An email attachment
@@ -796,6 +812,7 @@ var Request = mongoose.model('Request', RequestSchema);
 var RequestUnconfirmed = mongoose.model('RequestUnconfirmed', RequestUnconfirmedSchema);
 
 var ChatMessage = mongoose.model('ChatMessage', ChatMessageSchema);
+var Event = mongoose.model('Event', EventSchema);
 var File = mongoose.model('File', FileSchema);
 var FileVersion = mongoose.model('FileVersion', FileVersionSchema);
 
@@ -841,6 +858,7 @@ module.exports = {
     InviteSchema: InviteSchema,
     RequestSchema: RequestSchema,
     ChatMessageSchema: ChatMessageSchema,
+    EventSchema: EventSchema,
     FileSchema: FileSchema,
     FileVersionSchema: FileVersionSchema,
     OAuthClientSchema: OAuthClientSchema,
@@ -869,6 +887,7 @@ module.exports = {
   Request: Request,
   RequestUnconfirmed: RequestUnconfirmed,
 	ChatMessage: ChatMessage,
+  Event: Event,
   File: File,
   FileVersion: FileVersion,
   OAuthClient: OAuthClient,

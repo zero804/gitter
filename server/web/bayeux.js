@@ -12,22 +12,30 @@ var nconf             = require('../utils/config');
 var shutdown          = require('../utils/shutdown');
 var contextGenerator  = require('./context-generator');
 var appVersion        = require('./appVersion');
-var userService       = require('../services/user-service');
+var recentRoomService = require('../services/recent-room-service');
 
 var appTag = appVersion.getAppTag();
 
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
-  { re: /^\/api\/v1\/troupes\/(\w+)$/,         validator: validateUserForTroupeSubscription },
-  { re: /^\/api\/v1\/troupes\/(\w+)\/(\w+)$/,  validator: validateUserForSubTroupeSubscription,  populator: populateSubTroupeCollection },
+  { re: /^\/api\/v1\/troupes\/(\w+)$/,
+    validator: validateUserForTroupeSubscription },
+  { re: /^\/api\/v1\/troupes\/(\w+)\/(\w+)$/,
+    validator: validateUserForSubTroupeSubscription,
+    populator: populateSubTroupeCollection },
   { re: /^\/api\/v1\/troupes\/(\w+)\/(\w+)\/(\w+)\/(\w+)$/,
-                                      validator: validateUserForSubTroupeSubscription,  populator: populateSubSubTroupeCollection },
-
-  { re: /^\/api\/v1\/user\/(\w+)\/(\w+)$/,     validator: validateUserForUserSubscription,       populator: populateSubUserCollection },
+    validator: validateUserForSubTroupeSubscription,
+    populator: populateSubSubTroupeCollection },
+  { re: /^\/api\/v1\/user\/(\w+)\/(\w+)$/,
+    validator: validateUserForUserSubscription,
+    populator: populateSubUserCollection },
   { re: /^\/api\/v1\/user\/(\w+)\/troupes\/(\w+)\/unreadItems$/,
-                                      validator: validateUserForUserSubscription,       populator: populateUserUnreadItemsCollection },
-  { re: /^\/api\/v1\/user\/(\w+)$/,            validator: validateUserForUserSubscription },
-  { re: /^\/api\/v1\/ping$/,                   validator: validateUserForPingSubscription }
+    validator: validateUserForUserSubscription,
+    populator: populateUserUnreadItemsCollection },
+  { re: /^\/api\/v1\/user\/(\w+)$/,
+    validator: validateUserForUserSubscription },
+  { re: /^\/api\/v1\/ping(\/\w+)?$/,
+    validator: validateUserForPingSubscription }
 ];
 
 var superClientPassword = nconf.get('ws:superClientPassword');
@@ -58,7 +66,8 @@ function validateUserForSubTroupeSubscription(options, callback) {
     .nodeify(callback);
 }
 
-// This strategy ensures that a user can access a URL under a /user/ URL
+// This is only used by the native client. The web client publishes to
+// the url
 function validateUserForPingSubscription(options, callback) {
   return callback(null, true);
 }
@@ -108,6 +117,9 @@ function populateSubTroupeCollection(options, callback) {
 
     case "users":
       return restful.serializeUsersForTroupe(troupeId, userId, callback);
+
+    case "events":
+      return restful.serializeEventsForTroupe(troupeId, userId, callback);
 
     default:
       winston.error('Unable to provide snapshot for ' + collection);
@@ -178,8 +190,6 @@ var authenticator = {
     if(messageIsFromSuperClient(message)) {
       return callback(message);
     }
-
-    winston.verbose('bayeux: Handshake: ', message);
 
     var ext = message.ext;
 
@@ -254,7 +264,7 @@ var authenticator = {
       message.ext.userId = userId;
 
       if(troupeId) {
-        userService.saveLastVisitedTroupeforUserId(userId, troupeId);
+        recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId);
       }
 
       // If the troupeId was included, it means we've got a native
@@ -274,6 +284,18 @@ var authenticator = {
 
 };
 
+function destroyClient(clientId) {
+  if(!clientId) return;
+
+  process.nextTick(function() {
+    var engine = server._server._engine;
+    engine.destroyClient(clientId, function() {
+      winston.info('bayeux: client ' + clientId + ' destroyed');
+    });
+
+  });
+
+}
 //
 // Authorisation Extension - decides whether the user
 // is allowed to connect to the subscription channel
@@ -288,16 +310,7 @@ var authorisor = {
       message.error = '403::Access denied';
       winston.error('Socket authorisation failed. Disconnecting client.', message);
 
-      process.nextTick(function() {
-        var clientId = message.clientId;
-
-        var engine = server._server._engine;
-        engine.destroyClient(clientId, function() {
-          winston.warn('bayeux: client ' + clientId + ' destroyed');
-        });
-
-      });
-
+      destroyClient(message.clientId);
       callback(message);
     }
 
@@ -405,22 +418,16 @@ var authorisor = {
     });
 
   }
-
-};
-
-var subscriptionTimestamp = {
-  outgoing: function(message, callback) {
-    if (message.channel === '/meta/subscribe') {
-      message.timestamp = new Date().toISOString();
-    }
-
-    callback(message);
-  }
 };
 
 var pushOnlyServer = {
   incoming: function(message, callback) {
     if (message.channel.match(/^\/meta\//)) {
+      return callback(message);
+    }
+
+    // Only ping if data is {}
+    if (message.channel == '/api/v1/ping2' && Object.keys(message.data).length === 0) {
       return callback(message);
     }
 
@@ -436,7 +443,43 @@ var pushOnlyServer = {
     if (message.ext) delete message.ext.password;
     callback(message);
   }
+};
 
+var pingResponder = {
+  incoming: function(message, callback) {
+    // Only ping if data is {}
+    if (message.channel != '/api/v1/ping2') {
+      return callback(message);
+    }
+
+    function deny(err) {
+      message.error = '403::Access denied';
+      winston.error('Denying ping access' + err);
+      callback(message);
+    }
+
+    var clientId = message.clientId;
+
+    server._server._engine.clientExists(clientId, function(exists) {
+      if(!exists) {
+        return deny("Client does not exist", { clientId: clientId });
+      }
+
+      presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
+        if(err) return deny(err);
+
+        if(!userId) {
+          destroyClient(message.clientId);
+          return deny("Client not authenticated. Denying ping. ", { clientId: clientId });
+        }
+
+        return callback(message);
+      });
+
+    });
+
+
+  }
 };
 
 var superClient = {
@@ -447,6 +490,74 @@ var superClient = {
   }
 };
 
+function getClientIp(req) {
+  if(!req) return;
+
+  if(req.headers && req.headers['x-forwarded-for']) {
+    return req.headers['x-forwarded-for'];
+  }
+
+  if(req.connection && req.connection.remoteAddress) {
+    return req.connection.remoteAddress;
+  }
+}
+
+var logging = {
+  incoming: function(message, req, callback) {
+    switch(message.channel) {
+      case '/meta/handshake':
+        /* Rate is for the last full 10s period */
+        var connType = message.ext && message.ext.connType;
+        var handshakeRate = message.ext && message.ext.rate;
+        winston.verbose("bayeux: " + message.channel , { ip: getClientIp(req), connType: connType, rate: handshakeRate });
+        break;
+
+      case '/meta/connect':
+        /* Rate is for the last full 10s period */
+        var connectRate = message.ext && message.ext.rate;
+        if(connectRate && connectRate > 1) {
+          winston.verbose("bayeux: connect" , { ip: getClientIp(req), clientId: message.clientId, rate: connectRate });
+        }
+        break;
+
+      case '/meta/subscribe':
+        winston.verbose("bayeux: subscribe", { clientId: message.clientId, subs: message.subscription });
+        break;
+    }
+
+    callback(message);
+  },
+
+  outgoing: function(message, req, callback) {
+    if(message.channel === '/meta/handshake' ) {
+      var ip = getClientIp(req);
+      var clientId = message.clientId;
+      winston.verbose("bayeux: handshake complete", { ip: ip, clientId: clientId });
+    }
+    callback(message);
+  }
+};
+
+var adviseAdjuster = {
+  outgoing: function(message, req, callback) {
+    if(message.error && message.error.indexOf("403") === 0) {
+      if(!message.advice) {
+        message.advice = {};
+      }
+
+      if(message.channel == '/meta/handshake') {
+        // If we're unable to handshake, the situation is dire
+        message.advice.reconnect = 'none';
+      } else {
+        message.advice.reconnect = 'handshake';
+      }
+    }
+
+    callback(message);
+  }
+};
+
+
 var server = new faye.NodeAdapter({
   mount: '/faye',
   timeout: nconf.get('ws:fayeTimeout'),
@@ -456,6 +567,7 @@ var server = new faye.NodeAdapter({
     type: fayeRedis,
     host: nconf.get("redis:host"),
     port: nconf.get("redis:port"),
+    database: nconf.get("redis:redisDb"),
     interval: nconf.get('ws:fayeInterval'),
     namespace: 'fr:'
   }
@@ -469,15 +581,29 @@ module.exports = {
   server: server,
   engine: server._server._engine,
   client: client,
+  destroyClient: destroyClient,
   attach: function(httpServer) {
 
     // Attach event handlers
+    server.addExtension(logging);
     server.addExtension(authenticator);
     server.addExtension(authorisor);
     server.addExtension(pushOnlyServer);
-    server.addExtension(subscriptionTimestamp);
+    server.addExtension(pingResponder);
+    server.addExtension(adviseAdjuster);
+
 
     client.addExtension(superClient);
+
+
+    /** Some logging */
+    ['handshake', 'disconnect'].forEach(function(event) {
+      server.bind(event, function(clientId) {
+        winston.info("Client " + clientId + ": " + event);
+      });
+    });
+
+
 
     server.bind('disconnect', function(clientId) {
       // Warning, this event is called simulateously on

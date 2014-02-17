@@ -1,21 +1,27 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var persistence      = require('./persistence-service');
-var validateUri      = require('./github/github-uri-validator');
-var uriLookupService = require("./uri-lookup-service");
-var assert           = require("assert");
-var winston          = require("winston");
-var ObjectID         = require('mongodb').ObjectID;
-var Q                = require('q');
-var permissionsModel = require('./permissions-model');
-var userService      = require('./user-service');
-var troupeService    = require('./troupe-service');
-var chatService      = require('./chat-service');
-var nconf            = require('../utils/config');
-var request          = require('request');
-var xregexp          = require('xregexp').XRegExp;
-var serializeEvent   = require('./persistence-service-events').serializeEvent;
+var persistence        = require('./persistence-service');
+var validateUri        = require('./github/github-uri-validator');
+var uriLookupService   = require("./uri-lookup-service");
+var assert             = require("assert");
+var winston            = require("winston");
+var ObjectID           = require('mongodb').ObjectID;
+var Q                  = require('q');
+var permissionsModel   = require('./permissions-model');
+var userService        = require('./user-service');
+var troupeService      = require('./troupe-service');
+var chatService          = require('./chat-service');
+var nconf              = require('../utils/config');
+var request            = require('request');
+var GitHubRepoService  = require('./github/github-repo-service');
+var unreadItemService  = require('./unread-item-service');
+var _                  = require('underscore');
+var xregexp            = require('xregexp').XRegExp;
+var serializeEvent     = require('./persistence-service-events').serializeEvent;
+
+var redis = require('../utils/redis');
+var redisClient = redis.createClient();
 
 function localUriLookup(uri) {
   return uriLookupService.lookupUri(uri)
@@ -134,7 +140,10 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
                 _nonce: nonce,
                 githubType: githubType,
                 topic: topic || "",
-                users:  user ? [{ _id: new ObjectID(), userId: user._id }] : []
+                users:  user ? [{
+                  _id: new ObjectID(),
+                  userId: user._id
+                }] : []
               }
             },
             {
@@ -176,30 +185,63 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
     });
 }
 
+function determineDefaultNotifyForRoom(user, troupe) {
+  var repoService = new GitHubRepoService(user);
+  return repoService.getRepo(troupe.uri)
+    .then(function(repoInfo) {
+      if(!repoInfo || !repoInfo.permissions) return 0;
+
+      /* Admin or push? Notify */
+      return repoInfo.permissions.admin || repoInfo.permissions.push ? 1 : 0;
+    });
+}
 /**
  * Grant or remove the users access to a room
  * Makes the troupe reflect the users access to a room
  */
 function ensureAccessControl(user, troupe, access) {
-
   if(troupe) {
     if(access) {
       /* In troupe? */
       if(troupe.containsUserId(user.id)) return Q.resolve(troupe);
 
       troupe.addUserById(user.id);
+
+      // IRC
+      var msg_data = {user: user, room: troupe};
+      redisClient.publish('user_joined', JSON.stringify(msg_data));
+
       return troupe.saveQ().thenResolve(troupe);
+
     } else {
       /* No access */
       if(!troupe.containsUserId(user.id)) return Q.resolve(null);
 
       troupe.removeUserById(user.id);
+
+      // IRC
+      var msg_data = {user: user, room: troupe};
+      redisClient.publish('user_left', JSON.stringify(msg_data));
+
       return troupe.saveQ().thenResolve(null);
     }
   }
 
   return Q.resolve(null);
 }
+
+
+function findAllRoomsIdsForUserIncludingMentions(userId, callback) {
+  return Q.all([
+      unreadItemService.getRoomIdsMentioningUser(userId),
+      troupeService.findAllTroupesIdsForUser(userId)
+    ])
+    .spread(function(mentions, memberships) {
+      return _.uniq(mentions.concat(memberships));
+    })
+    .nodeify(callback);
+}
+exports.findAllRoomsIdsForUserIncludingMentions = findAllRoomsIdsForUserIncludingMentions;
 
 /**
  * Add a user to a room.
@@ -320,21 +362,22 @@ function createChannelForRoom(parentTroupe, user, name, callback) {
             if(newRoom._nonce === nonce) {
               serializeCreateEvent(newRoom);
 
-              // Indeed the room was just created right now
-              // Notify people or something at this point I
-              // guess
-              var text = "[CHANNEL] New channel *" + name + " created by " + user.username;
-              var meta = {
-                uri: newRoom.uri,
-                name: newRoom.name,
-                user: user.username,
-                type: 'webhook',
-                service: 'gitter',
-                event: 'channel'
-              };
+              return newRoom;
+              // // Indeed the room was just created right now
+              // // Notify people or something at this point I
+              // // guess
+              // var text = "[CHANNEL] New channel *" + name + " created by " + user.username;
+              // var meta = {
+              //   uri: newRoom.uri,
+              //   name: newRoom.name,
+              //   user: user.username,
+              //   type: 'webhook',
+              //   service: 'gitter',
+              //   event: 'channel'
+              // };
 
-              return chatService.newRichMessageToTroupe(parentTroupe, null, text, meta)
-                .thenResolve(newRoom);
+              // return chatService.newRichMessageToTroupe(parentTroupe, null, text, meta)
+              //   .thenResolve(newRoom);
             }
             return newRoom;
           });

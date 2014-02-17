@@ -6,13 +6,20 @@ require([
   'views/toolbar/troupeMenu',
   'collections/instances/troupes',
   'components/titlebar',
-  'views/widgets/preload', // No ref
-  'components/webNotifications', // No ref
-  'components/desktopNotifications', // No ref
-  'components/errorReporter',  // No ref
-  'template/helpers/all', // No ref
-], function(appEvents, context, AppIntegratedView, TroupeMenuView, troupeCollections, TitlebarUpdater) {
+  'components/realtime',
+  'views/widgets/preload',            // No ref
+  'components/webNotifications',      // No ref
+  'components/desktopNotifications',  // No ref
+  'template/helpers/all',             // No ref
+  'components/bug-reporting',         // No ref
+  'components/csrf'                   // No ref
+], function(appEvents, context, AppIntegratedView, TroupeMenuView, troupeCollections, TitlebarUpdater, realtime) {
   "use strict";
+
+  var chatIFrame = document.getElementById('content-frame');
+  if(window.location.hash) {
+    chatIFrame.src = chatIFrame.src + window.location.hash;
+  }
 
   var appView = new AppIntegratedView({ });
 
@@ -22,22 +29,26 @@ require([
     if(state) {
       // TODO: update the title....
       context.setTroupeId(undefined);
-      document.getElementById('content-frame').src = state;
+      chatIFrame.src = state+window.location.hash;
     }
   }
 
-  var troupeCollection = troupeCollections.troupes;
-  troupeCollection.on("remove", function(model) {
+  var titlebarUpdater = new TitlebarUpdater();
+
+  var allRoomsCollection = troupeCollections.troupes;
+  allRoomsCollection.on("remove", function(model) {
     if(model.id == context.getTroupeId()) {
       var username = context.user().get('username');
       var newLocation = '/' + username;
       var newFrame = newLocation + '/-/home';
-      window.history.pushState(newFrame, "", newLocation);
+      var title = '';
+
+      titlebarUpdater.setRoomName(title);
+
+      window.history.pushState(newFrame, title, newLocation);
       updateContent(newFrame);
     }
   });
-
-  var titlebarUpdater = new TitlebarUpdater();
 
   appEvents.on('navigation', function(url, type, title) {
     // This is a bit hacky..
@@ -50,7 +61,7 @@ require([
     }
     frameUrl += type;
 
-    titlebarUpdater.updateTitlebar(title);
+    titlebarUpdater.setRoomName(title);
 
     window.history.pushState(frameUrl, title, url);
     updateContent(frameUrl);
@@ -68,10 +79,13 @@ require([
     switch(message.type) {
       case 'context.troupeId':
         context.setTroupeId(message.troupeId);
-        titlebarUpdater.updateTitlebar(message.name);
+        titlebarUpdater.setRoomName(message.name);
         break;
       case 'navigation':
         appEvents.trigger('navigation', message.url, message.urlType, message.title);
+        break;
+      case 'realtime.testConnection':
+        realtime.testConnection();
         break;
     }
   });

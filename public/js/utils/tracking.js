@@ -60,9 +60,9 @@ define([
   }
 
   function trackError(message, file, line) {
-    if(window.mixpanel) {
-      window.mixpanel.track('jserror', { message: message, file: file, line: line } );
-    }
+    // if(window.mixpanel) {
+    //   window.mixpanel.track('jserror', { message: message, file: file, line: line } );
+    // }
 
     if(trackingId) {
       ga('send', 'event', 'error', message, file, line);
