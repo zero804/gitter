@@ -5,18 +5,12 @@
 var uuid                      = require('node-uuid');
 var winston                   = require("winston");
 var assert                    = require('assert');
-var Q                         = require('q');
-var moment                    = require('moment');
 var _                         = require('underscore');
 var persistence               = require("./persistence-service");
 var emailNotificationService  = require("./email-notification-service");
 var userConfirmationService   = require('./user-confirmation-service');
-// var geocodingService          = require("./geocoding-service");
 var statsService              = require("./stats-service");
-// var uriLookupService          = require("./uri-lookup-service");
-var appEvents                 = require("../app-events");
 var collections               = require("../utils/collections");
-// var promiseUtils              = require('../utils/promise-utils');
 
 /**
  * Creates a new user
@@ -137,6 +131,14 @@ var userService = {
     return persistence.User.findByIdQ(id).nodeify(callback);
   },
 
+  githubUserExists: function(username, callback) {
+    return persistence.User.countQ({ username: username })
+      .then(function(count) {
+        return !!count;
+      })
+      .nodeify(callback);
+  },
+
   findByGithubId: function(githubId, callback) {
     return persistence.User.findOneQ({ githubId: githubId })
            .nodeify(callback);
@@ -146,7 +148,6 @@ var userService = {
     return persistence.User.findOneQ({$or: [{ githubId: githubId }, { username: username }]})
            .nodeify(callback);
   },
-
 
   findByEmail: function(email, callback) {
     return persistence.User.findOneQ({ $or: [{ email: email.toLowerCase()}, { emails: email.toLowerCase() }]})
