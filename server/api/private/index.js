@@ -17,7 +17,10 @@ module.exports = {
         require('./user-email'));
 
     app.get('/api/private/gh/repos/*',
-        require('./github-mirror/repo-scope-mirror'));
+        require('./github-mirror/repos-mirror'));
+
+    app.get('/api/private/gh/users/*',
+        require('./github-mirror/users-mirror'));
 
     // No auth for hooks yet
     app.post('/api/private/hook/:hash',
