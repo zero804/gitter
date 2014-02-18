@@ -136,7 +136,7 @@ define([
 
         this.applyPlacement(tp, placement);
       } finally {
-        // This is very important. If you leave it out, Chrome will crash.
+        // This is very important. If you leave it out, Chrome will likely crash.
         if(this.mutant) this.mutant.takeRecords();
       }
 
@@ -190,6 +190,7 @@ define([
       var delta = 0;
       var replace;
 
+
       /* Adjust */
       if (placement == 'bottom' || placement == 'top') {
         if (offset.left < 0) {
@@ -200,6 +201,12 @@ define([
         if (offset.top < 0) {
           delta = offset.top * -2;
           offset.top = 0;
+        } else {
+          var clientHeight = this.scroller ? this.scroller.clientHeight : window.innerHeight;
+            if(offset.top + height > clientHeight) {
+            delta = 2 * (clientHeight - offset.top - height - 10);
+            offset.top = clientHeight - height - 10;
+          }
         }
       }
 
