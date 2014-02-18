@@ -51,19 +51,6 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
     return mention.screenName;
   });
 
-  var _msg;
-  if (troupe.oneToOne) {
-    var toUserId;
-    troupe.users.forEach(function(_user) {
-      if (_user.userId.toString() !== user.id.toString()) toUserId = _user.userId;
-    });
-    _msg = {oneToOne: true, username: user.username, toUserId: toUserId, text: text};
-  } else {
-    _msg = {oneToOne: false, username: user.username, room: troupe.uri, text: text};
-  }
-
-  appEvents.chatMessage(_msg);
-
   userService.findByUsernames(mentionUserNames, function(err, users) {
     if(err) return callback(err);
 
@@ -93,6 +80,21 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
         troupeId: troupe.id,
         username: user.username
       });
+
+      var _msg;
+      if (troupe.oneToOne) {
+        var toUserId;
+        troupe.users.forEach(function(_user) {
+          if (_user.userId.toString() !== user.id.toString()) toUserId = _user.userId;
+        });
+        _msg = {oneToOne: true, username: user.username, toUserId: toUserId, text: text, id: chatMessage.id};
+      } else {
+        _msg = {oneToOne: false, username: user.username, room: troupe.uri, text: text, id: chatMessage.id};
+      }
+
+      appEvents.chatMessage(_msg);
+
+
 
       return callback(null, chatMessage);
     });

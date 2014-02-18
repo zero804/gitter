@@ -8,13 +8,14 @@ define([
   'views/widgets/avatar',
   'marionette',
   'views/base',
+  'views/popover',
   'hbs!./tmpl/chatViewItem',
   'views/chat/chatInputView',
   'views/unread-item-view-mixin',
   'cocktail',
   'bootstrap_tooltip', // No ref
   'bootstrap-popover' // No ref
-], function($, _, context, chatModels, AvatarView, Marionette, TroupeViews,
+], function($, _, context, chatModels, AvatarView, Marionette, TroupeViews, Popover,
   chatItemTemplate, chatInputView, UnreadItemViewMixin, cocktail /* tooltip, popover*/) {
 
   "use strict";
@@ -300,7 +301,8 @@ define([
       this.readBy = new ReadByPopover({
         model: this.model,
         userCollection: this.userCollection,
-        placement: 'bottom',
+        scroller: this.$el.parents('.primary-scroll'),
+        placement: 'vertical',
         minHeight: '88px',
         width: '300px',
         title: 'Read By',
@@ -333,9 +335,9 @@ define([
   });
   cocktail.mixin(ReadByView, TroupeViews.LoadingCollectionMixin);
 
-  var ReadByPopover = TroupeViews.Popover.extend({
+  var ReadByPopover = Popover.extend({
     initialize: function(options) {
-      TroupeViews.Popover.prototype.initialize.apply(this, arguments);
+      Popover.prototype.initialize.apply(this, arguments);
       this.view = new ReadByView({ model: this.model, userCollection: options.userCollection });
     }
   });
