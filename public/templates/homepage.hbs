@@ -14,104 +14,126 @@
 <script src="//cdn.optimizely.com/js/590160700.js"></script>
 
 <body>
-
-  <div class="container main-green" style="background-image: url('{{ cdn "images/2/gitter/splash.jpg" }}');">
-    <div class="strip" style="text-align: left">
-      <div class="logo-container">
-        <img src="{{ cdn "images/2/gitter/logo-text-white-64.png" }}" height="64">
-      </div>
-      <div class="signup-container">
-        <a href="/login/github" class="button blur" id="signup" style="text-decoration: none; color: white">Login with GitHub</a>
-        <div class="write-explain">
-          <a href="https://gitter.zendesk.com/hc/articles/200176672-Authenticating-with-GitHub" target="_blank">Requires write access</a>
+  <div class="outer-container" style="">
+    <div class="container hero-container">
+      <div class="strip" style="text-align: left;">
+        <div class="logo-container"></div>
+        <div class="signup-container">
+          <div style="font-size: 14px; letter-spacing: 0.5px">
+             <a href="#features" class="button scroll-link text" id="about" style="text-decoration: none; color: white;" >Features</a>
+            <a href="#pricing" class="button scroll-link text" id="about" style="text-decoration: none; color: white;" >Pricing</a>
+            <a href="/login/github" class="button blur" id="signup" style="text-decoration: none; color: white; margin-left: 20px">Login with GitHub</a>
+          </div>
         </div>
       </div>
-    </div>
-    <br>
-    <br>
-    <div>
-      <div class="strip" style="color:white; text-shadow: 0 0 0 transparent,1px 1px 2px rgba(0,0,0,0.2)">
-        <div style="display: inline-block; padding: 0 24px 12px 24px; margin-bottom: 24px; margin-top: 12px;">
-          <h1 style="margin-bottom: 10px">The chat you always wanted</h1>
-          <h3>Messaging for software developers. Integrated with your team, projects and your code.</h3>
+      <Br><br>
+      <div>
+        <div class="strip" style="color:white; text-shadow: 0 0 0 transparent,1px 1px 2px rgba(0,0,0,0.2); text-align: left">
+          <div class="hero">
+            <div style="display: inline-block; background-color: rgba(0,0,0,0.75); padding: 0 10px; margin-bottom: 10px">
+              <h1 style="margin: 16px; color: #1bee82">The chat you've always wanted</h1>
+            </div>
+            <div style="display: inline-block; background-color: rgba(0,0,0,0.75); padding: 14px 24px; letter-spacing: 0.05em">
+              Messaging for people who make software. Integrated with your team, projects and your code.
+            </div>
+          </div>
+        </div>
+        <div class="strip" style="text-align: left; margin-top: 24px">
+          <a href="/login/github" class="button green" id="signup" style="text-decoration: none; color: white">Sign up with GitHub</a>
         </div>
       </div>
+      <!-- <div class="strip"><img src="{{ cdn "images/2/gitter/screenshot-small.png" }}" width="920" style="border-radius: 2px 2px 0 0"></div> -->
     </div>
-    <div class="strip"><img src="{{ cdn "images/2/gitter/screenshot-small.png" }}" width="920" style="border-radius: 2px 2px 0 0; margin-bottom: -5px"></div>
-  </div>
-  <div class="container grey">
-    <div class="strip feature">
-      <div style="display: inline-block; vertical-align: top; max-width: 450px; margin-top: 40px">
-        <h2 style="margin-top: 0">Chat rooms for everything</h2>
-        <div style="text-align: left">Free chat rooms for your public repositories. <br>A bit like IRC only <a href="#smart" rel="" id="anchor1" style="color: #1dce73; text-decoration: none" class="scroll-link">smarter</a>. <p>Chats for private repositories as well as organisations.</p></div>
-      </div>
-      <div style="display: inline-block; float: right; vertical-align: top;">
-        <img src="{{ cdn "images/2/gitter/rooms.png" }}" width="284" height="284">
-      </div>
-    </div>
-  </div>
-  <div class="container" style="background-color: #162e34; padding: 60px 0">
-    <div class="strip">
-      <span style="opacity: 0.8; color: white">Interested? Gitter is in beta right now, but feel free to give it a go. </span><br><br>
-      <a href="/login/github" class="button green" id="signup">Sign up with GitHub</a>
-    </div>
-  </div>
 
-  <div class="container" style="background-color: white; padding: 10px 0">
-    <div id="smart" class="strip feature">
-      <h2 style="text-align: center">So smart, it even knows your issues</h2>
-      <div style="text-align: center"><img src="{{ cdn "images/2/gitter/issue.png" }}" width="600"></div><br>
-      <h2 style="text-align: center">Talks markdown, including formatted code</h2>
-      <div style="text-align: center"><img src="{{ cdn "images/2/gitter/code.png" }}" width="700"></div><br><br>
-    </div>
-  </div>
-
-  <div class="container" style="background-color: #eee">
-    <div class="strip feature">
-      <div style="display: inline-block; vertical-align: top; max-width: 620px; margin-top: 60px">
-        <h2 style="margin-top: 0">Integrated with the products you use</h2>
-        <div style="text-align: left">Webhook integrations with Github, Jenkins, Travis, Trello and Sprintly.</p></div>
-      </div>
-      <div style="display: inline-block; float: right; vertical-align: top; margin-right: 80px;">
-        <img src="{{ cdn "images/2/gitter/activity.png" }}" width="250rs">
-      </div>
-    </div>
-  </div>
-
-  <div class="container" style="background-color: #162e34; padding-bottom: 30px">
-    <div class="strip feature" style="text-align: center">
-      <h2 style="text-align: center; color: white">Other awesome features</h2>
-      <span style="color: white; line-height: 150%">Know who's seen any message. <span style="opacity: 0.6">Edit messages after you've sent them. </span>Full emoji support. <span style="opacity: 0.6">Special Lurk Mode.</span><br>
-      <span style="opacity:0.6;">Automatically embeds content like Gists, YouTube, pictures of cats and other stuff.</span> Desktop notifications and @mentions.<br>
-      Infinite chat history stored in the cloud. Will soon be searchable too. <span style='opacity: 0.6'>Phew, that's a lot and we're building more constantly.</span></span>
-    </div>
-  </div>
-
-  <div class="container" style="background-color: #eee">
-    <div class="strip feature">
-      <div style="display: inline-block; vertical-align: top; max-width: 620px; margin-top: 60px">
-        <h2 style="margin-top: 0">Available everywhere that has internets</h2>
-        <div style="text-align: left">
-          <p>In any browser. Desktop app for Mac. Windows, iPhone and Android coming soon.<br><br>
-          Yes, we know, that's a gold iPhone.</p>
+    <div class="container" style="background-color: #eee; padding-bottom: 20px" >
+      <div class="strip feature">
+        <div style="display: inline-block; vertical-align: top; max-width: 450px; margin-top: 60px">
+          <h2 style="margin-top: 0">Chat rooms for everything</h2>
+          <div style="text-align: left">Free chat rooms for your public repositories. <br>A bit like IRC only <a href="#features" rel="" id="anchor1" style="color: #1dce73; text-decoration: none" class="scroll-link">smarter</a>. <p>Chats for private repositories as well as organisations.</div>
         </div>
-      </div>
-      <div style="display: inline-block; float: right; vertical-align: top; margin-right: 80px; margin-top: 10px">
-        <img src="{{ cdn "images/2/gitter/iphone.png" }}" width="150">
+        <div style="display: inline-block; float: right; vertical-align: top;" style=""><img src="{{ cdn "images/2/gitter/rooms.png" }}" width="284" height="284"></div>
       </div>
     </div>
-  </div>
 
-  <div class="container" style="background-color: white;padding: 40px 0">
-    <div class="strip">
-      <span style="opacity: 0.8; color: black";>Interested? Gitter is in beta right now, but don't let that stop you. </span>
-      <br>
-      <br>
-      <a href="/login/github" class="button green" id="signup">My brain can't handle the awesome. Sign me up!</a>
+    <div class="container" style="background-color: #162e34; padding: 60px 0">
+      <div class="strip">
+         <span style="opacity: 0.8; color: white";>Interested? Gitter is in beta right now, but feel free to give it a go. </span><br><br>
+        <a href="/login/github" class="button green" id="signup" style="text-decoration: none; color: white">Sign up with GitHub</a>
+      </div>
     </div>
+
+    <div class="container" style="background-color: white; padding: 10px 0">
+  <a name="features" id="features"> </a>
+      <div class="strip feature">
+        <h2 style="text-align: center">So smart, it even knows your issues</h2>
+        <div style="text-align: center"><img src="{{ cdn "images/2/gitter/issue.png" }}" width="600"></div><br>
+        <h2 style="text-align: center">And talks markdown, including formatted code</h2>
+        <div style="text-align: center"><img src="{{ cdn "images/2/gitter/code.png" }}" width="700"></div><br><br>
+      </div>
+    </div>
+
+    <div class="container" style="background-color: #eee">
+      <div class="strip feature">
+        <div style="display: inline-block; vertical-align: top; max-width: 620px; margin-top: 60px">
+          <h2 style="margin-top: 0">Integrated with the products you use</h2>
+          <div style="text-align: left">Webhook integrations with Github, Jenkins, Travis, Trello and Sprintly</p></div>
+        </div>
+        <div style="display: inline-block; float: right; vertical-align: top;" style=""><img src="{{ cdn "images/2/gitter/activity.png" }}" width="250rs"></div>
+      </div>
+    </div>
+
+    <div class="container" style="background-color: #162e34; padding-bottom: 30px">
+      <div class="strip feature" style="text-align: center">
+        <h2 style="text-align: center; color: white">Other awesome features</h2>
+        <span style="color: white; line-height: 150%">Know who's seen any message. <span style="opacity: 0.6">Edit messages after you've sent them. </span>Full emoji support. <span style="opacity: 0.6">Special Lurk Mode.</span> IRC bridge.<br>
+        <span style="opacity:0.6;">Automatically embeds content like Gists, YouTube, pictures of cats and other stuff.</span> Desktop notifications and @mentions.<br>
+        Infinite chat history stored in the cloud. Will soon be searchable too. <span style='opacity: 0.6'>Phew, that's a lot and we're building more constantly.</span></span>
+      </div>
+    </div>
+
+    <div class="container" style="background-color: white; padding: 0; margin: 0">
+      <div class="strip feature" style="padding: 0; margin: 40px 0 0 0">
+        <h2 style="text-align: center;">Delivered through your browser</h2>
+        <img src="{{ cdn "images/2/gitter/screenshot-small@2x.png" }}" width="920" style="margin-top: 20px"></div>
+      </div>
+    </div>
+
+    <div class="container" style="background-color: #eee; margin-top: -5px">
+      <div class="strip feature">
+        <div style="display: inline-block; vertical-align: top; max-width: 620px; margin-top: 60px">
+          <h2 style="margin-top: 0">Available everywhere that has internets</h2>
+          <div style="text-align: left">Desktop app for Mac. Windows, iPhone and Android coming soon.<br>Works perfectly in mobile web browsers.<br><br>
+            Yes, we know, that's a gold iPhone.</p></div>
+        </div>
+        <div style="display: inline-block; float: right; vertical-align: top; margin-right: 80px; margin-top: 10px" style=""><img src="{{ cdn "images/2/gitter/iphone.png" }}" height="284"></div>
+      </div>
+    </div>
+
+    <div class="container" style="background-color: #162e34; padding-bottom: 30px">
+      <a name="pricing" id="pricing"> </a>
+      <div class="strip feature" style="text-align: center">
+        <h2 style="text-align: center; color: white">What does it cost?</h2>
+        <span style="color: white; line-height: 150%">During our Beta period, Gitter is available for free. Rest assured public conversations will always be free.<br>
+          <span style="opacity: 0.6"> We'll work out a great, affordable price for private conversations, which will most likely include a free tier.</span></span>
+      </div>
+    </div>
+
+
+    <div class="container" style="background-color: white;padding: 40px 0">
+      <div class="strip">
+        <span style="opacity: 0.8; color: black";>Interested? Gitter is in beta right now, but don't let that stop you. </span><br><br>
+        <a href="/login/github" class="button green" id="signup" style="text-decoration: none; color: white">My brain can't handle the awesome. Sign me up!</a>
+      </div>
+    </div>
+
   </div>
 
-  <script type="text/javascript" src="{{ cdn "repo/retina/retina.js" }}"></script>
+  <script>
 
-</body>
-</html>
+
+
+  </script>
+
+
+  </body>
+  </html>
