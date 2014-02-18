@@ -22,8 +22,12 @@ define([
     serializeData: function() {
       var data = this.model.toJSON();
 
-      if(data.blog && !data.blog.match(/^https?:\/\//)) {
-        data.blogUrl = 'http://' + data.blog;
+      if(data.blog) {
+        if(!data.blog.match(/^https?:\/\//)) {
+          data.blogUrl = 'http://' + data.blog;
+        } else {
+          data.blogUrl = data.blog;
+        }
       }
 
       data.avatarUrl = data.avatar_url && data.avatar_url + "&s=128" || failoverImage;
