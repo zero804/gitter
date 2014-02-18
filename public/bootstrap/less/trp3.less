@@ -309,6 +309,28 @@ a:hover {
   }
 }
 
+.github-LOCATION {
+  .prepend-icon-location;
+  &:before {
+    font-size: 16px;
+  }
+}
+
+.github-MAIL {
+  .prepend-icon-mail;
+  &:before {
+    font-size: 16px;
+  }
+}
+
+.github-LINK {
+  .prepend-icon-link;
+  &:before {
+    font-size: 16px;
+  }
+}
+
+
 .github-ONETOONE {
   .prepend-121-icon;
   &:before {
@@ -2322,12 +2344,19 @@ ul.roster {
 
 }
 
+.trpPopoverDetails {
+  float: right;
+  margin-left: 12px;
+  h1 {
+    line-height: 28px;
+  }
+}
+
 ul.trpUserDetails {
   list-style: none;
   padding-top: 15px;
   padding-bottom: 15px;
-  border-top: 1px solid #eee;
-  border-bottom: 1px solid #eee;
+  margin: 0;
 
   padding: 0;
   margin-top: 0;
@@ -2335,11 +2364,24 @@ ul.trpUserDetails {
 
   & li {
     width: 100%;
-    padding: 2px 0 2px 24px;
+    padding: 2px 0;
     overflow-x: hidden;
     font-size: 14px;
     text-overflow: ellipsis;
   }
+}
+
+.trpUserDetailActions {
+  margin-left: 138px;
+  margin-top: 8px;
+  clear: both;
+}
+
+.vcard-stats {
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  padding: 4px 2px;
+  margin-bottom: 4px;
 }
 
 .octicon-organisation {

@@ -71,7 +71,6 @@ define([
         userCollection: this.userCollection,
         placement: 'horizontal',
         minHeight: '88px',
-        width: '300px',
         title: model.get('username'),
         targetElement: event.target
       });
