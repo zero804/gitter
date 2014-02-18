@@ -1,7 +1,7 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var Mirror = require("../../../services/github/mirrors/repo-then-user-scope-mirror");
+var Mirror = require("../../../services/github/github-mirror-service")('repo');
 
 module.exports = function(req, res, next) {
   if(!req.user) return next(403);
