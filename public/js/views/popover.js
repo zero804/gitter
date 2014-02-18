@@ -11,18 +11,18 @@ define([
   var Popover = TroupeViews.Base.extend({
     template: popoverTemplate,
     className: "popover",
+    options: {
+      animation: true,
+      selector: false,
+      title: '',
+      delay: 300,
+      container: false,
+      placement: 'right',
+      scroller: null,
+      width: '',
+      minHeight: ''
+    },
     initialize: function(options) {
-      this.options = {
-        animation: true,
-        selector: false,
-        title: '',
-        delay: 300,
-        container: false,
-        placement: 'right',
-        scroller: null,
-        width: '',
-        minHeight: ''
-      };
       _.bindAll(this, 'leave', 'enter');
       _.extend(this.options, options);
       //this.init('popover', element, options);
@@ -48,6 +48,7 @@ define([
       var $e = this.$el;
       var title = this.options.title;
 
+
       $e.find('.popover-title').text(title);
       $e.find('.popover-content > *').append(this.view.render().el);
       $e.find('.popover-inner').css('width', this.options.width).css('min-height', this.options.minHeight);
@@ -55,6 +56,7 @@ define([
       $e.on('mouseenter', this.enter);
       $e.on('mouseleave', this.leave);
 
+      $e.addClass('popover-hidden');
       $e.removeClass('fade top bottom left right in');
     },
 
@@ -69,7 +71,7 @@ define([
 
       var self = this;
       this.timeout = setTimeout(function() {
-        // self.hide();
+        self.hide();
       }, self.options.delay);
     },
 
@@ -87,13 +89,14 @@ define([
       var $e = this.render().$el;
       var e = this.el;
 
-      if (this.options.animation) {
-        $e.addClass('fade');
-      }
+      // $e.addClass('fade');
+
 
       $e.detach().css({ top: 0, left: 0, display: 'block' });
       $e.insertAfter($('body'));
       this.reposition();
+
+      $e.removeClass('popover-hidden');
 
       this.mutant = new Mutant(e);
       this.listenTo(this.mutant, 'mutation.throttled', this.reposition);
@@ -244,25 +247,13 @@ define([
 
       $e.removeClass('in');
 
-      function removeWithAnimation() {
-        var timeout = setTimeout(function() {
-          $e.off($.support.transition.end).detach();
-        }, 500);
-
-        $e.one($.support.transition.end, function () {
-          clearTimeout(timeout);
-          $e.detach();
-        });
-      }
-
-      if($.support.transition && this.$tip.hasClass('fade')) {
-        removeWithAnimation();
-      } else {
+      $e.addClass('popover-hidden');
+      setTimeout(function() {
         $e.detach();
-      }
+      }, 350);
 
       $e.trigger('hidden');
-      // this.trigger('hide');
+      this.trigger('hide');
       this.close();
 
       return this;

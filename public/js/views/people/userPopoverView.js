@@ -6,8 +6,9 @@ define([
   'hbs!./tmpl/userPopoverView',
   'utils/appevents',
   'utils/context',
+  'underscore',
   'utils/momentWrapper'
-], function(Marionette, Backbone, Popover, template, appEvents, context, moment) {
+], function(Marionette, Backbone, Popover, template, appEvents, context, _, moment) {
   "use strict";
 
   var UserView = Marionette.ItemView.extend({
@@ -41,6 +42,10 @@ define([
   });
 
   var UserPopoverView = Popover.extend({
+    options: _.extend({}, Popover.prototype.options, {
+      placement: 'horizontal',
+      minHeight: '88px'
+    }),
     initialize: function(options) {
       var username, displayName;
       if(this.model) {
