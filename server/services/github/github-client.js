@@ -3,19 +3,12 @@
 
 var github = require('troupe-octonode');
 var assert = require('assert');
-var request = require('request');
-var fetchAllPages = require('./fetch-all-pages');
-var logFailingRequest = require('./log-failing-request');
-var requestWithRetry = require('./request-with-retry');
+var request = require('./request-wrapper');
 
 function createClient(user, token) {
   assert(token, 'token required');
 
-  var client = github.client(token,
-                  fetchAllPages(
-                  logFailingRequest(
-                  requestWithRetry({ maxRetries: 3 },
-                  request))));
+  var client = github.client(token, request);
 
   return client;
 }

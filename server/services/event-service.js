@@ -28,10 +28,10 @@ exports.newEventToTroupe = function(troupe, user, text, meta, payload, callback)
   event.meta       = meta;
   event.payload    = payload;
 
-  appEvents.hookEvent({username: 'gitter', room: troupe.uri, text: text});
-
   event.save(function (err) {
     if(err) return callback(err);
+
+    appEvents.hookEvent({username: 'gitter', room: troupe.uri, text: text});
 
     return callback(null, event);
   });
