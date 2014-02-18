@@ -8,9 +8,8 @@ define([
   'utils/appevents',
   'utils/context',
   'utils/cdn',
-  'underscore',
-  'utils/momentWrapper'
-], function(Marionette, Backbone, Popover, template, footerTemplate, appEvents, context, cdn, _, moment) {
+  'underscore'
+], function(Marionette, Backbone, Popover, template, footerTemplate, appEvents, context, cdn, _) {
   "use strict";
 
   var failoverImage = cdn('images/2/gitter/logo-mark-grey-64.png');
@@ -42,11 +41,16 @@ define([
       'click #button-onetoone': function() {
         var username = this.model.get('login');
         appEvents.trigger('navigation', '/' + username, 'chat', username, this.model.id);
+      },
+      'click #button-mention': function() {
+        var username = this.model.get('login');
+        appEvents.trigger('input.append', '@' + username);
       }
     },
     serializeData: function() {
       var data = this.model.toJSON();
       var chatPrivately = data.has_gitter_login && data.login !== context.user().get('username');
+      var mentionable = data.login !== context.user().get('username');
 
       // Special case
       if(context.inOneToOneTroupeContext()) {
@@ -56,7 +60,7 @@ define([
       }
 
       data.chatPrivately = chatPrivately;
-
+      data.mentionable = mentionable;
       return data;
     }
 
