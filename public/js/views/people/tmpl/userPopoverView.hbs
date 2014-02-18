@@ -24,16 +24,19 @@
 
 
 <div class="vcard-stats">
-  <a class="vcard-stat" href="/suprememoocow/followers">
     <strong class="vcard-stat-count">{{followers}}</strong>
     followers
-  </a>
-    <a class="vcard-stat" href="/stars">
-      <strong class="vcard-stat-count">{{public_repos}}</strong>
-      repos
-    </a>
-  <a class="vcard-stat" href="/suprememoocow/following">
+
+    <strong class="vcard-stat-count">{{public_repos}}</strong>
+    repos
+
     <strong class="vcard-stat-count">{{following}}</strong>
     following
-  </a>
 </div>
+
+{{#if chatPrivately}}
+<br/>
+<button class="trpBtnGreen trpButtonMedium" id="button-onetoone">
+  Chat Privately
+</button>
+{{/if}}
