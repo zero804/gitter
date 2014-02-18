@@ -1,18 +1,23 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
+  'backbone',
   'underscore',
   'utils/context',
   'views/base',
   'hbs!./tmpl/avatar',
-  'bootstrap_tooltip'
-], function($, _, context, TroupeViews, template) {
+  'views/people/userPopoverView',
+  'bootstrap_tooltip',                // No ref
+], function($, Backbone, _, context, TroupeViews, template, UserPopoverView) {
 
   "use strict";
 
   return TroupeViews.Base.extend({
     tagName: 'span',
     template: template,
+    events: {
+      // 'click': 'showDetail'
+    },
     initialize: function(options) {
       var self = this;
       this.user = options.user ? options.user : {};
@@ -50,6 +55,28 @@ define([
         });
 
       }
+    },
+
+    showDetail: function(event) {
+      if (this.compactView) return;
+
+      if(this.readBy) return;
+      event.preventDefault();
+
+      this.$el.find(':first-child').tooltip('hide');
+
+      var model = this.model || new Backbone.Model(this.user);
+      var popover = new UserPopoverView({
+        model: model,
+        userCollection: this.userCollection,
+        placement: 'horizontal',
+        minHeight: '88px',
+        width: '300px',
+        title: model.get('username'),
+        targetElement: event.target
+      });
+
+      popover.show();
     },
 
     update: function() {
