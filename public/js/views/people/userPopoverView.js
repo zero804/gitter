@@ -6,10 +6,13 @@ define([
   'hbs!./tmpl/userPopoverView',
   'utils/appevents',
   'utils/context',
+  'utils/cdn',
   'underscore',
   'utils/momentWrapper'
-], function(Marionette, Backbone, Popover, template, appEvents, context, _, moment) {
+], function(Marionette, Backbone, Popover, template, appEvents, context, cdn, _, moment) {
   "use strict";
+
+  var failoverImage = cdn('images/2/gitter/logo-mark-grey-64.png');
 
   var UserView = Marionette.ItemView.extend({
     template: template,
@@ -33,7 +36,7 @@ define([
         }
       }
 
-      data.avatarUrl = data.avatar_url && data.avatar_url + "&s=200";
+      data.avatarUrl = data.avatar_url && data.avatar_url + "&s=128" || failoverImage;
       data.joined = data.created_at && moment(data.created_at).format('LL');
       data.chatPrivately = chatPrivately;
 
