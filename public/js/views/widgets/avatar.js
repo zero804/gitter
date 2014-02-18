@@ -16,7 +16,7 @@ define([
     tagName: 'span',
     template: template,
     events: {
-      'click': 'showDetail'
+      // 'click': 'showDetail'
     },
     initialize: function(options) {
       var self = this;
