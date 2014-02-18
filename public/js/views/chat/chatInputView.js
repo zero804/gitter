@@ -37,6 +37,12 @@ define([
   /** @const */
   var ENTER = 13;
 
+  /** @const */
+  var PAGE_UP = 33;
+
+  /** @const */
+  var PAGE_DOWN = 34;
+
 
   var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];
 
@@ -59,7 +65,8 @@ define([
 
       var inputBox = new ChatInputBoxView({
         el: this.$el.find('.trpChatInputBoxTextArea'),
-        rollers: this.rollers
+        rollers: this.rollers,
+        chatCollectionView: this.chatCollectionView
       });
       this.inputBox = inputBox;
 
@@ -324,6 +331,8 @@ define([
 
       this.drafty = drafty(this.el);
       chatResizer.resetInput(true);
+
+      this.chatCollectionView = options.chatCollectionView;
     },
 
     onFocusOut: function() {
@@ -349,6 +358,10 @@ define([
         if(!this.$el.val()) {
           this.trigger('editLast');
         }
+      } else if(e.keyCode === PAGE_UP && !e.ctrlKey && !e.shiftKey) {
+        this.chatCollectionView.pageUp();
+      } else if(e.keyCode === PAGE_DOWN && !e.ctrlKey && !e.shiftKey) {
+        this.chatCollectionView.pageDown();
       }
     },
 
