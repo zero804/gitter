@@ -508,6 +508,7 @@ define([
         delay: 300,
         container: false,
         placement: 'right',
+        scroller: null,
         width: '',
         minHeight: ''
       };
@@ -515,11 +516,17 @@ define([
       _.extend(this.options, options);
       //this.init('popover', element, options);
       this.view = this.options.view;
+
+      if(this.options.scroller) {
+        this.$scroller = $(this.options.scroller);
+        this.scroller = this.$scroller[0];
+      }
+
       this.targetElement = this.options.targetElement;
       this.$targetElement = $(this.targetElement);
 
-      this.$targetElement.on('mouseenter', this.enter);
-      this.$targetElement.on('mouseleave', this.leave);
+      //this.$targetElement.on('mouseenter', this.enter);
+      //this.$targetElement.on('mouseleave', this.leave);
     },
 
     afterRender: function() {
@@ -530,8 +537,8 @@ define([
       $e.find('.popover-content > *').append(this.view.render().el);
       $e.find('.popover-inner').css('width', this.options.width).css('min-height', this.options.minHeight);
 
-      $e.on('mouseenter', this.enter);
-      $e.on('mouseleave', this.leave);
+      //$e.on('mouseenter', this.enter);
+      //$e.on('mouseleave', this.leave);
 
       $e.removeClass('fade top bottom left right in');
     },
@@ -553,16 +560,15 @@ define([
 
     onClose: function() {
       this.$el.off('mouseenter', this.enter);
-      this.$el.off('mouseleave', this.leave);
+      //this.$el.off('mouseleave', this.leave);
 
       this.$targetElement.off('mouseenter', this.enter);
-      this.$targetElement.off('mouseleave', this.leave);
+      //this.$targetElement.off('mouseleave', this.leave);
 
       this.view.close();
     },
 
     show: function () {
-
       var $e = this.render().$el;
       var e = this.el;
 
@@ -579,10 +585,16 @@ define([
       var actualWidth = e.offsetWidth;
       var actualHeight = e.offsetHeight;
 
+      // if(this.$scroller) {
+      //   var scrollBottom = this.$scroller.scrollTop() + this.scroller.clientHeight();
+      // }
       var placement = this.options.placement;
       switch (placement) {
         case 'vertical':
           placement = this.selectBestVerticalPlacement($e, this.targetElement);
+          break;
+       case 'horizontal':
+          placement = this.selectBestHorizontalPlacement($e, this.targetElement);
           break;
       }
 
@@ -603,6 +615,14 @@ define([
       }
 
       this.applyPlacement(tp, placement);
+
+
+      this.mutant = new Mutant(e);
+      this.listenTo(this.mutant, 'mutation', this.reposition);
+    },
+
+    reposition: function() {
+
     },
 
     selectBestVerticalPlacement: function(div, target) {
@@ -610,12 +630,24 @@ define([
 
       var panel = $target.offsetParent();
       if(!panel) return 'bottom';
-
       if($target.offset().top + div.height() + 20 >= panel[0].clientHeight) {
         return 'top';
       }
 
       return 'bottom';
+    },
+
+    selectBestHorizontalPlacement: function(div, target) {
+      var $target = $(target);
+
+      var panel = $target.offsetParent();
+      if(!panel) return 'right';
+
+      if($target.offset().left + div.width() + 20 >= panel[0].clientWidth) {
+        return 'left';
+      }
+
+      return 'right';
     },
 
     applyPlacement: function(offset, placement){
@@ -626,8 +658,21 @@ define([
       var height = e.offsetHeight;
       var actualWidth;
       var actualHeight;
-      var delta;
+      var delta = 0;
       var replace;
+
+      /* Adjust */
+      if (placement == 'bottom' || placement == 'top') {
+        if (offset.left < 0) {
+          delta = offset.left * -2;
+          offset.left = 0;
+        }
+      } else {
+        if (offset.top < 0) {
+          delta = offset.top * -2;
+          offset.top = 0;
+        }
+      }
 
       $e
         .offset(offset)
@@ -643,19 +688,20 @@ define([
       }
 
       if (placement == 'bottom' || placement == 'top') {
-        delta = 0;
+        // delta = 0;
 
-        if (offset.left < 0) {
-          delta = offset.left * -2;
-          offset.left = 0;
-          $e.offset(offset);
-          actualWidth = e.offsetWidth;
-          actualHeight = e.offsetHeight;
-        }
+        // if (offset.left < 0) {
+        //   delta = offset.left * -2;
+        //   offset.left = 0;
+        //   $e.offset(offset);
+        //   actualWidth = e.offsetWidth;
+        //   actualHeight = e.offsetHeight;
+        // }
 
         this.replaceArrow(delta - width + actualWidth, actualWidth, 'left');
       } else {
-        this.replaceArrow(actualHeight - height, actualHeight, 'top');
+        this.replaceArrow(delta - height + actualHeight, actualHeight, 'top');
+        // this.replaceArrow(actualHeight - height, actualHeight, 'top');
       }
 
       if (replace) $e.offset(offset);
@@ -701,11 +747,11 @@ define([
     getPosition: function () {
       var el = this.targetElement;
 
-      return _.extend({}, (typeof el.getBoundingClientRect == 'function') ? el.getBoundingClientRect() : {
+      var pos = _.extend({}, (typeof el.getBoundingClientRect == 'function') ? el.getBoundingClientRect() : {
         width: el.offsetWidth,
         height: el.offsetHeight
       }, this.$targetElement.offset());
-
+      return pos;
     },
 
     getTitle: function () {
@@ -714,7 +760,7 @@ define([
 
     arrow: function(){
       if(!this.$arrow) {
-        this.$arrow = this.$el.find(".tooltip-arrow");
+        this.$arrow = this.$el.find(".arrow");
       }
 
       return this.$arrow;
