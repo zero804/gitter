@@ -4,18 +4,37 @@ define([
   'backbone',
   'views/popover',
   'hbs!./tmpl/userPopoverView',
+  'hbs!./tmpl/userPopoverFooterView',
   'utils/appevents',
   'utils/context',
   'utils/cdn',
   'underscore',
   'utils/momentWrapper'
-], function(Marionette, Backbone, Popover, template, appEvents, context, cdn, _, moment) {
+], function(Marionette, Backbone, Popover, template, footerTemplate, appEvents, context, cdn, _, moment) {
   "use strict";
 
   var failoverImage = cdn('images/2/gitter/logo-mark-grey-64.png');
 
   var UserView = Marionette.ItemView.extend({
     template: template,
+    modelEvents: {
+        'change': 'render',
+    },
+    serializeData: function() {
+      var data = this.model.toJSON();
+
+      if(data.blog && !data.blog.match(/^https?:\/\//)) {
+        data.blogUrl = 'http://' + data.blog;
+      }
+
+      data.avatarUrl = data.avatar_url && data.avatar_url + "&s=128" || failoverImage;
+
+      return data;
+    }
+  });
+
+  var UserPopoverFooterView = Marionette.ItemView.extend({
+    template: footerTemplate,
     modelEvents: {
         'change': 'render',
     },
@@ -36,12 +55,11 @@ define([
         }
       }
 
-      data.avatarUrl = data.avatar_url && data.avatar_url + "&s=128" || failoverImage;
-      data.joined = data.created_at && moment(data.created_at).format('LL');
       data.chatPrivately = chatPrivately;
 
       return data;
     }
+
   });
 
   var UserPopoverView = Popover.extend({
@@ -66,6 +84,8 @@ define([
       ghModel.url = '/api/private/gh/users/' + username;
 
       ghModel.fetch();
+
+      options.footerView = new UserPopoverFooterView({ model: ghModel });
 
       Popover.prototype.initialize.apply(this, arguments);
       this.view = new UserView({ model: ghModel, userCollection: options.userCollection });

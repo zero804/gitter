@@ -15,6 +15,7 @@ define([
       animation: true,
       selector: false,
       title: '',
+      footerView: null,
       delay: 300,
       container: false,
       placement: 'right',
@@ -44,14 +45,23 @@ define([
       });
     },
 
+    getRenderData: function() {
+      return this.options;
+    },
+
     afterRender: function() {
       var $e = this.$el;
       var title = this.options.title;
 
-
       $e.find('.popover-title').text(title);
       $e.find('.popover-content > *').append(this.view.render().el);
       $e.find('.popover-inner').css('width', this.options.width).css('min-height', this.options.minHeight);
+
+      var fv = this.options.footerView;
+
+      if(fv) {
+        $e.find('.popover-footer-content').append(fv.render().el);
+      }
 
       $e.on('mouseenter', this.enter);
       $e.on('mouseleave', this.leave);
@@ -60,11 +70,11 @@ define([
       $e.removeClass('fade top bottom left right in');
     },
 
-    enter: function (/*e*/) {
+    enter: function () {
       if (this.timeout) clearTimeout(this.timeout);
     },
 
-    leave: function (/*e*/) {
+    leave: function () {
       if (!this.options.delay) {
         return self.hide();
       }
@@ -88,9 +98,6 @@ define([
     show: function () {
       var $e = this.render().$el;
       var e = this.el;
-
-      // $e.addClass('fade');
-
 
       $e.detach().css({ top: 0, left: 0, display: 'block' });
       $e.insertAfter($('body'));
@@ -142,8 +149,6 @@ define([
         // This is very important. If you leave it out, Chrome will likely crash.
         if(this.mutant) this.mutant.takeRecords();
       }
-
-
     },
 
     selectBestVerticalPlacement: function(div, target) {

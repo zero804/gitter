@@ -16,6 +16,8 @@ define([
 
   EventHandler.prototype = {
     detach: function() {
+      if(!this.element) return;
+
       this.element.removeEventListener('load', this, false);
       this.element.removeEventListener('error', this, false);
       this.element = null;
