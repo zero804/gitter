@@ -110,15 +110,25 @@
 
 .prepend-icon-huboard() {
   &:before {
-    content: 'H';
+    content: ' ';
     position: absolute;
+    background-image: url('../../images/2/gitter/icon-huboard.png');
     left: 0;
     -webkit-font-smoothing: antialiased;
     font-size: 14px;
+    margin-top: 3px;
+    background-size: contain;
   }
   position: relative;
   padding-left: 1.5em;
+
+  @media @retina {
+    &:before {
+      background-image: url('../../images/2/gitter/icon-huboard@2x.png');
+    }
+  }
 }
+
 
 .prepend-gitter-icon(@charCode) {
     &:before {
