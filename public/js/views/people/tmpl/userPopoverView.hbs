@@ -1,42 +1,43 @@
-<img src="{{avatarUrl}}" height="200" width="200"/>
-<h1>{{name}}</h1>
-<h2>{{login}}</h3>
+<div style="float: left"><img src="{{avatarUrl}}" class="avatar-l"/></div>
+<div class="trpPopoverDetails">
+  <h1>{{name}}</h1>
+  <h2><a href="http://github.com/{{login}}">{{login}}</a></h3>
 
-<ul class="trpUserDetails">
-  {{#if company}}
-  <li><span class="octicon-organisation"></span>{{company}}</li>
-  {{/if}}
+  <div class="vcard-stats">
+      <strong class="vcard-stat-count">{{followers}}</strong>
+      followers &nbsp;
+      <strong class="vcard-stat-count">{{public_repos}}</strong>
+      repos &nbsp;
+      <strong class="vcard-stat-count">{{following}}</strong>
+      following &nbsp;
+  </div>
 
-  {{#if location}}
-  <li><span class="oticon-location"></span>{{location}}</li>
-  {{/if}}
+  <ul class="trpUserDetails">
+    {{#if company}}
+    <li><span class="github-ORG"></span>{{company}}</li>
+    {{/if}}
 
-  {{#if email}}
-  <li><span class="octicon-mail"></span><a class="email" href="mailto:{{email}}">{{email}}</a></li>
-  {{/if}}
+    {{#if location}}
+    <li><span class="github-LOCATION"></span>{{location}}</li>
+    {{/if}}
 
-  {{#if blog}}
-  <li><span class="octicon-link"></span><a target="_new" href="{{blog}}" class="url" rel="nofollow me">{{blog}}</a></li>
-  {{/if}}
+    {{#if email}}
+    <li><span class="github-MAIL"></span><a class="email" href="mailto:{{email}}">{{email}}</a></li>
+    {{/if}}
 
-  <li><span class="octicon-clock"></span><span class="join-label">Joined on </span><span class="join-date">{{joined}}</span></li>
-</ul>
+    {{#if blog}}
+    <li><span class="github-LINK"></span><a target="_new" href="{{blog}}" class="url" rel="nofollow me">{{blog}}</a></li>
+    {{/if}}
 
-
-<div class="vcard-stats">
-    <strong class="vcard-stat-count">{{followers}}</strong>
-    followers
-
-    <strong class="vcard-stat-count">{{public_repos}}</strong>
-    repos
-
-    <strong class="vcard-stat-count">{{following}}</strong>
-    following
+    <!-- <li><span class="octicon-clock"></span><span class="join-label">Joined on </span><span class="join-date">{{joined}}</span></li> -->
+  </ul>
 </div>
 
-{{#if chatPrivately}}
-<br/>
-<button class="trpBtnGreen trpButtonMedium" id="button-onetoone">
-  Chat Privately
-</button>
-{{/if}}
+
+
+  {{#if chatPrivately}}
+  {{/if}}
+
+
+
+
