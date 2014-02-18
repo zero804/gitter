@@ -69,7 +69,7 @@ define([
 
       var self = this;
       this.timeout = setTimeout(function() {
-        self.hide();
+        // self.hide();
       }, self.options.delay);
     },
 
@@ -262,7 +262,7 @@ define([
       }
 
       $e.trigger('hidden');
-      this.trigger('hide');
+      // this.trigger('hide');
       this.close();
 
       return this;
