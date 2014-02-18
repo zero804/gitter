@@ -38,6 +38,10 @@ define([
 
       this.$targetElement.on('mouseenter', this.enter);
       this.$targetElement.on('mouseleave', this.leave);
+
+      this.addCleanup(function() {
+        if(this.mutant) this.mutant.disconnect();
+      });
     },
 
     afterRender: function() {
