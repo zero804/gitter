@@ -1,5 +1,6 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
+  'underscore',
   'marionette',
   'utils/context',
   'views/base',
@@ -19,6 +20,7 @@ define([
   'hbs!./tmpl/githubWatch',
 
   'hbs!./tmpl/bitbucket',
+  'hbs!./tmpl/huboard',
   'hbs!./tmpl/jenkins',
   'hbs!./tmpl/travis',
   'hbs!./tmpl/sprintly',
@@ -26,6 +28,7 @@ define([
 
   'cocktail'
 ], function(
+  _,
   Marionette,
   context,
   TroupeViews,
@@ -45,6 +48,7 @@ define([
   githubWatchTemplate,
 
   bitbucketTemplate,
+  huboardTemplate,
   jenkinsTemplate,
   travisTemplate,
   sprintlyTemplate,
@@ -54,32 +58,87 @@ define([
 ) {
   "use strict";
 
+  var serviceTemplates = {
+    bitbucket:  bitbucketTemplate,
+    huboard:    huboardTemplate,
+    jenkins:    jenkinsTemplate,
+    travis:     travisTemplate,
+    sprintly:   sprintlyTemplate,
+    trello:     trelloTemplate
+  };
+
+  var githubTemplates = {
+    push:           githubPushTemplate,
+    issues:         githubIssuesTemplate,
+    issue_comment:  githubIssueCommentTemplate,
+    commit_comment: githubCommitCommentTemplate,
+    pull_request:   githubPullRequestTemplate,
+    gollum:         githubGollumTemplate,
+    fork:           githubForkTemplate,
+    member:         githubMemberTemplate,
+    public:         githubPublicTemplate,
+    watch:          githubWatchTemplate
+  };
+
+  function getExtraRenderData(meta, payload) {
+    var extra = {};
+
+    if (meta.service == 'trello') {
+      var trello_actions = {
+        updateCard:   'updated',
+        createCard:   'created',
+        commentCard:  'commented',
+        voteOnCard:   'voted',
+      };
+      extra.trello_action = trello_actions[payload.action.type];
+    }
+    else if (meta.service == 'sprintly') {
+      if (payload.model == "Item") {
+        extra.sprintly_action = "created";
+      } else if (payload.model == "Comment") {
+        extra.sprintly_action = "commented on";
+      }
+    } else if (meta.service == 'github') {
+      if (meta.event == 'push') {
+        var commitCount = payload.commits ? payload.commits.length : 0;
+
+        if (commitCount == 1) {
+          var message = payload.commits[0].message;
+          extra.commit_text = (message.length > 34) ? message.substr(0,33) + '…' : message;
+        } else if(commitCount > 1) {
+          extra.multiple_commits = true;
+        }
+
+        extra.commits_count = commitCount;
+
+      } else if (meta.event == 'gollum') {
+        extra.wiki_url = payload.pages[0].html_url;
+        extra.wiki_page = payload.pages[0].page_name;
+      }
+    } else if (meta.service == 'jenkins') {
+      extra.build_status = payload.build.status ? payload.build.status.toLowerCase() : payload.build.phase.toLowerCase();
+    } else if (meta.service == 'travis') {
+      var status = payload.status_message ? payload.status_message.toLowerCase() : '';
+      extra.build_status = (status === 'still failing') ? 'failing' : status;
+    }
+
+    // Support branch names with slashes, ie: develop/feature/123-foo
+    if (payload.ref) {
+      var refs = payload.ref.split('/');
+      extra.branch_name = refs[3] ? refs[3] : refs[2];
+      extra.repo = payload.repository.owner.name + '/' + payload.repository.name;
+    }
+
+    return extra;
+  }
+
+
+
   var ActivityItemView = TroupeViews.Base.extend({
     tagName: 'li',
 
     initialize: function(/*options*/) {
       this.setRerenderOnChange();
-
-      var serviceTemplates = {
-        bitbucket:  bitbucketTemplate,
-        jenkins:    jenkinsTemplate,
-        travis:     travisTemplate,
-        sprintly:   sprintlyTemplate,
-        trello:     trelloTemplate
-      };
-
-      var githubTemplates = {
-        push:           githubPushTemplate,
-        issues:         githubIssuesTemplate,
-        issue_comment:  githubIssueCommentTemplate,
-        commit_comment: githubCommitCommentTemplate,
-        pull_request:   githubPullRequestTemplate,
-        gollum:         githubGollumTemplate,
-        fork:           githubForkTemplate,
-        member:         githubMemberTemplate,
-        public:         githubPublicTemplate,
-        watch:          githubWatchTemplate
-      };
 
       var service = this.model.get('meta').service;
       if (service == 'github') {
@@ -93,88 +152,19 @@ define([
     getRenderData: function() {
       var meta    = this.model.get('meta');
       var payload = this.model.get('payload');
+      var sent    = this.model.get('sent');
 
-      if (meta.service == 'trello') {
-        var trello_actions = {
-          updateCard:   'updated',
-          createCard:   'created',
-          commentCard:  'commented',
-          voteOnCard:   'voted',
-        };
-
-        var trello_action = trello_actions[payload.action.type];
-      }
-
-      if (meta.service == 'sprintly') {
-        var sprintly_action;
-        if (payload.model == "Item") {
-          sprintly_action = "created";
-        }
-        if (payload.model == "Comment") {
-          sprintly_action = "commented on";
-        }
-      }
-
-      // Support branch names with slashes, ie: develop/feature/123-foo
-      if (payload.ref) {
-        var refs = payload.ref.split('/');
-        var branch_name = refs[2];
-        // if (refs[3]) branch_name += '/' + refs[3];
-        if (refs[3]) branch_name = refs[3];
-        
-        var repo = payload.repository.owner.name + '/' + payload.repository.name;
-      }
-
-      if (meta.service == 'github') {
-        if (meta.event == 'push') {
-          var commits_count = payload.commits ? payload.commits.length : 0;
-          if (commits_count > 1) {
-            var multiple_commits = true;
-          }
-          else {
-            if (commits_count != 0) {
-              var commit_text = payload.commits[0].message;
-              if (commit_text.length > 34) {
-                commit_text = commit_text.substr(0,33) + '...';
-              }
-            }
-          }
-        }
-        if (meta.event == 'gollum') {
-          var wiki_url = payload.pages[0].html_url;
-          var wiki_page = payload.pages[0].page_name;
-        }
-      }
-
-
-      // TODO: Double check all of these attrs can be lowercased
-      var build_status;
-      if (meta.service == 'jenkins') {
-        build_status = payload.build.status ? payload.build.status.toLowerCase() : payload.build.phase.toLowerCase();
-      }
-      if (meta.service == 'travis') {
-        build_status = payload.status_message ? payload.status_message.toLowerCase() : '';
-        if (build_status == 'still failing') build_status = 'failing';
-      }
-
-      // log(JSON.stringify(payload));
-
-      return {
-        meta:             meta,
-        payload:          payload,
-        commits_count:    commits_count,
-        branch_name:      branch_name,
-        repo:             repo,
-        trello_action:    trello_action,
-        sprintly_action:  sprintly_action,
-        build_status:     build_status,
-        multiple_commits: multiple_commits,
-        commit_text:      commit_text,
-        wiki_url:         wiki_url,
-        wiki_page:        wiki_page,
-        sent:             this.model.get('sent')
+      var core = {
+        meta: meta,
+        payload: payload,
+        sent: sent
       };
+
+      var extra = getExtraRenderData(meta, payload);
+
+      return _.extend(core, extra);
     },
+
     afterRender: function() {
       issueDecorator.decorate(this, {placement: 'left'});
     }

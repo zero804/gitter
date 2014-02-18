@@ -14,6 +14,10 @@
   .prepend-octicon('\f037')
 }
 
+.prepend-lock-icon(){
+  .prepend-octicon('\f06a')
+}
+
 .prepend-repo-icon() {
   .prepend-octicon('\f001')
 }
@@ -106,6 +110,18 @@
 
 .prepend-trello-card-update() {
   .prepend-gitter-icon('\e813')
+}
+
+.prepend-icon-huboard() {
+  &:before {
+    content: 'H';
+    position: absolute;
+    left: 0;
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+  }
+  position: relative;
+  padding-left: 1.5em;
 }
 
 .prepend-gitter-icon(@charCode) {
