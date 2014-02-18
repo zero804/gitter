@@ -31,6 +31,19 @@ define([
   /** @const */
   var EDIT_WINDOW = 240000;
 
+  /** @const */
+  var UP_ARROW = 38;
+
+  /** @const */
+  var ENTER = 13;
+
+  /** @const */
+  var PAGE_UP = 33;
+
+  /** @const */
+  var PAGE_DOWN = 34;
+
+
   var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];
 
   var ChatInputView = TroupeViews.Base.extend({
@@ -52,7 +65,8 @@ define([
 
       var inputBox = new ChatInputBoxView({
         el: this.$el.find('.trpChatInputBoxTextArea'),
-        rollers: this.rollers
+        rollers: this.rollers,
+        chatCollectionView: this.chatCollectionView
       });
       this.inputBox = inputBox;
 
@@ -317,6 +331,8 @@ define([
 
       this.drafty = drafty(this.el);
       chatResizer.resetInput(true);
+
+      this.chatCollectionView = options.chatCollectionView;
     },
 
     onFocusOut: function() {
@@ -330,18 +346,22 @@ define([
     },
 
     onKeyDown: function(e) {
-      if(e.keyCode === 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/)) && !this.isTypeaheadShowing()) {
+      if(e.keyCode === ENTER && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/)) && !this.isTypeaheadShowing()) {
         e.stopPropagation();
         e.preventDefault();
 
         this.processInput();
 
         return false;
-      } else if(e.keyCode === 38 && !e.ctrlKey && !e.shiftKey) {
+      } else if(e.keyCode === UP_ARROW && !e.ctrlKey && !e.shiftKey) {
         /* Up key */
         if(!this.$el.val()) {
           this.trigger('editLast');
         }
+      } else if(e.keyCode === PAGE_UP && !e.ctrlKey && !e.shiftKey) {
+        this.chatCollectionView.pageUp();
+      } else if(e.keyCode === PAGE_DOWN && !e.ctrlKey && !e.shiftKey) {
+        this.chatCollectionView.pageDown();
       }
     },
 
