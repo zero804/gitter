@@ -68,10 +68,6 @@ define([
       var model = this.model || new Backbone.Model(this.user);
       var popover = new UserPopoverView({
         model: model,
-        userCollection: this.userCollection,
-        placement: 'horizontal',
-        minHeight: '88px',
-        title: model.get('username'),
         targetElement: event.target
       });
 

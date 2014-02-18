@@ -34,11 +34,7 @@ define([
 
         var popover = new UserPopoverView({
           username: username,
-          placement: 'horizontal',
-          minHeight: '88px',
-          width: '300px',
-          title: username,
-          targetElement: event.target
+          targetElement: e.target
         });
 
         popover.show();
