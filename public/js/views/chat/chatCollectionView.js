@@ -146,6 +146,18 @@ define([
       }
     },
 
+    pageUp: function() {
+      var scrollFromTop = this.$el.scrollTop();
+      var pageHeight = Math.floor(this.$el.height() * 0.8);
+      this.$el.scrollTop(scrollFromTop - pageHeight);
+    },
+
+    pageDown: function() {
+      var scrollFromTop = this.$el.scrollTop();
+      var pageHeight = Math.floor(this.$el.height() * 0.8);
+      this.$el.scrollTop(scrollFromTop + pageHeight);
+    },
+
     getFetchData: function() {
       log("Loading next message chunk.");
 
