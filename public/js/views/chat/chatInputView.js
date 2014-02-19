@@ -52,6 +52,11 @@ define([
     initialize: function(options) {
       this.rollers = options.rollers;
       this.chatCollectionView = options.chatCollectionView;
+      this.listenTo(appEvents, 'input.append', function(text) {
+        if(this.inputBox) {
+          this.inputBox.append(text);
+        }
+      });
     },
 
     getRenderData: function() {
@@ -384,6 +389,16 @@ define([
       this.el.value = '';
       this.drafty.reset();
       this.chatResizer.resetInput();
+    },
+
+    append: function(text) {
+      var current = this.$el.val();
+      if(!current || current.match(/\s+$/)) {
+        current = current + text;
+      } else {
+        current = current + ' ' + text;
+      }
+      this.$el.val(current);
     },
 
     isTypeaheadShowing: function() {

@@ -16,7 +16,7 @@ define([
     tagName: 'span',
     template: template,
     events: {
-      // 'click': 'showDetail'
+      'click': 'showDetail'
     },
     initialize: function(options) {
       var self = this;
@@ -68,11 +68,6 @@ define([
       var model = this.model || new Backbone.Model(this.user);
       var popover = new UserPopoverView({
         model: model,
-        userCollection: this.userCollection,
-        placement: 'horizontal',
-        minHeight: '88px',
-        width: '300px',
-        title: model.get('username'),
         targetElement: event.target
       });
 
