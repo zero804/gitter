@@ -12,7 +12,7 @@ module.exports = {
 
     user.getOrgs()
     .then(function(ghOrgs) {
-      var strategy = new restSerializer.GitHubOrgStrategy({currentUserId: req.user.id});
+      var strategy = new restSerializer.GitHubOrgStrategy({currentUserId: req.user.id, mapUsers: true});
 
       restSerializer.serialize(ghOrgs, strategy, function(err, serialized) {
         if(err) return next(err);
