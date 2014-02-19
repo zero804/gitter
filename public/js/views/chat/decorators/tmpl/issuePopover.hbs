@@ -6,11 +6,11 @@
 </div>
 <div class="trpChatBox">
   <div class="trpChatDetails">
-    <div class="trpChatFrom">@{{user.login}}</div>
+    <div class="trpChatFrom">{{user.login}}</div>
     <div class="trpChatTime"> &bull; {{date}}</div>
   </div>
-  {{#if description}}
-    <div class="trpChatText">{{description}}</div>
+  {{#if body_html}}
+    <div class="trpChatText">{{{body_html}}}</div>
   {{else}}
     <div class="trpChatText missing">No description given.</div>
   {{/if}}

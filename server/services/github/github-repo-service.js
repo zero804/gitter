@@ -3,6 +3,7 @@
 
 var Q = require('q');
 var wrap = require('./github-cache-wrapper');
+var converter = require('../../utils/process-chat');
 var createClient = require('./github-client');
 var badCredentialsCheck = require('./bad-credentials-check');
 
@@ -69,6 +70,14 @@ function getIssuesWithState(repo, state) {
       return openIssues.concat(closedIssues).sort(function(a, b) {
         return a.number - b.number;
       });
+    })
+    .then(function(issues) {
+      issues.forEach(function(issue) {
+        if(issue.body) {
+          issue.body_html = converter(issue.body).html;
+        }
+      });
+      return issues;
     })
     .fail(badCredentialsCheck);
 
