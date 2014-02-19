@@ -309,6 +309,28 @@ a:hover {
   }
 }
 
+.github-LOCATION {
+  .prepend-icon-location;
+  &:before {
+    font-size: 16px;
+  }
+}
+
+.github-MAIL {
+  .prepend-icon-mail;
+  &:before {
+    font-size: 16px;
+  }
+}
+
+.github-LINK {
+  .prepend-icon-link;
+  &:before {
+    font-size: 16px;
+  }
+}
+
+
 .github-ONETOONE {
   .prepend-121-icon;
   &:before {
@@ -2322,114 +2344,61 @@ ul.roster {
 
 }
 
-/*@media screen and (max-width:550px) {
-
-  .trpHeaderFavourite .avatar-s {
-    display: none;
+.trpPopoverDetails {
+  float: right;
+  margin-left: 12px;
+  h1 {
+    line-height: 28px;
   }
-
-  .trpChatAvatar {
-    margin-left: 10px;
-    margin-top: 0;
-    margin-bottom: -8px;
-    .transition300ms;
-  }
-
-  .trpChatInputArea .avatar-s {
-    display: none;
-  }
-
-  .trpChatInputBox {
-    margin-left: 0;
-  }
-
-  .trpHeaderFavourite {
-    padding-left: 0px;
-  }
-
-  .trpHeaderTitle {
-    padding-left: 0px;
-    font-size: 20px;
-  }
-
-  .trpChatDetails {
-    margin-left: 24px;
-    .transition300ms;
-    margin-top: -1px;
-  }
-
-  .trpChatFrom {
-    color: #AAA;
-    .transition300ms;
-  }
-
-	.trpChatItem .avatar-s {
-		width: 16px;
-		height: 16px;
-    .transition300ms;
-	}
-
-	.trpChatBox {
-		margin-left: 0px;
-	}
-
-	#request-roster, #invite-roster, #file-list, #mail-list, #people-share-troupe-button {
-
-	}
-
-}*/
-
-
-/*
-This stuff is no longer used
-
-.trpSmartBarItems ul {
-	position: relative;
-	list-style-type: none;
-	padding: 0;
 }
 
-.trpSmartBarItems li {
-    position: absolute; top: 0; left: 0;
-    height: 48px;
+ul.trpUserDetails {
+  list-style: none;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  margin: 0;
+
+  padding: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+
+  & li {
     width: 100%;
-    .avatar-s {
-    	margin: 0;
-    }
+    padding: 2px 0;
+    overflow-x: hidden;
+    font-size: 14px;
+    text-overflow: ellipsis;
+  }
 }
 
-.trpSmartBarItems .animated li {
-	transition: all 0.3s ease-in;
-	-webkit-transition: all 0.3s ease-in;
+.trpUserDetailActions {
+  margin-left: 138px;
+  margin-top: 8px;
+  clear: both;
 }
 
-.trpSmartItem (@i) {
-  -webkit-transform: translate3d(0, @i, 0);
-  transform: translate3d(0, @i, 0);
+.vcard-stats {
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  padding: 4px 2px;
+  margin-bottom: 4px;
 }
 
-.trpSmartBarItems {
-  #i0   { .trpSmartItem(0%); }
-  #i1   { .trpSmartItem(100%); }
-  #i2   { .trpSmartItem(200%); }
-  #i3   { .trpSmartItem(300%); }
-  #i4   { .trpSmartItem(400%); }
-  #i5   { .trpSmartItem(500%); }
-  #i6   { .trpSmartItem(600%); }
-  #i7   { .trpSmartItem(700%); }
-  #i8   { .trpSmartItem(800%); }
-  #i9   { .trpSmartItem(900%); }
-  #i10  { .trpSmartItem(1000%); }
-  #i11  { .trpSmartItem(1100%); }
-  #i12  { .trpSmartItem(1200%); }
-  #i13  { .trpSmartItem(1300%); }
-  #i14  { .trpSmartItem(1400%); }
-  #i15  { .trpSmartItem(1500%); }
-  #i16  { .trpSmartItem(1600%); }
-  #i17  { .trpSmartItem(1700%); }
-  #i18  { .trpSmartItem(1800%); }
-  #i19  { .trpSmartItem(1900%); }
-  #i20  { .trpSmartItem(2000%); }
-  #i21  { .trpSmartItem(2100%); }
+.octicon-organisation {
+  .prepend-icon-organisation();
 }
-*/
+.octicon-location {
+  .prepend-icon-location();
+}
+.octicon-link {
+  .prepend-icon-link();
+}
+.octicon-clock {
+  .prepend-icon-clock();
+}
+
+.octicon-mail {
+  .prepend-icon-mail();
+}
+
+

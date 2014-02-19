@@ -1,5 +1,5 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
-define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
+define(['./mutant'], function(Mutant) {
   "use strict";
 
   /** @const */ var TRACK_BOTTOM = 1;
@@ -24,17 +24,14 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
     this._mode = TRACK_BOTTOM;
 
     var adjustScroll = this.adjustScroll.bind(this);
-    // create an observer instance
-    var MutationObserver = window.MutationObserver || window.MozMutationObserver || window.WebKitMutationObserver || LegacyMutations;
-    var observer = new MutationObserver(adjustScroll);
+
+    var mutant = new Mutant(target);
+    mutant.on('mutation', adjustScroll);
 
     target.addEventListener('scroll', this.trackLocation.bind(this), false);
     window.addEventListener('resize', adjustScroll, false);
     window.addEventListener('focusin', adjustScroll, false);
     window.addEventListener('focusout', adjustScroll, false);
-
-    // pass in the target node, as well as the observer options
-    observer.observe(target, { attributes: true, childList: true, characterData: true, subtree: true });
   }
 
   function continuous(cb, ms) {

@@ -2,8 +2,8 @@
 /* global define:false */
 define([
   'utils/context',
-  'collections/instances/integrated-items'
-  ], function(context, collections) {
+  'views/people/userPopoverView'
+  ], function(context, UserPopoverView) {
   "use strict";
 
   function highlightMention(chatItemView) {
@@ -16,40 +16,36 @@ define([
     if(!username) return;
 
     if(mentions.some(function(mention) {
-      return mention.screenName === username ||
-              mention.screenName === '@' + username;
+      return mention.userId ===  context.getUserId();
     })) {
       chatItemView.$el.find('.trpChatBox').addClass('mention');
     }
   }
 
-  function removeFalseMentions(chatItemView, users) {
-    var usernames = users.map(function(user) {
-      return user.get('username');
-    });
-
-    chatItemView.$el.find('.trpChatText .mention').each(function() {
-      var username = this.dataset.screenName;
-
-      if(usernames.indexOf(username) === -1) {
-        $(this).replaceWith('@'+username);
-      }
-    });
-  }
-
   var decorator = {
 
     decorate: function(chatItemView) {
-      highlightMention(chatItemView);
-      var users = collections.users;
+      var mentions = chatItemView.model.get('mentions');
+      if(!mentions || !mentions.length) return;
 
-      if(users.length) {
-        removeFalseMentions(chatItemView, users);
-      } else {
-        users.once('add', function() {
-          removeFalseMentions(chatItemView, users);
+      function clickMention(e) {
+        var username = e.target.dataset.screenName;
+        if(!username) return;
+
+        var popover = new UserPopoverView({
+          username: username,
+          targetElement: e.target
         });
+
+        popover.show();
       }
+
+      chatItemView.$el.find('.mention').on('click', clickMention);
+      chatItemView.addCleanup(function() {
+        chatItemView.$el.find('.mention').off('click', clickMention);
+      });
+
+      highlightMention(chatItemView);
     }
 
   };

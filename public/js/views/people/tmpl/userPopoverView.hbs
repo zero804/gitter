@@ -1,36 +1,32 @@
-<img src="{{avatarUrl}}" height="200" width="200"/>
-<h1>{{displayName}}</h1>
-<h2>{{username}}</h3>
+<div style="float: left"><img src="{{avatarUrl}}" class="avatar-l"/></div>
+<div class="trpPopoverDetails">
+  <h1>{{name}}</h1>
+  <h2><a href="http://github.com/{{login}}">{{login}}</a></h3>
 
-<ul class="trpUserDetails">
-  <li class="vcard-detail"><span class="octicon octicon-organization"></span>Troupe https://trou.pe and Gitter https://gitter.im</li>
-
-  <li class="vcard-detail"><span class="octicon octicon-location"></span>London, United Kingdom and Cape Town, South Africa</li>
-  <li class="vcard-detail"><span class="octicon octicon-mail"></span><a class="email js-obfuscate-email" data-email="%61%6e%64%72%65%77%40%67%69%74%74%65%72%2e%69%6d" href="mailto:andrew@gitter.im">andrew@gitter.im</a></li>
-  <li class="vcard-detail"><span class="octicon octicon-link"></span><a href="https://gitter.im/suprememoocow" class="url" rel="nofollow me">https://gitter.im/suprememoocow</a></li>
-  <li class="vcard-detail"><span class="octicon octicon-clock"></span><span class="join-label">Joined on </span><span class="join-date">Feb 01, 2011</span></li>
-</ul>
-
-
-<div class="vcard-stats">
-  <a class="vcard-stat" href="/suprememoocow/followers">
-    <strong class="vcard-stat-count">3</strong>
-    followers
-  </a>
-    <a class="vcard-stat" href="/stars">
-      <strong class="vcard-stat-count">89</strong>
-      starred
-    </a>
-  <a class="vcard-stat" href="/suprememoocow/following">
-    <strong class="vcard-stat-count">3</strong>
-    following
-  </a>
-</div>
-
-<div class="vcard-orgs">
-  <h3>Organizations</h3>
-  <div class="avatars">
-      <a href="/troupe" aria-label="troupe" class="vcard-org-avatar tooltipped downwards" itemprop="follows" original-title=""><img alt="Troupe Technology" class=" js-avatar" data-user="4264183" height="36" src="https://2.gravatar.com/avatar/fccef17fbb5900d8e26b6b8596ea4c28?d=https%3A%2F%2Fidenticons.github.com%2F2755df02af3b717f15080bbd940c8146.png&amp;r=x&amp;s=140" width="36"></a>
-      <a href="/gitterHQ" aria-label="gitterHQ" class="vcard-org-avatar tooltipped downwards" itemprop="follows" original-title=""><img alt="Gitter" class=" js-avatar" data-user="5990364" height="36" src="https://2.gravatar.com/avatar/3af08c35936d0088e67fe7cd33bb61f0?d=https%3A%2F%2Fidenticons.github.com%2F1f39ee50c24c65d3d2b9f6db49dc943c.png&amp;r=x&amp;s=140" width="36"></a>
+  <div class="vcard-stats">
+      <strong class="vcard-stat-count">{{followers}}</strong>
+      followers &nbsp;
+      <strong class="vcard-stat-count">{{public_repos}}</strong>
+      repos &nbsp;
+      <strong class="vcard-stat-count">{{following}}</strong>
+      following &nbsp;
   </div>
+
+  <ul class="trpUserDetails">
+    {{#if company}}
+    <li><span class="github-ORG"></span>{{company}}</li>
+    {{/if}}
+
+    {{#if location}}
+    <li><span class="github-LOCATION"></span>{{location}}</li>
+    {{/if}}
+
+    {{#if email}}
+    <li><span class="github-MAIL"></span><a class="email" href="mailto:{{email}}">{{email}}</a></li>
+    {{/if}}
+
+    {{#if blog}}
+    <li><span class="github-LINK"></span><a target="_new" href="{{blogUrl}}" class="url" rel="nofollow me">{{blog}}</a></li>
+    {{/if}}
+  </ul>
 </div>
