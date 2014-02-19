@@ -2,11 +2,10 @@
 /* global define:false */
 define([
   'jquery',
-  'underscore',
   'utils/context',
   'hbs!./tmpl/issuePopover',
   'hbs!./tmpl/issuePopoverTitle',
-], function($, _, context, issuePopoverTemplate, issuePopoverTitleTemplate) {
+], function($, context, issuePopoverTemplate, issuePopoverTitleTemplate) {
   "use strict";
 
   function getRoomRepo() {
@@ -25,10 +24,6 @@ define([
   function preparePopover($issue, url, placement) {
     $.get(url, function(issue) {
       if(!issue.state) return;
-      var description = issue.body;
-
-      // css elipsis overflow cant handle multiline text
-      var shortDescription = (description && description.length > 250) ? description.substring(0,250)+'…' : description;
 
       // dont change the issue state colouring for the activity feed
       if(!$issue.hasClass('open') && !$issue.hasClass('closed')) {
@@ -43,10 +38,7 @@ define([
         title: issuePopoverTitleTemplate(issue),
         content: issuePopoverTemplate({
           user: issue.user,
-
-          // description should be rendered with markdown, but this will at least safely
-          // render escaped characters without xss
-          description: _.unescape(shortDescription),
+          body_html: issue.body_html,
           date: moment(issue.created_at).format("LLL"),
           assignee: issue.assignee
         })

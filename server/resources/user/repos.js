@@ -17,7 +17,7 @@ function indexQuery(req, res, next) {
       var filteredRepos = repos.filter(createTextFilter({ query: req.query.q, fields: ['name', 'full_name', 'description']}));
 
       var strategy = new restSerializer.SearchResultsStrategy({
-                            resultItemStrategy: new restSerializer.GitHubRepoStrategy({ currentUserId: req.user.id })
+                            resultItemStrategy: new restSerializer.GitHubRepoStrategy({ currentUserId: req.user.id, mapUsers: true })
                           });
 
       return restSerializer.serializeQ({ results: filteredRepos }, strategy);
@@ -36,7 +36,7 @@ module.exports = {
 
     repoService.suggestedReposForUser(req.user)
       .then(function(repos) {
-        var strategy = new restSerializer.GitHubRepoStrategy({ currentUserId: req.user.id });
+        var strategy = new restSerializer.GitHubRepoStrategy({ currentUserId: req.user.id, mapUsers: true });
 
         restSerializer.serialize(repos, strategy, function(err, serialized) {
           if(err) return next(err);
