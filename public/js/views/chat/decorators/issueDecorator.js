@@ -92,9 +92,9 @@ define([
           }
 
           if(repo.toLowerCase() === roomRepo.toLowerCase()) {
-            preparePopover($issue,'/api/v1/troupes/'+context.getTroupeId()+'/issues/'+issueNumber, options.placement);
+            preparePopover($issue,'/api/v1/troupes/'+context.getTroupeId()+'/issues/'+issueNumber+'?renderMarkdown=true', options.placement);
           } else {
-            preparePopover($issue,'/api/private/gh/repos/'+repo+'/issues/'+issueNumber, options.placement);
+            preparePopover($issue,'/api/private/gh/repos/'+repo+'/issues/'+issueNumber+'?renderMarkdown=true', options.placement);
           }
         }
       });

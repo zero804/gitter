@@ -50,9 +50,6 @@ module.exports = function(tokenPriority) {
       if(response.statusCode !== 200) {
         return response.statusCode;
       } else {
-        if(body.body) {
-          body.body_html = converter(body.body).html;
-        }
         return body;
       }
     }).fail(badCredentialsCheck);
