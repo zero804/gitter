@@ -6,7 +6,7 @@ var highlight = require('highlight.js');
 var _         = require('underscore');
 var util      = require('util');
 
-var options = { gfm: true, tables: true, sanitize: true, breaks: true, linkify: true };
+var options = { gfm: true, tables: true, sanitize: true, breaks: true, linkify: true, skipComments: true };
 
 var lexer = new marked.Lexer(options);
 
@@ -35,7 +35,7 @@ module.exports = exports = function processChat(text) {
       repo: repo ? repo : undefined
     });
 
-    var out = '<a href="#" data-link-type="issue" data-issue="' + issue + '"';
+    var out = '<a data-link-type="issue" data-issue="' + issue + '"';
     if(repo) {
       out += util.format(' data-issue-repo="%s"', repo);
     }

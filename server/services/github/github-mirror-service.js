@@ -20,6 +20,7 @@ module.exports = function(tokenPriority) {
 
   var Q = require('q');
   var wrap = require('./github-cache-wrapper');
+  var converter = require('../../utils/process-chat');
   var badCredentialsCheck = require('./bad-credentials-check');
   var request = require('request');
   var assert = require('assert');
@@ -49,11 +50,15 @@ module.exports = function(tokenPriority) {
       if(response.statusCode !== 200) {
         return response.statusCode;
       } else {
+        if(body.body) {
+          body.body_html = converter(body.body).html;
+        }
         return body;
       }
     }).fail(badCredentialsCheck);
   };
 
+  // return Mirror;
   return wrap(Mirror, function() {
     return [tokenStrategy(this.user)];
   });
