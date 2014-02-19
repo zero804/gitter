@@ -2,10 +2,12 @@
 /* global define:false */
 define([
   'jquery',
+  'backbone',
   'utils/context',
+  'views/popover',
   'hbs!./tmpl/issuePopover',
   'hbs!./tmpl/issuePopoverTitle',
-], function($, context, issuePopoverTemplate, issuePopoverTitleTemplate) {
+], function($, Backbone, context, Popover, issuePopoverTemplate, issuePopoverTitleTemplate) {
   "use strict";
 
   function getRoomRepo() {
@@ -30,20 +32,33 @@ define([
         $issue.addClass(issue.state);
       }
 
-      $issue.popover({
-        html: true,
-        trigger: 'manual',
-        placement: placement || 'right',
-        container: 'body',
-        title: issuePopoverTitleTemplate(issue),
-        content: issuePopoverTemplate({
-          user: issue.user,
-          body_html: issue.body_html,
-          date: moment(issue.created_at).format("LLL"),
-          assignee: issue.assignee
-        })
+      var TitleView = Backbone.View.extend({
+        render: function() {
+          this.$el.html(issuePopoverTitleTemplate(issue));
+          return this;
+        }
       });
-      makePopoverStayOnHover($issue);
+
+      var View = Backbone.View.extend({
+        render: function() {
+          this.$el.html(issuePopoverTemplate({
+            user: issue.user,
+            body_html: issue.body_html,
+            date: moment(issue.created_at).format("LLL"),
+            assignee: issue.assignee
+          }));
+          return this;
+        }
+      });
+
+      var pop = new Popover({
+        titleView: new TitleView(),
+        view: new View(),
+        targetElement: $issue[0]
+      });
+
+
+      makePopoverStayOnHover($issue, pop);
     }).fail(function(error) {
       if(error.status === 404) {
         plaintextify($issue);
@@ -51,18 +66,18 @@ define([
     });
   }
 
-  function makePopoverStayOnHover($issue) {
+  function makePopoverStayOnHover($issue, pop) {
     $issue.on('mouseenter', function() {
-      $issue.popover('show');
+      pop.show();
     });
     $issue.on('mouseleave', function() {
-      var $popover = $('.popover');
+      var $popover = pop.$el;
       if($popover.is(':hover')) {
         $popover.one('mouseleave', function() {
-          $issue.popover('hide');
+          pop.hide();
         });
       } else {
-        $issue.popover('hide');
+        pop.hide();
       }
     });
   }
