@@ -213,16 +213,23 @@ define([
     },
 
     selectBestHorizontalPlacement: function(div, target) {
-      var $target = $(target);
+      // var $target = $(target);
 
-      var panel = $target.offsetParent();
-      if(!panel) return 'right';
-
-      if($target.offset().left + div.width() + 20 >= panel[0].clientWidth) {
-        return 'left';
+      var bounds = target.getBoundingClientRect();
+      if(bounds.left < document.body.clientWidth / 2) {
+        return "right";
+      } else {
+        return "left";
       }
 
-      return 'right';
+      // var panel = $target.offsetParent();
+      // if(!panel) return 'right';
+
+      // if($target.offset().left + div.width() + 20 >= panel[0].clientWidth) {
+      //   return 'left';
+      // }
+
+      // return 'right';
     },
 
     applyPlacement: function(offset, placement){
