@@ -35,10 +35,11 @@ define([
     isEditing: false,
 
     events: {
-      'click .trpChatEdit':     'toggleEdit',
-      'keydown textarea':       'detectEscape',
-      'click .trpChatReadBy':   'showReadBy',
-      'click .webhook': 'expandActivity'
+      'click .trpChatEdit':       'toggleEdit',
+      'keydown textarea':         'detectEscape',
+      'click .trpChatReadBy':     'showReadBy',
+      'mouseover .trpChatReadBy': 'showReadByIntent',
+      'click .webhook':           'expandActivity'
     },
 
     expandActivity: function() {
@@ -292,11 +293,17 @@ define([
       this.listenTo(this.inputBox, 'save', this.saveChat);
     },
 
-    showReadBy: function(event) {
+    showReadByIntent: function(e) {
+      ReadByPopover.hoverTimeout(e, function() {
+        this.showReadBy(e);
+      }, this);
+    },
+
+    showReadBy: function(e) {
       if (this.compactView) return;
 
       if(this.readBy) return;
-      event.preventDefault();
+      e.preventDefault();
 
       this.readBy = new ReadByPopover({
         model: this.model,
@@ -306,7 +313,7 @@ define([
         minHeight: '88px',
         width: '300px',
         title: 'Read By',
-        targetElement: event.target
+        targetElement: e.target
       });
 
       var s = this;

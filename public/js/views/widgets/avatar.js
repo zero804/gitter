@@ -16,7 +16,8 @@ define([
     tagName: 'span',
     template: template,
     events: {
-      'click': 'showDetail'
+      'mouseover': 'showDetailIntent',
+      'click':     'showDetail'
     },
     initialize: function(options) {
       var self = this;
@@ -57,18 +58,24 @@ define([
       }
     },
 
-    showDetail: function(event) {
+    showDetailIntent: function(e) {
+      UserPopoverView.hoverTimeout(e, function() {
+        this.showDetail(e);
+      }, this);
+    },
+
+    showDetail: function(e) {
       if (this.compactView) return;
 
       if(this.readBy) return;
-      event.preventDefault();
+      e.preventDefault();
 
       this.$el.find(':first-child').tooltip('hide');
 
       var model = this.model || new Backbone.Model(this.user);
       var popover = new UserPopoverView({
         model: model,
-        targetElement: event.target
+        targetElement: e.target
       });
 
       popover.show();

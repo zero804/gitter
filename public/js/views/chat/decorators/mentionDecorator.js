@@ -40,9 +40,20 @@ define([
         popover.show();
       }
 
-      chatItemView.$el.find('.mention').on('click', clickMention);
+      function hoverIntent(e) {
+        UserPopoverView.hoverTimeout(e, function() {
+          clickMention(e);
+        });
+      }
+
+      var $mentions = chatItemView.$el.find('.mention');
+
+      $mentions.on('click', clickMention);
+      $mentions.on('mouseover', hoverIntent);
+
       chatItemView.addCleanup(function() {
-        chatItemView.$el.find('.mention').off('click', clickMention);
+        $mentions.off('click', clickMention);
+        $mentions.off('mouseover', hoverIntent);
       });
 
       highlightMention(chatItemView);
