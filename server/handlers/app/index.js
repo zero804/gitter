@@ -3,6 +3,7 @@
 
 var middleware      = require('../../web/middleware');
 var appRender       = require('./render');
+var archives        = require('./archives');
 var appMiddleware   = require('./middleware');
 var limitedReleaseService = require('../../services/limited-release-service');
 
@@ -68,6 +69,8 @@ module.exports = {
             appRender.renderMainFrame(req, res, next, 'chat');
           }
         });
+
+      app.get('/:userOrOrg/:repo/archive/', archives.repo.landing);
 
       app.get('/:userOrOrg/:repo/chat',
         middleware.grantAccessForRememberMeTokenMiddleware,
