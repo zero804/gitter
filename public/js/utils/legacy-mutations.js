@@ -21,6 +21,13 @@ define(['underscore'], function(_) {
       if(!this._target) return;
       this._target.removeEventListener('DOMSubtreeModified', this.onModifications, false);
       delete this._target;
+    },
+
+    takeRecords: function() {
+      var target = this._target;
+
+      target.removeEventListener('DOMSubtreeModified', this.onModifications, false);
+      target.addEventListener('DOMSubtreeModified', this.onModifications, false);
     }
   };
 

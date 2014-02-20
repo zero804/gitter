@@ -16,7 +16,8 @@ define([
     tagName: 'span',
     template: template,
     events: {
-      // 'click': 'showDetail'
+      'mouseover': 'showDetailIntent',
+      'click':     'showDetail'
     },
     initialize: function(options) {
       var self = this;
@@ -57,26 +58,28 @@ define([
       }
     },
 
-    showDetail: function(event) {
-      if (this.compactView) return;
+    showDetailIntent: function(e) {
+      UserPopoverView.hoverTimeout(e, function() {
+        this.showDetail(e);
+      }, this);
+    },
 
-      if(this.readBy) return;
-      event.preventDefault();
+    showDetail: function(e) {
+      if (this.compactView) return;
+      e.preventDefault();
+
+      if(this.popover) return;
 
       this.$el.find(':first-child').tooltip('hide');
 
       var model = this.model || new Backbone.Model(this.user);
       var popover = new UserPopoverView({
         model: model,
-        userCollection: this.userCollection,
-        placement: 'horizontal',
-        minHeight: '88px',
-        width: '300px',
-        title: model.get('username'),
-        targetElement: event.target
+        targetElement: e.target
       });
 
       popover.show();
+      UserPopoverView.singleton(this, popover);
     },
 
     update: function() {
