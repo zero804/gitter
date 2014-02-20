@@ -71,9 +71,7 @@ define([
 
   var decorator = {
 
-    decorate: function(chatItemView, options) {
-      options = options || {};
-
+    decorate: function(chatItemView) {
       var roomRepo = getRoomRepo();
 
       chatItemView.$el.find('*[data-link-type="issue"]').each(function() {
@@ -94,9 +92,9 @@ define([
           }
 
           if(repo.toLowerCase() === roomRepo.toLowerCase()) {
-            preparePopover($issue,'/api/v1/troupes/'+context.getTroupeId()+'/issues/'+issueNumber+'?renderMarkdown=true', options.placement);
+            preparePopover($issue,'/api/v1/troupes/'+context.getTroupeId()+'/issues/'+issueNumber+'?renderMarkdown=true');
           } else {
-            preparePopover($issue,'/api/private/gh/repos/'+repo+'/issues/'+issueNumber+'?renderMarkdown=true', options.placement);
+            preparePopover($issue,'/api/private/gh/repos/'+repo+'/issues/'+issueNumber+'?renderMarkdown=true');
           }
         }
       });
