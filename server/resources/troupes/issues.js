@@ -2,6 +2,7 @@
 "use strict";
 
 var RepoService =  require('../../services/github/github-repo-service');
+var converter = require('../../utils/process-chat');
 var winston = require('winston');
 
 function getEightSuggestedIssues(allIssues) {
@@ -58,6 +59,10 @@ module.exports = {
       if(!issue) {
         res.send(404);
       } else {
+        if(req.query.renderMarkdown && issue.body){
+          issue.body_html = converter(issue.body).html;
+        }
+
         res.send(issue);
       }
     }).fail(function(err) {
