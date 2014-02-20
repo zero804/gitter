@@ -8,6 +8,8 @@ define([
 ], function( $, _, TroupeViews, Mutant, popoverTemplate) {
   "use strict";
 
+  var singleton = null;
+
   var Popover = TroupeViews.Base.extend({
     template: popoverTemplate,
     className: "popover",
@@ -86,6 +88,10 @@ define([
     },
 
     onClose: function() {
+      if(singleton && singleton !== this) {
+        singleton = null;
+      }
+
       this.$el.off('mouseenter', this.enter);
       this.$el.off('mouseleave', this.leave);
 
@@ -96,6 +102,11 @@ define([
     },
 
     show: function () {
+      if(singleton && singleton !== this) {
+        singleton.hide();
+      }
+      singleton = this;
+
       var $e = this.render().$el;
       var e = this.el;
 
@@ -284,6 +295,17 @@ define([
     }
   });
 
+  Popover.hoverTimeout = function(e, callback, scope) {
+    var timeout = setTimeout(function() {
+      if(!timeout) return;
+      callback.call(scope, e);
+    }, 750);
+
+    $(e.target).one('mouseout', function() {
+      clearTimeout(timeout);
+      timeout = null;
+    });
+  };
 
   return Popover;
 });
