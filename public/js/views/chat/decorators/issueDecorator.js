@@ -11,6 +11,7 @@ define([
   "use strict";
 
   var IssuePopoverView = Backbone.View.extend({
+    className: 'issue-popover-body',
     render: function() {
       this.$el.html(issuePopoverTemplate(this.model.attributes));
       return this;
@@ -37,7 +38,7 @@ define([
     $el.replaceWith($el.text());
   }
 
-  function preparePopover($issue, url, placement) {
+  function preparePopover($issue, url) {
     $.get(url, function(issue) {
       if(!issue.state) return;
 
@@ -47,8 +48,7 @@ define([
       }
 
       var issueModel = new Backbone.Model(issue);
-
-      issue.date = moment(issue.created_at).format("LLL");
+      issueModel.set('date', moment(issue.created_at).format("LLL"));
 
       var pop = new Popover({
         titleView: new IssuePopoverTitleView({model: issueModel}),
