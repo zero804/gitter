@@ -166,7 +166,7 @@ define([
     },
 
     afterRender: function() {
-      issueDecorator.decorate(this, {placement: 'left'});
+      issueDecorator.decorate(this);
     }
   });
 
