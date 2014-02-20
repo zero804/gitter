@@ -302,10 +302,10 @@ define([
     showReadBy: function(e) {
       if (this.compactView) return;
 
-      if(this.readBy) return;
+      if(this.popover) return;
       e.preventDefault();
 
-      this.readBy = new ReadByPopover({
+      var popover = new ReadByPopover({
         model: this.model,
         userCollection: this.userCollection,
         scroller: this.$el.parents('.primary-scroll'),
@@ -316,13 +316,8 @@ define([
         targetElement: e.target
       });
 
-      var s = this;
-      this.readBy.once('hide', function() {
-        s.readBy = null;
-      });
-
-      this.readBy.show();
-
+      popover.show();
+      ReadByPopover.singleton(this, popover);
     }
 
   });

@@ -66,9 +66,9 @@ define([
 
     showDetail: function(e) {
       if (this.compactView) return;
-
-      if(this.readBy) return;
       e.preventDefault();
+
+      if(this.popover) return;
 
       this.$el.find(':first-child').tooltip('hide');
 
@@ -79,6 +79,7 @@ define([
       });
 
       popover.show();
+      UserPopoverView.singleton(this, popover);
     },
 
     update: function() {
