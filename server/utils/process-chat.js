@@ -13,6 +13,7 @@ var lexer = new marked.Lexer(options);
 var JAVA =  'java';
 var SCRIPT = 'script:';
 var scriptUrl = JAVA + SCRIPT;
+var dataUrl = 'data:';
 
 module.exports = exports = function processChat(text) {
   var urls      = [];
@@ -21,7 +22,10 @@ module.exports = exports = function processChat(text) {
   var paragraphCount = 0;
 
   function checkForIllegalUrl(href) {
-    if(href && href.trim().indexOf(scriptUrl) === 0) {
+    if(!href) return "";
+
+    href = href.trim();
+    if(href.indexOf(scriptUrl) === 0 || href.indexOf(dataUrl) === 0) {
       return "http://goo.gl/a7HIYr";
     }
 
