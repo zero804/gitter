@@ -53,12 +53,12 @@ define([
       var $e = this.$el;
 
       if(this.options.titleView) {
-        $e.find('.popover-title').html(this.options.titleView.render().$el.html());
+        $e.find('.popover-title').append(this.options.titleView.render().el);
       } else {
         $e.find('.popover-title').text(this.options.title);
       }
 
-      $e.find('.popover-content > *').append(this.view.render().el);
+      $e.find('.popover-content').append(this.view.render().el);
       $e.find('.popover-inner').css('width', this.options.width).css('min-height', this.options.minHeight);
 
       var fv = this.options.footerView;

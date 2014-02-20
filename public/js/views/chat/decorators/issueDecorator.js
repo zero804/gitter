@@ -10,6 +10,20 @@ define([
 ], function($, Backbone, context, Popover, issuePopoverTemplate, issuePopoverTitleTemplate) {
   "use strict";
 
+  var IssuePopoverView = Backbone.View.extend({
+    render: function() {
+      this.$el.html(issuePopoverTemplate(this.model.attributes));
+      return this;
+    }
+  });
+
+  var IssuePopoverTitleView = Backbone.View.extend({
+    render: function() {
+      this.$el.html(issuePopoverTitleTemplate(this.model.attributes));
+      return this;
+    }
+  });
+
   function getRoomRepo() {
     var room = context.troupe();
     if(room.get('githubType') === 'REPO') {
@@ -32,29 +46,15 @@ define([
         $issue.addClass(issue.state);
       }
 
-      var TitleView = Backbone.View.extend({
-        render: function() {
-          this.$el.html(issuePopoverTitleTemplate(issue));
-          return this;
-        }
-      });
+      var issueModel = new Backbone.Model(issue);
 
-      var View = Backbone.View.extend({
-        render: function() {
-          this.$el.html(issuePopoverTemplate({
-            user: issue.user,
-            body_html: issue.body_html,
-            date: moment(issue.created_at).format("LLL"),
-            assignee: issue.assignee
-          }));
-          return this;
-        }
-      });
+      issue.date = moment(issue.created_at).format("LLL");
 
       var pop = new Popover({
-        titleView: new TitleView(),
-        view: new View(),
-        targetElement: $issue[0]
+        titleView: new IssuePopoverTitleView({model: issueModel}),
+        view: new IssuePopoverView({model: issueModel}),
+        targetElement: $issue[0],
+        placement: 'horizontal'
       });
 
 
