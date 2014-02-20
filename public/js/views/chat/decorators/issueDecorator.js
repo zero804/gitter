@@ -2,11 +2,28 @@
 /* global define:false */
 define([
   'jquery',
+  'backbone',
   'utils/context',
+  'views/popover',
   'hbs!./tmpl/issuePopover',
   'hbs!./tmpl/issuePopoverTitle',
-], function($, context, issuePopoverTemplate, issuePopoverTitleTemplate) {
+], function($, Backbone, context, Popover, issuePopoverTemplate, issuePopoverTitleTemplate) {
   "use strict";
+
+  var IssuePopoverView = Backbone.View.extend({
+    className: 'issue-popover-body',
+    render: function() {
+      this.$el.html(issuePopoverTemplate(this.model.attributes));
+      return this;
+    }
+  });
+
+  var IssuePopoverTitleView = Backbone.View.extend({
+    render: function() {
+      this.$el.html(issuePopoverTitleTemplate(this.model.attributes));
+      return this;
+    }
+  });
 
   function getRoomRepo() {
     var room = context.troupe();
@@ -21,7 +38,7 @@ define([
     $el.replaceWith($el.text());
   }
 
-  function preparePopover($issue, url, placement) {
+  function preparePopover($issue, url) {
     $.get(url, function(issue) {
       if(!issue.state) return;
 
@@ -30,20 +47,21 @@ define([
         $issue.addClass(issue.state);
       }
 
-      $issue.popover({
-        html: true,
-        trigger: 'manual',
-        placement: placement || 'right',
-        container: 'body',
-        title: issuePopoverTitleTemplate(issue),
-        content: issuePopoverTemplate({
-          user: issue.user,
-          body_html: issue.body_html,
-          date: moment(issue.created_at).format("LLL"),
-          assignee: issue.assignee
-        })
+      var issueModel = new Backbone.Model(issue);
+      issueModel.set('date', moment(issue.created_at).format("LLL"));
+
+      $issue.on('mouseover', function(e) {
+        Popover.hoverTimeout(e, function() {
+          var pop = new Popover({
+            titleView: new IssuePopoverTitleView({model: issueModel}),
+            view: new IssuePopoverView({model: issueModel}),
+            targetElement: $issue[0],
+            placement: 'horizontal'
+          });
+          pop.show();
+        });
       });
-      makePopoverStayOnHover($issue);
+
     }).fail(function(error) {
       if(error.status === 404) {
         plaintextify($issue);
@@ -51,27 +69,9 @@ define([
     });
   }
 
-  function makePopoverStayOnHover($issue) {
-    $issue.on('mouseenter', function() {
-      $issue.popover('show');
-    });
-    $issue.on('mouseleave', function() {
-      var $popover = $('.popover');
-      if($popover.is(':hover')) {
-        $popover.one('mouseleave', function() {
-          $issue.popover('hide');
-        });
-      } else {
-        $issue.popover('hide');
-      }
-    });
-  }
-
   var decorator = {
 
-    decorate: function(chatItemView, options) {
-      options = options || {};
-
+    decorate: function(chatItemView) {
       var roomRepo = getRoomRepo();
 
       chatItemView.$el.find('*[data-link-type="issue"]').each(function() {
@@ -92,9 +92,9 @@ define([
           }
 
           if(repo.toLowerCase() === roomRepo.toLowerCase()) {
-            preparePopover($issue,'/api/v1/troupes/'+context.getTroupeId()+'/issues/'+issueNumber+'?renderMarkdown=true', options.placement);
+            preparePopover($issue,'/api/v1/troupes/'+context.getTroupeId()+'/issues/'+issueNumber+'?renderMarkdown=true');
           } else {
-            preparePopover($issue,'/api/private/gh/repos/'+repo+'/issues/'+issueNumber+'?renderMarkdown=true', options.placement);
+            preparePopover($issue,'/api/private/gh/repos/'+repo+'/issues/'+issueNumber+'?renderMarkdown=true');
           }
         }
       });
