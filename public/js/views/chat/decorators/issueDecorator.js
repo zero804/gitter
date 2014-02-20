@@ -50,34 +50,21 @@ define([
       var issueModel = new Backbone.Model(issue);
       issueModel.set('date', moment(issue.created_at).format("LLL"));
 
-      var pop = new Popover({
-        titleView: new IssuePopoverTitleView({model: issueModel}),
-        view: new IssuePopoverView({model: issueModel}),
-        targetElement: $issue[0],
-        placement: 'horizontal'
+      $issue.on('mouseover', function(e) {
+        Popover.hoverTimeout(e, function() {
+          var pop = new Popover({
+            titleView: new IssuePopoverTitleView({model: issueModel}),
+            view: new IssuePopoverView({model: issueModel}),
+            targetElement: $issue[0],
+            placement: 'horizontal'
+          });
+          pop.show();
+        });
       });
 
-
-      makePopoverStayOnHover($issue, pop);
     }).fail(function(error) {
       if(error.status === 404) {
         plaintextify($issue);
-      }
-    });
-  }
-
-  function makePopoverStayOnHover($issue, pop) {
-    $issue.on('mouseenter', function() {
-      pop.show();
-    });
-    $issue.on('mouseleave', function() {
-      var $popover = pop.$el;
-      if($popover.is(':hover')) {
-        $popover.one('mouseleave', function() {
-          pop.hide();
-        });
-      } else {
-        pop.hide();
       }
     });
   }

@@ -333,7 +333,7 @@ define([
     var timeout = setTimeout(function() {
       if(!timeout) return;
       callback.call(scope, e);
-    }, 750);
+    }, 500);
 
     $(e.target).one('mouseout click', function() {
       clearTimeout(timeout);
