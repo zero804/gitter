@@ -55,11 +55,14 @@ define([
       var $e = this.$el;
       var title = this.options.title;
 
+      this.view.parentPopover = this;
+
       $e.find('.popover-title').text(title);
       $e.find('.popover-content > *').append(this.view.render().el);
       $e.find('.popover-inner').css('width', this.options.width).css('min-height', this.options.minHeight);
 
       var fv = this.options.footerView;
+      fv.parentPopover = this;
 
       if(fv) {
         $e.find('.popover-footer-content').append(fv.render().el);

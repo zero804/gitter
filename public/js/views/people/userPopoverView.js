@@ -45,10 +45,12 @@ define([
       'click #button-onetoone': function() {
         var username = this.model.get('login');
         appEvents.trigger('navigation', '/' + username, 'chat', username, this.model.id);
+        this.parentPopover.hide();
       },
       'click #button-mention': function() {
         var username = this.model.get('login');
         appEvents.trigger('input.append', '@' + username);
+        this.parentPopover.hide();
       }
     },
     serializeData: function() {
