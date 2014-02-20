@@ -14,6 +14,9 @@ var JAVA =  'java';
 var SCRIPT = 'script:';
 var scriptUrl = JAVA + SCRIPT;
 var dataUrl = 'data:';
+var httpUrl = 'http://';
+var httpsUrl = 'https://';
+var noProtocolUrl = '//';
 
 module.exports = exports = function processChat(text) {
   var urls      = [];
@@ -25,8 +28,15 @@ module.exports = exports = function processChat(text) {
     if(!href) return "";
 
     href = href.trim();
-    if(href.indexOf(scriptUrl) === 0 || href.indexOf(dataUrl) === 0) {
+    var hrefLower = href.toLowerCase();
+
+    if(hrefLower.indexOf(scriptUrl) === 0 || hrefLower.indexOf(dataUrl) === 0) {
+      /* Rickroll the script kiddies */
       return "http://goo.gl/a7HIYr";
+    }
+
+    if(hrefLower.indexOf(httpUrl) !== 0 && hrefLower.indexOf(httpsUrl) !== 0 && hrefLower.indexOf(noProtocolUrl) !== 0)  {
+      return httpUrl + href;
     }
 
     return href;
