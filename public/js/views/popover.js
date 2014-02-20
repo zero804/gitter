@@ -8,6 +8,27 @@ define([
 ], function( $, _, TroupeViews, Mutant, popoverTemplate) {
   "use strict";
 
+  function findMaxZIndex(element) {
+    var max = 0;
+    while(element && element != document) {
+      var style = window.getComputedStyle(element, null);
+
+      if(style) {
+        var zIndex = style.getPropertyValue('z-index');
+        if(zIndex && zIndex !== "auto") {
+          zIndex = parseInt(zIndex, 10);
+          if(zIndex > max) {
+            max = zIndex;
+          }
+        }
+      }
+
+      element = element.parentNode;
+    }
+
+    return max;
+  }
+
   var Popover = TroupeViews.Base.extend({
     template: popoverTemplate,
     className: "popover",
@@ -39,6 +60,8 @@ define([
       this.targetElement = this.options.targetElement;
       this.$targetElement = $(this.targetElement);
 
+      this.zIndex = findMaxZIndex(this.targetElement);
+
       this.$targetElement.on('mouseenter', this.enter);
       this.$targetElement.on('mouseleave', this.leave);
 
@@ -54,6 +77,12 @@ define([
     afterRender: function() {
       var $e = this.$el;
 
+      this.view.parentPopover = this;
+
+      if(this.zIndex) {
+        this.el.style.zIndex = this.zIndex + 1;
+      }
+
       if(this.titleView) {
         $e.find('.popover-title').append(this.titleView.render().el);
       } else {
@@ -66,6 +95,7 @@ define([
       var fv = this.options.footerView;
 
       if(fv) {
+        fv.parentPopover = this;
         $e.find('.popover-footer-content').append(fv.render().el);
       }
 
@@ -92,6 +122,10 @@ define([
     },
 
     onClose: function() {
+      // if(singleton && singleton !== this) {
+      //   singleton = null;
+      // }
+
       this.$el.off('mouseenter', this.enter);
       this.$el.off('mouseleave', this.leave);
 
@@ -102,6 +136,11 @@ define([
     },
 
     show: function () {
+      // if(singleton && singleton !== this) {
+      //   singleton.hide();
+      // }
+      // singleton = this;
+
       var $e = this.render().$el;
       var e = this.el;
 
@@ -290,6 +329,24 @@ define([
     }
   });
 
+  Popover.hoverTimeout = function(e, callback, scope) {
+    var timeout = setTimeout(function() {
+      if(!timeout) return;
+      callback.call(scope, e);
+    }, 750);
+
+    $(e.target).one('mouseout click', function() {
+      clearTimeout(timeout);
+      timeout = null;
+    });
+  };
+
+  Popover.singleton = function(view, popover) {
+    view.popover = popover;
+    view.listenToOnce(popover, 'hide', function() {
+      view.popover = null;
+    });
+  };
 
   return Popover;
 });
