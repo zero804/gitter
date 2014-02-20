@@ -1,5 +1,5 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
-define(['./mutant'], function(Mutant) {
+define(['mutant'], function(Mutant) {
   "use strict";
 
   /** @const */ var TRACK_BOTTOM = 1;
@@ -25,8 +25,7 @@ define(['./mutant'], function(Mutant) {
 
     var adjustScroll = this.adjustScroll.bind(this);
 
-    var mutant = new Mutant(target);
-    mutant.on('mutation', adjustScroll);
+    this.mutant = new Mutant(target, adjustScroll);
 
     target.addEventListener('scroll', this.trackLocation.bind(this), false);
     window.addEventListener('resize', adjustScroll, false);

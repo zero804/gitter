@@ -13,11 +13,12 @@ define([
   'collections/instances/integrated-items',
   'utils/emoji',
   'components/drafty',
+  'utils/cdn',
   './commands',
   'jquery-textcomplete', // No ref
   'utils/sisyphus-cleaner' // No ref
 ], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate,
-  emojiListItemTemplate, moment, hasScrollBars, itemCollections, emoji, drafty, commands) {
+  emojiListItemTemplate, moment, hasScrollBars, itemCollections, emoji, drafty, cdn, commands) {
   "use strict";
 
   /** @const */
@@ -127,7 +128,8 @@ define([
             },
             template: function(emoji) {
               return emojiListItemTemplate({
-                emoji: emoji
+                emoji: emoji,
+                emojiUrl: cdn('images/2/gitter/emoji/' + emoji + '.png')
               });
             },
             replace: function (value) {
