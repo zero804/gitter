@@ -28,6 +28,8 @@ define([
       _.extend(this.options, options);
       //this.init('popover', element, options);
       this.view = this.options.view;
+      this.titleView = this.options.titleView;
+      this.title = this.options.title;
 
       if(this.options.scroller) {
         this.$scroller = $(this.options.scroller);
@@ -52,10 +54,10 @@ define([
     afterRender: function() {
       var $e = this.$el;
 
-      if(this.options.titleView) {
-        $e.find('.popover-title').append(this.options.titleView.render().el);
+      if(this.titleView) {
+        $e.find('.popover-title').append(this.titleView.render().el);
       } else {
-        $e.find('.popover-title').text(this.options.title);
+        $e.find('.popover-title').text(this.title);
       }
 
       $e.find('.popover-content').append(this.view.render().el);
