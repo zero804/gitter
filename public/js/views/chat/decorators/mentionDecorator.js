@@ -38,6 +38,8 @@ define([
         });
 
         popover.show();
+
+        UserPopoverView.singleton(chatItemView, popover);
       }
 
       function hoverIntent(e) {
