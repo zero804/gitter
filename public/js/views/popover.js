@@ -3,26 +3,48 @@ define([
   'jquery',
   'underscore',
   './base',
-  'utils/mutant',
+  'mutant',
   'hbs!./tmpl/popover',
 ], function( $, _, TroupeViews, Mutant, popoverTemplate) {
   "use strict";
 
+  function findMaxZIndex(element) {
+    var max = 0;
+    while(element && element != document) {
+      var style = window.getComputedStyle(element, null);
+
+      if(style) {
+        var zIndex = style.getPropertyValue('z-index');
+        if(zIndex && zIndex !== "auto") {
+          zIndex = parseInt(zIndex, 10);
+          if(zIndex > max) {
+            max = zIndex;
+          }
+        }
+      }
+
+      element = element.parentNode;
+    }
+
+    return max;
+  }
+
   var Popover = TroupeViews.Base.extend({
     template: popoverTemplate,
     className: "popover",
+    options: {
+      animation: true,
+      selector: false,
+      title: '',
+      footerView: null,
+      delay: 300,
+      container: false,
+      placement: 'right',
+      scroller: null,
+      width: '',
+      minHeight: ''
+    },
     initialize: function(options) {
-      this.options = {
-        animation: true,
-        selector: false,
-        title: '',
-        delay: 300,
-        container: false,
-        placement: 'right',
-        scroller: null,
-        width: '',
-        minHeight: ''
-      };
       _.bindAll(this, 'leave', 'enter');
       _.extend(this.options, options);
       //this.init('popover', element, options);
@@ -36,29 +58,53 @@ define([
       this.targetElement = this.options.targetElement;
       this.$targetElement = $(this.targetElement);
 
+      this.zIndex = findMaxZIndex(this.targetElement);
+
       this.$targetElement.on('mouseenter', this.enter);
       this.$targetElement.on('mouseleave', this.leave);
+
+      this.addCleanup(function() {
+        if(this.mutant) this.mutant.disconnect();
+      });
+    },
+
+    getRenderData: function() {
+      return this.options;
     },
 
     afterRender: function() {
       var $e = this.$el;
       var title = this.options.title;
 
+      this.view.parentPopover = this;
+
+      if(this.zIndex) {
+        this.el.style.zIndex = this.zIndex + 1;
+      }
+
       $e.find('.popover-title').text(title);
       $e.find('.popover-content > *').append(this.view.render().el);
       $e.find('.popover-inner').css('width', this.options.width).css('min-height', this.options.minHeight);
 
+      var fv = this.options.footerView;
+
+      if(fv) {
+        fv.parentPopover = this;
+        $e.find('.popover-footer-content').append(fv.render().el);
+      }
+
       $e.on('mouseenter', this.enter);
       $e.on('mouseleave', this.leave);
 
+      $e.addClass('popover-hidden');
       $e.removeClass('fade top bottom left right in');
     },
 
-    enter: function (/*e*/) {
+    enter: function () {
       if (this.timeout) clearTimeout(this.timeout);
     },
 
-    leave: function (/*e*/) {
+    leave: function () {
       if (!this.options.delay) {
         return self.hide();
       }
@@ -70,6 +116,10 @@ define([
     },
 
     onClose: function() {
+      // if(singleton && singleton !== this) {
+      //   singleton = null;
+      // }
+
       this.$el.off('mouseenter', this.enter);
       this.$el.off('mouseleave', this.leave);
 
@@ -80,19 +130,21 @@ define([
     },
 
     show: function () {
+      // if(singleton && singleton !== this) {
+      //   singleton.hide();
+      // }
+      // singleton = this;
+
       var $e = this.render().$el;
       var e = this.el;
-
-      if (this.options.animation) {
-        $e.addClass('fade');
-      }
 
       $e.detach().css({ top: 0, left: 0, display: 'block' });
       $e.insertAfter($('body'));
       this.reposition();
 
-      this.mutant = new Mutant(e);
-      this.listenTo(this.mutant, 'mutation.throttled', this.reposition);
+      $e.removeClass('popover-hidden');
+
+      this.mutant = new Mutant(e, this.reposition, { scope: this, timeout: 20 });
     },
 
     reposition: function() {
@@ -132,11 +184,9 @@ define([
 
         this.applyPlacement(tp, placement);
       } finally {
-        // This is very important. If you leave it out, Chrome will crash.
+        // This is very important. If you leave it out, Chrome will likely crash.
         if(this.mutant) this.mutant.takeRecords();
       }
-
-
     },
 
     selectBestVerticalPlacement: function(div, target) {
@@ -163,16 +213,23 @@ define([
     },
 
     selectBestHorizontalPlacement: function(div, target) {
-      var $target = $(target);
+      // var $target = $(target);
 
-      var panel = $target.offsetParent();
-      if(!panel) return 'right';
-
-      if($target.offset().left + div.width() + 20 >= panel[0].clientWidth) {
-        return 'left';
+      var bounds = target.getBoundingClientRect();
+      if(bounds.left < document.body.clientWidth / 2) {
+        return "right";
+      } else {
+        return "left";
       }
 
-      return 'right';
+      // var panel = $target.offsetParent();
+      // if(!panel) return 'right';
+
+      // if($target.offset().left + div.width() + 20 >= panel[0].clientWidth) {
+      //   return 'left';
+      // }
+
+      // return 'right';
     },
 
     applyPlacement: function(offset, placement){
@@ -186,6 +243,7 @@ define([
       var delta = 0;
       var replace;
 
+
       /* Adjust */
       if (placement == 'bottom' || placement == 'top') {
         if (offset.left < 0) {
@@ -196,6 +254,12 @@ define([
         if (offset.top < 0) {
           delta = offset.top * -2;
           offset.top = 0;
+        } else {
+          var clientHeight = this.scroller ? this.scroller.clientHeight : window.innerHeight;
+            if(offset.top + height > clientHeight) {
+            delta = 2 * (clientHeight - offset.top - height - 10);
+            offset.top = clientHeight - height - 10;
+          }
         }
       }
 
@@ -233,22 +297,10 @@ define([
 
       $e.removeClass('in');
 
-      function removeWithAnimation() {
-        var timeout = setTimeout(function() {
-          $e.off($.support.transition.end).detach();
-        }, 500);
-
-        $e.one($.support.transition.end, function () {
-          clearTimeout(timeout);
-          $e.detach();
-        });
-      }
-
-      if($.support.transition && this.$tip.hasClass('fade')) {
-        removeWithAnimation();
-      } else {
+      $e.addClass('popover-hidden');
+      setTimeout(function() {
         $e.detach();
-      }
+      }, 350);
 
       $e.trigger('hidden');
       this.trigger('hide');
@@ -278,6 +330,24 @@ define([
     }
   });
 
+  Popover.hoverTimeout = function(e, callback, scope) {
+    var timeout = setTimeout(function() {
+      if(!timeout) return;
+      callback.call(scope, e);
+    }, 750);
+
+    $(e.target).one('mouseout click', function() {
+      clearTimeout(timeout);
+      timeout = null;
+    });
+  };
+
+  Popover.singleton = function(view, popover) {
+    view.popover = popover;
+    view.listenToOnce(popover, 'hide', function() {
+      view.popover = null;
+    });
+  };
 
   return Popover;
 });

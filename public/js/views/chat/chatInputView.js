@@ -13,11 +13,12 @@ define([
   'collections/instances/integrated-items',
   'utils/emoji',
   'components/drafty',
+  'utils/cdn',
   './commands',
   'jquery-textcomplete', // No ref
   'utils/sisyphus-cleaner' // No ref
 ], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate,
-  emojiListItemTemplate, moment, hasScrollBars, itemCollections, emoji, drafty, commands) {
+  emojiListItemTemplate, moment, hasScrollBars, itemCollections, emoji, drafty, cdn, commands) {
   "use strict";
 
   /** @const */
@@ -52,6 +53,11 @@ define([
     initialize: function(options) {
       this.rollers = options.rollers;
       this.chatCollectionView = options.chatCollectionView;
+      this.listenTo(appEvents, 'input.append', function(text) {
+        if(this.inputBox) {
+          this.inputBox.append(text);
+        }
+      });
     },
 
     getRenderData: function() {
@@ -136,7 +142,8 @@ define([
             },
             template: function(emoji) {
               return emojiListItemTemplate({
-                emoji: emoji
+                emoji: emoji,
+                emojiUrl: cdn('images/2/gitter/emoji/' + emoji + '.png')
               });
             },
             replace: function (value) {
@@ -384,6 +391,16 @@ define([
       this.el.value = '';
       this.drafty.reset();
       this.chatResizer.resetInput();
+    },
+
+    append: function(text) {
+      var current = this.$el.val();
+      if(!current || current.match(/\s+$/)) {
+        current = current + text;
+      } else {
+        current = current + ' ' + text;
+      }
+      this.$el.val(current);
     },
 
     isTypeaheadShowing: function() {
