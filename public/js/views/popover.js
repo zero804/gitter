@@ -3,7 +3,7 @@ define([
   'jquery',
   'underscore',
   './base',
-  'utils/mutant',
+  'mutant',
   'hbs!./tmpl/popover',
 ], function( $, _, TroupeViews, Mutant, popoverTemplate) {
   "use strict";
@@ -105,8 +105,7 @@ define([
 
       $e.removeClass('popover-hidden');
 
-      this.mutant = new Mutant(e);
-      this.listenTo(this.mutant, 'mutation.throttled', this.reposition);
+      this.mutant = new Mutant(e, this.reposition, { scope: this, timeout: 20 });
     },
 
     reposition: function() {
