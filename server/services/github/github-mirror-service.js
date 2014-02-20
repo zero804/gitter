@@ -20,7 +20,6 @@ module.exports = function(tokenPriority) {
 
   var Q = require('q');
   var wrap = require('./github-cache-wrapper');
-  var converter = require('../../utils/process-chat');
   var badCredentialsCheck = require('./bad-credentials-check');
   var request = require('request');
   var assert = require('assert');
