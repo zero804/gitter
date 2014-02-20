@@ -49,6 +49,8 @@ define([
       _.extend(this.options, options);
       //this.init('popover', element, options);
       this.view = this.options.view;
+      this.titleView = this.options.titleView;
+      this.title = this.options.title;
 
       if(this.options.scroller) {
         this.$scroller = $(this.options.scroller);
@@ -74,7 +76,6 @@ define([
 
     afterRender: function() {
       var $e = this.$el;
-      var title = this.options.title;
 
       this.view.parentPopover = this;
 
@@ -82,8 +83,13 @@ define([
         this.el.style.zIndex = this.zIndex + 1;
       }
 
-      $e.find('.popover-title').text(title);
-      $e.find('.popover-content > *').append(this.view.render().el);
+      if(this.titleView) {
+        $e.find('.popover-title').append(this.titleView.render().el);
+      } else {
+        $e.find('.popover-title').text(this.title);
+      }
+
+      $e.find('.popover-content').append(this.view.render().el);
       $e.find('.popover-inner').css('width', this.options.width).css('min-height', this.options.minHeight);
 
       var fv = this.options.footerView;
@@ -334,7 +340,7 @@ define([
     var timeout = setTimeout(function() {
       if(!timeout) return;
       callback.call(scope, e);
-    }, 750);
+    }, 500);
 
     $(e.target).one('mouseout click', function() {
       clearTimeout(timeout);
