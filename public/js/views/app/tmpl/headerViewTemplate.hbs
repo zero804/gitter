@@ -21,7 +21,6 @@
       </ul>
     </div>
   </div>
-<!--   <div class="activityFeedToggle show-activity" id="activity-feed-toggle"></div> -->
   {{/unless}}
   <div class="trpTroupeFavourite {{#if troupeFavourite}}favourited{{/if}}" id="favourite-button">
       <div style="display: inline-block; vertical-align: middle">
@@ -29,6 +28,6 @@
         <i class="trpHeaderFavIcon unfavourited" width="24" height="24"></i>
       </div>
   </div>
-  <h1>{{troupeName}}</h1>
-  <p id="trpTopic">{{#unless oneToOne}}{{{troupeTopic}}}{{/unless}}{{#oneToOne}}<a href="http://github.com{{troupeUri}}" target="github">github.com{{troupeUri}}</a>{{/oneToOne}}</p>
+  <h1><a href="http://github.com{{troupeUri}}" target="github">{{troupeName}}</a></h1>
+  <p id="trpTopic">{{#unless oneToOne}}{{troupeTopic}}{{/unless}}{{#oneToOne}}<a href="http://github.com{{troupeUri}}" target="github">github.com{{troupeUri}}</a>{{/oneToOne}}</p>
 </div>
