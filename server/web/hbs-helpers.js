@@ -5,7 +5,7 @@ var nconf = require('../utils/config');
 var cdn = require("./cdn");
 var _ = require('underscore');
 var appVersion = require('./appVersion');
-
+var safeJson = require('../utils/safe-json');
 var minifiedDefault = nconf.get("web:minified");
 var appTag = appVersion.getAppTag();
 var revision = appVersion.getRevision();
@@ -88,7 +88,7 @@ exports.generateEnv = function(parameters) {
   var env = options ? _.extend({}, troupeEnv, options) : troupeEnv;
 
   return '<script type="text/javascript">' +
-          'window.troupeEnv = ' + JSON.stringify(env) + ';' +
+          'window.troupeEnv = ' + safeJson(JSON.stringify(env)) + ';' +
           '</script>';
 };
 
@@ -103,7 +103,7 @@ exports.generateTroupeContext = function(troupeContext, parameters) {
   }
 
   return '<script type="text/javascript">' +
-          'window.troupeEnv = ' + JSON.stringify(env) + ';' +
-          'window.troupeContext = ' + JSON.stringify(troupeContext) + ';' +
+          'window.troupeEnv = ' + safeJson(JSON.stringify(env)) + ';' +
+          'window.troupeContext = ' + safeJson(JSON.stringify(troupeContext)) + ';' +
           '</script>';
 };
