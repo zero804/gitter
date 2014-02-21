@@ -14,19 +14,19 @@
 
   <ul class="trpUserDetails">
     {{#if company}}
-    <li><span class="github-ORG"></span>{{company}}</li>
+    <li class="github-ORG">{{company}}</li>
     {{/if}}
 
     {{#if location}}
-    <li><span class="github-LOCATION"></span>{{location}}</li>
+    <li class="github-LOCATION">{{location}}</li>
     {{/if}}
 
     {{#if email}}
-    <li><span class="github-MAIL"></span><a class="email" href="mailto:{{email}}">{{email}}</a></li>
+    <li class="github-MAIL"><a class="email" href="mailto:{{email}}">{{email}}</a></li>
     {{/if}}
 
     {{#if blog}}
-    <li><span class="github-LINK"></span><a target="_new" href="{{blogUrl}}" class="url" rel="nofollow me">{{blog}}</a></li>
+    <li class="github-LINK"><a target="_new" href="{{blogUrl}}" class="url" rel="nofollow me">{{blog}}</a></li>
     {{/if}}
   </ul>
 </div>
