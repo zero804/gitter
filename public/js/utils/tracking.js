@@ -2,8 +2,7 @@
 define([
   'utils/context',
   'utils/appevents',
-  './mixpanel', // No ref
-  'optimizely'
+  './mixpanel' // No ref
 ], function(context, appEvents) {
   "use strict";
   var trackingId = context.env('googleTrackingId');

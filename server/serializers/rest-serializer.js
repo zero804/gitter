@@ -78,6 +78,11 @@ function UserRoleInTroupeStrategy(options) {
           });
         }
       })
+      .fail(function(err) {
+        /* Github Repo failure. Die quietely */
+        winston.error('UserRoleInTroupeStrategy unable to get contributors' + err, { exception: err });
+        return;
+      })
       .then(function(githubContributors) {
         if(!githubContributors) return;
         contributors = {};

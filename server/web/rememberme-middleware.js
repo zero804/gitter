@@ -68,8 +68,6 @@ function validateAuthToken(authCookieValue, callback) {
       if(err) return callback(err);
 
       if(!storedValue) {
-        statsService.event('user_login_auto_illegal', { });
-
         winston.info("rememberme: Client presented illegal rememberme token ", { token: key });
         return callback();
       }

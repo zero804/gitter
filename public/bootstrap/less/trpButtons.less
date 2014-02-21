@@ -1,3 +1,5 @@
+@import "trp3Colours.less";
+
 .trpButton {
   color: @trpDarkGrey;
   border: 1px solid @trpLightGrey;
@@ -78,22 +80,61 @@
 
 .trpBtnRed:hover {
   opacity: 1;
+  border-bottom: 2px solid @trpRed;
 }
 
 .trpBtnWhite:hover {
   background: rgba(255,255,255,1);
 }
 
+.trpBtnOrange {
+  background-color: @trpOrange;
+  opacity: 0.95;
+  color: white;
+  border-bottom: 2px solid darken(@trpOrange, 10%);
+}
+
+.trpBtnOrange:hover {
+  opacity: 1;
+  border-bottom: 2px solid @trpOrange;
+}
+
+.trpBtnBlue {
+  background-color: #395168;
+  opacity: 0.95;
+  color: white;
+  border-bottom: 2px solid darken(#395168, 10%);
+}
+
+.trpBtnBlue:hover {
+  opacity: 1;
+  border-bottom: 2px solid @trpDarkBlue;
+}
+
+.trpBtnLightBlue {
+  background-color: fade(@trpLightBlue, 20%);
+  opacity: 0.95;
+  color: black;
+  border-bottom: 2px solid fade(@trpLightBlue, 30%);
+}
+
+.trpBtnBlue:hover {
+  opacity: 1;
+  border-bottom: 2px solid fade(@trpLightBlue, 20%);
+}
+
+
 .trpBtnGreen {
   background-color: @trpGreen;
 /*  background: rgba(29,206,155, 0.95);*/
   opacity: 0.95;
   color: white;
-  border-bottom: 2px solid #19b363;
+  border-bottom: 2px solid darken(@trpGreen, 10%);
 }
 
 .trpBtnGreen:hover {
 /*  background: rgba(29,206,155, 1);*/
+  border-bottom: 2px solid @trpGreen;
   opacity: 1;
 }
 
@@ -107,11 +148,12 @@
   background-color: @trpLightGrey;
   color: black;
   opacity: 0.95;
-  border-bottom: 2px solid #ababab;
+  border-bottom: 2px solid darken(@trpLightGrey, 10%);
 }
 
 .trpBtnLightGrey:hover {
   opacity: 1;
+  border-bottom: 2px solid @trpLightGrey;
 }
 
 .trpButtonMedium.disabled,

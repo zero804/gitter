@@ -5,7 +5,7 @@ var Q = require('q');
 var wrap = require('./github-cache-wrapper');
 var createClient = require('./github-client');
 var badCredentialsCheck = require('./bad-credentials-check');
-var request = require('request');
+var request = require('./request-wrapper');
 var assert = require('assert');
 
 function GitHubMeService(user) {
@@ -29,7 +29,7 @@ GitHubMeService.prototype.getEmail = function() {
    */
   var d = Q.defer();
 
-  /* USE  OCTONODE !!! */
+  /* USE OCTONODE !!! */
   var token = this.user.githubUserToken || this.user.githubToken || '';
 
   var options = {

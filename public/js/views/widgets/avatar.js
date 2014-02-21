@@ -1,18 +1,24 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
+  'backbone',
   'underscore',
   'utils/context',
   'views/base',
   'hbs!./tmpl/avatar',
-  'bootstrap_tooltip'
-], function($, _, context, TroupeViews, template) {
+  'views/people/userPopoverView',
+  'bootstrap_tooltip',                // No ref
+], function($, Backbone, _, context, TroupeViews, template, UserPopoverView) {
 
   "use strict";
 
   return TroupeViews.Base.extend({
     tagName: 'span',
     template: template,
+    events: {
+      'mouseover': 'showDetailIntent',
+      'click':     'showDetail'
+    },
     initialize: function(options) {
       var self = this;
       this.user = options.user ? options.user : {};
@@ -50,6 +56,30 @@ define([
         });
 
       }
+    },
+
+    showDetailIntent: function(e) {
+      UserPopoverView.hoverTimeout(e, function() {
+        this.showDetail(e);
+      }, this);
+    },
+
+    showDetail: function(e) {
+      if (this.compactView) return;
+      e.preventDefault();
+
+      if(this.popover) return;
+
+      this.$el.find(':first-child').tooltip('hide');
+
+      var model = this.model || new Backbone.Model(this.user);
+      var popover = new UserPopoverView({
+        model: model,
+        targetElement: e.target
+      });
+
+      popover.show();
+      UserPopoverView.singleton(this, popover);
     },
 
     update: function() {
