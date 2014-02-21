@@ -5,11 +5,9 @@ var recentRoomService  = require('../../services/recent-room-service');
 var troupeService      = require("../../services/troupe-service");
 var userService        = require("../../services/user-service");
 var restSerializer     = require("../../serializers/rest-serializer");
+var appEvents          = require("../../app-events");
 var _                  = require("underscore");
 var Q                  = require("q");
-
-var redis = require('../../utils/redis');
-var redisClient = redis.createClient();
 
 module.exports = {
   id: 'resourceTroupeUser',
@@ -40,10 +38,7 @@ module.exports = {
         troupeService.removeUserFromTroupe(troupeId, userId)
       ])
       .then(function() {
-
-        var msg_data = {user: req.user, room: req.troupe};
-        redisClient.publish('user_left', JSON.stringify(msg_data));
-
+        appEvents.userLeft({user: req.user, room: req.troupe});
         res.send({ success: true });
       })
       .fail(next);

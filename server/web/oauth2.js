@@ -10,7 +10,8 @@ var oauth2orize = require('oauth2orize'),
     oauthService = require('../services/oauth-service'),
     loginUtils = require('./login-utils'),
     winston = require('winston'),
-    url = require('url');
+    url = require('url'),
+    random = require('../utils/random');
 
 // create OAuth 2.0 server
 var server = oauth2orize.createServer();
@@ -54,14 +55,16 @@ server.deserializeClient(function(id, done) {
 // values, and will be exchanged for an access token.
 
 server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, done) {
-  var code = uid(16);
-
   winston.info("Granted access to ", client.name, " for ", user.displayName);
   winston.info("Granted access to "+ client.name + " for " + user.displayName);
 
-  oauthService.saveAuthorizationCode(code, client, redirectUri, user, function(err) {
+  random.generateToken(function(err, token) {
     if (err) { return done(err); }
-    done(null, code);
+
+    oauthService.saveAuthorizationCode(token, client, redirectUri, user, function(err) {
+      if (err) { return done(err); }
+      done(null, token);
+    });
   });
 }));
 
@@ -77,10 +80,13 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, do
     if (!client._id.equals(authCode.clientId)) { return done(null, false); }
     if (redirectUri !== authCode.redirectUri) { return done(null, false); }
 
-    var token = uid(256);
-    oauthService.saveAccessToken(token, authCode.userId, authCode.clientId, function(err) {
+    random.generateToken(function(err, token) {
       if (err) { return done(err); }
-      done(null, token);
+
+      oauthService.saveAccessToken(token, authCode.userId, authCode.clientId, function(err) {
+        if (err) { return done(err); }
+        done(null, token);
+      });
     });
   });
 }));
@@ -170,29 +176,3 @@ exports.bearerLogin = [
     loginUtils.redirectUserToDefaultTroupe(req, res, next);
   }
 ];
-
-function uid(len) {
-  var buf = [],
-      chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
-      charlen = chars.length;
-
-  for (var i = 0; i < len; ++i) {
-    buf.push(chars[getRandomInt(0, charlen - 1)]);
-  }
-
-  return buf.join('');
-}
-
-/**
- * Retrun a random int, used by `utils.uid()`
- *
- * @param {Number} min
- * @param {Number} max
- * @return {Number}
- * @api private
- */
-
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-

@@ -15,7 +15,7 @@ var DEFAULT_CHAT_COUNT_LIMIT = 30;
 exports.serializeTroupesForUser = function(userId, callback) {
   return roomService.findAllRoomsIdsForUserIncludingMentions(userId)
     .then(function(troupeIds) {
-      var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
+      var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId, mapUsers: true });
 
       return restSerializer.serializeQ(troupeIds, strategy);
     })

@@ -48,10 +48,6 @@ define([
       });
     },
 
-    initNanoScroller: function() {
-      $('.nano').nanoScroller();
-    },
-
     onRender: function() {
 
       this.profile.show(new ProfileView());
@@ -73,14 +69,21 @@ define([
         roomsCollection: troupeCollections.troupes
       }));
 
-      setTimeout(this.initNanoScroller,500);
-
       // search results collection view
       this.searchView = new SearchView({ troupes: troupeCollections.troupes, $input: this.$el.find('#list-search-input') });
       this.search.show(this.searchView);
 
       // Organizations collection view
       this.orgs.show(new OrgCollectionView({ collection: troupeCollections.orgs }));
+
+      // nanoscroller has to be reset when regions are rerendered
+      var $nano = this.$el.find('.nano');
+      this.regionManager.forEach(function(region) {
+        region.currentView.on('render', function() {
+          $nano.nanoScroller();
+        });
+      });
+
     },
 
     onSearchClearIconClick: function() {

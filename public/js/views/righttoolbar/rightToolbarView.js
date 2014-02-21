@@ -61,9 +61,7 @@ define([
 
     onShow: function() {
        if (hasScrollBars()) {
-        $(".trpChatContainer").addClass("scroller");
-        $(".trpChatInputArea").addClass("scrollpush");
-        $("#room-content").addClass("scroller");
+        $(".trpToolbarContent").addClass("scroller");
       }
     },
 

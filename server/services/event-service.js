@@ -3,10 +3,8 @@
 
 var persistence   = require("./persistence-service");
 var processChat   = require('../utils/process-chat');
+var appEvents     = require("../app-events");
 var ObjectID      = require('mongodb').ObjectID;
-
-var redis = require('../utils/redis');
-var redisClient = redis.createClient();
 
 exports.newEventToTroupe = function(troupe, user, text, meta, payload, callback) {
   if(!troupe) return callback("Invalid troupe");
@@ -30,11 +28,10 @@ exports.newEventToTroupe = function(troupe, user, text, meta, payload, callback)
   event.meta       = meta;
   event.payload    = payload;
 
-  var _msg = {username: 'gitter', room: troupe.uri, text: text};
-  redisClient.publish('events', JSON.stringify(_msg));
-
   event.save(function (err) {
     if(err) return callback(err);
+
+    appEvents.hookEvent({username: 'gitter', room: troupe.uri, text: text});
 
     return callback(null, event);
   });
