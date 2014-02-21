@@ -25,8 +25,6 @@ define([
   var decorator = {
 
     decorate: function(chatItemView) {
-      var mentions = chatItemView.model.get('mentions');
-      if(!mentions || !mentions.length) return;
 
       function clickMention(e) {
         var username = e.target.dataset.screenName;

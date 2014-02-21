@@ -5,6 +5,7 @@ define([
   'utils/context',
   'views/base',
   'views/chat/decorators/issueDecorator',
+  'views/chat/decorators/mentionDecorator',
   'log!activity',
   'hbs!./tmpl/activityStream',
 
@@ -33,6 +34,7 @@ define([
   context,
   TroupeViews,
   issueDecorator,
+  mentionDecorator,
   log,
   activityStreamTemplate,
 
@@ -166,7 +168,8 @@ define([
     },
 
     afterRender: function() {
-      issueDecorator.decorate(this, {placement: 'left'});
+      issueDecorator.decorate(this);
+      mentionDecorator.decorate(this);
     }
   });
 

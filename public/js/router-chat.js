@@ -42,9 +42,23 @@ require([
   "use strict";
 
   // Make drop down menus drop down
+  // This is a bit nasty
   $(document).on("click", ".trpButtonDropdown .trpButtonMenu", function(/*event*/) {
     $(this).parent().next().toggle();
   });
+
+  // When a user clicks an internal link, prevent it from opening in a new window
+  $(document).on("click", "a.link", function(e) {
+    var basePath = context.env('basePath');
+    var href = e.target.getAttribute('href');
+    if(!href || href.indexOf(basePath) !== 0) {
+      return;
+    }
+
+    e.preventDefault();
+    window.parent.location.href = href;
+  });
+
 
   parent.postMessage(JSON.stringify({ type: "context.troupeId", troupeId: context.getTroupeId(), name: context.troupe().get('name') }), context.env('basePath'));
 

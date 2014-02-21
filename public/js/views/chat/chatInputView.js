@@ -111,13 +111,20 @@ define([
             match: /(^|\s)@(\w*)$/,
             maxCount: 8,
             search: function(term, callback) {
-                var loggedInUsername = context.user().get('username');
-                var matches = itemCollections.users.models.filter(function(user) {
-                  var username = user.get('username');
-                  var displayName = (user.get('displayName') || '').toLowerCase();
-                  return username != loggedInUsername && (username.indexOf(term) === 0 || displayName.indexOf(term) === 0);
-                });
-                callback(matches);
+              var lowerTerm = term.toLowerCase();
+              var loggedInUsername = context.user().get('username').toLowerCase();
+
+              var matches = itemCollections.users.models.filter(function(user) {
+                var username = user.get('username').toLowerCase();
+
+                if(username === loggedInUsername) return false;
+
+                var displayName = (user.get('displayName') || '').toLowerCase();
+
+                return (username.indexOf(lowerTerm) === 0 || displayName.indexOf(lowerTerm) === 0);
+              });
+
+              callback(matches);
             },
             template: function(user) {
               return listItemTemplate({

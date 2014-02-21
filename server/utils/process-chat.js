@@ -18,6 +18,8 @@ var httpUrl = 'http://';
 var httpsUrl = 'https://';
 var noProtocolUrl = '//';
 
+highlight.configure({classPrefix: ''});
+
 module.exports = exports = function processChat(text) {
   var urls      = [];
   var mentions  = [];
