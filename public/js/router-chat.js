@@ -59,15 +59,23 @@ require([
     window.parent.location.href = href;
   });
 
+  function postMessage(message) {
+    parent.postMessage(JSON.stringify(message), context.env('basePath'));
+  }
 
-  parent.postMessage(JSON.stringify({ type: "context.troupeId", troupeId: context.getTroupeId(), name: context.troupe().get('name') }), context.env('basePath'));
+
+  postMessage({ type: "context.troupeId", troupeId: context.getTroupeId(), name: context.troupe().get('name') });
 
   appEvents.on('navigation', function(url, type, title) {
-    parent.postMessage(JSON.stringify({ type: "navigation", url: url, urlType: type, title: title}), context.env('basePath'));
+    postMessage({ type: "navigation", url: url, urlType: type, title: title});
   });
 
   appEvents.on('realtime.testConnection', function() {
-    parent.postMessage(JSON.stringify({ type: "realtime.testConnection" }), context.env('basePath'));
+    postMessage({ type: "realtime.testConnection" });
+  });
+
+  appEvents.on('realtime:newConnectionEstablished', function() {
+    postMessage({ type: "realtime.testConnection" });
   });
 
   var appView = new ChatIntegratedView({ el: 'body' });
