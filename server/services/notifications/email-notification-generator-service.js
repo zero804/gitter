@@ -14,16 +14,12 @@ var emailNotificationService = require('../email-notification-service');
 var userSettingsService      = require('../user-settings-service');
 var userTroupeSettingsService = require('../user-troupe-settings-service');
 var winston                  = require('../../utils/winston');
+var nconf                    = require('../../utils/config');
 
-function removeTestIds(ids) {
+var filterTestValues = nconf.get('notifications:filterTestValues');
 
-  // Remove any test user ids that start with USER
-  return ids.filter(function(id) {
-    if(typeof id === 'string') {
-      return id.indexOf('USER') !== 0 && id.indexOf('TROUPE') !== 0;
-    }
-    return true;
-  });
+function isTestId(id) {
+  return id.indexOf('USER') === 0 || id.indexOf('TROUPE') === 0;
 }
 
 function sendEmailNotifications(since) {
@@ -32,6 +28,28 @@ function sendEmailNotifications(since) {
     }
 
     return unreadItemService.listTroupeUsersForEmailNotifications(since)
+      .then(function(userTroupeUnreadHash) {
+        if(!filterTestValues) return userTroupeUnreadHash;
+
+        /* Remove testing rubbish */
+        Object.keys(userTroupeUnreadHash).forEach(function(userId) {
+          if(isTestId(userId)) {
+            delete userTroupeUnreadHash[userId];
+            return;
+          }
+
+          Object.keys(userTroupeUnreadHash[userId]).forEach(function(troupeId) {
+            if(isTestId(troupeId)) {
+              delete userTroupeUnreadHash[userId][troupeId];
+              if(Object.keys(userTroupeUnreadHash[userId]).length === 1) {
+                delete userTroupeUnreadHash[userId];
+              }
+            }
+          });
+        });
+
+        return userTroupeUnreadHash;
+      })
       .then(function(userTroupeUnreadHash) {
         return Q.all(Object.keys(userTroupeUnreadHash).map(function(userId) {
           return unreadItemService.markUserAsEmailNotified(userId);
@@ -42,7 +60,7 @@ function sendEmailNotifications(since) {
         /**
          * Filter out all users who've opted out of notification emails
          */
-        var userIds = removeTestIds(Object.keys(userTroupeUnreadHash));
+        var userIds = Object.keys(userTroupeUnreadHash);
 
         return userSettingsService.getMultiUserSettings(userIds, 'unread_notifications_optout').
           then(function(settings) {
@@ -97,11 +115,11 @@ function sendEmailNotifications(since) {
         /**
          * Step 1: load the required data
          */
-        var userIds = removeTestIds(Object.keys(userTroupeUnreadHash));
+        var userIds = Object.keys(userTroupeUnreadHash);
 
-        var troupeIds = removeTestIds(_.flatten(Object.keys(userTroupeUnreadHash).map(function(userId) {
+        var troupeIds = _.flatten(Object.keys(userTroupeUnreadHash).map(function(userId) {
           return Object.keys(userTroupeUnreadHash[userId]);
-        })));
+        }));
 
 
         return Q.all([

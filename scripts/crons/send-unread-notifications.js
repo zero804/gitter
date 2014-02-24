@@ -4,11 +4,13 @@
 "use strict";
 
 var notificationGenerator = require('../../server/services/notifications/email-notification-generator-service');
+var nconf = require('../../server/utils/config');
+
 var shutdown = require('../../server/utils/shutdown');
 var opts = require("nomnom")
   .option('age', {
     abbr: 'a',
-    default: 60,
+    default: nconf.get('notifications:emailNotificationsAfterMins'),
     required: false,
     help: 'Age in minutes of the unread items'
   })
