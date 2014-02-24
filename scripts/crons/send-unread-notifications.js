@@ -15,9 +15,9 @@ var opts = require("nomnom")
   .parse();
 
 
-var anHourAgo = Date.now() - (opts.age * 60 * 1000); //60 * 60 * 1000;
+var sinceTime = Date.now() - (opts.age * 60 * 1000); //60 * 60 * 1000;
 
-notificationGenerator(anHourAgo)
+notificationGenerator(sinceTime)
   .then(function() {
     shutdown.shutdownGracefully();
   });
