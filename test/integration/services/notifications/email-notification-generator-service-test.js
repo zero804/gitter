@@ -3,12 +3,13 @@
 
 "use strict";
 
-var testRequire   = require('../../test-require');
-var assert        = require("assert");
-var mockito       = require('jsmockito').JsMockito;
-var Q             = require('q');
-var chatService   = testRequire('./services/chat-service');
-var fixtureLoader = require('../../test-fixtures');
+var testRequire         = require('../../test-require');
+var assert              = require("assert");
+var mockito             = require('jsmockito').JsMockito;
+var Q                   = require('q');
+var chatService         = testRequire('./services/chat-service');
+var userSettingsService = testRequire('./services/user-settings-service');
+var fixtureLoader       = require('../../test-fixtures');
 
 var times  = mockito.Verifiers.times;
 var never  = mockito.Verifiers.never();
@@ -39,24 +40,32 @@ before(fixtureLoader(fixture, {
 describe('email-notification-generator-service', function() {
 
   it('should do what it says on the tin', function(done) {
-    var c = 0;
-    mockito.when(emailNotificationServiceMock).sendUnreadItemsNotification().then(function() {
+    var c = 0, u = 0;
+    mockito.when(emailNotificationServiceMock).sendUnreadItemsNotification().then(function(user, troupeWithCounts) {
       c++;
+      if(user.id == fixture.user2.id) {
+        u++;
+        assert.equal(u, 1);
+        assert.equal(troupeWithCounts.length, 1);
+        assert.equal(troupeWithCounts[0].troupe.id, fixture.troupe1.id);
+      }
     });
-
-    chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, 'Hello', function(err) {
-      if(err) return done(err);
-      setTimeout(function() {
-        return sendEmailNotifications(Date.now())
-          .then(function() {
-            assert(c > 0);
-          })
-          .nodeify(done);
-
-      }, 10);
-
-    });
+    Q.all([
+      // userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', false),
+      chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, 'Hello')
+      ])
+      .delay(10)
+      .then(function() {
+        return sendEmailNotifications(Date.now());
+      })
+      .then(function() {
+        assert(c > 0);
+        assert.equal(u, 1);
+      })
+      .nodeify(done);
 
   });
+
+
 
 });
