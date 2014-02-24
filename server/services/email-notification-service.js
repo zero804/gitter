@@ -28,7 +28,6 @@ module.exports = {
   },
 
   sendUnreadItemsNotification: function(user, troupesWithUnreadCounts) {
-
     var plaintext = user.id + ',' + 'unread_notifications';
     var cipher    = crypto.createCipher('aes256', passphrase);
     var hash      = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');

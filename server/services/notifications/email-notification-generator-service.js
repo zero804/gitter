@@ -40,6 +40,7 @@ function sendEmailNotifications(since) {
       .then(function(userTroupeUnreadHash) {
         // Filter out all users who've opted out of emails
         var userIds = removeTestIds(Object.keys(userTroupeUnreadHash));
+
         return userSettingsService.getMultiUserSettings(userIds, 'unread_notifications_optout').
           then(function(settings) {
             // Check which users have opted out
