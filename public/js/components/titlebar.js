@@ -37,6 +37,7 @@ define([
     this._unreadRoomCount = 0;
     this._isUnreadInRoom = false;
     this._roomName = '';
+    this._roomNameNotInitialised = true;
 
     appEvents.on('troupeUnreadTotalChange', function(values) {
       self.setUnread(values.overall, !!values.current);
@@ -54,12 +55,17 @@ define([
   };
 
   TitlebarUpdater.prototype.setRoomName = function(roomName) {
+    this._roomNameNotInitialised = false;
     this._roomName = roomName;
     this._render();
   };
 
   TitlebarUpdater.prototype._render = function() {
-    var title = (this._roomName) ? this._roomName+' - Gitter' : 'Gitter';
+    if(this._roomNameNotInitialised) {
+      return;
+    }
+
+    var title = (this._roomName) ? this._roomName +' - Gitter' : 'Gitter';
 
     if(this._unreadRoomCount > 0) {
       if(this._isUnreadInRoom) {
