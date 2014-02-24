@@ -470,6 +470,7 @@ TroupeRemovedUserSchema.index({ userId: 1 });
 TroupeRemovedUserSchema.schemaTypeName = 'TroupeRemovedUserSchema';
 
 var UserTroupeSettingsSchema = require('./persistence/user-troupe-settings-schema.js');
+var UserSettingsSchema = require('./persistence/user-settings-schema.js');
 
 //
 // An invitation to a person to join a Troupe
@@ -800,6 +801,7 @@ var Troupe = mongoose.model('Troupe', TroupeSchema);
 var TroupeUser = mongoose.model('TroupeUser', TroupeUserSchema);
 var TroupeRemovedUser = mongoose.model('TroupeRemovedUser', TroupeRemovedUserSchema);
 var UserTroupeSettings = mongoose.model('UserTroupeSettings', UserTroupeSettingsSchema);
+var UserSettings = mongoose.model('UserSettings', UserSettingsSchema);
 var Email = mongoose.model('Email', EmailSchema);
 var EmailAttachment = mongoose.model('EmailAttachment', EmailAttachmentSchema);
 var Conversation = mongoose.model('Conversation', ConversationSchema);
@@ -851,6 +853,7 @@ module.exports = {
     TroupeUserSchema: TroupeUserSchema,
     TroupeRemovedUserSchema: TroupeRemovedUserSchema,
     UserTroupeSettingsSchema: UserTroupeSettingsSchema,
+    UserSettingsSchema: UserSettingsSchema,
     EmailSchema: EmailSchema,
     EmailAttachmentSchema: EmailAttachmentSchema,
     ConversationSchema: ConversationSchema,
@@ -877,6 +880,7 @@ module.exports = {
   TroupeUser: TroupeUser,
   TroupeRemovedUser: TroupeRemovedUser,
   UserTroupeSettings: UserTroupeSettings,
+  UserSettings: UserSettings,
 	Email: Email,
   EmailAttachment: EmailAttachment,
   Conversation: Conversation,
