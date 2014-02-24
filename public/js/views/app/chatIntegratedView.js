@@ -1,18 +1,14 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
-  'views/base',
   'utils/context',
-  'utils/appevents',
   'marionette',
+  'utils/appevents',
   'views/app/uiVars',
   'views/widgets/avatar',
   'components/modal-region',
-  'cocktail',
-  'utils/scrollbar-detect',
-  'bootstrap_tooltip'  // no ref
-  ], function($, TroupeViews, context, appEvents, Marionette, uiVars, AvatarView,
-    modalRegion, cocktail, hasScrollBars) {
+  'utils/scrollbar-detect'
+], function($, context, Marionette, appEvents, uiVars, AvatarView, modalRegion, hasScrollBars) {
   "use strict";
 
   var touchEvents = {
@@ -22,7 +18,7 @@ define([
 
   var mouseEvents = {
     // "keypress":                         "onKeyPress",
-    "keyup": "onKeyUp", 
+    "keyup": "onKeyUp",
     "click #favourite-button":          "toggleFavourite"
   };
 
@@ -52,12 +48,9 @@ define([
         user: context.getUser(),
         showTooltip: false
       }).render();
+
       // tooltips for the app-template
       $('#profile-icon, #home-icon').tooltip();
-
-      // $('body').append('<span id="fineUploader"></span>');
-
-      //$(".nano").nanoScroller({ preventPageScrolling: true });
 
       this.dialogRegion = modalRegion;
 
@@ -88,34 +81,30 @@ define([
 
 
     onKeyUp: function(e) {
-      if((e.keyCode === 82) || (e.keyCode ===81) && !e.ctrlKey && !e.shiftKey) {
+      if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+      if((e.keyCode === 82) || (e.keyCode ===81) && !e.ctrlKey && !e.shiftKey && !e.metaKey) {
         this.quoteText();
       }
     },
 
     getSelectionText: function() {
-        var text = "";
-        if (window.getSelection) {
-            text = window.getSelection().toString();
-        } else if (document.selection && document.selection.type != "Control") {
-            text = document.selection.createRange().text;
-        }
-        return text;
+      var text = "";
+      if (window.getSelection) {
+        text = window.getSelection().toString();
+      } else if (document.selection && document.selection.type != "Control") {
+        text = document.selection.createRange().text;
+      }
+      return text;
     },
 
     quoteText: function() {
-      var chatInputArea = $("textarea");
-      if(chatInputArea.is(":focus")) {
-        return;
-      }
       var selectedText = this.getSelectionText();
       if (selectedText.length > 0) {
-        chatInputArea.focus().val(chatInputArea.val() + "> " + selectedText);
+        appEvents.trigger('input.append', "> " + selectedText, { newLine: true });
       }
-    },
-
+    }
   });
-  //cocktail.mixin(ChatLayout, TroupeViews.DelayedShowLayoutMixin);
 
   return ChatLayout;
 });
