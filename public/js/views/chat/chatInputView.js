@@ -52,9 +52,9 @@ define([
     initialize: function(options) {
       this.rollers = options.rollers;
       this.chatCollectionView = options.chatCollectionView;
-      this.listenTo(appEvents, 'input.append', function(text) {
+      this.listenTo(appEvents, 'input.append', function(text, options) {
         if(this.inputBox) {
-          this.inputBox.append(text);
+          this.inputBox.append(text, options);
         }
       });
     },
@@ -399,14 +399,23 @@ define([
       this.chatResizer.resetInput();
     },
 
-    append: function(text) {
+    append: function(text, options) {
       var current = this.$el.val();
+      var start = current.length;
       if(!current || current.match(/\s+$/)) {
         current = current + text;
       } else {
-        current = current + ' ' + text;
+        if(options && options.newLine) {
+          start++;
+          current = current + '\n' + text;
+        } else {
+          current = current + ' ' + text;
+        }
       }
+      this.chatResizer.resizeInput();
       this.$el.val(current);
+      this.el.setSelectionRange(start, current.length);
+      this.el.scrollTop = this.el.clientHeight;
     },
 
     isTypeaheadShowing: function() {
