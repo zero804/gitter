@@ -101,7 +101,7 @@ function sendEmailNotifications(since) {
                     return { troupe: t, unreadCount: unreadCount };
                   });
 
-                emailNotificationService.sendUnreadItemsNotification(user, troupeData);
+                return emailNotificationService.sendUnreadItemsNotification(user, troupeData);
               });
 
           }));

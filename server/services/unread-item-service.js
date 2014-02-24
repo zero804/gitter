@@ -200,6 +200,12 @@ function newItemForUsers(troupeId, itemType, itemId, userIds) {
 
   return runScript('unread-add-item', keys, [troupeId, itemId, timestamp])
     .then(function(result) {
+      function logOptimisticUpgradeFailure(err) {
+        if(err) {
+          winston.info('unread-item-key-upgrade: failed. This is not as serious as it sounds, optimistically locked. ' + err, { exception: err });
+        }
+      }
+
       // Results come back as two items per key in sequence
       // * 2*n value is the new badge count (or -1 for don't update)
       // * 2*n+1 value is a bitwise collection, 1 = badge update, 2 = upgrade key
@@ -228,11 +234,7 @@ function newItemForUsers(troupeId, itemType, itemId, userIds) {
           var userBadgeKey = "ub:" + userId;
 
           // Upgrades can happen asynchoronously
-          upgradeKeyToSortedSet(key, userBadgeKey, troupeId, function(err) {
-            if(err) {
-              winston.info('unread-item-key-upgrade: failed. This is not as serious as it sounds, optimistically locked. ' + err, { exception: err });
-            }
-          });
+          upgradeKeyToSortedSet(key, userBadgeKey, troupeId, logOptimisticUpgradeFailure);
         }
       }
 
