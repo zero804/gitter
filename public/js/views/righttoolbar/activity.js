@@ -138,7 +138,9 @@ define([
       var column = meta.column;
       var previousColumn = meta.previousColumn;
 
-      if(column) {
+      if(meta.status) {
+        extra.context = 'to '+meta.status;
+      } else if(column) {
         extra.context = previousColumn ? 'from '+previousColumn+' to '+column : 'in '+column;
       }
       return extra;
