@@ -24,6 +24,7 @@ exports.getUserSettings = function(userId, troupeId, settingsKey) {
 
 
 exports.getMultiUserTroupeSettings = function(userTroupes, settingsKey) {
+  if(!userTroupes.length) return Q.resolve({});
 
   var terms = userTroupes.map(function(userTroupe) {
     var userId = mongoUtils.asObjectID(userTroupe.userId);

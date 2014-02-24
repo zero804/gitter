@@ -11,8 +11,9 @@ var Q                        = require('q');
 var collections              = require('../../utils/collections');
 var nconf                    = require('../../utils/config');
 var emailNotificationService = require('../email-notification-service');
-var preferences              = require('../notifications-preference-service');
-
+var userSettingsService      = require('../user-settings-service');
+var userTroupeSettingsService = require('../user-troupe-settings-service');
+var winston                  = require('../../utils/winston');
 
 function removeTestIds(ids) {
 
@@ -36,6 +37,61 @@ function sendEmailNotifications(since) {
           return unreadItemService.markUserAsEmailNotified(userId);
         }))
         .thenResolve(userTroupeUnreadHash);
+      })
+      .then(function(userTroupeUnreadHash) {
+        /**
+         * Filter out all users who've opted out of notification emails
+         */
+        var userIds = removeTestIds(Object.keys(userTroupeUnreadHash));
+
+        return userSettingsService.getMultiUserSettings(userIds, 'unread_notifications_optout').
+          then(function(settings) {
+            // Check which users have opted out
+            userIds.forEach(function(userId) {
+              // If unread_notifications_optout is truish, the
+              // user has opted out
+              if(settings[userId]) {
+                winston.verbose('User ' + userId + ' has opted out of unread_notifications, removing from results');
+                delete userTroupeUnreadHash[userId];
+              }
+            });
+
+            return userTroupeUnreadHash;
+          });
+      })
+      .then(function(userTroupeUnreadHash) {
+
+        /**
+         * Now we need to filter out users who've turned off notifications for a specific troupe
+         * TODO: HANDLE mentions!!!!!
+         */
+        var userTroupes = [];
+        Object.keys(userTroupeUnreadHash).forEach(function(userId) {
+            var troupeIds = Object.keys(userTroupeUnreadHash[userId]);
+            troupeIds.forEach(function(troupeId) {
+              userTroupes.push({ userId: userId, troupeId: troupeId });
+            });
+        });
+
+        return userTroupeSettingsService.getMultiUserTroupeSettings(userTroupes, "push")
+          .then(function(notificationSettings) {
+            Object.keys(userTroupeUnreadHash).forEach(function(userId) {
+                var troupeIds = Object.keys(userTroupeUnreadHash[userId]);
+                troupeIds.forEach(function(troupeId) {
+                  var setting = notificationSettings[userId + ':' + troupeId];
+                  if(setting && setting !== 'all') {
+                    winston.verbose('User ' + userId + ' has disabled notifications for this troupe');
+                    delete userTroupeUnreadHash[userId][troupeId];
+
+                    if(Object.keys(userTroupeUnreadHash[userId]).length === 0) {
+                      delete userTroupeUnreadHash[userId];
+                    }
+                  }
+                });
+            });
+
+            return userTroupeUnreadHash;
+          });
       })
       .then(function(userTroupeUnreadHash) {
         /**
@@ -83,9 +139,7 @@ function sendEmailNotifications(since) {
                     return { troupe: t, unreadCount: unreadCount };
                   });
 
-                preferences.verifyUserExpectsNotifications(user.id, 'unread_notifications', function(optedOut) {
-                  if (!optedOut) emailNotificationService.sendUnreadItemsNotification(user, troupeData);
-                });
+                return emailNotificationService.sendUnreadItemsNotification(user, troupeData);
               });
 
           }));
