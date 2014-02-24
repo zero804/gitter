@@ -12,6 +12,7 @@ var collections              = require('../../utils/collections');
 var nconf                    = require('../../utils/config');
 var emailNotificationService = require('../email-notification-service');
 var userSettingsService      = require('../user-settings-service');
+var userTroupeSettingsService = require('../user-troupe-settings-service');
 var winston                  = require('../../utils/winston');
 
 function removeTestIds(ids) {
@@ -38,7 +39,9 @@ function sendEmailNotifications(since) {
         .thenResolve(userTroupeUnreadHash);
       })
       .then(function(userTroupeUnreadHash) {
-        // Filter out all users who've opted out of emails
+        /**
+         * Filter out all users who've opted out of notification emails
+         */
         var userIds = removeTestIds(Object.keys(userTroupeUnreadHash));
 
         return userSettingsService.getMultiUserSettings(userIds, 'unread_notifications_optout').
@@ -51,6 +54,40 @@ function sendEmailNotifications(since) {
                 winston.verbose('User ' + userId + ' has opted out of unread_notifications, removing from results');
                 delete userTroupeUnreadHash[userId];
               }
+            });
+
+            return userTroupeUnreadHash;
+          });
+      })
+      .then(function(userTroupeUnreadHash) {
+
+        /**
+         * Now we need to filter out users who've turned off notifications for a specific troupe
+         * TODO: HANDLE mentions!!!!!
+         */
+        var userTroupes = [];
+        Object.keys(userTroupeUnreadHash).forEach(function(userId) {
+            var troupeIds = Object.keys(userTroupeUnreadHash[userId]);
+            troupeIds.forEach(function(troupeId) {
+              userTroupes.push({ userId: userId, troupeId: troupeId });
+            });
+        });
+
+        return userTroupeSettingsService.getMultiUserTroupeSettings(userTroupes, "push")
+          .then(function(notificationSettings) {
+            Object.keys(userTroupeUnreadHash).forEach(function(userId) {
+                var troupeIds = Object.keys(userTroupeUnreadHash[userId]);
+                troupeIds.forEach(function(troupeId) {
+                  var setting = notificationSettings[userId + ':' + troupeId];
+                  if(setting && setting !== 'all') {
+                    winston.verbose('User ' + userId + ' has disabled notifications for this troupe');
+                    delete userTroupeUnreadHash[userId][troupeId];
+
+                    if(Object.keys(userTroupeUnreadHash[userId]).length === 0) {
+                      delete userTroupeUnreadHash[userId];
+                    }
+                  }
+                });
             });
 
             return userTroupeUnreadHash;

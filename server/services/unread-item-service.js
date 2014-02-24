@@ -457,6 +457,8 @@ exports.markUserAsEmailNotified = function(userId) {
   // NB: this function is not atomic, but it doesn't need to be
   return Q.ninvoke(redisClient, "hgetall", EMAIL_NOTIFICATION_HASH_KEY)
     .then(function(troupeUserHash) {
+      if(!troupeUserHash) return [];
+
       return Object.keys(troupeUserHash)
         .filter(function(hashKey) {
           var troupeUserId = hashKey.split(':');
@@ -465,6 +467,8 @@ exports.markUserAsEmailNotified = function(userId) {
         });
     })
     .then(function(userTroupeKeys) {
+      if(!userTroupeKeys.length) return;
+
       var args =[EMAIL_NOTIFICATION_HASH_KEY];
       args.push.apply(args, userTroupeKeys);
 
