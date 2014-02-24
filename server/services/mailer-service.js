@@ -63,6 +63,8 @@ exports.sendEmail = function(options, done) {
         return d.resolve();
       }
 
+      require("fs").writeFileSync("/tmp/email.html", headerHtml + "\n" + html + "\n" + footerHtml);
+
       smtpTransport.sendMail({
         from: options.from,
         to: options.to,
