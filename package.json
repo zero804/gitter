@@ -76,7 +76,7 @@
     "i18n": "~0.4.1",
     "restler-q": "0.0.3",
     "debug": "~0.7.4",
-    "troupe-octonode": "0.3.12",
+    "octonode": "git://github.com/pksunkara/octonode#19ad516f5d7f2cbb49c7aaef218aae325a425f80",
     "jwt-simple": "~0.1.0",
     "snappy-cache": "0.0.4",
     "mailchimp-api": "~2.0.4",
