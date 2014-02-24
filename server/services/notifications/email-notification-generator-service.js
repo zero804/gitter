@@ -11,8 +11,8 @@ var Q                        = require('q');
 var collections              = require('../../utils/collections');
 var nconf                    = require('../../utils/config');
 var emailNotificationService = require('../email-notification-service');
-var preferences              = require('../notifications-preference-service');
-
+var userSettingsService      = require('../user-settings-service');
+var winston                  = require('../../utils/winston');
 
 function removeTestIds(ids) {
 
@@ -36,6 +36,24 @@ function sendEmailNotifications(since) {
           return unreadItemService.markUserAsEmailNotified(userId);
         }))
         .thenResolve(userTroupeUnreadHash);
+      })
+      .then(function(userTroupeUnreadHash) {
+        // Filter out all users who've opted out of emails
+        var userIds = removeTestIds(Object.keys(userTroupeUnreadHash));
+        return userSettingsService.getMultiUserSettings(userIds, 'unread_notifications_optout').
+          then(function(settings) {
+            // Check which users have opted out
+            userIds.forEach(function(userId) {
+              // If unread_notifications_optout is truish, the
+              // user has opted out
+              if(settings[userId]) {
+                winston.verbose('User ' + userId + ' has opted out of unread_notifications, removing from results');
+                delete userTroupeUnreadHash[userId];
+              }
+            });
+
+            return userTroupeUnreadHash;
+          });
       })
       .then(function(userTroupeUnreadHash) {
         /**
@@ -83,9 +101,7 @@ function sendEmailNotifications(since) {
                     return { troupe: t, unreadCount: unreadCount };
                   });
 
-                preferences.verifyUserExpectsNotifications(user.id, 'unread_notifications', function(optedOut) {
-                  if (!optedOut) emailNotificationService.sendUnreadItemsNotification(user, troupeData);
-                });
+                emailNotificationService.sendUnreadItemsNotification(user, troupeData);
               });
 
           }));

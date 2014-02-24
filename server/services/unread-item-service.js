@@ -156,15 +156,19 @@ function upgradeKeyToSortedSet(key, userBadgeKey, troupeId, callback) {
  * @return {promise} promise of nothing
  */
 function newItem(troupeId, creatorUserId, itemType, itemId) {
-  if(!troupeId) { winston.error("newitem failed. Troupe cannot be null"); return; }
-  if(!itemType) { winston.error("newitem failed. itemType cannot be null"); return; }
-  if(!itemId) { winston.error("newitem failed. itemId cannot be null"); return; }
+  function reject(msg) {
+    winston.error(msg);
+    return Q.reject(msg);
+  }
+
+  if(!troupeId) { return reject("newitem failed. Troupe cannot be null"); }
+  if(!itemType) { return reject("newitem failed. itemType cannot be null");  }
+  if(!itemId) { return reject("newitem failed. itemId cannot be null"); }
 
   return troupeService.findUserIdsForTroupeWithLurk(troupeId)
     .then(function(troupe) {
       var userIdsWithLurk = troupe.users;
       var userIds = Object.keys(userIdsWithLurk);
-
       if(creatorUserId) {
         userIds = userIds.filter(function(userId) {
           return ("" + userId) != ("" + creatorUserId);
@@ -424,7 +428,6 @@ exports.listTroupeUsersForEmailNotifications = function(sinceTime) {
 
           /* Its got to be older that the start time */
           if(time <= sinceTime) {
-
             return getUnreadItemsForUserTroupeSince(userId, troupeId, time)
               .then(function(items) {
 

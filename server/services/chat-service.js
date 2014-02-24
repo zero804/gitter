@@ -27,6 +27,7 @@ var ObjectID = require('mongodb').ObjectID;
 
 exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   if(!troupe) return callback(404);
+
   /* You have to have text */
   if(!text && text !== "" /* Allow empty strings for now */) return callback(400);
   if(text.length > MAX_CHAT_MESSAGE_LENGTH) return callback(400);
