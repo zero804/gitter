@@ -44,7 +44,6 @@ define([
   /** @const */
   var PAGE_DOWN = 34;
 
-
   var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];
 
   var ChatInputView = TroupeViews.Base.extend({

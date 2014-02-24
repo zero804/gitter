@@ -22,6 +22,7 @@ define([
 
   var mouseEvents = {
     // "keypress":                         "onKeyPress",
+    "keyup": "onKeyUp", 
     "click #favourite-button":          "toggleFavourite"
   };
 
@@ -61,7 +62,6 @@ define([
       this.dialogRegion = modalRegion;
 
       this.rightPanelRegion.on('show', function() {
-        //log("SHOW PANEL");
         self.showPanel("#right-panel");
       });
 
@@ -70,72 +70,7 @@ define([
         $(".trpChatInputArea").addClass("scrollpush");
         $("#room-content").addClass("scroller");
       }
-
-      // this.rightPanelRegion.on('close', function() {
-      //   window.setTimeout(function() {
-      //     if(!self.rightPanelRegion.currentView) {
-      //       //log("CLOSE PANEL");
-      //       self.hidePanel("#right-panel");
-      //     }
-      //   }, 100);
-      // });
-
-      // var profileCompleteTimeout = 60 * 1000;
-      // setTimeout(function() {
-      //   self.ensureSignupIsComplete();
-      // }, profileCompleteTimeout);
     },
-
-    // ensureSignupIsComplete: function() {
-    //   var self = this, noteId = 'completeSignup';
-    //   if (!context.isProfileComplete() || !context().user.username) {
-    //     notifications.notify({
-    //       id: noteId,
-    //       content: "<a href='#'>Click here to complete the signup process</a>",
-    //       timeout: Infinity,
-    //       click: function() {
-    //         notifications.notify({ id: noteId, action: 'hide' });
-    //         self.ensureProfileIsComplete();
-    //         self.ensureProfileIsUsernamed();
-    //       }
-    //     });
-    //   }
-    // },
-
-    // ensureProfileIsComplete: function() {
-    //   if (!context.isProfileComplete()) {
-    //     new ProfileView.Modal().show();
-    //   }
-    // },
-
-    // ensureProfileIsUsernamed: function() {
-    //   var user = context.getUser();
-    //   if (user && !user.username /* if the context has not yet loaded, what do we do? */) {
-    //     new UsernameView.Modal().show();
-    //   }
-    // },
-
-    // hidePanel: function (whichPanel) {
-    //   $("#chat-frame, #chat-input, #toolbar-frame, #header-area").removeClass('rightCollapse');
-    //   $(whichPanel).removeClass('visible');
-    //   this.rightpanel = false;
-    // },
-
-    // showPanel: function(whichPanel) {
-    //   if (!this.rightpanel) {
-    //     $("#chat-frame, #chat-input, #toolbar-frame, #header-area").addClass("rightCollapse");
-    //     $(whichPanel).addClass("visible");
-    //     this.rightpanel = true;
-    //   }
-    // },
-
-    // togglePanel: function(whichPanel) {
-    //   if (this.rightpanel) {
-    //     this.hidePanel(whichPanel);
-    //   } else {
-    //     this.showPanel(whichPanel);
-    //   }
-    // },
 
     toggleFavourite: function() {
       var favHeader = $('.trpTroupeFavourite');
@@ -151,30 +86,34 @@ define([
       });
     },
 
-    // /* Header */
-    // showProfileMenu: function() {
-    //   if (!this.profilemenu) {
 
-    //     // $(".trpProfileMenu").animate({
-    //     //     width: '132px'
-    //     // }, 250, function () {
+    onKeyUp: function(e) {
+      if((e.keyCode === 82) || (e.keyCode ===81) && !e.ctrlKey && !e.shiftKey) {
+        this.quoteText();
+      }
+    },
 
-    //     // });
+    getSelectionText: function() {
+        var text = "";
+        if (window.getSelection) {
+            text = window.getSelection().toString();
+        } else if (document.selection && document.selection.type != "Control") {
+            text = document.selection.createRange().text;
+        }
+        return text;
+    },
 
-    //     $(".trpProfileMenu").fadeIn('fast');
-    //     this.profilemenu = true;
-    //   }
-    // },
+    quoteText: function() {
+      var chatInputArea = $("textarea");
+      if(chatInputArea.is(":focus")) {
+        return;
+      }
+      var selectedText = this.getSelectionText();
+      if (selectedText.length > 0) {
+        chatInputArea.focus().val(chatInputArea.val() + "> " + selectedText);
+      }
+    },
 
-    // hideProfileMenu: function() {
-    //   if (this.profilemenu) {
-    //     $(".trpProfileMenu").fadeOut('fast');
-    //     // $(".trpProfileMenu").animate({
-    //     //     width: '0px'
-    //     // }, 250);
-    //     this.profilemenu = false;
-    //   }
-    // }
   });
   //cocktail.mixin(ChatLayout, TroupeViews.DelayedShowLayoutMixin);
 
