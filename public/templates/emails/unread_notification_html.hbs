@@ -13,7 +13,7 @@
               <table width="100%">
                 <tr>
                   <td>
-                    <p style="color: #404040;display: block;font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif;font-size: 18px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0; margin-bottom: 8px;">{{troupe.uri}}</p>
+                    <p style="color: #404040;display: block;font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif;font-size: 18px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0; margin-bottom: 8px;">{{#if troupe.oneToOne}}{{troupe.user.displayName}}{{#else}{{troupe.uri}}{{/if}}</p>
                     <p style="color: #404040;display: block;font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif;font-size: 13px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0; margin-bottom: 4px;">{{__n "%d unread message" "%d unread messages" unreadCount}}</p>
                     <p style="color: #404040;display: block;font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif;font-size: 15px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0;">
                   </td>
