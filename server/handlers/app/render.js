@@ -32,7 +32,7 @@ function renderHomePage(req, res, next) {
     res.render(page, {
       useAppCache: !!nconf.get('web:useAppCache'),
       bootScriptName: bootScriptName,
-      troupeName: (user && user.displayName) || '',
+      troupeName: (user && user.username) || '',
       troupeContext: troupeContext,
       agent: req.headers['user-agent'],
       isUserhome: true
@@ -50,13 +50,13 @@ function renderMainFrame(req, res, next, frame) {
       } else {
         chatAppLocation = '/' + req.uriContext.uri + '/-/' + frame;
       }
-
       var troupe = req.uriContext.troupe;
+      var otherUser = req.uriContext.otherUser;
 
       res.render('app-template', {
         appCache: getAppCache(req),
         bootScriptName: 'router-app',
-        troupeName: troupe && (troupe.uri || troupe.name),
+        troupeName: troupe.oneToOne ? otherUser.username : troupe.uri,
         troupeContext: troupeContext,
         chatAppLocation: chatAppLocation,
         agent: req.headers['user-agent']
@@ -67,16 +67,16 @@ function renderMainFrame(req, res, next, frame) {
 
 function renderChatPage(req, res, next) {
   var troupe = req.uriContext.troupe;
+  var otherUser = req.uriContext.otherUser;
 
   Q.all([
     contextGenerator.generateTroupeContext(req),
     restful.serializeChatsForTroupe(troupe.id, req.user.id, { limit: INITIAL_CHAT_COUNT })
     ]).spread(function(troupeContext, chats) {
-
       res.render('chat-template', {
         appCache: getAppCache(req),
         bootScriptName: 'router-chat',
-        troupeName: troupeContext.troupe.uri || troupeContext.troupe.name,
+        troupeName: troupe.oneToOne ? otherUser.username : troupe.uri,
         troupeTopic: troupeContext.troupe.topic,
         troupeFavourite: troupeContext.troupe.favourite,
         user: troupeContext.user,
@@ -97,7 +97,7 @@ function renderMobileUserHome(req, res, next) {
     res.render('mobile/mobile-app', {
       useAppCache: !!nconf.get('web:useAppCache'),
       bootScriptName: 'mobile-userhome',
-      troupeName: (user && user.displayName) || '',
+      troupeName: (user && user.username) || '',
       troupeContext: troupeContext,
       agent: req.headers['user-agent'],
       isUserhome: true
@@ -107,16 +107,16 @@ function renderMobileUserHome(req, res, next) {
 
 function renderMobileChat(req, res, next) {
   var troupe = req.uriContext.troupe;
+  var otherUser = req.uriContext.otherUser;
 
   Q.all([
     contextGenerator.generateTroupeContext(req),
     restful.serializeChatsForTroupe(troupe.id, req.user.id, { limit: INITIAL_CHAT_COUNT })
     ]).spread(function(troupeContext, chats) {
-
       res.render('mobile/mobile-app', {
         appCache: getAppCache(req),
         bootScriptName: 'mobile-app',
-        troupeName: troupeContext.troupe.uri || troupeContext.troupe.name,
+        troupeName: troupe.oneToOne ? otherUser.username : troupe.uri,
         troupeTopic: troupeContext.troupe.topic,
         troupeFavourite: troupeContext.troupe.favourite,
         user: troupeContext.user,
