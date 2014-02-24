@@ -4,15 +4,12 @@
 var RedisBatcher = require('../utils/redis-batcher').RedisBatcher;
 var Fiber = require('../utils/fiber');
 var persistence = require('./persistence-service');
-var ObjectID = require('mongodb').ObjectID;
 var assert = require('assert');
 var batcher = new RedisBatcher('readby', 0);
 var winston = require('winston');
 var appEvents = require("../app-events");
-
-function asObjectId(stringId) {
-  return new ObjectID(stringId);
-}
+var mongoUtils = require('../utils/mongo-utils');
+var Q = require('q');
 
 batcher.listen(function(key, userIdStrings, done) {
   var kp = key.split(':', 3);
@@ -20,10 +17,11 @@ batcher.listen(function(key, userIdStrings, done) {
   // Ignore everything except chats for now
   if(kp[0] !== 'chat') return done();
 
-  var troupeId = asObjectId(kp[1]);
-  var chatId = asObjectId(kp[2]);
 
-  var userIds = userIdStrings.map(asObjectId);
+  var troupeId = mongoUtils.asObjectID(kp[1]);
+  var chatId = mongoUtils.asObjectID(kp[2]);
+
+  var userIds = userIdStrings.map(mongoUtils.asObjectID);
 
   persistence.ChatMessage.findOneAndUpdate(
     { _id: chatId, toTroupeId: troupeId },
@@ -61,17 +59,22 @@ batcher.listen(function(key, userIdStrings, done) {
  * @return promise of nothing
  */
 exports.recordItemsAsRead = function(userId, troupeId, items, callback) {
-  assert(userId, 'userId expected');
-  assert(items, 'items expected');
-  if(!items.chat || !items.chat.length) return callback && callback(); // Don't bother with anything other than chats for the moment
+  return Q.fcall(function() {
+    assert(userId, 'userId expected');
+    assert(items, 'items expected');
+    if(!items.chat || !items.chat.length) return callback && callback(); // Don't bother with anything other than chats for the moment
 
-  var fiber = new Fiber();
+    var itemIds = items.chat;
+    return Q.all(itemIds.map(function(id) {
+      var d = Q.defer();
 
-  var itemIds = items.chat;
-  itemIds.forEach(function(id) {
-    batcher.add('chat:' + troupeId + ':' + id, userId, fiber.waitor());
-  });
+      assert(mongoUtils.isLikeObjectId(id));
+      assert(mongoUtils.isLikeObjectId(userId));
+      batcher.add('chat:' + troupeId + ':' + id, userId, d.makeNodeResolver());
 
-  return fiber.all().nodeify(callback);
+      return d.promise;
+    }));
+  })
+  .nodeify(callback);
 
 };

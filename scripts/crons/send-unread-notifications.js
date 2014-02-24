@@ -5,9 +5,19 @@
 
 var notificationGenerator = require('../../server/services/notifications/email-notification-generator-service');
 var shutdown = require('../../server/utils/shutdown');
+var opts = require("nomnom")
+  .option('age', {
+    abbr: 'a',
+    default: 60,
+    required: false,
+    help: 'Age in minutes of the unread items'
+  })
+  .parse();
 
-var an_hour_ago = Date.now() - 60 * 60 * 1000;
-notificationGenerator(an_hour_ago);
 
-// FIXME pls
-setTimeout(shutdown.shutdownGracefully, 30 * 1000);
+var sinceTime = Date.now() - (opts.age * 60 * 1000); //60 * 60 * 1000;
+
+notificationGenerator(sinceTime)
+  .then(function() {
+    shutdown.shutdownGracefully();
+  });
