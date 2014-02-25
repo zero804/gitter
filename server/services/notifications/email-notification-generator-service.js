@@ -159,7 +159,8 @@ function sendEmailNotifications(since) {
                   var unreadCount = b && b.length;
                   return { troupe: t, unreadCount: unreadCount };
                 });
-              count ++;
+
+              count++;
               return emailNotificationService.sendUnreadItemsNotification(user, troupeData)
                 .fail(function(err) {
                   if(err.gitterAction === 'logout_destroy_user_tokens') {
