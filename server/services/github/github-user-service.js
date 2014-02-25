@@ -15,7 +15,7 @@ GitHubUserService.prototype.getUser = function(user) {
   var d = Q.defer();
 
   var ghuser = this.client.user(user);
-  ghuser.info(d.makeNodeResolver());
+  ghuser.info(createClient.makeResolver(d));
 
   return d.promise
     .fail(badCredentialsCheck)

@@ -629,13 +629,15 @@ function TroupeStrategy(options) {
         if(!shownWarning) {
           winston.warn('TroupeStrategy initiated without currentUserId, but generating oneToOne troupes. This can be a problem!');
           shownWarning = true;
+        } else {
+          otherUser = null;
         }
       }
 
 
       if(otherUser) {
         troupeName = otherUser.displayName;
-        troupeUrl = otherUser.username ? "/" + otherUser.username : "/one-one/" + otherUser.id;
+        troupeUrl = "/" + otherUser.username;
       } else {
         winston.verbose("Troupe " + item.id + " appears to contain bad users", { users: item.toObject().users });
         // This should technically never happen......

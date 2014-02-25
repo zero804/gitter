@@ -1,194 +1,21 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var mailerService = require("./mailer-service");
-var nconf = require('../utils/config');
-var assert = require('assert');
-var url = require('url');
-var appEvents = require('../app-events');
-var statsService  = require("./stats-service");
+var mailerService     = require("./mailer-service");
+var nconf             = require('../utils/config');
+var statsService      = require("./stats-service");
+var crypto            = require('crypto');
+var GitHubMeService   = require('./github/github-me-service');
+var winston           = require('../utils/winston');
 
-
-var crypto = require('crypto');
-var passphrase = 'troupetasticprefs';
+var passphrase        = nconf.get('email:unsubscribeNotificationsSecret');
 
 module.exports = {
-  sendNewTroupeForExistingUser: function (user, troupe) {
-    var troupeLink = nconf.get("email:emailBasePath") + "/" + troupe.uri + "#|share";
-
-    mailerService.sendEmail({
-      templateFile: "newtroupe_email",
-      to: user.email,
-      from: 'Troupe <support@troupe.co>',
-      subject: "You created a new Troupe",
-      data: {
-        troupeName: troupe.name,
-        troupeLink: troupeLink,
-        baseServerPath: nconf.get("email:emailBasePath")
-      }
-    });
-  },
-
-  sendRequestAcceptanceToUser: function(user, troupe) {
-    var troupeLink = nconf.get("email:emailBasePath") + "/" + troupe.uri;
-
-    appEvents.userNotification({
-      userId: user.id,
-      troupeId: troupe.id,
-      title: "Request accepted",
-      text: "You've been accepted into a Troupe",
-      link:  "/" + troupe.uri
-    });
-
-    mailerService.sendEmail({
-      templateFile: "requestacceptance",
-      to: user.email,
-      from: 'Troupe <support@troupe.co>',
-      subject: "You've been accepted into a Troupe",
-      data: {
-        troupeName: troupe.name,
-        // note: this is not really a confirm link, just a link to the troupe
-        confirmLink: troupeLink,
-        baseServerPath: nconf.get("email:emailBasePath")
-      }
-    });
-  },
-
-  sendConnectAcceptanceToUser: function(fromUser, toUser, troupeUrl) {
-    var troupeLink = url.resolve(nconf.get("email:emailBasePath"), troupeUrl);
-
-    appEvents.userNotification({
-      userId: fromUser.id,
-      title: "Invite accepted",
-      text: "You are now connected to " + toUser.displayName,
-      link:  troupeUrl
-    });
-
-    mailerService.sendEmail({
-      templateFile: "connectacceptance",
-      to: fromUser.email,
-      from: 'Troupe <support@troupe.co>',
-      subject: "Your invite has been accepted",
-      data: {
-        fromUser: fromUser,
-        toUser: toUser,
-        troupeLink: troupeLink,
-        baseServerPath: nconf.get("email:emailBasePath")
-      }
-    });
-  },
-
-  sendPasswordResetForUser: function (user) {
-    assert(user.passwordResetCode, 'User does not have a password reset code');
-
-    var resetLink = nconf.get("email:emailBasePath") + "/reset/" + user.passwordResetCode;
-
-    mailerService.sendEmail({
-      templateFile: "resetemail",
-      to: user.email,
-      from: 'Troupe <support@troupe.co>',
-      subject: "You requested a password reset",
-      data: {
-        resetLink: resetLink,
-        baseServerPath: nconf.get("email:emailBasePath")
-      }
-    });
-  },
-
-  sendConfirmationForNewUser: function (user) {
-    assert(user.confirmationCode, 'User does not have a confirmation code');
-
-    var confirmLink = nconf.get("email:emailBasePath") + "/confirm/" + user.confirmationCode;
-    mailerService.sendEmail({
-      templateFile: "signupemail",
-      to: user.email,
-      from: 'Troupe <support@troupe.co>',
-      subject: "Welcome to Troupe, please confirm your email address",
-      data: {
-        confirmLink: confirmLink,
-        baseServerPath: nconf.get("email:emailBasePath")
-      }
-    });
-  },
-
-  sendConfirmationForSecondaryEmail: function (unconfirmed) {
-    assert(unconfirmed.confirmationCode, 'No confirmation code found');
-
-    var confirmLink = nconf.get("email:emailBasePath") + "/confirmSecondary/" + unconfirmed.confirmationCode;
-    var to = unconfirmed.email;
-
-    mailerService.sendEmail({
-      templateFile: "add-email-address",
-      to: to,
-      from: 'Troupe <support@troupe.co>',
-      subject: "Confirm new email address",
-      data: {
-        confirmLink: confirmLink,
-        // originalEmail: unconfirmed.email,
-        newEmail: unconfirmed.email,
-        baseServerPath: nconf.get("email:emailBasePath")
-      }
-    });
-  },
-
-  sendInvite: function(troupe, displayName, email, code, senderDisplayName) {
-    assert(email, 'email parameter required');
-    assert(senderDisplayName, 'senderDisplayName parameter required');
-
-    var acceptLink;
-    if(code) {
-      acceptLink = nconf.get("email:emailBasePath") + "/" + troupe.uri + "/accept/" + code;
-    } else {
-      acceptLink = nconf.get("email:emailBasePath") + "/" + troupe.uri;
-    }
-
-    mailerService.sendEmail({
-      templateFile: "inviteemail",
-      from: senderDisplayName + '<support@troupe.co>',
-      to: email,
-      subject: "You've been invited to join the " + troupe.name + " troupe",
-      data: {
-        displayName: displayName,
-        troupeName: troupe.name,
-        acceptLink: acceptLink,
-        senderDisplayName: senderDisplayName,
-        baseServerPath: nconf.get("email:emailBasePath")
-      }
-    });
-  },
-
-
-  sendConnectInvite: function(uri, displayName, email, code, senderDisplayName) {
-    assert(uri, 'uri parameter required');
-    assert(email, 'email parameter required');
-    assert(senderDisplayName, 'senderDisplayName parameter required');
-
-    var acceptLink;
-    if(code) {
-      acceptLink = nconf.get("email:emailBasePath") + uri + "/accept/" + code;
-    } else {
-      acceptLink = nconf.get("email:emailBasePath") + uri + "/accept/";
-    }
-
-    mailerService.sendEmail({
-      templateFile: "invite_connect_email",
-      from: senderDisplayName + '<support@troupe.co>',
-      to: email,
-      subject: senderDisplayName + " has invited you to connect on Troupe",
-      data: {
-        displayName: displayName,
-        acceptLink: acceptLink,
-        senderDisplayName: senderDisplayName,
-        baseServerPath: nconf.get("email:emailBasePath")
-      }
-    });
-  },
-
   sendContactSignupNotification: function(signupUser, toUser) {
     var signupDisplayName = signupUser.displayName;
     var email = toUser.email;
 
-    mailerService.sendEmail({
+    return mailerService.sendEmail({
       templateFile: "contact_signup_notification",
       from: 'Troupe <support@troupe.co>',
       to: email,
@@ -201,24 +28,38 @@ module.exports = {
   },
 
   sendUnreadItemsNotification: function(user, troupesWithUnreadCounts) {
-
     var plaintext = user.id + ',' + 'unread_notifications';
     var cipher    = crypto.createCipher('aes256', passphrase);
     var hash      = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
 
-    statsService.event('unread_notification_sent', {userId: user.id, email: user.email});
+    var ghMe = new GitHubMeService(user);
+    return ghMe.getEmail()
+      .then(function(email) {
+        if(!email) {
+          winston.info('Skipping email notification for ' + user.username + ' as they have no primary confirmed email');
+          return;
+        }
 
-    mailerService.sendEmail({
-      templateFile: "unread_notification",
-      from: 'Troupe <support@troupe.co>',
-      to: user.email,
-      subject: "Activity on Troupe",
-      data: {
-        user: user,
-        emailBasePath: nconf.get("email:emailBasePath"),
-        troupesWithUnreadCounts: troupesWithUnreadCounts,
-        unsubscribeHash: hash
-      }
-    });
+        statsService.event('unread_notification_sent', {userId: user.id, email: email});
+
+        return mailerService.sendEmail({
+          templateFile: "unread_notification",
+          from: 'Gitter Notifications <support@gitter.im>',
+          to: email,
+          subject: "Activity on Gitter",
+          data: {
+            user: user,
+            emailBasePath: nconf.get("email:emailBasePath"),
+            troupesWithUnreadCounts: troupesWithUnreadCounts,
+            unsubscribeHash: hash
+          }
+        });
+      })
+      .fail(function(err) {
+        winston.error('Unable to send unread items notifications: ' + err, { exception: err });
+        throw err;
+      });
+
+
   }
 };

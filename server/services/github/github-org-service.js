@@ -17,7 +17,7 @@ function GitHubOrgService(user) {
 GitHubOrgService.prototype.getOrg = function(org) {
   var ghorg  = this.client.org(org);
   var d = Q.defer();
-  ghorg.info(d.makeNodeResolver());
+  ghorg.info(createClient.makeResolver(d));
 
   return d.promise
     .fail(badCredentialsCheck)
@@ -33,7 +33,7 @@ GitHubOrgService.prototype.getOrg = function(org) {
 GitHubOrgService.prototype.members = function(org) {
   var ghorg  = this.client.org(org);
   var d = Q.defer();
-  ghorg.members(d.makeNodeResolver());
+  ghorg.members(createClient.makeResolver(d));
   return d.promise
     .fail(badCredentialsCheck);
 };
@@ -41,7 +41,7 @@ GitHubOrgService.prototype.members = function(org) {
 GitHubOrgService.prototype.member = function(org, username) {
   var ghorg  = this.client.org(org);
   var d = Q.defer();
-  ghorg.member(username, d.makeNodeResolver());
+  ghorg.member(username, createClient.makeResolver(d));
 
   return d.promise
     .fail(badCredentialsCheck)
@@ -54,7 +54,7 @@ GitHubOrgService.prototype.member = function(org, username) {
 GitHubOrgService.prototype.getRepos = function(org) {
   var ghorg  = this.client.org(org);
   var d = Q.defer();
-  ghorg.repos(d.makeNodeResolver());
+  ghorg.repos(createClient.makeResolver(d));
   return d.promise
     .fail(badCredentialsCheck);
 

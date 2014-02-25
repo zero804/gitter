@@ -82,25 +82,29 @@ define([
     watch:          githubWatchTemplate
   };
 
-  function getExtraRenderData(meta, payload) {
-    var extra = {};
-
-    if (meta.service == 'trello') {
+  var decorators = {
+    trello: function(meta, payload) {
       var trello_actions = {
         updateCard:   'updated',
         createCard:   'created',
         commentCard:  'commented',
         voteOnCard:   'voted',
       };
-      extra.trello_action = trello_actions[payload.action.type];
-    }
-    else if (meta.service == 'sprintly') {
+      return {trello_action: trello_actions[payload.action.type]};
+    },
+    sprintly: function(meta, payload) {
+      var extra = {};
+
       if (payload.model == "Item") {
         extra.sprintly_action = "created";
       } else if (payload.model == "Comment") {
         extra.sprintly_action = "commented on";
       }
-    } else if (meta.service == 'github') {
+      return extra;
+    },
+    github: function(meta, payload) {
+      var extra = {};
+
       if (meta.event == 'push') {
         var commitCount = payload.commits ? payload.commits.length : 0;
 
@@ -117,12 +121,37 @@ define([
         extra.wiki_url = payload.pages[0].html_url;
         extra.wiki_page = payload.pages[0].page_name;
       }
-    } else if (meta.service == 'jenkins') {
-      extra.build_status = payload.build.status ? payload.build.status.toLowerCase() : payload.build.phase.toLowerCase();
-    } else if (meta.service == 'travis') {
+      return extra;
+    },
+    jenkins: function(meta, payload) {
+      var status = payload.build.status ? payload.build.status.toLowerCase() : payload.build.phase.toLowerCase();
+      return { build_status: status };
+    },
+    travis: function(meta, payload) {
+      var extra = {};
       var status = payload.status_message ? payload.status_message.toLowerCase() : '';
       extra.build_status = (status === 'still failing') ? 'failing' : status;
+      return extra;
+    },
+    huboard: function(meta) {
+      var extra = {};
+      var column = meta.column;
+      var previousColumn = meta.previousColumn;
+
+      if(meta.milestone) {
+        extra.context = 'to '+meta.milestone;
+      } else if(meta.status) {
+        extra.context = 'to '+meta.status;
+      } else if(column) {
+        extra.context = previousColumn ? 'from '+previousColumn+' to '+column : 'in '+column;
+      }
+      return extra;
     }
+  };
+
+  function getExtraRenderData(meta, payload) {
+    var decorator = decorators[meta.service];
+    var extra = decorator ? decorator(meta, payload) : {};
 
     // Support branch names with slashes, ie: develop/feature/123-foo
     if (payload.ref) {

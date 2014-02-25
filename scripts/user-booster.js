@@ -8,7 +8,7 @@ var GitHubMeService = require('../server/services/github/github-me-service');
 var Q = require('q');
 var mcapi = require('mailchimp-api');
 var mc = new mcapi.Mailchimp('a93299794ab67205168e351adb03448e-us3');
-var github = require('troupe-octonode');
+var github = require('octonode');
 
 var opts = require("nomnom")
   .option('username', {
@@ -130,7 +130,7 @@ function boostMany(count) {
     .then(function(users) {
       console.log('Boosting ' + users.map(function(f) { return f.username; }).join(', '));
 
-      return Q.all(users.map(function(user) { 
+      return Q.all(users.map(function(user) {
         return boost(user.username)
             .then(function() {
               console.log('Boosted ' + user.username);

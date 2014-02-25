@@ -1,37 +1,63 @@
-<span class="heading" style="color: #404040;display: block;font-family: lucida grande, Geneva, Helvetica, Arial, Sans-serif;font-size: 24px;font-weight: bold;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0;">
-          You have unread messages on Troupe
-        </span>
-        <br>
-        <span class="body" style="color: #404040;display: block;font-family: lucida grande, Geneva, Helvetica, Arial, Sans-serif;font-size: 18px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0;">
-          <br><br><br><br>
-        </span>
+ <h1 style="margin: 0;padding: 0;display: block;font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif;font-size: 32px;font-style: normal;font-weight: bold; margin: 0 60px; line-height: 125%;letter-spacing: -1px;text-align: left;color: #172f35 !important;">You have unread messages</h1><br><br>
       </td>
     </tr>
   </table>
 
 <table width="100%" cellpadding="0" cellspacing="0" class="beige-strip" style="background-color: transparent;">
-<tr>
-<td align="center">
-  <table width="680">
-    {{#each troupesWithUnreadCounts}}
-      <tr>
-        <td align="center">
-          <p style="color: #404040;display: block;font-family: lucida grande, Geneva, Helvetica, Arial, Sans-serif;font-size: 18px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0; margin-bottom: 8px;">{{troupe.name}}</p>
-          <p style="color: #404040;display: block;font-family: lucida grande, Geneva, Helvetica, Arial, Sans-serif;font-size: 13px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0; margin-bottom: 4px;">{{__n "%d unread message" "%d unread messages" unreadCount}}</p>
-          <p style="color: #404040;display: block;font-family: lucida grande, Geneva, Helvetica, Arial, Sans-serif;font-size: 15px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0;"><a href="{{../emailBasePath}}{{troupe.url}}#utm_source=troupe&utm_medium=email&utm_campaign=unread-notifications" style="color: #1dce73">Read now</a></p>
-          <br/>
-        </td>
-      </tr>
-    {{/each}}
-  </table>
-</td>
-</tr>
-<tr>
-  <td align="center">
-    <p style="color: #AAAAAA; display: block;font-family: lucida grande, Geneva, Helvetica, Arial, Sans-serif;font-size: 10px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0;">
-      Don't want to receive any more unread message notifications? <a href='{{emailBasePath}}/settings/unsubscribe/{{unsubscribeHash}}'>Unsubscribe</a>
-    </p>
-  </td>
-</tr>
+  <tr>
+    <td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: white; padding-bottom: 20px">
+        {{#each troupesWithUnreadCounts}}
+          <tr>
+            <td align="left" style="padding: 0 60px">
+              <table width="100%">
+                <tr>
+                  <td>
+                    <p style="color: #404040;display: block;font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif;font-size: 18px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0; margin-bottom: 8px;">{{#if troupe.oneToOne}}{{troupe.name}}{{else}}{{troupe.uri}}{{/if}}</p>
+                    <p style="color: #404040;display: block;font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif;font-size: 13px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0; margin-bottom: 4px;">{{__n "%d unread message" "%d unread messages" unreadCount}}</p>
+                    <p style="color: #404040;display: block;font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif;font-size: 15px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0;">
+                  </td>
+                  <td width="200" align="right">
+                    <table>
+                      <tr>
+                        <td style="background-color: #1DCE73; padding: 6px 10px; border-radius: 5px">
+                          <a href="{{../emailBasePath}}{{troupe.url}}#utm_source=notification&utm_medium=email&utm_campaign=unread-notifications" style="color: white; text-decoration: none; font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif">Read now</a>
+                        </td>
+                      </tr>
+                    </table>
+                    </p>
+                    <br/>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        {{/each}}
+      </table>
+    </td>
+  </tr>
 </table>
+<table width="100%" cellpadding="0" cellspacing="0" class="green-strip" style="background-color: #F2F2F2;">
+  <tr>
+    <td align="center">
+      <table width="600" style="background-color: #162e34; padding: 0 60px;color: white; padding-top: 20px">
+        <tr>
+            <td><br>
+              <p style="color: white;display: block;font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif;font-size: 13px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0;">
+              Don't want to receive any more unread message notifications?<br>
+              <table>
+                <tr>
+                  <td style="background-color: white; padding: 6px 10px; border-radius: 5px">
+                    <a href="{{emailBasePath}}/settings/unsubscribe/{{unsubscribeHash}}" style="color: #162e34; text-decoration: none; font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif">Unsubscribe</a>
+                  </td>
+                </tr>
+              </table>
+              </p>
+            </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
 
