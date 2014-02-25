@@ -23,7 +23,7 @@ var thrice = times(3);
 var unreadItemServiceMock = mockito.spy(underlyingUnreadItemService);
 unreadItemServiceMock.install();
 
-mockito.when(unreadItemServiceMock).markUserAsEmailNotified().thenReturn();
+mockito.when(unreadItemServiceMock).markUserAsEmailNotified().thenReturn(Q.resolve());
 
 var fixture = {};
 
@@ -51,6 +51,8 @@ describe('email-notification-generator-service', function() {
         assert.equal(troupeWithCounts.length, 1);
         assert.equal(troupeWithCounts[0].troupe.id, fixture.troupe1.id);
       }
+
+      return Q.resolve();
     });
 
     Q.all([
@@ -78,6 +80,7 @@ describe('email-notification-generator-service', function() {
 
     mockito.when(emailNotificationServiceMock).sendUnreadItemsNotification().then(function(user, troupeWithCounts) {
       assert(user.id !== fixture.user2.id);
+      return Q.resolve();
     });
 
     Q.all([
@@ -103,6 +106,7 @@ describe('email-notification-generator-service', function() {
 
     mockito.when(emailNotificationServiceMock).sendUnreadItemsNotification().then(function(user, troupeWithCounts) {
       assert(user.id !== fixture.user2.id);
+      return Q.resolve();
     });
 
     underlyingUnreadItemService.markUserAsEmailNotified(fixture.user2.id)
@@ -139,6 +143,8 @@ describe('email-notification-generator-service', function() {
         assert.equal(troupeWithCounts.length, 1);
         assert.equal(troupeWithCounts[0].troupe.id, fixture.troupe1.id);
       }
+
+      return Q.resolve();
     });
 
     Q.all([
