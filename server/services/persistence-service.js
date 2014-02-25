@@ -115,7 +115,7 @@ var UserSchema = new Schema({
   permissions: {
     createRoom: { type: Boolean, 'default': true }
   },
-  githubScopes: {type: Schema.Types.Mixed },
+  githubScopes: { type: Schema.Types.Mixed },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 
@@ -200,6 +200,14 @@ UserSchema.methods.getGitHubToken = function(scope) {
 
   return this.githubToken || this.githubUserToken;
 };
+
+
+UserSchema.methods.destroyTokens = function() {
+  this.githubToken = null;
+  this.githubScopes = { };
+  this.githubUserToken = null;
+};
+
 
 UserSchema.methods.getDisplayName = function() {
   return this.displayName || this.username || this.email && this.email.split('@')[0] || "Unknown";
