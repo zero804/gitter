@@ -20,7 +20,6 @@ function renderHomePage(req, res, next) {
 
     var page, bootScriptName;
 
-    var user = req.user;
     if(req.isPhone) {
       page = 'mobile/mobile-app';
       bootScriptName = 'mobile-userhome';
@@ -32,7 +31,7 @@ function renderHomePage(req, res, next) {
     res.render(page, {
       useAppCache: !!nconf.get('web:useAppCache'),
       bootScriptName: bootScriptName,
-      troupeName: (user && user.username) || '',
+      troupeName: req.uriContext.uri,
       troupeContext: troupeContext,
       agent: req.headers['user-agent'],
       isUserhome: true
@@ -50,13 +49,11 @@ function renderMainFrame(req, res, next, frame) {
       } else {
         chatAppLocation = '/' + req.uriContext.uri + '/-/' + frame;
       }
-      var troupe = req.uriContext.troupe;
-      var otherUser = req.uriContext.otherUser;
 
       res.render('app-template', {
         appCache: getAppCache(req),
         bootScriptName: 'router-app',
-        troupeName: troupe.oneToOne ? otherUser.username : troupe.uri,
+        troupeName: req.uriContext.uri,
         troupeContext: troupeContext,
         chatAppLocation: chatAppLocation,
         agent: req.headers['user-agent']
@@ -67,7 +64,6 @@ function renderMainFrame(req, res, next, frame) {
 
 function renderChatPage(req, res, next) {
   var troupe = req.uriContext.troupe;
-  var otherUser = req.uriContext.otherUser;
 
   Q.all([
     contextGenerator.generateTroupeContext(req),
@@ -76,7 +72,7 @@ function renderChatPage(req, res, next) {
       res.render('chat-template', {
         appCache: getAppCache(req),
         bootScriptName: 'router-chat',
-        troupeName: troupe.oneToOne ? otherUser.username : troupe.uri,
+        troupeName: req.uriContext.uri,
         troupeTopic: troupeContext.troupe.topic,
         troupeFavourite: troupeContext.troupe.favourite,
         user: troupeContext.user,
@@ -92,12 +88,11 @@ function renderChatPage(req, res, next) {
 function renderMobileUserHome(req, res, next) {
   contextGenerator.generateMiniContext(req, function(err, troupeContext) {
     if(err) return next(err);
-    var user = req.user;
 
     res.render('mobile/mobile-app', {
       useAppCache: !!nconf.get('web:useAppCache'),
       bootScriptName: 'mobile-userhome',
-      troupeName: (user && user.username) || '',
+      troupeName: req.uriContext.uri,
       troupeContext: troupeContext,
       agent: req.headers['user-agent'],
       isUserhome: true
@@ -107,7 +102,6 @@ function renderMobileUserHome(req, res, next) {
 
 function renderMobileChat(req, res, next) {
   var troupe = req.uriContext.troupe;
-  var otherUser = req.uriContext.otherUser;
 
   Q.all([
     contextGenerator.generateTroupeContext(req),
@@ -116,7 +110,7 @@ function renderMobileChat(req, res, next) {
       res.render('mobile/mobile-app', {
         appCache: getAppCache(req),
         bootScriptName: 'mobile-app',
-        troupeName: troupe.oneToOne ? otherUser.username : troupe.uri,
+        troupeName: req.uriContext.uri,
         troupeTopic: troupeContext.troupe.topic,
         troupeFavourite: troupeContext.troupe.favourite,
         user: troupeContext.user,
