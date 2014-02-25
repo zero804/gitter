@@ -20,7 +20,7 @@ function GitHubRepoService(user) {
  GitHubRepoService.prototype.getRepo = function(repo) {
   var ghrepo = this.client.repo(repo);
   var d = Q.defer();
-  ghrepo.info(d.makeNodeResolver());
+  ghrepo.info(createClient.makeResolver(d));
   return d.promise
     .fail(badCredentialsCheck)
     .fail(function(err) {
@@ -35,7 +35,7 @@ function GitHubRepoService(user) {
  GitHubRepoService.prototype.getContributors = function(repo) {
   var ghrepo = this.client.repo(repo);
   var d = Q.defer();
-  ghrepo.contributors(d.makeNodeResolver());
+  ghrepo.contributors(createClient.makeResolver(d));
   return d.promise
     .fail(badCredentialsCheck)
     .fail(function(err) {
@@ -80,7 +80,7 @@ GitHubRepoService.prototype.getStarredRepos = function() {
   var d = Q.defer();
 
   var ghme = this.client.me();
-  ghme.starred(d.makeNodeResolver());
+  ghme.starred(createClient.makeResolver(d));
 
   return d.promise
     .fail(badCredentialsCheck);
@@ -91,7 +91,7 @@ GitHubRepoService.prototype.getWatchedRepos = function() {
   var d = Q.defer();
 
   var ghme = this.client.me();
-  ghme.watched(d.makeNodeResolver());
+  ghme.watched(createClient.makeResolver(d));
 
   return d.promise
     .fail(badCredentialsCheck);
@@ -101,7 +101,7 @@ GitHubRepoService.prototype.getRepos = function() {
   var d = Q.defer();
 
   var ghme = this.client.me();
-  ghme.repos(d.makeNodeResolver());
+  ghme.repos(createClient.makeResolver(d));
 
   return d.promise
     .fail(badCredentialsCheck);

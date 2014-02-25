@@ -409,7 +409,7 @@ describe('mentions', function() {
 
 });
 
-describe.skip('emailnotifications', function() {
+describe('emailnotifications', function() {
   it('should let you know who needs to be notified by email', function(done) {
     var troupeId = mongoUtils.getNewObjectIdString();
     var userId = mongoUtils.getNewObjectIdString();
@@ -424,7 +424,12 @@ describe.skip('emailnotifications', function() {
       './troupe-service': troupeServiceMock
     });
 
-    mockito.when(troupeServiceMock).findUserIdsForTroupe(troupeId).thenReturn(Q.resolve([userId]));
+    var userHash = {
+    };
+    userHash[userId] = false;
+    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve({
+      users: userHash
+    }));
 
     return Q.all([
         unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId1),
@@ -459,7 +464,13 @@ describe.skip('emailnotifications', function() {
       './troupe-service': troupeServiceMock
     });
 
-    mockito.when(troupeServiceMock).findUserIdsForTroupe(troupeId).thenReturn(Q.resolve([userId]));
+    var userHash = {
+    };
+    userHash[userId] = false;
+    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve({
+      users: userHash
+    }));
+
 
     return Q.all([
         unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId1),
