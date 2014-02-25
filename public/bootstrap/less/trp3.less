@@ -1468,10 +1468,20 @@ i.favourited:hover:before {
     box-sizing: border-box;
     padding-right: 10px;
 
-    .trpRepoMeta {
-      border-top: 1px solid fade(@trpGrey, 30%);
-      margin-top: 8px;
-      padding: 8px 0;
+    & li {
+      width: 100%;
+      padding: 2px 0 2px 20px;
+      overflow-x: hidden;
+      font-size: 14px;
+      text-overflow: ellipsis;
+      list-style: none;
+    } 
+
+    .vcard-stats {
+      border-top: 1px solid fade(@trpGrey, 20%);
+      border-bottom: 1px solid fade(@trpGrey, 20%);
+      padding: 4px 0;
+      margin: 8px 0;
     }
 
     .trpTroupeInfoBadge {
