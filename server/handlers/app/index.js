@@ -13,12 +13,15 @@ module.exports = {
         appMiddleware.uriContextResolverMiddleware,
         appMiddleware.isPhoneMiddleware,
         function(req, res, next) {
+
           if (req.uriContext.ownUrl) {
             if(req.isPhone) {
               appRender.renderMobileUserHome(req, res, next, 'home');
             } else {
               appRender.renderMainFrame(req, res, next, 'home');
             }
+
+            return;
           }
 
           if(req.isPhone) {
