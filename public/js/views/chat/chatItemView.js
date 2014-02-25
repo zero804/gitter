@@ -115,6 +115,12 @@ define([
       // Will only use the text when a value hasn't been returned from the server
       var html = this.model.get('html') || _.escape(this.model.get('text'));
 
+      // Handle empty messages as deleted
+      if (html.length === 0) {
+        html = '[deleted]';
+        this.$el.addClass('deleted');
+      }
+
       this.$el.find('.trpChatText').html(html);
 
       _.each(this.decorators, function(decorator) {
