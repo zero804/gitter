@@ -102,6 +102,12 @@ define([
       }
       return extra;
     },
+    bitbucket: function(meta) {
+      return {
+        first_commit: meta.commits[0],
+        multiple_commits: meta.commits.length > 1
+      };
+    },
     github: function(meta, payload) {
       var extra = {};
 
