@@ -13,7 +13,7 @@ var _          = require('underscore');
 var syncHandlebars = require('handlebars');
 var widgetHelpers = require('./widget-prerenderers');
 
-var chatWrapper = syncHandlebars.compile('<div class="trpChatItemContainer model-id-{{id}} {{unreadClass}}">{{{inner}}}</div>');
+var chatWrapper = syncHandlebars.compile('<div class="trpChatItemContainer model-id-{{id}} {{unreadClass}} {{deletedClass}}">{{{inner}}}</div>');
 
 var baseDir = path.normalize(__dirname + '/../../' + nconf.get('web:staticContent'));
 
@@ -58,6 +58,7 @@ module.exports = exports = function(model) {
 
   var displayName;
   var username;
+  var deletedClass;
 
   //data.readByText = this.getReadByText(data.readBy);
   //
@@ -65,6 +66,12 @@ module.exports = exports = function(model) {
   var meta = model.meta;
   var text = model.text;
   var html = model.html || model.text;
+
+  // Handle empty messages as deleted
+  if (html.length === 0) {
+    html = '[deleted]';
+    deletedClass = 'deleted';
+  }
 
   if(meta && meta.type === 'webhook') {
     var overrides = {};
@@ -99,6 +106,7 @@ module.exports = exports = function(model) {
   return chatWrapper({
     id: model.id,
     unreadClass: unreadClass,
+    deletedClass: deletedClass,
     inner: result
   });
 };
