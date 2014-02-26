@@ -4,7 +4,7 @@ Hi there,
 This is what you missed while you were away.
 
 {{#each troupesWithUnreadCounts}}
-{{troupe.name}}: {{__n "%d unread message" "%d unread messagess" unreadCount}}
+{{#if troupe.oneToOne}}{{troupe.name}}{{else}}{{troupe.uri}}{{/if}}: {{__n "%d unread message" "%d unread messages" unreadCount}}
 {{../emailBasePath}}{{troupe.url}}
 {{/each}}
 

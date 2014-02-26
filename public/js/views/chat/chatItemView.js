@@ -8,13 +8,14 @@ define([
   'views/widgets/avatar',
   'marionette',
   'views/base',
+  'views/popover',
   'hbs!./tmpl/chatViewItem',
   'views/chat/chatInputView',
   'views/unread-item-view-mixin',
   'cocktail',
   'bootstrap_tooltip', // No ref
   'bootstrap-popover' // No ref
-], function($, _, context, chatModels, AvatarView, Marionette, TroupeViews,
+], function($, _, context, chatModels, AvatarView, Marionette, TroupeViews, Popover,
   chatItemTemplate, chatInputView, UnreadItemViewMixin, cocktail /* tooltip, popover*/) {
 
   "use strict";
@@ -34,10 +35,11 @@ define([
     isEditing: false,
 
     events: {
-      'click .trpChatEdit':     'toggleEdit',
-      'keydown textarea':       'detectEscape',
-      'click .trpChatReadBy':   'showReadBy',
-      'click .webhook': 'expandActivity'
+      'click .trpChatEdit':       'toggleEdit',
+      'keydown textarea':         'detectEscape',
+      'click .trpChatReadBy':     'showReadBy',
+      'mouseover .trpChatReadBy': 'showReadByIntent',
+      'click .webhook':           'expandActivity'
     },
 
     expandActivity: function() {
@@ -112,6 +114,12 @@ define([
 
       // Will only use the text when a value hasn't been returned from the server
       var html = this.model.get('html') || _.escape(this.model.get('text'));
+
+      // Handle empty messages as deleted
+      if (html.length === 0) {
+        html = '[deleted]';
+        this.$el.addClass('deleted');
+      }
 
       this.$el.find('.trpChatText').html(html);
 
@@ -291,29 +299,31 @@ define([
       this.listenTo(this.inputBox, 'save', this.saveChat);
     },
 
-    showReadBy: function(event) {
+    showReadByIntent: function(e) {
+      ReadByPopover.hoverTimeout(e, function() {
+        this.showReadBy(e);
+      }, this);
+    },
+
+    showReadBy: function(e) {
       if (this.compactView) return;
 
-      if(this.readBy) return;
-      event.preventDefault();
+      if(this.popover) return;
+      e.preventDefault();
 
-      this.readBy = new ReadByPopover({
+      var popover = new ReadByPopover({
         model: this.model,
         userCollection: this.userCollection,
-        placement: 'bottom',
+        scroller: this.$el.parents('.primary-scroll'),
+        placement: 'vertical',
         minHeight: '88px',
         width: '300px',
         title: 'Read By',
-        targetElement: event.target
+        targetElement: e.target
       });
 
-      var s = this;
-      this.readBy.once('hide', function() {
-        s.readBy = null;
-      });
-
-      this.readBy.show();
-
+      popover.show();
+      ReadByPopover.singleton(this, popover);
     }
 
   });
@@ -333,9 +343,9 @@ define([
   });
   cocktail.mixin(ReadByView, TroupeViews.LoadingCollectionMixin);
 
-  var ReadByPopover = TroupeViews.Popover.extend({
+  var ReadByPopover = Popover.extend({
     initialize: function(options) {
-      TroupeViews.Popover.prototype.initialize.apply(this, arguments);
+      Popover.prototype.initialize.apply(this, arguments);
       this.view = new ReadByView({ model: this.model, userCollection: options.userCollection });
     }
   });

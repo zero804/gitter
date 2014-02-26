@@ -115,7 +115,7 @@ var UserSchema = new Schema({
   permissions: {
     createRoom: { type: Boolean, 'default': true }
   },
-  githubScopes: {type: Schema.Types.Mixed },
+  githubScopes: { type: Schema.Types.Mixed },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 
@@ -200,6 +200,14 @@ UserSchema.methods.getGitHubToken = function(scope) {
 
   return this.githubToken || this.githubUserToken;
 };
+
+
+UserSchema.methods.destroyTokens = function() {
+  this.githubToken = null;
+  this.githubScopes = { };
+  this.githubUserToken = null;
+};
+
 
 UserSchema.methods.getDisplayName = function() {
   return this.displayName || this.username || this.email && this.email.split('@')[0] || "Unknown";
@@ -471,6 +479,7 @@ TroupeRemovedUserSchema.index({ userId: 1 });
 TroupeRemovedUserSchema.schemaTypeName = 'TroupeRemovedUserSchema';
 
 var UserTroupeSettingsSchema = require('./persistence/user-troupe-settings-schema.js');
+var UserSettingsSchema = require('./persistence/user-settings-schema.js');
 
 //
 // An invitation to a person to join a Troupe
@@ -801,6 +810,7 @@ var Troupe = mongoose.model('Troupe', TroupeSchema);
 var TroupeUser = mongoose.model('TroupeUser', TroupeUserSchema);
 var TroupeRemovedUser = mongoose.model('TroupeRemovedUser', TroupeRemovedUserSchema);
 var UserTroupeSettings = mongoose.model('UserTroupeSettings', UserTroupeSettingsSchema);
+var UserSettings = mongoose.model('UserSettings', UserSettingsSchema);
 var Email = mongoose.model('Email', EmailSchema);
 var EmailAttachment = mongoose.model('EmailAttachment', EmailAttachmentSchema);
 var Conversation = mongoose.model('Conversation', ConversationSchema);
@@ -852,6 +862,7 @@ module.exports = {
     TroupeUserSchema: TroupeUserSchema,
     TroupeRemovedUserSchema: TroupeRemovedUserSchema,
     UserTroupeSettingsSchema: UserTroupeSettingsSchema,
+    UserSettingsSchema: UserSettingsSchema,
     EmailSchema: EmailSchema,
     EmailAttachmentSchema: EmailAttachmentSchema,
     ConversationSchema: ConversationSchema,
@@ -878,6 +889,7 @@ module.exports = {
   TroupeUser: TroupeUser,
   TroupeRemovedUser: TroupeRemovedUser,
   UserTroupeSettings: UserTroupeSettings,
+  UserSettings: UserSettings,
 	Email: Email,
   EmailAttachment: EmailAttachment,
   Conversation: Conversation,

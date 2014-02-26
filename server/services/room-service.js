@@ -17,13 +17,15 @@ var request            = require('request');
 var GitHubRepoService  = require('./github/github-repo-service');
 var unreadItemService  = require('./unread-item-service');
 var _                  = require('underscore');
+var appEvents          = require("../app-events");
 var xregexp            = require('xregexp').XRegExp;
 var serializeEvent     = require('./persistence-service-events').serializeEvent;
+
 
 var redis = require('../utils/redis');
 var redisClient = redis.createClient();
 
-function localUriLookup(uri) {
+function localUriLookup(uri, opts) {
   return uriLookupService.lookupUri(uri)
     .then(function(uriLookup) {
       if(!uriLookup) return null;
@@ -34,7 +36,7 @@ function localUriLookup(uri) {
             if(!user) return uriLookupService.removeBadUri(uri)
                                 .thenResolve(null);
 
-            if(user.username != uri && user.username.toLowerCase() === uri.toLowerCase()) throw { redirect: '/' + user.username };
+            if(!opts.ignoreCase && user.username != uri && user.username.toLowerCase() === uri.toLowerCase()) throw { redirect: '/' + user.username };
 
             return { user: user };
           });
@@ -46,7 +48,8 @@ function localUriLookup(uri) {
             if(!troupe) return uriLookupService.removeBadUri(uri)
                                 .thenResolve(null);
 
-            if(troupe.uri != uri && troupe.uri.toLowerCase() === uri.toLowerCase()) throw { redirect: '/' + troupe.uri };
+            if(!opts.ignoreCase && troupe.uri != uri && troupe.uri.toLowerCase() === uri.toLowerCase()) throw { redirect: '/' + troupe.uri };
+
             return { troupe: troupe };
           });
       }
@@ -208,8 +211,7 @@ function ensureAccessControl(user, troupe, access) {
       troupe.addUserById(user.id);
 
       // IRC
-      var msg_data = {user: user, room: troupe};
-      redisClient.publish('user_joined', JSON.stringify(msg_data));
+      appEvents.userJoined({user: user, room: troupe});
 
       return troupe.saveQ().thenResolve(troupe);
 
@@ -220,8 +222,7 @@ function ensureAccessControl(user, troupe, access) {
       troupe.removeUserById(user.id);
 
       // IRC
-      var msg_data = {user: user, room: troupe};
-      redisClient.publish('user_left', JSON.stringify(msg_data));
+      appEvents.userLeft({user: user, room: troupe});
 
       return troupe.saveQ().thenResolve(null);
     }
@@ -251,12 +252,13 @@ exports.findAllRoomsIdsForUserIncludingMentions = findAllRoomsIdsForUserIncludin
  *
  * @return The promise of a troupe or nothing.
  */
-function findOrCreateRoom(user, uri) {
+function findOrCreateRoom(user, uri, opts) {
   assert(uri, 'uri required');
   var userId = user.id;
+  opts = opts || {};
 
   /* First off, try use local data to figure out what this url is for */
-  return localUriLookup(uri)
+  return localUriLookup(uri, opts)
     .then(function(uriLookup) {
       winston.verbose('URI Lookup returned ', { uri: uri, isUser: !!(uriLookup && uriLookup.user), isTroupe: !!(uriLookup && uriLookup.troupe) });
 

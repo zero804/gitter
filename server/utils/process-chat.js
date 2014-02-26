@@ -6,15 +6,43 @@ var highlight = require('highlight.js');
 var _         = require('underscore');
 var util      = require('util');
 
-var options = { gfm: true, tables: true, sanitize: true, breaks: true, linkify: true };
+var options = { gfm: true, tables: true, sanitize: true, breaks: true, linkify: true, skipComments: true };
 
 var lexer = new marked.Lexer(options);
+
+var JAVA =  'java';
+var SCRIPT = 'script:';
+var scriptUrl = JAVA + SCRIPT;
+var dataUrl = 'data:';
+var httpUrl = 'http://';
+var httpsUrl = 'https://';
+var noProtocolUrl = '//';
+
+highlight.configure({classPrefix: ''});
 
 module.exports = exports = function processChat(text) {
   var urls      = [];
   var mentions  = [];
   var issues    = [];
   var paragraphCount = 0;
+
+  function checkForIllegalUrl(href) {
+    if(!href) return "";
+
+    href = href.trim();
+    var hrefLower = href.toLowerCase();
+
+    if(hrefLower.indexOf(scriptUrl) === 0 || hrefLower.indexOf(dataUrl) === 0) {
+      /* Rickroll the script kiddies */
+      return "http://goo.gl/a7HIYr";
+    }
+
+    if(hrefLower.indexOf(httpUrl) !== 0 && hrefLower.indexOf(httpsUrl) !== 0 && hrefLower.indexOf(noProtocolUrl) !== 0)  {
+      return httpUrl + href;
+    }
+
+    return href;
+  }
 
   var renderer = new marked.Renderer();
 
@@ -35,7 +63,7 @@ module.exports = exports = function processChat(text) {
       repo: repo ? repo : undefined
     });
 
-    var out = '<a href="#" data-link-type="issue" data-issue="' + issue + '"';
+    var out = '<a data-link-type="issue" data-issue="' + issue + '"';
     if(repo) {
       out += util.format(' data-issue-repo="%s"', repo);
     }
@@ -44,11 +72,13 @@ module.exports = exports = function processChat(text) {
   };
 
   renderer.link = function(href, title, text) {
+    href = checkForIllegalUrl(href);
     urls.push({ url: href });
     return util.format('<a href="%s" rel="nofollow" target="_new" class="link">%s</a>', href, text);
   };
 
   renderer.image = function(href, title, text) {
+    href = checkForIllegalUrl(href);
     urls.push({ url: href });
     return util.format('<img src="%s" alt="%s" rel="nofollow">', href, text);
 
@@ -61,6 +91,8 @@ module.exports = exports = function processChat(text) {
   };
 
   renderer.email = function(href, title, text) {
+    checkForIllegalUrl(href);
+
     urls.push({ url: href });
     return util.format('<a href="%s" rel="nofollow">%s</a>', href, text);
   };

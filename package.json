@@ -45,7 +45,6 @@
     "csv-stream": "0.1.3",
     "express-winston": "~0.2.1",
     "apn": "~1.4.3",
-    "kue": "git://github.com/suprememoocow/kue.git",
     "file": "0.2.1",
     "cube": "~0.2.12",
     "nomnom": "~1.6.2",
@@ -76,7 +75,7 @@
     "i18n": "~0.4.1",
     "restler-q": "0.0.3",
     "debug": "~0.7.4",
-    "troupe-octonode": "0.3.12",
+    "octonode": "git://github.com/pksunkara/octonode#19ad516f5d7f2cbb49c7aaef218aae325a425f80",
     "jwt-simple": "~0.1.0",
     "snappy-cache": "0.0.4",
     "mailchimp-api": "~2.0.4",
@@ -86,9 +85,8 @@
     "async": "~0.2.9",
     "troupe-passport-github": "git://github.com/troupe/passport-github.git#v0.1.8d",
     "text-filter": "~0.1.0",
-    "marked": "git://github.com/gitterHQ/marked.git#ae5b3de555bdaf87f1e812c7fda9337c9c468128",
-    "highlight.js": "~7.5.0",
-    "xregexp": "~2.0.0"
+    "marked": "git://github.com/gitterHQ/marked.git#v0.3.0",
+    "highlight.js": "~8.0.0"
   },
   "devDependencies": {
     "proxyquire": "0.4.0",

@@ -13,11 +13,12 @@ define([
   'collections/instances/integrated-items',
   'utils/emoji',
   'components/drafty',
+  'utils/cdn',
   './commands',
   'jquery-textcomplete', // No ref
   'utils/sisyphus-cleaner' // No ref
 ], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate,
-  emojiListItemTemplate, moment, hasScrollBars, itemCollections, emoji, drafty, commands) {
+  emojiListItemTemplate, moment, hasScrollBars, itemCollections, emoji, drafty, cdn, commands) {
   "use strict";
 
   /** @const */
@@ -31,6 +32,18 @@ define([
   /** @const */
   var EDIT_WINDOW = 240000;
 
+  /** @const */
+  var UP_ARROW = 38;
+
+  /** @const */
+  var ENTER = 13;
+
+  /** @const */
+  var PAGE_UP = 33;
+
+  /** @const */
+  var PAGE_DOWN = 34;
+
   var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];
 
   var ChatInputView = TroupeViews.Base.extend({
@@ -39,6 +52,11 @@ define([
     initialize: function(options) {
       this.rollers = options.rollers;
       this.chatCollectionView = options.chatCollectionView;
+      this.listenTo(appEvents, 'input.append', function(text, options) {
+        if(this.inputBox) {
+          this.inputBox.append(text, options);
+        }
+      });
     },
 
     getRenderData: function() {
@@ -52,7 +70,8 @@ define([
 
       var inputBox = new ChatInputBoxView({
         el: this.$el.find('.trpChatInputBoxTextArea'),
-        rollers: this.rollers
+        rollers: this.rollers,
+        chatCollectionView: this.chatCollectionView
       });
       this.inputBox = inputBox;
 
@@ -91,13 +110,20 @@ define([
             match: /(^|\s)@(\w*)$/,
             maxCount: 8,
             search: function(term, callback) {
-                var loggedInUsername = context.user().get('username');
-                var matches = itemCollections.users.models.filter(function(user) {
-                  var username = user.get('username');
-                  var displayName = (user.get('displayName') || '').toLowerCase();
-                  return username != loggedInUsername && (username.indexOf(term) === 0 || displayName.indexOf(term) === 0);
-                });
-                callback(matches);
+              var lowerTerm = term.toLowerCase();
+              var loggedInUsername = context.user().get('username').toLowerCase();
+
+              var matches = itemCollections.users.models.filter(function(user) {
+                var username = user.get('username').toLowerCase();
+
+                if(username === loggedInUsername) return false;
+
+                var displayName = (user.get('displayName') || '').toLowerCase();
+
+                return (username.indexOf(lowerTerm) === 0 || displayName.indexOf(lowerTerm) === 0);
+              });
+
+              callback(matches);
             },
             template: function(user) {
               return listItemTemplate({
@@ -122,7 +148,8 @@ define([
             },
             template: function(emoji) {
               return emojiListItemTemplate({
-                emoji: emoji
+                emoji: emoji,
+                emojiUrl: cdn('images/2/gitter/emoji/' + emoji + '.png')
               });
             },
             replace: function (value) {
@@ -317,6 +344,8 @@ define([
 
       this.drafty = drafty(this.el);
       chatResizer.resetInput(true);
+
+      this.chatCollectionView = options.chatCollectionView;
     },
 
     onFocusOut: function() {
@@ -330,18 +359,22 @@ define([
     },
 
     onKeyDown: function(e) {
-      if(e.keyCode === 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/)) && !this.isTypeaheadShowing()) {
+      if(e.keyCode === ENTER && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/)) && !this.isTypeaheadShowing()) {
         e.stopPropagation();
         e.preventDefault();
 
         this.processInput();
 
         return false;
-      } else if(e.keyCode === 38 && !e.ctrlKey && !e.shiftKey) {
+      } else if(e.keyCode === UP_ARROW && !e.ctrlKey && !e.shiftKey) {
         /* Up key */
         if(!this.$el.val()) {
           this.trigger('editLast');
         }
+      } else if(e.keyCode === PAGE_UP && !e.ctrlKey && !e.shiftKey) {
+        this.chatCollectionView.pageUp();
+      } else if(e.keyCode === PAGE_DOWN && !e.ctrlKey && !e.shiftKey) {
+        this.chatCollectionView.pageDown();
       }
     },
 
@@ -364,6 +397,25 @@ define([
       this.el.value = '';
       this.drafty.reset();
       this.chatResizer.resetInput();
+    },
+
+    append: function(text, options) {
+      var current = this.$el.val();
+      var start = current.length;
+      if(!current || current.match(/\s+$/)) {
+        current = current + text;
+      } else {
+        if(options && options.newLine) {
+          start++;
+          current = current + '\n' + text;
+        } else {
+          current = current + ' ' + text;
+        }
+      }
+      this.chatResizer.resizeInput();
+      this.$el.val(current);
+      this.el.setSelectionRange(start, current.length);
+      this.el.scrollTop = this.el.clientHeight;
     },
 
     isTypeaheadShowing: function() {

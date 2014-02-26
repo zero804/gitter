@@ -8,9 +8,8 @@ var useragent        = require("useragent");
 var crypto           = require("crypto");
 var permissionsModel = require("../services/permissions-model");
 var assert           = require("assert");
-
-var appVersion = require("./appVersion");
-var Q = require('q');
+var appVersion       = require("./appVersion");
+var Q                = require('q');
 
 /**
  * Returns the promise of a mini-context

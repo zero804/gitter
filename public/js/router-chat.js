@@ -11,7 +11,6 @@ require([
   'views/chat/chatCollectionView',
   'collections/instances/integrated-items',
   'views/righttoolbar/rightToolbarView',
-  'views/people/personDetailView',
   'views/shareSearch/inviteView',
   'views/app/troupeSettingsView',
   'views/app/markdownView',
@@ -21,7 +20,7 @@ require([
 
   'views/chat/decorators/webhookDecorator',
   'views/chat/decorators/issueDecorator',
-  // 'views/chat/decorators/mentionDecorator',
+  'views/chat/decorators/mentionDecorator',
   'views/chat/decorators/embedDecorator',
   'views/chat/decorators/emojiDecorator',
   'views/app/unreadBannerView',
@@ -37,24 +36,46 @@ require([
   'components/csrf'             // No ref
 ], function($, Backbone, context, liveContext, appEvents, peopleCollectionView, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, RightToolbarView,
-    PersonDetailView, inviteView, troupeSettingsView, markdownView, IntegrationSettingsModal,
-    Router, unreadItemsClient, webhookDecorator, issueDecorator, /*mentionDecorator,*/
+    inviteView, troupeSettingsView, markdownView, IntegrationSettingsModal,
+    Router, unreadItemsClient, webhookDecorator, issueDecorator, mentionDecorator,
     embedDecorator, emojiDecorator, UnreadBannerView, HeaderView) {
   "use strict";
 
   // Make drop down menus drop down
+  // This is a bit nasty
   $(document).on("click", ".trpButtonDropdown .trpButtonMenu", function(/*event*/) {
     $(this).parent().next().toggle();
   });
 
-  parent.postMessage(JSON.stringify({ type: "context.troupeId", troupeId: context.getTroupeId(), name: context.troupe().get('name') }), context.env('basePath'));
+  // When a user clicks an internal link, prevent it from opening in a new window
+  $(document).on("click", "a.link", function(e) {
+    var basePath = context.env('basePath');
+    var href = e.target.getAttribute('href');
+    if(!href || href.indexOf(basePath) !== 0) {
+      return;
+    }
+
+    e.preventDefault();
+    window.parent.location.href = href;
+  });
+
+  function postMessage(message) {
+    parent.postMessage(JSON.stringify(message), context.env('basePath'));
+  }
+
+
+  postMessage({ type: "context.troupeId", troupeId: context.getTroupeId(), name: context.troupe().get('name') });
 
   appEvents.on('navigation', function(url, type, title) {
-    parent.postMessage(JSON.stringify({ type: "navigation", url: url, urlType: type, title: title}), context.env('basePath'));
+    postMessage({ type: "navigation", url: url, urlType: type, title: title});
   });
 
   appEvents.on('realtime.testConnection', function() {
-    parent.postMessage(JSON.stringify({ type: "realtime.testConnection" }), context.env('basePath'));
+    postMessage({ type: "realtime.testConnection" });
+  });
+
+  appEvents.on('realtime:newConnectionEstablished', function() {
+    postMessage({ type: "realtime.testConnection" });
   });
 
   var appView = new ChatIntegratedView({ el: 'body' });
@@ -71,7 +92,7 @@ require([
     el: $('#content-frame'),
     collection: itemCollections.chats,
     userCollection: itemCollections.users,
-    decorators: [webhookDecorator, issueDecorator, /*mentionDecorator,*/ embedDecorator, emojiDecorator]
+    decorators: [webhookDecorator, issueDecorator, mentionDecorator, embedDecorator, emojiDecorator]
   }).render();
 
   var unreadChatsModel = unreadItemsClient.acrossTheFold();
@@ -108,10 +129,9 @@ require([
 
   new Router({
     routes: [
-      { name: "person",           re: /^person\/(\w+)$/,          viewType: PersonDetailView.Modal,             collection: itemCollections.users },
       { name: "people",           re: /^people/,                  viewType: peopleCollectionView.Modal,         collection: itemCollections.sortedUsers, skipModelLoad: true },
       { name: "inv",              re: /^inv$/,                    viewType: inviteView.Modal },
-      { name: "troupeSettings",   re: /^troupeSettings/,          viewType: troupeSettingsView },
+      { name: "notifications",    re: /^notifications/,           viewType: troupeSettingsView },
       { name: "markdown",         re: /^markdown/,                viewType: markdownView },
       { name: "integrations",     re: /^integrations/,            viewType: IntegrationSettingsModal,  validationCheck: integrationsValidationCheck }
     ],

@@ -16,7 +16,7 @@ clean:
 
 test:
 	NODE_ENV=test ./node_modules/.bin/mocha \
-		--reporter dot \
+		--reporter spec \
 		--timeout 10000 \
 		--recursive \
 		$(TESTS) || true
