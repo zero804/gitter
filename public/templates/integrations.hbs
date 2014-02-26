@@ -5,6 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
   <link href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href='{{cdn "bootstrap/css/trpHooks.css" }}' type='text/css'>
+  <style type="text/css">
+    h3 {
+      font-weight: normal;
+    }
+    form.create-integration {
+      display: inline-block;
+    }
+    form.create-integration button {
+      width: 100px;
+      text-align: center;
+    }
+    form.create-integration button img {
+      float: left;
+    }
+  </style>
 </head>
 
 <body style="margin-left: 8px">
@@ -42,47 +57,46 @@
       </form>
     </div>
     {{/each}}
-    <br>
   {{else}}
   <p class="trpBodyMedium">Notify your room of events by integrating with third-party services.</p>
   {{/if}}
 
 
-  <span class="trpBodyMedium">Add an integration</span><br>
-  <form style="display: inline-block; margin-top: 6px" method="post">
+  <h3 class="trpBodyMedium">Add an Integration:</h3>
+  <form class="create-integration" method="post">
     <input type="hidden" name="service" value="github">
     <input type="hidden" name="accessToken" value="{{accessToken}}">
-    <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="margin-left: 0; padding-bottom: 8px"><img src='{{cdn "images/2/icon-github@2x.png"}}' width="16" height="16" style="margin-right: 4px">GitHub</button>
+    <button class="trpButtonMedium trpBtnLightGrey" type="submit"><img src='{{cdn "images/2/icon-github@2x.png"}}' width="16" height="16">GitHub</button>
   </form>
-  <form style="display: inline-block;" method="post">
+  <form class="create-integration" method="post">
    <input type="hidden" name="service" value="bitbucket">
     <input type="hidden" name="accessToken" value="{{accessToken}}">
-   <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="padding-bottom: 8px"><img src='{{cdn "images/2/icon-bitbucket@2x.png"}}' width="16" height="16" style="margin-right: 4px">BitBucket</button>
+   <button class="trpButtonMedium trpBtnLightGrey" type="submit"><img src='{{cdn "images/2/icon-bitbucket@2x.png"}}' width="16" height="16">BitBucket</button>
  </form>
-  <form style="display: inline-block;" method="post">
+  <form class="create-integration" method="post">
     <input type="hidden" name="service" value="huboard">
     <input type="hidden" name="accessToken" value="{{accessToken}}">
-    <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="padding-bottom: 8px"><img src='{{cdn "images/2/icon-huboard@2x.png"}}' width="16" height="16" style="margin-right: 4px">HuBoard</button>
+    <button class="trpButtonMedium trpBtnLightGrey" type="submit"><img src='{{cdn "images/2/icon-huboard@2x.png"}}' width="16" height="16">HuBoard</button>
   </form>
-  <form style="display: inline-block;" method="post">
+  <form class="create-integration" method="post">
     <input type="hidden" name="service" value="jenkins">
     <input type="hidden" name="accessToken" value="{{accessToken}}">
-    <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="padding-bottom: 8px"><img src='{{cdn "images/2/icon-jenkins@2x.png"}}' width="16" height="16" style="margin-right: 4px">Jenkins</button>
+    <button class="trpButtonMedium trpBtnLightGrey" type="submit"><img src='{{cdn "images/2/icon-jenkins@2x.png"}}' width="16" height="16">Jenkins</button>
   </form>
-  <form style="display: inline-block;" method="post">
+  <form class="create-integration" method="post">
     <input type="hidden" name="service" value="travis">
     <input type="hidden" name="accessToken" value="{{accessToken}}">
-    <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="padding-bottom: 8px"><img src='{{cdn "images/2/icon-travis@2x.png"}}' width="16" height="16" style="margin-right: 4px">Travis</button>
+    <button class="trpButtonMedium trpBtnLightGrey" type="submit"><img src='{{cdn "images/2/icon-travis@2x.png"}}' width="16" height="16">Travis</button>
   </form>
-  <form style="display: inline-block;" method="post">
+  <form class="create-integration" method="post">
     <input type="hidden" name="service" value="sprintly">
     <input type="hidden" name="accessToken" value="{{accessToken}}">
-    <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="padding-bottom: 8px"><img src='{{cdn "images/2/icon-sprintly@2x.png"}}' width="16" height="16" style="margin-right: 4px">Sprintly</button>
+    <button class="trpButtonMedium trpBtnLightGrey" type="submit"><img src='{{cdn "images/2/icon-sprintly@2x.png"}}' width="16" height="16">Sprintly</button>
   </form>
-  <form style="display: inline-block;" method="post">
+  <form class="create-integration" method="post">
     <input type="hidden" name="service" value="trello">
     <input type="hidden" name="accessToken" value="{{accessToken}}">
-    <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="padding-bottom: 8px"><img src='{{cdn "images/2/icon-trello@2x.png"}}' width="16" height="16" style="margin-right: 4px">Trello</button>
+    <button class="trpButtonMedium trpBtnLightGrey" type="submit"><img src='{{cdn "images/2/icon-trello@2x.png"}}' width="16" height="16">Trello</button>
   </form>
 
 
