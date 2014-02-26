@@ -24,7 +24,7 @@ function cdnSingle(url, options) {
   var email = options && options.email;
 
   if (email) {
-    return nconf.get('email:emailBasePath') + cdnPrefix + "/" + url;
+    return nconf.get('email:emailBasePath') + "/_s/l/" + url;
   }
 
   if(appcache) {
@@ -44,7 +44,7 @@ function cdnMulti(url, options) {
   var appcache = options && options.appcache;
 
   if (email) {
-    return nconf.get('email:emailBasePath') + cdnPrefix + "/" + url;
+    return nconf.get('email:emailBasePath') + "/_s/l/" + url;
   }
 
   if(appcache) {
