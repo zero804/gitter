@@ -38,19 +38,25 @@ var chatMiddlewarePipeline = [
   }
 ];
 
+
 module.exports = {
     install: function(app) {
       [
-        /^\/([^\*\/]+)\/\-\/chat$/,             // ORG
-        /^\/([^\*\/]+)\/([^\/\*]+)\/chat$/,     // REPO
-        /^\/([^\*\/]+)\/(?:\*([^\/]+))\/chat$/, // ORG_CHANNEL
-        /^\/([^\/]+)\/([^\/]+)\/(?:\*([^\/]+))\/chat$/  // REPO_CHANNEL
+        '/:roomPart1/~chat',                         // ORG or ONE_TO_ONE
+        '/:roomPart1/:roomPart2/~chat',              // REPO or ORG_CHANNEL or ADHOC
+        '/:roomPart1/:roomPart2/:roomPart3/~chat',   // CUSTOM REPO_ROOM
+
+        // These URLs is deprecated. Remove after second master deployment
+        '/:roomPart1/-/chat',                       // ORG or ONE_TO_ONE
+        '/:roomPart1/:roomPart2/chat',              // REPO or ORG_CHANNEL or ADHOC
+        '/:roomPart1/:roomPart2/:roomPart3/chat',   // REPO_CHANNEL
       ].forEach(function(path) {
         app.get(path,
           function(req, res, next) {
-            req.params.userOrOrg = req.params[0];
-            req.params.repo = req.params[1];
-            req.params.channel = req.params[2];
+            var uri = normaliseUrl(req.params);
+            // req.params.userOrOrg = req.params[0];
+            // req.params.repo = req.params[1];
+            // req.params.channel = req.params[2];
             next();
           },
           chatMiddlewarePipeline);

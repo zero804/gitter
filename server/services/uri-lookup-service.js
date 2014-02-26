@@ -17,7 +17,6 @@ var winston = require('winston');
  */
 function lookupUri(uri) {
   var lcUri = uri.toLowerCase();
-  console.trace();
 
   winston.verbose('URI lookup: ' + uri);
 

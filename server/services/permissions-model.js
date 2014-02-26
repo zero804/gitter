@@ -71,15 +71,22 @@ function orgPermissionsModel(user, right, uri) {
 }
 
 function orgChannelPermissionsModel(user, right, uri) {
-  var orgUri = uri.replace(/\/\*.*$/,'');
+  var orgUri = uri.split('/').slice(0, -1).join('/');
+
   winston.verbose('Proxying permission on ' + uri + ' to org permission on ' + orgUri, { user: user && user.username, right: right });
   return orgPermissionsModel(user, right, orgUri);
 }
 
 function repoChannelPermissionsModel(user, right, uri) {
-  var repoUri = uri.replace(/\/\*.*$/,'');
+  var repoUri = uri.split('/').slice(0, -1).join('/');
   winston.verbose('Proxying permission on ' + uri + ' to repo permission on ' + repoUri, { user: user && user.username, right: right });
   return repoPermissionsModel(user, right, repoUri);
+}
+
+function userChannelPermissionsModel(user, right, uri) {
+  var userUri = uri.split('/').slice(0, -1).join('/');
+  winston.verbose('Proxying permission on ' + uri + ' to user permission on ' + userUri, { user: user && user.username, right: right });
+  return oneToOnePermissionsModel(user, right, userUri);
 }
 
 
@@ -110,28 +117,21 @@ function permissionsModel(user, right, uri, roomType) {
   assert(uri, 'uri required');
   assert(roomType, 'roomType required');
 
-  switch(roomType) {
-    case 'REPO':
-      return repoPermissionsModel(user, right, uri).then(log);
+  var submodel = {
+    'REPO': repoPermissionsModel,
+    'ORG': orgPermissionsModel,
+    'ONETOONE': oneToOnePermissionsModel,
+    'ORG_CHANNEL': orgChannelPermissionsModel,
+    'REPO_CHANNEL': repoChannelPermissionsModel,
+    'USER_CHANNEL': userChannelPermissionsModel
+  }[roomType];
 
-    case 'ORG':
-      return orgPermissionsModel(user, right, uri).then(log);
-
-    case 'ONETOONE':
-      // TODO: a one-to-one permissioning model
-      return oneToOnePermissionsModel(user, right, uri).then(log);
-
-    case 'ORG_CHANNEL':
-      return orgChannelPermissionsModel(user, right, uri).then(log);
-
-    case 'REPO_CHANNEL':
-      return repoChannelPermissionsModel(user, right, uri).then(log);
-
-    default:
-      assert(false, 'Invalid roomType ' + roomType);
-      throw 500;
+  if(!submodel) {
+    assert(false, 'Invalid roomType ' + roomType);
+    throw 500;
   }
 
+  return userChannelPermissionsModel(user, right, uri, roomType).then(log);
 }
 
 module.exports = permissionsModel;
