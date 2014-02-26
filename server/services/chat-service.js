@@ -86,9 +86,9 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
             troupe.users.forEach(function(_user) {
               if (_user.userId.toString() !== user.id.toString()) toUserId = _user.userId;
             });
-            _msg = {oneToOne: true, username: user.username, toUserId: toUserId, text: text, id: chatMessage.id};
+            _msg = {oneToOne: true, username: user.username, toUserId: toUserId, text: text, id: chatMessage.id, toTroupeId: troupe.id};
           } else {
-            _msg = {oneToOne: false, username: user.username, room: troupe.uri, text: text, id: chatMessage.id};
+            _msg = {oneToOne: false, username: user.username, room: troupe.uri, text: text, id: chatMessage.id, toTroupeId: troupe.id};
           }
 
           appEvents.chatMessage(_msg);
