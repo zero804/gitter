@@ -54,14 +54,23 @@ module.exports = {
         app.get(path, chatMiddlewarePipeline);
       });
 
-      app.get('/:roomPart1/-/home',
-        middleware.grantAccessForRememberMeTokenMiddleware,
-        middleware.ensureLoggedIn(),
-        appMiddleware.uriContextResolverMiddleware,
-        appMiddleware.isPhoneMiddleware,
-        function(req, res, next) {
-          appRender.renderHomePage(req, res, next);
-        });
+
+      [
+        '/:roomPart1/~home',
+        // This URL is deprecated
+        '/:roomPart1/-/home',
+      ].forEach(function(path) {
+        app.get(path,
+          middleware.grantAccessForRememberMeTokenMiddleware,
+          middleware.ensureLoggedIn(),
+          appMiddleware.uriContextResolverMiddleware,
+          appMiddleware.isPhoneMiddleware,
+          function(req, res, next) {
+            appRender.renderHomePage(req, res, next);
+          });
+      });
+
+
 
       require('./integrations').install(app);
 
