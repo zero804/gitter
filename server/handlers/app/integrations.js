@@ -10,16 +10,22 @@ var request                      = require('request');
 var uriContextResolverMiddleware = require('./middleware').uriContextResolverMiddleware;
 var jwt                          = require('jwt-simple');
 var Q                            = require('q');
+var cdn                          = require('../../web/cdn');
 
-var serviceDisplayNames = {
-  github: 'GitHub',
-  huboard: 'HuBoard',
-  bitbucket: 'BitBucket',
-  jenkins: 'Jenkins',
-  travis: 'Travis',
-  sprintly: 'Sprint.ly',
-  trello: 'Trello'
-};
+var supportedServices = [
+  {id: 'github', name: 'GitHub'},
+  {id: 'bitbucket', name: 'BitBucket'},
+  {id: 'huboard', name: 'HuBoard'},
+  {id: 'sprintly', name: 'Sprint.ly'},
+  {id: 'trello', name: 'Trello'},
+  {id: 'jenkins', name: 'Jenkins'},
+  {id: 'travis', name: 'Travis'}
+];
+
+var serviceIdNameMap = supportedServices.reduce(function(map, service) {
+  map[service.id] = service.name;
+  return map;
+}, {});
 
 function getIntegrations(req, res) {
   var url = nconf.get('webhooks:basepath')+'/troupes/' + req.troupe.id + '/hooks';
@@ -36,7 +42,7 @@ function getIntegrations(req, res) {
     winston.info('hook list received', { hooks: hooks });
 
     hooks.forEach(function(hook) {
-      hook.serviceDisplayName = serviceDisplayNames[hook.service];
+      hook.serviceDisplayName = serviceIdNameMap[hook.service];
     });
 
     var promise = req.session.accessToken ? Q.resolve(req.session.accessToken) : oauthService.findOrGenerateWebToken(req.user.id);
@@ -44,7 +50,9 @@ function getIntegrations(req, res) {
       res.render('integrations', {
         hooks: hooks,
         troupe: req.troupe,
-        accessToken: accessToken
+        accessToken: accessToken,
+        cdnRoot: cdn(''),
+        supportedServices: supportedServices
       });
     });
   });
