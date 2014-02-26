@@ -42,44 +42,18 @@
       </form>
     </div>
     {{/each}}
-    <br>
   {{else}}
   <p class="trpBodyMedium">Notify your room of events by integrating with third-party services.</p>
   {{/if}}
 
-
-  <span class="trpBodyMedium">Add an integration</span><br>
-  <form style="display: inline-block; margin-top: 6px" method="post">
-    <input type="hidden" name="service" value="github">
-    <input type="hidden" name="accessToken" value="{{accessToken}}">
-    <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="margin-left: 0; padding-bottom: 8px"><img src='{{cdn "images/2/icon-github@2x.png"}}' width="16" height="16" style="margin-right: 4px">GitHub</button>
+  <h3>Add an Integration:</h3>
+  {{#each supportedServices}}
+  <form class="add-integration" method="post">
+    <input type="hidden" name="service" value="{{id}}">
+    <input type="hidden" name="accessToken" value="{{../accessToken}}">
+    <button class="trpButtonMedium trpBtnLightGrey" type="submit"><img src='{{../cdnRoot}}images/2/icon-{{id}}@2x.png' width="16" height="16">{{name}}</button>
   </form>
-  <form style="display: inline-block;" method="post">
-    <input type="hidden" name="service" value="huboard">
-    <input type="hidden" name="accessToken" value="{{accessToken}}">
-    <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="padding-bottom: 8px"><img src='{{cdn "images/2/icon-huboard@2x.png"}}' width="16" height="16" style="margin-right: 4px">HuBoard</button>
-  </form>
-  <form style="display: inline-block;" method="post">
-    <input type="hidden" name="service" value="jenkins">
-    <input type="hidden" name="accessToken" value="{{accessToken}}">
-    <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="padding-bottom: 8px"><img src='{{cdn "images/2/icon-jenkins@2x.png"}}' width="16" height="16" style="margin-right: 4px">Jenkins</button>
-  </form>
-  <form style="display: inline-block;" method="post">
-    <input type="hidden" name="service" value="travis">
-    <input type="hidden" name="accessToken" value="{{accessToken}}">
-    <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="padding-bottom: 8px"><img src='{{cdn "images/2/icon-travis@2x.png"}}' width="16" height="16" style="margin-right: 4px">Travis</button>
-  </form>
-  <form style="display: inline-block;" method="post">
-    <input type="hidden" name="service" value="sprintly">
-    <input type="hidden" name="accessToken" value="{{accessToken}}">
-    <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="padding-bottom: 8px"><img src='{{cdn "images/2/icon-sprintly@2x.png"}}' width="16" height="16" style="margin-right: 4px">Sprintly</button>
-  </form>
-  <form style="display: inline-block;" method="post">
-    <input type="hidden" name="service" value="trello">
-    <input type="hidden" name="accessToken" value="{{accessToken}}">
-    <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="padding-bottom: 8px"><img src='{{cdn "images/2/icon-trello@2x.png"}}' width="16" height="16" style="margin-right: 4px">Trello</button>
-  </form>
-
+  {{/each}}
 
 </body>
 </html>

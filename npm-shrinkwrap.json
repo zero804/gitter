@@ -842,69 +842,6 @@
       "from": "apn@~1.4.3",
       "resolved": "https://registry.npmjs.org/apn/-/apn-1.4.4.tgz"
     },
-    "kue": {
-      "version": "0.5.0-patch1",
-      "from": "kue@git://github.com/suprememoocow/kue.git",
-      "resolved": "git://github.com/suprememoocow/kue.git#dd0cc290ea3751da3e12a211d1b1e64f1eba4982",
-      "dependencies": {
-        "redis": {
-          "version": "0.7.2",
-          "from": "redis@0.7.2"
-        },
-        "jade": {
-          "version": "0.26.3",
-          "from": "jade@0.26.3",
-          "dependencies": {
-            "commander": {
-              "version": "0.6.1",
-              "from": "commander@0.6.1"
-            },
-            "mkdirp": {
-              "version": "0.3.0",
-              "from": "mkdirp@0.3.0"
-            }
-          }
-        },
-        "stylus": {
-          "version": "0.27.2",
-          "from": "stylus@0.27.2",
-          "dependencies": {
-            "cssom": {
-              "version": "0.2.5",
-              "from": "cssom@0.2.x"
-            },
-            "mkdirp": {
-              "version": "0.3.5",
-              "from": "mkdirp@0.3.x"
-            }
-          }
-        },
-        "nib": {
-          "version": "0.5.0",
-          "from": "nib@0.5.0"
-        },
-        "reds": {
-          "version": "0.1.4",
-          "from": "reds@0.1.4",
-          "dependencies": {
-            "natural": {
-              "version": "0.0.69",
-              "from": "natural@0.0.69",
-              "dependencies": {
-                "sylvester": {
-                  "version": "0.0.21",
-                  "from": "sylvester@>= 0.0.12"
-                },
-                "apparatus": {
-                  "version": "0.0.8",
-                  "from": "apparatus@>= 0.0.4"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "file": {
       "version": "0.2.1",
       "from": "file@0.2.1",
