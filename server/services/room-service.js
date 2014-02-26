@@ -400,6 +400,7 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
             $setOnInsert: {
               lcUri: lcUri,
               uri: uri,
+              security: security,
               name: name,
               _nonce: nonce,
               githubType: githubType,
