@@ -5,16 +5,16 @@ require([
   'collections/chat',
   'views/chat/chatCollectionView',
   'views/chat/chatInputView',
-  'utils/router',
-  'components/modal-region',
   'components/unread-items-client',
   'backbone',
+  'components/modal-region',
   'views/toolbar/troupeMenu',
   'views/app/mobileAppView',
   'views/chat/decorators/emojiDecorator',
+  'views/app/troupeSettingsView',
   'components/csrf'                             // No ref
-  ], function($, appEvents, chatModels, ChatCollectionView, chatInputView, Router,
-    modalRegion, unreadItemsClient, Backbone, TroupeMenu, MobileAppView, emojiDecorator) {
+  ], function($, appEvents, chatModels, ChatCollectionView, chatInputView,
+    unreadItemsClient, Backbone, modalRegion, TroupeMenu, MobileAppView, emojiDecorator, TroupeSettingsView) {
   "use strict";
 
   new MobileAppView({
@@ -46,11 +46,25 @@ require([
     rollers: chatCollectionView.rollers
   }).render();
 
-  new Router({
-    routes: [
-    ],
-    regions: [null, modalRegion]
+  var Router = Backbone.Router.extend({
+    routes: {
+      // TODO: get rid of the pipes
+      "!": "hideModal",
+      "": "hideModal",
+      "|notifications": "notifications",
+    },
+
+    hideModal: function() {
+      modalRegion.close();
+    },
+
+    notifications: function() {
+      modalRegion.show(new TroupeSettingsView({}));
+    }
   });
+
+  new Router();
+
 
   $('html').removeClass('loading');
 
