@@ -42,16 +42,20 @@ module.exports = {
 
         statsService.event('unread_notification_sent', {userId: user.id, email: email});
 
+        var emailBasePath = nconf.get("email:emailBasePath");
+        var unsubscribeUrl = emailBasePath + '/settings/unsubscribe/' + hash;
+
         return mailerService.sendEmail({
           templateFile: "unread_notification",
           from: 'Gitter Notifications <support@gitter.im>',
           to: email,
+          unsubscribe: unsubscribeUrl,
           subject: "Activity on Gitter",
           data: {
             user: user,
-            emailBasePath: nconf.get("email:emailBasePath"),
+            emailBasePath: emailBasePath,
             troupesWithUnreadCounts: troupesWithUnreadCounts,
-            unsubscribeHash: hash
+            unsubscribeUrl: unsubscribeUrl
           }
         });
       })
