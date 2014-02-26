@@ -25,33 +25,15 @@ module.exports = {
       });
     },
 
-    "new": function(req, res){
-      res.send(500);
-    },
-
     create: function(req, res, next) {
       var body = req.body;
-      return roomService.createCustomChildRoom(req.troupe, req.user, body.name)
+      var security = body.security || 'INHERITED';
+
+      return roomService.createCustomChildRoom(req.troupe, req.user, { name: body.name, security: security })
         .then(function(customRoom) {
           return serialize(customRoom, req, res, next);
         })
         .fail(next);
-    },
-
-    show: function(req, res, next) {
-      return serialize(req.channel, req, res, next);
-    },
-
-    edit: function(req, res){
-      res.send(500);
-    },
-
-    update:  function(req, res) {
-      res.send(500);
-    },
-
-    destroy: function(req, res) {
-      res.send(500);
     },
 
     load: function(req, id, callback){

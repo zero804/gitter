@@ -7,7 +7,10 @@ var assert             = require("assert");
 var winston            = require('winston');
 var Q                  = require('q');
 
-function repoPermissionsModel(user, right, uri) {
+function repoPermissionsModel(user, right, uri, security) {
+  // Security is only for child rooms
+  assert(!security);
+
   // For now, only authenticated users can be members of orgs
   if(!user) return false;
 
@@ -43,7 +46,10 @@ function repoPermissionsModel(user, right, uri) {
 
 }
 
-function orgPermissionsModel(user, right, uri) {
+function orgPermissionsModel(user, right, uri, security) {
+  // Security is only for child rooms
+  assert(!security);
+
   // For now, only authenticated users can be members of orgs
   if(!user) return false;
 
@@ -70,27 +76,11 @@ function orgPermissionsModel(user, right, uri) {
     });
 }
 
-function orgChannelPermissionsModel(user, right, uri) {
-  var orgUri = uri.split('/').slice(0, -1).join('/');
 
-  winston.verbose('Proxying permission on ' + uri + ' to org permission on ' + orgUri, { user: user && user.username, right: right });
-  return orgPermissionsModel(user, right, orgUri);
-}
+function oneToOnePermissionsModel(user, right, uri, security) {
+  // Security is only for child rooms
+  assert(!security);
 
-function repoChannelPermissionsModel(user, right, uri) {
-  var repoUri = uri.split('/').slice(0, -1).join('/');
-  winston.verbose('Proxying permission on ' + uri + ' to repo permission on ' + repoUri, { user: user && user.username, right: right });
-  return repoPermissionsModel(user, right, repoUri);
-}
-
-function userChannelPermissionsModel(user, right, uri) {
-  var userUri = uri.split('/').slice(0, -1).join('/');
-  winston.verbose('Proxying permission on ' + uri + ' to user permission on ' + userUri, { user: user && user.username, right: right });
-  return oneToOnePermissionsModel(user, right, userUri);
-}
-
-
-function oneToOnePermissionsModel(user, right/*, uri*/) {
   // For now, only authenticated users can be in onetoones
   if(!user) return Q.resolve(false);
 
@@ -105,7 +95,72 @@ function oneToOnePermissionsModel(user, right/*, uri*/) {
   return Q.reject('Unknown right ' + right);
 }
 
-function permissionsModel(user, right, uri, roomType) {
+function orgChannelPermissionsModel(user, right, uri, security) {
+  console.log('RIGHT', right);
+  console.log('SECURITY ', security);
+  assert({'PRIVATE': 1, 'OPEN': 1, 'INHERITED': 1}.hasOwnProperty(security), 'Invalid security type:' + security);
+
+  if(right === 'join') {
+    switch(security) {
+      case 'OPEN': return Q.resolve(true);
+      case 'PRIVATE': return Q.resolve(false);
+      // INHERITED falls through
+    }
+  }
+
+  /* To create this room, you need admin rights on the parent room */
+  if(right === 'create') {
+    right = 'admin';
+  }
+
+  var orgUri = uri.split('/').slice(0, -1).join('/');
+  winston.verbose('Proxying permission on ' + uri + ' to org permission on ' + orgUri, { user: user && user.username, right: right });
+  return orgPermissionsModel(user, right, orgUri);
+}
+
+function repoChannelPermissionsModel(user, right, uri, security) {
+  assert({'PRIVATE': 1, 'OPEN': 1, 'INHERITED': 1}.hasOwnProperty(security), 'Invalid security type:' + security);
+
+  if(right === 'join') {
+    switch(security) {
+      case 'OPEN': return Q.resolve(true);
+      case 'PRIVATE': return Q.resolve(false);
+      // INHERITED falls through
+    }
+  }
+
+  /* To create this room, you need admin rights on the parent room */
+  if(right === 'create') {
+    right = 'admin';
+  }
+
+  var repoUri = uri.split('/').slice(0, -1).join('/');
+  winston.verbose('Proxying permission on ' + uri + ' to repo permission on ' + repoUri, { user: user && user.username, right: right });
+  return repoPermissionsModel(user, right, repoUri);
+}
+
+function userChannelPermissionsModel(user, right, uri, security) {
+  assert({'PRIVATE': 1, 'OPEN': 1 }.hasOwnProperty(security), 'Invalid security type:' + security);
+
+  if(right === 'join') {
+    switch(security) {
+      case 'OPEN': return Q.resolve(true);
+      case 'PRIVATE': return Q.resolve(false); // XXX
+    }
+  }
+
+  var userUri = uri.split('/').slice(0, -1).join('/');
+
+  /* To create this room, you need to be THE user */
+  if(right === 'create') {
+    return Q.resolve(userUri === user.username);
+  }
+
+  winston.verbose('Proxying permission on ' + uri + ' to user permission on ' + userUri, { user: user && user.username, right: right });
+  return oneToOnePermissionsModel(user, right, userUri);
+}
+
+function permissionsModel(user, right, uri, roomType, security) {
   function log(x) {
     winston.verbose('Permission', { user: user && user.username, uri: uri, roomType: roomType, granted: x });
     return x;
@@ -131,7 +186,7 @@ function permissionsModel(user, right, uri, roomType) {
     throw 500;
   }
 
-  return userChannelPermissionsModel(user, right, uri, roomType).then(log);
+  return submodel(user, right, uri, security).then(log);
 }
 
 module.exports = permissionsModel;
