@@ -2,6 +2,7 @@
 define([
   'log!chat-input',
   'jquery',
+  'backbone',
   'utils/context',
   'views/base',
   'utils/appevents',
@@ -17,7 +18,7 @@ define([
   './commands',
   'jquery-textcomplete', // No ref
   'utils/sisyphus-cleaner' // No ref
-], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate,
+], function(log, $, Backbone, context, TroupeViews, appEvents, template, listItemTemplate,
   emojiListItemTemplate, moment, hasScrollBars, itemCollections, emoji, drafty, cdn, commands) {
   "use strict";
 
@@ -50,6 +51,19 @@ define([
   /** @const */
   var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];
 
+  var x = new Backbone.Model({enabled: !!window.localStorage.getItem('something')});
+
+  x.on('change:enabled', function() {
+    if(x.get('enabled')) {
+      window.localStorage.setItem('something', 'anything');
+    } else {
+      window.localStorage.removeItem('something');
+    }
+  });
+
+  x.set('enabled', false);
+
+
   var ChatInputView = TroupeViews.Base.extend({
     template: template,
 
@@ -69,7 +83,8 @@ define([
 
     getRenderData: function() {
       return {
-        user: context.user()
+        user: context.user(),
+        isReturnToSendEnabled: x.get('enabled')
       };
     },
 
@@ -79,7 +94,8 @@ define([
       var inputBox = new ChatInputBoxView({
         el: this.$el.find('.trpChatInputBoxTextArea'),
         rollers: this.rollers,
-        chatCollectionView: this.chatCollectionView
+        chatCollectionView: this.chatCollectionView,
+        x: x
       });
       this.inputBox = inputBox;
 
@@ -201,8 +217,9 @@ define([
     },
 
     toggleReturnSend: function() {
-      this.inputBox.isReturnToSendEnabled = !this.inputBox.isReturnToSendEnabled;
-      this.$el.find('.return-send').toggleClass('active');
+      var newVal = !x.get('enabled');
+      this.$el.find('.return-send').toggleClass('active', newVal);
+      x.set('enabled', newVal);
     },
 
     send: function(val) {
@@ -363,6 +380,8 @@ define([
       chatResizer.resetInput(true);
 
       this.chatCollectionView = options.chatCollectionView;
+      this.x = options.x;
+
     },
 
     onFocusOut: function() {
@@ -376,7 +395,7 @@ define([
     },
 
     onKeyDown: function(e) {
-      if(e.keyCode === ENTER && !hasModifierKey(e) && !this.isTypeaheadShowing() && !this.isReturnToSendEnabled) {
+      if(e.keyCode === ENTER && !hasModifierKey(e) && !this.isTypeaheadShowing() && !this.x.get('enabled')) {
         if(this.$el.val()) {
           this.processInput();
         }
@@ -384,7 +403,7 @@ define([
         // dont insert a new line
         e.preventDefault();
         return false;
-      } else if(e.keyCode === ENTER && e.ctrlKey && !this.isTypeaheadShowing() && this.isReturnToSendEnabled) {
+      } else if(e.keyCode === ENTER && e.ctrlKey && !this.isTypeaheadShowing() && this.x.get('enabled')) {
         if(this.$el.val()) {
           this.processInput();
         }
