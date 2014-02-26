@@ -53,6 +53,10 @@ define([
   var ChatInputView = TroupeViews.Base.extend({
     template: template,
 
+    events: {
+      'click .return-send': 'toggleReturnSend'
+    },
+
     initialize: function(options) {
       this.rollers = options.rollers;
       this.chatCollectionView = options.chatCollectionView;
@@ -194,6 +198,11 @@ define([
       this.listenTo(this.inputBox, 'save', this.send);
       this.listenTo(this.inputBox, 'subst', this.subst);
       this.listenTo(this.inputBox, 'editLast', this.editLast);
+    },
+
+    toggleReturnSend: function() {
+      this.inputBox.isReturnToSendEnabled = !this.inputBox.isReturnToSendEnabled;
+      this.$el.find('.return-send').toggleClass('active');
     },
 
     send: function(val) {
@@ -367,12 +376,21 @@ define([
     },
 
     onKeyDown: function(e) {
-      if(e.keyCode === ENTER && !hasModifierKey(e) && this.hasVisibleText() && !this.isTypeaheadShowing()) {
-        e.stopPropagation();
+      if(e.keyCode === ENTER && !hasModifierKey(e) && !this.isTypeaheadShowing() && !this.isReturnToSendEnabled) {
+        if(this.$el.val()) {
+          this.processInput();
+        }
+
+        // dont insert a new line
         e.preventDefault();
+        return false;
+      } else if(e.keyCode === ENTER && e.ctrlKey && !this.isTypeaheadShowing() && this.isReturnToSendEnabled) {
+        if(this.$el.val()) {
+          this.processInput();
+        }
 
-        this.processInput();
-
+        // dont insert a new line
+        e.preventDefault();
         return false;
       } else if(e.keyCode === UP_ARROW && !hasModifierKey(e) && !this.$el.val()) {
         this.trigger('editLast');
