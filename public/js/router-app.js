@@ -40,7 +40,7 @@ require([
     if(model.id == context.getTroupeId()) {
       var username = context.user().get('username');
       var newLocation = '/' + username;
-      var newFrame = newLocation + '/-/home';
+      var newFrame = newLocation + '/~home';
       var title = '';
 
       titlebarUpdater.setRoomName(title);
@@ -55,12 +55,7 @@ require([
     // Add a /-/ if the path only has one component
     // so /moo/ goes to /moo/-/chat but
     // /moo/foo goes to /moo/foo/chat
-    var frameUrl = url + '/';
-    if(url.substring(1).indexOf('/') < 0) {
-      frameUrl += '-/';
-    }
-    frameUrl += type;
-
+    var frameUrl = url + '/~' + type;
     titlebarUpdater.setRoomName(title);
 
     window.history.pushState(frameUrl, title, url);

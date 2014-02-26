@@ -43,12 +43,7 @@ function renderHomePage(req, res, next) {
 function renderMainFrame(req, res, next, frame) {
   contextGenerator.generateMiniContext(req)
     .then(function(troupeContext) {
-      var chatAppLocation;
-      if(req.uriContext.uri.indexOf('/') >= 0) {
-        chatAppLocation = '/' + req.uriContext.uri + '/' + frame;
-      } else {
-        chatAppLocation = '/' + req.uriContext.uri + '/-/' + frame;
-      }
+      var chatAppLocation = '/' + req.uriContext.uri + '/~' + frame;
 
       res.render('app-template', {
         appCache: getAppCache(req),
