@@ -1,24 +1,24 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var persistence        = require('./persistence-service');
-var validateUri        = require('./github/github-uri-validator');
-var uriLookupService   = require("./uri-lookup-service");
-var assert             = require("assert");
 var winston            = require("winston");
 var ObjectID           = require('mongodb').ObjectID;
 var Q                  = require('q');
+var request            = require('request');
+var _                  = require('underscore');
+var xregexp            = require('xregexp').XRegExp;
+var persistence        = require('./persistence-service');
+var validateUri        = require('./github/github-uri-validator');
+var uriLookupService   = require("./uri-lookup-service");
 var permissionsModel   = require('./permissions-model');
 var userService        = require('./user-service');
 var troupeService      = require('./troupe-service');
 var nconf              = require('../utils/config');
-var request            = require('request');
 var GitHubRepoService  = require('./github/github-repo-service');
 var unreadItemService  = require('./unread-item-service');
-var _                  = require('underscore');
 var appEvents          = require("../app-events");
-var xregexp            = require('xregexp').XRegExp;
 var serializeEvent     = require('./persistence-service-events').serializeEvent;
+var validate           = require('../utils/validate');
 
 function localUriLookup(uri, opts) {
   return uriLookupService.lookupUri(uri)
@@ -54,9 +54,9 @@ function localUriLookup(uri, opts) {
 }
 
 function applyAutoHooksForRepoRoom(user, troupe) {
-  assert(user, 'user is required');
-  assert(troupe, 'troupe is required');
-  assert(troupe.githubType === 'REPO', 'Auto hooks can only be used on repo rooms. This room is a ', troupe.githubType);
+  validate.expect(user, 'user is required');
+  validate.expect(troupe, 'troupe is required');
+  validate.expect(troupe.githubType === 'REPO', 'Auto hooks can only be used on repo rooms. This room is a '+ troupe.githubType);
 
   winston.info("Requesting autoconfigured integrations");
 
@@ -103,7 +103,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
 
     return Q.all([
         troupe,
-        permissionsModel(user, 'join', uri, troupe.githubType)
+        permissionsModel(user, 'join', uri, troupe.githubType, troupe.security)
       ]);
   }
 
@@ -248,7 +248,8 @@ exports.findAllRoomsIdsForUserIncludingMentions = findAllRoomsIdsForUserIncludin
  * @return The promise of a troupe or nothing.
  */
 function findOrCreateRoom(user, uri, opts) {
-  assert(uri, 'uri required');
+  validate.expect(uri, 'uri required');
+
   var userId = user.id;
   opts = opts || {};
 
@@ -315,7 +316,7 @@ exports.findChildChannelRoom = findChildChannelRoom;
 
 function assertValidName(name) {
   var matcher = xregexp('^[\\p{L}\\d]+$');
-  if(!matcher.test(name)) throw 400;
+  validate.expect(matcher.test(name));
 }
 
 var RANGE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefgihjklmnopqrstuvwxyz01234567890';
@@ -329,8 +330,8 @@ function generateRandomName() {
 
 function createCustomChildRoom(parentTroupe, user, options, callback) {
   return Q.fcall(function() {
-    assert(user, 'user is expected');
-    assert(options, 'options is expected');
+    validate.expect(user, 'user is expected');
+    validate.expect(options, 'options is expected');
 
     var name = options.name;
     var security = options.security;
@@ -352,11 +353,11 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
           githubType = 'REPO_CHANNEL';
           break;
         default:
-          assert(false, 'Invalid parent room type');
+          validate.fail('Invalid parent room type');
       }
 
       if(!{ OPEN: 1, PRIVATE: 1, INHERITED: 1 }.hasOwnProperty(security) ) {
-        assert(false, 'Invalid security option: ' + security);
+        validate.fail('Invalid security option: ' + security);
       }
 
     } else {
@@ -378,7 +379,7 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
           break;
 
         default:
-          assert(false, 'Invalid security option: ' + security);
+          validate.fail('Invalid security option: ' + security);
       }
 
       uri = user.username + '/' + name;
@@ -387,7 +388,7 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
 
     var lcUri = uri.toLowerCase();
 
-    return permissionsModel(user, 'create', uri, githubType)
+    return permissionsModel(user, 'create', uri, githubType, security)
       .then(function(access) {
         if(!access) throw 403;
 
@@ -416,19 +417,20 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
 
             return newRoom;
           });
-      });
+      })
+     .then(function(newRoom) {
+      if(parentTroupe && security !== 'PRIVATE') {
+        // Add this room to the list of channels
+        // owed by the parent
+        parentTroupe.channels.addToSet(newRoom.id);
+        return parentTroupe.saveQ()
+          .thenResolve(newRoom);
+      } else {
+        return newRoom;
+      }
+    });
+
    })
-   .then(function(newRoom) {
-    if(parentTroupe) {
-      // Add this room to the list of channels
-      // owed by the parent
-      parentTroupe.channels.addToSet(newRoom.id);
-      return parentTroupe.saveQ()
-        .thenResolve(newRoom);
-    } else {
-      return newRoom;
-    }
-   })
-   .nodeify(callback);
+  .nodeify(callback);
 }
 exports.createCustomChildRoom = createCustomChildRoom;
