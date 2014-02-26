@@ -8,10 +8,8 @@ var userService   = require("./user-service");
 var statsService  = require("./stats-service");
 var unsafeHtml    = require('../utils/unsafe-html');
 var processChat   = require('../utils/process-chat');
-
-var redis = require('../utils/redis');
-var redisClient = redis.createClient();
-
+var appEvents     = require('../app-events');
+var Q             = require('q');
 /*
  * Hey Trouper!
  * Bump the version if you modify the behaviour of TwitterText.
@@ -28,68 +26,82 @@ var MAX_CHAT_EDIT_AGE_SECONDS = 300;
 var ObjectID = require('mongodb').ObjectID;
 
 exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
-  if(!troupe) return callback(404);
-  /* You have to have text */
-  if(!text && text !== "" /* Allow empty strings for now */) return callback(400);
-  if(text.length > MAX_CHAT_MESSAGE_LENGTH) return callback(400);
+  return Q.fcall(function() {
+    if(!troupe) throw 404;
 
-  if(!troupeService.userHasAccessToTroupe(user, troupe)) return callback(403);
+    /* You have to have text */
+    if(!text && text !== "" /* Allow empty strings for now */) throw 400;
+    if(text.length > MAX_CHAT_MESSAGE_LENGTH) throw 400;
 
-  var chatMessage = new persistence.ChatMessage();
-  chatMessage.fromUserId = user.id;
-  chatMessage.toTroupeId = troupe.id;
-  chatMessage.sent = new Date();
+    if(!troupeService.userHasAccessToTroupe(user, troupe)) throw 403;
 
-  // Keep the raw message.
-  chatMessage.text = text;
 
-  var parsedMessage = processChat(text);
-  // TODO: validate message
+    // TODO: validate message
+    var parsedMessage = processChat(text);
 
-  chatMessage.html  = parsedMessage.html;
-
-  /* Look through the mentions and attempt to tie the mentions to userIds */
-  var mentionUserNames = parsedMessage.mentions.map(function(mention) {
-    return mention.screenName;
-  });
-
-  var _msg = {username: user.username, room: troupe.uri, text: text};
-  redisClient.publish('chat_messages', JSON.stringify(_msg));
-
-  userService.findByUsernames(mentionUserNames, function(err, users) {
-    if(err) return callback(err);
-
-    var usersIndexed = collections.indexByProperty(users, 'username');
-
-    var mentions = parsedMessage.mentions.map(function(mention) {
-      var user = usersIndexed[mention.screenName];
-      var userId = user && user.id;
-
-      return {
-        screenName: mention.screenName,
-        userId: userId
-      };
+    var chatMessage = new persistence.ChatMessage({
+      fromUserId: user.id,
+      toTroupeId: troupe.id,
+      sent: new Date(),
+      text: text,                // Keep the raw message.
+      html: parsedMessage.html
     });
 
-    // Metadata
-    chatMessage.urls      = parsedMessage.urls;
-    chatMessage.mentions  = mentions;
-    chatMessage.issues    = parsedMessage.issues;
-    chatMessage._md       = CURRENT_META_DATA_VERSION;
+    /* Look through the mentions and attempt to tie the mentions to userIds */
+    var mentionUserNames = parsedMessage.mentions.map(function(mention) {
+      return mention.screenName;
+    });
 
-    chatMessage.save(function (err) {
-      if(err) return callback(err);
+    return userService.findByUsernames(mentionUserNames)
+      .then(function(users) {
+      var usersIndexed = collections.indexByProperty(users, 'username');
 
-      statsService.event("new_chat", {
-        userId: user.id,
-        troupeId: troupe.id,
-        username: user.username
+      var mentions = parsedMessage.mentions.map(function(mention) {
+        var user = usersIndexed[mention.screenName];
+        var userId = user && user.id;
+
+        return {
+          screenName: mention.screenName,
+          userId: userId
+        };
       });
 
-      return callback(null, chatMessage);
-    });
+      // Metadata
+      chatMessage.urls      = parsedMessage.urls;
+      chatMessage.mentions  = mentions;
+      chatMessage.issues    = parsedMessage.issues;
+      chatMessage._md       = CURRENT_META_DATA_VERSION;
 
-  });
+      return chatMessage.saveQ()
+        .then(function() {
+          statsService.event("new_chat", {
+            userId: user.id,
+            troupeId: troupe.id,
+            username: user.username
+          });
+
+          var _msg;
+          if (troupe.oneToOne) {
+            var toUserId;
+            troupe.users.forEach(function(_user) {
+              if (_user.userId.toString() !== user.id.toString()) toUserId = _user.userId;
+            });
+            _msg = {oneToOne: true, username: user.username, toUserId: toUserId, text: text, id: chatMessage.id};
+          } else {
+            _msg = {oneToOne: false, username: user.username, room: troupe.uri, text: text, id: chatMessage.id};
+          }
+
+          appEvents.chatMessage(_msg);
+
+          return chatMessage;
+        });
+
+    });
+  })
+  .nodeify(callback);
+
+
+
 
 };
 

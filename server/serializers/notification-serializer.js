@@ -119,13 +119,13 @@ function TroupeStrategy(options) {
   function getOtherUserId(item) {
     if(!recipientUserId) return undefined;
     var userIds = item.getUserIds();
-    var userId = userIds.filter(function(userId) { return userId != recipientUserId; })[0];
+    var userId = userIds.filter(function(userId) { return "" + userId != "" + recipientUserId; })[0];
     return userId;
   }
 
   function getHomeUrl(user) {
     if(!user) return undefined;
-    return user.username ? "/" + user.username : "/one-one/" + user.id;
+    return "/" + user.username;
   }
 
   function getUrlUserMap(troupe) {

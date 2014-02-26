@@ -1,21 +1,14 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 'use strict';
 
-var github = require('troupe-octonode');
+var github = require('octonode');
 var assert = require('assert');
-var request = require('request');
-var fetchAllPages = require('./fetch-all-pages');
-var logFailingRequest = require('./log-failing-request');
-var requestWithRetry = require('./request-with-retry');
+var request = require('./request-wrapper');
 
 function createClient(user, token) {
   assert(token, 'token required');
 
-  var client = github.client(token,
-                  fetchAllPages(
-                  logFailingRequest(
-                  requestWithRetry({ maxRetries: 3 },
-                  request))));
+  var client = github.client(token, { request: request });
 
   return client;
 }
@@ -30,5 +23,14 @@ module.exports = exports = {
     assert(user, 'user required');
     var token = user.githubToken || user.githubUserToken;
     return createClient(user, token);
+  },
+  makeResolver: function(defer) {
+    /* Similar to Q's makeNodeResolver, but ensures that the result is
+     * not an array of the real result and the headers (octonode returns
+     * two values which get turned into an array)  */
+    return function(err, s) {
+      if(err) return defer.reject(err);
+      return defer.resolve(s);
+    };
   }
 };

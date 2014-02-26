@@ -1,146 +1,272 @@
-  @import "trp3Vars.less";
 
+@import "trp3Vars.less";
+@import "icon-mixins.less";
+@import "trpFonts.less";
+@import "trpColours.less";
 
-  html {
-    @media @small {
-      height: 100%;
-    }
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  @media @small {
+    height: 100%;
   }
-
-  body {
-    margin: 0;
-    padding: 0;
-    @media @small {
-      height: 100%;
-      overflow: hidden;
-    }
+  @media @mobile {
+    height:100%;
   }
+}
 
-  a {
-    color: #2980b9;
+html {
+  height: 100%;
+  @media @small {
+    height:100%;
   }
-
-
-  h1 {
-    font-family: 'Open Sans';
-    font-weight: 300;
-    font-size: 42px;
-    color: white;
-
-    @media @small {
-      font-size: 24px;
-    }
-
+  @media @mobile {
+    height: 100%;
   }
+}
 
-  h2 {
-    font-weight: 300;
-    font-family: 'Open Sans';
+
+h1 {
+  font-family: 'Open Sans';
+  font-weight: 300;
+  font-size: 42px;
+  @media @mobile {
     font-size: 30px;
   }
-
-  #beta-description {
-    @media @small {
-      display: none;
-    }
+  @media @small {
+    font-size: 20px;
   }
+}
 
-  .outer-container {
-    @media @small {
-      height: 100%;
-    }
+h2 {
+  font-weight: 400;
+  font-family: 'Open Sans';
+  font-size: 30px;
+}
+
+.subtext {
+  display: inline-block; 
+  background-color: rgba(0,0,0,0.75); 
+  padding: 14px 24px; 
+  letter-spacing: 0.04em;
+  @media @small {
+    display: none;
   }
-
-  .container {
-    background-image: url('../../images/2/gitter/splash.jpg');
-    background-size: cover;
-    padding-top: 20px;
-    background-color: #417f6a;
-    text-align: center;
-    @media @small {
-      height: 100%;
-    }
-  }
-
-  .strip {
-    width: 920px;
+  @media @mobile {
     display: inline-block;
-    font-family: 'Open Sans';
-    font-weight: 400;
+  }
+}
+
+h3 {
+  font-weight: 300;
+  font-family: 'Open Sans';
+  font-size: 16px;
+    @media @mobile {
+      font-size: 14px;
+    }
     @media @small {
-      width: 100%;
-      padding: 0 30px;
-      overflow: hidden;
-      box-sizing: border-box;
+        font-size: 14px;
     }
+}
+
+img {
+  max-width: 100%;
+  border: 0;
+  -ms-interpolation-mode: bicubic;
+}
+
+
+.hero-container {
+  background-size: cover; 
+  padding-top: 20px; 
+  background-color: #eee; 
+  height: 800px;
+  background-image: url("../../images/2/gitter/laptop-smaller.jpg");
+  @media @mobile {
+    height: 620px;
   }
-
-  .logo {
-    background-image: url('../../images/2/gitter/logo-text-white-64.png');
-    background-size: 196px 64px;
-    background-repeat: no-repeat;
-    height: 64px;
-
-    @media @retina {
-      background-image: url('../../images/2/gitter/logo-text-white-64@2x.png');
-    }
+  @media @small {
+    height: 620px;
   }
+  @media @retina {
+    background-image: url("../../images/2/gitter/laptop-smaller@2x.jpg");
+  }
+}
 
-  .feature {
+.hero {
+  display: inline-block; 
+  margin-top: 180px;
+  @media @mobile {
     margin-top: 40px;
-    text-align: left;
-    margin-bottom: 40px;
   }
+  @media @small {
+    margin-top: 40px;
+  }
+}
 
-  .button {
-    border-radius: 4px;
-    display: inline-block;
-    padding: 18px 24px;
-    text-transform:uppercase;
-    transition:all .2s ease-in-out;
+.github-REPO {
+  .prepend-repo-icon;
+  &:before {
+    font-size: 32px;
   }
+}
 
-  .button.white {
-    background-color: rgba(255,255,255,0.8);
-    border-bottom: 3px solid rgba(255,255,255,1);
+.github-PRIVATE {
+  .prepend-lock-icon;
+  &:before {
+    font-size: 32px;
   }
+}
 
-  .button.blur {
-    color: white;
-    background-color: rgba(255,255,255,0.15);
-  }
+.circle {
+  border-radius: 50em;
+  display: inline-block;
+  width: 200px;
+  height: 200px;
+}
 
-  .button.blur:hover {
-   background-color: rgba(255,255,255,0.3);
-  }
+.circle.green {
+  background-color: @trpGreen;
+}
 
-  .button.green {
-    color: white;
-    background-color: rgba(29,206,115, 0.9);
-    border-bottom: 3px solid rgba(29,206,115, 1);
-  }
+.circle.other {
+  background-color: #A95A31;
+}
 
-  .button.green:hover {
-    background-color: rgba(29,206,115, 1);
+.container {
+  text-align: center;
+  @media @small {
+    padding-left: 20px;
   }
+  @media @mobile {
+    padding-left: 0;
+  }
+}
 
-  .interested {
-    background-color: rgba(0,0,0,0.5);
-    border-radius: 6px;
-    padding: 38px 28px;
-    margin: 40px 0;
+.logo-container {
+  float: left;
+  background-image: url('../../images/2/gitter/logo-text-white-64.png');
+  width: 196px;
+  height: 64px;
+
+  @media @retina {
+    background-image: url('../../images/2/gitter/logo-text-white-64@2x.png');
+    background-size: contain;
   }
+}
+
+.signup-container {
+  float: right;
+  font-size: 14px; 
+  letter-spacing: 0.5px;
+  @media @mobile {
+    width: 100%;
+    text-align: center;
+    margin-top: 20px;
+  }
+  @media @small {
+    width: 100%;
+    text-align: center;
+    margin-top: 20px;
+  }
+}
+
+.container.main-green {
+  background-size: cover;
+  padding-top: 20px;
+  background-color: #417f6a
+}
+
+.container.grey {
+  background-color: #eee;
+  padding-bottom: 20px
+}
+
+.strip {
+  width: 100%;
+  max-width: 900px;
+  display: inline-block;
+  font-family: 'Open Sans';
+  font-weight: 300;
+  padding: 0 10px 0 10px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+}
+
+.feature {
+  margin-top: 40px;
+  text-align: left;
+  margin-bottom: 40px;
+}
+
+.feature-circle-container {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+.feature-circle {
+  display: inline-block;
+  width: 50%;
+}
+
+
+.button {
+  border-radius: 4px;
+  display: inline-block;
+  padding: 18px 24px;
+  text-transform:uppercase;
+  transition:all .2s ease-in-out;
+}
+
+.button.text {
+  color: white;
+  opacity: 0.8;
+  @media @mobile {
+    display: none;
+  }
+}
+
+.button.text:hover {
+  opacity: 1;
+}
+
+.button.green {
+  color: white;
+  background-color: rgba(29,206,115, 0.9);
+  border-bottom: 3px solid rgba(29,206,115, 1);
+  text-decoration: none;
+}
+
+.button.blur {
+  color: white;
+  background-color: rgba(255,255,255,0.15);
+}
+
+.button.blur:hover {
+  background-color: rgba(255,255,255,0.3);
+}
+
+.button.green:hover {
+  background-color: rgba(29,206,115, 1);
+}
+
+.interested {
+  background-color: rgba(0,0,0,0.5);
+  border-radius: 6px;
+  padding: 38px 28px;
+  margin: 40px 0;
+}
 
 .write-explain {
   color: white;
   font-size: 12px;
   text-align: center;
   margin-top: 2px;
-
-@media @mobile {
-  display: none;
-}
-
+  font-weight: 400;
+  @media @mobile {
+    display: none;
+  }
 }
 
 .write-explain a{

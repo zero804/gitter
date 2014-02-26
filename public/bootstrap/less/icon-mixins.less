@@ -14,6 +14,10 @@
   .prepend-octicon('\f037')
 }
 
+.prepend-lock-icon(){
+  .prepend-octicon('\f06a')
+}
+
 .prepend-repo-icon() {
   .prepend-octicon('\f001')
 }
@@ -108,6 +112,57 @@
   .prepend-gitter-icon('\e813')
 }
 
+
+.prepend-trello-card-update() {
+  .prepend-gitter-icon('\e813')
+}
+
+.prepend-icon-organisation() {
+  .prepend-octicon('\f037')
+}
+
+.prepend-icon-location() {
+  .prepend-octicon('\f060')
+}
+
+.prepend-icon-mail() {
+  .prepend-octicon('\f03b')
+}
+.prepend-icon-link() {
+  .prepend-octicon('\f05c')
+}
+.prepend-icon-clock() {
+  .prepend-octicon('\f046')
+}
+
+.prepend-icon-bitbucket() {
+  .prepend-gitter-icon('\e819');
+  margin-left: 2px;
+}
+
+
+.prepend-icon-huboard() {
+  &:before {
+    content: '';
+    position: absolute;
+    background-image: url('../../images/2/gitter/icon-huboard.png');
+    left: 0;
+    margin-top: 3px;
+    height: 16px;
+    width: 16px;
+    background-size: contain;
+  }
+  position: relative;
+  padding-left: 1.5em;
+
+  @media @retina {
+    &:before {
+      background-image: url('../../images/2/gitter/icon-huboard@2x.png');
+    }
+  }
+}
+
+
 .prepend-gitter-icon(@charCode) {
     &:before {
       font-family: 'troupe-icons';
@@ -133,6 +188,8 @@
     left: 0;
     -webkit-font-smoothing: antialiased;
     font-size: 16px;
+    width: 16px;
+    text-align: center;
   }
   position: relative;
   padding-left: 1.5em;

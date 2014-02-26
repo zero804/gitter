@@ -4,8 +4,6 @@
 var middleware      = require('../../web/middleware');
 var appRender       = require('./render');
 var appMiddleware   = require('./middleware');
-var limitedReleaseService = require('../../services/limited-release-service');
-
 
 var chatFrameMiddlewarePipeline = [
   middleware.grantAccessForRememberMeTokenMiddleware,
@@ -13,22 +11,13 @@ var chatFrameMiddlewarePipeline = [
   appMiddleware.uriContextResolverMiddleware,
   appMiddleware.isPhoneMiddleware,
   function(req, res, next) {
-    /* This can only happen on some /userOrOrg uris */
     if (req.uriContext.ownUrl) {
-      return limitedReleaseService.shouldUserBeTurnedAway(req.user)
-        .then(function(allow) {
-          if(allow) {
-            if(req.isPhone) {
-              appRender.renderMobileUserHome(req, res, next, 'home');
-            } else {
-              appRender.renderMainFrame(req, res, next, 'home');
-            }
-          } else {
-            var email = req.user.emails[0];
-            return res.render('thanks', { email: email, userEmailAccess: req.user.hasGitHubScope('user:email') });
-          }
-        })
-        .fail(next);
+      if(req.isPhone) {
+        appRender.renderMobileUserHome(req, res, next, 'home');
+      } else {
+        appRender.renderMainFrame(req, res, next, 'home');
+      }
+      return;
     }
 
     if(req.isPhone) {

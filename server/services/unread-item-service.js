@@ -156,15 +156,19 @@ function upgradeKeyToSortedSet(key, userBadgeKey, troupeId, callback) {
  * @return {promise} promise of nothing
  */
 function newItem(troupeId, creatorUserId, itemType, itemId) {
-  if(!troupeId) { winston.error("newitem failed. Troupe cannot be null"); return; }
-  if(!itemType) { winston.error("newitem failed. itemType cannot be null"); return; }
-  if(!itemId) { winston.error("newitem failed. itemId cannot be null"); return; }
+  function reject(msg) {
+    winston.error(msg);
+    return Q.reject(msg);
+  }
+
+  if(!troupeId) { return reject("newitem failed. Troupe cannot be null"); }
+  if(!itemType) { return reject("newitem failed. itemType cannot be null");  }
+  if(!itemId) { return reject("newitem failed. itemId cannot be null"); }
 
   return troupeService.findUserIdsForTroupeWithLurk(troupeId)
     .then(function(troupe) {
       var userIdsWithLurk = troupe.users;
       var userIds = Object.keys(userIdsWithLurk);
-
       if(creatorUserId) {
         userIds = userIds.filter(function(userId) {
           return ("" + userId) != ("" + creatorUserId);
@@ -196,6 +200,12 @@ function newItemForUsers(troupeId, itemType, itemId, userIds) {
 
   return runScript('unread-add-item', keys, [troupeId, itemId, timestamp])
     .then(function(result) {
+      function logOptimisticUpgradeFailure(err) {
+        if(err) {
+          winston.info('unread-item-key-upgrade: failed. This is not as serious as it sounds, optimistically locked. ' + err, { exception: err });
+        }
+      }
+
       // Results come back as two items per key in sequence
       // * 2*n value is the new badge count (or -1 for don't update)
       // * 2*n+1 value is a bitwise collection, 1 = badge update, 2 = upgrade key
@@ -224,11 +234,7 @@ function newItemForUsers(troupeId, itemType, itemId, userIds) {
           var userBadgeKey = "ub:" + userId;
 
           // Upgrades can happen asynchoronously
-          upgradeKeyToSortedSet(key, userBadgeKey, troupeId, function(err) {
-            if(err) {
-              winston.info('unread-item-key-upgrade: failed. This is not as serious as it sounds, optimistically locked. ' + err, { exception: err });
-            }
-          });
+          upgradeKeyToSortedSet(key, userBadgeKey, troupeId, logOptimisticUpgradeFailure);
         }
       }
 
@@ -424,7 +430,6 @@ exports.listTroupeUsersForEmailNotifications = function(sinceTime) {
 
           /* Its got to be older that the start time */
           if(time <= sinceTime) {
-
             return getUnreadItemsForUserTroupeSince(userId, troupeId, time)
               .then(function(items) {
 
@@ -452,6 +457,8 @@ exports.markUserAsEmailNotified = function(userId) {
   // NB: this function is not atomic, but it doesn't need to be
   return Q.ninvoke(redisClient, "hgetall", EMAIL_NOTIFICATION_HASH_KEY)
     .then(function(troupeUserHash) {
+      if(!troupeUserHash) return [];
+
       return Object.keys(troupeUserHash)
         .filter(function(hashKey) {
           var troupeUserId = hashKey.split(':');
@@ -460,6 +467,8 @@ exports.markUserAsEmailNotified = function(userId) {
         });
     })
     .then(function(userTroupeKeys) {
+      if(!userTroupeKeys.length) return;
+
       var args =[EMAIL_NOTIFICATION_HASH_KEY];
       args.push.apply(args, userTroupeKeys);
 

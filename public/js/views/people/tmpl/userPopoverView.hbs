@@ -1,0 +1,32 @@
+<div style="float: left"><img src="{{avatarUrl}}" class="avatar-l"/></div>
+<div class="trpPopoverDetails">
+  <h1>{{name}}</h1>
+  <h2><a href="http://github.com/{{login}}">{{login}}</a></h3>
+
+  <div class="vcard-stats">
+      <strong class="vcard-stat-count">{{followers}}</strong>
+      followers &nbsp;
+      <strong class="vcard-stat-count">{{public_repos}}</strong>
+      repos &nbsp;
+      <strong class="vcard-stat-count">{{following}}</strong>
+      following &nbsp;
+  </div>
+
+  <ul class="trpUserDetails">
+    {{#if company}}
+    <li class="github-ORG">{{company}}</li>
+    {{/if}}
+
+    {{#if location}}
+    <li class="github-LOCATION">{{location}}</li>
+    {{/if}}
+
+    {{#if email}}
+    <li class="github-MAIL"><a class="email" href="mailto:{{email}}">{{email}}</a></li>
+    {{/if}}
+
+    {{#if blog}}
+    <li class="github-LINK"><a target="_new" href="{{blogUrl}}" class="url" rel="nofollow me">{{blog}}</a></li>
+    {{/if}}
+  </ul>
+</div>

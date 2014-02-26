@@ -270,8 +270,16 @@
       }
     },
     "connect-redis": {
-      "version": "1.4.6",
-      "from": "connect-redis@~1.4.6"
+      "version": "1.4.7",
+      "from": "connect-redis@1.4.7",
+      "resolved": "https://registry.npmjs.org/connect-redis/-/connect-redis-1.4.7.tgz",
+      "dependencies": {
+        "redis": {
+          "version": "0.10.1",
+          "from": "redis@0.10.1",
+          "resolved": "https://registry.npmjs.org/redis/-/redis-0.10.1.tgz"
+        }
+      }
     },
     "fineuploader-express-middleware": {
       "version": "0.0.2",
@@ -781,40 +789,49 @@
       "resolved": "https://registry.npmjs.org/csv-stream/-/csv-stream-0.1.3.tgz"
     },
     "express-winston": {
-      "version": "0.2.1",
-      "from": "express-winston@~0.2.1",
+      "version": "0.2.4",
+      "from": "express-winston@0.2.4",
+      "resolved": "https://registry.npmjs.org/express-winston/-/express-winston-0.2.4.tgz",
       "dependencies": {
         "winston": {
           "version": "0.6.2",
-          "from": "winston@0.6.x",
+          "from": "winston@0.6.2",
+          "resolved": "https://registry.npmjs.org/winston/-/winston-0.6.2.tgz",
           "dependencies": {
             "async": {
               "version": "0.1.22",
-              "from": "async@0.1.x"
+              "from": "async@0.1.22",
+              "resolved": "https://registry.npmjs.org/async/-/async-0.1.22.tgz"
             },
             "colors": {
               "version": "0.6.2",
-              "from": "colors@0.x.x"
+              "from": "colors@0.6.2",
+              "resolved": "https://registry.npmjs.org/colors/-/colors-0.6.2.tgz"
             },
             "cycle": {
               "version": "1.0.3",
-              "from": "cycle@1.0.x"
+              "from": "cycle@1.0.3",
+              "resolved": "https://registry.npmjs.org/cycle/-/cycle-1.0.3.tgz"
             },
             "eyes": {
               "version": "0.1.8",
-              "from": "eyes@0.1.x"
+              "from": "eyes@0.1.8",
+              "resolved": "https://registry.npmjs.org/eyes/-/eyes-0.1.8.tgz"
             },
             "pkginfo": {
               "version": "0.2.3",
-              "from": "pkginfo@0.2.x"
+              "from": "pkginfo@0.2.3",
+              "resolved": "https://registry.npmjs.org/pkginfo/-/pkginfo-0.2.3.tgz"
             },
             "request": {
               "version": "2.9.203",
-              "from": "request@2.9.x"
+              "from": "request@2.9.203",
+              "resolved": "https://registry.npmjs.org/request/-/request-2.9.203.tgz"
             },
             "stack-trace": {
-              "version": "0.0.7",
-              "from": "stack-trace@0.0.x"
+              "version": "0.0.9",
+              "from": "https://registry.npmjs.org/stack-trace/-/stack-trace-0.0.9.tgz",
+              "resolved": "https://registry.npmjs.org/stack-trace/-/stack-trace-0.0.9.tgz"
             }
           }
         }
@@ -824,69 +841,6 @@
       "version": "1.4.4",
       "from": "apn@~1.4.3",
       "resolved": "https://registry.npmjs.org/apn/-/apn-1.4.4.tgz"
-    },
-    "kue": {
-      "version": "0.5.0-patch1",
-      "from": "kue@git://github.com/suprememoocow/kue.git",
-      "resolved": "git://github.com/suprememoocow/kue.git#dd0cc290ea3751da3e12a211d1b1e64f1eba4982",
-      "dependencies": {
-        "redis": {
-          "version": "0.7.2",
-          "from": "redis@0.7.2"
-        },
-        "jade": {
-          "version": "0.26.3",
-          "from": "jade@0.26.3",
-          "dependencies": {
-            "commander": {
-              "version": "0.6.1",
-              "from": "commander@0.6.1"
-            },
-            "mkdirp": {
-              "version": "0.3.0",
-              "from": "mkdirp@0.3.0"
-            }
-          }
-        },
-        "stylus": {
-          "version": "0.27.2",
-          "from": "stylus@0.27.2",
-          "dependencies": {
-            "cssom": {
-              "version": "0.2.5",
-              "from": "cssom@0.2.x"
-            },
-            "mkdirp": {
-              "version": "0.3.5",
-              "from": "mkdirp@0.3.x"
-            }
-          }
-        },
-        "nib": {
-          "version": "0.5.0",
-          "from": "nib@0.5.0"
-        },
-        "reds": {
-          "version": "0.1.4",
-          "from": "reds@0.1.4",
-          "dependencies": {
-            "natural": {
-              "version": "0.0.69",
-              "from": "natural@0.0.69",
-              "dependencies": {
-                "sylvester": {
-                  "version": "0.0.21",
-                  "from": "sylvester@>= 0.0.12"
-                },
-                "apparatus": {
-                  "version": "0.0.8",
-                  "from": "apparatus@>= 0.0.4"
-                }
-              }
-            }
-          }
-        }
-      }
     },
     "file": {
       "version": "0.2.1",
@@ -1348,8 +1302,9 @@
       }
     },
     "easynexmo": {
-      "version": "0.3.1",
-      "from": "easynexmo@~0.3.1"
+      "version": "0.3.2",
+      "from": "easynexmo@0.3.2",
+      "resolved": "https://registry.npmjs.org/easynexmo/-/easynexmo-0.3.2.tgz"
     },
     "ent": {
       "version": "0.1.0",
@@ -1383,10 +1338,10 @@
       "version": "0.7.4",
       "from": "debug@~0.7.4"
     },
-    "troupe-octonode": {
-      "version": "0.3.12",
-      "from": "troupe-octonode@0.3.12",
-      "resolved": "https://registry.npmjs.org/troupe-octonode/-/troupe-octonode-0.3.12.tgz",
+    "octonode": {
+      "version": "0.5.0",
+      "from": "octonode@git://github.com/pksunkara/octonode#19ad516f5d7f2cbb49c7aaef218aae325a425f80",
+      "resolved": "git://github.com/pksunkara/octonode#19ad516f5d7f2cbb49c7aaef218aae325a425f80",
       "dependencies": {
         "request": {
           "version": "2.27.0",
@@ -1401,7 +1356,7 @@
               "from": "json-stringify-safe@~5.0.0"
             },
             "forever-agent": {
-              "version": "0.5.0",
+              "version": "0.5.2",
               "from": "forever-agent@~0.5.0"
             },
             "tunnel-agent": {
@@ -1414,13 +1369,11 @@
               "dependencies": {
                 "assert-plus": {
                   "version": "0.1.2",
-                  "from": "assert-plus@0.1.2",
-                  "resolved": "https://registry.npmjs.org/assert-plus/-/assert-plus-0.1.2.tgz"
+                  "from": "assert-plus@0.1.2"
                 },
                 "asn1": {
                   "version": "0.1.11",
-                  "from": "asn1@0.1.11",
-                  "resolved": "https://registry.npmjs.org/asn1/-/asn1-0.1.11.tgz"
+                  "from": "asn1@0.1.11"
                 },
                 "ctype": {
                   "version": "0.5.2",
@@ -1477,8 +1430,7 @@
                   "dependencies": {
                     "delayed-stream": {
                       "version": "0.0.5",
-                      "from": "delayed-stream@0.0.5",
-                      "resolved": "https://registry.npmjs.org/delayed-stream/-/delayed-stream-0.0.5.tgz"
+                      "from": "delayed-stream@0.0.5"
                     }
                   }
                 }
@@ -1487,8 +1439,12 @@
           }
         },
         "randomstring": {
-          "version": "1.0.2",
+          "version": "1.0.3",
           "from": "randomstring@1.x.x"
+        },
+        "deep-extend": {
+          "version": "0.2.8",
+          "from": "deep-extend@0.x.x"
         }
       }
     },
@@ -1535,8 +1491,9 @@
       "from": "parse-links@~0.1.0"
     },
     "async": {
-      "version": "0.2.9",
-      "from": "async@~0.2.9"
+      "version": "0.2.10",
+      "from": "async@0.2.10",
+      "resolved": "https://registry.npmjs.org/async/-/async-0.2.10.tgz"
     },
     "troupe-passport-github": {
       "version": "0.1.8-d",
@@ -1598,13 +1555,14 @@
       "from": "text-filter@~0.1.0"
     },
     "marked": {
-      "version": "0.2.10-b",
-      "from": "marked@git://github.com/gitterHQ/marked.git#ae5b3de555bdaf87f1e812c7fda9337c9c468128",
-      "resolved": "git://github.com/gitterHQ/marked.git#ae5b3de555bdaf87f1e812c7fda9337c9c468128"
+      "version": "0.3.0",
+      "from": "marked@git://github.com/gitterHQ/marked.git#v0.3.0",
+      "resolved": "git://github.com/gitterHQ/marked.git#777e409347430839d9a0d82ca76b9fc51d81350c"
     },
     "highlight.js": {
-      "version": "7.5.0",
-      "from": "highlight.js@~7.5.0"
+      "version": "8.0.0",
+      "from": "highlight.js@8.0.0",
+      "resolved": "https://registry.npmjs.org/highlight.js/-/highlight.js-8.0.0.tgz"
     },
     "xregexp": {
       "version": "2.0.0",

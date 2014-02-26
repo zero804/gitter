@@ -15,6 +15,7 @@ img.emoji {
   border-radius: 2px;
   padding: 0 4px;
   font-size: 13px;
+  cursor: pointer;
 }
 
 .gtrActivityItemText .mention {
@@ -63,6 +64,18 @@ a.issue:hover {
 
 .issue.closed:hover {
   background-color: fade(@trpRed, 40%)
+}
+
+.issue-popover-body {
+  float: left;
+  width: 100%;
+}
+
+blockquote {
+  margin-bottom: 0;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 27.5px;
 }
 
 .trpChatContainer {
@@ -278,6 +291,10 @@ pre code {
 
 .trpChatItemContainer:last-child .trpChatItem {
   padding-bottom: 16px;
+}
+
+.trpChatContainer .deleted {
+  opacity: 0.5;
 }
 
 .trpChatItem {
@@ -529,7 +546,6 @@ pre code {
   opacity: 0.4;
   height: 16px;
   vertical-align: middle;
-  padding-bottom: 2px;
 }
 
 // if the viewer can edit the message, dont gray it out

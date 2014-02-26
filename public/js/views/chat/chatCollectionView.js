@@ -20,8 +20,6 @@ define([
 
   /** @const */
   var PAGE_SIZE = 15;
-  /** @const */
-  var MAX_IMAGE_EMBED_LOAD_TIME_MS = 2000;
 
   /*
    * View
@@ -75,7 +73,6 @@ define([
       this.decorators     = options.decorators || [];
 
       this.rollers.scrollToBottom();
-      this.rollers.adjustScrollContinuously(MAX_IMAGE_EMBED_LOAD_TIME_MS);
 
       /* Scroll to the bottom when the user sends a new chat */
       this.listenTo(appEvents, 'chat.send', function() {
@@ -144,6 +141,18 @@ define([
       if(this.collection.length === 1) {
         this.adjustTopPadding();
       }
+    },
+
+    pageUp: function() {
+      var scrollFromTop = this.$el.scrollTop();
+      var pageHeight = Math.floor(this.$el.height() * 0.8);
+      this.$el.scrollTop(scrollFromTop - pageHeight);
+    },
+
+    pageDown: function() {
+      var scrollFromTop = this.$el.scrollTop();
+      var pageHeight = Math.floor(this.$el.height() * 0.8);
+      this.$el.scrollTop(scrollFromTop + pageHeight);
     },
 
     getFetchData: function() {

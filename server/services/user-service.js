@@ -2,21 +2,13 @@
 "use strict";
 
 // var sechash                   = require('sechash');
-var uuid                      = require('node-uuid');
 var winston                   = require("winston");
 var assert                    = require('assert');
-var Q                         = require('q');
-var moment                    = require('moment');
 var _                         = require('underscore');
 var persistence               = require("./persistence-service");
-var emailNotificationService  = require("./email-notification-service");
 var userConfirmationService   = require('./user-confirmation-service');
-// var geocodingService          = require("./geocoding-service");
 var statsService              = require("./stats-service");
-// var uriLookupService          = require("./uri-lookup-service");
-var appEvents                 = require("../app-events");
 var collections               = require("../utils/collections");
-// var promiseUtils              = require('../utils/promise-utils');
 
 /**
  * Creates a new user
@@ -95,25 +87,6 @@ var userService = {
       .nodeify(callback);
   },
 
-  requestPasswordReset: function(login, callback) {
-    winston.info("Requesting password reset for ", login);
-    return userService.findByLogin(login)
-    .then(function(user) {
-      assert(user, 'User not found');
-      if(user.passwordResetCode) {
-        /* Resend the password reset code to the user */
-      } else {
-        user.passwordResetCode = uuid.v4();
-        return user.saveQ().thenResolve(user);
-      }
-    })
-    .then(function(user) {
-      emailNotificationService.sendPasswordResetForUser(user);
-      return user;
-    })
-    .nodeify(callback);
-  },
-
   findAndUsePasswordResetCode: function(passwordResetCode, callback) {
     winston.info("Using password reset code", passwordResetCode);
     return persistence.User.findOneQ({ passwordResetCode: passwordResetCode })
@@ -137,6 +110,14 @@ var userService = {
     return persistence.User.findByIdQ(id).nodeify(callback);
   },
 
+  githubUserExists: function(username, callback) {
+    return persistence.User.countQ({ username: username })
+      .then(function(count) {
+        return !!count;
+      })
+      .nodeify(callback);
+  },
+
   findByGithubId: function(githubId, callback) {
     return persistence.User.findOneQ({ githubId: githubId })
            .nodeify(callback);
@@ -146,7 +127,6 @@ var userService = {
     return persistence.User.findOneQ({$or: [{ githubId: githubId }, { username: username }]})
            .nodeify(callback);
   },
-
 
   findByEmail: function(email, callback) {
     return persistence.User.findOneQ({ $or: [{ email: email.toLowerCase()}, { emails: email.toLowerCase() }]})
@@ -277,262 +257,10 @@ var userService = {
   //   });
   // },
 
-  // updateInitialPassword: function(userId, password, callback) {
-  //   winston.info("Initial password reset", userId);
-
-  //   persistence.User.findById(userId, function(err, user) {
-  //     if(user.passwordHash) return callback("User already has a password set");
-
-  //      sechash.strongHash('sha512', password, function(err, hash3) {
-  //        user.passwordHash = hash3;
-  //        return callback(false);
-  //      });
-  //   });
-  // },
-
-  // checkPassword: function(user, password, callback) {
-  //   if(!user.passwordHash) {
-  //     /* User has not yet set their password */
-  //     return callback(false);
-  //   }
-
-  //   sechash.testHash(password, user.passwordHash, function(err, match) {
-  //     if(err) return callback(false);
-  //     callback(match);
-  //   });
-  // },
-
-  // updateProfile: function(options, callback) {
-  //   winston.info("User profile update", options.userId);
-  //   var userId = options.userId;
-  //   var password = options.password;
-  //   var oldPassword = options.oldPassword;
-  //   var displayName = options.displayName;
-  //   var username = options.username;
-
-  //   assert(userId, 'userId expected');
-
-  //   var postSave = [];
-
-  //   var seq = userService.findById(userId)
-  //     .then(promiseUtils.required)
-  //     .then(queueDeleteInvites);
-
-  //   if(displayName) seq = seq.then(updateDisplayName);
-  //   if(password) seq = seq.then(updatePassword);
-  //   if(username) seq = seq.then(updateUsername);
-
-  //   return seq.then(saveUser)
-  //           .then(performPostSaveActions)
-  //           .then(notifyTrackers)
-  //           .nodeify(callback);
-
-  //   function queueDeleteInvites(user) {
-  //     postSave.push(function() {
-  //       userService.deleteAllUsedInvitesForUser(user);
-  //     });
-
-  //     return user;
-  //   }
-
-  //   function updateDisplayName(user) {
-  //     // set new properties
-  //     user.displayName = displayName;
-  //     return user;
-  //   }
-
-  //   function updatePassword(user) {
-  //     switch(user.status) {
-  //       case 'PROFILE_NOT_COMPLETED':
-  //         return hashAndUpdatePassword();
-
-  //       case 'ACTIVE':
-  //         return testExistingPassword()
-  //             .then(hashAndUpdatePassword);
-
-  //       default:
-  //         throw "Invalid user status: " + user.status;
-  //     }
-
-
-  //     // generates and sets the new password hash
-  //     function hashAndUpdatePassword() {
-  //       return Q.nfcall(sechash.strongHash, 'sha512', password)
-  //         .then(function(hash3) {
-  //           user.passwordHash = hash3;
-  //           // mark user as active after setting the password
-  //           if (user.status === 'PROFILE_NOT_COMPLETED' || user.status === 'UNCONFIRMED') {
-  //             user.status = "ACTIVE";
-
-  //             postSave.push(function() {
-  //               appEvents.userAccountActivated(user.id);
-  //               statsService.event('profile_completed', { userId: user.id, email: user.email });
-  //             });
-  //           }
-  //           return user;
-  //         });
-  //     }
-
-  //     function testExistingPassword() {
-  //       if(user.passwordHash) {
-  //         return Q.nfcall(sechash.testHash, oldPassword, user.passwordHash)
-  //           .then(function(match) {
-  //             if(!match && user.passwordHash) throw {authFailure: true };
-  //             return user;
-  //           });
-  //       } else {
-  //         return Q.fcall(function() {
-  //           return user;
-  //         });
-  //       }
-  //     }
-
-  //   }
-
-  //   function updateUsername(user) {
-  //     username = username.toLowerCase();
-
-  //     if(user.username === username) {
-  //       // Nothing to do, the user has not changed their email username
-  //       return user;
-  //     }
-
-  //     return uriLookupService.updateUsernameForUserId(user.id, user.username, username)
-  //       .then(function() {
-  //         // save the new email address while it is being confirmed
-  //         user.username = username;
-
-  //         return user;
-  //       })
-  //       .fail(function(err) {
-  //         if(err === 409) throw { usernameConflict: true };
-
-  //         throw err;
-  //       });
-
-  //   }
-
-  //   function saveUser(user) {
-  //     return user.saveQ().then(function() {
-  //       return user;
-  //     });
-  //   }
-
-  //   function performPostSaveActions(user) {
-  //     postSave.forEach(function(f) { f(); });
-  //     return user;
-  //   }
-
-  //   function notifyTrackers(user) {
-  //     statsService.userUpdate(user);
-  //     statsService.event('profile_updated', { userId: user.id, email: user.email });
-
-  //     return user;
-  //   }
-
-  // },
-
   deleteAllUsedInvitesForUser: function(user) {
     persistence.Invite.remove({ userId: user.id, status: "USED" });
   },
 
-  // addSecondaryEmail: function(user, email, silent) {
-  //   winston.verbose("Adding secondary email ", email, " for user ", user.id);
-  //   return persistence.User.findOneQ({ $or: [{ email: email }, { emails: email } ]})
-  //     .then(function(existing) {
-  //       if(existing) throw 409; // conflict
-
-  //       var secondary = {
-  //         email: email,
-  //         confirmationCode: uuid.v4()
-  //       };
-
-  //       user.unconfirmedEmails.push(secondary);
-
-  //       if (!silent) {
-  //         emailNotificationService.sendConfirmationForSecondaryEmail(secondary);
-  //       }
-
-  //       return user.saveQ().thenResolve(user);
-
-  //     });
-  // },
-
-  // switchPrimaryEmail: function(user, email) {
-  //   assert(user.isConfirmed(), 'User must be confirmed');
-
-  //   var index = user.emails.indexOf(email);
-  //   if(index < 0) return Q.reject(404);
-  //   user.emails.splice(index, 1, user.email);
-
-  //   user.email = email;
-  //   return user.saveQ().thenResolve(user);
-  // },
-
-  // removeSecondaryEmail: function(user, email) {
-  //   var index = user.emails.indexOf(email);
-  //   if(index >= 0) {
-  //     user.emails.splice(index, 1);
-  //     return user.saveQ().thenResolve(user);
-  //   }
-
-  //   var unconfirmed = user.unconfirmedEmails.filter(function(unconfirmedEmail) {
-  //     return unconfirmedEmail.email === email;
-  //   }).shift();
-
-  //   if(unconfirmed) {
-  //     unconfirmed.remove();
-  //     return user.saveQ().thenResolve(user);
-  //   }
-
-  //   return Q.reject(404);
-  // },
-
-  // confirmSecondaryEmail: function(user, confirmationCode) {
-  //   return userService.confirmSecondaryEmailByCode(user, confirmationCode);
-  // },
-
-  // confirmSecondaryEmailByCode: function(user, confirmationCode) {
-  //   var unconfirmed = user.unconfirmedEmails.filter(function(unconfirmedEmail) {
-  //     return unconfirmedEmail.confirmationCode === confirmationCode;
-  //   }).shift();
-
-  //   return userService.confirmSecondaryUnconfirmed(user, unconfirmed);
-  // },
-
-  // confirmSecondaryEmailByAddress: function(user, email) {
-  //   var unconfirmed = user.unconfirmedEmails.filter(function(unconfirmedEmail) {
-  //     return unconfirmedEmail.email === email;
-  //   }).shift();
-
-  //   return userService.confirmSecondaryUnconfirmed(user, unconfirmed);
-  // },
-
-  // // private
-  // confirmSecondaryUnconfirmed: function(user, unconfirmed) {
-  //   if(!unconfirmed) return Q.reject(404);
-  //   winston.info("Confirming secondary email ", { userId: user.id, email: unconfirmed.email });
-
-  //   unconfirmed.remove();
-  //   var email = unconfirmed.email;
-
-  //   user.emails.push(email);
-
-  //   return user.saveQ()
-  //     .then(function() {
-
-  //       // Signal that an email address has been confirmed
-  //       appEvents.emailConfirmed(email, user.id);
-
-  //       // Remove the unconfirmed secondary email address for
-  //       // any other users who may have tried to register it
-  //       return persistence.User.updateQ(
-  //         { 'unconfirmedEmails.email': email },
-  //         { $pull: { unconfirmedEmails: { email: email } } },
-  //         { multi: true });
-  //     })
-  //     .thenResolve(user);
-  // }
 
 };
 
