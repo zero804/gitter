@@ -18,6 +18,9 @@ define([
     /*notifications,*/ modalRegion, cocktail/*, hasScrollBars*/) {
   "use strict";
 
+  /** @const */
+  var BACKSPACE = 8;
+
   var touchEvents = {
     "click #menu-toggle-button":        "onMenuToggle",
     "keypress":                         "onKeyPress"
@@ -31,6 +34,7 @@ define([
     "mouseenter #toolbar-frame":        "onMouseEnterToolbar",
     "mouseleave #toolbar-frame":        "onMouseLeaveToolbar",
     "keypress":                         "onKeyPress",
+    "keydown":                          "onKeyDown",
     "click #troupe-more-actions":       "toggleTroupeMenu",
     "click #favourite-button":          "toggleFavourite"
   };
@@ -239,7 +243,17 @@ define([
       $("#list-search-input").focus();
     },
 
+    onKeyDown: function(e) {
+      if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+      if (e.keyCode === BACKSPACE) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    },
+
     onKeyPress: function(e) {
+
       //  return if user is copying or pasting
       if ( e.metaKey || e.ctrlKey ) return true;
 
