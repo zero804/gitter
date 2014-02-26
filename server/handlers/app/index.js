@@ -51,18 +51,10 @@ module.exports = {
         '/:roomPart1/:roomPart2/chat',              // REPO or ORG_CHANNEL or ADHOC
         '/:roomPart1/:roomPart2/:roomPart3/chat',   // REPO_CHANNEL
       ].forEach(function(path) {
-        app.get(path,
-          function(req, res, next) {
-            var uri = normaliseUrl(req.params);
-            // req.params.userOrOrg = req.params[0];
-            // req.params.repo = req.params[1];
-            // req.params.channel = req.params[2];
-            next();
-          },
-          chatMiddlewarePipeline);
+        app.get(path, chatMiddlewarePipeline);
       });
 
-      app.get('/:userOrOrg/-/home',
+      app.get('/:roomPart1/-/home',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         appMiddleware.uriContextResolverMiddleware,
@@ -91,8 +83,9 @@ module.exports = {
         chatFrameMiddlewarePipeline);
 
       [
-        '/:userOrOrg',
-        '/:userOrOrg/:repo',
+        '/:roomPart1',
+        '/:roomPart1/:roomPart2',
+        '/:roomPart1/:roomPart2/:roomPart3',
       ].forEach(function(path) {
         app.get(path, chatFrameMiddlewarePipeline);
       });

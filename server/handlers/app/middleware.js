@@ -19,7 +19,6 @@ function normaliseUrl(params) {
 function uriContextResolverMiddleware(req, res, next) {
   var uri = normaliseUrl(req.params);
 
-  console.log('URI IS ', uri);
   return roomService.findOrCreateRoom(req.user, uri)
     .then(function(uriContext) {
       if(!uriContext.troupe && !uriContext.ownUrl) throw 404;
