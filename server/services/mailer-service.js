@@ -63,12 +63,19 @@ exports.sendEmail = function(options, done) {
         return d.resolve();
       }
 
+      var headers;
+      if(options.unsubscribe) {
+        headers = {
+          'List-Unsubscribe': '<' + options.unsubscribe + '>'
+        };
+      }
       smtpTransport.sendMail({
         from: options.from,
         to: options.to,
         subject: options.subject,
         html: headerHtml + "\n" + html + "\n" + footerHtml,
-        text: plaintext
+        text: plaintext,
+        headers: headers
       }, function(error, response){
 
         if(err) {
