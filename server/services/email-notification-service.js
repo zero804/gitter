@@ -44,6 +44,10 @@ module.exports = {
 
         var emailBasePath = nconf.get("email:emailBasePath");
         var unsubscribeUrl = emailBasePath + '/settings/unsubscribe/' + hash;
+        var canChangeNotifySettings = troupesWithUnreadCounts.some(function(troupeWithUnreadCounts) {
+          return !troupeWithUnreadCounts.troupe.oneToOne;
+        });
+
 
         return mailerService.sendEmail({
           templateFile: "unread_notification",
@@ -52,6 +56,7 @@ module.exports = {
           unsubscribe: unsubscribeUrl,
           subject: "Activity on Gitter",
           data: {
+            canChangeNotifySettings: canChangeNotifySettings,
             user: user,
             emailBasePath: emailBasePath,
             troupesWithUnreadCounts: troupesWithUnreadCounts,
