@@ -311,7 +311,7 @@ var TroupeSchema = new Schema({
   topic: { type: String, 'default':'' },
   uri: { type: String },
   lcUri: { type: String, 'default': function() { return this.uri ? this.uri.toLowerCase() : null; }  },
-  githubType: { type: String, 'enum': ['REPO', 'ORG', 'ONETOONE', 'REPO_CHANNEL', 'ORG_CHANNEL'], required: true },
+  githubType: { type: String, 'enum': ['REPO', 'ORG', 'ONETOONE', 'REPO_CHANNEL', 'ORG_CHANNEL', 'USER_CHANNEL'], required: true },
   status: { type: String, "enum": ['ACTIVE', 'DELETED'], "default": 'ACTIVE'},
   oneToOne: { type: Boolean, "default": false },
   users: [TroupeUserSchema],

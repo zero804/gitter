@@ -11,7 +11,6 @@ var Q                  = require('q');
 var permissionsModel   = require('./permissions-model');
 var userService        = require('./user-service');
 var troupeService      = require('./troupe-service');
-var chatService          = require('./chat-service');
 var nconf              = require('../utils/config');
 var request            = require('request');
 var GitHubRepoService  = require('./github/github-repo-service');
@@ -20,10 +19,6 @@ var _                  = require('underscore');
 var appEvents          = require("../app-events");
 var xregexp            = require('xregexp').XRegExp;
 var serializeEvent     = require('./persistence-service-events').serializeEvent;
-
-
-var redis = require('../utils/redis');
-var redisClient = redis.createClient();
 
 function localUriLookup(uri, opts) {
   return uriLookupService.lookupUri(uri)
@@ -317,26 +312,80 @@ function findChildChannelRoom(parentTroupe, childTroupeId, callback) {
 }
 exports.findChildChannelRoom = findChildChannelRoom;
 
-var channelMatcher = xregexp('^[\\p{L}\\d]+$');
 
-function createChannelForRoom(parentTroupe, user, name, callback) {
+function assertValidName(name) {
+  var matcher = xregexp('^[\\p{L}\\d]+$');
+  if(!matcher.test(name)) throw 400;
+}
+
+var RANGE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefgihjklmnopqrstuvwxyz01234567890';
+function generateRandomName() {
+  var s = '';
+  for(var i = 0; i < 6; i++) {
+    s += RANGE.charAt(Math.floor(Math.random() * RANGE.length));
+  }
+  return s;
+}
+
+function createCustomChildRoom(parentTroupe, user, options, callback) {
   return Q.fcall(function() {
-    assert(name, 'Name is expected');
-    assert(channelMatcher.test(name), 'Name is must be one or more letters long');
+    assert(user, 'user is expected');
+    assert(options, 'options is expected');
 
-    var uri = parentTroupe.uri + '/*' + name;
-    var lcUri = uri.toLowerCase();
-    var githubType;
-    switch(parentTroupe.githubType) {
-      case 'ORG':
-        githubType = 'ORG_CHANNEL';
-        break;
-      case 'REPO':
-        githubType = 'REPO_CHANNEL';
-        break;
-      default:
-        assert(false, 'Parent room must be an ORG or a REPO');
+    var name = options.name;
+    var security = options.security;
+    var uri, githubType;
+
+
+    if(parentTroupe) {
+      assertValidName(name);
+      uri = parentTroupe.uri + '/' + name;
+
+      if(!{ ORG: 1, REPO: 1 }.hasOwnProperty(parentTroupe.githubType) ) {
+      }
+
+      switch(parentTroupe.githubType) {
+        case 'ORG':
+          githubType = 'ORG_CHANNEL';
+          break;
+        case 'REPO':
+          githubType = 'REPO_CHANNEL';
+          break;
+        default:
+          assert(false, 'Invalid parent room type');
+      }
+
+      if(!{ OPEN: 1, PRIVATE: 1, INHERITED: 1 }.hasOwnProperty(security) ) {
+        assert(false, 'Invalid security option: ' + security);
+      }
+
+    } else {
+      githubType = 'USER_CHANNEL';
+
+      // Create a child room for a user
+      switch(security) {
+        case 'OPEN':
+          assertValidName(name);
+          break;
+
+        case 'PRIVATE':
+          if(name) {
+            /* If you cannot afford a name, one will be assigned to you */
+            assertValidName(name);
+          } else {
+            name = generateRandomName();
+          }
+          break;
+
+        default:
+          assert(false, 'Invalid security option: ' + security);
+      }
+
+      uri = user.username + '/' + name;
+
     }
+
+    var lcUri = uri.toLowerCase();
 
     return permissionsModel(user, 'create', uri, githubType)
       .then(function(access) {
@@ -363,35 +412,23 @@ function createChannelForRoom(parentTroupe, user, name, callback) {
             // TODO handle adding the user in the event that they didn't create the room!
             if(newRoom._nonce === nonce) {
               serializeCreateEvent(newRoom);
-
-              return newRoom;
-              // // Indeed the room was just created right now
-              // // Notify people or something at this point I
-              // // guess
-              // var text = "[CHANNEL] New channel *" + name + " created by " + user.username;
-              // var meta = {
-              //   uri: newRoom.uri,
-              //   name: newRoom.name,
-              //   user: user.username,
-              //   type: 'webhook',
-              //   service: 'gitter',
-              //   event: 'channel'
-              // };
-
-              // return chatService.newRichMessageToTroupe(parentTroupe, null, text, meta)
-              //   .thenResolve(newRoom);
             }
+
             return newRoom;
           });
       });
    })
    .then(function(newRoom) {
-    // Add this room to the list of channels
-    // owed by the parent
-    parentTroupe.channels.addToSet(newRoom.id);
-    return parentTroupe.saveQ()
-      .thenResolve(newRoom);
+    if(parentTroupe) {
+      // Add this room to the list of channels
+      // owed by the parent
+      parentTroupe.channels.addToSet(newRoom.id);
+      return parentTroupe.saveQ()
+        .thenResolve(newRoom);
+    } else {
+      return newRoom;
+    }
    })
    .nodeify(callback);
 }
-exports.createChannelForRoom = createChannelForRoom;
+exports.createCustomChildRoom = createCustomChildRoom;

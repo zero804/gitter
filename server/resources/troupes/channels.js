@@ -31,9 +31,9 @@ module.exports = {
 
     create: function(req, res, next) {
       var body = req.body;
-      return roomService.createChannelForRoom(req.troupe, req.user, body.name)
-        .then(function(channelRoom) {
-          return serialize(channelRoom, req, res, next);
+      return roomService.createCustomChildRoom(req.troupe, req.user, body.name)
+        .then(function(customRoom) {
+          return serialize(customRoom, req, res, next);
         })
         .fail(next);
     },
