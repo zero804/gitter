@@ -131,7 +131,7 @@ require([
     routes: [
       { name: "people",           re: /^people/,                  viewType: peopleCollectionView.Modal,         collection: itemCollections.sortedUsers, skipModelLoad: true },
       { name: "inv",              re: /^inv$/,                    viewType: inviteView.Modal },
-      { name: "troupeSettings",   re: /^troupeSettings/,          viewType: troupeSettingsView },
+      { name: "notifications",    re: /^notifications/,           viewType: troupeSettingsView },
       { name: "markdown",         re: /^markdown/,                viewType: markdownView },
       { name: "integrations",     re: /^integrations/,            viewType: IntegrationSettingsModal,  validationCheck: integrationsValidationCheck }
     ],
