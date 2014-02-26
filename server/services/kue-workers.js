@@ -11,11 +11,4 @@ exports.startWorkers = function() {
   require('./unread-item-service');
 
   require('../utils/worker-queue').startWorkers();
-
-  //require('./kue-cleanup-service').startCleanupJob();
-
-  //if(nconf.get("kue:startAdminApp")) {
-  //  var kue = require('../utils/kue');
-  //  kue.app.listen(nconf.get("kue:adminAppPort"));
-  //}
 };

@@ -2,51 +2,12 @@
 "use strict";
 
 //var nconf = require('./config');
-var kue = require("./kue");
 var winston = require('./winston');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 
-function KueQueue(name, options, loaderFn) {
-  this.name = name;
-  this.options = options || {};
-  this.jobs = kue.createQueue();
-  this.loaderFn = loaderFn;
-  this.controller = options.controller;
-
-  this.controller.onStart(function() {
-    var fn = this.loaderFn();
-
-    this.jobs.process(this.name, this.options.parallel || 20, function(job, done) {
-      fn(job.data, kue.wrapCallback(job, done));
-    });
-
-  }.bind(this));
-}
-
-KueQueue.prototype.process = function() {
-
-};
-
-KueQueue.prototype.invoke = function(data, options, callback) {
-  if(arguments.length == 2 && typeof options == 'function') {
-    callback = options;
-    options = {};
-  }
-
-  var j = this.jobs.create(this.name, data)
-    .attempts(options && options.attempts || 2);
-
-  if(options && options.delay) {
-    j.delay(options.delay);
-  }
-
-  j.save(callback);
-};
-
 function TimerQueue(name, options, loaderFn) {
   this.name = name;
-  this.jobs = kue.createQueue();
   this.fn = loaderFn();
 }
 
@@ -127,6 +88,5 @@ module.exports = {
     options.controller = controller;
     return new TimerQueue(name, options, loaderFn);
   },
-  TimerQueue: TimerQueue,
-  KueQueue: KueQueue
+  TimerQueue: TimerQueue
 };
