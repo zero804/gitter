@@ -36,6 +36,9 @@ define([
   var UP_ARROW = 38;
 
   /** @const */
+  var DOWN_ARROW = 40;
+
+  /** @const */
   var ENTER = 13;
 
   /** @const */
@@ -44,6 +47,7 @@ define([
   /** @const */
   var PAGE_DOWN = 34;
 
+  /** @const */
   var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];
 
   var ChatInputView = TroupeViews.Base.extend({
@@ -314,6 +318,10 @@ define([
 
   };
 
+  function hasModifierKey(event) {
+    return event.ctrlKey || event.shiftKey || event.altKey || event.metaKey;
+  }
+
   var ChatInputBoxView = TroupeViews.Base.extend({
     events: {
       "keydown":  "onKeyDown",
@@ -359,21 +367,18 @@ define([
     },
 
     onKeyDown: function(e) {
-      if(e.keyCode === ENTER && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/)) && !this.isTypeaheadShowing()) {
+      if(e.keyCode === ENTER && !hasModifierKey(e) && this.hasVisibleText() && !this.isTypeaheadShowing()) {
         e.stopPropagation();
         e.preventDefault();
 
         this.processInput();
 
         return false;
-      } else if(e.keyCode === UP_ARROW && !e.ctrlKey && !e.shiftKey) {
-        /* Up key */
-        if(!this.$el.val()) {
-          this.trigger('editLast');
-        }
-      } else if(e.keyCode === PAGE_UP && !e.ctrlKey && !e.shiftKey) {
+      } else if(e.keyCode === UP_ARROW && !hasModifierKey(e) && !this.$el.val()) {
+        this.trigger('editLast');
+      } else if((e.keyCode === PAGE_UP && !hasModifierKey(e)) || (e.keyCode === UP_ARROW && e.metaKey)) {
         this.chatCollectionView.pageUp();
-      } else if(e.keyCode === PAGE_DOWN && !e.ctrlKey && !e.shiftKey) {
+      } else if((e.keyCode === PAGE_DOWN && !hasModifierKey(e)) || (e.keyCode === DOWN_ARROW && e.metaKey)) {
         this.chatCollectionView.pageDown();
       }
     },
@@ -420,6 +425,10 @@ define([
 
     isTypeaheadShowing: function() {
       return this.$el.parent().find('.dropdown-menu').is(":visible");
+    },
+
+    hasVisibleText: function() {
+      return !this.$el.val().match(/^\s+$/);
     }
   });
 
