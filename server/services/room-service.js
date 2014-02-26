@@ -124,7 +124,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
       winston.verbose('Checking if user has permission to create a room at ' + uri);
 
       /* Room does not yet exist */
-      return permissionsModel(user, 'create', uri, githubType)
+      return permissionsModel(user, 'create', uri, githubType, null) // Parent rooms always have security == null
         .then(function(access) {
           if(!access) return [null, access];
 

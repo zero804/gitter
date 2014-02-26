@@ -6,6 +6,20 @@ var GitHubOrgService   = require('./github/github-org-service');
 var assert             = require("assert");
 var winston            = require('winston');
 var Q                  = require('q');
+var persistence        = require('./persistence-service');
+
+function userIsAlreadyInRoom(uri, user) {
+  var lcUri = uri.toLowerCase();
+  return persistence.Troupe.findOneQ({ lcUri: lcUri }, 'users.userId', { lean: true })
+    .then(function(troupe) {
+      if(!troupe) return;
+
+      return troupe.users.some(function(troupeUser) {
+        return troupeUser.userId === user._id;
+      });
+
+    });
+}
 
 function repoPermissionsModel(user, right, uri, security) {
   // Security is only for child rooms
@@ -96,14 +110,12 @@ function oneToOnePermissionsModel(user, right, uri, security) {
 }
 
 function orgChannelPermissionsModel(user, right, uri, security) {
-  console.log('RIGHT', right);
-  console.log('SECURITY ', security);
-  assert({'PRIVATE': 1, 'OPEN': 1, 'INHERITED': 1}.hasOwnProperty(security), 'Invalid security type:' + security);
+  assert({ 'PRIVATE': 1, 'OPEN': 1, 'INHERITED': 1}.hasOwnProperty(security), 'Invalid security type:' + security);
 
   if(right === 'join') {
     switch(security) {
       case 'OPEN': return Q.resolve(true);
-      case 'PRIVATE': return Q.resolve(false);
+      case 'PRIVATE': return userIsAlreadyInRoom(uri, user);
       // INHERITED falls through
     }
   }
@@ -119,12 +131,12 @@ function orgChannelPermissionsModel(user, right, uri, security) {
 }
 
 function repoChannelPermissionsModel(user, right, uri, security) {
-  assert({'PRIVATE': 1, 'OPEN': 1, 'INHERITED': 1}.hasOwnProperty(security), 'Invalid security type:' + security);
+  assert({ 'PRIVATE': 1, 'OPEN': 1, 'INHERITED': 1}.hasOwnProperty(security), 'Invalid security type:' + security);
 
   if(right === 'join') {
     switch(security) {
       case 'OPEN': return Q.resolve(true);
-      case 'PRIVATE': return Q.resolve(false);
+      case 'PRIVATE': return userIsAlreadyInRoom(uri, user);
       // INHERITED falls through
     }
   }
@@ -140,12 +152,12 @@ function repoChannelPermissionsModel(user, right, uri, security) {
 }
 
 function userChannelPermissionsModel(user, right, uri, security) {
-  assert({'PRIVATE': 1, 'OPEN': 1 }.hasOwnProperty(security), 'Invalid security type:' + security);
+  assert({ 'PRIVATE': 1, 'OPEN': 1 }.hasOwnProperty(security), 'Invalid security type:' + security);
 
   if(right === 'join') {
     switch(security) {
       case 'OPEN': return Q.resolve(true);
-      case 'PRIVATE': return Q.resolve(false); // XXX
+      case 'PRIVATE': return userIsAlreadyInRoom(uri, user);
     }
   }
 

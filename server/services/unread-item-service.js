@@ -850,7 +850,7 @@ function detectAndCreateMentions(troupeId, creatingUserId, chat) {
         if(!users.length) return;
 
         return Q.all(users.map(function(user) {
-          return permissionsModel(user, 'join', troupe.uri, troupe.githubType)
+          return permissionsModel(user, 'join', troupe.uri, troupe.githubType, troupe.security)
             .then(function(access) {
               if(access) {
                 mentionLurkerAndNonMemberUserIds.push(user.id);

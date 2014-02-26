@@ -528,7 +528,7 @@ function createUniqueUri() {
 
 function updateTopic(user, troupe, topic) {
   /* First check whether the user has permission to work the topic */
-  return permissionsModel(user, 'admin', troupe.uri, troupe.githubType)
+  return permissionsModel(user, 'admin', troupe.uri, troupe.githubType, troupe.security)
     .then(function(access) {
       if(!access) throw 403; /* Forbidden */
 
