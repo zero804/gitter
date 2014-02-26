@@ -36,6 +36,9 @@ define([
   var UP_ARROW = 38;
 
   /** @const */
+  var DOWN_ARROW = 40;
+
+  /** @const */
   var ENTER = 13;
 
   /** @const */
@@ -45,11 +48,6 @@ define([
   var PAGE_DOWN = 34;
 
   /** @const */
-  var UP_ARROW = 38;
-
-  /** @const */
-  var DOWN_ARROW = 40;
-
   var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];
 
   var ChatInputView = TroupeViews.Base.extend({
