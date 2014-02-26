@@ -30,12 +30,13 @@ var fixture = {};
 before(fixtureLoader(fixture, {
   user1: { },
   user2: { },
-  troupe1: { users: ['user1', 'user2']}
+  user3: { },
+  troupe1: { users: ['user1', 'user2', 'user3']}
 }));
 
 describe('email-notification-generator-service', function() {
 
-  it('should do what it says on the tin', function(done) {
+  it('should send out an email notification for a user with unread items', function(done) {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
 
     var sendEmailNotifications = testRequire.withProxies('./services/notifications/email-notification-generator-service', {
@@ -43,11 +44,18 @@ describe('email-notification-generator-service', function() {
       '../unread-item-service': unreadItemServiceMock
     });
 
-    var u = 0;
+    var u = 0, v = 0;
     mockito.when(emailNotificationServiceMock).sendUnreadItemsNotification().then(function(user, troupeWithCounts) {
       if(user.id == fixture.user2.id) {
         u++;
         assert.equal(u, 1);
+        assert.equal(troupeWithCounts.length, 1);
+        assert.equal(troupeWithCounts[0].troupe.id, fixture.troupe1.id);
+      }
+
+      if(user.id == fixture.user3.id) {
+        v++;
+        assert.equal(v, 1);
         assert.equal(troupeWithCounts.length, 1);
         assert.equal(troupeWithCounts[0].troupe.id, fixture.troupe1.id);
       }
@@ -57,14 +65,17 @@ describe('email-notification-generator-service', function() {
 
     Q.all([
       userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', false),
-      chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, 'Hello')
       ])
+      .then(function() {
+        return chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, 'Hello');
+      })
       .delay(50)
       .then(function() {
         return sendEmailNotifications(Date.now());
       })
       .then(function() {
         assert.equal(u, 1);
+        assert.equal(v, 1);
       })
       .nodeify(done);
 
@@ -78,25 +89,39 @@ describe('email-notification-generator-service', function() {
       '../unread-item-service': unreadItemServiceMock
     });
 
+    var v = 0;
     mockito.when(emailNotificationServiceMock).sendUnreadItemsNotification().then(function(user, troupeWithCounts) {
       assert(user.id !== fixture.user2.id);
+
+      if(user.id == fixture.user3.id) {
+        v++;
+        assert.equal(v, 1);
+        assert.equal(troupeWithCounts.length, 1);
+        assert.equal(troupeWithCounts[0].troupe.id, fixture.troupe1.id);
+      }
+
       return Q.resolve();
     });
 
     Q.all([
       userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', true),
-      chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, 'Hello')
       ])
+      .then(function() {
+        return chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, 'Hello');
+      })
       .delay(50)
       .then(function() {
         return sendEmailNotifications(Date.now());
+      })
+      .then(function() {
+        assert.equal(v, 1);
       })
       .nodeify(done);
 
   });
 
 
-  it('SHOULD NOT email somebody who has opted out of notifications for a specific troupe', function(done) {
+  it('SHOULD NOT email somebody who has opted out of notifications', function(done) {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
 
     var sendEmailNotifications = testRequire.withProxies('./services/notifications/email-notification-generator-service', {
@@ -104,27 +129,89 @@ describe('email-notification-generator-service', function() {
       '../unread-item-service': unreadItemServiceMock
     });
 
+    var v = 0;
     mockito.when(emailNotificationServiceMock).sendUnreadItemsNotification().then(function(user, troupeWithCounts) {
       assert(user.id !== fixture.user2.id);
+
+      if(user.id == fixture.user3.id) {
+        v++;
+        assert.equal(v, 1);
+        assert.equal(troupeWithCounts.length, 1);
+        assert.equal(troupeWithCounts[0].troupe.id, fixture.troupe1.id);
+      }
+
       return Q.resolve();
     });
 
     underlyingUnreadItemService.markUserAsEmailNotified(fixture.user2.id)
       .then(function() {
         return Q.all([
-            userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', false),
-            userTroupeSettingsService.setUserSettings(fixture.user2.id, fixture.troupe1.id, 'push', "mute"), // <-- NB
-            chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, 'Hello')
+            userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', true),
+            userTroupeSettingsService.setUserSettings(fixture.user2.id, fixture.troupe1.id, 'notification', { push:  "all" }), // <-- NB
           ])
+          .then(function() {
+            return chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, 'Hello');
+          })
           .delay(50)
           .then(function() {
             return sendEmailNotifications(Date.now());
+          })
+          .then(function() {
+            assert.equal(v, 1);
           });
 
       })
       .nodeify(done);
 
   });
+
+
+it('SHOULD NOT email somebody who has opted out of notifications set to mention only', function(done) {
+  var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+
+  var sendEmailNotifications = testRequire.withProxies('./services/notifications/email-notification-generator-service', {
+    '../email-notification-service': emailNotificationServiceMock,
+    '../unread-item-service': unreadItemServiceMock
+  });
+
+  var v = 0;
+
+  mockito.when(emailNotificationServiceMock).sendUnreadItemsNotification().then(function(user, troupeWithCounts) {
+    assert(user.id !== fixture.user2.id);
+
+    if(user.id == fixture.user3.id) {
+      v++;
+      assert.equal(v, 1);
+      assert.equal(troupeWithCounts.length, 1);
+      assert.equal(troupeWithCounts[0].troupe.id, fixture.troupe1.id);
+    }
+
+    return Q.resolve();
+  });
+
+  underlyingUnreadItemService.markUserAsEmailNotified(fixture.user2.id)
+    .then(function() {
+      return Q.all([
+          underlyingUnreadItemService.markAllChatsRead(fixture.user2.id, fixture.troupe1.id),
+          userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', false),
+          userTroupeSettingsService.setUserSettings(fixture.user2.id, fixture.troupe1.id, 'notifications', { push: "mentions" } ), // <-- NB
+        ])
+        .then(function() {
+          return chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, 'Hello');
+        })
+        .delay(50)
+        .then(function() {
+          return sendEmailNotifications(Date.now());
+        })
+        .then(function() {
+          assert.equal(v, 1);
+        });
+
+
+    })
+    .nodeify(done);
+
+});
 
   // TODO: handle mentions
   it('SHOULD email somebody who has not opted out of notifications for a specific troupe', function(done) {
@@ -135,7 +222,7 @@ describe('email-notification-generator-service', function() {
       '../unread-item-service': unreadItemServiceMock
     });
 
-    var u = 0;
+    var u = 0, v = 0;
     mockito.when(emailNotificationServiceMock).sendUnreadItemsNotification().then(function(user, troupeWithCounts) {
       if(user.id == fixture.user2.id) {
         u++;
@@ -144,12 +231,18 @@ describe('email-notification-generator-service', function() {
         assert.equal(troupeWithCounts[0].troupe.id, fixture.troupe1.id);
       }
 
+      if(user.id == fixture.user3.id) {
+        v++;
+        assert.equal(v, 1);
+        assert.equal(troupeWithCounts.length, 1);
+        assert.equal(troupeWithCounts[0].troupe.id, fixture.troupe1.id);
+      }
       return Q.resolve();
     });
 
     Q.all([
       userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', false),
-      userTroupeSettingsService.setUserSettings(fixture.user2.id, fixture.troupe1.id, 'push', "all"), // <-- NB
+      userTroupeSettingsService.setUserSettings(fixture.user2.id, fixture.troupe1.id, 'notifications', { push: "all" } ), // <-- NB
       chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, 'Hello')
       ])
       .delay(50)
@@ -158,9 +251,9 @@ describe('email-notification-generator-service', function() {
       })
       .then(function() {
         assert.equal(u, 1);
+        assert.equal(v, 1);
       })
       .nodeify(done);
-
   });
 
 

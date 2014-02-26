@@ -92,12 +92,14 @@ function sendEmailNotifications(since) {
           });
       });
 
-      return userTroupeSettingsService.getMultiUserTroupeSettings(userTroupes, "push")
+      return userTroupeSettingsService.getMultiUserTroupeSettings(userTroupes, "notifications")
         .then(function(notificationSettings) {
           Object.keys(userTroupeUnreadHash).forEach(function(userId) {
               var troupeIds = Object.keys(userTroupeUnreadHash[userId]);
               troupeIds.forEach(function(troupeId) {
-                var setting = notificationSettings[userId + ':' + troupeId];
+                var ns = notificationSettings[userId + ':' + troupeId];
+                var setting = ns && ns.push;
+
                 if(setting && setting !== 'all') {
                   winston.verbose('User ' + userId + ' has disabled notifications for this troupe');
                   delete userTroupeUnreadHash[userId][troupeId];
