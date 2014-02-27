@@ -54,8 +54,14 @@ define([
   /** @const */
   var PLACEHOLDER = 'Click here to type a chat message. Supports GitHub flavoured markdown.';
 
+  var isMacBrowser = window.navigator.platform.indexOf('Mac') === 0;
+
   /** @const */
-  var PLACEHOLDER_COMPOSE_MODE = 'Click here to type a chat message. Supports GitHub flavoured markdown. Ctrl+Enter to send.';
+  var PLACEHOLDER_COMPOSE_MODE = PLACEHOLDER+' '+(isMacBrowser ? 'Cmd' : 'Ctrl')+'+Enter to send.';
+
+  /** @const */
+  var COMPOSE_MODE_MODIFIER_KEY = isMacBrowser ? 'metaKey' : 'ctrlKey';
+
 
 
   var ComposeMode = function() {
@@ -430,7 +436,7 @@ define([
         // dont insert a new line
         e.preventDefault();
         return false;
-      } else if(e.keyCode === ENTER && e.ctrlKey && !this.isTypeaheadShowing() && isComposeModeEnabled) {
+      } else if(e.keyCode === ENTER && e[COMPOSE_MODE_MODIFIER_KEY] && !this.isTypeaheadShowing() && isComposeModeEnabled) {
         if(this.hasVisibleText()) {
           this.processInput();
         }
