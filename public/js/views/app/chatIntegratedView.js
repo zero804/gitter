@@ -11,6 +11,9 @@ define([
 ], function($, context, Marionette, appEvents, uiVars, AvatarView, modalRegion, hasScrollBars) {
   "use strict";
 
+  /** @const */
+  var BACKSPACE = 8;
+
   var touchEvents = {
     // "click #menu-toggle-button":        "onMenuToggle",
     "keypress":                         "onKeyPress"
@@ -18,6 +21,7 @@ define([
 
   var mouseEvents = {
     // "keypress":                         "onKeyPress",
+    "keydown": "onKeyDown",
     "keyup": "onKeyUp",
     "click #favourite-button":          "toggleFavourite"
   };
@@ -79,6 +83,16 @@ define([
       });
     },
 
+
+    onKeyDown: function(e) {
+      if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+      // Avoid backspace from navigating back
+      if (e.keyCode === BACKSPACE) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    },
 
     onKeyUp: function(e) {
       if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;

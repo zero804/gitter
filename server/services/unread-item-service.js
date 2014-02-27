@@ -506,6 +506,7 @@ exports.markItemsRead = function(userId, troupeId, itemIds, mentionIds, options)
 };
 
 exports.markAllChatsRead = function(userId, troupeId, options) {
+  if(!options) options = {};
   return exports.getUnreadItems(userId, troupeId, 'chat')
     .then(function(chatIds) {
       if(!chatIds.length) return;
