@@ -48,6 +48,15 @@ define([
   /** @const */
   var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];
 
+  /** @const */
+  var MOBILE_PLACEHOLDER = 'Touch here to type a chat message.';
+
+  /** @const */
+  var PLACEHOLDER = 'Click here to type a chat message. Supports GitHub flavoured markdown.';
+
+  /** @const */
+  var PLACEHOLDER_COMPOSE_MODE = 'Click here to type a chat message. Supports GitHub flavoured markdown. Ctrl+Enter to send.';
+
 
   var ComposeMode = function() {
     var stringBoolean = window.localStorage.getItem('compose_mode_enabled') || 'false';
@@ -83,9 +92,20 @@ define([
     },
 
     getRenderData: function() {
+      var placeholder;
+
+      if(this.compactView) {
+        placeholder = MOBILE_PLACEHOLDER;
+      } else if(this.composeMode.isEnabled()) {
+        placeholder = PLACEHOLDER_COMPOSE_MODE;
+      } else {
+        placeholder = PLACEHOLDER;
+      }
+
       return {
         user: context.user(),
-        isComposeModeEnabled: this.composeMode.isEnabled()
+        isComposeModeEnabled: this.composeMode.isEnabled(),
+        placeholder: placeholder
       };
     },
 
@@ -222,6 +242,9 @@ define([
     toggleReturnSend: function() {
       this.composeMode.toggle();
       this.$el.find('.return-send').toggleClass('active', this.composeMode.isEnabled());
+
+      var placeholder = this.composeMode.isEnabled() ? PLACEHOLDER_COMPOSE_MODE : PLACEHOLDER;
+      this.$el.find('textarea').attr('placeholder', placeholder);
     },
 
     send: function(val) {
