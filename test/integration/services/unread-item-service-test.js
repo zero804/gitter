@@ -580,6 +580,7 @@ describe('emailnotifications', function() {
     var userId = mongoUtils.getNewObjectIdString();
     var itemType = 'chat';
     var itemId1 = mongoUtils.getNewObjectIdString();
+    var itemId2 = mongoUtils.getNewObjectIdString();
 
     var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
     var appEventsMock = mockito.mock(testRequire('./app-events'));
@@ -615,12 +616,57 @@ describe('emailnotifications', function() {
       .then(function(results) {
         assert(!results[userId]);
       })
+      .then(function() {
+        unreadItemService.testOnly.newItemForUsers(troupeId, itemType, itemId2, [userId]);
+      })
       .delay(1100)
       .then(function() {
         return unreadItemService.listTroupeUsersForEmailNotifications(Date.now(), 1);
       })
       .then(function(results) {
         assert(results[userId]);
+      })
+
+      .nodeify(done);
+  });
+
+  it('should email somebody twice if no new messages have arrived', function(done) {
+    var troupeId = mongoUtils.getNewObjectIdString();
+    var userId = mongoUtils.getNewObjectIdString();
+    var itemType = 'chat';
+    var itemId1 = mongoUtils.getNewObjectIdString();
+
+    var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
+    var appEventsMock = mockito.mock(testRequire('./app-events'));
+
+    var unreadItemService = testRequire.withProxies("./services/unread-item-service", {
+      './troupe-service': troupeServiceMock,
+      '../app-events': appEventsMock
+    });
+
+    var usersWithLurkHash = {};
+    usersWithLurkHash[userId] = false;
+
+    var troupe = {
+      users: usersWithLurkHash,
+      githubType: 'REPO'
+    };
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupe));
+
+    return unreadItemService.testOnly.newItemForUsers(troupeId, itemType, itemId1, [userId])
+      .then(function() {
+        return unreadItemService.listTroupeUsersForEmailNotifications(Date.now(), 1);
+      })
+      .then(function(results) {
+        assert(results[userId]);
+      })
+      .delay(1100)
+      .then(function() {
+        return unreadItemService.listTroupeUsersForEmailNotifications(Date.now(), 1);
+      })
+      .then(function(results) {
+        assert(!results[userId]);
       })
 
       .nodeify(done);

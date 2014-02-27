@@ -409,11 +409,13 @@ exports.listTroupeUsersForEmailNotifications = function(horizonTime, emailLatchE
 
       if(!filteredKeys.length) return {};
 
-      var keys = filteredKeys.map(function(troupeUserKey) {
+      var keys = [EMAIL_NOTIFICATION_HASH_KEY].concat(filteredKeys.map(function(troupeUserKey) {
         return 'uel:' + troupeUserKey;
-      });
+      }));
 
-      return runScript('unread-latch-emails', keys, [emailLatchExpiryTimeS])
+      var values = [emailLatchExpiryTimeS].concat(filteredKeys);
+
+      return runScript('unread-latch-emails', keys, values)
         .then(function(results) {
 
           var result = {};
