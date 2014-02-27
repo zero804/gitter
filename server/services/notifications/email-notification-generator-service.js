@@ -18,6 +18,11 @@ var nconf                    = require('../../utils/config');
 
 var filterTestValues = nconf.get('notifications:filterTestValues');
 
+
+
+var timeBeforeNextEmailNotificationS = nconf.get('notifications:timeBeforeNextEmailNotificationMins') * 60;
+var emailNotificationsAfterMins = nconf.get('notifications:emailNotificationsAfterMins');
+
 function isTestId(id) {
   return id.indexOf('USER') === 0 || id.indexOf('TROUPE') === 0;
 }
@@ -25,10 +30,10 @@ function isTestId(id) {
 function sendEmailNotifications(since) {
   var start = Date.now();
   if(!since) {
-    since = moment().subtract('h', nconf.get("notifications:emailDelayHours")).valueOf();
+    since = moment().subtract('m', emailNotificationsAfterMins).valueOf();
   }
 
-  return unreadItemService.listTroupeUsersForEmailNotifications(since)
+  return unreadItemService.listTroupeUsersForEmailNotifications(since, timeBeforeNextEmailNotificationS)
     .then(function(userTroupeUnreadHash) {
       if(!filterTestValues) return userTroupeUnreadHash;
 
@@ -52,12 +57,6 @@ function sendEmailNotifications(since) {
       return userTroupeUnreadHash;
     })
     .then(function(userTroupeUnreadHash) {
-      return Q.all(Object.keys(userTroupeUnreadHash).map(function(userId) {
-        return unreadItemService.markUserAsEmailNotified(userId);
-      }))
-      .thenResolve(userTroupeUnreadHash);
-    })
-    .then(function(userTroupeUnreadHash) {
       /**
        * Filter out all users who've opted out of notification emails
        */
@@ -79,10 +78,8 @@ function sendEmailNotifications(since) {
         });
     })
     .then(function(userTroupeUnreadHash) {
-
       /**
        * Now we need to filter out users who've turned off notifications for a specific troupe
-       * TODO: HANDLE mentions!!!!!
        */
       var userTroupes = [];
       Object.keys(userTroupeUnreadHash).forEach(function(userId) {
@@ -94,6 +91,7 @@ function sendEmailNotifications(since) {
 
       return userTroupeSettingsService.getMultiUserTroupeSettings(userTroupes, "notifications")
         .then(function(notificationSettings) {
+
           Object.keys(userTroupeUnreadHash).forEach(function(userId) {
               var troupeIds = Object.keys(userTroupeUnreadHash[userId]);
               troupeIds.forEach(function(troupeId) {
@@ -116,7 +114,7 @@ function sendEmailNotifications(since) {
     })
     .then(function(userTroupeUnreadHash) {
       /**
-       * Step 1: load the required data
+       *load the data we're going to need for the emails
        */
       var userIds = Object.keys(userTroupeUnreadHash);
 

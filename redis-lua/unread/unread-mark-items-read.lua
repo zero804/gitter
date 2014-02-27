@@ -3,6 +3,7 @@ local user_troupe_key = KEYS[2]
 local email_hash_key = KEYS[3]
 local user_troupe_mention_key = KEYS[4]
 local user_mention_key = KEYS[5]
+local user_email_latch_key = KEYS[6];
 
 -- Values are lrt timestamp, troupeId followed by itemIds,
 local troupe_id = table.remove(ARGV, 1)
@@ -56,6 +57,7 @@ for i, item_id in ipairs(itemIds) do
 end
 
 -- Remove this user from the list of people who may get an email
+redis.call("DEL", user_email_latch_key);
 redis.call("HDEL", email_hash_key, troupe_id..':'..user_id)
 
 table.insert(result, card)

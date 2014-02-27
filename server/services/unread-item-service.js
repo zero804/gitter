@@ -17,7 +17,6 @@ var assert           = require('assert');
 var redisClient      = redis.createClient();
 var badgeBatcher     = new RedisBatcher('badge', 300);
 var scriptManager    = new Scripto(redisClient);
-
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/unread');
 
 var EMAIL_NOTIFICATION_HASH_KEY = "unread:email_notify";
@@ -194,11 +193,11 @@ function newItem(troupeId, creatorUserId, itemType, itemId) {
 
 function newItemForUsers(troupeId, itemType, itemId, userIds) {
   // Now talk to redis and do the update
-  var keys = getScriptKeysForUserIds(userIds, itemType, troupeId);
-
+  var keys = [EMAIL_NOTIFICATION_HASH_KEY].concat(getScriptKeysForUserIds(userIds, itemType, troupeId));
   var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
+  var values = [troupeId, itemId, timestamp].concat(userIds);
 
-  return runScript('unread-add-item', keys, [troupeId, itemId, timestamp])
+  return runScript('unread-add-item', keys, values)
     .then(function(result) {
       function logOptimisticUpgradeFailure(err) {
         if(err) {
@@ -238,13 +237,6 @@ function newItemForUsers(troupeId, itemType, itemId, userIds) {
         }
       }
 
-
-      /**
-       * Put these users on a list of people who may need a reminder email
-       * at a later stage
-       */
-      var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
-      markUsersForEmailNotification(troupeId, userIds, timestamp);
     });
 
 
@@ -347,7 +339,8 @@ function markItemsOfTypeRead(userId, troupeId, itemType, ids, member) {
       "unread:" + itemType + ":" + userId + ":" + troupeId,
       EMAIL_NOTIFICATION_HASH_KEY,
       "m:" + userId + ":" + troupeId,
-      "m:" + userId
+      "m:" + userId,
+      'uel:' + troupeId + ":" + userId
     ];
 
   var values = [troupeId, userId].concat(ids);
@@ -384,17 +377,6 @@ function markItemsOfTypeRead(userId, troupeId, itemType, ids, member) {
     });
 }
 
-function markUsersForEmailNotification(troupeId, userIds, dateNow) {
-  var values = [dateNow];
-  values.push.apply(values, userIds.map(function(f) { return troupeId + ':' + f; }));
-
-  return runScript('unread-mark-users-for-email', [EMAIL_NOTIFICATION_HASH_KEY], values)
-    .fail(function(err) {
-      winston.error('unread-mark-users-for-email failed:' + err, { exception: err });
-    });
-
-}
-
 /**
  * Mark an item in a troupe as having been read by a user
  * @return {promise} promise of nothing
@@ -413,26 +395,40 @@ function setLastReadTimeForUser(userId, troupeId, lastReadTimestamp) {
  * outstanding notifications since before the specified time
  * @return a promise of hash
  */
-exports.listTroupeUsersForEmailNotifications = function(sinceTime) {
+exports.listTroupeUsersForEmailNotifications = function(horizonTime, emailLatchExpiryTimeS) {
   return Q.ninvoke(redisClient, "hgetall", EMAIL_NOTIFICATION_HASH_KEY)
     .then(function(troupeUserHash) {
-      var result = {};
+      if (!troupeUserHash) return {};
 
-      if (!troupeUserHash) return result;
+      /* Filter out values which are too recent */
+      var filteredKeys = Object.keys(troupeUserHash).filter(function(key) {
+        var value = troupeUserHash[key];
+        var oldest = parseInt(value, 10);
+        return oldest <= horizonTime;
+      });
 
-      var promises = Object.keys(troupeUserHash)
-        .map(function(key) {
-          var troupeUserId = key.split(':');
-          var time = parseInt(troupeUserHash[key], 10);
+      if(!filteredKeys.length) return {};
 
-          var troupeId = troupeUserId[0];
-          var userId = troupeUserId[1];
+      var multi = redisClient.multi();
+      filteredKeys.forEach(function(troupeUserKey) {
+        multi.set('uel:' + troupeUserKey, 1, 'ex', emailLatchExpiryTimeS , 'nx');
+      });
 
-          /* Its got to be older that the start time */
-          if(time <= sinceTime) {
-            return getUnreadItemsForUserTroupeSince(userId, troupeId, time)
+      return Q.ninvoke(multi, 'exec')
+        .then(function(results) {
+
+          var result = {};
+
+          /* Remove items that have an email latch on */
+          var promises = filteredKeys.filter(function(value, i) {
+            return results[i];
+          }).map(function(key) {
+            var troupeUserId = key.split(':');
+            var troupeId = troupeUserId[0];
+            var userId = troupeUserId[1];
+
+            return getUnreadItemsForUserTroupeSince(userId, troupeId, 0/* time */)
               .then(function(items) {
-
                 if(items && items.chat && items.chat.length) {
                   var v = result[userId];
                   if(!v) {
@@ -443,36 +439,14 @@ exports.listTroupeUsersForEmailNotifications = function(sinceTime) {
                   v[troupeId] = items && items.chat;
                 }
               });
-          }
+          });
+
+          return Q.all(promises)
+            .then(function() {
+              return result;
+            });
+
         });
-
-      return Q.all(promises)
-        .then(function() {
-          return result;
-        });
-    });
-};
-
-exports.markUserAsEmailNotified = function(userId) {
-  // NB: this function is not atomic, but it doesn't need to be
-  return Q.ninvoke(redisClient, "hgetall", EMAIL_NOTIFICATION_HASH_KEY)
-    .then(function(troupeUserHash) {
-      if(!troupeUserHash) return [];
-
-      return Object.keys(troupeUserHash)
-        .filter(function(hashKey) {
-          var troupeUserId = hashKey.split(':');
-          var hashUserId = troupeUserId[1];
-          return hashUserId == userId;
-        });
-    })
-    .then(function(userTroupeKeys) {
-      if(!userTroupeKeys.length) return;
-
-      var args =[EMAIL_NOTIFICATION_HASH_KEY];
-      args.push.apply(args, userTroupeKeys);
-
-      return Q.npost(redisClient, "hdel", args);
 
     });
 };
@@ -887,7 +861,6 @@ function detectAndRemoveMentions(troupeId, creatingUserId, chat) {
   // XXX: remove the mention
 }
 
-
 exports.install = function() {
 
   appEvents.localOnly.onChat(function(data) {
@@ -934,5 +907,6 @@ exports.testOnly = {
   sinceFilter: sinceFilter,
   newItem: newItem,
   removeItem: removeItem,
+  newItemForUsers: newItemForUsers,
   detectAndCreateMentions: detectAndCreateMentions
 };

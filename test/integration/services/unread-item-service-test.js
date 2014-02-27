@@ -437,7 +437,7 @@ describe('emailnotifications', function() {
         unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId3)
       ])
       .then(function() {
-        return unreadItemService.listTroupeUsersForEmailNotifications(Date.now());
+        return unreadItemService.listTroupeUsersForEmailNotifications(Date.now() + 10, 5);
       })
       .then(function(results) {
         assert(results[userId]);
@@ -471,17 +471,16 @@ describe('emailnotifications', function() {
       users: userHash
     }));
 
-
     return Q.all([
         unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId1),
         unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId2),
         unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId3)
       ])
       .then(function() {
-        return unreadItemService.markUserAsEmailNotified(userId);
+        return unreadItemService.listTroupeUsersForEmailNotifications(Date.now(), 5);
       })
       .then(function() {
-        return unreadItemService.listTroupeUsersForEmailNotifications(Date.now());
+        return unreadItemService.listTroupeUsersForEmailNotifications(Date.now(), 5);
       })
       .then(function(results) {
         assert(!results[userId]);
@@ -526,7 +525,7 @@ describe('emailnotifications', function() {
         unreadItemService.markItemsRead(userId, troupeId, items);
       })
       .then(function() {
-        return unreadItemService.listTroupeUsersForEmailNotifications(Date.now());
+        return unreadItemService.listTroupeUsersForEmailNotifications(Date.now(), 5);
       })
       .then(function(results) {
         assert(!results[userId]);
@@ -567,11 +566,63 @@ describe('emailnotifications', function() {
         unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId3)
       ])
       .then(function() {
-        return unreadItemService.listTroupeUsersForEmailNotifications(Date.now() - 86400000);
+        return unreadItemService.listTroupeUsersForEmailNotifications(Date.now() - 86400000, 5);
       })
       .then(function(results) {
         assert(!results[userId]);
       })
+      .nodeify(done);
+  });
+
+
+  it('should not email somebody until the email timeout period has expired', function(done) {
+    var troupeId = mongoUtils.getNewObjectIdString();
+    var userId = mongoUtils.getNewObjectIdString();
+    var itemType = 'chat';
+    var itemId1 = mongoUtils.getNewObjectIdString();
+
+    var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
+    var appEventsMock = mockito.mock(testRequire('./app-events'));
+
+    var unreadItemService = testRequire.withProxies("./services/unread-item-service", {
+      './troupe-service': troupeServiceMock,
+      '../app-events': appEventsMock
+    });
+
+    var usersWithLurkHash = {};
+    usersWithLurkHash[userId] = false;
+
+    var troupe = {
+      users: usersWithLurkHash,
+      githubType: 'REPO'
+    };
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupe));
+
+    return unreadItemService.testOnly.newItemForUsers(troupeId, itemType, itemId1, [userId])
+      .then(function() {
+        return unreadItemService.listTroupeUsersForEmailNotifications(Date.now(), 1);
+      })
+      .then(function(results) {
+        assert(results[userId]);
+      })
+      .then(function() {
+        unreadItemService.testOnly.newItemForUsers(troupeId, itemType, itemId1, [userId]);
+      })
+      .then(function() {
+        return unreadItemService.listTroupeUsersForEmailNotifications(Date.now(), 1);
+      })
+      .then(function(results) {
+        assert(!results[userId]);
+      })
+      .delay(1100)
+      .then(function() {
+        return unreadItemService.listTroupeUsersForEmailNotifications(Date.now(), 1);
+      })
+      .then(function(results) {
+        assert(results[userId]);
+      })
+
       .nodeify(done);
   });
 
