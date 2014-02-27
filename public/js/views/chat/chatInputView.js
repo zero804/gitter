@@ -38,9 +38,6 @@ define([
   var UP_ARROW = 38;
 
   /** @const */
-  var DOWN_ARROW = 40;
-
-  /** @const */
   var ENTER = 13;
 
   /** @const */
@@ -53,18 +50,18 @@ define([
   var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];
 
 
-  var ReturnToSend = function() {
-    var stringBoolean = window.localStorage.getItem('return_to_send_disabled') || 'false';
+  var ComposeMode = function() {
+    var stringBoolean = window.localStorage.getItem('compose_mode_enabled') || 'false';
     this.disabled = JSON.parse(stringBoolean);
   };
 
-  ReturnToSend.prototype.toggle = function() {
+  ComposeMode.prototype.toggle = function() {
     this.disabled = !this.disabled;
     var stringBoolean = JSON.stringify(this.disabled);
-    window.localStorage.setItem('return_to_send_disabled', stringBoolean);
+    window.localStorage.setItem('compose_mode_enabled', stringBoolean);
   };
 
-  ReturnToSend.prototype.isDisabled = function() {
+  ComposeMode.prototype.isEnabled = function() {
     return this.disabled;
   };
 
@@ -91,7 +88,7 @@ define([
     initialize: function(options) {
       this.rollers = options.rollers;
       this.chatCollectionView = options.chatCollectionView;
-      this.returnToSend = new ReturnToSend();
+      this.composeMode = new ComposeMode();
       this.listenTo(appEvents, 'input.append', function(text, options) {
         if(this.inputBox) {
           this.inputBox.append(text, options);
@@ -102,7 +99,7 @@ define([
     getRenderData: function() {
       return {
         user: context.user(),
-        isReturnToSendDisabled: this.returnToSend.isDisabled()
+        isComposeModeEnabled: this.composeMode.isEnabled()
       };
     },
 
@@ -113,7 +110,7 @@ define([
         el: this.$el.find('.trpChatInputBoxTextArea'),
         rollers: this.rollers,
         chatCollectionView: this.chatCollectionView,
-        returnToSend: this.returnToSend
+        composeMode: this.composeMode
       });
       this.inputBox = inputBox;
 
@@ -237,8 +234,8 @@ define([
     },
 
     toggleReturnSend: function() {
-      this.returnToSend.toggle();
-      this.$el.find('.return-send').toggleClass('active', this.returnToSend.isDisabled());
+      this.composeMode.toggle();
+      this.$el.find('.return-send').toggleClass('active', this.composeMode.isEnabled());
     },
 
     send: function(val) {
@@ -399,7 +396,7 @@ define([
       chatResizer.resetInput(true);
 
       this.chatCollectionView = options.chatCollectionView;
-      this.returnToSend = options.returnToSend;
+      this.composeMode = options.composeMode;
 
     },
 
@@ -414,7 +411,7 @@ define([
     },
 
     onKeyDown: function(e) {
-      if(e.keyCode === ENTER && !hasModifierKey(e) && !this.isTypeaheadShowing() && !this.returnToSend.isDisabled()) {
+      if(e.keyCode === ENTER && !hasModifierKey(e) && !this.isTypeaheadShowing() && !this.composeMode.isEnabled()) {
         if(this.hasVisibleText()) {
           this.processInput();
         }
@@ -422,7 +419,7 @@ define([
         // dont insert a new line
         e.preventDefault();
         return false;
-      } else if(e.keyCode === ENTER && e.ctrlKey && !this.isTypeaheadShowing() && this.returnToSend.isDisabled()) {
+      } else if(e.keyCode === ENTER && e.ctrlKey && !this.isTypeaheadShowing() && this.composeMode.isEnabled()) {
         if(this.hasVisibleText()) {
           this.processInput();
         }
