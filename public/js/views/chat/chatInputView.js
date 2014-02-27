@@ -2,7 +2,6 @@
 define([
   'log!chat-input',
   'jquery',
-  'backbone',
   'utils/context',
   'views/base',
   'utils/appevents',
@@ -19,7 +18,7 @@ define([
   'bootstrap_tooltip', // No ref
   'jquery-textcomplete', // No ref
   'utils/sisyphus-cleaner' // No ref
-], function(log, $, Backbone, context, TroupeViews, appEvents, template, listItemTemplate,
+], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate,
   emojiListItemTemplate, moment, hasScrollBars, itemCollections, emoji, drafty, cdn, commands) {
   "use strict";
 
@@ -64,19 +63,6 @@ define([
   ComposeMode.prototype.isEnabled = function() {
     return this.disabled;
   };
-
-  var x = new Backbone.Model({enabled: !!window.localStorage.getItem('something')});
-
-  x.on('change:enabled', function() {
-    if(x.get('enabled')) {
-      window.localStorage.setItem('something', 'anything');
-    } else {
-      window.localStorage.removeItem('something');
-    }
-  });
-
-  x.set('enabled', false);
-
 
   var ChatInputView = TroupeViews.Base.extend({
     template: template,
