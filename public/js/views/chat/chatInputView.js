@@ -113,7 +113,7 @@ define([
         user: context.user(),
         isComposeModeEnabled: this.composeMode.isEnabled(),
         placeholder: placeholder,
-        composeModeToggleTitle: isComposeModeEnabled ? 'Chat mode' : 'Compose mode'
+        composeModeToggleTitle: isComposeModeEnabled ? 'Switch to chat mode' : 'Switch to compose mode'
       };
     },
 
@@ -251,7 +251,7 @@ define([
       this.composeMode.toggle();
       var isComposeModeEnabled = this.composeMode.isEnabled();
 
-      var title = isComposeModeEnabled ? 'Chat mode' : 'Compose mode';
+      var title = isComposeModeEnabled ? 'Switch to chat mode' : 'Switch to compose mode';
       this.$el.find('.compose-mode-toggle')
         .toggleClass('active', isComposeModeEnabled)
         .attr('title', title)
