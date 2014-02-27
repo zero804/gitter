@@ -1,6 +1,6 @@
   -- Keys are user:troupe keys
-  local key_count = #KEYS
-  local expire_seconds = ARGV[1]
+  local email_hash_key = table.remove(KEYS, 1)
+  local expire_seconds = table.remove(ARGV, 1)
 
   local result = {}
 
@@ -12,6 +12,10 @@
     end
 
     table.insert(result, r)
+  end
+
+  for k, v in pairs(ARGV) do
+    redis.call("HDEL", email_hash_key, v)
   end
 
   return result
