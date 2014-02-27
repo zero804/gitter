@@ -98,11 +98,12 @@ define([
     },
 
     getRenderData: function() {
+      var isComposeModeEnabled = this.composeMode.isEnabled()
       var placeholder;
 
       if(this.compactView) {
         placeholder = MOBILE_PLACEHOLDER;
-      } else if(this.composeMode.isEnabled()) {
+      } else if(isComposeModeEnabled) {
         placeholder = PLACEHOLDER_COMPOSE_MODE;
       } else {
         placeholder = PLACEHOLDER;
@@ -111,7 +112,8 @@ define([
       return {
         user: context.user(),
         isComposeModeEnabled: this.composeMode.isEnabled(),
-        placeholder: placeholder
+        placeholder: placeholder,
+        composeModeToggleTitle: isComposeModeEnabled ? 'Chat mode' : 'Compose mode'
       };
     },
 
@@ -247,9 +249,16 @@ define([
 
     toggleReturnSend: function() {
       this.composeMode.toggle();
-      this.$el.find('.return-send').toggleClass('active', this.composeMode.isEnabled());
+      var isComposeModeEnabled = this.composeMode.isEnabled();
 
-      var placeholder = this.composeMode.isEnabled() ? PLACEHOLDER_COMPOSE_MODE : PLACEHOLDER;
+      var title = isComposeModeEnabled ? 'Chat mode' : 'Compose mode';
+      this.$el.find('.return-send')
+        .toggleClass('active', isComposeModeEnabled)
+        .attr('title', title)
+        .tooltip('fixTitle')
+        .tooltip('hide');
+
+      var placeholder = isComposeModeEnabled ? PLACEHOLDER_COMPOSE_MODE : PLACEHOLDER;
       this.$el.find('textarea').attr('placeholder', placeholder).focus();
     },
 
