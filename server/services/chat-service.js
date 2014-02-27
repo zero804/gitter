@@ -25,6 +25,9 @@ var MAX_CHAT_EDIT_AGE_SECONDS = 300;
 
 var ObjectID = require('mongodb').ObjectID;
 
+/**
+ * Create a new chat and return a promise of the chat
+ */
 exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   return Q.fcall(function() {
     if(!troupe) throw 404;
