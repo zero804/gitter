@@ -1,12 +1,12 @@
   <div class="trpChatInputContainer">
     <div class="trpChatInputButtons">
-      <div class="return-send" style="display: none"></div>
-      <a href="#|markdown" style="text-decoration: none"><div class="md-help"></div></a>
+      <div class="return-send {{#if isComposeModeEnabled}}active{{/if}}" title="Compose mode"></div>
+      <a href="#|markdown" style="text-decoration: none"><div class="md-help" title="Markdown help"></div></a>
     </div>
     <div class="trpChatInputAvatar">
 	{{ widget "avatar" model=user size='s' showTooltip=false }}
     </div>
 	  <form class="trpChatInputBox" name="chat">
-	    <textarea class="trpChatInputBoxTextArea" name="chat" id="chat-input-textarea" placeholder="{{#compactView}}Touch{{/compactView}}{{^compactView}}Click{{/compactView}} here to type a chat message. {{^compactView}}Supports GitHub flavoured markdown.{{/compactView}}" autofocus="autofocus" maxlength="4096"></textarea>
+	    <textarea class="trpChatInputBoxTextArea" name="chat" id="chat-input-textarea" placeholder="{{placeholder}}" autofocus="autofocus" maxlength="4096"></textarea>
 	  </form>
 	</div>
