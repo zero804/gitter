@@ -376,9 +376,9 @@ define([
         return false;
       } else if(e.keyCode === UP_ARROW && !hasModifierKey(e) && !this.$el.val()) {
         this.trigger('editLast');
-      } else if((e.keyCode === PAGE_UP && !hasModifierKey(e)) || (e.keyCode === UP_ARROW && e.metaKey)) {
+      } else if(e.keyCode === PAGE_UP && !hasModifierKey(e)) {
         this.chatCollectionView.pageUp();
-      } else if((e.keyCode === PAGE_DOWN && !hasModifierKey(e)) || (e.keyCode === DOWN_ARROW && e.metaKey)) {
+      } else if(e.keyCode === PAGE_DOWN && !hasModifierKey(e)) {
         this.chatCollectionView.pageDown();
       }
     },
