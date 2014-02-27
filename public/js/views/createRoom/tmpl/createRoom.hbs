@@ -1,24 +1,77 @@
 <div class="trpModalBody">
-  <dl class="owner" style="float: left">
-    <dt>
-      <label for="owner">Owner</label>
-    </dt>
-    <dd>
-      <div class="gtrInput gtrOwnerDD">
-        <span class="gtrDDButton">
-          <img src="https://avatars.githubusercontent.com/u/4264183" class="avatar-xs">
-          <span class="gtrDDText">Troupe</span>
+  <div id="room-owner-and-name" class="gtrRoomName">
+    <dl class="owner" style="float: left">
+      <dt>
+        <label for="owner">Owner</label>
+      </dt>
+      <dd>
+        <div class="gtrInput gtrOwnerDD">
+          <span class="gtrDDButton">
+            <img src="https://avatars.githubusercontent.com/u/4264183" class="avatar-xs">
+            <span class="gtrDDText">Troupe</span>
+          </span>
+        </div>
+      </dd>
+    </dl>
+    <div class="gtrSlash">/</div>
+     <dl class="owner" style="float: left">
+      <dt>
+        <label for="room">Room name</label>
+      </dt>
+      <dd>
+        <input class="gtrInput room" id="room-name"/>
+      </dd>
+    </dl>
+  </div>
+  <div id="permissions" class="gtrRoomPermissions">
+    <label>Permissions</label>
+    <div id="permission-public" class="permission-row">
+      <label>
+        <div><input name="permissions" checked="checked" type="radio" id="public"></div>
+        <span class="github-REPO">
+          <span class="permission-label">
+            Public
+          </span>
         </span>
-      </div>
-    </dd>
-  </dl>
-  <div class="gtrSlash">/</div>
-   <dl class="owner" style="float: left">
-    <dt>
-      <label for="room">Room name</label>
-    </dt>
-    <dd>
-      <input class="gtrInput room"/>
-    </dd>
-  </dl>
+      </label>
+      <span class="description">Anyone in the world can join.</span>
+    </div>
+    
+    <div id="permission-org" class="permission-row">
+      <label>
+        <div><input name="permissions" type="radio" id="child"></div>
+        <span class="github-ORG">
+          <span class="permission-label">
+            Organisation
+          </span>
+        </span>
+      </label>
+      <span class="description">Anyone in <strong>orgName</strong> can join. </span>
+    </div>
+    
+    <div id="permission-custom" class="permission-row">
+      <label>
+        <div><input name="permissions" type="radio" id="private"></div>
+        <span class="github-LOCK">
+          <span class="permission-label">
+            Private
+          </span>
+        </span>
+      </label>
+      <span class="description">Only people added to the room can join.</span>
+    </div>
+    
+    <div id="permission-repo" style="display: none">
+        <input name="permissions" type="radio">
+    </div>
+
+    <div id="auto-join" class="gtrAutoJoin">
+      <input type="checkbox"/>
+      <div class="permission-label">Automatically add people in <strong>orgName</strong> to this room.</div>
+    </div>
+
+  </div>
+
+
+
 </div>

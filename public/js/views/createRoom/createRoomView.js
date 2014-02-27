@@ -12,6 +12,10 @@ define([
 
   var View = TroupeViews.Base.extend({
     template: template,
+    events: {
+      'click #room-name': 'showOrgPermissions',
+      'click .gtrOwnerDD': 'hideOrgPermissions'
+    },
 
     initialize: function(options) {
 
@@ -23,14 +27,38 @@ define([
       };
     },
 
-    events: {
 
+    showAutoJoin: function() {
+      this.$el.find("#auto-join").removeClass('disabled');
+    },
+
+    hideAutoJoin: function() {
+      this.$el.find("#auto-join").addClass('disabled');
     },
 
     afterRender: function() {
-
-
+      var self = this;
+      this.$el.find("input:radio").change(function () {
+        if ($("#private").is(":checked")) {
+          self.hideAutoJoin();
+        } else {
+          self.showAutoJoin();
+        }
+      });
     },
+
+    hideOrgPermissions: function() {
+      this.$el.find("#permission-org").slideUp("fast", function() {
+
+      });
+    },
+
+    showOrgPermissions: function() {
+      this.$el.find("#permission-org").slideDown("fast", function() {
+
+      });
+    },
+
 
   });
 
