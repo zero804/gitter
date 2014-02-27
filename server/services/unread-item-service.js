@@ -409,12 +409,11 @@ exports.listTroupeUsersForEmailNotifications = function(horizonTime, emailLatchE
 
       if(!filteredKeys.length) return {};
 
-      var multi = redisClient.multi();
-      filteredKeys.forEach(function(troupeUserKey) {
-        multi.set('uel:' + troupeUserKey, 1, 'ex', emailLatchExpiryTimeS , 'nx');
+      var keys = filteredKeys.map(function(troupeUserKey) {
+        return 'uel:' + troupeUserKey;
       });
 
-      return Q.ninvoke(multi, 'exec')
+      return runScript('unread-latch-emails', keys, [emailLatchExpiryTimeS])
         .then(function(results) {
 
           var result = {};
