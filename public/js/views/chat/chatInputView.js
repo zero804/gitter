@@ -16,6 +16,7 @@ define([
   'components/drafty',
   'utils/cdn',
   './commands',
+  'bootstrap_tooltip', // No ref
   'jquery-textcomplete', // No ref
   'utils/sisyphus-cleaner' // No ref
 ], function(log, $, Backbone, context, TroupeViews, appEvents, template, listItemTemplate,
@@ -51,6 +52,22 @@ define([
   /** @const */
   var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];
 
+
+  var ReturnToSend = function() {
+    var stringBoolean = window.localStorage.getItem('return_to_send_disabled') || 'false';
+    this.disabled = JSON.parse(stringBoolean);
+  };
+
+  ReturnToSend.prototype.toggle = function() {
+    this.disabled = !this.disabled;
+    var stringBoolean = JSON.stringify(this.disabled);
+    window.localStorage.setItem('return_to_send_disabled', stringBoolean);
+  };
+
+  ReturnToSend.prototype.isDisabled = function() {
+    return this.disabled;
+  };
+
   var x = new Backbone.Model({enabled: !!window.localStorage.getItem('something')});
 
   x.on('change:enabled', function() {
@@ -74,6 +91,7 @@ define([
     initialize: function(options) {
       this.rollers = options.rollers;
       this.chatCollectionView = options.chatCollectionView;
+      this.returnToSend = new ReturnToSend();
       this.listenTo(appEvents, 'input.append', function(text, options) {
         if(this.inputBox) {
           this.inputBox.append(text, options);
@@ -84,7 +102,7 @@ define([
     getRenderData: function() {
       return {
         user: context.user(),
-        isReturnToSendEnabled: x.get('enabled')
+        isReturnToSendDisabled: this.returnToSend.isDisabled()
       };
     },
 
@@ -95,9 +113,11 @@ define([
         el: this.$el.find('.trpChatInputBoxTextArea'),
         rollers: this.rollers,
         chatCollectionView: this.chatCollectionView,
-        x: x
+        returnToSend: this.returnToSend
       });
       this.inputBox = inputBox;
+
+      this.$el.find('.return-send').tooltip({placement: 'left'});
 
       this.$el.find('textarea').textcomplete([
           {
@@ -217,9 +237,8 @@ define([
     },
 
     toggleReturnSend: function() {
-      var newVal = !x.get('enabled');
-      this.$el.find('.return-send').toggleClass('active', newVal);
-      x.set('enabled', newVal);
+      this.returnToSend.toggle();
+      this.$el.find('.return-send').toggleClass('active', this.returnToSend.isDisabled());
     },
 
     send: function(val) {
@@ -380,7 +399,7 @@ define([
       chatResizer.resetInput(true);
 
       this.chatCollectionView = options.chatCollectionView;
-      this.x = options.x;
+      this.returnToSend = options.returnToSend;
 
     },
 
@@ -395,7 +414,7 @@ define([
     },
 
     onKeyDown: function(e) {
-      if(e.keyCode === ENTER && !hasModifierKey(e) && !this.isTypeaheadShowing() && !this.x.get('enabled')) {
+      if(e.keyCode === ENTER && !hasModifierKey(e) && !this.isTypeaheadShowing() && !this.returnToSend.isDisabled()) {
         if(this.$el.val()) {
           this.processInput();
         }
@@ -403,7 +422,7 @@ define([
         // dont insert a new line
         e.preventDefault();
         return false;
-      } else if(e.keyCode === ENTER && e.ctrlKey && !this.isTypeaheadShowing() && this.x.get('enabled')) {
+      } else if(e.keyCode === ENTER && e.ctrlKey && !this.isTypeaheadShowing() && this.returnToSend.isDisabled()) {
         if(this.$el.val()) {
           this.processInput();
         }
