@@ -244,7 +244,7 @@ define([
       this.$el.find('.return-send').toggleClass('active', this.composeMode.isEnabled());
 
       var placeholder = this.composeMode.isEnabled() ? PLACEHOLDER_COMPOSE_MODE : PLACEHOLDER;
-      this.$el.find('textarea').attr('placeholder', placeholder);
+      this.$el.find('textarea').attr('placeholder', placeholder).focus();
     },
 
     send: function(val) {
