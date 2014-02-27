@@ -61,8 +61,28 @@
       <span class="description">Only people added to the room can join.</span>
     </div>
     
-    <div id="permission-repo" style="display: none">
-        <input name="permissions" type="radio">
+    <div id="permission-repo-public" class="permission-row" style="display: none">
+      <label>
+        <div><input name="permissions" type="radio" id="repo-public"></div>
+        <span class="github-REPO">
+          <span class="permission-label">
+            Public
+          </span>
+        </span>
+      </label>
+      <span class="description">Anyone in the world can join.</span>
+    </div>
+
+    <div id="permission-repo-private" class="permission-row" style="display: none">
+      <label>
+        <div><input name="permissions" type="radio" id="repo-private"></div>
+        <span class="github-LOCK">
+          <span class="permission-label">
+            Private
+          </span>
+        </span>
+      </label>
+      <span class="description">Only people in <strong>repoName</strong> can join.</span>
     </div>
 
     <div id="auto-join" class="gtrAutoJoin">
