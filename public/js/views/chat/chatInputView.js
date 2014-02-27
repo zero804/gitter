@@ -83,7 +83,7 @@ define([
     template: template,
 
     events: {
-      'click .return-send': 'toggleReturnSend'
+      'click .compose-mode-toggle': 'toggleComposeMode'
     },
 
     initialize: function(options) {
@@ -128,7 +128,7 @@ define([
       });
       this.inputBox = inputBox;
 
-      this.$el.find('.return-send, .md-help').tooltip({placement: 'left'});
+      this.$el.find('.compose-mode-toggle, .md-help').tooltip({placement: 'left'});
 
       this.$el.find('textarea').textcomplete([
           {
@@ -247,12 +247,12 @@ define([
       this.listenTo(this.inputBox, 'editLast', this.editLast);
     },
 
-    toggleReturnSend: function() {
+    toggleComposeMode: function() {
       this.composeMode.toggle();
       var isComposeModeEnabled = this.composeMode.isEnabled();
 
       var title = isComposeModeEnabled ? 'Chat mode' : 'Compose mode';
-      this.$el.find('.return-send')
+      this.$el.find('.compose-mode-toggle')
         .toggleClass('active', isComposeModeEnabled)
         .attr('title', title)
         .tooltip('fixTitle')
