@@ -114,7 +114,7 @@ define([
       });
       this.inputBox = inputBox;
 
-      this.$el.find('.return-send').tooltip({placement: 'left'});
+      this.$el.find('.return-send, .md-help').tooltip({placement: 'left'});
 
       this.$el.find('textarea').textcomplete([
           {
