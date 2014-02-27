@@ -13,8 +13,8 @@ define([
   var View = TroupeViews.Base.extend({
     template: template,
     events: {
-      'click #room-name': 'showOrgPermissions',
-      'click .gtrOwnerDD': 'hideOrgPermissions'
+      'click #room-name': 'showPrivateRepoPermissions',
+      'click .gtrOwnerDD': 'hidePrivateRepoPermissions'
     },
 
     initialize: function(options) {
@@ -27,6 +27,62 @@ define([
       };
     },
 
+
+    showOtherPermissions: function() {
+
+    },
+
+    hidePublicRepoPermissions: function() {
+      var self=this;
+      this.$el.find("#permission-repo-public").slideUp("fast", function() {
+        self.$el.find("#permission-org, #permission-public, #permission-custom").slideDown("fast", function() {
+          self.showAutoJoin();
+          $('#public').prop('checked',true);
+        });
+      });
+    },
+
+    showPublicRepoPermissions: function() {
+      var self=this;
+      self.hideAutoJoin();
+      this.$el.find("#permission-org, #permission-public, #permission-custom").slideUp("fast", function() {
+        self.$el.find("#permission-repo-public").slideDown("fast", function() {
+          $('#repo-public').prop('checked',true);
+        });
+      });
+    },
+
+    hidePrivateRepoPermissions: function() {
+      var self=this;
+      this.$el.find("#permission-repo-private").slideUp("fast", function() {
+        self.$el.find("#permission-org, #permission-public, #permission-custom").slideDown("fast", function() {
+          self.showAutoJoin();
+          $('#public').prop('checked',true);
+        });
+      });
+    },
+
+    showPrivateRepoPermissions: function() {
+      var self=this;
+      self.hideAutoJoin();
+      this.$el.find("#permission-org, #permission-public, #permission-custom").slideUp("fast", function() {
+        self.$el.find("#permission-repo-private").slideDown("fast", function() {
+          $('#repo-private').prop('checked',true);
+        });
+      });
+    },
+
+    hideOrgPermissions: function() {
+      this.$el.find("#permission-org").slideUp("fast", function() {
+
+      });
+    },
+
+    showOrgPermissions: function() {
+      this.$el.find("#permission-org").slideDown("fast", function() {
+
+      });
+    },
 
     showAutoJoin: function() {
       this.$el.find("#auto-join").removeClass('disabled');
@@ -44,18 +100,6 @@ define([
         } else {
           self.showAutoJoin();
         }
-      });
-    },
-
-    hideOrgPermissions: function() {
-      this.$el.find("#permission-org").slideUp("fast", function() {
-
-      });
-    },
-
-    showOrgPermissions: function() {
-      this.$el.find("#permission-org").slideDown("fast", function() {
-
       });
     },
 
