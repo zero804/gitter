@@ -6,12 +6,14 @@ define([
   'utils/appevents',
   'collections/instances/troupes',
   'views/toolbar/troupeCollectionView',
+  'views/createRoom/createRoomView',
+  'components/modal-region',
   'hbs!./tmpl/troupeMenu',
   './searchView',
   './profileView',
   './orgCollectionView',
   'nanoscroller' //no ref
-], function($, Marionette, context, appEvents, troupeCollections, TroupeCollectionView, template, SearchView, ProfileView, OrgCollectionView) {
+], function($, Marionette, context, appEvents, troupeCollections, TroupeCollectionView, createRoomView, modalRegion, template, SearchView, ProfileView, OrgCollectionView) {
   "use strict";
 
   return Marionette.Layout.extend({
@@ -29,7 +31,8 @@ define([
 
     events: {
       "click #search-clear-icon" : "onSearchClearIconClick",
-      "click #left-menu-profile" : "onClickProfileMenu"
+      "click #left-menu-profile" : "onClickProfileMenu",
+      "click #create-room-button" : "onClickCreateRoom"
     },
 
     initialize: function() {
@@ -46,6 +49,10 @@ define([
       $(window).on('hideSearch', function() {
         self.hideSearch();
       });
+    },
+
+    onClickCreateRoom: function() {
+      modalRegion.show(new createRoomView.Modal({}));
     },
 
     onRender: function() {
