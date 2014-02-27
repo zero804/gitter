@@ -147,6 +147,11 @@ define([
       var scrollFromTop = this.$el.scrollTop();
       var pageHeight = Math.floor(this.$el.height() * 0.8);
       this.$el.scrollTop(scrollFromTop - pageHeight);
+
+      // page up doesnt trigger scroll events
+      if(scrollFromTop === 0) {
+        this.scroll.trigger('approaching.end');
+      }
     },
 
     pageDown: function() {

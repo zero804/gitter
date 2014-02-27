@@ -14,6 +14,16 @@ define([
 
   var failoverImage = cdn('images/2/gitter/logo-mark-grey-64.png');
 
+  function largeAvatar(url) {
+    if(!url) return failoverImage;
+
+    if(url.indexOf('?') >= 0) {
+      return url + '&s=128';
+    }
+
+    return url + '?s=128';
+  }
+
   var UserView = Marionette.ItemView.extend({
     template: template,
     modelEvents: {
@@ -30,7 +40,7 @@ define([
         }
       }
 
-      data.avatarUrl = data.avatar_url && data.avatar_url + "&s=128" || failoverImage;
+      data.avatarUrl = largeAvatar(data.avatar_url);
 
       return data;
     }
