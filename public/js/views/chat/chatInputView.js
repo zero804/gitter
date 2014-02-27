@@ -439,9 +439,9 @@ define([
       } else if(e.keyCode === UP_ARROW && !hasModifierKey(e) && !this.$el.val()) {
         this.trigger('editLast');
       } else if(e.keyCode === PAGE_UP && !hasModifierKey(e)) {
-        this.chatCollectionView.pageUp();
+        if(this.chatCollectionView) this.chatCollectionView.pageUp();
       } else if(e.keyCode === PAGE_DOWN && !hasModifierKey(e)) {
-        this.chatCollectionView.pageDown();
+        if(this.chatCollectionView) this.chatCollectionView.pageDown();
       }
     },
 
