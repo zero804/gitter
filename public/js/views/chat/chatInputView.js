@@ -420,7 +420,9 @@ define([
     },
 
     onKeyDown: function(e) {
-      if(e.keyCode === ENTER && !hasModifierKey(e) && !this.isTypeaheadShowing() && !this.composeMode.isEnabled()) {
+      var isComposeModeEnabled = this.composeMode && this.composeMode.isEnabled();
+
+      if(e.keyCode === ENTER && !hasModifierKey(e) && !this.isTypeaheadShowing() && !isComposeModeEnabled) {
         if(this.hasVisibleText()) {
           this.processInput();
         }
@@ -428,7 +430,7 @@ define([
         // dont insert a new line
         e.preventDefault();
         return false;
-      } else if(e.keyCode === ENTER && e.ctrlKey && !this.isTypeaheadShowing() && this.composeMode.isEnabled()) {
+      } else if(e.keyCode === ENTER && e.ctrlKey && !this.isTypeaheadShowing() && isComposeModeEnabled) {
         if(this.hasVisibleText()) {
           this.processInput();
         }
