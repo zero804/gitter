@@ -2165,25 +2165,23 @@ ul.roster {
     opacity: 0.5;
     .transition300ms;
     cursor: pointer;
+    .prepend-pencil-off;
+    height: 20px;
+    &:before {
+      margin-left: 3px;
+    };
   }
 
   .return-send.active {
     color: @trpGreen;
     opacity: 0.7;
+    .prepend-pencil-on;
   }
 
   .return-send:hover {
     opacity: 0.9;
   }
 
-  .return-send:before {
-    font-family: 'troupe-icons';
-    content: '\e82f';
-    margin-right: 8px;
-    width: 12px;
-    font-size: 14px;
-    -webkit-font-smoothing: antialiased;
-  }
 }
 
 .markdown-help-content {
