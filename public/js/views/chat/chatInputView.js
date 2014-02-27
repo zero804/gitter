@@ -415,7 +415,7 @@ define([
 
     onKeyDown: function(e) {
       if(e.keyCode === ENTER && !hasModifierKey(e) && !this.isTypeaheadShowing() && !this.returnToSend.isDisabled()) {
-        if(this.$el.val()) {
+        if(this.hasVisibleText()) {
           this.processInput();
         }
 
@@ -423,7 +423,7 @@ define([
         e.preventDefault();
         return false;
       } else if(e.keyCode === ENTER && e.ctrlKey && !this.isTypeaheadShowing() && this.returnToSend.isDisabled()) {
-        if(this.$el.val()) {
+        if(this.hasVisibleText()) {
           this.processInput();
         }
 
