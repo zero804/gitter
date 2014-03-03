@@ -1,0 +1,19 @@
+<div class="trpChatAvatar">
+  <span>
+    <div class="trpDisplayPicture avatar-s" style="background-image: url({{author.avatar_url}});">
+   </div>
+  </span>
+</div>
+<div class="trpChatBox">
+  <div class="trpChatDetails">
+    <div class="trpChatFrom">{{author.login}}</div>
+    <div class="trpChatTime"> &bull; {{date}}</div>
+  </div>
+  <div class="trpChatText">
+    <ul>
+      {{#each files}}
+      <li>{{filename}} - {{#if additions}}additions: {{additions}}{{/if}} {{#if deletions}}deletions: {{deletions}}{{/if}}</li>
+      {{/each}}
+    </ul>
+  </div>
+</div>
