@@ -3,11 +3,16 @@
 
   <span class="gtrActivityItemText"><a href="https://github.com/{{payload.pusher.name}}" target="_blank"><span class='mention' data-link-type="mention" data-screen-name="{{payload.pusher.name}}">{{payload.pusher.name}}</span></a> on {{branch_name}}<br>
     <span class="activity-commit">
-    {{#if multiple_commits}}
-      {{commits_count}} commits <a href="{{payload.compare}}" target="_blank" style="opacity: 0.6">(compare)</a>
-    {{else}}
-      {{commit_text}} <a href="{{payload.compare}}" target="_blank" style="opacity: 0.6">(compare)</a>
-    {{/if}}
+      {{#if commit_text}}
+        {{commit_text}}
+      {{/if}}
+      {{#each commits}}
+        <a href="" data-link-type="commit" data-commit-sha1="{{id}}" data-commit-repo="{{../repo}}" class="commit">{{short_sha}}</a>
+      {{/each}}
+      {{#if hidden_commit_count}}
+        and {{hidden_commit_count}} more
+      {{/if}}
+      <a href="{{payload.compare}}" target="_blank" style="opacity: 0.6">(compare)</a>
     </span>
   </span>
 

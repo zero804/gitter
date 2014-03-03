@@ -5,6 +5,7 @@ define([
   'utils/context',
   'views/base',
   'views/chat/decorators/issueDecorator',
+  'views/chat/decorators/commitDecorator',
   'views/chat/decorators/mentionDecorator',
   'log!activity',
   'hbs!./tmpl/activityStream',
@@ -34,6 +35,7 @@ define([
   context,
   TroupeViews,
   issueDecorator,
+  commitDecorator,
   mentionDecorator,
   log,
   activityStreamTemplate,
@@ -114,11 +116,18 @@ define([
       if (meta.event == 'push') {
         var commitCount = payload.commits ? payload.commits.length : 0;
 
+        extra.commits = payload.commits;
+        extra.commits.forEach(function(commit){
+          commit.short_sha = commit.id.substring(0,7);
+        });
+
         if (commitCount == 1) {
           var message = payload.commits[0].message;
           extra.commit_text = (message.length > 34) ? message.substr(0,33) + '…' : message;
-        } else if(commitCount > 1) {
-          extra.multiple_commits = true;
+          extra.commit_short_sha = payload.commits[0].id.substring(0,7);
+        } else if(commitCount > 3) {
+          extra.commits = extra.commits.slice(0,3);
+          extra.hidden_commit_count = commitCount - 3;
         }
 
         extra.commits_count = commitCount;
@@ -204,6 +213,7 @@ define([
 
     afterRender: function() {
       issueDecorator.decorate(this);
+      commitDecorator.decorate(this);
       mentionDecorator.decorate(this);
     }
   });
