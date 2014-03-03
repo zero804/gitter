@@ -14,7 +14,17 @@ define([
   var IssuePopoverView = Backbone.View.extend({
     className: 'commit-popover-body',
     render: function() {
-      this.$el.html(commitPopoverTemplate(this.model.attributes));
+      var data = this.model.toJSON();
+      data.date = moment(data.author.date).format("LLL");
+
+      data.files.forEach(function(file) {
+        if(file.filename.length > MAX_PATH_LENGTH) {
+          file.fullFilename = file.filename;
+          file.filename = getShortPath(file.filename);
+        }
+      });
+
+      this.$el.html(commitPopoverTemplate(data));
       return this;
     }
   });
@@ -54,16 +64,7 @@ define([
 
   function preparePopover($commit, url) {
     $.get(url, function(commit) {
-
       var commitModel = new Backbone.Model(commit);
-      commitModel.set('date', moment(commit.author.date).format("LLL"));
-      var files = commitModel.get('files');
-      files.forEach(function(file) {
-        if(file.filename.length > MAX_PATH_LENGTH) {
-          file.fullFilename = file.filename;
-          file.filename = getShortPath(file.filename);
-        }
-      });
 
       $commit.on('mouseover', function(e) {
         Popover.hoverTimeout(e, function() {
