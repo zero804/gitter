@@ -30,7 +30,6 @@ require([
   'components/dozy',            // Sleep detection No ref
   'template/helpers/all',       // No ref
   'components/eyeballs',        // No ref
-  'bootstrap-dropdown',         // No ref
   'components/bug-reporting',   // No ref
   'components/csrf'             // No ref
 ], function($, Backbone, context, liveContext, appEvents, peopleCollectionView, ChatIntegratedView, chatInputView,

@@ -498,16 +498,6 @@ module.exports = function( grunt ) {
         exports: 'ScrollFix'
       },
 
-      'bootstrap-typeahead': {
-        files : {
-          'output/client-libs/bootstrap/bootstrap-typeahead.js': ['output/client-libs/bootstrap/js/bootstrap-typeahead.js']
-        },
-        modules: {
-          'jquery': 'jQuery'
-        },
-        exports: 'jQuery'
-      },
-
       'zeroclipboard': {
         files : {
           'output/client-libs/zeroclipboard/zeroclipboard-amd.js': ['output/client-libs/zeroclipboard/zeroclipboard.js']
