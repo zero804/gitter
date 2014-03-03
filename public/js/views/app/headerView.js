@@ -5,9 +5,8 @@ define([
   'marionette',
   'hbs!./tmpl/headerViewTemplate',
   'autolink',
-  'underscore',
   'components/notifications'
-], function($, context, Marionette, headerViewTemplate, autolink, _, notifications)  {
+], function($, context, Marionette, headerViewTemplate, autolink, notifications)  {
   "use strict";
 
   return Marionette.ItemView.extend({
