@@ -2,13 +2,14 @@
 
 define([
   'jquery',
-  'underscore',
   'marionette',
-  'utils/context',
+  'collections/instances/troupes',
+  'views/controls/combobox',
   'views/base',
-  'utils/cdn',
-  'hbs!./tmpl/createRoom'
-], function($, _, Marionette, context, TroupeViews, cdn, template) {
+  './parentSelectView',
+  'hbs!./tmpl/createRoom',
+  'hbs!./tmpl/ownerSelectItem'
+], function($, Marionette, troupeCollections, Combobox, TroupeViews, ParentSelectView, template, ownerSelectItemTemplate) {
   "use strict";
 
   var View = Marionette.Layout.extend({
@@ -20,21 +21,13 @@ define([
       permOrg: "#permission-org",
       permAll: "#permission-org, #permission-public, #permission-custom"
     },
+    regions: {
+      ownerSelect: '#owner-region',
+    },
     events: {
       'click #room-name': 'showPrivateRepoPermissions',
       'click .gtrOwnerDD': 'hidePrivateRepoPermissions'
     },
-
-    initialize: function(options) {
-
-    },
-
-    getRenderData: function() {
-      return {
-
-      };
-    },
-
 
     showOtherPermissions: function() {
 
@@ -100,7 +93,12 @@ define([
       this.ui.autoJoin.addClass('disabled');
     },
 
-    afterRender: function() {
+    onRender: function() {
+      this.ownerSelect.show(new ParentSelectView({
+        orgsCollection: troupeCollections.orgs,
+        troupesCollection: troupeCollections.troupes
+      }));
+
       var self = this;
       this.$el.find("input:radio").change(function () {
         if ($("#private").is(":checked")) {
