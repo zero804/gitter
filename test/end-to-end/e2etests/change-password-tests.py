@@ -107,7 +107,7 @@ class ChangePasswordTests(unittest.TestCase):
 
     def changeProfilePassword(self, oldPassword, newPassword):
         self.driver.find_element_by_id('profile-icon').click()
-        
+
         form = self.driver.find_element_by_id('updateprofileform')
         # wait for form to load
         time.sleep(1)
@@ -120,7 +120,7 @@ class ChangePasswordTests(unittest.TestCase):
 
         self.driver.find_element_by_css_selector('input[name=username]').send_keys('testuser-' + str(uuid.uuid4()))
         self.driver.find_element_by_css_selector('input[name=submit]').click()
-        
+
         form = self.driver.find_element_by_id('updateprofileform')
         # wait for form to load
         time.sleep(1)
@@ -133,7 +133,7 @@ class ChangePasswordTests(unittest.TestCase):
         utils.getJSON('/testdata/newTroupeForUser?id='+self.userId)
 
     def inviteToTroupe(self, email):
-        self.driver.get(utils.baseUrl('/#|share'))
+        self.driver.get(utils.baseUrl('/#share'))
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, 'custom-email')))
         self.driver.find_element_by_id('custom-email').send_keys(email)
         self.driver.find_element_by_id('custom-email-button').click()

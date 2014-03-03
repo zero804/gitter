@@ -49,9 +49,10 @@ require([
   var Router = Backbone.Router.extend({
     routes: {
       // TODO: get rid of the pipes
-      "!": "hideModal",
+      "!": "hideModal",                  // TODO: remove this soon
       "": "hideModal",
-      "|notifications": "notifications",
+      "notifications": "notifications",
+      "|notifications": "notifications", // TODO: remove this soon
     },
 
     hideModal: function() {
