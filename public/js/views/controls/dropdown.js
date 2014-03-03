@@ -13,7 +13,6 @@ define([
   var backdrop = '.dropdown-backdrop';
   var toggle   = '[data-toggle=dropdown]';
 
-
   var EmptyView = Marionette.ItemView.extend({
     template: emptyTemplate
   });
