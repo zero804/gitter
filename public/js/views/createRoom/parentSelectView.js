@@ -5,18 +5,22 @@ define([
   'hbs!./tmpl/parentSelectView',
   'hbs!./tmpl/parentItemView',
   'typeahead',
-  'views/controls/dropdown'
-], function(Marionette, context, template, itemTemplate, Typeahead) {
+  'views/controls/dropdown',
+  'backbone'
+], function(Marionette, context, template, itemTemplate, Typeahead, Dropdown, Backbone) {
   "use strict";
 
-  return Marionette.ItemView.extend({
+  return Marionette.Layout.extend({
     events: {
       'click input#input-parent': function() {
-        this.typeahead.open();
-        this.typeahead.dropdown.update('');
+        // this.typeahead.open();
+        // this.typeahead.dropdown.update('');
+        this.dropdown.show();
       }
     },
-
+    regions: {
+      dropdownRegion: '#dd-region',
+    },
     ui: {
       input: "input#input-parent"
     },
@@ -25,9 +29,16 @@ define([
     initialize: function(options) {
       this.orgsCollection = options.orgsCollection;
       this.troupesCollection = options.troupesCollection;
+
+      var c = new Backbone.Collection();
+      c.add(new Backbone.Model({ title: 'moo' }));
+      this.dropdown = new Dropdown({ collection: c });
     },
 
     onRender: function() {
+      this.dropdownRegion.show(this.dropdown);
+
+      return;
       var self = this;
       this.typeahead = new Typeahead({
         input: this.ui.input,
