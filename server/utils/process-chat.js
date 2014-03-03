@@ -94,9 +94,10 @@ module.exports = exports = function processChat(text) {
     return out;
   };
 
-  renderer.commit = function(repo, sha1, text) {
+  renderer.commit = function(href, repo, sha1, text) {
 
-    var out = '<a data-link-type="commit"' +
+    var out = '<a href="' + href + '"' +
+              'data-link-type="commit"' +
               'data-commit-sha1="' + sha1 + '"' +
               'data-commit-repo="' + repo + '"' +
               'class="commit">' + text + '</a>';
@@ -112,7 +113,7 @@ module.exports = exports = function processChat(text) {
         return renderer.issue(githubData.repo, githubData.number, issueText);
       } else if(githubData.type === 'commit') {
         var commitText = githubData.repo+'@'+githubData.sha1.substring(0,7);
-        return renderer.commit(githubData.repo, githubData.sha1, commitText);
+        return renderer.commit(href, githubData.repo, githubData.sha1, commitText);
       }
 
     } else {
