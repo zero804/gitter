@@ -5,6 +5,7 @@ var marked    = require('marked');
 var highlight = require('highlight.js');
 var _         = require('underscore');
 var util      = require('util');
+var url       = require('url');
 
 var options = { gfm: true, tables: true, sanitize: true, breaks: true, linkify: true, skipComments: true };
 
@@ -44,6 +45,21 @@ module.exports = exports = function processChat(text) {
     return href;
   }
 
+  function getGitHubIssueData(href) {
+    var urlObj = url.parse(href);
+
+    if(urlObj.hostname === 'github.com') {
+      // [ '', 'trevorah', 'test-repo', 'issues', '1' ]
+      var pathParts = urlObj.pathname.split('/');
+      if(pathParts[3] === 'issues' && pathParts[4]) {
+        return {
+          repo: pathParts[1]+'/'+pathParts[2],
+          number: pathParts[4]
+        };
+      }
+    }
+  }
+
   var renderer = new marked.Renderer();
 
   // Highlight code blocks
@@ -73,8 +89,14 @@ module.exports = exports = function processChat(text) {
 
   renderer.link = function(href, title, text) {
     href = checkForIllegalUrl(href);
-    urls.push({ url: href });
-    return util.format('<a href="%s" rel="nofollow" target="_new" class="link">%s</a>', href, text);
+    var issueData = getGitHubIssueData(href);
+    if(issueData) {
+      var issueText = issueData.repo+'#'+issueData.number;
+      return renderer.issue(issueData.repo, issueData.number, issueText);
+    } else {
+      urls.push({ url: href });
+      return util.format('<a href="%s" rel="nofollow" target="_new" class="link">%s</a>', href, text);  
+    }
   };
 
   renderer.image = function(href, title, text) {

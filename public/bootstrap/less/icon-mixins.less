@@ -112,6 +112,25 @@
   .prepend-gitter-icon('\e813')
 }
 
+.prepend-pencil-off() {
+  .prepend-gitter-icon('\e832');
+  &:before {
+    font-size: 16px;
+    left: -4px;
+    top: 2px;
+  }
+
+}
+
+.prepend-pencil-on() {
+  .prepend-gitter-icon('\e831');
+  &:before {
+    font-size: 20px;
+    left: -4px;
+    top: -2px;
+  }
+}
+
 
 .prepend-trello-card-update() {
   .prepend-gitter-icon('\e813')

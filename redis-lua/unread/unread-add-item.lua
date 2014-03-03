@@ -4,8 +4,16 @@ local troupe_id = table.remove(ARGV, 1)
 local item_id = table.remove(ARGV, 1)
 local time_now = table.remove(ARGV, 1)
 
+local email_hash_key = table.remove(KEYS, 1)
+
 local MAX_ITEMS = 100
 local MAX_ITEMS_PLUS_ONE = MAX_ITEMS + 1
+
+-- Update values in the email hash with time_now, if a value does not exist
+local userIds = ARGV
+for i, user_id in ipairs(userIds) do
+  redis.call("HSETNX", email_hash_key, troupe_id..':'..user_id, time_now)
+end
 
 local key_count = #KEYS/2
 
@@ -16,6 +24,8 @@ local result = {};
 for i = 1,key_count do
 	local user_troupe_key = KEYS[i]
 	local user_badge_key = KEYS[i + key_count]
+
+
   local item_count = -1 -- -1 means do not update
   local update = 0 -- bit flags: 1 = badge_update, 2 = upgrade_key
   local key_type = redis.call("TYPE", user_troupe_key)["ok"];

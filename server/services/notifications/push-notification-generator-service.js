@@ -44,8 +44,6 @@ var queue = workerQueue.queue('generate-push-notifications', {}, function() {
   var basePath = nconf.get('web:basepath');
 
   function serializeItems(troupeId, recipientUserId, items, callback) {
-    winston.verbose('serializeItems:', items);
-
     var itemTypes = Object.keys(items);
 
     var f = new Fiber();

@@ -15,6 +15,7 @@ define([
   'components/drafty',
   'utils/cdn',
   './commands',
+  'bootstrap_tooltip', // No ref
   'jquery-textcomplete', // No ref
   'utils/sisyphus-cleaner' // No ref
 ], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate,
@@ -36,9 +37,6 @@ define([
   var UP_ARROW = 38;
 
   /** @const */
-  var DOWN_ARROW = 40;
-
-  /** @const */
   var ENTER = 13;
 
   /** @const */
@@ -50,12 +48,48 @@ define([
   /** @const */
   var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];
 
+  /** @const */
+  var MOBILE_PLACEHOLDER = 'Touch here to type a chat message.';
+
+  /** @const */
+  var PLACEHOLDER = 'Click here to type a chat message. Supports GitHub flavoured markdown.';
+
+  var isMacBrowser = window.navigator.platform.indexOf('Mac') === 0;
+
+  /** @const */
+  var PLACEHOLDER_COMPOSE_MODE = PLACEHOLDER+' '+(isMacBrowser ? 'Cmd' : 'Ctrl')+'+Enter to send.';
+
+  /** @const */
+  var COMPOSE_MODE_MODIFIER_KEY = isMacBrowser ? 'metaKey' : 'ctrlKey';
+
+
+
+  var ComposeMode = function() {
+    var stringBoolean = window.localStorage.getItem('compose_mode_enabled') || 'false';
+    this.disabled = JSON.parse(stringBoolean);
+  };
+
+  ComposeMode.prototype.toggle = function() {
+    this.disabled = !this.disabled;
+    var stringBoolean = JSON.stringify(this.disabled);
+    window.localStorage.setItem('compose_mode_enabled', stringBoolean);
+  };
+
+  ComposeMode.prototype.isEnabled = function() {
+    return this.disabled;
+  };
+
   var ChatInputView = TroupeViews.Base.extend({
     template: template,
+
+    events: {
+      'click .compose-mode-toggle': 'toggleComposeMode'
+    },
 
     initialize: function(options) {
       this.rollers = options.rollers;
       this.chatCollectionView = options.chatCollectionView;
+      this.composeMode = new ComposeMode();
       this.listenTo(appEvents, 'input.append', function(text, options) {
         if(this.inputBox) {
           this.inputBox.append(text, options);
@@ -64,8 +98,22 @@ define([
     },
 
     getRenderData: function() {
+      var isComposeModeEnabled = this.composeMode.isEnabled()
+      var placeholder;
+
+      if(this.compactView) {
+        placeholder = MOBILE_PLACEHOLDER;
+      } else if(isComposeModeEnabled) {
+        placeholder = PLACEHOLDER_COMPOSE_MODE;
+      } else {
+        placeholder = PLACEHOLDER;
+      }
+
       return {
-        user: context.user()
+        user: context.user(),
+        isComposeModeEnabled: this.composeMode.isEnabled(),
+        placeholder: placeholder,
+        composeModeToggleTitle: isComposeModeEnabled ? 'Switch to chat mode' : 'Switch to compose mode'
       };
     },
 
@@ -75,9 +123,12 @@ define([
       var inputBox = new ChatInputBoxView({
         el: this.$el.find('.trpChatInputBoxTextArea'),
         rollers: this.rollers,
-        chatCollectionView: this.chatCollectionView
+        chatCollectionView: this.chatCollectionView,
+        composeMode: this.composeMode
       });
       this.inputBox = inputBox;
+
+      this.$el.find('.compose-mode-toggle, .md-help').tooltip({placement: 'left'});
 
       this.$el.find('textarea').textcomplete([
           {
@@ -194,6 +245,21 @@ define([
       this.listenTo(this.inputBox, 'save', this.send);
       this.listenTo(this.inputBox, 'subst', this.subst);
       this.listenTo(this.inputBox, 'editLast', this.editLast);
+    },
+
+    toggleComposeMode: function() {
+      this.composeMode.toggle();
+      var isComposeModeEnabled = this.composeMode.isEnabled();
+
+      var title = isComposeModeEnabled ? 'Switch to chat mode' : 'Switch to compose mode';
+      this.$el.find('.compose-mode-toggle')
+        .toggleClass('active', isComposeModeEnabled)
+        .attr('title', title)
+        .tooltip('fixTitle')
+        .tooltip('hide');
+
+      var placeholder = isComposeModeEnabled ? PLACEHOLDER_COMPOSE_MODE : PLACEHOLDER;
+      this.$el.find('textarea').attr('placeholder', placeholder).focus();
     },
 
     send: function(val) {
@@ -354,6 +420,8 @@ define([
       chatResizer.resetInput(true);
 
       this.chatCollectionView = options.chatCollectionView;
+      this.composeMode = options.composeMode;
+
     },
 
     onFocusOut: function() {
@@ -367,18 +435,29 @@ define([
     },
 
     onKeyDown: function(e) {
-      if(e.keyCode === ENTER && !hasModifierKey(e) && this.hasVisibleText() && !this.isTypeaheadShowing()) {
-        e.stopPropagation();
+      var isComposeModeEnabled = this.composeMode && this.composeMode.isEnabled();
+
+      if(e.keyCode === ENTER && !hasModifierKey(e) && !this.isTypeaheadShowing() && !isComposeModeEnabled) {
+        if(this.hasVisibleText()) {
+          this.processInput();
+        }
+
+        // dont insert a new line
         e.preventDefault();
+        return false;
+      } else if(e.keyCode === ENTER && e[COMPOSE_MODE_MODIFIER_KEY] && !this.isTypeaheadShowing() && isComposeModeEnabled) {
+        if(this.hasVisibleText()) {
+          this.processInput();
+        }
 
-        this.processInput();
-
+        // dont insert a new line
+        e.preventDefault();
         return false;
       } else if(e.keyCode === UP_ARROW && !hasModifierKey(e) && !this.$el.val()) {
         this.trigger('editLast');
-      } else if((e.keyCode === PAGE_UP && !hasModifierKey(e)) || (e.keyCode === UP_ARROW && e.metaKey)) {
+      } else if(e.keyCode === PAGE_UP && !hasModifierKey(e)) {
         if(this.chatCollectionView) this.chatCollectionView.pageUp();
-      } else if((e.keyCode === PAGE_DOWN && !hasModifierKey(e)) || (e.keyCode === DOWN_ARROW && e.metaKey)) {
+      } else if(e.keyCode === PAGE_DOWN && !hasModifierKey(e)) {
         if(this.chatCollectionView) this.chatCollectionView.pageDown();
       }
     },

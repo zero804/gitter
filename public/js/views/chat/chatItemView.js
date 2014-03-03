@@ -117,7 +117,7 @@ define([
 
       // Handle empty messages as deleted
       if (html.length === 0) {
-        html = '[deleted]';
+        html = '<i>This message was deleted</i>';
         this.$el.addClass('deleted');
       }
 
