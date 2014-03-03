@@ -31,8 +31,20 @@ define([
           file.filename = getShortPath(file.filename);
         }
       });
-      if(data.files.length === 1 && data.files[0].patch) {
-        data.diff = data.files[0].patch;
+
+      if(data.files.length === 1) {
+        data.isFileLengthSingular = true;
+        if(data.files[0].patch) {
+          data.diff = data.files[0].patch;
+        }
+      }
+
+      if(data.stats.additions === 1) {
+        data.isAdditionsSingular = true;
+      }
+
+      if(data.stats.deletions === 1) {
+        data.isDeletionsSingular = true;
       }
 
       this.$el.html(commitPopoverTemplate(data));
