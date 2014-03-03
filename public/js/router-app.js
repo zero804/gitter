@@ -2,18 +2,20 @@
 require([
   'utils/appevents',
   'utils/context',
+  'backbone',
   'views/app/appIntegratedView',
   'views/toolbar/troupeMenu',
   'collections/instances/troupes',
   'components/titlebar',
   'components/realtime',
+  'views/createRoom/createRoomView',
   'views/widgets/preload',            // No ref
   'components/webNotifications',      // No ref
   'components/desktopNotifications',  // No ref
   'template/helpers/all',             // No ref
   'components/bug-reporting',         // No ref
   'components/csrf'                   // No ref
-], function(appEvents, context, AppIntegratedView, TroupeMenuView, troupeCollections, TitlebarUpdater, realtime) {
+], function(appEvents, context, Backbone, AppIntegratedView, TroupeMenuView, troupeCollections, TitlebarUpdater, realtime, createRoomView) {
   "use strict";
 
   var chatIFrame = document.getElementById('content-frame');
@@ -84,6 +86,27 @@ require([
         break;
     }
   });
+
+
+
+  var Router = Backbone.Router.extend({
+    routes: {
+      // TODO: get rid of the pipes
+      "": "hideModal",
+      "customroom": "customroom",
+    },
+
+    hideModal: function() {
+      appView.dialogRegion.close();
+    },
+
+    customroom: function() {
+      appView.dialogRegion.show(new createRoomView.Modal({}));
+    }
+  });
+
+  new Router();
+  Backbone.history.start();
 
   // Asynchronously load tracker
   require([
