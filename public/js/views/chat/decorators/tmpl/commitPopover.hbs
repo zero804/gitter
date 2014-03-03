@@ -13,7 +13,7 @@
     <p>{{stats.total}} files changed. {{stats.additions}} additions, {{stats.deletions}} deletions.</p>
     <ul class="file-list">
       {{#each files}}
-      <li><span class="{{status}}">{{filename}}</span></li>
+      <li><span class="{{status}}" title="{{fullFilename}}">{{filename}}</span></li>
       {{/each}}
     </ul>
   </div>
