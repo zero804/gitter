@@ -512,35 +512,40 @@ define([
     },
 
     appendHtml: function(collectionView, itemView, index) {
-      //log("Inserting view at index ", index, " of ", collectionView.collection.length, " in collection ", collectionView.collection.url, "; itemView ", itemView.model.attributes, ((this.isRendering) ? " with rendering shortcut" : ''));
+      var el = collectionView.itemViewContainer || collectionView.el;
+      var $el = collectionView.itemViewContainer ? $(collectionView.itemViewContainer) : collectionView.$el;
 
       // Shortcut - just place at the end!
       if (this.isRendering) {
-        // if this is during rendering, then the views always come in sort order, so just append
-        collectionView.$el.append(itemView.el);
+        // if this is during rendering, then the views always come in sort order,
+        // so just append
+        $el.append(itemView.el);
         return;
       }
 
-      // we are inserting views after rendering, find the adjacent view if there is one already
+      // we are inserting views after rendering, find the adjacent view if there
+      // is one already
       var adjView;
 
       if (index === 0) {
-        // find the view that comes after the first one (sometimes there will be a non view that is the first child so we can't prepend)
+        // find the view that comes after the first one (sometimes there will be a
+        // non view that is the first child so we can't prepend)
         adjView = findViewAfter(0);
 
         if (adjView) {
           itemView.$el.insertBefore(adjView.el);
         } else {
           // there are no existing views after the first,
-          // we append (keeping the place of non-view children already present in the container)
-          itemView.$el.appendTo(collectionView.el);
+          // we append (keeping the place of non-view children already present in the
+          // container)
+          itemView.$el.appendTo(el);
         }
 
         return;
       }
 
       if(index == collectionView.collection.length - 1) {
-        itemView.$el.appendTo(collectionView.el);
+        itemView.$el.appendTo(el);
         return;
       }
 
@@ -560,7 +565,7 @@ define([
           /* in this case, the itemViews are not coming in any sequential order  */
           // We can't find an item before, we can't find an item after,
           // just give up and insert at the end. (hopefully this will never happen eh?)
-          itemView.$el.appendTo(collectionView.el);
+          itemView.$el.appendTo(el);
         }
       }
 

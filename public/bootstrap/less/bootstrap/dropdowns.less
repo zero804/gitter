@@ -123,6 +123,16 @@
   }
 }
 
+// Backdrop to catch body clicks on mobile, etc.
+.dropdown-backdrop {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  z-index: (@zindexDropdown - 10);
+}
+
 // Typeahead
 .typeahead {
   margin-top: 2px; // give it some space to breathe

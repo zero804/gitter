@@ -92,10 +92,12 @@ define([
     },
 
     onRender: function() {
-      this.ownerSelect.show(new ParentSelectView({
+      var parentSelect = new ParentSelectView({
         orgsCollection: troupeCollections.orgs,
         troupesCollection: troupeCollections.troupes
-      }));
+      });
+
+      this.ownerSelect.show(parentSelect);
 
       var self = this;
       this.$el.find("input:radio").change(function () {
