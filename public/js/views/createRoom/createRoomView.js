@@ -3,15 +3,23 @@
 define([
   'jquery',
   'underscore',
+  'marionette',
   'utils/context',
   'views/base',
   'utils/cdn',
   'hbs!./tmpl/createRoom'
-], function($, _, context, TroupeViews, cdn, template) {
+], function($, _, Marionette, context, TroupeViews, cdn, template) {
   "use strict";
 
-  var View = TroupeViews.Base.extend({
+  var View = Marionette.Layout.extend({
     template: template,
+    ui: {
+      autoJoin: "#auto-join",
+      permPublic: "#permission-repo-public",
+      permPrivate: "#permission-repo-private",
+      permOrg: "#permission-org",
+      permAll: "#permission-org, #permission-public, #permission-custom"
+    },
     events: {
       'click #room-name': 'showPrivateRepoPermissions',
       'click .gtrOwnerDD': 'hidePrivateRepoPermissions'
@@ -33,9 +41,9 @@ define([
     },
 
     hidePublicRepoPermissions: function() {
-      var self=this;
-      this.$el.find("#permission-repo-public").slideUp("fast", function() {
-        self.$el.find("#permission-org, #permission-public, #permission-custom").slideDown("fast", function() {
+      var self = this;
+      this.ui.permPublic.slideUp("fast", function() {
+        self.ui.permAll.slideDown("fast", function() {
           self.showAutoJoin();
           $('#public').prop('checked',true);
         });
@@ -45,7 +53,7 @@ define([
     showPublicRepoPermissions: function() {
       var self=this;
       self.hideAutoJoin();
-      this.$el.find("#permission-org, #permission-public, #permission-custom").slideUp("fast", function() {
+      this.ui.permAll.slideUp("fast", function() {
         self.$el.find("#permission-repo-public").slideDown("fast", function() {
           $('#repo-public').prop('checked',true);
         });
@@ -55,7 +63,7 @@ define([
     hidePrivateRepoPermissions: function() {
       var self=this;
       this.$el.find("#permission-repo-private").slideUp("fast", function() {
-        self.$el.find("#permission-org, #permission-public, #permission-custom").slideDown("fast", function() {
+        self.ui.permAll.slideDown("fast", function() {
           self.showAutoJoin();
           $('#public').prop('checked',true);
         });
@@ -65,31 +73,31 @@ define([
     showPrivateRepoPermissions: function() {
       var self=this;
       self.hideAutoJoin();
-      this.$el.find("#permission-org, #permission-public, #permission-custom").slideUp("fast", function() {
-        self.$el.find("#permission-repo-private").slideDown("fast", function() {
+      this.ui.permAll.slideUp("fast", function() {
+        self.ui.permPrivate.slideDown("fast", function() {
           $('#repo-private').prop('checked',true);
         });
       });
     },
 
     hideOrgPermissions: function() {
-      this.$el.find("#permission-org").slideUp("fast", function() {
+      this.ui.permOrg.slideUp("fast", function() {
 
       });
     },
 
     showOrgPermissions: function() {
-      this.$el.find("#permission-org").slideDown("fast", function() {
+      this.ui.permOrg.slideDown("fast", function() {
 
       });
     },
 
     showAutoJoin: function() {
-      this.$el.find("#auto-join").removeClass('disabled');
+      this.ui.autoJoin.removeClass('disabled');
     },
 
     hideAutoJoin: function() {
-      this.$el.find("#auto-join").addClass('disabled');
+      this.ui.autoJoin.addClass('disabled');
     },
 
     afterRender: function() {
