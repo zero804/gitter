@@ -13,9 +13,17 @@ define([
 
   var IssuePopoverView = Backbone.View.extend({
     className: 'commit-popover-body',
+    initialize: function() {
+      this.listenTo(this.model, 'change', this.render);
+    },
     render: function() {
       var data = this.model.toJSON();
-      data.date = moment(data.author.date).format("LLL");
+
+      // dont bother rendering an empty model
+      if(Object.keys(data).length === 0) return this;
+
+      data.date = moment(data.commit.author.date).format("LLL");
+      console.log(data.commit.author.date, data.date);
 
       data.files.forEach(function(file) {
         if(file.filename.length > MAX_PATH_LENGTH) {
@@ -30,8 +38,16 @@ define([
   });
 
   var IssuePopoverTitleView = Backbone.View.extend({
+    initialize: function() {
+      this.listenTo(this.model, 'change', this.render);
+    },
     render: function() {
-      this.$el.html(commitPopoverTitleTemplate(this.model.attributes));
+      var data = this.model.toJSON();
+
+      // dont bother rendering an empty model
+      if(Object.keys(data).length === 0) return this;
+
+      this.$el.html(commitPopoverTitleTemplate(data));
       return this;
     }
   });
@@ -63,25 +79,27 @@ define([
   }
 
   function preparePopover($commit, url) {
-    $.get(url, function(commit) {
-      var commitModel = new Backbone.Model(commit);
+    $commit.on('mouseover', function(e) {
 
-      $commit.on('mouseover', function(e) {
-        Popover.hoverTimeout(e, function() {
-          var pop = new Popover({
-            titleView: new IssuePopoverTitleView({model: commitModel}),
-            view: new IssuePopoverView({model: commitModel}),
-            targetElement: $commit[0],
-            placement: 'horizontal'
-          });
-          pop.show();
-        });
+      var commitModel = new Backbone.Model();
+      $.get(url, function(commit) {
+        commitModel.set(commit);
+      }).fail(function(error) {
+        if(error.status === 404) {
+          plaintextify($commit);
+        }
       });
 
-    }).fail(function(error) {
-      if(error.status === 404) {
-        plaintextify($commit);
-      }
+      Popover.hoverTimeout(e, function() {
+        var pop = new Popover({
+          titleView: new IssuePopoverTitleView({model: commitModel}),
+          view: new IssuePopoverView({model: commitModel}),
+          targetElement: $commit[0],
+          placement: 'horizontal'
+        });
+        pop.show();
+
+      });
     });
   }
 
