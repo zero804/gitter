@@ -18,7 +18,6 @@ define([
   return Marionette.Layout.extend({
     events: {
       'focus @ui.input': 'show',
-      // 'blur @ui.input': 'hide',
       'keydown @ui.input': 'keydown',
       'keyup @ui.input': 'keyup'
     },
@@ -48,6 +47,10 @@ define([
             return compare(a.get('name').toLowerCase(), b.get('name').toLowerCase());
           } else {
             return -1;
+          }
+        } else {
+          if(b.get('type') === 'org') {
+            return 1;
           }
         }
 
