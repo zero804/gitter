@@ -137,7 +137,7 @@ require([
     },
 
     people: function() {
-      appView.dialogRegion.show(new peopleCollectionView.Modal({}));
+      appView.dialogRegion.show(new peopleCollectionView.Modal({ collection: itemCollections.sortedUsers }));
     },
 
     notifications: function() {
