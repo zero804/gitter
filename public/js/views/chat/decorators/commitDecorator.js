@@ -60,10 +60,8 @@ define([
       var files = commitModel.get('files');
       files.forEach(function(file) {
         if(file.filename.length > MAX_PATH_LENGTH) {
-
           file.fullFilename = file.filename;
           file.filename = getShortPath(file.filename);
-
         }
       });
 

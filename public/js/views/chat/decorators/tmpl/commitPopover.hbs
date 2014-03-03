@@ -10,7 +10,7 @@
     <div class="trpChatTime"> &bull; {{date}}</div>
   </div>
   <div class="trpChatText">
-    <p>{{stats.total}} files changed. {{stats.additions}} additions, {{stats.deletions}} deletions.</p>
+    <p>{{files.length}} files changed. {{stats.additions}} additions, {{stats.deletions}} deletions.</p>
     <ul class="file-list">
       {{#each files}}
       <li><span class="{{status}}" title="{{fullFilename}}">{{filename}}</span></li>
