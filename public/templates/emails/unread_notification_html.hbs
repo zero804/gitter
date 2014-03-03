@@ -35,8 +35,7 @@
       </table>
     </td>
   </tr>
-</table>
-              {{#if canChangeNotifySettings}}
+</table>{{#if canChangeNotifySettings}}       
 <table width="100%" cellpadding="0" cellspacing="0" class="green-strip" style="background-color: #F2F2F2;">
   <tr>
     <td align="center">
@@ -44,9 +43,7 @@
         <tr>
             <td><br>
                 <h2 style="margin: 0;padding: 0;display: block;font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif;font-size: 24px;font-style: normal; font-weight: normal; margin: 0 60px; line-height: 125%;letter-spacing: -1px;text-align: left;color: #333;">Change notification settings</h2>
-                <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                  {{#each troupesWithUnreadCounts}}
-                  {{#unless troupe.oneToOne}}
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">{{#each troupesWithUnreadCounts}}{{#unless troupe.oneToOne}}  
                   <tr>
                     <td align="left" style="padding: 20px 60px">
                       <table width="100%">
@@ -67,14 +64,11 @@
                         </tr>
                       </table>
                     </td>
-                  </tr>
-                  {{/unless}}
-                  {{/each}}
+                  </tr>{{/unless}}{{/each}}         
                 </table>
             </td>
           </tr>
-        </table>
-        {{/if}}
+        </table>{{/if}}
         <table width="600" style="background-color: #162e34; padding: 0 60px">
           <tr>
             <td style="margin: 0 60px">
