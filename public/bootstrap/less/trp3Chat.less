@@ -1,5 +1,6 @@
 @import "oembed-gist.less";
 @import "highlight.less";
+@import "icon-mixins.less";
 
 // originally from leedo/noembed
 // https://github.com/leedo/noembed/blob/12280d9cef26b1c9c8987e7e11fd381662dafd8a/share/styles/Gist.css
@@ -47,6 +48,31 @@ img.emoji {
   padding: 0 4px;
   font-size: 13px;
   color: black;
+}
+
+.commit-popover-body {
+  ul.file-list {
+    list-style: none;
+    margin-left: 0;
+  }
+  .modified {
+    .prepend-diff-modified();
+    &:before {
+      color: @trpOrange;
+    }
+  }
+  .added {
+    .prepend-diff-added();
+    &:before {
+      color: @trpGreen;
+    }
+  }
+  .removed {
+    .prepend-diff-removed();
+    &:before {
+      color: @trpRed;
+    }
+  }
 }
 
 .commit:hover {
