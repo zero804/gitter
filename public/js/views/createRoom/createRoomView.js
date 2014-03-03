@@ -4,12 +4,10 @@ define([
   'jquery',
   'marionette',
   'collections/instances/troupes',
-  'views/controls/combobox',
   'views/base',
   './parentSelectView',
-  'hbs!./tmpl/createRoom',
-  'hbs!./tmpl/ownerSelectItem'
-], function($, Marionette, troupeCollections, Combobox, TroupeViews, ParentSelectView, template, ownerSelectItemTemplate) {
+  'hbs!./tmpl/createRoom'
+], function($, Marionette, troupeCollections, TroupeViews, ParentSelectView, template) {
   "use strict";
 
   var View = Marionette.Layout.extend({

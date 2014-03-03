@@ -4,7 +4,8 @@ define([
   'utils/context',
   'hbs!./tmpl/parentSelectView',
   'hbs!./tmpl/parentItemView',
-  'typeahead'
+  'typeahead',
+  'views/controls/dropdown'
 ], function(Marionette, context, template, itemTemplate, Typeahead) {
   "use strict";
 
