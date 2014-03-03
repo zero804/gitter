@@ -22,7 +22,16 @@ define([
   return Marionette.CompositeView.extend({
     itemViewContainer: "ul",
     itemView: RowView,
-    template: template
+    template: template,
+    ui: {
+      menu: 'ul'
+    },
+    show: function() {
+      this.ui.menu.show();
+    },
+    hide: function () {
+      this.ui.menu.hide();
+    }
   });
 
 });
