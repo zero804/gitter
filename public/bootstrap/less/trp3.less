@@ -2303,30 +2303,34 @@ ul.roster {
     opacity: 0.4;
   }
 
-  .return-send {
+  .compose-mode-toggle {
     margin-bottom: 4px;
     opacity: 0.5;
     .transition300ms;
     cursor: pointer;
+    .prepend-pencil-off;
+    height: 20px;
+    &:before {
+      margin-left: 3px;
+      font-size: 16px;
+    };
+/*    &:hover {
+      .prepend-pencil-on;
+    }*/
   }
 
-  .return-send.active {
-    color: @trpGreen;
+  .compose-mode-toggle.active {
     opacity: 0.7;
+    .prepend-pencil-on;
+/*    &:hover {
+      .prepend-pencil-off;
+    }*/
   }
 
-  .return-send:hover {
+  .compose-mode-toggle:hover {
     opacity: 0.9;
   }
 
-  .return-send:before {
-    font-family: 'troupe-icons';
-    content: '\e82f';
-    margin-right: 8px;
-    width: 12px;
-    font-size: 14px;
-    -webkit-font-smoothing: antialiased;
-  }
 }
 
 .markdown-help-content {

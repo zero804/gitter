@@ -54,8 +54,14 @@ define([
   /** @const */
   var PLACEHOLDER = 'Click here to type a chat message. Supports GitHub flavoured markdown.';
 
+  var isMacBrowser = window.navigator.platform.indexOf('Mac') === 0;
+
   /** @const */
-  var PLACEHOLDER_COMPOSE_MODE = 'Click here to type a chat message. Supports GitHub flavoured markdown. Ctrl+Enter to send.';
+  var PLACEHOLDER_COMPOSE_MODE = PLACEHOLDER+' '+(isMacBrowser ? 'Cmd' : 'Ctrl')+'+Enter to send.';
+
+  /** @const */
+  var COMPOSE_MODE_MODIFIER_KEY = isMacBrowser ? 'metaKey' : 'ctrlKey';
+
 
 
   var ComposeMode = function() {
@@ -77,7 +83,7 @@ define([
     template: template,
 
     events: {
-      'click .return-send': 'toggleReturnSend'
+      'click .compose-mode-toggle': 'toggleComposeMode'
     },
 
     initialize: function(options) {
@@ -92,11 +98,12 @@ define([
     },
 
     getRenderData: function() {
+      var isComposeModeEnabled = this.composeMode.isEnabled()
       var placeholder;
 
       if(this.compactView) {
         placeholder = MOBILE_PLACEHOLDER;
-      } else if(this.composeMode.isEnabled()) {
+      } else if(isComposeModeEnabled) {
         placeholder = PLACEHOLDER_COMPOSE_MODE;
       } else {
         placeholder = PLACEHOLDER;
@@ -105,7 +112,8 @@ define([
       return {
         user: context.user(),
         isComposeModeEnabled: this.composeMode.isEnabled(),
-        placeholder: placeholder
+        placeholder: placeholder,
+        composeModeToggleTitle: isComposeModeEnabled ? 'Switch to chat mode' : 'Switch to compose mode'
       };
     },
 
@@ -120,7 +128,7 @@ define([
       });
       this.inputBox = inputBox;
 
-      this.$el.find('.return-send, .md-help').tooltip({placement: 'left'});
+      this.$el.find('.compose-mode-toggle, .md-help').tooltip({placement: 'left'});
 
       this.$el.find('textarea').textcomplete([
           {
@@ -239,11 +247,18 @@ define([
       this.listenTo(this.inputBox, 'editLast', this.editLast);
     },
 
-    toggleReturnSend: function() {
+    toggleComposeMode: function() {
       this.composeMode.toggle();
-      this.$el.find('.return-send').toggleClass('active', this.composeMode.isEnabled());
+      var isComposeModeEnabled = this.composeMode.isEnabled();
 
-      var placeholder = this.composeMode.isEnabled() ? PLACEHOLDER_COMPOSE_MODE : PLACEHOLDER;
+      var title = isComposeModeEnabled ? 'Switch to chat mode' : 'Switch to compose mode';
+      this.$el.find('.compose-mode-toggle')
+        .toggleClass('active', isComposeModeEnabled)
+        .attr('title', title)
+        .tooltip('fixTitle')
+        .tooltip('hide');
+
+      var placeholder = isComposeModeEnabled ? PLACEHOLDER_COMPOSE_MODE : PLACEHOLDER;
       this.$el.find('textarea').attr('placeholder', placeholder).focus();
     },
 
@@ -420,7 +435,9 @@ define([
     },
 
     onKeyDown: function(e) {
-      if(e.keyCode === ENTER && !hasModifierKey(e) && !this.isTypeaheadShowing() && !this.composeMode.isEnabled()) {
+      var isComposeModeEnabled = this.composeMode && this.composeMode.isEnabled();
+
+      if(e.keyCode === ENTER && !hasModifierKey(e) && !this.isTypeaheadShowing() && !isComposeModeEnabled) {
         if(this.hasVisibleText()) {
           this.processInput();
         }
@@ -428,7 +445,7 @@ define([
         // dont insert a new line
         e.preventDefault();
         return false;
-      } else if(e.keyCode === ENTER && e.ctrlKey && !this.isTypeaheadShowing() && this.composeMode.isEnabled()) {
+      } else if(e.keyCode === ENTER && e[COMPOSE_MODE_MODIFIER_KEY] && !this.isTypeaheadShowing() && isComposeModeEnabled) {
         if(this.hasVisibleText()) {
           this.processInput();
         }
@@ -439,9 +456,9 @@ define([
       } else if(e.keyCode === UP_ARROW && !hasModifierKey(e) && !this.$el.val()) {
         this.trigger('editLast');
       } else if(e.keyCode === PAGE_UP && !hasModifierKey(e)) {
-        this.chatCollectionView.pageUp();
+        if(this.chatCollectionView) this.chatCollectionView.pageUp();
       } else if(e.keyCode === PAGE_DOWN && !hasModifierKey(e)) {
-        this.chatCollectionView.pageDown();
+        if(this.chatCollectionView) this.chatCollectionView.pageDown();
       }
     },
 

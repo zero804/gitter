@@ -27,10 +27,10 @@ define([
       menu: 'ul'
     },
     show: function() {
-      this.ui.menu.show();
+      this.ui.menu.show('fast');
     },
     hide: function () {
-      this.ui.menu.hide();
+      this.ui.menu.hide('fast');
     }
   });
 
