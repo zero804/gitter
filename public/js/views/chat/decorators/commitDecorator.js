@@ -31,6 +31,9 @@ define([
           file.filename = getShortPath(file.filename);
         }
       });
+      if(data.files.length === 1 && data.files[0].patch) {
+        data.diff = data.files[0].patch;
+      }
 
       this.$el.html(commitPopoverTemplate(data));
       return this;
