@@ -45,7 +45,7 @@ module.exports = exports = function processChat(text) {
     return href;
   }
 
-  function getGitHubIssueData(href) {
+  function getGitHubData(href) {
     var urlObj = url.parse(href);
 
     if(urlObj.hostname === 'github.com') {
@@ -53,8 +53,15 @@ module.exports = exports = function processChat(text) {
       var pathParts = urlObj.pathname.split('/');
       if(pathParts[3] === 'issues' && pathParts[4]) {
         return {
+          type: 'issue',
           repo: pathParts[1]+'/'+pathParts[2],
           number: pathParts[4]
+        };
+      } else if(pathParts[3] === 'commit' && pathParts[4]) {
+        return {
+          type: 'commit',
+          repo: pathParts[1]+'/'+pathParts[2],
+          sha1: pathParts[4]
         };
       }
     }
@@ -87,12 +94,27 @@ module.exports = exports = function processChat(text) {
     return out;
   };
 
+  renderer.commit = function(repo, sha1, text) {
+
+    var out = '<a data-link-type="commit"' +
+              'data-commit-sha1="' + sha1 + '"' +
+              'data-commit-repo="' + repo + '"' +
+              'class="commit">' + text + '</a>';
+    return out;
+  };
+
   renderer.link = function(href, title, text) {
     href = checkForIllegalUrl(href);
-    var issueData = getGitHubIssueData(href);
-    if(issueData) {
-      var issueText = issueData.repo+'#'+issueData.number;
-      return renderer.issue(issueData.repo, issueData.number, issueText);
+    var githubData = getGitHubData(href);
+    if(githubData) {
+      if(githubData.type === 'issue') {
+        var issueText = githubData.repo+'#'+githubData.number;
+        return renderer.issue(githubData.repo, githubData.number, issueText);
+      } else if(githubData.type === 'commit') {
+        var commitText = githubData.repo+'@'+githubData.sha1.substring(0,7);
+        return renderer.commit(githubData.repo, githubData.sha1, commitText);
+      }
+
     } else {
       urls.push({ url: href });
       return util.format('<a href="%s" rel="nofollow" target="_new" class="link">%s</a>', href, text);  
