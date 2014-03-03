@@ -4,14 +4,14 @@
     <div class="dropdown">
       <div class="dropdown-toggle" data-toggle="dropdown"></div>
       <ul class="dropdown-menu" role="menu">
-        <li><a role="menuitem" tabindex="-1" href="#|inv">Share this chat room</a>
+        <li><a role="menuitem" tabindex="-1" href="#inv">Share this chat room</a>
         <li role="presentation" class="divider"></li>
-        <li><a id="notifications-settings-link" role="menuitem" tabindex="-1" href="#|notifications">Notifications</a></li>
+        <li><a id="notifications-settings-link" role="menuitem" tabindex="-1" href="#notifications">Notifications</a></li>
         {{#if permissions.admin}}
           {{#if isNativeDesktopApp}}
-            <li><a role="menuitem" tabindex="-1" href="{{troupeUrl}}#|integrations" target="_blank">Integrations</a></li>
+            <li><a role="menuitem" tabindex="-1" href="{{troupeUrl}}#integrations" target="_blank">Integrations</a></li>
           {{else}}
-            <li><a role="menuitem" tabindex="-1" href="#|integrations">Integrations</a></li>
+            <li><a role="menuitem" tabindex="-1" href="#integrations">Integrations</a></li>
           {{/if}}
         {{/if}}
         <li role="presentation" class="divider"></li>
