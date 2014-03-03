@@ -46,6 +46,21 @@ require([
   //   $(this).parent().next().toggle();
   // });
 
+
+  $(document).on("click", "a", function(e) {
+    if(this.href) {
+      var href = $(this).attr('href');
+      if(href.indexOf('#') === 0) {
+        e.preventDefault();
+        window.location = href;
+      }
+    }
+
+    return true;
+  });
+
+
+
   // When a user clicks an internal link, prevent it from opening in a new window
   $(document).on("click", "a.link", function(e) {
     var basePath = context.env('basePath');
