@@ -38,6 +38,12 @@ module.exports = {
         auth,
         require('./repo-info.js'));
 
+    app.get('/api/v1/public-repo-search',
+        auth,
+        require('./public-repo-search.js'));
+
+
+
 
   }
 };
