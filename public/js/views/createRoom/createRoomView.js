@@ -14,81 +14,62 @@ define([
     template: template,
     ui: {
       autoJoin: "#auto-join",
-      permPublic: "#permission-repo-public",
-      permPrivate: "#permission-repo-private",
-      permOrg: "#permission-org",
-      permAll: "#permission-org, #permission-public, #permission-custom"
+      permPublic: "#perm-select-public",
+      permPrivate: "#perm-select-private",
+      permInherited: "#perm-select-inherited",
+      selectParentRequired: "#perm-select-required",
+      parentNameLabel: "#parent-name",
+      permInheritedLabel: '#perm-inherited-label',
     },
     regions: {
       ownerSelect: '#owner-region',
     },
-    events: {
-      'click #room-name': 'showPrivateRepoPermissions',
-      'click .gtrOwnerDD': 'hidePrivateRepoPermissions'
-    },
 
-    showOtherPermissions: function() {
+    // showPrivateRepoPermissions: function() {
+    //   var self=this;
+    //   self.hideAutoJoin();
+    //   this.ui.permAll.slideUp("fast", function() {
+    //     self.ui.permPrivate.slideDown("fast", function() {
+    //       $('#repo-private').prop('checked',true);
+    //     });
+    //   });
+    // },
 
-    },
+    parentSelected: function(model, animated) {
+      var hide = [this.ui.autoJoin, this.ui.permPublic, this.ui.permPrivate, this.ui.permInherited];
+      var show = [this.ui.selectParentRequired];
 
-    hidePublicRepoPermissions: function() {
-      var self = this;
-      this.ui.permPublic.slideUp("fast", function() {
-        self.ui.permAll.slideDown("fast", function() {
-          self.showAutoJoin();
-          $('#public').prop('checked',true);
+      if(model) {
+        this.ui.parentNameLabel.text(model.get('name'));
+        switch(model.get('type')) {
+          case 'org':
+          case 'repo':
+            this.ui.permInheritedLabel.text(model.get('type') === 'repo' ? 'Repository' : 'Organisation');
+            show = [this.ui.autoJoin, this.ui.permPublic, this.ui.permPrivate, this.ui.permInherited];
+            hide = [this.ui.selectParentRequired];
+            break;
+          case 'user':
+            show = [this.ui.permPublic, this.ui.permPrivate];
+            hide = [this.ui.selectParentRequired, this.ui.permInherited, this.ui.autoJoin];
+            break;
+        }
+      }
+
+      function arrayToJq(array) {
+        var elements = [];
+        array.forEach(function(a) {
+          elements = elements.concat(a.get());
         });
-      });
-    },
+        return $(elements);
+      }
 
-    showPublicRepoPermissions: function() {
-      var self=this;
-      self.hideAutoJoin();
-      this.ui.permAll.slideUp("fast", function() {
-        self.$el.find("#permission-repo-public").slideDown("fast", function() {
-          $('#repo-public').prop('checked',true);
-        });
-      });
-    },
-
-    hidePrivateRepoPermissions: function() {
-      var self=this;
-      this.$el.find("#permission-repo-private").slideUp("fast", function() {
-        self.ui.permAll.slideDown("fast", function() {
-          self.showAutoJoin();
-          $('#public').prop('checked',true);
-        });
-      });
-    },
-
-    showPrivateRepoPermissions: function() {
-      var self=this;
-      self.hideAutoJoin();
-      this.ui.permAll.slideUp("fast", function() {
-        self.ui.permPrivate.slideDown("fast", function() {
-          $('#repo-private').prop('checked',true);
-        });
-      });
-    },
-
-    hideOrgPermissions: function() {
-      this.ui.permOrg.slideUp("fast", function() {
-
-      });
-    },
-
-    showOrgPermissions: function() {
-      this.ui.permOrg.slideDown("fast", function() {
-
-      });
-    },
-
-    showAutoJoin: function() {
-      this.ui.autoJoin.removeClass('disabled');
-    },
-
-    hideAutoJoin: function() {
-      this.ui.autoJoin.addClass('disabled');
+      if(animated === false) {
+        arrayToJq(show).show();
+        arrayToJq(hide).hide();
+      } else {
+        arrayToJq(show).filter(':hidden').slideDown("fast");
+        arrayToJq(hide).filter(':visible').slideUp("fast");
+      }
     },
 
     onRender: function() {
@@ -99,17 +80,19 @@ define([
       this.parentSelect = parentSelect;
       this.ownerSelect.show(parentSelect);
 
-      this.listenTo(parentSelect, 'selected', function(m) {
-      });
+      this.listenTo(parentSelect, 'selected', this.parentSelected);
 
-      var self = this;
-      this.$el.find("input:radio").change(function () {
-        if ($("#private").is(":checked")) {
-          self.hideAutoJoin();
-        } else {
-          self.showAutoJoin();
-        }
-      });
+
+      this.parentSelected(null, false);
+
+      // var self = this;
+      // this.$el.find("input:radio").change(function () {
+      //   if ($("#private").is(":checked")) {
+      //     self.hideAutoJoin();
+      //   } else {
+      //     self.showAutoJoin();
+      //   }
+      // });
     },
 
 
