@@ -20,10 +20,8 @@ define([
   var RowView = Marionette.ItemView.extend({
     tagName: "li",
     events: {
-      'click a': function(e) {
-        this.trigger('selected', this.model);
-        e.preventDefault();
-      }
+      'click a':  'click',
+      'click':    'click'
     },
     template: itemTemplate,
     initialize: function(options) {
@@ -37,6 +35,11 @@ define([
       }
 
       return "";
+    },
+    click: function(e) {
+      this.trigger('selected', this.model);
+      e.preventDefault();
+      e.stopPropagation();
     }
   });
 
@@ -58,6 +61,7 @@ define([
     className: 'dropdown',
     itemEvents: {
       'selected': function(e, target, model) {
+        // Forward 'selected' events
         this.trigger('selected', model);
       }
     },
@@ -103,6 +107,7 @@ define([
     },
     hide: function() {
       if(!this.active()) return;
+      this.$el.find('li.active:not(.divider):visible').removeClass('active');
       this.$el.removeClass('open');
       activeDropdown = null;
     },
@@ -120,7 +125,7 @@ define([
       if (!$items.length) return;
 
       var currentActive = $items.filter('.active');
-      var newActive = e.target;
+      var newActive = e.currentTarget;
 
       if(currentActive[0] === newActive) return;
 
@@ -128,28 +133,40 @@ define([
       $(newActive).addClass('active');
     },
     keydown: function (e) {
-      if (!/(38|40|27|13)/.test(e.keyCode)) return;
+      switch(e.keyCode) {
+        case 13:
+          this.selected();
+          return;
+        case 27:
+          this.hide();
+          break;
+        case 38:
+          this.selectPrev();
+          break;
+        case 40:
+          this.selectNext();
+          break;
+        default:
+          return;
+      }
 
       e.preventDefault();
       e.stopPropagation();
-
-      var $parent  = this.$el; //getParent($this);
-      var isActive = $parent.hasClass('open');
-
-      if (isActive && e.keyCode == 27) {
-        // if (e.which == 27) $parent.find(toggle).focus();
-        return this.hide();
-      }
-
-      if (e.keyCode == 38) this.selectPrev();
-      if (e.keyCode == 40) this.selectNext();
-
     },
     selectPrev: function() {
       this._moveSelect(-1);
     },
     selectNext: function() {
       this._moveSelect(+1);
+    },
+    select: function() {
+      var first = this.$el.find('li:not(.divider):visible.active').first();
+      if(first.length) {
+        first.trigger('click');
+      } else {
+        this._moveSelect(0);
+        this.$el.find('li:not(.divider):visible.active').first().trigger('click');
+      }
     },
     _moveSelect: function(delta) {
       var $items = this.$el.find('li:not(.divider):visible');
