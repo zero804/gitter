@@ -69,7 +69,7 @@ module.exports = exports = function(model) {
 
   // Handle empty messages as deleted
   if (html.length === 0) {
-    html = '[deleted]';
+    html = '<i>This message was deleted</i>';
     deletedClass = 'deleted';
   }
 

@@ -7,13 +7,12 @@ define([
   'utils/appevents',
   'marionette',
   'hbs!./tmpl/modal',
-  'hbs!./tmpl/popover',
   'hbs!./tmpl/loading',
   'hbs!./tmpl/confirmationView',
   'log!base-views',
   'utils/detect-compact',
   '../template/helpers/all' // No ref
-], function(require, $, _, Backbone, appEvents, Marionette, modalTemplate, popoverTemplate,
+], function(require, $, _, Backbone, appEvents, Marionette, modalTemplate,
   loadingTemplate, confirmationViewTemplate, log, detectCompact) {
   "use strict";
 
@@ -35,7 +34,6 @@ define([
   var isIE9 = window.navigator.userAgent.indexOf("MSIE 9.0") !== -1;
   var userAgentTabletFragment = navigator.userAgent.match(/(iPad)/);
 
-  /* This value is used by the dialogFragment Handlebars helper */
   if (compactView) {
     $('body').addClass('trpCompactView');
   }
@@ -342,18 +340,19 @@ define([
     hide: function ( e ) {
       if(e) e.preventDefault();
       if(this.navigable) {
-        var hash = window.location.hash.replace(/\%7C/ig, '|');
-        var currentFragment;
-        if(!hash) {
-          currentFragment = '#!';
-        } else {
-          currentFragment = hash.split('|', 1)[0];
-          if (currentFragment == "#") {
-            currentFragment = "#!";
-          }
-        }
 
-        window.location = currentFragment;
+        // var hash = window.location.hash.replace(/\%7C/ig, '|');
+        // var currentFragment;
+        // if(!hash) {
+        //   currentFragment = '#!';
+        // } else {
+        //   currentFragment = hash.split('|', 1)[0];
+        //   if (currentFragment == "#") {
+        //     currentFragment = "#!";
+        //   }
+        // }
+
+        window.location = '#';
         return;
       }
       this.hideInternal();

@@ -11,33 +11,33 @@ define([
     appEvents.trigger('track', name);
   }
 
-  var installClickTrigger = _.once(function() {
-    $(document).on("click", "a", function(event) {
-      if(this.href) {
-        var href = $(this).attr('href');
-        if(href.substring(0, 2) === "#|") {
-          event.preventDefault();
+  // var installClickTrigger = _.once(function() {
+  //   $(document).on("click", "a", function(event) {
+  //     if(this.href) {
+  //       var href = $(this).attr('href');
+  //       if(href.substring(0, 2) === "#|") {
+  //         event.preventDefault();
 
-          href = href.substring(2);
+  //         href = href.substring(2);
 
-          var currentFragment;
-          var hash = window.location.hash;
+  //         var currentFragment;
+  //         var hash = window.location.hash;
 
-          if(!hash) {
-            currentFragment = '#';
-          } else {
-            currentFragment = hash.split('|', 1)[0];
-          }
+  //         if(!hash) {
+  //           currentFragment = '#';
+  //         } else {
+  //           currentFragment = hash.split('|', 1)[0];
+  //         }
 
-          window.location = currentFragment + "|" + href;
-        }
-      }
+  //         window.location = currentFragment + "|" + href;
+  //       }
+  //     }
 
-      return true;
-    });
+  //     return true;
+  //   });
 
 
-  });
+  // });
 
   function getFragmentsFromPath(path) {
     var lowerCaseHash = window.location.hash.toLowerCase();
@@ -102,7 +102,7 @@ define([
 
   var Router = Backbone.Router.extend({
     initialize: function(options) {
-      installClickTrigger();
+      // installClickTrigger();
       if(options) {
         this.regions = options.regions || this.regions;
         this.routes = options.routes || this.routes;
@@ -142,7 +142,7 @@ define([
 
       var regionUpdateList = [
         {
-          regionName: 'rightPanelRegion',
+          regionName: 'dialogRegion',
           fragment : fragments[0] || '',
           region: this.regions[0]
         },
