@@ -2,23 +2,24 @@
 "use strict";
 
 var cases = [
-  { scope: '', username: 'suprememoocow', githubToken: '***REMOVED***' },
-  { scope: 'user', username: 'suprememoocow', githubToken: '***REMOVED***' },
-  { scope: 'user:email', username: 'suprememoocow', githubToken: '***REMOVED***' },
-  { scope: 'user:follow', username: 'suprememoocow', githubToken: '***REMOVED***' },
-  { scope: 'public_repo', username: 'suprememoocow', githubToken: '***REMOVED***' },
-  { scope: 'repo', username: 'suprememoocow', githubToken: '***REMOVED***' },
-  { scope: 'repo_deployment', username: 'suprememoocow', githubToken: '***REMOVED***' },
-  { scope: 'repo:status', username: 'suprememoocow', githubToken: '***REMOVED***' },
-  { scope: 'delete_repo', username: 'suprememoocow', githubToken: '***REMOVED***' },
-  { scope: 'notifications', username: 'suprememoocow', githubToken: '***REMOVED***' },
-  { scope: 'gist', username: 'suprememoocow', githubToken: '***REMOVED***' },
-  { scope: 'read:repo_hook', username: 'suprememoocow', githubToken: '***REMOVED***' },
-  { scope: 'write:repo_hook', username: 'suprememoocow', githubToken: '***REMOVED***' },
-  { scope: 'admin:repo_hook', username: 'suprememoocow', githubToken: '***REMOVED***' },
-  { scope: 'read:public_key', username: 'suprememoocow', githubToken: '***REMOVED***' },
-  { scope: 'write:public_key', username: 'suprememoocow', githubToken: '***REMOVED***' },
-  { scope: 'admin:public_key', username: 'suprememoocow', githubToken: '***REMOVED***' },
+  { scope: '', username: 'gittertestbot', githubToken: '***REMOVED***' },
+  { scope: 'user', username: 'gittertestbot', githubToken: '***REMOVED***' },
+  { scope: 'user:email', username: 'gittertestbot', githubToken: '***REMOVED***' },
+  { scope: 'user:follow', username: 'gittertestbot', githubToken: '***REMOVED***' },
+  { scope: 'public_repo', username: 'gittertestbot', githubToken: '***REMOVED***' },
+  { scope: 'repo', username: 'gittertestbot', githubToken: '***REMOVED***' },
+  { scope: 'repo_deployment', username: 'gittertestbot', githubToken: '***REMOVED***' },
+  { scope: 'repo:status', username: 'gittertestbot', githubToken: '***REMOVED***' },
+  { scope: 'delete_repo', username: 'gittertestbot', githubToken: '***REMOVED***' },
+  { scope: 'notifications', username: 'gittertestbot', githubToken: '***REMOVED***' },
+  { scope: 'gist', username: 'gittertestbot', githubToken: '***REMOVED***' },
+  { scope: 'read:repo_hook', username: 'gittertestbot', githubToken: '***REMOVED***' },
+  { scope: 'write:repo_hook', username: 'gittertestbot', githubToken: '***REMOVED***' },
+  { scope: 'admin:repo_hook', username: 'gittertestbot', githubToken: '***REMOVED***' },
+  { scope: 'read:public_key', username: 'gittertestbot', githubToken: '***REMOVED***' },
+  { scope: 'write:public_key', username: 'gittertestbot', githubToken: '***REMOVED***' },
+  { scope: 'admin:public_key', username: 'gittertestbot', githubToken: '***REMOVED***' },
+  { scope: 'read:org', username: 'gittertestbot', githubToken: '***REMOVED***'}
 ];
 
 
