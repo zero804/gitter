@@ -72,15 +72,19 @@ define([
     selected: function(m) {
       this.ui.input.val(m.get('uri'));
       this.dropdown.hide();
+
+      this.trigger('selected', m);
     },
 
     onRender: function() {
       this.dropdownRegion.show(this.dropdown);
     },
+
     reset: function() {
       var query = this.ui.input.val();
       this.refilter(query);
     },
+
     keyup: function(e) {
       if(e.keyCode === 27) {
         e.stopPropagation();
@@ -88,6 +92,7 @@ define([
         return;
       }
     },
+
     change: function() {
       var self = this;
       this.dropdown.show();
@@ -98,7 +103,6 @@ define([
     },
 
     keydown: function(e) {
-
       switch(e.keyCode) {
         case 13:
           this.dropdown.select();
@@ -124,14 +128,16 @@ define([
       e.stopPropagation();
       e.preventDefault();
     },
+
     show: function() {
-      var query = this.ui.input.val();
-      this.refilter(query);
       this.dropdown.show();
+      this.refilterInput();
     },
+
     hide: function() {
       // this.dropdown.hide();
     },
+
     refilterInput: function() {
       var query = this.ui.input.val();
       this.refilter(query);
@@ -139,6 +145,7 @@ define([
     refilter: function(query) {
       var self = this;
       var results;
+      var select;
 
       if(!query) {
         results = defaultResults();
@@ -157,16 +164,20 @@ define([
               };
             });
         } else {
-          // results = defaultResults().filter(function(m) {
-          //         return m.name.toLowerCase().indexOf(query) === 0;
-          //       });
           results = defaultResults();
+          select = results.filter(function(r) {
+            return r.name.toLowerCase().indexOf(query) === 0;
+          })[0];
         }
       }
 
       this.dropdownItems.set(results.map(function(m) {
         return new ItemModel(m);
       }), { add: true, remove: true, merge: true });
+
+      if(select) {
+        this.dropdown.chooseModel(select);
+      }
 
       function defaultResults() {
         var user = context.user();

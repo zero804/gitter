@@ -96,8 +96,11 @@ define([
         orgsCollection: troupeCollections.orgs,
         troupesCollection: troupeCollections.troupes
       });
-
+      this.parentSelect = parentSelect;
       this.ownerSelect.show(parentSelect);
+
+      this.listenTo(parentSelect, 'selected', function(m) {
+      });
 
       var self = this;
       this.$el.find("input:radio").change(function () {
