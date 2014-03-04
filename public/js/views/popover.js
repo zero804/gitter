@@ -10,6 +10,19 @@ define([
 
   var ARROW_WIDTH_PX = 10;
 
+  var DEFAULTS = {
+    animation: true,
+    selector: false,
+    title: '',
+    footerView: null,
+    delay: 300,
+    container: false,
+    placement: 'right',
+    scroller: null,
+    width: '',
+    minHeight: ''
+  };
+
   function findMaxZIndex(element) {
     var max = 0;
     while(element && element != document) {
@@ -34,25 +47,14 @@ define([
   var Popover = TroupeViews.Base.extend({
     template: popoverTemplate,
     className: "popover",
-    options: {
-      animation: true,
-      selector: false,
-      title: '',
-      footerView: null,
-      delay: 300,
-      container: false,
-      placement: 'right',
-      scroller: null,
-      width: '',
-      minHeight: ''
-    },
     initialize: function(options) {
       _.bindAll(this, 'leave', 'enter');
-      _.extend(this.options, options);
+      this.options = _.extend({}, DEFAULTS, options);
       //this.init('popover', element, options);
       this.view = this.options.view;
       this.titleView = this.options.titleView;
       this.title = this.options.title;
+      this.footerView = this.options.footerView;
 
       if(this.options.scroller) {
         this.$scroller = $(this.options.scroller);
@@ -94,7 +96,7 @@ define([
       $e.find('.popover-content').append(this.view.render().el);
       $e.find('.popover-inner').css('width', this.options.width).css('min-height', this.options.minHeight);
 
-      var fv = this.options.footerView;
+      var fv = this.footerView;
 
       if(fv) {
         fv.parentPopover = this;

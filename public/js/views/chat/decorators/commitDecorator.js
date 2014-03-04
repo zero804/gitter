@@ -3,10 +3,12 @@
 define([
   'jquery',
   'backbone',
+  'utils/appevents',
   'views/popover',
   'hbs!./tmpl/commitPopover',
   'hbs!./tmpl/commitPopoverTitle',
-], function($, Backbone, Popover, commitPopoverTemplate, commitPopoverTitleTemplate) {
+  'hbs!./tmpl/commitPopoverFooter'
+], function($, Backbone, appEvents, Popover, template, titleTemplate, footerTemplate) {
   "use strict";
 
   var MAX_PATH_LENGTH = 40;
@@ -46,7 +48,7 @@ define([
         data.isDeletionsSingular = true;
       }
 
-      this.$el.html(commitPopoverTemplate(data));
+      this.$el.html(template(data));
       return this;
     }
   });
@@ -61,8 +63,31 @@ define([
       // dont bother rendering an empty model
       if(Object.keys(data).length === 0) return this;
 
-      this.$el.html(commitPopoverTitleTemplate(data));
+      this.$el.html(titleTemplate(data));
       return this;
+    }
+  });
+
+  var FooterView = Backbone.View.extend({
+    initialize: function() {
+      this.listenTo(this.model, 'change', this.render);
+    },
+    events: {
+      'click button.mention': 'onMentionClick'
+    },
+    render: function() {
+      var data = this.model.toJSON();
+
+      // dont bother rendering an empty model
+      if(Object.keys(data).length === 0) return this;
+
+      this.$el.html(footerTemplate(data));
+      return this;
+    },
+    onMentionClick: function() {
+      var text = this.model.get('repo')+'@'+this.model.get('sha').substring(0,7);
+      appEvents.trigger('input.append', text);
+      this.parentPopover.hide();
     }
   });
 
@@ -92,12 +117,14 @@ define([
     return '…/'+shortPath;
   }
 
-  function preparePopover($commit, url) {
+  function preparePopover($commit, repo, sha1) {
+    var url = '/api/private/gh/repos/'+repo+'/commits/'+sha1+'?renderPatchIfSingle=true';
     $commit.on('mouseover', function(e) {
 
       var commitModel = new Backbone.Model();
       $.get(url, function(commit) {
         commitModel.set(commit);
+        commitModel.set('repo', repo);
       }).fail(function(error) {
         if(error.status === 404) {
           plaintextify($commit);
@@ -108,6 +135,7 @@ define([
         var pop = new Popover({
           titleView: new IssuePopoverTitleView({model: commitModel}),
           view: new IssuePopoverView({model: commitModel}),
+          footerView: new FooterView({model: commitModel}),
           targetElement: $commit[0],
           placement: 'horizontal'
         });
@@ -132,7 +160,7 @@ define([
         } else {
           this.target = "github";
 
-          preparePopover($commit,'/api/private/gh/repos/'+repo+'/commits/'+sha1+'?renderPatchIfSingle=true');
+          preparePopover($commit, repo, sha1);
         }
       });
 
