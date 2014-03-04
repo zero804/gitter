@@ -59,6 +59,27 @@ describe('github-scope-tests', function() {
 
   });
 
+  describe('concealed org membership (read-only)', function() {
+
+    scopeFixtures.scopes.filter(filterScopes('read:org')).forEach(function(c) {
+      var FAKE_USER = { username: c.username, githubToken: c.githubToken };
+
+      it('should obtain membership status on a concealed org: ' + c.scope, function(done) {
+        var gh = new GithubOrgService(FAKE_USER);
+
+        gh.member('gittertestbotorg','gittertestbot')
+          .then(function(isMember) {
+            assert(isMember);
+          })
+          .nodeify(done);
+
+      });
+
+    });
+
+  });
+
+
   describe('private repo membership', function() {
     scopeFixtures.scopes.filter(filterScopes('repo')).forEach(function(c) {
       var FAKE_USER = { username: c.username, githubToken: c.githubToken };
