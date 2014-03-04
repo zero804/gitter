@@ -15,7 +15,6 @@
                   <td>
                     <p style="color: #333;display: block;font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif;font-size: 28px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0; margin-bottom: 8px;">{{#if troupe.oneToOne}}{{troupe.name}}{{else}}{{troupe.uri}}{{/if}}</p>
                     <p style="color: #333;display: block;font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif;font-size: 20px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0; margin-bottom: 4px;">{{__n "%d unread message" "%d unread messages" unreadCount}}</p>
-
                   </td>
                   <td width="100" align="right" valign="top">
                     <table>
@@ -35,47 +34,40 @@
       </table>
     </td>
   </tr>
-</table>
-              {{#if canChangeNotifySettings}}
+</table>{{#if canChangeNotifySettings}}       
 <table width="100%" cellpadding="0" cellspacing="0" class="green-strip" style="background-color: #F2F2F2;">
   <tr>
     <td align="center">
       <table width="600" style="background-color: #ccc; color: white; padding-top: 20px; padding-bottom: 20px">
         <tr>
-            <td><br>
-                <h2 style="margin: 0;padding: 0;display: block;font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif;font-size: 24px;font-style: normal; font-weight: normal; margin: 0 60px; line-height: 125%;letter-spacing: -1px;text-align: left;color: #333;">Change notification settings</h2>
-                <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                  {{#each troupesWithUnreadCounts}}
-                  {{#unless troupe.oneToOne}}
-                  <tr>
-                    <td align="left" style="padding: 20px 60px">
-                      <table width="100%">
-                        <tr>
-                          <td>
-                            <p style="color: #333;display: block;font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif;font-size: 18px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0; margin-bottom: 8px;">{{troupe.uri}}</p>
-                          </td>
-                          <td width="100" align="right" valign="top">
-                            <table>
-                              <tr>
-                                <td style="background-color: white; padding: 6px 14px; border-radius: 5px" width="70" align="center">
-                                  <a href="{{../../emailBasePath}}{{troupe.url}}#notifications" style="color: #333  ; font-size: 18px; text-decoration: none; font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif">Change</a>
-                                </td>
-                              </tr>
-                            </table>
-                            <br/>
-                          </td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-                  {{/unless}}
-                  {{/each}}
-                </table>
-            </td>
-          </tr>
-        </table>
-        {{/if}}
-        <table width="600" style="background-color: #162e34; padding: 0 60px">
+          <td><br>
+            <h2 style="margin: 0;padding: 0;display: block;font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif;font-size: 24px;font-style: normal; font-weight: normal; margin: 0 60px; line-height: 125%;letter-spacing: -1px;text-align: left;color: #333;">Change notification settings</h2>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">{{#each troupesWithUnreadCounts}}{{#unless troupe.oneToOne}}  
+              <tr>
+                <td align="left" style="padding: 20px 60px">
+                  <table width="100%">
+                    <tr>
+                      <td>
+                        <p style="color: #333;display: block;font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif;font-size: 18px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0; margin-bottom: 8px;">{{troupe.uri}}</p>
+                      </td>
+                      <td width="100" align="right" valign="top">
+                        <table>
+                          <tr>
+                            <td style="background-color: white; padding: 6px 14px; border-radius: 5px" width="70" align="center">
+                              <a href="{{../../emailBasePath}}{{troupe.url}}#notifications" style="color: #333  ; font-size: 18px; text-decoration: none; font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif">Change</a>
+                            </td>
+                          </tr>
+                        </table>
+                        <br/>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>{{/unless}}{{/each}}         
+            </table>
+          </td>
+        </tr>
+        </table>{{/if}}<table width="600" style="background-color: #162e34; padding: 0 60px">
           <tr>
             <td style="margin: 0 60px">
               <br><Br>
@@ -91,10 +83,9 @@
                   </td>
                 </tr>
               </table>
-              </p>
             </td>
-        </tr>
-      </table>
+          </tr>
+        </table>
     </td>
   </tr>
 </table>
