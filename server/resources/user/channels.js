@@ -17,19 +17,15 @@ function serialize(items, req, res, next) {
 }
 
 module.exports = {
-    index: function(req, res, next){
-      roomService.findAllChannelsForRoom(req.troupe, function(err, channelTroupes) {
-        if(err) return next(err);
-
-        serialize(channelTroupes, req, res, next);
-      });
+    index: function(req, res){
+      res.send([]);
     },
 
     create: function(req, res, next) {
       var body = req.body;
       var security = body.security || 'INHERITED';
 
-      return roomService.createCustomChildRoom(req.troupe, req.user, { name: body.name, security: security })
+      return roomService.createCustomChildRoom(null, req.user, { name: body.name, security: security })
         .then(function(customRoom) {
           return serialize(customRoom, req, res, next);
         })
