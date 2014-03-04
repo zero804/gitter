@@ -10,16 +10,20 @@ define([
 ], function(_, Marionette, context, template, itemTemplate, Dropdown, Backbone) {
   "use strict";
 
-
   var ItemModel = Backbone.Model.extend({
     idAttribute: "uri",
   });
 
   return Marionette.Layout.extend({
     events: {
-      'focus @ui.input': 'show',
-      'keydown @ui.input': 'keydown',
-      'keyup @ui.input': 'keyup'
+      'focus @ui.input':    'show',
+      'keydown @ui.input':  'keydown',
+      'change @ui.input': 'change',
+      'cut @ui.input': 'change',
+      'paste @ui.input': 'change',
+      'input @ui.input': 'change',
+      'keypress @ui.input': 'keypress',
+      'keyup @ui.input':    'keyup'
     },
     regions: {
       dropdownRegion: '#dd-region',
@@ -67,6 +71,7 @@ define([
 
     selected: function(m) {
       this.ui.input.val(m.get('uri'));
+      this.dropdown.hide();
     },
 
     onRender: function() {
@@ -77,23 +82,34 @@ define([
       this.refilter(query);
     },
     keyup: function(e) {
-      if({ 38: 1, 40: 1, 27: 1}.hasOwnProperty(e.keyCode)) {
+      if(e.keyCode === 27) {
         e.stopPropagation();
         e.preventDefault();
         return;
       }
-
-      // Don't stop the event
-      this.refilterInput();
-      return;
     },
+    change: function() {
+      var self = this;
+      this.dropdown.show();
+
+      setTimeout(function() {
+        self.refilterInput();
+      }, 1);
+    },
+
     keydown: function(e) {
+
       switch(e.keyCode) {
+        case 13:
+          this.dropdown.select();
+          break;
+
         case 38:
           this.dropdown.selectPrev();
           break;
 
         case 40:
+          this.dropdown.show();
           this.dropdown.selectNext();
           break;
 
@@ -102,7 +118,6 @@ define([
           break;
 
         default:
-          // Don't stop the event
           return;
       }
 
@@ -142,16 +157,16 @@ define([
               };
             });
         } else {
-          results = defaultResults().filter(function(m) {
-                  return m.name.toLowerCase().indexOf(query) === 0;
-                });
+          // results = defaultResults().filter(function(m) {
+          //         return m.name.toLowerCase().indexOf(query) === 0;
+          //       });
+          results = defaultResults();
         }
       }
 
       this.dropdownItems.set(results.map(function(m) {
         return new ItemModel(m);
       }), { add: true, remove: true, merge: true });
-
 
       function defaultResults() {
         var user = context.user();
