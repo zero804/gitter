@@ -316,7 +316,14 @@ exports.findChildChannelRoom = findChildChannelRoom;
 
 function assertValidName(name) {
   var matcher = xregexp('^[\\p{L}\\d]+$');
-  validate.expect(matcher.test(name));
+  if(!matcher.test(name)) {
+    throw {
+      responseStatusCode: 400,
+      clientDetail: {
+        illegalName: true
+      }
+    };
+  }
 }
 
 var RANGE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefgihjklmnopqrstuvwxyz01234567890';
@@ -326,6 +333,27 @@ function generateRandomName() {
     s += RANGE.charAt(Math.floor(Math.random() * RANGE.length));
   }
   return s;
+}
+
+function ensureNoRepoNameClash(user, uri) {
+  var parts = uri.split('/');
+
+  if(parts.length < 2) {
+    /* The classic "this should never happen" gag */
+    throw "Bad channel uri";
+  }
+
+  if(parts.length == 2) {
+    var repoService = new GitHubRepoService(user);
+    return repoService.getRepo(uri)
+      .then(function(repo) {
+        /* Result? Then we have a clash */
+        return !!repo;
+      });
+  }
+
+  // Cant clash with /x/y/z
+  return false;
 }
 
 function createCustomChildRoom(parentTroupe, user, options, callback) {
@@ -391,6 +419,11 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
     return permissionsModel(user, 'create', uri, githubType, security)
       .then(function(access) {
         if(!access) throw 403;
+        // Make sure that no such repo exists on Github
+        return ensureNoRepoNameClash(uri);
+      })
+      .then(function(clash) {
+        if(clash) throw 409;
 
         var nonce = Math.floor(Math.random() * 100000);
 

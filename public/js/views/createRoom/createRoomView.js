@@ -105,8 +105,15 @@ define([
         statusCode: {
           400: function(data) {
             if ($.parseJSON(data.responseText).illegalName) {
+              window.alert('The name you have chosen is illegal');
               this.ui.roomNameInput.focus();
             }
+          },
+          403: function() {
+            window.alert('You don\'t have permission to create that room');
+          },
+          409: function() {
+            window.alert('There is already a Github repository with that name');
           }
         },
         success: function(data) {
