@@ -14,6 +14,7 @@ require([
   'views/shareSearch/inviteView',
   'views/app/troupeSettingsView',
   'views/app/markdownView',
+  'views/app/addPeopleView',
   'views/app/integrationSettingsModal',
   'components/unread-items-client',
 
@@ -34,7 +35,7 @@ require([
   'components/csrf'             // No ref
 ], function($, Backbone, context, liveContext, appEvents, peopleCollectionView, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, RightToolbarView,
-    inviteView, TroupeSettingsView, MarkdownView, IntegrationSettingsModal,
+    inviteView, TroupeSettingsView, MarkdownView, AddPeopleView, IntegrationSettingsModal,
     unreadItemsClient, webhookDecorator, issueDecorator, mentionDecorator,
     embedDecorator, emojiDecorator, UnreadBannerView, HeaderView) {
   "use strict";
@@ -144,6 +145,7 @@ require([
       "notifications": "notifications",
       "markdown": "markdown",
       "integrations": "integrations",
+      "add" : "add"
     },
 
     hideModal: function() {
@@ -160,6 +162,10 @@ require([
 
     markdown: function() {
       appView.dialogRegion.show(new MarkdownView({}));
+    },
+
+    addpeople: function() {
+      appView.dialogRegion.show(new AddPeopleView({}));
     },
 
     integrations: function() {
