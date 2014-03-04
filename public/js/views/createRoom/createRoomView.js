@@ -110,9 +110,8 @@ define([
           }
         },
         success: function(data) {
-          this.dialog.close(function() {
-            appEvents.trigger('navigation', data.url , 'chat', data.uri);
-          });
+          this.dialog.hide();
+          appEvents.trigger('navigation', data.url , 'chat', data.uri);
         }
       });
     },
