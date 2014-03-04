@@ -5,7 +5,8 @@ define([
   'marionette',
   'hbs!./tmpl/headerViewTemplate',
   'autolink',
-  'components/notifications'
+  'components/notifications',
+  'bootstrap-dropdown' // No ref
 ], function($, context, Marionette, headerViewTemplate, autolink, notifications)  {
   "use strict";
 
