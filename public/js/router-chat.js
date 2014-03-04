@@ -15,7 +15,6 @@ require([
   'views/app/troupeSettingsView',
   'views/app/markdownView',
   'views/app/integrationSettingsModal',
-  'utils/router',
   'components/unread-items-client',
 
   'views/chat/decorators/webhookDecorator',
@@ -36,16 +35,31 @@ require([
   'components/csrf'             // No ref
 ], function($, Backbone, context, liveContext, appEvents, peopleCollectionView, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, RightToolbarView,
-    inviteView, troupeSettingsView, markdownView, IntegrationSettingsModal,
-    Router, unreadItemsClient, webhookDecorator, issueDecorator, mentionDecorator,
+    inviteView, TroupeSettingsView, MarkdownView, IntegrationSettingsModal,
+    unreadItemsClient, webhookDecorator, issueDecorator, mentionDecorator,
     embedDecorator, emojiDecorator, UnreadBannerView, HeaderView) {
   "use strict";
 
   // Make drop down menus drop down
   // This is a bit nasty
-  $(document).on("click", ".trpButtonDropdown .trpButtonMenu", function(/*event*/) {
-    $(this).parent().next().toggle();
+  // $(document).on("click", ".trpButtonDropdown .trpButtonMenu", function(/*event*/) {
+  //   $(this).parent().next().toggle();
+  // });
+
+
+  $(document).on("click", "a", function(e) {
+    if(this.href) {
+      var href = $(this).attr('href');
+      if(href.indexOf('#') === 0) {
+        e.preventDefault();
+        window.location = href;
+      }
+    }
+
+    return true;
   });
+
+
 
   // When a user clicks an internal link, prevent it from opening in a new window
   $(document).on("click", "a.link", function(e) {
@@ -122,21 +136,48 @@ require([
     rollers: chatCollectionView.rollers
   }).render();
 
-  // var profileModal = context.getUser().username ? profileView.Modal : completeYourProfileModal;
-  function integrationsValidationCheck() {
-    return context().permissions.admin;
-  }
+  var Router = Backbone.Router.extend({
+    routes: {
+      // TODO: get rid of the pipes
+      "": "hideModal",
+      "inv": "inv",
+      "people": "people",
+      "notifications": "notifications",
+      "markdown": "markdown",
+      "integrations": "integrations",
+    },
 
-  new Router({
-    routes: [
-      { name: "people",           re: /^people/,                  viewType: peopleCollectionView.Modal,         collection: itemCollections.sortedUsers, skipModelLoad: true },
-      { name: "inv",              re: /^inv$/,                    viewType: inviteView.Modal },
-      { name: "notifications",    re: /^notifications/,           viewType: troupeSettingsView },
-      { name: "markdown",         re: /^markdown/,                viewType: markdownView },
-      { name: "integrations",     re: /^integrations/,            viewType: IntegrationSettingsModal,  validationCheck: integrationsValidationCheck }
-    ],
-    regions: [appView.rightPanelRegion, appView.dialogRegion]
+    hideModal: function() {
+      appView.dialogRegion.close();
+    },
+
+    people: function() {
+      appView.dialogRegion.show(new peopleCollectionView.Modal({ collection: itemCollections.sortedUsers }));
+    },
+
+    notifications: function() {
+      appView.dialogRegion.show(new TroupeSettingsView({}));
+    },
+
+    markdown: function() {
+      appView.dialogRegion.show(new MarkdownView({}));
+    },
+
+    integrations: function() {
+      if(context().permissions.admin) {
+        appView.dialogRegion.show(new IntegrationSettingsModal({}));
+      } else {
+        window.location = '#';
+      }
+    },
+
+    inv: function() {
+      appView.dialogRegion.show(new inviteView.Modal({}));
+    }
+
   });
+
+  new Router();
 
   // Listen for changes to the room
   liveContext.syncRoom();
