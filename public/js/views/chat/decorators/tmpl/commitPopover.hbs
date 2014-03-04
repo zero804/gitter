@@ -16,8 +16,8 @@
       <li><a href="{{blob_url}}" target="github" class="{{status}}" title="{{fullFilename}}">{{filename}}</a></li>
       {{/each}}
     </ul>
-    {{#if diff}}
-    <pre><code>{{diff}}</code></pre>
+    {{#if firstPatchHtml}}
+      {{{firstPatchHtml}}}
     {{/if}}
   </div>
 </div>
