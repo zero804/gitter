@@ -420,7 +420,7 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
       .then(function(access) {
         if(!access) throw 403;
         // Make sure that no such repo exists on Github
-        return ensureNoRepoNameClash(uri);
+        return ensureNoRepoNameClash(user, uri);
       })
       .then(function(clash) {
         if(clash) throw 409;
