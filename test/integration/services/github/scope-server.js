@@ -47,6 +47,7 @@ var oauthScopes = [
   { scope: 'read:public_key', clientID: '66c914dc4630920013be', clientSecret: '3b950c04756dd3a34f8f50a49211f3dc9f962b4f' },
   { scope: 'write:public_key', clientID: '2dbc626740b2530737ff', clientSecret: 'c70ed2e8a0644e8bfe11232651fbb77f6b6851d9' },
   { scope: 'admin:public_key',  clientID: 'ba7203b0a15a7cb98120', clientSecret: '52684e6301b71d93024726bdff060044cd1160d7' },
+  { scope: 'read:org',  clientID: '953035b1402f13489208', clientSecret: '6bb190448c65d40e7e5e27e8d01cffc48e3d084f' }
 ];
 
 
