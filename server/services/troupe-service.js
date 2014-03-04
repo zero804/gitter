@@ -426,16 +426,35 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
           { 'users.userId': userId2 }
           ]})
         .then(function(troupe) {
-          if(raw.upserted) {
-            winston.verbose('Created a oneToOne troupe for ', { userId1: userId1, userId2: userId2 });
+          if(!raw.upserted) return troupe;
 
-            statsService.event('new_troupe', {
-              troupeId: troupe.id,
-              oneToOne: true,
-              userId: userId1,
-              oneToOneUpgrade: false
+          winston.verbose('Created a oneToOne troupe for ', { userId1: userId1, userId2: userId2 });
+
+          statsService.event('new_troupe', {
+            troupeId: troupe.id,
+            oneToOne: true,
+            userId: userId1,
+            oneToOneUpgrade: false
+          });
+
+          // TODO: do this here to get around problems with
+          // circular dependencies. This will probably need to change in
+          // future
+          var restSerializer = require('../serializers/rest-serializer');
+
+          troupe.users.forEach(function(troupeUser) {
+            var currentUserId = troupeUser.userId;
+            var url = '/user/' + troupeUser.userId + '/troupes';
+
+            var strategy = new restSerializer.TroupeStrategy({ currentUserId: currentUserId });
+
+            restSerializer.serialize(troupe, strategy, function(err, serializedModel) {
+              if(err) return winston.error('Error while serializing oneToOne troupe: ' + err, { exception: err });
+
+              appEvents.dataChange2(url, 'create', serializedModel);
             });
-          }
+
+          });
 
           return troupe;
         });
