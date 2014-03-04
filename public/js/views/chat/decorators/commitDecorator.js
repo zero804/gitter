@@ -158,8 +158,6 @@ define([
           // this aint no commit I ever saw
           plaintextify($commit);
         } else {
-          this.target = "github";
-
           preparePopover($commit, repo, sha1);
         }
       });
