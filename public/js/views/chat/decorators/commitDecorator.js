@@ -13,7 +13,7 @@ define([
 
   var MAX_PATH_LENGTH = 40;
 
-  var IssuePopoverView = Backbone.View.extend({
+  var BodyView = Backbone.View.extend({
     className: 'commit-popover-body',
     initialize: function() {
       this.listenTo(this.model, 'change', this.render);
@@ -53,7 +53,7 @@ define([
     }
   });
 
-  var IssuePopoverTitleView = Backbone.View.extend({
+  var TitleView = Backbone.View.extend({
     initialize: function() {
       this.listenTo(this.model, 'change', this.render);
     },
@@ -105,7 +105,7 @@ define([
 
     // remove parents until short enough: a/b/c/d.ext -> …/c/d.ext
     while(shortPath.length > MAX_PATH_LENGTH-2) {
-    var parts = shortPath.split('/');
+      var parts = shortPath.split('/');
       // cant remove any more parents
       if(parts.length === 1) {
         parts[0] = parts[0].substring(0, MAX_PATH_LENGTH-3)+'…';
@@ -133,8 +133,8 @@ define([
 
       Popover.hoverTimeout(e, function() {
         var pop = new Popover({
-          titleView: new IssuePopoverTitleView({model: commitModel}),
-          view: new IssuePopoverView({model: commitModel}),
+          titleView: new TitleView({model: commitModel}),
+          view: new BodyView({model: commitModel}),
           footerView: new FooterView({model: commitModel}),
           targetElement: $commit[0],
           placement: 'horizontal'
