@@ -118,11 +118,6 @@ define([
       this.dropdownRegion.show(this.dropdown);
     },
 
-    reset: function() {
-      var query = this.ui.input.val();
-      this.refilter(query);
-    },
-
     keyup: function(e) {
       if(e.keyCode === 27) {
         e.stopPropagation();
@@ -198,7 +193,9 @@ define([
         mapper = modelFromRepoTroupe;
       } else {
         if(uri === context.user().get('username')) {
-          return this.selected(modelFromUser());
+          var userModel = modelFromUser();
+          this.selected(userModel);
+          return userModel;
         }
 
         collection = this.orgsCollection;
@@ -209,16 +206,9 @@ define([
       var item = collection.find(predicate);
 
       if(item) {
-        this.selected(mapper(item));
-      } else {
-        collection.once('reset sync', function() {
-          /* Try one more time */
-          item = collection.find(predicate);
-
-          if(item) {
-            this.selected(mapper(item));
-          }
-        }, this);
+        var model = mapper(item);
+        this.selected(model);
+        return model;
       }
 
     },
