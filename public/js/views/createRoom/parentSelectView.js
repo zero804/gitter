@@ -14,6 +14,38 @@ define([
     idAttribute: "uri",
   });
 
+  function modelFromRepoTroupe(m) {
+    return new ItemModel({
+      uri: m.get('uri'),
+      name: m.get('name'),
+      type: 'repo',
+      repoType: true
+    });
+  }
+
+  function modelFromUser() {
+    var user = context.user();
+
+    return new ItemModel({
+      uri: user.get('username'),
+      name: user.get('username'),
+      avatarUrl: user.get('avatarUrlSmall'),
+      type: 'user',
+      userType: true
+    });
+  }
+
+
+  function modelFromOrg(a) {
+    return new ItemModel({
+      uri: a.get('room').uri,
+      name: a.get('name'),
+      avatarUrl: a.get('avatar_url'),
+      type: 'org',
+      orgType: true
+    });
+  }
+
   return Marionette.Layout.extend({
     events: {
       'focus @ui.input':    'show',
@@ -142,10 +174,52 @@ define([
       var query = this.ui.input.val();
       this.refilter(query);
     },
+
+    selectUri: function(uri) {
+      var collection, predicate, mapper;
+
+      function repoPredicate(troupe) {
+        return troupe.get('githubType') === 'REPO' && troupe.get('uri') === uri;
+      }
+
+      function orgPredicate(o) {
+        return o.get('room') && o.get('room').uri === uri;
+      }
+
+      if(uri.indexOf('/') >= 0) {
+        collection = this.troupesCollection;
+        predicate = repoPredicate;
+        mapper = modelFromRepoTroupe;
+      } else {
+        if(uri === context.user().get('username')) {
+          return this.selected(modelFromUser());
+        }
+
+        collection = this.orgsCollection;
+        predicate = orgPredicate;
+        mapper = modelFromOrg;
+      }
+
+      var item = collection.find(predicate);
+
+      if(item) {
+        this.selected(mapper(item));
+      } else {
+        collection.once('reset sync', function() {
+          /* Try one more time */
+          item = collection.find(predicate);
+
+          if(item) {
+            this.selected(mapper(item));
+          }
+        }, this);
+      }
+
+    },
+
     refilter: function(query) {
       var self = this;
       var results;
-      var select;
 
       if(!query) {
         results = defaultResults();
@@ -155,50 +229,23 @@ define([
         if(query.indexOf('/') >= 0) {
           results = this.troupesCollection.filter(function(troupe) {
               return troupe.get('githubType') === 'REPO' && troupe.get('uri').toLowerCase().indexOf(query) === 0;
-            }).map(function(m) {
-              return {
-                uri: m.get('uri'),
-                name: m.get('name'),
-                type: 'repo',
-                repoType: true
-              };
-            });
+            }).map(modelFromRepoTroupe);
         } else {
           results = defaultResults();
-          select = results.filter(function(r) {
-            return r.name.toLowerCase().indexOf(query) === 0;
-          })[0];
         }
       }
 
-      this.dropdownItems.set(results.map(function(m) {
-        return new ItemModel(m);
-      }), { add: true, remove: true, merge: true });
+      this.dropdownItems.set(results, { add: true, remove: true, merge: true });
 
-      if(select) {
-        // this.dropdown.chooseModel(select);
-      }
+      // if(select) {
+      //   // this.dropdown.chooseModel(select);
+      // }
 
       function defaultResults() {
-        var user = context.user();
 
         return self.orgsCollection.filter(function(m) {
           return !!m.get('room');
-        }).map(function(a) {
-          return {
-            uri: a.get('room').uri,
-            name: a.get('name'),
-            avatarUrl: a.get('avatar_url'),
-            type: 'org',
-            orgType: true
-          };
-        }).concat({
-          uri: user.get('username'),
-          name: user.get('username'),
-          avatarUrl: user.get('avatarUrlSmall'),
-          type: 'user',
-          userType: true
-        });
+        }).map(modelFromOrg).concat(modelFromUser());
       }
     }
 
