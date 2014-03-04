@@ -104,6 +104,10 @@ require([
       /* Figure out who's the daddy */
 
       function getParentUri(troupe) {
+        if(troupe.get('oneToOne') === true) {
+          return context.user().get('username');
+        }
+
         if(troupe.get('githubType') === 'REPO' || troupe.get('githubType') === 'ORG') {
           return troupe.get('uri');
         }
@@ -120,10 +124,10 @@ require([
         showWithOptions({ initialParent: uri });
       }
 
-      var current = allRoomsCollection.findWhere({ uri: uri });
+      var current = allRoomsCollection.findWhere({ url: '/' + uri });
       if(!current) {
         allRoomsCollection.once('reset sync', function() {
-          current = allRoomsCollection.findWhere({ uri: uri });
+          current = allRoomsCollection.findWhere({ url: '/' + uri });
           if(current) {
             uri = getParentUri(current);
             showWithOptions({ initialParent: uri });

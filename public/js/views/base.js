@@ -250,7 +250,7 @@ define([
       modalBody.append(this.view.render().el);
       this.$el.find('.close').on('click', this.hide);
 
-      if(!compactView) {
+      if(!compactView && !this.disableAutoFocus) {
         window.setTimeout(function() {
           try {
             var v = self.$el.find('input[type=text], input[type=url], input[type=tel], input[type=number], input[type=color], input[type=email]')[0];

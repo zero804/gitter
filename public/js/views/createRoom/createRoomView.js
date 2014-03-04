@@ -31,6 +31,7 @@ define([
     parentSelected: function(model, animated) {
       var hide = [this.ui.autoJoin, this.ui.permPublic, this.ui.permPrivate, this.ui.permInherited];
       var show = [this.ui.selectParentRequired];
+      var placeholder = "";
 
       if(model) {
         this.ui.parentNameLabel.text(model.get('name'));
@@ -40,10 +41,12 @@ define([
             this.ui.permInheritedLabel.text(model.get('type') === 'repo' ? 'Repository' : 'Organisation');
             show = [this.ui.autoJoin, this.ui.permPublic, this.ui.permPrivate, this.ui.permInherited];
             hide = [this.ui.selectParentRequired];
+            placeholder = "Required";
             break;
           case 'user':
             show = [this.ui.permPublic, this.ui.permPrivate];
             hide = [this.ui.selectParentRequired, this.ui.permInherited, this.ui.autoJoin];
+            placeholder = "Optional";
             break;
         }
       }
@@ -56,6 +59,7 @@ define([
         return $(elements);
       }
 
+      this.ui.roomNameInput.attr('placeholder', placeholder);
       if(animated === false) {
         arrayToJq(show).show();
         arrayToJq(hide).hide();
@@ -77,7 +81,8 @@ define([
       this.listenTo(parentSelect, 'selected', this.parentSelected);
 
       if(this.options.initialParent) {
-        this.parentSelect.selectUri(this.options.initialParent);
+        var model = this.parentSelect.selectUri(this.options.initialParent);
+        this.parentSelected(model, false);
       } else {
         this.parentSelected(null, false);
       }
@@ -87,6 +92,7 @@ define([
   });
 
   var Modal = TroupeViews.Modal.extend({
+    disableAutoFocus: true,
     initialize: function(options) {
       options = options || {};
       options.title = options.title || "Create a chat room";
