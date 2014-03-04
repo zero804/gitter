@@ -97,10 +97,10 @@ module.exports = exports = function processChat(text) {
   renderer.commit = function(repo, sha1) {
     var text = repo+'@'+sha1.substring(0, 7);
     var href = 'https://github.com/'+repo+'/commit/'+sha1;
-    var out = '<a href="' + href + '"' +
-              'data-link-type="commit"' +
-              'data-commit-sha1="' + sha1 + '"' +
-              'data-commit-repo="' + repo + '"' +
+    var out = '<a href="' + href + '" ' +
+              'data-link-type="commit" target="github" ' +
+              'data-commit-sha1="' + sha1 + '" ' +
+              'data-commit-repo="' + repo + '" ' +
               'class="commit">' + text + '</a>';
     return out;
   };
