@@ -182,7 +182,7 @@ define([
       }), { add: true, remove: true, merge: true });
 
       if(select) {
-        this.dropdown.chooseModel(select);
+        // this.dropdown.chooseModel(select);
       }
 
       function defaultResults() {
