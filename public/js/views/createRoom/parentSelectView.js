@@ -16,6 +16,7 @@ define([
 
   function modelFromRepoTroupe(m) {
     return new ItemModel({
+      id: m.get('id'),
       uri: m.get('uri'),
       name: m.get('name'),
       type: 'repo',
@@ -38,6 +39,7 @@ define([
 
   function modelFromOrg(a) {
     return new ItemModel({
+      id: a.get('room').id,
       uri: a.get('room').uri,
       name: a.get('name'),
       avatarUrl: a.get('avatar_url'),

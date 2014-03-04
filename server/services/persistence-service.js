@@ -316,7 +316,7 @@ var TroupeSchema = new Schema({
   oneToOne: { type: Boolean, "default": false },
   users: [TroupeUserSchema],
   channels: [ObjectId], // Channels under this repo/org
-  security: { type: String, 'enum': ['PRIVATE', 'OPEN', 'INHERITED'], required: false }, // For REPO_CHANNEL, ORG_CHANNEL, USER_CHANNEL
+  security: { type: String, 'enum': ['PRIVATE', 'PUBLIC', 'INHERITED'], required: false }, // For REPO_CHANNEL, ORG_CHANNEL, USER_CHANNEL
   dateDeleted: { type: Date },
   _nonce: { type: Number },
   _tv: { type: 'MongooseNumber', 'default': 0 }

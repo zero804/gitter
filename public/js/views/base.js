@@ -224,12 +224,13 @@ define([
     },
 
     getRenderData: function() {
+      var menuItems = this.menuItems || this.options.menuItems;
       return {
         hideHeader: this.options.hideHeader,
         customTitle: !!this.options.title,
         title: this.options.title,
-        hasMenuItems: !!this.options.menuItems.length,
-        menuItems: this.options.menuItems,
+        hasMenuItems: !!menuItems.length,
+        menuItems: menuItems,
         disableClose: this.options.disableClose
       };
     },
