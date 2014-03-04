@@ -116,10 +116,13 @@ label {
 }
 
 .gtrDDAvatar:before {
+  margin-left: -20px;
+}
+
+.gtrDDAvatar {
   height: 20px;
   width: 20px;
   content: ' ';
-  background-image: url('https://avatars.githubusercontent.com/u/4264183');
   background-size: contain;
   display: inline-block;
   border-radius: 3px;
@@ -137,16 +140,10 @@ label {
   }
 }
 
-.gtrDDText {
-  padding-left: 35px;
-  margin-left: -32px;
-  width: 150px;
-}
-
 .gtrDDButton:before {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 7px;
+  right: 14px;
   display: block;
   width: 0;
   height: 0;
@@ -156,6 +153,15 @@ label {
   border-left-color: transparent;
   border-bottom-color: transparent;
 }
+
+
+.gtrDDText {
+  padding-left: 35px;
+  margin-left: -32px;
+  width: 150px;
+  padding-right: 20px;
+}
+
 
 .gtrSlash {
   float: left;

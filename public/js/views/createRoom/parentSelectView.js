@@ -29,7 +29,8 @@ define([
       dropdownRegion: '#dd-region',
     },
     ui: {
-      input: "input#input-parent"
+      input: "input#input-parent",
+      avatar: "#avatar"
     },
 
     template: template,
@@ -72,6 +73,11 @@ define([
     selected: function(m) {
       this.ui.input.val(m.get('uri'));
       this.dropdown.hide();
+      if  (m.get('type') === 'repo') {
+        this.ui.avatar.css("background-image", "url(../../images/2/gitter/icon-repo.png)");
+      } else {
+        this.ui.avatar.css("background-image", "url(" + m.get('avatarUrl') + ")");
+      }
 
       this.trigger('selected', m);
     },
