@@ -104,6 +104,26 @@ define([
 
       });
 
+      // filter the suggestions from the repo search service
+      this.findPublicRepos(query, function(suggestions) {
+        var additional = suggestions.filter(function(repo) {
+            return !self.collection.findWhere({ uri: repo.uri });
+          }).map(function(repo) {
+            return new Backbone.Model({
+              id: repo.id,
+              name: repo.uri,
+              uri: repo.uri,
+              url: '/' + repo.uri,
+              githubType: 'REPO',
+              ethereal: !repo.room
+            });
+          });
+
+        self.collection.set(additional, { remove: false, add: true, merge: true });
+
+      });
+
+
 
       // set the initial local search results
       self.collection.set(results, { remove: true, add: true, merge: true });
@@ -182,6 +202,43 @@ define([
         }
       }});
     },
+
+    findPublicRepos: function(query, callback) {
+      var self = this;
+
+      if (!query)
+        return;
+
+      // if we have done this query already, don't fetch it again (this could be problematic).
+      if (this.repo_queries[query]) {
+        setTimeout(function() { callback(self.repo_queries[query]); }, 0); // simulate async callback
+        return;
+      }
+
+      // if a superset of this query was empty, so is this one
+      var emptyPreviously = _.some(this.repo_queries, function(v,k) {
+        return query.toLowerCase().indexOf(k.toLowerCase()) === 0 && v.length === 0;
+      });
+
+      if (emptyPreviously) {
+        setTimeout(function() { callback([]); }, 0);
+        return;
+      }
+
+      $.ajax({ url: '/api/v1/public-repo-search', data : { q: query }, success: function(data) {
+
+        if (data.results) {
+          if (!self.repo_queries[query]) self.repo_queries[query] = [];
+
+          self.repo_queries[query] = _.uniq(self.repo_queries[query].concat(data.results), function(s) {
+            return s.name;
+          });
+
+          callback(self.repo_queries[query]);
+        }
+      }});
+    },
+
 
 
     keyPress: function(e) {
