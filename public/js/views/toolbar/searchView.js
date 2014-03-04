@@ -19,6 +19,7 @@ define([
       this.repo_queries = {};
       this.troupes = options.troupes;
       this.collection = new Backbone.Collection();
+      this.collection.comparator = function(m) { return -m.get('people');};
       this.selectedIndex = 0;
       this.query = '';
       this.$input = options.$input;
@@ -61,7 +62,8 @@ define([
             uri: name,
             url: '/' + name,
             githubType: 'ORG',
-            ethereal: !org.room
+            ethereal: !org.room,
+            people: org.room ? org.room.users.length : 0
           });
         });
 
@@ -78,7 +80,8 @@ define([
               uri: user.username,
               url: '/' + user.username,
               oneToOne: true,
-              githubType: 'ONETOONE'
+              githubType: 'ONETOONE',
+              people: 1
             });
           });
 
@@ -96,7 +99,8 @@ define([
               uri: repo.uri,
               url: '/' + repo.uri,
               githubType: 'REPO',
-              ethereal: !repo.room
+              ethereal: !repo.room,
+              people: repo.room ? repo.room.users.length : 0
             });
           });
 
@@ -115,7 +119,8 @@ define([
               uri: repo.uri,
               url: '/' + repo.uri,
               githubType: 'REPO',
-              ethereal: !repo.room
+              ethereal: !repo.room,
+              people: repo.room ? repo.room.users.length : 0
             });
           });
 
