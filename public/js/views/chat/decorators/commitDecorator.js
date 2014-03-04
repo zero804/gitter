@@ -34,8 +34,8 @@ define([
 
       if(data.files.length === 1) {
         data.isFileLengthSingular = true;
-        if(data.files[0].patch) {
-          data.diff = data.files[0].patch;
+        if(data.files[0].patch_html) {
+          data.firstPatchHtml = data.files[0].patch_html;
         }
       }
 
@@ -133,7 +133,7 @@ define([
         } else {
           this.target = "github";
 
-          preparePopover($commit,'/api/private/gh/repos/'+repo+'/commits/'+sha1);
+          preparePopover($commit,'/api/private/gh/repos/'+repo+'/commits/'+sha1+'?renderPatchIfSingle=true');
         }
       });
 
