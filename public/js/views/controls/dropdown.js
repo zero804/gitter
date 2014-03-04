@@ -11,7 +11,7 @@ define([
   "use strict";
 
   var backdrop = '.dropdown-backdrop';
-  var toggle   = '[data-toggle=dropdown]';
+  // var toggle   = '[data-toggle=dropdown]';
 
   var EmptyView = Marionette.ItemView.extend({
     template: emptyTemplate
@@ -52,7 +52,8 @@ define([
       menu: 'ul.dropdown-menu'
     },
     events: {
-      'keydown': 'keydown'
+      'keydown': 'keydown',
+      'mouseover li:not(.divider):visible': 'mouseover'
     },
     className: 'dropdown',
     itemEvents: {
@@ -113,8 +114,21 @@ define([
         this.show();
       }
     },
+    mouseover: function(e) {
+      var $items = this.$el.find('li:not(.divider):visible');
+
+      if (!$items.length) return;
+
+      var currentActive = $items.filter('.active');
+      var newActive = e.target;
+
+      if(currentActive[0] === newActive) return;
+
+      currentActive.removeClass('active');
+      $(newActive).addClass('active');
+    },
     keydown: function (e) {
-      if (!/(38|40|27)/.test(e.keyCode)) return;
+      if (!/(38|40|27|13)/.test(e.keyCode)) return;
 
       e.preventDefault();
       e.stopPropagation();
@@ -122,8 +136,8 @@ define([
       var $parent  = this.$el; //getParent($this);
       var isActive = $parent.hasClass('open');
 
-      if (!isActive || (isActive && e.keyCode == 27)) {
-        if (e.which == 27) $parent.find(toggle).focus();
+      if (isActive && e.keyCode == 27) {
+        // if (e.which == 27) $parent.find(toggle).focus();
         return this.hide();
       }
 
@@ -156,8 +170,10 @@ define([
       }
 
       if(index != currentActive) {
+        var newActive = $items.eq(index);
         currentActive.removeClass('active');
-        $items.eq(index).addClass('active');
+        newActive.addClass('active');
+        newActive.addClass('focus');
       }
     }
   });

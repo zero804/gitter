@@ -76,8 +76,16 @@ define([
       var query = this.ui.input.val();
       this.refilter(query);
     },
-    keyup: function() {
+    keyup: function(e) {
+      if({ 38: 1, 40: 1, 27: 1}.hasOwnProperty(e.keyCode)) {
+        e.stopPropagation();
+        e.preventDefault();
+        return;
+      }
+
+      // Don't stop the event
       this.refilterInput();
+      return;
     },
     keydown: function(e) {
       switch(e.keyCode) {
@@ -97,6 +105,7 @@ define([
           // Don't stop the event
           return;
       }
+
       e.stopPropagation();
       e.preventDefault();
     },
