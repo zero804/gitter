@@ -23,7 +23,6 @@ define([
       if(Object.keys(data).length === 0) return this;
 
       data.date = moment(data.commit.author.date).format("LLL");
-      console.log(data.commit.author.date, data.date);
 
       data.files.forEach(function(file) {
         if(file.filename.length > MAX_PATH_LENGTH) {
