@@ -356,7 +356,7 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
           validate.fail('Invalid parent room type');
       }
 
-      if(!{ OPEN: 1, PRIVATE: 1, INHERITED: 1 }.hasOwnProperty(security) ) {
+      if(!{ PUBLIC: 1, PRIVATE: 1, INHERITED: 1 }.hasOwnProperty(security) ) {
         validate.fail('Invalid security option: ' + security);
       }
 
@@ -365,7 +365,7 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
 
       // Create a child room for a user
       switch(security) {
-        case 'OPEN':
+        case 'PUBLIC':
           assertValidName(name);
           break;
 
