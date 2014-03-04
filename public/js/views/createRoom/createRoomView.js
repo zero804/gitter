@@ -12,6 +12,7 @@ define([
 
   var View = Marionette.Layout.extend({
     template: template,
+
     ui: {
       autoJoin: "#auto-join",
       permPublic: "#perm-select-public",
@@ -20,20 +21,12 @@ define([
       selectParentRequired: "#perm-select-required",
       parentNameLabel: "#parent-name",
       permInheritedLabel: '#perm-inherited-label',
+      roomNameInput: '#room-name'
     },
+
     regions: {
       ownerSelect: '#owner-region',
     },
-
-    // showPrivateRepoPermissions: function() {
-    //   var self=this;
-    //   self.hideAutoJoin();
-    //   this.ui.permAll.slideUp("fast", function() {
-    //     self.ui.permPrivate.slideDown("fast", function() {
-    //       $('#repo-private').prop('checked',true);
-    //     });
-    //   });
-    // },
 
     parentSelected: function(model, animated) {
       var hide = [this.ui.autoJoin, this.ui.permPublic, this.ui.permPrivate, this.ui.permInherited];
@@ -80,19 +73,14 @@ define([
       this.parentSelect = parentSelect;
       this.ownerSelect.show(parentSelect);
 
+
       this.listenTo(parentSelect, 'selected', this.parentSelected);
 
-
-      this.parentSelected(null, false);
-
-      // var self = this;
-      // this.$el.find("input:radio").change(function () {
-      //   if ($("#private").is(":checked")) {
-      //     self.hideAutoJoin();
-      //   } else {
-      //     self.showAutoJoin();
-      //   }
-      // });
+      if(this.options.initialParent) {
+        this.parentSelect.selectUri(this.options.initialParent);
+      } else {
+        this.parentSelected(null, false);
+      }
     },
 
 

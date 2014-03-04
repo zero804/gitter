@@ -101,7 +101,41 @@ require([
     },
 
     customroom: function() {
-      appView.dialogRegion.show(new createRoomView.Modal({}));
+      /* Figure out who's the daddy */
+
+      function getParentUri(troupe) {
+        if(troupe.get('githubType') === 'REPO' || troupe.get('githubType') === 'ORG') {
+          return troupe.get('uri');
+        }
+
+        return troupe.get('uri').split('/').slice(0, -1).join('/');
+      }
+
+      function showWithOptions(options) {
+        appView.dialogRegion.show(new createRoomView.Modal(options));
+      }
+
+      var uri = window.location.pathname.split('/').slice(1).join('/');
+      if(uri === context.user().get('username')) {
+        showWithOptions({ initialParent: uri });
+      }
+
+      var current = allRoomsCollection.findWhere({ uri: uri });
+      if(!current) {
+        allRoomsCollection.once('reset sync', function() {
+          current = allRoomsCollection.findWhere({ uri: uri });
+          if(current) {
+            uri = getParentUri(current);
+            showWithOptions({ initialParent: uri });
+          } else {
+            showWithOptions({ });
+          }
+        });
+        return;
+      }
+
+      uri = getParentUri(current);
+      showWithOptions({ initialParent: uri });
     }
   });
 
