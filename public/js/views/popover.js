@@ -8,6 +8,8 @@ define([
 ], function( $, _, TroupeViews, Mutant, popoverTemplate) {
   "use strict";
 
+  var ARROW_WIDTH_PX = 10;
+
   function findMaxZIndex(element) {
     var max = 0;
     while(element && element != document) {
@@ -157,7 +159,7 @@ define([
       try {
         var $e = this.$el;
         var e = this.el;
-        var pos = this.getPosition();
+        var pos = this.getTargetPosition();
 
         var actualWidth = e.offsetWidth;
         var actualHeight = e.offsetHeight;
@@ -181,7 +183,7 @@ define([
             tp = {top: pos.top - actualHeight, left: pos.left + pos.width / 2 - actualWidth / 2 - 2};
             break;
           case 'left':
-            tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left - actualWidth};
+            tp = {top: pos.top + pos.height / 2 - actualHeight / 2, right: (document.body.clientWidth - pos.left) + ARROW_WIDTH_PX};
             break;
           case 'right':
             tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width};
@@ -269,8 +271,20 @@ define([
         }
       }
 
+      var newPosition = {
+        top: offset.top
+      };
+
+      if(offset.right) {
+        newPosition.left = 'initial';
+        newPosition.right = offset.right;
+      } else {
+        newPosition.left = offset.left;
+        newPosition.right = 'initial';
+      }
+
       $e
-        .css({ top: offset.top, left: offset.left })
+        .css(newPosition)
         .addClass(placement)
         .addClass('in');
 
@@ -315,7 +329,7 @@ define([
       return this;
     },
 
-    getPosition: function () {
+    getTargetPosition: function () {
       var el = this.targetElement;
 
       var pos = _.extend({}, el.getBoundingClientRect(), this.$targetElement.offset());
