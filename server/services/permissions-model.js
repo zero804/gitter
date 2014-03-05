@@ -50,7 +50,7 @@ function repoPermissionsModel(user, right, uri, security) {
 
         case 'create':
         case 'admin':
-          return isAdmin;
+          return !!isAdmin;
 
         default:
           throw 'Unknown right ' + right;
