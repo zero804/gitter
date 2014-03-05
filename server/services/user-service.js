@@ -118,6 +118,20 @@ var userService = {
       .nodeify(callback);
   },
 
+  /**
+   * Returns a hash of booleans if the given usernames exist in gitter
+   */
+  githubUsersExists: function(usernames, callback) {
+    return persistence.User.findQ({ username: { $in: usernames } }, { username: 1, _id: 0 }, { lean: true })
+      .then(function(results) {
+        return results.reduce(function(memo, index) {
+          memo[index.username] = true;
+          return memo;
+        }, { });
+      })
+      .nodeify(callback);
+  },
+
   findByGithubId: function(githubId, callback) {
     return persistence.User.findOneQ({ githubId: githubId })
            .nodeify(callback);
