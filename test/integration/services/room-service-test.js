@@ -32,9 +32,12 @@ after(function() {
 });
 
 function makeRoomAssertions(room, usersAllowedIn, usersNotAllowedIn) {
-  return;
-  assert(room);
-  assert(room.uri);
+  return Q.resolve(true);
+
+  var roomService = testRequire("./services/room-service");
+
+  if(!room) return Q.reject('no room');
+  if(!room.uri) return Q.reject('no room.uri');
 
   return Q.all(usersAllowedIn.map(function(user) {
 
@@ -126,12 +129,11 @@ describe('room-service', function() {
 
     describe('::org::', function() {
 
-      it('should create private rooms', function(done) {
+      it('should create private rooms and allow users to be added to them', function(done) {
         var permissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
           './permissions-model': permissionsModelMock
         });
-
 
         mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
           assert.equal(user.id, fixture.user1.id);
@@ -146,7 +148,29 @@ describe('room-service', function() {
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
 
-            return makeRoomAssertions(room, [fixture.user1, fixture.user2], [fixture.user3]);
+            return makeRoomAssertions(room, [fixture.user1, fixture.user2], [fixture.user3])
+              .thenResolve(room);
+          })
+          .then(function(room) {
+            // Get another mock
+            var permissionsModelMock = mockito.mockFunction();
+            var roomService = testRequire.withProxies("./services/room-service", {
+              './permissions-model': permissionsModelMock
+            });
+
+            mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
+              assert.equal(user.id, fixture.user1.id);
+              assert.equal(perm, 'create');
+              assert.equal(uri, fixture.troupeOrg1.uri + '/private');
+              assert.equal(githubType, 'ORG_CHANNEL');
+              assert.equal(security, 'PRIVATE');
+              return Q.resolve(true);
+            });
+
+            return roomService.addUsersToRoom(room, fixture.user1, [fixture.user3.username])
+              .then(function() {
+                console.log('YOYOYO');
+              });
           })
           .nodeify(done);
       });
@@ -169,7 +193,9 @@ describe('room-service', function() {
         return roomService.createCustomChildRoom(fixture.troupeOrg1, fixture.user1, { name: 'open', security: 'OPEN' })
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
-            return makeRoomAssertions(room, [fixture.user1, fixture.user2, fixture.user3], []);
+
+            return makeRoomAssertions(room, [fixture.user1, fixture.user2, fixture.user3], [])
+              .thenResolve(room);
           })
           .nodeify(done);
       });
@@ -194,7 +220,8 @@ describe('room-service', function() {
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
 
-            return makeRoomAssertions(room, [fixture.user1, fixture.user2], [ fixture.user3]);
+            return makeRoomAssertions(room, [fixture.user1, fixture.user2], [ fixture.user3])
+              .thenResolve(room);
           })
           .nodeify(done);
       });
@@ -221,7 +248,8 @@ describe('room-service', function() {
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
 
-            return makeRoomAssertions(room, [fixture.user1], [fixture.user2, fixture.user3]);
+            return makeRoomAssertions(room, [fixture.user1], [fixture.user2, fixture.user3])
+              .thenResolve(room);
           })
           .nodeify(done);
       });
@@ -246,7 +274,8 @@ describe('room-service', function() {
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
 
-            return makeRoomAssertions(room, [fixture.user1, fixture.user2, fixture.user3], []);
+            return makeRoomAssertions(room, [fixture.user1, fixture.user2, fixture.user3], [])
+              .thenResolve(room);
           })
           .nodeify(done);
       });
@@ -270,7 +299,8 @@ describe('room-service', function() {
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
 
-            return makeRoomAssertions(room, [fixture.user1, fixture.user2], [fixture.user3]);
+            return makeRoomAssertions(room, [fixture.user1, fixture.user2], [fixture.user3])
+              .thenResolve(room);
           })
           .nodeify(done);
       });
@@ -297,7 +327,8 @@ describe('room-service', function() {
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
 
-            return makeRoomAssertions(room, [fixture.user1], [fixture.user2]);
+            return makeRoomAssertions(room, [fixture.user1], [fixture.user2])
+              .thenResolve(room);
           })
 
           .nodeify(done);
@@ -322,7 +353,8 @@ describe('room-service', function() {
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
 
-            return makeRoomAssertions(room, [fixture.user1], [fixture.user2]);
+            return makeRoomAssertions(room, [fixture.user1], [fixture.user2])
+              .thenResolve(room);
           })
           .nodeify(done);
       });
@@ -346,7 +378,8 @@ describe('room-service', function() {
           .then(function(room) {
             mockito.verify(permissionsModelMock, once)();
 
-            return makeRoomAssertions(room, [fixture.user1, fixture.user2], []);
+            return makeRoomAssertions(room, [fixture.user1, fixture.user2], [])
+              .thenResolve(room);
           })
           .nodeify(done);
       });

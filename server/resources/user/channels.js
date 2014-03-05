@@ -17,29 +17,31 @@ function serialize(items, req, res, next) {
 }
 
 module.exports = {
-    index: function(req, res){
-      res.send([]);
-    },
+  id: 'userTroupe',
 
-    create: function(req, res, next) {
-      var body = req.body;
-      var security = body.security || 'INHERITED';
+  index: function(req, res){
+    res.send([]);
+  },
 
-      return roomService.createCustomChildRoom(null, req.user, { name: body.name, security: security })
-        .then(function(customRoom) {
-          return serialize(customRoom, req, res, next);
-        })
-        .fail(function(err) {
-          if(err.clientDetail && err.responseStatusCode) {
-            res.send(err.responseStatusCode, err.clientDetail);
-          } else {
-            next(err);
-          }
-        });
-    },
+  create: function(req, res, next) {
+    var body = req.body;
+    var security = body.security || 'INHERITED';
 
-    load: function(req, id, callback){
-      roomService.findChildChannelRoom(req.troupe, id, callback);
-    }
+    return roomService.createCustomChildRoom(null, req.user, { name: body.name, security: security })
+      .then(function(customRoom) {
+        return serialize(customRoom, req, res, next);
+      })
+      .fail(function(err) {
+        if(err.clientDetail && err.responseStatusCode) {
+          res.send(err.responseStatusCode, err.clientDetail);
+        } else {
+          next(err);
+        }
+      });
+  },
+
+  load: function(req, id, callback){
+    roomService.findChildChannelRoom(req.troupe, id, callback);
+  }
 
 };
