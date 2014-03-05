@@ -6,7 +6,6 @@ var persistence              = require("./persistence-service");
 var userService              = require("./user-service");
 var appEvents                = require("../app-events");
 var assert                   = require("assert");
-var emailNotificationService = require("./email-notification-service");
 var winston                  = require("winston");
 var collections              = require("../utils/collections");
 var mongoUtils               = require("../utils/mongo-utils");

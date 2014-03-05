@@ -366,12 +366,12 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
     var security = options.security;
     var uri, githubType;
 
-
     if(parentTroupe) {
       assertValidName(name);
       uri = parentTroupe.uri + '/' + name;
 
       if(!{ ORG: 1, REPO: 1 }.hasOwnProperty(parentTroupe.githubType) ) {
+        validate.fail('Invalid security option: ' + security);
       }
 
       switch(parentTroupe.githubType) {
