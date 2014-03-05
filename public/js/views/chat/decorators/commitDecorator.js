@@ -140,8 +140,8 @@ define([
       chatItemView.$el.find('*[data-link-type="commit"]').each(function() {
         var $commit = $(this);
 
-        var sha1 = this.dataset.commitSha1;
-        var repo = this.dataset.commitRepo;
+        var sha1 = $commit.data('commitSha1');
+        var repo = $commit.data('commitRepo');
 
         if(!repo || !sha1) {
           // this aint no commit I ever saw
