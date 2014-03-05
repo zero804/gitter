@@ -8,12 +8,14 @@ var m = {
   expect: function(value, message) {
     if(!value) {
       winston.warn('failed-validation:' + message);
+      console.trace();
       throw 400;
     }
   },
 
   fail: function(message) {
     winston.warn('failed-validation:' + message);
+    console.trace();
     throw 400;
   },
 };
