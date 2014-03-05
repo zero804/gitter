@@ -43,7 +43,7 @@ define([
 
   });
 
-  var Modal = TroupeViews.Modal.extend({
+  return TroupeViews.Modal.extend({
     disableAutoFocus: true,
     initialize: function(options) {
       options = options || {};
@@ -57,10 +57,5 @@ define([
       { action: "cancel", text: "Cancel", className: "trpBtnLightGrey"}
     ]
   });
-
-  return {
-    View: View,
-    Modal: Modal
-  };
 
 });
