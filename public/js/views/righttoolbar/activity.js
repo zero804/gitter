@@ -114,17 +114,19 @@ define([
       var extra = {};
 
       if (meta.event == 'push') {
-        var commitCount = payload.commits ? payload.commits.length : 0;
+        // if you push a tag, then commits is undefined
+        var commits = payload.commits || [];
+        var commitCount = commits.length;
 
-        extra.commits = payload.commits;
+        extra.commits = commits;
         extra.commits.forEach(function(commit){
           commit.short_sha = commit.id.substring(0,7);
         });
 
         if (commitCount == 1) {
-          var message = payload.commits[0].message;
+          var message = commits[0].message;
           extra.commit_text = (message.length > 34) ? message.substr(0,33) + '…' : message;
-          extra.commit_short_sha = payload.commits[0].id.substring(0,7);
+          extra.commit_short_sha = commits[0].id.substring(0,7);
         } else if(commitCount > 3) {
           extra.commits = extra.commits.slice(0,3);
           extra.hidden_commit_count = commitCount - 3;
