@@ -248,6 +248,47 @@ label {
 
 }
 
+.gtrPeopleAddRoster {
+  min-height: 80px;
+}
+
+.gtrPeopleRosterItem {
+  margin-top: 8px;
+  max-width: 500px;
+  cursor: default;
+  .trpDisplayPicture {
+    vertical-align: middle;
+    margin-right: 2px;
+  }
+
+
+  .username {
+    color: #999;
+  }
+
+  &:hover .remove {
+    opacity: 1;
+  }
+
+  .remove {
+    float: right;
+    .prepend-icon-clear();
+    cursor: pointer;
+    opacity: 0.6;
+    .transition300ms;
+  }
+
+  .remove:before {
+    position: inherit;
+  }
+
+  .remove:hover {
+    color: @trpRed;
+  }
+
+
+}
+
 .modal textarea.hidden-input {
   .trpBodyMedium;
   outline: 0;
