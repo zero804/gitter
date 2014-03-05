@@ -35,7 +35,7 @@ require([
   'components/csrf'             // No ref
 ], function($, Backbone, context, liveContext, appEvents, peopleCollectionView, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, RightToolbarView,
-    inviteView, TroupeSettingsView, MarkdownView, AddPeopleView, IntegrationSettingsModal,
+    inviteView, TroupeSettingsView, MarkdownView, AddPeopleViewModal, IntegrationSettingsModal,
     unreadItemsClient, webhookDecorator, issueDecorator, mentionDecorator,
     embedDecorator, emojiDecorator, UnreadBannerView, HeaderView) {
   "use strict";
@@ -145,7 +145,7 @@ require([
       "notifications": "notifications",
       "markdown": "markdown",
       "integrations": "integrations",
-      "add" : "add"
+      "add" : "addPeople"
     },
 
     hideModal: function() {
@@ -164,8 +164,8 @@ require([
       appView.dialogRegion.show(new MarkdownView({}));
     },
 
-    addpeople: function() {
-      appView.dialogRegion.show(new AddPeopleView({}));
+    addPeople: function() {
+      appView.dialogRegion.show(new AddPeopleViewModal({}));
     },
 
     integrations: function() {
