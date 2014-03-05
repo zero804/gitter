@@ -14,7 +14,7 @@ module.exports = {
     //
     app.get('/login/github',
       function(req, res, next) {
-        passport.authorize('github_user', { scope: 'user' })(req, res, next);
+        passport.authorize('github_user', { scope: 'user:email,read:org' })(req, res, next);
       },
       function() {});
 
@@ -42,7 +42,8 @@ module.exports = {
         middleware.ensureLoggedIn(),
         function(req, res, next) {
           var scopes = req.query.scopes ? req.query.scopes.split(/\s*,\s*/) : [''];
-          scopes.push('user'); // Always request user-scope
+          scopes.push('user:email');  // Always request user:email scope
+          scopes.push('read:org');    // Always request read-only access to orgs
           var existing = req.user.githubScopes || { };
           var addedScopes = false;
 

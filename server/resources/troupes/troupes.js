@@ -10,7 +10,7 @@ var Q                 = require('q');
 module.exports = {
   index: function(req, res, next) {
 
-    restful.serializeTroupesForUser(req.resourceUser.id)
+    restful.serializeTroupesForUser(req.user.id)
       .then(function(serialized) {
         res.send(serialized);
       })
@@ -40,7 +40,7 @@ module.exports = {
     if(updatedTroupe.autoConfigureHooks) {
       promises.push(roomService.applyAutoHooksForRepoRoom(req.user, troupe));
     }
-  
+
     if(updatedTroupe.hasOwnProperty('topic')) {
       promises.push(troupeService.updateTopic(req.user, troupe, updatedTroupe.topic));
     }
