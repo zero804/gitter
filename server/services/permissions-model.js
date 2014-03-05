@@ -6,20 +6,7 @@ var GitHubOrgService   = require('./github/github-org-service');
 var assert             = require("assert");
 var winston            = require('winston');
 var Q                  = require('q');
-var persistence        = require('./persistence-service');
-
-function userIsAlreadyInRoom(uri, user) {
-  var lcUri = uri.toLowerCase();
-  return persistence.Troupe.findOneQ({ lcUri: lcUri }, 'users.userId', { lean: true })
-    .then(function(troupe) {
-      if(!troupe) return;
-
-      return troupe.users.some(function(troupeUser) {
-        return troupeUser.userId === user._id;
-      });
-
-    });
-}
+var userIsInRoom       = require('./user-in-room');
 
 /**
  * REPO permissions model
@@ -199,7 +186,7 @@ function repoChannelPermissionsModel(user, right, uri, security) {
 
     case 'create':
       /* Anyone who can ADMIN an REPO can create a child channel */
-      return repoPermissionsModel(user, 'admin', repoUri);
+      return repoPermissionsModel(user, 'create', repoUri);
 
     case 'admin':
       /* Anyone who can join an ORG can create a child channel */
@@ -231,7 +218,13 @@ function userChannelPermissionsModel(user, right, uri, security) {
       break;
 
     case 'adduser':
-      return Q.resolve(true);
+      if(security === 'PUBLIC') return Q.resolve(true);
+
+      if(userUri === user.username) {
+        return Q.resolve(true);
+      }
+
+      return userIsInRoom(uri, user);
 
     case 'create':
     case 'admin':
