@@ -111,8 +111,8 @@ define([
     return '…/'+shortPath;
   }
 
-  function preparePopover($commit, repo, sha1) {
-    var url = '/api/private/gh/repos/'+repo+'/commits/'+sha1+'?renderPatchIfSingle=true';
+  function preparePopover($commit, repo, sha) {
+    var url = '/api/private/gh/repos/'+repo+'/commits/'+sha+'?renderPatchIfSingle=true';
     $commit.on('mouseover', function(e) {
 
       var commitModel = new Backbone.Model();
@@ -125,7 +125,7 @@ define([
         var pop = new Popover({
           titleView: new TitleView({model: commitModel}),
           view: new BodyView({model: commitModel}),
-          footerView: new FooterView({repo: repo, sha: sha1}),
+          footerView: new FooterView({repo: repo, sha: sha}),
           targetElement: $commit[0],
           placement: 'horizontal'
         });
@@ -140,14 +140,14 @@ define([
       chatItemView.$el.find('*[data-link-type="commit"]').each(function() {
         var $commit = $(this);
 
-        var sha1 = $commit.data('commitSha1');
+        var sha = $commit.data('commitSha');
         var repo = $commit.data('commitRepo');
 
-        if(!repo || !sha1) {
+        if(!repo || !sha) {
           // this aint no commit I ever saw
           plaintextify($commit);
         } else {
-          preparePopover($commit, repo, sha1);
+          preparePopover($commit, repo, sha);
         }
       });
 
