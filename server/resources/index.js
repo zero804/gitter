@@ -49,5 +49,6 @@ module.exports = {
 
     installUserSubResource('orgs',        'orgs');
     installUserSubResource('repos',       'repos');
+    installUserSubResource('channels',    'channels');
   }
 };
