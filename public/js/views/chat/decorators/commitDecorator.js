@@ -69,24 +69,18 @@ define([
   });
 
   var FooterView = Backbone.View.extend({
-    initialize: function() {
-      this.listenTo(this.model, 'change', this.render);
+    initialize: function(options) {
+      this.mentionText = options.repo+'@'+options.sha.substring(0,7);
     },
     events: {
       'click button.mention': 'onMentionClick'
     },
     render: function() {
-      var data = this.model.toJSON();
-
-      // dont bother rendering an empty model
-      if(Object.keys(data).length === 0) return this;
-
-      this.$el.html(footerTemplate(data));
+      this.$el.html(footerTemplate());
       return this;
     },
     onMentionClick: function() {
-      var text = this.model.get('repo')+'@'+this.model.get('sha').substring(0,7);
-      appEvents.trigger('input.append', text);
+      appEvents.trigger('input.append', this.mentionText);
       this.parentPopover.hide();
     }
   });
@@ -125,22 +119,17 @@ define([
       $.get(url, function(commit) {
         commitModel.set(commit);
         commitModel.set('repo', repo);
-      }).fail(function(error) {
-        if(error.status === 404) {
-          plaintextify($commit);
-        }
       });
 
       Popover.hoverTimeout(e, function() {
         var pop = new Popover({
           titleView: new TitleView({model: commitModel}),
           view: new BodyView({model: commitModel}),
-          footerView: new FooterView({model: commitModel}),
+          footerView: new FooterView({repo: repo, sha: sha1}),
           targetElement: $commit[0],
           placement: 'horizontal'
         });
         pop.show();
-
       });
     });
   }
