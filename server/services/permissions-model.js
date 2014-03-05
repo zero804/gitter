@@ -21,6 +21,9 @@ function userIsAlreadyInRoom(uri, user) {
     });
 }
 
+/**
+ * REPO permissions model
+ */
 function repoPermissionsModel(user, right, uri, security) {
   // Security is only for child rooms
   assert(!security);
@@ -34,32 +37,32 @@ function repoPermissionsModel(user, right, uri, security) {
       /* Can't see the repo? no access */
       if(!repoInfo) return false;
 
+      /* Want to join and can see the repo? Go ahead! */
       if(right === 'join') return true;
 
       var perms = repoInfo.permissions;
+      var isAdmin = perms && (perms.push || perms.admin);
 
-      /* Need admin or push permission from here on out */
-      if(!perms) return false;
+      switch(right) {
+        case 'join':
+        case 'adduser':
+          return true;
 
-      if(!perms.push && !perms.admin) return false;
+        case 'create':
+        case 'admin':
+          return !!isAdmin;
 
-      if(right === 'create') {
-        // If the user isn't wearing the magic hat, refuse them
-        // permission
-        if(!user.permissions.createRoom) return false;
-
-        return true;
+        default:
+          throw 'Unknown right ' + right;
       }
 
-      if(right === 'admin') {
-        return perms.admin || perms.push;
-      }
-
-      assert(false, 'Unknown right ' + right);
     });
 
 }
 
+/**
+ * ORG permissions model
+ */
 function orgPermissionsModel(user, right, uri, security) {
   // Security is only for child rooms
   assert(!security);
@@ -76,21 +79,24 @@ function orgPermissionsModel(user, right, uri, security) {
         return false;
       }
 
-      if(right === 'create') {
-        // If the user isn't wearing the magic hat, refuse them
-        // permission
-        return user.permissions.createRoom;
+      switch(right) {
+        case 'create':
+        case 'admin':
+        case 'join':
+        case 'adduser':
+          /* Org members can do anything */
+          return true;
+
+        default:
+          throw 'Unknown right ' + right;
       }
 
-      if(right === 'admin' || right === 'join') {
-        return true;
-      }
-
-      assert(false, 'Unknown right ' + right);
     });
 }
 
-
+/**
+ * ONE-TO-ONE permissions model
+ */
 function oneToOnePermissionsModel(user, right, uri, security) {
   // Security is only for child rooms
   assert(!security);
@@ -98,80 +104,148 @@ function oneToOnePermissionsModel(user, right, uri, security) {
   // For now, only authenticated users can be in onetoones
   if(!user) return Q.resolve(false);
 
-  if(right === 'create' || right === 'join') {
-    return Q.resolve(true);
+  switch(right) {
+    case 'create':
+    case 'join':
+      return Q.resolve(true);
+
+    case 'adduser':
+    case 'admin':
+      return Q.resolve(false);
+
+    default:
+      throw 'Unknown right ' + right;
   }
 
-  if(right === 'admin') {
-    return Q.resolve(false);
-  }
-
-  return Q.reject('Unknown right ' + right);
 }
 
+/**
+ * ORG_CHANNEL permissions model
+ */
 function orgChannelPermissionsModel(user, right, uri, security) {
   assert({ 'PRIVATE': 1, 'PUBLIC': 1, 'INHERITED': 1}.hasOwnProperty(security), 'Invalid security type:' + security);
-
-  if(right === 'join') {
-    switch(security) {
-      case 'PUBLIC': return Q.resolve(true);
-      case 'PRIVATE': return userIsAlreadyInRoom(uri, user);
-      // INHERITED falls through
-    }
-  }
-
-  /* To create this room, you need admin rights on the parent room */
-  if(right === 'create') {
-    right = 'admin';
-  }
-
   var orgUri = uri.split('/').slice(0, -1).join('/');
-  winston.verbose('Proxying permission on ' + uri + ' to org permission on ' + orgUri, { user: user && user.username, right: right });
-  return orgPermissionsModel(user, right, orgUri);
+
+  switch(right) {
+    case 'join':
+      switch(security) {
+        case 'PUBLIC': return Q.resolve(true);
+        case 'PRIVATE': return Q.resolve(false);
+        case 'INHERITED':
+          return orgPermissionsModel(user, right, orgUri);
+        default:
+          throw 'Unknown security: ' + security;
+      }
+      break;
+
+    case 'adduser':
+      switch(security) {
+        case 'PUBLIC':
+          return Q.resolve(true);
+
+        case 'PRIVATE':
+        case 'INHERITED':
+          return orgPermissionsModel(user, right, orgUri);
+        default:
+          throw 'Unknown security: ' + security;
+      }
+      break;
+
+    case 'create':
+      /* Anyone who can join an ORG can create a child channel */
+      return orgPermissionsModel(user, 'join', orgUri);
+
+    case 'admin':
+      /* Anyone who can join an ORG can create a child channel */
+      return orgPermissionsModel(user, 'admin', orgUri);
+
+    default:
+      throw 'Unknown right ' + right;
+  }
 }
 
+/**
+ * REPO_CHANNEL permissions model
+ */
 function repoChannelPermissionsModel(user, right, uri, security) {
   assert({ 'PRIVATE': 1, 'PUBLIC': 1, 'INHERITED': 1}.hasOwnProperty(security), 'Invalid security type:' + security);
 
-  if(right === 'join') {
-    switch(security) {
-      case 'PUBLIC': return Q.resolve(true);
-      case 'PRIVATE': return userIsAlreadyInRoom(uri, user);
-      // INHERITED falls through
-    }
-  }
-
-  /* To create this room, you need admin rights on the parent room */
-  if(right === 'create') {
-    right = 'admin';
-  }
-
   var repoUri = uri.split('/').slice(0, -1).join('/');
-  winston.verbose('Proxying permission on ' + uri + ' to repo permission on ' + repoUri, { user: user && user.username, right: right });
-  return repoPermissionsModel(user, right, repoUri);
+
+  switch(right) {
+    case 'join':
+      switch(security) {
+        case 'PUBLIC': return Q.resolve(true);
+        case 'PRIVATE': return Q.resolve(false);
+        case 'INHERITED':
+          return repoPermissionsModel(user, right, repoUri);
+        default:
+          throw 'Unknown security: ' + security;
+      }
+      break;
+
+    case 'adduser':
+      switch(security) {
+        case 'PUBLIC':
+          return Q.resolve(true);
+
+        case 'PRIVATE':
+        case 'INHERITED':
+          return repoPermissionsModel(user, right, repoUri);
+        default:
+          throw 'Unknown security: ' + security;
+      }
+      break;
+
+    case 'create':
+      /* Anyone who can ADMIN an REPO can create a child channel */
+      return repoPermissionsModel(user, 'admin', repoUri);
+
+    case 'admin':
+      /* Anyone who can join an ORG can create a child channel */
+      return repoPermissionsModel(user, 'admin', repoUri);
+
+    default:
+      throw 'Unknown right ' + right;
+  }
+
 }
 
+/**
+ * USER_CHANNEL permissions model
+ */
 function userChannelPermissionsModel(user, right, uri, security) {
   assert({ 'PRIVATE': 1, 'PUBLIC': 1 }.hasOwnProperty(security), 'Invalid security type:' + security);
 
-  if(right === 'join') {
-    switch(security) {
-      case 'PUBLIC': return Q.resolve(true);
-      case 'PRIVATE': return userIsAlreadyInRoom(uri, user);
-    }
-  }
-
   var userUri = uri.split('/').slice(0, -1).join('/');
 
-  /* To create this room, you need to be THE user */
-  if(right === 'create') {
-    return Q.resolve(userUri === user.username);
+  switch(right) {
+    case 'join':
+      switch(security) {
+        case 'PUBLIC': return Q.resolve(true);
+        case 'PRIVATE': return Q.resolve(false);
+        /* No inherited security for user channels */
+        default:
+          throw 'Unknown security: ' + security;
+      }
+      break;
+
+    case 'adduser':
+      return Q.resolve(true);
+
+    case 'create':
+    case 'admin':
+      return Q.resolve(userUri === user.username);
+
+    default:
+      throw 'Unknown right ' + right;
   }
 
-  winston.verbose('Proxying permission on ' + uri + ' to user permission on ' + userUri, { user: user && user.username, right: right });
-  return oneToOnePermissionsModel(user, right, userUri);
 }
 
+/**
+ * Main entry point
+ */
 function permissionsModel(user, right, uri, roomType, security) {
   function log(x) {
     winston.verbose('Permission', { user: user && user.username, uri: uri, roomType: roomType, granted: x });
@@ -180,7 +254,7 @@ function permissionsModel(user, right, uri, roomType, security) {
 
   assert(user, 'user required');
   assert(right, 'right required');
-  assert(right === 'create' || right === 'join' || right === 'admin', 'Invalid right ' + right);
+  assert(right === 'create' || right === 'join' || right === 'admin' || right === 'adduser', 'Invalid right ' + right);
   assert(uri, 'uri required');
   assert(roomType, 'roomType required');
 
