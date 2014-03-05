@@ -1,3 +1,11 @@
+{{#if error}}
+Please check that:
+<ul>
+  <li><a href="https://github.com/{{repo}}/commit/{{sha}}" target="github" class="link">{{repo}}@{{sha}}</a> is a real commit</li>
+  <li>Gitter has <a href="https://github.com/settings/applications" target="github" class="link">permission to view it<a></li>
+</ul>
+{{else}}
+{{#if author}}
 <div class="trpChatAvatar">
   <span>
     <div class="trpDisplayPicture avatar-s" style="background-image: url({{author.avatar_url}});">
@@ -21,3 +29,5 @@
     {{/if}}
   </div>
 </div>
+{{/if}}
+{{/if}}

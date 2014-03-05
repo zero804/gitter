@@ -21,31 +21,31 @@ define([
     render: function() {
       var data = this.model.toJSON();
 
-      // dont bother rendering an empty model
-      if(Object.keys(data).length === 0) return this;
+      if(data.author) {
 
-      data.date = moment(data.commit.author.date).format("LLL");
+        data.date = moment(data.commit.author.date).format("LLL");
 
-      data.files.forEach(function(file) {
-        if(file.filename.length > MAX_PATH_LENGTH) {
-          file.fullFilename = file.filename;
-          file.filename = getShortPath(file.filename);
+        data.files.forEach(function(file) {
+          if(file.filename.length > MAX_PATH_LENGTH) {
+            file.fullFilename = file.filename;
+            file.filename = getShortPath(file.filename);
+          }
+        });
+
+        if(data.files.length === 1) {
+          data.isFileLengthSingular = true;
+          if(data.files[0].patch_html) {
+            data.firstPatchHtml = data.files[0].patch_html;
+          }
         }
-      });
 
-      if(data.files.length === 1) {
-        data.isFileLengthSingular = true;
-        if(data.files[0].patch_html) {
-          data.firstPatchHtml = data.files[0].patch_html;
+        if(data.stats.additions === 1) {
+          data.isAdditionsSingular = true;
         }
-      }
 
-      if(data.stats.additions === 1) {
-        data.isAdditionsSingular = true;
-      }
-
-      if(data.stats.deletions === 1) {
-        data.isDeletionsSingular = true;
+        if(data.stats.deletions === 1) {
+          data.isDeletionsSingular = true;
+        }
       }
 
       this.$el.html(template(data));
@@ -59,10 +59,7 @@ define([
     },
     render: function() {
       var data = this.model.toJSON();
-
-      // dont bother rendering an empty model
-      if(Object.keys(data).length === 0) return this;
-
+      data.shortSha = data.sha.substring(0,7);
       this.$el.html(titleTemplate(data));
       return this;
     }
@@ -115,10 +112,16 @@ define([
     var url = '/api/private/gh/repos/'+repo+'/commits/'+sha+'?renderPatchIfSingle=true';
     $commit.on('mouseover', function(e) {
 
-      var commitModel = new Backbone.Model();
+      var commitModel = new Backbone.Model({
+        repo: repo,
+        sha: sha,
+        html_url: 'https://github.com/'+repo+'/commit/'+sha
+      });
+
       $.get(url, function(commit) {
         commitModel.set(commit);
-        commitModel.set('repo', repo);
+      }).fail(function(err) {
+        commitModel.set('error', err.status);
       });
 
       Popover.hoverTimeout(e, function() {
