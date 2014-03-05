@@ -23,6 +23,7 @@
   display: inline-block;
   vertical-align: top;
   cursor: pointer;
+  .transition300ms;
 }
 
 .trpButtonMedium:hover {
@@ -147,6 +148,11 @@
 .trpBtnGrey {
   background-color: @trpDarkGrey;
   color: white;
+  border-bottom: 2px solid darken(@trpDarkGrey,10%);
+}
+
+.trpBtnGrey:hover {
+  border-bottom: 2px solid @trpDarkGrey;
 }
 
 .trpBtnLightGrey {
