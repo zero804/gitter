@@ -61,7 +61,7 @@ module.exports = exports = function processChat(text) {
         return {
           type: 'commit',
           repo: pathParts[1]+'/'+pathParts[2],
-          sha1: pathParts[4]
+          sha: pathParts[4]
         };
       }
     }
@@ -94,12 +94,12 @@ module.exports = exports = function processChat(text) {
     return out;
   };
 
-  renderer.commit = function(repo, sha1) {
-    var text = repo+'@'+sha1.substring(0, 7);
-    var href = 'https://github.com/'+repo+'/commit/'+sha1;
+  renderer.commit = function(repo, sha) {
+    var text = repo+'@'+sha.substring(0, 7);
+    var href = 'https://github.com/'+repo+'/commit/'+sha;
     var out = '<a href="' + href + '" ' +
               'data-link-type="commit" target="github" ' +
-              'data-commit-sha1="' + sha1 + '" ' +
+              'data-commit-sha="' + sha + '" ' +
               'data-commit-repo="' + repo + '" ' +
               'class="commit">' + text + '</a>';
     return out;
@@ -113,7 +113,7 @@ module.exports = exports = function processChat(text) {
         var issueText = githubData.repo+'#'+githubData.number;
         return renderer.issue(githubData.repo, githubData.number, issueText);
       } else if(githubData.type === 'commit') {
-        return renderer.commit(githubData.repo, githubData.sha1);
+        return renderer.commit(githubData.repo, githubData.sha);
       }
 
     } else {

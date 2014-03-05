@@ -7,7 +7,7 @@
         {{commit_text}}
       {{/if}}
       {{#each commits}}
-        <a href="https://github.com/{{../repo}}/commit/{{id}}" target="github" data-link-type="commit" data-commit-sha1="{{id}}" data-commit-repo="{{../repo}}" class="commit">{{short_sha}}</a>
+        <a href="https://github.com/{{../repo}}/commit/{{id}}" target="github" data-link-type="commit" data-commit-sha="{{id}}" data-commit-repo="{{../repo}}" class="commit">{{short_sha}}</a>
       {{/each}}
       {{#if hidden_commit_count}}
         and {{hidden_commit_count}} more
