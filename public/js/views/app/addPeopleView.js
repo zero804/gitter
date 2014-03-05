@@ -53,7 +53,7 @@ define([
       this.view = new View(options);
     },
     menuItems: [
-      { action: "create", text: "Create", className: "trpBtnGreen" },
+      { action: "create", text: "Add", className: "trpBtnGreen" },
       { action: "cancel", text: "Cancel", className: "trpBtnLightGrey"}
     ]
   });
