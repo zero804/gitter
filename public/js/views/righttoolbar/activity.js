@@ -121,13 +121,11 @@ define([
         extra.commits = commits;
         extra.commits.forEach(function(commit){
           commit.short_sha = commit.id.substring(0,7);
+          var message = commit.message;
+          commit.short_message = (message.length > 32) ? message.substr(0,31) + '…' : message;
         });
 
-        if (commitCount == 1) {
-          var message = commits[0].message;
-          extra.commit_text = (message.length > 34) ? message.substr(0,33) + '…' : message;
-          extra.commit_short_sha = commits[0].id.substring(0,7);
-        } else if(commitCount > 3) {
+        if(commitCount > 3) {
           extra.commits = extra.commits.slice(0,3);
           extra.hidden_commit_count = commitCount - 3;
         }
