@@ -10,7 +10,7 @@ define([
 ], function($, Backbone, context, Popover, issuePopoverTemplate, issuePopoverTitleTemplate) {
   "use strict";
 
-  var IssuePopoverView = Backbone.View.extend({
+  var BodyView = Backbone.View.extend({
     className: 'issue-popover-body',
     render: function() {
       this.$el.html(issuePopoverTemplate(this.model.attributes));
@@ -18,7 +18,7 @@ define([
     }
   });
 
-  var IssuePopoverTitleView = Backbone.View.extend({
+  var TitleView = Backbone.View.extend({
     render: function() {
       this.$el.html(issuePopoverTitleTemplate(this.model.attributes));
       return this;
@@ -40,8 +40,8 @@ define([
 
   function createPopover(model, targetElement) {
     return new Popover({
-      titleView: new IssuePopoverTitleView({model: model}),
-      view: new IssuePopoverView({model: model}),
+      titleView: new TitleView({model: model}),
+      view: new BodyView({model: model}),
       targetElement: targetElement,
       placement: 'horizontal'
     });
@@ -74,14 +74,14 @@ define([
         $.get(url, function(issue) {
 
           function showPopover(e) {
-            var popover = createPopover(issueModel, e.target);
+            var popover = createPopover(model, e.target);
             popover.show();
             Popover.singleton(view, popover);
           }
 
           function showPopoverLater(e) {
             Popover.hoverTimeout(e, function() {
-              var popover = createPopover(issueModel, e.target);
+              var popover = createPopover(model, e.target);
               popover.show();
               Popover.singleton(view, popover);
             });
@@ -92,8 +92,8 @@ define([
             $issue.addClass(issue.state);
           }
 
-          var issueModel = new Backbone.Model(issue);
-          issueModel.set('date', moment(issue.created_at).format("LLL"));
+          var model = new Backbone.Model(issue);
+          model.set('date', moment(issue.created_at).format("LLL"));
 
           $issue.on('click', showPopover);
           $issue.on('mouseover', showPopoverLater);
