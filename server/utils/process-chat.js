@@ -86,11 +86,11 @@ module.exports = exports = function processChat(text) {
       repo: repo ? repo : undefined
     });
 
-    var out = '<a data-link-type="issue" data-issue="' + issue + '"';
+    var out = '<span data-link-type="issue" data-issue="' + issue + '"';
     if(repo) {
       out += util.format(' data-issue-repo="%s"', repo);
     }
-    out += ' class="issue">' + text + '</a>';
+    out += ' class="issue">' + text + '</span>';
     return out;
   };
 
