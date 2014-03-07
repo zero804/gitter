@@ -83,11 +83,10 @@ define([
   });
 
   var UserPopoverView = Popover.extend({
-    options: _.extend({}, Popover.prototype.options, {
-      placement: 'horizontal',
-      minHeight: '88px'
-    }),
     initialize: function(options) {
+      options.placement = 'horizontal';
+      options.minHeight = '88px';
+
       var username, displayName;
       if(this.model) {
         username = this.model.get('username');

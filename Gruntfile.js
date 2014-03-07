@@ -277,7 +277,8 @@ module.exports = function( grunt ) {
     watch: {
       less: {
         files: [
-          'public/bootstrap/less/*.less'
+          'public/bootstrap/less/*.less',
+          'public/bootstrap/less/bootstrap/*.less'
         ],
         tasks: 'less'
       }

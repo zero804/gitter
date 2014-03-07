@@ -2,26 +2,72 @@
 
 define([
   'jquery',
+  'underscore',
   'marionette',
+  'backbone',
   'views/base',
   'utils/context',
-  'hbs!./tmpl/addPeople'
-], function($, Marionette, TroupeViews, context, template) {
+  'hbs!./tmpl/addPeople',
+  'hbs!./tmpl/userSearchItem',
+  'hbs!./tmpl/addItemTemplate',
+  'views/controls/dropdown',
+  'views/controls/typeahead'
+], function($, _, Marionette, Backbone, TroupeViews, context, template, userSearchItemTemplate, itemTemplate, Dropdown, Typeahead) {
   "use strict";
 
-  var View = Marionette.Layout.extend({
+  var UserSearchModel = Backbone.Model.extend({
+    idAttribute: "id",
+  });
+
+  var UserSearchCollection = Backbone.Collection.extend({
+    url: '/api/v1/user',
+    model: UserSearchModel,
+    parse: function(response) {
+      return response.results;
+    }
+  });
+
+  var RowView = Marionette.ItemView.extend({
+    tagName: "div",
+    className: "gtrPeopleRosterItem",
+    template: itemTemplate,
+    ui: {
+      remove: '.remove'
+    },
+    triggers: {
+      'click @ui.remove': 'remove:clicked'
+    }
+  });
+
+
+  var View = Marionette.CompositeView.extend({
+    itemViewContainer: ".gtrPeopleAddRoster",
+    itemView: RowView,
     template: template,
 
     ui: {
-
+      input: 'input.gtrInput',
+      select: '#select-button'
     },
 
-    regions: {
-
+    events: {
     },
-
+    itemEvents: {
+      "remove:clicked": function(event, view) {
+        this.collection.remove(view.model);
+      }
+    },
     initialize: function() {
+      if(!this.collection) {
+        this.collection = new Backbone.Collection();
+      }
+
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
+    },
+
+    selected: function(m) {
+      this.collection.add(m);
+      this.typeahead.dropdown.hide();
     },
 
     menuItemClicked: function(button) {
@@ -37,9 +83,15 @@ define([
     },
 
     onRender: function() {
-
+      this.typeahead = new Typeahead({ collection: new UserSearchCollection(), itemTemplate: userSearchItemTemplate, el: this.ui.input[0] });
+      this.listenTo(this.typeahead, 'selected', this.selected);
     },
 
+    onClose: function() {
+      if(this.typeahead) {
+        this.typeahead.close();
+      }
+    }
 
   });
 
