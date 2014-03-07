@@ -37,7 +37,10 @@ define([
       return this;
     },
     onMentionClick: function() {
-      var mentionText = this.model.get('repo')+'#'+this.model.get('number');
+      var roomRepo = getRoomRepo();
+      var modelRepo = this.model.get('repo');
+      var modelNumber = this.model.get('number');
+      var mentionText = (modelRepo === roomRepo) ? '#'+modelNumber : modelRepo+'#'+modelNumber;
       appEvents.trigger('input.append', mentionText);
       this.parentPopover.hide();
     }
