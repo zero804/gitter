@@ -652,6 +652,7 @@ a.trpMiniLeftMenuItem {
   border-radius: 2px;
   padding: 0 4px;
   font-size: 11px;
+  cursor: pointer;
 }
 
 .gtrActivityList {
@@ -678,10 +679,6 @@ a.trpMiniLeftMenuItem {
       border: 1px solid fade(@trpGrey,50%);
       background-color: fade(@trpGrey,30%);
     }
-
-    .activity-time {
-      background-color: rgba(230,230,230,1);
-    }
   }
 
   .activity-detail {
@@ -690,8 +687,9 @@ a.trpMiniLeftMenuItem {
   }
 
   .activity-commit {
-    .activity-detail;
-    margin-left: 2px;
+    font-size: 12px;
+    line-height: 20px;
+    margin: 0;
   }
 
   .activity-time {
@@ -700,12 +698,8 @@ a.trpMiniLeftMenuItem {
     position: absolute;
     right: 4px;
     top: 2px;
-    background-color: inherit;
     color: rgba(100,100,100,0.4);
-    padding-left: 5px;
-    background-color: @trpBgColor;
     z-index: 100;
-
   }
 
 }
@@ -727,7 +721,7 @@ a.trpMiniLeftMenuItem {
   vertical-align: middle;
   display: inline-block;
   opacity: 0.8;
-  width: 85%;
+  width: 205px;
 }
 
 
@@ -1170,7 +1164,7 @@ i.favourited:before {
   font-family: 'troupe-icons';
   /*content: '\e81a';*/
   content: '\e826';
-  color: #f1c40f;
+  color: @trpYellow;
   width: 12px;
   font-size: 20px;
   transition:all .5s ease-in-out;
@@ -1404,12 +1398,8 @@ i.favourited:hover:before {
     color: #333;
   }
 
-  a:hover {
+  a.link:hover {
     color: @trpLightBlue;
-  }
-
-  a.issue:hover {
-    color: inherit;
   }
 
  .trpMiniActions {
