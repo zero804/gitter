@@ -10,6 +10,8 @@ define([
 
   var ARROW_WIDTH_PX = 10;
 
+  var HOVER_DELAY = 750;
+
   var DEFAULTS = {
     animation: true,
     selector: false,
@@ -356,7 +358,7 @@ define([
     var timeout = setTimeout(function() {
       if(!timeout) return;
       callback.call(scope, e);
-    }, 500);
+    }, HOVER_DELAY);
 
     $(e.target).one('mouseout click', function() {
       clearTimeout(timeout);
