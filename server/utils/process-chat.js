@@ -99,7 +99,7 @@ module.exports = exports = function processChat(text) {
     var out = '<span data-link-type="commit" ' +
               'data-commit-sha="' + sha + '" ' +
               'data-commit-repo="' + repo + '" ' +
-              'class="commit">' + text + '</a>';
+              'class="commit">' + text + '</span>';
     return out;
   };
 
