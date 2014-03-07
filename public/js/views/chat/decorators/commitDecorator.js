@@ -82,10 +82,6 @@ define([
     }
   });
 
-  function plaintextify($el) {
-    $el.replaceWith($el.text());
-  }
-
   function getShortPath(pathString) {
     // if you have one long filename
     if(pathString.split('/').length === 1) {
@@ -108,54 +104,77 @@ define([
     return '…/'+shortPath;
   }
 
-  function preparePopover($commit, repo, sha) {
-    var url = '/api/private/gh/repos/'+repo+'/commits/'+sha+'?renderPatchIfSingle=true';
-    $commit.on('mouseover', function(e) {
-
-      var commitModel = new Backbone.Model({
-        repo: repo,
-        sha: sha,
-        html_url: 'https://github.com/'+repo+'/commit/'+sha
-      });
-
-      $.get(url, function(commit) {
-        commitModel.set(commit);
-      }).fail(function(err) {
-        commitModel.set('error', err.status);
-      });
-
-      Popover.hoverTimeout(e, function() {
-        var pop = new Popover({
-          titleView: new TitleView({model: commitModel}),
-          view: new BodyView({model: commitModel}),
-          footerView: new FooterView({repo: repo, sha: sha}),
-          targetElement: $commit[0],
-          placement: 'horizontal'
-        });
-        pop.show();
-      });
-    });
-  }
-
   var decorator = {
 
-    decorate: function(chatItemView) {
-      chatItemView.$el.find('*[data-link-type="commit"]').each(function() {
-        var $commit = $(this);
+    decorate: function(view) {
+      view.$el.find('*[data-link-type="commit"]').each(function(){
 
-        var sha = $commit.data('commitSha');
-        var repo = $commit.data('commitRepo');
+        function showPopover(e) {
+          var url = '/api/private/gh/repos/'+repo+'/commits/'+sha+'?renderPatchIfSingle=true';
+          $.get(url, function(commit) {
+            model.set(commit);
+          }).fail(function(err) {
+            model.set('error', err.status);
+          });
 
-        if(!repo || !sha) {
-          // this aint no commit I ever saw
-          plaintextify($commit);
-        } else {
-          preparePopover($commit, repo, sha);
+          var popover = new Popover({
+            titleView: new TitleView({model: model}),
+            view: new BodyView({model: model}),
+            footerView: new FooterView({repo: repo, sha: sha}),
+            targetElement: e.target,
+            placement: 'horizontal'
+          });
+
+          popover.show();
+
+          Popover.singleton(view, popover);
         }
+
+        function showPopoverLater(e) {
+          var url = '/api/private/gh/repos/'+repo+'/commits/'+sha+'?renderPatchIfSingle=true';
+          $.get(url, function(commit) {
+            model.set(commit);
+          }).fail(function(err) {
+            model.set('error', err.status);
+          });
+
+          Popover.hoverTimeout(e, function() {
+            var popover = new Popover({
+              titleView: new TitleView({model: model}),
+              view: new BodyView({model: model}),
+              footerView: new FooterView({repo: repo, sha: sha}),
+              targetElement: e.target,
+              placement: 'horizontal'
+            });
+
+            popover.show();
+
+            Popover.singleton(view, popover);
+          });
+        }
+
+        var $commit = $(this);
+        var repo = $commit.data('commitRepo');
+        var sha = $commit.data('commitSha');
+
+        if(!repo || !sha) return;
+
+        var model = new Backbone.Model({
+          repo: repo,
+          sha: sha,
+          html_url: 'https://github.com/'+repo+'/commit/'+sha
+        });
+
+        $commit.on('click', showPopover);
+        $commit.on('mouseover', showPopoverLater);
+
+        view.addCleanup(function() {
+          $commit.off('click', showPopover);
+          $commit.off('mouseover', showPopoverLater);
+        });
+
       });
-
     }
-
   };
 
   return decorator;
