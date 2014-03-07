@@ -38,69 +38,81 @@ define([
     $el.replaceWith($el.text());
   }
 
-  function preparePopover($issue, url) {
-    $.get(url, function(issue) {
-      if(!issue.state) return;
-
-      // dont change the issue state colouring for the activity feed
-      if(!$issue.hasClass('open') && !$issue.hasClass('closed')) {
-        $issue.addClass(issue.state);
-      }
-
-      var issueModel = new Backbone.Model(issue);
-      issueModel.set('date', moment(issue.created_at).format("LLL"));
-
-      $issue.on('mouseover', function(e) {
-        Popover.hoverTimeout(e, function() {
-          var pop = new Popover({
-            titleView: new IssuePopoverTitleView({model: issueModel}),
-            view: new IssuePopoverView({model: issueModel}),
-            targetElement: $issue[0],
-            placement: 'horizontal'
-          });
-          pop.show();
-        });
-      });
-
-    }).fail(function(error) {
-      if(error.status === 404) {
-        plaintextify($issue);
-      }
-    });
-  }
-
   var decorator = {
 
-    decorate: function(chatItemView) {
+    decorate: function(view) {
       var roomRepo = getRoomRepo();
 
-      chatItemView.$el.find('*[data-link-type="issue"]').each(function() {
+      view.$el.find('*[data-link-type="issue"]').each(function() {
         var $issue = $(this);
 
-        var repo = this.dataset.issueRepo || roomRepo;
-        var issueNumber = this.dataset.issue;
+        var repo = $issue.data('issueRepo') || roomRepo;
+        var issueNumber = $issue.data('issue');
 
         if(!repo || !issueNumber) {
           // this aint no issue I ever saw
           plaintextify($issue);
-        } else {
-          this.target = "github";
-
-          var href = $issue.attr('href');
-          if(!href || href === '#') {
-            $issue.attr('href', 'https://github.com/'+repo+'/issues/'+issueNumber);
-          }
-
-          if(repo.toLowerCase() === roomRepo.toLowerCase()) {
-            preparePopover($issue,'/api/v1/troupes/'+context.getTroupeId()+'/issues/'+issueNumber+'?renderMarkdown=true');
-          } else {
-            preparePopover($issue,'/api/private/gh/repos/'+repo+'/issues/'+issueNumber+'?renderMarkdown=true');
-          }
+          return;
         }
+
+        var url;
+        if(repo.toLowerCase() === roomRepo.toLowerCase()) {
+          url = '/api/v1/troupes/'+context.getTroupeId()+'/issues/'+issueNumber+'?renderMarkdown=true';
+        } else {
+          url = '/api/private/gh/repos/'+repo+'/issues/'+issueNumber+'?renderMarkdown=true';
+        }
+
+        $.get(url, function(issue) {
+
+          function showPopover(e) {
+            var popover = new Popover({
+              titleView: new IssuePopoverTitleView({model: issueModel}),
+              view: new IssuePopoverView({model: issueModel}),
+              targetElement: e.target,
+              placement: 'horizontal'
+            });
+
+            popover.show();
+            Popover.singleton(view, popover);
+          }
+
+          function showPopoverLater(e) {
+            Popover.hoverTimeout(e, function() {
+              var popover = new Popover({
+                titleView: new IssuePopoverTitleView({model: issueModel}),
+                view: new IssuePopoverView({model: issueModel}),
+                targetElement: e.target,
+                placement: 'horizontal'
+              });
+
+              popover.show();
+              Popover.singleton(view, popover);
+            });
+          }
+
+          // dont change the issue state colouring for the activity feed
+          if(!$issue.hasClass('open') && !$issue.hasClass('closed')) {
+            $issue.addClass(issue.state);
+          }
+
+          var issueModel = new Backbone.Model(issue);
+          issueModel.set('date', moment(issue.created_at).format("LLL"));
+
+          $issue.on('click', showPopover);
+          $issue.on('mouseover', showPopoverLater);
+
+          view.addCleanup(function() {
+            $issue.off('click', showPopover);
+            $issue.off('mouseover', showPopoverLater);
+          });
+
+        }).fail(function(error) {
+          if(error.status === 404) {
+            plaintextify($issue);
+          }
+        });
       });
-
     }
-
   };
 
   return decorator;
