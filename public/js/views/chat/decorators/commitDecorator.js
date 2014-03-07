@@ -106,6 +106,16 @@ define([
     return '…/'+shortPath;
   }
 
+  function createPopover(model, targetElement) {
+    return new Popover({
+      titleView: new TitleView({model: model}),
+      view: new BodyView({model: model}),
+      footerView: new FooterView({model: model}),
+      targetElement: targetElement,
+      placement: 'horizontal'
+    });
+  }
+
   var decorator = {
 
     decorate: function(view) {
@@ -119,16 +129,8 @@ define([
             model.set('error', err.status);
           });
 
-          var popover = new Popover({
-            titleView: new TitleView({model: model}),
-            view: new BodyView({model: model}),
-            footerView: new FooterView({model: model}),
-            targetElement: e.target,
-            placement: 'horizontal'
-          });
-
+          var popover = createPopover(model, e.target);
           popover.show();
-
           Popover.singleton(view, popover);
         }
 
@@ -141,16 +143,8 @@ define([
           });
 
           Popover.hoverTimeout(e, function() {
-            var popover = new Popover({
-              titleView: new TitleView({model: model}),
-              view: new BodyView({model: model}),
-              footerView: new FooterView({model: model}),
-              targetElement: e.target,
-              placement: 'horizontal'
-            });
-
+            var popover = createPopover(model, e.target);
             popover.show();
-
             Popover.singleton(view, popover);
           });
         }

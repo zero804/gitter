@@ -38,6 +38,15 @@ define([
     $el.replaceWith($el.text());
   }
 
+  function createPopover(model, targetElement) {
+    return new Popover({
+      titleView: new IssuePopoverTitleView({model: model}),
+      view: new IssuePopoverView({model: model}),
+      targetElement: targetElement,
+      placement: 'horizontal'
+    });
+  }
+
   var decorator = {
 
     decorate: function(view) {
@@ -65,26 +74,14 @@ define([
         $.get(url, function(issue) {
 
           function showPopover(e) {
-            var popover = new Popover({
-              titleView: new IssuePopoverTitleView({model: issueModel}),
-              view: new IssuePopoverView({model: issueModel}),
-              targetElement: e.target,
-              placement: 'horizontal'
-            });
-
+            var popover = createPopover(issueModel, e.target);
             popover.show();
             Popover.singleton(view, popover);
           }
 
           function showPopoverLater(e) {
             Popover.hoverTimeout(e, function() {
-              var popover = new Popover({
-                titleView: new IssuePopoverTitleView({model: issueModel}),
-                view: new IssuePopoverView({model: issueModel}),
-                targetElement: e.target,
-                placement: 'horizontal'
-              });
-
+              var popover = createPopover(issueModel, e.target);
               popover.show();
               Popover.singleton(view, popover);
             });
