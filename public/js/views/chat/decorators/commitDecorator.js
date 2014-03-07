@@ -66,18 +66,20 @@ define([
   });
 
   var FooterView = Backbone.View.extend({
-    initialize: function(options) {
-      this.mentionText = options.repo+'@'+options.sha.substring(0,7);
+    className: 'commit-popover-footer',
+    initialize: function() {
+      this.listenTo(this.model, 'change', this.render);
     },
     events: {
       'click button.mention': 'onMentionClick'
     },
     render: function() {
-      this.$el.html(footerTemplate());
+      this.$el.html(footerTemplate(this.model.toJSON()));
       return this;
     },
     onMentionClick: function() {
-      appEvents.trigger('input.append', this.mentionText);
+      var mentionText = this.model.get('repo')+'@'+this.model.get('sha').substring(0,7);
+      appEvents.trigger('input.append', mentionText);
       this.parentPopover.hide();
     }
   });
@@ -120,7 +122,7 @@ define([
           var popover = new Popover({
             titleView: new TitleView({model: model}),
             view: new BodyView({model: model}),
-            footerView: new FooterView({repo: repo, sha: sha}),
+            footerView: new FooterView({model: model}),
             targetElement: e.target,
             placement: 'horizontal'
           });
@@ -142,7 +144,7 @@ define([
             var popover = new Popover({
               titleView: new TitleView({model: model}),
               view: new BodyView({model: model}),
-              footerView: new FooterView({repo: repo, sha: sha}),
+              footerView: new FooterView({model: model}),
               targetElement: e.target,
               placement: 'horizontal'
             });
