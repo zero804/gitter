@@ -8,6 +8,23 @@ define([
 ], function( $, _, TroupeViews, Mutant, popoverTemplate) {
   "use strict";
 
+  var ARROW_WIDTH_PX = 10;
+
+  var HOVER_DELAY = 750;
+
+  var DEFAULTS = {
+    animation: true,
+    selector: false,
+    title: '',
+    footerView: null,
+    delay: 300,
+    container: false,
+    placement: 'right',
+    scroller: null,
+    width: '',
+    minHeight: ''
+  };
+
   function findMaxZIndex(element) {
     var max = 0;
     while(element && element != document) {
@@ -32,25 +49,14 @@ define([
   var Popover = TroupeViews.Base.extend({
     template: popoverTemplate,
     className: "popover",
-    options: {
-      animation: true,
-      selector: false,
-      title: '',
-      footerView: null,
-      delay: 300,
-      container: false,
-      placement: 'right',
-      scroller: null,
-      width: '',
-      minHeight: ''
-    },
     initialize: function(options) {
       _.bindAll(this, 'leave', 'enter');
-      _.extend(this.options, options);
+      this.options = _.extend({}, DEFAULTS, options);
       //this.init('popover', element, options);
       this.view = this.options.view;
       this.titleView = this.options.titleView;
       this.title = this.options.title;
+      this.footerView = this.options.footerView;
 
       if(this.options.scroller) {
         this.$scroller = $(this.options.scroller);
@@ -92,7 +98,7 @@ define([
       $e.find('.popover-content').append(this.view.render().el);
       $e.find('.popover-inner').css('width', this.options.width).css('min-height', this.options.minHeight);
 
-      var fv = this.options.footerView;
+      var fv = this.footerView;
 
       if(fv) {
         fv.parentPopover = this;
@@ -157,7 +163,7 @@ define([
       try {
         var $e = this.$el;
         var e = this.el;
-        var pos = this.getPosition();
+        var pos = this.getTargetPosition();
 
         var actualWidth = e.offsetWidth;
         var actualHeight = e.offsetHeight;
@@ -181,7 +187,7 @@ define([
             tp = {top: pos.top - actualHeight, left: pos.left + pos.width / 2 - actualWidth / 2 - 2};
             break;
           case 'left':
-            tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left - actualWidth};
+            tp = {top: pos.top + pos.height / 2 - actualHeight / 2, right: (document.body.clientWidth - pos.left) + ARROW_WIDTH_PX};
             break;
           case 'right':
             tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width};
@@ -269,8 +275,20 @@ define([
         }
       }
 
+      var newPosition = {
+        top: offset.top
+      };
+
+      if(offset.right) {
+        newPosition.left = 'initial';
+        newPosition.right = offset.right;
+      } else {
+        newPosition.left = offset.left;
+        newPosition.right = 'initial';
+      }
+
       $e
-        .css({ top: offset.top, left: offset.left })
+        .css(newPosition)
         .addClass(placement)
         .addClass('in');
 
@@ -315,7 +333,7 @@ define([
       return this;
     },
 
-    getPosition: function () {
+    getTargetPosition: function () {
       var el = this.targetElement;
 
       var pos = _.extend({}, el.getBoundingClientRect(), this.$targetElement.offset());
@@ -340,7 +358,7 @@ define([
     var timeout = setTimeout(function() {
       if(!timeout) return;
       callback.call(scope, e);
-    }, 500);
+    }, HOVER_DELAY);
 
     $(e.target).one('mouseout click', function() {
       clearTimeout(timeout);

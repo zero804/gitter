@@ -45,7 +45,7 @@ module.exports = exports = function processChat(text) {
     return href;
   }
 
-  function getGitHubIssueData(href) {
+  function getGitHubData(href) {
     var urlObj = url.parse(href);
 
     if(urlObj.hostname === 'github.com') {
@@ -53,8 +53,15 @@ module.exports = exports = function processChat(text) {
       var pathParts = urlObj.pathname.split('/');
       if(pathParts[3] === 'issues' && pathParts[4]) {
         return {
+          type: 'issue',
           repo: pathParts[1]+'/'+pathParts[2],
           number: pathParts[4]
+        };
+      } else if(pathParts[3] === 'commit' && pathParts[4]) {
+        return {
+          type: 'commit',
+          repo: pathParts[1]+'/'+pathParts[2],
+          sha: pathParts[4]
         };
       }
     }
@@ -79,20 +86,34 @@ module.exports = exports = function processChat(text) {
       repo: repo ? repo : undefined
     });
 
-    var out = '<a data-link-type="issue" data-issue="' + issue + '"';
+    var out = '<span data-link-type="issue" data-issue="' + issue + '"';
     if(repo) {
       out += util.format(' data-issue-repo="%s"', repo);
     }
-    out += ' class="issue">' + text + '</a>';
+    out += ' class="issue">' + text + '</span>';
+    return out;
+  };
+
+  renderer.commit = function(repo, sha) {
+    var text = repo+'@'+sha.substring(0, 7);
+    var out = '<span data-link-type="commit" ' +
+              'data-commit-sha="' + sha + '" ' +
+              'data-commit-repo="' + repo + '" ' +
+              'class="commit">' + text + '</span>';
     return out;
   };
 
   renderer.link = function(href, title, text) {
     href = checkForIllegalUrl(href);
-    var issueData = getGitHubIssueData(href);
-    if(issueData) {
-      var issueText = issueData.repo+'#'+issueData.number;
-      return renderer.issue(issueData.repo, issueData.number, issueText);
+    var githubData = getGitHubData(href);
+    if(githubData) {
+      if(githubData.type === 'issue') {
+        var issueText = githubData.repo+'#'+githubData.number;
+        return renderer.issue(githubData.repo, githubData.number, issueText);
+      } else if(githubData.type === 'commit') {
+        return renderer.commit(githubData.repo, githubData.sha);
+      }
+
     } else {
       urls.push({ url: href });
       return util.format('<a href="%s" rel="nofollow" target="_new" class="link">%s</a>', href, text);  

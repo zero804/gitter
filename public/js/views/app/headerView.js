@@ -6,8 +6,8 @@ define([
   'hbs!./tmpl/headerViewTemplate',
   'autolink',
   'components/notifications',
-  'bootstrap-dropdown' // No ref
-], function($, context, Marionette, headerViewTemplate, autolink, notifications)  {
+  'views/controls/dropdown'
+], function($, context, Marionette, headerViewTemplate, autolink, notifications, Dropdown)  {
   "use strict";
 
   return Marionette.ItemView.extend({
@@ -15,7 +15,12 @@ define([
     modelEvents: {
         'change': 'render'
     },
+    ui: {
+      cog: '.dropdown-toggle',
+      dropdownMenu: '#cog-dropdown'
+    },
     events: {
+      'click @ui.cog': 'showDropdown',
       'click #leave-room': 'leaveRoom',
       'click #activity-feed-toggle' : 'toggleActivityFeed',
       'click #notifications-settings-link': 'enableBrowserNotifications'
@@ -23,6 +28,10 @@ define([
 
     initialize: function() {
       this.showActivity = true;
+    },
+
+    showDropdown: function() {
+      this.dropdown.show();
     },
 
     leaveRoom: function() {
@@ -75,6 +84,9 @@ define([
     },
 
     onRender: function() {
+      if(!this.dropdown) {
+        this.dropdown = new Dropdown({ targetElement: this.ui.cog[0], el: this.ui.dropdownMenu[0] });
+      }
       autolink(this.el);
     }
   });

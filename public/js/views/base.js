@@ -475,12 +475,15 @@ define([
       if(this.options.disableClose) return;
       var that = this;
       if (this.isShown && this.options.keyboard) {
-        $(document).on('keyup', function ( e ) {
-          if(e.which == 27) that.hide();
-        });
+        $(document).on('keydown', keydown);
       } else if (!this.isShown) {
-        $(document).off('keyup');
+        $(document).off('keydown', keydown);
       }
+
+      function keydown( e ) {
+        if(e.which == 27) that.hide();
+      }
+
     }
   });
 

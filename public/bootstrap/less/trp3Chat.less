@@ -1,5 +1,6 @@
 @import "oembed-gist.less";
 @import "highlight.less";
+@import "icon-mixins.less";
 
 // originally from leedo/noembed
 // https://github.com/leedo/noembed/blob/12280d9cef26b1c9c8987e7e11fd381662dafd8a/share/styles/Gist.css
@@ -38,6 +39,77 @@ img.emoji {
   padding: 0 4px;
   font-size: 13px;
   color: black;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.commit {
+  border: 1px solid fade(@trpAsbestos,30%);
+  background-color: fade(@trpAsbestos,20%);
+  border-radius: 2px;
+  padding: 0 4px;
+  font-size: 13px;
+  color: black;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.gtrActivityItemText .commit {
+  font-size: 11px;
+}
+
+.commit-popover-title {
+  display: inline-block;
+  width: 100%;
+  -moz-box-sizing: border-box;
+       box-sizing: border-box;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.commit-popover-body {
+  float: left;
+  width: 100%;
+
+  ul.file-list {
+    list-style: none;
+    margin-left: 0;
+  }
+  .modified {
+    .prepend-diff-modified();
+    font-size: small;
+    &:before {
+      color: @trpYellow;
+    }
+  }
+  .added {
+    .prepend-diff-added();
+    font-size: small;
+    &:before {
+      color: @trpGreen;
+    }
+  }
+  .removed {
+    .prepend-diff-removed();
+    font-size: small;
+    &:before {
+      color: @trpRed;
+    }
+  }
+}
+
+.popover-footer a.open-in-github {
+  float: right;
+  line-height: 22px;
+  &:hover{
+    text-decoration: none;
+  }
+}
+
+.commit:hover {
+  text-decoration: none;
+  background-color: fade(@trpAsbestos, 40%);
 }
 
 .gtrActivityItemText .issue {

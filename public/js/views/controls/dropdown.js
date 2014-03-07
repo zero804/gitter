@@ -1,21 +1,40 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
+  'underscore',
   'marionette',
   'views/base',
   'cocktail',
+  'mutant',
   'hbs!./tmpl/dropdown',
   'hbs!./tmpl/dropdownItem',
   'hbs!./tmpl/dropdownEmpty'
-], function($, Marionette, TroupeViews, cocktail, template, itemTemplate, emptyTemplate) {
+], function($, _, Marionette, TroupeViews, cocktail, Mutant, template, itemTemplate, emptyTemplate) {
   "use strict";
+
+  function findMaxZIndex(element) {
+    var max = 0;
+    while(element && element != document) {
+      var style = window.getComputedStyle(element, null);
+
+      if(style) {
+        var zIndex = style.getPropertyValue('z-index');
+        if(zIndex && zIndex !== "auto") {
+          zIndex = parseInt(zIndex, 10);
+          if(zIndex > max) {
+            max = zIndex;
+          }
+        }
+      }
+
+      element = element.parentNode;
+    }
+
+    return max;
+  }
 
   var backdrop = '.dropdown-backdrop';
   // var toggle   = '[data-toggle=dropdown]';
-
-  var EmptyView = Marionette.ItemView.extend({
-    template: emptyTemplate
-  });
 
   var RowView = Marionette.ItemView.extend({
     tagName: "li",
@@ -46,19 +65,18 @@ define([
   var activeDropdown = null;
 
 
-  var View = Marionette.CompositeView.extend({
-    itemViewContainer: "ul.dropdown-menu",
+  var DropdownMenuView = Marionette.CollectionView.extend({
     itemView: RowView,
-    emptyView: EmptyView,
-    template: template,
+    tagName: 'ul',
+    className: 'dropdown dropdown-hidden',
     ui: {
-      menu: 'ul.dropdown-menu'
+      menu: 'ul.dropdown'
     },
     events: {
       'keydown': 'keydown',
       'mouseover li:not(.divider):visible': 'mouseover'
     },
-    className: 'dropdown',
+    // className: 'dropdown',
     itemEvents: {
       'selected': function(e, target, model) {
         // Forward 'selected' events
@@ -72,11 +90,66 @@ define([
       }
       return options;
     },
-    active: function() {
-      return this.$el.hasClass('open');
+
+    initialize: function(options) {
+
+      this.targetElement = options.targetElement;
+      this.$targetElement = $(this.targetElement);
     },
-    show: function() {
+    active: function() {
+      return !this.$el.hasClass('dropdown-hidden');
+    },
+
+    onRender: function() {
+      this.el.style.zIndex = findMaxZIndex(this.targetElement) + 5;
+    },
+    onClose: function() {
+      if(this.mutant) this.mutant.disconnect();
+    },
+
+    getPosition: function () {
+      var el = this.targetElement;
+
+      var pos = _.extend({}, el.getBoundingClientRect(), this.$targetElement.offset());
+
+      return pos;
+    },
+
+    hasItems: function() {
+      if(this.collection) return this.collection.length > 0;
+
+      // Static mode
+      return true;
+    },
+
+    onAfterItemAdded: function() {
+      setTimeout(function() {
+        if(!this.active() && this.showWhenItems && this.hasItems()) {
+          this.show();
+        }
+      }.bind(this), 10);
+    },
+
+    onItemRemoved: function() {
+      setTimeout(function() {
+        if(!this.hasItems()) {
+          this.hide();
+          this.showWhenItems = true;
+        }
+      }.bind(this), 10);
+    },
+
+    show: function () {
       if(this.active()) return;
+
+      if(!this.hasItems()) {
+        this.showWhenItems = true;
+        return;
+      }
+
+      var $e = this.render().$el;
+      var e = this.el;
+
 
       $(backdrop).remove();
       if(activeDropdown) {
@@ -87,7 +160,8 @@ define([
 
       activeDropdown = this;
 
-      $('<div class="dropdown-backdrop"/>').insertAfter(this.$el).on('click', function() {
+      var zIndex = parseInt(this.el.style.zIndex, 10);
+      $('<div class="dropdown-backdrop"/>').css({ zIndex: zIndex - 1 }).insertAfter(this.$el).on('click', function() {
         $(backdrop).remove();
         if(activeDropdown) {
           var t = activeDropdown;
@@ -96,21 +170,67 @@ define([
         }
       });
 
-      this.trigger('show.bs.dropdown');
 
-      this.$el
-        .addClass('open');
+      $e.detach().css({ top: 0, left: 0, display: 'block' });
+      $e.appendTo($('body'));
+      this.reposition();
 
-      this.trigger('shown.bs.dropdown');
+      $e.removeClass('dropdown-hidden');
 
-      this.$el.focus();
+      if(!this.mutant) {
+        this.mutant = new Mutant(e, this.reposition, { scope: this, timeout: 20 });
+      }
     },
+
     hide: function() {
+      this.showWhenItems = false;
       if(!this.active()) return;
       this.$el.find('li.active:not(.divider):visible').removeClass('active');
-      this.$el.removeClass('open');
+      this.$el.addClass('dropdown-hidden');
       activeDropdown = null;
     },
+
+    reposition: function() {
+      try {
+        var e = this.el;
+        var pos = this.getPosition();
+
+        var actualWidth = e.offsetWidth;
+
+        // var tp = {top: pos.top + pos.height, left: pos.left};
+        var tp = {top: pos.top + pos.height, left: pos.left - actualWidth + pos.width };
+        this.applyPlacement(tp);
+      } finally {
+        // This is very important. If you leave it out, Chrome will likely crash.
+        if(this.mutant) this.mutant.takeRecords();
+      }
+    },
+
+    applyPlacement: function(offset){
+      var $e = this.$el;
+      var e = $e[0];
+
+      var actualWidth;
+      var actualHeight;
+      var delta = 0;
+      var replace;
+
+
+      /* Adjust */
+      if ('left' in offset && offset.left < 0) {
+        delta = offset.left * -2;
+        offset.left = 0;
+      }
+
+      $e
+        .css(offset);
+
+      actualWidth = e.offsetWidth;
+      actualHeight = e.offsetHeight;
+      if (replace) $e.offset(offset);
+    },
+
+
     toggle: function () {
       var isActive = this.active();
       if(isActive) {
@@ -194,7 +314,7 @@ define([
       }
     }
   });
-  cocktail.mixin(View, TroupeViews.SortableMarionetteView);
+  cocktail.mixin(DropdownMenuView, TroupeViews.SortableMarionetteView);
 
-  return View;
+  return DropdownMenuView;
 });
