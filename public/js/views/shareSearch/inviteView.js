@@ -14,8 +14,21 @@ define([
   var View = TroupeViews.Base.extend({
     template: template,
 
-    initialize: function(options) {
+    initialize: function() {
+      this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
+    },
 
+    menuItemClicked: function(button) {
+      switch(button) {
+        case 'add':
+          this.dialog.hide();
+          window.location.href = window.location.href + "#add";
+          break;
+
+        case 'cancel':
+          this.dialog.hide();
+          break;
+      }
     },
 
     getShareUrl: function() {
@@ -91,7 +104,11 @@ define([
 
       TroupeViews.Modal.prototype.initialize.call(this, options);
       this.view = new View(options);
-    }
+    },
+    menuItems: [
+      { action: "cancel", text: "Close", className: "trpBtnLightGrey" },
+      { action: "add", text: "Add people", className: "trpBtnBlue trpBtnRight"}
+    ]
   });
 
   return {
