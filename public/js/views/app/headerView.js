@@ -85,7 +85,7 @@ define([
 
     onRender: function() {
       if(!this.dropdown) {
-        this.dropdown = new Dropdown({ targetElement: this.ui.cog[0], el: this.ui.dropdownMenu[0] });
+        this.dropdown = new Dropdown({ targetElement: this.ui.cog[0], el: this.ui.dropdownMenu[0], placement: 'right' });
       }
       autolink(this.el);
     }

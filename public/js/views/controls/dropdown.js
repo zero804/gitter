@@ -64,6 +64,9 @@ define([
 
   var activeDropdown = null;
 
+  var DEFAULTS = {
+    placement: 'left'
+  };
 
   var DropdownMenuView = Marionette.CollectionView.extend({
     itemView: RowView,
@@ -74,7 +77,8 @@ define([
     },
     events: {
       'keydown': 'keydown',
-      'mouseover li:not(.divider):visible': 'mouseover'
+      'mouseover li:not(.divider):visible': 'mouseover',
+      'click li a': 'clicked'
     },
     // className: 'dropdown',
     itemEvents: {
@@ -90,23 +94,26 @@ define([
       }
       return options;
     },
-
     initialize: function(options) {
-
       this.targetElement = options.targetElement;
       this.$targetElement = $(this.targetElement);
+      this.options = _.extend({}, DEFAULTS, options);
     },
     active: function() {
       return !this.$el.hasClass('dropdown-hidden');
     },
-
     onRender: function() {
       this.el.style.zIndex = findMaxZIndex(this.targetElement) + 5;
     },
     onClose: function() {
       if(this.mutant) this.mutant.disconnect();
     },
-
+    clicked: function() {
+      if(!this.collection) {
+        /* Static */
+        this.hide();
+      }
+    },
     getPosition: function () {
       var el = this.targetElement;
 
@@ -178,7 +185,7 @@ define([
       $e.removeClass('dropdown-hidden');
 
       if(!this.mutant) {
-        this.mutant = new Mutant(e, this.reposition, { scope: this, timeout: 20 });
+        this.mutant = new Mutant(e, this.mutationReposition, { scope: this, timeout: 20 });
       }
     },
 
@@ -190,20 +197,34 @@ define([
       activeDropdown = null;
     },
 
-    reposition: function() {
+    mutationReposition: function() {
       try {
-        var e = this.el;
-        var pos = this.getPosition();
-
-        var actualWidth = e.offsetWidth;
-
-        // var tp = {top: pos.top + pos.height, left: pos.left};
-        var tp = {top: pos.top + pos.height, left: pos.left - actualWidth + pos.width };
-        this.applyPlacement(tp);
+        if(!this.active()) return;
+        this.reposition();
       } finally {
         // This is very important. If you leave it out, Chrome will likely crash.
         if(this.mutant) this.mutant.takeRecords();
       }
+    },
+
+    reposition: function() {
+      var e = this.el;
+      var pos = this.getPosition();
+
+      var actualWidth = e.offsetWidth;
+
+      var left;
+      if(this.options.placement === 'left') {
+        left = pos.left;
+      } else {
+        left = pos.left - actualWidth + pos.width;
+      }
+
+      console.log('LEFT IS ', left);
+      console.log('POS IS ', pos);
+
+      var tp = {top: pos.top + pos.height, left: left};
+      this.applyPlacement(tp);
     },
 
     applyPlacement: function(offset){
