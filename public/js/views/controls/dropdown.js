@@ -34,7 +34,6 @@ define([
   }
 
   var backdrop = '.dropdown-backdrop';
-  // var toggle   = '[data-toggle=dropdown]';
 
   var RowView = Marionette.ItemView.extend({
     tagName: "li",
@@ -80,7 +79,6 @@ define([
       'mouseover li:not(.divider):visible': 'mouseover',
       'click li a': 'clicked'
     },
-    // className: 'dropdown',
     itemEvents: {
       'selected': function(e, target, model) {
         // Forward 'selected' events
@@ -103,7 +101,11 @@ define([
       return !this.$el.hasClass('dropdown-hidden');
     },
     onRender: function() {
-      this.el.style.zIndex = findMaxZIndex(this.targetElement) + 5;
+      var zIndex = findMaxZIndex(this.targetElement) + 5;
+      if(zIndex < 100) {
+        zIndex = 100;
+      }
+      this.el.style.zIndex = zIndex;
     },
     onClose: function() {
       if(this.mutant) this.mutant.disconnect();

@@ -40,6 +40,18 @@ define([
       this.attach();
     },
 
+    show: function() {
+      if(this.lastFetchInput === undefined) {
+        this.inputChangeDebounced();
+      }
+
+      this.dropdown.show();
+    },
+
+    hide: function() {
+      this.dropdown.hide();
+    },
+
     attach: function() {
       if(this.dropdown) return;
       this.dropdown = new Dropdown({ collection: this.collection, itemTemplate: this.options.itemTemplate, targetElement: this.el });

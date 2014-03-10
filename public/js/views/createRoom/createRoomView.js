@@ -26,6 +26,10 @@ define([
       roomNameInput: '#room-name'
     },
 
+    events: {
+
+    },
+
     regions: {
       ownerSelect: '#owner-region',
     },
@@ -136,8 +140,8 @@ define([
           case 'org':
           case 'repo':
             this.ui.permInheritedLabel.text(model.get('type') === 'repo' ? 'Repository' : 'Organisation');
-            show = [this.ui.autoJoin, this.ui.permPublic, this.ui.permPrivate, this.ui.permInherited];
-            hide = [this.ui.selectParentRequired];
+            show = [/*this.ui.autoJoin, */this.ui.permPublic, this.ui.permPrivate, this.ui.permInherited];
+            hide = [this.ui.selectParentRequired, /* REMOVE */this.ui.autoJoin];
             placeholder = "Required";
             break;
           case 'user':
@@ -171,9 +175,9 @@ define([
         orgsCollection: troupeCollections.orgs,
         troupesCollection: troupeCollections.troupes
       });
+
       this.parentSelect = parentSelect;
       this.ownerSelect.show(parentSelect);
-
 
       this.listenTo(parentSelect, 'selected', this.parentSelected);
 
