@@ -190,3 +190,17 @@ function suggestedReposForUser(user) {
 
 }
 exports.suggestedReposForUser = suggestedReposForUser;
+
+function findPublicReposWithRoom(user, query, options) {
+  if(!options) options = {};
+
+  var ghRepo  = new GithubRepo(user);
+  var q = new RegExp(query, 'i');
+  return persistence.Troupe.findQ({lcUri: q, githubType: 'REPO'}).then(function(troupes) {
+    return Q.all(troupes.map(function(troupe) { return ghRepo.getRepo(troupe.uri); })).then(function(repos) {
+      return repos.filter(function(repo) { return repo ? !repo.private : null; });
+    });
+  });
+}
+
+exports.findPublicReposWithRoom = findPublicReposWithRoom;
