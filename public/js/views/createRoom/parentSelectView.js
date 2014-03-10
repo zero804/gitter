@@ -6,8 +6,9 @@ define([
   'hbs!./tmpl/parentSelectView',
   'hbs!./tmpl/parentItemView',
   'views/controls/dropdown',
+  'views/controls/typeahead',
   'backbone'
-], function(_, Marionette, context, template, itemTemplate, Dropdown, Backbone) {
+], function(_, Marionette, context, template, itemTemplate, Dropdown, Typeahead, Backbone) {
   "use strict";
 
   var ItemModel = Backbone.Model.extend({
@@ -51,6 +52,7 @@ define([
   return Marionette.Layout.extend({
     events: {
       'focus @ui.input':    'show',
+      'click @ui.input':    'show',
       'keydown @ui.input':  'keydown',
       'change @ui.input': 'change',
       'cut @ui.input': 'change',
@@ -58,9 +60,6 @@ define([
       'input @ui.input': 'change',
       'keypress @ui.input': 'keypress',
       'keyup @ui.input':    'keyup'
-    },
-    regions: {
-      dropdownRegion: '#dd-region',
     },
     ui: {
       input: "input#input-parent",
@@ -71,8 +70,6 @@ define([
     initialize: function(options) {
       this.orgsCollection = options.orgsCollection;
       this.troupesCollection = options.troupesCollection;
-
-      this.refilterInput = _.throttle(_.bind(this.refilterInput, this), 50);
 
       this.dropdownItems = new Backbone.Collection({ });
       this.dropdownItems.comparator = function(a, b) {
@@ -96,14 +93,17 @@ define([
         return compare(a.get('name').toLowerCase(), b.get('name').toLowerCase());
       };
 
-
       this.listenTo(this.orgsCollection, 'add remove change reset sync', this.reset);
       this.listenTo(this.troupesCollection, 'add remove change reset sync', this.reset);
     },
 
     selected: function(m) {
       this.ui.input.val(m.get('uri'));
-      this.dropdown.hide();
+
+      if(this.typeahead) {
+        this.typeahead.hide();
+      }
+
       if  (m.get('type') === 'repo') {
         this.ui.avatar.css("background-image", "url(../../images/2/gitter/icon-repo.png)");
       } else {
@@ -114,69 +114,22 @@ define([
     },
 
     onRender: function() {
-      if(!this.dropdown) {
-        this.dropdown = new Dropdown({ collection: this.dropdownItems, itemTemplate: itemTemplate, targetElement: this.ui.input[0] });
-        this.listenTo(this.dropdown, 'selected', this.selected);
-        this.dropdownRegion.show(this.dropdown);
+      if(!this.typeahead) {
+        this.typeahead = new Typeahead({ fetch: this.refilter.bind(this), collection: this.dropdownItems, itemTemplate: itemTemplate, el: this.ui.input[0] });
+        this.listenTo(this.typeahead, 'selected', this.selected);
       }
     },
 
-    keyup: function(e) {
-      if(e.keyCode === 27) {
-        e.stopPropagation();
-        e.preventDefault();
-        return;
-      }
-    },
-
-    change: function() {
-      var self = this;
-      this.dropdown.show();
-
-      setTimeout(function() {
-        self.refilterInput();
-      }, 1);
-    },
-
-    keydown: function(e) {
-      switch(e.keyCode) {
-        case 13:
-          this.dropdown.select();
-          break;
-
-        case 38:
-          this.dropdown.selectPrev();
-          break;
-
-        case 40:
-          this.dropdown.show();
-          this.dropdown.selectNext();
-          break;
-
-        case 27:
-          this.dropdown.hide();
-          break;
-
-        default:
-          return;
-      }
-
-      e.stopPropagation();
-      e.preventDefault();
+    onClose: function() {
+      this.typeahead.close();
     },
 
     show: function() {
-      this.dropdown.show();
-      this.refilterInput();
+      this.typeahead.show();
     },
 
     hide: function() {
-      // this.dropdown.hide();
-    },
-
-    refilterInput: function() {
-      var query = this.ui.input.val();
-      this.refilter(query);
+      this.dropdown.hide();
     },
 
     selectUri: function(uri) {
@@ -216,7 +169,7 @@ define([
 
     },
 
-    refilter: function(query) {
+    refilter: function(query, collection) {
       var self = this;
       var results;
 
@@ -234,11 +187,7 @@ define([
         }
       }
 
-      this.dropdownItems.set(results, { add: true, remove: true, merge: true });
-
-      // if(select) {
-      //   // this.dropdown.chooseModel(select);
-      // }
+      collection.set(results, { add: true, remove: true, merge: true });
 
       function defaultResults() {
 

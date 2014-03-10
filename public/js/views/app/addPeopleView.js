@@ -50,8 +50,6 @@ define([
       select: '#select-button'
     },
 
-    events: {
-    },
     itemEvents: {
       "remove:clicked": function(event, view) {
         this.collection.remove(view.model);
