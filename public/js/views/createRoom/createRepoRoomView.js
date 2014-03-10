@@ -11,30 +11,21 @@ define([
   var View = Marionette.Layout.extend({
     template: template,
 
-    ui: {
-
-    },
-
-    events: {
-      // 'change @ui.roomNameInput': 'roomNameChange',
-      // 'cut @ui.roomNameInput': 'roomNameChange',
-      // 'paste @ui.roomNameInput': 'roomNameChange',
-      // 'input @ui.roomNameInput': 'roomNameChange'
-    },
-
     regions: {
       repoSelectRegion: '#repo-select',
     },
 
     initialize: function() {
-      this.repoSelectView = new RepoSelectView();
+      this.repoSelectView = new RepoSelectView({ });
       this.listenTo(this.repoSelectView, 'selected', this.repoSelected);
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
     },
+
     repoSelected: function(r) {
       appEvents.trigger('navigation', '/' + r.get('uri'), 'chat', r.get('name'));
       this.dialog.hide();
     },
+
     menuItemClicked: function(button) {
       switch(button) {
         case 'cancel':
@@ -43,18 +34,11 @@ define([
       }
     },
 
-    validateAndCreate: function() {
-    },
-
     onRender: function() {
       if(!this.repoSelectRegion.currentView) {
         this.repoSelectRegion.show(this.repoSelectView);
       }
-    },
-
-    roomNameChange: function() {
-    },
-
+    }
 
   });
 

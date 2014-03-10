@@ -613,31 +613,13 @@ define([
   // Mixin for Marionette.CollectionView classes
   TroupeViews.LoadingCollectionMixin = {
     loadingView: TroupeViews.LoadingView,
-    loadingModel: new Backbone.Model(),
-    initialize: function() {
-      this.showEmptyView = this.showLoadingView;
-    },
-    showLoadingView: function() {
+    getEmptyView: function() {
       if(this.collection.loading) {
-        var LoadingView = Marionette.getOption(this, "loadingView");
-
-        var v = this.children.findByModel(this.loadingModel);
-
-        if (LoadingView && !v) {
-          this.addItemView(this.loadingModel, LoadingView, 0);
-          this.listenToOnce(this.collection, 'loaded', function() {
-            this.removeItemView(this.loadingModel);
-
-            if(this.collection.length === 0) {
-              Marionette.CollectionView.prototype.showEmptyView.call(this);
-            }
-          });
-        }
-        return;
+        return Marionette.getOption(this, "loadingView");
       }
 
-      return Marionette.CollectionView.prototype.showEmptyView.call(this);
-    }
+      return Marionette.getOption(this, "emptyView");
+    },
   };
 
   TroupeViews.DelayedShowLayoutMixin = {

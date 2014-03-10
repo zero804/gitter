@@ -1,6 +1,7 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'marionette',
+  'underscore',
   'backbone',
   'views/base',
   'collections/base',
@@ -12,11 +13,12 @@ define([
   'views/controls/live-search',
   'filtered-collection' /* no ref */
 
-], function(Marionette, Backbone, TroupeViews, TroupeCollections, template, itemTemplate, repoModels, cocktail, SelectableMixin, liveSearch) {
+], function(Marionette, _, Backbone, TroupeViews, TroupeCollections, template, itemTemplate, repoModels, cocktail, SelectableMixin, liveSearch) {
   "use strict";
 
   var FilteredLoadingCollection = Backbone.FilteredCollection.extend({ });
-  cocktail.mixin(FilteredLoadingCollection, TroupeCollections.LoadingMixin);
+  cocktail.mixin(FilteredLoadingCollection, TroupeCollections.UnderlyingLoadingMixin);
+
 
   var ItemView = Marionette.ItemView.extend({
     template: itemTemplate,
@@ -35,16 +37,22 @@ define([
     itemViewContainer: '#list',
     itemView: ItemView,
     template: template,
-    initialize: function() {
-      var underlying = new repoModels.ReposCollection({ });
-      underlying.fetch();
+    constructor: function(options) {
+      if(!options) options = {};
+      if(!options.collection) {
+        var underlying = new repoModels.ReposCollection({ });
+        underlying.fetch();
 
-      var c = new FilteredLoadingCollection(null, { model: repoModels.RepoModel, collection: underlying });
-      c.setFilter(function(m) {
-        return !m.get('room');
-      });
+        var c = new FilteredLoadingCollection(null, { model: repoModels.RepoModel, collection: underlying });
+        c.setFilter(function(m) {
+          return !m.get('room');
+        });
+        c.loading = true;
 
-      this.collection = c;
+        options.collection = c;
+      }
+
+      return Marionette.CompositeView.call(this, options);
     },
     onRender: function() {
       liveSearch(this, this.ui.search, 'searchTextChanged', { shortDebounce: 50, longDebounce: 200 });
@@ -56,7 +64,7 @@ define([
     }
   });
 
-  cocktail.mixin(View, SelectableMixin, TroupeViews.SortableMarionetteView, TroupeViews.LoadingCollectionMixin);
+  cocktail.mixin(View, TroupeViews.LoadingCollectionMixin, SelectableMixin, TroupeViews.SortableMarionetteView);
 
   return View;
 
