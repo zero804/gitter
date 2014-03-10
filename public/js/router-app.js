@@ -10,6 +10,7 @@ require([
   'components/realtime',
   'views/createRoom/createRoomView',
   'views/createRoom/createRepoRoomView',
+  'views/createRoom/chooseRoomView',
   'views/widgets/preload',                // No ref
   'components/webNotifications',          // No ref
   'components/desktopNotifications',      // No ref
@@ -17,7 +18,7 @@ require([
   'components/bug-reporting',             // No ref
   'components/csrf'                       // No ref
 ], function(appEvents, context, Backbone, AppIntegratedView, TroupeMenuView, troupeCollections,
-  TitlebarUpdater, realtime, createRoomView, createRepoRoomView) {
+  TitlebarUpdater, realtime, createRoomView, createRepoRoomView, chooseRoomView) {
   "use strict";
 
   var chatIFrame = document.getElementById('content-frame');
@@ -97,10 +98,15 @@ require([
       "": "hideModal",
       "customroom": "customroom",
       "createreporoom": "createreporoom",
+      "chooseroom" : "chooseroom"
     },
 
     hideModal: function() {
       appView.dialogRegion.close();
+    },
+
+    chooseroom: function() {
+      appView.dialogRegion.show(new chooseRoomView.Modal());
     },
 
     customroom: function() {
