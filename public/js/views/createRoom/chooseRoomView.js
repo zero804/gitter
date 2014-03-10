@@ -14,7 +14,8 @@ define([
     template: template,
 
     ui: {
-
+      radioCustom: 'input#radio-custom',
+      radioRepo: 'input#radio-repo',
     },
 
     events: {
@@ -32,7 +33,13 @@ define([
     menuItemClicked: function(button) {
       switch(button) {
         case 'next':
-          this.nextScreen();
+          if(this.ui.radioRepo[0].checked) {
+            window.location.hash = "#createreporoom";
+          }
+
+          if(this.ui.radioCustom[0].checked) {
+            window.location.hash = "#createcustomroom";
+          }
           break;
 
         case 'cancel':
@@ -42,7 +49,7 @@ define([
     },
 
     nextScreen: function() {
-      
+
     },
 
     onRender: function() {
@@ -62,7 +69,7 @@ define([
       this.view = new View(options);
     },
     menuItems: [
-      { action: "cancel", text: "Next", className: "trpBtnGreen" },
+      { action: "next", text: "Next", className: "trpBtnGreen" },
       { action: "cancel", text: "Cancel", className: "trpBtnLightGrey"}
     ]
   });
