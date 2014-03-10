@@ -3,6 +3,7 @@ define([
   'marionette',
   'backbone',
   'views/base',
+  'collections/base',
   'hbs!./tmpl/repoSelectView',
   'hbs!./tmpl/repoItemView',
   'collections/repos',
@@ -11,8 +12,11 @@ define([
   'views/controls/live-search',
   'filtered-collection' /* no ref */
 
-], function(Marionette, Backbone, TroupeViews, template, itemTemplate, repoModels, cocktail, SelectableMixin, liveSearch) {
+], function(Marionette, Backbone, TroupeViews, TroupeCollections, template, itemTemplate, repoModels, cocktail, SelectableMixin, liveSearch) {
   "use strict";
+
+  var FilteredLoadingCollection = Backbone.FilteredCollection.extend({ });
+  cocktail.mixin(FilteredLoadingCollection, TroupeCollections.LoadingMixin);
 
   var ItemView = Marionette.ItemView.extend({
     template: itemTemplate,
@@ -35,7 +39,7 @@ define([
       var underlying = new repoModels.ReposCollection({ });
       underlying.fetch();
 
-      var c = new Backbone.FilteredCollection(null, { model: repoModels.RepoModel, collection: underlying });
+      var c = new FilteredLoadingCollection(null, { model: repoModels.RepoModel, collection: underlying });
       c.setFilter(function(m) {
         return !m.get('room');
       });

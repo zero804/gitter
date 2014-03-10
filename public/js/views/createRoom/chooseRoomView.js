@@ -1,29 +1,18 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 
 define([
-  'jquery',
   'marionette',
   'views/base',
-  'utils/context',
   'hbs!./tmpl/chooseRoom',
-  'utils/appevents'
-], function($, Marionette, TroupeViews, context, template, appEvents) {
+], function(Marionette, TroupeViews, template) {
   "use strict";
 
-  var View = Marionette.Layout.extend({
+  var View = Marionette.ItemView.extend({
     template: template,
 
     ui: {
       radioCustom: 'input#radio-custom',
       radioRepo: 'input#radio-repo',
-    },
-
-    events: {
-
-    },
-
-    regions: {
-
     },
 
     initialize: function() {
@@ -47,15 +36,6 @@ define([
           break;
       }
     },
-
-    nextScreen: function() {
-
-    },
-
-    onRender: function() {
-
-    },
-
 
   });
 

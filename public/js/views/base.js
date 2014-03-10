@@ -22,6 +22,7 @@ define([
       this.beforeClose();
     }
     this.remove();
+    this.stopListening();
     this.unbind();
   };
 

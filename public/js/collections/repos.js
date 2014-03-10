@@ -2,8 +2,9 @@
 define([
   'utils/context',
   './base',
-  'backbone'
-], function(context, TroupeCollections, Backbone) {
+  'backbone',
+  'cocktail'
+], function(context, TroupeCollections, Backbone, cocktail) {
   "use strict";
 
   var RepoModel = TroupeCollections.Model.extend({
@@ -21,10 +22,10 @@ define([
         return a < b ? -1 : +1;
       }
 
-
       return compare(a.get('name').toLowerCase(), b.get('name').toLowerCase());
     }
   });
+  cocktail.mixin(ReposCollection, TroupeCollections.LoadingMixin);
 
   return {
     ReposCollection: ReposCollection,
