@@ -96,9 +96,6 @@ define([
         return compare(a.get('name').toLowerCase(), b.get('name').toLowerCase());
       };
 
-      this.dropdown = new Dropdown({ collection: this.dropdownItems, itemTemplate: itemTemplate });
-
-      this.listenTo(this.dropdown, 'selected', this.selected);
 
       this.listenTo(this.orgsCollection, 'add remove change reset sync', this.reset);
       this.listenTo(this.troupesCollection, 'add remove change reset sync', this.reset);
@@ -117,7 +114,11 @@ define([
     },
 
     onRender: function() {
-      this.dropdownRegion.show(this.dropdown);
+      if(!this.dropdown) {
+        this.dropdown = new Dropdown({ collection: this.dropdownItems, itemTemplate: itemTemplate, targetElement: this.ui.input[0] });
+        this.listenTo(this.dropdown, 'selected', this.selected);
+        this.dropdownRegion.show(this.dropdown);
+      }
     },
 
     keyup: function(e) {
