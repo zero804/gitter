@@ -2,6 +2,7 @@
 
 define([
   'jquery',
+  'underscore',
   'marionette',
   'collections/instances/troupes',
   'views/base',
@@ -9,7 +10,7 @@ define([
   './parentSelectView',
   'hbs!./tmpl/createRoom',
   'utils/appevents'
-], function($, Marionette, troupeCollections, TroupeViews, context, ParentSelectView, template, appEvents) {
+], function($, _, Marionette, troupeCollections, TroupeViews, context, ParentSelectView, template, appEvents) {
   "use strict";
 
   var View = Marionette.Layout.extend({
@@ -19,15 +20,23 @@ define([
       autoJoin: "#auto-join",
       permPublic: "#perm-select-public",
       permPrivate: "#perm-select-private",
-      permInherited: "#perm-select-inherited",
+      permInheritedOrg: "#perm-select-inherited-org",
+      permInheritedRepo: "#perm-select-inherited-repo",
+      permExistingRepo: "#perm-select-existing-repo",
+
+
       selectParentRequired: "#perm-select-required",
+      existing: '#existing',
       parentNameLabel: "#parent-name",
       permInheritedLabel: '#perm-inherited-label',
       roomNameInput: '#room-name'
     },
 
     events: {
-
+      'change @ui.roomNameInput': 'roomNameChange',
+      'cut @ui.roomNameInput': 'roomNameChange',
+      'paste @ui.roomNameInput': 'roomNameChange',
+      'input @ui.roomNameInput': 'roomNameChange'
     },
 
     regions: {
@@ -35,7 +44,11 @@ define([
     },
 
     initialize: function() {
-      this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
+      var self = this;
+      self.listenTo(self, 'menuItemClicked', self.menuItemClicked);
+      self.recalcViewDebounced = _.debounce(function() {
+        self.recalcView(true);
+      }, 300);
     },
 
     menuItemClicked: function(button) {
@@ -129,44 +142,129 @@ define([
 
     parentSelected: function(model, animated) {
       this.selectedModel = model;
+      this.recalcView(animated);
+    },
 
-      var hide = [this.ui.autoJoin, this.ui.permPublic, this.ui.permPrivate, this.ui.permInherited];
-      var show = [this.ui.selectParentRequired];
+    recalcView: function(animated) {
+      var self = this;
+      var showHide = {
+        'selectParentRequired': false,
+        'autoJoin': false,
+        'permPublic': false,
+        'permPrivate': false,
+        'permInheritedOrg': false,
+        'permInheritedRepo': false,
+        'permExistingRepo': false,
+        'existing': false
+      };
+
       var placeholder = "";
+      var model = this.selectedModel;
+      var checkForRepo;
+      var parentName = "";
 
       if(model) {
-        this.ui.parentNameLabel.text(model.get('name'));
+        this.ui.parentNameLabel.text();
+        parentName = model.get('name');
+        var roomName = this.ui.roomNameInput.val();
+        var parentUri = model.get('uri');
+
         switch(model.get('type')) {
           case 'org':
-          case 'repo':
-            this.ui.permInheritedLabel.text(model.get('type') === 'repo' ? 'Repository' : 'Organisation');
-            show = [/*this.ui.autoJoin, */this.ui.permPublic, this.ui.permPrivate, this.ui.permInherited];
-            hide = [this.ui.selectParentRequired, /* REMOVE */this.ui.autoJoin];
+            [/*'autoJoin', */'permPublic', 'permPrivate', 'permInheritedOrg'].forEach(function(f) { showHide[f] = true; });
+            checkForRepo = roomName && parentUri + '/' + roomName;
             placeholder = "Required";
             break;
-          case 'user':
-            show = [this.ui.permPublic, this.ui.permPrivate];
-            hide = [this.ui.selectParentRequired, this.ui.permInherited, this.ui.autoJoin];
-            placeholder = "Optional";
+
+          case 'repo':
+            [/*'autoJoin', */'permPublic', 'permPrivate', 'permInheritedRepo'].forEach(function(f) { showHide[f] = true; });
+            placeholder = "Required";
             break;
+
+          case 'user':
+            [/*'autoJoin', */'permPublic', 'permPrivate'].forEach(function(f) { showHide[f] = true; });
+            placeholder = "Optional";
+            checkForRepo = roomName && parentUri + '/' + roomName;
+            break;
+        }
+
+        var existing = roomName && troupeCollections.troupes.findWhere({ uri: parentUri + '/' + roomName});
+        if(existing) {
+          showHide = {
+            'selectParentRequired': false,
+            'autoJoin': false,
+            'permPublic': false,
+            'permPrivate': false,
+            'permInheritedOrg': false,
+            'permInheritedRepo': false,
+            'existing': true
+          };
+          checkForRepo = null;
         }
       }
 
-      function arrayToJq(array) {
-        var elements = [];
-        array.forEach(function(a) {
-          elements = elements.concat(a.get());
+
+      if(checkForRepo) {
+        checkForRepoExistence(checkForRepo, function(exists) {
+          if(exists) {
+            showHide = {
+              'selectParentRequired': false,
+              'autoJoin': false,
+              'permPublic': false,
+              'permPrivate': false,
+              'permInheritedOrg': false,
+              'permInheritedRepo': false,
+              'permExistingRepo': true,
+              'existing': false
+            };
+          }
+
+          applyShowHides();
         });
-        return $(elements);
+      } else {
+        applyShowHides();
       }
 
-      this.ui.roomNameInput.attr('placeholder', placeholder);
-      if(animated === false) {
-        arrayToJq(show).show();
-        arrayToJq(hide).hide();
-      } else {
-        arrayToJq(show).filter(':hidden').slideDown("fast");
-        arrayToJq(hide).filter(':visible').slideUp("fast");
+      function checkForRepoExistence(repo, cb) {
+        $.ajax({
+          url: '/api/private/gh/repos/' + repo,
+          contentType: "application/json",
+          dataType: "json",
+          type: "GET",
+          error: function() {
+            cb(false);
+          },
+          success: function() {
+            cb(true);
+          }
+        });
+      }
+
+      function applyShowHides() {
+        function arrayToJq(value) {
+          var elements = [];
+          Object.keys(showHide).forEach(function(f) {
+            if(showHide[f] === value) {
+              elements = elements.concat(self.ui[f].get());
+            }
+          });
+          return $(elements);
+        }
+
+        if(animated === false) {
+          arrayToJq(true).show();
+          arrayToJq(false).hide();
+          self.ui.roomNameInput.attr('placeholder', placeholder);
+          self.ui.parentNameLabel.text(parentName);
+        } else {
+          arrayToJq(true).filter(':hidden').slideDown("fast");
+          arrayToJq(false).filter(':visible').slideUp("fast");
+          window.setTimeout(function() {
+            self.ui.parentNameLabel.text(parentName);
+            self.ui.roomNameInput.attr('placeholder', placeholder);
+          }, 200);
+        }
+
       }
     },
 
@@ -187,6 +285,10 @@ define([
       } else {
         this.parentSelected(null, false);
       }
+    },
+
+    roomNameChange: function() {
+      this.recalcViewDebounced();
     },
 
 

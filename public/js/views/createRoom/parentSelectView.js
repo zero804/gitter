@@ -52,14 +52,7 @@ define([
   return Marionette.Layout.extend({
     events: {
       'focus @ui.input':    'show',
-      'click @ui.input':    'show',
-      'keydown @ui.input':  'keydown',
-      'change @ui.input': 'change',
-      'cut @ui.input': 'change',
-      'paste @ui.input': 'change',
-      'input @ui.input': 'change',
-      'keypress @ui.input': 'keypress',
-      'keyup @ui.input':    'keyup'
+      'click @ui.input':    'show'
     },
     ui: {
       input: "input#input-parent",
