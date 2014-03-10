@@ -96,20 +96,20 @@ require([
     routes: {
       // TODO: get rid of the pipes
       "": "hideModal",
-      "customroom": "customroom",
+      "createcustomroom": "createcustomroom",
       "createreporoom": "createreporoom",
-      "chooseroom" : "chooseroom"
+      "createroom" : "createroom"
     },
 
     hideModal: function() {
       appView.dialogRegion.close();
     },
 
-    chooseroom: function() {
+    createroom: function() {
       appView.dialogRegion.show(new chooseRoomView.Modal());
     },
 
-    customroom: function() {
+    createcustomroom: function() {
       /* Figure out who's the daddy */
 
       function getParentUri(troupe) {
