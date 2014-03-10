@@ -49,7 +49,7 @@ define([
     });
   }
 
-  return Marionette.Layout.extend({
+  return Marionette.ItemView.extend({
     events: {
       'focus @ui.input':    'show',
       'click @ui.input':    'show'
