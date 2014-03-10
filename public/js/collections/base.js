@@ -312,8 +312,23 @@ define([
 
   exports.LoadingMixin = {
     initialize: function() {
-      this.loading = true;
-      this.listenToOnce(this, 'add reset sync', this.loadComplete);
+      if(this.length === 0) {
+        this.loading = true;
+        this.listenToOnce(this, 'add reset sync', this.loadComplete);
+      }
+    },
+    loadComplete: function() {
+      delete this.loading;
+      this.trigger('loaded');
+    }
+  };
+
+  exports.UnderlyingLoadingMixin = {
+    initialize: function() {
+      if(this.collection.loading) {
+        this.loading = true;
+        this.listenToOnce(this.collection, 'loaded', this.loadComplete);
+      }
     },
     loadComplete: function() {
       delete this.loading;
