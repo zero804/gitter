@@ -12,6 +12,9 @@ define([
 ], function($, _, Marionette, TroupeViews, cocktail, Mutant, template, itemTemplate, emptyTemplate) {
   "use strict";
 
+  /* Transition period on css */
+  var TRANSITION = 160;
+
   function findMaxZIndex(element) {
     var max = 0;
     while(element && element != document) {
@@ -192,10 +195,15 @@ define([
     },
 
     hide: function() {
+      var $el = this.$el;
       this.showWhenItems = false;
       if(!this.active()) return;
-      this.$el.find('li.active:not(.divider):visible').removeClass('active');
-      this.$el.addClass('dropdown-hidden');
+      $el.find('li.active:not(.divider):visible').removeClass('active');
+      $el.addClass('dropdown-hidden');
+
+      window.setTimeout(function() {
+        $el.css({ display: 'none' });
+      }, TRANSITION);
       activeDropdown = null;
     },
 

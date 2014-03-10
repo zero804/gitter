@@ -66,6 +66,7 @@ define([
     },
 
     selected: function(m) {
+      this.selected = m;
       this.trigger('selected', m);
     },
 
