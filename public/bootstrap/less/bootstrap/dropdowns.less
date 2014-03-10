@@ -72,6 +72,44 @@
   }
 }
 
+ul.selectable {
+  list-style: none;
+  margin: 0; // override default ul
+
+  li.active > a {
+    color: @white;
+    text-decoration: none;
+    background-color: @linkColor;
+  }
+
+  li.selected {
+    text-decoration: none;
+    background-color: #e5e5e5;
+  }
+
+  .divider {
+    height: 1px;
+    margin: 5px 1px;
+    overflow: hidden;
+    background-color: #e5e5e5;
+    border-bottom: 1px solid @white;
+  }
+
+  a {
+    display: block;
+    padding: 3px 15px;
+    clear: both;
+    font-weight: normal;
+    line-height: @baseLineHeight;
+    color: @gray;
+    white-space: nowrap;
+  }
+
+  li a,
+  li a:hover {
+    text-decoration: none;
+  }
+}
 
 // Backdrop to catch body clicks on mobile, etc.
 .dropdown-backdrop {

@@ -9,13 +9,15 @@ require([
   'components/titlebar',
   'components/realtime',
   'views/createRoom/createRoomView',
-  'views/widgets/preload',            // No ref
-  'components/webNotifications',      // No ref
-  'components/desktopNotifications',  // No ref
-  'template/helpers/all',             // No ref
-  'components/bug-reporting',         // No ref
-  'components/csrf'                   // No ref
-], function(appEvents, context, Backbone, AppIntegratedView, TroupeMenuView, troupeCollections, TitlebarUpdater, realtime, createRoomView) {
+  'views/createRoom/createRepoRoomView',
+  'views/widgets/preload',                // No ref
+  'components/webNotifications',          // No ref
+  'components/desktopNotifications',      // No ref
+  'template/helpers/all',                 // No ref
+  'components/bug-reporting',             // No ref
+  'components/csrf'                       // No ref
+], function(appEvents, context, Backbone, AppIntegratedView, TroupeMenuView, troupeCollections,
+  TitlebarUpdater, realtime, createRoomView, createRepoRoomView) {
   "use strict";
 
   var chatIFrame = document.getElementById('content-frame');
@@ -94,6 +96,7 @@ require([
       // TODO: get rid of the pipes
       "": "hideModal",
       "customroom": "customroom",
+      "createreporoom": "createreporoom",
     },
 
     hideModal: function() {
@@ -140,6 +143,10 @@ require([
 
       uri = getParentUri(current);
       showWithOptions({ initialParent: uri });
+    },
+
+    createreporoom: function() {
+      appView.dialogRegion.show(new createRepoRoomView.Modal());
     }
   });
 

@@ -266,6 +266,15 @@ define([
       }
     },
 
+    setButtonState: function(name,state) {
+      var $s = this.$el.find('.modal-footer button[data-action=' + name + ']');
+      if(state) {
+        $s.removeAttr('disabled');
+      } else {
+        $s.attr('disabled', true);
+      }
+    },
+
     onClose: function() {
       this.view.close();
       this.view.dialog = null;
