@@ -566,7 +566,9 @@ function addUsersToRoom(troupe, instigatingUser, usernamesToAdd) {
     .then(function(usersToAdd) {
       /* Next, add the users */
       usersToAdd.forEach(function(user) {
-        troupe.addUserById(user.id);
+        if(!troupe.containsUserId(user.id)) {
+          troupe.addUserById(user.id);
+        }
       });
 
       return troupe.saveQ()

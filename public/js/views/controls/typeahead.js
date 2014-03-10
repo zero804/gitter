@@ -73,6 +73,8 @@ define([
 
     inputChangeDebounced: function() {
       var input = this.$el.val();
+      if(this.lastFetchInput === input) return;
+      this.lastFetchInput = input;
 
       if(this.options.fetch) {
         this.options.fetch(input, this.collection);

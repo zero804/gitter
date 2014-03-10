@@ -82,6 +82,36 @@ define([
       }
     },
 
+    /**
+     * Validate the form and send the request
+     */
+    validateAndCreate: function() {
+      if(this.collection.length === 0) {
+        window.alert('Search for some people to add');
+        this.ui.input.focus();
+        return;
+      }
+
+      $.ajax({
+        url: '/api/v1/troupes/' + context.getTroupeId()  + '/users',
+        contentType: "application/json",
+        dataType: "json",
+        type: "POST",
+        data: JSON.stringify({ usernames: this.collection.pluck('username') }),
+        context: this,
+        statusCode: {
+          400: function(data) {
+            // if ($.parseJSON(data.responseText).illegalName) {
+            // }
+          }
+        },
+        success: function() {
+          this.dialog.hide();
+        }
+      });
+
+    },
+
     onRender: function() {
       this.typeahead = new Typeahead({ collection: new UserSearchCollection(), itemTemplate: userSearchItemTemplate, el: this.ui.input[0] });
       this.listenTo(this.typeahead, 'selected', this.selected);
