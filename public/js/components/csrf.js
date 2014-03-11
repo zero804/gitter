@@ -5,10 +5,8 @@ define([
 ], function($, context) {
   'use strict';
 
-  $.ajaxSetup({
-    headers: {
-      'x-access-token': context().accessToken
-    }
+  $( document ).ajaxSend(function( event, jqxhr ) {
+    jqxhr.setRequestHeader('x-access-token', context().accessToken);
   });
 
 });

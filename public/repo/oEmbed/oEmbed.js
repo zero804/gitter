@@ -5,19 +5,21 @@
     var oEmbed = {};
     //factory(oEmbed);
     if (typeof define === "function" && define.amd) {
-      define(['jquery'], factory); // AMD
+      define(['jquery-iframely'], factory); // AMD
     } else {
       root.oEmbed = factory(jQuery); // <script>
     }
   }
 }(this, function ($) {
   var oEmbed    = {};
-  var providers = {};
+  var oEmbedProviders = {};
+  var iframelyProviders = [];
   var lookups   = [];
   var defaults  = {};
+  $.iframely.defaults.endpoint = 'http://localhost:8061/iframely';
 
-  function addProvider(name, patterns, endpoint, opts) {
-    providers[name] = {
+  function addOEmbedProvider(name, patterns, endpoint, opts) {
+    oEmbedProviders[name] = {
       patterns:   patterns,
       endpoint:   endpoint,
       opts:       opts
@@ -26,6 +28,35 @@
     for (var i = 0; i < patterns.length; i++) {
       lookups.push({name: name, re: new RegExp(patterns[i])});
     }
+  }
+
+  function something(url, cb) {
+    $.iframely.getPageData(url, function(error, data) {
+      if(error) return cb(null);
+
+      renderBestContent(data, cb);
+    });
+  }
+
+  function what(link) {
+    var supportedRels = ['image', 'player', 'thumbnail', 'app'];
+    return supportedRels.some(function(supportedRel) {
+      return link.rel.indexOf(supportedRel) > -1;
+    });
+  }
+
+  function renderBestContent(iframelyData, cb) {
+    var match;
+    iframelyData.links.forEach(function(link) {
+      if(!match && what(link)) {
+        match = link;
+      }
+    });
+
+    if(!match) return cb(null);
+
+    var $el = $.iframely.generateLinkElement(match, iframelyData);
+    cb({html: $el[0].outerHTML});
   }
 
   function fetch(provider, url, cb) {
@@ -60,8 +91,10 @@
     var providerName = supported(url);
     var imageUrl     = url.match(/https?:\/\/([\w-:\.\/%]+)(\.jpe?g|\.gif|\.png)/i);
 
-    if (providerName) {
-      fetch(providers[providerName], url, cb);
+    if (iframelySupported(url)) {
+      something(url, cb);
+    } else if(providerName) {
+      fetch(oEmbedProviders[providerName], url, cb);
     } else if (imageUrl) {
       var imgTag = '<img src="' + imageUrl[0] + '" width="' + oEmbed.defaults.maxwidth + '">';
       var embed  = {html: imgTag};
@@ -77,34 +110,38 @@
     }
   }
 
-  // Native providers
-  addProvider("spotify",      ["open.spotify.com/(track|album|user)/"],           "//embed.spotify.com/oembed/");
-  addProvider("rdio.com",     ["rd.io/.+","rdio.com"],                            "//www.rdio.com/api/oembed/");
-  addProvider("Soundcloud",   ["soundcloud.com/.+","snd.sc/.+"],                  "//soundcloud.com/oembed", {format: 'js', maxheight: 200});
-  addProvider("twitter",      ["twitter.com/.+"],                                 "//api.twitter.com/1/statuses/oembed.json");
-  addProvider("meetup",       ["meetup.(com|ps)/.+"],                             "//api.meetup.com/oembed");
-  addProvider("vimeo",        ["vimeo.com/groups/.*/videos/.*", "vimeo.com/.*"],  "//vimeo.com/api/oembed.json");
-	addProvider("dailymotion",  ["dailymotion.com/.+"],                             "//www.dailymotion.com/services/oembed");
-  addProvider("ustream",      ["ustream.tv/recorded/.*"],                         "//www.ustream.tv/oembed");
-  addProvider("photobucket",  ["photobucket.com/(albums|groups)/.+"],             "//photobucket.com/oembed/");
-  addProvider("slideshare",   ["slideshare.net"],                                 "//www.slideshare.net/api/oembed/2",{format:'jsonp'});
+  function iframelySupported(url) {
+    return iframelyProviders.some(function(re) {
+      return url.match(re);
+    });
+  }
+
+  // Native oEmbedProviders
+  addOEmbedProvider("spotify",      ["open.spotify.com/(track|album|user)/"],           "//embed.spotify.com/oembed/");
+  addOEmbedProvider("rdio.com",     ["rd.io/.+","rdio.com"],                            "//www.rdio.com/api/oembed/");
+  addOEmbedProvider("Soundcloud",   ["soundcloud.com/.+","snd.sc/.+"],                  "//soundcloud.com/oembed", {format: 'js', maxheight: 200});
+  addOEmbedProvider("twitter",      ["twitter.com/.+"],                                 "//api.twitter.com/1/statuses/oembed.json");
+  addOEmbedProvider("meetup",       ["meetup.(com|ps)/.+"],                             "//api.meetup.com/oembed");
+  addOEmbedProvider("vimeo",        ["vimeo.com/groups/.*/videos/.*", "vimeo.com/.*"],  "//vimeo.com/api/oembed.json");
+  addOEmbedProvider("dailymotion",  ["dailymotion.com/.+"],                             "//www.dailymotion.com/services/oembed");
+  addOEmbedProvider("ustream",      ["ustream.tv/recorded/.*"],                         "//www.ustream.tv/oembed");
+  addOEmbedProvider("photobucket",  ["photobucket.com/(albums|groups)/.+"],             "//photobucket.com/oembed/");
+  addOEmbedProvider("slideshare",   ["slideshare.net"],                                 "//www.slideshare.net/api/oembed/2",{format:'jsonp'});
 
   // NoEmbed fallbacks (http://noembed.com/)
-  addProvider("wikipedia",    ["wikipedia.org/wiki/"],                            "//noembed.com/embed");
-  addProvider("youtube",      ["youtube.com/watch"],                              "//noembed.com/embed");
-  addProvider("instagram",    ["instagr.?am(.com)?/p/"],                          "//noembed.com/embed");
-  addProvider("gist",         ["gist.github.com/.+/.+"],                          "//noembed.com/embed");
-  addProvider("cloudup",      ["cloudup.com"],                                    "//noembed.com/embed");
-  addProvider("dropbox",      ["dropbox.com"],                                    "//noembed.com/embed");
+  iframelyProviders.push(new RegExp("wikipedia.org/wiki/"));
+  iframelyProviders.push(new RegExp("youtube.com/watch"));
+  iframelyProviders.push(new RegExp("instagr.?am(.com)?/p/"));
+  iframelyProviders.push(new RegExp("gist.github.com/.+/.+"));
+  iframelyProviders.push(new RegExp("cloudup.com"));
+  iframelyProviders.push(new RegExp("cl.ly"));
+  iframelyProviders.push(new RegExp("dl.dropboxusercontent.com"));
 
   // FIXME Wrong embed size, overflows
   //addProvider("vine",       ["vine.co/v/"],                                     "//noembed.com/embed");
   //addProvider("ted",        ["ted.com/talks/"],                                 "//noembed.com/embed");
 
-  oEmbed.parse        = parse;
-  oEmbed.supported    = supported;
-  oEmbed.addProvider  = addProvider;
-  oEmbed.defaults     = defaults;
+  oEmbed.parse = parse;
 
   return oEmbed;
 
