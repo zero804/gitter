@@ -316,7 +316,7 @@ exports.findChildChannelRoom = findChildChannelRoom;
 
 
 function assertValidName(name) {
-  var matcher = xregexp('^[\\p{L}\\d]+$');
+  var matcher = xregexp('^[\\p{L}\\d][\\p{L}\\d\\-\\_]*$');
   if(!matcher.test(name)) {
     throw {
       responseStatusCode: 400,
