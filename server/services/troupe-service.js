@@ -23,12 +23,16 @@ function ensureExists(value) {
 }
 
 function findByUri(uri, callback) {
-  return persistence.Troupe.findOneQ({uri: uri})
+  var lcUri = uri.toLowerCase();
+
+  return persistence.Troupe.findOneQ({ lcUri: lcUri })
     .nodeify(callback);
 }
 
 function findAllByUri(uris, callback) {
-  return persistence.Troupe.where('uri').in(uris).execQ()
+  var lcUris = uris.map(function(f) { return f.toLowerCase(); });
+
+  return persistence.Troupe.where('lcUri').in(lcUris).execQ()
     .nodeify(callback);
 }
 
@@ -168,68 +172,6 @@ function validateTroupeEmailAndReturnDistributionList(options, callback) {
   });
 }
 
-/*
- * This function takes in a userId and a list of troupes
- * It returns a hash that tells whether the user has access to each troupe,
- * or null if the troupe represented by the uri does not exist.
- * For example:
- * For the input validateTroupeUrisForUser('1', ['a','b','c'],...)
- * The callback could return:
- * {
- *   'a': true,
- *   'b': false,
- *   'c': null
- * }
- * Mean: User '1' has access to 'a', no access to 'b' and no troupe 'c' exists
- */
-function validateTroupeUrisForUser(userId, uris, callback) {
-  persistence.Troupe
-    .where('uri')['in'](uris)
-    .where('status', 'ACTIVE')
-    .exec(function(err, troupes) {
-      if(err) return callback(err);
-
-      var troupesByUris = collections.indexByProperty(troupes, "uri");
-
-      var result = {};
-      uris.forEach(function(uri) {
-        var troupe = troupesByUris[uri];
-        if(troupe) {
-          result[uri] = troupe.containsUserId(userId);
-        } else {
-          result[uri] = null;
-        }
-      });
-
-      callback(null, result);
-    });
-}
-
-/**
- * Add the specified user to the troupe,
- * @param {[type]} userId
- * @param {[type]} troupeId
- * returns a promise with the troupe
- */
-function addUserIdToTroupe(userId, troupeId) {
-  assert(mongoUtils.isLikeObjectId(userId));
-  assert(mongoUtils.isLikeObjectId(troupeId));
-
-  return findByIdRequired(troupeId)
-      .then(function(troupe) {
-        if(troupe.status != 'ACTIVE') throw { troupeNoLongerActive: true };
-
-        if(troupe.containsUserId(userId)) {
-          return troupe;
-        }
-
-        appEvents.richMessage({eventName: 'userJoined', troupe: troupe, userId: userId, user: user});
-
-        troupe.addUserById(userId);
-        return troupe.saveQ()
-            .then(function() { return troupe; });
-      });
-}
 
 /**
  * Returns the URL a particular user would see if they wish to view a URL.
@@ -702,7 +644,6 @@ module.exports = {
   findUserIdsForTroupeWithLurk: findUserIdsForTroupeWithLurk,
   findUserIdsForTroupe: findUserIdsForTroupe,
 
-  validateTroupeUrisForUser: validateTroupeUrisForUser,
   updateTroupeName: updateTroupeName,
   findOneToOneTroupe: findOneToOneTroupe,
   findOrCreateOneToOneTroupeIfPossible: findOrCreateOneToOneTroupeIfPossible,

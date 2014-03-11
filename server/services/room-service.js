@@ -357,6 +357,13 @@ function ensureNoRepoNameClash(user, uri) {
   return false;
 }
 
+function ensureNoExistingChannelNameClash(uri) {
+  return troupeService.findByUri(uri)
+    .then(function(troupe) {
+      return !!troupe;
+    });
+}
+
 function createCustomChildRoom(parentTroupe, user, options, callback) {
   return Q.fcall(function() {
     validate.expect(user, 'user is expected');
@@ -425,6 +432,10 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
       })
       .then(function(clash) {
         if(clash) throw 409;
+        return ensureNoExistingChannelNameClash(uri);
+      })
+      .then(function(clash) {
+        if(clash) throw 409;
 
         var nonce = Math.floor(Math.random() * 100000);
 
@@ -445,12 +456,15 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
             upsert: true
           })
           .then(function(newRoom) {
+            console.log(newRoom);
             // TODO handle adding the user in the event that they didn't create the room!
             if(newRoom._nonce === nonce) {
               serializeCreateEvent(newRoom);
+              return newRoom;
             }
 
-            return newRoom;
+            /* Somehow someone beat us to it */
+            throw 409;
           });
       })
      .then(function(newRoom) {
