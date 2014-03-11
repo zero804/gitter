@@ -1,5 +1,4 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
-
 define([
   'jquery',
   'underscore',
@@ -28,7 +27,8 @@ define([
       parentNameLabel: "#parent-name",
       permInheritedLabel: '#perm-inherited-label',
       roomNameInput: '#room-name',
-      dropDownButton: '#dd-button'
+      dropDownButton: '#dd-button',
+      permissionsLabel: '#permissions-label'
     },
 
     events: {
@@ -74,7 +74,11 @@ define([
 
     showValidationMessage: function(message) {
       this.ui.validation.text(message);
-      this.ui.validation.slideDown('fast');
+      if(message) {
+        this.ui.validation.slideDown('fast');
+      } else {
+        this.ui.validation.slideUp('fast');
+      }
     },
 
     validateAndCreate: function() {
@@ -173,7 +177,8 @@ define([
         'permPrivate': false,
         'permInheritedOrg': false,
         'permInheritedRepo': false,
-        'existing': false
+        'existing': false,
+        'permissionsLabel': true
       };
 
       var placeholder = "";
@@ -215,6 +220,7 @@ define([
             'permPrivate': false,
             'permInheritedOrg': false,
             'permInheritedRepo': false,
+            'permissionsLabel': false,
             'existing': true
           };
           checkForRepo = null;
@@ -234,8 +240,13 @@ define([
               'permPrivate': false,
               'permInheritedOrg': false,
               'permInheritedRepo': false,
+              'permissionsLabel': false,
               'existing': false
             };
+
+            self.showValidationMessage('You cannot create a channel with this name as a repo with the same name already exists.');
+          } else {
+            self.showValidationMessage();
           }
 
           applyShowHides();
