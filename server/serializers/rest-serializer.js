@@ -663,6 +663,7 @@ function TroupeStrategy(options) {
       lurk: lurkStrategy ? !item.oneToOne && lurkStrategy.map(item.users) : undefined,
       url: troupeUrl,
       githubType: item.githubType,
+      security: item.security,
       v: getVersion(item)
     };
   };
