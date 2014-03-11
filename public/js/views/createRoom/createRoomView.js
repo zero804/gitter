@@ -28,14 +28,16 @@ define([
       existing: '#existing',
       parentNameLabel: "#parent-name",
       permInheritedLabel: '#perm-inherited-label',
-      roomNameInput: '#room-name'
+      roomNameInput: '#room-name',
+      dropDownButton: '#dd-button'
     },
 
     events: {
       'change @ui.roomNameInput': 'roomNameChange',
       'cut @ui.roomNameInput': 'roomNameChange',
       'paste @ui.roomNameInput': 'roomNameChange',
-      'input @ui.roomNameInput': 'roomNameChange'
+      'input @ui.roomNameInput': 'roomNameChange',
+      'click @ui.dropDownButton': 'clickDropDown'
     },
 
     regions: {
@@ -56,10 +58,19 @@ define([
           this.validateAndCreate();
           break;
 
+        case 'back':
+          window.location.hash = "#createroom";
+          break;
+
         case 'cancel':
           this.dialog.hide();
           break;
       }
+    },
+
+    clickDropDown: function() {
+      console.log("DD");
+      $('#input-parent').focus();
     },
 
     validateAndCreate: function() {
@@ -302,13 +313,14 @@ define([
     disableAutoFocus: true,
     initialize: function(options) {
       options = options || {};
-      options.title = options.title || "Create a chat room";
+      options.title = options.title || "Create a chanel";
 
       TroupeViews.Modal.prototype.initialize.call(this, options);
       this.view = new View(options);
     },
     menuItems: [
       { action: "create", text: "Create", className: "trpBtnGreen" },
+      { action: "back", text: "Back", className: "trpBtnLightGrey" },
       { action: "cancel", text: "Cancel", className: "trpBtnLightGrey"}
     ]
   });
