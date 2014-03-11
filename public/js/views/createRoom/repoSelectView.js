@@ -47,7 +47,7 @@ define([
     },
     searchTextChanged: function(text) {
       this.collection.setFilter(function(m) {
-        return !m.get('room') && m.get('name').indexOf(text) >= 0;
+        return m.get('name').indexOf(text) >= 0;
       });
     }
   });
@@ -57,8 +57,8 @@ define([
     underlying.fetch();
 
     var c = new FilteredLoadingCollection(null, { model: repoModels.RepoModel, collection: underlying });
-    c.setFilter(function(m) {
-      return !m.get('room');
+    c.setFilter(function() {
+      return true;
     });
 
     return c;
