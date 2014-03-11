@@ -614,15 +614,10 @@ define([
   TroupeViews.LoadingCollectionMixin = {
     loadingView: TroupeViews.LoadingView,
     initialize: function() {
-      console.log('setting show empty view');
-
       this.showEmptyView = this.showLoadingView;
     },
     showLoadingView: function() {
-      console.log('SHOW EMPTY VIEW!!!!!!!!!!!!!!');
-
       if(this.collection.loading) {
-        console.log('SHOWING LOADING VIEW');
         var LoadingView = Marionette.getOption(this, "loadingView");
 
         if(!this.loadingModel) {
@@ -634,12 +629,10 @@ define([
         if (LoadingView && !v) {
           this.addItemView(this.loadingModel, LoadingView, 0);
           this.listenToOnce(this.collection, 'loaded', function() {
-            console.log('REMOVING LOADING VIEW');
             this.removeItemView(this.loadingModel);
 
 
             if(this.collection.length === 0) {
-              console.log('SHOWING EMPTY VIEW');
               this.constructor.prototype.showEmptyView.call(this);
               return true;
             }
@@ -651,19 +644,6 @@ define([
       this.constructor.prototype.showEmptyView.call(this);
       return true;
     },
-
-    // collectionLoaded: function() {
-    //   this.render();
-    // },
-    // getEmptyView: function() {
-    //   console.log("getEmptyView");
-    //   console.trace();
-    //   if(this.collection.loading) {
-    //     return Marionette.getOption(this, "loadingView");
-    //   }
-
-    //   return Marionette.getOption(this, "emptyView");
-    // },
   };
 
   TroupeViews.DelayedShowLayoutMixin = {
