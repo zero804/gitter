@@ -1,8 +1,9 @@
 /* jshint unused:true, browser:true,  strict:true */
 /* global define:false */
 define([
-  'oEmbed'
-], function(oEmbed) {
+  'jquery-iframely',
+  'oEmbed',
+], function($, oEmbed) {
 
   "use strict";
 
@@ -11,6 +12,9 @@ define([
       oEmbed.parse(el.href, function(embed) {
         if (embed && embed.html) {
           $(el).after('<div class="embed">' + embed.html + '</div>');
+
+          // any iframely iframes will resize once content loads
+          $.iframely.registerIframesIn(chatItemView.$el);
         }
       });
     });
