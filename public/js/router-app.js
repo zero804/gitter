@@ -3,6 +3,7 @@ require([
   'utils/appevents',
   'utils/context',
   'backbone',
+  'underscore',
   'views/app/appIntegratedView',
   'views/toolbar/troupeMenu',
   'collections/instances/troupes',
@@ -17,7 +18,7 @@ require([
   'template/helpers/all',                 // No ref
   'components/bug-reporting',             // No ref
   'components/csrf'                       // No ref
-], function(appEvents, context, Backbone, AppIntegratedView, TroupeMenuView, troupeCollections,
+], function(appEvents, context, Backbone, _, AppIntegratedView, TroupeMenuView, troupeCollections,
   TitlebarUpdater, realtime, createRoomView, createRepoRoomView, chooseRoomView) {
   "use strict";
 
@@ -90,7 +91,15 @@ require([
     }
   });
 
+  function reallyOnce(emitter, name, callback, context) {
+    var once = _.once(function() {
+      emitter.off(name, once);
+      callback.apply(context, arguments);
+    });
 
+    once._callback = callback;
+    return emitter.once(name, once);
+  }
 
   var Router = Backbone.Router.extend({
     routes: {
@@ -135,7 +144,7 @@ require([
 
       var current = allRoomsCollection.findWhere({ url: '/' + uri });
       if(!current) {
-        allRoomsCollection.once('reset sync', function() {
+        reallyOnce(allRoomsCollection, 'reset sync', function() {
           current = allRoomsCollection.findWhere({ url: '/' + uri });
           if(current) {
             uri = getParentUri(current);
