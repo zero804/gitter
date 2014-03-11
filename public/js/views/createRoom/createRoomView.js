@@ -297,7 +297,7 @@ define([
     disableAutoFocus: true,
     initialize: function(options) {
       options = options || {};
-      options.title = options.title || "Create a chat room";
+      options.title = options.title || "Create a chanel";
 
       TroupeViews.Modal.prototype.initialize.call(this, options);
       this.view = new View(options);
