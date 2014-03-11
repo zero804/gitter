@@ -329,6 +329,29 @@ label {
   top: -9999px;
 }
 
+.scrollList {
+  max-height: 279px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 100px;
+
+  li {
+    width: 250px;
+    display: inline-block;
+  }
+
+  div {
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+
+ul.scrollList a {
+    padding: 4px 4px;
+    border-radius: 3px;
+  }
+
 .scroller::-webkit-scrollbar {
     width: 9px;
 }
@@ -520,8 +543,29 @@ a:hover {
   }
 }
 
+.github-ORG_CHANNEL {
+  .prepend-channel-icon;
+  &:before {
+    font-size: 16px;
+  }
+}
+
 .github-REPO {
   .prepend-repo-icon;
+  &:before {
+    font-size: 16px;
+  }
+}
+
+.github-REPO_CHANNEL {
+  .prepend-channel-icon;
+  &:before {
+    font-size: 16px;
+  }
+}
+
+.github-USER_CHANNEL {
+  .prepend-channel-icon;
   &:before {
     font-size: 16px;
   }

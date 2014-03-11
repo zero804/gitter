@@ -50,7 +50,7 @@ define([
     disableAutoFocus: true,
     initialize: function(options) {
       options = options || {};
-      options.title = options.title || "Create a repo chat room";
+      options.title = options.title || "Create a repository chat room";
 
       TroupeViews.Modal.prototype.initialize.call(this, options);
       this.view = new View(options);

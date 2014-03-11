@@ -75,6 +75,12 @@ define([
           this.validateAndCreate();
           break;
 
+        case 'share':
+          this.dialog.hide();
+          window.location.hash = "#inv";
+          break;
+
+
         case 'cancel':
           this.dialog.hide();
           break;
@@ -145,7 +151,8 @@ define([
     },
     menuItems: [
       { action: "create", text: "Add", className: "trpBtnGreen" },
-      { action: "cancel", text: "Cancel", className: "trpBtnLightGrey"}
+      { action: "cancel", text: "Cancel", className: "trpBtnLightGrey"},
+      { action: "share", text: "Share this room", className: "trpBtnBlue trpBtnRight"}
     ]
   });
 
