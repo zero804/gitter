@@ -80,6 +80,17 @@ function removeBadUri(uri) {
   return persistence.UriLookup.removeQ({ uri: lcUri });
 }
 
+function reserveUriForTroupeId(troupeId, uri) {
+  var lcUri = uri.toLowerCase();
+  troupeId = mongoUtils.asObjectID(troupeId);
+
+  return persistence.UriLookup.findOneAndUpdateQ(
+    { $or: [{ uri: lcUri }, { troupeId: troupeId }] },
+    { $set: { uri: lcUri, troupeId: troupeId }, $unset: { userId: '' } },
+    { upsert: true });
+}
+
+exports.reserveUriForTroupeId = reserveUriForTroupeId;
 exports.lookupUri = lookupUri;
 exports.removeUsernameForUserId = removeUsernameForUserId;
 exports.reserveUriForUsername = reserveUriForUsername;
