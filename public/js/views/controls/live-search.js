@@ -9,6 +9,7 @@ define([
 
     var longDebounceValue = options && options.longDebounce || 800;
     var shortDebounceValue = options && options.shortDebounce || 400;
+    var immediate = options && options.immediate;
 
     var fastDebounce = _.debounce(function() {
       var currentValue = $el.val();
@@ -28,6 +29,15 @@ define([
 
     var change = function(e) {
       var currentValue = e.target.value;
+
+      if(immediate) {
+        if(_.isFunction(immediate)) {
+          immediate.call(view, currentValue);
+        } else {
+          view[immediate].call(view, currentValue);
+        }
+      }
+
       if(currentValue.length < 3) {
         slowDebounce();
       } else {

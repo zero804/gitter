@@ -113,7 +113,11 @@ define([
           collection: this.dropdownItems,
           itemTemplate: itemTemplate,
           el: this.ui.input[0],
-          autoSelect: true
+          autoSelector: function(input) {
+            return function(m) {
+              return m.get('name').indexOf(input) >= 0;
+            };
+          }
         });
         this.listenTo(this.typeahead, 'selected', this.selected);
       }
@@ -168,7 +172,7 @@ define([
 
     },
 
-    refilter: function(query, collection) {
+    refilter: function(query, collection, success) {
       var self = this;
       var results;
 
@@ -187,6 +191,7 @@ define([
       }
 
       collection.set(results, { add: true, remove: true, merge: true });
+      if(success) success();
 
       function defaultResults() {
 

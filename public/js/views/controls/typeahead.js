@@ -19,6 +19,9 @@ define([
         this.collection = new Backbone.Collection();
       }
 
+      // May not exist
+      this.autoSelector = options.autoSelector;
+
       if(options.el) {
         this.attach();
       }
@@ -42,7 +45,7 @@ define([
 
     attach: function() {
       if(this.dropdown) return;
-      liveSearch(this, this.$el, 'searchTextChanged', { shortDebounce: 400, longDebounce: 800 });
+      liveSearch(this, this.$el, 'searchTextChanged', { shortDebounce: 400, longDebounce: 800, immediate: 'autoSelect' });
 
       this.dropdown = new Dropdown({
         collection: this.collection,
@@ -68,12 +71,37 @@ define([
     blur: function() {
       this.dropdown.hide();
     },
+    autoSelect: function() {
+      var input = this.el.value;
 
+      if(!this.autoSelector) return;
+      if(!input) return;
+
+      var model = this.dropdown.getActive();
+
+      var predicate = this.autoSelector(input);
+      if(model && predicate(model)) return; // Existing model matches
+
+      var matches = this.collection.filter(predicate);
+      if(matches.length === 0) return;
+      if(matches.length === 1) {
+        this.dropdown.setActive(matches[0]);
+        return;
+      }
+
+      this.dropdown.setActive(matches[0]);
+    },
     searchTextChanged: function(input) {
+      var self = this;
+
+      function fetchSuccess() {
+        self.autoSelect();
+      }
+
       if(this.options.fetch) {
-        this.options.fetch(input, this.collection);
+        this.options.fetch(input, this.collection, fetchSuccess);
       } else {
-        this.collection.fetch({ data: { q: input }}, { add: true, remove: true, merge: true });
+        this.collection.fetch({ data: { q: input }}, { add: true, remove: true, merge: true, success: fetchSuccess });
       }
 
       this.dropdown.show();
