@@ -631,7 +631,7 @@ define([
 
       this.constructor.prototype.showEmptyView.call(this);
       return true;
-    },
+    }
   };
 
   TroupeViews.DelayedShowLayoutMixin = {

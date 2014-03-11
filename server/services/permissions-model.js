@@ -131,7 +131,10 @@ function orgChannelPermissionsModel(user, right, uri, security) {
           return Q.resolve(true);
 
         case 'PRIVATE':
-          return Q.all([userIsInRoom(uri, user), orgPermissionsModel(user, right, orgUri)])
+          return Q.all([
+                    userIsInRoom(uri, user),
+                    orgPermissionsModel(user, right, orgUri)
+                  ])
                   .spread(function(inRoom, orgPerm) {
                     return inRoom && orgPerm;
                   });
@@ -169,10 +172,7 @@ function repoChannelPermissionsModel(user, right, uri, security) {
       switch(security) {
         case 'PUBLIC': return Q.resolve(true);
         case 'PRIVATE':
-          return Q.all([userIsInRoom(uri, user), repoPermissionsModel(user, right, repoUri)])
-                  .spread(function(inRoom, orgPerm) {
-                    return inRoom && orgPerm;
-                  });
+          return userIsInRoom(uri, user);
 
         case 'INHERITED':
           return repoPermissionsModel(user, right, repoUri);
@@ -187,7 +187,10 @@ function repoChannelPermissionsModel(user, right, uri, security) {
           return Q.resolve(true);
 
         case 'PRIVATE':
-          return Q.all([userIsInRoom(uri, user), repoPermissionsModel(user, right, repoUri)])
+          return Q.all([
+                    userIsInRoom(uri, user),
+                    repoPermissionsModel(user, right, repoUri)
+                  ])
                   .spread(function(inRoom, orgPerm) {
                     return inRoom && orgPerm;
                   });
@@ -225,7 +228,8 @@ function userChannelPermissionsModel(user, right, uri, security) {
     case 'join':
       switch(security) {
         case 'PUBLIC': return Q.resolve(true);
-        case 'PRIVATE': return userIsInRoom(uri, user);
+        case 'PRIVATE':
+          return userIsInRoom(uri, user);
         /* No inherited security for user channels */
         default:
           throw 'Unknown security: ' + security;
