@@ -30,7 +30,19 @@ define([
       var data = this.model.toJSON();
       data.createRoom = createRoom;
       if(data.name.length > 25) {
-        var repo = data.name.split('/')[1];
+        var repo;
+
+        if (data.name.split('/').length > 1) {
+          repo = data.name.split('/')[1] + "/" + data.name.split('/')[2];
+          if (repo.length > 25) {
+            repo = data.name.split('/')[2];
+          }
+
+        } 
+        else {
+          repo = data.name.split('/')[1];
+        }
+
         if(repo) {
           data.title = data.name;
           data.name = repo;
