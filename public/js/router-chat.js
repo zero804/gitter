@@ -36,7 +36,7 @@ require([
   'components/csrf'             // No ref
 ], function($, Backbone, context, liveContext, appEvents, peopleCollectionView, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, RightToolbarView,
-    inviteView, troupeSettingsView, MarkdownView, IntegrationSettingsModal,
+    inviteView, TroupeSettingsView, MarkdownView, IntegrationSettingsModal,
     unreadItemsClient, webhookDecorator, issueDecorator, commitDecorator, mentionDecorator,
     embedDecorator, emojiDecorator, UnreadBannerView, HeaderView) {
   "use strict";
