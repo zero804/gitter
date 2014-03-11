@@ -76,6 +76,7 @@ define([
         troupeUrl: window.location.origin+troupe.url,
         permissions: context().permissions,
         oneToOne: troupe.oneToOne,
+        privateRoom: context().troupe.security,
         troupeName: troupe.name,
         troupeTopic:  troupe.topic,
         troupeUri : troupe.url,
