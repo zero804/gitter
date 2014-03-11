@@ -276,8 +276,6 @@ define([
       e.stopPropagation();
     }
   });
-console.log(SelectableMixin);
   cocktail.mixin(DropdownMenuView, TroupeViews.SortableMarionetteView, SelectableMixin);
-  console.log(DropdownMenuView.prototype);
   return DropdownMenuView;
 });

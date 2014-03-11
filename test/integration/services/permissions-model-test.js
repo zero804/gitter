@@ -536,7 +536,27 @@ describe('permissions-model', function() {
       describe('join', function() {
         var right = 'join';
 
-        it('should deny', function(done) {
+        it('should allow somebody already in the room', function(done) {
+          mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
+            assert.equal(pUri, uri);
+            assert.equal(pUser, user);
+            return Q.resolve(true);
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(granted);
+            })
+            .nodeify(done);
+        });
+
+        it('should deny somebody not already in the room', function(done) {
+          mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
+            assert.equal(pUri, uri);
+            assert.equal(pUser, user);
+            return Q.resolve(false);
+          });
+
           return permissionsModel(user, right, uri, roomType, security)
             .then(function(granted) {
               assert(!granted);
@@ -549,7 +569,13 @@ describe('permissions-model', function() {
       describe('adduser', function() {
         var right = 'adduser';
 
-        it('should allow org members to add', function(done) {
+        it('should allow org members in the room to add', function(done) {
+          mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
+            assert.equal(pUri, uri);
+            assert.equal(pUser, user);
+            return Q.resolve(true);
+          });
+
           mockito.when(orgMemberMethodMock)().then(function(org) {
             assert.equal(org, parentUri);
             return Q.resolve(true);
@@ -558,6 +584,25 @@ describe('permissions-model', function() {
           return permissionsModel(user, right, uri, roomType, security)
             .then(function(granted) {
               assert(granted);
+            })
+            .nodeify(done);
+        });
+
+        it('should deny org members not in the room to add', function(done) {
+          mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
+            assert.equal(pUri, uri);
+            assert.equal(pUser, user);
+            return Q.resolve(false);
+          });
+
+          mockito.when(orgMemberMethodMock)().then(function(org) {
+            assert.equal(org, parentUri);
+            return Q.resolve(true);
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(!granted);
             })
             .nodeify(done);
         });
@@ -935,7 +980,27 @@ describe('permissions-model', function() {
       describe('join', function() {
         var right = 'join';
 
-        it('should deny', function(done) {
+        it('should allow somebody already in the room', function(done) {
+          mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
+            assert.equal(pUri, uri);
+            assert.equal(pUser, user);
+            return Q.resolve(true);
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(granted);
+            })
+            .nodeify(done);
+        });
+
+        it('should deny somebody not already in the room', function(done) {
+          mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
+            assert.equal(pUri, uri);
+            assert.equal(pUser, user);
+            return Q.resolve(false);
+          });
+
           return permissionsModel(user, right, uri, roomType, security)
             .then(function(granted) {
               assert(!granted);
@@ -948,7 +1013,13 @@ describe('permissions-model', function() {
       describe('adduser', function() {
         var right = 'adduser';
 
-        it('should allow repo members to add', function(done) {
+        it('should allow repo members in the room to add', function(done) {
+          mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
+            assert.equal(pUri, uri);
+            assert.equal(pUser, user);
+            return Q.resolve(true);
+          });
+
           mockito.when(getRepoMethodMock)().then(function(repo) {
             assert.equal(repo, parentUri);
             return Q.resolve(true);
@@ -957,6 +1028,25 @@ describe('permissions-model', function() {
           return permissionsModel(user, right, uri, roomType, security)
             .then(function(granted) {
               assert(granted);
+            })
+            .nodeify(done);
+        });
+
+        it('should deny repo members not in the room to add', function(done) {
+          mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
+            assert.equal(pUri, uri);
+            assert.equal(pUser, user);
+            return Q.resolve(false);
+          });
+
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, parentUri);
+            return Q.resolve(true);
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(!granted);
             })
             .nodeify(done);
         });
@@ -1369,7 +1459,27 @@ describe('permissions-model', function() {
       describe('join', function() {
         var right = 'join';
 
-        it('should allow', function(done) {
+        it('should allow people already in the room', function(done) {
+          mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
+            assert.equal(pUri, uri);
+            assert.equal(pUser, user);
+            return Q.resolve(true);
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(granted);
+            })
+            .nodeify(done);
+        });
+
+        it('should deny people not already in the room', function(done) {
+          mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
+            assert.equal(pUri, uri);
+            assert.equal(pUser, user);
+            return Q.resolve(false);
+          });
+
           return permissionsModel(user, right, uri, roomType, security)
             .then(function(granted) {
               assert(!granted);
