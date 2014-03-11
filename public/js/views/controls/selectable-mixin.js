@@ -99,6 +99,17 @@ define([
       }
       this.trigger('selected', model);
     },
+    getActive: function() {
+      var $c = getContainer(this);
+      var $active = $c.find('li.active:not(.divider):visible');
+
+      var active = $active[0];
+      if(!active) return;
+
+      var cid = active.dataset.cid;
+      var model = this.collection.get(cid);
+      return model;
+    },
     setActive: function(model) {
       if(!model) return;
 

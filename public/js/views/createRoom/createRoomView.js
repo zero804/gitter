@@ -24,7 +24,6 @@ define([
       permInheritedRepo: "#perm-select-inherited-repo",
       permExistingRepo: "#perm-select-existing-repo",
 
-
       selectParentRequired: "#perm-select-required",
       existing: '#existing',
       parentNameLabel: "#parent-name",

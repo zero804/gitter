@@ -12,7 +12,8 @@ define([
   'hbs!./tmpl/addItemTemplate',
   'views/controls/dropdown',
   'views/controls/typeahead'
-], function($, _, Marionette, Backbone, TroupeViews, context, template, userSearchItemTemplate, itemTemplate, Dropdown, Typeahead) {
+], function($, _, Marionette, Backbone, TroupeViews, context, template, userSearchItemTemplate,
+  itemTemplate, Dropdown, Typeahead) {
   "use strict";
 
   var UserSearchModel = Backbone.Model.extend({
@@ -111,7 +112,17 @@ define([
     },
 
     onRender: function() {
-      this.typeahead = new Typeahead({ collection: new UserSearchCollection(), itemTemplate: userSearchItemTemplate, el: this.ui.input[0] });
+      this.typeahead = new Typeahead({
+        collection: new UserSearchCollection(),
+        itemTemplate: userSearchItemTemplate,
+        el: this.ui.input[0],
+        autoSelector: function(input) {
+          return function(m) {
+            return m.get('displayName').indexOf(input) >= 0 || m.get('username').indexOf(input) >= 0;
+          };
+        }
+      });
+
       this.listenTo(this.typeahead, 'selected', this.selected);
     },
 
