@@ -22,7 +22,6 @@ define([
       permPrivate: "#perm-select-private",
       permInheritedOrg: "#perm-select-inherited-org",
       permInheritedRepo: "#perm-select-inherited-repo",
-      permExistingRepo: "#perm-select-existing-repo",
 
       selectParentRequired: "#perm-select-required",
       existing: '#existing',
@@ -69,7 +68,8 @@ define([
     },
 
     clickDropDown: function() {
-      $('#input-parent').focus();
+      this.parentSelect.focus();
+      this.parentSelect.show();
     },
 
     validateAndCreate: function() {
@@ -94,11 +94,13 @@ define([
       switch(ownerModel.get('type')) {
         case 'user':
           if(permissions !== 'public' && permissions !== 'private') {
+            window.alert('Please select the permissions for the room');
             // TODO: better error reporting!
             return;
           }
 
           if(channelName && !safeRoomName(channelName)) {
+            window.alert('You need to specify a room name');
             this.ui.roomNameInput.focus();
             return;
           }
@@ -109,11 +111,13 @@ define([
         case 'repo':
         case 'org':
           if(permissions !== 'public' && permissions !== 'private' && permissions != 'inherited') {
+            window.alert('Please select the permissions for the room');
             // TODO: better error reporting!
             return;
           }
 
           if(!safeRoomName(channelName)) {
+            window.alert('Please choose a channel name');
             this.ui.roomNameInput.focus();
             return;
           }
@@ -155,6 +159,7 @@ define([
     },
 
     recalcView: function(animated) {
+      if(!this.rendered) return;
 
       var self = this;
       var showHide = {
@@ -164,7 +169,6 @@ define([
         'permPrivate': false,
         'permInheritedOrg': false,
         'permInheritedRepo': false,
-        'permExistingRepo': false,
         'existing': false
       };
 
@@ -216,8 +220,9 @@ define([
 
       if(checkForRepo) {
         checkForRepoExistence(checkForRepo, function(exists) {
+          createButtonEnabled = !exists;
+
           if(exists) {
-            createButtonEnabled = !exists;
             showHide = {
               'selectParentRequired': false,
               'autoJoin': false,
@@ -225,7 +230,6 @@ define([
               'permPrivate': false,
               'permInheritedOrg': false,
               'permInheritedRepo': false,
-              'permExistingRepo': true,
               'existing': false
             };
           }
@@ -283,6 +287,7 @@ define([
     },
 
     onRender: function() {
+      this.rendered = true;
       var parentSelect = new ParentSelectView({
         orgsCollection: troupeCollections.orgs,
         troupesCollection: troupeCollections.troupes

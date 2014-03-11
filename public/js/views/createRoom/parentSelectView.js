@@ -127,6 +127,10 @@ define([
       this.typeahead.close();
     },
 
+    focus: function() {
+      this.ui.input.focus();
+    },
+
     show: function() {
       this.typeahead.show();
     },
