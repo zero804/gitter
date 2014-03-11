@@ -145,6 +145,7 @@ define([
     },
 
     recalcView: function(animated) {
+
       var self = this;
       var showHide = {
         'selectParentRequired': false,
@@ -161,9 +162,9 @@ define([
       var model = this.selectedModel;
       var checkForRepo;
       var parentName = "";
+      var createButtonEnabled = true;
 
       if(model) {
-        this.ui.parentNameLabel.text();
         parentName = model.get('name');
         var roomName = this.ui.roomNameInput.val();
         var parentUri = model.get('uri');
@@ -250,6 +251,7 @@ define([
           return $(elements);
         }
 
+        self.dialog.setButtonState('create', createButtonEnabled);
         if(animated === false) {
           arrayToJq(true).show();
           arrayToJq(false).hide();
@@ -258,10 +260,11 @@ define([
         } else {
           arrayToJq(true).filter(':hidden').slideDown("fast");
           arrayToJq(false).filter(':visible').slideUp("fast");
+
           window.setTimeout(function() {
-            self.ui.parentNameLabel.text(parentName);
-            self.ui.roomNameInput.attr('placeholder', placeholder);
-          }, 200);
+            this.ui.parentNameLabel.text(parentName);
+            this.ui.roomNameInput.attr('placeholder', placeholder);
+          }.bind(self), 200);
         }
 
       }
@@ -284,6 +287,8 @@ define([
       } else {
         this.parentSelected(null, false);
       }
+
+      this.recalcView(false);
     },
 
     roomNameChange: function() {
