@@ -16,7 +16,7 @@ define([
     },
 
     initialize: function() {
-      this.repoSelectView = new RepoSelectView({ });
+      this.repoSelectView = new RepoSelectView({ collection: RepoSelectView.createCollection() });
       this.listenTo(this.repoSelectView, 'selected', this.repoSelected);
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
     },
@@ -28,6 +28,10 @@ define([
 
     menuItemClicked: function(button) {
       switch(button) {
+        case 'back':
+          window.location.hash = "#createroom";
+          break;
+
         case 'cancel':
           this.dialog.hide();
           break;
@@ -52,6 +56,7 @@ define([
       this.view = new View(options);
     },
     menuItems: [
+      { action: "back", text: "Back", className: "trpBtnLightGrey"},
       { action: "cancel", text: "Cancel", className: "trpBtnLightGrey"}
     ]
   });

@@ -613,13 +613,57 @@ define([
   // Mixin for Marionette.CollectionView classes
   TroupeViews.LoadingCollectionMixin = {
     loadingView: TroupeViews.LoadingView,
-    getEmptyView: function() {
+    initialize: function() {
+      console.log('setting show empty view');
+
+      this.showEmptyView = this.showLoadingView;
+    },
+    showLoadingView: function() {
+      console.log('SHOW EMPTY VIEW!!!!!!!!!!!!!!');
+
       if(this.collection.loading) {
-        return Marionette.getOption(this, "loadingView");
+        console.log('SHOWING LOADING VIEW');
+        var LoadingView = Marionette.getOption(this, "loadingView");
+
+        if(!this.loadingModel) {
+          this.loadingModel = new Backbone.Model();
+        }
+
+        var v = this.children.findByModel(this.loadingModel);
+
+        if (LoadingView && !v) {
+          this.addItemView(this.loadingModel, LoadingView, 0);
+          this.listenToOnce(this.collection, 'loaded', function() {
+            console.log('REMOVING LOADING VIEW');
+            this.removeItemView(this.loadingModel);
+
+
+            if(this.collection.length === 0) {
+              console.log('SHOWING EMPTY VIEW');
+              this.constructor.prototype.showEmptyView.call(this);
+              return true;
+            }
+          });
+        }
+        return true;
       }
 
-      return Marionette.getOption(this, "emptyView");
+      this.constructor.prototype.showEmptyView.call(this);
+      return true;
     },
+
+    // collectionLoaded: function() {
+    //   this.render();
+    // },
+    // getEmptyView: function() {
+    //   console.log("getEmptyView");
+    //   console.trace();
+    //   if(this.collection.loading) {
+    //     return Marionette.getOption(this, "loadingView");
+    //   }
+
+    //   return Marionette.getOption(this, "emptyView");
+    // },
   };
 
   TroupeViews.DelayedShowLayoutMixin = {
