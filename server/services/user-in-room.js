@@ -9,9 +9,11 @@ function userIsInRoom(uri, user) {
     .then(function(troupe) {
       if(!troupe) return;
 
-      return troupe.users.some(function(troupeUser) {
-        return troupeUser.userId === user._id;
+      var inRoom = troupe.users.some(function(troupeUser) {
+        return "" + troupeUser.userId === "" + user._id;
       });
+
+      return inRoom;
 
     });
 }

@@ -100,7 +100,7 @@ function serializeCreateEvent(troupe) {
  */
 function findOrCreateNonOneToOneRoom(user, troupe, uri) {
   if(troupe) {
-    winston.verbose('Does user ' + user && user.username + ' have access to ' + uri + '?');
+    winston.verbose('Does user ' + (user && user.username || '~anon~') + ' have access to ' + uri + '?');
 
     return Q.all([
         troupe,
@@ -456,11 +456,12 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
             upsert: true
           })
           .then(function(newRoom) {
-            console.log(newRoom);
             // TODO handle adding the user in the event that they didn't create the room!
             if(newRoom._nonce === nonce) {
               serializeCreateEvent(newRoom);
-              return newRoom;
+
+              return uriLookupService.reserveUriForTroupeId(newRoom._id, uri)
+                .thenResolve(newRoom);
             }
 
             /* Somehow someone beat us to it */
