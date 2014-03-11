@@ -2,7 +2,7 @@
   <div id="room-owner-and-name" class="gtrRoomName">
     <dl class="owner" style="float: left">
       <dt>
-        <label for="owner">Owner</label>
+        <label for="owner"><strong>Owner</strong></label>
       </dt>
       <dd id="owner-region">
         <div class="gtrInput gtrOwnerDD">
@@ -12,7 +12,7 @@
     <div class="gtrSlash">/</div>
      <dl class="owner" style="float: left">
       <dt>
-        <label for="room">Room name</label>
+        <label for="room"><strong>Room name</strong></label>
       </dt>
       <dd>
         <input class="gtrInput room" id="room-name" autofocus/>
@@ -20,13 +20,13 @@
     </dl>
   </div>
   <div id="permissions" class="gtrRoomPermissions">
-    <label>Permissions</label>
+    <label><strong>Permissions</strong></label>
     <div id="perm-select-public" class="permission-row">
       <label>
         <div><input name="permissions" type="radio" value="public"></div>
-        <span class="github-REPO">
+        <span class="icon-public">
           <span class="permission-label">
-            Public
+            <strong>Public</strong>
           </span>
         </span>
         <span class="description">Anyone in the world can join.</span>
@@ -38,7 +38,7 @@
         <div><input name="permissions" type="radio" value="inherited"></div>
         <span class="github-ORG">
           <span id="perm-inherited-label" class="permission-label">
-            Organisation
+           <strong>Organisation</strong>
           </span>
         </span>
         <span class="description">Anyone in <strong id="parent-name">orgName</strong> can join. </span>
@@ -50,19 +50,31 @@
         <div><input name="permissions" type="radio" value="inherited"></div>
         <span class="github-REPO">
           <span id="perm-inherited-label" class="permission-label">
-            Repository
+            <strong>Repository</strong>
           </span>
         </span>
         <span class="description">Anyone in <strong id="parent-name">repoName</strong> can join. </span>
       </label>
     </div>
 
+<!--     <div id="perm-select-existing-repo" class="permission-row">
+      <label>
+        <div><input name="permissions" type="radio" value="inherited"></div>
+        <span class="github-REPO">
+          <span id="perm-inherited-label" class="permission-label">
+            <strong>Repository</strong>
+          </span>
+        </span>
+        <span class="description">Anyone who can access <strong id="parent-name">repoName</strong> can join. </span>
+      </label>
+    </div> -->
+
     <div id="perm-select-private" class="permission-row">
       <label>
         <div><input name="permissions" type="radio"  value="private"></div>
         <span class="github-LOCK">
           <span class="permission-label">
-            Private
+            <strong>Private</strong>
           </span>
         </span>
         <span class="description">Only people added to the room can join.</span>
