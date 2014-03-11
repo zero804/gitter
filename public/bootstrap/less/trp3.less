@@ -182,7 +182,7 @@ label {
 .gtrRoomPermissions {
   min-height: 180px;
   clear: both;
-
+  
   input {
     float: left;
     margin: 8px 12px 0 4px;
@@ -224,12 +224,20 @@ label {
 
   }
 
+  .icon-public {
+    .prepend-globe-icon;
+    &:before {
+      font-size: 22px;
+      padding-top: 8px;
+      margin-top: -4px;
+    }
+  }
+
   .github-REPO {
     .prepend-repo-icon;
     &:before {
       font-size: 24px;
       padding-top: 8px;
-      opacity: 0.6;
     }
   }
 
@@ -238,7 +246,6 @@ label {
     &:before {
       font-size: 22px;
       padding-top: 8px;
-      opacity: 0.6;
       margin-top: -4px;
     }
   }
@@ -248,7 +255,6 @@ label {
     &:before {
       font-size: 24px;
       padding-top: 8px;
-      opacity: 0.6;
     }
   }
 
@@ -257,7 +263,6 @@ label {
     &:before {
       font-size: 24px;
       padding-top: 8px;
-      color: #e9dba8;
     }
   }
 
