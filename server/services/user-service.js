@@ -9,6 +9,7 @@ var persistence               = require("./persistence-service");
 var userConfirmationService   = require('./user-confirmation-service');
 var statsService              = require("./stats-service");
 var collections               = require("../utils/collections");
+var uriLookupService          = require('./uri-lookup-service');
 
 /**
  * Creates a new user
@@ -48,6 +49,12 @@ function newUser(options, callback) {
     },
     {
       upsert: true
+    })
+    .then(function(user) {
+      // Reserve the URI for the user so that we don't need to figure it out
+      // manually later (which will involve dodgy calls to github)
+      return uriLookupService.reserveUriForUsername(user._id, user.username)
+        .thenResolve(user);
     })
     .then(function(user) {
       var optionStats = options.stats || {};
