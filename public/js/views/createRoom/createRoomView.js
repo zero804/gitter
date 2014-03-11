@@ -22,7 +22,7 @@ define([
       permPrivate: "#perm-select-private",
       permInheritedOrg: "#perm-select-inherited-org",
       permInheritedRepo: "#perm-select-inherited-repo",
-
+      validation: '#modal-failure',
       selectParentRequired: "#perm-select-required",
       existing: '#existing',
       parentNameLabel: "#parent-name",
@@ -72,10 +72,14 @@ define([
       this.parentSelect.show();
     },
 
+    showValidationMessage: function(message) {
+      this.ui.validation.text(message);
+      this.ui.validation.slideDown('fast');
+    },
+
     validateAndCreate: function() {
       /* We do a better job on the server with checking names, as we have XRegExp there */
       function safeRoomName(val) {
-        if(!val) return false;
         if(val.length < 1) return false;
         if(/[<>\\\/\{\}|\#@\&\.\(\)\'\"]/.test(val)) return false;
         return true;
@@ -88,19 +92,19 @@ define([
       }
 
       var permissions = this.$el.find('input[type=radio]:visible:checked').val();
-      var channelName = this.ui.roomNameInput.val();
+      var channelName = this.ui.roomNameInput.val().trim();
       var url;
 
       switch(ownerModel.get('type')) {
         case 'user':
           if(permissions !== 'public' && permissions !== 'private') {
-            window.alert('Please select the permissions for the room');
+            this.showValidationMessage('Please select the permissions for the room');
             // TODO: better error reporting!
             return;
           }
 
           if(channelName && !safeRoomName(channelName)) {
-            window.alert('You need to specify a room name');
+            this.showValidationMessage('You need to specify a room name');
             this.ui.roomNameInput.focus();
             return;
           }
@@ -111,13 +115,13 @@ define([
         case 'repo':
         case 'org':
           if(permissions !== 'public' && permissions !== 'private' && permissions != 'inherited') {
-            window.alert('Please select the permissions for the room');
+            this.showValidationMessage('Please select the permissions for the room');
             // TODO: better error reporting!
             return;
           }
 
-          if(!safeRoomName(channelName)) {
-            window.alert('Please choose a channel name');
+          if(!channelName || !safeRoomName(channelName)) {
+            this.showValidationMessage('Please choose a channel name consisting of letter and number characters');
             this.ui.roomNameInput.focus();
             return;
           }
@@ -135,15 +139,15 @@ define([
         statusCode: {
           400: function(data) {
             if ($.parseJSON(data.responseText).illegalName) {
-              window.alert('The name you have chosen is illegal');
+              this.showValidationMessage('Please choose a channel name consisting of letter and number characters');
               this.ui.roomNameInput.focus();
             }
           },
           403: function() {
-            window.alert('You don\'t have permission to create that room');
+            this.showValidationMessage('You don\'t have permission to create that room');
           },
           409: function() {
-            window.alert('There is already a Github repository with that name');
+            this.showValidationMessage('There is already a Github repository with that name');
           }
         },
         success: function(data) {
