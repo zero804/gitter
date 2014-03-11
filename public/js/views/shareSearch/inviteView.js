@@ -22,7 +22,7 @@ define([
       switch(button) {
         case 'add':
           this.dialog.hide();
-          window.location.href = window.location.href + "#add";
+          window.location.hash = "#add";
           break;
 
         case 'cancel':
