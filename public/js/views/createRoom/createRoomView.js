@@ -69,7 +69,6 @@ define([
     },
 
     clickDropDown: function() {
-      console.log("DD");
       $('#input-parent').focus();
     },
 
@@ -218,6 +217,7 @@ define([
       if(checkForRepo) {
         checkForRepoExistence(checkForRepo, function(exists) {
           if(exists) {
+            createButtonEnabled = !exists;
             showHide = {
               'selectParentRequired': false,
               'autoJoin': false,
@@ -263,6 +263,7 @@ define([
         }
 
         self.dialog.setButtonState('create', createButtonEnabled);
+
         if(animated === false) {
           arrayToJq(true).show();
           arrayToJq(false).hide();
