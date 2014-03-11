@@ -108,7 +108,13 @@ define([
 
     onRender: function() {
       if(!this.typeahead) {
-        this.typeahead = new Typeahead({ fetch: this.refilter.bind(this), collection: this.dropdownItems, itemTemplate: itemTemplate, el: this.ui.input[0] });
+        this.typeahead = new Typeahead({
+          fetch: this.refilter.bind(this),
+          collection: this.dropdownItems,
+          itemTemplate: itemTemplate,
+          el: this.ui.input[0],
+          autoSelect: true
+        });
         this.listenTo(this.typeahead, 'selected', this.selected);
       }
     },

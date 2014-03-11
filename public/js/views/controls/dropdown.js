@@ -6,10 +6,9 @@ define([
   'views/base',
   'cocktail',
   'mutant',
-  'hbs!./tmpl/dropdown',
-  'hbs!./tmpl/dropdownItem',
-  'hbs!./tmpl/dropdownEmpty'
-], function($, _, Marionette, TroupeViews, cocktail, Mutant, template, itemTemplate, emptyTemplate) {
+  './selectable-mixin',
+  'hbs!./tmpl/dropdownItem'
+], function($, _, Marionette, TroupeViews, cocktail, Mutant, SelectableMixin, itemTemplate) {
   "use strict";
 
   /* Transition period on css */
@@ -38,12 +37,8 @@ define([
 
   var backdrop = '.dropdown-backdrop';
 
-  var RowView = Marionette.ItemView.extend({
+  var DropdownItemView = Marionette.ItemView.extend({
     tagName: "li",
-    events: {
-      'click a':  'click',
-      'click':    'click'
-    },
     template: itemTemplate,
     initialize: function(options) {
       if(options && options.template) {
@@ -57,10 +52,8 @@ define([
 
       return "";
     },
-    click: function(e) {
-      this.trigger('selected', this.model);
-      e.preventDefault();
-      e.stopPropagation();
+    onRender: function() {
+      this.el.dataset.cid = this.model.cid;
     }
   });
 
@@ -71,23 +64,17 @@ define([
   };
 
   var DropdownMenuView = Marionette.CollectionView.extend({
-    itemView: RowView,
+    itemView: DropdownItemView,
     tagName: 'ul',
-    className: 'dropdown dropdown-hidden',
+    className: 'dropdown dropdown-hidden selectable',
     ui: {
       menu: 'ul.dropdown'
     },
     events: {
       'keydown': 'keydown',
-      'mouseover li:not(.divider):visible': 'mouseover',
       'click li a': 'clicked'
     },
-    itemEvents: {
-      'selected': function(e, target, model) {
-        // Forward 'selected' events
-        this.trigger('selected', model);
-      }
-    },
+
     itemViewOptions: function() {
       var options = {};
       if(this.options.itemTemplate) {
@@ -95,14 +82,17 @@ define([
       }
       return options;
     },
+
     initialize: function(options) {
       this.targetElement = options.targetElement;
       this.$targetElement = $(this.targetElement);
       this.options = _.extend({}, DEFAULTS, options);
     },
+
     active: function() {
       return !this.$el.hasClass('dropdown-hidden');
     },
+
     onRender: function() {
       var zIndex = findMaxZIndex(this.targetElement) + 5;
       if(zIndex < 100) {
@@ -110,9 +100,11 @@ define([
       }
       this.el.style.zIndex = zIndex;
     },
+
     onClose: function() {
       if(this.mutant) this.mutant.disconnect();
     },
+
     clicked: function() {
       if(!this.collection) {
         /* Static */
@@ -165,8 +157,6 @@ define([
 
       $(backdrop).remove();
       if(activeDropdown) {
-        // var t = activeDropdown;
-        // activeDropdown = null;
         activeDropdown.hide();
       }
 
@@ -181,6 +171,8 @@ define([
           t.hide();
         }
       });
+
+      this.setActive(this.selectedModel);
 
 
       $e.detach().css({ top: 0, left: 0, display: 'block' });
@@ -198,7 +190,7 @@ define([
       var $el = this.$el;
       this.showWhenItems = false;
       if(!this.active()) return;
-      $el.find('li.active:not(.divider):visible').removeClass('active');
+      // $el.find('li.active:not(.divider):visible').removeClass('active');
       $el.addClass('dropdown-hidden');
 
       window.setTimeout(function() {
@@ -230,9 +222,6 @@ define([
         left = pos.left - actualWidth + pos.width;
       }
 
-      console.log('LEFT IS ', left);
-      console.log('POS IS ', pos);
-
       var tp = {top: pos.top + pos.height, left: left};
       this.applyPlacement(tp);
     },
@@ -261,7 +250,6 @@ define([
       if (replace) $e.offset(offset);
     },
 
-
     toggle: function () {
       var isActive = this.active();
       if(isActive) {
@@ -270,19 +258,7 @@ define([
         this.show();
       }
     },
-    mouseover: function(e) {
-      var $items = this.$el.find('li:not(.divider):visible');
 
-      if (!$items.length) return;
-
-      var currentActive = $items.filter('.active');
-      var newActive = e.currentTarget;
-
-      if(currentActive[0] === newActive) return;
-
-      currentActive.removeClass('active');
-      $(newActive).addClass('active');
-    },
     keydown: function (e) {
       switch(e.keyCode) {
         case 13:
@@ -291,61 +267,16 @@ define([
         case 27:
           this.hide();
           break;
-        case 38:
-          this.selectPrev();
-          break;
-        case 40:
-          this.selectNext();
-          break;
         default:
           return;
       }
 
       e.preventDefault();
       e.stopPropagation();
-    },
-    selectPrev: function() {
-      this._moveSelect(-1);
-    },
-    selectNext: function() {
-      this._moveSelect(+1);
-    },
-    select: function() {
-      var first = this.$el.find('li:not(.divider):visible.active').first();
-      if(first.length) {
-        first.trigger('click');
-      } else {
-        this._moveSelect(0);
-        this.$el.find('li:not(.divider):visible.active').first().trigger('click');
-      }
-    },
-    _moveSelect: function(delta) {
-      var $items = this.$el.find('li:not(.divider):visible');
-
-      if (!$items.length) return;
-
-      var currentActive = $items.filter('.active');
-      var index = $items.index(currentActive);
-      if(!~index) {
-        index = 0;
-      } else {
-        index = index + delta;
-        if(index < 0) {
-          index = 0;
-        } else if(index >= $items.length) {
-          index = $items.length - 1;
-        }
-      }
-
-      if(index != currentActive) {
-        var newActive = $items.eq(index);
-        currentActive.removeClass('active');
-        newActive.addClass('active');
-        newActive.addClass('focus');
-      }
     }
   });
-  cocktail.mixin(DropdownMenuView, TroupeViews.SortableMarionetteView);
-
+console.log(SelectableMixin);
+  cocktail.mixin(DropdownMenuView, TroupeViews.SortableMarionetteView, SelectableMixin);
+  console.log(DropdownMenuView.prototype);
   return DropdownMenuView;
 });

@@ -351,18 +351,6 @@ define([
     hide: function ( e ) {
       if(e) e.preventDefault();
       if(this.navigable) {
-
-        // var hash = window.location.hash.replace(/\%7C/ig, '|');
-        // var currentFragment;
-        // if(!hash) {
-        //   currentFragment = '#!';
-        // } else {
-        //   currentFragment = hash.split('|', 1)[0];
-        //   if (currentFragment == "#") {
-        //     currentFragment = "#!";
-        //   }
-        // }
-
         window.location = '#';
         return;
       }

@@ -1,35 +1,23 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'underscore',
   'backbone',
   'marionette',
-  './dropdown'
-], function(_, Backbone, Marionette, Dropdown) {
+  './dropdown',
+  './live-search',
+], function(Backbone, Marionette, Dropdown, liveSearch) {
   "use strict";
-
 
   var TypeaheadView = Marionette.ItemView.extend({
     tagName: 'input',
     events: {
-      'change': 'inputChange',
-      'cut': 'inputChange',
-      'paste': 'inputChange',
-      'input': 'inputChange',
       'keydown': 'keydown',
       'keyup': 'keyup',
       'blur': 'blur'
     },
     initialize: function(options) {
-      var self = this;
-
       if(!this.collection) {
         this.collection = new Backbone.Collection();
       }
-
-      this.inputChangeFast = _.debounce(this.inputChangeDebounced.bind(this), 400);
-      this.inputChangeSlow = _.debounce(function() {
-        self.inputChangeFast();
-      }, 800);
 
       if(options.el) {
         this.attach();
@@ -42,7 +30,7 @@ define([
 
     show: function() {
       if(this.lastFetchInput === undefined) {
-        this.inputChangeDebounced();
+        this.searchTextChanged(this.el.value);
       }
 
       this.dropdown.show();
@@ -54,7 +42,14 @@ define([
 
     attach: function() {
       if(this.dropdown) return;
-      this.dropdown = new Dropdown({ collection: this.collection, itemTemplate: this.options.itemTemplate, targetElement: this.el });
+      liveSearch(this, this.$el, 'searchTextChanged', { shortDebounce: 400, longDebounce: 800 });
+
+      this.dropdown = new Dropdown({
+        collection: this.collection,
+        itemTemplate: this.options.itemTemplate,
+        targetElement: this.el
+      });
+
       this.listenTo(this.dropdown, 'selected', this.selected);
     },
 
@@ -74,21 +69,7 @@ define([
       this.dropdown.hide();
     },
 
-    inputChange: function() {
-      var input = this.$el.val();
-
-      if(input.length < 3) {
-        this.inputChangeSlow();
-      } else {
-        this.inputChangeFast();
-      }
-    },
-
-    inputChangeDebounced: function() {
-      var input = this.$el.val();
-      if(this.lastFetchInput === input) return;
-      this.lastFetchInput = input;
-
+    searchTextChanged: function(input) {
       if(this.options.fetch) {
         this.options.fetch(input, this.collection);
       } else {
@@ -101,7 +82,7 @@ define([
     keydown: function(e) {
       switch(e.keyCode) {
         case 13:
-          this.dropdown.select();
+          this.dropdown.selectActive();
           break;
 
         case 38:
@@ -109,8 +90,11 @@ define([
           break;
 
         case 40:
-          this.dropdown.show();
-          this.dropdown.selectNext();
+          if(this.dropdown.active()) {
+            this.dropdown.selectNext();
+          } else {
+            this.dropdown.show();
+          }
           break;
 
         case 27:

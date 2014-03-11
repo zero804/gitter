@@ -12,7 +12,8 @@ define([
   'views/controls/selectable-mixin',
   'views/controls/live-search',
   'filtered-collection' /* no ref */
-], function(Marionette, Backbone, TroupeViews, TroupeCollections, template, itemTemplate, emptyTemplate, repoModels, cocktail, SelectableMixin, liveSearch) {
+], function(Marionette, Backbone, TroupeViews, TroupeCollections, template, itemTemplate,
+  emptyTemplate, repoModels, cocktail, SelectableMixin, liveSearch) {
   "use strict";
 
   // TODO: put this somewhere else

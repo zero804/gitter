@@ -28,7 +28,6 @@ define([
       currentActive.removeClass('active');
       newActive.classList.add("active");
     },
-
     selectKeydown: function (e) {
       switch(e.keyCode) {
         case 13:
@@ -64,6 +63,9 @@ define([
         $c.find('li:not(.divider):visible.active').first().trigger('click');
       }
     },
+    selectActive: function() {
+      this.simulateClick();
+    },
     selectClicked: function(e) {
       var selected = e.currentTarget;
       var cid = selected.dataset.cid;
@@ -96,6 +98,20 @@ define([
         selectedView.$el.addClass('selected');
       }
       this.trigger('selected', model);
+    },
+    setActive: function(model) {
+      if(!model) return;
+
+      var activeView = this.children.findByModel(model);
+      if(!activeView) return;
+
+      /* Already active? */
+      if(activeView.$el.hasClass('active')) return;
+
+      var $c = getContainer(this);
+      $c.find('li.active:not(.divider):visible').removeClass('active');
+
+      activeView.$el.addClass('active');
     },
     _moveSelect: function(delta) {
       var $c = getContainer(this);
