@@ -192,6 +192,7 @@ define([
       if(!this.active()) return;
       // $el.find('li.active:not(.divider):visible').removeClass('active');
       $el.addClass('dropdown-hidden');
+      $(backdrop).remove();
 
       window.setTimeout(function() {
         $el.css({ display: 'none' });

@@ -22,7 +22,6 @@ define([
       permPrivate: "#perm-select-private",
       permInheritedOrg: "#perm-select-inherited-org",
       permInheritedRepo: "#perm-select-inherited-repo",
-      permExistingRepo: "#perm-select-existing-repo",
 
       selectParentRequired: "#perm-select-required",
       existing: '#existing',
@@ -69,7 +68,8 @@ define([
     },
 
     clickDropDown: function() {
-      $('#input-parent').focus();
+      this.parentSelect.focus();
+      this.parentSelect.show();
     },
 
     validateAndCreate: function() {
@@ -169,7 +169,6 @@ define([
         'permPrivate': false,
         'permInheritedOrg': false,
         'permInheritedRepo': false,
-        'permExistingRepo': false,
         'existing': false
       };
 
@@ -221,8 +220,9 @@ define([
 
       if(checkForRepo) {
         checkForRepoExistence(checkForRepo, function(exists) {
+          createButtonEnabled = !exists;
+
           if(exists) {
-            createButtonEnabled = !exists;
             showHide = {
               'selectParentRequired': false,
               'autoJoin': false,
@@ -230,7 +230,6 @@ define([
               'permPrivate': false,
               'permInheritedOrg': false,
               'permInheritedRepo': false,
-              'permExistingRepo': true,
               'existing': false
             };
           }
