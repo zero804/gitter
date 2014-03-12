@@ -147,7 +147,7 @@ define([
     {
       command: 'channel',
       description: 'Create/join a channel',
-      completion: 'channel',
+      completion: 'channel ',
       regexp: /^\/channel/,
       action: function(view) {
         var input = view.$el.val();
