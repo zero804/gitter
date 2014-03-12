@@ -85,6 +85,10 @@ require([
     postMessage({ type: "navigation", url: url, urlType: type, title: title});
   });
 
+  appEvents.on('route', function(hash) {
+    postMessage({ type: "route", hash: hash });
+  });
+
   appEvents.on('realtime.testConnection', function() {
     postMessage({ type: "realtime.testConnection" });
   });
