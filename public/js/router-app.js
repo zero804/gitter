@@ -85,6 +85,9 @@ require([
       case 'navigation':
         appEvents.trigger('navigation', message.url, message.urlType, message.title);
         break;
+      case 'route':
+        window.location.hash = '#' + message.hash;
+        break;
       case 'realtime.testConnection':
         realtime.testConnection();
         break;
@@ -106,6 +109,7 @@ require([
       // TODO: get rid of the pipes
       "": "hideModal",
       "createcustomroom": "createcustomroom",
+      "createcustomroom/:name": "createcustomroom",
       "createreporoom": "createreporoom",
       "createroom" : "createroom"
     },
@@ -118,7 +122,7 @@ require([
       appView.dialogRegion.show(new chooseRoomView.Modal());
     },
 
-    createcustomroom: function() {
+    createcustomroom: function(name) {
       /* Figure out who's the daddy */
 
       function getParentUri(troupe) {
@@ -139,7 +143,7 @@ require([
 
       var uri = window.location.pathname.split('/').slice(1).join('/');
       if(uri === context.user().get('username')) {
-        showWithOptions({ initialParent: uri });
+        showWithOptions({ initialParent: uri, roomName: name });
       }
 
       var current = allRoomsCollection.findWhere({ url: '/' + uri });
@@ -148,16 +152,16 @@ require([
           current = allRoomsCollection.findWhere({ url: '/' + uri });
           if(current) {
             uri = getParentUri(current);
-            showWithOptions({ initialParent: uri });
+            showWithOptions({ initialParent: uri, roomName: name });
           } else {
-            showWithOptions({ });
+            showWithOptions({ roomName: name });
           }
         });
         return;
       }
 
       uri = getParentUri(current);
-      showWithOptions({ initialParent: uri });
+      showWithOptions({ initialParent: uri, roomName: name });
     },
 
     createreporoom: function() {
