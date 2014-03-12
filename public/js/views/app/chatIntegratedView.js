@@ -130,10 +130,7 @@ define([
         e.preventDefault();
       }
 
-      function start() {
-        setTimeout(function(){ progressBar.css('width', '10%'); }, 50);
-        setTimeout(function(){ progressBar.css('width', '20%'); }, 150);
-      }
+      function start() {}
 
       function progress(bytesReceived, bytesExpected) {
         var percentage = (bytesReceived / bytesExpected * 100 + 20).toFixed(2) + '%';
@@ -151,6 +148,8 @@ define([
         e.preventDefault();
 
         progressBar.show();
+        setTimeout(function(){ progressBar.css('width', '10%'); }, 50);
+        setTimeout(function(){ progressBar.css('width', '20%'); }, 600);
 
         // Prepare formdata
         e = e.originalEvent;
