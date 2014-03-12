@@ -56,8 +56,10 @@
 
 <div class="trpToolbar" id="toolbar-frame">
 </div>
-
 <div class="trpChatInputWrapper" id="chat-input-wrapper">
+  <div class="trpFileProgressContainer">
+    <div class="trpFileProgressBar" id="file-progress-bar"></div>
+  </div>
   <div class="banner-wrapper bottom" style="display: none;">
     <div id="bottom-unread-banner" class="banner slide-away"></div>
   </div>
@@ -76,5 +78,13 @@
 <script type="text/javascript">
 window.scrollTo(0,document.body.scrollHeight);
 </script>
+
+<div style="display: none;">
+  <form id="upload-form" action="" enctype="multipart/form-data" method="POST">
+    <input type="hidden" name="params" value="">
+    <input type="file" name="file" multiple="multiple"/>
+  </form>
+</div>
+
 </body>
 </html>
