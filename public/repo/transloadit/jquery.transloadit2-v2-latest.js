@@ -823,8 +823,6 @@ define(["jquery"], function (jQuery){
           return;
         }
 
-        self.renderProgress(assembly);
-
         if (isComplete || (!self._options['wait'] && isExecuting)) {
           self.ended = true;
           document.title = self.documentTitle;
