@@ -4,6 +4,7 @@
 var userService = require('../../services/user-service');
 var troupeService = require('../../services/troupe-service');
 var chatService = require('../../services/chat-service');
+var nconf   = require('../../utils/config');
 
 var redis = require('../../utils/redis');
 var redisClient = redis.createClient();
@@ -32,7 +33,8 @@ module.exports = function(req, res) {
 
         // Generate a message for each uploaded file. 
         transloadit.results[':original'].forEach(function(upload) {
-          var text = '[' + upload.name + '](' + upload.ssl_url + ')';
+          var cnamed_url = upload.ssl_url.replace(nconf.get('transloadit:bucket') + '.s3.amazonaws.com', nconf.get('transloadit:cname'));
+          var text = '[' + upload.name + '](' + cnamed_url + ')';
           chatService.newChatMessageToTroupe(room, user, text, function() {});
         });
 
