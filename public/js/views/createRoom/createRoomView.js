@@ -313,6 +313,10 @@ define([
 
       this.listenTo(parentSelect, 'selected', this.parentSelected);
 
+      if(this.options.roomName) {
+        this.ui.roomNameInput.val(this.options.roomName);
+      }
+
       if(this.options.initialParent) {
         var model = this.parentSelect.selectUri(this.options.initialParent);
         this.parentSelected(model, false);
