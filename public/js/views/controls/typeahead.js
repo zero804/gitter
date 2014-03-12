@@ -45,7 +45,7 @@ define([
 
     attach: function() {
       if(this.dropdown) return;
-      liveSearch(this, this.$el, 'searchTextChanged', { shortDebounce: 400, longDebounce: 800, immediate: 'autoSelect' });
+      liveSearch(this, this.$el, 'searchTextChanged', { shortDebounce: 100, longDebounce: 200, immediate: 'autoSelect' });
 
       this.dropdown = new Dropdown({
         collection: this.collection,
