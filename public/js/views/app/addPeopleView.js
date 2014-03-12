@@ -48,7 +48,7 @@ define([
 
     ui: {
       input: 'input.gtrInput',
-      select: '#select-button'
+      validation: '#modal-failure'
     },
 
     itemEvents: {
@@ -87,12 +87,22 @@ define([
       }
     },
 
+
+    showValidationMessage: function(message) {
+      this.ui.validation.text(message);
+      if(message) {
+        this.ui.validation.slideDown('fast');
+      } else {
+        this.ui.validation.slideUp('fast');
+      }
+    },
+
     /**
      * Validate the form and send the request
      */
     validateAndCreate: function() {
       if(this.collection.length === 0) {
-        window.alert('Search for some people to add');
+        this.showValidationMessage('Search for some people to add');
         this.ui.input.focus();
         return;
       }
@@ -105,9 +115,11 @@ define([
         data: JSON.stringify({ usernames: this.collection.pluck('username') }),
         context: this,
         statusCode: {
-          400: function(data) {
-            // if ($.parseJSON(data.responseText).illegalName) {
-            // }
+          400: function() {
+            this.showValidationMessage('Unable to complete the request. Please try again later.');
+          },
+          403: function() {
+            this.showValidationMessage('You cannot add people to this room. Only members of the channels owner can add people to a private channel.');
           }
         },
         success: function() {
