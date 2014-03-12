@@ -169,7 +169,7 @@ define([
       activeDropdown = this;
 
       var zIndex = parseInt(this.el.style.zIndex, 10);
-      $('<div class="dropdown-backdrop"/>').css({ zIndex: zIndex - 1 }).insertAfter(this.$el).on('click', function() {
+      $('<div class="dropdown-backdrop"/>').css({ zIndex: zIndex - 1 }).insertAfter($('body')).on('click', function() {
         $(backdrop).remove();
         if(activeDropdown) {
           var t = activeDropdown;
