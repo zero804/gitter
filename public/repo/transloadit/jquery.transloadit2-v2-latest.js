@@ -325,7 +325,6 @@ define(["jquery"], function (jQuery){
     region                       : 'us-east-1',
     debug                        : true
   };
-  var CSS_LOADED = false;
 
   $.fn.transloadit = function() {
     var args = Array.prototype.slice.call(arguments);
@@ -424,8 +423,6 @@ define(["jquery"], function (jQuery){
     $form.on('change', 'input[type="file"]', function() {
       self._options.onFileSelect($(this).val(), $(this));
     });
-
-    this.includeCss();
   };
 
   Uploader.prototype.getBoredInstance = function() {
