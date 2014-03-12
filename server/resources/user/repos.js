@@ -25,6 +25,7 @@ function indexQuery(req, res, next) {
 }
 
 module.exports = {
+  id: 'repo',
   index: function(req, res, next) {
     if(req.query.q) {
       return indexQuery(req, res, next);
