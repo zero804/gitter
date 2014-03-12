@@ -87,6 +87,12 @@ define([
       this.targetElement = options.targetElement;
       this.$targetElement = $(this.targetElement);
       this.options = _.extend({}, DEFAULTS, options);
+
+      /* From the selectable-mixin */
+      this.listenTo(this, 'selectClicked', function() {
+        this.hide();
+      });
+
     },
 
     active: function() {

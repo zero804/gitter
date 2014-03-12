@@ -100,7 +100,7 @@ require([
   var appView = new ChatIntegratedView({ el: 'body' });
   appView.rightToolbarRegion.show(new RightToolbarView());
 
-  new HeaderView({ model: context.troupe(), el: '#header' }).render();
+  new HeaderView({ model: context.troupe(), el: '#header' });
 
   // instantiate user email collection
   // var userEmailCollection = new UserEmailCollection.UserEmailCollection();
