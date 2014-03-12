@@ -73,11 +73,15 @@ define([
       var model = this.collection.get(cid);
       this.setSelected(model);
 
-      e.preventDefault();
-      e.stopPropagation();
+      this.trigger('selectClicked');
+
+      if(!this.options.allowClickPropagation) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
     },
     onAfterItemAdded: function(itemView) {
-      if(this.selectedModel && itemView.model.id == this.selectedModel.id) {
+      if(this.selectedModel && itemView.model.id && itemView.model.id == this.selectedModel.id) {
         itemView.$el.addClass('selected');
       }
     },

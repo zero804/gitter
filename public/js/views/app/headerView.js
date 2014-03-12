@@ -3,21 +3,25 @@ define([
   'jquery',
   'utils/context',
   'marionette',
-  'hbs!./tmpl/headerViewTemplate',
+  'backbone',
+  // 'hbs!./tmpl/headerViewTemplate',
   'autolink',
   'components/notifications',
   'views/controls/dropdown'
-], function($, context, Marionette, headerViewTemplate, autolink, notifications, Dropdown)  {
+], function($, context, Marionette, Backbone, /*headerViewTemplate, */ autolink, notifications, Dropdown)  {
   "use strict";
 
   return Marionette.ItemView.extend({
-    template: headerViewTemplate,
+    // template: headerViewTemplate,
     modelEvents: {
-        'change': 'render'
+        'change': 'redisplay'
     },
     ui: {
       cog: '.dropdown-toggle',
-      dropdownMenu: '#cog-dropdown'
+      dropdownMenu: '#cog-dropdown',
+      topic: '#trpTopic',
+      name: '#name-label',
+      favourite: '#favourite-button'
     },
     events: {
       'click @ui.cog': 'showDropdown',
@@ -27,12 +31,59 @@ define([
     },
 
     initialize: function() {
+      this.bindUIElements();
+
       this.showActivity = true;
+      this.dropdown = new Dropdown({
+        allowClickPropagation: true,
+        collection: new Backbone.Collection(this.createMenu()),
+        targetElement: this.ui.cog[0],
+        placement: 'right'
+      });
+
+      this.listenTo(this.dropdown, 'selected', function(e) {
+        if(e.get('href') === '#leave') {
+          this.leaveRoom();
+        }
+      });
     },
 
     showDropdown: function() {
       this.dropdown.show();
     },
+
+    createMenu: function() {
+        var menuItems = [
+          { title: 'Add people to this room', href: '#add' }
+        ];
+
+        var c = context();
+        var url = this.model.get('url');
+
+        if(context.troupe().get('security') !== 'PRIVATE')
+          menuItems.push({ title: 'Share this chat room', href: '#inv' });
+
+        menuItems.push({ divider: true });
+        menuItems.push({ title: 'Notifications', href: '#notifications' });
+
+        if(c.permissions.admin) {
+          if(c.isNativeDesktopApp) {
+            menuItems.push({ title: 'Integrations', href: window.location.origin + url + '#integrations', target: '_blank' });
+          } else {
+            menuItems.push({ title: 'Integrations', href: '#integrations' });
+          }
+        }
+
+        menuItems.push({ divider: true });
+
+        var githubType = this.model.get('githubType');
+        if(githubType === 'REPO' || githubType === 'ORG') {
+          menuItems.push({ title: 'Open in GitHub', href: 'https://www.github.com' + url, target: '_blank' });
+        }
+        menuItems.push({ title: 'Leave this room', href: '#leave' });
+
+        return menuItems;
+      },
 
     leaveRoom: function() {
       $.ajax({
@@ -68,28 +119,17 @@ define([
       }
     },
 
-    serializeData: function() {
-      var troupe = this.model.toJSON();
+    redisplay: function() {
+      var model = this.model;
 
-      return {
-        isNativeDesktopApp: context().isNativeDesktopApp,
-        troupeUrl: window.location.origin+troupe.url,
-        permissions: context().permissions,
-        oneToOne: troupe.oneToOne,
-        privateRoom: context().troupe.security,
-        troupeName: troupe.name,
-        troupeTopic:  troupe.topic,
-        troupeUri : troupe.url,
-        troupeFavourite: troupe.favourite
-      };
-    },
+      this.ui.name.text(model.get('name'));
 
-    onRender: function() {
-      if(!this.dropdown) {
-        this.dropdown = new Dropdown({ targetElement: this.ui.cog[0], el: this.ui.dropdownMenu[0], placement: 'right' });
-      }
-      autolink(this.el);
+      this.ui.topic.text(model.get('topic'));
+      autolink(this.ui.topic[0]);
+
+      this.ui.favourite.toggleClass('favourited', !!model.get('favourite'));
     }
+
   });
 
 });
