@@ -144,7 +144,12 @@ define([
       }
 
       function error(assembly) {
-        if (assembly) alert(assembly.message);
+        if (assembly) {
+          appEvents.triggerParent('user_notification', {
+            title: "Error uploading file",
+            text:  assembly.message
+          });
+        }
         progressBar.hide(function() {
           progressBar.css('width', '0%');
         });
