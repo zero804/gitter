@@ -67,6 +67,7 @@ define([
       this.simulateClick();
     },
     selectClicked: function(e) {
+      if(!this.collection) return;
       var selected = e.currentTarget;
       var cid = selected.dataset.cid;
       var model = this.collection.get(cid);

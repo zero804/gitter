@@ -272,7 +272,7 @@ define([
             // No existing document exists, simply treat this as an add
             this.add(parsed);
           } else {
-            log('Ignoring patch for non-existant model', newModel);
+            log('Ignoring patch for non-existant model', newModel, 'loading?', this.loading);
           }
 
           break;
