@@ -140,6 +140,15 @@ define([
 
   });
 
+  var modalButtons = [
+    { action: "create", text: "Add", className: "trpBtnGreen" },
+    { action: "cancel", text: "Cancel", className: "trpBtnLightGrey"},
+  ];
+
+  if(context.troupe().get('security') !== 'PRIVATE') {
+    modalButtons.push({ action: "share", text: "Share this room", className: "trpBtnBlue trpBtnRight"});
+  }
+
   return TroupeViews.Modal.extend({
     disableAutoFocus: true,
     initialize: function(options) {
@@ -149,11 +158,7 @@ define([
       TroupeViews.Modal.prototype.initialize.call(this, options);
       this.view = new View(options);
     },
-    menuItems: [
-      { action: "create", text: "Add", className: "trpBtnGreen" },
-      { action: "cancel", text: "Cancel", className: "trpBtnLightGrey"},
-      { action: "share", text: "Share this room", className: "trpBtnBlue trpBtnRight"}
-    ]
+    menuItems: modalButtons
   });
 
 });
