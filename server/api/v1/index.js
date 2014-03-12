@@ -42,8 +42,5 @@ module.exports = {
         auth,
         require('./public-repo-search.js'));
 
-
-
-
   }
 };

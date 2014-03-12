@@ -30,7 +30,8 @@ define([
       'click #upgrade-auth': 'onUpgradeAuthClick',
       'click .activity-expand' : 'expandActivity',
       'click #people-header' : 'showPeopleList',
-      'click #info-header' : 'showRepoInfo'
+      'click #info-header' : 'showRepoInfo',
+      'submit #upload-form': 'upload'
     },
 
     showPeopleList: function() {
@@ -97,7 +98,6 @@ define([
           itemCollections.events.off('add reset sync', null, this);
         }
       }, this);
-
     },
 
   });

@@ -43,5 +43,12 @@ module.exports = {
         auth,
         require('./room-permission.js'));
 
+    app.get('/api/private/generate-signature',
+        auth,
+        require('./transloadit-signature.js'));
+
+    app.post('/api/private/transloadit/:token',
+        require('./transloadit.js'));
+
   }
 };
