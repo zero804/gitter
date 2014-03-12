@@ -34,6 +34,13 @@
   .transition(500ms);
 }
 
+
+@-webkit-keyframes pulsey {
+    0% { opacity: 0.3; }
+    50% { opacity: 1; }
+    100% { opacity: 0.3; }
+}
+
 .transition(@time) {
 /*  -webkit-transform: translate3d(0,0,0);
           transform: translate3d(0,0,0);*/
@@ -349,6 +356,11 @@ label {
     white-space: nowrap;
     text-overflow: ellipsis;
   }
+
+  .trpLoading {
+    margin-top: 16px;
+  }
+
 }
 
 ul.scrollList a {
@@ -2574,6 +2586,8 @@ ul.roster {
 	 width: 64px;
 	 height: 64px;
 	 vertical-align: text-bottom;
+   -webkit-animation: pulsey 2s linear infinite;
+   animation: pulsey 2s linear infinite;
  }
 
 .typeahead {
