@@ -296,23 +296,67 @@ function findOrCreateRoom(user, uri, opts) {
 
 exports.findOrCreateRoom = findOrCreateRoom;
 
-function findAllChannelsForRoom(troupe, callback) {
-  return troupeService.findByIds(troupe.channels)
+/**
+ * Find all non-private channels under a particular parent
+ */
+function findAllChannelsForRoom(user, parentTroupe, callback) {
+  return persistence.Troupe.findQ({
+      parentId: parentTroupe._id,
+      $or: [
+        { security: { $ne: 'PRIVATE' } }, // Not private...
+        { 'users.userId': user._id },     // ... or you're in the circle of trust
+      ]
+    })
     .nodeify(callback);
 }
 exports.findAllChannelsForRoom = findAllChannelsForRoom;
 
-function findChildChannelRoom(parentTroupe, childTroupeId, callback) {
-  return Q.fcall(function() {
-      if(parentTroupe.channels.some(function(troupeId) { return "" + childTroupeId == "" + troupeId; })) {
-        return troupeService.findById(childTroupeId);
-      } else {
-        return null;
-      }
+/**
+ * Given parent and child ids, find a child channel that is
+ * not PRIVATE
+ */
+function findChildChannelRoom(user, parentTroupe, childTroupeId, callback) {
+  return persistence.Troupe.findOneQ({
+      parentId: parentTroupe._id,
+      id: childTroupeId,
+      $or: [
+        { security: { $ne: 'PRIVATE' } }, // Not private...
+        { 'users.userId': user._id },     // ... or you're in the circle of trust
+      ]
     })
     .nodeify(callback);
 }
 exports.findChildChannelRoom = findChildChannelRoom;
+
+
+
+/**
+ * Find all non-private channels under a particular parent
+ */
+function findAllChannelsForUser(user, callback) {
+  return persistence.Troupe.findQ({
+      ownerUserId: user._id
+    })
+    .nodeify(callback);
+}
+exports.findAllChannelsForUser = findAllChannelsForUser;
+
+
+/**
+ * Given parent and child ids, find a child channel that is
+ * not PRIVATE
+ */
+function findUsersChannelRoom(user, childTroupeId, callback) {
+  return persistence.Troupe.findOneQ({
+      ownerUserId: user._id,
+      id: childTroupeId
+      /* Dont filter private as owner can see all private rooms */
+    })
+    .nodeify(callback);
+}
+exports.findUsersChannelRoom = findUsersChannelRoom;
+
+
 
 
 function assertValidName(name) {
@@ -447,6 +491,8 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
               uri: uri,
               security: security,
               name: name,
+              parentId: parentTroupe && parentTroupe._id,
+              ownerUserId: parentTroupe ? null : user._id,
               _nonce: nonce,
               githubType: githubType,
               users:  user ? [{ _id: new ObjectID(), userId: user._id }] : []
@@ -467,18 +513,7 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
             /* Somehow someone beat us to it */
             throw 409;
           });
-      })
-     .then(function(newRoom) {
-      if(parentTroupe && security !== 'PRIVATE') {
-        // Add this room to the list of channels
-        // owed by the parent
-        parentTroupe.channels.addToSet(newRoom.id);
-        return parentTroupe.saveQ()
-          .thenResolve(newRoom);
-      } else {
-        return newRoom;
-      }
-    });
+      });
 
    })
   .nodeify(callback);

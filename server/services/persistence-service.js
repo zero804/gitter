@@ -315,7 +315,8 @@ var TroupeSchema = new Schema({
   status: { type: String, "enum": ['ACTIVE', 'DELETED'], "default": 'ACTIVE'},
   oneToOne: { type: Boolean, "default": false },
   users: [TroupeUserSchema],
-  channels: [ObjectId], // Channels under this repo/org
+  parentId: { type: ObjectId, required: false },
+  ownerUserId: { type: ObjectId, required: false }, // For channels under a user /suprememoocow/custom
   security: { type: String, 'enum': ['PRIVATE', 'PUBLIC', 'INHERITED'], required: false }, // For REPO_CHANNEL, ORG_CHANNEL, USER_CHANNEL
   dateDeleted: { type: Date },
   _nonce: { type: Number },
@@ -326,6 +327,8 @@ TroupeSchema.schemaTypeName = 'TroupeSchema';
 // Ideally we should never search against URI, only lcURI
 TroupeSchema.index({ uri: 1 }, { unique: true, sparse: true });
 TroupeSchema.index({ lcUri: 1 }, { unique: true, sparse: true });
+TroupeSchema.index({ parentId: 1 });
+TroupeSchema.index({ ownerUserId: 1 });
 TroupeSchema.index({ "users.userId": 1 });
 TroupeSchema.index({ "users.userId": 1,  "users.deactivated": 2 });
 TroupeSchema.pre('save', function (next) {
