@@ -36,7 +36,8 @@ define([
       'cut @ui.roomNameInput': 'roomNameChange',
       'paste @ui.roomNameInput': 'roomNameChange',
       'input @ui.roomNameInput': 'roomNameChange',
-      'click @ui.dropDownButton': 'clickDropDown'
+      'click @ui.dropDownButton': 'clickDropDown',
+      'change input[type=radio]': 'permissionsChange'
     },
 
     regions: {
@@ -107,8 +108,14 @@ define([
             return;
           }
 
-          if(channelName && !safeRoomName(channelName)) {
+          if(permissions === 'public' && !channelName) {
             this.showValidationMessage('You need to specify a room name');
+            this.ui.roomNameInput.focus();
+            return;
+          }
+
+          if(channelName && !safeRoomName(channelName)) {
+            this.showValidationMessage('Please choose a channel name consisting of letter and number characters');
             this.ui.roomNameInput.focus();
             return;
           }
@@ -206,7 +213,19 @@ define([
 
           case 'user':
             [/*'autoJoin', */'permPublic', 'permPrivate'].forEach(function(f) { showHide[f] = true; });
-            placeholder = "Optional";
+            var permissions = this.$el.find('input[type=radio]:visible:checked').val();
+            switch(permissions) {
+              case 'public':
+                placeholder = "Required";
+                break;
+
+              case 'private':
+                placeholder = "Optional";
+                break;
+
+              default:
+                placeholder = "Required for public channels";
+            }
             checkForRepo = roomName && parentUri + '/' + roomName;
             break;
         }
@@ -330,6 +349,10 @@ define([
     roomNameChange: function() {
       this.recalcViewDebounced();
     },
+
+    permissionsChange: function() {
+      this.recalcViewDebounced();
+    }
 
 
   });
