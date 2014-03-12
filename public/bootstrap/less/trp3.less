@@ -1847,7 +1847,6 @@ ul.roster {
 }
 
 .trpChatInputWrapper {
-  width: 100%;
   min-height: 74px;
   background-color: white;
   text-align: center;
@@ -1859,6 +1858,38 @@ ul.roster {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   border-top: 1px solid rgba(0,0,0,0.05);
+  right: @rightMarginFull;
+  left: 0;
+
+  @media @mid {
+    right: @rightMarginMid;
+  }
+
+  @media @small {
+    right: @rightMarginSmall;
+  }
+
+}
+
+
+.trpFileProgressContainer {
+  position: absolute;
+  top: -2px;
+  left: 0;
+  right: 0;
+  background-color: transparent;
+  width: 100%;
+  height: 2px;
+}
+
+.trpFileProgressBar {
+  background-color: @trpGreen;
+  box-shadow: 0px 0px 1px 1px @trpGreen;
+  overflow: hidden;
+  width: 0;
+  display: none;
+  transition: width 0.5s;
+  transition-timing-function: ease;
 }
 
 
@@ -2108,19 +2139,7 @@ ul.roster {
   display: block;
   text-align: center;
   max-height: 160px;
-  margin-right: @rightMarginFull;
   .transition300ms;
-
-  @media @mid {
-    margin-right: @rightMarginMid;
-    padding-right: 12px;
-  }
-
-  @media @small {
-    margin-right: @rightMarginSmall;
-    padding-right: 0px;
-  }
-
 }
 
 .trpChatInputButtons {
