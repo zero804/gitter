@@ -11,8 +11,7 @@ define([
     tagName: 'input',
     events: {
       'keydown': 'keydown',
-      'keyup': 'keyup',
-      'blur': 'blur'
+      'keyup': 'keyup'
     },
     initialize: function(options) {
       if(!this.collection) {
@@ -68,9 +67,6 @@ define([
       this.trigger('selected', m);
     },
 
-    blur: function() {
-      this.dropdown.hide();
-    },
     autoSelect: function() {
       var input = this.el.value;
 

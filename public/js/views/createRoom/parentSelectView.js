@@ -15,6 +15,39 @@ define([
     idAttribute: "uri",
   });
 
+  function comparator(a, b) {
+    function compare(a, b) {
+      if(a === b) return 0;
+      return a < b ? -1 : +1;
+    }
+
+    if(a.get('type') === 'repo') {
+      if(b.get('type') === 'repo') {
+        return compare(a.get('name').toLowerCase(), b.get('name').toLowerCase());
+      } else {
+        return -1;
+      }
+    } else {
+      if(b.get('type') === 'repo') {
+        return 1;
+      }
+    }
+
+    if(a.get('type') === 'org') {
+      if(b.get('type') === 'org') {
+        return compare(a.get('name').toLowerCase(), b.get('name').toLowerCase());
+      } else {
+        return -1;
+      }
+    } else {
+      if(b.get('type') === 'org') {
+        return 1;
+      }
+    }
+
+    return compare(a.get('name').toLowerCase(), b.get('name').toLowerCase());
+  }
+
   function modelFromRepoTroupe(m) {
     return new ItemModel({
       id: m.get('id'),
@@ -65,26 +98,7 @@ define([
       this.troupesCollection = options.troupesCollection;
 
       this.dropdownItems = new Backbone.Collection({ });
-      this.dropdownItems.comparator = function(a, b) {
-        function compare(a, b) {
-          if(a === b) return 0;
-          return a < b ? -1 : +1;
-        }
-
-        if(a.get('type') === 'org') {
-          if(b.get('type') === 'org') {
-            return compare(a.get('name').toLowerCase(), b.get('name').toLowerCase());
-          } else {
-            return -1;
-          }
-        } else {
-          if(b.get('type') === 'org') {
-            return 1;
-          }
-        }
-
-        return compare(a.get('name').toLowerCase(), b.get('name').toLowerCase());
-      };
+      // this.dropdownItems.comparator =
 
       this.listenTo(this.orgsCollection, 'add remove change reset sync', this.reset);
       this.listenTo(this.troupesCollection, 'add remove change reset sync', this.reset);
@@ -115,7 +129,7 @@ define([
           el: this.ui.input[0],
           autoSelector: function(input) {
             return function(m) {
-              return m.get('name').indexOf(input) >= 0;
+              return m.get('name') && m.get('name').indexOf(input) >= 0;
             };
           }
         });
@@ -136,7 +150,7 @@ define([
     },
 
     hide: function() {
-      this.dropdown.hide();
+      this.typeahead.hide();
     },
 
     selectUri: function(uri) {
@@ -188,9 +202,24 @@ define([
         if(query.indexOf('/') >= 0) {
           results = this.troupesCollection.filter(function(troupe) {
               return troupe.get('githubType') === 'REPO' && troupe.get('uri').toLowerCase().indexOf(query) === 0;
-            }).map(modelFromRepoTroupe);
+            })
+            .map(modelFromRepoTroupe)
+            .concat(defaultResults());
         } else {
           results = defaultResults();
+        }
+      }
+
+      results.sort(comparator);
+
+      for(var type, i = results.length - 1; i >= 0; i--) {
+        if(!type) {
+          type = results[i].get('type');
+        } else {
+          if(type !== results[i].get('type')) {
+            type = results[i].get('type');
+            results.splice(i + 1, 0, new Backbone.Model({ divider: true }));
+          }
         }
       }
 
