@@ -441,7 +441,6 @@ define(["jquery"], function (jQuery){
           if (instance.error) {
             self.ended   = true;
             instance.url = url;
-            self.renderError(instance);
             self._options.onError(instance);
             return;
           }
@@ -460,7 +459,6 @@ define(["jquery"], function (jQuery){
                   error   : 'BORED_INSTANCE_ERROR',
                   message : 'Could not find a bored instance. ' + err.message
                 };
-                self.renderError(err);
                 self._options.onError(err);
                 return;
               }
@@ -478,7 +476,6 @@ define(["jquery"], function (jQuery){
             reason  : 'JSONP request status: ' + status,
             url     : url
           };
-          self.renderError(err);
           self._options.onError(err);
         }
       });
@@ -770,7 +767,6 @@ define(["jquery"], function (jQuery){
           if (self.pollRetries > self._options.poll404Retries) {
             document.title = self.documentTitle;
             self.ended = true;
-            self.renderError(assembly);
             self._options.onError(assembly);
             return;
           }
@@ -782,7 +778,6 @@ define(["jquery"], function (jQuery){
         }
         if (assembly.error) {
           self.ended = true;
-          self.renderError(assembly);
           document.title = self.documentTitle;
           self._options.onError(assembly);
           return;
@@ -857,7 +852,6 @@ define(["jquery"], function (jQuery){
             reason  : 'JSONP request status: '+status,
             url     : url
           };
-          self.renderError(err);
           self._options.onError(err);
           return;
         }
