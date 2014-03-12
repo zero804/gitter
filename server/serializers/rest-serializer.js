@@ -163,7 +163,6 @@ function UserStrategy(options) {
       url: user.getHomeUrl(),
       avatarUrlSmall: user.gravatarImageUrl,
       avatarUrlMedium: user.gravatarImageUrl,
-      createRoom: options.includePermissions ? user.permissions.createRoom : undefined,
       scopes: scopes,
       online: userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id) || undefined,
       role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.username) || undefined,
