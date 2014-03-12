@@ -147,31 +147,19 @@ define([
     {
       command: 'channel',
       description: 'Create/join a channel',
-      completion: 'channel ',
+      completion: 'channel',
       regexp: /^\/channel/,
-      criteria: function() {
-        var repoType = context.troupe().get('githubType');
-        return repoType === 'REPO' || repoType === 'ORG';
-      },
       action: function(view) {
-
-        var channelMatch = view.$el.val().match(/\/channel\s+(.*)/);
-        if (!channelMatch) return;
+        var input = view.$el.val();
+        var channelMatch = input.match(/^\s*\/channel(?:\s+(\w+))?/);
         var channel = channelMatch[1];
 
         view.$el.val('');
-
-        $.ajax({
-          url: "/api/v1/troupes/" + context.getTroupeId() + "/channels/",
-          contentType: "application/json",
-          dataType: "json",
-          context: this,
-          data: JSON.stringify({ name: channel }),
-          type: "POST",
-          success: function(channelRoom) {
-            appEvents.trigger('navigation', channelRoom.url, 'chat', channelRoom.name);
-          }
-        });
+        if(channel) {
+          appEvents.trigger('route', 'createcustomroom/' + channel);
+        } else {
+          appEvents.trigger('route', 'createcustomroom');
+        }
       }
     }
 
