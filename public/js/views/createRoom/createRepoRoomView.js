@@ -22,7 +22,7 @@ define([
     },
 
     repoSelected: function(r) {
-      appEvents.trigger('navigation', '/' + r.get('uri'), 'chat', r.get('name'));
+      appEvents.trigger('navigation', '/' + r.get('uri'), 'chat#inv', r.get('name'));
       this.dialog.hide();
     },
 
