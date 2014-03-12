@@ -163,7 +163,7 @@ define([
         },
         success: function(data) {
           this.dialog.hide();
-          appEvents.trigger('navigation', data.url , 'chat', data.uri);
+          appEvents.trigger('navigation', data.url , 'chat#add', data.uri);
         }
       });
     },
