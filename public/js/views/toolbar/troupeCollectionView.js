@@ -12,7 +12,6 @@ define([
 ], function($, context, Marionette, troupeListItemTemplate, appEvents, moment,  TroupeViews, cocktail) {
   "use strict";
 
-  var createRoom = context.getUser().createRoom;
   /* @const */
   var MAX_UNREAD = 99;
 
@@ -28,7 +27,6 @@ define([
     },
     serializeData: function() {
       var data = this.model.toJSON();
-      data.createRoom = createRoom;
       if(data.name.length > 25) {
         var repo;
 
@@ -37,9 +35,7 @@ define([
           if (repo.length > 25) {
             repo = data.name.split('/')[2];
           }
-
-        } 
-        else {
+        } else {
           repo = data.name.split('/')[1];
         }
 

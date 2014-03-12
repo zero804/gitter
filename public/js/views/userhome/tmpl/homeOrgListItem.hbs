@@ -1,16 +1,4 @@
-{{#if user.createRoom}}
-  <a href="/{{org.name}}" style="text-decoration: none">
-    <div style="display: inline-block"><img src="{{org.avatar_url}}" width="48" height="48" class="org-avatar" style="vertical-align: middle; margin-right: 20px"></div>
-    <div style="display: inline-block; vertical-align: middle">{{org.name}}</div>
-  </a>
-{{else}}
-  {{#if org.room}}
-    <a href="/{{org.name}}" style="text-decoration: none">
-      <div style="display: inline-block"><img src="{{org.avatar_url}}" width="48" height="48" class="org-avatar" style="vertical-align: middle; margin-right: 20px"></div>
-      <div style="display: inline-block; vertical-align: middle">{{org.name}}</div>
-    </a>
-  {{else}}
-    <div style="display: inline-block"><img src="{{org.avatar_url}}" width="48" height="48" class="org-avatar disabled" style="vertical-align: middle; margin-right: 20px"></div>
-    <div class="disabled" style="display: inline-block; vertical-align: middle" title="Sorry, you can't create chats yet. We're slowly giving users this ability to control our launch.">{{org.name}}</div>
-  {{/if}}
-{{/if}}
+<a href="/{{org.name}}" style="text-decoration: none">
+  <div style="display: inline-block"><img src="{{org.avatar_url}}" width="48" height="48" class="org-avatar" style="vertical-align: middle; margin-right: 20px"></div>
+  <div style="display: inline-block; vertical-align: middle">{{org.name}}</div>
+</a>
