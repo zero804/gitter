@@ -18,7 +18,7 @@ function serialize(items, req, res, next) {
 
 module.exports = {
     index: function(req, res, next){
-      roomService.findAllChannelsForRoom(req.troupe, function(err, channelTroupes) {
+      roomService.findAllChannelsForRoom(req.user, req.troupe, function(err, channelTroupes) {
         if(err) return next(err);
 
         serialize(channelTroupes, req, res, next);
@@ -43,7 +43,7 @@ module.exports = {
     },
 
     load: function(req, id, callback){
-      roomService.findChildChannelRoom(req.troupe, id, callback);
+      roomService.findChildChannelRoom(req.user, req.troupe, id, callback);
     }
 
 };
