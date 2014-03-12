@@ -65,9 +65,9 @@
       format: 'json'
     };
 
-    if (oEmbed.defaults) {
-      for (var key in oEmbed.defaults) {
-        data[key] = oEmbed.defaults[key];
+    if (defaults) {
+      for (var key in defaults) {
+        data[key] = defaults[key];
       }
     }
 
@@ -96,7 +96,7 @@
     } else if(providerName) {
       fetch(oEmbedProviders[providerName], url, cb);
     } else if (imageUrl) {
-      var imgTag = '<img src="' + imageUrl[0] + '" width="' + oEmbed.defaults.maxwidth + '">';
+      var imgTag = '<img src="' + imageUrl[0] + '" width="' + defaults.maxwidth + '">';
       var embed  = {html: imgTag};
       cb(embed);
     } else {
