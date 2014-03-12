@@ -136,7 +136,11 @@ define([
         el: this.ui.input[0],
         autoSelector: function(input) {
           return function(m) {
-            return m.get('displayName').indexOf(input) >= 0 || m.get('username').indexOf(input) >= 0;
+            var displayName = m.get('displayName');
+            var username = m.get('username');
+
+            return displayName && displayName.indexOf(input) >= 0 ||
+                   username && username.indexOf(input) >= 0;
           };
         }
       });
