@@ -8,8 +8,8 @@ var restSerializer    = require("../../serializers/rest-serializer");
 var Q                 = require('q');
 
 module.exports = {
+  id: 'troupe',
   index: function(req, res, next) {
-
     restful.serializeTroupesForUser(req.user.id)
       .then(function(serialized) {
         res.send(serialized);

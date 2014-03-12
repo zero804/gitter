@@ -41,6 +41,7 @@ module.exports = {
     }
 
     var userTroupeResource = installUserSubResource('troupes', 'troupes');
+
     var userSettings = new Resource('settings', require('./user/troupe-settings'), app);
     userTroupeResource.add(userSettings);
 

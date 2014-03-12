@@ -17,7 +17,7 @@ function serialize(items, req, res, next) {
 }
 
 module.exports = {
-  id: 'userTroupe',
+  id: 'userChannel',
 
   index: function(req, res, next) {
     roomService.findAllChannelsForUser(req.user, function(err, channelTroupes) {

@@ -17,33 +17,34 @@ function serialize(items, req, res, next) {
 }
 
 module.exports = {
-    index: function(req, res, next){
-      roomService.findAllChannelsForRoom(req.user, req.troupe, function(err, channelTroupes) {
-        if(err) return next(err);
+  id: 'channel',
+  index: function(req, res, next){
+    roomService.findAllChannelsForRoom(req.user, req.troupe, function(err, channelTroupes) {
+      if(err) return next(err);
 
-        serialize(channelTroupes, req, res, next);
+      serialize(channelTroupes, req, res, next);
+    });
+  },
+
+  create: function(req, res, next) {
+    var body = req.body;
+    var security = body.security || 'INHERITED';
+
+    return roomService.createCustomChildRoom(req.troupe, req.user, { name: body.name, security: security })
+      .then(function(customRoom) {
+        return serialize(customRoom, req, res, next);
+      })
+      .fail(function(err) {
+        if(err.clientDetail && err.responseStatusCode) {
+          res.send(err.responseStatusCode, err.clientDetail);
+        } else {
+          next(err);
+        }
       });
-    },
+  },
 
-    create: function(req, res, next) {
-      var body = req.body;
-      var security = body.security || 'INHERITED';
-
-      return roomService.createCustomChildRoom(req.troupe, req.user, { name: body.name, security: security })
-        .then(function(customRoom) {
-          return serialize(customRoom, req, res, next);
-        })
-        .fail(function(err) {
-          if(err.clientDetail && err.responseStatusCode) {
-            res.send(err.responseStatusCode, err.clientDetail);
-          } else {
-            next(err);
-          }
-        });
-    },
-
-    load: function(req, id, callback){
-      roomService.findChildChannelRoom(req.user, req.troupe, id, callback);
-    }
+  load: function(req, id, callback){
+    roomService.findChildChannelRoom(req.user, req.troupe, id, callback);
+  }
 
 };
