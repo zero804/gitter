@@ -65,7 +65,8 @@ module.exports =  function(req, res) {
   var params = {
     auth: {
       expires: expires,
-      key: nconf.get('transloadit:key')
+      key: nconf.get('transloadit:key'),
+      max_size: 5242880
     },
     template_id: nconf.get('transloadit:template_id'),
     fields: {

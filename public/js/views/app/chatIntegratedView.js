@@ -143,6 +143,13 @@ define([
         });
       }
 
+      function error(assembly) {
+        if (assembly) alert(assembly.message);
+        progressBar.hide(function() {
+          progressBar.css('width', '0%');
+        });
+      }
+
       function dropEvent(e) {
         e.stopPropagation();
         e.preventDefault();
@@ -178,7 +185,8 @@ define([
               onStart: start,
               onProgress: progress,
               onSuccess: reset,
-              onError: reset,
+              onError: error,
+              debug: false,
               formData: formdata
             };
 
