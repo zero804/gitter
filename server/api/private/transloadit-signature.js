@@ -45,7 +45,7 @@ var utcDateString = function(time) {
 };
 
 function randomString(length) {
-    var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     var result = '';
     for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
     return result;
@@ -60,7 +60,7 @@ module.exports =  function(req, res) {
   var shortToken = randomString(4);
 
   // Host for Transloadit callback. In dev env you'll need to use localtunnel
-  var host = (nodeEnv === 'dev') ? 'https://ftyjtrdeti.localtunnel.me' : nconf.get('web:basepath');
+  var host = (nodeEnv === 'dev') ? 'https://kkcfeoutet.localtunnel.me' : nconf.get('web:basepath');
 
   var params = {
     auth: {
