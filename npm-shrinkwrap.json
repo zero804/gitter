@@ -1609,11 +1609,6 @@
       "from": "highlight.js@8.0.0",
       "resolved": "https://registry.npmjs.org/highlight.js/-/highlight.js-8.0.0.tgz"
     },
-    "heapdump": {
-      "version": "0.2.6",
-      "from": "heapdump@",
-      "resolved": "https://registry.npmjs.org/heapdump/-/heapdump-0.2.6.tgz"
-    },
     "xregexp": {
       "version": "2.0.0",
       "from": "xregexp@~2.0.0"
