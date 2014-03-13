@@ -14,9 +14,8 @@ define([
   'views/unread-item-view-mixin',
   'cocktail',
   'bootstrap_tooltip', // No ref
-  'bootstrap-popover' // No ref
 ], function($, _, context, chatModels, AvatarView, Marionette, TroupeViews, Popover,
-  chatItemTemplate, chatInputView, UnreadItemViewMixin, cocktail /* tooltip, popover*/) {
+  chatItemTemplate, chatInputView, UnreadItemViewMixin, cocktail) {
 
   "use strict";
 

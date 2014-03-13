@@ -1,6 +1,162 @@
 // DROPDOWN MENUS
 // --------------
 
+div.textcomplete-wrapper ul.dropdown-menu,
+ul.dropdown {
+  opacity: 1;
+  padding: 1px;
+  text-align: left;
+  white-space: normal;
+
+  float: left;
+  display: block;
+  min-width: 160px;
+  padding: 4px 0;
+  margin: 0; // override default ul
+  margin-top: 6px;
+  list-style: none;
+  background-color: @white;
+  border-color: #ccc;
+  border-color: rgba(0,0,0,.2);
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 4px;
+
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  background-clip: padding-box;
+  -webkit-bg-clip: padding-box;
+     -moz-bg-clip: padding;
+  font-family: 'Open Sans';
+  -webkit-transition: opacity 150ms ease-in-out;
+     -moz-transition: opacity 150ms ease-in-out;
+       -o-transition: opacity 150ms ease-in-out;
+          transition: opacity 150ms ease-in-out;
+
+}
+
+ul.dropdown {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  &.dropdown-hidden {
+    opacity: 0;
+    display: none;
+  }
+/*
+  li.active > a {
+    color: @white;
+    text-decoration: none;
+    background-color: @linkColor;
+  }
+
+  .divider {
+    height: 1px;
+    margin: 5px 1px;
+    overflow: hidden;
+    background-color: #e5e5e5;
+    border-bottom: 1px solid @white;
+  }
+
+  a {
+    display: block;
+    padding: 3px 15px;
+    clear: both;
+    font-weight: normal;
+    line-height: @baseLineHeight;
+    color: @gray;
+    white-space: nowrap;
+  }
+
+  li a,
+  li a:hover {
+    text-decoration: none;
+  }
+  */
+}
+
+ul.dropdown.selectable {
+  margin-top: 6px;
+}
+
+div.textcomplete-wrapper ul.dropdown-menu {
+  li > a:hover {
+    color: @white;
+    text-decoration: none;
+    background-color: @linkColor;
+    cursor: default;
+    small {
+      color: rgba(255,255,255,0.4);
+    }
+  }
+
+}
+
+div.textcomplete-wrapper ul.dropdown-menu,
+ul.selectable {
+  list-style: none;
+  min-width: 206px;
+  margin: 0; // override default ul
+
+  li.active > a {
+    color: @white;
+    text-decoration: none;
+    background-color: @linkColor;
+
+    small {
+      color: rgba(255,255,255,0.4);
+    }
+  }
+
+  small {
+    font-size: smaller;
+    color: rgba(85,85,85,0.4);
+  }
+
+/*
+  li.selected {
+    text-decoration: none;
+    background-color: #e5e5e5;
+  }*/
+
+  .divider {
+    height: 1px;
+    margin: 5px 1px;
+    overflow: hidden;
+    background-color: #e5e5e5;
+    border-bottom: 1px solid @white;
+  }
+
+  a {
+    display: block;
+    padding: 3px 15px;
+    clear: both;
+    font-weight: normal;
+    line-height: @baseLineHeight;
+    color: @gray;
+    white-space: nowrap;
+  }
+
+  li a,
+  li a:hover {
+    text-decoration: none;
+  }
+}
+
+// Backdrop to catch body clicks on mobile, etc.
+.dropdown-backdrop {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+}
+
+
+
+
+/*
 // Use the .menu class on any <li> element within the topbar or ul.tabs and you'll get some superfancy dropdowns
 .dropdown {
   position: relative;
@@ -98,10 +254,15 @@
   }
 }
 
+.dropdown-menu li a,
+.dropdown-menu li a:hover {
+  text-decoration: none;
+}
+
 // Hover state
-.dropdown-menu li > a:hover,
+.dropdown-menu.hover li > a:hover,
 .dropdown-menu .active > a,
-.dropdown-menu .active > a:hover {
+.dropdown-menu.hover .active > a:hover {
   color: @white;
   text-decoration: none;
   background-color: @linkColor;
@@ -114,17 +275,27 @@
   *z-index: @zindexDropdown;
 
   .dropdown-toggle {
-/*    color: @white;
+/ *    color: @white;
     background: #ccc;
-    background: rgba(0,0,0,.3);*/
+    background: rgba(0,0,0,.3);* /
   }
   .dropdown-menu {
     display: block;
   }
 }
 
+// Backdrop to catch body clicks on mobile, etc.
+.dropdown-backdrop {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  z-index: (@zindexDropdown - 10);
+}
+
 // Typeahead
 .typeahead {
   margin-top: 2px; // give it some space to breathe
   .border-radius(4px);
-}
+}*/

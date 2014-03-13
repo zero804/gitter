@@ -143,6 +143,24 @@ define([
 
         view.reset();
       }
+    },
+    {
+      command: 'channel',
+      description: 'Create/join a channel',
+      completion: 'channel ',
+      regexp: /^\/channel/,
+      action: function(view) {
+        var input = view.$el.val();
+        var channelMatch = input.match(/^\s*\/channel(?:\s+(\w+))?/);
+        var channel = channelMatch[1];
+
+        view.$el.val('');
+        if(channel) {
+          appEvents.trigger('route', 'createcustomroom/' + channel);
+        } else {
+          appEvents.trigger('route', 'createcustomroom');
+        }
+      }
     }
 
   ];

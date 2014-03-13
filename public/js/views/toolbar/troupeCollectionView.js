@@ -12,9 +12,25 @@ define([
 ], function($, context, Marionette, troupeListItemTemplate, appEvents, moment,  TroupeViews, cocktail) {
   "use strict";
 
-  var createRoom = context.getUser().createRoom;
   /* @const */
   var MAX_UNREAD = 99;
+
+  /* @const */
+  var MAX_NAME_LENGTH = 25;
+
+  function trimName(uri) {
+    if(uri.length <= MAX_NAME_LENGTH) return uri;
+
+    var parts = uri.split('/');
+    for(var i = 1; i < parts.length; i++) {
+      var sub = parts.slice(i).join('/');
+      if(sub.length <= MAX_NAME_LENGTH) {
+        return sub;
+      }
+    }
+
+    return parts.slice(-1);
+  }
 
   var TroupeItemView = Marionette.ItemView.extend({
     tagName: 'li',
@@ -28,14 +44,7 @@ define([
     },
     serializeData: function() {
       var data = this.model.toJSON();
-      data.createRoom = createRoom;
-      if(data.name.length > 25) {
-        var repo = data.name.split('/')[1];
-        if(repo) {
-          data.title = data.name;
-          data.name = repo;
-        }
-      }
+      data.name = trimName(data.name);
       return data;
     },
     onItemClose: function(e) {

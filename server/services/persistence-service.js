@@ -311,10 +311,13 @@ var TroupeSchema = new Schema({
   topic: { type: String, 'default':'' },
   uri: { type: String },
   lcUri: { type: String, 'default': function() { return this.uri ? this.uri.toLowerCase() : null; }  },
-  githubType: { type: String, 'enum': ['REPO', /*'USER',*/ 'ORG', 'ONETOONE'], required: true },
+  githubType: { type: String, 'enum': ['REPO', 'ORG', 'ONETOONE', 'REPO_CHANNEL', 'ORG_CHANNEL', 'USER_CHANNEL'], required: true },
   status: { type: String, "enum": ['ACTIVE', 'DELETED'], "default": 'ACTIVE'},
   oneToOne: { type: Boolean, "default": false },
   users: [TroupeUserSchema],
+  parentId: { type: ObjectId, required: false },
+  ownerUserId: { type: ObjectId, required: false }, // For channels under a user /suprememoocow/custom
+  security: { type: String, 'enum': ['PRIVATE', 'PUBLIC', 'INHERITED'], required: false }, // For REPO_CHANNEL, ORG_CHANNEL, USER_CHANNEL
   dateDeleted: { type: Date },
   _nonce: { type: Number },
   _tv: { type: 'MongooseNumber', 'default': 0 }
@@ -324,6 +327,8 @@ TroupeSchema.schemaTypeName = 'TroupeSchema';
 // Ideally we should never search against URI, only lcURI
 TroupeSchema.index({ uri: 1 }, { unique: true, sparse: true });
 TroupeSchema.index({ lcUri: 1 }, { unique: true, sparse: true });
+TroupeSchema.index({ parentId: 1 });
+TroupeSchema.index({ ownerUserId: 1 });
 TroupeSchema.index({ "users.userId": 1 });
 TroupeSchema.index({ "users.userId": 1,  "users.deactivated": 2 });
 TroupeSchema.pre('save', function (next) {
