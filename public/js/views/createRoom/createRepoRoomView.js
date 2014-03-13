@@ -2,10 +2,11 @@
 define([
   'marionette',
   'views/base',
+  'utils/context',
   './repoSelectView',
   'hbs!./tmpl/createRepoRoom',
   'utils/appevents'
-], function(Marionette, TroupeViews, RepoSelectView, template, appEvents) {
+], function(Marionette, TroupeViews, context, RepoSelectView, template, appEvents) {
   "use strict";
 
   var View = Marionette.Layout.extend({
@@ -36,6 +37,12 @@ define([
           this.dialog.hide();
           break;
       }
+    },
+
+    serializeData: function () {
+      return {
+        privateRepoScope: !!context.getUser().scopes.private_repo
+      };
     },
 
     onRender: function() {
