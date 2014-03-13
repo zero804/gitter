@@ -39,13 +39,13 @@ module.exports = function(req, res, next) {
 
             if(transloadit.results['doc_thumbs']) {
               transloadit.results['doc_thumbs'].forEach(function(thumb) {
-                thumbs[thumb.name] = fixUrl(thumb.ssl_url);
+                thumbs[thumb.original_id] = fixUrl(thumb.ssl_url);
               });
             }
 
             if(transloadit.results['img_thumbs']) {
               transloadit.results['img_thumbs'].forEach(function(thumb) {
-                thumbs[thumb.name] = fixUrl(thumb.ssl_url);
+                thumbs[thumb.original_id] = fixUrl(thumb.ssl_url);
               });
             }
 
@@ -53,7 +53,7 @@ module.exports = function(req, res, next) {
             var promises = transloadit.results[':original'].map(function(upload) {
               var name = upload.name;
               var url = fixUrl(upload.ssl_url);
-              var thumb = thumbs[name];
+              var thumb = thumbs[upload.id];
 
               var text;
               if(thumb) {
