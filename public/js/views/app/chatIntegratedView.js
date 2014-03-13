@@ -166,7 +166,10 @@ define([
         // Prepare formdata
         e = e.originalEvent;
         var files = e.dataTransfer.files;
-        if (files.length === 0) { return; }
+        if (files.length === 0) {
+          reset();
+          return;
+        }
   
         var formdata = new FormData();
         for (var i in files) {
