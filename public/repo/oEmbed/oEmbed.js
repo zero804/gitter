@@ -119,6 +119,7 @@ define(['jquery-iframely'], function ($) {
   iframelyProviders.push(new RegExp("cloudup.com"));
   iframelyProviders.push(new RegExp("cl.ly"));
   iframelyProviders.push(new RegExp("dl.dropboxusercontent.com"));
+  iframelyProviders.push(new RegExp("dropbox.com"));
 
   return { parse: parse };
 
