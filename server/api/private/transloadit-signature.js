@@ -60,7 +60,7 @@ module.exports =  function(req, res) {
   var shortToken = randomString(4);
 
   // Host for Transloadit callback. In dev env you'll need to use localtunnel
-  var host = (nodeEnv === 'dev') ? 'https://kkcfeoutet.localtunnel.me' : nconf.get('web:basepath');
+  var host = (nodeEnv === 'dev') ? 'https://askdqdpcpd.localtunnel.me' : nconf.get('web:basepath');
 
   var params = {
     auth: {
@@ -74,9 +74,12 @@ module.exports =  function(req, res) {
       token: shortToken
     },
     steps: {
-      export: {
+      export_originals: {
         path: '${fields.room_uri}/${fields.token}/${file.url_name}'
-      }
+      },
+      export_thumbs: {
+        path: '${fields.room_uri}/${fields.token}/thumb/${file.url_name}'
+      },
     },
     notify_url: host + '/api/private/transloadit/' + token
   };
