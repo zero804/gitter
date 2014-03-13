@@ -1,6 +1,8 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var url = require('url');
+
 function repoTokenFirst(user) {
   return user && (user.githubToken || user.githubUserToken)  || '';
 }
@@ -31,11 +33,16 @@ module.exports = function(tokenPriority) {
     this.token = token;
   }
 
+
   Mirror.prototype.get = function(uri) {
     var d = Q.defer();
 
+    var u = url.parse(uri, true);
+    u.query.access_token = this.token;
+    u.protocol = 'https';
+    u.hostname = 'api.github.com';
     var options = {
-      url: 'https://api.github.com/'+uri+'?access_token='+this.token,
+      url: url.format(u),
       headers: {
         'Content-Type': 'application/json',
         'User-Agent': 'gitter/0.0 (https://gitter.im) terminal/0.0'

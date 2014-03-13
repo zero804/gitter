@@ -1,19 +1,6 @@
-{{#if user.createRoom}}
-    <span class="github-ORG">{{org.name}}</span>
-    {{#if org.unreadItems}}
-    <span class="item-unread-badge">
-      <span class="trpTroupeUnreadCounter">{{unreadItems}}</span>
-    </span>
-    {{/if}}
-{{else}}
-  {{#if org.room}}
-      <span class="github-ORG">{{org.name}}</span>
-      {{#if org.unreadItems}}
-      <span class="item-unread-badge">
-        <span class="trpTroupeUnreadCounter">{{unreadItems}}</span>
-      </span>
-      {{/if}}
-  {{else}}
-    <span class="github-ORG disabled" title="Sorry, you can't create chats yet. We're slowly giving users this ability to control our launch.">{{org.name}}</span>
-  {{/if}}
+<span class="github-ORG">{{org.name}}</span>
+{{#if org.unreadItems}}
+<span class="item-unread-badge">
+  <span class="trpTroupeUnreadCounter">{{unreadItems}}</span>
+</span>
 {{/if}}

@@ -4,7 +4,7 @@
 var userTroupeSettingsService = require("../../services/user-troupe-settings-service");
 
 module.exports = {
-  base: 'settings',
+  id: 'setting',
   index: function(req, res, next) {
     userTroupeSettingsService.getAllUserSettings(req.resourceUser.id, req.userTroupe.id)
       .then(function(settings) {

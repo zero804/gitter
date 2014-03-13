@@ -163,10 +163,9 @@ function UserStrategy(options) {
       url: user.getHomeUrl(),
       avatarUrlSmall: user.gravatarImageUrl,
       avatarUrlMedium: user.gravatarImageUrl,
-      createRoom: options.includePermissions ? user.permissions.createRoom : undefined,
       scopes: scopes,
-      online: userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id),
-      role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.username),
+      online: userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id) || undefined,
+      role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.username) || undefined,
       v: getVersion(user)
     };
   };
@@ -663,6 +662,7 @@ function TroupeStrategy(options) {
       lurk: lurkStrategy ? !item.oneToOne && lurkStrategy.map(item.users) : undefined,
       url: troupeUrl,
       githubType: item.githubType,
+      security: item.security,
       v: getVersion(item)
     };
   };

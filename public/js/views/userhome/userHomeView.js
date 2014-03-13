@@ -42,8 +42,7 @@ define([
       var user = context.getUser();
 
       return {
-        privateRepoScope: !!user.scopes.private_repo,
-        createRoom: context.getUser().createRoom
+        privateRepoScope: !!user.scopes.private_repo
       };
     },
 

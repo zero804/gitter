@@ -22,6 +22,12 @@ module.exports = {
     app.get('/api/private/gh/users/*',
         require('./github-mirror/users-mirror'));
 
+    app.get('/api/private/gh/user/repos',
+        require('./github-mirror/user-repos-mirror'));
+
+    app.get('/api/private/gh/search/users',
+        require('./github-mirror/user-search-mirror'));
+
     // No auth for hooks yet
     app.post('/api/private/hook/:hash',
         require('./hooks'));

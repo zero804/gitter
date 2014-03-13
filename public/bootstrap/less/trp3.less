@@ -34,6 +34,13 @@
   .transition(500ms);
 }
 
+
+@-webkit-keyframes pulsey {
+    0% { opacity: 0.3; }
+    50% { opacity: 1; }
+    100% { opacity: 0.3; }
+}
+
 .transition(@time) {
 /*  -webkit-transform: translate3d(0,0,0);
           transform: translate3d(0,0,0);*/
@@ -74,6 +81,14 @@ p {
   line-height: inherit;
 }
 
+dl, dd {
+  margin: 0;
+}
+
+label {
+  font-size: 15px;
+}
+
 .hidden-input input {
   .trpBodyMedium;
   outline: 0;
@@ -84,6 +99,220 @@ p {
   background-color: fade(@trpGrey, 50%);
   border-radius: 4px;
   color: black;
+}
+
+.gtrInput {
+  .trpBodyMedium;
+  outline: 0;
+  box-shadow: none;
+  display: inline-block;
+  padding: 9px;
+  border: 1px solid @trpGrey;
+  background-color: fade(@trpGrey, 50%);
+  border-radius: 4px;
+  color: black;
+
+  &.room {
+    width: 250px;
+  }
+
+}
+
+.gtrOwnerDD {
+  position: relative;
+}
+
+.gtrDDAvatar:before {
+  margin-left: -20px;
+}
+
+.gtrDDAvatar {
+  height: 20px;
+  width: 20px;
+  content: ' ';
+  background-size: contain;
+  display: inline-block;
+  border-radius: 3px;
+}
+
+.gtrDDButton {
+  vertical-align: middle;
+  margin-right: 14px;
+  position: relative;
+  margin-left: 7px;
+
+  .dropdown-menu {
+    max-height: 138px;
+    overflow-y: auto;
+  }
+
+  img {
+    vertical-align: middle;
+    margin-top: -2px;
+  }
+}
+
+.gtrDDButton:before {
+  position: absolute;
+  top: 7px;
+  right: 14px;
+  display: block;
+  width: 0;
+  height: 0;
+  content: "";
+  border: 4px solid;
+  border-right-color: transparent;
+  border-left-color: transparent;
+  border-bottom-color: transparent;
+}
+
+
+.gtrDDText {
+  padding-left: 35px;
+  margin-left: -32px;
+  width: 150px;
+  padding-right: 20px;
+}
+
+
+.gtrSlash {
+  float: left;
+  padding-top: 35px;
+  font-size: 18px;
+  margin: 0 12px 0 0;
+}
+
+.gtrRoomName {
+  height: 100px;
+}
+
+.gtrRoomPermissions {
+  clear: both;
+
+  input {
+    float: left;
+    margin: 8px 12px 0 4px;
+  }
+
+  .permission-row {
+    margin: 8px 0;
+  }
+
+  label {
+    display: inline;
+  }
+
+  .description {
+    display: block;
+    margin-left: 61px;
+    font-size: 14px;
+  }
+
+  .permission-label {
+    margin-left: 8px;
+  }
+
+  .gtrAutoJoin {
+    margin-top: 12px;
+    .transition300ms;
+    input {
+      margin-right: 8px;
+    }
+
+    &.disabled {
+      opacity: 0;
+    }
+    .permission-label {
+      vertical-align: middle;
+      padding-top: 4px;
+      padding-left: 22px;
+    }
+
+  }
+
+  .icon-public {
+    .prepend-globe-icon;
+    &:before {
+      font-size: 22px;
+      padding-top: 8px;
+      margin-top: -4px;
+    }
+  }
+
+  .github-REPO {
+    .prepend-repo-icon;
+    &:before {
+      font-size: 24px;
+      padding-top: 8px;
+    }
+  }
+
+  .icon-channel {
+    .prepend-channel-icon;
+    &:before {
+      font-size: 22px;
+      padding-top: 8px;
+      margin-top: -4px;
+    }
+  }
+
+  .github-ORG {
+    .prepend-org-icon;
+    &:before {
+      font-size: 24px;
+      padding-top: 8px;
+    }
+  }
+
+  .github-LOCK {
+    .prepend-lock-icon;
+    &:before {
+      font-size: 24px;
+      padding-top: 8px;
+    }
+  }
+
+}
+
+.gtrPeopleAddRoster {
+
+}
+
+.gtrPeopleRosterItem {
+  margin-top: 8px;
+  max-width: 500px;
+  cursor: default;
+  .trpDisplayPicture {
+    vertical-align: middle;
+    margin-right: 2px;
+  }
+
+
+  .username {
+    color: #999;
+  }
+
+  &:hover .remove {
+    opacity: 1;
+  }
+
+  .remove {
+    float: right;
+    .prepend-icon-clear();
+    cursor: pointer;
+    opacity: 0.6;
+    .transition300ms;
+  }
+
+  .remove:before {
+    position: inherit;
+  }
+
+  .remove:hover {
+    color: @trpRed;
+  }
+
+
 }
 
 .modal textarea.hidden-input {
@@ -110,6 +339,34 @@ p {
   position: absolute;
   top: -9999px;
 }
+
+.scrollList {
+  max-height: 279px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 100px;
+
+  li {
+    width: 250px;
+    display: inline-block;
+  }
+
+  div {
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .trpLoading {
+    margin-top: 16px;
+  }
+
+}
+
+ul.scrollList a {
+    padding: 4px 4px;
+    border-radius: 3px;
+  }
 
 .scroller::-webkit-scrollbar {
     width: 9px;
@@ -302,8 +559,29 @@ a:hover {
   }
 }
 
+.github-ORG_CHANNEL {
+  .prepend-channel-icon;
+  &:before {
+    font-size: 16px;
+  }
+}
+
 .github-REPO {
   .prepend-repo-icon;
+  &:before {
+    font-size: 16px;
+  }
+}
+
+.github-REPO_CHANNEL {
+  .prepend-channel-icon;
+  &:before {
+    font-size: 16px;
+  }
+}
+
+.github-USER_CHANNEL {
+  .prepend-channel-icon;
   &:before {
     font-size: 16px;
   }
@@ -548,7 +826,7 @@ a.trpMiniLeftMenuItem {
 
 .trpLeftMenu .nano {
   position: absolute;
-  bottom: 10px;
+  bottom: 60px;
   top: 100px;
   .transition(200ms);
 }
@@ -560,7 +838,7 @@ a.trpMiniLeftMenuItem {
 
 .trpLeftMenuActions {
 	position: absolute;
-	bottom: 20px;
+	bottom: 10px;
 	overflow: hidden;
   box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -645,6 +923,8 @@ a.trpMiniLeftMenuItem {
   color: #CCC;
   cursor: not-allowed;
 }
+
+
 
 .gtrActivityItemText .mention {
   border: 1px solid transparent;
@@ -1465,7 +1745,7 @@ i.favourited:hover:before {
       font-size: 14px;
       text-overflow: ellipsis;
       list-style: none;
-    } 
+    }
 
     .vcard-stats {
       border-top: 1px solid fade(@trpGrey, 20%);
@@ -2325,6 +2605,8 @@ ul.roster {
 	 width: 64px;
 	 height: 64px;
 	 vertical-align: text-bottom;
+   -webkit-animation: pulsey 2s linear infinite;
+   animation: pulsey 2s linear infinite;
  }
 
 .typeahead {
