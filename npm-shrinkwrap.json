@@ -240,16 +240,17 @@
     },
     "express-resource": {
       "version": "1.0.0",
-      "from": "express-resource@1.0.0",
+      "from": "https://registry.npmjs.org/express-resource/-/express-resource-1.0.0.tgz",
       "resolved": "https://registry.npmjs.org/express-resource/-/express-resource-1.0.0.tgz",
       "dependencies": {
         "lingo": {
           "version": "0.0.5",
-          "from": "lingo@>= 0.0.4"
+          "from": "lingo@0.0.5",
+          "resolved": "https://registry.npmjs.org/lingo/-/lingo-0.0.5.tgz"
         },
         "methods": {
           "version": "0.0.1",
-          "from": "methods@0.0.1",
+          "from": "https://registry.npmjs.org/methods/-/methods-0.0.1.tgz",
           "resolved": "https://registry.npmjs.org/methods/-/methods-0.0.1.tgz"
         }
       }
@@ -1607,6 +1608,11 @@
       "version": "8.0.0",
       "from": "highlight.js@8.0.0",
       "resolved": "https://registry.npmjs.org/highlight.js/-/highlight.js-8.0.0.tgz"
+    },
+    "heapdump": {
+      "version": "0.2.6",
+      "from": "heapdump@",
+      "resolved": "https://registry.npmjs.org/heapdump/-/heapdump-0.2.6.tgz"
     },
     "xregexp": {
       "version": "2.0.0",

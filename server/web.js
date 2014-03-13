@@ -13,9 +13,12 @@ var nconf    = require('./utils/config');
 var redis    = require('./utils/redis');
 var shutdown = require('./utils/shutdown');
 
+require('./utils/diagnostics');
+
+
+
 /* Load express-resource */
 require('express-resource');
-
 
 var app = express();
 
