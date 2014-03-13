@@ -9,6 +9,8 @@ var bayeux     = require('./web/bayeux');
 var redis      = require('./utils/redis');
 var appVersion = require('./web/appVersion');
 
+require('./utils/diagnostics');
+
 function getHttp() {
   var http = require('http');
   var amazonProxyProtocol = nconf.get("ws:amazonProxyProtocol");
