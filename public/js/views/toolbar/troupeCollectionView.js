@@ -15,6 +15,23 @@ define([
   /* @const */
   var MAX_UNREAD = 99;
 
+  /* @const */
+  var MAX_NAME_LENGTH = 25;
+
+  function trimName(uri) {
+    if(uri.length <= MAX_NAME_LENGTH) return uri;
+
+    var parts = uri.split('/');
+    for(var i = 1; i < parts.length; i++) {
+      var sub = parts.slice(i).join('/');
+      if(sub.length <= MAX_NAME_LENGTH) {
+        return sub;
+      }
+    }
+
+    return parts.slice(-1);
+  }
+
   var TroupeItemView = Marionette.ItemView.extend({
     tagName: 'li',
     template: troupeListItemTemplate,
@@ -27,23 +44,7 @@ define([
     },
     serializeData: function() {
       var data = this.model.toJSON();
-      if(data.name.length > 25) {
-        var repo;
-
-        if (data.name.split('/').length > 1) {
-          repo = data.name.split('/')[1] + "/" + data.name.split('/')[2];
-          if (repo.length > 25) {
-            repo = data.name.split('/')[2];
-          }
-        } else {
-          repo = data.name.split('/')[1];
-        }
-
-        if(repo) {
-          data.title = data.name;
-          data.name = repo;
-        }
-      }
+      data.name = trimName(data.name);
       return data;
     },
     onItemClose: function(e) {
