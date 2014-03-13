@@ -258,7 +258,7 @@ function findUserIdsForTroupe(troupeId, callback) {
  * and githubType
  */
 function findUserIdsForTroupeWithLurk(troupeId) {
-  return persistence.Troupe.findByIdQ(troupeId, 'users githubType uri', { lean: true })
+  return persistence.Troupe.findByIdQ(troupeId, 'users githubType uri security', { lean: true })
     .then(function(troupe) {
       var users = troupe.users.reduce(function(memo, v) {
         memo[v.userId] = !!v.lurk;
