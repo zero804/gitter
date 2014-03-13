@@ -74,9 +74,12 @@ module.exports =  function(req, res) {
       token: shortToken
     },
     steps: {
-      export: {
+      export_originals: {
         path: '${fields.room_uri}/${fields.token}/${file.url_name}'
-      }
+      },
+      export_thumbs: {
+        path: '${fields.room_uri}/${fields.token}/thumb/${file.url_name}'
+      },
     },
     notify_url: host + '/api/private/transloadit/' + token
   };
