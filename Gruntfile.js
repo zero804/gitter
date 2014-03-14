@@ -277,7 +277,8 @@ module.exports = function( grunt ) {
     watch: {
       less: {
         files: [
-          'public/bootstrap/less/*.less'
+          'public/bootstrap/less/*.less',
+          'public/bootstrap/less/bootstrap/*.less'
         ],
         tasks: 'less'
       }
@@ -496,16 +497,6 @@ module.exports = function( grunt ) {
         modules: {
         },
         exports: 'ScrollFix'
-      },
-
-      'bootstrap-typeahead': {
-        files : {
-          'output/client-libs/bootstrap/bootstrap-typeahead.js': ['output/client-libs/bootstrap/js/bootstrap-typeahead.js']
-        },
-        modules: {
-          'jquery': 'jQuery'
-        },
-        exports: 'jQuery'
       },
 
       'zeroclipboard': {

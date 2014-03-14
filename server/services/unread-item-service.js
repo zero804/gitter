@@ -774,7 +774,6 @@ function detectAndCreateMentions(troupeId, creatingUserId, chat) {
   /* Figure out what type of room this is */
   return troupeService.findUserIdsForTroupeWithLurk(troupeId)
     .then(function(troupe) {
-
       var oneToOne = troupe.githubType === 'ONETOONE';
 
       var usersHash = troupe.users;
@@ -826,7 +825,7 @@ function detectAndCreateMentions(troupeId, creatingUserId, chat) {
         if(!users.length) return;
 
         return Q.all(users.map(function(user) {
-          return permissionsModel(user, 'join', troupe.uri, troupe.githubType)
+          return permissionsModel(user, 'join', troupe.uri, troupe.githubType, troupe.security)
             .then(function(access) {
               if(access) {
                 mentionLurkerAndNonMemberUserIds.push(user.id);
@@ -879,22 +878,20 @@ exports.install = function() {
     var promise;
 
     if(operation === 'create') {
-      promise = newItem(troupeId, creatingUserId, 'chat', modelId);
-
-      promise = promise.then(function() {
-        detectAndCreateMentions(troupeId, creatingUserId, model);
-      });
+      promise = newItem(troupeId, creatingUserId, 'chat', modelId)
+        .then(function() {
+          return detectAndCreateMentions(troupeId, creatingUserId, model);
+        });
 
     } else if(operation === 'remove') {
-      promise = removeItem(troupeId, 'chat', modelId);
-
-      promise = promise.then(function() {
-        detectAndRemoveMentions(troupeId, creatingUserId, model);
-      });
+      promise = removeItem(troupeId, 'chat', modelId)
+        .then(function() {
+          return detectAndRemoveMentions(troupeId, creatingUserId, model);
+        });
     }
 
     if(promise) {
-      promise.fail(function(err) {
+      promise.catch(function(err) {
         winston.error('unreadItemService failure: ' + err, { exception: err });
         throw err;
       });

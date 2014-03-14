@@ -28,6 +28,7 @@ function trimDownIssue(issue) {
 }
 
 module.exports = {
+  id: 'issue',
   index: function(req, res) {
     var query = req.query || {};
     var repoName = query.repoName || (req.troupe.githubType === 'REPO' && req.troupe.uri);

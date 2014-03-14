@@ -5,6 +5,7 @@ var restSerializer  = require("../../serializers/rest-serializer");
 var GithubMe        = require("../../services/github/github-me-service");
 
 module.exports = {
+  id: 'org',
   index: function(req, res, next) {
     if (!req.user) return res.send(403);
 
