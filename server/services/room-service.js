@@ -1,22 +1,25 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var persistence        = require('./persistence-service');
-var validateUri        = require('./github/github-uri-validator');
-var uriLookupService   = require("./uri-lookup-service");
-var assert             = require("assert");
 var winston            = require("winston");
 var ObjectID           = require('mongodb').ObjectID;
 var Q                  = require('q');
+var request            = require('request');
+var _                  = require('underscore');
+var xregexp            = require('xregexp').XRegExp;
+var persistence        = require('./persistence-service');
+var validateUri        = require('./github/github-uri-validator');
+var uriLookupService   = require("./uri-lookup-service");
 var permissionsModel   = require('./permissions-model');
 var userService        = require('./user-service');
 var troupeService      = require('./troupe-service');
 var nconf              = require('../utils/config');
-var request            = require('request');
 var GitHubRepoService  = require('./github/github-repo-service');
 var unreadItemService  = require('./unread-item-service');
-var _                  = require('underscore');
 var appEvents          = require("../app-events");
+var serializeEvent     = require('./persistence-service-events').serializeEvent;
+var validate           = require('../utils/validate');
+var collections        = require('../utils/collections');
 
 function localUriLookup(uri, opts) {
   return uriLookupService.lookupUri(uri)
@@ -52,9 +55,9 @@ function localUriLookup(uri, opts) {
 }
 
 function applyAutoHooksForRepoRoom(user, troupe) {
-  assert(user, 'user is required');
-  assert(troupe, 'troupe is required');
-  assert(troupe.githubType === 'REPO', 'Auto hooks can only be used on repo rooms. This room is a ', troupe.githubType);
+  validate.expect(user, 'user is required');
+  validate.expect(troupe, 'troupe is required');
+  validate.expect(troupe.githubType === 'REPO', 'Auto hooks can only be used on repo rooms. This room is a '+ troupe.githubType);
 
   winston.info("Requesting autoconfigured integrations");
 
@@ -82,6 +85,14 @@ exports.applyAutoHooksForRepoRoom = applyAutoHooksForRepoRoom;
 
 
 /**
+ * Private method to push creates out to the bus
+ */
+function serializeCreateEvent(troupe) {
+  var urls = troupe.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/troupes'; });
+  serializeEvent(urls, 'create', troupe);
+}
+
+/**
  * Assuming that oneToOne uris have been handled already,
  * Figure out what this troupe is for
  *
@@ -89,11 +100,11 @@ exports.applyAutoHooksForRepoRoom = applyAutoHooksForRepoRoom;
  */
 function findOrCreateNonOneToOneRoom(user, troupe, uri) {
   if(troupe) {
-    winston.verbose('Does user ' + user && user.username + ' have access to ' + uri + '?');
+    winston.verbose('Does user ' + (user && user.username || '~anon~') + ' have access to ' + uri + '?');
 
     return Q.all([
         troupe,
-        permissionsModel(user, 'join', uri, troupe.githubType)
+        permissionsModel(user, 'join', uri, troupe.githubType, troupe.security)
       ]);
   }
 
@@ -114,7 +125,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
       winston.verbose('Checking if user has permission to create a room at ' + uri);
 
       /* Room does not yet exist */
-      return permissionsModel(user, 'create', uri, githubType)
+      return permissionsModel(user, 'create', uri, githubType, null) // Parent rooms always have security == null
         .then(function(access) {
           if(!access) return [null, access];
 
@@ -141,6 +152,8 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
               var hookCreationFailedDueToMissingScope;
 
               if(nonce == troupe._nonce) {
+                serializeCreateEvent(troupe);
+
                 /* Created here */
                 var requiredScope = "public_repo";
                 /* TODO: Later we'll need to handle private repos too */
@@ -236,7 +249,8 @@ exports.findAllRoomsIdsForUserIncludingMentions = findAllRoomsIdsForUserIncludin
  * @return The promise of a troupe or nothing.
  */
 function findOrCreateRoom(user, uri, opts) {
-  assert(uri, 'uri required');
+  validate.expect(uri, 'uri required');
+
   var userId = user.id;
   opts = opts || {};
 
@@ -281,3 +295,334 @@ function findOrCreateRoom(user, uri, opts) {
 }
 
 exports.findOrCreateRoom = findOrCreateRoom;
+
+/**
+ * Find all non-private channels under a particular parent
+ */
+function findAllChannelsForRoom(user, parentTroupe, callback) {
+  return persistence.Troupe.findQ({
+      parentId: parentTroupe._id,
+      $or: [
+        { security: { $ne: 'PRIVATE' } }, // Not private...
+        { 'users.userId': user._id },     // ... or you're in the circle of trust
+      ]
+    })
+    .nodeify(callback);
+}
+exports.findAllChannelsForRoom = findAllChannelsForRoom;
+
+/**
+ * Given parent and child ids, find a child channel that is
+ * not PRIVATE
+ */
+function findChildChannelRoom(user, parentTroupe, childTroupeId, callback) {
+  return persistence.Troupe.findOneQ({
+      parentId: parentTroupe._id,
+      id: childTroupeId,
+      $or: [
+        { security: { $ne: 'PRIVATE' } }, // Not private...
+        { 'users.userId': user._id },     // ... or you're in the circle of trust
+      ]
+    })
+    .nodeify(callback);
+}
+exports.findChildChannelRoom = findChildChannelRoom;
+
+
+
+/**
+ * Find all non-private channels under a particular parent
+ */
+function findAllChannelsForUser(user, callback) {
+  return persistence.Troupe.findQ({
+      ownerUserId: user._id
+    })
+    .nodeify(callback);
+}
+exports.findAllChannelsForUser = findAllChannelsForUser;
+
+
+/**
+ * Given parent and child ids, find a child channel that is
+ * not PRIVATE
+ */
+function findUsersChannelRoom(user, childTroupeId, callback) {
+  return persistence.Troupe.findOneQ({
+      ownerUserId: user._id,
+      id: childTroupeId
+      /* Dont filter private as owner can see all private rooms */
+    })
+    .nodeify(callback);
+}
+exports.findUsersChannelRoom = findUsersChannelRoom;
+
+
+
+
+function assertValidName(name) {
+  var matcher = xregexp('^[\\p{L}\\d][\\p{L}\\d\\-\\_]*$');
+  if(!matcher.test(name)) {
+    throw {
+      responseStatusCode: 400,
+      clientDetail: {
+        illegalName: true
+      }
+    };
+  }
+}
+
+var RANGE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefgihjklmnopqrstuvwxyz01234567890';
+function generateRandomName() {
+  var s = '';
+  for(var i = 0; i < 6; i++) {
+    s += RANGE.charAt(Math.floor(Math.random() * RANGE.length));
+  }
+  return s;
+}
+
+function ensureNoRepoNameClash(user, uri) {
+  var parts = uri.split('/');
+
+  if(parts.length < 2) {
+    /* The classic "this should never happen" gag */
+    throw "Bad channel uri";
+  }
+
+  if(parts.length == 2) {
+    var repoService = new GitHubRepoService(user);
+    return repoService.getRepo(uri)
+      .then(function(repo) {
+        /* Result? Then we have a clash */
+        return !!repo;
+      });
+  }
+
+  // Cant clash with /x/y/z
+  return false;
+}
+
+function ensureNoExistingChannelNameClash(uri) {
+  return troupeService.findByUri(uri)
+    .then(function(troupe) {
+      return !!troupe;
+    });
+}
+
+function createCustomChildRoom(parentTroupe, user, options, callback) {
+  return Q.fcall(function() {
+    validate.expect(user, 'user is expected');
+    validate.expect(options, 'options is expected');
+
+    var name = options.name;
+    var security = options.security;
+    var uri, githubType;
+
+    if(parentTroupe) {
+      assertValidName(name);
+      uri = parentTroupe.uri + '/' + name;
+
+      if(!{ ORG: 1, REPO: 1 }.hasOwnProperty(parentTroupe.githubType) ) {
+        validate.fail('Invalid security option: ' + security);
+      }
+
+      switch(parentTroupe.githubType) {
+        case 'ORG':
+          githubType = 'ORG_CHANNEL';
+          break;
+        case 'REPO':
+          githubType = 'REPO_CHANNEL';
+          break;
+        default:
+          validate.fail('Invalid parent room type');
+      }
+
+      if(!{ PUBLIC: 1, PRIVATE: 1, INHERITED: 1 }.hasOwnProperty(security) ) {
+        validate.fail('Invalid security option: ' + security);
+      }
+
+    } else {
+      githubType = 'USER_CHANNEL';
+
+      // Create a child room for a user
+      switch(security) {
+        case 'PUBLIC':
+          assertValidName(name);
+          break;
+
+        case 'PRIVATE':
+          if(name) {
+            /* If you cannot afford a name, one will be assigned to you */
+            assertValidName(name);
+          } else {
+            name = generateRandomName();
+          }
+          break;
+
+        default:
+          validate.fail('Invalid security option: ' + security);
+      }
+
+      uri = user.username + '/' + name;
+
+    }
+
+    var lcUri = uri.toLowerCase();
+
+    return permissionsModel(user, 'create', uri, githubType, security)
+      .then(function(access) {
+        if(!access) throw 403;
+        // Make sure that no such repo exists on Github
+        return ensureNoRepoNameClash(user, uri);
+      })
+      .then(function(clash) {
+        if(clash) throw 409;
+        return ensureNoExistingChannelNameClash(uri);
+      })
+      .then(function(clash) {
+        if(clash) throw 409;
+
+        var nonce = Math.floor(Math.random() * 100000);
+
+        return persistence.Troupe.findOneAndUpdateQ(
+          { lcUri: lcUri, githubType: githubType },
+          {
+            $setOnInsert: {
+              lcUri: lcUri,
+              uri: uri,
+              security: security,
+              name: name,
+              parentId: parentTroupe && parentTroupe._id,
+              ownerUserId: parentTroupe ? null : user._id,
+              _nonce: nonce,
+              githubType: githubType,
+              users:  user ? [{ _id: new ObjectID(), userId: user._id }] : []
+            }
+          },
+          {
+            upsert: true
+          })
+          .then(function(newRoom) {
+            // TODO handle adding the user in the event that they didn't create the room!
+            if(newRoom._nonce === nonce) {
+              serializeCreateEvent(newRoom);
+
+              return uriLookupService.reserveUriForTroupeId(newRoom._id, uri)
+                .thenResolve(newRoom);
+            }
+
+            /* Somehow someone beat us to it */
+            throw 409;
+          });
+      });
+
+   })
+  .nodeify(callback);
+}
+exports.createCustomChildRoom = createCustomChildRoom;
+
+
+/**
+ * Validates that all users on the list are validate candidates
+ * to be added to the room.
+ *
+ * Returns a promise of nothing or the promise of an exception if
+ * any of the users are not allowed to be added to the room.
+ */
+function validateUsersToAdd(troupe, usersToAdd) {
+  var validator;
+
+  function roomUserValidator(securityRoomUri, githubType) {
+    return function(user) {
+      return permissionsModel(user, 'join', securityRoomUri, githubType, null);
+    };
+  }
+
+  /* Next, for INHERITED security, make sure the users have access to the parent room */
+  switch(troupe.githubType) {
+    case 'REPO':
+      validator = roomUserValidator(troupe.uri, 'REPO');
+      break;
+
+    case 'ORG':
+      validator = roomUserValidator(troupe.uri, 'ORG');
+      break;
+
+    case 'ONETOONE':
+      /* Anyone can be added */
+      return Q.reject(400);
+
+    case 'REPO_CHANNEL':
+    case 'ORG_CHANNEL':
+      switch(troupe.security) {
+        case 'PRIVATE':
+          /* Anyone can be added */
+          return Q.resolve(true);
+
+        case 'INHERITED':
+          var parentUri = troupe.uri.split('/').slice(0, -1).join('/');
+          var parentRoomType = troupe.githubType === 'REPO_CHANNEL' ? 'REPO' : 'ORG';
+
+          validator = roomUserValidator(parentUri, parentRoomType);
+          break;
+
+        case 'PUBLIC':
+          /* Anyone can be added */
+          return Q.resolve(true);
+      }
+      break;
+
+
+    case 'USER_CHANNEL':
+      /* Anyone can be added, whether its PUBLIC or PRIVATE */
+      return;
+
+    default:
+      /* Dont know what kind of room this is */
+      return Q.reject(400);
+  }
+
+  return Q.all(usersToAdd.map(function(user) {
+    return roomUserValidator(user);
+  }));
+
+}
+/**
+ * Add users to a room
+ * @param {Troupe}    troupe
+ * @param {User}      instigatingUser
+ * @param {[String]}  usernamesToAdd    Usernames of the users to add to the room
+ */
+function addUsersToRoom(troupe, instigatingUser, usernamesToAdd) {
+  /* First step: make sure that the instigatingUser has add access.
+   */
+  return permissionsModel(instigatingUser, 'adduser', troupe.uri, troupe.githubType, troupe.security)
+    .then(function(access) {
+      if(!access) throw 403;
+
+      /* Next, resolve the users to add */
+      return userService.findByUsernames(usernamesToAdd);
+    })
+    .then(function(usersToAdd) {
+      var existing = collections.indexByProperty(usersToAdd, 'userId');
+      /* Next, filter out any users who are already in this room */
+      return usersToAdd.filter(function(user) {
+        return !existing[user.id];
+      });
+    })
+    .then(function(usersToAdd) {
+      validateUsersToAdd(troupe, usersToAdd);
+      return usersToAdd;
+    })
+    .then(function(usersToAdd) {
+      /* Next, add the users */
+      usersToAdd.forEach(function(user) {
+        if(!troupe.containsUserId(user.id)) {
+          troupe.addUserById(user.id);
+        }
+      });
+
+      return troupe.saveQ()
+        .thenResolve(troupe);
+    });
+}
+exports.addUsersToRoom = addUsersToRoom;

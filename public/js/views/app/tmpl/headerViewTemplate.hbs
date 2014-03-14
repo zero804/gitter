@@ -1,25 +1,7 @@
 <div class="trpHeaderContainer">
   {{#unless oneToOne}}
   <div class="settingsCog">
-    <div class="dropdown">
-      <div class="dropdown-toggle" data-toggle="dropdown"></div>
-      <ul class="dropdown-menu" role="menu">
-        <li><a role="menuitem" tabindex="-1" href="#inv">Share this chat room</a>
-        <li role="presentation" class="divider"></li>
-        <li><a id="notifications-settings-link" role="menuitem" tabindex="-1" href="#notifications">Notifications</a></li>
-        {{#if permissions.admin}}
-          {{#if isNativeDesktopApp}}
-            <li><a role="menuitem" tabindex="-1" href="{{troupeUrl}}#integrations" target="_blank">Integrations</a></li>
-          {{else}}
-            <li><a role="menuitem" tabindex="-1" href="#integrations">Integrations</a></li>
-          {{/if}}
-        {{/if}}
-        <li role="presentation" class="divider"></li>
-        <li><a role="menuitem" tabindex="-1" href="http://www.github.com{{troupeUri}}" target="_blank">Open in GitHub</a></li>
-        <li role="presentation" class="divider"></li>
-        <li><a role="menuitem" tabindex="-1" id="leave-room" style="cursor: pointer;">Leave this room</a></li>
-      </ul>
-    </div>
+    <div class="dropdown-toggle" data-toggle="dropdown"></div>
   </div>
   {{/unless}}
   <div class="trpTroupeFavourite {{#if troupeFavourite}}favourited{{/if}}" id="favourite-button">
@@ -28,6 +10,6 @@
         <i class="trpHeaderFavIcon unfavourited" width="24" height="24"></i>
       </div>
   </div>
-  <h1><a href="http://github.com{{troupeUri}}" target="github">{{troupeName}}</a></h1>
+  <h1 id="name-label"><a href="http://github.com{{troupeUri}}" target="github">{{troupeName}}</a></h1>
   <p id="trpTopic">{{#unless oneToOne}}{{troupeTopic}}{{/unless}}{{#oneToOne}}<a href="http://github.com{{troupeUri}}" target="github">github.com{{troupeUri}}</a>{{/oneToOne}}</p>
 </div>

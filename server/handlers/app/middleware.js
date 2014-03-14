@@ -4,13 +4,20 @@
 var roomService = require('../../services/room-service');
 var isPhone     = require('../../web/is-phone');
 
-function uriContextResolverMiddleware(req, res, next) {
-  var uri;
-  if(req.params.repo) {
-    uri = req.params.userOrOrg + '/' + req.params.repo;
-  } else {
-    uri = req.params.userOrOrg;
+function normaliseUrl(params) {
+  if(params.roomPart3) {
+    return params.roomPart1 + '/' + params.roomPart2 + '/' + params.roomPart3;
   }
+
+  if(params.roomPart2) {
+    return params.roomPart1 + '/' + params.roomPart2;
+  }
+
+  return params.roomPart1;
+}
+
+function uriContextResolverMiddleware(req, res, next) {
+  var uri = normaliseUrl(req.params);
 
   return roomService.findOrCreateRoom(req.user, uri)
     .then(function(uriContext) {
@@ -22,13 +29,14 @@ function uriContextResolverMiddleware(req, res, next) {
         req.session.events = events;
       }
 
-      if(uriContext.hookCreationFailedDueToMissingScope) {        
+      if(uriContext.hookCreationFailedDueToMissingScope) {
         events.push('hooks_require_additional_public_scope');
       }
 
-      if(uriContext.didCreate) {        
+      if(uriContext.didCreate) {
         events.push('room_created_now');
       }
+
       req.troupe = uriContext.troupe;
       req.uriContext = uriContext;
       next();

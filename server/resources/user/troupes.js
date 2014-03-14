@@ -9,7 +9,6 @@ var roomService = require('../../services/room-service');
 var Q = require('q');
 
 module.exports = {
-  base: 'troupes',
   id: 'userTroupe',
   index: function(req, res, next) {
     if(!req.user) {
@@ -83,7 +82,6 @@ module.exports = {
       })
       .fail(next);
   },
-
 
   load: function(req, id, callback) {
     troupeService.findById(id, function(err, troupe) {

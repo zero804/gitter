@@ -19,7 +19,11 @@
 {{#hasMenuItems}}
 <div class="modal-footer frame-menu-items">
   {{#each menuItems}}
+  {{#if this.disabled }}
+  <button class="trpModalButton trpButtonMedium {{this.className}} button" data-action="{{this.action}}" disabled>{{this.text}}</button>
+  {{ else }}
   <button class="trpModalButton trpButtonMedium {{this.className}} button" data-action="{{this.action}}">{{this.text}}</button>
+  {{/if}}
   {{/each}}
 </div>
 {{/hasMenuItems}}

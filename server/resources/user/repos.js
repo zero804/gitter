@@ -6,11 +6,6 @@ var repoService      = require("../../services/repo-service");
 var createTextFilter = require('text-filter');
 
 function indexQuery(req, res, next) {
-  var options = {
-    limit: req.query.limit,
-    skip: req.query.skip
-  };
-
   var search = repoService.getReposForUser(req.user);
 
   return search.then(function(repos) {
@@ -22,6 +17,7 @@ function indexQuery(req, res, next) {
 
       return restSerializer.serializeQ({ results: filteredRepos }, strategy);
     })
+
     .then(function(serialized) {
       res.send(serialized);
     })
@@ -29,6 +25,7 @@ function indexQuery(req, res, next) {
 }
 
 module.exports = {
+  id: 'repo',
   index: function(req, res, next) {
     if(req.query.q) {
       return indexQuery(req, res, next);

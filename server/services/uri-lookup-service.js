@@ -10,7 +10,7 @@
 var persistence = require("./persistence-service");
 var Q = require('q');
 var winston = require('winston');
-
+var mongoUtils = require('../utils/mongo-utils');
 /**
  * Lookup the owner of a URI
  * @return promise of a UriLookup
@@ -64,15 +64,14 @@ function removeUsernameForUserId(userId) {
   return persistence.UriLookup.findOneAndRemoveQ({ userId: userId });
 }
 
-function reserveUriForTroupeId(troupeId, uri) {
-  return persistence.UriLookup.findOneAndUpdateQ(
-          { troupeId: troupeId },
-          { $set: { uri: uri, troupeId: troupeId }, $unset: { userId: '' } },
-          { upsert: true });
-}
+function reserveUriForUsername(userId, username) {
+  var lcUri = username.toLowerCase();
+  userId = mongoUtils.asObjectID(userId);
 
-function removeUriForTroupeId(troupeId) {
-  return persistence.UriLookup.findOneAndRemoveQ({ troupeId: troupeId });
+  return persistence.UriLookup.findOneAndUpdateQ(
+    { $or: [{ uri: lcUri }, { userId: userId }] },
+    { $set: { uri: lcUri, userId: userId }, $unset: { troupeId: '' } },
+    { upsert: true });
 }
 
 function removeBadUri(uri) {
@@ -81,8 +80,18 @@ function removeBadUri(uri) {
   return persistence.UriLookup.removeQ({ uri: lcUri });
 }
 
+function reserveUriForTroupeId(troupeId, uri) {
+  var lcUri = uri.toLowerCase();
+  troupeId = mongoUtils.asObjectID(troupeId);
+
+  return persistence.UriLookup.findOneAndUpdateQ(
+    { $or: [{ uri: lcUri }, { troupeId: troupeId }] },
+    { $set: { uri: lcUri, troupeId: troupeId }, $unset: { userId: '' } },
+    { upsert: true });
+}
+
+exports.reserveUriForTroupeId = reserveUriForTroupeId;
 exports.lookupUri = lookupUri;
 exports.removeUsernameForUserId = removeUsernameForUserId;
-exports.reserveUriForTroupeId = reserveUriForTroupeId;
-exports.removeUriForTroupeId = removeUriForTroupeId;
+exports.reserveUriForUsername = reserveUriForUsername;
 exports.removeBadUri = removeBadUri;

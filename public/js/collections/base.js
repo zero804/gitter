@@ -272,7 +272,7 @@ define([
             // No existing document exists, simply treat this as an add
             this.add(parsed);
           } else {
-            log('Ignoring patch for non-existant model', newModel);
+            log('Ignoring patch for non-existant model', newModel, 'loading?', this.loading);
           }
 
           break;
@@ -312,8 +312,23 @@ define([
 
   exports.LoadingMixin = {
     initialize: function() {
-      this.loading = true;
-      this.listenToOnce(this, 'add reset sync', this.loadComplete);
+      if(this.length === 0) {
+        this.loading = true;
+        this.listenToOnce(this, 'add reset sync', this.loadComplete);
+      }
+    },
+    loadComplete: function() {
+      delete this.loading;
+      this.trigger('loaded');
+    }
+  };
+
+  exports.UnderlyingLoadingMixin = {
+    initialize: function() {
+      if(this.collection.loading) {
+        this.loading = true;
+        this.listenToOnce(this.collection, 'loaded', this.loadComplete);
+      }
     },
     loadComplete: function() {
       delete this.loading;
