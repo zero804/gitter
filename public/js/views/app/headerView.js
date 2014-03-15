@@ -67,10 +67,12 @@ define([
         menuItems.push({ title: 'Notifications', href: '#notifications' });
 
         if(c.permissions.admin) {
-          if(c.isNativeDesktopApp) {
-            menuItems.push({ title: 'Integrations', href: window.location.origin + url + '#integrations', target: '_blank' });
-          } else {
-            menuItems.push({ title: 'Integrations', href: '#integrations' });
+          if(c.troupe.githubType !== 'REPO_CHANNEL') {
+            if(c.isNativeDesktopApp) {
+              menuItems.push({ title: 'Integrations', href: window.location.origin + url + '#integrations', target: '_blank' });
+            } else {
+              menuItems.push({ title: 'Integrations', href: '#integrations' });
+            }
           }
         }
 
