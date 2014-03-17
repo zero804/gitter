@@ -82,7 +82,10 @@ module.exports = {
     }
 
     app.use(express.cookieParser());
-    app.use(express.bodyParser());
+    // app.use(express.bodyParser());
+    app.use(express.urlencoded());
+    app.use(express.json());
+
     app.use(express.methodOverride());
 
     (function fileUploading() {
@@ -237,7 +240,10 @@ module.exports = {
     }
 
     app.use(express.cookieParser());
-    app.use(express.bodyParser());
+    // app.use(express.bodyParser());
+    app.use(express.urlencoded());
+    app.use(express.json());
+
     app.use(express.session({ secret: 'keyboard cat', store: sessionStore, cookie: { path: '/', httpOnly: true, maxAge: 14400000, domain: nconf.get("web:cookieDomain"), secure: nconf.get("web:secureCookies") }}));
 
     app.use(express.errorHandler({ showStack: nconf.get('express:showStack'), dumpExceptions: nconf.get('express:dumpExceptions') }));

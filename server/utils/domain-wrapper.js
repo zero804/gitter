@@ -2,28 +2,44 @@
 "use strict";
 
 var domain = require('domain');
+var winston = require('./winston');
+var shutdown = require('./shutdown');
+
+var errorCount = 0;
 
 module.exports = function(app) {
+
   return function(req, res) {
     var reqd = domain.create();
     reqd.add(req);
     reqd.add(res);
 
     reqd.on('error', function(err) {
-      console.error('Error', err, req.url);
-      try {
-        res.writeHead(500);
-        res.end('Error occurred, sorry.');
-      } catch (err) {
-        console.error('Error sending 500', err, req.url);
-        try {
-          reqd.dispose();
-        } catch(e2) {
-        }
+      errorCount++;
+      winston.error('An unhandled domain exception occurred: ' + err, { url: req.url, exception: err });
+
+      if(!res.headersSent) {
+        res.send(500);
       }
+
+      try {
+        reqd.dispose();
+      } catch(e2) {
+      }
+
+      if(errorCount > 20) {
+        winston.error('Too many errors have occured. Recycling this server');
+        shutdown.shutdownGracefully();
+      }
+
     });
 
-    app.apply(null, arguments);
+    var args = arguments;
+
+    reqd.run(function() {
+      app.apply(null, args);
+    });
+
   };
 
 };
