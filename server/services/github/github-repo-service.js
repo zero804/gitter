@@ -67,9 +67,14 @@ function getIssuesWithState(repo, state) {
     getIssuesWithState(repo, 'open'),
     getIssuesWithState(repo, 'closed')
     ]).spread(function(openIssues, closedIssues) {
-      return openIssues.concat(closedIssues).sort(function(a, b) {
-        return a.number - b.number;
+      var issues = [];
+      openIssues.forEach(function(issue) {
+        issues[issue.number] = issue;
       });
+      closedIssues.forEach(function(issue) {
+        issues[issue.number] = issue;
+      });
+      return issues;
     })
     .fail(badCredentialsCheck);
 
