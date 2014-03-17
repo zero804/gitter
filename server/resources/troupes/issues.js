@@ -4,18 +4,23 @@
 var RepoService =  require('../../services/github/github-repo-service');
 var converter = require('../../utils/process-chat');
 var winston = require('winston');
+var _ = require('underscore');
 
-function getEightSuggestedIssues(allIssues) {
-  return allIssues.slice(0, 8).sort(function(issueA, issueB) {
-    return issueB.number - issueA.number;
-  }).map(trimDownIssue);
+function getEightSuggestedIssues(issues) {
+  var suggestedIssues = [];
+  for(var i = issues.length - 1; i >= 0 && suggestedIssues.length < 8; i--) {
+    var issue = issues[i];
+    if(issue) {
+      suggestedIssues.push(issue);
+    }
+  }
+
+  return suggestedIssues.map(trimDownIssue);
 }
 
-function getTopEightMatchingIssues(allIssues, term) {
-  var matches = allIssues.filter(function(issue) {
-    return (''+issue.number).indexOf(term) === 0;
-  }).sort(function(issueA, issueB) {
-    return issueA.number - issueB.number;
+function getTopEightMatchingIssues(issues, term) {
+  var matches = issues.filter(function(issue) {
+    return issue && (''+issue.number).indexOf(term) === 0;
   }).slice(0, 8).map(trimDownIssue);
   return matches;
 }
@@ -56,7 +61,9 @@ module.exports = {
     var repoName = req.troupe.uri;
 
     service.getIssues(repoName).then(function(issues) {
-      var issue = issues[issueNumber-1];
+      var issue = _.find(issues, function(issue) {
+        return issue && ''+issue.number === issueNumber;
+      });
       if(!issue) {
         res.send(404);
       } else {
