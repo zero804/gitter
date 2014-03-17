@@ -32,7 +32,7 @@ app.use(function(req, res, next) {
 });
 
 shutdown.installUnhandledExceptionHandler();
-shutdown.addHandler('web', 10, function(callback) {
+shutdown.addHandler('web', 20, function(callback) {
   gracefullyClosing = true;
   server.close(callback);
 });
