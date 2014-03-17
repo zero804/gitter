@@ -7,7 +7,7 @@ var nconf                         = require('../utils/config');
 var expressHbs                    = require('express-hbs');
 var winston                       = require('winston');
 var middleware                    = require('./middleware');
-var fineuploaderExpressMiddleware = require('fineuploader-express-middleware');
+// var fineuploaderExpressMiddleware = require('fineuploader-express-middleware');
 var fs                            = require('fs');
 var os                            = require('os');
 var responseTime                  = require('./response-time');
@@ -94,7 +94,7 @@ module.exports = {
         fs.mkdirSync(uploadDir);
       }
 
-      app.use(fineuploaderExpressMiddleware({ uploadDir: uploadDir }));
+      // app.use(fineuploaderExpressMiddleware({ uploadDir: uploadDir }));
 
       // clean out the file upload directory every few hours
       setInterval(function() {
