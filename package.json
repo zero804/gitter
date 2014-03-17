@@ -6,7 +6,7 @@
     "hiredis": "~0.1.15",
     "winston": "~0.7.2",
     "nconf": "0.6.4",
-    "express": "3.0.6",
+    "express": "^3.4.8",
     "express-resource": "1.0.0",
     "express-form": "0.8.1",
     "connect-redis": "~1.4.6",
