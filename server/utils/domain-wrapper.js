@@ -34,15 +34,15 @@ module.exports = function(app) {
         }
 
         winston.error('----------------------------------------------------------------');
-        winston.error('-- A VeryBadThing has happened.');
+        winston.error('-- A BadThing has happened.');
         winston.error('----------------------------------------------------------------');
-        winston.error('Uncaught exception: ' + err, { message: err.message, name: err.name });
+        winston.error('Domain exception: ' + err, { message: err.message, name: err.name });
 
         if(err.stack) {
           winston.error('' + err.stack);
         }
 
-        winston.error('Uncaught exception' + err + ' forcing shutdown');
+        winston.error('Domain exception' + err + ' forcing shutdown');
       } catch(e) {
         /* This might seem strange, but sometime just logging the error will crash your process a second time */
         try {
