@@ -8,6 +8,7 @@ var shutdown   = require('./utils/shutdown');
 var bayeux     = require('./web/bayeux');
 var redis      = require('./utils/redis');
 var appVersion = require('./web/appVersion');
+var domainWrapper = require('./utils/domain-wrapper');
 
 require('./utils/diagnostics');
 
@@ -24,7 +25,7 @@ function getHttp() {
 winston.info("Starting http/ws service");
 
 var app = express();
-var server = getHttp().createServer(app);
+var server = getHttp().createServer(domainWrapper(app));
 
 var RedisStore = require('connect-redis')(express);
 var sessionStore = new RedisStore({
