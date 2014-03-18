@@ -13,6 +13,7 @@ function shutdownGracefully(exitCode) {
       winston.info("Timeout awaiting graceful shutdown. Forcing shutdown.");
       process.exit(exitCode || 11);
   }, 100000);
+  timer.unref();
 
   performNextShutdownStage(exitCode);
 }

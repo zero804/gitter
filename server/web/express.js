@@ -7,7 +7,7 @@ var nconf                         = require('../utils/config');
 var expressHbs                    = require('express-hbs');
 var winston                       = require('winston');
 var middleware                    = require('./middleware');
-var fineuploaderExpressMiddleware = require('fineuploader-express-middleware');
+// var fineuploaderExpressMiddleware = require('fineuploader-express-middleware');
 var fs                            = require('fs');
 var os                            = require('os');
 var responseTime                  = require('./response-time');
@@ -82,7 +82,10 @@ module.exports = {
     }
 
     app.use(express.cookieParser());
-    app.use(express.bodyParser());
+    // app.use(express.bodyParser());
+    app.use(express.urlencoded());
+    app.use(express.json());
+
     app.use(express.methodOverride());
 
     (function fileUploading() {
@@ -94,7 +97,7 @@ module.exports = {
         fs.mkdirSync(uploadDir);
       }
 
-      app.use(fineuploaderExpressMiddleware({ uploadDir: uploadDir }));
+      // app.use(fineuploaderExpressMiddleware({ uploadDir: uploadDir }));
 
       // clean out the file upload directory every few hours
       setInterval(function() {
@@ -237,7 +240,10 @@ module.exports = {
     }
 
     app.use(express.cookieParser());
-    app.use(express.bodyParser());
+    // app.use(express.bodyParser());
+    app.use(express.urlencoded());
+    app.use(express.json());
+
     app.use(express.session({ secret: 'keyboard cat', store: sessionStore, cookie: { path: '/', httpOnly: true, maxAge: 14400000, domain: nconf.get("web:cookieDomain"), secure: nconf.get("web:secureCookies") }}));
 
     app.use(express.errorHandler({ showStack: nconf.get('express:showStack'), dumpExceptions: nconf.get('express:dumpExceptions') }));
