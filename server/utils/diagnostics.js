@@ -17,7 +17,7 @@ if(nconf.get('diagnostics:heapdump')) {
 
   var memwatch = require('memwatch');
   memwatch.on('leak', function(info) {
-    winston.warning('memwatch: leak: ' + info.reason);
+    winston.warn('memwatch: leak: ' + info.reason);
   });
 
   memwatch.on('stats', function(stats) {
