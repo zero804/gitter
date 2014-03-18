@@ -20,9 +20,9 @@ define(['underscore', 'backbone', 'utils/context'], function(_, Backbone, contex
   };
 
 
-  window.addEventListener("message", function() {
-    if (event.origin !== basePath) return;
-    var data = JSON.parse(event.data);
+  window.addEventListener("message", function(e) {
+    if (e.origin !== basePath) return;
+    var data = JSON.parse(e.data);
 
     if(data.child_window_event) {
       appEvents.trigger.apply(appEvents, data.child_window_event);
