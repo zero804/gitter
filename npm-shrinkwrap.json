@@ -672,6 +672,10 @@
         }
       }
     },
+    "heapdump": {
+      "version": "0.2.7",
+      "from": "heapdump@"
+    },
     "highlight.js": {
       "version": "8.0.0",
       "from": "highlight.js@~8.0.0"
