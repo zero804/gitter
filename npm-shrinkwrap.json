@@ -96,7 +96,7 @@
     },
     "cube": {
       "version": "0.2.12",
-      "from": "cube@~0.2.12",
+      "from": "cube@latest",
       "dependencies": {
         "node-static": {
           "version": "0.6.5",
@@ -784,6 +784,11 @@
           "from": "xregexp@~2.0.0"
         }
       }
+    },
+    "memwatch": {
+      "version": "0.2.2",
+      "from": "memwatch@",
+      "resolved": "https://registry.npmjs.org/memwatch/-/memwatch-0.2.2.tgz"
     },
     "mime": {
       "version": "1.2.5",

@@ -11,8 +11,16 @@ if(nconf.get('diagnostics:heapdump')) {
 
   process.on('SIGUSR2', function() {
     var filename = '/tmp/heap.' + Date.now() + '.heapsnapshot';
-    winston.error('Writing heapsnapshot: ' + filename);
+    winston.warn('Writing heapsnapshot: ' + filename);
     heapdump.writeSnapshot(filename);
   });
 
+  var memwatch = require('memwatch');
+  memwatch.on('leak', function(info) {
+    winston.warning('memwatch: leak: ' + info.reason);
+  });
+
+  memwatch.on('stats', function(stats) {
+    winston.info('memwatch: stats: ', stats);
+  });
 }
