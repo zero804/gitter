@@ -6,7 +6,7 @@ var winston = require('../utils/winston');
 
 var cube_enabled        = nconf.get("stats:cube:enabled")       || false;
 var mixpanel_enabled    = nconf.get("stats:mixpanel:enabled")   || false;
-var customerio_enabled  = nconf.get("stats:customerio:enabled") || false;
+// var customerio_enabled  = nconf.get("stats:customerio:enabled") || false;
 
 var blacklist = ['location_submission','push_notification','mail_bounce','new_troupe','new_mail_attachment','remailed_email','new_file_version','new_file','login_failed','password_reset_invalid','password_reset_completed','invite_reused','confirmation_reused'];
 
@@ -22,10 +22,10 @@ if (mixpanel_enabled) {
   var mixpanel  = Mixpanel.init(token);
 }
 
-if (customerio_enabled) {
-  var CustomerIO = require('customer.io');
-  var cio = CustomerIO.init(nconf.get("stats:customerio:siteId"), nconf.get("stats:customerio:key"));
-}
+// if (customerio_enabled) {
+//   var CustomerIO = require('customer.io');
+//   var cio = CustomerIO.init(nconf.get("stats:customerio:siteId"), nconf.get("stats:customerio:key"));
+// }
 
 function isTestUser(email) {
   return false;
