@@ -101,7 +101,7 @@ if (nconf.get("stats:mixpanel:enabled")) {
 exports.event = function(eventName, properties) {
   if(!properties) properties = {};
 
-  winston.verbose("[stats] event", {event: eventName, properties: properties});
+  winston.verbose("[stats] event", { event: eventName });
 
   statsHandlers.forEach(function(handler) {
     try {
@@ -119,7 +119,7 @@ exports.event = function(eventName, properties) {
 exports.userUpdate = function(user, properties) {
   if(!properties) properties = {};
 
-  winston.verbose("[stats] userUpdate", { user: user, properties: properties });
+  winston.verbose("[stats] userUpdate", { user: user });
 
   statsHandlers.forEach(function(handler) {
     try {
