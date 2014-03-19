@@ -1406,6 +1406,56 @@
         }
       }
     },
+    "statsd": {
+      "version": "0.7.1",
+      "from": "statsd@",
+      "resolved": "https://registry.npmjs.org/statsd/-/statsd-0.7.1.tgz",
+      "dependencies": {
+        "node-syslog": {
+          "version": "1.1.7",
+          "from": "node-syslog@1.1.7",
+          "resolved": "https://registry.npmjs.org/node-syslog/-/node-syslog-1.1.7.tgz"
+        },
+        "hashring": {
+          "version": "1.0.1",
+          "from": "hashring@1.0.1",
+          "resolved": "https://registry.npmjs.org/hashring/-/hashring-1.0.1.tgz",
+          "dependencies": {
+            "connection-parse": {
+              "version": "0.0.7",
+              "from": "connection-parse@0.0.x",
+              "resolved": "https://registry.npmjs.org/connection-parse/-/connection-parse-0.0.7.tgz"
+            },
+            "simple-lru-cache": {
+              "version": "0.0.1",
+              "from": "simple-lru-cache@0.0.x"
+            }
+          }
+        },
+        "winser": {
+          "version": "0.1.6",
+          "from": "winser@=0.1.6",
+          "resolved": "https://registry.npmjs.org/winser/-/winser-0.1.6.tgz",
+          "dependencies": {
+            "sequence": {
+              "version": "2.2.1",
+              "from": "sequence@2.2.1"
+            },
+            "commander": {
+              "version": "1.3.1",
+              "from": "commander@1.3.1",
+              "resolved": "https://registry.npmjs.org/commander/-/commander-1.3.1.tgz",
+              "dependencies": {
+                "keypress": {
+                  "version": "0.1.0",
+                  "from": "keypress@0.1.x"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "temp": {
       "version": "0.4.0",
       "from": "temp@0.4.0"
