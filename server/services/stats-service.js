@@ -119,7 +119,7 @@ exports.event = function(eventName, properties) {
 exports.userUpdate = function(user, properties) {
   if(!properties) properties = {};
 
-  winston.verbose("[stats] userUpdate", { user: user });
+  winston.verbose("[stats] userUpdate");
 
   statsHandlers.forEach(function(handler) {
     try {
