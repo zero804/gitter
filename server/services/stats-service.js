@@ -61,9 +61,9 @@ exports.event = function(eventName, properties) {
         }
 
         // CustomerIO
-        if (customerio_enabled) {
-          cio.track(properties.userId, eventName, properties);
-        }
+        // if (customerio_enabled) {
+        //   cio.track(properties.userId, eventName, properties);
+        // }
       }
     }
 
@@ -110,24 +110,24 @@ exports.userUpdate = function(user, properties) {
       email = "noemail@gitter.im";
     }
 
-    if (customerio_enabled) {
-      var cio_properties = {
-        first_name: firstName,
-        created_at: createdAt,
-        email:      email,
-        name:       user.displayName,
-        username:   user.username,
-        confirmationCode: user.confirmationCode,
-        status:     user.status
-      };
+    // if (customerio_enabled) {
+    //   var cio_properties = {
+    //     first_name: firstName,
+    //     created_at: createdAt,
+    //     email:      email,
+    //     name:       user.displayName,
+    //     username:   user.username,
+    //     confirmationCode: user.confirmationCode,
+    //     status:     user.status
+    //   };
 
-      for (var attr in properties) {
-        var value = properties[attr] instanceof Date ? Math.round(properties[attr].getTime() / 1000) : properties[attr];
-        cio_properties[attr] = value;
-      }
+    //   for (var attr in properties) {
+    //     var value = properties[attr] instanceof Date ? Math.round(properties[attr].getTime() / 1000) : properties[attr];
+    //     cio_properties[attr] = value;
+    //   }
 
-      cio.identify(user.id, email, cio_properties);
-    }
+    //   cio.identify(user.id, email, cio_properties);
+    // }
 
   } catch(err) {
     winston.error('[stats] Error processing userUpdate: ', err, properties);
