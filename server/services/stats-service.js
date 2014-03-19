@@ -21,10 +21,6 @@ if (mixpanel_enabled) {
   var mixpanel  = Mixpanel.init(token);
 }
 
-function isTestUser(email) {
-  return false;
-}
-
 exports.event = function(eventName, properties) {
 
   if(!properties) properties = {};
