@@ -85,7 +85,8 @@
     "highlight.js": "~8.0.0",
     "xregexp": "^2.0.0",
     "heapdump": "^0.2.7",
-    "memwatch": "^0.2.2"
+    "memwatch": "^0.2.2",
+    "statsd": "^0.7.1"
   },
   "devDependencies": {
     "proxyquire": "0.4.0",
