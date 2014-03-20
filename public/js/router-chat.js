@@ -33,20 +33,15 @@ require([
   'template/helpers/all',       // No ref
   'components/eyeballs',        // No ref
   'components/bug-reporting',   // No ref
-  'components/csrf'             // No ref
+  'components/csrf',            // No ref
+  'components/ajax-errors'      // No ref
+
 ], function($, Backbone, context, liveContext, appEvents, peopleCollectionView, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, RightToolbarView,
     inviteView, TroupeSettingsView, MarkdownView, AddPeopleViewModal, IntegrationSettingsModal,
     unreadItemsClient, webhookDecorator, issueDecorator, commitDecorator, mentionDecorator,
     embedDecorator, emojiDecorator, UnreadBannerView, HeaderView) {
   "use strict";
-
-  // Make drop down menus drop down
-  // This is a bit nasty
-  // $(document).on("click", ".trpButtonDropdown .trpButtonMenu", function(/*event*/) {
-  //   $(this).parent().next().toggle();
-  // });
-
 
   $(document).on("click", "a", function(e) {
     if(this.href) {
