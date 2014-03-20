@@ -1,12 +1,12 @@
 /* jshint unused:true, browser:true,  strict:true */
 /* global define:false */
-define(['jquery-iframely'], function ($) {
+define(['jquery-iframely', 'utils/context'], function ($, context) {
   "use strict";
 
   var oEmbedProviders = {};
   var iframelyProviders = [];
   var lookups   = [];
-  $.iframely.defaults.endpoint = 'http://localhost:8061/iframely';
+  $.iframely.defaults.endpoint = context.env('embedBaseUrl')+'/iframely';
 
   function addOEmbedProvider(name, patterns, endpoint, opts) {
     oEmbedProviders[name] = {
