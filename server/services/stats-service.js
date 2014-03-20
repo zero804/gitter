@@ -53,8 +53,8 @@ if (statsdEnabled) {
     statsdClient.increment(eventName);
   });
 
-  statsHandlers.responseTime.push(function(duration) {
-    statsdClient.timing(duration);
+  statsHandlers.responseTime.push(function(timerName, duration) {
+    statsdClient.timing(timerName, duration);
   });
 }
 
