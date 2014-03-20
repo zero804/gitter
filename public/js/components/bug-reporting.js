@@ -5,9 +5,10 @@ define([
 ], function(require, context) {
   "use strict";
 
-  if(context.env('env') != 'dev') {
+  var ravenUrl = context.env('ravenUrl');
+  if(ravenUrl) {
     require(['raven'], function(Raven) {
-      Raven.config('***REMOVED***', {
+      Raven.config(ravenUrl, {
           // # we highly recommend restricting exceptions to a domain in order to filter out clutter
           // whitelistUrls: ['example.com/scripts/']
       }).install();
@@ -19,6 +20,7 @@ define([
     });
 
   }
+
 
 
 });
