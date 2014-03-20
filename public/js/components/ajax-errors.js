@@ -7,19 +7,27 @@ define([
   "use strict";
 
   $(document).ajaxError(function(ev, jqxhr, settings) {
+    var url = settings.url;
+    var method =  settings.type;
+
+    if(!url) return;
+
+    if(url.indexOf('/') !== 0 && !url.match(/https?:\/\/[\w.-_]*gitter.im\//)) {
+      return;
+    }
 
     if(jqxhr.statusText == "error" && jqxhr.status === 404) {
-      log('unreachable: ' + settings.url);
+      log('unreachable: ' + url);
       /* Unreachable server */
-      appEvents.trigger('bugreport', 'ajaxError: unreachable: '+ settings.type + ' ' + settings.url);
+      appEvents.trigger('bugreport', 'ajaxError: unreachable: '+ method + ' ' + url);
 
     } else if(jqxhr.status < 500) {
       // 400 errors are the problem of the ajax caller, not the global handler
       return;
 
     } else {
-      log('ajaxError: HTTP ' + jqxhr.status + ' on ' + settings.url);
-      appEvents.trigger('bugreport', 'ajaxError: HTTP ' + jqxhr.status + ' on ' + settings.type + ' ' + settings.url);
+      log('ajaxError: HTTP ' + jqxhr.status + ' on ' + url);
+      appEvents.trigger('bugreport', 'ajaxError: HTTP ' + jqxhr.status + ' on ' + method + ' ' + url);
     }
 
     appEvents.trigger('ajaxError');

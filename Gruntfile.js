@@ -187,14 +187,6 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
-                  name: "router-login",
-                  include: [
-                    "utils/tracking",
-                    "views/widgets/avatar"
-                  ],
-                  exclude: ["core-libraries"]
-              },
-              {
                   name: "complete-profile",
                   include: [
                     "utils/tracking",
@@ -256,7 +248,6 @@ module.exports = function( grunt ) {
 //       "native-accept-router": createClosureConfig('routers/mobile/native/accept-router'),
 //       "native-connect-router": createClosureConfig('routers/mobile/native/connect-router'),
 //       "native-create-troupe-router": createClosureConfig('routers/mobile/native/create-troupe-router'),
-//       "router-login": createClosureConfig('router-login'),
 //       "complete-profile": createClosureConfig('complete-profile'),
 //       "start-app": createClosureConfig('start-app'),
 //       "tour-controller": createClosureConfig('tours/tour-controller'),
