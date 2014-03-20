@@ -8,7 +8,8 @@ define([
 
   $(document).ajaxError(function(ev, jqxhr, settings) {
     var url = settings.url;
-    var method =  settings.type;
+    var method = settings.type;
+    var status = jqxhr.status;
 
     if(!url) return;
 
@@ -16,18 +17,18 @@ define([
       return;
     }
 
-    if(jqxhr.statusText == "error" && jqxhr.status === 404) {
+    if(jqxhr.statusText == "error" && status === 404) {
       log('unreachable: ' + url);
       /* Unreachable server */
-      appEvents.trigger('bugreport', 'ajaxError: unreachable: '+ method + ' ' + url);
+      appEvents.trigger('bugreport', 'ajaxError: unreachable: '+ method + ' ' + url, { tags: { type: 'ajax', subtype: 'unreachable' } });
 
-    } else if(jqxhr.status < 500) {
+    } else if(status < 500) {
       // 400 errors are the problem of the ajax caller, not the global handler
       return;
 
     } else {
-      log('ajaxError: HTTP ' + jqxhr.status + ' on ' + url);
-      appEvents.trigger('bugreport', 'ajaxError: HTTP ' + jqxhr.status + ' on ' + method + ' ' + url);
+      log('ajaxError: HTTP ' + status + ' on ' + url);
+      appEvents.trigger('bugreport', 'ajaxError: HTTP ' + status + ' on ' + method + ' ' + url, { tags: { type: 'ajax', subtype: 'HTTP' + status } });
     }
 
     appEvents.trigger('ajaxError');
