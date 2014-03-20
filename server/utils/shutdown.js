@@ -6,6 +6,7 @@ var events = require('events');
 var eventEmitter = new events.EventEmitter();
 var Q = require('q');
 var _ = require('underscore');
+var errorReporting = require('./error-reporting');
 
 function shutdownGracefully(exitCode) {
   winston.info("Starting graceful shutdown procedure");
@@ -87,6 +88,8 @@ exports.installUnhandledExceptionHandler = function() {
   //
   process.on('uncaughtException', function(err) {
     try {
+      errorReporting(err, { type: 'uncaught' });
+
       winston.error('----------------------------------------------------------------');
       winston.error('-- A VeryBadThing has happened.');
       winston.error('----------------------------------------------------------------');

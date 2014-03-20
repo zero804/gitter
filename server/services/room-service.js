@@ -117,6 +117,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
     .spread(function(githubType, officialUri, topic) {
 
       winston.verbose('URI validation ' + uri + ' returned ', { type: githubType, uri: officialUri });
+
       /* If we can't determine the type, skip it */
       if(!githubType) return [null, false];
 
@@ -206,7 +207,7 @@ function ensureAccessControl(user, troupe, access) {
 
       troupe.addUserById(user.id);
 
-      // IRC
+      // IRC -- these should be centralised - in troupe.addUserById perhaps?
       appEvents.userJoined({user: user, room: troupe});
 
       return troupe.saveQ().thenResolve(troupe);
@@ -217,7 +218,7 @@ function ensureAccessControl(user, troupe, access) {
 
       troupe.removeUserById(user.id);
 
-      // IRC
+      // IRC -- these should be centralised - in troupe.addUserById perhaps?
       appEvents.userLeft({user: user, room: troupe});
 
       return troupe.saveQ().thenResolve(null);
@@ -282,6 +283,7 @@ function findOrCreateRoom(user, uri, opts) {
       /* Didn't find a user, but we may have found another room */
       return findOrCreateNonOneToOneRoom(user, uriLookup && uriLookup.troupe, uri)
         .spread(function(troupe, access, hookCreationFailedDueToMissingScope, didCreate) {
+
           return ensureAccessControl(user, troupe, access)
             .then(function(troupe) {
               return { oneToOne: false, troupe: troupe, hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope, didCreate: didCreate };

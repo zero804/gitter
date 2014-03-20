@@ -19,6 +19,8 @@ if(nconf.get('diagnostics:heapdump')) {
   });
 
   memwatch.on('stats', function(stats) {
-    winston.info('memwatch: stats: ', stats);
+    if(stats && stats.usage_trend) {
+      winston.info('memwatch: stats: ', stats);
+    }
   });
 }
