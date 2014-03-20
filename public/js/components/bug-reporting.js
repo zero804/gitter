@@ -5,11 +5,33 @@ define([
 ], function(require, context) {
   "use strict";
 
-  if(context.env('env') != 'dev') {
+  var ravenUrl = context.env('ravenUrl');
+
+  function normalise(s) {
+    return s.replace(/\/_s\/\w+\//, '/_s/l/');
+  }
+
+  if(ravenUrl) {
     require(['raven'], function(Raven) {
-      Raven.config('***REMOVED***', {
+      Raven.config(ravenUrl, {
           // # we highly recommend restricting exceptions to a domain in order to filter out clutter
           // whitelistUrls: ['example.com/scripts/']
+          dataCallback: function(data) {
+            try {
+              data.stacktrace.frames.forEach(function(frame) {
+                if(frame.filename) {
+                  frame.filename = normalise(frame.filename);
+                }
+              });
+
+              if(data.culprit) {
+                data.culprit = normalise(data.culprit);
+              }
+            } catch(e) {
+            }
+
+            return data;
+          }
       }).install();
 
       var user = context.user();
@@ -19,6 +41,7 @@ define([
     });
 
   }
+
 
 
 });
