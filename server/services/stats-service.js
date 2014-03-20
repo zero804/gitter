@@ -4,45 +4,44 @@
 var nconf   = require('../utils/config');
 var winston = require('../utils/winston');
 
-
-var mixpanelEventBlacklist = {
-  location_submission: true,
-  push_notification: true,
-  mail_bounce: true,
-  new_troupe: true,
-  new_mail_attachment: true,
-  remailed_email: true,
-  new_file_version: true,
-  new_file: true,
-  login_failed: true,
-  password_reset_invalid: true,
-  password_reset_completed: true,
-  invite_reused: true,
-  confirmation_reused: true,
+var statsHandlers = {
+  event: [],
+  userUpdate: [],
+  responseTime: []
 };
 
-var statsHandlers = [];
+var mixpanelEnabled = nconf.get("stats:mixpanel:enabled");
+var statsdEnabled = nconf.get("stats:statsd:enabled");
+var cubeEnabled = nconf.get("stats:cube:enabled");
 
-if (nconf.get("stats:cube:enabled")) {
+
+/**
+ * cube
+ */
+if (cubeEnabled) {
   var Cube = require("cube");
   var statsUrl = nconf.get("stats:cube:cubeUrl");
   var cube = Cube.emitter(statsUrl);
 
-  statsHandlers.push({
-    event: function(eventName, properties) {
-      properties.env = nconf.get("stats:envName");
+  statsHandlers.event.push(function(eventName, properties) {
+    if(!properties) properties = {};
 
-      var event = {
-        type: "gitter_" + eventName,
-        time: new Date(),
-        data: properties
-      };
-      cube.send(event);
-    }
+    properties.env = nconf.get("stats:envName");
+
+    var event = {
+      type: "gitter_" + eventName,
+      time: new Date(),
+      data: properties
+    };
+    cube.send(event);
   });
+
 }
 
-if (nconf.get("stats:statsd:enabled")) {
+/**
+ * statsd
+ */
+if (statsdEnabled) {
   var StatsD = require('node-statsd').StatsD;
   var statsdClient = new StatsD({ prefix: 'gitter.web.' });
 
@@ -50,85 +49,92 @@ if (nconf.get("stats:statsd:enabled")) {
     return winston.error("Error in statsd socket: " + error, { exception: error });
   });
 
-  statsHandlers.push({
-    event: function(eventName) {
-      statsdClient.increment(eventName);
-    }
+  statsHandlers.event.push(function(eventName) {
+    statsdClient.increment(eventName);
+  });
+
+  statsHandlers.responseTime.push(function(duration) {
+    statsdClient.timing(duration);
   });
 }
 
-if (nconf.get("stats:mixpanel:enabled")) {
+/**
+ * Mixpanel
+ */
+if (mixpanelEnabled) {
+  var mixpanelEventBlacklist = {
+    location_submission: true,
+    push_notification: true,
+    mail_bounce: true,
+    new_troupe: true,
+    new_mail_attachment: true,
+    remailed_email: true,
+    new_file_version: true,
+    new_file: true,
+    login_failed: true,
+    password_reset_invalid: true,
+    password_reset_completed: true,
+    invite_reused: true,
+    confirmation_reused: true,
+  };
+
   var Mixpanel  = require('mixpanel');
   var token     = nconf.get("stats:mixpanel:token");
   var mixpanel  = Mixpanel.init(token);
 
-  statsHandlers.push({
-    event: function(eventName, properties) {
-      if(mixpanelEventBlacklist[eventName]) return;
+  statsHandlers.event.push(function(eventName, properties) {
+    if(!properties) properties = {};
 
-      properties.distinct_id = properties.userId;
-      mixpanel.track(eventName, properties, function(err) {
-        winston.error('Mixpanel error: ' + err, { exception: err });
-      });
-    },
+    if(mixpanelEventBlacklist[eventName]) return;
 
-    userUpdate: function(user, properties) {
-      var createdAt = Math.round(user._id.getTimestamp().getTime() / 1000);
-      var firstName = user.getFirstName();
+    properties.distinct_id = properties.userId;
+    mixpanel.track(eventName, properties, function(err) {
+      winston.error('Mixpanel error: ' + err, { exception: err });
+    });
+  });
 
-      var mp_properties = {
-        $first_name:  firstName,
-        $created_at:  new Date(createdAt).toISOString(),
-        $email:       user.email,
-        $name:        user.displayName,
-        $username:    user.username,
-        $confirmationCode: user.confirmationCode,
-        Status:       user.status
-      };
+  statsHandlers.userUpdate.push(function(user, properties) {
+    var createdAt = Math.round(user._id.getTimestamp().getTime() / 1000);
+    var firstName = user.getFirstName();
 
+    var mp_properties = {
+      $first_name:  firstName,
+      $created_at:  new Date(createdAt).toISOString(),
+      $email:       user.email,
+      $name:        user.displayName,
+      $username:    user.username,
+      $confirmationCode: user.confirmationCode,
+      Status:       user.status
+    };
+
+    if(properties) {
       for (var attr in properties) {
         var value = properties[attr] instanceof Date ? properties[attr].toISOString() : properties[attr];
         mp_properties[attr] = value;
       }
-
-
-      mixpanel.people.set(user.id, mp_properties);
     }
-  });
 
+    mixpanel.people.set(user.id, mp_properties);
+  });
 }
 
-exports.event = function(eventName, properties) {
-  if(!properties) properties = {};
+function makeHandler(handlers) {
+  if(!handlers.length) return function() {};
 
-  winston.verbose("[stats] event", { event: eventName });
+  return function() {
+    var args = Array.prototype.slice.apply(arguments);
 
-  statsHandlers.forEach(function(handler) {
-    try {
-      if(handler.event) {
-        handler.event.call(null, eventName, properties);
+    handlers.forEach(function(handler) {
+      try {
+        handler.apply(null, args);
+      } catch(err) {
+        winston.error('[stats] Error processing event: ' + err, { exception: err });
       }
+    });
+  };
+}
 
-    } catch(err) {
-      winston.error('[stats] Error processing event: ' + err, { event: eventName, properties: properties, exception: err });
-    }
-  });
+exports.event = makeHandler(statsHandlers.event);
+exports.userUpdate = makeHandler(statsHandlers.userUpdate);
+exports.responseTime = makeHandler(statsHandlers.responseTime);
 
-};
-
-exports.userUpdate = function(user, properties) {
-  if(!properties) properties = {};
-
-  winston.verbose("[stats] userUpdate");
-
-  statsHandlers.forEach(function(handler) {
-    try {
-      if(handler.userUpdate) {
-        handler.userUpdate.call(null, user, properties);
-      }
-
-    } catch(err) {
-      winston.error('[stats] Error processing userUpdate: ' + err, { user: user, properties: properties, exception: err });
-    }
-  });
-};
