@@ -2,6 +2,7 @@
 "use strict";
 
 var recentRoomService  = require('../../services/recent-room-service');
+var roomService        = require('../../services/room-service');
 var troupeService      = require("../../services/troupe-service");
 var userService        = require("../../services/user-service");
 var restSerializer     = require("../../serializers/rest-serializer");
@@ -23,6 +24,17 @@ module.exports = {
       if(err) return next(err);
       res.send(serialized);
     });
+  },
+
+  create: function(req, res, next) {
+    var usernames = req.body.usernames;
+
+    return roomService.addUsersToRoom(req.troupe, req.user, usernames)
+      .then(function() {
+        res.send(200, { success: true });
+      })
+      .fail(next);
+
   },
 
   destroy: function(req, res, next){

@@ -12,8 +12,6 @@ module.exports = {
       return next(403);
     }
 
-    var unconnected = Boolean(req.query.unconnected);
-
     if(req.query.q) {
       var options = {
         limit: req.query.limit,
@@ -21,22 +19,18 @@ module.exports = {
         excludeTroupeId: req.query.excludeTroupeId
       };
 
+      return userSearchService.globalUserSearch(req.query.q, options)
+        .then(function(searchResults) {
+          var strategy = new restSerializer.SearchResultsStrategy({
+                                resultItemStrategy: new restSerializer.UserStrategy()
+                              });
 
-      var search = unconnected ? userSearchService.searchUnconnectedUsers(req.user.id, req.query.q, options)
-                               : userSearchService.searchForUsers(req.user.id, req.query.q, options);
-
-      return search.then(function(searchResults) {
-        var strategy = new restSerializer.SearchResultsStrategy({
-                              resultItemStrategy: new restSerializer.UserStrategy()
-                            });
-
-        return restSerializer.serializeQ(searchResults, strategy)
-          .then(function(serialized) {
-            res.send(serialized);
-          })
-          .fail(next);
-
-      });
+          return restSerializer.serializeQ(searchResults, strategy)
+            .then(function(serialized) {
+              res.send(serialized);
+            });
+        })
+        .fail(next);
 
     }
 

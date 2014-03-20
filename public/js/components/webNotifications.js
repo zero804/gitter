@@ -37,13 +37,13 @@ define([
   });
 
 
-  $(document).on('app.version.mismatch', function() {
-    notifications.notify({
-      id: 'app-update',
-      className: 'notification',
-      content: "<a href=\"javascript:window.location.reload()\">There is a new version of Gitter available. Click here to refresh.</a>"
-    });
-  });
+  // $(document).on('app.version.mismatch', function() {
+  //   notifications.notify({
+  //     id: 'app-update',
+  //     className: 'notification',
+  //     content: "<a href=\"javascript:window.location.reload()\">There is a new version of Gitter available. Click here to refresh.</a>"
+  //   });
+  // });
 
   // one notification when the connection to server is down
   // todo: this might also show when an invalid user operation is attempted.

@@ -16,7 +16,11 @@ function generateName() {
   return 'Test ' + (++counter) + ' ' + Date.now();
 }
 
-function generateUri() {
+function generateUri(roomType) {
+  if(roomType === 'REPO') {
+      return '_test_' + (++counter) + Date.now() + '/_repo_' + (++counter) + Date.now();
+  }
+
   return '_test_' + (++counter) + Date.now();
 }
 
@@ -137,10 +141,11 @@ function createExpectedFixtures(expected, done) {
     winston.verbose('Creating ' + fixtureName);
 
     var uri;
+    var githubType = f.githubType || 'ORG';
     if(f.oneToOne) {
       uri = null;
     } else {
-      uri = f.uri || generateUri();
+      uri = f.uri || generateUri(githubType);
     }
 
     return persistence.Troupe.createQ({
@@ -149,7 +154,7 @@ function createExpectedFixtures(expected, done) {
       status: f.status || 'ACTIVE',
       oneToOne: f.oneToOne,
       users: users,
-      githubType: f.githubType || 'ORG',
+      githubType: githubType,
       dateDeleted: f.dateDeleted
     });
   }

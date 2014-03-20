@@ -1,18 +1,20 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var express                       = require('express');
-var passport                      = require('passport');
-var nconf                         = require('../utils/config');
-var expressHbs                    = require('express-hbs');
-var winston                       = require('winston');
-var middleware                    = require('./middleware');
-var fineuploaderExpressMiddleware = require('fineuploader-express-middleware');
-var fs                            = require('fs');
-var os                            = require('os');
-var responseTime                  = require('./response-time');
-var oauthService                  = require('../services/oauth-service');
-var csrf                          = require('./csrf-middleware');
+var express        = require('express');
+var passport       = require('passport');
+var nconf          = require('../utils/config');
+var expressHbs     = require('express-hbs');
+var winston        = require('winston');
+var middleware     = require('./middleware');
+var fs             = require('fs');
+var os             = require('os');
+var responseTime   = require('./response-time');
+var oauthService   = require('../services/oauth-service');
+var csrf           = require('./csrf-middleware');
+var statsService   = require('../services/stats-service');
+var errorReporting = require('../utils/error-reporting');
+var _              = require('underscore');
 
 if(nconf.get('express:showStack')) {
   try {
@@ -82,7 +84,10 @@ module.exports = {
     }
 
     app.use(express.cookieParser());
-    app.use(express.bodyParser());
+    // app.use(express.bodyParser());
+    app.use(express.urlencoded());
+    app.use(express.json());
+
     app.use(express.methodOverride());
 
     (function fileUploading() {
@@ -94,7 +99,7 @@ module.exports = {
         fs.mkdirSync(uploadDir);
       }
 
-      app.use(fineuploaderExpressMiddleware({ uploadDir: uploadDir }));
+      // app.use(fineuploaderExpressMiddleware({ uploadDir: uploadDir }));
 
       // clean out the file upload directory every few hours
       setInterval(function() {
@@ -151,11 +156,12 @@ module.exports = {
     }
 
     app.use(function(err, req, res, next) {
+      var user = req.user;
+      var userId = user && user.id;
+
       if(err && err.gitterAction === 'logout_destroy_user_tokens') {
-
-        if(req.user) {
-
-          var user = req.user;
+        if(user) {
+          statsService.event('logout_destroy_user_tokens', { userId: userId });
 
           middleware.logout()(req, res, function() {
             if(err) winston.warn('Unable to log user out');
@@ -167,7 +173,7 @@ module.exports = {
             user.save(function(err) {
               if(err) winston.error('Unable to save user: ' + err, { exception: err });
 
-              oauthService.removeAllAccessTokensForUser(user.id, function(err) {
+              oauthService.removeAllAccessTokensForUser(userId, function(err) {
                 if(err) { winston.error('Unable to remove access tokens: ' + err, { exception: err }); }
                 res.redirect('/');
               });
@@ -175,37 +181,50 @@ module.exports = {
           });
         } else {
           res.redirect('/');
-      }
+        }
 
         return;
       }
+
+
 
       var status = 500;
       var template = '500';
       var message = "An unknown error occurred";
       var stack = err && err.stack;
 
-      if(err.status) {
+      if(_.isNumber(err)) {
+        if(err > 400) {
+          status = err;
+          message = 'HTTP ' + err;
+        }
+      } else {
         status = err.status;
-        message = err.name;
+        message = err.message;
       }
 
-      // Log some stuff
-      var meta = {
-        path: req.path,
-        err: err.message
-      };
+      if(status >= 500) {
+        // Send to sentry
+        errorReporting(err, { type: 'response', status: status, userId: userId });
+        // Send to statsd
+        statsService.event('client_error_5xx', { userId: userId });
 
-      if(status === 500) {
-        winston.error("An unexpected error occurred", meta);
+        winston.error("An unexpected error occurred", {
+          path: req.path,
+          message: message
+        });
+
         if(err.stack) {
           winston.error('Error: ' + err.stack);
         }
-      }
 
-      if(status === 404) {
+      } else if(status === 404) {
+        statsService.event('client_error_404', { userId: userId });
+
         template = '404';
         stack = null;
+      } else if(status >= 400 && status < 500) {
+        statsService.event('client_error_4xx', { userId: userId });
       }
 
       res.status(status);
@@ -237,7 +256,10 @@ module.exports = {
     }
 
     app.use(express.cookieParser());
-    app.use(express.bodyParser());
+    // app.use(express.bodyParser());
+    app.use(express.urlencoded());
+    app.use(express.json());
+
     app.use(express.session({ secret: 'keyboard cat', store: sessionStore, cookie: { path: '/', httpOnly: true, maxAge: 14400000, domain: nconf.get("web:cookieDomain"), secure: nconf.get("web:secureCookies") }}));
 
     app.use(express.errorHandler({ showStack: nconf.get('express:showStack'), dumpExceptions: nconf.get('express:dumpExceptions') }));

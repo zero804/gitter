@@ -68,7 +68,7 @@ exports.generateTroupeContext = function(req, callback) {
     user ? getWebToken(user) : null,
     troupe && user ? serializeTroupe(troupe, user) : fakeSerializedTroupe(req.uriContext),
     determineDesktopNotifications(user, req),
-    permissionsModel(user, 'admin', req.uriContext.uri, troupe.githubType)
+    permissionsModel(user, 'admin', req.uriContext.uri, troupe.githubType, troupe.security)
   ])
   .spread(function(serializedUser, serializedHomeUser, token, serializedTroupe, desktopNotifications, adminAccess) {
 

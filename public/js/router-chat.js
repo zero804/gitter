@@ -14,6 +14,7 @@ require([
   'views/shareSearch/inviteView',
   'views/app/troupeSettingsView',
   'views/app/markdownView',
+  'views/app/addPeopleView',
   'views/app/integrationSettingsModal',
   'components/unread-items-client',
 
@@ -31,12 +32,11 @@ require([
   'components/dozy',            // Sleep detection No ref
   'template/helpers/all',       // No ref
   'components/eyeballs',        // No ref
-  'bootstrap-dropdown',         // No ref
   'components/bug-reporting',   // No ref
   'components/csrf'             // No ref
 ], function($, Backbone, context, liveContext, appEvents, peopleCollectionView, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, RightToolbarView,
-    inviteView, troupeSettingsView, MarkdownView, IntegrationSettingsModal,
+    inviteView, TroupeSettingsView, MarkdownView, AddPeopleViewModal, IntegrationSettingsModal,
     unreadItemsClient, webhookDecorator, issueDecorator, commitDecorator, mentionDecorator,
     embedDecorator, emojiDecorator, UnreadBannerView, HeaderView) {
   "use strict";
@@ -85,6 +85,10 @@ require([
     postMessage({ type: "navigation", url: url, urlType: type, title: title});
   });
 
+  appEvents.on('route', function(hash) {
+    postMessage({ type: "route", hash: hash });
+  });
+
   appEvents.on('realtime.testConnection', function() {
     postMessage({ type: "realtime.testConnection" });
   });
@@ -96,7 +100,7 @@ require([
   var appView = new ChatIntegratedView({ el: 'body' });
   appView.rightToolbarRegion.show(new RightToolbarView());
 
-  new HeaderView({ model: context.troupe(), el: '#header' }).render();
+  new HeaderView({ model: context.troupe(), el: '#header' });
 
   // instantiate user email collection
   // var userEmailCollection = new UserEmailCollection.UserEmailCollection();
@@ -146,6 +150,7 @@ require([
       "notifications": "notifications",
       "markdown": "markdown",
       "integrations": "integrations",
+      "add" : "addPeople"
     },
 
     hideModal: function() {
@@ -162,6 +167,10 @@ require([
 
     markdown: function() {
       appView.dialogRegion.show(new MarkdownView({}));
+    },
+
+    addPeople: function() {
+      appView.dialogRegion.show(new AddPeopleViewModal({}));
     },
 
     integrations: function() {

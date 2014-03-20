@@ -3,7 +3,7 @@
 
 var appEvents                          = require("../../app-events");
 var winston                            = require("winston");
-var pushNotificationService            = require("../push-notification-service");
+// var pushNotificationService            = require("../push-notification-service");
 var _                                  = require("underscore");
 var presenceService                    = require("./../presence-service");
 var NotificationCollector              = require('../../utils/notification-collector');
@@ -29,65 +29,67 @@ function userCategorisationStrategy(userTroupes, callback) {
     if(err) return callback(err);
 
     var onlineUserTroupes = categories.online;
-    var offlineUserTroupes = categories.offline;
+    // var offlineUserTroupes = categories.offline;
 
     function done(additionalCategories) {
       var result = _.extend({ online: onlineUserTroupes }, additionalCategories);
       callback(null, result);
     }
 
-    if(!offlineUserTroupes || !offlineUserTroupes.length) {
-      // No further categorization of online users
-      return done();
-    }
+    return done({});
 
-    var offlineUsers = _.uniq(offlineUserTroupes.map(function(userTroupe) { return userTroupe.userId; } ));
+    // if(!offlineUserTroupes || !offlineUserTroupes.length) {
+    //   // No further categorization of online users
+    //   return done();
+    // }
 
-    var offlineUserTroupeLookup = {};
-    offlineUserTroupes.forEach(function(userTroupe) {
-      offlineUserTroupeLookup[userTroupe.userId + ':' + userTroupe.troupeId] = userTroupe;
-    });
+    // var offlineUsers = _.uniq(offlineUserTroupes.map(function(userTroupe) { return userTroupe.userId; } ));
 
-    pushNotificationService.findUsersWithDevices(offlineUsers, function(err, mobileUsers) {
-      if(err) return callback(err);
+    // var offlineUserTroupeLookup = {};
+    // offlineUserTroupes.forEach(function(userTroupe) {
+    //   offlineUserTroupeLookup[userTroupe.userId + ':' + userTroupe.troupeId] = userTroupe;
+    // });
 
-      if(!mobileUsers || !mobileUsers.length) return done();
+    // pushNotificationService.findUsersWithDevices(offlineUsers, function(err, mobileUsers) {
+    //   if(err) return callback(err);
 
-      var mobileSet = {};
-      mobileUsers.forEach(function(f) { mobileSet[f] = true; });
-      var mobileUserTroupes = offlineUserTroupes.filter(function(ut) { return mobileSet[ut.userId]; });
+    //   if(!mobileUsers || !mobileUsers.length) return done();
 
-      pushNotificationService.findUsersTroupesAcceptingNotifications(mobileUserTroupes, function(err, mobileUserTroupes) {
-        if(err) return callback(err);
+    //   var mobileSet = {};
+    //   mobileUsers.forEach(function(f) { mobileSet[f] = true; });
+    //   var mobileUserTroupes = offlineUserTroupes.filter(function(ut) { return mobileSet[ut.userId]; });
 
-        var pushEligble = [];
+    //   pushNotificationService.findUsersTroupesAcceptingNotifications(mobileUserTroupes, function(err, mobileUserTroupes) {
+    //     if(err) return callback(err);
 
-        mobileUserTroupes.forEach(function(mut) {
-          if(mut.accepting) {
-            var userId = mut.userId;
-            var troupeId = mut.troupeId;
+    //     var pushEligble = [];
 
-            var userTroupe = offlineUserTroupeLookup[userId + ':' + troupeId];
+    //     mobileUserTroupes.forEach(function(mut) {
+    //       if(mut.accepting) {
+    //         var userId = mut.userId;
+    //         var troupeId = mut.troupeId;
 
-            if(userTroupe) {
-              var startTime = getStartTimeForItems(userTroupe.items.map(function(i) { return i.itemId; } ).filter(function(f) { return !!f; }));
+    //         var userTroupe = offlineUserTroupeLookup[userId + ':' + troupeId];
 
-              pushEligble.push({
-                userId: userTroupe.userId,
-                troupeId: userTroupe.troupeId,
-                startTime: startTime
-              });
-            }
+    //         if(userTroupe) {
+    //           var startTime = getStartTimeForItems(userTroupe.items.map(function(i) { return i.itemId; } ).filter(function(f) { return !!f; }));
 
-          }
-        });
+    //           pushEligble.push({
+    //             userId: userTroupe.userId,
+    //             troupeId: userTroupe.troupeId,
+    //             startTime: startTime
+    //           });
+    //         }
 
-        done({
-          push: pushEligble
-        });
-      });
+    //       }
+    //     });
 
-    });
+    //     done({
+    //       push: pushEligble
+    //     });
+    //   });
+
+    // });
 
   });
 }
@@ -97,7 +99,7 @@ function userCategorisationStrategy(userTroupes, callback) {
 // This installs the listeners that will listen to events
 //
 exports.install = function() {
-  var pushNotificationGateway = require("../../gateways/push-notification-gateway");
+  // var pushNotificationGateway = require("../../gateways/push-notification-gateway");
   var notificationCollector = new NotificationCollector({ userCategorisationStrategy: userCategorisationStrategy });
 
   notificationCollector.on('collection:online', function(userTroupes) {
@@ -135,19 +137,19 @@ exports.install = function() {
     });
   });
 
-  /* Update badges for apps */
-  appEvents.localOnly.onBatchUserBadgeCountUpdate(function(data) {
-    var userIds = data.userIds;
-    pushNotificationGateway.sendUsersBadgeUpdates(userIds);
-  });
+  // /* Update badges for apps */
+  // appEvents.localOnly.onBatchUserBadgeCountUpdate(function(data) {
+  //   var userIds = data.userIds;
+  //   pushNotificationGateway.sendUsersBadgeUpdates(userIds);
+  // });
 
-  appEvents.localOnly.onEyeballSignal(function(userId, troupeId, eyeballSignal) {
-    if(eyeballSignal) {
-      pushNotificationService.resetNotificationsForUserTroupe(userId, troupeId, function(err) {
-        if(err) winston.error('Error while calling resetNotificationsForUserTroupe. Silently ignoring. ' + err, { exception: err });
-      });
-    }
-  });
+  // appEvents.localOnly.onEyeballSignal(function(userId, troupeId, eyeballSignal) {
+  //   if(eyeballSignal) {
+  //     pushNotificationService.resetNotificationsForUserTroupe(userId, troupeId, function(err) {
+  //       if(err) winston.error('Error while calling resetNotificationsForUserTroupe. Silently ignoring. ' + err, { exception: err });
+  //     });
+  //   }
+  // });
 
 };
 

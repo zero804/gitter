@@ -5,75 +5,98 @@ var middleware      = require('../../web/middleware');
 var appRender       = require('./render');
 var appMiddleware   = require('./middleware');
 
+var chatFrameMiddlewarePipeline = [
+  middleware.grantAccessForRememberMeTokenMiddleware,
+  middleware.ensureLoggedIn(),
+  appMiddleware.uriContextResolverMiddleware,
+  appMiddleware.isPhoneMiddleware,
+  function(req, res, next) {
+    if (req.uriContext.ownUrl) {
+      if(req.isPhone) {
+        appRender.renderMobileUserHome(req, res, next, 'home');
+      } else {
+        appRender.renderMainFrame(req, res, next, 'home');
+      }
+      return;
+    }
+
+    if(req.isPhone) {
+      appRender.renderMobileChat(req, res, next);
+    } else {
+      appRender.renderMainFrame(req, res, next, 'chat');
+    }
+  }
+];
+
+var chatMiddlewarePipeline = [
+  middleware.grantAccessForRememberMeTokenMiddleware,
+  middleware.ensureLoggedIn(),
+  appMiddleware.uriContextResolverMiddleware,
+  appMiddleware.isPhoneMiddleware,
+  function(req, res, next) {
+    appRender.renderChatPage(req, res, next);
+  }
+];
+
+
 module.exports = {
     install: function(app) {
-      app.get('/:userOrOrg',
-        middleware.grantAccessForRememberMeTokenMiddleware,
-        middleware.ensureLoggedIn(),
-        appMiddleware.uriContextResolverMiddleware,
-        appMiddleware.isPhoneMiddleware,
-        function(req, res, next) {
+      [
+        '/:roomPart1/~chat',                         // ORG or ONE_TO_ONE
+        '/:roomPart1/:roomPart2/~chat',              // REPO or ORG_CHANNEL or ADHOC
+        '/:roomPart1/:roomPart2/:roomPart3/~chat',   // CUSTOM REPO_ROOM
 
-          if (req.uriContext.ownUrl) {
-            if(req.isPhone) {
-              appRender.renderMobileUserHome(req, res, next, 'home');
-            } else {
-              appRender.renderMainFrame(req, res, next, 'home');
-            }
-
-            return;
-          }
-
-          if(req.isPhone) {
-            appRender.renderMobileChat(req, res, next);
-          } else {
-            appRender.renderMainFrame(req, res, next, 'chat');
-          }
-        });
-
-    app.get('/:userOrOrg/-/home',
-      middleware.grantAccessForRememberMeTokenMiddleware,
-      middleware.ensureLoggedIn(),
-      appMiddleware.uriContextResolverMiddleware,
-      appMiddleware.isPhoneMiddleware,
-      function(req, res, next) {
-        appRender.renderHomePage(req, res, next);
+        // These URLs is deprecated. Remove after second master deployment
+        '/:roomPart1/-/chat',                       // ORG or ONE_TO_ONE
+        '/:roomPart1/:roomPart2/chat',              // REPO or ORG_CHANNEL or ADHOC
+        '/:roomPart1/:roomPart2/:roomPart3/chat',   // REPO_CHANNEL
+      ].forEach(function(path) {
+        app.get(path, chatMiddlewarePipeline);
       });
 
-    app.get('/:userOrOrg/-/chat',
-      middleware.grantAccessForRememberMeTokenMiddleware,
-      middleware.ensureLoggedIn(),
-      appMiddleware.uriContextResolverMiddleware,
-      appMiddleware.isPhoneMiddleware,
-      function(req, res, next) {
-        appRender.renderChatPage(req, res, next);
+
+      [
+        '/:roomPart1/~home',
+        // This URL is deprecated
+        '/:roomPart1/-/home',
+      ].forEach(function(path) {
+        app.get(path,
+          middleware.grantAccessForRememberMeTokenMiddleware,
+          middleware.ensureLoggedIn(),
+          appMiddleware.uriContextResolverMiddleware,
+          appMiddleware.isPhoneMiddleware,
+          function(req, res, next) {
+            appRender.renderHomePage(req, res, next);
+          });
       });
 
-      app.get('/:userOrOrg/:repo',
-        middleware.grantAccessForRememberMeTokenMiddleware,
-        middleware.ensureLoggedIn(),
-        appMiddleware.uriContextResolverMiddleware,
-        appMiddleware.isPhoneMiddleware,
-        function(req, res, next) {
-          if(req.isPhone) {
-            appRender.renderMobileChat(req, res, next);
-          } else {
-            appRender.renderMainFrame(req, res, next, 'chat');
-          }
-        });
-
-      app.get('/:userOrOrg/:repo/chat',
-        middleware.grantAccessForRememberMeTokenMiddleware,
-        middleware.ensureLoggedIn(),
-        appMiddleware.uriContextResolverMiddleware,
-        appMiddleware.isPhoneMiddleware,
-        function(req, res, next) {
-          appRender.renderChatPage(req, res, next);
-        });
 
 
-
-      // require('./native-redirects').install(app);
       require('./integrations').install(app);
+
+      app.get(/^\/(?:([^\/]+?))\/(?:([^\/]+?))\/(?:\*([^\/]+))\/?$/,
+        function(req, res, next) {
+          req.params.userOrOrg = req.params[0];
+          req.params.repo = req.params[1];
+          req.params.channel = req.params[2];
+          next();
+        },
+        chatFrameMiddlewarePipeline);
+
+      app.get(/^\/(?:([^\/]+?))\/(?:\*([^\/]+))$/,
+        function(req, res, next) {
+          req.params.userOrOrg = req.params[0];
+          req.params.channel = req.params[1];
+          next();
+        },
+        chatFrameMiddlewarePipeline);
+
+      [
+        '/:roomPart1',
+        '/:roomPart1/:roomPart2',
+        '/:roomPart1/:roomPart2/:roomPart3',
+      ].forEach(function(path) {
+        app.get(path, chatFrameMiddlewarePipeline);
+      });
     }
 };

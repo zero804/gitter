@@ -12,15 +12,16 @@ var http     = require('http');
 var nconf    = require('./utils/config');
 var redis    = require('./utils/redis');
 var shutdown = require('./utils/shutdown');
+var domainWrapper = require('./utils/domain-wrapper');
+
+require('./utils/diagnostics');
 
 /* Load express-resource */
 require('express-resource');
 
-
 var app = express();
 
-
-var server = http.createServer(app);
+var server = http.createServer(domainWrapper(app));
 
 var gracefullyClosing = false;
 app.use(function(req, res, next) {
@@ -31,7 +32,7 @@ app.use(function(req, res, next) {
 });
 
 shutdown.installUnhandledExceptionHandler();
-shutdown.addHandler('web', 10, function(callback) {
+shutdown.addHandler('web', 20, function(callback) {
   gracefullyClosing = true;
   server.close(callback);
 });

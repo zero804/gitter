@@ -22,6 +22,7 @@ define([
       this.beforeClose();
     }
     this.remove();
+    this.stopListening();
     this.unbind();
   };
 
@@ -224,12 +225,13 @@ define([
     },
 
     getRenderData: function() {
+      var menuItems = this.menuItems || this.options.menuItems;
       return {
         hideHeader: this.options.hideHeader,
         customTitle: !!this.options.title,
         title: this.options.title,
-        hasMenuItems: !!this.options.menuItems.length,
-        menuItems: this.options.menuItems,
+        hasMenuItems: !!menuItems.length,
+        menuItems: menuItems,
         disableClose: this.options.disableClose
       };
     },
@@ -250,7 +252,7 @@ define([
       modalBody.append(this.view.render().el);
       this.$el.find('.close').on('click', this.hide);
 
-      if(!compactView) {
+      if(!compactView && !this.disableAutoFocus) {
         window.setTimeout(function() {
           try {
             var v = self.$el.find('input[type=text], input[type=url], input[type=tel], input[type=number], input[type=color], input[type=email]')[0];
@@ -262,6 +264,15 @@ define([
           }
         }, 100);
 
+      }
+    },
+
+    setButtonState: function(name,state) {
+      var $s = this.$el.find('.modal-footer button[data-action=' + name + ']');
+      if(state) {
+        $s.removeAttr('disabled');
+      } else {
+        $s.attr('disabled', true);
       }
     },
 
@@ -340,18 +351,6 @@ define([
     hide: function ( e ) {
       if(e) e.preventDefault();
       if(this.navigable) {
-
-        // var hash = window.location.hash.replace(/\%7C/ig, '|');
-        // var currentFragment;
-        // if(!hash) {
-        //   currentFragment = '#!';
-        // } else {
-        //   currentFragment = hash.split('|', 1)[0];
-        //   if (currentFragment == "#") {
-        //     currentFragment = "#!";
-        //   }
-        // }
-
         window.location = '#';
         return;
       }
@@ -474,12 +473,15 @@ define([
       if(this.options.disableClose) return;
       var that = this;
       if (this.isShown && this.options.keyboard) {
-        $(document).on('keyup', function ( e ) {
-          if(e.which == 27) that.hide();
-        });
+        $(document).on('keydown', keydown);
       } else if (!this.isShown) {
-        $(document).off('keyup');
+        $(document).off('keydown', keydown);
       }
+
+      function keydown( e ) {
+        if(e.which == 27) that.hide();
+      }
+
     }
   });
 
@@ -512,35 +514,40 @@ define([
     },
 
     appendHtml: function(collectionView, itemView, index) {
-      //log("Inserting view at index ", index, " of ", collectionView.collection.length, " in collection ", collectionView.collection.url, "; itemView ", itemView.model.attributes, ((this.isRendering) ? " with rendering shortcut" : ''));
+      var el = collectionView.itemViewContainer || collectionView.el;
+      var $el = collectionView.itemViewContainer ? $(collectionView.itemViewContainer) : collectionView.$el;
 
       // Shortcut - just place at the end!
       if (this.isRendering) {
-        // if this is during rendering, then the views always come in sort order, so just append
-        collectionView.$el.append(itemView.el);
+        // if this is during rendering, then the views always come in sort order,
+        // so just append
+        $el.append(itemView.el);
         return;
       }
 
-      // we are inserting views after rendering, find the adjacent view if there is one already
+      // we are inserting views after rendering, find the adjacent view if there
+      // is one already
       var adjView;
 
       if (index === 0) {
-        // find the view that comes after the first one (sometimes there will be a non view that is the first child so we can't prepend)
+        // find the view that comes after the first one (sometimes there will be a
+        // non view that is the first child so we can't prepend)
         adjView = findViewAfter(0);
 
         if (adjView) {
           itemView.$el.insertBefore(adjView.el);
         } else {
           // there are no existing views after the first,
-          // we append (keeping the place of non-view children already present in the container)
-          itemView.$el.appendTo(collectionView.el);
+          // we append (keeping the place of non-view children already present in the
+          // container)
+          itemView.$el.appendTo(el);
         }
 
         return;
       }
 
       if(index == collectionView.collection.length - 1) {
-        itemView.$el.appendTo(collectionView.el);
+        itemView.$el.appendTo(el);
         return;
       }
 
@@ -560,7 +567,7 @@ define([
           /* in this case, the itemViews are not coming in any sequential order  */
           // We can't find an item before, we can't find an item after,
           // just give up and insert at the end. (hopefully this will never happen eh?)
-          itemView.$el.appendTo(collectionView.el);
+          itemView.$el.appendTo(el);
         }
       }
 
@@ -594,13 +601,16 @@ define([
   // Mixin for Marionette.CollectionView classes
   TroupeViews.LoadingCollectionMixin = {
     loadingView: TroupeViews.LoadingView,
-    loadingModel: new Backbone.Model(),
     initialize: function() {
       this.showEmptyView = this.showLoadingView;
     },
     showLoadingView: function() {
       if(this.collection.loading) {
         var LoadingView = Marionette.getOption(this, "loadingView");
+
+        if(!this.loadingModel) {
+          this.loadingModel = new Backbone.Model();
+        }
 
         var v = this.children.findByModel(this.loadingModel);
 
@@ -609,15 +619,18 @@ define([
           this.listenToOnce(this.collection, 'loaded', function() {
             this.removeItemView(this.loadingModel);
 
+
             if(this.collection.length === 0) {
-              Marionette.CollectionView.prototype.showEmptyView.call(this);
+              this.constructor.prototype.showEmptyView.call(this);
+              return true;
             }
           });
         }
-        return;
+        return true;
       }
 
-      return Marionette.CollectionView.prototype.showEmptyView.call(this);
+      this.constructor.prototype.showEmptyView.call(this);
+      return true;
     }
   };
 

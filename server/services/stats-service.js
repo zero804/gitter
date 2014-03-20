@@ -4,133 +4,138 @@
 var nconf   = require('../utils/config');
 var winston = require('../utils/winston');
 
-var cube_enabled        = nconf.get("stats:cube:enabled")       || false;
-var mixpanel_enabled    = nconf.get("stats:mixpanel:enabled")   || false;
-var customerio_enabled  = nconf.get("stats:customerio:enabled") || false;
+var statsHandlers = {
+  event: [],
+  userUpdate: [],
+  responseTime: []
+};
 
-var blacklist = ['location_submission','push_notification','mail_bounce','new_troupe','new_mail_attachment','remailed_email','new_file_version','new_file','login_failed','password_reset_invalid','password_reset_completed','invite_reused','confirmation_reused'];
+var mixpanelEnabled = nconf.get("stats:mixpanel:enabled");
+var statsdEnabled = nconf.get("stats:statsd:enabled");
+var cubeEnabled = nconf.get("stats:cube:enabled");
 
-if (cube_enabled) {
+
+/**
+ * cube
+ */
+if (cubeEnabled) {
   var Cube = require("cube");
   var statsUrl = nconf.get("stats:cube:cubeUrl");
   var cube = Cube.emitter(statsUrl);
+
+  statsHandlers.event.push(function(eventName, properties) {
+    if(!properties) properties = {};
+
+    properties.env = nconf.get("stats:envName");
+
+    var event = {
+      type: "gitter_" + eventName,
+      time: new Date(),
+      data: properties
+    };
+    cube.send(event);
+  });
+
 }
 
-if (mixpanel_enabled) {
+/**
+ * statsd
+ */
+if (statsdEnabled) {
+  var StatsD = require('node-statsd').StatsD;
+  var statsdClient = new StatsD({ prefix: 'gitter.web.' });
+
+  statsdClient.socket.on('error', function(error) {
+    return winston.error("Error in statsd socket: " + error, { exception: error });
+  });
+
+  statsHandlers.event.push(function(eventName) {
+    statsdClient.increment(eventName);
+  });
+
+  statsHandlers.responseTime.push(function(duration) {
+    statsdClient.timing(duration);
+  });
+}
+
+/**
+ * Mixpanel
+ */
+if (mixpanelEnabled) {
+  var mixpanelEventBlacklist = {
+    location_submission: true,
+    push_notification: true,
+    mail_bounce: true,
+    new_troupe: true,
+    new_mail_attachment: true,
+    remailed_email: true,
+    new_file_version: true,
+    new_file: true,
+    login_failed: true,
+    password_reset_invalid: true,
+    password_reset_completed: true,
+    invite_reused: true,
+    confirmation_reused: true,
+  };
+
   var Mixpanel  = require('mixpanel');
   var token     = nconf.get("stats:mixpanel:token");
   var mixpanel  = Mixpanel.init(token);
-}
 
-if (customerio_enabled) {
-  var CustomerIO = require('customer.io');
-  var cio = CustomerIO.init(nconf.get("stats:customerio:siteId"), nconf.get("stats:customerio:key"));
-}
+  statsHandlers.event.push(function(eventName, properties) {
+    // Don't handle events that don't have a userId
+    if(!properties || !properties.userId) return;
 
-function isTestUser(email) {
-  return false;
-}
+    if(mixpanelEventBlacklist[eventName]) return;
 
-exports.event = function(eventName, properties) {
+    properties.distinct_id = properties.userId;
+    mixpanel.track(eventName, properties, function(err) {
+      winston.error('Mixpanel error: ' + err, { exception: err });
+    });
+  });
 
-  if(!properties) properties = {};
-
-  winston.verbose("[stats]", {event: eventName, properties: properties});
-
-  try {
-
-    // Cube
-    if (cube_enabled) {
-      properties.env = nconf.get("stats:envName");
-
-      var event = {
-        type: "gitter_" + eventName,
-        time: new Date(),
-        data: properties
-      };
-      cube.send(event);
-    }
-
-    if (blacklist.indexOf(eventName) == -1) {
-      if (!isTestUser(properties.email)) {
-        winston.verbose("[stats]" , "Logging user to Customer Actions: " );
-        // MixPanel
-        if (mixpanel_enabled) {
-          properties.distinct_id = properties.userId;
-          mixpanel.track(eventName, properties, function(err) { if (err) throw err; });
-        }
-
-        // CustomerIO
-        if (customerio_enabled) {
-          cio.track(properties.userId, eventName, properties);
-        }
-      }
-    }
-
-  } catch(err) {
-    winston.error('[stats] Error processing event: ', err, eventName, properties);
-  }
-
-};
-
-exports.userUpdate = function(user, properties) {
-
-  winston.verbose("[stats] Updating user stat");
-
-  try {
-
-    if(!properties) properties = {};
-
+  statsHandlers.userUpdate.push(function(user, properties) {
     var createdAt = Math.round(user._id.getTimestamp().getTime() / 1000);
     var firstName = user.getFirstName();
 
-    if (mixpanel_enabled) {
-      var mp_properties = {
-        $first_name:  firstName,
-        $created_at:  new Date(createdAt).toISOString(),
-        $email:       user.email,
-        $name:        user.displayName,
-        $username:    user.username,
-        $confirmationCode: user.confirmationCode,
-        Status:       user.status
-      };
+    var mp_properties = {
+      $first_name:  firstName,
+      $created_at:  new Date(createdAt).toISOString(),
+      $email:       user.email,
+      $name:        user.displayName,
+      $username:    user.username,
+      $confirmationCode: user.confirmationCode,
+      Status:       user.status
+    };
 
+    if(properties) {
       for (var attr in properties) {
         var value = properties[attr] instanceof Date ? properties[attr].toISOString() : properties[attr];
         mp_properties[attr] = value;
       }
-
-
-      mixpanel.people.set(user.id, mp_properties);
     }
 
-    var email = user.email;
+    mixpanel.people.set(user.id, mp_properties);
+  });
+}
 
-    if (user.email === '' || !user.email) {
-      email = "noemail@gitter.im";
-    }
+function makeHandler(handlers) {
+  if(!handlers.length) return function() {};
 
-    if (customerio_enabled) {
-      var cio_properties = {
-        first_name: firstName,
-        created_at: createdAt,
-        email:      email,
-        name:       user.displayName,
-        username:   user.username,
-        confirmationCode: user.confirmationCode,
-        status:     user.status
-      };
+  return function() {
+    var args = Array.prototype.slice.apply(arguments);
 
-      for (var attr in properties) {
-        var value = properties[attr] instanceof Date ? Math.round(properties[attr].getTime() / 1000) : properties[attr];
-        cio_properties[attr] = value;
+    handlers.forEach(function(handler) {
+      try {
+        handler.apply(null, args);
+      } catch(err) {
+        winston.error('[stats] Error processing event: ' + err, { exception: err });
       }
+    });
+  };
+}
 
-      cio.identify(user.id, email, cio_properties);
-    }
+exports.event = makeHandler(statsHandlers.event);
+exports.userUpdate = makeHandler(statsHandlers.userUpdate);
+exports.responseTime = makeHandler(statsHandlers.responseTime);
 
-  } catch(err) {
-    winston.error('[stats] Error processing userUpdate: ', err, properties);
-  }
-
-};
