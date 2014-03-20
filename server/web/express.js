@@ -13,6 +13,7 @@ var os                            = require('os');
 var responseTime                  = require('./response-time');
 var oauthService                  = require('../services/oauth-service');
 var csrf                          = require('./csrf-middleware');
+var statsService                  = require('../services/stats-service');
 
 if(nconf.get('express:showStack')) {
   try {
@@ -154,11 +155,12 @@ module.exports = {
     }
 
     app.use(function(err, req, res, next) {
+      var user = req.user;
+      var userId = user && user.id;
+
       if(err && err.gitterAction === 'logout_destroy_user_tokens') {
-
-        if(req.user) {
-
-          var user = req.user;
+        if(user) {
+          statsService.event('logout_destroy_user_tokens', { userId: userId });
 
           middleware.logout()(req, res, function() {
             if(err) winston.warn('Unable to log user out');
@@ -170,7 +172,7 @@ module.exports = {
             user.save(function(err) {
               if(err) winston.error('Unable to save user: ' + err, { exception: err });
 
-              oauthService.removeAllAccessTokensForUser(user.id, function(err) {
+              oauthService.removeAllAccessTokensForUser(userId, function(err) {
                 if(err) { winston.error('Unable to remove access tokens: ' + err, { exception: err }); }
                 res.redirect('/');
               });
@@ -178,7 +180,7 @@ module.exports = {
           });
         } else {
           res.redirect('/');
-      }
+        }
 
         return;
       }
@@ -199,16 +201,20 @@ module.exports = {
         err: err.message
       };
 
-      if(status === 500) {
+      if(status >= 500) {
+        statsService.event('client_error_5xx', { userId: userId });
+
         winston.error("An unexpected error occurred", meta);
         if(err.stack) {
           winston.error('Error: ' + err.stack);
         }
-      }
+      } else if(status === 404) {
+        statsService.event('client_error_404', { userId: userId });
 
-      if(status === 404) {
         template = '404';
         stack = null;
+      } else if(status >= 400 && status < 500) {
+        statsService.event('client_error_4xx', { userId: userId });
       }
 
       res.status(status);
