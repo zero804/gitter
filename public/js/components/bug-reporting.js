@@ -6,6 +6,11 @@ define([
   "use strict";
 
   var ravenUrl = context.env('ravenUrl');
+
+  function normalise(s) {
+    return s.replace(/\/_s\/\w+\//, '/_s/l/');
+  }
+
   if(ravenUrl) {
     require(['raven'], function(Raven) {
       Raven.config(ravenUrl, {
@@ -15,9 +20,13 @@ define([
             try {
               data.stacktrace.frames.forEach(function(frame) {
                 if(frame.filename) {
-                  frame.filename = frame.filename.replace(/\/_s\/\w+/, '/_s/l/');
+                  frame.filename = normalise(frame.filename);
                 }
               });
+
+              if(data.culprit) {
+                data.culprit = normalise(data.culprit);
+              }
             } catch(e) {
             }
 
