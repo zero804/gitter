@@ -1,8 +1,9 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'require',
-  'utils/context'
-], function(require, context) {
+  'utils/context',
+  'utils/appevents'
+], function(require, context, appEvents) {
   "use strict";
 
   var ravenUrl = context.env('ravenUrl');
@@ -38,6 +39,15 @@ define([
       Raven.setUser({
         username: user && user.get('username')
       });
+
+      appEvents.on('bugreport', function(description, data) {
+        if(description instanceof Error) {
+          Raven.captureException(description, data);
+        } else {
+          Raven.captureMessage(description, data);
+        }
+      });
+
     });
 
   }
