@@ -1,6 +1,9 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+
+var statsService = require('../services/stats-service');
+
 // Measure request elapsed time.
 
 module.exports = function responseTime(winston, minimal) {
@@ -12,6 +15,7 @@ module.exports = function responseTime(winston, minimal) {
 
     res.on('header', function() {
       var duration = new Date() - start;
+      statsService.responseTime(duration);
 
       if(res.statusCode === 404 && req.url.match(/\.map$/))
         return;
