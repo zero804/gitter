@@ -41,7 +41,7 @@ module.exports = {
 
 
   load: function(req, id, callback) {
-    return callback(id);
+    return callback(null, id);
   }
 
 };
