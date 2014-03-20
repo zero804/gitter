@@ -30,6 +30,7 @@ var troupeEnv = {
   appVersion: appTag,
   revision: revision,
   logging: nconf.get("web:consoleLogging"),
+  ravenUrl: nconf.get("errorReporting:clientRavenUrl"),
   websockets: {
     fayeUrl: nconf.get('ws:fayeUrl') || "/faye",
     options: {
