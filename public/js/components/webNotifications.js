@@ -36,32 +36,14 @@ define([
     });
   });
 
-
-  // $(document).on('app.version.mismatch', function() {
-  //   notifications.notify({
-  //     id: 'app-update',
-  //     className: 'notification',
-  //     content: "<a href=\"javascript:window.location.reload()\">There is a new version of Gitter available. Click here to refresh.</a>"
-  //   });
-  // });
-
-  // one notification when the connection to server is down
-  // todo: this might also show when an invalid user operation is attempted.
-  $(document).ajaxError(function(ev, jqxhr, settings /*, exception*/) {
-    require(['utils/tracking'], function(tracking) {
-      tracking.trackError("Ajax Error", settings.url, jqxhr.status);
-    });
-
-    if(jqxhr.status >= 400 && jqxhr.status < 500) {
-      // 400 errors are the problem of the ajax caller, not the global handler
-      return;
-    }
+  appEvents.on('ajaxError', function() {
 
     notifications.notify({
       id: 'ajax-error',
       className: 'notification-error',
       content: "We're having problems communicating with the server at the moment...."
     });
+
   });
 
   // // websocket notifications

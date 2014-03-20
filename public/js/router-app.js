@@ -17,7 +17,8 @@ require([
   'components/desktopNotifications',      // No ref
   'template/helpers/all',                 // No ref
   'components/bug-reporting',             // No ref
-  'components/csrf'                       // No ref
+  'components/csrf',                      // No ref
+  'components/ajax-errors'                // No ref
 ], function(appEvents, context, Backbone, _, AppIntegratedView, TroupeMenuView, troupeCollections,
   TitlebarUpdater, realtime, createRoomView, createRepoRoomView, chooseRoomView) {
   "use strict";
