@@ -1,19 +1,20 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var express                       = require('express');
-var passport                      = require('passport');
-var nconf                         = require('../utils/config');
-var expressHbs                    = require('express-hbs');
-var winston                       = require('winston');
-var middleware                    = require('./middleware');
-// var fineuploaderExpressMiddleware = require('fineuploader-express-middleware');
-var fs                            = require('fs');
-var os                            = require('os');
-var responseTime                  = require('./response-time');
-var oauthService                  = require('../services/oauth-service');
-var csrf                          = require('./csrf-middleware');
-var statsService                  = require('../services/stats-service');
+var express        = require('express');
+var passport       = require('passport');
+var nconf          = require('../utils/config');
+var expressHbs     = require('express-hbs');
+var winston        = require('winston');
+var middleware     = require('./middleware');
+var fs             = require('fs');
+var os             = require('os');
+var responseTime   = require('./response-time');
+var oauthService   = require('../services/oauth-service');
+var csrf           = require('./csrf-middleware');
+var statsService   = require('../services/stats-service');
+var errorReporting = require('../utils/error-reporting');
+var _              = require('underscore');
 
 if(nconf.get('express:showStack')) {
   try {
@@ -185,29 +186,38 @@ module.exports = {
         return;
       }
 
+
+
       var status = 500;
       var template = '500';
       var message = "An unknown error occurred";
       var stack = err && err.stack;
 
-      if(err.status) {
+      if(_.isNumber(err)) {
+        if(err > 400) {
+          status = err;
+          message = 'HTTP ' + err;
+        }
+      } else {
         status = err.status;
-        message = err.name;
+        message = err.message;
       }
 
-      // Log some stuff
-      var meta = {
-        path: req.path,
-        err: err.message
-      };
-
       if(status >= 500) {
+        // Send to sentry
+        errorReporting(err, { type: 'response', status: status, userId: userId });
+        // Send to statsd
         statsService.event('client_error_5xx', { userId: userId });
 
-        winston.error("An unexpected error occurred", meta);
+        winston.error("An unexpected error occurred", {
+          path: req.path,
+          message: message
+        });
+
         if(err.stack) {
           winston.error('Error: ' + err.stack);
         }
+
       } else if(status === 404) {
         statsService.event('client_error_404', { userId: userId });
 

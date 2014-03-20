@@ -4,7 +4,7 @@
 var domain = require('domain');
 var winston = require('./winston');
 var shutdown = require('./shutdown');
-
+var errorReporting = require('./error-reporting');
 
 module.exports = function(app) {
 
@@ -22,6 +22,9 @@ module.exports = function(app) {
         res.end();
       }
 
+      var userId = req.user && req.user.id;
+      errorReporting(err, { type: 'request', userId: userId });
+
       reqd.dispose();
     });
 
@@ -33,10 +36,14 @@ module.exports = function(app) {
           res.end();
         }
 
+        var userId = req.user && req.user.id;
+
+        errorReporting(err, { type: 'domain', userId: userId });
+
         winston.error('----------------------------------------------------------------');
         winston.error('-- A BadThing has happened.');
         winston.error('----------------------------------------------------------------');
-        winston.error('Domain exception: ' + err, { message: err.message, name: err.name });
+        winston.error('Domain exception: ' + err, { message: err.message, name: err.name, userId: userId });
 
         if(err.stack) {
           winston.error('' + err.stack);
