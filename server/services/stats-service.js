@@ -83,7 +83,8 @@ if (mixpanelEnabled) {
   var mixpanel  = Mixpanel.init(token);
 
   statsHandlers.event.push(function(eventName, properties) {
-    if(!properties) properties = {};
+    // Don't handle events that don't have a userId
+    if(!properties || !properties.userId) return;
 
     if(mixpanelEventBlacklist[eventName]) return;
 
