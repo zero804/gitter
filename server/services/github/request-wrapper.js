@@ -6,4 +6,7 @@ var fetchAllPages = require('./fetch-all-pages');
 var logFailingRequest = require('./log-failing-request');
 var requestWithRetry = require('./request-with-retry');
 
-module.exports = fetchAllPages(logFailingRequest(requestWithRetry({ maxRetries: 3 }, request)));
+module.exports = fetchAllPages(
+                    logFailingRequest(
+                    requestWithRetry({ maxRetries: 3 },
+                    request)));
