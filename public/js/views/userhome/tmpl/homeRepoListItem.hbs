@@ -1,9 +1,1 @@
-{{#if user.createRoom}}
-  <a href="/{{repo.name}}" class="github-REPO">{{repo.name}}</a>
-{{else}}
-  {{#if repo.room}}
-    <a href="/{{repo.name}}" class="github-REPO">{{repo.name}}</a>
-  {{else}}
-    <a class="github-REPO disabled" title="Sorry, you can't create chats yet. We're slowly giving users this ability to control our launch.">{{repo.name}}</a>
-  {{/if}}
-{{/if}}
+<a href="/{{repo.name}}" class="github-REPO">{{repo.name}}</a>

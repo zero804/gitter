@@ -1,46 +1,51 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var winston = require("winston");
+var appEvents = require("../app-events");
+var restSerializer =  require("../serializers/rest-serializer");
+
+
+// --------------------------------------------------------------------
+// Utility serialization stuff
+// --------------------------------------------------------------------
+
+// TODO: move this into its own module
+function serializeEvent(url, operation, model, callback) {
+  if(!url) { if(callback) callback(); return; }
+  winston.verbose("Serializing " + operation + " to " + url);
+
+  // TODO: consider swapping out the HEAVY WEIGHT restSerializer here for the
+  // light weight notification-serializer as it is much more effeicent. Obviously
+  // consumers of the events will need to be adapted to use objects of the new
+  // shape
+  restSerializer.serializeModel(model, function(err, serializedModel) {
+    if(err) {
+      winston.error("Silently failing model event: ", { exception: err, url: url, operation: operation });
+      if(callback) callback(err);
+      return;
+    }
+
+    if(Array.isArray(url)) {
+      url.forEach(function(u) {
+        appEvents.dataChange2(u, operation, serializedModel);
+      });
+    } else {
+      appEvents.dataChange2(url, operation, serializedModel);
+    }
+    if(callback) callback(null, serializedModel);
+  });
+}
+exports.serializeEvent = serializeEvent;
+
 exports.install = function(persistenceService) {
 
   var schemas = persistenceService.schemas;
-  var appEvents = require("../app-events");
   var mongooseUtils = require("../utils/mongoose-utils");
-  var winston = require("winston");
   var troupeService = require("./troupe-service");
-  var restSerializer =  require("../serializers/rest-serializer");
   var statsService = require("./stats-service");
 
 
-  // --------------------------------------------------------------------
-  // Utility serialization stuff
-  // --------------------------------------------------------------------
-
-  function serializeEvent(url, operation, model, callback) {
-    if(!url) { if(callback) callback(); return; }
-    winston.verbose("Serializing " + operation + " to " + url);
-
-    // TODO: consider swapping out the HEAVY WEIGHT restSerializer here for the
-    // light weight notification-serializer as it is much more effeicent. Obviously
-    // consumers of the events will need to be adapted to use objects of the new
-    // shape
-    restSerializer.serializeModel(model, function(err, serializedModel) {
-      if(err) {
-        winston.error("Silently failing model event: ", { exception: err, url: url, operation: operation });
-        if(callback) callback(err);
-        return;
-      }
-
-      if(Array.isArray(url)) {
-        url.forEach(function(u) {
-          appEvents.dataChange2(u, operation, serializedModel);
-        });
-      } else {
-        appEvents.dataChange2(url, operation, serializedModel);
-      }
-      if(callback) callback(null, serializedModel);
-    });
-  }
 
   /** */
   function attachNotificationListenersToSchema(schema, name, extractor) {

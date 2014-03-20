@@ -25,6 +25,7 @@ module.exports = {
 
     installTroupeSubResource('issues', 'issues');
     installTroupeSubResource('users', 'users');
+    installTroupeSubResource('channels', 'channels');
 
     var chatResource = installTroupeSubResource('chatMessages', 'chat-messages');
     var chatReadBy = new Resource('readBy', require('./troupes/chat-read-by'), app);
@@ -40,6 +41,7 @@ module.exports = {
     }
 
     var userTroupeResource = installUserSubResource('troupes', 'troupes');
+
     var userSettings = new Resource('settings', require('./user/troupe-settings'), app);
     userTroupeResource.add(userSettings);
 
@@ -48,5 +50,6 @@ module.exports = {
 
     installUserSubResource('orgs',        'orgs');
     installUserSubResource('repos',       'repos');
+    installUserSubResource('channels',    'channels');
   }
 };

@@ -22,6 +22,12 @@ module.exports = {
     app.get('/api/private/gh/users/*',
         require('./github-mirror/users-mirror'));
 
+    app.get('/api/private/gh/user/repos',
+        require('./github-mirror/user-repos-mirror'));
+
+    app.get('/api/private/gh/search/users',
+        require('./github-mirror/user-search-mirror'));
+
     // No auth for hooks yet
     app.post('/api/private/hook/:hash',
         require('./hooks'));
@@ -36,6 +42,13 @@ module.exports = {
     app.get('/api/private/room-permission',
         auth,
         require('./room-permission.js'));
+
+    app.get('/api/private/generate-signature',
+        auth,
+        require('./transloadit-signature.js'));
+
+    app.post('/api/private/transloadit/:token',
+        require('./transloadit.js'));
 
   }
 };

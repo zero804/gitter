@@ -114,7 +114,7 @@ function createIntegration(req, res) {
 
 function adminAccessCheck(req, res, next) {
   var uriContext = req.uriContext;
-  permissionsModel(req.user, 'admin', uriContext.uri, uriContext.troupe.githubType)
+  permissionsModel(req.user, 'admin', uriContext.uri, uriContext.troupe.githubType, uriContext.troupe.security)
     .then(function(access) {
       if(!access) return next(403);
 
@@ -125,42 +125,63 @@ function adminAccessCheck(req, res, next) {
 module.exports = {
     install: function(app) {
 
-      app.get('/settings/integrations/:userOrOrg',
+      app.get('/settings/integrations/:roomPart1',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         adminAccessCheck,
         getIntegrations);
 
-      app.get('/settings/integrations/:userOrOrg/:repo',
+      app.get('/settings/integrations/:roomPart1/:roomPart2',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         adminAccessCheck,
         getIntegrations);
 
-      app.del('/settings/integrations/:userOrOrg',
+      app.get('/settings/integrations/:roomPart1/:roomPart2/:roomPart3',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn(),
+        uriContextResolverMiddleware,
+        adminAccessCheck,
+        getIntegrations);
+
+      app.del('/settings/integrations/:roomPart1',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         adminAccessCheck,
         deleteIntegration);
 
-      app.del('/settings/integrations/:userOrOrg/:repo',
+      app.del('/settings/integrations/:roomPart1/:roomPart2',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         adminAccessCheck,
         deleteIntegration);
 
-      app.post('/settings/integrations/:userOrOrg',
+      app.del('/settings/integrations/:roomPart1/:roomPart2/:roomPart3',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn(),
+        uriContextResolverMiddleware,
+        adminAccessCheck,
+        deleteIntegration);
+
+      app.post('/settings/integrations/:roomPart1',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         adminAccessCheck,
         createIntegration);
 
-      app.post('/settings/integrations/:userOrOrg/:repo',
+      app.post('/settings/integrations/:roomPart1/:roomPart2',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn(),
+        uriContextResolverMiddleware,
+        adminAccessCheck,
+        createIntegration);
+
+      app.post('/settings/integrations/:roomPart1/:roomPart2/:roomPart3',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
