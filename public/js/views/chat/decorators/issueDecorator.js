@@ -86,12 +86,7 @@ define([
           return;
         }
 
-        var url;
-        if(repo.toLowerCase() === roomRepo.toLowerCase()) {
-          url = '/api/v1/troupes/'+context.getTroupeId()+'/issues/'+issueNumber+'?renderMarkdown=true';
-        } else {
-          url = '/api/private/gh/repos/'+repo+'/issues/'+issueNumber+'?renderMarkdown=true';
-        }
+        var url = '/api/private/gh/repos/'+repo+'/issues/'+issueNumber+'?renderMarkdown=true';
 
         $.get(url, function(issue) {
 

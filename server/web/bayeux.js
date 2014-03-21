@@ -13,6 +13,7 @@ var shutdown          = require('../utils/shutdown');
 var contextGenerator  = require('./context-generator');
 var appVersion        = require('./appVersion');
 var recentRoomService = require('../services/recent-room-service');
+var statsService      = require('../services/stats-service');
 
 var appTag = appVersion.getAppTag();
 
@@ -178,6 +179,8 @@ function getConnectionType(incoming) {
 var authenticator = {
   incoming: function(message, callback) {
     function deny() {
+      statsService.eventHF('bayeux.handshake.deny');
+
       message.error = '403::Access denied';
       winston.error('Denying client access', message);
       callback(message);
@@ -307,6 +310,8 @@ var authorisor = {
     }
 
     function deny() {
+      statsService.eventHF('bayeux.subscribe.deny');
+
       message.error = '403::Access denied';
       winston.error('Socket authorisation failed. Disconnecting client.', message);
 
@@ -453,6 +458,8 @@ var pingResponder = {
     }
 
     function deny(err) {
+      statsService.eventHF('bayeux.ping.deny');
+
       message.error = '403::Access denied';
       winston.error('Denying ping access' + err);
       callback(message);
@@ -506,6 +513,8 @@ var logging = {
   incoming: function(message, req, callback) {
     switch(message.channel) {
       case '/meta/handshake':
+        statsService.eventHF('bayeux.handshake');
+
         /* Rate is for the last full 10s period */
         var connType = message.ext && message.ext.connType;
         var handshakeRate = message.ext && message.ext.rate;
@@ -513,6 +522,8 @@ var logging = {
         break;
 
       case '/meta/connect':
+        statsService.eventHF('bayeux.connect');
+
         /* Rate is for the last full 10s period */
         var connectRate = message.ext && message.ext.rate;
         if(connectRate && connectRate > 1) {
@@ -521,6 +532,8 @@ var logging = {
         break;
 
       case '/meta/subscribe':
+        statsService.eventHF('bayeux.subscribe');
+
         winston.verbose("bayeux: subscribe", { clientId: message.clientId, subs: message.subscription });
         break;
     }
