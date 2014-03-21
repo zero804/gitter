@@ -6,6 +6,7 @@ var winston = require('../utils/winston');
 
 var statsHandlers = {
   event: [],
+  eventHF: [],
   userUpdate: [],
   responseTime: []
 };
@@ -51,6 +52,11 @@ if (statsdEnabled) {
 
   statsHandlers.event.push(function(eventName) {
     statsdClient.increment(eventName);
+  });
+
+  statsHandlers.eventHF.push(function(eventName) {
+    /* Only send to the server one tenth of the time */
+    statsdClient.increment(eventName, 1, 0.1);
   });
 
   statsHandlers.responseTime.push(function(timerName, duration) {
@@ -122,8 +128,25 @@ if (mixpanelEnabled) {
 function makeHandler(handlers) {
   if(!handlers.length) return function() {};
 
+  if(handlers.length === 1) {
+    /**
+     * Might seem a bit over the top, but these handlers get
+     * called a lot, so we should make this code perform if we can
+     */
+    var handler = handlers[0];
+    return function() {
+      var args = arguments;
+
+      try {
+        handler.apply(null, args);
+      } catch(err) {
+        winston.error('[stats] Error processing event: ' + err, { exception: err });
+      }
+    };
+  }
+
   return function() {
-    var args = Array.prototype.slice.apply(arguments);
+    var args = arguments;
 
     handlers.forEach(function(handler) {
       try {
@@ -135,7 +158,15 @@ function makeHandler(handlers) {
   };
 }
 
+/* Normal event */
 exports.event = makeHandler(statsHandlers.event);
+
+/* High frequency event */
+exports.eventHF = makeHandler(statsHandlers.eventHF);
+
+/* User update event */
 exports.userUpdate = makeHandler(statsHandlers.userUpdate);
+
+/* Response time recorder */
 exports.responseTime = makeHandler(statsHandlers.responseTime);
 
