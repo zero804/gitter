@@ -619,7 +619,6 @@ define([
           this.listenToOnce(this.collection, 'loaded', function() {
             this.removeItemView(this.loadingModel);
 
-
             if(this.collection.length === 0) {
               this.constructor.prototype.showEmptyView.call(this);
               return true;
@@ -700,13 +699,13 @@ define([
 
    });
 
-  appEvents.once('firstCollectionLoaded', function hideLoadingAmusement() {
-    var h = $('html'), b = $('.trpContentPanel');
-    b.fadeOut({ complete: function() {
-      h.removeClass('loading');
-    }});
-    b.fadeIn({ duration: 'fast' });
-  });
+  // appEvents.once('firstCollectionLoaded', function hideLoadingAmusement() {
+  //   var h = $('html'), b = $('.trpContentPanel');
+  //   b.fadeOut({ complete: function() {
+  //     h.removeClass('loading');
+  //   }});
+  //   b.fadeIn({ duration: 'fast' });
+  // });
 
   return TroupeViews;
 });
