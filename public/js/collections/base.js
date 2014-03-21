@@ -263,8 +263,8 @@ define([
               existing.set(parsed.attributes);
             } else {
               log('Ignoring out-of-date update', existing.toJSON(), newModel);
-              break;
             }
+            break;
           }
 
           if(operation !== 'patch') {
