@@ -36,7 +36,14 @@ require([
     if(state) {
       // TODO: update the title....
       context.setTroupeId(undefined);
-      chatIFrame.src = state+window.location.hash;
+      var hash;
+      var windowHash = window.location.hash;
+      if(!windowHash || windowHash === '#') {
+        hash = '#initial';
+      } else {
+        hash = windowHash;
+      }
+      chatIFrame.contentWindow.location.assign(state + hash);
     }
   }
 
