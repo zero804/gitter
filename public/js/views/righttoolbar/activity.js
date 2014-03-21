@@ -27,6 +27,8 @@ define([
   'hbs!./tmpl/travis',
   'hbs!./tmpl/sprintly',
   'hbs!./tmpl/trello',
+  'hbs!./tmpl/prerendered',
+
 
   'cocktail'
 ], function(
@@ -57,6 +59,7 @@ define([
   travisTemplate,
   sprintlyTemplate,
   trelloTemplate,
+  prerenderedTemplate,
 
   cocktail
 ) {
@@ -191,7 +194,11 @@ define([
         var event = this.model.get('meta').event;
         this.template = githubTemplates[event];
       } else {
-        this.template = serviceTemplates[service];
+        if(!this.model.get('meta').prerendered) {
+          this.template = serviceTemplates[service];
+        } else {
+          this.template = prerenderedTemplate;
+        }
       }
     },
 
@@ -199,14 +206,16 @@ define([
       var meta    = this.model.get('meta');
       var payload = this.model.get('payload');
       var sent    = this.model.get('sent');
+      var html    = this.model.get('html');
 
       var core = {
         meta: meta,
         payload: payload,
-        sent: sent
+        sent: sent,
+        html: html
       };
 
-      var extra = getExtraRenderData(meta, payload);
+      var extra = meta.prerendered ? {} : getExtraRenderData(meta, payload);
 
       return _.extend(core, extra);
     },
