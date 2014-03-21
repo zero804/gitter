@@ -65,6 +65,7 @@ function renderChatPage(req, res, next) {
     restful.serializeChatsForTroupe(troupe.id, req.user.id, { limit: INITIAL_CHAT_COUNT })
     ]).spread(function(troupeContext, chats) {
       res.render('chat-template', {
+        isRepo: troupe.githubType === 'REPO',
         appCache: getAppCache(req),
         bootScriptName: 'router-chat',
         troupeName: req.uriContext.uri,

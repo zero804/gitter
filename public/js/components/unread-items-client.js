@@ -323,9 +323,6 @@ define([
     // this is not a live collection so this will not work inside an SPA
     //$('.mobile-scroll-class').on('scroll', this._getBounds);
 
-    // TODO: don't reference this frame directly!
-    //$('#toolbar-frame').on('scroll', this._getBounds);
-
     appEvents.on('unreadItemDisplayed', this._getBounds);
 
     unreadItemStore.on('unreadItemRemoved', foldCountLimited);

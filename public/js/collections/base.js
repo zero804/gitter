@@ -114,7 +114,6 @@ define([
         triggerFirstLoad();
       }
 
-
       this.on('sync', this._onSync, this);
       this.on('request', this._onRequest, this);
 

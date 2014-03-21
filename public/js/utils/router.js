@@ -3,41 +3,12 @@ define([
   'backbone',
   'underscore',
   'utils/appevents',
-  'jquery'
-], function(Backbone, _, appEvents, $) {
+], function(Backbone, _, appEvents) {
   "use strict";
 
   function track(name) {
     appEvents.trigger('track', name);
   }
-
-  // var installClickTrigger = _.once(function() {
-  //   $(document).on("click", "a", function(event) {
-  //     if(this.href) {
-  //       var href = $(this).attr('href');
-  //       if(href.substring(0, 2) === "#|") {
-  //         event.preventDefault();
-
-  //         href = href.substring(2);
-
-  //         var currentFragment;
-  //         var hash = window.location.hash;
-
-  //         if(!hash) {
-  //           currentFragment = '#';
-  //         } else {
-  //           currentFragment = hash.split('|', 1)[0];
-  //         }
-
-  //         window.location = currentFragment + "|" + href;
-  //       }
-  //     }
-
-  //     return true;
-  //   });
-
-
-  // });
 
   function getFragmentsFromPath(path) {
     var lowerCaseHash = window.location.hash.toLowerCase();
