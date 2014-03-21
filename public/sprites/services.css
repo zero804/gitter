@@ -1,0 +1,41 @@
+.service {
+  background: url( 'services.png' ) no-repeat;
+  background-size: 32px 32px;
+}
+
+.service.h-square {
+  width: 16px;
+  height: 16px;
+  background-position: 0px 0px;
+}
+
+.service.smile-o {
+  width: 16px;
+  height: 16px;
+  background-position: -16px 0px;
+}
+
+.service.meh-o {
+  width: 16px;
+  height: 16px;
+  background-position: 0px -16px;
+}
+
+.service.frown-o {
+  width: 16px;
+  height: 16px;
+  background-position: -16px -16px;
+}
+
+
+
+@media (min--moz-device-pixel-ratio: 2),
+(-o-min-device-pixel-ratio: 2/1),
+(-webkit-min-device-pixel-ratio: 2),
+(min-device-pixel-ratio: 2) {
+.service {
+  background: url( 'services@2x.png' ) no-repeat;
+  background-size: 32px 32px;
+}
+
+}
