@@ -48,16 +48,16 @@ module.exports = exports = function processChat(text) {
   function getGitHubData(href) {
     var urlObj = url.parse(href);
 
-    if(urlObj.hostname === 'github.com') {
+    if(urlObj.hostname === 'github.com' && !urlObj.hash) {
       // [ '', 'trevorah', 'test-repo', 'issues', '1' ]
       var pathParts = urlObj.pathname.split('/');
-      if((pathParts[3] === 'issues' || pathParts[3] === 'pull') && pathParts[4]) {
+      if((pathParts[3] === 'issues' || pathParts[3] === 'pull') && pathParts[4] && pathParts.length === 5) {
         return {
           type: 'issue',
           repo: pathParts[1]+'/'+pathParts[2],
           number: pathParts[4]
         };
-      } else if(pathParts[3] === 'commit' && pathParts[4]) {
+      } else if(pathParts[3] === 'commit' && pathParts[4] && pathParts.length === 5) {
         return {
           type: 'commit',
           repo: pathParts[1]+'/'+pathParts[2],
