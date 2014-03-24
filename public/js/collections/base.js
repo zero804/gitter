@@ -95,7 +95,6 @@ define([
 
   });
 
-
   // LiveCollection: a collection with realtime capabilities
   exports.LiveCollection = Backbone.Collection.extend({
     nestedUrl: '',
@@ -114,23 +113,43 @@ define([
         triggerFirstLoad();
       }
 
-
       this.on('sync', this._onSync, this);
       this.on('request', this._onRequest, this);
 
-      this.once('error', function() {
-        $('#' + this.modelName + '-fail').show('fast', function() {
-        });
-      }, this);
+      // this.once('error', function() {
+      //   $('#' + this.modelName + '-fail').show('fast', function() {
+      //   });
+      // }, this);
 
-      if(options) {
-
-        if(options.listen) {
-          this.listen();
-        }
-
+      if(options && options.listen) {
+        this.listen();
       }
 
+    },
+
+    addWaiter: function(id, callback, timeout) {
+      if(!id) return;
+
+      var self = this;
+
+      function done(model) {
+        self.off('add', check, id);
+        self.off('change:id', check, id);
+        callback.apply(self, [model]);
+      }
+
+      function check(model) {
+        if(model.id === id) {
+          done(model);
+        }
+      }
+
+      setTimeout(function() {
+        done();
+      }, timeout);
+
+      this.on('change', check, id);
+      this.on('add', check, id);
     },
 
     _onSync: function() {
@@ -147,14 +166,13 @@ define([
       triggerFirstLoad();
 
       this.trigger('loaded');
+      // $('#' + this.modelName + '-amuse').hide('fast', function() {
+      //   $(this).remove();
+      // });
 
-      $('#' + this.modelName + '-amuse').hide('fast', function() {
-        $(this).remove();
-      });
-
-      if (this.length===0) {
-        $('#' + this.modelName + '-empty').fadeIn('fast');
-      }
+      // if (this.length===0) {
+      //   $('#' + this.modelName + '-empty').fadeIn('fast');
+      // }
     },
 
     listen: function() {
@@ -264,15 +282,29 @@ define([
               existing.set(parsed.attributes);
             } else {
               log('Ignoring out-of-date update', existing.toJSON(), newModel);
-              break;
             }
-          }
+            break;
 
-          if(operation !== 'patch') {
-            // No existing document exists, simply treat this as an add
-            this.add(parsed);
           } else {
-            log('Ignoring patch for non-existant model', newModel, 'loading?', this.loading);
+            /* Can't find an existing model */
+            if(operation === 'patch') {
+              this.addWaiter(id, function(existing) {
+                if(!existing) {
+                  log('Unable to find model ' + id);
+                  return;
+                }
+
+                if(this.operationIsUpToDate(operation, existing, newModel)) {
+                  log('Performing ' + operation, newModel);
+                  existing.set(parsed.attributes);
+                } else {
+                  log('Ignoring out-of-date update', existing.toJSON(), newModel);
+                }
+              }, 2000);
+
+            } else {
+              this.add(parsed);
+            }
           }
 
           break;
@@ -288,25 +320,6 @@ define([
           log("Unknown operation " + operation + ", ignoring");
 
       }
-    },
-
-    /**
-     * Get a model by ID or wait for the collection to load (probably via a snapshot)
-     * and then return it
-     */
-    getOrWait: function(id, callback) {
-      var model = this.get(id);
-      if(model) return callback(model);
-
-      if(!this._initialLoadCalled && this.length === 0) {
-        // we need to wait for models in the collection
-        this.once('reset sync', function() {
-          callback(this.get(id));
-        }, this);
-      } else {
-        callback();
-      }
-
     }
   });
 

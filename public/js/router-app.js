@@ -17,7 +17,8 @@ require([
   'components/desktopNotifications',      // No ref
   'template/helpers/all',                 // No ref
   'components/bug-reporting',             // No ref
-  'components/csrf'                       // No ref
+  'components/csrf',                      // No ref
+  'components/ajax-errors'                // No ref
 ], function(appEvents, context, Backbone, _, AppIntegratedView, TroupeMenuView, troupeCollections,
   TitlebarUpdater, realtime, createRoomView, createRepoRoomView, chooseRoomView) {
   "use strict";
@@ -35,7 +36,14 @@ require([
     if(state) {
       // TODO: update the title....
       context.setTroupeId(undefined);
-      chatIFrame.src = state+window.location.hash;
+      var hash;
+      var windowHash = window.location.hash;
+      if(!windowHash || windowHash === '#') {
+        hash = '#initial';
+      } else {
+        hash = windowHash;
+      }
+      chatIFrame.contentWindow.location.assign(state + hash);
     }
   }
 
