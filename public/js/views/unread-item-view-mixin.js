@@ -1,8 +1,9 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'components/unread-items-client',
-  'utils/appevents'
-], function(unreadItemsClient, appEvents) {
+  'utils/appevents',
+  'utils/dataset-shim'
+], function(unreadItemsClient, appEvents, dataset) {
   "use strict";
 
   return {
@@ -28,9 +29,10 @@ define([
 
         if(unread) {
           $e.addClass('unread');
-          e.dataset.itemId = id;
-          e.dataset.mentioned = mentioned;
-          e.dataset.itemType = this.unreadItemType;
+          dataset.set(e, 'itemId', id);
+          dataset.set(e, 'mentioned', mentioned);
+          dataset.set(e, 'itemType', this.unreadItemType);
+
           appEvents.trigger('unreadItemDisplayed');
         }
       }

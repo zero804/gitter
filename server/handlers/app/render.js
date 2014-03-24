@@ -43,7 +43,7 @@ function renderHomePage(req, res, next) {
 function renderMainFrame(req, res, next, frame) {
   contextGenerator.generateMiniContext(req)
     .then(function(troupeContext) {
-      var chatAppLocation = '/' + req.uriContext.uri + '/~' + frame;
+      var chatAppLocation = '/' + req.uriContext.uri + '/~' + frame + '#initial';
 
       res.render('app-template', {
         appCache: getAppCache(req),
@@ -65,6 +65,7 @@ function renderChatPage(req, res, next) {
     restful.serializeChatsForTroupe(troupe.id, req.user.id, { limit: INITIAL_CHAT_COUNT })
     ]).spread(function(troupeContext, chats) {
       res.render('chat-template', {
+        isRepo: troupe.githubType === 'REPO',
         appCache: getAppCache(req),
         bootScriptName: 'router-chat',
         troupeName: req.uriContext.uri,

@@ -1,14 +1,14 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'jquery',
   'underscore',
   'utils/context',
   'backbone',
-  'utils/appevents',
   'components/realtime',
   'log!collections'
-], function($, _, context, Backbone, appEvents, realtime, log) {
+], function(_, context, Backbone, realtime, log) {
   "use strict";
+
+  var PATCH_TIMEOUT = 2000; // 2000ms before a patch gives up
 
   var exports = {
     firstLoad: false
@@ -95,7 +95,6 @@ define([
 
   });
 
-
   // LiveCollection: a collection with realtime capabilities
   exports.LiveCollection = Backbone.Collection.extend({
     nestedUrl: '',
@@ -109,28 +108,39 @@ define([
 
       this._loading = false;
 
-      this.once('reset sync', this._onInitialLoad, this);
-      if (this.length > 0) {
-        triggerFirstLoad();
-      }
-
-
+      this.once('sync', this._onInitialLoad, this);
       this.on('sync', this._onSync, this);
       this.on('request', this._onRequest, this);
 
-      this.once('error', function() {
-        $('#' + this.modelName + '-fail').show('fast', function() {
-        });
-      }, this);
-
-      if(options) {
-
-        if(options.listen) {
-          this.listen();
-        }
-
+      if(options && options.listen) {
+        this.listen();
       }
 
+    },
+
+    addWaiter: function(id, callback, timeout) {
+      if(!id) return;
+
+      var self = this;
+
+      function done(model) {
+        self.off('add', check, id);
+        self.off('change:id', check, id);
+        callback.apply(self, [model]);
+      }
+
+      function check(model) {
+        if(model.id === id) {
+          done(model);
+        }
+      }
+
+      setTimeout(function() {
+        done();
+      }, timeout);
+
+      this.on('change', check, id);
+      this.on('add', check, id);
     },
 
     _onSync: function() {
@@ -144,17 +154,8 @@ define([
     _onInitialLoad: function() {
       if(this._initialLoadCalled) return;
       this._initialLoadCalled = true;
-      triggerFirstLoad();
 
       this.trigger('loaded');
-
-      $('#' + this.modelName + '-amuse').hide('fast', function() {
-        $(this).remove();
-      });
-
-      if (this.length===0) {
-        $('#' + this.modelName + '-empty').fadeIn('fast');
-      }
     },
 
     listen: function() {
@@ -243,7 +244,40 @@ define([
       return incomingVersion > existingVersion;
     },
 
+    // TODO: make this dude tighter
+    applyUpdate: function(operation, existingModel, newAttributes, parsed, options) {
+      if(this.operationIsUpToDate(operation, existingModel, newAttributes)) {
+        log('Performing patch', newAttributes);
+        existingModel.set(parsed.attributes, options || {});
+      } else {
+        log('Ignoring out-of-date update', existingModel.toJSON(), newAttributes);
+      }
+    },
+
+    patch: function(id, newModel, options) {
+      var self = this;
+
+      if(this.transformModel) newModel = this.transformModel(newModel);
+      var parsed = new this.model(newModel, { parse: true });
+      var existing = this.findExistingModel(id, parsed);
+      if(existing) {
+        this.applyUpdate('patch', existing, newModel, parsed, options);
+        return;
+      }
+
+      /* Existing model does not exist */
+      this.addWaiter(id, function(existing) {
+        if(!existing) {
+          log('Unable to find model ' + id);
+          return;
+        }
+
+        self.applyUpdate('patch', existing, newModel, parsed, options);
+      }, PATCH_TIMEOUT);
+    },
+
     _onDataChange: function(data) {
+      var self = this;
       var operation = data.operation;
       var newModel = data.model;
       var id = newModel.id;
@@ -259,20 +293,23 @@ define([
           // There can be existing documents for create events if the doc was created on this
           // client and lazy-inserted into the collection
           if(existing) {
-            if(this.operationIsUpToDate(operation, existing, newModel)) {
-              log('Performing ' + operation, newModel);
-              existing.set(parsed.attributes);
-            } else {
-              log('Ignoring out-of-date update', existing.toJSON(), newModel);
-              break;
-            }
-          }
-
-          if(operation !== 'patch') {
-            // No existing document exists, simply treat this as an add
-            this.add(parsed);
+            this.applyUpdate(operation, existing, newModel, parsed);
+            break;
           } else {
-            log('Ignoring patch for non-existant model', newModel, 'loading?', this.loading);
+            /* Can't find an existing model */
+            if(operation === 'patch') {
+              this.addWaiter(id, function(existing) {
+                if(!existing) {
+                  log('Unable to find model ' + id);
+                  return;
+                }
+
+                self.applyUpdate('patch', existing, newModel, parsed);
+              }, PATCH_TIMEOUT);
+
+            } else {
+              this.add(parsed);
+            }
           }
 
           break;
@@ -288,25 +325,6 @@ define([
           log("Unknown operation " + operation + ", ignoring");
 
       }
-    },
-
-    /**
-     * Get a model by ID or wait for the collection to load (probably via a snapshot)
-     * and then return it
-     */
-    getOrWait: function(id, callback) {
-      var model = this.get(id);
-      if(model) return callback(model);
-
-      if(!this._initialLoadCalled && this.length === 0) {
-        // we need to wait for models in the collection
-        this.once('reset sync', function() {
-          callback(this.get(id));
-        }, this);
-      } else {
-        callback();
-      }
-
     }
   });
 
@@ -473,13 +491,13 @@ define([
     };
   }
 
-  // used to indicate that the first collection has been loaded, ie loading screen can be hidden
-  function triggerFirstLoad() {
-    if(!exports.firstLoad) {
-      exports.firstLoad = true;
-      appEvents.trigger('firstCollectionLoaded');
-    }
-  }
+  // // used to indicate that the first collection has been loaded, ie loading screen can be hidden
+  // function triggerFirstLoad() {
+  //   if(!exports.firstLoad) {
+  //     exports.firstLoad = true;
+  //     appEvents.trigger('firstCollectionLoaded');
+  //   }
+  // }
 
   return exports;
 });
