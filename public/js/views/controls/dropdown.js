@@ -7,8 +7,9 @@ define([
   'cocktail',
   'mutant',
   './selectable-mixin',
-  'hbs!./tmpl/dropdownItem'
-], function($, _, Marionette, TroupeViews, cocktail, Mutant, SelectableMixin, itemTemplate) {
+  'hbs!./tmpl/dropdownItem',
+  'utils/dataset-shim'
+], function($, _, Marionette, TroupeViews, cocktail, Mutant, SelectableMixin, itemTemplate, dataset) {
   "use strict";
 
   /* Transition period on css */
@@ -53,7 +54,7 @@ define([
       return "";
     },
     onRender: function() {
-      this.el.dataset.cid = this.model.cid;
+      dataset.set(this.el, 'cid', this.model.cid);
     }
   });
 

@@ -40,36 +40,28 @@ define([
       var troupeId = message.troupeId;
       var totalUnreadItems = message.totalUnreadItems;
 
-      var model = this._collection.get(troupeId);
-      if(!model) {
-        log("Cannot find model. Refresh might be required....");
-        return;
-      }
+      var v = {
+        unreadItems: totalUnreadItems
+      };
 
-      // TroupeCollectionSync keeps track of the values
-      // for this troupe, so ignore those values
-      model.set('unreadItems', totalUnreadItems);
       if(totalUnreadItems === 0) {
         // If there are no unread items, there can't be unread mentions
         // either
-        model.set('mentions', 0);
+        v.mentions = 0;
       }
 
+      this._collection.patch(troupeId, v);
     },
 
     _handleIncomingMention: function(message) {
       var troupeId = message.troupeId;
       var mentions = message.mentions;
 
-      var model = this._collection.get(troupeId);
-      if(!model) {
-        log("Cannot find model. Refresh might be required....");
-        return;
-      }
+      var v = {
+        mentions: mentions
+      };
 
-      // TroupeCollectionSync keeps track of the values
-      // for this troupe, so ignore those values
-      model.set('mentions', mentions);
+      this._collection.patch(troupeId, v);
     }
   };
 

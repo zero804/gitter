@@ -8,8 +8,9 @@ define([
   'backbone',
   './csrf',
   'utils/appevents',
+  'utils/dataset-shim',
   'utils/double-hash'
-], function($, _, context, realtime, log, Backbone, csrf, appEvents, DoubleHash) {
+], function($, _, context, realtime, log, Backbone, csrf, appEvents, dataset, DoubleHash) {
   "use strict";
 
   function limit(fn, context, timeout) {
@@ -219,53 +220,6 @@ define([
   };
 
   // -----------------------------------------------------
-  // Syncs a troupe collection with the unread items client
-  // -----------------------------------------------------
-
-  var TroupeCollectionSync = function(troupeCollection, unreadItemStore) {
-    this._collection = troupeCollection;
-    this._store = unreadItemStore;
-    this._store.on('newcountvalue', this._onNewCountValue, this);
-
-    // Set the initial value
-    this._onNewCountValue(this._store._currentCount());
-  };
-
-  TroupeCollectionSync.prototype = {
-    _onNewCountValue: function(newValue) {
-      // log('Syncing store to collection ', newValue);
-
-      // log('TroupeCollectionSync: setting value of ' + context.getTroupeId() + ' to ' + newValue);
-
-      var troupe = this._collection.get(context.getTroupeId());
-      if(troupe) {
-        troupe.set('unreadItems', newValue);
-        // log('Completed successfully');
-        return;
-      }
-
-      // Not found, are there any items? If not await a sync-reset
-      if(this._collection.length === 0) {
-        this._collection.once('reset sync', function() {
-
-          log('Collection loading, syncing troupe unreadItems');
-
-          var troupe = this._collection.get(context.getTroupeId());
-          if(troupe) {
-            troupe.set('unreadItems', newValue);
-          } else {
-            log('TroupeCollectionSync: unable to locate locate troupe');
-          }
-        }, this);
-      } else {
-        // There are items, just not the ones we want
-        log('TroupeCollectionSync: unable to locate locate troupe');
-      }
-
-    }
-  };
-
-  // -----------------------------------------------------
   // Sync unread items with realtime notifications coming from the server
   // -----------------------------------------------------
 
@@ -276,7 +230,6 @@ define([
   _.extend(TroupeUnreadItemRealtimeSync.prototype, Backbone.Events, {
     _subscribe: function() {
       var store = this._store;
-      var self = this;
 
       var url = '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/unreadItems';
       realtime.subscribe(url, function(message) {
@@ -286,9 +239,9 @@ define([
           var items = message.items;
           store._unreadItemsRemoved(items);
 
-          _iteratePreload(items, function(itemType, itemId) {
-            this.trigger('unreadItemRemoved', itemType, itemId);
-          }, self);
+          // _iteratePreload(items, function(itemType, itemId) {
+          //   this.trigger('unreadItemRemoved', itemType, itemId);
+          // }, self);
         }
       });
 
@@ -326,6 +279,7 @@ define([
     appEvents.on('unreadItemDisplayed', this._getBounds);
 
     unreadItemStore.on('unreadItemRemoved', foldCountLimited);
+    // unreadItemStore.on('unreadItemRemoved', this._unreadItemRemoved, this);
 
     // When the UI changes, rescan
     // appEvents.on('appNavigation', this._getBounds);
@@ -353,6 +307,10 @@ define([
       this._windowScrollLimited();
     },
 
+    // _unreadItemRemoved: function(itemType, itemId) {
+    //   console.log('REMOVED itemType itemId', itemType, itemId);
+    // },
+
     _windowScroll: function() {
       if(!this._inFocus) {
         return;
@@ -374,9 +332,9 @@ define([
       for(var i = 0; i < unreadItems.length; i++) {
         var element = unreadItems[i];
 
-        var itemType = element.dataset.itemType;
-        var itemId = element.dataset.itemId;
-        var mentioned = element.dataset.mentioned;
+        var itemType = dataset.get(element, 'itemType');
+        var itemId = dataset.get(element, 'itemId');
+        var mentioned = dataset.get(element, 'mentioned') === 'true';
 
         if(itemType && itemId) {
           var top = element.offsetTop;
@@ -419,8 +377,8 @@ define([
       for(var i = 0; i < unreadItems.length; i++) {
         var element = unreadItems[i];
 
-        var itemType = element.dataset.itemType;
-        var itemId = element.dataset.itemId;
+        var itemType = dataset.get(element, 'itemType');
+        var itemId = dataset.get(element, 'itemId');
 
         if(itemType && itemId) {
           var top = element.offsetTop;
@@ -551,9 +509,22 @@ define([
         var collection = collections[itemType];
         if(!collection) return;
 
-        var item = collection.get(itemId);
-        if(item) item.set('unread', false, { silent: true });
-        if(mention) item.set('mentioned', false, { silent: true });
+        var v = { unread: false };
+
+        if(mention) {
+          v.mentioned = false;
+        }
+
+        collection.patch(itemId, v, { silent: true });
+      });
+
+      unreadItemStore.on('unreadItemRemoved', function(itemType, itemId) {
+        var collection = collections[itemType];
+        if(!collection) return;
+
+
+        var v = { unread: false, mentioned: false };
+        collection.patch(itemId, v);
       });
     },
 
@@ -569,7 +540,6 @@ define([
   unreadItemsClient.DoubleHash = DoubleHash;
   unreadItemsClient.Tarpit = Tarpit;
   unreadItemsClient.UnreadItemStore = UnreadItemStore;
-  unreadItemsClient.TroupeCollectionSync = TroupeCollectionSync;
 
   return unreadItemsClient;
 });
