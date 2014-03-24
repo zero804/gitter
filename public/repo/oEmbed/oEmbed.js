@@ -112,7 +112,6 @@ define(['jquery-iframely', 'utils/context'], function ($, context) {
   addOEmbedProvider("photobucket",  ["photobucket.com/(albums|groups)/.+"],             "//photobucket.com/oembed/");
   addOEmbedProvider("slideshare",   ["slideshare.net"],                                 "//www.slideshare.net/api/oembed/2",{format:'jsonp'});
 
-  iframelyProviders.push(new RegExp("wikipedia.org/wiki/"));
   iframelyProviders.push(new RegExp("youtube.com/watch"));
   iframelyProviders.push(new RegExp("instagr.?am(.com)?/p/"));
   iframelyProviders.push(new RegExp("gist.github.com/.+/.+"));
