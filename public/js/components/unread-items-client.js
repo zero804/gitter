@@ -279,7 +279,6 @@ define([
     appEvents.on('unreadItemDisplayed', this._getBounds);
 
     unreadItemStore.on('unreadItemRemoved', foldCountLimited);
-    // unreadItemStore.on('unreadItemRemoved', this._unreadItemRemoved, this);
 
     // When the UI changes, rescan
     // appEvents.on('appNavigation', this._getBounds);
@@ -306,10 +305,6 @@ define([
 
       this._windowScrollLimited();
     },
-
-    // _unreadItemRemoved: function(itemType, itemId) {
-    //   console.log('REMOVED itemType itemId', itemType, itemId);
-    // },
 
     _windowScroll: function() {
       if(!this._inFocus) {
