@@ -186,8 +186,6 @@ module.exports = {
         return;
       }
 
-
-
       var status = 500;
       var template = '500';
       var message = "An unknown error occurred";
@@ -199,8 +197,13 @@ module.exports = {
           message = 'HTTP ' + err;
         }
       } else {
-        status = err.status;
-        message = err.message;
+        if(_.isNumber(err.status)) {
+          status = err.status;
+        }
+
+        if(err.message) {
+          message = err.message;
+        }
       }
 
       if(status >= 500) {
@@ -226,7 +229,7 @@ module.exports = {
       } else if(status >= 400 && status < 500) {
         statsService.event('client_error_4xx', { userId: userId });
       }
-
+      console.log('STATUS: ', status);
       res.status(status);
 
       var responseType = req.accepts(['html', 'json']);
