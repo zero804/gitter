@@ -46,7 +46,7 @@ define(['jquery-iframely', 'utils/context'], function ($, context) {
     if(!match) return cb(null);
 
     var $el = $.iframely.generateLinkElement(match, iframelyData);
-    cb({html: $el[0].outerHTML});
+    cb({html: $el[0].outerHTML, site: iframelyData.meta.site});
   }
 
   function fetch(provider, url, cb) {
