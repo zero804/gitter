@@ -108,18 +108,9 @@ define([
 
       this._loading = false;
 
-      this.once('reset sync', this._onInitialLoad, this);
-      if (this.length > 0) {
-        triggerFirstLoad();
-      }
-
+      this.once('sync', this._onInitialLoad, this);
       this.on('sync', this._onSync, this);
       this.on('request', this._onRequest, this);
-
-      // this.once('error', function() {
-      //   $('#' + this.modelName + '-fail').show('fast', function() {
-      //   });
-      // }, this);
 
       if(options && options.listen) {
         this.listen();
@@ -163,16 +154,8 @@ define([
     _onInitialLoad: function() {
       if(this._initialLoadCalled) return;
       this._initialLoadCalled = true;
-      triggerFirstLoad();
 
       this.trigger('loaded');
-      // $('#' + this.modelName + '-amuse').hide('fast', function() {
-      //   $(this).remove();
-      // });
-
-      // if (this.length===0) {
-      //   $('#' + this.modelName + '-empty').fadeIn('fast');
-      // }
     },
 
     listen: function() {
@@ -486,13 +469,13 @@ define([
     };
   }
 
-  // used to indicate that the first collection has been loaded, ie loading screen can be hidden
-  function triggerFirstLoad() {
-    if(!exports.firstLoad) {
-      exports.firstLoad = true;
-      appEvents.trigger('firstCollectionLoaded');
-    }
-  }
+  // // used to indicate that the first collection has been loaded, ie loading screen can be hidden
+  // function triggerFirstLoad() {
+  //   if(!exports.firstLoad) {
+  //     exports.firstLoad = true;
+  //     appEvents.trigger('firstCollectionLoaded');
+  //   }
+  // }
 
   return exports;
 });
