@@ -8,8 +8,9 @@ define([
   'utils/momentWrapper',
   'views/base',
   'cocktail',
+  'utils/dataset-shim',
   'jquery-sortable' // No ref
-], function($, context, Marionette, troupeListItemTemplate, appEvents, moment,  TroupeViews, cocktail) {
+], function($, context, Marionette, troupeListItemTemplate, appEvents, moment,  TroupeViews, cocktail, dataset) {
   "use strict";
 
   /* @const */
@@ -64,7 +65,7 @@ define([
       var self = this;
 
       var m = self.model;
-      self.el.dataset.id = m.id;
+      dataset.set(self.el, 'id', m.id);
       var e = self.$el;
 
       var first = !self.initialRender;
@@ -187,10 +188,10 @@ define([
             if(!previousElement) {
               favPosition = 1;
             } else {
-              var previousCollectionItem = self.roomsCollection.get(previousElement.dataset.id);
+              var previousCollectionItem = self.roomsCollection.get(dataset.get(previousElement, 'id'));
               favPosition = previousCollectionItem.get('favourite') + 1;
             }
-            var collectionItem = self.roomsCollection.get(el.dataset.id);
+            var collectionItem = self.roomsCollection.get(dataset.get(el, 'id'));
             collectionItem.set('favourite', favPosition);
             collectionItem.save();
             // if ($(container.el).attr('id') == 'list-favs') {
@@ -206,7 +207,7 @@ define([
           var el = item[0];
 
           if ($(container.el).parent().attr('id') == 'list-favs') {
-            var collectionItem = self.roomsCollection.get(el.dataset.id);
+            var collectionItem = self.roomsCollection.get(dataset.get(el, 'id'));
             collectionItem.set('favourite', false).save();
 
             // do whatever else needs to be done to remove from favourites and store positions

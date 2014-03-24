@@ -1,14 +1,14 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'jquery',
   'underscore',
   'utils/context',
   'backbone',
-  'utils/appevents',
   'components/realtime',
   'log!collections'
-], function($, _, context, Backbone, appEvents, realtime, log) {
+], function(_, context, Backbone, realtime, log) {
   "use strict";
+
+  var PATCH_TIMEOUT = 2000; // 2000ms before a patch gives up
 
   var exports = {
     firstLoad: false
@@ -244,7 +244,40 @@ define([
       return incomingVersion > existingVersion;
     },
 
+    // TODO: make this dude tighter
+    applyUpdate: function(operation, existingModel, newAttributes, parsed, options) {
+      if(this.operationIsUpToDate(operation, existingModel, newAttributes)) {
+        log('Performing patch', newAttributes);
+        existingModel.set(parsed.attributes, options || {});
+      } else {
+        log('Ignoring out-of-date update', existingModel.toJSON(), newAttributes);
+      }
+    },
+
+    patch: function(id, newModel, options) {
+      var self = this;
+
+      if(this.transformModel) newModel = this.transformModel(newModel);
+      var parsed = new this.model(newModel, { parse: true });
+      var existing = this.findExistingModel(id, parsed);
+      if(existing) {
+        this.applyUpdate('patch', existing, newModel, parsed, options);
+        return;
+      }
+
+      /* Existing model does not exist */
+      this.addWaiter(id, function(existing) {
+        if(!existing) {
+          log('Unable to find model ' + id);
+          return;
+        }
+
+        self.applyUpdate('patch', existing, newModel, parsed, options);
+      }, PATCH_TIMEOUT);
+    },
+
     _onDataChange: function(data) {
+      var self = this;
       var operation = data.operation;
       var newModel = data.model;
       var id = newModel.id;
@@ -260,14 +293,8 @@ define([
           // There can be existing documents for create events if the doc was created on this
           // client and lazy-inserted into the collection
           if(existing) {
-            if(this.operationIsUpToDate(operation, existing, newModel)) {
-              log('Performing ' + operation, newModel);
-              existing.set(parsed.attributes);
-            } else {
-              log('Ignoring out-of-date update', existing.toJSON(), newModel);
-            }
+            this.applyUpdate(operation, existing, newModel, parsed);
             break;
-
           } else {
             /* Can't find an existing model */
             if(operation === 'patch') {
@@ -277,13 +304,8 @@ define([
                   return;
                 }
 
-                if(this.operationIsUpToDate(operation, existing, newModel)) {
-                  log('Performing ' + operation, newModel);
-                  existing.set(parsed.attributes);
-                } else {
-                  log('Ignoring out-of-date update', existing.toJSON(), newModel);
-                }
-              }, 2000);
+                self.applyUpdate('patch', existing, newModel, parsed);
+              }, PATCH_TIMEOUT);
 
             } else {
               this.add(parsed);
