@@ -96,7 +96,9 @@ if (mixpanelEnabled) {
 
     properties.distinct_id = properties.userId;
     mixpanel.track(eventName, properties, function(err) {
-      winston.error('Mixpanel error: ' + err, { exception: err });
+      if(err) {
+        winston.error('Mixpanel error: ' + err, { exception: err });
+      }
     });
   });
 
