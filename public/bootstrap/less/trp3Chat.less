@@ -418,8 +418,11 @@ pre code {
   .embed {
     border: 0px;
     margin-top: 5px;
-    max-height: 500px;
-    overflow-y: auto;
+
+    &.embed-limited {
+      max-height: 500px;
+      overflow-y: auto;
+    }
 
     h2 {
       font-size: 1.5em;
