@@ -30,7 +30,7 @@ if (cubeEnabled) {
     properties.env = nconf.get("stats:envName");
 
     var event = {
-      type: "gitter_" + eventName,
+      type: "gitter_" + eventName.replace(/\./g, '_'),
       time: new Date(),
       data: properties
     };
