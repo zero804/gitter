@@ -64,8 +64,10 @@ if(nconf.get('test:exposeInBrowserTests')) {
   require('./handlers/in-browser-tests').install(app);
 }
 
-/* This should be last */
+/* This should be second last */
 require('./handlers/app').install(app);
+
+require('./handlers/catch-all').install(app);
 
 var port = nconf.get("PORT");
 server.listen(port, function() {
