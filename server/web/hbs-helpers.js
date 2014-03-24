@@ -40,6 +40,10 @@ var troupeEnv = {
       interval: nconf.get('ws:fayeInterval')
     }
   },
+  embed: {
+    basepath: nconf.get('embed:basepath'),
+    cacheBuster: nconf.get('embed:cacheBuster')
+  }
 };
 
 exports.cdn = function(url, parameters) {

@@ -6,7 +6,8 @@ define(['jquery-iframely', 'utils/context'], function ($, context) {
   var oEmbedProviders = {};
   var iframelyProviders = [];
   var lookups = [];
-  $.iframely.defaults.endpoint = context.env('embedBaseUrl')+'/iframely';
+  var embedEnv = context.env('embed');
+  $.iframely.defaults.endpoint = embedEnv.basepath+'/'+embedEnv.cacheBuster+'/iframely';
 
   function addOEmbedProvider(name, patterns, endpoint, opts) {
     oEmbedProviders[name] = {
