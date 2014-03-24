@@ -38,7 +38,6 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
 
     if(!troupeService.userHasAccessToTroupe(user, troupe)) throw 403;
 
-
     // TODO: validate message
     var parsedMessage = processChat(text);
 
@@ -49,6 +48,7 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
       text: text,                // Keep the raw message.
       html: parsedMessage.html
     });
+
 
     /* Look through the mentions and attempt to tie the mentions to userIds */
     var mentionUserNames = parsedMessage.mentions.map(function(mention) {
@@ -77,11 +77,20 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
 
       return chatMessage.saveQ()
         .then(function() {
+
+          // setTimeout(function() {
+          //   troupe.users.forEach(function(troupeUser) {
+          //     require('./unread-item-service').markItemsRead(troupeUser.userId, troupe.id, [chatMessage.id], [], { member: true });
+          //   });
+
+          // }, 100);
+
           statsService.event("new_chat", {
             userId: user.id,
             troupeId: troupe.id,
             username: user.username
           });
+
 
           var _msg;
           if (troupe.oneToOne) {
@@ -134,9 +143,6 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
 
 
   chatMessage.editedAt = new Date();
-
-  var parsedMessage = processChat(newText);
-  chatMessage.html = parsedMessage.html;
 
   // Metadata
   chatMessage.urls      = parsedMessage.urls;

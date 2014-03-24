@@ -11,9 +11,10 @@ define([
   'cocktail',
   'views/controls/selectable-mixin',
   'views/controls/live-search',
+  'utils/dataset-shim',
   'filtered-collection' /* no ref */
 ], function(Marionette, Backbone, TroupeViews, TroupeCollections, template, itemTemplate,
-  emptyTemplate, repoModels, cocktail, SelectableMixin, liveSearch) {
+  emptyTemplate, repoModels, cocktail, SelectableMixin, liveSearch, dataset) {
   "use strict";
 
   // TODO: put this somewhere else
@@ -24,7 +25,7 @@ define([
     template: itemTemplate,
     tagName: 'li',
     onRender: function() {
-      this.el.dataset.cid = this.model.cid;
+      dataset.set(this.el, 'cid', this.model.cid);
     }
   });
 

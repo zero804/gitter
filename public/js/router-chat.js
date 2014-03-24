@@ -93,7 +93,7 @@ require([
   });
 
   var appView = new ChatIntegratedView({ el: 'body' });
-  appView.rightToolbarRegion.show(new RightToolbarView());
+  new RightToolbarView({ el: "#toolbar-frame" });
 
   new HeaderView({ model: context.troupe(), el: '#header' });
 

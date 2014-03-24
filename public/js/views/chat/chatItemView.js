@@ -46,6 +46,11 @@ define([
     },
 
     initialize: function(options) {
+      this.listenToOnce(this.model, 'change:unread', function() {
+        if(!this.model.get('unread')) {
+          this.$el.removeClass('unread');
+        }
+      });
 
       this._oneToOne = context.inOneToOneTroupeContext();
 

@@ -30,7 +30,7 @@ if (cubeEnabled) {
     properties.env = nconf.get("stats:envName");
 
     var event = {
-      type: "gitter_" + eventName,
+      type: "gitter_" + eventName.replace(/\./g, '_'),
       time: new Date(),
       data: properties
     };
@@ -96,7 +96,9 @@ if (mixpanelEnabled) {
 
     properties.distinct_id = properties.userId;
     mixpanel.track(eventName, properties, function(err) {
-      winston.error('Mixpanel error: ' + err, { exception: err });
+      if(err) {
+        winston.error('Mixpanel error: ' + err, { exception: err });
+      }
     });
   });
 

@@ -3,7 +3,6 @@
 
 var Q = require('q');
 var wrap = require('./github-cache-wrapper');
-var converter = require('../../utils/process-chat');
 var createClient = require('./github-client');
 var badCredentialsCheck = require('./bad-credentials-check');
 
