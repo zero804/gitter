@@ -45,7 +45,7 @@ exports.createClient = function createClient() {
   }
 
   client.once('end', function() {
-    winston.error('Redis client quit, removing from list');
+    winston.verbose('Redis client quit, removing from list');
 
     for(var i = 0; i < clients.length; i++) {
       if(clients[i] === client) {

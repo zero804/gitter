@@ -23,4 +23,8 @@ var sinceTime = Date.now() - (opts.age * 60 * 1000);
 notificationGenerator(sinceTime)
   .then(function() {
     shutdown.shutdownGracefully();
+  })
+  .fail(function(err) {
+    winston.error('send-unread-notifications failed: ' + err, { exception: err });
+    shutdown.shutdownGracefully(1);
   });
