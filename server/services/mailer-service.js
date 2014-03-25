@@ -5,7 +5,7 @@
 var nodemailer     = require('nodemailer');
 var troupeTemplate = require('../utils/troupe-template');
 var nconf          = require('../utils/config');
-var winston        = require("winston");
+var winston        = require('../utils/winston');
 var Q              = require('q');
 
 var logEmailToLogger = nconf.get('logging:logEmailContents');
