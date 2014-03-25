@@ -9,7 +9,7 @@ var presenceService   = require("../services/presence-service");
 var recentRoomService = require('../services/recent-room-service');
 var Q                 = require("q");
 var _                 = require("underscore");
-var winston           = require("winston");
+var winston           = require('../utils/winston');
 var collections       = require("../utils/collections");
 var GitHubRepoService = require('../services/github/github-repo-service');
 

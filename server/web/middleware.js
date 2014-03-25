@@ -2,7 +2,7 @@
 "use strict";
 
 var passport   = require("passport");
-var winston    = require("winston");
+var winston    = require('../utils/winston');
 var nconf      = require('../utils/config');
 var rememberMe = require('./rememberme-middleware');
 var useragent  = require('useragent');

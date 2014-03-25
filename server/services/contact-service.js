@@ -5,7 +5,7 @@ var persistence   = require("./persistence-service");
 var userService   = require("./user-service");
 var statsService  = require("./stats-service");
 var _             = require('underscore');
-var winston       = require('winston');
+var winston       = require('../utils/winston');
 var Q             = require('q');
 
 function indexImportsByEmail(contacts) {
