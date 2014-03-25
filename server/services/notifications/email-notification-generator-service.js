@@ -125,7 +125,7 @@ function sendEmailNotifications(since) {
        *load the data we're going to need for the emails
        */
       var userIds = Object.keys(userTroupeUnreadHash);
-      if(!userIds.length) return {};
+      if(!userIds.length) return [userIds, [], [], {}];
 
       winston.verbose('email-notify: After removing room non-notify users: ' + userIds.length);
 
@@ -142,13 +142,13 @@ function sendEmailNotifications(since) {
         ]);
     })
     .spread(function(userIds, users, allTroupes, userTroupeUnreadHash) {
+      if(!userIds.length) return;
+
       /**
        * Step 2: loop through the users
        */
       var troupeHash = collections.indexById(allTroupes);
       var userHash = collections.indexById(users);
-
-      if(!userIds.length) return;
 
       var count = 0;
 
