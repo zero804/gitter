@@ -9,7 +9,7 @@ var oauth2orize = require('oauth2orize'),
     middleware = require('./middleware'),
     oauthService = require('../services/oauth-service'),
     loginUtils = require('./login-utils'),
-    winston = require('winston'),
+    winston = require('../utils/winston'),
     url = require('url'),
     random = require('../utils/random');
 

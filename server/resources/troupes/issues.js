@@ -3,7 +3,7 @@
 
 var RepoService =  require('../../services/github/github-repo-service');
 var converter = require('../../utils/process-chat');
-var winston = require('winston');
+var winston = require('../../utils/winston');
 var _ = require('underscore');
 
 function getEightSuggestedIssues(issues) {

@@ -4,7 +4,7 @@
 var parseLinks = require('parse-links');
 var url        = require('url');
 var lazy       = require('lazy.js');
-var winston    = require('winston');
+var winston    = require('../../utils/winston');
 var Q          = require('q');
 
 function updatePerPage(options) {

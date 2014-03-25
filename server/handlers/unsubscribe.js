@@ -2,7 +2,7 @@
 "use strict";
 
 var crypto              = require('crypto');
-var winston             = require('winston');
+var winston             = require('../utils/winston');
 var userSettingsService = require('../services/user-settings-service');
 var statsService        = require("../services/stats-service");
 var nconf               = require('../utils/config');

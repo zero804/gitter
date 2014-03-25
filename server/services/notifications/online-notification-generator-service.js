@@ -1,7 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var winston                   = require('winston');
+var winston                   = require('../../utils/winston');
 var Q                         = require('q');
 var handlebars                = require('handlebars');
 var userTroupeSettingsService = require('../user-troupe-settings-service');

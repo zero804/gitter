@@ -2,7 +2,7 @@
 "use strict";
 
 var appEvents                          = require("../../app-events");
-var winston                            = require("winston");
+var winston                            = require('../../utils/winston');
 // var pushNotificationService            = require("../push-notification-service");
 var _                                  = require("underscore");
 var presenceService                    = require("./../presence-service");

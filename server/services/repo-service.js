@@ -8,7 +8,7 @@ var persistence     = require("./persistence-service");
 var Q               = require('q');
 var lazy            = require('lazy.js');
 var moment          = require('moment');
-var winston         = require('winston');
+var winston         = require('../utils/winston');
 
 var SCORE_STARRED = 50;
 var SCORE_WATCHED = 100;

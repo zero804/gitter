@@ -2,7 +2,7 @@
 "use strict";
 
 var crypto        = require('crypto');
-var winston       = require('winston');
+var winston       = require('../../utils/winston');
 var eventService  = require('../../services/event-service');
 var troupeService = require('../../services/troupe-service');
 

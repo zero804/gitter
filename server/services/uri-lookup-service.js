@@ -9,7 +9,7 @@
 
 var persistence = require("./persistence-service");
 var Q = require('q');
-var winston = require('winston');
+var winston = require('../utils/winston');
 var mongoUtils = require('../utils/mongo-utils');
 /**
  * Lookup the owner of a URI
