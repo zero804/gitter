@@ -642,7 +642,6 @@ module.exports = {
       setTimeout(callback, 1000);
     });
 
-    presenceService.startPresenceGcService(server._server._engine);
     server.attach(httpServer);
   }
 };
