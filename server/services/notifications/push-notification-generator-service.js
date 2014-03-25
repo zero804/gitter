@@ -3,7 +3,7 @@
 
 --------- CURRENTLY NOT BEING USED ---------
 
-var winston                   = require("winston");
+var winston                   = require('../../utils/winston');
 var pushNotificationService   = require("../push-notification-service");
 var userService               = require("../user-service");
 var nconf                     = require('../../utils/config');

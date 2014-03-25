@@ -3,7 +3,7 @@
 
 var faye              = require('faye');
 var fayeRedis         = require('faye-redis');
-var winston           = require('winston');
+var winston           = require('../utils/winston');
 var oauth             = require('../services/oauth-service');
 var troupeService     = require('../services/troupe-service');
 var presenceService   = require('../services/presence-service');

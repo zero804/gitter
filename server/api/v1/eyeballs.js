@@ -3,7 +3,7 @@
 
 var presenceService = require('../../services/presence-service');
 var bayeux = require('../../web/bayeux');
-var winston = require('winston');
+var winston = require('../../utils/winston');
 
 module.exports =  function(req, res, next) {
   var socketId = req.body.socketId;

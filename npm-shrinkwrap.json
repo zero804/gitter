@@ -1466,12 +1466,12 @@
       "from": "validator@~1.2.1"
     },
     "winston": {
-      "version": "0.7.2",
-      "from": "winston@~0.7.2",
+      "version": "0.7.3",
+      "from": "winston@latest",
       "dependencies": {
         "colors": {
           "version": "0.6.2",
-          "from": "colors@0.x.x"
+          "from": "colors@0.6.x"
         },
         "cycle": {
           "version": "1.0.3",

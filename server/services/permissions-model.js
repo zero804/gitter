@@ -4,7 +4,7 @@
 var GitHubRepoService  = require('./github/github-repo-service');
 var GitHubOrgService   = require('./github/github-org-service');
 var assert             = require("assert");
-var winston            = require('winston');
+var winston            = require('../utils/winston');
 var Q                  = require('q');
 var userIsInRoom       = require('./user-in-room');
 
