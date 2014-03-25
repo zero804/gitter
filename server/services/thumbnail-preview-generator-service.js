@@ -8,7 +8,7 @@ var workerQueue = require('../utils/worker-queue');
 
 var queue = workerQueue.queue('generate-thumbnail', {}, function() {
   var persistence = require("./persistence-service");
-  var winston = require("winston");
+  var winston = require('../utils/winston');
   var image = require("../utils/image");
   var converterService = require("../utils/converter-service-client");
   var gridfs = require("../utils/gridfs");

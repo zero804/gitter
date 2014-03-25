@@ -4,7 +4,7 @@
 var GitHubOrgService = require('./github-org-service');
 var GitHubRepoService = require('./github-repo-service');
 var Q = require('q');
-var winston = require('winston');
+var winston = require('../../utils/winston');
 
 function validateOrgUri(user, uri) {
   var orgService = new GitHubOrgService(user);
