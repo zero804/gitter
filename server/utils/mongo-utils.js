@@ -1,7 +1,7 @@
 /* jshint node:true */
 "use strict";
 
-var winston = require("winston");
+var winston = require('./winston');
 var ObjectID = require('mongodb').ObjectID;
 
 function asObjectID(id) {

@@ -4,7 +4,7 @@
 var os         = require("os");
 var nconf      = require('../../utils/config');
 var mongoose   = require('mongoose');
-var winston    = require('winston');
+var winston    = require('../../utils/winston');
 var appVersion = require('../../web/appVersion');
 
 //TODO: remove

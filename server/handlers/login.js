@@ -3,7 +3,7 @@
 
 var middleware  = require('../web/middleware');
 var passport    = require('passport');
-var winston     = require('winston');
+var winston     = require('../utils/winston');
 var client      = require("../utils/redis").createClient();
 var lock        = require("redis-lock")(client);
 var oauth2      = require('../web/oauth2');

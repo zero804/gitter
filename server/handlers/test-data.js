@@ -15,7 +15,7 @@ if(!nconf.get('test:exposeDataForTestingPurposes')) {
   var oauthService = require('../services/oauth-service');
   var userConfirmationService = require('../services/user-confirmation-service');
   var persistence = require('../services/persistence-service');
-  var winston = require('winston');
+  var winston = require('../utils/winston');
   var child_process = require('child_process');
   var uuid = require('node-uuid');
 

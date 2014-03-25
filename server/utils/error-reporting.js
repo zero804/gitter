@@ -3,7 +3,7 @@
 
 var raven = require('raven');
 var nconf = require('./config');
-var winston = require('winston');
+var winston = require('./winston');
 
 if(!nconf.get('errorReporting:enabled')) {
   module.exports = function() { };

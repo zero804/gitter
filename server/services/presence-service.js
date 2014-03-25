@@ -3,7 +3,7 @@
 
 var redis = require("../utils/redis");
 var nconf = require("../utils/config");
-var winston = require('winston');
+var winston = require('../utils/winston');
 var events = require('events');
 var assert = require('assert');
 var Fiber = require('../utils/fiber');

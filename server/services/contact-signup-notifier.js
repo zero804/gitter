@@ -3,7 +3,7 @@
 
 var appEvents                 = require('../app-events');
 var contactService            = require('./contact-service');
-var winston                   = require('winston');
+var winston                   = require('../utils/winston');
 var _                         = require('underscore');
 var userService               = require('./user-service');
 var presenceService           = require('./presence-service');
