@@ -19,7 +19,6 @@ var Scripto = require('redis-scripto');
 var scriptManager = new Scripto(redisClient);
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/presence');
 
-
 var prefix = nconf.get('presence:prefix') + ':';
 
 var ACTIVE_USERS_KEY = prefix + 'active_u';
@@ -790,6 +789,7 @@ function validateUsers(callback) {
     if(userIds.length === 0) return callback();
 
     var userId = null;
+
     function recurseUserIds(err) {
       if(err && !err.rollback) {
         return callback(err);
@@ -800,6 +800,7 @@ function validateUsers(callback) {
       }
 
       if(!userId) {
+        winston.info('presence:validate:validating next batch');
         if(userIds.length === 0) {
           var total = Date.now() - start;
           winston.info('Presence.validateUsers GC took ' + total + 'ms');
@@ -807,6 +808,8 @@ function validateUsers(callback) {
         }
 
         userId = userIds.shift();
+      } else {
+        winston.info('presence:validate:revalidating batch');
       }
 
       validateUsersSubset([userId], recurseUserIds);
