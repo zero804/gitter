@@ -34,7 +34,7 @@ define([
     template: titleTemplate
   });
 
-  var FooterView = Backbone.View.extend({
+  var FooterView = Marionette.ItemView.extend({
     className: 'commit-popover-footer',
     template: footerTemplate,
     events: {
@@ -47,7 +47,7 @@ define([
       var roomRepo = getRoomRepo();
       var modelRepo = this.model.get('repo');
       var modelNumber = this.model.get('number');
-      var mentionText = (modelRepo === roomRepo) ? '#'+modelNumber : modelRepo+'#'+modelNumber;
+      var mentionText = (modelRepo === roomRepo) ? '#' + modelNumber : modelRepo + '#' + modelNumber;
       appEvents.trigger('input.append', mentionText);
       this.parentPopover.hide();
     }
@@ -60,10 +60,6 @@ define([
     } else {
       return '';
     }
-  }
-
-  function plaintextify($el) {
-    $el.replaceWith($el.text());
   }
 
   function createPopover(model, targetElement) {
