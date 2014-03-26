@@ -208,7 +208,7 @@ module.exports = {
 
       if(status >= 500) {
         // Send to sentry
-        errorReporting(err, { type: 'response', status: status, userId: userId });
+        errorReporting(err, { type: 'response', status: status, userId: userId, url: req.url, method: req.method });
         // Send to statsd
         statsService.event('client_error_5xx', { userId: userId });
 
