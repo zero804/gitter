@@ -1,3 +1,8 @@
+{{#if error}}
+<div class="trpChatBox">
+  Issue not found. It may not exist or you may not have access to it.
+</div>
+{{else}}
 <div class="trpChatAvatar">
   <span>
     <div class="trpDisplayPicture avatar-s" style="background-image: url({{user.avatar_url}});">
@@ -19,7 +24,7 @@
   <div style="float: right;
   margin-top: 5px;
   ">
-    <div class="trpDisplayPicture avatar-xxs" style="background-image: url({{assignee.avatar_url}}); vertical-align: middle"></div>
+  <div class="trpDisplayPicture avatar-xxs" style="background-image: url({{assignee.avatar_url}}); vertical-align: middle"></div>
     <span style="
     font-size: smaller;
     vertical-align: middle;
@@ -28,3 +33,5 @@
   </div>
   {{/if}}
 
+
+{{/if}}
