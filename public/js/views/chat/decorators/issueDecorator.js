@@ -76,33 +76,45 @@ define([
     });
   }
 
-  var queryIssues = [];
+  // Query issues has the form { issue: [callbacks] }
+  var queryIssues = {};
   var throttledQuery = _.throttle(function() {
-    if(!queryIssues.length) return;
+    var workingQueryIssues = queryIssues;
+    queryIssues = {};
 
-    // Better caching if sorted
-    queryIssues.sort(function(a, b) {
-      var sa = a.i;
-      var sb = b.i;
-      if(sa == sb) return 0;
-      return sa < sb ? -1 : 1;
-    });
+    var issues = Object.keys(workingQueryIssues);
+    if(!issues.length) return;
+
+    // Better chance of caching if sorted
+    issues.sort();
 
     $.ajax({
       url: '/api/private/issue-state',
-      data: queryIssues.map(function(r) { return { name: 'q', value: r.i }; }),
+      data: issues.map(function(r) { return { name: 'q', value: r }; }),
       success: function(states) {
-        for(var i = 0; i < queryIssues.length; i++) {
-          var state = states[i];
-          queryIssues[i].callback(state);
-        }
+        issues.forEach(function(issue, index) {
+          var state = states[index] || '';
+          var callbacks = workingQueryIssues[issue];
+
+          callbacks.forEach(function(callback) {
+            callback(state);
+          });
+        });
       }
     });
-    queryIssues = [];
   }, 100);
 
   function addIssue(repo, issueNumber, callback) {
-    queryIssues.push({ i: repo + '/' + issueNumber, callback: callback });
+    var issue = repo + '/' + issueNumber;
+
+    var callbacks = queryIssues[issue];
+    if(!callbacks) {
+      callbacks = [callback];
+      queryIssues[issue] = callbacks;
+    } else {
+      callbacks.push(callback);
+    }
+
     throttledQuery();
   }
 
@@ -132,9 +144,23 @@ define([
           }
         });
 
-        function showPopover(e) {
-          var model = new IssueModel({ repo: repo, number: issueNumber });
-          model.fetch({ data: { renderMarkdown: true } });
+        function getModel() {
+          var model = new IssueModel({
+            repo: repo,
+            number: issueNumber,
+            html_url: 'https://github.com/' + repo + '/issues/' + issueNumber
+          });
+
+          model.fetch({
+            data: { renderMarkdown: true },
+            error: function() {
+              model.set({ error: true });
+            }
+          });
+          return model;
+        }
+        function showPopover(e, model) {
+          if(!model) model = getModel();
 
           var popover = createPopover(model, e.target);
           popover.show();
@@ -142,8 +168,10 @@ define([
         }
 
         function showPopoverLater(e) {
+          var model = getModel();
+
           Popover.hoverTimeout(e, function() {
-            showPopover(e);
+            showPopover(e, model);
           });
         }
 
@@ -154,53 +182,6 @@ define([
           $issue.off('click', showPopover);
           $issue.off('mouseover', showPopoverLater);
         });
-
-        // if(!repo || !issueNumber) {
-        //   // this aint no issue I ever saw
-        //   plaintextify($issue);
-        //   return;
-        // }
-
-        // var url = '/api/private/gh/repos/'+repo+'/issues/'+issueNumber+'?renderMarkdown=true';
-
-        // $.get(url, function(issue) {
-
-        //   function showPopover(e) {
-        //     var popover = createPopover(model, e.target);
-        //     popover.show();
-        //     Popover.singleton(view, popover);
-        //   }
-
-        //   function showPopoverLater(e) {
-        //     Popover.hoverTimeout(e, function() {
-        //       var popover = createPopover(model, e.target);
-        //       popover.show();
-        //       Popover.singleton(view, popover);
-        //     });
-        //   }
-
-        //   // dont change the issue state colouring for the activity feed
-        //   if(!$issue.hasClass('open') && !$issue.hasClass('closed')) {
-        //     $issue.addClass(issue.state);
-        //   }
-
-        //   var model = new Backbone.Model(issue);
-        //   model.set('date', moment(issue.created_at).format("LLL"));
-        //   model.set('repo', repo);
-
-        //   $issue.on('click', showPopover);
-        //   $issue.on('mouseover', showPopoverLater);
-
-        //   view.addCleanup(function() {
-        //     $issue.off('click', showPopover);
-        //     $issue.off('mouseover', showPopoverLater);
-        //   });
-
-        // }).fail(function(error) {
-        //   if(error.status === 404) {
-        //     plaintextify($issue);
-        //   }
-        // });
       });
     }
   };
