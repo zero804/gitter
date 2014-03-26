@@ -5,7 +5,7 @@ var express        = require('express');
 var passport       = require('passport');
 var nconf          = require('../utils/config');
 var expressHbs     = require('express-hbs');
-var winston        = require('winston');
+var winston        = require('../utils/winston');
 var middleware     = require('./middleware');
 var fs             = require('fs');
 var os             = require('os');
@@ -229,7 +229,6 @@ module.exports = {
       } else if(status >= 400 && status < 500) {
         statsService.event('client_error_4xx', { userId: userId });
       }
-      console.log('STATUS: ', status);
       res.status(status);
 
       var responseType = req.accepts(['html', 'json']);

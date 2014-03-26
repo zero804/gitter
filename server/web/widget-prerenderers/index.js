@@ -4,7 +4,7 @@
 var nconf      = require('../../utils/config');
 var path       = require('path');
 var fs         = require('fs');
-var winston    = require('winston');
+var winston    = require('../../utils/winston');
 var syncHandlebars = require('handlebars');
 var SafeString = syncHandlebars.SafeString;
 

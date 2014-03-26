@@ -3,7 +3,7 @@
 "use strict";
 
 var mongoose = require("mongoose");
-var winston = require("winston");
+var winston = require('./winston');
 var fs = require("fs");
 
 /* private */
