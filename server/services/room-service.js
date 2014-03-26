@@ -1,7 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var winston            = require("winston");
+var winston            = require('../utils/winston');
 var ObjectID           = require('mongodb').ObjectID;
 var Q                  = require('q');
 var request            = require('request');

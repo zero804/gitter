@@ -3,7 +3,7 @@
 
 var redis = require("../utils/redis");
 var nconf = require("../utils/config");
-var winston = require('winston');
+var winston = require('../utils/winston');
 var events = require('events');
 var assert = require('assert');
 var Fiber = require('../utils/fiber');
@@ -18,7 +18,6 @@ var redisClient = redis.createClient();
 var Scripto = require('redis-scripto');
 var scriptManager = new Scripto(redisClient);
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/presence');
-
 
 var prefix = nconf.get('presence:prefix') + ':';
 
@@ -790,6 +789,7 @@ function validateUsers(callback) {
     if(userIds.length === 0) return callback();
 
     var userId = null;
+
     function recurseUserIds(err) {
       if(err && !err.rollback) {
         return callback(err);
@@ -800,6 +800,7 @@ function validateUsers(callback) {
       }
 
       if(!userId) {
+        winston.info('presence:validate:validating next batch');
         if(userIds.length === 0) {
           var total = Date.now() - start;
           winston.info('Presence.validateUsers GC took ' + total + 'ms');
@@ -807,6 +808,8 @@ function validateUsers(callback) {
         }
 
         userId = userIds.shift();
+      } else {
+        winston.info('presence:validate:revalidating batch');
       }
 
       validateUsersSubset([userId], recurseUserIds);

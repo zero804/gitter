@@ -259,11 +259,6 @@ module.exports = function( grunt ) {
       all: ['test/**/*.html']
     },
 
-    reload: {
-      port: 35729, // LR default
-      liveReload: true
-    },
-
     // default watch configuration
     watch: {
       less: {
@@ -343,30 +338,6 @@ module.exports = function( grunt ) {
           "public/bootstrap/css/trpHooks.css": "public/bootstrap/less/trpHooks.less",
           "public/bootstrap/css/gitter-login.css": "public/bootstrap/less/gitter-login.less"
         }
-      }
-    },
-
-    concat: {
-      options: {
-        separator: '\n'
-      },
-      fineuploader: {
-        src: ['output/client-libs/fine-uploader/client/js/header.js',
-                'output/client-libs/fine-uploader/client/js/util.js',
-                'output/client-libs/fine-uploader/client/js/features.js',
-                'output/client-libs/fine-uploader/client/js/promise.js',
-                'output/client-libs/fine-uploader/client/js/button.js',
-                'output/client-libs/fine-uploader/client/js/paste.js',
-                'output/client-libs/fine-uploader/client/js/uploader.basic.js',
-                "output/client-libs/fine-uploader/client/js/dnd.js",
-                "output/client-libs/fine-uploader/client/js/uploader.js",
-                "output/client-libs/fine-uploader/client/js/ajax.requester.js",
-                "output/client-libs/fine-uploader/client/js/deletefile.ajax.requester.js",
-                "output/client-libs/fine-uploader/client/js/window.receive.message.js",
-                "output/client-libs/fine-uploader/client/js/handler.base.js",
-                "output/client-libs/fine-uploader/client/js/handler.form.js",
-                "output/client-libs/fine-uploader/client/js/handler.xhr.js"],
-        dest: 'output/client-libs/fine-uploader/fine-uploader.js-raw'
       }
     },
 
@@ -500,26 +471,33 @@ module.exports = function( grunt ) {
       }
 
 
+    },
+
+    retire: {
+      js: ['server/**/*.js'], /** Which js-files to scan. **/
+      node: ['.'], /** Which node directories to scan (containing package.json). **/
+      options: {
+         jsRepository: 'https://raw.github.com/bekk/retire.js/master/repository/jsrepository.json',
+         nodeRepository: 'https://raw.github.com/bekk/retire.js/master/repository/npmrepository.json'
+      }
     }
+
   });
 
   grunt.loadNpmTasks('grunt-contrib-requirejs');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-retire');
 
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-reload');
   grunt.loadNpmTasks('grunt-bower-require-wrapper');
   grunt.loadNpmTasks('grunt-wrap');
   grunt.loadNpmTasks('grunt-closure-compiler');
+  grunt.loadNpmTasks('grunt-nsp-shrinkwrap');
 
   grunt.registerTask('process', ['less', 'requirejs', 'closure-compiler']);
   grunt.registerTask('process-no-min', ['less', 'requirejs']);
 
-  grunt.registerTask('watchr', 'reload watch');
-  grunt.registerTask('client-libs', ['concat:fineuploader',
-                              'bowerRequireWrapper'
-                              ]);
+  grunt.registerTask('client-libs', ['bowerRequireWrapper']);
 
 
 };

@@ -1,7 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var winston = require('winston');
+var winston = require('../../utils/winston');
 var pushNotificationService = require('../../services/push-notification-service');
 
 module.exports = {
