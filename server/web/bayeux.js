@@ -451,7 +451,7 @@ var pushOnlyServer = {
 };
 
 var pingResponder = {
-  incoming: function(message, callback) {
+  incoming: function(message, req, callback) {
     // Only ping if data is {}
     if (message.channel != '/api/v1/ping2') {
       return callback(message);
@@ -459,17 +459,25 @@ var pingResponder = {
 
     function deny(err) {
       statsService.eventHF('bayeux.ping.deny');
+      var referer = req && req.headers && req.headers.referer;
+      var origin = req && req.headers && req.headers.origin;
+      var connection = req && req.headers && req.headers.connection;
 
       message.error = '403::Access denied';
-      winston.error('Denying ping access' + err);
+      winston.error('Denying ping access: ' + err, { referer: referer, origin: origin, connection: connection });
+
       callback(message);
     }
 
     var clientId = message.clientId;
 
+    if(!clientId) {
+      return deny("Client does not exist, clientId=null");
+    }
+
     server._server._engine.clientExists(clientId, function(exists) {
       if(!exists) {
-        return deny("Client does not exist", { clientId: clientId });
+        return deny("Client does not exist, clientId=" + clientId);
       }
 
       presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
