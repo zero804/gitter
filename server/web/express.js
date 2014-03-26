@@ -229,7 +229,6 @@ module.exports = {
       } else if(status >= 400 && status < 500) {
         statsService.event('client_error_4xx', { userId: userId });
       }
-      console.log('STATUS: ', status);
       res.status(status);
 
       var responseType = req.accepts(['html', 'json']);

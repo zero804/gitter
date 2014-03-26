@@ -36,6 +36,10 @@ module.exports = {
         auth,
         require('./irc-token.js'));
 
+    app.get('/api/private/issue-state',
+        auth,
+        require('./issue-state.js'));
+
     app.get('/api/private/validate-token',
         require('./validate-token.js'));
 

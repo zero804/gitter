@@ -264,7 +264,7 @@ define([
 
     client.publish('/api/v1/ping2', { })
       .then(function() {
-        log('Server ping succeeded');
+        // log('Server ping succeeded');
       }, function(error) {
         log('Unable to ping server', error);
         // We could reinstate the persistant outage concept on this

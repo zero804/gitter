@@ -3,44 +3,51 @@
 define([
   'jquery',
   'backbone',
+  'marionette',
+  'underscore',
   'utils/context',
   'utils/appevents',
   'views/popover',
   'hbs!./tmpl/issuePopover',
   'hbs!./tmpl/issuePopoverTitle',
   'hbs!./tmpl/commitPopoverFooter'
-], function($, Backbone, context, appEvents, Popover, bodyTemplate, titleTemplate, footerTemplate) {
+], function($, Backbone, Marionette, _, context, appEvents, Popover, bodyTemplate, titleTemplate, footerTemplate) {
   "use strict";
 
-  var BodyView = Backbone.View.extend({
+  var BodyView = Marionette.ItemView.extend({
     className: 'issue-popover-body',
-    render: function() {
-      this.$el.html(bodyTemplate(this.model.attributes));
-      return this;
+    template: bodyTemplate,
+    modelEvents: {
+      change: 'render'
+    },
+    serializeData: function() {
+      var data = this.model.toJSON();
+      data.date = moment(data.created_at).format("LLL");
+      return data;
     }
   });
 
-  var TitleView = Backbone.View.extend({
-    render: function() {
-      this.$el.html(titleTemplate(this.model.attributes));
-      return this;
-    }
+  var TitleView = Marionette.ItemView.extend({
+    modelEvents: {
+      change: 'render'
+    },
+    template: titleTemplate
   });
 
-  var FooterView = Backbone.View.extend({
+  var FooterView = Marionette.ItemView.extend({
     className: 'commit-popover-footer',
+    template: footerTemplate,
     events: {
       'click button.mention': 'onMentionClick'
     },
-    render: function() {
-      this.$el.html(footerTemplate(this.model.attributes));
-      return this;
+    modelEvents: {
+      change: 'render'
     },
     onMentionClick: function() {
       var roomRepo = getRoomRepo();
       var modelRepo = this.model.get('repo');
       var modelNumber = this.model.get('number');
-      var mentionText = (modelRepo === roomRepo) ? '#'+modelNumber : modelRepo+'#'+modelNumber;
+      var mentionText = (modelRepo === roomRepo) ? '#' + modelNumber : modelRepo + '#' + modelNumber;
       appEvents.trigger('input.append', mentionText);
       this.parentPopover.hide();
     }
@@ -55,19 +62,65 @@ define([
     }
   }
 
-  function plaintextify($el) {
-    $el.replaceWith($el.text());
-  }
-
   function createPopover(model, targetElement) {
     return new Popover({
-      titleView: new TitleView({model: model}),
-      view: new BodyView({model: model}),
-      footerView: new FooterView({model: model}),
+      titleView: new TitleView({ model: model }),
+      view: new BodyView({ model: model }),
+      footerView: new FooterView({ model: model }),
       targetElement: targetElement,
       placement: 'horizontal'
     });
   }
+
+  // Query issues has the form { issue: [callbacks] }
+  var queryIssues = {};
+  var throttledQuery = _.throttle(function() {
+    var workingQueryIssues = queryIssues;
+    queryIssues = {};
+
+    var issues = Object.keys(workingQueryIssues);
+    if(!issues.length) return;
+
+    // Better chance of caching if sorted
+    issues.sort();
+
+    $.ajax({
+      url: '/api/private/issue-state',
+      data: issues.map(function(r) { return { name: 'q', value: r }; }),
+      success: function(states) {
+        issues.forEach(function(issue, index) {
+          var state = states[index] || '';
+          var callbacks = workingQueryIssues[issue];
+
+          callbacks.forEach(function(callback) {
+            callback(state);
+          });
+        });
+      }
+    });
+  }, 100, { leading: false });
+
+  function addIssue(repo, issueNumber, callback) {
+    var issue = repo + '/' + issueNumber;
+
+    var callbacks = queryIssues[issue];
+    if(!callbacks) {
+      callbacks = [callback];
+      queryIssues[issue] = callbacks;
+    } else {
+      callbacks.push(callback);
+    }
+
+    throttledQuery();
+  }
+
+  var IssueModel = Backbone.Model.extend({
+    idAttribute: "number",
+    urlRoot: function() {
+      var repo = this.get('repo');
+      return '/api/private/gh/repos/' + repo + '/issues/';
+    }
+  });
 
   var decorator = {
 
@@ -80,51 +133,50 @@ define([
         var repo = $issue.data('issueRepo') || roomRepo;
         var issueNumber = $issue.data('issue');
 
-        if(!repo || !issueNumber) {
-          // this aint no issue I ever saw
-          plaintextify($issue);
-          return;
-        }
-
-        var url = '/api/private/gh/repos/'+repo+'/issues/'+issueNumber+'?renderMarkdown=true';
-
-        $.get(url, function(issue) {
-
-          function showPopover(e) {
-            var popover = createPopover(model, e.target);
-            popover.show();
-            Popover.singleton(view, popover);
-          }
-
-          function showPopoverLater(e) {
-            Popover.hoverTimeout(e, function() {
-              var popover = createPopover(model, e.target);
-              popover.show();
-              Popover.singleton(view, popover);
-            });
-          }
-
+        addIssue(repo, issueNumber, function(state) {
           // dont change the issue state colouring for the activity feed
           if(!$issue.hasClass('open') && !$issue.hasClass('closed')) {
-            $issue.addClass(issue.state);
+            $issue.addClass(state);
           }
+        });
 
-          var model = new Backbone.Model(issue);
-          model.set('date', moment(issue.created_at).format("LLL"));
-          model.set('repo', repo);
-
-          $issue.on('click', showPopover);
-          $issue.on('mouseover', showPopoverLater);
-
-          view.addCleanup(function() {
-            $issue.off('click', showPopover);
-            $issue.off('mouseover', showPopoverLater);
+        function getModel() {
+          var model = new IssueModel({
+            repo: repo,
+            number: issueNumber,
+            html_url: 'https://github.com/' + repo + '/issues/' + issueNumber
           });
 
-        }).fail(function(error) {
-          if(error.status === 404) {
-            plaintextify($issue);
-          }
+          model.fetch({
+            data: { renderMarkdown: true },
+            error: function() {
+              model.set({ error: true });
+            }
+          });
+          return model;
+        }
+        function showPopover(e, model) {
+          if(!model) model = getModel();
+
+          var popover = createPopover(model, e.target);
+          popover.show();
+          Popover.singleton(view, popover);
+        }
+
+        function showPopoverLater(e) {
+          var model = getModel();
+
+          Popover.hoverTimeout(e, function() {
+            showPopover(e, model);
+          });
+        }
+
+        $issue.on('click', showPopover);
+        $issue.on('mouseover', showPopoverLater);
+
+        view.addCleanup(function() {
+          $issue.off('click', showPopover);
+          $issue.off('mouseover', showPopoverLater);
         });
       });
     }
