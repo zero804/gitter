@@ -102,7 +102,7 @@ define([
         });
       }
     });
-  }, 100);
+  }, 100, { leading: false });
 
   function addIssue(repo, issueNumber, callback) {
     var issue = repo + '/' + issueNumber;
