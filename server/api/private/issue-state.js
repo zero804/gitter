@@ -5,6 +5,9 @@ var Q = require('q');
 
 var GithubIssueStateService = require('../../services/github/github-issue-state-service');
 
+var EXPIRES_SECONDS = 180;
+var EXPIRES_MILLISECONDS = 180 * 1000;
+
 module.exports =  function(req, res, next) {
   var issues = req.query.q;
 
@@ -18,6 +21,9 @@ module.exports =  function(req, res, next) {
 
     return service.getIssueState(parts[0] + '/' + parts[1], parts[2]);
   })).then(function(results) {
+    res.setHeader('Cache-Control', 'public, max-age=' + EXPIRES_SECONDS);
+    res.setHeader('Expires', new Date(Date.now() + EXPIRES_MILLISECONDS).toUTCString());
+
     res.send(results);
   }).fail(next);
 
