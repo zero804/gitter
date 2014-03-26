@@ -2,7 +2,7 @@
 "use strict";
 
 var Q = require('q');
-
+var winston = require('../../utils/winston');
 var GithubIssueStateService = require('../../services/github/github-issue-state-service');
 
 var EXPIRES_SECONDS = 180;
@@ -19,7 +19,15 @@ module.exports =  function(req, res, next) {
     var parts = issue.split('/');
     if(parts.length !== 3) return '';
 
-    return service.getIssueState(parts[0] + '/' + parts[1], parts[2]);
+    return service.getIssueState(parts[0] + '/' + parts[1], parts[2])
+      .fail(function(err) {
+
+        winston.warn('Unable to obtain issue state for ' +
+            parts[0] + '/' + parts[1] + '#' +parts[2] + ': ' + err,
+            { exception: err });
+
+        return '';
+      });
   })).then(function(results) {
     res.setHeader('Cache-Control', 'public, max-age=' + EXPIRES_SECONDS);
     res.setHeader('Expires', new Date(Date.now() + EXPIRES_MILLISECONDS).toUTCString());
