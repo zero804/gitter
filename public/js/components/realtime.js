@@ -85,6 +85,15 @@ define([
     callback(message);
   };
 
+  var ErrorLogger = function() {};
+  ErrorLogger.prototype.incoming = function(message, callback) {
+    if(message.error) {
+      log('Bayeux error', message);
+    }
+
+    callback(message);
+  };
+
   var ClientAuth = function() {};
   ClientAuth.prototype.outgoing = function(message, callback) {
     if(message.channel == '/meta/handshake') {
@@ -202,6 +211,7 @@ define([
     client.addExtension(new ClientAuth());
     client.addExtension(snapshotExtension);
     client.addExtension(new AccessTokenFailureExtension());
+    client.addExtension(new ErrorLogger());
 
     var userSubscription;
 
