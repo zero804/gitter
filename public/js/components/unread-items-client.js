@@ -238,10 +238,6 @@ define([
         } else if(message.notification === 'unread_items_removed') {
           var items = message.items;
           store._unreadItemsRemoved(items);
-
-          // _iteratePreload(items, function(itemType, itemId) {
-          //   this.trigger('unreadItemRemoved', itemType, itemId);
-          // }, self);
         }
       });
 
@@ -473,14 +469,12 @@ define([
     throw new Error("Unable to create an unread items store without a user");
   }
 
-
   var acrossTheFoldModel = new Backbone.Model({
     defaults: {
       unreadAbove: 0,
       unreadBelow: 0
     }
   });
-
 
   var unreadItemsClient = {
     acrossTheFold: function() {

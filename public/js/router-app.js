@@ -12,6 +12,7 @@ require([
   'views/createRoom/createRoomView',
   'views/createRoom/createRepoRoomView',
   'views/createRoom/chooseRoomView',
+  'log!router-app',
   'views/widgets/preload',                // No ref
   'components/webNotifications',          // No ref
   'components/desktopNotifications',      // No ref
@@ -20,7 +21,7 @@ require([
   'components/csrf',                      // No ref
   'components/ajax-errors'                // No ref
 ], function(appEvents, context, Backbone, _, AppIntegratedView, TroupeMenuView, troupeCollections,
-  TitlebarUpdater, realtime, createRoomView, createRepoRoomView, chooseRoomView) {
+  TitlebarUpdater, realtime, createRoomView, createRepoRoomView, chooseRoomView, log) {
   "use strict";
 
   var chatIFrame = document.getElementById('content-frame');
@@ -90,12 +91,34 @@ require([
         context.setTroupeId(message.troupeId);
         titlebarUpdater.setRoomName(message.name);
         break;
+
       case 'navigation':
         appEvents.trigger('navigation', message.url, message.urlType, message.title);
         break;
+
       case 'route':
         window.location.hash = '#' + message.hash;
         break;
+
+      case 'unreadItemsCount':
+        var count = e.data.count;
+        var troupeId = e.data.troupeId;
+        if(troupeId !== context.getTroupeId()) {
+          log('warning: troupeId mismatch in unreadItemsCount');
+        }
+        var v = {
+          unreadItems: count
+        };
+
+        if(count === 0) {
+          // If there are no unread items, there can't be unread mentions
+          // either
+          v.mentions = 0;
+        }
+
+        allRoomsCollection.patch(troupeId, v);
+        break;
+
       case 'realtime.testConnection':
         realtime.testConnection();
         break;

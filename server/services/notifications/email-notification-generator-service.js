@@ -142,6 +142,20 @@ function sendEmailNotifications(since) {
         ]);
     })
     .spread(function(userIds, users, allTroupes, userTroupeUnreadHash) {
+      if(!userIds.length) return [userIds, [], [], {}];
+
+      /* Remove anyone that we don't have a token for */
+      users = users.filter(function(user) {
+        return user.hasGitHubScope('user:email');
+      });
+
+      userIds = users.map(function(user) { return user.id; });
+
+      winston.verbose('email-notify: After removing users without the correct token: ' + userIds.length);
+
+      return [userIds, users, allTroupes, userTroupeUnreadHash];
+    })
+    .spread(function(userIds, users, allTroupes, userTroupeUnreadHash) {
       if(!userIds.length) return;
 
       /**

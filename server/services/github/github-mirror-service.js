@@ -53,6 +53,10 @@ module.exports = function(tokenPriority) {
     request(options, d.makeNodeResolver());
 
     return d.promise.spread(function(response, body) {
+      if(response.statusCode >= 400) {
+        throw response.statusCode;
+      }
+
       if(response.statusCode !== 200) {
         return response.statusCode;
       } else {
