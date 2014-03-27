@@ -157,7 +157,7 @@ define([
 
   try {
     document.domain = context.env('domain');
-  } try(e) {
+  } catch(e) {
   }
 
   return context;
