@@ -6,7 +6,7 @@ var userService = require('../../../services/user-service');
 var winston     = require('../../../utils/winston');
 var url         = require('url');
 module.exports = function(req, res, next) {
-  if(!req.user) return next(403);
+  if(!req.user) return next(401);
 
   var githubUri = url.format({ pathname: 'search/users', query: req.query });
 
