@@ -155,6 +155,11 @@ define([
     }
   };
 
+  try {
+    document.domain = context.env('domain');
+  } try(e) {
+  }
+
   return context;
 
 });
