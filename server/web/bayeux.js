@@ -183,6 +183,7 @@ var authenticator = {
 
       message.error = '403::Access denied';
       winston.error('Denying client access', message);
+
       callback(message);
     }
 
@@ -563,7 +564,9 @@ var adviseAdjuster = {
   outgoing: function(message, req, callback) {
     if(message.error && message.error.indexOf("403") === 0) {
       if(!message.advice) {
-        message.advice = {};
+        message.advice = {
+          interval: 2000
+        };
       }
 
       if(message.channel == '/meta/handshake') {
