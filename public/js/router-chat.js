@@ -92,6 +92,10 @@ require([
     postMessage({ type: "realtime.testConnection" });
   });
 
+  appEvents.on('unreadItemsCount', function(newCount) {
+    postMessage({ type: "unreadItemsCount", count: newCount, troupeId: context.getTroupeId() });
+  });
+
   var appView = new ChatIntegratedView({ el: 'body' });
   new RightToolbarView({ el: "#toolbar-frame" });
 

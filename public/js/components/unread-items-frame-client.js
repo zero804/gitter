@@ -9,7 +9,7 @@ define([
   "use strict";
 
   function limit(fn, context, timeout) {
-    return _.debounce(_.bind(fn, context), timeout || 30);
+    return _.throttle(_.bind(fn, context), timeout || 30, { leading: false });
   }
 
   // -----------------------------------------------------
@@ -20,7 +20,6 @@ define([
   var TroupeCollectionRealtimeSync = function(troupeCollection) {
     this._collection = troupeCollection;
   };
-
 
   TroupeCollectionRealtimeSync.prototype = {
     _subscribe: function() {
@@ -37,8 +36,14 @@ define([
     },
 
     _handleIncomingMessage: function(message) {
+      log('Handling troupe_unread: ' + message.troupeId + ': ' + message.totalUnreadItems);
       var troupeId = message.troupeId;
       var totalUnreadItems = message.totalUnreadItems;
+
+      var currentTroupeId = context.getTroupeId();
+      if(troupeId === currentTroupeId) {
+        log('Ignoring troupe_unread for current room');
+      }
 
       var v = {
         unreadItems: totalUnreadItems
@@ -54,6 +59,8 @@ define([
     },
 
     _handleIncomingMention: function(message) {
+      log('Handling troupe_mention: ' + message.troupeId + ': ' + message.mentions);
+
       var troupeId = message.troupeId;
       var mentions = message.mentions;
 
@@ -77,12 +84,7 @@ define([
     context.troupe().on('change:id', _.bind(this._recount, this));
 
     this._recountLimited = limit(this._recount, this, 50);
-    this._collection.on('change:unreadItems', this._recountLimited);
-    this._collection.on('reset', this._recountLimited);
-    this._collection.on('sync', this._recountLimited);
-    this._collection.on('add', this._recountLimited);
-    this._collection.on('remove', this._recountLimited);
-    this._collection.on('destroy', this._recountLimited);
+    this._collection.on('change:unreadItems reset sync add remove destroy', this._recountLimited, this);
 
     this._recountLimited();
   };
@@ -101,8 +103,6 @@ define([
       var c = this._collection;
 
       var newTroupeUnreadTotal = c.reduce(count, 0);
-      var newPplTroupeUnreadTotal = c.filter(function(trp) { return trp.get('oneToOne'); }).reduce(count, 0);
-      var newNormalTroupeUnreadTotal = c.filter(function(trp) { return !trp.get('oneToOne'); }).reduce(count, 0);
 
       var currentUnreadTotal;
       var currentTroupeId = context.getTroupeId();
@@ -112,14 +112,22 @@ define([
         currentUnreadTotal = 0;
       }
 
-      var counts = {
-        overall: newTroupeUnreadTotal,
-        oneToOne: newPplTroupeUnreadTotal,
-        normal: newNormalTroupeUnreadTotal,
-        current: currentUnreadTotal
-      };
+      if(this._troupeUnreadTotal !== newTroupeUnreadTotal ||
+          this._currentUnreadTotal != currentUnreadTotal) {
 
-      appEvents.trigger('troupeUnreadTotalChange', counts);
+        this._troupeUnreadTotal = newTroupeUnreadTotal;
+        this._currentUnreadTotal = currentUnreadTotal;
+
+        var counts = {
+          overall: newTroupeUnreadTotal,
+          current: currentUnreadTotal
+        };
+
+        log('troupeUnreadTotalChange', counts);
+
+        appEvents.trigger('troupeUnreadTotalChange', counts);
+      }
+
     }
 
   };
