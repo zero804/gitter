@@ -85,6 +85,15 @@ define([
     callback(message);
   };
 
+  var ErrorLogger = function() {};
+  ErrorLogger.prototype.incoming = function(message, callback) {
+    if(message.error) {
+      log('Bayeux error', message);
+    }
+
+    callback(message);
+  };
+
   var ClientAuth = function() {};
   ClientAuth.prototype.outgoing = function(message, callback) {
     if(message.channel == '/meta/handshake') {
@@ -202,6 +211,7 @@ define([
     client.addExtension(new ClientAuth());
     client.addExtension(snapshotExtension);
     client.addExtension(new AccessTokenFailureExtension());
+    client.addExtension(new ErrorLogger());
 
     var userSubscription;
 
@@ -262,9 +272,11 @@ define([
 
     appEvents.trigger('realtime.testConnection');
 
+    log('Testing connection');
+
     client.publish('/api/v1/ping2', { })
       .then(function() {
-        // log('Server ping succeeded');
+        log('Server ping succeeded');
       }, function(error) {
         log('Unable to ping server', error);
         // We could reinstate the persistant outage concept on this

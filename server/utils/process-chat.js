@@ -116,7 +116,7 @@ module.exports = exports = function processChat(text) {
 
     } else {
       urls.push({ url: href });
-      return util.format('<a href="%s" rel="nofollow" target="_new" class="link">%s</a>', href, text);  
+      return util.format('<a href="%s" rel="nofollow" target="_blank" class="link">%s</a>', href, text);  
     }
   };
 

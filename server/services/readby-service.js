@@ -2,7 +2,6 @@
 "use strict";
 
 var RedisBatcher = require('../utils/redis-batcher').RedisBatcher;
-var Fiber = require('../utils/fiber');
 var persistence = require('./persistence-service');
 var assert = require('assert');
 var batcher = new RedisBatcher('readby', 0);
