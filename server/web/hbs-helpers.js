@@ -18,6 +18,7 @@ if(nconf.get("cdn:use")) {
 
 // This stuff never changes
 var troupeEnv = {
+  domain: nconf.get('web:domain'),
   baseServer: nconf.get('web:baseserver'),
   basePath: nconf.get('web:basepath'),
   homeUrl: nconf.get('web:homeurl'),
