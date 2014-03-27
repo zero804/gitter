@@ -28,7 +28,7 @@ define([
     decorate: function(chatItemView) {
 
       function clickMention(e) {
-        var username = dataset.get(e, 'screenName');
+        var username = dataset.get(e.target, 'screenName');
         if(!username) return;
 
         var popover = new UserPopoverView({

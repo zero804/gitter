@@ -33,10 +33,6 @@ module.exports = {
 
     var promises = [];
 
-    // if(updatedTroupe.hasOwnProperty('favourite')) {
-    //   promises.push(recentRoomService.updateFavourite(req.user.id, troupe.id, updatedTroupe.favourite));
-    // }
-
     if(updatedTroupe.autoConfigureHooks) {
       promises.push(roomService.applyAutoHooksForRepoRoom(req.user, troupe));
     }

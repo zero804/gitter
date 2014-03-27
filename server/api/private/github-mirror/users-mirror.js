@@ -5,7 +5,7 @@ var Mirror      = require("../../../services/github/github-mirror-service")('use
 var userService = require('../../../services/user-service');
 
 module.exports = function(req, res, next) {
-  if(!req.user) return next(403);
+  if(!req.user) return next(401);
 
   var githubUri = 'users/' + req.route.params[0];
   var mirror = new Mirror(req.user);
