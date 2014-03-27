@@ -183,6 +183,7 @@ var authenticator = {
 
       message.error = '403::Access denied';
       winston.error('Denying client access', message);
+
       callback(message);
     }
 
@@ -561,17 +562,24 @@ var logging = {
 
 var adviseAdjuster = {
   outgoing: function(message, req, callback) {
-    if(message.error && message.error.indexOf("403") === 0) {
-      if(!message.advice) {
-        message.advice = {};
+    var error = message.error;
+    if(error) {
+      if(error.indexOf("403") === 0 || error.indexOf("401") === 0) {
+        if(!message.advice) {
+          message.advice = { };
+        }
+
+        message.interval = 1000;
+
+        if(message.channel == '/meta/handshake') {
+          // If we're unable to handshake, the situation is dire
+          message.advice.reconnect = 'none';
+        } else {
+          message.advice.reconnect = 'handshake';
+        }
       }
 
-      if(message.channel == '/meta/handshake') {
-        // If we're unable to handshake, the situation is dire
-        message.advice.reconnect = 'none';
-      } else {
-        message.advice.reconnect = 'handshake';
-      }
+      winston.info('Bayeux error', message);
     }
 
     callback(message);
