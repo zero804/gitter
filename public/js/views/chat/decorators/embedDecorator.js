@@ -15,7 +15,7 @@ define([
             var $embed = $(document.createElement('div'));
             $embed.addClass('embed');
 
-            if(embed.site === 'GitHub Gists') {
+            if(embed.limitHeight) {
               $embed.addClass('embed-limited');
             }
             $embed.html(embed.html);
