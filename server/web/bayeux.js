@@ -461,8 +461,6 @@ var pingResponder = {
       return callback(message);
     }
 
-    console.log(message);
-
     function deny(err) {
       statsService.eventHF('bayeux.ping.deny');
       var referer = req && req.headers && req.headers.referer;
