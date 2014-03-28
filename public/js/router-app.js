@@ -89,6 +89,8 @@ require([
     }
 
     var message = JSON.parse(e.data);
+    log('Received message ', message);
+
     switch(message.type) {
       case 'context.troupeId':
         context.setTroupeId(message.troupeId);
