@@ -73,7 +73,6 @@ require([
     parent.postMessage(JSON.stringify(message), context.env('basePath'));
   }
 
-
   postMessage({ type: "context.troupeId", troupeId: context.getTroupeId(), name: context.troupe().get('name') });
 
   appEvents.on('navigation', function(url, type, title) {
@@ -84,12 +83,12 @@ require([
     postMessage({ type: "route", hash: hash });
   });
 
-  appEvents.on('realtime.testConnection', function() {
-    postMessage({ type: "realtime.testConnection" });
+  appEvents.on('realtime.testConnection', function(reason) {
+    postMessage({ type: "realtime.testConnection", reason: reason });
   });
 
   appEvents.on('realtime:newConnectionEstablished', function() {
-    postMessage({ type: "realtime.testConnection" });
+    postMessage({ type: "realtime.testConnection", reason: 'newConnection' });
   });
 
   appEvents.on('unreadItemsCount', function(newCount) {

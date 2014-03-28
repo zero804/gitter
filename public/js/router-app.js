@@ -83,9 +83,14 @@ require([
   });
 
   window.addEventListener('message', function(e) {
-    if(e.origin !== context.env('basePath')) return;
+    if(e.origin !== context.env('basePath')) {
+      log('Ignoring message from ' + e.origin);
+      return;
+    }
 
     var message = JSON.parse(e.data);
+    log('Received message ', message);
+
     switch(message.type) {
       case 'context.troupeId':
         context.setTroupeId(message.troupeId);
@@ -120,7 +125,8 @@ require([
         break;
 
       case 'realtime.testConnection':
-        realtime.testConnection();
+        var reason = message.reason;
+        realtime.testConnection('chat.' + reason);
         break;
     }
   });

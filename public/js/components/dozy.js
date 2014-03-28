@@ -1,8 +1,8 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'jquery',
+  'utils/appevents',
   'log!dozy'
-], function($, log) {
+], function(appEvents, log) {
   "use strict";
 
   var TIMEOUT = 120000;
@@ -18,7 +18,7 @@ define([
 
     if(sleepDetected) {
       log('Sleep detected!');
-      $(document).trigger('reawaken', time);
+      appEvents.trigger('reawaken', time);
     }
 
   }, TIMEOUT);

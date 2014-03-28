@@ -261,15 +261,18 @@ var authenticator = {
     var troupeId = parts[4] || undefined;
     var eyeballState = parseInt(parts[5], 10) || 0;
 
+    winston.info("bayeux: connection " + clientId + ' is associated to ' + userId, { troupeId: troupeId, client: client });
+
     // Get the presence service involved around about now
     presenceService.userSocketConnected(userId, clientId, connectionType, client, troupeId, eyeballState, function(err) {
+
       if(err) winston.error("bayeux: Presence service failed to record socket connection: " + err, { exception: err });
 
       message.ext.userId = userId;
 
-      if(troupeId) {
-        recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId);
-      }
+      // if(troupeId) {
+      //   recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId);
+      // }
 
       // If the troupeId was included, it means we've got a native
       // client and they'll be looking for a snapshot:
@@ -433,7 +436,7 @@ var pushOnlyServer = {
     }
 
     // Only ping if data is {}
-    if (message.channel == '/api/v1/ping2' && Object.keys(message.data).length === 0) {
+    if (message.channel == '/api/v1/ping2' && Object.keys(message.data).length < 2) {
       return callback(message);
     }
 
@@ -463,9 +466,10 @@ var pingResponder = {
       var referer = req && req.headers && req.headers.referer;
       var origin = req && req.headers && req.headers.origin;
       var connection = req && req.headers && req.headers.connection;
+      var reason = message.data && message.data.reason;
 
       message.error = '403::Access denied';
-      winston.error('Denying ping access: ' + err, { referer: referer, origin: origin, connection: connection });
+      winston.error('Denying ping access: ' + err, { referer: referer, origin: origin, connection: connection, pingReason: reason });
 
       callback(message);
     }

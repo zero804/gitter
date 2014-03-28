@@ -112,21 +112,14 @@ define([
         currentUnreadTotal = 0;
       }
 
-      if(this._troupeUnreadTotal !== newTroupeUnreadTotal ||
-          this._currentUnreadTotal != currentUnreadTotal) {
+      var counts = {
+        overall: newTroupeUnreadTotal,
+        current: currentUnreadTotal
+      };
 
-        this._troupeUnreadTotal = newTroupeUnreadTotal;
-        this._currentUnreadTotal = currentUnreadTotal;
+      log('troupeUnreadTotalChange', counts);
 
-        var counts = {
-          overall: newTroupeUnreadTotal,
-          current: currentUnreadTotal
-        };
-
-        log('troupeUnreadTotalChange', counts);
-
-        appEvents.trigger('troupeUnreadTotalChange', counts);
-      }
+      appEvents.trigger('troupeUnreadTotalChange', counts);
 
     }
 
