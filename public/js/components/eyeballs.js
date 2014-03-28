@@ -39,7 +39,7 @@ define([
         } else {
           // The connection is gone...
           log('Eyeballs returned 400. Realtime connection may be dead.');
-          realtime.testConnection();
+          realtime.testConnection('eyeballs_error');
         }
       }
     });

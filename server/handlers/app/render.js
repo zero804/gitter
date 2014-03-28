@@ -64,10 +64,18 @@ function renderChatPage(req, res, next) {
     contextGenerator.generateTroupeContext(req),
     restful.serializeChatsForTroupe(troupe.id, req.user.id, { limit: INITIAL_CHAT_COUNT })
     ]).spread(function(troupeContext, chats) {
+
+      var githubLink;
+
+      if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
+        githubLink = 'https://github.com/' + req.uriContext.uri;
+      }
+
       res.render('chat-template', {
         isRepo: troupe.githubType === 'REPO',
         appCache: getAppCache(req),
         bootScriptName: 'router-chat',
+        githubLink: githubLink,
         troupeName: req.uriContext.uri,
         troupeTopic: troupeContext.troupe.topic,
         troupeFavourite: troupeContext.troupe.favourite,

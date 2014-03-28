@@ -36,18 +36,27 @@ define(['jquery-iframely', 'utils/context'], function ($, context) {
     });
   }
 
+  function canBeLimitedByHeight(link) {
+    var shrinkableRels = ['app'];
+    return shrinkableRels.some(function(supportedRel) {
+      return link.rel.indexOf(supportedRel) > -1;
+    });
+  }
+
   function renderBestContent(iframelyData, cb) {
     var match;
+    var limitHeight;
     iframelyData.links.forEach(function(link) {
       if(!match && isIframelyLinkSupported(link)) {
         match = link;
+        limitHeight = canBeLimitedByHeight(link);
       }
     });
 
     if(!match) return cb(null);
 
     var $el = $.iframely.generateLinkElement(match, iframelyData);
-    cb({html: $el[0].outerHTML, site: iframelyData.meta.site});
+    cb({html: $el[0].outerHTML, limitHeight: limitHeight});
   }
 
   function fetch(provider, url, cb) {
