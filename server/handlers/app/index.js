@@ -6,6 +6,14 @@ var appRender         = require('./render');
 var appMiddleware     = require('./middleware');
 var recentRoomService = require('../../services/recent-room-service');
 
+function saveRoom(req) {
+  var userId = req.user && req.user.id;
+  var troupeId = req.uriContext && req.uriContext.troupe && req.uriContext.troupe.id;
+
+  if(userId && troupeId) {
+    recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId);
+  }
+}
 var chatFrameMiddlewarePipeline = [
   middleware.grantAccessForRememberMeTokenMiddleware,
   middleware.ensureLoggedIn(),
@@ -22,6 +30,7 @@ var chatFrameMiddlewarePipeline = [
     }
 
     if(req.isPhone) {
+      saveRoom(req);
       appRender.renderMobileChat(req, res, next);
     } else {
       appRender.renderMainFrame(req, res, next, 'chat');
@@ -35,13 +44,7 @@ var chatMiddlewarePipeline = [
   appMiddleware.uriContextResolverMiddleware,
   appMiddleware.isPhoneMiddleware,
   function(req, res, next) {
-    var userId = req.user.id;
-    var troupeId = req.uriContext && req.uriContext.troupe && req.uriContext.troupe.id;
-
-    if(troupeId) {
-      recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId);
-    }
-
+    saveRoom(req);
     appRender.renderChatPage(req, res, next);
   }
 ];
