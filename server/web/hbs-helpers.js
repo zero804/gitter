@@ -85,6 +85,7 @@ exports.bootScript = function(url, parameters) {
 };
 
 exports.isMobile = function(agent, options) {
+  if (!agent) return false;
   return ((agent.match(/ipad/i)) ? options.fn(this) : null);
 };
 
