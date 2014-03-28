@@ -1,9 +1,10 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var middleware      = require('../../web/middleware');
-var appRender       = require('./render');
-var appMiddleware   = require('./middleware');
+var middleware        = require('../../web/middleware');
+var appRender         = require('./render');
+var appMiddleware     = require('./middleware');
+var recentRoomService = require('../../services/recent-room-service');
 
 var chatFrameMiddlewarePipeline = [
   middleware.grantAccessForRememberMeTokenMiddleware,
@@ -34,6 +35,13 @@ var chatMiddlewarePipeline = [
   appMiddleware.uriContextResolverMiddleware,
   appMiddleware.isPhoneMiddleware,
   function(req, res, next) {
+    var userId = req.user.id;
+    var troupeId = req.uriContext && req.uriContext.troupe && req.uriContext.troupe.id;
+
+    if(troupeId) {
+      recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId);
+    }
+
     appRender.renderChatPage(req, res, next);
   }
 ];
