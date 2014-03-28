@@ -433,7 +433,7 @@ var pushOnlyServer = {
     }
 
     // Only ping if data is {}
-    if (message.channel == '/api/v1/ping2' && Object.keys(message.data).length === 0) {
+    if (message.channel == '/api/v1/ping2' && Object.keys(message.data).length < 2) {
       return callback(message);
     }
 
@@ -458,14 +458,17 @@ var pingResponder = {
       return callback(message);
     }
 
+    console.log(message);
+
     function deny(err) {
       statsService.eventHF('bayeux.ping.deny');
       var referer = req && req.headers && req.headers.referer;
       var origin = req && req.headers && req.headers.origin;
       var connection = req && req.headers && req.headers.connection;
+      var reason = message.data && message.data.reason;
 
       message.error = '403::Access denied';
-      winston.error('Denying ping access: ' + err, { referer: referer, origin: origin, connection: connection });
+      winston.error('Denying ping access: ' + err, { referer: referer, origin: origin, connection: connection, pingReason: reason });
 
       callback(message);
     }

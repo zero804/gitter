@@ -250,10 +250,9 @@ define([
     return client;
   }
 
-  $(document).on('reawaken', function() {
+  appEvents.on('reawaken', function() {
     log('Recycling connection after reawaken');
-
-    testConnection();
+    testConnection('reawaken');
   });
 
   // Cordova events.... doesn't matter if IE8 doesn't handle them
@@ -261,19 +260,19 @@ define([
     document.addEventListener("deviceReady", function() {
       document.addEventListener("online", function() {
         log('realtime: online');
-        testConnection();
+        testConnection('device_ready');
       }, false);
     }, false);
   }
 
   var pingResponseOutstanding = false;
 
-  function testConnection() {
+  function testConnection(reason) {
     /* Only test the connection if one has already been established */
     if(!client) return;
     if(pingResponseOutstanding) return;
 
-    appEvents.trigger('realtime.testConnection');
+    appEvents.trigger('realtime.testConnection', reason);
 
     log('Testing connection');
 
@@ -287,7 +286,7 @@ define([
       }
     }, 30000);
 
-    client.publish('/api/v1/ping2', { })
+    client.publish('/api/v1/ping2', { reason: reason })
       .then(function() {
         pingResponseOutstanding = false;
         log('Server ping succeeded');
