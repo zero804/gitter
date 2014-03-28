@@ -270,9 +270,9 @@ var authenticator = {
 
       message.ext.userId = userId;
 
-      if(troupeId) {
-        recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId);
-      }
+      // if(troupeId) {
+      //   recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId);
+      // }
 
       // If the troupeId was included, it means we've got a native
       // client and they'll be looking for a snapshot:
@@ -460,8 +460,6 @@ var pingResponder = {
     if (message.channel != '/api/v1/ping2') {
       return callback(message);
     }
-
-    console.log(message);
 
     function deny(err) {
       statsService.eventHF('bayeux.ping.deny');

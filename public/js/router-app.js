@@ -83,7 +83,10 @@ require([
   });
 
   window.addEventListener('message', function(e) {
-    if(e.origin !== context.env('basePath')) return;
+    if(e.origin !== context.env('basePath')) {
+      log('Ignoring message from ' + e.origin);
+      return;
+    }
 
     var message = JSON.parse(e.data);
     switch(message.type) {
