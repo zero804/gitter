@@ -1,30 +1,48 @@
-.service {
+.service-sprite {
   background: url( 'services.png' ) no-repeat;
-  background-size: 32px 32px;
+  background-size: 48px 48px;
 }
 
-.service.h-square {
+.service-sprite.huboard-logo {
   width: 16px;
   height: 16px;
   background-position: 0px 0px;
 }
 
-.service.smile-o {
+.service-sprite.jenkins-frown {
   width: 16px;
   height: 16px;
   background-position: -16px 0px;
 }
 
-.service.meh-o {
+.service-sprite.jenkins-logo {
   width: 16px;
   height: 16px;
   background-position: 0px -16px;
 }
 
-.service.frown-o {
+.service-sprite.jenkins-meh {
   width: 16px;
   height: 16px;
   background-position: -16px -16px;
+}
+
+.service-sprite.jenkins-smile {
+  width: 16px;
+  height: 16px;
+  background-position: -32px 0px;
+}
+
+.service-sprite.sprintly-logo {
+  width: 16px;
+  height: 16px;
+  background-position: -32px -16px;
+}
+
+.service-sprite.travis-logo {
+  width: 16px;
+  height: 16px;
+  background-position: 0px -32px;
 }
 
 
@@ -33,9 +51,9 @@
 (-o-min-device-pixel-ratio: 2/1),
 (-webkit-min-device-pixel-ratio: 2),
 (min-device-pixel-ratio: 2) {
-.service {
+.service-sprite {
   background: url( 'services@2x.png' ) no-repeat;
-  background-size: 32px 32px;
+  background-size: 48px 48px;
 }
 
 }
