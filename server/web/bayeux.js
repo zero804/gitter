@@ -270,9 +270,9 @@ var authenticator = {
 
       message.ext.userId = userId;
 
-      if(troupeId) {
-        recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId);
-      }
+      // if(troupeId) {
+      //   recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId);
+      // }
 
       // If the troupeId was included, it means we've got a native
       // client and they'll be looking for a snapshot:
