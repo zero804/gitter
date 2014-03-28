@@ -101,8 +101,8 @@ require([
         break;
 
       case 'unreadItemsCount':
-        var count = e.data.count;
-        var troupeId = e.data.troupeId;
+        var count = message.count;
+        var troupeId = message.troupeId;
         if(troupeId !== context.getTroupeId()) {
           log('warning: troupeId mismatch in unreadItemsCount');
         }
@@ -120,7 +120,8 @@ require([
         break;
 
       case 'realtime.testConnection':
-        realtime.testConnection();
+        var reason = message.reason;
+        realtime.testConnection('chat.' + reason);
         break;
     }
   });
