@@ -4,7 +4,6 @@ define([
   'utils/context',
   'marionette',
   'backbone',
-  // 'hbs!./tmpl/headerViewTemplate',
   'autolink',
   'components/notifications',
   'views/controls/dropdown'

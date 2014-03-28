@@ -155,10 +155,10 @@ define([
     }
   };
 
-  try {
-    document.domain = context.env('domain');
-  } catch(e) {
-  }
+  // try {
+  //   document.domain = context.env('domain');
+  // } catch(e) {
+  // }
 
   return context;
 
