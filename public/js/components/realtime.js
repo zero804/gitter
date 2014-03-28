@@ -266,18 +266,33 @@ define([
     }, false);
   }
 
+  var pingResponseOutstanding = false;
+
   function testConnection() {
     /* Only test the connection if one has already been established */
     if(!client) return;
+    if(pingResponseOutstanding) return;
 
     appEvents.trigger('realtime.testConnection');
 
     log('Testing connection');
 
+    pingResponseOutstanding = true;
+
+    /* Only hold back pings for 30s, then retry is neccessary */
+    setTimeout(function() {
+      if(pingResponseOutstanding) {
+        log('Ping response still outstanding, resetting.');
+        pingResponseOutstanding = false;
+      }
+    }, 30000);
+
     client.publish('/api/v1/ping2', { })
       .then(function() {
+        pingResponseOutstanding = false;
         log('Server ping succeeded');
       }, function(error) {
+        pingResponseOutstanding = false;
         log('Unable to ping server', error);
         // We could reinstate the persistant outage concept on this
       });
