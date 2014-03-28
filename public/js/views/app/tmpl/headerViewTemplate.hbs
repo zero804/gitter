@@ -10,6 +10,10 @@
         <i class="trpHeaderFavIcon unfavourited" width="24" height="24"></i>
       </div>
   </div>
-  <h1 id="name-label"><a href="http://github.com{{troupeUri}}" target="_blank">{{troupeName}}</a></h1>
+  {{#if githubLink}}
+  <h1 id="name-label"><a href="{{githubLink}}" target="_blank">{{troupeName}}</a></h1>
+  {{else}}
+  <h1 id="name-label">{{troupeName}}</h1>
+  {{/if}}
   <p id="trpTopic">{{#unless oneToOne}}{{troupeTopic}}{{/unless}}{{#oneToOne}}<a href="http://github.com{{troupeUri}}" target="github">github.com{{troupeUri}}</a>{{/oneToOne}}</p>
 </div>
