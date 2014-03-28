@@ -261,8 +261,11 @@ var authenticator = {
     var troupeId = parts[4] || undefined;
     var eyeballState = parseInt(parts[5], 10) || 0;
 
+    winston.info("bayeux: connection " + clientId + ' is associated to ' + userId, { troupeId: troupeId, client: client });
+
     // Get the presence service involved around about now
     presenceService.userSocketConnected(userId, clientId, connectionType, client, troupeId, eyeballState, function(err) {
+
       if(err) winston.error("bayeux: Presence service failed to record socket connection: " + err, { exception: err });
 
       message.ext.userId = userId;
