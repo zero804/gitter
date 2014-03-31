@@ -584,6 +584,19 @@ var adviseAdjuster = {
       }
 
       winston.info('Bayeux error', message);
+    } else {
+      if(message.channel === '/meta/handshake') {
+        // * Already know there is no error. Reset the advice
+        if(!message.advice) {
+          message.advice = {
+            reconnect: 'retry',
+            interval:  1000 * nconf.get('ws:fayeInterval'),
+            timeout:   1000 * nconf.get('ws:fayeTimeout')
+          };
+        }
+
+
+      }
     }
 
     callback(message);

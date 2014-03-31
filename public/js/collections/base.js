@@ -119,18 +119,35 @@ define([
     },
 
     addWaiter: function(id, callback, timeout) {
+      log('Waiting for id', id);
+
       if(!id) return;
 
       var self = this;
 
+      var actionPerformed = false;
+
       function done(model) {
+        log('Waitor completed with model', model);
+
         self.off('add', check, id);
         self.off('change:id', check, id);
-        callback.apply(self, [model]);
+
+        if(actionPerformed) {
+          log('Warning: waitor function called twice.');
+          return;
+        }
+        actionPerformed = true;
+
+        if(model) {
+          callback.apply(self, [model]);
+        } else {
+          callback.apply(self, []);
+        }
       }
 
       function check(model) {
-        if(model.id === id) {
+        if(model && model.id === id) {
           done(model);
         }
       }
@@ -247,7 +264,8 @@ define([
     // TODO: make this dude tighter
     applyUpdate: function(operation, existingModel, newAttributes, parsed, options) {
       if(this.operationIsUpToDate(operation, existingModel, newAttributes)) {
-        log('Performing patch', newAttributes);
+        log('Performing ' + operation, newAttributes);
+
         existingModel.set(parsed.attributes, options || {});
       } else {
         log('Ignoring out-of-date update', existingModel.toJSON(), newAttributes);
@@ -255,6 +273,8 @@ define([
     },
 
     patch: function(id, newModel, options) {
+      log('Request to patch ' + id + ' with ', newModel, options);
+
       var self = this;
 
       if(this.transformModel) newModel = this.transformModel(newModel);
