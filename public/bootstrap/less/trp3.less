@@ -1678,14 +1678,6 @@ i.favourited:hover:before {
     font-size: 11px;
   }
 
-  a {
-    color: #333;
-  }
-
-  a.link:hover {
-    color: @trpLightBlue;
-  }
-
  .trpMiniActions {
     display: none;
     @media @mid {
@@ -1940,6 +1932,16 @@ ul.roster {
   }
   .gtrActivityItemText {
     padding-left: 1.5em;
+  }
+  a:hover {
+    color: inherit;
+  }
+
+  &.error {
+    color: #e74c3c;
+    a {
+      color: red;
+    }
   }
 }
 
