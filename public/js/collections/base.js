@@ -119,6 +119,8 @@ define([
     },
 
     addWaiter: function(id, callback, timeout) {
+      log('Waiting for id', id);
+
       if(!id) return;
 
       var self = this;
@@ -126,6 +128,8 @@ define([
       var actionPerformed = false;
 
       function done(model) {
+        log('Waitor found model', model);
+
         self.off('add', check, id);
         self.off('change:id', check, id);
 
