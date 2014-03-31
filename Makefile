@@ -184,11 +184,11 @@ upgrade-data:
 	./scripts/upgrade-data.sh
 
 maintain-data:
-	MODIFY=true ./scripts/datamaintenance/execute.sh
+	MODIFY=true ./scripts/datamaintenance/execute.sh || true
 
 # Make a second target
 post-test-maintain-data:
-	MODIFY=true ./scripts/datamaintenance/execute.sh
+	MODIFY=true ./scripts/datamaintenance/execute.sh || true
 
 
 init-test-data:
