@@ -256,7 +256,7 @@ define([
     // TODO: make this dude tighter
     applyUpdate: function(operation, existingModel, newAttributes, parsed, options) {
       if(this.operationIsUpToDate(operation, existingModel, newAttributes)) {
-        log('Performing patch', newAttributes);
+        log('Performing ' + operation, newAttributes);
 
         existingModel.set(parsed.attributes, options || {});
       } else {
