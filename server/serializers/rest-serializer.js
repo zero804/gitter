@@ -653,6 +653,7 @@ function TroupeStrategy(options) {
       topic: item.topic,
       uri: item.uri,
       oneToOne: item.oneToOne,
+      userCount: item.users.length,
       users: options.mapUsers && !item.oneToOne ? item.users.map(function(troupeUser) { return userIdStategy.map(troupeUser.userId); }) : undefined,
       user: otherUser,
       unreadItems: unreadItemStategy ? unreadItemStategy.map(item.id) : undefined,
