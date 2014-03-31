@@ -9,6 +9,7 @@ define([
   var trackingId = context.env('googleTrackingId');
   var ga;
   var gosquared;
+  var gosquaredTracker;
 
   if(trackingId) {
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -27,6 +28,7 @@ define([
 
   if(goSquaredTrackingId) {
     gosquared = window.GoSquared = {};
+    gosquaredTracker = window._gs;
     gosquared.acct = goSquaredTrackingId;
 
     if (user.username)
@@ -54,8 +56,8 @@ define([
       window.mixpanel.track('pageView', { pageName: routeName });
     }
 
-    if(gosquared) {
-      gosquared('track');
+    if(gosquaredTracker) {
+      gosquaredTracker('track');
     }
 
     if(trackingId) {
