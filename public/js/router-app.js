@@ -29,6 +29,11 @@ require([
     chatIFrame.src = chatIFrame.src + window.location.hash;
   }
 
+  function pushState(state, title, url) {
+    window.history.pushState(state, title, url);
+    appEvents.trigger('track', url);
+  }
+
   var appView = new AppIntegratedView({ });
 
   appView.leftMenuRegion.show(new TroupeMenuView({ }));
@@ -60,10 +65,11 @@ require([
 
       titlebarUpdater.setRoomName(title);
 
-      window.history.pushState(newFrame, title, newLocation);
+      pushState(newFrame, title, newLocation);
       updateContent(newFrame);
     }
   });
+
 
   appEvents.on('navigation', function(url, type, title) {
     // This is a bit hacky..
@@ -73,14 +79,16 @@ require([
     var frameUrl = url + '/~' + type;
     titlebarUpdater.setRoomName(title);
 
-    window.history.pushState(frameUrl, title, url);
+    pushState(frameUrl, title, url);
     updateContent(frameUrl);
   });
 
   // Revert to a previously saved state
-  window.addEventListener('popstate', function(event) {
-    updateContent(event.state);
-  });
+  window.onpopstate = function(e) {
+    updateContent(e.state);
+    appEvents.trigger('track', window.location.pathname + window.location.hash);
+    return true;
+  };
 
   window.addEventListener('message', function(e) {
     if(e.origin !== context.env('basePath')) {
