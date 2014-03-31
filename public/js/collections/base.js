@@ -123,9 +123,18 @@ define([
 
       var self = this;
 
+      var actionPerformed = false;
+
       function done(model) {
         self.off('add', check, id);
         self.off('change:id', check, id);
+
+        if(actionPerformed) {
+          log('Warning: waitor function called twice.');
+          return;
+        }
+        actionPerformed = true;
+
         callback.apply(self, [model]);
       }
 
@@ -248,6 +257,7 @@ define([
     applyUpdate: function(operation, existingModel, newAttributes, parsed, options) {
       if(this.operationIsUpToDate(operation, existingModel, newAttributes)) {
         log('Performing patch', newAttributes);
+
         existingModel.set(parsed.attributes, options || {});
       } else {
         log('Ignoring out-of-date update', existingModel.toJSON(), newAttributes);
@@ -255,6 +265,11 @@ define([
     },
 
     patch: function(id, newModel, options) {
+      var c = window['cons' + 'ole'];
+      if(c) {
+        c.trace();
+      }
+
       var self = this;
 
       if(this.transformModel) newModel = this.transformModel(newModel);
