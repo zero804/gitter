@@ -156,8 +156,8 @@ define([
         done();
       }, timeout);
 
-      this.on('change', check, id);
       this.on('add', check, id);
+      this.on('change:id', check, id);
     },
 
     _onSync: function() {
