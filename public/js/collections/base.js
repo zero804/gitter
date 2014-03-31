@@ -275,11 +275,6 @@ define([
     patch: function(id, newModel, options) {
       log('Request to patch ' + id + ' with ', newModel, options);
 
-      var c = window['cons' + 'ole'];
-      if(c && c.trace) {
-        c.trace();
-      }
-
       var self = this;
 
       if(this.transformModel) newModel = this.transformModel(newModel);
