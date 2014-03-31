@@ -128,7 +128,7 @@ define([
       var actionPerformed = false;
 
       function done(model) {
-        log('Waitor found model', model);
+        log('Waitor completed with model', model);
 
         self.off('add', check, id);
         self.off('change:id', check, id);
@@ -139,11 +139,15 @@ define([
         }
         actionPerformed = true;
 
-        callback.apply(self, [model]);
+        if(model) {
+          callback.apply(self, [model]);
+        } else {
+          callback.apply(self, []);
+        }
       }
 
       function check(model) {
-        if(model.id === id) {
+        if(model && model.id === id) {
           done(model);
         }
       }
@@ -269,8 +273,10 @@ define([
     },
 
     patch: function(id, newModel, options) {
+      log('Request to patch ' + id + ' with ', newModel, options);
+
       var c = window['cons' + 'ole'];
-      if(c) {
+      if(c && c.trace) {
         c.trace();
       }
 
