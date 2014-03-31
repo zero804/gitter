@@ -175,10 +175,9 @@ version-files:
 	echo $(GIT_COMMIT) > GIT_COMMIT
 	echo $(GIT_BRANCH) > VERSION
 
-test-reinit-data: maintain-data init-test-data test post-test-maintain-data
+test-reinit-data: maintain-data test post-test-maintain-data
 
-reset-test-data: maintain-data init-test-data
-
+reset-test-data: maintain-data
 
 upgrade-data:
 	./scripts/upgrade-data.sh
@@ -189,10 +188,6 @@ maintain-data:
 # Make a second target
 post-test-maintain-data:
 	MODIFY=true ./scripts/datamaintenance/execute.sh || true
-
-
-init-test-data:
-	./scripts/dataupgrades/005-test-users/001-update.sh
 
 tarball:
 	mkdir -p output
