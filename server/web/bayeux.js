@@ -400,6 +400,8 @@ var authorisor = {
 
     var clientId = message.clientId;
 
+    if(!clientId) return callback('Cannot authorise. Client not authenticated');
+
     presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
       if(err) return callback(err);
 
