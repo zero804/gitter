@@ -59,17 +59,17 @@ module.exports = exports = function(request) {
       if(error) return callback(error, response, body);
       if(response.statusCode >= 400) return callback(error, response, body);
 
+      var remaining;
+
+      if(!response.headers.link) {
+        return callback(error, response, body);
+      }
+
       var firstPage;
       try {
         firstPage = JSON.parse(body);
       } catch(e) {
         return callback(e, response, body);
-      }
-
-      var remaining;
-
-      if(!response.headers.link) {
-        return callback(error, response, body);
       }
 
       var links = parseLinks(response.headers.link);
