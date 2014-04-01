@@ -621,7 +621,12 @@ var server = new faye.NodeAdapter({
 
 var client = server.getClient();
 
-//faye.Logging.logLevel = 'info';
+faye.logger = {};
+['fatal', 'error', 'warn'].forEach(function(level) {
+  faye.logger[level] = function(message) {
+    winston[level]('faye: ' + message);
+  };
+});
 
 module.exports = {
   server: server,
