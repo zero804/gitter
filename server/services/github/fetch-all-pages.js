@@ -35,7 +35,16 @@ module.exports = exports = function(request) {
 
     request(options, function (error, response, body) {
       if(error) return d.reject(error);
-      d.resolve(JSON.parse(body));
+      if(response.statusCode >= 400) return d.reject('HTTP ' + response.statusCode);
+
+      var bodyJson;
+      try {
+        bodyJson = JSON.parse(body);
+      } catch(e) {
+        return d.reject(e);
+      }
+
+      d.resolve(bodyJson);
     });
 
     return d.promise;
@@ -48,6 +57,14 @@ module.exports = exports = function(request) {
 
     request(options, function (error, response, body) {
       if(error) return callback(error, response, body);
+      if(response.statusCode >= 400) return callback(error, response, body);
+
+      var firstPage;
+      try {
+        firstPage = JSON.parse(body);
+      } catch(e) {
+        return callback(e, response, body);
+      }
 
       var remaining;
 
@@ -66,7 +83,7 @@ module.exports = exports = function(request) {
           winston.info('Fetching another ' + (lastPage - 1)  + ' pages of results');
 
           var promises = lazy.range(1, lastPage + 1).map(function(i) {
-              if(i == 1) return JSON.parse(body);
+              if(i == 1) return firstPage;
 
               var uri = url.parse(links.last, true);
               delete uri.search;
