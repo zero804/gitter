@@ -33,7 +33,7 @@ batcher.listen(function(key, userIdStrings, done) {
         winston.info('Weird. No chat message found');
       } else {
 
-        appEvents.dataChange2("/troupes/" + troupeId + "/chatMessages", 'patch', {
+        appEvents.dataChange2("/rooms/" + troupeId + "/chatMessages", 'patch', {
           id: "" + chatId,
           readBy: chat.readBy.length,
           v: chat._tv ? 0 + chat._tv : undefined
@@ -41,7 +41,7 @@ batcher.listen(function(key, userIdStrings, done) {
 
         // Its too operationally expensive to serialise the full user object
         userIds.forEach(function(userId) {
-          appEvents.dataChange2("/troupes/" + troupeId + "/chatMessages/" + chatId + '/readBy', 'create', {
+          appEvents.dataChange2("/rooms/" + troupeId + "/chatMessages/" + chatId + '/readBy', 'create', {
             id: userId
           });
         });

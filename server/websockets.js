@@ -6,33 +6,18 @@ var nconf      = require('./utils/config');
 var winston    = require('./utils/winston');
 var shutdown   = require('./utils/shutdown');
 var bayeux     = require('./web/bayeux');
-var redis      = require('./utils/redis');
 var appVersion = require('./web/appVersion');
 var domainWrapper = require('./utils/domain-wrapper');
+var http       = require('http');
 
 require('./utils/diagnostics');
-
-function getHttp() {
-  var http = require('http');
-  var amazonProxyProtocol = nconf.get("ws:amazonProxyProtocol");
-  if(amazonProxyProtocol) {
-    return require('proxywrap').proxy(http);
-  } else {
-    return http;
-  }
-}
 
 winston.info("Starting http/ws service");
 
 var app = express();
-var server = getHttp().createServer(domainWrapper(app));
+var server = http.createServer(domainWrapper(app));
 
-var RedisStore = require('connect-redis')(express);
-var sessionStore = new RedisStore({
-  client: redis.createClient()
-});
-
-require('./web/express').installSocket(app, server, sessionStore);
+require('./web/express').installSocket(app);
 
 require('./web/passport').install();
 

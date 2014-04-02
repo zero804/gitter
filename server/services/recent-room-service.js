@@ -73,11 +73,11 @@ function removeRecentRoomForUser(userId, troupe) {
           return troupeService.removeUserFromTroupe(troupeId, userId);
         } else {
           // TODO: in future get rid of this but this collection is used by the native clients
-          appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: null, lastAccessTime: null, mentions: 0, unreadItems: 0 });
+          appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, favourite: null, lastAccessTime: null, mentions: 0, unreadItems: 0 });
         }
       } else {
         // Must be a mention
-        appEvents.dataChange2('/user/' + userId + '/troupes', 'remove', { id: troupeId });
+        appEvents.dataChange2('/user/' + userId + '/rooms', 'remove', { id: troupeId });
       }
 
     });
@@ -197,7 +197,7 @@ function updateFavourite(userId, troupeId, favouritePosition) {
     winston.verbose('recent-rooms: position is now: ' + position);
 
     // TODO: in future get rid of this but this collection is used by the native clients
-    appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: position });
+    appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, favourite: position });
   });
 
 }
@@ -276,7 +276,7 @@ function saveLastVisitedTroupeforUserId(userId, troupeId, callback) {
     .then(function() {
       // XXX: lastAccessTime should be a date but for some bizarre reason it's not
       // serializing properly
-      appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() });
+      appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() });
     })
     .nodeify(callback);
 }

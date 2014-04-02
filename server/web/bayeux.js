@@ -12,25 +12,26 @@ var nconf             = require('../utils/config');
 var shutdown          = require('../utils/shutdown');
 var contextGenerator  = require('./context-generator');
 var appVersion        = require('./appVersion');
-var recentRoomService = require('../services/recent-room-service');
 var statsService      = require('../services/stats-service');
+var mongoUtils        = require('../utils/mongo-utils');
+var StatusError       = require('statuserror');
 
 var appTag = appVersion.getAppTag();
 
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
-  { re: /^\/api\/v1\/troupes\/(\w+)$/,
+  { re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)$/,
     validator: validateUserForTroupeSubscription },
-  { re: /^\/api\/v1\/troupes\/(\w+)\/(\w+)$/,
+  { re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)\/(\w+)$/,
     validator: validateUserForSubTroupeSubscription,
     populator: populateSubTroupeCollection },
-  { re: /^\/api\/v1\/troupes\/(\w+)\/(\w+)\/(\w+)\/(\w+)$/,
+  { re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)\/(\w+)\/(\w+)\/(\w+)$/,
     validator: validateUserForSubTroupeSubscription,
     populator: populateSubSubTroupeCollection },
   { re: /^\/api\/v1\/user\/(\w+)\/(\w+)$/,
     validator: validateUserForUserSubscription,
     populator: populateSubUserCollection },
-  { re: /^\/api\/v1\/user\/(\w+)\/troupes\/(\w+)\/unreadItems$/,
+  { re: /^\/api\/v1\/user\/(\w+)\/(?:troupes|rooms)\/(\w+)\/unreadItems$/,
     validator: validateUserForUserSubscription,
     populator: populateUserUnreadItemsCollection },
   { re: /^\/api\/v1\/user\/(\w+)$/,
@@ -52,6 +53,11 @@ function validateUserForSubTroupeSubscription(options, callback) {
   var match = options.match;
 
   var troupeId = match[1];
+
+  if(!mongoUtils.isLikeObjectId(troupeId)) {
+    return callback(new StatusError(400, 'Invalid ID: ' + troupeId));
+  }
+
   return troupeService.findById(troupeId)
     .then(function(troupe) {
       if(!troupe) return false;
@@ -95,6 +101,9 @@ function populateSubUserCollection(options, callback) {
   }
 
   switch(collection) {
+    case "rooms":
+      return restful.serializeTroupesForUser(userId, callback);
+
     case "troupes":
       return restful.serializeTroupesForUser(userId, callback);
 
@@ -178,10 +187,10 @@ function getConnectionType(incoming) {
 
 var authenticator = {
   incoming: function(message, callback) {
-    function deny() {
+    function deny(errorCode, errorDescription) {
       statsService.eventHF('bayeux.handshake.deny');
 
-      message.error = '403::Access denied';
+      message.error = errorCode + '::' + errorDescription;
       winston.error('Denying client access', message);
 
       callback(message);
@@ -198,13 +207,13 @@ var authenticator = {
     var ext = message.ext;
 
     if(!ext || !ext.token) {
-      return deny();
+      return deny(401, 'Token required');
     }
 
     oauth.validateToken(ext.token, function(err, userId) {
       if(err) {
         winston.error("bayeux: Authentication error" + err, { exception: err, message: message });
-        return deny();
+        return deny(500, "A server error occurred.");
        }
 
       if(!userId) {
@@ -297,7 +306,7 @@ function destroyClient(clientId) {
   process.nextTick(function() {
     var engine = server._server._engine;
     engine.destroyClient(clientId, function() {
-      winston.info('bayeux: client ' + clientId + ' destroyed');
+      winston.info('bayeux: client ' + clientId + ' intentionally destroyed.');
     });
 
   });
@@ -313,26 +322,36 @@ var authorisor = {
       return callback(message);
     }
 
-    function deny() {
+    function deny(errorCode) {
       statsService.eventHF('bayeux.subscribe.deny');
+      var errorDescription;
+      switch(errorCode) {
+        case 401: errorDescription = 'Access denied'; break;
+        case 403: errorDescription = 'Permission denied'; break;
+        case 404: errorDescription = 'Not found'; break;
+        default:
+          errorDescription = 'A server error occurred';
+      }
 
-      message.error = '403::Access denied';
-      winston.error('Socket authorisation failed. Disconnecting client.', message);
+      message.error = errorCode + '::' + errorDescription;
+      winston.error('Socket authorisation failed. Denying subscribe.', message);
 
-      destroyClient(message.clientId);
       callback(message);
     }
+
 
     // Do we allow this user to connect to the requested channel?
     this.authorizeSubscribe(message, function(err, allowed) {
       if(err) {
+        var status = err.status || 500;
+
         winston.error("bayeux: Authorisation error", { exception: err, message: message });
-        return deny();
+        return deny(status, "A server error occurred.");
       }
 
       if(!allowed) {
         winston.warn("bayeux: Authorisation failed", { message: message });
-        return deny();
+        return deny(403, "Authorisation denied.");
       }
 
       return callback(message);
@@ -400,12 +419,14 @@ var authorisor = {
 
     var clientId = message.clientId;
 
+    if(!clientId) return callback(new StatusError(401, 'Cannot authorise. Client not authenticated'));
+
     presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
       if(err) return callback(err);
 
       if(!userId) {
         winston.warn('bayeux: client not authenticated.', { clientId: clientId });
-        return callback();
+        return callback(new StatusError(401, 'Cannot authorise. Client not authenticated'));
       }
 
       var match = null;
@@ -418,7 +439,7 @@ var authorisor = {
         return m;
       });
 
-      if(!hasMatch) return callback("Unknown subscription. Cannot validate");
+      if(!hasMatch) return callback(new StatusError(404, "Unknown subscription. Cannot validate"));
 
       var validator = match.route.validator;
       var m = match.match;
@@ -461,15 +482,22 @@ var pingResponder = {
       return callback(message);
     }
 
-    function deny(err) {
+    function deny(errorCode, errorDescription) {
       statsService.eventHF('bayeux.ping.deny');
+
       var referer = req && req.headers && req.headers.referer;
       var origin = req && req.headers && req.headers.origin;
       var connection = req && req.headers && req.headers.connection;
       var reason = message.data && message.data.reason;
 
-      message.error = '403::Access denied';
-      winston.error('Denying ping access: ' + err, { referer: referer, origin: origin, connection: connection, pingReason: reason });
+      message.error = errorCode + '::' + errorDescription;
+      winston.error('Denying ping access: ' + errorDescription, {
+        errorCode: errorCode,
+        clientId: clientId,
+        referer: referer,
+        origin: origin,
+        connection: connection,
+        pingReason: reason });
 
       callback(message);
     }
@@ -477,20 +505,22 @@ var pingResponder = {
     var clientId = message.clientId;
 
     if(!clientId) {
-      return deny("Client does not exist, clientId=null");
+      return deny(401, "Access denied. ClientId required.");
     }
 
     server._server._engine.clientExists(clientId, function(exists) {
       if(!exists) {
-        return deny("Client does not exist, clientId=" + clientId);
+        return deny(401, "Client does not exist");
       }
 
       presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
-        if(err) return deny(err);
+        if(err) {
+          winston.error("presenceService.lookupUserIdForSocket failed: " + err, { exception: err });
+          return deny(500, "A server error occurred.");
+        }
 
         if(!userId) {
-          destroyClient(message.clientId);
-          return deny("Client not authenticated. Denying ping. ", { clientId: clientId });
+          return deny(401, "Client not authenticated.");
         }
 
         return callback(message);
@@ -567,20 +597,32 @@ var logging = {
 var adviseAdjuster = {
   outgoing: function(message, req, callback) {
     var error = message.error;
+
     if(error) {
-      if(error.indexOf("403") === 0 || error.indexOf("401") === 0) {
-        if(!message.advice) {
-          message.advice = { };
+      var errorCode = error.split(/::/)[0];
+      if(errorCode) errorCode = parseInt(errorCode, 10);
+
+      if(errorCode === 401) {
+        var reconnect;
+
+        if(message.clientId) {
+          winston.info('Destroying client');
+          // We've told the person to go away, destroy their faye client
+          destroyClient(message.clientId);
         }
 
-        message.interval = 1000;
-
-        if(message.channel == '/meta/handshake') {
-          // If we're unable to handshake, the situation is dire
-          message.advice.reconnect = 'none';
+        if(message.channel === '/meta/handshake') {
+          // Handshake failing, go away
+          reconnect = 'none';
         } else {
-          message.advice.reconnect = 'handshake';
+          // Rehandshake
+          reconnect = 'handshake';
         }
+
+        message.advice = {
+          reconnect: reconnect,
+          interval:  1000
+        };
       }
 
       winston.info('Bayeux error', message);
@@ -621,7 +663,18 @@ var server = new faye.NodeAdapter({
 
 var client = server.getClient();
 
-//faye.Logging.logLevel = 'info';
+faye.stringify = function(object) {
+  var string = JSON.stringify(object);
+  statsService.gaugeHF('bayeux.message.size', string.length);
+  return string;
+};
+
+faye.logger = {};
+['fatal', 'error', 'warn'].forEach(function(level) {
+  faye.logger[level] = function(message) {
+    winston[level]('faye: ' + message);
+  };
+});
 
 module.exports = {
   server: server,
@@ -648,8 +701,6 @@ module.exports = {
         winston.info("Client " + clientId + ": " + event);
       });
     });
-
-
 
     server.bind('disconnect', function(clientId) {
       // Warning, this event is called simulateously on

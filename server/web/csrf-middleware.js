@@ -55,7 +55,8 @@ function isInWhitelist(req) {
          // Transloadit callback
          (req.path.indexOf('/api/private/transloadit/') === 0) ||
          // oauth post token endpoint for native login has its own auth
-         (req.path === '/login/oauth/token');
+         (req.path === '/login/oauth/token') ||
+         (req.path === '/oauth/authorize/decision');
 }
 
 function getClientToken(req) {

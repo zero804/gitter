@@ -1,5 +1,6 @@
 #!/bin/bash -l
 
+# Starts the development environment
 bash -l <<"DELIM"
 	if [ -f ~/.bashrc ]; then source ~/.bashrc; fi
 	if [ -f ~/.profile ]; then source ~/.profile; fi

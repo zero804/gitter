@@ -200,7 +200,7 @@ define([
       this._buffer = new DoubleHash();
 
       var async = !options || !options.sync;
-      var url = '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/unreadItems';
+      var url = '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId() + '/unreadItems';
 
       $.ajax({
         url: url,
@@ -231,7 +231,7 @@ define([
     _subscribe: function() {
       var store = this._store;
 
-      var url = '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/unreadItems';
+      var url = '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId() + '/unreadItems';
       realtime.subscribe(url, function(message) {
         if(message.notification === 'unread_items') {
           store._unreadItemsAdded(message.items);

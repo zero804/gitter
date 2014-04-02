@@ -21,8 +21,6 @@ module.exports = {
     app.get(
         '/login',
         function(req, res) {
-          var userAgent = req.headers['user-agent'] || '';
-          var compactView = userAgent.indexOf("Mobile/") >= 0;
           res.render('login');
         }
       );
@@ -30,15 +28,12 @@ module.exports = {
     app.get(
         '/login/explain',
         function(req, res) {
-          var userAgent = req.headers['user-agent'] || '';
-          var compactView = userAgent.indexOf("Mobile/") >= 0;
           res.render('github-explain');
         }
       );
 
     app.get(
         '/login/upgrade',
-        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         function(req, res, next) {
           var scopes = req.query.scopes ? req.query.scopes.split(/\s*,\s*/) : [''];
@@ -137,6 +132,9 @@ module.exports = {
     app.get('/login/oauth/authorize', oauth2.authorization);
     app.post('/login/oauth/authorize/decision', oauth2.decision);
     app.post('/login/oauth/token', oauth2.token);
+
+    app.post('/oauth/authorize/decision', oauth2.decision);
+
 
     app.get('/login/oauth/callback', function(req, res) {
       res.send(200, 'Can I help you with something?');

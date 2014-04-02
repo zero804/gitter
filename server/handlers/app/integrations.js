@@ -28,7 +28,7 @@ var serviceIdNameMap = supportedServices.reduce(function(map, service) {
 }, {});
 
 function getIntegrations(req, res) {
-  var url = nconf.get('webhooks:basepath')+'/troupes/' + req.troupe.id + '/hooks';
+  var url = nconf.get('webhooks:basepath')+'/rooms/' + req.troupe.id + '/hooks';
   winston.info('requesting hook list at ' + url);
   request.get({
     url: url,
@@ -62,7 +62,7 @@ function getIntegrations(req, res) {
 function deleteIntegration(req, res) {
 
   request.del({
-    url: nconf.get('webhooks:basepath') + '/troupes/' + req.troupe.id + '/hooks/' + req.body.id,
+    url: nconf.get('webhooks:basepath') + '/rooms/' + req.troupe.id + '/hooks/' + req.body.id,
     json: true
   },
   function(err, resp) {
@@ -80,7 +80,7 @@ function deleteIntegration(req, res) {
 function createIntegration(req, res) {
 
   request.post({
-    url: nconf.get('webhooks:basepath') + '/troupes/' + req.troupe.id + '/hooks',
+    url: nconf.get('webhooks:basepath') + '/rooms/' + req.troupe.id + '/hooks',
     json: {
       service: req.body.service,
       endpoint: 'gitter'
@@ -126,63 +126,54 @@ module.exports = {
     install: function(app) {
 
       app.get('/settings/integrations/:roomPart1',
-        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         adminAccessCheck,
         getIntegrations);
 
       app.get('/settings/integrations/:roomPart1/:roomPart2',
-        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         adminAccessCheck,
         getIntegrations);
 
       app.get('/settings/integrations/:roomPart1/:roomPart2/:roomPart3',
-        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         adminAccessCheck,
         getIntegrations);
 
       app.del('/settings/integrations/:roomPart1',
-        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         adminAccessCheck,
         deleteIntegration);
 
       app.del('/settings/integrations/:roomPart1/:roomPart2',
-        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         adminAccessCheck,
         deleteIntegration);
 
       app.del('/settings/integrations/:roomPart1/:roomPart2/:roomPart3',
-        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         adminAccessCheck,
         deleteIntegration);
 
       app.post('/settings/integrations/:roomPart1',
-        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         adminAccessCheck,
         createIntegration);
 
       app.post('/settings/integrations/:roomPart1/:roomPart2',
-        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         adminAccessCheck,
         createIntegration);
 
       app.post('/settings/integrations/:roomPart1/:roomPart2/:roomPart3',
-        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         adminAccessCheck,

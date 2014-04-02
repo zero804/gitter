@@ -1,4 +1,8 @@
 /*jslint node: true */
 "use strict";
 
-require('./server/websockets.js');
+var shutdown = require('./server/utils/shutdown');
+
+shutdown.domainWrap(function() {
+  require('./server/websockets.js');
+});

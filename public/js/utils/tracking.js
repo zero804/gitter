@@ -54,8 +54,9 @@ define([
       window.mixpanel.track('pageView', { pageName: routeName });
     }
 
-    if(gosquared) {
-      gosquared('track');
+    var gs = window._gs;
+    if(gs) {
+      gs('track');
     }
 
     if(trackingId) {
