@@ -35,6 +35,7 @@ module.exports = exports = function(request) {
 
     request(options, function (error, response, body) {
       if(error) return d.reject(error);
+      // Reject bad responses
       if(response.statusCode >= 400) return d.reject('HTTP ' + response.statusCode);
 
       var bodyJson;
