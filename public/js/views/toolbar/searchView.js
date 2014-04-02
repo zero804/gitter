@@ -63,7 +63,7 @@ define([
             url: '/' + name,
             githubType: 'ORG',
             ethereal: !org.room,
-            people: org.room ? org.room.users.length : 0
+            people: org.room ? org.room.userCount : 0
           });
         });
 
@@ -100,7 +100,7 @@ define([
               url: '/' + repo.uri,
               githubType: 'REPO',
               ethereal: !repo.room,
-              people: repo.room ? repo.room.users.length : 0
+              people: repo.room ? repo.room.userCount : 0
             });
           });
 
