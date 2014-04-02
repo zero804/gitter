@@ -9,9 +9,6 @@ define([
 ], function($, _, context, Faye, appEvents, log) {
   "use strict";
 
-  // All our transports work on the same origin
-  Faye.URI.isSameOrigin = function() { return true; };
-
   var logLevel = parseInt(window.localStorage.fayeLogging, 10) || 0;
 
   Faye.logger = {};
