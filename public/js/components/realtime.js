@@ -1,17 +1,24 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
+  'underscore',
   'utils/context',
   'faye',
   'utils/appevents',
   'log!realtime'
-], function($, context, Faye, appEvents, log) {
+], function($, _, context, Faye, appEvents, log) {
   "use strict";
 
-  if(window.localStorage.fayeLogging) {
-    Faye.Logging.logLevel = parseInt(window.localStorage.fayeLogging, 10);
-    Faye.logger = log;
-  }
+  // All our transports work on the same origin
+  Faye.URI.isSameOrigin = function() { return true; };
+
+  var logLevel = parseInt(window.localStorage.fayeLogging, 10) || 0;
+
+  Faye.logger = {};
+  var logLevels = ['fatal', 'error', 'warn', 'info', 'debug'];
+  logLevels.slice(0, 1 + logLevel).forEach(function(level) {
+    Faye.logger[level] = function(msg) { log('faye: ' + level + ': ' + msg); };
+  });
 
   var clientId = null;
 
@@ -94,6 +101,8 @@ define([
     callback(message);
   };
 
+  var subscribeOptions = {};
+
   var ClientAuth = function() {};
   ClientAuth.prototype.outgoing = function(message, callback) {
     if(message.channel == '/meta/handshake') {
@@ -111,6 +120,13 @@ define([
 
     } else if(message.channel == '/meta/subscribe') {
       if(!message.ext) { message.ext = {}; }
+
+      var options = subscribeOptions[message.subscription];
+      if(options) {
+        message.ext = _.extend(message.ext, options);
+        delete subscribeOptions[message.channel];
+      }
+
       message.ext.eyeballs = eyeballState ? 1 : 0;
     }
 
@@ -302,7 +318,11 @@ define([
       return clientId;
     },
 
-    subscribe: function(channel, callback, context) {
+    subscribe: function(channel, callback, context, options) {
+      if(options && options.snapshot === false) {
+        subscribeOptions[channel] = { snapshot: false };
+      }
+
       return getOrCreateClient().subscribe(channel, callback, context);
     },
 

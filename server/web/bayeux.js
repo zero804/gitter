@@ -312,15 +312,34 @@ function destroyClient(clientId) {
   });
 
 }
+
+function storeMessageValues(req, id, options) {
+  if(!req.bayeuxOptions) req.bayeuxOptions = {};
+  if(!req.bayeuxOptions[id]) req.bayeuxOptions[id] = options;
+}
+
+function getMessageValues(req, id) {
+  if(!req.bayeuxOptions || !req.bayeuxOptions[id]) return {};
+  var value = req.bayeuxOptions[id];
+  delete req.bayeuxOptions[id];
+  return value;
+}
 //
 // Authorisation Extension - decides whether the user
 // is allowed to connect to the subscription channel
 //
 var authorisor = {
-  incoming: function(message, callback) {
+  incoming: function(message, req, callback) {
     if(message.channel != '/meta/subscribe') {
       return callback(message);
     }
+
+    var snapshot = true;
+    if(message.ext && message.ext.snapshot === false) {
+      snapshot = false;
+    }
+
+    storeMessageValues(req, message.id, { snapshot: snapshot });
 
     function deny(errorCode) {
       statsService.eventHF('bayeux.subscribe.deny');
@@ -359,7 +378,7 @@ var authorisor = {
 
   },
 
-  outgoing: function(message, callback) {
+  outgoing: function(message, req, callback) {
     if(message.channel != '/meta/subscribe') {
       return callback(message);
     }
@@ -386,8 +405,10 @@ var authorisor = {
     var m = match.match;
     var clientId = message.clientId;
 
+    var messageOptions = getMessageValues(req, message.id);
+
     /* The populator is all about generating the snapshot for the client */
-    if(clientId && populator) {
+    if(clientId && populator && messageOptions.snapshot) {
       presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
         if(err) {
           winston.error('Error for lookupUserIdForSocket', { exception: err });
