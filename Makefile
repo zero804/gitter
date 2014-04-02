@@ -165,6 +165,10 @@ grunt: clean lint-configs
 	grunt -no-color process
 	./build-scripts/gzip-processed.sh
 
+sprites:
+	@mkdir -p output/temp-sprites
+	@node scripts/generate-service-sprite.js
+
 version-files:
 	@echo GIT COMMIT: $(GIT_COMMIT)
 	@echo GIT BRANCH: $(GIT_BRANCH)
