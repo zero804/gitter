@@ -62,6 +62,8 @@ exports.findAccessTokenAndClient = function(token, callback) {
   persistenceService.OAuthAccessToken.findOne({ token: token }, function(err, accessToken) {
     if(err) return callback(err);
 
+    if(!accessToken) return callback();
+
     var clientId = accessToken.clientId;
     if(!clientId) return callback(); // code invalid
 
