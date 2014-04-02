@@ -6,7 +6,7 @@ define([
   'hbs!./tmpl/peopleItemView',
   'hbs!./tmpl/peopleCollectionView',
   'hbs!./tmpl/remainingView'
-], function(Marionette, backbone, TroupeViews, peopleItemViewTemplate, peopleCollectionViewTemplate, remainingViewTempate) {
+], function(Marionette, Backbone, TroupeViews, peopleItemViewTemplate, peopleCollectionViewTemplate, remainingViewTempate) {
   "use strict";
 
   var PeopleItemView = TroupeViews.Base.extend({
@@ -27,7 +27,7 @@ define([
     }
   });
 
-  var RemainingView = backbone.View.extend({
+  var RemainingView = Backbone.View.extend({
     tagName: 'p',
     className: 'remaining',
     template: remainingViewTempate,
