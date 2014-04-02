@@ -64,7 +64,7 @@ function applyAutoHooksForRepoRoom(user, troupe) {
   var d = Q.defer();
 
   request.post({
-    url: nconf.get('webhooks:basepath') + '/rooms/' + troupe.id + '/hooks',
+    url: nconf.get('webhooks:basepath') + '/troupes/' + troupe.id + '/hooks',
     json: {
       service: 'github',
       endpoint: 'gitter',
