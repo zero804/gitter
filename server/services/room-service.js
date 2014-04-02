@@ -64,7 +64,7 @@ function applyAutoHooksForRepoRoom(user, troupe) {
   var d = Q.defer();
 
   request.post({
-    url: nconf.get('webhooks:basepath') + '/troupes/' + troupe.id + '/hooks',
+    url: nconf.get('webhooks:basepath') + '/rooms/' + troupe.id + '/hooks',
     json: {
       service: 'github',
       endpoint: 'gitter',
@@ -88,7 +88,7 @@ exports.applyAutoHooksForRepoRoom = applyAutoHooksForRepoRoom;
  * Private method to push creates out to the bus
  */
 function serializeCreateEvent(troupe) {
-  var urls = troupe.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/troupes'; });
+  var urls = troupe.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/rooms'; });
   serializeEvent(urls, 'create', troupe);
 }
 

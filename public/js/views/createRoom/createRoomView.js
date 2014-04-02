@@ -137,7 +137,7 @@ define([
             return;
           }
 
-          url = "/api/v1/troupes/" + ownerModel.get('id') + '/channels';
+          url = "/api/v1/rooms/" + ownerModel.get('id') + '/channels';
       }
 
       $.ajax({

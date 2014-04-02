@@ -71,7 +71,7 @@ define([
       var isFavourite = favHeader.hasClass('favourited');
 
       $.ajax({
-        url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId(),
+        url: '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId(),
         contentType: "application/json",
         dataType: "json",
         type: "PUT",

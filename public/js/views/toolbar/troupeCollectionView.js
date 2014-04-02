@@ -54,7 +54,7 @@ define([
       e.stopPropagation();
 
       $.ajax({
-        url: "/api/v1/user/" + context.getUserId() + "/troupes/" + this.model.id,
+        url: "/api/v1/user/" + context.getUserId() + "/rooms/" + this.model.id,
         data: "",
         type: "DELETE",
       });

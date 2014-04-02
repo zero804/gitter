@@ -1,8 +1,8 @@
 /*jslint node: true */
 "use strict";
 
-/* profiler ?
-require('look').start();
-*/
+var shutdown = require('./server/utils/shutdown');
 
-require('./server/web.js');
+shutdown.domainWrap(function() {
+  require('./server/web.js');
+});

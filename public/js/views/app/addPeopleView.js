@@ -108,7 +108,7 @@ define([
       }
 
       $.ajax({
-        url: '/api/v1/troupes/' + context.getTroupeId()  + '/users',
+        url: '/api/v1/rooms/' + context.getTroupeId()  + '/users',
         contentType: "application/json",
         dataType: "json",
         type: "POST",

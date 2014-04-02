@@ -7,6 +7,7 @@ var winston = require('../utils/winston');
 var statsHandlers = {
   event: [],
   eventHF: [],
+  gaugeHF: [],
   userUpdate: [],
   responseTime: []
 };
@@ -57,6 +58,11 @@ if (statsdEnabled) {
   statsHandlers.eventHF.push(function(eventName) {
     /* Only send to the server one tenth of the time */
     statsdClient.increment(eventName, 1, 0.1);
+  });
+
+  statsHandlers.gaugeHF.push(function(gaugeName, value) {
+    /* Only send to the server one tenth of the time */
+    statsdClient.gauge(gaugeName, value, 0.1);
   });
 
   statsHandlers.responseTime.push(function(timerName, duration) {
@@ -165,6 +171,8 @@ exports.event = makeHandler(statsHandlers.event);
 
 /* High frequency event */
 exports.eventHF = makeHandler(statsHandlers.eventHF);
+
+exports.gaugeHF = makeHandler(statsHandlers.gaugeHF);
 
 /* User update event */
 exports.userUpdate = makeHandler(statsHandlers.userUpdate);
