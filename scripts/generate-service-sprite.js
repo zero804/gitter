@@ -9,10 +9,10 @@ Object.keys(services).forEach(function(serviceKey) {
   Object.keys(service.icons).map(function(iconKey) {
     var icon = service.icons[iconKey];
 
-    fse.copySync(icon.legacy, __dirname+'/../temp/'+serviceKey+'-'+iconKey+'.png');
-    legacyImages.push(__dirname+'/../temp/'+serviceKey+'-'+iconKey+'.png');
-    fse.copySync(icon.retina, __dirname+'/../temp/'+serviceKey+'-'+iconKey+'@2x.png');
-    retinaImages.push(__dirname+'/../temp/'+serviceKey+'-'+iconKey+'@2x.png');
+    fse.copySync(icon.legacy, __dirname+'/../output/temp-sprites/'+serviceKey+'-'+iconKey+'.png');
+    legacyImages.push(__dirname+'/../output/temp-sprites/'+serviceKey+'-'+iconKey+'.png');
+    fse.copySync(icon.retina, __dirname+'/../output/temp-sprites/'+serviceKey+'-'+iconKey+'@2x.png');
+    retinaImages.push(__dirname+'/../output/temp-sprites/'+serviceKey+'-'+iconKey+'@2x.png');
   });
 });
 
