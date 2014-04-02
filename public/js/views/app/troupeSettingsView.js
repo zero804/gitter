@@ -29,7 +29,7 @@ define([
       this.listenTo(this.model, 'change:lurk', this.setShowUnreadBadgeValue);
 
       $.ajax({
-        url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
+        url: '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId() + '/settings/notifications',
         type: "GET",
         context: this,
         success: function(settings) {
@@ -106,7 +106,7 @@ define([
       }
 
       $.ajax({
-        url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
+        url: '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId() + '/settings/notifications',
         contentType: "application/json",
         dataType: "json",
         type: "PUT",
@@ -116,7 +116,7 @@ define([
 
 
       $.ajax({
-        url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId(),
+        url: '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId(),
         contentType: "application/json",
         dataType: "json",
         type: "PUT",

@@ -86,7 +86,7 @@ define([
 
     leaveRoom: function() {
       $.ajax({
-        url: "/api/v1/troupes/" + context.getTroupeId() + "/users/" + context.getUserId(),
+        url: "/api/v1/rooms/" + context.getTroupeId() + "/users/" + context.getUserId(),
         data: "",
         type: "DELETE",
       });

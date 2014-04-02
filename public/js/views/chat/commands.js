@@ -24,7 +24,7 @@ define([
 
           context.troupe().set('topic', topic);
           $.ajax({
-            url: '/api/v1/troupes/' + context.getTroupeId(),
+            url: '/api/v1/rooms/' + context.getTroupeId(),
             contentType: "application/json",
             dataType: "json",
             type: "PUT",
@@ -42,7 +42,7 @@ define([
         var isFavourite = !context.troupe().get('favourite');
 
         $.ajax({
-          url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId(),
+          url: '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId(),
           contentType: "application/json",
           dataType: "json",
           type: "PUT",
@@ -82,7 +82,7 @@ define([
         view.reset();
 
         $.ajax({
-          url: "/api/v1/troupes/" + context.getTroupeId() + "/users/" + context.getUserId(),
+          url: "/api/v1/rooms/" + context.getTroupeId() + "/users/" + context.getUserId(),
           data: "",
           type: "DELETE",
         });
@@ -110,7 +110,7 @@ define([
         }
 
         $.ajax({
-          url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
+          url: '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId() + '/settings/notifications',
           contentType: "application/json",
           dataType: "json",
           type: "PUT",
@@ -120,7 +120,7 @@ define([
 
 
         $.ajax({
-          url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId(),
+          url: '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId(),
           contentType: "application/json",
           dataType: "json",
           type: "PUT",

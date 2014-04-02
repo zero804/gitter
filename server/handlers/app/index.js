@@ -15,7 +15,6 @@ function saveRoom(req) {
   }
 }
 var chatFrameMiddlewarePipeline = [
-  middleware.grantAccessForRememberMeTokenMiddleware,
   middleware.ensureLoggedIn(),
   appMiddleware.uriContextResolverMiddleware,
   appMiddleware.isPhoneMiddleware,
@@ -39,7 +38,6 @@ var chatFrameMiddlewarePipeline = [
 ];
 
 var chatMiddlewarePipeline = [
-  middleware.grantAccessForRememberMeTokenMiddleware,
   middleware.ensureLoggedIn(),
   appMiddleware.uriContextResolverMiddleware,
   appMiddleware.isPhoneMiddleware,
@@ -72,7 +70,6 @@ module.exports = {
         '/:roomPart1/-/home',
       ].forEach(function(path) {
         app.get(path,
-          middleware.grantAccessForRememberMeTokenMiddleware,
           middleware.ensureLoggedIn(),
           appMiddleware.uriContextResolverMiddleware,
           appMiddleware.isPhoneMiddleware,

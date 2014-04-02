@@ -9,7 +9,6 @@ var redis                   = require("../utils/redis");
 var nconf                   = require('../utils/config');
 var userService             = require('../services/user-service');
 var statsService            = require("../services/stats-service");
-var useragent               = require('useragent');
 var useragentStats          = require('./useragent-stats');
 
 var cookieName = nconf.get('web:cookiePrefix') + 'auth';
@@ -22,6 +21,8 @@ function generateAuthToken(req, res, userId, options, callback) {
 
   var key = uuid.v4();
   var token = uuid.v4();
+
+  req.rememberMeTokenGenerated = true;
   res.cookie(cookieName, key + ":" + token, {
     domain: nconf.get("web:cookieDomain"),
     maxAge: 1000 * 60 * 60 * 24 * timeToLiveDays,
@@ -106,7 +107,7 @@ module.exports = {
       /* If the user is logged in, no problem */
       if (req.user) return next();
 
-      if(!req.cookies) return next();
+      if(!req.cookies || !req.cookies[cookieName]) return next();
 
       validateAuthToken(req.cookies[cookieName], function(err, userId) {
         if(err || !userId) return fail(err);
