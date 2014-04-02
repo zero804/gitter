@@ -7,6 +7,9 @@ var nconf       = require('../utils/config');
 var rememberMe  = require('./rememberme-middleware');
 var useragent   = require('useragent');
 var dolph       = require('dolph');
+var redis       = require("../utils/redis");
+var redisClient = redis.createClient();
+
 
 var authCookieName = nconf.get('web:cookiePrefix') + 'auth';
 var sessionCookieName = nconf.get('web:cookiePrefix') + 'session';
@@ -49,7 +52,8 @@ var rateLimiter = dolph({
   },
   keyFunction: function(req) {
     return req.user.id + ':' + req.authInfo.client.id;
-  }
+  },
+  redisClient: redisClient
  });
 
 
