@@ -5,7 +5,6 @@ var redis = require("../utils/redis");
 var nconf = require("../utils/config");
 var winston = require('../utils/winston');
 var events = require('events');
-var assert = require('assert');
 var Fiber = require('../utils/fiber');
 var appEvents = require('../app-events.js');
 var Q = require('q');
@@ -46,8 +45,8 @@ function keyUserSockets(troupeId) {
 
 // Callback(err);
 function disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callback) {
-  assert(userId, 'userId expected');
-  assert(socketId, 'socketId expected');
+  if(!userId) return callback && callback('userId expected');
+  if(!socketId) return callback && callback('socketId expected');
 
   lookupTroupeIdForSocket(socketId, function(err, troupeId) {
     if(err) return callback(err);
@@ -118,10 +117,10 @@ function sendAppEventsForUserEyeballsOffTroupe(userInTroupeCount, totalUsersInTr
 
 
 function userSocketConnected(userId, socketId, connectionType, client, troupeId, eyeballState, callback) {
-  assert(userId, 'userId expected');
-  assert(socketId, 'socketId expected');
-
   if(!callback) callback = function() {};
+
+  if(!userId) return callback('userId expected');
+  if(!socketId) return callback('socketId expected');
 
   var isMobileConnection = connectionType == 'mobile';
 
@@ -175,8 +174,8 @@ function userSocketConnected(userId, socketId, connectionType, client, troupeId,
 }
 
 function socketDisconnectionRequested(userId, socketId, callback) {
-  assert(socketId, 'socketId expected');
-  assert(userId, 'userId expected');
+  if(!socketId) return callback && callback('socketId expected');
+  if(!userId) return callback && callback('userId expected');
 
   lookupUserIdForSocket(socketId, function(err, userId2) {
     if(err) return callback(err);
@@ -190,7 +189,7 @@ function socketDisconnectionRequested(userId, socketId, callback) {
 }
 
 function socketDisconnected(socketId, callback) {
-  assert(socketId, 'socketId expected');
+  if(!socketId) return callback && callback('socketId expected');
 
   lookupUserIdForSocket(socketId, function(err, userId) {
     if(err) return callback(err);
@@ -223,9 +222,9 @@ function socketGarbageCollected(socketId, callback) {
 }
 
 function eyeBallsOnTroupe(userId, socketId, troupeId, callback) {
-  assert(userId, 'userId expected');
-  assert(socketId, 'socketId expected');
-  assert(troupeId, 'troupeId expected');
+  if(!userId) return callback && callback('userId expected');
+  if(!socketId) return callback && callback('socketId expected');
+  if(!troupeId) return callback && callback('troupeId expected');
 
   var keys = [keySocketUser(socketId), keyTroupeUsers(troupeId), keyUserLock(userId)];
   var values = [userId];
@@ -253,9 +252,9 @@ function eyeBallsOnTroupe(userId, socketId, troupeId, callback) {
 }
 
 function eyeBallsOffTroupe(userId, socketId, troupeId, callback) {
-  assert(userId, 'userId expected');
-  assert(socketId, 'socketId expected');
-  assert(troupeId, 'troupeId expected');
+  if(!userId) return callback && callback('userId expected');
+  if(!socketId) return callback && callback('socketId expected');
+  if(!troupeId) return callback && callback('troupeId expected');
 
   var keys = [keySocketUser(socketId), keyTroupeUsers(troupeId), keyUserLock(userId)];
   var values = [userId];
@@ -294,20 +293,20 @@ function lookupSocketOwnerAndTroupe(socketId, callback) {
 }
 
 function lookupUserIdForSocket (socketId, callback) {
-  assert(socketId, 'socketId expected');
+  if(!socketId) return callback('socketId expected');
 
   redisClient.hget(keySocketUser(socketId), "uid", callback);
 }
 
 function lookupTroupeIdForSocket (socketId, callback) {
-  assert(socketId, 'socketId expected');
+  if(!socketId) return callback('socketId expected');
 
   redisClient.hget(keySocketUser(socketId), "tid", callback);
 }
 
 
 function findOnlineUsersForTroupe(troupeId, callback) {
-  assert(troupeId, 'troupeId expected');
+  if(!troupeId) return callback('troupeId expected');
 
   redisClient.zrangebyscore(keyTroupeUsers(troupeId), 1, '+inf', callback);
 }
@@ -505,8 +504,8 @@ function listOnlineUsersForTroupes(troupeIds, callback) {
 }
 
 function clientEyeballSignal(userId, socketId, eyeballsOn, callback) {
-  assert(userId, 'userId expected');
-  assert(socketId, 'socketId expected');
+  if(!userId) return callback('userId expected');
+  if(!socketId) return callback('socketId expected');
 
   lookupSocketOwnerAndTroupe(socketId, function(err, socketInfo) {
     if(err) return callback(err);

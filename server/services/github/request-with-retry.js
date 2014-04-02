@@ -14,6 +14,9 @@ module.exports = exports = function(options, request) {
 
       statsService.event('github.api.count');
 
+      var uri = options.uri || options.url;
+      winston.verbose('github.request', { uri: uri, method: options.method });
+
       request(options, function (error, response, body) {
         var duration = Date.now() - start;
         statsService.responseTime('github.api.response.time', duration);

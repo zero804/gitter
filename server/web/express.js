@@ -7,8 +7,6 @@ var nconf          = require('../utils/config');
 var expressHbs     = require('express-hbs');
 var winston        = require('../utils/winston');
 var middleware     = require('./middleware');
-var fs             = require('fs');
-var os             = require('os');
 var responseTime   = require('./response-time');
 var oauthService   = require('../services/oauth-service');
 var csrf           = require('./csrf-middleware');
@@ -84,64 +82,69 @@ module.exports = {
     }
 
     app.use(express.cookieParser());
-    // app.use(express.bodyParser());
     app.use(express.urlencoded());
     app.use(express.json());
 
     app.use(express.methodOverride());
 
-    (function fileUploading() {
-      var uploadDir = os.tmpDir() + "/troupe-" + os.hostname();
-
-      // make sure it exists
-      if (!fs.existsSync(uploadDir)) {
-        winston.info("Creating the temporary file upload directory " + uploadDir);
-        fs.mkdirSync(uploadDir);
-      }
-
-      // app.use(fineuploaderExpressMiddleware({ uploadDir: uploadDir }));
-
-      // clean out the file upload directory every few hours
-      setInterval(function() {
-        winston.info("Cleaning up the file upload directory: " + uploadDir);
-
-        var now = new Date();
-        var expiration = nconf.get('express:fileCleanupExpiration') * 60 * 1000 || 60000;
-        fs.readdir(uploadDir, function(e, fileNames) {
-          fileNames.forEach(function(fileName) {
-            fs.stat(uploadDir + '/' + fileName, function (e, stat) {
-              if (e) return winston.error("Error stating file", e);
-              if (now.getTime() - stat.mtime.getTime() > expiration) {
-                winston.info("Deleting temp upload file " + fileName);
-                fs.unlink(uploadDir + '/' + fileName);
-              }
-            });
-          });
-        });
-      }, nconf.get('express:fileCleanupInterval') * 60 * 1000 || 60000);
-
-    }());
-
-
     app.use(ios6PostCachingFix());
-    app.use(express.session({
-      secret: nconf.get('web:sessionSecret'),
-      key: nconf.get('web:cookiePrefix') + 'session',
-      store: sessionStore,
-      cookie: {
-        path: '/',
-        httpOnly: true,
-        maxAge: 14400000,
-        domain: nconf.get("web:cookieDomain"),
-        secure: false /*nconf.get("web:secureCookies") Express won't sent the cookie as the https offloading is happening in nginx. Need to have connection.proxySecure set*/
+
+    app.use('/api/', function(req, res, next) {
+      req.isApiCall = true;
+      next();
+    });
+
+    // TODO remove this by 9/May/2014
+    app.use(function(req, res, next) {
+      Object.keys(req.cookies).forEach(function(key) {
+        if(key.indexOf('optimizely') === 0) {
+          res.clearCookie(key);
+        }
+      });
+
+      next();
+    });
+
+    var sessionCookieName = nconf.get('web:cookiePrefix') + 'session';
+    function useSession(req) {
+      /* No session for API calls, unless there's already a session cookie */
+      if(req.isApiCall && !req.cookies[sessionCookieName]) {
+        return false;
       }
-    }));
+
+      return true;
+    }
+
+    function session() {
+      var expressSession = express.session({
+        secret: nconf.get('web:sessionSecret'),
+        key: nconf.get('web:cookiePrefix') + 'session',
+        store: sessionStore,
+        cookie: {
+          path: '/',
+          httpOnly: true,
+          maxAge: 14400000,
+          domain: nconf.get("web:cookieDomain"),
+          secure: false /*nconf.get("web:secureCookies") Express won't sent the cookie as the https offloading is happening in nginx. Need to have connection.proxySecure set*/
+        }
+      });
+
+      return function(req, res, next) {
+        if(!useSession(req)) {
+          req.session = {};
+          return next();
+        }
+
+        return expressSession(req, res, next);
+      };
+    }
+
+    app.use(session());
+
     app.use(passport.initialize());
     app.use(passport.session());
     app.use(csrf);
     app.use(app.router);
-
-
 
     function linkStack(stack) {
       if(!stack) return;
@@ -155,7 +158,7 @@ module.exports = {
       }).join('\n');
     }
 
-    app.use(function(err, req, res, next) {
+    app.use(function(err, req, res, next) { /* Have to have four args */
       var user = req.user;
       var userId = user && user.id;
 
@@ -249,20 +252,19 @@ module.exports = {
       }
 
     });
-
   },
 
-  installSocket: function(app, server, sessionStore) {
+  installSocket: function(app) {
     if(nconf.get("logging:access")) {
       app.use(express.logger());
     }
 
     app.use(express.cookieParser());
-    // app.use(express.bodyParser());
     app.use(express.urlencoded());
     app.use(express.json());
 
-    app.use(express.session({ secret: 'keyboard cat', store: sessionStore, cookie: { path: '/', httpOnly: true, maxAge: 14400000, domain: nconf.get("web:cookieDomain"), secure: nconf.get("web:secureCookies") }}));
+    // No need for a session on here
+    // app.use(express.session({ secret: 'keyboard cat', store: sessionStore, cookie: { path: '/', httpOnly: true, maxAge: 14400000, domain: nconf.get("web:cookieDomain"), secure: nconf.get("web:secureCookies") }}));
 
     app.use(express.errorHandler({ showStack: nconf.get('express:showStack'), dumpExceptions: nconf.get('express:dumpExceptions') }));
 

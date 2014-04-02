@@ -201,7 +201,7 @@ require([
         autoConfigureHooks: 1
       },
       type: 'PUT',
-      url: '/api/v1/troupes/' + context.getTroupeId(),
+      url: '/api/v1/rooms/' + context.getTroupeId(),
       success: function() {
         appEvents.trigger('user_notification', {
           title: 'Thank You',

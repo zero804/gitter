@@ -4,7 +4,6 @@
 var middleware              = require("../web/middleware");
 var loginUtils              = require('../web/login-utils');
 var nconf                   = require('../utils/config');
-var isPhone                 = require('../web/is-phone');
 
 module.exports = {
     install: function(app) {

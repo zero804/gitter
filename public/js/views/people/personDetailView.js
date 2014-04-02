@@ -44,7 +44,7 @@ define([
       modal.on('menuItemClicked', function(action) {
         if (action === "yes") {
           $.ajax({
-            url: "/api/v1/troupes/" + context.getTroupeId() + "/users/" + this.model.get('id'),
+            url: "/api/v1/rooms/" + context.getTroupeId() + "/users/" + this.model.get('id'),
             data: "",
             type: "DELETE",
             success: function() {

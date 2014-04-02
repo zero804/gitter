@@ -9,7 +9,7 @@ define([
 
   function attachRoom(room) {
     var userId = context.getUserId();
-    realtime.subscribe('/api/v1/user/' + userId + '/troupes', function(data) {
+    realtime.subscribe('/api/v1/user/' + userId + '/rooms', function(data) {
       var operation = data.operation;
       var newModel = data.model;
       var id = newModel.id;

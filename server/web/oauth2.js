@@ -137,7 +137,7 @@ exports.authorization = [
     }
 
     /* Non-trusted Client */
-    res.render('dialog', { transactionId: req.oauth2.transactionID, user: req.user, client: req.oauth2.client });
+    res.render('oauth_authorize_dialog', { transactionId: req.oauth2.transactionID, user: req.user, client: req.oauth2.client });
   }
 ];
 

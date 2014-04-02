@@ -143,7 +143,7 @@ define([
               if(repoName) query.repoName = repoName;
               if(issueNumber) query.issueNumber = issueNumber;
 
-              $.getJSON('/api/v1/troupes/' + context.getTroupeId() + '/issues', query)
+              $.getJSON('/api/v1/rooms/' + context.getTroupeId() + '/issues', query)
                 .done(function(resp) {
                   callback(resp);
                 })

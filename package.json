@@ -46,7 +46,7 @@
     "cube": "^0.2.12",
     "nomnom": "~1.6.2",
     "mimelib": "0.2.10",
-    "faye": "~1.0.0",
+    "faye": "^1.0.1",
     "faye-redis": "~0.2.0",
     "geckoboard-push": "0.0.5",
     "mongoose-number": "~0.1.0",
@@ -86,7 +86,9 @@
     "heapdump": "^0.2.7",
     "memwatch": "^0.2.2",
     "node-statsd": "0.0.7",
-    "raven": "^0.6.2"
+    "raven": "^0.6.2",
+    "statuserror": "0.0.1",
+    "dolph": "0.0.2"
   },
   "devDependencies": {
     "proxyquire": "0.4.0",
