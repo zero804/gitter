@@ -22,7 +22,7 @@ define([
     initialize: function() {
       this.listenTo(this, 'change:favourite', this.reorderFavs);
       this.listenTo(this, 'change:lastAccessTime change:lurk', this.resetActivity);
-      this.url = "/api/v1/user/" + context.getUserId() + "/troupes";
+      this.url = "/api/v1/user/" + context.getUserId() + "/rooms";
     },
 
     resetActivity: function(model) {

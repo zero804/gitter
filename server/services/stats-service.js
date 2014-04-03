@@ -6,6 +6,8 @@ var winston = require('../utils/winston');
 
 var statsHandlers = {
   event: [],
+  eventHF: [],
+  gaugeHF: [],
   userUpdate: [],
   responseTime: []
 };
@@ -29,7 +31,7 @@ if (cubeEnabled) {
     properties.env = nconf.get("stats:envName");
 
     var event = {
-      type: "gitter_" + eventName,
+      type: "gitter_" + eventName.replace(/\./g, '_'),
       time: new Date(),
       data: properties
     };
@@ -53,8 +55,18 @@ if (statsdEnabled) {
     statsdClient.increment(eventName);
   });
 
-  statsHandlers.responseTime.push(function(duration) {
-    statsdClient.timing(duration);
+  statsHandlers.eventHF.push(function(eventName) {
+    /* Only send to the server one tenth of the time */
+    statsdClient.increment(eventName, 1, 0.1);
+  });
+
+  statsHandlers.gaugeHF.push(function(gaugeName, value) {
+    /* Only send to the server one tenth of the time */
+    statsdClient.gauge(gaugeName, value, 0.1);
+  });
+
+  statsHandlers.responseTime.push(function(timerName, duration) {
+    statsdClient.timing(timerName, duration);
   });
 }
 
@@ -90,7 +102,9 @@ if (mixpanelEnabled) {
 
     properties.distinct_id = properties.userId;
     mixpanel.track(eventName, properties, function(err) {
-      winston.error('Mixpanel error: ' + err, { exception: err });
+      if(err) {
+        winston.error('Mixpanel error: ' + err, { exception: err });
+      }
     });
   });
 
@@ -122,8 +136,25 @@ if (mixpanelEnabled) {
 function makeHandler(handlers) {
   if(!handlers.length) return function() {};
 
+  if(handlers.length === 1) {
+    /**
+     * Might seem a bit over the top, but these handlers get
+     * called a lot, so we should make this code perform if we can
+     */
+    var handler = handlers[0];
+    return function() {
+      var args = arguments;
+
+      try {
+        handler.apply(null, args);
+      } catch(err) {
+        winston.error('[stats] Error processing event: ' + err, { exception: err });
+      }
+    };
+  }
+
   return function() {
-    var args = Array.prototype.slice.apply(arguments);
+    var args = arguments;
 
     handlers.forEach(function(handler) {
       try {
@@ -135,7 +166,17 @@ function makeHandler(handlers) {
   };
 }
 
+/* Normal event */
 exports.event = makeHandler(statsHandlers.event);
+
+/* High frequency event */
+exports.eventHF = makeHandler(statsHandlers.eventHF);
+
+exports.gaugeHF = makeHandler(statsHandlers.gaugeHF);
+
+/* User update event */
 exports.userUpdate = makeHandler(statsHandlers.userUpdate);
+
+/* Response time recorder */
 exports.responseTime = makeHandler(statsHandlers.responseTime);
 

@@ -3,7 +3,7 @@
 
 var persistence = require("./persistence-service"),
     statsService = require("./stats-service"),
-    winston = require('winston');
+    winston = require('../utils/winston');
 
 function findConversation(options, callback) {
   var troupeId = options.troupeId;

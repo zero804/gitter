@@ -9,7 +9,7 @@ var oauth2orize = require('oauth2orize'),
     middleware = require('./middleware'),
     oauthService = require('../services/oauth-service'),
     loginUtils = require('./login-utils'),
-    winston = require('winston'),
+    winston = require('../utils/winston'),
     url = require('url'),
     random = require('../utils/random');
 
@@ -137,7 +137,7 @@ exports.authorization = [
     }
 
     /* Non-trusted Client */
-    res.render('dialog', { transactionId: req.oauth2.transactionID, user: req.user, client: req.oauth2.client });
+    res.render('oauth_authorize_dialog', { transactionId: req.oauth2.transactionID, user: req.user, client: req.oauth2.client });
   }
 ];
 

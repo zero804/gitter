@@ -61,6 +61,8 @@ function sendEmailNotifications(since) {
        * Filter out all users who've opted out of notification emails
        */
       var userIds = Object.keys(userTroupeUnreadHash);
+      winston.verbose('email-notify: Initial user count: ' + userIds.length);
+      if(!userIds.length) return {};
 
       return userSettingsService.getMultiUserSettings(userIds, 'unread_notifications_optout').
         then(function(settings) {
@@ -82,7 +84,13 @@ function sendEmailNotifications(since) {
        * Now we need to filter out users who've turned off notifications for a specific troupe
        */
       var userTroupes = [];
-      Object.keys(userTroupeUnreadHash).forEach(function(userId) {
+      var userIds = Object.keys(userTroupeUnreadHash);
+
+      if(!userIds.length) return {};
+
+      winston.verbose('email-notify: After removing opt-out users: ' + userIds.length);
+
+      userIds.forEach(function(userId) {
           var troupeIds = Object.keys(userTroupeUnreadHash[userId]);
           troupeIds.forEach(function(troupeId) {
             userTroupes.push({ userId: userId, troupeId: troupeId });
@@ -117,6 +125,9 @@ function sendEmailNotifications(since) {
        *load the data we're going to need for the emails
        */
       var userIds = Object.keys(userTroupeUnreadHash);
+      if(!userIds.length) return [userIds, [], [], {}];
+
+      winston.verbose('email-notify: After removing room non-notify users: ' + userIds.length);
 
       var troupeIds = _.flatten(Object.keys(userTroupeUnreadHash).map(function(userId) {
         return Object.keys(userTroupeUnreadHash[userId]);
@@ -131,6 +142,22 @@ function sendEmailNotifications(since) {
         ]);
     })
     .spread(function(userIds, users, allTroupes, userTroupeUnreadHash) {
+      if(!userIds.length) return [userIds, [], [], {}];
+
+      /* Remove anyone that we don't have a token for */
+      users = users.filter(function(user) {
+        return user.hasGitHubScope('user:email');
+      });
+
+      userIds = users.map(function(user) { return user.id; });
+
+      winston.verbose('email-notify: After removing users without the correct token: ' + userIds.length);
+
+      return [userIds, users, allTroupes, userTroupeUnreadHash];
+    })
+    .spread(function(userIds, users, allTroupes, userTroupeUnreadHash) {
+      if(!userIds.length) return;
+
       /**
        * Step 2: loop through the users
        */

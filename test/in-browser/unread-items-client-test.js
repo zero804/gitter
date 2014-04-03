@@ -337,40 +337,5 @@ define([
 
   });
 
-  describe('TroupeCollectionSync', function() {
-    it('should sync changes from the store to the troupe collection', function(done) {
-      context.setTroupeId('1');
-      context.testOnly.resetTroupeContext({ troupe: { id: '1' }, user: { id: 'USER1' } } );
-
-      var troupeCollection = new troupeModels.TroupeCollection([{ id: '1' }, { id: '2' } ]);
-
-      var unreadItemStore;
-
-      troupeCollection.once('change', function(a) {
-        console.log('A is ', a);
-        expect(a.get('id')).to.be('1');
-        expect(a.get('unreadItems')).to.be(0);
-
-        unreadItemStore._unreadItemAdded('file', 1);
-        unreadItemStore._unreadItemAdded('file', 2);
-
-        troupeCollection.once('change', function(a) {
-          expect(a.get('id')).to.be('1');
-          expect(a.get('unreadItems')).to.be(2);
-
-          var b = troupeCollection.get('2');
-          expect(b.get('unreadItems')).to.be(undefined);
-
-          done();
-        });
-      });
-
-      unreadItemStore = new unreadItemsClient.UnreadItemStore();
-      new unreadItemsClient.TroupeCollectionSync(troupeCollection, unreadItemStore);
-
-
-
-    });
-  });
 
 });

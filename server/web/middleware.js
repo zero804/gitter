@@ -1,11 +1,15 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var passport   = require("passport");
-var winston    = require("winston");
-var nconf      = require('../utils/config');
-var rememberMe = require('./rememberme-middleware');
-var useragent  = require('useragent');
+var passport    = require("passport");
+var winston     = require('../utils/winston');
+var nconf       = require('../utils/config');
+var rememberMe  = require('./rememberme-middleware');
+var useragent   = require('useragent');
+var dolph       = require('dolph');
+var redis       = require("../utils/redis");
+var redisClient = redis.createClient();
+
 
 var authCookieName = nconf.get('web:cookiePrefix') + 'auth';
 var sessionCookieName = nconf.get('web:cookiePrefix') + 'session';
@@ -27,6 +31,7 @@ function bearerAuthMiddleware(req, res, next) {
         // Dodgy hack to sort out problem with RestKit
         req.headers['authorization'] = 'Bearer ' + parts[1];
         bearerLogin(req, res, next);
+
         return;
       }
       if (/Bearer/i.test(scheme)) {
@@ -38,6 +43,20 @@ function bearerAuthMiddleware(req, res, next) {
   next();
 }
 
+var rateLimiter = dolph({
+  prefix: 'rate:',
+  limit: 100,
+  expiry: 60,
+  applyLimit: function(req) {
+    return !!(req.user && req.authInfo && req.authInfo.client);
+  },
+  keyFunction: function(req) {
+    return req.user.id + ':' + req.authInfo.client.id;
+  },
+  redisClient: redisClient
+ });
+
+
 /* Ensures that the person is logging in. However, if they present a bearer token,
  * we'll try log them in first
  */
@@ -45,7 +64,9 @@ exports.ensureLoggedIn = function(options) {
   if(!options) options = {};
 
   return [
+    rememberMe.rememberMeMiddleware(/* No Options */),
     bearerAuthMiddleware,
+    rateLimiter,
     function(req, res, next) {
       if (req.isAuthenticated && req.isAuthenticated()) {
         if(!req.user.githubToken && !req.user.githubUserToken) {
@@ -53,11 +74,12 @@ exports.ensureLoggedIn = function(options) {
           exports.logout()(req, res, function() {
 
             // Are we dealing with an API client? Tell em in HTTP
-            if(req.accepts(['json','html']) === 'json') {
+            if(req.isApiCall || req.accepts(['json','html']) === 'json') {
               winston.error("Use no longer has a token");
               res.send(401, { success: false, loginRequired: true });
               return;
             }
+
             /* Not a web client? Give them the message straightup */
             if(req.headers['authorization']) {
               return next(401);
@@ -75,7 +97,7 @@ exports.ensureLoggedIn = function(options) {
       winston.verbose('Client needs to authenticate', options);
 
       // Are we dealing with an API client? Tell em in HTTP
-      if(req.accepts(['json','html']) === 'json') {
+      if(req.isApiCall || req.accepts(['json','html']) === 'json') {
         winston.error("middleware: User is not logged in. Ye shall not pass!");
         res.send(401, { success: false, loginRequired: true });
         return;
@@ -178,6 +200,7 @@ exports.authenticate = function(scheme, options) {
 
 exports.grantAccessForRememberMeTokenMiddleware = [
   bearerAuthMiddleware,
+  rateLimiter,
   rememberMe.rememberMeMiddleware(/* No Options */),
 ];
 
@@ -203,7 +226,7 @@ exports.simulateDelay = function(timeout) {
 
 exports.ensureValidBrowser = function(req, res, next) {
   var agent = useragent.parse(req.headers['user-agent']);
-  if(agent.family === 'IE' && agent.major <= 9) {
+  if(agent.family === 'IE' && agent.major <= 10) {
     res.relativeRedirect('/-/unawesome-browser');
   } else {
     next();

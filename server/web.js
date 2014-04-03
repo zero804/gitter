@@ -31,6 +31,7 @@ app.use(function(req, res, next) {
   res.send(502, "Server is in the process of restarting");
 });
 
+
 shutdown.installUnhandledExceptionHandler();
 shutdown.addHandler('web', 20, function(callback) {
   gracefullyClosing = true;
@@ -64,8 +65,10 @@ if(nconf.get('test:exposeInBrowserTests')) {
   require('./handlers/in-browser-tests').install(app);
 }
 
-/* This should be last */
+/* This should be second last */
 require('./handlers/app').install(app);
+
+require('./handlers/catch-all').install(app);
 
 var port = nconf.get("PORT");
 server.listen(port, function() {

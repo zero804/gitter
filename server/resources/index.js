@@ -5,17 +5,16 @@ module.exports = {
   install: function(app) {
 
     var auth = [
-        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn()
     ];
 
     // Secure the REST API
-    ['/api/v1/troupes', '/api/v1/user'].forEach(function(path) {
+    ['/api/v1/:res(troupes|rooms)', '/api/v1/user'].forEach(function(path) {
         app.all(path, auth);
         app.all(path + '/*', auth);
     });
 
-    var troupesResource = app.resource('api/v1/troupes',  require('./troupes/troupes'));
+    var troupesResource = app.resource('api/v1/:res(troupes|rooms)',  require('./troupes/troupes'));
 
     function installTroupeSubResource(resourceName, moduleName) {
         var r = app.resource(resourceName,  require('./troupes/' + moduleName));
@@ -40,7 +39,7 @@ module.exports = {
         return r;
     }
 
-    var userTroupeResource = installUserSubResource('troupes', 'troupes');
+    var userTroupeResource = installUserSubResource(':res(troupes|rooms)', 'troupes');
 
     var userSettings = new Resource('settings', require('./user/troupe-settings'), app);
     userTroupeResource.add(userSettings);

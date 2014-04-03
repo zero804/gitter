@@ -57,6 +57,27 @@ exports.findAccessToken = function(token, callback) {
   persistenceService.OAuthAccessToken.findOne({ token: token }, callback);
 };
 
+// TODO: this really needs to be cached!
+exports.findAccessTokenAndClient = function(token, callback) {
+  persistenceService.OAuthAccessToken.findOne({ token: token }, function(err, accessToken) {
+    if(err) return callback(err);
+
+    if(!accessToken) return callback();
+
+    var clientId = accessToken.clientId;
+    if(!clientId) return callback(); // code invalid
+
+    persistenceService.OAuthClient.findById(clientId, function(err, client) {
+      if(err) return callback(err);
+
+      if(!client) return callback(); // code invalid
+
+      return callback(null, accessToken, client);
+    });
+  });
+};
+
+
 
 exports.removeAllAccessTokensForUser = function(userId, callback) {
   return persistenceService.OAuthAccessToken.removeQ({ userId: userId })

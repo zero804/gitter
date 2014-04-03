@@ -2,8 +2,9 @@
 /* global define:false */
 define([
   'utils/context',
-  'views/people/userPopoverView'
-  ], function(context, UserPopoverView) {
+  'views/people/userPopoverView',
+  'utils/dataset-shim'
+  ], function(context, UserPopoverView, dataset) {
   "use strict";
 
   function highlightMention(chatItemView) {
@@ -27,7 +28,7 @@ define([
     decorate: function(chatItemView) {
 
       function clickMention(e) {
-        var username = e.target.dataset.screenName;
+        var username = dataset.get(e.target, 'screenName');
         if(!username) return;
 
         var popover = new UserPopoverView({

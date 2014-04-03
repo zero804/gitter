@@ -2,11 +2,10 @@
 "use strict";
 
 var RedisBatcher = require('../utils/redis-batcher').RedisBatcher;
-var Fiber = require('../utils/fiber');
 var persistence = require('./persistence-service');
 var assert = require('assert');
 var batcher = new RedisBatcher('readby', 0);
-var winston = require('winston');
+var winston = require('../utils/winston');
 var appEvents = require("../app-events");
 var mongoUtils = require('../utils/mongo-utils');
 var Q = require('q');
@@ -34,7 +33,7 @@ batcher.listen(function(key, userIdStrings, done) {
         winston.info('Weird. No chat message found');
       } else {
 
-        appEvents.dataChange2("/troupes/" + troupeId + "/chatMessages", 'patch', {
+        appEvents.dataChange2("/rooms/" + troupeId + "/chatMessages", 'patch', {
           id: "" + chatId,
           readBy: chat.readBy.length,
           v: chat._tv ? 0 + chat._tv : undefined
@@ -42,7 +41,7 @@ batcher.listen(function(key, userIdStrings, done) {
 
         // Its too operationally expensive to serialise the full user object
         userIds.forEach(function(userId) {
-          appEvents.dataChange2("/troupes/" + troupeId + "/chatMessages/" + chatId + '/readBy', 'create', {
+          appEvents.dataChange2("/rooms/" + troupeId + "/chatMessages/" + chatId + '/readBy', 'create', {
             id: userId
           });
         });

@@ -1,7 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var winston = require("winston");
+var winston = require('../utils/winston');
 var appEvents = require("../app-events");
 var restSerializer =  require("../serializers/rest-serializer");
 
@@ -53,7 +53,7 @@ exports.install = function(persistenceService) {
     if(!extractor) {
       // Default extractor
       extractor = function(model) {
-        return "/troupes/" + model.troupeId + "/" + name + "s";
+        return "/rooms/" + model.troupeId + "/" + name + "s";
       };
     }
 
@@ -95,7 +95,7 @@ exports.install = function(persistenceService) {
           if(err) { winston.error("Silently failing user update: ", { exception: err }); return next(); }
 
           troupeIds.forEach(function(troupeId) {
-            var url = "/troupes/" + troupeId + "/users";
+            var url = "/rooms/" + troupeId + "/users";
             appEvents.dataChange2(url, "update", serializedModel);
           });
 
@@ -141,7 +141,7 @@ exports.install = function(persistenceService) {
   // });
   //
   function chatUrlExtractor(model) {
-    return "/troupes/" + model.toTroupeId + "/chatMessages";
+    return "/rooms/" + model.toTroupeId + "/chatMessages";
   }
   mongooseUtils.attachNotificationListenersToSchema(schemas.ChatMessageSchema, {
     onCreate: function(model, next) {
@@ -182,7 +182,7 @@ exports.install = function(persistenceService) {
 
 
   attachNotificationListenersToSchema(schemas.EventSchema, 'event', function(model) {
-    return '/troupes/' + model.toTroupeId + '/events';
+    return '/rooms/' + model.toTroupeId + '/events';
   });
   /*
   attachNotificationListenersToSchema(schemas.TroupeSchema, 'troupe', function(model) {
@@ -196,7 +196,7 @@ exports.install = function(persistenceService) {
   function serializeOneToOneTroupe(operation, troupe) {
     troupe.users.forEach(function(troupeUser) {
       var currentUserId = troupeUser.userId;
-      var url = '/user/' + troupeUser.userId + '/troupes';
+      var url = '/user/' + troupeUser.userId + '/rooms';
 
       var strategy = new restSerializer.TroupeStrategy({ currentUserId: currentUserId });
 
@@ -220,7 +220,7 @@ exports.install = function(persistenceService) {
         return next();
       }
 
-      var urls = model.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/troupes'; });
+      var urls = model.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/rooms'; });
       serializeEvent(urls, 'create', model);
       next();
     },
@@ -232,7 +232,7 @@ exports.install = function(persistenceService) {
         return next();
       }
 
-      var urls = model.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/troupes'; });
+      var urls = model.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/rooms'; });
       serializeEvent(urls, 'update', model);
       next();
     },
@@ -244,7 +244,7 @@ exports.install = function(persistenceService) {
         return;
       }
 
-      var urls = model.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/troupes'; });
+      var urls = model.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/rooms'; });
       serializeEvent(urls, 'remove', model);
     }
   });

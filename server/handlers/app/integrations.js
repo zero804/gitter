@@ -1,7 +1,7 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var winston                      = require("winston");
+var winston                      = require('../../utils/winston');
 var nconf                        = require('../../utils/config');
 var permissionsModel             = require('../../services/permissions-model');
 var middleware                   = require('../../web/middleware');
@@ -131,63 +131,54 @@ module.exports = {
     install: function(app) {
 
       app.get('/settings/integrations/:roomPart1',
-        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         adminAccessCheck,
         getIntegrations);
 
       app.get('/settings/integrations/:roomPart1/:roomPart2',
-        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         adminAccessCheck,
         getIntegrations);
 
       app.get('/settings/integrations/:roomPart1/:roomPart2/:roomPart3',
-        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         adminAccessCheck,
         getIntegrations);
 
       app.del('/settings/integrations/:roomPart1',
-        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         adminAccessCheck,
         deleteIntegration);
 
       app.del('/settings/integrations/:roomPart1/:roomPart2',
-        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         adminAccessCheck,
         deleteIntegration);
 
       app.del('/settings/integrations/:roomPart1/:roomPart2/:roomPart3',
-        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         adminAccessCheck,
         deleteIntegration);
 
       app.post('/settings/integrations/:roomPart1',
-        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         adminAccessCheck,
         createIntegration);
 
       app.post('/settings/integrations/:roomPart1/:roomPart2',
-        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         adminAccessCheck,
         createIntegration);
 
       app.post('/settings/integrations/:roomPart1/:roomPart2/:roomPart3',
-        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         adminAccessCheck,

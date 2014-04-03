@@ -12,6 +12,7 @@ require([
   'views/createRoom/createRoomView',
   'views/createRoom/createRepoRoomView',
   'views/createRoom/chooseRoomView',
+  'log!router-app',
   'views/widgets/preload',                // No ref
   'components/webNotifications',          // No ref
   'components/desktopNotifications',      // No ref
@@ -20,12 +21,17 @@ require([
   'components/csrf',                      // No ref
   'components/ajax-errors'                // No ref
 ], function(appEvents, context, Backbone, _, AppIntegratedView, TroupeMenuView, troupeCollections,
-  TitlebarUpdater, realtime, createRoomView, createRepoRoomView, chooseRoomView) {
+  TitlebarUpdater, realtime, createRoomView, createRepoRoomView, chooseRoomView, log) {
   "use strict";
 
   var chatIFrame = document.getElementById('content-frame');
   if(window.location.hash) {
     chatIFrame.src = chatIFrame.src + window.location.hash;
+  }
+
+  function pushState(state, title, url) {
+    window.history.pushState(state, title, url);
+    appEvents.trigger('track', url);
   }
 
   var appView = new AppIntegratedView({ });
@@ -36,7 +42,14 @@ require([
     if(state) {
       // TODO: update the title....
       context.setTroupeId(undefined);
-      chatIFrame.src = state+window.location.hash;
+      var hash;
+      var windowHash = window.location.hash;
+      if(!windowHash || windowHash === '#') {
+        hash = '#initial';
+      } else {
+        hash = windowHash;
+      }
+      chatIFrame.contentWindow.location.assign(state + hash);
     }
   }
 
@@ -52,10 +65,11 @@ require([
 
       titlebarUpdater.setRoomName(title);
 
-      window.history.pushState(newFrame, title, newLocation);
+      pushState(newFrame, title, newLocation);
       updateContent(newFrame);
     }
   });
+
 
   appEvents.on('navigation', function(url, type, title) {
     // This is a bit hacky..
@@ -65,32 +79,62 @@ require([
     var frameUrl = url + '/~' + type;
     titlebarUpdater.setRoomName(title);
 
-    window.history.pushState(frameUrl, title, url);
+    pushState(frameUrl, title, url);
     updateContent(frameUrl);
   });
 
   // Revert to a previously saved state
-  window.addEventListener('popstate', function(event) {
-    updateContent(event.state);
-  });
+  window.onpopstate = function(e) {
+    updateContent(e.state);
+    appEvents.trigger('track', window.location.pathname + window.location.hash);
+    return true;
+  };
 
   window.addEventListener('message', function(e) {
-    if(e.origin !== context.env('basePath')) return;
+    if(e.origin !== context.env('basePath')) {
+      log('Ignoring message from ' + e.origin);
+      return;
+    }
 
     var message = JSON.parse(e.data);
+    log('Received message ', message);
+
     switch(message.type) {
       case 'context.troupeId':
         context.setTroupeId(message.troupeId);
         titlebarUpdater.setRoomName(message.name);
         break;
+
       case 'navigation':
         appEvents.trigger('navigation', message.url, message.urlType, message.title);
         break;
+
       case 'route':
         window.location.hash = '#' + message.hash;
         break;
+
+      case 'unreadItemsCount':
+        var count = message.count;
+        var troupeId = message.troupeId;
+        if(troupeId !== context.getTroupeId()) {
+          log('warning: troupeId mismatch in unreadItemsCount');
+        }
+        var v = {
+          unreadItems: count
+        };
+
+        if(count === 0) {
+          // If there are no unread items, there can't be unread mentions
+          // either
+          v.mentions = 0;
+        }
+
+        allRoomsCollection.patch(troupeId, v);
+        break;
+
       case 'realtime.testConnection':
-        realtime.testConnection();
+        var reason = message.reason;
+        realtime.testConnection('chat.' + reason);
         break;
     }
   });

@@ -7,7 +7,7 @@ var ObjectId      = Schema.ObjectId;
 var mongooseUtils = require('../utils/mongoose-utils');
 var appEvents     = require("../app-events");
 var _             = require("underscore");
-var winston       = require("winston");
+var winston       = require('../utils/winston');
 var nconf         = require("../utils/config");
 var shutdown      = require('../utils/shutdown');
 var Fiber         = require("../utils/fiber");
@@ -383,10 +383,10 @@ TroupeSchema.methods.addUserById = function(userId, options) {
   this.post('save', function(postNext) {
     var f = new Fiber();
 
-    var url = "/troupes/" + this.id + "/users";
+    var url = "/rooms/" + this.id + "/users";
     serializeEvent(url, "create", troupeUser, f.waitor());
 
-    var userUrl = "/user/" + userId + "/troupes";
+    var userUrl = "/user/" + userId + "/rooms";
     serializeEvent(userUrl, "create", this, f.waitor());
 
 
@@ -398,7 +398,7 @@ TroupeSchema.methods.addUserById = function(userId, options) {
 };
 
 function serializeOneToOneTroupeEvent(userId, operation, model, callback) {
-  var oneToOneUserUrl = '/user/' + userId + '/troupes';
+  var oneToOneUserUrl = '/user/' + userId + '/rooms';
   var restSerializer = getRestSerializerLateBound();
 
   var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
@@ -426,10 +426,10 @@ TroupeSchema.methods.removeUserById = function(userId) {
 
       if(!this.oneToOne) {
         /* Dont mark the user as having been removed from the room */
-        var url = "/troupes/" + this.id + "/users";
+        var url = "/rooms/" + this.id + "/users";
         serializeEvent(url, "remove", troupeUser, f.waitor());
 
-        var userUrl = "/user/" + userId + "/troupes";
+        var userUrl = "/user/" + userId + "/rooms";
         serializeEvent(userUrl, "remove", this, f.waitor());
 
         // TODO: move this in a remove listener somewhere else in the codebase
@@ -627,7 +627,7 @@ ConversationSchema.schemaTypeName = 'ConversationSchema';
 
 ConversationSchema.methods.pushEmail = function(email) {
   this.post('save', function(postNext) {
-    var url = "/troupes/" + this.troupeId + "/conversations/" + this.id;
+    var url = "/rooms/" + this.troupeId + "/conversations/" + this.id;
     serializeEvent(url, "create", email, postNext);
   });
 
@@ -637,7 +637,7 @@ ConversationSchema.methods.pushEmail = function(email) {
 ConversationSchema.methods.removeEmail = function(email) {
   // TODO: unfortunately the TroupeUser middleware remove isn't being called as we may have expected.....
   this.post('save', function(postNext) {
-    var url = "/troupes/" + this.troupeId + "/conversations/" + this.id;
+    var url = "/rooms/" + this.troupeId + "/conversations/" + this.id;
     serializeEvent(url, "remove", email, postNext);
   });
 
@@ -677,9 +677,11 @@ var OAuthClientSchema = new Schema({
   clientKey: String,
   clientSecret: String,
   registeredRedirectUri: String,
-  canSkipAuthorization: Boolean
+  canSkipAuthorization: Boolean,
+  ownerUserId: ObjectId
 });
 OAuthClientSchema.index({ clientKey: 1 });
+OAuthClientSchema.index({ ownerUserId: 1 });
 OAuthClientSchema.schemaTypeName = 'OAuthClientSchema';
 
 var OAuthCodeSchema = new Schema({

@@ -1,17 +1,21 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
+  'underscore',
   'utils/context',
   'faye',
   'utils/appevents',
   'log!realtime'
-], function($, context, Faye, appEvents, log) {
+], function($, _, context, Faye, appEvents, log) {
   "use strict";
 
-  if(window.localStorage.fayeLogging) {
-    Faye.Logging.logLevel = parseInt(window.localStorage.fayeLogging, 10);
-    Faye.logger = log;
-  }
+  var logLevel = parseInt(window.localStorage.fayeLogging, 10) || 0;
+
+  Faye.logger = {};
+  var logLevels = ['fatal', 'error', 'warn', 'info', 'debug'];
+  logLevels.slice(0, 1 + logLevel).forEach(function(level) {
+    Faye.logger[level] = function(msg) { log('faye: ' + level + ': ' + msg); };
+  });
 
   var clientId = null;
 
@@ -85,6 +89,17 @@ define([
     callback(message);
   };
 
+  var ErrorLogger = function() {};
+  ErrorLogger.prototype.incoming = function(message, callback) {
+    if(message.error) {
+      log('Bayeux error', message);
+    }
+
+    callback(message);
+  };
+
+  var subscribeOptions = {};
+
   var ClientAuth = function() {};
   ClientAuth.prototype.outgoing = function(message, callback) {
     if(message.channel == '/meta/handshake') {
@@ -102,6 +117,13 @@ define([
 
     } else if(message.channel == '/meta/subscribe') {
       if(!message.ext) { message.ext = {}; }
+
+      var options = subscribeOptions[message.subscription];
+      if(options) {
+        message.ext = _.extend(message.ext, options);
+        delete subscribeOptions[message.channel];
+      }
+
       message.ext.eyeballs = eyeballState ? 1 : 0;
     }
 
@@ -202,6 +224,7 @@ define([
     client.addExtension(new ClientAuth());
     client.addExtension(snapshotExtension);
     client.addExtension(new AccessTokenFailureExtension());
+    client.addExtension(new ErrorLogger());
 
     var userSubscription;
 
@@ -240,10 +263,9 @@ define([
     return client;
   }
 
-  $(document).on('reawaken', function() {
+  appEvents.on('reawaken', function() {
     log('Recycling connection after reawaken');
-
-    testConnection();
+    testConnection('reawaken');
   });
 
   // Cordova events.... doesn't matter if IE8 doesn't handle them
@@ -251,21 +273,38 @@ define([
     document.addEventListener("deviceReady", function() {
       document.addEventListener("online", function() {
         log('realtime: online');
-        testConnection();
+        testConnection('device_ready');
       }, false);
     }, false);
   }
 
-  function testConnection() {
+  var pingResponseOutstanding = false;
+
+  function testConnection(reason) {
     /* Only test the connection if one has already been established */
     if(!client) return;
+    if(pingResponseOutstanding) return;
 
-    appEvents.trigger('realtime.testConnection');
+    appEvents.trigger('realtime.testConnection', reason);
 
-    client.publish('/api/v1/ping2', { })
+    log('Testing connection');
+
+    pingResponseOutstanding = true;
+
+    /* Only hold back pings for 30s, then retry is neccessary */
+    setTimeout(function() {
+      if(pingResponseOutstanding) {
+        log('Ping response still outstanding, resetting.');
+        pingResponseOutstanding = false;
+      }
+    }, 30000);
+
+    client.publish('/api/v1/ping2', { reason: reason })
       .then(function() {
+        pingResponseOutstanding = false;
         log('Server ping succeeded');
       }, function(error) {
+        pingResponseOutstanding = false;
         log('Unable to ping server', error);
         // We could reinstate the persistant outage concept on this
       });
@@ -276,7 +315,11 @@ define([
       return clientId;
     },
 
-    subscribe: function(channel, callback, context) {
+    subscribe: function(channel, callback, context, options) {
+      if(options && options.snapshot === false) {
+        subscribeOptions[channel] = { snapshot: false };
+      }
+
       return getOrCreateClient().subscribe(channel, callback, context);
     },
 

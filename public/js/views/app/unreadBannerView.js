@@ -85,7 +85,7 @@ define([
       if(this.getUnreadCount() < 1) return;
 
       $.ajax({
-        url: "/api/v1/user/" + context.getUserId() + "/troupes/" + context.getTroupeId() + "/unreadItems/all",
+        url: "/api/v1/user/" + context.getUserId() + "/rooms/" + context.getTroupeId() + "/unreadItems/all",
         data: "",
         type: "DELETE",
       });

@@ -1,7 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var winston            = require("winston");
+var winston            = require('../utils/winston');
 var ObjectID           = require('mongodb').ObjectID;
 var Q                  = require('q');
 var request            = require('request');
@@ -88,7 +88,7 @@ exports.applyAutoHooksForRepoRoom = applyAutoHooksForRepoRoom;
  * Private method to push creates out to the bus
  */
 function serializeCreateEvent(troupe) {
-  var urls = troupe.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/troupes'; });
+  var urls = troupe.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/rooms'; });
   serializeEvent(urls, 'create', troupe);
 }
 
@@ -382,6 +382,10 @@ function generateRandomName() {
   return s;
 }
 
+function notValidGithubRepoName(repoName) {
+  return (/^[\w\-]{1,}$/).test(repoName);
+}
+
 function ensureNoRepoNameClash(user, uri) {
   var parts = uri.split('/');
 
@@ -391,6 +395,11 @@ function ensureNoRepoNameClash(user, uri) {
   }
 
   if(parts.length == 2) {
+    /* If the name is non-valid in github land, it's safe to use it here */
+    if(!notValidGithubRepoName(parts[1])) {
+      return false;
+    }
+
     var repoService = new GitHubRepoService(user);
     return repoService.getRepo(uri)
       .then(function(repo) {

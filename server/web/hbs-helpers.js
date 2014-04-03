@@ -18,10 +18,12 @@ if(nconf.get("cdn:use")) {
 
 // This stuff never changes
 var troupeEnv = {
+  domain: nconf.get('web:domain'),
   baseServer: nconf.get('web:baseserver'),
   basePath: nconf.get('web:basepath'),
   homeUrl: nconf.get('web:homeurl'),
   badgeBaseUrl: nconf.get('web:badgeBaseUrl'),
+  embedBaseUrl: nconf.get('web:embedBaseUrl'),
   mixpanelToken: nconf.get("stats:mixpanel:token"),
   googleTrackingId: nconf.get("web:trackingId"),
   goSquaredTrackingId: nconf.get("web:goSquaredId"),
@@ -39,6 +41,10 @@ var troupeEnv = {
       interval: nconf.get('ws:fayeInterval')
     }
   },
+  embed: {
+    basepath: nconf.get('embed:basepath'),
+    cacheBuster: nconf.get('embed:cacheBuster')
+  }
 };
 
 exports.cdn = function(url, parameters) {
@@ -80,6 +86,7 @@ exports.bootScript = function(url, parameters) {
 };
 
 exports.isMobile = function(agent, options) {
+  if (!agent) return false;
   return ((agent.match(/ipad/i)) ? options.fn(this) : null);
 };
 

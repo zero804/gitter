@@ -6,7 +6,6 @@ var middleware = require('../../web/middleware');
 module.exports = {
   install: function(app) {
     var auth = [
-        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn()
     ];
 
@@ -35,6 +34,10 @@ module.exports = {
     app.get('/api/private/irc-token',
         auth,
         require('./irc-token.js'));
+
+    app.get('/api/private/issue-state',
+        auth,
+        require('./issue-state.js'));
 
     app.get('/api/private/validate-token',
         require('./validate-token.js'));

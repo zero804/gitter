@@ -46,6 +46,11 @@ define([
     },
 
     initialize: function(options) {
+      this.listenToOnce(this.model, 'change:unread', function() {
+        if(!this.model.get('unread')) {
+          this.$el.removeClass('unread');
+        }
+      });
 
       this._oneToOne = context.inOneToOneTroupeContext();
 
@@ -160,25 +165,25 @@ define([
         var readByCount = this.model.get('readBy');
         var oldValue = this.model.previous('readBy');
 
+        var readByLabel = this.$el.find('.trpChatReadBy');
 
-        if((!!oldValue) !== (!!readByCount)) {
-          var readByLabel = this.$el.find('.trpChatReadBy');
-          if(readByLabel.length === 0) {
-            if(readByCount) {
-             readByLabel = $(document.createElement('div')).addClass('trpChatReadBy');
-             readByLabel.insertBefore(this.$el.find('.trpChatEdit'));
-             setTimeout(function() {
-               readByLabel.addClass('readBySome');
-             }, 10);
-            }
-          } else {
+        if(readByLabel.length === 0) {
+          if(readByCount) {
+           readByLabel = $(document.createElement('div')).addClass('trpChatReadBy');
+           readByLabel.insertBefore(this.$el.find('.trpChatEdit'));
+           setTimeout(function() {
+             readByLabel.addClass('readBySome');
+           }, 10);
+          }
+        } else {
+          if((oldValue === 0) !== (readByCount === 0)) {
             // Things have changed
             readByLabel.toggleClass('readBySome', !!readByCount);
           }
-
-          readByLabel.text(readByCount ? this.getReadByText(readByCount) : '');
-
         }
+
+        readByLabel.text(readByCount ? this.getReadByText(readByCount) : '');
+
       }
     },
 

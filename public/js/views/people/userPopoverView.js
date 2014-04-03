@@ -8,8 +8,7 @@ define([
   'utils/appevents',
   'utils/context',
   'utils/cdn',
-  'underscore'
-], function(Marionette, Backbone, Popover, template, footerTemplate, appEvents, context, cdn, _) {
+], function(Marionette, Backbone, Popover, template, footerTemplate, appEvents, context, cdn) {
   "use strict";
 
   var failoverImage = cdn('images/2/gitter/logo-mark-grey-64.png');

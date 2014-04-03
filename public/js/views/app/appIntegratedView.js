@@ -1,21 +1,10 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
-  'views/base',
-  'utils/context',
-  'utils/appevents',
   'marionette',
-  // 'views/signup/usernameView',
-  // 'views/profile/profileView',
   'views/app/uiVars',
-  'views/widgets/avatar',
-  // 'components/webNotifications',
-  'components/modal-region',
-  'cocktail',
-  // 'utils/scrollbar-detect',
-  'bootstrap_tooltip'  // no ref
-  ], function($, TroupeViews, context, appEvents, Marionette, /*UsernameView, ProfileView,*/ uiVars, AvatarView,
-    /*notifications,*/ modalRegion, cocktail/*, hasScrollBars*/) {
+  'components/modal-region'
+  ], function($, Marionette, uiVars, modalRegion) {
   "use strict";
 
   /** @const */
@@ -30,98 +19,26 @@ define([
     "click #menu-toggle-button":        "onMenuToggle",
     "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
     "mouseenter #content-frame":        "onMouseEnterContentFrame",
-    "mouseenter #left-menu":            "onMouseEnterLeftMenu",
-    "mouseenter #toolbar-frame":        "onMouseEnterToolbar",
-    "mouseleave #toolbar-frame":        "onMouseLeaveToolbar",
     "keypress":                         "onKeyPress",
     "keydown":                          "onKeyDown",
     "click #troupe-more-actions":       "toggleTroupeMenu",
     "click #favourite-button":          "toggleFavourite"
   };
 
-  $('.trpDisplayPicture').tooltip('destroy');
+  // WHAT IS THIS??? $('.trpDisplayPicture').tooltip('destroy');
 
   var AppIntegratedLayout = Marionette.Layout.extend({
     el: 'body',
-    // leftmenu: false,
-    // rightpanel: false,
-    // profilemenu: false,
-    // shifted: false,
-    // alertpanel: false,
-    // files: false,
-    // originalRightMargin: "",
     regions: {
-      leftMenuRegion: "#left-menu",
-      // rightPanelRegion: "#right-panel",
-      // rightToolbarRegion: "#toolbar-frame"
+      leftMenuRegion: "#left-menu"
     },
 
     events: uiVars.isMobile ? touchEvents : mouseEvents,
 
     initialize: function() {
-      var self = this;
-
-      new AvatarView({
-        el: $('#profile-icon'),
-        user: context.getUser(),
-        showTooltip: false
-      }).render();
-
-      $('#profile-icon, #home-icon').tooltip();
-
-      // $('body').append('<span id="fineUploader"></span>');
-
-      //$(".nano").nanoScroller({ preventPageScrolling: true });
-
       this.dialogRegion = modalRegion;
       this._leftMenuLockCount = 0;
-
-      // this.rightPanelRegion.on('show', function() {
-      //   //log("SHOW PANEL");
-      //   self.showPanel("#right-panel");
-      // });
-
-      // if (hasScrollBars()) {
-      //   $(".trpChatContainer").addClass("scroller");
-      //   $(".trpChatInputArea").addClass("scrollpush");
-      // }
-
-      // this.rightPanelRegion.on('close', function() {
-      //   window.setTimeout(function() {
-      //     if(!self.rightPanelRegion.currentView) {
-      //       //log("CLOSE PANEL");
-      //       self.hidePanel("#right-panel");
-      //     }
-      //   }, 100);
-      // });
-
-      // var profileCompleteTimeout = 60 * 1000;
-      // setTimeout(function() {
-      //   self.ensureSignupIsComplete();
-      // }, profileCompleteTimeout);
     },
-
-    // ensureSignupIsComplete: function() {
-    //   var self = this, noteId = 'completeSignup';
-    //   if (!context.isProfileComplete() || !context().user.username) {
-    //     notifications.notify({
-    //       id: noteId,
-    //       content: "<a href='#'>Click here to complete the signup process</a>",
-    //       timeout: Infinity,
-    //       click: function() {
-    //         notifications.notify({ id: noteId, action: 'hide' });
-    //         self.ensureProfileIsComplete();
-    //         self.ensureProfileIsUsernamed();
-    //       }
-    //     });
-    //   }
-    // },
-
-    // ensureProfileIsComplete: function() {
-    //   if (!context.isProfileComplete()) {
-    //     new ProfileView.Modal().show();
-    //   }
-    // },
 
     showMenu: function() {
       if (this._menuAnimating) return;
@@ -147,11 +64,8 @@ define([
       var self = this;
       this._menuAnimating = true;
 
-      appEvents.trigger('leftMenu:animationStarting');
       setTimeout(function() {
         self._menuAnimating = false;
-        appEvents.trigger('leftMenu:showing');
-        appEvents.trigger('leftMenu:animationComplete');
       }, 350);
 
       $("#left-menu").addClass("visible");
@@ -171,11 +85,8 @@ define([
       var self = this;
       this._menuAnimating = true;
 
-      appEvents.trigger('leftMenu:animationStarting');
       setTimeout(function() {
         self._menuAnimating = false;
-        appEvents.trigger('leftMenu:hidden');
-        appEvents.trigger('leftMenu:animationComplete');
       }, 350);
 
       $("#mini-left-menu, #mini-left-menu-container").removeClass("active");
@@ -184,38 +95,6 @@ define([
 
       this.leftmenu = false;
     },
-
-
-    // togglePanel: function(whichPanel) {
-    //   if (this.rightpanel) {
-    //     this.hidePanel(whichPanel);
-    //   } else {
-    //     this.showPanel(whichPanel);
-    //   }
-    // },
-
-    // showTroupeMenu: function() {
-    //   // $("#file-list").css({"width" : "200px" , "padding-left" : "20px"});
-    //   $("#toolbar-frame").addClass("expanded");
-    //   this.files = true;
-    // },
-
-    // hideTroupeMenu: function() {
-    //   // $("#file-list").css({"width": "0px", "padding-left" : "0"});
-    //   $("#toolbar-frame").removeClass("expanded");
-    //   this.files = false;
-    // },
-
-    // toggleTroupeMenu: function() {
-    //   if (this.files) {
-    //     this.hideTroupeMenu();
-    //     $("#right-menu-icon").removeClass("active");
-    //   }
-    //   else {
-    //     this.showTroupeMenu();
-    //     $("#right-menu-icon").addClass("active");
-    //   }
-    // },
 
     toggleMenu: function() {
       if (this.leftmenu) {
@@ -250,83 +129,9 @@ define([
         e.stopPropagation();
         e.preventDefault();
       }
-    },
-
-    onKeyPress: function(e) {
-
-      //  return if user is copying or pasting
-      if ( e.metaKey || e.ctrlKey ) return true;
-
-      // // return if a form input has focus
-      // if ( $("*:focus").is("textarea, input") ) return true;
-
-      // // return in a modal is open
-      // if ( $("body").hasClass('modal-open') ) return true;
-
-      // // unless the left menu is open,
-      // if (!this.leftmenu) {
-      //   // put focus on the chat input box
-      //   $("#chat-input-textarea").focus();
-      //   // the first key press will propogate to the input box
-      //   return true;
-      // }
-      // // if the left menu is open,
-      // else {
-      //   // show and focus the search box
-      //   $(window).trigger('showSearch');
-      //   // the first key press should be propogated if the box is displayed before focussed
-      //   return true;
-      // }
-
-      // // t shows Troupe menu
-      // // if(e.keyCode == 84) {
-      // //   this.toggleMenu();
-      // // }
-
-      // // esc returns to the mail view
-      // if(e.keyCode == 27) {
-      //   window.location.href = '#';
-      // }
-
-      // esc returns to the mail view
-    },
-
-    // /* Header */
-    // showProfileMenu: function() {
-    //   if (!this.profilemenu) {
-
-    //     // $(".trpProfileMenu").animate({
-    //     //     width: '132px'
-    //     // }, 250, function () {
-
-    //     // });
-
-    //     $(".trpProfileMenu").fadeIn('fast');
-    //     this.profilemenu = true;
-    //   }
-    // },
-
-    // hideProfileMenu: function() {
-    //   if (this.profilemenu) {
-    //     $(".trpProfileMenu").fadeOut('fast');
-    //     // $(".trpProfileMenu").animate({
-    //     //     width: '0px'
-    //     // }, 250);
-    //     this.profilemenu = false;
-    //   }
-    // },
-
-    // lockLeftMenuOpen: function() {
-    //   this._leftMenuLockCount++;
-    // },
-
-    // unlockLeftMenuOpen: function() {
-    //   this._leftMenuLockCount--;
-    // }
-
+    }
 
   });
-  cocktail.mixin(AppIntegratedLayout, TroupeViews.DelayedShowLayoutMixin);
 
   return AppIntegratedLayout;
 });

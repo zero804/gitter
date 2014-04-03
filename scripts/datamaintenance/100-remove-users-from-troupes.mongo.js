@@ -4,49 +4,6 @@ var removeIds = [];
 var requiresModify = false;
 
 /* Mongo 2.2 doesn't support Object.keys */
-function keys(obj) {
-  var result = [];
-  for(var i in obj) {
-    if(obj.hasOwnProperty(i)) {
-      result.push(i);
-    }
-  }
-  return result;
-}
-
-function hashTroupeUsers() {
-  var allUsers = db.troupes.find({}, { _id: 0, 'users.userId': 1 } ).
-    map(function(users) {
-      return users.users;
-    });
-
-    var memo = {};
-    if(allUsers) {
-      allUsers.forEach(function(val) {
-        if(val) {
-          val.forEach(function(troupeUser) {
-            if(troupeUser.userId.valueOf()) {
-              memo[troupeUser.userId.valueOf()] = true;
-            }
-          });
-        }
-      });
-
-    }
-
-    return memo;
-}
-
-function findMissingTroupeUsers() {
-  var troupeUsers = hashTroupeUsers();
-
-  db.users.find({ _id: { $in: keys(troupeUsers).map(function(d) { return new ObjectId(d); }) } }, { _id: 1 }).
-    forEach(function(user) {
-      delete troupeUsers[user._id.valueOf()];
-    });
-
-  return keys(troupeUsers).map(function(d) { return new ObjectId(d); });
-}
 
 function addCandidates(query, reason, update) {
   db.troupes.find(query).forEach(function(d) {
@@ -67,23 +24,6 @@ addCandidates(
   { $pull: { users: { userId: { $exists: false } } } }
   );
 
-// Find users referenced in troupes who arent in the users collection
-var missingUserIds = findMissingTroupeUsers();
-
-if(missingUserIds.length) {
-  db.troupes.find({ users: { $size: { $gt: 0 } }, 'users.userId': { $in: missingUserIds } }).forEach(function(d) {
-    count++;
-    candidates.push({ reason: 'user_not_found', doc: d });
-    requiresModify = true;
-  });
-
-  if(modify) {
-    missingUserIds.forEach(function(id) {
-      db.troupes.update( { "users.userId": id }, { $pull: { users: { userId: id } } }, { multi: true });
-    });
-  }
-}
-
 addCandidates(
   { oneToOne: false, uri: null },
   'no_uri',
@@ -97,12 +37,6 @@ addCandidates(
   );
 
 addCandidates(
-  { status: 'ACTIVE', users: { $size: 0 } },
-  'no_users',
-  { $set: { status: 'DELETED' } }
-  );
-
-addCandidates(
   { status: 'DELETED', users: { $not: { $size: 0 } } },
   'deleted_troupe_with_users',
   { $set: { users: [] } }
@@ -113,6 +47,28 @@ addCandidates(
   'delete_troupe_without_date_deleted',
   { $set: { dateDeleted: Date.now() } }
   );
+
+
+var allUserIds = db.troupes.distinct('users.userId', { });
+var existingUsers = db.users.find({ _id: { $in: allUserIds } }, { _id: 1 }).toArray().reduce(function(memo, index) { memo[index._id] = true; return memo; }, {});
+
+var missingUsers = allUserIds.filter(function(userId) {
+  return !existingUsers[userId];
+});
+
+db.troupes.find({ 'users.userId': { $in: missingUsers } }).forEach(function(t) {
+  candidates.push({ reason: 'user_not_found', doc: t });
+  requiresModify = true;
+});
+
+if(modify && missingUsers.length) {
+  missingUsers.forEach(function(u, index) {
+    if(index % 100 === 0) {
+      print('Removing missing user ' + index + ' of ' + missingUsers.length);
+    }
+    db.troupes.update( { "users.userId": u }, { $pull: { users: { userId: u } } }, { multi: true });
+  });
+}
 
 printjson({ candidates: candidates, summary: { scanned: count, invalid: candidates.length }});
 

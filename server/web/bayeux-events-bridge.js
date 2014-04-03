@@ -1,15 +1,38 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var winston           = require('winston');
+var winston           = require('../utils/winston');
 var appEvents         = require("../app-events");
 var bayeux            = require('./bayeux');
 var ent               = require('ent');
 var presenceService   = require("../services/presence-service");
-var restSerializer    = require('../serializers/rest-serializer')
+var restSerializer    = require('../serializers/rest-serializer');
+
+
+function findFailbackChannel(channel) {
+  var res = [
+    /^\/api\/v1\/rooms\//,
+    /^\/api\/v1\/user\/\w+\/rooms\//
+  ];
+
+  for(var i = 0; i < res.length; i++) {
+    var m = channel.match(res[i]);
+    if(m) return channel.replace(/\/rooms\//, '/troupes/');
+  }
+}
 
 exports.install = function() {
   var bayeuxClient = bayeux.client;
+
+  function publish(channel, message) {
+    bayeuxClient.publish(channel, message);
+
+    var failbackChannel = findFailbackChannel(channel);
+
+    if(failbackChannel) {
+      bayeuxClient.publish(failbackChannel, message);
+    }
+  }
 
   appEvents.localOnly.onDataChange2(function(data) {
 
@@ -27,7 +50,7 @@ exports.install = function() {
           model: model
         };
 
-        bayeuxClient.publish(url, message);
+        publish(url, message);
 
         break;
       default:
@@ -75,14 +98,14 @@ exports.install = function() {
       };
       winston.verbose("Notification to " + url, message);
 
-      bayeuxClient.publish(url, message);
+      publish(url, message);
   });
 
   appEvents.localOnly.onUserLoggedIntoTroupe(function(data) {
     var troupeId = data.troupeId;
     var userId = data.userId;
 
-    bayeuxClient.publish("/api/v1/troupes/" + troupeId, {
+    publish("/api/v1/rooms/" + troupeId, {
       notification: "presence",
       userId: userId,
       status: "in"
@@ -94,7 +117,7 @@ exports.install = function() {
     var troupeId = data.troupeId;
     var userId = data.userId;
 
-    bayeuxClient.publish("/api/v1/troupes/" + troupeId, {
+    publish("/api/v1/rooms/" + troupeId, {
       notification: "presence",
       userId: userId,
       status: "out"
@@ -109,7 +132,7 @@ exports.install = function() {
     var troupeId = data.troupeId;
     var total = data.total;
 
-    bayeuxClient.publish("/api/v1/user/" + userId, {
+    publish("/api/v1/user/" + userId, {
       notification: "troupe_unread",
       troupeId: troupeId,
       totalUnreadItems: total
@@ -123,20 +146,20 @@ exports.install = function() {
     var total = data.total;
     var member = data.member;
 
-    bayeuxClient.publish("/api/v1/user/" + userId, {
+    publish("/api/v1/user/" + userId, {
       notification: "troupe_mention",
       troupeId: troupeId,
       mentions: total
     });
 
-    var mentionUrl = "/api/v1/user/" + userId + "/troupes";
+    var mentionUrl = "/api/v1/user/" + userId + "/rooms";
     if(data.op === 'add' && total === 1 && !member) {
       var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
 
       restSerializer.serializeQ(troupeId, strategy)
         .then(function(troupe) {
           // Simulate a create on the mentions resource
-          bayeuxClient.publish(mentionUrl, {
+          publish(mentionUrl, {
             operation: 'create',
             model: troupe
           });
@@ -144,7 +167,7 @@ exports.install = function() {
 
     } else if(data.op === 'remove' && total === 0 && !member) {
       // Simulate a remove
-      bayeuxClient.publish(mentionUrl, {
+      publish(mentionUrl, {
         operation: 'remove',
         model: {
           id: troupeId
@@ -152,7 +175,7 @@ exports.install = function() {
       });
     } else {
       // Just patch the mention count
-      bayeuxClient.publish(mentionUrl, {
+      publish(mentionUrl, {
         operation: 'patch',
         model: {
           id: troupeId,
@@ -169,12 +192,12 @@ exports.install = function() {
     var troupeId = data.troupeId;
     var items = data.items;
 
-    bayeuxClient.publish("/api/v1/user/" + userId, {
+    publish("/api/v1/user/" + userId, {
       notification: "activity",
       troupeId: troupeId
     });
 
-    bayeuxClient.publish("/api/v1/user/" + userId + '/troupes/' + troupeId + '/unreadItems', {
+    publish("/api/v1/user/" + userId + '/rooms/' + troupeId + '/unreadItems', {
       notification: "unread_items",
       items: items
     });
@@ -186,7 +209,7 @@ exports.install = function() {
     var troupeId = data.troupeId;
     var items = data.items;
 
-    bayeuxClient.publish("/api/v1/user/" + userId + '/troupes/' + troupeId + '/unreadItems', {
+    publish("/api/v1/user/" + userId + '/rooms/' + troupeId + '/unreadItems', {
       notification: "unread_items_removed",
       items: items
     });

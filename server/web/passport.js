@@ -4,7 +4,7 @@
 var _                      = require('underscore');
 var userService            = require('../services/user-service');
 var passport               = require('passport');
-var winston                = require('winston');
+var winston                = require('../utils/winston');
 var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
 var BearerStrategy         = require('passport-http-bearer').Strategy;
 var oauthService           = require('../services/oauth-service');
@@ -70,7 +70,7 @@ module.exports = {
      */
     passport.use(new BearerStrategy(
       function(accessToken, done) {
-        oauthService.findAccessToken(accessToken, function(err, token) {
+        oauthService.findAccessTokenAndClient(accessToken, function(err, token, client) {
           if (err) {
             winston.error("passport: Access token find failed", { exception: err });
             return done(err);
@@ -83,12 +83,9 @@ module.exports = {
 
           userService.findById(token.userId, function(err, user) {
             if (err) { return done(err); }
-            if (!user) { return done(null, false); }
+            if (!user) { return done(); }
 
-            // to keep this example simple, restricted scopes are not implemented,
-            // and this is just for illustrative purposes
-            var info = { scope: '*' };
-            done(null, user, info);
+            done(null, user, { client: client });
           });
         });
       }

@@ -2,7 +2,7 @@
 "use strict";
 
 // var sechash                   = require('sechash');
-var winston                   = require("winston");
+var winston                   = require('../utils/winston');
 var assert                    = require('assert');
 var _                         = require('underscore');
 var persistence               = require("./persistence-service");
