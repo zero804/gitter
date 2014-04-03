@@ -4,7 +4,7 @@
 
 var persistence   = require("./persistence-service");
 var troupeService = require("./troupe-service");
-var winston       = require("winston");
+var winston       = require('../utils/winston');
 var Fiber         = require("../utils/fiber");
 
 function deleteTroupe(troupeId, callback) {

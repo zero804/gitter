@@ -1,5 +1,6 @@
 #!/bin/bash -l
 
+# Starts the development environment
 bash -l <<"DELIM"
 	if [ -f ~/.bashrc ]; then source ~/.bashrc; fi
 	if [ -f ~/.profile ]; then source ~/.profile; fi
@@ -10,7 +11,7 @@ bash -l <<"DELIM"
 	echo starting mongo
 	./mongodb.sh &
 
-	sleep 10 
+	sleep 10
 
 	if [ "$(mongo --quiet --eval 'rs.status().ok')" -eq "0" ]; then
 		echo Replicaset not initialised. Initialising
@@ -36,4 +37,5 @@ bash -l <<"DELIM"
 
 	echo starting interactive shell
 DELIM
+
 bash -il

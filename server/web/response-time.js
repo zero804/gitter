@@ -15,7 +15,15 @@ module.exports = function responseTime(winston, minimal) {
 
     res.on('header', function() {
       var duration = new Date() - start;
-      statsService.responseTime(duration);
+      statsService.responseTime('web.request', duration);
+      if(duration >= 500) {
+        winston.warn('Request took ' + duration + 'ms. ', {
+          method: req.method,
+          url: req.url,
+          duration: duration,
+          status: res.statusCode
+        });
+      }
 
       if(res.statusCode === 404 && req.url.match(/\.map$/))
         return;

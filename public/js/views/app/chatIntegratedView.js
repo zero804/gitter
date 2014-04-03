@@ -39,29 +39,22 @@ define([
     files: false,
     originalRightMargin: "",
     regions: {
-      rightPanelRegion: "#right-panel",
-      rightToolbarRegion: "#toolbar-frame"
     },
 
     events: uiVars.isMobile ? touchEvents : mouseEvents,
 
     initialize: function() {
-      var self = this;
 
-      new AvatarView({
-        el: $('#profile-icon'),
-        user: context.getUser(),
-        showTooltip: false
-      }).render();
+      // new AvatarView({
+      //   el: $('#profile-icon'),
+      //   user: context.getUser(),
+      //   showTooltip: false
+      // }).render();
 
-      // tooltips for the app-template
-      $('#profile-icon, #home-icon').tooltip();
+      // // tooltips for the app-template
+      // $('#profile-icon, #home-icon').tooltip();
 
       this.dialogRegion = modalRegion;
-
-      this.rightPanelRegion.on('show', function() {
-        self.showPanel("#right-panel");
-      });
 
       if (hasScrollBars()) {
         $(".trpChatContainer").addClass("scroller");
@@ -78,7 +71,7 @@ define([
       var isFavourite = favHeader.hasClass('favourited');
 
       $.ajax({
-        url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId(),
+        url: '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId(),
         contentType: "application/json",
         dataType: "json",
         type: "PUT",
@@ -170,7 +163,7 @@ define([
           reset();
           return;
         }
-  
+
         var formdata = new FormData();
         for (var i in files) {
           if (typeof files[i] === 'object') {
@@ -180,10 +173,10 @@ define([
 
         // Generate signature and upload
         $.ajax({
-          type: 'GET', 
+          type: 'GET',
           url: '/api/private/generate-signature',
-          data: 'room_uri=' + context().troupe.uri + '&room_id=' + context().troupe.id, 
-          success: function(data) { 
+          data: 'room_uri=' + context().troupe.uri + '&room_id=' + context().troupe.id,
+          success: function(data) {
             formdata.append("signature", data.sig);
 
             var options = {
@@ -198,7 +191,7 @@ define([
               formData: formdata
             };
 
-            var form = $('#upload-form'); 
+            var form = $('#upload-form');
             form.find('input[name="params"]').attr('value', data.params);
             form.unbind('submit.transloadit');
             form.transloadit(options);
@@ -213,6 +206,6 @@ define([
       el.on('drop',      dropEvent);
     }
   });
-    
+
   return ChatLayout;
 });

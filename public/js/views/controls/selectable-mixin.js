@@ -1,6 +1,7 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-], function() {
+  'utils/dataset-shim'
+], function(dataset) {
   "use strict";
 
   function getContainer(self) {
@@ -69,7 +70,7 @@ define([
     selectClicked: function(e) {
       if(!this.collection) return;
       var selected = e.currentTarget;
-      var cid = selected.dataset.cid;
+      var cid = dataset.get(selected, 'cid');
       var model = this.collection.get(cid);
       this.setSelected(model);
 
@@ -111,7 +112,7 @@ define([
       var active = $active[0];
       if(!active) return;
 
-      var cid = active.dataset.cid;
+      var cid = dataset.get(active, 'cid');
       var model = this.collection.get(cid);
       return model;
     },

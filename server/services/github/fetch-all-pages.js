@@ -4,7 +4,7 @@
 var parseLinks = require('parse-links');
 var url        = require('url');
 var lazy       = require('lazy.js');
-var winston    = require('winston');
+var winston    = require('../../utils/winston');
 var Q          = require('q');
 
 function updatePerPage(options) {
@@ -35,7 +35,17 @@ module.exports = exports = function(request) {
 
     request(options, function (error, response, body) {
       if(error) return d.reject(error);
-      d.resolve(JSON.parse(body));
+      // Reject bad responses
+      if(response.statusCode >= 400) return d.reject('HTTP ' + response.statusCode);
+
+      var bodyJson;
+      try {
+        bodyJson = JSON.parse(body);
+      } catch(e) {
+        return d.reject(e);
+      }
+
+      d.resolve(bodyJson);
     });
 
     return d.promise;
@@ -48,11 +58,19 @@ module.exports = exports = function(request) {
 
     request(options, function (error, response, body) {
       if(error) return callback(error, response, body);
+      if(response.statusCode >= 400) return callback(error, response, body);
 
       var remaining;
 
       if(!response.headers.link) {
         return callback(error, response, body);
+      }
+
+      var firstPage;
+      try {
+        firstPage = JSON.parse(body);
+      } catch(e) {
+        return callback(e, response, body);
       }
 
       var links = parseLinks(response.headers.link);
@@ -66,7 +84,7 @@ module.exports = exports = function(request) {
           winston.info('Fetching another ' + (lastPage - 1)  + ' pages of results');
 
           var promises = lazy.range(1, lastPage + 1).map(function(i) {
-              if(i == 1) return JSON.parse(body);
+              if(i == 1) return firstPage;
 
               var uri = url.parse(links.last, true);
               delete uri.search;

@@ -137,7 +137,7 @@ define([
             return;
           }
 
-          url = "/api/v1/troupes/" + ownerModel.get('id') + '/channels';
+          url = "/api/v1/rooms/" + ownerModel.get('id') + '/channels';
       }
 
       $.ajax({
@@ -174,7 +174,8 @@ define([
     },
 
     recalcView: function(animated) {
-      if(!this.rendered) return;
+      if (!this.ui || !this._uiBindings) { return; }
+
 
       var self = this;
       var showHide = {
@@ -279,6 +280,7 @@ define([
           url: '/api/private/gh/repos/' + repo,
           contentType: "application/json",
           dataType: "json",
+          global: false, // Don't raise an error globally
           type: "GET",
           error: function() {
             cb(false);
@@ -321,7 +323,6 @@ define([
     },
 
     onRender: function() {
-      this.rendered = true;
       var parentSelect = new ParentSelectView({
         orgsCollection: troupeCollections.orgs,
         troupesCollection: troupeCollections.troupes

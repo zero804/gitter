@@ -7,6 +7,12 @@ var LogstashUDP = require('winston-logstash-udp').LogstashUDP;
 var fs = require('fs');
 var path = require('path');
 var Q = require('q');
+var statsService = require('../services/stats-service');
+
+var defaultLogger = new winston.Logger({
+  transports: []
+});
+
 
 function statFile(fileTransport) {
   if(!fileTransport) return;
@@ -17,7 +23,7 @@ function statFile(fileTransport) {
     fileTransport.close();
     fileTransport._stream = null;
     fileTransport.once('open', function() {
-      winston.info('Log rotation completed');
+      defaultLogger.info('Log rotation completed');
       console.log('Log rotation completed');
     });
   }
@@ -48,7 +54,7 @@ function periodicallyStatFile() {
   periodicListenerConfigured = true;
 
   setInterval(function() {
-    statFile(winston['default'].transports.file);
+    statFile(defaultLogger.transports.file);
   }, 30000);
 }
 
@@ -59,22 +65,44 @@ function reopenTransportOnHupSignal() {
 
   process.on('SIGHUP', function() {
     console.log('Caught SIGHUP, attempting logfile rotation');
-    winston.info('Caught SIGHUP, attempting logfile rotation');
+    defaultLogger.info('Caught SIGHUP, attempting logfile rotation');
 
-    statFile(winston['default'].transports.file);
-
+    statFile(defaultLogger.transports.file);
   });
 }
 
+function attachEventHandlers() {
 
+  defaultLogger.on('logging', function (transport, level) {
+    try {
+      switch(level) {
+        case 'warn':
+          statsService.eventHF('logged.warn');
+          break;
+        case 'error':
+          statsService.eventHF('logged.error');
+          break;
+        case 'fatal':
+          statsService.eventHF('logged.fatal');
+          break;
+      }
+    } catch(e) {
+      console.log('Error calling stats service', e);
+    }
+  });
+
+  defaultLogger.on('error', function (err) {
+    console.error('Logging error: ' + err, err);
+    if(err && err.stack) {
+      console.error(err.stack);
+    }
+  });
+}
 
 function configureTransports() {
-  var defaultLogger = winston['default'];
-
   for (var name in defaultLogger.transports) {
-    winston.remove({ name: name });
+    defaultLogger.remove({ name: name });
   }
-
 
   if (nconf.get('logging:logstash:enabled')) {
 
@@ -84,11 +112,12 @@ function configureTransports() {
       host:     nconf.get('logging:logstash:host')
     };
 
-    winston.add(LogstashUDP, logstash_opts);
+    defaultLogger.add(LogstashUDP, logstash_opts);
+
   }
 
   if(nconf.get('logging:logToFile') && nconf.get('LOG_FILE')) {
-    winston.add(winston.transports.File, {
+    defaultLogger.add(winston.transports.File, {
       filename: nconf.get('LOG_FILE'),
       level: nconf.get("logging:level"),
       timestamp: true,
@@ -97,9 +126,11 @@ function configureTransports() {
       json: false
     });
 
-    var fileTransport = winston['default'].transports.file;
+    var fileTransport = defaultLogger.transports.file;
     periodicallyStatFile(fileTransport);
     reopenTransportOnHupSignal(fileTransport);
+
+    fileTransport(consoleTransport);
 
   } else {
     if(nconf.get('logging:logToFile') && !nconf.get('LOG_FILE')) {
@@ -109,12 +140,15 @@ function configureTransports() {
 
     if(!nconf.get("logging:disableConsole")) {
 
-      winston.add(winston.transports.Console, {
+      defaultLogger.add(winston.transports.Console, {
         colorize: nconf.get("logging:colorize"),
         timestamp: nconf.get("logging:timestamp"),
         level: nconf.get("logging:level"),
         prettyPrint: nconf.get("logging:prettyPrint")
       });
+
+      var consoleTransport = defaultLogger.transports.console;
+      attachEventHandlers(consoleTransport);
     }
   }
 
@@ -122,33 +156,32 @@ function configureTransports() {
 
 configureTransports();
 
+// var oldError = winston.error;
+// winston.error = function(message, data) {
+//   function formatStackTrace(stack) {
+//     if(stack.join) {
+//       return stack.join('\n');
+//     }
 
-var oldError = winston.error;
-winston.error = function(message, data) {
-  function formatStackTrace(stack) {
-    if(stack.join) {
-      return stack.join('\n');
-    }
-
-    return '' + stack;
-  }
+//     return '' + stack;
+//   }
 
 
-  if(data && data.exception) {
-    console.error(data.exception);
+//   if(data && data.exception) {
+//     console.error(data.exception);
 
-    if(data.exception.stack) {
-        data.stack = formatStackTrace(data.exception.stack);
-    }
+//     if(data.exception.stack) {
+//         data.stack = formatStackTrace(data.exception.stack);
+//     }
 
-    if(data.exception.message) {
-      data.errorMessage = data.exception.message;
-      delete data.exception;
-    }
-  }
-  oldError.apply(winston, arguments);
+//     if(data.exception.message) {
+//       data.errorMessage = data.exception.message;
+//       delete data.exception;
+//     }
+//   }
+//   oldError.apply(winston, arguments);
 
-};
+// };
 
 var logLevel = nconf.get("logging:level");
 
@@ -170,4 +203,4 @@ nconf.events.on('reload', function() {
 Q.longStackSupport = !!nconf.get("logging:longStackSupport");
 Error.stackTraceLimit = 100;
 
-module.exports = winston;
+module.exports = defaultLogger;

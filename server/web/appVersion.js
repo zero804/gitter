@@ -4,7 +4,7 @@
 // This is actually the cdn prefix, but we're using it as the app version,
 // which only shows whether the version is different, not any ordering of versions.
 var fs = require("fs");
-var winston = require('winston');
+var winston = require('../utils/winston');
 
 var commit, revision;
 var tagFile = __dirname + '/../../GIT_COMMIT';

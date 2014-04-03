@@ -4,8 +4,9 @@ define([
   'utils/context',
   './realtime',
   'log!eyeballs',
+  './csrf',
   'utils/appevents'
-], function($, context, realtime, log, appEvents) {
+], function($, context, realtime, log, csrf, appEvents) {
   "use strict";
 
   var eyesOnState = true;
@@ -28,9 +29,7 @@ define([
         socketId: realtime.getClientId(),
         on: value
       },
-      headers: {
-        'x-access-token': context().accessToken
-      },
+      beforeSend: csrf,
       async: !synchronous,
       global: false,
       type: "POST",
@@ -40,7 +39,7 @@ define([
         } else {
           // The connection is gone...
           log('Eyeballs returned 400. Realtime connection may be dead.');
-          realtime.testConnection();
+          realtime.testConnection('eyeballs_error');
         }
       }
     });
@@ -201,6 +200,7 @@ define([
     $.ajax({
       url: '/api/v1/ping',
       global: false,
+      beforeSend: csrf,
       type: "GET",
       success: function(/*data*/) {
       },

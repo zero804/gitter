@@ -20,63 +20,6 @@
       "version": "2.0.3",
       "from": "byline@~2.0.3"
     },
-    "connect": {
-      "version": "2.6.2",
-      "from": "connect@2.6.2",
-      "dependencies": {
-        "qs": {
-          "version": "0.5.1",
-          "from": "qs@0.5.1"
-        },
-        "formidable": {
-          "version": "1.0.11",
-          "from": "formidable@1.0.11",
-          "resolved": "https://registry.npmjs.org/formidable/-/formidable-1.0.11.tgz"
-        },
-        "cookie-signature": {
-          "version": "0.0.1",
-          "from": "cookie-signature@0.0.1"
-        },
-        "crc": {
-          "version": "0.2.0",
-          "from": "crc@0.2.0",
-          "resolved": "https://registry.npmjs.org/crc/-/crc-0.2.0.tgz"
-        },
-        "cookie": {
-          "version": "0.0.4",
-          "from": "cookie@0.0.4"
-        },
-        "bytes": {
-          "version": "0.1.0",
-          "from": "bytes@0.1.0",
-          "resolved": "https://registry.npmjs.org/bytes/-/bytes-0.1.0.tgz"
-        },
-        "send": {
-          "version": "0.1.0",
-          "from": "send@0.1.0",
-          "resolved": "https://registry.npmjs.org/send/-/send-0.1.0.tgz",
-          "dependencies": {
-            "mime": {
-              "version": "1.2.6",
-              "from": "mime@1.2.6",
-              "resolved": "https://registry.npmjs.org/mime/-/mime-1.2.6.tgz"
-            },
-            "range-parser": {
-              "version": "0.0.4",
-              "from": "range-parser@0.0.4"
-            }
-          }
-        },
-        "fresh": {
-          "version": "0.1.0",
-          "from": "fresh@0.1.0"
-        },
-        "pause": {
-          "version": "0.0.1",
-          "from": "pause@0.0.1"
-        }
-      }
-    },
     "connect-redis": {
       "version": "1.4.7",
       "from": "connect-redis@~1.4.6",
@@ -162,6 +105,17 @@
     "diskspace": {
       "version": "0.1.5",
       "from": "diskspace@0.1.5"
+    },
+    "dolph": {
+      "version": "0.0.2",
+      "from": "dolph@0.0.2",
+      "resolved": "https://registry.npmjs.org/dolph/-/dolph-0.0.2.tgz",
+      "dependencies": {
+        "redis": {
+          "version": "0.10.1",
+          "from": "redis@^0.10.1"
+        }
+      }
     },
     "ducksnode": {
       "version": "0.1.0",
@@ -1578,6 +1532,11 @@
           }
         }
       }
+    },
+    "statuserror": {
+      "version": "0.0.1",
+      "from": "statuserror@0.0.1",
+      "resolved": "https://registry.npmjs.org/statuserror/-/statuserror-0.0.1.tgz"
     },
     "temp": {
       "version": "0.4.0",

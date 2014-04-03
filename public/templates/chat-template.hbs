@@ -51,12 +51,16 @@
       {{#each chats}}
         {{{ chatItemPrerender this }}}
       {{/each}}
+      {{! This is a way of forcing the browser to open at the bottom of the screen }}
+      <div id='initial' style="height:0;width:0;overflow:hidden"><a name="initial"/>_</a></div>
     </div>
   </div>
 </div>
 
 <div class="trpToolbar" id="toolbar-frame">
+  {{{ prerenderView "js/views/righttoolbar/tmpl/rightToolbar" }}}
 </div>
+
 <div class="trpChatInputWrapper" id="chat-input-wrapper">
   <div class="trpFileProgressContainer">
     <div class="trpFileProgressBar" id="file-progress-bar"></div>
@@ -76,8 +80,9 @@
 {{>require_wrapper}}
 {{{bootScript bootScriptName }}}
 
+
 <script type="text/javascript">
-window.scrollTo(0,document.body.scrollHeight);
+ window.scrollTo(0,document.body.scrollHeight);
 </script>
 
 <div style="display: none;">
@@ -86,6 +91,5 @@ window.scrollTo(0,document.body.scrollHeight);
     <input type="file" name="file" multiple="multiple"/>
   </form>
 </div>
-
 </body>
 </html>

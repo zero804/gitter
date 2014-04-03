@@ -73,7 +73,6 @@ require([
     parent.postMessage(JSON.stringify(message), context.env('basePath'));
   }
 
-
   postMessage({ type: "context.troupeId", troupeId: context.getTroupeId(), name: context.troupe().get('name') });
 
   appEvents.on('navigation', function(url, type, title) {
@@ -84,16 +83,20 @@ require([
     postMessage({ type: "route", hash: hash });
   });
 
-  appEvents.on('realtime.testConnection', function() {
-    postMessage({ type: "realtime.testConnection" });
+  appEvents.on('realtime.testConnection', function(reason) {
+    postMessage({ type: "realtime.testConnection", reason: reason });
   });
 
   appEvents.on('realtime:newConnectionEstablished', function() {
-    postMessage({ type: "realtime.testConnection" });
+    postMessage({ type: "realtime.testConnection", reason: 'newConnection' });
+  });
+
+  appEvents.on('unreadItemsCount', function(newCount) {
+    postMessage({ type: "unreadItemsCount", count: newCount, troupeId: context.getTroupeId() });
   });
 
   var appView = new ChatIntegratedView({ el: 'body' });
-  appView.rightToolbarRegion.show(new RightToolbarView());
+  new RightToolbarView({ el: "#toolbar-frame" });
 
   new HeaderView({ model: context.troupe(), el: '#header' });
 
@@ -198,7 +201,7 @@ require([
         autoConfigureHooks: 1
       },
       type: 'PUT',
-      url: '/api/v1/troupes/' + context.getTroupeId(),
+      url: '/api/v1/rooms/' + context.getTroupeId(),
       success: function() {
         appEvents.trigger('user_notification', {
           title: 'Thank You',

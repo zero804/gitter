@@ -18,7 +18,10 @@ module.exports = {
   },
 
   show: function(req, res, next) {
-    var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true, includeRolesForTroupe: req.troupe });
+    var strategyOptions = { currentUserId: req.user.id };
+
+    if (req.query.include_users) strategyOptions.mapUsers = true;
+    var strategy = new restSerializer.TroupeStrategy(strategyOptions);
 
     restSerializer.serialize(req.troupe, strategy, function(err, serialized) {
       if(err) return next(err);
@@ -32,10 +35,6 @@ module.exports = {
     var updatedTroupe = req.body;
 
     var promises = [];
-
-    // if(updatedTroupe.hasOwnProperty('favourite')) {
-    //   promises.push(recentRoomService.updateFavourite(req.user.id, troupe.id, updatedTroupe.favourite));
-    // }
 
     if(updatedTroupe.autoConfigureHooks) {
       promises.push(roomService.applyAutoHooksForRepoRoom(req.user, troupe));

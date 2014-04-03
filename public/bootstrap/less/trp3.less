@@ -641,7 +641,21 @@ a:hover {
   }
 }
 
+.item-fav .github-USER_CHANNEL {
+  .prepend-fav-icon;
+  &:before {
+    font-size: 16px;
+  }
+}
+
 .item-fav .github-ORG_CHANNEL {
+  .prepend-fav-icon;
+  &:before {
+    font-size: 16px;
+  }
+}
+
+.item-fav .github-REPO_CHANNEL {
   .prepend-fav-icon;
   &:before {
     font-size: 16px;
@@ -2197,26 +2211,24 @@ ul.roster {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   top: 0;
-  width: 100%;
   background-color: rgba(255, 255, 255, 0.95);
   border-bottom: 1px solid rgba(0,0,0,0.05);
   z-index: 1;
   .transition500ms;
+  left: 0;
+  right: @rightMarginFull;
+
+  @media @mid {
+    right: @rightMarginMid;
+  }
+
+  @media @small {
+    right: @rightMarginSmall
+  }
 
   .trpHeaderArea {
     display: block;
-    margin-right: @rightMarginFull;
     .transition500ms;
-
-    @media @mid {
-      margin-right: @rightMarginMid;
-    }
-
-    @media @small {
-      margin-right: @rightMarginSmall;
-      padding-right: 0px;
-    }
-
   }
 
   .trpHeaderContainer {
@@ -2267,7 +2279,7 @@ ul.roster {
   #trpTopic {
     font-family: 'Open Sans';
     font-size: 13px;
-    margin: -5px 0px 0px 52px;
+    margin: -5px 40px 0px 52px;
     color: #999;
     min-height: 1em;
 
@@ -2361,14 +2373,14 @@ ul.roster {
 
   .transition500ms();
   margin-left: 44px;
-  margin-right: @rightMarginFull + 45px;
+  margin-right: 40px;
   @media @mid {
     margin-left: 32px;
-    margin-right: @rightMarginMid + 32px;
+    margin-right: 32px;
   }
   @media @small {
     margin-left: @leftMarginSmall + 42px;
-    margin-right: @rightMarginSmall + 42px;
+    margin-right: 42px;
   }
 
   .banner {

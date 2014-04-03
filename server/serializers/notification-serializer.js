@@ -6,7 +6,7 @@ var chatService = require("../services/chat-service");
 var troupeService = require("../services/troupe-service");
 var Q = require("q");
 var _ = require("underscore");
-var winston = require("winston");
+var winston = require('../utils/winston');
 var collections = require("../utils/collections");
 
 function execPreloads(preloads, callback) {

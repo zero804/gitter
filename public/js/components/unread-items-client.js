@@ -6,9 +6,11 @@ define([
   './realtime',
   'log!unread-items-client',
   'backbone',
+  './csrf',
   'utils/appevents',
+  'utils/dataset-shim',
   'utils/double-hash'
-], function($, _, context, realtime, log, Backbone, appEvents, DoubleHash) {
+], function($, _, context, realtime, log, Backbone, csrf, appEvents, dataset, DoubleHash) {
   "use strict";
 
   function limit(fn, context, timeout) {
@@ -198,13 +200,14 @@ define([
       this._buffer = new DoubleHash();
 
       var async = !options || !options.sync;
-      var url = '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/unreadItems';
+      var url = '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId() + '/unreadItems';
 
       $.ajax({
         url: url,
         contentType: "application/json",
         data: JSON.stringify(queue),
         async: async,
+        beforeSend: csrf,
         type: "POST",
         global: false,
         success: function() {
@@ -212,53 +215,6 @@ define([
         error: function() {
         }
       });
-
-    }
-  };
-
-  // -----------------------------------------------------
-  // Syncs a troupe collection with the unread items client
-  // -----------------------------------------------------
-
-  var TroupeCollectionSync = function(troupeCollection, unreadItemStore) {
-    this._collection = troupeCollection;
-    this._store = unreadItemStore;
-    this._store.on('newcountvalue', this._onNewCountValue, this);
-
-    // Set the initial value
-    this._onNewCountValue(this._store._currentCount());
-  };
-
-  TroupeCollectionSync.prototype = {
-    _onNewCountValue: function(newValue) {
-      // log('Syncing store to collection ', newValue);
-
-      // log('TroupeCollectionSync: setting value of ' + context.getTroupeId() + ' to ' + newValue);
-
-      var troupe = this._collection.get(context.getTroupeId());
-      if(troupe) {
-        troupe.set('unreadItems', newValue);
-        // log('Completed successfully');
-        return;
-      }
-
-      // Not found, are there any items? If not await a sync-reset
-      if(this._collection.length === 0) {
-        this._collection.once('reset sync', function() {
-
-          log('Collection loading, syncing troupe unreadItems');
-
-          var troupe = this._collection.get(context.getTroupeId());
-          if(troupe) {
-            troupe.set('unreadItems', newValue);
-          } else {
-            log('TroupeCollectionSync: unable to locate locate troupe');
-          }
-        }, this);
-      } else {
-        // There are items, just not the ones we want
-        log('TroupeCollectionSync: unable to locate locate troupe');
-      }
 
     }
   };
@@ -274,19 +230,14 @@ define([
   _.extend(TroupeUnreadItemRealtimeSync.prototype, Backbone.Events, {
     _subscribe: function() {
       var store = this._store;
-      var self = this;
 
-      var url = '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/unreadItems';
+      var url = '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId() + '/unreadItems';
       realtime.subscribe(url, function(message) {
         if(message.notification === 'unread_items') {
           store._unreadItemsAdded(message.items);
         } else if(message.notification === 'unread_items_removed') {
           var items = message.items;
           store._unreadItemsRemoved(items);
-
-          _iteratePreload(items, function(itemType, itemId) {
-            this.trigger('unreadItemRemoved', itemType, itemId);
-          }, self);
         }
       });
 
@@ -320,9 +271,6 @@ define([
 
     // this is not a live collection so this will not work inside an SPA
     //$('.mobile-scroll-class').on('scroll', this._getBounds);
-
-    // TODO: don't reference this frame directly!
-    //$('#toolbar-frame').on('scroll', this._getBounds);
 
     appEvents.on('unreadItemDisplayed', this._getBounds);
 
@@ -375,9 +323,9 @@ define([
       for(var i = 0; i < unreadItems.length; i++) {
         var element = unreadItems[i];
 
-        var itemType = element.dataset.itemType;
-        var itemId = element.dataset.itemId;
-        var mentioned = element.dataset.mentioned;
+        var itemType = dataset.get(element, 'itemType');
+        var itemId = dataset.get(element, 'itemId');
+        var mentioned = dataset.get(element, 'mentioned') === 'true';
 
         if(itemType && itemId) {
           var top = element.offsetTop;
@@ -420,8 +368,8 @@ define([
       for(var i = 0; i < unreadItems.length; i++) {
         var element = unreadItems[i];
 
-        var itemType = element.dataset.itemType;
-        var itemId = element.dataset.itemId;
+        var itemType = dataset.get(element, 'itemType');
+        var itemId = dataset.get(element, 'itemId');
 
         if(itemType && itemId) {
           var top = element.offsetTop;
@@ -521,14 +469,12 @@ define([
     throw new Error("Unable to create an unread items store without a user");
   }
 
-
   var acrossTheFoldModel = new Backbone.Model({
     defaults: {
       unreadAbove: 0,
       unreadBelow: 0
     }
   });
-
 
   var unreadItemsClient = {
     acrossTheFold: function() {
@@ -552,9 +498,22 @@ define([
         var collection = collections[itemType];
         if(!collection) return;
 
-        var item = collection.get(itemId);
-        if(item) item.set('unread', false, { silent: true });
-        if(mention) item.set('mentioned', false, { silent: true });
+        var v = { unread: false };
+
+        if(mention) {
+          v.mentioned = false;
+        }
+
+        collection.patch(itemId, v, { silent: true });
+      });
+
+      unreadItemStore.on('unreadItemRemoved', function(itemType, itemId) {
+        var collection = collections[itemType];
+        if(!collection) return;
+
+
+        var v = { unread: false, mentioned: false };
+        collection.patch(itemId, v);
       });
     },
 
@@ -570,7 +529,6 @@ define([
   unreadItemsClient.DoubleHash = DoubleHash;
   unreadItemsClient.Tarpit = Tarpit;
   unreadItemsClient.UnreadItemStore = UnreadItemStore;
-  unreadItemsClient.TroupeCollectionSync = TroupeCollectionSync;
 
   return unreadItemsClient;
 });
