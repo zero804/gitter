@@ -118,7 +118,7 @@
     "grunt-contrib-watch": "~0.5.3",
     "jquery-builder": "~0.5.0",
     "jshamcrest": "~0.7.0",
-    "node-spritesheet": "^0.4.2",
+    "node-spritesheet": "trevorah/node-spritesheet",
     "fs-extra": "^0.8.1",
     "grunt-retire": "^0.1.23",
     "grunt-nsp-shrinkwrap": "0.0.3"
