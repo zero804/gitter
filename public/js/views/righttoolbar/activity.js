@@ -188,13 +188,14 @@ define([
 
     initialize: function(/*options*/) {
       this.setRerenderOnChange();
+      var meta = this.model.get('meta');
+      var service = meta.service;
 
-      var service = this.model.get('meta').service;
       if (service == 'github') {
-        var event = this.model.get('meta').event;
+        var event = meta.event;
         this.template = githubTemplates[event];
       } else {
-        if(!this.model.get('meta').prerendered) {
+        if(!meta.prerendered) {
           this.template = serviceTemplates[service];
         } else {
           this.template = prerenderedTemplate;
@@ -249,7 +250,7 @@ define([
     }
   });
 
-  
+
   return ActivityView;
 
 });
