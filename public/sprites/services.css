@@ -1,72 +1,84 @@
 .service-sprite {
   background: url( 'services.png' ) no-repeat;
-  background-size: 64px 48px;
+  background-size: 64px 64px;
 }
 
-.service-sprite.sprintly-columns {
+.service-sprite.pagerduty-logo {
   width: 16px;
   height: 16px;
   background-position: 0px 0px;
 }
 
-.service-sprite.huboard-logo {
+.service-sprite.heroku-logo {
   width: 16px;
   height: 16px;
   background-position: -16px 0px;
 }
 
-.service-sprite.jenkins-logo {
+.service-sprite.jenkins-frown {
   width: 16px;
   height: 16px;
   background-position: 0px -16px;
 }
 
-.service-sprite.jenkins-meh {
+.service-sprite.jenkins-logo {
   width: 16px;
   height: 16px;
   background-position: -16px -16px;
 }
 
-.service-sprite.jenkins-smile {
+.service-sprite.jenkins-meh {
   width: 16px;
   height: 16px;
   background-position: -32px 0px;
 }
 
-.service-sprite.jenkins-frown {
+.service-sprite.jenkins-smile {
   width: 16px;
   height: 16px;
   background-position: -32px -16px;
 }
 
-.service-sprite.sprintly-logo {
+.service-sprite.huboard-logo {
   width: 16px;
   height: 16px;
   background-position: 0px -32px;
 }
 
-.service-sprite.travis-frown {
+.service-sprite.sprintly-columns {
   width: 16px;
   height: 16px;
   background-position: -16px -32px;
 }
 
-.service-sprite.travis-logo {
+.service-sprite.sprintly-logo {
   width: 16px;
   height: 16px;
   background-position: -32px -32px;
 }
 
-.service-sprite.travis-meh {
+.service-sprite.travis-frown {
   width: 16px;
   height: 16px;
   background-position: -48px 0px;
 }
 
-.service-sprite.travis-smile {
+.service-sprite.travis-logo {
   width: 16px;
   height: 16px;
   background-position: -48px -16px;
+}
+
+.service-sprite.travis-meh {
+  width: 16px;
+  height: 16px;
+  background-position: -48px -32px;
+}
+
+.service-sprite.travis-smile {
+  width: 16px;
+  height: 16px;
+  background-position: 0px -48px;
 }
 
 
@@ -77,7 +89,7 @@
 (min-device-pixel-ratio: 2) {
 .service-sprite {
   background: url( 'services@2x.png' ) no-repeat;
-  background-size: 64px 48px;
+  background-size: 64px 64px;
 }
 
 }
