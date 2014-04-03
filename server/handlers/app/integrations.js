@@ -22,7 +22,7 @@ var supportedServices = [
 var openServices = Object.keys(services).map(function(id) {
   return {
     id: id,
-    name: services[id].friendlyName
+    name: services[id].name
   };
 });
 
