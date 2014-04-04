@@ -78,6 +78,7 @@ function renderChatPage(req, res, next) {
         githubLink: githubLink,
         troupeName: req.uriContext.uri,
         troupeTopic: troupeContext.troupe.topic,
+        oneToOne: troupe.oneToOne,
         troupeFavourite: troupeContext.troupe.favourite,
         user: troupeContext.user,
         troupeContext: troupeContext,
