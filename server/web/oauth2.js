@@ -76,9 +76,11 @@ server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, do
 
 server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, done) {
   oauthService.findAuthorizationCode(code, function(err, authCode) {
-    if (err) { return done(err); }
-    if (!client._id.equals(authCode.clientId)) { return done(null, false); }
-    if (redirectUri !== authCode.redirectUri) { return done(null, false); }
+    if (err) return done(err);
+    if (!authCode) return done();
+
+    if (!client._id.equals(authCode.clientId)) { return done(); }
+    if (redirectUri !== authCode.redirectUri) { return done(); }
 
     random.generateToken(function(err, token) {
       if (err) { return done(err); }
