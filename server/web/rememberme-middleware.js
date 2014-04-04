@@ -128,6 +128,8 @@ module.exports = {
             var properties = useragentStats(req.headers['user-agent']);
             statsService.userUpdate(user, properties);
 
+            winston.verbose('Rememberme token used for login.', { cookie: req.headers.cookie });
+
             statsService.event("user_login", _.extend({
               userId: userId,
               method: 'auto',
