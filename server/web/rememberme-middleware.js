@@ -104,6 +104,9 @@ module.exports = {
         return next();
       }
 
+      /* Never use the rememberme middleware on api.gitter.im */
+      if(req.isApiCall) return next();
+
       /* If the user is logged in, no problem */
       if (req.user) return next();
 

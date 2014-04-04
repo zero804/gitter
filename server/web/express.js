@@ -60,8 +60,6 @@ module.exports = {
       contentHelperName: 'content'
     }));
 
-    // registerAllTemplatesAsPartials(__dirname + '/../../' + nconf.get('web:staticContent') +'/js/views');
-
     app.set('view engine', 'hbs');
     app.set('views', __dirname + '/../../' + nconf.get('web:staticContent') +'/templates');
     app.set('trust proxy', true);
@@ -89,8 +87,12 @@ module.exports = {
 
     app.use(ios6PostCachingFix());
 
-    app.use('/api/', function(req, res, next) {
-      req.isApiCall = true;
+    var apiHostName = nconf.get('web:apihost');
+    app.use(function(req, res, next) {
+      // Set isApiCall to true for api.gitter.im
+      if(req.host === apiHostName) {
+        req.isApiCall = true;
+      }
       next();
     });
 
@@ -104,16 +106,6 @@ module.exports = {
 
       next();
     });
-
-    var sessionCookieName = nconf.get('web:cookiePrefix') + 'session';
-    function useSession(req) {
-      /* No session for API calls, unless there's already a session cookie */
-      if(req.isApiCall && !req.cookies[sessionCookieName]) {
-        return false;
-      }
-
-      return true;
-    }
 
     function session() {
       var expressSession = express.session({
@@ -130,12 +122,11 @@ module.exports = {
       });
 
       return function(req, res, next) {
-        if(!useSession(req)) {
-          req.session = {};
+        if(req.isApiCall) {
           return next();
+        } else {
+          return expressSession(req, res, next);
         }
-
-        return expressSession(req, res, next);
       };
     }
 

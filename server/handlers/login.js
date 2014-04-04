@@ -74,7 +74,7 @@ module.exports = {
         lock("oalock:" + code, function(done) {
 
             var handler;
-            if(req.session.githubScopeUpgrade) {
+            if(req.session && req.session.githubScopeUpgrade) {
               handler = passport.authorize('github_upgrade', { failureRedirect: '/login/upgrade-failed' });
             } else {
               handler = passport.authorize('github_user', { failureRedirect: '/' });
@@ -93,13 +93,13 @@ module.exports = {
       middleware.ensureLoggedIn(),
       middleware.generateRememberMeTokenMiddleware,
       function(req, res) {
-        if(req.session.githubScopeUpgrade) {
+        if(req.session && req.session.githubScopeUpgrade) {
           delete req.session.githubScopeUpgrade;
           res.render('github-upgrade-complete');
           return;
         }
 
-        if(req.session.returnTo) {
+        if(req.session && req.session.returnTo) {
           res.redirect(req.session.returnTo);
           return;
         }

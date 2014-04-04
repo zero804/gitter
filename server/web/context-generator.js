@@ -179,7 +179,7 @@ function fakeSerializedTroupe(uriContext) {
 }
 
 function createTroupeContext(req, options) {
-  var events = req.session.events;
+  var events = req.session && req.session.events;
   if(events) { req.session.events = []; }
 
   return {
