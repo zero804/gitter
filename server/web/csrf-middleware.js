@@ -12,6 +12,21 @@ module.exports = function(req, res, next){
   // oath strategy has already authenticated these with the bearer token
   if(hasBearerTokenHeader(req)) return next();
 
+  // Call on api.gitter.im?
+  if(req.isApiCall) {
+    if(req.user) {
+      // API call and user is logged in.
+      // TODO: change this when we start making our own calls go to api.gitter.im!
+      // NB NB NB
+      // XXX
+      return next();
+    } else {
+      /* User is attempting to make an unauthenticated call to the api. Go away. */
+      winston.info('csrf: rejecting unauthenticated call to api');
+      return next(403);
+    }
+  }
+
   if(isInWhitelist(req)) {
     winston.verbose('skipping csrf check for ' + req.path);
     return next();
