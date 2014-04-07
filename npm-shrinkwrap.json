@@ -181,7 +181,6 @@
             "csurf": {
               "version": "1.0.0",
               "from": "csurf@1.0.0",
-              "resolved": "https://registry.npmjs.org/csurf/-/csurf-1.0.0.tgz",
               "dependencies": {
                 "uid2": {
                   "version": "0.0.3",
@@ -196,7 +195,6 @@
             "express-session": {
               "version": "1.0.2",
               "from": "express-session@1.0.2",
-              "resolved": "https://registry.npmjs.org/express-session/-/express-session-1.0.2.tgz",
               "dependencies": {
                 "utils-merge": {
                   "version": "1.0.0",
@@ -208,7 +206,7 @@
                 },
                 "uid2": {
                   "version": "0.0.3",
-                  "from": "uid2@0.0.3"
+                  "from": "uid2@~0.0.2"
                 }
               }
             },
@@ -248,8 +246,7 @@
             },
             "static-favicon": {
               "version": "1.0.0",
-              "from": "static-favicon@1.0.0",
-              "resolved": "https://registry.npmjs.org/static-favicon/-/static-favicon-1.0.0.tgz"
+              "from": "static-favicon@1.0.0"
             },
             "vhost": {
               "version": "1.0.0",
@@ -351,8 +348,7 @@
         },
         "merge-descriptors": {
           "version": "0.0.2",
-          "from": "merge-descriptors@0.0.2",
-          "resolved": "https://registry.npmjs.org/merge-descriptors/-/merge-descriptors-0.0.2.tgz"
+          "from": "merge-descriptors@0.0.2"
         }
       }
     },
@@ -384,7 +380,7 @@
             },
             "minimatch": {
               "version": "0.2.14",
-              "from": "minimatch@~0.2.12",
+              "from": "minimatch@~0.2.6",
               "dependencies": {
                 "lru-cache": {
                   "version": "2.5.0",
@@ -420,8 +416,7 @@
       "dependencies": {
         "validator": {
           "version": "2.0.0",
-          "from": "validator@2.0.0",
-          "resolved": "https://registry.npmjs.org/validator/-/validator-2.0.0.tgz"
+          "from": "validator@2.0.0"
         }
       }
     },
@@ -439,7 +434,7 @@
             },
             "colors": {
               "version": "0.6.2",
-              "from": "colors@0.x.x"
+              "from": "colors@~0.6.0-1"
             },
             "cycle": {
               "version": "1.0.3",
@@ -509,7 +504,7 @@
           "dependencies": {
             "inherits": {
               "version": "2.0.1",
-              "from": "inherits@~2.0.1"
+              "from": "inherits@2"
             },
             "typedarray": {
               "version": "0.0.5",
@@ -610,9 +605,9 @@
       "from": "geckoboard-push@0.0.5"
     },
     "gitter-services": {
-      "version": "1.0.0",
-      "from": "gitter-services@git+ssh://git@github.com:gitterHQ/services.git#1.0.0",
-      "resolved": "git+ssh://git@github.com:gitterHQ/services.git#e7286a3cb5618186ddf6a25001d76a586f020a07",
+      "version": "1.0.1",
+      "from": "gitter-services@git+ssh://git@github.com:gitterHQ/services.git#1.0.1",
+      "resolved": "git+ssh://git@github.com:gitterHQ/services.git#eeaa9835a767a0fbb552175e96c883ef3a07cf14",
       "dependencies": {
         "require-all": {
           "version": "0.0.8",
@@ -648,7 +643,7 @@
           "dependencies": {
             "source-map": {
               "version": "0.1.33",
-              "from": "source-map@~0.1.7",
+              "from": "source-map@0.1.x",
               "dependencies": {
                 "amdefine": {
                   "version": "0.1.0",
@@ -684,7 +679,7 @@
               "dependencies": {
                 "source-map": {
                   "version": "0.1.33",
-                  "from": "source-map@~0.1.7",
+                  "from": "source-map@0.1.x",
                   "dependencies": {
                     "amdefine": {
                       "version": "0.1.0",
@@ -759,7 +754,6 @@
     "jade": {
       "version": "0.28.1",
       "from": "jade@0.28.1",
-      "resolved": "https://registry.npmjs.org/jade/-/jade-0.28.1.tgz",
       "dependencies": {
         "commander": {
           "version": "0.6.1",
@@ -866,8 +860,7 @@
     },
     "mixpanel": {
       "version": "0.0.16",
-      "from": "mixpanel@0.0.16",
-      "resolved": "https://registry.npmjs.org/mixpanel/-/mixpanel-0.0.16.tgz"
+      "from": "mixpanel@0.0.16"
     },
     "moment": {
       "version": "2.1.0",
@@ -1003,7 +996,7 @@
         },
         "optimist": {
           "version": "0.3.7",
-          "from": "optimist@~0.3",
+          "from": "optimist@0.3.x",
           "dependencies": {
             "wordwrap": {
               "version": "0.0.2",
@@ -1158,8 +1151,7 @@
                 },
                 "ctype": {
                   "version": "0.5.2",
-                  "from": "ctype@0.5.2",
-                  "resolved": "https://registry.npmjs.org/ctype/-/ctype-0.5.2.tgz"
+                  "from": "ctype@0.5.2"
                 }
               }
             },
@@ -1199,7 +1191,7 @@
             },
             "mime": {
               "version": "1.2.11",
-              "from": "mime@~1.2.9"
+              "from": "mime@~1.2.7"
             },
             "form-data": {
               "version": "0.1.2",
@@ -1236,7 +1228,6 @@
     "passport": {
       "version": "0.1.15",
       "from": "passport@0.1.15",
-      "resolved": "https://registry.npmjs.org/passport/-/passport-0.1.15.tgz",
       "dependencies": {
         "pkginfo": {
           "version": "0.2.3",
@@ -1354,7 +1345,7 @@
       "dependencies": {
         "qs": {
           "version": "0.6.6",
-          "from": "qs@~0.6.0"
+          "from": "qs@^0.6.6"
         },
         "json-stringify-safe": {
           "version": "4.0.0",
@@ -1382,8 +1373,7 @@
             },
             "ctype": {
               "version": "0.5.2",
-              "from": "ctype@0.5.2",
-              "resolved": "https://registry.npmjs.org/ctype/-/ctype-0.5.2.tgz"
+              "from": "ctype@0.5.2"
             }
           }
         },
@@ -1584,7 +1574,7 @@
       "dependencies": {
         "colors": {
           "version": "0.6.2",
-          "from": "colors@0.6.x"
+          "from": "colors@~0.6.0-1"
         },
         "cycle": {
           "version": "1.0.3",

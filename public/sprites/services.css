@@ -6,19 +6,19 @@
 .service-sprite.pagerduty-logo {
   width: 16px;
   height: 16px;
-  background-position: 0px 0px;
+  background-position: 0 0;
 }
 
 .service-sprite.heroku-logo {
   width: 16px;
   height: 16px;
-  background-position: -16px 0px;
+  background-position: -16px 0;
 }
 
 .service-sprite.jenkins-frown {
   width: 16px;
   height: 16px;
-  background-position: 0px -16px;
+  background-position: 0 -16px;
 }
 
 .service-sprite.jenkins-logo {
@@ -30,7 +30,7 @@
 .service-sprite.jenkins-meh {
   width: 16px;
   height: 16px;
-  background-position: -32px 0px;
+  background-position: -32px 0;
 }
 
 .service-sprite.jenkins-smile {
@@ -42,7 +42,7 @@
 .service-sprite.huboard-logo {
   width: 16px;
   height: 16px;
-  background-position: 0px -32px;
+  background-position: 0 -32px;
 }
 
 .service-sprite.sprintly-columns {
@@ -60,7 +60,7 @@
 .service-sprite.travis-frown {
   width: 16px;
   height: 16px;
-  background-position: -48px 0px;
+  background-position: -48px 0;
 }
 
 .service-sprite.travis-logo {
@@ -78,7 +78,7 @@
 .service-sprite.travis-smile {
   width: 16px;
   height: 16px;
-  background-position: 0px -48px;
+  background-position: 0 -48px;
 }
 
 
