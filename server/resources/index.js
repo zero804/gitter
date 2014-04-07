@@ -1,20 +1,18 @@
-var middleware = require('../web/middleware');
 var Resource = require('express-resource');
 
 module.exports = {
-  install: function(app) {
+  install: function(app, apiRoot, authMiddleware) {
 
-    var auth = [
-        middleware.ensureLoggedIn()
-    ];
+    var resourceApiRoot = apiRoot ? apiRoot.substring(1) + '/' : '';
 
     // Secure the REST API
-    ['/api/v1/:res(troupes|rooms)', '/api/v1/user'].forEach(function(path) {
-        app.all(path, auth);
-        app.all(path + '/*', auth);
+    ['/v1/:res(troupes|rooms)', '/v1/user'].forEach(function(path) {
+        app.all(apiRoot + path, authMiddleware);
+        app.all(apiRoot + path + '/', authMiddleware);
+        app.all(apiRoot + path + '/*', authMiddleware);
     });
 
-    var troupesResource = app.resource('api/v1/:res(troupes|rooms)',  require('./troupes/troupes'));
+    var troupesResource = app.resource(resourceApiRoot + 'v1/:res(troupes|rooms)',  require('./troupes/troupes'));
 
     function installTroupeSubResource(resourceName, moduleName) {
         var r = app.resource(resourceName,  require('./troupes/' + moduleName));
@@ -32,7 +30,7 @@ module.exports = {
 
     var eventsResource = installTroupeSubResource('events', 'events');
 
-    var userResource = app.resource('api/v1/user',  require('./user/user.js'));
+    var userResource = app.resource(resourceApiRoot + 'v1/user',  require('./user/user.js'));
     function installUserSubResource(resourceName, moduleName) {
         var r = new Resource(resourceName, require('./user/' + moduleName), app);
         userResource.add(r);
