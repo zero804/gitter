@@ -664,7 +664,47 @@ function ensureRepoRoomSecurity(uri, security) {
       });
 
       troupe.security = security;
-      return troupe.saveQ();
+
+      return troupe.saveQ()
+        .then(function() {
+          if(security === 'PUBLIC') return;
+
+          /* Only do this after the save, otherwise
+           * multiple events will be generated */
+
+          // TODO: XXX: move this into it's own method
+
+          /* Re-insure that each user in the room has access to the room */
+          var userIds = troupe.getUserIds();
+
+          return troupeService.findByIds(userIds)
+            .then(function(users) {
+              var usersHash = collections.indexById(users);
+
+              return Q.all(userIds.map(function(userId) {
+                var user = usersHash[userId];
+                if(!user) {
+                  // Can't find the user?, remove them
+                  winston.warn('Unable to find user, removing from troupe', { userId: userId, troupeId: troupe.id });
+                  troupe.removeUserById(userId);
+                  return;
+                }
+
+                return roomPermissionsModel(user, 'join', troupe)
+                  .then(function(access) {
+                    if(!access) {
+                      winston.warn('User no longer has access to room', { userId: userId, troupeId: troupe.id });
+                      troupe.removeUserById(userId);
+                    }
+                  });
+              }));
+            })
+            .then(function() {
+              return troupe.saveQ();
+            });
+
+        });
+
     });
 }
 exports.ensureRepoRoomSecurity = ensureRepoRoomSecurity;
