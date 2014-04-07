@@ -638,3 +638,33 @@ function addUsersToRoom(troupe, instigatingUser, usernamesToAdd) {
     });
 }
 exports.addUsersToRoom = addUsersToRoom;
+
+/**
+ * The security of a room may be off. Do a check and update if required
+ */
+function ensureRepoRoomSecurity(uri, security) {
+  if(security !== 'PRIVATE' && security != 'PUBLIC') {
+    return Q.reject(new Error("Unknown security type: " + security));
+  }
+
+  return troupeService.findByUri(uri)
+    .then(function(troupe) {
+      if(!troupe) return;
+
+      if(troupe.githubType != 'REPO') throw new Error("Only repo room security can be changed");
+
+      /* No need to change it? */
+      if(troupe.security === security) return;
+
+      winston.info('Security of troupe does not match. Updating.', {
+        roomId: troupe.id,
+        uri: uri,
+        current: troupe.security,
+        security: security
+      });
+
+      troupe.security = security;
+      return troupe.saveQ();
+    });
+}
+exports.ensureRepoRoomSecurity = ensureRepoRoomSecurity;

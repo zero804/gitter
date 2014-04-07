@@ -201,15 +201,12 @@ describe('room-service', function() {
 
         return roomService.createCustomChildRoom(fixture.troupeOrg1, fixture.user1, { name: 'open', security: 'PUBLIC' })
           .then(function(room) {
-            console.log(1);
             mockito.verify(permissionsModelMock, once)();
 
             return makeRoomAssertions(room, [fixture.user1, fixture.user2, fixture.user3], [])
               .thenResolve(room);
           })
           .then(function(room) {
-            console.log(2);
-
             // Get another mock
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
@@ -423,8 +420,6 @@ describe('room-service', function() {
               .thenResolve(room);
           })
           .then(function(room) {
-            console.log(2);
-
             // Get another mock
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();

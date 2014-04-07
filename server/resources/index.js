@@ -1,3 +1,6 @@
+/*jshint globalstrict:true, trailing:false, unused:true, node:true */
+"use strict";
+
 var middleware = require('../web/middleware');
 var Resource = require('express-resource');
 
@@ -30,7 +33,7 @@ module.exports = {
     var chatReadBy = new Resource('readBy', require('./troupes/chat-read-by'), app);
     chatResource.add(chatReadBy);
 
-    var eventsResource = installTroupeSubResource('events', 'events');
+    installTroupeSubResource('events', 'events');
 
     var userResource = app.resource('api/v1/user',  require('./user/user.js'));
     function installUserSubResource(resourceName, moduleName) {

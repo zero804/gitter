@@ -22,7 +22,6 @@ define([
   // to ensure that our test environment is working properly
   xdescribe("Mimmick default browser scroll behaviour", function() {
     it("should keep the current scroll position as the height of the container grows", function(done) {
-      console.log('woo')
       done();
     });
   });
