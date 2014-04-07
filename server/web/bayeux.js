@@ -102,8 +102,6 @@ function populateSubUserCollection(options, callback) {
 
   switch(collection) {
     case "rooms":
-      return restful.serializeTroupesForUser(userId, callback);
-
     case "troupes":
       return restful.serializeTroupesForUser(userId, callback);
 
@@ -313,17 +311,6 @@ function destroyClient(clientId) {
 
 }
 
-function storeMessageValues(req, id, options) {
-  if(!req.bayeuxOptions) req.bayeuxOptions = {};
-  if(!req.bayeuxOptions[id]) req.bayeuxOptions[id] = options;
-}
-
-function getMessageValues(req, id) {
-  if(!req.bayeuxOptions || !req.bayeuxOptions[id]) return {};
-  var value = req.bayeuxOptions[id];
-  delete req.bayeuxOptions[id];
-  return value;
-}
 //
 // Authorisation Extension - decides whether the user
 // is allowed to connect to the subscription channel
@@ -334,12 +321,10 @@ var authorisor = {
       return callback(message);
     }
 
-    var snapshot = true;
+    var snapshot = 1;
     if(message.ext && message.ext.snapshot === false) {
-      snapshot = false;
+      snapshot = 0;
     }
-
-    storeMessageValues(req, message.id, { snapshot: snapshot });
 
     function deny(errorCode) {
       statsService.eventHF('bayeux.subscribe.deny');
@@ -373,6 +358,8 @@ var authorisor = {
         return deny(403, "Authorisation denied.");
       }
 
+      message.id = [message.id || '', snapshot].join(':');
+
       return callback(message);
     });
 
@@ -405,10 +392,14 @@ var authorisor = {
     var m = match.match;
     var clientId = message.clientId;
 
-    var messageOptions = getMessageValues(req, message.id);
+    var parts = message.id && message.id.split(':');
+    if(!parts || parts.length !== 2) return callback(message);
+
+    message.id = parts[0] || undefined;
+    var snapshot = parseInt(parts[1], 10) === 1;
 
     /* The populator is all about generating the snapshot for the client */
-    if(clientId && populator && messageOptions.snapshot) {
+    if(clientId && populator && snapshot) {
       presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
         if(err) {
           winston.error('Error for lookupUserIdForSocket', { exception: err });
