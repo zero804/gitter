@@ -3,7 +3,7 @@
 
 var winston                      = require('../../utils/winston');
 var nconf                        = require('../../utils/config');
-var permissionsModel             = require('../../services/permissions-model');
+var roomPermissionsModel         = require('../../services/room-permissions-model');
 var middleware                   = require('../../web/middleware');
 var oauthService                 = require('../../services/oauth-service');
 var request                      = require('request');
@@ -119,7 +119,7 @@ function createIntegration(req, res) {
 
 function adminAccessCheck(req, res, next) {
   var uriContext = req.uriContext;
-  permissionsModel(req.user, 'admin', uriContext.uri, uriContext.troupe.githubType, uriContext.troupe.security)
+  roomPermissionsModel(req.user, 'admin', uriContext.troupe)
     .then(function(access) {
       if(!access) return next(403);
 

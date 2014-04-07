@@ -14,8 +14,7 @@ var ObjectID                 = require('mongodb').ObjectID;
 var _                        = require('underscore');
 var assert                   = require('assert');
 var statsService             = require("../services/stats-service");
-var permissionsModel         = require("./permissions-model");
-
+var roomPermissionsModel     = require('./room-permissions-model');
 
 function ensureExists(value) {
   if(!value) throw 404;
@@ -488,7 +487,7 @@ function createUniqueUri() {
 
 function updateTopic(user, troupe, topic) {
   /* First check whether the user has permission to work the topic */
-  return permissionsModel(user, 'admin', troupe.uri, troupe.githubType, troupe.security)
+  return roomPermissionsModel(user, 'admin', troupe)
     .then(function(access) {
       if(!access) throw 403; /* Forbidden */
 
