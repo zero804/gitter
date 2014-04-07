@@ -6,8 +6,10 @@ module.exports = {
     var resourceApiRoot = apiRoot ? apiRoot.substring(1) + '/' : '';
 
     // Secure the REST API
-    ['/v1/:res(troupes|rooms)/*', '/v1/user/*'].forEach(function(path) {
+    ['/v1/:res(troupes|rooms)', '/v1/user'].forEach(function(path) {
         app.all(apiRoot + path, authMiddleware);
+        app.all(apiRoot + path + '/', authMiddleware);
+        app.all(apiRoot + path + '/*', authMiddleware);
     });
 
     var troupesResource = app.resource(resourceApiRoot + 'v1/:res(troupes|rooms)',  require('./troupes/troupes'));
