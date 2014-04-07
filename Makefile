@@ -165,6 +165,10 @@ grunt: clean lint-configs
 	grunt -no-color process
 	./build-scripts/gzip-processed.sh
 
+sprites:
+	@mkdir -p output/temp-sprites
+	@node scripts/generate-service-sprite.js
+
 security-check:
 	grunt retire
 	grunt validate-shrinkwrap

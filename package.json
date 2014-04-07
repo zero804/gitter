@@ -86,6 +86,7 @@
     "memwatch": "^0.2.2",
     "node-statsd": "0.0.7",
     "raven": "^0.6.2",
+    "gitter-services": "git+ssh://git@github.com:gitterHQ/services.git#1.0.1",
     "statuserror": "0.0.1",
     "dolph": "0.0.2"
   },
@@ -116,6 +117,8 @@
     "grunt-contrib-watch": "~0.5.3",
     "jquery-builder": "~0.5.0",
     "jshamcrest": "~0.7.0",
+    "node-spritesheet": "trevorah/node-spritesheet",
+    "fs-extra": "^0.8.1",
     "grunt-retire": "^0.1.23",
     "grunt-nsp-shrinkwrap": "0.0.3"
   },
