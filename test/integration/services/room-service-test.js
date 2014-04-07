@@ -25,6 +25,7 @@ before(fixtureLoader(fixture, {
     users: ['user1', 'user2']
   },
   troupeRepo: {
+    security: 'PRIVATE',
     githubType: 'REPO',
     users: ['user1', 'user2']
   }
@@ -630,5 +631,38 @@ describe('room-service', function() {
 
     });
 
+  });
+
+  describe('user revalidation', function() {
+    it('should correctly revalidate the users in a room', function(done) {
+      var roomPermissionsModelMock = mockito.mockFunction();
+
+      var roomService = testRequire.withProxies("./services/room-service", {
+        './room-permissions-model': roomPermissionsModelMock
+      });
+
+      mockito.when(roomPermissionsModelMock)().then(function(user, perm, incomingRoom) {
+        assert.equal(perm, 'join');
+        assert.equal(incomingRoom.id, fixture.troupeRepo.id);
+
+        if(user.id == fixture.user1.id) {
+          return Q.resolve(true);
+        } else if(user.id == fixture.user2.id) {
+          return Q.resolve(false);
+        } else {
+          assert(false, 'Unknown user');
+        }
+
+      });
+
+      return roomService.revalidatePermissionsForUsers(fixture.troupeRepo)
+        .then(function() {
+          var userIds = fixture.troupeRepo.getUserIds();
+          assert.equal(userIds.length, 1);
+          assert.equal(userIds[0], fixture.user1.id);
+        })
+        .nodeify(done);
+
+    });
   });
 });

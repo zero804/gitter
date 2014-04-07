@@ -639,6 +639,40 @@ function addUsersToRoom(troupe, instigatingUser, usernamesToAdd) {
 }
 exports.addUsersToRoom = addUsersToRoom;
 
+function revalidatePermissionsForUsers(room) {
+  /* Re-insure that each user in the room has access to the room */
+  var userIds = room.getUserIds();
+
+  if(!userIds.length) return Q.resolve();
+
+  return userService.findByIds(userIds)
+    .then(function(users) {
+      var usersHash = collections.indexById(users);
+
+      return Q.all(userIds.map(function(userId) {
+        var user = usersHash[userId];
+        if(!user) {
+          // Can't find the user?, remove them
+          winston.warn('Unable to find user, removing from troupe', { userId: userId, troupeId: room.id });
+          room.removeUserById(userId);
+          return;
+        }
+
+        return roomPermissionsModel(user, 'join', room)
+          .then(function(access) {
+            if(!access) {
+              winston.warn('User no longer has access to room', { userId: userId, troupeId: room.id });
+              room.removeUserById(userId);
+            }
+          });
+      }));
+    })
+    .then(function() {
+      return room.saveQ();
+    });
+}
+exports.revalidatePermissionsForUsers = revalidatePermissionsForUsers;
+
 /**
  * The security of a room may be off. Do a check and update if required
  */
@@ -672,37 +706,7 @@ function ensureRepoRoomSecurity(uri, security) {
           /* Only do this after the save, otherwise
            * multiple events will be generated */
 
-          // TODO: XXX: move this into it's own method
-
-          /* Re-insure that each user in the room has access to the room */
-          var userIds = troupe.getUserIds();
-
-          return troupeService.findByIds(userIds)
-            .then(function(users) {
-              var usersHash = collections.indexById(users);
-
-              return Q.all(userIds.map(function(userId) {
-                var user = usersHash[userId];
-                if(!user) {
-                  // Can't find the user?, remove them
-                  winston.warn('Unable to find user, removing from troupe', { userId: userId, troupeId: troupe.id });
-                  troupe.removeUserById(userId);
-                  return;
-                }
-
-                return roomPermissionsModel(user, 'join', troupe)
-                  .then(function(access) {
-                    if(!access) {
-                      winston.warn('User no longer has access to room', { userId: userId, troupeId: troupe.id });
-                      troupe.removeUserById(userId);
-                    }
-                  });
-              }));
-            })
-            .then(function() {
-              return troupe.saveQ();
-            });
-
+          return revalidatePermissionsForUsers(troupe);
         });
 
     });

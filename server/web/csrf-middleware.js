@@ -4,28 +4,12 @@
 var winston = require('../utils/winston');
 var oauthService = require('../services/oauth-service');
 
-module.exports = function(req, res, next){
-
+module.exports = function(req, res, next) {
   // ignore these methods, they shouldnt alter state
   if('GET' == req.method || 'HEAD' == req.method || 'OPTIONS' == req.method) return next();
 
-  // oath strategy has already authenticated these with the bearer token
-  if(hasBearerTokenHeader(req)) return next();
-
-  // Call on api.gitter.im?
-  if(req.isApiCall) {
-    if(req.user) {
-      // API call and user is logged in.
-      // TODO: change this when we start making our own calls go to api.gitter.im!
-      // NB NB NB
-      // XXX
-      return next();
-    } else {
-      /* User is attempting to make an unauthenticated call to the api. Go away. */
-      winston.info('csrf: rejecting unauthenticated call to api');
-      return next(403);
-    }
-  }
+  /* OAuth clients have req.authInfo. Aways let them through */
+  if(req.authInfo) return next();
 
   if(isInWhitelist(req)) {
     winston.verbose('skipping csrf check for ' + req.path);

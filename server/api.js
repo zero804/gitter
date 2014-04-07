@@ -10,8 +10,10 @@ var winston  = require('./utils/winston');
 var express  = require('express');
 var http     = require('http');
 var nconf    = require('./utils/config');
-var redis    = require('./utils/redis');
 var domainWrapper = require('./utils/domain-wrapper');
+
+/* Load express-resource */
+require('express-resource');
 
 require('./utils/diagnostics');
 
@@ -24,32 +26,20 @@ var server = http.createServer(domainWrapper(app));
 
 require('./web/graceful-shutdown').install(server, app);
 
-var RedisStore = require('connect-redis')(express);
-var sessionStore = new RedisStore({
-  client: redis.createClient()
-});
+require('./web/express').installApi(app);
 
-require('./web/express').installFull(app, server, sessionStore);
-
-require('./web/passport').install();
+require('./web/passport').installApi();
 
 require('./utils/event-listeners').installLocalEventListeners();
-
-if(nconf.get('ws:startFayeInPrimaryApp')) {
-  var bayeux = require('./web/bayeux');
-  bayeux.attach(server);
-}
-
-require('./handlers/').install(app);
 
 require('./services/kue-workers').startWorkers();
 
 // APIS
-var auth = require('./web/middleware').ensureLoggedIn();
-require('./api/').install(app, '/api', auth);
+require('./api/').install(app, '', require('./web/middlewares/auth-api'));
 
-/* This should be second last */
-require('./handlers/app').install(app);
+app.get('/', function(req, res) {
+  res.redirect('https://developer.gitter.im');
+});
 
 require('./handlers/catch-all').install(app);
 

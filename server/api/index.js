@@ -3,9 +3,9 @@
 
 
 module.exports = {
-  install: function(app) {
-    require('./v1/').install(app);
-    require('./private/').install(app);
-    require('../resources/').install(app);
+  install: function(app, apiRoot, authMiddleware) {
+    require('./v1/').install(app, apiRoot, authMiddleware);
+    require('./private/').install(app, apiRoot, authMiddleware);
+    require('../resources/').install(app, apiRoot, authMiddleware);
   }
 };
