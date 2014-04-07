@@ -7,7 +7,6 @@ var nconf          = require('../utils/config');
 var expressHbs     = require('express-hbs');
 var winston        = require('../utils/winston');
 var responseTime   = require('./response-time');
-var csrf           = require('./csrf-middleware');
 
 // Naughty naughty naught, install some extra methods on the express prototype
 require('./http');
