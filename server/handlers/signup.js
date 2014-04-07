@@ -1,9 +1,9 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var middleware              = require("../web/middleware");
-var loginUtils              = require('../web/login-utils');
-var nconf                   = require('../utils/config');
+var middleware = require("../web/middleware");
+var loginUtils = require('../web/login-utils');
+var nconf      = require('../utils/config');
 
 module.exports = {
     install: function(app) {
@@ -18,13 +18,11 @@ module.exports = {
           }
 
           // when the viewer is not logged in:
-          res.render('homepage', { profileHasNoUsername: JSON.stringify(false), userId: JSON.stringify(null) });
-        }
-      );
+          res.render('homepage');
+        });
 
       if (nconf.get('web:homeurl') !== '/') {
-        app.get(
-          '/',
+        app.get('/',
           middleware.grantAccessForRememberMeTokenMiddleware,
           function(req, res) {
             if(req.user) {
@@ -33,8 +31,7 @@ module.exports = {
             }
 
             res.render('landing');
-          }
-        );
+          });
       }
 
     }

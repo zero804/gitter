@@ -23,8 +23,6 @@ app.set('views', __dirname + "/../public-admin/");
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 
-require('./admin/api/index').install(app);
-
 app.get('/', function (req, res) {
 	var options = { indexPage: true };
 	if(req.headers['x-pjax']) options.layout = null;
