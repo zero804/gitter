@@ -138,6 +138,8 @@ function createExpectedFixtures(expected, done) {
       users = [];
     }
 
+    var security = f.security || undefined;
+
     winston.verbose('Creating ' + fixtureName);
 
     var uri;
@@ -153,6 +155,7 @@ function createExpectedFixtures(expected, done) {
       uri: uri,
       status: f.status || 'ACTIVE',
       oneToOne: f.oneToOne,
+      security: security,
       users: users,
       githubType: githubType,
       dateDeleted: f.dateDeleted
