@@ -11,6 +11,7 @@ var persistence        = require('./persistence-service');
 var validateUri        = require('./github/github-uri-validator');
 var uriLookupService   = require("./uri-lookup-service");
 var permissionsModel   = require('./permissions-model');
+var roomPermissionsModel = require('./room-permissions-model');
 var userService        = require('./user-service');
 var troupeService      = require('./troupe-service');
 var nconf              = require('../utils/config');
@@ -104,7 +105,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
 
     return Q.all([
         troupe,
-        permissionsModel(user, 'join', uri, troupe.githubType, troupe.security)
+        roomPermissionsModel(user, 'join', troupe)
       ]);
   }
 
@@ -559,7 +560,7 @@ function validateUsersToAdd(troupe, usersToAdd) {
       break;
 
     case 'ONETOONE':
-      /* Anyone can be added */
+      /* Nobody can be added */
       return Q.reject(400);
 
     case 'REPO_CHANNEL':
@@ -606,7 +607,7 @@ function validateUsersToAdd(troupe, usersToAdd) {
 function addUsersToRoom(troupe, instigatingUser, usernamesToAdd) {
   /* First step: make sure that the instigatingUser has add access.
    */
-  return permissionsModel(instigatingUser, 'adduser', troupe.uri, troupe.githubType, troupe.security)
+  return roomPermissionsModel(instigatingUser, 'adduser', troupe)
     .then(function(access) {
       if(!access) throw 403;
 

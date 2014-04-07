@@ -4,7 +4,7 @@
 var troupeService    = require("./troupe-service");
 var readByService    = require("./readby-service");
 var userService      = require("./user-service");
-var permissionsModel = require('./permissions-model');
+var roomPermissionsModel = require('./room-permissions-model');
 var appEvents        = require("../app-events");
 var _                = require("underscore");
 var redis            = require("../utils/redis");
@@ -825,7 +825,7 @@ function detectAndCreateMentions(troupeId, creatingUserId, chat) {
         if(!users.length) return;
 
         return Q.all(users.map(function(user) {
-          return permissionsModel(user, 'join', troupe.uri, troupe.githubType, troupe.security)
+          return roomPermissionsModel(user, 'join', troupe)
             .then(function(access) {
               if(access) {
                 mentionLurkerAndNonMemberUserIds.push(user.id);
