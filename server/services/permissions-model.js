@@ -312,7 +312,17 @@ function permissionsModel(user, right, uri, roomType, security) {
   }
 
 
-  return submodel(user, right, uri, security).then(log);
+  return submodel(user, right, uri, security)
+    .then(log)
+    .fail(function(err) {
+      if(err.gitterAction === 'logout_destroy_user_tokens') {
+        winston.warn('User tokens have been revoked. Destroying tokens');
+        user.destroyTokens();
+        return user.saveQ().thenResolve(false);
+      }
+
+      throw err;
+    });
 }
 
 module.exports = permissionsModel;

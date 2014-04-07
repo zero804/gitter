@@ -131,56 +131,68 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
         .then(function(access) {
           if(!access) return [null, access];
 
-          var nonce = Math.floor(Math.random() * 100000);
-          return persistence.Troupe.findOneAndUpdateQ(
-            { lcUri: lcUri, githubType: githubType },
-            {
-              $setOnInsert: {
-                lcUri: lcUri,
-                uri: uri,
-                _nonce: nonce,
-                githubType: githubType,
-                topic: topic || "",
-                users:  user ? [{
-                  _id: new ObjectID(),
-                  userId: user._id
-                }] : []
-              }
-            },
-            {
-              upsert: true
-            })
-            .then(function(troupe) {
-              var hookCreationFailedDueToMissingScope;
+          /* This will load a cached copy */
+          var repoService = new GitHubRepoService(user);
+          return repoService.getRepo(troupe.uri)
+            .then(function(repoInfo) {
+              if(!repoInfo) return [null, false];
 
-              if(nonce == troupe._nonce) {
-                serializeCreateEvent(troupe);
+              var security = repoInfo.private ? 'PRIVATE' : 'PUBLIC';
 
-                /* Created here */
-                var requiredScope = "public_repo";
-                /* TODO: Later we'll need to handle private repos too */
-                var hasScope = user.hasGitHubScope(requiredScope);
+              var nonce = Math.floor(Math.random() * 100000);
+              return persistence.Troupe.findOneAndUpdateQ(
+                { lcUri: lcUri, githubType: githubType },
+                {
+                  $setOnInsert: {
+                    lcUri: lcUri,
+                    uri: uri,
+                    _nonce: nonce,
+                    githubType: githubType,
+                    topic: topic || "",
+                    security: security,
+                    dateLastSecurityCheck: new Date(),
+                    users:  user ? [{
+                      _id: new ObjectID(),
+                      userId: user._id
+                    }] : []
+                  }
+                },
+                {
+                  upsert: true
+                })
+                .then(function(troupe) {
+                  var hookCreationFailedDueToMissingScope;
 
-                if(hasScope) {
-                  winston.verbose('Upgrading requirements');
+                  if(nonce == troupe._nonce) {
+                    serializeCreateEvent(troupe);
 
-                  if(githubType === 'REPO') {
-                    /* Do this asynchronously */
-                    applyAutoHooksForRepoRoom(user, troupe)
-                      .catch(function(err) {
-                        winston.error("Unable to apply hooks for new room", { exception: err });
-                      });
+                    /* Created here */
+                    var requiredScope = "public_repo";
+                    /* TODO: Later we'll need to handle private repos too */
+                    var hasScope = user.hasGitHubScope(requiredScope);
+
+                    if(hasScope) {
+                      winston.verbose('Upgrading requirements');
+
+                      if(githubType === 'REPO') {
+                        /* Do this asynchronously */
+                        applyAutoHooksForRepoRoom(user, troupe)
+                          .catch(function(err) {
+                            winston.error("Unable to apply hooks for new room", { exception: err });
+                          });
+                      }
+
+                    } else {
+                      if(githubType === 'REPO') {
+                        winston.verbose('Skipping hook creation. User does not have permissions');
+                        hookCreationFailedDueToMissingScope = true;
+                      }
+                    }
                   }
 
-                } else {
-                  if(githubType === 'REPO') {
-                    winston.verbose('Skipping hook creation. User does not have permissions');
-                    hookCreationFailedDueToMissingScope = true;
-                  }
-                }
-              }
+                  return [troupe, true, hookCreationFailedDueToMissingScope, true];
+                });
 
-              return [troupe, true, hookCreationFailedDueToMissingScope, true];
             });
         });
     });
@@ -698,6 +710,7 @@ function ensureRepoRoomSecurity(uri, security) {
       });
 
       troupe.security = security;
+      troupe.dateLastSecurityCheck = new Date();
 
       return troupe.saveQ()
         .then(function() {
