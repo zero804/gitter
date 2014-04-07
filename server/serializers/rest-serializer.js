@@ -326,6 +326,8 @@ function EventStrategy(options) {
   };
 
   this.map = function(item) {
+    var prerendered = item.meta && item.meta.prerendered;
+
     return {
       id: item._id,
       text: item.text,
@@ -335,7 +337,7 @@ function EventStrategy(options) {
       fromUser: options.user ? options.user : userStategy.map(item.fromUserId),
       troupe: troupeStrategy ? troupeStrategy.map(item.toTroupeId) : undefined,
       meta: item.meta || {},
-      payload: item.payload || {},
+      payload: prerendered ? undefined : item.payload,
       v: getVersion(item)
     };
 
