@@ -267,7 +267,6 @@ function permissionsModel(user, right, uri, roomType, security) {
   assert(user, 'user required');
   assert(right, 'right required');
   assert(right === 'create' || right === 'join' || right === 'admin' || right === 'adduser', 'Invalid right ' + right);
-  assert(uri, 'uri required');
   assert(roomType, 'roomType required');
 
   var submodel = {
@@ -283,6 +282,14 @@ function permissionsModel(user, right, uri, roomType, security) {
     assert(false, 'Invalid roomType ' + roomType);
     throw 500;
   }
+
+  if(roomType !== 'ONETOONE') {
+    // For now uri can be null for one to one
+    // This will need to be fixed before we handle
+    // more fine grained permissions
+    assert(uri, 'uri required');
+  }
+
 
   return submodel(user, right, uri, security).then(log);
 }
