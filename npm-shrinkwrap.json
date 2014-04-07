@@ -145,7 +145,6 @@
         "connect": {
           "version": "2.14.1",
           "from": "connect@2.14.1",
-          "resolved": "https://registry.npmjs.org/connect/-/connect-2.14.1.tgz",
           "dependencies": {
             "basic-auth-connect": {
               "version": "1.0.0",
@@ -182,6 +181,7 @@
             "csurf": {
               "version": "1.0.0",
               "from": "csurf@1.0.0",
+              "resolved": "https://registry.npmjs.org/csurf/-/csurf-1.0.0.tgz",
               "dependencies": {
                 "uid2": {
                   "version": "0.0.3",
@@ -196,6 +196,7 @@
             "express-session": {
               "version": "1.0.2",
               "from": "express-session@1.0.2",
+              "resolved": "https://registry.npmjs.org/express-session/-/express-session-1.0.2.tgz",
               "dependencies": {
                 "utils-merge": {
                   "version": "1.0.0",
@@ -247,7 +248,8 @@
             },
             "static-favicon": {
               "version": "1.0.0",
-              "from": "static-favicon@1.0.0"
+              "from": "static-favicon@1.0.0",
+              "resolved": "https://registry.npmjs.org/static-favicon/-/static-favicon-1.0.0.tgz"
             },
             "vhost": {
               "version": "1.0.0",
@@ -349,7 +351,8 @@
         },
         "merge-descriptors": {
           "version": "0.0.2",
-          "from": "merge-descriptors@0.0.2"
+          "from": "merge-descriptors@0.0.2",
+          "resolved": "https://registry.npmjs.org/merge-descriptors/-/merge-descriptors-0.0.2.tgz"
         }
       }
     },
@@ -725,8 +728,7 @@
       "dependencies": {
         "bindings": {
           "version": "1.2.0",
-          "from": "bindings@*",
-          "resolved": "https://registry.npmjs.org/bindings/-/bindings-1.2.0.tgz"
+          "from": "bindings@*"
         }
       }
     },
@@ -864,7 +866,8 @@
     },
     "mixpanel": {
       "version": "0.0.16",
-      "from": "mixpanel@0.0.16"
+      "from": "mixpanel@0.0.16",
+      "resolved": "https://registry.npmjs.org/mixpanel/-/mixpanel-0.0.16.tgz"
     },
     "moment": {
       "version": "2.1.0",
@@ -1000,7 +1003,7 @@
         },
         "optimist": {
           "version": "0.3.7",
-          "from": "optimist@0.3.x",
+          "from": "optimist@~0.3",
           "dependencies": {
             "wordwrap": {
               "version": "0.0.2",
@@ -1155,7 +1158,8 @@
                 },
                 "ctype": {
                   "version": "0.5.2",
-                  "from": "ctype@0.5.2"
+                  "from": "ctype@0.5.2",
+                  "resolved": "https://registry.npmjs.org/ctype/-/ctype-0.5.2.tgz"
                 }
               }
             },
@@ -1232,6 +1236,7 @@
     "passport": {
       "version": "0.1.15",
       "from": "passport@0.1.15",
+      "resolved": "https://registry.npmjs.org/passport/-/passport-0.1.15.tgz",
       "dependencies": {
         "pkginfo": {
           "version": "0.2.3",
@@ -1377,7 +1382,8 @@
             },
             "ctype": {
               "version": "0.5.2",
-              "from": "ctype@0.5.2"
+              "from": "ctype@0.5.2",
+              "resolved": "https://registry.npmjs.org/ctype/-/ctype-0.5.2.tgz"
             }
           }
         },
