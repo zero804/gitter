@@ -89,15 +89,9 @@ module.exports = {
         secure: nconf.get("web:secureCookies")
       }
     }));
-    function log(req, res, next) {
-      console.log('LOG');
-    }
     app.use(passport.initialize());
     app.use(passport.session());
     app.use(app.router);
-
-    app.use(log);
-
     app.use(require('./middlewares/express-error-handler'));
   },
 
