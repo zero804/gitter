@@ -26,7 +26,8 @@ require([
 
   var chatIFrame = document.getElementById('content-frame');
   if(window.location.hash) {
-    chatIFrame.src = chatIFrame.src + window.location.hash;
+    var noHashSrc = chatIFrame.src.split('#')[0];
+    chatIFrame.src = noHashSrc + window.location.hash;
   }
 
   function pushState(state, title, url) {

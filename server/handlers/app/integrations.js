@@ -11,18 +11,22 @@ var uriContextResolverMiddleware = require('./middleware').uriContextResolverMid
 var jwt                          = require('jwt-simple');
 var Q                            = require('q');
 var cdn                          = require('../../web/cdn');
+var services                     = require('gitter-services');
 
 var supportedServices = [
   {id: 'github', name: 'GitHub'},
   {id: 'bitbucket', name: 'BitBucket'},
-  {id: 'huboard', name: 'HuBoard'},
-  {id: 'sprintly', name: 'Sprint.ly'},
   {id: 'trello', name: 'Trello'},
-  {id: 'jenkins', name: 'Jenkins'},
-  {id: 'travis', name: 'Travis'}
 ];
 
-var serviceIdNameMap = supportedServices.reduce(function(map, service) {
+var openServices = Object.keys(services).map(function(id) {
+  return {
+    id: id,
+    name: services[id].name
+  };
+});
+
+var serviceIdNameMap = supportedServices.concat(openServices).reduce(function(map, service) {
   map[service.id] = service.name;
   return map;
 }, {});
@@ -52,7 +56,8 @@ function getIntegrations(req, res) {
         troupe: req.troupe,
         accessToken: accessToken,
         cdnRoot: cdn(''),
-        supportedServices: supportedServices
+        supportedServices: supportedServices,
+        openServices: openServices
       });
     });
   });

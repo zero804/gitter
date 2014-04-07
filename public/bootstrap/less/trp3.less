@@ -461,7 +461,7 @@ a:hover {
 	left: 0;
 	width: 30px;
 	height: 100%;
-	z-index: 10;
+	z-index: 1010;
 	display: inline-block;
 }
 
@@ -1692,14 +1692,6 @@ i.favourited:hover:before {
     font-size: 11px;
   }
 
-  a {
-    color: #333;
-  }
-
-  a.link:hover {
-    color: @trpLightBlue;
-  }
-
  .trpMiniActions {
     display: none;
     @media @mid {
@@ -1943,6 +1935,28 @@ ul.roster {
 
 .bitbucket {
   .prepend-icon-bitbucket;
+}
+
+.prerendered {
+  position: relative;
+  .service-sprite {
+    position: absolute;
+    top: 3px;
+    opacity: 0.8;
+  }
+  .gtrActivityItemText {
+    padding-left: 1.5em;
+  }
+  a:hover {
+    color: inherit;
+  }
+
+  &.error {
+    color: #e74c3c;
+    a {
+      color: red;
+    }
+  }
 }
 
 .github-issue-opened {
