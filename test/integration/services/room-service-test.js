@@ -12,6 +12,8 @@ var mockito = require('jsmockito').JsMockito;
 var times = mockito.Verifiers.times;
 var once = times(1);
 
+Q.longStackSupport = true;
+
 var troupeService = testRequire("./services/troupe-service");
 
 before(fixtureLoader(fixture, {
@@ -264,10 +266,10 @@ describe('room-service', function() {
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
             var roomService = testRequire.withProxies("./services/room-service", {
-              './permissions-model': roomPermissionsModelMock
+              './room-permissions-model': roomPermissionsModelMock
             });
 
-            mockito.when(permissionsModelMock)().then(function(user, perm, _room) {
+            mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
               assert.equal(user.id, fixture.user1.id);
               assert.equal(perm, 'adduser');
               assert.equal(room.id, _room.id);
@@ -292,7 +294,7 @@ describe('room-service', function() {
     });
 
     describe('::repo::', function() {
-      it('should create private rooms', function(done) {
+      it(/* ::repo */ 'should create private rooms', function(done) {
         var permissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
           './permissions-model': permissionsModelMock
@@ -319,7 +321,7 @@ describe('room-service', function() {
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
             var roomService = testRequire.withProxies("./services/room-service", {
-              './permissions-model': roomPermissionsModelMock
+              './room-permissions-model': roomPermissionsModelMock
             });
 
             mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
@@ -344,7 +346,7 @@ describe('room-service', function() {
           .nodeify(done);
       });
 
-      it('should create open rooms', function(done) {
+      it(/* ::repo */ 'should create open rooms', function(done) {
         var permissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
           './permissions-model': permissionsModelMock
@@ -362,23 +364,20 @@ describe('room-service', function() {
 
         return roomService.createCustomChildRoom(fixture.troupeRepo, fixture.user1, { name: 'open', security: 'PUBLIC' })
           .then(function(room) {
-            console.log(1);
             mockito.verify(permissionsModelMock, once)();
 
             return makeRoomAssertions(room, [fixture.user1, fixture.user2, fixture.user3], [])
               .thenResolve(room);
           })
           .then(function(room) {
-            console.log(2);
-
             // Get another mock
             // ADD A PERSON TO THE ROOM
-            var permissionsModelMock = mockito.mockFunction();
+            var roomPermissionsModelMock = mockito.mockFunction();
             var roomService = testRequire.withProxies("./services/room-service", {
-              './permissions-model': permissionsModelMock
+              './room-permissions-model': roomPermissionsModelMock
             });
 
-            mockito.when(permissionsModelMock)().then(function(user, perm, _room) {
+            mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
               assert.equal(user.id, fixture.user1.id);
               assert.equal(perm, 'adduser');
               assert.equal(_room.id, room.id);
@@ -387,9 +386,7 @@ describe('room-service', function() {
 
             return roomService.addUsersToRoom(room, fixture.user1, [fixture.user3.username])
               .then(function() {
-          console.log(2);
-
-                mockito.verify(permissionsModelMock, once)();
+                mockito.verify(roomPermissionsModelMock, once)();
               })
               .thenResolve(room);
           })
@@ -403,7 +400,7 @@ describe('room-service', function() {
           .nodeify(done);
       });
 
-      it('should create inherited rooms', function(done) {
+      it(/* ::repo */ 'should create inherited rooms', function(done) {
         var permissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
           './permissions-model': permissionsModelMock
@@ -426,19 +423,19 @@ describe('room-service', function() {
               .thenResolve(room);
           })
           .then(function(room) {
+            console.log(2);
+
             // Get another mock
             // ADD A PERSON TO THE ROOM
-            var permissionsModelMock = mockito.mockFunction();
+            var roomPermissionsModelMock = mockito.mockFunction();
             var roomService = testRequire.withProxies("./services/room-service", {
-              './permissions-model': permissionsModelMock
+              './room-permissions-model': roomPermissionsModelMock
             });
 
-            mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
+            mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
               assert.equal(user.id, fixture.user1.id);
               assert.equal(perm, 'adduser');
-              assert.equal(uri, fixture.troupeRepo.uri + '/child');
-              assert.equal(githubType, 'REPO_CHANNEL');
-              assert.equal(security, 'INHERITED');
+              assert.equal(_room.id, room.id);
               return Q.resolve(true);
             });
 
@@ -486,23 +483,21 @@ describe('room-service', function() {
           .then(function(room) {
             // Get another mock
             // ADD A PERSON TO THE ROOM
-            var permissionsModelMock = mockito.mockFunction();
+            var roomPermissionsModelMock = mockito.mockFunction();
             var roomService = testRequire.withProxies("./services/room-service", {
-              './permissions-model': permissionsModelMock
+              './room-permissions-model': roomPermissionsModelMock
             });
 
-            mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
+            mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
               assert.equal(user.id, fixture.user1.id);
               assert.equal(perm, 'adduser');
-              assert.equal(uri, room.uri);
-              assert.equal(githubType, 'USER_CHANNEL');
-              assert.equal(security, 'PRIVATE');
+              assert.equal(_room.id, room.id);
               return Q.resolve(true);
             });
 
             return roomService.addUsersToRoom(room, fixture.user1, [fixture.user3.username])
               .then(function() {
-                mockito.verify(permissionsModelMock, once)();
+                mockito.verify(roomPermissionsModelMock, once)();
               })
               .thenResolve(room);
           })
@@ -541,23 +536,21 @@ describe('room-service', function() {
           .then(function(room) {
             // Get another mock
             // ADD A PERSON TO THE ROOM
-            var permissionsModelMock = mockito.mockFunction();
+            var roomPermissionsModelMock = mockito.mockFunction();
             var roomService = testRequire.withProxies("./services/room-service", {
-              './permissions-model': permissionsModelMock
+              './room-permissions-model': roomPermissionsModelMock
             });
 
-            mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
+            mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
               assert.equal(user.id, fixture.user1.id);
               assert.equal(perm, 'adduser');
-              assert.equal(uri, fixture.user1.username + '/private');
-              assert.equal(githubType, 'USER_CHANNEL');
-              assert.equal(security, 'PRIVATE');
+              assert.equal(_room.id, room.id);
               return Q.resolve(true);
             });
 
             return roomService.addUsersToRoom(room, fixture.user1, [fixture.user3.username])
               .then(function() {
-                mockito.verify(permissionsModelMock, once)();
+                mockito.verify(roomPermissionsModelMock, once)();
               })
               .thenResolve(room);
           })
@@ -595,23 +588,21 @@ describe('room-service', function() {
           .then(function(room) {
             // Get another mock
             // ADD A PERSON TO THE ROOM
-            var permissionsModelMock = mockito.mockFunction();
+            var roomPermissionsModelMock = mockito.mockFunction();
             var roomService = testRequire.withProxies("./services/room-service", {
-              './permissions-model': permissionsModelMock
+              './room-permissions-model': roomPermissionsModelMock
             });
 
-            mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType, security) {
+            mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
               assert.equal(user.id, fixture.user1.id);
               assert.equal(perm, 'adduser');
-              assert.equal(uri, fixture.user1.username + '/open');
-              assert.equal(githubType, 'USER_CHANNEL');
-              assert.equal(security, 'PUBLIC');
+              assert.equal(_room.id, room.id);
               return Q.resolve(true);
             });
 
             return roomService.addUsersToRoom(room, fixture.user1, [fixture.user3.username])
               .then(function() {
-                mockito.verify(permissionsModelMock, once)();
+                mockito.verify(roomPermissionsModelMock, once)();
               })
               .thenResolve(room);
           })
