@@ -86,7 +86,7 @@ module.exports = {
         httpOnly: true,
         maxAge: 14400000,
         domain: nconf.get("web:cookieDomain"),
-        secure: nconf.get("web:secureCookies")
+        secure: false /*nconf.get("web:secureCookies")*/ // TODO: fix this!!
       }
     }));
     app.use(passport.initialize());
