@@ -10,12 +10,10 @@ var dolph       = require('dolph');
 var redis       = require("../utils/redis");
 var redisClient = redis.createClient();
 
-
 var authCookieName = nconf.get('web:cookiePrefix') + 'auth';
 var sessionCookieName = nconf.get('web:cookiePrefix') + 'session';
 
 var bearerLogin = passport.authenticate('bearer', { session: true });
-
 function bearerAuthMiddleware(req, res, next) {
   // If the user is already logged in, don't check for OAUTH tokens
   // This could potentially lead to problems if one user is logged in
@@ -23,24 +21,12 @@ function bearerAuthMiddleware(req, res, next) {
   // and getting around it would be very ineffiecent
   if(req.user) return next();
 
-  if (req.headers && req.headers['authorization']) {
-    var parts = req.headers['authorization'].split(' ');
-    if (parts.length == 2) {
-      var scheme = parts[0];
-      if(/OAuth2/.test(scheme)) {
-        // Dodgy hack to sort out problem with RestKit
-        req.headers['authorization'] = 'Bearer ' + parts[1];
-        bearerLogin(req, res, next);
-
-        return;
-      }
-      if (/Bearer/i.test(scheme)) {
-        bearerLogin(req, res, next);
-        return;
-      }
-    }
+  if(req.headers.authorization)  {
+    /* Bearer login is not optional, so if you don't present a token we get a 401 */
+    return bearerLogin(req, res, next);
   }
-  next();
+
+  return next();
 }
 
 var rateLimiter = dolph({
@@ -67,15 +53,17 @@ exports.ensureLoggedIn = function(options) {
     rememberMe.rememberMeMiddleware(/* No Options */),
     bearerAuthMiddleware,
     rateLimiter,
+    require('./csrf-middleware'),
     function(req, res, next) {
-      if (req.isAuthenticated && req.isAuthenticated()) {
+      if (req.user) {
         if(!req.user.githubToken && !req.user.githubUserToken) {
           winston.verbose('Client needs to reauthenticate');
+
           exports.logout()(req, res, function() {
 
             // Are we dealing with an API client? Tell em in HTTP
-            if(req.isApiCall || req.accepts(['json','html']) === 'json') {
-              winston.error("Use no longer has a token");
+            if(req.accepts(['json','html']) === 'json') {
+              winston.error("User no longer has a token");
               res.send(401, { success: false, loginRequired: true });
               return;
             }
@@ -97,7 +85,7 @@ exports.ensureLoggedIn = function(options) {
       winston.verbose('Client needs to authenticate', options);
 
       // Are we dealing with an API client? Tell em in HTTP
-      if(req.isApiCall || req.accepts(['json','html']) === 'json') {
+      if(req.accepts(['json','html']) === 'json') {
         winston.error("middleware: User is not logged in. Ye shall not pass!");
         res.send(401, { success: false, loginRequired: true });
         return;
@@ -145,8 +133,6 @@ exports.logoutPreserveSession = function(req, res, done) {
   }
 };
 
-
-
 exports.logout = function() {
   return function(req, res, next) {
 
@@ -162,42 +148,6 @@ exports.logout = function() {
 
 };
 
-exports.authenticate = function(scheme, options) {
-  return function(req, res, next) {
-    winston.verbose("Attempting authentication", { scheme: scheme });
-
-    /* If you're trying to login, you're automatically logged out */
-    req.logout();
-
-    passport.authenticate(scheme, function(err, user, info) {
-      if (err || !user) {
-        winston.info("Authentication failed ", { scheme: scheme });
-
-        if(req.accepts(['json','html']) === 'json') {
-          var reason = info ? info.reason : undefined;
-
-          res.send(401, { success: false, reason: reason });
-        } else {
-          res.relativeRedirect(options.failureRedirect);
-        }
-        return;
-      }
-
-      winston.info("Authentication succeeded, logging user in", { scheme: scheme, userId: user.id });
-
-      req.login(user, options, function(err) {
-        if(err) {
-          winston.info("Passport login failed", { exception: err  });
-          return next(err);
-        }
-
-        winston.info("Passport login succeeded");
-        next();
-      });
-    })(req, res, next);
-  };
-};
-
 exports.grantAccessForRememberMeTokenMiddleware = [
   bearerAuthMiddleware,
   rateLimiter,
@@ -205,15 +155,10 @@ exports.grantAccessForRememberMeTokenMiddleware = [
 ];
 
 exports.generateRememberMeTokenMiddleware = function(req, res, next) {
-  // TODO: ask people if they want to be remembered (keep it as a user setting?)
-  //if(req.body.rememberMe) {
-    rememberMe.generateAuthToken(req, res, req.user.id, {}, function(err) {
-      if(err) return next(err);
-      next();
-    });
-  // } else {
-  //   next();
-  // }
+  rememberMe.generateAuthToken(req, res, req.user.id, {}, function(err) {
+    if(err) return next(err);
+    next();
+  });
 };
 
 exports.simulateDelay = function(timeout) {
