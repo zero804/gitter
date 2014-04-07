@@ -26,15 +26,6 @@ define([
           // There can be existing documents for create events if the doc was created on this
           // client and lazy-inserted into the collection
           room.set(parsed.attributes);
-
-          // if(this.operationIsUpToDate(operation, existing, newModel)) {
-          //   log('Performing ' + operation, newModel);
-          //   existing.set(parsed.attributes);
-          // } else {
-          //   log('Ignoring out-of-date update', existing.toJSON(), newModel);
-          //   break;
-          // }
-
           break;
 
         case 'remove':
@@ -46,7 +37,7 @@ define([
 
       }
 
-    });
+    }, null, { snapshot: false });
   }
 
   return {

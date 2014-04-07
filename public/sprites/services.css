@@ -1,0 +1,95 @@
+.service-sprite {
+  background: url( 'services.png' ) no-repeat;
+  background-size: 64px 64px;
+}
+
+.service-sprite.pagerduty-logo {
+  width: 16px;
+  height: 16px;
+  background-position: 0 0;
+}
+
+.service-sprite.heroku-logo {
+  width: 16px;
+  height: 16px;
+  background-position: -16px 0;
+}
+
+.service-sprite.jenkins-frown {
+  width: 16px;
+  height: 16px;
+  background-position: 0 -16px;
+}
+
+.service-sprite.jenkins-logo {
+  width: 16px;
+  height: 16px;
+  background-position: -16px -16px;
+}
+
+.service-sprite.jenkins-meh {
+  width: 16px;
+  height: 16px;
+  background-position: -32px 0;
+}
+
+.service-sprite.jenkins-smile {
+  width: 16px;
+  height: 16px;
+  background-position: -32px -16px;
+}
+
+.service-sprite.huboard-logo {
+  width: 16px;
+  height: 16px;
+  background-position: 0 -32px;
+}
+
+.service-sprite.sprintly-columns {
+  width: 16px;
+  height: 16px;
+  background-position: -16px -32px;
+}
+
+.service-sprite.sprintly-logo {
+  width: 16px;
+  height: 16px;
+  background-position: -32px -32px;
+}
+
+.service-sprite.travis-frown {
+  width: 16px;
+  height: 16px;
+  background-position: -48px 0;
+}
+
+.service-sprite.travis-logo {
+  width: 16px;
+  height: 16px;
+  background-position: -48px -16px;
+}
+
+.service-sprite.travis-meh {
+  width: 16px;
+  height: 16px;
+  background-position: -48px -32px;
+}
+
+.service-sprite.travis-smile {
+  width: 16px;
+  height: 16px;
+  background-position: 0 -48px;
+}
+
+
+
+@media (min--moz-device-pixel-ratio: 2),
+(-o-min-device-pixel-ratio: 2/1),
+(-webkit-min-device-pixel-ratio: 2),
+(min-device-pixel-ratio: 2) {
+.service-sprite {
+  background: url( 'services@2x.png' ) no-repeat;
+  background-size: 64px 64px;
+}
+
+}

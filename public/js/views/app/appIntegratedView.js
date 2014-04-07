@@ -18,6 +18,7 @@ define([
   var mouseEvents = {
     "click #menu-toggle-button":        "onMenuToggle",
     "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
+    "mouseleave #left-menu-hotspot":    "onLeftMenuHotspotLeave",
     "mouseenter #content-frame":        "onMouseEnterContentFrame",
     "keypress":                         "onKeyPress",
     "keydown":                          "onKeyDown",
@@ -109,7 +110,17 @@ define([
     },
 
     onLeftMenuHotspot: function() {
-      this.showMenu();
+      var self = this;
+      this.menuTimer = setTimeout(function() {
+        delete this.menuTimer;
+        self.showMenu();
+      }, 100);
+    },
+
+    onLeftMenuHotspotLeave: function() {
+      if (this.menuTimer) {
+        clearTimeout(this.menuTimer);
+      }
     },
 
     onMouseEnterContentFrame: function() {

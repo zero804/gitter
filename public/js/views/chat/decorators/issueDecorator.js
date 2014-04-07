@@ -28,6 +28,7 @@ define([
   });
 
   var TitleView = Marionette.ItemView.extend({
+    className: 'issue-popover-title',
     modelEvents: {
       change: 'render'
     },
