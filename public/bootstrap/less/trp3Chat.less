@@ -630,20 +630,23 @@ pre code {
   font-style: italic;
 }
 
-.issuePopoverTitle {
-  display: inline-block;
-  width: 100%;
-  padding-right: 50px;
-  -moz-box-sizing: border-box;
-       box-sizing: border-box;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.issuePopoverLabel {
-  position: absolute;
-  right: 14px;
+.issue-popover-title {
+  height: 20px;
+  position: relative;
+  a {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 50px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  span {
+    position: absolute;
+    right: 0;
+  }
 }
 
 .trpChatTime {
