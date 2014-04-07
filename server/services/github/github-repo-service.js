@@ -54,7 +54,6 @@ function getIssuesWithState(repo, state) {
 
   return d.promise
     .fail(badCredentialsCheck);
-
 }
 
 /**
