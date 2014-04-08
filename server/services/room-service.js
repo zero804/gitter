@@ -11,6 +11,7 @@ var persistence        = require('./persistence-service');
 var validateUri        = require('./github/github-uri-validator');
 var uriLookupService   = require("./uri-lookup-service");
 var permissionsModel   = require('./permissions-model');
+var roomPermissionsModel = require('./room-permissions-model');
 var userService        = require('./user-service');
 var troupeService      = require('./troupe-service');
 var nconf              = require('../utils/config');
@@ -104,7 +105,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
 
     return Q.all([
         troupe,
-        permissionsModel(user, 'join', uri, troupe.githubType, troupe.security)
+        roomPermissionsModel(user, 'join', troupe)
       ]);
   }
 
@@ -130,56 +131,68 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
         .then(function(access) {
           if(!access) return [null, access];
 
-          var nonce = Math.floor(Math.random() * 100000);
-          return persistence.Troupe.findOneAndUpdateQ(
-            { lcUri: lcUri, githubType: githubType },
-            {
-              $setOnInsert: {
-                lcUri: lcUri,
-                uri: uri,
-                _nonce: nonce,
-                githubType: githubType,
-                topic: topic || "",
-                users:  user ? [{
-                  _id: new ObjectID(),
-                  userId: user._id
-                }] : []
-              }
-            },
-            {
-              upsert: true
-            })
-            .then(function(troupe) {
-              var hookCreationFailedDueToMissingScope;
+          /* This will load a cached copy */
+          var repoService = new GitHubRepoService(user);
+          return repoService.getRepo(troupe.uri)
+            .then(function(repoInfo) {
+              if(!repoInfo) return [null, false];
 
-              if(nonce == troupe._nonce) {
-                serializeCreateEvent(troupe);
+              var security = repoInfo.private ? 'PRIVATE' : 'PUBLIC';
 
-                /* Created here */
-                var requiredScope = "public_repo";
-                /* TODO: Later we'll need to handle private repos too */
-                var hasScope = user.hasGitHubScope(requiredScope);
+              var nonce = Math.floor(Math.random() * 100000);
+              return persistence.Troupe.findOneAndUpdateQ(
+                { lcUri: lcUri, githubType: githubType },
+                {
+                  $setOnInsert: {
+                    lcUri: lcUri,
+                    uri: uri,
+                    _nonce: nonce,
+                    githubType: githubType,
+                    topic: topic || "",
+                    security: security,
+                    dateLastSecurityCheck: new Date(),
+                    users:  user ? [{
+                      _id: new ObjectID(),
+                      userId: user._id
+                    }] : []
+                  }
+                },
+                {
+                  upsert: true
+                })
+                .then(function(troupe) {
+                  var hookCreationFailedDueToMissingScope;
 
-                if(hasScope) {
-                  winston.verbose('Upgrading requirements');
+                  if(nonce == troupe._nonce) {
+                    serializeCreateEvent(troupe);
 
-                  if(githubType === 'REPO') {
-                    /* Do this asynchronously */
-                    applyAutoHooksForRepoRoom(user, troupe)
-                      .catch(function(err) {
-                        winston.error("Unable to apply hooks for new room", { exception: err });
-                      });
+                    /* Created here */
+                    var requiredScope = "public_repo";
+                    /* TODO: Later we'll need to handle private repos too */
+                    var hasScope = user.hasGitHubScope(requiredScope);
+
+                    if(hasScope) {
+                      winston.verbose('Upgrading requirements');
+
+                      if(githubType === 'REPO') {
+                        /* Do this asynchronously */
+                        applyAutoHooksForRepoRoom(user, troupe)
+                          .catch(function(err) {
+                            winston.error("Unable to apply hooks for new room", { exception: err });
+                          });
+                      }
+
+                    } else {
+                      if(githubType === 'REPO') {
+                        winston.verbose('Skipping hook creation. User does not have permissions');
+                        hookCreationFailedDueToMissingScope = true;
+                      }
+                    }
                   }
 
-                } else {
-                  if(githubType === 'REPO') {
-                    winston.verbose('Skipping hook creation. User does not have permissions');
-                    hookCreationFailedDueToMissingScope = true;
-                  }
-                }
-              }
+                  return [troupe, true, hookCreationFailedDueToMissingScope, true];
+                });
 
-              return [troupe, true, hookCreationFailedDueToMissingScope, true];
             });
         });
     });
@@ -559,7 +572,7 @@ function validateUsersToAdd(troupe, usersToAdd) {
       break;
 
     case 'ONETOONE':
-      /* Anyone can be added */
+      /* Nobody can be added */
       return Q.reject(400);
 
     case 'REPO_CHANNEL':
@@ -606,7 +619,7 @@ function validateUsersToAdd(troupe, usersToAdd) {
 function addUsersToRoom(troupe, instigatingUser, usernamesToAdd) {
   /* First step: make sure that the instigatingUser has add access.
    */
-  return permissionsModel(instigatingUser, 'adduser', troupe.uri, troupe.githubType, troupe.security)
+  return roomPermissionsModel(instigatingUser, 'adduser', troupe)
     .then(function(access) {
       if(!access) throw 403;
 
@@ -637,3 +650,78 @@ function addUsersToRoom(troupe, instigatingUser, usernamesToAdd) {
     });
 }
 exports.addUsersToRoom = addUsersToRoom;
+
+function revalidatePermissionsForUsers(room) {
+  /* Re-insure that each user in the room has access to the room */
+  var userIds = room.getUserIds();
+
+  if(!userIds.length) return Q.resolve();
+
+  return userService.findByIds(userIds)
+    .then(function(users) {
+      var usersHash = collections.indexById(users);
+
+      return Q.all(userIds.map(function(userId) {
+        var user = usersHash[userId];
+        if(!user) {
+          // Can't find the user?, remove them
+          winston.warn('Unable to find user, removing from troupe', { userId: userId, troupeId: room.id });
+          room.removeUserById(userId);
+          return;
+        }
+
+        return roomPermissionsModel(user, 'join', room)
+          .then(function(access) {
+            if(!access) {
+              winston.warn('User no longer has access to room', { userId: userId, troupeId: room.id });
+              room.removeUserById(userId);
+            }
+          });
+      }));
+    })
+    .then(function() {
+      return room.saveQ();
+    });
+}
+exports.revalidatePermissionsForUsers = revalidatePermissionsForUsers;
+
+/**
+ * The security of a room may be off. Do a check and update if required
+ */
+function ensureRepoRoomSecurity(uri, security) {
+  if(security !== 'PRIVATE' && security != 'PUBLIC') {
+    return Q.reject(new Error("Unknown security type: " + security));
+  }
+
+  return troupeService.findByUri(uri)
+    .then(function(troupe) {
+      if(!troupe) return;
+
+      if(troupe.githubType != 'REPO') throw new Error("Only repo room security can be changed");
+
+      /* No need to change it? */
+      if(troupe.security === security) return;
+
+      winston.info('Security of troupe does not match. Updating.', {
+        roomId: troupe.id,
+        uri: uri,
+        current: troupe.security,
+        security: security
+      });
+
+      troupe.security = security;
+      troupe.dateLastSecurityCheck = new Date();
+
+      return troupe.saveQ()
+        .then(function() {
+          if(security === 'PUBLIC') return;
+
+          /* Only do this after the save, otherwise
+           * multiple events will be generated */
+
+          return revalidatePermissionsForUsers(troupe);
+        });
+
+    });
+}
+exports.ensureRepoRoomSecurity = ensureRepoRoomSecurity;
