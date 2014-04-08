@@ -14,8 +14,9 @@ function saveRoom(req) {
     recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId);
   }
 }
+
 var chatFrameMiddlewarePipeline = [
-  middleware.ensureLoggedIn(),
+  // middleware.ensureLoggedIn(),
   appMiddleware.uriContextResolverMiddleware,
   appMiddleware.isPhoneMiddleware,
   function(req, res, next) {
@@ -38,7 +39,7 @@ var chatFrameMiddlewarePipeline = [
 ];
 
 var chatMiddlewarePipeline = [
-  middleware.ensureLoggedIn(),
+  // middleware.ensureLoggedIn(),
   appMiddleware.uriContextResolverMiddleware,
   appMiddleware.isPhoneMiddleware,
   function(req, res, next) {
@@ -53,21 +54,14 @@ module.exports = {
       [
         '/:roomPart1/~chat',                         // ORG or ONE_TO_ONE
         '/:roomPart1/:roomPart2/~chat',              // REPO or ORG_CHANNEL or ADHOC
-        '/:roomPart1/:roomPart2/:roomPart3/~chat',   // CUSTOM REPO_ROOM
-
-        // These URLs is deprecated. Remove after second master deployment
-        '/:roomPart1/-/chat',                       // ORG or ONE_TO_ONE
-        '/:roomPart1/:roomPart2/chat',              // REPO or ORG_CHANNEL or ADHOC
-        '/:roomPart1/:roomPart2/:roomPart3/chat',   // REPO_CHANNEL
+        '/:roomPart1/:roomPart2/:roomPart3/~chat'    // CUSTOM REPO_ROOM
       ].forEach(function(path) {
         app.get(path, chatMiddlewarePipeline);
       });
 
 
       [
-        '/:roomPart1/~home',
-        // This URL is deprecated
-        '/:roomPart1/-/home',
+        '/:roomPart1/~home'
       ].forEach(function(path) {
         app.get(path,
           middleware.ensureLoggedIn(),
@@ -78,26 +72,7 @@ module.exports = {
           });
       });
 
-
-
       require('./integrations').install(app);
-
-      app.get(/^\/(?:([^\/]+?))\/(?:([^\/]+?))\/(?:\*([^\/]+))\/?$/,
-        function(req, res, next) {
-          req.params.userOrOrg = req.params[0];
-          req.params.repo = req.params[1];
-          req.params.channel = req.params[2];
-          next();
-        },
-        chatFrameMiddlewarePipeline);
-
-      app.get(/^\/(?:([^\/]+?))\/(?:\*([^\/]+))$/,
-        function(req, res, next) {
-          req.params.userOrOrg = req.params[0];
-          req.params.channel = req.params[1];
-          next();
-        },
-        chatFrameMiddlewarePipeline);
 
       [
         '/:roomPart1',
