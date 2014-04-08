@@ -114,6 +114,22 @@ describe('room-service', function() {
         .nodeify(done);
     });
 
+    it('should create a room for a repo ignoring the case', function(done) {
+      var permissionsModelMock = mockito.mockFunction();
+      var roomService = testRequire("./services/room-service", {
+        './permissions-model': permissionsModelMock
+      });
+
+      return roomService.findOrCreateRoom(fixture.user1, 'gitterhq/sandbox', {ignoreCase: true})
+        .then(function(uriContext) {
+          assert(uriContext.troupe);
+          assert(uriContext.troupe.lcUri  === 'gitterhq/sandbox');
+          assert(uriContext.troupe.uri    === 'gitterHQ/sandbox');
+        })
+        .nodeify(done);
+    });
+
+
     it('should handle an invalid url correctly', function(done) {
       var permissionsModelMock = mockito.mockFunction();
       var roomService = testRequire("./services/room-service", {
