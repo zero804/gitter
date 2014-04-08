@@ -1,44 +1,40 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var middleware = require('../../web/middleware');
-
 module.exports = {
-  install: function(app) {
-    var auth = [
-        middleware.ensureLoggedIn()
-    ];
+  install: function(app, apiRoot, authMiddleware) {
+    var resourceApiRoot = apiRoot ? apiRoot.substring(1) + '/' : '';
 
-    app.post('/api/v1/location',
-        auth,
+    app.post(apiRoot + '/v1/location',
+        authMiddleware,
         require('./location.js'));
 
     /* APN has no auth requirement as user may not have authenticated */
-    // app.resource('api/v1/apn',
+    // app.resource(apiRoot + '/v1/apn',
     //     require('./apn.js'));
 
-    // app.post('/api/v1/userapn',
+    // app.post(apiRoot + '/v1/userapn',
     //     auth,
     //     require('./userapn.js'));
 
-    app.post('/api/v1/eyeballs',
-        auth,
+    app.post(apiRoot + '/v1/eyeballs',
+        authMiddleware,
         require('./eyeballs.js'));
 
-    app.get('/api/v1/ping',
-        auth,
+    app.get(apiRoot + '/v1/ping',
+        authMiddleware,
         require('./ping.js'));
 
-    app.all('/api/v1/sockets', auth);
-    app.resource('api/v1/sockets',
+    app.all(apiRoot + '/v1/sockets', authMiddleware);
+    app.resource(resourceApiRoot + 'v1/sockets',
         require('./sockets.js'));
 
-    app.get('/api/v1/repo-info',
-        auth,
+    app.get(apiRoot + '/v1/repo-info',
+        authMiddleware,
         require('./repo-info.js'));
 
-    app.get('/api/v1/public-repo-search',
-        auth,
+    app.get(apiRoot + '/v1/public-repo-search',
+        authMiddleware,
         require('./public-repo-search.js'));
 
   }

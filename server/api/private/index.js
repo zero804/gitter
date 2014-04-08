@@ -1,56 +1,58 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var middleware = require('../../web/middleware');
-
 module.exports = {
-  install: function(app) {
-    var auth = [
-        middleware.ensureLoggedIn()
-    ];
+  install: function(app, apiRoot, authMiddleware) {
 
-    app.get('/api/private/health_check',
+    app.get(apiRoot + '/private/health_check',
+        // No auth
         require('./health-check.js'));
 
-    app.get('/api/private/user_email',
-        require('./user-email'));
+    // app.get(apiRoot + '/private/user_email',
+    //     authMiddleware,
+    //     require('./user-email'));
 
-    app.get('/api/private/gh/repos/*',
+    app.get(apiRoot + '/private/gh/repos/*',
+        authMiddleware,
         require('./github-mirror/repos-mirror'));
 
-    app.get('/api/private/gh/users/*',
+    app.get(apiRoot + '/private/gh/users/*',
+        authMiddleware,
         require('./github-mirror/users-mirror'));
 
-    app.get('/api/private/gh/user/repos',
+    app.get(apiRoot + '/private/gh/user/repos',
+        authMiddleware,
         require('./github-mirror/user-repos-mirror'));
 
-    app.get('/api/private/gh/search/users',
+    app.get(apiRoot + '/private/gh/search/users',
+        authMiddleware,
         require('./github-mirror/user-search-mirror'));
 
     // No auth for hooks yet
-    app.post('/api/private/hook/:hash',
+    app.post(apiRoot + '/private/hook/:hash',
         require('./hooks'));
 
-    app.get('/api/private/irc-token',
-        auth,
+    app.get(apiRoot + '/private/irc-token',
+        authMiddleware,
         require('./irc-token.js'));
 
-    app.get('/api/private/issue-state',
-        auth,
+    app.get(apiRoot + '/private/issue-state',
+        authMiddleware,
         require('./issue-state.js'));
 
-    app.get('/api/private/validate-token',
+    app.get(apiRoot + '/private/validate-token',
         require('./validate-token.js'));
 
-    app.get('/api/private/room-permission',
-        auth,
+    app.get(apiRoot + '/private/room-permission',
+        authMiddleware,
         require('./room-permission.js'));
 
-    app.get('/api/private/generate-signature',
-        auth,
+    app.get(apiRoot + '/private/generate-signature',
+        authMiddleware,
         require('./transloadit-signature.js'));
 
-    app.post('/api/private/transloadit/:token',
+    app.post(apiRoot + '/private/transloadit/:token',
+        // No auth
         require('./transloadit.js'));
 
   }
