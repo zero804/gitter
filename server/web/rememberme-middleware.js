@@ -26,8 +26,8 @@ function generateAuthToken(req, res, userId, options, callback) {
   res.cookie(cookieName, key + ":" + token, {
     domain: nconf.get("web:cookieDomain"),
     maxAge: 1000 * 60 * 60 * 24 * timeToLiveDays,
-    secure: false,
-    httpOnly: true
+    httpOnly: true,
+    secure: nconf.get("web:secureCookies")
   });
 
   sechash.strongHash('sha512', token, function(err, hash3) {
@@ -103,9 +103,6 @@ module.exports = {
 
         return next();
       }
-
-      /* Never use the rememberme middleware on api.gitter.im */
-      if(req.isApiCall) return next();
 
       /* If the user is logged in, no problem */
       if (req.user) return next();

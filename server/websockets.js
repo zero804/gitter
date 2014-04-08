@@ -17,9 +17,9 @@ winston.info("Starting http/ws service");
 var app = express();
 var server = http.createServer(domainWrapper(app));
 
-require('./web/express').installSocket(app);
+require('./web/graceful-shutdown').install(server, app);
 
-require('./web/passport').install();
+require('./web/express').installSocket(app);
 
 app.get('/', function(req, res) {
   res.send('Nothing to see here. Move along please. ' + appVersion.getAppTag());
@@ -37,13 +37,6 @@ bayeux.attach(server);
 // Listen to the port
 server.listen(port, bindIp);
 
-var gracefullyClosing = false;
-app.use(function(req, res, next) {
-  if(!gracefullyClosing) return next();
-
-  res.setHeader("Connection", "close");
-  res.send(502, "Server is in the process of restarting");
-});
 
 shutdown.installUnhandledExceptionHandler();
 shutdown.addHandler('websockets', 10, function(callback) {

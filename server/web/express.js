@@ -6,42 +6,20 @@ var passport       = require('passport');
 var nconf          = require('../utils/config');
 var expressHbs     = require('express-hbs');
 var winston        = require('../utils/winston');
-var middleware     = require('./middleware');
 var responseTime   = require('./response-time');
-var oauthService   = require('../services/oauth-service');
-var csrf           = require('./csrf-middleware');
-var statsService   = require('../services/stats-service');
-var errorReporting = require('../utils/error-reporting');
-var _              = require('underscore');
-
-if(nconf.get('express:showStack')) {
-  try {
-    require("longjohn");
-  } catch(e) {
-    winston.info("Install longjohn using npm install longjohn if you would like better stacktraces.");
-  }
-}
 
 // Naughty naughty naught, install some extra methods on the express prototype
 require('./http');
 
-
-
-function ios6PostCachingFix() {
-  return function(req, res, next) {
-    if(req.method === 'POST' || req.method === 'PUT' || req.method === 'DELETE' || req.method === 'PATCH') {
-      res.set('Cache-Control', 'no-cache');
-    }
-    next();
-  };
+function configureLogging(app) {
+  app.use(responseTime(winston, nconf.get('logging:minimalAccess')));
 }
 
 module.exports = {
+  /**
+   * Configure express for the full web application
+   */
   installFull: function(app, server, sessionStore) {
-    function configureLogging() {
-      app.use(responseTime(winston, nconf.get('logging:minimalAccess')));
-    }
-
     expressHbs.registerHelper('cdn', require('./hbs-helpers').cdn);
     expressHbs.registerHelper('bootScript', require('./hbs-helpers').bootScript);
     expressHbs.registerHelper('isMobile', require('./hbs-helpers').isMobile);
@@ -69,32 +47,23 @@ module.exports = {
     }
 
     if(nconf.get("logging:access") && nconf.get("logging:logStaticAccess")) {
-      configureLogging();
+      configureLogging(app);
     }
 
     var staticFiles = __dirname + "/../../" + nconf.get('web:staticContent');
-    app.use(express['static'](staticFiles, { maxAge: nconf.get('web:staticContentExpiryDays') * 86400 * 1000 } ));
+    app.use(express['static'](staticFiles, {
+      maxAge: nconf.get('web:staticContentExpiryDays') * 86400 * 1000
+    }));
 
     if(nconf.get("logging:access") && !nconf.get("logging:logStaticAccess")) {
-      configureLogging();
+      configureLogging(app);
     }
 
     app.use(express.cookieParser());
     app.use(express.urlencoded());
     app.use(express.json());
-
     app.use(express.methodOverride());
-
-    app.use(ios6PostCachingFix());
-
-    var apiHostName = nconf.get('web:apihost');
-    app.use(function(req, res, next) {
-      // Set isApiCall to true for api.gitter.im
-      if(req.host === apiHostName) {
-        req.isApiCall = true;
-      }
-      next();
-    });
+    app.use(require('./middlewares/ie6-post-caching'));
 
     // TODO remove this by 9/May/2014
     app.use(function(req, res, next) {
@@ -107,157 +76,54 @@ module.exports = {
       next();
     });
 
-    function session() {
-      var expressSession = express.session({
-        secret: nconf.get('web:sessionSecret'),
-        key: nconf.get('web:cookiePrefix') + 'session',
-        store: sessionStore,
-        cookie: {
-          path: '/',
-          httpOnly: true,
-          maxAge: 14400000,
-          domain: nconf.get("web:cookieDomain"),
-          secure: false /*nconf.get("web:secureCookies") Express won't sent the cookie as the https offloading is happening in nginx. Need to have connection.proxySecure set*/
-        }
-      });
-
-      return function(req, res, next) {
-        if(req.isApiCall) {
-          return next();
-        } else {
-          return expressSession(req, res, next);
-        }
-      };
-    }
-
-    app.use(session());
-
+    app.use(express.session({
+      secret: nconf.get('web:sessionSecret'),
+      key: nconf.get('web:cookiePrefix') + 'session',
+      store: sessionStore,
+      cookie: {
+        path: '/',
+        httpOnly: true,
+        maxAge: 14400000,
+        domain: nconf.get("web:cookieDomain"),
+        secure: false /*nconf.get("web:secureCookies")*/ // TODO: fix this!!
+      }
+    }));
     app.use(passport.initialize());
     app.use(passport.session());
-    app.use(csrf);
     app.use(app.router);
+    app.use(require('./middlewares/express-error-handler'));
+  },
 
-    function linkStack(stack) {
-      if(!stack) return;
-      return stack.split(/\n/).map(function(i) {
-        return i.replace(/\(([^:]+):(\d+):(\d+)\)/, function(match, file, line, col) {
-          var ourCode = file.indexOf('node_modules') == -1;
-          var h = "(<a href='subl://open/?url=file://" + file + "&line=" + line + "&column=" + col + "'>" + file + ":" + line + ":" + col + "</a>)";
-          if(ourCode) h = "<b>" + h + "</b>";
-          return h;
-        });
-      }).join('\n');
+  installApi: function(app) {
+    app.set('trust proxy', true);
+
+    if(nconf.get("logging:access")) {
+      configureLogging(app);
     }
 
-    app.use(function(err, req, res, next) { /* Have to have four args */
-      var user = req.user;
-      var userId = user && user.id;
+    app.use(express.urlencoded());
+    app.use(express.json());
+    app.use(express.methodOverride());
 
-      if(err && err.gitterAction === 'logout_destroy_user_tokens') {
-        if(user) {
-          statsService.event('logout_destroy_user_tokens', { userId: userId });
+    app.use(require('./middlewares/ie6-post-caching'));
 
-          middleware.logout()(req, res, function() {
-            if(err) winston.warn('Unable to log user out');
+    app.use(passport.initialize());
+    app.use(app.router);
 
-            user.githubToken = null;
-            user.githubUserToken = null;
-            user.githubScopes = null;
-
-            user.save(function(err) {
-              if(err) winston.error('Unable to save user: ' + err, { exception: err });
-
-              oauthService.removeAllAccessTokensForUser(userId, function(err) {
-                if(err) { winston.error('Unable to remove access tokens: ' + err, { exception: err }); }
-                res.redirect('/');
-              });
-            });
-          });
-        } else {
-          res.redirect('/');
-        }
-
-        return;
-      }
-
-      var status = 500;
-      var template = '500';
-      var message = "An unknown error occurred";
-      var stack = err && err.stack;
-
-      if(_.isNumber(err)) {
-        if(err > 400) {
-          status = err;
-          message = 'HTTP ' + err;
-        }
-      } else {
-        if(_.isNumber(err.status)) {
-          status = err.status;
-        }
-
-        if(err.message) {
-          message = err.message;
-        }
-      }
-
-      if(status >= 500) {
-        // Send to sentry
-        errorReporting(err, { type: 'response', status: status, userId: userId, url: req.url, method: req.method });
-        // Send to statsd
-        statsService.event('client_error_5xx', { userId: userId });
-
-        winston.error("An unexpected error occurred", {
-          path: req.path,
-          message: message
-        });
-
-        if(err.stack) {
-          winston.error('Error: ' + err.stack);
-        }
-
-      } else if(status === 404) {
-        statsService.event('client_error_404', { userId: userId });
-
-        template = '404';
-        stack = null;
-      } else if(status >= 400 && status < 500) {
-        statsService.event('client_error_4xx', { userId: userId });
-      }
-      res.status(status);
-
-      var responseType = req.accepts(['html', 'json']);
-
-      if (responseType === 'html') {
-        res.render(template , {
-          status: status,
-          homeUrl : nconf.get('web:homeurl'),
-          user: req.user,
-          userMissingPrivateRepoScope: req.user && !req.user.hasGitHubScope('repo'),
-          message: message,
-          stack: nconf.get('express:showStack') && stack ? linkStack(stack) : null
-        });
-      } else if (responseType === 'json') {
-        res.send({ error: message });
-      } else {
-        res.type('txt').send(message);
-      }
-
-    });
+    app.use(require('./middlewares/api-error-handler'));
   },
 
   installSocket: function(app) {
+    app.set('trust proxy', true);
+
     if(nconf.get("logging:access")) {
-      app.use(express.logger());
+      app.use(responseTime(winston, nconf.get('logging:minimalAccess')));
     }
 
     app.use(express.cookieParser());
     app.use(express.urlencoded());
     app.use(express.json());
 
-    // No need for a session on here
-    // app.use(express.session({ secret: 'keyboard cat', store: sessionStore, cookie: { path: '/', httpOnly: true, maxAge: 14400000, domain: nconf.get("web:cookieDomain"), secure: nconf.get("web:secureCookies") }}));
-
-    app.use(express.errorHandler({ showStack: nconf.get('express:showStack'), dumpExceptions: nconf.get('express:dumpExceptions') }));
-
+    app.use(require('./middlewares/api-error-handler'));
   }
 };

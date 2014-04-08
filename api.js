@@ -5,5 +5,5 @@ var shutdown = require('./server/utils/shutdown');
 
 shutdown.installUnhandledExceptionHandler();
 shutdown.domainWrap(function() {
-  require('./server/web.js');
+  require('./server/api.js');
 });
