@@ -79,6 +79,8 @@ define([
     trackPageView(routeName);
   });
 
+  trackPageView(window.location.pathname);
+
   return {
     trackError: trackError
   };
