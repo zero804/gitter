@@ -30,6 +30,25 @@ module.exports = {
     });
   },
 
+  create: function(req, res, next) {
+    var roomUri = req.query.uri || req.body.uri;
+    if (!roomUri) return res.send('400', {error: 'Missing Room URI'});
+
+    return roomService.findOrCreateRoom(req.user, roomUri, {ignoreCase: true}).then(function(room) {
+      if (!room.troupe) { return res.send({allowed: false}); }
+
+      var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true, includeRolesForTroupe: room.troupe });
+      restSerializer.serialize(room.troupe, strategy, function(err, serialized) {
+        console.log(serialized);
+        if (err) return next(err);
+
+        res.send({allowed: true, room: serialized});
+      });
+
+    });
+
+  },
+
   update: function(req, res, next) {
     var troupe = req.troupe;
     var updatedTroupe = req.body;

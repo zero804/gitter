@@ -122,7 +122,9 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
       /* If we can't determine the type, skip it */
       if(!githubType) return [null, false];
 
-      if(officialUri != uri && officialUri.toLowerCase() === uri.toLowerCase()) throw { redirect: '/' + officialUri };
+
+      // This check is not necessary. If the room exists already we do check this before in validateUri and redirect accordingly.
+      //if(officialUri != uri && officialUri.toLowerCase() === uri.toLowerCase()) throw { redirect: '/' + officialUri };
 
       winston.verbose('Checking if user has permission to create a room at ' + uri);
 
@@ -145,7 +147,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
                 {
                   $setOnInsert: {
                     lcUri: lcUri,
-                    uri: uri,
+                    uri: officialUri,
                     _nonce: nonce,
                     githubType: githubType,
                     topic: topic || "",
