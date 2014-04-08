@@ -103,7 +103,7 @@ if (mixpanelEnabled) {
       mixpanel.alias(properties.distinctId, properties.userId);
     }  
 
-    properties.distinct_id = properties.userId || properties.distinctId;
+    properties.distinct_id = properties.distinctId || properties.userId;
     
     mixpanel.track(eventName, properties, function(err) {
       if(err) {
