@@ -13,6 +13,7 @@ var times = mockito.Verifiers.times;
 var once = times(1);
 var twice = times(2);
 
+Q.longStackSupport = true;
 
 describe('unread-item-service', function() {
   describe('getOldestId', function() {
@@ -303,12 +304,12 @@ describe('mentions', function() {
     var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
     var appEventsMock = mockito.spy(testRequire('./app-events'));
     var userServiceMock = mockito.spy(testRequire('./services/user-service'));
-    var permissionsModelMock = mockito.mockFunction();
+    var roomPermissionsModelMock = mockito.mockFunction();
 
     var unreadItemService = testRequire.withProxies("./services/unread-item-service", {
       './troupe-service': troupeServiceMock,
       '../app-events': appEventsMock,
-      './permissions-model': permissionsModelMock,
+      './room-permissions-model': roomPermissionsModelMock,
       './user-service': userServiceMock
     });
 
@@ -346,12 +347,10 @@ describe('mentions', function() {
     });
 
     var y = 0;
-    mockito.when(permissionsModelMock)().then(function(user, perm, uri, githubType) {
+    mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
       y++;
       assert.equal(perm, 'join');
-      assert.equal(uri, troupe.uri);
-      assert.equal(githubType, troupe.githubType);
-
+      assert.equal(_room.id, troupe.id);
 
       if(y > 2) {
         assert(false, 'permissions model called more than twice');

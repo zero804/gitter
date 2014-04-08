@@ -87,7 +87,7 @@ function bind(on) {
       });
     },
 
-    
+
 
     onUnreadItemsRemoved: function(callback) {
       on('unreadItemRemoved', callback);
@@ -257,6 +257,17 @@ function bind(on) {
 
     userLeft: function(data) {
       emit('userLeft', data);
+    },
+
+    repoPermissionsChangeDetected: function(uri, isPrivate) {
+      emit('repo_perm_change', {
+        uri: uri,
+        isPrivate: isPrivate
+      });
+    },
+
+    onRepoPermissionsChangeDetected: function(callback) {
+      on('repo_perm_change', callback);
     }
 
   };
