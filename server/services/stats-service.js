@@ -96,11 +96,15 @@ if (mixpanelEnabled) {
 
   statsHandlers.event.push(function(eventName, properties) {
     // Don't handle events that don't have a userId
-    if(!properties || !properties.userId) return;
-
+    if(!properties || !(properties.userId || properties.distinctId)) return;
     if(mixpanelEventBlacklist[eventName]) return;
 
-    properties.distinct_id = properties.userId;
+    if (eventName == 'new_user' && properties.distinctId && properties.userId)  {
+      mixpanel.alias(properties.distinctId, properties.userId);
+    }  
+
+    properties.distinct_id = properties.userId || properties.distinctId;
+    
     mixpanel.track(eventName, properties, function(err) {
       if(err) {
         winston.error('Mixpanel error: ' + err, { exception: err });
@@ -109,9 +113,9 @@ if (mixpanelEnabled) {
   });
 
   statsHandlers.userUpdate.push(function(user, properties) {
-    var createdAt = Math.round(user._id.getTimestamp().getTime() / 1000);
-    var firstName = user.getFirstName();
 
+    var createdAt = Math.round(user._id.getTimestamp().getTime());
+    var firstName = user.getFirstName();
     var mp_properties = {
       $first_name:  firstName,
       $created_at:  new Date(createdAt).toISOString(),

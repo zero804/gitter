@@ -56,22 +56,6 @@ function newUser(options, callback) {
       return uriLookupService.reserveUriForUsername(user._id, user.username)
         .thenResolve(user);
     })
-    .then(function(user) {
-      var optionStats = options.stats || {};
-
-      statsService.event('new_user', _.extend({
-        userId:   user.id,
-        username: options.username,
-        email:    options.email,
-        source:   options.source
-      }, optionStats));
-
-      statsService.userUpdate(user, _.extend({
-        source: options.source
-      }, optionStats));
-
-      return user;
-    })
     .nodeify(callback);
 }
 

@@ -9,6 +9,7 @@ var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy
 var BearerStrategy         = require('passport-http-bearer').Strategy;
 var oauthService           = require('../services/oauth-service');
 var statsService           = require("../services/stats-service");
+var mixpanel               = require('../web/mixpanelUtils');
 var nconf                  = require('../utils/config');
 var useragentStats         = require('./useragent-stats');
 var GitHubStrategy         = require('troupe-passport-github').Strategy;
@@ -164,6 +165,13 @@ function install() {
 
             req.logIn(user, function(err) {
               if (err) { return done(err); }
+              statsService.event("new_user", {
+                userId: user.id,
+                distinctId: mixpanel.getMixpanelDistinctId(req.cookies),
+                method: 'github_oauth',
+                username: user.username
+              });
+
               return done(null, user);
             });
           });
