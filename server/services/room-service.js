@@ -133,14 +133,25 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
         .then(function(access) {
           if(!access) return [null, access];
 
+
+          var securityPromise;
+          if(githubType === 'REPO') {
+            var repoService = new GitHubRepoService(user);
+            securityPromise = repoService.getRepo(uri)
+              .then(function(repoInfo) {
+                if(!repoInfo) throw new Error('Unable to find repo ' + uri);
+
+                var security = repoInfo.private ? 'PRIVATE' : 'PUBLIC';
+                return security;
+              });
+
+          } else {
+            securityPromise = Q.resolve(null);
+          }
+
+
           /* This will load a cached copy */
-          var repoService = new GitHubRepoService(user);
-          return repoService.getRepo(uri)
-            .then(function(repoInfo) {
-              if(!repoInfo) return [null, false];
-
-              var security = repoInfo.private ? 'PRIVATE' : 'PUBLIC';
-
+          return securityPromise.then(function(security) {
               var nonce = Math.floor(Math.random() * 100000);
               return persistence.Troupe.findOneAndUpdateQ(
                 { lcUri: lcUri, githubType: githubType },
