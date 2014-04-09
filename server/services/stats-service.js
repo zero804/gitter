@@ -113,7 +113,6 @@ if (mixpanelEnabled) {
   });
 
   statsHandlers.userUpdate.push(function(user, properties) {
-
     var createdAt = Math.round(user._id.getTimestamp().getTime());
     var firstName = user.getFirstName();
     var mp_properties = {
@@ -121,9 +120,7 @@ if (mixpanelEnabled) {
       $created_at:  new Date(createdAt).toISOString(),
       $email:       user.email,
       $name:        user.displayName,
-      $username:    user.username,
-      $confirmationCode: user.confirmationCode,
-      Status:       user.status
+      $username:    user.username
     };
 
     if(properties) {
