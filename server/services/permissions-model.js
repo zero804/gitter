@@ -7,13 +7,16 @@ var assert             = require("assert");
 var winston            = require('../utils/winston');
 var Q                  = require('q');
 var userIsInRoom       = require('./user-in-room');
+var appEvents          = require('../app-events');
 
 /**
  * REPO permissions model
  */
 function repoPermissionsModel(user, right, uri, security) {
-  // Security is only for child rooms
-  assert(!security);
+  // Security can be null for old repos
+  if(security && (security !== 'PRIVATE' && security !== 'PUBLIC')) {
+    assert('Unknown repo security: ' + security);
+  }
 
   // For now, only authenticated users can be members of orgs
   if(!user) return false;
@@ -22,7 +25,25 @@ function repoPermissionsModel(user, right, uri, security) {
   return repoService.getRepo(uri)
     .then(function(repoInfo) {
       /* Can't see the repo? no access */
-      if(!repoInfo) return false;
+      if(!repoInfo) {
+        if(security !== 'PRIVATE') {
+          if(right !== 'create') {
+            winston.warn('Unable to access repo, but not set as private. Notifying');
+            appEvents.repoPermissionsChangeDetected(uri, true);
+          }
+        }
+        return false;
+      }
+
+      if(right !== 'create') {
+        if(repoInfo.private && security !== 'PRIVATE') {
+          winston.warn('Repo private, updating our permissions');
+          appEvents.repoPermissionsChangeDetected(uri, true);
+        } else if(!repoInfo.private && security !== 'PUBLIC') {
+          winston.warn('Repo public, updating our permissions');
+          appEvents.repoPermissionsChangeDetected(uri, false);
+        }
+      }
 
       /* Want to join and can see the repo? Go ahead! */
       if(right === 'join') return true;
@@ -267,7 +288,6 @@ function permissionsModel(user, right, uri, roomType, security) {
   assert(user, 'user required');
   assert(right, 'right required');
   assert(right === 'create' || right === 'join' || right === 'admin' || right === 'adduser', 'Invalid right ' + right);
-  assert(uri, 'uri required');
   assert(roomType, 'roomType required');
 
   var submodel = {
@@ -284,7 +304,25 @@ function permissionsModel(user, right, uri, roomType, security) {
     throw 500;
   }
 
-  return submodel(user, right, uri, security).then(log);
+  if(roomType !== 'ONETOONE') {
+    // For now uri can be null for one to one
+    // This will need to be fixed before we handle
+    // more fine grained permissions
+    assert(uri, 'uri required');
+  }
+
+
+  return submodel(user, right, uri, security)
+    .then(log)
+    .fail(function(err) {
+      if(err.gitterAction === 'logout_destroy_user_tokens') {
+        winston.warn('User tokens have been revoked. Destroying tokens');
+        user.destroyTokens();
+        return user.saveQ().thenResolve(false);
+      }
+
+      throw err;
+    });
 }
 
 module.exports = permissionsModel;
