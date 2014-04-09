@@ -135,7 +135,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
 
           /* This will load a cached copy */
           var repoService = new GitHubRepoService(user);
-          return repoService.getRepo(troupe.uri)
+          return repoService.getRepo(uri)
             .then(function(repoInfo) {
               if(!repoInfo) return [null, false];
 
