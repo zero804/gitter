@@ -319,6 +319,7 @@ var TroupeSchema = new Schema({
   ownerUserId: { type: ObjectId, required: false }, // For channels under a user /suprememoocow/custom
   security: { type: String, 'enum': ['PRIVATE', 'PUBLIC', 'INHERITED'], required: false }, // For REPO_CHANNEL, ORG_CHANNEL, USER_CHANNEL
   dateDeleted: { type: Date },
+  dateLastSecurityCheck: { type: Date },
   _nonce: { type: Number },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });

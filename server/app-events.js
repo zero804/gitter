@@ -87,7 +87,7 @@ function bind(on) {
       });
     },
 
-    
+
 
     onUnreadItemsRemoved: function(callback) {
       on('unreadItemRemoved', callback);
@@ -203,38 +203,6 @@ function bind(on) {
       on('batchUserBadgeCountUpdate', callback);
     },
 
-    emailConfirmed: function(email, userId) {
-      emit('emailConfirmed', { email: email, userId: userId });
-    },
-
-    onEmailConfirmed: function(callback) {
-      on('emailConfirmed', callback);
-    },
-
-    userAccountActivated: function(userId) {
-      emit('userAccountActivated', { userId: userId });
-    },
-
-    onUserAccountActivated: function(callback) {
-      on('userAccountActivated', callback);
-    },
-
-    contactsUpdated: function(userId) {
-      emit('contactsUpdated', { userId: userId });
-    },
-
-    onContactsUpdated: function(callback) {
-      on('contactsUpdated', callback);
-    },
-
-    newInvite: function(options) {
-      emit('newInvite', options);
-    },
-
-    onNewInvite: function(callback) {
-      on('newInvite', callback);
-    },
-
     troupeDeleted: function(options) {
       emit('troupeDeleted', options);
     },
@@ -257,6 +225,17 @@ function bind(on) {
 
     userLeft: function(data) {
       emit('userLeft', data);
+    },
+
+    repoPermissionsChangeDetected: function(uri, isPrivate) {
+      emit('repo_perm_change', {
+        uri: uri,
+        isPrivate: isPrivate
+      });
+    },
+
+    onRepoPermissionsChangeDetected: function(callback) {
+      on('repo_perm_change', callback);
     }
 
   };

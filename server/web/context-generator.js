@@ -6,7 +6,7 @@ var oauthService     = require("../services/oauth-service");
 var presenceService  = require("../services/presence-service");
 var useragent        = require("useragent");
 var crypto           = require("crypto");
-var permissionsModel = require("../services/permissions-model");
+var roomPermissionsModel = require('../services/room-permissions-model');
 var assert           = require("assert");
 var appVersion       = require("./appVersion");
 var Q                = require('q');
@@ -68,7 +68,7 @@ exports.generateTroupeContext = function(req, callback) {
     user ? getWebToken(user) : null,
     troupe && user ? serializeTroupe(troupe, user) : fakeSerializedTroupe(req.uriContext),
     determineDesktopNotifications(user, req),
-    permissionsModel(user, 'admin', req.uriContext.uri, troupe.githubType, troupe.security)
+    roomPermissionsModel(user, 'admin', troupe)
   ])
   .spread(function(serializedUser, serializedHomeUser, token, serializedTroupe, desktopNotifications, adminAccess) {
 
