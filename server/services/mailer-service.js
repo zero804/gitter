@@ -76,10 +76,10 @@ exports.sendEmail = function(options, done) {
         html: headerHtml + "\n" + html + "\n" + footerHtml,
         text: plaintext,
         headers: headers
-      }, function(error, response){
+      }, function(err, response){
 
         if(err) {
-          winston.error("SMTP Email Error", { exception: error });
+          winston.error("SMTP Email Error", { exception: err });
           return d.reject(err);
         }
 
