@@ -51,6 +51,9 @@ define([
 
   function trackPageView(routeName) {
     if(window.mixpanel) {
+      if (context.getUserId()) {
+        window.mixpanel.register({ userStatus: 'ACTIVE'});
+      }
       window.mixpanel.track('pageView', { pageName: routeName });
     }
 
