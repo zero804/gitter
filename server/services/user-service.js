@@ -6,7 +6,6 @@ var winston                   = require('../utils/winston');
 var assert                    = require('assert');
 var _                         = require('underscore');
 var persistence               = require("./persistence-service");
-var userConfirmationService   = require('./user-confirmation-service');
 var statsService              = require("./stats-service");
 var collections               = require("../utils/collections");
 var uriLookupService          = require('./uri-lookup-service');
@@ -86,31 +85,6 @@ var userService = {
         return newUser(options);
       })
       .nodeify(callback);
-  },
-
-  findByConfirmationCode: function(confirmationCode, callback) {
-    persistence.User.find().or([{confirmationCode: confirmationCode} /*, {'unconfirmedEmails.confirmationCode': confirmationCode} */]).findOne()
-      .execQ()
-      .nodeify(callback);
-  },
-
-  findAndUsePasswordResetCode: function(passwordResetCode, callback) {
-    winston.info("Using password reset code", passwordResetCode);
-    return persistence.User.findOneQ({ passwordResetCode: passwordResetCode })
-    .then(function(user) {
-      assert(user, 'User not found');
-      user.passwordResetCode = null;
-      user.passwordHash = null;
-      return user.saveQ().thenResolve(user);
-    })
-    .then(function(user) {
-      if (user.isConfirmed()) {
-        return user;
-      } else {
-        return userConfirmationService.confirmSignup(user);
-      }
-    })
-    .nodeify(callback);
   },
 
   findById: function(id, callback) {
