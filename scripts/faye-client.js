@@ -16,7 +16,7 @@ faye.logger = {};
 });
 
 
-var client = new faye.Client('https://ws-beta.gitter.im/faye');
+var client = new faye.Client('https://ws.gitter.im/faye');
 
 client.addExtension({
   outgoing: function(message, callback) {
@@ -32,7 +32,7 @@ client.addExtension({
 });
 
 
-var subscription = client.subscribe('/api/v1/user/52939838240dde3715db3e98', function(message) {
+var subscription = client.subscribe('/api/v1/user/5299eef6ed5ab0b3bf04d082', function(message) {
   console.log('HELLO', message);
 });
 
