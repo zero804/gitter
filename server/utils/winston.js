@@ -7,7 +7,6 @@ var LogstashUDP = require('winston-logstash-udp').LogstashUDP;
 var fs = require('fs');
 var path = require('path');
 var Q = require('q');
-var statsService = require('../services/stats-service');
 
 var defaultLogger = new winston.Logger({
   transports: []
@@ -72,8 +71,13 @@ function reopenTransportOnHupSignal() {
 }
 
 function attachEventHandlers() {
+  var statsService;
 
   defaultLogger.on('logging', function (transport, level) {
+    if(!statsService) {
+      statsService = require('../services/stats-service');
+    }
+    
     try {
       switch(level) {
         case 'warn':

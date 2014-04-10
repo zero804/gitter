@@ -21,6 +21,7 @@ var appEvents          = require("../app-events");
 var serializeEvent     = require('./persistence-service-events').serializeEvent;
 var validate           = require('../utils/validate');
 var collections        = require('../utils/collections');
+var statsService       = require("./stats-service");
 
 function localUriLookup(uri, opts) {
   return uriLookupService.lookupUri(uri)
@@ -133,14 +134,25 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
         .then(function(access) {
           if(!access) return [null, access];
 
+
+          var securityPromise;
+          if(githubType === 'REPO') {
+            var repoService = new GitHubRepoService(user);
+            securityPromise = repoService.getRepo(uri)
+              .then(function(repoInfo) {
+                if(!repoInfo) throw new Error('Unable to find repo ' + uri);
+
+                var security = repoInfo.private ? 'PRIVATE' : 'PUBLIC';
+                return security;
+              });
+
+          } else {
+            securityPromise = Q.resolve(null);
+          }
+
+
           /* This will load a cached copy */
-          var repoService = new GitHubRepoService(user);
-          return repoService.getRepo(troupe.uri)
-            .then(function(repoInfo) {
-              if(!repoInfo) return [null, false];
-
-              var security = repoInfo.private ? 'PRIVATE' : 'PUBLIC';
-
+          return securityPromise.then(function(security) {
               var nonce = Math.floor(Math.random() * 100000);
               return persistence.Troupe.findOneAndUpdateQ(
                 { lcUri: lcUri, githubType: githubType },
@@ -221,6 +233,10 @@ function ensureAccessControl(user, troupe, access) {
       if(troupe.containsUserId(user.id)) return Q.resolve(troupe);
 
       troupe.addUserById(user.id);
+
+      statsService.event("join_room", {
+        userId: user.id,
+      });
 
       // IRC -- these should be centralised - in troupe.addUserById perhaps?
       appEvents.userJoined({user: user, room: troupe});
@@ -328,7 +344,16 @@ function findOrCreateRoom(user, uri, opts) {
         });
     })
     .then(function(uriLookup) {
-      if(uriLookup) uriLookup.uri = uri;
+      if(uriLookup) {
+        uriLookup.uri = uri;
+        if(uriLookup.didCreate) {
+          statsService.event("create_room", {
+            userId: user.id,
+            roomType: "github-room"
+          });
+        }
+      }
+
       return uriLookup;
     });
 }
@@ -366,8 +391,6 @@ function findChildChannelRoom(user, parentTroupe, childTroupeId, callback) {
     .nodeify(callback);
 }
 exports.findChildChannelRoom = findChildChannelRoom;
-
-
 
 /**
  * Find all non-private channels under a particular parent
@@ -550,10 +573,14 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
             upsert: true
           })
           .then(function(newRoom) {
+
             // TODO handle adding the user in the event that they didn't create the room!
             if(newRoom._nonce === nonce) {
               serializeCreateEvent(newRoom);
-
+              statsService.event("create_room", {
+                userId: user.id,
+                roomType: "channel"
+              });
               return uriLookupService.reserveUriForTroupeId(newRoom._id, uri)
                 .thenResolve(newRoom);
             }

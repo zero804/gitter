@@ -60,7 +60,7 @@
     "validator": "~1.2.1",
     "express-validator": "~1.0.0",
     "mongoose-q": "0.0.9",
-    "mixpanel": "0.0.16",
+    "mixpanel": "~0.0.19",
     "useragent": "2.0.6",
     "express3-handlebars": "~0.4.1",
     "easynexmo": "~0.3.1",
