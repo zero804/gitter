@@ -50,8 +50,8 @@ exports.ensureLoggedIn = function(options) {
   if(!options) options = {};
 
   return [
-    rememberMe.rememberMeMiddleware(/* No Options */),
     bearerAuthMiddleware,
+    rememberMe.rememberMeMiddleware(/* No Options */),
     rateLimiter,
     require('./csrf-middleware'),
     function(req, res, next) {
