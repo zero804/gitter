@@ -40,9 +40,6 @@ module.exports = {
         authMiddleware,
         require('./issue-state.js'));
 
-    app.get(apiRoot + '/private/validate-token',
-        require('./validate-token.js'));
-
     app.get(apiRoot + '/private/room-permission',
         authMiddleware,
         require('./room-permission.js'));
