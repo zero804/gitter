@@ -25,24 +25,19 @@ function installApi() {
    */
   passport.use(new BearerStrategy(
     function(accessToken, done) {
-      oauthService.findAccessTokenAndClient(accessToken, function(err, token, client) {
-        if (err) {
-          winston.error("passport: Access token find failed", { exception: err });
-          return done(err);
-        }
 
-        if (!token) {
-          winston.info("passport: Access token presented does not exist", { exception: err });
+      return oauthService.validateAccessTokenAndClient(accessToken)
+        .then(function(tokenInfo) {
           return done();
-        }
+          // Token not found
+          if(!tokenInfo) return done();
 
-        userService.findById(token.userId, function(err, user) {
-          if (err) { return done(err); }
-          if (!user) { return done(); }
-
+          var user = tokenInfo.user;
+          var client = tokenInfo.client;
+          // Not yet needed var accessToken = tokenInfo.accessToken;
           done(null, user, { client: client });
-        });
-      });
+        })
+        .fail(done);
     }
   ));
 }

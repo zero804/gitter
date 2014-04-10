@@ -208,16 +208,22 @@ var authenticator = {
       return deny(401, 'Token required');
     }
 
-    oauth.validateToken(ext.token, function(err, userId) {
+    oauth.validateAccessTokenAndClient(ext.token, function(err, tokenInfo) {
       if(err) {
-        winston.error("bayeux: Authentication error" + err, { exception: err, message: message });
+        winston.error("bayeux: Authentication error: " + err, { exception: err, message: message });
         return deny(500, "A server error occurred.");
-       }
-
-      if(!userId) {
-        winston.warn("bayeux: Authentication failed", { message: message });
-        return deny();
       }
+
+      if(!tokenInfo) {
+        winston.warn("bayeux: Authentication failed. Invalid access token.");
+        return deny(401, "Invalid access token");
+      }
+
+      var user = tokenInfo.user;
+      var oauthClient = tokenInfo.client;
+      var userId = user.id;
+
+      winston.verbose('bayeux: handshake', { username: user.username, client: oauthClient.name });
 
       var connectionType = getConnectionType(ext.connType);
       var client = ext.client || '';
