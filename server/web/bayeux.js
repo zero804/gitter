@@ -15,6 +15,7 @@ var appVersion        = require('./appVersion');
 var statsService      = require('../services/stats-service');
 var mongoUtils        = require('../utils/mongo-utils');
 var StatusError       = require('statuserror');
+var roomPermissionsModel = require('../services/room-permissions-model');
 
 var appTag = appVersion.getAppTag();
 
@@ -47,6 +48,33 @@ function validateUserForTroupeSubscription(options, callback) {
   validateUserForSubTroupeSubscription(options, callback);
 }
 
+function checkTroupeAccess(userId, troupeId, callback) {
+  // TODO: use the room permissions model
+  return troupeService.findById(troupeId)
+    .then(function(troupe) {
+      if(!troupe) return false;
+
+      if(troupe.security === 'PUBLIC') {
+        return true;
+      }
+
+      // After this point, everything needs to be authenticated
+      if(!userId) {
+        return false;
+      }
+
+      var result = troupeService.userIdHasAccessToTroupe(userId, troupe);
+
+      if(!result) {
+        winston.info("Denied user " + userId + " access to troupe " + troupe.uri);
+        return false;
+      }
+
+      return result;
+    })
+    .nodeify(callback);
+}
+
 // This strategy ensures that a user can access a URL under a troupe URL
 function validateUserForSubTroupeSubscription(options, callback) {
   var userId = options.userId;
@@ -58,9 +86,20 @@ function validateUserForSubTroupeSubscription(options, callback) {
     return callback(new StatusError(400, 'Invalid ID: ' + troupeId));
   }
 
-  return troupeService.findById(troupeId)
+  return checkTroupeAccess(userId, troupeId)
     .then(function(troupe) {
       if(!troupe) return false;
+
+      // TODO: use the room permissions model
+      if(troupe.security === 'PUBLIC') {
+        return true;
+      }
+
+      // After this point, everything needs to be authenticated
+      if(!userId) {
+        return false;
+      }
+
       var result = troupeService.userIdHasAccessToTroupe(userId, troupe);
 
       if(!result) {
@@ -85,6 +124,9 @@ function validateUserForUserSubscription(options, callback) {
   var match = options.match;
   var subscribeUserId = match[1];
 
+  // All /user/ subscriptions need to be authenticated
+  if(!userId) return false;
+
   var result = userId == subscribeUserId;
 
   return callback(null, result);
@@ -95,6 +137,9 @@ function populateSubUserCollection(options, callback) {
   var match = options.match;
   var subscribeUserId = match[1];
   var collection = match[2];
+
+  // All /user/ subscriptions need to be authenticated
+  if(!userId) return false;
 
   if(userId != subscribeUserId) {
     return callback(null, [ ]);
@@ -202,10 +247,25 @@ var authenticator = {
       return callback(message);
     }
 
-    var ext = message.ext;
+    var ext = message.ext || {};
 
-    if(!ext || !ext.token) {
-      return deny(401, 'Token required');
+    if(!ext.token) {
+      // Non logged in users will not present a token
+      winston.verbose('bayeux: anonymous handshake');
+
+      var connectionType = getConnectionType(ext.connType);
+      var userId = '';
+      var client = ext.client || '';
+      var troupeId = ext.troupeId || '';
+      var eyeballState = ext.eyeballs || '';
+
+      // This is an UGLY UGLY hack, but it's the only
+      // way possible to pass the userId to the outgoing extension
+      // where we have the clientId (but not the userId)
+      var id = message.id || '';
+      message.id = [id, userId, connectionType, client, troupeId, eyeballState].join(':');
+
+      return callback(message);
     }
 
     oauth.validateAccessTokenAndClient(ext.token, function(err, tokenInfo) {
@@ -267,12 +327,17 @@ var authenticator = {
     }
 
     message.id = parts[0] || undefined; // id not required for an incoming message
-    var userId = parts[1];
+    var userId = parts[1] || undefined;
     var connectionType = parts[2];
     var clientId = message.clientId;
-    var client = parts[3];
+    var client = parts[3] || undefined;
     var troupeId = parts[4] || undefined;
     var eyeballState = parseInt(parts[5], 10) || 0;
+
+    if(!userId) {
+      // Not logged in? Simply return
+      return callback(message);
+    }
 
     winston.info("bayeux: connection " + clientId + ' is associated to ' + userId, { troupeId: troupeId, client: client });
 
@@ -442,10 +507,10 @@ var authorisor = {
     presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
       if(err) return callback(err);
 
-      if(!userId) {
-        winston.warn('bayeux: client not authenticated.', { clientId: clientId });
-        return callback(new StatusError(401, 'Cannot authorise. Client not authenticated'));
-      }
+      // if(!userId) {
+      //   winston.warn('bayeux: client not authenticated.', { clientId: clientId });
+      //   return callback(new StatusError(401, 'Cannot authorise. Client not authenticated'));
+      // }
 
       var match = null;
 
