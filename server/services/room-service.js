@@ -21,6 +21,7 @@ var appEvents          = require("../app-events");
 var serializeEvent     = require('./persistence-service-events').serializeEvent;
 var validate           = require('../utils/validate');
 var collections        = require('../utils/collections');
+var statsService       = require("./stats-service");
 
 function localUriLookup(uri, opts) {
   return uriLookupService.lookupUri(uri)
@@ -233,6 +234,10 @@ function ensureAccessControl(user, troupe, access) {
 
       troupe.addUserById(user.id);
 
+      statsService.event("join_room", {
+        userId: user.id,
+      });
+
       // IRC -- these should be centralised - in troupe.addUserById perhaps?
       appEvents.userJoined({user: user, room: troupe});
 
@@ -317,7 +322,16 @@ function findOrCreateRoom(user, uri, opts) {
         });
     })
     .then(function(uriLookup) {
-      if(uriLookup) uriLookup.uri = uri;
+      if(uriLookup) {
+        uriLookup.uri = uri;
+        if(uriLookup.didCreate) {
+          statsService.event("create_room", {
+            userId: user.id,
+            roomType: "github-room"
+          });
+        }
+      }
+
       return uriLookup;
     });
 }
@@ -355,8 +369,6 @@ function findChildChannelRoom(user, parentTroupe, childTroupeId, callback) {
     .nodeify(callback);
 }
 exports.findChildChannelRoom = findChildChannelRoom;
-
-
 
 /**
  * Find all non-private channels under a particular parent
@@ -539,10 +551,14 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
             upsert: true
           })
           .then(function(newRoom) {
+
             // TODO handle adding the user in the event that they didn't create the room!
             if(newRoom._nonce === nonce) {
               serializeCreateEvent(newRoom);
-
+              statsService.event("create_room", {
+                userId: user.id,
+                roomType: "channel"
+              });
               return uriLookupService.reserveUriForTroupeId(newRoom._id, uri)
                 .thenResolve(newRoom);
             }
