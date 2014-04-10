@@ -54,11 +54,6 @@ module.exports = {
         '/:roomPart1/~chat',                         // ORG or ONE_TO_ONE
         '/:roomPart1/:roomPart2/~chat',              // REPO or ORG_CHANNEL or ADHOC
         '/:roomPart1/:roomPart2/:roomPart3/~chat',   // CUSTOM REPO_ROOM
-
-        // These URLs is deprecated. Remove after second master deployment
-        '/:roomPart1/-/chat',                       // ORG or ONE_TO_ONE
-        '/:roomPart1/:roomPart2/chat',              // REPO or ORG_CHANNEL or ADHOC
-        '/:roomPart1/:roomPart2/:roomPart3/chat',   // REPO_CHANNEL
       ].forEach(function(path) {
         app.get(path, chatMiddlewarePipeline);
       });
@@ -67,7 +62,6 @@ module.exports = {
       [
         '/:roomPart1/~home',
         // This URL is deprecated
-        '/:roomPart1/-/home',
       ].forEach(function(path) {
         app.get(path,
           middleware.ensureLoggedIn(),
