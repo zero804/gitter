@@ -1,12 +1,14 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var middleware  = require('../web/middleware');
-var passport    = require('passport');
-var winston     = require('../utils/winston');
-var client      = require("../utils/redis").createClient();
-var lock        = require("redis-lock")(client);
-var oauth2      = require('../web/oauth2');
+var middleware    = require('../web/middleware');
+var passport      = require('passport');
+var winston       = require('../utils/winston');
+var client        = require("../utils/redis").createClient();
+var lock          = require("redis-lock")(client);
+var oauth2        = require('../web/oauth2');
+var mixpanel      = require('../web/mixpanelUtils');
+var statsService  = require("../services/stats-service");
 
 module.exports = {
   install: function(app) {
@@ -14,6 +16,20 @@ module.exports = {
     //
     app.get('/login/github',
       function(req, res, next) {
+        //send data to stats service
+        if (req.query.action == 'login') {
+          statsService.event("login_clicked", {
+            distinctId: mixpanel.getMixpanelDistinctId(req.cookies),
+            method: 'github_oauth'
+          });
+        }
+        if (req.query.action == 'signup') {
+          statsService.event("signup_clicked", {
+            distinctId: mixpanel.getMixpanelDistinctId(req.cookies),
+            method: 'github_oauth',
+            button: req.query.button
+          });
+        }
         passport.authorize('github_user', { scope: 'user:email,read:org' })(req, res, next);
       },
       function() {});
@@ -70,7 +86,6 @@ module.exports = {
       '/login/callback',
       function(req, res, next) {
         var code = req.query.code;
-
         lock("oalock:" + code, function(done) {
 
             var handler;
@@ -86,8 +101,6 @@ module.exports = {
             });
 
         });
-
-
       },
 
       middleware.ensureLoggedIn(),
