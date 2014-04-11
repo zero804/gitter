@@ -82,6 +82,10 @@ exports.ensureLoggedIn = function(options) {
         return next();
       }
 
+      if(options.allowGet && req.method === 'GET') {
+        return next();
+      }
+
       winston.verbose('Client needs to authenticate', options);
 
       // Are we dealing with an API client? Tell em in HTTP

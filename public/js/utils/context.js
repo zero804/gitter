@@ -145,6 +145,11 @@ define([
     return window.troupeEnv && window.troupeEnv[envName];
   };
 
+  context.isLoggedIn = function() {
+    // TODO: this is not ideal. perhaps make this better
+    return !!user.id;
+  };
+
   context.testOnly = {
     resetTroupeContext: function(newContext) {
 

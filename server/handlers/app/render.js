@@ -59,10 +59,11 @@ function renderMainFrame(req, res, next, frame) {
 
 function renderChatPage(req, res, next) {
   var troupe = req.uriContext.troupe;
+  var userId = req.user && req.user.id;
 
   Q.all([
     contextGenerator.generateTroupeContext(req),
-    restful.serializeChatsForTroupe(troupe.id, req.user.id, { limit: INITIAL_CHAT_COUNT })
+    restful.serializeChatsForTroupe(troupe.id, userId, { limit: INITIAL_CHAT_COUNT })
     ]).spread(function(troupeContext, chats) {
 
       var githubLink;
@@ -108,9 +109,11 @@ function renderMobileUserHome(req, res, next) {
 function renderMobileChat(req, res, next) {
   var troupe = req.uriContext.troupe;
 
+  var userId = req.user && req.user.id;
+
   Q.all([
     contextGenerator.generateTroupeContext(req),
-    restful.serializeChatsForTroupe(troupe.id, req.user.id, { limit: INITIAL_CHAT_COUNT })
+    restful.serializeChatsForTroupe(troupe.id, userId, { limit: INITIAL_CHAT_COUNT })
     ]).spread(function(troupeContext, chats) {
       res.render('mobile/mobile-app', {
         appCache: getAppCache(req),
@@ -128,11 +131,42 @@ function renderMobileChat(req, res, next) {
     .fail(next);
 }
 
+function renderNotLoggedInRoom(req, res, next) {
+  var troupe = req.uriContext.troupe;
+
+  Q.all([
+    contextGenerator.generateTroupeContext(req),
+    restful.serializeChatsForTroupe(troupe.id, null, { limit: INITIAL_CHAT_COUNT })
+    ]).spread(function(troupeContext, chats) {
+
+      var githubLink;
+
+      if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
+        githubLink = 'https://github.com/' + req.uriContext.uri;
+      }
+
+      res.render('chat-not-logged-in-template', {
+        isRepo: troupe.githubType === 'REPO',
+        appCache: getAppCache(req),
+        bootScriptName: 'router-not-logged-in',
+        githubLink: githubLink,
+        troupeName: req.uriContext.uri,
+        troupeTopic: troupeContext.troupe.topic,
+        troupeContext: troupeContext,
+        chats: chats,
+        agent: req.headers['user-agent']
+      });
+
+    })
+    .fail(next);
+}
+
 
 module.exports = exports = {
   renderHomePage: renderHomePage,
   renderChatPage: renderChatPage,
   renderMainFrame: renderMainFrame,
   renderMobileChat: renderMobileChat,
-  renderMobileUserHome: renderMobileUserHome
+  renderMobileUserHome: renderMobileUserHome,
+  renderNotLoggedInRoom: renderNotLoggedInRoom
 };

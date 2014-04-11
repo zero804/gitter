@@ -82,13 +82,15 @@ module.exports = {
   },
 
   load: function(req, id, callback) {
-    if(!req.user) return callback(401);
-
     troupeService.findById(id, function(err, troupe) {
       if(err) return callback(500);
       if(!troupe) return callback(404);
 
       if(troupe.status != 'ACTIVE') return callback(404);
+
+      if(troupe.security === 'PUBLIC' && req.method === 'GET') {
+        return callback(null, troupe);
+      }
 
       if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
         return callback(403);

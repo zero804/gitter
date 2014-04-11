@@ -20,7 +20,9 @@ module.exports = {
     chatService.findChatMessagesForTroupe(req.troupe.id, options, function(err, chatMessages) {
       if(err) return next(err);
 
-      var strategy = new restSerializer.ChatStrategy({ currentUserId: req.user.id, troupeId: req.troupe.id });
+      var userId = req.user && req.user.id;
+
+      var strategy = new restSerializer.ChatStrategy({ currentUserId: userId, troupeId: req.troupe.id });
       restSerializer.serialize(chatMessages, strategy, function(err, serialized) {
         if(err) return next(err);
         res.send(serialized);
