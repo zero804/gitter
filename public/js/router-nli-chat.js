@@ -36,30 +36,30 @@ require([
     embedDecorator, emojiDecorator, HeaderView) {
   "use strict";
 
-  // $(document).on("click", "a", function(e) {
-  //   if(this.href) {
-  //     var href = $(this).attr('href');
-  //     if(href.indexOf('#') === 0) {
-  //       e.preventDefault();
-  //       window.location = href;
-  //     }
-  //   }
+  $(document).on("click", "a", function(e) {
+    if(this.href) {
+      var href = $(this).attr('href');
+      if(href.indexOf('#') === 0) {
+        e.preventDefault();
+        window.location = href;
+      }
+    }
 
-  //   return true;
-  // });
+    return true;
+  });
 
 
   // When a user clicks an internal link, prevent it from opening in a new window
-  // $(document).on("click", "a.link", function(e) {
-  //   var basePath = context.env('basePath');
-  //   var href = e.target.getAttribute('href');
-  //   if(!href || href.indexOf(basePath) !== 0) {
-  //     return;
-  //   }
+  $(document).on("click", "a.link", function(e) {
+    var basePath = context.env('basePath');
+    var href = e.target.getAttribute('href');
+    if(!href || href.indexOf(basePath) !== 0) {
+      return;
+    }
 
-  //   e.preventDefault();
-  //   window.parent.location.href = href;
-  // });
+    e.preventDefault();
+    window.parent.location.href = href;
+  });
 
   var appView = new ChatIntegratedView({ el: 'body' });
   new RightToolbarView({ el: "#toolbar-frame" });

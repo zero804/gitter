@@ -9,8 +9,6 @@ var highlight = require('highlight.js');
 highlight.configure({classPrefix: ''});
 
 module.exports = function(req, res, next) {
-  if(!req.user) return next(401);
-
   var githubUri = 'repos/' + req.route.params[0];
   var mirror = new Mirror(req.user);
 
