@@ -45,9 +45,18 @@ function renderMainFrame(req, res, next, frame) {
     .then(function(troupeContext) {
       var chatAppLocation = '/' + req.uriContext.uri + '/~' + frame + '#initial';
 
-      res.render('app-template', {
+      var template, bootScriptName;
+      if(req.user) {
+        template = 'app-template';
+        bootScriptName = 'router-app';
+      } else {
+        template = 'app-nli-template';
+        bootScriptName = 'router-nli-app';
+      }
+
+      res.render(template, {
         appCache: getAppCache(req),
-        bootScriptName: 'router-app',
+        bootScriptName: bootScriptName,
         troupeName: req.uriContext.uri,
         troupeContext: troupeContext,
         chatAppLocation: chatAppLocation,
@@ -131,7 +140,7 @@ function renderMobileChat(req, res, next) {
     .fail(next);
 }
 
-function renderNotLoggedInRoom(req, res, next) {
+function renderNotLoggedInChatPage(req, res, next) {
   var troupe = req.uriContext.troupe;
 
   Q.all([
@@ -145,10 +154,10 @@ function renderNotLoggedInRoom(req, res, next) {
         githubLink = 'https://github.com/' + req.uriContext.uri;
       }
 
-      res.render('chat-not-logged-in-template', {
+      res.render('chat-nli-template', {
         isRepo: troupe.githubType === 'REPO',
         appCache: getAppCache(req),
-        bootScriptName: 'router-not-logged-in',
+        bootScriptName: 'router-nli-chat',
         githubLink: githubLink,
         troupeName: req.uriContext.uri,
         troupeTopic: troupeContext.troupe.topic,
@@ -168,5 +177,5 @@ module.exports = exports = {
   renderMainFrame: renderMainFrame,
   renderMobileChat: renderMobileChat,
   renderMobileUserHome: renderMobileUserHome,
-  renderNotLoggedInRoom: renderNotLoggedInRoom
+  renderNotLoggedInChatPage: renderNotLoggedInChatPage
 };
