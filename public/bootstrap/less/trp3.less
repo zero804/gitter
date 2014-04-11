@@ -34,7 +34,6 @@
   .transition(500ms);
 }
 
-
 @-webkit-keyframes pulsey {
     0% { opacity: 0.3; }
     50% { opacity: 1; }
@@ -474,7 +473,16 @@ body.logged-out {
     margin-left: 100px;
   }
 
+  .trpContentPanel {
+    bottom: 0;
+  }
+
 }
+
+.trpButtonMedium, .trpButtonBig {
+  .transition300ms;
+}
+
 
 .trpLeftMenuLogo {
   padding: 20px;
@@ -482,14 +490,25 @@ body.logged-out {
   .logo-container {
     float: left;
     background-image: url('../../images/2/gitter/logo-text-white-64.png');
-    width: 146px;
-    height: 48px;
+    width: 196px;
+    height: 64px;
 
     @media @retina {
       background-image: url('../../images/2/gitter/logo-text-white-64@2x.png');
       background-size: contain;
     }
   }
+}
+
+.trpLeftMenuLoggedOut {
+  bottom: 0;
+  height: 400px;
+  left: 0;
+  margin: auto;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
 }
 
 .trpLeftMenuInfo {
