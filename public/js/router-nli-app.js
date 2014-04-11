@@ -3,10 +3,8 @@ require([
   'utils/appevents',
   'utils/context',
   'backbone',
-  'underscore',
   'views/app/appIntegratedView',
   'components/titlebar',
-  // 'components/realtime',
   'log!router-app',
   'views/widgets/preload',                // No ref
   'components/webNotifications',          // No ref
@@ -15,8 +13,7 @@ require([
   'components/bug-reporting',             // No ref
   'components/csrf',                      // No ref
   'components/ajax-errors'                // No ref
-], function(appEvents, context, Backbone, _, AppIntegratedView,
-  TitlebarUpdater, log) {
+], function(appEvents, context, Backbone, AppIntegratedView, TitlebarUpdater, log) {
   "use strict";
 
   var chatIFrame = document.getElementById('content-frame');
