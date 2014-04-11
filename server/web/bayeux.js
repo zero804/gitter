@@ -99,6 +99,10 @@ function validateUserForUserSubscription(options, callback) {
   // All /user/ subscriptions need to be authenticated
   if(!userId) return false;
 
+  if(!mongoUtils.isLikeObjectId(userId)) {
+    return callback(new StatusError(400, 'Invalid ID: ' + userId));
+  }
+
   var result = userId == subscribeUserId;
 
   return callback(null, result);
