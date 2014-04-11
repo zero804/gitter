@@ -25,7 +25,7 @@
     <link id="favicon" rel="shortcut icon" href='{{cdn "images/2/gitter/favicon5.png" }}'>
     {{>load_font_css}}
 </head>
-<body>
+<body class="logged-out">
 
   {{#isMobile agent}}
     <div class="trpPortraitAlert" id='portrait-alert'>
@@ -38,7 +38,23 @@
   {{/isMobile}}
 
   <div class="trpLeftMenuHotspot" id="left-menu-hotspot"></div>
-  <div class="trpLeftMenu" id="left-menu"></div>
+  <div class="trpLeftMenu" id="left-menu">
+    <div class="trpLeftMenuContainer">
+      <div class="trpLeftMenuLoggedOut">
+        <div class="trpLeftMenuLogo">
+          <div class="logo-container"></div>
+        </div>
+        <div class="trpLeftMenuInfo">
+          <p>Gitter provides free public chat rooms for open source repositories on GitHub.</p>
+          <br>
+          <o>You can also use Gitter for private conversations amongst your organisation.</p>
+        </div>
+        <div class="trpLeftMenuSignup">
+          <a class="trpButtonMedium trpBtnGreen gtrCreateRoomButton">Start talking</a>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
 <div class="trpMenuTab unread-count" id="menu-toggle-button">Login</div>

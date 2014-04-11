@@ -465,6 +465,47 @@ a:hover {
 	display: inline-block;
 }
 
+body.logged-out {
+  .trpLeftMenu {
+    width: 350px;
+  }
+
+  .trpFramePanel {
+    margin-left: 100px;
+  }
+
+}
+
+.trpLeftMenuLogo {
+  padding: 20px;
+  margin-bottom: 20px;
+  .logo-container {
+    float: left;
+    background-image: url('../../images/2/gitter/logo-text-white-64.png');
+    width: 146px;
+    height: 48px;
+
+    @media @retina {
+      background-image: url('../../images/2/gitter/logo-text-white-64@2x.png');
+      background-size: contain;
+    }
+  }
+}
+
+.trpLeftMenuInfo {
+  .trpBodyMedium;
+  margin-bottom: 20px;
+  clear: both;
+  padding: 20px;
+}
+
+.trpLeftMenuSignup {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  padding: 0 20px;
+  width: 100%;
+}
+
 .trpLeftMenu {
 	display: inline-block;
 	position: fixed;
