@@ -28,7 +28,6 @@ function installApi() {
 
       return oauthService.validateAccessTokenAndClient(accessToken)
         .then(function(tokenInfo) {
-          return done();
           // Token not found
           if(!tokenInfo) return done();
 
@@ -130,6 +129,9 @@ function install() {
               // Login
               req.logIn(user, function(err) {
                 if (err) { return done(err); }
+
+                // Remove the old token for this user
+                if(req.session) req.session.accessToken = null;
                 return done(null, user);
               });
 

@@ -19,7 +19,7 @@ exports.generateMiniContext = function(req, callback) {
 
   return Q.all([
       user ? serializeUser(user) : null,
-      user ? getWebToken(user) : null,
+      user ? getWebToken(user) : req.session && req.session.accessToken,
       user ? determineDesktopNotifications(user, req) : false
     ])
     .spread(function(serializedUser, token, desktopNotifications) {
@@ -65,7 +65,7 @@ exports.generateTroupeContext = function(req, callback) {
   return Q.all([
     user ? serializeUser(user) : null,
     homeUser ? serializeHomeUser(homeUser) : undefined, //include email if the user has an invite
-    user ? getWebToken(user) : null,
+    user ? getWebToken(user) : req.session && req.session.accessToken,
     troupe ? serializeTroupe(troupe, user) : undefined,
     determineDesktopNotifications(user, req),
     roomPermissionsModel(user, 'admin', troupe)
