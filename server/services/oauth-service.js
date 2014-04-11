@@ -137,12 +137,13 @@ exports.findOrGenerateWebToken = function(userId, callback) {
       .then(function(oauthAccessToken) {
         if(oauthAccessToken) return oauthAccessToken.token;
 
-        return random.generateTokenQ().then(function(token) {
-          return persistenceService.OAuthAccessToken.createQ({ token: token, userId: userId, clientId: webInternalClientId })
+        return random.generateToken()
+          .then(function(token) {
+            return persistenceService.OAuthAccessToken.createQ({ token: token, userId: userId, clientId: webInternalClientId })
               .then(function() {
                 return token;
               });
-        });
+          });
       })
       .nodeify(callback);
 
@@ -153,12 +154,13 @@ exports.findOrGenerateIRCToken = function(userId, callback) {
       .then(function(oauthAccessToken) {
         if(oauthAccessToken) return oauthAccessToken.token;
 
-        return random.generateTokenQ().then(function(token) {
-          return persistenceService.OAuthAccessToken.createQ({ token: token, userId: userId, clientId: ircClientId })
+        return random.generateToken()
+          .then(function(token) {
+            return persistenceService.OAuthAccessToken.createQ({ token: token, userId: userId, clientId: ircClientId })
               .then(function() {
                 return token;
               });
-        });
+            });
       })
       .nodeify(callback);
 
