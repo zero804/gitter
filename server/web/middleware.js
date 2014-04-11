@@ -53,7 +53,7 @@ exports.ensureLoggedIn = function(options) {
     bearerAuthMiddleware,
     rememberMe.rememberMeMiddleware(/* No Options */),
     rateLimiter,
-    require('./csrf-middleware'),
+    require('./middlewares/enforce-csrf'),
     function(req, res, next) {
       if (req.user) {
         if(!req.user.githubToken && !req.user.githubUserToken) {

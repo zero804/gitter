@@ -90,6 +90,7 @@ module.exports = {
     }));
     app.use(passport.initialize());
     app.use(passport.session());
+    app.use(require('./middlewares/configure-csrf'));
     app.use(app.router);
     app.use(require('./middlewares/express-error-handler'));
   },
