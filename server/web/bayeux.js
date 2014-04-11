@@ -15,14 +15,13 @@ var appVersion        = require('./appVersion');
 var statsService      = require('../services/stats-service');
 var mongoUtils        = require('../utils/mongo-utils');
 var StatusError       = require('statuserror');
-var roomPermissionsModel = require('../services/room-permissions-model');
 
 var appTag = appVersion.getAppTag();
 
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
   { re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)$/,
-    validator: validateUserForTroupeSubscription },
+    validator: validateUserForSubTroupeSubscription },
   { re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)\/(\w+)$/,
     validator: validateUserForSubTroupeSubscription,
     populator: populateSubTroupeCollection },
@@ -42,11 +41,6 @@ var routes = [
 ];
 
 var superClientPassword = nconf.get('ws:superClientPassword');
-
-// This strategy ensures that a user can access a given troupe URL
-function validateUserForTroupeSubscription(options, callback) {
-  validateUserForSubTroupeSubscription(options, callback);
-}
 
 function checkTroupeAccess(userId, troupeId, callback) {
   // TODO: use the room permissions model
@@ -87,28 +81,6 @@ function validateUserForSubTroupeSubscription(options, callback) {
   }
 
   return checkTroupeAccess(userId, troupeId)
-    .then(function(troupe) {
-      if(!troupe) return false;
-
-      // TODO: use the room permissions model
-      if(troupe.security === 'PUBLIC') {
-        return true;
-      }
-
-      // After this point, everything needs to be authenticated
-      if(!userId) {
-        return false;
-      }
-
-      var result = troupeService.userIdHasAccessToTroupe(userId, troupe);
-
-      if(!result) {
-        winston.info("Denied user " + userId + " access to troupe " + troupe.uri);
-        return false;
-      }
-
-      return result;
-    })
     .nodeify(callback);
 }
 

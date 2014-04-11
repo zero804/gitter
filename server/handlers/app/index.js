@@ -20,6 +20,7 @@ var chatFrameMiddlewarePipeline = [
   appMiddleware.uriContextResolverMiddleware,
   appMiddleware.isPhoneMiddleware,
   function(req, res, next) {
+
     if (req.uriContext.ownUrl) {
       if(req.isPhone) {
         appRender.renderMobileUserHome(req, res, next, 'home');
@@ -30,10 +31,18 @@ var chatFrameMiddlewarePipeline = [
     }
 
     if(req.isPhone) {
-      saveRoom(req);
-      appRender.renderMobileChat(req, res, next);
+      if(req.user) {
+        saveRoom(req);
+        appRender.renderMobileChat(req, res, next);
+      } else {
+        // TODO: XXX: deal with not logged in on this platform
+      }
     } else {
-      appRender.renderMainFrame(req, res, next, 'chat');
+      if(req.user) {
+        appRender.renderMainFrame(req, res, next, 'chat');
+      } else {
+        appRender.renderNotLoggedInRoom(req, res, next);
+      }
     }
   }
 ];

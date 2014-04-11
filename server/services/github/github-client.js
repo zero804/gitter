@@ -6,8 +6,7 @@ var assert = require('assert');
 var request = require('./request-wrapper');
 
 function createClient(user, token) {
-  assert(token, 'token required');
-
+  // assert(token, 'token required');
   var client = github.client(token, { request: request });
 
   return client;
@@ -15,11 +14,15 @@ function createClient(user, token) {
 
 module.exports = exports = {
   user: function(user) {
+    if(!user) return createClient();
+
     assert(user, 'user required');
     var token = user.githubUserToken || user.githubToken;
     return createClient(user, token);
   },
   full: function(user) {
+    if(!user) return createClient();
+
     assert(user, 'user required');
     var token = user.githubToken || user.githubUserToken;
     return createClient(user, token);

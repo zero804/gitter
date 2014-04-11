@@ -331,7 +331,10 @@ define([
     }
 
   });
-  cocktail.mixin(ChatItemView, UnreadItemViewMixin);
+
+  if(context.isLoggedIn()) {
+    cocktail.mixin(ChatItemView, UnreadItemViewMixin);
+  }
 
   var ReadByView = Marionette.CollectionView.extend({
     itemView: AvatarView,

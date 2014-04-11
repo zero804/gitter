@@ -66,7 +66,7 @@ exports.generateTroupeContext = function(req, callback) {
     user ? serializeUser(user) : null,
     homeUser ? serializeHomeUser(homeUser) : undefined, //include email if the user has an invite
     user ? getWebToken(user) : null,
-    troupe && user ? serializeTroupe(troupe, user) : fakeSerializedTroupe(req.uriContext),
+    troupe ? serializeTroupe(troupe, user) : undefined,
     determineDesktopNotifications(user, req),
     roomPermissionsModel(user, 'admin', troupe)
   ])

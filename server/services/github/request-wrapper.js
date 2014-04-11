@@ -5,8 +5,10 @@ var request = require('request');
 var fetchAllPages = require('./fetch-all-pages');
 var logFailingRequest = require('./log-failing-request');
 var requestWithRetry = require('./request-with-retry');
+var publicTokenPool = require('./public-token-pool');
 
-module.exports = fetchAllPages(
+module.exports = publicTokenPool(
+                    fetchAllPages(
                     logFailingRequest(
                     requestWithRetry({ maxRetries: 3 },
-                    request)));
+                    request))));
