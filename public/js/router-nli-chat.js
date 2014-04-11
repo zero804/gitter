@@ -3,7 +3,7 @@ require([
   'jquery',
   'backbone',
   'utils/context',
-  'components/live-context',
+  // 'components/live-context',
   // 'utils/appevents',
   // 'views/people/peopleCollectionView',
   'views/app/chatIntegratedView',
@@ -27,7 +27,8 @@ require([
   'components/csrf',            // No ref
   'components/ajax-errors'      // No ref
 
-], function($, Backbone, context, liveContext,
+], function($, Backbone, context,
+    // liveContext,
     // peopleCollectionView,
     ChatIntegratedView,
     ChatCollectionView, itemCollections, RightToolbarView,
@@ -87,8 +88,8 @@ require([
 
   new Router();
 
-  // Listen for changes to the room
-  liveContext.syncRoom();
+  // // Listen for changes to the room
+  // liveContext.syncRoom();
 
   Backbone.history.start();
 });
