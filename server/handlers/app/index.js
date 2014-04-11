@@ -38,11 +38,7 @@ var chatFrameMiddlewarePipeline = [
         // TODO: XXX: deal with not logged in on this platform
       }
     } else {
-      if(req.user) {
-        appRender.renderMainFrame(req, res, next, 'chat');
-      } else {
-        appRender.renderNotLoggedInRoom(req, res, next);
-      }
+      appRender.renderMainFrame(req, res, next, 'chat');
     }
   }
 ];
@@ -52,8 +48,13 @@ var chatMiddlewarePipeline = [
   appMiddleware.uriContextResolverMiddleware,
   appMiddleware.isPhoneMiddleware,
   function(req, res, next) {
-    saveRoom(req);
-    appRender.renderChatPage(req, res, next);
+    if(req.user) {
+      saveRoom(req);
+      appRender.renderChatPage(req, res, next);
+    } else {
+      appRender.renderNotLoggedInChatPage(req, res, next);
+    }
+
   }
 ];
 
