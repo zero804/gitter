@@ -210,3 +210,17 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
       return callback(null, results.map(massageMessages).reverse());
     });
 };
+
+exports.findChatMessagesForTroupeForDateRange = function(troupeId, startDate, endDate, callback) {
+  return persistence.ChatMessage.find({
+    $and: [
+      { toTroupeId: troupeId },
+      { sent: { $gte: startDate}  },
+      { sent: { $lte: endDate}  },
+    ]
+  }).sort({ sent: 'asc' })
+    .execQ().then(function(results) {
+      return results.map(massageMessages);
+    })
+    .nodeify(callback);
+};
