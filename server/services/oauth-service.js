@@ -8,6 +8,7 @@ var random = require('../utils/random');
 var Q = require('q');
 var userService = require('./user-service');
 var winston = require('../utils/winston');
+var moment = require('moment');
 
 var WEB_INTERNAL_CLIENT_KEY = 'web-internal';
 var webInternalClientId = null;
@@ -62,9 +63,10 @@ exports.findAccessToken = function(token, callback) {
 
 
 /**
- * Turn a token into a user/token/client
+ * Turn a token into a user/token/client.
  *
- * TODO: this really needs to be cached!
+ * Returns { user / client / accessToken } hash. If the token is for an anonymous user,
+ * user is null;
  */
 exports.validateAccessTokenAndClient = function(token, callback) {
   winston.verbose('Validating token');
@@ -82,22 +84,14 @@ exports.validateAccessTokenAndClient = function(token, callback) {
         return null; // code invalid
       }
 
-      var userId = accessToken.userId;
-      if(!userId) {
-        winston.warn('Invalid token presented (no userId): ', { token: token });
-        return null; // code invalid
-      }
+      var userId = accessToken.userId;   // userId can be null
 
+      // TODO: check for expired tokens
       return Q.all([
-          persistenceService.OAuthClient.findById(clientId),
-          userService.findById(userId)
+          persistenceService.OAuthClient.findByIdQ(clientId),
+          userId && userService.findById(userId)
         ])
         .spread(function(client, user) {
-          if(!client) {
-            winston.warn('Invalid token presented (client not found): ', { token: token });
-            return null;
-          }
-
           if(!client) {
             winston.warn('Invalid token presented (client not found): ', { token: token });
             return null;
@@ -133,7 +127,10 @@ exports.findClientByClientKey = function(clientKey, callback) {
 // TODO: move some of this functionality into redis for speed
 // TODO: make the web tokens expire
 exports.findOrGenerateWebToken = function(userId, callback) {
-  return persistenceService.OAuthAccessToken.findOneQ({ userId: userId, clientId: webInternalClientId })
+  return Q.fcall(function() {
+    if(!userId) throw new Error('userId required');
+
+    return persistenceService.OAuthAccessToken.findOneQ({ userId: userId, clientId: webInternalClientId })
       .then(function(oauthAccessToken) {
         if(oauthAccessToken) return oauthAccessToken.token;
 
@@ -144,9 +141,25 @@ exports.findOrGenerateWebToken = function(userId, callback) {
                 return token;
               });
           });
-      })
-      .nodeify(callback);
+      });
+    })
+    .nodeify(callback);
 
+};
+
+exports.findOrGenerateAnonWebToken = function(callback) {
+  return random.generateToken()
+    .then(function(token) {
+      return persistenceService.OAuthAccessToken.createQ({
+        token: token,
+        userId: null,
+        clientId: webInternalClientId,
+        expires: moment().add('days', 7).toDate()
+      }).then(function() {
+        return token;
+      });
+    })
+    .nodeify(callback);
 };
 
 exports.findOrGenerateIRCToken = function(userId, callback) {
@@ -165,16 +178,3 @@ exports.findOrGenerateIRCToken = function(userId, callback) {
       .nodeify(callback);
 
 };
-
-
-// TODO: move some of this functionality into redis for speed
-// TODO: make the web tokens expire
-exports.validateWebToken = function(token, callback) {
-  persistenceService.OAuthAccessToken.findOne({ token: token, clientId: webInternalClientId }, function(err, accessToken) {
-    if(err) return callback(err);
-    if(!accessToken) return callback("Access token not found");
-
-    return callback(null, accessToken.userId);
-  });
-};
-

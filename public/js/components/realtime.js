@@ -105,9 +105,8 @@ define([
     if(message.channel == '/meta/handshake') {
       if(!message.ext) { message.ext = {}; }
       var ext = message.ext;
-      var accessToken = context.isLoggedIn() ? context().accessToken : null;
-
-      var mobile =    isMobile();
+      var accessToken = context().accessToken;
+      var mobile = isMobile();
 
       ext.token     = accessToken;
       ext.troupeId  = context.getTroupeId();
@@ -201,7 +200,11 @@ define([
         window.setTimeout(function() {
           terminating = false;
           window.alert('Realtime communications with the server have been disconnected. Click OK to reload.');
-          window.parent.location.href = "/" + context.user().get('username');
+          if(context.isLoggedIn()) {
+            window.parent.location.href = "/" + context.user().get('username');
+          } else {
+            window.parent.location.href = "/";
+          }
         }, 10000);
 
       }
