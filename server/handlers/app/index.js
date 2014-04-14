@@ -52,7 +52,8 @@ var chatMiddlewarePipeline = [
       saveRoom(req);
       appRender.renderChatPage(req, res, next);
     } else {
-      // We're doing this so we correctly redirect a logged out user to the right chat post login
+      // We're doing this so we correctly redirect a logged out
+      // user to the right chat post login
       req.session.returnTo = req.url.replace(/\/~chat$/,"");
       appRender.renderNotLoggedInChatPage(req, res, next);
     }
@@ -86,12 +87,16 @@ module.exports = {
 
       require('./integrations').install(app);
 
+      var archiveMiddlewarePipeline = require('./archive');
+
       [
         '/:roomPart1',
         '/:roomPart1/:roomPart2',
         '/:roomPart1/:roomPart2/:roomPart3',
       ].forEach(function(path) {
         app.get(path, chatFrameMiddlewarePipeline);
+        app.get(path + '/archives/:yyyy(\\d{4})/:mm(\\d{2})/:dd(\\d{2})', archiveMiddlewarePipeline);
       });
+
     }
 };
