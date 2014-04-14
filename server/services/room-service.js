@@ -301,7 +301,6 @@ function findOrCreateRoom(user, uri, opts) {
         }
 
         if(uriLookup.troupe) {
-          console.log('I AM EHRE')
           return roomPermissionsModel(null, 'view', uriLookup.troupe)
             .then(function(access) {
               if(!access) return;
