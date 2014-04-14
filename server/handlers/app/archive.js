@@ -39,7 +39,7 @@ module.exports = [
             restSerializer.serializeQ(chatMessages, strategy)
           ]);
       })
-      .then(function(troupeContext, serialized) {
+      .spread(function(troupeContext, serialized) {
 
         var githubLink;
 
