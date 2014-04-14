@@ -175,7 +175,7 @@ define([
         $.ajax({
           type: 'GET',
           url: '/api/private/generate-signature',
-          data: 'room_uri=' + context().troupe.uri + '&room_id=' + context().troupe.id,
+          data: 'room_uri=' + context.troupe().get('uri') + '&room_id=' + context.getTroupeId(),
           success: function(data) {
             formdata.append("signature", data.sig);
 
