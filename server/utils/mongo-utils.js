@@ -47,11 +47,20 @@ function getNewObjectIdString() {
  */
 function isLikeObjectId(value) {
   // value instanceof Object doesn't always work, so we'll do something a bit more hacky
+  if(!value) return false;
 
-  return value && value._bsontype === 'ObjectID' ||
-          typeof value === 'string' ||
-          value instanceof String ||
-          value instanceof ObjectID;
+  if(value && value._bsontype === 'ObjectID' || value instanceof ObjectID) {
+    return true;
+  }
+
+  if(typeof value === 'string' || value instanceof String) {
+    // Avoid an expensive try-catch if possible
+    if(value.length !== 24) return false;
+
+    return (/^[0-9a-fA-F]{24}$/).test(value);
+  }
+
+  return true;
 }
 
 
