@@ -1,0 +1,56 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=IE9" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
+	<meta charset="utf-8">
+
+	<title>{{troupeName}} - Gitter</title>
+
+  <style>
+
+  @-webkit-keyframes pulsey {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+  }
+
+  html.loading .trpContentPanel { background: url("{{ cdn 'images/2/gitter/logo-mark-grey-64.png' }}") center no-repeat; height: 90%; -webkit-animation: pulsey 2s ease-out; -webkit-animation-iteration-count: infinite;  }
+  html.loading .trpContentPanel > * { visibility: hidden; }
+  </style>
+  <base target="_parent">
+  <link rel="stylesheet" href='{{cdn "sprites/services.css" }}'>
+  <link rel="stylesheet" href='{{cdn "bootstrap/css/trp3.css" }}'>
+
+    <!-- Le fav and touch icons -->
+    <link id="favicon" rel="shortcut icon" href='{{cdn "images/2/gitter/favicon5.png" }}'>
+    {{>load_font_css}}
+</head>
+<body class="logged-out">
+<div class="trpHeaderWrapper" id="header-wrapper">
+  <div class="trpHeaderArea" id="header">
+    {{{ prerenderView "js/views/app/tmpl/headerViewTemplate" }}}
+  </div>
+</div>
+
+<div class="trpContentPanel" id="content-wrapper">
+  <div class="trpChatPanel" id="chat-frame">
+    <div class="trpChatContainer  primary-scroll" id="content-frame">
+      {{#each chats}}
+        {{{ chatItemPrerender this }}}
+      {{/each}}
+      {{! This is a way of forcing the browser to open at the bottom of the screen }}
+      <div id='initial' style="height:0;width:0;overflow:hidden"><a name="initial"/>_</a></div>
+    </div>
+  </div>
+</div>
+
+<div class="trpBlankPage"> </div>
+
+{{{ generateTroupeContext troupeContext }}}
+
+{{>require_wrapper}}
+{{{bootScript bootScriptName }}}
+
+</body>
+</html>
