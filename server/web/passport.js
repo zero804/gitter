@@ -31,6 +31,9 @@ function installApi() {
           // Token not found
           if(!tokenInfo) return done();
 
+          // Anonymous tokens cannot be used for Bearer tokens
+          if(!tokenInfo.user) return done();
+
           var user = tokenInfo.user;
           var client = tokenInfo.client;
           // Not yet needed var accessToken = tokenInfo.accessToken;

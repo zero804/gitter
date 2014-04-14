@@ -15,7 +15,7 @@ function getAppCache(req) {
 }
 
 function renderHomePage(req, res, next) {
-  contextGenerator.generateMiniContext(req, function(err, troupeContext) {
+  contextGenerator.generateNonChatContext(req, function(err, troupeContext) {
     if(err) return next(err);
 
     var page, bootScriptName;
@@ -41,7 +41,7 @@ function renderHomePage(req, res, next) {
 
 
 function renderMainFrame(req, res, next, frame) {
-  contextGenerator.generateMiniContext(req)
+  contextGenerator.generateNonChatContext(req)
     .then(function(troupeContext) {
       var chatAppLocation = '/' + req.uriContext.uri + '/~' + frame + '#initial';
 
@@ -101,7 +101,7 @@ function renderChatPage(req, res, next) {
 }
 
 function renderMobileUserHome(req, res, next) {
-  contextGenerator.generateMiniContext(req, function(err, troupeContext) {
+  contextGenerator.generateNonChatContext(req, function(err, troupeContext) {
     if(err) return next(err);
 
     res.render('mobile/mobile-app', {
