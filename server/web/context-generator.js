@@ -19,7 +19,7 @@ exports.generateMiniContext = function(req, callback) {
 
   return Q.all([
       user ? serializeUser(user) : null,
-      user ? getWebToken(user) : req.session && req.session.accessToken,
+      req.session && req.session.accessToken || user && getWebToken(user),
       user ? determineDesktopNotifications(user, req) : false
     ])
     .spread(function(serializedUser, token, desktopNotifications) {
@@ -65,7 +65,7 @@ exports.generateTroupeContext = function(req, callback) {
   return Q.all([
     user ? serializeUser(user) : null,
     homeUser ? serializeHomeUser(homeUser) : undefined, //include email if the user has an invite
-    user ? getWebToken(user) : req.session && req.session.accessToken,
+    req.session && req.session.accessToken || user && getWebToken(user),
     troupe ? serializeTroupe(troupe, user) : undefined,
     determineDesktopNotifications(user, req),
     roomPermissionsModel(user, 'admin', troupe)
@@ -158,24 +158,6 @@ function serializeTroupe(troupe, user) {
   var strategy = new restSerializer.TroupeStrategy({ currentUserId: user ? user.id : null });
 
   return restSerializer.serializeQ(troupe, strategy);
-}
-
-function fakeSerializedTroupe(uriContext) {
-  var oneToOne = uriContext.oneToOne;
-  var otherUser = uriContext.otherUser;
-  var troupe = uriContext.troupe;
-
-  var uri = (oneToOne ?  (otherUser.username || "one-one/" + otherUser.id ) : troupe.uri);
-
-  var url = "/" + uri;
-
-  return {
-    oneToOne: oneToOne,
-    uri: uri,
-    url: url,
-    name: otherUser && otherUser.username ? otherUser.username : 'Welcome'
-  };
-
 }
 
 function createTroupeContext(req, options) {
