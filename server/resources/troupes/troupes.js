@@ -6,6 +6,7 @@ var roomService       = require("../../services/room-service");
 var restful           = require("../../services/restful");
 var restSerializer    = require("../../serializers/rest-serializer");
 var Q                 = require('q');
+var mongoUtils        = require('../../utils/mongo-utils');
 
 module.exports = {
   id: 'troupe',
@@ -82,6 +83,9 @@ module.exports = {
   },
 
   load: function(req, id, callback) {
+    /* Invalid id? Return 404 */
+    if(!mongoUtils.isLikeObjectId(id)) return callback();
+
     troupeService.findById(id, function(err, troupe) {
       if(err) return callback(500);
       if(!troupe) return callback(404);
