@@ -228,25 +228,10 @@ var authenticator = {
     var token = ext.token;
 
     if(!token) {
-      // Non logged in users will not present a token
-      winston.verbose('bayeux: anonymous handshake');
-
-      var connectionType = getConnectionType(ext.connType);
-      var userId = '';
-      var client = ext.client || '';
-      var troupeId = ext.troupeId || '';
-      var eyeballState = ext.eyeballs || '';
-
-      // This is an UGLY UGLY hack, but it's the only
-      // way possible to pass the userId to the outgoing extension
-      // where we have the clientId (but not the userId)
-      var id = message.id || '';
-      message.id = [id, userId, connectionType, client, troupeId, eyeballState].join(':');
-
-      return callback(message);
+      return deny(401, "Access token required");
     }
 
-    oauth.validateAccessTokenAndClient(token, function(err, tokenInfo) {
+    oauth.validateAccessTokenAndClient(ext.token, function(err, tokenInfo) {
       if(err) {
         winston.error("bayeux: Authentication error: " + err, { exception: err, message: message });
         return deny(500, "A server error occurred.");
@@ -259,9 +244,9 @@ var authenticator = {
 
       var user = tokenInfo.user;
       var oauthClient = tokenInfo.client;
-      var userId = user.id;
-
-      winston.verbose('bayeux: handshake', { username: user.username, client: oauthClient.name });
+      var userId = user && user.id;
+      console.log('oauthClient', oauthClient);
+      winston.verbose('bayeux: handshake', { username: user && user.username, client: oauthClient.name });
 
       var connectionType = getConnectionType(ext.connType);
       var client = ext.client || '';

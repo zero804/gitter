@@ -697,7 +697,8 @@ OAuthCodeSchema.schemaTypeName = 'OAuthCodeSchema';
 var OAuthAccessTokenSchema= new Schema({
   token: String,
   userId: ObjectId,
-  clientId: ObjectId
+  clientId: ObjectId,
+  expires: Date
 });
 OAuthAccessTokenSchema.index({ token: 1 });
 OAuthAccessTokenSchema.schemaTypeName = 'OAuthAccessTokenSchema';
