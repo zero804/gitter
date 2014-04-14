@@ -47,10 +47,11 @@ module.exports = [
           githubLink = 'https://github.com/' + req.uriContext.uri;
         }
 
-        res.render('chat-nli-template', {
+        res.render('chat-archive-template', {
           isRepo: troupe.githubType === 'REPO',
-          bootScriptName: 'router-nli-chat',
+          bootScriptName: 'router-archive-chat',
           githubLink: githubLink,
+          troupeContext: troupeContext,
           troupeName: req.uriContext.uri,
           troupeTopic: troupe.topic,
           chats: serialized,

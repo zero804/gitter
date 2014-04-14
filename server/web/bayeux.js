@@ -225,7 +225,9 @@ var authenticator = {
 
     var ext = message.ext || {};
 
-    if(!ext.token) {
+    var token = ext.token;
+
+    if(!token) {
       // Non logged in users will not present a token
       winston.verbose('bayeux: anonymous handshake');
 
@@ -244,14 +246,14 @@ var authenticator = {
       return callback(message);
     }
 
-    oauth.validateAccessTokenAndClient(ext.token, function(err, tokenInfo) {
+    oauth.validateAccessTokenAndClient(token, function(err, tokenInfo) {
       if(err) {
         winston.error("bayeux: Authentication error: " + err, { exception: err, message: message });
         return deny(500, "A server error occurred.");
       }
 
       if(!tokenInfo) {
-        winston.warn("bayeux: Authentication failed. Invalid access token.");
+        winston.warn("bayeux: Authentication failed. Invalid access token.", { token: token });
         return deny(401, "Invalid access token");
       }
 
