@@ -97,11 +97,6 @@ define([
     return !!troupe.get('oneToOne');
   };
 
-  context.inUserhomeContext = function() {
-    // TODO: deal with this? Probably env rather than context?
-    return ctx.inUserhome;
-  };
-
   /**
    * DEPRECATED
    */
