@@ -88,6 +88,7 @@ module.exports = {
       require('./integrations').install(app);
 
       var archiveMiddlewarePipeline = require('./archive');
+      // var archiveLandingMiddlewarePipeline = require('./archive-landing');
 
       [
         '/:roomPart1',
@@ -95,6 +96,7 @@ module.exports = {
         '/:roomPart1/:roomPart2/:roomPart3',
       ].forEach(function(path) {
         app.get(path, chatFrameMiddlewarePipeline);
+        // app.get(path + '/archives', archiveLandingMiddlewarePipeline);
         app.get(path + '/archives/:yyyy(\\d{4})/:mm(\\d{2})/:dd(\\d{2})', archiveMiddlewarePipeline);
       });
 

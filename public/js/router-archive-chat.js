@@ -4,16 +4,6 @@ require([
   'backbone',
   'utils/context',
   'views/app/chatIntegratedView',
-  'views/chat/chatCollectionView',
-  'collections/instances/integrated-items',
-  'views/righttoolbar/rightToolbarView',
-
-  'views/chat/decorators/webhookDecorator',
-  'views/chat/decorators/issueDecorator',
-  'views/chat/decorators/commitDecorator',
-  'views/chat/decorators/mentionDecorator',
-  'views/chat/decorators/embedDecorator',
-  'views/chat/decorators/emojiDecorator',
   'views/app/headerView',
 
   'views/widgets/preload',      // No ref
@@ -25,12 +15,8 @@ require([
   'components/ajax-errors'      // No ref
 
 ], function($, Backbone, context,
-    // liveContext,
-    // peopleCollectionView,
     ChatIntegratedView,
-    ChatCollectionView, itemCollections, RightToolbarView,
-    webhookDecorator, issueDecorator, commitDecorator, mentionDecorator,
-    embedDecorator, emojiDecorator, HeaderView) {
+    HeaderView) {
   "use strict";
 
   $(document).on("click", "a", function(e) {
@@ -59,17 +45,8 @@ require([
   });
 
   var appView = new ChatIntegratedView({ el: 'body' });
-  new RightToolbarView({ el: "#toolbar-frame" });
 
   new HeaderView({ model: context.troupe(), el: '#header' });
-
-  new ChatCollectionView({
-    el: $('#content-frame'),
-    collection: itemCollections.chats,
-    userCollection: itemCollections.users,
-    decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
-  }).render();
-
 
   var Router = Backbone.Router.extend({
     routes: {
@@ -84,9 +61,6 @@ require([
   });
 
   new Router();
-
-  // // Listen for changes to the room
-  // liveContext.syncRoom();
 
   Backbone.history.start();
 });

@@ -7,6 +7,7 @@ var nconf          = require('../utils/config');
 var expressHbs     = require('express-hbs');
 var winston        = require('../utils/winston');
 var responseTime   = require('./response-time');
+var path           = require('path');
 
 // Naughty naughty naught, install some extra methods on the express prototype
 require('./http');
@@ -14,6 +15,8 @@ require('./http');
 function configureLogging(app) {
   app.use(responseTime(winston, nconf.get('logging:minimalAccess')));
 }
+
+var staticContentDir = path.join(__dirname, '..', '..', nconf.get('web:staticContent'));
 
 module.exports = {
   /**
@@ -34,12 +37,13 @@ module.exports = {
     });
 
     app.engine('hbs', expressHbs.express3({
-      partialsDir: __dirname + '/../../' + nconf.get('web:staticContent') +'/templates/partials',
+      partialsDir: staticContentDir + '/templates/partials',
+      layoutsDir: staticContentDir + '/layouts',
       contentHelperName: 'content'
     }));
 
     app.set('view engine', 'hbs');
-    app.set('views', __dirname + '/../../' + nconf.get('web:staticContent') +'/templates');
+    app.set('views', staticContentDir + '/templates');
     app.set('trust proxy', true);
 
     if(nconf.get('express:viewCache')) {
@@ -50,8 +54,7 @@ module.exports = {
       configureLogging(app);
     }
 
-    var staticFiles = __dirname + "/../../" + nconf.get('web:staticContent');
-    app.use(express['static'](staticFiles, {
+    app.use(express.static(staticContentDir, {
       maxAge: nconf.get('web:staticContentExpiryDays') * 86400 * 1000
     }));
 

@@ -17,10 +17,6 @@ module.exports = [
       return next(403);
     }
 
-    var yyyy = parseInt(req.params.yyyy, 10);
-    var mm = parseInt(req.params.mm, 10);
-    var dd = parseInt(req.params.dd, 10);
-
     var startDate = moment(yyyy + "-" + mm + "-" + dd + "Z").valueOf();
     var endDate = startDate + 86400000 - 1;
 
@@ -48,7 +44,6 @@ module.exports = [
         }
 
         res.render('chat-archive-template', {
-          layout: 'archive',
           isRepo: troupe.githubType === 'REPO',
           bootScriptName: 'router-archive-chat',
           githubLink: githubLink,

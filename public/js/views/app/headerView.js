@@ -32,21 +32,23 @@ define([
       this.bindUIElements();
 
       this.showActivity = true;
-      this.dropdown = new Dropdown({
-        allowClickPropagation: true,
-        collection: new Backbone.Collection(this.createMenu()),
-        targetElement: this.ui.cog[0],
-        placement: 'right'
-      });
+      if(context.isLoggedIn()) {
+        this.dropdown = new Dropdown({
+          allowClickPropagation: true,
+          collection: new Backbone.Collection(this.createMenu()),
+          targetElement: this.ui.cog[0],
+          placement: 'right'
+        });
 
-      this.listenTo(this.dropdown, 'selected', function(e) {
-        var href = e.get('href');
-        if(href === '#leave') {
-          this.leaveRoom();
-        } else if(href === '#notifications') {
-          this.requestBrowserNotificationsPermission();
-        }
-      });
+        this.listenTo(this.dropdown, 'selected', function(e) {
+          var href = e.get('href');
+          if(href === '#leave') {
+            this.leaveRoom();
+          } else if(href === '#notifications') {
+            this.requestBrowserNotificationsPermission();
+          }
+        });
+      }
     },
 
     showDropdown: function() {
