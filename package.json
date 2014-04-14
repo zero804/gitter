@@ -10,7 +10,7 @@
     "express-resource": "1.0.0",
     "express-form": "0.8.1",
     "connect-redis": "~1.4.6",
-    "express-hbs": "~0.5.2",
+    "express-hbs": "^0.7.9",
     "consolidate": "~0.10.0",
     "handlebars": "~1.1.2",
     "jade": "0.28.1",
