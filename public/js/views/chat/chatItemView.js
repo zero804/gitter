@@ -112,7 +112,7 @@ define([
       // var links = this.model.get('urls') || [];
       // var mentions = this.model.get('mentions') || [];
       var issues = [];
-      if(context().troupe.githubType === 'REPO') {
+      if(context.troupe().get('githubType') === 'REPO') {
         issues = this.model.get('issues') || [];
       }
 
