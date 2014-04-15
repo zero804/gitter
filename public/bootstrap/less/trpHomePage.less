@@ -12,8 +12,8 @@ body {
 
 h1 {
   font-family: 'Open Sans';
-  font-weight: 300;
-  font-size: 48px;
+  font-weight: 400;
+  font-size: 62px;
   @media @mobile {
     font-size: 30px;
   }
@@ -39,6 +39,13 @@ img {
   max-width: 100%;
   border: 0;
   -ms-interpolation-mode: bicubic;
+}
+
+.arrow {
+  font-size: 46px;
+  vertical-align: middle;
+  margin-left: 20px;
+  color: @trpGreen;
 }
 
 .avatar {
@@ -69,18 +76,51 @@ img {
   padding-top: 20px; 
   background-color: #eee; 
   height: 800px;
-  background-image: url("../../images/2/gitter/laptop-darker.jpg");
+  background-image: url("../../images/2/gitter/background-stars-flipped@2x.jpg");
   @media @mobile {
     height: 620px;
   }
   @media @retina {
-    background-image: url("../../images/2/gitter/laptop-smaller@2x.jpg");
+    background-image: url("../../images/2/gitter/background-stars-flipped@2x.jpg");
+  }
+}
+
+.client-logo {
+  margin-right: 50px;
+  vertical-align: middle;
+}
+
+.os-container {
+  background-size: cover; 
+  padding-top: 20px; 
+  background-color: #eee; 
+  height: 800px;
+  background-image: url("../../images/2/gitter/background-code@2x.jpg");
+  @media @mobile {
+    height: 620px;
+  }
+  @media @retina {
+    background-image: url("../../images/2/gitter/background-code@2x.jpg");
+  }
+}
+
+.work-container {
+  background-size: cover; 
+  padding-top: 20px; 
+  background-color: #eee; 
+  height: 800px;
+  background-image: url("../../images/2/gitter/home-hero-image5.jpg");
+  @media @mobile {
+    height: 620px;
+  }
+  @media @retina {
+    background-image: url("../../images/2/gitter/home-hero-image5.jpg");
   }
 }
 
 .hero {
   display: inline-block; 
-  margin-top: 120px;
+  margin-top: 200px;
   @media @mobile {
     margin-top: 40px;
   }
@@ -113,6 +153,15 @@ img {
 
 .circle.other {
   background-color: #A95A31;
+}
+
+.menu-container {
+  text-align: center;
+  position: fixed;
+  top: 10px;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
 }
 
 .container {
@@ -158,7 +207,7 @@ img {
 
 .strip {
   width: 100%;
-  max-width: 900px;
+  max-width: 1200px;
   display: inline-block;
   font-family: 'Open Sans';
   font-weight: 300;
