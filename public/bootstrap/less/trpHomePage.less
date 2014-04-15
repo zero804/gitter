@@ -13,7 +13,7 @@ body {
 h1 {
   font-family: 'Open Sans';
   font-weight: 300;
-  font-size: 42px;
+  font-size: 48px;
   @media @mobile {
     font-size: 30px;
   }
@@ -28,7 +28,8 @@ h2 {
 h3 {
   font-weight: 300;
   font-family: 'Open Sans';
-  font-size: 16px;
+  font-size: 16
+  px;
     @media @mobile {
       font-size: 14px;
   }
@@ -40,13 +41,35 @@ img {
   -ms-interpolation-mode: bicubic;
 }
 
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 3px;
+  float: left;
+  margin-top: 2px;
+}
+
+.chat-item {
+  margin: 10px 0;
+}
+
+.chat-text {
+  margin-left: 50px;
+  font-size: 0.9em;
+}
+
+.chat-from {
+  margin-left: 50px;
+  font-size: 0.9em;
+  font-weight: bold;
+}
 
 .hero-container {
   background-size: cover; 
   padding-top: 20px; 
   background-color: #eee; 
   height: 800px;
-  background-image: url("../../images/2/gitter/laptop-smaller.jpg");
+  background-image: url("../../images/2/gitter/laptop-darker.jpg");
   @media @mobile {
     height: 620px;
   }
@@ -57,7 +80,7 @@ img {
 
 .hero {
   display: inline-block; 
-  margin-top: 180px;
+  margin-top: 120px;
   @media @mobile {
     margin-top: 40px;
   }
@@ -98,12 +121,13 @@ img {
 
 .logo-container {
   float: left;
-  background-image: url('../../images/2/gitter/logo-text-white-64.png');
-  width: 196px;
-  height: 64px;
+  background-image: url('../../images/2/gitter/logo-text-green.png');
+  width: 160px;
+  height: 32px;
+  margin-top: 20px;
 
   @media @retina {
-    background-image: url('../../images/2/gitter/logo-text-white-64@2x.png');
+    background-image: url('../../images/2/gitter/logo-text-green@2x.png');
     background-size: contain;
   }
 
@@ -112,6 +136,7 @@ img {
 .signup-container {
   float: right;
   font-size: 14px; 
+  margin-top: 10px;
   letter-spacing: 0.5px;
   @media @mobile {
     width: 100%;
