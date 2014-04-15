@@ -54,6 +54,7 @@ define([
   });
 
   var TitleView = Backbone.View.extend({
+    className: 'commit-popover-title',
     initialize: function() {
       this.listenTo(this.model, 'change', this.render);
     },
