@@ -8,7 +8,47 @@ var restSerializer = require('../../serializers/rest-serializer');
 var contextGenerator = require('../../web/context-generator');
 var Q = require('q');
 
-module.exports = [
+exports.datesList = [
+  appMiddleware.uriContextResolverMiddleware,
+  function(req, res, next) {
+
+    if(req.uriContext.troupe.security !== 'PUBLIC') {
+      // For now, archives for public rooms only
+      return next(403);
+    }
+
+    var troupe = req.uriContext.troupe;
+    var troupeId = troupe.id;
+
+    return chatService.findDatesForChatMessages(troupeId)
+      .then(function(dates) {
+        var datesList = dates.map(function(d) {
+          return {
+            formattedDate: d.format('YYYY-MM-DD'),
+            archiveLink: '/' + troupe.uri + '/archives/' + d.format('YYYY') + '/' + d.format('MM') + '/' + d.format('DD'),
+          };
+        });
+
+        var githubLink;
+        if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
+          githubLink = 'https://github.com/' + req.uriContext.uri;
+        }
+
+        res.render('chat-archive-dates-template', {
+          layout: 'archive',
+          isRepo: troupe.githubType === 'REPO',
+          bootScriptName: 'router-archive-chat',
+          githubLink: githubLink,
+          troupeName: req.uriContext.uri,
+          dates: datesList
+        });
+
+      })
+      .fail(next);
+  }
+];
+
+exports.chatArchive = [
   appMiddleware.uriContextResolverMiddleware,
   function(req, res, next) {
 

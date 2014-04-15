@@ -10,6 +10,9 @@ var unsafeHtml    = require('../utils/unsafe-html');
 var processChat   = require('../utils/process-chat');
 var appEvents     = require('../app-events');
 var Q             = require('q');
+var mongoUtils    = require('../utils/mongo-utils');
+var moment        = require('moment');
+
 /*
  * Hey Trouper!
  * Bump the version if you modify the behaviour of TwitterText.
@@ -223,4 +226,42 @@ exports.findChatMessagesForTroupeForDateRange = function(troupeId, startDate, en
       return results.map(massageMessages);
     })
     .nodeify(callback);
+};
+
+exports.findDatesForChatMessages = function(troupeId, callback) {
+  return persistence.ChatMessage.aggregateQ([
+    { $match: { toTroupeId: mongoUtils.asObjectID(troupeId) } },
+    { $project: {
+        _id: 0,
+        sent: 1
+      }
+    },
+    { $group: {
+        _id: 1,
+        dates: {
+          $addToSet: {
+            $add: [
+              { $multiply: [{ $year: '$sent' }, 10000] },
+              { $multiply: [{ $month: '$sent' }, 100] },
+              { $dayOfMonth: '$sent' }
+            ]
+          }
+        }
+      }
+    },
+    { $project: {
+        _id: 0,
+        dates: 1
+      }
+    },
+    {
+      $unwind: "$dates"
+    }
+  ])
+  .then(function(dates) {
+    return dates.map(function(d) {
+      return moment.utc("" + d.dates,  "YYYYMMDD");
+    });
+  })
+  .nodeify(callback);
 };
