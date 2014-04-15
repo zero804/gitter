@@ -4,6 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no"/>
 <link id="favicon" rel="shortcut icon" href='{{cdn "images/2/gitter/favicon5.png" }}'>
 <link rel="stylesheet" href='{{cdn "bootstrap/css/trpHomePage.css" }}'>
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 <title>Gitter - Chat, for GitHub</title>
     {{>require_wrapper}}
 
@@ -13,38 +14,118 @@
 </head>
 
 <body>
-  <div class="outer-container" style="">
-    <div class="container hero-container">
-      <div class="strip" style="text-align: left;">
-        <div class="logo-container"></div>
-        <div class="signup-container">
-          <div style="font-size: 14px; letter-spacing: 0.5px">
-             <a href="#features" class="button scroll-link text" id="about" style="text-decoration: none; color: white;" >Features</a>
-            <a href="#pricing" class="button scroll-link text" id="about" style="text-decoration: none; color: white;" >Pricing</a>
-            <a target="_top" href="/login/github?action=login" class="button blur" id="login" style="text-decoration: none; color: white; margin-left: 20px">Login with GitHub</a>
-          </div>
+  <div class="menu-container" style="">
+    <div class="strip" style="text-align: left;">
+      <div class="logo-container"></div>
+      <div class="signup-container">
+        <div style="font-size: 14px; letter-spacing: 0.5px">
+           <a href="#features" class="button scroll-link text" id="about" style="text-decoration: none; color: white;" >Features</a>
+          <a href="#pricing" class="button scroll-link text" id="about" style="text-decoration: none; color: white;" >Pricing</a>
+          <a target="_top" href="/login/github?action=login" class="button blur" id="login" style="text-decoration: none; color: white; margin-left: 20px">Login with GitHub</a>
         </div>
       </div>
-      <Br><br>
-      <div>
-        <div class="strip" style="color:white; text-shadow: 0 0 0 transparent,1px 1px 2px rgba(0,0,0,0.2); text-align: left">
-          <div class="hero">
-            <div style="display: inline-block; margin-bottom: 10px">
-              <h1 style="margin-top: 0">Better communication, <br>better products.</h1>
-            </div>
-            <div style="letter-spacing: 0.05em; font-size: 1.3em">
-              Free public chat rooms for open source projects.<br>
-              Private chat rooms for your company or team.
-            </div>
-          </div>
-        </div>
-        <br>
-        <div class="strip" style="text-align: left; margin-top: 44px">
-          <a href="/login/github?action=signup&button=1" class="button green" id="signup1" style="text-decoration: none; color: white">Sign up with GitHub</a>
-        </div>
-      </div>
-      <!-- <div class="strip"><img src="{{ cdn "images/2/gitter/screenshot-small.png" }}" width="920" style="border-radius: 2px 2px 0 0"></div> -->
     </div>
+  </div>
+  <div id="carousel">
+      <div class="outer-container" style="display: block; float: left;">
+        <div class="container hero-container">
+          <div id="first">
+            <div class="strip" style="color:white; text-shadow: 0 0 0 transparent,1px 1px 2px rgba(0,0,0,0.2); text-align: left">
+              <div class="hero">
+                <div style="display: inline-block; margin-bottom: 10px">
+                  <h1 style="margin-top: 0">Less email.<br>More awesome.</h1>
+                </div>
+                <div style="letter-spacing: 0.05em; font-size: 1.3em">
+                  Inbox zero starts here. Find out how Gitter can work for you. <i class="fa fa-chevron-right arrow next" id="next"></i>
+                </div>
+              </div>
+            </div>
+            <br>
+            <div class="strip" style="text-align: left; margin-top: 44px">
+              <a href="/login/github?action=signup&button=1" class="button green" id="signup1" style="text-decoration: none; color: white">Sign up with GitHub</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="outer-container" style="display: block; float: left;">
+        <div class="container os-container">
+          <div id="second">
+            <div class="strip" style="color:white; text-shadow: 0 0 0 transparent,1px 1px 2px rgba(0,0,0,0.2); text-align: left">
+              <div class="hero" style="width:100%">
+                <div style="display:inline-block">
+                  <div style="display: inline-block; margin-bottom: 10px">
+                    <h1 style="margin-top: 0">Building stronger<br>communities</h1>
+                  </div>
+                  <div style="letter-spacing: 0.05em; font-size: 1.3em">
+                    Gitter provides free public chat rooms<br> for open source projects. <br>
+                    <br>
+                    Find out more about Gitter for your business.
+                     <i class="fa fa-chevron-right arrow next" id="next"></i>
+                  </div>
+                </div>
+                <div style="display: inline-block; max-width: 400px; max-height: 400px; overflow: hidden; float: right">
+                  <h2>Live from angular/angular.js</h2>
+                  <div class="chat-item">
+                    <img src="https://avatars.githubusercontent.com/u/15655" class="avatar">
+                    <div class="chat-from">petebacondarwin</div>
+                    <div class="chat-text">I agree we should go with form submit raising the $flushInputs event by default and wait and see if people come up with a good reason to add a disable feature - in which case it would be an attribute of form or property on FormController.</div>
+                  </div>
+                  <div class="chat-item">
+                    <img src="https://avatars.githubusercontent.com/u/1764161" class="avatar">
+                    <div class="chat-from">shahata</div>
+                    <div class="chat-text">for textInputType the $$phase test was already there. do you have any idea why?</div>
+                  </div>
+                  <div class="chat-item">
+                    <img src="https://avatars.githubusercontent.com/u/1764161" class="avatar">
+                    <div class="chat-from">shahata</div>
+                    <div class="chat-text">found the reason: angular/angular.js#5293</div>
+                  </div>
+                  <div class="chat-item">
+                    <img src="https://avatars.githubusercontent.com/u/1764161" class="avatar">
+                    <div class="chat-from">shahata</div>
+                    <div class="chat-text">for textInputType the $$phase test was already there. do you have any idea why?</div>
+                  </div>
+                  <div class="chat-item">
+                    <img src="https://avatars.githubusercontent.com/u/15655" class="avatar">
+                    <div class="chat-from">petebacondarwin</div>
+                    <div class="chat-text">hmmm, not pretty</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <br>
+          <div class="strip" style="text-align: left; margin-top: 44px">
+            <a href="/login/github?action=signup&button=1" class="button green" id="signup1" style="text-decoration: none; color: white">Sign up with GitHub</a>
+          </div>
+        </div>
+      </div>
+      <div class="outer-container" style="display: block; float: left;">
+        <div class="container work-container">
+          <div id="first">
+            <div class="strip" style="color:white; text-shadow: 0 0 0 transparent,1px 1px 2px rgba(0,0,0,0.2); text-align: left">
+              <div class="hero">
+                <div style="display: inline-block; margin-bottom: 10px">
+                  <h1 style="margin-top: 0">Gitter at work</h1>
+                </div>
+                <div style="letter-spacing: 0.05em; font-size: 1.3em">
+                  Spend less time in your Inbox and more time discussing stuff that matters. <br>
+                  <div style="margin-top: 40px">
+                    <img src="{{ cdn "images/2/gitter/logo-flatiron.png" }}" width="100" class="client-logo"><img class="client-logo" src="{{ cdn "images/2/gitter/logo-storify.png" }}" width="100"><img class="client-logo" src="{{ cdn "images/2/gitter/logo-revolt.png" }}" width="100">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <br>
+            <div class="strip" style="text-align: left; margin-top: 44px">
+              <a href="/login/github?action=signup&button=1" class="button green" id="signup1" style="text-decoration: none; color: white">Sign up with GitHub</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
     <div class="container" style="background-color: #eee; padding-bottom: 20px" >
       <div class="strip feature">
