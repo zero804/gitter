@@ -317,13 +317,17 @@ var TroupeSchema = new Schema({
   users: [TroupeUserSchema],
   parentId: { type: ObjectId, required: false },
   ownerUserId: { type: ObjectId, required: false }, // For channels under a user /suprememoocow/custom
-  security: { type: String, 'enum': ['PRIVATE', 'PUBLIC', 'INHERITED'], required: false }, // For REPO_CHANNEL, ORG_CHANNEL, USER_CHANNEL
+  security: { type: String, /* WARNING: validation bug in mongo 'enum': ['PRIVATE', 'PUBLIC', 'INHERITED'], required: false */ }, // For REPO_CHANNEL, ORG_CHANNEL, USER_CHANNEL
   dateDeleted: { type: Date },
   dateLastSecurityCheck: { type: Date },
   _nonce: { type: Number },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 TroupeSchema.schemaTypeName = 'TroupeSchema';
+
+TroupeSchema.path('security').validate(function (value) {
+  return !value || value === 'PRIVATE' || value === 'PUBLIC' || value === 'INHERITED';
+}, 'Invalid security');
 
 // Ideally we should never search against URI, only lcURI
 TroupeSchema.index({ uri: 1 }, { unique: true, sparse: true });
