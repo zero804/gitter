@@ -28,7 +28,6 @@ function installApi() {
 
       return oauthService.validateAccessTokenAndClient(accessToken)
         .then(function(tokenInfo) {
-          return done();
           // Token not found
           if(!tokenInfo) return done();
 
