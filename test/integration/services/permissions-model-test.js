@@ -40,6 +40,39 @@ describe('permissions-model', function() {
     var security = null;
     var uri = 'x';
 
+    describe('view', function() {
+      var right = 'view';
+
+      it('should allow', function(done) {
+
+        mockito.when(orgMemberMethodMock)().then(function(org) {
+          assert.equal(org, uri);
+          return Q.resolve(true);
+        });
+
+        return permissionsModel(user, right, uri, roomType, security)
+          .then(function(granted) {
+            assert(granted);
+          })
+          .nodeify(done);
+      });
+
+      it('should deny', function(done) {
+
+        mockito.when(orgMemberMethodMock)().then(function(org) {
+          assert.equal(org, uri);
+          return Q.resolve(false);
+        });
+
+        return permissionsModel(user, right, uri, roomType, security)
+          .then(function(granted) {
+            assert(!granted);
+          })
+          .nodeify(done);
+      });
+
+    });
+
     describe('join', function() {
       var right = 'join';
 
@@ -174,188 +207,443 @@ describe('permissions-model', function() {
   describe('REPOs', function() {
 
     var roomType = 'REPO';
-    var security = null;
     var uri = 'x/y';
 
-    describe('join', function() {
-      var right = 'join';
+    describe('PRIVATE', function() {
+      var security = 'PRIVATE';
 
-      it('should allow', function(done) {
+      describe('view', function() {
+        var right = 'view';
 
-        mockito.when(getRepoMethodMock)().then(function(repo) {
-          assert.equal(repo, uri);
-          return Q.resolve(true);
+        it('should allow', function(done) {
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve(true);
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(granted);
+            })
+            .nodeify(done);
         });
 
-        return permissionsModel(user, right, uri, roomType, security)
-          .then(function(granted) {
-            assert(granted);
-          })
-          .nodeify(done);
-      });
+        it('should deny', function(done) {
 
-      it('should deny', function(done) {
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve(false);
+          });
 
-        mockito.when(getRepoMethodMock)().then(function(repo) {
-          assert.equal(repo, uri);
-          return Q.resolve(false);
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(!granted);
+            })
+            .nodeify(done);
         });
 
-        return permissionsModel(user, right, uri, roomType, security)
-          .then(function(granted) {
-            assert(!granted);
-          })
-          .nodeify(done);
       });
 
+      describe('join', function() {
+        var right = 'join';
+
+        it('should allow', function(done) {
+
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve(true);
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(granted);
+            })
+            .nodeify(done);
+        });
+
+        it('should deny', function(done) {
+
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve(false);
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(!granted);
+            })
+            .nodeify(done);
+        });
+
+      });
+
+      describe('adduser', function() {
+        var right = 'adduser';
+
+        it('should allow', function(done) {
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve(true);
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(granted);
+            })
+            .nodeify(done);
+        });
+
+        it('should deny', function(done) {
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve(false);
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(!granted);
+            })
+            .nodeify(done);
+        });
+
+      });
+
+
+      describe('create', function() {
+        var right = 'create';
+
+        it('should allow people with push access', function(done) {
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve({ permissions: { push: true } });
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(granted);
+            })
+            .nodeify(done);
+        });
+
+        it('should allow people with admin access', function(done) {
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve({ permissions: { admin: true } });
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(granted);
+            })
+            .nodeify(done);
+        });
+
+
+        it('should deny people with pull access only', function(done) {
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve({ permissions: { pull: true } });
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(!granted);
+            })
+            .nodeify(done);
+        });
+
+
+        it('should deny people who cant see the room', function(done) {
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve();
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(!granted);
+            })
+            .nodeify(done);
+        });
+
+      });
+
+      describe('admin', function() {
+        var right = 'admin';
+
+        it('should allow people with push access', function(done) {
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve({ permissions: { push: true } });
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(granted);
+            })
+            .nodeify(done);
+        });
+
+        it('should allow people with admin access', function(done) {
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve({ permissions: { admin: true } });
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(granted);
+            })
+            .nodeify(done);
+        });
+
+
+        it('should deny people with pull access only', function(done) {
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve({ permissions: { pull: true } });
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(!granted);
+            })
+            .nodeify(done);
+        });
+
+
+        it('should deny people who cant see the room', function(done) {
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve();
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(!granted);
+            })
+            .nodeify(done);
+        });
+
+      });
     });
 
-    describe('adduser', function() {
-      var right = 'adduser';
+    describe('PUBLIC', function() {
+      var security = 'PUBLIC';
 
-      it('should allow', function(done) {
-        mockito.when(getRepoMethodMock)().then(function(repo) {
-          assert.equal(repo, uri);
-          return Q.resolve(true);
+      describe('view', function() {
+        var right = 'view';
+
+        it('should allow', function(done) {
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve(true);
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(granted);
+            })
+            .nodeify(done);
         });
 
-        return permissionsModel(user, right, uri, roomType, security)
-          .then(function(granted) {
-            assert(granted);
-          })
-          .nodeify(done);
+        it('should allow when the user cant see the repo', function(done) {
+
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve(false);
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(granted);
+            })
+            .nodeify(done);
+        });
+
       });
 
-      it('should deny', function(done) {
-        mockito.when(getRepoMethodMock)().then(function(repo) {
-          assert.equal(repo, uri);
-          return Q.resolve(false);
+      describe('join', function() {
+        var right = 'join';
+
+        it('should allow', function(done) {
+
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve(true);
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(granted);
+            })
+            .nodeify(done);
         });
 
-        return permissionsModel(user, right, uri, roomType, security)
-          .then(function(granted) {
-            assert(!granted);
-          })
-          .nodeify(done);
+        it('should deny', function(done) {
+
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve(false);
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(!granted);
+            })
+            .nodeify(done);
+        });
+
       });
 
-    });
+      describe('adduser', function() {
+        var right = 'adduser';
 
+        it('should allow', function(done) {
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve(true);
+          });
 
-    describe('create', function() {
-      var right = 'create';
-
-      it('should allow people with push access', function(done) {
-        mockito.when(getRepoMethodMock)().then(function(repo) {
-          assert.equal(repo, uri);
-          return Q.resolve({ permissions: { push: true } });
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(granted);
+            })
+            .nodeify(done);
         });
 
-        return permissionsModel(user, right, uri, roomType, security)
-          .then(function(granted) {
-            assert(granted);
-          })
-          .nodeify(done);
-      });
+        it('should deny', function(done) {
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve(false);
+          });
 
-      it('should allow people with admin access', function(done) {
-        mockito.when(getRepoMethodMock)().then(function(repo) {
-          assert.equal(repo, uri);
-          return Q.resolve({ permissions: { admin: true } });
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(!granted);
+            })
+            .nodeify(done);
         });
 
-        return permissionsModel(user, right, uri, roomType, security)
-          .then(function(granted) {
-            assert(granted);
-          })
-          .nodeify(done);
-      });
-
-
-      it('should deny people with pull access only', function(done) {
-        mockito.when(getRepoMethodMock)().then(function(repo) {
-          assert.equal(repo, uri);
-          return Q.resolve({ permissions: { pull: true } });
-        });
-
-        return permissionsModel(user, right, uri, roomType, security)
-          .then(function(granted) {
-            assert(!granted);
-          })
-          .nodeify(done);
-      });
-
-
-      it('should deny people who cant see the room', function(done) {
-        mockito.when(getRepoMethodMock)().then(function(repo) {
-          assert.equal(repo, uri);
-          return Q.resolve();
-        });
-
-        return permissionsModel(user, right, uri, roomType, security)
-          .then(function(granted) {
-            assert(!granted);
-          })
-          .nodeify(done);
-      });
-
-    });
-
-    describe('admin', function() {
-      var right = 'admin';
-
-      it('should allow people with push access', function(done) {
-        mockito.when(getRepoMethodMock)().then(function(repo) {
-          assert.equal(repo, uri);
-          return Q.resolve({ permissions: { push: true } });
-        });
-
-        return permissionsModel(user, right, uri, roomType, security)
-          .then(function(granted) {
-            assert(granted);
-          })
-          .nodeify(done);
-      });
-
-      it('should allow people with admin access', function(done) {
-        mockito.when(getRepoMethodMock)().then(function(repo) {
-          assert.equal(repo, uri);
-          return Q.resolve({ permissions: { admin: true } });
-        });
-
-        return permissionsModel(user, right, uri, roomType, security)
-          .then(function(granted) {
-            assert(granted);
-          })
-          .nodeify(done);
       });
 
 
-      it('should deny people with pull access only', function(done) {
-        mockito.when(getRepoMethodMock)().then(function(repo) {
-          assert.equal(repo, uri);
-          return Q.resolve({ permissions: { pull: true } });
+      describe('create', function() {
+        var right = 'create';
+
+        it('should allow people with push access', function(done) {
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve({ permissions: { push: true } });
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(granted);
+            })
+            .nodeify(done);
         });
 
-        return permissionsModel(user, right, uri, roomType, security)
-          .then(function(granted) {
-            assert(!granted);
-          })
-          .nodeify(done);
+        it('should allow people with admin access', function(done) {
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve({ permissions: { admin: true } });
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(granted);
+            })
+            .nodeify(done);
+        });
+
+
+        it('should deny people with pull access only', function(done) {
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve({ permissions: { pull: true } });
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(!granted);
+            })
+            .nodeify(done);
+        });
+
+
+        it('should deny people who cant see the room', function(done) {
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve();
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(!granted);
+            })
+            .nodeify(done);
+        });
+
       });
 
+      describe('admin', function() {
+        var right = 'admin';
 
-      it('should deny people who cant see the room', function(done) {
-        mockito.when(getRepoMethodMock)().then(function(repo) {
-          assert.equal(repo, uri);
-          return Q.resolve();
+        it('should allow people with push access', function(done) {
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve({ permissions: { push: true } });
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(granted);
+            })
+            .nodeify(done);
         });
 
-        return permissionsModel(user, right, uri, roomType, security)
-          .then(function(granted) {
-            assert(!granted);
-          })
-          .nodeify(done);
+        it('should allow people with admin access', function(done) {
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve({ permissions: { admin: true } });
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(granted);
+            })
+            .nodeify(done);
+        });
+
+
+        it('should deny people with pull access only', function(done) {
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve({ permissions: { pull: true } });
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(!granted);
+            })
+            .nodeify(done);
+        });
+
+
+        it('should deny people who cant see the room', function(done) {
+          mockito.when(getRepoMethodMock)().then(function(repo) {
+            assert.equal(repo, uri);
+            return Q.resolve();
+          });
+
+          return permissionsModel(user, right, uri, roomType, security)
+            .then(function(granted) {
+              assert(!granted);
+            })
+            .nodeify(done);
+        });
+
       });
 
     });
