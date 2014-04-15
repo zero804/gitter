@@ -69,7 +69,11 @@ exports.recordItemsAsRead = function(userId, troupeId, items, callback) {
 
       assert(mongoUtils.isLikeObjectId(id));
       assert(mongoUtils.isLikeObjectId(userId));
-      batcher.add('chat:' + troupeId + ':' + id, userId, d.makeNodeResolver());
+
+      var idSerialized = mongoUtils.serializeObjectId(id);
+      var userIdSerialized = mongoUtils.serializeObjectId(userId);
+
+      batcher.add('chat:' + troupeId + ':' + idSerialized, userIdSerialized, d.makeNodeResolver());
 
       return d.promise;
     }));
