@@ -139,7 +139,8 @@ define([
         extra.wiki_url = payload.pages[0].html_url;
         extra.wiki_page = payload.pages[0].page_name;
       } else if (meta.event === 'commit_comment') {
-        extra.commit = {
+        // fall back to payload data for old hooks
+        extra.commit = meta.commit || {
           id: payload.comment.commit_id,
           short_sha: payload.comment.commit_id.substring(0,7),
         };
