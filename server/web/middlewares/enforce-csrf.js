@@ -1,15 +1,14 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 'use strict';
 
-var winston = require('../utils/winston');
-var oauthService = require('../services/oauth-service');
+var winston = require('../../utils/winston');
 
 module.exports = function(req, res, next) {
-  // ignore these methods, they shouldnt alter state
-  if('GET' == req.method || 'HEAD' == req.method || 'OPTIONS' == req.method) return next();
-
   /* OAuth clients have req.authInfo. Aways let them through */
   if(req.authInfo) return next();
+
+  // ignore these methods, they shouldnt alter state
+  if('GET' == req.method || 'HEAD' == req.method || 'OPTIONS' == req.method) return next();
 
   if(isInWhitelist(req)) {
     winston.verbose('skipping csrf check for ' + req.path);
@@ -22,31 +21,13 @@ module.exports = function(req, res, next) {
     return next(403);
   }
 
-  if(req.session.accessToken && req.session.accessToken !== clientToken) {
+  if(req.session.accessToken !== clientToken) {
     winston.warn('csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they presented an illegal token');
     return next(403);
   }
 
-  if(!req.user) {
-    winston.warn('csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they are not logged in');
-    return next(403);
-  }
-
-  return oauthService.findOrGenerateWebToken(req.user.id)
-    .then(function(serverToken) {
-      req.session.accessToken = serverToken;
-
-      if(clientToken !== serverToken) {
-        winston.warn('csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they presented an illegal token');
-        throw 403;
-      }
-    }).nodeify(next);
+  return next();
 };
-
-function hasBearerTokenHeader(req) {
-  var authHeader = req.headers.authorization;
-  return authHeader && authHeader.split(' ')[0] === 'Bearer';
-}
 
 function isInWhitelist(req) {
          // webhooks handler doesnt send a token, but the uri is hard to guess

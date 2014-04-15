@@ -31,6 +31,9 @@ function installApi() {
           // Token not found
           if(!tokenInfo) return done();
 
+          // Anonymous tokens cannot be used for Bearer tokens
+          if(!tokenInfo.user) return done();
+
           var user = tokenInfo.user;
           var client = tokenInfo.client;
           // Not yet needed var accessToken = tokenInfo.accessToken;
@@ -129,6 +132,9 @@ function install() {
               // Login
               req.logIn(user, function(err) {
                 if (err) { return done(err); }
+
+                // Remove the old token for this user
+                if(req.session) req.session.accessToken = null;
                 return done(null, user);
               });
 

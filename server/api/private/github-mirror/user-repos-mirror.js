@@ -4,8 +4,6 @@
 var Mirror      = require("../../../services/github/github-mirror-service")('repo');
 
 module.exports = function(req, res, next) {
-  if(!req.user) return next(401);
-
   var githubUri = 'user/repos';
   var mirror = new Mirror(req.user);
 

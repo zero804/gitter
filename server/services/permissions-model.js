@@ -3,7 +3,6 @@
 
 var GitHubRepoService  = require('./github/github-repo-service');
 var GitHubOrgService   = require('./github/github-org-service');
-var assert             = require("assert");
 var winston            = require('../utils/winston');
 var Q                  = require('q');
 var userIsInRoom       = require('./user-in-room');
@@ -15,11 +14,16 @@ var appEvents          = require('../app-events');
 function repoPermissionsModel(user, right, uri, security) {
   // Security can be null for old repos
   if(security && (security !== 'PRIVATE' && security !== 'PUBLIC')) {
-    assert('Unknown repo security: ' + security);
+    return Q.reject(new Error('Unknown repo security: ' + security));
   }
 
-  // For now, only authenticated users can be members of orgs
-  if(!user) return false;
+  // Anyone can view a public repo
+  if(right === 'view' && security === 'PUBLIC') {
+    return Q.resolve(true);
+  }
+
+  // The only thing an unloggedin user can do is view a public repo
+  if(!user) return Q.resolve(false);
 
   var repoService = new GitHubRepoService(user);
   return repoService.getRepo(uri)
@@ -46,7 +50,7 @@ function repoPermissionsModel(user, right, uri, security) {
       }
 
       /* Want to join and can see the repo? Go ahead! */
-      if(right === 'join') return true;
+      if(right === 'join' || right === 'view') return true;
 
       var perms = repoInfo.permissions;
       var isAdmin = perms && (perms.push || perms.admin);
@@ -73,10 +77,12 @@ function repoPermissionsModel(user, right, uri, security) {
  */
 function orgPermissionsModel(user, right, uri, security) {
   // Security is only for child rooms
-  assert(!security);
+  if(security) {
+    return Q.reject(new Error('orgs do not have security'));
+  }
 
   // For now, only authenticated users can be members of orgs
-  if(!user) return false;
+  if(!user) return Q.resolve(false);
 
   var ghOrg = new GitHubOrgService(user);
   return ghOrg.member(uri, user.username)
@@ -88,6 +94,7 @@ function orgPermissionsModel(user, right, uri, security) {
       }
 
       switch(right) {
+        case 'view':
         case 'create':
         case 'admin':
         case 'join':
@@ -107,12 +114,15 @@ function orgPermissionsModel(user, right, uri, security) {
  */
 function oneToOnePermissionsModel(user, right, uri, security) {
   // Security is only for child rooms
-  assert(!security);
+  if(security) {
+    return Q.reject(new Error('oneToOnes do not have security'));
+  }
 
   // For now, only authenticated users can be in onetoones
   if(!user) return Q.resolve(false);
 
   switch(right) {
+    case 'view':
     case 'create':
     case 'join':
       return Q.resolve(true);
@@ -131,11 +141,23 @@ function oneToOnePermissionsModel(user, right, uri, security) {
  * ORG_CHANNEL permissions model
  */
 function orgChannelPermissionsModel(user, right, uri, security) {
-  assert({ 'PRIVATE': 1, 'PUBLIC': 1, 'INHERITED': 1}.hasOwnProperty(security), 'Invalid security type:' + security);
+  if(!{ PRIVATE: 1, PUBLIC: 1, INHERITED: 1 }.hasOwnProperty(security)) {
+    return Q.reject(new Error('Invalid security type:' + security));
+  }
+
+  // Anyone can view a public org channel
+  if(right === 'view' && security === 'PUBLIC') {
+    return Q.resolve(true);
+  }
+
+  // No unauthenticated past this point
+  if(!user) return Q.resolve(false);
+
   var orgUri = uri.split('/').slice(0, -1).join('/');
 
   switch(right) {
     case 'join':
+    case 'view':
       switch(security) {
         case 'PUBLIC': return Q.resolve(true);
         case 'PRIVATE': return userIsInRoom(uri, user);
@@ -184,12 +206,23 @@ function orgChannelPermissionsModel(user, right, uri, security) {
  * REPO_CHANNEL permissions model
  */
 function repoChannelPermissionsModel(user, right, uri, security) {
-  assert({ 'PRIVATE': 1, 'PUBLIC': 1, 'INHERITED': 1}.hasOwnProperty(security), 'Invalid security type:' + security);
+  if(!{ PRIVATE: 1, PUBLIC: 1, INHERITED: 1 }.hasOwnProperty(security)) {
+    return Q.reject(new Error('Invalid security type:' + security));
+  }
+
+  // Anyone can view a public repo channel
+  if(right === 'view' && security === 'PUBLIC') {
+    return Q.resolve(true);
+  }
+
+  // No unauthenticated past this point
+  if(!user) return Q.resolve(false);
 
   var repoUri = uri.split('/').slice(0, -1).join('/');
 
   switch(right) {
     case 'join':
+    case 'view':
       switch(security) {
         case 'PUBLIC': return Q.resolve(true);
         case 'PRIVATE':
@@ -241,12 +274,23 @@ function repoChannelPermissionsModel(user, right, uri, security) {
  * USER_CHANNEL permissions model
  */
 function userChannelPermissionsModel(user, right, uri, security) {
-  assert({ 'PRIVATE': 1, 'PUBLIC': 1 }.hasOwnProperty(security), 'Invalid security type:' + security);
+  if(!{ PRIVATE: 1, PUBLIC: 1 }.hasOwnProperty(security)) {
+    return Q.reject(new Error('Invalid security type:' + security));
+  }
+
+  // Anyone can view a public repo channel
+  if(right === 'view' && security === 'PUBLIC') {
+    return Q.resolve(true);
+  }
+
+  // No unauthenticated past this point
+  if(!user) return Q.resolve(false);
 
   var userUri = uri.split('/').slice(0, -1).join('/');
 
   switch(right) {
     case 'join':
+    case 'view':
       switch(security) {
         case 'PUBLIC': return Q.resolve(true);
         case 'PRIVATE':
@@ -285,10 +329,14 @@ function permissionsModel(user, right, uri, roomType, security) {
     return x;
   }
 
-  assert(user, 'user required');
-  assert(right, 'right required');
-  assert(right === 'create' || right === 'join' || right === 'admin' || right === 'adduser', 'Invalid right ' + right);
-  assert(roomType, 'roomType required');
+
+  if(!right) return Q.reject(new Error('right required'));
+
+  if(!{ create: 1, join: 1, admin: 1, adduser: 1, view: 1 }.hasOwnProperty(right)) {
+    return Q.reject(new Error('Invalid right:' + right));
+  }
+
+  if(!roomType) return Q.reject(new Error('roomType required'));
 
   var submodel = {
     'REPO': repoPermissionsModel,
@@ -300,17 +348,16 @@ function permissionsModel(user, right, uri, roomType, security) {
   }[roomType];
 
   if(!submodel) {
-    assert(false, 'Invalid roomType ' + roomType);
-    throw 500;
+    return Q.reject(new Error('Invalid roomType ' + roomType));
   }
 
-  if(roomType !== 'ONETOONE') {
+
+  if(roomType !== 'ONETOONE' && !uri) {
     // For now uri can be null for one to one
     // This will need to be fixed before we handle
     // more fine grained permissions
-    assert(uri, 'uri required');
+    return Q.reject(new Error('uri required'));
   }
-
 
   return submodel(user, right, uri, security)
     .then(log)
@@ -318,7 +365,8 @@ function permissionsModel(user, right, uri, roomType, security) {
       if(err.gitterAction === 'logout_destroy_user_tokens') {
         winston.warn('User tokens have been revoked. Destroying tokens');
         user.destroyTokens();
-        return user.saveQ().thenResolve(false);
+        return user.saveQ()
+          .thenResolve(false);
       }
 
       throw err;

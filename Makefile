@@ -205,6 +205,12 @@ search-js-console:
 		exit 1; \
 	fi
 
+	if (find public/js -name "*.js" ! -path "*libs*" |xargs grep -q '\bcontext..\.troupe'); then \
+		echo context\(\).troupe references in code. Use context.troupe.get\('X'\); \
+		find public/js -name "*.js" ! -path "*libs*" |xargs grep '\bcontext..\.troupe'; \
+		exit 1; \
+	fi
+
 validate-source: search-js-console
 
 continuous-integration: clean validate-source npm grunt security-check version-files upgrade-data reset-test-data test-xunit test-coverage tarball

@@ -67,7 +67,7 @@ define([
         menuItems.push({ divider: true });
         menuItems.push({ title: 'Notifications', href: '#notifications' });
 
-        if(c.permissions.admin) {
+        if(c.permissions && c.permissions.admin) {
           if(c.isNativeDesktopApp) {
             menuItems.push({ title: 'Integrations', href: window.location.origin + url + '#integrations', target: '_blank' });
           } else {

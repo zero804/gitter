@@ -112,7 +112,7 @@ define([
       // var links = this.model.get('urls') || [];
       // var mentions = this.model.get('mentions') || [];
       var issues = [];
-      if(context().troupe.githubType === 'REPO') {
+      if(context.troupe().get('githubType') === 'REPO') {
         issues = this.model.get('issues') || [];
       }
 
@@ -331,7 +331,10 @@ define([
     }
 
   });
-  cocktail.mixin(ChatItemView, UnreadItemViewMixin);
+
+  if(context.isLoggedIn()) {
+    cocktail.mixin(ChatItemView, UnreadItemViewMixin);
+  }
 
   var ReadByView = Marionette.CollectionView.extend({
     itemView: AvatarView,
