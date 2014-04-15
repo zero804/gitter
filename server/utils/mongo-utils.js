@@ -60,12 +60,21 @@ function isLikeObjectId(value) {
     return (/^[0-9a-fA-F]{24}$/).test(value);
   }
 
-  return true;
+  return false;
 }
 
+
+function serializeObjectId(id) {
+  if(!id) return '';
+  if(typeof id === 'string') {
+    return id;
+  }
+  return id.toString();
+}
 
 exports.isLikeObjectId = isLikeObjectId;
 exports.asObjectID = asObjectID;
 exports.getDateFromObjectId = getDateFromObjectId;
 exports.getTimestampFromObjectId = getTimestampFromObjectId;
 exports.getNewObjectIdString = getNewObjectIdString;
+exports.serializeObjectId = serializeObjectId;
