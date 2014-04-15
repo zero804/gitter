@@ -25,8 +25,7 @@ define([
     events: {
       'click @ui.cog': 'showDropdown',
       'click #leave-room': 'leaveRoom',
-      'click #activity-feed-toggle' : 'toggleActivityFeed',
-      'click #notifications-settings-link': 'enableBrowserNotifications'
+      'click #activity-feed-toggle' : 'toggleActivityFeed'
     },
 
     initialize: function() {
@@ -41,8 +40,11 @@ define([
       });
 
       this.listenTo(this.dropdown, 'selected', function(e) {
-        if(e.get('href') === '#leave') {
+        var href = e.get('href');
+        if(href === '#leave') {
           this.leaveRoom();
+        } else if(href === '#notifications') {
+          this.requestBrowserNotificationsPermission();
         }
       });
     },
@@ -112,7 +114,7 @@ define([
       }
     },
 
-    enableBrowserNotifications: function() {
+    requestBrowserNotificationsPermission: function() {
       if(context().desktopNotifications) {
         notifications.enable();
       }
