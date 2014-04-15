@@ -33,10 +33,14 @@
 
 {{{body}}}
 
+{{#if troupeContext}}
 {{{ generateTroupeContext troupeContext }}}
+{{/if}}
 
 {{>require_wrapper}}
-{{{bootScript bootScriptName }}}
 
+{{#if bootScriptName}}
+{{{bootScript bootScriptName }}}
+{{/if}}
 </body>
 </html>

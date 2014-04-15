@@ -88,7 +88,8 @@
     "raven": "^0.6.2",
     "gitter-services": "git+ssh://git@github.com:gitterHQ/services.git#1.0.1",
     "statuserror": "0.0.1",
-    "dolph": "0.0.2"
+    "dolph": "0.0.2",
+    "sitemap": "https://registry.npmjs.org/sitemap/-/sitemap-0.7.2.tgz"
   },
   "devDependencies": {
     "proxyquire": "0.4.0",
