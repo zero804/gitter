@@ -13,9 +13,14 @@ var roomService         = require('./room-service');
 var DEFAULT_CHAT_COUNT_LIMIT = 30;
 
 exports.serializeTroupesForUser = function(userId, callback) {
+  if(!userId) return Q.resolve([]);
+
   return roomService.findAllRoomsIdsForUserIncludingMentions(userId)
     .then(function(troupeIds) {
-      var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId, mapUsers: false });
+      var strategy = new restSerializer.TroupeIdStrategy({
+        currentUserId: userId,
+        mapUsers: false
+      });
 
       return restSerializer.serializeQ(troupeIds, strategy);
     })
@@ -37,7 +42,12 @@ exports.serializeChatsForTroupe = function(troupeId, userId, options, cb) {
   chatService.findChatMessagesForTroupe(troupeId, { skip: options.skip || 0, limit: options.limit || DEFAULT_CHAT_COUNT_LIMIT, sort: options.sort }, function(err, chatMessages) {
     if(err) return callback(err);
 
-    var strategy = new restSerializer.ChatStrategy({ currentUserId: userId, troupeId: troupeId });
+    var strategy = new restSerializer.ChatStrategy({
+      notLoggedIn: !userId,
+      currentUserId: userId,
+      troupeId: troupeId
+    });
+
     restSerializer.serialize(chatMessages, strategy, callback);
   });
 

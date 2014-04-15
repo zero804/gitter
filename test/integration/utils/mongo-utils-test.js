@@ -76,4 +76,27 @@ describe('mongo-utils', function() {
     assert.equal(t, 1370344769000);
   });
 
+  describe('isLikeObjectId', function() {
+    it('should parse objectIds', function() {
+      var id = new ObjectID('51adcd412aefe1576f000005');
+      assert(underTest.isLikeObjectId(id));
+    });
+
+    it('should parse objectId strings', function() {
+      var id = '51adcd412aefe1576f000005';
+      assert(underTest.isLikeObjectId(id));
+    });
+
+    it('should not parse the string moo', function() {
+      var id = 'moo';
+      assert(!underTest.isLikeObjectId(id));
+    });
+
+    it('should not parse the string undefined', function() {
+      var id = 'undefined';
+      assert(!underTest.isLikeObjectId(id));
+    });
+
+  });
+
 });

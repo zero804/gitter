@@ -7,27 +7,16 @@ var Q = require('q');
 // Token length in bytes. 20 byts == 40 hex chars
 var tokenLength = 20;
 
-// Generate a cryptographically secure random token 
-
-exports.generateTokenQ = function() {
-  var deferred = Q.defer();
-  crypto.randomBytes(tokenLength, function(ex, buf) {
-    if (ex) {
-      deferred.reject(new Error(ex));
-    } else {
-      var token = buf.toString('hex');
-      deferred.resolve(token);
-    }
-  });
-  return deferred.promise;
-};
-
+// Generate a cryptographically secure random token
 exports.generateToken = function(cb) {
-  crypto.randomBytes(tokenLength, function(ex, buf) {
-    if (ex) { 
-      return cb(ex, null);
-    }
+  var d = Q.defer();
+
+  crypto.randomBytes(tokenLength, function(err, buf) {
+    if (err) return d.reject(err);
+
     var token = buf.toString('hex');
-    return cb(null, token);
+    return d.resolve(token);
   });
+
+  return d.promise.nodeify(cb);
 };

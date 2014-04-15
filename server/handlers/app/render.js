@@ -15,7 +15,7 @@ function getAppCache(req) {
 }
 
 function renderHomePage(req, res, next) {
-  contextGenerator.generateMiniContext(req, function(err, troupeContext) {
+  contextGenerator.generateNonChatContext(req, function(err, troupeContext) {
     if(err) return next(err);
 
     var page, bootScriptName;
@@ -41,13 +41,22 @@ function renderHomePage(req, res, next) {
 
 
 function renderMainFrame(req, res, next, frame) {
-  contextGenerator.generateMiniContext(req)
+  contextGenerator.generateNonChatContext(req)
     .then(function(troupeContext) {
       var chatAppLocation = '/' + req.uriContext.uri + '/~' + frame + '#initial';
 
-      res.render('app-template', {
+      var template, bootScriptName;
+      if(req.user) {
+        template = 'app-template';
+        bootScriptName = 'router-app';
+      } else {
+        template = 'app-nli-template';
+        bootScriptName = 'router-nli-app';
+      }
+
+      res.render(template, {
         appCache: getAppCache(req),
-        bootScriptName: 'router-app',
+        bootScriptName: bootScriptName,
         troupeName: req.uriContext.uri,
         troupeContext: troupeContext,
         chatAppLocation: chatAppLocation,
@@ -59,10 +68,11 @@ function renderMainFrame(req, res, next, frame) {
 
 function renderChatPage(req, res, next) {
   var troupe = req.uriContext.troupe;
+  var userId = req.user && req.user.id;
 
   Q.all([
     contextGenerator.generateTroupeContext(req),
-    restful.serializeChatsForTroupe(troupe.id, req.user.id, { limit: INITIAL_CHAT_COUNT })
+    restful.serializeChatsForTroupe(troupe.id, userId, { limit: INITIAL_CHAT_COUNT })
     ]).spread(function(troupeContext, chats) {
 
       var githubLink;
@@ -91,7 +101,7 @@ function renderChatPage(req, res, next) {
 }
 
 function renderMobileUserHome(req, res, next) {
-  contextGenerator.generateMiniContext(req, function(err, troupeContext) {
+  contextGenerator.generateNonChatContext(req, function(err, troupeContext) {
     if(err) return next(err);
 
     res.render('mobile/mobile-app', {
@@ -108,9 +118,11 @@ function renderMobileUserHome(req, res, next) {
 function renderMobileChat(req, res, next) {
   var troupe = req.uriContext.troupe;
 
+  var userId = req.user && req.user.id;
+
   Q.all([
     contextGenerator.generateTroupeContext(req),
-    restful.serializeChatsForTroupe(troupe.id, req.user.id, { limit: INITIAL_CHAT_COUNT })
+    restful.serializeChatsForTroupe(troupe.id, userId, { limit: INITIAL_CHAT_COUNT })
     ]).spread(function(troupeContext, chats) {
       res.render('mobile/mobile-app', {
         appCache: getAppCache(req),
@@ -128,11 +140,42 @@ function renderMobileChat(req, res, next) {
     .fail(next);
 }
 
+function renderNotLoggedInChatPage(req, res, next) {
+  var troupe = req.uriContext.troupe;
+
+  Q.all([
+    contextGenerator.generateTroupeContext(req),
+    restful.serializeChatsForTroupe(troupe.id, null, { limit: INITIAL_CHAT_COUNT })
+    ]).spread(function(troupeContext, chats) {
+
+      var githubLink;
+
+      if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
+        githubLink = 'https://github.com/' + req.uriContext.uri;
+      }
+
+      res.render('chat-nli-template', {
+        isRepo: troupe.githubType === 'REPO',
+        appCache: getAppCache(req),
+        bootScriptName: 'router-nli-chat',
+        githubLink: githubLink,
+        troupeName: req.uriContext.uri,
+        troupeTopic: troupeContext.troupe.topic,
+        troupeContext: troupeContext,
+        chats: chats,
+        agent: req.headers['user-agent']
+      });
+
+    })
+    .fail(next);
+}
+
 
 module.exports = exports = {
   renderHomePage: renderHomePage,
   renderChatPage: renderChatPage,
   renderMainFrame: renderMainFrame,
   renderMobileChat: renderMobileChat,
-  renderMobileUserHome: renderMobileUserHome
+  renderMobileUserHome: renderMobileUserHome,
+  renderNotLoggedInChatPage: renderNotLoggedInChatPage
 };

@@ -34,7 +34,6 @@
   .transition(500ms);
 }
 
-
 @-webkit-keyframes pulsey {
     0% { opacity: 0.3; }
     50% { opacity: 1; }
@@ -463,6 +462,67 @@ a:hover {
 	height: 100%;
 	z-index: 1010;
 	display: inline-block;
+}
+
+body.logged-out {
+  .trpLeftMenu {
+    width: 350px;
+  }
+
+  .trpFramePanel {
+    margin-left: 100px;
+  }
+
+  .trpContentPanel {
+    bottom: 0;
+  }
+
+}
+
+.trpButtonMedium, .trpButtonBig {
+  .transition300ms;
+}
+
+
+.trpLeftMenuLogo {
+  padding: 20px;
+  margin-bottom: 20px;
+  .logo-container {
+    float: left;
+    background-image: url('../../images/2/gitter/logo-text-white-64.png');
+    width: 196px;
+    height: 64px;
+
+    @media @retina {
+      background-image: url('../../images/2/gitter/logo-text-white-64@2x.png');
+      background-size: contain;
+    }
+  }
+}
+
+.trpLeftMenuLoggedOut {
+  bottom: 0;
+  height: 400px;
+  left: 0;
+  margin: auto;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+}
+
+.trpLeftMenuInfo {
+  .trpBodyMedium;
+  margin-bottom: 20px;
+  clear: both;
+  padding: 20px;
+}
+
+.trpLeftMenuSignup {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  padding: 0 20px;
+  width: 100%;
 }
 
 .trpLeftMenu {

@@ -13,7 +13,10 @@ define([
       return;
     }
 
-    jqxhr.setRequestHeader('x-access-token', context().accessToken);
+    var accessToken = context().accessToken;
+    if(accessToken) {
+      jqxhr.setRequestHeader('x-access-token', accessToken);
+    }
   }
 
   $(document).ajaxSend(function(e, jqxhr, settings) {

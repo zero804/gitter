@@ -14,11 +14,13 @@ function saveRoom(req) {
     recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId);
   }
 }
+
 var chatFrameMiddlewarePipeline = [
-  middleware.ensureLoggedIn(),
+  // middleware.ensureLoggedIn(),
   appMiddleware.uriContextResolverMiddleware,
   appMiddleware.isPhoneMiddleware,
   function(req, res, next) {
+
     if (req.uriContext.ownUrl) {
       if(req.isPhone) {
         appRender.renderMobileUserHome(req, res, next, 'home');
@@ -29,8 +31,12 @@ var chatFrameMiddlewarePipeline = [
     }
 
     if(req.isPhone) {
-      saveRoom(req);
-      appRender.renderMobileChat(req, res, next);
+      if(req.user) {
+        saveRoom(req);
+        appRender.renderMobileChat(req, res, next);
+      } else {
+        // TODO: XXX: deal with not logged in on this platform
+      }
     } else {
       appRender.renderMainFrame(req, res, next, 'chat');
     }
@@ -38,12 +44,19 @@ var chatFrameMiddlewarePipeline = [
 ];
 
 var chatMiddlewarePipeline = [
-  middleware.ensureLoggedIn(),
+  // middleware.ensureLoggedIn(),
   appMiddleware.uriContextResolverMiddleware,
   appMiddleware.isPhoneMiddleware,
   function(req, res, next) {
-    saveRoom(req);
-    appRender.renderChatPage(req, res, next);
+    if(req.user) {
+      saveRoom(req);
+      appRender.renderChatPage(req, res, next);
+    } else {
+      // We're doing this so we correctly redirect a logged out user to the right chat post login
+      req.session.returnTo = req.url.replace(/\/~chat$/,"");
+      appRender.renderNotLoggedInChatPage(req, res, next);
+    }
+
   }
 ];
 
@@ -53,15 +66,14 @@ module.exports = {
       [
         '/:roomPart1/~chat',                         // ORG or ONE_TO_ONE
         '/:roomPart1/:roomPart2/~chat',              // REPO or ORG_CHANNEL or ADHOC
-        '/:roomPart1/:roomPart2/:roomPart3/~chat',   // CUSTOM REPO_ROOM
+        '/:roomPart1/:roomPart2/:roomPart3/~chat'    // CUSTOM REPO_ROOM
       ].forEach(function(path) {
         app.get(path, chatMiddlewarePipeline);
       });
 
 
       [
-        '/:roomPart1/~home',
-        // This URL is deprecated
+        '/:roomPart1/~home'
       ].forEach(function(path) {
         app.get(path,
           middleware.ensureLoggedIn(),
@@ -72,26 +84,7 @@ module.exports = {
           });
       });
 
-
-
       require('./integrations').install(app);
-
-      app.get(/^\/(?:([^\/]+?))\/(?:([^\/]+?))\/(?:\*([^\/]+))\/?$/,
-        function(req, res, next) {
-          req.params.userOrOrg = req.params[0];
-          req.params.repo = req.params[1];
-          req.params.channel = req.params[2];
-          next();
-        },
-        chatFrameMiddlewarePipeline);
-
-      app.get(/^\/(?:([^\/]+?))\/(?:\*([^\/]+))$/,
-        function(req, res, next) {
-          req.params.userOrOrg = req.params[0];
-          req.params.channel = req.params[1];
-          next();
-        },
-        chatFrameMiddlewarePipeline);
 
       [
         '/:roomPart1',

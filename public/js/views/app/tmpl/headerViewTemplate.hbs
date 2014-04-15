@@ -1,14 +1,18 @@
 <div class="trpHeaderContainer">
   {{#unless oneToOne}}
+  {{#if user}}
   <div class="settingsCog">
     <div class="dropdown-toggle" data-toggle="dropdown"></div>
   </div>
+  {{/if}}
   {{/unless}}
   <div class="trpTroupeFavourite {{#if troupeFavourite}}favourited{{/if}}" id="favourite-button">
+    {{#if user}}
       <div style="display: inline-block; vertical-align: middle">
         <i class="trpHeaderFavIcon favourited" width="24" height="24"></i>
         <i class="trpHeaderFavIcon unfavourited" width="24" height="24"></i>
       </div>
+    {{/if}}
   </div>
   {{#if githubLink}}
   <h1 id="name-label"><a href="{{githubLink}}" target="_blank">{{troupeName}}</a></h1>
