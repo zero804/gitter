@@ -41,8 +41,8 @@
       </div>
     </div>
   </div>
-  <div id="carousel">
-      <div class="outer-container" style="display: block; float: left;">
+  <div id="carousel" style="overflow: hidden; height: 720px;">
+      <div class="outer-container" style="display: block; float: left; width: 100%">
         <div class="container hero-container">
           <div id="first">
             <div class="strip" style="color:white; text-shadow: 0 0 0 transparent,1px 1px 2px rgba(0,0,0,0.2); text-align: left">
@@ -72,7 +72,7 @@
                   <div style="letter-spacing: 0.05em; font-size: 1.3em">
                     Gitter provides free public chat rooms<br> for open source projects. <br>
                     <br>
-                    Find out more about Gitter for your business.
+                    You can also use Gitter for privately for teams & business.
                      <i class="fa fa-chevron-right arrow next" id="next"></i>
                   </div>
                   <a href="/login/github?action=signup&button=1" class="button green mt60" id="signup1" style="text-decoration: none; color: white">Sign up with GitHub</a>
@@ -141,42 +141,15 @@
   </div>
 
 
-    <div class="container" style="background-color: #eee; padding-bottom: 20px" >
-      <div class="strip feature">
-        <div style="display: inline-block; vertical-align: top; margin-top: 40px">
-          <div style="text-align: left; font-size: 1.3em">Thousands of open source projects have created Gitter chat rooms to collaborate and provide realtime support to developers and users. See what some of them are saying right now.</div>
-          <div style="margin-top: 30px; max-height: 169px; overflow: hidden">
-            <div class="chat-item">
-              <img src="https://avatars.githubusercontent.com/u/15655" class="avatar">
-              <div class="chat-from">petebacondarwin</div>
-              <div class="chat-text">I agree we should go with form submit raising the $flushInputs event by default and wait and see if people come up with a good reason to add a disable feature - in which case it would be an attribute of form or property on FormController.</div>
-            </div>
-            <div class="chat-item">
-              <img src="https://avatars.githubusercontent.com/u/1764161" class="avatar">
-              <div class="chat-from">shahata</div>
-              <div class="chat-text">for textInputType the $$phase test was already there. do you have any idea why?</div>
-            </div>
-            <div class="chat-item">
-              <img src="https://avatars.githubusercontent.com/u/1764161" class="avatar">
-              <div class="chat-from">shahata</div>
-              <div class="chat-text">found the reason: angular/angular.js#5293</div>
-            </div>
-            <div class="chat-item">
-              <img src="https://avatars.githubusercontent.com/u/1764161" class="avatar">
-              <div class="chat-from">shahata</div>
-              <div class="chat-text">for textInputType the $$phase test was already there. do you have any idea why?</div>
-            </div>
-            <div class="chat-item">
-              <img src="https://avatars.githubusercontent.com/u/15655" class="avatar">
-              <div class="chat-from">petebacondarwin</div>
-              <div class="chat-text">hmmm, not pretty</div>
-            </div>
-          </div>
-          <div style="font-size: 1.3em; margin-top: 30px">angular/angular.js<span style="opacity: 0.5; margin-left: 30px">marionette.js/backbone.marionette</span><span style="opacity: 0.5; margin-left: 30px">another/chat</span></div>
-          </div>
-        </div>
+  <div class="container" style="background-color: #eee; padding-bottom: 20px" >
+    <div class="strip feature">
+      <div style="display: inline-block; vertical-align: top; max-width: 450px; margin-top: 60px">
+        <h2 style="margin-top: 0">Chat rooms for everything</h2>
+        <div style="text-align: left">Free chat rooms for your public repositories. <br>A bit like IRC only <a href="#features" rel="" id="anchor1" style="color: #1dce73; text-decoration: none" class="scroll-link">smarter</a>. <p>Chats for private repositories as well as organisations.</div>
       </div>
+      <div style="display: inline-block; float: right; vertical-align: top;" style=""><img src="{{ cdn "images/2/gitter/rooms.png" }}" width="284" height="284"></div>
     </div>
+  </div>
 
     <div class="container" style="background-color: #162e34; padding: 60px 0">
       <div class="strip">
