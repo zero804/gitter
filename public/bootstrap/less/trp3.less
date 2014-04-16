@@ -467,11 +467,34 @@ a:hover {
 body.logged-out {
   .trpLeftMenu {
     width: 350px;
+
+    @media @small {
+      left:-350px;
+      transition-delay: 0s;
+
+        &.visible {
+          transition-delay: 0.3s;
+          left: 0px;
+        }
+    }
+  }
+
+  .trpLeftMenuTab {
+    width: 50px;
   }
 
   .trpFramePanel {
     margin-left: 100px;
+    @media @small {
+      margin-left: 0px;
+    }
+    &.leftCollapse {
+      @media @small {
+        left: 350px;
+      }
+    }
   }
+
 
   .trpContentPanel {
     bottom: 0;
