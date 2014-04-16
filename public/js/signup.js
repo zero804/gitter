@@ -26,7 +26,11 @@ require([
         onCreate: null,          // Function that will be called after the carousel has been created. Receives a map of all data.
         auto: false,
         next: ".next",
-        prev: "#back-button"
+        prev: "#back-button",
+        pagination: {
+            container: "#pager",
+            anchorBuilder: false
+        }
     });
 
     $('.scroll-link').click(function(){
