@@ -65,20 +65,6 @@ define([
       this.enableDragAndDrop();
     },
 
-    toggleFavourite: function() {
-      var favHeader = $('.trpTroupeFavourite');
-      favHeader.toggleClass('favourited');
-      var isFavourite = favHeader.hasClass('favourited');
-
-      $.ajax({
-        url: '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId(),
-        contentType: "application/json",
-        dataType: "json",
-        type: "PUT",
-        data: JSON.stringify({ favourite: isFavourite })
-      });
-    },
-
 
     onKeyDown: function(e) {
       if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;

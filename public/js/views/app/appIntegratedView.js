@@ -22,8 +22,7 @@ define([
     "mouseenter #content-frame":        "onMouseEnterContentFrame",
     "keypress":                         "onKeyPress",
     "keydown":                          "onKeyDown",
-    "click #troupe-more-actions":       "toggleTroupeMenu",
-    "click #favourite-button":          "toggleFavourite"
+    "click #troupe-more-actions":       "toggleTroupeMenu"
   };
 
   // WHAT IS THIS??? $('.trpDisplayPicture').tooltip('destroy');
