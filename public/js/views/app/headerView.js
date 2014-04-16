@@ -11,9 +11,8 @@ define([
   "use strict";
 
   return Marionette.ItemView.extend({
-    // template: headerViewTemplate,
     modelEvents: {
-        'change': 'redisplay'
+      change: 'redisplay'
     },
     ui: {
       cog: '.dropdown-toggle',
@@ -25,7 +24,7 @@ define([
     events: {
       'click @ui.cog': 'showDropdown',
       'click #leave-room': 'leaveRoom',
-      'click #activity-feed-toggle' : 'toggleActivityFeed'
+      'click @ui.favourite': 'toggleFavourite'
     },
 
     initialize: function() {
@@ -48,6 +47,8 @@ define([
             this.requestBrowserNotificationsPermission();
           }
         });
+      } else {
+        this.ui.favourite.css({ visibility: 'hidden' });
       }
     },
 
@@ -89,6 +90,8 @@ define([
       },
 
     leaveRoom: function() {
+      if(!context.isLoggedIn()) return;
+
       $.ajax({
         url: "/api/v1/rooms/" + context.getTroupeId() + "/users/" + context.getUserId(),
         data: "",
@@ -96,25 +99,21 @@ define([
       });
     },
 
-    showActivityFeed: function () {
-      $('.webhook').parent().parent().slideDown();
-      $('#activity-feed-toggle').addClass("show-activity");
+    toggleFavourite: function() {
+      if(!context.isLoggedIn()) return;
+
+      this.ui.favourite.toggleClass('favourited');
+      var isFavourite = this.ui.favourite.hasClass('favourited');
+
+      $.ajax({
+        url: '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId(),
+        contentType: "application/json",
+        dataType: "json",
+        type: "PUT",
+        data: JSON.stringify({ favourite: isFavourite })
+      });
     },
 
-    hideActivityFeed: function () {
-      $('.webhook').parent().parent().slideUp();
-      $('#activity-feed-toggle').removeClass("show-activity");
-    },
-
-    toggleActivityFeed: function() {
-      if (this.showActivity) {
-        this.hideActivityFeed();
-        this.showActivity = false;
-      } else {
-        this.showActivityFeed();
-        this.showActivity = true;
-      }
-    },
 
     requestBrowserNotificationsPermission: function() {
       if(context().desktopNotifications) {
