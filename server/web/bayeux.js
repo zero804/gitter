@@ -245,7 +245,6 @@ var authenticator = {
       var user = tokenInfo.user;
       var oauthClient = tokenInfo.client;
       var userId = user && user.id;
-      console.log('oauthClient', oauthClient);
       winston.verbose('bayeux: handshake', { username: user && user.username, client: oauthClient.name });
 
       var connectionType = getConnectionType(ext.connType);
