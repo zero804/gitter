@@ -283,13 +283,34 @@ exports.findAllRoomsIdsForUserIncludingMentions = findAllRoomsIdsForUserIncludin
 function findOrCreateRoom(user, uri, opts) {
   validate.expect(uri, 'uri required');
 
-  var userId = user.id;
+  var userId = user && user.id;
   opts = opts || {};
 
   /* First off, try use local data to figure out what this url is for */
   return localUriLookup(uri, opts)
     .then(function(uriLookup) {
       winston.verbose('URI Lookup returned ', { uri: uri, isUser: !!(uriLookup && uriLookup.user), isTroupe: !!(uriLookup && uriLookup.troupe) });
+
+      /* Deal with the case of the nonloggedin user first */
+      if(!user) {
+        if(!uriLookup) return null;
+
+        if(uriLookup.user) {
+          // TODO: figure out what we do for nonloggedin users viewing
+          // user profiles
+        }
+
+        if(uriLookup.troupe) {
+          return roomPermissionsModel(null, 'view', uriLookup.troupe)
+            .then(function(access) {
+              if(!access) return;
+
+              return { troupe: uriLookup.troupe };
+            });
+        }
+
+        return null;
+      }
 
       /* Lookup found a user? */
       if(uriLookup && uriLookup.user) {

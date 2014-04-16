@@ -162,7 +162,7 @@ define([
             }
           },
           {
-            match: /(^|\s)@(\w*)$/,
+            match: /(^|\s)@([a-zA-Z0-9_\-]*)$/,
             maxCount: 8,
             search: function(term, callback) {
               var lowerTerm = term.toLowerCase();

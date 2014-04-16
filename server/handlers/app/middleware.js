@@ -21,7 +21,14 @@ function uriContextResolverMiddleware(req, res, next) {
 
   return roomService.findOrCreateRoom(req.user, uri)
     .then(function(uriContext) {
-      if(!uriContext.troupe && !uriContext.ownUrl) throw 404;
+
+      if(!uriContext || (!uriContext.troupe && !uriContext.ownUrl)) {
+        if(!req.user) {
+          throw 401;
+        }
+
+        throw 404;
+      }
 
       var events = req.session.events;
       if(!events) {

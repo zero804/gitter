@@ -45,7 +45,7 @@ require('./handlers/').install(app);
 require('./services/kue-workers').startWorkers();
 
 // APIS
-var auth = require('./web/middleware').ensureLoggedIn();
+var auth = require('./web/middleware').ensureLoggedIn({ allowGet: true });
 require('./api/').install(app, '/api', auth);
 
 /* This should be second last */

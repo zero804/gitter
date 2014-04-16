@@ -383,6 +383,12 @@ function ChatStrategy(options)  {
   };
 
   this.map = function(item) {
+    var unread;
+    if(options.notLoggedIn) {
+      unread = false;
+    } else {
+      unread = options.currentUserId ? unreadItemStategy.map(item._id) : true;
+    }
     return {
       id: item._id,
       text: item.text,
@@ -390,7 +396,7 @@ function ChatStrategy(options)  {
       sent: formatDate(item.sent),
       editedAt: formatDate(item.editedAt),
       fromUser: options.user ? options.user : userStategy.map(item.fromUserId),
-      unread: options.currentUserId ? unreadItemStategy.map(item._id) : true,
+      unread: unread,
       room: troupeStrategy ? troupeStrategy.map(item.toTroupeId) : undefined,
       readBy: item.readBy ? item.readBy.length : undefined,
       urls: item.urls || [],
