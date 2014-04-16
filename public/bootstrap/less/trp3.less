@@ -2343,10 +2343,12 @@ ul.roster {
   }
 
   .trpTroupeFavourite {
+    float: left;
     cursor: pointer;
     display: inline-block;
     margin-left: 4px;
-    margin-right: 24px;
+    margin-right: 18px;
+    margin-top: 10px;
 
     @media @mid {
       margin-left: 16px;
@@ -2367,7 +2369,7 @@ ul.roster {
   #trpTopic {
     font-family: 'Open Sans';
     font-size: 13px;
-    margin: -5px 40px 0px 52px;
+    margin: -5px 0px 0px 0px;
     color: #999;
     min-height: 1em;
 
@@ -2379,6 +2381,10 @@ ul.roster {
       color: @trpLightBlue;
     }
 
+  }
+
+  .gtrNameTopic {
+    float: left;
   }
 
   .dropdown-toggle {
