@@ -141,6 +141,15 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
+                  name: "mobile-nli-app",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
                   name: "mobile-userhome",
                   include: [
                     "utils/tracking",
@@ -260,6 +269,7 @@ module.exports = function( grunt ) {
 //      "homepage-mobile" : createClosureConfig('homepage-mobile'),
 //       "native-chat-router": createClosureConfig('routers/mobile/native/chat-router'),
       "mobile-app": createClosureConfig('mobile-app'),
+      "mobile-nli-app": createClosureConfig('mobile-nli-app'),
       "mobile-userhome": createClosureConfig('mobile-userhome'),
 //       "native-files-router": createClosureConfig('routers/mobile/native/files-router'),
 //       "native-conversations-router": createClosureConfig('routers/mobile/native/conversations-router'),
