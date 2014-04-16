@@ -15,7 +15,7 @@ function saveRoom(req) {
   }
 }
 
-var chatFrameMiddlewarePipeline = [
+var mainFrameMiddlewarePipeline = [
   // middleware.ensureLoggedIn(),
   appMiddleware.uriContextResolverMiddleware,
   appMiddleware.isPhoneMiddleware,
@@ -31,12 +31,14 @@ var chatFrameMiddlewarePipeline = [
     }
 
     if(req.isPhone) {
-      if(req.user) {
-        saveRoom(req);
-        appRender.renderMobileChat(req, res, next);
-      } else {
-        // TODO: XXX: deal with not logged in on this platform
+      if(!req.user) {
+        appRender.renderMobileNotLoggedInChat(req, res, next);
+        return;
       }
+
+      saveRoom(req);
+      appRender.renderMobileChat(req, res, next);
+
     } else {
       appRender.renderMainFrame(req, res, next, 'chat');
     }
@@ -91,7 +93,7 @@ module.exports = {
         '/:roomPart1/:roomPart2',
         '/:roomPart1/:roomPart2/:roomPart3',
       ].forEach(function(path) {
-        app.get(path, chatFrameMiddlewarePipeline);
+        app.get(path, mainFrameMiddlewarePipeline);
       });
     }
 };
