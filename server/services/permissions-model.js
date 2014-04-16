@@ -49,13 +49,11 @@ function repoPermissionsModel(user, right, uri, security) {
         }
       }
 
-      /* Want to join and can see the repo? Go ahead! */
-      if(right === 'join' || right === 'view') return true;
-
       var perms = repoInfo.permissions;
       var isAdmin = perms && (perms.push || perms.admin);
 
       switch(right) {
+        case 'view':
         case 'join':
         case 'adduser':
           return true;

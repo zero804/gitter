@@ -140,6 +140,29 @@ function renderMobileChat(req, res, next) {
     .fail(next);
 }
 
+
+function renderMobileNotLoggedInChat(req, res, next) {
+  var troupe = req.uriContext.troupe;
+
+  Q.all([
+    contextGenerator.generateTroupeContext(req),
+    restful.serializeChatsForTroupe(troupe.id, null, { limit: INITIAL_CHAT_COUNT })
+    ]).spread(function(troupeContext, chats) {
+      res.render('mobile/mobile-app', {
+        bootScriptName: 'mobile-nli-app',
+        troupeName: req.uriContext.uri,
+        troupeTopic: troupeContext.troupe.topic,
+        troupeFavourite: troupeContext.troupe.favourite,
+        troupeContext: troupeContext,
+        chats: chats,
+        agent: req.headers['user-agent']
+      });
+
+    })
+    .fail(next);
+}
+
+
 function renderNotLoggedInChatPage(req, res, next) {
   var troupe = req.uriContext.troupe;
 
@@ -177,5 +200,6 @@ module.exports = exports = {
   renderMainFrame: renderMainFrame,
   renderMobileChat: renderMobileChat,
   renderMobileUserHome: renderMobileUserHome,
+  renderMobileNotLoggedInChat: renderMobileNotLoggedInChat,
   renderNotLoggedInChatPage: renderNotLoggedInChatPage
 };
