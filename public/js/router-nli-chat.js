@@ -19,6 +19,8 @@ require([
   'views/chat/decorators/emojiDecorator',
   'views/app/headerView',
 
+  'views/people/peopleCollectionView',
+
   'views/widgets/preload',      // No ref
   'filtered-collection',        // No ref
   'components/dozy',            // Sleep detection No ref
@@ -33,7 +35,7 @@ require([
     ChatIntegratedView,
     ChatCollectionView, itemCollections, RightToolbarView,
     webhookDecorator, issueDecorator, commitDecorator, mentionDecorator,
-    embedDecorator, emojiDecorator, HeaderView) {
+    embedDecorator, emojiDecorator, HeaderView, peopleCollectionView) {
   "use strict";
 
   $(document).on("click", "a", function(e) {
@@ -78,10 +80,15 @@ require([
     routes: {
       // TODO: get rid of the pipes
       "": "hideModal",
+      "people": "people",
     },
 
     hideModal: function() {
       appView.dialogRegion.close();
+    },
+
+    people: function() {
+      appView.dialogRegion.show(new peopleCollectionView.Modal({ collection: itemCollections.sortedUsers }));
     },
 
   });
