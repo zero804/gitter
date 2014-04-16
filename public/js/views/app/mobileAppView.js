@@ -1,8 +1,10 @@
-define(['backbone', 'jquery-hammer'], function(Backbone, $hammer) {
-  return Backbone.View.extend({
-
-    initialize: function() {
+define(['marionette', 'jquery-hammer'], function(Marionette, $hammer) {
+  return Marionette.ItemView.extend({
+    initialize: function(options) {
       this.$el = $hammer(this.$el).hammer();
+      if(options.hideMenu) {
+        this.$el.find('#showTroupesButton').hide();
+      }
     },
 
     events: {

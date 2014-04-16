@@ -97,6 +97,30 @@ describe('mongo-utils', function() {
       assert(!underTest.isLikeObjectId(id));
     });
 
+    it('should not parse random hashes', function() {
+      var id = { problems_i_have: 99 };
+      assert(!underTest.isLikeObjectId(id));
+    });
+
+  });
+
+  describe('serializeObjectId', function() {
+    it('should serialise objectIds', function() {
+      var id = new ObjectID('51adcd412aefe1576f000005');
+      assert.equal('51adcd412aefe1576f000005', underTest.serializeObjectId(id));
+    });
+
+    it('should serialise strings', function() {
+      var id = '51adcd412aefe1576f000005';
+      assert.equal('51adcd412aefe1576f000005', underTest.serializeObjectId(id));
+    });
+
+    it('should serialise nulls', function() {
+      var id = null;
+      assert.equal('', underTest.serializeObjectId(id));
+    });
+
+
   });
 
 });
