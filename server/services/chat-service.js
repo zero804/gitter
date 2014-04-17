@@ -266,10 +266,16 @@ exports.findDatesForChatMessages = function(troupeId, callback) {
   .nodeify(callback);
 };
 
-exports.findDailyChatActivityForRoom = function(troupeId, since, callback) {
-  console.log('TROUPEID:', troupeId);
+exports.findDailyChatActivityForRoom = function(troupeId, start, end, callback) {
   return persistence.ChatMessage.aggregateQ([
-    { $match: { /*toTroupeId: troupeId, sent: { $gte: since }*/ } },
+    { $match: {
+        toTroupeId: mongoUtils.asObjectID(troupeId),
+        sent: {
+          $gte: start,
+          $lte: end
+        }
+      }
+    },
     { $project: {
         _id: 0,
         sent: 1
@@ -291,7 +297,6 @@ exports.findDailyChatActivityForRoom = function(troupeId, since, callback) {
 
   ])
   .then(function(dates) {
-    console.log('DATES ARE', dates);
     return dates.reduce(function(memo, value) {
       memo[value._id] = value.count;
       return memo;
