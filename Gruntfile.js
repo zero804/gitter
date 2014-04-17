@@ -483,13 +483,13 @@ module.exports = function( grunt ) {
       },
       'jquery-carousel': {
         files : {
-          'output/client-libs/jquery-carousel/jquery.jquery-carouFredSel-6.2.1.amd.js': ['output/client-libs/jquery.jquery-carouFredSel-6.2.1.js']
+          'output/client-libs/jquery-carousel/jquery-carouFredSel-6.2.1.amd.js': ['output/client-libs/jquery-carouFredSel-6.2.1.js']
         },
         modules: {
           'jquery': 'jQuery'
         },
         exports: 'jQuery'
-      },
+      },  
       'scrollfix': {
         files : {
           'output/client-libs/scrollfix/scrollfix-amd.js': ['output/client-libs/scrollfix/scrollfix.js']
