@@ -96,6 +96,11 @@ module.exports = {
         return callback(null, troupe);
       }
 
+      /* From this point forward we need a user */
+      if(!req.user) {
+        return callback(401);
+      }
+
       if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
         return callback(403);
       }
