@@ -1,37 +1,10 @@
 
-<script type="text/javascript" src="//d3js.org/d3.v3.min.js"></script>
-<script type="text/javascript" src="//cdn.jsdelivr.net/cal-heatmap/3.3.10/cal-heatmap.min.js"></script>
 <link rel="stylesheet" href="//cdn.jsdelivr.net/cal-heatmap/3.3.10/cal-heatmap.css" />
 
 <div class="trpContentPanel" id="content-wrapper">
   <div class="trpChatPanel" id="chat-frame">
     <div class="trpChatContainer  primary-scroll" id="content-frame">
       <div id="cal-heatmap"></div>
-      <script type="text/javascript">
-        var cal = new CalHeatMap();
-        cal.init({
-          start: new Date(Date.now() - 340 * 86400 * 1000),
-          maxDate: new Date(),
-          minDate: new Date(2013, 10, 1), // 1 November 2013
-          range: 12,
-          domain: "month",
-          subDomain: "day",
-          considerMissingDataAsZero: false,
-          data: "{{{dataUrl}}}",
-          onClick: function(date) {
-            var yyyy = date.getFullYear();
-            var mm = date.getMonth() + 1;
-            if(mm < 10) mm = "0" + mm;
-
-            var dd = date.getDate();
-            if(dd < 10) dd = "0" + dd;
-
-            window.location.assign('archives/' + yyyy + '/' + mm + '/' + dd);
-          }
-        });
-
-      </script>
-
     </div>
   </div>
 </div>

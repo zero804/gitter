@@ -7,39 +7,38 @@ var chatService = require('../../services/chat-service');
 var restSerializer = require('../../serializers/rest-serializer');
 var contextGenerator = require('../../web/context-generator');
 var Q = require('q');
+var roomService = require('../../services/room-service');
 
 exports.datesList = [
   appMiddleware.uriContextResolverMiddleware,
   function(req, res, next) {
     var user = req.user;
-
-    if(req.uriContext.troupe.security !== 'PUBLIC') {
-      // For now, archives for public rooms only
-      return next(403);
-    }
-
     var troupe = req.uriContext.troupe;
-    var troupeId = troupe.id;
 
-    return contextGenerator.generateTroupeContext(req)
-      .then(function(troupeContext) {
+    return roomService.validateRoomForReadOnlyAccess(user, troupe)
+      .then(function() {
+        var troupe = req.uriContext.troupe;
 
-        var githubLink;
-        if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
-          githubLink = 'https://github.com/' + req.uriContext.uri;
-        }
+        return contextGenerator.generateTroupeContext(req)
+          .then(function(troupeContext) {
 
-        res.render('archive-home-template', {
-          layout: 'archive',
-          user: user,
-          troupeContext: troupeContext,
-          bootScriptName: 'router-archive-home',
-          troupeTopic: troupe.topic,
-          githubLink: githubLink,
-          troupeName: req.uriContext.uri,
-          dataUrl: '/api/private/chat-heatmap/' + troupeId + '?start={{d:start}}&end={{d:end}}'
-        });
+            var githubLink;
+            if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
+              githubLink = 'https://github.com/' + req.uriContext.uri;
+            }
 
+            res.render('archive-home-template', {
+              layout: 'archive',
+              user: user,
+              archives: true,
+              troupeContext: troupeContext,
+              bootScriptName: 'router-archive-home',
+              troupeTopic: troupe.topic,
+              githubLink: githubLink,
+              troupeName: req.uriContext.uri
+            });
+
+          });
       })
       .fail(next);
   }
@@ -49,58 +48,59 @@ exports.chatArchive = [
   appMiddleware.uriContextResolverMiddleware,
   function(req, res, next) {
     var user = req.user;
-
-    if(req.uriContext.troupe.security !== 'PUBLIC') {
-      // For now, archives for public rooms only
-      return next(403);
-    }
-
-    var yyyy = parseInt(req.params.yyyy, 10);
-    var mm = parseInt(req.params.mm, 10);
-    var dd = parseInt(req.params.dd, 10);
-
-    var startDate = moment(yyyy + "-" + mm + "-" + dd + "Z");
-    var endDate = moment(startDate).endOf('day');
-
-    var nextDate = moment(startDate).add('days', 1);
-    var previousDate = moment(startDate).subtract('days', 1);
-
     var troupe = req.uriContext.troupe;
-    var troupeId = troupe.id;
 
-    chatService.findChatMessagesForTroupeForDateRange(troupeId, startDate.toDate(), endDate.toDate())
-      .then(function(chatMessages) {
-        var strategy = new restSerializer.ChatStrategy({
-          notLoggedIn: true,
-          troupeId: troupeId
-        });
+    return roomService.validateRoomForReadOnlyAccess(user, troupe)
+      .then(function() {
 
-        return Q.all([
-            contextGenerator.generateTroupeContext(req),
-            restSerializer.serializeQ(chatMessages, strategy)
-          ]);
-      })
-      .spread(function(troupeContext, serialized) {
+        var yyyy = parseInt(req.params.yyyy, 10);
+        var mm = parseInt(req.params.mm, 10);
+        var dd = parseInt(req.params.dd, 10);
 
-        var githubLink;
+        var startDate = moment(yyyy + "-" + mm + "-" + dd + "Z");
+        var endDate = moment(startDate).endOf('day');
 
-        if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
-          githubLink = 'https://github.com/' + req.uriContext.uri;
-        }
+        var nextDate = moment(startDate).add('days', 1);
+        var previousDate = moment(startDate).subtract('days', 1);
 
-        res.render('chat-archive-template', {
-          layout: 'archive',
-          isRepo: troupe.githubType === 'REPO',
-          bootScriptName: 'router-archive-chat',
-          githubLink: githubLink,
-          user: user,
-          troupeContext: troupeContext,
-          troupeName: req.uriContext.uri,
-          troupeTopic: troupe.topic,
-          chats: serialized,
-          agent: req.headers['user-agent']
-        });
+        var troupe = req.uriContext.troupe;
+        var troupeId = troupe.id;
 
+        chatService.findChatMessagesForTroupeForDateRange(troupeId, startDate.toDate(), endDate.toDate())
+          .then(function(chatMessages) {
+            var strategy = new restSerializer.ChatStrategy({
+              notLoggedIn: true,
+              troupeId: troupeId
+            });
+
+            return Q.all([
+                contextGenerator.generateTroupeContext(req),
+                restSerializer.serializeQ(chatMessages, strategy)
+              ]);
+          })
+          .spread(function(troupeContext, serialized) {
+
+            var githubLink;
+
+            if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
+              githubLink = 'https://github.com/' + req.uriContext.uri;
+            }
+
+            res.render('chat-archive-template', {
+              layout: 'archive',
+              archives: true,
+              isRepo: troupe.githubType === 'REPO',
+              bootScriptName: 'router-archive-chat',
+              githubLink: githubLink,
+              user: user,
+              troupeContext: troupeContext,
+              troupeName: req.uriContext.uri,
+              troupeTopic: troupe.topic,
+              chats: serialized,
+              agent: req.headers['user-agent']
+            });
+
+          });
       })
       .fail(next);
   }
