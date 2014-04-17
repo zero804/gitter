@@ -2529,7 +2529,7 @@ define(["jquery"], function (jQuery){
 
 		FN._unbind_buttons = function() {
 			var ns1 = cf_e('', conf),
-				ns2 = cf_e('', conf, false);
+				ns2 = cf_e('', conf, false),
 				ns3 = cf_e('', conf, false, true, true);
 
 			$(document).unbind(ns3);
