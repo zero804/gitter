@@ -39,7 +39,12 @@
   {{else}}
   CREATE AN ACCOUNT
   {{/if}}
+  <div>
+    {{#if previousDate}}<a href="{{previousDateLink}}">{{previousDate}}</a>{{/if}}
+    {{#if nextDate}}<a href="{{nextDateLink}}">{{nextDate}}</a>{{/if}}
+  </div>
 </div>
+
 
 {{#if troupeContext}}
 {{{ generateTroupeContext troupeContext }}}
