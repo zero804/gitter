@@ -108,6 +108,7 @@ function findAllTroupesIdsForUser(userId, callback) {
 }
 
 function userHasAccessToTroupe(user, troupe) {
+  if(!user) return false;
   return troupe.containsUserId(user.id);
 }
 
