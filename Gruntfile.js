@@ -405,14 +405,6 @@ module.exports = function( grunt ) {
         },
         exports: 'Cocktail'
       },
-      fineuploader: {
-        files : {
-          'output/client-libs/fine-uploader/fine-uploader.js': ['output/client-libs/fine-uploader/fine-uploader.js-raw']
-        },
-        modules: {
-        },
-        exports: 'qq'
-      },
       faye: {
         files : {
           'output/client-libs/faye/faye-browser.js': ['output/client-libs/faye/browser/faye-browser' + (min ? '-min' : '') + '.js']
@@ -420,15 +412,6 @@ module.exports = function( grunt ) {
         modules: {
         },
         exports: 'window.Faye'
-      },
-      hopscotch: {
-        files: {
-          'output/client-libs/hopscotch/hopscotch-0.1.2-amd.js': ['output/client-libs/hopscotch/js/hopscotch-0.1.2.js']
-        },
-        modules: {
-
-        },
-        exports: 'window.hopscotch'
       },
       nanoscroller: {
         files : {
@@ -472,18 +455,9 @@ module.exports = function( grunt ) {
         },
         exports: 'jQuery'
       },
-      'jquery-placeholder': {
-        files : {
-          'output/client-libs/jquery-placeholder/jquery.placeholder-amd.js': ['output/client-libs/jquery-placeholder/jquery.placeholder' + (min ? '.min' : '') + '.js']
-        },
-        modules: {
-          'jquery': 'jQuery'
-        },
-        exports: 'jQuery'
-      },
       'jquery-carousel': {
         files : {
-          'output/client-libs/jquery-carousel/jquery-carouFredSel-6.2.1.amd.js': ['output/client-libs/jquery-carouFredSel-6.2.1.js']
+          'output/client-libs/jquery-carousel/jquery.carouFredSel-6.2.1.amd.js': ['output/client-libs/jquery-carousel/jquery.carouFredSel-6.2.1.js']
         },
         modules: {
           'jquery': 'jQuery'
