@@ -33,10 +33,6 @@ function uriContextResolverMiddleware(req, res, next) {
         events.push('hooks_require_additional_public_scope');
       }
 
-      if(uriContext.didCreate) {
-        events.push('room_created_now');
-      }
-
       req.troupe = uriContext.troupe;
       req.uriContext = uriContext;
       next();
