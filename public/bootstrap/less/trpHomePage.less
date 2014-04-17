@@ -58,6 +58,10 @@ img {
   vertical-align: middle;
   margin-left: 20px;
   color: @trpGreen;
+
+  &.small {
+    font-size: 25px;
+  }
 }
 
 .avatar {
@@ -135,7 +139,7 @@ img {
   display: inline-block; 
   margin-top: 140px;
   @media @mobile {
-    margin-top: 40px;
+    margin-top: 80px;
   }
 }
 
@@ -228,6 +232,16 @@ img {
   opacity: 1;
 }
 
+.next {
+  cursor: pointer;
+}
+
+.nomobile {
+  @media @mobile {
+    display: none;
+  }
+}
+
 .signup-container {
   float: right;
   font-size: 14px; 
@@ -235,8 +249,8 @@ img {
   letter-spacing: 0.5px;
   @media @mobile {
     width: 100%;
-    text-align: center;
-    margin-top: 20px;
+    margin-top: 300px;
+    text-align: left;
   }
 }
 
