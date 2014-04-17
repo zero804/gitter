@@ -1,7 +1,7 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//*global require:false */
 require([
   'jquery',
-  'carousel'
+  'jquery-carousel'
  ],
   function($, carousel) {
     "use strict";
