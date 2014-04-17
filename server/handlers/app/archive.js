@@ -35,7 +35,7 @@ exports.datesList = [
         }
 
         res.render('chat-archive-dates-template', {
-          layout: 'archive',
+          // layout: 'archive',
           isRepo: troupe.githubType === 'REPO',
           bootScriptName: 'router-archive-chat',
           githubLink: githubLink,
