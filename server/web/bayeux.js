@@ -21,7 +21,7 @@ var appTag = appVersion.getAppTag();
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
   { re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)$/,
-    validator: validateUserForTroupeSubscription },
+    validator: validateUserForSubTroupeSubscription },
   { re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)\/(\w+)$/,
     validator: validateUserForSubTroupeSubscription,
     populator: populateSubTroupeCollection },
@@ -42,9 +42,31 @@ var routes = [
 
 var superClientPassword = nconf.get('ws:superClientPassword');
 
-// This strategy ensures that a user can access a given troupe URL
-function validateUserForTroupeSubscription(options, callback) {
-  validateUserForSubTroupeSubscription(options, callback);
+function checkTroupeAccess(userId, troupeId, callback) {
+  // TODO: use the room permissions model
+  return troupeService.findById(troupeId)
+    .then(function(troupe) {
+      if(!troupe) return false;
+
+      if(troupe.security === 'PUBLIC') {
+        return true;
+      }
+
+      // After this point, everything needs to be authenticated
+      if(!userId) {
+        return false;
+      }
+
+      var result = troupeService.userIdHasAccessToTroupe(userId, troupe);
+
+      if(!result) {
+        winston.info("Denied user " + userId + " access to troupe " + troupe.uri);
+        return false;
+      }
+
+      return result;
+    })
+    .nodeify(callback);
 }
 
 // This strategy ensures that a user can access a URL under a troupe URL
@@ -58,18 +80,7 @@ function validateUserForSubTroupeSubscription(options, callback) {
     return callback(new StatusError(400, 'Invalid ID: ' + troupeId));
   }
 
-  return troupeService.findById(troupeId)
-    .then(function(troupe) {
-      if(!troupe) return false;
-      var result = troupeService.userIdHasAccessToTroupe(userId, troupe);
-
-      if(!result) {
-        winston.info("Denied user " + userId + " access to troupe " + troupe.uri);
-        return false;
-      }
-
-      return result;
-    })
+  return checkTroupeAccess(userId, troupeId)
     .nodeify(callback);
 }
 
@@ -85,6 +96,13 @@ function validateUserForUserSubscription(options, callback) {
   var match = options.match;
   var subscribeUserId = match[1];
 
+  // All /user/ subscriptions need to be authenticated
+  if(!userId) return false;
+
+  if(!mongoUtils.isLikeObjectId(userId)) {
+    return callback(new StatusError(400, 'Invalid ID: ' + userId));
+  }
+
   var result = userId == subscribeUserId;
 
   return callback(null, result);
@@ -95,6 +113,9 @@ function populateSubUserCollection(options, callback) {
   var match = options.match;
   var subscribeUserId = match[1];
   var collection = match[2];
+
+  // All /user/ subscriptions need to be authenticated
+  if(!userId) return false;
 
   if(userId != subscribeUserId) {
     return callback(null, [ ]);
@@ -202,10 +223,12 @@ var authenticator = {
       return callback(message);
     }
 
-    var ext = message.ext;
+    var ext = message.ext || {};
 
-    if(!ext || !ext.token) {
-      return deny(401, 'Token required');
+    var token = ext.token;
+
+    if(!token) {
+      return deny(401, "Access token required");
     }
 
     oauth.validateAccessTokenAndClient(ext.token, function(err, tokenInfo) {
@@ -215,15 +238,14 @@ var authenticator = {
       }
 
       if(!tokenInfo) {
-        winston.warn("bayeux: Authentication failed. Invalid access token.");
+        winston.warn("bayeux: Authentication failed. Invalid access token.", { token: token });
         return deny(401, "Invalid access token");
       }
 
       var user = tokenInfo.user;
       var oauthClient = tokenInfo.client;
-      var userId = user.id;
-
-      winston.verbose('bayeux: handshake', { username: user.username, client: oauthClient.name });
+      var userId = user && user.id;
+      winston.verbose('bayeux: handshake', { username: user && user.username, client: oauthClient.name });
 
       var connectionType = getConnectionType(ext.connType);
       var client = ext.client || '';
@@ -267,12 +289,17 @@ var authenticator = {
     }
 
     message.id = parts[0] || undefined; // id not required for an incoming message
-    var userId = parts[1];
+    var userId = parts[1] || undefined;
     var connectionType = parts[2];
     var clientId = message.clientId;
-    var client = parts[3];
+    var client = parts[3] || undefined;
     var troupeId = parts[4] || undefined;
     var eyeballState = parseInt(parts[5], 10) || 0;
+
+    if(!userId) {
+      // Not logged in? Simply return
+      return callback(message);
+    }
 
     winston.info("bayeux: connection " + clientId + ' is associated to ' + userId, { troupeId: troupeId, client: client });
 
@@ -442,10 +469,10 @@ var authorisor = {
     presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
       if(err) return callback(err);
 
-      if(!userId) {
-        winston.warn('bayeux: client not authenticated.', { clientId: clientId });
-        return callback(new StatusError(401, 'Cannot authorise. Client not authenticated'));
-      }
+      // if(!userId) {
+      //   winston.warn('bayeux: client not authenticated.', { clientId: clientId });
+      //   return callback(new StatusError(401, 'Cannot authorise. Client not authenticated'));
+      // }
 
       var match = null;
 

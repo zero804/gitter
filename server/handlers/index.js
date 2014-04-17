@@ -12,7 +12,6 @@ module.exports = {
     require('./apps').install(app);
     require('./test-data').install(app);
     require('./unawesome-browser').install(app);
-    require('./start').install(app);
     require('./unsubscribe').install(app);
   }
 };

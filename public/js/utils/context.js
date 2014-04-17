@@ -97,11 +97,6 @@ define([
     return !!troupe.get('oneToOne');
   };
 
-  context.inUserhomeContext = function() {
-    // TODO: deal with this? Probably env rather than context?
-    return ctx.inUserhome;
-  };
-
   /**
    * DEPRECATED
    */
@@ -143,6 +138,11 @@ define([
    */
   context.env = function(envName) {
     return window.troupeEnv && window.troupeEnv[envName];
+  };
+
+  context.isLoggedIn = function() {
+    // TODO: this is not ideal. perhaps make this better
+    return !!user.id;
   };
 
   context.testOnly = {
