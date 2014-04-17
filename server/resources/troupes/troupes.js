@@ -19,7 +19,7 @@ module.exports = {
   },
 
   show: function(req, res, next) {
-    var strategyOptions = { currentUserId: req.user.id };
+    var strategyOptions = { currentUserId: req.user && req.user.id };
 
     if (req.query.include_users) strategyOptions.mapUsers = true;
     var strategy = new restSerializer.TroupeStrategy(strategyOptions);
@@ -40,7 +40,6 @@ module.exports = {
 
       var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true, includeRolesForTroupe: room.troupe });
       restSerializer.serialize(room.troupe, strategy, function(err, serialized) {
-        console.log(serialized);
         if (err) return next(err);
 
         res.send({allowed: true, room: serialized});

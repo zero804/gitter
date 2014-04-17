@@ -51,7 +51,7 @@ module.exports = function(tokenPriority) {
 
     return d.promise.spread(function(response, body) {
       if(response.statusCode >= 400) {
-        throw response.statusCode;
+        throw response;
       }
 
       if(response.statusCode !== 200) {

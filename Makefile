@@ -255,22 +255,13 @@ install-client-libs:
 	cp output/client-libs/expect/expect-amd.js public/repo/expect/expect.js
 	cp output/client-libs/faye/faye-browser.js public/repo/faye/faye.js
 	cp output/client-libs/filtered-collection/backbone-filtered-collection-amd.js public/repo/filtered-collection/filtered-collection.js
-	cp output/client-libs/hopscotch/hopscotch-0.1.2-amd.js public/repo/hopscotch/hopscotch.js
-
-	mkdir -p public/repo/hopscotch/css/ public/repo/hopscotch/img
-	cp output/client-libs/hopscotch/css/hopscotch-0.1.1.min.css public/repo/hopscotch/css/hopscotch.css
-	cp output/client-libs/hopscotch/img/sprite-green-0.3.png public/repo/hopscotch/img/
-
-	cp output/client-libs/hopscotch/css/hopscotch-0.1.1.min.css public/repo/hopscotch/css/hopscotch.css
 	cp output/client-libs/marionette/lib/core/amd/backbone.marionette.min.js public/repo/marionette/marionette.js
-	cp output/client-libs/fine-uploader/fine-uploader.js public/repo/fine-uploader/fine-uploader.js
-	cp output/client-libs/fine-uploader/client/fineuploader.css public/repo/fine-uploader/fineuploader.less
 	cp output/client-libs/hbs/hbs.js public/repo/hbs/hbs.js
 	cp output/client-libs/hbs/hbs/i18nprecompile.js public/repo/hbs/i18nprecompile.js
 	cp output/client-libs/hbs/Handlebars.js public/repo/hbs/Handlebars.js
 	cp output/client-libs/hbs/hbs/json2.js public/repo/hbs/json2.js
-	cp output/client-libs/jquery-placeholder/jquery.placeholder-amd.js public/repo/jquery-placeholder/jquery-placeholder.js
 	cp output/client-libs/jquery.validation/jquery.validate-amd.js public/repo/jquery.validation/jquery.validation.js
+	cp output/client-libs/jquery-carousel/jquery.carouFredSel-6.2.1.amd.js public/repo/jquery-carousel/jquery.carouFredSel-6.2.1.js
 	cp output/client-libs/hammerjs/dist/jquery.hammer.min.js public/repo/hammerjs/jquery.hammer.js
 	cp output/client-libs/mocha/mocha-amd.js public/repo/mocha/mocha.js
 	cp output/client-libs/mocha/mocha.css public/repo/mocha/mocha.css
