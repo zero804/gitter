@@ -30,7 +30,8 @@ require([
         pagination: {
             container: "#pager",
             anchorBuilder: false
-        }
+        },
+        debug: false
     });
 
     $('.scroll-link').click(function(){
@@ -39,6 +40,19 @@ require([
     }, 500);
     return false;
     });
+
+
+    $('#arrow-1').click(function() {
+        if (window.mixpanel) {
+            window.mixpanel.track('arrow-click', { arrow: 'arrow-1' });
+        }
+    });
+    $('#arrow-2').click(function() {
+        if (window.mixpanel) {
+            window.mixpanel.track('arrow-click', { arrow: 'arrow-2' });
+        }
+    });
+
 });
 
 
