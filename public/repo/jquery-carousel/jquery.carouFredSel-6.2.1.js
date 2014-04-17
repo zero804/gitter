@@ -4045,7 +4045,7 @@ define(["jquery"], function (jQuery){
 			//	responsive carousel -> set to largest
 			if (opt.responsive)
 			{
-				debug(true, 'Set a '+opt.d['width']+' for the items!');
+				// debug(true, 'Set a '+opt.d['width']+' for the items!');
 				obj[opt.d['width']] = ms_getTrueLargestSize(itm, opt, 'outerWidth');
 			}
 			//	 non-responsive -> measure it or set to "variable"
