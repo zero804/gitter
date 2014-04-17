@@ -60,11 +60,20 @@ exports.chatArchive = [
         var startDate = moment(yyyy + "-" + mm + "-" + dd + "Z");
         var endDate = moment(startDate).endOf('day');
 
+        var troupe = req.uriContext.troupe;
+        var troupeId = troupe.id;
+
         var nextDate = moment(startDate).add('days', 1);
         var previousDate = moment(startDate).subtract('days', 1);
 
-        var troupe = req.uriContext.troupe;
-        var troupeId = troupe.id;
+        var today = moment().endOf('day');
+        if(moment(nextDate).endOf('day').isAfter(today)) {
+          nextDate = null;
+        }
+
+        if(moment(previousDate).startOf('day').isBefore(moment([2013, 11, 1]))) {
+          previousDate = null;
+        }
 
         chatService.findChatMessagesForTroupeForDateRange(troupeId, startDate.toDate(), endDate.toDate())
           .then(function(chatMessages) {
@@ -79,7 +88,6 @@ exports.chatArchive = [
               ]);
           })
           .spread(function(troupeContext, serialized) {
-
             var githubLink;
 
             if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
@@ -97,7 +105,8 @@ exports.chatArchive = [
               troupeName: req.uriContext.uri,
               troupeTopic: troupe.topic,
               chats: serialized,
-              agent: req.headers['user-agent']
+              nextDate: nextDate,
+              previousDate: previousDate
             });
 
           });
