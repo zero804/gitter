@@ -11,6 +11,7 @@ var Q = require('q');
 exports.datesList = [
   appMiddleware.uriContextResolverMiddleware,
   function(req, res, next) {
+    var user = req.user;
 
     if(req.uriContext.troupe.security !== 'PUBLIC') {
       // For now, archives for public rooms only
@@ -20,27 +21,23 @@ exports.datesList = [
     var troupe = req.uriContext.troupe;
     var troupeId = troupe.id;
 
-    return chatService.findDatesForChatMessages(troupeId)
-      .then(function(dates) {
-        var datesList = dates.map(function(d) {
-          return {
-            formattedDate: d.format('YYYY-MM-DD'),
-            archiveLink: '/' + troupe.uri + '/archives/' + d.format('YYYY') + '/' + d.format('MM') + '/' + d.format('DD'),
-          };
-        });
+    return contextGenerator.generateTroupeContext(req)
+      .then(function(troupeContext) {
 
         var githubLink;
         if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
           githubLink = 'https://github.com/' + req.uriContext.uri;
         }
 
-        res.render('chat-archive-dates-template', {
-          // layout: 'archive',
-          isRepo: troupe.githubType === 'REPO',
-          bootScriptName: 'router-archive-chat',
+        res.render('archive-home-template', {
+          layout: 'archive',
+          user: user,
+          troupeContext: troupeContext,
+          bootScriptName: 'router-archive-home',
+          troupeTopic: troupe.topic,
           githubLink: githubLink,
           troupeName: req.uriContext.uri,
-          dates: datesList
+          dataUrl: '/api/private/chat-heatmap/' + troupeId + '?start={{d:start}}&end={{d:end}}'
         });
 
       })
@@ -51,6 +48,7 @@ exports.datesList = [
 exports.chatArchive = [
   appMiddleware.uriContextResolverMiddleware,
   function(req, res, next) {
+    var user = req.user;
 
     if(req.uriContext.troupe.security !== 'PUBLIC') {
       // For now, archives for public rooms only
@@ -61,13 +59,16 @@ exports.chatArchive = [
     var mm = parseInt(req.params.mm, 10);
     var dd = parseInt(req.params.dd, 10);
 
-    var startDate = moment(yyyy + "-" + mm + "-" + dd + "Z").valueOf();
-    var endDate = startDate + 86400000 - 1;
+    var startDate = moment(yyyy + "-" + mm + "-" + dd + "Z");
+    var endDate = moment(startDate).endOf('day');
+
+    var nextDate = moment(startDate).add('days', 1);
+    var previousDate = moment(startDate).subtract('days', 1);
 
     var troupe = req.uriContext.troupe;
     var troupeId = troupe.id;
 
-    chatService.findChatMessagesForTroupeForDateRange(troupeId, startDate, endDate)
+    chatService.findChatMessagesForTroupeForDateRange(troupeId, startDate.toDate(), endDate.toDate())
       .then(function(chatMessages) {
         var strategy = new restSerializer.ChatStrategy({
           notLoggedIn: true,
@@ -92,6 +93,7 @@ exports.chatArchive = [
           isRepo: troupe.githubType === 'REPO',
           bootScriptName: 'router-archive-chat',
           githubLink: githubLink,
+          user: user,
           troupeContext: troupeContext,
           troupeName: req.uriContext.uri,
           troupeTopic: troupe.topic,
