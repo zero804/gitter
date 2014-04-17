@@ -20,6 +20,12 @@ module.exports = function(req, res, next) {
       ghResponse.files[0].patch_html = util.format('<pre><code>%s</code></pre>', highlight.highlight('diff', ghResponse.files[0].patch).value);
     }
     res.send(ghResponse);
-  }).fail(next);
+  }).fail(function(err) {
+    if(err.statusCode) {
+      res.send(err.statusCode);
+    } else {
+      next(err);
+    }
+  });
 
 };
