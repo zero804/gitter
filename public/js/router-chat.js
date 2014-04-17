@@ -17,6 +17,7 @@ require([
   'views/app/addPeopleView',
   'views/app/integrationSettingsModal',
   'components/unread-items-client',
+  'components/helpShareIfLonely',
 
   'views/chat/decorators/webhookDecorator',
   'views/chat/decorators/issueDecorator',
@@ -39,7 +40,7 @@ require([
 ], function($, Backbone, context, liveContext, appEvents, peopleCollectionView, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, RightToolbarView,
     inviteView, TroupeSettingsView, MarkdownView, AddPeopleViewModal, IntegrationSettingsModal,
-    unreadItemsClient, webhookDecorator, issueDecorator, commitDecorator, mentionDecorator,
+    unreadItemsClient, helpShareIfLonely, webhookDecorator, issueDecorator, commitDecorator, mentionDecorator,
     embedDecorator, emojiDecorator, UnreadBannerView, HeaderView) {
   "use strict";
 
@@ -231,13 +232,7 @@ require([
     setTimeout(promptForHook, 1500);
   }
 
-  if(context.popEvent('room_created_now')) {
-    if (!context.getTroupe().oneToOne) {
-      setTimeout(function() {
-        window.location.hash = "!|inv";
-      }, 500);
-    }
-  }
+  helpShareIfLonely();
 
   Backbone.history.start();
 });
