@@ -775,3 +775,19 @@ function ensureRepoRoomSecurity(uri, security) {
     });
 }
 exports.ensureRepoRoomSecurity = ensureRepoRoomSecurity;
+
+
+function findByIdForReadOnlyAccess(user, roomId) {
+  return troupeService.findById(roomId)
+    .then(function(troupe) {
+      if(!troupe) throw 404; // Mandatory
+
+      return roomPermissionsModel(user, 'view', troupe)
+        .then(function(access) {
+          if(access) return troupe;
+
+          throw 404;
+        });
+    });
+}
+exports.findByIdForReadOnlyAccess = findByIdForReadOnlyAccess;
