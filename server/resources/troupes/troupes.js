@@ -19,7 +19,7 @@ module.exports = {
   },
 
   show: function(req, res, next) {
-    var strategyOptions = { currentUserId: req.user.id };
+    var strategyOptions = { currentUserId: req.user && req.user.id };
 
     if (req.query.include_users) strategyOptions.mapUsers = true;
     var strategy = new restSerializer.TroupeStrategy(strategyOptions);
@@ -94,6 +94,11 @@ module.exports = {
 
       if(troupe.security === 'PUBLIC' && req.method === 'GET') {
         return callback(null, troupe);
+      }
+
+      /* From this point forward we need a user */
+      if(!req.user) {
+        return callback(404);
       }
 
       if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
