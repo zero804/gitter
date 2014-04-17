@@ -6,6 +6,7 @@ var roomService       = require("../../services/room-service");
 var restful           = require("../../services/restful");
 var restSerializer    = require("../../serializers/rest-serializer");
 var Q                 = require('q');
+var mongoUtils        = require('../../utils/mongo-utils');
 
 module.exports = {
   id: 'troupe',
@@ -18,7 +19,7 @@ module.exports = {
   },
 
   show: function(req, res, next) {
-    var strategyOptions = { currentUserId: req.user.id };
+    var strategyOptions = { currentUserId: req.user && req.user.id };
 
     if (req.query.include_users) strategyOptions.mapUsers = true;
     var strategy = new restSerializer.TroupeStrategy(strategyOptions);
@@ -39,7 +40,6 @@ module.exports = {
 
       var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true, includeRolesForTroupe: room.troupe });
       restSerializer.serialize(room.troupe, strategy, function(err, serialized) {
-        console.log(serialized);
         if (err) return next(err);
 
         res.send({allowed: true, room: serialized});
@@ -82,13 +82,23 @@ module.exports = {
   },
 
   load: function(req, id, callback) {
-    if(!req.user) return callback(401);
+    /* Invalid id? Return 404 */
+    if(!mongoUtils.isLikeObjectId(id)) return callback();
 
     troupeService.findById(id, function(err, troupe) {
       if(err) return callback(500);
       if(!troupe) return callback(404);
 
       if(troupe.status != 'ACTIVE') return callback(404);
+
+      if(troupe.security === 'PUBLIC' && req.method === 'GET') {
+        return callback(null, troupe);
+      }
+
+      /* From this point forward we need a user */
+      if(!req.user) {
+        return callback(404);
+      }
 
       if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
         return callback(403);

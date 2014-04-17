@@ -14,19 +14,16 @@ var Q                = require('q');
 /**
  * Returns the promise of a mini-context
  */
-exports.generateMiniContext = function(req, callback) {
+exports.generateNonChatContext = function(req, callback) {
   var user = req.user;
 
   return Q.all([
       user ? serializeUser(user) : null,
-      user ? getWebToken(user) : null,
       user ? determineDesktopNotifications(user, req) : false
     ])
-    .spread(function(serializedUser, token, desktopNotifications) {
+    .spread(function(serializedUser, desktopNotifications) {
       return createTroupeContext(req, {
         user: serializedUser,
-        accessToken: token,
-        inUserhome: true,
         desktopNotifications: desktopNotifications,
       });
     })
@@ -65,12 +62,11 @@ exports.generateTroupeContext = function(req, callback) {
   return Q.all([
     user ? serializeUser(user) : null,
     homeUser ? serializeHomeUser(homeUser) : undefined, //include email if the user has an invite
-    user ? getWebToken(user) : null,
-    troupe && user ? serializeTroupe(troupe, user) : fakeSerializedTroupe(req.uriContext),
+    troupe ? serializeTroupe(troupe, user) : undefined,
     determineDesktopNotifications(user, req),
     roomPermissionsModel(user, 'admin', troupe)
   ])
-  .spread(function(serializedUser, serializedHomeUser, token, serializedTroupe, desktopNotifications, adminAccess) {
+  .spread(function(serializedUser, serializedHomeUser, serializedTroupe, desktopNotifications, adminAccess) {
 
     var status;
     if(user) {
@@ -81,7 +77,6 @@ exports.generateTroupeContext = function(req, callback) {
       user: serializedUser,
       homeUser: serializedHomeUser,
       troupe: serializedTroupe,
-      accessToken: token,
       desktopNotifications: desktopNotifications,
       troupeHash: troupeHash,
       permissions: {
@@ -143,10 +138,6 @@ function serializeHomeUser(user, includeEmail) {
   return restSerializer.serializeQ(user, strategy);
 }
 
-function getWebToken(user) {
-  return oauthService.findOrGenerateWebToken(user.id);
-}
-
 function serializeTroupeId(troupeId, userId) {
   var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
 
@@ -160,24 +151,6 @@ function serializeTroupe(troupe, user) {
   return restSerializer.serializeQ(troupe, strategy);
 }
 
-function fakeSerializedTroupe(uriContext) {
-  var oneToOne = uriContext.oneToOne;
-  var otherUser = uriContext.otherUser;
-  var troupe = uriContext.troupe;
-
-  var uri = (oneToOne ?  (otherUser.username || "one-one/" + otherUser.id ) : troupe.uri);
-
-  var url = "/" + uri;
-
-  return {
-    oneToOne: oneToOne,
-    uri: uri,
-    url: url,
-    name: otherUser && otherUser.username ? otherUser.username : 'Welcome'
-  };
-
-}
-
 function createTroupeContext(req, options) {
   var events = req.session && req.session.events;
   if(events) { req.session.events = []; }
@@ -186,8 +159,7 @@ function createTroupeContext(req, options) {
       user: options.user,
       troupe: options.troupe,
       homeUser: options.homeUser,
-      inUserhome: options.inUserhome,
-      accessToken: options.accessToken,
+      accessToken: req.session.accessToken,
       appVersion: appVersion.getCurrentVersion(),
       desktopNotifications: options.desktopNotifications,
       events: events,

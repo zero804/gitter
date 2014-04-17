@@ -74,6 +74,14 @@ module.exports = function(err, req, res, next) {
    }
   }
 
+  /* Got a 401, the user isn't logged in and this is a browser? */
+  if(status === 401 && req.accepts(['json','html']) === 'html' && !req.user) {
+    req.session.returnTo = req.url.replace(/\/~chat$/,"");
+    res.redirect('/login');
+    return;
+  }
+
+
   if(status >= 500) {
    // Send to sentry
    errorReporting(err, { type: 'response', status: status, userId: userId, url: req.url, method: req.method });

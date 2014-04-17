@@ -23,13 +23,10 @@ module.exports = function(tokenPriority) {
   var Q = require('q');
   var wrap = require('./github-cache-wrapper');
   var badCredentialsCheck = require('./bad-credentials-check');
-  var request = require('request');
-  var assert = require('assert');
+  var request = require('./request-wrapper');
 
   function Mirror(user) {
-    assert(user, 'user required');
     var token = tokenStrategy(user);
-    assert(token, 'token required');
     this.token = token;
   }
 
@@ -42,7 +39,7 @@ module.exports = function(tokenPriority) {
     u.protocol = 'https';
     u.hostname = 'api.github.com';
     var options = {
-      url: url.format(u),
+      uri: url.format(u),
       headers: {
         'Content-Type': 'application/json',
         'User-Agent': 'gitter/0.0 (https://gitter.im) terminal/0.0'

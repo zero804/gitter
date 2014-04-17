@@ -13,20 +13,45 @@ var redisClient = redis.createClient();
 var authCookieName = nconf.get('web:cookiePrefix') + 'auth';
 var sessionCookieName = nconf.get('web:cookiePrefix') + 'session';
 
-var bearerLogin = passport.authenticate('bearer', { session: true });
+function hasAccessToken(req) {
+  return req.headers && req.headers['authorization'] ||
+         req.body && req.body['access_token'] ||
+         req.query && req.query['access_token'];
+}
+
+/* Optional middleware for oauth */
 function bearerAuthMiddleware(req, res, next) {
-  // If the user is already logged in, don't check for OAUTH tokens
-  // This could potentially lead to problems if one user is logged in
-  // but another users oauth token is presented, but this is pretty edge
-  // and getting around it would be very ineffiecent
-  if(req.user) return next();
+  if(!hasAccessToken(req)) return next();
 
-  if(req.headers.authorization)  {
-    /* Bearer login is not optional, so if you don't present a token we get a 401 */
-    return bearerLogin(req, res, next);
+  /* Temporary fix - remove 15 May 2014 */
+  /* A bug in the OSX client adds this header each time a refresh is done */
+  if(req.headers && req.headers['authorization']) {
+    var a = req.headers['authorization'];
+    if(a.indexOf('Bearer ') === 0 && a.indexOf(',') >= 0) {
+      winston.warn('auth: compensating for incorrect auth header');
+      req.headers['authorization'] = a.split(/,/)[0];
+    }
   }
+  /* End Temporary fix */
 
-  return next();
+  passport.authenticate('bearer', { session: true }, function(err, user, info) {
+    if(err) return next(err);
+    if(!user) return next(401);
+
+    return req.logIn(user, function(err) {
+      if (err) return next(err);
+      if(info) {
+        passport.transformAuthInfo(info, function(err, tinfo) {
+          if (err) return next(err);
+          req.authInfo = tinfo;
+          next();
+        });
+      } else {
+        next();
+      }
+    });
+
+  })(req, res, next);
 }
 
 var rateLimiter = dolph({
@@ -53,7 +78,7 @@ exports.ensureLoggedIn = function(options) {
     bearerAuthMiddleware,
     rememberMe.rememberMeMiddleware(/* No Options */),
     rateLimiter,
-    require('./csrf-middleware'),
+    require('./middlewares/enforce-csrf'),
     function(req, res, next) {
       if (req.user) {
         if(!req.user.githubToken && !req.user.githubUserToken) {
@@ -79,6 +104,10 @@ exports.ensureLoggedIn = function(options) {
           return;
         }
 
+        return next();
+      }
+
+      if(options.allowGet && req.method === 'GET') {
         return next();
       }
 
