@@ -24,7 +24,7 @@ exports.datesList = [
 
             var githubLink;
             if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
-              githubLink = 'https://github.com/' + req.uriContext.uri;
+              githubLink = '/' + req.uriContext.uri;
             }
 
             res.render('archive-home-template', {
@@ -91,12 +91,13 @@ exports.chatArchive = [
             var githubLink;
 
             troupeContext.archive = {
+              archiveDate: startDate,
               nextDate: nextDate,
               previousDate: previousDate
             };
 
             if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
-              githubLink = 'https://github.com/' + req.uriContext.uri;
+              githubLink = '/' + req.uriContext.uri;
             }
 
             res.render('chat-archive-template', {

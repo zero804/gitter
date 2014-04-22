@@ -3,8 +3,9 @@ define([
   'marionette',
   'utils/momentWrapper',
   'utils/context',
-  'hbs!./tmpl/archive-navigation-view'
-], function(Marionette, moment, context, template) {
+  'hbs!./tmpl/archive-navigation-view',
+  'cal-heatmap'
+], function(Marionette, moment, context, template, CalHeatMap) {
   'use strict';
 
   return Marionette.ItemView.extend({
@@ -28,8 +29,16 @@ define([
 
     onRender: function() {
       var a = this.options.archiveDate && moment(this.options.archiveDate).utc();
+      var v = a.diff(new Date());
+      var range = 3;
+      if(moment.duration(v).asMonths() < 1) {
+        range = 2;
+      }
 
       var start = moment(a).subtract('months', 1);
+
+
+      var troupeId = context.getTroupeId();
 
       var cal = new CalHeatMap();
       cal.init({
@@ -37,12 +46,14 @@ define([
         start: start.toDate(),
         maxDate: new Date(),
         minDate: new Date(2013, 10, 1), // 1 November 2013
-        range: 3,
+        range: range,
         domain: "month",
         subDomain: "day",
+        verticalOrientation: true,
         considerMissingDataAsZero: false,
         data: '/api/private/chat-heatmap/' + troupeId + '?start={{d:start}}&end={{d:end}}',
-        onClick: function(date) {
+        onClick: function(date, value) {
+          if(!value) return;
           var yyyy = date.getFullYear();
           var mm = date.getMonth() + 1;
           if(mm < 10) mm = "0" + mm;

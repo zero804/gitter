@@ -73,7 +73,9 @@ require([
     subDomain: "day",
     considerMissingDataAsZero: false,
     data: '/api/private/chat-heatmap/' + troupeId + '?start={{d:start}}&end={{d:end}}',
-    onClick: function(date) {
+    onClick: function(date, value) {
+      if(!value) return;
+
       var yyyy = date.getFullYear();
       var mm = date.getMonth() + 1;
       if(mm < 10) mm = "0" + mm;

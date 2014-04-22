@@ -49,10 +49,13 @@ require([
 
   new HeaderView({ model: context.troupe(), el: '#header' });
 
+  var archiveContext = context().archive;
+
   new ArchiveNavigationView({
     el: '#archive-navigation',
-    nextDate: context().archive.nextDate,
-    previousDate: context().archive.previousDate
+    archiveDate: archiveContext.archiveDate,
+    nextDate: archiveContext.nextDate,
+    previousDate: archiveContext.previousDate
   }).render();
 
   var Router = Backbone.Router.extend({
