@@ -96,9 +96,9 @@ module.exports = {
         '/:roomPart1/:roomPart2',
         '/:roomPart1/:roomPart2/:roomPart3',
       ].forEach(function(path) {
-        app.get(path, mainFrameMiddlewarePipeline);
-        app.get(path + '/archives', archive.datesList);
+        app.get(path + '/archives/all', archive.datesList);
         app.get(path + '/archives/:yyyy(\\d{4})/:mm(\\d{2})/:dd(\\d{2})', archive.chatArchive);
+        app.get(path, mainFrameMiddlewarePipeline);
       });
 
     }
