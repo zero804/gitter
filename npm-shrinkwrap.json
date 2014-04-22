@@ -605,9 +605,9 @@
       "from": "geckoboard-push@0.0.5"
     },
     "gitter-services": {
-      "version": "1.1.0",
-      "from": "gitter-services@git+ssh://git@github.com:gitterHQ/services.git#1.1.0",
-      "resolved": "git+ssh://git@github.com:gitterHQ/services.git#3193a446305ff7cfa0ba3b4992cf8c87d0130b3c",
+      "version": "1.1.1",
+      "from": "gitter-services@git+ssh://git@github.com:gitterHQ/services.git#1.1.1",
+      "resolved": "git+ssh://git@github.com:gitterHQ/services.git#7bef7088765dab5f477e4aeb017022b67cb37b72",
       "dependencies": {
         "require-all": {
           "version": "0.0.8",
@@ -754,6 +754,7 @@
     "jade": {
       "version": "0.28.1",
       "from": "jade@0.28.1",
+      "resolved": "https://registry.npmjs.org/jade/-/jade-0.28.1.tgz",
       "dependencies": {
         "commander": {
           "version": "0.6.1",
@@ -801,7 +802,7 @@
         },
         "source-map": {
           "version": "0.1.33",
-          "from": "source-map@0.1.x",
+          "from": "source-map@>= 0.1.2",
           "dependencies": {
             "amdefine": {
               "version": "0.1.0",
@@ -988,7 +989,7 @@
       "dependencies": {
         "async": {
           "version": "0.1.22",
-          "from": "async@0.1.x"
+          "from": "async@~0.1.22"
         },
         "ini": {
           "version": "1.1.0",
