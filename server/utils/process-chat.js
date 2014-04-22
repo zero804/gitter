@@ -5,7 +5,7 @@ var marked    = require('marked');
 var highlight = require('highlight.js');
 var _         = require('underscore');
 var util      = require('util');
-var url       = require('url');
+var matcher   = require('./github-url-matcher');
 
 var options = { gfm: true, tables: true, sanitize: true, breaks: true, linkify: true, skipComments: true };
 
@@ -43,28 +43,6 @@ module.exports = exports = function processChat(text) {
     }
 
     return href;
-  }
-
-  function getGitHubData(href) {
-    var urlObj = url.parse(href);
-
-    if(urlObj.hostname === 'github.com' && !urlObj.hash) {
-      // [ '', 'trevorah', 'test-repo', 'issues', '1' ]
-      var pathParts = urlObj.pathname.split('/');
-      if((pathParts[3] === 'issues' || pathParts[3] === 'pull') && pathParts[4] && pathParts.length === 5) {
-        return {
-          type: 'issue',
-          repo: pathParts[1]+'/'+pathParts[2],
-          number: pathParts[4]
-        };
-      } else if(pathParts[3] === 'commit' && pathParts[4] && pathParts.length === 5) {
-        return {
-          type: 'commit',
-          repo: pathParts[1]+'/'+pathParts[2],
-          sha: pathParts[4]
-        };
-      }
-    }
   }
 
   var renderer = new marked.Renderer();
@@ -105,15 +83,9 @@ module.exports = exports = function processChat(text) {
 
   renderer.link = function(href, title, text) {
     href = checkForIllegalUrl(href);
-    var githubData = getGitHubData(href);
+    var githubData = matcher(href);
     if(githubData) {
-      if(githubData.type === 'issue') {
-        var issueText = githubData.repo+'#'+githubData.number;
-        return renderer.issue(githubData.repo, githubData.number, issueText);
-      } else if(githubData.type === 'commit') {
-        return renderer.commit(githubData.repo, githubData.sha);
-      }
-
+      return renderer[githubData.type](githubData.repo, githubData.id, githubData.text);
     } else {
       urls.push({ url: href });
       return util.format('<a href="%s" rel="nofollow" target="_blank" class="link">%s</a>', href, text);  

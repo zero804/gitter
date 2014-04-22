@@ -9,76 +9,82 @@
   background-position: 0 0;
 }
 
-.service-sprite.heroku-logo {
+.service-sprite.gitlab-logo {
   width: 16px;
   height: 16px;
   background-position: -16px 0;
 }
 
-.service-sprite.jenkins-frown {
+.service-sprite.huboard-logo {
   width: 16px;
   height: 16px;
   background-position: 0 -16px;
 }
 
-.service-sprite.jenkins-logo {
+.service-sprite.jenkins-frown {
   width: 16px;
   height: 16px;
   background-position: -16px -16px;
 }
 
-.service-sprite.jenkins-meh {
+.service-sprite.jenkins-logo {
   width: 16px;
   height: 16px;
   background-position: -32px 0;
 }
 
-.service-sprite.jenkins-smile {
+.service-sprite.jenkins-meh {
   width: 16px;
   height: 16px;
   background-position: -32px -16px;
 }
 
-.service-sprite.huboard-logo {
+.service-sprite.jenkins-smile {
   width: 16px;
   height: 16px;
   background-position: 0 -32px;
 }
 
-.service-sprite.sprintly-columns {
+.service-sprite.heroku-logo {
   width: 16px;
   height: 16px;
   background-position: -16px -32px;
 }
 
-.service-sprite.sprintly-logo {
+.service-sprite.sprintly-columns {
   width: 16px;
   height: 16px;
   background-position: -32px -32px;
 }
 
-.service-sprite.travis-frown {
+.service-sprite.sprintly-logo {
   width: 16px;
   height: 16px;
   background-position: -48px 0;
 }
 
-.service-sprite.travis-logo {
+.service-sprite.travis-frown {
   width: 16px;
   height: 16px;
   background-position: -48px -16px;
 }
 
-.service-sprite.travis-meh {
+.service-sprite.travis-logo {
   width: 16px;
   height: 16px;
   background-position: -48px -32px;
 }
 
-.service-sprite.travis-smile {
+.service-sprite.travis-meh {
   width: 16px;
   height: 16px;
   background-position: 0 -48px;
+}
+
+.service-sprite.travis-smile {
+  width: 16px;
+  height: 16px;
+  background-position: -16px -48px;
 }
 
 
