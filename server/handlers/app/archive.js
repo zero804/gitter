@@ -90,6 +90,11 @@ exports.chatArchive = [
           .spread(function(troupeContext, serialized) {
             var githubLink;
 
+            troupeContext.archive = {
+              nextDate: nextDate,
+              previousDate: previousDate
+            };
+
             if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
               githubLink = 'https://github.com/' + req.uriContext.uri;
             }
@@ -104,9 +109,7 @@ exports.chatArchive = [
               troupeContext: troupeContext,
               troupeName: req.uriContext.uri,
               troupeTopic: troupe.topic,
-              chats: serialized,
-              nextDate: nextDate,
-              previousDate: previousDate
+              chats: serialized
             });
 
           });

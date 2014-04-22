@@ -5,6 +5,7 @@ require([
   'utils/context',
   'views/app/chatIntegratedView',
   'views/app/headerView',
+  'views/archive/archive-navigation-view',
 
   'views/widgets/preload',      // No ref
   'filtered-collection',        // No ref
@@ -16,7 +17,7 @@ require([
 
 ], function($, Backbone, context,
     ChatIntegratedView,
-    HeaderView) {
+    HeaderView, ArchiveNavigationView) {
   "use strict";
 
   $(document).on("click", "a", function(e) {
@@ -47,6 +48,12 @@ require([
   var appView = new ChatIntegratedView({ el: 'body' });
 
   new HeaderView({ model: context.troupe(), el: '#header' });
+
+  new ArchiveNavigationView({
+    el: '#archive-navigation',
+    nextDate: context().archive.nextDate,
+    previousDate: context().archive.previousDate
+  }).render();
 
   var Router = Backbone.Router.extend({
     routes: {
