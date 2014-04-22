@@ -29,7 +29,6 @@ define([
 
     initialize: function() {
       this.bindUIElements();
-
       this.showActivity = true;
       if(context.isLoggedIn()) {
         this.dropdown = new Dropdown({
@@ -50,6 +49,7 @@ define([
       } else {
         this.ui.favourite.css({ visibility: 'hidden' });
       }
+      this.redisplay();
     },
 
     showDropdown: function() {
@@ -121,14 +121,11 @@ define([
       }
     },
 
-    redisplay: function() {
+    redisplay: function(e) {
       var model = this.model;
-
       this.ui.name.text(model.get('name'));
-
       this.ui.topic.text(model.get('topic'));
       autolink(this.ui.topic[0]);
-
       this.ui.favourite.toggleClass('favourited', !!model.get('favourite'));
     }
 
