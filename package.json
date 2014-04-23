@@ -52,7 +52,6 @@
     "octonode": "git://github.com/pksunkara/octonode#19ad516f5d7f2cbb49c7aaef218aae325a425f80",
     "jwt-simple": "~0.1.0",
     "snappy-cache": "0.0.4",
-    "mailchimp-api": "~2.0.4",
     "lazy.js": "~0.2.1",
     "parse-links": "~0.1.0",
     "troupe-passport-github": "git://github.com/troupe/passport-github.git#v0.1.8d",

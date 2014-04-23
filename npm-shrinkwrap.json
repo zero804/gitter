@@ -565,7 +565,7 @@
         },
         "debug": {
           "version": "0.8.0",
-          "from": "debug@>= 0.7.3 < 1"
+          "from": "debug@*"
         }
       }
     },
@@ -598,10 +598,6 @@
     "lazy.js": {
       "version": "0.2.1",
       "from": "lazy.js@~0.2.1"
-    },
-    "mailchimp-api": {
-      "version": "2.0.4",
-      "from": "mailchimp-api@~2.0.4"
     },
     "marked": {
       "version": "0.4.0",
@@ -748,7 +744,7 @@
       "dependencies": {
         "async": {
           "version": "0.1.22",
-          "from": "async@~0.1.22"
+          "from": "async@0.1.x"
         },
         "ini": {
           "version": "1.1.0",
@@ -911,7 +907,8 @@
                 },
                 "asn1": {
                   "version": "0.1.11",
-                  "from": "asn1@0.1.11"
+                  "from": "asn1@0.1.11",
+                  "resolved": "https://registry.npmjs.org/asn1/-/asn1-0.1.11.tgz"
                 },
                 "ctype": {
                   "version": "0.5.2",
@@ -1111,7 +1108,8 @@
             },
             "asn1": {
               "version": "0.1.11",
-              "from": "asn1@0.1.11"
+              "from": "asn1@0.1.11",
+              "resolved": "https://registry.npmjs.org/asn1/-/asn1-0.1.11.tgz"
             },
             "ctype": {
               "version": "0.5.2",
@@ -1185,7 +1183,7 @@
             },
             "async": {
               "version": "0.2.10",
-              "from": "async@~0.2.7"
+              "from": "async@0.2.x"
             }
           }
         }
