@@ -15,6 +15,7 @@ var userSettingsService      = require('../user-settings-service');
 var userTroupeSettingsService = require('../user-troupe-settings-service');
 var winston                  = require('../../utils/winston');
 var nconf                    = require('../../utils/config');
+var statsService             = require('../stats-service');
 
 var filterTestValues = nconf.get('notifications:filterTestValues');
 
@@ -191,6 +192,8 @@ function sendEmailNotifications(since) {
               return emailNotificationService.sendUnreadItemsNotification(user, troupeData)
                 .fail(function(err) {
                   if(err.gitterAction === 'logout_destroy_user_tokens') {
+                    statsService.event('logout_destroy_user_tokens');
+
                     user.destroyTokens();
                     return user.saveQ();
                   }
