@@ -33,13 +33,14 @@
 
 {{{body}}}
 <div class="trpToolbar" id="toolbar-frame">
-  <h3>Archives</h3>
-  {{#if user}}
-  GO TO LIVE CHAT
-  {{else}}
-  CREATE AN ACCOUNT
-  {{/if}}
-  <div id="archive-navigation"></div>
+  <div class="gtrArchiveToolbarWrapper">
+    <div id="archive-navigation" class="gtrArchiveNavigationWrapper"></div>
+        {{#if user}}
+        <a class="trpButtonMedium trpBtnGreen gtrCreateRoomButton" href="https://somewhere.com">Go to live room</a>
+        {{else}}
+        CREATE AN ACCOUNT
+        {{/if}}
+  </div>
 </div>
 
 
