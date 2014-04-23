@@ -531,7 +531,7 @@
           }
         },
         "cookiejar": {
-          "version": "1.3.1",
+          "version": "1.3.2",
           "from": "cookiejar@"
         },
         "csprng": {
@@ -605,9 +605,9 @@
       "from": "geckoboard-push@0.0.5"
     },
     "gitter-services": {
-      "version": "1.1.1",
-      "from": "gitter-services@git+ssh://git@github.com:gitterHQ/services.git#1.1.1",
-      "resolved": "git+ssh://git@github.com:gitterHQ/services.git#7bef7088765dab5f477e4aeb017022b67cb37b72",
+      "version": "1.2.0",
+      "from": "gitter-services@git+ssh://git@github.com:gitterHQ/services.git#1.2.0",
+      "resolved": "git+ssh://git@github.com:gitterHQ/services.git#e434313a2de9d2a4f7f986ae5920b169ddf49acf",
       "dependencies": {
         "require-all": {
           "version": "0.0.8",
@@ -754,7 +754,6 @@
     "jade": {
       "version": "0.28.1",
       "from": "jade@0.28.1",
-      "resolved": "https://registry.npmjs.org/jade/-/jade-0.28.1.tgz",
       "dependencies": {
         "commander": {
           "version": "0.6.1",
@@ -802,7 +801,7 @@
         },
         "source-map": {
           "version": "0.1.33",
-          "from": "source-map@>= 0.1.2",
+          "from": "source-map@0.1.x",
           "dependencies": {
             "amdefine": {
               "version": "0.1.0",
@@ -1070,12 +1069,12 @@
           }
         },
         "simplesmtp": {
-          "version": "0.3.25",
+          "version": "0.3.27",
           "from": "simplesmtp@>= 0.1.15",
           "dependencies": {
             "rai": {
-              "version": "0.1.9",
-              "from": "rai@~0.1"
+              "version": "0.1.10",
+              "from": "rai@~0.1.10"
             },
             "xoauth2": {
               "version": "0.1.8",
@@ -1555,7 +1554,7 @@
       "dependencies": {
         "colors": {
           "version": "0.6.2",
-          "from": "colors@0.6.x"
+          "from": "colors@0.x.x"
         },
         "cycle": {
           "version": "1.0.3",
