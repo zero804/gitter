@@ -362,9 +362,10 @@ function permissionsModel(user, right, uri, roomType, security) {
     .fail(function(err) {
       if(err.gitterAction === 'logout_destroy_user_tokens') {
         winston.warn('User tokens have been revoked. Destroying tokens');
+
         user.destroyTokens();
         return user.saveQ()
-          .thenResolve(false);
+          .thenReject(err);
       }
 
       throw err;

@@ -3,8 +3,6 @@
 
 var nconf          = require('../../utils/config');
 var winston        = require('../../utils/winston');
-var middleware     = require('../middleware');
-var oauthService   = require('../../services/oauth-service');
 var statsService   = require('../../services/stats-service');
 var errorReporting = require('../../utils/error-reporting');
 var _              = require('underscore');
@@ -26,33 +24,6 @@ function linkStack(stack) {
 module.exports = function(err, req, res, next) {
   var user = req.user;
   var userId = user && user.id;
-
-  if(err && err.gitterAction === 'logout_destroy_user_tokens') {
-   if(user) {
-     statsService.event('logout_destroy_user_tokens', { userId: userId });
-
-     middleware.logout()(req, res, function() {
-       if(err) winston.warn('Unable to log user out');
-
-       user.githubToken = null;
-       user.githubUserToken = null;
-       user.githubScopes = null;
-
-       user.save(function(err) {
-         if(err) winston.error('Unable to save user: ' + err, { exception: err });
-
-         oauthService.removeAllAccessTokensForUser(userId, function(err) {
-           if(err) { winston.error('Unable to remove access tokens: ' + err, { exception: err }); }
-           res.redirect('/');
-         });
-       });
-     });
-   } else {
-     res.redirect('/');
-   }
-
-   return;
-  }
 
   var status = 500;
   var template = '500';
