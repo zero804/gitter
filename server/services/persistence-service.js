@@ -202,6 +202,11 @@ UserSchema.methods.getGitHubToken = function(scope) {
 };
 
 
+UserSchema.methods.isMissingTokens = function() {
+  return !this.githubToken && !this.githubUserToken;
+};
+
+
 UserSchema.methods.destroyTokens = function() {
   this.githubToken = null;
   this.githubScopes = { };
