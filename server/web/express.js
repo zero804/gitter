@@ -94,7 +94,9 @@ module.exports = {
     app.use(passport.initialize());
     app.use(passport.session());
     app.use(require('./middlewares/configure-csrf'));
+    app.use(require('./middlewares/tokenless-user'));
     app.use(app.router);
+    app.use(require('./middlewares/token-error-handler'));
     app.use(require('./middlewares/express-error-handler'));
   },
 
@@ -114,6 +116,7 @@ module.exports = {
     app.use(passport.initialize());
     app.use(app.router);
 
+    app.use(require('./middlewares/token-error-handler'));
     app.use(require('./middlewares/api-error-handler'));
   },
 
@@ -128,6 +131,7 @@ module.exports = {
     app.use(express.urlencoded());
     app.use(express.json());
 
+    app.use(require('./middlewares/token-error-handler'));
     app.use(require('./middlewares/api-error-handler'));
   }
 };
