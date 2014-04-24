@@ -3,7 +3,7 @@
 
 var passport    = require("passport");
 var rateLimiter = require('./rate-limiter');
-var winston     = require('../../utils/winston');
+var logoutDestroyTokens = require('./logout-destroy-tokens');
 
 function ensureLoggedIn(req, res, next) {
   if(!req.user) {
@@ -11,10 +11,8 @@ function ensureLoggedIn(req, res, next) {
     return;
   }
 
-  if(!req.user.githubToken && !req.user.githubUserToken) {
-    winston.error("User no longer has a token", { username: req.user.username });
-    res.send(401, { error: true, loginRequired: true });
-    return;
+  if(req.user.isMissingTokens()) {
+    return logoutDestroyTokens(req, res, next);
   }
 
   next();
