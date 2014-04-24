@@ -32,7 +32,6 @@ require([
     return true;
   });
 
-
   // When a user clicks an internal link, prevent it from opening in a new window
   $(document).on("click", "a.link", function(e) {
     var basePath = context.env('basePath');
