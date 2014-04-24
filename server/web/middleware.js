@@ -3,15 +3,13 @@
 
 var passport    = require("passport");
 var winston     = require('../utils/winston');
-var nconf       = require('../utils/config');
 var rememberMe  = require('./rememberme-middleware');
 var useragent   = require('useragent');
 var dolph       = require('dolph');
 var redis       = require("../utils/redis");
 var redisClient = redis.createClient();
 
-var authCookieName = nconf.get('web:cookiePrefix') + 'auth';
-var sessionCookieName = nconf.get('web:cookiePrefix') + 'session';
+var logoutMiddleware = require('./middlewares/logout');
 
 function hasAccessToken(req) {
   return req.headers && req.headers['authorization'] ||
@@ -81,10 +79,10 @@ exports.ensureLoggedIn = function(options) {
     require('./middlewares/enforce-csrf'),
     function(req, res, next) {
       if (req.user) {
-        if(!req.user.githubToken && !req.user.githubUserToken) {
+        if(req.user.isMissingTokens()) {
           winston.verbose('Client needs to reauthenticate');
 
-          exports.logout()(req, res, function() {
+          logoutMiddleware(req, res, function() {
 
             // Are we dealing with an API client? Tell em in HTTP
             if(req.accepts(['json','html']) === 'json') {
@@ -140,40 +138,6 @@ exports.ensureLoggedIn = function(options) {
       return;
     }
   ];
-
-};
-
-// This isn't actually a middleware, it's a useful function that
-// should probably be put somewhere else
-exports.logoutPreserveSession = function(req, res, done) {
-  req.logout();
-  var authCookie = req.cookies[authCookieName];
-  if(authCookie) {
-    rememberMe.deleteRememberMeToken(authCookie, logoutNextStep);
-  } else {
-    logoutNextStep();
-  }
-
-  function logoutNextStep(err) {
-    if(err) return done(err);
-
-    res.clearCookie(authCookieName, { domain: nconf.get("web:cookieDomain") });
-    done();
-  }
-};
-
-exports.logout = function() {
-  return function(req, res, next) {
-
-    exports.logoutPreserveSession(req, res, function() {
-      res.clearCookie(sessionCookieName, { domain: nconf.get("web:cookieDomain") });
-
-      req.session.destroy(function(err) {
-        req.session = null;
-        next(err);
-      });
-    });
-  };
 
 };
 

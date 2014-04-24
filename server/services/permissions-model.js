@@ -7,7 +7,6 @@ var winston            = require('../utils/winston');
 var Q                  = require('q');
 var userIsInRoom       = require('./user-in-room');
 var appEvents          = require('../app-events');
-var statsService       = require('./stats-service');
 
 /**
  * REPO permissions model
@@ -364,11 +363,9 @@ function permissionsModel(user, right, uri, roomType, security) {
       if(err.gitterAction === 'logout_destroy_user_tokens') {
         winston.warn('User tokens have been revoked. Destroying tokens');
 
-        statsService.event('logout_destroy_user_tokens');
-
         user.destroyTokens();
         return user.saveQ()
-          .thenResolve(false);
+          .thenReject(err);
       }
 
       throw err;
