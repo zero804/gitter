@@ -30,6 +30,8 @@ define([
         previousDate: p && p.format('Do MMM YYYY'),
         dayName: dayName,
         dayOrdinal: dayOrdinal,
+        monthName : p.format('MMMM'),
+        yearName : p.format('YYYY'),
         previousDateLink: p && '/' + uri + '/archives/' + p.format('YYYY/MM/DD'),
         nextDate: n && n.format('Do MMM YYYY'),
         nextDateLink: n && '/' + uri + '/archives/' + n.format('YYYY/MM/DD'),
