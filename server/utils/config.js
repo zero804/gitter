@@ -4,7 +4,6 @@
 
 var nconf = require('nconf');
 var Fiber = require('./fiber');
-var fs = require('fs');
 var EventEmitter = require('events').EventEmitter;
 
 /* Load configuration parameters */

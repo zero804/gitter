@@ -116,6 +116,11 @@ module.exports = {
           if(err)  return fail(err);
           if(!user) return fail();
 
+          /* No token, no touch */
+          if(user.isMissingTokens()) {
+            return fail();
+          }
+
           req.login(user, options, function(err) {
             if(err) {
               winston.info("rememberme: Passport login failed", { exception: err  });
