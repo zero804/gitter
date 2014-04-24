@@ -192,7 +192,7 @@ function sendEmailNotifications(since) {
               return emailNotificationService.sendUnreadItemsNotification(user, troupeData)
                 .fail(function(err) {
                   if(err.gitterAction === 'logout_destroy_user_tokens') {
-                    statsService.event('logout_destroy_user_tokens');
+                    statsService.event('logout_destroy_user_tokens', { userId: user.id });
 
                     user.destroyTokens();
                     return user.saveQ();
