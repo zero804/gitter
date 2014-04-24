@@ -26,7 +26,6 @@ exports.datesList = [
             if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
               githubLink = '/' + req.uriContext.uri;
             }
-
             res.render('archive-home-template', {
               layout: 'archive',
               user: user,
@@ -35,7 +34,8 @@ exports.datesList = [
               bootScriptName: 'router-archive-home',
               troupeTopic: troupe.topic,
               githubLink: githubLink,
-              troupeName: req.uriContext.uri
+              troupeName: req.uriContext.uri,
+              isHomePage: true
             });
 
           });
