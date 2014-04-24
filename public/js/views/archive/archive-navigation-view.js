@@ -32,7 +32,7 @@ define([
         dayOrdinal: dayOrdinal,
         previousDateLink: p && '/' + uri + '/archives/' + p.format('YYYY/MM/DD'),
         nextDate: n && n.format('Do MMM YYYY'),
-        nextDateLink: n && '/' + uri + '/archives/' + n.format('YYYY/MM/DD')
+        nextDateLink: n && '/' + uri + '/archives/' + n.format('YYYY/MM/DD'),
       };
     },
 
@@ -46,7 +46,7 @@ define([
 
       var start = moment(a).subtract('months', 1);
       var troupeId = context.getTroupeId();
-      
+
       var cal = new CalHeatMap();
       cal.init({
         itemSelector: this.ui.navigation[0],

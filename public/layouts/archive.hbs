@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
   <meta charset="utf-8">
 
-  <title>{{troupeName}} - Gitter</title>
+  <title>{{roomUri}} - Gitter</title>
 
   <style>
 
@@ -36,9 +36,23 @@
   <div class="gtrArchiveToolbarWrapper">
     <div id="archive-navigation" class="gtrArchiveNavigationWrapper"></div>
         {{#if user}}
-        <a class="trpButtonMedium trpBtnGreen gtrCreateRoomButton" href="https://somewhere.com">Go to live room</a>
+        <a class="trpButtonMedium trpBtnGreen gtrCreateRoomButton" href="/{{troupeName}}">Go to live room</a>
         {{else}}
-        CREATE AN ACCOUNT
+        <div class="trpLeftMenuContainer">
+          <div class="trpLeftMenuLoggedOut">
+            <div class="trpLeftMenuLogo">
+              <div class="logo-container"></div>
+            </div>
+            <div class="trpLeftMenuInfo">
+              <p>Gitter provides free public chat rooms for open source repositories on GitHub.</p>
+              <br>
+              <o>You can also use Gitter for private conversations amongst your organisation.</p>
+            </div>
+            <div class="trpLeftMenuSignup">
+              <a href="/login/github?action=login&button=leftmenu-1" class="trpButtonBig trpBtnGreen gtrCreateRoomButton">Login with GitHub to start talking</a>
+            </div>
+          </div>
+        </div>
         {{/if}}
   </div>
 </div>
