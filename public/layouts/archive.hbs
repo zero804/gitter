@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
   <meta charset="utf-8">
 
-  <title>{{roomUri}} - Gitter</title>
+  <title>{{troupeName}} - Gitter</title>
 
   <style>
 
@@ -32,26 +32,26 @@
 </div>
 
 {{{body}}}
-<div class="trpToolbar" id="toolbar-frame">
+<div class="trpToolbar" id="toolbar-frame" style="overflow: scroll">
   <div class="gtrArchiveToolbarWrapper">
+    {{^user}}
+    <div class="gtrArchiveInfoContainer">
+        <div class="gtrArchiveLogo">
+          <div class="logo-container"></div>
+        </div>
+        <div class="gtrArchiveInfo">
+          <p>These are chat archives for <strong>{{troupeName}}</strong></p>
+        </div>
+    </div>
+    {{/user}}
     <div id="archive-navigation" class="gtrArchiveNavigationWrapper"></div>
         {{#if user}}
-        <a class="trpButtonMedium trpBtnGreen gtrCreateRoomButton" href="/{{troupeName}}">Go to live room</a>
+        <div class="trpLeftMenuSignup">
+          <a class="trpButtonMedium trpBtnGreen gtrCreateRoomButton" href="/{{troupeName}}">Go to live room</a>
+        <div class="trpLeftMenuSignup">
         {{else}}
-        <div class="trpLeftMenuContainer">
-          <div class="trpLeftMenuLoggedOut">
-            <div class="trpLeftMenuLogo">
-              <div class="logo-container"></div>
-            </div>
-            <div class="trpLeftMenuInfo">
-              <p>Gitter provides free public chat rooms for open source repositories on GitHub.</p>
-              <br>
-              <o>You can also use Gitter for private conversations amongst your organisation.</p>
-            </div>
-            <div class="trpLeftMenuSignup">
-              <a href="/login/github?action=login&button=leftmenu-1" class="trpButtonBig trpBtnGreen gtrCreateRoomButton">Login with GitHub to start talking</a>
-            </div>
-          </div>
+        <div class="trpLeftMenuSignup">
+          <a href="/login/github?action=login&button=leftmenu-1" class="trpButtonBig trpBtnGreen gtrCreateRoomButton">Login with GitHub to start talking</a>
         </div>
         {{/if}}
   </div>
