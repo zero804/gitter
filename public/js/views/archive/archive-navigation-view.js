@@ -39,7 +39,7 @@ define([
         dayName: numericDate,
         dayOrdinal: ordinalPart,
         previousDateLink: p && '/' + uri + '/archives/' + p.format('YYYY/MM/DD', { lang: 'en' }),
-        nextDate: n && n.format('Do MMM YYYY'),
+        nextDate: n && n.format('Do MMM YYYY', { lang: language }),
         nextDateLink: n && '/' + uri + '/archives/' + n.format('YYYY/MM/DD', { lang: 'en' }),
         monthYearFormatted: monthYearFormatted
       };
