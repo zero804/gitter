@@ -105,6 +105,22 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
+                  name: "router-archive-home",
+                  include: [
+                    "views/widgets/avatar",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "router-archive-chat",
+                  include: [
+                    "views/widgets/avatar",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
                   name: "userhome",
                   include: [
                     "utils/tracking",
@@ -241,6 +257,7 @@ module.exports = function( grunt ) {
                   ],
                   exclude: ["core-libraries"]
               },*/
+
           ]
 
         }
@@ -265,6 +282,8 @@ module.exports = function( grunt ) {
       'router-nli-app': createClosureConfig('router-nli-app'),
       'router-chat': createClosureConfig('router-chat'),
       'router-nli-chat': createClosureConfig('router-nli-chat'),
+      'router-archive-home': createClosureConfig('router-archive-home'),
+      'router-archive-chat': createClosureConfig('router-archive-chat'),
       'userhome': createClosureConfig('userhome'),
 //      "homepage-mobile" : createClosureConfig('homepage-mobile'),
 //       "native-chat-router": createClosureConfig('routers/mobile/native/chat-router'),
@@ -345,6 +364,7 @@ module.exports = function( grunt ) {
         },
         files: {
           "public/bootstrap/css/trp3.css" : "public/bootstrap/less/trp3.less",
+          "public/bootstrap/css/archive.css" : "public/bootstrap/less/archive.less",
           "public/bootstrap/css/mtrp.css": "public/bootstrap/less/mtrp.less",
           "public/bootstrap/css/signup.css": "public/bootstrap/less/signup.less",
           "public/bootstrap/css/trpHomePage.css": "public/bootstrap/less/trpHomePage.less",
@@ -463,7 +483,7 @@ module.exports = function( grunt ) {
           'jquery': 'jQuery'
         },
         exports: 'jQuery'
-      },  
+      },
       'scrollfix': {
         files : {
           'output/client-libs/scrollfix/scrollfix-amd.js': ['output/client-libs/scrollfix/scrollfix.js']
