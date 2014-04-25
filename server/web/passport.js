@@ -13,6 +13,8 @@ var mixpanel               = require('../web/mixpanelUtils');
 var nconf                  = require('../utils/config');
 var useragentStats         = require('./useragent-stats');
 var GitHubStrategy         = require('troupe-passport-github').Strategy;
+var GitHubMeService        = require('../services/github/github-me-service');
+var errorReporter          = require('../utils/error-reporting');
 
 function installApi() {
   /**
@@ -91,99 +93,110 @@ function install() {
   /* Install the API OAuth strategy too */
   installApi();
 
-  function githubOauthCallback(req, accessToken, refreshToken, params, profile, done) {
-    var requestedScopes = params.scope.split(/,/);
-    var scopeHash = requestedScopes.reduce(function(memo, v) { memo[v] = true; return memo; }, {});
+  function githubOauthCallback(req, accessToken, refreshToken, params, _profile, done) {
+    var githubMeService = new GitHubMeService({ githubUserToken: accessToken });
+    return githubMeService.getUser()
+      .then(function(githubUserProfile) {
+        var requestedScopes = params.scope.split(/,/);
+        var scopeHash = requestedScopes.reduce(function(memo, v) { memo[v] = true; return memo; }, {});
 
-    if (req.user && req.session.githubScopeUpgrade) {
-      req.user.githubToken = accessToken;
-      req.user.githubScopes = scopeHash;
+        if (req.user && req.session.githubScopeUpgrade) {
+          req.user.githubToken = accessToken;
+          req.user.githubScopes = scopeHash;
 
-      req.user.save(function(err) {
-        winston.info('passport: User updated with token');
-        if(err) done(err);
-        return done(null, req.user);
-      });
-
-    } else {
-      return userService.findByGithubIdOrUsername(profile._json.id, profile._json.login)
-        .then(function(user) {
-          // Update an existing user
-          if(user) {
-            user.username         = profile._json.login;
-            user.displayName      = profile._json.name || profile._json.login;
-            user.gravatarImageUrl = profile._json.avatar_url;
-            user.githubId         = profile._json.id;
-            user.githubUserToken  = accessToken;
-
-            user.save(function(err) {
-              if (err) winston.error("Failed to update GH token for user ", user.username);
-
-              // Tracking
-              var properties = useragentStats(req.headers['user-agent']);
-              statsService.userUpdate(user, properties);
-
-              statsService.event("user_login", _.extend({
-                userId: user.id,
-                method: 'github_oauth',
-                username: user.username
-              }, properties));
-
-              // Login
-              req.logIn(user, function(err) {
-                if (err) { return done(err); }
-
-                // Remove the old token for this user
-                if(req.session) req.session.accessToken = null;
-                return done(null, user);
-              });
-
-            });
-
-            return;
-          }
-
-          // This is in fact a new user
-          var githubUser = {
-            username:           profile._json.login,
-            displayName:        profile._json.name || profile._json.login,
-            emails:             profile._json.email ? [profile._json.email] : [],
-            gravatarImageUrl:   profile._json.avatar_url,
-            githubUserToken:    accessToken,
-            githubId:           profile._json.id,
-            status:             'ACTIVE',
-            source:             'landing_github'
-          };
-
-
-          winston.verbose('About to create GitHub user ', githubUser);
-
-          userService.findOrCreateUserForGithubId(githubUser, function(err, user) {
-            if (err) return done(err);
-
-            winston.verbose('Created GitHub user ', user.toObject());
-
-            req.logIn(user, function(err) {
-              if (err) { return done(err); }
-              statsService.event("new_user", {
-                userId: user.id,
-                distinctId: mixpanel.getMixpanelDistinctId(req.cookies),
-                method: 'github_oauth',
-                username: user.username
-              });
-
-              return done(null, user);
-            });
+          req.user.save(function(err) {
+            winston.info('passport: User updated with token');
+            if(err) done(err);
+            return done(null, req.user);
           });
-        });
-    }
 
+        } else {
+          return userService.findByGithubIdOrUsername(githubUserProfile.id, githubUserProfile.login)
+            .then(function(user) {
+              // Update an existing user
+              if(user) {
+                user.username         = githubUserProfile.login;
+                user.displayName      = githubUserProfile.name || githubUserProfile.login;
+                user.gravatarImageUrl = githubUserProfile.avatar_url;
+                user.githubId         = githubUserProfile.id;
+                user.githubUserToken  = accessToken;
+
+                user.save(function(err) {
+                  if (err) winston.error("Failed to update GH token for user ", user.username);
+
+                  // Tracking
+                  var properties = useragentStats(req.headers['user-agent']);
+                  statsService.userUpdate(user, properties);
+
+                  statsService.event("user_login", _.extend({
+                    userId: user.id,
+                    method: 'github_oauth',
+                    username: user.username
+                  }, properties));
+
+                  // Login
+                  req.logIn(user, function(err) {
+                    if (err) { return done(err); }
+
+                    // Remove the old token for this user
+                    if(req.session) req.session.accessToken = null;
+                    return done(null, user);
+                  });
+
+                });
+
+                return;
+              }
+
+              // This is in fact a new user
+              var githubUser = {
+                username:           githubUserProfile.login,
+                displayName:        githubUserProfile.name || githubUserProfile.login,
+                emails:             githubUserProfile.email ? [githubUserProfile.email] : [],
+                gravatarImageUrl:   githubUserProfile.avatar_url,
+                githubUserToken:    accessToken,
+                githubId:           githubUserProfile.id,
+                status:             'ACTIVE',
+                source:             'landing_github'
+              };
+
+              winston.verbose('About to create GitHub user ', githubUser);
+
+              userService.findOrCreateUserForGithubId(githubUser, function(err, user) {
+                if (err) return done(err);
+
+                winston.verbose('Created GitHub user ', user.toObject());
+
+                req.logIn(user, function(err) {
+                  if (err) { return done(err); }
+                  statsService.event("new_user", {
+                    userId: user.id,
+                    distinctId: mixpanel.getMixpanelDistinctId(req.cookies),
+                    method: 'github_oauth',
+                    username: user.username
+                  });
+
+                  return done(null, user);
+                });
+              });
+            });
+        }
+
+      })
+      .fail(function(err) {
+        errorReporter(err, { oauth: "failed" });
+        statsService.event("oauth_profile.error");
+        winston.error('Error during oauth process. Unable to obtain user profile.', err);
+
+        return done(err);
+      });
   }
 
   var userStrategy = new GitHubStrategy({
       clientID:     nconf.get('github:user_client_id'),
       clientSecret: nconf.get('github:user_client_secret'),
       callbackURL:  nconf.get('web:basepath') + '/login/callback',
+      skipUserProfile: true,
       passReqToCallback: true
     }, githubOauthCallback);
   userStrategy.name = 'github_user';
@@ -193,6 +206,7 @@ function install() {
       clientID:     nconf.get('github:client_id'),
       clientSecret: nconf.get('github:client_secret'),
       callbackURL:  nconf.get('web:basepath') + '/login/callback',
+      skipUserProfile: true,
       passReqToCallback: true
     }, githubOauthCallback);
   upgradeStrategy.name = 'github_upgrade';
