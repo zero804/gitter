@@ -1,7 +1,8 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'moment'
-], function(moment) {
+  'moment',
+  'utils/context'
+], function(moment, context) {
   "use strict";
 
   moment.calendar = {
@@ -13,6 +14,7 @@ define([
     sameElse : 'LL'
   };
 
+  moment.lang(context.lang());
   moment.defaultFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZ';
 
   return moment;

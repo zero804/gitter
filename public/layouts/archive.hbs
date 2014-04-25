@@ -50,7 +50,7 @@
       </div>
       {{else}}
       <div class="trpLeftMenuSignup">
-        <a href="/login/github?action=login&button=leftmenu-1" class="trpButtonBig trpBtnGreen gtrCreateRoomButton">Login with GitHub to start talking</a>
+        <a href="/login/github?action=login&amp;button=leftmenu-1" class="trpButtonBig trpBtnGreen gtrCreateRoomButton">Login with GitHub to start talking</a>
       </div>
       {{/if}}
       {{else}}
@@ -65,24 +65,28 @@
         </div>
         {{/user}}
       {{/if}}
-    <div id="archive-navigation" class="gtrArchiveNavigationWrapper"></div>
-        {{#unless isHomePage}}
-          {{#if user}}
-          <div class="trpLeftMenuSignup">
-            <a class="trpButtonMedium trpBtnGreen gtrCreateRoomButton" href="/{{troupeName}}">Go to live room</a>
-          </div>
-          {{else}}
-          <div class="trpLeftMenuSignup">
-            <a href="/login/github?action=login&button=leftmenu-1" class="trpButtonBig trpBtnGreen gtrCreateRoomButton">Login with GitHub to start talking</a>
-          </div>
-          {{/if}}
-        {{/unless}}
+    <div id="archive-navigation" class="gtrArchiveNavigationWrapper">
+      {{#if archiveChats}}
+        {{{ prerenderView "js/views/archive/tmpl/archive-navigation-view" }}}
+      {{/if}}
+    </div>
+    {{#unless isHomePage}}
+      {{#if user}}
+      <div class="trpLeftMenuSignup">
+        <a class="trpButtonMedium trpBtnGreen gtrCreateRoomButton" href="/{{troupeName}}">Go to live room</a>
+      </div>
+      {{else}}
+      <div class="trpLeftMenuSignup">
+        <a href="/login/github?action=login&amp;button=leftmenu-1" class="trpButtonBig trpBtnGreen gtrCreateRoomButton">Login with GitHub to start talking</a>
+      </div>
+      {{/if}}
+    {{/unless}}
   </div>
 </div>
 
 
 {{#if troupeContext}}
-{{{ generateTroupeContext troupeContext }}}
+{{{ generateTroupeContext troupeContext lang=lang}}}
 {{/if}}
 
 {{>require_wrapper}}

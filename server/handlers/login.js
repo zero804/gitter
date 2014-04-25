@@ -9,6 +9,7 @@ var lock          = require("redis-lock")(client);
 var oauth2        = require('../web/oauth2');
 var mixpanel      = require('../web/mixpanelUtils');
 var statsService  = require("../services/stats-service");
+var languageSelector = require('../web/language-selector');
 
 module.exports = {
   install: function(app) {
@@ -37,14 +38,18 @@ module.exports = {
     app.get(
         '/login',
         function(req, res) {
-          res.render('login');
+          res.render('login', {
+            lang: languageSelector(req)
+          });
         }
       );
 
     app.get(
         '/login/explain',
         function(req, res) {
-          res.render('github-explain');
+          res.render('github-explain', {
+            lang: languageSelector(req)
+          });
         }
       );
 
