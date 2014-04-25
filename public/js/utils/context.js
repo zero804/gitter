@@ -145,6 +145,13 @@ define([
     return !!user.id;
   };
 
+  context.lang = function() {
+    if(ctx.lang) return ctx.lang;
+    var e = context.env('lang');
+    if(e) return e;
+    return [window.navigator.language];
+  };
+
   context.testOnly = {
     resetTroupeContext: function(newContext) {
 

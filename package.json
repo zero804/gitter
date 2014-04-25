@@ -29,7 +29,7 @@
     "passport-http": "0.2.2",
     "passport-oauth2-client-password": "0.1.0",
     "passport-http-bearer": "0.2.0",
-    "moment": "~2.1.0",
+    "moment": "git://github.com/gitterHQ/moment#440d7889d9c0c8540cdc7711819f546cc99584a8",
     "apn": "~1.4.4",
     "cube": "^0.2.12",
     "nomnom": "~1.6.2",

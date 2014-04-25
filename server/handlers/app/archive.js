@@ -2,12 +2,13 @@
 "use strict";
 
 var moment = require('moment');
-var appMiddleware     = require('./middleware');
+var appMiddleware = require('./middleware');
 var chatService = require('../../services/chat-service');
 var restSerializer = require('../../serializers/rest-serializer');
 var contextGenerator = require('../../web/context-generator');
 var Q = require('q');
 var roomService = require('../../services/room-service');
+var languageSelector = require('../../web/language-selector');
 
 exports.datesList = [
   appMiddleware.uriContextResolverMiddleware,
@@ -22,18 +23,15 @@ exports.datesList = [
         return contextGenerator.generateTroupeContext(req)
           .then(function(troupeContext) {
 
-            var githubLink;
-            if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
-              githubLink = '/' + req.uriContext.uri;
-            }
             res.render('archive-home-template', {
               layout: 'archive',
+              lang: languageSelector(req),
               user: user,
               archives: true,
               troupeContext: troupeContext,
               bootScriptName: 'router-archive-home',
               troupeTopic: troupe.topic,
-              githubLink: githubLink,
+              githubLink: '/' + req.uriContext.uri,
               troupeName: req.uriContext.uri,
               isHomePage: true
             });
@@ -88,29 +86,63 @@ exports.chatArchive = [
               ]);
           })
           .spread(function(troupeContext, serialized) {
-            var githubLink;
-
             troupeContext.archive = {
               archiveDate: startDate,
               nextDate: nextDate,
               previousDate: previousDate
             };
 
-            if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
-              githubLink = '/' + req.uriContext.uri;
+            var language = req.headers['accept-language'];
+            if(language) {
+              language = language.split(';')[0].split(',');
+            } else {
+              language = 'en-uk';
             }
+
+            var p = previousDate && moment(previousDate);
+            var n = nextDate && moment(nextDate);
+            var uri = req.uriContext.uri;
+
+            var ordinalDate = moment(startDate).format('Do', { lang: language });
+            var numericDate = moment(startDate).format('D', { lang: language });
+
+            var ordinalPart;
+            if(ordinalDate.indexOf('' + numericDate) === 0) {
+              ordinalPart = ordinalDate.substring(('' + numericDate).length);
+            } else {
+              ordinalPart = '';
+            }
+
+            var previousDateFormatted = p && p.format('Do MMM YYYY', { lang: language });
+            var dayNameFormatted = numericDate;
+            var dayOrdinalFormatted = ordinalPart;
+            var previousDateLink = p && '/' + uri + '/archives/' + p.format('YYYY/MM/DD', { lang: 'en' });
+            var nextDateFormatted = n && moment(n.valueOf()).lang(language).format('Do MMM YYYY', { lang: language });
+            var nextDateLink = n && '/' + uri + '/archives/' + n.format('YYYY/MM/DD', { lang: 'en' });
+            var monthYearFormatted = moment(startDate).format('MMM YYYYY', { lang: language });
 
             res.render('chat-archive-template', {
               layout: 'archive',
               archives: true,
+              archiveChats: true,
               isRepo: troupe.githubType === 'REPO',
               bootScriptName: 'router-archive-chat',
-              githubLink: githubLink,
+              githubLink: '/' + req.uriContext.uri,
               user: user,
               troupeContext: troupeContext,
               troupeName: req.uriContext.uri,
               troupeTopic: troupe.topic,
-              chats: serialized
+              chats: serialized,
+              lang: languageSelector(req),
+
+              /* For prerendered archive-navigation-view */
+              previousDate: previousDateFormatted,
+              dayName: dayNameFormatted,
+              dayOrdinal: dayOrdinalFormatted,
+              previousDateLink: previousDateLink,
+              nextDate: nextDateFormatted,
+              nextDateLink: nextDateLink,
+              monthYearFormatted: monthYearFormatted
             });
 
           });

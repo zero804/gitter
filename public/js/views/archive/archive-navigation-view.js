@@ -8,6 +8,8 @@ define([
 ], function(Marionette, moment, context, template, CalHeatMap) {
   'use strict';
 
+  var language = context.lang();
+
   return Marionette.ItemView.extend({
     ui: {
       navigation: '#archive-navigation'
@@ -19,20 +21,27 @@ define([
       var p = this.options.previousDate && moment(this.options.previousDate).utc();
       var n = this.options.nextDate && moment(this.options.nextDate).utc();
 
-      var dayName = moment(this.options.archiveDate).format('Do');
+      var archiveDate = moment(this.options.archiveDate);
 
-      var dayOrdinal = dayName.replace(/^\d+/,"");
+      var ordinalDate = archiveDate.format('Do', { lang: language });
+      var numericDate = archiveDate.format('D', { lang: language });
 
-      dayName = moment(this.options.archiveDate).format('D');
-
+      var ordinalPart;
+      if(ordinalDate.indexOf('' + numericDate) === 0) {
+        ordinalPart = ordinalDate.substring(('' + numericDate).length);
+      } else {
+        ordinalPart = '';
+      }
+      var monthYearFormatted = archiveDate.format('MMMM YYYY', { lang: language });
 
       return {
-        previousDate: p && p.format('Do MMM YYYY'),
-        dayName: dayName,
-        dayOrdinal: dayOrdinal,
-        previousDateLink: p && '/' + uri + '/archives/' + p.format('YYYY/MM/DD'),
+        previousDate: p && p.format('Do MMM YYYY', { lang: language }),
+        dayName: numericDate,
+        dayOrdinal: ordinalPart,
+        previousDateLink: p && '/' + uri + '/archives/' + p.format('YYYY/MM/DD', { lang: 'en' }),
         nextDate: n && n.format('Do MMM YYYY'),
-        nextDateLink: n && '/' + uri + '/archives/' + n.format('YYYY/MM/DD'),
+        nextDateLink: n && '/' + uri + '/archives/' + n.format('YYYY/MM/DD', { lang: 'en' }),
+        monthYearFormatted: monthYearFormatted
       };
     },
 

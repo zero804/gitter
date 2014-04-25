@@ -62,8 +62,6 @@ define([
   /** @const */
   var COMPOSE_MODE_MODIFIER_KEY = isMacBrowser ? 'metaKey' : 'ctrlKey';
 
-
-
   var ComposeMode = function() {
     var stringBoolean = window.localStorage.getItem('compose_mode_enabled') || 'false';
     this.disabled = JSON.parse(stringBoolean);

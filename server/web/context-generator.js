@@ -2,7 +2,6 @@
 "use strict";
 
 var restSerializer   = require("../serializers/rest-serializer");
-var oauthService     = require("../services/oauth-service");
 var presenceService  = require("../services/presence-service");
 var useragent        = require("useragent");
 var crypto           = require("crypto");
@@ -10,6 +9,7 @@ var roomPermissionsModel = require('../services/room-permissions-model');
 var assert           = require("assert");
 var appVersion       = require("./appVersion");
 var Q                = require('q');
+var languageSelector = require('./language-selector');
 
 /**
  * Returns the promise of a mini-context
@@ -156,16 +156,17 @@ function createTroupeContext(req, options) {
   if(events) { req.session.events = []; }
 
   return {
-      user: options.user,
-      troupe: options.troupe,
-      homeUser: options.homeUser,
-      accessToken: req.session.accessToken,
-      appVersion: appVersion.getCurrentVersion(),
-      desktopNotifications: options.desktopNotifications,
-      events: events,
-      troupeUri: options.troupe ? options.troupe.uri : undefined,
-      troupeHash: options.troupeHash,
-      isNativeDesktopApp: isNativeDesktopApp(req),
-      permissions: options.permissions
-    };
-  }
+    user: options.user,
+    troupe: options.troupe,
+    homeUser: options.homeUser,
+    accessToken: req.session.accessToken,
+    appVersion: appVersion.getCurrentVersion(),
+    desktopNotifications: options.desktopNotifications,
+    events: events,
+    troupeUri: options.troupe ? options.troupe.uri : undefined,
+    troupeHash: options.troupeHash,
+    isNativeDesktopApp: isNativeDesktopApp(req),
+    permissions: options.permissions,
+    lang: languageSelector(req)
+  };
+}
