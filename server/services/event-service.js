@@ -8,6 +8,9 @@ var ObjectID      = require('mongodb').ObjectID;
 
 exports.newEventToTroupe = function(troupe, user, text, meta, payload, callback) {
   if(!troupe) return callback("Invalid troupe");
+  if(!text) return callback("Text required");
+
+  text = "" + text;
 
   var event = new persistence.Event();
 
