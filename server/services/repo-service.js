@@ -234,6 +234,8 @@ function findPublicReposWithRoom(user, query, options) {
 
         return ghRepo.getRepo(troupe.uri)
           .then(function(repo) {
+            if(!repo) return null;
+
             if(repo.private) {
               return null;
             }
