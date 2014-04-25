@@ -10,6 +10,9 @@ var unsafeHtml    = require('../utils/unsafe-html');
 var processChat   = require('../utils/process-chat');
 var appEvents     = require('../app-events');
 var Q             = require('q');
+var mongoUtils    = require('../utils/mongo-utils');
+var moment        = require('moment');
+
 /*
  * Hey Trouper!
  * Bump the version if you modify the behaviour of TwitterText.
@@ -209,4 +212,95 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
 
       return callback(null, results.map(massageMessages).reverse());
     });
+};
+
+exports.findChatMessagesForTroupeForDateRange = function(troupeId, startDate, endDate, callback) {
+  return persistence.ChatMessage.find({
+    $and: [
+      { toTroupeId: troupeId },
+      { sent: { $gte: startDate}  },
+      { sent: { $lte: endDate}  },
+    ]
+  }).sort({ sent: 'asc' })
+    .execQ().then(function(results) {
+      return results.map(massageMessages);
+    })
+    .nodeify(callback);
+};
+
+exports.findDatesForChatMessages = function(troupeId, callback) {
+  return persistence.ChatMessage.aggregateQ([
+    { $match: { toTroupeId: mongoUtils.asObjectID(troupeId) } },
+    { $project: {
+        _id: 0,
+        sent: 1
+      }
+    },
+    { $group: {
+        _id: 1,
+        dates: {
+          $addToSet: {
+            $add: [
+              { $multiply: [{ $year: '$sent' }, 10000] },
+              { $multiply: [{ $month: '$sent' }, 100] },
+              { $dayOfMonth: '$sent' }
+            ]
+          }
+        }
+      }
+    },
+    { $project: {
+        _id: 0,
+        dates: 1
+      }
+    },
+    {
+      $unwind: "$dates"
+    }
+  ])
+  .then(function(dates) {
+    return dates.map(function(d) {
+      return moment.utc("" + d.dates,  "YYYYMMDD");
+    });
+  })
+  .nodeify(callback);
+};
+
+exports.findDailyChatActivityForRoom = function(troupeId, start, end, callback) {
+  return persistence.ChatMessage.aggregateQ([
+    { $match: {
+        toTroupeId: mongoUtils.asObjectID(troupeId),
+        sent: {
+          $gte: start,
+          $lte: end
+        }
+      }
+    },
+    { $project: {
+        _id: 0,
+        sent: 1
+      }
+    },
+    { $group: {
+        _id: {
+            $add: [
+              { $multiply: [{ $year: '$sent' }, 10000] },
+              { $multiply: [{ $month: '$sent' }, 100] },
+              { $dayOfMonth: '$sent' }
+            ]
+        },
+        count: {
+          $sum: 1
+        }
+      }
+    }
+
+  ])
+  .then(function(dates) {
+    return dates.reduce(function(memo, value) {
+      memo[value._id] = value.count;
+      return memo;
+    }, {});
+  })
+  .nodeify(callback);
 };

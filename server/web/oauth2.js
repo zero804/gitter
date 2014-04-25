@@ -4,14 +4,14 @@
 /**
  * Module dependencies.
  */
-var oauth2orize = require('oauth2orize'),
-    passport = require('passport'),
-    middleware = require('./middleware'),
-    oauthService = require('../services/oauth-service'),
-    loginUtils = require('./login-utils'),
-    winston = require('../utils/winston'),
-    url = require('url'),
-    random = require('../utils/random');
+var oauth2orize = require('oauth2orize');
+var passport = require('passport');
+var middleware = require('./middleware');
+var oauthService = require('../services/oauth-service');
+var loginUtils = require('./login-utils');
+var winston = require('../utils/winston');
+var languageSelector = require('./language-selector');
+var random = require('../utils/random');
 
 // create OAuth 2.0 server
 var server = oauth2orize.createServer();
@@ -139,7 +139,12 @@ exports.authorization = [
     }
 
     /* Non-trusted Client */
-    res.render('oauth_authorize_dialog', { transactionId: req.oauth2.transactionID, user: req.user, client: req.oauth2.client });
+    res.render('oauth_authorize_dialog', {
+      transactionId: req.oauth2.transactionID,
+      user: req.user,
+      client: req.oauth2.client,
+      lang: languageSelector(req)
+    });
   }
 ];
 

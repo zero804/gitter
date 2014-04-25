@@ -1,12 +1,15 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'views/base',
-  'utils/momentWrapper'
-], function(TroupeViews, moment) {
+  'utils/momentWrapper',
+  'utils/context'
+], function(TroupeViews, moment, context) {
   /*jslint browser: true*/
   "use strict";
 
   var maxDaysBeforeDateDisplay = 1;
+
+  var lang = context.lang();
 
   return TroupeViews.Base.extend({
     tagName: 'span',
@@ -52,12 +55,12 @@ define([
 
       var v;
       if(duration.asDays() >= maxDaysBeforeDateDisplay) {
-        v = this.compact ? this.time.format("MMM DD") : this.time.format("LL");
+        v = this.compact ? this.time.format("MMM DD", { lang: lang }) : this.time.format("LL", { lang: lang });
       } else {
-        v = this.compact ? this.time.format("H:mm") : duration.humanize() + " ago";
+        v = this.compact ? this.time.format("H:mm", { lang: lang }) : duration.humanize() + " ago";
       }
 
-      var fullTime = this.time.format("LLL");
+      var fullTime = this.time.format("LLL", { lang: lang });
       this.$el.html("<span title='" + fullTime + "'>" + v + "</span>");
       if (!window._troupeCompactView) {
         this.$el.find('[title]').tooltip({ container: 'body' });

@@ -11,6 +11,7 @@ module.exports = exports = function() {
     if(!hash) return "";
 
     var time = hash.time;
+    var lang = hash.lang;
     if(!time) return "";
 
     time = moment(time);
@@ -18,7 +19,7 @@ module.exports = exports = function() {
     var duration = moment.duration(Date.now() - time.valueOf());
     var v;
     if(duration.asDays() >= maxDaysBeforeDateDisplay) {
-      v = time.format("LL");
+      v = time.format("LL", { lang: lang });
     } else {
       v = duration.humanize() + " ago";
     }
