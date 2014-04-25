@@ -55,8 +55,9 @@ var webhookTemplates = ['bitbucket', 'generic', 'github', 'jenkins', 'sprintly',
 }, {});
 
 
-module.exports = exports = function(model) {
-
+module.exports = exports = function(model, params) {
+  var hash = params.hash;
+  var lang = hash && hash.lang;
   var displayName;
   var username;
   var deletedClass;
@@ -100,6 +101,7 @@ module.exports = exports = function(model) {
     username: username = model.fromUser && model.fromUser.username,
     text: text,
     html: html,
+    lang: lang,
     webhookClass: webhookClass
   }, widgetHelpers);
 

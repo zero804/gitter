@@ -75,14 +75,9 @@ define([
 
     getRenderData: function() {
       var data = this.model.toJSON();
-      var isMobile = navigator.userAgent.match(/mobile/i) ? true : false;
 
       if (data.fromUser) {
         data.username = data.fromUser.username;
-        // data.displayName = data.fromUser.displayName || data.fromUser.fallbackDisplayName;
-        // if (isMobile && data.displayName.length > 13) {
-        //   data.displayName = data.fromUser.displayName.split(" ").shift();
-        // }
       }
       data.readByText = this.getReadByText(data.readBy);
       if(!data.html) {
@@ -299,7 +294,7 @@ define([
         textarea.select();
       }, 10);
 
-      this.inputBox = new chatInputView.ChatInputBoxView({ el: textarea });
+      this.inputBox = new chatInputView.ChatInputBoxView({ el: textarea, editMode: true });
       this.listenTo(this.inputBox, 'save', this.saveChat);
     },
 

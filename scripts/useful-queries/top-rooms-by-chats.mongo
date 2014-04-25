@@ -4,5 +4,6 @@ db.chatmessages.aggregate([
   { $sort: { s: -1 } },
   { $limit: 40 }
 ]).result.forEach(function(f) {
-  print(db.troupes.findOne({ _id: f._id }).uri, f.s)
+  var t = db.troupes.findOne({ _id: f._id });
+  print(t.uri, f.s, t.security)
 })

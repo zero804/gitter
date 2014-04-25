@@ -1,0 +1,98 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=IE9" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
+  <meta charset="utf-8">
+
+  <title>{{troupeName}} - Gitter</title>
+
+  <style>
+
+  @-webkit-keyframes pulsey {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+  }
+
+  html.loading .trpContentPanel { background: url("{{ cdn 'images/2/gitter/logo-mark-grey-64.png' }}") center no-repeat; height: 90%; -webkit-animation: pulsey 2s ease-out; -webkit-animation-iteration-count: infinite;  }
+  html.loading .trpContentPanel > * { visibility: hidden; }
+  </style>
+  <base target="_parent">
+  <link rel="stylesheet" href='{{cdn "sprites/services.css" }}'>
+  <link rel="stylesheet" href='{{cdn "bootstrap/css/archive.css" }}'>
+  <link id="favicon" rel="shortcut icon" href='{{cdn "images/2/gitter/favicon5.png" }}'>
+  {{>load_font_css}}
+</head>
+<body class="logged-out">
+<div class="trpHeaderWrapper" id="header-wrapper">
+  <div class="trpHeaderArea" id="header">
+    {{{ prerenderView "js/views/app/tmpl/headerViewTemplate" }}}
+  </div>
+</div>
+
+{{{body}}}
+<div class="trpToolbar" id="toolbar-frame" style="overflow: scroll">
+  <div class="gtrArchiveToolbarWrapper">
+    {{#if isHomePage}}
+      <div class="gtrArchiveInfoContainer" style="height: 325px;">
+          <div class="gtrArchiveLogo">
+            <div class="logo-container"></div>
+          </div>
+          <div class="gtrArchiveInfo" style="padding-top: 40px">
+            <p>These are chat archives for <strong>{{troupeName}}</strong></p><br>
+            <p>Click on a coloured date box to view message archives for a given day.</p>
+          </div>
+      </div>
+      {{#if user}}
+      <div class="trpLeftMenuSignup">
+        <a class="trpButtonMedium trpBtnGreen gtrCreateRoomButton" href="/{{troupeName}}">Go to live room</a>
+      </div>
+      {{else}}
+      <div class="trpLeftMenuSignup">
+        <a href="/login/github?action=login&amp;button=leftmenu-1" class="trpButtonBig trpBtnGreen gtrCreateRoomButton">Login with GitHub to start talking</a>
+      </div>
+      {{/if}}
+      {{else}}
+        {{^user}}
+        <div class="gtrArchiveInfoContainer">
+            <div class="gtrArchiveLogo">
+              <div class="logo-container"></div>
+            </div>
+            <div class="gtrArchiveInfo">
+              <p>These are chat archives for <strong>{{troupeName}}</strong></p>
+            </div>
+        </div>
+        {{/user}}
+      {{/if}}
+    <div id="archive-navigation" class="gtrArchiveNavigationWrapper">
+      {{#if archiveChats}}
+        {{{ prerenderView "js/views/archive/tmpl/archive-navigation-view" }}}
+      {{/if}}
+    </div>
+    {{#unless isHomePage}}
+      {{#if user}}
+      <div class="trpLeftMenuSignup">
+        <a class="trpButtonMedium trpBtnGreen gtrCreateRoomButton" href="/{{troupeName}}">Go to live room</a>
+      </div>
+      {{else}}
+      <div class="trpLeftMenuSignup">
+        <a href="/login/github?action=login&amp;button=leftmenu-1" class="trpButtonBig trpBtnGreen gtrCreateRoomButton">Login with GitHub to start talking</a>
+      </div>
+      {{/if}}
+    {{/unless}}
+  </div>
+</div>
+
+
+{{#if troupeContext}}
+{{{ generateTroupeContext troupeContext lang=lang}}}
+{{/if}}
+
+{{>require_wrapper}}
+
+{{#if bootScriptName}}
+{{{bootScript bootScriptName }}}
+{{/if}}
+</body>
+</html>

@@ -46,7 +46,7 @@
   <div class="trpChatPanel" id="chat-frame">
     <div class="trpChatContainer  primary-scroll" id="content-frame">
       {{#each chats}}
-        {{{ chatItemPrerender this }}}
+        {{{ chatItemPrerender this lang=../lang}}}
       {{/each}}
       {{! This is a way of forcing the browser to open at the bottom of the screen }}
       <div id='initial' style="height:0;width:0;overflow:hidden"><a name="initial"/>_</a></div>
