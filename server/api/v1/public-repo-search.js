@@ -5,20 +5,17 @@ var repoService = require('../../services/repo-service');
 var restSerializer   = require("../../serializers/rest-serializer");
 
 module.exports =  function(req, res, next) {
-  var query = unescape(req.query.q);
+  repoService.findPublicReposWithRoom(req.user, req.query.q)
+    .then(function(troupes) {
+      var strategy = new restSerializer.SearchResultsStrategy({
+        resultItemStrategy: new restSerializer.TroupeStrategy({ currentUserId: req.user.id })
+      });
 
-  repoService.findPublicReposWithRoom(req.user,query)
-  .then(function(repos) {
-
-    var strategy = new restSerializer.SearchResultsStrategy({
-                          resultItemStrategy: new restSerializer.GitHubRepoStrategy({ currentUserId: req.user.id, mapUsers: true })
-                        });
-
-    return restSerializer.serializeQ({ results: repos }, strategy);
-  })
-  .then(function(serialized) {
-    res.send(serialized);
-  })
-  .fail(next);
+      return restSerializer.serializeQ({ results: troupes }, strategy);
+    })
+    .then(function(serialized) {
+      res.send(serialized);
+    })
+    .fail(next);
 };
 
