@@ -299,7 +299,7 @@ define([
         textarea.select();
       }, 10);
 
-      this.inputBox = new chatInputView.ChatInputBoxView({ el: textarea });
+      this.inputBox = new chatInputView.ChatInputBoxView({ el: textarea, editMode: true });
       this.listenTo(this.inputBox, 'save', this.saveChat);
     },
 

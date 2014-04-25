@@ -23,8 +23,8 @@ define([
   "use strict";
 
   /** @const */
-  // trpChatInputArea max-height in trp3.less needs to be adjusted if this changes
-  var MAX_CHAT_HEIGHT = 400;
+
+    var MAX_CHAT_HEIGHT = $(document).height() - $("#header-wrapper").height() - 140;
 
   /** @const */
   var EXTRA_PADDING = 20;
@@ -348,13 +348,12 @@ define([
       var scrollHeight = el.scrollHeight;
       var height = scrollHeight > MAX_CHAT_HEIGHT ? MAX_CHAT_HEIGHT : scrollHeight;
       var offsetHeight = el.offsetHeight;
+
       if(offsetHeight == height) {
         return;
       }
-
       var overflow = height < scrollHeight ? 'scroll' : '';
-      $el.css({ height: height, 'overflow-y': overflow });
-
+      $el.height(height);
       if (!editMode) {
         var css = {};
 
@@ -402,7 +401,6 @@ define([
       if(hasScrollBars()) {
         this.$el.addClass("scroller");
       }
-
       var chatResizer = new ChatCollectionResizer({
         compactView: this.compactView,
         el: this.el,
@@ -411,7 +409,7 @@ define([
       });
 
       this.chatResizer = chatResizer;
-
+      
       this.listenTo(this, 'change', function() {
         chatResizer.resizeInput();
       });
@@ -421,7 +419,7 @@ define([
 
       this.chatCollectionView = options.chatCollectionView;
       this.composeMode = options.composeMode;
-
+      this.chatResizer.resizeInput();
     },
 
     onFocusOut: function() {
