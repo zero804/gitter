@@ -6,11 +6,14 @@ Sitemap: {{sitemap}}
 
 User-agent: *
 Allow: *
-Disallow: */~chat
 
 {{else}}
 User-agent: *
 Disallow: /*
 Disallow: /
 {{/if}}
+Disallow: */~chat
+Disallow: api/*
+
+
 Allow: /humans.txt
