@@ -86,6 +86,14 @@ module.exports = {
         res.render('github-upgrade-failed');
       });
 
+    app.get(
+      '/login/failed',
+      function(req, res) {
+        res.render('github-login-failed', {
+          message: req.query.message
+        });
+      });
+
     // Welcome GitHub users.
     app.get(
       '/login/callback',
@@ -94,15 +102,30 @@ module.exports = {
         lock("oalock:" + code, function(done) {
 
             var handler;
-            if(req.session && req.session.githubScopeUpgrade) {
-              handler = passport.authorize('github_upgrade', { failureRedirect: '/login/upgrade-failed' });
+            var upgrade = req.session && req.session.githubScopeUpgrade;
+            if(upgrade) {
+              handler = passport.authorize('github_upgrade');
             } else {
-              handler = passport.authorize('github_user', { failureRedirect: '/' });
+              handler = passport.authorize('github_user');
             }
 
             handler(req, res, function(err) {
               done();
-              next(err);
+
+              if(err) {
+                if(upgrade) {
+                  res.redirect('/login/upgrade-failed');
+                } else {
+                  if(err.message) {
+                    res.redirect('/login/failed?message=' + encodeURIComponent(err.message));
+                  } else {
+                    res.redirect('/login/failed');
+                  }
+                }
+                return;
+              }
+
+              next();
             });
 
         });
