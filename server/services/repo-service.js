@@ -191,16 +191,60 @@ function suggestedReposForUser(user) {
 }
 exports.suggestedReposForUser = suggestedReposForUser;
 
+function createRegExpsForQuery(queryText) {
+  var normalized = ("" + queryText).trim().toLowerCase();
+  var parts = normalized.split(/[\s\'']+/)
+                        .filter(function(s) { return !!s; })
+                        .filter(function(s, index) { return index < 10; } );
+
+  return parts.map(function(i) {
+    return new RegExp("\\b" + i.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"));
+  });
+}
+
+
 function findPublicReposWithRoom(user, query, options) {
   if(!options) options = {};
 
   var ghRepo  = new GithubRepo(user);
-  var q = new RegExp(query, 'i');
-  return persistence.Troupe.findQ({lcUri: q, githubType: 'REPO'}).then(function(troupes) {
-    return Q.all(troupes.map(function(troupe) { return ghRepo.getRepo(troupe.uri); })).then(function(repos) {
-      return repos.filter(function(repo) { return repo ? !repo.private : null; });
+
+  var filters = createRegExpsForQuery(query);
+  if(!filters.length) return Q.resolve([]);
+
+  return persistence.Troupe
+    .find({
+      $and: filters.map(function(re) {
+        return { lcUri: re };
+      }),
+      githubType: 'REPO',
+      $or: [
+        { security: 'PUBLIC' },
+        { security: null },
+        { security: { $exists: false } }
+      ]
+    })
+    .limit(20)
+    .execQ()
+    .then(function(troupes) {
+      return Q.all(troupes.map(function(troupe) {
+        if(troupe.security === 'PUBLIC') {
+          return troupe;
+        }
+        if(troupe.security) return null;
+
+        return ghRepo.getRepo(troupe.uri)
+          .then(function(repo) {
+            if(repo.private) {
+              return null;
+            }
+
+            return troupe;
+          });
+      }));
+    })
+    .then(function(troupes) {
+      return troupes.filter(function(f) { return !!f; });
     });
-  });
 }
 
 exports.findPublicReposWithRoom = findPublicReposWithRoom;
