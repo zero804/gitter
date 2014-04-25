@@ -52,5 +52,9 @@ module.exports = {
         // No auth
         require('./transloadit.js'));
 
+    app.get(apiRoot + '/private/chat-heatmap/:roomId',
+        // No auth
+        require('./chat-heatmap.js'));
+
   }
 };

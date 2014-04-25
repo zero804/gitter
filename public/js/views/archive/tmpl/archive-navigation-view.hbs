@@ -1,0 +1,14 @@
+<div class="gtrArchiveNavigationInner">
+  <div class="gtrArchiveDate">
+    {{#if nextDate}}<a href="{{nextDateLink}}"><div class="gtrArchiveNext"></div></a>{{/if}}
+    {{#if previousDate}}<a href="{{previousDateLink}}"><div class="gtrArchivePrev"></div></a>{{/if}}
+    <div class="gtrArchiveToday">
+      <span class="gtrArchiveDay">{{dayName}}<sup>{{dayOrdinal}}</sup></span><br>
+      <span class="gtrArchiveMonth">{{monthYearFormatted}}</span>
+    </div>
+  </div>
+
+
+  <div id="archive-navigation" class="gtrArchiveCalendar">
+  </div>
+</div>

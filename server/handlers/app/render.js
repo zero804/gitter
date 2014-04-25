@@ -5,6 +5,7 @@ var nconf             = require('../../utils/config');
 var Q                 = require('q');
 var contextGenerator  = require('../../web/context-generator');
 var restful           = require('../../services/restful');
+var languageSelector = require('../../web/language-selector');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 20;
@@ -34,6 +35,7 @@ function renderHomePage(req, res, next) {
       troupeName: req.uriContext.uri,
       troupeContext: troupeContext,
       agent: req.headers['user-agent'],
+      lang: languageSelector(req),
       isUserhome: true
     });
   });
@@ -60,7 +62,8 @@ function renderMainFrame(req, res, next, frame) {
         troupeName: req.uriContext.uri,
         troupeContext: troupeContext,
         chatAppLocation: chatAppLocation,
-        agent: req.headers['user-agent']
+        agent: req.headers['user-agent'],
+        lang: languageSelector(req)
       });
     })
     .fail(next);
@@ -93,7 +96,8 @@ function renderChatPage(req, res, next) {
         user: troupeContext.user,
         troupeContext: troupeContext,
         chats: chats,
-        agent: req.headers['user-agent']
+        agent: req.headers['user-agent'],
+        lang: languageSelector(req)
       });
 
     })
@@ -110,7 +114,8 @@ function renderMobileUserHome(req, res, next) {
       troupeName: req.uriContext.uri,
       troupeContext: troupeContext,
       agent: req.headers['user-agent'],
-      isUserhome: true
+      isUserhome: true,
+      lang: languageSelector(req)
     });
   });
 }
@@ -155,7 +160,8 @@ function renderMobileNotLoggedInChat(req, res, next) {
         troupeFavourite: troupeContext.troupe.favourite,
         troupeContext: troupeContext,
         chats: chats,
-        agent: req.headers['user-agent']
+        agent: req.headers['user-agent'],
+        lang: languageSelector(req)
       });
 
     })

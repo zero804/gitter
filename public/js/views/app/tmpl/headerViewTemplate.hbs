@@ -1,10 +1,12 @@
 <div class="trpHeaderContainer">
+  {{#unless archives}}
   {{#unless oneToOne}}
   {{#if user}}
   <div class="settingsCog">
     <div class="dropdown-toggle" data-toggle="dropdown"></div>
   </div>
   {{/if}}
+  {{/unless}}
   {{/unless}}
   {{#if user}}
   <div class="trpTroupeFavourite {{#if troupeFavourite}}favourited{{/if}}" id="favourite-button">

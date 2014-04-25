@@ -10,7 +10,7 @@
       <div class="trpChatFrom">{{username}}</div>
       {{/if}}
 
-      <div class="trpChatTime"> {{#if fromUser}} &bull; {{/if}} {{widget "timeago" time=sent}} </div>
+      <div class="trpChatTime"> {{#if fromUser}} &bull; {{/if}} {{widget "timeago" time=sent lang=lang}} </div>
       {{#if readByText}}
       {{#if compactView}}
         <span class="trpChatReadBy readBySome">{{readByText}}</span>
