@@ -58,7 +58,6 @@ var webhookTemplates = ['bitbucket', 'generic', 'github', 'jenkins', 'sprintly',
 module.exports = exports = function(model, params) {
   var hash = params.hash;
   var lang = hash && hash.lang;
-  console.log('LANG', lang);
   var displayName;
   var username;
   var deletedClass;
