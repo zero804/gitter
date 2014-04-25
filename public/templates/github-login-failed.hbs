@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Login to Gitter</title>
+    <title>Login Failed</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -35,6 +35,7 @@
             <div style="display: inline-block; background-color: rgba(0,0,0,0.75); padding: 0 10px; margin-bottom: 10px">
               <h1 style="margin: 16px; color: red">Login failed</h1>
             </div>
+            <br>
             <div style="" class="subtext">
               We're very sorry, but we're unable to log you in right now.
               {{#if message}}
@@ -45,6 +46,7 @@
         </div>
         <div class="strip" style="text-align: left; margin-top: 24px; margin-bottom: 20px;">
           <a target="_top" href="/login/github?action=login" class="button green" id="login" style="text-decoration: none; color: white">Try login again</a>
+          <a target="_top" href="https://gitter.zendesk.com/hc/requests/new" class="button grey" id="login" style="text-decoration: none; color: white">Contact support</a>
         </div>
       </div>
       <!-- <div class="strip"><img src="{{ cdn "images/2/gitter/screenshot-small.png" }}" width="920" style="border-radius: 2px 2px 0 0"></div> -->
