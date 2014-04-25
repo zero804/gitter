@@ -20,6 +20,11 @@ exports.datesList = [
       .then(function() {
         var troupe = req.uriContext.troupe;
 
+        // This is where we want non-logged-in users to return
+        if(!user && req.session) {
+          req.session.returnTo = '/' + troupe.uri;
+        }
+
         return contextGenerator.generateTroupeContext(req)
           .then(function(troupeContext) {
 
@@ -51,6 +56,11 @@ exports.chatArchive = [
     return roomService.validateRoomForReadOnlyAccess(user, troupe)
       .then(function() {
 
+        // This is where we want non-logged-in users to return
+        if(!user && req.session) {
+          req.session.returnTo = '/' + troupe.uri;
+        }
+
         var yyyy = parseInt(req.params.yyyy, 10);
         var mm = parseInt(req.params.mm, 10);
         var dd = parseInt(req.params.dd, 10);
@@ -58,7 +68,6 @@ exports.chatArchive = [
         var startDate = moment(yyyy + "-" + mm + "-" + dd + "Z");
         var endDate = moment(startDate).endOf('day');
 
-        var troupe = req.uriContext.troupe;
         var troupeId = troupe.id;
 
         var nextDate = moment(startDate).add('days', 1);
