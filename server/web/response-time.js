@@ -33,7 +33,7 @@ module.exports = function responseTime(winston, minimal) {
           method: req.method,
           status: res.statusCode,
           url: req.url,
-          headers: req.headers['user-agent'],
+          user: req.user && req.user.username,
           duration: duration + 'ms',
           ip: req.headers['x-forwarded-for'] || req.ip || 'unknown'
         });
