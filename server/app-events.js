@@ -223,6 +223,18 @@ function bind(on) {
       emit('userJoined', data);
     },
 
+    onUserJoined: function(callback) {
+      on('userJoined', callback);
+    },
+
+    trackOrgMembership: function(data) {
+      emit('trackOrgMembership', data);
+    },
+
+    onTrackOrgMembership: function(callback) {
+      on('trackOrgMembership', callback);
+    },
+
     userLeft: function(data) {
       emit('userLeft', data);
     },
