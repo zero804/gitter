@@ -708,7 +708,6 @@ var OAuthAccessTokenSchema= new Schema({
 OAuthAccessTokenSchema.index({ token: 1 });
 OAuthAccessTokenSchema.schemaTypeName = 'OAuthAccessTokenSchema';
 
-
 /*
  * Reverse Geocoder Stuff
  */
@@ -812,6 +811,16 @@ var NotificationsPreferenceSchema = new Schema({
 NotificationsPreferenceSchema.index({ userId: 1} , { unique: true });
 NotificationsPreferenceSchema.schemaTypeName = 'NotificationsPreferenceSchema';
 
+/*
+ * Organization schema
+ */
+var OrgSchema = new Schema({
+  uri: String,
+  members: Array
+});
+OrgSchema.index({ uri: 1 });
+OrgSchema.schemaTypeName = 'OrgSchema';
+
 
 
 var User = mongoose.model('User', UserSchema);
@@ -852,6 +861,7 @@ var Contact = mongoose.model('Contact', ContactSchema);
 var SuggestedContact = mongoose.model('SuggestedContact', SuggestedContactSchema);
 
 var NotificationsPreference = mongoose.model('NotificationsPreference', NotificationsPreferenceSchema);
+var Org = mongoose.model('Org', OrgSchema);
 
 
 //
@@ -893,7 +903,8 @@ module.exports = {
     UriLookupSchema: UriLookupSchema,
     ContactSchema: ContactSchema,
     SuggestedContactSchema: SuggestedContactSchema,
-    NotificationsPreferenceSchema: NotificationsPreferenceSchema
+    NotificationsPreferenceSchema: NotificationsPreferenceSchema,
+    OrgSchema: OrgSchema
   },
   User: User,
   UserTroupeLastAccess: UserTroupeLastAccess,
@@ -924,7 +935,8 @@ module.exports = {
   UriLookup: UriLookup,
   Contact: Contact,
   SuggestedContact: SuggestedContact,
-  NotificationsPreference: NotificationsPreference
+  NotificationsPreference: NotificationsPreference,
+  Org: Org
 };
 
 process.nextTick(function() {

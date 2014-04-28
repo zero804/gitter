@@ -229,6 +229,7 @@ function determineDefaultNotifyForRoom(user, troupe) {
 function ensureAccessControl(user, troupe, access) {
   if(troupe) {
     if(access) {
+
       /* In troupe? */
       if(troupe.containsUserId(user.id)) return Q.resolve(troupe);
 
