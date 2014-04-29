@@ -23,16 +23,11 @@ mongoose.set('debug', nconf.get("mongo:logQueries"));
 
 mongoose.connect(nconf.get("mongo:url"), {
   server: {
-    readPreference: "primaryPreferred",
     socketOptions: { keepAlive: 1, connectTimeoutMS: 3000 },
     auto_reconnect: true,
     autoReconnect: true
   },
-  db: {
-    readPreference: "primaryPreferred"
-  },
   replset: {
-    readPreference: "primaryPreferred",
     socketOptions: { keepAlive: 1, connectTimeoutMS: 2000 },
     auto_reconnect: true,
     autoReconnect: true
@@ -43,12 +38,13 @@ shutdown.addHandler('mongo', 1, function(callback) {
   mongoose.disconnect(callback);
 });
 
-if(nconf.get("mongo:profileSlowQueries")) {
-  mongoose.connection.on('open', function() {
+mongoose.connection.on('open', function() {
+  if(nconf.get("mongo:profileSlowQueries")) {
     var MAX = 50;
     connection.setProfiling(1, MAX, function() {});
-  });
-}
+  }
+
+});
 
 connection.on('error', function(err) {
   winston.info("MongoDB connection error", { exception: err });
