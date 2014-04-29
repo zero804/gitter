@@ -12,7 +12,8 @@ var assert = require("assert");
 describe('pushNotificationService', function() {
   describe('#registerDevice()', function() {
     it('should prune unused old devices', function(done) {
-      var token = new Buffer('TESTTOKEN');
+      //var token = new Buffer('TESTTOKEN');
+      var token = 'TESTTOKEN';
 
       pushNotificationService.registerDevice('DEVICE1', 'TEST', token, 'TESTDEVICE', '1.0.1', '122', function(err, device) {
         if(err) return done(err);
