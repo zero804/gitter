@@ -9,7 +9,8 @@ module.exports = {
     var deviceId = req.body.deviceId;
     var deviceName = req.body.deviceName;
     var deviceType = req.body.deviceType;
-    var deviceToken = new Buffer(req.body.deviceToken, 'base64');
+    //var deviceToken = new Buffer(req.body.deviceToken, 'base64'); // mongoose 3.6.x
+    var deviceToken = req.body.deviceToken; // mongoose 3.8.x
     var appVersion = req.body.version || null;
     var appBuild = req.body.build || null;
 
