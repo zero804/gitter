@@ -1,0 +1,69 @@
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
+require([
+  'jquery',
+  'utils/appevents',
+  'collections/chat',
+  'views/chat/chatCollectionView',
+  'views/chat/chatInputView',
+  'components/unread-items-client',
+  'backbone',
+  'components/modal-region',
+  'views/app/mobileAppView',
+  'views/chat/decorators/emojiDecorator',
+  'views/app/troupeSettingsView',
+  'components/csrf'                             // No ref
+  ], function($, appEvents, chatModels, ChatCollectionView, chatInputView,
+    unreadItemsClient, Backbone, modalRegion, MobileAppView, emojiDecorator, TroupeSettingsView) {
+  "use strict";
+
+  new MobileAppView({
+    el: $('#mainPage')
+  });
+
+  appEvents.on('navigation', function(url) {
+    window.location.href = url;
+  });
+
+  var chatCollection = new chatModels.ChatCollection();
+  chatCollection.listen();
+
+  var chatCollectionView = new ChatCollectionView({
+    el: $('#frame-chat'),
+    collection: chatCollection,
+    decorators: [emojiDecorator]
+  }).render();
+
+  unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
+
+  new chatInputView.ChatInputView({
+    el: $('#chat-input'),
+    collection: chatCollection,
+    rollers: chatCollectionView.rollers
+  }).render();
+
+  var Router = Backbone.Router.extend({
+    routes: {
+      // TODO: get rid of the pipes
+      "!": "hideModal",                  // TODO: remove this soon
+      "": "hideModal",
+      "notifications": "notifications",
+      "|notifications": "notifications", // TODO: remove this soon
+    },
+
+    hideModal: function() {
+      modalRegion.close();
+    },
+
+    notifications: function() {
+      modalRegion.show(new TroupeSettingsView({}));
+    }
+  });
+
+  new Router();
+
+
+  $('html').removeClass('loading');
+
+  Backbone.history.start();
+
+});
