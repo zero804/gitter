@@ -23,14 +23,12 @@ mongoose.set('debug', nconf.get("mongo:logQueries"));
 
 mongoose.connect(nconf.get("mongo:url"), {
   server: {
-    socketOptions: { keepAlive: 1, connectTimeoutMS: 3000 },
     auto_reconnect: true,
-    autoReconnect: true
+    socketOptions: { keepAlive: 1, connectTimeoutMS: 3000 }
   },
   replset: {
-    socketOptions: { keepAlive: 1, connectTimeoutMS: 2000 },
     auto_reconnect: true,
-    autoReconnect: true
+    socketOptions: { keepAlive: 1, connectTimeoutMS: 2000 }
   }
 });
 
