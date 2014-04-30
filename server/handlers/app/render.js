@@ -120,7 +120,7 @@ function renderMobileUserHome(req, res, next) {
   });
 }
 
-function renderMobileChat(req, res, next) {
+function renderMobileApp(req, res, next) {
   var troupe = req.uriContext.troupe;
 
   var userId = req.user && req.user.id;
@@ -132,6 +132,31 @@ function renderMobileChat(req, res, next) {
       res.render('mobile/mobile-app', {
         appCache: getAppCache(req),
         bootScriptName: 'mobile-app',
+        troupeName: req.uriContext.uri,
+        troupeTopic: troupeContext.troupe.topic,
+        troupeFavourite: troupeContext.troupe.favourite,
+        user: troupeContext.user,
+        troupeContext: troupeContext,
+        chats: chats,
+        agent: req.headers['user-agent']
+      });
+
+    })
+    .fail(next);
+}
+
+function renderMobileChat(req, res, next) {
+  var troupe = req.uriContext.troupe;
+
+  var userId = req.user && req.user.id;
+
+  Q.all([
+    contextGenerator.generateTroupeContext(req),
+    restful.serializeChatsForTroupe(troupe.id, userId, { limit: INITIAL_CHAT_COUNT })
+    ]).spread(function(troupeContext, chats) {
+      res.render('mobile/mobile-chat', {
+        appCache: getAppCache(req),
+        bootScriptName: 'mobile-chat',
         troupeName: req.uriContext.uri,
         troupeTopic: troupeContext.troupe.topic,
         troupeFavourite: troupeContext.troupe.favourite,
@@ -204,6 +229,7 @@ module.exports = exports = {
   renderHomePage: renderHomePage,
   renderChatPage: renderChatPage,
   renderMainFrame: renderMainFrame,
+  renderMobileApp: renderMobileApp,
   renderMobileChat: renderMobileChat,
   renderMobileUserHome: renderMobileUserHome,
   renderMobileNotLoggedInChat: renderMobileNotLoggedInChat,
