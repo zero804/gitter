@@ -8,17 +8,12 @@ require([
   'components/unread-items-client',
   'backbone',
   'components/modal-region',
-  'views/app/mobileAppView',
   'views/chat/decorators/emojiDecorator',
   'views/app/troupeSettingsView',
   'components/csrf'                             // No ref
   ], function($, appEvents, chatModels, ChatCollectionView, chatInputView,
-    unreadItemsClient, Backbone, modalRegion, MobileAppView, emojiDecorator, TroupeSettingsView) {
+    unreadItemsClient, Backbone, modalRegion, emojiDecorator, TroupeSettingsView) {
   "use strict";
-
-  new MobileAppView({
-    el: $('#mainPage')
-  });
 
   appEvents.on('navigation', function(url) {
     window.location.href = url;
