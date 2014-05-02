@@ -92,6 +92,7 @@ module.exports = {
       });
 
       require('./integrations').install(app);
+      require('./mobile').install(app);
 
       var archive = require('./archive');
 
