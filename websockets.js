@@ -1,9 +1,9 @@
 /*jslint node: true */
 "use strict";
 
-var shutdown = require('./server/utils/shutdown');
+var unhandledExceptions = require('./server/utils/unhandled-exceptions');
 
-shutdown.installUnhandledExceptionHandler();
-shutdown.domainWrap(function() {
+unhandledExceptions.installUnhandledExceptionHandler();
+unhandledExceptions.domainWrap(function() {
   require('./server/websockets.js');
 });
