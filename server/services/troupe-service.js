@@ -29,6 +29,8 @@ function findByUri(uri, callback) {
 }
 
 function findAllByUri(uris, callback) {
+  if(!uris || !uris.length) return Q.resolve([]).nodeify(callback);
+
   var lcUris = uris.map(function(f) { return f.toLowerCase(); });
 
   return persistence.Troupe.where('lcUri').in(lcUris).execQ()
@@ -37,6 +39,8 @@ function findAllByUri(uris, callback) {
 
 
 function findByIds(ids, callback) {
+  if(!ids || !ids.length) return Q.resolve([]).nodeify(callback);
+
   return persistence.Troupe
     .where('_id')['in'](collections.idsIn(ids))
     .execQ()
