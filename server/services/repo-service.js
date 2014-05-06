@@ -97,13 +97,14 @@ function calculateAdditionalScoreFor(item) {
   return score;
 }
 
+/* This seems to be a very badly performing query! */
 function findReposWithRooms(repoList) {
-  var orTerms = lazy(repoList)
-                  .map(function(r) { return { lcUri: r && r.toLowerCase(), githubType: 'REPO' }; })
-                  .toArray();
+  var uris = repoList.map(function(r) {
+    return r && r.toLowerCase();
+  });
 
-  winston.info("Querying reposWithRooms for " + orTerms.length + " repositories");
-  var roomsPromise = orTerms.length ? persistence.Troupe.findQ({ $or: orTerms }, "uri") : Q.resolve([]);
+  winston.info("Querying reposWithRooms for " + uris.length + " repositories");
+  var roomsPromise = uris.length ? persistence.Troupe.findQ({ githubType: 'REPO', lcUri: { $in: uris } }, "uri") : Q.resolve([]);
   return roomsPromise;
 }
 
