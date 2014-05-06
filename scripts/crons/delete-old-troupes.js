@@ -4,12 +4,11 @@
 "use strict";
 
 var demolitionService = require('../../server/services/troupe-demolition-service');
-var shutdown = require('../../server/utils/shutdown');
+var shutdown = require('shutdown');
 
 demolitionService.deleteEligibleTroupes(function(err, counts) {
   if(err) {
-    console.error(err);
-    process.exit(1);
+    shutdown.shutdownGracefully(1);
     return;
   }
 

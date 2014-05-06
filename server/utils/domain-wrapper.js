@@ -3,7 +3,7 @@
 
 var domain = require('domain');
 var winston = require('./winston');
-var shutdown = require('./shutdown');
+var shutdown = require('shutdown');
 var errorReporting = require('./error-reporting');
 
 module.exports = function(app) {

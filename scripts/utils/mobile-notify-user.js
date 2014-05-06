@@ -4,7 +4,7 @@
 
 var pushNotificationGateway = require('../../server/gateways/push-notification-gateway');
 var winston = require('../../server/utils/winston');
-var shutdown = require('../../server/utils/shutdown');
+var shutdown = require('shutdown');
 
 var opts = require("nomnom")
    .option('user', {

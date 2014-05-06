@@ -4,7 +4,7 @@
 
 var presenceService = require('../../server/services/presence-service');
 var userService = require('../../server/services/user-service');
-var shutdown = require('../../server/utils/shutdown');
+var shutdown = require('shutdown');
 
 var winston = require('../../server/utils/winston');
 

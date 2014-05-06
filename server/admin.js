@@ -6,7 +6,7 @@ var exphbs  = require('express3-handlebars');
 require('express-resource');
 
 var http = require('http');
-var shutdown = require('./utils/shutdown');
+var shutdown = require('shutdown');
 
 var app = express();
 var server = http.createServer(app);
