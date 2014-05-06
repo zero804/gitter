@@ -7,6 +7,11 @@ module.exports = function(req, res, next) {
   /* OAuth clients have req.authInfo. Aways let them through */
   if(req.authInfo) return next();
 
+  /* Does the user already have an acces token? */
+  if(req.session && req.session.accessToken) {
+    return next();
+  }
+
   if(req.user) {
     return oauthService.findOrGenerateWebToken(req.user.id)
       .then(function(serverToken) {
