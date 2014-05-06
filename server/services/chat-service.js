@@ -167,6 +167,8 @@ exports.findById = function(id, callback) {
 };
 
  exports.findByIds = function(ids, callback) {
+  if(!ids || !ids.length) return callback(null, []);
+
   persistence.ChatMessage
     .where('_id')['in'](collections.idsIn(ids))
     .exec(callback);
