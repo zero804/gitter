@@ -11,8 +11,16 @@ var mainFrameMiddlewarePipeline = [
   }
 ];
 
+var userhomeMiddlewarePipeline = [
+  appMiddleware.isPhoneMiddleware,
+  function(req, res, next) {
+    appRender.renderMobileUserHomeApp(req, res, next);
+  }
+];
+
 module.exports = {
     install: function(app) {
-        app.get('/mobile/chat', mainFrameMiddlewarePipeline);
+      app.get('/mobile/chat', mainFrameMiddlewarePipeline);
+      app.get('/mobile/home', userhomeMiddlewarePipeline);
     }
 };

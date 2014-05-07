@@ -161,6 +161,22 @@ function renderMobileAppcacheChat(req, res, next) {
     .fail(next);
 }
 
+function renderMobileUserHomeApp(req, res, next) {
+  Q.all([
+    contextGenerator.generateNonChatContext(req),
+    ]).spread(function(troupeContext) {
+      res.render('mobile/native-' + 'userhome' + '-app', {
+        appCache: getAppCache(req),
+        bootScriptName: 'mobile-userhome-app',
+        user: troupeContext.user,
+        troupeContext: troupeContext,
+        agent: req.headers['user-agent']
+      });
+
+    })
+    .fail(next);
+}
+
 
 function renderMobileNotLoggedInChat(req, res, next) {
   var troupe = req.uriContext.troupe;
@@ -222,6 +238,7 @@ module.exports = exports = {
   renderMainFrame: renderMainFrame,
   renderMobileApp: renderMobileApp,
   renderMobileAppcacheChat: renderMobileAppcacheChat,
+  renderMobileUserHomeApp: renderMobileUserHomeApp,
   renderMobileUserHome: renderMobileUserHome,
   renderMobileNotLoggedInChat: renderMobileNotLoggedInChat,
   renderNotLoggedInChatPage: renderNotLoggedInChatPage
