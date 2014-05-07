@@ -1,31 +1,40 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 
 define([
-  'utils/context',
   'marionette',
   'views/base',
-  'hbs!./tmpl/homeRepoListItem'
-], function(context, Marionette, TroupeViews, repoListItemTemplate) {
+  'hbs!./tmpl/homeRepoListItem',
+  'utils/appevents'
+], function(Marionette, TroupeViews, repoListItemTemplate, appEvents) {
   "use strict";
 
   var TroupeItemView = TroupeViews.Base.extend({
-    tagName: 'div',
-    className: 'org-list-item',
+    tagName: 'li',
+    className: 'suggested-room-list-item',
     template: repoListItemTemplate,
     initialize: function() {
       this.setRerenderOnChange(true);
     },
     getRenderData: function() {
-      var data = {};
-      data.repo = this.model.toJSON();
-      data.user = context.getUser();
-
-      return data;
+      return this.model.toJSON();
+    },
+    events: function() {
+      if('ontouchstart' in document.documentElement) {
+        return { tap: 'navigate' };
+      } else {
+        return { click: 'navigate' };
+      }
+    },
+    navigate: function() {
+      var url = '/' + this.model.get('uri');
+      var name = this.model.get('name');
+      appEvents.trigger('navigation', url, 'chat', name);
     }
   });
 
   return Marionette.CollectionView.extend({
-    tagName: 'div',
+    tagName: 'ul',
+    className: 'suggested-room-list',
     itemView: TroupeItemView
   });
 
