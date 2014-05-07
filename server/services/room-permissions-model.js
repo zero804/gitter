@@ -2,11 +2,14 @@
 "use strict";
 
 var permissionsModel   = require('./permissions-model');
+var StatusError        = require('statuserror');
+var Q                  = require('q');
 
 /**
  * Main entry point
  */
 function roomPermissionsModel(user, right, room) {
+  if(!room) return Q.reject(new StatusError(404, "No such room"));
   if(room.oneToOne) {
     /*
      * TODO: pass the username of the other user through.
