@@ -129,6 +129,9 @@ module.exports = {
 
             winston.verbose("rememberme: Passport login succeeded");
 
+            // Remove the old token for this user
+            if(req.session) req.session.accessToken = null;
+
             // Tracking
             var properties = useragentStats(req.headers['user-agent']);
             statsService.userUpdate(user, properties);
