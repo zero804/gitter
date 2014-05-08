@@ -4,8 +4,15 @@
 var oauthService = require('../../services/oauth-service');
 
 module.exports = function(req, res, next) {
-  /* OAuth clients have req.authInfo. Aways let them through */
-  if(req.authInfo) return next();
+  /* OAuth clients have req.authInfo. Propogate their access token to their entire session
+   * so that all related web-requests are made by the same client
+   */
+  if(req.authInfo) {
+    if(req.session && req.authInfo.accessToken) {
+      req.session.accessToken = req.authInfo.accessToken;
+    }
+    return next();
+  }
 
   // Emergency removal of this
   // /* Does the user already have an acces token? */
