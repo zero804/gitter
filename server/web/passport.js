@@ -39,7 +39,7 @@ function installApi() {
           var user = tokenInfo.user;
           var client = tokenInfo.client;
           // Not yet needed var accessToken = tokenInfo.accessToken;
-          done(null, user, { client: client });
+          done(null, user, { client: client, accessToken: accessToken });
         })
         .fail(done);
     }
