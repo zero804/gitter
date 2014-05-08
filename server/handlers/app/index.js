@@ -17,6 +17,7 @@ function saveRoom(req) {
 
 var mainFrameMiddlewarePipeline = [
   // middleware.ensureLoggedIn(),
+  middleware.grantAccessForRememberMeTokenMiddleware,
   appMiddleware.uriContextResolverMiddleware,
   appMiddleware.isPhoneMiddleware,
   function(req, res, next) {
