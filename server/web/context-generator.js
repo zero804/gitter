@@ -159,7 +159,7 @@ function createTroupeContext(req, options) {
     user: options.user,
     troupe: options.troupe,
     homeUser: options.homeUser,
-    accessToken: req.session.accessToken,
+    accessToken: req.authInfo && req.authInfo.accessToken || req.session.accessToken,
     appVersion: appVersion.getCurrentVersion(),
     desktopNotifications: options.desktopNotifications,
     events: events,
