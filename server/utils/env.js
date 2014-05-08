@@ -4,4 +4,5 @@
 var gitterEnv = require('gitter-env');
 var path = require('path');
 
+/* Create a singleton environment */
 module.exports = gitterEnv.create(path.join(__dirname, '..', '..', 'config'));

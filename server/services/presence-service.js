@@ -638,7 +638,7 @@ function validateUsersSubset(userIds, callback) {
   var redisClient = redis.createClient();
 
   function done(err) {
-    redisClient.quit();
+    redis.quit(redisClient);
     return callback(err);
   }
 

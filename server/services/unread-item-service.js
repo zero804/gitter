@@ -76,7 +76,8 @@ function upgradeKeyToSortedSet(key, userBadgeKey, troupeId, callback) {
       winston.verbose('unread-item-key-upgrade: upgrade completed successfully');
     }
 
-    redisClient.quit();
+    redis.quit(redisClient);
+
     return callback(err);
   }
 
