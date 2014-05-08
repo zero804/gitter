@@ -2299,7 +2299,7 @@ ul.roster {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   top: 0;
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: rgba(255, 255, 255, 0.97);
   border-bottom: 1px solid rgba(0,0,0,0.05);
   z-index: 1;
   .transition500ms;
@@ -2369,9 +2369,9 @@ ul.roster {
   #trpTopic {
     font-family: 'Open Sans';
     font-size: 13px;
-    margin: -5px 0px 0px 0px;
-    color: #999;
+    color: #777;
     min-height: 1em;
+    margin: -5px 0 0 0;
 
     a {
       color: #666;
@@ -2384,7 +2384,12 @@ ul.roster {
   }
 
   .gtrNameTopic {
-    float: left;
+    margin-right: 60px;
+    margin-left: 50px;
+
+    @media @mid {
+      margin-left: 55px;
+    }
   }
 
   .dropdown-toggle {
