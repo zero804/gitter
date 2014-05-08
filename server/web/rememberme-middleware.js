@@ -13,7 +13,7 @@ var useragentStats          = require('./useragent-stats');
 
 var cookieName = nconf.get('web:cookiePrefix') + 'auth';
 
-var redisClient = redis.createClient();
+var redisClient = redis.getClient();
 
 function generateAuthToken(req, res, userId, options, callback) {
   options = options ? options : {};

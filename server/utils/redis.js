@@ -4,6 +4,10 @@
 var env = require('./env');
 
 /* Wrapper to gitter-env */
+exports.getClient = function() {
+  return env.redis.getClient();
+};
+
 exports.createClient = function() {
   return env.redis.createClient();
 };

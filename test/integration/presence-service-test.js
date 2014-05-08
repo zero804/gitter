@@ -462,7 +462,7 @@ describe('presenceService', function() {
     presenceService.userSocketConnected(userId, socketId, 'online', 'test', null, null, function(err) {
       if(err) return done(err);
 
-      var redisClient = redis.createClient();
+      var redisClient = redis.getClient();
 
       // Now mess things up intentionally
       redisClient.zincrby(presenceService.testOnly.ACTIVE_USERS_KEY, 1, userId, function(err) {
@@ -499,7 +499,7 @@ describe('presenceService', function() {
       presenceService.userSocketConnected(userId2, socketId2, 'mobile', 'test', null, null, function(err) {
         if(err) return done(err);
 
-        var redisClient = redis.createClient();
+        var redisClient = redis.getClient();
 
         // Now mess things up intentionally
         redisClient.zincrby(presenceService.testOnly.ACTIVE_USERS_KEY, 1, userId2, function(err) {
@@ -548,7 +548,7 @@ describe('presenceService', function() {
     presenceService.userSocketConnected(userId, socketId, 'online', 'test', null, null, function(err) {
       if(err) return done(err);
 
-      var redisClient = redis.createClient();
+      var redisClient = redis.getClient();
 
       // Now mess things up intentionally
       redisClient.zincrby(presenceService.testOnly.ACTIVE_USERS_KEY, 1, userId, function(err) {
