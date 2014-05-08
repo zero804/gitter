@@ -14,7 +14,7 @@ var RedisBatcher     = require('../utils/redis-batcher').RedisBatcher;
 var Scripto          = require('redis-scripto');
 var Q                = require('q');
 var assert           = require('assert');
-var redisClient      = redis.createClient();
+var redisClient      = redis.getClient();
 var badgeBatcher     = new RedisBatcher('badge', 300);
 var scriptManager    = new Scripto(redisClient);
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/unread');
@@ -66,7 +66,7 @@ var redisClient_smembers = Q.nbind(redisClient.smembers, redisClient);
 function upgradeKeyToSortedSet(key, userBadgeKey, troupeId, callback) {
   winston.verbose('unread-item-key-upgrade: attempting to upgrade ' + key);
 
-  // Use a new client due to the WATCH semantics
+  // Use a new client due to the WATCH semantics (don't use getClient!)
   var redisClient = redis.createClient();
 
   function done(err) {

@@ -12,7 +12,7 @@ var _ = require("underscore");
 
 var presenceService = new events.EventEmitter();
 
-var redisClient = redis.createClient();
+var redisClient = redis.getClient();
 
 var Scripto = require('redis-scripto');
 var scriptManager = new Scripto(redisClient);
@@ -634,7 +634,7 @@ function introduceDelayForTesting(cb) {
 
 function validateUsersSubset(userIds, callback) {
   winston.debug('Validating users', { userIds: userIds });
-  // Use a new client due to the WATCH semantics
+  // Use a new client due to the WATCH semantics (don't use getClient!)
   var redisClient = redis.createClient();
 
   function done(err) {

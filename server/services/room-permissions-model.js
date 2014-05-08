@@ -9,7 +9,6 @@ var Q                  = require('q');
  * Main entry point
  */
 function roomPermissionsModel(user, right, room) {
-  if(!room) return Q.reject(new StatusError(404, "No such room"));
   if(room.oneToOne) {
     /*
      * TODO: pass the username of the other user through.
