@@ -23,14 +23,12 @@ mongoose.set('debug', nconf.get("mongo:logQueries"));
 
 mongoose.connect(nconf.get("mongo:url"), {
   server: {
-    socketOptions: { keepAlive: 1, connectTimeoutMS: 3000 },
     auto_reconnect: true,
-    autoReconnect: true
+    socketOptions: { keepAlive: 1, connectTimeoutMS: 3000 }
   },
   replset: {
-    socketOptions: { keepAlive: 1, connectTimeoutMS: 2000 },
     auto_reconnect: true,
-    autoReconnect: true
+    socketOptions: { keepAlive: 1, connectTimeoutMS: 2000 }
   }
 });
 
@@ -40,6 +38,33 @@ shutdown.addHandler('mongo', 1, function(callback) {
 
 mongoose.connection.on('open', function() {
   if(nconf.get("mongo:profileSlowQueries")) {
+
+    mongoose.set('debug', function (collectionName, method, query/*, doc, options*/) {
+      var collection;
+
+      if(method === 'find' || method === 'findOne') {
+        collection = mongoose.connection.db.collection(collectionName);
+        collection.find(query, function(err, cursor) {
+          if(err) {
+            winston.verbose('Explain plan failed', { exception: err });
+            return;
+          }
+
+          cursor.explain(function(err, plan) {
+            if(err) {
+              winston.verbose('Explain plan failed', { exception: err });
+              return;
+            }
+
+            if(plan.cursor === 'BasicCursor') {
+              // Make sure that all full scans are removed before going into production!
+              winston.warn('Full scan query on ' + collectionName + ' for query ', { query: query, plan: plan });
+            }
+          });
+        });
+      }
+    });
+
     var MAX = 50;
     connection.setProfiling(1, MAX, function() {});
   }
@@ -116,7 +141,7 @@ var UserSchema = new Schema({
 });
 
 // UserSchema.index({ email: 1 }, { unique: true });
-UserSchema.index({ githubId: 1 }, { unique: true, sparse: true });
+UserSchema.index({ githubId: 1 }, { unique: true, sparse: true }); // TODO: does this still need to be sparse?
 UserSchema.index({ username: 1 }, { unique: true /*, sparse: true */});
 // UserSchema.index({ "emails.email" : 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';
@@ -706,6 +731,7 @@ var OAuthAccessTokenSchema= new Schema({
   expires: Date
 });
 OAuthAccessTokenSchema.index({ token: 1 });
+OAuthAccessTokenSchema.index({ userId: 1, clientId: 1 }, { unique: true, sparse: true }); // TODO: does this still need to be sparse?
 OAuthAccessTokenSchema.schemaTypeName = 'OAuthAccessTokenSchema';
 
 

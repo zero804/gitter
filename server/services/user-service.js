@@ -4,11 +4,10 @@
 // var sechash                   = require('sechash');
 var winston                   = require('../utils/winston');
 var assert                    = require('assert');
-var _                         = require('underscore');
 var persistence               = require("./persistence-service");
-var statsService              = require("./stats-service");
 var collections               = require("../utils/collections");
 var uriLookupService          = require('./uri-lookup-service');
+var Q                         = require('q');
 
 /**
  * Creates a new user
@@ -145,12 +144,16 @@ var userService = {
   },
 
   findByIds: function(ids, callback) {
+    if(!ids || !ids.length) return Q.resolve([]).nodeify(callback);
+
     return persistence.User.where('_id')['in'](collections.idsIn(ids))
       .execQ()
       .nodeify(callback);
   },
 
   findByUsernames: function(usernames, callback) {
+    if(!usernames || !usernames.length) return Q.resolve([]).nodeify(callback);
+
     return persistence.User.where('username')['in'](usernames)
       .execQ()
       .nodeify(callback);
