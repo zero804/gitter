@@ -626,7 +626,11 @@ function hashZset(scoresArray) {
 
 function introduceDelayForTesting(cb) {
   if(presenceService.testOnly.forceDelay) {
-    setTimeout(cb, 120);
+    setTimeout(function() {
+      if(presenceService.testOnly.onAfterDelay) {
+        presenceService.testOnly.onAfterDelay(cb);
+      }
+    }, 120);
   } else {
     cb();
   }
@@ -634,147 +638,149 @@ function introduceDelayForTesting(cb) {
 
 function validateUsersSubset(userIds, callback) {
   winston.debug('Validating users', { userIds: userIds });
+
   // Use a new client due to the WATCH semantics (don't use getClient!)
-  var redisClient = redis.createClient();
+  var rc = redis.createClient();
+  var redisWatchClient = redis.exposeUnderlyingClient(rc);
+
+  redisWatchClient.once('ready', function() {
+    redisWatchClient.watch(userIds.map(keyUserLock), introduceDelayForTesting(function(err) {
+      if(err) return done(err);
+
+      listActiveSockets(function(err, sockets) {
+        if(err) return done(err);
+
+        var onlineCounts = {};
+        var mobileCounts = {};
+        var troupeCounts = {};
+        var troupeIdsHash = {};
+
+        // This can't be done in the script manager
+        // as that is using a different redis connection
+        // and besides we don't know the semanitcs of WATCH
+        // in Lua :)
+
+        sockets.forEach(function(socket) {
+          var userId = socket.userId;
+          var troupeId = socket.troupeId;
+
+          if(userIds.indexOf(userId) >= 0) {
+            if(troupeId) {
+              troupeIdsHash[troupeId] = true;
+              if(socket.eyeballs) {
+                if(!troupeCounts[userId]) {
+                  troupeCounts[userId] = { troupeId: 1 };
+                } else {
+                  troupeCounts[userId][troupeId] = troupeCounts[userId][troupeId] ? troupeCounts[userId][troupeId] + 1 : 1;
+                }
+              }
+            }
+
+            if(socket.mobile) {
+              mobileCounts[userId] = mobileCounts[userId] ? mobileCounts[userId] + 1 : 1;
+            } else {
+              onlineCounts[userId] = onlineCounts[userId] ? onlineCounts[userId] + 1 : 1;
+            }
+          }
+        });
+
+        var f = new Fiber();
+        var troupeIds = Object.keys(troupeIdsHash);
+
+        redisWatchClient.zrangebyscore(ACTIVE_USERS_KEY, 1, '+inf', 'WITHSCORES', f.waitor());
+        redisWatchClient.zrangebyscore(MOBILE_USERS_KEY, 1, '+inf', 'WITHSCORES', f.waitor());
+
+        troupeIds.forEach(function(troupeId) {
+          redisWatchClient.zrangebyscore(keyTroupeUsers(troupeId), 1, '+inf', 'WITHSCORES', f.waitor());
+        });
+
+        f.all().then(function(results) {
+          var needsUpdate = false;
+          var multi = redisWatchClient.multi();
+
+          var currentActiveUserHash = hashZset(results[0]);
+          var currentMobileUserHash = hashZset(results[1]);
+
+          userIds.forEach(function(userId) {
+            var currentActiveScore = currentActiveUserHash[userId] || 0;
+            var currentMobileScore = currentMobileUserHash[userId] || 0;
+
+            var calculatedActiveScore = onlineCounts[userId] || 0;
+            var calculatedMobileScore = mobileCounts[userId] || 0;
+
+            if(calculatedActiveScore !== currentActiveScore) {
+              winston.info('Inconsistency in active score in presence service for user ' + userId + '. ' + calculatedActiveScore + ' vs ' + currentActiveScore);
+
+              needsUpdate = true;
+              multi.zrem(ACTIVE_USERS_KEY, userId);
+              if(calculatedActiveScore > 0) {
+                multi.zincrby(ACTIVE_USERS_KEY, calculatedActiveScore, userId);
+              }
+            }
+
+            if(calculatedMobileScore !== currentMobileScore) {
+              winston.info('Inconsistency in mobile score in presence service for user ' + userId + '. ' + currentMobileScore + ' vs ' + calculatedMobileScore);
+
+              needsUpdate = true;
+              multi.zrem(MOBILE_USERS_KEY, userId);
+              if(calculatedActiveScore > 0) {
+                multi.zincrby(MOBILE_USERS_KEY, calculatedMobileScore, userId);
+              }
+            }
+          });
+
+          // Now check each troupeId for each userId
+          troupeIds.forEach(function(troupeId, index) {
+            var userTroupeScores = hashZset(results[2 + index]);
+
+            userIds.forEach(function(userId) {
+              var currentTroupeScore = userTroupeScores[userId] || 0;
+
+              var calculatedTroupeScore = troupeCounts[userId] && troupeCounts[userId][troupeId] || 0;
+
+              if(calculatedTroupeScore !== currentTroupeScore) {
+                winston.info('Inconsistency in troupe score in presence service for user ' + userId + ' in troupe ' + troupeId + '. ' + calculatedTroupeScore + ' vs ' + currentTroupeScore);
+
+                needsUpdate = true;
+                var key = keyTroupeUsers(troupeId);
+                multi.zrem(key, userId);
+                if(calculatedTroupeScore > 0) {
+                  multi.zincrby(key, calculatedTroupeScore, userId);
+                }
+              }
+
+            });
+          });
+
+          // Nothing to do? Finish
+          if(!needsUpdate) return done();
+
+          multi.exec(function(err, replies) {
+            if(err) return done(err);
+
+            if(!replies) {
+              winston.info('Transaction rolled back.');
+              return done({ rollback: true });
+            }
+
+            return done();
+          });
+
+
+        }, done);
+
+
+      });
+
+    }));
+  });
 
   function done(err) {
-    redis.quit(redisClient);
+    redis.quit(rc);
     return callback(err);
   }
 
-  redisClient.watch(userIds.map(keyUserLock), introduceDelayForTesting(function(err) {
-    if(err) return done(err);
 
-    listActiveSockets(function(err, sockets) {
-      if(err) return done(err);
-
-      var onlineCounts = {};
-      var mobileCounts = {};
-      var troupeCounts = {};
-      var troupeIdsHash = {};
-
-      // This can't be done in the script manager
-      // as that is using a different redis connection
-      // and besides we don't know the semanitcs of WATCH
-      // in Lua :)
-
-      sockets.forEach(function(socket) {
-        var userId = socket.userId;
-        var troupeId = socket.troupeId;
-
-        if(userIds.indexOf(userId) >= 0) {
-          if(troupeId) {
-            troupeIdsHash[troupeId] = true;
-            if(socket.eyeballs) {
-              if(!troupeCounts[userId]) {
-                troupeCounts[userId] = { troupeId: 1 };
-              } else {
-                troupeCounts[userId][troupeId] = troupeCounts[userId][troupeId] ? troupeCounts[userId][troupeId] + 1 : 1;
-              }
-            }
-          }
-
-          if(socket.mobile) {
-            mobileCounts[userId] = mobileCounts[userId] ? mobileCounts[userId] + 1 : 1;
-          } else {
-            onlineCounts[userId] = onlineCounts[userId] ? onlineCounts[userId] + 1 : 1;
-          }
-        }
-      });
-
-      var f = new Fiber();
-      var troupeIds = Object.keys(troupeIdsHash);
-
-      redisClient.zrangebyscore(ACTIVE_USERS_KEY, 1, '+inf', 'WITHSCORES', f.waitor());
-      redisClient.zrangebyscore(MOBILE_USERS_KEY, 1, '+inf', 'WITHSCORES', f.waitor());
-
-      troupeIds.forEach(function(troupeId) {
-        redisClient.zrangebyscore(keyTroupeUsers(troupeId), 1, '+inf', 'WITHSCORES', f.waitor());
-      });
-
-      f.all().then(function(results) {
-        var needsUpdate = false;
-        var multi = redisClient.multi();
-
-        var currentActiveUserHash = hashZset(results[0]);
-        var currentMobileUserHash = hashZset(results[1]);
-
-        userIds.forEach(function(userId) {
-          var currentActiveScore = currentActiveUserHash[userId] || 0;
-          var currentMobileScore = currentMobileUserHash[userId] || 0;
-
-          var calculatedActiveScore = onlineCounts[userId] || 0;
-          var calculatedMobileScore = mobileCounts[userId] || 0;
-
-          if(calculatedActiveScore !== currentActiveScore) {
-            winston.info('Inconsistency in active score in presence service for user ', {
-              a: typeof calculatedActiveScore,
-              b: typeof currentActiveScore
-            });
-            winston.info('Inconsistency in active score in presence service for user ' + userId + '. ' + calculatedActiveScore + ' vs ' + currentActiveScore);
-
-            needsUpdate = true;
-            multi.zrem(ACTIVE_USERS_KEY, userId);
-            if(calculatedActiveScore > 0) {
-              multi.zincrby(ACTIVE_USERS_KEY, calculatedActiveScore, userId);
-            }
-          }
-
-          if(calculatedMobileScore !== currentMobileScore) {
-            winston.info('Inconsistency in mobile score in presence service for user ' + userId + '. ' + currentMobileScore + ' vs ' + calculatedMobileScore);
-
-            needsUpdate = true;
-            multi.zrem(MOBILE_USERS_KEY, userId);
-            if(calculatedActiveScore > 0) {
-              multi.zincrby(MOBILE_USERS_KEY, calculatedMobileScore, userId);
-            }
-          }
-        });
-
-        // Now check each troupeId for each userId
-        troupeIds.forEach(function(troupeId, index) {
-          var userTroupeScores = hashZset(results[2 + index]);
-
-          userIds.forEach(function(userId) {
-            var currentTroupeScore = userTroupeScores[userId] || 0;
-
-            var calculatedTroupeScore = troupeCounts[userId] && troupeCounts[userId][troupeId] || 0;
-
-            if(calculatedTroupeScore !== currentTroupeScore) {
-              winston.info('Inconsistency in troupe score in presence service for user ' + userId + ' in troupe ' + troupeId + '. ' + calculatedTroupeScore + ' vs ' + currentTroupeScore);
-
-              needsUpdate = true;
-              var key = keyTroupeUsers(troupeId);
-              multi.zrem(key, userId);
-              if(calculatedTroupeScore > 0) {
-                multi.zincrby(key, calculatedTroupeScore, userId);
-              }
-            }
-
-          });
-        });
-
-        // Nothing to do? Finish
-        if(!needsUpdate) return done();
-
-        multi.exec(function(err, replies) {
-          if(err) return done(err);
-
-          if(!replies) {
-            winston.info('Transaction rolled back.');
-            return done({ rollback: true });
-          }
-
-          return done();
-        });
-
-
-      }, done);
-
-
-    });
-
-  }));
 
 
 }
