@@ -3,6 +3,12 @@
 
 var env = require('./env');
 
-exports.createClient = function createClient() {
-  return env.createRedisClient();
+/* Wrapper to gitter-env */
+exports.createClient = function() {
+  return env.redis.createClient();
 };
+
+exports.quit = function(client) {
+  return env.redis.quitClient(client);
+};
+
