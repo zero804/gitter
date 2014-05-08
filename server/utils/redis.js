@@ -16,3 +16,7 @@ exports.quit = function(client) {
   return env.redis.quitClient(client);
 };
 
+/** If we ever move away from node-redis-sentinel-client, we'll probably need to change this */
+exports.exposeUnderlyingClient = function(client) {
+  return client.activeMasterClient || client;
+};
