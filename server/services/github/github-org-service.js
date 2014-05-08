@@ -60,6 +60,20 @@ GitHubOrgService.prototype.getRepos = function(org) {
 
 };
 
+GitHubOrgService.prototype.getOwners = function(org) {
+  var ghorg  = this.client.org(org);
+  var d = Q.defer();
+  var self = this;
+  ghorg.teams(function(err, teams) {
+    if (err) d.reject(err);
+    var owners = teams.filter(function(team) { if (team.slug === 'owners') return team; })[0];
+    self.client.team(owners.id).members(createClient.makeResolver(d));
+  });
+  return d.promise
+    .fail(badCredentialsCheck);
+};
+
+
 // module.exports = GitHubOrgService;
 module.exports = wrap(GitHubOrgService, function() {
   return [this.user && (this.user.githubUserToken || this.user.githubToken) || ''];
