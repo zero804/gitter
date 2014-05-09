@@ -642,7 +642,6 @@ describe('presenceService', function() {
             throw e;
           }
 
-
           done();
         });
 
