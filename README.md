@@ -1,4 +1,4 @@
-Gitter App Server
+Gitter Webapp
 =================
 
 Copyright Troupe Technology Limited 2012 - 2014
