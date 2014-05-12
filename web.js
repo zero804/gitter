@@ -1,9 +1,9 @@
 /*jslint node: true */
 "use strict";
 
-var unhandledExceptions = require('./server/utils/unhandled-exceptions');
+var env = require('./server/utils/env');
+env.installUncaughtExceptionHandler();
 
-unhandledExceptions.installUnhandledExceptionHandler();
-unhandledExceptions.domainWrap(function() {
+env.domainWrap(function() {
   require('./server/web.js');
 });

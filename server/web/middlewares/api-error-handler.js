@@ -1,9 +1,10 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var winston        = require('../../utils/winston');
-var statsService   = require('../../services/stats-service');
-var errorReporting = require('../../utils/error-reporting');
+var env = require('../../utils/env');
+var logger         = env.logger;
+var stats          = env.stats;
+var errorReporter  = env.errorReporter;
 var _              = require('underscore');
 
 /* Has to have four args */
@@ -33,26 +34,26 @@ module.exports = function(err, req, res, next) {
 
   if(status >= 500) {
    // Send to sentry
-   errorReporting(err, { type: 'response', status: status, userId: userId, url: req.url, method: req.method });
+   errorReporter(err, { type: 'response', status: status, userId: userId, url: req.url, method: req.method });
    // Send to statsd
-   statsService.event('client_error_5xx', { userId: userId });
+   stats.event('client_error_5xx', { userId: userId });
 
-   winston.error("An unexpected error occurred", {
+   logger.error("An unexpected error occurred", {
      path: req.path,
      message: message
    });
 
    if(err.stack) {
-     winston.error('Error: ' + err.stack);
+     logger.error('Error: ' + err.stack);
    }
 
   } else if(status === 404) {
-   statsService.event('client_error_404', { userId: userId });
+   stats.event('client_error_404', { userId: userId });
 
    template = '404';
    stack = null;
   } else if(status >= 400 && status < 500) {
-   statsService.event('client_error_4xx', { userId: userId });
+   stats.event('client_error_4xx', { userId: userId });
   }
   res.status(status);
   res.send({ error: message });

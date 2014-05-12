@@ -1,12 +1,12 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-
-var statsService = require('../services/stats-service');
+var env = require('../utils/env');
+var stats = env.stats;
 
 // Measure request elapsed time.
 
-module.exports = function responseTime(winston, minimal) {
+module.exports = function responseTime(logger, minimal) {
   return function(req, res, next){
     var start = new Date();
 
@@ -15,9 +15,9 @@ module.exports = function responseTime(winston, minimal) {
 
     res.on('header', function() {
       var duration = new Date() - start;
-      statsService.responseTime('web.request', duration);
+      stats.responseTime('web.request', duration);
       if(duration >= 500) {
-        winston.warn('Request took ' + duration + 'ms. ', {
+        logger.warn('Request took ' + duration + 'ms. ', {
           method: req.method,
           url: req.url,
           duration: duration,
@@ -29,7 +29,7 @@ module.exports = function responseTime(winston, minimal) {
         return;
 
       if(!minimal) {
-        winston.info('request', {
+        logger.info('request', {
           method: req.method,
           status: res.statusCode,
           url: req.url,
@@ -38,7 +38,7 @@ module.exports = function responseTime(winston, minimal) {
           ip: req.headers['x-forwarded-for'] || req.ip || 'unknown'
         });
       } else {
-        winston.verbose([
+        logger.verbose([
           'request',
           res.statusCode,
           req.method,
