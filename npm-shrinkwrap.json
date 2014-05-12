@@ -688,9 +688,9 @@
       "resolved": "https://registry.npmjs.org/faye-redis/-/faye-redis-0.2.0.tgz"
     },
     "gitter-env": {
-      "version": "0.3.3",
-      "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.3.3",
-      "resolved": "git+ssh://git@github.com:gitterHQ/gitter-env.git#d2e1b806fc17620c555fdb0ea52d4db8c42fe416",
+      "version": "0.3.4",
+      "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.3.4",
+      "resolved": "git+ssh://git@github.com:gitterHQ/gitter-env.git#413855b0d35f788cba690cc81f9f520fbb9b7349",
       "dependencies": {
         "async": {
           "version": "0.8.0",
@@ -730,8 +730,7 @@
         },
         "mixpanel": {
           "version": "0.0.20",
-          "from": "mixpanel@0.0.20",
-          "resolved": "https://registry.npmjs.org/mixpanel/-/mixpanel-0.0.20.tgz"
+          "from": "mixpanel@0.0.20"
         }
       }
     },
