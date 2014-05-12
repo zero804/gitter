@@ -1,14 +1,16 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
+var env           = require('../utils/env');
+var stats         = env.stats;
+var logger        = env.logger;
+
 var middleware    = require('../web/middleware');
 var passport      = require('passport');
-var winston       = require('../utils/winston');
 var client        = require("../utils/redis").getClient();
 var lock          = require("redis-lock")(client);
 var oauth2        = require('../web/oauth2');
 var mixpanel      = require('../web/mixpanelUtils');
-var statsService  = require("../services/stats-service");
 var languageSelector = require('../web/language-selector');
 
 module.exports = {
@@ -19,13 +21,13 @@ module.exports = {
       function(req, res, next) {
         //send data to stats service
         if (req.query.action == 'login') {
-          statsService.event("login_clicked", {
+          stats.event("login_clicked", {
             distinctId: mixpanel.getMixpanelDistinctId(req.cookies),
             method: 'github_oauth'
           });
         }
         if (req.query.action == 'signup') {
-          statsService.event("signup_clicked", {
+          stats.event("signup_clicked", {
             distinctId: mixpanel.getMixpanelDistinctId(req.cookies),
             method: 'github_oauth',
             button: req.query.button
@@ -157,9 +159,9 @@ module.exports = {
       '/login/callback',
       /* 4-nary error handler for /login/callback */
       function(err, req, res, next) {
-        winston.error("OAuth failed: " + err);
+        logger.error("OAuth failed: " + err);
         if(err.stack) {
-          winston.error("OAuth failure callback", err.stack);
+          logger.error("OAuth failure callback", err.stack);
         }
         res.redirect("/");
       });
