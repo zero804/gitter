@@ -700,9 +700,8 @@ var server = new faye.NodeAdapter({
   retry: nconf.get('ws:fayeRetry'),
   engine: {
     type: fayeRedis,
-    host: nconf.get("redis:host"),
-    port: nconf.get("redis:port"),
-    database: nconf.get("redis:redisDb"),
+    client: env.redis.getClient(),
+    subscriberClient: env.redis.createClient(),
     interval: nconf.get('ws:fayeInterval'),
     namespace: 'fr:'
   }
