@@ -113,14 +113,12 @@
       "resolved": "https://registry.npmjs.org/diskspace/-/diskspace-0.1.5.tgz"
     },
     "dolph": {
-      "version": "0.0.2",
-      "from": "https://registry.npmjs.org/dolph/-/dolph-0.0.2.tgz",
-      "resolved": "https://registry.npmjs.org/dolph/-/dolph-0.0.2.tgz",
+      "version": "0.0.3",
+      "from": "dolph@latest",
       "dependencies": {
         "redis": {
           "version": "0.10.1",
-          "from": "https://registry.npmjs.org/redis/-/redis-0.10.1.tgz",
-          "resolved": "https://registry.npmjs.org/redis/-/redis-0.10.1.tgz"
+          "from": "redis@^0.10.1"
         }
       }
     },
