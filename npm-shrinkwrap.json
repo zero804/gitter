@@ -686,9 +686,9 @@
       "resolved": "git://github.com/gitterHQ/faye-redis-node#11aa3dbf5638f40b659397045344096b08e9ca4c"
     },
     "gitter-env": {
-      "version": "0.4.1",
-      "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.4.1",
-      "resolved": "git+ssh://git@github.com:gitterHQ/gitter-env.git#a840e4e994c27fa17dcd797bfdb3aed7ec424fa3",
+      "version": "0.5.0",
+      "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.5.0",
+      "resolved": "git+ssh://git@github.com:gitterHQ/gitter-env.git#eba046101f441b37dc122a4d666688ee671fe356",
       "dependencies": {
         "async": {
           "version": "0.8.0",
