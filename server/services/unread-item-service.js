@@ -495,7 +495,7 @@ exports.markAllChatsRead = function(userId, troupeId, options) {
 
 exports.getUserUnreadCounts = function(userId, troupeId, callback) {
   var key = "unread:chat:" + userId + ":" + troupeId;
-  return runScript('unread-item-count', [key])
+  return runScript('unread-item-count', [key], [])
     .then(function(result) {
       return result || 0;
     })
@@ -508,7 +508,7 @@ exports.getUserUnreadCountsForTroupeIds = function(userId, troupeIds, callback) 
     return "unread:chat:" + userId + ":" + troupeId;
   });
 
-  return runScript('unread-item-count', keys)
+  return runScript('unread-item-count', keys, [])
     .then(function(replies) {
       return troupeIds.reduce(function(memo, troupeId, index) {
         memo[troupeId] = replies[index];
@@ -579,7 +579,7 @@ exports.findLastReadTimesForUsersForTroupe = function(userIds, troupeId, callbac
 
 exports.getUnreadItems = function(userId, troupeId, itemType, callback) {
   var keys = ["unread:" + itemType + ":" + userId + ":" + troupeId];
-  return runScript('unread-item-list', keys)
+  return runScript('unread-item-list', keys, [])
     .fail(function(err) {
       winston.warn("unreadItemService.getUnreadItems failed:" + err, { exception: err });
       // Mask error
