@@ -19,7 +19,7 @@ function getKeys(method, contextValues, args) {
 function wrap(service, contextFunction) {
   if(!config.get('github:caching')) return service;
 
-  var sc = new SnappyCache({ prefix: 'sc:', redis: redis.createClient(), ttl: 120 });
+  var sc = new SnappyCache({ prefix: 'sc:', redis: redis.getClient(), ttl: 120 });
 
   Object.keys(service.prototype).forEach(function(value) {
     var v = service.prototype[value];

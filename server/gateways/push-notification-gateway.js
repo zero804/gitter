@@ -1,12 +1,14 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var winston = require('../utils/winston');
+var env = require('../utils/env');
+var logger = env.logger;
+var config = env.config;
+var stats = env.stats;
+
 var pushNotificationService = require("../services/push-notification-service");
 var unreadItemService = require("../services/unread-item-service");
-var nconf = require('../utils/config');
 var apns = require('apn');
-var statsService = require("../services/stats-service");
 var workerQueue = require('../utils/worker-queue');
 
 var nexmo = require('easynexmo/lib/nexmo');
@@ -25,79 +27,77 @@ var errorDescriptions = {
   255: 'None (unknown)'
 };
 
-var basePath = nconf.get('web:basepath');
-
 function errorEventOccurred(err, notification) {
   try {
     var errorDescription = errorDescriptions[err];
 
     if(err === 8 && notification.pushDevice) {
-      winston.error("Removing invalid device ", { deviceName: notification.pushDevice.deviceName, deviceId: notification.pushDevice.deviceId });
+      logger.error("Removing invalid device ", { deviceName: notification.pushDevice.deviceName, deviceId: notification.pushDevice.deviceId });
       notification.pushDevice.remove();
       return;
     }
 
-    winston.error("APN error", {
+    logger.error("APN error", {
       exception: err,
       errorDescription: errorDescription,
       notification: notification ? notification.payload : null
     });
   } catch (e) {
-    winston.error("Error while handling APN error:" + e, {exception: e});
+    logger.error("Error while handling APN error:" + e, {exception: e});
   }
 }
 
-winston.info("Starting APN");
+logger.info("Starting APN");
 var apnsConnectionDev = new apns.Connection({
-    cert: nconf.get('apn:certDev'),
-    key: nconf.get('apn:keyDev'),
-    gateway: nconf.get('apn:gatewayDev'),
+    cert: config.get('apn:certDev'),
+    key: config.get('apn:keyDev'),
+    gateway: config.get('apn:gatewayDev'),
     enhanced: true,
     errorCallback: errorEventOccurred,
     connectionTimeout: 60000
 });
 
 apnsConnectionDev.on("error", function(err) {
-    winston.error("APN service (dev) experienced an error", { error: err.message });
+    logger.error("APN service (dev) experienced an error", { error: err.message });
 });
 
 var apnsConnectionBetaDev = new apns.Connection({
-    cert: nconf.get('apn:certBetaDev'),
-    key: nconf.get('apn:keyBetaDev'),
-    gateway: nconf.get('apn:gatewayBetaDev'),
+    cert: config.get('apn:certBetaDev'),
+    key: config.get('apn:keyBetaDev'),
+    gateway: config.get('apn:gatewayBetaDev'),
     enhanced: true,
     errorCallback: errorEventOccurred,
     connectionTimeout: 60000
 });
 
 apnsConnectionBetaDev.on("error", function(err) {
-    winston.error("APN service (beta dev) experienced an error", { error: err.message });
+    logger.error("APN service (beta dev) experienced an error", { error: err.message });
 });
 
 var apnsConnectionBeta = new apns.Connection({
-    cert: nconf.get('apn:certBeta'),
-    key: nconf.get('apn:keyBeta'),
-    gateway: nconf.get('apn:gatewayBeta'),
+    cert: config.get('apn:certBeta'),
+    key: config.get('apn:keyBeta'),
+    gateway: config.get('apn:gatewayBeta'),
     enhanced: true,
     errorCallback: errorEventOccurred,
     connectionTimeout: 60000
 });
 
 apnsConnectionBeta.on("error", function(err) {
-    winston.error("APN service (beta) experienced an error", { error: err.message });
+    logger.error("APN service (beta) experienced an error", { error: err.message });
 });
 
 var apnsConnection = new apns.Connection({
-    cert: nconf.get('apn:certProd'),
-    key: nconf.get('apn:keyProd'),
-    gateway: nconf.get('apn:gatewayProd'),
+    cert: config.get('apn:certProd'),
+    key: config.get('apn:keyProd'),
+    gateway: config.get('apn:gatewayProd'),
     enhanced: true,
     errorCallback: errorEventOccurred,
     connectionTimeout: 60000
 });
 
 apnsConnection.on("error", function(err) {
-    winston.error("APN service (prod) experienced an error", { error: err.message });
+    logger.error("APN service (prod) experienced an error", { error: err.message });
 });
 
 
@@ -105,25 +105,25 @@ apnsConnection.on("error", function(err) {
   try {
 
     var feedback = new apns.Feedback({
-        cert: nconf.get('apn:cert' + suffix),
-        key: nconf.get('apn:key' + suffix),
-        gateway: nconf.get('apn:feedback' + suffix),
-        interval: nconf.get('apn:feedbackInterval' + suffix),
+        cert: config.get('apn:cert' + suffix),
+        key: config.get('apn:key' + suffix),
+        gateway: config.get('apn:feedback' + suffix),
+        interval: config.get('apn:feedbackInterval' + suffix),
         batchFeedback: true
     });
 
     feedback.on("feedback", function(devices) {
       if(devices.length) {
-        winston.error("Failed delivery. Need to remove the following devices", { deviceCount: devices.length });
+        logger.error("Failed delivery. Need to remove the following devices", { deviceCount: devices.length });
       }
     });
 
     feedback.on("error", function(err) {
-        winston.error("Feedback service experienced an error", { error: err.message });
+        logger.error("Feedback service experienced an error", { error: err.message });
     });
 
   } catch(e) {
-    winston.error('Unable to start feedback service ', { exception: e });
+    logger.error('Unable to start feedback service ', { exception: e });
   }
 });
 
@@ -138,7 +138,7 @@ function sendNotificationToDevice(notification, badge, device) {
       device.deviceType === 'APPLE-DEV' ||
       device.deviceType === 'APPLE-BETA' ||
       device.deviceType === 'APPLE-BETA-DEV') && device.appleToken) {
-    winston.info("push-gateway: Sending apple push notification", { userId: device.userId, notification: notification });
+    logger.info("push-gateway: Sending apple push notification", { userId: device.userId, notification: notification });
     var note = new apns.Notification();
 
 
@@ -183,7 +183,7 @@ function sendNotificationToDevice(notification, badge, device) {
         apnsConnectionDev.pushNotification(note, deviceToken);
         break;
       default:
-        winston.warn('Unknown device type: ' + device.deviceType);
+        logger.warn('Unknown device type: ' + device.deviceType);
     }
 
     sent = true;
@@ -191,7 +191,7 @@ function sendNotificationToDevice(notification, badge, device) {
     sendSMSMessage(device.mobileNumber, notification.smsText);
     sent = true;
   } else {
-    winston.warn('Unknown device type: ' + device.deviceType);
+    logger.warn('Unknown device type: ' + device.deviceType);
   }
 
   // Android/google push notification goes here
@@ -200,7 +200,7 @@ function sendNotificationToDevice(notification, badge, device) {
 
   // Finally, send statistics out
   if(sent) {
-    statsService.event("push_notification", {
+    stats.event("push_notification", {
       userId: device.userId,
       deviceType: device.deviceType
     });
@@ -210,7 +210,7 @@ function sendNotificationToDevice(notification, badge, device) {
 
 function sendSMSMessage(mobileNumber, message) {
   nexmo.sendTextMessage('Troupe',mobileNumber,message, function(err) {
-    if(err) winston.error('Unable to send SMS message: ' + err, { exception: err });
+    if(err) logger.error('Unable to send SMS message: ' + err, { exception: err });
   });
 }
 
@@ -224,7 +224,7 @@ var queue = workerQueue.queue('push-notification', {}, function() {
       var usersWithDevices = devices.map(function(device) { return device.userId; });
 
       unreadItemService.getBadgeCountsForUserIds(usersWithDevices, function(err, counts) {
-        winston.verbose("push-gateway: Sending to " + devices.length + " potential devices for " + userIds.length + " users");
+        logger.verbose("push-gateway: Sending to " + devices.length + " potential devices for " + userIds.length + " users");
 
         devices.forEach(function(device) {
           var badge = counts[device.userId];

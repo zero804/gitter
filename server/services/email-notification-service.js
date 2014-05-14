@@ -1,14 +1,16 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var env               = require('../utils/env');
+var config            = env.config;
+var stats             = env.stats;
+var logger            = env.logger;
+
 var mailerService     = require("./mailer-service");
-var nconf             = require('../utils/config');
-var statsService      = require("./stats-service");
 var crypto            = require('crypto');
 var GitHubMeService   = require('./github/github-me-service');
-var winston           = require('../utils/winston');
 
-var passphrase        = nconf.get('email:unsubscribeNotificationsSecret');
+var passphrase        = config.get('email:unsubscribeNotificationsSecret');
 
 module.exports = {
   sendContactSignupNotification: function(signupUser, toUser) {
@@ -22,7 +24,7 @@ module.exports = {
       subject: signupDisplayName + " has joined Troupe",
       data: {
         signupDisplayName: signupDisplayName,
-        connectLink: nconf.get("email:emailBasePath") + signupUser.getHomeUrl(),
+        connectLink: config.get("email:emailBasePath") + signupUser.getHomeUrl(),
       }
     });
   },
@@ -36,13 +38,13 @@ module.exports = {
     return ghMe.getEmail()
       .then(function(email) {
         if(!email) {
-          winston.info('Skipping email notification for ' + user.username + ' as they have no primary confirmed email');
+          logger.info('Skipping email notification for ' + user.username + ' as they have no primary confirmed email');
           return;
         }
 
-        statsService.event('unread_notification_sent', {userId: user.id, email: email});
+        stats.event('unread_notification_sent', {userId: user.id, email: email});
 
-        var emailBasePath = nconf.get("email:emailBasePath");
+        var emailBasePath = config.get("email:emailBasePath");
         var unsubscribeUrl = emailBasePath + '/settings/unsubscribe/' + hash;
         var canChangeNotifySettings = troupesWithUnreadCounts.some(function(troupeWithUnreadCounts) {
           return !troupeWithUnreadCounts.troupe.oneToOne;
@@ -65,7 +67,7 @@ module.exports = {
         });
       })
       .fail(function(err) {
-        winston.error('Unable to send unread items notifications: ' + err, { exception: err });
+        logger.error('Unable to send unread items notifications: ' + err, { exception: err });
         throw err;
       });
 

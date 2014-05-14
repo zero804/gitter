@@ -67,7 +67,7 @@ persistence.Troupe.findQ({ security: 'PUBLIC' }, { _id: 1, uri: 1 })
           m.dates.forEach(function(d) {
             var date = moment.utc("" + d,  "YYYYMMDD");
 
-            var url = '/' + uri + '/archive/' + date.format('YYYY') + '/' + date.format('MM') + '/' + date.format('DD');
+            var url = '/' + uri + '/archives/' + date.format('YYYY') + '/' + date.format('MM') + '/' + date.format('DD');
 
             var changeFreq = 'yearly';
 

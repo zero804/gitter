@@ -3,7 +3,7 @@
 
 var dolph       = require('dolph');
 var redis       = require("../../utils/redis");
-var redisClient = redis.createClient();
+var redisClient = redis.getClient();
 
 module.exports = dolph({
   prefix: 'rate:',

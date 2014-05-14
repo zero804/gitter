@@ -2,8 +2,7 @@
 'use strict';
 
 var url = require('url');
-var nconf = require('nconf');
-
+var nconf = require('../../utils/config');
 
 var count = 0;
 

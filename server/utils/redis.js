@@ -1,66 +1,22 @@
 /*jshint node:true, unused:true */
 "use strict";
 
-var Q = require('q');
-var nconf = require("./config");
-var winston = require("./winston");
-var redis = require("redis");
-var shutdown = require('./shutdown');
-var host = nconf.get("redis:host");
-var port = nconf.get("redis:port");
-var redisDb = nconf.get("redis:redisDb");
-var clients = [];
+var env = require('./env');
 
-shutdown.addHandler('redis', 1, function(callback) {
-  var promises = [];
+/* Wrapper to gitter-env */
+exports.getClient = function() {
+  return env.redis.getClient();
+};
 
-  clients.forEach(function(client) {
-    var d = Q.defer();
-    promises.push(d.promise);
+exports.createClient = function() {
+  return env.redis.createClient();
+};
 
-    client.quit(function() {
-      d.resolve();
-    });
-  });
+exports.quit = function(client) {
+  return env.redis.quitClient(client);
+};
 
-  Q.all(promises).then(function() {
-    callback();
-  }).fail(function(err) {
-    if(err) console.error("Quit failed", err);
-    callback(err);
-  });
-});
-
-
-exports.createClient = function createClient() {
-  var client = redis.createClient(port, host);
-
-  if(redisDb) {
-    client.select(redisDb, function(err) {
-      if(err) {
-        winston.error('Unable to switch redis databases', err);
-        throw err;
-      }
-    });
-  }
-
-  client.once('end', function() {
-    winston.verbose('Redis client quit, removing from list');
-
-    for(var i = 0; i < clients.length; i++) {
-      if(clients[i] === client) {
-        clients.splice(i, 1);
-
-        return;
-      }
-    }
-  });
-
-  clients.push(client);
-
-  if(clients.length % 10 === 0) {
-    winston.info(clients.length + ' redis clients are currently open');
-  }
-
-  return client;
+/** If we ever move away from node-redis-sentinel-client, we'll probably need to change this */
+exports.exposeUnderlyingClient = function(client) {
+  return client.activeMasterClient || client;
 };
