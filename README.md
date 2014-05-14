@@ -1,4 +1,4 @@
-Gitter App Server
+Gitter Webapp
 =================
 
 Copyright Troupe Technology Limited 2012 - 2014
@@ -19,7 +19,3 @@ Getting Started
 Run Like Production
 -------------------
 `node web --web:staticContent=public-processed/ --web:minified=true`
-
-Give Hats To Everyone
----------------------
-`db.users.update({ }, { $set: { permissions: { createRoom: true } } }, { multi: true } )`
