@@ -108,9 +108,12 @@ define([
       return extra;
     },
     bitbucket: function(meta) {
+      // meta.commits is undefined for empty arrays. no idea why.
+      var commits = meta.commits || [];
       return {
-        first_commit: meta.commits[0],
-        multiple_commits: meta.commits.length > 1
+        first_commit: commits[0],
+        is_single_commit: commits.length === 1,
+        commits_count: commits.length
       };
     },
     github: function(meta, payload) {
