@@ -1,7 +1,11 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var winston            = require('../utils/winston');
+var env                = require('../utils/env');
+var logger             = env.logger;
+var nconf              = env.config;
+var stats              = env.stats;
+
 var ObjectID           = require('mongodb').ObjectID;
 var Q                  = require('q');
 var request            = require('request');
@@ -14,14 +18,12 @@ var permissionsModel   = require('./permissions-model');
 var roomPermissionsModel = require('./room-permissions-model');
 var userService        = require('./user-service');
 var troupeService      = require('./troupe-service');
-var nconf              = require('../utils/config');
 var GitHubRepoService  = require('./github/github-repo-service');
 var unreadItemService  = require('./unread-item-service');
 var appEvents          = require("../app-events");
 var serializeEvent     = require('./persistence-service-events').serializeEvent;
 var validate           = require('../utils/validate');
 var collections        = require('../utils/collections');
-var statsService       = require("./stats-service");
 
 function localUriLookup(uri, opts) {
   return uriLookupService.lookupUri(uri)
@@ -61,7 +63,7 @@ function applyAutoHooksForRepoRoom(user, troupe) {
   validate.expect(troupe, 'troupe is required');
   validate.expect(troupe.githubType === 'REPO', 'Auto hooks can only be used on repo rooms. This room is a '+ troupe.githubType);
 
-  winston.info("Requesting autoconfigured integrations");
+  logger.info("Requesting autoconfigured integrations");
 
   var d = Q.defer();
 
@@ -76,7 +78,7 @@ function applyAutoHooksForRepoRoom(user, troupe) {
     }
   },
   function(err, resp, body) {
-    winston.info("Autoconfiguration of webhooks completed. Success? " + !err);
+    logger.info("Autoconfiguration of webhooks completed. Success? " + !err);
     if(err) return d.reject(err);
     d.resolve(body);
   });
@@ -102,7 +104,7 @@ function serializeCreateEvent(troupe) {
  */
 function findOrCreateNonOneToOneRoom(user, troupe, uri) {
   if(troupe) {
-    winston.verbose('Does user ' + (user && user.username || '~anon~') + ' have access to ' + uri + '?');
+    logger.verbose('Does user ' + (user && user.username || '~anon~') + ' have access to ' + uri + '?');
 
     return Q.all([
         troupe,
@@ -112,13 +114,13 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
 
   var lcUri = uri.toLowerCase();
 
-  winston.verbose('Attempting to validate URI ' + uri + ' on Github');
+  logger.verbose('Attempting to validate URI ' + uri + ' on Github');
 
   /* From here on we're going to be doing a create */
   return validateUri(user, uri)
     .spread(function(githubType, officialUri, topic) {
 
-      winston.verbose('URI validation ' + uri + ' returned ', { type: githubType, uri: officialUri });
+      logger.verbose('URI validation ' + uri + ' returned ', { type: githubType, uri: officialUri });
 
       /* If we can't determine the type, skip it */
       if(!githubType) return [null, false];
@@ -127,7 +129,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
       // This check is not necessary. If the room exists already we do check this before in validateUri and redirect accordingly.
       //if(officialUri != uri && officialUri.toLowerCase() === uri.toLowerCase()) throw { redirect: '/' + officialUri };
 
-      winston.verbose('Checking if user has permission to create a room at ' + uri);
+      logger.verbose('Checking if user has permission to create a room at ' + uri);
 
       /* Room does not yet exist */
       return permissionsModel(user, 'create', uri, githubType, null) // Parent rooms always have security == null
@@ -186,19 +188,19 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
                     var hasScope = user.hasGitHubScope(requiredScope);
 
                     if(hasScope) {
-                      winston.verbose('Upgrading requirements');
+                      logger.verbose('Upgrading requirements');
 
                       if(githubType === 'REPO') {
                         /* Do this asynchronously */
                         applyAutoHooksForRepoRoom(user, troupe)
                           .catch(function(err) {
-                            winston.error("Unable to apply hooks for new room", { exception: err });
+                            logger.error("Unable to apply hooks for new room", { exception: err });
                           });
                       }
 
                     } else {
                       if(githubType === 'REPO') {
-                        winston.verbose('Skipping hook creation. User does not have permissions');
+                        logger.verbose('Skipping hook creation. User does not have permissions');
                         hookCreationFailedDueToMissingScope = true;
                       }
                     }
@@ -234,7 +236,7 @@ function ensureAccessControl(user, troupe, access) {
 
       troupe.addUserById(user.id);
 
-      statsService.event("join_room", {
+      stats.event("join_room", {
         userId: user.id,
       });
 
@@ -289,7 +291,7 @@ function findOrCreateRoom(user, uri, opts) {
   /* First off, try use local data to figure out what this url is for */
   return localUriLookup(uri, opts)
     .then(function(uriLookup) {
-      winston.verbose('URI Lookup returned ', { uri: uri, isUser: !!(uriLookup && uriLookup.user), isTroupe: !!(uriLookup && uriLookup.troupe) });
+      logger.verbose('URI Lookup returned ', { uri: uri, isUser: !!(uriLookup && uriLookup.user), isTroupe: !!(uriLookup && uriLookup.troupe) });
 
       /* Deal with the case of the nonloggedin user first */
       if(!user) {
@@ -317,12 +319,12 @@ function findOrCreateRoom(user, uri, opts) {
         var otherUser = uriLookup.user;
 
         if(otherUser.id == userId) {
-          winston.verbose('URI Lookup is our own');
+          logger.verbose('URI Lookup is our own');
 
           return { ownUrl: true };
         }
 
-        winston.verbose('Finding or creating a one to one chat');
+        logger.verbose('Finding or creating a one to one chat');
 
         return troupeService.findOrCreateOneToOneTroupeIfPossible(userId, otherUser.id)
           .spread(function(troupe, otherUser) {
@@ -330,7 +332,7 @@ function findOrCreateRoom(user, uri, opts) {
           });
       }
 
-      winston.verbose('Attempting to access room ' + uri);
+      logger.verbose('Attempting to access room ' + uri);
 
       /* Didn't find a user, but we may have found another room */
       return findOrCreateNonOneToOneRoom(user, uriLookup && uriLookup.troupe, uri)
@@ -346,7 +348,7 @@ function findOrCreateRoom(user, uri, opts) {
       if(uriLookup) {
         uriLookup.uri = uri;
         if(uriLookup.didCreate) {
-          statsService.event("create_room", {
+          stats.event("create_room", {
             userId: user.id,
             roomType: "github-room"
           });
@@ -576,7 +578,7 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
             // TODO handle adding the user in the event that they didn't create the room!
             if(newRoom._nonce === nonce) {
               serializeCreateEvent(newRoom);
-              statsService.event("create_room", {
+              stats.event("create_room", {
                 userId: user.id,
                 roomType: "channel"
               });
@@ -715,7 +717,7 @@ function revalidatePermissionsForUsers(room) {
         var user = usersHash[userId];
         if(!user) {
           // Can't find the user?, remove them
-          winston.warn('Unable to find user, removing from troupe', { userId: userId, troupeId: room.id });
+          logger.warn('Unable to find user, removing from troupe', { userId: userId, troupeId: room.id });
           room.removeUserById(userId);
           return;
         }
@@ -723,7 +725,7 @@ function revalidatePermissionsForUsers(room) {
         return roomPermissionsModel(user, 'join', room)
           .then(function(access) {
             if(!access) {
-              winston.warn('User no longer has access to room', { userId: userId, troupeId: room.id });
+              logger.warn('User no longer has access to room', { userId: userId, troupeId: room.id });
               room.removeUserById(userId);
             }
           });
@@ -752,7 +754,7 @@ function ensureRepoRoomSecurity(uri, security) {
       /* No need to change it? */
       if(troupe.security === security) return;
 
-      winston.info('Security of troupe does not match. Updating.', {
+      logger.info('Security of troupe does not match. Updating.', {
         roomId: troupe.id,
         uri: uri,
         current: troupe.security,

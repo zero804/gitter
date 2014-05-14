@@ -7,7 +7,7 @@ var nodeEnv = process.env['NODE_ENV'] || 'dev';
 var redis   = require('../../utils/redis');
 var uuid    = require('node-uuid');
 
-var redisClient = redis.createClient();
+var redisClient = redis.getClient();
 
 var utcDateString = function(time) {
   function pad(val, len) {

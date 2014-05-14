@@ -7,7 +7,7 @@ var notificationGenerator = require('../../server/services/notifications/email-n
 var nconf = require('../../server/utils/config');
 var winston = require('../../server/utils/winston');
 
-var shutdown = require('../../server/utils/shutdown');
+var shutdown = require('shutdown');
 var opts = require("nomnom")
   .option('age', {
     abbr: 'a',

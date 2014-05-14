@@ -9,7 +9,7 @@ var appEvents     = require("../app-events");
 var _             = require("underscore");
 var winston       = require('../utils/winston');
 var nconf         = require("../utils/config");
-var shutdown      = require('../utils/shutdown');
+var shutdown      = require('shutdown');
 var Fiber         = require("../utils/fiber");
 var assert        = require("assert");
 

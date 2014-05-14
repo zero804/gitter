@@ -7,7 +7,7 @@ var rememberMe  = require('./rememberme-middleware');
 var useragent   = require('useragent');
 var dolph       = require('dolph');
 var redis       = require("../utils/redis");
-var redisClient = redis.createClient();
+var redisClient = redis.getClient();
 
 var logoutMiddleware = require('./middlewares/logout');
 
