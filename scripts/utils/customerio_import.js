@@ -5,7 +5,7 @@
 var nconf       = require('../../server/utils/config');
 var winston     = require('../../server/utils/winston');
 var persistence = require("../../server/services/persistence-service");
-var shutdown    = require('../../server/utils/shutdown');
+var shutdown    = require('shutdown');
 
 
 function getAllUsers(callback) {

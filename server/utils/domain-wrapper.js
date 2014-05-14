@@ -1,10 +1,11 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var env = require('./env');
 var domain = require('domain');
-var winston = require('./winston');
-var shutdown = require('./shutdown');
-var errorReporting = require('./error-reporting');
+var logger = env.logger;
+var shutdown = require('shutdown');
+var errorReporter = env.errorReporter;
 
 module.exports = function(app) {
 
@@ -14,7 +15,7 @@ module.exports = function(app) {
     reqd.add(res);
 
     req.on('error', function(err) {
-      winston.error('Request failed: ' + err, { message: err.message, name: err.name });
+      logger.error('Request failed: ' + err, { message: err.message, name: err.name });
 
       if(!res.headersSent) {
         res.send(500);
@@ -23,7 +24,8 @@ module.exports = function(app) {
       }
 
       var userId = req.user && req.user.id;
-      errorReporting(err, { type: 'request', userId: userId });
+
+      errorReporter(err, { type: 'request', userId: userId });
 
       reqd.dispose();
     });
@@ -38,18 +40,19 @@ module.exports = function(app) {
 
         var userId = req.user && req.user.id;
 
-        errorReporting(err, { type: 'domain', userId: userId });
 
-        winston.error('----------------------------------------------------------------');
-        winston.error('-- A BadThing has happened.');
-        winston.error('----------------------------------------------------------------');
-        winston.error('Domain exception: ' + err, { message: err.message, name: err.name, userId: userId });
+        errorReporter(err, { type: 'domain', userId: userId });
+
+        logger.error('----------------------------------------------------------------');
+        logger.error('-- A BadThing has happened.');
+        logger.error('----------------------------------------------------------------');
+        logger.error('Domain exception: ' + err, { message: err.message, name: err.name, userId: userId });
 
         if(err.stack) {
-          winston.error('' + err.stack);
+          logger.error('' + err.stack);
         }
 
-        winston.error('Domain exception' + err + ' forcing shutdown');
+        logger.error('Domain exception' + err + ' forcing shutdown');
       } catch(e) {
         /* This might seem strange, but sometime just logging the error will crash your process a second time */
         try {

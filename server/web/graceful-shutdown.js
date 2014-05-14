@@ -1,7 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var shutdown = require('../utils/shutdown');
+var shutdown = require('shutdown');
 
 module.exports = {
   install: function(server, app) {

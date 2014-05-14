@@ -1,9 +1,9 @@
 /*jslint node: true */
 "use strict";
 
-var shutdown = require('./server/utils/shutdown');
+var env = require('./server/utils/env');
+env.installUncaughtExceptionHandler();
 
-shutdown.installUnhandledExceptionHandler();
-shutdown.domainWrap(function() {
+env.domainWrap(function() {
   require('./server/websockets.js');
 });
