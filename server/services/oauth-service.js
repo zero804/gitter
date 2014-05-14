@@ -1,13 +1,15 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var env = require('../utils/env');
+var stats = env.stats;
+var nconf = env.config;
+var logger = env.logger;
+
 var persistenceService = require("./persistence-service");
-var statsService = require("./stats-service");
-var nconf = require('../utils/config');
 var random = require('../utils/random');
 var Q = require('q');
 var userService = require('./user-service');
-var winston = require('../utils/winston');
 var moment = require('moment');
 
 var WEB_INTERNAL_CLIENT_KEY = 'web-internal';
@@ -42,7 +44,7 @@ exports.saveAuthorizationCode = function(code, client, redirectUri, user, callba
 
   var properties = {};
   properties['Last login from ' + client.tag] = new Date();
-  statsService.userUpdate(user, properties);
+  stats.userUpdate(user, properties);
 
   var authCode = new persistenceService.OAuthCode({
       code: code,
@@ -69,17 +71,17 @@ exports.findAccessToken = function(token, callback) {
  * user is null;
  */
 exports.validateAccessTokenAndClient = function(token, callback) {
-  winston.verbose('Validating token');
+  logger.verbose('Validating token');
   return persistenceService.OAuthAccessToken.findOneQ({ token: token })
     .then(function(accessToken) {
       if(!accessToken) {
-        winston.warn('Invalid token presented: ', { token: token });
+        logger.warn('Invalid token presented: ', { token: token });
         return null;
       }
 
       var clientId = accessToken.clientId;
       if(!clientId) {
-        winston.warn('Invalid token presented (no client): ', { token: token });
+        logger.warn('Invalid token presented (no client): ', { token: token });
 
         return null; // code invalid
       }
@@ -93,7 +95,7 @@ exports.validateAccessTokenAndClient = function(token, callback) {
         ])
         .spread(function(client, user) {
           if(!client) {
-            winston.warn('Invalid token presented (client not found): ', { token: token });
+            logger.warn('Invalid token presented (client not found): ', { token: token });
             return null;
           }
 

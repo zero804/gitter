@@ -4,11 +4,11 @@
 var express    = require('express');
 var nconf      = require('./utils/config');
 var winston    = require('./utils/winston');
-var shutdown   = require('./utils/shutdown');
 var bayeux     = require('./web/bayeux');
 var appVersion = require('./web/appVersion');
 var domainWrapper = require('./utils/domain-wrapper');
 var http       = require('http');
+var shutdown = require('shutdown');
 
 require('./utils/diagnostics');
 
@@ -38,7 +38,6 @@ bayeux.attach(server);
 server.listen(port, bindIp);
 
 
-shutdown.installUnhandledExceptionHandler();
 shutdown.addHandler('websockets', 10, function(callback) {
   server.close(function() {
     callback();

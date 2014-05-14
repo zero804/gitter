@@ -1,10 +1,12 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var winston = require('../utils/winston');
+var env = require('../utils/env');
+var logger = env.logger;
+var stats = env.stats;
+
 var appEvents = require("../app-events");
 var restSerializer =  require("../serializers/rest-serializer");
-
 
 // --------------------------------------------------------------------
 // Utility serialization stuff
@@ -13,7 +15,7 @@ var restSerializer =  require("../serializers/rest-serializer");
 // TODO: move this into its own module
 function serializeEvent(url, operation, model, callback) {
   if(!url) { if(callback) callback(); return; }
-  winston.verbose("Serializing " + operation + " to " + url);
+  logger.verbose("Serializing " + operation + " to " + url);
 
   // TODO: consider swapping out the HEAVY WEIGHT restSerializer here for the
   // light weight notification-serializer as it is much more effeicent. Obviously
@@ -21,7 +23,7 @@ function serializeEvent(url, operation, model, callback) {
   // shape
   restSerializer.serializeModel(model, function(err, serializedModel) {
     if(err) {
-      winston.error("Silently failing model event: ", { exception: err, url: url, operation: operation });
+      logger.error("Silently failing model event: ", { exception: err, url: url, operation: operation });
       if(callback) callback(err);
       return;
     }
@@ -43,7 +45,6 @@ exports.install = function(persistenceService) {
   var schemas = persistenceService.schemas;
   var mongooseUtils = require("../utils/mongoose-utils");
   var troupeService = require("./troupe-service");
-  var statsService = require("./stats-service");
 
 
 
@@ -88,11 +89,11 @@ exports.install = function(persistenceService) {
     onUpdate: function onUserUpdate(model, next) {
 
       troupeService.findAllTroupesIdsForUser(model.id, function(err, troupeIds) {
-        if(err) { winston.error("Silently ignoring error in user update ", { exception: err }); return next(); }
+        if(err) { logger.error("Silently ignoring error in user update ", { exception: err }); return next(); }
         if(!troupeIds) return next();
 
         restSerializer.serializeModel(model, function(err, serializedModel) {
-          if(err) { winston.error("Silently failing user update: ", { exception: err }); return next(); }
+          if(err) { logger.error("Silently failing user update: ", { exception: err }); return next(); }
 
           troupeIds.forEach(function(troupeId) {
             var url = "/rooms/" + troupeId + "/users";
@@ -110,7 +111,7 @@ exports.install = function(persistenceService) {
 
   // MixPanel tracking
   schemas.UserSchema.post('save', function(model) {
-    statsService.userUpdate(model);
+    stats.userUpdate(model);
   });
 
   // attachNotificationListenersToSchema(schemas.ConversationSchema, 'conversation');
@@ -203,7 +204,7 @@ exports.install = function(persistenceService) {
 
 
       restSerializer.serialize(troupe, strategy, function(err, serializedModel) {
-        if(err) return winston.error('Error while serializing oneToOne troupe: ' + err, { exception: err });
+        if(err) return logger.error('Error while serializing oneToOne troupe: ' + err, { exception: err });
 
         appEvents.dataChange2(url, operation, serializedModel);
       });

@@ -1,19 +1,20 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var _                       = require('underscore');
-var uuid                    = require('node-uuid');
-var sechash                 = require('sechash');
-var winston                 = require('../utils/winston');
-var redis                   = require("../utils/redis");
-var nconf                   = require('../utils/config');
-var userService             = require('../services/user-service');
-var statsService            = require("../services/stats-service");
-var useragentStats          = require('./useragent-stats');
+var env            = require('../utils/env');
+var logger         = env.logger;
+var nconf          = env.config;
+var stats          = env.stats;
+
+var _              = require('underscore');
+var uuid           = require('node-uuid');
+var sechash        = require('sechash');
+var userService    = require('../services/user-service');
+var useragentStats = require('./useragent-stats');
 
 var cookieName = nconf.get('web:cookiePrefix') + 'auth';
 
-var redisClient = redis.createClient();
+var redisClient = env.redis.getClient();
 
 function generateAuthToken(req, res, userId, options, callback) {
   options = options ? options : {};
@@ -56,7 +57,7 @@ function validateAuthToken(authCookieValue, callback) {
     /* Auth cookie */
     if(!authCookieValue) return callback();
 
-    winston.verbose('rememberme: Client has presented a rememberme auth cookie, attempting reauthentication');
+    logger.verbose('rememberme: Client has presented a rememberme auth cookie, attempting reauthentication');
 
     var authToken = authCookieValue.split(":", 2);
 
@@ -69,7 +70,7 @@ function validateAuthToken(authCookieValue, callback) {
       if(err) return callback(err);
 
       if(!storedValue) {
-        winston.info("rememberme: Client presented illegal rememberme token ", { token: key });
+        logger.info("rememberme: Client presented illegal rememberme token ", { token: key });
         return callback();
       }
 
@@ -89,7 +90,7 @@ module.exports = {
 
   deleteRememberMeToken: function(token, callback) {
       validateAuthToken(token, function(err) {
-        if(err) { winston.warn('Error validating token, but ignoring error ' + err, { exception: err }); }
+        if(err) { logger.warn('Error validating token, but ignoring error ' + err, { exception: err }); }
 
         return callback();
       });
@@ -123,22 +124,22 @@ module.exports = {
 
           req.login(user, options, function(err) {
             if(err) {
-              winston.info("rememberme: Passport login failed", { exception: err  });
+              logger.info("rememberme: Passport login failed", { exception: err  });
               return fail(err);
             }
 
-            winston.verbose("rememberme: Passport login succeeded");
+            logger.verbose("rememberme: Passport login succeeded");
 
             // Remove the old token for this user
             if(req.session) req.session.accessToken = null;
 
             // Tracking
             var properties = useragentStats(req.headers['user-agent']);
-            statsService.userUpdate(user, properties);
+            stats.userUpdate(user, properties);
 
-            winston.verbose('Rememberme token used for login.', { cookie: req.headers.cookie });
+            logger.verbose('Rememberme token used for login.', { cookie: req.headers.cookie });
 
-            statsService.event("user_login", _.extend({
+            stats.event("user_login", _.extend({
               userId: userId,
               method: 'auto',
               email: user.email

@@ -5,6 +5,7 @@
 
 var winston = require('../../server/utils/winston');
 var presenceService = require('../../server/services/presence-service');
+var shutdown = require('shutdown');
 
 var start = Date.now();
 
@@ -18,5 +19,4 @@ presenceService.validateUsers(function(err) {
   shutdown.shutdownGracefully(err ? 1 : 0);
 });
 
-var shutdown = require('../../server/utils/shutdown');
 

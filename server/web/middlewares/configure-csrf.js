@@ -23,7 +23,7 @@ module.exports = function(req, res, next) {
   if(req.user) {
     return oauthService.findOrGenerateWebToken(req.user.id)
       .then(function(serverToken) {
-        req.session.accessToken = serverToken;
+        if(req.session) req.session.accessToken = serverToken;
       })
       .nodeify(next);
   }
@@ -31,7 +31,7 @@ module.exports = function(req, res, next) {
   /* Generate an anonymous token */
   return oauthService.findOrGenerateAnonWebToken()
     .then(function(token) {
-      req.session.accessToken = token;
+      if(req.session) req.session.accessToken = token;
     })
     .nodeify(next);
 
