@@ -293,11 +293,13 @@ define([
       chatInputText.html("<textarea class='trpChatInput'></textarea>");
 
       var unsafeText = this.model.get('text');
-      var textarea = chatInputText.find('textarea').val(unsafeText);
 
-      setTimeout(function() {
-        textarea.select();
-      }, 10);
+      var textarea = chatInputText.find('textarea').val(unsafeText);
+      textarea.focus();
+      textarea.val("").val(unsafeText);
+      // setTimeout(function() {
+      //   textarea.select();
+      // }, 10);
 
       this.inputBox = new chatInputView.ChatInputBoxView({ el: textarea, editMode: true });
       this.listenTo(this.inputBox, 'save', this.saveChat);
