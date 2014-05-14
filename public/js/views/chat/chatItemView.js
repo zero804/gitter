@@ -212,10 +212,15 @@ define([
       }
     },
 
+    focusInput: function() {
+      $("#chat-input-textarea").focus();
+    },
+
     detectEscape: function(e) {
       if (e.keyCode === 27) {
         // found escape, cancel edit
         this.toggleEdit();
+        this.focusInput();
       }
     },
 
@@ -226,7 +231,7 @@ define([
           this.model.set('html', null);
           this.model.save();
         }
-
+        this.focusInput();
         this.toggleEdit();
       }
     },
