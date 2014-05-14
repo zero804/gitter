@@ -24,7 +24,9 @@ define([
     events: {
       'click @ui.cog': 'showDropdown',
       'click #leave-room': 'leaveRoom',
-      'click @ui.favourite': 'toggleFavourite'
+      'click @ui.favourite': 'toggleFavourite',
+      'dblclick @ui.topic': 'showInput',
+      'keydown textarea': 'detectKeys',
     },
 
     initialize: function() {
@@ -112,6 +114,67 @@ define([
         type: "PUT",
         data: JSON.stringify({ favourite: isFavourite })
       });
+    },
+
+    saveTopic: function() {
+      var topic = this.$el.find('textarea').val();
+      context.troupe().set('topic', topic);
+      $.ajax({
+        url: '/api/v1/rooms/' + context.getTroupeId(),
+        contentType: "application/json",
+        dataType: "json",
+        type: "PUT",
+        data: JSON.stringify({ topic: topic })
+      });
+      this.editingTopic = false;
+    },
+
+    cancelEditTopic: function() {
+      var topicInputText = this.$el.find('#trpTopic');
+      topicInputText.html(this.oldTopic);
+      this.editingTopic = false;
+      this.redisplay();
+    },
+
+    detectKeys: function(e) {
+      this.detectReturn(e);
+      this.detectEscape(e);
+    },
+
+    detectReturn: function(e) {
+      if(e.keyCode === 13 && (!e.ctrlKey && !e.shiftKey)) {
+        // found submit
+        this.saveTopic();
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    },
+
+    detectEscape: function(e) {
+      if (e.keyCode === 27) {
+        // found escape, cancel edit
+        this.cancelEditTopic();
+      }
+    },
+
+    showInput: function() {
+      if (this.editingTopic === true) return;
+      this.editingTopic = true;
+
+      var topicInputText = this.$el.find('#trpTopic');
+      var unsafeText = topicInputText.text();
+
+      this.oldTopic = unsafeText;
+
+      // create inputview
+      topicInputText.html("<textarea class='trpTopicInput'></textarea>");
+
+      var textarea = topicInputText.find('textarea').val(unsafeText);
+
+      setTimeout(function() {
+        textarea.select();
+      }, 10);
+
     },
 
 
