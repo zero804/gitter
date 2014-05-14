@@ -2,18 +2,20 @@
 /*global require: true, module: true */
 "use strict";
 
+var env                      = require('../utils/env');
+var logger                   = env.logger;
+var stats                    = env.stats;
+
 var persistence              = require("./persistence-service");
 var userService              = require("./user-service");
 var appEvents                = require("../app-events");
 var assert                   = require("assert");
-var winston                  = require('../utils/winston');
 var collections              = require("../utils/collections");
 var mongoUtils               = require("../utils/mongo-utils");
 var Q                        = require("q");
 var ObjectID                 = require('mongodb').ObjectID;
 var _                        = require('underscore');
 var assert                   = require('assert');
-var statsService             = require("../services/stats-service");
 var roomPermissionsModel     = require('./room-permissions-model');
 
 function ensureExists(value) {
@@ -29,6 +31,8 @@ function findByUri(uri, callback) {
 }
 
 function findAllByUri(uris, callback) {
+  if(!uris || !uris.length) return Q.resolve([]).nodeify(callback);
+
   var lcUris = uris.map(function(f) { return f.toLowerCase(); });
 
   return persistence.Troupe.where('lcUri').in(lcUris).execQ()
@@ -37,6 +41,8 @@ function findAllByUri(uris, callback) {
 
 
 function findByIds(ids, callback) {
+  if(!ids || !ids.length) return Q.resolve([]).nodeify(callback);
+
   return persistence.Troupe
     .where('_id')['in'](collections.idsIn(ids))
     .execQ()
@@ -369,9 +375,9 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
         .then(function(troupe) {
           if(!raw.upserted) return troupe;
 
-          winston.verbose('Created a oneToOne troupe for ', { userId1: userId1, userId2: userId2 });
+          logger.verbose('Created a oneToOne troupe for ', { userId1: userId1, userId2: userId2 });
 
-          statsService.event('new_troupe', {
+          stats.event('new_troupe', {
             troupeId: troupe.id,
             oneToOne: true,
             userId: userId1,
@@ -390,7 +396,7 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
             var strategy = new restSerializer.TroupeStrategy({ currentUserId: currentUserId });
 
             restSerializer.serialize(troupe, strategy, function(err, serializedModel) {
-              if(err) return winston.error('Error while serializing oneToOne troupe: ' + err, { exception: err });
+              if(err) return logger.error('Error while serializing oneToOne troupe: ' + err, { exception: err });
 
               appEvents.dataChange2(url, 'create', serializedModel);
             });

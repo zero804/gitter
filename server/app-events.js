@@ -9,7 +9,7 @@ var client = redis.createClient();
 var pubClient = redis.createClient();
 var eventEmitter = new events.EventEmitter();
 var localEventEmitter = new events.EventEmitter();
-var shutdown = require('./utils/shutdown');
+var shutdown = require('shutdown');
 
 var subscriptions = {};
 

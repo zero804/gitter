@@ -5,7 +5,7 @@
 var bayeux = require('../../server/web/bayeux');
 var winston = require('../../server/utils/winston');
 var presenceService = require('../../server/services/presence-service');
-var shutdown = require('../../server/utils/shutdown');
+var shutdown = require('shutdown');
 
 var opts = require("nomnom")
    .option('socketId', {

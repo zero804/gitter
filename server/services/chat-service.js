@@ -1,11 +1,13 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var env           = require('../utils/env');
+var stats         = env.stats;
+
 var persistence   = require("./persistence-service");
 var collections   = require("../utils/collections");
 var troupeService = require("./troupe-service");
 var userService   = require("./user-service");
-var statsService  = require("./stats-service");
 var unsafeHtml    = require('../utils/unsafe-html');
 var processChat   = require('../utils/process-chat');
 var appEvents     = require('../app-events');
@@ -88,7 +90,7 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
 
           // }, 100);
 
-          statsService.event("new_chat", {
+          stats.event("new_chat", {
             userId: user.id,
             troupeId: troupe.id,
             username: user.username
@@ -167,6 +169,8 @@ exports.findById = function(id, callback) {
 };
 
  exports.findByIds = function(ids, callback) {
+  if(!ids || !ids.length) return callback(null, []);
+
   persistence.ChatMessage
     .where('_id')['in'](collections.idsIn(ids))
     .exec(callback);

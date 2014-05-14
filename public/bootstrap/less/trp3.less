@@ -2369,9 +2369,10 @@ ul.roster {
   #trpTopic {
     font-family: 'Open Sans';
     font-size: 13px;
-    margin: -5px 0px 0px 0px;
     color: #777;
     min-height: 1em;
+    margin: -5px 0 0 0;
+    .user-select(text);
 
     a {
       color: #666;
@@ -2381,10 +2382,23 @@ ul.roster {
       color: @trpLightBlue;
     }
 
+    .trpTopicInput {
+      width: 100%;
+      font-size: 13px;
+      line-height: 120%;
+      margin-bottom: 0;
+      resize: none;
+    }
+
   }
 
   .gtrNameTopic {
-    float: left;
+    margin-right: 60px;
+    margin-left: 50px;
+
+    @media @mid {
+      margin-left: 55px;
+    }
   }
 
   .dropdown-toggle {

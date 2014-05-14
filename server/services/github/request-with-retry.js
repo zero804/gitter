@@ -1,8 +1,9 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 'use strict';
 
-var winston = require('../../utils/winston');
-var statsService = require('../stats-service');
+var env = require('../../utils/env');
+var logger = env.logger;
+var stats = env.stats;
 
 module.exports = exports = function(options, request) {
   var maxRetries = options.maxRetries || 4;
@@ -12,32 +13,32 @@ module.exports = exports = function(options, request) {
     function attempt() {
       var start = Date.now();
 
-      statsService.event('github.api.count');
+      stats.event('github.api.count');
 
       var uri = options.uri || options.url;
-      winston.verbose('github.request', { uri: uri, method: options.method });
+      logger.verbose('github.request', { uri: uri, method: options.method });
 
       request(options, function (error, response, body) {
         var duration = Date.now() - start;
-        statsService.responseTime('github.api.response.time', duration);
+        stats.responseTime('github.api.response.time', duration);
 
         if(error || response.statusCode >= 500) {
           retry++;
 
           if(retry <= maxRetries) {
-            winston.error("Error while communicating with GitHub. Retrying in " + backoff + "ms", {
+            logger.error("Error while communicating with GitHub. Retrying in " + backoff + "ms", {
               statusCode: response && response.statusCode,
               uri: options.uri || options.url,
               error: error,
               message: body
             });
 
-            statsService.event('github.api.error.retry');
+            stats.event('github.api.error.retry');
 
             backoff = backoff * (1 + exponentialBackoffFactor);
             return setTimeout(attempt, backoff);
           } else {
-            statsService.event('github.api.error.abort');
+            stats.event('github.api.error.abort');
           }
         }
 

@@ -17,6 +17,7 @@ function saveRoom(req) {
 
 var mainFrameMiddlewarePipeline = [
   // middleware.ensureLoggedIn(),
+  middleware.grantAccessForRememberMeTokenMiddleware,
   appMiddleware.uriContextResolverMiddleware,
   appMiddleware.isPhoneMiddleware,
   function(req, res, next) {
@@ -46,10 +47,11 @@ var mainFrameMiddlewarePipeline = [
 ];
 
 var chatMiddlewarePipeline = [
-  // middleware.ensureLoggedIn(),
   appMiddleware.uriContextResolverMiddleware,
   appMiddleware.isPhoneMiddleware,
   function(req, res, next) {
+    if(!req.uriContext.troupe) return next(404);
+
     if(req.user) {
       saveRoom(req);
       appRender.renderChatPage(req, res, next);

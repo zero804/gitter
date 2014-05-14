@@ -14,7 +14,7 @@ var RedisBatcher     = require('../utils/redis-batcher').RedisBatcher;
 var Scripto          = require('redis-scripto');
 var Q                = require('q');
 var assert           = require('assert');
-var redisClient      = redis.createClient();
+var redisClient      = redis.getClient();
 var badgeBatcher     = new RedisBatcher('badge', 300);
 var scriptManager    = new Scripto(redisClient);
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/unread');
@@ -66,7 +66,7 @@ var redisClient_smembers = Q.nbind(redisClient.smembers, redisClient);
 function upgradeKeyToSortedSet(key, userBadgeKey, troupeId, callback) {
   winston.verbose('unread-item-key-upgrade: attempting to upgrade ' + key);
 
-  // Use a new client due to the WATCH semantics
+  // Use a new client due to the WATCH semantics (don't use getClient!)
   var redisClient = redis.createClient();
 
   function done(err) {
@@ -76,7 +76,8 @@ function upgradeKeyToSortedSet(key, userBadgeKey, troupeId, callback) {
       winston.verbose('unread-item-key-upgrade: upgrade completed successfully');
     }
 
-    redisClient.quit();
+    redis.quit(redisClient);
+
     return callback(err);
   }
 
@@ -494,7 +495,7 @@ exports.markAllChatsRead = function(userId, troupeId, options) {
 
 exports.getUserUnreadCounts = function(userId, troupeId, callback) {
   var key = "unread:chat:" + userId + ":" + troupeId;
-  return runScript('unread-item-count', [key])
+  return runScript('unread-item-count', [key], [])
     .then(function(result) {
       return result || 0;
     })
@@ -507,7 +508,7 @@ exports.getUserUnreadCountsForTroupeIds = function(userId, troupeIds, callback) 
     return "unread:chat:" + userId + ":" + troupeId;
   });
 
-  return runScript('unread-item-count', keys)
+  return runScript('unread-item-count', keys, [])
     .then(function(replies) {
       return troupeIds.reduce(function(memo, troupeId, index) {
         memo[troupeId] = replies[index];
@@ -578,7 +579,7 @@ exports.findLastReadTimesForUsersForTroupe = function(userIds, troupeId, callbac
 
 exports.getUnreadItems = function(userId, troupeId, itemType, callback) {
   var keys = ["unread:" + itemType + ":" + userId + ":" + troupeId];
-  return runScript('unread-item-list', keys)
+  return runScript('unread-item-list', keys, [])
     .fail(function(err) {
       winston.warn("unreadItemService.getUnreadItems failed:" + err, { exception: err });
       // Mask error
