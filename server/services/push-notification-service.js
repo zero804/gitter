@@ -8,7 +8,7 @@ var Fiber                  = require('../utils/fiber');
 var crypto                 = require('crypto');
 var _                      = require('underscore');
 var redis                  = require("../utils/redis");
-var redisClient            = redis.createClient();
+var redisClient            = redis.getClient();
 
 var Scripto                = require('redis-scripto');
 var scriptManager          = new Scripto(redisClient);

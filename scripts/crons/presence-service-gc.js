@@ -6,6 +6,7 @@
 var winston = require('../../server/utils/winston');
 var presenceService = require('../../server/services/presence-service');
 var bayeux = require('../../server/web/bayeux');
+var shutdown = require('shutdown');
 
 var start = Date.now();
 
@@ -20,5 +21,4 @@ presenceService.collectGarbage(engine, function(err) {
   shutdown.shutdownGracefully(err ? 1 : 0);
 });
 
-var shutdown = require('../../server/utils/shutdown');
 

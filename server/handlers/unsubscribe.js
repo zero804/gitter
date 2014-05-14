@@ -1,12 +1,14 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
+var env                 = require('../utils/env');
+var logger              = env.logger;
+var stats               = env.stats;
+var config              = env.config;
+
 var crypto              = require('crypto');
-var winston             = require('../utils/winston');
 var userSettingsService = require('../services/user-settings-service');
-var statsService        = require("../services/stats-service");
-var nconf               = require('../utils/config');
-var passphrase          = nconf.get('email:unsubscribeNotificationsSecret');
+var passphrase          = config.get('email:unsubscribeNotificationsSecret');
 
 module.exports = {
   install: function(app) {
@@ -26,8 +28,8 @@ module.exports = {
       var userId            = parts[0];
       var notificationType  = parts[1];
 
-      winston.info("User " + userId + " opted-out from " + notificationType);
-      statsService.event('unsubscribed_unread_notifications', {userId: userId});
+      logger.info("User " + userId + " opted-out from " + notificationType);
+      stats.event('unsubscribed_unread_notifications', {userId: userId});
 
       userSettingsService.setUserSettings(userId, 'unread_notifications_optout', 1)
         .then(function() {
