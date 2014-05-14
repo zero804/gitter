@@ -130,8 +130,6 @@ define([
     },
 
     cancelEditTopic: function() {
-      var topicInputText = this.$el.find('#trpTopic');
-      topicInputText.html(this.oldTopic);
       this.editingTopic = false;
       this.redisplay();
     },
