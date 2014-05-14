@@ -27,6 +27,8 @@ function installApi() {
    * application, which is issued an access token to make requests on behalf of
    * the authorizing user.
    */
+
+  /* This is ONLY used to API clients, not WEB clients!! */
   passport.use(new BearerStrategy(
     function(accessToken, done) {
 

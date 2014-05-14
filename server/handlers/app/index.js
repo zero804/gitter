@@ -1,7 +1,7 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var middleware        = require('../../web/middleware');
+var ensureLoggedIn    = require('../../web/middlewares/ensure-logged-in');
 var appRender         = require('./render');
 var appMiddleware     = require('./middleware');
 var recentRoomService = require('../../services/recent-room-service');
@@ -16,8 +16,6 @@ function saveRoom(req) {
 }
 
 var mainFrameMiddlewarePipeline = [
-  // middleware.ensureLoggedIn(),
-  middleware.grantAccessForRememberMeTokenMiddleware,
   appMiddleware.uriContextResolverMiddleware,
   appMiddleware.isPhoneMiddleware,
   function(req, res, next) {
@@ -81,7 +79,7 @@ module.exports = {
         '/:roomPart1/~home'
       ].forEach(function(path) {
         app.get(path,
-          middleware.ensureLoggedIn(),
+          ensureLoggedIn,
           appMiddleware.uriContextResolverMiddleware,
           appMiddleware.isPhoneMiddleware,
           function(req, res, next) {

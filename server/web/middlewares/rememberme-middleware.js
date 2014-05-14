@@ -1,7 +1,7 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var env            = require('../utils/env');
+var env            = require('../../utils/env');
 var logger         = env.logger;
 var nconf          = env.config;
 var stats          = env.stats;
@@ -9,17 +9,16 @@ var stats          = env.stats;
 var _              = require('underscore');
 var uuid           = require('node-uuid');
 var sechash        = require('sechash');
-var userService    = require('../services/user-service');
-var useragentStats = require('./useragent-stats');
+var userService    = require('../../services/user-service');
+var useragentStats = require('../useragent-stats');
 
 var cookieName = nconf.get('web:cookiePrefix') + 'auth';
 
 var redisClient = env.redis.getClient();
 
-function generateAuthToken(req, res, userId, options, callback) {
-  options = options ? options : {};
-  var timeToLiveDays = options.timeToLiveDays ? options.timeToLiveDays : 30;
+var timeToLiveDays = nconf.get("web:rememberMeTTLDays");
 
+function generateAuthToken(req, res, userId, callback) {
   var key = uuid.v4();
   var token = uuid.v4();
 
@@ -86,8 +85,6 @@ function validateAuthToken(authCookieValue, callback) {
 }
 
 module.exports = {
-  generateAuthToken: generateAuthToken,
-
   deleteRememberMeToken: function(token, callback) {
       validateAuthToken(token, function(err) {
         if(err) { logger.warn('Error validating token, but ignoring error ' + err, { exception: err }); }
@@ -96,66 +93,69 @@ module.exports = {
       });
   },
 
-  rememberMeMiddleware: function(options) {
-    return function(req, res, next) {
-      function fail(err) {
-        res.clearCookie(cookieName, { domain: nconf.get("web:cookieDomain") });
-        if(err) return next(err);
+  generateRememberMeTokenMiddleware: function(req, res, next) {
+    generateAuthToken(req, res, req.user.id, function(err) {
+      if(err) return next(err);
+      next();
+    });
+  },
 
-        return next();
-      }
+  rememberMeMiddleware: function(req, res, next) {
+    function fail(err) {
+      res.clearCookie(cookieName, { domain: nconf.get("web:cookieDomain") });
+      return next(err);
+    }
 
-      /* If the user is logged in, no problem */
-      if (req.user) return next();
+    /* If the user is logged in, no problem */
+    if (req.user) return next();
 
-      if(!req.cookies || !req.cookies[cookieName]) return next();
+    if(!req.cookies || !req.cookies[cookieName]) return next();
 
-      validateAuthToken(req.cookies[cookieName], function(err, userId) {
-        if(err || !userId) return fail(err);
+    validateAuthToken(req.cookies[cookieName], function(err, userId) {
+      if(err || !userId) return fail(err);
 
-        userService.findById(userId, function(err, user) {
-          if(err)  return fail(err);
-          if(!user) return fail();
+      userService.findById(userId, function(err, user) {
+        if(err)  return fail(err);
+        if(!user) return fail();
 
-          /* No token, no touch */
-          if(user.isMissingTokens()) {
-            return fail();
+        /* No token, no touch */
+        if(user.isMissingTokens()) {
+          return fail();
+        }
+
+        req.login(user, function(err) {
+          if(err) {
+            logger.info("rememberme: Passport login failed", { exception: err  });
+            return fail(err);
           }
 
-          req.login(user, options, function(err) {
-            if(err) {
-              logger.info("rememberme: Passport login failed", { exception: err  });
-              return fail(err);
-            }
+          logger.verbose("rememberme: Passport login succeeded");
 
-            logger.verbose("rememberme: Passport login succeeded");
+          // Remove the old token for this user
+          if(req.session) req.session.accessToken = null;
 
-            // Remove the old token for this user
-            if(req.session) req.session.accessToken = null;
+          // Tracking
+          var properties = useragentStats(req.headers['user-agent']);
+          stats.userUpdate(user, properties);
 
-            // Tracking
-            var properties = useragentStats(req.headers['user-agent']);
-            stats.userUpdate(user, properties);
+          logger.verbose('Rememberme token used for login.', { cookie: req.headers.cookie });
 
-            logger.verbose('Rememberme token used for login.', { cookie: req.headers.cookie });
+          stats.event("user_login", _.extend({
+            userId: userId,
+            method: 'auto',
+            email: user.email
+          }, properties));
 
-            stats.event("user_login", _.extend({
-              userId: userId,
-              method: 'auto',
-              email: user.email
-            }, properties));
-
-            generateAuthToken(req, res, userId, options, function(err) {
-              return next(err);
-            });
-
+          generateAuthToken(req, res, userId, function(err) {
+            return next(err);
           });
 
         });
 
       });
 
+    });
 
-    };
+
   }
 };
