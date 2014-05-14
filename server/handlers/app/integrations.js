@@ -4,7 +4,6 @@
 var winston                      = require('../../utils/winston');
 var nconf                        = require('../../utils/config');
 var roomPermissionsModel         = require('../../services/room-permissions-model');
-var middleware                   = require('../../web/middleware');
 var oauthService                 = require('../../services/oauth-service');
 var request                      = require('request');
 var uriContextResolverMiddleware = require('./middleware').uriContextResolverMiddleware;
@@ -12,6 +11,7 @@ var jwt                          = require('jwt-simple');
 var Q                            = require('q');
 var cdn                          = require('../../web/cdn');
 var services                     = require('gitter-services');
+var ensureLoggedIn               = require('../../web/middlewares/ensure-logged-in');
 
 var supportedServices = [
   {id: 'github', name: 'GitHub'},
@@ -131,55 +131,55 @@ module.exports = {
     install: function(app) {
 
       app.get('/settings/integrations/:roomPart1',
-        middleware.ensureLoggedIn(),
+        ensureLoggedIn,
         uriContextResolverMiddleware,
         adminAccessCheck,
         getIntegrations);
 
       app.get('/settings/integrations/:roomPart1/:roomPart2',
-        middleware.ensureLoggedIn(),
+        ensureLoggedIn,
         uriContextResolverMiddleware,
         adminAccessCheck,
         getIntegrations);
 
       app.get('/settings/integrations/:roomPart1/:roomPart2/:roomPart3',
-        middleware.ensureLoggedIn(),
+        ensureLoggedIn,
         uriContextResolverMiddleware,
         adminAccessCheck,
         getIntegrations);
 
       app.del('/settings/integrations/:roomPart1',
-        middleware.ensureLoggedIn(),
+        ensureLoggedIn,
         uriContextResolverMiddleware,
         adminAccessCheck,
         deleteIntegration);
 
       app.del('/settings/integrations/:roomPart1/:roomPart2',
-        middleware.ensureLoggedIn(),
+        ensureLoggedIn,
         uriContextResolverMiddleware,
         adminAccessCheck,
         deleteIntegration);
 
       app.del('/settings/integrations/:roomPart1/:roomPart2/:roomPart3',
-        middleware.ensureLoggedIn(),
+        ensureLoggedIn,
         uriContextResolverMiddleware,
         adminAccessCheck,
         deleteIntegration);
 
       app.post('/settings/integrations/:roomPart1',
-        middleware.ensureLoggedIn(),
+        ensureLoggedIn,
         uriContextResolverMiddleware,
         adminAccessCheck,
         createIntegration);
 
       app.post('/settings/integrations/:roomPart1/:roomPart2',
-        middleware.ensureLoggedIn(),
+        ensureLoggedIn,
         uriContextResolverMiddleware,
         adminAccessCheck,
         createIntegration);
 
       app.post('/settings/integrations/:roomPart1/:roomPart2/:roomPart3',
-        middleware.ensureLoggedIn(),
+        ensureLoggedIn,
         uriContextResolverMiddleware,
         adminAccessCheck,
         createIntegration);
