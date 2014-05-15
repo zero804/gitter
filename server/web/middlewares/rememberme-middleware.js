@@ -132,7 +132,6 @@ module.exports = {
           logger.verbose("rememberme: Passport login succeeded");
 
           // Remove the old token for this user
-          if(req.session) req.session.accessToken = null;
           req.accessToken = null;
 
           // Tracking
