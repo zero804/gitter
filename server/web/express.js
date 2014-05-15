@@ -8,6 +8,7 @@ var express        = require('express');
 var passport       = require('passport');
 var expressHbs     = require('express-hbs');
 var path           = require('path');
+var I18n           = require('i18n-2');
 
 // Naughty naughty naught, install some extra methods on the express prototype
 require('./http');
@@ -72,6 +73,19 @@ module.exports = {
         }
       });
 
+      next();
+    });
+
+    I18n.expressBind(app, {
+      locales: ['en', 'fr', 'ja', 'de', 'ru', 'es', 'zh', 'pt', 'it', 'nl', 'sv', 'cs', 'pl', 'da', 'ko'],
+      devMode: config.runtimeEnvironment === 'dev',
+      directory: path.join(__dirname, '..', '..', 'locales')
+    });
+
+    app.use(function(req, res, next) {
+      if(req.i18n && req.i18n.prefLocale) {
+        req.i18n.setLocale(req.i18n.prefLocale);
+      }
       next();
     });
 
