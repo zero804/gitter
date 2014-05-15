@@ -138,7 +138,8 @@ function renderMobileChat(req, res, next) {
         user: troupeContext.user,
         troupeContext: troupeContext,
         chats: chats,
-        agent: req.headers['user-agent']
+        agent: req.headers['user-agent'],
+        lang: languageSelector(req)
       });
 
     })
@@ -192,7 +193,8 @@ function renderNotLoggedInChatPage(req, res, next) {
         troupeTopic: troupeContext.troupe.topic,
         troupeContext: troupeContext,
         chats: chats,
-        agent: req.headers['user-agent']
+        agent: req.headers['user-agent'],
+        lang: languageSelector(req)
       });
 
     })
