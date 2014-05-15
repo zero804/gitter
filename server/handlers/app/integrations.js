@@ -49,16 +49,13 @@ function getIntegrations(req, res) {
       hook.serviceDisplayName = serviceIdNameMap[hook.service];
     });
 
-    var promise = req.session.accessToken ? Q.resolve(req.session.accessToken) : oauthService.findOrGenerateWebToken(req.user.id);
-    promise.then(function(accessToken) {
-      res.render('integrations', {
-        hooks: hooks,
-        troupe: req.troupe,
-        accessToken: accessToken,
-        cdnRoot: cdn(''),
-        supportedServices: supportedServices,
-        openServices: openServices
-      });
+    res.render('integrations', {
+      hooks: hooks,
+      troupe: req.troupe,
+      accessToken: req.accessToken,
+      cdnRoot: cdn(''),
+      supportedServices: supportedServices,
+      openServices: openServices
     });
   });
 }

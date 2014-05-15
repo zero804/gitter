@@ -133,6 +133,7 @@ module.exports = {
 
           // Remove the old token for this user
           if(req.session) req.session.accessToken = null;
+          req.accessToken = null;
 
           // Tracking
           var properties = useragentStats(req.headers['user-agent']);
