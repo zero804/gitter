@@ -6,27 +6,35 @@ var env = require('../../utils/env');
 var stats = env.stats;
 var logger = env.logger;
 
-function setAccessToken(req, accessToken) {
+function setAccessToken(req, userId, accessToken) {
   if(req.session) {
-    req.session.accessToken = accessToken;
+    req.session['accessToken_' + (userId ? userId : '')] = accessToken;
   }
 
   req.accessToken = accessToken;
 }
 
+function getSessionAccessToken(req, userId) {
+  if(req.session) {
+    return req.session['accessToken_' + (userId ? userId : '')];
+  }
+}
+
 module.exports = function(req, res, next) {
+  var userId = req.user && req.user.id;
+
   /* OAuth clients have req.authInfo. Propogate their access token to their entire session
    * so that all related web-requests are made by the same client
    */
   if(req.authInfo && req.authInfo.accessToken) {
     logger.verbose('csrf: Using OAuth access token');
-
-    setAccessToken(req, req.authInfo.accessToken);
+    setAccessToken(req, userId, req.authInfo.accessToken);
     return next();
   }
 
-  if(req.session && req.session.accessToken) {
-    req.accessToken = req.session.accessToken;
+  var sessionAccessToken = getSessionAccessToken(req, userId);
+  if(sessionAccessToken) {
+    req.accessToken = sessionAccessToken;
     return next();
   }
 
@@ -36,7 +44,7 @@ module.exports = function(req, res, next) {
 
     return oauthService.findOrGenerateWebToken(req.user.id)
       .then(function(serverToken) {
-        setAccessToken(req, serverToken);
+        setAccessToken(req, userId, serverToken);
       })
       .nodeify(next);
   }
@@ -47,7 +55,7 @@ module.exports = function(req, res, next) {
   /* Generate an anonymous token */
   return oauthService.generateAnonWebToken()
     .then(function(token) {
-      setAccessToken(req, token);
+      setAccessToken(req, null, token);
     })
     .nodeify(next);
 

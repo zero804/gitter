@@ -144,7 +144,6 @@ function install() {
 
                     // Remove the old token for this user
                     req.accessToken = null;
-                    if(req.session) req.session.accessToken = null;
                     return done(null, user);
                   });
 
