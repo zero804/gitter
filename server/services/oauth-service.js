@@ -21,7 +21,8 @@ var cacheTimeout = 60; /* 60 seconds */
 
 /* Load webInternalClientId once at startup */
 persistenceService.OAuthClient.findOne({ clientKey: WEB_INTERNAL_CLIENT_KEY }, function(err, oauthClient) {
-  if(err) throw new Error("Unable to load internal client id");
+  if(err) throw new Error("Unable to load internal clientKey " + WEB_INTERNAL_CLIENT_KEY + ": " + err);
+
   if(!oauthClient) throw new Error("Unable to load internal client id. Have you loaded it into mongo?");
 
   webInternalClientId = oauthClient._id;
@@ -30,7 +31,8 @@ persistenceService.OAuthClient.findOne({ clientKey: WEB_INTERNAL_CLIENT_KEY }, f
 var ircClientId;
 
 persistenceService.OAuthClient.findOne({ clientKey: nconf.get('irc:clientKey') }, function(err, oauthClient) {
-  if(err) throw new Error("Unable to load internal client id");
+  if(err) throw new Error("Unable to load internal clientKey " + nconf.get('irc:clientKey') + ": " + err);
+
   if(!oauthClient) throw new Error("Unable to load internal client id. Have you loaded it into mongo?");
 
   ircClientId = oauthClient._id;

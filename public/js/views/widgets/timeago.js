@@ -2,8 +2,9 @@
 define([
   'views/base',
   'utils/momentWrapper',
-  'utils/context'
-], function(TroupeViews, moment, context) {
+  'utils/context',
+  'utils/locale'
+], function(TroupeViews, moment, context, locale) {
   /*jslint browser: true*/
   "use strict";
 
@@ -57,7 +58,8 @@ define([
       if(duration.asDays() >= maxDaysBeforeDateDisplay) {
         v = this.compact ? this.time.format("MMM DD", { lang: lang }) : this.time.format("LL", { lang: lang });
       } else {
-        v = this.compact ? this.time.format("H:mm", { lang: lang }) : duration.humanize() + " ago";
+
+        v = this.compact ? this.time.format("H:mm", { lang: lang }) : locale("%s ago", duration.humanize());
       }
 
       var fullTime = this.time.format("LLL", { lang: lang });

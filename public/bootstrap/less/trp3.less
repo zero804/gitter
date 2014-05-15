@@ -2372,6 +2372,7 @@ ul.roster {
     color: #777;
     min-height: 1em;
     margin: -5px 0 0 0;
+    .user-select(text);
 
     a {
       color: #666;
@@ -2379,6 +2380,14 @@ ul.roster {
 
     a:hover {
       color: @trpLightBlue;
+    }
+
+    .trpTopicInput {
+      width: 100%;
+      font-size: 13px;
+      line-height: 120%;
+      margin-bottom: 0;
+      resize: none;
     }
 
   }
