@@ -4,7 +4,15 @@
 var moment = require('moment');
 var maxDaysBeforeDateDisplay = 3;
 
-
+function useLanguage(language, callback) {
+  if(!language) return callback();
+  moment.lang(language);
+  try {
+    return callback();
+  } finally {
+    moment.lang('en-GB');
+  }
+}
 module.exports = exports = function() {
   return function timeagoWidgetHandler(params) {
     var hash = params.hash;
@@ -21,7 +29,9 @@ module.exports = exports = function() {
     if(duration.asDays() >= maxDaysBeforeDateDisplay) {
       v = time.format("LL", { lang: lang });
     } else {
-      v = duration.humanize() + " ago";
+      v = useLanguage(lang, function() {
+        return duration.humanize() + " ago";
+      });
     }
 
     return v;
