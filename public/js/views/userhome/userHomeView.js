@@ -39,9 +39,11 @@ define([
 
     serializeData: function() {
       var user = context.getUser();
+      var isMobile = !!('ontouchstart' in document.documentElement);
+      var hasPrivateRepoScope = !!user.scopes.private_repo;
 
       return {
-        privateRepoScope: !!user.scopes.private_repo
+        showUpgradeAuthLink: !isMobile && !hasPrivateRepoScope
       };
     },
 
