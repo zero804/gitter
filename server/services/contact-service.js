@@ -1,11 +1,13 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var env           = require('../utils/env');
+var stats         = env.stats;
+var logger        = env.logger;
+
 var persistence   = require("./persistence-service");
 var userService   = require("./user-service");
-var statsService  = require("./stats-service");
 var _             = require('underscore');
-var winston       = require('../utils/winston');
 var Q             = require('q');
 
 function indexImportsByEmail(contacts) {
@@ -45,7 +47,7 @@ exports.ingestGoogleContacts = function(user, data, cb) {
     });
   }
 
-  winston.verbose('[contact] Importing contacts: ', contacts.length);
+  logger.verbose('[contact] Importing contacts: ', contacts.length);
 
   var importsByEmail = indexImportsByEmail(contacts);
   var emails = Object.keys(importsByEmail);
@@ -91,8 +93,8 @@ exports.ingestGoogleContacts = function(user, data, cb) {
     })
     .then(function(imported) {
       if (imported.length > 0) {
-        statsService.userUpdate(user, {'import_contacts': 'Google'});
-        statsService.event('import_contacts', {'userId': user.id});
+        stats.userUpdate(user, {'import_contacts': 'Google'});
+        stats.event('import_contacts', {'userId': user.id});
       }
       return imported;
     })
@@ -152,7 +154,7 @@ exports.updateContactsWithUserId = function(email, userId) {
   return persistence.Contact.find({ emails: email, contactUserId: { $exists: false } })
     .execQ()
     .then(function(contacts) {
-      winston.silly('Updating ' + contacts.length + ' contacts with userId');
+      logger.silly('Updating ' + contacts.length + ' contacts with userId');
 
       // Update and save all matching contacts
       return Q.all(contacts.map(function(contact) {

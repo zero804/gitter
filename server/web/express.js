@@ -1,22 +1,21 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
+var env = require('../utils/env');
+var config          = env.config;
+
 var express        = require('express');
 var passport       = require('passport');
-var nconf          = require('../utils/config');
 var expressHbs     = require('express-hbs');
-var winston        = require('../utils/winston');
-var responseTime   = require('./response-time');
 var path           = require('path');
+var rememberMe     = require('./middlewares/rememberme-middleware');
+var I18n           = require('i18n-2');
 
 // Naughty naughty naught, install some extra methods on the express prototype
 require('./http');
 
-function configureLogging(app) {
-  app.use(responseTime(winston, nconf.get('logging:minimalAccess')));
-}
 
-var staticContentDir = path.join(__dirname, '..', '..', nconf.get('web:staticContent'));
+var staticContentDir = path.join(__dirname, '..', '..', config.get('web:staticContent'));
 
 module.exports = {
   /**
@@ -32,8 +31,8 @@ module.exports = {
     expressHbs.registerHelper('chatItemPrerender', require('./prerender-chat-helper'));
 
     app.locals({
-      googleTrackingId: nconf.get("web:trackingId"),
-      minified: nconf.get('web:minified')
+      googleTrackingId: config.get("web:trackingId"),
+      minified: config.get('web:minified')
     });
 
     app.engine('hbs', expressHbs.express3({
@@ -46,20 +45,19 @@ module.exports = {
     app.set('views', staticContentDir + '/templates');
     app.set('trust proxy', true);
 
-    if(nconf.get('express:viewCache')) {
+    if(config.get('express:viewCache')) {
       app.enable('view cache');
     }
 
-    if(nconf.get("logging:access") && nconf.get("logging:logStaticAccess")) {
-      configureLogging(app);
+    if(config.get("logging:logStaticAccess")) {
+      app.use(env.middlewares.accessLogger);
     }
 
     app.use(express.static(staticContentDir, {
-      maxAge: nconf.get('web:staticContentExpiryDays') * 86400 * 1000
+      maxAge: config.get('web:staticContentExpiryDays') * 86400 * 1000
     }));
 
-    if(nconf.get("logging:access") && !nconf.get("logging:logStaticAccess")) {
-      configureLogging(app);
+    if(!config.get("logging:logStaticAccess")) {
     }
 
     app.use(express.cookieParser());
@@ -79,23 +77,46 @@ module.exports = {
       next();
     });
 
+    I18n.expressBind(app, {
+      locales: ['en', 'fr', 'ja', 'de', 'ru', 'es', 'zh', 'pt', 'it', 'nl', 'sv', 'cs', 'pl', 'da', 'ko'],
+      devMode: config.runtimeEnvironment === 'dev',
+      directory: path.join(__dirname, '..', '..', 'locales')
+    });
+
+    app.use(function(req, res, next) {
+      if(req.i18n && req.i18n.prefLocale) {
+        req.i18n.setLocale(req.i18n.prefLocale);
+      }
+      next();
+    });
+
     app.use(express.session({
-      secret: nconf.get('web:sessionSecret'),
-      key: nconf.get('web:cookiePrefix') + 'session',
+      secret: config.get('web:sessionSecret'),
+      key: config.get('web:cookiePrefix') + 'session',
       store: sessionStore,
       cookie: {
         path: '/',
         httpOnly: true,
         maxAge: 14400000,
-        domain: nconf.get("web:cookieDomain"),
-        secure: false /*nconf.get("web:secureCookies")*/ // TODO: fix this!!
+        domain: config.get("web:cookieDomain"),
+        secure: false /*config.get("web:secureCookies")*/ // TODO: fix this!!
       }
     }));
+
     app.use(passport.initialize());
     app.use(passport.session());
+
+    app.use(require('./middlewares/authenticate-bearer'));
+    app.use(rememberMe.rememberMeMiddleware);
+    app.use(require('./middlewares/rate-limiter'));
+
     app.use(require('./middlewares/configure-csrf'));
+    app.use(require('./middlewares/enforce-csrf'));
+
     app.use(require('./middlewares/tokenless-user'));
+
     app.use(app.router);
+
     app.use(require('./middlewares/token-error-handler'));
     app.use(require('./middlewares/express-error-handler'));
   },
@@ -103,9 +124,7 @@ module.exports = {
   installApi: function(app) {
     app.set('trust proxy', true);
 
-    if(nconf.get("logging:access")) {
-      configureLogging(app);
-    }
+    app.use(env.middlewares.accessLogger);
 
     app.use(express.urlencoded());
     app.use(express.json());
@@ -117,21 +136,17 @@ module.exports = {
     app.use(app.router);
 
     app.use(require('./middlewares/token-error-handler'));
-    app.use(require('./middlewares/api-error-handler'));
+    app.use(env.middlewares.errorHandler);
   },
 
   installSocket: function(app) {
     app.set('trust proxy', true);
-
-    if(nconf.get("logging:access")) {
-      app.use(responseTime(winston, nconf.get('logging:minimalAccess')));
-    }
-
+    app.use(env.middlewares.accessLogger);
     app.use(express.cookieParser());
     app.use(express.urlencoded());
     app.use(express.json());
 
     app.use(require('./middlewares/token-error-handler'));
-    app.use(require('./middlewares/api-error-handler'));
+    app.use(env.middlewares.errorHandler);
   }
 };

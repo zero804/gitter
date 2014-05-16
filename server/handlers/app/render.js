@@ -36,6 +36,7 @@ function renderHomePage(req, res, next) {
       troupeContext: troupeContext,
       agent: req.headers['user-agent'],
       lang: languageSelector(req),
+      locale: req.i18n,
       isUserhome: true
     });
   });
@@ -63,7 +64,8 @@ function renderMainFrame(req, res, next, frame) {
         troupeContext: troupeContext,
         chatAppLocation: chatAppLocation,
         agent: req.headers['user-agent'],
-        lang: languageSelector(req)
+        lang: languageSelector(req),
+        locale: req.i18n
       });
     })
     .fail(next);
@@ -72,7 +74,7 @@ function renderMainFrame(req, res, next, frame) {
 function renderChatPage(req, res, next) {
   var troupe = req.uriContext.troupe;
   var userId = req.user && req.user.id;
-
+  console.log('>>>>>>>>>>>>>>>', req.i18n.locale);
   Q.all([
     contextGenerator.generateTroupeContext(req),
     restful.serializeChatsForTroupe(troupe.id, userId, { limit: INITIAL_CHAT_COUNT })
@@ -97,7 +99,8 @@ function renderChatPage(req, res, next) {
         troupeContext: troupeContext,
         chats: chats,
         agent: req.headers['user-agent'],
-        lang: languageSelector(req)
+        lang: languageSelector(req),
+        locale: req.i18n
       });
 
     })
@@ -115,7 +118,8 @@ function renderMobileUserHome(req, res, next) {
       troupeContext: troupeContext,
       agent: req.headers['user-agent'],
       isUserhome: true,
-      lang: languageSelector(req)
+      lang: languageSelector(req),
+      locale: req.i18n
     });
   });
 }
@@ -138,7 +142,9 @@ function renderMobileApp(req, res, next) {
         user: troupeContext.user,
         troupeContext: troupeContext,
         chats: chats,
-        agent: req.headers['user-agent']
+        agent: req.headers['user-agent'],
+        lang: languageSelector(req),
+        locale: req.i18n
       });
 
     })
@@ -193,7 +199,8 @@ function renderMobileNotLoggedInChat(req, res, next) {
         troupeContext: troupeContext,
         chats: chats,
         agent: req.headers['user-agent'],
-        lang: languageSelector(req)
+        lang: languageSelector(req),
+        locale: req.i18n
       });
 
     })
@@ -224,7 +231,9 @@ function renderNotLoggedInChatPage(req, res, next) {
         troupeTopic: troupeContext.troupe.topic,
         troupeContext: troupeContext,
         chats: chats,
-        agent: req.headers['user-agent']
+        agent: req.headers['user-agent'],
+        lang: languageSelector(req),
+        locale: req.i18n
       });
 
     })

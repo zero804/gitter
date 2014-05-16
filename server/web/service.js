@@ -1,12 +1,15 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+
+BROKEN!
+
 /* Listen for SIGUSR1 signals to start/stop profiling */
 // require('./utils/profiler');
 
 var express  = require('express');
 var http     = require('http');
-var shutdown = require('./utils/shutdown');
+var shutdown = require('shutdown');
 var domainWrapper = require('./utils/domain-wrapper');
 
 require('./utils/diagnostics');
@@ -24,7 +27,6 @@ app.use(function(req, res, next) {
 });
 
 
-shutdown.installUnhandledExceptionHandler();
 shutdown.addHandler('web', 20, function(callback) {
   gracefullyClosing = true;
   server.close(callback);

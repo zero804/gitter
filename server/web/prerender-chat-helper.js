@@ -58,9 +58,11 @@ var webhookTemplates = ['bitbucket', 'generic', 'github', 'jenkins', 'sprintly',
 module.exports = exports = function(model, params) {
   var hash = params.hash;
   var lang = hash && hash.lang;
+  var locale = hash && hash.locale;
   var displayName;
   var username;
   var deletedClass;
+
 
   //data.readByText = this.getReadByText(data.readBy);
   //
@@ -95,13 +97,13 @@ module.exports = exports = function(model, params) {
     webhookClass = 'webhook';
   }
 
-
   var m = _.extend({}, model, {
     displayName: displayName = model.fromUser && model.fromUser.displayName,
     username: username = model.fromUser && model.fromUser.username,
     text: text,
     html: html,
     lang: lang,
+    locale: locale,
     webhookClass: webhookClass
   }, widgetHelpers);
 
@@ -112,6 +114,7 @@ module.exports = exports = function(model, params) {
     id: model.id,
     unreadClass: unreadClass,
     deletedClass: deletedClass,
+    locale: locale,
     inner: result
   });
 };
