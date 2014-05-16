@@ -462,7 +462,7 @@ describe('presenceService', function() {
     presenceService.userSocketConnected(userId, socketId, 'online', 'test', null, null, function(err) {
       if(err) return done(err);
 
-      var redisClient = redis.createClient();
+      var redisClient = redis.getClient();
 
       // Now mess things up intentionally
       redisClient.zincrby(presenceService.testOnly.ACTIVE_USERS_KEY, 1, userId, function(err) {
@@ -499,7 +499,7 @@ describe('presenceService', function() {
       presenceService.userSocketConnected(userId2, socketId2, 'mobile', 'test', null, null, function(err) {
         if(err) return done(err);
 
-        var redisClient = redis.createClient();
+        var redisClient = redis.getClient();
 
         // Now mess things up intentionally
         redisClient.zincrby(presenceService.testOnly.ACTIVE_USERS_KEY, 1, userId2, function(err) {
@@ -549,28 +549,27 @@ describe('presenceService', function() {
       if(err) return done(err);
 
       var redisClient = redis.createClient();
+      redisClient.on('ready', function() {
 
-      // Now mess things up intentionally
-      redisClient.zincrby(presenceService.testOnly.ACTIVE_USERS_KEY, 1, userId, function(err) {
-        if(err) return done(err);
+        // now mess things up intentionally
+        redisClient.zincrby(presenceService.testOnly.ACTIVE_USERS_KEY, 1, userId, function(err) {
+          if(err) return done(err);
 
+          presenceService.testOnly.forceDelay = true;
+          presenceService.testOnly.onAfterDelay = function(callback) {
+            presenceService.socketDisconnected(socketId, callback);
+          };
 
-        presenceService.testOnly.forceDelay = true;
-        presenceService.testOnly.validateUsersSubset([userId], function(err) {
-          presenceService.testOnly.forceDelay = false;
+          presenceService.testOnly.validateUsersSubset([userId], function(err) {
+            presenceService.testOnly.forceDelay = false;
+            presenceService.testOnly.onAfterDelay = null;
 
-          assert(err, 'Expected an error');
-          assert(err.rollback, 'Expected a transaction rollback');
-          done();
-        });
-
-        setTimeout(function() {
-
-          presenceService.socketDisconnected(socketId, function(err) {
-            if(err) return done(err);
+            assert(err, 'Expected an error');
+            assert(err.rollback, 'Expected a transaction rollback');
+            done();
           });
 
-        }, 10);
+        });
 
       });
     });
@@ -615,7 +614,6 @@ describe('presenceService', function() {
       presenceService.userSocketConnected(userId2, socketId2, 'online', 'test', null, null, function(err) {
         if(err) return done(err);
 
-
         presenceService.categorizeUserTroupesByOnlineStatus([
             {userId: userId1, troupeId: troupeId },
             {userId: userId2, troupeId: troupeId },
@@ -643,7 +641,6 @@ describe('presenceService', function() {
             console.error(e);
             throw e;
           }
-
 
           done();
         });

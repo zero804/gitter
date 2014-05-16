@@ -1,20 +1,22 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var env                    = require('../utils/env');
+var winston                = env.logger;
+var errorReporter          = env.errorReporter;
+var config                 = env.config;
+var stats                  = env.stats;
+
 var _                      = require('underscore');
 var userService            = require('../services/user-service');
 var passport               = require('passport');
-var winston                = require('../utils/winston');
 var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
 var BearerStrategy         = require('passport-http-bearer').Strategy;
 var oauthService           = require('../services/oauth-service');
-var statsService           = require("../services/stats-service");
 var mixpanel               = require('../web/mixpanelUtils');
-var nconf                  = require('../utils/config');
 var useragentStats         = require('./useragent-stats');
 var GitHubStrategy         = require('troupe-passport-github').Strategy;
 var GitHubMeService        = require('../services/github/github-me-service');
-var errorReporter          = require('../utils/error-reporting');
 
 function installApi() {
   /**
@@ -25,6 +27,8 @@ function installApi() {
    * application, which is issued an access token to make requests on behalf of
    * the authorizing user.
    */
+
+  /* This is ONLY used to API clients, not WEB clients!! */
   passport.use(new BearerStrategy(
     function(accessToken, done) {
 
@@ -126,9 +130,9 @@ function install() {
 
                   // Tracking
                   var properties = useragentStats(req.headers['user-agent']);
-                  statsService.userUpdate(user, properties);
+                  stats.userUpdate(user, properties);
 
-                  statsService.event("user_login", _.extend({
+                  stats.event("user_login", _.extend({
                     userId: user.id,
                     method: 'github_oauth',
                     username: user.username
@@ -139,7 +143,7 @@ function install() {
                     if (err) { return done(err); }
 
                     // Remove the old token for this user
-                    if(req.session) req.session.accessToken = null;
+                    req.accessToken = null;
                     return done(null, user);
                   });
 
@@ -169,7 +173,7 @@ function install() {
 
                 req.logIn(user, function(err) {
                   if (err) { return done(err); }
-                  statsService.event("new_user", {
+                  stats.event("new_user", {
                     userId: user.id,
                     distinctId: mixpanel.getMixpanelDistinctId(req.cookies),
                     method: 'github_oauth',
@@ -185,7 +189,7 @@ function install() {
       })
       .fail(function(err) {
         errorReporter(err, { oauth: "failed" });
-        statsService.event("oauth_profile.error");
+        stats.event("oauth_profile.error");
         winston.error('Error during oauth process. Unable to obtain user profile.', err);
 
         return done(err);
@@ -193,9 +197,9 @@ function install() {
   }
 
   var userStrategy = new GitHubStrategy({
-      clientID:     nconf.get('github:user_client_id'),
-      clientSecret: nconf.get('github:user_client_secret'),
-      callbackURL:  nconf.get('web:basepath') + '/login/callback',
+      clientID:     config.get('github:user_client_id'),
+      clientSecret: config.get('github:user_client_secret'),
+      callbackURL:  config.get('web:basepath') + '/login/callback',
       skipUserProfile: true,
       passReqToCallback: true
     }, githubOauthCallback);
@@ -203,9 +207,9 @@ function install() {
   passport.use(userStrategy);
 
   var upgradeStrategy = new GitHubStrategy({
-      clientID:     nconf.get('github:client_id'),
-      clientSecret: nconf.get('github:client_secret'),
-      callbackURL:  nconf.get('web:basepath') + '/login/callback',
+      clientID:     config.get('github:client_id'),
+      clientSecret: config.get('github:client_secret'),
+      callbackURL:  config.get('web:basepath') + '/login/callback',
       skipUserProfile: true,
       passReqToCallback: true
     }, githubOauthCallback);
