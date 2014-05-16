@@ -1,15 +1,18 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var middleware    = require('../web/middleware');
-var passport      = require('passport');
-var winston       = require('../utils/winston');
-var client        = require("../utils/redis").createClient();
-var lock          = require("redis-lock")(client);
-var oauth2        = require('../web/oauth2');
-var mixpanel      = require('../web/mixpanelUtils');
-var statsService  = require("../services/stats-service");
+var env            = require('../utils/env');
+var stats          = env.stats;
+var logger         = env.logger;
+
+var passport       = require('passport');
+var client         = require("../utils/redis").getClient();
+var lock           = require("redis-lock")(client);
+var oauth2         = require('../web/oauth2');
+var mixpanel       = require('../web/mixpanelUtils');
 var languageSelector = require('../web/language-selector');
+var rememberMe     = require('../web/middlewares/rememberme-middleware');
+var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
 
 module.exports = {
   install: function(app) {
@@ -19,13 +22,13 @@ module.exports = {
       function(req, res, next) {
         //send data to stats service
         if (req.query.action == 'login') {
-          statsService.event("login_clicked", {
+          stats.event("login_clicked", {
             distinctId: mixpanel.getMixpanelDistinctId(req.cookies),
             method: 'github_oauth'
           });
         }
         if (req.query.action == 'signup') {
-          statsService.event("signup_clicked", {
+          stats.event("signup_clicked", {
             distinctId: mixpanel.getMixpanelDistinctId(req.cookies),
             method: 'github_oauth',
             button: req.query.button
@@ -55,7 +58,7 @@ module.exports = {
 
     app.get(
         '/login/upgrade',
-        middleware.ensureLoggedIn(),
+        ensureLoggedIn,
         function(req, res, next) {
           var scopes = req.query.scopes ? req.query.scopes.split(/\s*,\s*/) : [''];
           scopes.push('user:email');  // Always request user:email scope
@@ -131,8 +134,8 @@ module.exports = {
         });
       },
 
-      middleware.ensureLoggedIn(),
-      middleware.generateRememberMeTokenMiddleware,
+      ensureLoggedIn,
+      rememberMe.generateRememberMeTokenMiddleware,
       function(req, res) {
         if(req.session && req.session.githubScopeUpgrade) {
           delete req.session.githubScopeUpgrade;
@@ -157,9 +160,9 @@ module.exports = {
       '/login/callback',
       /* 4-nary error handler for /login/callback */
       function(err, req, res, next) {
-        winston.error("OAuth failed: " + err);
+        logger.error("OAuth failed: " + err);
         if(err.stack) {
-          winston.error("OAuth failure callback", err.stack);
+          logger.error("OAuth failure callback", err.stack);
         }
         res.redirect("/");
       });

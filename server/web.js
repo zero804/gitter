@@ -26,7 +26,7 @@ require('./web/graceful-shutdown').install(server, app);
 
 var RedisStore = require('connect-redis')(express);
 var sessionStore = new RedisStore({
-  client: redis.createClient()
+  client: redis.getClient()
 });
 
 require('./web/express').installFull(app, server, sessionStore);
@@ -45,7 +45,7 @@ require('./handlers/').install(app);
 require('./services/kue-workers').startWorkers();
 
 // APIS
-var auth = require('./web/middleware').ensureLoggedIn({ allowGet: true });
+var auth = require('./web/middlewares/ensure-logged-in-or-get');
 require('./api/').install(app, '/api', auth);
 
 /* This should be second last */

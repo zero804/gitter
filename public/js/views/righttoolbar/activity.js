@@ -108,7 +108,8 @@ define([
       return extra;
     },
     bitbucket: function(meta) {
-      // meta.commits is undefined for empty arrays. no idea why.
+      // meta.commits is undefined for empty arrays in old hooks.
+      // this is because of issue #233 (form encoding was removing empty arrays)
       var commits = meta.commits || [];
       return {
         first_commit: commits[0],

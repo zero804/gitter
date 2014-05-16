@@ -182,7 +182,7 @@ var userService = {
   },
 
   // setUserLocation: function(userId, location, callback) {
-  //   statsService.event("location_submission", {
+  //   stats.event("location_submission", {
   //     userId: userId
   //   });
 
