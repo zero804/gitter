@@ -725,13 +725,13 @@ OAuthCodeSchema.index({ code: 1 });
 OAuthCodeSchema.schemaTypeName = 'OAuthCodeSchema';
 
 var OAuthAccessTokenSchema= new Schema({
-  token: String,
+  token: { type: String, index: true, unique: true },
   userId: ObjectId,
   clientId: ObjectId,
   expires: Date
 });
-OAuthAccessTokenSchema.index({ token: 1 });
-OAuthAccessTokenSchema.index({ userId: 1, clientId: 1 }, { unique: true, sparse: true }); // TODO: does this still need to be sparse?
+
+OAuthAccessTokenSchema.index({ userId: 1, clientId: 1 }, { sparse: true }); // can't be unique due to mongo fail
 OAuthAccessTokenSchema.schemaTypeName = 'OAuthAccessTokenSchema';
 
 

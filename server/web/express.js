@@ -8,6 +8,7 @@ var express        = require('express');
 var passport       = require('passport');
 var expressHbs     = require('express-hbs');
 var path           = require('path');
+var rememberMe     = require('./middlewares/rememberme-middleware');
 var I18n           = require('i18n-2');
 
 // Naughty naughty naught, install some extra methods on the express prototype
@@ -101,11 +102,21 @@ module.exports = {
         secure: false /*config.get("web:secureCookies")*/ // TODO: fix this!!
       }
     }));
+
     app.use(passport.initialize());
     app.use(passport.session());
+
+    app.use(require('./middlewares/authenticate-bearer'));
+    app.use(rememberMe.rememberMeMiddleware);
+    app.use(require('./middlewares/rate-limiter'));
+
     app.use(require('./middlewares/configure-csrf'));
+    app.use(require('./middlewares/enforce-csrf'));
+
     app.use(require('./middlewares/tokenless-user'));
+
     app.use(app.router);
+
     app.use(require('./middlewares/token-error-handler'));
     app.use(require('./middlewares/express-error-handler'));
   },
