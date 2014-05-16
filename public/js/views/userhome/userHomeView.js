@@ -30,11 +30,10 @@ define([
 
     onRender: function() {
       $('#header-wrapper').hide();
-      this.orgs.show(new OrgCollectionView({ collection: troupeCollections.orgs, emptyView: Marionette.ItemView.extend({ template: userHomeEmptyOrgViewTemplate, serializeData: function() {
-        var viewData = {};
-        viewData.privateRepoScope = !!context.getUser().scopes.private_repo;
-        return viewData;
-      }}) }));
+      this.orgs.show(new OrgCollectionView({
+        collection: troupeCollections.orgs,
+        emptyView: Marionette.ItemView.extend({ template: userHomeEmptyOrgViewTemplate })
+      }));
       this.repos.show(new RepoCollectionView({ collection: reposCollection }));
     },
 
