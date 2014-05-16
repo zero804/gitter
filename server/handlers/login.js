@@ -1,17 +1,18 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var env           = require('../utils/env');
-var stats         = env.stats;
-var logger        = env.logger;
+var env            = require('../utils/env');
+var stats          = env.stats;
+var logger         = env.logger;
 
-var middleware    = require('../web/middleware');
-var passport      = require('passport');
-var client        = require("../utils/redis").getClient();
-var lock          = require("redis-lock")(client);
-var oauth2        = require('../web/oauth2');
-var mixpanel      = require('../web/mixpanelUtils');
+var passport       = require('passport');
+var client         = require("../utils/redis").getClient();
+var lock           = require("redis-lock")(client);
+var oauth2         = require('../web/oauth2');
+var mixpanel       = require('../web/mixpanelUtils');
 var languageSelector = require('../web/language-selector');
+var rememberMe     = require('../web/middlewares/rememberme-middleware');
+var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
 
 module.exports = {
   install: function(app) {
@@ -57,7 +58,7 @@ module.exports = {
 
     app.get(
         '/login/upgrade',
-        middleware.ensureLoggedIn(),
+        ensureLoggedIn,
         function(req, res, next) {
           var scopes = req.query.scopes ? req.query.scopes.split(/\s*,\s*/) : [''];
           scopes.push('user:email');  // Always request user:email scope
@@ -133,8 +134,8 @@ module.exports = {
         });
       },
 
-      middleware.ensureLoggedIn(),
-      middleware.generateRememberMeTokenMiddleware,
+      ensureLoggedIn,
+      rememberMe.generateRememberMeTokenMiddleware,
       function(req, res) {
         if(req.session && req.session.githubScopeUpgrade) {
           delete req.session.githubScopeUpgrade;
