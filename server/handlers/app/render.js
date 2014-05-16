@@ -74,7 +74,6 @@ function renderMainFrame(req, res, next, frame) {
 function renderChatPage(req, res, next) {
   var troupe = req.uriContext.troupe;
   var userId = req.user && req.user.id;
-  console.log('>>>>>>>>>>>>>>>', req.i18n.locale);
   Q.all([
     contextGenerator.generateTroupeContext(req),
     restful.serializeChatsForTroupe(troupe.id, userId, { limit: INITIAL_CHAT_COUNT })
