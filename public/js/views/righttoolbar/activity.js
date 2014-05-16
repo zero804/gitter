@@ -182,7 +182,7 @@ define([
     var extra = decorator ? decorator(meta, payload) : {};
 
     // Support branch names with slashes, ie: develop/feature/123-foo
-    if (payload.ref) {
+    if (payload && payload.ref) {
       var refs = payload.ref.split('/');
       extra.branch_name = refs[3] ? refs[3] : refs[2];
       extra.repo = payload.repository.owner.name + '/' + payload.repository.name;
