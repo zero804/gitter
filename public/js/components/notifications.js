@@ -28,7 +28,7 @@ define([
     var text = message.text;
     var icon = '/images/2/gitter/logo-mark-blue-64.png';
 
-    var notification = new Notification(title, { body: text, tag: link, icon: icon });
+    var notification = new Notification(title, { body: text, icon: icon });
 
     notification.onshow = function() {
       setTimeout(function() {
