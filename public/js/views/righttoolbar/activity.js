@@ -3,6 +3,7 @@ define([
   'underscore',
   'marionette',
   'utils/context',
+  'utils/appevents',
   'views/base',
   'views/chat/decorators/issueDecorator',
   'views/chat/decorators/commitDecorator',
@@ -35,6 +36,7 @@ define([
   _,
   Marionette,
   context,
+  appEvents,
   TroupeViews,
   issueDecorator,
   commitDecorator,
@@ -214,21 +216,27 @@ define([
     },
 
     getRenderData: function() {
-      var meta    = this.model.get('meta');
-      var payload = this.model.get('payload');
-      var sent    = this.model.get('sent');
-      var html    = this.model.get('html');
+      try{
+        var meta    = this.model.get('meta');
+        var payload = this.model.get('payload');
+        var sent    = this.model.get('sent');
+        var html    = this.model.get('html');
 
-      var core = {
-        meta: meta,
-        payload: payload,
-        sent: sent,
-        html: html
-      };
+        var core = {
+          meta: meta,
+          payload: payload,
+          sent: sent,
+          html: html
+        };
 
-      var extra = meta.prerendered ? {} : getExtraRenderData(meta, payload);
-
-      return _.extend(core, extra);
+        var extra = meta.prerendered ? {} : getExtraRenderData(meta, payload);
+        return _.extend(core, extra);
+      } catch(e) {
+        var modelData = this.model && this.model.attributes;
+        appEvents.trigger('bugreport', e, { extra: modelData });
+        log('ERROR rendering activity item:', e.message, e.stack, modelData);
+        return {};
+      }
     },
 
     afterRender: function() {
