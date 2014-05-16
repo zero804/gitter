@@ -46,7 +46,13 @@ module.exports = function(app) {
         logger.error('----------------------------------------------------------------');
         logger.error('-- A BadThing has happened.');
         logger.error('----------------------------------------------------------------');
-        logger.error('Domain exception: ' + err, { message: err.message, name: err.name, userId: userId });
+        logger.error('Domain exception: ' + err, {
+          message: err.message,
+          url: req.url,
+          method: req.method,
+          name: err.name,
+          userId: userId
+        });
 
         if(err.stack) {
           logger.error('' + err.stack);

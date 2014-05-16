@@ -59,11 +59,13 @@ module.exports = function(err, req, res, next) {
    // Send to sentry
    errorReporter (err, { type: 'response', status: status, userId: userId, url: req.url, method: req.method });
    // Send to statsd
-   stats.event('client_error_5xx', { userId: userId });
+   stats.event('client_error_5xx', { userId: userId, url: req.url });
 
-   logger .error("An unexpected error occurred", {
-     path: req.path,
-     message: message
+   logger.error("An unexpected error occurred", {
+      method: req.method,
+      url: req.url,
+      userId: userId,
+      message: message
    });
 
    if(err.stack) {
