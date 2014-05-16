@@ -1,11 +1,12 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 
 define([
+  'jquery-hammer',
   'marionette',
   'views/base',
   'hbs!./tmpl/homeRepoListItem',
   'utils/appevents'
-], function(Marionette, TroupeViews, repoListItemTemplate, appEvents) {
+], function($hammer, Marionette, TroupeViews, repoListItemTemplate, appEvents) {
   "use strict";
 
   var TroupeItemView = TroupeViews.Base.extend({
@@ -13,6 +14,7 @@ define([
     className: 'suggested-room-list-item',
     template: repoListItemTemplate,
     initialize: function() {
+      this.$el = $hammer(this.$el).hammer();
       this.setRerenderOnChange(true);
     },
     getRenderData: function() {
