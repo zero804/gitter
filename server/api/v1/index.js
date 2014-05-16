@@ -10,12 +10,12 @@ module.exports = {
     //     require('./location.js'));
 
     /* APN has no auth requirement as user may not have authenticated */
-    // app.resource(apiRoot + '/v1/apn',
-    //     require('./apn.js'));
+    app.resource(apiRoot + '/v1/apn',
+        require('./apn.js'));
 
-    // app.post(apiRoot + '/v1/userapn',
-    //     auth,
-    //     require('./userapn.js'));
+    app.post(apiRoot + '/v1/userapn',
+        authMiddleware,
+        require('./userapn.js'));
 
     app.post(apiRoot + '/v1/eyeballs',
         authMiddleware,
