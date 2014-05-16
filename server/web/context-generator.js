@@ -155,11 +155,13 @@ function createTroupeContext(req, options) {
   var events = req.session && req.session.events;
   if(events) { req.session.events = []; }
 
+  console.log(req.i18n);
+
   return {
     user: options.user,
     troupe: options.troupe,
     homeUser: options.homeUser,
-    accessToken: req.authInfo && req.authInfo.accessToken || req.session.accessToken,
+    accessToken: req.accessToken,
     appVersion: appVersion.getCurrentVersion(),
     desktopNotifications: options.desktopNotifications,
     events: events,
@@ -167,6 +169,7 @@ function createTroupeContext(req, options) {
     troupeHash: options.troupeHash,
     isNativeDesktopApp: isNativeDesktopApp(req),
     permissions: options.permissions,
-    lang: languageSelector(req)
+    lang: languageSelector(req),
+    locale: req.i18n.locales[req.i18n.locale]
   };
 }

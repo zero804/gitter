@@ -1,18 +1,20 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
+var env               = require('../utils/env');
+var logger            = env.logger;
+var nconf             = env.config;
+var stats             = env.stats;
+
 var faye              = require('faye');
 var fayeRedis         = require('faye-redis');
-var winston           = require('../utils/winston');
 var oauth             = require('../services/oauth-service');
 var troupeService     = require('../services/troupe-service');
 var presenceService   = require('../services/presence-service');
 var restful           = require('../services/restful');
-var nconf             = require('../utils/config');
-var shutdown          = require('../utils/shutdown');
+var shutdown          = require('shutdown');
 var contextGenerator  = require('./context-generator');
 var appVersion        = require('./appVersion');
-var statsService      = require('../services/stats-service');
 var mongoUtils        = require('../utils/mongo-utils');
 var StatusError       = require('statuserror');
 
@@ -60,7 +62,7 @@ function checkTroupeAccess(userId, troupeId, callback) {
       var result = troupeService.userIdHasAccessToTroupe(userId, troupe);
 
       if(!result) {
-        winston.info("Denied user " + userId + " access to troupe " + troupe.uri);
+        logger.info("Denied user " + userId + " access to troupe " + troupe.uri);
         return false;
       }
 
@@ -127,7 +129,7 @@ function populateSubUserCollection(options, callback) {
       return restful.serializeTroupesForUser(userId, callback);
 
     default:
-      winston.error('Unable to provide snapshot for ' + collection);
+      logger.error('Unable to provide snapshot for ' + collection);
   }
 
   callback(null, [ ]);
@@ -151,7 +153,7 @@ function populateSubTroupeCollection(options, callback) {
       return restful.serializeEventsForTroupe(troupeId, userId, callback);
 
     default:
-      winston.error('Unable to provide snapshot for ' + collection);
+      logger.error('Unable to provide snapshot for ' + collection);
   }
 
   callback(null, [ ]);
@@ -207,10 +209,10 @@ function getConnectionType(incoming) {
 var authenticator = {
   incoming: function(message, callback) {
     function deny(errorCode, errorDescription) {
-      statsService.eventHF('bayeux.handshake.deny');
+      stats.eventHF('bayeux.handshake.deny');
 
       message.error = errorCode + '::' + errorDescription;
-      winston.error('Denying client access', message);
+      logger.error('Denying client access', message);
 
       callback(message);
     }
@@ -233,19 +235,19 @@ var authenticator = {
 
     oauth.validateAccessTokenAndClient(ext.token, function(err, tokenInfo) {
       if(err) {
-        winston.error("bayeux: Authentication error: " + err, { exception: err, message: message });
+        logger.error("bayeux: Authentication error: " + err, { exception: err, message: message });
         return deny(500, "A server error occurred.");
       }
 
       if(!tokenInfo) {
-        winston.warn("bayeux: Authentication failed. Invalid access token.", { token: token });
+        logger.warn("bayeux: Authentication failed. Invalid access token.", { token: token });
         return deny(401, "Invalid access token");
       }
 
       var user = tokenInfo.user;
       var oauthClient = tokenInfo.client;
       var userId = user && user.id;
-      winston.verbose('bayeux: handshake', { username: user && user.username, client: oauthClient.name });
+      logger.verbose('bayeux: handshake', { username: user && user.username, client: oauthClient.name });
 
       var connectionType = getConnectionType(ext.connType);
       var client = ext.client || '';
@@ -301,12 +303,12 @@ var authenticator = {
       return callback(message);
     }
 
-    winston.info("bayeux: connection " + clientId + ' is associated to ' + userId, { troupeId: troupeId, client: client });
+    logger.info("bayeux: connection " + clientId + ' is associated to ' + userId, { troupeId: troupeId, client: client });
 
     // Get the presence service involved around about now
     presenceService.userSocketConnected(userId, clientId, connectionType, client, troupeId, eyeballState, function(err) {
 
-      if(err) winston.error("bayeux: Presence service failed to record socket connection: " + err, { exception: err });
+      if(err) logger.error("bayeux: Presence service failed to record socket connection: " + err, { exception: err });
 
       message.ext.userId = userId;
 
@@ -317,7 +319,7 @@ var authenticator = {
       // If the troupeId was included, it means we've got a native
       // client and they'll be looking for a snapshot:
       contextGenerator.generateSocketContext(userId, troupeId, function(err, context) {
-        if(err) winston.error("bayeux: Unable to generate context: " + err, { exception: err });
+        if(err) logger.error("bayeux: Unable to generate context: " + err, { exception: err });
 
         message.ext.context = context;
 
@@ -337,7 +339,7 @@ function destroyClient(clientId) {
   process.nextTick(function() {
     var engine = server._server._engine;
     engine.destroyClient(clientId, function() {
-      winston.info('bayeux: client ' + clientId + ' intentionally destroyed.');
+      logger.info('bayeux: client ' + clientId + ' intentionally destroyed.');
     });
 
   });
@@ -360,7 +362,7 @@ var authorisor = {
     }
 
     function deny(errorCode) {
-      statsService.eventHF('bayeux.subscribe.deny');
+      stats.eventHF('bayeux.subscribe.deny');
       var errorDescription;
       switch(errorCode) {
         case 401: errorDescription = 'Access denied'; break;
@@ -371,7 +373,7 @@ var authorisor = {
       }
 
       message.error = errorCode + '::' + errorDescription;
-      winston.error('Socket authorisation failed. Denying subscribe.', message);
+      logger.error('Socket authorisation failed. Denying subscribe.', message);
 
       callback(message);
     }
@@ -382,12 +384,12 @@ var authorisor = {
       if(err) {
         var status = err.status || 500;
 
-        winston.error("bayeux: Authorisation error", { exception: err, message: message });
+        logger.error("bayeux: Authorisation error", { exception: err, message: message });
         return deny(status, "A server error occurred.");
       }
 
       if(!allowed) {
-        winston.warn("bayeux: Authorisation failed", { message: message });
+        logger.warn("bayeux: Authorisation failed", { message: message });
         return deny(403, "Authorisation denied.");
       }
 
@@ -435,7 +437,7 @@ var authorisor = {
     if(clientId && populator && snapshot) {
       presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
         if(err) {
-          winston.error('Error for lookupUserIdForSocket', { exception: err });
+          logger.error('Error for lookupUserIdForSocket', { exception: err });
           return callback(message);
         }
 
@@ -470,7 +472,7 @@ var authorisor = {
       if(err) return callback(err);
 
       // if(!userId) {
-      //   winston.warn('bayeux: client not authenticated.', { clientId: clientId });
+      //   logger.warn('bayeux: client not authenticated.', { clientId: clientId });
       //   return callback(new StatusError(401, 'Cannot authorise. Client not authenticated'));
       // }
 
@@ -528,7 +530,7 @@ var pingResponder = {
     }
 
     function deny(errorCode, errorDescription) {
-      statsService.eventHF('bayeux.ping.deny');
+      stats.eventHF('bayeux.ping.deny');
 
       var referer = req && req.headers && req.headers.referer;
       var origin = req && req.headers && req.headers.origin;
@@ -536,7 +538,7 @@ var pingResponder = {
       var reason = message.data && message.data.reason;
 
       message.error = errorCode + '::' + errorDescription;
-      winston.error('Denying ping access: ' + errorDescription, {
+      logger.error('Denying ping access: ' + errorDescription, {
         errorCode: errorCode,
         clientId: clientId,
         referer: referer,
@@ -560,7 +562,7 @@ var pingResponder = {
 
       presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
         if(err) {
-          winston.error("presenceService.lookupUserIdForSocket failed: " + err, { exception: err });
+          logger.error("presenceService.lookupUserIdForSocket failed: " + err, { exception: err });
           return deny(500, "A server error occurred.");
         }
 
@@ -601,28 +603,28 @@ var logging = {
   incoming: function(message, req, callback) {
     switch(message.channel) {
       case '/meta/handshake':
-        statsService.eventHF('bayeux.handshake');
+        stats.eventHF('bayeux.handshake');
 
         /* Rate is for the last full 10s period */
         var connType = message.ext && message.ext.connType;
         var handshakeRate = message.ext && message.ext.rate;
-        winston.verbose("bayeux: " + message.channel , { ip: getClientIp(req), connType: connType, rate: handshakeRate });
+        logger.verbose("bayeux: " + message.channel , { ip: getClientIp(req), connType: connType, rate: handshakeRate });
         break;
 
       case '/meta/connect':
-        statsService.eventHF('bayeux.connect');
+        stats.eventHF('bayeux.connect');
 
         /* Rate is for the last full 10s period */
         var connectRate = message.ext && message.ext.rate;
         if(connectRate && connectRate > 1) {
-          winston.verbose("bayeux: connect" , { ip: getClientIp(req), clientId: message.clientId, rate: connectRate });
+          logger.verbose("bayeux: connect" , { ip: getClientIp(req), clientId: message.clientId, rate: connectRate });
         }
         break;
 
       case '/meta/subscribe':
-        statsService.eventHF('bayeux.subscribe');
+        stats.eventHF('bayeux.subscribe');
 
-        winston.verbose("bayeux: subscribe", { clientId: message.clientId, subs: message.subscription });
+        logger.verbose("bayeux: subscribe", { clientId: message.clientId, subs: message.subscription });
         break;
     }
 
@@ -633,7 +635,7 @@ var logging = {
     if(message.channel === '/meta/handshake' ) {
       var ip = getClientIp(req);
       var clientId = message.clientId;
-      winston.verbose("bayeux: handshake complete", { ip: ip, clientId: clientId });
+      logger.verbose("bayeux: handshake complete", { ip: ip, clientId: clientId });
     }
     callback(message);
   }
@@ -651,7 +653,7 @@ var adviseAdjuster = {
         var reconnect;
 
         if(message.clientId) {
-          winston.info('Destroying client');
+          logger.info('Destroying client');
           // We've told the person to go away, destroy their faye client
           destroyClient(message.clientId);
         }
@@ -670,7 +672,7 @@ var adviseAdjuster = {
         };
       }
 
-      winston.info('Bayeux error', message);
+      logger.info('Bayeux error', message);
     } else {
       if(message.channel === '/meta/handshake') {
         // * Already know there is no error. Reset the advice
@@ -698,9 +700,8 @@ var server = new faye.NodeAdapter({
   retry: nconf.get('ws:fayeRetry'),
   engine: {
     type: fayeRedis,
-    host: nconf.get("redis:host"),
-    port: nconf.get("redis:port"),
-    database: nconf.get("redis:redisDb"),
+    client: env.redis.getClient(),
+    subscriberClient: env.redis.createClient(),
     interval: nconf.get('ws:fayeInterval'),
     namespace: 'fr:'
   }
@@ -710,14 +711,14 @@ var client = server.getClient();
 
 faye.stringify = function(object) {
   var string = JSON.stringify(object);
-  statsService.gaugeHF('bayeux.message.size', string.length);
+  stats.gaugeHF('bayeux.message.size', string.length);
   return string;
 };
 
 faye.logger = {};
 ['fatal', 'error', 'warn'].forEach(function(level) {
   faye.logger[level] = function(message) {
-    winston[level]('faye: ' + message);
+    logger[level]('faye: ' + message);
   };
 });
 
@@ -743,7 +744,7 @@ module.exports = {
     /** Some logging */
     ['handshake', 'disconnect'].forEach(function(event) {
       server.bind(event, function(clientId) {
-        winston.info("Client " + clientId + ": " + event);
+        logger.info("Client " + clientId + ": " + event);
       });
     });
 
@@ -751,9 +752,9 @@ module.exports = {
       // Warning, this event is called simulateously on
       // all the servers that are connected to the same redis/faye
       // connection
-      winston.info("Client " + clientId + " disconnected");
+      logger.info("Client " + clientId + " disconnected");
       presenceService.socketDisconnected(clientId, function(err) {
-        if(err && err !== 404) { winston.error("bayeux: Error while attempting disconnection of socket " + clientId + ": " + err,  { exception: err }); }
+        if(err && err !== 404) { logger.error("bayeux: Error while attempting disconnection of socket " + clientId + ": " + err,  { exception: err }); }
       });
     });
 

@@ -1,21 +1,28 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var env = require('../utils/env');
+var stats = env.stats;
+var nconf = env.config;
+var logger = env.logger;
+
+var redisClient = env.redis.getClient();
+
 var persistenceService = require("./persistence-service");
-var statsService = require("./stats-service");
-var nconf = require('../utils/config');
 var random = require('../utils/random');
 var Q = require('q');
 var userService = require('./user-service');
-var winston = require('../utils/winston');
 var moment = require('moment');
 
 var WEB_INTERNAL_CLIENT_KEY = 'web-internal';
 var webInternalClientId = null;
 
+var cacheTimeout = 60; /* 60 seconds */
+
 /* Load webInternalClientId once at startup */
 persistenceService.OAuthClient.findOne({ clientKey: WEB_INTERNAL_CLIENT_KEY }, function(err, oauthClient) {
-  if(err) throw new Error("Unable to load internal client id");
+  if(err) throw new Error("Unable to load internal clientKey " + WEB_INTERNAL_CLIENT_KEY + ": " + err);
+
   if(!oauthClient) throw new Error("Unable to load internal client id. Have you loaded it into mongo?");
 
   webInternalClientId = oauthClient._id;
@@ -24,12 +31,63 @@ persistenceService.OAuthClient.findOne({ clientKey: WEB_INTERNAL_CLIENT_KEY }, f
 var ircClientId;
 
 persistenceService.OAuthClient.findOne({ clientKey: nconf.get('irc:clientKey') }, function(err, oauthClient) {
-  if(err) throw new Error("Unable to load internal client id");
+  if(err) throw new Error("Unable to load internal clientKey " + nconf.get('irc:clientKey') + ": " + err);
+
   if(!oauthClient) throw new Error("Unable to load internal client id. Have you loaded it into mongo?");
 
   ircClientId = oauthClient._id;
 });
 
+
+
+var tokenLookupCachePrefix = "token:c:";
+var tokenLookupCache = {
+  get: function(userId, clientId) {
+    var d = Q.defer();
+    redisClient.get(tokenLookupCachePrefix + userId + ':' + clientId, d.makeNodeResolver());
+    return d.promise.catch(function(err) {
+      logger.warn('Unable to lookup token in cache ' + err, { exception: err });
+    });
+  },
+
+  set: function(userId, clientId, token) {
+    var d = Q.defer();
+    redisClient.setex(tokenLookupCachePrefix + userId + ':' + clientId, cacheTimeout, token, d.makeNodeResolver());
+    return d.promise.catch(function(err) {
+      logger.warn('Unable to set token lookup in cache ' + err, { exception: err });
+    });
+  }
+};
+
+var tokenValidationCachePrefix = "token:t:";
+var tokenValidationCache = {
+  get: function(token) {
+    var d = Q.defer();
+    redisClient.get(tokenValidationCachePrefix + token, d.makeNodeResolver());
+    return d.promise
+      .then(function(value) {
+        if(!value) return;
+        var parts = ("" + value).split(':');
+
+        return { userId: parts[0] || null, clientId: parts[1] };
+      })
+      .catch(function(err) {
+        logger.warn('Unable to lookup token in cache ' + err, { exception: err });
+      });
+  },
+
+  set: function(token, userId, clientId) {
+    /* NB: userId can be null! */
+    if(!userId) userId = '';
+
+    var d = Q.defer();
+    var value = userId + ":" + clientId;
+    redisClient.setex(tokenValidationCachePrefix + token, cacheTimeout, value, d.makeNodeResolver());
+    return d.promise.catch(function(err) {
+      logger.warn('Unable to set token lookup in cache ' + err, { exception: err });
+    });
+  }
+};
 
 
 
@@ -42,7 +100,7 @@ exports.saveAuthorizationCode = function(code, client, redirectUri, user, callba
 
   var properties = {};
   properties['Last login from ' + client.tag] = new Date();
-  statsService.userUpdate(user, properties);
+  stats.userUpdate(user, properties);
 
   var authCode = new persistenceService.OAuthCode({
       code: code,
@@ -57,11 +115,6 @@ exports.findAuthorizationCode = function(code, callback) {
   persistenceService.OAuthCode.findOne({ code: code }, callback);
 };
 
-exports.findAccessToken = function(token, callback) {
-  persistenceService.OAuthAccessToken.findOne({ token: token }, callback);
-};
-
-
 /**
  * Turn a token into a user/token/client.
  *
@@ -69,36 +122,55 @@ exports.findAccessToken = function(token, callback) {
  * user is null;
  */
 exports.validateAccessTokenAndClient = function(token, callback) {
-  winston.verbose('Validating token');
-  return persistenceService.OAuthAccessToken.findOneQ({ token: token })
+  return tokenValidationCache.get(token)
+    .then(function(cachedInfo) {
+      if(cachedInfo) {
+        return cachedInfo;
+      }
+
+      return persistenceService.OAuthAccessToken.findOneQ({ token: token })
+        .then(function(accessToken) {
+          if(!accessToken) return;
+
+          /* Cache this result */
+          return tokenValidationCache.set(token, accessToken.userId, accessToken.clientId)
+            .thenResolve(accessToken);
+        });
+    })
     .then(function(accessToken) {
       if(!accessToken) {
-        winston.warn('Invalid token presented: ', { token: token });
+        logger.warn('Invalid token presented: ', { token: token });
         return null;
       }
 
       var clientId = accessToken.clientId;
       if(!clientId) {
-        winston.warn('Invalid token presented (no client): ', { token: token });
-
+        logger.warn('Invalid token presented (no client): ', { token: token });
         return null; // code invalid
       }
 
-      var userId = accessToken.userId;   // userId can be null
+      var userId = accessToken.userId;   // userId CAN be null
 
-      // TODO: check for expired tokens
+      // TODO: check for expired tokens!!
+
       return Q.all([
           persistenceService.OAuthClient.findByIdQ(clientId),
           userId && userService.findById(userId)
         ])
         .spread(function(client, user) {
           if(!client) {
-            winston.warn('Invalid token presented (client not found): ', { token: token });
+            logger.warn('Invalid token presented (client not found): ', { token: token });
             return null;
           }
 
-          return { user: user, client: client, accessToken: accessToken };
+          if(userId && !user) {
+           logger.warn('Invalid token presented (user not found): ', { token: token });
+           return null;
+          }
+
+          return { user: user, client: client };
         });
+
     })
     .nodeify(callback);
 };
@@ -124,30 +196,56 @@ exports.findClientByClientKey = function(clientKey, callback) {
   persistenceService.OAuthClient.findOne({ clientKey: clientKey }, callback);
 };
 
-// TODO: move some of this functionality into redis for speed
-// TODO: make the web tokens expire
-exports.findOrGenerateWebToken = function(userId, callback) {
-  return Q.fcall(function() {
-    if(!userId) throw new Error('userId required');
+function findOrCreateToken(userId, clientId, callback) {
+  if(!userId) return Q.reject('userId required').nodeify(callback);
 
-    return persistenceService.OAuthAccessToken.findOneQ({ userId: userId, clientId: webInternalClientId })
-      .then(function(oauthAccessToken) {
-        if(oauthAccessToken) return oauthAccessToken.token;
+  return tokenLookupCache.get(userId, clientId)
+    .then(function(token) {
+      /* Cached okay? */
+      if(token) return token;
 
-        return random.generateToken()
-          .then(function(token) {
-            return persistenceService.OAuthAccessToken.createQ({ token: token, userId: userId, clientId: webInternalClientId })
-              .then(function() {
-                return token;
+      /* Lookup and possible create */
+      return persistenceService.OAuthAccessToken.findOneQ({
+          userId: userId,
+          clientId: webInternalClientId
+        }).then(function(oauthAccessToken) {
+          if(oauthAccessToken) {
+            return tokenLookupCache.set(userId, clientId, oauthAccessToken.token)
+              .thenResolve(oauthAccessToken.token);
+          }
+
+          return random.generateToken()
+            .then(function(token) {
+              return persistenceService.OAuthAccessToken.findOneAndUpdateQ(
+                { userId: userId, clientId: webInternalClientId },
+                {
+                  $setOnInsert: {
+                    token: token
+                  }
+                },
+                {
+                  upsert: true
+                }).then(function(result) {
+                  return tokenLookupCache.set(userId, clientId, result.token)
+                    .thenResolve(result.token);
+                });
               });
-          });
-      });
+            });
+
     })
     .nodeify(callback);
 
+
+
+}
+
+// TODO: move some of this functionality into redis for speed
+// TODO: make the web tokens expire
+exports.findOrGenerateWebToken = function(userId, callback) {
+  return findOrCreateToken(userId, webInternalClientId, callback);
 };
 
-exports.findOrGenerateAnonWebToken = function(callback) {
+exports.generateAnonWebToken = function(callback) {
   return random.generateToken()
     .then(function(token) {
       return persistenceService.OAuthAccessToken.createQ({
@@ -163,18 +261,5 @@ exports.findOrGenerateAnonWebToken = function(callback) {
 };
 
 exports.findOrGenerateIRCToken = function(userId, callback) {
-  return persistenceService.OAuthAccessToken.findOneQ({ userId: userId, clientId: ircClientId })
-      .then(function(oauthAccessToken) {
-        if(oauthAccessToken) return oauthAccessToken.token;
-
-        return random.generateToken()
-          .then(function(token) {
-            return persistenceService.OAuthAccessToken.createQ({ token: token, userId: userId, clientId: ircClientId })
-              .then(function() {
-                return token;
-              });
-            });
-      })
-      .nodeify(callback);
-
+  return findOrCreateToken(userId, ircClientId, callback);
 };

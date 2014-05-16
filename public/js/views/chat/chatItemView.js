@@ -212,10 +212,15 @@ define([
       }
     },
 
+    focusInput: function() {
+      $("#chat-input-textarea").focus();
+    },
+
     detectEscape: function(e) {
       if (e.keyCode === 27) {
         // found escape, cancel edit
         this.toggleEdit();
+        this.focusInput();
       }
     },
 
@@ -226,7 +231,7 @@ define([
           this.model.set('html', null);
           this.model.save();
         }
-
+        this.focusInput();
         this.toggleEdit();
       }
     },
@@ -288,10 +293,12 @@ define([
       chatInputText.html("<textarea class='trpChatInput'></textarea>");
 
       var unsafeText = this.model.get('text');
+
       var textarea = chatInputText.find('textarea').val(unsafeText);
 
       setTimeout(function() {
-        textarea.select();
+        textarea.focus();
+        textarea.val("").val(unsafeText);
       }, 10);
 
       this.inputBox = new chatInputView.ChatInputBoxView({ el: textarea, editMode: true });

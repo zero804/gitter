@@ -1,6 +1,11 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var env                      = require('../../utils/env');
+var logger                   = env.logger;
+var config                    = env.config;
+var stats                    = env.stats;
+
 var _                        = require("underscore");
 var troupeService            = require("../troupe-service");
 var userService              = require("../user-service");
@@ -9,20 +14,16 @@ var serializer               = require('../../serializers/notification-serialize
 var moment                   = require('moment');
 var Q                        = require('q');
 var collections              = require('../../utils/collections');
-var nconf                    = require('../../utils/config');
 var emailNotificationService = require('../email-notification-service');
 var userSettingsService      = require('../user-settings-service');
 var userTroupeSettingsService = require('../user-troupe-settings-service');
-var winston                  = require('../../utils/winston');
-var nconf                    = require('../../utils/config');
-var statsService             = require('../stats-service');
 
-var filterTestValues = nconf.get('notifications:filterTestValues');
+var filterTestValues = config.get('notifications:filterTestValues');
 
 
 
-var timeBeforeNextEmailNotificationS = nconf.get('notifications:timeBeforeNextEmailNotificationMins') * 60;
-var emailNotificationsAfterMins = nconf.get('notifications:emailNotificationsAfterMins');
+var timeBeforeNextEmailNotificationS = config.get('notifications:timeBeforeNextEmailNotificationMins') * 60;
+var emailNotificationsAfterMins = config.get('notifications:emailNotificationsAfterMins');
 
 function isTestId(id) {
   return id.indexOf('USER') === 0 || id.indexOf('TROUPE') === 0;
@@ -62,7 +63,7 @@ function sendEmailNotifications(since) {
        * Filter out all users who've opted out of notification emails
        */
       var userIds = Object.keys(userTroupeUnreadHash);
-      winston.verbose('email-notify: Initial user count: ' + userIds.length);
+      logger.verbose('email-notify: Initial user count: ' + userIds.length);
       if(!userIds.length) return {};
 
       return userSettingsService.getMultiUserSettings(userIds, 'unread_notifications_optout').
@@ -72,7 +73,7 @@ function sendEmailNotifications(since) {
             // If unread_notifications_optout is truish, the
             // user has opted out
             if(settings[userId]) {
-              winston.verbose('User ' + userId + ' has opted out of unread_notifications, removing from results');
+              logger.verbose('User ' + userId + ' has opted out of unread_notifications, removing from results');
               delete userTroupeUnreadHash[userId];
             }
           });
@@ -89,7 +90,7 @@ function sendEmailNotifications(since) {
 
       if(!userIds.length) return {};
 
-      winston.verbose('email-notify: After removing opt-out users: ' + userIds.length);
+      logger.verbose('email-notify: After removing opt-out users: ' + userIds.length);
 
       userIds.forEach(function(userId) {
           var troupeIds = Object.keys(userTroupeUnreadHash[userId]);
@@ -108,7 +109,7 @@ function sendEmailNotifications(since) {
                 var setting = ns && ns.push;
 
                 if(setting && setting !== 'all') {
-                  winston.verbose('User ' + userId + ' has disabled notifications for this troupe');
+                  logger.verbose('User ' + userId + ' has disabled notifications for this troupe');
                   delete userTroupeUnreadHash[userId][troupeId];
 
                   if(Object.keys(userTroupeUnreadHash[userId]).length === 0) {
@@ -128,7 +129,7 @@ function sendEmailNotifications(since) {
       var userIds = Object.keys(userTroupeUnreadHash);
       if(!userIds.length) return [userIds, [], [], {}];
 
-      winston.verbose('email-notify: After removing room non-notify users: ' + userIds.length);
+      logger.verbose('email-notify: After removing room non-notify users: ' + userIds.length);
 
       var troupeIds = _.flatten(Object.keys(userTroupeUnreadHash).map(function(userId) {
         return Object.keys(userTroupeUnreadHash[userId]);
@@ -152,7 +153,7 @@ function sendEmailNotifications(since) {
 
       userIds = users.map(function(user) { return user.id; });
 
-      winston.verbose('email-notify: After removing users without the correct token: ' + userIds.length);
+      logger.verbose('email-notify: After removing users without the correct token: ' + userIds.length);
 
       return [userIds, users, allTroupes, userTroupeUnreadHash];
     })
@@ -192,7 +193,7 @@ function sendEmailNotifications(since) {
               return emailNotificationService.sendUnreadItemsNotification(user, troupeData)
                 .fail(function(err) {
                   if(err.gitterAction === 'logout_destroy_user_tokens') {
-                    statsService.event('logout_destroy_user_tokens', { userId: user.id });
+                    stats.event('logout_destroy_user_tokens', { userId: user.id });
 
                     user.destroyTokens();
                     return user.saveQ();
@@ -203,7 +204,7 @@ function sendEmailNotifications(since) {
         }))
         .then(function() {
           var time = Date.now() - start;
-          winston.info("Sent unread notification emails to " + count + " users in " + time + "ms");
+          logger.info("Sent unread notification emails to " + count + " users in " + time + "ms");
         });
     });
 }

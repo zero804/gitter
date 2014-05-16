@@ -4,7 +4,7 @@
 
 var appEvents = require('../../server/app-events');
 var userService = require('../../server/services/user-service');
-var shutdown = require('../../server/utils/shutdown');
+var shutdown = require('shutdown');
 
 var winston = require('../../server/utils/winston');
 

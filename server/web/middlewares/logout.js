@@ -2,7 +2,7 @@
 "use strict";
 
 var nconf       = require('../../utils/config');
-var rememberMe  = require('../rememberme-middleware');
+var rememberMe  = require('./rememberme-middleware');
 var winston     = require('../../utils/winston');
 
 var authCookieName = nconf.get('web:cookiePrefix') + 'auth';
