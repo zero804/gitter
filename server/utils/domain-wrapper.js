@@ -58,7 +58,7 @@ module.exports = function(app) {
           logger.error('' + err.stack);
         }
 
-        logger.error('Domain exception' + err + ' forcing shutdown');
+        logger.error('Domain exception: ' + err + ' forcing shutdown');
       } catch(e) {
         /* This might seem strange, but sometime just logging the error will crash your process a second time */
         try {
