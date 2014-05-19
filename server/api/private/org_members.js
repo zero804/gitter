@@ -28,7 +28,7 @@ module.exports = function(req, res, next) {
       });
 
     } else {
-      res.send([]);
+      res.send(401);
     }
   
   }).fail(function(err) {
