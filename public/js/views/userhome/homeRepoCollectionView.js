@@ -5,8 +5,9 @@ define([
   'marionette',
   'views/base',
   'hbs!./tmpl/homeRepoListItem',
-  'utils/appevents'
-], function($hammer, Marionette, TroupeViews, repoListItemTemplate, appEvents) {
+  'utils/appevents',
+  'utils/is-mobile'
+], function($hammer, Marionette, TroupeViews, repoListItemTemplate, appEvents, isMobile) {
   "use strict";
 
   var TroupeItemView = TroupeViews.Base.extend({
@@ -21,11 +22,7 @@ define([
       return this.model.toJSON();
     },
     events: function() {
-      if('ontouchstart' in document.documentElement) {
-        return { tap: 'navigate' };
-      } else {
-        return { click: 'navigate' };
-      }
+      return isMobile() ? { tap: 'navigate' } : { click: 'navigate' };
     },
     navigate: function() {
       var url = '/' + this.model.get('uri');
