@@ -155,8 +155,6 @@ function createTroupeContext(req, options) {
   var events = req.session && req.session.events;
   if(events) { req.session.events = []; }
 
-  console.log(req.i18n);
-
   return {
     user: options.user,
     troupe: options.troupe,
