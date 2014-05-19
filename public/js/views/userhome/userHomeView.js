@@ -8,8 +8,9 @@ define([
   'hbs!./tmpl/userHomeEmptyOrgView',
   './homeOrgCollectionView',
   './homeRepoCollectionView',
-  'collections/repos'
-], function($, Marionette, context, troupeCollections, userHomeTemplate, userHomeEmptyOrgViewTemplate, OrgCollectionView, RepoCollectionView, repoModels) {
+  'collections/repos',
+  'utils/is-mobile'
+], function($, Marionette, context, troupeCollections, userHomeTemplate, userHomeEmptyOrgViewTemplate, OrgCollectionView, RepoCollectionView, repoModels, isMobile) {
   "use strict";
 
   var reposCollection = new repoModels.ReposCollection();
@@ -39,11 +40,10 @@ define([
 
     serializeData: function() {
       var user = context.getUser();
-      var isMobile = !!('ontouchstart' in document.documentElement);
       var hasPrivateRepoScope = !!user.scopes.private_repo;
 
       return {
-        showUpgradeAuthLink: !isMobile && !hasPrivateRepoScope
+        showUpgradeAuthLink: !isMobile() && !hasPrivateRepoScope
       };
     },
 
