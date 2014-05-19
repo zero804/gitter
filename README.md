@@ -1,5 +1,5 @@
 Gitter Webapp
-=================
+=============
 
 Copyright Troupe Technology Limited 2012 - 2014
 All rights reserved.
