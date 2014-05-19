@@ -60,5 +60,10 @@ module.exports = {
         authMiddleware,
         require('./org_owners.js'));
 
+    app.get(apiRoot + '/private/orgs/:orgUri/members',
+        authMiddleware,
+        require('./org_members.js'));
+
+
   }
 };
