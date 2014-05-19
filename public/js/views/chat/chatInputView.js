@@ -17,7 +17,6 @@ define([
   './commands',
   'bootstrap_tooltip', // No ref
   'jquery-textcomplete', // No ref
-  'jquery-hammer', // No ref
   'utils/sisyphus-cleaner' // No ref
 ], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate,
   emojiListItemTemplate, moment, hasScrollBars, itemCollections, emoji, drafty, cdn, commands) {
@@ -390,15 +389,12 @@ define([
     events: {
       "keydown":  "onKeyDown",
       "keyup":    "onKeyUp",
-      "focusout": "onFocusOut",
-      "tap": "onTap"
+      "focusout": "onFocusOut"
     },
 
     // pass in the textarea as el for ChatInputBoxView
     // pass in a scroll delegate
     initialize: function(options) {
-
-      this.$el = $(this.$el).hammer();
 
       if(hasScrollBars()) {
         this.$el.addClass("scroller");
@@ -422,10 +418,6 @@ define([
       this.chatCollectionView = options.chatCollectionView;
       this.composeMode = options.composeMode;
       this.chatResizer.resizeInput();
-    },
-
-    onTap: function() {
-      this.$el.focus();
     },
 
     onFocusOut: function() {
