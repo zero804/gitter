@@ -128,16 +128,16 @@ module.exports = function( grunt ) {
                     "views/widgets/timeago"
                   ],
                   exclude: ["core-libraries"]
-              },/*
+              },
               {
-                  name: "homepage-mobile",
+                  name: "mobile-native-userhome",
                   include: [
                     "utils/tracking",
                     "views/widgets/avatar",
                     "views/widgets/timeago"
                   ],
                   exclude: ["core-libraries"]
-              },*/
+              },
               {
                   name: "mobile-native-router",
                   include: [
@@ -294,7 +294,7 @@ module.exports = function( grunt ) {
       'router-archive-home': createClosureConfig('router-archive-home'),
       'router-archive-chat': createClosureConfig('router-archive-chat'),
       'userhome': createClosureConfig('userhome'),
-//      "homepage-mobile" : createClosureConfig('homepage-mobile'),
+      "mobile-native-userhome" : createClosureConfig('mobile-native-userhome'),
       "mobile-native-router": createClosureConfig('mobile-native-router'),
       "mobile-native-chat": createClosureConfig('mobile-native-chat'),
       "mobile-app": createClosureConfig('mobile-app'),
