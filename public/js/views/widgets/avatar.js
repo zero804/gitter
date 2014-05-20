@@ -4,12 +4,11 @@ define([
   'backbone',
   'underscore',
   'utils/context',
-  'utils/safe-html',
   'views/base',
   'hbs!./tmpl/avatar',
   'views/people/userPopoverView',
   'bootstrap_tooltip',                // No ref
-], function($, Backbone, _, context, safeHtml, TroupeViews, template, UserPopoverView) {
+], function($, Backbone, _, context, TroupeViews, template, UserPopoverView) {
 
   "use strict";
 
@@ -103,7 +102,7 @@ define([
 
     updateTooltip: function(data) {
       if(this.showTooltip) {
-        this.$el.find('.trpDisplayPicture').attr('data-original-title', safeHtml(data.tooltip));
+        this.$el.find('.trpDisplayPicture').attr('data-original-title', data.tooltip);
       }
     },
 
@@ -157,7 +156,7 @@ define([
 
       if (this.showTooltip && !window._troupeCompactView && (this.model ? this.model.get('displayName') : this.user.displayName)) {
         this.$el.find(':first-child').tooltip({
-          html : true,
+          html : false,
           placement : this.tooltipPlacement,
           container: "body"
         });
