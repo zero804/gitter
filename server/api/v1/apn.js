@@ -12,11 +12,6 @@ module.exports = function(req, res, next) {
   var appVersion = req.body.version || null;
   var appBuild = req.body.build || null;
 
-  // Backwards compatiblity, remove later
-  if(!deviceType) {
-    deviceType = 'APPLE-DEV';
-  }
-
   winston.info("APN device registration", { deviceId: deviceId, deviceName: deviceName, deviceType: deviceType });
   pushNotificationService.registerDevice(deviceId, deviceType, deviceToken, deviceName, appVersion, appBuild, function(err) {
     if(err) return next(err);
