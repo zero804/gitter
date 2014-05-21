@@ -2,7 +2,7 @@
 define([], function() {
   "use strict";
 
-  /* THIS IS FOR AN EMERGENCY FIX ONLY */
+  /* THIS IS FOR AN EMERGENCY FIX ONLY. Use hbs double brackets instead {{}} */
 
   /* @const */
   var HTML_ENTITIES = {
