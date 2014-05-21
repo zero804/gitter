@@ -8,6 +8,8 @@ var express        = require('express');
 var passport       = require('passport');
 var expressHbs     = require('express-hbs');
 var path           = require('path');
+var rememberMe     = require('./middlewares/rememberme-middleware');
+var I18n           = require('i18n-2');
 
 // Naughty naughty naught, install some extra methods on the express prototype
 require('./http');
@@ -39,6 +41,7 @@ module.exports = {
       contentHelperName: 'content'
     }));
 
+    app.disable('x-powered-by');
     app.set('view engine', 'hbs');
     app.set('views', staticContentDir + '/templates');
     app.set('trust proxy', true);
@@ -75,6 +78,19 @@ module.exports = {
       next();
     });
 
+    I18n.expressBind(app, {
+      locales: ['en', 'fr', 'ja', 'de', 'ru', 'es', 'zh', 'pt', 'it', 'nl', 'sv', 'cs', 'pl', 'da', 'ko'],
+      devMode: config.runtimeEnvironment === 'dev',
+      directory: path.join(__dirname, '..', '..', 'locales')
+    });
+
+    app.use(function(req, res, next) {
+      if(req.i18n && req.i18n.prefLocale) {
+        req.i18n.setLocale(req.i18n.prefLocale);
+      }
+      next();
+    });
+
     app.use(express.session({
       secret: config.get('web:sessionSecret'),
       key: config.get('web:cookiePrefix') + 'session',
@@ -87,16 +103,27 @@ module.exports = {
         secure: false /*config.get("web:secureCookies")*/ // TODO: fix this!!
       }
     }));
+
     app.use(passport.initialize());
     app.use(passport.session());
+
+    app.use(require('./middlewares/authenticate-bearer'));
+    app.use(rememberMe.rememberMeMiddleware);
+    app.use(require('./middlewares/rate-limiter'));
+
     app.use(require('./middlewares/configure-csrf'));
+    app.use(require('./middlewares/enforce-csrf'));
+
     app.use(require('./middlewares/tokenless-user'));
+
     app.use(app.router);
+
     app.use(require('./middlewares/token-error-handler'));
     app.use(require('./middlewares/express-error-handler'));
   },
 
   installApi: function(app) {
+    app.disable('x-powered-by');
     app.set('trust proxy', true);
 
     app.use(env.middlewares.accessLogger);
@@ -115,6 +142,7 @@ module.exports = {
   },
 
   installSocket: function(app) {
+    app.disable('x-powered-by');
     app.set('trust proxy', true);
     app.use(env.middlewares.accessLogger);
     app.use(express.cookieParser());
