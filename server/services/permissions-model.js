@@ -329,7 +329,7 @@ function userChannelPermissionsModel(user, right, uri, security) {
  */
 function permissionsModel(user, right, uri, roomType, security) {
   function log(x) {
-    winston.verbose('Permission', { user: user && user.username, uri: uri, roomType: roomType, granted: x, right: right });
+    //winston.verbose('Permission', { user: user && user.username, uri: uri, roomType: roomType, granted: x, right: right });
     return x;
   }
 
