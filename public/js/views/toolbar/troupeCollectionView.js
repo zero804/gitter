@@ -30,7 +30,7 @@ define([
       }
     }
 
-    return parts.slice(-1);
+    return parts.pop();
   }
 
   var TroupeItemView = Marionette.ItemView.extend({
