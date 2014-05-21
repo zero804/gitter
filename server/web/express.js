@@ -41,6 +41,7 @@ module.exports = {
       contentHelperName: 'content'
     }));
 
+    app.disable('x-powered-by');
     app.set('view engine', 'hbs');
     app.set('views', staticContentDir + '/templates');
     app.set('trust proxy', true);
@@ -122,6 +123,7 @@ module.exports = {
   },
 
   installApi: function(app) {
+    app.disable('x-powered-by');
     app.set('trust proxy', true);
 
     app.use(env.middlewares.accessLogger);
@@ -140,6 +142,7 @@ module.exports = {
   },
 
   installSocket: function(app) {
+    app.disable('x-powered-by');
     app.set('trust proxy', true);
     app.use(env.middlewares.accessLogger);
     app.use(express.cookieParser());
