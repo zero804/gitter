@@ -156,7 +156,7 @@ define([
 
       if (this.showTooltip && !window._troupeCompactView && (this.model ? this.model.get('displayName') : this.user.displayName)) {
         this.$el.find(':first-child').tooltip({
-          html : true,
+          html : false,
           placement : this.tooltipPlacement,
           container: "body"
         });

@@ -2,8 +2,17 @@
 "use strict";
 
 var moment = require('moment');
-var maxDaysBeforeDateDisplay = 3;
+var maxDaysBeforeDateDisplay = 1;
 
+function useLanguage(language, callback) {
+  if(!language) return callback();
+  moment.lang(language);
+  try {
+    return callback();
+  } finally {
+    moment.lang('en-GB');
+  }
+}
 
 module.exports = exports = function() {
   return function timeagoWidgetHandler(params) {
@@ -11,19 +20,26 @@ module.exports = exports = function() {
     if(!hash) return "";
 
     var time = hash.time;
-    var lang = hash.lang;
     if(!time) return "";
+
+    var lang = hash.lang;
+    var locale = hash.locale;
 
     time = moment(time);
 
     var duration = moment.duration(Date.now() - time.valueOf());
-    var v;
+
     if(duration.asDays() >= maxDaysBeforeDateDisplay) {
-      v = time.format("LL", { lang: lang });
-    } else {
-      v = duration.humanize() + " ago";
+      return time.format("LL", { lang: lang });
     }
 
-    return v;
+    var v = useLanguage(lang, function() {
+      return duration.humanize();
+    });
+
+    /* This should never happen... */
+    if(!locale) return v + " ago";
+
+    return locale.__("%s ago", v);
   };
 };

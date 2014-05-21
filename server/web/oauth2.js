@@ -6,12 +6,12 @@
  */
 var oauth2orize = require('oauth2orize');
 var passport = require('passport');
-var middleware = require('./middleware');
 var oauthService = require('../services/oauth-service');
 var loginUtils = require('./login-utils');
 var winston = require('../utils/winston');
 var languageSelector = require('./language-selector');
 var random = require('../utils/random');
+var ensureLoggedIn = require('./middlewares/ensure-logged-in');
 
 // create OAuth 2.0 server
 var server = oauth2orize.createServer();
@@ -112,10 +112,7 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, do
 // first, and rendering the `dialog` view.
 
 exports.authorization = [
-  middleware.ensureLoggedIn(/*{ loginUrl: function(req, done) {
-    // Redirect with all the query parameters intact
-    done(null, '/login?' + url.parse(req.url).query);
-  }}*/),
+  ensureLoggedIn,
   server.authorization(function(clientKey, redirectUri, done) {
 
     oauthService.findClientByClientKey(clientKey, function(err, client) {
@@ -156,7 +153,7 @@ exports.authorization = [
 // a response.
 
 exports.decision = [
-  middleware.ensureLoggedIn(),
+  ensureLoggedIn,
   server.decision()
 ];
 

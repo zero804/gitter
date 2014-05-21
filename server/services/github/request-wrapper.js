@@ -4,6 +4,7 @@
 var request = require('request');
 var fetchAllPages = require('./fetch-all-pages');
 var logFailingRequest = require('./log-failing-request');
+var logRateLimit = require('./log-rate-limit');
 var requestWithRetry = require('./request-with-retry');
 var publicTokenPool = require('./public-token-pool');
 
@@ -11,4 +12,5 @@ module.exports = publicTokenPool(
                     fetchAllPages(
                     logFailingRequest(
                     requestWithRetry({ maxRetries: 3 },
-                    request))));
+                    logRateLimit(
+                    request)))));
