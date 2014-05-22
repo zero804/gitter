@@ -184,7 +184,7 @@ exports.queueUserTroupesForNotification = function(userTroupes) {
           } else {
             delay = notificationWindowPeriods[notificationNumber - 1];
             if(!delay) {
-              // User had already gotten two notifications, that's enough
+              winston.verbose("User has already gotten two notifications, that's enough. Skipping");
               return;
             }
           }
