@@ -1,6 +1,6 @@
 {
   "name": "gitter-webapp",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "dependencies": {
     "apn": {
       "version": "1.4.4",
@@ -686,9 +686,9 @@
       "resolved": "git://github.com/gitterHQ/faye-redis-node#11aa3dbf5638f40b659397045344096b08e9ca4c"
     },
     "gitter-env": {
-      "version": "0.7.2",
-      "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.7.2",
-      "resolved": "git+ssh://git@github.com:gitterHQ/gitter-env.git#7d973a7948eeabbafe6afd031f7c62bbb885fd4f",
+      "version": "0.7.3",
+      "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.7.3",
+      "resolved": "git+ssh://git@github.com:gitterHQ/gitter-env.git#c2ae41c0e18cef261335d03f0cc33cdb696f8877",
       "dependencies": {
         "async": {
           "version": "0.8.0",

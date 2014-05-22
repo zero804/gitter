@@ -82,22 +82,23 @@ module.exports = function(err, req, res, next) {
   }
   res.status(status);
 
-  var responseType = req.accepts(['html', 'json']);
-
-  if (responseType === 'html') {
-   res.render(template , {
-     status: status,
-     homeUrl : config.get('web:homeurl'),
-     user: req.user,
-     userMissingPrivateRepoScope: req.user && !req.user.hasGitHubScope('repo'),
-     message: message,
-     stack: config.get('express:showStack') && stack ? linkStack(stack) : null
-   });
-  } else if (responseType === 'json') {
-   res.send({ error: message });
-  } else {
-   res.type('txt').send(message);
-  }
-
+  res.format({
+    html: function() {
+      res.render(template , {
+         status: status,
+         homeUrl : config.get('web:homeurl'),
+         user: req.user,
+         userMissingPrivateRepoScope: req.user && !req.user.hasGitHubScope('repo'),
+         message: message,
+         stack: config.get('express:showStack') && stack ? linkStack(stack) : null
+       });
+    },
+    json: function() {
+      res.send({ error: message });
+    },
+    text: function() {
+      res.send('Error: ', message);
+    }
+  });
 
 };

@@ -11,7 +11,6 @@ var redis           = testRequire("./utils/redis");
 var winston         = testRequire("./utils/winston");
 var Fiber           = testRequire("./utils/fiber");
 
-
 var fakeEngine = {
   clientExists: function(clientId, callback) { callback(!clientId.match(/^TEST/)); }
 };
@@ -719,7 +718,45 @@ describe('presenceService', function() {
 
     });
 
+  });
+
+  it('socketExists should work correctly', function(done) {
+    var userId = 'TESTUSER1' + Date.now();
+    var socketId = 'TESTSOCKET1' + Date.now();
+    var socketId2 = 'TESTSOCKET2' + Date.now();
+    var troupeId = 'TESTTROUPE1' + Date.now();
+
+    // Connect the socket
+    presenceService.userSocketConnected(userId, socketId, 'online', 'test', null, null, function(err) {
+      if(err) return done(err);
+
+      presenceService.socketExists(socketId, function(err, exists) {
+        if(err) return done(err);
+
+        assert(exists);
+
+        // Disconnect the socket
+        presenceService.socketDisconnected(socketId, function(err, exists) {
+          if(err) return done(err);
+
+          assert(!exists);
+
+          presenceService.socketExists(socketId2, function(err, exists) {
+            if(err) return done(err);
+
+            assert(!exists);
+
+            done();
+          });
+
+        });
+
+      });
+
+    });
+
 
   });
+
 });
 

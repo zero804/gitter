@@ -27,7 +27,18 @@ module.exports =  function(req, res, next) {
         return next(err);
       }
 
-      res.send('OK');
+      res.format({
+        text: function() {
+          res.send('OK');
+        },
+        json: function() {
+          res.send({ success: true });
+        },
+        html: function() {
+          res.send('OK');
+        }
+      });
+
     });
 
   });
