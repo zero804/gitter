@@ -303,10 +303,11 @@ var authenticator = {
       return callback(message);
     }
 
-    logger.info("bayeux: connection " + clientId + ' is associated to ' + userId, { troupeId: troupeId, client: client });
+    logger.verbose("bayeux: about to associate connection " + clientId + ' to user ' + userId, { troupeId: troupeId, client: client });
 
     // Get the presence service involved around about now
     presenceService.userSocketConnected(userId, clientId, connectionType, client, troupeId, eyeballState, function(err) {
+      logger.info("bayeux: connection " + clientId + ' is associated to ' + userId, { troupeId: troupeId, client: client });
 
       if(err) logger.error("bayeux: Presence service failed to record socket connection: " + err, { exception: err });
 
@@ -435,9 +436,14 @@ var authorisor = {
 
     /* The populator is all about generating the snapshot for the client */
     if(clientId && populator && snapshot) {
-      presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
+      presenceService.lookupUserIdForSocket(clientId, function(err, userId, exists) {
         if(err) {
           logger.error('Error for lookupUserIdForSocket', { exception: err });
+          return callback(message);
+        }
+
+        if(!exists) {
+          logger.warn('Populator failed as socket ' + clientId + ' does not exist');
           return callback(message);
         }
 
@@ -468,13 +474,10 @@ var authorisor = {
 
     if(!clientId) return callback(new StatusError(401, 'Cannot authorise. Client not authenticated'));
 
-    presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
+    presenceService.lookupUserIdForSocket(clientId, function(err, userId, exists) {
       if(err) return callback(err);
 
-      // if(!userId) {
-      //   logger.warn('bayeux: client not authenticated.', { clientId: clientId });
-      //   return callback(new StatusError(401, 'Cannot authorise. Client not authenticated'));
-      // }
+      if(!exists) return callback(new StatusError(401, 'Cannot authorise. Socket does not exist.'));
 
       var match = null;
 
@@ -492,6 +495,62 @@ var authorisor = {
       var m = match.match;
 
       validator({ userId: userId, match: m, message: message, clientId: clientId }, callback);
+    });
+
+  }
+};
+
+var noConnectForUnknownClients = {
+  incoming: function(message, req, callback) {
+
+    function deny(errorCode, errorDescription) {
+      stats.eventHF('bayeux.connect.deny');
+
+      var referer = req && req.headers && req.headers.referer;
+      var origin = req && req.headers && req.headers.origin;
+      var connection = req && req.headers && req.headers.connection;
+      var reason = message.data && message.data.reason;
+
+      message.error = errorCode + '::' + errorDescription;
+      logger.error('Denying connect access: ' + errorDescription, {
+        errorCode: errorCode,
+        clientId: clientId,
+        referer: referer,
+        origin: origin,
+        connection: connection,
+        pingReason: reason });
+
+      callback(message);
+    }
+
+    if (message.channel != '/meta/connect') return callback(message);
+
+    if(messageIsFromSuperClient(message)) {
+      return callback(message);
+    }
+
+    var clientId = message.clientId;
+
+    if(!clientId) {
+      return deny(401, "Access denied. ClientId required.");
+    }
+
+    server._server._engine.clientExists(clientId, function(exists) {
+      if(!exists) {
+        return deny(401, "Client does not exist");
+      }
+
+      presenceService.socketExists(clientId, function(err, exists) {
+        if(err) {
+          logger.error("presenceService.socketExists failed: " + err, { exception: err });
+          return deny(500, "A server error occurred.");
+        }
+
+        if(!exists) return deny(401, "Socket association does not exist");
+
+        return callback(message);
+      });
+
     });
 
   }
@@ -560,15 +619,13 @@ var pingResponder = {
         return deny(401, "Client does not exist");
       }
 
-      presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
+      presenceService.socketExists(clientId, function(err, exists) {
         if(err) {
-          logger.error("presenceService.lookupUserIdForSocket failed: " + err, { exception: err });
+          logger.error("presenceService.socketExists failed: " + err, { exception: err });
           return deny(500, "A server error occurred.");
         }
 
-        if(!userId) {
-          return deny(401, "Client not authenticated.");
-        }
+        if(!exists) return deny(401, "Socket association does not exist");
 
         return callback(message);
       });
@@ -653,7 +710,7 @@ var adviseAdjuster = {
         var reconnect;
 
         if(message.clientId) {
-          logger.info('Destroying client');
+          logger.info('Destroying client', { clientId: message.clientId });
           // We've told the person to go away, destroy their faye client
           destroyClient(message.clientId);
         }
@@ -732,11 +789,11 @@ module.exports = {
     // Attach event handlers
     server.addExtension(logging);
     server.addExtension(authenticator);
+    server.addExtension(noConnectForUnknownClients);
     server.addExtension(authorisor);
     server.addExtension(pushOnlyServer);
     server.addExtension(pingResponder);
     server.addExtension(adviseAdjuster);
-
 
     client.addExtension(superClient);
 
