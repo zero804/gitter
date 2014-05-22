@@ -22,7 +22,19 @@ module.exports = function(req, res, next) {
   }
 
   if(req.accessToken !== clientToken) {
-    winston.warn('csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they presented an illegal token');
+    if(!req.user) {
+      winston.warn('csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they are probably logged out', {
+        serverAccessToken: req.accessToken,
+        clientToken: clientToken,
+      });
+    } else {
+      winston.warn('csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they presented an illegal token', {
+        serverAccessToken: req.accessToken,
+        clientToken: clientToken,
+        username: req.user.username,
+        userId: req.user.id
+      });
+    }
     return next(403);
   }
 
