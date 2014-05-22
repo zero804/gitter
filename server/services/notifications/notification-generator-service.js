@@ -97,7 +97,7 @@ function userCategorisationStrategy(userTroupes, callback) {
 // This installs the listeners that will listen to events
 //
 exports.install = function() {
-  // var pushNotificationGateway = require("../../gateways/push-notification-gateway");
+  var pushNotificationGateway = require("../../gateways/push-notification-gateway");
   var notificationCollector = new NotificationCollector({ userCategorisationStrategy: userCategorisationStrategy });
 
   notificationCollector.on('collection:online', function(userTroupes) {
@@ -136,18 +136,18 @@ exports.install = function() {
   });
 
   // /* Update badges for apps */
-  // appEvents.localOnly.onBatchUserBadgeCountUpdate(function(data) {
-  //   var userIds = data.userIds;
-  //   pushNotificationGateway.sendUsersBadgeUpdates(userIds);
-  // });
+  appEvents.localOnly.onBatchUserBadgeCountUpdate(function(data) {
+    var userIds = data.userIds;
+    pushNotificationGateway.sendUsersBadgeUpdates(userIds);
+  });
 
-  // appEvents.localOnly.onEyeballSignal(function(userId, troupeId, eyeballSignal) {
-  //   if(eyeballSignal) {
-  //     pushNotificationService.resetNotificationsForUserTroupe(userId, troupeId, function(err) {
-  //       if(err) winston.error('Error while calling resetNotificationsForUserTroupe. Silently ignoring. ' + err, { exception: err });
-  //     });
-  //   }
-  // });
+  appEvents.localOnly.onEyeballSignal(function(userId, troupeId, eyeballSignal) {
+    if(eyeballSignal) {
+      pushNotificationService.resetNotificationsForUserTroupe(userId, troupeId, function(err) {
+        if(err) winston.error('Error while calling resetNotificationsForUserTroupe. Silently ignoring. ' + err, { exception: err });
+      });
+    }
+  });
 
 };
 
