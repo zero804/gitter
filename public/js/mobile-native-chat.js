@@ -6,6 +6,7 @@ require([
   'views/chat/chatInputView',
   'components/unread-items-client',
   'views/chat/decorators/emojiDecorator',
+  'components/eyeballs',                        // No ref
   'components/csrf'                             // No ref
   ], function($, chatModels, ChatCollectionView, chatInputView, unreadItemsClient, emojiDecorator) {
 
