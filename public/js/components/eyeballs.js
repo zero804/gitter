@@ -29,6 +29,7 @@ define([
         socketId: realtime.getClientId(),
         on: value
       },
+      dataType: 'text',
       beforeSend: csrf,
       async: !synchronous,
       global: false,
