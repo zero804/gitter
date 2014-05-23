@@ -44,6 +44,26 @@ var routes = [
 
 var superClientPassword = nconf.get('ws:superClientPassword');
 
+function requestInfo(req) {
+  if(!req) return;
+
+  var referer, origin, connection;
+  if(req.headers) {
+    referer = req.headers.referer;
+    origin = req.headers.origin;
+    connection = req.headers.connection;
+  }
+
+  var ip = req.headers && req.headers['x-forwarded-for'] || req.ip;
+
+  return {
+    ip: ip,
+    referer: referer,
+    origin: origin,
+    connection: connection
+  };
+}
+
 function checkTroupeAccess(userId, troupeId, callback) {
   // TODO: use the room permissions model
   return troupeService.findById(troupeId)
@@ -206,13 +226,17 @@ function getConnectionType(incoming) {
   }
 }
 
+// Validate handshakes
 var authenticator = {
-  incoming: function(message, callback) {
+  incoming: function(message, req, callback) {
     function deny(errorCode, errorDescription) {
       stats.eventHF('bayeux.handshake.deny');
 
       message.error = errorCode + '::' + errorDescription;
-      logger.error('Denying client access', message);
+      logger.error('Denying client access: ' + errorCode + '::' + errorDescription, {
+        token: message.ext && message.ext.token,
+        request: requestInfo(req)
+      });
 
       callback(message);
     }
@@ -235,6 +259,7 @@ var authenticator = {
 
     oauth.validateAccessTokenAndClient(ext.token, function(err, tokenInfo) {
       if(err) {
+        delete err.stack; // Too much logging
         logger.error("bayeux: Authentication error: " + err, { exception: err, message: message });
         return deny(500, "A server error occurred.");
       }
@@ -309,7 +334,9 @@ var authenticator = {
     presenceService.userSocketConnected(userId, clientId, connectionType, client, troupeId, eyeballState, function(err) {
       logger.info("bayeux: connection " + clientId + ' is associated to ' + userId, { troupeId: troupeId, client: client });
 
-      if(err) logger.error("bayeux: Presence service failed to record socket connection: " + err, { exception: err });
+      if(err) {
+        logger.error("bayeux: Presence service failed to record socket connection: " + err, { exception: err });
+      }
 
       message.ext.userId = userId;
 
@@ -320,7 +347,9 @@ var authenticator = {
       // If the troupeId was included, it means we've got a native
       // client and they'll be looking for a snapshot:
       contextGenerator.generateSocketContext(userId, troupeId, function(err, context) {
-        if(err) logger.error("bayeux: Unable to generate context: " + err, { exception: err });
+        if(err) {
+          logger.error("bayeux: Unable to generate context: " + err, { exception: err });
+        }
 
         message.ext.context = context;
 
@@ -362,19 +391,24 @@ var authorisor = {
       snapshot = 0;
     }
 
-    function deny(errorCode) {
+    function deny(errorCode, errorDescription) {
       stats.eventHF('bayeux.subscribe.deny');
-      var errorDescription;
+      var clientDescription;
+
       switch(errorCode) {
-        case 401: errorDescription = 'Access denied'; break;
-        case 403: errorDescription = 'Permission denied'; break;
-        case 404: errorDescription = 'Not found'; break;
+        case 401: clientDescription = 'Access denied'; break;
+        case 403: clientDescription = 'Permission denied'; break;
+        case 404: clientDescription = 'Not found'; break;
         default:
-          errorDescription = 'A server error occurred';
+          clientDescription = 'A server error occurred';
       }
 
-      message.error = errorCode + '::' + errorDescription;
-      logger.error('Socket authorisation failed. Denying subscribe.', message);
+      message.error = errorCode + '::' + clientDescription;
+      logger.error('bayeux: authorisor: Socket authorisation failed: ' + errorCode + '::' + errorDescription, {
+        request: requestInfo(req),
+        clientId: message.clientId,
+        subscription: message.subscription
+      });
 
       callback(message);
     }
@@ -384,13 +418,10 @@ var authorisor = {
     this.authorizeSubscribe(message, function(err, allowed) {
       if(err) {
         var status = err.status || 500;
-
-        logger.error("bayeux: Authorisation error", { exception: err, message: message });
-        return deny(status, "A server error occurred.");
+        return deny(status, err.message);
       }
 
       if(!allowed) {
-        logger.warn("bayeux: Authorisation failed", { message: message });
         return deny(403, "Authorisation denied.");
       }
 
@@ -500,25 +531,22 @@ var authorisor = {
   }
 };
 
+// CONNECT extension
 var noConnectForUnknownClients = {
   incoming: function(message, req, callback) {
 
     function deny(errorCode, errorDescription) {
       stats.eventHF('bayeux.connect.deny');
 
-      var referer = req && req.headers && req.headers.referer;
-      var origin = req && req.headers && req.headers.origin;
-      var connection = req && req.headers && req.headers.connection;
       var reason = message.data && message.data.reason;
 
       message.error = errorCode + '::' + errorDescription;
       logger.error('Denying connect access: ' + errorDescription, {
         errorCode: errorCode,
         clientId: clientId,
-        referer: referer,
-        origin: origin,
-        connection: connection,
-        pingReason: reason });
+        request: requestInfo(req),
+        pingReason: reason
+      });
 
       callback(message);
     }
@@ -542,6 +570,8 @@ var noConnectForUnknownClients = {
 
       presenceService.socketExists(clientId, function(err, exists) {
         if(err) {
+          delete err.stack; // Too much logging
+
           logger.error("presenceService.socketExists failed: " + err, { exception: err });
           return deny(500, "A server error occurred.");
         }
@@ -621,6 +651,8 @@ var pingResponder = {
 
       presenceService.socketExists(clientId, function(err, exists) {
         if(err) {
+          delete err.stack; // Too much logging
+
           logger.error("presenceService.socketExists failed: " + err, { exception: err });
           return deny(500, "A server error occurred.");
         }
