@@ -772,15 +772,47 @@ faye.stringify = function(object) {
   return string;
 };
 
+/* TEMPORARY DEBUGGING SOLUTION */
+var re;
+var fs = require('fs');
+
+setInterval(function() {
+  fs.exists('/tmp/faye-logging-filter', function(exists) {
+    if(exists) {
+      fs.readFile('/tmp/faye-logging-filter', 'utf8', function(err, data) {
+        if(err) {
+          logger.info('Unable to read /tmp/faye-logging-filter', { exception: err });
+        }
+
+        var lines = data.split(/[\n]/)
+          .map(function(line) { return line.trim(); })
+          .filter(function(line) { return line; });
+
+        try {
+          re = new RegExp(lines.join('|'));
+        } catch(e) {
+          re = null;
+          logger.info('Unable to create regular expression', { exception: err });
+        }
+
+      });
+    } else {
+      re = null;
+    }
+  });
+}, 5000);
+
 faye.logger = {
   debug: function(msg) {
-    if(msg.indexOf('[Faye.Engine] Queueing for client') === 0) {
+    if(!re) return;
+    if(msg.match(re)) {
       logger.verbose('faye: ' + msg);
     }
   },
   info: function(msg) {
-    if(msg.indexOf('[Faye.Engine]') === 0) {
-      logger.info('faye: ' + msg);
+    if(!re) return;
+    if(msg.match(re)) {
+      logger.verbose('faye: ' + msg);
     }
   }
 };
