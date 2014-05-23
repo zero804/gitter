@@ -865,7 +865,7 @@ module.exports = {
     // Attach event handlers
     server.addExtension(logging);
     server.addExtension(authenticator);
-    server.addExtension(noConnectForUnknownClients);
+    // server.addExtension(noConnectForUnknownClients);
     server.addExtension(authorisor);
     server.addExtension(pushOnlyServer);
     server.addExtension(pingResponder);
