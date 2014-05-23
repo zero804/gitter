@@ -772,12 +772,24 @@ faye.stringify = function(object) {
   return string;
 };
 
-faye.logger = {};
-['fatal', 'error', 'warn'].forEach(function(level) {
-  faye.logger[level] = function(message) {
-    logger[level]('faye: ' + message);
-  };
+faye.logger = {
+  debug: function(msg) {
+    if(msg.indexOf('[Faye.Engine] Queueing for client') === 0) {
+      logger.verbose('faye: ' + msg);
+    }
+  },
+  info: function(msg) {
+    if(msg.indexOf('[Faye.Engine]') === 0) {
+      logger.info('faye: ' + msg);
+    }
+  }
+};
+
+var logLevels = ['fatal', 'error', 'warn'];
+logLevels/*.slice(0, 1 + logLevel)*/.forEach(function(level) {
+  faye.logger[level] = function(msg) { logger[level]('faye: ' + msg); };
 });
+
 
 module.exports = {
   server: server,
@@ -797,11 +809,16 @@ module.exports = {
 
     client.addExtension(superClient);
 
+    ['connection:open', 'connection:close'].forEach(function(event) {
+      server._server._engine.bind(event, function(clientId) {
+        logger.info("faye-engine: Client " + clientId + ": " + event);
+      });
+    });
 
     /** Some logging */
     ['handshake', 'disconnect'].forEach(function(event) {
       server.bind(event, function(clientId) {
-        logger.info("Client " + clientId + ": " + event);
+        logger.info("faye-server: Client " + clientId + ": " + event);
       });
     });
 
