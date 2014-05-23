@@ -36,11 +36,6 @@
       "from": "https://registry.npmjs.org/consolidate/-/consolidate-0.10.0.tgz",
       "resolved": "https://registry.npmjs.org/consolidate/-/consolidate-0.10.0.tgz"
     },
-    "cors": {
-      "version": "2.3.1",
-      "from": "cors@",
-      "resolved": "https://registry.npmjs.org/cors/-/cors-2.3.1.tgz"
-    },
     "cube": {
       "version": "0.2.12",
       "from": "https://registry.npmjs.org/cube/-/cube-0.2.12.tgz",
@@ -705,8 +700,7 @@
           "dependencies": {
             "async": {
               "version": "0.2.9",
-              "from": "async@0.2.9",
-              "resolved": "https://registry.npmjs.org/async/-/async-0.2.9.tgz"
+              "from": "async@0.2.9"
             },
             "ini": {
               "version": "1.2.0",
@@ -729,9 +723,8 @@
           }
         },
         "redis": {
-          "version": "0.10.3",
-          "from": "redis@^0.10.1",
-          "resolved": "https://registry.npmjs.org/redis/-/redis-0.10.3.tgz"
+          "version": "0.10.2",
+          "from": "redis@^0.10.1"
         },
         "shutdown": {
           "version": "0.2.2",
@@ -1532,9 +1525,8 @@
                   "from": "passport-strategy@1.x.x"
                 },
                 "oauth": {
-                  "version": "0.9.12",
-                  "from": "oauth@0.9.x",
-                  "resolved": "https://registry.npmjs.org/oauth/-/oauth-0.9.12.tgz"
+                  "version": "0.9.11",
+                  "from": "oauth@0.9.x"
                 },
                 "utils-merge": {
                   "version": "1.0.0",
@@ -1552,9 +1544,8 @@
                   "from": "passport-strategy@1.x.x"
                 },
                 "oauth": {
-                  "version": "0.9.12",
-                  "from": "oauth@0.9.x",
-                  "resolved": "https://registry.npmjs.org/oauth/-/oauth-0.9.12.tgz"
+                  "version": "0.9.11",
+                  "from": "oauth@0.9.x"
                 },
                 "uid2": {
                   "version": "0.0.3",
