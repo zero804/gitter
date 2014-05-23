@@ -772,12 +772,56 @@ faye.stringify = function(object) {
   return string;
 };
 
-faye.logger = {};
-['fatal', 'error', 'warn'].forEach(function(level) {
-  faye.logger[level] = function(message) {
-    logger[level]('faye: ' + message);
-  };
+/* TEMPORARY DEBUGGING SOLUTION */
+var re;
+var fs = require('fs');
+
+setInterval(function() {
+  fs.exists('/tmp/faye-logging-filter', function(exists) {
+    if(exists) {
+      fs.readFile('/tmp/faye-logging-filter', 'utf8', function(err, data) {
+        if(err) {
+          logger.info('Unable to read /tmp/faye-logging-filter', { exception: err });
+        }
+
+        var lines = data.split(/[\n]/)
+          .map(function(line) { return line.trim(); })
+          .filter(function(line) { return line; });
+
+        try {
+          re = new RegExp(lines.join('|'));
+        } catch(e) {
+          re = null;
+          logger.info('Unable to create regular expression', { exception: err });
+        }
+
+      });
+    } else {
+      re = null;
+    }
+  });
+}, 5000);
+
+faye.logger = {
+  debug: function(msg) {
+    if(!re) return;
+    if(msg.match(re)) {
+      logger.verbose('faye: ' + msg);
+    }
+  },
+  info: function(msg) {
+    if(!re) return;
+    if(msg.match(re)) {
+      logger.verbose('faye: ' + msg);
+    }
+  }
+};
+
+var logLevels = ['fatal', 'error', 'warn'];
+logLevels/*.slice(0, 1 + logLevel)*/.forEach(function(level) {
+  faye.logger[level] = function(msg) { logger[level]('faye: ' + msg); };
 });
+
 
 module.exports = {
   server: server,
@@ -797,11 +841,16 @@ module.exports = {
 
     client.addExtension(superClient);
 
+    ['connection:open', 'connection:close'].forEach(function(event) {
+      server._server._engine.bind(event, function(clientId) {
+        logger.info("faye-engine: Client " + clientId + ": " + event);
+      });
+    });
 
     /** Some logging */
     ['handshake', 'disconnect'].forEach(function(event) {
       server.bind(event, function(clientId) {
-        logger.info("Client " + clientId + ": " + event);
+        logger.info("faye-server: Client " + clientId + ": " + event);
       });
     });
 
