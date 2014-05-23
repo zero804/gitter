@@ -10,11 +10,14 @@ var expressHbs     = require('express-hbs');
 var path           = require('path');
 var rememberMe     = require('./middlewares/rememberme-middleware');
 var I18n           = require('i18n-2');
+var cors           = require('cors');
 
 // Naughty naughty naught, install some extra methods on the express prototype
 require('./http');
 
 var staticContentDir = path.join(__dirname, '..', '..', config.get('web:staticContent'));
+
+var corsMiddleware = cors({ origin: config.get('web:corsOrigin')});
 
 module.exports = {
   /**
@@ -57,6 +60,7 @@ module.exports = {
       maxAge: config.get('web:staticContentExpiryDays') * 86400 * 1000
     }));
 
+    app.use(corsMiddleware);
     app.use(express.cookieParser());
     app.use(express.urlencoded());
     app.use(express.json());
@@ -119,17 +123,11 @@ module.exports = {
   },
 
   installApi: function(app) {
-    var cors = require('cors');
-
     app.disable('x-powered-by');
     app.set('trust proxy', true);
 
     app.use(env.middlewares.accessLogger);
-    app.use(cors({
-      origin: '*',
-      exposeHeaders: ['ETag', 'Link', 'X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset', 'X-OAuth-Scopes', 'X-Accepted-OAuth-Scopes', 'X-Access-Token'],
-      credentials: true
-    }));
+    app.use(corsMiddleware);
 
     app.use(express.urlencoded());
     app.use(express.json());
@@ -148,14 +146,7 @@ module.exports = {
     app.disable('x-powered-by');
     app.set('trust proxy', true);
     app.use(env.middlewares.accessLogger);
-
-
-    var cors = require('cors');
-    app.use(cors({
-      origin: '*',
-      exposeHeaders: ['ETag', 'Link', 'X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset', 'X-OAuth-Scopes', 'X-Accepted-OAuth-Scopes', 'X-Access-Token'],
-      credentials: true
-    }));
+    app.use(cors);
 
     app.use(express.cookieParser());
     app.use(express.urlencoded());
