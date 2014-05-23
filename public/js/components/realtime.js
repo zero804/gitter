@@ -218,11 +218,11 @@ define([
     var client = new Faye.Client(c.fayeUrl, c.options);
 
     // Disable websocket on Mobile due to iOS crash bug
-    // var userAgent = window.navigator.userAgent;
-    // if(userAgent.indexOf('Mobile') >= 0) {
+    var userAgent = window.navigator.userAgent;
+    if(userAgent.indexOf('Mobile') >= 0) {
       /* Testing no websockets */
       client.disable('websocket');
-    // }
+    }
 
     client.addExtension(new RateMonitor());
     client.addExtension(new ClientAuth());
