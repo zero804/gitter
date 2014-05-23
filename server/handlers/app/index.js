@@ -36,7 +36,7 @@ var mainFrameMiddlewarePipeline = [
       }
 
       saveRoom(req);
-      appRender.renderMobileApp(req, res, next);
+      appRender.renderMobileChat(req, res, next);
 
     } else {
       appRender.renderMainFrame(req, res, next, 'chat');
@@ -52,11 +52,7 @@ var chatMiddlewarePipeline = [
 
     if(req.user) {
       saveRoom(req);
-      if(req.isPhone) {
-        appRender.renderMobileChat(req, res, next);
-      } else {
-        appRender.renderChatPage(req, res, next);
-      }
+      appRender.renderChatPage(req, res, next);
     } else {
       // We're doing this so we correctly redirect a logged out
       // user to the right chat post login

@@ -123,7 +123,7 @@ function renderMobileUserHome(req, res, next) {
   });
 }
 
-function renderMobileApp(req, res, next) {
+function renderMobileChat(req, res, next) {
   var troupe = req.uriContext.troupe;
 
   var userId = req.user && req.user.id;
@@ -150,34 +150,32 @@ function renderMobileApp(req, res, next) {
     .fail(next);
 }
 
-function renderMobileAppcacheChat(req, res, next) {
-  Q.all([
-    contextGenerator.generateNonChatContext(req),
-    ]).spread(function(troupeContext) {
-      res.render('mobile/native-' + 'chat' + '-app', {
+function renderMobileNativeChat(req, res, next) {
+  // we cant get the chat room name from /mobile/chat, so we use a non chat context
+  contextGenerator.generateNonChatContext(req)
+    .then(function(troupeContext) {
+      res.render('mobile/native-chat-app', {
         appCache: getAppCache(req),
-        bootScriptName: 'mobile-appcache-chat',
+        // client side router gets troupeId from hash and updates the context instead
+        bootScriptName: 'mobile-native-router',
         user: troupeContext.user,
         troupeContext: troupeContext,
         agent: req.headers['user-agent']
       });
-
     })
     .fail(next);
 }
 
-function renderMobileUserHomeApp(req, res, next) {
-  Q.all([
-    contextGenerator.generateNonChatContext(req),
-    ]).spread(function(troupeContext) {
-      res.render('mobile/native-' + 'userhome' + '-app', {
+function renderMobileNativeUserhome(req, res, next) {
+  contextGenerator.generateNonChatContext(req)
+    .then(function(troupeContext) {
+      res.render('mobile/native-userhome-app', {
         appCache: getAppCache(req),
-        bootScriptName: 'mobile-userhome-app',
+        bootScriptName: 'mobile-native-userhome',
         user: troupeContext.user,
         troupeContext: troupeContext,
         agent: req.headers['user-agent']
       });
-
     })
     .fail(next);
 }
@@ -244,10 +242,10 @@ module.exports = exports = {
   renderHomePage: renderHomePage,
   renderChatPage: renderChatPage,
   renderMainFrame: renderMainFrame,
-  renderMobileApp: renderMobileApp,
-  renderMobileAppcacheChat: renderMobileAppcacheChat,
-  renderMobileUserHomeApp: renderMobileUserHomeApp,
+  renderMobileChat: renderMobileChat,
   renderMobileUserHome: renderMobileUserHome,
   renderMobileNotLoggedInChat: renderMobileNotLoggedInChat,
-  renderNotLoggedInChatPage: renderNotLoggedInChatPage
+  renderNotLoggedInChatPage: renderNotLoggedInChatPage,
+  renderMobileNativeChat: renderMobileNativeChat,
+  renderMobileNativeUserhome: renderMobileNativeUserhome
 };
