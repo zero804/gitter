@@ -3,40 +3,78 @@
 "use strict";
 
 var format = require('stringformat');
-var nomnom = require('nomnom');
 var _ = require('underscore');
+var nomnom = require('nomnom');
 
-var CliOutput = function(columns) {
-  var n = nomnom();
+var CliOutput = function(columns, extraOpts) {
   var defaults = {};
+  var showing = {};
+  var opts = nomnom();
 
-  n.option('header', { type: 'boolean', default: true });
+  if(extraOpts) {
+    opts.options(extraOpts);
+  }
+
+  opts.option('noheader', { flag: true });
 
   Object.keys(columns).forEach(function(column) {
-    n.option(column, { type: 'boolean', default: true });
     defaults[column] = '-';
+    opts.option(column, { flag: true });
+    opts.option('no' + column, { flag: true });
   });
 
-  var opts = n.parse();
+  var parsedOpts = opts.parse();
+
+  var hasNoShowColumns = Object.keys(columns).some(function(column) {
+    return parsedOpts['no' + column];
+  });
+
+  var hasShowColumns = Object.keys(columns).some(function(column) {
+    return parsedOpts[column];
+  });
+
+  var defaultShow;
+  if(hasNoShowColumns) {
+    defaultShow = true;
+  } else if(hasShowColumns) {
+    defaultShow = false;
+  } else {
+    defaultShow = true;
+  }
+
+  Object.keys(columns).forEach(function(column) {
+    var s;
+    if(parsedOpts['no' + column]) {
+      s = false;
+    } else if(parsedOpts[column]) {
+      s = true;
+    } else {
+      s = defaultShow;
+    }
+
+    showing[column] = s;
+  });
 
   var formatString = Object.keys(columns).filter(function(column) {
-    return opts[column];
+    return showing[column];
   }).map(function(column) {
     return '{' + column + ':-' + columns[column].width + '}';
   }).join(' ');
 
+  this.opts = parsedOpts;
   this.formatString = formatString;
-  this.opts = opts;
   this.columns = columns;
   this.defaults = defaults;
+  this.showing = showing;
 };
 
+
 CliOutput.prototype.headers = function() {
-  if(!this.opts.header) return;
+  if(this.opts.noheader) return;
   var self = this;
 
   var headers = Object.keys(self.columns).filter(function(column) {
-    return self.opts[column];
+    return self.showing[column];
   }).reduce(function(headers, column) {
     headers[column] = column;
     return headers;
