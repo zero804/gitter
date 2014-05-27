@@ -19,7 +19,7 @@ define([
       completion: 'ban ',
       regexp: /^\/ban/,
       action: function(view) {
-        var userMatch = view.$el.val().match(/\/ban @(\w+)/);
+        var userMatch = view.$el.val().match(/\/ban @([\w\-]+)/);
         if (!userMatch) return;
         var user = userMatch[1];
         $.ajax({
@@ -155,7 +155,7 @@ define([
       completion: 'query @',
       regexp: /^\/query/,
       action: function(view) {
-        var userMatch = view.$el.val().match(/\/query @(\w+)/);
+        var userMatch = view.$el.val().match(/\/query @([\w\-]+)/);
         if (!userMatch) return;
         var user = userMatch[1];
         view.reset();
@@ -216,7 +216,7 @@ define([
       completion: 'unban ',
       regexp: /^\/unban/,
       action: function(view) {
-        var userMatch = view.$el.val().match(/\/unban @(\w+)/);
+        var userMatch = view.$el.val().match(/\/unban @([\w\-]+)/);
         if (!userMatch) return;
         var user = userMatch[1];
         $.ajax({
@@ -248,7 +248,7 @@ define([
         });
       }
     }
-    
+
 
   ];
 
