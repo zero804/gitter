@@ -34,6 +34,31 @@ define([
       }
     },
     {
+      command: 'ban @username',
+      description: 'Set room topic to foo',
+      criteria: function() {
+        return !context.inOneToOneTroupeContext() && context().permissions.admin;
+      },
+      completion: 'topic ',
+      regexp: /^\/topic/,
+      action: function(view) {
+        var topicMatch = view.$el.val().match(/^\/topic (.+)/);
+        if (topicMatch) {
+          var topic = topicMatch[1];
+          view.reset();
+
+          context.troupe().set('topic', topic);
+          $.ajax({
+            url: '/api/v1/rooms/' + context.getTroupeId(),
+            contentType: "application/json",
+            dataType: "json",
+            type: "PUT",
+            data: JSON.stringify({ topic: topic })
+          });
+        }
+      }
+    },
+    {
       command: 'fav',
       description: 'Toggle the room as a favourite',
       completion: 'fav ',
