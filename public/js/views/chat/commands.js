@@ -158,8 +158,8 @@ define([
       }
     },
     {
-      command: 'query @user',
-      description: 'Go private with @user',
+      command: 'query @username',
+      description: 'Have a private conversation with @username',
       completion: 'query @',
       regexp: /^\/query/,
       action: function(view) {
