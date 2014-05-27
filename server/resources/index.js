@@ -22,6 +22,7 @@ module.exports = {
 
     installTroupeSubResource('issues', 'issues');
     installTroupeSubResource('users', 'users');
+    installTroupeSubResource('bans', 'bans');
     installTroupeSubResource('channels', 'channels');
 
     var chatResource = installTroupeSubResource('chatMessages', 'chat-messages');
