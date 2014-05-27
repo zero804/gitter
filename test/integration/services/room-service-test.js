@@ -689,59 +689,7 @@ describe('room-service', function() {
     });
   });
 
-  describe('bans', function() {
-    it('should ban users from rooms', function(done) {
-      var roomPermissionsModelMock = mockito.mockFunction();
 
-      var roomService = testRequire.withProxies("./services/room-service", {
-        './room-permissions-model': roomPermissionsModelMock
-      });
-      var userBannedFromRoom = testRequire('./services/user-banned-from-room');
-
-
-      mockito.when(roomPermissionsModelMock)().then(function(user, perm, incomingRoom) {
-        assert.equal(perm, 'admin');
-        assert.equal(incomingRoom.id, fixture.troupeBan.id);
-
-        if(user.id == fixture.userBan.id) {
-          return Q.resolve(false);
-        } else if(user.id == fixture.userBanAdmin.id) {
-          return Q.resolve(true);
-        } else {
-          assert(false, 'Unknown user');
-        }
-      });
-
-      return userBannedFromRoom(fixture.troupeBan.uri, fixture.userBan)
-        .then(function(banned) {
-          assert(!banned);
-
-          return roomService.banUserFromRoom(fixture.troupeBan, fixture.userBan.username, fixture.userBanAdmin)
-            .then(function(ban) {
-              assert.equal(ban.userId, fixture.userBan.id);
-              assert.equal(ban.bannedBy, fixture.userBanAdmin.id);
-              assert(ban.dateBanned);
-
-              assert(!fixture.troupeBan.containsUserId(fixture.userBan.id));
-
-              return userBannedFromRoom(fixture.troupeBan.uri, fixture.userBan)
-                .then(function(banned) {
-                  assert(banned);
-
-                  return roomService.unbanUserFromRoom(fixture.troupeBan, ban, fixture.userBanAdmin)
-                    .then(function() {
-                      return userBannedFromRoom(fixture.troupeBan.uri, fixture.userBan)
-                        .then(function(banned) {
-                          assert(!banned);
-                        });
-                    });
-                });
-            });
-        })
-        .nodeify(done);
-
-    });
-  });
 
 
 
@@ -1363,7 +1311,6 @@ describe('bans', function() {
     });
     var userBannedFromRoom = testRequire('./services/user-banned-from-room');
 
-
     mockito.when(roomPermissionsModelMock)().then(function(user, perm, incomingRoom) {
       assert.equal(perm, 'admin');
       assert.equal(incomingRoom.id, fixture.troupeBan.id);
@@ -1393,7 +1340,7 @@ describe('bans', function() {
               .then(function(banned) {
                 assert(banned);
 
-                return roomService.unbanUserFromRoom(fixture.troupeBan, ban, fixture.userBanAdmin)
+                return roomService.unbanUserFromRoom(fixture.troupeBan, ban, fixture.userBan.username, fixture.userBanAdmin)
                   .then(function() {
                     return userBannedFromRoom(fixture.troupeBan.uri, fixture.userBan)
                       .then(function(banned) {

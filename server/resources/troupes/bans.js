@@ -50,7 +50,7 @@ module.exports = {
   },
 
   destroy: function(req, res, next) {
-    return roomService.unbanUserFromRoom(req.troupe, req.troupeBan, req.user, function(err) {
+    return roomService.unbanUserFromRoom(req.troupe, req.troupeBan, req.troupeBanUser.username, req.user, function(err) {
       if(err) return next(err);
       res.send({ success: true });
     });
@@ -62,6 +62,8 @@ module.exports = {
     return userService.findByUsername(id, function(err, user) {
       if(err) return callback(err);
       if(!user) return callback();
+
+      req.troupeBanUser = user;
 
       var ban = _.find(req.troupe.bans, function(ban) { return ban.userId == user.id;} );
       return callback(null, ban);

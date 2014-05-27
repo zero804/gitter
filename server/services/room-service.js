@@ -25,6 +25,7 @@ var serializeEvent     = require('./persistence-service-events').serializeEvent;
 var validate           = require('../utils/validate');
 var collections        = require('../utils/collections');
 var StatusError        = require('statuserror');
+var eventService       = require('./event-service');
 
 function localUriLookup(uri, opts) {
   return uriLookupService.lookupUri(uri)
@@ -850,7 +851,22 @@ function banUserFromRoom(room, username, requestingUser, callback) {
 
             room.removeUserById(user.id);
 
-            return room.saveQ().thenResolve(ban);
+            return room.saveQ()
+              .then(function() {
+                return eventService.newEventToTroupe(
+                  room, requestingUser,
+                  "User @" + requestingUser.username + " banned @" + username + " from this room",
+                  {
+                    service: 'bans',
+                    event: 'banned',
+                    bannedUser: username,
+                    prerendered: true,
+                    performingUser: requestingUser.username
+                  }, {}, function(err) {
+                  if(err) logger.error("Unable to create an event in troupe: " + err, { exception: err });
+                });
+              })
+              .thenResolve(ban);
           }
 
         });
@@ -860,7 +876,7 @@ function banUserFromRoom(room, username, requestingUser, callback) {
 }
 exports.banUserFromRoom = banUserFromRoom;
 
-function unbanUserFromRoom(room, troupeBan, requestingUser, callback) {
+function unbanUserFromRoom(room, troupeBan, username, requestingUser, callback) {
   if(!room) return Q.reject(new StatusError(400, 'Room required')).nodeify(callback);
   if(!troupeBan) return Q.reject(new StatusError(400, 'Username required')).nodeify(callback);
   if(!requestingUser) return Q.reject(new StatusError(401, 'Not authenicated')).nodeify(callback);
@@ -875,6 +891,20 @@ function unbanUserFromRoom(room, troupeBan, requestingUser, callback) {
       room.bans.pull({ _id: troupeBan._id });
 
       return room.saveQ();
+    })
+    .then(function() {
+      return eventService.newEventToTroupe(
+        room, requestingUser,
+        "User @" + requestingUser.username + " unbanned @" + username + " from this room",
+        {
+          service: 'bans',
+          event: 'unbanned',
+          bannedUser: username,
+          prerendered: true,
+          performingUser: requestingUser.username
+        }, {}, function(err) {
+        if(err) logger.error("Unable to create an event in troupe: " + err, { exception: err });
+      });
     })
     .nodeify(callback);
 }
