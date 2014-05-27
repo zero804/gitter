@@ -8,7 +8,7 @@ function userIsBannedFromRoom(uri, user) {
   return persistence.Troupe.findOneQ({ lcUri: lcUri }, 'bans.userId', { lean: true })
     .then(function(troupe) {
       if(!troupe) return false;
-      if(troupe.bans) return false;
+      if(!troupe.bans) return false;
 
       var isBannedFromRoom = troupe.bans.some(function(troupeBan) {
         return "" + troupeBan.userId === "" + user._id;
