@@ -156,6 +156,7 @@ define([
     },
 
     showInput: function() {
+      if (!context().permissions.admin) return;
       if (this.editingTopic === true) return;
       this.editingTopic = true;
 
