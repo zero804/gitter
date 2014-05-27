@@ -460,6 +460,30 @@ function TroupeUserStrategy(options) {
   };
 }
 
+function TroupeBanStrategy(options) {
+  var userIdStategy = new UserIdStrategy(options);
+
+  this.preload = function(troupeBans, callback) {
+    var userIds = troupeBans.map(function(troupeBan) { return troupeBan.userId; });
+    var banningUsers = troupeBans.map(function(troupeBan) { return troupeBan.bannedBy; });
+
+    userIdStategy.preload(userIds.concat(banningUsers), callback);
+  };
+
+  this.map = function(troupeBan) {
+    var user = userIdStategy.map(troupeBan.userId);
+    var bannedBy = userIdStategy.map(troupeBan.bannedBy);
+
+    if(!user) return null;
+    return {
+      user: user,
+      bannedBy: bannedBy,
+      dateBanned: troupeBan.dateBanned
+    };
+  };
+}
+
+
 function GitHubOrgStrategy(options) {
 
   var troupeStrategy = new TroupeStrategy(options);
@@ -812,6 +836,10 @@ function serializeModel(model, callback) {
       strategy = new TroupeUserStrategy();
       break;
 
+    case 'TroupeBanStrategy':
+      strategy = new TroupeBanStrategy();
+      break;
+
     case 'ChatMessageSchema':
       strategy = new ChatStrategy();
       break;
@@ -838,6 +866,7 @@ module.exports = {
   TroupeStrategy: TroupeStrategy,
   TroupeIdStrategy: TroupeIdStrategy,
   TroupeUserStrategy: TroupeUserStrategy,
+  TroupeBanStrategy: TroupeBanStrategy,
   SearchResultsStrategy: SearchResultsStrategy,
   getStrategy: getStrategy,
   execPreloads: execPreloads,

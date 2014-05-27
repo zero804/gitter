@@ -70,6 +70,13 @@ function checkTroupeAccess(userId, troupeId, callback) {
     .then(function(troupe) {
       if(!troupe) return false;
 
+      if(troupe.bans && troupe.bans.some(function(troupeBan) {
+        return "" + userId == "" + troupeBan.userId;
+      })) {
+        // Banned from the room? You get to see nothing dog!
+        return false;
+      }
+
       if(troupe.security === 'PUBLIC') {
         return true;
       }
