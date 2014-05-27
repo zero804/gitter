@@ -63,7 +63,12 @@ module.exports = function(options) {
         return callback(incomingMessage);
       }
 
+      var timeout = setTimeout(function() {
+        logger.error("Extension took too long to process!", name, incomingMessage);
+      }, 1000);
+
       incoming(incomingMessage, req, function(err, outgoingMessage) {
+        clearTimeout(timeout);
         if(!outgoingMessage) outgoingMessage = incomingMessage;
 
         if(err) {
@@ -78,8 +83,8 @@ module.exports = function(options) {
             subscription: outgoingMessage.subscription,
             request: requestInfo(req)
           });
-
         }
+
         callback(outgoingMessage);
       });
     };
@@ -91,7 +96,13 @@ module.exports = function(options) {
         return callback(incomingMessage);
       }
 
+      var timeout = setTimeout(function() {
+        logger.error("Extension took too long to process!", name, incomingMessage);
+      }, 1000);
+
       outgoing(incomingMessage, req, function(err, outgoingMessage) {
+        clearTimeout(timeout);
+
         if(!outgoingMessage) outgoingMessage = incomingMessage;
 
         if(err) {
