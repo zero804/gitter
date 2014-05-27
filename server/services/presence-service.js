@@ -298,7 +298,7 @@ function lookupSocketOwnerAndTroupe(socketId, callback) {
 function lookupUserIdForSocket (socketId, callback) {
   if(!socketId) return callback('socketId expected');
 
-  redisClient.hmget(keySocketUser(socketId), "uid", "ctime", function(err, reply) {
+  redisClient.hmget(keySocketUser(socketId), "uid", "ct", function(err, reply) {
     if(err) return callback(err);
 
     return callback(null, reply[0], !!reply[1]);
@@ -308,7 +308,7 @@ function lookupUserIdForSocket (socketId, callback) {
 function socketExists(socketId, callback) {
   if(!socketId) return callback('socketId expected');
 
-  redisClient.hget(keySocketUser(socketId), "ctime", function(err, reply) {
+  redisClient.hget(keySocketUser(socketId), "ct", function(err, reply) {
     if(err) return callback(err);
 
     return callback(null, !!reply);
@@ -458,22 +458,6 @@ function listOnlineUsers(callback) {
 
 function listMobileUsers(callback) {
   redisClient.zrange(MOBILE_USERS_KEY, 0, -1, callback);
-}
-
-function getSocket(socketId, callback) {
-  redisClient.hmget(keySocketUser(socketId), 'uid', 'tid', 'eb', 'mob', 'ctime', 'ct', function(err, result) {
-    if(err) return callback(err);
-
-    return callback(null, {
-      userId: result[0],
-      troupeId: result[1],
-      eyeballs: !!result[2],
-      mobile: !!result[3],
-      createdTime: new Date(parseInt(result[4], 10)),
-      clientType: result[5]
-    });
-
-  });
 }
 
 function listActiveSockets(callback) {
@@ -869,7 +853,6 @@ presenceService.findOnlineUsersForTroupe =  findOnlineUsersForTroupe;
 presenceService.categorizeUsersByOnlineStatus =  categorizeUsersByOnlineStatus;
 presenceService.listOnlineUsers = listOnlineUsers;
 presenceService.listActiveSockets = listActiveSockets;
-presenceService.getSocket = getSocket;
 presenceService.listMobileUsers =  listMobileUsers;
 presenceService.listOnlineUsersForTroupes =  listOnlineUsersForTroupes;
 presenceService.categorizeUserTroupesByOnlineStatus = categorizeUserTroupesByOnlineStatus;
