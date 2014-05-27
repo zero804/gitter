@@ -34,8 +34,15 @@ define([
           statusCode: {
             403: function() {
               var errorMessage = 'You do not have permission to ban people.';
-              console.log(errorMessage);
-              appEvents.trigger('user_notification', {
+              appEvents.triggerParent('user_notification', {
+                title: 'Could not ban user',
+                text: errorMessage,
+                className: 'notification-error'
+              });
+            },
+            400: function(data) {
+              var errorMessage = data.responseJSON.error;
+              appEvents.triggerParent('user_notification', {
                 title: 'Could not ban user',
                 text: errorMessage,
                 className: 'notification-error'
@@ -223,8 +230,7 @@ define([
           statusCode: {
             403: function() {
               var errorMessage = 'You do not have permission to unban people.';
-              console.log(errorMessage);
-              appEvents.trigger('userNotification', {
+              appEvents.triggerParent('user_notification', {
                 title: 'Could not ban user',
                 text: errorMessage,
                 className: 'notification-error'
@@ -232,8 +238,7 @@ define([
             },
             404: function() {
               var errorMessage = 'That person is not on the banned list.';
-              console.log(errorMessage);
-              appEvents.trigger('user_notification', {
+              appEvents.triggerParent('user_notification', {
                 title: 'Could not ban user',
                 text: errorMessage,
                 className: 'notification-error'

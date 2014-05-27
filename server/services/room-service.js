@@ -820,7 +820,7 @@ function banUserFromRoom(room, username, requestingUser, callback) {
   if(!username) return Q.reject(new StatusError(400, 'Username required')).nodeify(callback);
   if(!requestingUser) return Q.reject(new StatusError(401, 'Not authenicated')).nodeify(callback);
   if(requestingUser.username === username) return Q.reject(new StatusError(400, 'You cannot ban yourself')).nodeify(callback);
-  if(!canBanInRoom(room)) return Q.reject(new StatusError(404, 'This room does not support bans')).nodeify(callback);
+  if(!canBanInRoom(room)) return Q.reject(new StatusError(400, 'This room does not support banning.')).nodeify(callback);
 
   /* Does the requesting user have admin rights to this room? */
   return roomPermissionsModel(requestingUser, 'admin', room)
