@@ -24,6 +24,7 @@ var appEvents          = require("../app-events");
 var serializeEvent     = require('./persistence-service-events').serializeEvent;
 var validate           = require('../utils/validate');
 var collections        = require('../utils/collections');
+var StatusError        = require('statuserror');
 
 function localUriLookup(uri, opts) {
   return uriLookupService.lookupUri(uri)
@@ -805,3 +806,67 @@ function validateRoomForReadOnlyAccess(user, room) {
     });
 }
 exports.validateRoomForReadOnlyAccess = validateRoomForReadOnlyAccess;
+
+function canBanInRoom(room) {
+  if(room.githubType === 'ONETOONE') return false;
+  if(room.githubType === 'ORG') return false;
+  if(room.security === 'PRIVATE') return false; /* No bans in private rooms */
+
+  return true;
+}
+
+function banUserFromRoom(room, username, requestingUser, callback) {
+  if(!room) return Q.reject(new StatusError(400, 'Room required')).nodeify(callback);
+  if(!username) return Q.reject(new StatusError(400, 'Username required')).nodeify(callback);
+  if(!requestingUser) return Q.reject(new StatusError(401, 'Not authenicated')).nodeify(callback);
+
+  if(!canBanInRoom(room)) return Q.reject(new StatusError(404, 'This room does not support bans')).nodeify(callback);
+
+  /* Does the requesting user have admin rights to this room? */
+  return roomPermissionsModel(requestingUser, 'admin', room)
+    .then(function(access) {
+      if(!access) throw new StatusError(404, 'Ban permission required');
+
+      return userService.findByUsername(username);
+    })
+    .then(function(user) {
+      if(!user) throw new StatusError(404, 'User ' + username + ' not found.');
+      var existingBan = _.find(room.bans, function(ban) { return ban.userId == user.id;} );
+
+      if(existingBan) {
+        return existingBan;
+      } else {
+        var ban = new persistence.TroupeBannedUser({
+          userId: user.id,
+          bannedBy: requestingUser.id
+        });
+
+        room.bans.push(ban);
+
+        room.saveQ().thenResolve(ban);
+      }
+    })
+    .nodeify(callback);
+}
+exports.banUserFromRoom = banUserFromRoom;
+
+function unbanUserFromRoom(room, troupeBan, requestingUser, callback) {
+  if(!room) return Q.reject(new StatusError(400, 'Room required')).nodeify(callback);
+  if(!troupeBan) return Q.reject(new StatusError(400, 'Username required')).nodeify(callback);
+  if(!requestingUser) return Q.reject(new StatusError(401, 'Not authenicated')).nodeify(callback);
+
+  if(!canBanInRoom(room)) return Q.reject(new StatusError(404, 'This room does not support bans')).nodeify(callback);
+
+  /* Does the requesting user have admin rights to this room? */
+  return roomPermissionsModel(requestingUser, 'admin', room)
+    .then(function(access) {
+      if(!access) throw new StatusError(403, 'Unban permission required');
+
+      room.bans.pull({ _id: troupeBan._id });
+
+      return room.saveQ();
+    })
+    .nodeify(callback);
+}
+exports.unbanUserFromRoom = unbanUserFromRoom;
+
