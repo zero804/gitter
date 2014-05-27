@@ -9,52 +9,43 @@ define([
 
   var commandsList = [
     {
-      command: 'topic foo',
-      description: 'Set room topic to foo',
+      command: 'ban @username',
+      description: 'Ban somebody from the room',
       criteria: function() {
-        return !context.inOneToOneTroupeContext() && context().permissions.admin;
+        var isOrgRoom = false;
+        if (context().troupe.githubType == "ORG") isOrgRoom = true;
+        return !context.inOneToOneTroupeContext() && context().permissions.admin && !isOrgRoom;
       },
-      completion: 'topic ',
-      regexp: /^\/topic/,
+      completion: 'ban ',
+      regexp: /^\/ban/,
       action: function(view) {
-        var topicMatch = view.$el.val().match(/^\/topic (.+)/);
-        if (topicMatch) {
-          var topic = topicMatch[1];
-          view.reset();
-
-          context.troupe().set('topic', topic);
-          $.ajax({
-            url: '/api/v1/rooms/' + context.getTroupeId(),
-            contentType: "application/json",
-            dataType: "json",
-            type: "PUT",
-            data: JSON.stringify({ topic: topic })
-          });
-        }
+        var userMatch = view.$el.val().match(/\/ban @(\w+)/);
+        if (!userMatch) return;
+        var user = userMatch[1];
+        $.ajax({
+          url: '/api/v1/rooms/' + context.getTroupeId() + '/bans',
+          contentType: "application/json",
+          dataType: "json",
+          type: "POST",
+          data: JSON.stringify({ username: user })
+        });
       }
     },
     {
-      command: 'ban @username',
-      description: 'Set room topic to foo',
-      criteria: function() {
-        return !context.inOneToOneTroupeContext() && context().permissions.admin;
-      },
-      completion: 'topic ',
-      regexp: /^\/topic/,
+      command: 'channel',
+      description: 'Create/join a channel',
+      completion: 'channel ',
+      regexp: /^\/channel/,
       action: function(view) {
-        var topicMatch = view.$el.val().match(/^\/topic (.+)/);
-        if (topicMatch) {
-          var topic = topicMatch[1];
-          view.reset();
+        var input = view.$el.val();
+        var channelMatch = input.match(/^\s*\/channel(?:\s+(\w+))?/);
+        var channel = channelMatch[1];
 
-          context.troupe().set('topic', topic);
-          $.ajax({
-            url: '/api/v1/rooms/' + context.getTroupeId(),
-            contentType: "application/json",
-            dataType: "json",
-            type: "PUT",
-            data: JSON.stringify({ topic: topic })
-          });
+        view.$el.val('');
+        if(channel) {
+          appEvents.trigger('route', 'createcustomroom/' + channel);
+        } else {
+          appEvents.trigger('route', 'createcustomroom');
         }
       }
     },
@@ -75,24 +66,6 @@ define([
         });
 
         view.reset();
-      }
-    },
-    {
-      command: 'query @user',
-      description: 'Go private with @user',
-      completion: 'query @',
-      regexp: /^\/query/,
-      action: function(view) {
-        var userMatch = view.$el.val().match(/\/query @(\w+)/);
-        if (!userMatch) return;
-        var user = userMatch[1];
-        view.reset();
-
-        var url = '/' + user;
-        var type = user === context.user().get('username') ? 'home' : 'chat';
-        var title = user;
-
-        appEvents.trigger('navigation', url, type, title);
       }
     },
     {
@@ -155,7 +128,24 @@ define([
 
       }
     },
+    {
+      command: 'query @user',
+      description: 'Go private with @user',
+      completion: 'query @',
+      regexp: /^\/query/,
+      action: function(view) {
+        var userMatch = view.$el.val().match(/\/query @(\w+)/);
+        if (!userMatch) return;
+        var user = userMatch[1];
+        view.reset();
 
+        var url = '/' + user;
+        var type = user === context.user().get('username') ? 'home' : 'chat';
+        var title = user;
+
+        appEvents.trigger('navigation', url, type, title);
+      }
+    },
     {
       command: 'subst',
       regexp: /^s\/([^\/]+)\/([^\/]*)\/i?(g?)\s*$/,
@@ -170,23 +160,53 @@ define([
       }
     },
     {
-      command: 'channel',
-      description: 'Create/join a channel',
-      completion: 'channel ',
-      regexp: /^\/channel/,
+      command: 'topic foo',
+      description: 'Set room topic to foo',
+      criteria: function() {
+        return !context.inOneToOneTroupeContext() && context().permissions.admin;
+      },
+      completion: 'topic ',
+      regexp: /^\/topic/,
       action: function(view) {
-        var input = view.$el.val();
-        var channelMatch = input.match(/^\s*\/channel(?:\s+(\w+))?/);
-        var channel = channelMatch[1];
+        var topicMatch = view.$el.val().match(/^\/topic (.+)/);
+        if (topicMatch) {
+          var topic = topicMatch[1];
+          view.reset();
 
-        view.$el.val('');
-        if(channel) {
-          appEvents.trigger('route', 'createcustomroom/' + channel);
-        } else {
-          appEvents.trigger('route', 'createcustomroom');
+          context.troupe().set('topic', topic);
+          $.ajax({
+            url: '/api/v1/rooms/' + context.getTroupeId(),
+            contentType: "application/json",
+            dataType: "json",
+            type: "PUT",
+            data: JSON.stringify({ topic: topic })
+          });
         }
       }
+    },
+    {
+      command: 'unban @username',
+      description: 'Unban somebody from the room',
+      criteria: function() {
+        var isOrgRoom = false;
+        if (context().troupe.githubType == "ORG") isOrgRoom = true;
+        return !context.inOneToOneTroupeContext() && context().permissions.admin && !isOrgRoom;
+      },
+      completion: 'unban ',
+      regexp: /^\/unban/,
+      action: function(view) {
+        var userMatch = view.$el.val().match(/\/unban @(\w+)/);
+        if (!userMatch) return;
+        var user = userMatch[1];
+        $.ajax({
+          url: '/api/v1/rooms/' + context.getTroupeId() + '/bans/' + user,
+          contentType: "application/json",
+          dataType: "json",
+          type: "DELETE"
+        });
+      }
     }
+    
 
   ];
 
