@@ -24,6 +24,8 @@ var appEvents          = require("../app-events");
 var serializeEvent     = require('./persistence-service-events').serializeEvent;
 var validate           = require('../utils/validate');
 var collections        = require('../utils/collections');
+var StatusError        = require('statuserror');
+var eventService       = require('./event-service');
 
 function localUriLookup(uri, opts) {
   return uriLookupService.lookupUri(uri)
@@ -539,19 +541,18 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
     }
 
     var lcUri = uri.toLowerCase();
-
     return permissionsModel(user, 'create', uri, githubType, security)
       .then(function(access) {
-        if(!access) throw 403;
+        if(!access) throw new StatusError(403, 'You do not have permission to create a channel here');
         // Make sure that no such repo exists on Github
         return ensureNoRepoNameClash(user, uri);
       })
       .then(function(clash) {
-        if(clash) throw 409;
+        if(clash) throw new StatusError(409, 'There is a repo at ' + uri + ' therefore you cannot create a channel there');
         return ensureNoExistingChannelNameClash(uri);
       })
       .then(function(clash) {
-        if(clash) throw 409;
+        if(clash) throw new StatusError(409, 'There is already a channel at ' + uri);
 
         var nonce = Math.floor(Math.random() * 100000);
 
@@ -805,3 +806,106 @@ function validateRoomForReadOnlyAccess(user, room) {
     });
 }
 exports.validateRoomForReadOnlyAccess = validateRoomForReadOnlyAccess;
+
+function canBanInRoom(room) {
+  if(room.githubType === 'ONETOONE') return false;
+  if(room.githubType === 'ORG') return false;
+  if(room.security === 'PRIVATE') return false; /* No bans in private rooms */
+
+  return true;
+}
+
+function banUserFromRoom(room, username, requestingUser, callback) {
+  if(!room) return Q.reject(new StatusError(400, 'Room required')).nodeify(callback);
+  if(!username) return Q.reject(new StatusError(400, 'Username required')).nodeify(callback);
+  if(!requestingUser) return Q.reject(new StatusError(401, 'Not authenicated')).nodeify(callback);
+  if(requestingUser.username === username) return Q.reject(new StatusError(400, 'You cannot ban yourself')).nodeify(callback);
+  if(!canBanInRoom(room)) return Q.reject(new StatusError(400, 'This room does not support banning.')).nodeify(callback);
+
+  /* Does the requesting user have admin rights to this room? */
+  return roomPermissionsModel(requestingUser, 'admin', room)
+    .then(function(access) {
+      if(!access) throw new StatusError(403, 'You do not have permission to ban people. Admin permission is need.');
+
+      return userService.findByUsername(username);
+    })
+    .then(function(user) {
+      if(!user) throw new StatusError(404, 'User ' + username + ' not found.');
+
+      return roomPermissionsModel(user, 'admin', room)
+        .then(function(bannedUserIsAdmin) {
+          if(bannedUserIsAdmin) throw new StatusError(400, 'User ' + username + ' is an admin in this room.');
+
+          var existingBan = _.find(room.bans, function(ban) { return ban.userId == user.id;} );
+
+          if(existingBan) {
+            return existingBan;
+          } else {
+            var ban = new persistence.TroupeBannedUser({
+              userId: user.id,
+              bannedBy: requestingUser.id
+            });
+
+            room.bans.push(ban);
+
+            room.removeUserById(user.id);
+
+            return room.saveQ()
+              .then(function() {
+                return eventService.newEventToTroupe(
+                  room, requestingUser,
+                  "User @" + requestingUser.username + " banned @" + username + " from this room",
+                  {
+                    service: 'bans',
+                    event: 'banned',
+                    bannedUser: username,
+                    prerendered: true,
+                    performingUser: requestingUser.username
+                  }, {}, function(err) {
+                  if(err) logger.error("Unable to create an event in troupe: " + err, { exception: err });
+                });
+              })
+              .thenResolve(ban);
+          }
+
+        });
+
+    })
+    .nodeify(callback);
+}
+exports.banUserFromRoom = banUserFromRoom;
+
+function unbanUserFromRoom(room, troupeBan, username, requestingUser, callback) {
+  if(!room) return Q.reject(new StatusError(400, 'Room required')).nodeify(callback);
+  if(!troupeBan) return Q.reject(new StatusError(400, 'Username required')).nodeify(callback);
+  if(!requestingUser) return Q.reject(new StatusError(401, 'Not authenicated')).nodeify(callback);
+
+  if(!canBanInRoom(room)) return Q.reject(new StatusError(400, 'This room does not support bans')).nodeify(callback);
+
+  /* Does the requesting user have admin rights to this room? */
+  return roomPermissionsModel(requestingUser, 'admin', room)
+    .then(function(access) {
+      if(!access) throw new StatusError(403, 'You do not have permission to unban people. Admin permission is need.');
+
+      room.bans.pull({ _id: troupeBan._id });
+
+      return room.saveQ();
+    })
+    .then(function() {
+      return eventService.newEventToTroupe(
+        room, requestingUser,
+        "User @" + requestingUser.username + " unbanned @" + username + " from this room",
+        {
+          service: 'bans',
+          event: 'unbanned',
+          bannedUser: username,
+          prerendered: true,
+          performingUser: requestingUser.username
+        }, {}, function(err) {
+        if(err) logger.error("Unable to create an event in troupe: " + err, { exception: err });
+      });
+    })
+    .nodeify(callback);
+}
+exports.unbanUserFromRoom = unbanUserFromRoom;
+

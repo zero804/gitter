@@ -28,7 +28,14 @@ before(fixtureLoader(fixture, {
     security: 'PRIVATE',
     githubType: 'REPO',
     users: ['user1', 'user2']
-  }
+  },
+  troupeBan: {
+    security: 'PUBLIC',
+    githubType: 'REPO',
+    users: ['userBan', 'userBanAdmin']
+  },
+  userBan: { },
+  userBanAdmin: {}
 }));
 
 after(function() {
@@ -143,6 +150,39 @@ describe('room-service', function() {
         .nodeify(done);
     });
 
+  });
+
+  describe('user revalidation', function() {
+    it('should correctly revalidate the users in a room', function(done) {
+      var roomPermissionsModelMock = mockito.mockFunction();
+
+      var roomService = testRequire.withProxies("./services/room-service", {
+        './room-permissions-model': roomPermissionsModelMock
+      });
+
+      mockito.when(roomPermissionsModelMock)().then(function(user, perm, incomingRoom) {
+        assert.equal(perm, 'join');
+        assert.equal(incomingRoom.id, fixture.troupeRepo.id);
+
+        if(user.id == fixture.user1.id) {
+          return Q.resolve(true);
+        } else if(user.id == fixture.user2.id) {
+          return Q.resolve(false);
+        } else {
+          assert(false, 'Unknown user');
+        }
+
+      });
+
+      return roomService.revalidatePermissionsForUsers(fixture.troupeRepo)
+        .then(function() {
+          var userIds = fixture.troupeRepo.getUserIds();
+          assert.equal(userIds.length, 1);
+          assert.equal(userIds[0], fixture.user1.id);
+        })
+        .nodeify(done);
+
+    });
   });
 
   describe('custom rooms', function() {
@@ -649,8 +689,59 @@ describe('room-service', function() {
 
   });
 
-  describe('user revalidation', function() {
-    it('should correctly revalidate the users in a room', function(done) {
+  describe('bans', function() {
+    it('should ban users from rooms', function(done) {
+      var roomPermissionsModelMock = mockito.mockFunction();
+
+      var roomService = testRequire.withProxies("./services/room-service", {
+        './room-permissions-model': roomPermissionsModelMock
+      });
+      var userBannedFromRoom = testRequire('./services/user-banned-from-room');
+
+      mockito.when(roomPermissionsModelMock)().then(function(user, perm, incomingRoom) {
+        assert.equal(perm, 'admin');
+        assert.equal(incomingRoom.id, fixture.troupeBan.id);
+
+        if(user.id == fixture.userBan.id) {
+          return Q.resolve(false);
+        } else if(user.id == fixture.userBanAdmin.id) {
+          return Q.resolve(true);
+        } else {
+          assert(false, 'Unknown user');
+        }
+      });
+
+      return userBannedFromRoom(fixture.troupeBan.uri, fixture.userBan)
+        .then(function(banned) {
+          assert(!banned);
+
+          return roomService.banUserFromRoom(fixture.troupeBan, fixture.userBan.username, fixture.userBanAdmin)
+            .then(function(ban) {
+              assert.equal(ban.userId, fixture.userBan.id);
+              assert.equal(ban.bannedBy, fixture.userBanAdmin.id);
+              assert(ban.dateBanned);
+
+              assert(!fixture.troupeBan.containsUserId(fixture.userBan.id));
+
+              return userBannedFromRoom(fixture.troupeBan.uri, fixture.userBan)
+                .then(function(banned) {
+                  assert(banned);
+
+                  return roomService.unbanUserFromRoom(fixture.troupeBan, ban, fixture.userBan.username, fixture.userBanAdmin)
+                    .then(function() {
+                      return userBannedFromRoom(fixture.troupeBan.uri, fixture.userBan)
+                        .then(function(banned) {
+                          assert(!banned);
+                        });
+                    });
+                });
+            });
+        })
+        .nodeify(done);
+
+    });
+
+    it('should not allow admins to be banned', function(done) {
       var roomPermissionsModelMock = mockito.mockFunction();
 
       var roomService = testRequire.withProxies("./services/room-service", {
@@ -658,27 +749,32 @@ describe('room-service', function() {
       });
 
       mockito.when(roomPermissionsModelMock)().then(function(user, perm, incomingRoom) {
-        assert.equal(perm, 'join');
-        assert.equal(incomingRoom.id, fixture.troupeRepo.id);
+        assert.equal(perm, 'admin');
+        assert.equal(incomingRoom.id, fixture.troupeBan.id);
 
-        if(user.id == fixture.user1.id) {
+        if(user.id == fixture.userBan.id) {
           return Q.resolve(true);
-        } else if(user.id == fixture.user2.id) {
-          return Q.resolve(false);
+        } else if(user.id == fixture.userBanAdmin.id) {
+          return Q.resolve(true);
         } else {
           assert(false, 'Unknown user');
         }
-
       });
 
-      return roomService.revalidatePermissionsForUsers(fixture.troupeRepo)
+
+      return roomService.banUserFromRoom(fixture.troupeBan, fixture.userBan.username, fixture.userBanAdmin)
         .then(function() {
-          var userIds = fixture.troupeRepo.getUserIds();
-          assert.equal(userIds.length, 1);
-          assert.equal(userIds[0], fixture.user1.id);
+          assert(false, 'Expected to fail as user is not an admin');
+        })
+        .fail(function(err) {
+          assert.equal(err.status, 400);
         })
         .nodeify(done);
 
     });
+
   });
+
+
+
 });
