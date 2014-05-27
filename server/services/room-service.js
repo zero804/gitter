@@ -819,13 +819,13 @@ function banUserFromRoom(room, username, requestingUser, callback) {
   if(!room) return Q.reject(new StatusError(400, 'Room required')).nodeify(callback);
   if(!username) return Q.reject(new StatusError(400, 'Username required')).nodeify(callback);
   if(!requestingUser) return Q.reject(new StatusError(401, 'Not authenicated')).nodeify(callback);
-  if(requestingUser.username === username) return Q.reject(new StatusError(400, 'Cannot ban yourself')).nodeify(callback);
+  if(requestingUser.username === username) return Q.reject(new StatusError(400, 'You cannot ban yourself')).nodeify(callback);
   if(!canBanInRoom(room)) return Q.reject(new StatusError(404, 'This room does not support bans')).nodeify(callback);
 
   /* Does the requesting user have admin rights to this room? */
   return roomPermissionsModel(requestingUser, 'admin', room)
     .then(function(access) {
-      if(!access) throw new StatusError(403, 'Ban permission required');
+      if(!access) throw new StatusError(403, 'You do not have permission to ban people. Admin permission is need.');
 
       return userService.findByUsername(username);
     })
@@ -865,12 +865,12 @@ function unbanUserFromRoom(room, troupeBan, requestingUser, callback) {
   if(!troupeBan) return Q.reject(new StatusError(400, 'Username required')).nodeify(callback);
   if(!requestingUser) return Q.reject(new StatusError(401, 'Not authenicated')).nodeify(callback);
 
-  if(!canBanInRoom(room)) return Q.reject(new StatusError(404, 'This room does not support bans')).nodeify(callback);
+  if(!canBanInRoom(room)) return Q.reject(new StatusError(400, 'This room does not support bans')).nodeify(callback);
 
   /* Does the requesting user have admin rights to this room? */
   return roomPermissionsModel(requestingUser, 'admin', room)
     .then(function(access) {
-      if(!access) throw new StatusError(403, 'Unban permission required');
+      if(!access) throw new StatusError(403, 'You do not have permission to unban people. Admin permission is need.');
 
       room.bans.pull({ _id: troupeBan._id });
 
