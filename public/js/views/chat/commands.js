@@ -47,6 +47,14 @@ define([
                 text: errorMessage,
                 className: 'notification-error'
               });
+            },
+            404: function() {
+              var errorMessage = 'That person does not exist (on Gitter that is)';
+              appEvents.triggerParent('user_notification', {
+                title: 'Could not ban user',
+                text: errorMessage,
+                className: 'notification-error'
+              });
             }
           }
         });
