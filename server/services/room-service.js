@@ -843,6 +843,8 @@ function banUserFromRoom(room, username, requestingUser, callback) {
 
         room.bans.push(ban);
 
+        room.removeUserById(user.id);
+
         room.saveQ().thenResolve(ban);
       }
     })
