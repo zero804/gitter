@@ -831,22 +831,30 @@ function banUserFromRoom(room, username, requestingUser, callback) {
     })
     .then(function(user) {
       if(!user) throw new StatusError(404, 'User ' + username + ' not found.');
-      var existingBan = _.find(room.bans, function(ban) { return ban.userId == user.id;} );
 
-      if(existingBan) {
-        return existingBan;
-      } else {
-        var ban = new persistence.TroupeBannedUser({
-          userId: user.id,
-          bannedBy: requestingUser.id
+      return roomPermissionsModel(user, 'admin', room)
+        .then(function(bannedUserIsAdmin) {
+          if(bannedUserIsAdmin) throw new StatusError(400, 'User ' + username + ' is an admin in this room.');
+
+          var existingBan = _.find(room.bans, function(ban) { return ban.userId == user.id;} );
+
+          if(existingBan) {
+            return existingBan;
+          } else {
+            var ban = new persistence.TroupeBannedUser({
+              userId: user.id,
+              bannedBy: requestingUser.id
+            });
+
+            room.bans.push(ban);
+
+            room.removeUserById(user.id);
+
+            return room.saveQ().thenResolve(ban);
+          }
+
         });
 
-        room.bans.push(ban);
-
-        room.removeUserById(user.id);
-
-        return room.saveQ().thenResolve(ban);
-      }
     })
     .nodeify(callback);
 }
