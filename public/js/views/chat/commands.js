@@ -13,7 +13,7 @@ define([
       description: 'Ban somebody from the room',
       criteria: function() {
         var isOrgRoom = false;
-        if (context().troupe.githubType == "ORG") isOrgRoom = true;
+        if (context.troupe().get("githubType") == "ORG") isOrgRoom = true;
         return !context.inOneToOneTroupeContext() && context().permissions.admin && !isOrgRoom;
       },
       completion: 'ban ',
@@ -27,7 +27,10 @@ define([
           contentType: "application/json",
           dataType: "json",
           type: "POST",
-          data: JSON.stringify({ username: user })
+          data: JSON.stringify({ username: user }),
+          success: function() {
+            view.reset();
+          }
         });
       }
     },
@@ -189,7 +192,7 @@ define([
       description: 'Unban somebody from the room',
       criteria: function() {
         var isOrgRoom = false;
-        if (context().troupe.githubType == "ORG") isOrgRoom = true;
+        if (context.troupe().get("githubType") == "ORG") isOrgRoom = true;
         return !context.inOneToOneTroupeContext() && context().permissions.admin && !isOrgRoom;
       },
       completion: 'unban ',
@@ -202,7 +205,10 @@ define([
           url: '/api/v1/rooms/' + context.getTroupeId() + '/bans/' + user,
           contentType: "application/json",
           dataType: "json",
-          type: "DELETE"
+          type: "DELETE",
+          success: function() {
+            view.reset();
+          }
         });
       }
     }
