@@ -1091,7 +1091,7 @@ Faye.Client = Faye.Class({
     this.endpoint   = Faye.URI.parse(endpoint || this.DEFAULT_ENDPOINT);
     this.endpoints  = this._options.endpoints || {};
     this.transports = {};
-    this.cookies    = Faye.CookieJar && new Faye.CookieJar();
+    this.cookies    = Faye.Cookies && new Faye.Cookies.CookieJar();
     this.headers    = {};
     this.ca         = this._options.ca;
     this._disabled  = [];
@@ -1550,25 +1550,27 @@ Faye.Transport = Faye.extend(Faye.Class({
   },
 
   _getCookies: function() {
-    var cookies = this._client.cookies;
+    var cookies = this._client.cookies,
+        url     = Faye.URI.stringify(this.endpoint);
+
     if (!cookies) return '';
 
-    return cookies.getCookies({
-      domain: this.endpoint.hostname,
-      path:   this.endpoint.path,
-      secure: this.endpoint.protocol === 'https:'
-    }).toValueString();
+    return Faye.map(cookies.getCookiesSync(url), function(cookie) {
+      return cookie.cookieString();
+    }).join('; ');
   },
 
   _storeCookies: function(setCookie) {
-    if (!setCookie || !this._client.cookies) return;
+    var cookies = this._client.cookies,
+        url     = Faye.URI.stringify(this.endpoint),
+        cookie;
+
+    if (!setCookie || !cookies) return;
     setCookie = [].concat(setCookie);
-    var cookie;
 
     for (var i = 0, n = setCookie.length; i < n; i++) {
-      cookie = this._client.cookies.setCookie(setCookie[i]);
-      cookie = cookie[0] || cookie;
-      cookie.domain = cookie.domain || this.endpoint.hostname;
+      cookie = Faye.Cookies.Cookie.parse(setCookie[i]);
+      cookies.setCookieSync(cookie, url);
     }
   }
 
@@ -2198,7 +2200,6 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
       delete self._socket;
       self._state = self.UNCONNECTED;
       self.removeTimeout('ping');
-      self.removeTimeout('pingTimeout');
       self.setDeferredStatus('unknown');
 
       var pending = self._pending ? self._pending.toArray() : [];
@@ -2220,12 +2221,6 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
 
       if (!messages) return;
       messages = [].concat(messages);
-
-      if (!messages.length) {
-        // Ping response
-        self.removeTimeout('pingTimeout');
-        self.addTimeout('ping', self._client._advice.timeout/2000, self._ping, self);
-      }
 
       for (var i = 0, n = messages.length; i < n; i++) {
         if (messages[i].successful === undefined) continue;
@@ -2255,12 +2250,7 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
   _ping: function() {
     if (!this._socket) return;
     this._socket.send('[]');
-    this.addTimeout('pingTimeout', this._client._advice.timeout/4000, this._pingTimeout, this);
-  },
-
-  _pingTimeout: function() {
-    this.close();
-    this._socket.onclose();
+    this.addTimeout('ping', this._client._advice.timeout/2000, this._ping, this);
   }
 
 }), {
@@ -2289,7 +2279,7 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
 Faye.extend(Faye.Transport.WebSocket.prototype, Faye.Deferrable);
 Faye.Transport.register('websocket', Faye.Transport.WebSocket);
 
-if (Faye.Event)
+if (Faye.Event && Faye.ENV.onbeforeunload !== undefined)
   Faye.Event.on(Faye.ENV, 'beforeunload', function() {
     Faye.Transport.WebSocket._unloaded = true;
   });
@@ -2382,11 +2372,11 @@ Faye.Transport.XHR = Faye.extend(Faye.Class(Faye.Transport, {
   },
 
   request: function(envelopes) {
-    var path = this.endpoint.path,
+    var href = this.endpoint.href,
         xhr  = Faye.ENV.ActiveXObject ? new ActiveXObject('Microsoft.XMLHTTP') : new XMLHttpRequest(),
         self = this;
 
-    xhr.open('POST', path, true);
+    xhr.open('POST', href, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.setRequestHeader('Pragma', 'no-cache');
     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -2398,7 +2388,7 @@ Faye.Transport.XHR = Faye.extend(Faye.Class(Faye.Transport, {
     }
 
     var abort = function() { xhr.abort() };
-    Faye.Event.on(Faye.ENV, 'beforeunload', abort);
+    if (Faye.ENV.onbeforeunload !== undefined) Faye.Event.on(Faye.ENV, 'beforeunload', abort);
 
     xhr.onreadystatechange = function() {
       if (!xhr || xhr.readyState !== 4) return;
@@ -2408,7 +2398,7 @@ Faye.Transport.XHR = Faye.extend(Faye.Class(Faye.Transport, {
           text          = xhr.responseText,
           successful    = (status >= 200 && status < 300) || status === 304 || status === 1223;
 
-      Faye.Event.detach(Faye.ENV, 'beforeunload', abort);
+      if (Faye.ENV.onbeforeunload !== undefined) Faye.Event.detach(Faye.ENV, 'beforeunload', abort);
       xhr.onreadystatechange = function() {};
       xhr = null;
 
