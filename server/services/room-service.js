@@ -541,19 +541,18 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
     }
 
     var lcUri = uri.toLowerCase();
-
     return permissionsModel(user, 'create', uri, githubType, security)
       .then(function(access) {
-        if(!access) throw 403;
+        if(!access) throw new StatusError(403, 'You do not have permission to create a channel here');
         // Make sure that no such repo exists on Github
         return ensureNoRepoNameClash(user, uri);
       })
       .then(function(clash) {
-        if(clash) throw 409;
+        if(clash) throw new StatusError(409, 'There is a repo at ' + uri + ' therefore you cannot create a channel there');
         return ensureNoExistingChannelNameClash(uri);
       })
       .then(function(clash) {
-        if(clash) throw 409;
+        if(clash) throw new StatusError(409, 'There is already a channel at ' + uri);
 
         var nonce = Math.floor(Math.random() * 100000);
 
