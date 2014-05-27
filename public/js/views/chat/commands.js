@@ -30,6 +30,17 @@ define([
           data: JSON.stringify({ username: user }),
           success: function() {
             view.reset();
+          },
+          statusCode: {
+            403: function() {
+              var errorMessage = 'You do not have permission to ban people.';
+              console.log(errorMessage);
+              appEvents.trigger('user_notification', {
+                title: 'Could not ban user',
+                text: errorMessage,
+                className: 'notification-error'
+              });
+            }
           }
         });
       }
@@ -208,7 +219,27 @@ define([
           type: "DELETE",
           success: function() {
             view.reset();
-          }
+          },
+          statusCode: {
+            403: function() {
+              var errorMessage = 'You do not have permission to unban people.';
+              console.log(errorMessage);
+              appEvents.trigger('userNotification', {
+                title: 'Could not ban user',
+                text: errorMessage,
+                className: 'notification-error'
+              });
+            },
+            404: function() {
+              var errorMessage = 'That person is not on the banned list.';
+              console.log(errorMessage);
+              appEvents.trigger('user_notification', {
+                title: 'Could not ban user',
+                text: errorMessage,
+                className: 'notification-error'
+              });
+            }
+          },
         });
       }
     }
