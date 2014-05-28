@@ -12,6 +12,7 @@ var http     = require('http');
 var nconf    = require('./utils/config');
 var redis    = require('./utils/redis');
 var domainWrapper = require('./utils/domain-wrapper');
+var serverStats = require('./utils/server-stats');
 
 require('./utils/diagnostics');
 
@@ -52,6 +53,8 @@ require('./api/').install(app, '/api', auth);
 require('./handlers/app').install(app);
 
 require('./handlers/catch-all').install(app);
+
+serverStats('web', server);
 
 var port = nconf.get("PORT");
 server.listen(port, function() {
