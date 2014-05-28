@@ -676,23 +676,21 @@
     },
     "faye-redis": {
       "version": "0.3.0",
-      "from": "faye-redis@git://github.com/gitterHQ/faye-redis-node#11aa3dbf5638f40b659397045344096b08e9ca4c",
+      "from": "faye-redis@git://github.com/gitterHQ/faye-redis-node#v0.3.0",
       "resolved": "git://github.com/gitterHQ/faye-redis-node#11aa3dbf5638f40b659397045344096b08e9ca4c"
     },
     "gitter-env": {
-      "version": "0.7.4",
-      "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#47255667cbebf3a66f332dbd0963eb8096bee8e4",
-      "resolved": "git+ssh://git@github.com:gitterHQ/gitter-env.git#47255667cbebf3a66f332dbd0963eb8096bee8e4",
+      "version": "0.7.5",
+      "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.7.5",
+      "resolved": "git+ssh://git@github.com:gitterHQ/gitter-env.git#7b4958f202ac2cfc1a8343a3b3586db3e5f00bee",
       "dependencies": {
         "async": {
           "version": "0.8.0",
-          "from": "async@0.8.0",
-          "resolved": "https://registry.npmjs.org/async/-/async-0.8.0.tgz"
+          "from": "async@^0.8.0"
         },
         "nconf": {
           "version": "0.6.9",
-          "from": "nconf@0.6.9",
-          "resolved": "https://registry.npmjs.org/nconf/-/nconf-0.6.9.tgz",
+          "from": "nconf@^0.6.9",
           "dependencies": {
             "async": {
               "version": "0.2.9",
@@ -700,8 +698,7 @@
             },
             "ini": {
               "version": "1.2.1",
-              "from": "ini@1.2.1",
-              "resolved": "https://registry.npmjs.org/ini/-/ini-1.2.1.tgz"
+              "from": "ini@1.x.x"
             },
             "optimist": {
               "version": "0.6.0",
@@ -709,13 +706,11 @@
               "dependencies": {
                 "wordwrap": {
                   "version": "0.0.2",
-                  "from": "wordwrap@~0.0.2",
-                  "resolved": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.2.tgz"
+                  "from": "wordwrap@~0.0.2"
                 },
                 "minimist": {
                   "version": "0.0.10",
-                  "from": "minimist@0.0.10",
-                  "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.10.tgz"
+                  "from": "minimist@~0.0.1"
                 }
               }
             }
@@ -723,8 +718,7 @@
         },
         "redis": {
           "version": "0.10.3",
-          "from": "redis@0.10.3",
-          "resolved": "https://registry.npmjs.org/redis/-/redis-0.10.3.tgz"
+          "from": "redis@^0.10.1"
         },
         "mixpanel": {
           "version": "0.0.20",
@@ -732,28 +726,28 @@
         },
         "underscore": {
           "version": "1.6.0",
-          "from": "underscore@1.6.0",
-          "resolved": "https://registry.npmjs.org/underscore/-/underscore-1.6.0.tgz"
+          "from": "underscore@^1.6.0"
         }
       }
     },
     "gitter-services": {
       "version": "1.2.0",
-      "from": "gitter-services@git+ssh://git@github.com:gitterHQ/services.git#e434313a2de9d2a4f7f986ae5920b169ddf49acf",
+      "from": "gitter-services@git+ssh://git@github.com:gitterHQ/services.git#1.2.0",
       "resolved": "git+ssh://git@github.com:gitterHQ/services.git#e434313a2de9d2a4f7f986ae5920b169ddf49acf",
       "dependencies": {
         "require-all": {
           "version": "0.0.8",
-          "from": "require-all@0.0.8"
+          "from": "require-all@0.0.8",
+          "resolved": "https://registry.npmjs.org/require-all/-/require-all-0.0.8.tgz"
         },
         "qs": {
           "version": "0.6.6",
-          "from": "qs@0.6.6",
+          "from": "qs@^0.6.6",
           "resolved": "https://registry.npmjs.org/qs/-/qs-0.6.6.tgz"
         },
         "extend": {
           "version": "1.2.1",
-          "from": "extend@1.2.1",
+          "from": "extend@^1.2.1",
           "resolved": "https://registry.npmjs.org/extend/-/extend-1.2.1.tgz"
         }
       }
@@ -866,7 +860,7 @@
     },
     "marked": {
       "version": "0.4.0",
-      "from": "marked@git://github.com/gitterHQ/marked.git#8908cb9b4a66b7b0cd0db3b50c917fca1be6e607",
+      "from": "marked@git://github.com/gitterHQ/marked.git#v0.4.0",
       "resolved": "git://github.com/gitterHQ/marked.git#8908cb9b4a66b7b0cd0db3b50c917fca1be6e607"
     },
     "memwatch": {
@@ -1293,12 +1287,12 @@
     },
     "redis-scripto": {
       "version": "0.2.0",
-      "from": "redis-scripto@git+ssh://git@github.com:gitterHQ/node-redis-scripto.git#b3306d0d40b1e82a640e66e6a47af85150b4511b",
+      "from": "redis-scripto@git+ssh://git@github.com:gitterHQ/node-redis-scripto.git#v0.2.0",
       "resolved": "git+ssh://git@github.com:gitterHQ/node-redis-scripto.git#b3306d0d40b1e82a640e66e6a47af85150b4511b",
       "dependencies": {
         "redis": {
           "version": "0.8.6",
-          "from": "redis@0.8.6",
+          "from": "redis@0.8.x",
           "resolved": "https://registry.npmjs.org/redis/-/redis-0.8.6.tgz"
         }
       }
@@ -1521,58 +1515,59 @@
     },
     "troupe-passport-github": {
       "version": "0.1.8-d",
-      "from": "troupe-passport-github@git://github.com/troupe/passport-github.git#02a05aa34203a1e0e73c05d7fe46c02dc45aa0d3",
+      "from": "troupe-passport-github@git://github.com/troupe/passport-github.git#v0.1.8d",
       "resolved": "git://github.com/troupe/passport-github.git#02a05aa34203a1e0e73c05d7fe46c02dc45aa0d3",
       "dependencies": {
         "pkginfo": {
           "version": "0.2.3",
-          "from": "pkginfo@0.2.3"
+          "from": "pkginfo@0.2.x",
+          "resolved": "https://registry.npmjs.org/pkginfo/-/pkginfo-0.2.3.tgz"
         },
         "passport-oauth": {
           "version": "1.0.0-d",
-          "from": "passport-oauth@git://github.com/troupe/passport-oauth#44e2532059278c38c1714974ef58b625a2587be4",
+          "from": "passport-oauth@git://github.com/troupe/passport-oauth#v1.0.0d",
           "resolved": "git://github.com/troupe/passport-oauth#44e2532059278c38c1714974ef58b625a2587be4",
           "dependencies": {
             "passport-oauth1": {
               "version": "1.0.1",
-              "from": "passport-oauth1@1.0.1",
+              "from": "passport-oauth1@1.x.x",
               "resolved": "https://registry.npmjs.org/passport-oauth1/-/passport-oauth1-1.0.1.tgz",
               "dependencies": {
                 "passport-strategy": {
                   "version": "1.0.0",
-                  "from": "passport-strategy@1.0.0",
+                  "from": "passport-strategy@1.x.x",
                   "resolved": "https://registry.npmjs.org/passport-strategy/-/passport-strategy-1.0.0.tgz"
                 },
                 "oauth": {
                   "version": "0.9.12",
-                  "from": "oauth@0.9.12",
+                  "from": "oauth@0.9.x",
                   "resolved": "https://registry.npmjs.org/oauth/-/oauth-0.9.12.tgz"
                 },
                 "utils-merge": {
                   "version": "1.0.0",
-                  "from": "utils-merge@1.0.0",
+                  "from": "utils-merge@1.x.x",
                   "resolved": "https://registry.npmjs.org/utils-merge/-/utils-merge-1.0.0.tgz"
                 }
               }
             },
             "passport-oauth2": {
               "version": "1.1.1-d",
-              "from": "passport-oauth2@git://github.com/troupe/passport-oauth2.git#c464879e7ebd58e29a3f126b06c5bdd82544333a",
+              "from": "passport-oauth2@git://github.com/troupe/passport-oauth2.git#v1.1.1d",
               "resolved": "git://github.com/troupe/passport-oauth2.git#c464879e7ebd58e29a3f126b06c5bdd82544333a",
               "dependencies": {
                 "passport-strategy": {
                   "version": "1.0.0",
-                  "from": "passport-strategy@1.0.0",
+                  "from": "passport-strategy@1.x.x",
                   "resolved": "https://registry.npmjs.org/passport-strategy/-/passport-strategy-1.0.0.tgz"
                 },
                 "oauth": {
                   "version": "0.9.12",
-                  "from": "oauth@0.9.12",
+                  "from": "oauth@0.9.x",
                   "resolved": "https://registry.npmjs.org/oauth/-/oauth-0.9.12.tgz"
                 },
                 "uid2": {
                   "version": "0.0.3",
-                  "from": "uid2@0.0.3",
+                  "from": "uid2@0.0.x",
                   "resolved": "https://registry.npmjs.org/uid2/-/uid2-0.0.3.tgz"
                 }
               }
