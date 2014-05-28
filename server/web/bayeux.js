@@ -45,26 +45,6 @@ var routes = [
 
 var superClientPassword = nconf.get('ws:superClientPassword');
 
-function requestInfo(req) {
-  if(!req) return;
-
-  var referer, origin, connection;
-  if(req.headers) {
-    referer = req.headers.referer;
-    origin = req.headers.origin;
-    connection = req.headers.connection;
-  }
-
-  var ip = req.headers && req.headers['x-forwarded-for'] || req.ip;
-
-  return {
-    ip: ip,
-    referer: referer,
-    origin: origin,
-    connection: connection
-  };
-}
-
 function checkTroupeAccess(userId, troupeId, callback) {
   // TODO: use the room permissions model
   return troupeService.findById(troupeId)
@@ -353,10 +333,6 @@ function destroyClient(clientId) {
 // Authorize a sbscription message
 // callback(err, allowAccess)
 function authorizeSubscribe(message, callback) {
-  if(messageIsFromSuperClient(message)) {
-    return callback(null, true);
-  }
-
   var clientId = message.clientId;
 
   presenceService.lookupUserIdForSocket(clientId, function(err, userId, exists) {

@@ -96,6 +96,10 @@ module.exports = function(options) {
         return callback(incomingMessage);
       }
 
+      if(skipSuperClient && messageIsFromSuperClient(incomingMessage)) {
+        return callback(incomingMessage);
+      }
+
       var timeout = setTimeout(function() {
         logger.error("Extension took too long to process!", name, incomingMessage);
       }, 1000);
@@ -106,12 +110,13 @@ module.exports = function(options) {
         if(!outgoingMessage) outgoingMessage = incomingMessage;
 
         if(err) {
+          // In an ideal world we dont throw errors on outbound messages
           if(failureStat) stats.eventHF(failureStat);
 
           var error = makeError(err);
           outgoingMessage.error = error;
 
-          logger.error('bayeux: extension ' + name + '[outgoing] failed: ' + error, {
+          logger.error('bayeux: extension ' + name + '[outgoing] failed: ' + error + '. Technically this should not happen.', {
             channel: outgoingMessage.channel,
             token: outgoingMessage.ext && outgoingMessage.ext.token,
             subscription: outgoingMessage.subscription,
