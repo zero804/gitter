@@ -23,7 +23,17 @@ module.exports = {
 
     return unreadItemService.markItemsRead(req.resourceUser.id, req.userTroupe.id, unreadItems.chat, unreadItems.mention)
       .then(function() {
-        res.send(200);
+        res.format({
+          text: function() {
+            res.send('OK');
+          },
+          json: function() {
+            res.send({ success: true });
+          },
+          html: function() {
+            res.send('OK');
+          }
+        });
       })
       .fail(next);
 
@@ -34,7 +44,17 @@ module.exports = {
 
     return unreadItemService.markAllChatsRead(req.resourceUser.id, req.userTroupe.id, { member: true })
       .then(function() {
-        res.send(200);
+        res.format({
+          text: function() {
+            res.send('OK');
+          },
+          json: function() {
+            res.send({ success: true });
+          },
+          html: function() {
+            res.send('OK');
+          }
+        });
       })
       .fail(next);
   },

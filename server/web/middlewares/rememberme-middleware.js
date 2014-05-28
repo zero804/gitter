@@ -16,39 +16,62 @@ var cookieName = nconf.get('web:cookiePrefix') + 'auth';
 
 var redisClient = env.redis.getClient();
 
+var tokenGracePeriodMillis = 5000; /* How long after a token has been used can you reuse it? */
 var timeToLiveDays = nconf.get("web:rememberMeTTLDays");
 
-function generateAuthToken(req, res, userId, callback) {
+function generateAuthToken(userId, callback) {
   var key = uuid.v4();
   var token = uuid.v4();
-
-  req.rememberMeTokenGenerated = true;
-  res.cookie(cookieName, key + ":" + token, {
-    domain: nconf.get("web:cookieDomain"),
-    maxAge: 1000 * 60 * 60 * 24 * timeToLiveDays,
-    httpOnly: true,
-    secure: nconf.get("web:secureCookies")
-  });
 
   sechash.strongHash('sha512', token, function(err, hash3) {
     if(err) return callback(err);
 
-    var json = JSON.stringify({userId: userId, hash: hash3});
+    var json = JSON.stringify({ userId: userId, hash: hash3 });
     redisClient.setex("rememberme:" + key, 60 * 60 * 24 * timeToLiveDays, json);
 
-    callback(null);
+    /* The server doesn't keep a copy of the token anywhere, only the hash */
+    callback(null, key, token);
+  });
+
+}
+
+function setupRememberMeTokenCookie(req, res, userId, callback) {
+  generateAuthToken(userId, function(err, key, token) {
+    res.cookie(cookieName, key + ":" + token, {
+      domain: nconf.get("web:cookieDomain"),
+      maxAge: 1000 * 60 * 60 * 24 * timeToLiveDays,
+      httpOnly: true,
+      secure: nconf.get("web:secureCookies")
+    });
+
+    callback();
   });
 }
 
-function getAndDeleteRedisKey(key, callback) {
-  redisClient.multi()
-    .get(key)
-    .del(key)
-    .exec(function(err, replies) {
-      if(err) return callback(err);
-      var getResult = replies[0];
-      return callback(null, getResult);
-    });
+function parseToken(tokenInfo) {
+  try {
+    return JSON.parse(tokenInfo);
+  } catch(e) {
+  }
+}
+
+function deleteAuthToken(authCookieValue, callback) {
+  /* Auth cookie */
+  if(!authCookieValue) return callback();
+
+  var authToken = authCookieValue.split(":", 2);
+  if(authToken.length != 2) return callback();
+
+  var key = authToken[0];
+
+  if(!key) return callback();
+
+  logger.verbose('rememberme: Deleting rememberme token', { key: key });
+
+  var redisKey = "rememberme:" + key;
+
+  /* After the rememberme token has been used, it will expire in 5 seconds */
+  redisClient.del(redisKey, callback);
 }
 
 /* Validate a token and call callback(err, userId) */
@@ -56,37 +79,65 @@ function validateAuthToken(authCookieValue, callback) {
     /* Auth cookie */
     if(!authCookieValue) return callback();
 
-    logger.verbose('rememberme: Client has presented a rememberme auth cookie, attempting reauthentication');
-
     var authToken = authCookieValue.split(":", 2);
-
     if(authToken.length != 2) return callback();
 
     var key = authToken[0];
-    var hash = authToken[1];
+    var clientToken = authToken[1];
 
-    getAndDeleteRedisKey("rememberme:" + key, function(err, storedValue) {
-      if(err) return callback(err);
+    if(!key) return callback();
 
-      if(!storedValue) {
-        logger.info("rememberme: Client presented illegal rememberme token ", { token: key });
-        return callback();
-      }
+    logger.verbose('rememberme: Client has presented a rememberme auth cookie, attempting reauthentication', { key: key });
 
-      var stored = JSON.parse(storedValue);
+    var redisKey = "rememberme:" + key;
 
-      sechash.testHash(hash, stored.hash, function(err, match) {
-        if(err || !match) return callback();
-        var userId = stored.userId;
+    /* After the rememberme token has been used, it will expire in 5 seconds */
+    redisClient.multi()
+      .get(redisKey)
+      .pexpire(redisKey, tokenGracePeriodMillis)
+      .exec(function(err, replies) {
+        if(err) return callback(err);
 
-        return callback(null, userId);
+        var tokenInfo = replies[0];
+        if(!tokenInfo) {
+          logger.info("rememberme: rememberme token not found. Illegal or expired.", { key: key });
+          return callback();
+        }
+
+        var stored = parseToken(tokenInfo);
+        if(!stored) {
+          logger.info("rememberme: Saved token is corrupt.", { key: key, tokenInfo: tokenInfo });
+          return callback();
+        }
+
+        var serverHash = stored.hash;
+
+        sechash.testHash(clientToken, serverHash, function(err, match) {
+          if(err) {
+            logger.error("rememberme: error during testHash", { err: err });
+            return callback(err);
+          }
+
+          if(!match) {
+            logger.warn("rememberme: testHash failed. Illegal token", {
+              serverHash: serverHash,
+              clientToken: clientToken,
+              key: key
+            });
+
+            return callback();
+          }
+
+          var userId = stored.userId;
+
+          return callback(null, userId);
+        });
       });
-    });
 }
 
 module.exports = {
-  deleteRememberMeToken: function(token, callback) {
-      validateAuthToken(token, function(err) {
+  deleteRememberMeToken: function(cookie, callback) {
+      deleteAuthToken(cookie, function(err) {
         if(err) { logger.warn('Error validating token, but ignoring error ' + err, { exception: err }); }
 
         return callback();
@@ -94,14 +145,13 @@ module.exports = {
   },
 
   generateRememberMeTokenMiddleware: function(req, res, next) {
-    generateAuthToken(req, res, req.user.id, function(err) {
-      if(err) return next(err);
-      next();
-    });
+    setupRememberMeTokenCookie(req, res, req.user.id, next);
   },
 
   rememberMeMiddleware: function(req, res, next) {
     function fail(err) {
+      stats.event("rememberme_rejected");
+
       res.clearCookie(cookieName, { domain: nconf.get("web:cookieDomain") });
       return next(err);
     }
@@ -129,10 +179,9 @@ module.exports = {
             return fail(err);
           }
 
-          logger.verbose("rememberme: Passport login succeeded");
-
           // Remove the old token for this user
           req.accessToken = null;
+          if(req.session) req.session.accessToken = null;
 
           // Tracking
           var properties = useragentStats(req.headers['user-agent']);
@@ -140,13 +189,17 @@ module.exports = {
 
           logger.verbose('Rememberme token used for login.', { cookie: req.headers.cookie });
 
-          stats.event("user_login", _.extend({
-            userId: userId,
-            method: 'auto',
-            email: user.email
-          }, properties));
+          setupRememberMeTokenCookie(req, res, userId, function(err) {
+            if(err) return next(err);
 
-          generateAuthToken(req, res, userId, function(err) {
+            stats.event("rememberme_accepted");
+
+            stats.event("user_login", _.extend({
+              userId: userId,
+              method: 'auto',
+              email: user.email
+            }, properties));
+
             return next(err);
           });
 
@@ -157,5 +210,14 @@ module.exports = {
     });
 
 
+  },
+
+  testOnly: {
+    generateAuthToken: generateAuthToken,
+    validateAuthToken: validateAuthToken,
+    deleteAuthToken: deleteAuthToken,
+    setTokenGracePeriodMillis: function(time) {
+      tokenGracePeriodMillis = time;
+    }
   }
 };

@@ -17,6 +17,8 @@ define([
       return;
     }
 
+    var className = message.className;
+
     var element = $.parseHTML(template({
         link: message.link,
         title: message.title,
@@ -32,7 +34,8 @@ define([
     }
 
     notifications.notify({
-      content: element
+      content: element,
+      className: className
     });
   });
 

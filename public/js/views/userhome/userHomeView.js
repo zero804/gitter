@@ -8,8 +8,9 @@ define([
   'hbs!./tmpl/userHomeEmptyOrgView',
   './homeOrgCollectionView',
   './homeRepoCollectionView',
-  'collections/repos'
-], function($, Marionette, context, troupeCollections, userHomeTemplate, userHomeEmptyOrgViewTemplate, OrgCollectionView, RepoCollectionView, repoModels) {
+  'collections/repos',
+  'utils/is-mobile'
+], function($, Marionette, context, troupeCollections, userHomeTemplate, userHomeEmptyOrgViewTemplate, OrgCollectionView, RepoCollectionView, repoModels, isMobile) {
   "use strict";
 
   var reposCollection = new repoModels.ReposCollection();
@@ -30,19 +31,19 @@ define([
 
     onRender: function() {
       $('#header-wrapper').hide();
-      this.orgs.show(new OrgCollectionView({ collection: troupeCollections.orgs, emptyView: Marionette.ItemView.extend({ template: userHomeEmptyOrgViewTemplate, serializeData: function() {
-        var viewData = {};
-        viewData.privateRepoScope = !!context.getUser().scopes.private_repo;
-        return viewData;
-      }}) }));
+      this.orgs.show(new OrgCollectionView({
+        collection: troupeCollections.orgs,
+        emptyView: Marionette.ItemView.extend({ template: userHomeEmptyOrgViewTemplate })
+      }));
       this.repos.show(new RepoCollectionView({ collection: reposCollection }));
     },
 
     serializeData: function() {
       var user = context.getUser();
+      var hasPrivateRepoScope = !!user.scopes.private_repo;
 
       return {
-        privateRepoScope: !!user.scopes.private_repo
+        showUpgradeAuthLink: !isMobile() && !hasPrivateRepoScope
       };
     },
 

@@ -128,9 +128,9 @@ module.exports = function( grunt ) {
                     "views/widgets/timeago"
                   ],
                   exclude: ["core-libraries"]
-              },/*
+              },
               {
-                  name: "homepage-mobile",
+                  name: "mobile-native-userhome",
                   include: [
                     "utils/tracking",
                     "views/widgets/avatar",
@@ -139,14 +139,23 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
-                  name: "routers/mobile/native/chat-router",
+                  name: "mobile-native-router",
                   include: [
                     "utils/tracking",
                     "views/widgets/avatar",
                     "views/widgets/timeago"
                   ],
                   exclude: ["core-libraries"]
-              },*/
+              },
+              {
+                  name: "mobile-native-chat",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
               {
                   name: "mobile-app",
                   include: [
@@ -285,8 +294,9 @@ module.exports = function( grunt ) {
       'router-archive-home': createClosureConfig('router-archive-home'),
       'router-archive-chat': createClosureConfig('router-archive-chat'),
       'userhome': createClosureConfig('userhome'),
-//      "homepage-mobile" : createClosureConfig('homepage-mobile'),
-//       "native-chat-router": createClosureConfig('routers/mobile/native/chat-router'),
+      "mobile-native-userhome" : createClosureConfig('mobile-native-userhome'),
+      "mobile-native-router": createClosureConfig('mobile-native-router'),
+      "mobile-native-chat": createClosureConfig('mobile-native-chat'),
       "mobile-app": createClosureConfig('mobile-app'),
       "mobile-nli-app": createClosureConfig('mobile-nli-app'),
       "mobile-userhome": createClosureConfig('mobile-userhome'),
