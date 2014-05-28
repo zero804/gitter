@@ -637,9 +637,17 @@ var server = new faye.NodeAdapter({
 var client = server.getClient();
 
 faye.stringify = function(object) {
-  var string = JSON.stringify(object);
-  stats.gaugeHF('bayeux.message.size', string.length);
-  return string;
+  try {
+    var string = JSON.stringify(object);
+    if(string) {
+      // Over cautious
+      stats.gaugeHF('bayeux.message.size', string.length);
+    }
+    return string;
+  } catch(e) {
+    logger.error('Error while serializing JSON message', { exception: e });
+    throw e;
+  }
 };
 
 /* TEMPORARY DEBUGGING SOLUTION */
