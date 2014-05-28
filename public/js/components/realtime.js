@@ -220,6 +220,7 @@ define([
     // Disable websocket on Mobile due to iOS crash bug
     var userAgent = window.navigator.userAgent;
     if(userAgent.indexOf('Mobile') >= 0) {
+      /* Testing no websockets */
       client.disable('websocket');
     }
 

@@ -6,10 +6,12 @@ CACHE:
 {{ cdn 'bootstrap/css/trpNativeChat.css' 			 appcache=true }}
 {{#if minified}}
 {{ cdn 'js/core-libraries.min.js' 					 appcache=true }}
-{{ cdn 'js/routers/mobile/native/chat-router.min.js' appcache=true }}
+{{ cdn 'js/mobile-native-router.min.js' appcache=true }}
+{{ cdn 'js/mobile-native-chat.min.js' appcache=true }}
 {{else}}
-{{ cdn 'js/core-libraries.js' 						 appcache=true }}
-{{ cdn 'js/routers/mobile/native/chat-router.js' 	 appcache=true }}
+{{ cdn 'js/core-libraries.js'            appcache=true }}
+{{ cdn 'js/mobile-native-router.js' appcache=true }}
+{{ cdn 'js/mobile-native-chat.js' appcache=true }}
 {{/if}}
 {{ cdn 'images/2/favicon8.ico' 					     appcache=true }}
 {{ cdn 'images/2/avatar-default-s.png' 			     appcache=true }}

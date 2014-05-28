@@ -292,10 +292,27 @@ function lookupSocketOwnerAndTroupe(socketId, callback) {
   });
 }
 
+/**
+ * Callback -> (err, userId, exists)
+ */
 function lookupUserIdForSocket (socketId, callback) {
   if(!socketId) return callback('socketId expected');
 
-  redisClient.hget(keySocketUser(socketId), "uid", callback);
+  redisClient.hmget(keySocketUser(socketId), "uid", "ct", function(err, reply) {
+    if(err) return callback(err);
+
+    return callback(null, reply[0], !!reply[1]);
+  });
+}
+
+function socketExists(socketId, callback) {
+  if(!socketId) return callback('socketId expected');
+
+  redisClient.hget(keySocketUser(socketId), "ct", function(err, reply) {
+    if(err) return callback(err);
+
+    return callback(null, !!reply);
+  });
 }
 
 function lookupTroupeIdForSocket (socketId, callback) {
@@ -831,6 +848,7 @@ presenceService.socketDisconnectionRequested = socketDisconnectionRequested;
 
 // Query Status
 presenceService.lookupUserIdForSocket =  lookupUserIdForSocket;
+presenceService.socketExists = socketExists;
 presenceService.findOnlineUsersForTroupe =  findOnlineUsersForTroupe;
 presenceService.categorizeUsersByOnlineStatus =  categorizeUsersByOnlineStatus;
 presenceService.listOnlineUsers = listOnlineUsers;

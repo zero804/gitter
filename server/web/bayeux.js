@@ -44,11 +44,38 @@ var routes = [
 
 var superClientPassword = nconf.get('ws:superClientPassword');
 
+function requestInfo(req) {
+  if(!req) return;
+
+  var referer, origin, connection;
+  if(req.headers) {
+    referer = req.headers.referer;
+    origin = req.headers.origin;
+    connection = req.headers.connection;
+  }
+
+  var ip = req.headers && req.headers['x-forwarded-for'] || req.ip;
+
+  return {
+    ip: ip,
+    referer: referer,
+    origin: origin,
+    connection: connection
+  };
+}
+
 function checkTroupeAccess(userId, troupeId, callback) {
   // TODO: use the room permissions model
   return troupeService.findById(troupeId)
     .then(function(troupe) {
       if(!troupe) return false;
+
+      if(troupe.bans && troupe.bans.some(function(troupeBan) {
+        return "" + userId == "" + troupeBan.userId;
+      })) {
+        // Banned from the room? You get to see nothing dog!
+        return false;
+      }
 
       if(troupe.security === 'PUBLIC') {
         return true;
@@ -206,13 +233,17 @@ function getConnectionType(incoming) {
   }
 }
 
+// Validate handshakes
 var authenticator = {
-  incoming: function(message, callback) {
+  incoming: function(message, req, callback) {
     function deny(errorCode, errorDescription) {
       stats.eventHF('bayeux.handshake.deny');
 
       message.error = errorCode + '::' + errorDescription;
-      logger.error('Denying client access', message);
+      logger.error('Denying client access: ' + errorCode + '::' + errorDescription, {
+        token: message.ext && message.ext.token,
+        request: requestInfo(req)
+      });
 
       callback(message);
     }
@@ -235,6 +266,7 @@ var authenticator = {
 
     oauth.validateAccessTokenAndClient(ext.token, function(err, tokenInfo) {
       if(err) {
+        delete err.stack; // Too much logging
         logger.error("bayeux: Authentication error: " + err, { exception: err, message: message });
         return deny(500, "A server error occurred.");
       }
@@ -303,12 +335,15 @@ var authenticator = {
       return callback(message);
     }
 
-    logger.info("bayeux: connection " + clientId + ' is associated to ' + userId, { troupeId: troupeId, client: client });
+    logger.verbose("bayeux: about to associate connection " + clientId + ' to user ' + userId, { troupeId: troupeId, client: client });
 
     // Get the presence service involved around about now
     presenceService.userSocketConnected(userId, clientId, connectionType, client, troupeId, eyeballState, function(err) {
+      logger.info("bayeux: connection " + clientId + ' is associated to ' + userId, { troupeId: troupeId, client: client });
 
-      if(err) logger.error("bayeux: Presence service failed to record socket connection: " + err, { exception: err });
+      if(err) {
+        logger.error("bayeux: Presence service failed to record socket connection: " + err, { exception: err });
+      }
 
       message.ext.userId = userId;
 
@@ -319,7 +354,9 @@ var authenticator = {
       // If the troupeId was included, it means we've got a native
       // client and they'll be looking for a snapshot:
       contextGenerator.generateSocketContext(userId, troupeId, function(err, context) {
-        if(err) logger.error("bayeux: Unable to generate context: " + err, { exception: err });
+        if(err) {
+          logger.error("bayeux: Unable to generate context: " + err, { exception: err });
+        }
 
         message.ext.context = context;
 
@@ -361,19 +398,24 @@ var authorisor = {
       snapshot = 0;
     }
 
-    function deny(errorCode) {
+    function deny(errorCode, errorDescription) {
       stats.eventHF('bayeux.subscribe.deny');
-      var errorDescription;
+      var clientDescription;
+
       switch(errorCode) {
-        case 401: errorDescription = 'Access denied'; break;
-        case 403: errorDescription = 'Permission denied'; break;
-        case 404: errorDescription = 'Not found'; break;
+        case 401: clientDescription = 'Access denied'; break;
+        case 403: clientDescription = 'Permission denied'; break;
+        case 404: clientDescription = 'Not found'; break;
         default:
-          errorDescription = 'A server error occurred';
+          clientDescription = 'A server error occurred';
       }
 
-      message.error = errorCode + '::' + errorDescription;
-      logger.error('Socket authorisation failed. Denying subscribe.', message);
+      message.error = errorCode + '::' + clientDescription;
+      logger.error('bayeux: authorisor: Socket authorisation failed: ' + errorCode + '::' + errorDescription, {
+        request: requestInfo(req),
+        clientId: message.clientId,
+        subscription: message.subscription
+      });
 
       callback(message);
     }
@@ -383,13 +425,10 @@ var authorisor = {
     this.authorizeSubscribe(message, function(err, allowed) {
       if(err) {
         var status = err.status || 500;
-
-        logger.error("bayeux: Authorisation error", { exception: err, message: message });
-        return deny(status, "A server error occurred.");
+        return deny(status, err.message);
       }
 
       if(!allowed) {
-        logger.warn("bayeux: Authorisation failed", { message: message });
         return deny(403, "Authorisation denied.");
       }
 
@@ -435,9 +474,14 @@ var authorisor = {
 
     /* The populator is all about generating the snapshot for the client */
     if(clientId && populator && snapshot) {
-      presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
+      presenceService.lookupUserIdForSocket(clientId, function(err, userId, exists) {
         if(err) {
           logger.error('Error for lookupUserIdForSocket', { exception: err });
+          return callback(message);
+        }
+
+        if(!exists) {
+          logger.warn('Populator failed as socket ' + clientId + ' does not exist');
           return callback(message);
         }
 
@@ -468,13 +512,10 @@ var authorisor = {
 
     if(!clientId) return callback(new StatusError(401, 'Cannot authorise. Client not authenticated'));
 
-    presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
+    presenceService.lookupUserIdForSocket(clientId, function(err, userId, exists) {
       if(err) return callback(err);
 
-      // if(!userId) {
-      //   logger.warn('bayeux: client not authenticated.', { clientId: clientId });
-      //   return callback(new StatusError(401, 'Cannot authorise. Client not authenticated'));
-      // }
+      if(!exists) return callback(new StatusError(401, 'Cannot authorise. Socket does not exist.'));
 
       var match = null;
 
@@ -492,6 +533,61 @@ var authorisor = {
       var m = match.match;
 
       validator({ userId: userId, match: m, message: message, clientId: clientId }, callback);
+    });
+
+  }
+};
+
+// CONNECT extension
+var noConnectForUnknownClients = {
+  incoming: function(message, req, callback) {
+
+    function deny(errorCode, errorDescription) {
+      stats.eventHF('bayeux.connect.deny');
+
+      var reason = message.data && message.data.reason;
+
+      message.error = errorCode + '::' + errorDescription;
+      logger.error('Denying connect access: ' + errorDescription, {
+        errorCode: errorCode,
+        clientId: clientId,
+        request: requestInfo(req),
+        pingReason: reason
+      });
+
+      callback(message);
+    }
+
+    if (message.channel != '/meta/connect') return callback(message);
+
+    if(messageIsFromSuperClient(message)) {
+      return callback(message);
+    }
+
+    var clientId = message.clientId;
+
+    if(!clientId) {
+      return deny(401, "Access denied. ClientId required.");
+    }
+
+    server._server._engine.clientExists(clientId, function(exists) {
+      if(!exists) {
+        return deny(401, "Client does not exist");
+      }
+
+      presenceService.socketExists(clientId, function(err, exists) {
+        if(err) {
+          delete err.stack; // Too much logging
+
+          logger.error("presenceService.socketExists failed: " + err, { exception: err });
+          return deny(500, "A server error occurred.");
+        }
+
+        if(!exists) return deny(401, "Socket association does not exist");
+
+        return callback(message);
+      });
+
     });
 
   }
@@ -560,15 +656,15 @@ var pingResponder = {
         return deny(401, "Client does not exist");
       }
 
-      presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
+      presenceService.socketExists(clientId, function(err, exists) {
         if(err) {
-          logger.error("presenceService.lookupUserIdForSocket failed: " + err, { exception: err });
+          delete err.stack; // Too much logging
+
+          logger.error("presenceService.socketExists failed: " + err, { exception: err });
           return deny(500, "A server error occurred.");
         }
 
-        if(!userId) {
-          return deny(401, "Client not authenticated.");
-        }
+        if(!exists) return deny(401, "Socket association does not exist");
 
         return callback(message);
       });
@@ -653,7 +749,7 @@ var adviseAdjuster = {
         var reconnect;
 
         if(message.clientId) {
-          logger.info('Destroying client');
+          logger.info('Destroying client', { clientId: message.clientId });
           // We've told the person to go away, destroy their faye client
           destroyClient(message.clientId);
         }
@@ -715,12 +811,56 @@ faye.stringify = function(object) {
   return string;
 };
 
-faye.logger = {};
-['fatal', 'error', 'warn'].forEach(function(level) {
-  faye.logger[level] = function(message) {
-    logger[level]('faye: ' + message);
-  };
+/* TEMPORARY DEBUGGING SOLUTION */
+var re;
+var fs = require('fs');
+
+setInterval(function() {
+  fs.exists('/tmp/faye-logging-filter', function(exists) {
+    if(exists) {
+      fs.readFile('/tmp/faye-logging-filter', 'utf8', function(err, data) {
+        if(err) {
+          logger.info('Unable to read /tmp/faye-logging-filter', { exception: err });
+        }
+
+        var lines = data.split(/[\n]/)
+          .map(function(line) { return line.trim(); })
+          .filter(function(line) { return line; });
+
+        try {
+          re = new RegExp(lines.join('|'));
+        } catch(e) {
+          re = null;
+          logger.info('Unable to create regular expression', { exception: err });
+        }
+
+      });
+    } else {
+      re = null;
+    }
+  });
+}, 5000);
+
+faye.logger = {
+  debug: function(msg) {
+    if(!re) return;
+    if(msg.match(re)) {
+      logger.verbose('faye: ' + msg);
+    }
+  },
+  info: function(msg) {
+    if(!re) return;
+    if(msg.match(re)) {
+      logger.verbose('faye: ' + msg);
+    }
+  }
+};
+
+var logLevels = ['fatal', 'error', 'warn'];
+logLevels/*.slice(0, 1 + logLevel)*/.forEach(function(level) {
+  faye.logger[level] = function(msg) { logger[level]('faye: ' + msg); };
 });
+
 
 module.exports = {
   server: server,
@@ -732,19 +872,24 @@ module.exports = {
     // Attach event handlers
     server.addExtension(logging);
     server.addExtension(authenticator);
+    // server.addExtension(noConnectForUnknownClients);
     server.addExtension(authorisor);
     server.addExtension(pushOnlyServer);
     server.addExtension(pingResponder);
     server.addExtension(adviseAdjuster);
 
-
     client.addExtension(superClient);
 
+    ['connection:open', 'connection:close'].forEach(function(event) {
+      server._server._engine.bind(event, function(clientId) {
+        logger.info("faye-engine: Client " + clientId + ": " + event);
+      });
+    });
 
     /** Some logging */
     ['handshake', 'disconnect'].forEach(function(event) {
       server.bind(event, function(clientId) {
-        logger.info("Client " + clientId + ": " + event);
+        logger.info("faye-server: Client " + clientId + ": " + event);
       });
     });
 

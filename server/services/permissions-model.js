@@ -1,12 +1,13 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var GitHubRepoService  = require('./github/github-repo-service');
-var GitHubOrgService   = require('./github/github-org-service');
-var winston            = require('../utils/winston');
-var Q                  = require('q');
-var userIsInRoom       = require('./user-in-room');
-var appEvents          = require('../app-events');
+var GitHubRepoService    = require('./github/github-repo-service');
+var GitHubOrgService     = require('./github/github-org-service');
+var winston              = require('../utils/winston');
+var Q                    = require('q');
+var userIsInRoom         = require('./user-in-room');
+var userIsBannedFromRoom = require('./user-banned-from-room');
+var appEvents            = require('../app-events');
 
 /**
  * REPO permissions model
@@ -318,6 +319,13 @@ function userChannelPermissionsModel(user, right, uri, security) {
 
 }
 
+function checkBan(user, uri) {
+  if(!user) return Q.resolve(false);
+  if(!uri) return Q.resolve(false);
+
+  return userIsBannedFromRoom(uri, user);
+}
+
 /**
  * Main entry point
  */
@@ -357,18 +365,24 @@ function permissionsModel(user, right, uri, roomType, security) {
     return Q.reject(new Error('uri required'));
   }
 
-  return submodel(user, right, uri, security)
-    .then(log)
-    .fail(function(err) {
-      if(err.gitterAction === 'logout_destroy_user_tokens') {
-        winston.warn('User tokens have been revoked. Destroying tokens');
+  return checkBan(user, uri)
+    .then(function(banned) {
+      if(banned) return false;
 
-        user.destroyTokens();
-        return user.saveQ()
-          .thenReject(err);
-      }
+      return submodel(user, right, uri, security)
+        .then(log)
+        .fail(function(err) {
+          if(err.gitterAction === 'logout_destroy_user_tokens') {
+            winston.warn('User tokens have been revoked. Destroying tokens');
 
-      throw err;
+            user.destroyTokens();
+            return user.saveQ()
+              .thenReject(err);
+          }
+
+          throw err;
+        });
+
     });
 }
 

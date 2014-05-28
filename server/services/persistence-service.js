@@ -329,6 +329,12 @@ var TroupeUserSchema = new Schema({
 });
 TroupeUserSchema.schemaTypeName = 'TroupeUserSchema';
 
+var TroupeBannedUserSchema = new Schema({
+  userId: { type: ObjectId },
+  dateBanned: { type: Date, "default": Date.now },
+  bannedBy: { type: ObjectId }
+});
+TroupeBannedUserSchema.schemaTypeName = 'TroupeBannedUserSchema';
 //
 // A Troupe
 //
@@ -341,6 +347,7 @@ var TroupeSchema = new Schema({
   status: { type: String, "enum": ['ACTIVE', 'DELETED'], "default": 'ACTIVE'},
   oneToOne: { type: Boolean, "default": false },
   users: [TroupeUserSchema],
+  bans: [TroupeBannedUserSchema],
   parentId: { type: ObjectId, required: false },
   ownerUserId: { type: ObjectId, required: false }, // For channels under a user /suprememoocow/custom
   security: { type: String, /* WARNING: validation bug in mongo 'enum': ['PRIVATE', 'PUBLIC', 'INHERITED'], required: false */ }, // For REPO_CHANNEL, ORG_CHANNEL, USER_CHANNEL
@@ -766,7 +773,11 @@ GeoPopulatedPlaceSchema.schemaTypeName = 'GeoPopulatedPlaceSchema';
   userId: ObjectId,
   deviceId: String,
   deviceName: String,
-  appleToken: Buffer,
+  /*
+   * appleToken should be a raw Buffer, but mongoose throws a CastError when doing an update.
+   * We instead store the hex string, which is what apn's pushNotification uses anyway.
+   */
+  appleToken: String,
   tokenHash: String,
   deviceType: { type: String, "enum": ['APPLE', 'APPLE-DEV', 'ANDROID', 'TEST', 'SMS']},
   mobileNumber: { type: String },
@@ -844,6 +855,7 @@ var UserTroupeFavourites = mongoose.model('UserTroupeFavourites', UserTroupeFavo
 
 var Troupe = mongoose.model('Troupe', TroupeSchema);
 var TroupeUser = mongoose.model('TroupeUser', TroupeUserSchema);
+var TroupeBannedUser = mongoose.model('TroupeBannedUser', TroupeBannedUserSchema);
 var TroupeRemovedUser = mongoose.model('TroupeRemovedUser', TroupeRemovedUserSchema);
 var UserTroupeSettings = mongoose.model('UserTroupeSettings', UserTroupeSettingsSchema);
 var UserSettings = mongoose.model('UserSettings', UserSettingsSchema);
@@ -896,6 +908,7 @@ module.exports = {
     UserTroupeFavouritesSchema: UserTroupeFavouritesSchema,
     TroupeSchema: TroupeSchema,
     TroupeUserSchema: TroupeUserSchema,
+    TroupeBannedUserSchema: TroupeBannedUserSchema,
     TroupeRemovedUserSchema: TroupeRemovedUserSchema,
     UserTroupeSettingsSchema: UserTroupeSettingsSchema,
     UserSettingsSchema: UserSettingsSchema,
@@ -923,6 +936,7 @@ module.exports = {
   UserTroupeFavourites: UserTroupeFavourites,
   Troupe: Troupe,
   TroupeUser: TroupeUser,
+  TroupeBannedUser: TroupeBannedUser,
   TroupeRemovedUser: TroupeRemovedUser,
   UserTroupeSettings: UserTroupeSettings,
   UserSettings: UserSettings,
