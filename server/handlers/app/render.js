@@ -150,6 +150,36 @@ function renderMobileChat(req, res, next) {
     .fail(next);
 }
 
+function renderMobileNativeChat(req, res, next) {
+  // we cant get the chat room name from /mobile/chat, so we use a non chat context
+  contextGenerator.generateNonChatContext(req)
+    .then(function(troupeContext) {
+      res.render('mobile/native-chat-app', {
+        appCache: getAppCache(req),
+        // client side router gets troupeId from hash and updates the context instead
+        bootScriptName: 'mobile-native-router',
+        user: troupeContext.user,
+        troupeContext: troupeContext,
+        agent: req.headers['user-agent']
+      });
+    })
+    .fail(next);
+}
+
+function renderMobileNativeUserhome(req, res, next) {
+  contextGenerator.generateNonChatContext(req)
+    .then(function(troupeContext) {
+      res.render('mobile/native-userhome-app', {
+        appCache: getAppCache(req),
+        bootScriptName: 'mobile-native-userhome',
+        user: troupeContext.user,
+        troupeContext: troupeContext,
+        agent: req.headers['user-agent']
+      });
+    })
+    .fail(next);
+}
+
 
 function renderMobileNotLoggedInChat(req, res, next) {
   var troupe = req.uriContext.troupe;
@@ -215,5 +245,7 @@ module.exports = exports = {
   renderMobileChat: renderMobileChat,
   renderMobileUserHome: renderMobileUserHome,
   renderMobileNotLoggedInChat: renderMobileNotLoggedInChat,
-  renderNotLoggedInChatPage: renderNotLoggedInChatPage
+  renderNotLoggedInChatPage: renderNotLoggedInChatPage,
+  renderMobileNativeChat: renderMobileNativeChat,
+  renderMobileNativeUserhome: renderMobileNativeUserhome
 };

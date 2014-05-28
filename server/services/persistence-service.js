@@ -774,7 +774,11 @@ GeoPopulatedPlaceSchema.schemaTypeName = 'GeoPopulatedPlaceSchema';
   userId: ObjectId,
   deviceId: String,
   deviceName: String,
-  appleToken: Buffer,
+  /*
+   * appleToken should be a raw Buffer, but mongoose throws a CastError when doing an update.
+   * We instead store the hex string, which is what apn's pushNotification uses anyway.
+   */
+  appleToken: String,
   tokenHash: String,
   deviceType: { type: String, "enum": ['APPLE', 'APPLE-DEV', 'ANDROID', 'TEST', 'SMS']},
   mobileNumber: { type: String },

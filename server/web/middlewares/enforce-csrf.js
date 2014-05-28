@@ -46,6 +46,8 @@ function isInWhitelist(req) {
   return (req.path.indexOf('/api/private/hook/') === 0) ||
          // Transloadit callback
          (req.path.indexOf('/api/private/transloadit/') === 0) ||
+         // device registration requires no user id
+         (req.path === '/api/v1/apn') ||
          // oauth post token endpoint for native login has its own auth
          (req.path === '/login/oauth/token') ||
          (req.path === '/oauth/authorize/decision');
