@@ -9,6 +9,7 @@ var appVersion = require('./web/appVersion');
 var domainWrapper = require('./utils/domain-wrapper');
 var http       = require('http');
 var shutdown = require('shutdown');
+var serverStats = require('./utils/server-stats');
 
 require('./utils/diagnostics');
 
@@ -37,6 +38,7 @@ bayeux.attach(server);
 // Listen to the port
 server.listen(port, bindIp);
 
+serverStats('websockets', server);
 
 shutdown.addHandler('websockets', 10, function(callback) {
   server.close(function() {
