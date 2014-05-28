@@ -125,7 +125,7 @@ function userSocketConnected(userId, socketId, connectionType, client, troupeId,
   var isMobileConnection = connectionType == 'mobile';
 
   var keys = [keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, keyUserLock(userId), keyUserSockets(userId)];
-  var values = [userId, socketId, Date.now(), isMobileConnection ? 1 : 0, client, troupeId || ''];
+  var values = [userId, socketId, Date.now(), isMobileConnection ? 1 : 0, client, troupeId || null];
 
   scriptManager.run('presence-associate', keys, values, function(err, result) {
     if(err) return callback(err);
