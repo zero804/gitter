@@ -55,10 +55,6 @@ function repoPermissionsModel(user, right, uri, security) {
       switch(right) {
         case 'view':
         case 'join':
-          // Track users per org for billing
-          if (repoInfo.private && repoInfo.owner.type === 'Organization') {
-            appEvents.trackOrgMembership({uri: uri, userId: user.id});
-          }
         case 'adduser':
           return true;
 
@@ -100,8 +96,6 @@ function orgPermissionsModel(user, right, uri, security) {
         case 'create':
         case 'admin':
         case 'join':
-          appEvents.trackOrgMembership({uri: uri, userId: user.id});
-
         case 'adduser':
           /* Org members can do anything */
           return true;
