@@ -37,7 +37,7 @@ exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName,
     { deviceId: deviceId },
     {
       deviceId: deviceId,
-      appleToken: deviceToken,
+      appleToken: deviceToken.toString('hex'),
       tokenHash: tokenHash,
       deviceType: deviceType,
       deviceName: deviceName,

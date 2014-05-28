@@ -1,31 +1,39 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 
 define([
-  'utils/context',
+  'jquery-hammer',
   'marionette',
   'views/base',
-  'hbs!./tmpl/homeOrgListItem'
-], function(context, Marionette, TroupeViews, orgListItemTemplate) {
+  'hbs!./tmpl/homeOrgListItem',
+  'utils/appevents',
+  'utils/is-mobile'
+], function($hammer, Marionette, TroupeViews, orgListItemTemplate, appEvents, isMobile) {
   "use strict";
 
   var TroupeItemView = TroupeViews.Base.extend({
-    tagName: 'div',
-    className: 'org-list-item',
+    tagName: 'li',
+    className: 'suggested-room-list-item',
     template: orgListItemTemplate,
     initialize: function() {
+      this.$el = $hammer(this.$el).hammer();
       this.setRerenderOnChange(true);
     },
     getRenderData: function() {
-      var data = {};
-      data.org = this.model.toJSON();
-      data.user = context.getUser();
-
-      return data;
+      return this.model.toJSON();
+    },
+    events: function() {
+      return isMobile() ? { tap: 'navigate' } : { click: 'navigate' };
+    },
+    navigate: function() {
+      var name = this.model.get('name');
+      var url = '/' + name;
+      appEvents.trigger('navigation', url, 'chat', name);
     }
   });
 
   return Marionette.CollectionView.extend({
-    tagName: 'div',
+    tagName: 'ul',
+    className: 'suggested-room-list',
     itemView: TroupeItemView
   });
 
