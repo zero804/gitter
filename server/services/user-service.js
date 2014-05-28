@@ -139,7 +139,7 @@ var userService = {
   },
 
   findByUsername: function(username, callback) {
-    return persistence.User.findOneQ({username: username.toLowerCase()})
+    return persistence.User.findOneQ({username: username})
             .nodeify(callback);
   },
 
