@@ -11,7 +11,7 @@ Getting Started
 1.	`npm install`
 2.	`grunt less`
 3.	`./mongodb.sh`
-4.	`./redis.sh &`
+4.	`./redis.sh`
 5.	`./scripts/mongo/init-dev-mongo.sh`
 6.	`./scripts/upgrade-data.sh`
 7.	`nodemon -w public/templates -w server -e js,hbs web.js`
