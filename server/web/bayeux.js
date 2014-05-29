@@ -43,6 +43,8 @@ var routes = [
     validator: validateUserForPingSubscription }
 ];
 
+var superClientPassword = nconf.get('ws:superClientPassword');
+
 function checkTroupeAccess(userId, troupeId, callback) {
   // TODO: use the room permissions model
   return troupeService.findById(troupeId)
