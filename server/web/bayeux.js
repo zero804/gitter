@@ -628,15 +628,24 @@ var server = new faye.NodeAdapter({
 
 var client = server.getClient();
 
+var STATS_FREQUENCY = 0.01;
+
 faye.stringify = function(object) {
   try {
     var string = JSON.stringify(object);
+    // Over cautious
+    stats.eventHF('bayeux.message.count', STATS_FREQUENCY);
+
     if(string) {
-      // Over cautious
-      stats.gaugeHF('bayeux.message.size', string.length);
+      stats.gaugeHF('bayeux.message.size', string.length, STATS_FREQUENCY);
+    } else {
+      stats.gaugeHF('bayeux.message.size', 0, STATS_FREQUENCY);
     }
+
     return string;
   } catch(e) {
+    stats.event('bayeux.message.serialization_error');
+
     logger.error('Error while serializing JSON message', { exception: e });
     throw e;
   }
