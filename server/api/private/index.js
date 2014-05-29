@@ -56,5 +56,8 @@ module.exports = {
         // No auth
         require('./chat-heatmap.js'));
 
+    app.post(apiRoot + '/private/statsc',
+        authMiddleware,
+        require('./statsc.js'));
   }
 };

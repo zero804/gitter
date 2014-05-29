@@ -42,12 +42,25 @@ define([
 
       appEvents.on('bugreport', function(description, data) {
         if(description instanceof Error) {
+          appEvents.trigger('stats.event', 'error');
           Raven.captureException(description, data);
         } else {
+          appEvents.trigger('stats.event', 'warning');
           Raven.captureMessage(description, data);
         }
       });
 
+    });
+
+  } else {
+
+    /* No raven here please */
+    appEvents.on('bugreport', function(description) {
+      if(description instanceof Error) {
+        appEvents.trigger('stats.event', 'error');
+      } else {
+        appEvents.trigger('stats.event', 'warning');
+      }
     });
 
   }

@@ -13,6 +13,7 @@ require([
   'views/createRoom/createRepoRoomView',
   'views/createRoom/chooseRoomView',
   'log!router-app',
+  'components/statsc',                    // No ref
   'views/widgets/preload',                // No ref
   'components/webNotifications',          // No ref
   'components/desktopNotifications',      // No ref
