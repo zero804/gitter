@@ -43,8 +43,6 @@ var routes = [
     validator: validateUserForPingSubscription }
 ];
 
-var superClientPassword = nconf.get('ws:superClientPassword');
-
 function checkTroupeAccess(userId, troupeId, callback) {
   // TODO: use the room permissions model
   return troupeService.findById(troupeId)
@@ -194,12 +192,6 @@ function populateUserUnreadItemsCollection(options, callback) {
   }
 
   return restful.serializeUnreadItemsForTroupe(troupeId, userId, callback);
-}
-
-function messageIsFromSuperClient(message) {
-  return message &&
-         message.ext &&
-         message.ext.password === superClientPassword;
 }
 
 function getConnectionType(incoming) {
