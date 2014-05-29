@@ -27,8 +27,14 @@ define([
 
       if(c.error) {
         c.error(m, errorInfo);
+        if(error && error.stack) {
+          c.error(error.stack);
+        }
       } else if(c.log) {
         c.log(m, errorInfo);
+        if(error && error.stack) {
+          c.log(error.stack);
+        }
       }
     }
   }
