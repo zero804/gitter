@@ -636,7 +636,7 @@ faye.stringify = function(object) {
   try {
     var string = JSON.stringify(object);
     // Over cautious
-    stats.eventHF('bayeux.message.count', STATS_FREQUENCY);
+    stats.eventHF('bayeux.message.count', 1, STATS_FREQUENCY);
 
     if(string) {
       stats.gaugeHF('bayeux.message.size', string.length, STATS_FREQUENCY);
