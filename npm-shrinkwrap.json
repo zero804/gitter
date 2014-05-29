@@ -680,9 +680,9 @@
       "resolved": "git://github.com/gitterHQ/faye-redis-node#11aa3dbf5638f40b659397045344096b08e9ca4c"
     },
     "gitter-env": {
-      "version": "0.7.6",
-      "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.7.6",
-      "resolved": "git+ssh://git@github.com:gitterHQ/gitter-env.git#479f35f71b5773896682199fe5c9e28892828939",
+      "version": "0.7.7",
+      "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.7.7",
+      "resolved": "git+ssh://git@github.com:gitterHQ/gitter-env.git#898f3a84c0f05b8f8d9978041d6e99521d7386a6",
       "dependencies": {
         "async": {
           "version": "0.8.0",
@@ -703,7 +703,6 @@
             "optimist": {
               "version": "0.6.0",
               "from": "optimist@0.6.0",
-              "resolved": "https://registry.npmjs.org/optimist/-/optimist-0.6.0.tgz",
               "dependencies": {
                 "wordwrap": {
                   "version": "0.0.2",
