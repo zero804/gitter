@@ -27,6 +27,8 @@ var errorDescriptions = {
   255: 'None (unknown)'
 };
 
+var rootDirname = __dirname+'/../..';
+
 function errorEventOccurred(err, notification) {
   try {
     var errorDescription = errorDescriptions[err];
@@ -49,8 +51,8 @@ function errorEventOccurred(err, notification) {
 
 logger.info("Starting APN");
 var apnsConnectionDev = new apns.Connection({
-    cert: config.get('apn:certDev'),
-    key: config.get('apn:keyDev'),
+    cert: rootDirname+'/'+config.get('apn:certDev'),
+    key: rootDirname+'/'+config.get('apn:keyDev'),
     gateway: config.get('apn:gatewayDev'),
     enhanced: true,
     errorCallback: errorEventOccurred,
@@ -62,8 +64,8 @@ apnsConnectionDev.on("error", function(err) {
 });
 
 var apnsConnectionBetaDev = new apns.Connection({
-    cert: config.get('apn:certBetaDev'),
-    key: config.get('apn:keyBetaDev'),
+    cert: rootDirname+'/'+config.get('apn:certBetaDev'),
+    key: rootDirname+'/'+config.get('apn:keyBetaDev'),
     gateway: config.get('apn:gatewayBetaDev'),
     enhanced: true,
     errorCallback: errorEventOccurred,
@@ -75,8 +77,8 @@ apnsConnectionBetaDev.on("error", function(err) {
 });
 
 var apnsConnectionBeta = new apns.Connection({
-    cert: config.get('apn:certBeta'),
-    key: config.get('apn:keyBeta'),
+    cert: rootDirname+'/'+config.get('apn:certBeta'),
+    key: rootDirname+'/'+config.get('apn:keyBeta'),
     gateway: config.get('apn:gatewayBeta'),
     enhanced: true,
     errorCallback: errorEventOccurred,
@@ -88,8 +90,8 @@ apnsConnectionBeta.on("error", function(err) {
 });
 
 var apnsConnection = new apns.Connection({
-    cert: config.get('apn:certProd'),
-    key: config.get('apn:keyProd'),
+    cert: rootDirname+'/'+config.get('apn:certProd'),
+    key: rootDirname+'/'+config.get('apn:keyProd'),
     gateway: config.get('apn:gatewayProd'),
     enhanced: true,
     errorCallback: errorEventOccurred,
@@ -105,8 +107,8 @@ apnsConnection.on("error", function(err) {
   try {
 
     var feedback = new apns.Feedback({
-        cert: config.get('apn:cert' + suffix),
-        key: config.get('apn:key' + suffix),
+        cert: rootDirname+'/'+config.get('apn:cert' + suffix),
+        key: rootDirname+'/'+config.get('apn:key' + suffix),
         gateway: config.get('apn:feedback' + suffix),
         interval: config.get('apn:feedbackInterval' + suffix),
         batchFeedback: true

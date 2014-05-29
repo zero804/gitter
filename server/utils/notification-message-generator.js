@@ -120,7 +120,7 @@ NotificationMessageGenerator.prototype.truncate = function(line) {
 };
 
 NotificationMessageGenerator.prototype.getTroupeDescription = function(troupe) {
-  return troupe.name; // TODO: deal with one-to-one troupes
+  return troupe.uri;
 };
 
 
