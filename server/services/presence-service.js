@@ -125,7 +125,7 @@ function userSocketConnected(userId, socketId, connectionType, client, troupeId,
   var isMobileConnection = connectionType == 'mobile';
 
   var keys = [keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, keyUserLock(userId), keyUserSockets(userId)];
-  var values = [userId, socketId, Date.now(), isMobileConnection ? 1 : 0, client, troupeId];
+  var values = [userId, socketId, Date.now(), isMobileConnection ? 1 : 0, client, troupeId || null];
 
   scriptManager.run('presence-associate', keys, values, function(err, result) {
     if(err) return callback(err);
@@ -298,7 +298,7 @@ function lookupSocketOwnerAndTroupe(socketId, callback) {
 function lookupUserIdForSocket (socketId, callback) {
   if(!socketId) return callback('socketId expected');
 
-  redisClient.hmget(keySocketUser(socketId), "uid", "ct", function(err, reply) {
+  redisClient.hmget(keySocketUser(socketId), "uid", "ctime", function(err, reply) {
     if(err) return callback(err);
 
     return callback(null, reply[0], !!reply[1]);
@@ -308,7 +308,7 @@ function lookupUserIdForSocket (socketId, callback) {
 function socketExists(socketId, callback) {
   if(!socketId) return callback('socketId expected');
 
-  redisClient.hget(keySocketUser(socketId), "ct", function(err, reply) {
+  redisClient.hget(keySocketUser(socketId), "ctime", function(err, reply) {
     if(err) return callback(err);
 
     return callback(null, !!reply);
@@ -458,6 +458,54 @@ function listOnlineUsers(callback) {
 
 function listMobileUsers(callback) {
   redisClient.zrange(MOBILE_USERS_KEY, 0, -1, callback);
+}
+
+function getSocket(socketId, callback) {
+  redisClient.hmget(keySocketUser(socketId), 'uid', 'tid', 'eb', 'mob', 'ctime', 'ct', function(err, result) {
+    if(err) return callback(err);
+
+    if(!result[4]) return callback();
+
+    return callback(null, {
+      userId: result[0],
+      troupeId: result[1],
+      eyeballs: !!result[2],
+      mobile: !!result[3],
+      createdTime: new Date(parseInt(result[4], 10)),
+      clientType: result[5]
+    });
+  });
+}
+
+function getSockets(socketIds, callback) {
+  var multi = redisClient.multi();
+  socketIds.forEach(function(socketId) {
+    multi.hmget(keySocketUser(socketId), 'uid', 'tid', 'eb', 'mob', 'ctime', 'ct');
+  });
+
+  multi.exec(function(err, results) {
+    if(err) return callback(err);
+    var hash = results.reduce(function(hash, result, index) {
+      var socketId = socketIds[index];
+      if(!result[4]) {
+        hash[socketId] = null;
+        return hash;
+      }
+
+      hash[socketId] = {
+        userId: result[0],
+        troupeId: result[1],
+        eyeballs: !!result[2],
+        mobile: !!result[3],
+        createdTime: new Date(parseInt(result[4], 10)),
+        clientType: result[5]
+      };
+
+      return hash;
+    }, {});
+
+    callback(null, hash);
+  });
 }
 
 function listActiveSockets(callback) {
@@ -853,6 +901,8 @@ presenceService.findOnlineUsersForTroupe =  findOnlineUsersForTroupe;
 presenceService.categorizeUsersByOnlineStatus =  categorizeUsersByOnlineStatus;
 presenceService.listOnlineUsers = listOnlineUsers;
 presenceService.listActiveSockets = listActiveSockets;
+presenceService.getSocket = getSocket;
+presenceService.getSockets = getSockets;
 presenceService.listMobileUsers =  listMobileUsers;
 presenceService.listOnlineUsersForTroupes =  listOnlineUsersForTroupes;
 presenceService.categorizeUserTroupesByOnlineStatus = categorizeUserTroupesByOnlineStatus;
