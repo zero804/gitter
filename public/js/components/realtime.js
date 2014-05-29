@@ -298,6 +298,8 @@ define([
     /* Only hold back pings for 30s, then retry is neccessary */
     setTimeout(function() {
       if(pingResponseOutstanding) {
+        appEvents.trigger('stats.event', 'faye.ping.reset');
+
         log('Ping response still outstanding, resetting.');
         pingResponseOutstanding = false;
       }
@@ -308,6 +310,8 @@ define([
         pingResponseOutstanding = false;
         log('Server ping succeeded');
       }, function(error) {
+        appEvents.trigger('stats.event', 'faye.ping.reset');
+
         pingResponseOutstanding = false;
         log('Unable to ping server', error);
         // We could reinstate the persistant outage concept on this

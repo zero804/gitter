@@ -28,6 +28,7 @@ require([
   'views/app/unreadBannerView',
   'views/app/headerView',
 
+  'components/statsc',          // No ref
   'views/widgets/preload',      // No ref
   'filtered-collection',        // No ref
   'components/dozy',            // Sleep detection No ref
