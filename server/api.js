@@ -11,6 +11,7 @@ var express  = require('express');
 var http     = require('http');
 var nconf    = require('./utils/config');
 var domainWrapper = require('./utils/domain-wrapper');
+var serverStats = require('./utils/server-stats');
 
 /* Load express-resource */
 require('express-resource');
@@ -42,6 +43,8 @@ app.get('/', function(req, res) {
 });
 
 require('./handlers/catch-all').install(app);
+
+serverStats('api', server);
 
 var port = nconf.get("PORT");
 server.listen(port, function() {

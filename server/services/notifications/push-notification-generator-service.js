@@ -1,8 +1,6 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
---------- CURRENTLY NOT BEING USED ---------
-
 var winston                   = require('../../utils/winston');
 var pushNotificationService   = require("../push-notification-service");
 var userService               = require("../user-service");
@@ -186,7 +184,7 @@ exports.queueUserTroupesForNotification = function(userTroupes) {
           } else {
             delay = notificationWindowPeriods[notificationNumber - 1];
             if(!delay) {
-              // User had already gotten two notifications, that's enough
+              winston.verbose("User has already gotten two notifications, that's enough. Skipping");
               return;
             }
           }
