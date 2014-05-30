@@ -1130,17 +1130,9 @@ Faye.Client = Faye.Class({
   },
 
   reset: function() {
-    if (this._transport) this._transport.close();
-    this._transport = null;
-    this._advice = {
-      reconnect: this.RETRY,
-      interval:  1000 * (this._options.interval || this.INTERVAL),
-      timeout:   1000 * (this._options.timeout  || this.CONNECTION_TIMEOUT)
-    };
     this._clientId  = null;
     this._state     = this.UNCONNECTED;
-
-    this.connect();
+    this._cycleConnection();
   },
 
   // Request
@@ -1163,6 +1155,8 @@ Faye.Client = Faye.Class({
   //                * id                                         * id
   //                * authSuccessful
   handshake: function(callback, context) {
+    this.removeTimeout('handshake');
+
     if (this._advice.reconnect === this.NONE) return;
     if (this._state !== this.UNCONNECTED) return;
 
@@ -1192,7 +1186,7 @@ Faye.Client = Faye.Class({
 
       } else {
         this.info('Handshake unsuccessful');
-        Faye.ENV.setTimeout(function() { self.handshake(callback, context) }, this._advice.interval);
+        this.addTimeout('handshake', this._advice.interval / 1000, function() { this.handshake(callback, context) }, this);
         this._state = this.UNCONNECTED;
       }
     }, this);
@@ -1464,7 +1458,8 @@ Faye.Client = Faye.Class({
     if (this._advice.reconnect === this.HANDSHAKE && this._state !== this.DISCONNECTED) {
       this._state    = this.UNCONNECTED;
       this._clientId = null;
-      this._cycleConnection();
+      // Don't call cycle connection twice!
+      // this._cycleConnection();
     }
   },
 
@@ -1475,12 +1470,26 @@ Faye.Client = Faye.Class({
   },
 
   _cycleConnection: function() {
+    this.removeTimeout('cycleConnection');
+
     if (this._connectRequest) {
       this._connectRequest = null;
       this.info('Closed connection for ?', this._clientId);
     }
-    var self = this;
-    Faye.ENV.setTimeout(function() { self.connect() }, this._advice.interval);
+
+    // Unconnected, force transport to disconnect
+    if(this._state === this.UNCONNECTED && this._transport) {
+      this.info('Disconnecting client ?', this._clientId);
+
+      this._transport.close();
+      this._transport = null;
+    }
+
+    this.addTimeout('cycleConnection', this._advice.interval / 1000, function() {
+      this.info('Reconnecting on cycle for ?', this._clientId);
+
+      this.connect();
+    }, this);
   }
 });
 
@@ -1488,6 +1497,8 @@ Faye.extend(Faye.Client.prototype, Faye.Deferrable);
 Faye.extend(Faye.Client.prototype, Faye.Publisher);
 Faye.extend(Faye.Client.prototype, Faye.Logging);
 Faye.extend(Faye.Client.prototype, Faye.Extensible);
+Faye.extend(Faye.Client.prototype, Faye.Timeouts);
+
 
 Faye.Transport = Faye.extend(Faye.Class({
   MAX_DELAY: 0,

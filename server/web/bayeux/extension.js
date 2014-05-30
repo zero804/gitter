@@ -81,6 +81,7 @@ module.exports = function(options) {
             channel: outgoingMessage.channel,
             token: outgoingMessage.ext && outgoingMessage.ext.token,
             subscription: outgoingMessage.subscription,
+            clientId: outgoingMessage.clientId,
             request: requestInfo(req)
           });
         }
@@ -120,6 +121,7 @@ module.exports = function(options) {
             channel: outgoingMessage.channel,
             token: outgoingMessage.ext && outgoingMessage.ext.token,
             subscription: outgoingMessage.subscription,
+            clientId: outgoingMessage.clientId,
             request: requestInfo(req)
           });
         }

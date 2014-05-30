@@ -229,9 +229,10 @@ define([
     if(!client) return;
     if(pingResponseOutstanding) return;
 
-    appEvents.trigger('realtime.testConnection', reason);
-
-    log('Testing connection');
+    if(reason !== 'ping') {
+      appEvents.trigger('realtime.testConnection', reason);
+      log('Testing connection due to ' + reason);
+    }
 
     pingResponseOutstanding = true;
 
