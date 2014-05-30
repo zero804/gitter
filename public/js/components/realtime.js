@@ -158,9 +158,7 @@ define([
     var c = context.env('websockets');
     var client = new Faye.Client(c.fayeUrl, c.options);
 
-    // Disable websocket on Mobile due to iOS crash bug
-    var userAgent = window.navigator.userAgent;
-    if(userAgent.indexOf('Mobile') >= 0) {
+    if(true || isMobile()) {
       /* Testing no websockets */
       client.disable('websocket');
     }
