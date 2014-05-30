@@ -787,9 +787,9 @@
       }
     },
     "heapdump": {
-      "version": "0.2.7",
-      "from": "https://registry.npmjs.org/heapdump/-/heapdump-0.2.7.tgz",
-      "resolved": "https://registry.npmjs.org/heapdump/-/heapdump-0.2.7.tgz"
+      "version": "0.2.8",
+      "from": "heapdump@latest",
+      "resolved": "https://registry.npmjs.org/heapdump/-/heapdump-0.2.8.tgz"
     },
     "highlight.js": {
       "version": "8.0.0",
