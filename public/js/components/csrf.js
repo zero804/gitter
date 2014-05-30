@@ -13,7 +13,7 @@ define([
       return;
     }
 
-    var accessToken = context().accessToken;
+    var accessToken = context.getAccessToken();
     if(accessToken) {
       jqxhr.setRequestHeader('x-access-token', accessToken);
     }

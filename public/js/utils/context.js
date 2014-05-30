@@ -140,6 +140,10 @@ define([
     return window.troupeEnv && window.troupeEnv[envName];
   };
 
+  context.getAccessToken = function() {
+    return context.env('accessToken') || ctx.accessToken;
+  };
+
   context.isLoggedIn = function() {
     // TODO: this is not ideal. perhaps make this better
     return !!user.id;

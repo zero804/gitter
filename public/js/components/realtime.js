@@ -105,7 +105,7 @@ define([
     if(message.channel == '/meta/handshake') {
       if(!message.ext) { message.ext = {}; }
       var ext = message.ext;
-      var accessToken = context().accessToken;
+      var accessToken = context.getAccessToken();
       var mobile = isMobile();
 
       ext.token     = accessToken;

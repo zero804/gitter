@@ -150,20 +150,23 @@ function renderMobileChat(req, res, next) {
     .fail(next);
 }
 
-function renderMobileNativeChat(req, res, next) {
-  // we cant get the chat room name from /mobile/chat, so we use a non chat context
-  contextGenerator.generateNonChatContext(req)
-    .then(function(troupeContext) {
-      res.render('mobile/native-chat-app', {
-        appCache: getAppCache(req),
-        // client side router gets troupeId from hash and updates the context instead
-        bootScriptName: 'mobile-native-router',
-        user: troupeContext.user,
-        troupeContext: troupeContext,
-        agent: req.headers['user-agent']
-      });
-    })
-    .fail(next);
+function renderMobileNativeChat(req, res) {
+  /*
+   * All native chats are served from one endpoint so we can appcache one page.
+   *
+   * This means:
+   * 1. server has no idea what the troupe id is
+   * 2. the embedded troupe context must be minimal as the appcache would make it permanent
+   *
+   * Therefore creating a troupe context is the responibility of the client browser.
+   */
+  res.render('mobile/native-chat-app', {
+    appCache: getAppCache(req),
+    troupeContext: {
+      userId: req.user.id
+    },
+    accessToken: req.accessToken,
+  });
 }
 
 function renderMobileNativeUserhome(req, res, next) {
