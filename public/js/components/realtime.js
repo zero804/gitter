@@ -30,65 +30,6 @@ define([
     eyeballState = state;
   });
 
-  var Rate = function() {
-    this.hash = {};
-    this.counter = 0;
-  };
-
-  Rate.prototype.event = function() {
-    this.counter++;
-
-    var d = Math.floor(Date.now() / 10000);
-    if(this.hash[d]) {
-      this.hash[d]++;
-    } else {
-      this.hash[d] = 1;
-    }
-
-    if(this.counter % 10 === 0) {
-      this.cleanup(d);
-    }
-
-    return this.hash[d - 1] || 0;
-  };
-
-  Rate.prototype.cleanup = function(p) {
-    var horizon = p - 2;
-    var hash = this.hash;
-
-    Object.keys(hash).forEach(function(key) {
-      if(parseInt(key, 10) < horizon) {
-        delete hash[key];
-      }
-    });
-  };
-
-  var RateMonitor = function() {
-    this.hRate = new Rate();
-    this.cRate = new Rate();
-  };
-
-  RateMonitor.prototype.outgoing = function(message, callback) {
-    var counter;
-    if(message.channel == '/meta/handshake') {
-      counter = this.hRate;
-    } else if(message.channel == '/meta/connect') {
-      counter = this.cRate;
-    }
-
-    if(counter) {
-      var rate = counter.event();
-      if(rate) {
-        /* Don't bother if the value is zero */
-        if(!message.ext) message.ext = {};
-        message.ext.rate = rate;
-        log('Rate of ' + message.channel  + ' is ' + rate + ' per 10s');
-      }
-    }
-
-    callback(message);
-  };
-
   var ErrorLogger = function() {};
   ErrorLogger.prototype.incoming = function(message, callback) {
     if(message.error) {
@@ -224,7 +165,6 @@ define([
       client.disable('websocket');
     }
 
-    client.addExtension(new RateMonitor());
     client.addExtension(new ClientAuth());
     client.addExtension(snapshotExtension);
     client.addExtension(new AccessTokenFailureExtension());
@@ -269,7 +209,7 @@ define([
 
   appEvents.on('reawaken', function() {
     log('Recycling connection after reawaken');
-    testConnection('reawaken');
+    if(client) client.reset();
   });
 
   // Cordova events.... doesn't matter if IE8 doesn't handle them
@@ -302,6 +242,8 @@ define([
 
         log('Ping response still outstanding, resetting.');
         pingResponseOutstanding = false;
+
+        client.reset();
       }
     }, 30000);
 
@@ -314,6 +256,8 @@ define([
 
         pingResponseOutstanding = false;
         log('Unable to ping server', error);
+
+        client.reset();
         // We could reinstate the persistant outage concept on this
       });
   }

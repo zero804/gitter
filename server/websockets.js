@@ -29,14 +29,13 @@ app.get('/', function(req, res) {
 require('./utils/event-listeners').installLocalEventListeners();
 
 var port = nconf.get('PORT') || nconf.get("ws:port");
-var bindIp = nconf.get("ws:bindIp");
-
-winston.info("Binding websockets service to " + bindIp + ":" + port);
 
 bayeux.attach(server);
 
 // Listen to the port
-server.listen(port, bindIp);
+server.listen(port, function() {
+  winston.info("Websockets listening on port " + port);
+});
 
 serverStats('websockets', server);
 
