@@ -1129,6 +1129,20 @@ Faye.Client = Faye.Class({
     this.headers[name] = value;
   },
 
+  reset: function() {
+    if (this._transport) this._transport.close();
+    this._transport = null;
+    this._advice = {
+      reconnect: this.RETRY,
+      interval:  1000 * (this._options.interval || this.INTERVAL),
+      timeout:   1000 * (this._options.timeout  || this.CONNECTION_TIMEOUT)
+    };
+    this._clientId  = null;
+    this._state     = this.UNCONNECTED;
+
+    this.connect();
+  },
+
   // Request
   // MUST include:  * channel
   //                * version
