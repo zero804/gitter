@@ -2256,7 +2256,7 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
 
   close: function() {
     if (!this._socket) return;
-    self.info('Websocket transport close requested');
+    this.info('Websocket transport close requested');
     this._socket.close();
   },
 
