@@ -156,9 +156,10 @@ define([
 
   function createClient() {
     var c = context.env('websockets');
+    c.options.reuseTransport = false;
     var client = new Faye.Client(c.fayeUrl, c.options);
 
-    if(true || isMobile()) {
+    if(isMobile()) {
       /* Testing no websockets */
       client.disable('websocket');
     }
@@ -205,6 +206,11 @@ define([
     return client;
   }
 
+  appEvents.on('eyeballsInvalid', function() {
+    log('Resetting connection after invalid eyeballs');
+    if(client) client.reset();
+  });
+
   appEvents.on('reawaken', function() {
     log('Recycling connection after reawaken');
     if(client) client.reset();
@@ -248,6 +254,7 @@ define([
 
     client.publish('/api/v1/ping2', { reason: reason })
       .then(function() {
+
         pingResponseOutstanding = false;
         log('Server ping succeeded');
       }, function(error) {
