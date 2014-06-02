@@ -144,6 +144,10 @@ define([
     return context.env('accessToken') || ctx.accessToken;
   };
 
+  context.getBearerToken = function() {
+    return context.env('accessToken');
+  };
+
   context.isLoggedIn = function() {
     // TODO: this is not ideal. perhaps make this better
     return !!user.id;

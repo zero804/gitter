@@ -17,6 +17,11 @@ define([
     if(accessToken) {
       jqxhr.setRequestHeader('x-access-token', accessToken);
     }
+
+    var bearerToken = context.getBearerToken();
+    if(bearerToken) {
+      jqxhr.setRequestHeader('Authorization', 'Bearer '+bearerToken);
+    }
   }
 
   $(document).ajaxSend(function(e, jqxhr, settings) {
