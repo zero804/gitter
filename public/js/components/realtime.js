@@ -226,6 +226,10 @@ define([
     }, false);
   }
 
+  setInterval(function() {
+    testConnection('ping');
+  }, 30000);
+
   var pingResponseOutstanding = false;
 
   function testConnection(reason) {
