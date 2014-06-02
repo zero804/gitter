@@ -29,7 +29,7 @@ GitHubMeService.prototype.getEmail = function() {
   return d.promise
     .then(function(emailHashes) {
       var primaries = emailHashes.filter(function(hash) {
-        return hash.primary && hash.verified;
+        return hash.primary;
       }).map(function(hash) {
         return hash.email;
       });
@@ -54,4 +54,3 @@ GitHubMeService.prototype.getOrgs = function() {
 module.exports = wrap(GitHubMeService, function() {
   return [this.user && (this.user.githubUserToken || this.user.githubToken) || ''];
 });
-
