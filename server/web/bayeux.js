@@ -725,7 +725,7 @@ module.exports = {
 
     ['connection:open', 'connection:close'].forEach(function(event) {
       server._server._engine.bind(event, function(clientId) {
-        logger.info("faye-engine: Client " + clientId + ": " + event);
+        logger.verbose("faye-engine: Client " + clientId + ": " + event);
       });
     });
 
