@@ -64,7 +64,8 @@ function install() {
 
       if(!user) {
         logger.error('Unable to deserialize user ' + id + '. Not found.');
-        return done();
+        /* For some reason passport wants a null here */
+        return done(null, null);
       }
 
       /* Todo: consider using a seperate object for the security user */
