@@ -27,6 +27,7 @@ module.exports = function( grunt ) {
   //
   // Grunt configuration:
   //
+  //
   // https://github.com/cowboy/grunt/blob/master/docs/getting_started.md
   //
   grunt.initConfig({
