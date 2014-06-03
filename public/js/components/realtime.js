@@ -246,18 +246,23 @@ define([
     }
 
     pingResponseOutstanding = true;
-
+    var originalClientId = clientId;
     /* Only hold back pings for 30s, then retry is neccessary */
     setTimeout(function() {
       if(pingResponseOutstanding) {
         appEvents.trigger('stats.event', 'faye.ping.reset');
 
-        log('Ping response still outstanding, resetting.');
         pingResponseOutstanding = false;
 
-        reset();
+        if(clientId === originalClientId) {
+          log('Ping response still outstanding, resetting.');
+          reset(originalClientId);
+        } else {
+          log('Ping response still outstanding, but clientId has changed.');
+        }
       }
     }, 30000);
+
 
     client.publish('/api/v1/ping2', { reason: reason })
       .then(function() {
@@ -268,16 +273,20 @@ define([
         appEvents.trigger('stats.event', 'faye.ping.reset');
 
         pingResponseOutstanding = false;
-        log('Unable to ping server', error);
 
-        reset();
+        if(clientId === originalClientId) {
+          log('Unable to ping server, resetting connection', error);
+          reset();
+        } else {
+          log('Unable to ping server, but clientId has changed', error);
+        }
         // We could reinstate the persistant outage concept on this
       });
   }
 
   function reset() {
-    if(!client || !clientId) return;
-    log("Resetting client connection");
+    if(!client) return;
+    log("Client reset requested");
     clientId = null;
     client.reset();
   }
