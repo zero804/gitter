@@ -2,7 +2,7 @@
 "use strict";
 
 var env                    = require('../utils/env');
-var winston                = env.logger;
+var logger                 = env.logger;
 var errorReporter          = env.errorReporter;
 var config                 = env.config;
 var stats                  = env.stats;
@@ -57,7 +57,10 @@ function install() {
 
   passport.deserializeUser(function deserializeUserCallback(id, done) {
     userService.findById(id, function findUserByIdCallback(err, user) {
-      if(err) return done(err);
+      if(err) {
+        logger.error('Unable to deserialize user ' + err, { exception: err });
+        return done(err);
+      }
       if(!user) return done();
 
       /* Todo: consider using a seperate object for the security user */
@@ -109,8 +112,12 @@ function install() {
           req.user.githubScopes = scopeHash;
 
           req.user.save(function(err) {
-            winston.info('passport: User updated with token');
-            if(err) done(err);
+            if(err) {
+              logger.error('passport: user save failed: ' + err, { exception: err });
+              return done(err);
+            }
+
+            logger.info('passport: User updated with token');
             return done(null, req.user);
           });
 
@@ -126,7 +133,7 @@ function install() {
                 user.githubUserToken  = accessToken;
 
                 user.save(function(err) {
-                  if (err) winston.error("Failed to update GH token for user ", user.username);
+                  if (err) logger.error("Failed to update GH token for user ", user.username);
 
                   // Tracking
                   var properties = useragentStats(req.headers['user-agent']);
@@ -164,12 +171,12 @@ function install() {
                 source:             'landing_github'
               };
 
-              winston.verbose('About to create GitHub user ', githubUser);
+              logger.verbose('About to create GitHub user ', githubUser);
 
               userService.findOrCreateUserForGithubId(githubUser, function(err, user) {
                 if (err) return done(err);
 
-                winston.verbose('Created GitHub user ', user.toObject());
+                logger.verbose('Created GitHub user ', user.toObject());
 
                 req.logIn(user, function(err) {
                   if (err) { return done(err); }
@@ -190,7 +197,7 @@ function install() {
       .fail(function(err) {
         errorReporter(err, { oauth: "failed" });
         stats.event("oauth_profile.error");
-        winston.error('Error during oauth process. Unable to obtain user profile.', err);
+        logger.error('Error during oauth process. Unable to obtain user profile.', err);
 
         return done(err);
       });
