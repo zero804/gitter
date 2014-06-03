@@ -44,6 +44,9 @@ define([
   var ClientAuth = function() {};
   ClientAuth.prototype.outgoing = function(message, callback) {
     if(message.channel == '/meta/handshake') {
+      clientId = null;
+      log("Rehandshaking realtime connection");
+
       if(!message.ext) { message.ext = {}; }
       var ext = message.ext;
       var accessToken = context.getAccessToken();
@@ -88,7 +91,7 @@ define([
         }
         if(clientId !== message.clientId) {
           clientId = message.clientId;
-          log("Realtime reestablished. New id is " + message.clientId);
+          log("Realtime reestablished. New id is " + clientId);
           appEvents.trigger('realtime:newConnectionEstablished');
         }
       }
@@ -208,12 +211,12 @@ define([
 
   appEvents.on('eyeballsInvalid', function() {
     log('Resetting connection after invalid eyeballs');
-    if(client) client.reset();
+    reset();
   });
 
   appEvents.on('reawaken', function() {
     log('Recycling connection after reawaken');
-    if(client) client.reset();
+    reset();
   });
 
   // Cordova events.... doesn't matter if IE8 doesn't handle them
@@ -252,7 +255,7 @@ define([
         log('Ping response still outstanding, resetting.');
         pingResponseOutstanding = false;
 
-        client.reset();
+        reset();
       }
     }, 30000);
 
@@ -267,9 +270,16 @@ define([
         pingResponseOutstanding = false;
         log('Unable to ping server', error);
 
-        client.reset();
+        reset();
         // We could reinstate the persistant outage concept on this
       });
+  }
+
+  function reset() {
+    if(!client || !clientId) return;
+    log("Resetting client connection");
+    clientId = null;
+    client.reset();
   }
 
   return {
@@ -291,6 +301,8 @@ define([
      * may not have realised it yet.
      */
     testConnection: testConnection,
+
+    reset: reset,
 
     getClient: function() {
       return getOrCreateClient();
