@@ -9,7 +9,7 @@ define([
 
   function embed(chatItemView) {
     chatItemView.$el.find('a.link').each(function(index, el) {
-      if(el.childElementCount === 0 && el.innerText === el.href) {
+      if(el.childElementCount === 0 && (el.innerText || el.textContent) === el.href) {
         oEmbed.parse(el.href, function(embed) {
           if (embed && embed.html) {
             var $embed = $(document.createElement('div'));
