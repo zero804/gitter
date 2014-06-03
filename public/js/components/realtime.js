@@ -30,65 +30,6 @@ define([
     eyeballState = state;
   });
 
-  var Rate = function() {
-    this.hash = {};
-    this.counter = 0;
-  };
-
-  Rate.prototype.event = function() {
-    this.counter++;
-
-    var d = Math.floor(Date.now() / 10000);
-    if(this.hash[d]) {
-      this.hash[d]++;
-    } else {
-      this.hash[d] = 1;
-    }
-
-    if(this.counter % 10 === 0) {
-      this.cleanup(d);
-    }
-
-    return this.hash[d - 1] || 0;
-  };
-
-  Rate.prototype.cleanup = function(p) {
-    var horizon = p - 2;
-    var hash = this.hash;
-
-    Object.keys(hash).forEach(function(key) {
-      if(parseInt(key, 10) < horizon) {
-        delete hash[key];
-      }
-    });
-  };
-
-  var RateMonitor = function() {
-    this.hRate = new Rate();
-    this.cRate = new Rate();
-  };
-
-  RateMonitor.prototype.outgoing = function(message, callback) {
-    var counter;
-    if(message.channel == '/meta/handshake') {
-      counter = this.hRate;
-    } else if(message.channel == '/meta/connect') {
-      counter = this.cRate;
-    }
-
-    if(counter) {
-      var rate = counter.event();
-      if(rate) {
-        /* Don't bother if the value is zero */
-        if(!message.ext) message.ext = {};
-        message.ext.rate = rate;
-        log('Rate of ' + message.channel  + ' is ' + rate + ' per 10s');
-      }
-    }
-
-    callback(message);
-  };
-
   var ErrorLogger = function() {};
   ErrorLogger.prototype.incoming = function(message, callback) {
     if(message.error) {
@@ -103,9 +44,12 @@ define([
   var ClientAuth = function() {};
   ClientAuth.prototype.outgoing = function(message, callback) {
     if(message.channel == '/meta/handshake') {
+      clientId = null;
+      log("Rehandshaking realtime connection");
+
       if(!message.ext) { message.ext = {}; }
       var ext = message.ext;
-      var accessToken = context().accessToken;
+      var accessToken = context.getAccessToken();
       var mobile = isMobile();
 
       ext.token     = accessToken;
@@ -147,7 +91,7 @@ define([
         }
         if(clientId !== message.clientId) {
           clientId = message.clientId;
-          log("Realtime reestablished. New id is " + message.clientId);
+          log("Realtime reestablished. New id is " + clientId);
           appEvents.trigger('realtime:newConnectionEstablished');
         }
       }
@@ -215,16 +159,14 @@ define([
 
   function createClient() {
     var c = context.env('websockets');
+    c.options.reuseTransport = false;
     var client = new Faye.Client(c.fayeUrl, c.options);
 
-    // Disable websocket on Mobile due to iOS crash bug
-    var userAgent = window.navigator.userAgent;
-    if(userAgent.indexOf('Mobile') >= 0) {
+    if(isMobile()) {
       /* Testing no websockets */
       client.disable('websocket');
     }
 
-    client.addExtension(new RateMonitor());
     client.addExtension(new ClientAuth());
     client.addExtension(snapshotExtension);
     client.addExtension(new AccessTokenFailureExtension());
@@ -267,9 +209,14 @@ define([
     return client;
   }
 
+  appEvents.on('eyeballsInvalid', function() {
+    log('Resetting connection after invalid eyeballs');
+    reset();
+  });
+
   appEvents.on('reawaken', function() {
     log('Recycling connection after reawaken');
-    testConnection('reawaken');
+    reset();
   });
 
   // Cordova events.... doesn't matter if IE8 doesn't handle them
@@ -289,33 +236,55 @@ define([
     if(!client) return;
     if(pingResponseOutstanding) return;
 
-    appEvents.trigger('realtime.testConnection', reason);
-
-    log('Testing connection');
+    if(reason !== 'ping') {
+      appEvents.trigger('realtime.testConnection', reason);
+      log('Testing connection due to ' + reason);
+    }
 
     pingResponseOutstanding = true;
-
+    var originalClientId = clientId;
     /* Only hold back pings for 30s, then retry is neccessary */
     setTimeout(function() {
       if(pingResponseOutstanding) {
         appEvents.trigger('stats.event', 'faye.ping.reset');
 
-        log('Ping response still outstanding, resetting.');
         pingResponseOutstanding = false;
+
+        if(clientId === originalClientId) {
+          log('Ping response still outstanding, resetting.');
+          reset(originalClientId);
+        } else {
+          log('Ping response still outstanding, but clientId has changed.');
+        }
       }
     }, 30000);
 
+
     client.publish('/api/v1/ping2', { reason: reason })
       .then(function() {
+
         pingResponseOutstanding = false;
         log('Server ping succeeded');
       }, function(error) {
         appEvents.trigger('stats.event', 'faye.ping.reset');
 
         pingResponseOutstanding = false;
-        log('Unable to ping server', error);
+
+        if(clientId === originalClientId) {
+          log('Unable to ping server, resetting connection', error);
+          reset();
+        } else {
+          log('Unable to ping server, but clientId has changed', error);
+        }
         // We could reinstate the persistant outage concept on this
       });
+  }
+
+  function reset() {
+    if(!client) return;
+    log("Client reset requested");
+    clientId = null;
+    client.reset();
   }
 
   return {
@@ -337,6 +306,8 @@ define([
      * may not have realised it yet.
      */
     testConnection: testConnection,
+
+    reset: reset,
 
     getClient: function() {
       return getOrCreateClient();

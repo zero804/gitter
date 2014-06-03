@@ -13,9 +13,14 @@ define([
       return;
     }
 
-    var accessToken = context().accessToken;
+    var accessToken = context.getAccessToken();
     if(accessToken) {
       jqxhr.setRequestHeader('x-access-token', accessToken);
+    }
+
+    var bearerToken = context.getBearerToken();
+    if(bearerToken) {
+      jqxhr.setRequestHeader('Authorization', 'Bearer '+bearerToken);
     }
   }
 
