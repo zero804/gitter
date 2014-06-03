@@ -43,9 +43,11 @@ define([
     scrollElementSelector: "#content-frame",
 
     /* "WHAT THE F" is this nasty thing. Document your codedebt people */
+    // This nasty thing changes the CSS rule for the first chat item to prevent a high headerView from covering it
+    // We do this instead of jQuery because the first-child selector can 
     adjustTopPadding: function() {
       var size = $('#header-wrapper').height() + 15 + 'px';
-      var ss = document.styleSheets[1];
+      var ss = document.styleSheets[2];
       try {
         if(ss.insertRule) {
           ss.insertRule('.trpChatContainer > div:first-child { padding-top: ' + size + ' }', ss.cssRules.length);
