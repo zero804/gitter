@@ -61,7 +61,11 @@ function install() {
         logger.error('Unable to deserialize user ' + err, { exception: err });
         return done(err);
       }
-      if(!user) return done();
+
+      if(!user) {
+        logger.error('Unable to deserialize user ' + id + '. Not found.');
+        return done();
+      }
 
       /* Todo: consider using a seperate object for the security user */
       return done(null, user);
