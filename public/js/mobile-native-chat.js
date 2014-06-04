@@ -7,11 +7,23 @@ require([
   'components/unread-items-client',
   'components/cache-sync',
   'views/chat/decorators/emojiDecorator',
+  'log!mobile-native-chat',
   'components/eyeballs',                        // No ref
   'components/csrf'                             // No ref
-  ], function($, chatModels, ChatCollectionView, chatInputView, unreadItemsClient, cacheSync, emojiDecorator) {
+  ], function($, chatModels, ChatCollectionView, chatInputView, unreadItemsClient, cacheSync, emojiDecorator, log) {
 
   "use strict";
+
+  $(document).on('app.version.mismatch', function() {
+    try {
+      if(window.applicationCache.status == 1) {
+        log('Attempting to update application cache');
+        window.applicationCache.update();
+      }
+    } catch(e) {
+      log('Unable to update application cache: ' + e, e);
+    }
+  });
 
   var chatCollection = new chatModels.ChatCollection();
   cacheSync.install(chatCollection);
