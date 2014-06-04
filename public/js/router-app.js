@@ -25,6 +25,10 @@ require([
   TitlebarUpdater, realtime, createRoomView, createRepoRoomView, chooseRoomView, log) {
   "use strict";
 
+  appEvents.on('keyboard.all', function(name, event, handler) {
+    console.log('keyboard event in app', name, event, handler);
+  });
+
   var chatIFrame = document.getElementById('content-frame');
   if(window.location.hash) {
     var noHashSrc = chatIFrame.src.split('#')[0];
@@ -147,7 +151,32 @@ require([
         var reason = message.reason;
         realtime.testConnection('chat.' + reason);
         break;
+
+      case 'keyboard':
+        appEvents.trigger('keyboard.' + message.name, message.event, message.handler);
+        appEvents.trigger('keyboard.all', message.name, message.event, message.handler);
+        break;
     }
+  });
+
+  function postMessage(message) {
+    chatIFrame.contentWindow.postMessage(JSON.stringify(message), context.env('basePath'));
+  }
+
+  // Sent keyboard events to chat frame
+  appEvents.on('keyboard.all', function (name, event, handler) {
+    // Don't send back events coming from the chat frame
+    if (event.origin && event.origin === 'chat') return;
+    var message = {
+      type: 'keyboard',
+      name: name,
+      // JSON serialisation makes it not possible to send the event object
+      event: {
+        origin: 'app'
+      },
+      handler: handler
+    };
+    postMessage(message);
   });
 
   function reallyOnce(emitter, name, callback, context) {

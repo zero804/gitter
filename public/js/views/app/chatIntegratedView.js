@@ -8,12 +8,11 @@ define([
   'views/widgets/avatar',
   'components/modal-region',
   'utils/scrollbar-detect',
+  'cocktail',
+  'views/keyboard-events-mixin',
   'transloadit'
-], function($, context, Marionette, appEvents, uiVars, AvatarView, modalRegion, hasScrollBars) {
+], function($, context, Marionette, appEvents, uiVars, AvatarView, modalRegion, hasScrollBars, cocktail, KeyboardEventsMixin) {
   "use strict";
-
-  /** @const */
-  var BACKSPACE = 8;
 
   var touchEvents = {
     // "click #menu-toggle-button":        "onMenuToggle",
@@ -21,9 +20,6 @@ define([
   };
 
   var mouseEvents = {
-    // "keypress":                         "onKeyPress",
-    "keydown": "onKeyDown",
-    "keyup": "onKeyUp",
     "click #favourite-button":          "toggleFavourite"
   };
 
@@ -42,6 +38,11 @@ define([
     },
 
     events: uiVars.isMobile ? touchEvents : mouseEvents,
+
+    keyboardEvents: {
+      'backspace': 'onKeyBackspace',
+      'quote': 'onKeyQuote'
+    },
 
     initialize: function() {
 
@@ -65,23 +66,16 @@ define([
       this.enableDragAndDrop();
     },
 
-
-    onKeyDown: function(e) {
-      if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-
-      // Avoid backspace from navigating back
-      if (e.keyCode === BACKSPACE) {
-        e.stopPropagation();
-        e.preventDefault();
-      }
+    onKeyBackspace: function(e) {
+      console.log('prevent backspace')
+      e.stopPropagation();
+      e.preventDefault();
     },
 
-    onKeyUp: function(e) {
-      if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-
-      if((e.keyCode === 82) || (e.keyCode ===81) && !e.ctrlKey && !e.shiftKey && !e.metaKey) {
-        this.quoteText();
-      }
+    onKeyQuote: function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.quoteText();
     },
 
     getSelectionText: function() {
@@ -97,6 +91,7 @@ define([
     quoteText: function() {
       var selectedText = this.getSelectionText();
       if (selectedText.length > 0) {
+        console.log('quoteText trigger input.append', selectedText);
         appEvents.trigger('input.append', "> " + selectedText, { newLine: true });
       }
     },
@@ -192,6 +187,8 @@ define([
       el.on('drop',      dropEvent);
     }
   });
+
+  cocktail.mixin(ChatLayout, KeyboardEventsMixin);
 
   return ChatLayout;
 });

@@ -51,7 +51,8 @@ require.config({
     "optimizely":                   "//cdn.optimizely.com/js/241369966",
     "transloadit":                  "../repo/transloadit/jquery.transloadit2-v2-latest",
     "d3":                           "../repo/d3/d3",
-    "cal-heatmap":                  "../repo/cal-heatmap/cal-heatmap"
+    "cal-heatmap":                  "../repo/cal-heatmap/cal-heatmap",
+    "keymaster":                    "../repo/keymaster/keymaster"
   },
   shim: {
     "uservoice": {
@@ -59,6 +60,9 @@ require.config({
     },
     "faye": {
       exports: "Faye"
+    },
+    "keymaster": {
+      exports: "window.key"
     }
   },
   hbs : {

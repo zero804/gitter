@@ -57,8 +57,6 @@ require([
     return true;
   });
 
-
-
   // When a user clicks an internal link, prevent it from opening in a new window
   $(document).on("click", "a.link", function(e) {
     var basePath = context.env('basePath');
@@ -69,6 +67,21 @@ require([
 
     e.preventDefault();
     window.parent.location.href = href;
+  });
+
+  window.addEventListener('message', function(e) {
+    if(e.origin !== context.env('basePath')) {
+      return;
+    }
+
+    var message = JSON.parse(e.data);
+
+    switch(message.type) {
+      case 'keyboard':
+        appEvents.trigger('keyboard.' + message.name, message.event, message.handler);
+        appEvents.trigger('keyboard.all', message.name, message.event, message.handler);
+        break;
+    }
   });
 
   function postMessage(message) {
@@ -95,6 +108,22 @@ require([
 
   appEvents.on('unreadItemsCount', function(newCount) {
     postMessage({ type: "unreadItemsCount", count: newCount, troupeId: context.getTroupeId() });
+  });
+
+  // Bubble keyboard events
+  appEvents.on('keyboard.all', function (name, event, handler) {
+    // Don't send back events coming from the app frame
+    if (event.origin && event.origin === 'app') return;
+    var message = {
+      type: 'keyboard',
+      name: name,
+      // JSON serialisation makes it not possible to send the event object
+      event: {
+        origin: 'chat'
+      },
+      handler: handler
+    };
+    postMessage(message);
   });
 
   var appView = new ChatIntegratedView({ el: 'body' });
