@@ -17,6 +17,7 @@ define([
     initialize: function(options) {
       this.time = moment(options.time);
       this.compact = options.compact;
+      this.position = options.position || "top";
 
       var self = this;
 
@@ -65,7 +66,7 @@ define([
       var fullTime = this.time.format("LLL", { lang: lang });
       this.$el.html("<span title='" + fullTime + "'>" + v + "</span>");
       if (!window._troupeCompactView) {
-        this.$el.find('[title]').tooltip({ container: 'body' });
+        this.$el.find('[title]').tooltip({ container: 'body', placement: this.position });
       }
     }
 

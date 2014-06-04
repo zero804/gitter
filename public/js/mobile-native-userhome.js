@@ -5,9 +5,21 @@ require([
   'jquery',
   'utils/appevents',
   'components/cordova-navigate',
+  'log!mobile-native-userhome',
   'components/csrf'             // No ref
-  ], function(context, UserHomeView, $, appEvents, cordovaNavigate) {
+  ], function(context, UserHomeView, $, appEvents, cordovaNavigate, log) {
   "use strict";
+
+  $(document).on('app.version.mismatch', function() {
+    try {
+      if(window.applicationCache.status == 1) {
+        log('Attempting to update application cache');
+        window.applicationCache.update();
+      }
+    } catch(e) {
+      log('Unable to update application cache: ' + e, e);
+    }
+  });
 
   function onContextLoad() {
     new UserHomeView({
