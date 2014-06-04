@@ -409,13 +409,15 @@ define([
       });
 
       this.chatResizer = chatResizer;
-      
+
       this.listenTo(this, 'change', function() {
         chatResizer.resizeInput();
       });
 
       this.drafty = drafty(this.el);
-      this.el.value = this.el.value + options.value;
+      if (options.value) {
+        this.el.value = this.el.value + options.value;
+      }
       chatResizer.resetInput(true);
 
       this.chatCollectionView = options.chatCollectionView;
