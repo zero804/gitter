@@ -507,15 +507,16 @@ define([
 
     onBeforeRenderSort: function() {
       this.isRendering = true;
-    },
 
-    onRenderSort: function() {
+      // set footerElement before rendering, used by appendHtml()
       if(this.footer) {
         this.footerElement = this.$el.find(this.footer)[0];
       } else {
         this.footerElement = null;
       }
+    },
 
+    onRenderSort: function() {
       delete this.isRendering;
     },
 
@@ -600,7 +601,7 @@ define([
         var adjView = findViewAtPos(i + 1);
 
         // find the nearest view that comes after this view
-        while (!adjView && ((i + nearestI + 1) < collectionView.collection.length - 1)) {
+        while (!adjView && ((i + nearestI + 1) < collectionView.collection.length)) {
           nearestI += 1;
           adjView = findViewAtPos(i + nearestI);
         }

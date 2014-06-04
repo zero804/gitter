@@ -4,9 +4,10 @@
 var nconf = require('./config');
 var winston = require('./winston');
 
-if(nconf.get('diagnostics:heapdump')) {
-  require('heapdump');
+/* Heapdump is now always on */
+require('heapdump');
 
+if(nconf.get('diagnostics:heapdump')) {
   var memwatch = require('memwatch');
   memwatch.on('leak', function(info) {
     winston.warn('memwatch: leak: ' + info.reason);

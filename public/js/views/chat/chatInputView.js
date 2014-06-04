@@ -96,7 +96,7 @@ define([
     },
 
     getRenderData: function() {
-      var isComposeModeEnabled = this.composeMode.isEnabled()
+      var isComposeModeEnabled = this.composeMode.isEnabled();
       var placeholder;
 
       if(this.compactView) {
@@ -111,18 +111,20 @@ define([
         user: context.user(),
         isComposeModeEnabled: this.composeMode.isEnabled(),
         placeholder: placeholder,
-        composeModeToggleTitle: isComposeModeEnabled ? 'Switch to chat mode' : 'Switch to compose mode'
+        composeModeToggleTitle: isComposeModeEnabled ? 'Switch to chat mode' : 'Switch to compose mode',
+        value: $("#chat-input-textarea").val()
       };
     },
 
-    afterRender: function() {
+    afterRender: function(data) {
       if (!window._troupeIsTablet) $("#chat-input-textarea").focus();
 
       var inputBox = new ChatInputBoxView({
         el: this.$el.find('.trpChatInputBoxTextArea'),
         rollers: this.rollers,
         chatCollectionView: this.chatCollectionView,
-        composeMode: this.composeMode
+        composeMode: this.composeMode,
+        value: data.value
       });
       this.inputBox = inputBox;
 
@@ -413,6 +415,7 @@ define([
       });
 
       this.drafty = drafty(this.el);
+      this.el.value = this.el.value + options.value;
       chatResizer.resetInput(true);
 
       this.chatCollectionView = options.chatCollectionView;
