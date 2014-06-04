@@ -15,16 +15,18 @@ define([
   'components/drafty',
   'utils/cdn',
   './commands',
+  'cocktail',
+  'views/keyboard-events-mixin',
   'bootstrap_tooltip', // No ref
   'jquery-textcomplete', // No ref
   'utils/sisyphus-cleaner' // No ref
 ], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate,
-  emojiListItemTemplate, moment, hasScrollBars, itemCollections, emoji, drafty, cdn, commands) {
+  emojiListItemTemplate, moment, hasScrollBars, itemCollections, emoji, drafty, cdn, commands,
+  cocktail, KeyboardEventsMixin) {
   "use strict";
 
   /** @const */
-
-    var MAX_CHAT_HEIGHT = $(document).height() - $("#header-wrapper").height() - 140;
+  var MAX_CHAT_HEIGHT = $(document).height() - $("#header-wrapper").height() - 140;
 
   /** @const */
   var EXTRA_PADDING = 20;
@@ -32,18 +34,6 @@ define([
   /* This value is also in chatItemView! */
   /** @const */
   var EDIT_WINDOW = 240000;
-
-  /** @const */
-  var UP_ARROW = 38;
-
-  /** @const */
-  var ENTER = 13;
-
-  /** @const */
-  var PAGE_UP = 33;
-
-  /** @const */
-  var PAGE_DOWN = 34;
 
   /** @const */
   var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];
@@ -58,9 +48,6 @@ define([
 
   /** @const */
   var PLACEHOLDER_COMPOSE_MODE = PLACEHOLDER+' '+(isMacBrowser ? 'Cmd' : 'Ctrl')+'+Enter to send.';
-
-  /** @const */
-  var COMPOSE_MODE_MODIFIER_KEY = isMacBrowser ? 'metaKey' : 'ctrlKey';
 
   var ComposeMode = function() {
     var stringBoolean = window.localStorage.getItem('compose_mode_enabled') || 'false';
@@ -82,6 +69,14 @@ define([
 
     events: {
       'click .compose-mode-toggle': 'toggleComposeMode'
+    },
+
+    keyboardEvents: {
+      'toggle': 'toggleComposeMode',
+      // Another way to delegate it? Seems to be handled by the router
+      chatHelp: function() {
+        window.location.href = '#markdown';
+      }
     },
 
     initialize: function(options) {
@@ -322,6 +317,8 @@ define([
     }
   });
 
+  cocktail.mixin(ChatInputView, KeyboardEventsMixin);
+
   var ChatCollectionResizer = function(options) {
     var compact = options.compactView;
     var rollers = options.rollers;
@@ -389,9 +386,16 @@ define([
 
   var ChatInputBoxView = TroupeViews.Base.extend({
     events: {
-      "keydown":  "onKeyDown",
       "keyup":    "onKeyUp",
       "focusout": "onFocusOut"
+    },
+
+    keyboardEvents: {
+      "chatEditLast": "onKeyEditLast",
+      "chatSend": "onKeySend",
+      "pageUp": "onKeyPageUp",
+      "pageDown": "onKeyPageDown",
+      "searchGo searchEscape": "onKeySearchLeftFocus"
     },
 
     // pass in the textarea as el for ChatInputBoxView
@@ -409,7 +413,7 @@ define([
       });
 
       this.chatResizer = chatResizer;
-      
+
       this.listenTo(this, 'change', function() {
         chatResizer.resizeInput();
       });
@@ -433,32 +437,34 @@ define([
       this.chatResizer.resizeInput();
     },
 
-    onKeyDown: function(e) {
+    onEditLast: function() {
+      if(!this.$el.val()) this.trigger('editLast');
+    },
+
+    onKeySend: function(event, handler) {
       var isComposeModeEnabled = this.composeMode && this.composeMode.isEnabled();
-
-      if(e.keyCode === ENTER && !hasModifierKey(e) && !this.isTypeaheadShowing() && !isComposeModeEnabled) {
+      // Has a modifier or not in compose mode
+      var shouldHandle = handler.mods.length || !isComposeModeEnabled;
+      // Need to test behaviour with typeahead
+      if(!this.isTypeaheadShowing() && shouldHandle) {
         if(this.hasVisibleText()) {
           this.processInput();
         }
-
-        // dont insert a new line
-        e.preventDefault();
+        event.preventDefault();
         return false;
-      } else if(e.keyCode === ENTER && e[COMPOSE_MODE_MODIFIER_KEY] && !this.isTypeaheadShowing() && isComposeModeEnabled) {
-        if(this.hasVisibleText()) {
-          this.processInput();
-        }
-
-        // dont insert a new line
-        e.preventDefault();
-        return false;
-      } else if(e.keyCode === UP_ARROW && !hasModifierKey(e) && !this.$el.val()) {
-        this.trigger('editLast');
-      } else if(e.keyCode === PAGE_UP && !hasModifierKey(e)) {
-        if(this.chatCollectionView) this.chatCollectionView.pageUp();
-      } else if(e.keyCode === PAGE_DOWN && !hasModifierKey(e)) {
-        if(this.chatCollectionView) this.chatCollectionView.pageDown();
       }
+    },
+
+    onKeyPageUp: function() {
+      if(this.chatCollectionView) this.chatCollectionView.pageUp();
+    },
+
+    onKeyPageDown: function() {
+      if(this.chatCollectionView) this.chatCollectionView.pageDown();
+    },
+
+    onKeySearchLeftFocus: function() {
+      if (!window._troupeIsTablet) this.$el.focus();
     },
 
     processInput: function() {
@@ -509,6 +515,8 @@ define([
       return !this.$el.val().match(/^\s+$/);
     }
   });
+
+  cocktail.mixin(ChatInputBoxView, KeyboardEventsMixin);
 
   return { ChatInputView: ChatInputView, ChatInputBoxView: ChatInputBoxView };
 });

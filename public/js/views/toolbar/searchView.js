@@ -7,11 +7,23 @@ define([
   'backbone',
   'utils/text-filter',
   './troupeCollectionView',
-  'collections/instances/troupes'
-], function(context, appEvents, $, _, Backbone, textFilter, TroupeCollectionView, troupeCollections) {
+  'collections/instances/troupes',
+  'cocktail',
+  'views/keyboard-events-mixin'
+], function(context, appEvents, $, _, Backbone, textFilter, TroupeCollectionView, troupeCollections, cocktail, KeyboardEventsMixin
+) {
   "use strict";
 
-  return TroupeCollectionView.extend({
+  var View = TroupeCollectionView.extend({
+
+    keyboardEvents: {
+      'search': 'onKeySearch',
+      'searchPrev': 'onKeySearchPrev',
+      'searchNext': 'onKeySearchNext',
+      'searchGo': 'onKeySearchGo',
+      'searchEscape': 'onKeySearchEscape',
+      'chatEscape': 'onKeyChatEscape'
+    },
 
     initialize: function(options) {
 
@@ -30,6 +42,33 @@ define([
         $(window).trigger('showSearch');
         return self.keyPress(e);
       });
+    },
+
+    onKeySearch: function() {
+      this.$input.focus();
+    },
+
+    onKeySearchPrev: function(e) {
+      this.selectPrev();
+      e.preventDefault();
+    },
+
+    onKeySearchNext: function(e) {
+      this.selectNext();
+      e.preventDefault();
+    },
+
+    onKeySearchGo: function() {
+      this.navigateToCurrent();
+    },
+
+    onKeySearchEscape: function() {
+      this.$input.val('');
+      this.search('');
+    },
+
+    onKeyChatEscape: function() {
+      if (this.query.length) this.$input.focus();
     },
 
     search: function(query) {
@@ -247,25 +286,7 @@ define([
 
 
     keyPress: function(e) {
-      this.keyNavigation(e);
       this.keySearch(e);
-    },
-
-    keyNavigation: function(e) {
-      // select one of the search results
-      // enter follows link
-      switch(e.keyCode) {
-        case 38: // up
-          this.selectPrev();
-          break;
-        case 40: // down
-          this.selectNext();
-          break;
-        case 13: // enter
-        case 39: // right
-          this.navigateToCurrent();
-          break;
-      }
     },
 
     selectPrev: function() {
@@ -284,7 +305,7 @@ define([
     },
 
     select: function(i) {
-      var itemElements = this.$el.find('.trpTroupeName');
+      var itemElements = this.$el.find('li');
 
       if (i >= 0 && i < itemElements.length) {
         this.selectedIndex = i;
@@ -298,5 +319,9 @@ define([
     }, 250)
 
   });
+
+  cocktail.mixin(View, KeyboardEventsMixin);
+
+  return View;
 
 });
