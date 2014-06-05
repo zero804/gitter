@@ -141,15 +141,13 @@ define([
         terminating = true;
         // More needs to be done here!
         log('Access denied', message);
-        window.setTimeout(function() {
-          terminating = false;
-          window.alert('Realtime communications with the server have been disconnected. Click OK to reload.');
-          if(context.isLoggedIn()) {
-            window.parent.location.href = "/" + context.user().get('username');
-          } else {
-            window.parent.location.href = "/";
-          }
-        }, 10000);
+
+        window.alert('Realtime communications with the server have been disconnected.');
+        if(context.isLoggedIn()) {
+          window.parent.location.href = "/signout";
+        } else {
+          window.parent.location.href = "/";
+        }
 
       }
     }
