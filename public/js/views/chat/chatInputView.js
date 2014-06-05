@@ -74,7 +74,7 @@ define([
     keyboardEvents: {
       'toggle': 'toggleComposeMode',
       // Another way to delegate it? Seems to be handled by the router
-      chatHelp: function() {
+      'chat.help': function() {
         window.location.href = '#markdown';
       }
     },
@@ -380,10 +380,6 @@ define([
 
   };
 
-  function hasModifierKey(event) {
-    return event.ctrlKey || event.shiftKey || event.altKey || event.metaKey;
-  }
-
   var ChatInputBoxView = TroupeViews.Base.extend({
     events: {
       "keyup":    "onKeyUp",
@@ -391,11 +387,11 @@ define([
     },
 
     keyboardEvents: {
-      "chatEditLast": "onKeyEditLast",
-      "chatSend": "onKeySend",
+      "chat.edit.openLast": "onKeyEditLast",
+      "chat.send": "onKeySend",
       "pageUp": "onKeyPageUp",
       "pageDown": "onKeyPageDown",
-      "searchGo searchEscape": "onKeySearchLeftFocus"
+      "search.go search.escape": "onKeySearchLeftFocus"
     },
 
     // pass in the textarea as el for ChatInputBoxView
@@ -437,7 +433,7 @@ define([
       this.chatResizer.resizeInput();
     },
 
-    onEditLast: function() {
+    onKeyEditLast: function() {
       if(!this.$el.val()) this.trigger('editLast');
     },
 

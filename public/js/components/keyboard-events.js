@@ -12,6 +12,7 @@ require([
 
   // Define different scopes for the key listeners
   // - 'input-chat' for the chat message input
+  // - 'input-chat-edit' for the chat message edit input
   // - 'input-search' for the search input
   // - 'input-other' for other inputs (including textarea and select)
   // - 'non-input' for the rest
@@ -22,6 +23,9 @@ require([
     }
     else if (tag.id === 'list-search-input') {
       scope = 'input-search';
+    }
+    else if (tag.className === 'trpChatInput') {
+      scope = 'input-chat-edit';
     }
     else if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag.tagName)) {
       scope = 'input-other';
@@ -45,32 +49,42 @@ require([
     'esc': [{
       name: 'escape',
       scope: 'all'
-    }, {
-      name: 'chatEscape',
+      },{
+      name: 'chat.escape',
       scope: 'input-chat'
-    }, {
-      name: 'searchEscape',
+      },{
+      name: 'chat.edit.escape',
+      scope: 'input-chat-edit'
+      },{
+      name: 'search.escape',
       scope: 'input-search'
     }],
     'enter': {
-      name: 'searchGo',
+      name: 'search.go',
       scope: 'input-search'
     },
+    'enter, ⌘+enter, ctrl+enter': [{
+      name: 'chat.send',
+      scope: 'input-chat'
+      },{
+      name: 'chat.edit.send',
+      scope: 'input-chat-edit'
+    }],
     'up': [{
       name: 'arrowUp',
       scope: 'all'
-    }, {
-      name: 'chatEditLast',
+      },{
+      name: 'chat.edit.openLast',
       scope: 'input-chat'
-    }, {
-      name: 'searchPrev',
+      },{
+      name: 'search.prev',
       scope: 'input-search'
     }],
     'down': [{
       name: 'arrowDown',
       scope: 'all'
-    }, {
-      name: 'searchNext',
+      },{
+      name: 'search.next',
       scope: 'input-search'
     }],
     'left': {
@@ -80,25 +94,21 @@ require([
     'right': [{
       name: 'arrowRight',
       scope: 'non-input'
-    }, {
-      name: 'searchGo',
+      },{
+      name: 'search.go',
       scope: 'input-search'
     }],
     'pageup': 'pageUp',
     'pagedown': 'pageDown',
-    'ctrl+space': 'search',
+    'ctrl+space': 'search.open',
     'ctrl+`': 'toggle',
     'ctrl+h': [{
       name: 'help',
       scope: 'non-input'
       },{
-      name: 'chatHelp',
+      name: 'chat.help',
       scope: 'input-chat'
     }],
-    'enter, ⌘+enter, ctrl+enter': {
-      name: 'chatSend',
-      scope: 'input-chat'
-    },
     'q, r': {
       name: 'quote',
       scope: 'non-input'

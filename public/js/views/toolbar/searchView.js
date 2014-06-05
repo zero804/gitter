@@ -17,12 +17,12 @@ define([
   var View = TroupeCollectionView.extend({
 
     keyboardEvents: {
-      'search': 'onKeySearch',
-      'searchPrev': 'onKeySearchPrev',
-      'searchNext': 'onKeySearchNext',
-      'searchGo': 'onKeySearchGo',
-      'searchEscape': 'onKeySearchEscape',
-      'chatEscape': 'onKeyChatEscape'
+      'search.open': 'onKeySearchOpen',
+      'search.prev': 'onKeySearchPrev',
+      'search.next': 'onKeySearchNext',
+      'search.go': 'onKeySearchGo',
+      'search.escape': 'onKeySearchEscape',
+      'chat.escape': 'onKeyChatEscape'
     },
 
     initialize: function(options) {
@@ -44,7 +44,7 @@ define([
       });
     },
 
-    onKeySearch: function() {
+    onKeySearchOpen: function() {
       this.$input.focus();
     },
 
