@@ -52,11 +52,12 @@ define([
       var accessToken = context.getAccessToken();
       var mobile = isMobile();
 
-      ext.token     = accessToken;
-      ext.troupeId  = context.getTroupeId();
-      ext.connType  = mobile ? 'mobile' : 'online';
-      ext.client    = mobile ? 'mobweb' : 'web';
-      ext.eyeballs  = eyeballState ? 1 : 0;
+      ext.token      = accessToken;
+      ext.appVersion = context.env('appVersion');
+      ext.troupeId   = context.getTroupeId();
+      ext.connType   = mobile ? 'mobile' : 'online';
+      ext.client     = mobile ? 'mobweb' : 'web';
+      ext.eyeballs   = eyeballState ? 1 : 0;
 
     } else if(message.channel == '/meta/subscribe') {
       if(!message.ext) { message.ext = {}; }
