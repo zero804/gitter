@@ -25,10 +25,6 @@ require([
   TitlebarUpdater, realtime, createRoomView, createRepoRoomView, chooseRoomView, log) {
   "use strict";
 
-  appEvents.on('keyboard.all', function(name, event, handler) {
-    console.log('keyboard event in app', name, event, handler);
-  });
-
   var chatIFrame = document.getElementById('content-frame');
   if(window.location.hash) {
     var noHashSrc = chatIFrame.src.split('#')[0];

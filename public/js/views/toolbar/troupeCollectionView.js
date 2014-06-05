@@ -9,8 +9,9 @@ define([
   'views/base',
   'cocktail',
   'utils/dataset-shim',
+  'views/keyboard-events-mixin',
   'jquery-sortable' // No ref
-], function($, context, Marionette, troupeListItemTemplate, appEvents, moment,  TroupeViews, cocktail, dataset) {
+], function($, context, Marionette, troupeListItemTemplate, appEvents, moment,  TroupeViews, cocktail, dataset, KeyboardEventsMixin) {
   "use strict";
 
   /* @const */
@@ -149,6 +150,14 @@ define([
     className: 'trpTroupeList',
     itemView: TroupeItemView,
 
+    keyboardEvents: {
+      'alt.up': 'selectPrev',
+      'alt.down': 'selectNext',
+      'alt.enter': 'navigateToCurrent',
+      'alt.left': 'navigateToPrev',
+      'alt.right': 'navigateToNext'
+    },
+
     initialize: function(options) {
       if(options.rerenderOnSort) {
         this.listenTo(this.collection, 'sort', this.render);
@@ -157,7 +166,53 @@ define([
         this.makeDraggable(options.dropTarget);
       }
       this.roomsCollection = options.roomsCollection;
+      this.selectedIndex = 0;
     },
+
+    selectPrev: function() {
+      var i = this.selectedIndex - 1;
+      if (i === -1) i = 0; // Select first element
+      this.select(i);
+    },
+
+    selectNext: function() {
+      this.select(this.selectedIndex + 1);
+    },
+
+    select: function(i) {
+      var itemElements = this.$el.find('li');
+
+      if (i >= 0 && i < itemElements.length) {
+        this.selectedIndex = i;
+        console.log('change selected', i);
+        itemElements.removeClass('selected');
+        $(itemElements[this.selectedIndex]).addClass('selected');
+      }
+    },
+
+    navigateToCurrent: function() {
+      var model = this.collection.at(this.selectedIndex);
+      if(!model) return;
+
+      $(this.$el.find('li')[this.selectedIndex]).click();
+    },
+
+    navigateTo: function(i) {
+      var itemElements = this.$el.find('li');
+
+      if (i >= 0 && i < itemElements.length) {
+        $(itemElements[this.selectedIndex]).click();
+      }
+    },
+
+    navigateToNext: function() {
+      this.navigateTo(this.selectedIndex + 1);
+    },
+
+    navigateToPrev: function() {
+      this.navigateTo(this.selectedIndex - 1);
+    },
+
     makeDraggable: function(drop) {
       var cancelDrop = false;
       var self = this;
@@ -220,7 +275,7 @@ define([
     },
   });
 
-  cocktail.mixin(CollectionView, TroupeViews.SortableMarionetteView);
+  cocktail.mixin(CollectionView, TroupeViews.SortableMarionetteView, KeyboardEventsMixin);
 
   return CollectionView;
 
