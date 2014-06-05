@@ -13,9 +13,10 @@ define([
   'views/chat/chatInputView',
   'views/unread-item-view-mixin',
   'cocktail',
+  'views/keyboard-events-mixin',
   'bootstrap_tooltip', // No ref
 ], function($, _, context, chatModels, AvatarView, Marionette, TroupeViews, Popover,
-  chatItemTemplate, chatInputView, UnreadItemViewMixin, cocktail) {
+  chatItemTemplate, chatInputView, UnreadItemViewMixin, cocktail, KeyboardEventMixins) {
 
   "use strict";
 
@@ -35,10 +36,15 @@ define([
 
     events: {
       'click .trpChatEdit':       'toggleEdit',
-      'keydown textarea':         'detectEscape',
+      // 'keydown textarea':         'detectEscape',
       'click .trpChatReadBy':     'showReadBy',
       'mouseover .trpChatReadBy': 'showReadByIntent',
       'click .webhook':           'expandActivity'
+    },
+
+    keyboardEvents: {
+      'chat.edit.escape': 'onKeyEscape',
+      'chat.edit.send': 'onKeySend'
     },
 
     expandActivity: function() {
