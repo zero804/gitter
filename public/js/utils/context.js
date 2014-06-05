@@ -141,11 +141,11 @@ define([
   };
 
   context.getAccessToken = function() {
-    return context.env('accessToken') || ctx.accessToken;
+    return context.getBearerToken() || ctx.accessToken;
   };
 
   context.getBearerToken = function() {
-    return context.env('accessToken');
+    return window.bearerToken;
   };
 
   context.isLoggedIn = function() {
