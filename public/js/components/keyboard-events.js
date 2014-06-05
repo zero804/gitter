@@ -11,27 +11,27 @@ require([
   // Use views/keyboard-events-mixin to attach handlers for these events to Backbone components
 
   // Define different scopes for the key listeners
-  // - 'input-chat' for the chat message input
-  // - 'input-chat-edit' for the chat message edit input
-  // - 'input-search' for the search input
-  // - 'input-other' for other inputs (including textarea and select)
-  // - 'non-input' for the rest
+  // - 'input.chat' for the chat message input
+  // - 'input.chat.edit' for the chat message edit input
+  // - 'input.search' for the search input
+  // - 'input.other' for other inputs (including textarea and select)
+  // - 'other' for the rest
   key.filter = function(event) {
     var scope, tag = event.target || event.srcElement;
     if (tag.id === 'chat-input-textarea') {
-      scope = 'input-chat';
+      scope = 'input.chat';
     }
     else if (tag.id === 'list-search-input') {
-      scope = 'input-search';
+      scope = 'input.search';
     }
     else if (tag.className === 'trpChatInput') {
-      scope = 'input-chat-edit';
+      scope = 'input.chat.edit';
     }
     else if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag.tagName)) {
-      scope = 'input-other';
+      scope = 'input.other';
     }
     else {
-      scope = 'non-input';
+      scope = 'other';
     }
     key.setScope(scope);
     return true;
@@ -44,59 +44,59 @@ require([
   var keyEvents = {
     'backspace': {
       name: 'backspace',
-      scope: 'non-input'
+      scope: 'other'
     },
     'esc': [{
       name: 'escape',
       scope: 'all'
       },{
       name: 'chat.escape',
-      scope: 'input-chat'
+      scope: 'input.chat'
       },{
       name: 'chat.edit.escape',
-      scope: 'input-chat-edit'
+      scope: 'input.chat.edit'
       },{
       name: 'search.escape',
-      scope: 'input-search'
+      scope: 'input.search'
     }],
     'enter': {
       name: 'search.go',
-      scope: 'input-search'
+      scope: 'input.search'
     },
     'enter, ⌘+enter, ctrl+enter': [{
       name: 'chat.send',
-      scope: 'input-chat'
+      scope: 'input.chat'
       },{
       name: 'chat.edit.send',
-      scope: 'input-chat-edit'
+      scope: 'input.chat.edit'
     }],
     'up': [{
       name: 'arrowUp',
       scope: 'all'
       },{
       name: 'chat.edit.openLast',
-      scope: 'input-chat'
+      scope: 'input.chat'
       },{
       name: 'search.prev',
-      scope: 'input-search'
+      scope: 'input.search'
     }],
     'down': [{
       name: 'arrowDown',
       scope: 'all'
       },{
       name: 'search.next',
-      scope: 'input-search'
+      scope: 'input.search'
     }],
     'left': {
       name: 'arrowLeft',
-      scope: 'non-input'
+      scope: 'other'
     },
     'right': [{
       name: 'arrowRight',
-      scope: 'non-input'
+      scope: 'other'
       },{
       name: 'search.go',
-      scope: 'input-search'
+      scope: 'input.search'
     }],
     'pageup': 'pageUp',
     'pagedown': 'pageDown',
@@ -104,14 +104,14 @@ require([
     'ctrl+`': 'toggle',
     'ctrl+h': [{
       name: 'help',
-      scope: 'non-input'
+      scope: 'other'
       },{
       name: 'chat.help',
-      scope: 'input-chat'
+      scope: 'input.chat'
     }],
     'q, r': {
       name: 'quote',
-      scope: 'non-input'
+      scope: 'other'
     }
   };
 

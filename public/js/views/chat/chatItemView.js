@@ -36,7 +36,6 @@ define([
 
     events: {
       'click .trpChatEdit':       'toggleEdit',
-      // 'keydown textarea':         'detectEscape',
       'click .trpChatReadBy':     'showReadBy',
       'mouseover .trpChatReadBy': 'showReadByIntent',
       'click .webhook':           'expandActivity'
@@ -106,6 +105,20 @@ define([
       }
 
       this.updateRender(this.model.changed);
+    },
+
+    onKeyEscape: function() {
+      if(this.inputBox) {
+        this.toggleEdit();
+        this.focusInput();
+      }
+    },
+
+    onKeySend: function(event) {
+      if(this.inputBox) {
+        this.inputBox.processInput();
+      }
+      event.preventDefault();
     },
 
     renderText: function() {
@@ -204,30 +217,8 @@ define([
       return  "You can't edit someone else's message";
     },
 
-    detectKeys: function(e) {
-      this.detectReturn(e);
-      this.detectEscape(e);
-    },
-
-    detectReturn: function(e) {
-      if(e.keyCode === 13 && (!e.ctrlKey && !e.shiftKey)) {
-        // found submit
-        this.saveChat();
-        e.stopPropagation();
-        e.preventDefault();
-      }
-    },
-
     focusInput: function() {
       $("#chat-input-textarea").focus();
-    },
-
-    detectEscape: function(e) {
-      if (e.keyCode === 27) {
-        // found escape, cancel edit
-        this.toggleEdit();
-        this.focusInput();
-      }
     },
 
     saveChat: function(newText) {
@@ -339,6 +330,8 @@ define([
     }
 
   });
+
+  cocktail.mixin(ChatItemView, KeyboardEventMixins);
 
   if(context.isLoggedIn()) {
     cocktail.mixin(ChatItemView, UnreadItemViewMixin);
