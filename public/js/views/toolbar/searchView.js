@@ -283,8 +283,6 @@ define([
       }});
     },
 
-
-
     keyPress: function(e) {
       this.keySearch(e);
     },

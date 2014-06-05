@@ -100,7 +100,12 @@ require([
     }],
     'pageup': 'pageUp',
     'pagedown': 'pageDown',
-    'ctrl+space': 'search.open',
+    'alt+up': 'alt.up',
+    'alt+down': 'alt.down',
+    'alt+left': 'alt.left',
+    'alt+right': 'alt.right',
+    'alt+enter': 'alt.enter',
+    'alt+space': 'search.open',
     'ctrl+`': 'toggle',
     'ctrl+h': [{
       name: 'help',
