@@ -23,8 +23,7 @@ define([
   "use strict";
 
   /** @const */
-
-    var MAX_CHAT_HEIGHT = $(document).height() - $("#header-wrapper").height() - 140;
+  var MAX_CHAT_HEIGHT = $(document).height() - $("#header-wrapper").height() - 140;
 
   /** @const */
   var EXTRA_PADDING = 20;
