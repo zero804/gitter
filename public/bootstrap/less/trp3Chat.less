@@ -230,20 +230,17 @@ blockquote {
 
 }
 
-
-.trpChatReadBy {
+.trpChatEdit {
   display: inline-block;
-
   text-align: right;
-  width: 24px;
-  height: 12px;
-  color: black;
+  width: 16px;
+  height: 16px;
+  color: transparent;
   margin-left: 2px;
-  background-image: url('../../images/2/icon-read.png');
+  background-image: url('../../images/2/gitter/icon-edit.png');
   background-repeat: no-repeat;
   line-height:9px;
   vertical-align: middle;
-  margin-top: 3px;
   opacity: 0;
   overflow-x: hidden;
   .trpBodyTiny;
@@ -252,15 +249,47 @@ blockquote {
   -moz-transition: opacity 0.2s ease;
   -o-transition: opacity 0.2s ease;
   transition: opacity 0.2s ease;
+  background-size: cover;
+
+  @media @retina {
+    background-image: url('../../images/2/gitter/icon-edit@2x.png');
+  }
+}
+
+.trpChatReadBy {
+  display: inline-block;
+  text-align: right;
+  width: 16px;
+  height: 16px;
+  color: transparent;
+  margin-left: 2px;
+  background-image: url('../../images/2/gitter/icon-read.png');
+  background-repeat: no-repeat;
+  line-height:9px;
+  vertical-align: middle;
+  opacity: 0;
+  overflow-x: hidden;
+  .trpBodyTiny;
+  .trpHand;
+  -webkit-transition: opacity 0.2s ease;
+  -moz-transition: opacity 0.2s ease;
+  -o-transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease;
+  background-size: cover;
+
 
   /* Own and has been read */
   .isViewers .trpChatBox &.readBySome {
-    opacity: 0.3;
+    opacity: 0.5;
   }
 
   /* Hover and has been read */
   .trpChatBox:hover &.readBySome {
-    opacity: 0.6;
+    opacity: 1;
+  }
+
+  @media @retina {
+      background-image: url('../../images/2/gitter/icon-read@2x.png');
   }
 
 }
@@ -589,18 +618,17 @@ pre code {
 
 // gray out the edit and read icons by default
 .trpChatEdit, .trpChatReads {
-  opacity: 0.4;
-  height: 16px;
-  vertical-align: middle;
+  opacity: 0.8;
 }
 
 // if the viewer can edit the message, dont gray it out
 .canEdit .trpChatEdit:hover {
-  opacity: 1;
+  opacity: 0.9;
   transition: opacity .25s ease-in-out;
   -moz-transition: opacity .25s ease-in-out;
   -webkit-transition: opacity .25s ease-in-out;
 }
+
 
 /*
 // hide the timeago when hovered
@@ -611,6 +639,7 @@ pre code {
 
 .trpChatFrom {
 	display: inline-block;
+  vertical-align: middle;
   @media @mobile {
     max-width: 100px;
     overflow: hidden;
@@ -661,6 +690,7 @@ pre code {
 
 .trpChatTime {
   opacity: 0.8;
+  vertical-align: middle;
 }
 
 .frame-chat {

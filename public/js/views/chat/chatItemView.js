@@ -133,7 +133,7 @@ define([
       this.timeChange();
 
       if (!this.compactView) {
-        var editIcon = this.$el.find('.trpChatEdit [title]');
+        var editIcon = this.$el.find('.trpChatEdit');
         editIcon.tooltip({ container: 'body', title: this.getEditTooltip.bind(this) });
       }
 

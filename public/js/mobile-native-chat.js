@@ -10,7 +10,8 @@ require([
   'log!mobile-native-chat',
   'components/eyeballs',                        // No ref
   'components/csrf'                             // No ref
-  ], function($, chatModels, ChatCollectionView, chatInputView, unreadItemsClient, cacheSync, emojiDecorator, log) {
+  ], function($, chatModels, ChatCollectionView, chatInputView, unreadItemsClient, cacheSync,
+    emojiDecorator, log) {
 
   "use strict";
 
@@ -35,6 +36,9 @@ require([
     decorators: [emojiDecorator]
   }).render();
 
+  unreadItemsClient.syncCollections({
+    'chat': chatCollection
+  });
   unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
 
   new chatInputView.ChatInputView({
