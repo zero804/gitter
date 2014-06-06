@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Gitter OAuth Failed</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href='{{cdn "bootstrap/css/trpAppsPage.css" }}' rel="stylesheet">
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+    <link id="favicon" rel="shortcut icon" href='{{cdn "images/2/gitter/favicon5.png" }}'>
+
+    {{>require_wrapper}}
+  </head>
+
+  <body>
+    <div class="trpHomeHeroStripContainer trpHomeiOSAppHeroStripContainer">
+
+      <div class="trpHomeTopStrip">
+        <div class="trpHomeLogo">{{^compactView}}<a href="{{homeUrl}}">{{/compactView}}<img src="{{ cdn "images/2/gitter/logo-text-white-64.png" }}" height="64">{{^compactView}}</a>{{/compactView}}</div>
+      </div>
+
+      <div class="trpHomeHero">
+        <div class="trpHeroText">
+          <p>We're very sorry about this, but your OAuth request just won't do.</p>
+          {{#if clientMismatch}}
+          <p>The supplied client credentials don't match: either the <code>client_id</code> or the 
+            <code>redirect_uri</code> wasn't <em>exactly</em> right.
+          </p>
+          {{/if}}
+          {{#if missingParams}}
+            <p>Your request didn&apos;t include some of the required OAuth parameters: <code>{{missingParams}}</code>
+          {{/if}}
+          {{#if incorrectResponseType}}
+            <p>Your request had the incorrect <code>response_type</code> parameter.
+          {{/if}}
+          
+        </div>
+      </div>
+
+    </div>
+
+
+
+
+
+
+  </body>
+</html>
