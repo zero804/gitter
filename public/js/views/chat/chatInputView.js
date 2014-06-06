@@ -11,7 +11,6 @@ define([
   'utils/momentWrapper',
   'utils/scrollbar-detect',
   'utils/is-mobile',
-  'collections/instances/integrated-items',
   'utils/emoji',
   'components/drafty',
   'utils/cdn',
@@ -20,7 +19,7 @@ define([
   'jquery-textcomplete', // No ref
   'utils/sisyphus-cleaner' // No ref
 ], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate,
-  emojiListItemTemplate, moment, hasScrollBars, isMobile, itemCollections, emoji, drafty, cdn, commands) {
+  emojiListItemTemplate, moment, hasScrollBars, isMobile, emoji, drafty, cdn, commands) {
   "use strict";
 
   /** @const */
@@ -91,6 +90,7 @@ define([
       this.rollers = options.rollers;
       this.chatCollectionView = options.chatCollectionView;
       this.composeMode = new ComposeMode();
+      this.userCollection = options.userCollection;
       this.listenTo(appEvents, 'input.append', function(text, options) {
         if(this.inputBox) {
           this.inputBox.append(text, options);
@@ -132,6 +132,7 @@ define([
       this.inputBox = inputBox;
 
       this.$el.find('.compose-mode-toggle, .md-help').tooltip({placement: 'left'});
+      var userCollection = this.userCollection;
 
       this.$el.find('textarea').textcomplete([
           {
@@ -171,7 +172,7 @@ define([
               var lowerTerm = term.toLowerCase();
               var loggedInUsername = context.user().get('username').toLowerCase();
 
-              var matches = itemCollections.users.models.filter(function(user) {
+              var matches = userCollection && userCollection.filter(function(user) {
                 var username = user.get('username').toLowerCase();
 
                 if(username === loggedInUsername) return false;
