@@ -56,7 +56,7 @@
     "marked": "git://github.com/gitterHQ/marked.git#v0.4.0",
     "highlight.js": "~8.0.0",
     "xregexp": "^2.0.0",
-    "heapdump": "^0.2.8",
+    "heapdump": "^0.2.9",
     "memwatch": "^0.2.2",
     "node-statsd": "0.0.7",
     "raven": "^0.6.2",

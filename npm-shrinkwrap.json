@@ -694,7 +694,8 @@
           "dependencies": {
             "async": {
               "version": "0.2.9",
-              "from": "async@0.2.9"
+              "from": "async@0.2.9",
+              "resolved": "https://registry.npmjs.org/async/-/async-0.2.9.tgz"
             },
             "ini": {
               "version": "1.2.1",
@@ -787,9 +788,9 @@
       }
     },
     "heapdump": {
-      "version": "0.2.8",
+      "version": "0.2.9",
       "from": "heapdump@latest",
-      "resolved": "https://registry.npmjs.org/heapdump/-/heapdump-0.2.8.tgz"
+      "resolved": "https://registry.npmjs.org/heapdump/-/heapdump-0.2.9.tgz"
     },
     "highlight.js": {
       "version": "8.0.0",
