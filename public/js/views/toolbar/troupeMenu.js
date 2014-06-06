@@ -19,8 +19,8 @@ define([
       'alt.up': 'selectPrev',
       'alt.down': 'selectNext',
       'alt.enter': 'navigateToCurrent',
-      'alt.left': 'navigateToPrev',
-      'alt.right': 'navigateToNext',
+      'room.prev': 'navigateToPrev',
+      'room.next': 'navigateToNext',
       'room.1 room.2 room.3 room.4 room.5 room.6 room.7 room.8 room.9 room.10': 'navigateToRoom'
     }
   });

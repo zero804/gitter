@@ -6,8 +6,13 @@ require([
 ], function($, _, appEvents) {
   "use strict";
 
+  // Central logic for focus events
+  // Listens to specific keyboard events to trigger corresponding 'focus.request' events
+
   var $previous;
   var isEditing = false;
+
+  // Listen to chat.edit toggle to handle proper focus between inputs
 
   appEvents.on('chat.edit.show', function() {
     isEditing = true;
@@ -36,14 +41,15 @@ require([
   };
 
   var focusNext = function(event, handler) {
-    console.log('focusNext', handler, findNewFocus(handler.scope, 1));
     appEvents.trigger('focus.request.' + findNewFocus(handler.scope, 1));
   };
 
   var focusPrev = function(event, handler) {
-    console.log('focusPrev', handler, findNewFocus(handler.scope, -1));
     appEvents.trigger('focus.request.' + findNewFocus(handler.scope, -1));
   };
+
+  // Manage 'escape' events on elements to 'blur' them
+  // 'focus' back when another 'escape' event is triggered
 
   var focusOut = function(event) {
     $previous = $(event.target || event.srcElement);
@@ -62,6 +68,9 @@ require([
       appEvents.trigger('focus.request.chat');
     }
   };
+
+  // Mapping from appEvents to specific callbacks
+  // or shortcuts for 'focus.request' triggers
 
   var mappings = {
     'keyboard.maininput.tab.next': focusNext,

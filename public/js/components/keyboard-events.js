@@ -94,11 +94,11 @@ require([
       scope: 'input.search'
     }],
     'left': {
-      name: 'arrowLeft',
+      name: 'room.prev',
       scope: 'other'
     },
     'right': [{
-      name: 'arrowRight',
+      name: 'room.next',
       scope: 'other'
       },{
       name: 'search.go',
@@ -125,7 +125,7 @@ require([
     'alt+left': 'alt.left',
     'alt+right': 'alt.right',
     'alt+enter': 'alt.enter',
-    'ctrl+`': 'toggle',
+    'ctrl+`': 'chat.toggle',
     '1': {
       name: 'room.1',
       scope: 'other'
