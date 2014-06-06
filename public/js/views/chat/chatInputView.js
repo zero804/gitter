@@ -72,7 +72,7 @@ define([
     },
 
     keyboardEvents: {
-      'toggle': 'toggleComposeMode'
+      'chat.toggle': 'toggleComposeMode'
     },
 
     initialize: function(options) {
