@@ -10,6 +10,7 @@ define([
   'hbs!./tmpl/emojiTypeaheadListItem',
   'utils/momentWrapper',
   'utils/scrollbar-detect',
+  'utils/is-mobile',
   'collections/instances/integrated-items',
   'utils/emoji',
   'components/drafty',
@@ -19,11 +20,14 @@ define([
   'jquery-textcomplete', // No ref
   'utils/sisyphus-cleaner' // No ref
 ], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate,
-  emojiListItemTemplate, moment, hasScrollBars, itemCollections, emoji, drafty, cdn, commands) {
+  emojiListItemTemplate, moment, hasScrollBars, isMobile, itemCollections, emoji, drafty, cdn, commands) {
   "use strict";
 
   /** @const */
   var MAX_CHAT_HEIGHT = $(document).height() - $("#header-wrapper").height() - 140;
+
+  /** @const */
+  var MAX_TYPEAHEAD_SUGGESTIONS = isMobile() ? 3 : 8;
 
   /** @const */
   var EXTRA_PADDING = 20;
@@ -132,7 +136,7 @@ define([
       this.$el.find('textarea').textcomplete([
           {
             match: /(^|\s)(([\w-_]+\/[\w-_]+)?#(\d*))$/,
-            maxCount: 8,
+            maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
             search: function(term, callback) {
               var terms = term.split('#');
               var repoName = terms[0];
@@ -162,7 +166,7 @@ define([
           },
           {
             match: /(^|\s)@([a-zA-Z0-9_\-]*)$/,
-            maxCount: 8,
+            maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
             search: function(term, callback) {
               var lowerTerm = term.toLowerCase();
               var loggedInUsername = context.user().get('username').toLowerCase();
@@ -191,7 +195,7 @@ define([
           },
           {
             match: /(^|\s):([\-+\w]*)$/,
-            maxCount: 8,
+            maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
             search: function(term, callback) {
               if(term.length < 1) return callback(SUGGESTED_EMOJI);
 
@@ -212,7 +216,7 @@ define([
           },
           {
             match: /(^)\/(\w*)$/,
-            maxCount: 8,
+            maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
             search: function(term, callback) {
               var matches = commands.getSuggestions(term);
               callback(matches);
