@@ -182,12 +182,8 @@ module.exports = {
     app.post('/login/oauth/authorize/decision', oauth2.decision);
     app.post('/login/oauth/token', oauth2.token);
 
-    app.post('/oauth/authorize/decision', oauth2.decision);
-
-
-    app.get('/login/oauth/callback', function(req, res) {
-      res.send(200, 'Can I help you with something?');
-    });
+    // Wait? Why is this here?
+    // REMOVE IT: app.post('/oauth/authorize/decision', oauth2.decision);
 
     // Zendesk login callback
     app.get(
