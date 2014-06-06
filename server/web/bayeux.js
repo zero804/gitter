@@ -234,7 +234,11 @@ var authenticator = bayeuxExtension({
       var oauthClient = tokenInfo.client;
       var userId = user && user.id;
 
-      logger.verbose('bayeux: handshake', { username: user && user.username, client: oauthClient.name });
+      logger.verbose('bayeux: handshake', {
+        appVersion: ext.appVersion,
+        username: user && user.username,
+        client: oauthClient.name
+      });
 
       var connectionType = getConnectionType(ext.connType);
       var client = ext.client || '';
@@ -283,9 +287,13 @@ var authenticator = bayeuxExtension({
 
     // Get the presence service involved around about now
     presenceService.userSocketConnected(userId, clientId, connectionType, client, troupeId, eyeballState, function(err) {
-      logger.info("bayeux: connection " + clientId + ' is associated to ' + userId, { troupeId: troupeId, client: client });
 
-      if(err) return callback(err);
+      if(err) {
+        logger.warn("bayeux: Unable to associate connection " + clientId + ' to ' + userId, { troupeId: troupeId, client: client, exception: err });
+        return callback(err);
+      }
+
+      logger.info("bayeux: connection " + clientId + ' is associated to ' + userId, { troupeId: troupeId, client: client });
 
       message.ext.userId = userId;
 

@@ -10,7 +10,7 @@ define([
   'hbs!./tmpl/emojiTypeaheadListItem',
   'utils/momentWrapper',
   'utils/scrollbar-detect',
-  'collections/instances/integrated-items',
+  'utils/is-mobile',
   'utils/emoji',
   'components/drafty',
   'utils/cdn',
@@ -19,12 +19,14 @@ define([
   'jquery-textcomplete', // No ref
   'utils/sisyphus-cleaner' // No ref
 ], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate,
-  emojiListItemTemplate, moment, hasScrollBars, itemCollections, emoji, drafty, cdn, commands) {
+  emojiListItemTemplate, moment, hasScrollBars, isMobile, emoji, drafty, cdn, commands) {
   "use strict";
 
   /** @const */
+  var MAX_CHAT_HEIGHT = $(document).height() - $("#header-wrapper").height() - 140;
 
-    var MAX_CHAT_HEIGHT = $(document).height() - $("#header-wrapper").height() - 140;
+  /** @const */
+  var MAX_TYPEAHEAD_SUGGESTIONS = isMobile() ? 3 : 8;
 
   /** @const */
   var EXTRA_PADDING = 20;
@@ -88,6 +90,7 @@ define([
       this.rollers = options.rollers;
       this.chatCollectionView = options.chatCollectionView;
       this.composeMode = new ComposeMode();
+      this.userCollection = options.userCollection;
       this.listenTo(appEvents, 'input.append', function(text, options) {
         if(this.inputBox) {
           this.inputBox.append(text, options);
@@ -129,11 +132,12 @@ define([
       this.inputBox = inputBox;
 
       this.$el.find('.compose-mode-toggle, .md-help').tooltip({placement: 'left'});
+      var userCollection = this.userCollection;
 
       this.$el.find('textarea').textcomplete([
           {
             match: /(^|\s)(([\w-_]+\/[\w-_]+)?#(\d*))$/,
-            maxCount: 8,
+            maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
             search: function(term, callback) {
               var terms = term.split('#');
               var repoName = terms[0];
@@ -163,12 +167,12 @@ define([
           },
           {
             match: /(^|\s)@([a-zA-Z0-9_\-]*)$/,
-            maxCount: 8,
+            maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
             search: function(term, callback) {
               var lowerTerm = term.toLowerCase();
               var loggedInUsername = context.user().get('username').toLowerCase();
 
-              var matches = itemCollections.users.models.filter(function(user) {
+              var matches = userCollection && userCollection.filter(function(user) {
                 var username = user.get('username').toLowerCase();
 
                 if(username === loggedInUsername) return false;
@@ -192,7 +196,7 @@ define([
           },
           {
             match: /(^|\s):([\-+\w]*)$/,
-            maxCount: 8,
+            maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
             search: function(term, callback) {
               if(term.length < 1) return callback(SUGGESTED_EMOJI);
 
@@ -213,7 +217,7 @@ define([
           },
           {
             match: /(^)\/(\w*)$/,
-            maxCount: 8,
+            maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
             search: function(term, callback) {
               var matches = commands.getSuggestions(term);
               callback(matches);

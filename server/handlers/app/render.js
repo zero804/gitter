@@ -164,8 +164,7 @@ function renderMobileNativeChat(req, res) {
     appCache: getAppCache(req),
     troupeContext: {
       userId: req.user.id
-    },
-    accessToken: req.accessToken,
+    }
   });
 }
 
@@ -182,8 +181,7 @@ function renderMobileNativeUserhome(req, res) {
     bootScriptName: 'mobile-native-userhome',
     troupeContext: {
       userId: req.user.id
-    },
-    accessToken: req.accessToken,
+    }
   });
 }
 

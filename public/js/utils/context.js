@@ -19,6 +19,22 @@ define([
       troupeModel = ctx.troupe;
     } else if(ctx.troupeId) {
       troupeModel = { id: ctx.troupeId };
+    } else if(window.cordova && window.location.pathname.indexOf('/mobile/chat') === 0) {
+      /*
+       * For native cordova apps, the room id is taken from the hash (or localstorage backup)
+       * instead of the url.
+       * This means that the we can use the same url for all rooms, and so cache one page in
+       * the user's web view.
+       */
+      var id = window.location.hash.split('#')[1] || window.localStorage.lastTroupeId;
+
+      if(!id) {
+        window.location.pathname = '/mobile/home';
+        return;
+      }
+
+      window.localStorage.lastTroupeId = id;
+      troupeModel = { id: id };
     }
 
     return new WatchableModel(troupeModel);
@@ -141,11 +157,11 @@ define([
   };
 
   context.getAccessToken = function() {
-    return context.env('accessToken') || ctx.accessToken;
+    return context.getBearerToken() || ctx.accessToken;
   };
 
   context.getBearerToken = function() {
-    return context.env('accessToken');
+    return window.bearerToken;
   };
 
   context.isLoggedIn = function() {
