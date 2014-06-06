@@ -2,13 +2,13 @@
 define([
   'jquery',
   'views/base',
-  'hbs!./tmpl/markdownTemplate'
-], function($, TroupeViews, markdownTemplate ) {
+  'hbs!./tmpl/keyboardTemplate'
+], function($, TroupeViews, keyboardTemplate ) {
   "use strict";
 
 
   var View = TroupeViews.Base.extend({
-    template: markdownTemplate,
+    template: keyboardTemplate,
     events: {
 
     },
@@ -16,12 +16,12 @@ define([
     initialize: function() {
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
     },
-    
+
     menuItemClicked: function(button) {
       switch(button) {
-        case 'showKeyboardShortcuts':
+        case 'showMarkdownHelp':
           this.dialog.hide();
-          window.location.hash = "#keys";
+          window.location.hash = "#markdown";
           break;
 
         case 'cancel':
@@ -46,13 +46,13 @@ define([
 
   return TroupeViews.Modal.extend({
       initialize: function(options) {
-        options.title = "Markdown Help";
+        options.title = "Keyboard Shortcuts";
         TroupeViews.Modal.prototype.initialize.apply(this, arguments);
         this.view = new View({ });
       },
       menuItems: [
         { action: "cancel", text: "Close", className: "trpBtnLightGrey" },
-        { action: "showKeyboardShortcuts", text: "Keyboard shortcuts", className: "trpBtnBlue trpBtnRight"}
+        { action: "showMarkdownHelp", text: "Markdown Help", className: "trpBtnBlue trpBtnRight"}
       ]
     });
   });
