@@ -14,6 +14,17 @@ define([
 ], function($, Marionette, context, appEvents, troupeCollections, TroupeCollectionView, template, SearchView, ProfileView, OrgCollectionView) {
   "use strict";
 
+  var FavouritesView = TroupeCollectionView.extend({
+    keyboardEvents: {
+      'alt.up': 'selectPrev',
+      'alt.down': 'selectNext',
+      'alt.enter': 'navigateToCurrent',
+      'alt.left': 'navigateToPrev',
+      'alt.right': 'navigateToNext',
+      'room.1 room.2 room.3 room.4 room.5 room.6 room.7 room.8 room.9 room.10': 'navigateToRoom'
+    }
+  });
+
   return Marionette.Layout.extend({
     template: template,
     tagName: 'span',
@@ -53,7 +64,7 @@ define([
       this.profile.show(new ProfileView());
 
       // mega-list: recent troupe view
-      this.favs.show(new TroupeCollectionView({
+      this.favs.show(new FavouritesView({
         collection: troupeCollections.favourites,
         rerenderOnSort: true,
         draggable: true,

@@ -150,14 +150,6 @@ define([
     className: 'trpTroupeList',
     itemView: TroupeItemView,
 
-    keyboardEvents: {
-      'alt.up': 'selectPrev',
-      'alt.down': 'selectNext',
-      'alt.enter': 'navigateToCurrent',
-      'alt.left': 'navigateToPrev',
-      'alt.right': 'navigateToNext'
-    },
-
     initialize: function(options) {
       if(options.rerenderOnSort) {
         this.listenTo(this.collection, 'sort', this.render);
@@ -166,7 +158,24 @@ define([
         this.makeDraggable(options.dropTarget);
       }
       this.roomsCollection = options.roomsCollection;
+
       this.selectedIndex = 0;
+
+      // Hacky solution to set the proper selectedIndex when loading
+      // Has to be in a timeout, otherwise context.getTroupeId() is undefined
+      var self = this;
+      setTimeout(function() {
+        var index = self.getIndexForId(context.getTroupeId());
+        if (index) self.selectedIndex = index;
+      }, 1600);
+    },
+
+    getIndexForId: function(id) {
+      if (!id) return;
+      var els = this.$el.find('li');
+      for (var i = 0, el; el = els[i]; i++) {
+        if ($(el).data('id') === id) return i;
+      }
     },
 
     selectPrev: function() {
@@ -184,7 +193,6 @@ define([
 
       if (i >= 0 && i < itemElements.length) {
         this.selectedIndex = i;
-        console.log('change selected', i);
         itemElements.removeClass('selected');
         $(itemElements[this.selectedIndex]).addClass('selected');
       }
@@ -201,7 +209,8 @@ define([
       var itemElements = this.$el.find('li');
 
       if (i >= 0 && i < itemElements.length) {
-        $(itemElements[this.selectedIndex]).click();
+        this.selectedIndex = i;
+        $(itemElements[i]).click();
       }
     },
 
@@ -211,6 +220,12 @@ define([
 
     navigateToPrev: function() {
       this.navigateTo(this.selectedIndex - 1);
+    },
+
+    navigateToRoom: function(e, handler) {
+      if (handler.key === '0') return this.navigateTo(9);
+      var index = parseInt(handler.key, 10) - 1;
+      this.navigateTo(index);
     },
 
     makeDraggable: function(drop) {

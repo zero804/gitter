@@ -7,6 +7,43 @@ require([
   "use strict";
 
   var $previous;
+  var isEditing = false;
+
+  appEvents.on('chat.edit.show', function() {
+    isEditing = true;
+  });
+  appEvents.on('chat.edit.hide', function() {
+    isEditing = false;
+  });
+
+  var getTabOrder = function() {
+    var order = ['chat', 'search'];
+    if (isEditing) order.push('chat.edit');
+    return order;
+  };
+
+  var findNewFocus = function(fromScope, position) {
+    var order = getTabOrder();
+    var name = fromScope.replace('input.', '');
+    var index = order.indexOf(name);
+    var findIndex = index + position;
+
+    if (index === -1 || !order[ findIndex ]) { // not found
+      if (position === -1) return order[ order.length-1 ];
+      return order[0];
+    }
+    return order[findIndex];
+  };
+
+  var focusNext = function(event, handler) {
+    console.log('focusNext', handler, findNewFocus(handler.scope, 1));
+    appEvents.trigger('focus.request.' + findNewFocus(handler.scope, 1));
+  };
+
+  var focusPrev = function(event, handler) {
+    console.log('focusPrev', handler, findNewFocus(handler.scope, -1));
+    appEvents.trigger('focus.request.' + findNewFocus(handler.scope, -1));
+  };
 
   var focusOut = function(event) {
     $previous = $(event.target || event.srcElement);
@@ -27,9 +64,9 @@ require([
   };
 
   var mappings = {
-    'keyboard.chat.edit.escape keyboard.search.tab.next keyboard.tab.next': 'chat',
-    'keyboard.chat.tab.next': 'search',
-    'keyboard.chat.escape keyboard.search.escape keyboard.input.escape': focusOut,
+    'keyboard.maininput.tab.next': focusNext,
+    'keyboard.maininput.tab.prev': focusPrev,
+    'keyboard.maininput.escape keyboard.input.escape': focusOut,
     'keyboard.document.escape': focusIn
   };
 

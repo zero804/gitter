@@ -138,6 +138,14 @@ require([
     postMessage(message);
   });
 
+  appEvents.on('chat.edit.show', function() {
+    postMessage({type: 'chat.edit.show'});
+  });
+
+  appEvents.on('chat.edit.hide', function() {
+    postMessage({type: 'chat.edit.hide'});
+  });
+
   var appView = new ChatIntegratedView({ el: 'body' });
   new RightToolbarView({ el: "#toolbar-frame" });
 
@@ -233,7 +241,31 @@ require([
 
   });
 
-  new Router();
+  var router = new Router();
+
+  var showingHelp = false;
+  appEvents.on('keyboard.help', function() {
+    if (showingHelp) {
+      router.navigate('', {trigger: true});
+      showingHelp = false;
+    }
+    else {
+      router.navigate('markdown', {trigger: true});
+      showingHelp = 'markdown';
+    }
+  });
+  appEvents.on('keyboard.document.escape', function() {
+    if (showingHelp) {
+      showingHelp = false;
+    }
+  });
+  appEvents.on('keyboard.tab.next keyboard.tab.prev', function(e) {
+    e.preventDefault();
+    if (showingHelp) {
+      showingHelp = showingHelp === 'markdown' ? 'keys' : 'markdown';
+      router.navigate(showingHelp, {trigger: true});
+    }
+  });
 
   // Listen for changes to the room
   liveContext.syncRoom();

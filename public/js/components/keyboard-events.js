@@ -56,6 +56,9 @@ require([
       name: 'search.escape',
       scope: 'input.search'
       },{
+      name: 'maininput.escape',
+      scope: ['input.chat', 'input.chat.edit', 'input.search']
+      },{
       name: 'input.escape',
       scope: 'input.other'
       },{
@@ -102,22 +105,19 @@ require([
       scope: 'input.search'
     }],
     'tab': [{
-      name: 'chat.tab.next',
-      scope: 'input.chat'
-    },{
-      name: 'chat.edit.tab.next',
-      scope: 'input.chat.edit'
-    },{
-      name: 'search.tab.next',
-      scope: 'input.search'
-    },{
-      name: 'input.tab.next',
-      scope: 'input.other'
-    },{
+      name: 'maininput.tab.next',
+      scope: ['input.chat', 'input.chat.edit', 'input.search']
+      },{
       name: 'tab.next',
       scope: 'other'
     }],
-    'alt+tab': 'tab.prev',
+    'alt+tab': [{
+      name: 'maininput.tab.prev',
+      scope: ['input.chat', 'input.chat.edit', 'input.search']
+      },{
+      name: 'tab.prev',
+      scope: 'other'
+    }],
     'pageup': 'pageUp',
     'pagedown': 'pageDown',
     'alt+up': 'alt.up',
@@ -126,6 +126,46 @@ require([
     'alt+right': 'alt.right',
     'alt+enter': 'alt.enter',
     'ctrl+`': 'toggle',
+    '1': {
+      name: 'room.1',
+      scope: 'other'
+    },
+    '2': {
+      name: 'room.2',
+      scope: 'other'
+    },
+    '3': {
+      name: 'room.3',
+      scope: 'other'
+    },
+    '4': {
+      name: 'room.4',
+      scope: 'other'
+    },
+    '5': {
+      name: 'room.5',
+      scope: 'other'
+    },
+    '6': {
+      name: 'room.6',
+      scope: 'other'
+    },
+    '7': {
+      name: 'room.7',
+      scope: 'other'
+    },
+    '8': {
+      name: 'room.8',
+      scope: 'other'
+    },
+    '9': {
+      name: 'room.9',
+      scope: 'other'
+    },
+    '0': {
+      name: 'room.10',
+      scope: 'other'
+    },
     'h': {
       name: 'help',
       scope: 'other'

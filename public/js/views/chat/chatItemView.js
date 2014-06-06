@@ -12,11 +12,12 @@ define([
   'hbs!./tmpl/chatViewItem',
   'views/chat/chatInputView',
   'views/unread-item-view-mixin',
+  'utils/appevents',
   'cocktail',
   'views/keyboard-events-mixin',
   'bootstrap_tooltip', // No ref
 ], function($, _, context, chatModels, AvatarView, Marionette, TroupeViews, Popover,
-  chatItemTemplate, chatInputView, UnreadItemViewMixin, cocktail, KeyboardEventMixins) {
+  chatItemTemplate, chatInputView, UnreadItemViewMixin, appEvents, cocktail, KeyboardEventMixins) {
 
   "use strict";
 
@@ -264,10 +265,18 @@ define([
       if (this.isEditing) {
         this.isEditing = false;
         this.showText();
+        this.stopListening(appEvents, 'focus.request.chat.edit');
+        appEvents.trigger('chat.edit.hide');
       } else {
         if (this.canEdit()) {
+          var self = this;
           this.isEditing = true;
           this.showInput();
+          this.listenTo(appEvents, 'focus.request.chat.edit', function() {
+            self.inputBox.$el.focus();
+            appEvents.trigger('focus.change.chat.edit');
+          });
+          appEvents.trigger('chat.edit.show');
         }
       }
     },
