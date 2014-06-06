@@ -14,7 +14,7 @@ Getting Started
 4.	`./redis.sh`
 5.	`./scripts/mongo/init-dev-mongo.sh`
 6.	`./scripts/upgrade-data.sh`
-7.	`nodemon -w public/templates -w server -e js,hbs web.js`
+7.	`nodemon` (this will run node and restart when anything changes based on config in nodemon.json)
 
 Data Upgrades
 -------------
