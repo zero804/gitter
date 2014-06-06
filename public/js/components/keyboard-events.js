@@ -47,9 +47,6 @@ require([
       scope: 'other'
     },
     'esc': [{
-      name: 'escape',
-      scope: 'all'
-      },{
       name: 'chat.escape',
       scope: 'input.chat'
       },{
@@ -58,6 +55,12 @@ require([
       },{
       name: 'search.escape',
       scope: 'input.search'
+      },{
+      name: 'input.escape',
+      scope: 'input.other'
+      },{
+      name: 'document.escape',
+      scope: 'other'
     }],
     'enter': {
       name: 'search.go',
@@ -98,6 +101,23 @@ require([
       name: 'search.go',
       scope: 'input.search'
     }],
+    'tab': [{
+      name: 'chat.tab.next',
+      scope: 'input.chat'
+    },{
+      name: 'chat.edit.tab.next',
+      scope: 'input.chat.edit'
+    },{
+      name: 'search.tab.next',
+      scope: 'input.search'
+    },{
+      name: 'input.tab.next',
+      scope: 'input.other'
+    },{
+      name: 'tab.next',
+      scope: 'other'
+    }],
+    'alt+tab': 'tab.prev',
     'pageup': 'pageUp',
     'pagedown': 'pageDown',
     'alt+up': 'alt.up',
@@ -105,15 +125,11 @@ require([
     'alt+left': 'alt.left',
     'alt+right': 'alt.right',
     'alt+enter': 'alt.enter',
-    'alt+space': 'search.open',
     'ctrl+`': 'toggle',
-    'ctrl+h': [{
+    'h': {
       name: 'help',
       scope: 'other'
-      },{
-      name: 'chat.help',
-      scope: 'input.chat'
-    }],
+    },
     'q, r': {
       name: 'quote',
       scope: 'other'

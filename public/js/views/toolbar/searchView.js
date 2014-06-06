@@ -17,7 +17,6 @@ define([
   var View = TroupeCollectionView.extend({
 
     keyboardEvents: {
-      'search.open': 'onKeySearchOpen',
       'search.prev': 'onKeySearchPrev',
       'search.next': 'onKeySearchNext',
       'search.go': 'onKeySearchGo',
@@ -39,13 +38,12 @@ define([
       // listen for keypresses on the input
       var self = this;
       this.$input.on('keyup', function(e) {
-        $(window).trigger('showSearch');
-        return self.keyPress(e);
+        return self.keySearch(e);
       });
-    },
-
-    onKeySearchOpen: function() {
-      this.$input.focus();
+      appEvents.on('focus.request.search', function() {
+        self.$input.focus();
+        appEvents.trigger('focus.change.search');
+      });
     },
 
     onKeySearchPrev: function(e) {
@@ -79,8 +77,10 @@ define([
       // don't do anything if the search term hasn't changed
       if (query === this.query)
         return;
-      else
+      else {
         this.query = query;
+        $(window).trigger('showSearch');
+      }
 
       var filter = textFilter({ query: query, fields: ['name', 'username', 'displayName', 'uri']});
 
@@ -166,8 +166,6 @@ define([
         self.collection.set(additional, { remove: false, add: true, merge: true });
 
       });
-
-
 
       // set the initial local search results
       self.collection.set(results, { remove: true, add: true, merge: true });
@@ -283,10 +281,6 @@ define([
       }});
     },
 
-    keyPress: function(e) {
-      this.keySearch(e);
-    },
-
     selectPrev: function() {
       this.select(this.selectedIndex - 1);
     },
@@ -312,7 +306,7 @@ define([
       }
     },
 
-    keySearch: _.debounce(function(e) {
+    keySearch: _.debounce(function() {
       this.search(this.$input.val());
     }, 250)
 

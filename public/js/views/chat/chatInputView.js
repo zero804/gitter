@@ -88,6 +88,12 @@ define([
           this.inputBox.append(text, options);
         }
       });
+      this.listenTo(appEvents, 'focus.request.chat', function() {
+        if(this.inputBox) {
+          this.inputBox.$el.focus();
+          appEvents.trigger('focus.change.chat');
+        }
+      });
     },
 
     getRenderData: function() {
@@ -390,8 +396,7 @@ define([
       "chat.edit.openLast": "onKeyEditLast",
       "chat.send": "onKeySend",
       "pageUp": "onKeyPageUp",
-      "pageDown": "onKeyPageDown",
-      "search.go search.escape": "onKeySearchLeftFocus"
+      "pageDown": "onKeyPageDown"
     },
 
     // pass in the textarea as el for ChatInputBoxView
@@ -457,10 +462,6 @@ define([
 
     onKeyPageDown: function() {
       if(this.chatCollectionView) this.chatCollectionView.pageDown();
-    },
-
-    onKeySearchLeftFocus: function() {
-      if (!window._troupeIsTablet) this.$el.focus();
     },
 
     processInput: function() {
