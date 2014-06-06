@@ -494,19 +494,6 @@ define([
     syncCollections: function(collections) {
       var unreadItemStore = getUnreadItemStoreReq();
 
-      unreadItemStore.on('itemMarkedRead', function(itemType, itemId, mention) {
-        var collection = collections[itemType];
-        if(!collection) return;
-
-        var v = { unread: false };
-
-        if(mention) {
-          v.mentioned = false;
-        }
-
-        collection.patch(itemId, v, { silent: true });
-      });
-
       unreadItemStore.on('unreadItemRemoved', function(itemType, itemId) {
         var collection = collections[itemType];
         if(!collection) return;

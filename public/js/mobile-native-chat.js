@@ -36,6 +36,9 @@ require([
     decorators: [emojiDecorator]
   }).render();
 
+  unreadItemsClient.syncCollections({
+    'chat': chatCollection
+  });
   unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
 
   new chatInputView.ChatInputView({
