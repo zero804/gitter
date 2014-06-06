@@ -287,7 +287,6 @@ module.exports = function( grunt ) {
       'router-archive-chat': createClosureConfig('router-archive-chat'),
       'userhome': createClosureConfig('userhome'),
       "mobile-native-userhome" : createClosureConfig('mobile-native-userhome'),
-      "mobile-native-router": createClosureConfig('mobile-native-router'),
       "mobile-native-chat": createClosureConfig('mobile-native-chat'),
       "mobile-app": createClosureConfig('mobile-app'),
       "mobile-nli-app": createClosureConfig('mobile-nli-app'),
