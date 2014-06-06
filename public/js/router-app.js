@@ -20,7 +20,8 @@ require([
   'template/helpers/all',                 // No ref
   'components/bug-reporting',             // No ref
   'components/csrf',                      // No ref
-  'components/ajax-errors'                // No ref
+  'components/ajax-errors',               // No ref
+  'components/focus-events'               // No ref
 ], function(appEvents, context, Backbone, _, AppIntegratedView, TroupeMenuView, troupeCollections,
   TitlebarUpdater, realtime, createRoomView, createRepoRoomView, chooseRoomView, log) {
   "use strict";
@@ -149,6 +150,18 @@ require([
         break;
 
       case 'keyboard':
+        message.event = {
+          origin: 'chat',
+          preventDefault: function() {
+            console.warn('Could not use preventDefault() because the event comes from the `' + this.origin + '` frame');
+          },
+          stopPropagation: function() {
+            console.warn('Could not use stopPropagation() because the event comes from the `' + this.origin + '` frame');
+          },
+          stopImmediatePropagation: function() {
+            console.warn('Could not use stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame');
+          }
+        };
         appEvents.trigger('keyboard.' + message.name, message.event, message.handler);
         appEvents.trigger('keyboard.all', message.name, message.event, message.handler);
         break;
@@ -167,9 +180,7 @@ require([
       type: 'keyboard',
       name: name,
       // JSON serialisation makes it not possible to send the event object
-      event: {
-        origin: 'app'
-      },
+      event: {},
       handler: handler
     };
     postMessage(message);
