@@ -21,9 +21,10 @@
       </div>
 
       <div class="trpHomeHero">
-        <div class="trpHeroText">
-          <p>We're very sorry about this, but your OAuth request just won't do.</p>
+        <div class="trpHeroText failure">
+          <p>We're terribly sorry about this, but your OAuth request is incorrect :(</p>
           {{#if clientMismatch}}
+          <br>
           <p>The supplied client credentials don't match: either the <code>client_id</code> or the 
             <code>redirect_uri</code> wasn't <em>exactly</em> right.
           </p>
@@ -34,8 +35,11 @@
           {{#if incorrectResponseType}}
             <p>Your request had the incorrect <code>response_type</code> parameter.
           {{/if}}
+          <br>
+            <p>If you can't resolve this issue, please <a href="http://support.gitter.im" style="color: white">contact support</a>.</p>
           
         </div>
+
       </div>
 
     </div>
