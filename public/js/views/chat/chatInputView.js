@@ -72,11 +72,7 @@ define([
     },
 
     keyboardEvents: {
-      'toggle': 'toggleComposeMode',
-      // Another way to delegate it? Seems to be handled by the router
-      'chat.help': function() {
-        window.location.href = '#markdown';
-      }
+      'toggle': 'toggleComposeMode'
     },
 
     initialize: function(options) {

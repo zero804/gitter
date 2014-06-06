@@ -149,6 +149,14 @@ require([
         realtime.testConnection('chat.' + reason);
         break;
 
+      case 'chat.edit.show':
+        appEvents.trigger('chat.edit.show');
+        break;
+
+      case 'chat.edit.hide':
+        appEvents.trigger('chat.edit.hide');
+        break;
+
       case 'keyboard':
         message.event = {
           origin: 'chat',
