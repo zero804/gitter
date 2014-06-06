@@ -187,6 +187,7 @@ require([
     el: $('#chat-input'),
     collection: itemCollections.chats,
     chatCollectionView: chatCollectionView,
+    userCollection: itemCollections.users,
     rollers: chatCollectionView.rollers
   }).render();
 

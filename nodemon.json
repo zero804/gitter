@@ -1,0 +1,7 @@
+{
+  "watch": ["server", "public/templates"],
+  "ext": "js,hbs",
+  "env": {
+    "NODEMON": "1"
+  }
+}
