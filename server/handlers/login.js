@@ -4,15 +4,20 @@
 var env            = require('../utils/env');
 var stats          = env.stats;
 var logger         = env.logger;
+var config         = env.config;
 
 var passport       = require('passport');
 var client         = require("../utils/redis").getClient();
 var lock           = require("redis-lock")(client);
+var jwt            = require('jwt-simple');
+var uuid           = require('node-uuid');
+var url            = require('url');
 var oauth2         = require('../web/oauth2');
 var mixpanel       = require('../web/mixpanelUtils');
 var languageSelector = require('../web/language-selector');
 var rememberMe     = require('../web/middlewares/rememberme-middleware');
 var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
+var GithubMeService  = require("../services/github/github-me-service");
 
 module.exports = {
   install: function(app) {
@@ -177,11 +182,44 @@ module.exports = {
     app.post('/login/oauth/authorize/decision', oauth2.decision);
     app.post('/login/oauth/token', oauth2.token);
 
-    app.post('/oauth/authorize/decision', oauth2.decision);
+    // Wait? Why is this here?
+    // REMOVE IT: app.post('/oauth/authorize/decision', oauth2.decision);
 
+    // Zendesk login callback
+    app.get(
+      "/login/zendesk",
+      ensureLoggedIn,
+      function(req, res, next) {
+        var ghMe = new GithubMeService(req.user);
+        ghMe.getEmail()
+        .then(function(email) {
+          var cfg = config.get("zendesk");
+          var payload = {
+            "iat": (new Date().getTime() / 1000),
+            "jti": uuid.v4(),
+            "name": req.user.displayName,
+            "email": email,
+            "external_id": req.user.id,
+            "remote_photo_url": "https://avatars.githubusercontent.com/" + req.user.username,
+            "user_fields": {
+              "username": req.user.username
+            }
+          };
 
-    app.get('/login/oauth/callback', function(req, res) {
-      res.send(200, 'Can I help you with something?');
+          logger.info("Sending data to Zendesk", payload);
+
+          var token = jwt.encode(payload, cfg.sharedKey);
+          var redirect = "https://" + cfg.subdomain + ".zendesk.com/access/jwt?jwt=" + token;
+
+          var query = url.parse(req.url, true).query;
+
+          if(query.return_to) {
+            redirect += "&return_to=" + encodeURIComponent(query.return_to);
+          }
+
+          res.redirect(redirect);
+        })
+        .catch(next);
     });
 
   }

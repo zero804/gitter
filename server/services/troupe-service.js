@@ -391,13 +391,12 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
 
           troupe.users.forEach(function(troupeUser) {
             var currentUserId = troupeUser.userId;
-            var url = '/user/' + troupeUser.userId + '/troupes';
+            var url = '/user/' + currentUserId + '/rooms';
 
             var strategy = new restSerializer.TroupeStrategy({ currentUserId: currentUserId });
 
             restSerializer.serialize(troupe, strategy, function(err, serializedModel) {
               if(err) return logger.error('Error while serializing oneToOne troupe: ' + err, { exception: err });
-
               appEvents.dataChange2(url, 'create', serializedModel);
             });
 

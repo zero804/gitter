@@ -9,6 +9,7 @@ var appVersion = require('./web/appVersion');
 var domainWrapper = require('./utils/domain-wrapper');
 var http       = require('http');
 var shutdown = require('shutdown');
+var serverStats = require('./utils/server-stats');
 
 require('./utils/diagnostics');
 
@@ -28,15 +29,15 @@ app.get('/', function(req, res) {
 require('./utils/event-listeners').installLocalEventListeners();
 
 var port = nconf.get('PORT') || nconf.get("ws:port");
-var bindIp = nconf.get("ws:bindIp");
-
-winston.info("Binding websockets service to " + bindIp + ":" + port);
 
 bayeux.attach(server);
 
 // Listen to the port
-server.listen(port, bindIp);
+server.listen(port, function() {
+  winston.info("Websockets listening on port " + port);
+});
 
+serverStats('websockets', server);
 
 shutdown.addHandler('websockets', 10, function(callback) {
   server.close(function() {

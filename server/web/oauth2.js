@@ -4,11 +4,14 @@
 /**
  * Module dependencies.
  */
+var env                    = require('../utils/env');
+var logger                 = env.logger;
+var errorReporter          = env.errorReporter;
+var stats                  = env.stats;
+
 var oauth2orize = require('oauth2orize');
 var passport = require('passport');
 var oauthService = require('../services/oauth-service');
-var loginUtils = require('./login-utils');
-var winston = require('../utils/winston');
 var languageSelector = require('./language-selector');
 var random = require('../utils/random');
 var ensureLoggedIn = require('./middlewares/ensure-logged-in');
@@ -34,10 +37,7 @@ server.serializeClient(function(client, done) {
 });
 
 server.deserializeClient(function(id, done) {
-  oauthService.findClientById(id, function(err, client) {
-    if (err) { return done(err); }
-    return done(null, client);
-  });
+  oauthService.findClientById(id, done);
 });
 
 // Register supported grant types.
@@ -55,8 +55,7 @@ server.deserializeClient(function(id, done) {
 // values, and will be exchanged for an access token.
 
 server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, done) {
-  winston.info("Granted access to ", client.name, " for ", user.displayName);
-  winston.info("Granted access to "+ client.name + " for " + user.displayName);
+  logger.info("Granted access to "+ client.name + " for " + user.displayName);
 
   random.generateToken(function(err, token) {
     if (err) { return done(err); }
@@ -114,17 +113,25 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, do
 exports.authorization = [
   ensureLoggedIn,
   server.authorization(function(clientKey, redirectUri, done) {
-
+    stats.event('oauth.authorize');
     oauthService.findClientByClientKey(clientKey, function(err, client) {
       if (err) { return done(err); }
-      if(!client) { return done("Illegal client"); }
+
+      if(!client) {
+        var e1 = new Error("Invalid clientKey");
+        e1.clientMismatch = true;
+        return done(e1);
+      }
 
       if(client.registeredRedirectUri !== redirectUri) {
-        winston.warn("Provided redirectUri does not match registered URI for clientKey ", {
+        logger.warn("Provided redirectUri does not match registered URI for clientKey ", {
           redirectUri: redirectUri,
           registeredUri: client.registeredRedirectUri,
           clientKey: clientKey});
-        return done("Redirect URL does not match");
+
+        var e2 = new Error("URI mismatch");
+        e2.clientMismatch = true;
+        return done(e2);
       }
       return done(null, client, redirectUri);
     });
@@ -135,6 +142,8 @@ exports.authorization = [
       return server.decision({ loadTransaction: false })(req, res, next);
     }
 
+    stats.event('oauth.authorize.dialog');
+
     /* Non-trusted Client */
     res.render('oauth_authorize_dialog', {
       transactionId: req.oauth2.transactionID,
@@ -142,6 +151,30 @@ exports.authorization = [
       client: req.oauth2.client,
       lang: languageSelector(req)
     });
+  },
+  function(err, req, res, next) {
+    stats.event('oauth.authorize.failed');
+    errorReporter(err, { oauthAuthorizationDialog: "failed" });
+
+    var missingParams = ['response_type', 'redirect_uri', 'client_id']
+          .filter(function(param) {
+            return !req.query[param];
+          });
+
+    var incorrectResponseType = req.query.response_type && req.query.response_type !== 'code';
+
+    if(err.clientMismatch || missingParams.length || incorrectResponseType) {
+      res.render('oauth_authorize_failed', {
+        clientMismatch: !!err.clientMismatch,
+        missingParams: missingParams.length && missingParams.join(','),
+        incorrectResponseType: incorrectResponseType,
+        lang: languageSelector(req)
+      });
+    } else {
+      /* Let the main error handler deal with this */
+      next();
+    }
+
   }
 ];
 
@@ -166,17 +199,11 @@ exports.decision = [
 // authenticate when making requests to this endpoint.
 
 exports.token = [
+  function(req, res, next) {
+    stats.event('oauth.exchange');
+    next();
+  },
   passport.authenticate([/*'basic', */'oauth2-client-password'], { session: false }),
   server.token(),
   server.errorHandler()
-];
-
-// The bearer login is used by the embedded apps (like IOS) to prevent
-//  the user needing to login via a login prompt when accessing the webapp
-exports.bearerLogin = [
-  passport.authenticate('bearer', { session: true }),
-  function(req, res, next) {
-    winston.info("oauth: user logged in via bearerLogin", { user: req.user.displayName });
-    loginUtils.redirectUserToDefaultTroupe(req, res, next);
-  }
 ];

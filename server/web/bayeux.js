@@ -17,6 +17,7 @@ var contextGenerator  = require('./context-generator');
 var appVersion        = require('./appVersion');
 var mongoUtils        = require('../utils/mongo-utils');
 var StatusError       = require('statuserror');
+var bayeuxExtension   = require('./bayeux/extension');
 
 var appTag = appVersion.getAppTag();
 
@@ -43,26 +44,6 @@ var routes = [
 ];
 
 var superClientPassword = nconf.get('ws:superClientPassword');
-
-function requestInfo(req) {
-  if(!req) return;
-
-  var referer, origin, connection;
-  if(req.headers) {
-    referer = req.headers.referer;
-    origin = req.headers.origin;
-    connection = req.headers.connection;
-  }
-
-  var ip = req.headers && req.headers['x-forwarded-for'] || req.ip;
-
-  return {
-    ip: ip,
-    referer: referer,
-    origin: origin,
-    connection: connection
-  };
-}
 
 function checkTroupeAccess(userId, troupeId, callback) {
   // TODO: use the room permissions model
@@ -215,12 +196,6 @@ function populateUserUnreadItemsCollection(options, callback) {
   return restful.serializeUnreadItemsForTroupe(troupeId, userId, callback);
 }
 
-function messageIsFromSuperClient(message) {
-  return message &&
-         message.ext &&
-         message.ext.password === superClientPassword;
-}
-
 function getConnectionType(incoming) {
   if(!incoming) return 'online';
 
@@ -234,52 +209,36 @@ function getConnectionType(incoming) {
 }
 
 // Validate handshakes
-var authenticator = {
+var authenticator = bayeuxExtension({
+  channel: '/meta/handshake',
+  name: 'authenticator',
+  failureStat: 'bayeux.handshake.deny',
+  skipSuperClient: true,
   incoming: function(message, req, callback) {
-    function deny(errorCode, errorDescription) {
-      stats.eventHF('bayeux.handshake.deny');
-
-      message.error = errorCode + '::' + errorDescription;
-      logger.error('Denying client access: ' + errorCode + '::' + errorDescription, {
-        token: message.ext && message.ext.token,
-        request: requestInfo(req)
-      });
-
-      callback(message);
-    }
-
-    if (message.channel != '/meta/handshake') {
-      return callback(message);
-    }
-
-    if(messageIsFromSuperClient(message)) {
-      return callback(message);
-    }
-
     var ext = message.ext || {};
 
     var token = ext.token;
 
     if(!token) {
-      return deny(401, "Access token required");
+      return callback({ status: 401, message: "Access token required" });
     }
 
     oauth.validateAccessTokenAndClient(ext.token, function(err, tokenInfo) {
-      if(err) {
-        delete err.stack; // Too much logging
-        logger.error("bayeux: Authentication error: " + err, { exception: err, message: message });
-        return deny(500, "A server error occurred.");
-      }
+      if(err) return callback(err);
 
       if(!tokenInfo) {
-        logger.warn("bayeux: Authentication failed. Invalid access token.", { token: token });
-        return deny(401, "Invalid access token");
+        return callback({ status: 401, message: "Invalid access token" });
       }
 
       var user = tokenInfo.user;
       var oauthClient = tokenInfo.client;
       var userId = user && user.id;
-      logger.verbose('bayeux: handshake', { username: user && user.username, client: oauthClient.name });
+
+      logger.verbose('bayeux: handshake', {
+        appVersion: ext.appVersion,
+        username: user && user.username,
+        client: oauthClient.name
+      });
 
       var connectionType = getConnectionType(ext.connType);
       var client = ext.client || '';
@@ -292,21 +251,12 @@ var authenticator = {
       var id = message.id || '';
       message.id = [id, userId, connectionType, client, troupeId, eyeballState].join(':');
 
-      return callback(message);
+      return callback(null, message);
     });
 
   },
 
-  outgoing: function(message, callback) {
-    if (message.channel != '/meta/handshake') {
-      return callback(message);
-    }
-
-    // Already failed?
-    if(!message.successful)  {
-      return callback(message);
-    }
-
+  outgoing: function(message, req, callback) {
     if(!message.ext) message.ext = {};
     message.ext.appVersion = appTag;
 
@@ -314,12 +264,12 @@ var authenticator = {
     // get the userId out from the message
     var fakeId = message.id;
     if(!fakeId) {
-      return callback(message);
+      return callback(null, message);
     }
 
     var parts = fakeId.split(':');
     if(parts.length != 6) {
-      return callback(message);
+      return callback(null, message);
     }
 
     message.id = parts[0] || undefined; // id not required for an incoming message
@@ -332,18 +282,18 @@ var authenticator = {
 
     if(!userId) {
       // Not logged in? Simply return
-      return callback(message);
+      return callback(null, message);
     }
-
-    logger.verbose("bayeux: about to associate connection " + clientId + ' to user ' + userId, { troupeId: troupeId, client: client });
 
     // Get the presence service involved around about now
     presenceService.userSocketConnected(userId, clientId, connectionType, client, troupeId, eyeballState, function(err) {
-      logger.info("bayeux: connection " + clientId + ' is associated to ' + userId, { troupeId: troupeId, client: client });
 
       if(err) {
-        logger.error("bayeux: Presence service failed to record socket connection: " + err, { exception: err });
+        logger.warn("bayeux: Unable to associate connection " + clientId + ' to ' + userId, { troupeId: troupeId, client: client, exception: err });
+        return callback(err);
       }
+
+      logger.info("bayeux: connection " + clientId + ' is associated to ' + userId, { troupeId: troupeId, client: client });
 
       message.ext.userId = userId;
 
@@ -354,21 +304,19 @@ var authenticator = {
       // If the troupeId was included, it means we've got a native
       // client and they'll be looking for a snapshot:
       contextGenerator.generateSocketContext(userId, troupeId, function(err, context) {
-        if(err) {
-          logger.error("bayeux: Unable to generate context: " + err, { exception: err });
-        }
+        if(err) return callback(err);
 
         message.ext.context = context;
 
         // Not possible to throw an error here, so just carry only
-        callback(message);
+        callback(null, message);
       });
 
     });
 
   }
 
-};
+});
 
 function destroyClient(clientId) {
   if(!clientId) return;
@@ -383,70 +331,16 @@ function destroyClient(clientId) {
 
 }
 
-//
-// Authorisation Extension - decides whether the user
-// is allowed to connect to the subscription channel
-//
-var authorisor = {
-  incoming: function(message, req, callback) {
-    if(message.channel != '/meta/subscribe') {
-      return callback(message);
-    }
 
-    var snapshot = 1;
-    if(message.ext && message.ext.snapshot === false) {
-      snapshot = 0;
-    }
+// Authorize a sbscription message
+// callback(err, allowAccess)
+function authorizeSubscribe(message, callback) {
+  var clientId = message.clientId;
 
-    function deny(errorCode, errorDescription) {
-      stats.eventHF('bayeux.subscribe.deny');
-      var clientDescription;
+  presenceService.lookupUserIdForSocket(clientId, function(err, userId, exists) {
+    if(err) return callback(err);
 
-      switch(errorCode) {
-        case 401: clientDescription = 'Access denied'; break;
-        case 403: clientDescription = 'Permission denied'; break;
-        case 404: clientDescription = 'Not found'; break;
-        default:
-          clientDescription = 'A server error occurred';
-      }
-
-      message.error = errorCode + '::' + clientDescription;
-      logger.error('bayeux: authorisor: Socket authorisation failed: ' + errorCode + '::' + errorDescription, {
-        request: requestInfo(req),
-        clientId: message.clientId,
-        subscription: message.subscription
-      });
-
-      callback(message);
-    }
-
-
-    // Do we allow this user to connect to the requested channel?
-    this.authorizeSubscribe(message, function(err, allowed) {
-      if(err) {
-        var status = err.status || 500;
-        return deny(status, err.message);
-      }
-
-      if(!allowed) {
-        return deny(403, "Authorisation denied.");
-      }
-
-      message.id = [message.id || '', snapshot].join(':');
-
-      return callback(message);
-    });
-
-  },
-
-  outgoing: function(message, req, callback) {
-    if(message.channel != '/meta/subscribe') {
-      return callback(message);
-    }
-
-    if(message.error) {
-      return callback(message);
-    }
+    if(!exists) return callback({ status: 401, message: 'Socket association does not exist' });
 
     var match = null;
 
@@ -458,222 +352,159 @@ var authorisor = {
       return m;
     });
 
-    if(!hasMatch) {
-      return callback(message);
+    if(!hasMatch) return callback({ status: 404, message: "Unknown subscription" });
+
+    var validator = match.route.validator;
+    var m = match.match;
+
+    validator({ userId: userId, match: m, message: message, clientId: clientId }, callback);
+  });
+
+}
+
+//
+// Authorisation Extension - decides whether the user
+// is allowed to connect to the subscription channel
+//
+var authorisor = bayeuxExtension({
+  channel: '/meta/subscribe',
+  name: 'authorisor',
+  failureStat: 'bayeux.subscribe.deny',
+  skipSuperClient: true,
+  incoming: function(message, req, callback) {
+    var snapshot = 1;
+    if(message.ext && message.ext.snapshot === false) {
+      snapshot = 0;
     }
 
-    var populator = match.route.populator;
-    var m = match.match;
+    // Do we allow this user to connect to the requested channel?
+    authorizeSubscribe(message, function(err, allowed) {
+      if(err) return callback(err);
+
+      if(!allowed) {
+        return callback({ status: 403, message: "Authorisation denied."});
+      }
+
+      message.id = [message.id || '', snapshot].join(':');
+
+      return callback(null, message);
+    });
+
+  },
+
+  outgoing: function(message, req, callback) {
     var clientId = message.clientId;
 
     var parts = message.id && message.id.split(':');
-    if(!parts || parts.length !== 2) return callback(message);
+    if(!parts || parts.length !== 2) return callback(null, message);
 
     message.id = parts[0] || undefined;
     var snapshot = parseInt(parts[1], 10) === 1;
 
+    var match = null;
+
+    var hasMatch = routes.some(function(route) {
+      var m = route.re.exec(message.subscription);
+      if(m) {
+        match = { route: route, match: m };
+      }
+      return m;
+    });
+
+    if(!hasMatch) return callback(null, message);
+
+    var populator = match.route.populator;
+    var m = match.match;
+
     /* The populator is all about generating the snapshot for the client */
-    if(clientId && populator && snapshot) {
-      presenceService.lookupUserIdForSocket(clientId, function(err, userId, exists) {
-        if(err) {
-          logger.error('Error for lookupUserIdForSocket', { exception: err });
-          return callback(message);
-        }
-
-        if(!exists) {
-          logger.warn('Populator failed as socket ' + clientId + ' does not exist');
-          return callback(message);
-        }
-
-        populator({ userId: userId, match: m }, function(err, data) {
-          var e = message.ext;
-          if(!e) {
-            e = {};
-            message.ext = e;
-          }
-          e.snapshot = data;
-          return callback(message);
-        });
-
-      });
-    } else {
-      return callback(message);
-    }
-  },
-
-  // Authorize a sbscription message
-  // callback(err, allowAccess)
-  authorizeSubscribe: function(message, callback) {
-    if(messageIsFromSuperClient(message)) {
-      return callback(null, true);
-    }
-
-    var clientId = message.clientId;
-
-    if(!clientId) return callback(new StatusError(401, 'Cannot authorise. Client not authenticated'));
+    if(!clientId || !populator || !snapshot) return callback(null, message);
 
     presenceService.lookupUserIdForSocket(clientId, function(err, userId, exists) {
-      if(err) return callback(err);
+      if(err) callback(err);
 
-      if(!exists) return callback(new StatusError(401, 'Cannot authorise. Socket does not exist.'));
+      if(!exists) return callback({ status: 401, message: "Snapshot failed. Socket not associated" });
 
-      var match = null;
-
-      var hasMatch = routes.some(function(route) {
-        var m = route.re.exec(message.subscription);
-        if(m) {
-          match = { route: route, match: m };
-        }
-        return m;
+      populator({ userId: userId, match: m }, function(err, data) {
+        if(!message.ext) message.ext = {};
+        message.ext.snapshot = data;
+        return callback(null, message);
       });
 
-      if(!hasMatch) return callback(new StatusError(404, "Unknown subscription. Cannot validate"));
-
-      var validator = match.route.validator;
-      var m = match.match;
-
-      validator({ userId: userId, match: m, message: message, clientId: clientId }, callback);
     });
 
   }
-};
+});
 
 // CONNECT extension
-var noConnectForUnknownClients = {
+var noConnectForUnknownClients = bayeuxExtension({
+  channel: '/meta/connect',
+  name: 'doorman',
+  failureStat: 'bayeux.connect.deny',
+  skipSuperClient: true,
   incoming: function(message, req, callback) {
-
-    function deny(errorCode, errorDescription) {
-      stats.eventHF('bayeux.connect.deny');
-
-      var reason = message.data && message.data.reason;
-
-      message.error = errorCode + '::' + errorDescription;
-      logger.error('Denying connect access: ' + errorDescription, {
-        errorCode: errorCode,
-        clientId: clientId,
-        request: requestInfo(req),
-        pingReason: reason
-      });
-
-      callback(message);
-    }
-
-    if (message.channel != '/meta/connect') return callback(message);
-
-    if(messageIsFromSuperClient(message)) {
-      return callback(message);
-    }
-
     var clientId = message.clientId;
 
-    if(!clientId) {
-      return deny(401, "Access denied. ClientId required.");
-    }
-
     server._server._engine.clientExists(clientId, function(exists) {
-      if(!exists) {
-        return deny(401, "Client does not exist");
-      }
+      if(!exists) return callback({ status: 401, message: "Client does not exist"});
 
       presenceService.socketExists(clientId, function(err, exists) {
-        if(err) {
-          delete err.stack; // Too much logging
+        if(err) return callback(err);
 
-          logger.error("presenceService.socketExists failed: " + err, { exception: err });
-          return deny(500, "A server error occurred.");
-        }
+        if(!exists) return callback({ status: 401, message: "Socket association does not exist" });
 
-        if(!exists) return deny(401, "Socket association does not exist");
-
-        return callback(message);
+        return callback(null, message);
       });
 
     });
 
   }
-};
+});
 
-var pushOnlyServer = {
-  incoming: function(message, callback) {
-    if (message.channel.match(/^\/meta\//)) {
-      return callback(message);
+var pushOnlyServer = bayeuxExtension({
+  name: 'pushOnly',
+  skipSuperClient: true,
+  incoming: function(message, req, callback) {
+    if (message.channel == '/api/v1/ping2' || message.channel.match(/^\/meta\//)) {
+      return callback();
     }
 
-    // Only ping if data is {}
-    if (message.channel == '/api/v1/ping2' && Object.keys(message.data).length < 2) {
-      return callback(message);
-    }
-
-    if(messageIsFromSuperClient(message)) {
-      return callback(message);
-    }
-
-    message.error = '403::Push access denied';
-    callback(message);
+    return callback({ status: 403, message: "Push access denied" });
   },
+});
 
-  outgoing: function(message, callback) {
+var hidePassword = bayeuxExtension({
+  name: 'hidePassword',
+  outgoing: function(message, req, callback) {
     if (message.ext) delete message.ext.password;
-    callback(message);
+    callback(null, message);
   }
-};
+});
 
-var pingResponder = {
+
+var pingResponder = bayeuxExtension({
+  channel: '/api/v1/ping2',
+  name: 'pingResponder',
+  failureStat: 'bayeux.ping.deny',
   incoming: function(message, req, callback) {
-    // Only ping if data is {}
-    if (message.channel != '/api/v1/ping2') {
-      return callback(message);
-    }
-
-    function deny(errorCode, errorDescription) {
-      stats.eventHF('bayeux.ping.deny');
-
-      var referer = req && req.headers && req.headers.referer;
-      var origin = req && req.headers && req.headers.origin;
-      var connection = req && req.headers && req.headers.connection;
-      var reason = message.data && message.data.reason;
-
-      message.error = errorCode + '::' + errorDescription;
-      logger.error('Denying ping access: ' + errorDescription, {
-        errorCode: errorCode,
-        clientId: clientId,
-        referer: referer,
-        origin: origin,
-        connection: connection,
-        pingReason: reason });
-
-      callback(message);
-    }
+    // Remember we've got the ping reason if we need it
+    //var reason = message.data && message.data.reason;
 
     var clientId = message.clientId;
 
-    if(!clientId) {
-      return deny(401, "Access denied. ClientId required.");
-    }
-
     server._server._engine.clientExists(clientId, function(exists) {
-      if(!exists) {
-        return deny(401, "Client does not exist");
-      }
+      if(!exists) return callback({ status: 401, message: "Client does not exist"});
 
       presenceService.socketExists(clientId, function(err, exists) {
-        if(err) {
-          delete err.stack; // Too much logging
+        if(err) return callback(err);
 
-          logger.error("presenceService.socketExists failed: " + err, { exception: err });
-          return deny(500, "A server error occurred.");
-        }
+        if(!exists) return callback({ status: 401, message: "Socket association does not exist" });
 
-        if(!exists) return deny(401, "Socket association does not exist");
-
-        return callback(message);
+        return callback(null, message);
       });
 
     });
-
-
   }
-};
+});
 
 var superClient = {
   outgoing: function(message, callback) {
@@ -693,6 +524,8 @@ function getClientIp(req) {
   if(req.connection && req.connection.remoteAddress) {
     return req.connection.remoteAddress;
   }
+
+  return req.ip;
 }
 
 var logging = {
@@ -748,11 +581,11 @@ var adviseAdjuster = {
       if(errorCode === 401) {
         var reconnect;
 
-        if(message.clientId) {
-          logger.info('Destroying client', { clientId: message.clientId });
-          // We've told the person to go away, destroy their faye client
-          destroyClient(message.clientId);
-        }
+        // if(message.clientId) {
+        //   logger.info('Destroying client', { clientId: message.clientId });
+        //   // We've told the person to go away, destroy their faye client
+        //   destroyClient(message.clientId);
+        // }
 
         if(message.channel === '/meta/handshake') {
           // Handshake failing, go away
@@ -764,11 +597,11 @@ var adviseAdjuster = {
 
         message.advice = {
           reconnect: reconnect,
-          interval:  1000
+          interval: 1000
         };
       }
 
-      logger.info('Bayeux error', message);
+      logger.info('bayeux: error', message);
     } else {
       if(message.channel === '/meta/handshake') {
         // * Already know there is no error. Reset the advice
@@ -805,10 +638,27 @@ var server = new faye.NodeAdapter({
 
 var client = server.getClient();
 
+var STATS_FREQUENCY = 0.01;
+
 faye.stringify = function(object) {
-  var string = JSON.stringify(object);
-  stats.gaugeHF('bayeux.message.size', string.length);
-  return string;
+  try {
+    var string = JSON.stringify(object);
+    // Over cautious
+    stats.eventHF('bayeux.message.count', 1, STATS_FREQUENCY);
+
+    if(string) {
+      stats.gaugeHF('bayeux.message.size', string.length, STATS_FREQUENCY);
+    } else {
+      stats.gaugeHF('bayeux.message.size', 0, STATS_FREQUENCY);
+    }
+
+    return string;
+  } catch(e) {
+    stats.event('bayeux.message.serialization_error');
+
+    logger.error('Error while serializing JSON message', { exception: e });
+    throw e;
+  }
 };
 
 /* TEMPORARY DEBUGGING SOLUTION */
@@ -872,9 +722,10 @@ module.exports = {
     // Attach event handlers
     server.addExtension(logging);
     server.addExtension(authenticator);
-    // server.addExtension(noConnectForUnknownClients);
+    server.addExtension(noConnectForUnknownClients);
     server.addExtension(authorisor);
     server.addExtension(pushOnlyServer);
+    server.addExtension(hidePassword);
     server.addExtension(pingResponder);
     server.addExtension(adviseAdjuster);
 
@@ -882,7 +733,7 @@ module.exports = {
 
     ['connection:open', 'connection:close'].forEach(function(event) {
       server._server._engine.bind(event, function(clientId) {
-        logger.info("faye-engine: Client " + clientId + ": " + event);
+        logger.verbose("faye-engine: Client " + clientId + ": " + event);
       });
     });
 

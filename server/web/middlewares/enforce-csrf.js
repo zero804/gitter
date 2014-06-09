@@ -50,7 +50,7 @@ function isInWhitelist(req) {
          (req.path === '/api/v1/apn') ||
          // oauth post token endpoint for native login has its own auth
          (req.path === '/login/oauth/token') ||
-         (req.path === '/oauth/authorize/decision');
+         (req.path === '/login/oauth/authorize/decision');
 }
 
 function getClientToken(req) {

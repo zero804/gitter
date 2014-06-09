@@ -34,11 +34,16 @@ define([
   function ChatCacheSync(collection) {
     var troupeId = context.getTroupeId();
 
+    log('Loading collection from native cache');
+
     getChatsForTroupe(troupeId, function(err, result) {
       if(err || !result) return;
       log('Cache contains ' + result.length + ' items');
 
       collection.reset(result, { parse: true });
+      collection.forEach(function(model) {
+        model.set('presnapshot', true);
+      });
     });
 
     this.onAddChange = function(model) {
