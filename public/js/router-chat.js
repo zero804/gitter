@@ -83,9 +83,9 @@ require([
 
     var makeEvent = function(message) {
       var origin = 'app';
-        if (message.event && message.event.origin) origin = message.event.origin;
-        message.event = {
-          origin: origin,
+      if (message.event && message.event.origin) origin = message.event.origin;
+      message.event = {
+        origin: origin,
         preventDefault: function() {
           log.warn('Could not use preventDefault() because the event comes from the `' + this.origin + '` frame');
         },
@@ -274,23 +274,26 @@ require([
     showingHelp = false;
   };
 
-  appEvents.on('keyboard.help', function(event) {
-    if (showingHelp) hideHelp();
+  appEvents.on('keyboard.help.markdown', function(event) {
+    if (showingHelp === 'markdown') hideHelp();
     else {
       appEvents.trigger('focus.request.out', event);
       router.navigate('markdown', {trigger: true});
       showingHelp = 'markdown';
     }
   });
+
+  appEvents.on('keyboard.help.keyboard', function(event) {
+    if (showingHelp === 'keys') hideHelp();
+    else {
+      appEvents.trigger('focus.request.out', event);
+      router.navigate('keys', {trigger: true});
+      showingHelp = 'keys';
+    }
+  });
+
   appEvents.on('keyboard.document.escape', function() {
     if (showingHelp) hideHelp();
-  });
-  appEvents.on('keyboard.tab.next keyboard.tab.prev', function(e) {
-    if (!e.origin) e.preventDefault();
-    if (showingHelp) {
-      showingHelp = showingHelp === 'markdown' ? 'keys' : 'markdown';
-      router.navigate(showingHelp, {trigger: true});
-    }
   });
 
   // Listen for changes to the room
