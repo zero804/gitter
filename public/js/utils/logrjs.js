@@ -28,12 +28,18 @@ define({
         }
       }
 
-      function passthrough() {
-        var a = Array.prototype.slice.apply(arguments);
-        a[0] = dateString() + ' ' + name + " " + a[0];
+      function logDetails(lgr) {
+        return function() {
+          var a = Array.prototype.slice.apply(arguments);
+          a[0] = dateString() + ' ' + name + " " + a[0];
 
-        logger.apply(null, a);
+          lgr.apply(null, a);
+        };
       }
+
+      var passthrough = logDetails(logger);
+      passthrough.warn = logDetails(logger.warn);
+      passthrough.error = logDetails(logger.error);
 
       onload(logging ? passthrough : function() {});
     });

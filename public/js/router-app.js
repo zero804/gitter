@@ -111,6 +111,23 @@ require([
     var message = JSON.parse(e.data);
     log('Received message ', message);
 
+    var makeEvent = function(message) {
+      var origin = 'chat';
+      if (message.event && message.event.origin) origin = message.event.origin;
+      message.event = {
+        origin: origin,
+        preventDefault: function() {
+          log.warn('Could not call preventDefault() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
+        },
+        stopPropagation: function() {
+          log.warn('Could not call stopPropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
+        },
+        stopImmediatePropagation: function() {
+          log.warn('Could not call stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
+        }
+      };
+    };
+
     switch(message.type) {
       case 'context.troupeId':
         context.setTroupeId(message.troupeId);
@@ -158,20 +175,14 @@ require([
         break;
 
       case 'keyboard':
-        message.event = {
-          origin: 'chat',
-          preventDefault: function() {
-            console.warn('Could not use preventDefault() because the event comes from the `' + this.origin + '` frame');
-          },
-          stopPropagation: function() {
-            console.warn('Could not use stopPropagation() because the event comes from the `' + this.origin + '` frame');
-          },
-          stopImmediatePropagation: function() {
-            console.warn('Could not use stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame');
-          }
-        };
+        makeEvent(message);
         appEvents.trigger('keyboard.' + message.name, message.event, message.handler);
         appEvents.trigger('keyboard.all', message.name, message.event, message.handler);
+        break;
+
+      case 'focus':
+        makeEvent(message);
+        appEvents.trigger('focus.request.' + message.focus, message.event);
         break;
     }
   });
@@ -179,6 +190,21 @@ require([
   function postMessage(message) {
     chatIFrame.contentWindow.postMessage(JSON.stringify(message), context.env('basePath'));
   }
+
+  // Call preventDefault() on tab events so that we can manage focus as we want
+  appEvents.on('keyboard.tab.next keyboard.tab.prev', function(e) {
+    if (!e.origin) e.preventDefault();
+  });
+
+  // Send focus events to chat frame
+  appEvents.on('focus.request.chat.in', function() {
+    console.log('app send focus in request to chat');
+    postMessage({type: 'focus', focus: 'in'});
+  });
+  appEvents.on('focus.request.chat.out', function() {
+    console.log('app send focus out request to chat');
+    postMessage({type: 'focus', focus: 'out'});
+  });
 
   // Sent keyboard events to chat frame
   appEvents.on('keyboard.all', function (name, event, handler) {
@@ -188,7 +214,8 @@ require([
       type: 'keyboard',
       name: name,
       // JSON serialisation makes it not possible to send the event object
-      event: {},
+      // Keep track of the origin in case of return
+      event: {origin: event.origin},
       handler: handler
     };
     postMessage(message);

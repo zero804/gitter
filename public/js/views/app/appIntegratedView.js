@@ -7,8 +7,6 @@ define([
   ], function($, Marionette, uiVars, modalRegion) {
   "use strict";
 
-  // appIntegratedView
-
   /** @const */
   var BACKSPACE = 8;
 

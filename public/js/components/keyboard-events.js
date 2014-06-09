@@ -1,14 +1,26 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
   'utils/appevents',
+  'utils/platformDetect',
   'underscore',
   'keymaster'
-], function(appEvents, _, key) {
+], function(appEvents, platformDetect, _, key) {
   "use strict";
 
   // Attach keyboard events listeners as specified by the keymaster library
   // They will we emitted to appEvents with the `keyboard.` prefix
   // Use views/keyboard-events-mixin to attach handlers for these events to Backbone components
+
+  // Set modifier keys for the OS
+  var cmdKey, gitterKey;
+  if (platformDetect() === 'Mac') {
+    cmdKey = '⌘';
+    gitterKey = 'ctrl';
+  }
+  else { // Windows, Linux
+    cmdKey = 'ctrl';
+    gitterKey = 'alt';
+  }
 
   // Define different scopes for the key listeners
   // - 'input.chat' for the chat message input
@@ -69,13 +81,6 @@ require([
       name: 'search.go',
       scope: 'input.search'
     },
-    'enter, ⌘+enter, ctrl+enter': [{
-      name: 'chat.send',
-      scope: 'input.chat'
-      },{
-      name: 'chat.edit.send',
-      scope: 'input.chat.edit'
-    }],
     'up': [{
       name: 'arrowUp',
       scope: 'all'
@@ -111,7 +116,7 @@ require([
       name: 'tab.next',
       scope: 'other'
     }],
-    'alt+tab': [{
+    '⇧+tab': [{
       name: 'maininput.tab.prev',
       scope: ['input.chat', 'input.chat.edit', 'input.search']
       },{
@@ -120,52 +125,6 @@ require([
     }],
     'pageup': 'pageUp',
     'pagedown': 'pageDown',
-    'alt+up': 'alt.up',
-    'alt+down': 'alt.down',
-    'alt+left': 'alt.left',
-    'alt+right': 'alt.right',
-    'alt+enter': 'alt.enter',
-    'ctrl+`': 'chat.toggle',
-    '1': {
-      name: 'room.1',
-      scope: 'other'
-    },
-    '2': {
-      name: 'room.2',
-      scope: 'other'
-    },
-    '3': {
-      name: 'room.3',
-      scope: 'other'
-    },
-    '4': {
-      name: 'room.4',
-      scope: 'other'
-    },
-    '5': {
-      name: 'room.5',
-      scope: 'other'
-    },
-    '6': {
-      name: 'room.6',
-      scope: 'other'
-    },
-    '7': {
-      name: 'room.7',
-      scope: 'other'
-    },
-    '8': {
-      name: 'room.8',
-      scope: 'other'
-    },
-    '9': {
-      name: 'room.9',
-      scope: 'other'
-    },
-    '0': {
-      name: 'room.10',
-      scope: 'other'
-    },
     'h': {
       name: 'help',
       scope: 'other'
@@ -175,6 +134,40 @@ require([
       scope: 'other'
     }
   };
+
+  // OS-specific modifier key
+  keyEvents['enter, ' + cmdKey + '+enter'] = [{
+    name: 'chat.send',
+    scope: 'input.chat'
+    },{
+    name: 'chat.edit.send',
+    scope: 'input.chat.edit'
+  }];
+
+  keyEvents[cmdKey + '+`'] = 'chat.toggle';
+  keyEvents[cmdKey + '+' + gitterKey + '+h'] = 'help';
+
+  keyEvents[cmdKey + '+' + gitterKey + '+up'] = 'room.up';
+  keyEvents[cmdKey + '+' + gitterKey + '+down'] = 'room.down';
+  keyEvents[cmdKey + '+' + gitterKey + '+left'] = 'room.prev';
+  keyEvents[cmdKey + '+' + gitterKey + '+right'] = 'room.next';
+  keyEvents[cmdKey + '+' + gitterKey + '+enter'] = 'room.enter';
+
+  // Go to a conversation by index in favourites
+  _.each('123456789'.split(''), function(n) {
+    keyEvents[n] = {
+      name: 'room.' + n,
+      scope: 'other'
+    };
+    keyEvents[cmdKey + '+' + gitterKey + '+' + n] = 'room.' + n;
+  });
+  keyEvents['0'] = {
+    name: 'room.10',
+    scope: 'other'
+  };
+  keyEvents[cmdKey + '+' + gitterKey + '+0'] = 'room.10';
+
+  // Add listeners
 
   var assign = function(k, name, scope) {
     if (_.isObject(name)) {
