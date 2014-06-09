@@ -162,11 +162,11 @@ require([
 
   // Send focus events to app frame
   appEvents.on('focus.request.app.in', function() {
-    console.log('chat send focus in request to app');
+    log('chat send focus in request to app');
     postMessage({type: 'focus', focus: 'in'});
   });
   appEvents.on('focus.request.app.out', function() {
-    console.log('chat send focus out request to app');
+    log('chat send focus out request to app');
     postMessage({type: 'focus', focus: 'out'});
   });
 

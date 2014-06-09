@@ -67,7 +67,6 @@ define([
     },
 
     onKeyBackspace: function(e) {
-      console.log('prevent backspace')
       e.stopPropagation();
       e.preventDefault();
     },

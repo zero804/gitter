@@ -56,23 +56,23 @@ require([
 
   var focusOut = function(event) {
     if (event.origin && event.origin !== frame) {
-      console.log('request focusOut has origin', event.origin);
+      log('request focusOut has origin', event.origin);
       return; //appEvents.trigger('focus.request.' + event.origin + '.out');
     }
 
-    console.log('request focusOut', event, frame);
+    log('request focusOut', event, frame);
     $previous = $(document.activeElement);
     $previous.blur();
-    console.log('focusOut', $previous);
+    log('focusOut', $previous);
     appEvents.trigger('focus.change.out', $previous);
   };
 
   var focusIn = function(event) {
     if (event.origin && event.origin !== frame) {
-      console.log('request focusOut has origin', event.origin);
+      log('request focusOut has origin', event.origin);
       return appEvents.trigger('focus.request.' + event.origin + '.in');
     }
-    console.log('focusIn', $previous);
+    log('focusIn', $previous);
     if ($previous) {
       $previous.focus();
       appEvents.trigger('focus.change.in', $previous);
