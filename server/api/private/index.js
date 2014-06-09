@@ -56,6 +56,11 @@ module.exports = {
         // No auth
         require('./chat-heatmap.js'));
 
+    app.get(apiRoot + '/private/orgs/:orgUri/members',
+        authMiddleware,
+        require('./org-members.js'));
+
+
     app.post(apiRoot + '/private/statsc',
         authMiddleware,
         require('./statsc.js'));
