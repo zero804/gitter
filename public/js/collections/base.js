@@ -4,11 +4,14 @@ define([
   'utils/context',
   'backbone',
   'components/realtime',
-  'log!collections'
-], function(_, context, Backbone, realtime, log) {
+  'log!collections',
+  './equals'
+], function(_, context, Backbone, realtime, log, equals) {
   "use strict";
 
   var PATCH_TIMEOUT = 2000; // 2000ms before a patch gives up
+
+  Backbone.isEqual = equals;
 
   var exports = {
     firstLoad: false
@@ -194,14 +197,19 @@ define([
          */
         var options = {
           parse: true,    /* parse the items */
-          remove: false,  /* used to be true - no longer remove items missing from the snapshot */
+          remove: true,
           add: true,      /* add new items */
           merge: true     /* merge into items that already exist */
         };
 
         if(self.length > 0) {
+          /* Remove any presnapshot stuff (cached from previous time) */
+          self.remove();
+
+          var forKeeping = self.where({ presnapshot: undefined });
+
           // add one by one
-          self.set(snapshot, options);
+          self.set(snapshot.concat(forKeeping), options);
         } else {
           // trash it and add all in one go
           self.reset(snapshot, options);
@@ -209,6 +217,7 @@ define([
 
         self._onInitialLoad();
         self.trigger('sync');
+        self.trigger('snapshot');
       });
 
       this.subscription.errback(function(error) {

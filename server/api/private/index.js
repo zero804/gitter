@@ -61,5 +61,8 @@ module.exports = {
         require('./org-members.js'));
 
 
+    app.post(apiRoot + '/private/statsc',
+        authMiddleware,
+        require('./statsc.js'));
   }
 };
