@@ -37,11 +37,17 @@ define({
         };
       }
 
+      // Expose log, log.warn and log.error with details (date and module)
       var passthrough = logDetails(logger);
       passthrough.warn = logDetails(logger.warn);
       passthrough.error = logDetails(logger.error);
 
-      onload(logging ? passthrough : function() {});
+      // Only expose errors in production
+      var prodlog = function(){};
+      prodlog.warn = function(){};
+      prodlog.error = logger.error;
+
+      onload(logging ? passthrough : prodlog);
     });
   }
 });

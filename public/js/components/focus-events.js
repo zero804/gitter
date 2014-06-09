@@ -2,9 +2,8 @@
 require([
   'jquery',
   'underscore',
-  'utils/appevents',
-  'log!focus-events'
-], function($, _, appEvents, log) {
+  'utils/appevents'
+], function($, _, appEvents) {
   "use strict";
 
   // Central logic for focus events
@@ -13,7 +12,7 @@ require([
   var $previous;
   var isEditing = false;
   var $chatFrame = $('#content-frame');
-  var frame = $chatFrame.hasClass('trpChatContainer') && 'chat' || 'app';
+  var thisFrame = $chatFrame.hasClass('trpChatContainer') && 'chat' || 'app';
 
   // Listen to chat.edit toggle to handle proper focus between inputs
 
@@ -55,32 +54,33 @@ require([
   // 'focus' back when another 'escape' event is triggered
 
   var focusOut = function(event) {
-    if (event.origin && event.origin !== frame) {
-      log('request focusOut has origin', event.origin);
-      return; //appEvents.trigger('focus.request.' + event.origin + '.out');
+    if (event.origin) {
+      // If the original event comes from another frame, transfer the focus request to it
+      if (event.origin !== thisFrame) return appEvents.trigger('focus.request.' + event.origin + '.out', event);
+      // If an event comes back to its original frame, it's because it originated in it
+      // but the logic can be present in another frame, that would delegate the focus logic back to the original frame
+      // It's also possible that the event fired in multiple frames, so we need to make sure it is not handled twice
+      if ($previous) return;
     }
 
-    log('request focusOut', event, frame);
-    $previous = $(document.activeElement);
-    $previous.blur();
-    log('focusOut', $previous);
-    appEvents.trigger('focus.change.out', $previous);
+    // Only accept focus out request from inputs
+    if (/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) {
+      $previous = $(document.activeElement);
+      $previous.blur();
+      appEvents.trigger('focus.change.out', $previous);
+    }
   };
 
   var focusIn = function(event) {
-    if (event.origin && event.origin !== frame) {
-      log('request focusOut has origin', event.origin);
-      return appEvents.trigger('focus.request.' + event.origin + '.in');
+    // If the original event comes from another frame, transfer the focus request to it
+    if (event.origin && event.origin !== thisFrame) {
+      return appEvents.trigger('focus.request.' + event.origin + '.in', event);
     }
-    log('focusIn', $previous);
+
     if ($previous) {
       $previous.focus();
       appEvents.trigger('focus.change.in', $previous);
       $previous = null;
-    }
-    else {
-      log.warn('Could not respond to focus.request.in: no previous element set. Defaulting to focus.request.chat');
-      appEvents.trigger('focus.request.chat');
     }
   };
 
@@ -88,6 +88,8 @@ require([
   // or shortcuts for 'focus.request' triggers
 
   var mappings = {
+    'keyboard.focus.search': 'search',
+    'keyboard.focus.chat': 'chat',
     'keyboard.maininput.tab.next': focusNext,
     'keyboard.maininput.tab.prev': focusPrev,
     'focus.request.out keyboard.maininput.escape keyboard.input.escape': focusOut,

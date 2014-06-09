@@ -154,20 +154,20 @@ require([
 
   // Bubble chat toggle events
   appEvents.on('chat.edit.show', function() {
-    postMessage({type: 'chat.ed  it.show'});
+    postMessage({type: 'chat.edit.show'});
   });
   appEvents.on('chat.edit.hide', function() {
     postMessage({type: 'chat.edit.hide'});
   });
 
   // Send focus events to app frame
-  appEvents.on('focus.request.app.in', function() {
+  appEvents.on('focus.request.app.in', function(event) {
     log('chat send focus in request to app');
-    postMessage({type: 'focus', focus: 'in'});
+    postMessage({type: 'focus', focus: 'in', event: event});
   });
-  appEvents.on('focus.request.app.out', function() {
+  appEvents.on('focus.request.app.out', function(event) {
     log('chat send focus out request to app');
-    postMessage({type: 'focus', focus: 'out'});
+    postMessage({type: 'focus', focus: 'out', event: event});
   });
 
   var appView = new ChatIntegratedView({ el: 'body' });
