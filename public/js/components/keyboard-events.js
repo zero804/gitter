@@ -1,10 +1,10 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
   'utils/appevents',
-  'utils/platformDetect',
+  'utils/platform-keys',
   'underscore',
   'keymaster'
-], function(appEvents, platformDetect, _, key) {
+], function(appEvents, platformKeys, _, key) {
   "use strict";
 
   // Attach keyboard events listeners as specified by the keymaster library
@@ -12,15 +12,8 @@ require([
   // Use views/keyboard-events-mixin to attach handlers for these events to Backbone components
 
   // Set modifier keys for the OS
-  var cmdKey, gitterKey;
-  if (platformDetect() === 'Mac') {
-    cmdKey = '⌘';
-    gitterKey = 'ctrl';
-  }
-  else { // Windows, Linux
-    cmdKey = 'ctrl';
-    gitterKey = 'alt';
-  }
+  var cmdKey = platformKeys.cmd;
+  var gitterKey = platformKeys.gitter;
 
   // Define different scopes for the key listeners
   // - 'input.chat' for the chat message input
@@ -146,10 +139,11 @@ require([
     scope: 'input.chat.edit'
   }];
 
-  keyEvents[cmdKey + '+/'] = 'chat.toggle';
+  keyEvents[cmdKey + '+/, ' + cmdKey + '+' + gitterKey + '+/'] = 'chat.toggle';
   keyEvents[cmdKey + '+' + gitterKey + '+f'] = 'focus.search';
-  keyEvents[cmdKey + '+' + gitterKey + '+g'] = 'focus.chat';
-  keyEvents[cmdKey + '+' + gitterKey + '+h'] = 'help';
+  keyEvents[cmdKey + '+' + gitterKey + '+c'] = 'focus.chat';
+  keyEvents[cmdKey + '+' + gitterKey + '+m'] = 'help.markdown';
+  keyEvents[cmdKey + '+' + gitterKey + '+k'] = 'help.keyboard';
 
   keyEvents[cmdKey + '+' + gitterKey + '+up'] = 'room.up';
   keyEvents[cmdKey + '+' + gitterKey + '+down'] = 'room.down';

@@ -1,21 +1,11 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
-  'utils/platformDetect',
+  'utils/platform-keys',
   'views/base',
   'hbs!./tmpl/keyboardTemplate'
-], function($, platformDetect, TroupeViews, keyboardTemplate ) {
+], function($, platformKeys, TroupeViews, keyboardTemplate ) {
   "use strict";
-
-  var cmdKey, gitterKey;
-  if (platformDetect() === 'Mac') {
-    cmdKey = '⌘';
-    gitterKey = 'Ctrl';
-  }
-  else { // Windows, Linux
-    cmdKey = 'Ctrl';
-    gitterKey = 'Alt';
-  }
 
   var View = TroupeViews.Base.extend({
     template: keyboardTemplate,
@@ -51,8 +41,8 @@ define([
 
     getRenderData: function() {
       return {
-        cmdKey: cmdKey,
-        gitterKey: gitterKey
+        cmdKey: platformKeys.cmd,
+        gitterKey: platformKeys.gitter
       };
     },
   });
@@ -65,7 +55,7 @@ define([
       },
       menuItems: [
         { action: "cancel", text: "Close", className: "trpBtnLightGrey" },
-        { action: "showMarkdownHelp", text: "Markdown Help", className: "trpBtnBlue trpBtnRight"}
+        { action: "showMarkdownHelp", text: "Markdown Help ("+ platformKeys.cmd +" + "+ platformKeys.gitter +" + m)", className: "trpBtnBlue trpBtnRight"}
       ]
     });
   });

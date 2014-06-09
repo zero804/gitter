@@ -1,11 +1,11 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
+  'utils/platform-keys',
   'views/base',
   'hbs!./tmpl/markdownTemplate'
-], function($, TroupeViews, markdownTemplate ) {
+], function($, platformKeys, TroupeViews, markdownTemplate ) {
   "use strict";
-
 
   var View = TroupeViews.Base.extend({
     template: markdownTemplate,
@@ -16,7 +16,7 @@ define([
     initialize: function() {
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
     },
-    
+
     menuItemClicked: function(button) {
       switch(button) {
         case 'showKeyboardShortcuts':
@@ -52,7 +52,7 @@ define([
       },
       menuItems: [
         { action: "cancel", text: "Close", className: "trpBtnLightGrey" },
-        { action: "showKeyboardShortcuts", text: "Keyboard shortcuts", className: "trpBtnBlue trpBtnRight"}
+        { action: "showKeyboardShortcuts", text: "Keyboard shortcuts ("+ platformKeys.cmd +" + "+ platformKeys.gitter +" + k)", className: "trpBtnBlue trpBtnRight"}
       ]
     });
   });
