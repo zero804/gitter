@@ -741,6 +741,7 @@ var OAuthAccessTokenSchema= new Schema({
 OAuthAccessTokenSchema.index({ userId: 1, clientId: 1 }, { sparse: true }); // can't be unique due to mongo fail
 OAuthAccessTokenSchema.schemaTypeName = 'OAuthAccessTokenSchema';
 
+
 /*
  * Reverse Geocoder Stuff
  */
@@ -848,6 +849,8 @@ var NotificationsPreferenceSchema = new Schema({
 NotificationsPreferenceSchema.index({ userId: 1} , { unique: true });
 NotificationsPreferenceSchema.schemaTypeName = 'NotificationsPreferenceSchema';
 
+
+
 var User = mongoose.model('User', UserSchema);
 var UserLocationHistory = mongoose.model('UserLocationHistory', UserLocationHistorySchema);
 var UserTroupeLastAccess = mongoose.model('UserTroupeLastAccess', UserTroupeLastAccessSchema);
@@ -929,7 +932,7 @@ module.exports = {
     UriLookupSchema: UriLookupSchema,
     ContactSchema: ContactSchema,
     SuggestedContactSchema: SuggestedContactSchema,
-    NotificationsPreferenceSchema: NotificationsPreferenceSchema,
+    NotificationsPreferenceSchema: NotificationsPreferenceSchema
   },
   User: User,
   UserTroupeLastAccess: UserTroupeLastAccess,
@@ -961,7 +964,7 @@ module.exports = {
   UriLookup: UriLookup,
   Contact: Contact,
   SuggestedContact: SuggestedContact,
-  NotificationsPreference: NotificationsPreference,
+  NotificationsPreference: NotificationsPreference
 };
 
 process.nextTick(function() {
