@@ -22,8 +22,6 @@ function validateRepoUri(user, uri) {
   var repoService = new GitHubRepoService(user);
   return repoService.getRepo(uri)
     .then(function(repo) {
-      winston.verbose('URI ' + uri + ' is a repo?' + !!repo);
-
       if(repo) return ['REPO', repo.full_name, repo.description];
 
       return [];
