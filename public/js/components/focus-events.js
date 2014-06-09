@@ -2,8 +2,9 @@
 require([
   'jquery',
   'underscore',
-  'utils/appevents'
-], function($, _, appEvents) {
+  'utils/appevents',
+  'log!focus-events'
+], function($, _, appEvents, log) {
   "use strict";
 
   // Central logic for focus events
@@ -11,6 +12,8 @@ require([
 
   var $previous;
   var isEditing = false;
+  var $chatFrame = $('#content-frame');
+  var frame = $chatFrame.hasClass('trpChatContainer') && 'chat' || 'app';
 
   // Listen to chat.edit toggle to handle proper focus between inputs
 
@@ -52,19 +55,31 @@ require([
   // 'focus' back when another 'escape' event is triggered
 
   var focusOut = function(event) {
-    $previous = $(event.target || event.srcElement);
+    if (event.origin && event.origin !== frame) {
+      console.log('request focusOut has origin', event.origin);
+      return; //appEvents.trigger('focus.request.' + event.origin + '.out');
+    }
+
+    console.log('request focusOut', event, frame);
+    $previous = $(document.activeElement);
     $previous.blur();
+    console.log('focusOut', $previous);
     appEvents.trigger('focus.change.out', $previous);
   };
 
-  var focusIn = function() {
+  var focusIn = function(event) {
+    if (event.origin && event.origin !== frame) {
+      console.log('request focusOut has origin', event.origin);
+      return appEvents.trigger('focus.request.' + event.origin + '.in');
+    }
+    console.log('focusIn', $previous);
     if ($previous) {
       $previous.focus();
       appEvents.trigger('focus.change.in', $previous);
       $previous = null;
     }
     else {
-      console.warn('Could not respond to focus.request.in: no previous element set. Defaulting to focus.request.chat');
+      log.warn('Could not respond to focus.request.in: no previous element set. Defaulting to focus.request.chat');
       appEvents.trigger('focus.request.chat');
     }
   };
@@ -75,8 +90,8 @@ require([
   var mappings = {
     'keyboard.maininput.tab.next': focusNext,
     'keyboard.maininput.tab.prev': focusPrev,
-    'keyboard.maininput.escape keyboard.input.escape': focusOut,
-    'keyboard.document.escape': focusIn
+    'focus.request.out keyboard.maininput.escape keyboard.input.escape': focusOut,
+    'focus.request.in keyboard.document.escape': focusIn
   };
 
   var _bind = function(src, dest) {

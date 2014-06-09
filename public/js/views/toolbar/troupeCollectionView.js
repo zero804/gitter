@@ -223,8 +223,10 @@ define([
     },
 
     navigateToRoom: function(e, handler) {
-      if (handler.key === '0') return this.navigateTo(9);
-      var index = parseInt(handler.key, 10) - 1;
+      var keys = handler.key.split('+');
+      var key = keys[ keys.length - 1 ];
+      if (key === '0') return this.navigateTo(9);
+      var index = parseInt(key, 10) - 1;
       this.navigateTo(index);
     },
 

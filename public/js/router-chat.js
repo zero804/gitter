@@ -5,6 +5,7 @@ require([
   'utils/context',
   'components/live-context',
   'utils/appevents',
+  'log!router-chat',
   'views/people/peopleCollectionView',
   'views/app/chatIntegratedView',
   'views/chat/chatInputView',
@@ -40,7 +41,7 @@ require([
   'components/ajax-errors',     // No ref
   'components/focus-events'     // No ref
 
-], function($, Backbone, context, liveContext, appEvents, peopleCollectionView, ChatIntegratedView, chatInputView,
+], function($, Backbone, context, liveContext, appEvents, log, peopleCollectionView, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, RightToolbarView,
     inviteView, TroupeSettingsView, MarkdownView, KeyboardView, AddPeopleViewModal, IntegrationSettingsModal,
     unreadItemsClient, helpShareIfLonely, webhookDecorator, issueDecorator, commitDecorator, mentionDecorator,
@@ -73,27 +74,40 @@ require([
 
   window.addEventListener('message', function(e) {
     if(e.origin !== context.env('basePath')) {
+      log('Ignoring message from ' + e.origin);
       return;
     }
 
     var message = JSON.parse(e.data);
+    log('Received message ', message);
+
+    var makeEvent = function(message) {
+      var origin = 'app';
+        if (message.event && message.event.origin) origin = message.event.origin;
+        message.event = {
+          origin: origin,
+        preventDefault: function() {
+          log.warn('Could not use preventDefault() because the event comes from the `' + this.origin + '` frame');
+        },
+        stopPropagation: function() {
+          log.warn('Could not use stopPropagation() because the event comes from the `' + this.origin + '` frame');
+        },
+        stopImmediatePropagation: function() {
+          log.warn('Could not use stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame');
+        }
+      };
+    };
 
     switch(message.type) {
       case 'keyboard':
-        message.event = {
-          origin: 'app',
-          preventDefault: function() {
-            console.warn('Could not use preventDefault() because the event comes from the `' + this.origin + '` frame');
-          },
-          stopPropagation: function() {
-            console.warn('Could not use stopPropagation() because the event comes from the `' + this.origin + '` frame');
-          },
-          stopImmediatePropagation: function() {
-            console.warn('Could not use stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame');
-          }
-        };
+        makeEvent(message);
         appEvents.trigger('keyboard.' + message.name, message.event, message.handler);
         appEvents.trigger('keyboard.all', message.name, message.event, message.handler);
+        break;
+
+      case 'focus':
+        makeEvent(message);
+        appEvents.trigger('focus.request.' + message.focus, message.event);
         break;
     }
   });
@@ -138,12 +152,22 @@ require([
     postMessage(message);
   });
 
+  // Bubble chat toggle events
   appEvents.on('chat.edit.show', function() {
-    postMessage({type: 'chat.edit.show'});
+    postMessage({type: 'chat.ed  it.show'});
   });
-
   appEvents.on('chat.edit.hide', function() {
     postMessage({type: 'chat.edit.hide'});
+  });
+
+  // Send focus events to app frame
+  appEvents.on('focus.request.app.in', function() {
+    console.log('chat send focus in request to app');
+    postMessage({type: 'focus', focus: 'in'});
+  });
+  appEvents.on('focus.request.app.out', function() {
+    console.log('chat send focus out request to app');
+    postMessage({type: 'focus', focus: 'out'});
   });
 
   var appView = new ChatIntegratedView({ el: 'body' });
@@ -245,23 +269,24 @@ require([
   var router = new Router();
 
   var showingHelp = false;
-  appEvents.on('keyboard.help', function() {
-    if (showingHelp) {
-      router.navigate('', {trigger: true});
-      showingHelp = false;
-    }
+  var hideHelp = function() {
+    router.navigate('', {trigger: true});
+    showingHelp = false;
+  };
+
+  appEvents.on('keyboard.help', function(event) {
+    if (showingHelp) hideHelp();
     else {
+      appEvents.trigger('focus.request.out', event);
       router.navigate('markdown', {trigger: true});
       showingHelp = 'markdown';
     }
   });
   appEvents.on('keyboard.document.escape', function() {
-    if (showingHelp) {
-      showingHelp = false;
-    }
+    if (showingHelp) hideHelp();
   });
   appEvents.on('keyboard.tab.next keyboard.tab.prev', function(e) {
-    e.preventDefault();
+    if (!e.origin) e.preventDefault();
     if (showingHelp) {
       showingHelp = showingHelp === 'markdown' ? 'keys' : 'markdown';
       router.navigate(showingHelp, {trigger: true});

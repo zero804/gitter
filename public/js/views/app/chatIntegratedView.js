@@ -91,7 +91,6 @@ define([
     quoteText: function() {
       var selectedText = this.getSelectionText();
       if (selectedText.length > 0) {
-        console.log('quoteText trigger input.append', selectedText);
         appEvents.trigger('input.append', "> " + selectedText, { newLine: true });
       }
     },
