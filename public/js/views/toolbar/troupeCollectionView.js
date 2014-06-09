@@ -9,9 +9,8 @@ define([
   'views/base',
   'cocktail',
   'utils/dataset-shim',
-  'views/keyboard-events-mixin',
   'jquery-sortable' // No ref
-], function($, context, Marionette, troupeListItemTemplate, appEvents, moment,  TroupeViews, cocktail, dataset, KeyboardEventsMixin) {
+], function($, context, Marionette, troupeListItemTemplate, appEvents, moment,  TroupeViews, cocktail, dataset) {
   "use strict";
 
   /* @const */
@@ -158,76 +157,6 @@ define([
         this.makeDraggable(options.dropTarget);
       }
       this.roomsCollection = options.roomsCollection;
-
-      this.selectedIndex = 0;
-
-      // Hacky solution to set the proper selectedIndex when loading
-      // Has to be in a timeout, otherwise context.getTroupeId() is undefined
-      var self = this;
-      setTimeout(function() {
-        var index = self.getIndexForId(context.getTroupeId());
-        if (index) self.selectedIndex = index;
-      }, 1600);
-    },
-
-    getIndexForId: function(id) {
-      if (!id) return;
-      var els = this.$el.find('li');
-      for (var i = 0, el; el = els[i]; i++) {
-        if ($(el).data('id') === id) return i;
-      }
-    },
-
-    selectPrev: function() {
-      var i = this.selectedIndex - 1;
-      if (i === -1) i = 0; // Select first element
-      this.select(i);
-    },
-
-    selectNext: function() {
-      this.select(this.selectedIndex + 1);
-    },
-
-    select: function(i) {
-      var itemElements = this.$el.find('li');
-
-      if (i >= 0 && i < itemElements.length) {
-        this.selectedIndex = i;
-        itemElements.removeClass('selected');
-        $(itemElements[this.selectedIndex]).addClass('selected');
-      }
-    },
-
-    navigateToCurrent: function() {
-      var model = this.collection.at(this.selectedIndex);
-      if(!model) return;
-
-      $(this.$el.find('li')[this.selectedIndex]).click();
-    },
-
-    navigateTo: function(i) {
-      var itemElements = this.$el.find('li');
-
-      if (i >= 0 && i < itemElements.length) {
-        this.selectedIndex = i;
-        $(itemElements[i]).click();
-      }
-    },
-
-    navigateToNext: function() {
-      this.navigateTo(this.selectedIndex + 1);
-    },
-
-    navigateToPrev: function() {
-      this.navigateTo(this.selectedIndex - 1);
-    },
-
-    navigateToRoom: function(e, handler) {
-      var keys = handler.key.split('+');
-      var key = keys[ keys.length - 1 ];
-      if (key === '0') return this.navigateTo(9);
-      var index = parseInt(key, 10) - 1;
-      this.navigateTo(index);
     },
 
     makeDraggable: function(drop) {
@@ -292,7 +221,7 @@ define([
     },
   });
 
-  cocktail.mixin(CollectionView, TroupeViews.SortableMarionetteView, KeyboardEventsMixin);
+  cocktail.mixin(CollectionView, TroupeViews.SortableMarionetteView);
 
   return CollectionView;
 

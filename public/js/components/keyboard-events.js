@@ -69,7 +69,7 @@ require([
       scope: 'input.search'
       },{
       name: 'maininput.escape',
-      scope: ['input.chat', 'input.chat.edit', 'input.search']
+      scope: ['input.chat', 'input.search']
       },{
       name: 'input.escape',
       scope: 'input.other'
@@ -77,13 +77,16 @@ require([
       name: 'document.escape',
       scope: 'other'
     }],
-    'enter': {
+    'enter': [{
       name: 'search.go',
       scope: 'input.search'
-    },
+      },{
+      name: 'room.enter',
+      scope: 'other'
+    }],
     'up': [{
-      name: 'arrowUp',
-      scope: 'all'
+      name: 'room.up',
+      scope: 'other'
       },{
       name: 'chat.edit.openLast',
       scope: 'input.chat'
@@ -92,43 +95,42 @@ require([
       scope: 'input.search'
     }],
     'down': [{
-      name: 'arrowDown',
-      scope: 'all'
+      name: 'room.down',
+      scope: 'other'
       },{
       name: 'search.next',
       scope: 'input.search'
     }],
-    'left': {
-      name: 'room.prev',
-      scope: 'other'
-    },
-    'right': [{
-      name: 'room.next',
-      scope: 'other'
-      },{
+    // 'left': {
+    //   name: 'room.prev',
+    //   scope: 'other'
+    // },
+    'right': {
       name: 'search.go',
       scope: 'input.search'
-    }],
-    'tab': [{
+    },
+    // {
+    // name: 'room.next',
+    // scope: 'other'
+    // },
+    'tab': {
       name: 'maininput.tab.next',
       scope: ['input.chat', 'input.chat.edit', 'input.search']
-      },{
-      name: 'tab.next',
-      scope: 'other'
-    }],
-    '⇧+tab': [{
+    },
+    // ,{
+    // name: 'tab.next',
+    // scope: 'other'
+    // }
+    '⇧+tab': {
       name: 'maininput.tab.prev',
       scope: ['input.chat', 'input.chat.edit', 'input.search']
-      },{
-      name: 'tab.prev',
-      scope: 'other'
-    }],
+    },
+    // ,{
+    // name: 'tab.prev',
+    // scope: 'other'
+    // }
     'pageup': 'pageUp',
     'pagedown': 'pageDown',
-    'h': {
-      name: 'help',
-      scope: 'other'
-    },
     'q, r': {
       name: 'quote',
       scope: 'other'
@@ -145,6 +147,8 @@ require([
   }];
 
   keyEvents[cmdKey + '+/'] = 'chat.toggle';
+  keyEvents[cmdKey + '+' + gitterKey + '+f'] = 'focus.search';
+  keyEvents[cmdKey + '+' + gitterKey + '+g'] = 'focus.chat';
   keyEvents[cmdKey + '+' + gitterKey + '+h'] = 'help';
 
   keyEvents[cmdKey + '+' + gitterKey + '+up'] = 'room.up';
@@ -155,16 +159,8 @@ require([
 
   // Go to a conversation by index in favourites
   _.each('123456789'.split(''), function(n) {
-    keyEvents[n] = {
-      name: 'room.' + n,
-      scope: 'other'
-    };
     keyEvents[cmdKey + '+' + gitterKey + '+' + n] = 'room.' + n;
   });
-  keyEvents['0'] = {
-    name: 'room.10',
-    scope: 'other'
-  };
   keyEvents[cmdKey + '+' + gitterKey + '+0'] = 'room.10';
 
   // Add listeners

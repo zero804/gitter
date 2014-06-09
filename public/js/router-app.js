@@ -197,13 +197,13 @@ require([
   });
 
   // Send focus events to chat frame
-  appEvents.on('focus.request.chat.in', function() {
+  appEvents.on('focus.request.chat.in', function(event) {
     log('app send focus in request to chat');
-    postMessage({type: 'focus', focus: 'in'});
+    postMessage({type: 'focus', focus: 'in', event: event});
   });
-  appEvents.on('focus.request.chat.out', function() {
+  appEvents.on('focus.request.chat.out', function(event) {
     log('app send focus out request to chat');
-    postMessage({type: 'focus', focus: 'out'});
+    postMessage({type: 'focus', focus: 'out', event: event});
   });
 
   // Sent keyboard events to chat frame
