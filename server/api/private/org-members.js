@@ -6,6 +6,7 @@ var restSerializer     = require("../../serializers/rest-serializer");
 var userService        = require('../../services/user-service');
 var StatusError        = require('statuserror');
 
+/* Only org owners get to call this service */
 module.exports = function(req, res, next) {
   var uri = req.params.orgUri;
   var user = req.user;
@@ -17,7 +18,8 @@ module.exports = function(req, res, next) {
     .then(function(owners) {
       // If the user requesting the members list happens to be one of the owners  we'll return a
       // list of the org members that are also Gitter users, just that intersection.
-      if (!owners.some(function(owner) { return owner.login === user.username; })) throw new StatusError(403);
+      if (!owners.some(function(owner) { return owner.login === user.username; }))
+        throw new StatusError(403);
 
       return ghOrg.members(uri);
     })
