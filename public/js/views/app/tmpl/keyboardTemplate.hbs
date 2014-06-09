@@ -5,11 +5,11 @@
           <td colspan="2"><h2>Global shortcuts</h2></td>
         </tr>
         <tr>
-          <td><code>{{cmdKey}}</code> + <code>`</code></td>
-          <td>Toggle keyboard shortcut mode</td>
+          <td><code>{{cmdKey}}</code> + <code>/</code></td>
+          <td>Toggle compose mode.</td>
         </tr>
         <tr>
-          <td><code>q</code>, <code>r</code></td>
+          <td><code>q</code> or <code>r</code></td>
           <td>Quote selected text</td>
         </tr>
         <tr>
@@ -17,12 +17,8 @@
           <td>Toggle help dialog</td>
         </tr>
         <tr>
-          <td><code>Alt</code> + <code>⇧</code> + <code>↓</code></td>
-          <td>Select next conversation in the favourites list</td>
-        </tr>
-        <tr>
-          <td><code>Alt</code> + <code>⇧</code> + <code>↑</code></td>
-          <td>Select previous conversation in the favourites list</td>
+          <td><code>{{cmdKey}}</code> + <code>{{gitterKey}}</code> + <code>↓</code> or <code>↑</code></td>
+          <td>Navigate up and down the left menu</td>
         </tr>
         <tr>
           <td><code>Alt</code> + <code>⇧</code> + <code>Enter</code></td>
@@ -38,7 +34,7 @@
         </tr>
         <tr>
           <td><code>Alt</code> + <code>⇧</code> <code>1</code>...<code>0</code></td>
-          <td>Go to conversation N in the favourites list (key <code>0</code> for conversation 10)</td>
+          <td>Open favourite in numbered position</td>
         </tr>
         <tr>
           <td colspan="2">
@@ -60,15 +56,14 @@
             <em>Active when focusing the chat input</em>
           </td>
         </tr>
-        <tr>
+<!--         <tr>
           <td><code>Enter</code></td>
           <td>Send message (when not in compose mode)</td>
-        </tr>
+        </tr> -->
         <td>
-          <code>Ctrl</code> + <code>Enter</code><br>
-          <code>⌘</code> + <code>Enter</code>
+          <code>{{cmdKey}}</code> + <code>Enter</code><br>
         </td>
-        <td>Send message</td>
+        <td>Send message when in compose mode</td>
         <tr>
           <td><code>↑</code></td>
           <td>Edit previous message (if possible)</td>

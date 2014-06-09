@@ -144,7 +144,7 @@ require([
     scope: 'input.chat.edit'
   }];
 
-  keyEvents[cmdKey + '+`'] = 'chat.toggle';
+  keyEvents[cmdKey + '+/'] = 'chat.toggle';
   keyEvents[cmdKey + '+' + gitterKey + '+h'] = 'help';
 
   keyEvents[cmdKey + '+' + gitterKey + '+up'] = 'room.up';
