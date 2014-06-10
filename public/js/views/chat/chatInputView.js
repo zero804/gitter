@@ -15,11 +15,15 @@ define([
   'components/drafty',
   'utils/cdn',
   './commands',
+  'cocktail',
+  'views/keyboard-events-mixin',
+  'utils/platform-keys',
   'bootstrap_tooltip', // No ref
   'jquery-textcomplete', // No ref
   'utils/sisyphus-cleaner' // No ref
 ], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate,
-  emojiListItemTemplate, moment, hasScrollBars, isMobile, emoji, drafty, cdn, commands) {
+  emojiListItemTemplate, moment, hasScrollBars, isMobile, emoji, drafty, cdn, commands,
+  cocktail, KeyboardEventsMixin, platformKeys) {
   "use strict";
 
   /** @const */
@@ -36,18 +40,6 @@ define([
   var EDIT_WINDOW = 240000;
 
   /** @const */
-  var UP_ARROW = 38;
-
-  /** @const */
-  var ENTER = 13;
-
-  /** @const */
-  var PAGE_UP = 33;
-
-  /** @const */
-  var PAGE_DOWN = 34;
-
-  /** @const */
   var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];
 
   /** @const */
@@ -56,13 +48,8 @@ define([
   /** @const */
   var PLACEHOLDER = 'Click here to type a chat message. Supports GitHub flavoured markdown.';
 
-  var isMacBrowser = window.navigator.platform.indexOf('Mac') === 0;
-
   /** @const */
-  var PLACEHOLDER_COMPOSE_MODE = PLACEHOLDER+' '+(isMacBrowser ? 'Cmd' : 'Ctrl')+'+Enter to send.';
-
-  /** @const */
-  var COMPOSE_MODE_MODIFIER_KEY = isMacBrowser ? 'metaKey' : 'ctrlKey';
+  var PLACEHOLDER_COMPOSE_MODE = PLACEHOLDER+' '+ platformKeys.cmd +'+Enter to send.';
 
   var ComposeMode = function() {
     var stringBoolean = window.localStorage.getItem('compose_mode_enabled') || 'false';
@@ -86,6 +73,10 @@ define([
       'click .compose-mode-toggle': 'toggleComposeMode'
     },
 
+    keyboardEvents: {
+      'chat.toggle': 'toggleComposeMode'
+    },
+
     initialize: function(options) {
       this.rollers = options.rollers;
       this.chatCollectionView = options.chatCollectionView;
@@ -96,6 +87,17 @@ define([
           this.inputBox.append(text, options);
         }
       });
+      this.listenTo(appEvents, 'focus.request.chat', function() {
+        if(this.inputBox) {
+          this.inputBox.$el.focus();
+          appEvents.trigger('focus.change.chat');
+        }
+      });
+    },
+
+    getComposeModeTitle: function() {
+      var mode = this.composeMode.isEnabled() ? 'chat' : 'compose';
+      return 'Switch to '+ mode +' mode ('+ platformKeys.cmd +' + /)';
     },
 
     getRenderData: function() {
@@ -114,7 +116,8 @@ define([
         user: context.user(),
         isComposeModeEnabled: this.composeMode.isEnabled(),
         placeholder: placeholder,
-        composeModeToggleTitle: isComposeModeEnabled ? 'Switch to chat mode' : 'Switch to compose mode',
+        composeModeToggleTitle: this.getComposeModeTitle(),
+        showMarkdownTitle: 'Markdown help ('+ platformKeys.cmd +' + '+ platformKeys.gitter +' + /)',
         value: $("#chat-input-textarea").val()
       };
     },
@@ -251,14 +254,15 @@ define([
       this.listenTo(this.inputBox, 'editLast', this.editLast);
     },
 
-    toggleComposeMode: function() {
+    toggleComposeMode: function(event) {
+      if(!event.origin) event.preventDefault();
+
       this.composeMode.toggle();
       var isComposeModeEnabled = this.composeMode.isEnabled();
 
-      var title = isComposeModeEnabled ? 'Switch to chat mode' : 'Switch to compose mode';
       this.$el.find('.compose-mode-toggle')
         .toggleClass('active', isComposeModeEnabled)
-        .attr('title', title)
+        .attr('title', this.getComposeModeTitle())
         .tooltip('fixTitle')
         .tooltip('hide');
 
@@ -326,6 +330,8 @@ define([
     }
   });
 
+  cocktail.mixin(ChatInputView, KeyboardEventsMixin);
+
   var ChatCollectionResizer = function(options) {
     var compact = options.compactView;
     var rollers = options.rollers;
@@ -387,15 +393,17 @@ define([
 
   };
 
-  function hasModifierKey(event) {
-    return event.ctrlKey || event.shiftKey || event.altKey || event.metaKey;
-  }
-
   var ChatInputBoxView = TroupeViews.Base.extend({
     events: {
-      "keydown":  "onKeyDown",
       "keyup":    "onKeyUp",
       "focusout": "onFocusOut"
+    },
+
+    keyboardEvents: {
+      "chat.edit.openLast": "onKeyEditLast",
+      "chat.send": "onKeySend",
+      "pageUp": "onKeyPageUp",
+      "pageDown": "onKeyPageDown"
     },
 
     // pass in the textarea as el for ChatInputBoxView
@@ -439,32 +447,30 @@ define([
       this.chatResizer.resizeInput();
     },
 
-    onKeyDown: function(e) {
+    onKeyEditLast: function() {
+      if(!this.$el.val()) this.trigger('editLast');
+    },
+
+    onKeySend: function(event, handler) {
       var isComposeModeEnabled = this.composeMode && this.composeMode.isEnabled();
-
-      if(e.keyCode === ENTER && !hasModifierKey(e) && !this.isTypeaheadShowing() && !isComposeModeEnabled) {
+      // Has a modifier or not in compose mode
+      var shouldHandle = handler.mods.length || !isComposeModeEnabled;
+      // Need to test behaviour with typeahead
+      if(!this.isTypeaheadShowing() && shouldHandle) {
         if(this.hasVisibleText()) {
           this.processInput();
         }
-
-        // dont insert a new line
-        e.preventDefault();
+        event.preventDefault();
         return false;
-      } else if(e.keyCode === ENTER && e[COMPOSE_MODE_MODIFIER_KEY] && !this.isTypeaheadShowing() && isComposeModeEnabled) {
-        if(this.hasVisibleText()) {
-          this.processInput();
-        }
-
-        // dont insert a new line
-        e.preventDefault();
-        return false;
-      } else if(e.keyCode === UP_ARROW && !hasModifierKey(e) && !this.$el.val()) {
-        this.trigger('editLast');
-      } else if(e.keyCode === PAGE_UP && !hasModifierKey(e)) {
-        if(this.chatCollectionView) this.chatCollectionView.pageUp();
-      } else if(e.keyCode === PAGE_DOWN && !hasModifierKey(e)) {
-        if(this.chatCollectionView) this.chatCollectionView.pageDown();
       }
+    },
+
+    onKeyPageUp: function() {
+      if(this.chatCollectionView) this.chatCollectionView.pageUp();
+    },
+
+    onKeyPageDown: function() {
+      if(this.chatCollectionView) this.chatCollectionView.pageDown();
     },
 
     processInput: function() {
@@ -515,6 +521,8 @@ define([
       return !this.$el.val().match(/^\s+$/);
     }
   });
+
+  cocktail.mixin(ChatInputBoxView, KeyboardEventsMixin);
 
   return { ChatInputView: ChatInputView, ChatInputBoxView: ChatInputBoxView };
 });
