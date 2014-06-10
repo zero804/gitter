@@ -850,6 +850,7 @@ NotificationsPreferenceSchema.index({ userId: 1} , { unique: true });
 NotificationsPreferenceSchema.schemaTypeName = 'NotificationsPreferenceSchema';
 
 
+var SubscriptionSchema = require('./persistence/subscription-schema.js');
 
 var User = mongoose.model('User', UserSchema);
 var UserLocationHistory = mongoose.model('UserLocationHistory', UserLocationHistorySchema);
@@ -890,6 +891,7 @@ var Contact = mongoose.model('Contact', ContactSchema);
 var SuggestedContact = mongoose.model('SuggestedContact', SuggestedContactSchema);
 
 var NotificationsPreference = mongoose.model('NotificationsPreference', NotificationsPreferenceSchema);
+var Subscription = mongoose.model('Subscription', SubscriptionSchema);
 
 
 //
@@ -932,7 +934,8 @@ module.exports = {
     UriLookupSchema: UriLookupSchema,
     ContactSchema: ContactSchema,
     SuggestedContactSchema: SuggestedContactSchema,
-    NotificationsPreferenceSchema: NotificationsPreferenceSchema
+    NotificationsPreferenceSchema: NotificationsPreferenceSchema,
+    SubscriptionSchema: SubscriptionSchema
   },
   User: User,
   UserTroupeLastAccess: UserTroupeLastAccess,
@@ -964,7 +967,8 @@ module.exports = {
   UriLookup: UriLookup,
   Contact: Contact,
   SuggestedContact: SuggestedContact,
-  NotificationsPreference: NotificationsPreference
+  NotificationsPreference: NotificationsPreference,
+  Subscription: Subscription
 };
 
 process.nextTick(function() {
