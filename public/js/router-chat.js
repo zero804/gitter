@@ -146,7 +146,8 @@ require([
       type: 'keyboard',
       name: name,
       // JSON serialisation makes it not possible to send the event object
-      event: {},
+      // Keep track of the origin in case of return
+      event: {origin: event.origin},
       handler: handler
     };
     postMessage(message);
@@ -162,11 +163,9 @@ require([
 
   // Send focus events to app frame
   appEvents.on('focus.request.app.in', function(event) {
-    log('chat send focus in request to app');
     postMessage({type: 'focus', focus: 'in', event: event});
   });
   appEvents.on('focus.request.app.out', function(event) {
-    log('chat send focus out request to app');
     postMessage({type: 'focus', focus: 'out', event: event});
   });
 

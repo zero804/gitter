@@ -11,8 +11,7 @@ require([
 
   var $previous;
   var isEditing = false;
-  var $chatFrame = $('#content-frame');
-  var thisFrame = $chatFrame.hasClass('trpChatContainer') && 'chat' || 'app';
+  var thisFrame = $('#content-frame').hasClass('trpChatContainer') && 'chat' || 'app';
 
   // Listen to chat.edit toggle to handle proper focus between inputs
 
