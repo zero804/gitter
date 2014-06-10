@@ -20,8 +20,8 @@ define([
       'search.prev': 'onKeySearchPrev',
       'search.next': 'onKeySearchNext',
       'search.go': 'onKeySearchGo',
-      'search.escape': 'onKeySearchEscape',
-      'chat.escape': 'onKeyChatEscape'
+      'search.escape': 'onKeySearchEscape'
+      // 'chat.escape': 'onKeyChatEscape'
     },
 
     initialize: function(options) {
@@ -58,6 +58,8 @@ define([
 
     onKeySearchGo: function() {
       this.navigateToCurrent();
+      this.$input.val('');
+      this.search('');
     },
 
     onKeySearchEscape: function() {
@@ -65,9 +67,9 @@ define([
       this.search('');
     },
 
-    onKeyChatEscape: function() {
-      if (this.query.length) this.$input.focus();
-    },
+    // onKeyChatEscape: function() {
+    //   if (this.query.length) this.$input.focus();
+    // },
 
     search: function(query) {
       var self = this;

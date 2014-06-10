@@ -2,6 +2,9 @@
 define(['underscore'], function(_) {
   "use strict";
 
+  var ObjProto = Object.prototype;
+  var toString = ObjProto.toString;
+
   // Internal recursive comparison function for `isEqual`.
   var eq = function(a, b, aStack, bStack) {
     // Identical objects are equal. `0 === -0`, but they aren't identical.

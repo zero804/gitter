@@ -29,7 +29,7 @@ require([
     else if (tag.id === 'list-search-input') {
       scope = 'input.search';
     }
-    else if (tag.className === 'trpChatInput') {
+    else if (/^trpChatInput/.test(tag.className)) {
       scope = 'input.chat.edit';
     }
     else if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag.tagName)) {
