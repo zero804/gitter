@@ -169,6 +169,19 @@ require([
     postMessage({type: 'focus', focus: 'out', event: event});
   });
 
+  itemCollections.users.on('remove', function(m) {
+    console.log('user removed', m);
+  });
+
+  appEvents.on('command.troupe.remove', function(username) {
+    var user = itemCollections.users.findWhere({username: username});
+    console.log('command.troupe.remove', username, itemCollections, user);
+    if (user) {
+      console.log('found user', user.id);
+      itemCollections.users.remove(user);
+    }
+  });
+
   var appView = new ChatIntegratedView({ el: 'body' });
   new RightToolbarView({ el: "#toolbar-frame" });
 

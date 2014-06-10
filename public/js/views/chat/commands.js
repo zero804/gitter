@@ -255,8 +255,23 @@ define([
           },
         });
       }
+    },
+    {
+      command: 'remove @username',
+      description: 'Remove somebody from the room',
+      criteria: function() {
+        return !context.inOneToOneTroupeContext() && context().permissions.admin;
+      },
+      completion: 'remove ',
+      regexp: /^\/remove/,
+      action: function(view) {
+        var userMatch = view.$el.val().match(/\/remove @([\w\-]+)/);
+        if (!userMatch) return;
+        var user = userMatch[1];
+        appEvents.trigger('command.troupe.remove', user);
+        view.reset();
+      }
     }
-
 
   ];
 
