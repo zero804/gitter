@@ -34,9 +34,11 @@ define(function() {
   if (typeof console.log == "object") return ieLog;
 
   var consoleLog = consoleApply('log');
-  consoleLog.log = consoleApply('log');
-  consoleLog.warn = consoleApply('warn');
-  consoleLog.error = consoleApply('error');
+  // For some reason r.js compilation fails when other logging functions are added
+  // Works fine when using without compilation though
+  // consoleLog.log = consoleApply('log');
+  // consoleLog.warn = consoleApply('warn');
+  // consoleLog.error = consoleApply('error');
 
   return consoleLog;
 });

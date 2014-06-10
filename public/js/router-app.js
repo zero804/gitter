@@ -117,13 +117,13 @@ require([
       message.event = {
         origin: origin,
         preventDefault: function() {
-          log.warn('Could not call preventDefault() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
+          log('Warning: could not call preventDefault() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
         },
         stopPropagation: function() {
-          log.warn('Could not call stopPropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
+          log('Warning: could not call stopPropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
         },
         stopImmediatePropagation: function() {
-          log.warn('Could not call stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
+          log('Warning: could not call stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
         }
       };
     };

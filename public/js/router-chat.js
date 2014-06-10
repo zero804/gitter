@@ -87,13 +87,13 @@ require([
       message.event = {
         origin: origin,
         preventDefault: function() {
-          log.warn('Could not use preventDefault() because the event comes from the `' + this.origin + '` frame');
+          log('Warning: could not use preventDefault() because the event comes from the `' + this.origin + '` frame');
         },
         stopPropagation: function() {
-          log.warn('Could not use stopPropagation() because the event comes from the `' + this.origin + '` frame');
+          log('Warning: could not use stopPropagation() because the event comes from the `' + this.origin + '` frame');
         },
         stopImmediatePropagation: function() {
-          log.warn('Could not use stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame');
+          log('Warning: could not use stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame');
         }
       };
     };
