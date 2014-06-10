@@ -61,13 +61,12 @@ define([
       });
 
       this.selectedIndex = 0;
-
-      // Hacky solution to set the proper selectedIndex when loading
-      // Has to be in a timeout, otherwise context.getTroupeId() is undefined
-      setTimeout(function() {
-        var index = self.getIndexForId(context.getTroupeId());
+      // Keep track of conversation change to select the proper element
+      appEvents.on('context.troupeId', function(id) {
+        $('#recentTroupesList li').removeClass('selected');
+        var index = self.getIndexForId(id);
         if (index) self.selectedIndex = index;
-      }, 1600);
+      });
     },
 
     getIndexForId: function(id) {
