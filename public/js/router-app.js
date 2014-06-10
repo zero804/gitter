@@ -132,6 +132,7 @@ require([
       case 'context.troupeId':
         context.setTroupeId(message.troupeId);
         titlebarUpdater.setRoomName(message.name);
+        appEvents.trigger('context.troupeId', message.troupeId);
         break;
 
       case 'navigation':
