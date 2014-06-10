@@ -3,12 +3,12 @@ define([
   'jquery',
   'utils/platform-keys',
   'views/base',
-  'hbs!./tmpl/markdownTemplate'
-], function($, platformKeys, TroupeViews, markdownTemplate ) {
+  'hbs!./tmpl/keyboardTemplate'
+], function($, platformKeys, TroupeViews, keyboardTemplate ) {
   "use strict";
 
   var View = TroupeViews.Base.extend({
-    template: markdownTemplate,
+    template: keyboardTemplate,
     events: {
 
     },
@@ -19,9 +19,9 @@ define([
 
     menuItemClicked: function(button) {
       switch(button) {
-        case 'showKeyboardShortcuts':
+        case 'showMarkdownHelp':
           this.dialog.hide();
-          window.location.hash = "#keys";
+          window.location.hash = "#markdown";
           break;
 
         case 'cancel':
@@ -40,19 +40,23 @@ define([
     },
 
     getRenderData: function() {
-
+      return {
+        cmdKey: platformKeys.cmd,
+        roomKey: platformKeys.room,
+        gitterKey: platformKeys.gitter
+      };
     },
   });
 
   return TroupeViews.Modal.extend({
       initialize: function(options) {
-        options.title = "Markdown Help";
+        options.title = "Keyboard Shortcuts";
         TroupeViews.Modal.prototype.initialize.apply(this, arguments);
         this.view = new View({ });
       },
       menuItems: [
         { action: "cancel", text: "Close", className: "trpBtnLightGrey" },
-        { action: "showKeyboardShortcuts", text: "Keyboard shortcuts ("+ platformKeys.cmd +" + "+ platformKeys.gitter +" + k)", className: "trpBtnBlue trpBtnRight"}
+        { action: "showMarkdownHelp", text: "Markdown Help ("+ platformKeys.cmd +" + "+ platformKeys.gitter +" + m)", className: "trpBtnBlue trpBtnRight"}
       ]
     });
   });

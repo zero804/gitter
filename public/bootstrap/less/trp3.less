@@ -1157,7 +1157,7 @@ body.dragging .list-favourites li.placeholder {
     list-style: none;
   }
 
-  li:hover {
+  li:hover, li.selected {
     border-radius: 4px 0 0 4px;
     background-color: rgba(255,255,255,0.2);
 
@@ -2640,6 +2640,7 @@ ul.roster {
 
   td {
     border-top: 1px solid fade(@trpDarkBlue, 10%);
+    min-width: 180px;
   }
 
   a {
@@ -2882,5 +2883,3 @@ ul.trpUserDetails {
 .octicon-mail {
   .prepend-icon-mail();
 }
-
-

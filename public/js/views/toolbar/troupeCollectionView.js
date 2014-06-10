@@ -158,6 +158,7 @@ define([
       }
       this.roomsCollection = options.roomsCollection;
     },
+
     makeDraggable: function(drop) {
       var cancelDrop = false;
       var self = this;
