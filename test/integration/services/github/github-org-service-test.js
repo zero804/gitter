@@ -44,6 +44,17 @@ describe('github-org-service', function() {
       .nodeify(done);
   });
 
+  it('member should return a list of users in the owners team in an org', function(done) {
+    var gh = new GithubOrgService(FAKE_USER);
+
+    gh.getOwners('gitterHQ')
+      .then(function(members) {
+        assert(members.some(function(member) { return member.login === 'suprememoocow'; }));
+      })
+      .nodeify(done);
+  });
+
+
 
   xit('member should return false if a user is not in an org GITTERHQ', function(done) {
     var gh = new GithubOrgService({ username: 'mbtesting', githubToken: 'e00b7680cd3665d50ebd6f0fe0ba3e49e2600c67'});

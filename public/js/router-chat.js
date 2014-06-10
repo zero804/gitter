@@ -5,6 +5,7 @@ require([
   'utils/context',
   'components/live-context',
   'utils/appevents',
+  'log!router-chat',
   'views/people/peopleCollectionView',
   'views/app/chatIntegratedView',
   'views/chat/chatInputView',
@@ -14,6 +15,7 @@ require([
   'views/shareSearch/inviteView',
   'views/app/troupeSettingsView',
   'views/app/markdownView',
+  'views/app/keyboardView',
   'views/app/addPeopleView',
   'views/app/integrationSettingsModal',
   'components/unread-items-client',
@@ -36,11 +38,12 @@ require([
   'components/eyeballs',        // No ref
   'components/bug-reporting',   // No ref
   'components/csrf',            // No ref
-  'components/ajax-errors'      // No ref
+  'components/ajax-errors',     // No ref
+  'components/focus-events'     // No ref
 
-], function($, Backbone, context, liveContext, appEvents, peopleCollectionView, ChatIntegratedView, chatInputView,
+], function($, Backbone, context, liveContext, appEvents, log, peopleCollectionView, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, RightToolbarView,
-    inviteView, TroupeSettingsView, MarkdownView, AddPeopleViewModal, IntegrationSettingsModal,
+    inviteView, TroupeSettingsView, MarkdownView, KeyboardView, AddPeopleViewModal, IntegrationSettingsModal,
     unreadItemsClient, helpShareIfLonely, webhookDecorator, issueDecorator, commitDecorator, mentionDecorator,
     embedDecorator, emojiDecorator, UnreadBannerView, HeaderView) {
   "use strict";
@@ -57,8 +60,6 @@ require([
     return true;
   });
 
-
-
   // When a user clicks an internal link, prevent it from opening in a new window
   $(document).on("click", "a.link", function(e) {
     var basePath = context.env('basePath');
@@ -69,6 +70,46 @@ require([
 
     e.preventDefault();
     window.parent.location.href = href;
+  });
+
+  window.addEventListener('message', function(e) {
+    if(e.origin !== context.env('basePath')) {
+      log('Ignoring message from ' + e.origin);
+      return;
+    }
+
+    var message = JSON.parse(e.data);
+    log('Received message ', message);
+
+    var makeEvent = function(message) {
+      var origin = 'app';
+      if (message.event && message.event.origin) origin = message.event.origin;
+      message.event = {
+        origin: origin,
+        preventDefault: function() {
+          log('Warning: could not use preventDefault() because the event comes from the `' + this.origin + '` frame');
+        },
+        stopPropagation: function() {
+          log('Warning: could not use stopPropagation() because the event comes from the `' + this.origin + '` frame');
+        },
+        stopImmediatePropagation: function() {
+          log('Warning: could not use stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame');
+        }
+      };
+    };
+
+    switch(message.type) {
+      case 'keyboard':
+        makeEvent(message);
+        appEvents.trigger('keyboard.' + message.name, message.event, message.handler);
+        appEvents.trigger('keyboard.all', message.name, message.event, message.handler);
+        break;
+
+      case 'focus':
+        makeEvent(message);
+        appEvents.trigger('focus.request.' + message.focus, message.event);
+        break;
+    }
   });
 
   function postMessage(message) {
@@ -95,6 +136,37 @@ require([
 
   appEvents.on('unreadItemsCount', function(newCount) {
     postMessage({ type: "unreadItemsCount", count: newCount, troupeId: context.getTroupeId() });
+  });
+
+  // Bubble keyboard events
+  appEvents.on('keyboard.all', function (name, event, handler) {
+    // Don't send back events coming from the app frame
+    if (event.origin && event.origin === 'app') return;
+    var message = {
+      type: 'keyboard',
+      name: name,
+      // JSON serialisation makes it not possible to send the event object
+      // Keep track of the origin in case of return
+      event: {origin: event.origin},
+      handler: handler
+    };
+    postMessage(message);
+  });
+
+  // Bubble chat toggle events
+  appEvents.on('chat.edit.show', function() {
+    postMessage({type: 'chat.edit.show'});
+  });
+  appEvents.on('chat.edit.hide', function() {
+    postMessage({type: 'chat.edit.hide'});
+  });
+
+  // Send focus events to app frame
+  appEvents.on('focus.request.app.in', function(event) {
+    postMessage({type: 'focus', focus: 'in', event: event});
+  });
+  appEvents.on('focus.request.app.out', function(event) {
+    postMessage({type: 'focus', focus: 'out', event: event});
   });
 
   var appView = new ChatIntegratedView({ el: 'body' });
@@ -150,6 +222,7 @@ require([
       "people": "people",
       "notifications": "notifications",
       "markdown": "markdown",
+      "keys" : "keys",
       "integrations": "integrations",
       "add" : "addPeople"
     },
@@ -170,6 +243,10 @@ require([
       appView.dialogRegion.show(new MarkdownView({}));
     },
 
+    keys: function() {
+      appView.dialogRegion.show(new KeyboardView({}));
+    },
+
     addPeople: function() {
       appView.dialogRegion.show(new AddPeopleViewModal({}));
     },
@@ -188,7 +265,35 @@ require([
 
   });
 
-  new Router();
+  var router = new Router();
+
+  var showingHelp = false;
+  var hideHelp = function() {
+    router.navigate('', {trigger: true});
+    showingHelp = false;
+  };
+
+  appEvents.on('keyboard.help.markdown', function(event) {
+    if (showingHelp === 'markdown') hideHelp();
+    else {
+      appEvents.trigger('focus.request.out', event);
+      router.navigate('markdown', {trigger: true});
+      showingHelp = 'markdown';
+    }
+  });
+
+  appEvents.on('keyboard.help.keyboard', function(event) {
+    if (showingHelp === 'keys') hideHelp();
+    else {
+      appEvents.trigger('focus.request.out', event);
+      router.navigate('keys', {trigger: true});
+      showingHelp = 'keys';
+    }
+  });
+
+  appEvents.on('keyboard.document.escape', function() {
+    if (showingHelp) hideHelp();
+  });
 
   // Listen for changes to the room
   liveContext.syncRoom();

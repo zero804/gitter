@@ -35,10 +35,19 @@ function localUriLookup(uri, opts) {
       if(uriLookup.userId) {
         return userService.findById(uriLookup.userId)
           .then(function(user) {
-            if(!user) return uriLookupService.removeBadUri(uri)
-                                .thenResolve(null);
+            if(!user) {
+              logger.info('Removing stale uri: ' + uri + ' from URI lookups');
 
-            if(!opts.ignoreCase && user.username != uri && user.username.toLowerCase() === uri.toLowerCase()) throw { redirect: '/' + user.username };
+              return uriLookupService.removeBadUri(uri)
+                                      .thenResolve(null);
+            }
+
+            if(!opts.ignoreCase &&
+                user.username != uri &&
+                user.username.toLowerCase() === uri.toLowerCase()) {
+              logger.info('Incorrect case for room: ' + uri + ' redirecting to ' + user.username);
+              throw { redirect: '/' + user.username };
+            }
 
             return { user: user };
           });
@@ -47,10 +56,19 @@ function localUriLookup(uri, opts) {
       if(uriLookup.troupeId) {
         return troupeService.findById(uriLookup.troupeId)
           .then(function(troupe) {
-            if(!troupe) return uriLookupService.removeBadUri(uri)
-                                .thenResolve(null);
+            if(!troupe) {
+              logger.info('Removing stale uri: ' + uri + ' from URI lookups');
 
-            if(!opts.ignoreCase && troupe.uri != uri && troupe.uri.toLowerCase() === uri.toLowerCase()) throw { redirect: '/' + troupe.uri };
+              return uriLookupService.removeBadUri(uri)
+                                      .thenResolve(null);
+            }
+
+            if(!opts.ignoreCase &&
+                troupe.uri != uri &&
+                troupe.uri.toLowerCase() === uri.toLowerCase()) {
+              logger.info('Incorrect case for room: ' + uri + ' redirecting to ' + troupe.uri);
+              throw { redirect: '/' + troupe.uri };
+            }
 
             return { troupe: troupe };
           });
@@ -104,7 +122,9 @@ function serializeCreateEvent(troupe) {
  *
  * @returns Promise of a troupe if the user is able to join/create the troupe
  */
-function findOrCreateNonOneToOneRoom(user, troupe, uri) {
+function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
+  if(!options) options = {};
+
   if(troupe) {
     logger.verbose('Does user ' + (user && user.username || '~anon~') + ' have access to ' + uri + '?');
 
@@ -116,8 +136,6 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
 
   var lcUri = uri.toLowerCase();
 
-  logger.verbose('Attempting to validate URI ' + uri + ' on Github');
-
   /* From here on we're going to be doing a create */
   return validateUri(user, uri)
     .spread(function(githubType, officialUri, topic) {
@@ -127,17 +145,21 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
       /* If we can't determine the type, skip it */
       if(!githubType) return [null, false];
 
+      if(!options.ignoreCase &&
+        officialUri !== uri &&
+        officialUri.toLowerCase() === uri.toLowerCase()) {
 
-      // This check is not necessary. If the room exists already we do check this before in validateUri and redirect accordingly.
-      //if(officialUri != uri && officialUri.toLowerCase() === uri.toLowerCase()) throw { redirect: '/' + officialUri };
+        logger.verbose('Redirecting client from ' + uri + ' to official uri ' + officialUri);
+
+        throw { redirect: '/' + officialUri };
+      }
 
       logger.verbose('Checking if user has permission to create a room at ' + uri);
 
       /* Room does not yet exist */
-      return permissionsModel(user, 'create', uri, githubType, null) // Parent rooms always have security == null
+      return permissionsModel(user, 'create', officialUri, githubType, null) // Parent rooms always have security == null
         .then(function(access) {
           if(!access) return [null, access];
-
 
           var securityPromise;
           if(githubType === 'REPO') {
@@ -154,10 +176,12 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
             securityPromise = Q.resolve(null);
           }
 
-
           /* This will load a cached copy */
           return securityPromise.then(function(security) {
               var nonce = Math.floor(Math.random() * 100000);
+
+              console.log('CREATING >>> ', officialUri);
+
               return persistence.Troupe.findOneAndUpdateQ(
                 { lcUri: lcUri, githubType: githubType },
                 {
@@ -284,14 +308,14 @@ exports.findAllRoomsIdsForUserIncludingMentions = findAllRoomsIdsForUserIncludin
  *
  * @return The promise of a troupe or nothing.
  */
-function findOrCreateRoom(user, uri, opts) {
+function findOrCreateRoom(user, uri, options) {
+  if(!options) options = {};
   validate.expect(uri, 'uri required');
 
   var userId = user && user.id;
-  opts = opts || {};
 
   /* First off, try use local data to figure out what this url is for */
-  return localUriLookup(uri, opts)
+  return localUriLookup(uri, options)
     .then(function(uriLookup) {
       logger.verbose('URI Lookup returned ', { uri: uri, isUser: !!(uriLookup && uriLookup.user), isTroupe: !!(uriLookup && uriLookup.troupe) });
 
@@ -337,7 +361,7 @@ function findOrCreateRoom(user, uri, opts) {
       logger.verbose('Attempting to access room ' + uri);
 
       /* Didn't find a user, but we may have found another room */
-      return findOrCreateNonOneToOneRoom(user, uriLookup && uriLookup.troupe, uri)
+      return findOrCreateNonOneToOneRoom(user, uriLookup && uriLookup.troupe, uri, options)
         .spread(function(troupe, access, hookCreationFailedDueToMissingScope, didCreate) {
 
           return ensureAccessControl(user, troupe, access)
