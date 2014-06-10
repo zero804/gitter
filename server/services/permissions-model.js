@@ -6,6 +6,7 @@ var GitHubOrgService     = require('./github/github-org-service');
 var winston              = require('../utils/winston');
 var Q                    = require('q');
 var userIsInRoom         = require('./user-in-room');
+var uriIsPremium         = require('./uri-is-premium');
 var userIsBannedFromRoom = require('./user-banned-from-room');
 var appEvents            = require('../app-events');
 
@@ -60,6 +61,21 @@ function repoPermissionsModel(user, right, uri, security) {
           return true;
 
         case 'create':
+          if(!isAdmin) return false;
+          if(!repoInfo.private) return true;
+
+          /* Private rooms. What to do... */
+          switch(repoInfo.owner.type) {
+            case 'Organization': // American spelling because GitHub
+              return uriIsPremium(repoInfo.owner.login);
+            case 'User':
+              return uriIsPremium(repoInfo.owner.login);
+            default:
+              winston.error("Unknown owner type " + repoInfo.owner.type, { repo: repoInfo, user: user });
+              return false;
+          }
+          break;
+
         case 'admin':
           return !!isAdmin;
 
@@ -174,12 +190,12 @@ function orgChannelPermissionsModel(user, right, uri, security) {
 
         case 'PRIVATE':
           return Q.all([
-                    userIsInRoom(uri, user),
-                    orgPermissionsModel(user, right, orgUri)
-                  ])
-                  .spread(function(inRoom, orgPerm) {
-                    return inRoom && orgPerm;
-                  });
+              userIsInRoom(uri, user),
+              orgPermissionsModel(user, right, orgUri)
+            ])
+            .spread(function(inRoom, orgPerm) {
+              return inRoom && orgPerm;
+            });
 
         case 'INHERITED':
           return orgPermissionsModel(user, right, orgUri);
@@ -189,8 +205,28 @@ function orgChannelPermissionsModel(user, right, uri, security) {
       break;
 
     case 'create':
-      /* Anyone who can join an ORG can create a child channel */
-      return orgPermissionsModel(user, 'join', orgUri);
+      /* Anyone who can create an ORG can create a PUBLIC child channel */
+      var userPermissionPromise = orgPermissionsModel(user, 'create', orgUri);
+
+      switch(security) {
+        case 'PUBLIC':
+          return userPermissionPromise;
+
+        case 'PRIVATE':
+        case 'INHERITED':
+          return userPermissionPromise
+            .then(function(access) {
+              if(!access) return false;
+
+              return uriIsPremium(orgUri)
+                .then(function(isPremium) {
+                  return isPremium;
+                });
+            });
+        default:
+          throw new Error('Illegal state');
+      }
+      break;
 
     case 'admin':
       /* Anyone who can join an ORG can create a child channel */
@@ -217,7 +253,9 @@ function repoChannelPermissionsModel(user, right, uri, security) {
   // No unauthenticated past this point
   if(!user) return Q.resolve(false);
 
-  var repoUri = uri.split('/').slice(0, -1).join('/');
+  var repoParts = uri.split('/');
+  var repoUri = repoParts.slice(0, -1).join('/');
+  var repoOwnerUri = repoParts[0];
 
   switch(right) {
     case 'join':
@@ -256,8 +294,28 @@ function repoChannelPermissionsModel(user, right, uri, security) {
       break;
 
     case 'create':
-      /* Anyone who can ADMIN an REPO can create a child channel */
-      return repoPermissionsModel(user, 'create', repoUri);
+      /* Anyone who can CREATE an REPO can create a child channel */
+      var repoPermissionPromise = repoPermissionsModel(user, 'create', repoUri);
+
+      switch(security) {
+        case 'PUBLIC':
+          return repoPermissionPromise;
+
+        case 'PRIVATE':
+        case 'INHERITED':
+          return repoPermissionPromise
+            .then(function(access) {
+              if(!access) return false;
+
+              return uriIsPremium(repoOwnerUri)
+                .then(function(isPremium) {
+                  return isPremium;
+                });
+            });
+        default:
+          throw new Error('Illegal state');
+      }
+      break;
 
     case 'admin':
       /* Anyone who can join an ORG can create a child channel */
@@ -310,8 +368,24 @@ function userChannelPermissionsModel(user, right, uri, security) {
       return userIsInRoom(uri, user);
 
     case 'create':
+      if(userUri !== user.username) {
+        return Q.resolve(false);
+      }
+
+      switch(security) {
+        case 'PUBLIC':
+          return Q.resolve(false);
+
+        case 'PRIVATE':
+          return uriIsPremium(userUri);
+
+        default:
+          throw new Error('Illegal state');
+      }
+      break;
+
     case 'admin':
-      return Q.resolve(userUri === user.username);
+      return Q.resolve(userUri !== user.username);
 
     default:
       throw 'Unknown right ' + right;
