@@ -105,15 +105,15 @@ define([
       $(itemElements[this.selectedIndex]).click();
     },
 
-    // Navigation to previous or next conversation appears tricky as the list of recent conversations is sorted by date
+    navigateTo: function(i) {
+      var itemElements = $('#recentTroupesList li');
+      if (i >= 0 && i < itemElements.length) {
+        this.selectedIndex = i;
+        $(itemElements[i]).click();
+      }
+    },
 
-    // navigateTo: function(i) {
-    //   var itemElements = $('#recentTroupesList li');
-    //   if (i >= 0 && i < itemElements.length) {
-    //     this.selectedIndex = i;
-    //     $(itemElements[i]).click();
-    //   }
-    // },
+    // Navigation to previous or next conversation appears tricky as the list of recent conversations is sorted by date
     //
     // navigateToNext: function() {
     //   this.navigateTo(this.selectedIndex + 1);
