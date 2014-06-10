@@ -6,15 +6,18 @@ define([
   'utils/appevents',
   'collections/instances/troupes',
   'views/toolbar/troupeCollectionView',
+  'log!troupeMenu',
+  'cocktail',
+  'views/keyboard-events-mixin',
   'hbs!./tmpl/troupeMenu',
   './searchView',
   './profileView',
   './orgCollectionView',
   'nanoscroller' //no ref
-], function($, Marionette, context, appEvents, troupeCollections, TroupeCollectionView, template, SearchView, ProfileView, OrgCollectionView) {
+], function($, Marionette, context, appEvents, troupeCollections, TroupeCollectionView, log, cocktail, KeyboardEventsMixin, template, SearchView, ProfileView, OrgCollectionView) {
   "use strict";
 
-  return Marionette.Layout.extend({
+  var View = Marionette.Layout.extend({
     template: template,
     tagName: 'span',
     selectedListIcon: "icon-troupes",
@@ -32,6 +35,16 @@ define([
       "click #left-menu-profile" : "onClickProfileMenu"
     },
 
+    keyboardEvents: {
+      'room.up': 'selectPrev',
+      'room.down': 'selectNext',
+      'room.enter': 'navigateToCurrent',
+      // Not working properly due to recent conversations sorting by date
+      // 'room.prev': 'navigateToPrev',
+      // 'room.next': 'navigateToNext',
+      'room.1 room.2 room.3 room.4 room.5 room.6 room.7 room.8 room.9 room.10': 'navigateToRoom'
+    },
+
     initialize: function() {
       // this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
       this.repoList = false;
@@ -46,6 +59,75 @@ define([
       $(window).on('hideSearch', function() {
         self.hideSearch();
       });
+
+      this.selectedIndex = 0;
+      // Keep track of conversation change to select the proper element
+      appEvents.on('context.troupeId', function(id) {
+        $('#recentTroupesList li').removeClass('selected');
+        var index = self.getIndexForId(id);
+        if (index) self.selectedIndex = index;
+      });
+    },
+
+    getIndexForId: function(id) {
+      if (!id) return;
+      var els = $('#recentTroupesList li');
+      for (var i = 0, el; el = els[i]; i++) {
+        if ($(el).data('id') === id) return i;
+      }
+    },
+
+    selectPrev: function(event) {
+      appEvents.trigger('focus.request.out', event);
+      var i = this.selectedIndex - 1;
+      if (i === -1) i = 0; // Select first element
+      this.select(i);
+    },
+
+    selectNext: function(event) {
+      appEvents.trigger('focus.request.out', event);
+      this.select(this.selectedIndex + 1);
+    },
+
+    select: function(i) {
+      var itemElements = $('#recentTroupesList li');
+      if (i >= 0 && i < itemElements.length) {
+        this.selectedIndex = i;
+        itemElements.removeClass('selected');
+        $(itemElements[this.selectedIndex]).addClass('selected');
+      }
+    },
+
+    navigateToCurrent: function() {
+      var itemElements = $('#recentTroupesList li');
+      itemElements.removeClass('selected');
+      $(itemElements[this.selectedIndex]).click();
+    },
+
+    navigateTo: function(i) {
+      var itemElements = $('#recentTroupesList li');
+      if (i >= 0 && i < itemElements.length) {
+        this.selectedIndex = i;
+        $(itemElements[i]).click();
+      }
+    },
+
+    // Navigation to previous or next conversation appears tricky as the list of recent conversations is sorted by date
+    //
+    // navigateToNext: function() {
+    //   this.navigateTo(this.selectedIndex + 1);
+    // },
+    //
+    // navigateToPrev: function() {
+    //   this.navigateTo(this.selectedIndex - 1);
+    // },
+
+    navigateToRoom: function(e, handler) {
+      var keys = handler.key.split('+');
+      var key = keys[ keys.length - 1 ];
+      if (key === '0') return this.navigateTo(9);
+      var index = parseInt(key, 10) - 1;
+      this.navigateTo(index);
     },
 
     onRender: function() {
@@ -117,5 +199,7 @@ define([
 
   });
 
+  cocktail.mixin(View, KeyboardEventsMixin);
 
+  return View;
 });

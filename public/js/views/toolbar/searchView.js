@@ -7,11 +7,22 @@ define([
   'backbone',
   'utils/text-filter',
   './troupeCollectionView',
-  'collections/instances/troupes'
-], function(context, appEvents, $, _, Backbone, textFilter, TroupeCollectionView, troupeCollections) {
+  'collections/instances/troupes',
+  'cocktail',
+  'views/keyboard-events-mixin'
+], function(context, appEvents, $, _, Backbone, textFilter, TroupeCollectionView, troupeCollections, cocktail, KeyboardEventsMixin
+) {
   "use strict";
 
-  return TroupeCollectionView.extend({
+  var View = TroupeCollectionView.extend({
+
+    keyboardEvents: {
+      'search.prev': 'onKeySearchPrev',
+      'search.next': 'onKeySearchNext',
+      'search.go': 'onKeySearchGo',
+      'search.escape': 'onKeySearchEscape'
+      // 'chat.escape': 'onKeyChatEscape'
+    },
 
     initialize: function(options) {
 
@@ -27,10 +38,38 @@ define([
       // listen for keypresses on the input
       var self = this;
       this.$input.on('keyup', function(e) {
-        $(window).trigger('showSearch');
-        return self.keyPress(e);
+        return self.keySearch(e);
+      });
+      appEvents.on('focus.request.search', function() {
+        self.$input.focus();
+        appEvents.trigger('focus.change.search');
       });
     },
+
+    onKeySearchPrev: function(e) {
+      this.selectPrev();
+      e.preventDefault();
+    },
+
+    onKeySearchNext: function(e) {
+      this.selectNext();
+      e.preventDefault();
+    },
+
+    onKeySearchGo: function() {
+      this.navigateToCurrent();
+      this.$input.val('');
+      this.search('');
+    },
+
+    onKeySearchEscape: function() {
+      this.$input.val('');
+      this.search('');
+    },
+
+    // onKeyChatEscape: function() {
+    //   if (this.query.length) this.$input.focus();
+    // },
 
     search: function(query) {
       var self = this;
@@ -40,8 +79,10 @@ define([
       // don't do anything if the search term hasn't changed
       if (query === this.query)
         return;
-      else
+      else {
         this.query = query;
+        $(window).trigger('showSearch');
+      }
 
       var filter = textFilter({ query: query, fields: ['name', 'username', 'displayName', 'uri']});
 
@@ -127,8 +168,6 @@ define([
         self.collection.set(additional, { remove: false, add: true, merge: true });
 
       });
-
-
 
       // set the initial local search results
       self.collection.set(results, { remove: true, add: true, merge: true });
@@ -244,30 +283,6 @@ define([
       }});
     },
 
-
-
-    keyPress: function(e) {
-      this.keyNavigation(e);
-      this.keySearch(e);
-    },
-
-    keyNavigation: function(e) {
-      // select one of the search results
-      // enter follows link
-      switch(e.keyCode) {
-        case 38: // up
-          this.selectPrev();
-          break;
-        case 40: // down
-          this.selectNext();
-          break;
-        case 13: // enter
-        case 39: // right
-          this.navigateToCurrent();
-          break;
-      }
-    },
-
     selectPrev: function() {
       this.select(this.selectedIndex - 1);
     },
@@ -284,7 +299,7 @@ define([
     },
 
     select: function(i) {
-      var itemElements = this.$el.find('.trpTroupeName');
+      var itemElements = this.$el.find('li');
 
       if (i >= 0 && i < itemElements.length) {
         this.selectedIndex = i;
@@ -293,10 +308,14 @@ define([
       }
     },
 
-    keySearch: _.debounce(function(e) {
+    keySearch: _.debounce(function() {
       this.search(this.$input.val());
     }, 250)
 
   });
+
+  cocktail.mixin(View, KeyboardEventsMixin);
+
+  return View;
 
 });
