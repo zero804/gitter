@@ -42,6 +42,7 @@ define([
     getRenderData: function() {
       return {
         cmdKey: platformKeys.cmd,
+        roomKey: platformKeys.room,
         gitterKey: platformKeys.gitter
       };
     },

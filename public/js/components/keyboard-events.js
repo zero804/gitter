@@ -13,6 +13,7 @@ require([
 
   // Set modifier keys for the OS
   var cmdKey = platformKeys.cmd;
+  var roomKey = platformKeys.room;
   var gitterKey = platformKeys.gitter;
 
   // Define different scopes for the key listeners
@@ -129,11 +130,11 @@ require([
   keyEvents[cmdKey + '+' + gitterKey + '+m'] = 'help.markdown';
   keyEvents[cmdKey + '+' + gitterKey + '+k'] = 'help.keyboard';
 
-  keyEvents[cmdKey + '+' + gitterKey + '+up'] = 'room.up';
-  keyEvents[cmdKey + '+' + gitterKey + '+down'] = 'room.down';
-  // keyEvents[cmdKey + '+' + gitterKey + '+left'] = 'room.prev';
-  // keyEvents[cmdKey + '+' + gitterKey + '+right'] = 'room.next';
-  keyEvents[cmdKey + '+' + gitterKey + '+enter'] = 'room.enter';
+  keyEvents[cmdKey + '+' + roomKey + '+up'] = 'room.up';
+  keyEvents[cmdKey + '+' + roomKey + '+down'] = 'room.down';
+  // keyEvents[cmdKey + '+' + roomKey + '+left'] = 'room.prev';
+  // keyEvents[cmdKey + '+' + roomKey + '+right'] = 'room.next';
+  keyEvents[cmdKey + '+' + roomKey + '+enter'] = 'room.enter';
 
   // Go to a conversation by index in list
   _.each('123456789'.split(''), function(n) {
