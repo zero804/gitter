@@ -223,6 +223,10 @@ function bind(on) {
       emit('userJoined', data);
     },
 
+    onUserJoined: function(callback) {
+      on('userJoined', callback);
+    },
+
     userLeft: function(data) {
       emit('userLeft', data);
     },
