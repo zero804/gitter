@@ -9,8 +9,8 @@ define([
   switch(platformDetect()) {
     case 'Mac': return {
       cmd: '⌘',
-      room: '⌃',
-      gitter: '⌃'
+      room: 'ctrl',
+      gitter: 'ctrl'
     };
     case 'Windows': return {
       cmd: 'ctrl',
@@ -18,9 +18,9 @@ define([
       gitter: 'alt'
     };
     default: return { // Linux and other
-      cmd: '⌃',
+      cmd: 'ctrl',
       room: '⇧',
-      gitter: '⌥'
+      gitter: 'alt'
     };
   }
 
