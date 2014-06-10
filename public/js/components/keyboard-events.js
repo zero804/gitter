@@ -94,34 +94,18 @@ require([
       name: 'search.next',
       scope: 'input.search'
     }],
-    // 'left': {
-    //   name: 'room.prev',
-    //   scope: 'other'
-    // },
     'right': {
       name: 'search.go',
       scope: 'input.search'
     },
-    // {
-    // name: 'room.next',
-    // scope: 'other'
-    // },
     'tab': {
       name: 'maininput.tab.next',
       scope: ['input.chat', 'input.chat.edit', 'input.search']
     },
-    // ,{
-    // name: 'tab.next',
-    // scope: 'other'
-    // }
     '⇧+tab': {
       name: 'maininput.tab.prev',
       scope: ['input.chat', 'input.chat.edit', 'input.search']
     },
-    // ,{
-    // name: 'tab.prev',
-    // scope: 'other'
-    // }
     'pageup': 'pageUp',
     'pagedown': 'pageDown',
     'q, r': {
@@ -147,11 +131,11 @@ require([
 
   keyEvents[cmdKey + '+' + gitterKey + '+up'] = 'room.up';
   keyEvents[cmdKey + '+' + gitterKey + '+down'] = 'room.down';
-  keyEvents[cmdKey + '+' + gitterKey + '+left'] = 'room.prev';
-  keyEvents[cmdKey + '+' + gitterKey + '+right'] = 'room.next';
+  // keyEvents[cmdKey + '+' + gitterKey + '+left'] = 'room.prev';
+  // keyEvents[cmdKey + '+' + gitterKey + '+right'] = 'room.next';
   keyEvents[cmdKey + '+' + gitterKey + '+enter'] = 'room.enter';
 
-  // Go to a conversation by index in favourites
+  // Go to a conversation by index in list
   _.each('123456789'.split(''), function(n) {
     keyEvents[cmdKey + '+' + gitterKey + '+' + n] = 'room.' + n;
   });

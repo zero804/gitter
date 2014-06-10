@@ -39,8 +39,9 @@ define([
       'room.up': 'selectPrev',
       'room.down': 'selectNext',
       'room.enter': 'navigateToCurrent',
-      'room.prev': 'navigateToPrev',
-      'room.next': 'navigateToNext',
+      // Not working properly due to recent conversations sorting by date
+      // 'room.prev': 'navigateToPrev',
+      // 'room.next': 'navigateToNext',
       'room.1 room.2 room.3 room.4 room.5 room.6 room.7 room.8 room.9 room.10': 'navigateToRoom'
     },
 
@@ -104,21 +105,23 @@ define([
       $(itemElements[this.selectedIndex]).click();
     },
 
-    navigateTo: function(i) {
-      var itemElements = $('#recentTroupesList li');
-      if (i >= 0 && i < itemElements.length) {
-        this.selectedIndex = i;
-        $(itemElements[i]).click();
-      }
-    },
+    // Navigation to previous or next conversation appears tricky as the list of recent conversations is sorted by date
 
-    navigateToNext: function() {
-      this.navigateTo(this.selectedIndex + 1);
-    },
-
-    navigateToPrev: function() {
-      this.navigateTo(this.selectedIndex - 1);
-    },
+    // navigateTo: function(i) {
+    //   var itemElements = $('#recentTroupesList li');
+    //   if (i >= 0 && i < itemElements.length) {
+    //     this.selectedIndex = i;
+    //     $(itemElements[i]).click();
+    //   }
+    // },
+    //
+    // navigateToNext: function() {
+    //   this.navigateTo(this.selectedIndex + 1);
+    // },
+    //
+    // navigateToPrev: function() {
+    //   this.navigateTo(this.selectedIndex - 1);
+    // },
 
     navigateToRoom: function(e, handler) {
       var keys = handler.key.split('+');

@@ -37,15 +37,21 @@ define({
         };
       }
 
-      // Expose log, log.warn and log.error with details (date and module)
-      var passthrough = logDetails(logger);
-      passthrough.warn = logDetails(logger.warn);
-      passthrough.error = logDetails(logger.error);
+      // For some reason require.js compilation fails when other logging functions are added
+      // Works fine when using without compilation though
+      //
+      // // Expose log, log.warn and log.error with details (date and module)
+      // var passthrough = logDetails(logger);
+      // passthrough.warn = logDetails(logger.warn);
+      // passthrough.error = logDetails(logger.error);
+      //
+      // // Only expose errors in production
+      // var prodlog = function(){};
+      // prodlog.warn = function(){};
+      // prodlog.error = logger.error;
 
-      // Only expose errors in production
+      var passthrough = logDetails(logger);
       var prodlog = function(){};
-      prodlog.warn = function(){};
-      prodlog.error = logger.error;
 
       onload(logging ? passthrough : prodlog);
     });
