@@ -6,20 +6,22 @@ define([
 
   // Set modifier keys for the OS
 
-  var keys;
-  if (platformDetect() === 'Mac') {
-    keys = {
+  switch(platformDetect()) {
+    case 'Mac': return {
       cmd: '⌘',
-      gitter: 'ctrl'
+      room: '⌃',
+      gitter: '⌃'
     };
-  }
-  else { // Windows, Linux
-    keys = {
+    case 'Windows': return {
       cmd: 'ctrl',
+      room: 'alt',
       gitter: 'alt'
     };
+    default: return { // Linux and other
+      cmd: '⌃',
+      room: '⇧',
+      gitter: '⌥'
+    };
   }
-
-  return keys;
 
 });

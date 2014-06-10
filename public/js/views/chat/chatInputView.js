@@ -17,12 +17,13 @@ define([
   './commands',
   'cocktail',
   'views/keyboard-events-mixin',
+  'utils/platform-keys',
   'bootstrap_tooltip', // No ref
   'jquery-textcomplete', // No ref
   'utils/sisyphus-cleaner' // No ref
 ], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate,
   emojiListItemTemplate, moment, hasScrollBars, isMobile, emoji, drafty, cdn, commands,
-  cocktail, KeyboardEventsMixin) {
+  cocktail, KeyboardEventsMixin, platformKeys) {
   "use strict";
 
   /** @const */
@@ -47,10 +48,8 @@ define([
   /** @const */
   var PLACEHOLDER = 'Click here to type a chat message. Supports GitHub flavoured markdown.';
 
-  var isMacBrowser = window.navigator.platform.indexOf('Mac') === 0;
-
   /** @const */
-  var PLACEHOLDER_COMPOSE_MODE = PLACEHOLDER+' '+(isMacBrowser ? 'Cmd' : 'Ctrl')+'+Enter to send.';
+  var PLACEHOLDER_COMPOSE_MODE = PLACEHOLDER+' '+ platformKeys.cmd +'+Enter to send.';
 
   var ComposeMode = function() {
     var stringBoolean = window.localStorage.getItem('compose_mode_enabled') || 'false';
@@ -96,6 +95,11 @@ define([
       });
     },
 
+    getComposeModeTitle: function() {
+      var mode = this.composeMode.isEnabled() ? 'chat' : 'compose';
+      return 'Switch to '+ mode +' mode ('+ platformKeys.cmd +' + /)';
+    },
+
     getRenderData: function() {
       var isComposeModeEnabled = this.composeMode.isEnabled();
       var placeholder;
@@ -112,7 +116,8 @@ define([
         user: context.user(),
         isComposeModeEnabled: this.composeMode.isEnabled(),
         placeholder: placeholder,
-        composeModeToggleTitle: isComposeModeEnabled ? 'Switch to chat mode' : 'Switch to compose mode',
+        composeModeToggleTitle: this.getComposeModeTitle(),
+        showMarkdownTitle: 'Markdown help ('+ platformKeys.cmd +' + '+ platformKeys.gitter +' + /)',
         value: $("#chat-input-textarea").val()
       };
     },
@@ -249,14 +254,15 @@ define([
       this.listenTo(this.inputBox, 'editLast', this.editLast);
     },
 
-    toggleComposeMode: function() {
+    toggleComposeMode: function(event) {
+      if(!event.origin) event.preventDefault();
+
       this.composeMode.toggle();
       var isComposeModeEnabled = this.composeMode.isEnabled();
 
-      var title = isComposeModeEnabled ? 'Switch to chat mode' : 'Switch to compose mode';
       this.$el.find('.compose-mode-toggle')
         .toggleClass('active', isComposeModeEnabled)
-        .attr('title', title)
+        .attr('title', this.getComposeModeTitle())
         .tooltip('fixTitle')
         .tooltip('hide');
 
