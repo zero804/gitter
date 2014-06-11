@@ -831,19 +831,30 @@ function validateRoomForReadOnlyAccess(user, room) {
 }
 exports.validateRoomForReadOnlyAccess = validateRoomForReadOnlyAccess;
 
+/**
+ * Remove user from room
+ * If the user to be removed is not the one requesting, check permissions
+ */
 function removeUserFromRoom(room, user, requestingUser) {
   if(!room) return Q.reject(new StatusError(400, 'Room required'));
-  if(room.githubType === 'ONETOONE') return Q.reject(new StatusError(400, 'This room does not support removing.'));
   if(!user) return Q.reject(new StatusError(400, 'User required'));
   if(!requestingUser) return Q.reject(new StatusError(401, 'Not authenticated'));
 
-  /* Does the requesting user have admin rights to this room? */
-  return roomPermissionsModel(requestingUser, 'admin', room)
+  return Q.fcall(function() {
+    // User is requesting user -> leave
+    if(user.id === requestingUser.id) return true;
+    // Check if not in one-to-one room and requesting user is admin
+    if(room.githubType === 'ONETOONE') throw new StatusError(400, 'This room does not support removing.');
+    return roomPermissionsModel(requestingUser, 'admin', room)
     .then(function(access) {
       if(!access) throw new StatusError(403, 'You do not have permission to remove people. Admin permission is needed.');
-      room.removeUserById(user.id);
-      return room.saveQ();
     });
+  })
+  // Do the removal
+  .then(function() {
+    room.removeUserById(user.id);
+    return room.saveQ();
+  });
 }
 exports.removeUserFromRoom = removeUserFromRoom;
 

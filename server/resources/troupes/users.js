@@ -3,12 +3,10 @@
 
 var recentRoomService  = require('../../services/recent-room-service');
 var roomService        = require('../../services/room-service');
-var troupeService      = require("../../services/troupe-service");
 var userService        = require("../../services/user-service");
 var restSerializer     = require("../../serializers/rest-serializer");
 var appEvents          = require("../../app-events");
 var _                  = require("underscore");
-var Q                  = require("q");
 
 module.exports = {
   id: 'resourceTroupeUser',
@@ -39,27 +37,16 @@ module.exports = {
 
   destroy: function(req, res, next){
     var user = req.resourceTroupeUser;
-    var userId = user.id;
-    var troupeId = req.troupe._id;
 
-    var remove = function() {
-      Q.all([
-        recentRoomService.removeRecentRoomForUser(userId, req.troupe),
-        troupeService.removeUserFromTroupe(troupeId, userId)
-      ])
+    return roomService.removeUserFromRoom(req.troupe, user, req.user)
+      .then(function() {
+        recentRoomService.removeRecentRoomForUser(user.id, req.troupe);
+      })
       .then(function() {
         appEvents.userLeft({user: req.user, room: req.troupe});
         res.send({ success: true });
       })
       .catch(next);
-    };
-
-    if(req.user.id === userId) { // User chooses to leave the room
-      remove();
-    }
-    else { // User is removed by another user, check permissions
-      roomService.removeUserFromRoom(req.troupe, user, req.user).done(remove, next);
-    }
   },
 
   load: function(req, id, callback) {
