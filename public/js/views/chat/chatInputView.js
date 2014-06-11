@@ -117,7 +117,7 @@ define([
         isComposeModeEnabled: this.composeMode.isEnabled(),
         placeholder: placeholder,
         composeModeToggleTitle: this.getComposeModeTitle(),
-        showMarkdownTitle: 'Markdown help ('+ platformKeys.cmd +' + '+ platformKeys.gitter +' + /)',
+        showMarkdownTitle: 'Markdown help ('+ platformKeys.cmd +' + '+ platformKeys.gitter +' + m)',
         value: $("#chat-input-textarea").val()
       };
     },
