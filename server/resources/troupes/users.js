@@ -39,13 +39,11 @@ module.exports = {
 
   destroy: function(req, res, next){
     var user = req.resourceTroupeUser;
-    if(req.user.id != user.id) {
-      // For now, you can only remove yourself from the room
-      return next(401);
-    }
-    var troupeId = req.troupe._id;
     var userId = user.id;
-    Q.all([
+    var troupeId = req.troupe._id;
+
+    var remove = function() {
+      Q.all([
         recentRoomService.removeRecentRoomForUser(userId, req.troupe),
         troupeService.removeUserFromTroupe(troupeId, userId)
       ])
@@ -53,8 +51,15 @@ module.exports = {
         appEvents.userLeft({user: req.user, room: req.troupe});
         res.send({ success: true });
       })
-      .fail(next);
+      .catch(next);
+    };
 
+    if(req.user.id === userId) { // User chooses to leave the room
+      remove();
+    }
+    else { // User is removed by another user, check permissions
+      roomService.removeUserFromRoom(req.troupe, user, req.user).done(remove, next);
+    }
   },
 
   load: function(req, id, callback) {

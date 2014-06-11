@@ -63,7 +63,7 @@ define([
       },
       'click #button-remove': function() {
         var username = this.model.get('login');
-        appEvents.trigger('command.troupe.remove', username);
+        appEvents.trigger('command.room.remove', username);
         this.parentPopover.hide();
       }
     },

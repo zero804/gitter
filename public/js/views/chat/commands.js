@@ -268,7 +268,7 @@ define([
         var userMatch = view.$el.val().match(/\/remove @([\w\-]+)/);
         if (!userMatch) return;
         var user = userMatch[1];
-        appEvents.trigger('command.troupe.remove', user);
+        appEvents.trigger('command.room.remove', user);
         view.reset();
       }
     }

@@ -169,17 +169,40 @@ require([
     postMessage({type: 'focus', focus: 'out', event: event});
   });
 
-  itemCollections.users.on('remove', function(m) {
-    console.log('user removed', m);
-  });
+  var notifyRemoveError = function(message) {
+    appEvents.triggerParent('user_notification', {
+      title: 'Could not remove user',
+      text: message,
+      className: 'notification-error'
+    });
+  };
 
-  appEvents.on('command.troupe.remove', function(username) {
+  appEvents.on('command.room.remove', function(username) {
     var user = itemCollections.users.findWhere({username: username});
-    console.log('command.troupe.remove', username, itemCollections, user);
     if (user) {
-      console.log('found user', user.id);
-      itemCollections.users.remove(user);
+      $.ajax({
+        url: "/api/v1/rooms/" + context.getTroupeId() + "/users/" + user.id,
+        type: "DELETE",
+        success: function() {
+          itemCollections.users.remove(user);
+        },
+        statusCode: {
+          400: function(jqXHR, textStatus) {
+            notifyRemoveError(textStatus);
+          },
+          401: function() {
+            notifyRemoveError('Please login to perform this action.');
+          },
+          403: function() {
+            notifyRemoveError('You do not have permission to remove people from this room.');
+          },
+          404: function() {
+            notifyRemoveError('User '+ username +' was not found in this room.');
+          }
+        },
+      });
     }
+    else notifyRemoveError('User '+ username +' was not found in this room.');
   });
 
   var appView = new ChatIntegratedView({ el: 'body' });
