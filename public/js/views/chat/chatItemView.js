@@ -12,10 +12,12 @@ define([
   'hbs!./tmpl/chatViewItem',
   'views/chat/chatInputView',
   'views/unread-item-view-mixin',
+  'utils/appevents',
   'cocktail',
+  'views/keyboard-events-mixin',
   'bootstrap_tooltip', // No ref
 ], function($, _, context, chatModels, AvatarView, Marionette, TroupeViews, Popover,
-  chatItemTemplate, chatInputView, UnreadItemViewMixin, cocktail) {
+  chatItemTemplate, chatInputView, UnreadItemViewMixin, appEvents, cocktail, KeyboardEventMixins) {
 
   "use strict";
 
@@ -35,10 +37,14 @@ define([
 
     events: {
       'click .trpChatEdit':       'toggleEdit',
-      'keydown textarea':         'detectEscape',
       'click .trpChatReadBy':     'showReadBy',
       'mouseover .trpChatReadBy': 'showReadByIntent',
       'click .webhook':           'expandActivity'
+    },
+
+    keyboardEvents: {
+      'chat.edit.escape': 'onKeyEscape',
+      'chat.edit.send': 'onKeySend'
     },
 
     expandActivity: function() {
@@ -100,6 +106,20 @@ define([
       }
 
       this.updateRender(this.model.changed);
+    },
+
+    onKeyEscape: function() {
+      if(this.inputBox) {
+        this.toggleEdit();
+        this.focusInput();
+      }
+    },
+
+    onKeySend: function(event) {
+      if(this.inputBox) {
+        this.inputBox.processInput();
+      }
+      event.preventDefault();
     },
 
     renderText: function() {
@@ -198,30 +218,8 @@ define([
       return  "You can't edit someone else's message";
     },
 
-    detectKeys: function(e) {
-      this.detectReturn(e);
-      this.detectEscape(e);
-    },
-
-    detectReturn: function(e) {
-      if(e.keyCode === 13 && (!e.ctrlKey && !e.shiftKey)) {
-        // found submit
-        this.saveChat();
-        e.stopPropagation();
-        e.preventDefault();
-      }
-    },
-
     focusInput: function() {
       $("#chat-input-textarea").focus();
-    },
-
-    detectEscape: function(e) {
-      if (e.keyCode === 27) {
-        // found escape, cancel edit
-        this.toggleEdit();
-        this.focusInput();
-      }
     },
 
     saveChat: function(newText) {
@@ -267,10 +265,18 @@ define([
       if (this.isEditing) {
         this.isEditing = false;
         this.showText();
+        this.stopListening(appEvents, 'focus.request.chat.edit');
+        appEvents.trigger('chat.edit.hide');
       } else {
         if (this.canEdit()) {
+          var self = this;
           this.isEditing = true;
           this.showInput();
+          this.listenTo(appEvents, 'focus.request.chat.edit', function() {
+            self.inputBox.$el.focus();
+            appEvents.trigger('focus.change.chat.edit');
+          });
+          appEvents.trigger('chat.edit.show');
         }
       }
     },
@@ -333,6 +339,8 @@ define([
     }
 
   });
+
+  cocktail.mixin(ChatItemView, KeyboardEventMixins);
 
   if(context.isLoggedIn()) {
     cocktail.mixin(ChatItemView, UnreadItemViewMixin);

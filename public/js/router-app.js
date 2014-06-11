@@ -20,7 +20,8 @@ require([
   'template/helpers/all',                 // No ref
   'components/bug-reporting',             // No ref
   'components/csrf',                      // No ref
-  'components/ajax-errors'                // No ref
+  'components/ajax-errors',               // No ref
+  'components/focus-events'               // No ref
 ], function(appEvents, context, Backbone, _, AppIntegratedView, TroupeMenuView, troupeCollections,
   TitlebarUpdater, realtime, createRoomView, createRepoRoomView, chooseRoomView, log) {
   "use strict";
@@ -110,10 +111,28 @@ require([
     var message = JSON.parse(e.data);
     log('Received message ', message);
 
+    var makeEvent = function(message) {
+      var origin = 'chat';
+      if (message.event && message.event.origin) origin = message.event.origin;
+      message.event = {
+        origin: origin,
+        preventDefault: function() {
+          log('Warning: could not call preventDefault() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
+        },
+        stopPropagation: function() {
+          log('Warning: could not call stopPropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
+        },
+        stopImmediatePropagation: function() {
+          log('Warning: could not call stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
+        }
+      };
+    };
+
     switch(message.type) {
       case 'context.troupeId':
         context.setTroupeId(message.troupeId);
         titlebarUpdater.setRoomName(message.name);
+        appEvents.trigger('context.troupeId', message.troupeId);
         break;
 
       case 'navigation':
@@ -147,7 +166,58 @@ require([
         var reason = message.reason;
         realtime.testConnection('chat.' + reason);
         break;
+
+      case 'chat.edit.show':
+        appEvents.trigger('chat.edit.show');
+        break;
+
+      case 'chat.edit.hide':
+        appEvents.trigger('chat.edit.hide');
+        break;
+
+      case 'keyboard':
+        makeEvent(message);
+        appEvents.trigger('keyboard.' + message.name, message.event, message.handler);
+        appEvents.trigger('keyboard.all', message.name, message.event, message.handler);
+        break;
+
+      case 'focus':
+        makeEvent(message);
+        appEvents.trigger('focus.request.' + message.focus, message.event);
+        break;
     }
+  });
+
+  function postMessage(message) {
+    chatIFrame.contentWindow.postMessage(JSON.stringify(message), context.env('basePath'));
+  }
+
+  // Call preventDefault() on tab events so that we can manage focus as we want
+  appEvents.on('keyboard.tab.next keyboard.tab.prev', function(e) {
+    if (!e.origin) e.preventDefault();
+  });
+
+  // Send focus events to chat frame
+  appEvents.on('focus.request.chat.in', function(event) {
+    postMessage({type: 'focus', focus: 'in', event: event});
+  });
+  appEvents.on('focus.request.chat.out', function(event) {
+    postMessage({type: 'focus', focus: 'out', event: event});
+  });
+
+  // Sent keyboard events to chat frame
+  appEvents.on('keyboard.all', function (name, event, handler) {
+    // Don't send back events coming from the chat frame
+    if (event.origin && event.origin === 'chat') return;
+    var message = {
+      type: 'keyboard',
+      name: name,
+      // JSON serialisation makes it not possible to send the event object
+      // Keep track of the origin in case of return
+      event: {origin: event.origin},
+      handler: handler
+    };
+    postMessage(message);
   });
 
   function reallyOnce(emitter, name, callback, context) {
