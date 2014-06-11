@@ -83,7 +83,7 @@ define([
 
       data.chatPrivately = chatPrivately;
       data.mentionable = mentionable;
-      data.removable = true;//removable;
+      data.removable = removable;
       return data;
     }
 
