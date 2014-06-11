@@ -36,7 +36,24 @@ before(fixtureLoader(fixture, {
     users: ['userBan', 'userBanAdmin']
   },
   userBan: { },
-  userBanAdmin: {}
+  userBanAdmin: {},
+  troupeCanRemove: {
+    security: 'PUBLIC',
+    githubType: 'REPO',
+    users: [
+      'userToRemove',
+      'userRemoveNonAdmin',
+      'userRemoveAdmin'
+    ]
+  },
+  troupeCannotRemove: {
+    security: 'PRIVATE',
+    githubType: 'ONETOONE',
+    users: ['userToRemove', 'userRemoveAdmin']
+  },
+  userToRemove: {},
+  userRemoveNonAdmin: {},
+  userRemoveAdmin: {}
 }));
 
 after(function() {
@@ -805,6 +822,78 @@ describe('room-service', function() {
 
   });
 
+  describe('removes', function() {
 
+    var roomPermissionsModelMock = mockito.mockFunction();
+    var roomService = testRequire.withProxies('./services/room-service', {
+      './room-permissions-model': roomPermissionsModelMock
+    });
+    var userIsInRoom = testRequire('./services/user-in-room');
+
+    mockito.when(roomPermissionsModelMock)().then(function(user, perm, incomingRoom) {
+      assert.equal(perm, 'admin');
+
+      if(user.id == fixture.userRemoveNonAdmin.id) {
+        return Q.resolve(false);
+      } else if(user.id == fixture.userRemoveAdmin.id) {
+        return Q.resolve(true);
+      } else {
+        assert(false, 'Unknown user');
+      }
+    });
+
+    it('should prevent non-admin from removing users from rooms', function(done) {
+      return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userToRemove)
+        .then(function(here) {
+          assert(here);
+          return roomService.removeUserFromRoom(fixture.troupeCanRemove, fixture.userToRemove, fixture.userRemoveNonAdmin);
+        })
+        .catch(function(err) {
+          assert.equal(err.status, 403);
+        })
+        .then(function() {
+          return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userToRemove);
+        })
+        .then(function(here) {
+          assert(here);
+        })
+        .done(done);
+    });
+
+    it('should prevent from removing users from one-to-one rooms', function(done) {
+      return userIsInRoom(fixture.troupeCannotRemove.uri, fixture.userToRemove)
+        .then(function(here) {
+          assert(here);
+          return roomService.removeUserFromRoom(fixture.troupeCannotRemove, fixture.userToRemove, fixture.userRemoveAdmin);
+        })
+        .catch(function(err) {
+          assert.equal(err.status, 400);
+          assert.equal(err.message, 'This room does not support removing.');
+        })
+        .then(function() {
+          return userIsInRoom(fixture.troupeCannotRemove.uri, fixture.userToRemove);
+        })
+        .then(function(here) {
+          assert(here);
+        })
+        .done(done);
+    });
+
+    it('should remove users from rooms', function(done) {
+      return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userToRemove)
+        .then(function(here) {
+          assert(here);
+          return roomService.removeUserFromRoom(fixture.troupeCanRemove, fixture.userToRemove, fixture.userRemoveAdmin);
+        })
+        .then(function() {
+          return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userToRemove);
+        })
+        .then(function(here) {
+          assert(!here);
+        })
+        .done(done);
+    });
+
+  });
 
 });

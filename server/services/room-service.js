@@ -840,7 +840,7 @@ function removeUserFromRoom(room, user, requestingUser) {
   /* Does the requesting user have admin rights to this room? */
   return roomPermissionsModel(requestingUser, 'admin', room)
     .then(function(access) {
-      if(!access) throw new StatusError(403, 'You do not have permission to remove people. Admin permission is need.');
+      if(!access) throw new StatusError(403, 'You do not have permission to remove people. Admin permission is needed.');
       room.removeUserById(user.id);
       return room.saveQ();
     });
@@ -865,7 +865,7 @@ function banUserFromRoom(room, username, requestingUser, callback) {
   /* Does the requesting user have admin rights to this room? */
   return roomPermissionsModel(requestingUser, 'admin', room)
     .then(function(access) {
-      if(!access) throw new StatusError(403, 'You do not have permission to ban people. Admin permission is need.');
+      if(!access) throw new StatusError(403, 'You do not have permission to ban people. Admin permission is needed.');
 
       return userService.findByUsername(username);
     })
@@ -925,7 +925,7 @@ function unbanUserFromRoom(room, troupeBan, username, requestingUser, callback) 
   /* Does the requesting user have admin rights to this room? */
   return roomPermissionsModel(requestingUser, 'admin', room)
     .then(function(access) {
-      if(!access) throw new StatusError(403, 'You do not have permission to unban people. Admin permission is need.');
+      if(!access) throw new StatusError(403, 'You do not have permission to unban people. Admin permission is needed.');
 
       room.bans.pull({ _id: troupeBan._id });
 
