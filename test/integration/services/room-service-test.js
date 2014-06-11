@@ -40,11 +40,7 @@ before(fixtureLoader(fixture, {
   troupeCanRemove: {
     security: 'PUBLIC',
     githubType: 'REPO',
-    users: [
-      'userToRemove',
-      'userRemoveNonAdmin',
-      'userRemoveAdmin'
-    ]
+    users: ['userToRemove', 'userRemoveNonAdmin', 'userRemoveAdmin']
   },
   troupeCannotRemove: {
     security: 'PRIVATE',
@@ -822,7 +818,7 @@ describe('room-service', function() {
 
   });
 
-  describe('removes', function() {
+  describe('removals', function() {
 
     var roomPermissionsModelMock = mockito.mockFunction();
     var roomService = testRequire.withProxies('./services/room-service', {
