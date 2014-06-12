@@ -120,38 +120,38 @@ describe('troupe-service', function() {
   });
 
 
-  describe('#removeUserFromTroupe()', function() {
-    it('#01 should be able to remove a user from a troupe', function(done) {
-      var troupeService = testRequire('./services/troupe-service');
-
-      troupeService.removeUserFromTroupe(fixture.troupeForDeletion.id, fixture.user1.id, function(err) {
-        if(err) return done(err);
-
-        troupeService.findById(fixture.troupeForDeletion.id, function(err, troupe) {
-          if(err) return done(err);
-
-          var earlier = new Date(Date.now() - 10000);
-
-          assert.strictEqual(1, troupe.users.length);
-          assert.equal(fixture.user2.id, troupe.users[0].userId);
-
-          persistence.TroupeRemovedUser.find({
-            troupeId: troupe.id,
-            userId: fixture.user1.id,
-            dateDeleted: { $gt: earlier }
-          }, function(err, entry) {
-            if(err) return done(err);
-
-            assert(entry, 'Expected a troupeRemoved entry');
-            done();
-
-          });
-        });
-      });
-
-    });
-
-  });
+  // describe('#removeUserFromTroupe()', function() {
+  //   it('#01 should be able to remove a user from a troupe', function(done) {
+  //     var troupeService = testRequire('./services/troupe-service');
+  //
+  //     troupeService.removeUserFromTroupe(fixture.troupeForDeletion.id, fixture.user1.id, function(err) {
+  //       if(err) return done(err);
+  //
+  //       troupeService.findById(fixture.troupeForDeletion.id, function(err, troupe) {
+  //         if(err) return done(err);
+  //
+  //         var earlier = new Date(Date.now() - 10000);
+  //
+  //         assert.strictEqual(1, troupe.users.length);
+  //         assert.equal(fixture.user2.id, troupe.users[0].userId);
+  //
+  //         persistence.TroupeRemovedUser.find({
+  //           troupeId: troupe.id,
+  //           userId: fixture.user1.id,
+  //           dateDeleted: { $gt: earlier }
+  //         }, function(err, entry) {
+  //           if(err) return done(err);
+  //
+  //           assert(entry, 'Expected a troupeRemoved entry');
+  //           done();
+  //
+  //         });
+  //       });
+  //     });
+  //
+  //   });
+  //
+  // });
 
 
   describe('#deleteTroupe()', function() {
