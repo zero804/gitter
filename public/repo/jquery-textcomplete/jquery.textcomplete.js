@@ -164,7 +164,7 @@ define(["jquery"], function (jQuery){
           data = data.slice(0, this.strategy.maxCount);
           this.listView.render(data);
         }
-        
+
         if (!this.listView.data.length && this.listView.shown) {
           this.listView.deactivate();
         }
@@ -366,6 +366,7 @@ define(["jquery"], function (jQuery){
       activate: function () {
         if (!this.shown) {
           this.$el.show();
+          this.completer.$el.trigger('textComplete:show');
           this.shown = true;
         }
         return this;
@@ -374,6 +375,7 @@ define(["jquery"], function (jQuery){
       deactivate: function () {
         if (this.shown) {
           this.$el.hide();
+          this.completer.$el.trigger('textComplete:hide');
           this.shown = false;
           this.data = this.index = null;
         }

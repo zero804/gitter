@@ -137,113 +137,123 @@ define([
       this.$el.find('.compose-mode-toggle, .md-help').tooltip({placement: 'left'});
       var userCollection = this.userCollection;
 
-      this.$el.find('textarea').textcomplete([
-          {
-            match: /(^|\s)(([\w-_]+\/[\w-_]+)?#(\d*))$/,
-            maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
-            search: function(term, callback) {
-              var terms = term.split('#');
-              var repoName = terms[0];
-              var issueNumber = terms[1];
-              var query = {};
+      var $textarea = this.$el.find('textarea');
 
-              if(repoName) query.repoName = repoName;
-              if(issueNumber) query.issueNumber = issueNumber;
+      $textarea.textcomplete([
+        {
+          match: /(^|\s)(([\w-_]+\/[\w-_]+)?#(\d*))$/,
+          maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
+          search: function(term, callback) {
+            var terms = term.split('#');
+            var repoName = terms[0];
+            var issueNumber = terms[1];
+            var query = {};
 
-              $.getJSON('/api/v1/rooms/' + context.getTroupeId() + '/issues', query)
-                .done(function(resp) {
-                  callback(resp);
-                })
-                .fail(function() {
-                  callback([]);
-                });
-            },
-            template: function(issue) {
-              return listItemTemplate({
-                name: issue.number,
-                description: issue.title
+            if(repoName) query.repoName = repoName;
+            if(issueNumber) query.issueNumber = issueNumber;
+
+            $.getJSON('/api/v1/rooms/' + context.getTroupeId() + '/issues', query)
+              .done(function(resp) {
+                callback(resp);
+              })
+              .fail(function() {
+                callback([]);
               });
-            },
-            replace: function(issue) {
-              return '$1$3#' + issue.number + ' ';
-            }
           },
-          {
-            match: /(^|\s)@([a-zA-Z0-9_\-]*)$/,
-            maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
-            search: function(term, callback) {
-              var lowerTerm = term.toLowerCase();
-              var loggedInUsername = context.user().get('username').toLowerCase();
-
-              var matches = userCollection && userCollection.filter(function(user) {
-                var username = user.get('username').toLowerCase();
-
-                if(username === loggedInUsername) return false;
-
-                var displayName = (user.get('displayName') || '').toLowerCase();
-
-                return (username.indexOf(lowerTerm) === 0 || displayName.indexOf(lowerTerm) === 0);
-              });
-
-              callback(matches);
-            },
-            template: function(user) {
-              return listItemTemplate({
-                name: user.get('username'),
-                description: user.get('displayName')
-              });
-            },
-            replace: function(user) {
-                return '$1@' + user.get('username') + ' ';
-            }
+          template: function(issue) {
+            return listItemTemplate({
+              name: issue.number,
+              description: issue.title
+            });
           },
-          {
-            match: /(^|\s):([\-+\w]*)$/,
-            maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
-            search: function(term, callback) {
-              if(term.length < 1) return callback(SUGGESTED_EMOJI);
-
-              var matches = emoji.named.filter(function(emoji) {
-                return emoji.indexOf(term) === 0;
-              });
-              callback(matches);
-            },
-            template: function(emoji) {
-              return emojiListItemTemplate({
-                emoji: emoji,
-                emojiUrl: cdn('images/2/gitter/emoji/' + emoji + '.png')
-              });
-            },
-            replace: function (value) {
-              return '$1:' + value + ': ';
-            }
-          },
-          {
-            match: /(^)\/(\w*)$/,
-            maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
-            search: function(term, callback) {
-              var matches = commands.getSuggestions(term);
-              callback(matches);
-            },
-            template: function(cmd) {
-              return listItemTemplate({
-                name: cmd.command,
-                description: cmd.description
-              });
-            },
-            replace: function (cmd) {
-              return '$1/' + cmd.completion;
-            }
+          replace: function(issue) {
+            return '$1$3#' + issue.number + ' ';
           }
+        },
+        {
+          match: /(^|\s)@([a-zA-Z0-9_\-]*)$/,
+          maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
+          search: function(term, callback) {
+            var lowerTerm = term.toLowerCase();
+            var loggedInUsername = context.user().get('username').toLowerCase();
 
+            var matches = userCollection && userCollection.filter(function(user) {
+              var username = user.get('username').toLowerCase();
+
+              if(username === loggedInUsername) return false;
+
+              var displayName = (user.get('displayName') || '').toLowerCase();
+
+              return (username.indexOf(lowerTerm) === 0 || displayName.indexOf(lowerTerm) === 0);
+            });
+
+            callback(matches);
+          },
+          template: function(user) {
+            return listItemTemplate({
+              name: user.get('username'),
+              description: user.get('displayName')
+            });
+          },
+          replace: function(user) {
+              return '$1@' + user.get('username') + ' ';
+          }
+        },
+        {
+          match: /(^|\s):([\-+\w]*)$/,
+          maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
+          search: function(term, callback) {
+            if(term.length < 1) return callback(SUGGESTED_EMOJI);
+
+            var matches = emoji.named.filter(function(emoji) {
+              return emoji.indexOf(term) === 0;
+            });
+            callback(matches);
+          },
+          template: function(emoji) {
+            return emojiListItemTemplate({
+              emoji: emoji,
+              emojiUrl: cdn('images/2/gitter/emoji/' + emoji + '.png')
+            });
+          },
+          replace: function (value) {
+            return '$1:' + value + ': ';
+          }
+        },
+        {
+          match: /(^)\/(\w*)$/,
+          maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
+          search: function(term, callback) {
+            var matches = commands.getSuggestions(term);
+            callback(matches);
+          },
+          template: function(cmd) {
+            return listItemTemplate({
+              name: cmd.command,
+              description: cmd.description
+            });
+          },
+          replace: function (cmd) {
+            return '$1/' + cmd.completion;
+          }
+        }
       ]);
 
-      // http://stackoverflow.com/questions/16149083/keyboardshrinksview-makes-lose-focus/18904886#18904886
-      this.$el.find("textarea").on('touchend', function(){
-        var t = $(this);
+      // Use 'on' and 'off' instead of proper booleans as attributes are strings
+      $textarea.on('textComplete:show', function() {
+        $textarea.attr('data-prevent-keys', 'on');
+      });
+      $textarea.on('textComplete:hide', function() {
+        // Defer change to make sure the last key event is prevented
+        setTimeout(function() {
+          $textarea.attr('data-prevent-keys', 'off');
+        }, 0);
+      });
 
+      // http://stackoverflow.com/questions/16149083/keyboardshrinksview-makes-lose-focus/18904886#18904886
+      $textarea.on('touchend', function(){
         window.setTimeout(function() {
-          t.focus();
+          $textarea.focus();
         }, 300);
 
         return true;
