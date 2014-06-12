@@ -171,7 +171,7 @@ require([
 
   var notifyRemoveError = function(message) {
     appEvents.triggerParent('user_notification', {
-      title: 'Could not remove user',
+      title: 'Failed to remove user',
       text: message,
       className: 'notification-error'
     });
@@ -182,23 +182,14 @@ require([
     if (user) {
       $.ajax({
         url: "/api/v1/rooms/" + context.getTroupeId() + "/users/" + user.id,
+        dataType: "json",
         type: "DELETE",
         success: function() {
           itemCollections.users.remove(user);
         },
-        statusCode: {
-          400: function(jqXHR, textStatus) {
-            notifyRemoveError(textStatus);
-          },
-          401: function() {
-            notifyRemoveError('Please login to perform this action.');
-          },
-          403: function() {
-            notifyRemoveError('You do not have permission to remove people from this room.');
-          },
-          404: function() {
-            notifyRemoveError('User '+ username +' was not found in this room.');
-          }
+        error: function(jqXHR) {
+          if (jqXHR.status < 500) notifyRemoveError(jqXHR.responseJSON.error);
+          else notifyRemoveError('');
         },
       });
     }
