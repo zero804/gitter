@@ -18,9 +18,6 @@ require('express-resource');
 
 require('./utils/diagnostics');
 
-/* Load express-resource */
-require('express-resource');
-
 var app = express();
 
 var server = http.createServer(domainWrapper(app));
