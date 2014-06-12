@@ -1,3 +1,4 @@
+
 /*jslint node:true, unused:true*/
 /*global describe:true, it:true, beforeEach */
 "use strict";
@@ -5,27 +6,27 @@
 var testRequire = require('../../test-require');
 var assert = require('assert');
 var Q = require('q');
-
+var testGenerator = require('../../test-generator');
 var mockito = require('jsmockito').JsMockito;
 
-var user;
 var permissionsModel;
 var getRepoMethodMock;
 var uriIsPremiumMethodMock;
+var ORG = 'ORG';
+var URI = 'ORG/REPO';
+var USERNAME = 'gitterbob';
 
 function GitHubRepoServiceMocker() {
   this.getRepo = getRepoMethodMock;
 }
 
 beforeEach(function() {
-  user = { username: 'gitterbob' };
+  ORG = 'ORG';
+  URI = 'ORG/REPO';
+  USERNAME = 'gitterbob';
 
   getRepoMethodMock = mockito.mockFunction();
   uriIsPremiumMethodMock = mockito.mockFunction();
-
-  mockito.when(uriIsPremiumMethodMock)().then(function(uri, callback) {
-    callback(null, true);
-  });
 
   permissionsModel = testRequire.withProxies("./services/permissions/repo-permissions-model", {
     '../github/github-repo-service': GitHubRepoServiceMocker,
@@ -34,156 +35,306 @@ beforeEach(function() {
 
 });
 
-describe('REPOs', function() {
+var ALL_RIGHTS = ['create', 'join', 'admin', 'adduser', 'view'];
+var ALL_RIGHTS_TESTS = ALL_RIGHTS.map(function(right) {
+  return { right: right };
+});
 
-  var uri = 'x/y';
-
-  describe('PRIVATE', function() {
-    var security = 'PRIVATE';
-
-    // mocks for each usergroup
-    var m = {
-      members: true,
-      not_members: false,
-      people_with_push_access: {permissions: {push: true}},
-      people_with_admin_access: {permissions: {admin: true}},
-      people_with_pull_access_only: {permissions: {pull: true}}
-    };
-
-    var rights = {
-      view: {
-        allowed:  ['members'],
-        denied:   ['not_members']
+// All of our fixtures
+var FIXTURES = [{
+  name: 'unauthenticated users',
+  meta: {
+    user: false
+  },
+  tests: [{
+    name: 'in public repos',
+    meta: {
+      repo: { },
+      security: 'PUBLIC'
+    },
+    tests: [
+      { right: 'create',  expectedResult: false },
+      { right: 'join',    expectedResult: false },
+      { right: 'admin',   expectedResult: false },
+      { right: 'adduser', expectedResult: false },
+      { right: 'view',    expectedResult: true  } // Unauthenticated users can view public repos
+    ]
+  },{
+    name: 'in private repos',
+    meta: {
+      repo: null,
+      security: 'PRIVATE',
+      expectedResult: false // Unauthenticated users cannot do anything with private repos
+    },
+    tests: ALL_RIGHTS_TESTS
+  }]
+},{
+  name: 'authenticated',
+  meta: {
+    user: true
+  },
+  tests: [{
+    name: 'free users',
+    meta: {
+      premiumUser: false
+    },
+    tests: [{
+      name: 'in public repos',
+      meta: {
+        security: 'PUBLIC'
       },
-      join: {
-        allowed:  ['members'],
-        denied:   ['not_members']
+      tests: [{
+        name: 'with push access',
+        meta: {
+          repo: { permissions: { push: true } },
+          expectedResult: true // Users with push access have full rights
+        },
+        tests: ALL_RIGHTS_TESTS
+      }, {
+        name: 'with admin access',
+        meta: {
+          repo: { permissions: { admin: true } },
+          expectedResult: true // Users with push access have full rights
+        },
+        tests: ALL_RIGHTS_TESTS
+      }, {
+        name: 'with no permissions',
+        meta: {
+          repo: { },
+        },
+        tests: [
+          { right: 'create',  expectedResult: false },
+          { right: 'join',    expectedResult: true  },
+          { right: 'admin',   expectedResult: false },
+          { right: 'adduser', expectedResult: true  },
+          { right: 'view',    expectedResult: true  }
+        ]
+      }, {
+        name: 'with no access',
+        meta: {
+          repo: null
+        },
+        tests: [
+          { right: 'create',  expectedResult: false },
+          { right: 'join',    expectedResult: false },
+          { right: 'admin',   expectedResult: false },
+          { right: 'adduser', expectedResult: false },
+          { right: 'view',    expectedResult: true  } // Edge case: we know the room is public, allow access
+        ]
+      }]
+    },{
+      name: 'in private user repos',
+      meta: {
+        security: 'PRIVATE'
       },
-      adduser: {
-        allowed:  ['members'],
-        denied:   ['not_members']
+      tests: [{
+        name: 'with push access',
+        meta: {
+          repo: { private: true, permissions: { push: true }, owner: { login: USERNAME, type: 'User' } },
+          expectedResult: true // Users with push access have full rights
+        },
+        tests: [
+          { right: 'create',  expectedResult: false },
+          { right: 'join',    expectedResult: true  },
+          { right: 'admin',   expectedResult: true },
+          { right: 'adduser', expectedResult: true },
+          { right: 'view',    expectedResult: true  }
+        ]
+      }, {
+        name: 'with no permissions',
+        meta: {
+          repo: { private: true, owner: { login: USERNAME, type: 'User' }  },
+          expectedResult: false
+        },
+        tests: [
+          { right: 'create',  expectedResult: false },
+          { right: 'join',    expectedResult: true  },
+          { right: 'admin',   expectedResult: false },
+          { right: 'adduser', expectedResult: true },
+          { right: 'view',    expectedResult: true  }
+        ]
+      }]
+    }]
+  }, {
+    name: 'premium users',
+    meta: {
+      premiumUser: true
+    },
+    tests: [{
+      name: 'in public repos',
+      meta: {
+        security: 'PUBLIC'
       },
-      create: {
-        allowed:  ['people_with_push_access', 'people_with_admin_access'],
-        denied:   ['not_members', 'people_with_pull_access_only']
+      tests: [{
+        name: 'with push access',
+        meta: {
+          repo: { permissions: { push: true } },
+          expectedResult: true // Users with push access have full rights
+        },
+        tests: ALL_RIGHTS_TESTS
+      }, {
+        name: 'with admin access',
+        meta: {
+          repo: { permissions: { admin: true } },
+          expectedResult: true // Users with push access have full rights
+        },
+        tests: ALL_RIGHTS_TESTS
+      }, {
+        name: 'with no access',
+        meta: {
+          repo: { },
+        },
+        tests: [
+          { right: 'create',  expectedResult: false },
+          { right: 'join',    expectedResult: true  },
+          { right: 'admin',   expectedResult: false },
+          { right: 'adduser', expectedResult: true  },
+          { right: 'view',    expectedResult: true  }
+        ]
+      }]
+    },{
+      name: 'in premium orgs',
+      meta: {
+        premiumOrg: true
       },
-      admin: {
-        allowed:  ['people_with_push_access', 'people_with_admin_access'],
-        denied:   ['not_members', 'people_with_pull_access_only']
-      }
-    };
+      tests: [{
+        name: 'in private repos',
+        meta: {
+          security: 'PRIVATE'
+        },
+        tests: [{
+          name: 'with push access',
+          meta: {
+            repo: { private: true, permissions: { push: true }, owner: { login: ORG, type: 'Organization' } },
+            expectedResult: true // Users with push access have full rights
+          },
+          tests: ALL_RIGHTS_TESTS
+        }, {
+          name: 'with admin access',
+          meta: {
+            repo: { private: true, permissions: { admin: true }, owner: { login: ORG, type: 'Organization' } },
+            expectedResult: true // Users with push access have full rights
+          },
+          tests: ALL_RIGHTS_TESTS
+        }, {
+          name: 'with no access',
+          meta: {
+            repo: { private: true, owner: { type: 'Organization', login: ORG } },
+          },
+          tests: [
+            { right: 'create',  expectedResult: false },
+            { right: 'join',    expectedResult: true  },
+            { right: 'admin',   expectedResult: false },
+            { right: 'adduser', expectedResult: true  },
+            { right: 'view',    expectedResult: true  }
+          ]
+        }]
+      }]
+    },{
+      name: 'in free orgs',
+      meta: {
+        premiumOrg: false
+      },
+      tests: [{
+        name: 'in private repos',
+        meta: {
+          security: 'PRIVATE'
+        },
+        tests: [{
+          name: 'with push access',
+          meta: {
+            repo: { private: true, permissions: { push: true }, owner: { login: ORG, type: 'Organization' } },
+          },
+          tests: [
+            { right: 'create',  expectedResult: false }, // Cannot create a private room in a free org
+            { right: 'join',    expectedResult: true  },
+            { right: 'admin',   expectedResult: true  },
+            { right: 'adduser', expectedResult: true  },
+            { right: 'view',    expectedResult: true  }
+          ]
+        }, {
+          name: 'with no permissions',
+          meta: {
+            repo: { private: true, owner: { type: 'Organization', login: ORG } },
+          },
+          tests: [
+            { right: 'create',  expectedResult: false },
+            { right: 'join',    expectedResult: true  },
+            { right: 'admin',   expectedResult: false },
+            { right: 'adduser', expectedResult: true  },
+            { right: 'view',    expectedResult: true  }
+          ]
+        }]
+      }]
+    }]
+  }]
+}, {
+  name: 'security has changed to private',
+  meta: {
+    repo: { private: true, owner: { type: 'Organization', login: ORG } },
+    security: 'PUBLIC',
+    user: true,
+    premiumOrg: false,
+    premiumUser: false,
+    right: 'join',
+    expectedResult: true
+  }
+}, {
+  name: 'security has changed to public',
+  meta: {
+    repo: { private: false, owner: { type: 'Organization', login: ORG } },
+    security: 'PRIVATE',
+    user: true,
+    premiumOrg: false,
+    premiumUser: false,
+    right: 'join',
+    expectedResult: true
+  }
+}, {
+  name: 'Unexpected owner type',
+  meta: {
+    repo: { private: true, owner: { type: 'Super Furry Animal', login: ORG } },
+    security: 'PRIVATE',
+    user: true,
+    premiumOrg: false,
+    premiumUser: false,
+    right: 'create',
+    expectedResult: false
+  }
+}];
 
-    Object.keys(rights).forEach(function(right) {
+describe('repo-permissions', function() {
+  testGenerator(FIXTURES, function(name, meta) {
 
-      describe(right, function() {
-        rights[right].allowed.forEach(function(usergroup) {
-          it('should allow ' + usergroup, function(done) {
+    var RIGHT = meta.right;
+    var USER = meta.user ? { username: USERNAME } : null;
+    var EXPECTED = meta.expectedResult;
+    var SECURITY = meta.security;
 
-            mockito.when(getRepoMethodMock)().then(function(org) {
-              assert.equal(org, uri);
-              return Q.resolve(m[usergroup]);
-            });
+    if(!name) name = 'should be ' + (EXPECTED ? 'allowed' : 'denied') + ' ' + RIGHT;
+    it(name, function(done) {
+      mockito.when(uriIsPremiumMethodMock)().then(function(uri, callback) {
+        if(uri === USER.username) {
+          return Q.resolve(!!meta.premiumUser).nodeify(callback);
+        }
 
-            return permissionsModel(user, right, uri, security)
-              .then(function(granted) {
-                assert(granted);
-              })
-              .nodeify(done);
-          });
-        });
+        if(uri === ORG) {
+          return Q.resolve(!!meta.premiumOrg).nodeify(callback);
+        }
 
-        rights[right].denied.forEach(function(usergroup) {
-          it('should deny ' + usergroup, function(done) {
-
-            mockito.when(getRepoMethodMock)().then(function(org) {
-              assert.equal(org, uri);
-              return Q.resolve(m[usergroup]);
-            });
-
-            return permissionsModel(user, right, uri, security)
-              .then(function(granted) {
-                assert(!granted);
-              })
-              .nodeify(done);
-          });
-        });
+        assert(false, 'Unknown uri ' + uri);
       });
 
-    });
-
-  });
-
-  describe('PUBLIC', function() {
-    var security = 'PUBLIC';
-
-    // mocks for each usergroup
-    var m = {
-      members: true,
-      not_members: false,
-      people_with_push_access: {permissions: {push: true}},
-      people_with_admin_access: {permissions: {admin: true}},
-      people_with_pull_access_only: {permissions: {pull: true}}
-    };
-
-    var rights = {
-      view: {
-        allowed:  ['members'],
-        denied:   []
-      },
-      join: {
-        allowed:  ['members'],
-        denied:   ['not_members']
-      },
-      adduser: {
-        allowed:  ['members'],
-        denied:   ['not_members']
-      },
-      create: {
-        allowed:  ['people_with_push_access', 'people_with_admin_access'],
-        denied:   ['not_members', 'people_with_pull_access_only']
-      },
-      admin: {
-        allowed:  ['people_with_push_access', 'people_with_admin_access'],
-        denied:   ['not_members', 'people_with_pull_access_only']
-      }
-    };
-
-    Object.keys(rights).forEach(function(right) {
-
-      describe(right, function() {
-        rights[right].allowed.forEach(function(usergroup) {
-          it('should allow ' + usergroup, function(done) {
-
-            mockito.when(getRepoMethodMock)().then(function(org) {
-              assert.equal(org, uri);
-              return Q.resolve(m[usergroup]);
-            });
-
-            return permissionsModel(user, right, uri, security)
-              .then(function(granted) {
-                assert(granted);
-              })
-              .nodeify(done);
-          });
-        });
-
-        rights[right].denied.forEach(function(usergroup) {
-          it('should deny ' + usergroup, function(done) {
-
-            mockito.when(getRepoMethodMock)().then(function(org) {
-              assert.equal(org, uri);
-              return Q.resolve(m[usergroup]);
-            });
-
-            return permissionsModel(user, right, uri, security)
-              .then(function(granted) {
-                assert(!granted);
-              })
-              .nodeify(done);
-          });
-        });
+      mockito.when(getRepoMethodMock)().then(function(uri) {
+        assert.equal(uri, URI);
+        return Q.resolve(meta.repo);
       });
-    });
 
+      permissionsModel(USER, RIGHT, URI, SECURITY)
+        .then(function(result) {
+          assert.strictEqual(result, EXPECTED);
+        })
+        .nodeify(done);
+    });
   });
 });

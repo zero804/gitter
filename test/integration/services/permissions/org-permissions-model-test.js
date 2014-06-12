@@ -5,6 +5,7 @@
 var testRequire = require('../../test-require');
 var assert = require('assert');
 var Q = require('q');
+var testGenerator = require('../../test-generator');
 
 var mockito = require('jsmockito').JsMockito;
 
@@ -12,12 +13,14 @@ function GitHubOrgServiceMocker() {
   this.member = orgMemberMethodMock;
 }
 
-var user;
 var permissionsModel;
 var orgMemberMethodMock;
+var URI;
+var SECURITY;
 
 beforeEach(function() {
-  user = { username: 'gitterbob' };
+  URI = 'x';
+  SECURITY = null;
 
   orgMemberMethodMock = mockito.mockFunction();
 
@@ -26,76 +29,50 @@ beforeEach(function() {
   });
 });
 
-describe('ORGS', function() {
-
-  var security = null;
-  var uri = 'x';
-
-  // mock for each usergroup
-  var m = {
-    members: true,
-    not_members: false
-  };
-
-  var rights = {
-    view: {
-      allowed:  ['members'],
-      denied:   ['not_members']
-    },
-    join: {
-      allowed:  ['members'],
-      denied:   ['not_members']
-    },
-    adduser: {
-      allowed:  ['members'],
-      denied:   ['not_members']
-    },
-    create: {
-      allowed:  ['members'],
-      denied:   ['not_members']
-    },
-    admin: {
-      allowed:  ['members'],
-      denied:   ['not_members']
+var ALL_RIGHTS = ['create', 'join', 'admin', 'adduser', 'view'];
+var ALL_RIGHTS_TESTS = ALL_RIGHTS.map(function(right) {
+  return {
+    meta: {
+      right: right
     }
   };
-
-  Object.keys(rights).forEach(function(right) {
-
-    describe(right, function() {
-      rights[right].allowed.forEach(function(usergroup) {
-        it('should allow ' + usergroup, function(done) {
-
-          mockito.when(orgMemberMethodMock)().then(function(org) {
-            assert.equal(org, uri);
-            return Q.resolve(m[usergroup]);
-          });
-
-          return permissionsModel(user, right, uri, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-      });
-
-      rights[right].denied.forEach(function(usergroup) {
-        it('should deny ' + usergroup, function(done) {
-
-          mockito.when(orgMemberMethodMock)().then(function(org) {
-            assert.equal(org, uri);
-            return Q.resolve(m[usergroup]);
-          });
-
-          return permissionsModel(user, right, uri, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-      });
-    });
-
-  });
-
 });
+
+// All of our fixtures
+var FIXTURES = [{
+  name: 'Authenticated users',
+  meta: {
+    user: true,
+    org: false,
+    expectedResult: false
+  },
+  tests: ALL_RIGHTS_TESTS
+},{
+  name: 'Unauthenticated users',
+  meta: {
+    user: false,
+    expectedResult: false
+  },
+  tests: ALL_RIGHTS_TESTS
+}];
+
+describe('org room permissions', function() {
+  testGenerator(FIXTURES, function(name, meta) {
+    var RIGHT = meta.right;
+    var USER = meta.user ? { username: 'gitterbob' } : null;
+    var EXPECTED = meta.expectedResult;
+
+    it('should ' + (EXPECTED ? 'allow' : 'deny') + ' ' + RIGHT, function(done) {
+      mockito.when(orgMemberMethodMock)().then(function() {
+        return Q.resolve(!!meta.org);
+      });
+
+      permissionsModel(USER, RIGHT, URI, SECURITY)
+        .then(function(result) {
+          assert.strictEqual(result, EXPECTED);
+        })
+        .nodeify(done);
+    });
+  });
+});
+
