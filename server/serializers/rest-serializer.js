@@ -1,17 +1,19 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var Q                 = require("q");
+var _                 = require("underscore");
 var userService       = require("../services/user-service");
 var chatService       = require("../services/chat-service");
 var troupeService     = require("../services/troupe-service");
 var unreadItemService = require("../services/unread-item-service");
 var presenceService   = require("../services/presence-service");
 var recentRoomService = require('../services/recent-room-service');
-var Q                 = require("q");
-var _                 = require("underscore");
+var GitHubRepoService = require('../services/github/github-repo-service');
+var billingService    = require('../services/billing-service');
+
 var winston           = require('../utils/winston');
 var collections       = require("../utils/collections");
-var GitHubRepoService = require('../services/github/github-repo-service');
 
 function formatDate(d) {
   return d ? d.toISOString() : null;
@@ -119,10 +121,55 @@ function UserPresenceInTroupeStrategy(troupeId) {
 
 }
 
+function UserPremiumStatusStrategy() {
+  var usersWithPlans;
+
+  this.preload = function(userIds, callback) {
+    return billingService.findActivePersonalPlansForUsers(userIds)
+      .then(function(subscriptions) {
+        usersWithPlans = subscriptions.reduce(function(memo, s) {
+          memo[s.userId] = true;
+          return memo;
+        }, {});
+
+        return true;
+      })
+      .nodeify(callback);
+  };
+
+  this.map = function(userId) {
+    return !!usersWithPlans[userId];
+  };
+
+}
+
+function OrgPremiumStatusStrategy() {
+  var orgsWithPlans;
+
+  this.preload = function(orgUris, callback) {
+    return billingService.findActiveOrgPlans(orgUris)
+      .then(function(subscriptions) {
+        orgsWithPlans = subscriptions.reduce(function(memo, s) {
+          memo[s.uri] = true;
+          return memo;
+        }, {});
+
+        return true;
+      })
+      .nodeify(callback);
+  };
+
+  this.map = function(orgUri) {
+    return !!orgsWithPlans[orgUri];
+  };
+
+}
+
 function UserStrategy(options) {
   options = options ? options : {};
   var userRoleInTroupeStrategy = options.includeRolesForTroupeId || options.includeRolesForTroupe ? new UserRoleInTroupeStrategy(options) : null;
   var userPresenceInTroupeStrategy = options.showPresenceForTroupeId ? new UserPresenceInTroupeStrategy(options.showPresenceForTroupeId) : null;
+  var userPremiumStatusStrategy = options.showPremiumStatus ? new UserPremiumStatusStrategy() : null;
 
   this.preload = function(users, callback) {
     var strategies = [];
@@ -141,6 +188,13 @@ function UserStrategy(options) {
       });
     }
 
+    if(userPremiumStatusStrategy) {
+      strategies.push({
+        strategy: userPremiumStatusStrategy,
+        data: users.map(function(user) { return user.id; })
+      });
+    }
+
     execPreloads(strategies, callback);
   };
 
@@ -154,6 +208,7 @@ function UserStrategy(options) {
         'private_repo': user.hasGitHubScope('repo')
       };
     }
+
     return {
       id: user.id,
       status: options.includeEmail ? user.status : undefined,
@@ -166,6 +221,7 @@ function UserStrategy(options) {
       scopes: scopes,
       online: userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id) || undefined,
       role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.username) || undefined,
+      premium: userPremiumStatusStrategy && userPremiumStatusStrategy.map(user.id) || undefined,
       v: getVersion(user)
     };
   };
@@ -485,32 +541,28 @@ function TroupeBanStrategy(options) {
 
 
 function GitHubOrgStrategy(options) {
-
-  var troupeStrategy = new TroupeStrategy(options);
-  var self = this;
+  var troupeUriStrategy = new TroupeUriStrategy(options);
+  var premiumStatusStrategy = new OrgPremiumStatusStrategy();
 
   this.preload = function(orgs, callback) {
-    var _orgs = _.map(orgs, function(org) { return org.login; });
+    var orgUris = orgs.map(function(org) { return org.login; });
 
-    troupeService.findAllByUri(_orgs, function(err, troupes) {
-      if (err) callback(err);
-
-      self.troupes = collections.indexByProperty(troupes, 'uri');
-
-      execPreloads([{
-        strategy: troupeStrategy,
-        data: troupes
-      }], callback);
-    });
+    execPreloads([{
+      strategy: troupeUriStrategy,
+      data: orgUris
+    },{
+      strategy: premiumStatusStrategy,
+      data: orgUris
+    }], callback);
   };
 
   this.map = function(item) {
-    var room = self.troupes[item.login];
     return {
       id: item.id,
       name: item.login,
       avatar_url: item.avatar_url,
-      room: room ? troupeStrategy.map(room) : undefined
+      room: troupeUriStrategy.map(item.login),
+      premium: premiumStatusStrategy.map(item.login)
     };
   };
 
@@ -728,6 +780,35 @@ function TroupeIdStrategy(options) {
       return null;
     }
 
+    return troupeStrategy.map(troupe);
+  };
+}
+
+
+function TroupeUriStrategy(options) {
+  var troupeStrategy = new TroupeStrategy(options);
+  var self = this;
+
+  this.preload = function(uris, callback) {
+    troupeService.findAllByUri(uris, function(err, troupes) {
+      if(err) {
+        winston.error("Error loading troupes", { exception: err });
+        return callback(err);
+      }
+
+      self.troupes = collections.indexByProperty(troupes, 'uri');
+
+      execPreloads([{
+        strategy: troupeStrategy,
+        data: troupes
+      }], callback);
+
+    });
+  };
+
+  this.map = function(uri) {
+    var troupe = self.troupes[uri];
+    if(!troupe) return null;
     return troupeStrategy.map(troupe);
   };
 
