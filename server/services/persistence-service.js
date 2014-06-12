@@ -893,18 +893,6 @@ var SuggestedContact = mongoose.model('SuggestedContact', SuggestedContactSchema
 var NotificationsPreference = mongoose.model('NotificationsPreference', NotificationsPreferenceSchema);
 var Subscription = mongoose.model('Subscription', SubscriptionSchema);
 
-
-//
-// 8-May-2013: Delete this after it's been rolled into production!
-//
-Troupe.update({ status: 'INACTIVE' }, { status: 'ACTIVE' }, { multi: true }, function (err, numberAffected) {
-  if (err) return winston.error(err);
-  if(numberAffected > 0) {
-    winston.warn('Updated ' + numberAffected + ' INACTIVE troupes to status ACTIVE');
-  }
-});
-
-
 module.exports = {
   schemas: {
     UserSchema: UserSchema,
