@@ -1006,11 +1006,24 @@ a.trpMiniLeftMenuItem {
   margin-left: 10px;
 }
 
-.trpSearchClear {
+.trpSearchContainer {
   position: relative;
-  left: -20px;
-  top: -3px;
-  opacity: 0.8;
+
+  .trpLeftMenuSearch:focus ~ .trpSearchClear {
+    opacity: 0.8;
+  }
+}
+
+.trpSearchClear {
+  position: absolute;
+  right: 15px;
+  top: 5px;
+  cursor: pointer;
+  opacity: 0;
+  -webkit-transition: opacity 0.2s linear;
+  -moz-transition: opacity 0.2s linear;
+  -o-transition: opacity 0.2s linear;
+  transition: opacity 0.2s linear;
 }
 
 .trpSearchClear:before {

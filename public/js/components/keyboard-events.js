@@ -24,6 +24,9 @@ require([
   // - 'other' for the rest
   key.filter = function(event) {
     var scope, tag = event.target || event.srcElement;
+    if (tag.getAttribute('data-prevent-keys') === 'on') {
+      return false; // Prevent triggering
+    }
     if (tag.id === 'chat-input-textarea') {
       scope = 'input.chat';
     }

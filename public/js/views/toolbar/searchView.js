@@ -74,8 +74,11 @@ define([
     search: function(query) {
       var self = this;
 
-      if (query === '')
+      if (query === '') {
+        this.query = query;
         $(window).trigger('hideSearch');
+        return;
+      }
       // don't do anything if the search term hasn't changed
       if (query === this.query)
         return;
