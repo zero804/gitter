@@ -36,7 +36,7 @@ define([
   };
 
   var touchEvents = {
-    'dblclick' : 'toggleEdit'
+    'hold' : 'toggleEdit'
   };
 
   var ChatItemView = TroupeViews.Base.extend({
