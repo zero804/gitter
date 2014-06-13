@@ -13,6 +13,9 @@ var shutdown      = require('shutdown');
 var Fiber         = require("../utils/fiber");
 var assert        = require("assert");
 
+var restSerializer = require('../serializers/rest-serializer');
+var serializeModel = restSerializer.serializeModel;
+
 // Install inc and dec number fields in mongoose
 require('mongoose-number')(mongoose);
 
@@ -81,28 +84,10 @@ connection.on('error', function(err) {
 // Utility serialization stuff
 // --------------------------------------------------------------------
 
-// This needs to be late-bound to prevent circular dependencies
-// TODO: review architecture to remove possible circular dependency
-var serializeModel = null;
-function serializeModelLateBound(model, callback) {
-  if(serializeModel === null) {
-    serializeModel = require("../serializers/rest-serializer").serializeModel;
-  }
-  serializeModel(model, callback);
-}
-
-var restSerializer = null;
-function getRestSerializerLateBound() {
-  if(!restSerializer) {
-    restSerializer = require("../serializers/rest-serializer");
-  }
-  return restSerializer;
-}
-
 function serializeEvent(url, operation, model, callback) {
   winston.verbose("Serializing " + operation + " to " + url);
 
-  serializeModelLateBound(model, function(err, serializedModel) {
+  serializeModel(model, function(err, serializedModel) {
     if(err) {
       winston.error("Silently failing model event: ", { exception: err, url: url, operation: operation });
     } else {
@@ -959,7 +944,5 @@ module.exports = {
   Subscription: Subscription
 };
 
-process.nextTick(function() {
-  var events = require("./persistence-service-events");
-  events.install(module.exports);
-});
+var events = require("./persistence-service-events");
+events.install(module.exports);
