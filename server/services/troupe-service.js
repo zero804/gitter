@@ -221,31 +221,6 @@ function indexTroupesByUserIdTroupeId(troupes, userId) {
   };
 }
 
-
-
-function removeUserFromTroupe(troupeId, userId, callback) {
-  return findById(troupeId)
-    .then(function(troupe) {
-      if(!troupe) throw 404;
-
-      // TODO: Add the user to a removeUsers collection
-      var deleteRecord = new persistence.TroupeRemovedUser({
-        userId: userId,
-        troupeId: troupeId
-      });
-
-      return deleteRecord.saveQ()
-        .then(function() {
-          // TODO: Let the user know that they've been removed from the troupe (via email or something)
-          troupe.removeUserById(userId);
-
-          return troupe.saveQ();
-        });
-    })
-    .nodeify(callback);
-}
-
-
 /**
  * Find the userIds of all the troupe.
  *
@@ -641,8 +616,6 @@ module.exports = {
   findAllImplicitContactUserIds: findAllImplicitContactUserIds,
   findAllConnectedUserIdsForUserId: findAllConnectedUserIdsForUserId,
   getUrlForTroupeForUserId: getUrlForTroupeForUserId,
-
-  removeUserFromTroupe: removeUserFromTroupe,
 
   findAllUserIdsForTroupes: findAllUserIdsForTroupes,
   findAllUserIdsForTroupe: findAllUserIdsForTroupe,
