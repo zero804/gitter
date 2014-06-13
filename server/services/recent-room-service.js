@@ -63,8 +63,7 @@ function removeRecentRoomForUser(userId, roomId, isMember) {
   return Q.all([
       clearFavourite(userId, roomId),
       clearLastVisitedTroupeforUserId(userId, roomId),
-      // This one keeps the test pending, why?
-      // unreadItemsService.markAllChatsRead(userId, roomId, { member: !!isMember })
+      unreadItemsService.markAllChatsRead(userId, roomId, { member: !!isMember })
     ]);
 }
 

@@ -1,5 +1,5 @@
 /*jslint node:true, unused:true*/
-/*global describe:true, it:true, before:true, after: true */
+/*global describe:true, it:true, beforeEach:true, afterEach: true */
 "use strict";
 
 var testRequire = require('../test-require');
@@ -7,44 +7,162 @@ var assert = require('assert');
 var fixtureLoader = require('../test-fixtures');
 var Q = require('q');
 var fixture = {};
+var troupeService = testRequire('./services/troupe-service');
+var recentRoomService = testRequire('./services/recent-room-service');
+var userIsInRoom = testRequire('./services/user-in-room');
+var appEvents = testRequire('./app-events');
 
 var mockito = require('jsmockito').JsMockito;
 
 Q.longStackSupport = true;
 
-before(fixtureLoader(fixture, {
+beforeEach(fixtureLoader(fixture, {
   troupeCanRemove: {
     security: 'PUBLIC',
     githubType: 'REPO',
-    users: ['userLeave', 'userToRemove', 'userRemoveNonAdmin', 'userRemoveAdmin']
+    users: ['userFavourite', 'userLeave', 'userToRemove', 'userRemoveNonAdmin', 'userRemoveAdmin']
   },
   troupeCannotRemove: {
     security: 'PRIVATE',
     githubType: 'ONETOONE',
     users: ['userToRemove', 'userRemoveAdmin']
   },
+  troupeEmpty: {
+    security: 'PUBLIC',
+    githubType: 'REPO',
+    users: []
+  },
+  userFavourite: {},
   userLeave: {},
   userToRemove: {},
   userRemoveNonAdmin: {},
   userRemoveAdmin: {}
 }));
 
-after(function() {
+afterEach(function() {
   fixture.cleanup();
 });
 
 describe('remove-service', function() {
 
-  describe('remove room from recent', function() {
+  describe('#removeFavourite', function() {
 
-    // check cases if is member / is lurking (appEvents)
+    var removeService = testRequire('./services/remove-service');
+
+    var getFavs = function() {
+      return recentRoomService.findFavouriteTroupesForUser(fixture.userFavourite.id);
+    };
+
+    var createFav = function() {
+      return recentRoomService.updateFavourite(fixture.userFavourite.id, fixture.troupeCanRemove.id, true)
+      .then(getFavs)
+      .then(function(favs) {
+        assert(favs[fixture.troupeCanRemove.id]); // Favourite is created
+      });
+    };
+
+    var checkHere = function() {
+      return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userFavourite);
+    };
+
+    // Create an event listener with expected parameters
+    // If the test keeps pending, it means no event is emitted with these parameters
+    var addListenner = function(expected) {
+      var dfd = Q.defer();
+      appEvents.onDataChange2(function(res) {
+        // First filter by url and operation, as other events may have been emitted
+        if (expected.url && expected.url !== res.url) return;
+        if (expected.operation && expected.operation !== res.operation) return;
+        // Check model with deepEqual
+        if (expected.model) dfd.resolve(assert.deepEqual(res.model, expected.model));
+        else dfd.resolve();
+      });
+      return function() {
+        return dfd.promise;
+      };
+    };
+
+    it('should remove favourite', function(done) {
+      var checkEvent = addListenner({
+        url: '/user/' + fixture.userFavourite.id + '/rooms',
+        operation: 'patch',
+        model: {
+          id: fixture.troupeCanRemove.id,
+          favourite: null,
+          lastAccessTime: null,
+          mentions: 0,
+          unreadItems: 0
+        }
+      });
+
+      createFav()
+      .then(function() {
+        return removeService.removeRecentRoomForUser(fixture.troupeCanRemove, fixture.userFavourite.id);
+      })
+      .then(checkEvent) // Ensure event was emitted
+      .then(getFavs)
+      .then(function(favs) {
+        assert(!favs[fixture.troupeCanRemove.id]); // Favourite is removed
+      })
+      .then(checkHere)
+      .then(function(here) {
+        assert(here); // User is still in room
+      })
+      .done(done);
+    });
+
+    it('should remove user from the room if lurking', function(done) {
+      createFav()
+      .then(function() { // Set user as lurking
+        return troupeService.updateTroupeLurkForUserId(fixture.userFavourite.id, fixture.troupeCanRemove.id, true);
+      })
+      .then(function() { // Get updated troupe
+        return troupeService.findById(fixture.troupeCanRemove.id);
+      })
+      .then(function(troupe) {
+        return removeService.removeRecentRoomForUser(troupe, fixture.userFavourite.id);
+      })
+      .then(getFavs)
+      .then(function(favs) {
+        assert(!favs[fixture.troupeCanRemove.id]); // Favourite is removed
+      })
+      .then(checkHere)
+      .then(function(here) {
+        assert(!here); // User has been removed
+      })
+      .done(done);
+    });
+
+    it('should check if the proper event is emitted when the favourite is removed', function(done) {
+      var checkEvent = addListenner({
+        url: '/user/' + fixture.userFavourite.id + '/rooms',
+        operation: 'remove',
+        model: {id: fixture.troupeEmpty.id}
+      });
+
+      createFav()
+      .then(function() {
+        return userIsInRoom(fixture.troupeEmpty.uri, fixture.userFavourite);
+      })
+      .then(function(here) {
+        assert(!here); // Check that user is not in the room
+      })
+      .then(function() {
+        return removeService.removeRecentRoomForUser(fixture.troupeEmpty, fixture.userFavourite.id);
+      })
+      .then(checkEvent) // Ensure event was emitted
+      .then(getFavs)
+      .then(function(favs) {
+        assert(!favs[fixture.troupeEmpty.id]); // Favourite is removed
+      })
+      .done(done);
+    });
 
   });
 
-  describe('user leaves room', function() {
+  describe('#userLeaveRoom', function() {
 
     var removeService = testRequire('./services/remove-service');
-    var userIsInRoom = testRequire('./services/user-in-room');
 
     it('should remove user from room', function(done) {
       return userIsInRoom(fixture.troupeCanRemove.uri, fixture.userLeave)
@@ -63,15 +181,14 @@ describe('remove-service', function() {
 
   });
 
-  describe('remove user from room', function() {
+  describe('#removeUserFromRoom', function() {
 
     var roomPermissionsModelMock = mockito.mockFunction();
     var removeService = testRequire.withProxies('./services/remove-service', {
       './room-permissions-model': roomPermissionsModelMock
     });
-    var userIsInRoom = testRequire('./services/user-in-room');
 
-    mockito.when(roomPermissionsModelMock)().then(function(user, perm, incomingRoom) {
+    mockito.when(roomPermissionsModelMock)().then(function(user, perm) {
       assert.equal(perm, 'admin');
 
       if(user.id == fixture.userRemoveNonAdmin.id) {
