@@ -1,14 +1,12 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'underscore',
   'marionette',
   'utils/context',
   'hbs!./tmpl/parentSelectView',
   'hbs!./tmpl/parentItemView',
-  'views/controls/dropdown',
   'views/controls/typeahead',
   'backbone'
-], function(_, Marionette, context, template, itemTemplate, Dropdown, Typeahead, Backbone) {
+], function(Marionette, context, template, itemTemplate, Typeahead, Backbone) {
   "use strict";
 
   var ItemModel = Backbone.Model.extend({
