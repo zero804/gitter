@@ -6,7 +6,7 @@ var logger = env.logger;
 var stats = env.stats;
 
 var appEvents = require("../app-events");
-var restSerializer =  require("../serializers/rest-serializer");
+var restSerializer = require("../serializers/rest-serializer");
 
 // --------------------------------------------------------------------
 // Utility serialization stuff
@@ -45,8 +45,6 @@ exports.install = function(persistenceService) {
   var schemas = persistenceService.schemas;
   var mongooseUtils = require("../utils/mongoose-utils");
   var troupeService = require("./troupe-service");
-
-
 
   /** */
   function attachNotificationListenersToSchema(schema, name, extractor) {
