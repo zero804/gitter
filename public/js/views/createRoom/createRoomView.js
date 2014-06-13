@@ -141,6 +141,11 @@ define([
           url = "/api/v1/rooms/" + ownerModel.get('id') + '/channels';
       }
 
+      if(this.selectedOptionsRequireUpgrade()) {
+        this.showValidationMessage('In order to continue, you\'ll need a premium account.');
+        return;
+      }
+
       $.ajax({
         url: url,
         contentType: "application/json",
