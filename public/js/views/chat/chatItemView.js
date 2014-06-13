@@ -36,8 +36,7 @@ define([
   };
 
   var touchEvents = {
-    'dblclick' :                   'toggleEditDisplay',
-    'click .trpChatEdit':       'mobileToggleEdit',
+    'click .trpChatEdit':       'toggleEdit',
   };
 
   var ChatItemView = TroupeViews.Base.extend({
@@ -267,19 +266,6 @@ define([
 
     hasBeenRead: function() {
       return !!this.model.get('readBy');
-    },
-
-    mobileToggleEdit: function(e) {
-      e.preventDefault();
-      this.toggleEdit();
-    },
-
-    toggleEditDisplay: function() {
-      if (this.$el.hasClass("isEditable")) {
-        this.$el.find('.trpChatEdit').toggleClass("force-show");
-      } else {
-        this.$el.find('.trpChatEdit').hide();
-      }
     },
 
     toggleEdit: function() {
