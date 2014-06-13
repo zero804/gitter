@@ -614,7 +614,9 @@ pre code {
 .trpChatBox:hover > .trpChatDetails > .trpChatEdit,
 .trpChatBox:hover > .trpChatDetails > .trpChatReads {
   visibility: visible;
+}
 
+.trpChatItemContainer.cantEdit .trpChatBox:hover > .trpChatDetails > .trpChatEdit {
   @media @mobile {
     visibility: hidden;
   }
@@ -641,14 +643,18 @@ pre code {
   -webkit-transition: opacity .25s ease-in-out;
 }
 
-.canEdit .trpChatEdit.force-show {
-  visibility: visible;
-  display: inline-block;
+.canEdit .trpChatEdit {
+  @media @mobile {
+    visibility: visible;
+    display: inline-block;
+  }
 }
 
-.canEdit .trpChatEdit.force-show:hover {
-  visibility: visible;
-  display: inline-block;
+.canEdit .trpChatEdit:hover {
+  @media @mobile {
+    visibility: visible;
+    display: inline-block;
+  }
 }
 
 .trpChatBox:hover > .trpChatDetails > .trpChatEdit.force-show {
