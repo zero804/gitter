@@ -35,3 +35,5 @@ function TroupeUriStrategy(options) {
   };
 
 }
+
+module.exports = TroupeUriStrategy;

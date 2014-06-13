@@ -6,7 +6,7 @@ var _                 = require("underscore");
 var collections       = require("../../utils/collections");
 var execPreloads      = require('../exec-preloads');
 var TroupeUriStrategy = require('./troupe-uri-strategy');
-var billingService    = require('../services/billing-service');
+var billingService    = require('../../services/billing-service');
 
 function OrgPremiumStatusStrategy() {
   var orgsWithPlans;
