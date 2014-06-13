@@ -251,6 +251,14 @@ blockquote {
   transition: opacity 0.2s ease;
   background-size: cover;
 
+  @media @mobile {
+    background-image: url('../../images/2/gitter/icon-edit-24@2x.png');
+    width: 24px;
+    height: 24px;
+    float: right;
+    margin-right: -16px;
+  }
+
   @media @retina {
     background-image: url('../../images/2/gitter/icon-edit@2x.png');
   }
@@ -606,6 +614,10 @@ pre code {
 .trpChatBox:hover > .trpChatDetails > .trpChatEdit,
 .trpChatBox:hover > .trpChatDetails > .trpChatReads {
   visibility: visible;
+
+  @media @mobile {
+    visibility: hidden;
+  }
 }
 
 .isOld .trpChatEdit {
@@ -627,6 +639,20 @@ pre code {
   transition: opacity .25s ease-in-out;
   -moz-transition: opacity .25s ease-in-out;
   -webkit-transition: opacity .25s ease-in-out;
+}
+
+.canEdit .trpChatEdit.force-show {
+  visibility: visible;
+  display: inline-block;
+}
+
+.canEdit .trpChatEdit.force-show:hover {
+  visibility: visible;
+  display: inline-block;
+}
+
+.trpChatBox:hover > .trpChatDetails > .trpChatEdit.force-show {
+  visibility: visible;
 }
 
 
