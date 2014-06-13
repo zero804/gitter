@@ -6,6 +6,20 @@ var winston              = require('../../utils/winston');
 var Q                    = require('q');
 var uriIsPremium         = require('../uri-is-premium');
 var appEvents            = require('../../app-events');
+var userIsInRoom         = require('../user-in-room');
+
+function githubFailurePermissionsModel(user, right, uri, security, originalError) {
+  // We can't help out. Send the original error out
+  if(right !== 'view' && right !== 'join') throw originalError;
+
+  // Public room? Let them in
+  if(security === 'PUBLIC') return Q.resolve(true);
+
+  // Private room? Let the user in if they're already in the room.
+  if(security === 'PRIVATE') return userIsInRoom(uri, user);
+
+  throw originalError;
+}
 
 /**
  * REPO permissions model
@@ -80,6 +94,16 @@ module.exports = function repoPermissionsModel(user, right, uri, security) {
           throw 'Unknown right ' + right;
       }
 
+    })
+    .catch(function(err) {
+      if(err.errno && err.syscall || err.statusCode >= 500) {
+        logger.error('Repo: ' + err, { exception: err });
+        // GitHub call failed and may be down.
+        // We can fall back to whether the user is already in the room
+        return githubFailurePermissionsModel(user, right, uri, security);
+      }
+
+      throw err;
     });
 
 };
