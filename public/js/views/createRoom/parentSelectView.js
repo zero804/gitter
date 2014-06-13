@@ -53,6 +53,7 @@ define([
       id: m.get('id'),
       uri: m.get('uri'),
       name: m.get('name'),
+      premium: m.get('premium'),
       type: 'repo',
       repoType: true
     });
@@ -65,6 +66,7 @@ define([
       uri: user.get('username'),
       name: user.get('username'),
       avatarUrl: user.get('avatarUrlSmall'),
+      premium: user.get('premium'),
       type: 'user',
       userType: true
     });
@@ -75,6 +77,7 @@ define([
     return new ItemModel({
       id: a.get('room').id,
       uri: a.get('room').uri,
+      premium: a.get('premium'),
       name: a.get('name'),
       avatarUrl: a.get('avatar_url'),
       type: 'org',
