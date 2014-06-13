@@ -16,7 +16,7 @@ module.exports = {
 
     user.getOrgs()
     .then(function(ghOrgs) {
-      var strategy = new restSerializer.GitHubOrgStrategy(strategyOptions);
+      var strategy = new restSerializer.GithubOrgStrategy(strategyOptions);
 
       restSerializer.serialize(ghOrgs, strategy, function(err, serialized) {
         if(err) return next(err);

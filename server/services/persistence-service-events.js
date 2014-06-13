@@ -6,7 +6,7 @@ var logger = env.logger;
 var stats = env.stats;
 
 var appEvents = require("../app-events");
-var restSerializer =  require("../serializers/rest-serializer");
+var restSerializer = require("../serializers/rest-serializer");
 
 // --------------------------------------------------------------------
 // Utility serialization stuff
@@ -44,9 +44,6 @@ exports.install = function(persistenceService) {
 
   var schemas = persistenceService.schemas;
   var mongooseUtils = require("../utils/mongoose-utils");
-  var troupeService = require("./troupe-service");
-
-
 
   /** */
   function attachNotificationListenersToSchema(schema, name, extractor) {
@@ -88,7 +85,8 @@ exports.install = function(persistenceService) {
     ignoredPaths: ['lastTroupe','confirmationCode','status','passwordHash','passwordResetCode'],
     onUpdate: function onUserUpdate(model, next) {
 
-      troupeService.findAllTroupesIdsForUser(model.id, function(err, troupeIds) {
+      // Need to do the require in the function call, cyclic dependency with userService otherwise
+      require("./troupe-service").findAllTroupesIdsForUser(model.id, function(err, troupeIds) {
         if(err) { logger.error("Silently ignoring error in user update ", { exception: err }); return next(); }
         if(!troupeIds) return next();
 
@@ -252,4 +250,3 @@ exports.install = function(persistenceService) {
 
 
 };
-
