@@ -28,7 +28,8 @@ define([
       permInheritedLabel: '#perm-inherited-label',
       roomNameInput: '#room-name',
       dropDownButton: '#dd-button',
-      permissionsLabel: '#permissions-label'
+      permissionsLabel: '#permissions-label',
+      premiumRequired: '#premium-required'
     },
 
     events: {
@@ -173,9 +174,41 @@ define([
       this.recalcView(animated);
     },
 
+    selectedOptionsRequireUpgrade: function() {
+      var userIsPremium = context.user().get('premium');
+
+      var ownerModel = this.selectedModel;
+      if(!ownerModel) return false;
+
+      var orgIsPremium = false;
+
+      var permissions = this.$el.find('input[type=radio]:visible:checked').val();
+      if(permissions === 'public') return false;
+
+      switch(ownerModel.get('type')) {
+        case 'user':
+          return !userIsPremium;
+
+        case 'repo':
+          if(permissions === 'inherited') {
+            return !userIsPremium;
+          }
+
+          /* private */
+          return !userIsPremium;
+
+        case 'org':
+          if(permissions === 'inherited') return true;
+
+          /* private */
+          return !orgIsPremium;
+      }
+
+      return false;
+    },
+
     recalcView: function(animated) {
       if (!this.ui || !this._uiBindings) { return; }
-
 
       var self = this;
       var showHide = {
@@ -185,6 +218,7 @@ define([
         'permPrivate': false,
         'permInheritedOrg': false,
         'permInheritedRepo': false,
+        'premiumRequired': false,
         'existing': false,
         'permissionsLabel': true
       };
@@ -247,6 +281,9 @@ define([
         }
       }
 
+      if(showHide.permPrivate && this.ui.permPrivate.find('input[type=radio]').is(':checked')) {
+        showHide.premiumRequired = this.selectedOptionsRequireUpgrade();
+      }
 
       if(checkForRepo) {
         checkForRepoExistence(checkForRepo, function(exists) {
