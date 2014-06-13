@@ -10,8 +10,29 @@ var collections       = require("../../utils/collections");
 var GitHubRepoService = require('../../services/github/github-repo-service');
 var execPreloads      = require('../exec-preloads');
 var getVersion        = require('../get-model-version');
-var billingService    = require('../services/billing-service');
+var billingService    = require('../../services/billing-service');
 
+function UserPremiumStatusStrategy() {
+  var usersWithPlans;
+
+  this.preload = function(userIds, callback) {
+    return billingService.findActivePersonalPlansForUsers(userIds)
+      .then(function(subscriptions) {
+        usersWithPlans = subscriptions.reduce(function(memo, s) {
+          memo[s.userId] = true;
+          return memo;
+        }, {});
+
+        return true;
+      })
+      .nodeify(callback);
+  };
+
+  this.map = function(userId) {
+    return !!usersWithPlans[userId];
+  };
+
+}
 
 function UserRoleInTroupeStrategy(options) {
   var contributors;

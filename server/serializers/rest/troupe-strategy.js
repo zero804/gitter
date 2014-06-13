@@ -3,6 +3,8 @@
 
 var unreadItemService = require("../../services/unread-item-service");
 var recentRoomService = require('../../services/recent-room-service');
+var billingService    = require('../../services/billing-service');
+
 var _                 = require("underscore");
 var winston           = require('../../utils/winston');
 var execPreloads      = require('../exec-preloads');
@@ -108,6 +110,37 @@ function LurkTroupeForUserStrategy(options) {
 
 }
 
+function PremiumRoomStrategy() {
+  var premium = {};
+
+  this.preload = function(troupes, callback) {
+    var uris = troupes.map(function(troupe) {
+      if(!troupe.uri) return; // one-to-one
+
+      return troupe.uri.split('/', 1).shift();
+    }).filter(function(f) {
+      return !!f;
+    });
+
+    var uris = _.uniq(uris);
+    return billingService.findActivePlans(uris)
+      .then(function(subscriptions) {
+        subscriptions.forEach(function(subscription) {
+          return premium[subscription.uri] = true;
+        });
+
+        return true;
+      })
+      .nodeify(callback);
+  }
+
+  this.map = function(troupe) {
+    if(!troupe || !troupe.uri) return undefined;
+
+    return !!premium[troupe.uri];
+  }
+}
+
 function TroupeStrategy(options) {
   if(!options) options = {};
 
@@ -119,6 +152,7 @@ function TroupeStrategy(options) {
   var favouriteStrategy = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
   var lurkStrategy = currentUserId ? new LurkTroupeForUserStrategy(options) : null;
   var userIdStategy = new UserIdStrategy(options);
+  var premiumRoomStrategy = new PremiumRoomStrategy(options);
 
   this.preload = function(items, callback) {
 
@@ -153,6 +187,11 @@ function TroupeStrategy(options) {
       });
     }
 
+    strategies.push({
+      strategy: premiumRoomStrategy,
+      data: items
+    });
+
     var userIds;
     if(options.mapUsers) {
       userIds = _.flatten(items.map(function(troupe) { return troupe.getUserIds(); }));
@@ -169,7 +208,6 @@ function TroupeStrategy(options) {
       strategy: userIdStategy,
       data: userIds
     });
-
 
     execPreloads(strategies, callback);
   };
@@ -234,6 +272,7 @@ function TroupeStrategy(options) {
       url: troupeUrl,
       githubType: item.githubType,
       security: item.security,
+      premium: premiumRoomStrategy.map(item),
       v: getVersion(item)
     };
   };
