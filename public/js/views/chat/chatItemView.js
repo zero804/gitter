@@ -8,6 +8,7 @@ define([
   'views/widgets/avatar',
   'marionette',
   'views/base',
+  'views/app/uiVars',
   'views/popover',
   'hbs!./tmpl/chatViewItem',
   'views/chat/chatInputView',
@@ -16,7 +17,7 @@ define([
   'cocktail',
   'views/keyboard-events-mixin',
   'bootstrap_tooltip', // No ref
-], function($, _, context, chatModels, AvatarView, Marionette, TroupeViews, Popover,
+], function($, _, context, chatModels, AvatarView, Marionette, TroupeViews, uiVars, Popover,
   chatItemTemplate, chatInputView, UnreadItemViewMixin, appEvents, cocktail, KeyboardEventMixins) {
 
   "use strict";
@@ -27,6 +28,17 @@ define([
   /** @const */
   var EDIT_WINDOW = 240000;
 
+  var mouseEvents = {
+    'click .trpChatEdit':       'toggleEdit',
+    'click .trpChatReadBy':     'showReadBy',
+    'mouseover .trpChatReadBy': 'showReadByIntent',
+    'click .webhook':           'expandActivity'
+  };
+
+  var touchEvents = {
+    'hold' : 'toggleEdit'
+  };
+
   var ChatItemView = TroupeViews.Base.extend({
     attributes: {
       class: 'trpChatItemContainer'
@@ -35,12 +47,7 @@ define([
     template: chatItemTemplate,
     isEditing: false,
 
-    events: {
-      'click .trpChatEdit':       'toggleEdit',
-      'click .trpChatReadBy':     'showReadBy',
-      'mouseover .trpChatReadBy': 'showReadByIntent',
-      'click .webhook':           'expandActivity'
-    },
+    events: uiVars.isMobile ? touchEvents : mouseEvents,
 
     keyboardEvents: {
       'chat.edit.escape': 'onKeyEscape',

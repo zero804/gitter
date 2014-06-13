@@ -496,15 +496,6 @@ TroupeSchema.methods.reactivateUserById = function(userId) {
   }
 };
 
-
-var TroupeRemovedUserSchema = new Schema({
-  userId: { type: ObjectId },
-  troupeId: { type: ObjectId },
-  dateDeleted: { type: Date, "default": Date.now }
-});
-TroupeRemovedUserSchema.index({ userId: 1 });
-TroupeRemovedUserSchema.schemaTypeName = 'TroupeRemovedUserSchema';
-
 var UserTroupeSettingsSchema = require('./persistence/user-troupe-settings-schema.js');
 var UserSettingsSchema = require('./persistence/user-settings-schema.js');
 
@@ -845,7 +836,6 @@ var UserTroupeFavourites = mongoose.model('UserTroupeFavourites', UserTroupeFavo
 var Troupe = mongoose.model('Troupe', TroupeSchema);
 var TroupeUser = mongoose.model('TroupeUser', TroupeUserSchema);
 var TroupeBannedUser = mongoose.model('TroupeBannedUser', TroupeBannedUserSchema);
-var TroupeRemovedUser = mongoose.model('TroupeRemovedUser', TroupeRemovedUserSchema);
 var UserTroupeSettings = mongoose.model('UserTroupeSettings', UserTroupeSettingsSchema);
 var UserSettings = mongoose.model('UserSettings', UserSettingsSchema);
 var Email = mongoose.model('Email', EmailSchema);
@@ -887,7 +877,6 @@ module.exports = {
     TroupeSchema: TroupeSchema,
     TroupeUserSchema: TroupeUserSchema,
     TroupeBannedUserSchema: TroupeBannedUserSchema,
-    TroupeRemovedUserSchema: TroupeRemovedUserSchema,
     UserTroupeSettingsSchema: UserTroupeSettingsSchema,
     UserSettingsSchema: UserSettingsSchema,
     EmailSchema: EmailSchema,
@@ -916,7 +905,6 @@ module.exports = {
   Troupe: Troupe,
   TroupeUser: TroupeUser,
   TroupeBannedUser: TroupeBannedUser,
-  TroupeRemovedUser: TroupeRemovedUser,
   UserTroupeSettings: UserTroupeSettings,
   UserSettings: UserSettings,
 	Email: Email,
