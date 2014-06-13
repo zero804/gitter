@@ -251,12 +251,8 @@ blockquote {
   transition: opacity 0.2s ease;
   background-size: cover;
 
-
-  @media @mobile {
-    background-image: url('../../images/2/gitter/icon-edit-24@2x.png');
-    width: 24px;
-    height: 24px;
-    float: right;
+  @media @retina {
+    background-image: url('../../images/2/gitter/icon-edit@2x.png');
   }
 }
 
@@ -554,7 +550,6 @@ pre code {
 
   @media @mobile {
     margin-left: 24px;
-    padding: 0 0 0 12px;
   }
 
 }
@@ -634,11 +629,6 @@ pre code {
   -webkit-transition: opacity .25s ease-in-out;
 }
 
-.cantEdit .trpChatEdit {
-  @media @mobile {
-    display: none;
-  }
-}
 
 /*
 // hide the timeago when hovered
