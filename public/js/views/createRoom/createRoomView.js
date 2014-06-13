@@ -180,28 +180,31 @@ define([
       var ownerModel = this.selectedModel;
       if(!ownerModel) return false;
 
-      var orgIsPremium = false;
+      var ownerIsPremium = ownerModel.get('premium');
 
       var permissions = this.$el.find('input[type=radio]:visible:checked').val();
-      if(permissions === 'public') return false;
+      if(permissions === 'public' || !permissions) return false;
 
       switch(ownerModel.get('type')) {
         case 'user':
           return !userIsPremium;
 
         case 'repo':
+
           if(permissions === 'inherited') {
-            return !userIsPremium;
+            if(ownerModel.get('security') === 'PUBLIC') {
+              return false; // No need to upgrade, but this would be odd.
+            }
+
+            return !ownerIsPremium;
           }
 
           /* private */
-          return !userIsPremium;
+          return !ownerIsPremium;
 
         case 'org':
-          if(permissions === 'inherited') return true;
-
-          /* private */
-          return !orgIsPremium;
+          /* private or inherited */
+          return !ownerIsPremium;
       }
 
       return false;
@@ -281,9 +284,7 @@ define([
         }
       }
 
-      if(showHide.permPrivate && this.ui.permPrivate.find('input[type=radio]').is(':checked')) {
-        showHide.premiumRequired = this.selectedOptionsRequireUpgrade();
-      }
+      showHide.premiumRequired = this.selectedOptionsRequireUpgrade();
 
       if(checkForRepo) {
         checkForRepoExistence(checkForRepo, function(exists) {
