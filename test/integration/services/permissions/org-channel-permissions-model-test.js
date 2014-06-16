@@ -21,8 +21,12 @@ beforeEach(function() {
   userIsInRoomMock = mockito.mockFunction();
   orgPermissionsMock = mockito.mockFunction();
 
-  mockito.when(premiumOrThrowMock)().then(function(uri) {
+  mockito.when(premiumOrThrowMock)().then(function() {
     return Q.resolve(true);
+  });
+
+  mockito.when(orgPermissionsMock)().then(function() {
+    assert(false, 'THIS MOCK STILL NEEDS TO BE CONFIGURED');
   });
 
   permissionsModel = testRequire.withProxies("./services/permissions/org-channel-permissions-model", {
