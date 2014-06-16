@@ -568,6 +568,7 @@ var ChatMessageSchema = new Schema({
   fromUserId: ObjectId,
   toTroupeId: ObjectId,  //TODO: rename to troupeId
   text: String,
+  status: { type: Boolean, required: false },
   html: String,
   urls: Array,  // TODO: schema-ify this
   mentions: [{
