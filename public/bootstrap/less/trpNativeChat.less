@@ -22,7 +22,7 @@ body {
 	margin: 0px;
 	position: relative;
 	min-height: 300px;
-	.user-select(none)
+	.user-select(none);
 }
 
 html, body {
@@ -53,6 +53,17 @@ a {
 	overflow-x: hidden;
 	-webkit-overflow-scrolling: touch;
 }
+
+// People have big thumbs, so it is easier to make a large area selectable
+// and block out the detail text that we dont want than making only the
+// small message content selectable.
+.trpChatItemContainer {
+	.user-select(text);
+	.trpChatDetails {
+		.user-select(none);
+	}
+}
+
 /*
 .trpChatInputArea {
 	position: absolute;
