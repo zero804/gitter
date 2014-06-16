@@ -3,7 +3,7 @@
 
 var Q                    = require('q');
 var userIsInRoom         = require('../user-in-room');
-var uriIsPremium         = require('../uri-is-premium');
+var premiumOrThrow       = require('./premium-or-throw');
 
 var ALLOWED_USER_CHANNEL_SECURITY_VALUES = {
   PRIVATE: 1,
@@ -60,7 +60,7 @@ module.exports = function userChannelPermissionsModel(user, right, uri, security
           return Q.resolve(true);
 
         case 'PRIVATE':
-          return uriIsPremium(userUri);
+          return premiumOrThrow(userUri);
 
         default:
           throw new Error('Illegal state');

@@ -6,7 +6,7 @@ var collections       = require("../../utils/collections");
 var execPreloads      = require('../exec-preloads');
 var TroupeStrategy    = require('./troupe-strategy');
 
-function GitHubRepoStrategy(options) {
+function GithubRepoStrategy(options) {
 
   var troupeStrategy = new TroupeStrategy(options);
   var self = this;
@@ -38,4 +38,4 @@ function GitHubRepoStrategy(options) {
   };
 
 }
-module.exports = GitHubRepoStrategy;
+module.exports = GithubRepoStrategy;

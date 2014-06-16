@@ -3,7 +3,7 @@
 
 var Q                    = require('q');
 var userIsInRoom         = require('../user-in-room');
-var uriIsPremium         = require('../uri-is-premium');
+var premiumOrThrow       = require('./premium-or-throw');
 
 var repoPermissionsModel = require('./repo-permissions-model');
 
@@ -83,10 +83,7 @@ module.exports = function repoChannelPermissionsModel(user, right, uri, security
             .then(function(access) {
               if(!access) return false;
 
-              return uriIsPremium(repoOwnerUri)
-                .then(function(isPremium) {
-                  return isPremium;
-                });
+              return premiumOrThrow(repoOwnerUri);
             });
         default:
           throw new Error('Illegal state');

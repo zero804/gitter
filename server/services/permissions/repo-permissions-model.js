@@ -4,7 +4,7 @@
 var GitHubRepoService    = require('../github/github-repo-service');
 var winston              = require('../../utils/winston');
 var Q                    = require('q');
-var uriIsPremium         = require('../uri-is-premium');
+var premiumOrThrow       = require('./premium-or-throw');
 var appEvents            = require('../../app-events');
 var userIsInRoom         = require('../user-in-room');
 
@@ -75,14 +75,17 @@ module.exports = function repoPermissionsModel(user, right, uri, security) {
           if(!isAdmin) return false;
           if(!repoInfo.private) return true;
 
+          var ownerType = repoInfo.owner && repoInfo.owner.type;
           /* Private rooms. What to do... */
-          switch(repoInfo.owner.type) {
+          switch(ownerType) {
             case 'Organization': // American spelling because GitHub
-              return uriIsPremium(repoInfo.owner.login);
+              return premiumOrThrow(repoInfo.owner.login);
+
             case 'User':
-              return uriIsPremium(repoInfo.owner.login);
+              return premiumOrThrow(repoInfo.owner.login);
+
             default:
-              winston.error("Unknown owner type " + repoInfo.owner.type, { repo: repoInfo, user: user });
+              winston.error("Unknown owner type " + ownerType, { repo: repoInfo, user: user });
               return false;
           }
           break;
