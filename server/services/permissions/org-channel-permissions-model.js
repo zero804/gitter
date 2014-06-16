@@ -3,7 +3,7 @@
 
 var Q                    = require('q');
 var userIsInRoom         = require('../user-in-room');
-var uriIsPremium         = require('../uri-is-premium');
+var premiumOrThrow       = require('./premium-or-throw');
 
 var orgPermissionsModel  = require('./org-permissions-model');
 
@@ -79,10 +79,6 @@ module.exports = function orgChannelPermissionsModel(user, right, uri, security)
             .then(function(access) {
               if(!access) return false;
 
-              return uriIsPremium(orgUri)
-                .then(function(isPremium) {
-                  return isPremium;
-                });
             });
         default:
           throw new Error('Illegal state');
