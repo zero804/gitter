@@ -85,27 +85,33 @@ exports.install = function(persistenceService) {
     ignoredPaths: ['lastTroupe','confirmationCode','status','passwordHash','passwordResetCode'],
     onUpdate: function onUserUpdate(model, next) {
 
-      // Need to do the require in the function call, cyclic dependency with userService otherwise
-      require("./troupe-service").findAllTroupesIdsForUser(model.id, function(err, troupeIds) {
-        if(err) { logger.error("Silently ignoring error in user update ", { exception: err }); return next(); }
-        if(!troupeIds) return next();
+      persistenceService.Troupe
+        .where('users.userId', model.id)
+        .select('id')
+        .execQ()
+        .then(function(result) {
+          var troupeIds = result.map(function(troupe) { return troupe.id; } );
+          return troupeIds;
+        })
+        .nodeify(function(err, troupeIds) {
+          if(err) { logger.error("Silently ignoring error in user update ", { exception: err }); return next(); }
+          if(!troupeIds) return next();
 
-        restSerializer.serializeModel(model, function(err, serializedModel) {
-          if(err) { logger.error("Silently failing user update: ", { exception: err }); return next(); }
+          restSerializer.serializeModel(model, function(err, serializedModel) {
+            if(err) { logger.error("Silently failing user update: ", { exception: err }); return next(); }
 
-          troupeIds.forEach(function(troupeId) {
-            var url = "/rooms/" + troupeId + "/users";
-            appEvents.dataChange2(url, "update", serializedModel);
+            troupeIds.forEach(function(troupeId) {
+              var url = "/rooms/" + troupeId + "/users";
+              appEvents.dataChange2(url, "update", serializedModel);
+            });
+
+            next();
           });
-
-          next();
         });
-      });
     }
 
     // TODO: deal with user deletion!
   });
-
 
   // MixPanel tracking
   schemas.UserSchema.post('save', function(model) {
