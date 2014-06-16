@@ -83,7 +83,7 @@ module.exports = function(err, req, res, next) {
     template = '402';
     stack = null;
     extraTemplateValues = {
-      billingUrl: err.uri
+      billingUrl: config.get('web:billingBaseUrl')  + '/bill/' + err.uri
     }
 
     stats.event('client_error_402', { userId: userId });
