@@ -28,6 +28,16 @@ exports.findActiveOrgPlans = function(orgUris) {
   });
 }
 
+exports.findActivePlan = function(uri) {
+  var lcUri = toLowerCase(uri);
+
+  return persistence.Subscription.findOneQ({
+    lcUri: lcUri,
+    status: 'CURRENT'
+  });
+
+}
+
 exports.findActivePlans = function(uris) {
   if(!uris || !uris.length) return Q.resolve([]);
 

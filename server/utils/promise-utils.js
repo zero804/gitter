@@ -1,17 +1,20 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var StatusError = require('statuserror');
+
 /* Ensure that the last promise has returned a value */
 exports.required = function(value) {
-	if(!value) throw 404;
+	if(!value) throw new StatusError(404, 'Value required');
 	return value;
 };
 
 /* Always return a given value from the promise */
-exports.value = function(value) {
-	return function() {
-		return value;
-	};
-};
+// Q ALREADY DOES THIS
+// exports.value = function(value) {
+// 	return function() {
+// 		return value;
+// 	};
+// };
 
 
