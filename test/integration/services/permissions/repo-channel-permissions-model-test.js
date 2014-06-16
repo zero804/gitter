@@ -10,24 +10,24 @@ var mockito = require('jsmockito').JsMockito;
 
 var user;
 var permissionsModel;
-var uriIsPremiumMethodMock;
+var premiumOrThrowMock;
 var userIsInRoomMock;
 var repoPermissionsMock;
 
 beforeEach(function() {
   user = { username: 'gitterbob' };
 
-  uriIsPremiumMethodMock = mockito.mockFunction();
+  premiumOrThrowMock = mockito.mockFunction();
   userIsInRoomMock = mockito.mockFunction();
   repoPermissionsMock = mockito.mockFunction();
 
-  mockito.when(uriIsPremiumMethodMock)().then(function(uri) {
+  mockito.when(premiumOrThrowMock)().then(function(uri) {
     return Q.resolve(true);
   });
 
   permissionsModel = testRequire.withProxies("./services/permissions/repo-channel-permissions-model", {
     './repo-permissions-model': repoPermissionsMock,
-    '../uri-is-premium': uriIsPremiumMethodMock,
+    './premium-or-throw': premiumOrThrowMock,
     '../user-in-room': userIsInRoomMock
   });
 

@@ -8,32 +8,19 @@ var assert = require('assert');
 var Q = require('q');
 var testGenerator = require('../../test-generator');
 var mockito = require('jsmockito').JsMockito;
+var StatusError = require('statuserror');
 
-var permissionsModel;
-var getRepoMethodMock;
-var uriIsPremiumMethodMock;
 var ORG = 'ORG';
 var URI = 'ORG/REPO';
 var USERNAME = 'gitterbob';
 
-function GitHubRepoServiceMocker() {
-  this.getRepo = getRepoMethodMock;
+function createMockGitHubRepoService(getRepoMethodMock) {
+  function GitHubRepoServiceMocker() {
+    this.getRepo = getRepoMethodMock;
+  }
+
+  return GitHubRepoServiceMocker;
 }
-
-beforeEach(function() {
-  ORG = 'ORG';
-  URI = 'ORG/REPO';
-  USERNAME = 'gitterbob';
-
-  getRepoMethodMock = mockito.mockFunction();
-  uriIsPremiumMethodMock = mockito.mockFunction();
-
-  permissionsModel = testRequire.withProxies("./services/permissions/repo-permissions-model", {
-    '../github/github-repo-service': GitHubRepoServiceMocker,
-    '../uri-is-premium': uriIsPremiumMethodMock
-  });
-
-});
 
 var ALL_RIGHTS = ['create', 'join', 'admin', 'adduser', 'view'];
 var ALL_RIGHTS_TESTS = ALL_RIGHTS.map(function(right) {
@@ -134,7 +121,7 @@ var FIXTURES = [{
           expectedResult: true // Users with push access have full rights
         },
         tests: [
-          { right: 'create',  expectedResult: false },
+          { right: 'create',  expectedResult: 'throw', expectedErrStatus: 402 },
           { right: 'join',    expectedResult: true  },
           { right: 'admin',   expectedResult: true },
           { right: 'adduser', expectedResult: true },
@@ -246,7 +233,7 @@ var FIXTURES = [{
             repo: { private: true, permissions: { push: true }, owner: { login: ORG, type: 'Organization' } },
           },
           tests: [
-            { right: 'create',  expectedResult: false }, // Cannot create a private room in a free org
+            { right: 'create',  expectedResult: 'throw', expectedErrStatus: 402 }, // Cannot create a private room in a free org
             { right: 'join',    expectedResult: true  },
             { right: 'admin',   expectedResult: true  },
             { right: 'adduser', expectedResult: true  },
@@ -306,23 +293,46 @@ var FIXTURES = [{
 describe('repo-permissions', function() {
   testGenerator(FIXTURES, function(name, meta) {
 
-    var RIGHT = meta.right;
-    var USER = meta.user ? { username: USERNAME } : null;
-    var EXPECTED = meta.expectedResult;
-    var SECURITY = meta.security;
-
-    if(!name) name = 'should be ' + (EXPECTED ? 'allowed' : 'denied') + ' ' + RIGHT;
+    if(!name) name = 'should be ' + (meta.expectedResult ? 'allowed' : 'denied') + ' ' + meta.right;
     it(name, function(done) {
-      mockito.when(uriIsPremiumMethodMock)().then(function(uri, callback) {
-        if(uri === USER.username) {
-          return Q.resolve(!!meta.premiumUser).nodeify(callback);
-        }
+      var RIGHT = meta.right;
+      var USER = meta.user ? { username: USERNAME } : null;
+      var EXPECTED = meta.expectedResult;
+      var SECURITY = meta.security;
 
-        if(uri === ORG) {
-          return Q.resolve(!!meta.premiumOrg).nodeify(callback);
-        }
+      // ---------------------------------------------
 
-        assert(false, 'Unknown uri ' + uri);
+      var permissionsModel;
+      var getRepoMethodMock = mockito.mockFunction();
+      var premiumOrThrowMock = mockito.mockFunction();
+
+      ORG = 'ORG';
+      URI = 'ORG/REPO';
+      USERNAME = 'gitterbob';
+
+      permissionsModel = testRequire.withProxies("./services/permissions/repo-permissions-model", {
+        '../github/github-repo-service': createMockGitHubRepoService(getRepoMethodMock),
+        './premium-or-throw': premiumOrThrowMock
+      });
+
+      mockito.when(premiumOrThrowMock)().then(function(uri, callback) {
+        return Q.fcall(function() {
+          if(uri === USER.username) {
+            if(meta.premiumUser) return true;
+
+            throw new StatusError(402, 'Fail');
+          }
+
+          if(uri === ORG) {
+            if(meta.premiumOrg) return true;
+
+            throw new StatusError(402, 'Fail');
+          }
+
+          assert(false, 'Unknown uri ' + uri);
+
+        })
+        .nodeify(callback);
       });
 
       mockito.when(getRepoMethodMock)().then(function(uri) {
@@ -332,7 +342,16 @@ describe('repo-permissions', function() {
 
       permissionsModel(USER, RIGHT, URI, SECURITY)
         .then(function(result) {
-          assert.strictEqual(result, EXPECTED);
+          if(EXPECTED !== 'throw') {
+            assert.strictEqual(result, EXPECTED);
+          } else {
+            assert(false, 'Expected the permission model to throw an exception');
+          }
+        }, function(err) {
+          if(EXPECTED !== 'throw') throw err;
+          if(meta.expectedErrStatus) {
+            assert.strictEqual(err.status, meta.expectedErrStatus);
+          }
         })
         .nodeify(done);
     });

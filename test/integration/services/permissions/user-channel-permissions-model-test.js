@@ -6,6 +6,7 @@ var testRequire = require('../../test-require');
 var assert = require('assert');
 var Q = require('q');
 var testGenerator = require('../../test-generator');
+var StatusError = require('statuserror');
 
 var mockito = require('jsmockito').JsMockito;
 
@@ -54,7 +55,7 @@ var FIXTURES = [{
           { name: 'allow create of a public channel',
             security: 'PUBLIC', expectedResult: true },
           { name: 'deny create of a private channel for free user',
-            security: 'PRIVATE', expectedResult: false, premiumUser: false },
+            security: 'PRIVATE', expectedResult: 'throw', expectedErrStatus: 402, premiumUser: false },
           { name: 'allow create of a private channel for premium user',
             security: 'PRIVATE', expectedResult: true, premiumUser: true },
         ]
@@ -115,29 +116,33 @@ var FIXTURES = [{
 describe('user-channel-permissions', function() {
   testGenerator(FIXTURES, function(name, meta) {
 
-    var RIGHT = meta.right;
-    var USER = meta.user ? { username: USERNAME } : null;
-    var EXPECTED = meta.expectedResult;
-    var SECURITY = meta.security;
-    var URI = meta.ownChannel ? USERNAME + '/channel' : 'someoneelse/channel';
-
-    if(!name) name = 'should be ' + (EXPECTED ? 'allowed' : 'denied') + ' ' + RIGHT;
-
+    if(!name) name = 'should be ' + (meta.expectedResult ? 'allowed' : 'denied') + ' ' + meta.right;
     it(name, function(done) {
-      var uriIsPremiumMethodMock = mockito.mockFunction();
+      var RIGHT = meta.right;
+      var USER = meta.user ? { username: USERNAME } : null;
+      var EXPECTED = meta.expectedResult;
+      var SECURITY = meta.security;
+      var URI = meta.ownChannel ? USERNAME + '/channel' : 'someoneelse/channel';
+
+      var premiumOrThrowMock = mockito.mockFunction();
       var userIsInRoomMock = mockito.mockFunction();
 
       var permissionsModel = testRequire.withProxies("./services/permissions/user-channel-permissions-model", {
-        '../uri-is-premium': uriIsPremiumMethodMock,
+        './premium-or-throw': premiumOrThrowMock,
         '../user-in-room': userIsInRoomMock
       });
 
-      mockito.when(uriIsPremiumMethodMock)().then(function(uri, callback) {
-        if(uri === USER.username) {
-          return Q.resolve(!!meta.premiumUser).nodeify(callback);
-        }
+      mockito.when(premiumOrThrowMock)().then(function(uri) {
+        return Q.fcall(function() {
+          if(USER && uri === USER.username) {
+            if(meta.premiumUser) return true;
 
-        assert(false, 'Unknown uri ' + uri);
+            throw new StatusError(402, 'Fail');
+          }
+
+          assert(false, 'Unknown uri ' + uri);
+        });
+
       });
 
       mockito.when(userIsInRoomMock)().then(function(uri, user) {
@@ -148,10 +153,20 @@ describe('user-channel-permissions', function() {
 
       permissionsModel(USER, RIGHT, URI, SECURITY)
         .then(function(result) {
-          assert.strictEqual(result, EXPECTED);
+          if(EXPECTED !== 'throw') {
+            assert.strictEqual(result, EXPECTED);
+          } else {
+            assert(false, 'Expected the permission model to throw an exception');
+          }
+        }, function(err) {
+          if(EXPECTED !== 'throw') throw err;
+          if(meta.expectedErrStatus) {
+            assert.strictEqual(err.status, meta.expectedErrStatus);
+          }
         })
         .nodeify(done);
     });
+
   });
 });
 
