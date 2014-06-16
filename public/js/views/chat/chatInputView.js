@@ -280,20 +280,33 @@ define([
       this.$el.find('textarea').attr('placeholder', placeholder).focus();
     },
 
-    isStatusMessage: function(message) {
+    /**
+     * isStatusMessage() checks whether message is a status ('/me' command).
+     *
+     * @param <String> message
+     * @return <Boolean>
+     */
+    isStatusMessage: function (message) {
       return /^\/me /.test(message); // if it starts with '/me' it should be a status update
     },
 
-    /* TODO: Clean it up. */
-    toStatusText: function (message) {
-      var finalMessage = message.split(' ');
-      finalMessage[0] = '@' + context.getUser().username;
-      finalMessage = finalMessage.join(' ');
-      return finalMessage;
+    /**
+     * textToStatus() converts a message to a status, removing the '/me' and replacing it with the current user's username
+     *
+     * @param <String> message
+     * @return <Boolean>
+     */
+    textToStatus: function (message) {
+      return message.replace(/^\/me /, '@' + context.getUser().username + ' ');
     },
 
-    send: function(val) {
-      
+    /**
+     * send() {describe}
+     *
+     * @param <String> val
+     * @return <Boolean>
+     */
+    send: function (val) {
       if (val) {
         /* baseline for message model */
         var newMessage = {
@@ -302,20 +315,18 @@ define([
           sent: moment(),
         };
 
-        /* TODO: Clean it up */
         /* if it is a status message add a key `status` to the Object created above with value `true` */
         if (this.isStatusMessage(newMessage.text)) {
+          newMessage.text = this.textToStatus(newMessage.text);
           newMessage.status = true;
-          newMessage.text = this.toStatusText(newMessage.text);
-          console.debug('IS STATUS MESSAGE:', newMessage);
-        } 
+        }
 
-        /* go ahead and create the model */
+        /* create the model */
         var model = this.collection.create(newMessage);
 
+        /* emit event with model created */
         appEvents.trigger('chat.send', model);
       }
-
       return false;
     },
 
