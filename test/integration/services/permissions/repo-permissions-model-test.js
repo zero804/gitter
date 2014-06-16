@@ -233,7 +233,7 @@ var FIXTURES = [{
             repo: { private: true, permissions: { push: true }, owner: { login: ORG, type: 'Organization' } },
           },
           tests: [
-            { right: 'create',  expectedResult: 'throw', expectedErrStatus: 402 }, // Cannot create a private room in a free org
+            { right: 'create',  expectedResult: 'throw', expectedErrStatus: 402  }, // Cannot create a private room in a free org
             { right: 'join',    expectedResult: true  },
             { right: 'admin',   expectedResult: true  },
             { right: 'adduser', expectedResult: true  },
