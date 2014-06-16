@@ -1,6 +1,8 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
   'jquery',
+  'utils/context',
+  'components/cordova-navigate',
   'collections/chat',
   'views/chat/chatCollectionView',
   'views/chat/chatInputView',
@@ -10,7 +12,7 @@ require([
   'log!mobile-native-chat',
   'components/eyeballs',                        // No ref
   'components/csrf'                             // No ref
-  ], function($, chatModels, ChatCollectionView, chatInputView, unreadItemsClient, cacheSync,
+  ], function($, context, cordovaNav, chatModels, ChatCollectionView, chatInputView, unreadItemsClient, cacheSync,
     emojiDecorator, log) {
 
   "use strict";
@@ -25,6 +27,8 @@ require([
       log('Unable to update application cache: ' + e, e);
     }
   });
+
+  cordovaNav.syncNativeWithWebContext(context.troupe());
 
   var chatCollection = new chatModels.ChatCollection();
   cacheSync.install(chatCollection);
