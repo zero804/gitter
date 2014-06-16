@@ -280,15 +280,42 @@ define([
       this.$el.find('textarea').attr('placeholder', placeholder).focus();
     },
 
+    isStatusMessage: function(message) {
+      return /^\/me /.test(message); // if it starts with '/me' it should be a status update
+    },
+
+    /* TODO: Clean it up. */
+    toStatusText: function (message) {
+      var finalMessage = message.split(' ');
+      finalMessage[0] = '@' + context.getUser().username;
+      finalMessage = finalMessage.join(' ');
+      return finalMessage;
+    },
+
     send: function(val) {
-      if(val) {
-        var model = this.collection.create({
+      
+      if (val) {
+        /* baseline for message model */
+        var newMessage = {
           text: val,
           fromUser: context.getUser(),
-          sent: moment()
-        });
+          sent: moment(),
+        };
+
+        /* TODO: Clean it up */
+        /* if it is a status message add a key `status` to the Object created above with value `true` */
+        if (this.isStatusMessage(newMessage.text)) {
+          newMessage.status = true;
+          newMessage.text = this.toStatusText(newMessage.text);
+          console.debug('IS STATUS MESSAGE:', newMessage);
+        } 
+
+        /* go ahead and create the model */
+        var model = this.collection.create(newMessage);
+
         appEvents.trigger('chat.send', model);
       }
+
       return false;
     },
 
