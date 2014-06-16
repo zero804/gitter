@@ -152,10 +152,16 @@ define([
           dataType: "json",
           type: "PUT",
           data: JSON.stringify({ lurk: true }),
-          success: done
+          success: done,
         });
 
       }
+    },
+    {
+      command: 'me',
+      description: 'Let people know what\'s happening',
+      completion: 'me ',
+      regexp: /^\/me/
     },
     {
       command: 'query @username',
