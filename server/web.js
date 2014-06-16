@@ -6,6 +6,7 @@
 
 /* Configure winston before all else! */
 var winston  = require('./utils/winston');
+winston.info('Starting server/web.js');
 
 var express  = require('express');
 var http     = require('http');
