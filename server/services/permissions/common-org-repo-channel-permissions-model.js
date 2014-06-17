@@ -21,7 +21,7 @@ module.exports = function(delegatePermissionsModel, userIsInRoom, premiumOrThrow
 
   return function commonChannelPermissionsModel(user, right, uri, security) {
     if(!ALLOWED_SECURITY_VALUES.hasOwnProperty(security)) {
-      return Q.reject(new Error('Invalid security type:' + security));
+      return Q.reject(new Error('Unknown security: ' + security));
     }
 
     // Anyone can view a public ORG or REPO channel
@@ -47,7 +47,7 @@ module.exports = function(delegatePermissionsModel, userIsInRoom, premiumOrThrow
           case 'INHERITED':
             return delegatePermissionsModel(user, right, uriLastPart);
           default:
-            throw 'Unknown security: ' + security;
+            throw new Error('Unknown security: ' + security);
         }
         break;
 
@@ -68,7 +68,7 @@ module.exports = function(delegatePermissionsModel, userIsInRoom, premiumOrThrow
           case 'INHERITED':
             return delegatePermissionsModel(user, right, uriLastPart);
           default:
-            throw 'Unknown security: ' + security;
+            throw new Error('Unknown security: ' + security);
         }
         break;
 
@@ -89,7 +89,7 @@ module.exports = function(delegatePermissionsModel, userIsInRoom, premiumOrThrow
                 return premiumOrThrow(uriFirstPart);
               });
           default:
-            throw new Error('Illegal state');
+            throw new Error('Unknown security: ' + security);
         }
         break;
 
@@ -98,7 +98,7 @@ module.exports = function(delegatePermissionsModel, userIsInRoom, premiumOrThrow
         return delegatePermissionsModel(user, 'admin', uriLastPart);
 
       default:
-        throw 'Unknown right ' + right;
+        throw new Error('Unknown right: ' + right);
     }
   };
 };
