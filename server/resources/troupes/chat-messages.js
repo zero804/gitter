@@ -35,7 +35,6 @@ module.exports = {
       if(err) return next(err);
 
       var strategy = new restSerializer.ChatStrategy({ currentUserId: req.user.id, troupeId: req.troupe.id });
-      console.log(chatMessage);
 
       restSerializer.serialize(chatMessage, strategy, function (err, serialized) {
         if(err) return next(err);
