@@ -7,36 +7,11 @@ var assert = require('assert');
 var _ = require('underscore');
 var Q = require('q');
 var testGenerator = require('../../test-generator');
-
 var mockito = require('jsmockito').JsMockito;
 
-var permissionsModel;
-var premiumOrThrowMock;
-var userIsInRoomMock;
-var repoPermissionsMock;
-var USER;
-var URI;
-var PARENT_URI;
-
-beforeEach(function() {
-  USER = { username: 'gitterbob' };
-  URI = 'x/custom';
-  PARENT_URI = 'x';
-
-  premiumOrThrowMock = mockito.mockFunction();
-  userIsInRoomMock = mockito.mockFunction();
-  repoPermissionsMock = mockito.mockFunction();
-
-  mockito.when(premiumOrThrowMock)().then(function() {
-    return Q.resolve(true);
-  });
-
-  permissionsModel = testRequire.withProxies("./services/permissions/repo-channel-permissions-model", {
-    './repo-permissions-model': repoPermissionsMock,
-    './premium-or-throw': premiumOrThrowMock,
-    '../user-in-room': userIsInRoomMock
-  });
-});
+var USER = { username: 'gitterbob' };
+var URI = 'x/custom';
+var PARENT_URI = 'x';
 
 var resolveUserInRoom = function(res) {
   return function(uri, user) {
@@ -172,7 +147,7 @@ var makeTest = function(params, expectedResult) {
 };
 
 var FIXTURES = _.map(tests, function(rights, security) {
-  // First level of the Object are the keys reprensenting the security
+  // First level of the Object are the keys representing the security
   return {
     name: security,
     meta: {
@@ -213,23 +188,47 @@ var FIXTURES = _.map(tests, function(rights, security) {
   };
 });
 
-describe('repo channel permissions', function() {
-  testGenerator(FIXTURES, function(name, meta) {
-    var RIGHT = meta.right;
-    var EXPECTED = meta.expectedResult;
-    var SECURITY = meta.security;
-    name = name || 'should ' + (EXPECTED ? 'allow' : 'deny') + ' ' + RIGHT;
+var premiumOrThrowMock = mockito.mockFunction();
+var userIsInRoomMock = mockito.mockFunction();
 
-    it(name, function(done) {
-      mockito.when(userIsInRoomMock)().then(meta.inRoom);
-      mockito.when(repoPermissionsMock)().then(meta.permission);
+var generate = function(name, permsMock, permsModel) {
+  describe(name + ' channel permissions', function() {
+    testGenerator(FIXTURES, function(name, meta) {
+      var RIGHT = meta.right;
+      var EXPECTED = meta.expectedResult;
+      var SECURITY = meta.security;
+      name = name || 'should ' + (EXPECTED ? 'allow' : 'deny') + ' ' + RIGHT;
 
-      permissionsModel(USER, RIGHT, URI, SECURITY)
-        .then(function(result) {
-          if (EXPECTED) assert(result);
-          else assert(!result);
-        })
-        .nodeify(done);
+      it(name, function(done) {
+        mockito.when(premiumOrThrowMock)().then(function() {
+          return Q.resolve(true);
+        });
+        mockito.when(userIsInRoomMock)().then(meta.inRoom);
+        mockito.when(permsMock)().then(meta.permission);
+
+        permsModel(USER, RIGHT, URI, SECURITY)
+          .then(function(result) {
+            if (EXPECTED) assert(result);
+            else assert(!result);
+          })
+          .nodeify(done);
+      });
     });
   });
+};
+
+var orgPermissionsMock = mockito.mockFunction();
+var orgPermissionsModel = testRequire.withProxies("./services/permissions/org-channel-permissions-model", {
+  './org-permissions-model': orgPermissionsMock,
+  './premium-or-throw': premiumOrThrowMock,
+  '../user-in-room': userIsInRoomMock
 });
+generate('org', orgPermissionsMock, orgPermissionsModel);
+
+var repoPermissionsMock = mockito.mockFunction();
+var repoPermissionsModel = testRequire.withProxies("./services/permissions/repo-channel-permissions-model", {
+  './repo-permissions-model': repoPermissionsMock,
+  './premium-or-throw': premiumOrThrowMock,
+  '../user-in-room': userIsInRoomMock
+});
+generate('repo', repoPermissionsMock, repoPermissionsModel);
