@@ -1,19 +1,20 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var env           = require('../utils/env');
-var stats         = env.stats;
+var env              = require('../utils/env');
+var stats            = env.stats;
 
-var persistence   = require("./persistence-service");
-var collections   = require("../utils/collections");
-var troupeService = require("./troupe-service");
-var userService   = require("./user-service");
-var unsafeHtml    = require('../utils/unsafe-html');
-var processChat   = require('../utils/process-chat');
-var appEvents     = require('../app-events');
-var Q             = require('q');
-var mongoUtils    = require('../utils/mongo-utils');
-var moment        = require('moment');
+var persistence      = require("./persistence-service");
+var collections      = require("../utils/collections");
+var troupeService    = require("./troupe-service");
+var userService      = require("./user-service");
+var unsafeHtml       = require('../utils/unsafe-html');
+var processChat      = require('../utils/process-chat');
+var appEvents        = require('../app-events');
+var Q                = require('q');
+var mongoUtils       = require('../utils/mongo-utils');
+var moment           = require('moment');
+var roomCapabilities = require('./room-capabilities');
 
 /*
  * Hey Trouper!
@@ -53,7 +54,6 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
       text: text,                // Keep the raw message.
       html: parsedMessage.html
     });
-
 
     /* Look through the mentions and attempt to tie the mentions to userIds */
     var mentionUserNames = parsedMessage.mentions.map(function(mention) {
@@ -195,27 +195,34 @@ function massageMessages(message) {
 }
 
 exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
-  var q = persistence.ChatMessage
-    .where('toTroupeId', troupeId);
+  return roomCapabilities.getMaxHistoryMessageDate(troupeId)
+    .then(function(maxHistoryDate) {
+      var q = persistence.ChatMessage
+        .where('toTroupeId', troupeId);
 
-  if(options.startId) {
-    var startId = new ObjectID(options.startId);
-    q = q.where('_id').gte(startId);
-  }
+      if(maxHistoryDate) {
+        q = q.where('sent').gte(maxHistoryDate);
+      }
 
-  if(options.beforeId) {
-    var beforeId = new ObjectID(options.beforeId);
-    q = q.where('_id').lt(beforeId);
-  }
+      if(options.startId) {
+        var startId = new ObjectID(options.startId);
+        q = q.where('_id').gte(startId);
+      }
 
-  q.sort(options.sort || { sent: 'desc' })
-    .limit(options.limit || 50)
-    .skip(options.skip || 0)
-    .exec(function(err, results) {
-      if(err) return callback(err);
+      if(options.beforeId) {
+        var beforeId = new ObjectID(options.beforeId);
+        q = q.where('_id').lt(beforeId);
+      }
 
-      return callback(null, results.map(massageMessages).reverse());
-    });
+      return q.sort(options.sort || { sent: 'desc' })
+        .limit(options.limit || 50)
+        .skip(options.skip || 0)
+        .execQ()
+        .then(function(results) {
+          return results.map(massageMessages).reverse();
+        })
+    })
+    .nodeify(callback)
 };
 
 exports.findChatMessagesForTroupeForDateRange = function(troupeId, startDate, endDate, callback) {
