@@ -10,7 +10,8 @@ define([
   'views/base',
   'views/app/uiVars',
   'views/popover',
-  'hbs!./tmpl/chatViewItem',
+  'hbs!./tmpl/chatItemView',
+  'hbs!./tmpl/statusItemView',
   'views/chat/chatInputView',
   'views/unread-item-view-mixin',
   'utils/appevents',
@@ -18,7 +19,7 @@ define([
   'views/keyboard-events-mixin',
   'bootstrap_tooltip', // No ref
 ], function($, _, context, chatModels, AvatarView, Marionette, TroupeViews, uiVars, Popover,
-  chatItemTemplate, chatInputView, UnreadItemViewMixin, appEvents, cocktail, KeyboardEventMixins) {
+  chatItemTemplate, statusItemTemplate, chatInputView, UnreadItemViewMixin, appEvents, cocktail, KeyboardEventMixins) {
 
   "use strict";
 
@@ -44,7 +45,6 @@ define([
       class: 'trpChatItemContainer'
     },
     unreadItemType: 'chat',
-    template: chatItemTemplate,
     isEditing: false,
 
     events: uiVars.isMobile ? touchEvents : mouseEvents,
@@ -84,6 +84,13 @@ define([
         var oldInMS = this.model.get('sent').valueOf() + OLD_TIMEOUT - Date.now();
         setTimeout(timeChange, oldInMS + 50);
       }
+    },
+
+    template: function (serializedData) {
+      if (serializedData.status) {
+        return statusItemTemplate(serializedData);
+      }
+      return chatItemTemplate(serializedData);
     },
 
     getRenderData: function() {
