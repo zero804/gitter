@@ -658,6 +658,11 @@ pre code {
 .trpChatItemContainer:hover .trpChatEdit,
 .trpChatItemContainer:hover .trpChatReads {
   visibility: visible;
+
+  @media @mobile {
+    visibility: hidden;
+  }
+
 }
 
 .trpChatItemContainer.cantEdit .trpChatBox:hover .trpChatEdit {
@@ -689,14 +694,14 @@ pre code {
 
 .canEdit .trpChatEdit {
   @media @mobile {
-    visibility: visible;
+    visibility: hidden;
     display: inline-block;
   }
 }
 
 .canEdit .trpChatEdit:hover {
   @media @mobile {
-    visibility: visible;
+    visibility: hidden;
     display: inline-block;
   }
 }
