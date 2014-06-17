@@ -6,6 +6,7 @@ var troupeService = require('../../services/troupe-service');
 var chatService   = require('../../services/chat-service');
 var nconf         = require('../../utils/config');
 var Q             = require('q');
+var StatusError   = require('statuserror');
 
 var env           = require('../../utils/env');
 var stats         = env.stats;
@@ -26,7 +27,7 @@ module.exports = function(req, res, next) {
   redisClient.get('transloadit:' + token, function(err, data) {
     if(err) return next(err);
 
-    if(!data) return next(404);
+    if(!data) return next(new StatusError(404));
 
     var metadata;
     try {
@@ -53,8 +54,11 @@ module.exports = function(req, res, next) {
 
     return troupeService.findById(metadata.room_id)
       .then(function(room) {
+        if(!room) throw new StatusError(404, 'Unable to find room ' + metadata.room_id);
+
         return userService.findById(metadata.user_id)
           .then(function(user) {
+            if(!user) throw new StatusError(404, 'Unable to find user ' + metadata.user_id);
 
             var thumbs = {};
 
@@ -84,9 +88,8 @@ module.exports = function(req, res, next) {
               }
 
               stats.event('file.upload');
-              return chatService.newChatMessageToTroupe(room, user, text);
+              return chatService.newChatMessageToTroupe(room, user, { text: text });
             });
-
 
             return Q.all(promises);
           });
