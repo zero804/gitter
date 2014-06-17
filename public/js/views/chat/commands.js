@@ -152,7 +152,7 @@ define([
           dataType: "json",
           type: "PUT",
           data: JSON.stringify({ lurk: true }),
-          success: done,
+          success: done
         });
 
       }

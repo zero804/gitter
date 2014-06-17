@@ -523,7 +523,7 @@ define([
 
     processInput: function() {
       var cmd = commands.findMatch(this.$el.val());
-      if(cmd && typeof cmd.action !== "undefined") {
+      if(cmd && cmd.action) {
         cmd.action(this);
       } else {
         this.send();
