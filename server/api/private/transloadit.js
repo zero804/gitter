@@ -7,6 +7,11 @@ var chatService   = require('../../services/chat-service');
 var nconf         = require('../../utils/config');
 var Q             = require('q');
 
+var env           = require('../../utils/env');
+var stats         = env.stats;
+var logger        = env.logger;
+
+
 var redis         = require('../../utils/redis');
 var redisClient   = redis.createClient();
 
@@ -23,11 +28,27 @@ module.exports = function(req, res, next) {
 
     if(!data) return next(404);
 
-    var metadata = JSON.parse(data);
-    var transloadit = JSON.parse(req.body.transloadit);
+    var metadata;
+    try {
+      metadata = JSON.parse(data);
+    } catch(e) {
+      logger.info('Unable to parse redis data', { data: data });
+      return next(new Error('JSON parse error: ' + e.message));
+    }
+
+    var transloadit;
+    try {
+      transloadit = req.body.transloadit;
+
+      if(typeof transloadit === 'string') {
+        transloadit = JSON.parse(req.body.transloadit);
+      }
+    } catch(e) {
+      return next(new Error('Transloadit json parse error: ' + e.message));
+    }
 
     if (transloadit.ok !== 'ASSEMBLY_COMPLETED') {
-      return next(500);
+      return next(new Error('Transload did not return ASSEMBLY_COMPLETED.'));
     }
 
     return troupeService.findById(metadata.room_id)
@@ -62,6 +83,7 @@ module.exports = function(req, res, next) {
                 text = "[" + name + "](" + url + ")";
               }
 
+              stats.event('file.upload');
               return chatService.newChatMessageToTroupe(room, user, text);
             });
 
