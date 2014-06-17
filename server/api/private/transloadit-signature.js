@@ -94,7 +94,11 @@ module.exports =  function(req, res) {
 
   // Store the token temporarily to verify Transloadit callback
   var expiry = 30 * 60; // 30 mins to be safe, S3 uploads, etc
-  var metadata = {room_id: req.query.room_id, user_id: req.user.id};
+  var metadata = {
+    room_id: req.query.room_id,
+    user_id: req.user.id
+  };
+
   redisClient.setex('transloadit:' + token, expiry, JSON.stringify(metadata));
 
   res.send({
