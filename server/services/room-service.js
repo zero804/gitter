@@ -180,8 +180,6 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
           return securityPromise.then(function(security) {
               var nonce = Math.floor(Math.random() * 100000);
 
-              console.log('CREATING >>> ', officialUri);
-
               return persistence.Troupe.findOneAndUpdateQ(
                 { lcUri: lcUri, githubType: githubType },
                 {
