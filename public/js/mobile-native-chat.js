@@ -9,11 +9,12 @@ require([
   'components/unread-items-client',
   'components/cache-sync',
   'views/chat/decorators/emojiDecorator',
+  'views/chat/decorators/mobileDecorator',
   'log!mobile-native-chat',
   'components/eyeballs',                        // No ref
   'components/csrf'                             // No ref
   ], function($, context, cordovaNav, chatModels, ChatCollectionView, chatInputView, unreadItemsClient, cacheSync,
-    emojiDecorator, log) {
+    emojiDecorator, mobileDecorator, log) {
 
   "use strict";
 
@@ -37,7 +38,7 @@ require([
   var chatCollectionView = new ChatCollectionView({
     el: $('#frame-chat'),
     collection: chatCollection,
-    decorators: [emojiDecorator]
+    decorators: [emojiDecorator, mobileDecorator]
   }).render();
 
   unreadItemsClient.syncCollections({

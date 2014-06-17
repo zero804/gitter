@@ -11,10 +11,12 @@ require([
   'views/toolbar/troupeMenu',
   'views/app/mobileAppView',
   'views/chat/decorators/emojiDecorator',
+  'views/chat/decorators/mobileDecorator',
   'views/app/troupeSettingsView',
   'components/csrf'                             // No ref
   ], function($, appEvents, chatModels, ChatCollectionView, chatInputView,
-    unreadItemsClient, Backbone, modalRegion, TroupeMenu, MobileAppView, emojiDecorator, TroupeSettingsView) {
+    unreadItemsClient, Backbone, modalRegion, TroupeMenu, MobileAppView,
+    emojiDecorator, mobileDecorator, TroupeSettingsView) {
   "use strict";
 
   new MobileAppView({
@@ -35,7 +37,7 @@ require([
   var chatCollectionView = new ChatCollectionView({
     el: $('#frame-chat'),
     collection: chatCollection,
-    decorators: [emojiDecorator]
+    decorators: [emojiDecorator, mobileDecorator]
   }).render();
 
   unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
