@@ -62,13 +62,21 @@ module.exports =  function(req, res) {
   // Host for Transloadit callback. In dev env you'll need to use localtunnel
   var host = (nodeEnv === 'dev') ? 'https://peshchkyha.localtunnel.me' : nconf.get('web:basepath');
 
+  var templateId = nconf.get('transloadit:template_id');
+  if(req.query.type === 'image') {
+    var typeTemplateId = nconf.get('transloadit:template_image_id');
+    if(typeTemplateId) {
+      templateId = typeTemplateId;
+    }
+  }
+
   var params = {
     auth: {
       expires: expires,
       key: nconf.get('transloadit:key'),
       max_size: 5242880
     },
-    template_id: nconf.get('transloadit:template_id'),
+    template_id: templateId,
     fields: {
       room_uri: req.query.room_uri,
       token: shortToken
