@@ -6,6 +6,7 @@ var restful = require("../../services/restful");
 var restSerializer = require("../../serializers/rest-serializer");
 var recentRoomService = require('../../services/recent-room-service');
 var roomService = require('../../services/room-service');
+var removeService = require('../../services/remove-service');
 var Q = require('q');
 
 module.exports = {
@@ -79,7 +80,7 @@ module.exports = {
     var troupe = req.userTroupe;
     var userId = req.user.id;
 
-    return recentRoomService.removeRecentRoomForUser(userId, troupe)
+    return removeService.removeRecentRoomForUser(troupe, userId)
       .then(function() {
         res.send({ success: true });
       })

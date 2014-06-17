@@ -60,12 +60,19 @@ define([
         var username = this.model.get('login');
         appEvents.trigger('input.append', '@' + username);
         this.parentPopover.hide();
+      },
+      'click #button-remove': function() {
+        var username = this.model.get('login');
+        appEvents.trigger('command.room.remove', username);
+        this.parentPopover.hide();
       }
     },
     serializeData: function() {
       var data = this.model.toJSON();
-      var chatPrivately = data.has_gitter_login && data.login !== context.user().get('username');
-      var mentionable = data.login !== context.user().get('username');
+      var isntSelf = data.login !== context.user().get('username');
+      var chatPrivately = data.has_gitter_login && isntSelf;
+      var mentionable = isntSelf;
+      var removable = isntSelf && context().permissions.admin;
 
       // Special case
       if(context.inOneToOneTroupeContext()) {
@@ -76,6 +83,7 @@ define([
 
       data.chatPrivately = chatPrivately;
       data.mentionable = mentionable;
+      data.removable = removable;
       return data;
     }
 

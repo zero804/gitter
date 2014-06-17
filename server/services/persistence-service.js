@@ -13,6 +13,9 @@ var shutdown      = require('shutdown');
 var Fiber         = require("../utils/fiber");
 var assert        = require("assert");
 
+var restSerializer = require('../serializers/rest-serializer');
+var serializeModel = restSerializer.serializeModel;
+
 // Install inc and dec number fields in mongoose
 require('mongoose-number')(mongoose);
 
@@ -81,28 +84,10 @@ connection.on('error', function(err) {
 // Utility serialization stuff
 // --------------------------------------------------------------------
 
-// This needs to be late-bound to prevent circular dependencies
-// TODO: review architecture to remove possible circular dependency
-var serializeModel = null;
-function serializeModelLateBound(model, callback) {
-  if(serializeModel === null) {
-    serializeModel = require("../serializers/rest-serializer").serializeModel;
-  }
-  serializeModel(model, callback);
-}
-
-var restSerializer = null;
-function getRestSerializerLateBound() {
-  if(!restSerializer) {
-    restSerializer = require("../serializers/rest-serializer");
-  }
-  return restSerializer;
-}
-
 function serializeEvent(url, operation, model, callback) {
   winston.verbose("Serializing " + operation + " to " + url);
 
-  serializeModelLateBound(model, function(err, serializedModel) {
+  serializeModel(model, function(err, serializedModel) {
     if(err) {
       winston.error("Silently failing model event: ", { exception: err, url: url, operation: operation });
     } else {
@@ -511,15 +496,6 @@ TroupeSchema.methods.reactivateUserById = function(userId) {
   }
 };
 
-
-var TroupeRemovedUserSchema = new Schema({
-  userId: { type: ObjectId },
-  troupeId: { type: ObjectId },
-  dateDeleted: { type: Date, "default": Date.now }
-});
-TroupeRemovedUserSchema.index({ userId: 1 });
-TroupeRemovedUserSchema.schemaTypeName = 'TroupeRemovedUserSchema';
-
 var UserTroupeSettingsSchema = require('./persistence/user-troupe-settings-schema.js');
 var UserSettingsSchema = require('./persistence/user-settings-schema.js');
 
@@ -592,6 +568,7 @@ var ChatMessageSchema = new Schema({
   fromUserId: ObjectId,
   toTroupeId: ObjectId,  //TODO: rename to troupeId
   text: String,
+  status: { type: Boolean, required: false },
   html: String,
   urls: Array,  // TODO: schema-ify this
   mentions: [{
@@ -859,7 +836,6 @@ var UserTroupeFavourites = mongoose.model('UserTroupeFavourites', UserTroupeFavo
 var Troupe = mongoose.model('Troupe', TroupeSchema);
 var TroupeUser = mongoose.model('TroupeUser', TroupeUserSchema);
 var TroupeBannedUser = mongoose.model('TroupeBannedUser', TroupeBannedUserSchema);
-var TroupeRemovedUser = mongoose.model('TroupeRemovedUser', TroupeRemovedUserSchema);
 var UserTroupeSettings = mongoose.model('UserTroupeSettings', UserTroupeSettingsSchema);
 var UserSettings = mongoose.model('UserSettings', UserSettingsSchema);
 var Email = mongoose.model('Email', EmailSchema);
@@ -912,7 +888,6 @@ module.exports = {
     TroupeSchema: TroupeSchema,
     TroupeUserSchema: TroupeUserSchema,
     TroupeBannedUserSchema: TroupeBannedUserSchema,
-    TroupeRemovedUserSchema: TroupeRemovedUserSchema,
     UserTroupeSettingsSchema: UserTroupeSettingsSchema,
     UserSettingsSchema: UserSettingsSchema,
     EmailSchema: EmailSchema,
@@ -940,7 +915,6 @@ module.exports = {
   Troupe: Troupe,
   TroupeUser: TroupeUser,
   TroupeBannedUser: TroupeBannedUser,
-  TroupeRemovedUser: TroupeRemovedUser,
   UserTroupeSettings: UserTroupeSettings,
   UserSettings: UserSettings,
 	Email: Email,
@@ -967,7 +941,5 @@ module.exports = {
   NotificationsPreference: NotificationsPreference
 };
 
-process.nextTick(function() {
-  var events = require("./persistence-service-events");
-  events.install(module.exports);
-});
+var events = require("./persistence-service-events");
+events.install(module.exports);

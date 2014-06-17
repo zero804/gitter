@@ -169,6 +169,33 @@ require([
     postMessage({type: 'focus', focus: 'out', event: event});
   });
 
+  var notifyRemoveError = function(message) {
+    appEvents.triggerParent('user_notification', {
+      title: 'Failed to remove user',
+      text: message,
+      className: 'notification-error'
+    });
+  };
+
+  appEvents.on('command.room.remove', function(username) {
+    var user = itemCollections.users.findWhere({username: username});
+    if (user) {
+      $.ajax({
+        url: "/api/v1/rooms/" + context.getTroupeId() + "/users/" + user.id,
+        dataType: "json",
+        type: "DELETE",
+        success: function() {
+          itemCollections.users.remove(user);
+        },
+        error: function(jqXHR) {
+          if (jqXHR.status < 500) notifyRemoveError(jqXHR.responseJSON.error);
+          else notifyRemoveError('');
+        },
+      });
+    }
+    else notifyRemoveError('User '+ username +' was not found in this room.');
+  });
+
   var appView = new ChatIntegratedView({ el: 'body' });
   new RightToolbarView({ el: "#toolbar-frame" });
 

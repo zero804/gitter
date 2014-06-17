@@ -3,12 +3,10 @@
 
 var recentRoomService  = require('../../services/recent-room-service');
 var roomService        = require('../../services/room-service');
-var troupeService      = require("../../services/troupe-service");
 var userService        = require("../../services/user-service");
 var restSerializer     = require("../../serializers/rest-serializer");
 var appEvents          = require("../../app-events");
 var _                  = require("underscore");
-var Q                  = require("q");
 
 module.exports = {
   id: 'resourceTroupeUser',
@@ -39,22 +37,16 @@ module.exports = {
 
   destroy: function(req, res, next){
     var user = req.resourceTroupeUser;
-    if(req.user.id != user.id) {
-      // For now, you can only remove yourself from the room
-      return next(401);
-    }
-    var troupeId = req.troupe._id;
-    var userId = user.id;
-    Q.all([
-        recentRoomService.removeRecentRoomForUser(userId, req.troupe),
-        troupeService.removeUserFromTroupe(troupeId, userId)
-      ])
+
+    return roomService.removeUserFromRoom(req.troupe, user, req.user)
+      .then(function() {
+        recentRoomService.removeRecentRoomForUser(user.id, req.troupe);
+      })
       .then(function() {
         appEvents.userLeft({user: req.user, room: req.troupe});
         res.send({ success: true });
       })
-      .fail(next);
-
+      .catch(next);
   },
 
   load: function(req, id, callback) {

@@ -15,7 +15,7 @@ function indexQuery(req, res, next) {
       if (req.query.include_users) strategyOptions.mapUsers = true;
 
       var strategy = new restSerializer.SearchResultsStrategy({
-                            resultItemStrategy: new restSerializer.GitHubRepoStrategy(strategyOptions)
+                            resultItemStrategy: new restSerializer.GithubRepoStrategy(strategyOptions)
                           });
 
       return restSerializer.serializeQ({ results: filteredRepos }, strategy);
@@ -39,7 +39,7 @@ module.exports = {
 
     repoService.suggestedReposForUser(req.user)
       .then(function(repos) {
-        var strategy = new restSerializer.GitHubRepoStrategy(strategyOptions);
+        var strategy = new restSerializer.GithubRepoStrategy(strategyOptions);
 
         restSerializer.serialize(repos, strategy, function(err, serialized) {
           if(err) return next(err);

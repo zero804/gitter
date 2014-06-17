@@ -251,6 +251,14 @@ blockquote {
   transition: opacity 0.2s ease;
   background-size: cover;
 
+  @media @mobile {
+    background-image: url('../../images/2/gitter/icon-edit-24@2x.png');
+    width: 24px;
+    height: 24px;
+    float: right;
+    margin-right: -16px;
+  }
+
   @media @retina {
     background-image: url('../../images/2/gitter/icon-edit@2x.png');
   }
@@ -400,6 +408,50 @@ pre code {
       width: 24px;
       height: 24px;
     }
+  }
+
+  &.status {
+    @status_bg: hsl(220, 65%, 97%);
+
+    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box;         /* Opera/IE 8+ */
+    width: 100%;
+    overflow: hidden;
+
+    .wrapper {
+      text-align: center;
+      background-color: @status_bg;
+      border: 2px solid darken(@status_bg, 1%);
+      border-radius: 3px;
+      padding: 10px;
+    }
+
+    .mention {
+      margin: 0;
+    }
+
+    .trpChatAvatar {
+      float: center;
+      display: inline-block;
+    }
+
+    .trpChatBox {
+      margin: 0;
+    }
+
+    .trpChatBox {
+      text-align: center;
+      // display: inline-block;
+    }
+
+    .icons {
+      float: right;
+      position: relative;
+      top: 0px;
+      right: 0px;
+    }
+
   }
 
   @media @mobile {
@@ -603,9 +655,15 @@ pre code {
   visibility: hidden;
 }
 
-.trpChatBox:hover > .trpChatDetails > .trpChatEdit,
-.trpChatBox:hover > .trpChatDetails > .trpChatReads {
+.trpChatItemContainer:hover .trpChatEdit,
+.trpChatItemContainer:hover .trpChatReads {
   visibility: visible;
+}
+
+.trpChatItemContainer.cantEdit .trpChatBox:hover .trpChatEdit {
+  @media @mobile {
+    visibility: hidden;
+  }
 }
 
 .isOld .trpChatEdit {
@@ -627,6 +685,24 @@ pre code {
   transition: opacity .25s ease-in-out;
   -moz-transition: opacity .25s ease-in-out;
   -webkit-transition: opacity .25s ease-in-out;
+}
+
+.canEdit .trpChatEdit {
+  @media @mobile {
+    visibility: visible;
+    display: inline-block;
+  }
+}
+
+.canEdit .trpChatEdit:hover {
+  @media @mobile {
+    visibility: visible;
+    display: inline-block;
+  }
+}
+
+.trpChatBox:hover > .trpChatDetails > .trpChatEdit.force-show {
+  visibility: visible;
 }
 
 

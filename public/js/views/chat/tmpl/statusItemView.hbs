@@ -1,0 +1,15 @@
+<div class='trpChatItem status'>
+  <div class='wrapper'>
+    <div class='trpChatAvatar'>
+      {{ widget "avatar" user=fromUser }}
+    </div>
+    <div class='trpChatBox {{webhookClass}}'>
+      <div class='trpChatDetails'>
+        <div class='trpChatTime'>{{widget "timeago" time=sent lang=lang locale=locale}}</div>
+      </div>
+      <div class='trpChatText'>
+        {{{html}}}
+      </div>
+    </div>
+  </div>
+</div>
