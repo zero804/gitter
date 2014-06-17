@@ -6,6 +6,12 @@ var troupeService = require('../../services/troupe-service');
 var chatService   = require('../../services/chat-service');
 var nconf         = require('../../utils/config');
 var Q             = require('q');
+var StatusError   = require('statuserror');
+
+var env           = require('../../utils/env');
+var stats         = env.stats;
+var logger        = env.logger;
+
 
 var redis         = require('../../utils/redis');
 var redisClient   = redis.createClient();
@@ -21,19 +27,38 @@ module.exports = function(req, res, next) {
   redisClient.get('transloadit:' + token, function(err, data) {
     if(err) return next(err);
 
-    if(!data) return next(404);
+    if(!data) return next(new StatusError(404));
 
-    var metadata = JSON.parse(data);
-    var transloadit = JSON.parse(req.body.transloadit);
+    var metadata;
+    try {
+      metadata = JSON.parse(data);
+    } catch(e) {
+      logger.info('Unable to parse redis data', { data: data });
+      return next(new Error('JSON parse error: ' + e.message));
+    }
+
+    var transloadit;
+    try {
+      transloadit = req.body.transloadit;
+
+      if(typeof transloadit === 'string') {
+        transloadit = JSON.parse(req.body.transloadit);
+      }
+    } catch(e) {
+      return next(new Error('Transloadit json parse error: ' + e.message));
+    }
 
     if (transloadit.ok !== 'ASSEMBLY_COMPLETED') {
-      return next(500);
+      return next(new Error('Transload did not return ASSEMBLY_COMPLETED.'));
     }
 
     return troupeService.findById(metadata.room_id)
       .then(function(room) {
+        if(!room) throw new StatusError(404, 'Unable to find room ' + metadata.room_id);
+
         return userService.findById(metadata.user_id)
           .then(function(user) {
+            if(!user) throw new StatusError(404, 'Unable to find user ' + metadata.user_id);
 
             var thumbs = {};
 
@@ -62,9 +87,9 @@ module.exports = function(req, res, next) {
                 text = "[" + name + "](" + url + ")";
               }
 
-              return chatService.newChatMessageToTroupe(room, user, text);
+              stats.event('file.upload');
+              return chatService.newChatMessageToTroupe(room, user, { text: text });
             });
-
 
             return Q.all(promises);
           });
