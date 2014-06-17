@@ -4,6 +4,7 @@
 var Q                  = require('q');
 var lazy               = require('lazy.js');
 var troupeService      = require('./troupe-service');
+var roomService        = require('./room-service');
 var persistence        = require('./persistence-service');
 var appEvents          = require('../app-events');
 var winston            = require('../utils/winston');
@@ -54,35 +55,17 @@ function generateRoomListForUser(userId) {
 }
 
 /**
- * Called when the user removes a room from the left hand menu
+ * Called when the user removes a room from the left hand menu.
  */
-function removeRecentRoomForUser(userId, troupe) {
+function removeRecentRoomForUser(userId, roomId, isMember) {
   winston.verbose('recent-rooms: removeRecentRoomForUser');
 
-  var troupeId = troupe.id;
-  var troupeUser = troupe.findTroupeUser(userId);
-
   return Q.all([
-      clearFavourite(userId, troupeId),
-      clearLastVisitedTroupeforUserId(userId, troupeId),
-      unreadItemsService.markAllChatsRead(userId, troupeId, { member: !!troupeUser })
-    ])
-    .then(function() {
-      if(troupeUser) {
-        if(troupeUser.lurk) {
-          return troupeService.removeUserFromTroupe(troupeId, userId);
-        } else {
-          // TODO: in future get rid of this but this collection is used by the native clients
-          appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, favourite: null, lastAccessTime: null, mentions: 0, unreadItems: 0 });
-        }
-      } else {
-        // Must be a mention
-        appEvents.dataChange2('/user/' + userId + '/rooms', 'remove', { id: troupeId });
-      }
-
-    });
+      clearFavourite(userId, roomId),
+      clearLastVisitedTroupeforUserId(userId, roomId),
+      unreadItemsService.markAllChatsRead(userId, roomId, { member: !!isMember })
+    ]);
 }
-
 
 /**
  * Internal call

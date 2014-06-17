@@ -831,6 +831,33 @@ function validateRoomForReadOnlyAccess(user, room) {
 }
 exports.validateRoomForReadOnlyAccess = validateRoomForReadOnlyAccess;
 
+/**
+ * Remove user from room
+ * If the user to be removed is not the one requesting, check permissions
+ */
+function removeUserFromRoom(room, user, requestingUser) {
+  if(!room) return Q.reject(new StatusError(400, 'Room required'));
+  if(!user) return Q.reject(new StatusError(400, 'User required'));
+  if(!requestingUser) return Q.reject(new StatusError(401, 'Not authenticated'));
+
+  return Q.fcall(function() {
+    // User is requesting user -> leave
+    if(user.id === requestingUser.id) return true;
+    // Check if not in one-to-one room and requesting user is admin
+    if(room.githubType === 'ONETOONE') throw new StatusError(400, 'This room does not support removing.');
+    return roomPermissionsModel(requestingUser, 'admin', room)
+    .then(function(access) {
+      if(!access) throw new StatusError(403, 'You do not have permission to remove people. Admin permission is needed.');
+    });
+  })
+  // Do the removal
+  .then(function() {
+    room.removeUserById(user.id);
+    return room.saveQ();
+  });
+}
+exports.removeUserFromRoom = removeUserFromRoom;
+
 function canBanInRoom(room) {
   if(room.githubType === 'ONETOONE') return false;
   if(room.githubType === 'ORG') return false;
@@ -842,14 +869,14 @@ function canBanInRoom(room) {
 function banUserFromRoom(room, username, requestingUser, callback) {
   if(!room) return Q.reject(new StatusError(400, 'Room required')).nodeify(callback);
   if(!username) return Q.reject(new StatusError(400, 'Username required')).nodeify(callback);
-  if(!requestingUser) return Q.reject(new StatusError(401, 'Not authenicated')).nodeify(callback);
+  if(!requestingUser) return Q.reject(new StatusError(401, 'Not authenticated')).nodeify(callback);
   if(requestingUser.username === username) return Q.reject(new StatusError(400, 'You cannot ban yourself')).nodeify(callback);
   if(!canBanInRoom(room)) return Q.reject(new StatusError(400, 'This room does not support banning.')).nodeify(callback);
 
   /* Does the requesting user have admin rights to this room? */
   return roomPermissionsModel(requestingUser, 'admin', room)
     .then(function(access) {
-      if(!access) throw new StatusError(403, 'You do not have permission to ban people. Admin permission is need.');
+      if(!access) throw new StatusError(403, 'You do not have permission to ban people. Admin permission is needed.');
 
       return userService.findByUsername(username);
     })
@@ -902,14 +929,14 @@ exports.banUserFromRoom = banUserFromRoom;
 function unbanUserFromRoom(room, troupeBan, username, requestingUser, callback) {
   if(!room) return Q.reject(new StatusError(400, 'Room required')).nodeify(callback);
   if(!troupeBan) return Q.reject(new StatusError(400, 'Username required')).nodeify(callback);
-  if(!requestingUser) return Q.reject(new StatusError(401, 'Not authenicated')).nodeify(callback);
+  if(!requestingUser) return Q.reject(new StatusError(401, 'Not authenticated')).nodeify(callback);
 
   if(!canBanInRoom(room)) return Q.reject(new StatusError(400, 'This room does not support bans')).nodeify(callback);
 
   /* Does the requesting user have admin rights to this room? */
   return roomPermissionsModel(requestingUser, 'admin', room)
     .then(function(access) {
-      if(!access) throw new StatusError(403, 'You do not have permission to unban people. Admin permission is need.');
+      if(!access) throw new StatusError(403, 'You do not have permission to unban people. Admin permission is needed.');
 
       room.bans.pull({ _id: troupeBan._id });
 
@@ -932,4 +959,3 @@ function unbanUserFromRoom(room, troupeBan, username, requestingUser, callback) 
     .nodeify(callback);
 }
 exports.unbanUserFromRoom = unbanUserFromRoom;
-

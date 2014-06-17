@@ -26,7 +26,7 @@ require([
       el: $('#frame-chat')
     }).render();
 
-    appEvents.on('navigation', cordovaNavigate);
+    appEvents.on('navigation', cordovaNavigate.navigate);
 
     $('html').removeClass('loading');
   }
