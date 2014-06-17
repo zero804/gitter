@@ -198,24 +198,38 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
   var q = persistence.ChatMessage
     .where('toTroupeId', troupeId);
 
-  if(options.startId) {
-    var startId = new ObjectID(options.startId);
-    q = q.where('_id').gte(startId);
-  }
+  var sentOrder = 'desc';
 
   if(options.beforeId) {
     var beforeId = new ObjectID(options.beforeId);
     q = q.where('_id').lt(beforeId);
   }
 
-  q.sort(options.sort || { sent: 'desc' })
+  if(options.beforeIncludingId) {
+    var beforeIncludingId = new ObjectID(options.beforeIncludingId);
+    q = q.where('_id').lte(beforeIncludingId);
+  }
+
+  if(options.afterId) {
+    // Reverse the initial order for afterId
+    var afterId = new ObjectID(options.afterId);
+    sentOrder = 'asc';
+    q = q.where('_id').gt(afterId);
+  }
+
+  return q.sort(options.sort || { sent: sentOrder })
     .limit(options.limit || 50)
     .skip(options.skip || 0)
-    .exec(function(err, results) {
-      if(err) return callback(err);
+    .execQ()
+    .then(function(results) {
+      results = results.map(massageMessages);
+      if(sentOrder === 'desc') {
+        return results.reverse();
+      }
 
-      return callback(null, results.map(massageMessages).reverse());
-    });
+      return results;
+    })
+    .nodeify(callback);
 };
 
 exports.findChatMessagesForTroupeForDateRange = function(troupeId, startDate, endDate, callback) {

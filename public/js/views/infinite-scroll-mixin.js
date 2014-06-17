@@ -16,8 +16,15 @@ define([
       var scrollElement = this.scrollElementSelector ? /*this.el*/document.querySelector(this.scrollElementSelector) : this.el;
 
       var scroll = new NeverEndingStory(scrollElement, { reverse: this.reverseScrolling });
-      this.listenTo(scroll, 'approaching.end', function() {
-        this.loadMore();
+      var loading = false;
+      this.listenTo(scroll, 'approaching.top', function() {
+        if(loading) return;
+        loading = true;
+        console.log('LOADING!');
+        this.loadMore(function() {
+          console.log('DONE!!!!');
+          loading = false;
+        });
       });
 
       this.listenTo(this.collection, 'search:newquery', function() {
@@ -37,18 +44,13 @@ define([
       this.scroll.disable();
     },
 
-    loadMore: function() {
+    loadMore: function(done) {
       // If the collection support pagenation, use it
       if(this.collection.fetchNext) {
         this.collection.fetchNext({
           context: this,
-          done: function() {
-            this.scroll.loadComplete();
-          }
+          done: done
         });
-
-        /* Our work here is done */
-        return;
       }
 
       var fetchData = this.getFetchData && this.getFetchData.call(this) || {
@@ -74,7 +76,7 @@ define([
         remove: false, // Never remove on load more
         data: fetchData,
         success: function() {
-          self.scroll.loadComplete();
+          // self.scroll.loadComplete();
 
           self.collection.off('add', onAdd);
 
@@ -83,9 +85,12 @@ define([
             self.scroll.disable();
           }
 
+          done();
+
         },
         error: function() {
-          self.scroll.loadComplete();
+          done();
+          // self.scroll.loadComplete();
         }
       });
     }

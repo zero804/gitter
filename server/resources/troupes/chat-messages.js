@@ -10,10 +10,12 @@ module.exports = {
     var skip = req.query.skip;
     var limit = req.query.limit;
     var beforeId = req.query.beforeId;
+    var afterId = req.query.afterId;
 
     var options = {
         skip: skip ? skip : 0,
         beforeId: beforeId ? beforeId : null,
+        afterId: afterId ? afterId : null,
         limit: limit ? limit: 50
     };
 
