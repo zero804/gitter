@@ -42,7 +42,7 @@ define([
 
   var ChatItemView = TroupeViews.Base.extend({
     attributes: {
-      class: 'trpChatItemContainer'
+      class: 'chat-item'
     },
     unreadItemType: 'chat',
     isEditing: false,
@@ -154,7 +154,7 @@ define([
         this.$el.addClass('deleted');
       }
 
-      this.$el.find('.trpChatText').html(html);
+      this.$el.find('.js-chat-item-text').html(html);
 
       _.each(this.decorators, function(decorator) {
         decorator.decorate(this);
@@ -307,7 +307,7 @@ define([
 
     showInput: function() {
       //var isAtBottom = this.scrollDelegate.isAtBottom();
-      var chatInputText = this.$el.find('.trpChatText');
+      var chatInputText = this.$el.find('.js-chat-item-text');
 
       // create inputview
       chatInputText.html("<textarea class='trpChatInput'></textarea>");
@@ -351,7 +351,6 @@ define([
       popover.show();
       ReadByPopover.singleton(this, popover);
     }
-
   });
 
   cocktail.mixin(ChatItemView, KeyboardEventMixins);

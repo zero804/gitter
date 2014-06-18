@@ -13,7 +13,7 @@ var _          = require('underscore');
 var syncHandlebars = require('handlebars');
 var widgetHelpers = require('./widget-prerenderers');
 
-var chatWrapper = syncHandlebars.compile('<div class="trpChatItemContainer model-id-{{id}} {{unreadClass}} {{deletedClass}}">{{{inner}}}</div>');
+var chatWrapper = syncHandlebars.compile('<div class="chat-item model-id-{{id}} {{unreadClass}} {{deletedClass}}">{{{inner}}}</div>');
 
 var baseDir = path.normalize(__dirname + '/../../' + nconf.get('web:staticContent'));
 
