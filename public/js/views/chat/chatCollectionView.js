@@ -44,7 +44,7 @@ define([
 
     /* "WHAT THE F" is this nasty thing. Document your codedebt people */
     // This nasty thing changes the CSS rule for the first chat item to prevent a high headerView from covering it
-    // We do this instead of jQuery because the first-child selector can 
+    // We do this instead of jQuery because the first-child selector can
     adjustTopPadding: function() {
       var size = $('#header-wrapper').height() + 15 + 'px';
       var ss = document.styleSheets[2];
@@ -164,24 +164,27 @@ define([
     },
 
     getFetchData: function() {
-      log("Loading next message chunk.");
+      // this.collection.fetchMoreBefore({}, function() {
+      //   log("Loaded ");
+      // }, this);
+      // log("Loading next message chunk.");
 
-      var ids = this.collection.map(function(m) { return m.get('id'); });
-      var lowestId = _.min(ids, function(a, b) {
-        if(a < b) return -1;
-        if(a > b) return 1;
-        return 0;
-      });
+      // var ids = this.collection.map(function(m) { return m.get('id'); });
+      // var lowestId = _.min(ids, function(a, b) {
+      //   if(a < b) return -1;
+      //   if(a > b) return 1;
+      //   return 0;
+      // });
 
-      if(lowestId === Infinity) {
-        log('No messages loaded, cancelling pagenation (!!)');
-        return;
-      }
+      // if(lowestId === Infinity) {
+      //   log('No messages loaded, cancelling pagenation (!!)');
+      //   return;
+      // }
 
-      return {
-          beforeId: lowestId,
-          limit: PAGE_SIZE
-      };
+      // return {
+      //     beforeId: lowestId,
+      //     limit: PAGE_SIZE
+      // };
 
     }
 
