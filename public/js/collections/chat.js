@@ -62,6 +62,91 @@ define([
 
   });
 
+  var InfiniteCollection = {
+    fetchMoreBefore: function(options, callback, context) {
+      if(this.atTop) return;
+      if(this._isFetching) return;
+      this._isFetching = true;
+
+      var beforeId;
+      if(this.length) {
+        beforeId = _.min(this.pluck('id'), function(a, b) {
+          if(a === b) return 0;
+          return a > b ? 1 : -1;
+        });
+      }
+      console.log('FETCH MORE BEFORE!!!', beforeId);
+
+      var data = { beforeId: beforeId };
+      var self = this;
+
+      this.fetch({
+        remove: ('remove' in options) ? options.remove : false,
+        add: ('add' in options) ? options.add : true,
+        merge: ('merge' in options) ? options.merge : true,
+        data: data,
+        success: function(collection, response) {
+          delete self._isFetching;
+          console.log(response.length);
+          if(response.length < 50) {
+            // NO MORE
+            self.atTop = true;
+          }
+          while(self.length > 150) {
+            self.pop();
+            self.atBottom = false;
+          }
+          if(callback) callback.call(context);
+        },
+        error: function(err) {
+          if(callback) callback.call(err);
+        }
+      });
+    },
+
+    fetchMoreAfter: function(options, callback, context) {
+      console.log('SELF AT BOTTOM', this.atBottom);
+      if(this.atBottom) return;
+      if(this._isFetching) return;
+      this._isFetching = true;
+      var afterId;
+      if(this.length) {
+        afterId = _.max(this.pluck('id'), function(a, b) {
+          if(a === b) return 0;
+          return a > b ? 1 : -1;
+        });
+      }
+      console.log('FETCH MORE AFTER!!!', afterId);
+
+      var data = { afterId: afterId };
+      var self = this;
+
+      this.fetch({
+        remove: ('remove' in options) ? options.remove : false,
+        add: ('add' in options) ? options.add : true,
+        merge: ('merge' in options) ? options.merge : true,
+        data: data,
+        success: function(collection, response) {
+          delete self._isFetching;
+          console.log(response.length);
+          if(response.length < 50) {
+            // NO MORE
+            self.atBottom = true;
+          }
+          while(self.length > 150) {
+            self.shift();
+            self.atTop = false;
+          }
+          if(callback) callback.call(context);
+        },
+        error: function(err) {
+          if(callback) callback.call(err);
+        }
+      });
+    }
+  };
+
+
   var ChatCollection = TroupeCollections.LiveCollection.extend({
     model: ChatModel,
     modelName: 'chat',
@@ -87,6 +172,7 @@ define([
     }
   });
   cocktail.mixin(ChatCollection, TroupeCollections.ReversableCollectionBehaviour);
+  cocktail.mixin(ChatCollection, InfiniteCollection);
 
   var ReadByModel = TroupeCollections.Model.extend({
     idAttribute: "id"

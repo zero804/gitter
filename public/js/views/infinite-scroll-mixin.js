@@ -16,16 +16,14 @@ define([
       var scrollElement = this.scrollElementSelector ? /*this.el*/document.querySelector(this.scrollElementSelector) : this.el;
 
       var scroll = new NeverEndingStory(scrollElement, { reverse: this.reverseScrolling });
-      var loading = false;
       this.listenTo(scroll, 'approaching.top', function() {
-        if(loading) return;
-        loading = true;
-        console.log('LOADING!');
-        this.loadMore(function() {
-          console.log('DONE!!!!');
-          loading = false;
-        });
+        this.collection.fetchMoreBefore({});
       });
+
+      this.listenTo(scroll, 'approaching.bottom', function() {
+        this.collection.fetchMoreAfter({});
+      });
+
 
       this.listenTo(this.collection, 'search:newquery', function() {
         scroll.enable();
@@ -45,54 +43,55 @@ define([
     },
 
     loadMore: function(done) {
-      // If the collection support pagenation, use it
-      if(this.collection.fetchNext) {
-        this.collection.fetchNext({
-          context: this,
-          done: done
-        });
-      }
+      this.collection.fetchMoreBefore({}, done, this);
+      // // If the collection support pagenation, use it
+      // if(this.collection.fetchNext) {
+      //   this.collection.fetchNext({
+      //     context: this,
+      //     done: done
+      //   });
+      // }
 
-      var fetchData = this.getFetchData && this.getFetchData.call(this) || {
-        skip: this.collection.length,
-        limit: PAGE_SIZE
-      };
+      // var fetchData = this.getFetchData && this.getFetchData.call(this) || {
+      //   skip: this.collection.length,
+      //   limit: PAGE_SIZE
+      // };
 
-      if(!fetchData) {
-        // No fetch data means nothing to fetch
-        return;
-      }
+      // if(!fetchData) {
+      //   // No fetch data means nothing to fetch
+      //   return;
+      // }
 
-      var itemAdded = false;
-      function onAdd() {
-        itemAdded = true;
-      }
+      // var itemAdded = false;
+      // function onAdd() {
+      //   itemAdded = true;
+      // }
 
-      this.collection.once('add', onAdd);
-      var self = this;
-      this.collection.fetch({
-        update: true,
-        add: true,
-        remove: false, // Never remove on load more
-        data: fetchData,
-        success: function() {
-          // self.scroll.loadComplete();
+      // this.collection.once('add', onAdd);
+      // var self = this;
+      // this.collection.fetch({
+      //   update: true,
+      //   add: true,
+      //   remove: false, // Never remove on load more
+      //   data: fetchData,
+      //   success: function() {
+      //     // self.scroll.loadComplete();
 
-          self.collection.off('add', onAdd);
+      //     self.collection.off('add', onAdd);
 
-          if(!itemAdded) {
-            // turn off infinite scroll if there were no new messages retrieved
-            self.scroll.disable();
-          }
+      //     if(!itemAdded) {
+      //       // turn off infinite scroll if there were no new messages retrieved
+      //       self.scroll.disable();
+      //     }
 
-          done();
+      //     done();
 
-        },
-        error: function() {
-          done();
-          // self.scroll.loadComplete();
-        }
-      });
+      //   },
+      //   error: function() {
+      //     done();
+      //     // self.scroll.loadComplete();
+      //   }
+      // });
     }
 
 
