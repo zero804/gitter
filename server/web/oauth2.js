@@ -81,14 +81,9 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, do
     if (!client._id.equals(authCode.clientId)) { return done(); }
     if (redirectUri !== authCode.redirectUri) { return done(); }
 
-    random.generateToken(function(err, token) {
-      if (err) { return done(err); }
+    return oauthService.findOrCreateToken(authCode.userId, authCode.clientId)
+      .nodeify(done);
 
-      oauthService.saveAccessToken(token, authCode.userId, authCode.clientId, function(err) {
-        if (err) { return done(err); }
-        done(null, token);
-      });
-    });
   });
 }));
 
