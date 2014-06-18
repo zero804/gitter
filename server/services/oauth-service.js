@@ -182,22 +182,13 @@ exports.removeAllAccessTokensForUser = function(userId, callback) {
     .nodeify(callback);
 };
 
-exports.saveAccessToken = function(token, userId, clientId, callback) {
-
-  var accessToken = new persistenceService.OAuthAccessToken({
-    token: token,
-    userId: userId,
-    clientId: clientId
-  });
-  accessToken.save(callback);
-};
-
 exports.findClientByClientKey = function(clientKey, callback) {
   persistenceService.OAuthClient.findOne({ clientKey: clientKey }, callback);
 };
 
 function findOrCreateToken(userId, clientId, callback) {
   if(!userId) return Q.reject('userId required').nodeify(callback);
+  if(!clientId) return Q.reject('userId required').nodeify(callback);
 
   return tokenLookupCache.get(userId, clientId)
     .then(function(token) {
@@ -207,7 +198,7 @@ function findOrCreateToken(userId, clientId, callback) {
       /* Lookup and possible create */
       return persistenceService.OAuthAccessToken.findOneQ({
           userId: userId,
-          clientId: webInternalClientId
+          clientId: clientId
         }).then(function(oauthAccessToken) {
           if(oauthAccessToken) {
             return tokenLookupCache.set(userId, clientId, oauthAccessToken.token)
@@ -217,7 +208,7 @@ function findOrCreateToken(userId, clientId, callback) {
           return random.generateToken()
             .then(function(token) {
               return persistenceService.OAuthAccessToken.findOneAndUpdateQ(
-                { userId: userId, clientId: webInternalClientId },
+                { userId: userId, clientId: clientId },
                 {
                   $setOnInsert: {
                     token: token
@@ -234,10 +225,8 @@ function findOrCreateToken(userId, clientId, callback) {
 
     })
     .nodeify(callback);
-
-
-
 }
+exports.findOrCreateToken = findOrCreateToken;
 
 // TODO: move some of this functionality into redis for speed
 // TODO: make the web tokens expire
@@ -263,3 +252,23 @@ exports.generateAnonWebToken = function(callback) {
 exports.findOrGenerateIRCToken = function(userId, callback) {
   return findOrCreateToken(userId, ircClientId, callback);
 };
+
+exports.testOnly = {
+  invalidateCache: function() {
+    var d = Q.defer();
+    redisClient.keys(tokenValidationCachePrefix + '*', function(err, results) {
+      if(err) return d.reject(err);
+
+      if(!results.length) return d.resolve();
+
+      redisClient.del(results, function(err) {
+        if(err) return d.reject(err);
+
+        d.resolve();
+      });
+    });
+
+    return d.promise;
+  }
+};
+
