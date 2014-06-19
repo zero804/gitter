@@ -14,6 +14,7 @@ var appEvents     = require('../app-events');
 var Q             = require('q');
 var mongoUtils    = require('../utils/mongo-utils');
 var moment        = require('moment');
+var StatusError   = require('statuserror');
 
 /*
  * Hey Trouper!
@@ -38,10 +39,10 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
     if(!troupe) throw 404;
 
     /* You have to have text */
-    if(!data.text && data.text !== "" /* Allow empty strings for now */) throw 400;
-    if(data.text.length > MAX_CHAT_MESSAGE_LENGTH) throw 400;
+    if(!data.text && data.text !== "" /* Allow empty strings for now */) throw new StatusError(400, 'Text is required');
+    if(data.text.length > MAX_CHAT_MESSAGE_LENGTH) throw new StatusError(400, 'Message exceeds maximum size');
 
-    if(!troupeService.userHasAccessToTroupe(user, troupe)) throw 403;
+    if(!troupeService.userHasAccessToTroupe(user, troupe)) throw new StatusError(403, 'Access denied');
 
     // TODO: validate message
     var parsedMessage = processChat(data.text);

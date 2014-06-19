@@ -82,10 +82,13 @@ define([
 
         menuItems.push({ divider: true });
 
+        menuItems.push({ title: 'Archives', href: 'archives/all', target: '_blank'});
+
         var githubType = this.model.get('githubType');
         if(githubType === 'REPO' || githubType === 'ORG') {
           menuItems.push({ title: 'Open in GitHub', href: 'https://www.github.com' + url, target: '_blank' });
         }
+
         menuItems.push({ title: 'Leave this room', href: '#leave' });
 
         return menuItems;
