@@ -14,7 +14,7 @@ module.exports = function(prefix, server) {
     });
   }, 1000);
 
-  shutdown.addHandler('server-stats', 20, function(callback) {
+  shutdown.addHandler('server-stats', 30, function(callback) {
     clearTimeout(timer);
     callback();
   });
