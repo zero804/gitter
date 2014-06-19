@@ -89,8 +89,9 @@ function UserPresenceInTroupeStrategy(troupeId) {
 
 function setAvatarSize(url, size) {
   var sizeText;
-  if (size=='m') sizeText="s=128";
-  if (size=='s') sizeText="s=32";
+  if(!url || typeof url !== "string") return null;
+  if(size=='m') sizeText="s=128";
+  if(size=='s') sizeText="s=32";
 
   if(url.indexOf('?') >= 0) {
     return url + '&' + sizeText;
