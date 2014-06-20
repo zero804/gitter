@@ -10,13 +10,14 @@
  * Contents
  * =========
  * 
- * Notes								Read'em.
- * Imports							All the libraries and other stylesheet files.
- * CSS Reset 						Resets the styling in order to standardize it.
- * Type 								Defines all font related styles.
- * Color 								Contains the colors.
- * Elements 						Defines styling for UI components.
- * Media Queries				Styles for largers
+ * Notes                Read'em.
+ * App Structure        A hierarchical view of the application.
+ * Imports              All the libraries and other stylesheet files.
+ * CSS Reset            Resets the styling in order to standardize it.
+ * Type                 Defines all font related styles.
+ * Color                Contains the colors.
+ * Elements             Defines styling for UI components.
+ * Media Queries        Styles for largers
  *
  * Author: Walter Carvalho 2014.
  * Inspired by: https://github.com/csswizardry/CSS-Guidelines#css-document-anatomy
@@ -38,6 +39,20 @@
   * TODO: Always use the prefix `js-` for webhooks in HTML classes. e.g. <div class='chat-item__content  js-example-webhook'>.
   */
 
+/* App Structure */
+/**
+  • App
+      • Menu
+      • Chat
+          • ChatAlerts
+          • ChatHeader
+          • ChatArea
+              • ChatItem
+          • ChatInput
+          • ChatToolBar
+  */
+
+
 /* Imports */
 // @import 'some-lib.less';
 
@@ -48,25 +63,25 @@ html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abb
 *, *:before, *:after { box-sizing: border-box; }
 
 /* Type */
-@type = 'Open Sans','HelveticaNeue-Light', sans-serif;
-@type_size = 1em;
-@type_base = #444;
+@type: 'Open Sans', 'HelveticaNeue-Light', sans-serif;
+@type_size: 1em;
+@type_base: #444;
 
-@type_light = lighten(@type_base, 10%);
-@type_dark = darken(@type_base, 10%);
+@type_light: lighten(@type_base, 10%);
+@type_dark: darken(@type_base, 10%);
 
 /* Color */
-@base = 
-@primary =
-@secondary =
-@warning =
-@danger = 
-@success =
+// @base = 
+// @primary =
+// @secondary =
+// @warning =
+// @danger = 
+// @success = 
 
 /* Elements */
-@import 'chat-item.less';
+// @import 'chat-item.less';
 
 /* Media Queries */
-@media only screen and (min-width: 50em) {
+// @media only screen and (min-width: 50em) {
 
-}
+// }
