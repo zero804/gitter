@@ -11,12 +11,12 @@
       <div class='chat-item__time'>{{widget "timeago" time=sent lang=lang locale=locale}}</div>
       {{#if readByText}}
         {{#if compactView}}
-          <span class=".chat-item__icon--read">{{readByText}}</span>
+          <span class="chat-item__icon--read  js-chat-item-readby">{{readByText}}</span>
         {{else}}
-          <div class=".chat-item__icon--read">{{readByText}}</div>
+          <div class="chat-item__icon--read  js-chat-item-readby">{{readByText}}</div>
         {{/if}}
       {{/if}}
-      <div class='.chat-item__icon--edit'></div>
+      <div class='chat-item__icon--edit  js-chat-item-edit'></div>
     </div>
     <div class='chat-item__text  js-chat-item-text'>
       {{{html}}}
