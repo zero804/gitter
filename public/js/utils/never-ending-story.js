@@ -51,20 +51,6 @@ define(['underscore', 'backbone', 'log!nes'], function(_, Backbone, log) {
           this.trigger('approaching.bottom');
         }
       }
-
-
-      // var timeToLimit;
-      // if(delta < 0) {
-      //   var gradient = delta / timeDelta;
-      //   timeToLimit = st / -gradient;
-      // }
-
-      // if((timeToLimit < 300) || (st < 50 && delta < 0)) {
-      //   log('approaching end');
-
-      //   this.loading = true;
-      //   this.trigger('approaching.end');
-      // }
     },
 
     loadComplete: function() {

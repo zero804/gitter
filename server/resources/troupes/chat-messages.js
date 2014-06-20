@@ -11,12 +11,16 @@ module.exports = {
     var limit = req.query.limit;
     var beforeId = req.query.beforeId;
     var afterId = req.query.afterId;
+    var marker = req.query.marker;
+    var userId = req.user && req.user.id;
 
     var options = {
-        skip: skip ? skip : 0,
-        beforeId: beforeId ? beforeId : null,
-        afterId: afterId ? afterId : null,
-        limit: limit ? limit: 50
+        skip: parseInt(skip, 10) || 0,
+        limit: parseInt(limit, 10) || 50,
+        beforeId: beforeId && "" + beforeId || null,
+        afterId: afterId && "" + afterId || null,
+        marker: marker && "" + marker || null,
+        userId: userId
     };
 
     chatService.findChatMessagesForTroupe(req.troupe.id, options, function(err, chatMessages) {
