@@ -10,7 +10,7 @@ define([
     },
 
     getCollectionLimit: function() {
-      return 2 * this.getLoadLimit();
+      return 5 * this.getLoadLimit();
     },
 
     ignoreDataChange: function(data) {
