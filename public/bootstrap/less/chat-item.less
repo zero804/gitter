@@ -5,12 +5,64 @@
   * Bubble some common attributes to .chat-item
   * 
   */
+.gitter {
+  
+  /* menu begin */
+  & &__menu {
 
-/* "super class" */
-.chat-item {}
+    & &__header {
+      
+      & &--different {
+
+      }
+    }
+
+    & &__search {
+
+    }
+
+    & &__content {
+
+    }
+
+    & &__actions {
+
+    }
+  } /* menu ends */
+
+  /* chat begin */
+  & &__chat {
+    
+    & &__alerts {
+
+    }
+
+    & &__header {
+
+    }
+
+    & &__chat-area {
+
+      & &__container {
+
+        & &__chat-item {
+
+        }
+      }
+    }
+
+    & &__input {
+
+    }
+
+    & &__toolbar {
+
+    }
+  }
+  /* chat ends */
+}
 
 .chat-item__container {
-
   padding: 8px 30px 8px 44px;
   -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
   -moz-box-sizing: border-box;    /* Firefox, other Gecko */
