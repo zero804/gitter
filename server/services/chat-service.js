@@ -1,20 +1,21 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var env           = require('../utils/env');
-var stats         = env.stats;
+var env               = require('../utils/env');
+var stats             = env.stats;
 
-var persistence   = require("./persistence-service");
-var collections   = require("../utils/collections");
-var troupeService = require("./troupe-service");
-var userService   = require("./user-service");
-var unsafeHtml    = require('../utils/unsafe-html');
-var processChat   = require('../utils/process-chat');
-var appEvents     = require('../app-events');
-var Q             = require('q');
-var mongoUtils    = require('../utils/mongo-utils');
-var moment        = require('moment');
-var StatusError   = require('statuserror');
+var persistence       = require("./persistence-service");
+var collections       = require("../utils/collections");
+var troupeService     = require("./troupe-service");
+var userService       = require("./user-service");
+var unsafeHtml        = require('../utils/unsafe-html');
+var processChat       = require('../utils/process-chat');
+var appEvents         = require('../app-events');
+var Q                 = require('q');
+var mongoUtils        = require('../utils/mongo-utils');
+var moment            = require('moment');
+var StatusError       = require('statuserror');
+var unreadItemService = require('./unread-item-service');
 
 /*
  * Hey Trouper!
@@ -36,7 +37,7 @@ var ObjectID = require('mongodb').ObjectID;
  */
 exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
   return Q.fcall(function() {
-    if(!troupe) throw 404;
+    if(!troupe) throw new StatusError(404, 'Unknown room');
 
     /* You have to have text */
     if(!data.text && data.text !== "" /* Allow empty strings for now */) throw new StatusError(400, 'Text is required');
@@ -195,42 +196,85 @@ function massageMessages(message) {
   return message;
 }
 
+function findFirstUnreadMessageId(troupeId, userId) {
+  var d = Q.defer();
+  unreadItemService.getFirstUnreadItem(userId, troupeId, 'chat', d.makeNodeResolver());
+  return d.promise.spread(function(minId) {
+    return minId;
+  });
+}
+
 exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
-  var q = persistence.ChatMessage
-    .where('toTroupeId', troupeId);
-
-  var sentOrder = 'desc';
-
-  if(options.beforeId) {
-    var beforeId = new ObjectID(options.beforeId);
-    q = q.where('_id').lt(beforeId);
+  var findMarker;
+  if(options.marker === 'first-unread' && options.userId) {
+    findMarker = findFirstUnreadMessageId(troupeId, options.userId);
+  } else {
+    findMarker = Q.resolve();
   }
 
-  if(options.beforeIncludingId) {
-    var beforeIncludingId = new ObjectID(options.beforeIncludingId);
-    q = q.where('_id').lte(beforeIncludingId);
-  }
+  return findMarker
+    .then(function(markerId) {
 
-  if(options.afterId) {
-    // Reverse the initial order for afterId
-    var afterId = new ObjectID(options.afterId);
-    sentOrder = 'asc';
-    q = q.where('_id').gt(afterId);
-  }
+      var q = persistence.ChatMessage
+        .where('toTroupeId', troupeId);
 
-  return q.sort(options.sort || { sent: sentOrder })
-    .limit(options.limit || 50)
-    .skip(options.skip || 0)
-    .execQ()
-    .then(function(results) {
-      results = results.map(massageMessages);
-      if(sentOrder === 'desc') {
-        return results.reverse();
+      var sentOrder = 'desc';
+
+      if(options.beforeId) {
+        var beforeId = new ObjectID(options.beforeId);
+        q = q.where('_id').lt(beforeId);
       }
 
-      return results;
+      if(options.beforeIncludingId) {
+        var beforeIncludingId = new ObjectID(options.beforeIncludingId);
+        q = q.where('_id').lte(beforeIncludingId);
+      }
+
+      if(options.afterId) {
+        // Reverse the initial order for afterId
+        var afterId = new ObjectID(options.afterId);
+        sentOrder = 'asc';
+        q = q.where('_id').gt(afterId);
+      }
+
+      if(!markerId && !options.aroundId) {
+        return q.sort(options.sort || { sent: sentOrder })
+          .limit(options.limit || 50)
+          .skip(options.skip || 0)
+          .execQ()
+          .then(function(results) {
+            results = results.map(massageMessages);
+            if(sentOrder === 'desc') {
+              return results.reverse();
+            }
+
+            return results;
+          });
+      }
+
+      var aroundId = new ObjectID(markerId || options.aroundId);
+      /* Around case */
+      return Q.all([
+        persistence.ChatMessage
+                .where('toTroupeId', troupeId)
+                .sort({ sent: 'desc' })
+                .limit(Math.floor(options.limit / 2) || 25)
+                .where('_id').lte(aroundId)
+                .execQ(),
+        persistence.ChatMessage
+                .where('toTroupeId', troupeId)
+                .sort({ sent: 'asc' })
+                .limit(Math.ceil(options.limit / 2) || 25)
+                .where('_id').gt(aroundId)
+                .execQ(),
+        ])
+        .spread(function(a, b) {
+          return [].concat(a.reverse(), b);
+        });
     })
     .nodeify(callback);
+
+
 };
 
 exports.findChatMessagesForTroupeForDateRange = function(troupeId, startDate, endDate, callback) {

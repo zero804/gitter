@@ -311,6 +311,10 @@ define([
       var newModel = data.model;
       var id = newModel.id;
 
+      if(this.ignoreDataChange) {
+        if(this.ignoreDataChange(data)) return;
+      }
+
       if(this.transformModel) newModel = this.transformModel(newModel);
       var parsed = new this.model(newModel, { parse: true });
       var existing = this.findExistingModel(id, parsed);

@@ -616,20 +616,19 @@ function getUnreadItemsForUserTroupeSince(userId, troupeId, since, callback) {
 exports.getUnreadItemsForUserTroupeSince = getUnreadItemsForUserTroupeSince;
 
 exports.getFirstUnreadItem = function(userId, troupeId, itemType, callback) {
-    exports.getUnreadItems(userId, troupeId, itemType, function(err, members) {
-      if(err) {
-        winston.warn("unreadItemService.getUnreadItems failed: " + err, { exception: err });
+  exports.getUnreadItems(userId, troupeId, itemType, function(err, members) {
+    if(err) {
+      winston.warn("unreadItemService.getUnreadItems failed: " + err, { exception: err });
 
-        // Mask error
-        return callback(null, null);
-      }
+      // Mask error
+      return callback(null, null);
+    }
 
-      var totalUnreadItems = members.length;
-      var minId = getOldestId(members);
+    var totalUnreadItems = members.length;
+    var minId = getOldestId(members);
 
-      return callback(null, minId, totalUnreadItems);
-
-    });
+    return callback(null, minId, totalUnreadItems);
+  });
 };
 
 exports.getUnreadItemsForUser = function(userId, troupeId, callback) {
