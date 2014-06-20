@@ -77,7 +77,6 @@ define([
       if(this._contains(itemType, itemId)) return;
 
       this._addTarpit._add(itemType, itemId);
-      this.trigger('add', itemType, itemId);
       this._recountLimited();
     },
 
@@ -109,6 +108,7 @@ define([
 
     _promote: function(itemType, itemId) {
       this._add(itemType, itemId);
+      this.trigger('add', itemType, itemId);
     },
 
     _recount: function() {
