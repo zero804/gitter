@@ -30,14 +30,14 @@ define([
   var EDIT_WINDOW = 240000;
 
   var mouseEvents = {
-    'click .trpChatEdit':       'toggleEdit',
-    'click .trpChatReadBy':     'showReadBy',
-    'mouseover .trpChatReadBy': 'showReadByIntent',
+    'click .js-chat-item-edit':       'toggleEdit',
+    'click .js-chat-item-readby':     'showReadBy',
+    'mouseover .js-chat-item-readby': 'showReadByIntent',
     'click .webhook':           'expandActivity'
   };
 
   var touchEvents = {
-    'click .trpChatEdit':       'toggleEdit',
+    'click .js-chat-item-edit':       'toggleEdit',
   };
 
   var ChatItemView = TroupeViews.Base.extend({
@@ -167,7 +167,7 @@ define([
       this.timeChange();
 
       if (!this.compactView) {
-        var editIcon = this.$el.find('.trpChatEdit');
+        var editIcon = this.$el.find('.js-chat-item-edit');
         editIcon.tooltip({ container: 'body', title: this.getEditTooltip.bind(this) });
       }
 
@@ -194,12 +194,12 @@ define([
         var readByCount = this.model.get('readBy');
         var oldValue = this.model.previous('readBy');
 
-        var readByLabel = this.$el.find('.trpChatReadBy');
+        var readByLabel = this.$el.find('.js-chat-item-readby');
 
         if(readByLabel.length === 0) {
           if(readByCount) {
-           readByLabel = $(document.createElement('div')).addClass('trpChatReadBy');
-           readByLabel.insertBefore(this.$el.find('.trpChatEdit'));
+           readByLabel = $(document.createElement('div')).addClass('chat-item__icon--read js-chat-item-readby');
+           readByLabel.insertBefore(this.$el.find('.js-chat-item-edit'));
            setTimeout(function() {
              readByLabel.addClass('readBySome');
            }, 10);
