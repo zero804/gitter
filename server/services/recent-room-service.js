@@ -135,11 +135,14 @@ function addTroupeAsFavouriteInPosition(userId, troupeId, position) {
       var set = {};
       set['favs.' + troupeId] = position;
 
-      winston.verbose('recent-rooms: Issuing changes: ', { set: set, inc: inc });
+      var update = {$set: set};
+      if (!_.isEmpty(inc)) update.$inc = inc; // Empty $inc is invalid
+
+      winston.verbose('recent-rooms: Issuing changes: ', update);
 
       return persistence.UserTroupeFavourites.updateQ(
         { userId: userId },
-        { $set: set, $inc: inc },
+        update,
         { upsert: true })
         .thenResolve(position);
     });
