@@ -1,0 +1,37 @@
+.menu {
+
+  /* vars */
+  @menu-width: 250px;
+  
+  /* visibility */
+  display: inline-block;
+  overflow: hidden;
+
+  /* positioning */
+  z-index: @l10;
+  position: fixed;
+  left: 0em;
+  top: 0em;
+  margin-top: 0px;
+
+  /* dimensions */
+  width: @menu-width;
+  height: 100%;
+
+  /* colors */
+  background-color: lighten(#aaa, 5%);
+  color: white;
+
+  /* effects */
+  transition:background-color 0.3s ease-in-out 0s, left .5s ease-in-out 0.3s;
+  
+  /* states */
+  &:hover {}
+
+  /* sub components */
+  .menu__header {
+    
+  }
+
+  /* media queries */
+}
