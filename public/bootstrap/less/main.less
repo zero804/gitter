@@ -14,6 +14,7 @@
  * App Structure        A hierarchical view of the application.
  * Imports              All the libraries and other stylesheet files.
  * CSS Reset            Resets the styling in order to standardize it.
+ * UI Levels            Used to separate `z-index`es more manageably.
  * Type                 Defines all font related styles.
  * Color                Contains the colors.
  * Elements             Defines styling for UI components.
@@ -27,8 +28,9 @@
   * Notes
   *
   * We're trying to follow the BEM (Block, Element, Modifier) methodology for writing maintanable CSS.
-  * Please follow this method. If you are not comfortable with BEM,
-  * read this: http://www.integralist.co.uk/posts/maintainable-css-with-bem/ or come to see me. Thanks! :)
+  * Please follow this method. If you want to know more about BEM, read this:
+  *
+  * http://www.integralist.co.uk/posts/maintainable-css-with-bem/ or ask for help. Thanks! :)
   *
   * ** IMPORTANT! **
   * Always use BEM.
@@ -52,15 +54,23 @@
           • ChatToolBar
   */
 
-
 /* Imports */
-// @import 'some-lib.less';
 
 /* CSS Reset */
-// Eric Meyer's Reset CSS v2.0 - http://cssreset.com
-html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{border:0;font-size:100%;font:inherit;vertical-align:baseline;margin:0;padding:0}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:none}table{border-collapse:collapse;border-spacing:0}
-// Paul Irish's Box Sizing Tip - http://www.paulirish.com/2012/box-sizing-border-box-ftw/
-*, *:before, *:after { box-sizing: border-box; }
+@import 'reset.css'; // Eric Meyer's Reset CSS v2.0 - http://cssreset.com
+*, *:before, *:after { box-sizing: border-box; } // Paul Irish's Box Sizing Tip - http://www.paulirish.com/2012/box-sizing-border-box-ftw/
+
+/* UI Levels */
+@l1:  100;   /* deep -> Root UI Components */ 
+@l2:  200;
+@l3:  300;
+@l4:  400;
+@l5:  500;
+@l6:  600;
+@l7:  700;
+@l8:  800;
+@l9:  900;
+@l10: 1000;   /* shallow -> Popups and others */
 
 /* Type */
 @type: 'Open Sans', 'HelveticaNeue-Light', sans-serif;
@@ -79,7 +89,10 @@ html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abb
 // @success = 
 
 /* Elements */
-// @import 'chat-item.less';
+@import 'menu.less';
+@import 'chat.less';
+@import 'toolbar.less';
+@import 'chat-item.less';
 
 /* Media Queries */
 // @media only screen and (min-width: 50em) {
