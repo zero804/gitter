@@ -1,10 +1,11 @@
-<div class="trpLeftMenuContainer">
-  <div id="left-menu-profile" class="trpLeftMenuProfile"></div>
-  <div class="trpSearchContainer">
-    <input class="trpLeftMenuSearch" id="list-search-input" placeholder="search"/>
-    <span class="trpSearchClear" id="search-clear-icon"></span>
+{{!-- <div class="trpLeftMenuContainer  menu__container"> --}}
+  
+  <div id="left-menu-profile" class="trpLeftMenuProfile  menu-header"></div>
+  <div class="menu-search">
+    <input class="menu-search__input" id="list-search-input" placeholder="Search"/>
+    <span class="menu-search__clear" id="search-clear-icon"></span>
   </div>
-  <div class="nano" id="left-menu-scroll">
+  <div class="nano  menu-content" id="left-menu-scroll">
     <div class="content nano-content trpLeftMenuWrapper" style="outline: none">
       <div class="trpToolbarList" id="list-mega">
         <div id="recentTroupesList" class="trpLeftMenuList">
@@ -23,7 +24,8 @@
       </div>
     </div>
   </div>
-  <div class="trpLeftMenuActions">
+  <div class="menu-actions">
     <a class="trpButtonMedium trpBtnWhite gtrCreateRoomButton" href="#createroom">Create a room</a>
   </div>
-</div>
+
+{{!-- </div> --}}
