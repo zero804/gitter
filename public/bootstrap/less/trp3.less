@@ -471,7 +471,7 @@ a:hover {
 }
 
 body.logged-out {
-  .trpLeftMenu {
+  .menu {
     width: 350px;
 
     @media @small {
@@ -557,7 +557,7 @@ body.logged-out {
 @import "menu";
 @import "chat-item";
 
-.trpLeftMenu {
+// .trpLeftMenu {
 	// display: inline-block;
 	// position: fixed;
 	// width: @leftMarginFull;
@@ -579,41 +579,23 @@ body.logged-out {
  //  &:hover {
  //    background-color: @trpDarkBlue;
  //  }
-
-  a {
-    text-decoration: none;
-  }
-
-  li {
-    line-height: 25px;
-  }
-
-  @media @small {
-    left:-250px;
-    transition-delay: 0s;
-
-      &.visible {
-        transition-delay: 0.3s;
-        left: 0px;
-      }
-  }
-}
+// }
 
 #people-roster {
   margin-left: 6px;
 }
 
-.trpLeftMenu .trpToolbarHeader {
-  margin-left: 12px;
-  padding-top: 0;
-  padding-bottom: 2px;
-  opacity: 0.6;
-  font-weight: 400;
-  width: 240px;
-  box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  padding-right: 9px;
-}
+// .trpLeftMenu .trpToolbarHeader {
+//   margin-left: 12px;
+//   padding-top: 0;
+//   padding-bottom: 2px;
+//   opacity: 0.6;
+//   font-weight: 400;
+//   width: 240px;
+//   box-sizing: border-box;
+//   -moz-box-sizing: border-box;
+//   padding-right: 9px;
+// }
 
 .trpToolbarHeaderItem {
   display: inline-block;
@@ -633,20 +615,19 @@ body.logged-out {
   opacity: 1;
 }
 
-.trpToolbarHeader .list-toggle {
-  opacity: 0;
-  float: right;
-  .transition300ms;
-}
+// .trpToolbarHeader .list-toggle {
+//   opacity: 0;
+//   float: right;
+//   .transition300ms;
+// }
 
-.trpToolbarHeader:hover >.list-toggle {
-  opacity: 0.8;
-}
+// .trpToolbarHeader:hover >.list-toggle {
+//   opacity: 0.8;
+// }
 
-.trpLeftMenuList {
-  margin-bottom: 20px;
-}
-
+// .trpLeftMenuList {
+//   margin-bottom: 20px;
+// }
 
 .github-ORG {
   .prepend-org-icon;
@@ -889,7 +870,7 @@ body.logged-out {
   .transition300ms;
 }
 
-.trpLeftMenu:hover + .trpRightPanel {
+.menu:hover + .trpRightPanel {
 	opacity: 1;
 }
 
@@ -2235,11 +2216,11 @@ ul.roster {
   padding-top: 16px;
 }
 
-.trpToolbarList {
-  display: inline-block;
-	vertical-align: top;
-  width: 100%;
-}
+// .trpToolbarList {
+//   display: inline-block;
+// 	vertical-align: top;
+//   width: 100%;
+// }
 
 .trpToolbarListContent {
   padding-left: 10px;
