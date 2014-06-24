@@ -21,6 +21,8 @@ require([
     }
   });
 
+  cordovaNavigate.setNativeToUserhome();
+
   function onContextLoad() {
     new UserHomeView({
       el: $('#frame-chat')
