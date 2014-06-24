@@ -7,10 +7,10 @@
 @l7:  700;
 @l8:  800;
 @l9:  900;
-@l10: 1000;
+@l10: 1000;  /* shallow -> Popups and others */
 
 .menu {
-  
+
   &, & * {
     .boxhack;
     overflow: hidden;
@@ -44,7 +44,7 @@
   transition: background-color 0.3s ease-in-out 0s, left .5s ease-in-out 0.3s;
   
   /* states */
-  &:hover {
+  body.hover &:hover {
     background-color: @trpDarkBlue;
   }
 
@@ -76,6 +76,13 @@
         left: 0px;
       }
   }
+
+  @media @mobile {
+    width: 85%;
+    height: 100%;
+    position: absolute;
+    padding: 10px;
+  }
 }
 
 .menu-header {
@@ -90,7 +97,7 @@
 
   .transition(200ms);
 
-  &.active {
+  body.hover &.active {
     background-color: rgba(255, 255, 255, 0.2);
     height: 116px;
     padding-bottom: 0.3125 + 0.3125em;
@@ -98,7 +105,7 @@
     .transition(400ms);
   }
 
-  &:hover {
+  body.hover &:hover {
     background-color: rgba(255,255,255,0.2);
   }
 
@@ -143,7 +150,7 @@
       padding-left: 10px;
     }
 
-    .item:hover {
+    body.hover .item:hover {
       border-radius: 4px;
       background-color: rgba(255,255,255,0.2);
     }
@@ -163,13 +170,24 @@
     li.item .icon-apps {
       .prepend-home-apps()
     }
+
+    @media @mobile {
+      & .item {
+        padding-left: 0;
+      }
+    }
+  }
+
+  @media @mobile {
+    height: auto;
+
   }
 }
 
 .menu-search {
   text-align: center;
   width: 100%;
-  padding: 0 .234375em 10px;
+  padding: 0 0 10px;
   position: relative;
 
   .menu-search__clear {
@@ -217,6 +235,10 @@
       color: hsl(0, 0%, 70%);
     }
   }
+
+  @media @mobile {
+    display: none;
+  }
 }
 
 .menu-content {
@@ -230,7 +252,7 @@
   
   .transition(200ms);
 
-  &.nano.pushed {
+  body.hover &.nano.pushed {
     top: 180px;
     .transition(400ms);
   }
@@ -273,10 +295,10 @@
       & .list-toggle {
         opacity: 0;
         float: right;
-        .transition300ms;
+        // .transition300ms;
       }
 
-      &:hover > .list-toggle {
+      body.hover &:hover > .list-toggle {
         opacity: 0.8;
       }
     }
@@ -301,8 +323,17 @@
       .menu-list__section;
     }
 
+    @media @mobile {
+      font-size: 16px;
+      ul {
+        margin-bottom: 0;
+      }
+    }
   }
 
+  @media @mobile {
+    top: 110px;
+  }
 }
 
 .menu-actions {
