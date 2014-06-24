@@ -178,7 +178,7 @@ version-files:
 	@echo GIT COMMIT: $(GIT_COMMIT)
 	@echo GIT BRANCH: $(GIT_BRANCH)
 	echo $(ASSET_TAG_PREFIX)$(GIT_COMMIT) > GIT_COMMIT
-	echo $(ASSET_TAG_PREFIX)$(GIT_BRANCH) > VERSION
+	echo $(GIT_BRANCH) > VERSION
 
 test-reinit-data: maintain-data test post-test-maintain-data
 
