@@ -7,6 +7,7 @@ var mongoose      = require('mongoose');
 var env           = require('../../utils/env');
 var logger        = env.logger;
 var config        = env.config;
+var redis         = env.redis;
 var errorReporter = env.errorReporter;
 var StatusError   = require('statuserror');
 
@@ -35,7 +36,12 @@ module.exports = [
             pingtestCollection.remove({ }, function(err) {
               if(err) return next(err);
 
-              res.send("OK from " + os.hostname() + ":" + config.get('PORT') + ", running " + appVersion.getAppTag());
+              var redisClient = redis.getClient();
+              redisClient.incr('ping.test', function(err) {
+                if(err) return next(err);
+
+                res.send("OK from " + os.hostname() + ":" + config.get('PORT') + ", running " + appVersion.getAppTag());
+              });
             });
           });
 
@@ -50,6 +56,6 @@ module.exports = [
   function(err, req, res, next) {
     logger.error('Health check failed: ' + err, { exception: err });
     errorReporter(err, { health_check_full: "failed" });
-    res.send(500);
+    res.status(500).send('Failed: ' + err);
   }
 ];
