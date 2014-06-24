@@ -22,6 +22,12 @@
 
 @import "trpInvites.less";
 
+.boxhack {
+  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+  box-sizing: border-box;  
+}
+
 .transition300ms() {
   .transition(300ms);
 }
@@ -928,27 +934,27 @@ a.trpMiniLeftMenuItem {
   bottom: 0px;
 }
 
-.trpLeftMenu .nano {
-  position: absolute;
-  bottom: 60px;
-  top: 100px;
-  .transition(200ms);
-}
+// .trpLeftMenu .nano {
+//   position: absolute;
+//   bottom: 60px;
+//   top: 100px;
+//   .transition(200ms);
+// }
 
-.trpLeftMenu .nano.pushed {
-  top: 180px;
-  .transition(400ms);
-}
+// .trpLeftMenu .nano.pushed {
+//   top: 180px;
+//   .transition(400ms);
+// }
 
-.trpLeftMenuActions {
-	position: absolute;
-	bottom: 10px;
-	overflow: hidden;
-  box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  padding: 0 10px;
-  width: 100%;
-}
+// .trpLeftMenuActions {
+// 	position: absolute;
+// 	bottom: 10px;
+// 	overflow: hidden;
+//   box-sizing: border-box;
+//   -moz-box-sizing: border-box;
+//   padding: 0 10px;
+//   width: 100%;
+// }
 
 .trpLeftMenuWrapper {
   display: inline-block;
