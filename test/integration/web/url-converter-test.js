@@ -3,7 +3,7 @@
 /*global describe:true, it: true */
 "use strict";
 
-var proxyquire =  require('proxyquire');
+var testRequire = require('../test-require');
 var Q = require('q');
 
 var roomServiceStub = {
@@ -29,7 +29,7 @@ var roomServiceStub = {
 
 var dummyUser = {};
 
-var converter = proxyquire('../../../server/web/url-converter', {
+var converter = testRequire.withProxies('./web/url-converter', {
   '../services/room-service': roomServiceStub
 });
 
