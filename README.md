@@ -28,4 +28,5 @@ This is run as part of the beta build, but is **not** run as part of a productio
 
 Run Like Production
 -------------------
-`node web --web:staticContent=public-processed/ --web:minified=true`
+1.  `make grunt`
+2.  `node web --web:staticContent=public-processed/ --web:minified=true`
