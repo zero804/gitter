@@ -1,27 +1,28 @@
 /*jslint node: true */
-/*global describe:true, it: true, before:false, after:false */
+/*jshint newcap:false */
+/*global describe:true, it: true */
 "use strict";
 
 var proxyquire =  require('proxyquire');
-var q = require('q');
+var Q = require('q');
 
 var roomServiceStub = {
   findOrCreateRoom: function(user, uri) {
     if(uri === 'someone/repo') {
-      return q({
+      return Q({
         troupe: {
           id: '12345'
         }
       });
     } else if(uri === 'someone') {
-      return q({
+      return Q({
         ownUrl: true,
         troupe: {
           id: 'abcdef'
         }
       });
     } else {
-      return q();
+      return Q();
     }
   }
 };
