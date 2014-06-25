@@ -102,7 +102,7 @@
 
   body.hover &.active {
     background-color: rgba(255, 255, 255, 0.2);
-    height: 122px;
+    height: 127px;
     padding-bottom: 0.3125 + 0.3125em;
 
     .transition(400ms);
@@ -112,6 +112,10 @@
     background-color: rgba(255,255,255,0.2);
   }
 
+  .trpDisplayPicture {
+    float: left;
+  }
+
   .avatar-s {
     width: 32px;
     height: 32px;
@@ -119,11 +123,15 @@
 
   .menu-header__profile {
     // padding-bottom: 4px; ? unecessary?
+    overflow: hidden;
+    clear: both;
+    width: 100%;
   }
 
   .menu-header__name {
     display: inline-block;
     line-height: 2em;
+    float: left;
     // vertical-align: top;
     // padding-top: 4px;
     font-weight: 300;
@@ -140,6 +148,7 @@
     padding-bottom: 12px;
     overflow: hidden;
     width: 100%;
+    margin-top: 8px;
     color: white;
     font-weight: 300;
     line-height: 24px;
@@ -157,8 +166,6 @@
         background-color: rgba(255,255,255,0.2);
       }
     }
-
-    
 
     li {
       list-style: none;
@@ -221,14 +228,15 @@
   }
 
   .menu-search__input {
-    // 
     background-color: rgba(255,255,255, 0.15);
     border: 1px solid rgba(255,255,255, 0.25);
     border-radius: 4px;
     font-size: 15px;
     font-weight: 100;
     font-family: @fontSans;
-    padding: 13px 4px 13px 7px;
+    height: 28px;
+    padding: 0 4px 0 7px;
+    // padding: 13px 4px 13px 7px;
     color: rgba(255,255,255, 0.7);
     width: 100%;
     margin: 0;
