@@ -6,7 +6,7 @@ module.exports = {
     var urlObj = url.parse(desktopUrl);
     var uri = urlObj.pathname.substring(1);
 
-    return roomService.findOrCreateRoom(user, uri)
+    return roomService.findOrCreateRoom(user, uri, { ignoreCase: true })
       .then(function(uriContext) {
           urlObj.pathname = '/mobile/chat';
           urlObj.hash = undefined;
