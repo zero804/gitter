@@ -5,6 +5,11 @@
   transition: background-color 0.5s linear;
   border-top: 1px solid transparent;
 
+  img.emoji {
+    height: 20px;
+    width: 20px;
+  }
+
   &.deleted {
     opacity: 0.5;
     .chat-item__text {
@@ -15,6 +20,19 @@
   &.unread, &.reading {
     background-color: fade(@trpGreen, 20%);
     border-top: 1px solid fade(@trpGreen, 25%);
+  }
+
+  @media @small {
+    // padding: 12px 12px;
+  }
+
+  @media @mid {
+    // padding: 12px 32px;
+
+    .avatar-s {
+      width: 24px;
+      height: 24px;
+    }
   }
 }
 
@@ -141,6 +159,15 @@
     }
 
     .chat-item__text {
+
+      margin: 0;
+      padding: 0;
+      word-wrap: break-word;
+      .user-select(text);
+
+      a.link {
+        color: @trpLightBlue;
+      }
 
       .trpChatInput {
         outline: 1px solid @trpLightBlue;

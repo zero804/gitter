@@ -1,10 +1,10 @@
 @import "highlight.less";
 @import "icon-mixins.less";
 
-img.emoji {
-  height: 20px;
-  width: 20px;
-}
+// img.emoji {
+//   height: 20px;
+//   width: 20px;
+// }
 
 // .trpChatText .mention {
 //   border: 1px solid fade(@trpGrey,40%);
@@ -144,12 +144,12 @@ a.issue:hover {
   width: 100%;
 }
 
-blockquote {
-  margin-bottom: 0;
-  font-size: 14px;
-  font-weight: 300;
-  line-height: 27.5px;
-}
+// blockquote {
+//   margin-bottom: 0;
+//   font-size: 14px;
+//   font-weight: 300;
+//   line-height: 27.5px;
+// }
 
 .trpChatContainer {
   text-align: center;
@@ -228,6 +228,28 @@ blockquote {
     padding: 0 12px;
   }
 
+}
+
+code {
+  border: 1px solid fade(@trpGrey,40%);
+  background-color: fade(@trpGrey,20%);
+  border-radius: 2px;
+  padding: 0 4px;
+  font-size: 14px;
+  overflow-x: auto;
+  word-wrap: normal;
+}
+
+pre code {
+  border-radius: 6px;
+  border: none;
+}
+
+blockquote {
+  margin-bottom: 0;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 27.5px;
 }
 
 // .trpChatEdit {
@@ -357,20 +379,20 @@ blockquote {
 //   margin: 4px 0 0 0;
 // }
 
-code {
-  border: 1px solid fade(@trpGrey,40%);
-  background-color: fade(@trpGrey,20%);
-  border-radius: 2px;
-  padding: 0 4px;
-  font-size: 14px;
-  overflow-x: auto;
-  word-wrap: normal;
-}
+// code {
+//   border: 1px solid fade(@trpGrey,40%);
+//   background-color: fade(@trpGrey,20%);
+//   border-radius: 2px;
+//   padding: 0 4px;
+//   font-size: 14px;
+//   overflow-x: auto;
+//   word-wrap: normal;
+// }
 
-pre code {
-  border-radius: 6px;
-  border: none;
-}
+// pre code {
+//   border-radius: 6px;
+//   border: none;
+// }
 
 // .trpChatItemContainer:last-child .trpChatItem {
 //   padding-bottom: 16px;
