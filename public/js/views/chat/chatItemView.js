@@ -300,6 +300,7 @@ define([
 
       if (this.inputBox) {
         this.stopListening(this.inputBox);
+        this.inputBox.remove();
         delete this.inputBox;
       }
 

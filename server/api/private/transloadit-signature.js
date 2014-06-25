@@ -60,7 +60,15 @@ module.exports =  function(req, res) {
   var shortToken = randomString(4);
 
   // Host for Transloadit callback. In dev env you'll need to use localtunnel
-  var host = (nodeEnv === 'dev') ? 'https://askdqdpcpd.localtunnel.me' : nconf.get('web:basepath');
+  var host = (nodeEnv === 'dev') ? 'https://peshchkyha.localtunnel.me' : nconf.get('web:basepath');
+
+  var templateId = nconf.get('transloadit:template_id');
+  if(req.query.type === 'image') {
+    var typeTemplateId = nconf.get('transloadit:template_image_id');
+    if(typeTemplateId) {
+      templateId = typeTemplateId;
+    }
+  }
 
   var params = {
     auth: {
@@ -68,7 +76,7 @@ module.exports =  function(req, res) {
       key: nconf.get('transloadit:key'),
       max_size: 5242880
     },
-    template_id: nconf.get('transloadit:template_id'),
+    template_id: templateId,
     fields: {
       room_uri: req.query.room_uri,
       token: shortToken
@@ -94,7 +102,11 @@ module.exports =  function(req, res) {
 
   // Store the token temporarily to verify Transloadit callback
   var expiry = 30 * 60; // 30 mins to be safe, S3 uploads, etc
-  var metadata = {room_id: req.query.room_id, user_id: req.user.id};
+  var metadata = {
+    room_id: req.query.room_id,
+    user_id: req.user.id
+  };
+
   redisClient.setex('transloadit:' + token, expiry, JSON.stringify(metadata));
 
   res.send({
