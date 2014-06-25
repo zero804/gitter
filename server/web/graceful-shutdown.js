@@ -1,6 +1,9 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+
+var env = require('../utils/env');
+var logger = env.logger;
 var shutdown = require('shutdown');
 
 module.exports = {
@@ -15,7 +18,12 @@ module.exports = {
 
     shutdown.addHandler('web', 20, function(callback) {
       gracefullyClosing = true;
-      server.close(callback);
+      var start = Date.now();
+      server.close(function() {
+        var time = Date.now() - start;
+        logger.info('Web server shutdown successfully in ' + time + 'ms');
+        callback();
+      });
     });
   }
 };

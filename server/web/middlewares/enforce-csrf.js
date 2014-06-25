@@ -2,6 +2,18 @@
 'use strict';
 
 var winston = require('../../utils/winston');
+var escapeRegExp = require('../../utils/escape-regexp');
+
+var WHITELIST = [
+'/api/private/hook/',
+'/api/private/transloadit/',
+'/api/v1/apn',
+'/login/oauth/token',
+'/login/oauth/authorize/decision',
+'/faye'
+];
+
+var WHITELIST_REGEXP = new RegExp('^(' + WHITELIST.map(escapeRegExp).join('|') + ')');
 
 module.exports = function(req, res, next) {
   // ignore these methods, they shouldnt alter state
@@ -42,15 +54,7 @@ module.exports = function(req, res, next) {
 };
 
 function isInWhitelist(req) {
-         // webhooks handler doesnt send a token, but the uri is hard to guess
-  return (req.path.indexOf('/api/private/hook/') === 0) ||
-         // Transloadit callback
-         (req.path.indexOf('/api/private/transloadit/') === 0) ||
-         // device registration requires no user id
-         (req.path === '/api/v1/apn') ||
-         // oauth post token endpoint for native login has its own auth
-         (req.path === '/login/oauth/token') ||
-         (req.path === '/login/oauth/authorize/decision');
+  return WHITELIST_REGEXP.test(req.path);
 }
 
 function getClientToken(req) {
