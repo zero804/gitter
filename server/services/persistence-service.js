@@ -422,7 +422,6 @@ TroupeSchema.methods.addUserById = function(userId, options) {
 
 function serializeOneToOneTroupeEvent(userId, operation, model, callback) {
   var oneToOneUserUrl = '/user/' + userId + '/rooms';
-  var restSerializer = getRestSerializerLateBound();
 
   var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
 
