@@ -35,6 +35,9 @@ require('./services/kue-workers').startWorkers();
 // APIS
 require('./api/').install(app, '', require('./web/middlewares/auth-api'));
 
+app.get('/api/private/health_check', require('./api/private/health-check'));
+app.get('/api/private/health_check/full', require('./api/private/health-check-full'));
+
 app.get('/', function(req, res) {
   res.redirect('https://developer.gitter.im');
 });
@@ -44,6 +47,6 @@ require('./handlers/catch-all').install(app);
 serverStats('api', server);
 
 var port = nconf.get("PORT");
-server.listen(port, function() {
+server.listen(port, undefined, nconf.get("web:backlog"), function() {
   winston.info("Listening on " + port);
 });
