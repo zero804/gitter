@@ -48,14 +48,14 @@ header {
   padding: 3px 5px;
 }
 
-.sideMenu {
-  // .trpBodyMedium;
-  .boxhack;
-  width: 85%;
-  height: 100%;
-  position: absolute;
-  padding: 10px;
-}
+// .sideMenu {
+//   // .trpBodyMedium;
+//   .boxhack;
+//   width: 85%;
+//   height: 100%;
+//   position: absolute;
+//   padding: 10px;
+// }
 
 // .trpLeftMenuWrapper {
 //   height: 100%;
@@ -71,7 +71,7 @@ header {
 
 #mainPage {
   box-shadow: 0 0 15px black;
-  z-index: 1;
+  z-index: @l10;
   .animation(cubic-bezier(0.6, -0.28, 0.735, 0.045));
 }
 
@@ -119,9 +119,14 @@ header {
 }
 
 .item-unread-badge {
+  display: none;
+  margin: 0;
   float: right;
-  padding-bottom: 2px;
-  padding-right: 8px;
+  &.shown {
+    display: inline-block;
+  }
+  // padding-bottom: 2px;
+  // padding-right: 8px;
 }
 
 .github-ORG {
@@ -129,7 +134,7 @@ header {
 }
 
 .github-ORG:before {
-    margin-top: -2px;
+    // margin-top: -2px;
 }
 
 
@@ -141,7 +146,7 @@ header {
 }
 
 .github-ORG_CHANNEL:before {
-    margin-top: -2px;
+    // margin-top: -2px;
 }
 
 
@@ -150,9 +155,8 @@ header {
 }
 
 .github-REPO:before {
-    margin-top: -2px;
+    // margin-top: -2px;
 }
-
 
 .github-REPO_CHANNEL {
   .prepend-channel-icon;
@@ -162,7 +166,7 @@ header {
 }
 
 .github-REPO_CHANNEL:before {
-    margin-top: -2px;
+    // margin-top: -2px;
 }
 
 
@@ -174,7 +178,7 @@ header {
 }
 
 .github-USER_CHANNEL:before {
-    margin-top: -2px;
+    // margin-top: -2px;
 }
 
 .github-ONETOONE {
@@ -182,7 +186,7 @@ header {
 }
 
 .github-ONETOONE:before {
-   margin-top: -2px;
+   // margin-top: -2px;
 }
 
 .item-fav .github-ORG {

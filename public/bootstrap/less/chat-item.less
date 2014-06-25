@@ -1,5 +1,4 @@
 .chat-item {
-
   
 }
 
@@ -42,10 +41,11 @@
         display: inline-block;
 
         @media @mobile {
-          max-width: 100px;
+          max-width: 50%;
           overflow: hidden;
           white-space: nowrap;
         }
+
       }
 
       .chat-item__time {
@@ -53,6 +53,10 @@
         display: inline-block;
         opacity: 0.8;
         color: #aaa;
+
+        &:before {
+          content: '\0020\2022\0020';
+        }
       }
 
       .chat-item__icon {
@@ -78,6 +82,7 @@
         background-repeat: no-repeat;
 
         @media @mobile {
+          display: none;
           width: 24px;
           height: 24px;
           float: right;
@@ -130,6 +135,10 @@
       }
     }
   }
+
+  @media @mobile {
+    padding: 12px 10px;
+  }
 }
 
 .chat-item__container--status {
@@ -139,7 +148,7 @@
     background-color: @status_bg;
     border: 2px solid darken(@status_bg, 1%);
     width: 89.5%;
-    margin: 0.625em 5.25%;
+    margin: 0 5.25% 0.625em;
     padding: 0.625em;
     border-radius: 3px;
 
@@ -151,5 +160,11 @@
       margin: 0;
       padding: 0;
       text-align: center;
+
+      .chat-item__details .chat-item__time {
+        &:before {
+          display: none;
+        }
+      }
     }
 }
