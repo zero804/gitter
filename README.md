@@ -8,13 +8,13 @@ Please symlink pre-commit to .git/hooks/pre-commit to enable the pre-commit hook
 
 Getting Started
 ---------------
-1.	`npm install`
-2.	`grunt less`
-3.	`./mongodb.sh`
-4.	`./redis.sh`
-5.	`./scripts/mongo/init-dev-mongo.sh`
-6.	`./scripts/upgrade-data.sh`
-7.	`nodemon` (this will run node and restart when anything changes based on config in nodemon.json)
+1.  `npm install`
+2.  `grunt less`
+3.  `./mongodb.sh`
+4.  `./redis.sh`
+5.  `./scripts/mongo/init-dev-mongo.sh`
+6.  `./scripts/upgrade-data.sh`
+7.  `nodemon` (this will run node and restart when anything changes based on config in nodemon.json)
 
 Data Upgrades
 -------------
