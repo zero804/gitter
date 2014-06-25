@@ -1,10 +1,17 @@
-@import "bootstrap/bootstrap.less";
-@import "trpMobileFonts.less";
-@import "trp3Colours.less";
-@import "trpNativeChat.less";
-@import "trpButtons.less";
-@import "trp3Vars.less";
-@import "icon-mixins.less";
+@import "bootstrap/bootstrap";
+@import "trpMobileFonts";
+@import "trp3Colours";
+@import "trpNativeChat";
+@import "trpButtons";
+@import "trp3Vars";
+@import "icon-mixins";
+@import "menu";
+
+.boxhack {
+  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+  box-sizing: border-box;  
+}
 
 body.with-sideMenu {
   background-color: @trpDarkBlue;
@@ -34,8 +41,6 @@ header {
   }
 }
 
-
-
 #showTroupesButton {
   position: absolute;
   left: 0;
@@ -43,27 +48,30 @@ header {
   padding: 3px 5px;
 }
 
-.sideMenu {
-  width: 85%;
-  height: 100%;
-  position: absolute;
-}
+// .sideMenu {
+//   // .trpBodyMedium;
+//   .boxhack;
+//   width: 85%;
+//   height: 100%;
+//   position: absolute;
+//   padding: 10px;
+// }
 
-.trpLeftMenuWrapper {
-  height: 100%;
-}
+// .trpLeftMenuWrapper {
+//   height: 100%;
+// }
 
 #profile-menu-gitter-apps {
   display: none;
 }
 
-.trpLeftMenuContainer {
-  height: 100%;
-}
+// .trpLeftMenuContainer {
+//   height: 100%;
+// }
 
 #mainPage {
   box-shadow: 0 0 15px black;
-  z-index: 1;
+  z-index: @l10;
   .animation(cubic-bezier(0.6, -0.28, 0.735, 0.045));
 }
 
@@ -111,9 +119,14 @@ header {
 }
 
 .item-unread-badge {
+  display: none;
+  margin: 0;
   float: right;
-  padding-bottom: 2px;
-  padding-right: 8px;
+  &.shown {
+    display: inline-block;
+  }
+  // padding-bottom: 2px;
+  // padding-right: 8px;
 }
 
 .github-ORG {
@@ -121,7 +134,7 @@ header {
 }
 
 .github-ORG:before {
-    margin-top: -2px;
+    // margin-top: -2px;
 }
 
 
@@ -133,7 +146,7 @@ header {
 }
 
 .github-ORG_CHANNEL:before {
-    margin-top: -2px;
+    // margin-top: -2px;
 }
 
 
@@ -142,9 +155,8 @@ header {
 }
 
 .github-REPO:before {
-    margin-top: -2px;
+    // margin-top: -2px;
 }
-
 
 .github-REPO_CHANNEL {
   .prepend-channel-icon;
@@ -154,7 +166,7 @@ header {
 }
 
 .github-REPO_CHANNEL:before {
-    margin-top: -2px;
+    // margin-top: -2px;
 }
 
 
@@ -166,7 +178,7 @@ header {
 }
 
 .github-USER_CHANNEL:before {
-    margin-top: -2px;
+    // margin-top: -2px;
 }
 
 .github-ONETOONE {
@@ -174,7 +186,7 @@ header {
 }
 
 .github-ONETOONE:before {
-   margin-top: -2px;
+   // margin-top: -2px;
 }
 
 .item-fav .github-ORG {
@@ -206,85 +218,83 @@ header {
 }
 
 
-.trpLeftMenuProfile {
-  .trpBodyMedium;
-  padding: 10px 0 10px 10px;
-  cursor: pointer;
+// .menu-header {
+//   .trpBodyMedium;
+//   padding: 10px 0 10px 10px;
+//   cursor: pointer;
 
-  .avatar-s {
-    width: 32px;
-    height: 32px;
-  }
+//   .avatar-s {
+//     width: 32px;
+//     height: 32px;
+//   }
+// }
 
-}
+// .menu-header__options {
+//   box-sizing: border-box;
+//   margin-left: -4px;
+//   padding-bottom: 12px;
+//   overflow: hidden;
+//   width: 100%;
+//   color: white;
+//   .trpBodyMedium;
+//   font-weight: 300;
+//   line-height: 30px;
+//   padding-right: 20px;
+//   box-sizing: border-box;
 
-.trpLeftMenuProfileMenu {
-  box-sizing: border-box;
-  margin-left: -4px;
-  padding-bottom: 12px;
-  overflow: hidden;
-  width: 100%;
-  color: white;
-  .trpBodyMedium;
-  font-weight: 300;
-  line-height: 30px;
-  padding-right: 20px;
-  box-sizing: border-box;
+//   a {
+//     color: white;
+//     text-decoration: none;
+//   }
 
-  a {
-    color: white;
-    text-decoration: none;
-  }
+//   .item {
+//     padding-left: 10px;
+//     margin-right: 10px;
+//   }
 
-  .item {
-    padding-left: 10px;
-    margin-right: 10px;
-  }
+//   .item:active {
+//     border-radius: 0 4px 4px 0;
+//     background-color: rgba(255,255,255,0.2);
+//   }
 
-  .item:active {
-    border-radius: 0 4px 4px 0;
-    background-color: rgba(255,255,255,0.2);
-  }
+//   li {
+//     list-style: none;
+//   }
 
-  li {
-    list-style: none;
-  }
+//   li.item .icon-home {
+//     .prepend-home-icon()
+//   }
 
-  li.item .icon-home {
-    .prepend-home-icon()
-  }
+//   li.item .icon-signout {
+//     .prepend-home-signout()
+//   }
 
-  li.item .icon-signout {
-    .prepend-home-signout()
-  }
+//   li.item .icon-apps {
+//     .prepend-home-apps()
+//   }
+// }
 
-  li.item .icon-apps {
-    .prepend-home-apps()
-  }
+// .list-favourites .trpTroupeList {
+//   margin-bottom: 0px;
+// }
 
-}
+// .menu-header__name {
+//   display: inline-block;
+//   vertical-align: top;
+//   padding-top: 4px;
+//   font-weight: 300;
+//   font-size: 16px;
+//   margin-left: 8px;
+//   max-width: 187px;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+//   white-space: nowrap;
+// }
 
-.list-favourites .trpTroupeList {
-  margin-bottom: 0px;
-}
-
-.trpLeftMenuProfileName {
-  display: inline-block;
-  vertical-align: top;
-  padding-top: 4px;
-  font-weight: 300;
-  font-size: 16px;
-  margin-left: 8px;
-  max-width: 187px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.sideMenu .nano {
-  position: absolute;
-  width: 100%;
-  bottom: 10px;
-  top: 110px;
-  -webkit-overflow-scrolling: touch;
-}
+// .sideMenu .nano {
+//   position: absolute;
+//   width: 100%;
+//   bottom: 10px;
+//   top: 110px;
+//   -webkit-overflow-scrolling: touch;
+// }

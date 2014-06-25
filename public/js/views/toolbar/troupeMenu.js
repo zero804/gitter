@@ -167,7 +167,7 @@ define([
       });
 
     },
-
+    /* the clear icon shouldn't be available at all times? */
     onSearchClearIconClick: function() {
       $('#list-search-input').val('');
       this.hideSearch();

@@ -112,7 +112,7 @@ define([
     var webhookView = new Klass();
 
     webhookView.data = viewData;
-    chatItemView.$el.find('.trpChatText').html(webhookView.render().el);
+    chatItemView.$el.find('.trpChatItem').html(webhookView.render().el);
 
     // This could be moved to the template render, is here temporarily.
     chatItemView.$el.find('.trpChatBox').addClass('webhook');
