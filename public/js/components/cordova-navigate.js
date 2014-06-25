@@ -17,10 +17,7 @@ define([
     });
   }
 
-  var updateNativeContext = function(troupeId, title) {
-    var url = window.location.origin + '/mobile/chat#' + troupeId;
-    var context = 'troupe';
-    var altContext = 'chat';
+  var updateNativeContext = function(url, context, troupeId, altContext, title) {
     cordova.exec(
       noop,
       noop,
@@ -35,7 +32,10 @@ define([
     var id = troupe.get('id');
 
     if(id && name) {
-      updateNativeContext(id, name);
+      var url = window.location.origin + '/mobile/chat#' + id;
+      var context = 'troupe';
+      var altContext = 'chat';
+      updateNativeContext(url, context, id, altContext, name);
     }
   };
 
@@ -59,6 +59,11 @@ define([
       });
 
       updateNativeContextWithTroupe(troupe);
+    },
+    setNativeToUserhome: function() {
+      if(!cordova) return;
+
+      updateNativeContext(window.location.href, 'home', null, null, 'Home');
     }
   };
 

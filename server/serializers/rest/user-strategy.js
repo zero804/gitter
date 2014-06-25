@@ -87,6 +87,19 @@ function UserPresenceInTroupeStrategy(troupeId) {
 
 }
 
+function setAvatarSize(url, size) {
+  var sizeText;
+  if(!url || typeof url !== "string") return null;
+  if(size=='m') sizeText="s=128";
+  if(size=='s') sizeText="s=32";
+
+  if(url.indexOf('?') >= 0) {
+    return url + '&' + sizeText;
+  }
+
+  return url + '?' + sizeText;
+}
+
 function UserStrategy(options) {
   options = options ? options : {};
   var userRoleInTroupeStrategy = options.includeRolesForTroupeId || options.includeRolesForTroupe ? new UserRoleInTroupeStrategy(options) : null;
@@ -129,8 +142,8 @@ function UserStrategy(options) {
       displayName: options.exposeRawDisplayName ? user.displayName : user.getDisplayName(),
       fallbackDisplayName: options.exposeRawDisplayName && user.getDisplayName(),
       url: user.getHomeUrl(),
-      avatarUrlSmall: user.gravatarImageUrl,
-      avatarUrlMedium: user.gravatarImageUrl,
+      avatarUrlSmall: setAvatarSize(user.gravatarImageUrl,'s'),
+      avatarUrlMedium: setAvatarSize(user.gravatarImageUrl,'m'),
       scopes: scopes,
       online: userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id) || undefined,
       role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.username) || undefined,

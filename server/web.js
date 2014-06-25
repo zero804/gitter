@@ -58,6 +58,6 @@ require('./handlers/catch-all').install(app);
 serverStats('web', server);
 
 var port = nconf.get("PORT");
-server.listen(port, function() {
+server.listen(port, undefined, nconf.get("web:backlog"), function() {
   winston.info("Listening on " + port);
 });
