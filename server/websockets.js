@@ -26,6 +26,9 @@ app.get('/', function(req, res) {
   res.send('Nothing to see here. Move along please. ' + appVersion.getAppTag());
 });
 
+app.get('/api/private/health_check', require('./api/private/health-check'));
+app.get('/api/private/health_check/full', require('./api/private/health-check-full'));
+
 require('./utils/event-listeners').installLocalEventListeners();
 
 var port = nconf.get('PORT') || nconf.get("ws:port");
