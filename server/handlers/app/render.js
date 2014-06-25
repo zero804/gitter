@@ -74,9 +74,11 @@ function renderMainFrame(req, res, next, frame) {
 function renderChatPage(req, res, next) {
   var troupe = req.uriContext.troupe;
   var userId = req.user && req.user.id;
+  var aroundId = req.query.at;
+
   Q.all([
     contextGenerator.generateTroupeContext(req),
-    restful.serializeChatsForTroupe(troupe.id, userId, { limit: INITIAL_CHAT_COUNT })
+    restful.serializeChatsForTroupe(troupe.id, userId, { limit: INITIAL_CHAT_COUNT, aroundId: aroundId })
     ]).spread(function(troupeContext, chats) {
 
       var githubLink;

@@ -9,6 +9,7 @@ var chatService         = require("./chat-service");
 var eventService        = require("./event-service");
 var Q                   = require('q');
 var roomService         = require('./room-service');
+var _                   = require('underscore');
 
 var DEFAULT_CHAT_COUNT_LIMIT = 30;
 
@@ -35,11 +36,16 @@ exports.serializeChatsForTroupe = function(troupeId, userId, options, cb) {
 
   if(!options) options = {};
 
+  options = _.extend({}, {
+    skip: 0,
+    limit: DEFAULT_CHAT_COUNT_LIMIT
+  }, options);
+
   var d = Q.defer();
   var callback = d.makeNodeResolver();
   d = d.promise.nodeify(cb);
 
-  chatService.findChatMessagesForTroupe(troupeId, { skip: options.skip || 0, limit: options.limit || DEFAULT_CHAT_COUNT_LIMIT, sort: options.sort }, function(err, chatMessages) {
+  chatService.findChatMessagesForTroupe(troupeId, options, function(err, chatMessages) {
     if(err) return callback(err);
 
     var strategy = new restSerializer.ChatStrategy({
