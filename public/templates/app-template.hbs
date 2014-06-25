@@ -1,67 +1,63 @@
-<!doctype html>
-<html class="no-js loading" lang="en">
-<head>
-  <meta http-equiv="X-UA-Compatible" content="IE=IE10" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
-	<meta charset="utf-8">
+<!DOCTYPE html>
+  <html class="no-js loading" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=IE10" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
+  	<meta charset="utf-8">
 
-	<title>{{troupeName}} - Gitter</title>
+  	<title>{{troupeName}} - Gitter</title>
 
-  <style>
+    <style>
 
-  @-webkit-keyframes pulsey {
-      0% { opacity: 0.6; }
-      50% { opacity: 1; }
-      100% { opacity: 0.6; }
-  }
+      @-webkit-keyframes pulsey {
+          0% { opacity: 0.6; }
+          50% { opacity: 1; }
+          100% { opacity: 0.6; }
+      }
 
-  html.loading .trpContentPanel { background: url("{{ cdn 'images/2/gitter/logo-mark-grey-64.png' }}") center no-repeat; height: 90%; -webkit-animation: pulsey 2s ease-out; -webkit-animation-iteration-count: infinite;  }
-  html.loading .trpContentPanel > * { visibility: hidden; }
-  </style>
-
-  <link rel="stylesheet" href='{{cdn "bootstrap/css/trp3.css" }}'>
+      html.loading .trpContentPanel { background: url("{{ cdn 'images/2/gitter/logo-mark-grey-64.png' }}") center no-repeat; height: 90%; -webkit-animation: pulsey 2s ease-out; -webkit-animation-iteration-count: infinite;  }
+      html.loading .trpContentPanel > * { visibility: hidden; }
+    </style>
 
     <!-- Le fav and touch icons -->
+    <link rel="stylesheet" href='{{cdn "bootstrap/css/trp3.css" }}'>
     <link id="favicon" rel="shortcut icon" href='{{cdn "images/2/gitter/favicon5.png" }}'>
     {{>load_font_css}}
-</head>
-<body>
+  </head>
+  <body class='hover'>
 
-  {{#isMobile agent}}
-    <div class="trpPortraitAlert" id='portrait-alert'>
-      <div class="message">
-        <img class="ipad-icon" src='{{cdn "images/2/icon-rotate-ipad.png"}}'>
-        <p>Rotate iPad for better experience.</p>
-        <img class="logo" src='{{cdn "images/2/menu-toggle.png" }}'>
+    {{#isMobile agent}}
+      <div class="trpPortraitAlert" id='portrait-alert'>
+        <div class="message">
+          <img class="ipad-icon" src='{{cdn "images/2/icon-rotate-ipad.png"}}'>
+          <p>Rotate iPad for better experience.</p>
+          <img class="logo" src='{{cdn "images/2/menu-toggle.png" }}'>
+        </div>
+      </div>
+      
+    {{/isMobile}}
+
+    <div class="trpLeftMenuHotspot" id="left-menu-hotspot"></div>
+    <div class="trpLeftMenu  menu" id="left-menu"></div>
+
+    <div class="trpMenuTab unread-count" id="menu-toggle-button">{{#if unreadCount}}{{unreadCount}}{{else}}0{{/if}}</div>
+
+    <div class="trpAlertWrapper" id="alert-panel">
+      <div class="trpAlertContainer">
+        <div class="trpAlertContent" id="alert-content">
+        </div>
       </div>
     </div>
-  {{/isMobile}}
 
-  <div class="trpLeftMenuHotspot" id="left-menu-hotspot"></div>
-  <div class="trpLeftMenu" id="left-menu"></div>
-
-
-<div class="trpMenuTab unread-count" id="menu-toggle-button">{{#if unreadCount}}{{unreadCount}}{{else}}0{{/if}}</div>
-
-<div class="trpAlertWrapper" id="alert-panel">
-  <div class="trpAlertContainer">
-    <div class="trpAlertContent" id="alert-content">
+    <div class="trpFramePanel" id="iframe-panel">
+      <iframe id="content-frame" src="{{chatAppLocation}}" style="width: 100%; height: 100%; border: 0" frameBorder="0"></iframe>
     </div>
-  </div>
-</div>
 
-<div class="trpFramePanel" id="iframe-panel">
-  <iframe id="content-frame" src="{{chatAppLocation}}" style="width: 100%; height: 100%; border: 0" frameBorder="0"></iframe>
-</div>
+    {{{ generateTroupeContext troupeContext }}}
 
-{{{ generateTroupeContext troupeContext }}}
+    {{>require_wrapper}}
+    {{{bootScript bootScriptName }}}
 
-{{>require_wrapper}}
-{{{bootScript bootScriptName }}}
-
-<style>
-
-</style>
-
-</body>
+    {{!-- <script src="//localhost:35729/livereload.js"></script> --}}
+  </body>
 </html>

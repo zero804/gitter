@@ -30,19 +30,19 @@ define([
   var EDIT_WINDOW = 240000;
 
   var mouseEvents = {
-    'click .trpChatEdit':       'toggleEdit',
-    'click .trpChatReadBy':     'showReadBy',
-    'mouseover .trpChatReadBy': 'showReadByIntent',
+    'click .js-chat-item-edit':       'toggleEdit',
+    'click .js-chat-item-readby':     'showReadBy',
+    'mouseover .js-chat-item-readby': 'showReadByIntent',
     'click .webhook':           'expandActivity'
   };
 
   var touchEvents = {
-    'click .trpChatEdit':       'toggleEdit',
+    'click .js-chat-item-edit':       'toggleEdit',
   };
 
   var ChatItemView = TroupeViews.Base.extend({
     attributes: {
-      class: 'trpChatItemContainer'
+      class: 'chat-item'
     },
     unreadItemType: 'chat',
     isEditing: false,
@@ -154,7 +154,7 @@ define([
         this.$el.addClass('deleted');
       }
 
-      this.$el.find('.trpChatText').html(html);
+      this.$el.find('.js-chat-item-text').html(html);
 
       _.each(this.decorators, function(decorator) {
         decorator.decorate(this);
@@ -167,7 +167,7 @@ define([
       this.timeChange();
 
       if (!this.compactView) {
-        var editIcon = this.$el.find('.trpChatEdit');
+        var editIcon = this.$el.find('.js-chat-item-edit');
         editIcon.tooltip({ container: 'body', title: this.getEditTooltip.bind(this) });
       }
 
@@ -194,12 +194,12 @@ define([
         var readByCount = this.model.get('readBy');
         var oldValue = this.model.previous('readBy');
 
-        var readByLabel = this.$el.find('.trpChatReadBy');
+        var readByLabel = this.$el.find('.js-chat-item-readby');
 
         if(readByLabel.length === 0) {
           if(readByCount) {
-           readByLabel = $(document.createElement('div')).addClass('trpChatReadBy');
-           readByLabel.insertBefore(this.$el.find('.trpChatEdit'));
+           readByLabel = $(document.createElement('div')).addClass('chat-item__icon--read js-chat-item-readby');
+           readByLabel.insertBefore(this.$el.find('.js-chat-item-edit'));
            setTimeout(function() {
              readByLabel.addClass('readBySome');
            }, 10);
@@ -308,7 +308,7 @@ define([
 
     showInput: function() {
       //var isAtBottom = this.scrollDelegate.isAtBottom();
-      var chatInputText = this.$el.find('.trpChatText');
+      var chatInputText = this.$el.find('.js-chat-item-text');
 
       // create inputview
       chatInputText.html("<textarea class='trpChatInput'></textarea>");
@@ -352,7 +352,6 @@ define([
       popover.show();
       ReadByPopover.singleton(this, popover);
     }
-
   });
 
   cocktail.mixin(ChatItemView, KeyboardEventMixins);
