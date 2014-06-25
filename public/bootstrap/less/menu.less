@@ -11,13 +11,14 @@
 
 .menu {
 
+  overflow: hidden;
+
   &, & * {
     .boxhack;
-    overflow: hidden;
   }
 
-  @menu-width: 250px;
   /* vars */
+  @menu-width: 250px;
   
   /* visibility */
   display: inline-block;
@@ -63,18 +64,18 @@
   }
 
   li {
-    line-height: 25px;
+    line-height: 26px;
   }
 
   /* media queries */
   @media @small {
-    left:-250px;
+    // left: -250px;
     transition-delay: 0s;
 
-      &.visible {
-        transition-delay: 0.3s;
-        left: 0px;
-      }
+    &.visible {
+      transition-delay: 0.3s;
+      left: 0px;
+    }
   }
 
   @media @mobile {
@@ -99,7 +100,7 @@
 
   body.hover &.active {
     background-color: rgba(255, 255, 255, 0.2);
-    height: 116px;
+    height: 122px;
     padding-bottom: 0.3125 + 0.3125em;
 
     .transition(400ms);
@@ -148,12 +149,14 @@
 
     .item {
       padding-left: 10px;
+
+      body.hover &:hover {
+        border-radius: 4px;
+        background-color: rgba(255,255,255,0.2);
+      }
     }
 
-    body.hover .item:hover {
-      border-radius: 4px;
-      background-color: rgba(255,255,255,0.2);
-    }
+    
 
     li {
       list-style: none;
@@ -172,15 +175,20 @@
     }
 
     @media @mobile {
+      margin-top: 8px;
+      padding-bottom: 0;
       & .item {
         padding-left: 0;
+        margin-bottom: 8px;
+        &:last-child {
+          margin-bottom: 0;
+        }
       }
     }
   }
 
   @media @mobile {
     height: auto;
-
   }
 }
 
@@ -263,6 +271,10 @@
     overflow-y: auto;
     overflow-x: hidden;
     font-weight: 300;
+
+    @media @mobile {
+      width: 100%;
+    }
   }
 
   .menu-list {
@@ -304,7 +316,7 @@
     }
 
     .menu-list__section {
-
+      width: 100%;
     }
 
     .menu-list__section--fav {
@@ -332,7 +344,18 @@
   }
 
   @media @mobile {
-    top: 110px;
+    position: static;
+    // top: 110px;
+    .menu-list__item {
+      .menu-list__header {
+        margin-left: 0;
+      }
+
+      li {
+        padding-left: 0;
+        margin-bottom: 2px;
+      }
+    }
   }
 }
 
@@ -342,4 +365,23 @@
   right: 0px;
   bottom: 0px;
   left: 0px; 
+}
+
+.trpTroupeUnreadCounter {
+  .boxhack;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+  display: inline-block;
+  padding: 0 4px;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 14px;
+  color: white;
+  white-space: nowrap;
+  vertical-align: middle;
+  background-color: #1dce73;
+  @media @mobile {
+    padding: 1px 4px 0px;
+  }
 }
