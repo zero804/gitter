@@ -36,7 +36,7 @@ var port = nconf.get('PORT') || nconf.get("ws:port");
 bayeux.attach(server);
 
 // Listen to the port
-server.listen(port, function() {
+server.listen(port, undefined, nconf.get("ws:backlog"), function() {
   winston.info("Websockets listening on port " + port);
 });
 
