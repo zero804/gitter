@@ -79,6 +79,9 @@ define([
         return sent.valueOf() + offset;
       }
     },
+    subscriptionOptions: function() {
+      return { aroundId: '539adf13fad68e388a5de07e' };
+    }
 
     findModelForOptimisticMerge: function(newModel) {
       var optimisticModel = this.find(function(model) {
