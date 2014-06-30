@@ -13,7 +13,7 @@ var random = require('../utils/random');
 var Q = require('q');
 var userService = require('./user-service');
 var moment = require('moment');
-var mongoose = require('mongoose');
+var onMongoConnect = require('../utils/on-mongo-connect');
 
 var WEB_INTERNAL_CLIENT_KEY = 'web-internal';
 var webInternalClientId = null;
@@ -21,7 +21,7 @@ var ircClientId;
 
 var cacheTimeout = 60; /* 60 seconds */
 
-function loadIds() {
+onMongoConnect(function() {
   logger.verbose('Loading oauth ids');
 
   /* Load webInternalClientId once at startup */
@@ -41,13 +41,7 @@ function loadIds() {
     ircClientId = oauthClient._id;
   });
 
-}
-
-if(mongoose.connection.readyState === 1) {
-  setImmediate(loadIds);
-} else {
-  mongoose.connection.on('open', loadIds);
-}
+});
 
 var tokenLookupCachePrefix = "token:c:";
 var tokenLookupCache = {
