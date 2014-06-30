@@ -10,6 +10,8 @@ var languageSelector = require('../../web/language-selector');
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 20;
 
+var staging = nconf.get('STAGING');
+
 function getAppCache(req) {
   if(!nconf.get('web:useAppCache')) return;
   return req.url + '.appcache';
@@ -65,6 +67,7 @@ function renderMainFrame(req, res, next, frame) {
         chatAppLocation: chatAppLocation,
         agent: req.headers['user-agent'],
         lang: languageSelector(req),
+        staging: staging,
         locale: req.i18n
       });
     })
