@@ -13,32 +13,41 @@ var random = require('../utils/random');
 var Q = require('q');
 var userService = require('./user-service');
 var moment = require('moment');
+var mongoose = require('mongoose');
 
 var WEB_INTERNAL_CLIENT_KEY = 'web-internal';
 var webInternalClientId = null;
+var ircClientId;
 
 var cacheTimeout = 60; /* 60 seconds */
 
-/* Load webInternalClientId once at startup */
-persistenceService.OAuthClient.findOne({ clientKey: WEB_INTERNAL_CLIENT_KEY }, function(err, oauthClient) {
-  if(err) throw new Error("Unable to load internal clientKey " + WEB_INTERNAL_CLIENT_KEY + ": " + err);
+function loadIds() {
+  logger.verbose('Loading oauth ids');
 
-  if(!oauthClient) throw new Error("Unable to load internal client id. Have you loaded it into mongo?");
+  /* Load webInternalClientId once at startup */
+  persistenceService.OAuthClient.findOne({ clientKey: WEB_INTERNAL_CLIENT_KEY }, function(err, oauthClient) {
+    if(err) throw new Error("Unable to load internal clientKey " + WEB_INTERNAL_CLIENT_KEY + ": " + err);
 
-  webInternalClientId = oauthClient._id;
-});
+    if(!oauthClient) throw new Error("Unable to load internal client id. Have you loaded it into mongo?");
 
-var ircClientId;
+    webInternalClientId = oauthClient._id;
+  });
 
-persistenceService.OAuthClient.findOne({ clientKey: nconf.get('irc:clientKey') }, function(err, oauthClient) {
-  if(err) throw new Error("Unable to load internal clientKey " + nconf.get('irc:clientKey') + ": " + err);
+  persistenceService.OAuthClient.findOne({ clientKey: nconf.get('irc:clientKey') }, function(err, oauthClient) {
+    if(err) throw new Error("Unable to load internal clientKey " + nconf.get('irc:clientKey') + ": " + err);
 
-  if(!oauthClient) throw new Error("Unable to load internal client id. Have you loaded it into mongo?");
+    if(!oauthClient) throw new Error("Unable to load internal client id. Have you loaded it into mongo?");
 
-  ircClientId = oauthClient._id;
-});
+    ircClientId = oauthClient._id;
+  });
 
+}
 
+if(mongoose.connection.readyState === 1) {
+  setImmediate(loadIds);
+} else {
+  mongoose.connection.on('open', loadIds);
+}
 
 var tokenLookupCachePrefix = "token:c:";
 var tokenLookupCache = {
