@@ -1427,7 +1427,7 @@ ul li.placeholder:before {
 	text-align: center;
 /*	padding-top: 40px;*/
 	top: 0px;
-  bottom: 74px;
+  bottom: 70px;
   right: 0px;
   /* this min height isn't the best solution*/
   /* we need the content panel to take up the entire middle of the screen*/
@@ -1867,7 +1867,9 @@ ul.roster {
   background-color: fade(@trpLightBlue, 30%);
 }
 
-.trpChatInputArea.rightCollapse, .trpHeaderContainer.rightCollapse, .trpChatPanel.rightCollapse {
+// .trpChatInputArea.rightCollapse,
+.trpHeaderContainer.rightCollapse,
+.trpChatPanel.rightCollapse {
   margin-right: 510px;
 
   @media @mid {
@@ -2190,26 +2192,25 @@ ul.roster {
 }
 
 
-.trpFileProgressContainer {
-  position: absolute;
-  top: -2px;
-  left: 0;
-  right: 0;
-  background-color: transparent;
-  width: 100%;
-  height: 2px;
-}
+// .trpFileProgressContainer {
+//   position: absolute;
+//   top: -2px;
+//   left: 0;
+//   right: 0;
+//   background-color: transparent;
+//   width: 100%;
+//   height: 2px;
+// }
 
-.trpFileProgressBar {
-  background-color: @trpGreen;
-  box-shadow: 0px 0px 1px 1px @trpGreen;
-  overflow: hidden;
-  width: 0;
-  display: none;
-  transition: width 0.5s;
-  transition-timing-function: ease;
-}
-
+// .trpFileProgressBar {
+//   background-color: @trpGreen;
+//   box-shadow: 0px 0px 1px 1px @trpGreen;
+//   overflow: hidden;
+//   width: 0;
+//   display: none;
+//   transition: width 0.5s;
+//   transition-timing-function: ease;
+// }
 
 .trpHeaderWrapper {
   padding-bottom: 10px;
@@ -2472,68 +2473,68 @@ ul.roster {
   }
 }
 
-.trpChatInputArea {
-  display: block;
-  text-align: center;
-  .transition300ms;
-}
+// .trpChatInputArea {
+//   display: block;
+//   text-align: center;
+//   .transition300ms;
+// }
 
-.trpChatInputButtons {
-  position: absolute;
-  right: 8px;
+// .trpChatInputButtons {
+//   position: absolute;
+//   right: 8px;
 
-  @media @mobile {
-    display: none;
-  }
+//   @media @mobile {
+//     display: none;
+//   }
 
-  .md-help {
-    opacity: 0.5;
-    .transition300ms;
-  }
+//   .md-help {
+//     opacity: 0.5;
+//     .transition300ms;
+//   }
 
-  .md-help:hover {
-    opacity: 0.9;
-  }
+//   .md-help:hover {
+//     opacity: 0.9;
+//   }
 
-  .md-help:before {
-    font-family: 'troupe-icons';
-    content: '\e82d';
-    margin-right: 6px;
-    width: 12px;
-    font-size: 20px;
-    -webkit-font-smoothing: antialiased;
-    opacity: 0.4;
-  }
+//   .md-help:before {
+//     font-family: 'troupe-icons';
+//     content: '\e82d';
+//     margin-right: 6px;
+//     width: 12px;
+//     font-size: 20px;
+//     -webkit-font-smoothing: antialiased;
+//     opacity: 0.4;
+//   }
 
-  .compose-mode-toggle {
-    margin-bottom: 4px;
-    opacity: 0.5;
-    .transition300ms;
-    cursor: pointer;
-    .prepend-pencil-off;
-    height: 20px;
-    &:before {
-      margin-left: 3px;
-      font-size: 16px;
-    };
-/*    &:hover {
-      .prepend-pencil-on;
-    }*/
-  }
+//   .compose-mode-toggle {
+//     margin-bottom: 4px;
+//     opacity: 0.5;
+//     .transition300ms;
+//     cursor: pointer;
+//     .prepend-pencil-off;
+//     height: 20px;
+//     &:before {
+//       margin-left: 3px;
+//       font-size: 16px;
+//     };
+// /*    &:hover {
+//       .prepend-pencil-on;
+//     }*/
+//   }
 
-  .compose-mode-toggle.active {
-    opacity: 0.7;
-    .prepend-pencil-on;
-/*    &:hover {
-      .prepend-pencil-off;
-    }*/
-  }
+//   .compose-mode-toggle.active {
+//     opacity: 0.7;
+//     .prepend-pencil-on;
+// /*    &:hover {
+//       .prepend-pencil-off;
+//     }*/
+//   }
 
-  .compose-mode-toggle:hover {
-    opacity: 0.9;
-  }
+//   .compose-mode-toggle:hover {
+//     opacity: 0.9;
+//   }
 
-}
+// }
 
 .markdown-help-content {
   .trpBodyMedium;
@@ -2571,7 +2572,6 @@ ul.roster {
 
 
 }
-
 
 .login-content {
 	width: 100%;

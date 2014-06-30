@@ -58,8 +58,8 @@ define([
       this.dialogRegion = modalRegion;
 
       if (hasScrollBars()) {
-        $(".trpChatContainer").addClass("scroller");
-        $(".trpChatInputArea").addClass("scrollpush");
+        $(".js-chat-container").addClass("scroller");
+        $(".js-chat-input-container").addClass("scrollpush");
         $("#room-content").addClass("scroller");
       }
 
