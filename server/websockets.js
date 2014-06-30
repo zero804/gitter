@@ -10,6 +10,7 @@ var domainWrapper = require('./utils/domain-wrapper');
 var http       = require('http');
 var shutdown = require('shutdown');
 var serverStats = require('./utils/server-stats');
+var onMongoConnect = require('./utils/on-mongo-connect');
 
 require('./utils/diagnostics');
 
@@ -35,12 +36,15 @@ var port = nconf.get('PORT') || nconf.get("ws:port");
 
 bayeux.attach(server);
 
-// Listen to the port
-server.listen(port, undefined, nconf.get("ws:backlog"), function() {
-  winston.info("Websockets listening on port " + port);
+onMongoConnect(function() {
+  // Listen to the port
+  serverStats('websockets', server);
+
+  server.listen(port, undefined, nconf.get("ws:backlog"), function() {
+    winston.info("Websockets listening on port " + port);
+  });
 });
 
-serverStats('websockets', server);
 
 shutdown.addHandler('websockets', 10, function(callback) {
   server.close(function() {
