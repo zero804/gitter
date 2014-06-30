@@ -6,32 +6,31 @@
 var fs = require("fs");
 var winston = require('../utils/winston');
 
-var commit, revision;
-var tagFile = __dirname + '/../../GIT_COMMIT';
+var revision, assetTag;
+var tagFile = __dirname + '/../../ASSET_TAG';
 
 try {
   if(fs.existsSync(tagFile)) {
-    commit = ('' + fs.readFileSync(tagFile)).trim();
-    revision = commit;
+    assetTag = ('' + fs.readFileSync(tagFile)).trim();
+    revision = assetTag;
   }
 } catch(e) {
-	winston.error('Unable to read GIT_COMMIT: ' + e);
+	winston.error('Unable to read ASSET_TAG: ' + e);
 }
 
-if(!commit) {
-  commit = 'dev' + Math.floor(Date.now() / 10000);
+if(!assetTag) {
+  assetTag = 'dev' + Math.floor(Date.now() / 10000);
   revision = 'develop';
 }
 
-var appTag = commit.substring(0, 6);
-var cdnPrefix = commit ? "/_s/" + appTag : '';
+var cdnPrefix = assetTag ? "/_s/" + assetTag : '';
 
 function getCurrentVersion() {
   return cdnPrefix;
 }
 
 function getAppTag() {
-	return appTag;
+	return assetTag;
 }
 
 function getRevision() {
