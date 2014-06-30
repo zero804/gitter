@@ -6,7 +6,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 TARBALL_URL=${BUILD_URL}artifact/output/troupe.tgz 
 ASSETS_TARBALL_URL=${BUILD_URL}artifact/output/assets.tgz 
-EXTRA_VARS=assets_location='${ASSETS_TARBALL_URL} tag=$TAG tarball_location=${TARBALL_URL}'
+EXTRA_VARS=assets_location="${ASSETS_TARBALL_URL} tag=$TAG tarball_location=${TARBALL_URL}"
 
 if [[ $STAGED_ENVIRONMENT = true ]]; then
   TAG=S$(echo $GIT_COMMIT|cut -c 1-6)
