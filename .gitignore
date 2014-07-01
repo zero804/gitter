@@ -56,3 +56,4 @@ npm-debug.log
 docker_build
 dump.rdb
 heapdump-*.heapsnapshot
+ASSET_TAG

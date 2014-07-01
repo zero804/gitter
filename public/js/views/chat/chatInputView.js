@@ -280,13 +280,51 @@ define([
       this.$el.find('textarea').attr('placeholder', placeholder).focus();
     },
 
-    send: function(val) {
-      if(val) {
-        var model = this.collection.create({
+    /**
+     * isStatusMessage() checks whether message is a status ('/me' command).
+     *
+     * @param <String> message
+     * @return <Boolean>
+     */
+    isStatusMessage: function (message) {
+      return /^\/me /.test(message); // if it starts with '/me' it should be a status update
+    },
+
+    /**
+     * textToStatus() converts a message to a status, removing the '/me' and replacing it with the current user's username
+     *
+     * @param <String> message
+     * @return <Boolean>
+     */
+    textToStatus: function (message) {
+      return message.replace(/^\/me /, '@' + context.getUser().username + ' ');
+    },
+
+    /**
+     * send() {describe}
+     *
+     * @param <String> val
+     * @return <Boolean>
+     */
+    send: function (val) {
+      if (val) {
+        /* baseline for message model */
+        var newMessage = {
           text: val,
           fromUser: context.getUser(),
-          sent: moment()
-        });
+          sent: moment(),
+        };
+
+        /* if it is a status message add a key `status` to the Object created above with value `true` */
+        if (this.isStatusMessage(newMessage.text)) {
+          newMessage.text = this.textToStatus(newMessage.text);
+          newMessage.status = true;
+        }
+
+        /* create the model */
+        var model = this.collection.create(newMessage);
+
+        /* emit event with model created */
         appEvents.trigger('chat.send', model);
       }
       return false;
@@ -485,7 +523,7 @@ define([
 
     processInput: function() {
       var cmd = commands.findMatch(this.$el.val());
-      if(cmd) {
+      if(cmd && cmd.action) {
         cmd.action(this);
       } else {
         this.send();

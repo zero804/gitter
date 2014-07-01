@@ -12,6 +12,7 @@ var http     = require('http');
 var nconf    = require('./utils/config');
 var domainWrapper = require('./utils/domain-wrapper');
 var serverStats = require('./utils/server-stats');
+var onMongoConnect = require('./utils/on-mongo-connect');
 
 /* Load express-resource */
 require('express-resource');
@@ -35,15 +36,19 @@ require('./services/kue-workers').startWorkers();
 // APIS
 require('./api/').install(app, '', require('./web/middlewares/auth-api'));
 
+app.get('/api/private/health_check', require('./api/private/health-check'));
+app.get('/api/private/health_check/full', require('./api/private/health-check-full'));
+
 app.get('/', function(req, res) {
   res.redirect('https://developer.gitter.im');
 });
 
 require('./handlers/catch-all').install(app);
+onMongoConnect(function() {
+  serverStats('api', server);
 
-serverStats('api', server);
-
-var port = nconf.get("PORT");
-server.listen(port, function() {
-  winston.info("Listening on " + port);
+  var port = nconf.get("PORT");
+  server.listen(port, undefined, nconf.get("web:backlog"), function() {
+    winston.info("Listening on " + port);
+  });
 });
