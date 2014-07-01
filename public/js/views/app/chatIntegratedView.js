@@ -20,7 +20,7 @@ define([
   };
 
   var mouseEvents = {
-    "click #favourite-button":          "toggleFavourite"
+    "click .js-favourite-button":          "toggleFavourite"
   };
 
   $('.trpDisplayPicture').tooltip('destroy');
