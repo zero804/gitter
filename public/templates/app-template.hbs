@@ -55,7 +55,8 @@
     {{{ generateTroupeContext troupeContext }}}
     {{>require_wrapper}}
     {{{bootScript bootScriptName }}}
-
-    <script src="//localhost:35729/livereload.js"></script>
+    {{#if liveReload}}
+      <script src="//localhost:35729/livereload.js"></script>
+    {{/if}}
   </body>
 </html>
