@@ -9,20 +9,18 @@
    </div>
   </span>
 </div>
-<div class="'chat-item__container'">
-  <div class='chat-item__content'>
-    <div class="chat-item__details">
-      <div class="chat-item__from">{{user.login}}</div>
-      <div class="chat-item__time">{{date}}</div>
-    </div>
-    {{#if body_html}}
-      <div class="chat-item__text">{{{body_html}}}</div>
-    {{else}}
-      <div class="chat-item__text missing">No description given.</div>
-    {{/if}}
+<div class='chat-item__content'>
+  <div class="chat-item__details">
+    <div class="chat-item__from">{{user.login}}</div>
+    <div class="chat-item__time">{{date}}</div>
   </div>
+  {{#if body_html}}
+    <div class="chat-item__text">{{{body_html}}}</div>
+  {{else}}
+    <div class="chat-item__text missing">No description given.</div>
+  {{/if}}
 </div>
-  {{#if assignee}}
+{{#if assignee}}
   <div style="float: right;
   margin-top: 5px;
   ">
@@ -34,6 +32,4 @@
     ">{{assignee.login}} is assigned</span>
   </div>
   {{/if}}
-
-
 {{/if}}
