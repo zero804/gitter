@@ -23,6 +23,90 @@
   }
 }
 
+.banner-wrapper {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -35px;
+  overflow: hidden;
+  height: 35px;
+  z-index: -1;
+
+  .transition500ms();
+  margin-left: 44px;
+  margin-right: 40px;
+  @media @mid {
+    margin-left: 32px;
+    margin-right: 32px;
+  }
+  @media @small {
+    margin-left: @leftMarginSmall + 42px;
+    margin-right: 42px;
+  }
+
+  .banner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 35px;
+
+    .transition500ms();
+    &.slide-away {
+      top: -35px;
+    }
+
+    button {
+      .trpButton;
+      position: absolute;
+      height: 100%;
+      padding: 4px 11px;
+      color: white;
+      background-color: fade(@trpGreen, 90%);
+      border-width: 0 0 0 0;
+
+      &:hover {
+        background-color: darken(@trpGreen, 5%);
+      }
+
+      &.main {
+        left: 0;
+        width: 100%;
+        .trpBodyMedium;
+        text-align: left;
+        border-radius: 0 0 4px 4px;
+      }
+
+      &.side {
+        right: 0;
+        .trpBodySmall;
+        border-left-width: 2px;
+        border-left-color: darken(@trpGreen, 5%);
+        border-radius: 0 0 4px 0;
+      }
+    }
+  }
+}
+
+.banner-wrapper.bottom {
+  bottom: auto;
+  top: -35px;
+  .banner {
+    top: auto;
+    bottom: 0;
+    &.slide-away {
+      top: auto;
+      bottom: -35px;
+    }
+    button.main {
+      border-radius: 4px 4px 0 0;
+    }
+    button.side {
+      display: none;
+    }
+  }
+}
+
 .chat-header__favourite {
   float: left;
   padding: 0px 25px 0px 40px;
@@ -99,128 +183,31 @@
   text-align: center;
   line-height: 68px;
 
-  .dropdown-toggle {
+  i {
     cursor: pointer;
     opacity: 0.4;
     transition: opacity .1s ease-in-out;
   }
 
-  .dropdown-toggle:before {
+  i:before {
     font-family: 'troupe-icons';
     content: '\e823';
     font-style: normal;
     font-size: 20px;
   }
 
-  .dropdown-toggle:hover {
+  i:hover {
     opacity: 1;
-  }
-
-  .dropdown-menu {
-    .trpBodyMedium;
-    right: 0;
-    left: auto;
   }
 }
 
-.trpHeaderWrapper {
-  // padding-bottom: 10px;
-  // position: fixed;
-  // -moz-box-sizing: border-box;
-  // box-sizing: border-box;
-  // top: 0;
-  // background-color: rgba(255, 255, 255, 0.97);
-  // border-bottom: 1px solid rgba(0,0,0,0.05);
-  // z-index: 1;
-  // .transition500ms;
-  // left: 0;
-  // right: @rightMarginFull;
+/** ! DEPRECATED???? !
+  *
+  * .trpHeaderWrapper
+  *
+  */
 
-  // @media @mid {
-  //   right: @rightMarginMid;
-  // }
-
-  // @media @small {
-  //   right: @rightMarginSmall
-  // }
-
-  // .trpHeaderArea {
-  //   display: block;
-  //   .transition500ms;
-  // }
-
-  .trpHeaderContainer {
-    // display: inline-block;
-    // width: 100%;
-    // padding-left: 46px;
-
-    // -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-    // -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-    // box-sizing: border-box;         /* Opera/IE 8+ */
-
-    // & h1 a:hover {
-    //   text-decoration: none;
-    // }
-
-    // @media @mid {
-    //   padding-left: 20px;
-    // }
-
-    // @media @small {
-    //   padding-left: 30px;
-    // }
-
-  }
-
-  // .trpTroupeFavourite {
-  //   float: left;
-  //   cursor: pointer;
-  //   display: inline-block;
-  //   margin-left: 4px;
-  //   margin-right: 18px;
-  //   margin-top: 10px;
-
-  //   @media @mid {
-  //     margin-left: 16px;
-  //     margin-right: 13px;
-  //   }
-
-  // }
-
-  // h1 {
-  //   font-family: 'Open Sans';
-  //   font-weight: 300;
-  //   font-size: 22px;
-  //   color: #333;
-  //   display: inline;
-  //   vertical-align: middle;
-  // }
-
-  // #trpTopic {
-  //   font-family: @fontSans;
-  //   font-size: 13px;
-  //   color: #777;
-  //   min-height: 1em;
-  //   margin: -5px 0 0 0;
-  //   .user-select(text);
-
-  //   a {
-  //     color: #666;
-  //   }
-
-  //   a:hover {
-  //     color: @trpLightBlue;
-  //   }
-
-  //   .trpTopicInput {
-  //     width: 100%;
-  //     font-size: 13px;
-  //     line-height: 120%;
-  //     margin-bottom: 0;
-  //     resize: none;
-  //   }
-
-  // }
+// .trpHeaderWrapper {
 
   // .gtrNameTopic {
   //   margin-right: 60px;
@@ -229,16 +216,6 @@
   //   @media @mid {
   //     margin-left: 55px;
   //   }
-  // }
-
-  // .dropdown-toggle {
-
-  // }
-
-  // .settingsCog {
-  //   float: right;
-  //   margin-top: 15px;
-  //   margin-right: 12px;
   // }
 
   // .activityFeedToggle {
@@ -271,95 +248,4 @@
   //     font-size: 20px;
   //     -webkit-font-smoothing: antialiased;
   // }
-
-  // .dropdown-toggle:before {
-  //     font-family: 'troupe-icons';
-  //     /*content: '\e81a';*/
-  //   /*  content: '\e81e';*/
-  //     content: '\e823';
-  //     margin-right: 8px;
-  //     width: 12px;
-  //     font-size: 20px;
-  // }
-
-  // .dropdown-toggle {
-  //   cursor: pointer;
-  //   opacity: 0.4;
-  //   transition:all .5s ease-in-out;
-  // }
-
-  // .dropdown-toggle:hover {
-  //   opacity: 1;
-  // }
-
-  // .dropdown-menu {
-  //   .trpBodyMedium;
-  //   right: 0;
-  //   left: auto;
-  // }
-}
-
-.banner-wrapper {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -35px;
-  overflow: hidden;
-  height: 35px;
-  z-index: -1;
-
-  .transition500ms();
-  margin-left: 44px;
-  margin-right: 40px;
-  @media @mid {
-    margin-left: 32px;
-    margin-right: 32px;
-  }
-  @media @small {
-    margin-left: @leftMarginSmall + 42px;
-    margin-right: 42px;
-  }
-
-  .banner {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 35px;
-
-    .transition500ms();
-    &.slide-away {
-      top: -35px;
-    }
-
-    button {
-      .trpButton;
-      position: absolute;
-      height: 100%;
-      padding: 4px 11px;
-      color: white;
-      background-color: fade(@trpGreen, 90%);
-      border-width: 0 0 0 0;
-
-      &:hover {
-        background-color: darken(@trpGreen, 5%);
-      }
-
-      &.main {
-        left: 0;
-        width: 100%;
-        .trpBodyMedium;
-        text-align: left;
-        border-radius: 0 0 4px 4px;
-      }
-
-      &.side {
-        right: 0;
-        .trpBodySmall;
-        border-left-width: 2px;
-        border-left-color: darken(@trpGreen, 5%);
-        border-radius: 0 0 4px 0;
-      }
-    }
-  }
-}
+// }

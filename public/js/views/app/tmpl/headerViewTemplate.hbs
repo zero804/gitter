@@ -1,33 +1,31 @@
-{{!-- <div class="trpHeaderContainer"> --}}
-  {{#unless archives}}
-    {{#unless oneToOne}}
-      {{#if user}}
-        <div class="chat-header__settings">
-          <i class="dropdown-toggle" data-toggle="dropdown"></i>
-        </div>
-      {{/if}}
-    {{/unless}}
-  {{/unless}}
-  {{#if user}}
-    <div class="chat-header__favourite" id="favourite-button">
-      <i class="js-favourite-button  {{#if troupeFavourite}}favourite{{/if}}" width="24" height="24"></i>
-    </div>
-  {{/if}}
-  <div class="chat-header__content">
-    {{#if githubLink}}
-      <h1 id="name-label">
-        <a href="{{githubLink}}" target="_blank">{{troupeName}}</a>
-      </h1>
-    {{else}}
-      <h1 id="name-label">{{troupeName}}</h1>
+{{#unless archives}}
+  {{#unless oneToOne}}
+    {{#if user}}
+      <div class="chat-header__settings">
+        <i class="js-chat-settings" data-toggle="dropdown"></i>
+      </div>
     {{/if}}
-    <p id="trpTopic">
-      {{#unless oneToOne}}
-        {{troupeTopic}}
-      {{/unless}}
-      {{#oneToOne}}
-        <a href="http://github.com{{troupeUri}}" target="github">github.com{{troupeUri}}</a>
-      {{/oneToOne}}
-    </p>
+  {{/unless}}
+{{/unless}}
+{{#if user}}
+  <div class="chat-header__favourite">
+    <i class="js-favourite-button  {{#if troupeFavourite}}favourite{{/if}}" width="24" height="24"></i>
   </div>
-{{!-- </div> --}}
+{{/if}}
+<div class="chat-header__content">
+  <h1 class='js-chat-name'>
+    {{#if githubLink}}
+      <a href="{{githubLink}}" target="_blank">{{troupeName}}</a>
+    {{else}}
+      {{troupeName}}
+    {{/if}}
+  </h1>
+  <p class="js-chat-topic">
+    {{#unless oneToOne}}
+      {{troupeTopic}}
+    {{/unless}}
+    {{#oneToOne}}
+      <a href="http://github.com{{troupeUri}}" target="_blank">github.com{{troupeUri}}</a>
+    {{/oneToOne}}
+  </p>
+</div>

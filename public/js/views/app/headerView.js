@@ -15,10 +15,10 @@ define([
       change: 'redisplay'
     },
     ui: {
-      cog: '.dropdown-toggle',
+      cog: '.js-chat-settings',
       dropdownMenu: '#cog-dropdown',
-      topic: '#trpTopic',
-      name: '#name-label',
+      topic: '.js-chat-topic',
+      name: '.js-chat-name',
       favourite: '.js-favourite-button'
     },
     events: {
