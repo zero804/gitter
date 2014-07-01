@@ -11,8 +11,6 @@
 
 .menu {
 
-  overflow: hidden;
-
   &, & * {
     .boxhack;
   }
@@ -34,7 +32,7 @@
   /* dimensions */
   width: @menu-width;
   height: 100%;
-  padding: 8px;
+  padding: 0;
 
   /* colors */
   background-color: lighten(@trpDarkBlue, 5%);
@@ -90,7 +88,8 @@
 
 .menu-header {
   .trpBodyMedium;
-  width: 100%;
+  width: 92%;
+  margin: 10px auto 0;
   padding: 0.3125em;
   margin-bottom: 10px;
   cursor: pointer;
@@ -203,7 +202,8 @@
 
 .menu-search {
   text-align: center;
-  width: 100%;
+  width: 92%;
+  margin: 10px auto 0;
   padding: 0 0 10px;
   position: relative;
 
@@ -243,6 +243,10 @@
 
     .transition(200ms);
 
+    &::-ms-clear {
+      display: none;
+    }
+
     &:focus {
       color: hsl(0, 0%, 10%);
       background-color: rgba(255,255,255, 0.95);
@@ -261,14 +265,18 @@
 
 .menu-content {
 
-  width: auto;
+  // width: 100%;
   position: absolute;
   top: 100px;
-  right: 0px;
+  // right: 0px;
   bottom: 60px;
-  left: 0px;
+  // left: 0px;
   
   .transition(200ms);
+
+  &.has-scrollbar {
+    max-width: 106%;
+  }
 
   body.hover &.nano.pushed {
     top: 180px;
@@ -278,7 +286,6 @@
   .menu-content__wrapper {
     .trpBodyMedium;
     display: inline-block;
-    overflow-y: auto;
     overflow-x: hidden;
     font-weight: 300;
 
