@@ -39,7 +39,8 @@ function renderHomePage(req, res, next) {
       agent: req.headers['user-agent'],
       lang: languageSelector(req),
       locale: req.i18n,
-      isUserhome: true
+      isUserhome: true,
+      liveReload: nconf.get('web:liveReload')
     });
   });
 }
@@ -68,7 +69,8 @@ function renderMainFrame(req, res, next, frame) {
         agent: req.headers['user-agent'],
         lang: languageSelector(req),
         staging: staging,
-        locale: req.i18n
+        locale: req.i18n,
+        liveReload: nconf.get('web:liveReload')
       });
     })
     .fail(next);
@@ -102,7 +104,8 @@ function renderChatPage(req, res, next) {
         chats: chats,
         agent: req.headers['user-agent'],
         lang: languageSelector(req),
-        locale: req.i18n
+        locale: req.i18n,
+        liveReload: nconf.get('web:liveReload')
       });
 
     })
@@ -121,7 +124,8 @@ function renderMobileUserHome(req, res, next) {
       agent: req.headers['user-agent'],
       isUserhome: true,
       lang: languageSelector(req),
-      locale: req.i18n
+      locale: req.i18n,
+      liveReload: nconf.get('web:liveReload')
     });
   });
 }
@@ -146,7 +150,8 @@ function renderMobileChat(req, res, next) {
         chats: chats,
         agent: req.headers['user-agent'],
         lang: languageSelector(req),
-        locale: req.i18n
+        locale: req.i18n,
+        liveReload: nconf.get('web:liveReload')
       });
 
     })
