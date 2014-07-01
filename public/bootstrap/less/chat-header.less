@@ -14,32 +14,6 @@
   background-color: rgba(255, 255, 255, 0.97);
   border-bottom: 1px solid rgba(0,0,0,0.05);
 
-  .dropdown-toggle:before {
-    font-family: 'troupe-icons';
-    /*content: '\e81a';*/
-    /*  content: '\e81e';*/
-    content: '\e823';
-    margin-right: 8px;
-    width: 12px;
-    font-size: 20px;
-  }
-
-  .dropdown-toggle {
-    cursor: pointer;
-    opacity: 0.4;
-    transition:all .5s ease-in-out;
-  }
-
-  .dropdown-toggle:hover {
-    opacity: 1;
-  }
-
-  .dropdown-menu {
-    .trpBodyMedium;
-    right: 0;
-    left: auto;
-  }
-
   @media @mid {
     right: @rightMarginMid;
   }
@@ -124,6 +98,29 @@
   padding: 0px 10px;
   text-align: center;
   line-height: 68px;
+
+  .dropdown-toggle {
+    cursor: pointer;
+    opacity: 0.4;
+    transition: opacity .1s ease-in-out;
+  }
+
+  .dropdown-toggle:before {
+    font-family: 'troupe-icons';
+    content: '\e823';
+    font-style: normal;
+    font-size: 20px;
+  }
+
+  .dropdown-toggle:hover {
+    opacity: 1;
+  }
+
+  .dropdown-menu {
+    .trpBodyMedium;
+    right: 0;
+    left: auto;
+  }
 }
 
 .trpHeaderWrapper {
@@ -300,7 +297,6 @@
   //   right: 0;
   //   left: auto;
   // }
-
 }
 
 .banner-wrapper {
