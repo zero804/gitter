@@ -27,11 +27,11 @@ mongoose.set('debug', nconf.get("mongo:logQueries"));
 mongoose.connect(nconf.get("mongo:url"), {
   server: {
     auto_reconnect: true,
-    socketOptions: { keepAlive: 1, connectTimeoutMS: 3000 }
+    socketOptions: { keepAlive: 1, connectTimeoutMS: 30000 }
   },
   replset: {
     auto_reconnect: true,
-    socketOptions: { keepAlive: 1, connectTimeoutMS: 2000 }
+    socketOptions: { keepAlive: 1, connectTimeoutMS: 20000 }
   }
 });
 
@@ -422,7 +422,6 @@ TroupeSchema.methods.addUserById = function(userId, options) {
 
 function serializeOneToOneTroupeEvent(userId, operation, model, callback) {
   var oneToOneUserUrl = '/user/' + userId + '/rooms';
-  var restSerializer = getRestSerializerLateBound();
 
   var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
 
@@ -568,6 +567,7 @@ var ChatMessageSchema = new Schema({
   fromUserId: ObjectId,
   toTroupeId: ObjectId,  //TODO: rename to troupeId
   text: String,
+  status: { type: Boolean, required: false },
   html: String,
   urls: Array,  // TODO: schema-ify this
   mentions: [{

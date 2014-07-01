@@ -52,6 +52,12 @@ define([
       }
     };
 
+    this.onSync = function() {
+      collection.forEach(function(model) {
+        updateChat(troupeId, model.id, JSON.stringify(model.toJSON()), null);
+      });
+    };
+
     this.onRemove = function(model) {
       if(model.id) {
         removeChat(troupeId, model.id, null);
@@ -59,6 +65,7 @@ define([
     };
 
     collection.on('add change', this.onAddChange);
+    collection.on('sync', this.onSync);
     collection.on('remove', this.onRemove);
   }
 

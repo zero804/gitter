@@ -4,17 +4,18 @@
 var env              = require('../utils/env');
 var stats            = env.stats;
 
-var persistence      = require("./persistence-service");
-var collections      = require("../utils/collections");
-var troupeService    = require("./troupe-service");
-var userService      = require("./user-service");
-var unsafeHtml       = require('../utils/unsafe-html');
-var processChat      = require('../utils/process-chat');
-var appEvents        = require('../app-events');
-var Q                = require('q');
-var mongoUtils       = require('../utils/mongo-utils');
-var moment           = require('moment');
+var persistence   = require("./persistence-service");
+var collections   = require("../utils/collections");
+var troupeService = require("./troupe-service");
+var userService   = require("./user-service");
+var unsafeHtml    = require('../utils/unsafe-html');
+var processChat   = require('../utils/process-chat');
+var appEvents     = require('../app-events');
+var Q             = require('q');
+var mongoUtils    = require('../utils/mongo-utils');
+var moment        = require('moment');
 var roomCapabilities = require('./room-capabilities');
+var StatusError   = require('statuserror');
 
 /*
  * Hey Trouper!
@@ -34,24 +35,25 @@ var ObjectID = require('mongodb').ObjectID;
 /**
  * Create a new chat and return a promise of the chat
  */
-exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
+exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
   return Q.fcall(function() {
     if(!troupe) throw 404;
 
     /* You have to have text */
-    if(!text && text !== "" /* Allow empty strings for now */) throw 400;
-    if(text.length > MAX_CHAT_MESSAGE_LENGTH) throw 400;
+    if(!data.text && data.text !== "" /* Allow empty strings for now */) throw new StatusError(400, 'Text is required');
+    if(data.text.length > MAX_CHAT_MESSAGE_LENGTH) throw new StatusError(400, 'Message exceeds maximum size');
 
-    if(!troupeService.userHasAccessToTroupe(user, troupe)) throw 403;
+    if(!troupeService.userHasAccessToTroupe(user, troupe)) throw new StatusError(403, 'Access denied');
 
     // TODO: validate message
-    var parsedMessage = processChat(text);
+    var parsedMessage = processChat(data.text);
 
     var chatMessage = new persistence.ChatMessage({
       fromUserId: user.id,
       toTroupeId: troupe.id,
       sent: new Date(),
-      text: text,                // Keep the raw message.
+      text: data.text,                // Keep the raw message.
+      status: data.status,            // Checks if it is a status update
       html: parsedMessage.html
     });
 
@@ -103,9 +105,9 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
             troupe.users.forEach(function(_user) {
               if (_user.userId.toString() !== user.id.toString()) toUserId = _user.userId;
             });
-            _msg = {oneToOne: true, username: user.username, toUserId: toUserId, text: text, id: chatMessage.id, toTroupeId: troupe.id};
+            _msg = {oneToOne: true, username: user.username, toUserId: toUserId, text: data.text, id: chatMessage.id, toTroupeId: troupe.id };
           } else {
-            _msg = {oneToOne: false, username: user.username, room: troupe.uri, text: text, id: chatMessage.id, toTroupeId: troupe.id};
+            _msg = {oneToOne: false, username: user.username, room: troupe.uri, text: data.text, id: chatMessage.id, toTroupeId: troupe.id };
           }
 
           appEvents.chatMessage(_msg);
