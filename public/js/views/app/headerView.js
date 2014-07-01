@@ -19,7 +19,7 @@ define([
       dropdownMenu: '#cog-dropdown',
       topic: '#trpTopic',
       name: '#name-label',
-      favourite: '#favourite-button'
+      favourite: '.js-favourite-button'
     },
     events: {
       'click @ui.cog': 'showDropdown',
@@ -107,8 +107,8 @@ define([
     toggleFavourite: function() {
       if(!context.isLoggedIn()) return;
 
-      this.ui.favourite.toggleClass('favourited');
-      var isFavourite = this.ui.favourite.hasClass('favourited');
+      this.ui.favourite.toggleClass('favourite');
+      var isFavourite = this.ui.favourite.hasClass('favourite');
 
       $.ajax({
         url: '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId(),
@@ -191,7 +191,7 @@ define([
       this.ui.name.text(model.get('name'));
       this.ui.topic.text(model.get('topic'));
       autolink(this.ui.topic[0]);
-      this.ui.favourite.toggleClass('favourited', !!model.get('favourite'));
+      this.ui.favourite.toggleClass('favourite', !!model.get('favourite'));
     }
 
   });
