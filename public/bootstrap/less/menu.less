@@ -11,8 +11,6 @@
 
 .menu {
 
-  overflow: hidden;
-
   &, & * {
     .boxhack;
   }
@@ -267,17 +265,17 @@
 
 .menu-content {
 
-  width: 100%;
+  // width: 100%;
   position: absolute;
   top: 100px;
-  right: 0px;
+  // right: 0px;
   bottom: 60px;
-  left: 0px;
+  // left: 0px;
   
   .transition(200ms);
 
   &.has-scrollbar {
-    width: 106%;
+    max-width: 106%;
   }
 
   body.hover &.nano.pushed {
@@ -288,7 +286,6 @@
   .menu-content__wrapper {
     .trpBodyMedium;
     display: inline-block;
-    overflow-y: auto;
     overflow-x: hidden;
     font-weight: 300;
 
