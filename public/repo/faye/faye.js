@@ -1080,6 +1080,7 @@ Faye.Client = Faye.Class({
     this._endpoint   = endpoint || this.DEFAULT_ENDPOINT;
     this._channels   = new Faye.Channel.Set();
     this._dispatcher = new Faye.Dispatcher(this, this._endpoint, options);
+    this._reuseTransport = options.reuseTransport !== false; // Default true
 
     this._messageId = 0;
     this._state     = this.UNCONNECTED;
@@ -1132,6 +1133,10 @@ Faye.Client = Faye.Class({
   handshake: function(callback, context) {
     if (this._advice.reconnect === this.NONE) return;
     if (this._state !== this.UNCONNECTED) return;
+
+    if (!this._reuseTransport) {
+      this._dispatcher.close();
+    }
 
     this._state = this.CONNECTING;
     var self = this;
@@ -1338,6 +1343,11 @@ Faye.Client = Faye.Class({
     }, this);
 
     return publication;
+  },
+
+  reset: function() {
+    this._state     = this.UNCONNECTED;
+    this._cycleConnection();
   },
 
   _sendMessage: function(message, callback, context) {
