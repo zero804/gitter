@@ -21,7 +21,7 @@ function readFileSync(fileName) {
 
 var assetTag = readFileSync('ASSET_TAG') || '';
 var commit = readFileSync('GIT_COMMIT') || '';
-var branch = readFileSync('GIT_BRANCH') || 'HEAD';
+var branch = readFileSync('VERSION') || 'HEAD';
 var version = commit ? commit.substring(0, 6) : 'HEAD-' + Math.floor(Date.now() / 10000);
 
 /* THE NEW */
