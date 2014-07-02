@@ -1,8 +1,10 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var chatService = require("../../services/chat-service"),
-    restSerializer = require("../../serializers/rest-serializer");
+var chatService = require('../../services/chat-service');
+var restSerializer = require('../../serializers/rest-serializer');
+var userAgentTags = require('../../utils/user-agent-tagger');
+var _ = require('underscore');
 
 module.exports = {
   id: 'chatMessage',
@@ -37,7 +39,10 @@ module.exports = {
   },
 
   create: function(req, res, next) {
-    chatService.newChatMessageToTroupe(req.troupe, req.user, req.body, function (err, chatMessage) {
+    var data = _.clone(req.body);
+    data.stats = userAgentTags(req.headers['user-agent']);
+
+    chatService.newChatMessageToTroupe(req.troupe, req.user, data, function (err, chatMessage) {
       if(err) return next(err);
 
       var strategy = new restSerializer.ChatStrategy({ currentUserId: req.user.id, troupeId: req.troupe.id });

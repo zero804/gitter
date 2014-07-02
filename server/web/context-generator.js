@@ -160,7 +160,6 @@ function createTroupeContext(req, options) {
     troupe: options.troupe,
     homeUser: options.homeUser,
     accessToken: req.accessToken,
-    appVersion: appVersion.getCurrentVersion(),
     desktopNotifications: options.desktopNotifications,
     events: events,
     troupeUri: options.troupe ? options.troupe.uri : undefined,

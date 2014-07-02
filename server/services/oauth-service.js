@@ -13,32 +13,35 @@ var random = require('../utils/random');
 var Q = require('q');
 var userService = require('./user-service');
 var moment = require('moment');
+var onMongoConnect = require('../utils/on-mongo-connect');
 
 var WEB_INTERNAL_CLIENT_KEY = 'web-internal';
 var webInternalClientId = null;
+var ircClientId;
 
 var cacheTimeout = 60; /* 60 seconds */
 
-/* Load webInternalClientId once at startup */
-persistenceService.OAuthClient.findOne({ clientKey: WEB_INTERNAL_CLIENT_KEY }, function(err, oauthClient) {
-  if(err) throw new Error("Unable to load internal clientKey " + WEB_INTERNAL_CLIENT_KEY + ": " + err);
+onMongoConnect(function() {
+  logger.verbose('Loading oauth ids');
 
-  if(!oauthClient) throw new Error("Unable to load internal client id. Have you loaded it into mongo?");
+  /* Load webInternalClientId once at startup */
+  persistenceService.OAuthClient.findOne({ clientKey: WEB_INTERNAL_CLIENT_KEY }, function(err, oauthClient) {
+    if(err) throw new Error("Unable to load internal clientKey " + WEB_INTERNAL_CLIENT_KEY + ": " + err);
 
-  webInternalClientId = oauthClient._id;
+    if(!oauthClient) throw new Error("Unable to load internal client id. Have you loaded it into mongo?");
+
+    webInternalClientId = oauthClient._id;
+  });
+
+  persistenceService.OAuthClient.findOne({ clientKey: nconf.get('irc:clientKey') }, function(err, oauthClient) {
+    if(err) throw new Error("Unable to load internal clientKey " + nconf.get('irc:clientKey') + ": " + err);
+
+    if(!oauthClient) throw new Error("Unable to load internal client id. Have you loaded it into mongo?");
+
+    ircClientId = oauthClient._id;
+  });
+
 });
-
-var ircClientId;
-
-persistenceService.OAuthClient.findOne({ clientKey: nconf.get('irc:clientKey') }, function(err, oauthClient) {
-  if(err) throw new Error("Unable to load internal clientKey " + nconf.get('irc:clientKey') + ": " + err);
-
-  if(!oauthClient) throw new Error("Unable to load internal client id. Have you loaded it into mongo?");
-
-  ircClientId = oauthClient._id;
-});
-
-
 
 var tokenLookupCachePrefix = "token:c:";
 var tokenLookupCache = {

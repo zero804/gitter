@@ -159,76 +159,84 @@ a.issue:hover {
   overflow: auto;
 }
 
-.trpChatInputContainer {
-  text-align: center;
-  display: inline-block;
-  width: 100%;
-  padding: 0 44px;
-  position: relative;
-  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-  -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-  box-sizing: border-box;         /* Opera/IE 8+ */
+// .trpChatContainer div:nth-child(odd) .chat-item__container {
+//   // background-color: #f3f8f1;
+// }
 
-  @media @mid {
-    padding: 0 32px;
-    padding-right: 42px;
-  }
-  @media @small {
-    padding: 0 42px 0 42px;
-  }
-  @media @mobile {
-    padding: 0 12px;
-  }
+.trpChatContainer > div:first-child {
+  padding-top: 72px;
 }
 
-.trpChatInputAvatar {
-  float: left;
-}
+// .trpChatInputContainer {
+//   text-align: center;
+//   display: inline-block;
+//   width: 100%;
+//   padding: 0 44px;
+//   position: relative;
+//   -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+//   -moz-box-sizing: border-box;     /* Firefox, other Gecko */
+//   box-sizing: border-box;         /* Opera/IE 8+ */
 
-.trpChatInputArea {
+//   @media @mid {
+//     padding: 0 32px;
+//     padding-right: 42px;
+//   }
+//   @media @small {
+//     padding: 0 42px 0 42px;
+//   }
+//   @media @mobile {
+//     padding: 0 12px;
+//   }
+// }
 
-  @media @mid {
-    .avatar-s {
-      width: 24px;
-      height: 24px;
-    }
-  }
+// .trpChatInputAvatar {
+//   float: left;
+// }
 
-  @media @mobile {
-    background-color: white;
-    padding-top: 5px;
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    border-top: 1px solid @trpBgColor;
+// .trpChatInputArea {
 
-    .avatar-s {
-      width: 24px;
-      height:24px;
-    }
-  }
-}
+//   @media @mid {
+//     .avatar-s {
+//       width: 24px;
+//       height: 24px;
+//     }
+//   }
 
-.trpChatInputBox {
-	display: block;
-	background-color: white;
-/*	height: 58px;*/
-	vertical-align: top;
-	border-radius: 5px 5px 5px 5px;
-	margin-left: 52px;
-  margin-bottom: 0px;
+//   @media @mobile {
+//     background-color: white;
+//     padding-top: 5px;
+//     position: absolute;
+//     bottom: 0;
+//     width: 100%;
+//     border-top: 1px solid @trpBgColor;
 
-  @media @mid {
-    margin-left: 40px;
-  }
+//     .avatar-s {
+//       width: 24px;
+//       height:24px;
+//     }
+//   }
+// }
 
-  @media @mobile {
-    background-color: white;
-    margin-left: 24px;
-    padding: 0 12px;
-  }
+// .trpChatInputBox {
+// 	display: block;
+// 	background-color: white;
+// /*	height: 58px;*/
+// 	vertical-align: top;
+// 	border-radius: 5px 5px 5px 5px;
+// 	margin-left: 52px;
+//   margin-bottom: 0px;
 
-}
+//   @media @mid {
+//     margin-left: 40px;
+//   }
+
+//   @media @mobile {
+//     background-color: white;
+//     margin-left: 24px;
+//     padding: 0 12px;
+//   }
+
+// }
 
 code {
   border: 1px solid fade(@trpGrey,40%);
@@ -343,37 +351,37 @@ blockquote {
 //   }
 // }
 
+// .trpChatInput,
+// .trpChatInputBoxTextArea {
+// 	display: block;
+// 	width: 100%;
+// 	outline: none;
+// 	.trpBodyMedium;
+// 	padding-left: 5px;
+// 	border: 0px;
+// 	resize: none;
+// 	margin: 1px;
+// 	box-shadow: none;
+// 	height: 44px;
+// }
 
-.trpChatInput, .trpChatInputBoxTextArea {
-	display: block;
-	width: 100%;
-	outline: none;
-	.trpBodyMedium;
-	padding-left: 5px;
-	border: 0px;
-	resize: none;
-	margin: 1px;
-	box-shadow: none;
-	height: 44px;
-}
+// .trpChatInputBoxTextArea:focus {
+//   outline: none;
+// }
 
-.trpChatInputBoxTextArea:focus {
-  outline: none;
-}
+// .trpChatInputBoxTextArea {
+//   overflow: hidden;
+//   padding: 5px;
+//   margin: -5px 0 0 -5px;
+//   margin-bottom: 12px;
+//   color: black;
 
-.trpChatInputBoxTextArea {
-  overflow: hidden;
-  padding: 5px;
-  margin: -5px 0 0 -5px;
-  margin-bottom: 12px;
-  color: black;
-
-  @media @mobile {
-    background-color: white;
-    padding: 0;
-    margin: 0;
-  }
-}
+//   @media @mobile {
+//     background-color: white;
+//     padding: 0;
+//     margin: 0;
+//   }
+// }
 
 // .trpChatItem pre {
 //   margin: 4px 0 0 0;
@@ -482,11 +490,6 @@ blockquote {
 
 // }
 
-// .trpChatContainer div:nth-child(odd) .trpChatItemContainer {
-// /*  background-color: #f3f8f1;*/
-// }
-
-
 // .trpChatItemContainer {
 // /*  border-bottom: 1px solid #ecf1ed;*/
 //   -webkit-transition: background-color 0.5s linear;
@@ -518,9 +521,7 @@ blockquote {
 // }
 
 
-// .trpChatContainer > div:first-child {
-//   padding-top: 72px;
-// }
+
 
 // .trpChatItem {
 //   .embed {
@@ -759,9 +760,6 @@ blockquote {
 //   a.link {
 //     color: @trpLightBlue;
 //   }
-
-
-
 // }
 
 .missing {

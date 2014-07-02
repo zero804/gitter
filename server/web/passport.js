@@ -14,7 +14,7 @@ var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy
 var BearerStrategy         = require('passport-http-bearer').Strategy;
 var oauthService           = require('../services/oauth-service');
 var mixpanel               = require('../web/mixpanelUtils');
-var useragentStats         = require('./useragent-stats');
+var useragentTagger        = require('../utils/user-agent-tagger');
 var GitHubStrategy         = require('troupe-passport-github').Strategy;
 var GitHubMeService        = require('../services/github/github-me-service');
 
@@ -141,7 +141,7 @@ function install() {
                   if (err) logger.error("Failed to update GH token for user ", user.username);
 
                   // Tracking
-                  var properties = useragentStats(req.headers['user-agent']);
+                  var properties = useragentTagger(req.headers['user-agent']);
                   stats.userUpdate(user, properties);
 
                   stats.event("user_login", _.extend({

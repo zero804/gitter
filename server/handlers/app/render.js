@@ -5,10 +5,33 @@ var nconf             = require('../../utils/config');
 var Q                 = require('q');
 var contextGenerator  = require('../../web/context-generator');
 var restful           = require('../../services/restful');
-var languageSelector = require('../../web/language-selector');
+var languageSelector  = require('../../web/language-selector');
+var appVersion        = require('../../web/appVersion');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 20;
+
+var stagingText, stagingLink;
+
+/* App tag */
+var staging = nconf.get('STAGING');
+switch(nconf.get('NODE_ENV')) {
+  case 'prod':
+    if(staging) {
+      stagingText = 'NEXT';
+      stagingLink = 'https://next.gitter.im';
+    }
+    break;
+  case 'beta':
+    var branch = appVersion.getBranch();
+    stagingText = branch ? branch.split('/').pop() : 'BETA';
+    stagingLink = appVersion.getGithubLink();
+    break;
+  case 'dev':
+    stagingText = 'DEV';
+    stagingLink = 'https://github.com/troupe/gitter-webapp/tree/develop';
+    break;
+}
 
 function getAppCache(req) {
   if(!nconf.get('web:useAppCache')) return;
@@ -37,7 +60,8 @@ function renderHomePage(req, res, next) {
       agent: req.headers['user-agent'],
       lang: languageSelector(req),
       locale: req.i18n,
-      isUserhome: true
+      isUserhome: true,
+      liveReload: nconf.get('web:liveReload')
     });
   });
 }
@@ -65,7 +89,10 @@ function renderMainFrame(req, res, next, frame) {
         chatAppLocation: chatAppLocation,
         agent: req.headers['user-agent'],
         lang: languageSelector(req),
-        locale: req.i18n
+        stagingText: stagingText,
+        stagingLink: stagingLink,
+        locale: req.i18n,
+        liveReload: nconf.get('web:liveReload')
       });
     })
     .fail(next);
@@ -101,7 +128,8 @@ function renderChatPage(req, res, next) {
         chats: chats,
         agent: req.headers['user-agent'],
         lang: languageSelector(req),
-        locale: req.i18n
+        locale: req.i18n,
+        liveReload: nconf.get('web:liveReload')
       });
 
     })
@@ -120,7 +148,8 @@ function renderMobileUserHome(req, res, next) {
       agent: req.headers['user-agent'],
       isUserhome: true,
       lang: languageSelector(req),
-      locale: req.i18n
+      locale: req.i18n,
+      liveReload: nconf.get('web:liveReload')
     });
   });
 }
@@ -145,7 +174,8 @@ function renderMobileChat(req, res, next) {
         chats: chats,
         agent: req.headers['user-agent'],
         lang: languageSelector(req),
-        locale: req.i18n
+        locale: req.i18n,
+        liveReload: nconf.get('web:liveReload')
       });
 
     })

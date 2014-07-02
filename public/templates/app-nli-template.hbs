@@ -26,7 +26,29 @@
     {{>load_font_css}}
 </head>
 <body class="logged-out">
-
+  {{#if stagingText}}
+  <div class="staging-indicator" style="
+      position: fixed;
+      left: 50%;
+      top: 0;
+      width: 40px;
+      background-color: #1dce73;
+      border-radius: 0 0 4px 4px;
+      z-index: 100000;
+      color: white;
+      font-family: 'open sans';
+      font-size: 10px;
+      text-align: center;
+  ">
+    {{#if stagingLink}}
+    <a style="text-decoration: none; color:white" href="{{stagingLink}}" target="_new">{{stagingText}}</a>
+    {{else}}
+    {{stagingText}}
+    {{/if}}
+    
+  </div>
+  {{/if}}
+  
   {{#isMobile agent}}
     <div class="trpPortraitAlert" id='portrait-alert'>
       <div class="message">
@@ -38,7 +60,7 @@
   {{/isMobile}}
 
   <div class="trpLeftMenuHotspot" id="left-menu-hotspot"></div>
-  <div class="trpLeftMenu" id="left-menu">
+  <div class="trpLeftMenu menu" id="left-menu">
     <div class="trpLeftMenuContainer">
       <div class="trpLeftMenuLoggedOut">
         <div class="trpLeftMenuLogo">
@@ -74,7 +96,9 @@
 
 {{>require_wrapper}}
 {{{bootScript bootScriptName }}}
-
+{{#if liveReload}}
+  <script src="//localhost:35729/livereload.js"></script>
+{{/if}}
 <style>
 
 </style>

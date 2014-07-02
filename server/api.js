@@ -12,6 +12,7 @@ var http     = require('http');
 var nconf    = require('./utils/config');
 var domainWrapper = require('./utils/domain-wrapper');
 var serverStats = require('./utils/server-stats');
+var onMongoConnect = require('./utils/on-mongo-connect');
 
 /* Load express-resource */
 require('express-resource');
@@ -43,10 +44,11 @@ app.get('/', function(req, res) {
 });
 
 require('./handlers/catch-all').install(app);
+onMongoConnect(function() {
+  serverStats('api', server);
 
-serverStats('api', server);
-
-var port = nconf.get("PORT");
-server.listen(port, undefined, nconf.get("web:backlog"), function() {
-  winston.info("Listening on " + port);
+  var port = nconf.get("PORT");
+  server.listen(port, undefined, nconf.get("web:backlog"), function() {
+    winston.info("Listening on " + port);
+  });
 });
