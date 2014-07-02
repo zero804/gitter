@@ -7,9 +7,9 @@ var winston    = require('./utils/winston');
 var bayeux     = require('./web/bayeux');
 var appVersion = require('./web/appVersion');
 var domainWrapper = require('./utils/domain-wrapper');
-var http       = require('http');
-var shutdown = require('shutdown');
-var serverStats = require('./utils/server-stats');
+var http          = require('http');
+var shutdown      = require('shutdown');
+var serverStats   = require('./utils/server-stats');
 var onMongoConnect = require('./utils/on-mongo-connect');
 
 require('./utils/diagnostics');
@@ -24,7 +24,7 @@ require('./web/graceful-shutdown').install(server, app);
 require('./web/express').installSocket(app);
 
 app.get('/', function(req, res) {
-  res.send('Nothing to see here. Move along please. ' + appVersion.getAppTag());
+  res.send('Nothing to see here. Move along please. ' + appVersion.getVersion());
 });
 
 app.get('/api/private/health_check', require('./api/private/health-check'));
