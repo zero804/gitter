@@ -5,6 +5,14 @@ var useragent = require('useragent');
 var isPhone = require('../web/is-phone');
 var _ = require('underscore');
 
+// prior to 1.2.1, the ios app would incorrectly send its build number instead of the version nubmer
+var mobileBuildVersionMapping = {
+  '600': '1.2.0',
+  '598': '1.1.1',
+  '595': '1.1.0',
+  '587': '1.0.0'
+};
+
 function isNativeApp(userAgentString) {
   return (userAgentString.indexOf('Gitter') >= 0 );
 }
@@ -20,7 +28,13 @@ function getGitterAppMetadata(userAgentString) {
   var parts = extension.split('/');
 
   var family = parts[0];
-  var versionParts = (parts[1] || '').split('.');
+  var version = parts[1];
+
+  if(getType(userAgentString) === 'mobile') {
+    version = mobileBuildVersionMapping[version] || version;
+  }
+
+  var versionParts = (version || '').split('.');
 
   return {
     family: family,
