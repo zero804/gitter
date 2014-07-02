@@ -221,10 +221,27 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
         .skip(options.skip || 0)
         .execQ()
         .then(function(results) {
-          return results.map(massageMessages).reverse();
-        })
+          return [results.map(massageMessages).reverse(), maxHistoryDate];
+        });
     })
-    .nodeify(callback)
+    .spread(function(results, maxHistoryDate) {
+      if (!maxHistoryDate) return callback(null, results, false);
+
+      var q = persistence.ChatMessage
+              .where('toTroupeId', troupeId)
+              .limit(1)
+              .where('sent')
+              .lte(maxHistoryDate);
+
+      return q.execQ().then(function(_results) {
+        var limitReached = _results.length !== 0;
+        callback(null, results, limitReached);
+      });
+    })
+    .fail(function(err) {
+      callback(err);
+    });
+    //.nodeify(callback)
 };
 
 exports.findChatMessagesForTroupeForDateRange = function(troupeId, startDate, endDate, callback) {

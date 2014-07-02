@@ -73,7 +73,7 @@ define([
         add: true,
         remove: false, // Never remove on load more
         data: fetchData,
-        success: function() {
+        success: function(collection, response, options) {
           self.scroll.loadComplete();
 
           self.collection.off('add', onAdd);
@@ -82,7 +82,11 @@ define([
             // turn off infinite scroll if there were no new messages retrieved
             self.scroll.disable();
           }
-
+          
+          var limitReached = (options.xhr.getResponseHeader('LimitReached') === 'true') ? true : false;
+          if (limitReached) {
+            self.collection.trigger('limitReached');
+          }
         },
         error: function() {
           self.scroll.loadComplete();

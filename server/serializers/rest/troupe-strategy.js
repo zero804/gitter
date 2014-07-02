@@ -126,7 +126,7 @@ function PremiumRoomStrategy() {
     return billingService.findActivePlans(uris)
       .then(function(subscriptions) {
         subscriptions.forEach(function(subscription) {
-          return premium[subscription.uri] = true;
+          return premium[subscription.uri] = subscription.plan; // true;
         });
 
         return true;
@@ -137,7 +137,7 @@ function PremiumRoomStrategy() {
   this.map = function(troupe) {
     if(!troupe || !troupe.uri) return undefined;
 
-    return !!premium[troupe.uri];
+    return premium[troupe.uri];
   }
 }
 
