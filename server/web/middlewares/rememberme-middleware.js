@@ -1,16 +1,16 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var env            = require('../../utils/env');
-var logger         = env.logger;
-var nconf          = env.config;
-var stats          = env.stats;
+var env             = require('../../utils/env');
+var logger          = env.logger;
+var nconf           = env.config;
+var stats           = env.stats;
 
-var _              = require('underscore');
-var uuid           = require('node-uuid');
-var sechash        = require('sechash');
-var userService    = require('../../services/user-service');
-var useragentStats = require('../useragent-stats');
+var _               = require('underscore');
+var uuid            = require('node-uuid');
+var sechash         = require('sechash');
+var userService     = require('../../services/user-service');
+var useragentTagger = require('../../utils/user-agent-tagger');
 
 var cookieName = nconf.get('web:cookiePrefix') + 'auth';
 
@@ -184,7 +184,7 @@ module.exports = {
           if(req.session) req.session.accessToken = null;
 
           // Tracking
-          var properties = useragentStats(req.headers['user-agent']);
+          var properties = useragentTagger(req.headers['user-agent']);
           stats.userUpdate(user, properties);
 
           logger.verbose('Rememberme token used for login.', { cookie: req.headers.cookie });
