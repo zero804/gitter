@@ -105,6 +105,7 @@
   },
   "main": "web.js",
   "scripts": {
+    "start": "nodemon web.js",
     "test": "make test"
   }
 }

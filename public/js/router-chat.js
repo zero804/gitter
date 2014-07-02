@@ -28,6 +28,8 @@ require([
   'views/chat/decorators/embedDecorator',
   'views/chat/decorators/emojiDecorator',
   'views/app/unreadBannerView',
+  'views/app/historyLimitView',
+
   'views/app/headerView',
 
   'components/statsc',          // No ref
@@ -45,7 +47,7 @@ require([
     ChatCollectionView, itemCollections, RightToolbarView,
     inviteView, TroupeSettingsView, MarkdownView, KeyboardView, AddPeopleViewModal, IntegrationSettingsModal,
     unreadItemsClient, helpShareIfLonely, webhookDecorator, issueDecorator, commitDecorator, mentionDecorator,
-    embedDecorator, emojiDecorator, UnreadBannerView, HeaderView) {
+    embedDecorator, emojiDecorator, UnreadBannerView, HistoryLimitView, HeaderView) {
   "use strict";
 
   $(document).on("click", "a", function(e) {
@@ -226,6 +228,13 @@ require([
     model: unreadChatsModel,
     chatCollectionView: chatCollectionView
   }).render();
+
+  new HistoryLimitView.Top({
+    el: '#limit-banner',
+    collection: itemCollections.chats,
+    chatCollectionView: chatCollectionView
+  }).render();
+
 
   itemCollections.chats.once('sync', function() {
     unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));

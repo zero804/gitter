@@ -13,7 +13,7 @@ var PLAN_TYPE_MESSAGE_HISTORY = {
   'unlimited': null,
   'silver': null,
   'bronze': [6, 'months'],
-  'free-private': [14, 'days']
+  'free-private': [1, 'days']
 };
 
 
@@ -59,6 +59,7 @@ function getPlanTypeCached(troupeId) {
 exports.getMaxHistoryMessageDate = function(troupeId) {
   return getPlanTypeCached(troupeId)
     .then(function(planType) {
+
       if(!PLAN_TYPE_MESSAGE_HISTORY.hasOwnProperty(planType))
         throw new StatusError(500, 'Unknown plan type ' + plan.plan);
 
