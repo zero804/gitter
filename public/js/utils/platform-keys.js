@@ -14,8 +14,8 @@ define([
     };
     case 'Windows': return {
       cmd: 'ctrl',
-      room: 'alt',
-      gitter: 'alt'
+      room: '⇧',
+      gitter: '⇧'
     };
     default: return { // Linux and other
       cmd: 'ctrl',
