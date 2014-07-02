@@ -1135,6 +1135,7 @@ Faye.Client = Faye.Class({
     if (this._state !== this.UNCONNECTED) return;
 
     if (!this._reuseTransport) {
+      this.info('Closing existing transport on handshake.');
       this._dispatcher.close();
     }
 
@@ -2345,7 +2346,7 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
 
   _pingTimeout: function() {
     this.info('Ping timeout');
-    this.close();
+    this._dispatcher._client.reset();
   }
 
 }), {
