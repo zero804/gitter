@@ -1,15 +1,14 @@
-<div class='trpChatItem status'>
-  <div class='wrapper'>
-    <div class='trpChatAvatar'>
+{{!-- NOTE: this is wrapped by <div class='chat-item'> --}}
+<div class='chat-item__container--status'>
+  <div class='chat-item__content'>
+    {{#if fromUser}}
       {{ widget "avatar" user=fromUser }}
+    {{/if}}
+    <div class='chat-item__details'>
+      <div class='chat-item__time'>{{widget "timeago" time=sent lang=lang locale=locale}}</div>
     </div>
-    <div class='trpChatBox {{webhookClass}}'>
-      <div class='trpChatDetails'>
-        <div class='trpChatTime'>{{widget "timeago" time=sent lang=lang locale=locale}}</div>
-      </div>
-      <div class='trpChatText'>
-        {{{html}}}
-      </div>
+    <div class='chat-item__text  js-chat-item-text'>
+      {{{html}}}
     </div>
   </div>
 </div>

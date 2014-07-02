@@ -10,6 +10,8 @@ var languageSelector = require('../../web/language-selector');
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 20;
 
+var staging = nconf.get('STAGING');
+
 function getAppCache(req) {
   if(!nconf.get('web:useAppCache')) return;
   return req.url + '.appcache';
@@ -37,7 +39,8 @@ function renderHomePage(req, res, next) {
       agent: req.headers['user-agent'],
       lang: languageSelector(req),
       locale: req.i18n,
-      isUserhome: true
+      isUserhome: true,
+      liveReload: nconf.get('web:liveReload')
     });
   });
 }
@@ -65,7 +68,9 @@ function renderMainFrame(req, res, next, frame) {
         chatAppLocation: chatAppLocation,
         agent: req.headers['user-agent'],
         lang: languageSelector(req),
-        locale: req.i18n
+        staging: staging,
+        locale: req.i18n,
+        liveReload: nconf.get('web:liveReload')
       });
     })
     .fail(next);
@@ -99,7 +104,8 @@ function renderChatPage(req, res, next) {
         chats: chats,
         agent: req.headers['user-agent'],
         lang: languageSelector(req),
-        locale: req.i18n
+        locale: req.i18n,
+        liveReload: nconf.get('web:liveReload')
       });
 
     })
@@ -118,7 +124,8 @@ function renderMobileUserHome(req, res, next) {
       agent: req.headers['user-agent'],
       isUserhome: true,
       lang: languageSelector(req),
-      locale: req.i18n
+      locale: req.i18n,
+      liveReload: nconf.get('web:liveReload')
     });
   });
 }
@@ -143,7 +150,8 @@ function renderMobileChat(req, res, next) {
         chats: chats,
         agent: req.headers['user-agent'],
         lang: languageSelector(req),
-        locale: req.i18n
+        locale: req.i18n,
+        liveReload: nconf.get('web:liveReload')
       });
 
     })

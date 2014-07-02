@@ -10,9 +10,9 @@
   <style>
 
   @-webkit-keyframes pulsey {
-      0% { opacity: 0.6; }
-      50% { opacity: 1; }
-      100% { opacity: 0.6; }
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
   }
 
   html.loading .trpContentPanel { background: url("{{ cdn 'images/2/gitter/logo-mark-grey-64.png' }}") center no-repeat; height: 90%; -webkit-animation: pulsey 2s ease-out; -webkit-animation-iteration-count: infinite;  }
@@ -36,18 +36,18 @@
   </div>
 </div>
 
-<div class="trpHeaderWrapper" id="header-wrapper">
-  <div class="trpHeaderArea" id="header">
+<div class="chat-header" id="header-wrapper">
+  <div id="header">
     {{{ prerenderView "js/views/app/tmpl/headerViewTemplate" }}}
   </div>
   <div class="banner-wrapper" style="display: none;">
-    <div id="unread-banner" class="banner slide-away"></div>
+    <div  class="banner  slide-away" id="unread-banner"></div>
   </div>
 </div>
 
 <div class="trpContentPanel" id="content-wrapper">
   <div class="trpChatPanel" id="chat-frame">
-    <div class="trpChatContainer  primary-scroll" id="content-frame">
+    <div class="trpChatContainer  js-chat-container  primary-scroll" id="content-frame">
       {{#each chats}}
         {{{ chatItemPrerender this lang=../lang locale=../locale}}}
       {{/each}}
@@ -61,14 +61,14 @@
   {{{ prerenderView "js/views/righttoolbar/tmpl/rightToolbar" }}}
 </div>
 
-<div class="trpChatInputWrapper" id="chat-input-wrapper">
-  <div class="trpFileProgressContainer">
-    <div class="trpFileProgressBar" id="file-progress-bar"></div>
+<div class="chat-input  {{!-- trpChatInputWrapper --}}" id="chat-input-wrapper">
+  <div class="{{!-- trpFileProgressContainer --}}  progress">
+    <div class="{{!-- trpFileProgressBar --}}  progress__bar" id="file-progress-bar"></div>
   </div>
-  <div class="banner-wrapper bottom" style="display: none;">
+  <div class="banner-wrapper  bottom" style="display: none;">
     <div id="bottom-unread-banner" class="banner slide-away"></div>
   </div>
-  <div class="trpChatInputArea" id="chat-input">
+  <div class="{{!-- trpChatInputArea --}}  chat-input__container  js-chat-input-container" id="chat-input">
     {{{ prerenderView "js/views/chat/tmpl/chatInputView" }}}
   </div>
 </div>
@@ -79,7 +79,6 @@
 
 {{>require_wrapper}}
 {{{bootScript bootScriptName }}}
-
 
 <script type="text/javascript">
  window.scrollTo(0,document.body.scrollHeight);
