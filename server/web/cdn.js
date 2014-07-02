@@ -80,7 +80,8 @@ if(!useCdn) {
   if(cdnPrefix) {
     cdnPrefix = "/" + cdnPrefix;
   } else {
-    cdnPrefix = appVersion.getCurrentVersion();
+    var assetTag = appVersion.getAssetTag();
+    cdnPrefix = assetTag ? "/_s/" + assetTag : '';
   }
 
   if(hostLength > 1) {

@@ -25,7 +25,7 @@
     {{>load_font_css}}
   </head>
   <body class='hover'>
-    {{#if staging}}
+    {{#if stagingText}}
     <div class="staging-indicator" style="
         position: fixed;
         left: 50%;
@@ -38,7 +38,14 @@
         font-family: 'open sans';
         font-size: 10px;
         text-align: center;
-    ">NEXT</div>
+    ">
+      {{#if stagingLink}}
+      <a style="text-decoration: none; color:white" href="{{stagingLink}}" target="_new">{{stagingText}}</a>
+      {{else}}
+      {{stagingText}}
+      {{/if}}
+      
+    </div>
     {{/if}}
     
     {{#isMobile agent}}
