@@ -53,6 +53,11 @@ define([
       }, 300);
     },
 
+    setBillingUrl: function() {
+      var billingUrl = context.env('billingUrl') + '/bill/' + this.selectedModel.get('uri');
+      $('#billing-url').attr("href",billingUrl);
+    },
+
     menuItemClicked: function(button) {
       switch(button) {
         case 'create':
@@ -101,6 +106,10 @@ define([
       var channelName = this.ui.roomNameInput.val().trim();
       var url;
 
+      if(this.selectedOptionsRequireUpgrade()) {
+        return;
+      }
+
       switch(ownerModel.get('type')) {
         case 'user':
           if(permissions !== 'public' && permissions !== 'private') {
@@ -139,11 +148,6 @@ define([
           }
 
           url = "/api/v1/rooms/" + ownerModel.get('id') + '/channels';
-      }
-
-      if(this.selectedOptionsRequireUpgrade()) {
-        this.showValidationMessage('In order to continue, you\'ll need a premium account.');
-        return;
       }
 
       $.ajax({
@@ -217,7 +221,7 @@ define([
 
     recalcView: function(animated) {
       if (!this.ui || !this._uiBindings) { return; }
-
+      this.setBillingUrl();
       var self = this;
       var showHide = {
         'selectParentRequired': false,
