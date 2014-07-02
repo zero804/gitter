@@ -76,7 +76,7 @@ We may disclose your personal information to any partner of Gitter and/or a memb
 
 You have the right to ask us not to process your personal data by contacting us at [support@gitter.im](mailto:support@gitter.im).
 
-The Data Protection Act 1998 gives you the right to access information held about you by submitting a request in accordance with the act and is subject to a £10 administrative fee. All such requests should be sent to [email address].
+The Data Protection Act 1998 gives you the right to access information held about you by submitting a request in accordance with the act and is subject to a £10 administrative fee. All such requests should be sent to [support@gitter.im](mailto:support@gitter.im).
 
 ### Changes to this policy
 

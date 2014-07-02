@@ -1,6 +1,6 @@
 This acceptable use policy sets out the terms between you and us under which you may access our Gitter platform (“Gitter”). This acceptable use policy applies to all users of, and visitors to, Gitter.  Your use of Gitter means that you accept, and agree to abide by, all the policies in this acceptable use policy, which supplement our terms of use [INSERT LINK TO THE TERMS OF USE].
 
-Gitter is operated by Troupe Technology Limited (**“us”** or **“we”**). We are registered in England and Wales under company number 08293148 and have our registered office at 18 Mitchell Road, West Malling, Kent ME19 4RF, United Kingdom.  Our VAT number is [VAT NUMBER]. 
+Gitter is operated by Troupe Technology Limited (**“us”** or **“we”**). We are registered in England and Wales under company number 08293148 and have our registered office at 18 Mitchell Road, West Malling, Kent ME19 4RF, United Kingdom.  Our VAT number is GB 157 1194 10. 
 
 ## Prohibited uses
 
