@@ -5,12 +5,32 @@ var nconf             = require('../../utils/config');
 var Q                 = require('q');
 var contextGenerator  = require('../../web/context-generator');
 var restful           = require('../../services/restful');
-var languageSelector = require('../../web/language-selector');
+var languageSelector  = require('../../web/language-selector');
+var appVersion        = require('../../web/appVersion');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 20;
 
+var stagingText, stagingLink;
+
+/* App tag */
 var staging = nconf.get('STAGING');
+switch(nconf.get('NODE_ENV')) {
+  case 'prod':
+    if(staging) {
+      stagingText = 'NEXT';
+      stagingLink = 'https://next.gitter.im';
+    }
+    break;
+  case 'beta':
+    stagingText = appVersion.getBranch() || 'BETA';
+    stagingLink = appVersion.getGithubLink();
+    break;
+  case 'dev':
+    stagingText = 'DEV';
+    stagingLink = 'https://github.com/troupe/gitter-webapp/tree/develop';
+    break;
+}
 
 function getAppCache(req) {
   if(!nconf.get('web:useAppCache')) return;
@@ -68,7 +88,8 @@ function renderMainFrame(req, res, next, frame) {
         chatAppLocation: chatAppLocation,
         agent: req.headers['user-agent'],
         lang: languageSelector(req),
-        staging: staging,
+        stagingText: stagingText,
+        stagingLink: stagingLink,
         locale: req.i18n,
         liveReload: nconf.get('web:liveReload')
       });

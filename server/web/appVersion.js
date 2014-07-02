@@ -1,42 +1,51 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-// This is actually the cdn prefix, but we're using it as the app version,
-// which only shows whether the version is different, not any ordering of versions.
+/* #### See version-files in the Makefile #### */
+
 var fs = require("fs");
 var winston = require('../utils/winston');
 
-var revision, assetTag;
-var tagFile = __dirname + '/../../ASSET_TAG';
-
-try {
-  if(fs.existsSync(tagFile)) {
-    assetTag = ('' + fs.readFileSync(tagFile)).trim();
-    revision = assetTag;
+function readFileSync(fileName) {
+  try {
+    if(fs.existsSync(__dirname + '/../../' + fileName)) {
+      return ('' + fs.readFileSync(fileName)).trim();
+    }
+  } catch(e) {
+    winston.error('Unable to read ' + fileName + ': ' + e);
   }
-} catch(e) {
-	winston.error('Unable to read ASSET_TAG: ' + e);
+  return '';
 }
 
-if(!assetTag) {
-  assetTag = 'dev' + Math.floor(Date.now() / 10000);
-  revision = 'develop';
-}
+var assetTag = readFileSync('ASSET_TAG') || '';
+var commit = readFileSync('GIT_COMMIT') || '';
+var branch = readFileSync('GIT_BRANCH') || 'HEAD';
+var version = commit ? commit.substring(0, 6) : 'HEAD-' + Math.floor(Date.now() / 10000);
 
-var cdnPrefix = assetTag ? "/_s/" + assetTag : '';
+/* THE NEW */
+/* Returns a unique identifier for the current code */
+exports.getVersion = function() {
+  return version;
+};
 
-function getCurrentVersion() {
-  return cdnPrefix;
-}
+/* Returns the current asset hash or '' */
+exports.getAssetTag = function() {
+  return assetTag;
+};
 
-function getAppTag() {
-	return assetTag;
-}
+/* Returns the current commit hash */
+exports.getCommit = function() {
+  return commit;
+};
 
-function getRevision() {
-  return revision;
-}
+/* Returns the current branch or HEAD */
+exports.getBranch = function() {
+  return branch;
+};
 
-exports.getCurrentVersion = getCurrentVersion;
-exports.getAppTag = getAppTag;
-exports.getRevision = getRevision;
+exports.getGithubLink = function() {
+  if(commit)
+    return 'https://github.com/troupe/gitter-webapp/commit/' + commit;
+
+  return '';
+};
