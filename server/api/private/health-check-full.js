@@ -40,7 +40,7 @@ module.exports = [
               redisClient.incr('ping.test', function(err) {
                 if(err) return next(err);
 
-                res.send("OK from " + os.hostname() + ":" + config.get('PORT') + ", running " + appVersion.getAppTag());
+                res.send("OK from " + os.hostname() + ":" + config.get('PORT') + ", running " + appVersion.getVersion());
               });
             });
           });

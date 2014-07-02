@@ -19,7 +19,7 @@ var mongoUtils        = require('../utils/mongo-utils');
 var StatusError       = require('statuserror');
 var bayeuxExtension   = require('./bayeux/extension');
 
-var appTag = appVersion.getAppTag();
+var version = appVersion.getVersion();
 
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
@@ -258,7 +258,7 @@ var authenticator = bayeuxExtension({
 
   outgoing: function(message, req, callback) {
     if(!message.ext) message.ext = {};
-    message.ext.appVersion = appTag;
+    message.ext.appVersion = version;
 
     // The other half of the UGLY hack,
     // get the userId out from the message
