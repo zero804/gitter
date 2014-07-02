@@ -54,7 +54,7 @@ define([
     },
 
     setBillingUrl: function() {
-      var billingUrl = context.env('billingUrl') + '/bill/' + this.selectedModel.get('uri');
+      var billingUrl = context.env('billingUrl') + '/bill/' + this.selectedModel.get('uri').split('/')[0];
       $('#billing-url').attr("href",billingUrl);
     },
 
