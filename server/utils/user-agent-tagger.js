@@ -72,6 +72,9 @@ function createVersionString(obj) {
 }
 
 module.exports = function(userAgentString) {
+  // no useragentstring? no tags for you.
+  if(!userAgentString) return {};
+
   var userAgentObj = useragent.parse(userAgentString).toJSON();
 
   if(isNativeApp(userAgentString)) {
