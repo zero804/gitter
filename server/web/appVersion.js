@@ -4,15 +4,17 @@
 /* #### See version-files in the Makefile #### */
 
 var fs = require("fs");
+var path = require('path');
 var winston = require('../utils/winston');
 
 function readFileSync(fileName) {
+  var file = path.join(__dirname, '../..', fileName);
   try {
-    if(fs.existsSync(__dirname + '/../../' + fileName)) {
-      return ('' + fs.readFileSync(fileName)).trim();
+    if(fs.existsSync(file)) {
+      return ('' + fs.readFileSync(file)).trim();
     }
   } catch(e) {
-    winston.error('Unable to read ' + fileName + ': ' + e);
+    winston.error('Unable to read ' + file + ': ' + e);
   }
   return '';
 }
