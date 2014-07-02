@@ -8,21 +8,21 @@ var tagger = require('../../../server/utils/user-agent-tagger');
 describe('user agent tags', function() {
 
   it('should parse gitter beta ios app', function() {
-    var tags = tagger('Mozilla/5.0 (iPhone; CPU iPhone OS 7_1 like Mac OS X) AppleWebKit/537.51.2 (KHTML, like Gecko) Mobile/11D167 GitterBeta/1.2.0 (4659610624)');
+    var tags = tagger('Mozilla/5.0 (iPhone; CPU iPhone OS 7_1 like Mac OS X) AppleWebKit/537.51.2 (KHTML, like Gecko) Mobile/11D167 GitterBeta/1.2.1 (4659610624)');
 
     assert.equal(tags['agent:type'], 'mobile');
     assert.equal(tags['agent:family'], 'GitterBeta');
-    assert.equal(tags['agent:version'], '1.2.0');
+    assert.equal(tags['agent:version'], '1.2.1');
     assert.equal(tags['agent:device:family'], 'iPhone');
     assert.equal(tags['agent:device:version'], undefined);
     assert.equal(tags['agent:os:family'], 'iOS');
     assert.equal(tags['agent:os:version'], '7.1');
   });
 
-  it('should parse gitter beta ios app without version string fix', function() {
-    var tags = tagger('Mozilla/5.0 (iPhone; CPU iPhone OS 7_1 like Mac OS X) AppleWebKit/537.51.2 (KHTML, like Gecko) Mobile/11D167 GitterBeta/2200 (5736412944)');
+  it('should map the gitter ios app version without buildnumber/versionnumber fix', function() {
+    var tags = tagger('Mozilla/5.0 (iPhone; CPU iPhone OS 7_1 like Mac OS X) AppleWebKit/537.51.2 (KHTML, like Gecko) Mobile/11D167 Gitter/598 (5736412944)');
 
-    assert.equal(tags['agent:version'], '2200');
+    assert.equal(tags['agent:version'], '1.1.1');
   });
 
   it('shouldnt mess with unmodified Chrome', function() {
