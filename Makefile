@@ -8,8 +8,8 @@ BETA_SITE = https://beta.trou.pe
 BASE_URL = http://localhost:5000
 MAIL_HOST = localhost
 MAIL_PORT = 2525
-GIT_BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
-GIT_COMMIT = $(shell git rev-parse HEAD)
+GIT_BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD)
+GIT_COMMIT ?= $(shell git rev-parse HEAD)
 ASSET_TAG_PREFIX = 
 ASSET_TAG = $(ASSET_TAG_PREFIX)$(shell echo $(GIT_COMMIT)|cut -c 1-6)
 
