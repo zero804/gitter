@@ -4,8 +4,7 @@
 var appVersion = require('../web/appVersion');
 var nconf = require('../utils/config');
 
-var currentVersion = appVersion.getCurrentVersion();
-if(!currentVersion) currentVersion = Date.now();
+var currentVersion = appVersion.getVersion();
 
 var useAppCache = nconf.get('web:useAppCache');
 var minified = nconf.get('web:minified');

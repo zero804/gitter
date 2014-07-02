@@ -53,7 +53,7 @@ define([
       var mobile = isMobile();
 
       ext.token      = accessToken;
-      ext.appVersion = context.env('appVersion');
+      ext.version    = context.env('version');
       ext.troupeId   = context.getTroupeId();
       ext.connType   = mobile ? 'mobile' : 'online';
       ext.client     = mobile ? 'mobweb' : 'web';
