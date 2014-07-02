@@ -23,7 +23,8 @@ switch(nconf.get('NODE_ENV')) {
     }
     break;
   case 'beta':
-    stagingText = appVersion.getBranch() || 'BETA';
+    var branch = appVersion.getBranch();
+    stagingText = branch ? branch.split('/').pop() : 'BETA';
     stagingLink = appVersion.getGithubLink();
     break;
   case 'dev':
