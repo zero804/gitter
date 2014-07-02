@@ -9,6 +9,7 @@ BASE_URL = http://localhost:5000
 MAIL_HOST = localhost
 MAIL_PORT = 2525
 ASSET_TAG_PREFIX= 
+ASSET_TAG = $(ASSET_TAG_PREFIX)$(shell echo $(GIT_COMMIT)|cut -c 1-6)
 
 .PHONY: clean test perf-test-xunit perf-test test-xunit test-in-browser test-in-browser-xunit test-coverage prepare-for-end-to-end-testing end-to-end-test
 
@@ -177,7 +178,8 @@ security-check:
 version-files:
 	@echo GIT COMMIT: $(GIT_COMMIT)
 	@echo GIT BRANCH: $(GIT_BRANCH)
-	echo $(ASSET_TAG_PREFIX)$(GIT_COMMIT) > GIT_COMMIT
+	echo $(ASSET_TAG) > ASSET_TAG
+	echo $(GIT_COMMIT) > GIT_COMMIT
 	echo $(GIT_BRANCH) > VERSION
 
 test-reinit-data: maintain-data test post-test-maintain-data
