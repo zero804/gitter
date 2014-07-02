@@ -8,16 +8,16 @@ Please check that:
 {{#if author}}
 <div class="trpChatAvatar">
   <span>
-    <div class="trpDisplayPicture avatar-s" style="background-image: url({{author.avatar_url}});">
+    <div class="trpDisplayPicture--left avatar-s" style="background-image: url({{author.avatar_url}});">
    </div>
   </span>
 </div>
-<div class="trpChatBox">
-  <div class="trpChatDetails">
-    <div class="trpChatFrom">{{author.login}}</div>
-    <div class="trpChatTime"> &bull; {{date}}</div>
+<div class='chat-item__content'>
+  <div class="chat-item__details">
+    <div class="chat-item__from">{{author.login}}</div>
+    <div class="chat-item__time">{{date}}</div>
   </div>
-  <div class="trpChatText">
+  <div class="chat-item__text">
     <p>{{files.length}} file{{#unless isFileLengthSingular}}s{{/unless}} changed. {{stats.additions}} addition{{#unless isAdditionsSingular}}s{{/unless}}, {{stats.deletions}} deletion{{#unless isDeletionsSingular}}s{{/unless}}.</p>
     <ul class="file-list">
       {{#each files}}

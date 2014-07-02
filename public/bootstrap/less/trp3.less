@@ -19,11 +19,14 @@
 @import "trpUserhome.less";
 
 @import "nanoScroller.less";
-
 @import "trpInvites.less";
 
+/* new stuff */
 @import "menu";
 @import "chat-item";
+@import "chat-input";
+@import "chat-header";
+/* end of new stuff*/
 
 .boxhack {
   -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
@@ -387,18 +390,18 @@ ul.scrollList a {
 
 /* Handle */
 .scroller::-webkit-scrollbar-thumb {
-    -webkit-border-radius: 10px;
-    border-radius: 10px;
-    background: rgba(100,100,100,0.2);
-    margin-right: 1px;
-    .transition300ms;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  background: rgba(100,100,100,0.2);
+  margin-right: 1px;
+  .transition300ms;
 }
 .scroller:hover::-webkit-scrollbar-thumb {
-    -webkit-border-radius: 10px;
-    border-radius: 10px;
-    background: rgba(100,100,100,0.4);
-    margin-right: 1px;
-    .transition300ms;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  background: rgba(100,100,100,0.4);
+  margin-right: 1px;
+  .transition300ms;
 }
 .scroller::-webkit-scrollbar-thumb:window-inactive {
   background: rgba(0,0,0,0.1);
@@ -518,15 +521,16 @@ body.logged-out {
 
 .trpLeftMenuLogo {
   padding: 20px;
-  margin-bottom: 20px;
+
   .logo-container {
     float: left;
-    background-image: url('../../images/2/gitter/logo-text-white-64.png');
-    width: 196px;
-    height: 64px;
-
+    background-image: url('../../images/2/gitter/logo-text-white-48.png');
+    width: 244px;
+    height: 48px;
+    margin-bottom: 20px;
+      
     @media @retina {
-      background-image: url('../../images/2/gitter/logo-text-white-64@2x.png');
+      background-image: url('../../images/2/gitter/logo-text-white-48@2x.png');
       background-size: contain;
     }
   }
@@ -825,17 +829,17 @@ body.logged-out {
 //   white-space: nowrap;
 // }
 
-// .trpLeftMenuContainer {
-//   height: 100%;
-//   overflow: hidden;
-// }
+.trpLeftMenuContainer {
+  height: 100%;
+  overflow: hidden;
+}
 
-// .trpLeftMenu .nano {
-//   position: absolute;
-//   bottom: 60px;
-//   top: 100px;
-//   .transition(200ms);
-// }
+.trpLeftMenu .nano {
+  position: absolute;
+  bottom: 60px;
+  top: 100px;
+  .transition(200ms);
+}
 
 // .trpLeftMenu .nano.pushed {
 //   top: 180px;
@@ -943,8 +947,6 @@ body.logged-out {
   cursor: not-allowed;
 }
 
-
-
 .gtrActivityItemText .mention {
   border: 1px solid transparent;
   background-color: fade(@trpGrey,20%);
@@ -1012,9 +1014,6 @@ body.logged-out {
   }
 
 }
-
-
-
 
 .gtrActivityItemText {
   vertical-align: middle;
@@ -1290,6 +1289,7 @@ ul li.placeholder:before {
 
   &.login {
     width: auto;
+    display: none;
     padding: 0 1em;
   }
 
@@ -1429,12 +1429,12 @@ ul li.placeholder:before {
 	text-align: center;
 /*	padding-top: 40px;*/
 	top: 0px;
-  bottom: 74px;
+  bottom: 70px;
   right: 0px;
   /* this min height isn't the best solution*/
   /* we need the content panel to take up the entire middle of the screen*/
   /* so that the mouseover event to close the left menu on it gets triggered */
-  min-height: 400px;
+  // min-height: 400px;
   overflow: none;
   .transition500ms;
 }
@@ -1461,60 +1461,6 @@ ul li.placeholder:before {
   }
 }
 
-.trpTroupeFavourite i {
-	display: none;
-  margin-top: 4px;
-}
-
-i.favourited:before {
-  font-family: 'troupe-icons';
-  /*content: '\e81a';*/
-  content: '\e826';
-  color: @trpYellow;
-  width: 12px;
-  font-size: 20px;
-  transition:all .5s ease-in-out;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-}
-
-i.unfavourited:before {
-  font-family: 'troupe-icons';
-  /*content: '\e81a';*/
-  content: '\e825';
-  opacity: 0.3;
-  width: 12px;
-  font-size: 20px;
-  transition:all .5s ease-in-out;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-}
-
-i.unfavourited:hover:before {
-  opacity: 0.8;
-  color: #f1c40f;
-}
-
-i.favourited:hover:before {
-  opacity: 0.8;
-}
-
-.trpTroupeFavourite i.unfavourited {
-	display: inline-block;
-  vertical-align: top;
-}
-
-.trpTroupeFavourite.favourited i.unfavourited {
-	display: none;
-}
-
-.trpTroupeFavourite.favourited i.favourited {
-	display: inline-block;
-  vertical-align: top;
-}
-
-
-//
 .trpTroupeFavourite .trpActionsMenuLabel {
   display: none;
 }
@@ -1869,7 +1815,9 @@ ul.roster {
   background-color: fade(@trpLightBlue, 30%);
 }
 
-.trpChatInputArea.rightCollapse, .trpHeaderContainer.rightCollapse, .trpChatPanel.rightCollapse {
+// .trpChatInputArea.rightCollapse,
+.trpHeaderContainer.rightCollapse,
+.trpChatPanel.rightCollapse {
   margin-right: 510px;
 
   @media @mid {
@@ -2192,350 +2140,203 @@ ul.roster {
 }
 
 
-.trpFileProgressContainer {
-  position: absolute;
-  top: -2px;
-  left: 0;
-  right: 0;
-  background-color: transparent;
-  width: 100%;
-  height: 2px;
-}
+// .trpFileProgressContainer {
+//   position: absolute;
+//   top: -2px;
+//   left: 0;
+//   right: 0;
+//   background-color: transparent;
+//   width: 100%;
+//   height: 2px;
+// }
 
-.trpFileProgressBar {
-  background-color: @trpGreen;
-  box-shadow: 0px 0px 1px 1px @trpGreen;
-  overflow: hidden;
-  width: 0;
-  display: none;
-  transition: width 0.5s;
-  transition-timing-function: ease;
-}
-
+// .trpFileProgressBar {
+//   background-color: @trpGreen;
+//   box-shadow: 0px 0px 1px 1px @trpGreen;
+//   overflow: hidden;
+//   width: 0;
+//   display: none;
+//   transition: width 0.5s;
+//   transition-timing-function: ease;
+// }
 
 .trpHeaderWrapper {
-  padding-bottom: 10px;
-  position: fixed;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  top: 0;
-  background-color: rgba(255, 255, 255, 0.97);
-  border-bottom: 1px solid rgba(0,0,0,0.05);
-  z-index: 1;
-  .transition500ms;
-  left: 0;
-  right: @rightMarginFull;
+  // padding-bottom: 10px;
+  // position: fixed;
+  // -moz-box-sizing: border-box;
+  // box-sizing: border-box;
+  // top: 0;
+  // background-color: rgba(255, 255, 255, 0.97);
+  // border-bottom: 1px solid rgba(0,0,0,0.05);
+  // z-index: 1;
+  // .transition500ms;
+  // left: 0;
+  // right: @rightMarginFull;
 
-  @media @mid {
-    right: @rightMarginMid;
-  }
+  // @media @mid {
+  //   right: @rightMarginMid;
+  // }
 
-  @media @small {
-    right: @rightMarginSmall
-  }
+  // @media @small {
+  //   right: @rightMarginSmall
+  // }
 
-  .trpHeaderArea {
-    display: block;
-    .transition500ms;
-  }
+  // .trpHeaderArea {
+  //   display: block;
+  //   .transition500ms;
+  // }
 
-  .trpHeaderContainer {
-    display: inline-block;
-    width: 100%;
-    padding-left: 46px;
+  // .trpHeaderContainer {
+  //   display: inline-block;
+  //   width: 100%;
+  //   padding-left: 46px;
 
-    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-    box-sizing: border-box;         /* Opera/IE 8+ */
+  //   // -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+  //   // -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+  //   // box-sizing: border-box;         /* Opera/IE 8+ */
 
-    & h1 a:hover {
-      text-decoration: none;
-    }
+  //   & h1 a:hover {
+  //     text-decoration: none;
+  //   }
 
-    @media @mid {
-      padding-left: 20px;
-    }
+  //   @media @mid {
+  //     padding-left: 20px;
+  //   }
 
-    @media @small {
-      padding-left: 30px;
-    }
+  //   @media @small {
+  //     padding-left: 30px;
+  //   }
 
-  }
+  // }
 
-  .trpTroupeFavourite {
-    float: left;
-    cursor: pointer;
-    display: inline-block;
-    margin-left: 4px;
-    margin-right: 18px;
-    margin-top: 10px;
+  // .trpTroupeFavourite {
+  //   float: left;
+  //   cursor: pointer;
+  //   display: inline-block;
+  //   margin-left: 4px;
+  //   margin-right: 18px;
+  //   margin-top: 10px;
 
-    @media @mid {
-      margin-left: 16px;
-      margin-right: 13px;
-    }
+  //   @media @mid {
+  //     margin-left: 16px;
+  //     margin-right: 13px;
+  //   }
 
-  }
+  // }
 
-  h1 {
-    font-family: 'Open Sans';
-    font-weight: 300;
-    font-size: 22px;
-    color: #333;
-    display: inline;
-    vertical-align: middle;
-  }
+  // h1 {
+  //   font-family: 'Open Sans';
+  //   font-weight: 300;
+  //   font-size: 22px;
+  //   color: #333;
+  //   display: inline;
+  //   vertical-align: middle;
+  // }
 
-  #trpTopic {
-    font-family: @fontSans;
-    font-size: 13px;
-    color: #777;
-    min-height: 1em;
-    margin: -5px 0 0 0;
-    .user-select(text);
+  // #trpTopic {
+  //   font-family: @fontSans;
+  //   font-size: 13px;
+  //   color: #777;
+  //   min-height: 1em;
+  //   margin: -5px 0 0 0;
+  //   .user-select(text);
 
-    a {
-      color: #666;
-    }
+  //   a {
+  //     color: #666;
+  //   }
 
-    a:hover {
-      color: @trpLightBlue;
-    }
+  //   a:hover {
+  //     color: @trpLightBlue;
+  //   }
 
-    .trpTopicInput {
-      width: 100%;
-      font-size: 13px;
-      line-height: 120%;
-      margin-bottom: 0;
-      resize: none;
-    }
+  //   .trpTopicInput {
+  //     width: 100%;
+  //     font-size: 13px;
+  //     line-height: 120%;
+  //     margin-bottom: 0;
+  //     resize: none;
+  //   }
 
-  }
+  // }
 
-  .gtrNameTopic {
-    margin-right: 60px;
-    margin-left: 50px;
+  // .gtrNameTopic {
+  //   margin-right: 60px;
+  //   margin-left: 50px;
 
-    @media @mid {
-      margin-left: 55px;
-    }
-  }
+  //   @media @mid {
+  //     margin-left: 55px;
+  //   }
+  // }
 
-  .dropdown-toggle {
+  // .dropdown-toggle {
 
-  }
+  // }
 
-  .settingsCog {
-    float: right;
-    margin-top: 15px;
-    margin-right: 12px;
-  }
+  // .settingsCog {
+  //   float: right;
+  //   margin-top: 15px;
+  //   margin-right: 12px;
+  // }
 
-  .activityFeedToggle {
-    float: right;
-    margin-top: 15px;
-    margin-right: 12px;
-    cursor: pointer;
-    opacity: 0.4;
-    transition:all .5s ease-in-out;
+//   .activityFeedToggle {
+//     float: right;
+//     margin-top: 15px;
+//     margin-right: 12px;
+//     cursor: pointer;
+//     opacity: 0.4;
+//     transition:all .5s ease-in-out;
 
-    &.show-activity {
-      color: @trpGreen;
-      opacity: 0.8;
-      transition:all 0.1s ease-in-out;
-    }
+//     &.show-activity {
+//       color: @trpGreen;
+//       opacity: 0.8;
+//       transition:all 0.1s ease-in-out;
+//     }
 
-  }
+//   }
 
-  .activityFeedToggle:hover {
-    opacity: 1;
-  }
+//   .activityFeedToggle:hover {
+//     opacity: 1;
+//   }
 
-  .activityFeedToggle:before {
-      font-family: 'troupe-icons';
-      /*content: '\e81a';*/
-    /*  content: '\e81e';*/
-      content: '\e82c';
-      margin-right: 8px;
-      width: 12px;
-      font-size: 20px;
-      -webkit-font-smoothing: antialiased;
-  }
+//   .activityFeedToggle:before {
+//       font-family: 'troupe-icons';
+//       /*content: '\e81a';*/
+//     /*  content: '\e81e';*/
+//       content: '\e82c';
+//       margin-right: 8px;
+//       width: 12px;
+//       font-size: 20px;
+//       -webkit-font-smoothing: antialiased;
+//   }
 
-  .dropdown-toggle:before {
-      font-family: 'troupe-icons';
-      /*content: '\e81a';*/
-    /*  content: '\e81e';*/
-      content: '\e823';
-      margin-right: 8px;
-      width: 12px;
-      font-size: 20px;
-  }
+//   .dropdown-toggle:before {
+//       font-family: 'troupe-icons';
+//       /*content: '\e81a';*/
+//     /*  content: '\e81e';*/
+//       content: '\e823';
+//       margin-right: 8px;
+//       width: 12px;
+//       font-size: 20px;
+//   }
 
-  .dropdown-toggle {
-    cursor: pointer;
-    opacity: 0.4;
-    transition:all .5s ease-in-out;
-  }
+//   .dropdown-toggle {
+//     cursor: pointer;
+//     opacity: 0.4;
+//     transition:all .5s ease-in-out;
+//   }
 
-  .dropdown-toggle:hover {
-    opacity: 1;
-  }
+//   .dropdown-toggle:hover {
+//     opacity: 1;
+//   }
 
-  .dropdown-menu {
-    .trpBodyMedium;
-    right: 0;
-    left: auto;
-  }
-
-}
-
-.banner-wrapper {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -35px;
-  overflow: hidden;
-  height: 35px;
-  z-index: -1;
-
-  .transition500ms();
-  margin-left: 44px;
-  margin-right: 40px;
-  @media @mid {
-    margin-left: 32px;
-    margin-right: 32px;
-  }
-  @media @small {
-    margin-left: @leftMarginSmall + 42px;
-    margin-right: 42px;
-  }
-
-  .banner {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 35px;
-
-    .transition500ms();
-    &.slide-away {
-      top: -35px;
-    }
-
-    button {
-      .trpButton;
-      position: absolute;
-      height: 100%;
-      padding: 4px 11px;
-      color: white;
-      background-color: fade(@trpGreen, 90%);
-      border-width: 0 0 0 0;
-
-      &:hover {
-        background-color: darken(@trpGreen, 5%);
-      }
-
-      &.main {
-        left: 0;
-        width: 100%;
-        .trpBodyMedium;
-        text-align: left;
-        border-radius: 0 0 4px 4px;
-      }
-
-      &.side {
-        right: 0;
-        .trpBodySmall;
-        border-left-width: 2px;
-        border-left-color: darken(@trpGreen, 5%);
-        border-radius: 0 0 4px 0;
-      }
-    }
-  }
-}
-
-.banner-wrapper.bottom {
-  bottom: auto;
-  top: -35px;
-  .banner {
-    top: auto;
-    bottom: 0;
-    &.slide-away {
-      top: auto;
-      bottom: -35px;
-    }
-    button.main {
-      border-radius: 4px 4px 0 0;
-    }
-    button.side {
-      display: none;
-    }
-  }
-}
-
-.trpChatInputArea {
-  display: block;
-  text-align: center;
-  .transition300ms;
-}
-
-.trpChatInputButtons {
-  position: absolute;
-  right: 8px;
-
-  @media @mobile {
-    display: none;
-  }
-
-  .md-help {
-    opacity: 0.5;
-    .transition300ms;
-  }
-
-  .md-help:hover {
-    opacity: 0.9;
-  }
-
-  .md-help:before {
-    font-family: 'troupe-icons';
-    content: '\e82d';
-    margin-right: 6px;
-    width: 12px;
-    font-size: 20px;
-    -webkit-font-smoothing: antialiased;
-    opacity: 0.4;
-  }
-
-  .compose-mode-toggle {
-    margin-bottom: 4px;
-    opacity: 0.5;
-    .transition300ms;
-    cursor: pointer;
-    .prepend-pencil-off;
-    height: 20px;
-    &:before {
-      margin-left: 3px;
-      font-size: 16px;
-    };
-/*    &:hover {
-      .prepend-pencil-on;
-    }*/
-  }
-
-  .compose-mode-toggle.active {
-    opacity: 0.7;
-    .prepend-pencil-on;
-/*    &:hover {
-      .prepend-pencil-off;
-    }*/
-  }
-
-  .compose-mode-toggle:hover {
-    opacity: 0.9;
-  }
+//   .dropdown-menu {
+//     .trpBodyMedium;
+//     right: 0;
+//     left: auto;
+//   }
 
 }
+
 
 .markdown-help-content {
   .trpBodyMedium;
@@ -2573,7 +2374,6 @@ ul.roster {
 
 
 }
-
 
 .login-content {
 	width: 100%;

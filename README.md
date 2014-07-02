@@ -30,3 +30,7 @@ Run Like Production
 -------------------
 1.  `make grunt`
 2.  `node web --web:staticContent=public-processed/ --web:minified=true`
+
+Utility Scripts
+---------------
+These are scripts that can help you answer questions like "What's this user's eyeball state?" and "What's the userId for mydigitalself?". They can be found in `scripts/utils`.

@@ -16,6 +16,8 @@ var mongoUtils        = require('../utils/mongo-utils');
 var moment            = require('moment');
 var StatusError       = require('statuserror');
 var unreadItemService = require('./unread-item-service');
+var _                 = require('underscore');
+
 
 /*
  * Hey Trouper!
@@ -92,11 +94,13 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
 
           // }, 100);
 
-          stats.event("new_chat", {
+          var statMetadata = _.extend({
             userId: user.id,
             troupeId: troupe.id,
             username: user.username
-          });
+          }, data.stats);
+
+          stats.event("new_chat", statMetadata);
 
 
           var _msg;
