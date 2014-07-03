@@ -34,3 +34,12 @@ Run Like Production
 Utility Scripts
 ---------------
 These are scripts that can help you answer questions like "What's this user's eyeball state?" and "What's the userId for mydigitalself?". They can be found in `scripts/utils`.
+
+If you want to run against production, ssh into app-00X and run with the NODE_ENV varible set.
+
+e.g `NODE_ENV=prod node /opt/gitter/gitter-webapp/scripts/utils/unread.js trevorah`
+
+### unread.js
+Lists out why a user has an unread badge. Requires a username.
+
+e.g `node scripts/utils/unread.js trevorah`
