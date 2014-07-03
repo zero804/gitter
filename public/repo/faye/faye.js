@@ -2232,7 +2232,11 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
 
     this.callback(function(socket) {
       if (!socket) return;
-      socket.send(Faye.toJSON(messages));
+      try {
+        socket.send(Faye.toJSON(messages));
+      } catch(e) {
+        self._handleError(messages);
+      }
     }, this);
     this.connect();
   },
@@ -2270,9 +2274,7 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
       if (closed) return;
       closed = true;
 
-      if(self._dispatcher.transports && self._dispatcher.transports.websocket) {
-        delete self._dispatcher.transports.websocket[self.endpoint];
-      }
+      self._invalidateSocket();
 
       if (this._closing) {
         self.info('Websocket closed as expected. code ?, reason ?, wasClean ?', event && event.code, event && event.reason, event && event.wasClean);
@@ -2322,6 +2324,7 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
     this._closing = true;
     this.info('Websocket transport close requested');
     this._socket.close();
+    this._invalidateSocket();
     delete this._socket;
   },
 
@@ -2337,6 +2340,12 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
     if (Faye.ENV.WebSocket)    return new WebSocket(url);
   },
 
+  _invalidateSocket: function() {
+    if(this._dispatcher.transports && this._dispatcher.transports.websocket) {
+      delete this._dispatcher.transports.websocket[this.endpoint.href];
+    }
+  },
+
   _ping: function() {
     if (!this._socket) return;
 
@@ -2349,7 +2358,7 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
 
   _pingTimeout: function() {
     this.info('Ping timeout');
-    this._dispatcher._client.reset();
+    this.close();
   }
 
 }), {
