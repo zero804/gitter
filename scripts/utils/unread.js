@@ -18,21 +18,25 @@ function getBadgeCount(userId) {
 
 function getBadgeTroupeNames(userId) {
   return unreadService.testOnly.getTroupeIdsCausingBadgeCount(userId)
-    .then(getNamesForTroupeIds);
+    .then(function(troupeIds) {
+      return getNamesForTroupeIds(troupeIds, userId);
+    });
 }
 
 function getUnreadTroupeNames(userId) {
   return unreadService.testOnly.getTroupeIdsWithUnreadChats(userId)
-    .then(getNamesForTroupeIds);
+    .then(function(troupeIds) {
+      return getNamesForTroupeIds(troupeIds, userId);
+    });
 }
 
-function getNamesForTroupeIds(troupeIds) {
+function getNamesForTroupeIds(troupeIds, userId) {
   return troupeService.findByIds(troupeIds)
     .then(function(troupes) {
       return troupes.map(function(troupe) {
-        return troupe.uri;
+        return troupeService.getUrlForTroupeForUserId(troupe, userId);
       });
-    });
+    }).all();
 }
 
 userService.findByUsername(opts.username)
