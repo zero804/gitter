@@ -771,6 +771,17 @@ function getTroupeIdsCausingBadgeCount(userId, callback) {
     .nodeify(callback);
 }
 
+function getTroupeIdsWithUnreadChats(userId, callback) {
+  return Q.ninvoke(redisClient, 'keys', 'unread:chat:' + userId + ':*')
+    .then(function(keys) {
+      var troupeIds = keys.map(function(key) {
+        return key.split(':')[3];
+      });
+      return troupeIds;
+    })
+    .nodeify(callback);
+}
+
 /**
  * Returns a promise of nothing
  */
@@ -913,6 +924,7 @@ exports.testOnly = {
   removeItem: removeItem,
   newItemForUsers: newItemForUsers,
   detectAndCreateMentions: detectAndCreateMentions,
-  getTroupeIdsCausingBadgeCount: getTroupeIdsCausingBadgeCount
+  getTroupeIdsCausingBadgeCount: getTroupeIdsCausingBadgeCount,
+  getTroupeIdsWithUnreadChats: getTroupeIdsWithUnreadChats
 
 };
