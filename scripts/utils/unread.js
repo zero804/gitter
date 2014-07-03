@@ -18,9 +18,17 @@ function getBadgeCount(userId) {
 
 function getBadgeTroupeNames(userId) {
   return unreadService.testOnly.getTroupeIdsCausingBadgeCount(userId)
-    .then(function(troupeIds) {
-      return troupeService.findByIds(troupeIds);
-    }).then(function(troupes) {
+    .then(getNamesForTroupeIds);
+}
+
+function getUnreadTroupeNames(userId) {
+  return unreadService.testOnly.getTroupeIdsWithUnreadChats(userId)
+    .then(getNamesForTroupeIds);
+}
+
+function getNamesForTroupeIds(troupeIds) {
+  return troupeService.findByIds(troupeIds)
+    .then(function(troupes) {
       return troupes.map(function(troupe) {
         return troupe.uri;
       });
@@ -32,11 +40,12 @@ userService.findByUsername(opts.username)
     return user._id;
   })
   .then(function(userId) {
-    return [getBadgeCount(userId), getBadgeTroupeNames(userId)];
+    return [getBadgeCount(userId), getBadgeTroupeNames(userId), getUnreadTroupeNames(userId)];
   })
-  .spread(function(badgeNumber, troupeNames) {
+  .spread(function(badgeNumber, badgeTroupeNames, unreadTroupeNames) {
     console.log('Unread badge number:', badgeNumber);
-    console.log('Caused by:', troupeNames);
+    console.log('Rooms causing badge number:', badgeTroupeNames);
+    console.log('Rooms with unread messages:', unreadTroupeNames);
   })
   .fail(function(err) {
     console.error(err.stack);
