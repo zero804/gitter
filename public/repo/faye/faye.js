@@ -2270,6 +2270,9 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
       if (closed) return;
       closed = true;
 
+      if(self._dispatcher.transports && self._dispatcher.transports.websocket) {
+        delete self._dispatcher.transports.websocket[self.endpoint];
+      }
 
       if (this._closing) {
         self.info('Websocket closed as expected. code ?, reason ?, wasClean ?', event && event.code, event && event.reason, event && event.wasClean);
