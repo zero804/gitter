@@ -19,6 +19,8 @@ define([
     return false;
   }
 
+
+
   var ChatModel = TroupeCollections.Model.extend({
     idAttribute: "id",
     parse: function(message) {
@@ -77,15 +79,66 @@ define([
         return sent.valueOf() + offset;
       }
     },
-
+    initialize: function() {
+      this.listenTo(this, 'add reset sync remove', function (item) {
+        this.calculateBursts();
+      });
+    },
     findModelForOptimisticMerge: function(newModel) {
       var optimisticModel = this.find(function(model) {
         return !model.id && model.get('text') === newModel.get('text');
       });
 
       return optimisticModel;
+    },
+    /**
+      * calculateBursts() calculates what chat messages are 'bursts'.
+      */
+    calculateBursts: function () {
+
+      /* @const - time window, in which an user can keep adding chat items as part of a initial "burst" */
+      var BURST_WINDOW = 5 * 60 * 1000; // 5 minutes
+
+      var burstUser,
+          burstStart;
+      
+      this.forEach(function (chat) {
+
+        var newUser = chat.get('fromUser').username;
+        var newSentTime = chat.get('sent');
+
+        /* if message is a me status */
+        if (chat.get('status')) {
+          burstUser = null;
+          chat.set('burstStart', true);
+          return;
+        }
+
+        /* if the message is by a there is not a burst user then we're starting a burst */
+        if (!burstUser) {
+          burstUser = newUser;
+          burstStart = newSentTime;
+          chat.set('burstStart', true);
+          return;
+        } 
+
+        /* get tge duration since last burst */
+        var durationSinceBurstStart = newSentTime.valueOf() - burstStart.valueOf();
+
+        /* if the current user is different or the duration since last burst is larger than 5 minutes we have a new burst */
+        if (newUser !== burstUser || durationSinceBurstStart > BURST_WINDOW) {
+          burstUser = newUser;
+          burstStart = newSentTime;
+          chat.set('burstStart', true);
+          return;
+        }
+
+        /* most messages won't be a burst */
+        chat.set('burstStart', false);
+      });
     }
   });
+
   cocktail.mixin(ChatCollection, TroupeCollections.ReversableCollectionBehaviour);
 
   var ReadByModel = TroupeCollections.Model.extend({
