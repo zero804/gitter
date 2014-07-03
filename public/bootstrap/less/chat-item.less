@@ -47,6 +47,18 @@ img.emoji {
   text-align: left;
   width: 100%;
   clear: left;
+  &.syncerror {
+    background-color: #edb2bd;
+
+    .chat-item__from,
+    .chat-item__time {
+      color: #888;
+    }
+  }
+
+  // .burstContinued & {
+  //   padding: 0 30px 0 44px;
+  // }
 
   @media @mid {
     padding: padding: 8px 30px 8px 32px;
