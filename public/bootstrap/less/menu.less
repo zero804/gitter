@@ -79,7 +79,7 @@
 
   @media @mobile {
     left: 0;
-    width: 85%;
+    width: 250px;
     height: 100%;
     position: absolute;
     padding: 10px;
@@ -99,8 +99,10 @@
 
   .transition(200ms);
 
-  body.hover &.active {
-    background-color: rgba(255, 255, 255, 0.2);
+  &.active {
+    .hover & {
+      background-color: rgba(255, 255, 255, 0.2);  
+    }
     height: 127px;
     padding-bottom: 0.3125 + 0.3125em;
 
@@ -193,10 +195,6 @@
         }
       }
     }
-  }
-
-  @media @mobile {
-    height: auto;
   }
 }
 
