@@ -194,6 +194,10 @@ define([
         this.$el.toggleClass('burstContinued', !this.model.get('burstStart'));
       }
 
+      if (!changes || 'burstFinal' in changes) {
+        this.$el.toggleClass('burstFinal', this.model.get('burstFinal'));
+      }
+
       /* Don't run on the initial (changed=undefined) as its done in the template */
       if(changes && 'readBy' in changes) {
         var readByCount = this.model.get('readBy');
