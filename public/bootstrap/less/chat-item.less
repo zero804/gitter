@@ -10,6 +10,59 @@ img.emoji {
   transition: background-color 0.5s linear;
   border-top: 1px solid transparent;
 
+  /* this handles all styles for bursts continuation */
+  &.burstContinued {
+
+    .chat-item__container {
+      padding: 1px 30px 1px 44px;
+    }
+
+    .chat-item__content {
+      margin: 0;
+      padding: 0 10px 0 0;
+    }
+
+    .chat-item__details {
+      float: left;
+      margin: 0;
+      height: 19px;
+      line-height: 19px;
+
+      .hover .chat-item:hover > & {
+        margin-left: 2px;
+        display: inline-block;
+      }
+    }
+
+    .chat-item__icon--read,
+    .chat-item__icon--edit {
+      visibility: hidden;
+    }
+
+    .chat-item__text {
+      margin-left: 50px;
+    }
+
+    .chat-item__time {
+      display: none;
+      &:before {
+        content: none;
+      }
+    }
+
+    .chat-item__from,
+    .chat-item__aside {
+      display: none;
+    }
+  }
+
+  // &.burstFinal {
+  &.chat-item__icon--read:nth-last-child(2) {
+    visibility: visible;
+    opacity: 0.3;
+  }
+  // }
+
   &.deleted {
     opacity: 0.5;
     .chat-item__text {
@@ -37,56 +90,6 @@ img.emoji {
       width: 24px;
       height: 24px;
     }
-  }
-}
-
-.burstStart {
-  
-}
-
-/* this handles all styles for bursts continuation */
-.burstContinued {
-
-  .chat-item__container {
-    padding: 1px 30px 1px 44px;
-  }
-
-  .chat-item__content {
-    margin: 0;
-    padding: 0 10px 0 0;
-  }
-
-  .chat-item__details {
-    display: none;
-    float: left;
-    margin: 0;
-    height: 19px;
-    line-height: 19px;
-    // .hover & {
-    .hover .chat-item:hover > & {
-      margin-left: 2px;
-      display: inline-block;
-    }
-  }
-
-  // .chat-item__icon--read { float: right; }
-
-  // .chat-item__icon--edit { float: left; }
-
-  .chat-item__text {
-    margin-left: 50px;
-  }
-
-  .chat-item__time {
-    display: none;
-    &:before {
-      content: none;
-    }
-  }
-
-  .chat-item__from,
-  .chat-item__aside {
-    display: none;
   }
 }
 

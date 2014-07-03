@@ -91,6 +91,17 @@ define([
 
       return optimisticModel;
     },
+
+    /**
+      * setFinalBurst() sets the final burst class for the previous chat item once a new burst happens
+      *
+      * chatItem `Object` chat-item to be set as burst final 
+      * void
+      */
+    setFinalBurst: function (chatItem) {
+      chatItem.set('burstFinal', true);
+    },
+
     /**
       * calculateBursts() calculates what chat messages are 'bursts'.
       */
@@ -100,9 +111,13 @@ define([
       var BURST_WINDOW = 5 * 60 * 1000; // 5 minutes
 
       var burstUser,
-          burstStart;
+          burstStart,
+          self = this;
       
-      this.forEach(function (chat) {
+      this.forEach(function (chat, index, chats) {
+
+        /* most messages won't be a burst */
+        chat.set('burstFinal', false);
 
         var newUser = chat.get('fromUser').username;
         var newSentTime = chat.get('sent');
@@ -111,6 +126,7 @@ define([
         if (chat.get('status')) {
           burstUser = null;
           chat.set('burstStart', true);
+          if (index !== 0) self.setFinalBurst(chats[index - 1]);
           return;
         }
 
@@ -119,6 +135,7 @@ define([
           burstUser = newUser;
           burstStart = newSentTime;
           chat.set('burstStart', true);
+          if (index !== 0) self.setFinalBurst(chats[index - 1]);
           return;
         } 
 
@@ -130,6 +147,7 @@ define([
           burstUser = newUser;
           burstStart = newSentTime;
           chat.set('burstStart', true);
+          if (index !== 0) self.setFinalBurst(chats[index - 1]);
           return;
         }
 
