@@ -37,4 +37,16 @@ describe('user agent tags', function() {
     assert.equal(tags['agent:os:version'], '10.9.3');
   });
 
+  it('shouldnt define any tags if the user agent is null', function() {
+    var tags = tagger(null);
+
+    assert.equal(tags['agent:type'], undefined);
+    assert.equal(tags['agent:family'], undefined);
+    assert.equal(tags['agent:version'], undefined);
+    assert.equal(tags['agent:device:family'], undefined);
+    assert.equal(tags['agent:device:version'], undefined);
+    assert.equal(tags['agent:os:family'], undefined);
+    assert.equal(tags['agent:os:version'], undefined);
+  });
+
 });
