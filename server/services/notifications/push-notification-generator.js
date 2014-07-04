@@ -8,7 +8,7 @@ var nconf                     = require('../../utils/config');
 var pushNotificationGateway = require("../../gateways/push-notification-gateway");
 var serializer = require("../../serializers/notification-serializer");
 var notificationMessageGenerator = require('../../utils/notification-message-generator');
-var unreadItemService = require('./../unread-item-service');
+var unreadItemService = require('../unread-item-service');
 var Fiber = require('../../utils/fiber');
 var basePath = nconf.get('web:basepath');
 
