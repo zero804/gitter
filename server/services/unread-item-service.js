@@ -765,6 +765,22 @@ function removeMentionForUser(userId, troupeId, itemIds, member) {
 
 }
 
+function getTroupeIdsCausingBadgeCount(userId, callback) {
+  return Q.ninvoke(redisClient, "zrange", ["ub:" + userId, 0, -1])
+    .nodeify(callback);
+}
+
+function getTroupeIdsWithUnreadChats(userId, callback) {
+  return Q.ninvoke(redisClient, 'keys', 'unread:chat:' + userId + ':*')
+    .then(function(keys) {
+      var troupeIds = keys.map(function(key) {
+        return key.split(':')[3];
+      });
+      return troupeIds;
+    })
+    .nodeify(callback);
+}
+
 /**
  * Returns a promise of nothing
  */
@@ -906,5 +922,8 @@ exports.testOnly = {
   newItem: newItem,
   removeItem: removeItem,
   newItemForUsers: newItemForUsers,
-  detectAndCreateMentions: detectAndCreateMentions
+  detectAndCreateMentions: detectAndCreateMentions,
+  getTroupeIdsCausingBadgeCount: getTroupeIdsCausingBadgeCount,
+  getTroupeIdsWithUnreadChats: getTroupeIdsWithUnreadChats
+
 };

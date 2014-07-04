@@ -19,7 +19,7 @@ switch(nconf.get('NODE_ENV')) {
   case 'prod':
     if(staging) {
       stagingText = 'NEXT';
-      stagingLink = 'https://next.gitter.im';
+      stagingLink = 'http://next.gitter.im';
     }
     break;
   case 'beta':
