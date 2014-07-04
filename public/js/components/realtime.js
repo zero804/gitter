@@ -74,7 +74,7 @@ define([
     callback(message);
   };
 
-  var updateTimer;
+  var updateTimers;
 
   ClientAuth.prototype.incoming = function(message, callback) {
     if(message.channel == '/meta/handshake') {
@@ -82,18 +82,27 @@ define([
         var ext = message.ext;
         if(ext) {
           if(ext.appVersion && ext.appVersion !== context.env('version')) {
+
             log('Application version mismatch');
-            if(!updateTimer) {
+            if(!updateTimers) {
               // Give the servers time to complete the upgrade
-              updateTimer = setTimeout(function() {
-                // Don't clear the timer.. so that people don't get the
-                // message multiple times
+              updateTimers = [setTimeout(function() {
+                /* 10 minutes */
                 $(document).trigger('app.version.mismatch');
-              }, 10 * 60000);
+              }, 10 * 60000), setTimeout(function() {
+                /* 1 hour */
+                $(document).trigger('app.version.mismatch');
+              }, 60 * 60000), setTimeout(function() {
+                /* 6 hours */
+                window.location.reload(true);
+              }, 360 * 60000)];
             }
-          } else {
-            clearTimeout(updateTimer);
-            updateTimer = null;
+
+          } else if(updateTimers) {
+            updateTimers.forEach(function(t) {
+              clearTimeout(t);
+            });
+            updateTimers = null;
           }
 
           if(ext.context) {
