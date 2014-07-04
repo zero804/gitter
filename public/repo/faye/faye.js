@@ -2262,6 +2262,11 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
         return;
       }
 
+      if (socket.readyState !== 1) {
+        this._handleError(messages);
+        return;
+      }
+
       try {
         socket.send(Faye.toJSON(messages));
       } catch(e) {
@@ -2378,9 +2383,22 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
   _ping: function() {
     if (!this._socket) return;
 
+    if (this._socket.readyState !== 1) {
+      this.warn('Websocket unable to send. readyState=?', this._socket.readyState);
+      this.close();
+      return;
+    }
+
     this.debug('Websocket transport ping');
 
-    this._socket.send('[]');
+    try {
+      this._socket.send('[]');
+    } catch(e) {
+      this.warn('Websocket ping failed: ?', e);
+      this.close();
+      return;
+    }
+
     this.addTimeout('ping', this._dispatcher.timeout / 2, this._ping, this);
     this.addTimeout('pingTimeout', this._dispatcher.timeout / 1.5, this._pingTimeout, this);
   },
