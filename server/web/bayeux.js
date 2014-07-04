@@ -709,7 +709,7 @@ module.exports = {
       // connection
       logger.info("Client " + clientId + " disconnected");
       presenceService.socketDisconnected(clientId, function(err) {
-        if(err && err !== 404) { logger.error("bayeux: Error while attempting disconnection of socket " + clientId + ": " + err,  { exception: err }); }
+        if(err && err.status !== 404) { logger.error("bayeux: Error while attempting disconnection of socket " + clientId + ": " + err.status,  { exception: err }); }
       });
     });
 
