@@ -25,7 +25,7 @@ var calculateBursts = function (chats) {
   
   chats.forEach(function (chat, index) {
 
-    var newUser = chat.fromUser.username;
+    var newUser = chat.fromUser && chat.fromUser.username;
     var newSentTime = chat.sent;
 
     // if message is a me status
