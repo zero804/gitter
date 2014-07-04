@@ -8,7 +8,7 @@ var _                                  = require("underscore");
 var presenceService                    = require("./../presence-service");
 var NotificationCollector              = require('../../utils/notification-collector');
 var onlineNotificationGeneratorService = require('./online-notification-generator-service');
-var pushNotificationGeneratorService   = require('./push-notification-generator-service');
+var pushNotificationPostbox            = require('./push-notification-postbox');
 var mongoUtils                         = require('../../utils/mongo-utils');
 
 function getStartTimeForItems(items) {
@@ -120,7 +120,7 @@ exports.install = function() {
   });
 
   notificationCollector.on('collection:push', function(userTroupes) {
-    pushNotificationGeneratorService.queueUserTroupesForNotification(userTroupes);
+    pushNotificationPostbox.postUserTroupes(userTroupes);
   });
 
 
