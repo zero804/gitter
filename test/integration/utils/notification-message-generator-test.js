@@ -17,6 +17,36 @@ describe('notification-message-generator', function() {
     assert.equal(message.smsText, 'gitterHQ/gitter-webapp\nMike: Yo\nhttp://localhost/test');
   });
 
+  it('should generate a message for a one to one', function() {
+    var troupe = {
+      "id": "5395a3c7ade1b7aa68a08e6d",
+      "name": "Andy Trevorah",
+      "oneToOne": true,
+      "userIds": ["535f8372096160afe0362eba","538f52b7ade1b7aa68a08e68"],
+      "url": "/trevorah"
+    };
+    var items = {
+      "chat": [{
+        "id": "53b68c9b11e679b683873e12",
+        "text": "test message",
+        "sent": "2014-07-04T11:14:35.188Z",
+        "mentions": [],
+        "fromUser": {
+          "id": "535f8372096160afe0362eba",
+          "username": "trevorah",
+          "displayName": "Andy Trevorah"
+        },
+        "troupe": false
+      }]
+    };
+    var smsLink = "http://localhost:5000/trevorah";
+
+    var message = underTest.generateNotificationMessage(troupe, items, smsLink);
+
+    assert.equal(message.notificationText, 'Andy Trevorah  \nAndy: test message');
+    assert.equal(message.smsText, 'Andy Trevorah\nAndy: test message\nhttp://localhost:5000/trevorah');
+  });
+
   it('should generate message for the simple file case', function() {
     var message = underTest.generateNotificationMessage({ uri: 'gitterHQ/gitter-webapp' }, {
       'file': [ { id: '00001', fileName: 'accounts.xls', latestVersion : { creatorUser: { displayName: 'Mike Bartlett '} } } ]
