@@ -12,14 +12,12 @@ define([
 
   function mentionsUser(message) {
     var m = message.mentions;
-    if(!m) return false;
-    for(var i = 0; i < m.length; i++) {
+    if (!m) return false;
+    for (var i = 0; i < m.length; i++) {
       if(userId && m[i].userId === userId) return true;
     }
     return false;
   }
-
-
 
   var ChatModel = TroupeCollections.Model.extend({
     idAttribute: "id",
@@ -61,7 +59,6 @@ define([
 
       return d;
     }
-
   });
 
   var ChatCollection = TroupeCollections.LiveCollection.extend({
@@ -103,10 +100,10 @@ define([
     },
 
     /**
+      * TODO: OPTIMIZE THIS
       * calculateBursts() calculates what chat messages are 'bursts'.
       */
     calculateBursts: function () {
-
       /* @const - time window, in which an user can keep adding chat items as part of a initial "burst" */
       var BURST_WINDOW = 5 * 60 * 1000; // 5 minutes
 

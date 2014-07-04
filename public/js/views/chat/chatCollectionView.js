@@ -19,7 +19,7 @@ define([
   "use strict";
 
   /** @const */
-  var PAGE_SIZE = 15;
+  var PAGE_SIZE = 20;
 
   /*
    * View
@@ -28,6 +28,7 @@ define([
     itemView: chatItemView.ChatItemView,
     footer: '#initial', // Used to force the browser to display the bottom of the screen from the outset
     reverseScrolling: true,
+
     itemViewOptions: function(item) {
       var options = {
         userCollection: this.userCollection,
@@ -40,6 +41,7 @@ define([
       }
       return options;
     },
+
     scrollElementSelector: "#content-frame",
 
     /* "WHAT THE F" is this nasty thing. Document your codedebt people */
@@ -172,18 +174,19 @@ define([
         return 0;
       });
 
-      if(lowestId === Infinity) {
+      if (lowestId === Infinity) {
         log('No messages loaded, cancelling pagenation (!!)');
         return;
       }
 
       return {
-          beforeId: lowestId,
-          limit: PAGE_SIZE
+        beforeId: lowestId,
+        limit: PAGE_SIZE
       };
     }
 
   });
+
   cocktail.mixin(ChatCollectionView, TroupeViews.SortableMarionetteView, InfiniteScrollMixin);
 
   return ChatCollectionView;
