@@ -119,7 +119,8 @@ define([
         /* most messages won't be a burst */
         chat.set('burstFinal', false);
 
-        var newUser = chat.get('fromUser').username;
+        var fromUser = chat.get('fromUser');
+        var newUser = fromUser && fromUser.username;
         var newSentTime = chat.get('sent');
 
         /* if message is a me status */
