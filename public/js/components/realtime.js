@@ -14,7 +14,7 @@ define([
   Faye.logger = {};
   var logLevels = ['fatal', 'error', 'warn', 'info', 'debug'];
   logLevels.slice(0, 1 + logLevel).forEach(function(level) {
-    Faye.logger[level] = function(msg) { log('faye: ' + level + ': ' + msg); };
+    Faye.logger[level] = function(msg) { log('faye: ' + level + ': ' + msg.substring(0, 100)); };
   });
 
   var clientId = null;
