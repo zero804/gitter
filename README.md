@@ -39,7 +39,13 @@ If you want to run against production, ssh into app-00X and run with the NODE_EN
 
 e.g `NODE_ENV=prod node /opt/gitter/gitter-webapp/scripts/utils/unread.js trevorah`
 
+### online-state.js
+Prints the current online state for a user. Requires a username.
+
+e.g `node scripts/utils/online-state.js trevorah`
+
 ### unread.js
 Lists out why a user has an unread badge. Requires a username.
 
 e.g `node scripts/utils/unread.js trevorah`
+
