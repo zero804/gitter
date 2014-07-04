@@ -454,7 +454,7 @@ function listAllSocketsForUser(userId, callback) {
 }
 
 function listOnlineUsers(callback) {
-  redisClient.zrange(ACTIVE_USERS_KEY, 0, -1, callback);
+  return Q.ninvoke(redisClient, 'zrange', ACTIVE_USERS_KEY, 0, -1).nodeify(callback);
 }
 
 function listMobileUsers(callback) {
