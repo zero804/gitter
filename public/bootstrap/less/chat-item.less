@@ -3,6 +3,11 @@ img.emoji {
   width: 20px;
 }
 
+// .trpChatContainer .isViewers:nth-last-child(2) .chat-item__details .chat-item__icon--read {
+.trpChatContainer .isViewers:nth-last-child(2) .chat-item__details .readBySome {
+  visibility: visible;
+}
+
 .chat-item {
   -webkit-transition: background-color 0.5s linear;
   -moz-transition: background-color 0.5s linear;
@@ -54,14 +59,25 @@ img.emoji {
     .chat-item__aside {
       display: none;
     }
+
+    @media @mobile {
+      .chat-item__details { display: none; }
+      .chat-item__text {
+        margin: 0;
+      }
+    }
   }
 
   // &.burstFinal {
   // TODO: Last .isViewers.read should always be visible
-  &.chat-item__icon--read:nth-last-child(2) {
-    visibility: visible;
-    opacity: 0.3;
-  }
+  // &.isViewers.chat-item__icon--read:nth-last-child(2) {
+  // .isViewers .chat-item__icon--read:last-child {
+  // // &.isViewers .chat-item__details:last-of-type(1) {
+  //   // .chat-item__icon--read {
+  //     visibility: visible;
+  //     opacity: 0.3;
+  // }
+  // }
   // }
 
   &.deleted {
@@ -92,6 +108,11 @@ img.emoji {
       height: 24px;
     }
   }
+
+  @media @mobile {
+    &:nth-last-child(2) { padding-bottom: 0px; }
+    &:nth-last-child(1) { padding-bottom: 8px; }
+  }
 }
 
 .chat-item__aside { float: left; }
@@ -119,14 +140,13 @@ img.emoji {
   // }
 
   @media @mid {
-    padding: padding: 8px 30px 8px 32px;
+    padding: padding: 8px 30px 1px 32px;
   }
 
   @media @mobile {
-    padding: 12px 10px;
+    padding: 8px 10px 1px;
   }
 }
-
 
 .chat-item__details {
   margin: -4px 0 0px 0;
@@ -309,10 +329,6 @@ img.emoji {
     }
   }
 }
-
-// .chat-item__container--continued {
-  
-// }
 
 .trpDisplayPicture--left {
   .trpDisplayPicture;
