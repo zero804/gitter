@@ -665,7 +665,7 @@ faye.stringify = function(object) {
 faye.logger = {
 };
 
-var logLevels = ['fatal', 'error', 'warn'/*, 'info'*/];
+var logLevels = ['fatal', 'error'/*, 'warn', 'info'*/];
 logLevels.forEach(function(level) {
   faye.logger[level] = function(msg) { logger[level]('faye: ' + msg.substring(0,180)); };
 });
