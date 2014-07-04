@@ -6,7 +6,6 @@ var testRequire = require('../test-require');
 
 var chatService = testRequire('./services/chat-service');
 var fixtureLoader = require('../test-fixtures');
-
 var assert = require('assert');
 
 var fixture = {};
@@ -15,10 +14,9 @@ var fixture = {};
 describe('chatService', function() {
 
   describe('updateChatMessage', function() {
-
     it('should update a recent chat message sent by the same user', function(done) {
 
-      chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, 'Hello', function(err, chatMessage) {
+      chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'Hello' }, function(err, chatMessage) {
         if(err) return done(err);
 
         var originalSentTime = chatMessage.sent;
@@ -35,16 +33,24 @@ describe('chatService', function() {
           done();
         });
       });
-
-
     });
-
   });
+
+  describe('updateStatusMessage', function() {
+    it('should update a recent `/me` status message sent by the same user ', function (done) {
+      chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: '@walter is happy', status: true }, function (err, chatMessage) {
+        if (err) return done(err);
+        assert(chatMessage.text === '@walter is happy', 'Expected text to be the same');
+        assert(chatMessage.status, 'Expected status to be set to true');
+      });
+      done();
+    });
+  })
 
   describe('Message entities', function() {
     it('should collect metadata from the message text', function(done) {
 
-      chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, 'hey @mauro check https://trou.pe', function(err, chatMessage) {
+      chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'hey @mauro check https://trou.pe' }, function(err, chatMessage) {
         if(err) return done(err);
 
         assert(Array.isArray(chatMessage.urls), 'urls should be an array');

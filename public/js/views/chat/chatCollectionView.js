@@ -81,7 +81,6 @@ define([
       this.listenTo(appEvents, 'chat.send', function() {
         this.rollers.scrollToBottom();
       });
-
     },
 
     scrollToFirstUnread: function() {
@@ -182,7 +181,6 @@ define([
           beforeId: lowestId,
           limit: PAGE_SIZE
       };
-
     }
 
   });

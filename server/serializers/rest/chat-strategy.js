@@ -82,6 +82,7 @@ function ChatStrategy(options)  {
     return {
       id: item._id,
       text: item.text,
+      status: item.status, 
       html: item.html,
       sent: formatDate(item.sent),
       editedAt: formatDate(item.editedAt),

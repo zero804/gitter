@@ -20,7 +20,7 @@ define([
   };
 
   var mouseEvents = {
-    "click #favourite-button":          "toggleFavourite"
+    "click .js-favourite-button":          "toggleFavourite"
   };
 
   $('.trpDisplayPicture').tooltip('destroy');
@@ -58,8 +58,8 @@ define([
       this.dialogRegion = modalRegion;
 
       if (hasScrollBars()) {
-        $(".trpChatContainer").addClass("scroller");
-        $(".trpChatInputArea").addClass("scrollpush");
+        $(".js-chat-container").addClass("scroller");
+        $(".js-chat-input-container").addClass("scrollpush");
         $("#room-content").addClass("scroller");
       }
 
@@ -144,17 +144,31 @@ define([
         }
 
         var formdata = new FormData();
-        for (var i in files) {
-          if (typeof files[i] === 'object') {
-            formdata.append("file", files[i]);
+        var type = '';
+        for(var i = 0; i < files.length; i++) {
+          var file = files[i];
+          var t = file.type.split('/').shift();
+
+          if(!i) {
+            type = t;
+          } else {
+            if(t !== type) {
+              type = '';
+            }
           }
+
+          formdata.append("file", file);
         }
 
         // Generate signature and upload
         $.ajax({
           type: 'GET',
           url: '/api/private/generate-signature',
-          data: 'room_uri=' + context.troupe().get('uri') + '&room_id=' + context.getTroupeId(),
+          data: {
+            room_uri: context.troupe().get('uri'),
+            room_id: context.getTroupeId(),
+            type: type
+          },
           success: function(data) {
             formdata.append("signature", data.sig);
 

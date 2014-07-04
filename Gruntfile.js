@@ -16,10 +16,10 @@ module.exports = function( grunt ) {
         compilation_level: 'SIMPLE_OPTIMIZATIONS',
         language_in: 'ECMASCRIPT5_STRICT',
         create_source_map: 'public-processed/js/' + name + '.min.js.map',
-//        define: [
-//        '"DEBUG=false"',
-//        '"UI_DELAY=500"'
-//        ],
+        // define: [
+        // '"DEBUG=false"',
+        // '"UI_DELAY=500"'
+        // ],
       }
     };
   }
@@ -325,7 +325,10 @@ module.exports = function( grunt ) {
           'public/bootstrap/less/*.less',
           'public/bootstrap/less/bootstrap/*.less'
         ],
-        tasks: 'less'
+        tasks: 'less',
+        options: {
+          livereload: true
+        }
       }
     },
 
@@ -527,20 +530,19 @@ module.exports = function( grunt ) {
 
   });
 
-  grunt.loadNpmTasks('grunt-contrib-requirejs');
-  grunt.loadNpmTasks('grunt-contrib-less');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-retire');
-
-  grunt.loadNpmTasks('grunt-bower-require-wrapper');
-  grunt.loadNpmTasks('grunt-wrap');
-  grunt.loadNpmTasks('grunt-closure-compiler');
-  grunt.loadNpmTasks('grunt-nsp-shrinkwrap');
+  /* using matchdep to load all grunt related modules */
+  require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
+  // grunt-contrib-requirejs
+  // grunt-contrib-less
+  // grunt-contrib-watch
+  // grunt-retire
+  // grunt-bower-require-wrapper
+  // grunt-wrap
+  // grunt-closure-compiler
+  // grunt-nsp-shrinkwrap
 
   grunt.registerTask('process', ['less', 'requirejs', 'closure-compiler']);
   grunt.registerTask('process-no-min', ['less', 'requirejs']);
-
   grunt.registerTask('client-libs', ['bowerRequireWrapper']);
-
 
 };

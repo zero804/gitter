@@ -6,7 +6,8 @@ define([
 
   var hosts = context.env('cdns');
   var hostLength = hosts && hosts.length;
-  var cdnPrefix = context.env('appVersion') ? "/_s/" + context.env('appVersion') : '';
+  var assetTag = context.env('assetTag');
+  var cdnPrefix =  assetTag ? "/_s/" + assetTag : '';
 
   function cdnPassthrough(url) {
     return "/" + url;

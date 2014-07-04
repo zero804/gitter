@@ -8,6 +8,10 @@ module.exports = {
         // No auth
         require('./health-check.js'));
 
+    app.get(apiRoot + '/private/health_check/full',
+        // No auth
+        require('./health-check-full.js'));
+
     // app.get(apiRoot + '/private/user_email',
     //     authMiddleware,
     //     require('./user-email'));

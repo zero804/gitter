@@ -13,14 +13,17 @@ var _          = require('underscore');
 var syncHandlebars = require('handlebars');
 var widgetHelpers = require('./widget-prerenderers');
 
-var chatWrapper = syncHandlebars.compile('<div class="trpChatItemContainer model-id-{{id}} {{unreadClass}} {{deletedClass}}">{{{inner}}}</div>');
+var chatWrapper = syncHandlebars.compile('<div class="chat-item model-id-{{id}} {{burstClass}} {{unreadClass}} {{deletedClass}}">{{{inner}}}</div>');
 
 var baseDir = path.normalize(__dirname + '/../../' + nconf.get('web:staticContent'));
 
-var templateFile = baseDir + '/js/views/chat/tmpl/chatViewItem.hbs';
-var buffer = fs.readFileSync(templateFile);
-var chatItemTemplate = syncHandlebars.compile(buffer.toString());
+function compileTemplate (file) {
+  var buffer = fs.readFileSync(baseDir + '/js/views/chat/tmpl/' + file);
+  return syncHandlebars.compile(buffer.toString());
+};
 
+var chatItemTemplate = compileTemplate('chatItemView.hbs');
+var statusItemTemplate = compileTemplate('statusItemView.hbs');
 
 var human_actions = {
   push:           'pushed',
@@ -46,8 +49,8 @@ var favicons = {
 };
 
 var webhookTemplates = ['bitbucket', 'generic', 'github', 'jenkins', 'sprintly', 'travis', 'trello', 'gitter'].reduce(function(memo, v) {
-  var templateFile = baseDir + '/js/views/chat/decorators/tmpl/' + v + '.hbs';
-  var buffer = fs.readFileSync(templateFile);
+  var chatTemplateFile = baseDir + '/js/views/chat/decorators/tmpl/' + v + '.hbs';
+  var buffer = fs.readFileSync(chatTemplateFile);
   var template = syncHandlebars.compile(buffer.toString());
 
   memo[v] = template;
@@ -107,11 +110,20 @@ module.exports = exports = function(model, params) {
     webhookClass: webhookClass
   }, widgetHelpers);
 
-  var result = chatItemTemplate(m);
+  var result;
+
+  if (m.status) {
+    result = statusItemTemplate(m);
+  } else {
+    result = chatItemTemplate(m);
+  }
+  
   var unreadClass = model.unread ? 'unread' : 'read';
+  var burstClass = model.burstStart ? 'burstStart' : 'burstContinued';
 
   return chatWrapper({
     id: model.id,
+    burstClass: burstClass,
     unreadClass: unreadClass,
     deletedClass: deletedClass,
     locale: locale,

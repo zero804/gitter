@@ -329,11 +329,12 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
     }
   });
 
+  // Need to use $elemMatch due to a regression in Mongo 2.6, see https://jira.mongodb.org/browse/SERVER-13843
   return persistence.Troupe.updateQ(
     { $and: [
       { oneToOne: true },
-      { 'users.userId': userId1 },
-      { 'users.userId': userId2 }
+      { 'users': {$elemMatch: {userId: userId1} }},
+      { 'users': {$elemMatch: {userId: userId2} }}
       ]},
     {
       $setOnInsert: insertFields
