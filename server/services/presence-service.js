@@ -9,6 +9,7 @@ var Fiber = require('../utils/fiber');
 var appEvents = require('../app-events.js');
 var Q = require('q');
 var _ = require("underscore");
+var StatusError = require('statuserror');
 
 var presenceService = new events.EventEmitter();
 
@@ -64,7 +65,7 @@ function disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callback
           userId: userId
         });
 
-        return callback(404);
+        return callback(new StatusError(404, 'socket not found'));
       }
 
       var userSocketCount = parseInt(result[1], 10);
@@ -138,7 +139,7 @@ function userSocketConnected(userId, socketId, connectionType, client, troupeId,
         userId: userId
       });
 
-      return callback(409 /* conflict */);
+      return callback(new StatusError(409, 'socket already exists'));
     }
 
     var userSocketCount = parseInt(result[1], 10);
@@ -180,7 +181,7 @@ function socketDisconnectionRequested(userId, socketId, callback) {
   lookupUserIdForSocket(socketId, function(err, userId2) {
     if(err) return callback(err);
     if(userId !== userId2) {
-      return callback(401);
+      return callback(new StatusError(401, 'userId did not match userId for socket'));
     }
 
     disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callback);
@@ -194,7 +195,7 @@ function socketDisconnected(socketId, callback) {
   lookupUserIdForSocket(socketId, function(err, userId) {
     if(err) return callback(err);
     if(!userId) {
-      return callback(404);
+      return callback(new StatusError(404, 'no user found for socket'));
     }
 
     disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callback);
@@ -208,7 +209,7 @@ function socketGarbageCollected(socketId, callback) {
       // Force socket disconnect
       // Technically this should never happen now that sockets are associated at authentication
       // time and therefore we never have a socket and userId at the same time
-      winston.error('Unable to disconnect socket, forcing disconnect: ' + err, { socketId: socketId });
+      winston.error('Unable to disconnect socket, forcing disconnect: ' + err.status, { socketId: socketId, error: err });
 
       var keys = [keySocketUser(socketId), ACTIVE_SOCKETS_KEY];
       var values = [socketId];
