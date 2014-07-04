@@ -2296,7 +2296,7 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
 
       self._invalidateSocket();
 
-      if (this._closing) {
+      if (self._closing) {
         self.info('Websocket closed as expected. code ?, reason ?, wasClean ?', event && event.code, event && event.reason, event && event.wasClean);
       } else {
         self.warn('Websocket closed unexpectedly. code ?, reason ?, wasClean ?', event && event.code, event && event.reason, event && event.wasClean);
@@ -2345,7 +2345,6 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
     this.info('Websocket transport close requested');
     this._socket.close();
     this._invalidateSocket();
-    // delete this._socket;
   },
 
   _createSocket: function() {
