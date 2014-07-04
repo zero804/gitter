@@ -1533,10 +1533,15 @@ Faye.Dispatcher = Faye.Class({
         request  = envelope && envelope.request,
         self     = this;
 
+    this.debug('handleError');
+
     if (!envelope || !envelope.request) return;
 
     request.then(function(req) {
-      if (req && req.abort) req.abort();
+      if (req && req.abort) {
+        self.debug('Aborting request');
+        req.abort();
+      }
     });
 
     Faye.ENV.clearTimeout(envelope.timer);
@@ -2251,11 +2256,16 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
     for (var i = 0, n = messages.length; i < n; i++) this._pending.add(messages[i]);
 
     this.callback(function(socket) {
-      if (!socket) return;
+      if (!socket) {
+        this.info('Cancelling request as socket has been closed');
+        // Should we this._handleError(messages);
+        return;
+      }
+
       try {
         socket.send(Faye.toJSON(messages));
       } catch(e) {
-        self._handleError(messages);
+        this._handleError(messages);
       }
     }, this);
     this.connect();
