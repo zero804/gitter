@@ -15,7 +15,12 @@ img.emoji {
   transition: background-color 0.5s linear;
   // border-top: 1px solid transparent;
 
-  /* this handles all styles for bursts continuation */
+  /* this handles all styles for burst start */  
+  &.burstStart {
+    padding-bottom: 2px;
+  }
+
+  /* this handles all styles for burst continuation */
   &.burstContinued {
 
     .chat-item__container {
