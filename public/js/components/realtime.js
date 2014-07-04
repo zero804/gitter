@@ -74,14 +74,35 @@ define([
     callback(message);
   };
 
+  var updateTimers;
+
   ClientAuth.prototype.incoming = function(message, callback) {
     if(message.channel == '/meta/handshake') {
       if(message.successful) {
         var ext = message.ext;
         if(ext) {
-          if(ext.appVersion && ext.appVersion !== context.env('appVersion')) {
+          if(ext.appVersion && ext.appVersion !== context.env('version')) {
+
             log('Application version mismatch');
-            $(document).trigger('app.version.mismatch');
+            if(!updateTimers) {
+              // Give the servers time to complete the upgrade
+              updateTimers = [setTimeout(function() {
+                /* 10 minutes */
+                $(document).trigger('app.version.mismatch');
+              }, 10 * 60000), setTimeout(function() {
+                /* 1 hour */
+                $(document).trigger('app.version.mismatch');
+              }, 60 * 60000), setTimeout(function() {
+                /* 6 hours */
+                window.location.reload(true);
+              }, 360 * 60000)];
+            }
+
+          } else if(updateTimers) {
+            updateTimers.forEach(function(t) {
+              clearTimeout(t);
+            });
+            updateTimers = null;
           }
 
           if(ext.context) {
