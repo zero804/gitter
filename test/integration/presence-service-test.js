@@ -31,17 +31,12 @@ describe('presenceService', function() {
   afterEach(cleanup);
 
   it('should cleanup invalid sockets correctly', function(done) {
+    presenceService.listOnlineUsers()
+      .then(function(users) {
+        var noTestUsersOnline = users.length === 0 || users.every(function(id) { return !id.match(/^TEST/); });
 
-    presenceService.listOnlineUsers(function(err, users) {
-      if(err) return done(err);
-
-      var noTestUsersOnline = users.length === 0 || users.every(function(id) { return !id.match(/^TEST/); });
-
-      assert(noTestUsersOnline, 'Garbage collection does not seem to have run correctly ' + users.join(', '));
-
-      done();
-    });
-
+        assert(noTestUsersOnline, 'Garbage collection does not seem to have run correctly ' + users.join(', '));
+      }).nodeify(done);
   });
 
   it('should allow a user to connect', function(done) {
