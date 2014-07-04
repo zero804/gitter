@@ -10,7 +10,7 @@ define([
   }
 
   function updateFavicon(unreadCount) {
-    var image = (unreadCount > 0) ? '/images/2/gitter/favicon5-unread.png' : '/images/2/gitter/favicon5.png';
+    var image = (unreadCount > 0) ? '/images/2/gitter/favicon-unread.ico' : '/images/2/gitter/favicon-read.ico';
     $('#favicon').attr('href', image);
   }
 

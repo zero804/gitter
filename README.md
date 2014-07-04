@@ -8,13 +8,13 @@ Please symlink pre-commit to .git/hooks/pre-commit to enable the pre-commit hook
 
 Getting Started
 ---------------
-1.	`npm install`
-2.	`grunt less`
-3.	`./mongodb.sh`
-4.	`./redis.sh`
-5.	`./scripts/mongo/init-dev-mongo.sh`
-6.	`./scripts/upgrade-data.sh`
-7.	`nodemon` (this will run node and restart when anything changes based on config in nodemon.json)
+1.  `npm install`
+2.  `grunt less`
+3.  `./mongodb.sh`
+4.  `./redis.sh`
+5.  `./scripts/mongo/init-dev-mongo.sh`
+6.  `./scripts/upgrade-data.sh`
+7.  `nodemon` (this will run node and restart when anything changes based on config in nodemon.json)
 
 Data Upgrades
 -------------
@@ -28,4 +28,24 @@ This is run as part of the beta build, but is **not** run as part of a productio
 
 Run Like Production
 -------------------
-`node web --web:staticContent=public-processed/ --web:minified=true`
+1.  `make grunt`
+2.  `node web --web:staticContent=public-processed/ --web:minified=true`
+
+Utility Scripts
+---------------
+These are scripts that can help you answer questions like "What's this user's eyeball state?" and "What's the userId for mydigitalself?". They can be found in `scripts/utils`.
+
+If you want to run against production, ssh into app-00X and run with the NODE_ENV varible set.
+
+e.g `NODE_ENV=prod node /opt/gitter/gitter-webapp/scripts/utils/unread.js trevorah`
+
+### online-state.js
+Prints the current online state for a user. Requires a username.
+
+e.g `node scripts/utils/online-state.js trevorah`
+
+### unread.js
+Lists out why a user has an unread badge. Requires a username.
+
+e.g `node scripts/utils/unread.js trevorah`
+

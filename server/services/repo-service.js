@@ -17,6 +17,7 @@ var SCORE_PUSH = 1500;
 var SCORE_ADMIN = 3000;
 var SCORE_RECENT = 5000;
 var SCORE_EXISTING = 5000;
+var SCORE_ROOM_PER_USER = 300;
 
 var WATCHER_COEFFICIENT = 0.1;
 var FORK_COEFFICIENT = 0.3;
@@ -99,13 +100,18 @@ function calculateAdditionalScoreFor(item) {
 
 /* This seems to be a very badly performing query! */
 function findReposWithRooms(repoList) {
+  if(repoList.length === 0) return Q.resolve([]);
+
   var uris = repoList.map(function(r) {
     return r && r.toLowerCase();
   });
 
   winston.info("Querying reposWithRooms for " + uris.length + " repositories");
-  var roomsPromise = uris.length ? persistence.Troupe.findQ({ githubType: 'REPO', lcUri: { $in: uris } }, "uri") : Q.resolve([]);
-  return roomsPromise;
+
+  return persistence.Troupe.findQ({
+      githubType: 'REPO',
+      lcUri: { $in: uris }
+    }, { uri: 1, users: 1 });
 }
 
 function suggestedReposForUser(user) {
@@ -149,6 +155,7 @@ function suggestedReposForUser(user) {
             var s = scores[troupe.uri];
             if(s) {
               s.score += SCORE_EXISTING;
+              s.score += troupe.users.length * SCORE_ROOM_PER_USER;
             }
           });
 
@@ -251,3 +258,31 @@ function findPublicReposWithRoom(user, query, options) {
 }
 
 exports.findPublicReposWithRoom = findPublicReposWithRoom;
+
+
+function findReposByUris(uris) {
+  if(uris.length === 0) return Q.resolve([]);
+
+  uris = uris.map(function(r) {
+    return r && r.toLowerCase();
+  });
+
+  winston.info("Querying findReposByUris for " + uris.length + " repositories");
+  return persistence.Troupe.findQ({
+      githubType: 'REPO',
+      lcUri: { $in: uris }
+    }, {
+      uri: 1,
+      githubId: 1,
+      security: 1
+    })
+    .then(function(troupes) {
+      return troupes.map(function(t) {
+        return {
+          full_name: t.uri,
+          private: t.security === 'PRIVATE'
+        };
+      });
+    });
+}
+exports.findReposByUris = findReposByUris;

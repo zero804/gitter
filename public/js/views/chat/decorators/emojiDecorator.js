@@ -8,7 +8,7 @@ define(['utils/emoji'], function(emoji) {
 
   var decorator = {
     decorate: function(chatItemView) {
-      emojify.run(chatItemView.$el.find('.trpChatText')[0]);
+      emojify.run(chatItemView.$el.find('.js-chat-item-text')[0]);
     }
   };
 

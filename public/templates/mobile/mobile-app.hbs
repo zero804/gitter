@@ -30,7 +30,7 @@
 </head>
 <body class="with-sideMenu">
 
-  <div id="troupeList" class="sideMenu">
+  <div id="troupeList" class="menu">
   </div>
 
   <div id="mainPage">
@@ -51,8 +51,10 @@
       </div>
     </div>
 
-    <div class="trpChatInputArea" id="chat-input"></div>
+    <div class="chat-input__container  js-chat-input-container" id="chat-input"></div>
   </div>
-
+  {{#if liveReload}}
+    <script src="//localhost:35729/livereload.js"></script>
+  {{/if}}
 </body>
 </html>

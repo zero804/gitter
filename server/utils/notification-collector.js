@@ -8,7 +8,7 @@ var _ = require('underscore');
 var NotificationCollector = function(options) {
   this.collection = {};
   this.userCategorisationStrategy = options.userCategorisationStrategy;
-  this.collect = _.debounce(this.collectTimeout.bind(this), options.collectionTime || 500);
+  this.collect = _.throttle(this.collectTimeout.bind(this), options.collectionTime || 500, { leading: false });
 };
 
 util.inherits(NotificationCollector, EventEmitter);

@@ -13,32 +13,35 @@ var random = require('../utils/random');
 var Q = require('q');
 var userService = require('./user-service');
 var moment = require('moment');
+var onMongoConnect = require('../utils/on-mongo-connect');
 
 var WEB_INTERNAL_CLIENT_KEY = 'web-internal';
 var webInternalClientId = null;
+var ircClientId;
 
 var cacheTimeout = 60; /* 60 seconds */
 
-/* Load webInternalClientId once at startup */
-persistenceService.OAuthClient.findOne({ clientKey: WEB_INTERNAL_CLIENT_KEY }, function(err, oauthClient) {
-  if(err) throw new Error("Unable to load internal clientKey " + WEB_INTERNAL_CLIENT_KEY + ": " + err);
+onMongoConnect(function() {
+  logger.verbose('Loading oauth ids');
 
-  if(!oauthClient) throw new Error("Unable to load internal client id. Have you loaded it into mongo?");
+  /* Load webInternalClientId once at startup */
+  persistenceService.OAuthClient.findOne({ clientKey: WEB_INTERNAL_CLIENT_KEY }, function(err, oauthClient) {
+    if(err) throw new Error("Unable to load internal clientKey " + WEB_INTERNAL_CLIENT_KEY + ": " + err);
 
-  webInternalClientId = oauthClient._id;
+    if(!oauthClient) throw new Error("Unable to load internal client id. Have you loaded it into mongo?");
+
+    webInternalClientId = oauthClient._id;
+  });
+
+  persistenceService.OAuthClient.findOne({ clientKey: nconf.get('irc:clientKey') }, function(err, oauthClient) {
+    if(err) throw new Error("Unable to load internal clientKey " + nconf.get('irc:clientKey') + ": " + err);
+
+    if(!oauthClient) throw new Error("Unable to load internal client id. Have you loaded it into mongo?");
+
+    ircClientId = oauthClient._id;
+  });
+
 });
-
-var ircClientId;
-
-persistenceService.OAuthClient.findOne({ clientKey: nconf.get('irc:clientKey') }, function(err, oauthClient) {
-  if(err) throw new Error("Unable to load internal clientKey " + nconf.get('irc:clientKey') + ": " + err);
-
-  if(!oauthClient) throw new Error("Unable to load internal client id. Have you loaded it into mongo?");
-
-  ircClientId = oauthClient._id;
-});
-
-
 
 var tokenLookupCachePrefix = "token:c:";
 var tokenLookupCache = {
@@ -182,22 +185,13 @@ exports.removeAllAccessTokensForUser = function(userId, callback) {
     .nodeify(callback);
 };
 
-exports.saveAccessToken = function(token, userId, clientId, callback) {
-
-  var accessToken = new persistenceService.OAuthAccessToken({
-    token: token,
-    userId: userId,
-    clientId: clientId
-  });
-  accessToken.save(callback);
-};
-
 exports.findClientByClientKey = function(clientKey, callback) {
   persistenceService.OAuthClient.findOne({ clientKey: clientKey }, callback);
 };
 
 function findOrCreateToken(userId, clientId, callback) {
   if(!userId) return Q.reject('userId required').nodeify(callback);
+  if(!clientId) return Q.reject('userId required').nodeify(callback);
 
   return tokenLookupCache.get(userId, clientId)
     .then(function(token) {
@@ -207,7 +201,7 @@ function findOrCreateToken(userId, clientId, callback) {
       /* Lookup and possible create */
       return persistenceService.OAuthAccessToken.findOneQ({
           userId: userId,
-          clientId: webInternalClientId
+          clientId: clientId
         }).then(function(oauthAccessToken) {
           if(oauthAccessToken) {
             return tokenLookupCache.set(userId, clientId, oauthAccessToken.token)
@@ -217,7 +211,7 @@ function findOrCreateToken(userId, clientId, callback) {
           return random.generateToken()
             .then(function(token) {
               return persistenceService.OAuthAccessToken.findOneAndUpdateQ(
-                { userId: userId, clientId: webInternalClientId },
+                { userId: userId, clientId: clientId },
                 {
                   $setOnInsert: {
                     token: token
@@ -234,10 +228,8 @@ function findOrCreateToken(userId, clientId, callback) {
 
     })
     .nodeify(callback);
-
-
-
 }
+exports.findOrCreateToken = findOrCreateToken;
 
 // TODO: move some of this functionality into redis for speed
 // TODO: make the web tokens expire
@@ -263,3 +255,23 @@ exports.generateAnonWebToken = function(callback) {
 exports.findOrGenerateIRCToken = function(userId, callback) {
   return findOrCreateToken(userId, ircClientId, callback);
 };
+
+exports.testOnly = {
+  invalidateCache: function() {
+    var d = Q.defer();
+    redisClient.keys(tokenValidationCachePrefix + '*', function(err, results) {
+      if(err) return d.reject(err);
+
+      if(!results.length) return d.resolve();
+
+      redisClient.del(results, function(err) {
+        if(err) return d.reject(err);
+
+        d.resolve();
+      });
+    });
+
+    return d.promise;
+  }
+};
+

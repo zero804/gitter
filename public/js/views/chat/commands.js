@@ -158,6 +158,12 @@ define([
       }
     },
     {
+      command: 'me',
+      description: 'Let people know what\'s happening',
+      completion: 'me ',
+      regexp: /^\/me/
+    },
+    {
       command: 'query @username',
       description: 'Have a private conversation with @username',
       completion: 'query @',
