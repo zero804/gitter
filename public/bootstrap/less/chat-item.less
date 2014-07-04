@@ -3,12 +3,82 @@ img.emoji {
   width: 20px;
 }
 
+// .trpChatContainer .isViewers:nth-last-child(2) .chat-item__details .chat-item__icon--read {
+.trpChatContainer .isViewers:nth-last-child(2) .chat-item__details .readBySome {
+  visibility: visible;
+}
+
 .chat-item {
   -webkit-transition: background-color 0.5s linear;
   -moz-transition: background-color 0.5s linear;
   -o-transition: background-color 0.5s linear;
   transition: background-color 0.5s linear;
   border-top: 1px solid transparent;
+
+  /* this handles all styles for bursts continuation */
+  &.burstContinued {
+
+    .chat-item__container {
+      padding: 1px 30px 1px 44px;
+    }
+
+    .chat-item__content {
+      margin: 0;
+      padding: 0 10px 0 0;
+    }
+
+    .chat-item__details {
+      float: left;
+      margin: 0;
+      height: 19px;
+      line-height: 19px;
+
+      .hover .chat-item:hover > & {
+        margin-left: 2px;
+        display: inline-block;
+      }
+    }
+
+    .chat-item__icon--read,
+    .chat-item__icon--edit {
+      visibility: hidden;
+    }
+
+    .chat-item__text {
+      margin-left: 50px;
+    }
+
+    .chat-item__time {
+      display: none;
+      &:before {
+        content: none;
+      }
+    }
+
+    .chat-item__from,
+    .chat-item__aside {
+      display: none;
+    }
+
+    @media @mobile {
+      .chat-item__details { display: none; }
+      .chat-item__text {
+        margin: 0;
+      }
+    }
+  }
+
+  // &.burstFinal {
+  // TODO: Last .isViewers.read should always be visible
+  // &.isViewers.chat-item__icon--read:nth-last-child(2) {
+  // .isViewers .chat-item__icon--read:last-child {
+  // // &.isViewers .chat-item__details:last-of-type(1) {
+  //   // .chat-item__icon--read {
+  //     visibility: visible;
+  //     opacity: 0.3;
+  // }
+  // }
+  // }
 
   &.deleted {
     opacity: 0.5;
@@ -20,6 +90,10 @@ img.emoji {
   &.unread, &.reading {
     background-color: fade(@trpGreen, 20%);
     border-top: 1px solid fade(@trpGreen, 25%);
+  }
+
+  &:nth-last-child(2) {
+    padding-bottom: 8px;
   }
 
   @media @small {
@@ -34,12 +108,17 @@ img.emoji {
       height: 24px;
     }
   }
+
+  @media @mobile {
+    &:nth-last-child(2) { padding-bottom: 0px; }
+    &:nth-last-child(1) { padding-bottom: 8px; }
+  }
 }
 
 .chat-item__aside { float: left; }
 
 .chat-item__container {
-  padding: 8px 30px 8px 44px;
+  padding: 8px 30px 1px 44px;
   -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
   -moz-box-sizing: border-box;    /* Firefox, other Gecko */
   box-sizing: border-box;         /* Opera/IE 8+ */
@@ -61,12 +140,20 @@ img.emoji {
   // }
 
   @media @mid {
-    padding: padding: 8px 30px 8px 32px;
+    padding: padding: 8px 30px 1px 32px;
   }
 
   @media @mobile {
-    padding: 12px 10px;
+    padding: 8px 10px 1px;
   }
+}
+
+.chat-item__details {
+  margin: -4px 0 0px 0;
+  padding: 0;
+  font-size: 12px;
+  display: block;
+  color: #999;
 }
 
 .chat-item__from {
@@ -109,6 +196,7 @@ img.emoji {
   vertical-align: middle;
   opacity: 0.5;
   visibility: hidden;
+  // display: none;
   overflow-x: hidden;
   background-size: cover;
   background-repeat: no-repeat;
@@ -128,11 +216,13 @@ img.emoji {
 
   .chat-item:hover & {
     visibility: visible;
+    // display: inline-block;
     opacity: 1;
   }
   
   .isViewers & {
     visibility: visible;
+    // display: inline-block;
   }
 
   @media @retina {
@@ -145,6 +235,7 @@ img.emoji {
 
   .isViewers.chat-item:hover & {
     visibility: visible;
+    // display: inline-block;
     opacity: 1;
   }
 
@@ -153,14 +244,6 @@ img.emoji {
   @media @retina {
     background-image: url('../../images/2/gitter/icon-edit@2x.png');
   }
-}
-
-.chat-item__details {
-  margin: -4px 0 0px 0;
-  padding: 0;
-  font-size: 12px;
-  display: block;
-  color: #999;
 }
 
 .chat-item__text {
