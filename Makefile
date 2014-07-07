@@ -35,7 +35,7 @@ test:
 test-coverage:
 	rm -rf ./coverage/ cobertura-coverage.xml
 	mkdir -p output
-	find $(TESTS) -iname "*test.js" | NODE_ENV=test xargs ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- --timeout 10000 --reporter xunit-file || true
+	find $(TESTS) -iname "*test.js" | NODE_ENV=test XUNIT_FILE=output/test-reports/integration_cov.xml xargs ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- --timeout 10000 --reporter xunit-file || true
 	./node_modules/.bin/istanbul report cobertura
 
 perf-test-xunit:
