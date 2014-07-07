@@ -53,9 +53,8 @@ define([
       }, 300);
     },
 
-    setBillingUrl: function() {
-      var billingUrl = context.env('billingUrl') + '/bill/' + this.selectedModel.get('uri').split('/')[0];
-      $('#billing-url').attr("href",billingUrl);
+    billingUrl: function() {
+      return context.env('billingUrl') + '/bill/' + this.selectedModel.get('uri').split('/')[0];
     },
 
     menuItemClicked: function(button) {
@@ -70,6 +69,10 @@ define([
 
         case 'cancel':
           this.dialog.hide();
+          break;
+
+        case 'get-plan':
+          window.location = this.billingUrl();
           break;
       }
     },
@@ -221,7 +224,6 @@ define([
 
     recalcView: function(animated) {
       if (!this.ui || !this._uiBindings) { return; }
-      this.setBillingUrl();
       var self = this;
       var showHide = {
         'selectParentRequired': false,
@@ -294,6 +296,7 @@ define([
       }
 
       showHide.premiumRequired = this.selectedOptionsRequireUpgrade();
+      createButtonEnabled = !showHide.premiumRequired;
 
       if(checkForRepo) {
         checkForRepoExistence(checkForRepo, function(exists) {
@@ -350,6 +353,15 @@ define([
         }
 
         self.dialog.setButtonState('create', createButtonEnabled);
+
+        if (showHide.premiumRequired) {
+          self.dialog.hideActions();
+          self.dialog.showPremium();
+        } else {
+          self.dialog.showActions();
+          self.dialog.hidePremium();
+        }
+        
 
         if(animated === false) {
           arrayToJq(true).show();
@@ -415,9 +427,10 @@ define([
       this.view = new View(options);
     },
     menuItems: [
-      { action: "create", text: "Create", className: "trpBtnGreen" },
-      { action: "back", text: "Back", className: "trpBtnLightGrey" },
-      { action: "cancel", text: "Cancel", className: "trpBtnLightGrey"}
+      { action: "create", text: "Create", className: "trpBtnGreen action" },
+      { action: "back", text: "Back", className: "trpBtnLightGrey action" },
+      { action: "cancel", text: "Cancel", className: "trpBtnLightGrey action"},
+      { action: "get-plan", text: "Get Plan", className: "trpBtnGreen premium hidden"}
     ]
   });
 
