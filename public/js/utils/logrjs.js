@@ -1,4 +1,3 @@
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define({
   load: function (name, req, onload/*, config*/) {
     "use strict";

@@ -1,4 +1,3 @@
-/*jshint unused:true, browser:true */
 define(function () {
 
   // This is taken from https://github.com/troupe/text-filter
