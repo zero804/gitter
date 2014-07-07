@@ -19,7 +19,7 @@ var mongoUtils        = require('../utils/mongo-utils');
 var StatusError       = require('statuserror');
 var bayeuxExtension   = require('./bayeux/extension');
 
-var appTag = appVersion.getAppTag();
+var version = appVersion.getVersion();
 
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
@@ -258,7 +258,7 @@ var authenticator = bayeuxExtension({
 
   outgoing: function(message, req, callback) {
     if(!message.ext) message.ext = {};
-    message.ext.appVersion = appTag;
+    message.ext.appVersion = version;
 
     // The other half of the UGLY hack,
     // get the userId out from the message
@@ -662,53 +662,12 @@ faye.stringify = function(object) {
 };
 
 /* TEMPORARY DEBUGGING SOLUTION */
-var re;
-var fs = require('fs');
-
-setInterval(function() {
-  fs.exists('/tmp/faye-logging-filter', function(exists) {
-    if(exists) {
-      fs.readFile('/tmp/faye-logging-filter', 'utf8', function(err, data) {
-        if(err) {
-          logger.info('Unable to read /tmp/faye-logging-filter', { exception: err });
-        }
-
-        var lines = data.split(/[\n]/)
-          .map(function(line) { return line.trim(); })
-          .filter(function(line) { return line; });
-
-        try {
-          re = new RegExp(lines.join('|'));
-        } catch(e) {
-          re = null;
-          logger.info('Unable to create regular expression', { exception: err });
-        }
-
-      });
-    } else {
-      re = null;
-    }
-  });
-}, 5000);
-
 faye.logger = {
-  debug: function(msg) {
-    if(!re) return;
-    if(msg.match(re)) {
-      logger.verbose('faye: ' + msg);
-    }
-  },
-  info: function(msg) {
-    if(!re) return;
-    if(msg.match(re)) {
-      logger.verbose('faye: ' + msg);
-    }
-  }
 };
 
-var logLevels = ['fatal', 'error', 'warn'];
-logLevels/*.slice(0, 1 + logLevel)*/.forEach(function(level) {
-  faye.logger[level] = function(msg) { logger[level]('faye: ' + msg); };
+var logLevels = ['fatal', 'error'/*, 'warn', 'info'*/];
+logLevels.forEach(function(level) {
+  faye.logger[level] = function(msg) { logger[level]('faye: ' + msg.substring(0,180)); };
 });
 
 

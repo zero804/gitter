@@ -8,6 +8,25 @@
 @import "bootstrap/dropdowns.less";
 @import "trpModals.less";
 @import "chat-item";
+@import "chat-input";
+
+.boxhack {
+  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+  box-sizing: border-box;  
+}
+
+.transition300ms() {
+  .transition(300ms);
+}
+
+.transition100ms() {
+  .transition(100ms);
+}
+
+.transition500ms() {
+  .transition(500ms);
+}
 
 html {
 	height: 100%;
@@ -43,7 +62,7 @@ a {
 #content {
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
-	padding-bottom: 50px;
+	padding-bottom: 59px;
 	position: absolute;
 }
 

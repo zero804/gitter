@@ -126,7 +126,7 @@ define([
       if (!window._troupeIsTablet) $("#chat-input-textarea").focus();
 
       var inputBox = new ChatInputBoxView({
-        el: this.$el.find('.trpChatInputBoxTextArea'),
+        el: this.$el.find('.js-chat-input-text-area'),
         rollers: this.rollers,
         chatCollectionView: this.chatCollectionView,
         composeMode: this.composeMode,
@@ -437,8 +437,6 @@ define([
         rollers.adjustScrollContinuously(300);
       }
     }
-
-
   };
 
   var ChatInputBoxView = TroupeViews.Base.extend({
@@ -461,6 +459,7 @@ define([
       if(hasScrollBars()) {
         this.$el.addClass("scroller");
       }
+      
       var chatResizer = new ChatCollectionResizer({
         compactView: this.compactView,
         el: this.el,

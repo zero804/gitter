@@ -21,11 +21,33 @@
 
     <!-- Le fav and touch icons -->
     <link rel="stylesheet" href='{{cdn "bootstrap/css/trp3.css" }}'>
-    <link id="favicon" rel="shortcut icon" href='{{cdn "images/2/gitter/favicon5.png" }}'>
+    <link id="favicon" rel="shortcut icon" href='{{cdn "images/2/gitter/favicon-read.ico" }}'>
     {{>load_font_css}}
   </head>
   <body class='hover'>
-
+    {{#if stagingText}}
+    <div class="staging-indicator" style="
+        position: fixed;
+        left: 50%;
+        top: 0;
+        padding: 2px 10px;
+        background-color: #1dce73;
+        border-radius: 0 0 4px 4px;
+        z-index: 100000;
+        color: white;
+        font-family: 'open sans';
+        font-size: 10px;
+        text-align: center;
+    ">
+      {{#if stagingLink}}
+      <a style="text-decoration: none; color:white" href="{{stagingLink}}" target="_new">{{stagingText}}</a>
+      {{else}}
+      {{stagingText}}
+      {{/if}}
+      
+    </div>
+    {{/if}}
+    
     {{#isMobile agent}}
       <div class="trpPortraitAlert" id='portrait-alert'>
         <div class="message">
@@ -34,7 +56,6 @@
           <img class="logo" src='{{cdn "images/2/menu-toggle.png" }}'>
         </div>
       </div>
-      
     {{/isMobile}}
 
     <div class="trpLeftMenuHotspot" id="left-menu-hotspot"></div>
@@ -54,10 +75,10 @@
     </div>
 
     {{{ generateTroupeContext troupeContext }}}
-
     {{>require_wrapper}}
     {{{bootScript bootScriptName }}}
-
-    {{!-- <script src="//localhost:35729/livereload.js"></script> --}}
+    {{#if liveReload}}
+      <script src="//localhost:35729/livereload.js"></script>
+    {{/if}}
   </body>
 </html>

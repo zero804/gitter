@@ -15,11 +15,11 @@ define([
       change: 'redisplay'
     },
     ui: {
-      cog: '.dropdown-toggle',
+      cog: '.js-chat-settings',
       dropdownMenu: '#cog-dropdown',
-      topic: '#trpTopic',
-      name: '#name-label',
-      favourite: '#favourite-button'
+      topic: '.js-chat-topic',
+      name: '.js-chat-name',
+      favourite: '.js-favourite-button'
     },
     events: {
       'click @ui.cog': 'showDropdown',
@@ -107,8 +107,8 @@ define([
     toggleFavourite: function() {
       if(!context.isLoggedIn()) return;
 
-      this.ui.favourite.toggleClass('favourited');
-      var isFavourite = this.ui.favourite.hasClass('favourited');
+      this.ui.favourite.toggleClass('favourite');
+      var isFavourite = this.ui.favourite.hasClass('favourite');
 
       $.ajax({
         url: '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId(),
@@ -163,13 +163,13 @@ define([
       if (this.editingTopic === true) return;
       this.editingTopic = true;
 
-      var topicInputText = this.$el.find('#trpTopic');
+      var topicInputText = this.$el.find('.js-chat-topic');
       var unsafeText = topicInputText.text();
 
       this.oldTopic = unsafeText;
 
       // create inputview
-      topicInputText.html("<textarea class='trpTopicInput'></textarea>");
+      topicInputText.html("<textarea class='topic-input'></textarea>");
 
       var textarea = topicInputText.find('textarea').val(unsafeText);
 
@@ -191,7 +191,7 @@ define([
       this.ui.name.text(model.get('name'));
       this.ui.topic.text(model.get('topic'));
       autolink(this.ui.topic[0]);
-      this.ui.favourite.toggleClass('favourited', !!model.get('favourite'));
+      this.ui.favourite.toggleClass('favourite', !!model.get('favourite'));
     }
 
   });

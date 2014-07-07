@@ -5,13 +5,29 @@
 @import "trpButtons";
 @import "trp3Vars";
 @import "icon-mixins";
+
+/* new stuff */
 @import "menu";
 @import "chat-item";
+@import "chat-input";
+/* end of new stuff*/
 
 .boxhack {
   -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
   -moz-box-sizing: border-box;    /* Firefox, other Gecko */
   box-sizing: border-box;  
+}
+
+.transition300ms() {
+  .transition(300ms);
+}
+
+.transition100ms() {
+  .transition(100ms);
+}
+
+.transition500ms() {
+  .transition(500ms);
 }
 
 body.with-sideMenu {
@@ -77,7 +93,7 @@ header {
 }
 
 #mainPage.partiallyOffScreen {
-  left: 85%;
+  left: 250px;
   .animation(linear);
 }
 

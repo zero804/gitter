@@ -7,8 +7,6 @@ var _ = require('underscore');
 var appVersion = require('./appVersion');
 var safeJson = require('../utils/safe-json');
 var minifiedDefault = nconf.get("web:minified");
-var appTag = appVersion.getAppTag();
-var revision = appVersion.getRevision();
 var env = process.env['NODE_ENV'];
 
 var cdns;
@@ -29,8 +27,8 @@ var troupeEnv = {
   goSquaredTrackingId: nconf.get("web:goSquaredId"),
   env: env,
   cdns: cdns,
-  appVersion: appTag,
-  revision: revision,
+  version: appVersion.getVersion(),
+  assetTag: appVersion.getAssetTag(),
   logging: nconf.get("web:consoleLogging"),
   ravenUrl: nconf.get("errorReporting:clientRavenUrl"),
   websockets: {
