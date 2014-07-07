@@ -177,12 +177,8 @@ grunt: clean lint-configs
 		do cp -R $$i public-processed/; \
 	done
 	
-	for i in $(find public -name '*.hbs'); do \
-		dest=$(echo $i|sed -e 's/^public/public-processed/'); \
-		mkdir -p $(dirname $dest); \
-		cp $i $dest;\
-	done
-
+	./build-scripts/copy-templates.sh
+	
 	grunt -no-color --verbose less
 	grunt -no-color --verbose requirejs
 	./build-scripts/selective-js-compile.sh
