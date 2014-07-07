@@ -21,7 +21,7 @@ for i in $(find $ROOT_DIR/public-processed/js -maxdepth 1 -name '*.js' ! -name '
     echo $i needs updating >&2
     
     rm -f $min_file ${min_file}.gz ${min_file}.map ${min_file}.map.gz
-    nice grunt closure-compiler --closureModule $(basename $i) &
+    nice grunt closure --closureModule $(basename $i) &
     echo $md5_checksum > $md5_file 
   fi
 done

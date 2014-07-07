@@ -193,6 +193,28 @@ module.exports = function( grunt ) {
     return requireConfig;
   }
 
+  function appendSourceMapping(modules) {
+
+    var config = {};
+
+    var closureModule = grunt.option('closureModule');
+
+    modules.forEach(function(module) {
+      var name = module.name;
+
+      if(closureModule && closureModule !== name + '.js') return;
+      var files = {};
+      files["public-processed/js/" + name + ".min.js"] = name + ".min.js.map";
+      config[module.name] = {
+        files: files
+      };
+
+    });
+
+    return config;
+
+  }
+
   //
   // Grunt configuration:
   //
@@ -206,7 +228,7 @@ module.exports = function( grunt ) {
 
     requirejs: compileRequireModules(MODULES),
     "closure-compiler": createClosureConfig(MODULES),
-
+    "append-sourcemapping": appendSourceMapping(MODULES),
     // default watch configuration
     watch: {
       less: {
@@ -423,6 +445,7 @@ module.exports = function( grunt ) {
   require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
   grunt.registerTask('process', ['less', 'requirejs', 'closure-compiler']);
+  grunt.registerTask('closure', ['closure-compiler', 'append-sourcemapping']);
   grunt.registerTask('process-no-min', ['less', 'requirejs']);
   grunt.registerTask('client-libs', ['bowerRequireWrapper']);
 
