@@ -24,7 +24,6 @@ define([
       if(this._isFetching) return;
 
       var loadLimit = this.getLoadLimit();
-      var collectionLimit = this.getCollectionLimit();
 
       var data = { limit: loadLimit /* Latest is the default */ };
 
@@ -83,7 +82,6 @@ define([
       }
 
       var loadLimit = this.getLoadLimit();
-      var collectionLimit = this.getCollectionLimit();
 
       var data = { beforeId: beforeId, limit: loadLimit };
       var self = this;
@@ -121,7 +119,6 @@ define([
       }
 
       var loadLimit = this.getLoadLimit();
-      var collectionLimit = this.getCollectionLimit();
 
       var data = { afterId: afterId, limit: loadLimit };
 
@@ -152,7 +149,6 @@ define([
       this._isFetching = true;
 
       var loadLimit = this.getLoadLimit();
-      var collectionLimit = this.getCollectionLimit();
 
       var existingIds = utils.index(this.pluck('id'), utils.identityTransform);
 
