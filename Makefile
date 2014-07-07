@@ -231,7 +231,7 @@ search-js-console:
 
 validate-source: search-js-console
 
-continuous-integration: clean validate-source npm grunt security-check version-files upgrade-data reset-test-data test-coverage tarball
+continuous-integration: clean validate-source npm grunt security-check version-files upgrade-data reset-test-data test tarball
 
 continuous-integration-no-test: clean validate-source npm grunt version-files upgrade-data reset-test-data tarball
 
