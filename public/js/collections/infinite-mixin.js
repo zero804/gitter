@@ -58,17 +58,11 @@ define([
             // NO MORE
             self.atTop = true;
           } else {
-            if(self.length > collectionLimit) {
-              /* Too many items? Trim off the top */
-              var forRemoval = self.slice(0, -collectionLimit);
-              self.remove(forRemoval);
-              self.atTop = false;
-            }
+            self.trimTop();
           }
-          // while(self.length > collectionLimit) {
-          //   self.pop();
-          //   self.atBottom = false;
-          // }
+
+          self.trigger('scroll.fetch', 'previous');
+
           if(callback) callback.call(context);
         },
         error: function(err) {
@@ -105,11 +99,9 @@ define([
             // NO MORE
             self.atTop = true;
           }
-          if(self.length > collectionLimit) {
-            var forRemoval = self.slice(-collectionLimit);
-            self.remove(forRemoval);
-            self.atBottom = false;
-          }
+          self.trimBottom();
+
+          self.trigger('scroll.fetch', 'previous');
           if(callback) callback.call(context);
         },
         error: function(err) {
@@ -144,11 +136,8 @@ define([
             // NO MORE
             self.atBottom = true;
           }
-          if(self.length > collectionLimit) {
-            var forRemoval = self.slice(0, -collectionLimit);
-            self.remove(forRemoval);
-            self.atTop = false;
-          }
+          self.trimTop();
+          self.trigger('scroll.fetch', 'next');
           if(callback) callback.call(context);
         },
         error: function(err) {
@@ -194,17 +183,38 @@ define([
             self.remove(existingModels);
           }
 
-          while(self.length > collectionLimit) {
-            self.pop();
-            self.atBottom = false;
-          }
+          // Ideally we should trim both sides
+          self.trimBottom();
 
+          self.trigger('scroll.fetch', 'marker');
           if(callback) callback.call(context);
         },
         error: function(err) {
           if(callback) callback.call(err);
         }
       });
+    },
+
+    trimTop: function() {
+      var collectionLimit = this.getCollectionLimit();
+
+      if(this.length > collectionLimit) {
+        var forRemoval = this.slice(0, -collectionLimit);
+        this.remove(forRemoval);
+        console.log('REMAINING', this.length);
+        this.atTop = false;
+      }
+    },
+
+    trimBottom: function() {
+      var collectionLimit = this.getCollectionLimit();
+
+      if(this.length > collectionLimit) {
+        var forRemoval = this.slice(collectionLimit);
+        this.remove(forRemoval);
+        this.atBottom = false;
+      }
+
     }
   };
 });
