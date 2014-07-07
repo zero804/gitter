@@ -35,7 +35,7 @@ test:
 test-coverage:
 	rm -rf ./coverage/ cobertura-coverage.xml
 	mkdir -p output
-	find $(TESTS) -iname "*test.js" | NODE_ENV=test xargs ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- --timeout 10000  || true
+	find $(TESTS) -iname "*test.js" | NODE_ENV=test xargs ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- --timeout 10000 --reporter xunit-file || true
 	./node_modules/.bin/istanbul report cobertura
 
 perf-test-xunit:
@@ -231,7 +231,7 @@ search-js-console:
 
 validate-source: search-js-console
 
-continuous-integration: clean validate-source npm grunt security-check version-files upgrade-data reset-test-data test-xunit test-coverage tarball
+continuous-integration: clean validate-source npm grunt security-check version-files upgrade-data reset-test-data test-coverage tarball
 
 continuous-integration-no-test: clean validate-source npm grunt version-files upgrade-data reset-test-data tarball
 
