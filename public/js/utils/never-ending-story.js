@@ -1,4 +1,3 @@
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define(['underscore', 'backbone', 'log!nes'], function(_, Backbone, log) {
   "use strict";
 
