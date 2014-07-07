@@ -18,6 +18,8 @@ else
 CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/)
 endif
 
+PUBLIC_EXCLUDING_JS = $(shell ls -d public/*|grep -v ^public/js$)
+
 .PHONY: clean test perf-test-xunit perf-test test-xunit test-in-browser test-in-browser-xunit test-coverage prepare-for-end-to-end-testing end-to-end-test
 
 clean:
@@ -171,8 +173,9 @@ lint-configs: config/*.json
 grunt: clean lint-configs
 	mkdir output
 	mkdir -p public-processed/js
-	for i in $(ls -d public/*|grep -v ^public/js$); \
-		do cp -R $i public-processed/; \
+	echo $(PUBLIC_EXCLUDING_JS)
+	for i in $(PUBLIC_EXCLUDING_JS); \
+		do cp -R $$i public-processed/; \
 	done
 	grunt -no-color --verbose less
 	grunt -no-color --verbose requirejs
