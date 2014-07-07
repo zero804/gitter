@@ -136,13 +136,14 @@ define([
       // current chat-item details
       var currUser = chatItem.get('fromUser') && chatItem.get('fromUser').username;
       var currSentTime = chatItem.get('sent').valueOf();
+      var currIsStatus = chatItem.get('status');
 
       // always set the chat-item to be false for both final and start
       chatItem.set('burstFinal', false);
       chatItem.set('burstStart', false);
 
       // if the current user is different to the previous user we have a burst
-      if (currUser !== prevUser || prevIsStatus || (currSentTime - prevSentTime) > this.BURST_WINDOW) {
+      if (currUser !== prevUser || prevIsStatus || currIsStatus || (currSentTime - prevSentTime) > this.BURST_WINDOW) {
         chatItem.set('burstStart', true);
         prevChatItem.set('burstFinal', true);
         return;
