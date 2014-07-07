@@ -247,18 +247,30 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
     //.nodeify(callback)
 };
 
-exports.findChatMessagesForTroupeForDateRange = function(troupeId, startDate, endDate, callback) {
-  return persistence.ChatMessage.find({
-    $and: [
-      { toTroupeId: troupeId },
-      { sent: { $gte: startDate}  },
-      { sent: { $lte: endDate}  },
-    ]
-  }).sort({ sent: 'asc' })
-    .execQ().then(function(results) {
-      return results.map(massageMessages);
-    })
-    .nodeify(callback);
+exports.findChatMessagesForTroupeForDateRange = function(troupeId, startDate, endDate) {
+  return roomCapabilities.getMaxHistoryMessageDate(troupeId)
+    .then(function(maxHistoryDate) {
+      var q = persistence.ChatMessage
+              .where('toTroupeId', troupeId)
+              .where('sent').gte(startDate)
+              .where('sent').lte(endDate)
+              .sort({sent: 'asc'});
+
+      return q.exec().then(function(results) {
+        var chats;
+        var limitReached;
+
+        if (maxHistoryDate > startDate) {
+          chats = [];
+          limitReached = true;
+          return Q.all([chats, limitReached]);
+        } else {
+          chats = results.map(massageMessages);
+          limitReached = false;
+          return Q.all([chats, limitReached]);
+        }
+      });
+    });
 };
 
 exports.findDatesForChatMessages = function(troupeId, callback) {

@@ -1,7 +1,14 @@
-
 <div class="trpContentPanel" id="content-wrapper">
   <div class="trpChatPanel" id="chat-frame">
     <div class="trpChatContainer  primary-scroll  chat-container" id="content-frame">
+
+      {{#if limitReached}}
+      <div class='limit-reached'>
+        <p>To see messages older than {{historyHorizon}} upgrade your plan.</p>
+        <p><a class='trpButtonMedium trpButtonGreen' href="{{billingUrl}}">Upgrade now!</a></p>
+      </div>
+      {{/if}}
+
       {{#each chats}}
         {{{ chatItemPrerender this lang=../lang locale=../locale}}}
       {{/each}}
