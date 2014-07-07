@@ -23,10 +23,11 @@ define([
       return;
     }
 
+    var clientId = realtime.getClientId();
     $.ajax({
       url: '/api/v1/eyeballs',
       data: {
-        socketId: realtime.getClientId(),
+        socketId: clientId,
         on: value
       },
       dataType: 'text',
@@ -40,7 +41,7 @@ define([
         } else {
           // The connection is gone...
           log('Eyeballs returned 400. Realtime connection may be dead.');
-          appEvents.trigger('eyeballsInvalid');
+          appEvents.trigger('eyeballsInvalid', clientId);
         }
       }
     });
