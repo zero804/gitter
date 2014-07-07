@@ -62,7 +62,7 @@ define([
     initialize: function(options) {
       // this.hasLoaded = false;
       this.adjustTopPadding();
-      var self=this;
+      var self = this;
       var resizer;
       $(window).resize(function(){
         clearTimeout(resizer);
@@ -83,6 +83,14 @@ define([
         this.rollers.scrollToBottom();
         this.collection.fetchLatest({}, function() {
         }, this);
+      });
+
+      this.listenTo(this.collection, 'scroll.fetch', function() {
+        if(this.rollers.isScrolledToBottom() && !this.collection.atBottom) {
+          // The user has forced the scroll bar all the way to the bottom,
+          // fetch the latest
+          this.collection.fetchLatest({});
+        }
       });
     },
 
