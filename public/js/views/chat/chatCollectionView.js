@@ -18,6 +18,9 @@ define([
     Marionette, TroupeViews, appEvents, chatItemView, Rollers, cocktail /* tooltip*/) {
   "use strict";
 
+  /** @const */
+  var PAGE_SIZE = 20;
+
   /*
    * View
    */
@@ -25,6 +28,7 @@ define([
     itemView: chatItemView.ChatItemView,
     footer: '#initial', // Used to force the browser to display the bottom of the screen from the outset
     reverseScrolling: true,
+
     itemViewOptions: function(item) {
       var options = {
         userCollection: this.userCollection,
@@ -37,6 +41,7 @@ define([
       }
       return options;
     },
+
     scrollElementSelector: "#content-frame",
 
     // This nasty thing changes the CSS rule for the first chat item to prevent a high headerView from covering it
@@ -79,7 +84,6 @@ define([
         this.collection.fetchLatest({}, function() {
         }, this);
       });
-
     },
 
     scrollToFirstUnread: function() {
@@ -138,6 +142,27 @@ define([
       var scrollFromTop = this.$el.scrollTop();
       var pageHeight = Math.floor(this.$el.height() * 0.8);
       this.$el.scrollTop(scrollFromTop + pageHeight);
+    },
+
+    getFetchData: function() {
+      log("Loading next message chunk.");
+
+      var ids = this.collection.map(function(m) { return m.get('id'); });
+      var lowestId = _.min(ids, function(a, b) {
+        if(a < b) return -1;
+        if(a > b) return 1;
+        return 0;
+      });
+
+      if (lowestId === Infinity) {
+        log('No messages loaded, cancelling pagenation (!!)');
+        return;
+      }
+
+      return {
+        beforeId: lowestId,
+        limit: PAGE_SIZE
+      };
     }
 
   });
