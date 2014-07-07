@@ -1,10 +1,10 @@
 /**
- * setFinalBurst() sets the final burst class for the previous chat item once a new burst happens
+ * setBurstFinal() sets the final burst class for the previous chat item once a new burst happens
  *
  * chatItem `Object` chat-item to be set as burst final 
  * void
  */
-var setFinalBurst = function (chatItem) {
+var setBurstFinal = function (chatItem) {
   chatItem.burstFinal = true;
 }
 
@@ -32,7 +32,7 @@ var calculateBursts = function (chats) {
     if (chat.status) {
       burstUser = null;
       chat.burstStart = true;
-      if (index !== 0) setFinalBurst(chats[index - 1]);
+      if (index !== 0) setBurstFinal(chats[index - 1]);
       return;
     }
 
@@ -41,7 +41,7 @@ var calculateBursts = function (chats) {
       burstUser = newUser;
       burstStart = newSentTime;
       chat.burstStart = true;
-      if (index !== 0) setFinalBurst(chats[index - 1]);
+      if (index !== 0) setBurstFinal(chats[index - 1]);
       return;
     } 
 
@@ -53,7 +53,7 @@ var calculateBursts = function (chats) {
       burstUser = newUser;
       burstStart = newSentTime;
       chat.burstStart = true;
-      if (index !== 0) setFinalBurst(chats[index - 1]);
+      if (index !== 0) setBurstFinal(chats[index - 1]);
       return;
     }
 
