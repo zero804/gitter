@@ -39,6 +39,17 @@ define([
     });
   });
 
+  // websocket notifications
+  $(document).on('app.version.mismatch', function() {
+    notifications.notify({
+      content: "A new version of the application has been deployed. Click here to reload",
+      click: function() {
+        window.location.reload(true);
+      }
+    });
+  });
+
+
   appEvents.on('ajaxError', function() {
 
     notifications.notify({
