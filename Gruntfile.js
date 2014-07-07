@@ -125,7 +125,7 @@ var MODULES = [
   }
 ];
 
-var CLOSURE_PATH = 'build-scripts/closure-v20130722';
+var CLOSURE_PATH = 'build-scripts/closure-v20140625';
 
 module.exports = function( grunt ) {
   'use strict';
