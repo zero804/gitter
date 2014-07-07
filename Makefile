@@ -12,18 +12,29 @@ GIT_BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD)
 GIT_COMMIT ?= $(shell git rev-parse HEAD)
 ASSET_TAG_PREFIX = 
 ASSET_TAG = $(ASSET_TAG_PREFIX)$(shell echo $(GIT_COMMIT)|cut -c 1-6)
+ifeq ($(FAST_BUILD), 1)
+CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ && ls -d public-processed/* | grep -v ^public-processed/js$ )
+else
+CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/)
+endif
 
 .PHONY: clean test perf-test-xunit perf-test test-xunit test-in-browser test-in-browser-xunit test-coverage prepare-for-end-to-end-testing end-to-end-test
 
 clean:
-	rm -rf public-processed/ output/ coverage/ cobertura-coverage.xml html-report/
-
+	rm -rf $(CLEAN_FILES)
+	
 test:
 	NODE_ENV=test ./node_modules/.bin/mocha \
 		--reporter spec \
 		--timeout 10000 \
 		--recursive \
 		$(TESTS) || true
+	
+test-coverage:
+	rm -rf ./coverage/ cobertura-coverage.xml
+	mkdir -p output
+	find $(TESTS) -iname "*test.js" | NODE_ENV=test xargs ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- --timeout 10000  || true
+	./node_modules/.bin/istanbul report cobertura
 
 perf-test-xunit:
 	npm install
@@ -66,12 +77,6 @@ rest-test-xunit:
 		--timeout 4000 \
 		--reporter xunit \
 		test/rest > output/test-reports/rest.xml || true
-
-test-coverage:
-	rm -rf ./coverage/ cobertura-coverage.xml
-	mkdir -p output
-	find $(TESTS) -iname "*test.js" | NODE_ENV=test xargs ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- --timeout 10000  || true
-	./node_modules/.bin/istanbul report cobertura
 
 prepare-for-end-to-end-testing:
 	curl https://raw.github.com/pypa/pip/master/contrib/get-pip.py > /tmp/get-pip.py
@@ -165,8 +170,13 @@ lint-configs: config/*.json
 
 grunt: clean lint-configs
 	mkdir output
-	cp -R public/ public-processed/
-	grunt -no-color process
+	mkdir -p public-processed/js
+	for i in $(ls -d public/*|grep -v ^public/js$); \
+		do cp -R $i public-processed/; \
+	done
+	grunt -no-color --verbose less
+	grunt -no-color --verbose requirejs
+	./build-scripts/selective-js-compile.sh
 	./build-scripts/gzip-processed.sh
 
 sprites:
