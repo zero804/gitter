@@ -1,4 +1,3 @@
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 
 // TODO: Confirmation after invite sent
 
