@@ -1,4 +1,3 @@
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
   'utils/appevents',
   'utils/platform-keys',

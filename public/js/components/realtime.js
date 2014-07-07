@@ -1,4 +1,3 @@
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
   'underscore',
@@ -14,7 +13,7 @@ define([
   Faye.logger = {};
   var logLevels = ['fatal', 'error', 'warn', 'info', 'debug'];
   logLevels.slice(0, 1 + logLevel).forEach(function(level) {
-    Faye.logger[level] = function(msg) { log('faye: ' + level + ': ' + msg); };
+    Faye.logger[level] = function(msg) { log('faye: ' + level + ': ' + msg.substring(0, 100)); };
   });
 
   var clientId = null;
@@ -179,10 +178,10 @@ define([
 
   function createClient() {
     var c = context.env('websockets');
-    c.options.reuseTransport = false;
+    c.options.reuseTransport = false; // TODO: consider if we need this
     var client = new Faye.Client(c.fayeUrl, c.options);
 
-    if(isMobile()) {
+    if(websocketsDisabled) {
       /* Testing no websockets */
       client.disable('websocket');
     }
@@ -214,29 +213,60 @@ define([
   }
 
   var client;
+  var connectionFailureTimeout;
+  var persistentOutage;
+  var websocketsDisabled = isMobile();
+
   function getOrCreateClient() {
     if(client) return client;
     client = createClient();
 
     client.on('transport:down', function() {
       log('realtime: transport down');
+
+      var c = context.env('websockets');
+      var timeout = c.options && c.options.timeout || 30;
+
+      if(!connectionFailureTimeout) {
+        connectionFailureTimeout = setTimeout(function() {
+          if(!persistentOutage) {
+            persistentOutage = true;
+            log('realtime: persistent outage');
+            appEvents.trigger('connectionFailure');
+
+            if(!websocketsDisabled) {
+              log('realtime: disabling websockets');
+              client.disable('websockets');
+            }
+          }
+        }, timeout * 1000);
+      }
     });
 
     client.on('transport:up', function() {
       log('realtime: transport up');
+      if(connectionFailureTimeout) {
+        clearTimeout(connectionFailureTimeout);
+      }
+
+      if(persistentOutage) {
+        persistentOutage = false;
+        log('realtime: persistent outage restored');
+        appEvents.trigger('connectionRestored');
+      }
     });
 
     return client;
   }
 
-  appEvents.on('eyeballsInvalid', function() {
+  appEvents.on('eyeballsInvalid', function(originalClientId) {
     log('Resetting connection after invalid eyeballs');
-    reset();
+    reset(originalClientId);
   });
 
   appEvents.on('reawaken', function() {
     log('Recycling connection after reawaken');
-    reset();
+    reset(clientId);
   });
 
   // Cordova events.... doesn't matter if IE8 doesn't handle them
@@ -270,15 +300,9 @@ define([
 
         pingResponseOutstanding = false;
 
-        if(clientId === originalClientId) {
-          log('Ping response still outstanding, resetting.');
-          reset(originalClientId);
-        } else {
-          log('Ping response still outstanding, but clientId has changed.');
-        }
+        reset(originalClientId);
       }
     }, 30000);
-
 
     client.publish('/api/v1/ping2', { reason: reason })
       .then(function() {
@@ -286,25 +310,23 @@ define([
         pingResponseOutstanding = false;
         log('Server ping succeeded');
       }, function(error) {
+        log('Server ping failed: ', error);
         appEvents.trigger('stats.event', 'faye.ping.reset');
 
         pingResponseOutstanding = false;
-
-        if(clientId === originalClientId) {
-          log('Unable to ping server, resetting connection', error);
-          reset();
-        } else {
-          log('Unable to ping server, but clientId has changed', error);
-        }
-        // We could reinstate the persistant outage concept on this
+        reset(originalClientId);
       });
   }
 
-  function reset() {
+  function reset(clientIdOnPing) {
     if(!client) return;
-    log("Client reset requested");
-    clientId = null;
-    client.reset();
+    if(clientIdOnPing === clientId) {
+      log("Client reset requested");
+      clientId = null;
+      client.reset();
+    } else {
+      log("Ignoring reset request as clientId has changed.");
+    }
   }
 
   return {
