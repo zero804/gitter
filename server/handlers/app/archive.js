@@ -9,6 +9,7 @@ var contextGenerator = require('../../web/context-generator');
 var Q = require('q');
 var roomService = require('../../services/room-service');
 var languageSelector = require('../../web/language-selector');
+var burstCalculator   = require('../../utils/burst-calculator');
 
 exports.datesList = [
   appMiddleware.uriContextResolverMiddleware,
@@ -94,7 +95,7 @@ exports.chatArchive = [
                 restSerializer.serializeQ(chatMessages, strategy)
               ]);
           })
-          .spread(function(troupeContext, serialized) {
+          .spread(function (troupeContext, serialized) {
             troupeContext.archive = {
               archiveDate: startDate,
               nextDate: nextDate,
@@ -141,7 +142,7 @@ exports.chatArchive = [
               troupeContext: troupeContext,
               troupeName: req.uriContext.uri,
               troupeTopic: troupe.topic,
-              chats: serialized,
+              chats: burstCalculator(serialized),
               lang: languageSelector(req),
 
               /* For prerendered archive-navigation-view */
