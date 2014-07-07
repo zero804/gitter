@@ -11,7 +11,7 @@ var roomService = require('../../services/room-service');
 var languageSelector = require('../../web/language-selector');
 var env              = require('../../utils/env');
 var roomCapabilities = require('../../services/room-capabilities');
-
+var burstCalculator   = require('../../utils/burst-calculator');
 
 exports.datesList = [
   appMiddleware.uriContextResolverMiddleware,
@@ -153,7 +153,7 @@ exports.chatArchive = [
                 troupeContext: troupeContext,
                 troupeName: req.uriContext.uri,
                 troupeTopic: troupe.topic,
-                chats: serialized,
+                chats: burstCalculator(serialized),
                 lang: languageSelector(req),
                 limitReached: limitReached,
                 historyHorizon: historyHorizon,
