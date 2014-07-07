@@ -13,7 +13,7 @@ var PLAN_TYPE_MESSAGE_HISTORY = {
   'unlimited': null,
   'silver': null,
   'bronze': [6, 'months'],
-  'free-private': [3, 'days']
+  'free-private': [14, 'days']
 };
 
 
