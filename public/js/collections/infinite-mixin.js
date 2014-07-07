@@ -1,4 +1,3 @@
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   '../utils/utils'
 ], function(utils) {
@@ -54,14 +53,22 @@ define([
             self.remove(existingModels);
           }
 
+          // Less than the requested limit? Must be at the top
           if(response.length < loadLimit) {
             // NO MORE
             self.atTop = true;
+          } else {
+            if(self.length > collectionLimit) {
+              /* Too many items? Trim off the top */
+              var forRemoval = self.slice(0, -collectionLimit);
+              self.remove(forRemoval);
+              self.atTop = false;
+            }
           }
-          while(self.length > collectionLimit) {
-            self.pop();
-            self.atBottom = false;
-          }
+          // while(self.length > collectionLimit) {
+          //   self.pop();
+          //   self.atBottom = false;
+          // }
           if(callback) callback.call(context);
         },
         error: function(err) {
@@ -98,8 +105,9 @@ define([
             // NO MORE
             self.atTop = true;
           }
-          while(self.length > collectionLimit) {
-            self.pop();
+          if(self.length > collectionLimit) {
+            var forRemoval = self.slice(-collectionLimit);
+            self.remove(forRemoval);
             self.atBottom = false;
           }
           if(callback) callback.call(context);
@@ -136,8 +144,9 @@ define([
             // NO MORE
             self.atBottom = true;
           }
-          while(self.length > collectionLimit) {
-            self.shift();
+          if(self.length > collectionLimit) {
+            var forRemoval = self.slice(0, -collectionLimit);
+            self.remove(forRemoval);
             self.atTop = false;
           }
           if(callback) callback.call(context);

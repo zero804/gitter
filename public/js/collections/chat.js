@@ -78,13 +78,13 @@ define([
       }
     },
     initialize: function() {
-      this.listenTo(this, 'add reset sync remove', function (item) {
+      this.listenTo(this, 'add reset sync remove', function () {
         this.calculateBursts();
       });
     },
-    subscriptionOptions: function() {
-      return { aroundId: '539adf13fad68e388a5de07e' };
-    },
+    // subscriptionOptions: function() {
+    //   return { aroundId: '539adf13fad68e388a5de07e' };
+    // },
     findModelForOptimisticMerge: function(newModel) {
       var optimisticModel = this.find(function(model) {
         return !model.id && model.get('text') === newModel.get('text');
@@ -96,7 +96,7 @@ define([
     /**
       * setFinalBurst() sets the final burst class for the previous chat item once a new burst happens
       *
-      * chatItem `Object` chat-item to be set as burst final 
+      * chatItem `Object` chat-item to be set as burst final
       * void
       */
     setFinalBurst: function (chatItem) {
@@ -114,7 +114,7 @@ define([
       var burstUser,
           burstStart,
           self = this;
-      
+
       this.forEach(function (chat, index, chats) {
 
         /* most messages won't be a burst */
@@ -139,7 +139,7 @@ define([
           chat.set('burstStart', true);
           if (index !== 0) self.setFinalBurst(chats[index - 1]);
           return;
-        } 
+        }
 
         /* get tge duration since last burst */
         var durationSinceBurstStart = newSentTime.valueOf() - burstStart.valueOf();
