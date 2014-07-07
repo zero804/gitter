@@ -13,7 +13,7 @@ var PLAN_TYPE_MESSAGE_HISTORY = {
   'unlimited': null,
   'silver': null,
   'bronze': [6, 'months'],
-  'free-private': [1, 'days']
+  'free-private': [3, 'days']
 };
 
 
@@ -40,6 +40,13 @@ function getPlanType(troupeId) {
         })
     })
 }
+exports.getPlanType = getPlanTypeCached;
+
+function getMessageHistory(plan) {
+  var history = PLAN_TYPE_MESSAGE_HISTORY[plan];
+  return history ? history.join(' ') : 'unlimited';
+}
+exports.getMessageHistory = getMessageHistory;
 
 var sc = new SnappyCache({ prefix: 'sc:rc:', redis: env.redis.getClient(), ttl: 120 });
 function getPlanTypeCached(troupeId) {
