@@ -5,6 +5,7 @@
 var testRequire = require('../../test-require');
 var Q = require('q');
 var mockito = require('jsmockito').JsMockito;
+var assert = require('assert');
 
 var times = mockito.Verifiers.times;
 var never = times(0);
@@ -28,19 +29,21 @@ var userServiceStub = {
 
 var unreadItemServiceStub = {
   getUnreadItemsForUserTroupeSince: function(x, y, z, callback) {
-    callback(null, { '1234567890': 'veryunread' });
+    callback(null, { 'chat': ['chat1234567890'] });
   }
 };
 
 var notificationSerializerStub = {
-  getStrategy: function() {
-    return function() {};
+  getStrategy: function(name) {
+    return function() {
+      this.name = name;
+    };
   },
-  serialize: function(x, y, callback) {
-    if(x === '1234567890') {
-      callback(null, {id: 'someTroupeId', name: 'someName'});
-    } else {
-      callback(null, []);
+  serialize: function(item, strategy, callback) {
+    if(strategy.name === 'troupeId') {
+      callback(null, {id: 'serializedId', name: 'serializedName', url: 'serializedUrl'});
+    } else if(strategy.name === 'chatId') {
+      callback(null, [{id: 'serializedChatId', text: 'serializedText', fromUser: {displayName: 'serializedFromUser'}}]);
     }
   }
 };
@@ -90,6 +93,30 @@ describe('push notification generator service', function() {
 
       mockito.verify(mockSendUserNotification, never)();
       done();
+    });
+  });
+
+  it('should serialize troupes and chats correctly', function(done) {
+    var mockSendUserNotification = function(userId, notification) {
+      assert.equal(userId, 'userId1234');
+      assert.equal(notification.link, '/mobile/chat#serializedId');
+      assert(notification.message.indexOf('serializedFromUser') >= 0, 'serialized unread chat data not found');
+      done();
+    };
+
+    var service = testRequire.withProxies('./services/notifications/push-notification-generator', {
+      '../user-troupe-settings-service': userTroupeSettingsServiceStub,
+      '../push-notification-service': pushNotificationServiceStub,
+      '../user-service': userServiceStub,
+      '../../gateways/push-notification-gateway': {
+        sendUserNotification: mockSendUserNotification
+      },
+      '../unread-item-service': unreadItemServiceStub,
+      '../../serializers/notification-serializer': notificationSerializerStub
+    });
+
+    service.sendUserTroupeNotification({ userId: 'userId1234', troupeId: '1234567890' }, 1, 'some setting', function(err) {
+      if(err) return done(err);
     });
   });
 
