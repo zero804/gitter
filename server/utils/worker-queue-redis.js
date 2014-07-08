@@ -37,11 +37,13 @@ var Queue = function(name, options, loaderFn) {
   });
 
   worker.on('success', function(queue, job, result){
-    self.fn(result);
+    self.fn(result, function(err) {
+      if(err) return winston.error('worker calback failed:' + err, { exception: err });
+    });
   });
 
-  worker.on('error', function(err) {
-    winston.error('queue worker failed:' + err, { exception: err });
+  worker.on('error', function(queue, job, err) {
+    winston.error('queue worker failed:' + err, { queue: queue, job: job, exception: err });
   });
 };
 
