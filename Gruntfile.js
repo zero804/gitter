@@ -204,7 +204,7 @@ module.exports = function( grunt ) {
 
       if(closureModule && closureModule !== name + '.js') return;
       var files = {};
-      files["public-processed/js/" + name + ".min.js"] = name + ".min.js.map";
+      files["public-processed/js/" + name + ".min.js"] = name + ".js.map";
       config[module.name] = {
         files: files
       };
