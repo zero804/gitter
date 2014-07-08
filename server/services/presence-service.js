@@ -624,26 +624,6 @@ function collectGarbage(engine, callback) {
 
 }
 
-
-function startPresenceGcService(engine) {
-  var i = 0;
-  setInterval(function() {
-    collectGarbage(engine, function(err) {
-      if(err) return;
-
-      if(++i % 10 === 0) {
-        winston.verbose('Performing user validation');
-        validateUsers(function(err) {
-          winston.verbose('User validation complete');
-
-          if(err) return;
-        });
-      }
-    });
-  }, nconf.get('presence:gcInterval'));
-}
-
-
 function validateActiveSockets(engine, callback) {
   redisClient.smembers(ACTIVE_SOCKETS_KEY, function(err, sockets) {
     if(!sockets.length) {
@@ -856,33 +836,29 @@ function validateUsers(callback) {
   listOnlineUsers(function(err, userIds) {
     if(err) return callback(err);
 
+    winston.info('presence:validate:online user count is ' + userIds.length);
+
+
     if(userIds.length === 0) return callback();
 
-    var userId = null;
-
     function recurseUserIds(err) {
-      if(err && !err.rollback) {
-        return callback(err);
-      }
-
-      if(!err || !err.rollback) {
-        userId = null;
-      }
-
-      if(!userId) {
-        winston.info('presence:validate:validating next batch');
-        if(userIds.length === 0) {
-          var total = Date.now() - start;
-          winston.info('Presence.validateUsers GC took ' + total + 'ms');
-          return callback();
+      if(err) {
+        if(!err.rollback) {
+          return callback(err);
         }
 
-        userId = userIds.shift();
-      } else {
-        winston.info('presence:validate:revalidating batch');
+        winston.info('presence:validate:rollback');
       }
 
-      validateUsersSubset([userId], recurseUserIds);
+      winston.info('presence:validate:validating next batch: ' + userIds.length + ' users remaining.');
+      if(userIds.length === 0) {
+        var total = Date.now() - start;
+        winston.info('Presence.validateUsers GC took ' + total + 'ms');
+        return callback();
+      }
+
+      var subset = userIds.splice(0, 100);
+      validateUsersSubset(subset, recurseUserIds);
     }
 
     recurseUserIds();
@@ -915,8 +891,6 @@ presenceService.clientEyeballSignal =  clientEyeballSignal;
 
   // GC
 presenceService.collectGarbage =  collectGarbage;
-presenceService.startPresenceGcService =  startPresenceGcService;
-
 presenceService.validateUsers = validateUsers;
 
 // -------------------------------------------------------------------

@@ -101,7 +101,8 @@
     "requirejs": "~2.1.8",
     "restler": "~2.0.1",
     "sinon": "1.5.2",
-    "xunit-file": "0.0.3"
+    "xunit-file": "0.0.3",
+    "grunt-append-sourcemapping": "0.0.2"
   },
   "main": "web.js",
   "scripts": {
