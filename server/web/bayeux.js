@@ -660,7 +660,10 @@ faye.stringify = function(object) {
 faye.logger = {
 };
 
-var logLevels = ['fatal', 'error'/*, 'warn', 'info'*/];
+var logLevels = ['fatal', 'error', 'warn'];
+if(nconf.get('ws:fayeLogging') === 'info') logLevels.push('info');
+if(nconf.get('ws:fayeLogging') === 'debug') logLevels.push('info', 'debug');
+
 logLevels.forEach(function(level) {
   faye.logger[level] = function(msg) { logger[level]('faye: ' + msg.substring(0,180)); };
 });
