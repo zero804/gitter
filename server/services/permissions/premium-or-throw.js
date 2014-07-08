@@ -9,7 +9,7 @@ var StatusError  = require('statuserror');
 module.exports = function premiumOrThrow(uri) {
   return uriIsPremium(uri)
     .then(function(isPremium) {
-      if(isPremium) return true;
+      if(isPremium || env.config.get('premium:disabled')) return true;
 
       var err = new StatusError(402 /* Payment required */, 'Payment required');
       err.uri = uri;

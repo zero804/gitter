@@ -11,6 +11,8 @@ var GitHubRepoService = require('../../services/github/github-repo-service');
 var execPreloads      = require('../exec-preloads');
 var getVersion        = require('../get-model-version');
 var billingService    = require('../../services/billing-service');
+var env               = require('../../utils/env');
+
 
 function UserPremiumStatusStrategy() {
   var usersWithPlans;
@@ -29,7 +31,7 @@ function UserPremiumStatusStrategy() {
   };
 
   this.map = function(userId) {
-    return !!usersWithPlans[userId];
+    return env.config.get('premium:disabled') ? true : !!usersWithPlans[userId];
   };
 
 }
