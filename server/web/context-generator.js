@@ -121,19 +121,32 @@ function isNativeDesktopApp(req) {
 }
 
 function serializeUser(user) {
-  var strategy = new restSerializer.UserStrategy({ exposeRawDisplayName: true, includeScopes: true, includePermissions: true });
+  var strategy = new restSerializer.UserStrategy({
+    exposeRawDisplayName: true,
+    includeScopes: true,
+    includePermissions: true,
+    showPremiumStatus: true
+  });
 
   return restSerializer.serializeQ(user, strategy);
 }
 
 function serializeUserId(userId) {
-  var strategy = new restSerializer.UserIdStrategy({ exposeRawDisplayName: true, includeScopes: true, includePermissions: true });
+  var strategy = new restSerializer.UserIdStrategy({
+    exposeRawDisplayName: true,
+    includeScopes: true,
+    includePermissions: true,
+    showPremiumStatus: true
+  });
 
   return restSerializer.serializeQ(userId, strategy);
 }
 
 function serializeHomeUser(user, includeEmail) {
-  var strategy = new restSerializer.UserStrategy({ includeEmail: includeEmail, hideLocation: true });
+  var strategy = new restSerializer.UserStrategy({
+    includeEmail: includeEmail,
+    hideLocation: true
+  });
 
   return restSerializer.serializeQ(user, strategy);
 }
