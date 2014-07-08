@@ -1,4 +1,3 @@
-/*jslint node:true, unused:true*/
 "use strict";
 
 var testRequire = require('./test-require');
@@ -176,6 +175,28 @@ function createExpectedFixtures(expected, done) {
 
   }
 
+  function createMessage(fixtureName, f) {
+    winston.verbose('Creating ' + fixtureName);
+
+    return persistence.ChatMessage.createQ({
+      fromUserId:   f.fromUserId,
+      toTroupeId:   f.toTroupeId,
+      text:         f.text,
+      status:       f.status,
+      html:         f.html,
+      urls:         f.urls,
+      mentions:     f.mentions,
+      issues:       f.issues,
+      meta:         f.meta,
+      sent:         f.sent, 
+      editedAt:     f.editedAt,
+      readBy:       f.readBy,
+    });
+
+  }
+
+
+
   function createUsers(fixture) {
     var userCounter = 0;
     var promises = Object.keys(expected).map(function(key) {
@@ -322,10 +343,32 @@ function createExpectedFixtures(expected, done) {
     return Q.all(promises).thenResolve(fixture);
   }
 
+  function createMessages(fixture) {
+    var promises = Object.keys(expected).map(function(key) {
+      if(key.match(/^message/)) {
+        var expectedMessage = expected[key];
+
+        expectedMessage.fromUserId = fixture[expectedMessage.user]._id;
+        expectedMessage.toTroupeId = fixture[expectedMessage.troupe]._id;
+
+        return createMessage(key, expectedMessage)
+          .then(function(message) {
+            fixture[key] = message;
+          });
+      }
+
+      return null;
+    });
+
+    return Q.all(promises).then(function() { return fixture; });
+  }
+
+
   return createUsers(createBaseFixture())
     .then(createTroupes)
     .then(createContacts)
     .then(createInvites)
+    .then(createMessages)
     .nodeify(done);
 }
 
