@@ -8,6 +8,7 @@ var Fiber                  = require('../utils/fiber');
 var crypto                 = require('crypto');
 var _                      = require('underscore');
 var redis                  = require("../utils/redis");
+var mongoUtils             = require('../utils/mongo-utils');
 var redisClient            = redis.getClient();
 
 var Scripto                = require('redis-scripto');
@@ -102,11 +103,15 @@ exports.findDevicesForUsers = function(userIds, callback) {
 };
 
 exports.findEnabledDevicesForUsers = function(userIds, callback) {
-  userIds = _.uniq(userIds);
+  userIds = mongoUtils.asObjectIDs(_.uniq(userIds));
   return PushNotificationDevice
     .where('userId')['in'](userIds)
     .or([ { enabled: true }, { enabled: { $exists: false } } ]) // Exists false === enabled for old devices
-    .execQ(callback);
+    .execQ()
+    .then(function(devices) {
+      return devices;
+    })
+    .nodeify(callback);
 };
 
 exports.findDeviceForDeviceId = function(deviceId, callback) {

@@ -143,7 +143,6 @@ function sendNotificationToDevice(notification, badge, device) {
     logger.info("push-gateway: Sending apple push notification", { userId: device.userId, notification: notification });
     var note = new apns.Notification();
 
-
     if(badge >= 0) {
       note.badge = badge;
     }
