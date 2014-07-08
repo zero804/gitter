@@ -39,12 +39,14 @@ var notificationSerializerStub = {
       this.name = name;
     };
   },
-  serialize: function(item, strategy, callback) {
-    if(strategy.name === 'troupeId') {
-      callback(null, {id: 'serializedId', name: 'serializedName', url: 'serializedUrl'});
-    } else if(strategy.name === 'chatId') {
-      callback(null, [{id: 'serializedChatId', text: 'serializedText', fromUser: {displayName: 'serializedFromUser'}}]);
-    }
+  serializeQ: function(item, strategy) {
+    return Q.fcall(function() {
+      if(strategy.name === 'troupeId') {
+        return {id: 'serializedId', name: 'serializedName', url: 'serializedUrl'};
+      } else if(strategy.name === 'chatId') {
+        return [{id: 'serializedChatId', text: 'serializedText', fromUser: {displayName: 'serializedFromUser'}}];
+      }
+    });
   }
 };
 
