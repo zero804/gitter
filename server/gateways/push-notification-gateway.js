@@ -140,7 +140,7 @@ function sendNotificationToDevice(notification, badge, device) {
       device.deviceType === 'APPLE-DEV' ||
       device.deviceType === 'APPLE-BETA' ||
       device.deviceType === 'APPLE-BETA-DEV') && device.appleToken) {
-    logger.info("push-gateway: Sending apple push notification", { userId: device.userId, notification: notification });
+    logger.info("push-gateway: Sending apple push notification", { userId: device.userId, notification: notification, badge: badge });
     var note = new apns.Notification();
 
     if(badge >= 0) {
