@@ -28,9 +28,11 @@ onMongoConnect()
     pushNotificationGateway.sendUsersBadgeUpdates([userId], d.makeNodeResolver());
     return d.promise;
   })
+  .delay(5000)
+  .then(function() {
+    shutdown.shutdownGracefully();
+  })
   .fail(function(err) {
     console.error(err.stack);
-  })
-  .fin(function() {
-    // shutdown.shutdownGracefully();
+    shutdown.shutdownGracefully(1);
   });
