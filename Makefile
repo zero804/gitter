@@ -178,8 +178,7 @@ grunt: clean lint-configs
 	done
 	if [[ -d public-compile-cache/js/ ]] && [[ -n $$(find public-compile-cache/js/ -maxdepth 1 -type f -name '*' -print -quit) ]; then cp public-compile-cache/js/* public-processed/js/; fi
 	./build-scripts/copy-templates.sh
-	grunt -no-color --verbose less
-	grunt -no-color --verbose requirejs
+	grunt -no-color less requirejs
 	./build-scripts/selective-js-compile.sh
 	rm -rf public-compile-cache
 	mkdir -p public-compile-cache/js
