@@ -7,6 +7,8 @@ var collections       = require("../../utils/collections");
 var execPreloads      = require('../exec-preloads');
 var TroupeUriStrategy = require('./troupe-uri-strategy');
 var billingService    = require('../../services/billing-service');
+var env               = require('../../utils/env');
+
 
 function OrgPremiumStatusStrategy() {
   var orgsWithPlans;
@@ -25,7 +27,8 @@ function OrgPremiumStatusStrategy() {
   };
 
   this.map = function(orgUri) {
-    return !!orgsWithPlans[orgUri];
+    // TODO remove when premium goes live
+    return env.config.get('premium:disabled') ? true : !!orgsWithPlans[orgUri];
   };
 
 }

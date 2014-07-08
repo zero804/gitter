@@ -10,6 +10,8 @@ var winston           = require('../../utils/winston');
 var execPreloads      = require('../exec-preloads');
 var getVersion        = require('../get-model-version');
 var UserIdStrategy    = require('./user-id-strategy');
+var env               = require('../../utils/env');
+
 /**
  *
  */
@@ -137,7 +139,8 @@ function PremiumRoomStrategy() {
   this.map = function(troupe) {
     if(!troupe || !troupe.uri) return undefined;
 
-    return premium[troupe.uri];
+    // TODO remove when premium goes live
+    return env.config.get('premium:disabled') ? true : premium[troupe.uri];
   }
 }
 
