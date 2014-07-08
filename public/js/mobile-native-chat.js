@@ -35,7 +35,7 @@ require([
   chatCollection.listen();
 
   var chatCollectionView = new ChatCollectionView({
-    el: $('#frame-chat'),
+    el: $('#content-frame'),
     collection: chatCollection,
     decorators: [emojiDecorator, mobileDecorator]
   }).render();
