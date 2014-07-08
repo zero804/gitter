@@ -9,7 +9,7 @@ var pushNotificationGateway = require("../../gateways/push-notification-gateway"
 var serializer = require("../../serializers/notification-serializer");
 var notificationMessageGenerator = require('../../utils/notification-message-generator');
 var unreadItemService = require('../unread-item-service');
-var Fiber = require('../../utils/fiber');
+var Q = require('q');
 var basePath = nconf.get('web:basepath');
 
 function filterUnreadItemsForUserByMention(user, items) {
@@ -35,12 +35,11 @@ function filterUnreadItemsForUserByMention(user, items) {
 function serializeItems(troupeId, recipientUserId, items, callback) {
   var itemTypes = Object.keys(items);
 
-  var f = new Fiber();
-
   var TroupeStrategy = serializer.getStrategy("troupeId");
   var troupeStrategy = new TroupeStrategy({ recipientUserId: recipientUserId });
 
-  serializer.serialize(troupeId, troupeStrategy, f.waitor());
+  var promises = [];
+  promises.push(serializer.serializeQ(troupeId, troupeStrategy));
 
   itemTypes.forEach(function(itemType) {
     var itemIds = items[itemType];
@@ -49,12 +48,11 @@ function serializeItems(troupeId, recipientUserId, items, callback) {
 
     if(Strategy) {
       var strategy = new Strategy({ includeTroupe: false, recipientUserId: recipientUserId });
-      serializer.serialize(itemIds, strategy, f.waitor());
+      promises.push(serializer.serializeQ(itemIds, strategy));
     }
-
   });
 
-  f.all().then(function(results) {
+  return Q.all(promises).then(function(results) {
     var troupe = results[0];
     var serializedItems = {};
 
@@ -62,8 +60,9 @@ function serializeItems(troupeId, recipientUserId, items, callback) {
       serializedItems[itemType] = results[i + 1];
     });
 
-    callback(null, troupe, serializedItems);
-  }, callback);
+    return { troupe: troupe, serializedItems: serializedItems };
+
+  }).nodeify(callback);
 }
 
 function notifyUserOfActivitySince(userId, troupeId, since, notificationNumber, userSetting, callback) {
@@ -82,16 +81,17 @@ function notifyUserOfActivitySince(userId, troupeId, since, notificationNumber, 
         return callback();
       }
 
-      serializeItems(troupeId, userId, unreadItems, function(err, troupe, items) {
+      serializeItems(troupeId, userId, unreadItems, function(err, serialized) {
         if(err) return callback(err);
+
+        var troupe = serialized.troupe;
+        var items = serialized.serializedItems;
 
         if(userSetting == 'mention') {
           items = filterUnreadItemsForUserByMention(user, items);
           // Still want to notify the user?
           if(!items.chat || !items.chat.length) return callback();
         }
-
-        var f = new Fiber();
 
         var notificationLink = '/mobile/chat#' + troupe.id;
         var smsLink = basePath + troupe.url;
@@ -103,9 +103,7 @@ function notifyUserOfActivitySince(userId, troupeId, since, notificationNumber, 
             smsText: message.smsText,
             sound: notificationNumber == 1 ? 'notify.caf' : 'notify-2.caf',
             link: notificationLink
-          }, f.waitor());
-
-        f.thenCallback(callback);
+          }, callback);
 
       });
 
