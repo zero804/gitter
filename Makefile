@@ -176,7 +176,7 @@ grunt: clean lint-configs
 	for i in $(PUBLIC_EXCLUDING_JS); \
 		do cp -R $$i public-processed/; \
 	done
-	if [[ -d public-compile-cache/js/ ]] && [[ -n $$(find public-compile-cache/js/ -maxdepth 1 -type f -name '*' -print -quit) ]; then cp public-compile-cache/js/* public-processed/js/; fi
+	if [ -d public-compile-cache/js/ ] && [ -n $$(find public-compile-cache/js/ -maxdepth 1 -type f -name '*' -print -quit) ]; then cp public-compile-cache/js/* public-processed/js/; fi
 	./build-scripts/copy-templates.sh
 	grunt -no-color less requirejs
 	./build-scripts/selective-js-compile.sh
