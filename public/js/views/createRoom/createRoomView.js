@@ -53,7 +53,8 @@ define([
     },
 
     billingUrl: function() {
-      return context.env('billingUrl') + '/bill/' + this.selectedModel.get('uri').split('/')[0];
+      var userOrOrg = this.selectedModel.get('uri').split('/')[0];
+      return context.env('billingUrl') + '/bill/' + userOrOrg + '?r=' + window.location.pathname;
     },
 
     menuItemClicked: function(button) {
@@ -71,7 +72,7 @@ define([
           break;
 
         case 'get-plan':
-          window.location = this.billingUrl();
+          window.open(this.billingUrl());
           break;
       }
     },
