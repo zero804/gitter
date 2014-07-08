@@ -13,9 +13,9 @@ GIT_COMMIT ?= $(shell git rev-parse HEAD)
 ASSET_TAG_PREFIX = 
 ASSET_TAG = $(ASSET_TAG_PREFIX)$(shell echo $(GIT_COMMIT)|cut -c 1-6)
 ifeq ($(FAST_BUILD), 1)
-CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/js/views public-processed/js/components  && ls -d public-processed/* | grep -v ^public-processed/js$ )
+CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/ )
 else
-CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/)
+CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/ public-compile-cache/)
 endif
 
 PUBLIC_EXCLUDING_JS = $(shell ls -d public/*|grep -v ^public/js$)
@@ -176,12 +176,14 @@ grunt: clean lint-configs
 	for i in $(PUBLIC_EXCLUDING_JS); \
 		do cp -R $$i public-processed/; \
 	done
-	
+	if [ -n $$(find public-compile-cache/js/ -maxdepth 1 -type f -name '*' -print -quit) ]; then cp public-compile-cache/js/* public-processed/js/; fi
 	./build-scripts/copy-templates.sh
-	
 	grunt -no-color --verbose less
 	grunt -no-color --verbose requirejs
 	./build-scripts/selective-js-compile.sh
+	rm -rf public-compile-cache
+	mkdir -p public-compile-cache/js
+	cp public-processed/js/*.min.js public-processed/js/*.md5 public-compile-cache/js
 	./build-scripts/gzip-processed.sh
 
 sprites:
