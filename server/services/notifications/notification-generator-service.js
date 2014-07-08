@@ -138,6 +138,7 @@ exports.install = function() {
   // /* Update badges for apps */
   appEvents.localOnly.onBatchUserBadgeCountUpdate(function(data) {
     var userIds = data.userIds;
+    winston.info('Publishing badge count updates for ' + userIds.length + ' users.');
     pushNotificationGateway.sendUsersBadgeUpdates(userIds);
   });
 
