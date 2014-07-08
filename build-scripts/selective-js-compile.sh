@@ -16,6 +16,21 @@ for i in $(find $ROOT_DIR/public-processed/js -maxdepth 1 -name '*.js' ! -name '
   min_file=${i%.js}.min.js
   md5_file=$i.md5  
   md5_checksum=$(generate_md5 $i)
+  
+  #
+  # A little bit of debugging
+  #
+  if [[ ! -f $md5_file ]]; then
+    echo "$i: $md5_file does not exist" >&2
+  else 
+    if [[ ! -f $min_file ]]; then
+        echo "$i: $min_file does not exist" >&2
+    else
+      if [[ $md5_checksum != $(cat $md5_file) ]]; then
+        echo "$i Checksum mismatch $md5_checksum != $(cat $md5_file)" >&2
+      fi
+    fi
+  fi
     
   if [[ ! -f $md5_file ]] || [[ ! -f $min_file ]] || [[ $md5_checksum != $(cat $md5_file) ]]; then
     echo $i needs updating >&2
@@ -23,6 +38,8 @@ for i in $(find $ROOT_DIR/public-processed/js -maxdepth 1 -name '*.js' ! -name '
     rm -f $min_file ${min_file}.gz ${min_file}.map ${min_file}.map.gz
     nice grunt closure --closureModule $(basename $i) &
     echo $md5_checksum > $md5_file 
+  else
+    echo "$i is compiled" >&2
   fi
 done
 
