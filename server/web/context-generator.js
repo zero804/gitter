@@ -32,7 +32,7 @@ exports.generateNonChatContext = function(req, callback) {
 
 exports.generateSocketContext = function(userId, troupeId, callback) {
   return Q.all([
-      serializeUserId(userId),
+      userId && serializeUserId(userId),
       troupeId && serializeTroupeId(troupeId, userId) || undefined
     ])
     .spread(function(serializedUser, serializedTroupe) {
