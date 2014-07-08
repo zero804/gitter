@@ -9,7 +9,7 @@ var Fiber = require('../utils/fiber');
 var appEvents = require('../app-events.js');
 var Q = require('q');
 var _ = require("underscore");
-
+var StatusError = require('statuserror');
 var presenceService = new events.EventEmitter();
 
 var redisClient = redis.getClient();
@@ -45,14 +45,21 @@ function keyUserSockets(troupeId) {
 
 // Callback(err);
 function disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callback) {
-  if(!userId) return callback && callback('userId expected');
-  if(!socketId) return callback && callback('socketId expected');
+  var keys, values;
+  if(!socketId) return callback && callback(new StatusError(400, 'socketId expected'));
+
+  if(!userId) {
+    keys = [keySocketUser(socketId), ACTIVE_SOCKETS_KEY, keyUserSockets('anon')];
+    values = [socketId];
+    scriptManager.run('presence-disassociate-anon', keys, values, callback);
+    return;
+  }
 
   lookupTroupeIdForSocket(socketId, function(err, troupeId) {
     if(err) return callback(err);
 
-    var keys = [keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, keyUserLock(userId), troupeId ? keyTroupeUsers(troupeId) : null, keyUserSockets(userId)];
-    var values = [userId, socketId];
+    keys = [keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, keyUserLock(userId), troupeId ? keyTroupeUsers(troupeId) : null, keyUserSockets(userId)];
+    values = [userId, socketId];
 
     scriptManager.run('presence-disassociate', keys, values, function(err, result) {
       if(err) return callback(err);
@@ -64,7 +71,7 @@ function disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callback
           userId: userId
         });
 
-        return callback(404);
+        return callback(new StatusError(404, 'Not found'));
       }
 
       var userSocketCount = parseInt(result[1], 10);
@@ -118,14 +125,42 @@ function sendAppEventsForUserEyeballsOffTroupe(userInTroupeCount, totalUsersInTr
 
 function userSocketConnected(userId, socketId, connectionType, client, troupeId, eyeballState, callback) {
   if(!callback) callback = function() {};
-
-  if(!userId) return callback('userId expected');
-  if(!socketId) return callback('socketId expected');
+  if(!socketId) return callback(new StatusError(400, 'socketId expected'));
+  var keys;
+  var values;
 
   var isMobileConnection = connectionType == 'mobile';
 
-  var keys = [keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, keyUserLock(userId), keyUserSockets(userId)];
-  var values = [userId, socketId, Date.now(), isMobileConnection ? 1 : 0, client, troupeId || null];
+  if(!userId) {
+    keys = [keySocketUser(socketId), ACTIVE_SOCKETS_KEY, keyUserSockets('anon')];
+    values = [socketId, Date.now(), isMobileConnection ? 1 : 0, client, troupeId || null];
+
+    scriptManager.run('presence-associate-anon', keys, values, function(err, result) {
+      if(err) return callback(err);
+
+      var lockSuccess = result[0];
+
+      if(!lockSuccess)  {
+        winston.silly('presence: associateSocketAndActivateUser rejected. Socket already exists.', {
+          socketId: socketId,
+          userId: userId
+        });
+
+        return callback(new StatusError(409, 'Conflict'));
+      }
+
+      var saddResult = result[1];
+      if(saddResult != 1) {
+        winston.warn("presence: Socket has already been added to active sockets. Something fishy is happening.");
+      }
+
+      return callback(null, 0);
+    });
+    return;
+  }
+
+  keys = [keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, keyUserLock(userId), keyUserSockets(userId)];
+  values = [userId, socketId, Date.now(), isMobileConnection ? 1 : 0, client, troupeId || null];
 
   scriptManager.run('presence-associate', keys, values, function(err, result) {
     if(err) return callback(err);
@@ -138,7 +173,7 @@ function userSocketConnected(userId, socketId, connectionType, client, troupeId,
         userId: userId
       });
 
-      return callback(409 /* conflict */);
+      return callback(new StatusError(409, 'conflict'));
     }
 
     var userSocketCount = parseInt(result[1], 10);
@@ -152,7 +187,7 @@ function userSocketConnected(userId, socketId, connectionType, client, troupeId,
       presenceService.emit('userOnline', userId);
     }
 
-    if(troupeId && eyeballState) {
+    if(troupeId && eyeballState && userId) {
       eyeBallsOnTroupe(userId, socketId, troupeId, function(err) {
         if(err) {
           winston.error('Unable to signal eyeballs on: ' + err, {
@@ -174,57 +209,43 @@ function userSocketConnected(userId, socketId, connectionType, client, troupeId,
 }
 
 function socketDisconnectionRequested(userId, socketId, callback) {
-  if(!socketId) return callback && callback('socketId expected');
-  if(!userId) return callback && callback('userId expected');
+  if(!socketId) return callback && callback(new StatusError(400, 'socketId expected'));
+  if(!userId) userId = null;
 
-  lookupUserIdForSocket(socketId, function(err, userId2) {
+  lookupUserIdForSocket(socketId, function(err, userId2, exists) {
     if(err) return callback(err);
+    if(!exists) {
+      return callback(new StatusError(404, 'Socket not found'));
+    }
+
+    if(!userId2) userId2 = null;
+
     if(userId !== userId2) {
-      return callback(401);
+      return callback(new StatusError(401, 'Access denied'));
     }
 
     disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callback);
-
   });
 }
 
 function socketDisconnected(socketId, callback) {
-  if(!socketId) return callback && callback('socketId expected');
+  if(!socketId) return callback && callback(new StatusError(400, 'socketId expected'));
 
   lookupUserIdForSocket(socketId, function(err, userId) {
     if(err) return callback(err);
-    if(!userId) {
-      return callback(404);
-    }
 
     disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callback);
-
   });
 }
 
 function socketGarbageCollected(socketId, callback) {
-  socketDisconnected(socketId, function(err) {
-    if(err) {
-      // Force socket disconnect
-      // Technically this should never happen now that sockets are associated at authentication
-      // time and therefore we never have a socket and userId at the same time
-      winston.error('Unable to disconnect socket, forcing disconnect: ' + err, { socketId: socketId });
-
-      var keys = [keySocketUser(socketId), ACTIVE_SOCKETS_KEY];
-      var values = [socketId];
-
-      scriptManager.run('presence-force-disassociate', keys, values, callback);
-      return;
-    }
-
-    callback();
-  });
+  socketDisconnected(socketId, callback);
 }
 
 function eyeBallsOnTroupe(userId, socketId, troupeId, callback) {
-  if(!userId) return callback && callback('userId expected');
-  if(!socketId) return callback && callback('socketId expected');
-  if(!troupeId) return callback && callback('troupeId expected');
+  if(!userId) return callback && callback(new StatusError(400, 'userId expected'));
+  if(!socketId) return callback && callback(new StatusError(400, 'socketId expected'));
+  if(!troupeId) return callback && callback(new StatusError(400, 'troupeId expected'));
 
   var keys = [keySocketUser(socketId), keyTroupeUsers(troupeId), keyUserLock(userId)];
   var values = [userId];
@@ -252,9 +273,9 @@ function eyeBallsOnTroupe(userId, socketId, troupeId, callback) {
 }
 
 function eyeBallsOffTroupe(userId, socketId, troupeId, callback) {
-  if(!userId) return callback && callback('userId expected');
-  if(!socketId) return callback && callback('socketId expected');
-  if(!troupeId) return callback && callback('troupeId expected');
+  if(!userId) return callback && callback(new StatusError(400, 'userId expected'));
+  if(!socketId) return callback && callback(new StatusError(400, 'socketId expected'));
+  if(!troupeId) return callback && callback(new StatusError(400, 'troupeId expected'));
 
   var keys = [keySocketUser(socketId), keyTroupeUsers(troupeId), keyUserLock(userId)];
   var values = [userId];
@@ -296,7 +317,7 @@ function lookupSocketOwnerAndTroupe(socketId, callback) {
  * Callback -> (err, userId, exists)
  */
 function lookupUserIdForSocket (socketId, callback) {
-  if(!socketId) return callback('socketId expected');
+  if(!socketId) return callback(new StatusError(400, 'socketId expected'));
 
   redisClient.hmget(keySocketUser(socketId), "uid", "ctime", function(err, reply) {
     if(err) return callback(err);
@@ -306,7 +327,7 @@ function lookupUserIdForSocket (socketId, callback) {
 }
 
 function socketExists(socketId, callback) {
-  if(!socketId) return callback('socketId expected');
+  if(!socketId) return callback(new StatusError(400, 'socketId expected'));
 
   redisClient.hget(keySocketUser(socketId), "ctime", function(err, reply) {
     if(err) return callback(err);
@@ -316,14 +337,14 @@ function socketExists(socketId, callback) {
 }
 
 function lookupTroupeIdForSocket (socketId, callback) {
-  if(!socketId) return callback('socketId expected');
+  if(!socketId) return callback(new StatusError(400, 'socketId expected'));
 
   redisClient.hget(keySocketUser(socketId), "tid", callback);
 }
 
 
 function findOnlineUsersForTroupe(troupeId, callback) {
-  if(!troupeId) return callback('troupeId expected');
+  if(!troupeId) return callback(new StatusError(400, 'troupeId expected'));
 
   redisClient.zrangebyscore(keyTroupeUsers(troupeId), 1, '+inf', callback);
 }
@@ -569,8 +590,8 @@ function listOnlineUsersForTroupes(troupeIds, callback) {
 }
 
 function clientEyeballSignal(userId, socketId, eyeballsOn, callback) {
-  if(!userId) return callback('userId expected');
-  if(!socketId) return callback('socketId expected');
+  if(!userId) return callback(new StatusError(400, 'userId expected'));
+  if(!socketId) return callback(new StatusError(400, 'socketId expected'));
 
   lookupSocketOwnerAndTroupe(socketId, function(err, socketInfo) {
     if(err) return callback(err);
@@ -586,7 +607,7 @@ function clientEyeballSignal(userId, socketId, eyeballsOn, callback) {
     }
 
     var troupeId = socketInfo.troupeId;
-    if(!troupeId) return callback('Socket is not associated with a troupe');
+    if(!troupeId) return callback(new StatusError(409, 'Socket is not associated with a troupe'));
 
     if(eyeballsOn) {
       winston.verbose('presence: Eyeballs on: user ' + userId + ' troupe ' + troupeId);
