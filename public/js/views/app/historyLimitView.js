@@ -44,7 +44,7 @@ define([
       }, 500);
     },
     onMainButtonClick: function() {
-      window.open(context.env('billingUrl') + '/orgs/' + context().troupeUri);
+      window.open(context.env('billingUrl') + '/bill/' + context().troupeUri);
     }
   });
 
