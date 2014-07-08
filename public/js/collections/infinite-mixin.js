@@ -197,7 +197,6 @@ define([
       if(this.length > collectionLimit) {
         var forRemoval = this.slice(0, -collectionLimit);
         this.remove(forRemoval);
-        console.log('REMAINING', this.length);
         this.atTop = false;
       }
     },
