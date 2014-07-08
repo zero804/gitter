@@ -1,3 +1,7 @@
+#!/usr/bin/env node
+/*jslint node: true */
+"use strict";
+
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
 var presenceService = require('../../server/services/presence-service.js');
