@@ -3,10 +3,8 @@ define([
   'utils/context',
   'hbs!./tmpl/notification',
   'utils/appevents',
-  'log!web-notifications',
-  'require',
   './notify'                              // No reference,
-], function($, context, template, appEvents, log, require){
+], function($, context, template, appEvents){
   "use strict";
 
   var notifications = $('<div id="notification-center" class="notification-center"></div>').appendTo('body');
@@ -59,25 +57,23 @@ define([
 
   });
 
-  // // websocket notifications
-  // $(document).on('realtime:persistentOutage', function() {
-  //   log('realtime:persistentOutage');
-  //   notifications.notify({
-  //     id: 'realtime-error',
-  //     className: 'notification-error',
-  //     content: "We're having problems with our realtime connection at present.",
-  //     timeout: Infinity
-  //     /* TODO: make this persistent and clear it when the persistentOutageCleared event occurs */
-  //   });
-  // });
+  // websocket notifications
+  appEvents.on('connectionFailure', function() {
+    notifications.notify({
+      id: 'realtime-error',
+      className: 'notification-error',
+      content: "Can't connect to server, retrying....",
+      timeout: Infinity
+      /* TODO: make this persistent and clear it when the persistentOutageCleared event occurs */
+    });
+  });
 
-  // $(document).on('realtime:persistentOutageCleared', function() {
-  //   log('realtime:persistentOutageCleared');
-  //   notifications.notify({
-  //     id: 'realtime-error',
-  //     action: 'hide'
-  //   });
-  // });
+  appEvents.on('connectionRestored', function() {
+    notifications.notify({
+      id: 'realtime-error',
+      action: 'hide'
+    });
+  });
 
 
   $(window).on('beforeunload', function(){
