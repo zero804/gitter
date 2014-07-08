@@ -8,10 +8,36 @@ var chatService = testRequire('./services/chat-service');
 var fixtureLoader = require('../test-fixtures');
 var assert = require('assert');
 
-var fixture = {};
-
 
 describe('chatService', function() {
+
+  var fixture = {};
+  before(fixtureLoader(fixture, {
+    user1: {},
+    troupe1: {},
+    message1: {
+      user: 'user1',
+      troupe: 'troupe1',
+      text: 'old_message',
+      sent: new Date("01/01/2014")
+    },
+    message2: {
+      user: 'user1',
+      troupe: 'troupe1',
+      text: 'new_message',
+      sent: new Date()
+    }
+  }));
+
+  describe('findChatMessagesForTroupe for non-premium orgs', function() {
+    it('should return messages not older than 2 weeks', function (done) {
+      chatService.findChatMessagesForTroupe(fixture.troupe1, {}, function(err, chatMessages, limitReached) {
+        assert(1 === chatMessages.length);
+        assert(true === limitReached);
+        done();
+      });
+    });
+  });
 
   describe('updateChatMessage', function() {
     it('should update a recent chat message sent by the same user', function(done) {
@@ -66,9 +92,6 @@ describe('chatService', function() {
 
     });
   });
-
-
-  before(fixtureLoader(fixture));
 
 });
 

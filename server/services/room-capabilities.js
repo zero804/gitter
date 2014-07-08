@@ -67,8 +67,11 @@ exports.getMaxHistoryMessageDate = function(troupeId) {
   return getPlanTypeCached(troupeId)
     .then(function(planType) {
 
+      // TODO Remove after enabling billing
+      if (env.config.get("premium:disabled")) return null;
+
       if(!PLAN_TYPE_MESSAGE_HISTORY.hasOwnProperty(planType))
-        throw new StatusError(500, 'Unknown plan type ' + plan.plan);
+        throw new StatusError(500, 'Unknown plan type ' + planType);
 
       var history = PLAN_TYPE_MESSAGE_HISTORY[planType];
 
