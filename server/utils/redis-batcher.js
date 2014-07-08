@@ -4,7 +4,7 @@
 
 var redis = require('./redis');
 var winston = require('./winston');
-var workerQueue = require('./worker-queue');
+var workerQueue = require('./worker-queue-redis');
 
 var PREFIX = "rb:";
 
