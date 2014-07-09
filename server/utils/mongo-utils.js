@@ -16,6 +16,12 @@ function asObjectID(id) {
   return id;
 }
 
+function asObjectIDs(ids) {
+  return ids.map(function(id) {
+    return asObjectID(id);
+  });
+}
+
 function getDateFromObjectId(id) {
   if(!id) {
     winston.silly('Null ID passed into getDateFromObjectId.');
@@ -74,6 +80,7 @@ function serializeObjectId(id) {
 
 exports.isLikeObjectId = isLikeObjectId;
 exports.asObjectID = asObjectID;
+exports.asObjectIDs = asObjectIDs;
 exports.getDateFromObjectId = getDateFromObjectId;
 exports.getTimestampFromObjectId = getTimestampFromObjectId;
 exports.getNewObjectIdString = getNewObjectIdString;

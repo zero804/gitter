@@ -68,7 +68,8 @@
     "gitter-env": "git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.7.7",
     "shutdown": "^0.2.3",
     "i18n-2": "^0.4.6",
-    "stringformat": "0.0.5"
+    "stringformat": "0.0.5",
+    "node-resque": "^0.8.3"
   },
   "devDependencies": {
     "better-assert": "1.0.0",
@@ -106,6 +107,7 @@
   },
   "main": "web.js",
   "scripts": {
+    "start": "nodemon web.js",
     "test": "make test"
   }
 }

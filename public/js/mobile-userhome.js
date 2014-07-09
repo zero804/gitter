@@ -21,7 +21,7 @@ require([
   }).render();
 
   new UserHomeView({
-    el: $('#frame-chat')
+    el: $('#content-frame')
   }).render();
 
   $('html').removeClass('loading');
