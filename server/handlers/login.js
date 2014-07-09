@@ -14,7 +14,6 @@ var uuid           = require('node-uuid');
 var url            = require('url');
 var oauth2         = require('../web/oauth2');
 var mixpanel       = require('../web/mixpanelUtils');
-var languageSelector = require('../web/language-selector');
 var rememberMe     = require('../web/middlewares/rememberme-middleware');
 var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
 var GithubMeService  = require("../services/github/github-me-service");
@@ -47,7 +46,6 @@ module.exports = {
         '/login',
         function(req, res) {
           res.render('login', {
-            lang: languageSelector(req)
           });
         }
       );
@@ -56,7 +54,6 @@ module.exports = {
         '/login/explain',
         function(req, res) {
           res.render('github-explain', {
-            lang: languageSelector(req)
           });
         }
       );

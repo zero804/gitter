@@ -8,7 +8,6 @@ var restSerializer = require('../../serializers/rest-serializer');
 var contextGenerator = require('../../web/context-generator');
 var Q = require('q');
 var roomService = require('../../services/room-service');
-var languageSelector = require('../../web/language-selector');
 var env              = require('../../utils/env');
 var roomCapabilities = require('../../services/room-capabilities');
 var burstCalculator   = require('../../utils/burst-calculator');
@@ -85,7 +84,7 @@ exports.chatArchive = [
           previousDate = null;
         }
 
-        
+
 
         return chatService.findChatMessagesForTroupeForDateRange(troupeId, startDate.toDate(), endDate.toDate())
           .spread(function(chatMessages, limitReached) {
@@ -154,7 +153,6 @@ exports.chatArchive = [
                 troupeName: req.uriContext.uri,
                 troupeTopic: troupe.topic,
                 chats: burstCalculator(serialized),
-                lang: languageSelector(req),
                 limitReached: limitReached,
                 historyHorizon: historyHorizon,
                 billingUrl: billingUrl,

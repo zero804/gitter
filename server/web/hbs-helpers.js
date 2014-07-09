@@ -1,13 +1,13 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var nconf = require('../utils/config');
-var cdn = require("./cdn");
-var _ = require('underscore');
-var appVersion = require('./appVersion');
-var safeJson = require('../utils/safe-json');
+var nconf           = require('../utils/config');
+var cdn             = require("./cdn");
+var _               = require('underscore');
+var appVersion      = require('./appVersion');
+var safeJson        = require('../utils/safe-json');
+var env             = process.env['NODE_ENV'];
 var minifiedDefault = nconf.get("web:minified");
-var env = process.env['NODE_ENV'];
 
 var cdns;
 if(nconf.get("cdn:use")) {
@@ -56,7 +56,8 @@ exports.bootScript = function(url, parameters) {
   var requireScript;
   var cdnFunc  = (options.skipCdn) ? function(a) { return '/' + a; } : cdn;
   var skipCore = options.skipCore;
-  var minified = 'minified' in options ? options.minified : minifiedDefault;
+  // Only allow minified true or false values, otherwise we'll use the default
+  var minified = minified === true ? true : minified === false ? false : minifiedDefault;
   var async    = 'async' in options ? options.async : true;
   var cdnOptions = { appcache: options.appcache };
 
@@ -91,9 +92,9 @@ exports.isMobile = function(agent, options) {
 
 exports.generateEnv = function(parameters) {
   var options = parameters.hash;
-
-  var env = options ? _.extend({}, troupeEnv, options) : troupeEnv;
-
+  var env = options ? _.extend({
+    lang: this.lang
+  }, troupeEnv, options) : troupeEnv;
   return '<script type="text/javascript">' +
           'window.troupeEnv = ' + safeJson(JSON.stringify(env)) + ';' +
           '</script>';
@@ -102,7 +103,9 @@ exports.generateEnv = function(parameters) {
 exports.generateTroupeContext = function(troupeContext, parameters) {
   var options = parameters.hash;
 
-  var env = options ? _.extend({}, troupeEnv, options) : troupeEnv;
+  var env = options ? _.extend({
+    lang: this.lang
+  }, troupeEnv, options) : troupeEnv;
 
   /* Disable the use of CDNs if we're using the appcache as douchey appcache doesn't support CDN fetchs */
   if(options && options.appcache) {
