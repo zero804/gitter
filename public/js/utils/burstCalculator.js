@@ -91,9 +91,6 @@ define(function () {
 
         var index = collection.indexOf(chat);
 
-        // console.debug('start:', start, 'index:', index, 'end:', end);
-        // console.debug(chat);
-
         var newSentTime = chat.get('sent').valueOf();
         var sinceBurstStart = newSentTime - burstStart; // get the duration since last burst
         var newUser = chat.get('fromUser') && chat.get('fromUser').username;
