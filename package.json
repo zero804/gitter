@@ -104,7 +104,8 @@
     "sinon": "1.5.2",
     "xunit-file": "0.0.3",
     "grunt-append-sourcemapping": "0.0.2",
-    "grunt-contrib-htmlmin": "^0.3.0"
+    "grunt-contrib-htmlmin": "^0.3.0",
+    "grunt-jsonlint": "^1.0.4"
   },
   "main": "web.js",
   "scripts": {

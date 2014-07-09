@@ -125,7 +125,9 @@ var MODULES = [
   }
 ];
 
-var CLOSURE_PATH = 'build-scripts/closure-v20140625';
+// Unfortunately we can't upgrade to the latest closure
+// as it won't let you mix strict and unstrict code
+var CLOSURE_PATH = 'build-scripts/closure-v20130722';
 
 module.exports = function( grunt ) {
   'use strict';
@@ -167,8 +169,8 @@ module.exports = function( grunt ) {
       requireConfig[module.name] = {
         options: {
           optimize: 'none',
-          generateSourceMaps: true,
-          preserveLicenseComments: false,
+          // generateSourceMaps: true,
+          // preserveLicenseComments: false,
           baseUrl: "public/js",
           name: module.name,
           include: module.include,
@@ -230,6 +232,12 @@ module.exports = function( grunt ) {
     "closure-compiler": createClosureConfig(MODULES),
     "append-sourcemapping": appendSourceMapping(MODULES),
 
+    jsonlint: {
+      config: {
+        src: grunt.file.expand('config/**/*.json')
+      }
+    },
+
     htmlmin: {                                     // Task
       dist: {                                      // Target
         options: {                                 // Target options
@@ -239,7 +247,7 @@ module.exports = function( grunt ) {
           minifyJS: true,
           minifyCSS: true
         },
-        files: grunt.file.expandMapping('**/*.hbs', 'public-processed', { cwd: 'public'})
+        files: grunt.file.expandMapping('template/**/*.hbs', 'public-processed', { cwd: 'public'})
       }
     },
 
@@ -458,7 +466,7 @@ module.exports = function( grunt ) {
   /* using matchdep to load all grunt related modules */
   require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
-  grunt.registerTask('process', ['less', 'requirejs', 'closure-compiler']);
+  grunt.registerTask('process', ['jsonlint', 'less', 'requirejs', 'closure-compiler']);
   grunt.registerTask('closure', ['closure-compiler', 'append-sourcemapping']);
   grunt.registerTask('process-no-min', ['less', 'requirejs']);
   grunt.registerTask('client-libs', ['bowerRequireWrapper']);
