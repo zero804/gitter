@@ -300,9 +300,9 @@ define([
     },
 
     /**
-     * send() {describe}
+     * send() what does send do?
      *
-     * @param <String> val
+     * @param <String> val describe `val`
      * @return <Boolean>
      */
     send: function (val) {
