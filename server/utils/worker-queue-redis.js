@@ -88,6 +88,8 @@ Queue.prototype.invoke = function(data, options, callback) {
   var delay = options && options.delay || 0;
 
   this.internalQueue.enqueueIn(delay, this.name, 'echo', data);
+
+  if(callback) callback();
 };
 
 Queue.prototype.destroy = function() {
