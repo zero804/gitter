@@ -1,5 +1,8 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
-define(function () {
+define([
+  'underscore',
+  'backbone'
+], function (_, Backbone) {
   "use strict";
 
   // const - 5 minutes window to merge messages into previous burst
@@ -41,7 +44,7 @@ define(function () {
   function findBurstBelow (index) {
     if (index === this.length - 1) return index;
     var chat = null;
-    while (index <= this.length) {
+    while (index < this.length) {
       chat = this.at(index);
       if (chat.get('burstStart')) break;
       index++;
@@ -82,8 +85,7 @@ define(function () {
     end = (typeof end !== 'undefined') ? end : collection.length; // end defaults at index n
 
     var burstUser,
-        burstStart,
-        self = this;
+        burstStart;
 
     collection
       .slice(start, end + 1)
