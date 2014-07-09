@@ -280,11 +280,6 @@ var authenticator = bayeuxExtension({
     var troupeId = parts[4] || undefined;
     var eyeballState = parseInt(parts[5], 10) || 0;
 
-    if(!userId) {
-      // Not logged in? Simply return
-      return callback(null, message);
-    }
-
     // Get the presence service involved around about now
     presenceService.userSocketConnected(userId, clientId, connectionType, client, troupeId, eyeballState, function(err) {
 
@@ -665,7 +660,10 @@ faye.stringify = function(object) {
 faye.logger = {
 };
 
-var logLevels = ['fatal', 'error'/*, 'warn', 'info'*/];
+var logLevels = ['fatal', 'error', 'warn'];
+if(nconf.get('ws:fayeLogging') === 'info') logLevels.push('info');
+if(nconf.get('ws:fayeLogging') === 'debug') logLevels.push('info', 'debug');
+
 logLevels.forEach(function(level) {
   faye.logger[level] = function(msg) { logger[level]('faye: ' + msg.substring(0,180)); };
 });
@@ -709,7 +707,9 @@ module.exports = {
       // connection
       logger.info("Client " + clientId + " disconnected");
       presenceService.socketDisconnected(clientId, function(err) {
-        if(err && err !== 404) { logger.error("bayeux: Error while attempting disconnection of socket " + clientId + ": " + err,  { exception: err }); }
+        if(err && err.status !== 404) {
+          logger.error("bayeux: Error while attempting disconnection of socket " + clientId + ": " + err,  { exception: err });
+        }
       });
     });
 

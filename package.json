@@ -68,7 +68,8 @@
     "gitter-env": "git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.7.7",
     "shutdown": "^0.2.3",
     "i18n-2": "^0.4.6",
-    "stringformat": "0.0.5"
+    "stringformat": "0.0.5",
+    "node-resque": "^0.8.3"
   },
   "devDependencies": {
     "better-assert": "1.0.0",
@@ -101,10 +102,14 @@
     "requirejs": "~2.1.8",
     "restler": "~2.0.1",
     "sinon": "1.5.2",
-    "xunit-file": "0.0.3"
+    "xunit-file": "0.0.3",
+    "grunt-append-sourcemapping": "0.0.2",
+    "grunt-contrib-htmlmin": "^0.3.0",
+    "grunt-jsonlint": "^1.0.4"
   },
   "main": "web.js",
   "scripts": {
+    "start": "nodemon web.js",
     "test": "make test"
   }
 }

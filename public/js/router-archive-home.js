@@ -61,6 +61,7 @@ require([
 
   var troupeId = context.getTroupeId();
 
+
   var cal = new CalHeatMap();
   cal.init({
     start: new Date(Date.now() - 340 * 86400 * 1000),
