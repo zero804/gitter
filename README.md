@@ -6,10 +6,6 @@ All rights reserved.
 
 Please symlink pre-commit to .git/hooks/pre-commit to enable the pre-commit hooks.
 
-Prerequisites
--------------
-Redis 2.8 (Sentinel 2 is shipped with Redis 2.8) & MongoDB 2.4 must be installed.
-
 Getting Started
 ---------------
 1.  `npm install`
