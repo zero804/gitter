@@ -4,7 +4,7 @@ define([
   'utils/context',
   './base',
   '../utils/momentWrapper',
-  '../utils/burstCalculator',
+  '../utils/burst-calculator',
   'cocktail'
 ], function (_, context, TroupeCollections, moment, burstCalculator, cocktail) {
   "use strict";

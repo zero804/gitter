@@ -3,13 +3,13 @@ define([
   'backbone',
   'assert',
   'utils/momentWrapper',
-  'utils/burstCalculator'
+  'utils/burst-calculator'
 ], function (Backbone, assert, moment, bc) {
 
   var Message = Backbone.Model;
   var Collection = Backbone.Collection;
 
-  describe('burstCalculator', function () {
+  describe('burst-calculator', function () {
 
     it('parse() single message', function () {
       var messages = [{
