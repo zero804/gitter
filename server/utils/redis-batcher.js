@@ -4,7 +4,7 @@
 
 var redis = require('./redis');
 var winston = require('./winston');
-var workerQueue = require('./worker-queue-redis');
+var workerQueue = require('./worker-queue');
 
 var PREFIX = "rb:";
 
@@ -35,22 +35,14 @@ RedisBatcher.prototype = {
 
     var redisKey = this.getKey(key);
 
-    this.redisClient.rpush(redisKey, item, function(err) {
+    this.redisClient.rpush(redisKey, item, function(err, reply) {
       if(err) return callback(err);
 
-      var friendlyLockValue = Date.now() + this.timeout + 1;
-
-      // check if batch timeout is already queued
-      self.redisClient.set('ul:'+redisKey, [friendlyLockValue, 'PX', this.timeout, 'NX'], function(err, reply) {
-        if(err) return callback(err);
-
-        if(reply === 'OK') {
-          // successfully set lock, so queue a new batch timeout
-          self.addToQueue(key, callback);
-        } else {
-          callback();
-        }
-      });
+      if(reply === 1) {
+        self.addToQueue(key, callback);
+      } else {
+        callback();
+      }
     });
   },
 
