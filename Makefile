@@ -10,7 +10,7 @@ MAIL_HOST = localhost
 MAIL_PORT = 2525
 GIT_BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD)
 GIT_COMMIT ?= $(shell git rev-parse HEAD)
-ASSET_TAG_PREFIX = 
+ASSET_TAG_PREFIX =
 ASSET_TAG = $(ASSET_TAG_PREFIX)$(shell echo $(GIT_COMMIT)|cut -c 1-6)
 ifeq ($(FAST_BUILD), 1)
 CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/ )
@@ -24,14 +24,14 @@ PUBLIC_EXCLUDING_JS = $(shell ls -d public/*|grep -v ^public/js$)
 
 clean:
 	rm -rf $(CLEAN_FILES)
-	
+
 test:
 	NODE_ENV=test ./node_modules/.bin/mocha \
 		--reporter spec \
 		--timeout 10000 \
 		--recursive \
 		$(TESTS) || true
-	
+
 test-coverage:
 	rm -rf ./coverage/ cobertura-coverage.xml
 	mkdir -p output
@@ -195,7 +195,7 @@ version-files:
 	@echo GIT BRANCH: $(GIT_BRANCH)
 	echo $(ASSET_TAG) > ASSET_TAG
 	echo $(GIT_COMMIT) > GIT_COMMIT
-	echo $(GIT_BRANCH) > VERSION 
+	echo $(GIT_BRANCH) > VERSION
 
 test-reinit-data: maintain-data test post-test-maintain-data
 
@@ -231,7 +231,7 @@ search-js-console:
 
 validate-source: search-js-console
 
-continuous-integration: clean validate-source npm grunt security-check version-files upgrade-data reset-test-data test-xunit tarball
+continuous-integration: clean validate-source npm grunt security-check version-files upgrade-data reset-test-data test-xunit test-in-browser tarball
 
 continuous-integration-no-test: clean validate-source npm grunt version-files upgrade-data reset-test-data tarball
 
