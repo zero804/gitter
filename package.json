@@ -63,7 +63,7 @@
     "raven": "^0.6.2",
     "gitter-services": "git+ssh://git@github.com:gitterHQ/services.git#1.2.0",
     "statuserror": "0.0.1",
-    "dolph": "0.0.3",
+    "dolph": "0.0.4",
     "sitemap": "https://registry.npmjs.org/sitemap/-/sitemap-0.7.2.tgz",
     "redis-sentinel-client": "^0.1.5",
     "gitter-env": "git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.7.7",
