@@ -15,7 +15,7 @@ describe('redis-batcher', function() {
       cb();
       count++;
 
-      assert(items.length === 4, 'Expected 4 items');
+      assert.equal(items.length, 4, 'Expected 4 items');
       assert(items.indexOf('a') >= 0, 'Expected items a,b,c,d, got ' + items.join(','));
       assert(items.indexOf('b') >= 0, 'Expected items a,b,c,d, got ' + items.join(','));
       assert(items.indexOf('c') >= 0, 'Expected items a,b,c,d, got ' + items.join(','));
