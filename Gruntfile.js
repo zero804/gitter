@@ -229,6 +229,20 @@ module.exports = function( grunt ) {
     requirejs: compileRequireModules(MODULES),
     "closure-compiler": createClosureConfig(MODULES),
     "append-sourcemapping": appendSourceMapping(MODULES),
+
+    htmlmin: {                                     // Task
+      dist: {                                      // Target
+        options: {                                 // Target options
+          removeComments: true,
+          collapseWhitespace: true,
+          // lint: true,
+          minifyJS: true,
+          minifyCSS: true
+        },
+        files: grunt.file.expandMapping('**/*.hbs', 'public-processed', { cwd: 'public'})
+      }
+    },
+
     // default watch configuration
     watch: {
       less: {
