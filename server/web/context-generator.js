@@ -9,7 +9,6 @@ var roomPermissionsModel = require('../services/room-permissions-model');
 var assert           = require("assert");
 var appVersion       = require("./appVersion");
 var Q                = require('q');
-var languageSelector = require('./language-selector');
 
 /**
  * Returns the promise of a mini-context
@@ -179,7 +178,6 @@ function createTroupeContext(req, options) {
     troupeHash: options.troupeHash,
     isNativeDesktopApp: isNativeDesktopApp(req),
     permissions: options.permissions,
-    lang: languageSelector(req),
     locale: req.i18n.locales[req.i18n.locale]
   };
 }
