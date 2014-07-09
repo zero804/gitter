@@ -26,7 +26,7 @@ require([
   chatCollection.listen();
 
   new ChatCollectionView({
-    el: '#frame-chat',
+    el: '#content-frame',
     collection: chatCollection,
     decorators: [emojiDecorator]
   }).render();
