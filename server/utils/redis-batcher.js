@@ -76,11 +76,7 @@ RedisBatcher.prototype = {
         if(err) return done(err);
 
         var items = replies[0];
-        if(items.length) {
-          return handler(key, items, done);
-        } else {
-          return done();
-        }
+        return handler(key, items, done);
       });
   },
 
