@@ -14,7 +14,7 @@ describe('chatService', function() {
   var fixture = {};
   before(fixtureLoader(fixture, {
     user1: {},
-    troupe1: {},
+    troupe1: {users: ['user1']},
     message1: {
       user: 'user1',
       troupe: 'troupe1',
