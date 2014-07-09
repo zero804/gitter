@@ -6,14 +6,14 @@ var workerQueue = require('../test-require')('./utils/worker-queue-redis');
 var assert = require('assert');
 var uuid = require('node-uuid');
 
-describe('redis backed worker queue', function() {
+describe('worker-queue-redis', function() {
   // queue takes a while to start up
   this.timeout(10000);
 
   it('should echo data back', function(done) {
     var data = 'test data ' + uuid.v4();
 
-    var queue = workerQueue.queue('test-queue', {}, function() {
+    var queue = workerQueue.queue('test-queue1', {}, function() {
       return function(result, queuedone) {
         queuedone();
 
@@ -25,6 +25,21 @@ describe('redis backed worker queue', function() {
     });
 
     queue.invoke(data, { delay: 0 }, function() {});
+
+  });
+
+  it('should callback when invoked', function(done) {
+    var data = 'test data ' + uuid.v4();
+
+    var queue = workerQueue.queue('test-queue2', {}, function() {
+      return function(result, queuedone) {
+        queuedone();
+      };
+    });
+
+    queue.invoke(data, { delay: 0 }, function() {
+      done();
+    });
 
   });
 
