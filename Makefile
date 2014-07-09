@@ -167,10 +167,7 @@ npm:
 	npm install
 	#npm shrinkwrap
 
-lint-configs: config/*.json
-	set -e && for i in $?; do (./node_modules/.bin/jsonlint $$i > /dev/null); done
-
-grunt: clean lint-configs
+grunt: clean
 	mkdir output
 	mkdir -p public-processed/js
 	for i in $(PUBLIC_EXCLUDING_JS); \

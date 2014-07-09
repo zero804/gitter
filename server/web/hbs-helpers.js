@@ -56,8 +56,9 @@ exports.bootScript = function(url, parameters) {
   var requireScript;
   var cdnFunc  = (options.skipCdn) ? function(a) { return '/' + a; } : cdn;
   var skipCore = options.skipCore;
-  // Only allow minified true or false values, otherwise we'll use the default
-  var minified = minified === true ? true : minified === false ? false : minifiedDefault;
+
+
+  var minified = 'minified' in this ? !!this.minified : minifiedDefault;
   var async    = 'async' in options ? options.async : true;
   var cdnOptions = { appcache: options.appcache };
 
