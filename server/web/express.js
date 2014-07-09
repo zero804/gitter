@@ -30,8 +30,7 @@ module.exports = {
     expressHbs.registerHelper('chatItemPrerender', require('./prerender-chat-helper'));
 
     app.locals({
-      googleTrackingId: config.get("web:trackingId"),
-      minified: config.get('web:minified')
+      googleTrackingId: config.get("web:trackingId")
     });
 
     app.engine('hbs', expressHbs.express3({
