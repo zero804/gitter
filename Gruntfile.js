@@ -218,12 +218,8 @@ module.exports = function( grunt ) {
     });
 
     return c;
-    // uglify: {
-    //   mangle: {toplevel: true},
-    //   squeeze: {dead_code: false},
-    //   codegen: {quote_keys: true}
-    // },
   }
+
   function appendSourceMapping(modules) {
 
     var config = {};
