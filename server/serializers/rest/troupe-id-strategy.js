@@ -5,7 +5,7 @@ var troupeService     = require("../../services/troupe-service");
 var winston           = require('../../utils/winston');
 var collections       = require("../../utils/collections");
 var execPreloads      = require('../exec-preloads');
-var TroupeStrategy = require('./troupe-strategy');
+var TroupeStrategy    = require('./troupe-strategy');
 
 function TroupeIdStrategy(options) {
   var troupeStrategy = new TroupeStrategy(options);

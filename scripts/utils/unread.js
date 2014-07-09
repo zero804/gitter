@@ -1,3 +1,7 @@
+#!/usr/bin/env node
+/*jslint node:true, unused:true */
+"use strict";
+
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
 var unreadService = require('../../server/services/unread-item-service');
@@ -51,6 +55,7 @@ userService.findByUsername(opts.username)
     console.log('Rooms causing badge number:', badgeTroupeNames);
     console.log('Rooms with unread messages:', unreadTroupeNames);
   })
+  .delay(1000)
   .fail(function(err) {
     console.error(err.stack);
   })

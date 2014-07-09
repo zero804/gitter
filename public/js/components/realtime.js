@@ -88,12 +88,18 @@ define([
               updateTimers = [setTimeout(function() {
                 /* 10 minutes */
                 $(document).trigger('app.version.mismatch');
+                appEvents.trigger('stats.event', 'reload.warning.10m');
               }, 10 * 60000), setTimeout(function() {
                 /* 1 hour */
                 $(document).trigger('app.version.mismatch');
+                appEvents.trigger('stats.event', 'reload.warning.1hr');
               }, 60 * 60000), setTimeout(function() {
                 /* 6 hours */
-                window.location.reload(true);
+                appEvents.trigger('stats.event', 'reload.forced');
+                setTimeout(function() {
+                  window.location.reload(true);
+                }, 30000); // Give the stat time to send
+
               }, 360 * 60000)];
             }
 
@@ -216,6 +222,7 @@ define([
   var connectionFailureTimeout;
   var persistentOutage;
   var websocketsDisabled = isMobile();
+  var persistentOutageStartTime;
 
   function getOrCreateClient() {
     if(client) return client;
@@ -225,11 +232,12 @@ define([
       log('realtime: transport down');
 
       var c = context.env('websockets');
-      var timeout = c.options && c.options.timeout || 30;
+      var timeout = c.options && c.options.timeout || 60;
 
       if(!connectionFailureTimeout) {
         connectionFailureTimeout = setTimeout(function() {
           if(!persistentOutage) {
+            persistentOutageStartTime = Date.now();
             persistentOutage = true;
             log('realtime: persistent outage');
             appEvents.trigger('connectionFailure');
@@ -250,7 +258,10 @@ define([
       }
 
       if(persistentOutage) {
+        appEvents.trigger('stats.event', 'faye.outage.restored');
+        appEvents.trigger('stats.time', 'faye.outage.restored.time', Date.now() - persistentOutageStartTime);
         persistentOutage = false;
+        persistentOutageStartTime = null;
         log('realtime: persistent outage restored');
         appEvents.trigger('connectionRestored');
       }

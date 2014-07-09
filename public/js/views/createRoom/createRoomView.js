@@ -27,7 +27,8 @@ define([
       permInheritedLabel: '#perm-inherited-label',
       roomNameInput: '#room-name',
       dropDownButton: '#dd-button',
-      permissionsLabel: '#permissions-label'
+      permissionsLabel: '#permissions-label',
+      premiumRequired: '#premium-required'
     },
 
     events: {
@@ -51,6 +52,11 @@ define([
       }, 300);
     },
 
+    billingUrl: function() {
+      var userOrOrg = this.selectedModel.get('uri').split('/')[0];
+      return context.env('billingUrl') + '/bill/' + userOrOrg + '?r=' + window.location.pathname;
+    },
+
     menuItemClicked: function(button) {
       switch(button) {
         case 'create':
@@ -63,6 +69,10 @@ define([
 
         case 'cancel':
           this.dialog.hide();
+          break;
+
+        case 'get-plan':
+          window.open(this.billingUrl());
           break;
       }
     },
@@ -98,6 +108,10 @@ define([
       var permissions = this.$el.find('input[type=radio]:visible:checked').val();
       var channelName = this.ui.roomNameInput.val().trim();
       var url;
+
+      if(this.selectedOptionsRequireUpgrade()) {
+        return;
+      }
 
       switch(ownerModel.get('type')) {
         case 'user':
@@ -172,10 +186,44 @@ define([
       this.recalcView(animated);
     },
 
+    selectedOptionsRequireUpgrade: function() {
+      var userIsPremium = context.user().get('premium');
+
+      var ownerModel = this.selectedModel;
+      if(!ownerModel) return false;
+
+      var ownerIsPremium = ownerModel.get('premium');
+
+      var permissions = this.$el.find('input[type=radio]:visible:checked').val();
+      if(permissions === 'public' || !permissions) return false;
+
+      switch(ownerModel.get('type')) {
+        case 'user':
+          return !userIsPremium;
+
+        case 'repo':
+
+          if(permissions === 'inherited') {
+            if(ownerModel.get('security') === 'PUBLIC') {
+              return false; // No need to upgrade, but this would be odd.
+            }
+
+            return !ownerIsPremium;
+          }
+
+          /* private */
+          return !ownerIsPremium;
+
+        case 'org':
+          /* private or inherited */
+          return !ownerIsPremium;
+      }
+
+      return false;
+    },
+
     recalcView: function(animated) {
       if (!this.ui || !this._uiBindings) { return; }
-
-
       var self = this;
       var showHide = {
         'selectParentRequired': false,
@@ -184,6 +232,7 @@ define([
         'permPrivate': false,
         'permInheritedOrg': false,
         'permInheritedRepo': false,
+        'premiumRequired': false,
         'existing': false,
         'permissionsLabel': true
       };
@@ -246,6 +295,8 @@ define([
         }
       }
 
+      showHide.premiumRequired = this.selectedOptionsRequireUpgrade();
+      createButtonEnabled = !showHide.premiumRequired;
 
       if(checkForRepo) {
         checkForRepoExistence(checkForRepo, function(exists) {
@@ -302,6 +353,15 @@ define([
         }
 
         self.dialog.setButtonState('create', createButtonEnabled);
+
+        if (showHide.premiumRequired) {
+          self.dialog.hideActions();
+          self.dialog.showPremium();
+        } else {
+          self.dialog.showActions();
+          self.dialog.hidePremium();
+        }
+        
 
         if(animated === false) {
           arrayToJq(true).show();
@@ -367,9 +427,10 @@ define([
       this.view = new View(options);
     },
     menuItems: [
-      { action: "create", text: "Create", className: "trpBtnGreen" },
-      { action: "back", text: "Back", className: "trpBtnLightGrey" },
-      { action: "cancel", text: "Cancel", className: "trpBtnLightGrey"}
+      { action: "create", text: "Create", className: "trpBtnGreen action" },
+      { action: "back", text: "Back", className: "trpBtnLightGrey action" },
+      { action: "cancel", text: "Cancel", className: "trpBtnLightGrey action"},
+      { action: "get-plan", text: "Get Plan", className: "trpBtnGreen premium hidden"}
     ]
   });
 

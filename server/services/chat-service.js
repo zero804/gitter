@@ -1,8 +1,8 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var env           = require('../utils/env');
-var stats         = env.stats;
+var env              = require('../utils/env');
+var stats            = env.stats;
 
 var persistence   = require("./persistence-service");
 var collections   = require("../utils/collections");
@@ -14,6 +14,7 @@ var appEvents     = require('../app-events');
 var Q             = require('q');
 var mongoUtils    = require('../utils/mongo-utils');
 var moment        = require('moment');
+var roomCapabilities = require('./room-capabilities');
 var StatusError   = require('statuserror');
 var _ = require('underscore');
 
@@ -199,41 +200,77 @@ function massageMessages(message) {
 }
 
 exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
-  var q = persistence.ChatMessage
-    .where('toTroupeId', troupeId);
+  return roomCapabilities.getMaxHistoryMessageDate(troupeId)
+    .then(function(maxHistoryDate) {
+      var q = persistence.ChatMessage
+        .where('toTroupeId', troupeId);
 
-  if(options.startId) {
-    var startId = new ObjectID(options.startId);
-    q = q.where('_id').gte(startId);
-  }
+      if(maxHistoryDate) {
+        q = q.where('sent').gte(maxHistoryDate);
+      }
 
-  if(options.beforeId) {
-    var beforeId = new ObjectID(options.beforeId);
-    q = q.where('_id').lt(beforeId);
-  }
+      if(options.startId) {
+        var startId = new ObjectID(options.startId);
+        q = q.where('_id').gte(startId);
+      }
 
-  q.sort(options.sort || { sent: 'desc' })
-    .limit(options.limit || 50)
-    .skip(options.skip || 0)
-    .exec(function(err, results) {
-      if(err) return callback(err);
+      if(options.beforeId) {
+        var beforeId = new ObjectID(options.beforeId);
+        q = q.where('_id').lt(beforeId);
+      }
 
-      return callback(null, results.map(massageMessages).reverse());
+      return q.sort(options.sort || { sent: 'desc' })
+        .limit(options.limit || 50)
+        .skip(options.skip || 0)
+        .execQ()
+        .then(function(results) {
+          return [results.map(massageMessages).reverse(), maxHistoryDate];
+        });
+    })
+    .spread(function(results, maxHistoryDate) {
+      if (!maxHistoryDate) return callback(null, results, false);
+
+      var q = persistence.ChatMessage
+              .where('toTroupeId', troupeId)
+              .limit(1)
+              .where('sent')
+              .lte(maxHistoryDate);
+
+      return q.execQ().then(function(_results) {
+        var limitReached = _results.length !== 0;
+        callback(null, results, limitReached);
+      });
+    })
+    .fail(function(err) {
+      callback(err);
     });
+    //.nodeify(callback)
 };
 
-exports.findChatMessagesForTroupeForDateRange = function(troupeId, startDate, endDate, callback) {
-  return persistence.ChatMessage.find({
-    $and: [
-      { toTroupeId: troupeId },
-      { sent: { $gte: startDate}  },
-      { sent: { $lte: endDate}  },
-    ]
-  }).sort({ sent: 'asc' })
-    .execQ().then(function(results) {
-      return results.map(massageMessages);
-    })
-    .nodeify(callback);
+exports.findChatMessagesForTroupeForDateRange = function(troupeId, startDate, endDate) {
+  return roomCapabilities.getMaxHistoryMessageDate(troupeId)
+    .then(function(maxHistoryDate) {
+      var q = persistence.ChatMessage
+              .where('toTroupeId', troupeId)
+              .where('sent').gte(startDate)
+              .where('sent').lte(endDate)
+              .sort({sent: 'asc'});
+
+      return q.exec().then(function(results) {
+        var chats;
+        var limitReached;
+
+        if (maxHistoryDate > startDate) {
+          chats = [];
+          limitReached = true;
+          return Q.all([chats, limitReached]);
+        } else {
+          chats = results.map(massageMessages);
+          limitReached = false;
+          return Q.all([chats, limitReached]);
+        }
+      });
+    });
 };
 
 exports.findDatesForChatMessages = function(troupeId, callback) {

@@ -14,14 +14,15 @@ module.exports = {
     var strategyOptions = { currentUserId: req.user.id };
     if (req.query.include_users) strategyOptions.mapUsers = true;
 
-    user.getOrgs()
-    .then(function(ghOrgs) {
-      var strategy = new restSerializer.GithubOrgStrategy(strategyOptions);
+    return user.getOrgs()
+      .then(function(ghOrgs) {
+        var strategy = new restSerializer.GithubOrgStrategy(strategyOptions);
 
-      restSerializer.serialize(ghOrgs, strategy, function(err, serialized) {
-        if(err) return next(err);
+        return restSerializer.serializeQ(ghOrgs, strategy)
+      })
+      .then(function(serialized) {
         res.send(serialized);
-      });
-    });
+      })
+      .fail(next);
   }
 };

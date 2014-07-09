@@ -12,18 +12,31 @@ GIT_BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD)
 GIT_COMMIT ?= $(shell git rev-parse HEAD)
 ASSET_TAG_PREFIX = 
 ASSET_TAG = $(ASSET_TAG_PREFIX)$(shell echo $(GIT_COMMIT)|cut -c 1-6)
+ifeq ($(FAST_BUILD), 1)
+CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/ )
+else
+CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/ public-compile-cache/)
+endif
+
+PUBLIC_EXCLUDING_JS = $(shell ls -d public/*|grep -v ^public/js$)
 
 .PHONY: clean test perf-test-xunit perf-test test-xunit test-in-browser test-in-browser-xunit test-coverage prepare-for-end-to-end-testing end-to-end-test
 
 clean:
-	rm -rf public-processed/ output/ coverage/ cobertura-coverage.xml html-report/
-
+	rm -rf $(CLEAN_FILES)
+	
 test:
 	NODE_ENV=test ./node_modules/.bin/mocha \
 		--reporter spec \
 		--timeout 10000 \
 		--recursive \
 		$(TESTS) || true
+	
+test-coverage:
+	rm -rf ./coverage/ cobertura-coverage.xml
+	mkdir -p output
+	find $(TESTS) -iname "*test.js" | NODE_ENV=test XUNIT_FILE=output/test-reports/integration_cov.xml xargs ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- --timeout 10000 --reporter xunit-file || true
+	./node_modules/.bin/istanbul report cobertura
 
 perf-test-xunit:
 	npm install
@@ -66,12 +79,6 @@ rest-test-xunit:
 		--timeout 4000 \
 		--reporter xunit \
 		test/rest > output/test-reports/rest.xml || true
-
-test-coverage:
-	rm -rf ./coverage/ cobertura-coverage.xml
-	mkdir -p output
-	find $(TESTS) -iname "*test.js" | NODE_ENV=test xargs ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- --timeout 10000  || true
-	./node_modules/.bin/istanbul report cobertura
 
 prepare-for-end-to-end-testing:
 	curl https://raw.github.com/pypa/pip/master/contrib/get-pip.py > /tmp/get-pip.py
@@ -160,13 +167,19 @@ npm:
 	npm install
 	#npm shrinkwrap
 
-lint-configs: config/*.json
-	set -e && for i in $?; do (./node_modules/.bin/jsonlint $$i > /dev/null); done
-
-grunt: clean lint-configs
+grunt: clean
 	mkdir output
-	cp -R public/ public-processed/
-	grunt -no-color process
+	mkdir -p public-processed/js
+	for i in $(PUBLIC_EXCLUDING_JS); \
+		do cp -R $$i public-processed/; \
+	done
+	if [ -d public-compile-cache/js/ ] && [ -n $$(find public-compile-cache/js/ -maxdepth 1 -type f -name '*' -print -quit) ]; then cp public-compile-cache/js/* public-processed/js/; fi
+	./build-scripts/copy-templates.sh
+	grunt -no-color less requirejs
+	./build-scripts/selective-js-compile.sh
+	rm -rf public-compile-cache
+	mkdir -p public-compile-cache/js
+	cp public-processed/js/*.min.js public-processed/js/*.md5 public-compile-cache/js
 	./build-scripts/gzip-processed.sh
 
 sprites:
@@ -218,7 +231,7 @@ search-js-console:
 
 validate-source: search-js-console
 
-continuous-integration: clean validate-source npm grunt security-check version-files upgrade-data reset-test-data test-xunit test-coverage tarball
+continuous-integration: clean validate-source npm grunt security-check version-files upgrade-data reset-test-data test-xunit tarball
 
 continuous-integration-no-test: clean validate-source npm grunt version-files upgrade-data reset-test-data tarball
 

@@ -3,7 +3,6 @@
 
 var loginUtils = require('../web/login-utils');
 var nconf      = require('../utils/config');
-var languageSelector = require('../web/language-selector');
 
 module.exports = {
     install: function(app) {
@@ -18,7 +17,6 @@ module.exports = {
 
           // when the viewer is not logged in:
           res.render('homepage', {
-            lang: languageSelector(req)
           });
         });
 
