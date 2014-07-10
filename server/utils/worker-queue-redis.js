@@ -4,6 +4,7 @@
 var redis = require('./redis');
 var resque = require("node-resque");
 var winston = require('./winston');
+var os = require('os');
 
 var connectionDetails = {
   redis: redis.createClient()
@@ -25,13 +26,30 @@ var jobs = {
   }
 };
 
+var uniqueWorkerCounter = 0;
+
 var Queue = function(name, options, loaderFn) {
   this.name = name;
   this.fn = loaderFn();
 
   var self = this;
 
-  this.worker = new resque.worker({connection: connectionDetails, queues: [name]}, jobs, function(){
+  uniqueWorkerCounter++;
+  var workerOpts = {
+    connection: connectionDetails,
+    timeout: 100,
+    /*
+     * "If you plan to run more than one worker per nodejs process,
+     * be sure to name them something distinct. Names must follow
+     * the patern 'hostname:pid+unique_id'."
+     *
+     * from https://github.com/taskrabbit/node-resque#notes
+     */
+    name: os.hostname() + ":" + process.pid + "+" + uniqueWorkerCounter,
+    queues: [name]
+  };
+
+  this.worker = new resque.worker(workerOpts, jobs, function() {
     self.worker.workerCleanup();
     self.worker.start();
   });
