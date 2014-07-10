@@ -77,11 +77,15 @@ define([
       }
     },
     initialize: function() {
-      this.listenTo(this, 'add remove', function (model, collection, options) {
-        burstCalculator.calc.call(this, model);
+      this.listenTo(this, 'add remove', function (model, collection) {
+        collection.once('sort', function () {
+          console.log('sort called');
+          burstCalculator.calc.call(collection, model);
+          return;
+        });
       });
 
-      this.listenTo(this, 'reset', function (collection, options) {
+      this.listenTo(this, 'reset', function (collection) {
         burstCalculator.parse.call(this, collection);
       });
     },
