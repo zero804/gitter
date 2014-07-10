@@ -11,4 +11,6 @@ exports.startWorkers = function() {
   require('./unread-item-service');
 
   require('../utils/worker-queue').startWorkers();
+
+  require('../utils/worker-queue-redis').startScheduler();
 };

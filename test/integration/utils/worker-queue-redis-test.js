@@ -1,5 +1,5 @@
 /*jslint node: true */
-/*global describe:true, it: true, beforeEach:true, afterEach:true */
+/*global describe:true, it: true, before:true, after:true */
 "use strict";
 
 var workerQueue = require('../test-require')('./utils/worker-queue-redis');
@@ -9,6 +9,10 @@ var uuid = require('node-uuid');
 describe('worker-queue-redis', function() {
   // queue takes a while to start up
   this.timeout(10000);
+
+  before(function() {
+    workerQueue.startScheduler();
+  });
 
   it('should echo data back', function(done) {
     var data = 'test data ' + uuid.v4();
@@ -41,6 +45,10 @@ describe('worker-queue-redis', function() {
       done();
     });
 
+  });
+
+  after(function(done) {
+    workerQueue.stopScheduler(done);
   });
 
 });

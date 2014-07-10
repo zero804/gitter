@@ -12,9 +12,8 @@ var connectionDetails = {
   redis: redis.createClient()
 };
 
-var scheduler = new resque.scheduler({connection: connectionDetails}, function() {
-  scheduler.start();
-});
+// scheduler is responbsible for scheduling delayed jobs and giving them to the workers.
+var scheduler = new resque.scheduler({connection: connectionDetails}, function() {});
 
 scheduler.on('error', function(err) {
   logger.error('worker-queue-redis: scheduler failed: ' + err, { exception: err });
@@ -128,5 +127,11 @@ module.exports = {
   queue: function(name, options, loaderFn) {
     if(!options) options = {};
     return new Queue(name, options, loaderFn);
+  },
+  startScheduler: function() {
+    scheduler.start();
+  },
+  stopScheduler: function(callback) {
+    scheduler.end(callback);
   }
 };
