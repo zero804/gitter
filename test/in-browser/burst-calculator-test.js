@@ -9,6 +9,33 @@ define([
   var Message = Backbone.Model;
   var Collection = Backbone.Collection;
 
+  function validateAgainstParse (collection) {
+    var testData = collection.toJSON();
+    var validationSet = bc.parse(collection);
+
+    for (var i = 0; i < testData.length; i++) {
+      var burstStart = testData[i].burstStart === validationSet[i].burstStart;
+      var burstFinal = testData[i].burstFinal === validationSet[i].burstFinal;
+      if (!burstStart || !burstFinal) {
+        var a = testData[i];
+        var b = validationSet[i];
+        console.log(a.text, 'is different');
+        console.log('ACTUAL:', 'burstStart:', a.burstStart, 'burstFinal:', a.burstFinal);
+        console.log('EXPECTED:', 'burstStart:', b.burstStart, 'burstFinal:', b.burstFinal);
+        // visualize(collection);
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  function visualize (collection) {
+    collection.each(function (m) {
+      console.log((m.get('burstStart') ? '\u2022' : ' '), (m.get('burstFinal') ? '\u25e6' : ' '), m.get('sent').format('h:mm:ss:SSS'), '-', m.get('fromUser').username, 'said:', m.get('text'));
+    });
+  }
+
   describe('burst-calculator', function () {
 
     it('parse() single message', function () {
@@ -22,7 +49,6 @@ define([
 
       var res = new Collection(bc.parse(messages));
       assert(res.at(0).get('burstStart'), 'burstStart should be true');
-      assert.equal(res.at(0).get('burstFinal'), false, 'burstFinal should be false');
     });
 
     it('parse() multiple messages same user', function () {
@@ -177,7 +203,7 @@ define([
     });
 
     it('calc() empty collection, add a single message', function () {
-      var collection = new Collection([]);
+      var res = new Collection([]);
       var model = new Message(
         { text: 'A1',
           sent: moment(),
@@ -186,10 +212,9 @@ define([
           }
         });
 
-      collection.add(model);
-      bc.calc.call(collection, model);
-      assert(model.get('burstStart'), 'burstStart should be true');
-      assert.equal(model.get('burstFinal'), false, 'burstFinal should be false');
+      res.add(model);
+      bc.calc.call(res, model);
+      assert(validateAgainstParse(res));
     });
 
     it('calc() pre-populated and parsed collection, adding at the bottom', function () {
@@ -237,7 +262,7 @@ define([
       res.add(model);
       bc.calc.call(res, model);
 
-      assert(model.get('burstStart'), 'burstStart should be true');
+      assert(validateAgainstParse(res));
     });
 
     it('calc() pre-populated and parsed collection, adding at the top', function () {
@@ -297,9 +322,7 @@ define([
       res.add(b2);
       bc.calc.call(res, b2);
 
-      assert(b1.get('burstStart'), 'burstStart should be true');
-      assert(b2.get('burstFinal'), 'burstStart && burstFinal should be true');
-      assert(res.at(2).get('burstStart'), 'burstStart should be true');
+      assert(validateAgainstParse(res));
     });
 
     it('calc() pre-populated and parsed collection, adding at the middle', function () {
@@ -348,9 +371,92 @@ define([
       res.add(model);
       bc.calc.call(res, model);
 
-      assert(res.at(0).get('burstStart') && res.at(0).get('burstFinal'), 'burstStart && burstFinal should be true');
-      assert(model.get('burstStart') && model.get('burstFinal'), 'burstStart && burstFinal should be true');
-      assert(res.at(1).get('burstStart'), 'burstStart should be true');
+      assert(validateAgainstParse(res));
+    });
+
+    it('calc() pre-populated and bombarding from 3 users', function (done) {
+
+      var messages = [
+        {
+          text: 'PRE-POPULATED 1',
+          sent: moment(),
+          fromUser: {
+            username: 'A'
+          }
+        },
+        {
+          text: 'PRE-POPULATED 2',
+          sent: moment().add('minutes', 0.1),
+          status: true,
+          fromUser: {
+            username: 'A'
+          }
+        },
+        {
+          text: 'PRE-POPULATED 3',
+          sent: moment().add('minutes', 0.12),
+          fromUser: {
+            username: 'B'
+          }
+        },
+        {
+          text: 'PRE-POPULATED 4',
+          sent: moment().add('minutes', 0.15),
+          fromUser: {
+            username: 'B'
+          }
+        }
+      ];
+
+      var res = new Collection(bc.parse(messages));
+      res.comparator = 'sent';
+
+      res.on('add', function (m, c, o) {
+        c.once('sort', function (collection, opt) {
+          bc.calc.call(c, m);
+          return;
+        });
+      });
+
+      var count = 0;
+
+      function sendMessage (user, delay) {
+
+        var model = new Message(
+          { text: count,
+            sent: moment().subtract('ms', delay),
+            fromUser: {
+              username: user
+            }
+          });
+        this.add(model);
+        count++;
+      }
+
+      var t1 = setInterval(sendMessage.bind(res, 'A'), 15);
+      var t2 = setInterval(sendMessage.bind(res, 'B'), 23);
+      var t3 = setInterval(sendMessage.bind(res, 'C'), 45);
+
+      setTimeout(function () {
+        clearInterval(t1);
+        clearInterval(t2);
+        clearInterval(t3);
+
+        setTimeout(function () {
+
+          // messages inserted at a random time after 300ms
+          sendMessage.call(res, 'CRAZY INSERTION', ~~(Math.random(1000)));
+          sendMessage.call(res, 'CRAZY_INSERTION', ~~(Math.random(1000)));
+          sendMessage.call(res, 'CRAZY INSERTION', 512);
+          sendMessage.call(res, 'CRAZY_INSERTION', 950);
+
+          // TODO: TOGGLE IT FOR A NICE CONSOLE VISUALIZATION OF THE MESSAGES BURSTS AND SUCH
+          assert(validateAgainstParse(res));
+
+          done();
+        }, 300);
+
+      }, 1 * 1000);
     });
   });
 });
