@@ -55,7 +55,8 @@ define([
 
   /**
    * findSlice() triggers a parse based on a model, however it finds the correct `slice`
-   * of the chat-collection to be recalculated.
+   * of the chat-collection to be recalculated. To summarize: This function is responsible for calling parse
+   * with a subset of the collection.
    *
    * model    Backbone.Model - the model that is to be added to the collection
    * returns  void - it simply calls parse(), which mutates the collection directly
@@ -121,7 +122,7 @@ define([
    * start        Number - index set as the starting point of the iteration
    * end          Number - index set as the ending point of the iteration
    *
-   * returns Backbone.Collection - the mutated collection
+   * returns Object - the mutated collection (Backbone.Collection.toJSON())
    */
   function parse (collection_, start, end) {
     var collection = toCollection(collection_);
@@ -152,40 +153,8 @@ define([
         // chat.set('burstFinal', false);
 
         if (index > 0) collection.at(index - 1).set('burstFinal', state.prevFinal);
-
-        // var newSentTime = chat.get('sent').valueOf();
-        // var sinceBurstStart = newSentTime - burstStart; // get the duration since last burst
-        // var newUser = chat.get('fromUser') && chat.get('fromUser').username;
-        // var prevChatIsStatus = (index > 0) ? collection.at(index - 1).get('status') : false;
-
-        // // always set the chat-item to be false for both final and start
-        // chat.set('burstFinal', false);
-        // chat.set('burstStart', false);
-
-        // // `/me` status
-        // if (chat.get('status')) {
-        //   burstUser = null;
-        //   chat.set('burstStart', true);
-        //   chat.set('burstFinal', true);
-        //   if (index > 0) collection.at([index - 1]).set('burstFinal', true);
-        // }
-
-        // // if we do not currently have a burst user set new as current and create a new burst
-        // if (!burstUser) {
-        //   burstUser = newUser;
-        //   burstStart = newSentTime;
-        //   chat.set('burstStart', true);
-        //   if (index > 0) collection.at([index - 1]).set('burstFinal', true);
-        // }
-
-        // // if the current user is different or the duration since last burst is larger than 5 minutes we have a new burst
-        // if (prevChatIsStatus || newUser !== burstUser || sinceBurstStart > BURST_WINDOW) {
-        //   burstUser = newUser;
-        //   burstStart = newSentTime;
-        //   chat.set('burstStart', true);
-        //   if (index > 0) collection.at([index - 1]).set('burstFinal', true);
-        // }
       });
+
     return collection.toJSON();
   }
 
