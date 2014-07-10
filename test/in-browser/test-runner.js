@@ -1,32 +1,28 @@
 require([
   'require',
   'mocha'
-  ], function(require){
+], function (require, mocha) {
 
-    mocha.setup({
-      ui: 'bdd',
-      timeout: 20000
-    });
+  mocha.setup({
+    ui: 'bdd',
+    timeout: 20000
+  });
 
-    require([
-      'in-browser/roster-test'
-      // 'in-browser/chat-scroll-test',
-      // 'in-browser/faye-test',
-      // 'in-browser/faye-wrapper-test',
-      // 'in-browser/is-android-test',
-      // 'in-browser/mixpanel-test',
-      // 'in-browser/realtime-test',
-      // 'in-browser/sortable-marionette-test',
-      // 'in-browser/unread-items-client-test',
-      // 'in-browser/rollers-test'
-      ], function() {
-
+  require([
+      "in-browser/burst-calculator-test",
+      'in-browser/roster-test',
+      'in-browser/chat-scroll-test',
+      'in-browser/is-android-test',
+      'in-browser/mixpanel-test',
+      'in-browser/realtime-test',
+      // 'in-browser/sortable-marionette-test', // TODO: failing at the moment, FIX IT!
+      'in-browser/unread-items-client-test',
+      'in-browser/rollers-test'
+    ], function () {
       if (window.mochaPhantomJS) {
         mochaPhantomJS.run();
       } else {
         mocha.run();
       }
-
     });
-
-  });
+});

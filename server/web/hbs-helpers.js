@@ -8,6 +8,7 @@ var appVersion      = require('./appVersion');
 var safeJson        = require('../utils/safe-json');
 var env             = process.env['NODE_ENV'];
 var minifiedDefault = nconf.get("web:minified");
+var util            = require('util');
 
 var cdns;
 if(nconf.get("cdn:use")) {
@@ -56,32 +57,46 @@ exports.bootScript = function(url, parameters) {
   var requireScript;
   var cdnFunc  = (options.skipCdn) ? function(a) { return '/' + a; } : cdn;
   var skipCore = options.skipCore;
-  // Only allow minified true or false values, otherwise we'll use the default
-  var minified = minified === true ? true : minified === false ? false : minifiedDefault;
+
   var async    = 'async' in options ? options.async : true;
   var cdnOptions = { appcache: options.appcache };
 
   var baseUrl = cdnFunc("js/", cdnOptions);
   var asyncScript = async ? "defer='defer' async='true' " : '';
 
-  if(minified) {
-    if(skipCore) {
-      requireScript = cdnFunc("js/" + url + ".min.js", cdnOptions);
-    } else {
+  if(minifiedDefault) {
+    /* Distribution-ready */
+
+    if(this.minified !== false) {
       url = url + ".min";
-      // note: when the skipCdn flag was introduced it affected this even though this isn't the file that was requested in this invocation
-      requireScript = cdnFunc("js/core-libraries.min.js", cdnOptions);
     }
 
-    return "<script type='text/javascript'>\nwindow.require_config.baseUrl = '" + baseUrl + "';</script>\n" +
-            "<script " + asyncScript + "data-main='" + url + "' src='" + requireScript + "' type='text/javascript'></script>\n";
+    if(skipCore) {
+      /* No requirejs */
+      return util.format("<script type='text/javascript'>window.require_config.baseUrl = '%s';</script>" +
+              "<script %s src='%s' type='text/javascript'></script>",
+              baseUrl,
+              asyncScript,
+              cdnFunc(util.format("js/%s.js", url), cdnOptions));
+    }
+
+    /* Standard distribution setup */
+    return util.format("<script type='text/javascript'>window.require_config.baseUrl = '%s';</script>" +
+            "<script %s data-main='%s' src='%s' type='text/javascript'></script>\n",
+            baseUrl,
+            asyncScript,
+            url,
+            cdnFunc("js/core-libraries.min.js", cdnOptions));
 
   }
 
-  requireScript = cdnFunc("repo/requirejs/requirejs.js", cdnOptions);
-
-  return "<script type='text/javascript'>window.require_config.baseUrl = '" + baseUrl + "';</script>\n" +
-         "<script " + asyncScript + "data-main='" + url + ".js' src='" + requireScript + "' type='text/javascript'></script>";
+  /* Non minified - use requirejs as the core (development mode) */
+  return util.format("<script type='text/javascript'>window.require_config.baseUrl = '%s';</script>" +
+         "<script %s data-main='%s.js' src='%s' type='text/javascript'></script>",
+         baseUrl,
+         asyncScript,
+         url,
+         cdnFunc("repo/requirejs/requirejs.js", cdnOptions));
 
 };
 
