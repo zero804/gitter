@@ -35,6 +35,7 @@ define([
     }
     return index;
   }
+
   /**
    * findBurstBelow() finds the first burstStart below the given index
    *
@@ -53,18 +54,64 @@ define([
   }
 
   /**
-   * calculate() triggers a parse based on a model, however it finds the correct `slice`
+   * findSlice() triggers a parse based on a model, however it finds the correct `slice`
    * of the chat-collection to be recalculated.
    *
    * model    Backbone.Model - the model that is to be added to the collection
    * returns  void - it simply calls parse(), which mutates the collection directly
    */
-  function calculate (model) {
+  function findSlice (model) {
     if('burstStart' in model.attributes) return; // already calculated bursts for this batch
     var index = this.indexOf(model);
     var start = findBurstAbove.call(this, index);
     var end = findBurstBelow.call(this, index);
     parse(this, start, end);
+  }
+
+  /**
+   * calculateBurst() analyses what criteria a chat-item meets and modifies the current burst state accordingly
+   *
+   * chat     Backbone.Model - the chat-item to be analysed
+   * state    Object - the current burst state
+   *
+   * returns  void - it mutates the object directly
+   */
+  function calculateBurst (chat, state) {
+
+    var fromUser = chat.get('fromUser');
+    var sent = chat.get('sent');
+    var user = fromUser && fromUser.username;
+    var time = sent && sent.valueOf();
+
+    if (chat.get('status')) {
+      state.burstStart = true;
+      state.prevFinal = true;
+      state.time = time;
+      return;
+    }
+
+    if (!state.user) {
+      state.burstStart = true;
+      state.prevFinal = true;
+      state.user = user;
+      state.time = time;
+      return;
+    }
+
+    var outsideBurstWindow = ((time - state.time) > BURST_WINDOW) ? true : false;
+
+    if (state.prevIsStatus || user !== state.user || outsideBurstWindow) {
+      state.burstStart = true;
+      state.prevFinal = true;
+      state.user = user;
+      state.time = time;
+      return; /*{ burstStart: true, prevFinal: true, user: user, time: time };*/
+    }
+
+    state.burstStart = false;
+    state.prevFinal = false;
+    state.user = user;
+    return;
   }
 
   /**
@@ -82,56 +129,69 @@ define([
     // pre-run checks
     if (!collection) return;
     start = (typeof start !== 'undefined') ? start : 0; // start defaults at index 0
-    end = (typeof end !== 'undefined') ? end : collection.length; // end defaults at index n
+    end = (typeof end !== 'undefined') ? end : collection.length - 1; // end defaults at index n
 
-    var burstUser,
-        burstStart;
+    var state = {
+      user: null,
+      burstStart: false,
+      prevFinal: false,
+      prevIsStatus: false,
+      time: null
+    };
 
     collection
       .slice(start, end + 1)
-      .forEach(function (chat) {
+      .forEach(function (chat, index) {
+        // IMPORTANT: index is modified, to cater for the use of `slice()`
+        index = index + start;
 
-        var index = collection.indexOf(chat);
+        if (index > 0) state.prevIsStatus = collection.at(index - 1).get('status');
+        calculateBurst(chat, state);
 
-        var newSentTime = chat.get('sent').valueOf();
-        var sinceBurstStart = newSentTime - burstStart; // get the duration since last burst
-        var newUser = chat.get('fromUser') && chat.get('fromUser').username;
-        var prevChatIsStatus = (index > 0) ? collection.at(index - 1).get('status') : false;
+        chat.set('burstStart', state.burstStart);
+        // chat.set('burstFinal', false);
 
-        // always set the chat-item to be false for both final and start
-        chat.set('burstFinal', false);
-        chat.set('burstStart', false);
+        if (index > 0) collection.at(index - 1).set('burstFinal', state.prevFinal);
 
-        // `/me` status
-        if (chat.get('status')) {
-          burstUser = null;
-          chat.set('burstStart', true);
-          chat.set('burstFinal', true);
-          if (index > 0) collection.at([index - 1]).set('burstFinal', true);
-        }
+        // var newSentTime = chat.get('sent').valueOf();
+        // var sinceBurstStart = newSentTime - burstStart; // get the duration since last burst
+        // var newUser = chat.get('fromUser') && chat.get('fromUser').username;
+        // var prevChatIsStatus = (index > 0) ? collection.at(index - 1).get('status') : false;
 
-        // if we do not currently have a burst user set new as current and create a new burst
-        if (!burstUser) {
-          burstUser = newUser;
-          burstStart = newSentTime;
-          chat.set('burstStart', true);
-          if (index > 0) collection.at([index - 1]).set('burstFinal', true);
-        }
+        // // always set the chat-item to be false for both final and start
+        // chat.set('burstFinal', false);
+        // chat.set('burstStart', false);
 
-        // if the current user is different or the duration since last burst is larger than 5 minutes we have a new burst
-        if (prevChatIsStatus || newUser !== burstUser || sinceBurstStart > BURST_WINDOW) {
-          burstUser = newUser;
-          burstStart = newSentTime;
-          chat.set('burstStart', true);
-          if (index > 0) collection.at([index - 1]).set('burstFinal', true);
-        }
+        // // `/me` status
+        // if (chat.get('status')) {
+        //   burstUser = null;
+        //   chat.set('burstStart', true);
+        //   chat.set('burstFinal', true);
+        //   if (index > 0) collection.at([index - 1]).set('burstFinal', true);
+        // }
+
+        // // if we do not currently have a burst user set new as current and create a new burst
+        // if (!burstUser) {
+        //   burstUser = newUser;
+        //   burstStart = newSentTime;
+        //   chat.set('burstStart', true);
+        //   if (index > 0) collection.at([index - 1]).set('burstFinal', true);
+        // }
+
+        // // if the current user is different or the duration since last burst is larger than 5 minutes we have a new burst
+        // if (prevChatIsStatus || newUser !== burstUser || sinceBurstStart > BURST_WINDOW) {
+        //   burstUser = newUser;
+        //   burstStart = newSentTime;
+        //   chat.set('burstStart', true);
+        //   if (index > 0) collection.at([index - 1]).set('burstFinal', true);
+        // }
       });
     return collection.toJSON();
   }
 
   /* public interface */
   return {
-    calc: calculate,
+    calc: findSlice,
     parse: parse
   };
 });
