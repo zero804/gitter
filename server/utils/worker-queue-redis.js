@@ -9,12 +9,12 @@ var connectionDetails = {
   redis: redis.createClient()
 };
 
-var scheduler = new resque.scheduler({connection: connectionDetails}, function(){
+var scheduler = new resque.scheduler({connection: connectionDetails}, function() {
   scheduler.start();
 });
 
-scheduler.on('error', function(err){
-  winston.error('scheduler failed: ' + err, { exception: err });
+scheduler.on('error', function(err) {
+  winston.error('worker-queue-redis: scheduler failed: ' + err, { exception: err });
 });
 
 var jobs = {
@@ -36,46 +36,46 @@ var Queue = function(name, options, loaderFn) {
     self.worker.start();
   });
 
-  this.internalQueue = new resque.queue({connection: connectionDetails}, jobs, function(){
+  this.internalQueue = new resque.queue({connection: connectionDetails}, jobs, function() {
     // ready to add to queue
   });
 
   this.worker.on('start', function() {
-    winston.silly('worker started');
+    winston.silly('worker-queue-redis: started ' + self.name);
   });
 
-  this.worker.on('end', function(){
-    winston.silly("worker ended");
+  this.worker.on('end', function() {
+    winston.silly("worker-queue-redis: ended " + self.name);
   });
 
   this.worker.on('cleaning_worker', function(worker) {
-    winston.silly("cleaning old worker " + worker);
+    winston.silly("worker-queue-redis: cleaning old worker: " + worker);
   });
 
-  this.worker.on('poll',            function(queue){
-    winston.silly("worker polling " + queue);
+  this.worker.on('poll', function(queue) {
+    winston.silly("worker-queue-redis: polling " + queue);
   });
 
-  this.worker.on('job', function(queue, job){
-    winston.silly("working job " + queue + " " + JSON.stringify(job));
+  this.worker.on('job', function(queue, job) {
+    winston.silly("worker-queue-redis: working job " + queue + " " + JSON.stringify(job));
   });
 
-  this.worker.on('reEnqueue', function(queue, job, plugin){
-    winston.silly("reEnqueue job (" + plugin + ") " + queue + " " + JSON.stringify(job));
+  this.worker.on('reEnqueue', function(queue, job, plugin) {
+    winston.silly("worker-queue-redis: reEnqueue job (" + plugin + ") " + queue + " " + JSON.stringify(job));
   });
 
-  this.worker.on('pause', function(){
-    winston.silly("worker paused");
+  this.worker.on('pause', function() {
+    winston.silly("worker-queue-redis: paused " + self.name);
   });
 
   this.worker.on('success', function(queue, job, result){
     self.fn(result, function(err) {
-      if(err) return winston.error('worker callback failed: ' + err, { exception: err });
+      if(err) return winston.error('worker-queue-redis: callback failed: ' + err, { queue: queue, job: job, exception: err });
     });
   });
 
   this.worker.on('error', function(queue, job, err) {
-    winston.error('queue worker failed: ' + err, { queue: queue, job: job, exception: err });
+    winston.error('worker-queue-redis: failed: ' + err, { queue: queue, job: job, exception: err });
   });
 };
 
