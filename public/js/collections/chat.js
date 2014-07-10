@@ -80,7 +80,6 @@ define([
     initialize: function() {
       this.listenTo(this, 'add remove', function (model, collection) {
         collection.once('sort', function () {
-          console.log('sort called');
           burstCalculator.calc.call(collection, model);
           return;
         });
