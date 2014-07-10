@@ -4,8 +4,16 @@
 
 var testRequire = require('../test-require');
 var assert = require('assert');
+var workerQueue = testRequire('./utils/worker-queue-redis');
 
 describe('redis-batcher', function() {
+  // queue takes a while to start up
+  this.timeout(10000);
+
+  before(function() {
+    workerQueue.startScheduler();
+  });
+
   it('should batch tasks together', function(done) {
     var RedisBatcher = testRequire('./utils/redis-batcher').RedisBatcher;
 
@@ -77,4 +85,9 @@ describe('redis-batcher', function() {
 
 
   });
+
+  after(function(done) {
+    workerQueue.stopScheduler(done);
+  });
+
 });
