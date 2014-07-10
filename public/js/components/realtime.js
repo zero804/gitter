@@ -247,7 +247,7 @@ define([
               client.disable('websockets');
             }
           }
-        }, timeout * 1000);
+        }, timeout * 2 * 1000);
       }
     });
 

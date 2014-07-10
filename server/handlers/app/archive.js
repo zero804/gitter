@@ -32,7 +32,6 @@ exports.datesList = [
 
             res.render('archive-home-template', {
               layout: 'archive',
-              lang: languageSelector(req),
               user: user,
               archives: true,
               troupeContext: troupeContext,

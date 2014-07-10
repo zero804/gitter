@@ -125,7 +125,9 @@ var MODULES = [
   }
 ];
 
-var CLOSURE_PATH = 'build-scripts/closure-v20140625';
+// Unfortunately we can't upgrade to the latest closure
+// as it won't let you mix strict and unstrict code
+var CLOSURE_PATH = 'build-scripts/closure-v20130722';
 
 module.exports = function( grunt ) {
   'use strict';
@@ -135,12 +137,12 @@ module.exports = function( grunt ) {
   function createClosureConfig(modules) {
     var config = {};
 
-    var closureModule = grunt.option('closureModule');
+    var selectedModule = grunt.option('module');
 
     modules.forEach(function(module) {
       var name = module.name;
 
-      if(closureModule && closureModule !== name + '.js') return;
+      if(selectedModule && selectedModule !== name + '.js') return;
 
       config[module.name] = {
         js: 'public-processed/js/' + name + '.js',
@@ -167,8 +169,6 @@ module.exports = function( grunt ) {
       requireConfig[module.name] = {
         options: {
           optimize: 'none',
-          generateSourceMaps: true,
-          preserveLicenseComments: false,
           baseUrl: "public/js",
           name: module.name,
           include: module.include,
@@ -193,16 +193,43 @@ module.exports = function( grunt ) {
     return requireConfig;
   }
 
-  function appendSourceMapping(modules) {
+  function createUglifyConfig(modules) {
+    var c = {};
 
-    var config = {};
-
-    var closureModule = grunt.option('closureModule');
+    var selectedModule = grunt.option('module');
 
     modules.forEach(function(module) {
       var name = module.name;
 
-      if(closureModule && closureModule !== name + '.js') return;
+      if(selectedModule && selectedModule !== name + '.js') return;
+
+      var files = {};
+
+      files['public-processed/js/' + name + '.min.js'] =  ['public-processed/js/' + name + '.js'];
+
+      c[name] = {
+        options: {
+          // sourceMap: true,
+          // sourceMapIncludeSources: true,
+          // sourceMapIn: 'example/coffeescript-sourcemap.js', // input sourcemap from a previous compilation
+        },
+        files: files
+      };
+    });
+
+    return c;
+  }
+
+  function appendSourceMapping(modules) {
+
+    var config = {};
+
+    var selectedModule = grunt.option('module');
+
+    modules.forEach(function(module) {
+      var name = module.name;
+
+      if(selectedModule && selectedModule !== name + '.js') return;
       var files = {};
       files["public-processed/js/" + name + ".min.js"] = name + ".js.map";
       config[module.name] = {
@@ -227,8 +254,28 @@ module.exports = function( grunt ) {
     },
 
     requirejs: compileRequireModules(MODULES),
+    "uglify": createUglifyConfig(MODULES),
     "closure-compiler": createClosureConfig(MODULES),
     "append-sourcemapping": appendSourceMapping(MODULES),
+
+    jsonlint: {
+      config: {
+        src: grunt.file.expand('config/**/*.json')
+      }
+    },
+
+    htmlmin: {                                     // Task
+      dist: {                                      // Target
+        options: {                                 // Target options
+          removeComments: true,
+          collapseWhitespace: true,
+          minifyJS: true,
+          minifyCSS: true
+        },
+        files: grunt.file.expandMapping('templates/**/*.hbs', 'public-processed', { cwd: 'public'})
+      }
+    },
+
     // default watch configuration
     watch: {
       less: {
@@ -274,11 +321,6 @@ module.exports = function( grunt ) {
       }
     },
 
-    uglify: {
-      mangle: {toplevel: true},
-      squeeze: {dead_code: false},
-      codegen: {quote_keys: true}
-    },
 
     less: {
       production: {
@@ -444,8 +486,8 @@ module.exports = function( grunt ) {
   /* using matchdep to load all grunt related modules */
   require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
-  grunt.registerTask('process', ['less', 'requirejs', 'closure-compiler']);
-  grunt.registerTask('closure', ['closure-compiler', 'append-sourcemapping']);
+  grunt.registerTask('process', ['jsonlint', 'less', 'requirejs', 'closure-compiler']);
+  grunt.registerTask('manglejs', ['uglify']);
   grunt.registerTask('process-no-min', ['less', 'requirejs']);
   grunt.registerTask('client-libs', ['bowerRequireWrapper']);
 
