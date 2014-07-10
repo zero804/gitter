@@ -2,9 +2,10 @@
 define([
   'backbone',
   'assert',
+  'utils/log',
   'utils/momentWrapper',
   'utils/burst-calculator'
-], function (Backbone, assert, moment, bc) {
+], function (Backbone, assert, log, moment, bc) {
 
   var Message = Backbone.Model;
   var Collection = Backbone.Collection;
@@ -19,10 +20,10 @@ define([
       if (!burstStart || !burstFinal) {
         var a = testData[i];
         var b = validationSet[i];
-        console.log(a.text, 'is different');
-        console.log('ACTUAL:', 'burstStart:', a.burstStart, 'burstFinal:', a.burstFinal);
-        console.log('EXPECTED:', 'burstStart:', b.burstStart, 'burstFinal:', b.burstFinal);
-        // visualize(collection);
+        log(a.text, 'is different');
+        log('ACTUAL:', 'burstStart:', a.burstStart, 'burstFinal:', a.burstFinal);
+        log('EXPECTED:', 'burstStart:', b.burstStart, 'burstFinal:', b.burstFinal);
+        visualize(collection);
         return false;
       }
     }
@@ -32,7 +33,7 @@ define([
 
   function visualize (collection) {
     collection.each(function (m) {
-      console.log((m.get('burstStart') ? '\u2022' : ' '), (m.get('burstFinal') ? '\u25e6' : ' '), m.get('sent').format('h:mm:ss:SSS'), '-', m.get('fromUser').username, 'said:', m.get('text'));
+      log((m.get('burstStart') ? '\u2022' : ' '), (m.get('burstFinal') ? '\u25e6' : ' '), m.get('sent').format('h:mm:ss:SSS'), '-', m.get('fromUser').username, 'said:', m.get('text'));
     });
   }
 
@@ -450,7 +451,7 @@ define([
           sendMessage.call(res, 'CRAZY INSERTION', 512);
           sendMessage.call(res, 'CRAZY_INSERTION', 950);
 
-          // TODO: TOGGLE IT FOR A NICE CONSOLE VISUALIZATION OF THE MESSAGES BURSTS AND SUCH
+          // TODO: TOGGLE IT FOR A LOG VISUALIZATION OF THE MESSAGES BURSTS AND SUCH
           assert(validateAgainstParse(res));
 
           done();
