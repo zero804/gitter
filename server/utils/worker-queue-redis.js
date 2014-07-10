@@ -3,7 +3,9 @@
 
 var redis = require('./redis');
 var resque = require("node-resque");
-var winston = require('./winston');
+var env = require('./env');
+var logger = env.logger;
+var stats = env.stats;
 var os = require('os');
 
 var connectionDetails = {
@@ -15,7 +17,8 @@ var scheduler = new resque.scheduler({connection: connectionDetails}, function()
 });
 
 scheduler.on('error', function(err) {
-  winston.error('worker-queue-redis: scheduler failed: ' + err, { exception: err });
+  logger.error('worker-queue-redis: scheduler failed: ' + err, { exception: err });
+  stats.event('resque.scheduler.error', { exception: err });
 });
 
 var jobs = {
@@ -59,41 +62,48 @@ var Queue = function(name, options, loaderFn) {
   });
 
   this.worker.on('start', function() {
-    winston.silly('worker-queue-redis: started ' + self.name);
+    logger.silly('worker-queue-redis: started ' + self.name);
+    stats.event('resque.worker.started', { name: self.worker.name });
   });
 
   this.worker.on('end', function() {
-    winston.silly("worker-queue-redis: ended " + self.name);
+    logger.silly("worker-queue-redis: ended " + self.name);
+    stats.event('resque.worker.ended', { name: self.worker.name });
   });
 
   this.worker.on('cleaning_worker', function(worker) {
-    winston.silly("worker-queue-redis: cleaning old worker: " + worker);
+    logger.silly("worker-queue-redis: cleaning old worker: " + worker);
+    stats.event('resque.worker.cleaning', { cleaner: self.worker.name, beingCleaned: worker });
   });
 
   this.worker.on('poll', function(queue) {
-    winston.silly("worker-queue-redis: polling " + queue);
+    stats.eventHF('resque.worker.polling', { name: self.worker.name, queue: queue }, 0.005);
   });
 
   this.worker.on('job', function(queue, job) {
-    winston.silly("worker-queue-redis: working job " + queue + " " + JSON.stringify(job));
+    logger.silly("worker-queue-redis: working job " + queue + " " + JSON.stringify(job));
+    stats.eventHF('resque.worker.working', { name: self.worker.name, queue: queue, job: job });
   });
 
   this.worker.on('reEnqueue', function(queue, job, plugin) {
-    winston.silly("worker-queue-redis: reEnqueue job (" + plugin + ") " + queue + " " + JSON.stringify(job));
+    logger.silly("worker-queue-redis: reEnqueue job (" + plugin + ") " + queue + " " + JSON.stringify(job));
+    stats.event('resque.worker.reenqueue', { name: self.worker.name, queue: queue, job: job, plugin: plugin });
   });
 
   this.worker.on('pause', function() {
-    winston.silly("worker-queue-redis: paused " + self.name);
+    stats.eventHF('resque.worker.paused', { name: self.worker.name }, 0.005);
   });
 
   this.worker.on('success', function(queue, job, result){
     self.fn(result, function(err) {
-      if(err) return winston.error('worker-queue-redis: callback failed: ' + err, { queue: queue, job: job, exception: err });
+      if(err) return logger.error('worker-queue-redis: callback failed: ' + err, { queue: queue, job: job, exception: err });
     });
+    stats.eventHF('resque.worker.success', { name: self.worker.name });
   });
 
   this.worker.on('error', function(queue, job, err) {
-    winston.error('worker-queue-redis: failed: ' + err, { queue: queue, job: job, exception: err });
+    logger.error('worker-queue-redis: failed: ' + err, { queue: queue, job: job, exception: err });
+    stats.event('resque.worker.error', { name: self.worker.name, queue: queue, job: job, exception: err });
   });
 };
 
