@@ -15,7 +15,6 @@ require([
       'in-browser/is-android-test',
       'in-browser/mixpanel-test',
       'in-browser/realtime-test',
-      // 'in-browser/sortable-marionette-test', // TODO: failing at the moment, FIX IT!
       'in-browser/unread-items-client-test',
       'in-browser/rollers-test'
     ], function () {
@@ -26,3 +25,6 @@ require([
       }
     });
 });
+
+// TODO: failing at the moment, FIX IT!
+// 'in-browser/sortable-marionette-test',
