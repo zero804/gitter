@@ -4,8 +4,16 @@
 
 var testRequire = require('../test-require');
 var assert = require('assert');
+var workerQueue = testRequire('./utils/worker-queue-redis');
 
 describe('redis-batcher', function() {
+  // queue takes a while to start up
+  this.timeout(10000);
+
+  before(function() {
+    workerQueue.startScheduler();
+  });
+
   it('should batch tasks together', function(done) {
     var RedisBatcher = testRequire('./utils/redis-batcher').RedisBatcher;
 
@@ -15,7 +23,7 @@ describe('redis-batcher', function() {
       cb();
       count++;
 
-      assert(items.length === 4, 'Expected 4 items');
+      assert.equal(items.length, 4, 'Expected 4 items');
       assert(items.indexOf('a') >= 0, 'Expected items a,b,c,d, got ' + items.join(','));
       assert(items.indexOf('b') >= 0, 'Expected items a,b,c,d, got ' + items.join(','));
       assert(items.indexOf('c') >= 0, 'Expected items a,b,c,d, got ' + items.join(','));
@@ -77,4 +85,9 @@ describe('redis-batcher', function() {
 
 
   });
+
+  after(function(done) {
+    workerQueue.stopScheduler(done);
+  });
+
 });
