@@ -63,6 +63,9 @@ define([
    */
   function findSlice (model) {
     if('burstStart' in model.attributes) return; // already calculated bursts for this batch
+    if (model.get('text') === '4') {
+      debugger;
+    }
     var index = this.indexOf(model);
     var start = findBurstAbove.call(this, index);
     var end = findBurstBelow.call(this, index);
@@ -82,7 +85,7 @@ define([
     var fromUser = chat.get('fromUser');
     var sent = chat.get('sent');
     var user = fromUser && fromUser.username;
-    var time = sent && sent.valueOf();
+    var time = sent && new Date(sent).valueOf();
 
     if (chat.get('status')) {
       state.burstStart = true;
