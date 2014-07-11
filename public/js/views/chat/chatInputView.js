@@ -417,8 +417,7 @@ define([
         if(compact) {
           css['padding-bottom'] = (height + EXTRA_PADDING) + 'px';
         } else {
-          // css['margin-bottom'] = height + 'px';
-          css['bottom'] = (height + 30) + 'px';
+          css['bottom'] = ($('#chat-input-wrapper').outerHeight()) + 'px';
         }
 
         log('Applying ', css, ' to ', frameChat);
@@ -431,9 +430,9 @@ define([
     function adjustScroll(initial) {
       if(!rollers) return;
       if(initial) {
-        rollers.adjustScroll(300);
+        rollers.adjustScroll(500);
       } else {
-        rollers.adjustScrollContinuously(300);
+        rollers.adjustScrollContinuously(500);
       }
     }
   };
@@ -458,7 +457,7 @@ define([
       if(hasScrollBars()) {
         this.$el.addClass("scroller");
       }
-      
+
       var chatResizer = new ChatCollectionResizer({
         compactView: this.compactView,
         el: this.el,
