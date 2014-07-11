@@ -458,7 +458,7 @@ define([
       if(hasScrollBars()) {
         this.$el.addClass("scroller");
       }
-
+      
       var chatResizer = new ChatCollectionResizer({
         compactView: this.compactView,
         el: this.el,
