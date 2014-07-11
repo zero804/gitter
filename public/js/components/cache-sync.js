@@ -1,4 +1,3 @@
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'log!cache-sync',
   'utils/context'
@@ -41,6 +40,7 @@ define([
       log('Cache contains ' + result.length + ' items');
 
       collection.reset(result, { parse: true });
+
       collection.forEach(function(model) {
         model.set('presnapshot', true);
       });

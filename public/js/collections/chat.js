@@ -1,19 +1,19 @@
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'underscore',
   'utils/context',
   './base',
   '../utils/momentWrapper',
+  '../utils/burst-calculator',
   'cocktail'
-], function(_, context, TroupeCollections, moment, cocktail) {
+], function (_, context, TroupeCollections, moment, burstCalculator, cocktail) {
   "use strict";
 
   var userId = context.getUserId();
 
   function mentionsUser(message) {
     var m = message.mentions;
-    if(!m) return false;
-    for(var i = 0; i < m.length; i++) {
+    if (!m) return false;
+    for (var i = 0; i < m.length; i++) {
       if(userId && m[i].userId === userId) return true;
     }
     return false;
@@ -21,23 +21,24 @@ define([
 
   var ChatModel = TroupeCollections.Model.extend({
     idAttribute: "id",
-    parse: function(message) {
-      if(message.sent) {
+    parse: function (message) {
+
+      if (message.sent) {
         message.sent = moment(message.sent, moment.defaultFormat);
       }
 
-      if(message.editedAt) {
+      if (message.editedAt) {
         message.editedAt = moment(message.editedAt, moment.defaultFormat);
       }
 
       // Check for the special case of messages from the current user
-      if(message.unread && message.fromUser) {
-        if(message.fromUser.id === userId) {
+      if (message.unread && message.fromUser) {
+        if (message.fromUser.id === userId) {
           message.unread = false;
         }
       }
 
-      if(mentionsUser(message)) {
+      if (mentionsUser(message)) {
         message.mentioned = true;
       } else {
         message.mentioned = false;
@@ -45,7 +46,6 @@ define([
 
       return message;
     },
-
     toJSON: function() {
       var d = _.clone(this.attributes);
       var sent = this.get('sent');
@@ -59,7 +59,6 @@ define([
 
       return d;
     }
-
   });
 
   var ChatCollection = TroupeCollections.LiveCollection.extend({
@@ -77,15 +76,29 @@ define([
         return sent.valueOf() + offset;
       }
     },
+    initialize: function() {
+      this.listenTo(this, 'add remove', function (model, collection) {
+        collection.once('sort', function () {
+          burstCalculator.calc.call(this, model);
+        });
+      });
 
-    findModelForOptimisticMerge: function(newModel) {
+      this.listenTo(this, 'reset sync', function () {
+        burstCalculator.parse(this);
+      });
+    },
+    parse: function (collection) {
+      return burstCalculator.parse(collection);
+    },
+    findModelForOptimisticMerge: function (newModel) {
       var optimisticModel = this.find(function(model) {
         return !model.id && model.get('text') === newModel.get('text');
       });
 
       return optimisticModel;
-    }
+    },
   });
+
   cocktail.mixin(ChatCollection, TroupeCollections.ReversableCollectionBehaviour);
 
   var ReadByModel = TroupeCollections.Model.extend({

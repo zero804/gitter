@@ -1,4 +1,3 @@
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'log!chat-input',
   'jquery',
@@ -301,9 +300,9 @@ define([
     },
 
     /**
-     * send() {describe}
+     * send() what does send do?
      *
-     * @param <String> val
+     * @param <String> val describe `val`
      * @return <Boolean>
      */
     send: function (val) {
@@ -437,8 +436,6 @@ define([
         rollers.adjustScrollContinuously(300);
       }
     }
-
-
   };
 
   var ChatInputBoxView = TroupeViews.Base.extend({
@@ -461,6 +458,7 @@ define([
       if(hasScrollBars()) {
         this.$el.addClass("scroller");
       }
+      
       var chatResizer = new ChatCollectionResizer({
         compactView: this.compactView,
         el: this.el,

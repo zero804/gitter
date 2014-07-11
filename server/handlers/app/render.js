@@ -7,9 +7,10 @@ var contextGenerator  = require('../../web/context-generator');
 var restful           = require('../../services/restful');
 var languageSelector  = require('../../web/language-selector');
 var appVersion        = require('../../web/appVersion');
+var burstCalculator   = require('../../utils/burst-calculator');
 
 /* How many chats to send back */
-var INITIAL_CHAT_COUNT = 20;
+var INITIAL_CHAT_COUNT = 50;
 
 var stagingText, stagingLink;
 
@@ -66,7 +67,6 @@ function renderHomePage(req, res, next) {
   });
 }
 
-
 function renderMainFrame(req, res, next, frame) {
   contextGenerator.generateNonChatContext(req)
     .then(function(troupeContext) {
@@ -101,10 +101,11 @@ function renderMainFrame(req, res, next, frame) {
 function renderChatPage(req, res, next) {
   var troupe = req.uriContext.troupe;
   var userId = req.user && req.user.id;
+
   Q.all([
     contextGenerator.generateTroupeContext(req),
     restful.serializeChatsForTroupe(troupe.id, userId, { limit: INITIAL_CHAT_COUNT })
-    ]).spread(function(troupeContext, chats) {
+    ]).spread(function (troupeContext, chats) {
 
       var githubLink;
 
@@ -123,7 +124,7 @@ function renderChatPage(req, res, next) {
         troupeFavourite: troupeContext.troupe.favourite,
         user: troupeContext.user,
         troupeContext: troupeContext,
-        chats: chats,
+        chats: burstCalculator(chats),
         agent: req.headers['user-agent'],
         lang: languageSelector(req),
         locale: req.i18n,
@@ -159,8 +160,9 @@ function renderMobileChat(req, res, next) {
 
   Q.all([
     contextGenerator.generateTroupeContext(req),
-    restful.serializeChatsForTroupe(troupe.id, userId, { limit: INITIAL_CHAT_COUNT })
+      restful.serializeChatsForTroupe(troupe.id, userId, { limit: INITIAL_CHAT_COUNT })
     ]).spread(function(troupeContext, chats) {
+      burstCalculator(chats);
       res.render('mobile/mobile-app', {
         appCache: getAppCache(req),
         bootScriptName: 'mobile-app',
@@ -169,7 +171,7 @@ function renderMobileChat(req, res, next) {
         troupeFavourite: troupeContext.troupe.favourite,
         user: troupeContext.user,
         troupeContext: troupeContext,
-        chats: chats,
+        chats: burstCalculator(chats),
         agent: req.headers['user-agent'],
         lang: languageSelector(req),
         locale: req.i18n,
@@ -215,7 +217,6 @@ function renderMobileNativeUserhome(req, res) {
   });
 }
 
-
 function renderMobileNotLoggedInChat(req, res, next) {
   var troupe = req.uriContext.troupe;
 
@@ -229,7 +230,7 @@ function renderMobileNotLoggedInChat(req, res, next) {
         troupeTopic: troupeContext.troupe.topic,
         troupeFavourite: troupeContext.troupe.favourite,
         troupeContext: troupeContext,
-        chats: chats,
+        chats: burstCalculator(chats),
         agent: req.headers['user-agent'],
         lang: languageSelector(req),
         locale: req.i18n
@@ -262,7 +263,7 @@ function renderNotLoggedInChatPage(req, res, next) {
         troupeName: req.uriContext.uri,
         troupeTopic: troupeContext.troupe.topic,
         troupeContext: troupeContext,
-        chats: chats,
+        chats: burstCalculator(chats),
         agent: req.headers['user-agent'],
         lang: languageSelector(req),
         locale: req.i18n
