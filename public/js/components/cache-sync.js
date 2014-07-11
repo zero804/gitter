@@ -40,6 +40,7 @@ define([
       log('Cache contains ' + result.length + ' items');
 
       collection.reset(result, { parse: true });
+
       collection.forEach(function(model) {
         model.set('presnapshot', true);
       });

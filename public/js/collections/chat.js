@@ -23,22 +23,22 @@ define([
     idAttribute: "id",
     parse: function (message) {
 
-      if(message.sent) {
+      if (message.sent) {
         message.sent = moment(message.sent, moment.defaultFormat);
       }
 
-      if(message.editedAt) {
+      if (message.editedAt) {
         message.editedAt = moment(message.editedAt, moment.defaultFormat);
       }
 
       // Check for the special case of messages from the current user
-      if(message.unread && message.fromUser) {
-        if(message.fromUser.id === userId) {
+      if (message.unread && message.fromUser) {
+        if (message.fromUser.id === userId) {
           message.unread = false;
         }
       }
 
-      if(mentionsUser(message)) {
+      if (mentionsUser(message)) {
         message.mentioned = true;
       } else {
         message.mentioned = false;
@@ -79,13 +79,12 @@ define([
     initialize: function() {
       this.listenTo(this, 'add remove', function (model, collection) {
         collection.once('sort', function () {
-          burstCalculator.calc.call(collection, model);
-          return;
+          burstCalculator.calc.call(this, model);
         });
       });
 
-      this.listenTo(this, 'reset', function (collection) {
-        burstCalculator.parse.call(this, collection);
+      this.listenTo(this, 'reset sync', function () {
+        burstCalculator.parse(this);
       });
     },
     parse: function (collection) {
