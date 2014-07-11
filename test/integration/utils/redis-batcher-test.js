@@ -5,6 +5,7 @@
 var testRequire = require('../test-require');
 var assert = require('assert');
 var workerQueue = testRequire('./utils/worker-queue-redis');
+var uuid = require('node-uuid');
 
 describe('redis-batcher', function() {
   // queue takes a while to start up
@@ -17,7 +18,7 @@ describe('redis-batcher', function() {
   it('should batch tasks together', function(done) {
     var RedisBatcher = testRequire('./utils/redis-batcher').RedisBatcher;
 
-    var underTest = new RedisBatcher('test1', 0);
+    var underTest = new RedisBatcher('test1-' + uuid.v4(), 0);
     var count = 0;
     underTest.listen(function(key, items, cb) {
       cb();
@@ -55,7 +56,7 @@ describe('redis-batcher', function() {
   it('should keep separate keys separate', function(done) {
     var RedisBatcher = testRequire('./utils/redis-batcher').RedisBatcher;
 
-    var underTest = new RedisBatcher('test2', 0);
+    var underTest = new RedisBatcher('test2-' + uuid.v4(), 0);
 
     var keys = {};
     underTest.listen(function(key, items, cb) {
