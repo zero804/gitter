@@ -418,7 +418,7 @@ define([
           css['padding-bottom'] = (height + EXTRA_PADDING) + 'px';
         } else {
           // css['margin-bottom'] = height + 'px';
-          css['bottom'] = (height + 30) + 'px';
+          css['bottom'] = (height + 48) + 'px';
         }
 
         log('Applying ', css, ' to ', frameChat);
