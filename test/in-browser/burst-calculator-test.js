@@ -468,7 +468,8 @@ define([
         { parse: true }
       );
 
-      visualize(chatCollection);
+      // TODO: TURN THIS ON TO VISUALIZE STUFF
+      // visualize(chatCollection);
       assert(validateAgainstParse(chatCollection));
     });
   });
