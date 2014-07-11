@@ -10,7 +10,7 @@ var appVersion        = require('../../web/appVersion');
 var burstCalculator   = require('../../utils/burst-calculator');
 
 /* How many chats to send back */
-var INITIAL_CHAT_COUNT = 30;
+var INITIAL_CHAT_COUNT = 50;
 
 var stagingText, stagingLink;
 
