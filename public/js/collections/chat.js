@@ -84,7 +84,7 @@ define([
         });
       });
 
-      this.listenTo(this, 'reset sync', function (collection) {
+      this.listenTo(this, 'reset sync', function () {
         burstCalculator.parse(this);
       });
     },
