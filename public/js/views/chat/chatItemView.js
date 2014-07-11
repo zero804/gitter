@@ -23,10 +23,10 @@ define([
 
   "use strict";
 
-  /** @const */
-  var OLD_TIMEOUT = 3600000 /*1 hour*/;
+  /* @const */
+  var OLD_TIMEOUT = 3600000; /*1 hour*/
 
-  /** @const */
+  /* @const */
   var EDIT_WINDOW = 240000;
 
   var mouseEvents = {
@@ -170,7 +170,6 @@ define([
         var editIcon = this.$el.find('.js-chat-item-edit');
         editIcon.tooltip({ container: 'body', title: this.getEditTooltip.bind(this) });
       }
-
     },
 
     timeChange: function() {
@@ -181,12 +180,22 @@ define([
     },
 
     updateRender: function(changes) {
+
       if(!changes || 'fromUser' in changes) {
         this.$el.toggleClass('isViewers', this.isOwnMessage());
       }
 
       if(!changes || 'editedAt' in changes) {
         this.$el.toggleClass('hasBeenEdited', this.hasBeenEdited());
+      }
+
+      if(!changes || 'burstStart' in changes) {
+        this.$el.toggleClass('burstStart', this.model.get('burstStart'));
+        this.$el.toggleClass('burstContinued', !this.model.get('burstStart'));
+      }
+
+      if (!changes || 'burstFinal' in changes) {
+        this.$el.toggleClass('burstFinal', this.model.get('burstFinal'));
       }
 
       /* Don't run on the initial (changed=undefined) as its done in the template */
@@ -356,7 +365,7 @@ define([
 
   cocktail.mixin(ChatItemView, KeyboardEventMixins);
 
-  if(context.isLoggedIn()) {
+  if (context.isLoggedIn()) {
     cocktail.mixin(ChatItemView, UnreadItemViewMixin);
   }
 

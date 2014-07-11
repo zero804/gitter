@@ -1347,6 +1347,7 @@ Faye.Client = Faye.Class({
   },
 
   reset: function() {
+    this._dispatcher.reset();
     this._state     = this.UNCONNECTED;
     this._cycleConnection();
   },
@@ -1458,10 +1459,29 @@ Faye.Dispatcher = Faye.Class({
     this.headers[name] = value;
   },
 
+  reset: function() {
+    this.close();
+    var transports = this.transports.websocket;
+    if(transports) {
+      this.transports.websocket = {};
+
+      for(var key in transports) {
+        if(transports.hasOwnProperty(key)) {
+          var transport = transports[key];
+          if(transport) transport.close();
+        }
+      }
+    }
+
+  },
+
   close: function() {
     var transport = this._transport;
     delete this._transport;
-    if (transport) transport.close();
+    if (transport) {
+      this.info('Dispatch close to close transport.');
+      transport.close();
+    }
   },
 
   selectTransport: function(transportTypes) {
@@ -1487,6 +1507,7 @@ Faye.Dispatcher = Faye.Class({
     if (envelope.request || envelope.timer) return;
 
     envelope.timer = Faye.ENV.setTimeout(function() {
+      self.debug('Delivery of message ? timed out', id);
       self.handleError(message, false);
     }, timeout * 1000);
 
@@ -1515,17 +1536,25 @@ Faye.Dispatcher = Faye.Class({
 
     if (!envelope || !envelope.request) return;
 
+    this.debug('handleError');
+
     request.then(function(req) {
-      if (req && req.abort) req.abort();
+      if (req && req.abort) {
+        self.debug('Aborting request');
+        req.abort();
+      }
     });
 
     Faye.ENV.clearTimeout(envelope.timer);
     envelope.request = envelope.timer = null;
 
     if (immediate) {
+      this.debug('Retrying message#? delivery immediately', message.id);
       this.sendMessage(envelope.message, envelope.timeout);
     } else {
+      this.debug('Retrying message#? delivery after timeout', message.id);
       envelope.timer = Faye.ENV.setTimeout(function() {
+        self.debug('Attempting redelivery of failed message');
         envelope.timer = null;
         self.sendMessage(envelope.message, envelope.timeout);
       }, this.retry * 1000);
@@ -2231,11 +2260,21 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
     for (var i = 0, n = messages.length; i < n; i++) this._pending.add(messages[i]);
 
     this.callback(function(socket) {
-      if (!socket) return;
+      if (!socket) {
+        this.info('Cancelling request as socket has been closed');
+        // Should we this._handleError(messages);
+        return;
+      }
+
+      if (socket.readyState !== 1) {
+        this._handleError(messages);
+        return;
+      }
+
       try {
         socket.send(Faye.toJSON(messages));
       } catch(e) {
-        self._handleError(messages);
+        this._handleError(messages);
       }
     }, this);
     this.connect();
@@ -2276,7 +2315,7 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
 
       self._invalidateSocket();
 
-      if (this._closing) {
+      if (self._closing) {
         self.info('Websocket closed as expected. code ?, reason ?, wasClean ?', event && event.code, event && event.reason, event && event.wasClean);
       } else {
         self.warn('Websocket closed unexpectedly. code ?, reason ?, wasClean ?', event && event.code, event && event.reason, event && event.wasClean);
@@ -2305,6 +2344,7 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
     };
 
     socket.onmessage = function(event) {
+      self.debug('Websocket message received');
       var replies = JSON.parse(event.data);
       if (!replies) return;
 
@@ -2325,7 +2365,6 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
     this.info('Websocket transport close requested');
     this._socket.close();
     this._invalidateSocket();
-    delete this._socket;
   },
 
   _createSocket: function() {
@@ -2349,9 +2388,22 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
   _ping: function() {
     if (!this._socket) return;
 
+    if (this._socket.readyState !== 1) {
+      this.warn('Websocket unable to send. readyState=?', this._socket.readyState);
+      this.close();
+      return;
+    }
+
     this.debug('Websocket transport ping');
 
-    this._socket.send('[]');
+    try {
+      this._socket.send('[]');
+    } catch(e) {
+      this.warn('Websocket ping failed: ?', e);
+      this.close();
+      return;
+    }
+
     this.addTimeout('ping', this._dispatcher.timeout / 2, this._ping, this);
     this.addTimeout('pingTimeout', this._dispatcher.timeout / 1.5, this._pingTimeout, this);
   },
