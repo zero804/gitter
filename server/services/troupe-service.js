@@ -480,6 +480,20 @@ function updateTopic(user, troupe, topic) {
     });
 }
 
+function toggleSearchIndexing(user, troupe, bool) {
+  return roomPermissionsModel(user, 'admin', troupe)
+    .then(function(access) {
+      if(!access) throw 403; /* Forbidden */
+
+      troupe.noindex = bool;
+
+      return troupe.saveQ()
+        .then(function() {
+          return troupe;
+        });
+    });
+}
+
 function updateTroupeLurkForUserId(userId, troupeId, lurk) {
   return findById(troupeId)
     .then(function(troupe) {
@@ -630,6 +644,7 @@ module.exports = {
   findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe,
 
   updateTopic: updateTopic,
-  updateTroupeLurkForUserId: updateTroupeLurkForUserId
+  updateTroupeLurkForUserId: updateTroupeLurkForUserId,
+  toggleSearchIndexing: toggleSearchIndexing
 
 };
