@@ -24,7 +24,7 @@ function die(error) {
   process.exit(1);
 }
 
-persistence.Troupe.findQ({ security: 'PUBLIC' }, { _id: 1, uri: 1 })
+persistence.Troupe.findQ({ security: 'PUBLIC', '$or': [{'noindex': {'$exists': false}}, {'noindex': false}]}, { _id: 1, uri: 1 })
   .then(function(troupes) {
     var uris = troupes.reduce(function(memo,value) { memo[value._id] = value.uri; return memo; }, {});
     var ids = troupes.map(function(value) { return value._id; });

@@ -63,6 +63,10 @@ module.exports = {
       promises.push(troupeService.updateTopic(req.user, troupe, updatedTroupe.topic));
     }
 
+    if(updatedTroupe.hasOwnProperty('noindex')) {
+      promises.push(troupeService.toggleSearchIndexing(req.user, troupe, updatedTroupe.noindex));
+    }
+
     Q.all(promises)
       .then(function() {
         troupeService.findById(troupe.id, function(err, troupe) {
