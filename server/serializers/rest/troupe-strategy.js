@@ -276,6 +276,7 @@ function TroupeStrategy(options) {
       githubType: item.githubType,
       security: item.security,
       premium: premiumRoomStrategy.map(item),
+      noindex: item.noindex,
       v: getVersion(item)
     };
   };
