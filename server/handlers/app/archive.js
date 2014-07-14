@@ -11,6 +11,7 @@ var roomService = require('../../services/room-service');
 var env              = require('../../utils/env');
 var roomCapabilities = require('../../services/room-capabilities');
 var burstCalculator   = require('../../utils/burst-calculator');
+var roomPermissionsModel = require('../../services/room-permissions-model');
 
 exports.datesList = [
   appMiddleware.uriContextResolverMiddleware,
@@ -27,21 +28,31 @@ exports.datesList = [
           req.session.returnTo = '/' + troupe.uri;
         }
 
-        return contextGenerator.generateTroupeContext(req)
-          .then(function(troupeContext) {
+        var roomUrl = '/api/v1/rooms/' + troupe.id;
 
-            res.render('archive-home-template', {
-              layout: 'archive',
-              user: user,
-              archives: true,
-              troupeContext: troupeContext,
-              bootScriptName: 'router-archive-home',
-              troupeTopic: troupe.topic,
-              githubLink: '/' + req.uriContext.uri,
-              troupeName: req.uriContext.uri,
-              isHomePage: true
-            });
+        return roomPermissionsModel(user, 'admin', troupe)
+          .then(function(access) {
 
+            return contextGenerator.generateTroupeContext(req)
+              .then(function(troupeContext) {
+
+                res.render('archive-home-template', {
+                  layout: 'archive',
+                  user: user,
+                  isAdmin: access,
+                  archives: true,
+                  troupeContext: troupeContext,
+                  bootScriptName: 'router-archive-home',
+                  troupeTopic: troupe.topic,
+                  githubLink: '/' + req.uriContext.uri,
+                  troupeName: req.uriContext.uri,
+                  isHomePage: true,
+                  noindex: troupe.noindex,
+                  roomUrl: roomUrl,
+                  accessToken: req.accessToken
+                });
+
+              });
           });
       })
       .fail(next);
@@ -136,6 +147,7 @@ exports.chatArchive = [
             var monthYearFormatted = moment(startDate).format('MMM YYYYY', { lang: language });
 
             var billingUrl = env.config.get('web:billingBaseUrl') + '/bill/' + req.uriContext.uri.split('/')[0];
+            var roomUrl = '/api/v1/rooms/' + troupe.id;
 
             return roomCapabilities.getPlanType(troupe.id).then(function(plan) {
               var historyHorizon = roomCapabilities.getMessageHistory(plan);
@@ -155,6 +167,9 @@ exports.chatArchive = [
                 limitReached: limitReached,
                 historyHorizon: historyHorizon,
                 billingUrl: billingUrl,
+                noindex: troupe.noindex,
+                roomUrl: roomUrl,
+                accessToken: req.accessToken,
 
                 /* For prerendered archive-navigation-view */
                 previousDate: previousDateFormatted,
