@@ -31,6 +31,25 @@ require([
     return true;
   });
 
+  $('#noindex').on("change", function() {
+    var noindex = $('#noindex')[0].checked;
+    $.ajax({
+      type: 'PUT',
+      url: '/api/v1/rooms/' + context.troupe().id,
+      data: {
+        noindex: !noindex
+      },
+      success: function() {
+        var msg = 'Room indexing disabled. The change will take effect the next time a search engine crawls this room.';
+        $('#noindexStatus').html(!noindex ? msg : '');
+      },
+      error: function() {
+        $('#noindexStatus').html('Oops, something went wrong. Reload and try again.');
+      }
+    });
+  });
+ 
+
   // When a user clicks an internal link, prevent it from opening in a new window
   $(document).on("click", "a.link", function(e) {
     var basePath = context.env('basePath');

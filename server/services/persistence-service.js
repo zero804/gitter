@@ -338,6 +338,7 @@ var TroupeSchema = new Schema({
   security: { type: String, /* WARNING: validation bug in mongo 'enum': ['PRIVATE', 'PUBLIC', 'INHERITED'], required: false */ }, // For REPO_CHANNEL, ORG_CHANNEL, USER_CHANNEL
   dateDeleted: { type: Date },
   dateLastSecurityCheck: { type: Date },
+  noindex: { type: Boolean, 'default': false},
   _nonce: { type: Number },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
