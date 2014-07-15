@@ -15,13 +15,8 @@ function searchGitterUsers(query, searcherId, excludeTroupeId, limit, skip, call
     excludeTroupeId: excludeTroupeId
   };
 
-  return userSearchService.searchForUsers(searcherId, query, options).then(function(searchResults) {
-    var strategy = new restSerializer.SearchResultsStrategy({
-      resultItemStrategy: new restSerializer.UserStrategy()
-    });
-
-    return restSerializer.serializeQ(searchResults, strategy);
-  }).nodeify(callback);
+  return userSearchService.searchForUsers(searcherId, query, options)
+    .nodeify(callback);
 }
 
 function searchGithubUsers(query, user, callback) {
@@ -30,8 +25,9 @@ function searchGithubUsers(query, user, callback) {
     var results = users.map(function (user) {
       return {
         username: user.login,
-        avatarUrlSmall: user.avatar_url + 's=60',
-        avatarUrlMedium: user.avatar_url + 's=128'
+        gravatarImageUrl: user.avatar_url,
+        getDisplayName: function() {},
+        getHomeUrl: function() {}
       };
     });
 
@@ -64,6 +60,12 @@ module.exports = {
           return gitterResults;
         })
         .then(function(searchResults) {
+          var strategy = new restSerializer.SearchResultsStrategy({
+            resultItemStrategy: new restSerializer.UserStrategy()
+          });
+
+          return restSerializer.serializeQ(searchResults, strategy);
+        }).then(function(searchResults) {
           res.send(searchResults);
         })
         .fail(next);
