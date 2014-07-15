@@ -46,6 +46,10 @@ function createBaseFixture() {
     generateGithubToken: generateGithubToken,
 
     cleanup: function() {
+      //persistence.User.removeQ();
+      //persistence.Troupe.removeQ();
+      //persistence.ChatMessage.removeQ();
+
       var self = this;
       Object.keys(this).forEach(function(key) {
         var o = self[key];
