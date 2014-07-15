@@ -28,7 +28,10 @@ module.exports = function(req, res, next) {
       return userService.findByUsernames(usernames);
     })
     .then(function(users) {
-      return restSerializer.serializeQ(users, new restSerializer.UserStrategy());
+      return users.filter(function(user) { return user.state !== 'INVITED'; });
+    })
+   .then(function(users) {
+     return restSerializer.serializeQ(users, new restSerializer.UserStrategy());
     })
     .then(function(serializeUsers) {
       res.send(serializeUsers);
