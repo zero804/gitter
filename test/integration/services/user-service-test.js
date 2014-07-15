@@ -43,6 +43,7 @@ describe("User Service", function() {
     userService.inviteByUsername('node-gitter')
     .then(function(user) {
       assert.equal(user.username,'node-gitter');
+      assert.equal(user.state, 'INVITED');
     })
     .nodeify(done);
   });
