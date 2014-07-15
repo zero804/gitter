@@ -4,6 +4,41 @@
 var restSerializer = require("../../serializers/rest-serializer");
 var userService = require("../../services/user-service");
 var userSearchService = require("../../services/user-search-service");
+var githubSearchService = require("../../services/github/github-fast-search");
+var Q = require('q');
+
+
+function searchGitterUsers(query, searcherId, excludeTroupeId, limit, skip, callback) {
+  var options = {
+    limit: limit,
+    skip: skip,
+    excludeTroupeId: excludeTroupeId
+  };
+
+  return userSearchService.searchForUsers(searcherId, query, options).then(function(searchResults) {
+    var strategy = new restSerializer.SearchResultsStrategy({
+      resultItemStrategy: new restSerializer.UserStrategy()
+    });
+
+    return restSerializer.serializeQ(searchResults, strategy);
+  }).nodeify(callback);
+}
+
+function searchGithubUsers(query, user, callback) {
+  var search = new githubSearchService(user);
+  return search.findUsers(query).then(function(users) {
+    var results = users.map(function (user) {
+      return {
+        username: user.login,
+        avatarUrlSmall: user.avatar_url + 's=60',
+        avatarUrlMedium: user.avatar_url + 's=128'
+      };
+    });
+
+    return results;
+  }).nodeify(callback);
+}
+
 
 module.exports = {
   id: 'resourceUser',
@@ -13,25 +48,25 @@ module.exports = {
     }
 
     if(req.query.q) {
-      var options = {
-        limit: req.query.limit,
-        skip: req.query.skip,
-        excludeTroupeId: req.query.excludeTroupeId
-      };
 
-      return userSearchService.globalUserSearch(req.query.q, options)
+      var searchQuery = req.query.q;
+      var userId = req.user.id;
+      var limit = req.query.limit;
+      var skip = req.query.skip;
+      var excludeTroupeId = req.query.excludeTroupeId;
+
+      return Q([
+          searchGitterUsers(searchQuery, userId, excludeTroupeId, limit, skip),
+          searchGithubUsers(searchQuery, req.user)
+        ])
+        .spread(function(gitterResults, githubResults) {
+          gitterResults.results = gitterResults.results.concat(githubResults);
+          return gitterResults;
+        })
         .then(function(searchResults) {
-          var strategy = new restSerializer.SearchResultsStrategy({
-                                resultItemStrategy: new restSerializer.UserStrategy()
-                              });
-
-          return restSerializer.serializeQ(searchResults, strategy)
-            .then(function(serialized) {
-              res.send(serialized);
-            });
+          res.send(searchResults);
         })
         .fail(next);
-
     }
 
     var strategy = new restSerializer.UserStrategy();

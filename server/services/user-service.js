@@ -29,7 +29,8 @@ function newUser(options, callback) {
     githubScopes:       options.githubScopes,
     gravatarImageUrl:   options.gravatarImageUrl,
     username:           options.username,
-    displayName:        options.displayName
+    displayName:        options.displayName,
+    state:              options.state
   };
 
   if (options.emails && options.emails.length) {
@@ -73,6 +74,7 @@ var userService = {
           emails:             githubUser.email ? [githubUser.email] : [],
           gravatarImageUrl:   githubUser.avatar_url,
           githubId:           githubUser.id,
+          state:              'INVITED'
         };
 
         return newUser(gitterUser);
