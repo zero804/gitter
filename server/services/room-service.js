@@ -699,7 +699,16 @@ function addUsersToRoom(troupe, instigatingUser, usernamesToAdd) {
       if(!access) throw 403;
 
       /* Next, resolve the users to add */
-      return userService.findByUsernames(usernamesToAdd);
+      return Q.all([usernamesToAdd, userService.findByUsernames(usernamesToAdd)]);
+    })
+    .spread(function(usernamesToAdd, existingUsers) {
+      var existing = existingUsers.map(function(u) { return u.username; });
+      var usernamesToInvite = usernamesToAdd.filter(function(u) { return existing.indexOf(u) === -1; });
+
+      return Q.all([existingUsers, userService.inviteByUsernames(usernamesToInvite, instigatingUser)]);
+    })
+    .spread(function(existingUsers, invitedUsers) {
+      return(existingUsers.concat(invitedUsers));
     })
     .then(function(usersToAdd) {
       var existing = collections.indexByProperty(usersToAdd, 'userId');

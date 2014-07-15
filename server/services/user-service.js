@@ -1,6 +1,8 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var env                       = require('../utils/env');
+var stats                     = env.stats;
 // var sechash                   = require('sechash');
 var winston                   = require('../utils/winston');
 var assert                    = require('assert');
@@ -8,6 +10,7 @@ var persistence               = require("./persistence-service");
 var collections               = require("../utils/collections");
 var uriLookupService          = require('./uri-lookup-service');
 var Q                         = require('q');
+var githubUserService         = require('./github/github-user-service');
 
 /**
  * Creates a new user
@@ -58,6 +61,51 @@ function newUser(options, callback) {
 }
 
 var userService = {
+  inviteByUsername: function(username, user, callback) {
+    var githubUser = new githubUserService(user);
+
+    return githubUser.getUser(username)
+      .then(function (githubUser) {
+
+        var gitterUser = {
+          username:           githubUser.login,
+          displayName:        githubUser.name || githubUser.login,
+          emails:             githubUser.email ? [githubUser.email] : [],
+          gravatarImageUrl:   githubUser.avatar_url,
+          githubId:           githubUser.id,
+        };
+
+        return newUser(gitterUser);
+      })
+      .then(function(user) {
+        stats.event("new_invited_user", {
+          userId: user.id,
+          method: 'added_to_room',
+          username: user.username
+        });
+
+        return user;
+      })
+      .nodeify(callback);
+  },
+
+  inviteByUsernames: function(usernames, user, callback) {
+    var promises = usernames.map(function(username) { 
+      return userService.inviteByUsername(username, user); 
+    });
+
+    return Q.allSettled(promises)
+    .then(function (results) {
+      var invitedUsers = results.reduce(function (accum, result) {
+        if (result.state === "fulfilled") accum.push(result.value);
+        return accum;
+      }, []);
+
+      return invitedUsers;
+    })
+    .nodeify(callback);
+  },
+
   findOrCreateUserForGithubId: function(options, callback) {
     winston.info("Locating or creating user", options);
 

@@ -172,8 +172,6 @@ function install() {
                 gravatarImageUrl:   githubUserProfile.avatar_url,
                 githubUserToken:    accessToken,
                 githubId:           githubUserProfile.id,
-                status:             'ACTIVE',
-                source:             'landing_github'
               };
 
               logger.verbose('About to create GitHub user ', githubUser);
