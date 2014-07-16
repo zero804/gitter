@@ -78,5 +78,25 @@ module.exports = {
       });
 
 
+  },
+
+  sendInvitation: function(fromUser, toUser, room) {
+    var senderName = fromUser.displayName;
+    var recipientName = toUser.recipientName;
+    var email = toUser.email;
+
+    return mailerService.sendEmail({
+      templateFile: "invitation",
+      from: senderName + ' <support@gitter.im>',
+      to: email,
+      subject: '[' + room.uri + '] join the chat on Gitter',
+      data: {
+        roomUri: room.uri,
+        roomUrl: config.get("email:emailBasePath") + '/' + room.uri,
+        senderName: senderName,
+        recipientName: recipientName
+      }
+    });
   }
+
 };
