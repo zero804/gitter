@@ -26,6 +26,7 @@ var validate           = require('../utils/validate');
 var collections        = require('../utils/collections');
 var StatusError        = require('statuserror');
 var eventService       = require('./event-service');
+var emailNotificationService = require('./email-notification-service');
 
 function localUriLookup(uri, opts) {
   return uriLookupService.lookupUri(uri)
@@ -708,6 +709,8 @@ function addUsersToRoom(troupe, instigatingUser, usernamesToAdd) {
       return Q.all([existingUsers, userService.inviteByUsernames(usernamesToInvite, instigatingUser)]);
     })
     .spread(function(existingUsers, invitedUsers) {
+      invitedUsers.forEach(function(user) { emailNotificationService.sendInvitation(instigatingUser, user, troupe); });
+
       return(existingUsers.concat(invitedUsers));
     })
     .then(function(usersToAdd) {
