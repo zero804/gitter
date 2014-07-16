@@ -7,6 +7,7 @@ var troupeTemplate = require('../utils/troupe-template');
 var nconf          = require('../utils/config');
 var winston        = require('../utils/winston');
 var Q              = require('q');
+var emailify       = require('emailify');
 
 var logEmailToLogger = nconf.get('logging:logEmailContents');
 
@@ -49,42 +50,46 @@ exports.sendEmail = function(options, done) {
     var html = htmlTemplate(options.data);
     var footerHtml = footerTemplate(options.data);
 
-    var plaintextTemplateFile = "emails/" + options.templateFile;
-    troupeTemplate.compile(plaintextTemplateFile, function(err, plaintextTemplate) {
-      if(err) return d.reject(err);
+    var compiledHtmlEmail = headerHtml + "\n" + html + "\n" + footerHtml;
 
-      var plaintext = plaintextTemplate(options.data);
-      if(logEmailToLogger) {
-        winston.info("Sending email", plaintext);
-      }
+    emailify.parse(compiledHtmlEmail, 'utf8', function(err,htmlContent) {
+      var plaintextTemplateFile = "emails/" + options.templateFile;
+      troupeTemplate.compile(plaintextTemplateFile, function(err, plaintextTemplate) {
+        if(err) return d.reject(err);
 
-      if(/@troupetest.local/.test(options.from) || /@troupetest.local/.test(options.to)) {
-        winston.info('Skipping send for troupetest.local');
-        return d.resolve();
-      }
-
-      var headers;
-      if(options.unsubscribe) {
-        headers = {
-          'List-Unsubscribe': '<' + options.unsubscribe + '>'
-        };
-      }
-      smtpTransport.sendMail({
-        from: options.from,
-        to: options.to,
-        subject: options.subject,
-        html: headerHtml + "\n" + html + "\n" + footerHtml,
-        text: plaintext,
-        headers: headers
-      }, function(err, response){
-
-        if(err) {
-          winston.error("SMTP Email Error", { exception: err });
-          return d.reject(err);
+        var plaintext = plaintextTemplate(options.data);
+        if(logEmailToLogger) {
+          winston.info("Sending email", plaintext);
         }
 
-        winston.info("Email sent successfully through SMTP", { message: response.message });
-        d.resolve();
+        if(/@troupetest.local/.test(options.from) || /@troupetest.local/.test(options.to)) {
+          winston.info('Skipping send for troupetest.local');
+          return d.resolve();
+        }
+
+        var headers;
+        if(options.unsubscribe) {
+          headers = {
+            'List-Unsubscribe': '<' + options.unsubscribe + '>'
+          };
+        }
+        smtpTransport.sendMail({
+          from: options.from,
+          to: options.to,
+          subject: options.subject,
+          html: htmlContent,
+          text: plaintext,
+          headers: headers
+        }, function(err, response){
+
+          if(err) {
+            winston.error("SMTP Email Error", { exception: err });
+            return d.reject(err);
+          }
+
+          winston.info("Email sent successfully through SMTP", { message: response.message });
+          d.resolve();
+        });
       });
     });
   });
