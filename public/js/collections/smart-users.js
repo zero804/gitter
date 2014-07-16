@@ -16,6 +16,14 @@ define([
     return roleRank.indexOf(aRole) - roleRank.indexOf(bRole);
   }
 
+  /**
+   * inviteStatusDiffer() checks whether the invitation status is different for 2 users
+   *
+   * userA    Backbone.Model - the first item in the comparison
+   * userB    Backbone.Model - the second item in the comparison
+   *
+   * returns  Booean indicates whether the status differ (true) or not (false)
+   */
   function inviteStatusDiffer (userA, userB) {
     var aInvited = userA.get('invited');
     var bInvited = userB.get('invited');
@@ -23,6 +31,13 @@ define([
     return false;
   }
 
+  /**
+   * compareInvites() used for sorting, it determines the logic for different situations
+   *
+   * userA    Backbone.Model - the first item in the comparison
+   * userB    Backbone.Model - the second item in the comparison
+   * @return  Number - indicates whether the status differ (true) or not (false)
+   */
   function compareInvites (userA, userB) {
     var aInvited = userA.get('invited');
     var bInvited = userB.get('invited');
@@ -33,7 +48,7 @@ define([
     // if only b is invited it should be placed after a
     if (!aInvited && bInvited) return  1;
 
-    return 0;
+    return 0; // it should never get to this point TODO: one can safely remove this line in the future
   }
 
   function compareNames(userA, userB) {
@@ -72,15 +87,15 @@ define([
       this.reset(collection.models);
     },
 
-    // lower in array is better
+    // lower in array is better, therefore whatever is returned should be inverted (thus the `-` before each return statement)
     comparator: function(userA, userB) {
       var roleDifference = compareRoles(userA, userB);
 
       // if there is a ranking difference sort by role;
-      if (roleDifference !== 0) { return - roleDifference; }
+      if (roleDifference !== 0) return - roleDifference;
 
       // if the users have a different invite status, sort by whether a user is invited:
-      if (inviteStatusDiffer(userA, userB)) { return - compareInvites(userA, userB); }
+      if (inviteStatusDiffer(userA, userB)) return - compareInvites(userA, userB);
 
       // by default sort by name
       return - compareNames(userA, userB);
