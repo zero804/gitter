@@ -48,7 +48,7 @@ define([
     // if only b is invited it should be placed after a
     if (!aInvited && bInvited) return  1;
 
-    return 0; // it should never get to this point TODO: one can safely remove this line in the future
+    return 0; // it should never get to this point therefore -> TODO: one can safely remove this line in the future
   }
 
   function compareNames(userA, userB) {
