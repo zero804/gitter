@@ -47,7 +47,8 @@ define([
 
     ui: {
       input: 'input.gtrInput',
-      validation: '#modal-failure'
+      validation: '#modal-failure',
+      success: '#modal-success'
     },
 
     itemEvents: {
@@ -96,6 +97,15 @@ define([
       }
     },
 
+    showSuccessMessage: function(message) {
+      this.ui.success.text(message);
+      if(message) {
+        this.ui.success.slideDown('fast');
+      } else {
+        this.ui.success.slideUp('fast');
+      }
+    },
+
     /**
      * Validate the form and send the request
      */
@@ -121,8 +131,20 @@ define([
             this.showValidationMessage('You cannot add people to this room. Only members of the channels owner can add people to a private channel.');
           }
         },
-        success: function() {
-          this.dialog.hide();
+        success: function(res) {
+          var usersInvited = [];
+          var existingUsers = [];
+          res.users.forEach(function(user) { 
+            if (user.invited) { 
+              usersInvited.push(user.username);
+            } else {
+              existingUsers.push(user.username);
+            }
+          });
+
+          var msg = "We invited " + usersInvited.join(', ') + " to this chat";
+          this.showSuccessMessage(msg);
+          //this.dialog.hide();
         }
       });
 

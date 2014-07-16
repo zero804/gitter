@@ -709,7 +709,9 @@ function addUsersToRoom(troupe, instigatingUser, usernamesToAdd) {
       return Q.all([existingUsers, userService.inviteByUsernames(usernamesToInvite, instigatingUser)]);
     })
     .spread(function(existingUsers, invitedUsers) {
-      invitedUsers.forEach(function(user) { emailNotificationService.sendInvitation(instigatingUser, user, troupe); });
+      invitedUsers.forEach(function(user) { 
+        emailNotificationService.sendInvitation(instigatingUser, user, troupe);   
+      });
 
       return(existingUsers.concat(invitedUsers));
     })
@@ -726,14 +728,16 @@ function addUsersToRoom(troupe, instigatingUser, usernamesToAdd) {
     })
     .then(function(usersToAdd) {
       /* Next, add the users */
+      var usersAdded = [];
       usersToAdd.forEach(function(user) {
         if(!troupe.containsUserId(user.id)) {
           troupe.addUserById(user.id);
+          usersAdded.push(user);
         }
       });
 
       return troupe.saveQ()
-        .thenResolve(troupe);
+        .thenResolve(usersAdded);
     });
 }
 exports.addUsersToRoom = addUsersToRoom;
