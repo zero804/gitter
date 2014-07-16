@@ -93,20 +93,24 @@ define([
       options.placement = 'horizontal';
       options.minHeight = '88px';
 
-      var username, displayName;
+      var username, displayName, invited;
       if(this.model) {
         username = this.model.get('username');
         displayName = this.model.get('displayName');
+        invited = this.model.get('invited');
       } else {
         username = options.username;
         displayName = options.displayName;
+        invited = options.invited;
       }
 
       var ghModel = new Backbone.Model({
         login: username,
         name: displayName
       });
+
       ghModel.url = '/api/private/gh/users/' + username;
+      ghModel.set('invited', invited);
 
       ghModel.fetch();
 
