@@ -6,90 +6,62 @@ var testRequire = require('../test-require');
 var assert = require("assert");
 var Q = require('q');
 
-var FakeGithubSearch = function() {};
-FakeGithubSearch.prototype.findUsers = function(query) {
-  var results = {
-    'gitter-and-github': [{ login: 'some-github-user'}],
-    'duplicate-users': [{ login: 'gitter-friend'}],
-    'include-self': [{ login: 'fake-user'}],
-    'github-user-on-gitter': [{ login: 'gitter-user-that-you-dont-know'}],
-    'on-gitter-off-gitter': [{ login: 'some-github-user'}, { login: 'gitter-user-that-you-dont-know'}]
-  };
-
-  return Q(results[query]);
-};
-
-var fakeGitterSearch = {
-  searchForUsers: function(userId, query) {
-    var results = {
-      'gitter-and-github': [{ username: 'gitter-friend'}],
-      'duplicate-users': [{ username: 'gitter-friend'}],
-      'include-self': [fakeUser],
-      'github-user-on-gitter': [],
-      'on-gitter-off-gitter': []
-    };
-
-    return Q({ results: results[query]});
-  }
-};
-
-var fakeUserService = {
-  githubUsersExists: function() {
-    return Q({
-      'gitter-user-that-you-dont-know': true,
-      'gitter-friend': true,
-      'fake-user': true,
-    });
-  },
-  findByUsernames: function(usernames) {
-    return Q.fcall(function() {
-      return usernames.map(function(username) {
-        var user = { username: username };
-
-        if(username === 'fake-user') {
-          user.id = 'abc123';
-        } else if(username === 'gitter-user-that-you-dont-know') {
-          user.id = 'iamnewid1234';
-        }
-        return user;
-      });
-    });
-  }
-
-};
-
-
-var search = testRequire.withProxies('./services/github-gitter-user-search', {
-  './user-search-service': fakeGitterSearch,
-  './github/github-fast-search': FakeGithubSearch,
-  './user-service': fakeUserService
-});
-
-var fakeUser = { id: 'abc123', username: 'fake-user' };
+var fakeUser = { username: 'fake-user', id: 'abc123' };
 
 describe('github-gitter-user-serach', function() {
+
   it('puts gitter connections above strangers', function(done) {
 
-    search('gitter-and-github', fakeUser).then(function(data) {
-      assert.equal(data.results[0].username, 'gitter-friend');
-      assert.equal(data.results[1].username, 'some-github-user');
+    var search = createSearchWithStubData({
+      gitter: [{ username: 'gitter-friend', id: '123456'}],
+      github: [{ login: 'some-github-user'}],
+      userService: { 'gitter-friend': '123456' }
+    });
+
+    search('something', fakeUser).then(function(data) {
+      var list = getResults(data);
+
+      assert.deepEqual(list, [
+        { username: 'gitter-friend', id: '123456'},
+        { username: 'some-github-user' }
+      ]);
+
     }).nodeify(done);
 
   });
 
   it('removes duplicate github users', function(done) {
 
-    search('duplicate-users', fakeUser).then(function(data) {
-      assert.equal(data.results[0].username, 'gitter-friend');
-      assert.equal(data.results.length, 1);
+    var search = createSearchWithStubData({
+      gitter: [{ username: 'gitter-friend', id: '123456'}],
+      github: [{ login: 'gitter-friend'}],
+      userService: { 'gitter-friend': '123456' }
+    });
+
+    search('something', fakeUser).then(function(data) {
+      var list = getResults(data);
+
+      assert.deepEqual(list, [
+        { username: 'gitter-friend', id: '123456'}
+      ]);
+
     }).nodeify(done);
 
   });
 
   it('doesnt include yourself', function(done) {
 
-    search('include-self', fakeUser).then(function(data) {
-      assert.equal(data.results.length, 0);
+    var search = createSearchWithStubData({
+      gitter: [{ username: 'me', id: '123456' }],
+      github: [{ login: 'me'}],
+      userService: { 'me': 'abc123' }
+    });
+
+    search('something', { username: 'me', id: '123456' }).then(function(data) {
+      var list = getResults(data);
+
+      assert.deepEqual(list, []);
+
     }).nodeify(done);
 
   });
@@ -98,19 +70,39 @@ describe('github-gitter-user-serach', function() {
 
     it('adds metatdata to a single matching github user', function(done) {
 
-      search('github-user-on-gitter', fakeUser).then(function(data) {
-        assert.equal(data.results[0].id, 'iamnewid1234');
-        assert.equal(data.results.length, 1);
+      var search = createSearchWithStubData({
+        gitter: [],
+        github: [{ login: 'gitter-user'}],
+        userService: { 'gitter-user': 'testid' }
+      });
+
+      search('include-self', fakeUser).then(function(data) {
+        var list = getResults(data);
+
+        assert.deepEqual(list, [
+          { username: 'gitter-user', id: 'testid'}
+        ]);
+
       }).nodeify(done);
 
     });
 
     it('handles sparse matches correctly', function(done) {
 
-      search('on-gitter-off-gitter', fakeUser).then(function(data) {
-        assert(!data.results[0].id);
-        assert.equal(data.results[1].id, 'iamnewid1234');
-        assert.equal(data.results.length, 2);
+      var search = createSearchWithStubData({
+        gitter: [],
+        github: [{ login: 'not-on-gitter'}, { login: 'on-gitter'}],
+        userService: { 'on-gitter': 'testid' }
+      });
+
+      search('something', fakeUser).then(function(data) {
+        var list = getResults(data);
+
+        assert.deepEqual(list, [
+          { username: 'not-on-gitter' },
+          { username: 'on-gitter', id: 'testid'}
+        ]);
+
       }).nodeify(done);
 
     });
@@ -118,3 +110,58 @@ describe('github-gitter-user-serach', function() {
   });
 
 });
+
+function createSearchWithStubData(data) {
+  return testRequire.withProxies('./services/github-gitter-user-search', {
+    './user-search-service': createFakeGitterSearch(data.gitter),
+    './github/github-fast-search': createFakeGithubSearch(data.github),
+    './user-service': createFakeUserService(data.userService)
+  });
+}
+
+function createFakeGitterSearch(users) {
+  return {
+    searchForUsers: function() {
+      return Q({ results: users });
+    }
+  };
+}
+
+function createFakeGithubSearch(users) {
+  var FakeGithubSearch = function() {};
+  FakeGithubSearch.prototype.findUsers = function() {
+    return Q(users);
+  };
+  return FakeGithubSearch;
+}
+
+function createFakeUserService(usermap) {
+  return {
+    githubUsersExists: function() {
+      return Q(usermap);
+    },
+    findByUsernames: function(usernames) {
+      return Q.fcall(function() {
+        return usernames.map(function(username) {
+          return {
+            id: usermap[username],
+            username: username
+          };
+        });
+      });
+    }
+  };
+}
+
+function getResults(data) {
+  return data.results.map(function(user) {
+    var newuser = {
+      username: user.username,
+    };
+
+    if(user.id) {
+      newuser.id = user.id;
+    }
+    return newuser;
+  });
+}
