@@ -181,7 +181,8 @@ function UserStrategy(options) {
       online: userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id) || undefined,
       role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.username) || undefined,
       premium: userPremiumStatusStrategy && userPremiumStatusStrategy.map(user.id) || undefined,
-      state: user.state,
+      /* TODO: when adding states use user.state and the respective string value desired */
+      invited: user.state === 'INVITED',
       v: getVersion(user)
     };
   };

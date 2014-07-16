@@ -18,7 +18,7 @@ define([
       'mouseover': 'showDetailIntent',
       'click':     'showDetail'
     },
-    initialize: function(options) {
+    initialize: function (options) {
       var self = this;
       this.user = options.user ? options.user : {};
       this.showEmail = options.showEmail || {};
@@ -81,11 +81,12 @@ define([
       UserPopoverView.singleton(this, popover);
     },
 
-    update: function() {
+    update: function () {
       var data = this.getRenderData();
       this.updatePresence(data);
       this.updateAvatar(data);
       this.updateTooltip(data);
+      this.updateState(data);
     },
 
     updatePresence: function(data) {
@@ -93,6 +94,10 @@ define([
         this.$el.find('.trpDisplayPicture').toggleClass('online', data.online);
         this.$el.find('.trpDisplayPicture').toggleClass('offline', !data.online);
       }
+    },
+
+    updateState: function (data) {
+      //if (data.invited) console.debug('updateState() called ======');
     },
 
     updateAvatar: function(data) {
@@ -143,7 +148,8 @@ define([
         presenceClass: presenceClass,
         online: online,
         offline: !online,
-        role: user.role
+        role: user.role,
+        invited: user.invited
       };
     },
 

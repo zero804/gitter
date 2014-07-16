@@ -31,7 +31,7 @@
 .boxhack {
   -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
   -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-  box-sizing: border-box;  
+  box-sizing: border-box;
 }
 
 .transition300ms() {
@@ -528,7 +528,7 @@ body.logged-out {
     width: 244px;
     height: 48px;
     margin-bottom: 20px;
-      
+
     @media @retina {
       background-image: url('../../images/2/gitter/logo-text-white-48@2x.png');
       background-size: contain;
@@ -2546,7 +2546,28 @@ ul.roster {
 
 }
 
+// TODO: as we progress with the css refactoring this will have to be changed. Walter.
+.popover-content {
+  .invited {
+    .boxhack;
+    background-color: hsl(0, 60%, 70%);
+    padding: 10px;
+    line-height: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+
+    p {
+      margin: 0;
+      small {
+        font-size: 0.8em;
+        color: white;
+      }
+    }
+  }
+}
+
 .trpPopoverDetails {
+  .boxhack;
   float: right;
   max-width: 340px;
   margin-left: 12px;

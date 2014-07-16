@@ -24,6 +24,7 @@ module.exports = exports = function(template) {
       showStatus: showStatus,
       showBadge: showBadge
     });
+
     return r;
   };
 };
