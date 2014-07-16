@@ -27,6 +27,7 @@ define([
       this.avatarSize = options.size ? options.size : 's';
       this.showTooltip = options.showTooltip !== false;
       this.tooltipPlacement = options.tooltipPlacement || 'vertical';
+      // TODO: is it necessary to listen for updates to the invite status?
 
       // once this widget has the id of the user,
       // it will listen to changes on the global user collection,
@@ -94,10 +95,6 @@ define([
         this.$el.find('.trpDisplayPicture').toggleClass('online', data.online);
         this.$el.find('.trpDisplayPicture').toggleClass('offline', !data.online);
       }
-    },
-
-    updateState: function (data) {
-      //if (data.invited) console.debug('updateState() called ======');
     },
 
     updateAvatar: function(data) {
