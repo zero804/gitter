@@ -2,6 +2,7 @@
 "use strict";
 
 var userSearchService = require("./user-search-service");
+var userService = require("./user-service");
 var githubSearchService = require("./github/github-fast-search");
 var Q = require('q');
 var _ = require('underscore');
@@ -31,23 +32,59 @@ function searchGithubUsers(query, user, callback) {
     });
 
     return results;
-  }).nodeify(callback);
+  })
+  .nodeify(callback);
 }
 
-function mergeResultArrays(gitterUsers, githubUsers, excludedUsername) {
-  var merged = gitterUsers.concat(githubUsers);
-  var noSelfMentions = merged.filter(function(user) { return user.username != excludedUsername });
-  var deduplicated = _.uniq(noSelfMentions, false, function(user) { return user.username; });
-  return deduplicated;
+function addGitterDataToGithubUsers(githubUsers, callback) {
+  var usernames = githubUsers.map(function(user) {
+    return user.username;
+  });
+
+  return userService.githubUsersExists(usernames)
+    .then(function(existsHash) {
+
+      var gitterUsernames = Object.keys(existsHash).filter(function(username) {
+        return !!existsHash[username];
+      });
+
+      return gitterUsernames;
+    })
+    .then(userService.findByUsernames)
+    .then(function(gitterUsers) {
+
+      var map = {};
+      gitterUsers.forEach(function(user) {
+        map[user.username] = user;
+      });
+
+      var augmentedGithubUsers = githubUsers.map(function(githubUser) {
+        return map[githubUser.username] || githubUser;
+      });
+
+      return augmentedGithubUsers;
+    });
 }
 
 module.exports = function(searchQuery, user, excludeTroupeId, limit, skip, callback) {
   return Q([
     searchGitterUsers(searchQuery, user.id, excludeTroupeId, limit, skip),
-    searchGithubUsers(searchQuery, user)
+    searchGithubUsers(searchQuery, user).then(addGitterDataToGithubUsers)
   ])
-  .spread(function(gitterResults, githubResults) {
-    gitterResults.results = mergeResultArrays(gitterResults.results, githubResults, user.username);
+  .spread(function(gitterResults, githubUsers) {
+    var gitterUsers = gitterResults.results
+    var excludedUsername = user.username;
+
+    var merged = gitterUsers.concat(githubUsers);
+    var noSelfMentions = merged.filter(function(user) {
+      return user.username != excludedUsername
+    });
+    var deduplicated = _.uniq(noSelfMentions, false, function(user) {
+      return user.username;
+    });
+    var limited = deduplicated.slice(0, limit);
+
+    gitterResults.results = limited
     return gitterResults;
   })
   .nodeify(callback);

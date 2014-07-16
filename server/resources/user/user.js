@@ -16,7 +16,7 @@ module.exports = {
 
       var searchQuery = req.query.q;
       var user = req.user;
-      var limit = req.query.limit;
+      var limit = req.query.limit || 10;
       var skip = req.query.skip;
       var excludeTroupeId = req.query.excludeTroupeId;
 
