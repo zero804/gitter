@@ -26,11 +26,11 @@
                           <td style="max-width: 400px; width: 400px;">
                             <h2>{{#if troupe.oneToOne}}{{troupe.name}}{{else}}{{troupe.uri}}{{/if}}</h1>
                             <h4>{{__n "%d unread message" "%d unread messages" unreadCount}}</h4>
-                            <p><{{#unless troupe.oneToOne}}a href="{{../../emailBasePath}}{{troupe.url}}#notifications" style="color: #2980b9;">Notification settings</a>{{/unless}}&nbsp;</p>
+                            <p>{{#unless troupe.oneToOne}}<a href="{{../../emailBasePath}}{{troupe.url}}#notifications" style="color: #2980b9;">Notification settings</a>{{/unless}}&nbsp;</p>
                             <br>
                           </td>
                           <td>
-                            <table class="button-read">
+                            <table class="button-green">
                               <tr>
                                 <td>Read</td>
                               </tr>
@@ -44,4 +44,43 @@
                   </tr>
                 </table>
         {{/each}}
+                <table class="row">
+                  <tr>
+                    <td class="wrapper">
+                      <table class="twelve columns">
+                        <tr>
+                          <td>
+                            You can customise notification rules per room buy clicking on "Notification settings".<br>
+                            <a href="{{unsubscribeUrl}}" style="text-decoration: none">Unsubscribe</a> to stop receiving all unread message notifications from all conversations.<br>
+                          </td>
+                          <td class="expander"></td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+                <!-- promotion for apps -->>
+                <br><br>
+                <table class="row promo">
+                  <tr>
+                    <td class="wrapper">
+                      <table class="twelve columns">
+                        <tr>
+                          <td>
+                            <h4>Did you know we have desktop and mobile apps?</h4>
+                            <a href="https://gitter.im/apps">
+                              <table class="button-green" style="margin-top: 4px;">
+                                <tr>
+                                  <td>Find out more</td>
+                                </tr>
+                              </table>
+                            </a>
+                          </td>
+                          <td class="expander"></td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+
 
