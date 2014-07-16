@@ -66,7 +66,6 @@ define([
         .append(this.rosterView.render().el)
         .append(this.remainingView.render().el);
     }
-
   });
 
   var AllUsersModal = TroupeViews.Modal.extend({

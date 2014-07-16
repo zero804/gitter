@@ -8,11 +8,32 @@ define([
   // higher index in array, higher rank
   var roleRank = ['contributor', 'admin'];
 
+
   function compareRoles(userA, userB) {
     var aRole = userA.get('role');
     var bRole = userB.get('role');
 
     return roleRank.indexOf(aRole) - roleRank.indexOf(bRole);
+  }
+
+  function inviteStatusDiffer (userA, userB) {
+    var aInvited = userA.get('invited');
+    var bInvited = userB.get('invited');
+    if (aInvited !== bInvited) return true;
+    return false;
+  }
+
+  function compareInvites (userA, userB) {
+    var aInvited = userA.get('invited');
+    var bInvited = userB.get('invited');
+
+    // if only a is invited it should be placed after b
+    if (aInvited && !bInvited) return  -1;
+
+    // if only b is invited it should be placed after a
+    if (!aInvited && bInvited) return  1;
+
+    return 0;
   }
 
   function compareNames(userA, userB) {
@@ -33,7 +54,6 @@ define([
       this.listenTo(userList, 'reset', this.parentReset);
 
       // this.listenTo(userList, 'change:displayName change:username change:role', this.sortLimited);
-
     },
 
     disconnect: function() {
@@ -56,11 +76,14 @@ define([
     comparator: function(userA, userB) {
       var roleDifference = compareRoles(userA, userB);
 
-      if(roleDifference !== 0) {
-        return - roleDifference;
-      } else {
-        return - compareNames(userA, userB);
-      }
+      // if there is a ranking difference sort by role;
+      if (roleDifference !== 0) { return - roleDifference; }
+
+      // if the users have a different invite status, sort by whether a user is invited:
+      if (inviteStatusDiffer(userA, userB)) { return - compareInvites(userA, userB); }
+
+      // by default sort by name
+      return - compareNames(userA, userB);
     }
   });
 
