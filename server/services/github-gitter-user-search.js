@@ -4,6 +4,7 @@
 var userSearchService = require("./user-search-service");
 var githubSearchService = require("./github/github-fast-search");
 var Q = require('q');
+var _ = require('underscore');
 
 
 function searchGitterUsers(query, searcherId, excludeTroupeId, limit, skip, callback) {
@@ -33,13 +34,19 @@ function searchGithubUsers(query, user, callback) {
   }).nodeify(callback);
 }
 
+function mergeResultArrays(gitterUsers, githubUsers) {
+  var merged = gitterUsers.concat(githubUsers);
+  var filtered = _.uniq(merged, false, function(user) { return user.username; });
+  return filtered;
+}
+
 module.exports = function(searchQuery, user, excludeTroupeId, limit, skip, callback) {
   return Q([
     searchGitterUsers(searchQuery, user.id, excludeTroupeId, limit, skip),
     searchGithubUsers(searchQuery, user)
   ])
   .spread(function(gitterResults, githubResults) {
-    gitterResults.results = gitterResults.results.concat(githubResults);
+    gitterResults.results = mergeResultArrays(gitterResults.results, githubResults);
     return gitterResults;
   })
   .nodeify(callback);
