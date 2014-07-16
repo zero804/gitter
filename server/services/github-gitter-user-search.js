@@ -34,10 +34,11 @@ function searchGithubUsers(query, user, callback) {
   }).nodeify(callback);
 }
 
-function mergeResultArrays(gitterUsers, githubUsers) {
+function mergeResultArrays(gitterUsers, githubUsers, excludedUsername) {
   var merged = gitterUsers.concat(githubUsers);
-  var filtered = _.uniq(merged, false, function(user) { return user.username; });
-  return filtered;
+  var noSelfMentions = merged.filter(function(user) { return user.username != excludedUsername });
+  var deduplicated = _.uniq(noSelfMentions, false, function(user) { return user.username; });
+  return deduplicated;
 }
 
 module.exports = function(searchQuery, user, excludeTroupeId, limit, skip, callback) {
@@ -46,7 +47,7 @@ module.exports = function(searchQuery, user, excludeTroupeId, limit, skip, callb
     searchGithubUsers(searchQuery, user)
   ])
   .spread(function(gitterResults, githubResults) {
-    gitterResults.results = mergeResultArrays(gitterResults.results, githubResults);
+    gitterResults.results = mergeResultArrays(gitterResults.results, githubResults, user.username);
     return gitterResults;
   })
   .nodeify(callback);
