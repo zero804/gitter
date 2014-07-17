@@ -22,7 +22,7 @@ define([
   var UserSearchCollection = Backbone.Collection.extend({
     url: '/api/v1/user',
     model: UserSearchModel,
-    parse: function(response) {
+    parse: function (response) {
       return response.results;
     }
   });
@@ -56,21 +56,26 @@ define([
         this.collection.remove(view.model);
       }
     },
+
     initialize: function() {
       if(!this.collection) {
         this.collection = new Backbone.Collection();
+        // TODO: collection should be sorted by latest model added
+        // this.collection.comparator = function (m) {
+        //   return m.get('added');
+        // };
       }
 
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
     },
 
-    selected: function(m) {
-      this.collection.add(m);
+    selected: function (m) {
+      this.addUserToRoom(m);
       this.typeahead.dropdown.hide();
     },
 
-    menuItemClicked: function(button) {
-      switch(button) {
+    menuItemClicked: function (button) {
+      switch (button) {
         case 'create':
           this.validateAndCreate();
           break;
@@ -80,8 +85,7 @@ define([
           window.location.hash = "#inv";
           break;
 
-
-        case 'cancel':
+        case 'done':
           this.dialog.hide();
           break;
       }
@@ -106,11 +110,63 @@ define([
       }
     },
 
+    /** TODO
+     * computeFeedback() what does it do?
+     *
+     * param type description
+     * @return return type description
+     */
+    computeFeedback: function (m) {
+      // if (m.get('invited')) return 'has been invited.';
+      // if (m.get('added')) return 'has been added.';
+      // if (m.get('unreachable')) return 'this user is not reachable.';
+      return {
+        outcome: 'success',
+        message: 'has been added'
+      };
+    },
+
+    /** TODO
+     * addUserToRoom() what does it do?
+     *
+     * param type description
+     * @return return type description
+     */
+    addUserToRoom: function (m) {
+      $.ajax({
+        url: '/api/v1/rooms/' + context.getTroupeId()  + '/users',
+        contentType: "application/json",
+        dataType: "json",
+        type: "POST",
+        data: JSON.stringify({ usernames: [ m.get('username') ] }),
+        context: this,
+        statusCode: {
+          400: function() {
+            this.showValidationMessage('Unable to complete the request. Please try again later.');
+          },
+          403: function() {
+            this.showValidationMessage('You cannot add people to this room. Only members of the channels owner can add people to a private channel.');
+          },
+          500: function () {
+            this.showValidationMessage('Server error. Please try again later.');
+          }
+        },
+        success: function (res) {
+          console.debug(res.users);
+          var feedback = this.computeFeedback(res.users);
+          m.set('feedback', feedback.message);
+          m.set('outcome', feedback.outcome);
+          this.collection.add(m);
+          //this.dialog.hide();
+        }
+      });
+    },
+
     /**
      * Validate the form and send the request
      */
-    validateAndCreate: function() {
-      if(this.collection.length === 0) {
+    validateAndCreate: function () {
+      if (this.collection.length === 0) {
         this.showValidationMessage('Search for some people to add');
         this.ui.input.focus();
         return;
@@ -134,8 +190,8 @@ define([
         success: function(res) {
           var usersInvited = [];
           var existingUsers = [];
-          res.users.forEach(function(user) { 
-            if (user.invited) { 
+          res.users.forEach(function(user) {
+            if (user.invited) {
               usersInvited.push(user.username);
             } else {
               existingUsers.push(user.username);
@@ -178,8 +234,8 @@ define([
   });
 
   var modalButtons = [
-    { action: "create", text: "Add", className: "trpBtnGreen" },
-    { action: "cancel", text: "Cancel", className: "trpBtnLightGrey"},
+    // { action: "create", text: "Add", className: "trpBtnGreen" },
+    { action: "done", text: "Done", className: "trpBtnLightGrey"},
   ];
 
   if(context.troupe().get('security') !== 'PRIVATE') {
