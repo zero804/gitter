@@ -25,13 +25,17 @@ module.exports = {
   },
 
   create: function(req, res, next) {
-    var usernames = req.body.usernames;
+    var username = req.body.usernames[0] || req.body.username;
 
-    return roomService.addUsersToRoom(req.troupe, req.user, usernames)
-      .then(function (usersAdded) {
+    return roomService.addUserToRoom(req.troupe, req.user, username)
+      .then(function(userAdded) {
         var strategy = new restSerializer.UserStrategy();
-        restSerializer.serialize(usersAdded, strategy, function (err, serialized) {
-          res.send(200, { success: true, users: serialized });
+        restSerializer.serialize(userAdded, strategy, function(err, serialized) {
+          if(err) throw err;
+
+          serialized.email = userAdded.email;
+
+          res.send(200, { success: true, user: serialized, users: [serialized] });
         });
       })
       .fail(next);
