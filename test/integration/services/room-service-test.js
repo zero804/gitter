@@ -436,7 +436,7 @@ describe('room-service', function() {
               return Q.resolve(true);
             });
 
-            return roomService.addUsersToRoom(room, fixture.user1, [fixture.user3.username])
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(permissionsModelMock, once)();
               })
@@ -488,7 +488,7 @@ describe('room-service', function() {
               return Q.resolve(true);
             });
 
-            return roomService.addUsersToRoom(room, fixture.user1, [fixture.user3.username])
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
               })
@@ -530,7 +530,8 @@ describe('room-service', function() {
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
             var roomService = testRequire.withProxies("./services/room-service", {
-              './room-permissions-model': roomPermissionsModelMock
+              './room-permissions-model': roomPermissionsModelMock,
+              './invited-permissions-service': function() { return Q.resolve(true); }
             });
 
             mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
@@ -540,7 +541,7 @@ describe('room-service', function() {
               return Q.resolve(true);
             });
 
-            return roomService.addUsersToRoom(room, fixture.user1, [fixture.user3.username])
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
               })
@@ -595,7 +596,7 @@ describe('room-service', function() {
               return Q.resolve(true);
             });
 
-            return roomService.addUsersToRoom(room, fixture.user1, [fixture.user3.username])
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
               })
@@ -648,7 +649,7 @@ describe('room-service', function() {
               return Q.resolve(true);
             });
 
-            return roomService.addUsersToRoom(room, fixture.user1, [fixture.user3.username])
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
               })
@@ -691,7 +692,8 @@ describe('room-service', function() {
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
             var roomService = testRequire.withProxies("./services/room-service", {
-              './room-permissions-model': roomPermissionsModelMock
+              './room-permissions-model': roomPermissionsModelMock,
+              './invited-permissions-service': function() { return Q.resolve(true); }
             });
 
             mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
@@ -701,7 +703,7 @@ describe('room-service', function() {
               return Q.resolve(true);
             });
 
-            return roomService.addUsersToRoom(room, fixture.user1, [fixture.user3.username])
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(permissionsModelMock, once)();
               })
@@ -757,7 +759,7 @@ describe('room-service', function() {
               return Q.resolve(true);
             });
 
-            return roomService.addUsersToRoom(room, fixture.user1, [fixture.user3.username])
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
               })
@@ -810,7 +812,7 @@ describe('room-service', function() {
               return Q.resolve(true);
             });
 
-            return roomService.addUsersToRoom(room, fixture.user1, [fixture.user3.username])
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
               })
@@ -862,7 +864,7 @@ describe('room-service', function() {
               return Q.resolve(true);
             });
 
-            return roomService.addUsersToRoom(room, fixture.user1, [fixture.user3.username])
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
               })
