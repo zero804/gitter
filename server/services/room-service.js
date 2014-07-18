@@ -27,6 +27,7 @@ var collections        = require('../utils/collections');
 var StatusError        = require('statuserror');
 var eventService       = require('./event-service');
 var emailNotificationService = require('./email-notification-service');
+var canBeInvited       = require('./invited-permissions-service');
 
 function localUriLookup(uri, opts) {
   return uriLookupService.lookupUri(uri)
@@ -624,67 +625,11 @@ exports.createCustomChildRoom = createCustomChildRoom;
 /**
  * Validates that all users on the list are validate candidates
  * to be added to the room.
- *
- * Returns a promise of nothing or the promise of an exception if
- * any of the users are not allowed to be added to the room.
  */
 function validateUsersToAdd(troupe, usersToAdd) {
-  var validator;
-
-  function roomUserValidator(securityRoomUri, githubType) {
-    return function(user) {
-      return permissionsModel(user, 'join', securityRoomUri, githubType, null);
-    };
-  }
-
-  /* Next, for INHERITED security, make sure the users have access to the parent room */
-  switch(troupe.githubType) {
-    case 'REPO':
-      validator = roomUserValidator(troupe.uri, 'REPO');
-      break;
-
-    case 'ORG':
-      validator = roomUserValidator(troupe.uri, 'ORG');
-      break;
-
-    case 'ONETOONE':
-      /* Nobody can be added */
-      return Q.reject(400);
-
-    case 'REPO_CHANNEL':
-    case 'ORG_CHANNEL':
-      switch(troupe.security) {
-        case 'PRIVATE':
-          /* Anyone can be added */
-          return Q.resolve(true);
-
-        case 'INHERITED':
-          var parentUri = troupe.uri.split('/').slice(0, -1).join('/');
-          var parentRoomType = troupe.githubType === 'REPO_CHANNEL' ? 'REPO' : 'ORG';
-
-          validator = roomUserValidator(parentUri, parentRoomType);
-          break;
-
-        case 'PUBLIC':
-          /* Anyone can be added */
-          return Q.resolve(true);
-      }
-      break;
-
-
-    case 'USER_CHANNEL':
-      /* Anyone can be added, whether its PUBLIC or PRIVATE */
-      return;
-
-    default:
-      /* Dont know what kind of room this is */
-      return Q.reject(400);
-  }
-
   return Q.all(usersToAdd.map(function(user) {
-    return roomUserValidator(user);
+    return canBeInvited(user, troupe);
   }));
-
 }
 /**
  * Add users to a room
