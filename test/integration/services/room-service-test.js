@@ -228,6 +228,173 @@ describe('room-service', function() {
     });
   });
 
+  describe('addUserToRoom', function() {
+
+    function createRoomServiceWithStubs(stubs) {
+      return testRequire.withProxies("./services/room-service", {
+        './room-permissions-model': function() {
+          return Q.resolve(stubs.addUser);
+        },
+        './invited-permissions-service': function() {
+          return Q.resolve(stubs.canBeInvited);
+        },
+        './user-service': {
+          inviteByUsername: function() {
+            return Q.resolve(stubs.inviteByUsernameResult);
+          },
+          findByUsername: function() {
+            return Q.resolve(stubs.findByUsernameResult);
+          }
+        },
+        './email-notification-service': {
+          sendInvitation: stubs.onInviteEmail
+        }
+      });
+    }
+
+    it('adds a user to the troupe', function(done) {
+      var service = createRoomServiceWithStubs({
+        addUser: true,
+        findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
+        inviteByUsernameResult: null,
+        canBeInvited: true,
+        onInviteEmail: function() {}
+      });
+
+      var troupe = {
+        containsUserId: function() { return false; },
+        addUserById: function(id) {
+          assert.equal(id, 'test-user-id');
+          done();
+        },
+        saveQ: function() {}
+      };
+      service.addUserToRoom(troupe, {}, 'test-user').fail(done);
+    });
+
+    it('saves troupe changes', function(done) {
+      var service = createRoomServiceWithStubs({
+        addUser: true,
+        findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
+        inviteByUsernameResult: null,
+        canBeInvited: true,
+        onInviteEmail: function() {}
+      });
+
+      var troupe = {
+        containsUserId: function() { return false; },
+        addUserById: function() {},
+        saveQ: function() {
+          done();
+        }
+      };
+      service.addUserToRoom(troupe, {}, 'test-user').fail(done);
+    });
+
+    it('returns the added user', function(done) {
+      var service = createRoomServiceWithStubs({
+        addUser: true,
+        findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
+        inviteByUsernameResult: null,
+        canBeInvited: true,
+        onInviteEmail: function() {}
+      });
+
+      var troupe = {
+        containsUserId: function() { return false; },
+        addUserById: function() {},
+        saveQ: function() {}
+      };
+
+      service.addUserToRoom(troupe, {}, 'test-user')
+        .then(function(user) {
+          assert.equal(user.id, 'test-user-id');
+          assert.equal(user.username, 'test-user');
+        }).nodeify(done);
+    });
+
+    it('attempts an email invite for new users', function(done) {
+      var service = createRoomServiceWithStubs({
+        addUser: true,
+        findByUsernameResult: null,
+        inviteByUsernameResult: { username: 'test-user', id: 'test-user-id', state: 'INVITED' },
+        canBeInvited: true,
+        onInviteEmail: function() {
+          done();
+        }
+      });
+
+      var troupe = {
+        containsUserId: function() { return false; },
+        addUserById: function() {},
+        saveQ: function() {}
+      };
+
+      service.addUserToRoom(troupe, {}, 'test-user').fail(done);
+    });
+
+    it('fails with 400 when adding someone to who cant be invited', function(done) {
+      var service = createRoomServiceWithStubs({
+        addUser: true,
+        findByUsernameResult: null,
+        inviteByUsernameResult: { username: 'test-user', id: 'test-user-id', state: 'INVITED' },
+        canBeInvited: false,
+        onInviteEmail: function() {}
+      });
+
+      var troupe = {
+        containsUserId: function() { return false; },
+        addUserById: function() {},
+        saveQ: function() {}
+      };
+
+      service.addUserToRoom(troupe, {}, 'test-user').fail(function(err) {
+        assert.equal(err.status, 400);
+      }).nodeify(done);
+    });
+
+    it('fails with 409 when adding someone who is already in the room', function(done) {
+      var service = createRoomServiceWithStubs({
+        addUser: true,
+        findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
+        inviteByUsernameResult: null,
+        canBeInvited: true,
+        onInviteEmail: function() {}
+      });
+
+      var troupe = {
+        containsUserId: function() { return true; },
+        addUserById: function() {},
+        saveQ: function() {}
+      };
+
+      service.addUserToRoom(troupe, {}, 'test-user').fail(function(err) {
+        assert.equal(err.status, 409);
+      }).nodeify(done);
+    });
+
+    it('fails with 403 when invitee doesnt have permission to add people', function(done) {
+      var service = createRoomServiceWithStubs({
+        addUser: false,
+        findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
+        inviteByUsernameResult: null,
+        canBeInvited: true,
+        onInviteEmail: function() {}
+      });
+
+      var troupe = {
+        containsUserId: function() { return true; },
+        addUserById: function() {},
+        saveQ: function() {}
+      };
+
+      service.addUserToRoom(troupe, {}, 'test-user').fail(function(err) {
+        assert.equal(err.status, 403);
+      }).nodeify(done);
+    });
+
+  });
+
   describe('custom rooms', function() {
 
     describe('::org::', function() {
