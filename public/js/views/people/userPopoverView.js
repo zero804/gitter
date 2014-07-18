@@ -96,12 +96,8 @@ define([
       var username, displayName, invited;
       if(this.model) {
         username = this.model.get('username');
-        displayName = this.model.get('displayName');
-        invited = this.model.get('invited');
       } else {
         username = options.username;
-        displayName = options.displayName;
-        invited = options.invited;
       }
 
       var ghModel = new Backbone.Model({
@@ -110,9 +106,10 @@ define([
       });
 
       ghModel.url = '/api/private/gh/users/' + username;
-      ghModel.set('invited', invited);
 
-      ghModel.fetch();
+      ghModel.fetch({ success: function (model) {
+        model.set('invited', model.get('state') === 'INVITED');
+      }});
 
       options.footerView = new UserPopoverFooterView({ model: ghModel });
 

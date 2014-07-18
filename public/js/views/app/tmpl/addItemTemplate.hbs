@@ -1,5 +1,7 @@
 {{!-- This is actually wrapped by div.gtrPeopleAddRoster --}}
-<div class="trpDisplayPicture avatar-s  " style="background-image: url('{{avatarUrlSmall}}')" data-title="{{displayName}}"></div>
-{{outcome}} <strong>{{username}}</strong> {{feedback}}.
-{{!-- displayName --}}
-{{!-- <span class="remove"></span> --}}
+<div class='gtrPeopleRosterItem__avatar'>
+  <div class="trpDisplayPicture avatar-s  " style="background-image: url('{{avatarUrlSmall}}')" data-title="{{displayName}}"></div>
+</div>
+<div class='gtrPeopleRosterItem__content'>
+  <p class='{{outcome}}'><strong>{{username}}</strong> {{message}} {{#if action}}<a href={{action.href}}>{{action.text}}</a>{{/if}}</p>
+</div>
