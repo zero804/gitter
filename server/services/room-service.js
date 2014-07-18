@@ -626,9 +626,9 @@ exports.createCustomChildRoom = createCustomChildRoom;
  * Validates that all users on the list are validate candidates
  * to be added to the room.
  */
-function validateUsersToAdd(troupe, usersToAdd) {
+function validateUsersToAdd(troupe, usersToAdd, invitee) {
   return Q.all(usersToAdd.map(function(user) {
-    return canBeInvited(user, troupe);
+    return canBeInvited(user, troupe, invitee);
   }));
 }
 /**
@@ -668,7 +668,7 @@ function addUsersToRoom(troupe, instigatingUser, usernamesToAdd) {
       });
     })
     .then(function(usersToAdd) {
-      validateUsersToAdd(troupe, usersToAdd);
+      validateUsersToAdd(troupe, usersToAdd, instigatingUser);
       return usersToAdd;
     })
     .then(function(usersToAdd) {
