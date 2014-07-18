@@ -6,12 +6,13 @@ define([
   'backbone',
   'views/base',
   'utils/context',
+  'utils/mailto-gen',
   'hbs!./tmpl/addPeople',
   'hbs!./tmpl/userSearchItem',
   'hbs!./tmpl/addItemTemplate',
   'views/controls/dropdown',
   'views/controls/typeahead'
-], function($, _, Marionette, Backbone, TroupeViews, context, template, userSearchItemTemplate,
+], function($, _, Marionette, Backbone, TroupeViews, context, mailto, template, userSearchItemTemplate,
   itemTemplate, Dropdown, Typeahead) {
   "use strict";
 
@@ -47,6 +48,7 @@ define([
 
     ui: {
       input: 'input.gtrInput',
+      share: '.js-add-people-share',
       validation: '#modal-failure',
       success: '#modal-success'
     },
@@ -60,12 +62,9 @@ define([
     initialize: function() {
       if(!this.collection) {
         this.collection = new Backbone.Collection();
-        // TODO: collection should be sorted by latest model added
-        // this.collection.comparator = function (m) {
-        //   return m.get('added');
-        // };
+        // TODO: this collection should be sorted by latest model added
+        // this.collection.comparator = function (m) {};
       }
-
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
     },
 
@@ -76,9 +75,9 @@ define([
 
     menuItemClicked: function (button) {
       switch (button) {
-        case 'create':
-          this.validateAndCreate();
-          break;
+        // case 'create':
+        //   this.validateAndCreate();
+        //   break;
 
         case 'share':
           this.dialog.hide();
@@ -91,46 +90,63 @@ define([
       }
     },
 
+    /**
+     * showMessage() slides the given element down then up
+     *
+     * el   DOM Element - element to be animated
+     */
+    showMessage: function (el) {
+      el.slideDown('fast');
+      setTimeout(function () {
+        el.slideUp('fast');
+        return;
+      }, 3000);
+    },
 
     showValidationMessage: function(message) {
       this.ui.validation.text(message);
-      if(message) {
-        this.ui.validation.slideDown('fast');
-      } else {
-        this.ui.validation.slideUp('fast');
-      }
+      this.showMessage(this.ui.validation);
     },
 
     showSuccessMessage: function(message) {
       this.ui.success.text(message);
-      if(message) {
-        this.ui.success.slideDown('fast');
-      } else {
-        this.ui.success.slideUp('fast');
-      }
+      this.showMessage(this.ui.success);
     },
 
     /** TODO
-     * computeFeedback() what does it do?
+     * computeFeedback() produces feedback for the action of adding a user to a room
      *
-     * param type description
-     * @return return type description
+     * user    Object - user object in which the logic is applied to
+     * returns Object - contans the outcome `class` and the message to be displayed on the current item.
      */
-    computeFeedback: function (m) {
-      // if (m.get('invited')) return 'has been invited.';
-      // if (m.get('added')) return 'has been added.';
-      // if (m.get('unreachable')) return 'this user is not reachable.';
-      return {
-        outcome: 'success',
-        message: 'has been added'
+    computeFeedback: function (user) {
+      var fb = {
+        outcome: null,
+        message: null,
+        action: { href: null, text: null }
       };
+
+      if (!user.invited) {
+        fb.outcome = 'added';
+        fb.message = 'was added.';
+      } else if (user.invited && user.email) {
+        fb.outcome = 'invited';
+        fb.message = 'has been invited to Gitter.';
+      } else {
+        fb.outcome = 'unreachable';
+        fb.message = 'is not on Gitter and has no email.';
+        var email = mailto.el({ subject: 'Gitter Invite', body: 'Hi <b>' + user.username + '</b>, I\'ve messaged you on Gitter. Join me! ' + context.env('basePath') + context.troupe().get('url') });
+        fb.action.href = email.href;
+        fb.action.text = 'Invite.';
+      }
+
+      return fb;
     },
 
-    /** TODO
-     * addUserToRoom() what does it do?
+    /**
+     * addUserToRoom() sends request and handles reponse of adding an user to a room
      *
-     * param type description
-     * @return return type description
+     * m    BackboneModel - the user to be added to the room
      */
     addUserToRoom: function (m) {
       $.ajax({
@@ -152,58 +168,15 @@ define([
           }
         },
         success: function (res) {
-          console.debug(res.users);
-          var feedback = this.computeFeedback(res.users);
-          m.set('feedback', feedback.message);
+          if (!res.users.length) return this.showValidationMessage('User is already in the room.');
+          var feedback = this.computeFeedback(res.users[0]);
+          m.set('message', feedback.message);
           m.set('outcome', feedback.outcome);
+          m.set('action', feedback.action);
+          this.typeahead.clear();
           this.collection.add(m);
-          //this.dialog.hide();
         }
       });
-    },
-
-    /**
-     * Validate the form and send the request
-     */
-    validateAndCreate: function () {
-      if (this.collection.length === 0) {
-        this.showValidationMessage('Search for some people to add');
-        this.ui.input.focus();
-        return;
-      }
-
-      $.ajax({
-        url: '/api/v1/rooms/' + context.getTroupeId()  + '/users',
-        contentType: "application/json",
-        dataType: "json",
-        type: "POST",
-        data: JSON.stringify({ usernames: this.collection.pluck('username') }),
-        context: this,
-        statusCode: {
-          400: function() {
-            this.showValidationMessage('Unable to complete the request. Please try again later.');
-          },
-          403: function() {
-            this.showValidationMessage('You cannot add people to this room. Only members of the channels owner can add people to a private channel.');
-          }
-        },
-        success: function(res) {
-          var usersInvited = [];
-          var existingUsers = [];
-          res.users.forEach(function(user) {
-            if (user.invited) {
-              usersInvited.push(user.username);
-            } else {
-              existingUsers.push(user.username);
-            }
-          });
-
-          var msg = "We invited " + usersInvited.join(', ') + " to this chat";
-          this.showSuccessMessage(msg);
-          //this.dialog.hide();
-        }
-      });
-
     },
 
     onRender: function() {

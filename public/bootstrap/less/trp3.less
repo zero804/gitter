@@ -291,25 +291,61 @@ label {
 
 }
 
-.gtrPeopleAddRoster {
-
-}
+.gtrPeopleAddRoster { }
 
 .gtrPeopleRosterItem {
   .trpBodyMedium;
   width: 100%;
   cursor: default;
   margin-bottom: 8px;
+  overflow: hidden;
+
+  &__avatar {
+    float: left;
+  }
+
+  &__content {
+
+    margin-left: 39px;
+    line-height: 30px;
+
+    p {
+      margin-bottom: 0;
+      padding-left: 24px !important;
+
+      a {
+        text-decoration: underline;
+      }
+
+      &.added {
+        .prepend-octicon('\f03a');
+
+        &::before {
+          color: hsl(100, 60%, 70%);
+        }
+      }
+
+      &.invited {
+        .prepend-octicon('\f03c');
+
+        &::before {
+          color: hsl(0, 0%, 75%);
+        }
+      }
+
+      &.unreachable {
+        .prepend-octicon('\f081');
+
+        &::before {
+          color: hsl(0, 60%, 70%);
+        }
+      }
+    }
+  }
 
   &:last-child {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
   }
-
-  .trpDisplayPicture {
-    vertical-align: middle;
-    margin-right: 2px;
-  }
-
 
   .username {
     color: #999;

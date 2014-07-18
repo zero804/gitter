@@ -15,7 +15,14 @@ module.exports = function(req, res, next) {
 
         body.has_gitter_login = exists;
 
+        userService.getUserState(body.login, function(err, state) {
+
+        body.state = state;
         return res.send(body);
+
+        })
+
+
       });
     } else {
       res.send(body);

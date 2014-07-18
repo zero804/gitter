@@ -29,6 +29,14 @@ define([
       this.attach();
     },
 
+    /**
+     * clear() clears the input element's value
+     *
+     */
+    clear: function () {
+      this.el.value = '';
+    },
+
     show: function() {
       if(this.lastFetchInput === undefined) {
         this.searchTextChanged(this.el.value);

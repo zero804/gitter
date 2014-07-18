@@ -92,8 +92,8 @@ var userService = {
   },
 
   inviteByUsernames: function(usernames, user, callback) {
-    var promises = usernames.map(function(username) { 
-      return userService.inviteByUsername(username, user); 
+    var promises = usernames.map(function(username) {
+      return userService.inviteByUsername(username, user);
     });
 
     return Q.allSettled(promises)
@@ -130,6 +130,14 @@ var userService = {
         return !!count;
       })
       .nodeify(callback);
+  },
+
+  getUserState: function(username, callback) {
+        return persistence.User.findOneQ({ username: username })
+           .then(function(user) {
+              return user.state;
+           })
+           .nodeify(callback);
   },
 
   /**
