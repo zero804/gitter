@@ -5,12 +5,12 @@ var permissionsModel = require('./permissions-model');
 var Q = require('q');
 
 
-function canUserBeInvitedToJoinRoom(user, troupe) {
+function canUserBeInvitedToJoinRoom(userToBeInvited, troupe, invitee) {
   var validator;
 
   function roomUserValidator(securityRoomUri, githubType) {
-    return function(user) {
-      return permissionsModel(user, 'join', securityRoomUri, githubType, null);
+    return function(userToBeInvited) {
+      return permissionsModel(userToBeInvited, 'join', securityRoomUri, githubType, null, { githubTokenUser: invitee });
     };
   }
 
@@ -58,7 +58,7 @@ function canUserBeInvitedToJoinRoom(user, troupe) {
       return Q.reject(400);
   }
 
-  return validator(user);
+  return validator(userToBeInvited);
 }
 
 module.exports = canUserBeInvitedToJoinRoom;
