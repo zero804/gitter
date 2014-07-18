@@ -134,7 +134,7 @@ define([
         fb.message = 'has been invited to Gitter.';
       } else {
         fb.outcome = 'unreachable';
-        fb.message = 'is not on Gitter and has no email.';
+        fb.message = 'is not on Gitter and has no public email.';
         var email = mailto.el({ subject: 'Gitter Invite', body: 'Hi <b>' + user.username + '</b>, I\'ve messaged you on Gitter. Join me! ' + context.env('basePath') + context.troupe().get('url') });
         fb.action.href = email.href;
         fb.action.text = 'Invite.';
@@ -154,7 +154,7 @@ define([
         contentType: "application/json",
         dataType: "json",
         type: "POST",
-        data: JSON.stringify({ usernames: [ m.get('username') ] }),
+        data: JSON.stringify({ username: m.get('username') }),
         context: this,
         statusCode: {
           400: function() {
@@ -163,13 +163,15 @@ define([
           403: function() {
             this.showValidationMessage('You cannot add people to this room. Only members of the channels owner can add people to a private channel.');
           },
+          409: function () {
+            this.showValidationMessage('User is already in the room.');
+          },
           500: function () {
             this.showValidationMessage('Server error. Please try again later.');
           }
         },
         success: function (res) {
-          if (!res.users.length) return this.showValidationMessage('User is already in the room.');
-          var feedback = this.computeFeedback(res.users[0]);
+          var feedback = this.computeFeedback(res.user);
           m.set('message', feedback.message);
           m.set('outcome', feedback.outcome);
           m.set('action', feedback.action);

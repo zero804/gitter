@@ -93,11 +93,14 @@ define([
       options.placement = 'horizontal';
       options.minHeight = '88px';
 
-      var username, displayName, invited;
-      if(this.model) {
+      var username, displayName;
+
+      if (this.model) {
         username = this.model.get('username');
+        displayName = this.model.get('displayName'); // leave those in, optimistic loading.
       } else {
         username = options.username;
+        displayName = options.displayName; // leave those in, optimistic loading.
       }
 
       var ghModel = new Backbone.Model({
@@ -107,9 +110,11 @@ define([
 
       ghModel.url = '/api/private/gh/users/' + username;
 
-      ghModel.fetch({ success: function (model) {
-        model.set('invited', model.get('state') === 'INVITED');
-      }});
+      ghModel.fetch({
+        success: function (model) {
+          model.set('invited', model.get('state') === 'INVITED');
+        }
+      });
 
       options.footerView = new UserPopoverFooterView({ model: ghModel });
 
