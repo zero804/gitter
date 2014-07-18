@@ -67,6 +67,79 @@ describe('permissions-model', function() {
       setupRoomTypeTests(roomType);
     });
   });
+
+  describe('token rejection', function() {
+    beforeEach(function() {
+      mockito.when(userBannedFromRoomMock)().then(function() { return Q.resolve(false); });
+      mockito.when(orgPermissionsModelMock)().then(function() {
+        var error = new Error();
+        error.gitterAction = 'logout_destroy_user_tokens';
+        return Q.reject(error);
+      });
+    });
+
+    it('destroys the user token', function(done) {
+      var user = {
+        username: 'gitterbob',
+        destroyTokens: function() {
+          done();
+        }
+      };
+
+      permissionsModel(user, 'join', 'uri', 'ORG', 'PUBLIC');
+    });
+
+    it('saves the destruction of the user token', function(done) {
+      var user = {
+        username: 'gitterbob',
+        destroyTokens: function() {},
+        saveQ: function() {
+          done();
+        }
+      };
+
+      permissionsModel(user, 'join', 'uri', 'ORG', 'PUBLIC');
+    });
+
+    it('destroys the optional github user token (if supplied)', function(done) {
+      var user = {
+        username: 'gitterbob',
+        destroyTokens: function() {
+          assert(false, 'user token should not be destroyed');
+        }
+      };
+
+      var tokenUser = {
+        username: 'usemytokens',
+        destroyTokens: function() {
+          done();
+        }
+      };
+
+      permissionsModel(user, 'join', 'uri', 'ORG', 'PUBLIC', { githubTokenUser: tokenUser });
+    });
+
+    it('saves the destruction of the optional github user token (if supplied)', function(done) {
+      var user = {
+        username: 'gitterbob',
+        destroyTokens: function() {
+          assert(false, 'user token should not be destroyed');
+        }
+      };
+
+      var tokenUser = {
+        username: 'usemytokens',
+        destroyTokens: function() {},
+        saveQ: function() {
+          done();
+        }
+      };
+
+      permissionsModel(user, 'join', 'uri', 'ORG', 'PUBLIC', { githubTokenUser: tokenUser });
+    });
+
+  });
+
 });
 
 function setupRoomTypeTests(roomType) {
