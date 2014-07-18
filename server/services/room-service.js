@@ -687,6 +687,41 @@ function addUsersToRoom(troupe, instigatingUser, usernamesToAdd) {
 }
 exports.addUsersToRoom = addUsersToRoom;
 
+function addUserToRoom(troupe, instigatingUser, usernameToAdd) {
+  return roomPermissionsModel(instigatingUser, 'adduser', troupe)
+    .then(function(access) {
+      if(!access) throw new StatusError(403, 'you do not have permission to add people to this room');;
+
+      return userService.findByUsername(usernameToAdd);
+    })
+    .then(function(existingUser) {
+      return existingUser || userService.inviteByUsername(usernameToAdd);
+    })
+    .then(function(user) {
+
+      if(troupe.containsUserId(user.id)) {
+        throw new StatusError(409, 'user is already in this room');
+      }
+
+      return canBeInvited(user, troupe, instigatingUser)
+        .then(function(hasPermissionToJoin) {
+          if(!hasPermissionToJoin) throw new StatusError(400, 'user does not have permission to join this room');
+
+          troupe.addUserById(user.id);
+          return troupe.saveQ();
+        })
+        .then(function() {
+          if(user.state === 'INVITED') {
+            emailNotificationService.sendInvitation(instigatingUser, user, troupe);
+          }
+
+          return user;
+        });
+
+    });
+}
+exports.addUserToRoom = addUserToRoom;
+
 function revalidatePermissionsForUsers(room) {
   /* Re-insure that each user in the room has access to the room */
   var userIds = room.getUserIds();
