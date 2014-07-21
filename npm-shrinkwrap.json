@@ -710,7 +710,8 @@
           "dependencies": {
             "async": {
               "version": "0.2.9",
-              "from": "async@0.2.9"
+              "from": "async@0.2.9",
+              "resolved": "https://registry.npmjs.org/async/-/async-0.2.9.tgz"
             },
             "ini": {
               "version": "1.2.1",
@@ -719,6 +720,7 @@
             "optimist": {
               "version": "0.6.0",
               "from": "optimist@0.6.0",
+              "resolved": "https://registry.npmjs.org/optimist/-/optimist-0.6.0.tgz",
               "dependencies": {
                 "wordwrap": {
                   "version": "0.0.2",
@@ -738,7 +740,8 @@
         },
         "mixpanel": {
           "version": "0.0.20",
-          "from": "mixpanel@0.0.20"
+          "from": "mixpanel@0.0.20",
+          "resolved": "https://registry.npmjs.org/mixpanel/-/mixpanel-0.0.20.tgz"
         },
         "underscore": {
           "version": "1.6.0",
@@ -753,7 +756,8 @@
       "dependencies": {
         "require-all": {
           "version": "0.0.8",
-          "from": "require-all@0.0.8"
+          "from": "require-all@0.0.8",
+          "resolved": "https://registry.npmjs.org/require-all/-/require-all-0.0.8.tgz"
         },
         "qs": {
           "version": "0.6.6",
@@ -875,9 +879,9 @@
       "resolved": "https://registry.npmjs.org/lazy.js/-/lazy.js-0.2.1.tgz"
     },
     "marked": {
-      "version": "0.4.0",
-      "from": "marked@git://github.com/gitterHQ/marked.git#v0.4.0",
-      "resolved": "git://github.com/gitterHQ/marked.git#8908cb9b4a66b7b0cd0db3b50c917fca1be6e607"
+      "version": "0.4.1",
+      "from": "marked@git://github.com/gitterHQ/marked.git#v0.4.1",
+      "resolved": "git://github.com/gitterHQ/marked.git#f99f6f77ab1d30685e5d7f2ebcbd2e7abce66a76"
     },
     "memwatch": {
       "version": "0.2.2",
@@ -973,12 +977,12 @@
       "dependencies": {
         "redis": {
           "version": "0.10.3",
-          "from": "redis@0.10.3",
+          "from": "https://registry.npmjs.org/redis/-/redis-0.10.3.tgz",
           "resolved": "https://registry.npmjs.org/redis/-/redis-0.10.3.tgz"
         },
         "async": {
           "version": "0.9.0",
-          "from": "async@0.9.0",
+          "from": "https://registry.npmjs.org/async/-/async-0.9.0.tgz",
           "resolved": "https://registry.npmjs.org/async/-/async-0.9.0.tgz"
         }
       }

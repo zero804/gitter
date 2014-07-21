@@ -54,7 +54,7 @@
     "parse-links": "~0.1.0",
     "troupe-passport-github": "git://github.com/troupe/passport-github.git#v0.1.8d",
     "text-filter": "~0.1.0",
-    "marked": "git://github.com/gitterHQ/marked.git#v0.4.0",
+    "marked": "git://github.com/gitterHQ/marked.git#v0.4.1",
     "highlight.js": "~8.0.0",
     "xregexp": "^2.0.0",
     "heapdump": "^0.2.9",
