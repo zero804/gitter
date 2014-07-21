@@ -651,6 +651,19 @@ function addUserToRoom(troupe, instigatingUser, usernameToAdd) {
             emailNotificationService.addedToRoomNotification(instigatingUser, user, troupe);
           }
 
+          var statsMethod = 'auto_join';
+
+          if(user.state === 'INVITED') {
+            statsMethod = (user.emails && user.emails[0]) ? 'email_sent' : 'unreadchable';
+          }
+
+          stats.event('user_added', {
+            userId: user.id,
+            method: statsMethod,
+            troupeId: troupe.id,
+            instigatingUserId: instigatingUser.id
+          });
+
           return user;
         });
 
