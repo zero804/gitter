@@ -17,7 +17,7 @@ var scheduler = new resque.scheduler({connection: connectionDetails}, function()
 
 scheduler.on('error', function(err) {
   logger.error('worker-queue-redis: scheduler failed: ' + err, { exception: err });
-  stats.event('resque.scheduler.error', { exception: err });
+  stats.event('resque.scheduler.error');
 });
 
 var jobs = {
@@ -62,47 +62,47 @@ var Queue = function(name, options, loaderFn) {
 
   this.worker.on('start', function() {
     logger.silly('worker-queue-redis: started ' + self.name);
-    stats.event('resque.worker.started', { name: self.worker.name });
+    stats.event('resque.worker.started');
   });
 
   this.worker.on('end', function() {
     logger.silly("worker-queue-redis: ended " + self.name);
-    stats.event('resque.worker.ended', { name: self.worker.name });
+    stats.event('resque.worker.ended');
   });
 
   this.worker.on('cleaning_worker', function(worker) {
     logger.silly("worker-queue-redis: cleaning old worker: " + worker);
-    stats.event('resque.worker.cleaning', { cleaner: self.worker.name, beingCleaned: worker });
+    stats.event('resque.worker.cleaning');
   });
 
   this.worker.on('poll', function(queue) {
-    stats.eventHF('resque.worker.polling', { name: self.worker.name, queue: queue }, 0.005);
+    stats.eventHF('resque.worker.polling', 1, 0.005);
   });
 
   this.worker.on('job', function(queue, job) {
     logger.silly("worker-queue-redis: working job " + queue + " " + JSON.stringify(job));
-    stats.eventHF('resque.worker.working', { name: self.worker.name, queue: queue, job: job });
+    stats.eventHF('resque.worker.working');
   });
 
   this.worker.on('reEnqueue', function(queue, job, plugin) {
     logger.silly("worker-queue-redis: reEnqueue job (" + plugin + ") " + queue + " " + JSON.stringify(job));
-    stats.event('resque.worker.reenqueue', { name: self.worker.name, queue: queue, job: job, plugin: plugin });
+    stats.event('resque.worker.reenqueue');
   });
 
   this.worker.on('pause', function() {
-    stats.eventHF('resque.worker.paused', { name: self.worker.name }, 0.005);
+    stats.eventHF('resque.worker.paused', 1, 0.005);
   });
 
   this.worker.on('success', function(queue, job, result){
     self.fn(result, function(err) {
       if(err) return logger.error('worker-queue-redis: callback failed: ' + err, { queue: queue, job: job, exception: err });
     });
-    stats.eventHF('resque.worker.success', { name: self.worker.name });
+    stats.eventHF('resque.worker.success');
   });
 
   this.worker.on('error', function(queue, job, err) {
     logger.error('worker-queue-redis: failed: ' + err, { queue: queue, job: job, exception: err });
-    stats.event('resque.worker.error', { name: self.worker.name, queue: queue, job: job, exception: err });
+    stats.event('resque.worker.error');
   });
 };
 
