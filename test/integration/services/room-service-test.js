@@ -334,7 +334,7 @@ describe('room-service', function() {
       service.addUserToRoom(troupe, {}, 'test-user').fail(done);
     });
 
-    it('fails with 400 when adding someone to who cant be invited', function(done) {
+    it('fails with 403 when adding someone to who cant be invited', function(done) {
       var service = createRoomServiceWithStubs({
         addUser: true,
         findByUsernameResult: null,
@@ -350,7 +350,7 @@ describe('room-service', function() {
       };
 
       service.addUserToRoom(troupe, {}, 'test-user').fail(function(err) {
-        assert.equal(err.status, 400);
+        assert.equal(err.status, 403);
       }).nodeify(done);
     });
 

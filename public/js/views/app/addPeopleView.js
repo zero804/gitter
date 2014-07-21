@@ -142,6 +142,14 @@ define([
       return fb;
     },
 
+
+    handleError: function (res, status, message) {
+      var json = res.responseJSON;
+      this.ui.loading.toggleClass('hide');
+      this.showValidationMessage((json) ? json.error : res.status + ': ' + res.statusText);
+      this.typeahead.clear();
+    },
+
     /**
      * addUserToRoom() sends request and handles reponse of adding an user to a room
      *
@@ -157,49 +165,24 @@ define([
         data: JSON.stringify({ username: m.get('username') }),
         context: this,
         timeout: 45 * 1000,
-        statusCode: {
-          400: function() {
-            this.showValidationMessage('Unable to complete the request. Please try again later.');
-          },
-          403: function() {
-            this.showValidationMessage('You cannot add people to this room. Only members of the channels owner can add people to a private channel.');
-          },
-          409: function () {
-            this.showValidationMessage('User is already in the room.');
-          },
-          500: function () {
-            this.showValidationMessage('Server error. Please try again later.');
-          }
-        },
-        error: function (res, statusText) {
-          this.ui.loading.toggleClass('hide');
-          switch (statusText) {
-            case 'timeout':
-              this.showValidationMessage('The request timed out.');
-              break;
-            case 'abort':
-              this.showValidationMessage('The request was aborted.');
-              break;
-            default:
-              this.showValidationMessage('An unknown error has occurred.');
-              break;
-          }
-        },
+        error: this.handleError,
         success: function (res) {
           this.ui.loading.toggleClass('hide');
           var feedback = this.computeFeedback(res.user);
           if (res.user.email) m.set('email', res.user.email);
-          m.set('message', feedback.message);
-          m.set('outcome', feedback.outcome);
-          m.set('action', feedback.action);
-          m.set('timeAdded', Date.now());
-          this.typeahead.clear();
+          m.set({
+            message: feedback.message,
+            outcome: feedback.outcome,
+            action: feedback.action,
+            timeAdded: Date.now()
+          });
           this.collection.add(m);
+          this.typeahead.clear();
         }
       });
     },
 
-    onRender: function() {
+    onRender: function () {
       this.typeahead = new Typeahead({
         collection: new UserSearchCollection(),
         itemTemplate: userSearchItemTemplate,
