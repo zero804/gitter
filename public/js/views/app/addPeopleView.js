@@ -4,6 +4,7 @@ define([
   'underscore',
   'marionette',
   'backbone',
+  'cocktail',
   'views/base',
   'utils/context',
   'utils/mailto-gen',
@@ -12,7 +13,7 @@ define([
   'hbs!./tmpl/addItemTemplate',
   'views/controls/dropdown',
   'views/controls/typeahead'
-], function($, _, Marionette, Backbone, TroupeViews, context, mailto, template, userSearchItemTemplate,
+], function($, _, Marionette, Backbone, cocktail, TroupeViews, context, mailto, template, userSearchItemTemplate,
   itemTemplate, Dropdown, Typeahead) {
   "use strict";
 
@@ -31,15 +32,8 @@ define([
   var RowView = Marionette.ItemView.extend({
     tagName: "div",
     className: "gtrPeopleRosterItem",
-    template: itemTemplate,
-    ui: {
-      remove: '.remove'
-    },
-    triggers: {
-      'click @ui.remove': 'remove:clicked'
-    }
+    template: itemTemplate
   });
-
 
   var View = Marionette.CompositeView.extend({
     itemViewContainer: ".gtrPeopleAddRoster",
@@ -49,21 +43,21 @@ define([
     ui: {
       input: 'input.gtrInput',
       share: '.js-add-people-share',
+      loading: '.js-add-roster-loading',
       validation: '#modal-failure',
       success: '#modal-success'
     },
 
-    itemEvents: {
-      "remove:clicked": function(event, view) {
-        this.collection.remove(view.model);
-      }
-    },
-
     initialize: function() {
       if(!this.collection) {
-        this.collection = new Backbone.Collection();
-        // TODO: this collection should be sorted by latest model added
-        // this.collection.comparator = function (m) {};
+
+        var ResultsCollection = Backbone.Collection.extend({
+          comparator: function(a, b) {
+            return b.get('timeAdded') - a.get('timeAdded');
+          }
+        });
+
+        this.collection = new ResultsCollection();
       }
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
     },
@@ -73,12 +67,14 @@ define([
       this.typeahead.dropdown.hide();
     },
 
+    strTemplate: function (str, o) {
+      return str.replace(/{{([a-z_$]+)}}/gi, function (m, k) {
+          return (typeof o[k] !== 'undefined' ? o[k] : '');
+      });
+    },
+
     menuItemClicked: function (button) {
       switch (button) {
-        // case 'create':
-        //   this.validateAndCreate();
-        //   break;
-
         case 'share':
           this.dialog.hide();
           window.location.hash = "#inv";
@@ -113,7 +109,7 @@ define([
       this.showMessage(this.ui.success);
     },
 
-    /** TODO
+    /*
      * computeFeedback() produces feedback for the action of adding a user to a room
      *
      * user    Object - user object in which the logic is applied to
@@ -135,7 +131,10 @@ define([
       } else {
         fb.outcome = 'unreachable';
         fb.message = 'is not on Gitter and has no public email.';
-        var email = mailto.el({ subject: 'Gitter Invite', body: 'Hi <b>' + user.username + '</b>, I\'ve messaged you on Gitter. Join me! ' + context.env('basePath') + context.troupe().get('url') });
+        var email = mailto.el({
+          subject: 'Gitter Invite',
+          body: this.strTemplate('Hi {{user}}, I\'ve messaged you on Gitter. Join me! {{base}}{{roomUrl}}', { user: user.username, base: context.env('basePath'), roomUrl: context.troupe().get('url') })
+        });
         fb.action.href = email.href;
         fb.action.text = 'Invite.';
       }
@@ -149,6 +148,7 @@ define([
      * m    BackboneModel - the user to be added to the room
      */
     addUserToRoom: function (m) {
+      this.ui.loading.toggleClass('hide');
       $.ajax({
         url: '/api/v1/rooms/' + context.getTroupeId()  + '/users',
         contentType: "application/json",
@@ -156,6 +156,7 @@ define([
         type: "POST",
         data: JSON.stringify({ username: m.get('username') }),
         context: this,
+        timeout: 45 * 1000,
         statusCode: {
           400: function() {
             this.showValidationMessage('Unable to complete the request. Please try again later.');
@@ -170,11 +171,28 @@ define([
             this.showValidationMessage('Server error. Please try again later.');
           }
         },
+        error: function (res, statusText) {
+          this.ui.loading.toggleClass('hide');
+          switch (statusText) {
+            case 'timeout':
+              this.showValidationMessage('The request timed out.');
+              break;
+            case 'abort':
+              this.showValidationMessage('The request was aborted.');
+              break;
+            default:
+              this.showValidationMessage('An unknown error has occurred.');
+              break;
+          }
+        },
         success: function (res) {
+          this.ui.loading.toggleClass('hide');
           var feedback = this.computeFeedback(res.user);
+          if (res.user.email) m.set('email', res.user.email);
           m.set('message', feedback.message);
           m.set('outcome', feedback.outcome);
           m.set('action', feedback.action);
+          m.set('timeAdded', Date.now());
           this.typeahead.clear();
           this.collection.add(m);
         }
@@ -205,17 +223,17 @@ define([
         this.typeahead.close();
       }
     }
-
   });
 
   var modalButtons = [
-    // { action: "create", text: "Add", className: "trpBtnGreen" },
-    { action: "done", text: "Done", className: "trpBtnLightGrey"},
+    { action: "done", text: "Done", className: "trpBtnLightGrey"}
   ];
 
   if(context.troupe().get('security') !== 'PRIVATE') {
     modalButtons.push({ action: "share", text: "Share this room", className: "trpBtnBlue trpBtnRight"});
   }
+
+  cocktail.mixin(View, TroupeViews.SortableMarionetteView);
 
   return TroupeViews.Modal.extend({
     disableAutoFocus: true,
