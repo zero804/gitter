@@ -11,23 +11,21 @@ var crypto            = require('crypto');
 var GitHubMeService   = require('./github/github-me-service');
 
 var passphrase        = config.get('email:unsubscribeNotificationsSecret');
+var Q = require('q');
+
+function findValidEmail(user) {
+  var deferred = Q.defer();
+
+  if (user.githubUserToken || user.githubToken) {
+    var ghMe = new GitHubMeService(user);
+    return ghMe.getEmail();
+  } else {
+    deferred.resolve(user.emails[0]);
+    return deferred.promise;
+  }
+}
 
 module.exports = {
-  sendContactSignupNotification: function(signupUser, toUser) {
-    var signupDisplayName = signupUser.displayName;
-    var email = toUser.email;
-
-    return mailerService.sendEmail({
-      templateFile: "contact_signup_notification",
-      from: 'Troupe <support@troupe.co>',
-      to: email,
-      subject: signupDisplayName + " has joined Troupe",
-      data: {
-        signupDisplayName: signupDisplayName,
-        connectLink: config.get("email:emailBasePath") + signupUser.getHomeUrl(),
-      }
-    });
-  },
 
   sendUnreadItemsNotification: function(user, troupesWithUnreadCounts) {
     var plaintext = user.id + ',' + 'unread_notifications';
@@ -39,9 +37,7 @@ module.exports = {
       return;
     }
 
-
-    var ghMe = new GitHubMeService(user);
-    return ghMe.getEmail()
+    return findValidEmail(user)
       .then(function(email) {
         if(!email) {
           logger.info('Skipping email notification for ' + user.username + ' as they have no primary confirmed email');
@@ -83,42 +79,50 @@ module.exports = {
   sendInvitation: function(fromUser, toUser, room) {
     var senderName = fromUser.displayName;
     var recipientName = toUser.displayName;
-    var email = toUser.emails[0];
 
-    if (!email) return;
+    return findValidEmail(toUser)
+      .then(function(email) {
+        if (!email) return;
 
-    return mailerService.sendEmail({
-      templateFile: "invitation",
-      from: senderName + ' <support@gitter.im>',
-      to: email,
-      subject: '[' + room.uri + '] Join the chat on Gitter',
-      data: {
-        roomUri: room.uri,
-        roomUrl: config.get("email:emailBasePath") + '/' + room.uri,
-        senderName: senderName,
-        recipientName: recipientName
-      }
+        stats.event('invitation_sent', {userId: toUser.id, email: email});
+
+        return mailerService.sendEmail({
+          templateFile: "invitation",
+          from: senderName + ' <support@gitter.im>',
+          to: email,
+          subject: '[' + room.uri + '] Join the chat on Gitter',
+          data: {
+            roomUri: room.uri,
+            roomUrl: config.get("email:emailBasePath") + '/' + room.uri,
+            senderName: senderName,
+            recipientName: recipientName
+          }
+        });
     });
   },
 
   addedToRoomNotification: function(fromUser, toUser, room) {
     var senderName = fromUser.displayName;
     var recipientName = toUser.displayName;
-    var email = toUser.emails[0];
 
-    if (!email) return;
+    return findValidEmail(toUser)
+      .then(function(email) {
+        if (!email) return;
 
-    return mailerService.sendEmail({
-      templateFile: "added_to_room",
-      from: senderName + ' <support@gitter.im>',
-      to: email,
-      subject: '[' + room.uri + '] Join the chat on Gitter',
-      data: {
-        roomUri: room.uri,
-        roomUrl: config.get("email:emailBasePath") + '/' + room.uri,
-        senderName: senderName,
-        recipientName: recipientName
-      }
+        stats.event('added_to_room_notification_sent', {userId: toUser.id, email: email});
+
+        return mailerService.sendEmail({
+          templateFile: "added_to_room",
+          from: senderName + ' <support@gitter.im>',
+          to: email,
+          subject: '[' + room.uri + '] Join the chat on Gitter',
+          data: {
+            roomUri: room.uri,
+            roomUrl: config.get("email:emailBasePath") + '/' + room.uri,
+            senderName: senderName,
+            recipientName: recipientName
+          }
+        });
     });
 
   }
