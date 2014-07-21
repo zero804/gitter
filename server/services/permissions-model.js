@@ -70,7 +70,7 @@ function permissionsModel(user, right, uri, roomType, security, options) {
     .then(function(banned) {
       if(banned) return false;
 
-      return submodel(user, right, uri, security)
+      return submodel(user, right, uri, security, options)
         .then(log)
         .fail(function(err) {
           if(err.gitterAction === 'logout_destroy_user_tokens') {

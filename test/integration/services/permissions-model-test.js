@@ -140,6 +140,16 @@ describe('permissions-model', function() {
 
   });
 
+  it('passes options through', function(done) {
+    mockito.when(userBannedFromRoomMock)().then(function() { return Q.resolve(false); });
+    mockito.when(orgPermissionsModelMock)().then(function(user, right, uri, security, options) {
+      assert.equal(options.someoption, 'iamhere');
+      done();
+    });
+
+    permissionsModel({}, 'join', 'uri', 'ORG', 'PUBLIC', { someoption: 'iamhere' });
+  });
+
 });
 
 function setupRoomTypeTests(roomType) {
