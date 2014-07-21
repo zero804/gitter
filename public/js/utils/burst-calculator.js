@@ -63,9 +63,6 @@ define([
    */
   function findSlice (model) {
     if('burstStart' in model.attributes) return; // already calculated bursts for this batch
-    if (model.get('text') === '4') {
-      debugger;
-    }
     var index = this.indexOf(model);
     var start = findBurstAbove.call(this, index);
     var end = findBurstBelow.call(this, index);

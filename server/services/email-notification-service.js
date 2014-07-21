@@ -1,17 +1,17 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var env               = require('../utils/env');
-var config            = env.config;
-var stats             = env.stats;
-var logger            = env.logger;
+var env                 = require('../utils/env');
+var config              = env.config;
+var stats               = env.stats;
+var logger              = env.logger;
+var mailerService       = require("./mailer-service");
+var crypto              = require('crypto');
+var GitHubMeService     = require('./github/github-me-service');
+var passphrase          = config.get('email:unsubscribeNotificationsSecret');
+var Q                   = require('q');
+var userSettingsService = require('../services/user-settings-service');
 
-var mailerService     = require("./mailer-service");
-var crypto            = require('crypto');
-var GitHubMeService   = require('./github/github-me-service');
-
-var passphrase        = config.get('email:unsubscribeNotificationsSecret');
-var Q = require('q');
 
 function findValidEmail(user) {
   var deferred = Q.defer();
@@ -102,26 +102,43 @@ module.exports = {
   },
 
   addedToRoomNotification: function(fromUser, toUser, room) {
+    var plaintext       = user.id + ',' + 'unread_notifications';
+    var cipher          = crypto.createCipher('aes256', passphrase);
+    var hash            = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
+    var unsubscribeUrl  = emailBasePath + '/settings/unsubscribe/' + hash;
+
     var senderName = fromUser.displayName;
     var recipientName = toUser.displayName;
 
-    return findValidEmail(toUser)
-      .then(function(email) {
-        if (!email) return;
+    userSettingsService.getUserSettings(toUser.id, 'unread_notifications_optout')
+      .then(function(optout) {
+        if (optout) {
+          logger.info('Skipping email notification for ' + toUser.username + ' because opt-out');
+          return;
+        }
 
-        stats.event('added_to_room_notification_sent', {userId: toUser.id, email: email});
+        return findValidEmail(toUser)
+          .then(function(email) {
+            if (!email) {
+              logger.info('Skipping email notification for ' + toUser.username + ' as they have no primary confirmed email');
+              return;
+            }
 
-        return mailerService.sendEmail({
-          templateFile: "added_to_room",
-          from: senderName + ' <support@gitter.im>',
-          to: email,
-          subject: '[' + room.uri + '] Join the chat on Gitter',
-          data: {
-            roomUri: room.uri,
-            roomUrl: config.get("email:emailBasePath") + '/' + room.uri,
-            senderName: senderName,
-            recipientName: recipientName
-          }
+            stats.event('added_to_room_notification_sent', {userId: toUser.id, email: email});
+
+            return mailerService.sendEmail({
+              templateFile: "added_to_room",
+              from: senderName + ' <support@gitter.im>',
+              to: email,
+              subject: '[' + room.uri + '] Join the chat on Gitter',
+              data: {
+                roomUri: room.uri,
+                roomUrl: config.get("email:emailBasePath") + '/' + room.uri,
+                senderName: senderName,
+                recipientName: recipientName,
+                unsubscribeUrl: unsubscribeUrl
+              }
+            });
         });
     });
 
