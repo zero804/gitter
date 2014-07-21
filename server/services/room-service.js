@@ -624,7 +624,7 @@ exports.createCustomChildRoom = createCustomChildRoom;
 function addUserToRoom(troupe, instigatingUser, usernameToAdd) {
   return roomPermissionsModel(instigatingUser, 'adduser', troupe)
     .then(function(access) {
-      if(!access) throw new StatusError(403, 'you do not have permission to add people to this room');;
+      if(!access) throw new StatusError(403, 'You do not have permission to add people to this room.');
 
       return userService.findByUsername(usernameToAdd);
     })
@@ -634,12 +634,12 @@ function addUserToRoom(troupe, instigatingUser, usernameToAdd) {
     .then(function(user) {
 
       if(troupe.containsUserId(user.id)) {
-        throw new StatusError(409, 'user is already in this room');
+        throw new StatusError(409, usernameToAdd + ' is already in this room.');
       }
 
       return canBeInvited(user, troupe, instigatingUser)
         .then(function(hasPermissionToJoin) {
-          if(!hasPermissionToJoin) throw new StatusError(400, 'user does not have permission to join this room');
+          if(!hasPermissionToJoin) throw new StatusError(403, usernameToAdd + ' does not have permission to join this room.');
 
           troupe.addUserById(user.id);
           return troupe.saveQ();
