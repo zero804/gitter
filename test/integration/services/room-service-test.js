@@ -374,7 +374,7 @@ describe('room-service', function() {
       }).nodeify(done);
     });
 
-    it('fails with 403 when invitee doesnt have permission to add people', function(done) {
+    it('fails with 403 when instigating user doesnt have permission to add people', function(done) {
       var service = createRoomServiceWithStubs({
         addUser: false,
         findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
