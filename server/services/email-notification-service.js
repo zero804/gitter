@@ -26,21 +26,6 @@ function findValidEmail(user) {
 }
 
 module.exports = {
-  sendContactSignupNotification: function(signupUser, toUser) {
-    var signupDisplayName = signupUser.displayName;
-    var email = toUser.email;
-
-    return mailerService.sendEmail({
-      templateFile: "contact_signup_notification",
-      from: 'Troupe <support@troupe.co>',
-      to: email,
-      subject: signupDisplayName + " has joined Troupe",
-      data: {
-        signupDisplayName: signupDisplayName,
-        connectLink: config.get("email:emailBasePath") + signupUser.getHomeUrl(),
-      }
-    });
-  },
 
   sendUnreadItemsNotification: function(user, troupesWithUnreadCounts) {
     var plaintext = user.id + ',' + 'unread_notifications';
