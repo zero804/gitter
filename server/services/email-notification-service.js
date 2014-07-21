@@ -102,9 +102,10 @@ module.exports = {
   },
 
   addedToRoomNotification: function(fromUser, toUser, room) {
-    var plaintext       = user.id + ',' + 'unread_notifications';
+    var plaintext       = toUser.id + ',' + 'unread_notifications';
     var cipher          = crypto.createCipher('aes256', passphrase);
     var hash            = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
+    var emailBasePath   = config.get("email:emailBasePath");
     var unsubscribeUrl  = emailBasePath + '/settings/unsubscribe/' + hash;
 
     var senderName = fromUser.displayName;
