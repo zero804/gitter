@@ -60,6 +60,14 @@ var chatMiddlewarePipeline = [
       appRender.renderNotLoggedInChatPage(req, res, next);
     }
 
+  },
+  function(err, req, res, next) {
+    if(err && err.userNotSignedUp) {
+      appRender.renderUserNotSignedUp(req, res, next);
+      return;
+    }
+
+    return next();
   }
 ];
 
