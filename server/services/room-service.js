@@ -352,10 +352,16 @@ function findOrCreateRoom(user, uri, options) {
 
         logger.verbose('Finding or creating a one to one chat');
 
-        return troupeService.findOrCreateOneToOneTroupeIfPossible(userId, otherUser.id)
-          .spread(function(troupe, otherUser) {
-            return { oneToOne: true, troupe: troupe, otherUser: otherUser };
-          });
+        return permissionsModel(user, 'view', otherUser.username, 'ONETOONE', null)
+          .then(function(access) {
+            if(!access) return null;
+
+            return troupeService.findOrCreateOneToOneTroupeIfPossible(userId, otherUser.id)
+              .spread(function(troupe, otherUser) {
+                return { oneToOne: true, troupe: troupe, otherUser: otherUser };
+              });
+          })
+
       }
 
       logger.verbose('Attempting to access room ' + uri);

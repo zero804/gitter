@@ -101,7 +101,7 @@ module.exports = function repoPermissionsModel(user, right, uri, security, optio
     })
     .catch(function(err) {
       if(err.errno && err.syscall || err.statusCode >= 500) {
-        logger.error('Repo: ' + err, { exception: err });
+        winston.error('Repo: ' + err, { exception: err });
         // GitHub call failed and may be down.
         // We can fall back to whether the user is already in the room
         return githubFailurePermissionsModel(user, right, uri, security);
