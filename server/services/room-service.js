@@ -647,6 +647,8 @@ function addUserToRoom(troupe, instigatingUser, usernameToAdd) {
         .then(function() {
           if(user.state === 'INVITED') {
             emailNotificationService.sendInvitation(instigatingUser, user, troupe);
+          } else {
+            emailNotificationService.addedToRoomNotification(instigatingUser, user, troupe);
           }
 
           return user;
