@@ -247,7 +247,8 @@ describe('room-service', function() {
           }
         },
         './email-notification-service': {
-          sendInvitation: stubs.onInviteEmail
+          sendInvitation: stubs.onInviteEmail,
+          addedToRoomNotification: function() {}
         }
       });
     }
