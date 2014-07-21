@@ -82,7 +82,7 @@ module.exports = {
 
   sendInvitation: function(fromUser, toUser, room) {
     var senderName = fromUser.displayName;
-    var recipientName = toUser.recipientName;
+    var recipientName = toUser.displayName;
     var email = toUser.emails[0];
 
     if (!email) return;
@@ -99,6 +99,28 @@ module.exports = {
         recipientName: recipientName
       }
     });
+  },
+
+  addedToRoomNotification: function(fromUser, toUser, room) {
+    var senderName = fromUser.displayName;
+    var recipientName = toUser.displayName;
+    var email = toUser.emails[0];
+
+    if (!email) return;
+
+    return mailerService.sendEmail({
+      templateFile: "added_to_room",
+      from: senderName + ' <support@gitter.im>',
+      to: email,
+      subject: '[' + room.uri + '] Join the chat on Gitter',
+      data: {
+        roomUri: room.uri,
+        roomUrl: config.get("email:emailBasePath") + '/' + room.uri,
+        senderName: senderName,
+        recipientName: recipientName
+      }
+    });
+
   }
 
 };
