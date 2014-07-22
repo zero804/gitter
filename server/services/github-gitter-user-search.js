@@ -7,18 +7,6 @@ var githubSearchService = require("./github/github-fast-search");
 var Q = require('q');
 var _ = require('underscore');
 
-
-function searchGitterUsers(query, searcherId, excludeTroupeId, limit, skip, callback) {
-  var options = {
-    limit: limit,
-    skip: skip,
-    excludeTroupeId: excludeTroupeId
-  };
-
-  return userSearchService.searchForUsers(searcherId, query, options)
-    .nodeify(callback);
-}
-
 function searchGithubUsers(query, user, callback) {
   var search = new githubSearchService(user);
   return search.findUsers(query).then(function(users) {
@@ -66,9 +54,11 @@ function addGitterDataToGithubUsers(githubUsers, callback) {
     });
 }
 
-module.exports = function(searchQuery, user, excludeTroupeId, limit, skip, callback) {
+module.exports = function(searchQuery, user, options, callback) {
+  var options = options || {};
+
   return Q([
-    searchGitterUsers(searchQuery, user.id, excludeTroupeId, limit, skip),
+    userSearchService.searchForUsers(user.id, searchQuery, options),
     searchGithubUsers(searchQuery, user).then(addGitterDataToGithubUsers)
   ])
   .spread(function(gitterResults, githubUsers) {
@@ -82,7 +72,7 @@ module.exports = function(searchQuery, user, excludeTroupeId, limit, skip, callb
     var deduplicated = _.uniq(noSelfMentions, false, function(user) {
       return user.username;
     });
-    var limited = deduplicated.slice(0, limit);
+    var limited = deduplicated.slice(0, options.limit);
 
     gitterResults.results = limited
     return gitterResults;
