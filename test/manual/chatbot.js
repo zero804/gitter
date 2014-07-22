@@ -14,11 +14,10 @@ var opts = require("nomnom")
    })
    .option('user', {
       abbr: 'u',
-      'default': 'testuser@troupetest.local'
+      required: true
    })
    .option('troupe', {
-      abbr: 't',
-      'default': 'testtroupe1'
+      abbr: 't'
    })
    .option('frequency', {
       abbr: 'f',
@@ -40,6 +39,7 @@ function sendMessage(token, troupe, host) {
 }
 
 function error(e) {
+  console.error('Error');
   console.error(e);
   process.exit(1);
 }
@@ -48,7 +48,7 @@ userService.findByUsername(opts.user, function(err, user) {
   if(err) return error(err);
   if(!user) return error('User not found');
 
-  troupeService.findById(opts.troupe, function(err, troupe) {
+  troupeService.findByUri(opts.troupe, function(err, troupe) {
     if(err) return error(err);
     if(!troupe) return error('Troupe not found');
 

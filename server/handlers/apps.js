@@ -2,7 +2,6 @@
 "use strict";
 
 var nconf = require('../utils/config');
-var languageSelector = require('../web/language-selector');
 
 /* /apps is reserved on github */
 module.exports = {
@@ -14,8 +13,7 @@ module.exports = {
           var compactView = userAgent.indexOf("Mobile/") >= 0;
           res.render('apps', {
             compactView: compactView,
-            homeUrl: nconf.get('web:homeurl'),
-            lang: languageSelector(req)
+            homeUrl: nconf.get('web:homeurl')
           });
         }
       );

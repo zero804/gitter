@@ -10,6 +10,31 @@ var collections       = require("../../utils/collections");
 var GitHubRepoService = require('../../services/github/github-repo-service');
 var execPreloads      = require('../exec-preloads');
 var getVersion        = require('../get-model-version');
+var billingService    = require('../../services/billing-service');
+var env               = require('../../utils/env');
+
+
+function UserPremiumStatusStrategy() {
+  var usersWithPlans;
+
+  this.preload = function(userIds, callback) {
+    return billingService.findActivePersonalPlansForUsers(userIds)
+      .then(function(subscriptions) {
+        usersWithPlans = subscriptions.reduce(function(memo, s) {
+          memo[s.userId] = true;
+          return memo;
+        }, {});
+
+        return true;
+      })
+      .nodeify(callback);
+  };
+
+  this.map = function(userId) {
+    return env.config.get('premium:disabled') ? true : !!usersWithPlans[userId];
+  };
+
+}
 
 function UserRoleInTroupeStrategy(options) {
   var contributors;
@@ -104,6 +129,7 @@ function UserStrategy(options) {
   options = options ? options : {};
   var userRoleInTroupeStrategy = options.includeRolesForTroupeId || options.includeRolesForTroupe ? new UserRoleInTroupeStrategy(options) : null;
   var userPresenceInTroupeStrategy = options.showPresenceForTroupeId ? new UserPresenceInTroupeStrategy(options.showPresenceForTroupeId) : null;
+  var userPremiumStatusStrategy = options.showPremiumStatus ? new UserPremiumStatusStrategy() : null;
 
   this.preload = function(users, callback) {
     var strategies = [];
@@ -119,6 +145,13 @@ function UserStrategy(options) {
       strategies.push({
         strategy: userPresenceInTroupeStrategy,
         data: null
+      });
+    }
+
+    if(userPremiumStatusStrategy) {
+      strategies.push({
+        strategy: userPremiumStatusStrategy,
+        data: users.map(function(user) { return user.id; })
       });
     }
 
@@ -147,6 +180,7 @@ function UserStrategy(options) {
       scopes: scopes,
       online: userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id) || undefined,
       role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.username) || undefined,
+      premium: userPremiumStatusStrategy && userPremiumStatusStrategy.map(user.id) || undefined,
       v: getVersion(user)
     };
   };
