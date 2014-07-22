@@ -1,0 +1,32 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=IE9" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
+    <meta charset="utf-8">
+    <title>{{troupeName}} - Gitter</title>
+    <style>
+
+      @-webkit-keyframes pulsey {
+        0% { opacity: 0.6; }
+        50% { opacity: 1; }
+        100% { opacity: 0.6; }
+      }
+
+      html.loading .trpContentPanel { background: url("{{ cdn 'images/2/gitter/logo-mark-grey-64.png' }}") center no-repeat; height: 90%; -webkit-animation: pulsey 2s ease-out; -webkit-animation-iteration-count: infinite;  }
+      html.loading .trpContentPanel > * { visibility: hidden; }
+    </style>
+    <base target="_parent">
+    <link rel="stylesheet" href='{{cdn "sprites/services.css" }}'>
+    <link rel="stylesheet" href='{{cdn "bootstrap/css/trp3.css" }}'>
+    <link id="favicon" rel="shortcut icon" href='{{cdn "images/2/gitter/favicon5.png" }}'><!-- Le fav and touch icons -->
+    {{> load_font_css}}
+  </head>
+  <body class="iframe">
+    {{{body}}}
+    {{> chat_upload}}
+  </body>
+  <script type="text/javascript">
+    window.scrollTo(0,document.body.scrollHeight);
+  </script>
+</html>
