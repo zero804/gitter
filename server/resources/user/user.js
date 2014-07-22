@@ -3,7 +3,9 @@
 
 var restSerializer = require("../../serializers/rest-serializer");
 var userService = require("../../services/user-service");
-var search = require("../../services/github-gitter-user-search")
+var githubGitterUserSearch = require("../../services/github-gitter-user-search");
+var gitterUserSearch = require("../../services/user-search-service");
+var Q = require('q');
 
 module.exports = {
   id: 'resourceUser',
@@ -16,11 +18,21 @@ module.exports = {
 
       var searchQuery = req.query.q;
       var user = req.user;
-      var limit = req.query.limit || 10;
-      var skip = req.query.skip;
-      var excludeTroupeId = req.query.excludeTroupeId;
+      var searchType = req.query.type;
 
-      return search(searchQuery, user, excludeTroupeId, limit, skip)
+      var options = {
+        limit: req.query.limit || 10,
+        skip: req.query.skip,
+        excludeTroupeId: req.query.excludeTroupeId
+      };
+
+      return Q.fcall(function() {
+          if(searchType === 'gitter') {
+            return gitterUserSearch.globalUserSearch(searchQuery, options)
+          } else {
+            return githubGitterUserSearch(searchQuery, user, options)
+          }
+        })
         .then(function(searchResults) {
           var strategy = new restSerializer.SearchResultsStrategy({
             resultItemStrategy: new restSerializer.UserStrategy()
