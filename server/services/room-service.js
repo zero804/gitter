@@ -352,8 +352,6 @@ function findOrCreateRoom(user, uri, options) {
 
         logger.verbose('Finding or creating a one to one chat');
 
-debugger;
-
         return permissionsModel(user, 'view', otherUser.username, 'ONETOONE', null)
           .then(function(access) {
             if(!access) return null;
