@@ -28,6 +28,7 @@ var StatusError        = require('statuserror');
 var eventService       = require('./event-service');
 var emailNotificationService = require('./email-notification-service');
 var canBeInvited       = require('./invited-permissions-service');
+var isValidEmail       = require('email-validator').validate;
 
 function localUriLookup(uri, opts) {
   return uriLookupService.lookupUri(uri)
@@ -651,21 +652,24 @@ function addUserToRoom(troupe, instigatingUser, usernameToAdd) {
           return troupe.saveQ();
         })
         .then(function() {
+
+          var notification;
+
           if(user.state === 'INVITED') {
-            emailNotificationService.sendInvitation(instigatingUser, user, troupe);
+            if(user.emails && isValidEmail(user.emails[0])) {
+              emailNotificationService.sendInvitation(instigatingUser, user, troupe);
+              notification = 'email_invite_sent';
+            } else {
+              notification = 'unreachable_for_invite';
+            }
           } else {
-            emailNotificationService.addedToRoomNotification(instigatingUser, user, troupe);
-          }
-
-          var statsMethod = 'auto_join';
-
-          if(user.state === 'INVITED') {
-            statsMethod = (user.emails && user.emails[0]) ? 'email_sent' : 'unreadchable';
+            emailNotificationService.addedToRoomNotification(instigatingUser, user, troupe)
+            notification = 'email_notification_sent';
           }
 
           stats.event('user_added', {
             userId: user.id,
-            method: statsMethod,
+            notification: notification,
             troupeId: troupe.id,
             instigatingUserId: instigatingUser.id
           });

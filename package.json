@@ -71,7 +71,8 @@
     "i18n-2": "^0.4.6",
     "stringformat": "0.0.5",
     "node-resque": "^0.8.3",
-    "emailify": "~0.0.2"
+    "emailify": "~0.0.2",
+    "email-validator": "^1.0.0"
   },
   "devDependencies": {
     "better-assert": "1.0.0",
