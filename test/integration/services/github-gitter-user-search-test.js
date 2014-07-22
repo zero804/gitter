@@ -8,7 +8,7 @@ var Q = require('q');
 
 var fakeUser = { username: 'fake-user', id: 'abc123' };
 
-describe('github-gitter-user-serach', function() {
+describe('github-gitter-user-search', function() {
 
   it('puts gitter connections above strangers', function(done) {
 
@@ -122,7 +122,7 @@ function createSearchWithStubData(data) {
 function createFakeGitterSearch(users) {
   return {
     searchForUsers: function() {
-      return Q({ results: users });
+      return Q.resolve({ results: users });
     }
   };
 }
@@ -130,7 +130,7 @@ function createFakeGitterSearch(users) {
 function createFakeGithubSearch(users) {
   var FakeGithubSearch = function() {};
   FakeGithubSearch.prototype.findUsers = function() {
-    return Q(users);
+    return Q.resolve(users);
   };
   return FakeGithubSearch;
 }
@@ -138,7 +138,7 @@ function createFakeGithubSearch(users) {
 function createFakeUserService(usermap) {
   return {
     githubUsersExists: function() {
-      return Q(usermap);
+      return Q.resolve(usermap);
     },
     findByUsernames: function(usernames) {
       return Q.fcall(function() {

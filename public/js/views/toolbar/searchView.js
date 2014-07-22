@@ -199,7 +199,8 @@ define([
         return;
       }
 
-      $.ajax({ url: '/api/v1/user', data : { q: query, unconnected:1 }, success: function(data) {
+      // only search for gitter users so we dont risk linking to 404 pages for github users
+      $.ajax({ url: '/api/v1/user', data : { q: query, type: 'gitter' }, success: function(data) {
 
         if (data.results) {
           if (!self.user_queries[query]) self.user_queries[query] = [];

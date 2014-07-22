@@ -1,13 +1,11 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var Q = require('q');
-
-
-var env           = require('../../utils/env');
-var logger        = env.logger;
+var Q               = require('q');
+var env             = require('../../utils/env');
+var logger          = env.logger;
 var userHasSignedUp = require('../user-has-signed-up');
-var StatusError   = require('statuserror');
+var StatusError     = require('statuserror');
 
 function ensureUserHasSignedUp(uri) {
   return userHasSignedUp(uri)
