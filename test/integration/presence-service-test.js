@@ -9,15 +9,15 @@ var redis           = testRequire("./utils/redis");
 var winston         = testRequire("./utils/winston");
 var Fiber           = testRequire("./utils/fiber");
 
-var blockTimer = require('./block-timer');
-before(blockTimer.on);
-after(blockTimer.off);
-
 var fakeEngine = {
   clientExists: function(clientId, callback) { callback(!clientId.match(/^TEST/)); }
 };
 
 describe('presenceService', function() {
+  var blockTimer = require('./block-timer');
+  before(blockTimer.on);
+  after(blockTimer.off);
+
   function cleanup(done) {
     presenceService.collectGarbage(fakeEngine, function(err) {
       if(err) return done(err);

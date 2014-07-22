@@ -8,11 +8,12 @@ var restSerializer = testRequire('./serializers/rest-serializer');
 var assert = require("assert");
 var fixtureLoader = require('./test-fixtures');
 
-var blockTimer = require('./block-timer');
-before(blockTimer.on);
-after(blockTimer.off);
 
 describe('restSerializer', function() {
+
+  var blockTimer = require('./block-timer');
+  before(blockTimer.on);
+  after(blockTimer.off);
 
   var fixture = {};
   before(fixtureLoader(fixture, {
