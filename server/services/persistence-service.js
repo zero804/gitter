@@ -123,12 +123,14 @@ var UserSchema = new Schema({
   },
   githubScopes: { type: Schema.Types.Mixed },
   state: { type: String },
+  stripeCustomerId: { type: String },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 
 // UserSchema.index({ email: 1 }, { unique: true });
 UserSchema.index({ githubId: 1 }, { unique: true, sparse: true }); // TODO: does this still need to be sparse?
 UserSchema.index({ username: 1 }, { unique: true /*, sparse: true */});
+UserSchema.index({ stripeCustomerId: 1 }, { unique: true, sparse: true });
 // UserSchema.index({ "emails.email" : 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';
 

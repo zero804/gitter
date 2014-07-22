@@ -113,6 +113,15 @@ describe('room-service', function() {
         './permissions-model': permissionsModelMock
       });
 
+      mockito.when(permissionsModelMock)().then(function(user, right, uri, githubType) {
+        assert.equal(user.username, fixture.user1.username);
+        assert.equal(right, 'view');
+        assert.equal(uri, fixture.user2.username);
+        assert.equal(githubType, 'ONETOONE');
+
+        return Q.resolve(true);
+      });
+
       return roomService.findOrCreateRoom(fixture.user1, fixture.user2.username)
         .then(function(uriContext) {
           assert(uriContext.oneToOne);
