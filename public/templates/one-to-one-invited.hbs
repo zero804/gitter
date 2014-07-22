@@ -1,0 +1,80 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=IE9" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
+    <meta charset="utf-8">
+
+    <title>{{troupeName}} - Gitter</title>
+
+    <style>
+
+      @-webkit-keyframes pulsey {
+        0% { opacity: 0.6; }
+        50% { opacity: 1; }
+        100% { opacity: 0.6; }
+      }
+
+      html.loading .trpContentPanel { background: url("{{ cdn 'images/2/gitter/logo-mark-grey-64.png' }}") center no-repeat; height: 90%; -webkit-animation: pulsey 2s ease-out; -webkit-animation-iteration-count: infinite;  }
+      html.loading .trpContentPanel > * { visibility: hidden; }
+    </style>
+
+    <base target="_parent">
+    <link rel="stylesheet" href='{{cdn "sprites/services.css" }}'>
+    <link rel="stylesheet" href='{{cdn "bootstrap/css/trp3.css" }}'>
+
+    <!-- Le fav and touch icons -->
+    <link id="favicon" rel="shortcut icon" href='{{cdn "images/2/gitter/favicon5.png" }}'>
+    {{>load_font_css}}
+  </head>
+  <body class="iframe">
+    <div class="trpAlertWrapper" id="alert-panel">
+      <div class="trpAlertContainer">
+        <div class="trpAlertContent" id="alert-content">
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-header" id="header-wrapper">
+      <div id="header">
+        {{{ prerenderView "js/views/app/tmpl/headerViewTemplate" }}}
+      </div>
+      <div class="banner-wrapper" style="display: none;">
+        <div id="unread-banner" class="banner slide-away"></div>
+        <div id="limit-banner" class="banner slide-away"></div>
+      </div>
+    </div>
+
+    <div class="trpContentPanel" id="content-wrapper">
+      <div class="trpChatPanel" id="chat-frame">
+        <div class="trpChatContainer  chat-container  js-chat-container  primary-scroll" id="content-frame">
+          <div class='chat-container-invited'>
+            <div class='chat-container-invited__icon'>
+              <img src="{{invitedUser.gravatarImageUrl}}">
+            </div>
+            <h1>{{invitedUser.username}} isn't here...</h1>
+            <p>Sorry. It looks like <b>{{invitedUser.displayName}}</b> hasn't joined Gitter yet. <a href='mailto:{{invitedUser.emails}}?subject=Gitter Invite&body=Hi {{invitedUser.username}}, I have messaged you on Gitter. Join me!'>Invite {{invitedUser.username}}?</a></p>
+          </div>
+          {{! This is a way of forcing the browser to open at the bottom of the screen }}
+          <div id='initial' style="height:0;width:0;overflow:hidden"><a name="initial"/>_</a></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="trpToolbar" id="toolbar-frame">
+      {{{ prerenderView "js/views/righttoolbar/tmpl/rightToolbar" }}}
+    </div>
+    <div class="trpBlankPage"></div>
+
+    <script type="text/javascript">
+     window.scrollTo(0,document.body.scrollHeight);
+    </script>
+
+    <div style="display: none;">
+      <form id="upload-form" action="" enctype="multipart/form-data" method="POST">
+        <input type="hidden" name="params" value="">
+        <input type="file" name="file" multiple="multiple"/>
+      </form>
+    </div>
+  </body>
+</html>

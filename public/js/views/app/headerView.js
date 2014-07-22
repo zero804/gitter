@@ -128,6 +128,7 @@ define([
         type: "PUT",
         data: JSON.stringify({ topic: topic })
       });
+      // TODO: once saved topic recalculate the header size
       this.editingTopic = false;
     },
 

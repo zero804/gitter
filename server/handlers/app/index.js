@@ -47,7 +47,7 @@ var mainFrameMiddlewarePipeline = [
 var chatMiddlewarePipeline = [
   appMiddleware.uriContextResolverMiddleware,
   appMiddleware.isPhoneMiddleware,
-  function(req, res, next) {
+  function (req, res, next) {
     if(!req.uriContext.troupe) return next(404);
 
     if(req.user) {
@@ -61,12 +61,11 @@ var chatMiddlewarePipeline = [
     }
 
   },
-  function(err, req, res, next) {
-    if(err && err.userNotSignedUp) {
+  function (err, req, res, next) {
+    if (err && err.userNotSignedUp) {
       appRender.renderUserNotSignedUp(req, res, next);
       return;
     }
-
     return next();
   }
 ];
