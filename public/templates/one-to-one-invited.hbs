@@ -53,7 +53,9 @@
               <img src="{{invitedUser.gravatarImageUrl}}">
             </div>
             <h1>{{invitedUser.username}} isn't here...</h1>
-            <p>Sorry. It looks like <b>{{invitedUser.displayName}}</b> hasn't joined Gitter yet. <a href='mailto:{{invitedUser.emails}}?subject=Gitter Invite&body=Hi {{invitedUser.username}}, I have messaged you on Gitter. Join me!'>Invite {{invitedUser.username}}?</a></p>
+            <p>Sorry. It looks like <b>{{invitedUser.displayName}}</b> hasn't joined Gitter yet.
+              <a href='mailto:{{invitedUser.emails}}?subject=Gitter Invite&body=Hi {{invitedUser.username}}, I have messaged you on Gitter. Join me! {{shareURL}}'>Invite {{invitedUser.username}}?</a>
+            </p>
           </div>
           {{! This is a way of forcing the browser to open at the bottom of the screen }}
           <div id='initial' style="height:0;width:0;overflow:hidden"><a name="initial"/>_</a></div>

@@ -257,6 +257,7 @@ function renderNotLoggedInChatPage(req, res, next) {
  * renderUserNotSignedUp() renders a set template for a 1:1 chat, with an invited user.
  */
 function renderUserNotSignedUp(req, res, next) {
+
   UserService.findByUsername(req.params.roomPart1)
     .then(function (user) {
       res.render('one-to-one-invited', {
@@ -264,7 +265,8 @@ function renderUserNotSignedUp(req, res, next) {
         appCache: getAppCache(req),
         agent: req.headers['user-agent'],
         invitedUser: user,
-        troupeName: user.username
+        troupeName: user.username,
+        shareURL: nconf.get('web:basepath') + '/' + req.user.username
       });
     })
     .fail(next);
