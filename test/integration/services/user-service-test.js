@@ -4,12 +4,8 @@
 
 var testRequire        = require('./../test-require');
 var fixtureLoader      = require('../test-fixtures');
-var persistenceService = testRequire('./services/persistence-service');
-var userService        = testRequire('./services/user-service');
 var assert             = testRequire("assert");
 var Q                  = require('q');
-
-var fixture = {};
 var fixture2 = {};
 
 describe("User Service", function() {
@@ -18,9 +14,6 @@ describe("User Service", function() {
     user1: { username: true },
     user2: { }
   }));
-
-  before(fixtureLoader(fixture));
-
 
   it('should allow two users with the same githubId to be created at the same moment, but only create a single account', function(done) {
     var userService = testRequire("./services/user-service");
@@ -41,7 +34,6 @@ describe("User Service", function() {
 
 
   after(function() {
-    fixture.cleanup();
     fixture2.cleanup();
   });
 });
