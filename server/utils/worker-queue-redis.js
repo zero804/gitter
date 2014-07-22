@@ -15,6 +15,10 @@ var connectionDetails = {
 // scheduler is responbsible for scheduling delayed jobs and giving them to the workers.
 var scheduler = new resque.scheduler({connection: connectionDetails}, function() {});
 
+scheduler.on('start', function() {
+  logger.verbose('worker-queue-redis: scheduler started');
+});
+
 scheduler.on('error', function(err) {
   logger.error('worker-queue-redis: scheduler failed: ' + err, { exception: err });
   stats.event('resque.scheduler.error');
@@ -50,10 +54,16 @@ var Queue = function(name, options, loaderFn) {
     name: os.hostname() + ":" + process.pid + "+" + uniqueWorkerCounter,
     queues: [name]
   };
-
   this.worker = new resque.worker(workerOpts, jobs, function() {
-    self.worker.workerCleanup();
-    self.worker.start();
+    if(scheduler.running) {
+      self.worker.workerCleanup();
+      self.worker.start();
+    } else {
+      scheduler.once('start', function() {
+        self.worker.workerCleanup();
+        self.worker.start();
+      });
+    }
   });
 
   this.internalQueue = new resque.queue({connection: connectionDetails}, jobs, function() {

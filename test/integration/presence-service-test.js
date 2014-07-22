@@ -1,5 +1,5 @@
 /*jslint node: true */
-/*global describe:true, it: true, beforeEach:true, afterEach:true */
+/*global describe:true, it: true, beforeEach:true, afterEach:true, before:true, after:true */
 "use strict";
 
 var testRequire     = require('./test-require');
@@ -10,6 +10,10 @@ var presenceService = testRequire('./services/presence-service');
 var redis           = testRequire("./utils/redis");
 var winston         = testRequire("./utils/winston");
 var Fiber           = testRequire("./utils/fiber");
+
+var blockTimer = require('./block-timer');
+before(blockTimer.on);
+after(blockTimer.off);
 
 var fakeEngine = {
   clientExists: function(clientId, callback) { callback(!clientId.match(/^TEST/)); }
