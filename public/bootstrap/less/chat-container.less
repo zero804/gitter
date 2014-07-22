@@ -1,0 +1,28 @@
+.chat-container {
+  .trpBodyMedium;
+
+  &-invited {
+
+    position: relative;
+    top: 44%;
+    padding: 0 10px !important;
+
+    &__icon {
+
+      img {
+        max-width: 60px;
+        border-radius: 60px;
+        border: 8px solid hsl(0, 0, 97%);
+        .transition300ms();
+        &:hover {
+
+          border: 8px solid hsl(0, 60%, 70%);
+        }
+      }
+    }
+
+    a {
+      text-decoration: underline;
+    }
+  }
+}
