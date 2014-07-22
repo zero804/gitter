@@ -7,6 +7,7 @@ var userService        = require("../../services/user-service");
 var restSerializer     = require("../../serializers/rest-serializer");
 var appEvents          = require("../../app-events");
 var _                  = require("underscore");
+var isValidEmail       = require('email-validator').validate;
 
 module.exports = {
   id: 'resourceTroupeUser',
@@ -32,7 +33,11 @@ module.exports = {
         var strategy = new restSerializer.UserStrategy();
         restSerializer.serialize(userAdded, strategy, function (err, serialized) {
           if (err) throw err;
-          serialized.email = userAdded.emails[0];
+
+          if(userAdded.state === 'INVITED' && userAdded.emails && isValidEmail(userAdded.emails[0])) {
+            serialized.email = userAdded.emails[0];
+          }
+
           res.send(200, { success: true, user: serialized });
         });
       })

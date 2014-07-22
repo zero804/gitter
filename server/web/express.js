@@ -49,13 +49,11 @@ module.exports = {
       app.enable('view cache');
     }
 
-    if(config.get("logging:logStaticAccess")) {
-      app.use(env.middlewares.accessLogger);
-    }
-
     app.use(express.static(staticContentDir, {
       maxAge: config.get('web:staticContentExpiryDays') * 86400 * 1000
     }));
+
+    app.use(env.middlewares.accessLogger);
 
     app.use(express.cookieParser());
     app.use(express.urlencoded());

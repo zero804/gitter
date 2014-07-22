@@ -113,6 +113,15 @@ describe('room-service', function() {
         './permissions-model': permissionsModelMock
       });
 
+      mockito.when(permissionsModelMock)().then(function(user, right, uri, githubType) {
+        assert.equal(user.username, fixture.user1.username);
+        assert.equal(right, 'view');
+        assert.equal(uri, fixture.user2.username);
+        assert.equal(githubType, 'ONETOONE');
+
+        return Q.resolve(true);
+      });
+
       return roomService.findOrCreateRoom(fixture.user1, fixture.user2.username)
         .then(function(uriContext) {
           assert(uriContext.oneToOne);
@@ -318,7 +327,7 @@ describe('room-service', function() {
       var service = createRoomServiceWithStubs({
         addUser: true,
         findByUsernameResult: null,
-        inviteByUsernameResult: { username: 'test-user', id: 'test-user-id', state: 'INVITED' },
+        inviteByUsernameResult: { username: 'test-user', id: 'test-user-id', state: 'INVITED', emails: ['a@b.com']},
         canBeInvited: true,
         onInviteEmail: function() {
           done();
@@ -332,6 +341,26 @@ describe('room-service', function() {
       };
 
       service.addUserToRoom(troupe, {}, 'test-user').fail(done);
+    });
+
+    it('doesnt send emails to invalid addresses', function(done) {
+      var service = createRoomServiceWithStubs({
+        addUser: true,
+        findByUsernameResult: null,
+        inviteByUsernameResult: { username: 'test-user', id: 'test-user-id', state: 'INVITED', emails: ['NOT A VALID EMAIL'] },
+        canBeInvited: true,
+        onInviteEmail: function() {
+          assert(false, 'invite should not be sent');
+        }
+      });
+
+      var troupe = {
+        containsUserId: function() { return false; },
+        addUserById: function() {},
+        saveQ: function() {}
+      };
+
+      service.addUserToRoom(troupe, {}, 'test-user').nodeify(done);
     });
 
     it('fails with 403 when adding someone to who cant be invited', function(done) {
