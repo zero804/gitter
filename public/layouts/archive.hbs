@@ -53,11 +53,13 @@
       </div>
 
         {{#if isAdmin}}
-        <div class="trpTroupeActions" style="text-align: center;">
-          <p><small id='noindexStatus'></small></p>
-          <input id='noindex' type='checkbox' name='noindex' {{#unless noindex}} checked {{/unless}}>
-          <small>Room indexed by search engines.</small>
-        </div>
+          {{#if public}}
+            <div class="trpTroupeActions" style="text-align: center;">
+              <p><small id='noindexStatus'></small></p>
+              <input id='noindex' type='checkbox' name='noindex' {{#unless noindex}} checked {{/unless}}>
+              <small>Room indexed by search engines.</small>
+            </div>
+          {{/if}}
         {{/if}}
 
       {{else}}
