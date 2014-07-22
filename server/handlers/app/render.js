@@ -107,6 +107,7 @@ function renderChatPage(req, res, next) {
       }
 
       res.render('chat-template', {
+        layout: 'chat-layout',
         isRepo: troupe.githubType === 'REPO',
         appCache: getAppCache(req),
         bootScriptName: 'router-chat',
@@ -261,9 +262,10 @@ function renderUserNotSignedUp(req, res, next) {
   UserService.findByUsername(req.params.roomPart1)
     .then(function (user) {
       res.render('one-to-one-invited', {
-        // layout: '' // TODO: add layout
+        layout: 'chat-layout',
         appCache: getAppCache(req),
         agent: req.headers['user-agent'],
+        oneToOneInvited: true,
         invitedUser: user,
         troupeName: user.username,
         shareURL: nconf.get('web:basepath') + '/' + req.user.username
