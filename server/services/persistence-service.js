@@ -338,6 +338,7 @@ var TroupeSchema = new Schema({
   security: { type: String, /* WARNING: validation bug in mongo 'enum': ['PRIVATE', 'PUBLIC', 'INHERITED'], required: false */ }, // For REPO_CHANNEL, ORG_CHANNEL, USER_CHANNEL
   dateDeleted: { type: Date },
   dateLastSecurityCheck: { type: Date },
+  noindex: { type: Boolean, 'default': false},
   _nonce: { type: Number },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
@@ -826,6 +827,7 @@ NotificationsPreferenceSchema.index({ userId: 1} , { unique: true });
 NotificationsPreferenceSchema.schemaTypeName = 'NotificationsPreferenceSchema';
 
 
+var SubscriptionSchema = require('./persistence/subscription-schema.js');
 
 var User = mongoose.model('User', UserSchema);
 var UserLocationHistory = mongoose.model('UserLocationHistory', UserLocationHistorySchema);
@@ -865,18 +867,7 @@ var Contact = mongoose.model('Contact', ContactSchema);
 var SuggestedContact = mongoose.model('SuggestedContact', SuggestedContactSchema);
 
 var NotificationsPreference = mongoose.model('NotificationsPreference', NotificationsPreferenceSchema);
-
-
-//
-// 8-May-2013: Delete this after it's been rolled into production!
-//
-Troupe.update({ status: 'INACTIVE' }, { status: 'ACTIVE' }, { multi: true }, function (err, numberAffected) {
-  if (err) return winston.error(err);
-  if(numberAffected > 0) {
-    winston.warn('Updated ' + numberAffected + ' INACTIVE troupes to status ACTIVE');
-  }
-});
-
+var Subscription = mongoose.model('Subscription', SubscriptionSchema);
 
 module.exports = {
   schemas: {
@@ -906,7 +897,8 @@ module.exports = {
     UriLookupSchema: UriLookupSchema,
     ContactSchema: ContactSchema,
     SuggestedContactSchema: SuggestedContactSchema,
-    NotificationsPreferenceSchema: NotificationsPreferenceSchema
+    NotificationsPreferenceSchema: NotificationsPreferenceSchema,
+    SubscriptionSchema: SubscriptionSchema
   },
   User: User,
   UserTroupeLastAccess: UserTroupeLastAccess,
@@ -937,7 +929,8 @@ module.exports = {
   UriLookup: UriLookup,
   Contact: Contact,
   SuggestedContact: SuggestedContact,
-  NotificationsPreference: NotificationsPreference
+  NotificationsPreference: NotificationsPreference,
+  Subscription: Subscription
 };
 
 var events = require("./persistence-service-events");

@@ -2,11 +2,18 @@
 "use strict";
 
 var mongoose = require('mongoose');
+var Q = require('q');
 
 module.exports = function onMongoConnect(callback) {
+  var d;
+
   if(mongoose.connection.readyState === 1) {
     setImmediate(callback);
+    d = Q.resolve();
   } else {
-    mongoose.connection.on('open', callback);
+    d = Q.defer();
+    mongoose.connection.on('open', d.makeNodeResolver());
   }
+
+  return d.promise.nodeify(callback);
 };

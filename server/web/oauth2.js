@@ -12,7 +12,6 @@ var stats                  = env.stats;
 var oauth2orize = require('oauth2orize');
 var passport = require('passport');
 var oauthService = require('../services/oauth-service');
-var languageSelector = require('./language-selector');
 var random = require('../utils/random');
 var ensureLoggedIn = require('./middlewares/ensure-logged-in');
 
@@ -144,7 +143,6 @@ exports.authorization = [
       transactionId: req.oauth2.transactionID,
       user: req.user,
       client: req.oauth2.client,
-      lang: languageSelector(req)
     });
   },
   function(err, req, res, next) {
@@ -163,7 +161,6 @@ exports.authorization = [
         clientMismatch: !!err.clientMismatch,
         missingParams: missingParams.length && missingParams.join(','),
         incorrectResponseType: incorrectResponseType,
-        lang: languageSelector(req)
       });
     } else {
       /* Let the main error handler deal with this */

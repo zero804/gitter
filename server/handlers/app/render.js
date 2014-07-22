@@ -5,7 +5,6 @@ var nconf             = require('../../utils/config');
 var Q                 = require('q');
 var contextGenerator  = require('../../web/context-generator');
 var restful           = require('../../services/restful');
-var languageSelector  = require('../../web/language-selector');
 var appVersion        = require('../../web/appVersion');
 var burstCalculator   = require('../../utils/burst-calculator');
 
@@ -59,8 +58,6 @@ function renderHomePage(req, res, next) {
       troupeName: req.uriContext.uri,
       troupeContext: troupeContext,
       agent: req.headers['user-agent'],
-      lang: languageSelector(req),
-      locale: req.i18n,
       isUserhome: true,
       liveReload: nconf.get('web:liveReload')
     });
@@ -88,10 +85,8 @@ function renderMainFrame(req, res, next, frame) {
         troupeContext: troupeContext,
         chatAppLocation: chatAppLocation,
         agent: req.headers['user-agent'],
-        lang: languageSelector(req),
         stagingText: stagingText,
         stagingLink: stagingLink,
-        locale: req.i18n,
         liveReload: nconf.get('web:liveReload')
       });
     })
@@ -126,8 +121,6 @@ function renderChatPage(req, res, next) {
         troupeContext: troupeContext,
         chats: burstCalculator(chats),
         agent: req.headers['user-agent'],
-        lang: languageSelector(req),
-        locale: req.i18n,
         liveReload: nconf.get('web:liveReload')
       });
 
@@ -146,8 +139,6 @@ function renderMobileUserHome(req, res, next) {
       troupeContext: troupeContext,
       agent: req.headers['user-agent'],
       isUserhome: true,
-      lang: languageSelector(req),
-      locale: req.i18n,
       liveReload: nconf.get('web:liveReload')
     });
   });
@@ -173,8 +164,6 @@ function renderMobileChat(req, res, next) {
         troupeContext: troupeContext,
         chats: burstCalculator(chats),
         agent: req.headers['user-agent'],
-        lang: languageSelector(req),
-        locale: req.i18n,
         liveReload: nconf.get('web:liveReload')
       });
 
@@ -231,9 +220,7 @@ function renderMobileNotLoggedInChat(req, res, next) {
         troupeFavourite: troupeContext.troupe.favourite,
         troupeContext: troupeContext,
         chats: burstCalculator(chats),
-        agent: req.headers['user-agent'],
-        lang: languageSelector(req),
-        locale: req.i18n
+        agent: req.headers['user-agent']
       });
 
     })
@@ -264,9 +251,7 @@ function renderNotLoggedInChatPage(req, res, next) {
         troupeTopic: troupeContext.troupe.topic,
         troupeContext: troupeContext,
         chats: burstCalculator(chats),
-        agent: req.headers['user-agent'],
-        lang: languageSelector(req),
-        locale: req.i18n
+        agent: req.headers['user-agent']
       });
 
     })

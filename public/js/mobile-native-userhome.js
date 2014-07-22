@@ -24,7 +24,7 @@ require([
 
   function onContextLoad() {
     new UserHomeView({
-      el: $('#frame-chat')
+      el: $('#content-frame')
     }).render();
 
     appEvents.on('navigation', cordovaNavigate.navigate);

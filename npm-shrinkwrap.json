@@ -966,6 +966,23 @@
       "from": "https://registry.npmjs.org/mongoose-q/-/mongoose-q-0.0.10.tgz",
       "resolved": "https://registry.npmjs.org/mongoose-q/-/mongoose-q-0.0.10.tgz"
     },
+    "node-resque": {
+      "version": "0.8.3",
+      "from": "https://registry.npmjs.org/node-resque/-/node-resque-0.8.3.tgz",
+      "resolved": "https://registry.npmjs.org/node-resque/-/node-resque-0.8.3.tgz",
+      "dependencies": {
+        "redis": {
+          "version": "0.10.3",
+          "from": "redis@0.10.3",
+          "resolved": "https://registry.npmjs.org/redis/-/redis-0.10.3.tgz"
+        },
+        "async": {
+          "version": "0.9.0",
+          "from": "async@0.9.0",
+          "resolved": "https://registry.npmjs.org/async/-/async-0.9.0.tgz"
+        }
+      }
+    },
     "node-statsd": {
       "version": "0.0.7",
       "from": "https://registry.npmjs.org/node-statsd/-/node-statsd-0.0.7.tgz",
