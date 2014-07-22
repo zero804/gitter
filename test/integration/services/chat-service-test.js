@@ -9,6 +9,10 @@ var fixtureLoader = require('../test-fixtures');
 var assert = require('assert');
 
 
+var blockTimer = require('../block-timer');
+before(blockTimer.on);
+after(blockTimer.off);
+
 describe('chatService', function() {
 
   var fixture = {};

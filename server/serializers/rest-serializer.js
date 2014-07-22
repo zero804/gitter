@@ -8,7 +8,11 @@ var path    = require('path');
 
 /* This method should move */
 function serialize(items, strat, callback) {
-  if(!items) return callback(null, null);
+  var d = Q.defer();
+
+  if(!items) {
+    return Q.resolve().nodeify(callback);
+  }
 
   var single = !Array.isArray(items);
   if(single) {
@@ -20,30 +24,33 @@ function serialize(items, strat, callback) {
   }
 
   strat.preload(items, function(err) {
+
     if(err) {
       winston.error("Error during preload", { exception: err });
-      return callback(err);
+      return d.reject(err);
     }
 
-    callback(null, pkg(items.map(strat.map).filter(function(f) { return f !== undefined; })));
+    d.resolve(pkg(items.map(strat.map).filter(function(f) { return f !== undefined; })));
   });
+
+  return d.promise.nodeify(callback);
+
 }
 
 function serializeExcludeNulls(items, strat, callback) {
   var single = !Array.isArray(items);
 
-  return serialize(items, strat, function(err, results) {
-    if(err) return callback(err);
-    if(single) return callback(null, results);
-
-    return callback(null, results.filter(function(f) { return !!f; }));
-  });
+  return serialize(items, strat)
+    .then(function(results) {
+      if(single) return results;
+      return results.filter(function(f) { return !!f; });
+    })
+    .nodeify(callback);
 }
 
+// XXX: deprecated
 function serializeQ(items, strat) {
-  var d = Q.defer();
-  serialize(items, strat, d.makeNodeResolver());
-  return d.promise;
+  return serialize(items, strat);
 }
 
 
@@ -64,10 +71,11 @@ function getStrategy(modelName) {
 }
 
 function serializeModel(model, callback) {
-  if(model === null) return callback(null, null);
+  if(model === null) return Q.resolve().nodeify(callback);
+
   var schema = model.schema;
-  if(!schema) return callback("Model does not have a schema");
-  if(!schema.schemaTypeName) return callback("Schema does not have a schema name");
+  if(!schema) return Q.reject(new Error("Model does not have a schema")).nodeify(callback);
+  if(!schema.schemaTypeName) return Q.reject(new Error("Schema does not have a schema name")).nodeify(callback);
 
   var strategy;
 
@@ -98,20 +106,28 @@ function serializeModel(model, callback) {
 
   }
 
-  if(!strategy) return callback("No strategy for " + schema.schemaTypeName);
+  if(!strategy) return Q.reject(new Error("No strategy for " + schema.schemaTypeName)).nodeify(callback);
 
-
-  serialize(model, strategy, callback);
+  return serialize(model, strategy, callback);
 }
 
+function eagerLoadStrategies() {
+  Object.keys(restSerializer).forEach(function(key) {
+    restSerializer[key];
+  });
+}
 
 var restSerializer = {
   getStrategy: getStrategy,
   serialize: serialize,
   serializeExcludeNulls: serializeExcludeNulls,
   serializeQ: serializeQ,
-  serializeModel: serializeModel
+  serializeModel: serializeModel,
+  testOnly: {
+    eagerLoadStrategies: eagerLoadStrategies
+  }
 };
+
 
 fs.readdirSync(__dirname + '/rest').forEach(function(fileName) {
   if(!/\.js$/.test(fileName)) return;
