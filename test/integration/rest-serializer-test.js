@@ -1,5 +1,3 @@
-/*jslint node: true */
-/*global describe:true, it: true, before:false, after:false */
 "use strict";
 
 var testRequire = require('./test-require');
