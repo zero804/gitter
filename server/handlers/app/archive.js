@@ -49,7 +49,8 @@ exports.datesList = [
                   isHomePage: true,
                   noindex: troupe.noindex,
                   roomUrl: roomUrl,
-                  accessToken: req.accessToken
+                  accessToken: req.accessToken,
+                  public: troupe.security === 'PUBLIC'
                 });
 
               });
