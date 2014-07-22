@@ -11,7 +11,6 @@ describe('process-chat', function() {
   var dir = path.join(__dirname, 'markdown-conversions');
 
   var items = fs.readdirSync(dir);
-  console.log(items);
   items.filter(function(file) {
     return /\.markdown$/.test(file);
   }).forEach(function(file) {

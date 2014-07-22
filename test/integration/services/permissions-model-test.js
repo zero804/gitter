@@ -22,46 +22,48 @@ var permissionMocks;
 var fixtures;
 var delegate;
 
-beforeEach(function() {
-  USER = { username: 'gitterbob' };
-  URI = 'uri';
-  SECURITY = 'SECURITAAAAAI'; // Always just passed through
-  userBannedFromRoomMock = mockito.mockFunction();
-
-  permissionMocks = [
-    repoPermissionsModelMock = mockito.mockFunction(),
-    orgPermissionsModelMock = mockito.mockFunction(),
-    oneToOnePermissionsModelMock = mockito.mockFunction(),
-    orgChannelPermissionsModelMock = mockito.mockFunction(),
-    repoChannelPermissionsModelMock = mockito.mockFunction(),
-    userChannelPermissionsModelMock = mockito.mockFunction()
-  ];
-
-  fixtures = {
-    'REPO': repoPermissionsModelMock,
-    'ORG': orgPermissionsModelMock,
-    'ONETOONE': oneToOnePermissionsModelMock,
-    'ORG_CHANNEL': orgChannelPermissionsModelMock,
-    'REPO_CHANNEL': repoChannelPermissionsModelMock,
-    'USER_CHANNEL': userChannelPermissionsModelMock
-  };
-
-  permissionsModel = testRequire.withProxies("./services/permissions-model", {
-    './user-banned-from-room': userBannedFromRoomMock,
-    './permissions/repo-permissions-model': repoPermissionsModelMock,
-    './permissions/org-permissions-model': orgPermissionsModelMock,
-    './permissions/one-to-one-permissions-model': oneToOnePermissionsModelMock,
-    './permissions/org-channel-permissions-model': orgChannelPermissionsModelMock,
-    './permissions/repo-channel-permissions-model': repoChannelPermissionsModelMock,
-    './permissions/user-channel-permissions-model': userChannelPermissionsModelMock,
-  });
-
-});
 
 var RIGHTS = ['create', 'join', 'admin', 'adduser', 'view'];
 var ROOM_TYPES = ['REPO', 'ORG', 'ONETOONE', 'ORG_CHANNEL', 'REPO_CHANNEL', 'USER_CHANNEL'];
 
 describe('permissions-model', function() {
+
+  beforeEach(function() {
+    USER = { username: 'gitterbob' };
+    URI = 'uri';
+    SECURITY = 'SECURITAAAAAI'; // Always just passed through
+    userBannedFromRoomMock = mockito.mockFunction();
+
+    permissionMocks = [
+      repoPermissionsModelMock = mockito.mockFunction(),
+      orgPermissionsModelMock = mockito.mockFunction(),
+      oneToOnePermissionsModelMock = mockito.mockFunction(),
+      orgChannelPermissionsModelMock = mockito.mockFunction(),
+      repoChannelPermissionsModelMock = mockito.mockFunction(),
+      userChannelPermissionsModelMock = mockito.mockFunction()
+    ];
+
+    fixtures = {
+      'REPO': repoPermissionsModelMock,
+      'ORG': orgPermissionsModelMock,
+      'ONETOONE': oneToOnePermissionsModelMock,
+      'ORG_CHANNEL': orgChannelPermissionsModelMock,
+      'REPO_CHANNEL': repoChannelPermissionsModelMock,
+      'USER_CHANNEL': userChannelPermissionsModelMock
+    };
+
+    permissionsModel = testRequire.withProxies("./services/permissions-model", {
+      './user-banned-from-room': userBannedFromRoomMock,
+      './permissions/repo-permissions-model': repoPermissionsModelMock,
+      './permissions/org-permissions-model': orgPermissionsModelMock,
+      './permissions/one-to-one-permissions-model': oneToOnePermissionsModelMock,
+      './permissions/org-channel-permissions-model': orgChannelPermissionsModelMock,
+      './permissions/repo-channel-permissions-model': repoChannelPermissionsModelMock,
+      './permissions/user-channel-permissions-model': userChannelPermissionsModelMock,
+    });
+
+  });
+
   ROOM_TYPES.forEach(function(roomType) {
     describe('Room type ' + roomType, function() {
       setupRoomTypeTests(roomType);
