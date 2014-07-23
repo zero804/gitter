@@ -1,5 +1,3 @@
-/*jslint node:true, unused:true*/
-/*global describe:true, it:true*/
 "use strict";
 
 var testRequire = require('../test-require');
@@ -11,11 +9,15 @@ var assert = require('assert');
 
 var times = mockito.Verifiers.times;
 var once = times(1);
-var twice = times(2);
 
 Q.longStackSupport = true;
 
 describe('unread-item-service', function() {
+
+  var blockTimer = require('../block-timer');
+  before(blockTimer.on);
+  after(blockTimer.off);
+
   describe('getOldestId', function() {
     it('getOldestId', function() {
       var unreadItemService = testRequire("./services/unread-item-service");
@@ -258,7 +260,6 @@ describe('limits', function() {
       './troupe-service': troupeServiceMock
     });
 
-
     var usersWithLurkHash = {};
     usersWithLurkHash[userId] = false;
 
@@ -275,8 +276,10 @@ describe('limits', function() {
       adds.push(unreadItemService.testOnly.newItem(troupeId, null, itemType, mongoUtils.getNewObjectIdString()));
     }
 
+    blockTimer.reset();
     return Q.all(adds)
       .then(function() {
+        blockTimer.reset();
         // Do a single insert sans contention. In the real world, there will never be this much
         // contention for a single usertroupe
         return unreadItemService.testOnly.newItem(troupeId, null, itemType, mongoUtils.getNewObjectIdString());
@@ -559,12 +562,14 @@ describe('emailnotifications', function() {
 
     mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupe));
 
+    blockTimer.reset();
     return Q.all([
         unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId1),
         unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId2),
         unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId3)
       ])
       .then(function() {
+        blockTimer.reset();
         return unreadItemService.listTroupeUsersForEmailNotifications(Date.now() - 86400000, 5);
       })
       .then(function(results) {
