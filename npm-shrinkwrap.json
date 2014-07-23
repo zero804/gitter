@@ -36,6 +36,16 @@
       "version": "0.10.0",
       "from": "consolidate@~0.10.0"
     },
+    "csprng": {
+      "version": "0.1.1",
+      "from": "csprng@",
+      "dependencies": {
+        "sequin": {
+          "version": "0.1.0",
+          "from": "sequin@"
+        }
+      }
+    },
     "cube": {
       "version": "0.2.12",
       "from": "cube@^0.2.12",
@@ -798,68 +808,6 @@
         }
       }
     },
-    "faye": {
-      "version": "1.0.3",
-      "from": "faye@^1.0.1",
-      "dependencies": {
-        "concat-stream": {
-          "version": "1.4.6",
-          "from": "concat-stream@",
-          "dependencies": {
-            "inherits": {
-              "version": "2.0.1",
-              "from": "inherits@~2.0.1"
-            },
-            "typedarray": {
-              "version": "0.0.6",
-              "from": "typedarray@~0.0.5"
-            },
-            "readable-stream": {
-              "version": "1.1.13-1",
-              "from": "readable-stream@~1.1.9",
-              "dependencies": {
-                "core-util-is": {
-                  "version": "1.0.1",
-                  "from": "core-util-is@~1.0.0"
-                },
-                "isarray": {
-                  "version": "0.0.1",
-                  "from": "isarray@0.0.1"
-                },
-                "string_decoder": {
-                  "version": "0.10.25-1",
-                  "from": "string_decoder@~0.10.x"
-                }
-              }
-            }
-          }
-        },
-        "cookiejar": {
-          "version": "2.0.1",
-          "from": "cookiejar@"
-        },
-        "csprng": {
-          "version": "0.1.1",
-          "from": "csprng@",
-          "dependencies": {
-            "sequin": {
-              "version": "0.1.0",
-              "from": "sequin@"
-            }
-          }
-        },
-        "faye-websocket": {
-          "version": "0.7.2",
-          "from": "faye-websocket@>=0.7.0",
-          "dependencies": {
-            "websocket-driver": {
-              "version": "0.3.5",
-              "from": "websocket-driver@>=0.3.1"
-            }
-          }
-        }
-      }
-    },
     "faye-redis": {
       "version": "0.3.0",
       "from": "faye-redis@git://github.com/gitterHQ/faye-redis-node#v0.3.0",
@@ -871,10 +819,20 @@
         }
       }
     },
+    "faye-websocket": {
+      "version": "0.7.2",
+      "from": "faye-websocket@",
+      "dependencies": {
+        "websocket-driver": {
+          "version": "0.3.5",
+          "from": "websocket-driver@>=0.3.1"
+        }
+      }
+    },
     "gitter-env": {
-      "version": "0.8.3",
-      "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.8.3",
-      "resolved": "git+ssh://git@github.com:gitterHQ/gitter-env.git#1f6322145eae3acbc12c2b855eb07d3748f83215",
+      "version": "0.8.4",
+      "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.8.4",
+      "resolved": "git+ssh://git@github.com:gitterHQ/gitter-env.git#25e2808871283f7c8da3c2dd48fd01036c96bc80",
       "dependencies": {
         "async": {
           "version": "0.8.0",
@@ -886,7 +844,8 @@
           "dependencies": {
             "async": {
               "version": "0.2.9",
-              "from": "async@0.2.9"
+              "from": "async@0.2.9",
+              "resolved": "https://registry.npmjs.org/async/-/async-0.2.9.tgz"
             },
             "ini": {
               "version": "1.2.1",
@@ -1749,6 +1708,16 @@
     "text-filter": {
       "version": "0.1.0",
       "from": "text-filter@~0.1.0"
+    },
+    "tough-cookie": {
+      "version": "0.12.1",
+      "from": "tough-cookie@",
+      "dependencies": {
+        "punycode": {
+          "version": "1.3.0",
+          "from": "punycode@>=0.2.0"
+        }
+      }
     },
     "troupe-passport-github": {
       "version": "0.1.8-d",
