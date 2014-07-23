@@ -258,6 +258,9 @@ describe('room-service', function() {
         './email-notification-service': {
           sendInvitation: stubs.onInviteEmail,
           addedToRoomNotification: function() {}
+        },
+        './email-address-service': function() {
+          return Q.resolve('a@b.com');
         }
       });
     }
@@ -341,26 +344,6 @@ describe('room-service', function() {
       };
 
       service.addUserToRoom(troupe, {}, 'test-user').fail(done);
-    });
-
-    it('doesnt send emails to invalid addresses', function(done) {
-      var service = createRoomServiceWithStubs({
-        addUser: true,
-        findByUsernameResult: null,
-        inviteByUsernameResult: { username: 'test-user', id: 'test-user-id', state: 'INVITED', emails: ['NOT A VALID EMAIL'] },
-        canBeInvited: true,
-        onInviteEmail: function() {
-          assert(false, 'invite should not be sent');
-        }
-      });
-
-      var troupe = {
-        containsUserId: function() { return false; },
-        addUserById: function() {},
-        saveQ: function() {}
-      };
-
-      service.addUserToRoom(troupe, {}, 'test-user').nodeify(done);
     });
 
     it('fails with 403 when adding someone to who cant be invited', function(done) {
