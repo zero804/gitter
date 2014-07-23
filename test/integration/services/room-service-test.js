@@ -113,6 +113,15 @@ describe('room-service', function() {
         './permissions-model': permissionsModelMock
       });
 
+      mockito.when(permissionsModelMock)().then(function(user, right, uri, githubType) {
+        assert.equal(user.username, fixture.user1.username);
+        assert.equal(right, 'view');
+        assert.equal(uri, fixture.user2.username);
+        assert.equal(githubType, 'ONETOONE');
+
+        return Q.resolve(true);
+      });
+
       return roomService.findOrCreateRoom(fixture.user1, fixture.user2.username)
         .then(function(uriContext) {
           assert(uriContext.oneToOne);
@@ -228,6 +237,177 @@ describe('room-service', function() {
     });
   });
 
+  describe('addUserToRoom', function() {
+
+    function createRoomServiceWithStubs(stubs) {
+      return testRequire.withProxies("./services/room-service", {
+        './room-permissions-model': function() {
+          return Q.resolve(stubs.addUser);
+        },
+        './invited-permissions-service': function() {
+          return Q.resolve(stubs.canBeInvited);
+        },
+        './user-service': {
+          inviteByUsername: function() {
+            return Q.resolve(stubs.inviteByUsernameResult);
+          },
+          findByUsername: function() {
+            return Q.resolve(stubs.findByUsernameResult);
+          }
+        },
+        './email-notification-service': {
+          sendInvitation: stubs.onInviteEmail,
+          addedToRoomNotification: function() {}
+        },
+        './email-address-service': function() {
+          return Q.resolve('a@b.com');
+        }
+      });
+    }
+
+    it('adds a user to the troupe', function(done) {
+      var service = createRoomServiceWithStubs({
+        addUser: true,
+        findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
+        inviteByUsernameResult: null,
+        canBeInvited: true,
+        onInviteEmail: function() {}
+      });
+
+      var troupe = {
+        containsUserId: function() { return false; },
+        addUserById: function(id) {
+          assert.equal(id, 'test-user-id');
+          done();
+        },
+        saveQ: function() {}
+      };
+      service.addUserToRoom(troupe, {}, 'test-user').fail(done);
+    });
+
+    it('saves troupe changes', function(done) {
+      var service = createRoomServiceWithStubs({
+        addUser: true,
+        findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
+        inviteByUsernameResult: null,
+        canBeInvited: true,
+        onInviteEmail: function() {}
+      });
+
+      var troupe = {
+        containsUserId: function() { return false; },
+        addUserById: function() {},
+        saveQ: function() {
+          done();
+        }
+      };
+      service.addUserToRoom(troupe, {}, 'test-user').fail(done);
+    });
+
+    it('returns the added user', function(done) {
+      var service = createRoomServiceWithStubs({
+        addUser: true,
+        findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
+        inviteByUsernameResult: null,
+        canBeInvited: true,
+        onInviteEmail: function() {}
+      });
+
+      var troupe = {
+        containsUserId: function() { return false; },
+        addUserById: function() {},
+        saveQ: function() {}
+      };
+
+      service.addUserToRoom(troupe, {}, 'test-user')
+        .then(function(user) {
+          assert.equal(user.id, 'test-user-id');
+          assert.equal(user.username, 'test-user');
+        }).nodeify(done);
+    });
+
+    it('attempts an email invite for new users', function(done) {
+      var service = createRoomServiceWithStubs({
+        addUser: true,
+        findByUsernameResult: null,
+        inviteByUsernameResult: { username: 'test-user', id: 'test-user-id', state: 'INVITED', emails: ['a@b.com']},
+        canBeInvited: true,
+        onInviteEmail: function() {
+          done();
+        }
+      });
+
+      var troupe = {
+        containsUserId: function() { return false; },
+        addUserById: function() {},
+        saveQ: function() {}
+      };
+
+      service.addUserToRoom(troupe, {}, 'test-user').fail(done);
+    });
+
+    it('fails with 403 when adding someone to who cant be invited', function(done) {
+      var service = createRoomServiceWithStubs({
+        addUser: true,
+        findByUsernameResult: null,
+        inviteByUsernameResult: { username: 'test-user', id: 'test-user-id', state: 'INVITED' },
+        canBeInvited: false,
+        onInviteEmail: function() {}
+      });
+
+      var troupe = {
+        containsUserId: function() { return false; },
+        addUserById: function() {},
+        saveQ: function() {}
+      };
+
+      service.addUserToRoom(troupe, {}, 'test-user').fail(function(err) {
+        assert.equal(err.status, 403);
+      }).nodeify(done);
+    });
+
+    it('fails with 409 when adding someone who is already in the room', function(done) {
+      var service = createRoomServiceWithStubs({
+        addUser: true,
+        findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
+        inviteByUsernameResult: null,
+        canBeInvited: true,
+        onInviteEmail: function() {}
+      });
+
+      var troupe = {
+        containsUserId: function() { return true; },
+        addUserById: function() {},
+        saveQ: function() {}
+      };
+
+      service.addUserToRoom(troupe, {}, 'test-user').fail(function(err) {
+        assert.equal(err.status, 409);
+      }).nodeify(done);
+    });
+
+    it('fails with 403 when instigating user doesnt have permission to add people', function(done) {
+      var service = createRoomServiceWithStubs({
+        addUser: false,
+        findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
+        inviteByUsernameResult: null,
+        canBeInvited: true,
+        onInviteEmail: function() {}
+      });
+
+      var troupe = {
+        containsUserId: function() { return true; },
+        addUserById: function() {},
+        saveQ: function() {}
+      };
+
+      service.addUserToRoom(troupe, {}, 'test-user').fail(function(err) {
+        assert.equal(err.status, 403);
+      }).nodeify(done);
+    });
+
+  });
+
   describe('custom rooms', function() {
 
     describe('::org::', function() {
@@ -269,7 +449,7 @@ describe('room-service', function() {
               return Q.resolve(true);
             });
 
-            return roomService.addUsersToRoom(room, fixture.user1, [fixture.user3.username])
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(permissionsModelMock, once)();
               })
@@ -321,7 +501,7 @@ describe('room-service', function() {
               return Q.resolve(true);
             });
 
-            return roomService.addUsersToRoom(room, fixture.user1, [fixture.user3.username])
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
               })
@@ -363,7 +543,8 @@ describe('room-service', function() {
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
             var roomService = testRequire.withProxies("./services/room-service", {
-              './room-permissions-model': roomPermissionsModelMock
+              './room-permissions-model': roomPermissionsModelMock,
+              './invited-permissions-service': function() { return Q.resolve(true); }
             });
 
             mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
@@ -373,7 +554,7 @@ describe('room-service', function() {
               return Q.resolve(true);
             });
 
-            return roomService.addUsersToRoom(room, fixture.user1, [fixture.user3.username])
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
               })
@@ -428,7 +609,7 @@ describe('room-service', function() {
               return Q.resolve(true);
             });
 
-            return roomService.addUsersToRoom(room, fixture.user1, [fixture.user3.username])
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
               })
@@ -481,7 +662,7 @@ describe('room-service', function() {
               return Q.resolve(true);
             });
 
-            return roomService.addUsersToRoom(room, fixture.user1, [fixture.user3.username])
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
               })
@@ -524,7 +705,8 @@ describe('room-service', function() {
             // ADD A PERSON TO THE ROOM
             var roomPermissionsModelMock = mockito.mockFunction();
             var roomService = testRequire.withProxies("./services/room-service", {
-              './room-permissions-model': roomPermissionsModelMock
+              './room-permissions-model': roomPermissionsModelMock,
+              './invited-permissions-service': function() { return Q.resolve(true); }
             });
 
             mockito.when(roomPermissionsModelMock)().then(function(user, perm, _room) {
@@ -534,7 +716,7 @@ describe('room-service', function() {
               return Q.resolve(true);
             });
 
-            return roomService.addUsersToRoom(room, fixture.user1, [fixture.user3.username])
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(permissionsModelMock, once)();
               })
@@ -590,7 +772,7 @@ describe('room-service', function() {
               return Q.resolve(true);
             });
 
-            return roomService.addUsersToRoom(room, fixture.user1, [fixture.user3.username])
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
               })
@@ -643,7 +825,7 @@ describe('room-service', function() {
               return Q.resolve(true);
             });
 
-            return roomService.addUsersToRoom(room, fixture.user1, [fixture.user3.username])
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
               })
@@ -695,7 +877,7 @@ describe('room-service', function() {
               return Q.resolve(true);
             });
 
-            return roomService.addUsersToRoom(room, fixture.user1, [fixture.user3.username])
+            return roomService.addUserToRoom(room, fixture.user1, fixture.user3.username)
               .then(function() {
                 mockito.verify(roomPermissionsModelMock, once)();
               })

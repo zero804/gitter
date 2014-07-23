@@ -3,6 +3,7 @@
 
 var recentRoomService  = require('../../services/recent-room-service');
 var roomService        = require('../../services/room-service');
+var emailAddressService = require('../../services/email-address-service');
 var userService        = require("../../services/user-service");
 var restSerializer     = require("../../serializers/rest-serializer");
 var appEvents          = require("../../app-events");
@@ -25,14 +26,29 @@ module.exports = {
   },
 
   create: function(req, res, next) {
-    var usernames = req.body.usernames;
+    var username = req.body.username;
 
-    return roomService.addUsersToRoom(req.troupe, req.user, usernames)
-      .then(function() {
-        res.send(200, { success: true });
+    return roomService.addUserToRoom(req.troupe, req.user, username)
+      .then(function(userAdded) {
+
+        // invited users dont have github tokens yet
+        var options = userAdded.state === 'INVITED' ? { githubTokenUser: req.user } : {};
+        var strategy = new restSerializer.UserStrategy();
+
+        return [
+          restSerializer.serializeQ(userAdded, strategy),
+          emailAddressService(userAdded, options)
+        ];
+      })
+      .spread(function(serializedUser, email) {
+
+        if(serializedUser.invited && email) {
+          serializedUser.email = email;
+        }
+
+        res.send(200, { success: true, user: serializedUser });
       })
       .fail(next);
-
   },
 
   destroy: function(req, res, next){

@@ -10,6 +10,7 @@ require([
 
   require([
       "in-browser/burst-calculator-test",
+      "in-browser/mailto-gen-test",
       'in-browser/roster-test',
       'in-browser/chat-scroll-test',
       'in-browser/is-android-test',
