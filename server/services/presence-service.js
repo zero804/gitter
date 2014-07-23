@@ -71,7 +71,7 @@ function disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callback
           userId: userId
         });
 
-        return callback(new StatusError(404, 'Not found'));
+        return callback(new StatusError(404, 'socket not found'));
       }
 
       var userSocketCount = parseInt(result[1], 10);
@@ -173,7 +173,7 @@ function userSocketConnected(userId, socketId, connectionType, client, troupeId,
         userId: userId
       });
 
-      return callback(new StatusError(409, 'conflict'));
+      return callback(new StatusError(409, 'socket already exists'));
     }
 
     var userSocketCount = parseInt(result[1], 10);
@@ -221,7 +221,7 @@ function socketDisconnectionRequested(userId, socketId, callback) {
     if(!userId2) userId2 = null;
 
     if(userId !== userId2) {
-      return callback(new StatusError(401, 'Access denied'));
+      return callback(new StatusError(401, 'userId did not match userId for socket'));
     }
 
     disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callback);
@@ -474,7 +474,7 @@ function listAllSocketsForUser(userId, callback) {
 }
 
 function listOnlineUsers(callback) {
-  redisClient.zrange(ACTIVE_USERS_KEY, 0, -1, callback);
+  return Q.ninvoke(redisClient, 'zrange', ACTIVE_USERS_KEY, 0, -1).nodeify(callback);
 }
 
 function listMobileUsers(callback) {
