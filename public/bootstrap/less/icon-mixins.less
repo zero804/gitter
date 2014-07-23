@@ -50,6 +50,10 @@
   .prepend-octicon('\f028')
 }
 
+.prepend-alert-icon() {
+  .prepend-octicon('\f02d')
+}
+
 .prepend-issue-opened() {
   .prepend-octicon('\f026')
 }
@@ -193,7 +197,7 @@
 
 
 .prepend-icon-huboard() {
-  &:before {
+  &::before {
     content: '';
     position: absolute;
     background-image: url('../../images/2/gitter/icon-huboard.png');
@@ -207,7 +211,7 @@
   padding-left: 1.5em;
 
   @media @retina {
-    &:before {
+    &::before {
       background-image: url('../../images/2/gitter/icon-huboard@2x.png');
     }
   }
@@ -215,7 +219,7 @@
 
 
 .prepend-gitter-icon(@charCode) {
-    &:before {
+    &::before {
       font-family: 'troupe-icons';
       font-style: normal;
       font-variant: normal;
@@ -230,7 +234,7 @@
   }
 
 .prepend-octicon(@charCode) {
-  &:before {
+  &::before {
     font-family: 'octicons';
     font-style: normal;
     font-variant: normal;

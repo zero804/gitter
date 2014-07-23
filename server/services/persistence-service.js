@@ -119,6 +119,7 @@ var UserSchema = new Schema({
     createRoom: { type: Boolean, 'default': true }
   },
   githubScopes: { type: Schema.Types.Mixed },
+  state: { type: String },
   stripeCustomerId: { type: String },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });

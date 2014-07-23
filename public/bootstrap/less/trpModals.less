@@ -6,11 +6,23 @@
 
 @padding: 15px;
 
+.boxhack {
+  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+  box-sizing: border-box;
+}
+
+.modal,
+.modal-body,
+.modal-header,
+.modal-footer,
+.trpModalBody {
+  .boxhack;
+}
+
 .modal-backdrop, .modal-backdrop.fade.in {
   opacity: 0.2;
 }
-
-
 
 .trpModalHeader {
   padding: 6px 20px 8px 15px;
@@ -196,7 +208,7 @@ body.modal-open {
 
 .modal-body {
   padding: @padding @padding 0 @padding;
-  max-height: 440px;
+  max-height: 350px; // OLD: 440px
   display: block;
 
   @media @mobile {

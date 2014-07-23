@@ -72,7 +72,9 @@
     "node-resque": "^0.8.3",
     "csprng": "^0.1.1",
     "faye-websocket": "^0.7.2",
-    "tough-cookie": "^0.12.1"
+    "tough-cookie": "^0.12.1",
+    "emailify": "~0.0.2",
+    "email-validator": "^1.0.0"
   },
   "devDependencies": {
     "better-assert": "1.0.0",

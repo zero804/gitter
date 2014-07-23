@@ -131,11 +131,28 @@ function install() {
             .then(function(user) {
               // Update an existing user
               if(user) {
+
+                // If the user was in the DB already but was invited, notify MixPanel
+                if (user.state === 'INVITED') {
+                  stats.event("invite_accepted", {
+                    userId: user.id,
+                    method: 'github_oauth',
+                    username: user.username
+                  });
+                  stats.event("new_user", {
+                    userId: user.id,
+                    method: 'github_oauth',
+                    username: user.username,
+                    source: 'invited'
+                  });
+                }
+
                 user.username         = githubUserProfile.login;
                 user.displayName      = githubUserProfile.name || githubUserProfile.login;
                 user.gravatarImageUrl = githubUserProfile.avatar_url;
                 user.githubId         = githubUserProfile.id;
                 user.githubUserToken  = accessToken;
+                user.state            = undefined;
 
                 user.save(function(err) {
                   if (err) logger.error("Failed to update GH token for user ", user.username);
@@ -171,9 +188,7 @@ function install() {
                 emails:             githubUserProfile.email ? [githubUserProfile.email] : [],
                 gravatarImageUrl:   githubUserProfile.avatar_url,
                 githubUserToken:    accessToken,
-                githubId:           githubUserProfile.id,
-                status:             'ACTIVE',
-                source:             'landing_github'
+                githubId:           githubUserProfile.id
               };
 
               logger.verbose('About to create GitHub user ', githubUser);
@@ -185,6 +200,7 @@ function install() {
 
                 req.logIn(user, function(err) {
                   if (err) { return done(err); }
+
                   stats.event("new_user", {
                     userId: user.id,
                     distinctId: mixpanel.getMixpanelDistinctId(req.cookies),

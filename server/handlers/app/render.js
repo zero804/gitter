@@ -1,10 +1,10 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
-
 var nconf             = require('../../utils/config');
 var Q                 = require('q');
 var contextGenerator  = require('../../web/context-generator');
 var restful           = require('../../services/restful');
+var UserService       = require('../../services/user-service');
 var appVersion        = require('../../web/appVersion');
 var burstCalculator   = require('../../utils/burst-calculator');
 
@@ -59,7 +59,6 @@ function renderHomePage(req, res, next) {
       troupeContext: troupeContext,
       agent: req.headers['user-agent'],
       isUserhome: true,
-      liveReload: nconf.get('web:liveReload')
     });
   });
 }
@@ -87,7 +86,6 @@ function renderMainFrame(req, res, next, frame) {
         agent: req.headers['user-agent'],
         stagingText: stagingText,
         stagingLink: stagingLink,
-        liveReload: nconf.get('web:liveReload')
       });
     })
     .fail(next);
@@ -121,7 +119,6 @@ function renderChatPage(req, res, next) {
         troupeContext: troupeContext,
         chats: burstCalculator(chats),
         agent: req.headers['user-agent'],
-        liveReload: nconf.get('web:liveReload')
       });
 
     })
@@ -139,7 +136,6 @@ function renderMobileUserHome(req, res, next) {
       troupeContext: troupeContext,
       agent: req.headers['user-agent'],
       isUserhome: true,
-      liveReload: nconf.get('web:liveReload')
     });
   });
 }
@@ -164,7 +160,6 @@ function renderMobileChat(req, res, next) {
         troupeContext: troupeContext,
         chats: burstCalculator(chats),
         agent: req.headers['user-agent'],
-        liveReload: nconf.get('web:liveReload')
       });
 
     })
@@ -234,7 +229,7 @@ function renderNotLoggedInChatPage(req, res, next) {
   Q.all([
     contextGenerator.generateTroupeContext(req),
     restful.serializeChatsForTroupe(troupe.id, null, { limit: INITIAL_CHAT_COUNT })
-    ]).spread(function(troupeContext, chats) {
+    ]).spread(function (troupeContext, chats) {
 
       var githubLink;
 
@@ -258,6 +253,51 @@ function renderNotLoggedInChatPage(req, res, next) {
     .fail(next);
 }
 
+/**
+ * renderUserNotSignedUp() renders a set template for a 1:1 chat, with an invited user.
+ */
+function renderUserNotSignedUp(req, res, next) {
+
+  UserService.findByUsername(req.params.roomPart1)
+    .then(function (user) {
+      res.render('one-to-one-invited', {
+        appCache: getAppCache(req),
+        agent: req.headers['user-agent'],
+        invitedUser: user,
+        troupeName: user.username,
+        shareURL: nconf.get('web:basepath') + '/' + req.user.username
+      });
+    })
+    .fail(next);
+}
+
+function renderUserNotSignedUpMainFrame(req, res, next, frame) {
+  contextGenerator.generateNonChatContext(req)
+    .then(function(troupeContext) {
+      var chatAppLocation = '/' + req.params.roomPart1 + '/~' + frame + '#initial';
+
+      var template, bootScriptName;
+      if(req.user) {
+        template = 'app-template';
+        bootScriptName = 'router-app';
+      } else {
+        template = 'app-nli-template';
+        bootScriptName = 'router-nli-app';
+      }
+
+      res.render(template, {
+        appCache: getAppCache(req),
+        bootScriptName: bootScriptName,
+        troupeName: req.params.roomPart1,
+        troupeContext: troupeContext,
+        chatAppLocation: chatAppLocation,
+        agent: req.headers['user-agent'],
+        stagingText: stagingText,
+        stagingLink: stagingLink,
+      });
+    }).fail(next);
+}
+
 
 module.exports = exports = {
   renderHomePage: renderHomePage,
@@ -268,5 +308,7 @@ module.exports = exports = {
   renderMobileNotLoggedInChat: renderMobileNotLoggedInChat,
   renderNotLoggedInChatPage: renderNotLoggedInChatPage,
   renderMobileNativeChat: renderMobileNativeChat,
-  renderMobileNativeUserhome: renderMobileNativeUserhome
+  renderMobileNativeUserhome: renderMobileNativeUserhome,
+  renderUserNotSignedUp: renderUserNotSignedUp,
+  renderUserNotSignedUpMainFrame: renderUserNotSignedUpMainFrame
 };

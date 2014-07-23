@@ -1,93 +1,76 @@
- <h1 style="margin: 0;padding: 0;display: block;font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif;font-size: 32px;font-style: normal;font-weight: bold; margin: 0 60px; line-height: 125%;letter-spacing: -1px;text-align: left;color: #172f35 !important;"><br>You have unread messages</h1><br><br>
-      </td>
-    </tr>
-  </table>
+          <table class="container">
+            <tr>
+              <td>
+                <table class="row">
+                  <tr>
+                    <td class="wrapper last">
+                      <table class="twelve columns">
+                        <tr>
+                          <td>
+                            <h1>You have unread messages</h1>
+                            <br><br>
+                          </td>
+                          <td class="expander"></td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
 
-<table width="100%" cellpadding="0" cellspacing="0" class="beige-strip" style="background-color: transparent;">
-  <tr>
-    <td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: white; padding-bottom: 80px">
         {{#each troupesWithUnreadCounts}}
-          <tr>
-            <td align="left" style="padding: 20px 60px">
-              <table width="100%">
-                <tr>
-                  <td>
-                    <p style="color: #333;display: block;font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif;font-size: 28px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0; margin-bottom: 8px;">{{#if troupe.oneToOne}}{{troupe.name}}{{else}}{{troupe.uri}}{{/if}}</p>
-                    <p style="color: #333;display: block;font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif;font-size: 20px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0; margin-bottom: 4px;">{{__n "%d unread message" "%d unread messages" unreadCount}}</p>
-                  </td>
-                  <td width="100" align="right" valign="top">
-                    <table>
-                      <tr>
-                        <td style="background-color: #1DCE73; padding: 6px 14px; border-radius: 5px" width="70" align="center">
-                          <a href="{{../emailBasePath}}{{troupe.url}}#utm_source=notification&utm_medium=email&utm_campaign=unread-notifications" style="color: white; font-size: 20px; text-decoration: none; font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif">Read</a>
-                        </td>
-                      </tr>
-                    </table>
-                    <br/>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+                <table class="row">
+                  <tr>
+                    <td class="wrapper">
+                      <table class="twelve columns">
+                        <tr>
+                          <td style="max-width: 400px; width: 400px;">
+                            <h2>{{#if troupe.oneToOne}}{{troupe.name}}{{else}}{{troupe.uri}}{{/if}}</h1>
+                            <h4>{{__n "%d unread message" "%d unread messages" unreadCount}}</h4>
+                            <p>{{#unless troupe.oneToOne}}<a href="{{../../emailBasePath}}{{troupe.url}}#notifications" style="color: #2980b9;">Notification settings</a>{{/unless}}&nbsp;</p>
+                            <br>
+                          </td>
+                          <td>
+                            <a href="{{../emailBasePath}}{{troupe.url}}#utm_source=notification&utm_medium=email&utm_campaign=unread-notifications" style="text-decoration: none" class="button-green">Read</a>
+                          </td>
+                          <td class="expander"></td>
+                        </tr>
+                      </table>
+                    </td>
+                    <td class="expander"></td>
+                  </tr>
+                </table>
         {{/each}}
-      </table>
-    </td>
-  </tr>
-</table>{{#if canChangeNotifySettings}}       
-<table width="100%" cellpadding="0" cellspacing="0" class="green-strip" style="background-color: #F2F2F2;">
-  <tr>
-    <td align="center">
-      <table width="600" style="background-color: #ccc; color: white; padding-top: 20px; padding-bottom: 20px">
-        <tr>
-          <td><br>
-            <h2 style="margin: 0;padding: 0;display: block;font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif;font-size: 24px;font-style: normal; font-weight: normal; margin: 0 60px; line-height: 125%;letter-spacing: -1px;text-align: left;color: #333;">Change notification settings</h2>
-            <table width="100%" cellpadding="0" cellspacing="0" border="0">{{#each troupesWithUnreadCounts}}{{#unless troupe.oneToOne}}  
-              <tr>
-                <td align="left" style="padding: 20px 60px">
-                  <table width="100%">
-                    <tr>
-                      <td>
-                        <p style="color: #333;display: block;font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif;font-size: 18px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0; margin-bottom: 8px;">{{troupe.uri}}</p>
-                      </td>
-                      <td width="100" align="right" valign="top">
-                        <table>
-                          <tr>
-                            <td style="background-color: white; padding: 6px 14px; border-radius: 5px" width="70" align="center">
-                              <a href="{{../../emailBasePath}}{{troupe.url}}#notifications" style="color: #333  ; font-size: 18px; text-decoration: none; font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif">Change</a>
-                            </td>
-                          </tr>
-                        </table>
-                        <br/>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>{{/unless}}{{/each}}         
-            </table>
-          </td>
-        </tr>
-        </table>{{/if}}<table width="600" style="background-color: #162e34; padding: 0 60px">
-          <tr>
-            <td style="margin: 0 60px">
-              <br><Br>
-              <p style="color: white;display: block;font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif;font-size: 18px;font-weight: normal;line-height: 100%;">To stop receiving all unread message notifications</p>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <table>
-                <tr>
-                  <td style="background-color: white; border-radius: 5px; padding: 6px 10px">
-                    <a href="{{unsubscribeUrl}}" style="color: #162e34; text-decoration: none; font-family: Helvetica, Geneva, Lucida Grande, Arial, Sans-serif">Unsubscribe</a>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
-    </td>
-  </tr>
-</table>
+                <table class="row">
+                  <tr>
+                    <td class="wrapper">
+                      <table class="twelve columns">
+                        <tr>
+                          <td>
+                            You can customise notification rules per room buy clicking on "Notification settings".<br>
+                            <a href="{{unsubscribeUrl}}" style="text-decoration: none">Unsubscribe</a> to stop receiving all unread message notifications from all conversations.<br>
+                          </td>
+                          <td class="expander"></td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+                <!-- promotion for apps -->>
+                <br><br>
+                <table class="row promo">
+                  <tr>
+                    <td class="wrapper">
+                      <table class="twelve columns">
+                        <tr>
+                          <td class="promo-inner">
+                            <h4 style="margin-bottom: 10px">Did you know we have desktop and mobile apps?</h4><br>
+                            <a href="https://gitter.im/apps" style="text-decoration: none;" class="button-green">Find out more</a>
+                          </td>
+                          <td class="expander"></td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
 
 

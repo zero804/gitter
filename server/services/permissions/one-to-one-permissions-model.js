@@ -1,7 +1,23 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var Q = require('q');
+var Q               = require('q');
+var env             = require('../../utils/env');
+var logger          = env.logger;
+var userHasSignedUp = require('../user-has-signed-up');
+var StatusError     = require('statuserror');
+
+function ensureUserHasSignedUp(uri) {
+  return userHasSignedUp(uri)
+    .then(function(signedUp) {
+      if(signedUp) return true;
+
+      var err = new StatusError(404, 'User not signed up');
+      err.uri = uri;
+      err.userNotSignedUp = true;
+      throw err;
+    })
+};
 
 /**
  * ONE-TO-ONE permissions model
@@ -16,10 +32,10 @@ module.exports = function oneToOnePermissionsModel(user, right, uri, security) {
   if(!user) return Q.resolve(false);
 
   switch(right) {
-    case 'view':
     case 'create':
+    case 'view':
     case 'join':
-      return Q.resolve(true);
+      return ensureUserHasSignedUp(uri);
 
     case 'adduser':
     case 'admin':
