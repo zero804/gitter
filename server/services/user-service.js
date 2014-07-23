@@ -71,7 +71,6 @@ var userService = {
         var gitterUser = {
           username:           githubUser.login,
           displayName:        githubUser.name || githubUser.login,
-          emails:             githubUser.email ? [githubUser.email] : [],
           gravatarImageUrl:   githubUser.avatar_url,
           githubId:           githubUser.id,
           state:              'INVITED'

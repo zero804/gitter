@@ -3,11 +3,11 @@
 
 var recentRoomService  = require('../../services/recent-room-service');
 var roomService        = require('../../services/room-service');
+var emailAddressService = require('../../services/email-address-service');
 var userService        = require("../../services/user-service");
 var restSerializer     = require("../../serializers/rest-serializer");
 var appEvents          = require("../../app-events");
 var _                  = require("underscore");
-var isValidEmail       = require('email-validator').validate;
 
 module.exports = {
   id: 'resourceTroupeUser',
@@ -30,16 +30,23 @@ module.exports = {
 
     return roomService.addUserToRoom(req.troupe, req.user, username)
       .then(function(userAdded) {
+
+        // invited users dont have github tokens yet
+        var options = userAdded.state === 'INVITED' ? { githubTokenUser: req.user } : {};
         var strategy = new restSerializer.UserStrategy();
-        restSerializer.serialize(userAdded, strategy, function (err, serialized) {
-          if (err) throw err;
 
-          if(userAdded.state === 'INVITED' && userAdded.emails && isValidEmail(userAdded.emails[0])) {
-            serialized.email = userAdded.emails[0];
-          }
+        return [
+          restSerializer.serializeQ(userAdded, strategy),
+          emailAddressService(userAdded, options)
+        ];
+      })
+      .spread(function(serializedUser, email) {
 
-          res.send(200, { success: true, user: serialized });
-        });
+        if(serializedUser.invited && email) {
+          serializedUser.email = email;
+        }
+
+        res.send(200, { success: true, user: serializedUser });
       })
       .fail(next);
   },

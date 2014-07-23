@@ -7,23 +7,10 @@ var stats               = env.stats;
 var logger              = env.logger;
 var mailerService       = require("./mailer-service");
 var crypto              = require('crypto');
-var GitHubMeService     = require('./github/github-me-service');
 var passphrase          = config.get('email:unsubscribeNotificationsSecret');
 var Q                   = require('q');
-var userSettingsService = require('../services/user-settings-service');
-
-
-function findValidEmail(user) {
-  var deferred = Q.defer();
-
-  if (user.githubUserToken || user.githubToken) {
-    var ghMe = new GitHubMeService(user);
-    return ghMe.getEmail();
-  } else {
-    deferred.resolve(user.emails[0]);
-    return deferred.promise;
-  }
-}
+var userSettingsService = require('./user-settings-service');
+var emailAddressService = require('./email-address-service')
 
 module.exports = {
 
@@ -37,7 +24,7 @@ module.exports = {
       return;
     }
 
-    return findValidEmail(user)
+    return emailAddressService(user)
       .then(function(email) {
         if(!email) {
           logger.info('Skipping email notification for ' + user.username + ' as they have no primary confirmed email');
@@ -80,7 +67,7 @@ module.exports = {
     var senderName = fromUser.displayName;
     var recipientName = toUser.displayName;
 
-    return findValidEmail(toUser)
+    return emailAddressService(toUser, { githubTokenUser: fromUser })
       .then(function(email) {
         if (!email) return;
 
@@ -118,7 +105,7 @@ module.exports = {
           return;
         }
 
-        return findValidEmail(toUser)
+        return emailAddressService(toUser)
           .then(function(email) {
             if (!email) {
               logger.info('Skipping email notification for ' + toUser.username + ' as they have no primary confirmed email');
