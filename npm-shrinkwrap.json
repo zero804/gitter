@@ -831,25 +831,28 @@
     },
     "gitter-env": {
       "version": "0.8.4",
-      "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.8.4",
+      "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#25e2808871283f7c8da3c2dd48fd01036c96bc80",
       "resolved": "git+ssh://git@github.com:gitterHQ/gitter-env.git#25e2808871283f7c8da3c2dd48fd01036c96bc80",
       "dependencies": {
         "async": {
           "version": "0.8.0",
-          "from": "async@^0.8.0"
+          "from": "async@0.8.0",
+          "resolved": "https://registry.npmjs.org/async/-/async-0.8.0.tgz"
         },
         "nconf": {
           "version": "0.6.9",
-          "from": "nconf@^0.6.9",
+          "from": "nconf@0.6.9",
+          "resolved": "https://registry.npmjs.org/nconf/-/nconf-0.6.9.tgz",
           "dependencies": {
             "async": {
               "version": "0.2.9",
-              "from": "async@0.2.9",
+              "from": "https://registry.npmjs.org/async/-/async-0.2.9.tgz",
               "resolved": "https://registry.npmjs.org/async/-/async-0.2.9.tgz"
             },
             "ini": {
               "version": "1.2.1",
-              "from": "ini@1.x.x"
+              "from": "ini@1.2.1",
+              "resolved": "https://registry.npmjs.org/ini/-/ini-1.2.1.tgz"
             },
             "optimist": {
               "version": "0.6.0",
@@ -857,11 +860,13 @@
               "dependencies": {
                 "wordwrap": {
                   "version": "0.0.2",
-                  "from": "wordwrap@~0.0.2"
+                  "from": "wordwrap@0.0.2",
+                  "resolved": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.2.tgz"
                 },
                 "minimist": {
                   "version": "0.0.10",
-                  "from": "minimist@~0.0.1"
+                  "from": "minimist@0.0.10",
+                  "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.10.tgz"
                 }
               }
             }
@@ -869,11 +874,13 @@
         },
         "redis": {
           "version": "0.10.3",
-          "from": "redis@^0.10.1"
+          "from": "redis@0.10.3",
+          "resolved": "https://registry.npmjs.org/redis/-/redis-0.10.3.tgz"
         },
         "underscore": {
           "version": "1.6.0",
-          "from": "underscore@^1.6.0"
+          "from": "underscore@1.6.0",
+          "resolved": "https://registry.npmjs.org/underscore/-/underscore-1.6.0.tgz"
         },
         "clockout": {
           "version": "0.0.1",
@@ -881,7 +888,8 @@
         },
         "blocked": {
           "version": "1.0.0",
-          "from": "blocked@^1.0.0"
+          "from": "blocked@1.0.0",
+          "resolved": "https://registry.npmjs.org/blocked/-/blocked-1.0.0.tgz"
         }
       }
     },
