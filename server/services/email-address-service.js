@@ -12,18 +12,16 @@ function getPrivateEmailAddress(user) {
 }
 
 function getValidPublicEmailAddress(user, githubTokenUser) {
-  console.log('public', arguments);
   var ghUser = new GitHubUserService(githubTokenUser);
   return ghUser.getUser(user.username)
     .then(function(user) {
-      console.log('user',user)
       if(user.email && isValidEmail(user.email)) {
         return user.email;
       }
     });
 }
 
-var p = function(user, options) {
+module.exports = function(user, options) {
   var options = options || {};
 
   if(user.githubUserToken || user.githubToken) {
@@ -33,15 +31,4 @@ var p = function(user, options) {
   } else {
     return Q.resolve(undefined);
   }
-}
-
-module.exports = function(user, options) {
-  console.log('s', user, options);
-  console.trace();
-  return p(user, options).then(function(result) {
-    // console.log()
-    console.trace();
-    console.log('@@@@@', result)
-    return result;
-  })
-}
+};
