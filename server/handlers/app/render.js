@@ -261,7 +261,6 @@ function renderUserNotSignedUp(req, res, next) {
   UserService.findByUsername(req.params.roomPart1)
     .then(function (user) {
       res.render('one-to-one-invited', {
-        // layout: '' // TODO: add layout
         appCache: getAppCache(req),
         agent: req.headers['user-agent'],
         invitedUser: user,
@@ -270,6 +269,33 @@ function renderUserNotSignedUp(req, res, next) {
       });
     })
     .fail(next);
+}
+
+function renderUserNotSignedUpMainFrame(req, res, next, frame) {
+  contextGenerator.generateNonChatContext(req)
+    .then(function(troupeContext) {
+      var chatAppLocation = '/' + req.params.roomPart1 + '/~' + frame + '#initial';
+
+      var template, bootScriptName;
+      if(req.user) {
+        template = 'app-template';
+        bootScriptName = 'router-app';
+      } else {
+        template = 'app-nli-template';
+        bootScriptName = 'router-nli-app';
+      }
+
+      res.render(template, {
+        appCache: getAppCache(req),
+        bootScriptName: bootScriptName,
+        troupeName: req.params.roomPart1,
+        troupeContext: troupeContext,
+        chatAppLocation: chatAppLocation,
+        agent: req.headers['user-agent'],
+        stagingText: stagingText,
+        stagingLink: stagingLink,
+      });
+    }).fail(next);
 }
 
 
@@ -283,5 +309,6 @@ module.exports = exports = {
   renderNotLoggedInChatPage: renderNotLoggedInChatPage,
   renderMobileNativeChat: renderMobileNativeChat,
   renderMobileNativeUserhome: renderMobileNativeUserhome,
-  renderUserNotSignedUp: renderUserNotSignedUp
+  renderUserNotSignedUp: renderUserNotSignedUp,
+  renderUserNotSignedUpMainFrame: renderUserNotSignedUpMainFrame
 };
