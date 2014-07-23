@@ -14,9 +14,6 @@ var fakeEngine = {
 };
 
 describe('presenceService', function() {
-  var blockTimer = require('./block-timer');
-  before(blockTimer.on);
-  after(blockTimer.off);
 
   function cleanup(done) {
     presenceService.collectGarbage(fakeEngine, function(err) {
@@ -31,6 +28,10 @@ describe('presenceService', function() {
 
   beforeEach(cleanup);
   afterEach(cleanup);
+
+  var blockTimer = require('./block-timer');
+  before(blockTimer.on);
+  after(blockTimer.off);
 
   it('should cleanup invalid sockets correctly', function(done) {
 

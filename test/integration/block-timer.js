@@ -6,6 +6,7 @@ var winston = testRequire('./utils/winston');
 
 var timer;
 var t;
+var last;
 
 module.exports = {
   on: function() {
@@ -14,12 +15,12 @@ module.exports = {
     // These are blocking, but once off
     testRequire('./serializers/rest-serializer').testOnly.eagerLoadStrategies();
 
-    var last = Date.now();
     timer = true;
+    last = Date.now();
 
     t = setInterval(function checkLoop() {
       var n = Date.now();
-      if(n - last > 50) winston.warn('Block' + (n - last) + 'ms');
+      if(n - last > 50) winston.warn('Block ' + (n - last) + 'ms');
       last = n;
     }, 10);
 
@@ -27,5 +28,8 @@ module.exports = {
   off: function() {
     timer = false;
     clearTimeout(t);
+  },
+  reset: function() {
+    last = Date.now();
   }
 };

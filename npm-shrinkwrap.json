@@ -872,9 +872,9 @@
       }
     },
     "gitter-env": {
-      "version": "0.8.2",
-      "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.8.2",
-      "resolved": "git+ssh://git@github.com:gitterHQ/gitter-env.git#f1667e99ef717337af23f79243dec8746e2f7f93",
+      "version": "0.8.3",
+      "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.8.3",
+      "resolved": "git+ssh://git@github.com:gitterHQ/gitter-env.git#1f6322145eae3acbc12c2b855eb07d3748f83215",
       "dependencies": {
         "async": {
           "version": "0.8.0",
