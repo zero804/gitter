@@ -6,7 +6,7 @@ exports.startWorkers = function() {
 
   require('./mailer-service');
   // require('../gateways/push-notification-gateway');
-  require('./notifications/push-notification-generator-service');
+  require('./notifications/push-notification-postbox');
   // require('./thumbnail-preview-generator-service');
   require('./unread-item-service');
 

@@ -5,6 +5,7 @@ var ensureLoggedIn    = require('../../web/middlewares/ensure-logged-in');
 var appRender         = require('./render');
 var appMiddleware     = require('./middleware');
 var recentRoomService = require('../../services/recent-room-service');
+var isPhone     = require('../../web/is-phone');
 
 function saveRoom(req) {
   var userId = req.user && req.user.id;
@@ -41,13 +42,20 @@ var mainFrameMiddlewarePipeline = [
     } else {
       appRender.renderMainFrame(req, res, next, 'chat');
     }
+  },
+  function (err, req, res, next) {
+    if (err && err.userNotSignedUp && !isPhone(req.headers['user-agent'])) {
+      appRender.renderUserNotSignedUpMainFrame(req, res, next, 'chat');
+      return;
+    }
+    return next(err);
   }
 ];
 
 var chatMiddlewarePipeline = [
   appMiddleware.uriContextResolverMiddleware,
   appMiddleware.isPhoneMiddleware,
-  function(req, res, next) {
+  function (req, res, next) {
     if(!req.uriContext.troupe) return next(404);
 
     if(req.user) {
@@ -60,6 +68,13 @@ var chatMiddlewarePipeline = [
       appRender.renderNotLoggedInChatPage(req, res, next);
     }
 
+  },
+  function (err, req, res, next) {
+    if (err && err.userNotSignedUp) {
+      appRender.renderUserNotSignedUp(req, res, next);
+      return;
+    }
+    return next(err);
   }
 ];
 

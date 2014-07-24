@@ -3,7 +3,9 @@
 
 var restSerializer = require("../../serializers/rest-serializer");
 var userService = require("../../services/user-service");
-var userSearchService = require("../../services/user-search-service");
+var githubGitterUserSearch = require("../../services/github-gitter-user-search");
+var gitterUserSearch = require("../../services/user-search-service");
+var Q = require('q');
 
 module.exports = {
   id: 'resourceUser',
@@ -13,25 +15,35 @@ module.exports = {
     }
 
     if(req.query.q) {
+
+      var searchQuery = req.query.q;
+      var user = req.user;
+      var searchType = req.query.type;
+
       var options = {
-        limit: req.query.limit,
+        limit: req.query.limit || 10,
         skip: req.query.skip,
         excludeTroupeId: req.query.excludeTroupeId
       };
 
-      return userSearchService.globalUserSearch(req.query.q, options)
+      return Q.fcall(function() {
+          if(searchType === 'gitter') {
+            return gitterUserSearch.globalUserSearch(searchQuery, options)
+          } else {
+            return githubGitterUserSearch(searchQuery, user, options)
+          }
+        })
         .then(function(searchResults) {
           var strategy = new restSerializer.SearchResultsStrategy({
-                                resultItemStrategy: new restSerializer.UserStrategy()
-                              });
+            resultItemStrategy: new restSerializer.UserStrategy()
+          });
 
-          return restSerializer.serializeQ(searchResults, strategy)
-            .then(function(serialized) {
-              res.send(serialized);
-            });
+          return restSerializer.serializeQ(searchResults, strategy);
+        })
+        .then(function(searchResults) {
+          res.send(searchResults);
         })
         .fail(next);
-
     }
 
     var strategy = new restSerializer.UserStrategy();

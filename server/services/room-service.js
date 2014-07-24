@@ -26,6 +26,9 @@ var validate           = require('../utils/validate');
 var collections        = require('../utils/collections');
 var StatusError        = require('statuserror');
 var eventService       = require('./event-service');
+var emailNotificationService = require('./email-notification-service');
+var canBeInvited       = require('./invited-permissions-service');
+var emailAddressService = require('./email-address-service');
 
 function localUriLookup(uri, opts) {
   return uriLookupService.lookupUri(uri)
@@ -350,10 +353,16 @@ function findOrCreateRoom(user, uri, options) {
 
         logger.verbose('Finding or creating a one to one chat');
 
-        return troupeService.findOrCreateOneToOneTroupeIfPossible(userId, otherUser.id)
-          .spread(function(troupe, otherUser) {
-            return { oneToOne: true, troupe: troupe, otherUser: otherUser };
-          });
+        return permissionsModel(user, 'view', otherUser.username, 'ONETOONE', null)
+          .then(function(access) {
+            if(!access) return null;
+
+            return troupeService.findOrCreateOneToOneTroupeIfPossible(userId, otherUser.id)
+              .spread(function(troupe, otherUser) {
+                return { oneToOne: true, troupe: troupe, otherUser: otherUser };
+              });
+          })
+
       }
 
       logger.verbose('Attempting to access room ' + uri);
@@ -619,112 +628,63 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
 }
 exports.createCustomChildRoom = createCustomChildRoom;
 
-
-/**
- * Validates that all users on the list are validate candidates
- * to be added to the room.
- *
- * Returns a promise of nothing or the promise of an exception if
- * any of the users are not allowed to be added to the room.
- */
-function validateUsersToAdd(troupe, usersToAdd) {
-  var validator;
-
-  function roomUserValidator(securityRoomUri, githubType) {
-    return function(user) {
-      return permissionsModel(user, 'join', securityRoomUri, githubType, null);
-    };
-  }
-
-  /* Next, for INHERITED security, make sure the users have access to the parent room */
-  switch(troupe.githubType) {
-    case 'REPO':
-      validator = roomUserValidator(troupe.uri, 'REPO');
-      break;
-
-    case 'ORG':
-      validator = roomUserValidator(troupe.uri, 'ORG');
-      break;
-
-    case 'ONETOONE':
-      /* Nobody can be added */
-      return Q.reject(400);
-
-    case 'REPO_CHANNEL':
-    case 'ORG_CHANNEL':
-      switch(troupe.security) {
-        case 'PRIVATE':
-          /* Anyone can be added */
-          return Q.resolve(true);
-
-        case 'INHERITED':
-          var parentUri = troupe.uri.split('/').slice(0, -1).join('/');
-          var parentRoomType = troupe.githubType === 'REPO_CHANNEL' ? 'REPO' : 'ORG';
-
-          validator = roomUserValidator(parentUri, parentRoomType);
-          break;
-
-        case 'PUBLIC':
-          /* Anyone can be added */
-          return Q.resolve(true);
-      }
-      break;
-
-
-    case 'USER_CHANNEL':
-      /* Anyone can be added, whether its PUBLIC or PRIVATE */
-      return;
-
-    default:
-      /* Dont know what kind of room this is */
-      return Q.reject(400);
-  }
-
-  return Q.all(usersToAdd.map(function(user) {
-    return roomUserValidator(user);
-  }));
-
-}
-/**
- * Add users to a room
- * @param {Troupe}    troupe
- * @param {User}      instigatingUser
- * @param {[String]}  usernamesToAdd    Usernames of the users to add to the room
- */
-function addUsersToRoom(troupe, instigatingUser, usernamesToAdd) {
-  /* First step: make sure that the instigatingUser has add access.
-   */
+function addUserToRoom(troupe, instigatingUser, usernameToAdd) {
   return roomPermissionsModel(instigatingUser, 'adduser', troupe)
     .then(function(access) {
-      if(!access) throw 403;
+      if(!access) throw new StatusError(403, 'You do not have permission to add people to this room.');
 
-      /* Next, resolve the users to add */
-      return userService.findByUsernames(usernamesToAdd);
+      return userService.findByUsername(usernameToAdd);
     })
-    .then(function(usersToAdd) {
-      var existing = collections.indexByProperty(usersToAdd, 'userId');
-      /* Next, filter out any users who are already in this room */
-      return usersToAdd.filter(function(user) {
-        return !existing[user.id];
-      });
+    .then(function(existingUser) {
+      return existingUser || userService.inviteByUsername(usernameToAdd);
     })
-    .then(function(usersToAdd) {
-      validateUsersToAdd(troupe, usersToAdd);
-      return usersToAdd;
-    })
-    .then(function(usersToAdd) {
-      /* Next, add the users */
-      usersToAdd.forEach(function(user) {
-        if(!troupe.containsUserId(user.id)) {
+    .then(function(user) {
+
+      if(troupe.containsUserId(user.id)) {
+        throw new StatusError(409, usernameToAdd + ' is already in this room.');
+      }
+
+      return canBeInvited(user, troupe, instigatingUser)
+        .then(function(hasPermissionToJoin) {
+          if(!hasPermissionToJoin) throw new StatusError(403, usernameToAdd + ' does not have permission to join this room.');
+
           troupe.addUserById(user.id);
-        }
-      });
+          return troupe.saveQ();
+        })
+        .then(function() {
+          // invited users dont have github tokens yet
+          var options = user.state === 'INVITED' ? { githubTokenUser: instigatingUser } : {};
 
-      return troupe.saveQ()
-        .thenResolve(troupe);
+          return emailAddressService(user, options);
+        }).then(function(emailAddress) {
+
+          var notification;
+
+          if(user.state === 'INVITED') {
+            if(emailAddress) {
+              emailNotificationService.sendInvitation(instigatingUser, user, troupe);
+              notification = 'email_invite_sent';
+            } else {
+              notification = 'unreachable_for_invite';
+            }
+          } else {
+            emailNotificationService.addedToRoomNotification(instigatingUser, user, troupe);
+            notification = 'email_notification_sent';
+          }
+
+          stats.event('user_added', {
+            userId: user.id,
+            notification: notification,
+            troupeId: troupe.id,
+            instigatingUserId: instigatingUser.id
+          });
+
+          return user;
+        });
+
     });
 }
-exports.addUsersToRoom = addUsersToRoom;
+exports.addUserToRoom = addUserToRoom;
 
 function revalidatePermissionsForUsers(room) {
   /* Re-insure that each user in the room has access to the room */

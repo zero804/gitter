@@ -33,7 +33,7 @@
 
 .trpPeopleListItem.unread {
       -webkit-animation: pulsate 3s ease-out;
-    -webkit-animation-iteration-count: infinite; 
+    -webkit-animation-iteration-count: infinite;
 
 }
 
@@ -45,13 +45,13 @@
     -webkit-transform: translate3d(0, 0, 0);
   &.unread {
     -webkit-animation: pulsate 3s ease-out;
-    -webkit-animation-iteration-count: infinite; 
+    -webkit-animation-iteration-count: infinite;
   }
 
   @media @retina {
     &.unread {
       -webkit-animation: pulsate-retina 3s ease-out;
-      -webkit-animation-iteration-count: infinite; 
+      -webkit-animation-iteration-count: infinite;
     }
   }
 }
@@ -225,6 +225,26 @@ a .trpDisplayPicture {
 
 .trpDisplayPicture {
   border-bottom: 2px solid transparent;
+}
+
+.trpDisplayPicture.invited {
+
+  @invitedGray: 0;
+  @invitedOpacity: 0.3;
+  @MSinvitedOpacity: @invitedOpacity * 100; /* DO NOT CHANGE */
+
+  opacity: @invitedOpacity;
+  filter: alpha(opacity=@MSinvitedOpacity);
+
+  -webkit-filter: grayscale(@invitedGray);
+     -moz-filter: grayscale(@invitedGray);
+       -o-filter: grayscale(@invitedGray);
+      -ms-filter: grayscale(@invitedGray);
+          filter: grayscale(@invitedGray);
+
+  .trpStatus {
+    display: none;
+  }
 }
 
 .trpDisplayPicture.online .trpStatus{
