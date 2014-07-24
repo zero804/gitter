@@ -11,16 +11,17 @@ var Q = require('q');
 var fixtureLoader = require('../test-fixtures');
 var fixture = {};
 
-before(fixtureLoader(fixture, {
-  user1: { }
-}));
-
-after(function() {
- fixture.cleanup();
-});
 
 
 describe('oauth-service', function() {
+  before(fixtureLoader(fixture, {
+    user1: { }
+  }));
+
+  after(function() {
+   fixture.cleanup();
+  });
+
   it('should create tokens', function(done) {
 
     var userId = mongoUtils.getNewObjectIdString();

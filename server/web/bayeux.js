@@ -6,7 +6,7 @@ var logger            = env.logger;
 var nconf             = env.config;
 var stats             = env.stats;
 
-var faye              = require('faye');
+var faye              = require('./faye-node');
 var fayeRedis         = require('faye-redis');
 var oauth             = require('../services/oauth-service');
 var troupeService     = require('../services/troupe-service');

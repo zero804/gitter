@@ -14,29 +14,26 @@ var restSerializer = require("../serializers/rest-serializer");
 
 // TODO: move this into its own module
 function serializeEvent(url, operation, model, callback) {
-  if(!url) { if(callback) callback(); return; }
+  if(!url) { return Q.resolve().nodeify(callback); }
   logger.verbose("Serializing " + operation + " to " + url);
 
   // TODO: consider swapping out the HEAVY WEIGHT restSerializer here for the
   // light weight notification-serializer as it is much more effeicent. Obviously
   // consumers of the events will need to be adapted to use objects of the new
   // shape
-  restSerializer.serializeModel(model, function(err, serializedModel) {
-    if(err) {
-      logger.error("Silently failing model event: ", { exception: err, url: url, operation: operation });
-      if(callback) callback(err);
-      return;
-    }
+  return restSerializer.serializeModel(model)
+    .then(function(serializedModel) {
+      if(Array.isArray(url)) {
+        url.forEach(function(u) {
+          appEvents.dataChange2(u, operation, serializedModel);
+        });
+      } else {
+        appEvents.dataChange2(url, operation, serializedModel);
+      }
 
-    if(Array.isArray(url)) {
-      url.forEach(function(u) {
-        appEvents.dataChange2(u, operation, serializedModel);
-      });
-    } else {
-      appEvents.dataChange2(url, operation, serializedModel);
-    }
-    if(callback) callback(null, serializedModel);
-  });
+      return serializedModel
+    })
+    .nodeify(callback);
 }
 exports.serializeEvent = serializeEvent;
 
@@ -118,36 +115,10 @@ exports.install = function(persistenceService) {
     stats.userUpdate(model);
   });
 
-  // attachNotificationListenersToSchema(schemas.ConversationSchema, 'conversation');
-  // attachNotificationListenersToSchema(schemas.FileSchema, 'file');
-
-  // attachNotificationListenersToSchema(schemas.InviteSchema, 'invite', function(model) {
-  //   var urls = [];
-
-  //   if(model.userId) {
-  //     urls.push("/user/" + model.userId + "/invites");
-  //   }
-
-  //   // One to one connection invite
-  //   if(model.fromUserId && !model.troupeId) {
-  //     urls.push("/user/" + model.fromUserId + "/connectioninvites");
-  //   }
-
-  //   if(model.troupeId) {
-  //     urls.push("/troupes/" + model.troupeId + "/invites");
-  //   }
-
-  //   return urls.length ? urls : null;
-  // });
-
-  // attachNotificationListenersToSchema(schemas.RequestSchema, 'request');
-  // attachNotificationListenersToSchema(schemas.ChatMessageSchema, 'chat', function(model) {
-  //   return "/troupes/" + model.toTroupeId + "/chatMessages";
-  // });
-  //
   function chatUrlExtractor(model) {
     return "/rooms/" + model.toTroupeId + "/chatMessages";
   }
+
   mongooseUtils.attachNotificationListenersToSchema(schemas.ChatMessageSchema, {
     onCreate: function(model, next) {
       var url = chatUrlExtractor(model);
@@ -185,18 +156,9 @@ exports.install = function(persistenceService) {
     }
   });
 
-
   attachNotificationListenersToSchema(schemas.EventSchema, 'event', function(model) {
     return '/rooms/' + model.toTroupeId + '/events';
   });
-  /*
-  attachNotificationListenersToSchema(schemas.TroupeSchema, 'troupe', function(model) {
-    // Never serialize any one-to-one troupe events as that's just silly
-    if(model.oneToOne) return null;
-
-    return "/troupes/" + model.id;
-  });
-  */
 
   function serializeOneToOneTroupe(operation, troupe) {
     troupe.users.forEach(function(troupeUser) {
@@ -218,7 +180,6 @@ exports.install = function(persistenceService) {
 
   mongooseUtils.attachNotificationListenersToSchema(schemas.TroupeSchema, {
     onCreate: function onTroupeCreate(model, next) {
-
       if(model.oneToOne) {
         // Because the troupe needs the currentUserId to be set!
         serializeOneToOneTroupe('create', model);

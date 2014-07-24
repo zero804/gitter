@@ -3,7 +3,8 @@
 "use strict";
 
 var assert = require('assert');
-var tagger = require('../../../server/utils/user-agent-tagger');
+var testRequire = require('../test-require');
+var tagger = testRequire('./utils/user-agent-tagger');
 
 describe('user agent tags', function() {
 

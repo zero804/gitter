@@ -24,17 +24,16 @@ var thrice = times(3);
 var unreadItemServiceMock = mockito.spy(underlyingUnreadItemService);
 unreadItemServiceMock.install();
 
-var fixture = {};
-
-beforeEach(fixtureLoader(fixture, {
-  user1: { },
-  user2: { },
-  user3: { },
-  troupe1: { users: ['user1', 'user2', 'user3']}
-}));
-afterEach(function() { fixture.cleanup(); });
-
 describe('email-notification-generator-service', function() {
+  var fixture = {};
+
+  beforeEach(fixtureLoader(fixture, {
+    user1: { },
+    user2: { },
+    user3: { },
+    troupe1: { users: ['user1', 'user2', 'user3']}
+  }));
+  afterEach(function() { fixture.cleanup(); });
 
   it('should send out an email notification for a user with unread items', function(done) {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
