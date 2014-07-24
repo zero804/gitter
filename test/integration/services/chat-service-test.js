@@ -11,6 +11,10 @@ var assert = require('assert');
 
 describe('chatService', function() {
 
+  var blockTimer = require('../block-timer');
+  before(blockTimer.on);
+  after(blockTimer.off);
+
   var fixture = {};
   before(fixtureLoader(fixture, {
     user1: {},

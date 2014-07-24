@@ -1,5 +1,3 @@
-/*jslint node: true */
-/*global describe:true, it: true, beforeEach:true, afterEach:true */
 "use strict";
 
 var testRequire     = require('./test-require');
@@ -16,6 +14,7 @@ var fakeEngine = {
 };
 
 describe('presenceService', function() {
+
   function cleanup(done) {
     presenceService.collectGarbage(fakeEngine, function(err) {
       if(err) return done(err);
@@ -29,6 +28,10 @@ describe('presenceService', function() {
 
   beforeEach(cleanup);
   afterEach(cleanup);
+
+  var blockTimer = require('./block-timer');
+  before(blockTimer.on);
+  after(blockTimer.off);
 
   it('should cleanup invalid sockets correctly', function(done) {
 

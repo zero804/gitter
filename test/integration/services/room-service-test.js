@@ -17,44 +17,6 @@ Q.longStackSupport = true;
 var troupeService = testRequire("./services/troupe-service");
 var persistence = testRequire("./services/persistence-service");
 
-before(fixtureLoader(fixture, {
-  user1: { },
-  user2: { },
-  user3: { },
-  troupeOrg1: {
-    githubType: 'ORG',
-    users: ['user1', 'user2']
-  },
-  troupeRepo: {
-    security: 'PRIVATE',
-    githubType: 'REPO',
-    users: ['user1', 'user2']
-  },
-  troupeBan: {
-    security: 'PUBLIC',
-    githubType: 'REPO',
-    users: ['userBan', 'userBanAdmin']
-  },
-  userBan: { },
-  userBanAdmin: {},
-  troupeCanRemove: {
-    security: 'PUBLIC',
-    githubType: 'REPO',
-    users: ['userToRemove', 'userRemoveNonAdmin', 'userRemoveAdmin']
-  },
-  troupeCannotRemove: {
-    security: 'PRIVATE',
-    githubType: 'ONETOONE',
-    users: ['userToRemove', 'userRemoveAdmin']
-  },
-  userToRemove: {},
-  userRemoveNonAdmin: {},
-  userRemoveAdmin: {}
-}));
-
-after(function() {
-  fixture.cleanup();
-});
 
 function makeRoomAssertions(room, usersAllowedIn, usersNotAllowedIn) {
   return Q.resolve(true);
@@ -93,6 +55,44 @@ function makeRoomAssertions(room, usersAllowedIn, usersNotAllowedIn) {
 }
 
 describe('room-service', function() {
+  before(fixtureLoader(fixture, {
+    user1: { },
+    user2: { },
+    user3: { },
+    troupeOrg1: {
+      githubType: 'ORG',
+      users: ['user1', 'user2']
+    },
+    troupeRepo: {
+      security: 'PRIVATE',
+      githubType: 'REPO',
+      users: ['user1', 'user2']
+    },
+    troupeBan: {
+      security: 'PUBLIC',
+      githubType: 'REPO',
+      users: ['userBan', 'userBanAdmin']
+    },
+    userBan: { },
+    userBanAdmin: {},
+    troupeCanRemove: {
+      security: 'PUBLIC',
+      githubType: 'REPO',
+      users: ['userToRemove', 'userRemoveNonAdmin', 'userRemoveAdmin']
+    },
+    troupeCannotRemove: {
+      security: 'PRIVATE',
+      githubType: 'ONETOONE',
+      users: ['userToRemove', 'userRemoveAdmin']
+    },
+    userToRemove: {},
+    userRemoveNonAdmin: {},
+    userRemoveAdmin: {}
+  }));
+
+  after(function() {
+    fixture.cleanup();
+  });
 
   describe('classic functionality', function() {
 

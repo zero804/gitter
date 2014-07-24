@@ -1732,537 +1732,645 @@ Faye.Transport = Faye.extend(Faye.Class({
 Faye.extend(Faye.Transport.prototype, Faye.Logging);
 Faye.extend(Faye.Transport.prototype, Faye.Timeouts);
 
-Faye.Event = {
-  _registry: [],
-
-  on: function(element, eventName, callback, context) {
-    var wrapped = function() { callback.call(context) };
-
-    if (element.addEventListener)
-      element.addEventListener(eventName, wrapped, false);
-    else
-      element.attachEvent('on' + eventName, wrapped);
-
-    this._registry.push({
-      _element:   element,
-      _type:      eventName,
-      _callback:  callback,
-      _context:     context,
-      _handler:   wrapped
-    });
+Faye.Engine = {
+  get: function(options) {
+    return new Faye.Engine.Proxy(options);
   },
 
-  detach: function(element, eventName, callback, context) {
-    var i = this._registry.length, register;
-    while (i--) {
-      register = this._registry[i];
-
-      if ((element    && element    !== register._element)   ||
-          (eventName  && eventName  !== register._type)      ||
-          (callback   && callback   !== register._callback)  ||
-          (context      && context      !== register._context))
-        continue;
-
-      if (register._element.removeEventListener)
-        register._element.removeEventListener(register._type, register._handler, false);
-      else
-        register._element.detachEvent('on' + register._type, register._handler);
-
-      this._registry.splice(i,1);
-      register = null;
-    }
-  }
+  METHODS: ['createClient', 'clientExists', 'destroyClient', 'ping', 'subscribe', 'unsubscribe']
 };
 
-if (Faye.ENV.onunload !== undefined) Faye.Event.on(Faye.ENV, 'unload', Faye.Event.detach, Faye.Event);
+Faye.Engine.Proxy = Faye.Class({
+  MAX_DELAY:  0,
+  INTERVAL:   0,
+  TIMEOUT:    60,
 
-/*
-    json2.js
-    2013-05-26
+  className: 'Engine',
 
-    Public Domain.
+  initialize: function(options) {
+    this._options     = options || {};
+    this._connections = {};
+    this.interval     = this._options.interval || this.INTERVAL;
+    this.timeout      = this._options.timeout  || this.TIMEOUT;
 
-    NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
+    var engineClass = this._options.type || Faye.Engine.Memory;
+    this._engine    = engineClass.create(this, this._options);
 
-    See http://www.JSON.org/js.html
+    this.bind('close', function(clientId) {
+      var self = this;
+      Faye.Promise.defer(function() { self.flushConnection(clientId) });
+    }, this);
 
+    this.debug('Created new engine: ?', this._options);
+  },
 
-    This code should be minified before deployment.
-    See http://javascript.crockford.com/jsmin.html
+  connect: function(clientId, options, callback, context) {
+    this.debug('Accepting connection from ?', clientId);
+    this._engine.ping(clientId);
+    var conn = this.connection(clientId, true);
+    conn.connect(options, callback, context);
+    this._engine.emptyQueue(clientId);
+  },
 
-    USE YOUR OWN COPY. IT IS EXTREMELY UNWISE TO LOAD CODE FROM SERVERS YOU DO
-    NOT CONTROL.
+  hasConnection: function(clientId) {
+    return this._connections.hasOwnProperty(clientId);
+  },
 
+  connection: function(clientId, create) {
+    var conn = this._connections[clientId];
+    if (conn || !create) return conn;
+    this._connections[clientId] = new Faye.Engine.Connection(this, clientId);
+    this.trigger('connection:open', clientId);
+    return this._connections[clientId];
+  },
 
-    This file creates a global JSON object containing two methods: stringify
-    and parse.
+  closeConnection: function(clientId) {
+    this.debug('Closing connection for ?', clientId);
+    var conn = this._connections[clientId];
+    if (!conn) return;
+    if (conn.socket) conn.socket.close();
+    this.trigger('connection:close', clientId);
+    delete this._connections[clientId];
+  },
 
-        JSON.stringify(value, replacer, space)
-            value       any JavaScript value, usually an object or array.
+  openSocket: function(clientId, socket) {
+    var conn = this.connection(clientId, true);
+    conn.socket = socket;
+  },
 
-            replacer    an optional parameter that determines how object
-                        values are stringified for objects. It can be a
-                        function or an array of strings.
+  deliver: function(clientId, messages) {
+    if (!messages || messages.length === 0) return false;
 
-            space       an optional parameter that specifies the indentation
-                        of nested structures. If it is omitted, the text will
-                        be packed without extra whitespace. If it is a number,
-                        it will specify the number of spaces to indent at each
-                        level. If it is a string (such as '\t' or '&nbsp;'),
-                        it contains the characters used to indent at each level.
+    var conn = this.connection(clientId, false);
+    if (!conn) return false;
 
-            This method produces a JSON text from a JavaScript value.
+    for (var i = 0, n = messages.length; i < n; i++) {
+      conn.deliver(messages[i]);
+    }
+    return true;
+  },
 
-            When an object value is found, if the object contains a toJSON
-            method, its toJSON method will be called and the result will be
-            stringified. A toJSON method does not serialize: it returns the
-            value represented by the name/value pair that should be serialized,
-            or undefined if nothing should be serialized. The toJSON method
-            will be passed the key associated with the value, and this will be
-            bound to the value
+  generateId: function() {
+    return Faye.random();
+  },
 
-            For example, this would serialize Dates as ISO strings.
+  flushConnection: function(clientId, close) {
+    if (!clientId) return;
+    this.debug('Flushing connection for ?', clientId);
+    var conn = this.connection(clientId, false);
+    if (!conn) return;
+    if (close === false) conn.socket = null;
+    conn.flush();
+    this.closeConnection(clientId);
+  },
 
-                Date.prototype.toJSON = function (key) {
-                    function f(n) {
-                        // Format integers to have at least two digits.
-                        return n < 10 ? '0' + n : n;
-                    }
+  close: function() {
+    for (var clientId in this._connections) this.flushConnection(clientId);
+    this._engine.disconnect();
+  },
 
-                    return this.getUTCFullYear()   + '-' +
-                         f(this.getUTCMonth() + 1) + '-' +
-                         f(this.getUTCDate())      + 'T' +
-                         f(this.getUTCHours())     + ':' +
-                         f(this.getUTCMinutes())   + ':' +
-                         f(this.getUTCSeconds())   + 'Z';
-                };
+  disconnect: function() {
+    if (this._engine.disconnect) return this._engine.disconnect();
+  },
 
-            You can provide an optional replacer method. It will be passed the
-            key and value of each member, with this bound to the containing
-            object. The value that is returned from your method will be
-            serialized. If your method returns undefined, then the member will
-            be excluded from the serialization.
+  publish: function(message) {
+    var channels = Faye.Channel.expand(message.channel);
+    return this._engine.publish(message, channels);
+  }
+});
 
-            If the replacer parameter is an array of strings, then it will be
-            used to select the members to be serialized. It filters the results
-            such that only members with keys listed in the replacer array are
-            stringified.
+Faye.Engine.METHODS.forEach(function(method) {
+  Faye.Engine.Proxy.prototype[method] = function() {
+    return this._engine[method].apply(this._engine, arguments);
+  };
+});
 
-            Values that do not have JSON representations, such as undefined or
-            functions, will not be serialized. Such values in objects will be
-            dropped; in arrays they will be replaced with null. You can use
-            a replacer function to replace those with JSON values.
-            JSON.stringify(undefined) returns undefined.
+Faye.extend(Faye.Engine.Proxy.prototype, Faye.Publisher);
+Faye.extend(Faye.Engine.Proxy.prototype, Faye.Logging);
 
-            The optional space parameter produces a stringification of the
-            value that is filled with line breaks and indentation to make it
-            easier to read.
+Faye.Engine.Connection = Faye.Class({
+  initialize: function(engine, id, options) {
+    this._engine  = engine;
+    this._id      = id;
+    this._options = options;
+    this._inbox   = [];
+  },
 
-            If the space parameter is a non-empty string, then that string will
-            be used for indentation. If the space parameter is a number, then
-            the indentation will be that many spaces.
+  deliver: function(message) {
+    if (this.socket) return this.socket.send(message);
+    this._inbox.push(message);
+    this._beginDeliveryTimeout();
+  },
 
-            Example:
+  connect: function(options, callback, context) {
+    options = options || {};
+    var timeout = (options.timeout !== undefined) ? options.timeout / 1000 : this._engine.timeout;
 
-            text = JSON.stringify(['e', {pluribus: 'unum'}]);
-            // text is '["e",{"pluribus":"unum"}]'
+    this.setDeferredStatus('unknown');
+    this.callback(callback, context);
 
+    this._beginDeliveryTimeout();
+    this._beginConnectionTimeout(timeout);
+  },
 
-            text = JSON.stringify(['e', {pluribus: 'unum'}], null, '\t');
-            // text is '[\n\t"e",\n\t{\n\t\t"pluribus": "unum"\n\t}\n]'
+  flush: function() {
+    this.removeTimeout('connection');
+    this.removeTimeout('delivery');
 
-            text = JSON.stringify([new Date()], function (key, value) {
-                return this[key] instanceof Date ?
-                    'Date(' + this[key] + ')' : value;
-            });
-            // text is '["Date(---current time---)"]'
+    this.setDeferredStatus('succeeded', this._inbox);
+    this._inbox = [];
 
+    if (!this.socket) this._engine.closeConnection(this._id);
+  },
 
-        JSON.parse(text, reviver)
-            This method parses a JSON text to produce an object or array.
-            It can throw a SyntaxError exception.
+  _beginDeliveryTimeout: function() {
+    if (this._inbox.length === 0) return;
+    this.addTimeout('delivery', this._engine.MAX_DELAY, this.flush, this);
+  },
 
-            The optional reviver parameter is a function that can filter and
-            transform the results. It receives each of the keys and values,
-            and its return value is used instead of the original value.
-            If it returns what it received, then the structure is not modified.
-            If it returns undefined then the member is deleted.
+  _beginConnectionTimeout: function(timeout) {
+    this.addTimeout('connection', timeout, this.flush, this);
+  }
+});
 
-            Example:
+Faye.extend(Faye.Engine.Connection.prototype, Faye.Deferrable);
+Faye.extend(Faye.Engine.Connection.prototype, Faye.Timeouts);
 
-            // Parse the text. Values that look like ISO date strings will
-            // be converted to Date objects.
+Faye.Engine.Memory = function(server, options) {
+  this._server    = server;
+  this._options   = options || {};
+  this.reset();
+};
 
-            myData = JSON.parse(text, function (key, value) {
-                var a;
-                if (typeof value === 'string') {
-                    a =
-/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/.exec(value);
-                    if (a) {
-                        return new Date(Date.UTC(+a[1], +a[2] - 1, +a[3], +a[4],
-                            +a[5], +a[6]));
-                    }
-                }
-                return value;
-            });
+Faye.Engine.Memory.create = function(server, options) {
+  return new this(server, options);
+};
 
-            myData = JSON.parse('["Date(09/09/2001)"]', function (key, value) {
-                var d;
-                if (typeof value === 'string' &&
-                        value.slice(0, 5) === 'Date(' &&
-                        value.slice(-1) === ')') {
-                    d = new Date(value.slice(5, -1));
-                    if (d) {
-                        return d;
-                    }
-                }
-                return value;
-            });
+Faye.Engine.Memory.prototype = {
+  disconnect: function() {
+    this.reset();
+    this.removeAllTimeouts();
+  },
 
+  reset: function() {
+    this._namespace = new Faye.Namespace();
+    this._clients   = {};
+    this._channels  = {};
+    this._messages  = {};
+  },
 
-    This is a reference implementation. You are free to copy, modify, or
-    redistribute.
-*/
+  createClient: function(callback, context) {
+    var clientId = this._namespace.generate();
+    this._server.debug('Created new client ?', clientId);
+    this.ping(clientId);
+    this._server.trigger('handshake', clientId);
+    callback.call(context, clientId);
+  },
 
-/*jslint evil: true, regexp: true */
+  destroyClient: function(clientId, callback, context) {
+    if (!this._namespace.exists(clientId)) return;
+    var clients = this._clients;
 
-/*members "", "\b", "\t", "\n", "\f", "\r", "\"", JSON, "\\", apply,
-    call, charCodeAt, getUTCDate, getUTCFullYear, getUTCHours,
-    getUTCMinutes, getUTCMonth, getUTCSeconds, hasOwnProperty, join,
-    lastIndex, length, parse, prototype, push, replace, slice, stringify,
-    test, toJSON, toString, valueOf
-*/
+    if (clients[clientId])
+      clients[clientId].forEach(function(channel) { this.unsubscribe(clientId, channel) }, this);
 
+    this.removeTimeout(clientId);
+    this._namespace.release(clientId);
+    delete this._messages[clientId];
+    this._server.debug('Destroyed client ?', clientId);
+    this._server.trigger('disconnect', clientId);
+    this._server.trigger('close', clientId);
+    if (callback) callback.call(context);
+  },
 
-// Create a JSON object only if one does not already exist. We create the
-// methods in a closure to avoid creating global variables.
+  clientExists: function(clientId, callback, context) {
+    callback.call(context, this._namespace.exists(clientId));
+  },
 
-if (typeof JSON !== 'object') {
-    JSON = {};
-}
+  ping: function(clientId) {
+    var timeout = this._server.timeout;
+    if (typeof timeout !== 'number') return;
 
-(function () {
-    'use strict';
+    this._server.debug('Ping ?, ?', clientId, timeout);
+    this.removeTimeout(clientId);
+    this.addTimeout(clientId, 2 * timeout, function() {
+      this.destroyClient(clientId);
+    }, this);
+  },
 
-    function f(n) {
-        // Format integers to have at least two digits.
-        return n < 10 ? '0' + n : n;
+  subscribe: function(clientId, channel, callback, context) {
+    var clients = this._clients, channels = this._channels;
+
+    clients[clientId] = clients[clientId] || new Faye.Set();
+    var trigger = clients[clientId].add(channel);
+
+    channels[channel] = channels[channel] || new Faye.Set();
+    channels[channel].add(clientId);
+
+    this._server.debug('Subscribed client ? to channel ?', clientId, channel);
+    if (trigger) this._server.trigger('subscribe', clientId, channel);
+    if (callback) callback.call(context, true);
+  },
+
+  unsubscribe: function(clientId, channel, callback, context) {
+    var clients  = this._clients,
+        channels = this._channels,
+        trigger  = false;
+
+    if (clients[clientId]) {
+      trigger = clients[clientId].remove(channel);
+      if (clients[clientId].isEmpty()) delete clients[clientId];
     }
 
-    if (typeof Date.prototype.toJSON !== 'function') {
-
-        Date.prototype.toJSON = function () {
-
-            return isFinite(this.valueOf())
-                ? this.getUTCFullYear()     + '-' +
-                    f(this.getUTCMonth() + 1) + '-' +
-                    f(this.getUTCDate())      + 'T' +
-                    f(this.getUTCHours())     + ':' +
-                    f(this.getUTCMinutes())   + ':' +
-                    f(this.getUTCSeconds())   + 'Z'
-                : null;
-        };
-
-        String.prototype.toJSON      =
-            Number.prototype.toJSON  =
-            Boolean.prototype.toJSON = function () {
-                return this.valueOf();
-            };
+    if (channels[channel]) {
+      channels[channel].remove(clientId);
+      if (channels[channel].isEmpty()) delete channels[channel];
     }
 
-    var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
-        escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
-        gap,
-        indent,
-        meta = {    // table of character substitutions
-            '\b': '\\b',
-            '\t': '\\t',
-            '\n': '\\n',
-            '\f': '\\f',
-            '\r': '\\r',
-            '"' : '\\"',
-            '\\': '\\\\'
-        },
-        rep;
+    this._server.debug('Unsubscribed client ? from channel ?', clientId, channel);
+    if (trigger) this._server.trigger('unsubscribe', clientId, channel);
+    if (callback) callback.call(context, true);
+  },
 
+  publish: function(message, channels) {
+    this._server.debug('Publishing message ?', message);
 
-    function quote(string) {
+    var messages = this._messages,
+        clients  = new Faye.Set(),
+        subs;
 
-// If the string contains no control characters, no quote characters, and no
-// backslash characters, then we can safely slap some quotes around it.
-// Otherwise we must also replace the offending characters with safe escape
-// sequences.
-
-        escapable.lastIndex = 0;
-        return escapable.test(string) ? '"' + string.replace(escapable, function (a) {
-            var c = meta[a];
-            return typeof c === 'string'
-                ? c
-                : '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
-        }) + '"' : '"' + string + '"';
+    for (var i = 0, n = channels.length; i < n; i++) {
+      subs = this._channels[channels[i]];
+      if (!subs) continue;
+      subs.forEach(clients.add, clients);
     }
 
+    clients.forEach(function(clientId) {
+      this._server.debug('Queueing for client ?: ?', clientId, message);
+      messages[clientId] = messages[clientId] || [];
+      messages[clientId].push(Faye.copyObject(message));
+      this.emptyQueue(clientId);
+    }, this);
 
-    function str(key, holder) {
+    this._server.trigger('publish', message.clientId, message.channel, message.data);
+  },
 
-// Produce a string from holder[key].
+  emptyQueue: function(clientId) {
+    if (!this._server.hasConnection(clientId)) return;
+    this._server.deliver(clientId, this._messages[clientId]);
+    delete this._messages[clientId];
+  }
+};
+Faye.extend(Faye.Engine.Memory.prototype, Faye.Timeouts);
 
-        var i,          // The loop counter.
-            k,          // The member key.
-            v,          // The member value.
-            length,
-            mind = gap,
-            partial,
-            value = holder[key];
+Faye.Server = Faye.Class({
+  META_METHODS: ['handshake', 'connect', 'disconnect', 'subscribe', 'unsubscribe'],
 
-// If the value has a toJSON method, call it to obtain a replacement value.
+  initialize: function(options) {
+    this._options  = options || {};
+    var engineOpts = this._options.engine || {};
+    engineOpts.timeout = this._options.timeout;
+    this._engine   = Faye.Engine.get(engineOpts);
 
-        if (value && typeof value === 'object' &&
-                typeof value.toJSON === 'function') {
-            value = value.toJSON(key);
-        }
+    this.info('Created new server: ?', this._options);
+  },
 
-// If we were called with a replacer function, then call the replacer to
-// obtain a replacement value.
+  close: function() {
+    return this._engine.close();
+  },
 
-        if (typeof rep === 'function') {
-            value = rep.call(holder, key, value);
-        }
+  openSocket: function(clientId, socket, request) {
+    if (!clientId || !socket) return;
+    this._engine.openSocket(clientId, new Faye.Server.Socket(this, socket, request));
+  },
 
-// What happens next depends on the value's type.
+  closeSocket: function(clientId, close) {
+    this._engine.flushConnection(clientId, close);
+  },
 
-        switch (typeof value) {
-        case 'string':
-            return quote(value);
+  process: function(messages, request, callback, context) {
+    var local = (request === null);
 
-        case 'number':
+    messages = [].concat(messages);
+    this.info('Processing messages: ? (local: ?)', messages, local);
 
-// JSON numbers must be finite. Encode non-finite numbers as null.
+    if (messages.length === 0) return callback.call(context, []);
+    var processed = 0, responses = [], self = this;
 
-            return isFinite(value) ? String(value) : 'null';
+    var gatherReplies = function(replies) {
+      responses = responses.concat(replies);
+      processed += 1;
+      if (processed < messages.length) return;
 
-        case 'boolean':
-        case 'null':
-
-// If the value is a boolean or null, convert it to a string. Note:
-// typeof null does not produce 'null'. The case is included here in
-// the remote chance that this gets fixed someday.
-
-            return String(value);
-
-// If the type is 'object', we might be dealing with an object or an array or
-// null.
-
-        case 'object':
-
-// Due to a specification blunder in ECMAScript, typeof null is 'object',
-// so watch out for that case.
-
-            if (!value) {
-                return 'null';
-            }
-
-// Make an array to hold the partial results of stringifying this object value.
-
-            gap += indent;
-            partial = [];
-
-// Is the value an array?
-
-            if (Object.prototype.toString.apply(value) === '[object Array]') {
-
-// The value is an array. Stringify every element. Use null as a placeholder
-// for non-JSON values.
-
-                length = value.length;
-                for (i = 0; i < length; i += 1) {
-                    partial[i] = str(i, value) || 'null';
-                }
-
-// Join all of the elements together, separated with commas, and wrap them in
-// brackets.
-
-                v = partial.length === 0
-                    ? '[]'
-                    : gap
-                    ? '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']'
-                    : '[' + partial.join(',') + ']';
-                gap = mind;
-                return v;
-            }
-
-// If the replacer is an array, use it to select the members to be stringified.
-
-            if (rep && typeof rep === 'object') {
-                length = rep.length;
-                for (i = 0; i < length; i += 1) {
-                    if (typeof rep[i] === 'string') {
-                        k = rep[i];
-                        v = str(k, value);
-                        if (v) {
-                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
-                        }
-                    }
-                }
-            } else {
-
-// Otherwise, iterate through all of the keys in the object.
-
-                for (k in value) {
-                    if (Object.prototype.hasOwnProperty.call(value, k)) {
-                        v = str(k, value);
-                        if (v) {
-                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
-                        }
-                    }
-                }
-            }
-
-// Join all of the member texts together, separated with commas,
-// and wrap them in braces.
-
-            v = partial.length === 0
-                ? '{}'
-                : gap
-                ? '{\n' + gap + partial.join(',\n' + gap) + '\n' + mind + '}'
-                : '{' + partial.join(',') + '}';
-            gap = mind;
-            return v;
-        }
-    }
-
-// If the JSON object does not yet have a stringify method, give it one.
-
-    Faye.stringify = function (value, replacer, space) {
-
-// The stringify method takes a value and an optional replacer, and an optional
-// space parameter, and returns a JSON text. The replacer can be a function
-// that can replace values, or an array of strings that will select the keys.
-// A default replacer method can be provided. Use of the space parameter can
-// produce text that is more easily readable.
-
-        var i;
-        gap = '';
-        indent = '';
-
-// If the space parameter is a number, make an indent string containing that
-// many spaces.
-
-        if (typeof space === 'number') {
-            for (i = 0; i < space; i += 1) {
-                indent += ' ';
-            }
-
-// If the space parameter is a string, it will be used as the indent string.
-
-        } else if (typeof space === 'string') {
-            indent = space;
-        }
-
-// If there is a replacer, it must be a function or an array.
-// Otherwise, throw an error.
-
-        rep = replacer;
-        if (replacer && typeof replacer !== 'function' &&
-                (typeof replacer !== 'object' ||
-                typeof replacer.length !== 'number')) {
-            throw new Error('JSON.stringify');
-        }
-
-// Make a fake root object containing our value under the key of ''.
-// Return the result of stringifying the value.
-
-        return str('', {'': value});
+      var n = responses.length;
+      while (n--) {
+        if (!responses[n]) responses.splice(n,1);
+      }
+      self.info('Returning replies: ?', responses);
+      callback.call(context, responses);
     };
 
-    if (typeof JSON.stringify !== 'function') {
-        JSON.stringify = Faye.stringify;
+    var handleReply = function(replies) {
+      var extended = 0, expected = replies.length;
+      if (expected === 0) gatherReplies(replies);
+
+      for (var i = 0, n = replies.length; i < n; i++) {
+        this.debug('Processing reply: ?', replies[i]);
+        (function(index) {
+          self.pipeThroughExtensions('outgoing', replies[index], request, function(message) {
+            replies[index] = message;
+            extended += 1;
+            if (extended === expected) gatherReplies(replies);
+          });
+        })(i);
+      }
+    };
+
+    for (var i = 0, n = messages.length; i < n; i++) {
+      this.pipeThroughExtensions('incoming', messages[i], request, function(pipedMessage) {
+        this._handle(pipedMessage, local, handleReply, this);
+      }, this);
+    }
+  },
+
+  _makeResponse: function(message) {
+    var response = {};
+
+    if (message.id)       response.id       = message.id;
+    if (message.clientId) response.clientId = message.clientId;
+    if (message.channel)  response.channel  = message.channel;
+    if (message.error)    response.error    = message.error;
+
+    response.successful = !response.error;
+    return response;
+  },
+
+  _handle: function(message, local, callback, context) {
+    if (!message) return callback.call(context, []);
+    this.info('Handling message: ? (local: ?)', message, local);
+
+    var channelName = message.channel,
+        error       = message.error,
+        response;
+
+    if (Faye.Channel.isMeta(channelName))
+      return this._handleMeta(message, local, callback, context);
+
+    if (!Faye.Grammar.CHANNEL_NAME.test(channelName))
+      error = Faye.Error.channelInvalid(channelName);
+
+    delete message.clientId;
+    if (!error) this._engine.publish(message);
+
+    response = this._makeResponse(message);
+    if (error) response.error = error;
+    response.successful = !response.error;
+    callback.call(context, [response]);
+  },
+
+  _handleMeta: function(message, local, callback, context) {
+    var method = Faye.Channel.parse(message.channel)[1],
+        response;
+
+    if (Faye.indexOf(this.META_METHODS, method) < 0) {
+      response = this._makeResponse(message);
+      response.error = Faye.Error.channelForbidden(message.channel);
+      response.successful = false;
+      return callback.call(context, [response]);
     }
 
-// If the JSON object does not yet have a parse method, give it one.
+    this[method](message, local, function(responses) {
+      responses = [].concat(responses);
+      for (var i = 0, n = responses.length; i < n; i++) this._advize(responses[i], message.connectionType);
+      callback.call(context, responses);
+    }, this);
+  },
 
-    if (typeof JSON.parse !== 'function') {
-        JSON.parse = function (text, reviver) {
+  _advize: function(response, connectionType) {
+    if (Faye.indexOf([Faye.Channel.HANDSHAKE, Faye.Channel.CONNECT], response.channel) < 0)
+      return;
 
-// The parse method takes a text and an optional reviver function, and returns
-// a JavaScript value if the text is a valid JSON text.
-
-            var j;
-
-            function walk(holder, key) {
-
-// The walk method is used to recursively walk the resulting structure so
-// that modifications can be made.
-
-                var k, v, value = holder[key];
-                if (value && typeof value === 'object') {
-                    for (k in value) {
-                        if (Object.prototype.hasOwnProperty.call(value, k)) {
-                            v = walk(value, k);
-                            if (v !== undefined) {
-                                value[k] = v;
-                            } else {
-                                delete value[k];
-                            }
-                        }
-                    }
-                }
-                return reviver.call(holder, key, value);
-            }
-
-
-// Parsing happens in four stages. In the first stage, we replace certain
-// Unicode characters with escape sequences. JavaScript handles many characters
-// incorrectly, either silently deleting them, or treating them as line endings.
-
-            text = String(text);
-            cx.lastIndex = 0;
-            if (cx.test(text)) {
-                text = text.replace(cx, function (a) {
-                    return '\\u' +
-                        ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
-                });
-            }
-
-// In the second stage, we run the text against regular expressions that look
-// for non-JSON patterns. We are especially concerned with '()' and 'new'
-// because they can cause invocation, and '=' because it can cause mutation.
-// But just to be safe, we want to reject all unexpected forms.
-
-// We split the second stage into 4 regexp operations in order to work around
-// crippling inefficiencies in IE's and Safari's regexp engines. First we
-// replace the JSON backslash pairs with '@' (a non-JSON character). Second, we
-// replace all simple value tokens with ']' characters. Third, we delete all
-// open brackets that follow a colon or comma or that begin the text. Finally,
-// we look to see that the remaining characters are only whitespace or ']' or
-// ',' or ':' or '{' or '}'. If that is so, then the text is safe for eval.
-
-            if (/^[\],:{}\s]*$/
-                    .test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@')
-                        .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
-                        .replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
-
-// In the third stage we use the eval function to compile the text into a
-// JavaScript structure. The '{' operator is subject to a syntactic ambiguity
-// in JavaScript: it can begin a block or an object literal. We wrap the text
-// in parens to eliminate the ambiguity.
-
-                j = eval('(' + text + ')');
-
-// In the optional fourth stage, we recursively walk the new structure, passing
-// each name/value pair to a reviver function for possible transformation.
-
-                return typeof reviver === 'function'
-                    ? walk({'': j}, '')
-                    : j;
-            }
-
-// If the text is not JSON parseable, then a SyntaxError is thrown.
-
-            throw new SyntaxError('JSON.parse');
-        };
+    var interval, timeout;
+    if (connectionType === 'eventsource') {
+      interval = Math.floor(this._engine.timeout * 1000);
+      timeout  = 0;
+    } else {
+      interval = Math.floor(this._engine.interval * 1000);
+      timeout  = Math.floor(this._engine.timeout * 1000);
     }
-}());
+
+    response.advice = response.advice || {};
+    if (response.error) {
+      Faye.extend(response.advice, {reconnect:  'handshake'}, false);
+    } else {
+      Faye.extend(response.advice, {
+        reconnect:  'retry',
+        interval:   interval,
+        timeout:    timeout
+      }, false);
+    }
+  },
+
+  // MUST contain  * version
+  //               * supportedConnectionTypes
+  // MAY contain   * minimumVersion
+  //               * ext
+  //               * id
+  handshake: function(message, local, callback, context) {
+    var response = this._makeResponse(message);
+    response.version = Faye.BAYEUX_VERSION;
+
+    if (!message.version)
+      response.error = Faye.Error.parameterMissing('version');
+
+    var clientConns = message.supportedConnectionTypes,
+        commonConns;
+
+    response.supportedConnectionTypes = Faye.CONNECTION_TYPES;
+
+    if (clientConns) {
+      commonConns = Faye.filter(clientConns, function(conn) {
+        return Faye.indexOf(Faye.CONNECTION_TYPES, conn) >= 0;
+      });
+      if (commonConns.length === 0)
+        response.error = Faye.Error.conntypeMismatch(clientConns);
+    } else {
+      response.error = Faye.Error.parameterMissing('supportedConnectionTypes');
+    }
+
+    response.successful = !response.error;
+    if (!response.successful) return callback.call(context, response);
+
+    this._engine.createClient(function(clientId) {
+      response.clientId = clientId;
+      callback.call(context, response);
+    }, this);
+  },
+
+  // MUST contain  * clientId
+  //               * connectionType
+  // MAY contain   * ext
+  //               * id
+  connect: function(message, local, callback, context) {
+    var response       = this._makeResponse(message),
+        clientId       = message.clientId,
+        connectionType = message.connectionType;
+
+    this._engine.clientExists(clientId, function(exists) {
+      if (!exists)         response.error = Faye.Error.clientUnknown(clientId);
+      if (!clientId)       response.error = Faye.Error.parameterMissing('clientId');
+
+      if (Faye.indexOf(Faye.CONNECTION_TYPES, connectionType) < 0)
+        response.error = Faye.Error.conntypeMismatch(connectionType);
+
+      if (!connectionType) response.error = Faye.Error.parameterMissing('connectionType');
+
+      response.successful = !response.error;
+
+      if (!response.successful) {
+        delete response.clientId;
+        return callback.call(context, response);
+      }
+
+      if (message.connectionType === 'eventsource') {
+        message.advice = message.advice || {};
+        message.advice.timeout = 0;
+      }
+      this._engine.connect(response.clientId, message.advice, function(events) {
+        callback.call(context, [response].concat(events));
+      });
+    }, this);
+  },
+
+  // MUST contain  * clientId
+  // MAY contain   * ext
+  //               * id
+  disconnect: function(message, local, callback, context) {
+    var response = this._makeResponse(message),
+        clientId = message.clientId;
+
+    this._engine.clientExists(clientId, function(exists) {
+      if (!exists)   response.error = Faye.Error.clientUnknown(clientId);
+      if (!clientId) response.error = Faye.Error.parameterMissing('clientId');
+
+      response.successful = !response.error;
+      if (!response.successful) delete response.clientId;
+
+      if (response.successful) this._engine.destroyClient(clientId);
+      callback.call(context, response);
+    }, this);
+  },
+
+  // MUST contain  * clientId
+  //               * subscription
+  // MAY contain   * ext
+  //               * id
+  subscribe: function(message, local, callback, context) {
+    var response     = this._makeResponse(message),
+        clientId     = message.clientId,
+        subscription = message.subscription,
+        channel;
+
+    subscription = subscription ? [].concat(subscription) : [];
+
+    this._engine.clientExists(clientId, function(exists) {
+      if (!exists)               response.error = Faye.Error.clientUnknown(clientId);
+      if (!clientId)             response.error = Faye.Error.parameterMissing('clientId');
+      if (!message.subscription) response.error = Faye.Error.parameterMissing('subscription');
+
+      response.subscription = message.subscription || [];
+
+      for (var i = 0, n = subscription.length; i < n; i++) {
+        channel = subscription[i];
+
+        if (response.error) break;
+        if (!local && !Faye.Channel.isSubscribable(channel)) response.error = Faye.Error.channelForbidden(channel);
+        if (!Faye.Channel.isValid(channel))                  response.error = Faye.Error.channelInvalid(channel);
+
+        if (response.error) break;
+        this._engine.subscribe(clientId, channel);
+      }
+
+      response.successful = !response.error;
+      callback.call(context, response);
+    }, this);
+  },
+
+  // MUST contain  * clientId
+  //               * subscription
+  // MAY contain   * ext
+  //               * id
+  unsubscribe: function(message, local, callback, context) {
+    var response     = this._makeResponse(message),
+        clientId     = message.clientId,
+        subscription = message.subscription,
+        channel;
+
+    subscription = subscription ? [].concat(subscription) : [];
+
+    this._engine.clientExists(clientId, function(exists) {
+      if (!exists)               response.error = Faye.Error.clientUnknown(clientId);
+      if (!clientId)             response.error = Faye.Error.parameterMissing('clientId');
+      if (!message.subscription) response.error = Faye.Error.parameterMissing('subscription');
+
+      response.subscription = message.subscription || [];
+
+      for (var i = 0, n = subscription.length; i < n; i++) {
+        channel = subscription[i];
+
+        if (response.error) break;
+        if (!local && !Faye.Channel.isSubscribable(channel)) response.error = Faye.Error.channelForbidden(channel);
+        if (!Faye.Channel.isValid(channel))                  response.error = Faye.Error.channelInvalid(channel);
+
+        if (response.error) break;
+        this._engine.unsubscribe(clientId, channel);
+      }
+
+      response.successful = !response.error;
+      callback.call(context, response);
+    }, this);
+  }
+});
+
+Faye.extend(Faye.Server.prototype, Faye.Logging);
+Faye.extend(Faye.Server.prototype, Faye.Extensible);
+
+Faye.Server.Socket = Faye.Class({
+  initialize: function(server, socket, request) {
+    this._server  = server;
+    this._socket  = socket;
+    this._request = request;
+  },
+
+  send: function(message) {
+    this._server.pipeThroughExtensions('outgoing', message, this._request, function(pipedMessage) {
+      if (this._socket)
+        this._socket.send(Faye.toJSON([pipedMessage]));
+    }, this);
+  },
+
+  close: function() {
+    if (this._socket) this._socket.close();
+    delete this._socket;
+  }
+});
+
+Faye.Transport.NodeLocal = Faye.extend(Faye.Class(Faye.Transport, {
+  batching: false,
+
+  request: function(messages) {
+    messages = Faye.copyObject(messages);
+    this.endpoint.process(messages, null, function(replies) {
+      this._receive(Faye.copyObject(replies));
+    }, this);
+  }
+}), {
+  isUsable: function(client, endpoint, callback, context) {
+    callback.call(context, endpoint instanceof Faye.Server);
+  }
+});
+
+Faye.Transport.register('in-process', Faye.Transport.NodeLocal);
 
 Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
   UNCONNECTED:  1,
@@ -2479,269 +2587,420 @@ if (Faye.Event && Faye.ENV.onbeforeunload !== undefined)
     Faye.Transport.WebSocket._unloaded = true;
   });
 
-Faye.Transport.EventSource = Faye.extend(Faye.Class(Faye.Transport, {
-  initialize: function(dispatcher, endpoint) {
-    Faye.Transport.prototype.initialize.call(this, dispatcher, endpoint);
-    if (!Faye.ENV.EventSource) return this.setDeferredStatus('failed');
-
-    this._xhr = new Faye.Transport.XHR(dispatcher, endpoint);
-
-    endpoint = Faye.copyObject(endpoint);
-    endpoint.pathname += '/' + dispatcher.clientId;
-
-    var socket = new EventSource(Faye.URI.stringify(endpoint)),
-        self   = this;
-
-    socket.onopen = function() {
-      self._everConnected = true;
-      self.setDeferredStatus('succeeded');
-    };
-
-    socket.onerror = function() {
-      if (self._everConnected) {
-        self._handleError([]);
-      } else {
-        self.setDeferredStatus('failed');
-        socket.close();
-      }
-    };
-
-    socket.onmessage = function(event) {
-      self._receive(JSON.parse(event.data));
-    };
-
-    this._socket = socket;
-  },
-
-  close: function() {
-    if (!this._socket) return;
-    this._socket.onopen = this._socket.onerror = this._socket.onmessage = null;
-    this._socket.close();
-    delete this._socket;
-  },
-
-  isUsable: function(callback, context) {
-    this.callback(function() { callback.call(context, true) });
-    this.errback(function() { callback.call(context, false) });
-  },
-
-  encode: function(messages) {
-    return this._xhr.encode(messages);
-  },
-
-  request: function(messages) {
-    return this._xhr.request(messages);
-  }
-
-}), {
-  isUsable: function(dispatcher, endpoint, callback, context) {
-    var id = dispatcher.clientId;
-    if (!id) return callback.call(context, false);
-
-    Faye.Transport.XHR.isUsable(dispatcher, endpoint, function(usable) {
-      if (!usable) return callback.call(context, false);
-      this.create(dispatcher, endpoint).isUsable(callback, context);
-    }, this);
-  },
-
-  create: function(dispatcher, endpoint) {
-    var sockets = dispatcher.transports.eventsource = dispatcher.transports.eventsource || {},
-        id      = dispatcher.clientId;
-
-    endpoint = Faye.copyObject(endpoint);
-    endpoint.pathname += '/' + (id || '');
-    var url = Faye.URI.stringify(endpoint);
-
-    sockets[url] = sockets[url] || new this(dispatcher, endpoint);
-    return sockets[url];
-  }
-});
-
-Faye.extend(Faye.Transport.EventSource.prototype, Faye.Deferrable);
-Faye.Transport.register('eventsource', Faye.Transport.EventSource);
-
-Faye.Transport.XHR = Faye.extend(Faye.Class(Faye.Transport, {
+Faye.Transport.NodeHttp = Faye.extend(Faye.Class(Faye.Transport, {
   encode: function(messages) {
     return Faye.toJSON(messages);
   },
 
   request: function(messages) {
-    var href = this.endpoint.href,
-        xhr  = Faye.ENV.ActiveXObject ? new ActiveXObject('Microsoft.XMLHTTP') : new XMLHttpRequest(),
-        self = this;
+    var uri     = this.endpoint,
+        secure  = (uri.protocol === 'https:'),
+        client  = secure ? https : http,
+        content = new Buffer(this.encode(messages), 'utf8'),
+        self    = this;
 
-    xhr.open('POST', href, true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.setRequestHeader('Pragma', 'no-cache');
-    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    var params  = this._buildParams(uri, content, secure),
+        request = client.request(params);
 
-    var headers = this._dispatcher.headers;
-    for (var key in headers) {
-      if (!headers.hasOwnProperty(key)) continue;
-      xhr.setRequestHeader(key, headers[key]);
-    }
+    request.on('response', function(response) {
+      self._handleResponse(messages, response);
+      self._storeCookies(response.headers['set-cookie']);
+    });
 
-    var abort = function() { xhr.abort() };
-    if (Faye.ENV.onbeforeunload !== undefined) Faye.Event.on(Faye.ENV, 'beforeunload', abort);
+    request.on('error', function(error) {
+      self._handleError(messages);
+    });
 
-    xhr.onreadystatechange = function() {
-      if (!xhr || xhr.readyState !== 4) return;
+    request.end(content);
+    return request;
+  },
 
-      var replies    = null,
-          status     = xhr.status,
-          text       = xhr.responseText,
-          successful = (status >= 200 && status < 300) || status === 304 || status === 1223;
+  _buildParams: function(uri, content, secure) {
+    var params = {
+      method:   'POST',
+      host:     uri.hostname,
+      port:     uri.port || (secure ? 443 : 80),
+      path:     uri.path,
+      headers:  Faye.extend({
+        'Content-Length': content.length,
+        'Content-Type':   'application/json',
+        'Cookie':         this._getCookies(),
+        'Host':           uri.host
+      }, this._dispatcher.headers)
+    };
+    if (this._dispatcher.ca) params.ca = this._dispatcher.ca;
+    return params;
+  },
 
-      if (Faye.ENV.onbeforeunload !== undefined) Faye.Event.detach(Faye.ENV, 'beforeunload', abort);
-      xhr.onreadystatechange = function() {};
-      xhr = null;
+  _handleResponse: function(messages, response) {
+    var replies = null,
+        body    = '',
+        self    = this;
 
-      if (!successful) return self._handleError(messages);
+    response.setEncoding('utf8');
+    response.on('data', function(chunk) { body += chunk });
 
+    response.on('end', function() {
       try {
-        replies = JSON.parse(text);
+        replies = JSON.parse(body);
       } catch (e) {}
 
       if (replies)
         self._receive(replies);
       else
         self._handleError(messages);
-    };
-
-    xhr.send(this.encode(messages));
-    return xhr;
+    });
   }
+
 }), {
   isUsable: function(dispatcher, endpoint, callback, context) {
-    callback.call(context, Faye.URI.isSameOrigin(endpoint));
+    callback.call(context, Faye.URI.isURI(endpoint));
   }
 });
 
-Faye.Transport.register('long-polling', Faye.Transport.XHR);
+Faye.Transport.register('long-polling', Faye.Transport.NodeHttp);
 
-Faye.Transport.CORS = Faye.extend(Faye.Class(Faye.Transport, {
-  encode: function(messages) {
-    return 'message=' + encodeURIComponent(Faye.toJSON(messages));
+var crypto = require('crypto'),
+    fs     = require('fs'),
+    http   = require('http'),
+    https  = require('https'),
+    net    = require('net'),
+    path   = require('path'),
+    tls    = require('tls'),
+    url    = require('url'),
+    querystring = require('querystring'),
+
+    csprng = require('csprng');
+
+Faye.WebSocket   = require('faye-websocket');
+Faye.EventSource = Faye.WebSocket.EventSource;
+Faye.Cookies     = require('tough-cookie');
+
+Faye.NodeAdapter = Faye.Class({
+  DEFAULT_ENDPOINT: '/bayeux',
+  SCRIPT_PATH:      'faye-browser-min.js',
+
+  TYPE_JSON:    {'Content-Type': 'application/json; charset=utf-8'},
+  TYPE_SCRIPT:  {'Content-Type': 'text/javascript; charset=utf-8'},
+  TYPE_TEXT:    {'Content-Type': 'text/plain; charset=utf-8'},
+
+  VALID_JSONP_CALLBACK: /^[a-z_\$][a-z0-9_\$]*(\.[a-z_\$][a-z0-9_\$]*)*$/i,
+
+  initialize: function(options) {
+    this._options    = options || {};
+    this._endpoint   = this._options.mount || this.DEFAULT_ENDPOINT;
+    this._endpointRe = new RegExp('^' + this._endpoint.replace(/\/$/, '') + '(/[^/]*)*(\\.[^\\.]+)?$');
+    this._server     = new Faye.Server(this._options);
+
+    this._static = new Faye.StaticServer(path.dirname(__filename) + '/../browser', /\.(?:js|map)$/);
+    this._static.map(path.basename(this._endpoint) + '.js', this.SCRIPT_PATH);
+    this._static.map('client.js', this.SCRIPT_PATH);
+
+    var extensions = this._options.extensions;
+    if (!extensions) return;
+
+    extensions = [].concat(extensions);
+    for (var i = 0, n = extensions.length; i < n; i++)
+      this.addExtension(extensions[i]);
   },
 
-  request: function(messages) {
-    var xhrClass = Faye.ENV.XDomainRequest ? XDomainRequest : XMLHttpRequest,
-        xhr      = new xhrClass(),
-        headers  = this._dispatcher.headers,
-        self     = this,
-        key;
+  listen: function() {
+    throw new Error('The listen() method is deprecated - use the attach() method to bind Faye to an http.Server');
+  },
 
-    xhr.open('POST', Faye.URI.stringify(this.endpoint), true);
+  addExtension: function(extension) {
+    return this._server.addExtension(extension);
+  },
 
-    if (xhr.setRequestHeader) {
-      xhr.setRequestHeader('Pragma', 'no-cache');
-      for (key in headers) {
-        if (!headers.hasOwnProperty(key)) continue;
-        xhr.setRequestHeader(key, headers[key]);
+  removeExtension: function(extension) {
+    return this._server.removeExtension(extension);
+  },
+
+  close: function() {
+    return this._server.close();
+  },
+
+  getClient: function() {
+    return this._client = this._client || new Faye.Client(this._server);
+  },
+
+  attach: function(httpServer) {
+    this._overrideListeners(httpServer, 'request', 'handle');
+    this._overrideListeners(httpServer, 'upgrade', 'handleUpgrade');
+  },
+
+  _overrideListeners: function(httpServer, event, method) {
+    var listeners = httpServer.listeners(event),
+        self      = this;
+
+    httpServer.removeAllListeners(event);
+
+    httpServer.on(event, function(request) {
+      if (self.check(request)) return self[method].apply(self, arguments);
+
+      for (var i = 0, n = listeners.length; i < n; i++)
+        listeners[i].apply(this, arguments);
+    });
+  },
+
+  check: function(request) {
+    var path = url.parse(request.url, true).pathname;
+    return !!this._endpointRe.test(path);
+  },
+
+  handle: function(request, response) {
+    var requestUrl    = url.parse(request.url, true),
+        requestMethod = request.method,
+        self          = this;
+
+    request.originalUrl = request.url;
+
+    request.on('error', function(error) { self._returnError(response, error) });
+    response.on('error', function(error) { self._returnError(null, error) });
+
+    if (this._static.test(requestUrl.pathname))
+      return this._static.call(request, response);
+
+    // http://groups.google.com/group/faye-users/browse_thread/thread/4a01bb7d25d3636a
+    if (requestMethod === 'OPTIONS' || request.headers['access-control-request-method'] === 'POST')
+      return this._handleOptions(response);
+
+    if (Faye.EventSource.isEventSource(request))
+      return this.handleEventSource(request, response);
+
+    if (requestMethod === 'GET')
+      return this._callWithParams(request, response, requestUrl.query);
+
+    if (requestMethod === 'POST')
+      return this._concatStream(request, function(data) {
+        var type   = (request.headers['content-type'] || '').split(';')[0],
+            params = (type === 'application/json')
+                   ? {message: data}
+                   : querystring.parse(data);
+
+        request.body = data;
+        this._callWithParams(request, response, params);
+      }, this);
+
+    this._returnError(response, {message: 'Unrecognized request type'});
+  },
+
+  _callWithParams: function(request, response, params) {
+    if (!params.message)
+      return this._returnError(response, {message: 'Received request with no message: ' + this._formatRequest(request)});
+
+    try {
+      this.debug('Received message via HTTP ' + request.method + ': ?', params.message);
+
+      var message = JSON.parse(params.message),
+          jsonp   = params.jsonp || Faye.JSONP_CALLBACK,
+          isGet   = (request.method === 'GET'),
+          type    = isGet ? this.TYPE_SCRIPT : this.TYPE_JSON,
+          headers = Faye.extend({}, type),
+          origin  = request.headers.origin;
+
+      if (!this.VALID_JSONP_CALLBACK.test(jsonp))
+        return this._returnError(response, {message: 'Invalid JSON-P callback: ' + jsonp});
+
+      if (origin) headers['Access-Control-Allow-Origin'] = origin;
+      headers['Cache-Control'] = 'no-cache, no-store';
+      headers['X-Content-Type-Options'] = 'nosniff';
+
+      this._server.process(message, request, function(replies) {
+        var body = Faye.toJSON(replies);
+
+        if (isGet) {
+          body = '/**/' + jsonp + '(' + this._jsonpEscape(body) + ');';
+          // Disable this for now as it breaks
+          // gitter osx
+          // headers['Content-Disposition'] = 'attachment; filename=f.txt';
+        }
+
+        headers['Content-Length'] = new Buffer(body, 'utf8').length.toString();
+        headers['Connection'] = 'close';
+
+        this.debug('HTTP response: ?', body);
+        response.writeHead(200, headers);
+        response.end(body);
+      }, this);
+    } catch (error) {
+      this._returnError(response, error);
+    }
+  },
+
+  _jsonpEscape: function(json) {
+    return json.replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
+  },
+
+  handleUpgrade: function(request, socket, head) {
+    var ws       = new Faye.WebSocket(request, socket, head, null, {ping: this._options.ping}),
+        clientId = null,
+        self     = this;
+
+    request.originalUrl = request.url;
+
+    ws.onmessage = function(event) {
+      try {
+        self.debug('Received message via WebSocket[' + ws.version + ']: ?', event.data);
+
+        var message = JSON.parse(event.data),
+            cid     = Faye.clientIdFromMessages(message);
+
+        if (clientId && cid && cid !== clientId) self._server.closeSocket(clientId, false);
+        self._server.openSocket(cid, ws, request);
+        clientId = cid;
+
+        self._server.process(message, request, function(replies) {
+          if (ws) ws.send(Faye.toJSON(replies));
+        });
+      } catch (e) {
+        self.error(e.message + '\nBacktrace:\n' + e.stack);
       }
+    };
+
+    ws.onclose = function(event) {
+      self._server.closeSocket(clientId);
+      ws = null;
+    };
+  },
+
+  handleEventSource: function(request, response) {
+    var es       = new Faye.EventSource(request, response, {ping: this._options.ping}),
+        clientId = es.url.split('/').pop(),
+        self     = this;
+
+    this.debug('Opened EventSource connection for ?', clientId);
+    this._server.openSocket(clientId, es, request);
+
+    es.onclose = function(event) {
+      self._server.closeSocket(clientId);
+      es = null;
+    };
+  },
+
+  _handleOptions: function(response) {
+    var headers = {
+      'Access-Control-Allow-Credentials': 'false',
+      'Access-Control-Allow-Headers':     'Accept, Content-Type, Pragma, X-Requested-With',
+      'Access-Control-Allow-Methods':     'POST, GET, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Origin':      '*',
+      'Access-Control-Max-Age':           '86400'
+    };
+    response.writeHead(200, headers);
+    response.end('');
+  },
+
+  _concatStream: function(stream, callback, context) {
+    var chunks = [],
+        length = 0;
+
+    stream.on('data', function(chunk) {
+      chunks.push(chunk);
+      length += chunk.length;
+    });
+
+    stream.on('end', function() {
+      var buffer = new Buffer(length),
+          offset = 0;
+
+      for (var i = 0, n = chunks.length; i < n; i++) {
+        chunks[i].copy(buffer, offset);
+        offset += chunks[i].length;
+      }
+      callback.call(context, buffer.toString('utf8'));
+    });
+  },
+
+  _formatRequest: function(request) {
+    var method = request.method.toUpperCase(),
+        string = 'curl -X ' + method;
+
+    string += " 'http://" + request.headers.host + request.url + "'";
+    if (method === 'POST') {
+      string += " -H 'Content-Type: " + request.headers['content-type'] + "'";
+      string += " -d '" + request.body + "'";
     }
+    return string;
+  },
 
-    var cleanUp = function() {
-      if (!xhr) return false;
-      xhr.onload = xhr.onerror = xhr.ontimeout = xhr.onprogress = null;
-      xhr = null;
-    };
+  _returnError: function(response, error) {
+    var message = error.message;
+    if (error.stack) message += '\nBacktrace:\n' + error.stack;
+    this.error(message);
 
-    xhr.onload = function() {
-      var replies = null;
-      try {
-        replies = JSON.parse(xhr.responseText);
-      } catch (e) {}
+    if (!response) return;
 
-      cleanUp();
-
-      if (replies)
-        self._receive(replies);
-      else
-        self._handleError(messages);
-    };
-
-    xhr.onerror = xhr.ontimeout = function() {
-      cleanUp();
-      self._handleError(messages);
-    };
-
-    xhr.onprogress = function() {};
-    xhr.send(this.encode(messages));
-    return xhr;
-  }
-}), {
-  isUsable: function(dispatcher, endpoint, callback, context) {
-    if (Faye.URI.isSameOrigin(endpoint))
-      return callback.call(context, false);
-
-    if (Faye.ENV.XDomainRequest)
-      return callback.call(context, endpoint.protocol === Faye.ENV.location.protocol);
-
-    if (Faye.ENV.XMLHttpRequest) {
-      var xhr = new Faye.ENV.XMLHttpRequest();
-      return callback.call(context, xhr.withCredentials !== undefined);
-    }
-    return callback.call(context, false);
+    response.writeHead(400, this.TYPE_TEXT);
+    response.end('Bad request');
   }
 });
 
-Faye.Transport.register('cross-origin-long-polling', Faye.Transport.CORS);
+for (var method in Faye.Publisher) (function(method) {
+  Faye.NodeAdapter.prototype[method] = function() {
+    return this._server._engine[method].apply(this._server._engine, arguments);
+  };
+})(method);
 
-Faye.Transport.JSONP = Faye.extend(Faye.Class(Faye.Transport, {
- encode: function(messages) {
-    var url = Faye.copyObject(this.endpoint);
-    url.query.message = Faye.toJSON(messages);
-    url.query.jsonp   = '__jsonp' + Faye.Transport.JSONP._cbCount + '__';
-    return Faye.URI.stringify(url);
+Faye.extend(Faye.NodeAdapter.prototype, Faye.Logging);
+
+Faye.StaticServer = Faye.Class({
+  initialize: function(directory, pathRegex) {
+    this._directory = directory;
+    this._pathRegex = pathRegex;
+    this._pathMap   = {};
+    this._index     = {};
   },
 
-  request: function(messages) {
-    var head         = document.getElementsByTagName('head')[0],
-        script       = document.createElement('script'),
-        callbackName = Faye.Transport.JSONP.getCallbackName(),
-        endpoint     = Faye.copyObject(this.endpoint),
-        self         = this;
-
-    endpoint.query.message = Faye.toJSON(messages);
-    endpoint.query.jsonp   = callbackName;
-
-    var cleanup = function() {
-      if (!Faye.ENV[callbackName]) return false;
-      Faye.ENV[callbackName] = undefined;
-      try { delete Faye.ENV[callbackName] } catch (e) {}
-      script.parentNode.removeChild(script);
-    };
-
-    Faye.ENV[callbackName] = function(replies) {
-      cleanup();
-      self._receive(replies);
-    };
-
-    script.type = 'text/javascript';
-    script.src  = Faye.URI.stringify(endpoint);
-    head.appendChild(script);
-
-    script.onerror = function() {
-      cleanup();
-      self._handleError(messages);
-    };
-
-    return {abort: cleanup};
-  }
-}), {
-  _cbCount: 0,
-
-  getCallbackName: function() {
-    this._cbCount += 1;
-    return '__jsonp' + this._cbCount + '__';
+  map: function(requestPath, filename) {
+    this._pathMap[requestPath] = filename;
   },
 
-  isUsable: function(dispatcher, endpoint, callback, context) {
-    callback.call(context, true);
+  test: function(pathname) {
+    return this._pathRegex.test(pathname);
+  },
+
+  call: function(request, response) {
+    var pathname = url.parse(request.url, true).pathname,
+        filename = path.basename(pathname);
+
+    filename = this._pathMap[filename] || filename;
+    this._index[filename] = this._index[filename] || {};
+
+    var cache    = this._index[filename],
+        fullpath = path.join(this._directory, filename);
+
+    try {
+      cache.content = cache.content || fs.readFileSync(fullpath);
+      cache.digest  = cache.digest  || crypto.createHash('sha1').update(cache.content).digest('hex');
+      cache.mtime   = cache.mtime   || fs.statSync(fullpath).mtime;
+    } catch (e) {
+      response.writeHead(404, {});
+      return response.end();
+    }
+
+    var type = /\.js$/.test(pathname) ? 'TYPE_SCRIPT' : 'TYPE_JSON',
+        ims  = request.headers['if-modified-since'];
+
+    var headers = {
+      'ETag':          cache.digest,
+      'Last-Modified': cache.mtime.toGMTString()
+    };
+
+    if (request.headers['if-none-match'] === cache.digest) {
+      response.writeHead(304, headers);
+      response.end();
+    }
+    else if (ims && cache.mtime <= new Date(ims)) {
+      response.writeHead(304, headers);
+      response.end();
+    }
+    else {
+      headers['Content-Length'] = cache.content.length;
+      Faye.extend(headers, Faye.NodeAdapter.prototype[type]);
+      response.writeHead(200, headers);
+      response.end(cache.content);
+    }
   }
 });
-
-Faye.Transport.register('callback-polling', Faye.Transport.JSONP);
 
 })();

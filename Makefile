@@ -217,9 +217,9 @@ tarball:
 	tar -cvzf output/assets.tgz -C public-processed . > /dev/null
 
 search-js-console:
-	if (find public/js -name "*.js" ! -path "*libs*" ! -name log.js |xargs grep -q '\bconsole\b'); then \
+	if (find public/js -name "*.js" ! -path "*libs*" ! -name log.js |xargs grep -qE '\b(console|debugger)\b'); then \
 		echo console references in the code; \
-		find public/js -name "*.js" ! -path "*libs*" ! -name log.js |xargs grep '\bconsole\b'; \
+		find public/js -name "*.js" ! -path "*libs*" ! -name log.js |xargs grep -E '\b(console|debugger)\b'; \
 		exit 1; \
 	fi
 

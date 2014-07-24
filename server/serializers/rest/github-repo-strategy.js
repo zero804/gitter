@@ -29,11 +29,13 @@ function GithubRepoStrategy(options) {
   this.map = function(item) {
     var room = self.troupes[item.full_name];
     return {
-      id:       item.id,
-      name:     item.full_name,
-      uri:      item.full_name,
-      private:  item.private,
-      room:     room ? troupeStrategy.map(room) : undefined
+      id:           item.id,
+      name:         item.full_name,
+      description:  item.description,
+      uri:          item.full_name,
+      private:      item.private,
+      room:         room ? troupeStrategy.map(room) : undefined,
+      avatar_url:   item.owner.avatar_url
     };
   };
 

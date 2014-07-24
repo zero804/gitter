@@ -10,15 +10,14 @@ var fixture = {};
 
 var rememberMeMiddleware = testRequire('./web/middlewares/rememberme-middleware');
 
-before(fixtureLoader(fixture, {
-  user1: { }
-}));
-
-after(function() {
- fixture.cleanup();
-});
-
 describe('rememberme-middleware', function() {
+  before(fixtureLoader(fixture, {
+    user1: { }
+  }));
+
+  after(function() {
+   fixture.cleanup();
+  });
 
   it('should generate a token for a user', function(done) {
     rememberMeMiddleware.testOnly.generateAuthToken(fixture.user1.id, function(err, key, token) {
