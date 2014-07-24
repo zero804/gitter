@@ -225,7 +225,7 @@
         },
         "optimist": {
           "version": "0.3.7",
-          "from": "optimist@0.3.x",
+          "from": "optimist@~0.3.5",
           "resolved": "https://registry.npmjs.org/optimist/-/optimist-0.3.7.tgz",
           "dependencies": {
             "wordwrap": {
@@ -418,7 +418,7 @@
               "dependencies": {
                 "accepts": {
                   "version": "1.0.7",
-                  "from": "accepts@~1.0.7",
+                  "from": "accepts@~1.0.4",
                   "resolved": "https://registry.npmjs.org/accepts/-/accepts-1.0.7.tgz",
                   "dependencies": {
                     "mime-types": {
@@ -500,7 +500,7 @@
               "dependencies": {
                 "accepts": {
                   "version": "1.0.7",
-                  "from": "accepts@~1.0.7",
+                  "from": "accepts@~1.0.4",
                   "resolved": "https://registry.npmjs.org/accepts/-/accepts-1.0.7.tgz",
                   "dependencies": {
                     "mime-types": {
@@ -541,7 +541,7 @@
                 },
                 "utils-merge": {
                   "version": "1.0.0",
-                  "from": "utils-merge@1.0.0",
+                  "from": "utils-merge@1.x.x",
                   "resolved": "https://registry.npmjs.org/utils-merge/-/utils-merge-1.0.0.tgz"
                 }
               }
@@ -789,7 +789,7 @@
             },
             "mime": {
               "version": "1.2.11",
-              "from": "mime@1.2.11",
+              "from": "mime@~1.2.11",
               "resolved": "https://registry.npmjs.org/mime/-/mime-1.2.11.tgz"
             },
             "ms": {
@@ -992,7 +992,7 @@
           "dependencies": {
             "inherits": {
               "version": "2.0.1",
-              "from": "inherits@2",
+              "from": "inherits@~2.0.1",
               "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
             },
             "minimatch": {
@@ -1046,9 +1046,9 @@
       }
     },
     "gitter-env": {
-      "version": "0.9.0",
-      "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.9.0",
-      "resolved": "git+ssh://git@github.com:gitterHQ/gitter-env.git#a6c27bcc82e08c32a029af15e1f005424d22a39e",
+      "version": "0.8.4",
+      "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.8.4",
+      "resolved": "git+ssh://git@github.com:gitterHQ/gitter-env.git#25e2808871283f7c8da3c2dd48fd01036c96bc80",
       "dependencies": {
         "async": {
           "version": "0.8.0",
@@ -1077,7 +1077,7 @@
               "dependencies": {
                 "wordwrap": {
                   "version": "0.0.2",
-                  "from": "wordwrap@~0.0.2",
+                  "from": "wordwrap@0.0.x",
                   "resolved": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.2.tgz"
                 },
                 "minimist": {
@@ -1093,11 +1093,6 @@
           "version": "0.10.3",
           "from": "redis@^0.10.1",
           "resolved": "https://registry.npmjs.org/redis/-/redis-0.10.3.tgz"
-        },
-        "node-dogstatsd": {
-          "version": "0.0.5",
-          "from": "node-dogstatsd@0.0.5",
-          "resolved": "https://registry.npmjs.org/node-dogstatsd/-/node-dogstatsd-0.0.5.tgz"
         },
         "underscore": {
           "version": "1.6.0",
@@ -1925,7 +1920,7 @@
         },
         "mime": {
           "version": "1.2.11",
-          "from": "mime@~1.2.9",
+          "from": "mime@~1.2.11",
           "resolved": "https://registry.npmjs.org/mime/-/mime-1.2.11.tgz"
         },
         "form-data": {
@@ -1947,7 +1942,7 @@
             },
             "async": {
               "version": "0.2.10",
-              "from": "async@0.2.x",
+              "from": "async@~0.2.7",
               "resolved": "https://registry.npmjs.org/async/-/async-0.2.10.tgz"
             }
           }
@@ -1988,7 +1983,7 @@
         },
         "debug": {
           "version": "1.0.4",
-          "from": "debug@*",
+          "from": "debug@^1.0.2",
           "resolved": "https://registry.npmjs.org/debug/-/debug-1.0.4.tgz",
           "dependencies": {
             "ms": {
@@ -2202,7 +2197,7 @@
             },
             "mime": {
               "version": "1.2.11",
-              "from": "mime@~1.2.9",
+              "from": "mime@~1.2.7",
               "resolved": "https://registry.npmjs.org/mime/-/mime-1.2.11.tgz"
             },
             "hawk": {

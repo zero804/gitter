@@ -65,7 +65,7 @@
     "dolph": "0.0.4",
     "sitemap": "https://registry.npmjs.org/sitemap/-/sitemap-0.7.2.tgz",
     "redis-sentinel-client": "^0.1.5",
-    "gitter-env": "git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.9.0",
+    "gitter-env": "git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.8.4",
     "shutdown": "^0.2.3",
     "i18n-2": "^0.4.6",
     "stringformat": "0.0.5",
