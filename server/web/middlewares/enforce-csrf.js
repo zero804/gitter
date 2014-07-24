@@ -1,7 +1,9 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
-'use strict';
+"use strict";
 
-var winston = require('../../utils/winston');
+var env = require('../../utils/env');
+var stats = env.stats;
+var logger = env.logger;
+
 var escapeRegExp = require('../../utils/escape-regexp');
 
 var WHITELIST = [
@@ -23,30 +25,34 @@ module.exports = function(req, res, next) {
   if(req.authInfo) return next();
 
   if(isInWhitelist(req)) {
-    winston.verbose('skipping csrf check for ' + req.path);
+    logger.verbose('skipping csrf check for ' + req.path);
     return next();
   }
 
   var clientToken = getClientToken(req);
   if(!clientToken) {
-    winston.warn('csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they presented no token');
+    stats.event('token.rejected.notpresented');
+    logger.warn('csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they presented no token');
     return next(403);
   }
 
   if(req.accessToken !== clientToken) {
+    stats.event('token.rejected.mismatch');
+
     if(!req.user) {
-      winston.warn('csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they are probably logged out', {
+      logger.warn('csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they are probably logged out', {
         serverAccessToken: req.accessToken,
         clientToken: clientToken,
       });
     } else {
-      winston.warn('csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they presented an illegal token', {
+      logger.warn('csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they presented an illegal token', {
         serverAccessToken: req.accessToken,
         clientToken: clientToken,
         username: req.user.username,
         userId: req.user.id
       });
     }
+
     return next(403);
   }
 
