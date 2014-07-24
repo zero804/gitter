@@ -87,7 +87,6 @@ define([
       this.updatePresence(data);
       this.updateAvatar(data);
       this.updateTooltip(data);
-      this.updateState(data);
     },
 
     updatePresence: function(data) {
