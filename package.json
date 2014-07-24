@@ -65,14 +65,16 @@
     "dolph": "0.0.4",
     "sitemap": "https://registry.npmjs.org/sitemap/-/sitemap-0.7.2.tgz",
     "redis-sentinel-client": "^0.1.5",
-    "gitter-env": "git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.8.4",
+    "gitter-env": "git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.9.0",
     "shutdown": "^0.2.3",
     "i18n-2": "^0.4.6",
     "stringformat": "0.0.5",
     "node-resque": "^0.8.3",
     "csprng": "^0.1.1",
     "faye-websocket": "^0.7.2",
-    "tough-cookie": "^0.12.1"
+    "tough-cookie": "^0.12.1",
+    "emailify": "~0.0.2",
+    "email-validator": "^1.0.0"
   },
   "devDependencies": {
     "better-assert": "1.0.0",

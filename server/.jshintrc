@@ -1,5 +1,5 @@
 {
-  trailing: false, 
-  unused:true, 
-  node:true
+  "trailing": false, 
+  "unused": true, 
+  "node": true
 }

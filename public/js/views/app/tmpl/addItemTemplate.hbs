@@ -1,3 +1,13 @@
-<div class="trpDisplayPicture avatar-s  " style="background-image: url('{{avatarUrlSmall}}')" data-title="{{displayName}}"></div>
-<strong>{{username}}</strong> <span class="username">{{displayName}}</span>
-<span class="remove"></span>
+{{!-- This is actually wrapped by div.gtrPeopleAddRoster --}}
+<div class='gtrPeopleRosterItem__avatar'>
+  <div class="trpDisplayPicture avatar-s  " style="background-image: url('{{avatarUrlSmall}}')" data-title="{{displayName}}"></div>
+</div>
+<div class='gtrPeopleRosterItem__content'>
+  <p class='{{outcome}}'>
+    {{#if email}} {{!-- if we have an email, show instead of username --}}
+      <strong>{{email}}</strong>
+    {{else}}
+      <strong>{{username}}</strong>
+    {{/if}} {{message}} {{#if action}}<a href={{action.href}}>{{action.text}}</a>{{/if}}
+  </p>
+</div>
