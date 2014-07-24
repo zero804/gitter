@@ -5,14 +5,6 @@ var restSerializer   = require("../../serializers/rest-serializer");
 var repoService      = require("../../services/repo-service");
 var createTextFilter = require('text-filter');
 
-function getDefaultReposSuggestions() {
-  return repoService.findReposByUris([
-    'gitterHQ/gitter',
-    'gitterHQ/developers',
-    'gitterHQ/rhubarb'
-  ]);
-}
-
 function indexQuery(req, res, next) {
   var search = repoService.getReposForUser(req.user);
 
@@ -46,11 +38,6 @@ module.exports = {
     if (req.query.include_users) strategyOptions.mapUsers = true;
 
     repoService.suggestedReposForUser(req.user)
-      .then(function(repos) {
-        if(repos.length) return repos;
-
-        return getDefaultReposSuggestions();
-      })
       .then(function(repos) {
         var strategy = new restSerializer.GithubRepoStrategy(strategyOptions);
 
