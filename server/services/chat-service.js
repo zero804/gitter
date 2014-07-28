@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var env              = require('../utils/env');
@@ -158,7 +157,6 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
       chatMessage._md       = parsedMessage.markdownProcessingFailed ?
                                 -CURRENT_META_DATA_VERSION : CURRENT_META_DATA_VERSION;
 
-
       return chatMessage.saveQ()
         .thenResolve(chatMessage);
     })
@@ -166,17 +164,17 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
 };
 
 exports.findById = function(id, callback) {
-  persistence.ChatMessage.findById(id, function(err, chatMessage) {
-    callback(err, chatMessage);
-  });
+  return persistence.ChatMessage.findByIdQ(id)
+    .nodeify(callback);
 };
 
  exports.findByIds = function(ids, callback) {
-  if(!ids || !ids.length) return callback(null, []);
+  if(!ids || !ids.length) return Q.resolve([]).nodeify(callback);
 
-  persistence.ChatMessage
+  return persistence.ChatMessage
     .where('_id')['in'](collections.idsIn(ids))
-    .exec(callback);
+    .execQ()
+    .nodeify(callback);
 };
 
 // function massageMessages(message) {
@@ -196,6 +194,21 @@ exports.findById = function(id, callback) {
 
 //   return message;
 // }
+
+/* This is much more cacheable than searching less than a date */
+function getDateOfFirstMessageInRoom(troupeId) {
+  return persistence.ChatMessage
+    .where('toTroupeId', troupeId)
+    .limit(1)
+    .select({ sent: 1 })
+    .sort({ _id: 'asc' })
+    .lean()
+    .execQ()
+    .then(function(r) {
+      if(!r.length) return null;
+      return r[0].sent;
+    });
+}
 
 /**
  * Returns a promise of
@@ -232,18 +245,13 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
     .spread(function(results, maxHistoryDate) {
       if (!maxHistoryDate) return [results, false];
 
-      var q = persistence.ChatMessage
-              .where('toTroupeId', troupeId)
-              .limit(1)
-              .where('sent')
-              .lte(maxHistoryDate);
-
-      return [results, q.execQ()];
-    })
-    .spread(function(results, _results) {
-      // TODO: consider if there's a better way of handling this...
-      var limitReached = _results.length !== 0;
-      return [results, limitReached];
+      return [
+        results,
+        getDateOfFirstMessageInRoom(troupeId)
+          .then(function(firstMessageSent) {
+            return !!(firstMessageSent && firstMessageSent < maxHistoryDate);
+          })
+      ];
     })
     .nodeify(callback);
 };
@@ -255,22 +263,16 @@ exports.findChatMessagesForTroupeForDateRange = function(troupeId, startDate, en
               .where('toTroupeId', troupeId)
               .where('sent').gte(startDate)
               .where('sent').lte(endDate)
-              .sort({sent: 'asc'});
+              .sort({ sent: 'asc' });
 
-      return q.exec().then(function(results) {
-        var chats;
-        var limitReached;
+      return q.execQ()
+        .then(function(results) {
+          if (maxHistoryDate > startDate) {
+            return [[], true];
+          }
 
-        if (maxHistoryDate > startDate) {
-          chats = [];
-          limitReached = true;
-          return Q.all([chats, limitReached]);
-        } else {
-          chats = results; // skip massage for now .map(massageMessages);
-          limitReached = false;
-          return Q.all([chats, limitReached]);
-        }
-      });
+          return [results, false];
+        });
     });
 };
 
