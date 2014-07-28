@@ -1119,6 +1119,11 @@
       "version": "8.0.0",
       "from": "highlight.js@~8.0.0"
     },
+    "htmlencode": {
+      "version": "0.0.4",
+      "from": "htmlencode@",
+      "resolved": "https://registry.npmjs.org/htmlencode/-/htmlencode-0.0.4.tgz"
+    },
     "i18n": {
       "version": "0.4.1",
       "from": "i18n@~0.4.1",
