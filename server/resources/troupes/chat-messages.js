@@ -28,7 +28,7 @@ module.exports = {
         return restSerializer.serialize(chatMessages, strategy)
           .then(function(serialized) {
             if(limitReached) {
-              res.set('LimitReached', limitReached);
+              res.set('LimitReached', 'true');
             }
 
             res.send(serialized);
