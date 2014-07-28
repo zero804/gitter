@@ -8,15 +8,14 @@ var persistence   = require("./persistence-service");
 var collections   = require("../utils/collections");
 var troupeService = require("./troupe-service");
 var userService   = require("./user-service");
-var unsafeHtml    = require('../utils/unsafe-html');
-var processChat   = require('../utils/process-chat');
+var processChat   = require('../utils/process-chat-isolated');
 var appEvents     = require('../app-events');
 var Q             = require('q');
 var mongoUtils    = require('../utils/mongo-utils');
 var moment        = require('moment');
 var roomCapabilities = require('./room-capabilities');
 var StatusError   = require('statuserror');
-var _ = require('underscore');
+var _             = require('underscore');
 
 /*
  * Hey Trouper!
@@ -47,8 +46,9 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
     if(!troupeService.userHasAccessToTroupe(user, troupe)) throw new StatusError(403, 'Access denied');
 
     // TODO: validate message
-    var parsedMessage = processChat(data.text);
-
+    return processChat(data.text);
+  })
+  .then(function(parsedMessage) {
     var chatMessage = new persistence.ChatMessage({
       fromUserId: user.id,
       toTroupeId: troupe.id,
@@ -121,50 +121,45 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
     });
   })
   .nodeify(callback);
-
-
-
-
 };
 
 exports.updateChatMessage = function(troupe, chatMessage, user, newText, callback) {
-  var age = (Date.now() - chatMessage.sent.valueOf()) / 1000;
-  if(age > MAX_CHAT_EDIT_AGE_SECONDS) {
-    return callback("You can no longer edit this message");
-  }
+  return Q.fcall(function() {
+      var age = (Date.now() - chatMessage.sent.valueOf()) / 1000;
+      if(age > MAX_CHAT_EDIT_AGE_SECONDS) {
+        return callback("You can no longer edit this message");
+      }
 
-  if(chatMessage.toTroupeId != troupe.id) {
-    return callback("Permission to edit this chat message is denied.");
-  }
+      if(chatMessage.toTroupeId != troupe.id) {
+        return callback("Permission to edit this chat message is denied.");
+      }
 
-  if(chatMessage.fromUserId != user.id) {
-    return callback("Permission to edit this chat message is denied.");
-  }
+      if(chatMessage.fromUserId != user.id) {
+        return callback("Permission to edit this chat message is denied.");
+      }
 
-  // If the user has been kicked out of the troupe...
-  if(!troupeService.userHasAccessToTroupe(user, troupe)) {
-    return callback("Permission to edit this chat message is denied.");
-  }
+      // If the user has been kicked out of the troupe...
+      if(!troupeService.userHasAccessToTroupe(user, troupe)) {
+        return callback("Permission to edit this chat message is denied.");
+      }
 
-  chatMessage.text = newText;
+      chatMessage.text = newText;
+      return processChat(newText);
+    })
+    .then(function(parsedMessage) {
+      chatMessage.html  = parsedMessage.html;
+      chatMessage.editedAt = new Date();
 
-  var parsedMessage = processChat(newText);
-  chatMessage.html  = parsedMessage.html;
+      // Metadata
+      chatMessage.urls      = parsedMessage.urls;
+      chatMessage.mentions  = parsedMessage.mentions;
+      chatMessage.issues    = parsedMessage.issues;
+      chatMessage._md       = CURRENT_META_DATA_VERSION;
 
-
-  chatMessage.editedAt = new Date();
-
-  // Metadata
-  chatMessage.urls      = parsedMessage.urls;
-  chatMessage.mentions  = parsedMessage.mentions;
-  chatMessage.issues    = parsedMessage.issues;
-  chatMessage._md       = CURRENT_META_DATA_VERSION;
-
-  chatMessage.save(function(err) {
-    if(err) return callback(err);
-
-    return callback(null, chatMessage);
-  });
+      return chatMessage.saveQ()
+        .thenResolve(chatMessage);
+    })
+    .nodeify(callback);
 };
 
 exports.findById = function(id, callback) {
@@ -181,23 +176,23 @@ exports.findById = function(id, callback) {
     .exec(callback);
 };
 
-function massageMessages(message) {
-  if('html' in message && 'text' in message) {
+// function massageMessages(message) {
+//   if('html' in message && 'text' in message) {
 
-    if(message._md == VERSION_INITIAL) {
-      var text = unsafeHtml(message.text);
-      var d = processChat(text);
+//     if(message._md == VERSION_INITIAL) {
+//       var text = unsafeHtml(message.text);
+//       var d = processChat(text);
 
-      message.text      = text;
-      message.html      = d.html;
-      message.urls      = d.urls;
-      message.mentions  = d.mentions;
-      message.issues    = d.issues;
-    }
-  }
+//       message.text      = text;
+//       message.html      = d.html;
+//       message.urls      = d.urls;
+//       message.mentions  = d.mentions;
+//       message.issues    = d.issues;
+//     }
+//   }
 
-  return message;
-}
+//   return message;
+// }
 
 /**
  * Returns a promise of
@@ -228,7 +223,7 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
         .skip(options.skip || 0)
         .execQ()
         .then(function(results) {
-          return [results.map(massageMessages).reverse(), maxHistoryDate];
+          return [results /*.map(massageMessages)*/.reverse(), maxHistoryDate];
         });
     })
     .spread(function(results, maxHistoryDate) {
@@ -268,7 +263,7 @@ exports.findChatMessagesForTroupeForDateRange = function(troupeId, startDate, en
           limitReached = true;
           return Q.all([chats, limitReached]);
         } else {
-          chats = results.map(massageMessages);
+          chats = results; // skip massage for now .map(massageMessages);
           limitReached = false;
           return Q.all([chats, limitReached]);
         }
