@@ -6,6 +6,7 @@ var stats         = env.stats;
 var workerFarm    = require('worker-farm');
 var shutdown      = require('shutdown');
 var Q             = require('q');
+var StatusError   = require('statuserror');
 var farm;
 
 function startWorkerFarm() {
@@ -33,7 +34,9 @@ function processChatIsolated(text, callback) {
       stats.event('markdown.failure');
 
       if(err.type === 'TimeoutError') {
-        errorReporter(new Error("Markdown processing failed"), { text: text });
+        var newError = new StatusError(500, "Markdown processing failed");
+        errorReporter(newError, { text: text });
+        throw newError;
       }
       throw err;
     })
