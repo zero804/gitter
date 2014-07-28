@@ -2,7 +2,7 @@
 "use strict";
 
 var RepoService =  require('../../services/github/github-repo-service');
-var converter = require('../../utils/process-chat');
+var processChat = require('../../utils/process-chat-isolated');
 var winston = require('../../utils/winston');
 var _ = require('underscore');
 
@@ -43,14 +43,15 @@ module.exports = {
     var issueNumber = query.issueNumber || '';
     var service = new RepoService(req.user);
 
-    service.getIssues(repoName).then(function(issues) {
-      var matches = issueNumber.length ? getTopEightMatchingIssues(issues, issueNumber) : getEightSuggestedIssues(issues);
-      res.send(matches);
-    })
-    .fail(function(err) {
-      winston.err('failed to find issues for ' + repoName, err);
-      res.send([]);
-    });
+    service.getIssues(repoName)
+      .then(function(issues) {
+        var matches = issueNumber.length ? getTopEightMatchingIssues(issues, issueNumber) : getEightSuggestedIssues(issues);
+        res.send(matches);
+      })
+      .fail(function(err) {
+        winston.err('failed to find issues for ' + repoName, err);
+        res.send([]);
+      });
   },
 
   show: function(req, res) {
@@ -60,22 +61,32 @@ module.exports = {
     var service = new RepoService(req.user);
     var repoName = req.troupe.uri;
 
-    service.getIssues(repoName).then(function(issues) {
-      var issue = _.find(issues, function(issue) {
-        return issue && ''+issue.number === issueNumber;
-      });
-      if(!issue) {
-        res.send(404);
-      } else {
-        if(req.query.renderMarkdown && issue.body){
-          issue.body_html = converter(issue.body).html;
+    service.getIssues(repoName)
+      .then(function(issues) {
+        // TODO: this needs urgent fixing!
+        var issue = _.find(issues, function(issue) {
+          return issue && '' + issue.number === issueNumber;
+        });
+
+        if(!issue) {
+          res.send(404);
+          return;
+        }
+
+        if(req.query.renderMarkdown && issue.body) {
+          return processChat(issue.body)
+            .then(function(result) {
+              issue.body_html = result.html;
+              res.send(issue);
+            });
         }
 
         res.send(issue);
-      }
-    }).fail(function(err) {
-      winston.err('failed to issue '+issueNumber+' for '+repoName, err);
-      res.send(404);
-    });
+
+      })
+      .fail(function(err) {
+        winston.err('failed to issue '+issueNumber+' for '+repoName, err);
+        res.send(404);
+      });
   }
 };

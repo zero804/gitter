@@ -111,6 +111,10 @@ describe('room-capabilities', function() {
 
       });
 
+      // Disable premium disabled...
+      var env = testRequire('./utils/env');
+      env.config.set("premium:disabled", false);
+
       roomCapabilities.getMaxHistoryMessageDate(ID)
         .then(function(date) {
           if(!EXPECTED) {
