@@ -7,6 +7,8 @@ var workerFarm    = require('worker-farm');
 var shutdown      = require('shutdown');
 var Q             = require('q');
 var StatusError   = require('statuserror');
+var htmlencode    = require('htmlencode');
+
 var farm;
 
 function startWorkerFarm() {
@@ -36,7 +38,17 @@ function processChatIsolated(text, callback) {
       if(err.type === 'TimeoutError') {
         var newError = new StatusError(500, "Markdown processing failed");
         errorReporter(newError, { text: text });
-        throw newError;
+
+        var html = htmlencode.htmlEncode(text);
+        html = html.replace(/\n|&#10;/g,'<br>');
+        return {
+          text: text,
+          html: html,
+          urls: [],
+          mentions: [],
+          issues: [],
+          markdownProcessingFailed: true
+        };
       }
       throw err;
     })
