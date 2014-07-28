@@ -19,23 +19,18 @@ module.exports = {
         limit: limit ? limit: 50
     };
 
-    return chatService.findChatMessagesForTroupe(req.troupe.id, options)
-      .spread(function(chatMessages, limitReached) {
-        var userId = req.user && req.user.id;
+    chatService.findChatMessagesForTroupe(req.troupe.id, options, function(err, chatMessages, limitReached) {
+      if(err) return next(err);
 
-        var strategy = new restSerializer.ChatStrategy({ currentUserId: userId, troupeId: req.troupe.id });
+      var userId = req.user && req.user.id;
 
-        return restSerializer.serialize(chatMessages, strategy)
-          .then(function(serialized) {
-            if(limitReached) {
-              res.set('LimitReached', limitReached);
-            }
-
-            res.send(serialized);
-          });
-      })
-      .fail(next);
-
+      var strategy = new restSerializer.ChatStrategy({ currentUserId: userId, troupeId: req.troupe.id });
+      restSerializer.serialize(chatMessages, strategy, function(err, serialized) {
+        if(err) return next(err);
+        res.set('LimitReached', limitReached);
+        res.send(serialized);
+      });
+    });
   },
 
   create: function(req, res, next) {
