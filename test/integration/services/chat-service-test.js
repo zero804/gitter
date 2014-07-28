@@ -35,11 +35,12 @@ describe('chatService', function() {
 
   describe('findChatMessagesForTroupe for non-premium orgs', function() {
     it('should return messages not older than 2 weeks', function (done) {
-      chatService.findChatMessagesForTroupe(fixture.troupe1, {}, function(err, chatMessages, limitReached) {
-        assert(1 === chatMessages.length);
-        assert(true === limitReached);
-        done();
-      });
+      chatService.findChatMessagesForTroupe(fixture.troupe1, {})
+        .spread(function(chatMessages, limitReached) {
+          assert.strictEqual(1, chatMessages.length);
+          assert.strictEqual(true, limitReached);
+        })
+        .nodeify(done);
     });
   });
 
