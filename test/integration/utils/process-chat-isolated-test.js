@@ -55,10 +55,10 @@ describe('process-chat', function() {
       it('visual studio', function(done) {
         var f = path.join(__dirname, 'markdown-conversions', 'visual-studio.badmarkdown');
         var badMarkdown = fs.readFileSync(f, { encoding: 'utf8' });
-        processChat(badMarkdown, function(err) {
-          if(err) return done();
+        processChat(badMarkdown, function(err, result) {
+          if(err) return done(err);
 
-          assert(false, 'Expected a failure with known bad markdown');
+          assert(result.markdownProcessingFailed, 'Expected a failure with known bad markdown');
           done();
         });
       });
