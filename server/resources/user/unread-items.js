@@ -2,6 +2,7 @@
 "use strict";
 
 var unreadItemService = require("../../services/unread-item-service");
+var StatusError = require('statuserror');
 
 module.exports = {
   id: 'unreadItem',
@@ -17,9 +18,9 @@ module.exports = {
 
   create: function(req, res, next) {
     var unreadItems = req.body;
-    if(!unreadItems) return next(400);
+    if(!unreadItems) return next(new StatusError(400, 'No body'));
 
-    if(!unreadItems.mention && !unreadItems.chat) return next(400); /* You comin at me bro? */
+    if(!unreadItems.mention && !unreadItems.chat) return next(new StatusError(400, 'No chat or mention items')); /* You comin at me bro? */
 
     return unreadItemService.markItemsRead(req.resourceUser.id, req.userTroupe.id, unreadItems.chat, unreadItems.mention)
       .then(function() {
@@ -40,7 +41,7 @@ module.exports = {
   },
 
   destroy: function(req, res, next) {
-    if(req.params.unreadItem.toLowerCase() !== 'all') return next(404);
+    if(req.params.unreadItem.toLowerCase() !== 'all') return next(new StatusError(404, 'Not found'));
 
     return unreadItemService.markAllChatsRead(req.resourceUser.id, req.userTroupe.id, { member: true })
       .then(function() {
