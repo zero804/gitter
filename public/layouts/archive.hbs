@@ -4,6 +4,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=IE9" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
   <meta charset="utf-8">
+  {{#if noindex}}
+  <meta name="robots" content="noindex, nofollow" />
+  {{/if}}
 
   <title>{{troupeName}} - Gitter</title>
 
@@ -21,7 +24,7 @@
   <base target="_parent">
   <link rel="stylesheet" href='{{cdn "sprites/services.css" }}'>
   <link rel="stylesheet" href='{{cdn "bootstrap/css/archive.css" }}'>
-  <link id="favicon" rel="shortcut icon" href='{{cdn "images/2/gitter/favicon5.png" }}'>
+  <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/2/gitter/favicon.ico' }}">
   {{>load_font_css}}
 </head>
 <body class="logged-out">
@@ -48,6 +51,17 @@
       <div class="trpLeftMenuSignup">
         <a class="trpButtonMedium trpBtnGreen gtrCreateRoomButton" href="/{{troupeName}}">Go to live room</a>
       </div>
+
+        {{#if isAdmin}}
+          {{#if public}}
+            <div class="trpTroupeActions" style="text-align: center;">
+              <p><small id='noindexStatus'></small></p>
+              <input id='noindex' type='checkbox' name='noindex' {{#unless noindex}} checked {{/unless}}>
+              <small>Room indexed by search engines.</small>
+            </div>
+          {{/if}}
+        {{/if}}
+
       {{else}}
       <div class="trpLeftMenuSignup">
         <a href="/login/github?action=login&amp;button=leftmenu-1" class="trpButtonBig trpBtnGreen gtrCreateRoomButton">Login with GitHub to start talking</a>
@@ -86,7 +100,7 @@
 
 
 {{#if troupeContext}}
-{{{ generateTroupeContext troupeContext lang=lang locale=locale}}}
+{{{ generateTroupeContext troupeContext }}}
 {{/if}}
 
 {{>require_wrapper}}

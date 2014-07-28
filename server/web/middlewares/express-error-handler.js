@@ -31,6 +31,7 @@ module.exports = function(err, req, res, next) {
   var template = '500';
   var message = "An unknown error occurred";
   var stack = err && err.stack;
+  var extraTemplateValues;
 
   if(_.isNumber(err)) {
    if(err > 400) {
@@ -56,42 +57,52 @@ module.exports = function(err, req, res, next) {
 
 
   if(status >= 500) {
-   // Send to sentry
-   errorReporter (err, { type: 'response', status: status, userId: userId, url: req.url, method: req.method });
-   // Send to statsd
-   stats.event('client_error_5xx', { userId: userId, url: req.url });
+    // Send to sentry
+    errorReporter (err, { type: 'response', status: status, userId: userId, url: req.url, method: req.method });
+    // Send to statsd
+    stats.event('client_error_5xx', { userId: userId, url: req.url });
 
-   logger.error("An unexpected error occurred", {
-      method: req.method,
-      url: req.url,
-      userId: userId,
-      message: message
-   });
+    logger.error("An unexpected error occurred", {
+       method: req.method,
+       url: req.url,
+       userId: userId,
+       message: message
+    });
 
-   if(err.stack) {
-     logger .error('Error: ' + err.stack);
-   }
+    if(err.stack) {
+      logger .error('Error: ' + err.stack);
+    }
 
   } else if(status === 404) {
-   stats.event('client_error_404', { userId: userId });
+    stats.event('client_error_404', { userId: userId });
 
-   template = '404';
-   stack = null;
+    template = '404';
+    stack = null;
+  } else if(status === 402) {
+    /* HTTP 402 = Payment required */
+    template = '402';
+    stack = null;
+    extraTemplateValues = {
+      billingUrl: config.get('web:billingBaseUrl')  + '/bill/' + err.uri
+    }
+
+    stats.event('client_error_402', { userId: userId });
   } else if(status >= 400 && status < 500) {
-   stats.event('client_error_4xx', { userId: userId });
+    stats.event('client_error_4xx', { userId: userId });
   }
+
   res.status(status);
 
   res.format({
     html: function() {
-      res.render(template , {
+      res.render(template , _.extend({
          status: status,
          homeUrl : config.get('web:homeurl'),
          user: req.user,
          userMissingPrivateRepoScope: req.user && !req.user.hasGitHubScope('repo'),
          message: message,
          stack: config.get('express:showStack') && stack ? linkStack(stack) : null
-       });
+       }, extraTemplateValues));
     },
     json: function() {
       res.send({ error: message });

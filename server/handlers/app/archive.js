@@ -8,8 +8,10 @@ var restSerializer = require('../../serializers/rest-serializer');
 var contextGenerator = require('../../web/context-generator');
 var Q = require('q');
 var roomService = require('../../services/room-service');
-var languageSelector = require('../../web/language-selector');
+var env              = require('../../utils/env');
+var roomCapabilities = require('../../services/room-capabilities');
 var burstCalculator   = require('../../utils/burst-calculator');
+var roomPermissionsModel = require('../../services/room-permissions-model');
 
 exports.datesList = [
   appMiddleware.uriContextResolverMiddleware,
@@ -26,22 +28,32 @@ exports.datesList = [
           req.session.returnTo = '/' + troupe.uri;
         }
 
-        return contextGenerator.generateTroupeContext(req)
-          .then(function(troupeContext) {
+        var roomUrl = '/api/v1/rooms/' + troupe.id;
 
-            res.render('archive-home-template', {
-              layout: 'archive',
-              lang: languageSelector(req),
-              user: user,
-              archives: true,
-              troupeContext: troupeContext,
-              bootScriptName: 'router-archive-home',
-              troupeTopic: troupe.topic,
-              githubLink: '/' + req.uriContext.uri,
-              troupeName: req.uriContext.uri,
-              isHomePage: true
-            });
+        return roomPermissionsModel(user, 'admin', troupe)
+          .then(function(access) {
 
+            return contextGenerator.generateTroupeContext(req)
+              .then(function(troupeContext) {
+
+                res.render('archive-home-template', {
+                  layout: 'archive',
+                  user: user,
+                  isAdmin: access,
+                  archives: true,
+                  troupeContext: troupeContext,
+                  bootScriptName: 'router-archive-home',
+                  troupeTopic: troupe.topic,
+                  githubLink: '/' + req.uriContext.uri,
+                  troupeName: req.uriContext.uri,
+                  isHomePage: true,
+                  noindex: troupe.noindex,
+                  roomUrl: roomUrl,
+                  accessToken: req.accessToken,
+                  public: troupe.security === 'PUBLIC'
+                });
+
+              });
           });
       })
       .fail(next);
@@ -83,8 +95,11 @@ exports.chatArchive = [
           previousDate = null;
         }
 
-        chatService.findChatMessagesForTroupeForDateRange(troupeId, startDate.toDate(), endDate.toDate())
-          .then(function(chatMessages) {
+
+
+        return chatService.findChatMessagesForTroupeForDateRange(troupeId, startDate.toDate(), endDate.toDate())
+          .spread(function(chatMessages, limitReached) {
+
             var strategy = new restSerializer.ChatStrategy({
               notLoggedIn: true,
               troupeId: troupeId
@@ -92,10 +107,11 @@ exports.chatArchive = [
 
             return Q.all([
                 contextGenerator.generateTroupeContext(req),
-                restSerializer.serializeQ(chatMessages, strategy)
+                restSerializer.serializeQ(chatMessages, strategy),
+                limitReached
               ]);
           })
-          .spread(function (troupeContext, serialized) {
+          .spread(function(troupeContext, serialized, limitReached) {
             troupeContext.archive = {
               archiveDate: startDate,
               nextDate: nextDate,
@@ -131,28 +147,41 @@ exports.chatArchive = [
             var nextDateLink = n && '/' + uri + '/archives/' + n.format('YYYY/MM/DD', { lang: 'en' });
             var monthYearFormatted = moment(startDate).format('MMM YYYYY', { lang: language });
 
-            res.render('chat-archive-template', {
-              layout: 'archive',
-              archives: true,
-              archiveChats: true,
-              isRepo: troupe.githubType === 'REPO',
-              bootScriptName: 'router-archive-chat',
-              githubLink: '/' + req.uriContext.uri,
-              user: user,
-              troupeContext: troupeContext,
-              troupeName: req.uriContext.uri,
-              troupeTopic: troupe.topic,
-              chats: burstCalculator(serialized),
-              lang: languageSelector(req),
+            var billingUrl = env.config.get('web:billingBaseUrl') + '/bill/' + req.uriContext.uri.split('/')[0];
+            var roomUrl = '/api/v1/rooms/' + troupe.id;
 
-              /* For prerendered archive-navigation-view */
-              previousDate: previousDateFormatted,
-              dayName: dayNameFormatted,
-              dayOrdinal: dayOrdinalFormatted,
-              previousDateLink: previousDateLink,
-              nextDate: nextDateFormatted,
-              nextDateLink: nextDateLink,
-              monthYearFormatted: monthYearFormatted
+            return roomCapabilities.getPlanType(troupe.id).then(function(plan) {
+              var historyHorizon = roomCapabilities.getMessageHistory(plan);
+
+              return res.render('chat-archive-template', {
+                layout: 'archive',
+                archives: true,
+                archiveChats: true,
+                isRepo: troupe.githubType === 'REPO',
+                bootScriptName: 'router-archive-chat',
+                githubLink: '/' + req.uriContext.uri,
+                user: user,
+                troupeContext: troupeContext,
+                troupeName: req.uriContext.uri,
+                troupeTopic: troupe.topic,
+                chats: burstCalculator(serialized),
+                limitReached: limitReached,
+                historyHorizon: historyHorizon,
+                billingUrl: billingUrl,
+                noindex: troupe.noindex,
+                roomUrl: roomUrl,
+                accessToken: req.accessToken,
+
+                /* For prerendered archive-navigation-view */
+                previousDate: previousDateFormatted,
+                dayName: dayNameFormatted,
+                dayOrdinal: dayOrdinalFormatted,
+                previousDateLink: previousDateLink,
+                nextDate: nextDateFormatted,
+                nextDateLink: nextDateLink,
+                monthYearFormatted: monthYearFormatted
+              });
+
             });
 
           });

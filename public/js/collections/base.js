@@ -203,8 +203,6 @@ define([
 
         if(self.length > 0) {
           /* Remove any presnapshot stuff (cached from previous time) */
-          self.remove();
-
           var forKeeping = self.where({ presnapshot: undefined });
 
           // add one by one

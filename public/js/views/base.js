@@ -275,6 +275,29 @@ define([
       }
     },
 
+
+    hideActions: function() {
+      var $s = this.$el.find('.modal-footer .action');
+      $s.hide();
+    },
+
+    showActions: function() {
+      var $s = this.$el.find('.modal-footer .action');
+      $s.show();
+    },
+
+    showPremium: function() {
+      var $s = this.$el.find('.modal-footer .premium');
+      $s.removeClass('hidden');
+      $s.show();
+    },
+
+    hidePremium: function() {
+      var $s = this.$el.find('.modal-footer .premium');
+      $s.addClass('hidden');
+      $s.hide();
+    },
+
     onClose: function() {
       this.view.close();
       this.view.dialog = null;

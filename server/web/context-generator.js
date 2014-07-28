@@ -9,7 +9,6 @@ var roomPermissionsModel = require('../services/room-permissions-model');
 var assert           = require("assert");
 var appVersion       = require("./appVersion");
 var Q                = require('q');
-var languageSelector = require('./language-selector');
 
 /**
  * Returns the promise of a mini-context
@@ -32,7 +31,7 @@ exports.generateNonChatContext = function(req, callback) {
 
 exports.generateSocketContext = function(userId, troupeId, callback) {
   return Q.all([
-      serializeUserId(userId),
+      userId && serializeUserId(userId),
       troupeId && serializeTroupeId(troupeId, userId) || undefined
     ])
     .spread(function(serializedUser, serializedTroupe) {
@@ -121,19 +120,32 @@ function isNativeDesktopApp(req) {
 }
 
 function serializeUser(user) {
-  var strategy = new restSerializer.UserStrategy({ exposeRawDisplayName: true, includeScopes: true, includePermissions: true });
+  var strategy = new restSerializer.UserStrategy({
+    exposeRawDisplayName: true,
+    includeScopes: true,
+    includePermissions: true,
+    showPremiumStatus: true
+  });
 
   return restSerializer.serializeQ(user, strategy);
 }
 
 function serializeUserId(userId) {
-  var strategy = new restSerializer.UserIdStrategy({ exposeRawDisplayName: true, includeScopes: true, includePermissions: true });
+  var strategy = new restSerializer.UserIdStrategy({
+    exposeRawDisplayName: true,
+    includeScopes: true,
+    includePermissions: true,
+    showPremiumStatus: true
+  });
 
   return restSerializer.serializeQ(userId, strategy);
 }
 
 function serializeHomeUser(user, includeEmail) {
-  var strategy = new restSerializer.UserStrategy({ includeEmail: includeEmail, hideLocation: true });
+  var strategy = new restSerializer.UserStrategy({
+    includeEmail: includeEmail,
+    hideLocation: true
+  });
 
   return restSerializer.serializeQ(user, strategy);
 }
@@ -166,7 +178,6 @@ function createTroupeContext(req, options) {
     troupeHash: options.troupeHash,
     isNativeDesktopApp: isNativeDesktopApp(req),
     permissions: options.permissions,
-    lang: languageSelector(req),
     locale: req.i18n.locales[req.i18n.locale]
   };
 }

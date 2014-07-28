@@ -107,7 +107,13 @@ require([
       return;
     }
 
-    var message = JSON.parse(e.data);
+    var message;
+    try {
+      message = JSON.parse(e.data);
+    } catch(err) {
+      throw new Error("Cross-frame message parse failure: " + err + ". Unable to parse " + e.data);
+    }
+
     log('Received message ', message);
 
     var makeEvent = function(message) {

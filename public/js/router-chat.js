@@ -27,6 +27,8 @@ require([
   'views/chat/decorators/embedDecorator',
   'views/chat/decorators/emojiDecorator',
   'views/app/unreadBannerView',
+  'views/app/historyLimitView',
+
   'views/app/headerView',
 
   'components/statsc',          // No ref
@@ -44,7 +46,7 @@ require([
     ChatCollectionView, itemCollections, RightToolbarView,
     inviteView, TroupeSettingsView, MarkdownView, KeyboardView, AddPeopleViewModal, IntegrationSettingsModal,
     unreadItemsClient, helpShareIfLonely, webhookDecorator, issueDecorator, commitDecorator, mentionDecorator,
-    embedDecorator, emojiDecorator, UnreadBannerView, HeaderView) {
+    embedDecorator, emojiDecorator, UnreadBannerView, HistoryLimitView, HeaderView) {
   "use strict";
 
   $(document).on("click", "a", function(e) {
@@ -77,7 +79,13 @@ require([
       return;
     }
 
-    var message = JSON.parse(e.data);
+    var message;
+    try {
+      message = JSON.parse(e.data);
+    } catch(err) {
+      throw new Error("Cross-frame message parse failure: " + err + ". Unable to parse " + e.data);
+    }
+
     log('Received message ', message);
 
     var makeEvent = function(message) {
@@ -225,6 +233,13 @@ require([
     model: unreadChatsModel,
     chatCollectionView: chatCollectionView
   }).render();
+
+  new HistoryLimitView.Top({
+    el: '#limit-banner',
+    collection: itemCollections.chats,
+    chatCollectionView: chatCollectionView
+  }).render();
+
 
   itemCollections.chats.once('sync', function() {
     unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));

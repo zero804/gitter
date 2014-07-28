@@ -1,28 +1,30 @@
 @charset "UTF-8";
-@import "bootstrap/bootstrap.less";
+@import "bootstrap/bootstrap";
 
-// @import "../../repo/fine-uploader/fineuploader.less";
+// @import "../../repo/fine-uploader/fineuploader";
 
-@import "trp3Colours.less";
-//@import "trpWebFonts.less";
-@import "trpFonts.less";
-@import "icon-mixins.less";
+@import "trp3Colours";
+//@import "trpWebFonts";
+@import "trpFonts";
+@import "icon-mixins";
 
-@import "trpModals.less";
-@import "trp3Common.less";
-@import "trpButtons.less";
+@import "trpModals";
+@import "trp3Common";
+@import "trpButtons";
 
-@import "trp3Chat.less";
-@import "trp3Mail.less";
-@import "trp3Files.less";
-@import "trp3People.less";
-@import "trpUserhome.less";
+@import "trp3Chat";
+@import "trp3Mail";
+@import "trp3Files";
+@import "trp3People";
+@import "trpUserhome";
 
-@import "nanoScroller.less";
-@import "trpInvites.less";
+@import "nanoScroller";
+@import "trpInvites";
 
 /* new stuff */
 @import "menu";
+@import "chat";
+@import "chat-container";
 @import "chat-item";
 @import "chat-input";
 @import "chat-header";
@@ -31,7 +33,7 @@
 .boxhack {
   -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
   -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-  box-sizing: border-box;  
+  box-sizing: border-box;
 }
 
 .transition300ms() {
@@ -46,10 +48,47 @@
   .transition(500ms);
 }
 
+@-webkit-keyframes spin {
+  0%   { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+@-moz-keyframes spin {
+  0%   { -moz-transform: rotate(0deg); }
+  100% { -moz-transform: rotate(360deg); }
+}
+@-o-keyframes spin {
+  0%   { -o-transform: rotate(0deg); }
+  100% { -o-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0%   { -ms-transform: rotate(0deg); filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=0); }
+  100% { -ms-transform: rotate(360deg); filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=5); }
+}
+
 @-webkit-keyframes pulsey {
-    0% { opacity: 0.3; }
+    0% { opacity: 0.2; }
     50% { opacity: 1; }
-    100% { opacity: 0.3; }
+    100% { opacity: 0.2; }
+}
+
+.hide {
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
+}
+
+.spin {
+  -webkit-animation: spin 2s linear infinite;
+}
+
+.pulse {
+  -webkit-animation: pulsey 2s linear infinite;
+}
+
+.isLoading {
+  .prepend-octicon('\f00a');
+  // display: none;
 }
 
 .transition(@time) {
@@ -113,8 +152,14 @@ label {
 }
 
 .gtrInput {
+  .boxhack;
   .trpBodyMedium;
+
+  width: 100%;
+  height: 32px;
+  padding: 0px 10px;
   outline: 0;
+  margin-bottom: 15px;
   box-shadow: none;
   display: inline-block;
   padding: 9px;
@@ -286,18 +331,67 @@ label {
 }
 
 .gtrPeopleAddRoster {
-
+  .trpBodyMedium;
+  &__adding {
+    p { margin: 0; }
+    margin-left: 10px;
+    padding-bottom: 15px;
+  }
 }
 
 .gtrPeopleRosterItem {
-  margin-top: 8px;
-  max-width: 500px;
+  // .trpBodyMedium;
+  width: 100%;
   cursor: default;
-  .trpDisplayPicture {
-    vertical-align: middle;
-    margin-right: 2px;
+  margin-bottom: 8px;
+  overflow: hidden;
+
+  &__avatar {
+    float: left;
   }
 
+  &__content {
+
+    margin-left: 39px;
+    line-height: 30px;
+
+    p {
+      margin-bottom: 0;
+      padding-left: 24px !important;
+
+      a {
+        text-decoration: underline;
+      }
+
+      &.added {
+        .prepend-octicon('\f03a');
+
+        &::before {
+          color: hsl(100, 60%, 70%);
+        }
+      }
+
+      &.invited {
+        .prepend-octicon('\f03c');
+
+        &::before {
+          color: hsl(0, 0%, 75%);
+        }
+      }
+
+      &.unreachable {
+        .prepend-octicon('\f081');
+
+        &::before {
+          color: hsl(0, 60%, 70%);
+        }
+      }
+    }
+  }
+
+  &:last-child {
+    margin-bottom: 10px;
+  }
 
   .username {
     color: #999;
@@ -528,7 +622,7 @@ body.logged-out {
     width: 244px;
     height: 48px;
     margin-bottom: 20px;
-      
+
     @media @retina {
       background-image: url('../../images/2/gitter/logo-text-white-48@2x.png');
       background-size: contain;
@@ -2546,7 +2640,34 @@ ul.roster {
 
 }
 
+// TODO: as we progress with the css refactoring this will have to be changed. Walter.
+.popover-content {
+  .invited {
+    .boxhack;
+    background-color: hsl(0, 60%, 70%);
+    padding: 10px;
+    line-height: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+
+    p {
+      margin: 0;
+      small {
+        font-size: 0.8em;
+        color: white;
+      }
+    }
+  }
+}
+
+.popover-content .invited ~ .trpPopoverDetails,
+.popover-content .invited ~ div img.avatar-l {
+  opacity: 0.70;
+  filter: alpha(opacity=70);
+}
+
 .trpPopoverDetails {
+  .boxhack;
   float: right;
   max-width: 340px;
   margin-left: 12px;

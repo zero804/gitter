@@ -1,20 +1,18 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var mongoose      = require('../utils/mongoose-q');
-var Schema        = mongoose.Schema;
-var ObjectId      = Schema.ObjectId;
-var mongooseUtils = require('../utils/mongoose-utils');
-var appEvents     = require("../app-events");
-var _             = require("underscore");
-var winston       = require('../utils/winston');
-var nconf         = require("../utils/config");
-var shutdown      = require('shutdown');
-var Fiber         = require("../utils/fiber");
-var assert        = require("assert");
-
+var mongoose       = require('../utils/mongoose-q');
+var Schema         = mongoose.Schema;
+var ObjectId       = Schema.ObjectId;
+var mongooseUtils  = require('../utils/mongoose-utils');
+var appEvents      = require("../app-events");
+var _              = require("underscore");
+var winston        = require('../utils/winston');
+var nconf          = require("../utils/config");
+var shutdown       = require('shutdown');
+var assert         = require("assert");
+var Q              = require('q');
 var restSerializer = require('../serializers/rest-serializer');
-var serializeModel = restSerializer.serializeModel;
 
 // Install inc and dec number fields in mongoose
 require('mongoose-number')(mongoose);
@@ -87,15 +85,14 @@ connection.on('error', function(err) {
 function serializeEvent(url, operation, model, callback) {
   winston.verbose("Serializing " + operation + " to " + url);
 
-  serializeModel(model, function(err, serializedModel) {
-    if(err) {
-      winston.error("Silently failing model event: ", { exception: err, url: url, operation: operation });
-    } else {
+  return restSerializer.serializeModel(model)
+    .then(function(serializedModel) {
       appEvents.dataChange2(url, operation, serializedModel);
-    }
-
-    if(callback) callback();
-  });
+    })
+    .fail(function(err) {
+      winston.error("Silently failing model event: ", { exception: err, url: url, operation: operation });
+    })
+    .nodeify(callback);
 }
 
 // --------------------------------------------------------------------
@@ -122,12 +119,15 @@ var UserSchema = new Schema({
     createRoom: { type: Boolean, 'default': true }
   },
   githubScopes: { type: Schema.Types.Mixed },
+  state: { type: String },
+  stripeCustomerId: { type: String },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 
 // UserSchema.index({ email: 1 }, { unique: true });
 UserSchema.index({ githubId: 1 }, { unique: true, sparse: true }); // TODO: does this still need to be sparse?
 UserSchema.index({ username: 1 }, { unique: true /*, sparse: true */});
+UserSchema.index({ stripeCustomerId: 1 }, { unique: true, sparse: true });
 // UserSchema.index({ "emails.email" : 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';
 
@@ -338,6 +338,7 @@ var TroupeSchema = new Schema({
   security: { type: String, /* WARNING: validation bug in mongo 'enum': ['PRIVATE', 'PUBLIC', 'INHERITED'], required: false */ }, // For REPO_CHANNEL, ORG_CHANNEL, USER_CHANNEL
   dateDeleted: { type: Date },
   dateLastSecurityCheck: { type: Date },
+  noindex: { type: Boolean, 'default': false},
   _nonce: { type: Number },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
@@ -402,19 +403,15 @@ TroupeSchema.methods.addUserById = function(userId, options) {
 
   // TODO: disable this methods for one-to-one troupes
   var troupeUser = new TroupeUser(raw);
-
   this.post('save', function(postNext) {
-    var f = new Fiber();
-
     var url = "/rooms/" + this.id + "/users";
-    serializeEvent(url, "create", troupeUser, f.waitor());
-
     var userUrl = "/user/" + userId + "/rooms";
-    serializeEvent(userUrl, "create", this, f.waitor());
 
-
-
-    f.all().then(function() { postNext(); }).fail(function(err) { postNext(err); });
+    Q.all([
+      serializeEvent(url, "create", troupeUser),
+      serializeEvent(userUrl, "create", this)
+      ])
+      .nodeify(postNext);
   });
 
   return this.users.push(troupeUser);
@@ -425,12 +422,11 @@ function serializeOneToOneTroupeEvent(userId, operation, model, callback) {
 
   var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
 
-  restSerializer.serialize(model, strategy, function(err, serializedModel) {
-    if(err) return callback(err);
-
-    appEvents.dataChange2(oneToOneUserUrl, operation, serializedModel);
-    callback();
-  });
+  return restSerializer.serialize(model, strategy)
+    .then(function(serializedModel) {
+      appEvents.dataChange2(oneToOneUserUrl, operation, serializedModel);
+    })
+    .nodeify(callback);
 }
 
 TroupeSchema.methods.removeUserById = function(userId) {
@@ -444,23 +440,25 @@ TroupeSchema.methods.removeUserById = function(userId) {
   if(troupeUser) {
     // TODO: unfortunately the TroupeUser middleware remove isn't being called as we may have expected.....
     this.post('save', function(postNext) {
-      var f = new Fiber();
+      var promise;
 
       if(!this.oneToOne) {
         /* Dont mark the user as having been removed from the room */
         var url = "/rooms/" + this.id + "/users";
-        serializeEvent(url, "remove", troupeUser, f.waitor());
-
         var userUrl = "/user/" + userId + "/rooms";
-        serializeEvent(userUrl, "remove", this, f.waitor());
+
+        promise = Q.all([
+          serializeEvent(url, "remove", troupeUser),
+          serializeEvent(userUrl, "remove", this)
+        ]);
 
         // TODO: move this in a remove listener somewhere else in the codebase
         appEvents.userRemovedFromTroupe({ troupeId: this.id, userId: troupeUser.userId });
       } else {
-        serializeOneToOneTroupeEvent(userId, "remove", this, f.waitor());
+        promise = serializeOneToOneTroupeEvent(userId, "remove", this);
       }
 
-      f.all().then(function() { postNext(); }).fail(function(err) { postNext(err); });
+      return promise.nodeify(postNext);
     });
 
     if(this.oneToOne) {
@@ -826,6 +824,7 @@ NotificationsPreferenceSchema.index({ userId: 1} , { unique: true });
 NotificationsPreferenceSchema.schemaTypeName = 'NotificationsPreferenceSchema';
 
 
+var SubscriptionSchema = require('./persistence/subscription-schema.js');
 
 var User = mongoose.model('User', UserSchema);
 var UserLocationHistory = mongoose.model('UserLocationHistory', UserLocationHistorySchema);
@@ -865,18 +864,7 @@ var Contact = mongoose.model('Contact', ContactSchema);
 var SuggestedContact = mongoose.model('SuggestedContact', SuggestedContactSchema);
 
 var NotificationsPreference = mongoose.model('NotificationsPreference', NotificationsPreferenceSchema);
-
-
-//
-// 8-May-2013: Delete this after it's been rolled into production!
-//
-Troupe.update({ status: 'INACTIVE' }, { status: 'ACTIVE' }, { multi: true }, function (err, numberAffected) {
-  if (err) return winston.error(err);
-  if(numberAffected > 0) {
-    winston.warn('Updated ' + numberAffected + ' INACTIVE troupes to status ACTIVE');
-  }
-});
-
+var Subscription = mongoose.model('Subscription', SubscriptionSchema);
 
 module.exports = {
   schemas: {
@@ -906,7 +894,8 @@ module.exports = {
     UriLookupSchema: UriLookupSchema,
     ContactSchema: ContactSchema,
     SuggestedContactSchema: SuggestedContactSchema,
-    NotificationsPreferenceSchema: NotificationsPreferenceSchema
+    NotificationsPreferenceSchema: NotificationsPreferenceSchema,
+    SubscriptionSchema: SubscriptionSchema
   },
   User: User,
   UserTroupeLastAccess: UserTroupeLastAccess,
@@ -937,7 +926,8 @@ module.exports = {
   UriLookup: UriLookup,
   Contact: Contact,
   SuggestedContact: SuggestedContact,
-  NotificationsPreference: NotificationsPreference
+  NotificationsPreference: NotificationsPreference,
+  Subscription: Subscription
 };
 
 var events = require("./persistence-service-events");

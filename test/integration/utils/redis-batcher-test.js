@@ -4,18 +4,27 @@
 
 var testRequire = require('../test-require');
 var assert = require('assert');
+var workerQueue = testRequire('./utils/worker-queue-redis');
+var uuid = require('node-uuid');
 
 describe('redis-batcher', function() {
+  // queue takes a while to start up
+  this.timeout(10000);
+
+  before(function() {
+    workerQueue.startScheduler();
+  });
+
   it('should batch tasks together', function(done) {
     var RedisBatcher = testRequire('./utils/redis-batcher').RedisBatcher;
 
-    var underTest = new RedisBatcher('test1', 0);
+    var underTest = new RedisBatcher('test1-' + uuid.v4(), 0);
     var count = 0;
     underTest.listen(function(key, items, cb) {
       cb();
       count++;
 
-      assert(items.length === 4, 'Expected 4 items');
+      assert.equal(items.length, 4, 'Expected 4 items');
       assert(items.indexOf('a') >= 0, 'Expected items a,b,c,d, got ' + items.join(','));
       assert(items.indexOf('b') >= 0, 'Expected items a,b,c,d, got ' + items.join(','));
       assert(items.indexOf('c') >= 0, 'Expected items a,b,c,d, got ' + items.join(','));
@@ -47,7 +56,7 @@ describe('redis-batcher', function() {
   it('should keep separate keys separate', function(done) {
     var RedisBatcher = testRequire('./utils/redis-batcher').RedisBatcher;
 
-    var underTest = new RedisBatcher('test2', 0);
+    var underTest = new RedisBatcher('test2-' + uuid.v4(), 0);
 
     var keys = {};
     underTest.listen(function(key, items, cb) {
@@ -77,4 +86,9 @@ describe('redis-batcher', function() {
 
 
   });
+
+  after(function(done) {
+    workerQueue.stopScheduler(done);
+  });
+
 });

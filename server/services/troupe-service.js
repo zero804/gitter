@@ -17,11 +17,9 @@ var ObjectID                 = require('mongodb').ObjectID;
 var _                        = require('underscore');
 var assert                   = require('assert');
 var roomPermissionsModel     = require('./room-permissions-model');
-
-function ensureExists(value) {
-  if(!value) throw 404;
-  return value;
-}
+var leanTroupeDao            = require('./daos/lean-troupe-dao');
+var StatusError              = require('statuserror');
+var promiseUtils             = require('../utils/promise-utils');
 
 function findByUri(uri, callback) {
   var lcUri = uri.toLowerCase();
@@ -60,7 +58,7 @@ function findByIdRequired(id) {
   assert(mongoUtils.isLikeObjectId(id));
 
   return persistence.Troupe.findByIdQ(id)
-    .then(ensureExists);
+    .then(promiseUtils.required);
 }
 
 /**
@@ -239,7 +237,7 @@ function findUserIdsForTroupe(troupeId, callback) {
  * and githubType
  */
 function findUserIdsForTroupeWithLurk(troupeId) {
-  return persistence.Troupe.findByIdQ(troupeId, 'users githubType uri security', { lean: true })
+  return leanTroupeDao.findByIdRequired(troupeId, 'users githubType uri security')
     .then(function(troupe) {
       var users = troupe.users.reduce(function(memo, v) {
         memo[v.userId] = !!v.lurk;
@@ -482,6 +480,20 @@ function updateTopic(user, troupe, topic) {
     });
 }
 
+function toggleSearchIndexing(user, troupe, bool) {
+  return roomPermissionsModel(user, 'admin', troupe)
+    .then(function(access) {
+      if(!access) throw 403; /* Forbidden */
+
+      troupe.noindex = bool;
+
+      return troupe.saveQ()
+        .then(function() {
+          return troupe;
+        });
+    });
+}
+
 function updateTroupeLurkForUserId(userId, troupeId, lurk) {
   return findById(troupeId)
     .then(function(troupe) {
@@ -526,11 +538,8 @@ function findAllUserIdsForTroupes(troupeIds, callback) {
 }
 
 function findAllUserIdsForTroupe(troupeId) {
-
-  return persistence.Troupe.findByIdQ(troupeId, 'users', { lean: true })
+  return leanTroupeDao.findByIdRequired(troupeId, 'users')
     .then(function(troupe) {
-      if(!troupe) throw 404;
-
       return troupe.users.map(function(troupeUser) { return troupeUser.userId; });
     });
 }
@@ -635,6 +644,7 @@ module.exports = {
   findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe,
 
   updateTopic: updateTopic,
-  updateTroupeLurkForUserId: updateTroupeLurkForUserId
+  updateTroupeLurkForUserId: updateTroupeLurkForUserId,
+  toggleSearchIndexing: toggleSearchIndexing
 
 };

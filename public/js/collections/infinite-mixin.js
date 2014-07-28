@@ -18,6 +18,13 @@ define([
       return false;
     },
 
+    checkLimit: function(xhr) {
+      var limitReached = xhr.getResponseHeader('LimitReached') === 'true';
+      if (limitReached) {
+        this.trigger('limitReached');
+      }
+    },
+
     fetchLatest: function(options, callback, context) {
       var self = this;
       if(this.atBottom) return;
@@ -34,7 +41,7 @@ define([
         add: ('add' in options) ? options.add : true,
         merge: ('merge' in options) ? options.merge : true,
         data: data,
-        success: function(collection, response) {
+        success: function(collection, response, options) {
           delete self._isFetching;
           self.atBottom = true;
 
@@ -61,6 +68,7 @@ define([
           }
 
           self.trigger('scroll.fetch', 'previous');
+          self.checkLimit(options.xhr);
 
           if(callback) callback.call(context);
         },
@@ -91,7 +99,7 @@ define([
         add: ('add' in options) ? options.add : true,
         merge: ('merge' in options) ? options.merge : true,
         data: data,
-        success: function(collection, response) {
+        success: function(collection, response, options) {
           delete self._isFetching;
           if(response.length < loadLimit) {
             // NO MORE
@@ -100,6 +108,8 @@ define([
           self.trimBottom();
 
           self.trigger('scroll.fetch', 'previous');
+          self.checkLimit(options.xhr);
+
           if(callback) callback.call(context);
         },
         error: function(err) {
@@ -127,7 +137,7 @@ define([
         add: ('add' in options) ? options.add : true,
         merge: ('merge' in options) ? options.merge : true,
         data: data,
-        success: function(collection, response) {
+        success: function(collection, response, options) {
           delete self._isFetching;
           if(response.length < loadLimit) {
             // NO MORE
@@ -135,6 +145,8 @@ define([
           }
           self.trimTop();
           self.trigger('scroll.fetch', 'next');
+          self.checkLimit(options.xhr);
+
           if(callback) callback.call(context);
         },
         error: function(err) {
@@ -160,7 +172,7 @@ define([
         add: ('add' in options) ? options.add : true,
         merge: ('merge' in options) ? options.merge : true,
         data: data,
-        success: function(collection, response) {
+        success: function(collection, response, options) {
           delete self._isFetching;
 
           var responseIds = response.map(utils.idTransform);
@@ -183,6 +195,8 @@ define([
           self.trimBottom();
 
           self.trigger('scroll.fetch', 'marker');
+          self.checkLimit(options.xhr);
+
           if(callback) callback.call(context);
         },
         error: function(err) {

@@ -2,7 +2,7 @@
 "use strict";
 
 var Mirror = require("../../../services/github/github-mirror-service")('repo');
-var converter = require('../../../utils/process-chat');
+var processChat = require('../../../utils/process-chat-isolated');
 var util = require('util');
 var highlight = require('highlight.js');
 
@@ -12,20 +12,31 @@ module.exports = function(req, res, next) {
   var githubUri = 'repos/' + req.route.params[0];
   var mirror = new Mirror(req.user);
 
-  mirror.get(githubUri).then(function(ghResponse) {
-    if(req.query.renderMarkdown && ghResponse.body) {
-      ghResponse.body_html = converter(ghResponse.body).html;
-    }
-    if(req.query.renderPatchIfSingle && ghResponse.files && ghResponse.files.length === 1 && ghResponse.files[0].patch) {
-      ghResponse.files[0].patch_html = util.format('<pre><code>%s</code></pre>', highlight.highlight('diff', ghResponse.files[0].patch).value);
-    }
-    res.send(ghResponse);
-  }).fail(function(err) {
-    if(err.statusCode) {
-      res.send(err.statusCode);
-    } else {
-      next(err);
-    }
-  });
+  mirror.get(githubUri)
+    .then(function(ghResponse) {
+      if(req.query.renderMarkdown && ghResponse.body) {
+        return processChat(ghResponse.body)
+          .then(function(result) {
+            ghResponse.body_html = result.html;
+            return ghResponse;
+          });
+      }
+
+      // TODO: handle async processing of diffs
+      if(req.query.renderPatchIfSingle && ghResponse.files && ghResponse.files.length === 1 && ghResponse.files[0].patch) {
+        ghResponse.files[0].patch_html = util.format('<pre><code>%s</code></pre>', highlight.highlight('diff', ghResponse.files[0].patch).value);
+      }
+
+      return ghResponse;
+    })
+    .then(function(ghResponse) {
+      res.send(ghResponse);
+    }).fail(function(err) {
+      if(err.statusCode) {
+        res.send(err.statusCode);
+      } else {
+        next(err);
+      }
+    });
 
 };
