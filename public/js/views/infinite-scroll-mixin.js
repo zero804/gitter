@@ -25,8 +25,6 @@ define([
     beforeClose: function() {
       this.scroll.disable();
     }
-
-
   };
 
 });

@@ -14,7 +14,6 @@ var I18n           = require('i18n-2');
 // Naughty naughty naught, install some extra methods on the express prototype
 require('./http');
 
-
 var staticContentDir = path.join(__dirname, '..', '..', config.get('web:staticContent'));
 
 module.exports = {
@@ -32,7 +31,7 @@ module.exports = {
 
     app.locals({
       googleTrackingId: config.get("web:trackingId"),
-      minified: config.get('web:minified')
+      liveReload: config.get('web:liveReload')
     });
 
     app.engine('hbs', expressHbs.express3({
@@ -50,16 +49,11 @@ module.exports = {
       app.enable('view cache');
     }
 
-    if(config.get("logging:logStaticAccess")) {
-      app.use(env.middlewares.accessLogger);
-    }
-
     app.use(express.static(staticContentDir, {
       maxAge: config.get('web:staticContentExpiryDays') * 86400 * 1000
     }));
 
-    if(!config.get("logging:logStaticAccess")) {
-    }
+    app.use(env.middlewares.accessLogger);
 
     app.use(express.cookieParser());
     app.use(express.urlencoded());
@@ -67,26 +61,26 @@ module.exports = {
     app.use(express.methodOverride());
     app.use(require('./middlewares/ie6-post-caching'));
 
-    // TODO remove this by 9/May/2014
-    app.use(function(req, res, next) {
-      Object.keys(req.cookies).forEach(function(key) {
-        if(key.indexOf('optimizely') === 0) {
-          res.clearCookie(key);
-        }
-      });
-
-      next();
-    });
-
     I18n.expressBind(app, {
       locales: ['en', 'fr', 'ja', 'de', 'ru', 'es', 'zh', 'pt', 'it', 'nl', 'sv', 'cs', 'pl', 'da', 'ko'],
       devMode: config.runtimeEnvironment === 'dev',
       directory: path.join(__dirname, '..', '..', 'locales')
     });
 
+    /* Blanket Middlewares */
     app.use(function(req, res, next) {
+      /*  Setup i18n */
       if(req.i18n && req.i18n.prefLocale) {
         req.i18n.setLocale(req.i18n.prefLocale);
+      }
+
+      /* i18n stuff */
+      res.locals.locale = req.i18n;
+      res.locals.lang = req.i18n && req.i18n.locale || 'en';
+
+      /* Setup minify switch */
+      if(req.query.minified === '0') {
+        res.locals.minified = false;
       }
       next();
     });

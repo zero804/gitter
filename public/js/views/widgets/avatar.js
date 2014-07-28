@@ -18,7 +18,7 @@ define([
       'mouseover': 'showDetailIntent',
       'click':     'showDetail'
     },
-    initialize: function(options) {
+    initialize: function (options) {
       var self = this;
       this.user = options.user ? options.user : {};
       this.showEmail = options.showEmail || {};
@@ -27,6 +27,7 @@ define([
       this.avatarSize = options.size ? options.size : 's';
       this.showTooltip = options.showTooltip !== false;
       this.tooltipPlacement = options.tooltipPlacement || 'vertical';
+      // TODO: is it necessary to listen for updates to the invite status?
 
       // once this widget has the id of the user,
       // it will listen to changes on the global user collection,
@@ -81,7 +82,7 @@ define([
       UserPopoverView.singleton(this, popover);
     },
 
-    update: function() {
+    update: function () {
       var data = this.getRenderData();
       this.updatePresence(data);
       this.updateAvatar(data);
@@ -143,7 +144,8 @@ define([
         presenceClass: presenceClass,
         online: online,
         offline: !online,
-        role: user.role
+        role: user.role,
+        invited: user.invited
       };
     },
 

@@ -41,23 +41,18 @@ exports.serializeChatsForTroupe = function(troupeId, userId, options, cb) {
     limit: DEFAULT_CHAT_COUNT_LIMIT
   }, options);
 
-  var d = Q.defer();
-  var callback = d.makeNodeResolver();
-  d = d.promise.nodeify(cb);
+  return chatService.findChatMessagesForTroupe(troupeId, options)
+    .spread(function(chatMessages/*, limitReached*/) {
+      var strategy = new restSerializer.ChatStrategy({
+        notLoggedIn: !userId,
+        currentUserId: userId,
+        troupeId: troupeId
+      });
 
-  chatService.findChatMessagesForTroupe(troupeId, options, function(err, chatMessages) {
-    if(err) return callback(err);
+      return restSerializer.serialize(chatMessages, strategy);
+    })
+    .nodeify(cb);
 
-    var strategy = new restSerializer.ChatStrategy({
-      notLoggedIn: !userId,
-      currentUserId: userId,
-      troupeId: troupeId
-    });
-
-    restSerializer.serialize(chatMessages, strategy, callback);
-  });
-
-  return d;
 };
 
 exports.serializeUsersForTroupe = function(troupeId, userId, callback) {

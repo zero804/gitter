@@ -13,9 +13,7 @@ module.exports = {
     require('./test-data').install(app);
     require('./unawesome-browser').install(app);
     require('./unsubscribe').install(app);
-
+    require('./in-browser-tests').install(app);
     require('./robots').install(app);
-
-
   }
 };

@@ -90,9 +90,16 @@ exports.globalUserSearch = function(queryText, options, callback) {
 };
 
 exports.searchForUsers = function(userId, queryText, options, callback) {
+  var emptyResponse = {
+    hasMoreResults: undefined,
+    limit: 20,
+    skip: 0,
+    results: []
+  };
+
   return createRegExpsForQuery(queryText)
     .then(function(res) {
-      if(!res.length) return [];
+      if(!res.length) return emptyResponse;
 
       return troupeService.findAllTroupesIdsForUser(userId)
         .then(function(troupeIds) {
@@ -101,7 +108,7 @@ exports.searchForUsers = function(userId, queryText, options, callback) {
             troupeIds = troupeIds.filter(function(t) { return t != options.excludeTroupeId; } );
           }
 
-          if(!troupeIds.length) return [];
+          if(!troupeIds.length) return emptyResponse;
 
           return troupeService.findAllUserIdsForTroupes(troupeIds)
             .then(function(userIds) {
@@ -109,7 +116,7 @@ exports.searchForUsers = function(userId, queryText, options, callback) {
               // Remove the user doing the search
               userIds = userIds.filter(function(t) { return t != userId; } );
 
-              if(!userIds.length) return [];
+              if(!userIds.length) return emptyResponse;
 
               if(!options.excludeTroupeId) {
                 return searchForRegularExpressionsWithinUserIds(userIds, res, queryText, options);

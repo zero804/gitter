@@ -7,1551 +7,242 @@ var assert = require('assert');
 var Q = require('q');
 
 var mockito = require('jsmockito').JsMockito;
+var USER;
+var URI;
+var SECURITY;
+var repoPermissionsModelMock;
+var userBannedFromRoomMock;
+var orgPermissionsModelMock;
+var oneToOnePermissionsModelMock;
+var orgChannelPermissionsModelMock;
+var repoChannelPermissionsModelMock;
+var userChannelPermissionsModelMock;
+var permissionsModel;
+var permissionMocks;
+var fixtures;
+var delegate;
 
-function GitHubOrgServiceMocker() {
-  this.member = orgMemberMethodMock;
-}
 
-function GitHubRepoServiceMocker() {
-  this.getRepo = getRepoMethodMock;
-}
-
-var permissionsModel, orgMemberMethodMock, getRepoMethodMock, userIsInRoomMock;
-
-beforeEach(function() {
-  userIsInRoomMock = mockito.mockFunction();
-  orgMemberMethodMock = mockito.mockFunction();
-  getRepoMethodMock = mockito.mockFunction();
-  permissionsModel = testRequire.withProxies("./services/permissions-model", {
-    './github/github-repo-service': GitHubRepoServiceMocker,
-    './github/github-org-service': GitHubOrgServiceMocker,
-    './user-in-room': userIsInRoomMock
-  });
-});
+var RIGHTS = ['create', 'join', 'admin', 'adduser', 'view'];
+var ROOM_TYPES = ['REPO', 'ORG', 'ONETOONE', 'ORG_CHANNEL', 'REPO_CHANNEL', 'USER_CHANNEL'];
 
 describe('permissions-model', function() {
-  var user = { username: 'gitterbob' };
 
-  describe('ORGS', function() {
+  beforeEach(function() {
+    USER = { username: 'gitterbob' };
+    URI = 'uri';
+    SECURITY = 'SECURITAAAAAI'; // Always just passed through
+    userBannedFromRoomMock = mockito.mockFunction();
 
-    var roomType = 'ORG';
-    var security = null;
-    var uri = 'x';
+    permissionMocks = [
+      repoPermissionsModelMock = mockito.mockFunction(),
+      orgPermissionsModelMock = mockito.mockFunction(),
+      oneToOnePermissionsModelMock = mockito.mockFunction(),
+      orgChannelPermissionsModelMock = mockito.mockFunction(),
+      repoChannelPermissionsModelMock = mockito.mockFunction(),
+      userChannelPermissionsModelMock = mockito.mockFunction()
+    ];
 
-    // mock for each usergroup
-    var m = {
-      members: true,
-      not_members: false
+    fixtures = {
+      'REPO': repoPermissionsModelMock,
+      'ORG': orgPermissionsModelMock,
+      'ONETOONE': oneToOnePermissionsModelMock,
+      'ORG_CHANNEL': orgChannelPermissionsModelMock,
+      'REPO_CHANNEL': repoChannelPermissionsModelMock,
+      'USER_CHANNEL': userChannelPermissionsModelMock
     };
 
-    var rights = {
-      view: {
-        allowed:  ['members'],
-        denied:   ['not_members']
-      },
-      join: {
-        allowed:  ['members'],
-        denied:   ['not_members']
-      },
-      adduser: {
-        allowed:  ['members'],
-        denied:   ['not_members']
-      },
-      create: {
-        allowed:  ['members'],
-        denied:   ['not_members']
-      },
-      admin: {
-        allowed:  ['members'],
-        denied:   ['not_members']
-      }
-    };
-
-    Object.keys(rights).forEach(function(right) {
-
-      describe(right, function() {
-        rights[right].allowed.forEach(function(usergroup) {
-          it('should allow ' + usergroup, function(done) {
-
-            mockito.when(orgMemberMethodMock)().then(function(org) {
-              assert.equal(org, uri);
-              return Q.resolve(m[usergroup]);
-            });
-
-            return permissionsModel(user, right, uri, roomType, security)
-              .then(function(granted) {
-                assert(granted);
-              })
-              .nodeify(done);
-          });
-        });
-
-        rights[right].denied.forEach(function(usergroup) {
-          it('should deny ' + usergroup, function(done) {
-
-            mockito.when(orgMemberMethodMock)().then(function(org) {
-              assert.equal(org, uri);
-              return Q.resolve(m[usergroup]);
-            });
-
-            return permissionsModel(user, right, uri, roomType, security)
-              .then(function(granted) {
-                assert(!granted);
-              })
-              .nodeify(done);
-          });
-        });
-      });
-
+    permissionsModel = testRequire.withProxies("./services/permissions-model", {
+      './user-banned-from-room': userBannedFromRoomMock,
+      './permissions/repo-permissions-model': repoPermissionsModelMock,
+      './permissions/org-permissions-model': orgPermissionsModelMock,
+      './permissions/one-to-one-permissions-model': oneToOnePermissionsModelMock,
+      './permissions/org-channel-permissions-model': orgChannelPermissionsModelMock,
+      './permissions/repo-channel-permissions-model': repoChannelPermissionsModelMock,
+      './permissions/user-channel-permissions-model': userChannelPermissionsModelMock,
     });
 
   });
 
-  /*****************************************************************/
+  ROOM_TYPES.forEach(function(roomType) {
+    describe('Room type ' + roomType, function() {
+      setupRoomTypeTests(roomType);
+    });
+  });
 
-  describe('REPOs', function() {
+  describe('token rejection', function() {
+    beforeEach(function() {
+      mockito.when(userBannedFromRoomMock)().then(function() { return Q.resolve(false); });
+      mockito.when(orgPermissionsModelMock)().then(function() {
+        var error = new Error();
+        error.gitterAction = 'logout_destroy_user_tokens';
+        return Q.reject(error);
+      });
+    });
 
-    var roomType = 'REPO';
-    var uri = 'x/y';
-
-
-
-    describe('PRIVATE', function() {
-      var security = 'PRIVATE';
-
-      // mocks for each usergroup
-      var m = {
-        members: true,
-        not_members: false,
-        people_with_push_access: {permissions: {push: true}},
-        people_with_admin_access: {permissions: {admin: true}},
-        people_with_pull_access_only: {permissions: {pull: true}}
-      };
-
-      var rights = {
-        view: {
-          allowed:  ['members'],
-          denied:   ['not_members']
-        },
-        join: {
-          allowed:  ['members'],
-          denied:   ['not_members']
-        },
-        adduser: {
-          allowed:  ['members'],
-          denied:   ['not_members']
-        },
-        create: {
-          allowed:  ['people_with_push_access', 'people_with_admin_access'],
-          denied:   ['not_members', 'people_with_pull_access_only']
-        },
-        admin: {
-          allowed:  ['people_with_push_access', 'people_with_admin_access'],
-          denied:   ['not_members', 'people_with_pull_access_only']
+    it('destroys the user token', function(done) {
+      var user = {
+        username: 'gitterbob',
+        destroyTokens: function() {
+          done();
         }
       };
 
-      Object.keys(rights).forEach(function(right) {
-
-        describe(right, function() {
-          rights[right].allowed.forEach(function(usergroup) {
-            it('should allow ' + usergroup, function(done) {
-
-              mockito.when(getRepoMethodMock)().then(function(org) {
-                assert.equal(org, uri);
-                return Q.resolve(m[usergroup]);
-              });
-
-              return permissionsModel(user, right, uri, roomType, security)
-                .then(function(granted) {
-                  assert(granted);
-                })
-                .nodeify(done);
-            });
-          });
-
-          rights[right].denied.forEach(function(usergroup) {
-            it('should deny ' + usergroup, function(done) {
-
-              mockito.when(getRepoMethodMock)().then(function(org) {
-                assert.equal(org, uri);
-                return Q.resolve(m[usergroup]);
-              });
-
-              return permissionsModel(user, right, uri, roomType, security)
-                .then(function(granted) {
-                  assert(!granted);
-                })
-                .nodeify(done);
-            });
-          });
-        });
-
-      });
-
+      permissionsModel(user, 'join', 'uri', 'ORG', 'PUBLIC');
     });
 
-    describe('PUBLIC', function() {
-      var security = 'PUBLIC';
-
-      // mocks for each usergroup
-      var m = {
-        members: true,
-        not_members: false,
-        people_with_push_access: {permissions: {push: true}},
-        people_with_admin_access: {permissions: {admin: true}},
-        people_with_pull_access_only: {permissions: {pull: true}}
-      };
-
-      var rights = {
-        view: {
-          allowed:  ['members'],
-          denied:   []
-        },
-        join: {
-          allowed:  ['members'],
-          denied:   ['not_members']
-        },
-        adduser: {
-          allowed:  ['members'],
-          denied:   ['not_members']
-        },
-        create: {
-          allowed:  ['people_with_push_access', 'people_with_admin_access'],
-          denied:   ['not_members', 'people_with_pull_access_only']
-        },
-        admin: {
-          allowed:  ['people_with_push_access', 'people_with_admin_access'],
-          denied:   ['not_members', 'people_with_pull_access_only']
+    it('saves the destruction of the user token', function(done) {
+      var user = {
+        username: 'gitterbob',
+        destroyTokens: function() {},
+        saveQ: function() {
+          done();
         }
       };
 
-      Object.keys(rights).forEach(function(right) {
-
-        describe(right, function() {
-          rights[right].allowed.forEach(function(usergroup) {
-            it('should allow ' + usergroup, function(done) {
-
-              mockito.when(getRepoMethodMock)().then(function(org) {
-                assert.equal(org, uri);
-                return Q.resolve(m[usergroup]);
-              });
-
-              return permissionsModel(user, right, uri, roomType, security)
-                .then(function(granted) {
-                  assert(granted);
-                })
-                .nodeify(done);
-            });
-          });
-
-          rights[right].denied.forEach(function(usergroup) {
-            it('should deny ' + usergroup, function(done) {
-
-              mockito.when(getRepoMethodMock)().then(function(org) {
-                assert.equal(org, uri);
-                return Q.resolve(m[usergroup]);
-              });
-
-              return permissionsModel(user, right, uri, roomType, security)
-                .then(function(granted) {
-                  assert(!granted);
-                })
-                .nodeify(done);
-            });
-          });
-        });
-      });
-
-    });
-  });
-
-  /*****************************************************************/
-
-  describe('ONETOONE', function() {
-
-    var roomType = 'ONETOONE';
-    var security = null;
-    var uri = 'x';
-
-    describe('join', function() {
-      var right = 'join';
-
-      it('should allow', function(done) {
-        return permissionsModel(user, right, uri, roomType, security)
-          .then(function(granted) {
-            assert(granted);
-          })
-          .nodeify(done);
-      });
-
+      permissionsModel(user, 'join', 'uri', 'ORG', 'PUBLIC');
     });
 
-    describe('adduser', function() {
-      var right = 'adduser';
-
-      it('should deny', function(done) {
-        return permissionsModel(user, right, uri, roomType, security)
-          .then(function(granted) {
-            assert(!granted);
-          })
-          .nodeify(done);
-      });
-
-    });
-
-
-    describe('create', function() {
-      var right = 'create';
-
-      it('should allow', function(done) {
-        return permissionsModel(user, right, uri, roomType, security)
-          .then(function(granted) {
-            assert(granted);
-          })
-          .nodeify(done);
-      });
-
-    });
-
-    describe('admin', function() {
-      var right = 'admin';
-
-      it('should deny', function(done) {
-        return permissionsModel(user, right, uri, roomType, security)
-          .then(function(granted) {
-            assert(!granted);
-          })
-          .nodeify(done);
-      });
-
-    });
-
-  });
-
-  /*****************************************************************/
-
-  describe('ORG_CHANNEL', function() {
-    var roomType = 'ORG_CHANNEL';
-    var uri = 'x/custom';
-    var parentUri = 'x';
-
-    describe('PUBLIC', function() {
-
-      var security = 'PUBLIC';
-
-      // mock for each usergroup
-      var m = {
-        members: true,
-        not_members: false
-      };
-
-
-      var rights = {
-        view: {
-          allowed:  ['members'],
-          denied:   []
-        },
-        join: {
-          allowed:  ['members'],
-          denied:   []
-        },
-        adduser: {
-          allowed:  ['members'],
-          denied:   []
-        },
-        create: {
-          allowed:  ['members'],
-          denied:   ['not_members']
-        },
-        admin: {
-          allowed:  ['members'],
-          denied:   ['not_members']
+    it('destroys the optional github user token (if supplied)', function(done) {
+      var user = {
+        username: 'gitterbob',
+        destroyTokens: function() {
+          assert(false, 'user token should not be destroyed');
         }
       };
 
-      Object.keys(rights).forEach(function(right) {
+      var tokenUser = {
+        username: 'usemytokens',
+        destroyTokens: function() {
+          done();
+        }
+      };
 
-        describe(right, function() {
-          rights[right].allowed.forEach(function(usergroup) {
-            it('should allow ' + usergroup, function(done) {
-
-              mockito.when(orgMemberMethodMock)().then(function(org) {
-                assert.equal(org, parentUri);
-                return Q.resolve(m[usergroup]);
-              });
-
-              return permissionsModel(user, right, uri, roomType, security)
-                .then(function(granted) {
-                  assert(granted);
-                })
-                .nodeify(done);
-            });
-          });
-
-          rights[right].denied.forEach(function(usergroup) {
-            it('should deny ' + usergroup, function(done) {
-
-              mockito.when(orgMemberMethodMock)().then(function(org) {
-                assert.equal(org, parentUri);
-                return Q.resolve(m[usergroup]);
-              });
-
-              return permissionsModel(user, right, uri, roomType, security)
-                .then(function(granted) {
-                  assert(!granted);
-                })
-                .nodeify(done);
-            });
-          });
-        });
-      });
-
-
-
-      //describe('join', function() {
-      //  var right = 'join';
-
-      //  it('should allow', function(done) {
-
-      //    return permissionsModel(user, right, uri, roomType, security)
-      //      .then(function(granted) {
-      //        assert(granted);
-      //      })
-      //      .nodeify(done);
-      //  });
-
-      //});
-
-      //describe('adduser', function() {
-      //  var right = 'adduser';
-
-      //  it('should allow', function(done) {
-      //    return permissionsModel(user, right, uri, roomType, security)
-      //      .then(function(granted) {
-      //        assert(granted);
-      //      })
-      //      .nodeify(done);
-      //  });
-
-      //});
-
-
-
-      //describe('create', function() {
-      //  var right = 'create';
-
-      //  it('should allow for org members', function(done) {
-      //    mockito.when(orgMemberMethodMock)().then(function(org) {
-      //      assert.equal(org, parentUri);
-      //      return Q.resolve(true);
-      //    });
-
-      //    return permissionsModel(user, right, uri, roomType, security)
-      //      .then(function(granted) {
-      //        assert(granted);
-      //      })
-      //      .nodeify(done);
-      //  });
-
-      //  it('should deny for non org members', function(done) {
-      //    mockito.when(orgMemberMethodMock)().then(function(org) {
-      //      assert.equal(org, parentUri);
-      //      return Q.resolve(false);
-      //    });
-
-      //    return permissionsModel(user, right, uri, roomType, security)
-      //      .then(function(granted) {
-      //        assert(!granted);
-      //      })
-      //      .nodeify(done);
-      //  });
-
-      //});
-
-      //describe('admin', function() {
-      //  var right = 'admin';
-
-      //  it('should allow', function(done) {
-      //    mockito.when(orgMemberMethodMock)().then(function(org) {
-      //      assert.equal(org, parentUri);
-      //      return Q.resolve(true);
-      //    });
-
-      //    return permissionsModel(user, right, uri, roomType, security)
-      //      .then(function(granted) {
-      //        assert(granted);
-      //      })
-      //      .nodeify(done);
-      //  });
-
-      //  it('should deny', function(done) {
-      //    mockito.when(orgMemberMethodMock)().then(function(org) {
-      //      assert.equal(org, parentUri);
-      //      return Q.resolve(false);
-      //    });
-
-      //    return permissionsModel(user, right, uri, roomType, security)
-      //      .then(function(granted) {
-      //        assert(!granted);
-      //      })
-      //      .nodeify(done);
-      //  });
-
-      //});
-
-
+      permissionsModel(user, 'join', 'uri', 'ORG', 'PUBLIC', { githubTokenUser: tokenUser });
     });
 
-    describe('PRIVATE', function() {
+    it('saves the destruction of the optional github user token (if supplied)', function(done) {
+      var user = {
+        username: 'gitterbob',
+        destroyTokens: function() {
+          assert(false, 'user token should not be destroyed');
+        }
+      };
 
-      var security = 'PRIVATE';
+      var tokenUser = {
+        username: 'usemytokens',
+        destroyTokens: function() {},
+        saveQ: function() {
+          done();
+        }
+      };
 
-      describe('join', function() {
-        var right = 'join';
-
-        it('should allow somebody already in the room', function(done) {
-          mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
-            assert.equal(pUri, uri);
-            assert.equal(pUser, user);
-            return Q.resolve(true);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny somebody not already in the room', function(done) {
-          mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
-            assert.equal(pUri, uri);
-            assert.equal(pUser, user);
-            return Q.resolve(false);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-      describe('adduser', function() {
-        var right = 'adduser';
-
-        it('should allow org members in the room to add', function(done) {
-          mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
-            assert.equal(pUri, uri);
-            assert.equal(pUser, user);
-            return Q.resolve(true);
-          });
-
-          mockito.when(orgMemberMethodMock)().then(function(org) {
-            assert.equal(org, parentUri);
-            return Q.resolve(true);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny org members not in the room to add', function(done) {
-          mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
-            assert.equal(pUri, uri);
-            assert.equal(pUser, user);
-            return Q.resolve(false);
-          });
-
-          mockito.when(orgMemberMethodMock)().then(function(org) {
-            assert.equal(org, parentUri);
-            return Q.resolve(true);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-
-        it('should deny non org members add', function(done) {
-
-          mockito.when(orgMemberMethodMock)().then(function(org) {
-            assert.equal(org, parentUri);
-            return Q.resolve(false);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-      describe('create', function() {
-        var right = 'create';
-
-        it('should allow for org members', function(done) {
-          mockito.when(orgMemberMethodMock)().then(function(org) {
-            assert.equal(org, parentUri);
-            return Q.resolve(true);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny for non org members', function(done) {
-          mockito.when(orgMemberMethodMock)().then(function(org) {
-            assert.equal(org, parentUri);
-            return Q.resolve(false);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-      describe('admin', function() {
-        var right = 'admin';
-
-        it('should allow org members', function(done) {
-          mockito.when(orgMemberMethodMock)().then(function(org) {
-            assert.equal(org, parentUri);
-            return Q.resolve(true);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny non org members', function(done) {
-          mockito.when(orgMemberMethodMock)().then(function(org) {
-            assert.equal(org, parentUri);
-            return Q.resolve(false);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-
+      permissionsModel(user, 'join', 'uri', 'ORG', 'PUBLIC', { githubTokenUser: tokenUser });
     });
-
-    describe('INHERITED', function() {
-      var security = 'INHERITED';
-
-      describe('join', function() {
-        var right = 'join';
-
-        it('should allow org members', function(done) {
-          mockito.when(orgMemberMethodMock)().then(function(org) {
-            assert.equal(org, parentUri);
-            return Q.resolve(true);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny non org members', function(done) {
-          mockito.when(orgMemberMethodMock)().then(function(org) {
-            assert.equal(org, parentUri);
-            return Q.resolve(false);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-      describe('adduser', function() {
-        var right = 'adduser';
-
-        it('should allow org members to add', function(done) {
-          mockito.when(orgMemberMethodMock)().then(function(org) {
-            assert.equal(org, parentUri);
-            return Q.resolve(true);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-
-        it('should deny non org members add', function(done) {
-          mockito.when(orgMemberMethodMock)().then(function(org) {
-            assert.equal(org, parentUri);
-            return Q.resolve(false);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-      describe('create', function() {
-        var right = 'create';
-
-        it('should allow for org members', function(done) {
-          mockito.when(orgMemberMethodMock)().then(function(org) {
-            assert.equal(org, parentUri);
-            return Q.resolve(true);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny for non org members', function(done) {
-          mockito.when(orgMemberMethodMock)().then(function(org) {
-            assert.equal(org, parentUri);
-            return Q.resolve(false);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-      describe('admin', function() {
-        var right = 'admin';
-
-        it('should allow org members', function(done) {
-          mockito.when(orgMemberMethodMock)().then(function(org) {
-            assert.equal(org, parentUri);
-            return Q.resolve(true);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny non org members', function(done) {
-          mockito.when(orgMemberMethodMock)().then(function(org) {
-            assert.equal(org, parentUri);
-            return Q.resolve(false);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-
-    });
-  });
-
-  /*****************************************************************/
-
-  describe('REPO_CHANNEL', function() {
-    var roomType = 'REPO_CHANNEL';
-    var uri = 'x/custom';
-    var parentUri = 'x';
-
-    describe('PUBLIC', function() {
-
-      var security = 'PUBLIC';
-
-      describe('join', function() {
-        var right = 'join';
-
-        it('should allow', function(done) {
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-      describe('adduser', function() {
-        var right = 'adduser';
-
-        it('should allow', function(done) {
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-
-      describe('create', function() {
-        var right = 'create';
-
-        it('should allow for repo push members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve({ permissions: { push: true } });
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should allow for repo admin members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve({ permissions: { admin: true } });
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny for repo pull members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve({ permissions: { pull: true } });
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny for non repo members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve(null);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-      describe('admin', function() {
-        var right = 'admin';
-
-        it('should allow for repo push members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve({ permissions: { push: true } });
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should allow for repo admin members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve({ permissions: { admin: true } });
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny for repo pull members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve({ permissions: { pull: true } });
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny for non repo members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve(null);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-      });
-
-    });
-
-    describe('PRIVATE', function() {
-      var security = 'PRIVATE';
-
-      describe('join', function() {
-        var right = 'join';
-
-        it('should allow somebody already in the room', function(done) {
-          mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
-            assert.equal(pUri, uri);
-            assert.equal(pUser, user);
-            return Q.resolve(true);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny somebody not already in the room', function(done) {
-          mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
-            assert.equal(pUri, uri);
-            assert.equal(pUser, user);
-            return Q.resolve(false);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-      describe('adduser', function() {
-        var right = 'adduser';
-
-        it('should allow repo members in the room to add', function(done) {
-          mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
-            assert.equal(pUri, uri);
-            assert.equal(pUser, user);
-            return Q.resolve(true);
-          });
-
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve(true);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny repo members not in the room to add', function(done) {
-          mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
-            assert.equal(pUri, uri);
-            assert.equal(pUser, user);
-            return Q.resolve(false);
-          });
-
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve(true);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-
-        it('should deny non repo members add', function(done) {
-
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve(false);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-      describe('create', function() {
-        var right = 'create';
-
-        it('should allow for repo admin members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve({ permissions: { admin: true } });
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should allow for repo push members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve({ permissions: { push: true } });
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-
-        it('should deny for repo pull members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve({ permissions: { pull: true } });
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny for non repo members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve();
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-      describe('admin', function() {
-        var right = 'admin';
-
-        it('should allow repo admin members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve({ permissions: { admin: true } });
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should allow repo push members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve({ permissions: { push: true } });
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-
-        it('should deny repo pull members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve({ permissions: { pull: true } });
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny non repo members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve();
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-    });
-
-    describe('INHERITED', function() {
-      var security = 'INHERITED';
-
-      describe('join', function() {
-        var right = 'join';
-
-        it('should allow repo members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve({ permissions: { pull: true } });
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny non repo members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve(null);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-      describe('adduser', function() {
-        var right = 'adduser';
-
-        it('should allow repo members to add', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve({ permissions: { pull: true } });
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-
-        it('should deny non repo members add', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve();
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-      describe('create', function() {
-        var right = 'create';
-
-        it('should allow for repo admin members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve({ permissions: { admin: true } });
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should allow for repo push members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve({ permissions: { push: true } });
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny for repo pull members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve({ permissions: { pull: true } });
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny for non repo members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve();
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-      describe('admin', function() {
-        var right = 'admin';
-
-
-        it('should allow for repo admin members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve({ permissions: { admin: true } });
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should allow for repo push members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve({ permissions: { push: true } });
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny for repo pull members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve({ permissions: { pull: true } });
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny for non repo members', function(done) {
-          mockito.when(getRepoMethodMock)().then(function(repo) {
-            assert.equal(repo, parentUri);
-            return Q.resolve();
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-
-    });
-  });
-
-  /*****************************************************************/
-
-  describe('USER_CHANNEL', function() {
-    var roomType = 'USER_CHANNEL';
-    var uri = 'gitterclare/custom';
-    var user2 = { username: 'gitterclare' };
-
-    describe('PUBLIC', function() {
-      var security = 'PUBLIC';
-
-      describe('join', function() {
-        var right = 'join';
-
-        it('should allow', function(done) {
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-      describe('adduser', function() {
-        var right = 'adduser';
-
-
-        it('should allow', function(done) {
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-
-      describe('create', function() {
-        var right = 'create';
-
-        it('should allow for the owner', function(done) {
-          return permissionsModel(user2, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny for non owner', function(done) {
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-      describe('admin', function() {
-        var right = 'admin';
-
-        it('should allow for the owner', function(done) {
-          return permissionsModel(user2, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny for non owner', function(done) {
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-      });
-
-
-    });
-
-    describe('PRIVATE', function() {
-      var security = 'PRIVATE';
-
-      describe('join', function() {
-        var right = 'join';
-
-        it('should allow people already in the room', function(done) {
-          mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
-            assert.equal(pUri, uri);
-            assert.equal(pUser, user);
-            return Q.resolve(true);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny people not already in the room', function(done) {
-          mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
-            assert.equal(pUri, uri);
-            assert.equal(pUser, user);
-            return Q.resolve(false);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-      describe('adduser', function() {
-        var right = 'adduser';
-
-        it('should allow for the owner', function(done) {
-          return permissionsModel(user2, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should allow for somebody in the room', function(done) {
-          mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
-            assert.equal(pUri, uri);
-            assert.equal(pUser, user);
-            return Q.resolve(true);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-
-        it('should deny somebody not in the room', function(done) {
-          mockito.when(userIsInRoomMock)().then(function(pUri, pUser) {
-            assert.equal(pUri, uri);
-            assert.equal(pUser, user);
-            return Q.resolve(false);
-          });
-
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-      });
-
-
-      describe('create', function() {
-        var right = 'create';
-
-        it('should allow for the owner', function(done) {
-          return permissionsModel(user2, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny for non owner', function(done) {
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-
-      });
-
-      describe('admin', function() {
-        var right = 'admin';
-
-        it('should allow for the owner', function(done) {
-          return permissionsModel(user2, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(granted);
-            })
-            .nodeify(done);
-        });
-
-        it('should deny for non owner', function(done) {
-          return permissionsModel(user, right, uri, roomType, security)
-            .then(function(granted) {
-              assert(!granted);
-            })
-            .nodeify(done);
-        });
-      });
-
-
-
-    });
-
 
   });
 
+  it('passes options through', function(done) {
+    mockito.when(userBannedFromRoomMock)().then(function() { return Q.resolve(false); });
+    mockito.when(orgPermissionsModelMock)().then(function(user, right, uri, security, options) {
+      assert.equal(options.someoption, 'iamhere');
+      done();
+    });
+
+    permissionsModel({}, 'join', 'uri', 'ORG', 'PUBLIC', { someoption: 'iamhere' });
+  });
 
 });
+
+function setupRoomTypeTests(roomType) {
+  beforeEach(function() {
+    // Stop the other mocks from being called
+    permissionMocks.filter(function(m) { return m !== delegate; }).forEach(function(mock) {
+      mockito.when(mock)().then(function() {
+        assert(false, 'Unexpected call to mock ' + mock);
+      });
+    });
+  });
+
+  describe('non banned', function() {
+
+    beforeEach(function() {
+      delegate = fixtures[roomType];
+
+      // Stop the other mocks from being called
+      permissionMocks.filter(function(m) { return m !== delegate; }).forEach(function(mock) {
+        mockito.when(mock)().then(function() {
+          assert(false, 'Unexpected call to mock ' + mock);
+        });
+      });
+
+      mockito.when(userBannedFromRoomMock)().then(function(uri, user) {
+        assert.strictEqual(uri, URI);
+        assert.strictEqual(user, USER);
+
+        return Q.resolve(false);
+      });
+    });
+
+    [true, false].forEach(function(allowAccess) {
+      describe(allowAccess ? 'Access allowed' : 'Access denied', function() {
+
+        RIGHTS.forEach(function(right) {
+
+          it('should pass the request to the underlying model for ' + right, function(done) {
+            mockito.when(delegate)().then(function(user, iRight, uri, security) {
+              assert.strictEqual(uri, URI);
+              assert.strictEqual(user, USER);
+              assert.strictEqual(iRight, right);
+              assert.strictEqual(security, SECURITY);
+
+              return Q.resolve(allowAccess);
+            });
+
+            permissionsModel(USER, right, URI, roomType, SECURITY)
+              .then(function(result) {
+                assert.strictEqual(result, allowAccess);
+              })
+              .nodeify(done);
+          });
+        });
+
+
+      });
+
+    });
+
+
+  });
+
+  describe('banned', function() {
+    beforeEach(function() {
+      // Stop the mocks from being called
+      permissionMocks.forEach(function(mock) {
+        mockito.when(mock)().then(function() {
+          assert(false, 'Unexpected call to mock ' + mock);
+        });
+      });
+
+      mockito.when(userBannedFromRoomMock)().then(function(uri, user) {
+        assert.strictEqual(uri, URI);
+        assert.strictEqual(user, USER);
+
+        return Q.resolve(true);
+      });
+
+    });
+
+    RIGHTS.forEach(function(right) {
+      it('should not allow a banned user to ' + right, function(done) {
+        permissionsModel(USER, right, URI, roomType, SECURITY)
+          .then(function(result) {
+            assert.strictEqual(result, false);
+          })
+          .nodeify(done);
+      });
+    });
+
+  });
+
+}

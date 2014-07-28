@@ -25,17 +25,23 @@ module.exports = {
         userId: userId
     };
 
-    chatService.findChatMessagesForTroupe(req.troupe.id, options, function(err, chatMessages) {
-      if(err) return next(err);
+    return chatService.findChatMessagesForTroupe(req.troupe.id, options)
+      .spread(function(chatMessages, limitReached) {
+        var userId = req.user && req.user.id;
 
-      var userId = req.user && req.user.id;
+        var strategy = new restSerializer.ChatStrategy({ currentUserId: userId, troupeId: req.troupe.id });
 
-      var strategy = new restSerializer.ChatStrategy({ currentUserId: userId, troupeId: req.troupe.id });
-      restSerializer.serialize(chatMessages, strategy, function(err, serialized) {
-        if(err) return next(err);
-        res.send(serialized);
-      });
-    });
+        return restSerializer.serialize(chatMessages, strategy)
+          .then(function(serialized) {
+            if(limitReached) {
+              res.set('LimitReached', 'true');
+            }
+
+            res.send(serialized);
+          });
+      })
+      .fail(next);
+
   },
 
   create: function(req, res, next) {

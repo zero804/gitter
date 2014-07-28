@@ -1,5 +1,3 @@
-/*jslint node: true */
-/*global describe:true, it: true, before:false, after:false */
 "use strict";
 
 var testRequire = require('./test-require');
@@ -10,22 +8,31 @@ var restSerializer = testRequire('./serializers/rest-serializer');
 var assert = require("assert");
 var fixtureLoader = require('./test-fixtures');
 
-var fixture = {};
 
 describe('restSerializer', function() {
+
+  var blockTimer = require('./block-timer');
+  before(blockTimer.on);
+  after(blockTimer.off);
+
+  var fixture = {};
+  before(fixtureLoader(fixture, {
+    user1: {},
+    troupe1: {users: ['user1']}
+  }));
+  after(function() { fixture.cleanup(); });
+
   describe('#UserStrategy()', function() {
 
     var userStrategy = new restSerializer.UserStrategy();
 
     it('should serialize a user ', function(done) {
-
       var users = [fixture.user1];
       restSerializer.serialize(users, userStrategy, function(err, serialized) {
         if(err) return done(err);
         assert(serialized);
         done();
       });
-
     });
 
     it('should return the correct display name', function() {
@@ -34,8 +41,5 @@ describe('restSerializer', function() {
     });
 
   });
-
-  before(fixtureLoader(fixture));
-  after(function() { fixture.cleanup(); });
 
 });

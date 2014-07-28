@@ -88,7 +88,7 @@ module.exports = exports = function processChat(text) {
       return renderer[githubData.type](githubData.repo, githubData.id, githubData.text);
     } else {
       urls.push({ url: href });
-      return util.format('<a href="%s" rel="nofollow" target="_blank" class="link">%s</a>', href, text);  
+      return util.format('<a href="%s" rel="nofollow" target="_blank" class="link">%s</a>', href, text);
     }
   };
 
@@ -111,6 +111,18 @@ module.exports = exports = function processChat(text) {
     urls.push({ url: href });
     return util.format('<a href="%s" rel="nofollow">%s</a>', href, text);
   };
+
+
+  renderer.heading = function(text, level, raw) {
+    return '<h'
+      + level
+      + '>'
+      + text
+      + '</h'
+      + level
+      + '>\n';
+  };
+
 
   var tokens = lexer.lex(text);
 

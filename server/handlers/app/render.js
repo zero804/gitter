@@ -1,16 +1,15 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
-
 var nconf             = require('../../utils/config');
 var Q                 = require('q');
 var contextGenerator  = require('../../web/context-generator');
 var restful           = require('../../services/restful');
-var languageSelector  = require('../../web/language-selector');
+var UserService       = require('../../services/user-service');
 var appVersion        = require('../../web/appVersion');
 var burstCalculator   = require('../../utils/burst-calculator');
 
 /* How many chats to send back */
-var INITIAL_CHAT_COUNT = 30;
+var INITIAL_CHAT_COUNT = 50;
 
 var stagingText, stagingLink;
 
@@ -59,10 +58,7 @@ function renderHomePage(req, res, next) {
       troupeName: req.uriContext.uri,
       troupeContext: troupeContext,
       agent: req.headers['user-agent'],
-      lang: languageSelector(req),
-      locale: req.i18n,
       isUserhome: true,
-      liveReload: nconf.get('web:liveReload')
     });
   });
 }
@@ -88,11 +84,8 @@ function renderMainFrame(req, res, next, frame) {
         troupeContext: troupeContext,
         chatAppLocation: chatAppLocation,
         agent: req.headers['user-agent'],
-        lang: languageSelector(req),
         stagingText: stagingText,
         stagingLink: stagingLink,
-        locale: req.i18n,
-        liveReload: nconf.get('web:liveReload')
       });
     })
     .fail(next);
@@ -127,9 +120,6 @@ function renderChatPage(req, res, next) {
         troupeContext: troupeContext,
         chats: burstCalculator(chats),
         agent: req.headers['user-agent'],
-        lang: languageSelector(req),
-        locale: req.i18n,
-        liveReload: nconf.get('web:liveReload')
       });
 
     })
@@ -147,9 +137,6 @@ function renderMobileUserHome(req, res, next) {
       troupeContext: troupeContext,
       agent: req.headers['user-agent'],
       isUserhome: true,
-      lang: languageSelector(req),
-      locale: req.i18n,
-      liveReload: nconf.get('web:liveReload')
     });
   });
 }
@@ -174,9 +161,6 @@ function renderMobileChat(req, res, next) {
         troupeContext: troupeContext,
         chats: burstCalculator(chats),
         agent: req.headers['user-agent'],
-        lang: languageSelector(req),
-        locale: req.i18n,
-        liveReload: nconf.get('web:liveReload')
       });
 
     })
@@ -232,9 +216,7 @@ function renderMobileNotLoggedInChat(req, res, next) {
         troupeFavourite: troupeContext.troupe.favourite,
         troupeContext: troupeContext,
         chats: burstCalculator(chats),
-        agent: req.headers['user-agent'],
-        lang: languageSelector(req),
-        locale: req.i18n
+        agent: req.headers['user-agent']
       });
 
     })
@@ -248,7 +230,7 @@ function renderNotLoggedInChatPage(req, res, next) {
   Q.all([
     contextGenerator.generateTroupeContext(req),
     restful.serializeChatsForTroupe(troupe.id, null, { limit: INITIAL_CHAT_COUNT })
-    ]).spread(function(troupeContext, chats) {
+    ]).spread(function (troupeContext, chats) {
 
       var githubLink;
 
@@ -265,13 +247,56 @@ function renderNotLoggedInChatPage(req, res, next) {
         troupeTopic: troupeContext.troupe.topic,
         troupeContext: troupeContext,
         chats: burstCalculator(chats),
-        agent: req.headers['user-agent'],
-        lang: languageSelector(req),
-        locale: req.i18n
+        agent: req.headers['user-agent']
       });
 
     })
     .fail(next);
+}
+
+/**
+ * renderUserNotSignedUp() renders a set template for a 1:1 chat, with an invited user.
+ */
+function renderUserNotSignedUp(req, res, next) {
+
+  UserService.findByUsername(req.params.roomPart1)
+    .then(function (user) {
+      res.render('one-to-one-invited', {
+        appCache: getAppCache(req),
+        agent: req.headers['user-agent'],
+        invitedUser: user,
+        troupeName: user.username,
+        shareURL: nconf.get('web:basepath') + '/' + req.user.username
+      });
+    })
+    .fail(next);
+}
+
+function renderUserNotSignedUpMainFrame(req, res, next, frame) {
+  contextGenerator.generateNonChatContext(req)
+    .then(function(troupeContext) {
+      var chatAppLocation = '/' + req.params.roomPart1 + '/~' + frame + '#initial';
+
+      var template, bootScriptName;
+      if(req.user) {
+        template = 'app-template';
+        bootScriptName = 'router-app';
+      } else {
+        template = 'app-nli-template';
+        bootScriptName = 'router-nli-app';
+      }
+
+      res.render(template, {
+        appCache: getAppCache(req),
+        bootScriptName: bootScriptName,
+        troupeName: req.params.roomPart1,
+        troupeContext: troupeContext,
+        chatAppLocation: chatAppLocation,
+        agent: req.headers['user-agent'],
+        stagingText: stagingText,
+        stagingLink: stagingLink,
+      });
+    }).fail(next);
 }
 
 
@@ -284,5 +309,7 @@ module.exports = exports = {
   renderMobileNotLoggedInChat: renderMobileNotLoggedInChat,
   renderNotLoggedInChatPage: renderNotLoggedInChatPage,
   renderMobileNativeChat: renderMobileNativeChat,
-  renderMobileNativeUserhome: renderMobileNativeUserhome
+  renderMobileNativeUserhome: renderMobileNativeUserhome,
+  renderUserNotSignedUp: renderUserNotSignedUp,
+  renderUserNotSignedUpMainFrame: renderUserNotSignedUpMainFrame
 };

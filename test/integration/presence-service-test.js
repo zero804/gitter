@@ -1,5 +1,3 @@
-/*jslint node: true */
-/*global describe:true, it: true, beforeEach:true, afterEach:true */
 "use strict";
 
 var testRequire     = require('./test-require');
@@ -16,6 +14,7 @@ var fakeEngine = {
 };
 
 describe('presenceService', function() {
+
   function cleanup(done) {
     presenceService.collectGarbage(fakeEngine, function(err) {
       if(err) return done(err);
@@ -30,18 +29,17 @@ describe('presenceService', function() {
   beforeEach(cleanup);
   afterEach(cleanup);
 
+  var blockTimer = require('./block-timer');
+  before(blockTimer.on);
+  after(blockTimer.off);
+
   it('should cleanup invalid sockets correctly', function(done) {
+    presenceService.listOnlineUsers()
+      .then(function(users) {
+        var noTestUsersOnline = users.length === 0 || users.every(function(id) { return !id.match(/^TEST/); });
 
-    presenceService.listOnlineUsers(function(err, users) {
-      if(err) return done(err);
-
-      var noTestUsersOnline = users.length === 0 || users.every(function(id) { return !id.match(/^TEST/); });
-
-      assert(noTestUsersOnline, 'Garbage collection does not seem to have run correctly ' + users.join(', '));
-
-      done();
-    });
-
+        assert(noTestUsersOnline, 'Garbage collection does not seem to have run correctly ' + users.join(', '));
+      }).nodeify(done);
   });
 
   it('should allow a user to connect', function(done) {

@@ -1,5 +1,9 @@
 <!doctype html>
-<html lang="en" {{#if appCache}}manifest="{{appCache}}"{{/if}}>
+{{#if appCache}}
+<html lang="en" manifest="{{appCache}}">
+{{else}}
+<html lang="en">
+{{/if}}
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no"/>
   <meta name="format-detection" content="telephone=no" />
@@ -27,11 +31,6 @@
   <div id="mainPage">
     <div id="content">
       <div class="contentBody mobile-scroll-class" id="content-frame">
-        <div class="frame-chat">
-          <div class="trpChatPanel" id="chat-frame">
-            <div class="chatPanel" id="frame-chat"></div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -39,7 +38,7 @@
   </div>
 
   {{>require_wrapper}}
-  {{{bootScript "mobile-native-chat" appcache=appCache }}}
+  {{{ bootScript "mobile-native-chat" appcache=appCache }}}
 
 </body>
 </html>
