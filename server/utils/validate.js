@@ -3,20 +3,19 @@
 
 var Q = require('q');
 var winston = require('./winston');
+var StatusError = require('statuserror');
 
 var m = {
   expect: function(value, message) {
     if(!value) {
       winston.warn('failed-validation:' + message);
-      console.trace();
-      throw 400;
+      throw new StatusError(400, message);
     }
   },
 
   fail: function(message) {
     winston.warn('failed-validation:' + message);
-    console.trace();
-    throw 400;
+    throw new StatusError(400, message);
   },
 };
 
