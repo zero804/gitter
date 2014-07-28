@@ -75,7 +75,8 @@
     "tough-cookie": "^0.12.1",
     "emailify": "~0.0.2",
     "email-validator": "^1.0.0",
-    "worker-farm": "^0.3.1"
+    "worker-farm": "^0.3.1",
+    "htmlencode": "0.0.4"
   },
   "devDependencies": {
     "better-assert": "1.0.0",

@@ -6,6 +6,9 @@ var stats         = env.stats;
 var workerFarm    = require('worker-farm');
 var shutdown      = require('shutdown');
 var Q             = require('q');
+var StatusError   = require('statuserror');
+var htmlencode    = require('htmlencode');
+
 var farm;
 
 function startWorkerFarm() {
@@ -33,7 +36,19 @@ function processChatIsolated(text, callback) {
       stats.event('markdown.failure');
 
       if(err.type === 'TimeoutError') {
-        errorReporter(new Error("Markdown processing failed"), { text: text });
+        var newError = new StatusError(500, "Markdown processing failed");
+        errorReporter(newError, { text: text });
+
+        var html = htmlencode.htmlEncode(text);
+        html = html.replace(/\n|&#10;/g,'<br>');
+        return {
+          text: text,
+          html: html,
+          urls: [],
+          mentions: [],
+          issues: [],
+          markdownProcessingFailed: true
+        };
       }
       throw err;
     })

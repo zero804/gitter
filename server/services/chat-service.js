@@ -21,7 +21,7 @@ var _             = require('underscore');
  * Hey Trouper!
  * Bump the version if you modify the behaviour of TwitterText.
  */
-var VERSION_INITIAL; /* = undefined; All previous versions are null due to a bug */
+// var VERSION_INITIAL; /* = undefined; All previous versions are null due to a bug */
 var VERSION_SWITCH_TO_SERVER_SIDE_RENDERING = 5;
 var MAX_CHAT_MESSAGE_LENGTH = 4096;
 
@@ -81,7 +81,8 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
       chatMessage.urls      = parsedMessage.urls;
       chatMessage.mentions  = mentions;
       chatMessage.issues    = parsedMessage.issues;
-      chatMessage._md       = CURRENT_META_DATA_VERSION;
+      chatMessage._md       = parsedMessage.markdownProcessingFailed ?
+                                -CURRENT_META_DATA_VERSION : CURRENT_META_DATA_VERSION;
 
       return chatMessage.saveQ()
         .then(function() {
@@ -154,7 +155,9 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
       chatMessage.urls      = parsedMessage.urls;
       chatMessage.mentions  = parsedMessage.mentions;
       chatMessage.issues    = parsedMessage.issues;
-      chatMessage._md       = CURRENT_META_DATA_VERSION;
+      chatMessage._md       = parsedMessage.markdownProcessingFailed ?
+                                -CURRENT_META_DATA_VERSION : CURRENT_META_DATA_VERSION;
+
 
       return chatMessage.saveQ()
         .thenResolve(chatMessage);
