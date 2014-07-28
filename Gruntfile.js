@@ -79,15 +79,6 @@ var MODULES = [
       exclude: ["core-libraries"]
   },
   {
-      name: "mobile-native-router",
-      include: [
-        "utils/tracking",
-        "views/widgets/avatar",
-        "views/widgets/timeago"
-      ],
-      exclude: ["core-libraries"]
-  },
-  {
       name: "mobile-native-chat",
       include: [
         "utils/tracking",
