@@ -15,9 +15,6 @@
     .boxhack;
   }
 
-  /* vars */
-  @menu-width: 250px;
-  
   /* visibility */
   display: inline-block;
   overflow: hidden;
@@ -25,12 +22,12 @@
   /* positioning */
   z-index: @l10;
   position: fixed;
-  left: 0em;
-  top: 0em;
-  margin-top: 0px;
+  left: 0;
+  top: 0;
+  margin-top: 0;
 
   /* dimensions */
-  width: @menu-width;
+  width: 250px;
   height: 100%;
   padding: 0;
 
@@ -73,7 +70,7 @@
 
     &.visible {
       transition-delay: 0.3s;
-      left: 0px;
+      left: 0;
     }
   }
 
