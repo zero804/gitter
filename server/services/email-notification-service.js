@@ -118,7 +118,7 @@ module.exports = {
               templateFile: "added_to_room",
               from: senderName + ' <support@gitter.im>',
               to: email,
-              subject: '[' + room.uri + '] Join the chat on Gitter',
+              subject: '[' + room.uri + '] You\'ve been added to a new room on Gitter',
               data: {
                 roomUri: room.uri,
                 roomUrl: config.get("email:emailBasePath") + '/' + room.uri,
