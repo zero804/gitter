@@ -199,10 +199,6 @@ function massageMessages(message) {
   return message;
 }
 
-/**
- * Returns a promise of
- * [ messages, limitReached]
- */
 exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
   return roomCapabilities.getMaxHistoryMessageDate(troupeId)
     .then(function(maxHistoryDate) {
@@ -232,7 +228,7 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
         });
     })
     .spread(function(results, maxHistoryDate) {
-      if (!maxHistoryDate) return [results, false];
+      if (!maxHistoryDate) return callback(null, results, false);
 
       var q = persistence.ChatMessage
               .where('toTroupeId', troupeId)
@@ -240,14 +236,15 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
               .where('sent')
               .lte(maxHistoryDate);
 
-      return [results, q.execQ()];
+      return q.execQ().then(function(_results) {
+        var limitReached = _results.length !== 0;
+        callback(null, results, limitReached);
+      });
     })
-    .spread(function(results, _results) {
-      // TODO: consider if there's a better way of handling this...
-      var limitReached = _results.length !== 0;
-      return [results, limitReached];
-    })
-    .nodeify(callback);
+    .fail(function(err) {
+      callback(err);
+    });
+    //.nodeify(callback)
 };
 
 exports.findChatMessagesForTroupeForDateRange = function(troupeId, startDate, endDate) {

@@ -35,18 +35,23 @@ exports.serializeChatsForTroupe = function(troupeId, userId, options, cb) {
 
   if(!options) options = {};
 
-  return chatService.findChatMessagesForTroupe(troupeId, { skip: options.skip || 0, limit: options.limit || DEFAULT_CHAT_COUNT_LIMIT, sort: options.sort })
-    .spread(function(chatMessages/*, limitReached*/) {
-      var strategy = new restSerializer.ChatStrategy({
-        notLoggedIn: !userId,
-        currentUserId: userId,
-        troupeId: troupeId
-      });
+  var d = Q.defer();
+  var callback = d.makeNodeResolver();
+  d = d.promise.nodeify(cb);
 
-      return restSerializer.serialize(chatMessages, strategy);
-    })
-    .nodeify(cb);
+  chatService.findChatMessagesForTroupe(troupeId, { skip: options.skip || 0, limit: options.limit || DEFAULT_CHAT_COUNT_LIMIT, sort: options.sort }, function(err, chatMessages) {
+    if(err) return callback(err);
 
+    var strategy = new restSerializer.ChatStrategy({
+      notLoggedIn: !userId,
+      currentUserId: userId,
+      troupeId: troupeId
+    });
+
+    restSerializer.serialize(chatMessages, strategy, callback);
+  });
+
+  return d;
 };
 
 exports.serializeUsersForTroupe = function(troupeId, userId, callback) {
