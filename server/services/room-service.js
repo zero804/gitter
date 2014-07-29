@@ -672,11 +672,11 @@ function addUserToRoom(troupe, instigatingUser, usernameToAdd) {
             notification = 'email_notification_sent';
           }
 
-          stats.event('user_added', {
-            userId: user.id,
+          stats.event('user_added_someone', {
+            userId: instigatingUser.id,
+            addedUserId: user.id,
             notification: notification,
-            troupeId: troupe.id,
-            instigatingUserId: instigatingUser.id
+            troupeId: troupe.id
           });
 
           return user;
