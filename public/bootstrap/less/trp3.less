@@ -23,6 +23,7 @@
 
 /* new stuff */
 @import "menu";
+@import "menu-list-item";
 @import "chat";
 @import "chat-container";
 @import "chat-item";
@@ -1280,26 +1281,6 @@ ul li.placeholder:before {
   display: inline-block;
 }
 
-.trpTroupeList li .item-unread-badge{
-  float: right;
-  margin-right: 8px;
-  display: none;
-}
-
-.trpTroupeList li .item-unread-badge.mention .trpTroupeUnreadCounter {
-  background-color: @trpRed;
-  font-weight: 300;
-}
-
-.trpTroupeList li .item-unread-badge.shown{
-  display: inline;
-}
-
-.trpTroupeList li:hover .item-unread-badge {
-  display: none;
-}
-
-
 .item-close {
   float: right;
   opacity: 0.3;
@@ -1456,23 +1437,6 @@ ul li.placeholder:before {
 	border: 2px solid white;
 	*/
 }
-
-// .trpTroupeUnreadCounter {
-//   -webkit-border-radius: 4px;
-//      -moz-border-radius: 4px;
-//           border-radius: 4px;
-//   display: inline-block;
-//   padding: 0 5px 1px;
-//   font-size: 10px;
-//   font-weight: bold;
-//   height: 16px;
-//   line-height: 16px;
-//   color: white;
-//   white-space: nowrap;
-//   // vertical-align: baseline;
-//   vertical-align: middle;
-//   background-color: @trpGreen;
-// }
 
 .trpTroupeName {
 	vertical-align: top;
