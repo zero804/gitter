@@ -1,5 +1,3 @@
-/*jslint node: true */
-/*global describe:true, it: true, beforeEach:true, afterEach:true */
 "use strict";
 
 var testRequire = require('../test-require');
@@ -50,7 +48,7 @@ describe('notification-collection', function() {
       done();
     });
 
-    underTest.incomingNotification('user1-on', 'file', ['c1','c2'], 'troupeId1');
+    underTest.incomingNotification('user1-on', 'chat', ['c1','c2'], 'troupeId1');
     underTest.incomingNotification('user2-on', 'chat', ['c1','c2'], 'troupeId2');
   });
 
