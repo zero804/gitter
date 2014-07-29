@@ -51,6 +51,9 @@ module.exports = function(options) {
   var failureStat = options.failureStat;
   var skipSuperClient = options.skipSuperClient;
 
+  // No point in shared state unless theres an incoming and outgoing extension
+  var privateState = options.privateState && incoming && outgoing;
+
   var extension = {};
 
   if(incoming) {
@@ -66,6 +69,10 @@ module.exports = function(options) {
       var timeout = setTimeout(function() {
         logger.error("Extension took too long to process!", name, incomingMessage);
       }, 1000);
+
+      if(privateState) {
+        if(!incomingMessage._private) incomingMessage._private = { };
+      }
 
       incoming(incomingMessage, req, function(err, outgoingMessage) {
         clearTimeout(timeout);
@@ -107,8 +114,16 @@ module.exports = function(options) {
 
       outgoing(incomingMessage, req, function(err, outgoingMessage) {
         clearTimeout(timeout);
-
         if(!outgoingMessage) outgoingMessage = incomingMessage;
+
+        // if(privateState && outgoingMessage._private && outgoingMessage._private[name]) {
+        //   delete outgoingMessage._private[name];
+
+        //   // TODO: delete this in an extension
+        //   if(Object.keys(outgoingMessage._private).length === 0) {
+        //     delete outgoingMessage._private;
+        //   }
+        // }
 
         if(err) {
           // In an ideal world we dont throw errors on outbound messages

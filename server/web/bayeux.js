@@ -214,6 +214,7 @@ var authenticator = bayeuxExtension({
   name: 'authenticator',
   failureStat: 'bayeux.handshake.deny',
   skipSuperClient: true,
+  privateState: true,
   incoming: function(message, req, callback) {
     var ext = message.ext || {};
 
@@ -241,15 +242,14 @@ var authenticator = bayeuxExtension({
       });
 
       var connectionType = getConnectionType(ext.connType);
-      var client = ext.client || '';
-      var troupeId = ext.troupeId || '';
-      var eyeballState = ext.eyeballs || '';
 
-      // This is an UGLY UGLY hack, but it's the only
-      // way possible to pass the userId to the outgoing extension
-      // where we have the clientId (but not the userId)
-      var id = message.id || '';
-      message.id = [id, userId, connectionType, client, troupeId, eyeballState].join(':');
+      message._private.authenticator = {
+        userId: userId,
+        connectionType: connectionType,
+        client: ext.client,
+        troupeId: ext.troupeId,
+        eyeballState: parseInt(ext.eyeballs, 10) || 0
+      };
 
       return callback(null, message);
     });
@@ -260,25 +260,15 @@ var authenticator = bayeuxExtension({
     if(!message.ext) message.ext = {};
     message.ext.appVersion = version;
 
-    // The other half of the UGLY hack,
-    // get the userId out from the message
-    var fakeId = message.id;
-    if(!fakeId) {
-      return callback(null, message);
-    }
+    var state = message._private && message._private.authenticator;
+    if(!state) return callback(message);
 
-    var parts = fakeId.split(':');
-    if(parts.length != 6) {
-      return callback(null, message);
-    }
-
-    message.id = parts[0] || undefined; // id not required for an incoming message
-    var userId = parts[1] || undefined;
-    var connectionType = parts[2];
+    var userId = state.userId;
+    var connectionType = state.connectionType;
     var clientId = message.clientId;
-    var client = parts[3] || undefined;
-    var troupeId = parts[4] || undefined;
-    var eyeballState = parseInt(parts[5], 10) || 0;
+    var client = state.client;
+    var troupeId = state.troupeId;
+    var eyeballState = state.eyeballState;
 
     // Get the presence service involved around about now
     presenceService.userSocketConnected(userId, clientId, connectionType, client, troupeId, eyeballState, function(err) {
@@ -366,12 +356,8 @@ var authorisor = bayeuxExtension({
   name: 'authorisor',
   failureStat: 'bayeux.subscribe.deny',
   skipSuperClient: true,
+  privateState: true,
   incoming: function(message, req, callback) {
-    var snapshot = 1;
-    if(message.ext && message.ext.snapshot === false) {
-      snapshot = 0;
-    }
-
     // Do we allow this user to connect to the requested channel?
     authorizeSubscribe(message, function(err, allowed) {
       if(err) return callback(err);
@@ -380,7 +366,9 @@ var authorisor = bayeuxExtension({
         return callback({ status: 403, message: "Authorisation denied."});
       }
 
-      message.id = [message.id || '', snapshot].join(':');
+      message._private.authorisor = {
+        snapshot: message.ext && message.ext.snapshot
+      };
 
       return callback(null, message);
     });
@@ -390,11 +378,8 @@ var authorisor = bayeuxExtension({
   outgoing: function(message, req, callback) {
     var clientId = message.clientId;
 
-    var parts = message.id && message.id.split(':');
-    if(!parts || parts.length !== 2) return callback(null, message);
-
-    message.id = parts[0] || undefined;
-    var snapshot = parseInt(parts[1], 10) === 1;
+    var state = message._private && message._private.authorisor;
+    var snapshot = state && state.snapshot;
 
     var match = null;
 
@@ -412,7 +397,7 @@ var authorisor = bayeuxExtension({
     var m = match.match;
 
     /* The populator is all about generating the snapshot for the client */
-    if(!clientId || !populator || !snapshot) return callback(null, message);
+    if(!clientId || !populator || snapshot === false) return callback(null, message);
 
     presenceService.lookupUserIdForSocket(clientId, function(err, userId, exists) {
       if(err) callback(err);
@@ -567,6 +552,8 @@ var logging = {
 
 var adviseAdjuster = {
   outgoing: function(message, req, callback) {
+    delete message._private;
+
     var error = message.error;
 
     if(error) {
@@ -576,6 +563,8 @@ var adviseAdjuster = {
       if(errorCode === 401) {
         var reconnect;
 
+        // Consider whether to put this back....
+        //
         // if(message.clientId) {
         //   logger.info('Destroying client', { clientId: message.clientId });
         //   // We've told the person to go away, destroy their faye client
@@ -631,23 +620,47 @@ var server = new faye.NodeAdapter({
   }
 });
 
+/* Nasty hack, but no way around it */
+server._server._makeResponse = function(message) {
+  var response = {};
+
+  if (message.id)       response.id       = message.id;
+  if (message.clientId) response.clientId = message.clientId;
+  if (message.channel)  response.channel  = message.channel;
+  if (message.error)    response.error    = message.error;
+
+  // Our improvement: information for extensions
+  if (message._private) response._private = message._private;
+
+  response.successful = !response.error;
+  return response;
+};
+
+
 var client = server.getClient();
 
 var STATS_FREQUENCY = 0.01;
 
 faye.stringify = function(object) {
   try {
-    var string = JSON.stringify(object);
-    // Over cautious
-    stats.eventHF('bayeux.message.count', 1, STATS_FREQUENCY);
+    if(typeof object === 'object') {
+      var string = JSON.stringify(object);
 
-    if(string) {
-      stats.gaugeHF('bayeux.message.size', string.length, STATS_FREQUENCY);
+      // Over cautious
+      stats.eventHF('bayeux.message.count', 1, STATS_FREQUENCY);
+
+      if(string) {
+        stats.gaugeHF('bayeux.message.size', string.length, STATS_FREQUENCY);
+      } else {
+        stats.gaugeHF('bayeux.message.size', 0, STATS_FREQUENCY);
+      }
+
+      return string;
+
     } else {
-      stats.gaugeHF('bayeux.message.size', 0, STATS_FREQUENCY);
-    }
+      return JSON.stringify(object);
 
-    return string;
+    }
   } catch(e) {
     stats.event('bayeux.message.serialization_error');
 

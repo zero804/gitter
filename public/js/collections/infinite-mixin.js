@@ -223,7 +223,21 @@ define([
         this.remove(forRemoval);
         this.atBottom = false;
       }
+    },
 
+    getSnapshotState: function() {
+      // TODO: handle initial load
+      if(!this.length) return;
+
+      if(this.atBottom) {
+        // At the bottom is easy-ish
+        return { limit: this.length };
+      }
+
+      var start = this.at(0).get('id');
+      var end = this.at(this.length - 1).get('id');
+
+      return { limit: this.length, between: start + ',' + end };
     }
   };
 });
