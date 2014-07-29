@@ -29,16 +29,10 @@ exports.serializeTroupesForUser = function(userId, callback) {
 };
 
 exports.serializeChatsForTroupe = function(troupeId, userId, options, callback) {
-  if(typeof options == 'function' && typeof callback == 'undefined') {
-    callback = options;
-    options = {};
-  }
-
-  if(!options) options = {};
-
   options = _.extend({}, {
     skip: 0,
-    limit: DEFAULT_CHAT_COUNT_LIMIT
+    limit: DEFAULT_CHAT_COUNT_LIMIT,
+    userId: userId // This may also be appearing through in options
   }, options);
 
   return chatService.findChatMessagesForTroupe(troupeId, options)
