@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var persistence   = require("./persistence-service");
@@ -7,7 +6,6 @@ var appEvents     = require("../app-events");
 var ObjectID      = require('mongodb').ObjectID;
 var Q             = require('q');
 var StatusError   = require('statuserror');
-
 
 exports.newEventToTroupe = function(troupe, user, text, meta, payload, callback) {
   text = text ? "" : "" + text;
@@ -31,7 +29,7 @@ exports.newEventToTroupe = function(troupe, user, text, meta, payload, callback)
 
       return event.saveQ()
         .then(function() {
-          appEvents.hookEvent({username: 'gitter', room: troupe.uri, text: text});
+          appEvents.hookEvent({ username: 'gitter', room: troupe.uri, text: text });
           return event;
         });
 
@@ -53,12 +51,12 @@ exports.findEventsForTroupe = function(troupeId, options, callback) {
     q = q.where('_id').lt(beforeId);
   }
 
-  q.sort(options.sort || { sent: 'desc' })
+  return q.sort(options.sort || { sent: 'desc' })
     .limit(options.limit || 20)
     .skip(options.skip || 0)
-    .exec(function(err, results) {
-      if(err) return callback(err);
-
-      return callback(null, results.reverse());
-    });
+    .execQ()
+    .then(function(results) {
+      return results.reverse();
+    })
+    .nodeify(callback);
 };

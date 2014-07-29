@@ -67,7 +67,7 @@ module.exports = function(options) {
       }
 
       var timeout = setTimeout(function() {
-        logger.error("Extension took too long to process!", name, incomingMessage);
+        logger.error("Incoming extension took too long to process!", { name: name, message: incomingMessage });
       }, 1000);
 
       if(privateState) {
@@ -109,21 +109,12 @@ module.exports = function(options) {
       }
 
       var timeout = setTimeout(function() {
-        logger.error("Extension took too long to process!", name, incomingMessage);
+        logger.error("Outgoing extension took too long to process!", { name: name, message: incomingMessage });
       }, 1000);
 
       outgoing(incomingMessage, req, function(err, outgoingMessage) {
         clearTimeout(timeout);
         if(!outgoingMessage) outgoingMessage = incomingMessage;
-
-        // if(privateState && outgoingMessage._private && outgoingMessage._private[name]) {
-        //   delete outgoingMessage._private[name];
-
-        //   // TODO: delete this in an extension
-        //   if(Object.keys(outgoingMessage._private).length === 0) {
-        //     delete outgoingMessage._private;
-        //   }
-        // }
 
         if(err) {
           // In an ideal world we dont throw errors on outbound messages
@@ -133,6 +124,7 @@ module.exports = function(options) {
           outgoingMessage.error = error;
 
           logger.error('bayeux: extension ' + name + '[outgoing] failed: ' + error + '. Technically this should not happen.', {
+            exception: err,
             channel: outgoingMessage.channel,
             token: outgoingMessage.ext && outgoingMessage.ext.token,
             subscription: outgoingMessage.subscription,

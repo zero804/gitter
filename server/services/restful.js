@@ -28,9 +28,9 @@ exports.serializeTroupesForUser = function(userId, callback) {
     .nodeify(callback);
 };
 
-exports.serializeChatsForTroupe = function(troupeId, userId, options, cb) {
-  if(typeof options == 'function' && typeof cb == 'undefined') {
-    cb = options;
+exports.serializeChatsForTroupe = function(troupeId, userId, options, callback) {
+  if(typeof options == 'function' && typeof callback == 'undefined') {
+    callback = options;
     options = {};
   }
 
@@ -51,45 +51,46 @@ exports.serializeChatsForTroupe = function(troupeId, userId, options, cb) {
 
       return restSerializer.serialize(chatMessages, strategy);
     })
-    .nodeify(cb);
+    .nodeify(callback);
 
 };
 
 exports.serializeUsersForTroupe = function(troupeId, userId, callback) {
-  troupeService.findUserIdsForTroupe(troupeId, function(err, userIds) {
-    if(err) return callback(err);
+  return troupeService.findUserIdsForTroupe(troupeId)
+    .then(function(userIds) {
+      var strategy = new restSerializer.UserIdStrategy({
+        showPresenceForTroupeId: troupeId,
+        includeRolesForTroupeId: troupeId,
+        currentUserId: userId
+      });
 
-    var strategy = new restSerializer.UserIdStrategy({
-      showPresenceForTroupeId: troupeId,
-      includeRolesForTroupeId: troupeId,
-      currentUserId: userId
-    });
-
-    restSerializer.serializeExcludeNulls(userIds, strategy, callback);
-  });
+      return restSerializer.serializeExcludeNulls(userIds, strategy);
+    })
+    .nodeify(callback);
 };
 
 exports.serializeUnreadItemsForTroupe = function(troupeId, userId, callback) {
-  unreadItemService.getUnreadItemsForUser(userId, troupeId, callback);
+  var d = Q.defer();
+  unreadItemService.getUnreadItemsForUser(userId, troupeId, d.makeNodeResolver());
+  return d.promise.nodeify(callback);
 };
 
 exports.serializeReadBysForChat = function(troupeId, chatId, callback) {
-  chatService.findById(chatId, function(err, chatMessage) {
-    if(err) return callback(err);
-    var strategy = new restSerializer.UserIdStrategy({});
+  return chatService.findById(chatId)
+    .then(function(chatMessage) {
+      var strategy = new restSerializer.UserIdStrategy({});
 
-    restSerializer.serialize(chatMessage.readBy, strategy, function(err, serialized) {
-      if(err) return callback(err);
-      callback(null, serialized);
-    });
-
-  });
+      return restSerializer.serialize(chatMessage.readBy, strategy);
+    })
+    .nodeify(callback);
 
 };
 
 exports.serializeEventsForTroupe = function(troupeId, userId, callback) {
-  eventService.findEventsForTroupe(troupeId, {}, function(err, events) {
-    var strategy = new restSerializer.EventStrategy({ currentUserId: userId, troupeId: troupeId });
-    restSerializer.serialize(events, strategy, callback);
-  });
+  return eventService.findEventsForTroupe(troupeId, {})
+    .then(function(events) {
+      var strategy = new restSerializer.EventStrategy({ currentUserId: userId, troupeId: troupeId });
+      return restSerializer.serialize(events, strategy);
+    })
+    .nodeify(callback);
 };
