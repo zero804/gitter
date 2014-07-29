@@ -107,7 +107,7 @@ function validateUserForUserSubscription(options) {
   var subscribeUserId = match[1];
 
   // All /user/ subscriptions need to be authenticated
-  if(!userId) return Q.reject(false);
+  if(!userId) return Q.resolve(false);
 
   if(!mongoUtils.isLikeObjectId(userId)) {
     return Q.reject(new StatusError(400, 'Invalid ID: ' + userId));
@@ -118,6 +118,10 @@ function validateUserForUserSubscription(options) {
   return Q.resolve(result);
 }
 
+function arrayToSnapshot(data) {
+  return { data: data };
+}
+
 function populateSubUserCollection(options) {
   var userId = options.userId;
   var match = options.match;
@@ -125,19 +129,20 @@ function populateSubUserCollection(options) {
   var collection = match[2];
 
   if(!userId || userId != subscribeUserId) {
-    return Q.resolve([]);
+    return Q.resolve();
   }
 
   switch(collection) {
     case "rooms":
     case "troupes":
-      return restful.serializeTroupesForUser(userId);
+      return restful.serializeTroupesForUser(userId)
+        .then(arrayToSnapshot);
 
     default:
       logger.error('Unable to provide snapshot for ' + collection);
   }
 
-  return Q.resolve([]);
+  return Q.resolve();
 }
 
 function populateSubTroupeCollection(options) {
@@ -149,19 +154,37 @@ function populateSubTroupeCollection(options) {
 
   switch(collection) {
     case "chatMessages":
-      return restful.serializeChatsForTroupe(troupeId, userId);
+      var beforeId, afterId, marker, limit;
+      if(snapshot) {
+        beforeId = snapshot.beforeId;
+        afterId = snapshot.afterId;
+        marker = snapshot.marker;
+        limit = snapshot.limit;
+      }
+
+      var chatOptions = {
+        limit: limit,
+        beforeId: beforeId,
+        afterId: afterId,
+        marker: marker
+      };
+
+      return restful.serializeChatsForTroupe(troupeId, userId, chatOptions)
+        .then(arrayToSnapshot);
 
     case "users":
-      return restful.serializeUsersForTroupe(troupeId, userId);
+      return restful.serializeUsersForTroupe(troupeId, userId)
+        .then(arrayToSnapshot);
 
     case "events":
-      return restful.serializeEventsForTroupe(troupeId, userId);
+      return restful.serializeEventsForTroupe(troupeId, userId)
+        .then(arrayToSnapshot);
 
     default:
       logger.error('Unable to provide snapshot for ' + collection);
   }
 
-  return Q.resolve([]);
+  return Q.resolve();
 }
 
 function populateSubSubTroupeCollection(options) {
@@ -173,13 +196,15 @@ function populateSubSubTroupeCollection(options) {
 
   switch(collection + '-' + subCollection) {
     case "chatMessages-readBy":
-      return restful.serializeReadBysForChat(troupeId, subId);
+      return restful.serializeReadBysForChat(troupeId, subId)
+        .then(arrayToSnapshot);
+
 
     default:
       logger.error('Unable to provide snapshot for ' + collection);
   }
 
-  return Q.resolve([]);
+  return Q.resolve();
 }
 
 function populateUserUnreadItemsCollection(options) {
@@ -189,10 +214,11 @@ function populateUserUnreadItemsCollection(options) {
   var troupeId = match[2];
 
   if(!userId || userId !== subscriptionUserId) {
-    return Q.resolve([]);
+    return Q.resolve();
   }
 
-  return restful.serializeUnreadItemsForTroupe(troupeId, userId);
+  return restful.serializeUnreadItemsForTroupe(troupeId, userId)
+    .then(arrayToSnapshot);
 }
 
 function getConnectionType(incoming) {
@@ -260,7 +286,7 @@ var authenticator = bayeuxExtension({
     message.ext.appVersion = version;
 
     var state = message._private && message._private.authenticator;
-    if(!state) return callback(message);
+    if(!state) return callback(null, message);
 
     var userId = state.userId;
     var connectionType = state.connectionType;
@@ -646,26 +672,27 @@ var client = server.getClient();
 
 var STATS_FREQUENCY = 0.01;
 
+/* This function is used a lot, this version excludes try-catch so that it can be optimised */
+function stringifyInternal(object) {
+  if(typeof object !== 'object') return JSON.stringify(object);
+
+  var string = JSON.stringify(object);
+
+  // Over cautious
+  stats.eventHF('bayeux.message.count', 1, STATS_FREQUENCY);
+
+  if(string) {
+    stats.gaugeHF('bayeux.message.size', string.length, STATS_FREQUENCY);
+  } else {
+    stats.gaugeHF('bayeux.message.size', 0, STATS_FREQUENCY);
+  }
+
+  return string;
+}
+
 faye.stringify = function(object) {
   try {
-    if(typeof object === 'object') {
-      var string = JSON.stringify(object);
-
-      // Over cautious
-      stats.eventHF('bayeux.message.count', 1, STATS_FREQUENCY);
-
-      if(string) {
-        stats.gaugeHF('bayeux.message.size', string.length, STATS_FREQUENCY);
-      } else {
-        stats.gaugeHF('bayeux.message.size', 0, STATS_FREQUENCY);
-      }
-
-      return string;
-
-    } else {
-      return JSON.stringify(object);
-
-    }
+    return stringifyInternal(object);
   } catch(e) {
     stats.event('bayeux.message.serialization_error');
 
