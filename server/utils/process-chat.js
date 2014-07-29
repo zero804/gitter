@@ -1,7 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var marked    = require('marked');
+var marked    = require('gitter-marked');
 var highlight = require('highlight.js');
 var _         = require('underscore');
 var util      = require('util');

@@ -1,6 +1,6 @@
 {
   "name": "gitter-webapp",
-  "version": "3.9.1",
+  "version": "4.1.1",
   "dependencies": {
     "apn": {
       "version": "1.4.4",
@@ -1056,6 +1056,10 @@
         }
       }
     },
+    "gitter-marked": {
+      "version": "0.4.2",
+      "from": "gitter-marked@"
+    },
     "gitter-services": {
       "version": "1.2.0",
       "from": "gitter-services@git+ssh://git@github.com:gitterHQ/services.git#1.2.0",
@@ -1185,11 +1189,6 @@
     "lazy.js": {
       "version": "0.2.1",
       "from": "lazy.js@~0.2.1"
-    },
-    "marked": {
-      "version": "0.4.1",
-      "from": "marked@git://github.com/gitterHQ/marked.git#v0.4.1",
-      "resolved": "git://github.com/gitterHQ/marked.git#f99f6f77ab1d30685e5d7f2ebcbd2e7abce66a76"
     },
     "memwatch": {
       "version": "0.2.2",
