@@ -1,0 +1,36 @@
+.menu-list-item .item-unread-badge {
+  float: right;
+  margin-right: 8px;
+  display: none;
+}
+
+.menu-list-item .item-unread-badge.shown {
+  display: inline;
+}
+
+.menu-list-item:hover .item-unread-badge {
+  display: none;
+}
+
+.menu-list-item .item-unread-badge .trpTroupeUnreadCounter {
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+  display: inline-block;
+  padding: 0 4px;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 14px;
+  color: white;
+  white-space: nowrap;
+  vertical-align: middle;
+  background-color: @trpGreen;
+  @media @mobile {
+    padding: 1px 4px 0px;
+  }
+}
+
+.menu-list-item .item-unread-badge.mention .trpTroupeUnreadCounter {
+  background-color: @trpRed;
+  font-weight: 300;
+}
