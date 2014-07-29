@@ -1,3 +1,9 @@
+@-webkit-keyframes pulse_animation {
+  0% { box-shadow: 0 0 0px #1bee82; color: #1bee82; }
+  50% { box-shadow: 0 0 8px #1bee82; color: @trpGreen; }
+  100% { box-shadow: 0 0 0px #1bee82; color: #1bee82;  }
+}
+
 .menu-list-item {
   padding-left: 4px;
   margin-left: 12px;
@@ -5,6 +11,39 @@
   padding-bottom: 2px;
   list-style: none;
   line-height: 26px;
+}
+
+.menu-list-item:hover, .menu-list-item.selected {
+  border-radius: 4px 0 0 4px;
+  background-color: rgba(255,255,255,0.2);
+
+  @media @mobile {
+    background-color: transparent;
+  }
+
+  &.chatting:after {
+    display: none;
+  }
+}
+
+.menu-list-item.chatting:after {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50em;
+  background-color: #1dce73;
+  position: relative;
+  top: 13px;
+  right: 13px;
+  content: ' ';
+  float: right
+}
+
+.menu-list-item.chatting.chatting-now:after {
+  -webkit-animation-name: 'pulse_animation';
+  -webkit-animation-duration: 800ms;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-timing-function: linear;
 }
 
 .menu-list-item .item-unread-badge {

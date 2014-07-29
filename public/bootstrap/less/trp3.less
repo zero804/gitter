@@ -1159,49 +1159,6 @@ body.dragging .list-favourites li.placeholder {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
 
-  li:hover, li.selected {
-    border-radius: 4px 0 0 4px;
-    background-color: rgba(255,255,255,0.2);
-
-    @media @mobile {
-      background-color: transparent;
-    }
-
-    &.chatting:after {
-      display: none;
-    }
-  }
-
-  @-webkit-keyframes pulse_animation {
-    0% { box-shadow: 0 0 0px #1bee82; color: #1bee82; }
-    50% { box-shadow: 0 0 8px #1bee82; color: @trpGreen; }
-    100% { box-shadow: 0 0 0px #1bee82; color: #1bee82;  }
-  }
-
-  li.chatting {
-    /*background-color: red;*/
-  }
-
-  li.chatting:after {
-    display: inline-block;
-    width: 5px;
-    height: 5px;
-    border-radius: 50em;
-    background-color: #1dce73;
-    position: relative;
-    top: 13px;
-    right: 13px;
-    content: ' ';
-    float: right
-  }
-
-  li.chatting.chatting-now:after {
-    -webkit-animation-name: 'pulse_animation';
-      -webkit-animation-duration: 800ms;
-      -webkit-animation-iteration-count: infinite;
-      -webkit-animation-timing-function: linear;
-  }
-
   span {
     display: inline-block;
     color: white;
