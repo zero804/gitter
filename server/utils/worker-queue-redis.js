@@ -85,17 +85,17 @@ var Queue = function(name, options, loaderFn) {
     stats.event('resque.worker.cleaning');
   });
 
-  this.worker.on('poll', function(queue) {
+  this.worker.on('poll', function() {
     stats.eventHF('resque.worker.polling', 1, 0.005);
   });
 
-  this.worker.on('job', function(queue, job) {
-    logger.silly("worker-queue-redis: working job " + queue + " " + JSON.stringify(job));
+  this.worker.on('job', function(queue) {
+    logger.silly("worker-queue-redis: working job " + queue);
     stats.eventHF('resque.worker.working');
   });
 
   this.worker.on('reEnqueue', function(queue, job, plugin) {
-    logger.silly("worker-queue-redis: reEnqueue job (" + plugin + ") " + queue + " " + JSON.stringify(job));
+    logger.silly("worker-queue-redis: reEnqueue job (" + plugin + ")");
     stats.event('resque.worker.reenqueue');
   });
 
