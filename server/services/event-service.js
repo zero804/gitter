@@ -31,7 +31,7 @@ exports.newEventToTroupe = function(troupe, user, text, meta, payload, callback)
 
       return event.saveQ()
         .then(function() {
-          appEvents.hookEvent({username: 'gitter', room: troupe.uri, text: text});
+          appEvents.hookEvent({ username: 'gitter', room: troupe.uri, text: text });
           return event;
         });
 
