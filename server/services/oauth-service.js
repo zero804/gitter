@@ -23,7 +23,6 @@ var cacheTimeout = 60; /* 60 seconds */
 function loadWebClientId() {
   if(webInternalClientId) return Q.resolve(webInternalClientId);
 
-  console.log('SEARHCING ' + WEB_INTERNAL_CLIENT_KEY);
   /* Load webInternalClientId once */
   return persistenceService.OAuthClient.findOneQ({ clientKey: WEB_INTERNAL_CLIENT_KEY })
     .then(function(oauthClient) {

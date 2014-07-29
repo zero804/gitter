@@ -8,7 +8,7 @@ var Q             = require('q');
 var StatusError   = require('statuserror');
 
 exports.newEventToTroupe = function(troupe, user, text, meta, payload, callback) {
-  text = text ? "" : "" + text;
+  text = text ? "" + text : "";
 
   return Q.fcall(function() {
       if(!troupe) throw new StatusError(500, "Invalid troupe");
