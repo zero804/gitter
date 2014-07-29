@@ -49,6 +49,7 @@ module.exports = function(options) {
   var name = options.name;
   var failureStat = options.failureStat;
   var skipSuperClient = options.skipSuperClient;
+  var skipOnError = options.skipOnError;
 
   // No point in shared state unless theres an incoming and outgoing extension
   var privateState = options.privateState && incoming && outgoing;
@@ -57,6 +58,10 @@ module.exports = function(options) {
 
   if(incoming) {
     extension.incoming = function(incomingMessage, req, callback) {
+      if(skipOnError && incomingMessage.error) {
+        return callback(incomingMessage);
+      }
+
       if(channel && incomingMessage.channel !== channel) {
         return callback(incomingMessage);
       }
@@ -81,9 +86,14 @@ module.exports = function(options) {
           if(failureStat) stats.eventHF(failureStat);
 
           var error = makeError(err);
-          outgoingMessage.error = error;
+
+          // Don't mask previous errors
+          if(!outgoingMessage.error) {
+            outgoingMessage.error = error;
+          }
 
           logger.error('bayeux: extension ' + name + '[incoming] failed: ' + error, {
+            exception: err,
             channel: outgoingMessage.channel,
             token: outgoingMessage.ext && outgoingMessage.ext.token,
             subscription: outgoingMessage.subscription,
@@ -99,6 +109,10 @@ module.exports = function(options) {
 
   if(outgoing) {
     extension.outgoing = function(incomingMessage, req, callback) {
+      if(skipOnError && incomingMessage.error) {
+        return callback(incomingMessage);
+      }
+
       if(channel && incomingMessage.channel !== channel) {
         return callback(incomingMessage);
       }
@@ -120,7 +134,11 @@ module.exports = function(options) {
           if(failureStat) stats.eventHF(failureStat);
 
           var error = makeError(err);
-          outgoingMessage.error = error;
+
+          // Don't mask previous errors
+          if(!outgoingMessage.error) {
+            outgoingMessage.error = error;
+          }
 
           logger.error('bayeux: extension ' + name + '[outgoing] failed: ' + error + '. Technically this should not happen.', {
             exception: err,

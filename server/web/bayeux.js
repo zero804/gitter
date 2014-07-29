@@ -241,6 +241,7 @@ var authenticator = bayeuxExtension({
   name: 'authenticator',
   failureStat: 'bayeux.handshake.deny',
   skipSuperClient: true,
+  skipOnError: true,
   privateState: true,
   incoming: function(message, req, callback) {
     var ext = message.ext || {};
@@ -333,12 +334,11 @@ var authenticator = bayeuxExtension({
 function destroyClient(clientId) {
   if(!clientId) return;
 
-  process.nextTick(function() {
+  setImmediate(function() {
     var engine = server._server._engine;
     engine.destroyClient(clientId, function() {
       logger.info('bayeux: client ' + clientId + ' intentionally destroyed.');
     });
-
   });
 
 }
@@ -375,85 +375,13 @@ function authorizeSubscribe(message, callback) {
 
 }
 
-//
-// Authorisation Extension - decides whether the user
-// is allowed to connect to the subscription channel
-//
-var authorisor = bayeuxExtension({
-  channel: '/meta/subscribe',
-  name: 'authorisor',
-  failureStat: 'bayeux.subscribe.deny',
-  skipSuperClient: true,
-  privateState: true,
-  incoming: function(message, req, callback) {
-    // Do we allow this user to connect to the requested channel?
-    authorizeSubscribe(message, function(err, allowed) {
-      if(err) return callback(err);
-
-      if(!allowed) {
-        return callback(new StatusError(403, "Authorisation denied."));
-      }
-
-      message._private.authorisor = {
-        snapshot: message.ext && message.ext.snapshot
-      };
-
-      return callback(null, message);
-    });
-
-  },
-
-  outgoing: function(message, req, callback) {
-    var clientId = message.clientId;
-
-    var state = message._private && message._private.authorisor;
-    var snapshot = state && state.snapshot;
-
-    var match = null;
-
-    var hasMatch = routes.some(function(route) {
-      var m = route.re.exec(message.subscription);
-      if(m) {
-        match = { route: route, match: m };
-      }
-      return m;
-    });
-
-    if(!hasMatch) return callback(null, message);
-
-    var populator = match.route.populator;
-    var m = match.match;
-
-    /* The populator is all about generating the snapshot for the client */
-    if(!clientId || !populator || snapshot === false) return callback(null, message);
-
-    presenceService.lookupUserIdForSocket(clientId, function(err, userId, exists) {
-      if(err) callback(err);
-
-      if(!exists) return callback(new StatusError(401, "Snapshot failed. Socket not associated"));
-
-      populator({ userId: userId, match: m, snapshot: snapshot })
-        .then(function(snapshot) {
-          if(snapshot) {
-            if(!message.ext) message.ext = {};
-            message.ext.snapshot = snapshot.data;
-            message.ext.snapshot_meta = snapshot.meta;
-          }
-          return message;
-        })
-        .nodeify(callback);
-
-    });
-
-  }
-});
-
 // CONNECT extension
 var noConnectForUnknownClients = bayeuxExtension({
   channel: '/meta/connect',
   name: 'doorman',
   failureStat: 'bayeux.connect.deny',
   skipSuperClient: true,
+  skipOnError: true,
   incoming: function(message, req, callback) {
     var clientId = message.clientId;
 
@@ -727,7 +655,13 @@ module.exports = {
     server.addExtension(logging);
     server.addExtension(authenticator);
     server.addExtension(noConnectForUnknownClients);
-    server.addExtension(authorisor);
+
+    //
+    // Authorisation Extension - decides whether the user
+    // is allowed to connect to the subscription channel
+    //
+    server.addExtension(require('./bayeux/authorisor'));
+
     server.addExtension(pushOnlyServer);
     server.addExtension(hidePassword);
     server.addExtension(pingResponder);
