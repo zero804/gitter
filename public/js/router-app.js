@@ -111,7 +111,8 @@ require([
     try {
       message = JSON.parse(e.data);
     } catch(err) {
-      throw new Error("Cross-frame message parse failure: " + err + ". Unable to parse " + e.data);
+      /* It seems as through chrome extensions use this event to pass messages too. Ignore them. */
+      return;
     }
 
     log('Received message ', message);
