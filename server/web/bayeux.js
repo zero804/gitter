@@ -18,6 +18,7 @@ var appVersion        = require('./appVersion');
 var mongoUtils        = require('../utils/mongo-utils');
 var StatusError       = require('statuserror');
 var bayeuxExtension   = require('./bayeux/extension');
+var Q                 = require('q');
 
 var version = appVersion.getVersion();
 
@@ -80,94 +81,90 @@ function checkTroupeAccess(userId, troupeId, callback) {
 }
 
 // This strategy ensures that a user can access a URL under a troupe URL
-function validateUserForSubTroupeSubscription(options, callback) {
+function validateUserForSubTroupeSubscription(options) {
   var userId = options.userId;
   var match = options.match;
 
   var troupeId = match[1];
 
   if(!mongoUtils.isLikeObjectId(troupeId)) {
-    return callback(new StatusError(400, 'Invalid ID: ' + troupeId));
+    return Q.reject(new StatusError(400, 'Invalid ID: ' + troupeId));
   }
 
-  return checkTroupeAccess(userId, troupeId)
-    .nodeify(callback);
+  return checkTroupeAccess(userId, troupeId);
 }
 
 // This is only used by the native client. The web client publishes to
 // the url
-function validateUserForPingSubscription(options, callback) {
-  return callback(null, true);
+function validateUserForPingSubscription(/* options */) {
+  return Q.resolve(true);
 }
 
 // This strategy ensures that a user can access a URL under a /user/ URL
-function validateUserForUserSubscription(options, callback) {
+function validateUserForUserSubscription(options) {
   var userId = options.userId;
   var match = options.match;
   var subscribeUserId = match[1];
 
   // All /user/ subscriptions need to be authenticated
-  if(!userId) return false;
+  if(!userId) return Q.reject(false);
 
   if(!mongoUtils.isLikeObjectId(userId)) {
-    return callback(new StatusError(400, 'Invalid ID: ' + userId));
+    return Q.reject(new StatusError(400, 'Invalid ID: ' + userId));
   }
 
   var result = userId == subscribeUserId;
 
-  return callback(null, result);
+  return Q.resolve(result);
 }
 
-function populateSubUserCollection(options, callback) {
+function populateSubUserCollection(options) {
   var userId = options.userId;
   var match = options.match;
   var subscribeUserId = match[1];
   var collection = match[2];
 
-  // All /user/ subscriptions need to be authenticated
-  if(!userId) return false;
-
-  if(userId != subscribeUserId) {
-    return callback(null, [ ]);
+  if(!userId || userId != subscribeUserId) {
+    return Q.resolve([]);
   }
 
   switch(collection) {
     case "rooms":
     case "troupes":
-      return restful.serializeTroupesForUser(userId, callback);
+      return restful.serializeTroupesForUser(userId);
 
     default:
       logger.error('Unable to provide snapshot for ' + collection);
   }
 
-  callback(null, [ ]);
+  return Q.resolve([]);
 }
 
-
-function populateSubTroupeCollection(options, callback) {
+function populateSubTroupeCollection(options) {
   var userId = options.userId;
   var match = options.match;
+  var snapshot = options.snapshot; // Details of the snapshot
   var troupeId = match[1];
   var collection = match[2];
 
   switch(collection) {
     case "chatMessages":
-      return restful.serializeChatsForTroupe(troupeId, userId, callback);
+      return restful.serializeChatsForTroupe(troupeId, userId);
 
     case "users":
-      return restful.serializeUsersForTroupe(troupeId, userId, callback);
+      return restful.serializeUsersForTroupe(troupeId, userId);
 
     case "events":
-      return restful.serializeEventsForTroupe(troupeId, userId, callback);
+      return restful.serializeEventsForTroupe(troupeId, userId);
 
     default:
       logger.error('Unable to provide snapshot for ' + collection);
   }
 
-  callback(null, [ ]);
+  return Q.resolve([]);
 }
 
-function populateSubSubTroupeCollection(options, callback) {
+function populateSubSubTroupeCollection(options) {
   var match = options.match;
   var troupeId = match[1];
   var collection = match[2];
@@ -176,24 +173,26 @@ function populateSubSubTroupeCollection(options, callback) {
 
   switch(collection + '-' + subCollection) {
     case "chatMessages-readBy":
-      return restful.serializeReadBysForChat(troupeId, subId, callback);
+      return restful.serializeReadBysForChat(troupeId, subId);
 
+    default:
+      logger.error('Unable to provide snapshot for ' + collection);
   }
 
-  callback(null, [ ]);
+  return Q.resolve([]);
 }
 
-function populateUserUnreadItemsCollection(options, callback) {
+function populateUserUnreadItemsCollection(options) {
   var userId = options.userId;
   var match = options.match;
   var subscriptionUserId = match[1];
   var troupeId = match[2];
 
-  if(userId !== subscriptionUserId) {
-    return callback(null, [ ]);
+  if(!userId || userId !== subscriptionUserId) {
+    return Q.resolve([]);
   }
 
-  return restful.serializeUnreadItemsForTroupe(troupeId, userId, callback);
+  return restful.serializeUnreadItemsForTroupe(troupeId, userId);
 }
 
 function getConnectionType(incoming) {
@@ -221,14 +220,14 @@ var authenticator = bayeuxExtension({
     var token = ext.token;
 
     if(!token) {
-      return callback({ status: 401, message: "Access token required" });
+      return callback(new StatusError(401, "Access token required"));
     }
 
     oauth.validateAccessTokenAndClient(ext.token, function(err, tokenInfo) {
       if(err) return callback(err);
 
       if(!tokenInfo) {
-        return callback({ status: 401, message: "Invalid access token" });
+        return callback(new StatusError(401, "Invalid access token"));
       }
 
       var user = tokenInfo.user;
@@ -337,12 +336,13 @@ function authorizeSubscribe(message, callback) {
       return m;
     });
 
-    if(!hasMatch) return callback({ status: 404, message: "Unknown subscription" });
+    if(!hasMatch) return callback(new StatusError(404, "Unknown subscription"));
 
     var validator = match.route.validator;
     var m = match.match;
 
-    validator({ userId: userId, match: m, message: message, clientId: clientId }, callback);
+    validator({ userId: userId, match: m, message: message, clientId: clientId })
+      .nodeify(callback);
   });
 
 }
@@ -363,7 +363,7 @@ var authorisor = bayeuxExtension({
       if(err) return callback(err);
 
       if(!allowed) {
-        return callback({ status: 403, message: "Authorisation denied."});
+        return callback(new StatusError(403, "Authorisation denied."));
       }
 
       message._private.authorisor = {
@@ -402,13 +402,18 @@ var authorisor = bayeuxExtension({
     presenceService.lookupUserIdForSocket(clientId, function(err, userId, exists) {
       if(err) callback(err);
 
-      if(!exists) return callback({ status: 401, message: "Snapshot failed. Socket not associated" });
+      if(!exists) return callback(new StatusError(401, "Snapshot failed. Socket not associated"));
 
-      populator({ userId: userId, match: m }, function(err, data) {
-        if(!message.ext) message.ext = {};
-        message.ext.snapshot = data;
-        return callback(null, message);
-      });
+      populator({ userId: userId, match: m, snapshot: snapshot })
+        .then(function(snapshot) {
+          if(snapshot) {
+            if(!message.ext) message.ext = {};
+            message.ext.snapshot = snapshot.data;
+            message.ext.snapshot_meta = snapshot.meta;
+          }
+          return message;
+        })
+        .nodeify(callback);
 
     });
 
@@ -425,12 +430,12 @@ var noConnectForUnknownClients = bayeuxExtension({
     var clientId = message.clientId;
 
     server._server._engine.clientExists(clientId, function(exists) {
-      if(!exists) return callback({ status: 401, message: "Client does not exist"});
+      if(!exists) return callback(new StatusError(401, "Client does not exist"));
 
       presenceService.socketExists(clientId, function(err, exists) {
         if(err) return callback(err);
 
-        if(!exists) return callback({ status: 401, message: "Socket association does not exist" });
+        if(!exists) return callback(new StatusError(401, "Socket association does not exist"));
 
         return callback(null, message);
       });
@@ -448,7 +453,7 @@ var pushOnlyServer = bayeuxExtension({
       return callback();
     }
 
-    return callback({ status: 403, message: "Push access denied" });
+    return callback(new StatusError(403, "Push access denied"));
   },
 });
 
@@ -472,12 +477,12 @@ var pingResponder = bayeuxExtension({
     var clientId = message.clientId;
 
     server._server._engine.clientExists(clientId, function(exists) {
-      if(!exists) return callback({ status: 401, message: "Client does not exist"});
+      if(!exists) return callback(new StatusError(401, "Client does not exist"));
 
       presenceService.socketExists(clientId, function(err, exists) {
         if(err) return callback(err);
 
-        if(!exists) return callback({ status: 401, message: "Socket association does not exist" });
+        if(!exists) return callback(new StatusError(401, "Socket association does not exist"));
 
         return callback(null, message);
       });
