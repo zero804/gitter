@@ -242,7 +242,12 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
 
         if(options.beforeId) {
           var beforeId = new ObjectID(options.beforeId);
-          q = q.where('_id').lte(beforeId);
+          q = q.where('_id').lt(beforeId);
+        }
+
+        if(options.beforeInclId) {
+          var beforeInclId = new ObjectID(options.beforeInclId);
+          q = q.where('_id').lte(beforeInclId); // Note: less than *or equal to*
         }
 
         if(options.afterId) {
