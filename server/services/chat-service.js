@@ -240,9 +240,9 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
 
         var sentOrder = 'desc';
 
-        if(options.beforeIncludingId) {
-          var beforeIncludingId = new ObjectID(options.beforeIncludingId);
-          q = q.where('_id').lte(beforeIncludingId);
+        if(options.beforeId) {
+          var beforeId = new ObjectID(options.beforeId);
+          q = q.where('_id').lte(beforeId);
         }
 
         if(options.afterId) {

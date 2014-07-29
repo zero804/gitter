@@ -185,6 +185,12 @@ define([
         self._onDataChange(message);
       });
 
+      function getState() {
+        return self.getSnapshotState();
+      }
+
+      var stateProvider = this.getSnapshotState && getState;
+
       realtime.registerForSnapsnots(this.url, function(snapshot) {
         self.trigger('request');
         /**
@@ -215,7 +221,7 @@ define([
         self._onInitialLoad();
         self.trigger('sync');
         self.trigger('snapshot');
-      });
+      }, stateProvider);
 
       this.subscription.errback(function(error) {
         log('Subscription error for ' + self.url, error);

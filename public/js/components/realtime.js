@@ -129,6 +129,22 @@ define([
 
   var SnapshotExtension = function() {
     this._listeners = {};
+    this._stateProvider = {};
+  };
+
+  SnapshotExtension.prototype.outgoing = function(message, callback) {
+    if(message.channel == '/meta/subscribe') {
+      var stateProvider = this._stateProvider[message.subscription];
+      if(stateProvider) {
+        var snapshotState = stateProvider();
+        if(snapshotState) {
+          if(!message.ext) message.ext = {};
+          message.ext.snapshot = snapshotState;
+        }
+      }
+    }
+
+    callback(message);
   };
 
   SnapshotExtension.prototype.incoming = function(message, callback) {
@@ -144,13 +160,21 @@ define([
     callback(message);
   };
 
-  SnapshotExtension.prototype.registerForSnapshots = function(channel, listener) {
+  SnapshotExtension.prototype.registerForSnapshots = function(channel, listener, stateProvider) {
     var list = this._listeners[channel];
     if(list) {
       list.push(listener);
     } else {
       list = [listener];
       this._listeners[channel] = list;
+    }
+
+    if(stateProvider) {
+      if(this._stateProvider[channel]) {
+        log('Warning: a stateprovider already exists for ' + channel);
+      }
+
+      this._stateProvider[channel] = stateProvider;
     }
   };
 
@@ -366,8 +390,8 @@ define([
       return getOrCreateClient();
     },
 
-    registerForSnapsnots: function(channel, listener) {
-      return snapshotExtension.registerForSnapshots(channel, listener);
+    registerForSnapsnots: function(channel, listener, stateProvider) {
+      return snapshotExtension.registerForSnapshots(channel, listener, stateProvider);
     }
 
   };
