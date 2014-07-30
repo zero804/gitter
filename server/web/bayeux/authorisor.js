@@ -107,8 +107,9 @@ function populateSubTroupeCollection(options) {
 
   switch(collection) {
     case "chatMessages":
-      var beforeId, afterId, marker, limit, beforeInclId;
+      var beforeId, afterId, marker, limit, beforeInclId, aroundId;
       if(snapshot) {
+        aroundId = snapshot.aroundId;
         beforeInclId = snapshot.beforeInclId;
         beforeId = snapshot.beforeId;
         afterId = snapshot.afterId;
@@ -118,6 +119,7 @@ function populateSubTroupeCollection(options) {
 
       var chatOptions = {
         limit: limit,
+        aroundId: aroundId,
         beforeInclId: beforeInclId,
         beforeId: beforeId,
         afterId: afterId,

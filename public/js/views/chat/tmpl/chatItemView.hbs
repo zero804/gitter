@@ -6,6 +6,11 @@
     {{/if}}
   </div>
   <div class='chat-item__content'>
+    {{#if initial}}
+    {{! This is a way of forcing the browser to open at the bottom of the screen }}
+    <div id='initial' style="position:relative;top:-120px; left: 0; height:0;width:0;overflow:hidden"><a name="initial"/>_</a></div>
+    {{/if}}
+
     <div class='chat-item__details'>
       <div class='chat-item__from'>{{username}}</div>
       <div class='chat-item__time'>{{widget "timeago" time=sent lang=lang locale=locale}}</div>

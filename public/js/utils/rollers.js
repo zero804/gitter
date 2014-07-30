@@ -20,7 +20,7 @@ define(['mutant'], function(Mutant) {
 
     this._nopass = null;
     this._stableElement = null;
-    this._mode = TRACK_BOTTOM;
+    this.initTrackingMode();
 
     var adjustScroll = this.adjustScroll.bind(this);
 
@@ -61,11 +61,7 @@ define(['mutant'], function(Mutant) {
       }
     },
 
-    cancelTrackUntil: function() {
-      if(!this._nopass) return;
-
-      this._nopass = null;
-
+    initTrackingMode: function() {
       var target = this._target;
 
       if(this.isScrolledToBottom()) {
@@ -83,7 +79,14 @@ define(['mutant'], function(Mutant) {
         this._stableElementFromBottom = scrollBottom - stableElementTop;
 
       }
+    },
 
+    cancelTrackUntil: function() {
+      if(!this._nopass) return;
+
+      this._nopass = null;
+
+      this.initTrackingMode();
     },
 
     disableTrackBottom: function() {

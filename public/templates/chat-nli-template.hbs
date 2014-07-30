@@ -40,8 +40,10 @@
       {{#each chats}}
         {{{ chatItemPrerender this lang=../lang locale=../locale}}}
       {{/each}}
+      {{#if initialBottom}}
       {{! This is a way of forcing the browser to open at the bottom of the screen }}
       <div id='initial' style="height:0;width:0;overflow:hidden"><a name="initial"/>_</a></div>
+      {{/if}}
     </div>
   </div>
 </div>
@@ -59,14 +61,8 @@
 
 
 <script type="text/javascript">
- window.scrollTo(0,document.body.scrollHeight);
+window.location = '#initial';
 </script>
 
-<div style="display: none;">
-  <form id="upload-form" action="" enctype="multipart/form-data" method="POST">
-    <input type="hidden" name="params" value="">
-    <input type="file" name="file" multiple="multiple"/>
-  </form>
-</div>
 </body>
 </html>

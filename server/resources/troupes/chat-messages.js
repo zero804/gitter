@@ -13,15 +13,17 @@ module.exports = {
     var limit = req.query.limit;
     var beforeId = req.query.beforeId;
     var afterId = req.query.afterId;
+    var aroundId = req.query.aroundId;
     var marker = req.query.marker;
     var userId = req.user && req.user.id;
 
     var options = {
         skip: parseInt(skip, 10) || 0,
         limit: parseInt(limit, 10) || 50,
-        beforeId: beforeId && "" + beforeId || null,
-        afterId: afterId && "" + afterId || null,
-        marker: marker && "" + marker || null,
+        beforeId: beforeId && "" + beforeId || undefined,
+        afterId: afterId && "" + afterId || undefined,
+        aroundId: aroundId && "" + aroundId || undefined,
+        marker: marker && "" + marker || undefined,
         userId: userId
     };
 
@@ -29,7 +31,11 @@ module.exports = {
       .spread(function(chatMessages, limitReached) {
         var userId = req.user && req.user.id;
 
-        var strategy = new restSerializer.ChatStrategy({ currentUserId: userId, troupeId: req.troupe.id });
+        var strategy = new restSerializer.ChatStrategy({
+          currentUserId: userId,
+          troupeId: req.troupe.id,
+          initialId: aroundId
+        });
 
         return [restSerializer.serialize(chatMessages, strategy), limitReached];
       })
