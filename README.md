@@ -53,3 +53,7 @@ Lists out why a user has an unread badge. Requires a username.
 
 e.g `./scripts/utils/unread.js trevorah`
 
+### suggested-rooms.js
+Lists out the rooms suggested to a user. Requires a username.
+
+e.g `./scripts/utils/suggested-rooms.js trevorah`
