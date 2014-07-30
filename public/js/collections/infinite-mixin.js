@@ -1,6 +1,7 @@
 define([
-  '../utils/utils'
-], function(utils) {
+  '../utils/utils',
+  '../utils/context'
+], function(utils, context) {
   "use strict";
 
   return {
@@ -226,6 +227,20 @@ define([
     },
 
     getSnapshotState: function() {
+      // If snapshot state has been passed from the server use it once
+      var initialSnapshot = context().snapshots;
+      if(initialSnapshot) {
+        var config = initialSnapshot[this.modelName];
+        if(config) {
+          this.atTop = false;
+          this.atBottom = false;
+          this.listenToOnce(this, 'snapshot', function() {
+            delete initialSnapshot[this.modelName];
+          });
+        }
+        return config;
+      }
+
       // TODO: handle initial load
       if(!this.length) return;
 

@@ -7,13 +7,12 @@ var useragent        = require("useragent");
 var crypto           = require("crypto");
 var roomPermissionsModel = require('../services/room-permissions-model');
 var assert           = require("assert");
-var appVersion       = require("./appVersion");
 var Q                = require('q');
 
 /**
  * Returns the promise of a mini-context
  */
-exports.generateNonChatContext = function(req, callback) {
+exports.generateNonChatContext = function(req) {
   var user = req.user;
 
   return Q.all([
@@ -25,11 +24,10 @@ exports.generateNonChatContext = function(req, callback) {
         user: serializedUser,
         desktopNotifications: desktopNotifications,
       });
-    })
-    .nodeify(callback);
+    });
 };
 
-exports.generateSocketContext = function(userId, troupeId, callback) {
+exports.generateSocketContext = function(userId, troupeId) {
   return Q.all([
       userId && serializeUserId(userId),
       troupeId && serializeTroupeId(troupeId, userId) || undefined
@@ -39,14 +37,15 @@ exports.generateSocketContext = function(userId, troupeId, callback) {
         user: serializedUser,
         troupe: serializedTroupe
       };
-    })
-    .nodeify(callback);
+    });
 };
 
-exports.generateTroupeContext = function(req, callback) {
+exports.generateTroupeContext = function(req, options) {
   var user = req.user;
   var uriContext = req.uriContext;
   assert(uriContext);
+
+  var snapshots = options && options.snapshots;
 
   var troupe = req.uriContext.troupe;
   var homeUser = req.uriContext.oneToOne && req.uriContext.otherUser; // The users page being looked at
@@ -78,12 +77,12 @@ exports.generateTroupeContext = function(req, callback) {
       troupe: serializedTroupe,
       desktopNotifications: desktopNotifications,
       troupeHash: troupeHash,
+      snapshots: snapshots,
       permissions: {
         admin: adminAccess
       }
     });
-  })
-  .nodeify(callback);
+  });
 };
 
 /**
@@ -178,6 +177,7 @@ function createTroupeContext(req, options) {
     troupeHash: options.troupeHash,
     isNativeDesktopApp: isNativeDesktopApp(req),
     permissions: options.permissions,
+    snapshots: options.snapshots,
     locale: req.i18n.locales[req.i18n.locale]
   };
 }

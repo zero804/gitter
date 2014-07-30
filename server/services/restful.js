@@ -35,10 +35,13 @@ exports.serializeChatsForTroupe = function(troupeId, userId, options, callback) 
     userId: userId // This may also be appearing through in options
   }, options);
 
+  var initialId = options.aroundId;
+
   return chatService.findChatMessagesForTroupe(troupeId, options)
     .spread(function(chatMessages/*, limitReached*/) {
       var strategy = new restSerializer.ChatStrategy({
         notLoggedIn: !userId,
+        initialId: initialId,
         currentUserId: userId,
         troupeId: troupeId
       });

@@ -1,0 +1,66 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no"/>
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta charset="utf-8">
+
+  <title>{{troupeName}}</title>
+
+  {{#if isUserhome}}
+  <link rel="stylesheet" href='{{ cdn "bootstrap/css/trpMobileUserhome.css"}}'>
+  {{else}}
+  <link rel="stylesheet" href='{{ cdn "bootstrap/css/trpMobileApp.css"}}'>
+  {{/if}}
+
+  {{{ generateTroupeContext troupeContext }}}
+
+  {{>require_wrapper}}
+  {{{bootScript bootScriptName }}}
+  <link rel="apple-touch-icon" href='{{ cdn "images/2/gitter/touch-icon-iphone.png" }}'>
+  <link rel="shortcut icon" href='{{ cdn "images/2/gitter/favicon5.png"}}'>
+
+  <style>
+    html.loading body {
+      background: url("{{ cdn 'images/2/gitter/logo-mark-grey-64.png' }}") center no-repeat;
+      height: 90%;
+    }
+    html.loading body > * { visibility: hidden; }
+  </style>
+</head>
+<body class="with-sideMenu">
+
+  <div id="troupeList" class="menu">
+  </div>
+
+  <div id="mainPage">
+    <header>
+      <div id="showTroupesButton">
+        <img src='{{cdn "images/2/gitter/icon-more@2x.png" }}' width="16" height="16" id="menu-toggle" style="margin-left: 8px">
+      </div>
+      <span class="trpTitle">{{troupeName}}</span>
+    </header>
+
+    <div id="content" class="header-above">
+      <div class="contentBody mobile-scroll-class" id="content-frame">
+        {{#each chats}}
+          {{{ chatItemPrerender this lang=../lang locale=../locale}}}
+        {{/each}}
+        {{#if initialBottom}}
+        {{! This is a way of forcing the browser to open at the bottom of the screen }}
+        <div id='initial' style="height:0;width:0;overflow:hidden"><a name="initial"/>_</a></div>
+        {{/if}}
+      </div>
+    </div>
+
+    <div class="chat-input__container  js-chat-input-container" id="chat-input"></div>
+  </div>
+  {{#if liveReload}}
+    <script src="//localhost:35729/livereload.js"></script>
+  {{/if}}
+  <script type="text/javascript">
+   window.location = '#initial';
+  </script>
+
+</body>
+</html>

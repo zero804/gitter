@@ -1,5 +1,6 @@
 /* jshint unused:true, browser:true,  strict:true *//* global define:false */
 define([
+  'jquery',
   'underscore',
   'utils/context',
   'log!chat-collection-view',
@@ -14,7 +15,7 @@ define([
   'utils/rollers',
   'cocktail',
   'bootstrap_tooltip' // No ref
-], function(_, context, log, chatModels, AvatarView, InfiniteScrollMixin, unreadItemsClient,
+], function($, _, context, log, chatModels, AvatarView, InfiniteScrollMixin, unreadItemsClient,
     Marionette, TroupeViews, appEvents, chatItemView, Rollers, cocktail /* tooltip*/) {
   "use strict";
 
@@ -77,8 +78,6 @@ define([
 
       this.userCollection = options.userCollection;
       this.decorators     = options.decorators || [];
-
-      this.rollers.scrollToBottom();
 
       /* Scroll to the bottom when the user sends a new chat */
       this.listenTo(appEvents, 'chat.send', function() {
