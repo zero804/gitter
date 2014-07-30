@@ -3,13 +3,13 @@
 var env               = require('../../utils/env');
 var logger            = env.logger;
 
-var troupeService     = require('../../services/troupe-service');
 var presenceService   = require('../../services/presence-service');
 var restful           = require('../../services/restful');
 var mongoUtils        = require('../../utils/mongo-utils');
 var StatusError       = require('statuserror');
 var bayeuxExtension   = require('./extension');
 var Q                 = require('q');
+var userCanAccessRoom = require('../../services/user-can-access-room');
 
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
@@ -33,40 +33,6 @@ var routes = [
     validator: validateUserForPingSubscription }
 ];
 
-function checkTroupeAccess(userId, troupeId, callback) {
-  // TODO: use the room permissions model
-  return troupeService.findById(troupeId)
-    .then(function(troupe) {
-      if(!troupe) return false;
-
-      if(troupe.bans && troupe.bans.some(function(troupeBan) {
-        return "" + userId == "" + troupeBan.userId;
-      })) {
-        // Banned from the room? You get to see nothing dog!
-        return false;
-      }
-
-      if(troupe.security === 'PUBLIC') {
-        return true;
-      }
-
-      // After this point, everything needs to be authenticated
-      if(!userId) {
-        return false;
-      }
-
-      var result = troupeService.userIdHasAccessToTroupe(userId, troupe);
-
-      if(!result) {
-        logger.info("Denied user " + userId + " access to troupe " + troupe.uri);
-        return false;
-      }
-
-      return result;
-    })
-    .nodeify(callback);
-}
-
 // This strategy ensures that a user can access a URL under a troupe URL
 function validateUserForSubTroupeSubscription(options) {
   var userId = options.userId;
@@ -78,7 +44,7 @@ function validateUserForSubTroupeSubscription(options) {
     return Q.reject(new StatusError(400, 'Invalid ID: ' + troupeId));
   }
 
-  return checkTroupeAccess(userId, troupeId);
+  return userCanAccessRoom(userId, troupeId);
 }
 
 // This is only used by the native client. The web client publishes to
@@ -230,7 +196,7 @@ function authorizeSubscribe(message, callback) {
       return m;
     });
 
-    if(!hasMatch) return callback(new StatusError(404, "Unknown subscription"));
+    if(!hasMatch) return callback(new StatusError(404, "Unknown subscription " + message.subscription));
 
     var validator = match.route.validator;
     var m = match.match;
