@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var env               = require('../../utils/env');
@@ -50,11 +49,19 @@ module.exports = function(options) {
   var name = options.name;
   var failureStat = options.failureStat;
   var skipSuperClient = options.skipSuperClient;
+  var skipOnError = options.skipOnError;
+
+  // No point in shared state unless theres an incoming and outgoing extension
+  var privateState = options.privateState && incoming && outgoing;
 
   var extension = {};
 
   if(incoming) {
     extension.incoming = function(incomingMessage, req, callback) {
+      if(skipOnError && incomingMessage.error) {
+        return callback(incomingMessage);
+      }
+
       if(channel && incomingMessage.channel !== channel) {
         return callback(incomingMessage);
       }
@@ -64,8 +71,12 @@ module.exports = function(options) {
       }
 
       var timeout = setTimeout(function() {
-        logger.error("Extension took too long to process!", name, incomingMessage);
+        logger.error("Incoming extension took too long to process!", { name: name, message: incomingMessage });
       }, 1000);
+
+      if(privateState) {
+        if(!incomingMessage._private) incomingMessage._private = { };
+      }
 
       incoming(incomingMessage, req, function(err, outgoingMessage) {
         clearTimeout(timeout);
@@ -75,9 +86,14 @@ module.exports = function(options) {
           if(failureStat) stats.eventHF(failureStat);
 
           var error = makeError(err);
-          outgoingMessage.error = error;
+
+          // Don't mask previous errors
+          if(!outgoingMessage.error) {
+            outgoingMessage.error = error;
+          }
 
           logger.error('bayeux: extension ' + name + '[incoming] failed: ' + error, {
+            exception: err,
             channel: outgoingMessage.channel,
             token: outgoingMessage.ext && outgoingMessage.ext.token,
             subscription: outgoingMessage.subscription,
@@ -93,6 +109,10 @@ module.exports = function(options) {
 
   if(outgoing) {
     extension.outgoing = function(incomingMessage, req, callback) {
+      if(skipOnError && incomingMessage.error) {
+        return callback(incomingMessage);
+      }
+
       if(channel && incomingMessage.channel !== channel) {
         return callback(incomingMessage);
       }
@@ -102,12 +122,11 @@ module.exports = function(options) {
       }
 
       var timeout = setTimeout(function() {
-        logger.error("Extension took too long to process!", name, incomingMessage);
+        logger.error("Outgoing extension took too long to process!", { name: name, message: incomingMessage });
       }, 1000);
 
       outgoing(incomingMessage, req, function(err, outgoingMessage) {
         clearTimeout(timeout);
-
         if(!outgoingMessage) outgoingMessage = incomingMessage;
 
         if(err) {
@@ -115,9 +134,14 @@ module.exports = function(options) {
           if(failureStat) stats.eventHF(failureStat);
 
           var error = makeError(err);
-          outgoingMessage.error = error;
+
+          // Don't mask previous errors
+          if(!outgoingMessage.error) {
+            outgoingMessage.error = error;
+          }
 
           logger.error('bayeux: extension ' + name + '[outgoing] failed: ' + error + '. Technically this should not happen.', {
+            exception: err,
             channel: outgoingMessage.channel,
             token: outgoingMessage.ext && outgoingMessage.ext.token,
             subscription: outgoingMessage.subscription,

@@ -44,7 +44,6 @@ define([
 
     scrollElementSelector: "#content-frame",
 
-    /* "WHAT THE F" is this nasty thing. Document your codedebt people */
     // This nasty thing changes the CSS rule for the first chat item to prevent a high headerView from covering it
     // We do this instead of jQuery because the first-child selector can
     adjustTopPadding: function() {
@@ -84,40 +83,29 @@ define([
       /* Scroll to the bottom when the user sends a new chat */
       this.listenTo(appEvents, 'chat.send', function() {
         this.rollers.scrollToBottom();
+        this.collection.fetchLatest({}, function() {
+        }, this);
+      });
+
+      this.listenTo(this.collection, 'scroll.fetch', function() {
+        if(this.rollers.isScrolledToBottom() && !this.collection.atBottom) {
+          // The user has forced the scroll bar all the way to the bottom,
+          // fetch the latest
+          this.collection.fetchLatest({});
+        }
       });
     },
 
     scrollToFirstUnread: function() {
       var self = this;
-      var syncCount = 0;
-
-      function findFirstUnread(callback) {
+      this.collection.fetchFromMarker('first-unread', {}, function() {
         var firstUnread = self.collection.findWhere({ unread: true });
-
-        if(!firstUnread && syncCount > 8) {
-          // stop trying to load so many messages. Have some old message instead.
-          var someOldMessage = self.collection.first();
-          return callback(someOldMessage);
-        }
-
-        if(!firstUnread) {
-          self.loadMore();
-          self.collection.once('sync', function() {
-            syncCount++;
-            findFirstUnread(callback);
-          });
-        } else {
-          callback(firstUnread);
-        }
-      }
-
-      findFirstUnread(function(firstUnread) {
         if(!firstUnread) return;
-
         var firstUnreadView = self.children.findByModel(firstUnread);
+        if(!firstUnreadView) return;
         self.rollers.scrollToElement(firstUnreadView.el);
-
       });
+
     },
 
     scrollToFirstUnreadBelow: function() {
@@ -188,7 +176,6 @@ define([
     }
 
   });
-
   cocktail.mixin(ChatCollectionView, TroupeViews.SortableMarionetteView, InfiniteScrollMixin);
 
   return ChatCollectionView;
