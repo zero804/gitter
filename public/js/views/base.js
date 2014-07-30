@@ -8,11 +8,12 @@ define([
   'hbs!./tmpl/modal',
   'hbs!./tmpl/loading',
   'hbs!./tmpl/confirmationView',
+  'hbs!./tmpl/interstitial',
   'log!base-views',
   'utils/detect-compact',
   '../template/helpers/all' // No ref
 ], function(require, $, _, Backbone, appEvents, Marionette, modalTemplate,
-  loadingTemplate, confirmationViewTemplate, log, detectCompact) {
+  loadingTemplate, confirmationViewTemplate, interstitialTemplate, log, detectCompact) {
   "use strict";
 
   /* From http://coenraets.org/blog/2012/01/backbone-js-lessons-learned-and-improved-sample-app/ */
@@ -753,6 +754,20 @@ define([
   //   }});
   //   b.fadeIn({ duration: 'fast' });
   // });
+
+  TroupeViews.Interstitial = TroupeViews.Modal.extend({
+    template: interstitialTemplate,
+    className: "interstitial",
+
+    afterRender: function() {
+      this.$el.hide();
+      var modalBody = this.$el.find('.interstitial-body');
+      modalBody.append(this.view.render().el);
+      this.$el.find('.close').on('click', this.hide);
+    },
+
+  });
+
 
   return TroupeViews;
 });
