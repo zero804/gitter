@@ -1,0 +1,166 @@
+@import "trpFonts.less";
+
+.interstitial {
+  text-align: left;
+  //top: 0px;
+  //left: 0px;
+  width: 100%;
+  //height: 100%;
+  //margin: 0px;
+  //padding: 0px;
+  //z-index: 1050;
+  //display: none;
+  //background: white;
+  //position: fixed;
+}
+
+.interstitial-header {
+  text-align: left;
+  margin: 20px;
+  font-family: @fontSans;
+  font-weight: 200;
+  font-size: 22px;
+  img {
+    vertical-align: middle;
+    height: 48px;
+    width: 48px;
+  }
+}
+
+.interstitial-body {
+  text-align: left;
+  margin: 20px;
+}
+
+.interstitial-footer {
+  text-align: left;
+  position: fixed;
+  bottom: 0px;
+  width: 100%;
+  .actions {
+    margin: 20px;
+  }
+}
+
+.welcome-modal {
+  font-family: @fontSans;
+  h2 {
+    font-size: 18px;
+    margin-top: 20px;
+    font-weight: bold;
+  }
+}
+
+.welcome-modal__close {
+  cursor: pointer;
+  transition: all 300ms ease-in-out;
+  float: right;
+  opacity: 0.2;
+  margin: 20px;
+  &:before {
+    font-family: 'troupe-icons';
+    content: '\e827';
+    font-size: 14px;
+  }
+  &:hover {
+    opacity: 0.4;
+  }
+}
+
+.welcome-modal__header {
+  padding: 10px;
+  border-bottom: 1px solid rgba(200,200,200,0.3);
+  h2 {
+    text-align: left;
+    font-family: @fontSans;
+    font-weight: 200;
+    font-size: 22px;
+    padding: 0 10px;
+  }
+  img {
+    vertical-align: middle;
+    height: 48px;
+    width: 48px;
+  }
+}
+
+.welcome-modal__collaborators {
+  font-size: 14px;
+  font-family: @fontSans;
+  text-align: left;
+  background: #f4f5f6;
+  border-radius: 5px;
+  margin: 20px 40px;
+
+  ul {
+    list-style: none;
+    margin: 20px 0 0 0;
+    max-height: 250px;
+    overflow: scroll;
+    padding: 0 20px;
+  }
+
+  li {
+    display: inline-block;
+    width: 265px;
+    margin-right: 40px;
+  }
+}
+
+.welcome-modal__collaborator {
+  display: inline-block;
+  width: 265px;
+  max-width: 100%;
+  line-height: 22px;
+  border-radius: 4px;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  cursor: pointer;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  height: 75px;
+
+  img {
+    margin-right: 20px;
+    border-radius: 4px;
+    float: left;
+    width: 48px;
+    height: 48px;
+  }
+
+  p {
+    float: left;
+    max-width: 70%;
+    margin: 0px;
+    white-space: normal;
+    //text-overflow: ellipsis;
+    //overflow: hidden;
+  }
+
+  .add {
+    float: right;
+  }
+
+  .message {
+    color: #888;
+
+    a {
+    color: @trpLightBlue;
+    }
+
+  }
+
+}
+
+.welcome-modal__footer {
+  padding: 20px;
+}
+
+#activity-tip {
+  color: #666;
+  margin: 20px;
+  a {
+    color: #333;
+  }
+ }
