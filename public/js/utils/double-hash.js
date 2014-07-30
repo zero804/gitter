@@ -1,6 +1,7 @@
 define([
-  'underscore'
-], function(_) {
+  'underscore',
+  'utils/utils'
+], function(_, utils) {
   "use strict";
 
   // -----------------------------------------------------
@@ -14,16 +15,28 @@ define([
   DoubleHash.prototype = {
     // Add an item, return true if it did not exist before
     _add: function(itemType, itemId) {
-      var substore = this._data[itemType];
+      var self = this;
+      var substore = self._data[itemType];
       if(!substore) {
-        substore = this._data[itemType] = {};
+        substore = self._data[itemType] = {};
       }
 
       var exists = substore[itemId];
       if(exists) return false;
       substore[itemId] = true;
 
-      if(this._onItemAdded) this._onItemAdded(itemType, itemId);
+      if(self._maxItems) {
+        var items = _.keys(substore);
+        if(items.length > self._maxItems) {
+          items.sort(utils.naturalComparator);
+          var forRemoval = items.slice(0, - self._maxItems);
+          forRemoval.forEach(function(itemId) {
+            self._remove(itemType, itemId);
+          });
+        }
+      }
+
+      if(self._onItemAdded) self._onItemAdded(itemType, itemId);
 
       return true;
     },
@@ -59,6 +72,12 @@ define([
         var ids = _.keys(this._data[itemType]);
         return memo + ids.length;
       }, 0, this);
+    },
+
+    _getItemsOfType: function(itemType) {
+      var substore = this._data[itemType];
+      if(!substore) return [];
+      return Object.keys(substore);
     },
 
     _marshall: function() {
