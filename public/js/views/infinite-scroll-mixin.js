@@ -81,8 +81,8 @@ define([
             // turn off infinite scroll if there were no new messages retrieved
             self.scroll.disable();
           }
-          
-          var limitReached = (options.xhr.getResponseHeader('LimitReached') === 'true') ? true : false;
+
+          var limitReached = options.xhr.getResponseHeader('LimitReached') === 'true';
           if (limitReached) {
             self.collection.trigger('limitReached');
           }
