@@ -383,7 +383,7 @@ define([
 
       var chats = this._store._getItemsOfType('chat');
 
-      var allItems = this._scrollElement.querySelectorAll('.trpChatItemContainer');
+      var allItems = this._scrollElement.querySelectorAll('.chat-item');
       var chatAboveIndex = _.sortedIndex(allItems, topBound - 1, function(item) {
         if(typeof item === 'number') return item;
         return item.offsetTop + item.offsetHeight;
