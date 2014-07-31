@@ -18,6 +18,7 @@ var appVersion        = require('./appVersion');
 var mongoUtils        = require('../utils/mongo-utils');
 var StatusError       = require('statuserror');
 var bayeuxExtension   = require('./bayeux/extension');
+var Q                 = require('q');
 
 var version = appVersion.getVersion();
 
@@ -80,94 +81,115 @@ function checkTroupeAccess(userId, troupeId, callback) {
 }
 
 // This strategy ensures that a user can access a URL under a troupe URL
-function validateUserForSubTroupeSubscription(options, callback) {
+function validateUserForSubTroupeSubscription(options) {
   var userId = options.userId;
   var match = options.match;
 
   var troupeId = match[1];
 
   if(!mongoUtils.isLikeObjectId(troupeId)) {
-    return callback(new StatusError(400, 'Invalid ID: ' + troupeId));
+    return Q.reject(new StatusError(400, 'Invalid ID: ' + troupeId));
   }
 
-  return checkTroupeAccess(userId, troupeId)
-    .nodeify(callback);
+  return checkTroupeAccess(userId, troupeId);
 }
 
 // This is only used by the native client. The web client publishes to
 // the url
-function validateUserForPingSubscription(options, callback) {
-  return callback(null, true);
+function validateUserForPingSubscription(/* options */) {
+  return Q.resolve(true);
 }
 
 // This strategy ensures that a user can access a URL under a /user/ URL
-function validateUserForUserSubscription(options, callback) {
+function validateUserForUserSubscription(options) {
   var userId = options.userId;
   var match = options.match;
   var subscribeUserId = match[1];
 
   // All /user/ subscriptions need to be authenticated
-  if(!userId) return false;
+  if(!userId) return Q.resolve(false);
 
   if(!mongoUtils.isLikeObjectId(userId)) {
-    return callback(new StatusError(400, 'Invalid ID: ' + userId));
+    return Q.reject(new StatusError(400, 'Invalid ID: ' + userId));
   }
 
   var result = userId == subscribeUserId;
 
-  return callback(null, result);
+  return Q.resolve(result);
 }
 
-function populateSubUserCollection(options, callback) {
+function arrayToSnapshot(data) {
+  return { data: data };
+}
+
+function populateSubUserCollection(options) {
   var userId = options.userId;
   var match = options.match;
   var subscribeUserId = match[1];
   var collection = match[2];
 
-  // All /user/ subscriptions need to be authenticated
-  if(!userId) return false;
-
-  if(userId != subscribeUserId) {
-    return callback(null, [ ]);
+  if(!userId || userId != subscribeUserId) {
+    return Q.resolve();
   }
 
   switch(collection) {
     case "rooms":
     case "troupes":
-      return restful.serializeTroupesForUser(userId, callback);
+      return restful.serializeTroupesForUser(userId)
+        .then(arrayToSnapshot);
 
     default:
       logger.error('Unable to provide snapshot for ' + collection);
   }
 
-  callback(null, [ ]);
+  return Q.resolve();
 }
 
-
-function populateSubTroupeCollection(options, callback) {
+function populateSubTroupeCollection(options) {
   var userId = options.userId;
   var match = options.match;
+  var snapshot = options.snapshot; // Details of the snapshot
   var troupeId = match[1];
   var collection = match[2];
 
   switch(collection) {
     case "chatMessages":
-      return restful.serializeChatsForTroupe(troupeId, userId, callback);
+      var beforeId, afterId, marker, limit, beforeInclId;
+      if(snapshot) {
+        beforeInclId = snapshot.beforeInclId;
+        beforeId = snapshot.beforeId;
+        afterId = snapshot.afterId;
+        marker = snapshot.marker;
+        limit = snapshot.limit;
+      }
+
+      var chatOptions = {
+        limit: limit,
+        beforeInclId: beforeInclId,
+        beforeId: beforeId,
+        afterId: afterId,
+        marker: marker
+      };
+
+      return restful.serializeChatsForTroupe(troupeId, userId, chatOptions)
+        .then(arrayToSnapshot);
 
     case "users":
-      return restful.serializeUsersForTroupe(troupeId, userId, callback);
+      return restful.serializeUsersForTroupe(troupeId, userId)
+        .then(arrayToSnapshot);
 
     case "events":
-      return restful.serializeEventsForTroupe(troupeId, userId, callback);
+      return restful.serializeEventsForTroupe(troupeId, userId)
+        .then(arrayToSnapshot);
 
     default:
       logger.error('Unable to provide snapshot for ' + collection);
   }
 
-  callback(null, [ ]);
+  return Q.resolve();
 }
 
-function populateSubSubTroupeCollection(options, callback) {
+function populateSubSubTroupeCollection(options) {
   var match = options.match;
   var troupeId = match[1];
   var collection = match[2];
@@ -176,24 +198,29 @@ function populateSubSubTroupeCollection(options, callback) {
 
   switch(collection + '-' + subCollection) {
     case "chatMessages-readBy":
-      return restful.serializeReadBysForChat(troupeId, subId, callback);
+      return restful.serializeReadBysForChat(troupeId, subId)
+        .then(arrayToSnapshot);
 
+
+    default:
+      logger.error('Unable to provide snapshot for ' + collection);
   }
 
-  callback(null, [ ]);
+  return Q.resolve();
 }
 
-function populateUserUnreadItemsCollection(options, callback) {
+function populateUserUnreadItemsCollection(options) {
   var userId = options.userId;
   var match = options.match;
   var subscriptionUserId = match[1];
   var troupeId = match[2];
 
-  if(userId !== subscriptionUserId) {
-    return callback(null, [ ]);
+  if(!userId || userId !== subscriptionUserId) {
+    return Q.resolve();
   }
 
-  return restful.serializeUnreadItemsForTroupe(troupeId, userId, callback);
+  return restful.serializeUnreadItemsForTroupe(troupeId, userId)
+    .then(arrayToSnapshot);
 }
 
 function getConnectionType(incoming) {
@@ -214,20 +241,22 @@ var authenticator = bayeuxExtension({
   name: 'authenticator',
   failureStat: 'bayeux.handshake.deny',
   skipSuperClient: true,
+  skipOnError: true,
+  privateState: true,
   incoming: function(message, req, callback) {
     var ext = message.ext || {};
 
     var token = ext.token;
 
     if(!token) {
-      return callback({ status: 401, message: "Access token required" });
+      return callback(new StatusError(401, "Access token required"));
     }
 
     oauth.validateAccessTokenAndClient(ext.token, function(err, tokenInfo) {
       if(err) return callback(err);
 
       if(!tokenInfo) {
-        return callback({ status: 401, message: "Invalid access token" });
+        return callback(new StatusError(401, "Invalid access token"));
       }
 
       var user = tokenInfo.user;
@@ -241,15 +270,14 @@ var authenticator = bayeuxExtension({
       });
 
       var connectionType = getConnectionType(ext.connType);
-      var client = ext.client || '';
-      var troupeId = ext.troupeId || '';
-      var eyeballState = ext.eyeballs || '';
 
-      // This is an UGLY UGLY hack, but it's the only
-      // way possible to pass the userId to the outgoing extension
-      // where we have the clientId (but not the userId)
-      var id = message.id || '';
-      message.id = [id, userId, connectionType, client, troupeId, eyeballState].join(':');
+      message._private.authenticator = {
+        userId: userId,
+        connectionType: connectionType,
+        client: ext.client,
+        troupeId: ext.troupeId,
+        eyeballState: parseInt(ext.eyeballs, 10) || 0
+      };
 
       return callback(null, message);
     });
@@ -260,25 +288,15 @@ var authenticator = bayeuxExtension({
     if(!message.ext) message.ext = {};
     message.ext.appVersion = version;
 
-    // The other half of the UGLY hack,
-    // get the userId out from the message
-    var fakeId = message.id;
-    if(!fakeId) {
-      return callback(null, message);
-    }
+    var state = message._private && message._private.authenticator;
+    if(!state) return callback(null, message);
 
-    var parts = fakeId.split(':');
-    if(parts.length != 6) {
-      return callback(null, message);
-    }
-
-    message.id = parts[0] || undefined; // id not required for an incoming message
-    var userId = parts[1] || undefined;
-    var connectionType = parts[2];
+    var userId = state.userId;
+    var connectionType = state.connectionType;
     var clientId = message.clientId;
-    var client = parts[3] || undefined;
-    var troupeId = parts[4] || undefined;
-    var eyeballState = parseInt(parts[5], 10) || 0;
+    var client = state.client;
+    var troupeId = state.troupeId;
+    var eyeballState = state.eyeballState;
 
     // Get the presence service involved around about now
     presenceService.userSocketConnected(userId, clientId, connectionType, client, troupeId, eyeballState, function(err) {
@@ -316,12 +334,11 @@ var authenticator = bayeuxExtension({
 function destroyClient(clientId) {
   if(!clientId) return;
 
-  process.nextTick(function() {
+  setImmediate(function() {
     var engine = server._server._engine;
     engine.destroyClient(clientId, function() {
       logger.info('bayeux: client ' + clientId + ' intentionally destroyed.');
     });
-
   });
 
 }
@@ -347,88 +364,16 @@ function authorizeSubscribe(message, callback) {
       return m;
     });
 
-    if(!hasMatch) return callback({ status: 404, message: "Unknown subscription" });
+    if(!hasMatch) return callback(new StatusError(404, "Unknown subscription"));
 
     var validator = match.route.validator;
     var m = match.match;
 
-    validator({ userId: userId, match: m, message: message, clientId: clientId }, callback);
+    validator({ userId: userId, match: m, message: message, clientId: clientId })
+      .nodeify(callback);
   });
 
 }
-
-//
-// Authorisation Extension - decides whether the user
-// is allowed to connect to the subscription channel
-//
-var authorisor = bayeuxExtension({
-  channel: '/meta/subscribe',
-  name: 'authorisor',
-  failureStat: 'bayeux.subscribe.deny',
-  skipSuperClient: true,
-  incoming: function(message, req, callback) {
-    var snapshot = 1;
-    if(message.ext && message.ext.snapshot === false) {
-      snapshot = 0;
-    }
-
-    // Do we allow this user to connect to the requested channel?
-    authorizeSubscribe(message, function(err, allowed) {
-      if(err) return callback(err);
-
-      if(!allowed) {
-        return callback({ status: 403, message: "Authorisation denied."});
-      }
-
-      message.id = [message.id || '', snapshot].join(':');
-
-      return callback(null, message);
-    });
-
-  },
-
-  outgoing: function(message, req, callback) {
-    var clientId = message.clientId;
-
-    var parts = message.id && message.id.split(':');
-    if(!parts || parts.length !== 2) return callback(null, message);
-
-    message.id = parts[0] || undefined;
-    var snapshot = parseInt(parts[1], 10) === 1;
-
-    var match = null;
-
-    var hasMatch = routes.some(function(route) {
-      var m = route.re.exec(message.subscription);
-      if(m) {
-        match = { route: route, match: m };
-      }
-      return m;
-    });
-
-    if(!hasMatch) return callback(null, message);
-
-    var populator = match.route.populator;
-    var m = match.match;
-
-    /* The populator is all about generating the snapshot for the client */
-    if(!clientId || !populator || !snapshot) return callback(null, message);
-
-    presenceService.lookupUserIdForSocket(clientId, function(err, userId, exists) {
-      if(err) callback(err);
-
-      if(!exists) return callback({ status: 401, message: "Snapshot failed. Socket not associated" });
-
-      populator({ userId: userId, match: m }, function(err, data) {
-        if(!message.ext) message.ext = {};
-        message.ext.snapshot = data;
-        return callback(null, message);
-      });
-
-    });
-
-  }
-});
 
 // CONNECT extension
 var noConnectForUnknownClients = bayeuxExtension({
@@ -436,16 +381,17 @@ var noConnectForUnknownClients = bayeuxExtension({
   name: 'doorman',
   failureStat: 'bayeux.connect.deny',
   skipSuperClient: true,
+  skipOnError: true,
   incoming: function(message, req, callback) {
     var clientId = message.clientId;
 
     server._server._engine.clientExists(clientId, function(exists) {
-      if(!exists) return callback({ status: 401, message: "Client does not exist"});
+      if(!exists) return callback(new StatusError(401, "Client does not exist"));
 
       presenceService.socketExists(clientId, function(err, exists) {
         if(err) return callback(err);
 
-        if(!exists) return callback({ status: 401, message: "Socket association does not exist" });
+        if(!exists) return callback(new StatusError(401, "Socket association does not exist"));
 
         return callback(null, message);
       });
@@ -463,7 +409,7 @@ var pushOnlyServer = bayeuxExtension({
       return callback();
     }
 
-    return callback({ status: 403, message: "Push access denied" });
+    return callback(new StatusError(403, "Push access denied"));
   },
 });
 
@@ -487,12 +433,12 @@ var pingResponder = bayeuxExtension({
     var clientId = message.clientId;
 
     server._server._engine.clientExists(clientId, function(exists) {
-      if(!exists) return callback({ status: 401, message: "Client does not exist"});
+      if(!exists) return callback(new StatusError(401, "Client does not exist"));
 
       presenceService.socketExists(clientId, function(err, exists) {
         if(err) return callback(err);
 
-        if(!exists) return callback({ status: 401, message: "Socket association does not exist" });
+        if(!exists) return callback(new StatusError(401, "Socket association does not exist"));
 
         return callback(null, message);
       });
@@ -567,6 +513,8 @@ var logging = {
 
 var adviseAdjuster = {
   outgoing: function(message, req, callback) {
+    delete message._private;
+
     var error = message.error;
 
     if(error) {
@@ -576,6 +524,8 @@ var adviseAdjuster = {
       if(errorCode === 401) {
         var reconnect;
 
+        // Consider whether to put this back....
+        //
         // if(message.clientId) {
         //   logger.info('Destroying client', { clientId: message.clientId });
         //   // We've told the person to go away, destroy their faye client
@@ -631,23 +581,48 @@ var server = new faye.NodeAdapter({
   }
 });
 
+/* Nasty hack, but no way around it */
+server._server._makeResponse = function(message) {
+  var response = {};
+
+  if (message.id)       response.id       = message.id;
+  if (message.clientId) response.clientId = message.clientId;
+  if (message.channel)  response.channel  = message.channel;
+  if (message.error)    response.error    = message.error;
+
+  // Our improvement: information for extensions
+  if (message._private) response._private = message._private;
+
+  response.successful = !response.error;
+  return response;
+};
+
+
 var client = server.getClient();
 
 var STATS_FREQUENCY = 0.01;
 
+/* This function is used a lot, this version excludes try-catch so that it can be optimised */
+function stringifyInternal(object) {
+  if(typeof object !== 'object') return JSON.stringify(object);
+
+  var string = JSON.stringify(object);
+
+  // Over cautious
+  stats.eventHF('bayeux.message.count', 1, STATS_FREQUENCY);
+
+  if(string) {
+    stats.gaugeHF('bayeux.message.size', string.length, STATS_FREQUENCY);
+  } else {
+    stats.gaugeHF('bayeux.message.size', 0, STATS_FREQUENCY);
+  }
+
+  return string;
+}
+
 faye.stringify = function(object) {
   try {
-    var string = JSON.stringify(object);
-    // Over cautious
-    stats.eventHF('bayeux.message.count', 1, STATS_FREQUENCY);
-
-    if(string) {
-      stats.gaugeHF('bayeux.message.size', string.length, STATS_FREQUENCY);
-    } else {
-      stats.gaugeHF('bayeux.message.size', 0, STATS_FREQUENCY);
-    }
-
-    return string;
+    return stringifyInternal(object);
   } catch(e) {
     stats.event('bayeux.message.serialization_error');
 
@@ -680,7 +655,13 @@ module.exports = {
     server.addExtension(logging);
     server.addExtension(authenticator);
     server.addExtension(noConnectForUnknownClients);
-    server.addExtension(authorisor);
+
+    //
+    // Authorisation Extension - decides whether the user
+    // is allowed to connect to the subscription channel
+    //
+    server.addExtension(require('./bayeux/authorisor'));
+
     server.addExtension(pushOnlyServer);
     server.addExtension(hidePassword);
     server.addExtension(pingResponder);

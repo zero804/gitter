@@ -86,6 +86,18 @@ define(['mutant'], function(Mutant) {
 
     },
 
+    disableTrackBottom: function() {
+      this.disableTrackBottom = true;
+
+    },
+
+    enableTrackBottom: function() {
+      this.disableTrackBottom = true;
+      if(this.isScrolledToBottom()) {
+        this.trackLocation();
+      }
+    },
+
     isScrolledToBottom: function() {
       var target = this._target;
       var atBottom = target.scrollTop >= target.scrollHeight - target.clientHeight - BOTTOM_MARGIN;
@@ -162,7 +174,6 @@ define(['mutant'], function(Mutant) {
         this._stableElementFromBottom = scrollBottom - stableElementTop;
       }
     },
-
 
     updateStableTracking: function() {
       if(!this._stableElement) return;

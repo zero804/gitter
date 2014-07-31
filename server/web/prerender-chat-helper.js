@@ -20,7 +20,7 @@ var baseDir = path.normalize(__dirname + '/../../' + nconf.get('web:staticConten
 function compileTemplate (file) {
   var buffer = fs.readFileSync(baseDir + '/js/views/chat/tmpl/' + file);
   return syncHandlebars.compile(buffer.toString());
-};
+}
 
 var chatItemTemplate = compileTemplate('chatItemView.hbs');
 var statusItemTemplate = compileTemplate('statusItemView.hbs');
@@ -117,7 +117,7 @@ module.exports = exports = function(model, params) {
   } else {
     result = chatItemTemplate(m);
   }
-  
+
   var unreadClass = model.unread ? 'unread' : 'read';
   var burstClass = model.burstStart ? 'burstStart' : 'burstContinued';
 
