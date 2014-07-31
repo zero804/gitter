@@ -3,7 +3,7 @@
   background-size: 80px 64px;
 }
 
-.service-sprite.logentries-error {
+.service-sprite.logentries-logo {
   width: 16px;
   height: 16px;
   background-position: 0 0;
@@ -57,13 +57,13 @@
   background-position: -32px -32px;
 }
 
-.service-sprite.custom-logo {
+.service-sprite.logentries-error {
   width: 16px;
   height: 16px;
   background-position: -48px 0;
 }
 
-.service-sprite.logentries-logo {
+.service-sprite.custom-logo {
   width: 16px;
   height: 16px;
   background-position: -48px -16px;
@@ -75,46 +75,52 @@
   background-position: -48px -32px;
 }
 
-.service-sprite.sentry-logo {
+.service-sprite.sentry-error {
   width: 16px;
   height: 16px;
   background-position: 0 -48px;
 }
 
-.service-sprite.sprintly-columns {
+.service-sprite.sentry-logo {
   width: 16px;
   height: 16px;
   background-position: -16px -48px;
 }
 
-.service-sprite.sprintly-logo {
+.service-sprite.sprintly-columns {
   width: 16px;
   height: 16px;
   background-position: -32px -48px;
 }
 
-.service-sprite.travis-frown {
+.service-sprite.sprintly-logo {
   width: 16px;
   height: 16px;
   background-position: -48px -48px;
 }
 
-.service-sprite.travis-logo {
+.service-sprite.travis-frown {
   width: 16px;
   height: 16px;
   background-position: -64px 0;
 }
 
-.service-sprite.travis-meh {
+.service-sprite.travis-logo {
   width: 16px;
   height: 16px;
   background-position: -64px -16px;
 }
 
-.service-sprite.travis-smile {
+.service-sprite.travis-meh {
   width: 16px;
   height: 16px;
   background-position: -64px -32px;
+}
+
+.service-sprite.travis-smile {
+  width: 16px;
+  height: 16px;
+  background-position: -64px -48px;
 }
 
 
