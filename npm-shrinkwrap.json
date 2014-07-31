@@ -1,6 +1,6 @@
 {
   "name": "gitter-webapp",
-  "version": "4.1.1",
+  "version": "4.2.2",
   "dependencies": {
     "apn": {
       "version": "1.4.4",
@@ -992,43 +992,37 @@
     },
     "gitter-env": {
       "version": "0.8.4",
-      "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#25e2808871283f7c8da3c2dd48fd01036c96bc80",
+      "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.8.4",
       "resolved": "git+ssh://git@github.com:gitterHQ/gitter-env.git#25e2808871283f7c8da3c2dd48fd01036c96bc80",
       "dependencies": {
         "async": {
           "version": "0.8.0",
-          "from": "https://registry.npmjs.org/async/-/async-0.8.0.tgz",
-          "resolved": "https://registry.npmjs.org/async/-/async-0.8.0.tgz"
+          "from": "async@^0.8.0"
         },
         "nconf": {
           "version": "0.6.9",
-          "from": "https://registry.npmjs.org/nconf/-/nconf-0.6.9.tgz",
-          "resolved": "https://registry.npmjs.org/nconf/-/nconf-0.6.9.tgz",
+          "from": "nconf@^0.6.9",
           "dependencies": {
             "async": {
               "version": "0.2.9",
-              "from": "https://registry.npmjs.org/async/-/async-0.2.9.tgz",
+              "from": "async@0.2.9",
               "resolved": "https://registry.npmjs.org/async/-/async-0.2.9.tgz"
             },
             "ini": {
               "version": "1.2.1",
-              "from": "https://registry.npmjs.org/ini/-/ini-1.2.1.tgz",
-              "resolved": "https://registry.npmjs.org/ini/-/ini-1.2.1.tgz"
+              "from": "ini@1.x.x"
             },
             "optimist": {
               "version": "0.6.0",
-              "from": "https://registry.npmjs.org/optimist/-/optimist-0.6.0.tgz",
-              "resolved": "https://registry.npmjs.org/optimist/-/optimist-0.6.0.tgz",
+              "from": "optimist@0.6.0",
               "dependencies": {
                 "wordwrap": {
                   "version": "0.0.2",
-                  "from": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.2.tgz",
-                  "resolved": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.2.tgz"
+                  "from": "wordwrap@~0.0.2"
                 },
                 "minimist": {
                   "version": "0.0.10",
-                  "from": "https://registry.npmjs.org/minimist/-/minimist-0.0.10.tgz",
-                  "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.10.tgz"
+                  "from": "minimist@~0.0.1"
                 }
               }
             }
@@ -1036,23 +1030,19 @@
         },
         "redis": {
           "version": "0.10.3",
-          "from": "https://registry.npmjs.org/redis/-/redis-0.10.3.tgz",
-          "resolved": "https://registry.npmjs.org/redis/-/redis-0.10.3.tgz"
+          "from": "redis@^0.10.1"
         },
         "underscore": {
           "version": "1.6.0",
-          "from": "https://registry.npmjs.org/underscore/-/underscore-1.6.0.tgz",
-          "resolved": "https://registry.npmjs.org/underscore/-/underscore-1.6.0.tgz"
+          "from": "underscore@^1.6.0"
         },
         "clockout": {
           "version": "0.0.1",
-          "from": "https://registry.npmjs.org/clockout/-/clockout-0.0.1.tgz",
-          "resolved": "https://registry.npmjs.org/clockout/-/clockout-0.0.1.tgz"
+          "from": "clockout@0.0.1"
         },
         "blocked": {
           "version": "1.0.0",
-          "from": "https://registry.npmjs.org/blocked/-/blocked-1.0.0.tgz",
-          "resolved": "https://registry.npmjs.org/blocked/-/blocked-1.0.0.tgz"
+          "from": "blocked@^1.0.0"
         }
       }
     },
@@ -1061,9 +1051,9 @@
       "from": "gitter-marked@"
     },
     "gitter-services": {
-      "version": "1.2.0",
-      "from": "gitter-services@git+ssh://git@github.com:gitterHQ/services.git#1.2.0",
-      "resolved": "git+ssh://git@github.com:gitterHQ/services.git#e434313a2de9d2a4f7f986ae5920b169ddf49acf",
+      "version": "1.3.0",
+      "from": "gitter-services@git+ssh://git@github.com:gitterHQ/services.git#1.3.0",
+      "resolved": "git+ssh://git@github.com:gitterHQ/services.git#8400c1fd3cb0689269a263bc95f7a5f5f1d6a311",
       "dependencies": {
         "require-all": {
           "version": "0.0.8",
