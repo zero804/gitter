@@ -43,7 +43,7 @@ define([
         data: data,
         success: function(collection, response, options) {
           delete self._isFetching;
-          self.atBottom = true;
+          self.setAtBottom(true);
 
           var responseIds = response.map(utils.idTransform);
           var responseOverlaps = responseIds.some(function(id) {
@@ -62,7 +62,7 @@ define([
           // Less than the requested limit? Must be at the top
           if(response.length < loadLimit) {
             // NO MORE
-            self.atTop = true;
+            set.setAtTop(true);
           } else {
             self.trimTop();
           }
@@ -103,7 +103,7 @@ define([
           delete self._isFetching;
           if(response.length < loadLimit) {
             // NO MORE
-            self.atTop = true;
+            self.setAtTop(true);
           }
           self.trimBottom();
 
@@ -141,7 +141,7 @@ define([
           delete self._isFetching;
           if(response.length < loadLimit) {
             // NO MORE
-            self.atBottom = true;
+            self.setAtBottom(true);
           }
           self.trimTop();
           self.trigger('scroll.fetch', 'next');
@@ -181,8 +181,8 @@ define([
           });
 
           if(!responseOverlaps) {
-            self.atBottom = false;
-            self.atTop = false;
+            self.setAtBottom(false);
+            self.setAtTop(false);
             // No overlap, we're going to need to delete the existing items
             var existingModels = Object.keys(existingIds)
                                   .map(function(id) {
@@ -211,7 +211,7 @@ define([
       if(this.length > collectionLimit) {
         var forRemoval = this.slice(0, -collectionLimit);
         this.remove(forRemoval);
-        this.atTop = false;
+        this.setAtTop(false);
       }
     },
 
@@ -221,7 +221,7 @@ define([
       if(this.length > collectionLimit) {
         var forRemoval = this.slice(collectionLimit);
         this.remove(forRemoval);
-        this.atBottom = false;
+        this.setAtBottom(false);
       }
     },
 
@@ -237,6 +237,18 @@ define([
       var end = this.at(this.length - 1).get('id');
 
       return { limit: this.length, beforeInclId: end };
+    },
+
+    setAtTop: function(value) {
+      if(!!value === !!this.atTop) return; // jshint ignore:line
+      this.atTop = !!value;
+      this.trigger('atTopChanged', this.atTop);
+    },
+
+    setAtBottom: function(value) {
+      if(!!value === !!this.atBottom) return; // jshint ignore:line
+      this.atBottom = !!value;
+      this.trigger('atBottomChanged', this.atBottom);
     }
   };
 });
