@@ -13,9 +13,9 @@ GIT_COMMIT ?= $(shell git rev-parse HEAD)
 ASSET_TAG_PREFIX =
 ASSET_TAG = $(ASSET_TAG_PREFIX)$(shell echo $(GIT_COMMIT)|cut -c 1-6)
 ifeq ($(FAST_BUILD), 1)
-CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/ )
+CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/ public/bootstrap/css/)
 else
-CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/ public-compile-cache/)
+CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/ public/bootstrap/css/ public-compile-cache/)
 endif
 
 PUBLIC_EXCLUDING_JS = $(shell ls -d public/*|grep -v ^public/js$)
