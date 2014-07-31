@@ -5,6 +5,11 @@ define([
   "use strict";
 
   return {
+    initialize: function() {
+      this.atTop = false;
+      this.atBottom = true;
+    },
+
     getLoadLimit: function() {
       return Math.round((window.screen.height-150)/20);
     },
@@ -232,12 +237,14 @@ define([
       if(initialSnapshot) {
         var config = initialSnapshot[this.modelName];
         if(config) {
-          this.atTop = false;
-          this.atBottom = false;
+          this.setAtTop(false);
+          this.setAtBottom(false);
+
           this.listenToOnce(this, 'snapshot', function() {
             delete initialSnapshot[this.modelName];
           });
         }
+
         return config;
       }
 
