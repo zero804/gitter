@@ -170,12 +170,13 @@ npm:
 grunt: clean
 	mkdir output
 	mkdir -p public-processed/js
+	grunt -no-color less
 	for i in $(PUBLIC_EXCLUDING_JS); \
 		do cp -R $$i public-processed/; \
 	done
 	if [ -d public-compile-cache/js/ ] && [ -n $$(find public-compile-cache/js/ -maxdepth 1 -type f -name '*' -print -quit) ]; then cp public-compile-cache/js/* public-processed/js/; fi
 	./build-scripts/copy-templates.sh
-	grunt -no-color less requirejs
+	grunt -no-color requirejs
 	./build-scripts/selective-js-compile.sh
 	rm -rf public-compile-cache
 	mkdir -p public-compile-cache/js
