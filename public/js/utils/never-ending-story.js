@@ -1,6 +1,10 @@
 define(['underscore', 'backbone', 'log!nes'], function(_, Backbone, log) {
   "use strict";
 
+  /* @const */
+  var ABSOLUTE_MARGIN = 50;
+  var IGNORE_MARGIN = 500;
+
   /* Put your scrolling panels on rollers */
   function NeverEndingStory(target, options) {
     this._target = target;
@@ -12,28 +16,39 @@ define(['underscore', 'backbone', 'log!nes'], function(_, Backbone, log) {
   }
   _.extend(NeverEndingStory.prototype, Backbone.Events, {
     scroll: function() {
+      var target = this._target;
+
       var now = Date.now();
-      var st = this._reverse ? this._target.scrollTop : this._target.scrollHeight - this._target.scrollTop - this._target.clientHeight;
+      var scrollTop = target.scrollTop;
+      var scrollBottom = target.scrollHeight - target.scrollTop - target.clientHeight;
 
-      var delta = st - this._prevScrollTop;
-      var timeDelta = now - this._prevScrollTime;
+      // var st = this._reverse ? target.scrollTop : target.scrollHeight - target.scrollTop - target.clientHeight;
+      var prevScrollTime = this._prevScrollTime;
+      var prevScrollTop = this._prevScrollTop;
+      var prevScrollBottom = this._prevScrollBottom;
 
-      this._prevScrollTop = st;
+      this._prevScrollTop = scrollTop;
+      this._prevScrollBottom = scrollBottom;
       this._prevScrollTime = now;
 
-      if(this.loading) return;
+      if(!prevScrollTime || this.loading) return;
 
-      var timeToLimit;
-      if(delta < 0) {
-        var gradient = delta / timeDelta;
-        timeToLimit = st / -gradient;
-      }
+      var deltaTop = prevScrollTop - scrollTop;
+      var deltaBottom = prevScrollBottom - scrollBottom;
+      var timeDelta = now - prevScrollTime;
 
-      if((timeToLimit < 300) || (st < 50 && delta < 0)) {
-        log('approaching end');
-
-        this.loading = true;
-        this.trigger('approaching.end');
+      if(deltaTop > 0) {
+        /* We're scrolling towards the top */
+        if(scrollTop < ABSOLUTE_MARGIN || (scrollTop < IGNORE_MARGIN && (scrollTop * timeDelta/deltaTop < 300))) {
+          log('approaching.top');
+          this.trigger('approaching.top');
+        }
+      } else if(deltaBottom > 0) {
+        /* We're scrolling towards the bottom */
+        if(scrollBottom < ABSOLUTE_MARGIN || (scrollBottom < IGNORE_MARGIN && (scrollBottom * timeDelta/deltaBottom < 300))) {
+          log('approaching.bottom');
+          this.trigger('approaching.bottom');
+        }
       }
     },
 
