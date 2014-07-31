@@ -192,7 +192,7 @@ function suggestedReposForUser(user) {
                 .map(function(a) {
                   return a[1].repo;
                 })
-                .take(20)
+                .take(6)
                 .toArray();
     });
 
