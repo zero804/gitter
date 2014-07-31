@@ -27,7 +27,7 @@ define([
    */
   var ChatCollectionView = Marionette.CollectionView.extend({
     itemView: chatItemView.ChatItemView,
-    footer: '#initial', // Used to force the browser to display the bottom of the screen from the outset
+    // footer: '#initial', // Used to force the browser to display the bottom of the screen from the outset
     reverseScrolling: true,
 
     itemViewOptions: function(item) {
@@ -74,7 +74,7 @@ define([
 
       var contentFrame = document.querySelector(this.scrollElementSelector);
 
-      this.rollers = new Rollers(contentFrame);
+      this.rollers = new Rollers(contentFrame, this.el);
 
       this.userCollection = options.userCollection;
       this.decorators     = options.decorators || [];
