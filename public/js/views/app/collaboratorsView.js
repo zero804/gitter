@@ -62,7 +62,6 @@ define([
       //this.ui.loading.toggleClass('hide');
       //this.showValidationMessage((json) ? json.error : res.status + ': ' + res.statusText);
       //this.typeahead.clear();
-      console.debug('error', res);
     },
 
     /**
