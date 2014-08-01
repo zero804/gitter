@@ -4,8 +4,9 @@ define([
   './base',
   '../utils/momentWrapper',
   '../utils/burst-calculator',
+  './infinite-mixin',
   'cocktail'
-], function (_, context, TroupeCollections, moment, burstCalculator, cocktail) {
+], function(_, context, TroupeCollections, moment, burstCalculator, InfiniteCollectionMixin, cocktail) {
   "use strict";
 
   var userId = context.getUserId();
@@ -61,6 +62,7 @@ define([
     }
   });
 
+
   var ChatCollection = TroupeCollections.LiveCollection.extend({
     model: ChatModel,
     modelName: 'chat',
@@ -98,8 +100,7 @@ define([
       return optimisticModel;
     },
   });
-
-  cocktail.mixin(ChatCollection, TroupeCollections.ReversableCollectionBehaviour);
+  cocktail.mixin(ChatCollection, InfiniteCollectionMixin, TroupeCollections.ReversableCollectionBehaviour);
 
   var ReadByModel = TroupeCollections.Model.extend({
     idAttribute: "id"

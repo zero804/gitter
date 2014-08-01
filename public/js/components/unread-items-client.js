@@ -62,6 +62,8 @@ define([
   var UnreadItemStore = function() {
     DoubleHash.call(this);
 
+    this._maxItems = 100;
+
     this._addTarpit = new Tarpit(ADD_TIMEOUT, _.bind(this._promote, this));
     this._deleteTarpit = new Tarpit(REMOVE_TIMEOUT);
     this._recountLimited = limit(this._recount, this, 30);
@@ -105,6 +107,7 @@ define([
 
     _promote: function(itemType, itemId) {
       this._add(itemType, itemId);
+      this.trigger('add', itemType, itemId);
     },
 
     _recount: function() {
@@ -265,7 +268,6 @@ define([
 
     appEvents.on('eyeballStateChange', this._eyeballStateChange, this);
 
-
     this._scrollElement.addEventListener('scroll', this._getBounds, false);
 
     // this is not a live collection so this will not work inside an SPA
@@ -273,6 +275,7 @@ define([
 
     appEvents.on('unreadItemDisplayed', this._getBounds);
 
+    unreadItemStore.on('add', foldCountLimited);
     unreadItemStore.on('unreadItemRemoved', foldCountLimited);
 
     // When the UI changes, rescan
@@ -314,6 +317,8 @@ define([
       delete this._scrollTop;
       delete this._scrollBottom;
 
+      var elementAbove, elementBelow;
+      var elementAboveTop, elementBelowTop;
       var unreadItems = this._scrollElement.querySelectorAll('.unread');
 
       var timeout = 1000;
@@ -340,52 +345,74 @@ define([
           } else if(top > bottomBound) {
             // This item is below the bottom fold
             below++;
+            if(elementBelow) {
+              if(top < elementBelowTop) {
+                elementBelow = element;
+                elementBelowTop = top;
+              }
+            } else {
+              elementBelow = element;
+              elementBelowTop = top;
+            }
           } else if(top < topBound) {
             // This item is above the top fold
+            if(elementAbove) {
+              if(top > elementAboveTop) {
+                elementAbove = element;
+                elementAboveTop = top;
+              }
+            } else {
+              elementAbove = element;
+              elementAboveTop = top;
+            }
 
           }
         }
 
       }
 
-      var total = self._store._recount();
-      var above = total - below;
-      acrossTheFoldModel.set('unreadAbove', above);
-      acrossTheFoldModel.set('unreadBelow', below);
+      this._foldCount(topBound, bottomBound);
     },
 
     _foldCount: function() {
-      var self = this;
+      var above = 0;
+      var below = 0;
 
       var topBound = this._scrollElement.scrollTop;
       var bottomBound = topBound + this._scrollElement.clientHeight;
 
-      var unreadItems = this._scrollElement.querySelectorAll('.unread');
+      var chats = this._store._getItemsOfType('chat');
 
-      var below = 0, inframe = 0;
-      /* Beware, this is not an array, it's a nodelist. We can't use array methods like forEach  */
-      for(var i = 0; i < unreadItems.length; i++) {
-        var element = unreadItems[i];
+      var allItems = this._scrollElement.querySelectorAll('.chat-item');
+      var chatAboveIndex = _.sortedIndex(allItems, topBound - 1, function(item) {
+        if(typeof item === 'number') return item;
+        return item.offsetTop + item.offsetHeight;
+      });
 
-        var itemType = dataset.get(element, 'itemType');
-        var itemId = dataset.get(element, 'itemId');
-
-        if(itemType && itemId) {
-          var top = element.offsetTop;
-
-          if (top >= topBound && top <= bottomBound) {
-            inframe++;
-          } else if(top > bottomBound) {
-            // This item is below the bottom fold
-            below++;
-          }
+      var chatAboveView = allItems[chatAboveIndex];
+      if(chatAboveView) {
+        var aboveItemId = dataset.get(chatAboveView, 'itemId');
+        if(aboveItemId) {
+          chats.forEach(function(chatId) {
+            if(chatId <= aboveItemId) above++;
+          });
         }
-
       }
 
+      var chatBelowIndex = _.sortedIndex(allItems, bottomBound + 1, function(item) {
+        if(typeof item === 'number') return item;
+        return item.offsetTop;
+      });
+      var chatBelowView = allItems[chatBelowIndex];
+      if(chatBelowView) {
+        var belowItemId = dataset.get(chatBelowView, 'itemId');
+        if(belowItemId) {
+          chats.forEach(function(chatId) {
+            if(chatId >= belowItemId) below++;
+          });
+        }
+      }
 
-      var total = self._store._recount();
-      var above = total - below - inframe;
       acrossTheFoldModel.set('unreadAbove', above);
       acrossTheFoldModel.set('unreadBelow', below);
     },
