@@ -5,7 +5,8 @@ define([
   'utils/mailto-gen',
   'hbs!./tmpl/collaboratorsView',
   'hbs!./tmpl/collaboratorsItemView',
-  'hbs!./tmpl/collaboratorsEmptyView'
+  'hbs!./tmpl/collaboratorsEmptyView',
+  'utils/tracking' // no ref
 ], function($, Marionette, context, mailto, template, itemTemplate, emptyViewTemplate) {
   "use strict";
 
