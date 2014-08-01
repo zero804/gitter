@@ -6,8 +6,7 @@ Security {{security}} -->
  -->
 
  <div class="welcome-modal__no-suggestions">
-  <img src="{{ cdn 'images/2/gitter/sad-robot.png'}}">
-  <h3>Oh no!</h3>
+  <img src="{{ cdn 'images/2/gitter/emoji/disappointed.png'}}"><br><br>
   {{#showOrgMessage}} This room will only allow members from your GitHub organisation to join. <br>It looks like there's nobody in your organisation.  Why not <a href="https://github.com/orgs{{uri}}/people">add some on GitHub</a> or <a href="/home">create another room</a>?{{/showOrgMessage}}
   {{#unless showOrgMessage}}We couldn't suggest anyone to add to this room.{{/unless}} {{#isPublic}}Why not <a href="#inv">share the link</a> for others to join?{{/isPublic}}
  </div>
