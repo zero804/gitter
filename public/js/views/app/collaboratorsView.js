@@ -6,8 +6,8 @@ define([
   'hbs!./tmpl/collaboratorsView',
   'hbs!./tmpl/collaboratorsItemView',
   'hbs!./tmpl/collaboratorsEmptyView',
-  'utils/tracking' // no ref
-], function($, Marionette, context, mailto, template, itemTemplate, emptyViewTemplate) {
+  'utils/appevents',
+], function($, Marionette, context, mailto, template, itemTemplate, emptyViewTemplate, appEvents) {
   "use strict";
 
   var ItemView = Marionette.ItemView.extend({
@@ -75,9 +75,7 @@ define([
       e.stopPropagation();
       e.preventDefault();
 
-      if (window.mixpanel) {
-        window.mixpanel.track('welcome-add-user-click');
-      }
+      appEvents.triggerParent('track-event', 'welcome-add-user-click');
 
       this.$('.add').hide();
 
@@ -150,9 +148,7 @@ define([
     template: template,
 
     initialize: function() {
-      if (window.mixpanel) {
-        window.mixpanel.track('welcome-add-user-suggestions', { count: this.collection.length });
-      }
+      appEvents.triggerParent('track-event', 'welcome-add-user-suggestions', { count: this.collection.length });
     },
 
     onRender: function() {

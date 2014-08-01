@@ -58,7 +58,7 @@ define([
         // if the user is in the app and does not have a user id, they must be logged out user viewing a room
         if (window.troupeContext) loggedOutUserRoom = true;
       }
-      
+
       window.mixpanel.track('pageView', { pageName: routeName, loggedOutUserRoom: loggedOutUserRoom });
     }
 
@@ -85,6 +85,12 @@ define([
 
   appEvents.on('track', function(routeName) {
     trackPageView(routeName);
+  });
+
+  appEvents.on('track-event', function(eventName, data) {
+    if (window.mixpanel) {
+      window.mixpanel.track(eventName, data);
+    }
   });
 
   trackPageView(window.location.pathname);
