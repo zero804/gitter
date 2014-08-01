@@ -218,7 +218,7 @@ require([
   // Setup the ChatView
 
   var chatCollectionView = new ChatCollectionView({
-    el: $('#content-frame'),
+    el: $('.js-chat-container'),
     collection: itemCollections.chats,
     userCollection: itemCollections.users,
     decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]

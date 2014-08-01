@@ -532,7 +532,9 @@ define([
 
       // set footerElement before rendering, used by appendHtml()
       if(this.footer) {
-        this.footerElement = this.$el.find(this.footer)[0];
+        // Use .children, not .find as we're only searching directly
+        // underneath
+        this.footerElement = this.$el.children(this.footer)[0];
       } else {
         this.footerElement = null;
       }
