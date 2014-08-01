@@ -12,7 +12,7 @@ var Q                    = require('q');
  * ORG permissions model
  */
 module.exports = function orgPermissionsModel(user, right, uri, security, options) {
-  var options = options || {};
+  options = options || {};
   // Security is only for child rooms
   if(security) {
     return Q.reject(new Error('orgs do not have security'));

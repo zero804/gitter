@@ -92,9 +92,6 @@ define([
     parse: function (collection) {
       return burstCalculator.parse(collection);
     },
-	// subscriptionOptions: function() {
-    //   return { aroundId: '539adf13fad68e388a5de07e' };
-    // },
     findModelForOptimisticMerge: function (newModel) {
       var optimisticModel = this.find(function(model) {
         return !model.id && model.get('text') === newModel.get('text');
