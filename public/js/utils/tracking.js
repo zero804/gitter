@@ -17,7 +17,7 @@ define([
 
     ga = window.ga;
 
-    ga('create', 'UA-45918290-1', 'gitter.im');
+    ga('create', trackingId, 'gitter.im');
     ga('send', 'pageview');
   }
 
