@@ -74,6 +74,10 @@ define([
       e.stopPropagation();
       e.preventDefault();
 
+      if (window.mixpanel) {
+        window.mixpanel.track('welcome-add-user-click');
+      }
+
       this.$('.add').hide();
 
       var m = this.model;
@@ -143,6 +147,12 @@ define([
       }
     },
     template: template,
+
+    initialize: function() {
+      if (window.mixpanel) {
+        window.mixpanel.track('welcome-add-user-suggestions', { count: this.collection.length });
+      }
+    },
 
     onRender: function() {
       if (context.troupe().get('security') == 'PUBLIC') this.$el.find('.js-share-button').show();
