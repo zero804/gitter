@@ -41,6 +41,9 @@ module.exports = {
       })
       .spread(function(serialized, limitReached) {
         if(limitReached) {
+          // Consider whether storing this in a header is a good idea
+          // as headers don't get used to generate etags and therefore
+          // result in cache nastiness
           res.set('LimitReached', 'true');
         }
 
