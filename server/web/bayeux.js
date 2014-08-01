@@ -316,14 +316,15 @@ var authenticator = bayeuxExtension({
 
       // If the troupeId was included, it means we've got a native
       // client and they'll be looking for a snapshot:
-      contextGenerator.generateSocketContext(userId, troupeId, function(err, context) {
-        if(err) return callback(err);
+      contextGenerator.generateSocketContext(userId, troupeId)
+        .nodeify(function(err, context) {
+          if(err) return callback(err);
 
-        message.ext.context = context;
+          message.ext.context = context;
 
-        // Not possible to throw an error here, so just carry only
-        callback(null, message);
-      });
+          // Not possible to throw an error here, so just carry only
+          callback(null, message);
+        });
 
     });
 

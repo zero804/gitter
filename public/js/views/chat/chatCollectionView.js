@@ -1,5 +1,6 @@
 /* jshint unused:true, browser:true,  strict:true *//* global define:false */
 define([
+  'jquery',
   'underscore',
   'utils/context',
   'log!chat-collection-view',
@@ -14,7 +15,7 @@ define([
   'utils/rollers',
   'cocktail',
   'bootstrap_tooltip' // No ref
-], function(_, context, log, chatModels, AvatarView, InfiniteScrollMixin, unreadItemsClient,
+], function($, _, context, log, chatModels, AvatarView, InfiniteScrollMixin, unreadItemsClient,
     Marionette, TroupeViews, appEvents, chatItemView, Rollers, cocktail /* tooltip*/) {
   "use strict";
 
@@ -26,7 +27,7 @@ define([
    */
   var ChatCollectionView = Marionette.CollectionView.extend({
     itemView: chatItemView.ChatItemView,
-    footer: '#initial', // Used to force the browser to display the bottom of the screen from the outset
+    // footer: '#initial', // Used to force the browser to display the bottom of the screen from the outset
     reverseScrolling: true,
 
     itemViewOptions: function(item) {
@@ -73,12 +74,10 @@ define([
 
       var contentFrame = document.querySelector(this.scrollElementSelector);
 
-      this.rollers = new Rollers(contentFrame);
+      this.rollers = new Rollers(contentFrame, this.el);
 
       this.userCollection = options.userCollection;
       this.decorators     = options.decorators || [];
-
-      this.rollers.scrollToBottom();
 
       /* Scroll to the bottom when the user sends a new chat */
       this.listenTo(appEvents, 'chat.send', function() {
@@ -87,13 +86,25 @@ define([
         }, this);
       });
 
-      this.listenTo(this.collection, 'scroll.fetch', function() {
-        if(this.rollers.isScrolledToBottom() && !this.collection.atBottom) {
-          // The user has forced the scroll bar all the way to the bottom,
-          // fetch the latest
-          this.collection.fetchLatest({});
-        }
+      this.listenTo(this.collection, 'fetch.started', function() {
+        this.rollers.stable();
+        this.rollers.setModeLocked(true);
       });
+
+      this.listenTo(this.collection, 'fetch.completed', function() {
+        this.rollers.setModeLocked(false);
+      });
+
+      // this.listenTo(this.collection, 'scroll.fetch', function() {
+      //   if(this.rollers.isScrolledToBottom() && !this.collection.atBottom) {
+      //     // The user has forced the scroll bar all the way to the bottom,
+      //     // fetch the latest
+      //     this.collection.fetchLatest({}, function() {
+      //       self.rollers.setModeLocked(false);
+      //       self.rollers.scrollToBottom();
+      //     });
+      //   }
+      // });
     },
 
     scrollToFirstUnread: function() {
