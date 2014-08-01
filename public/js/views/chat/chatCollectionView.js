@@ -86,13 +86,25 @@ define([
         }, this);
       });
 
-      this.listenTo(this.collection, 'scroll.fetch', function() {
-        if(this.rollers.isScrolledToBottom() && !this.collection.atBottom) {
-          // The user has forced the scroll bar all the way to the bottom,
-          // fetch the latest
-          this.collection.fetchLatest({});
-        }
+      this.listenTo(this.collection, 'fetch.started', function() {
+        this.rollers.stable();
+        this.rollers.setModeLocked(true);
       });
+
+      this.listenTo(this.collection, 'fetch.completed', function() {
+        this.rollers.setModeLocked(false);
+      });
+
+      // this.listenTo(this.collection, 'scroll.fetch', function() {
+      //   if(this.rollers.isScrolledToBottom() && !this.collection.atBottom) {
+      //     // The user has forced the scroll bar all the way to the bottom,
+      //     // fetch the latest
+      //     this.collection.fetchLatest({}, function() {
+      //       self.rollers.setModeLocked(false);
+      //       self.rollers.scrollToBottom();
+      //     });
+      //   }
+      // });
     },
 
     scrollToFirstUnread: function() {

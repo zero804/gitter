@@ -68,7 +68,7 @@ define([
           // Less than the requested limit? Must be at the top
           if(response.length < loadLimit) {
             // NO MORE
-            set.setAtTop(true);
+            self.setAtTop(true);
           } else {
             self.trimTop();
           }
@@ -138,12 +138,16 @@ define([
 
       var data = { afterId: afterId, limit: loadLimit };
 
+      this.trigger('fetch.started');
+
       this.fetch({
         remove: ('remove' in options) ? options.remove : false,
         add: ('add' in options) ? options.add : true,
         merge: ('merge' in options) ? options.merge : true,
         data: data,
         success: function(collection, response, options) {
+          self.trigger('fetch.completed');
+
           delete self._isFetching;
           if(response.length < loadLimit) {
             // NO MORE
@@ -156,6 +160,7 @@ define([
           if(callback) callback.call(context);
         },
         error: function(err) {
+          self.trigger('fetch.completed');
           if(callback) callback.call(err);
         }
       });
