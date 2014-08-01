@@ -70,7 +70,7 @@ module.exports = {
       });
   },
 
-  update:  function(req, res, next) {
+  update: function(req, res, next) {
     return chatService.updateChatMessage(req.troupe, req.chatMessage, req.user, req.body.text)
       .then(function(chatMessage) {
         var strategy = new restSerializer.ChatStrategy({ currentUserId: req.user.id, troupeId: req.troupe.id });

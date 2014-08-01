@@ -242,8 +242,9 @@ define([
       if(initialSnapshot) {
         var config = initialSnapshot[this.modelName];
         if(config) {
+          // Come up with a better algorithm for this
           this.setAtTop(false);
-          this.setAtBottom(false);
+          this.setAtTop(!config.aroundId);
 
           this.listenToOnce(this, 'snapshot', function() {
             delete initialSnapshot[this.modelName];
