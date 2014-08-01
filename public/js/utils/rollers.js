@@ -217,7 +217,6 @@ define(['mutant'], function(Mutant) {
             }
           } else {
             if(this._mode != TRACK_BOTTOM) {
-              console.log('switching to tracking');
               this._mode = TRACK_BOTTOM;
             }
           }
