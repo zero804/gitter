@@ -15,7 +15,6 @@ GitHubIssueStateService.prototype.getIssueState = function(repo, issueNumber) {
   var d = Q.defer();
 
   var ghissue = this.client.issue(repo, issueNumber);
-
   ghissue.info(createClient.makeResolver(d));
 
   return d.promise
