@@ -73,7 +73,7 @@ function permissionsModel(user, right, uri, roomType, security, options) {
       return submodel(user, right, uri, security, options)
         .then(log)
         .fail(function(err) {
-          if(err.gitterAction === 'logout_destroy_user_tokens') {
+          if(err && err.gitterAction === 'logout_destroy_user_tokens') {
             winston.warn('User tokens have been revoked. Destroying tokens');
 
             var tokenUser = options.githubTokenUser || user;

@@ -1,13 +1,10 @@
 require([
-  'views/app/appIntegratedView',
   'views/userhome/userHomeView',
   'utils/appevents',
   'components/csrf'                             // No ref
-], function(AppIntegratedView, UserHomeView, appEvents) {
+], function(UserHomeView, appEvents) {
 
   "use strict";
-
-  new AppIntegratedView();
 
   new UserHomeView({ el: '#content-wrapper' }).render();
 

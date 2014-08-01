@@ -26,11 +26,12 @@ define([
 
         $e.toggleClass('mention', mentioned);
 
+        dataset.set(e, 'itemId', id);
+        dataset.set(e, 'mentioned', mentioned);
+        dataset.set(e, 'itemType', this.unreadItemType);
+
         if(unread) {
           $e.addClass('unread');
-          dataset.set(e, 'itemId', id);
-          dataset.set(e, 'mentioned', mentioned);
-          dataset.set(e, 'itemType', this.unreadItemType);
 
           appEvents.trigger('unreadItemDisplayed');
         }
