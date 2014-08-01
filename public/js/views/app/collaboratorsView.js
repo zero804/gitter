@@ -4,8 +4,9 @@ define([
   'utils/context',
   'utils/mailto-gen',
   'hbs!./tmpl/collaboratorsView',
-  'hbs!./tmpl/collaboratorsItemView'
-], function($, Marionette, context, mailto, template, itemTemplate) {
+  'hbs!./tmpl/collaboratorsItemView',
+  'hbs!./tmpl/collaboratorsEmptyView'
+], function($, Marionette, context, mailto, template, itemTemplate, emptyViewTemplate) {
   "use strict";
 
   var ItemView = Marionette.ItemView.extend({
@@ -103,14 +104,63 @@ define([
 
   });
 
+  var EmptyView = Marionette.ItemView.extend({
+    template: emptyViewTemplate,
+    initialize: function(options) {
+      this.model.set("security", options.security);
+      this.model.set("githubType", options.githubType);
+      this.model.set("url", options.url);
+    },
+    serializeData: function() {
+      var data = this.model.toJSON();
+      if (data.githubType === 'ORG') {
+        data.showOrgMessage = true;
+      }
+      if (data.githubType == 'ORG_CHANNEL') {
+        if (data.security == 'INHERITED') {
+          data.showOrgMessage = true;
+        }
+      }
+      if (data.security == 'PUBLIC') {
+        data.isPublic = true;
+      }
+
+      return data;
+    }
+  });
+
   var View = Marionette.CompositeView.extend({
     itemViewContainer: '#list',
     itemView: ItemView,
-    //emptyView: EmptyView,
+    emptyView: EmptyView,
+    itemViewOptions: function() {
+      if (!this.collection.length) {
+        return {
+          githubType: context.troupe().get('githubType'),
+          security: context.troupe().get('security'),
+          url: context.troupe().get('url')
+        };
+      }
+    },
     template: template,
 
+    onRender: function() {
+      if (context.troupe().get('security') == 'PUBLIC') this.$el.find('.js-share-button').show();
+    },
+
     events: {
-      'click .js-close': 'dismiss'
+      'click .js-close': 'dismiss',
+      'click #add-button' : 'clickAddButton',
+      'click #share-button' : 'clickShareButton'
+    },
+
+    clickAddButton: function() {
+      window.location.href = "#add";
+    },
+
+
+    clickShareButton: function() {
+      window.location.href = "#inv";
     },
 
     dismiss: function() {

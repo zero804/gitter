@@ -1,54 +1,7 @@
 @import "trpFonts.less";
 
-.interstitial {
-  text-align: left;
-  //top: 0px;
-  //left: 0px;
-  width: 100%;
-  //height: 100%;
-  //margin: 0px;
-  //padding: 0px;
-  //z-index: 1050;
-  //display: none;
-  //background: white;
-  //position: fixed;
-}
-
-.interstitial-header {
-  text-align: left;
-  margin: 20px;
-  font-family: @fontSans;
-  font-weight: 200;
-  font-size: 22px;
-  img {
-    vertical-align: middle;
-    height: 48px;
-    width: 48px;
-  }
-}
-
-.interstitial-body {
-  text-align: left;
-  margin: 20px;
-}
-
-.interstitial-footer {
-  text-align: left;
-  position: fixed;
-  bottom: 0px;
-  width: 100%;
-  .actions {
-    margin: 20px;
-  }
-}
-
-.welcome-modal {
-  font-family: @fontSans;
-  h2 {
-    font-size: 18px;
-    margin-top: 20px;
-    font-weight: bold;
-  }
+.js-share-button {
+  display: none;
 }
 
 .welcome-modal__close {
@@ -73,7 +26,6 @@
   h2 {
     text-align: left;
     font-family: @fontSans;
-    font-weight: 200;
     font-size: 22px;
     padding: 0 10px;
   }
@@ -81,6 +33,13 @@
     vertical-align: middle;
     height: 48px;
     width: 48px;
+  }
+}
+
+.welcome-modal__explain {
+  padding: 20px 0 0 20px;
+  p {
+    display: none;
   }
 }
 
@@ -94,10 +53,11 @@
 
   ul {
     list-style: none;
-    margin: 20px 0 0 0;
+    margin: 0;
     max-height: 250px;
     overflow: scroll;
-    padding: 0 20px;
+    padding: 10px 20px;
+    background-color: rgba(255,255,255,0.6);
   }
 
   li {
@@ -119,7 +79,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  height: 75px;
+  padding: 10px 0;
 
   img {
     margin-right: 20px;
@@ -153,8 +113,22 @@
 
 }
 
+.welcome-modal__no-suggestions {
+  padding: 20px 0;
+  text-align: center;
+
+  a {
+    text-decoration: underline;
+  }
+}
+
 .welcome-modal__footer {
-  padding: 20px;
+  padding: 20px 0 20px 20px;
+}
+
+.welcome-modal__footer-button {
+  display: inline-block;
+  margin-right: 10px;
 }
 
 #activity-tip {
