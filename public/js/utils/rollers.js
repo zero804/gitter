@@ -63,22 +63,34 @@ define(['mutant'], function(Mutant) {
     },
 
     initTrackingMode: function() {
-      var target = this._target;
-
       if(this.isScrolledToBottom()) {
         this._mode = TRACK_BOTTOM;
       } else {
-        this._mode = STABLE;
+        // Default to stable mode
+        this.stable();
+      }
+    },
 
-        this._stableElement = this.getBottomMostVisibleElement();
+    stable: function() {
+      var target = this._target;
 
-        // TODO: check that the element is within the targets DOM heirachy
-        var scrollBottom = target.scrollTop + target.clientHeight;
-        var stableElementTop = this._stableElement.offsetTop - target.offsetTop;
+      this._nopass = null;
+      this._mode = STABLE;
 
-        // Calculate an record the distance of the stable element to the bottom of the view
-        this._stableElementFromBottom = scrollBottom - stableElementTop;
+      this._stableElement = this.getBottomMostVisibleElement();
 
+      // TODO: check that the element is within the targets DOM heirachy
+      var scrollBottom = target.scrollTop + target.clientHeight;
+      var stableElementTop = this._stableElement.offsetTop - target.offsetTop;
+
+      // Calculate an record the distance of the stable element to the bottom of the view
+      this._stableElementFromBottom = scrollBottom - stableElementTop;
+    },
+
+    setModeLocked: function(value) {
+      this.modeLocked = value;
+      if(!value) {
+        this.trackLocation();
       }
     },
 
@@ -196,20 +208,23 @@ define(['mutant'], function(Mutant) {
 
       var atBottom = target.scrollTop >= target.scrollHeight - target.clientHeight - BOTTOM_MARGIN;
 
-      if(atBottom) {
-        if(this._nopass) {
-          if(this._mode != TRACK_NO_PASS) {
-            this._mode = TRACK_NO_PASS;
+      if(!this.modeLocked) {
+        if(atBottom) {
+          if(this._nopass) {
+            if(this._mode != TRACK_NO_PASS) {
+              this._mode = TRACK_NO_PASS;
 
+            }
+          } else {
+            if(this._mode != TRACK_BOTTOM) {
+              console.log('switching to tracking');
+              this._mode = TRACK_BOTTOM;
+            }
           }
         } else {
-          if(this._mode != TRACK_BOTTOM) {
-            this._mode = TRACK_BOTTOM;
+          if(this._mode != STABLE) {
+            this._mode = STABLE;
           }
-        }
-      } else {
-        if(this._mode != STABLE) {
-          this._mode = STABLE;
         }
       }
 
