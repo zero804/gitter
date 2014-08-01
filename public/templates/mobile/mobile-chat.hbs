@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js loading" lang="en">
+<html class="no-js" lang="en">
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no"/>
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
@@ -43,11 +43,19 @@
 
     <div id="content" class="header-above">
       <div class="contentBody mobile-scroll-class" id="content-frame">
+        {{#each chats}}
+          {{{ chatItemPrerender this lang=../lang locale=../locale}}}
+        {{/each}}
+        {{#if initialBottom}}
+        {{! This is a way of forcing the browser to open at the bottom of the screen }}
+        <div id='initial' style="height:0;width:0;overflow:hidden"><a name="initial"/>_</a></div>
+        {{/if}}
       </div>
     </div>
 
     <div class="chat-input__container  js-chat-input-container" id="chat-input"></div>
   </div>
   {{>live_reload}}
+  {{>set_initial_position}}
 </body>
 </html>

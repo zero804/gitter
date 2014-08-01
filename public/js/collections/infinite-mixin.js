@@ -1,9 +1,15 @@
 define([
-  '../utils/utils'
-], function(utils) {
+  '../utils/utils',
+  '../utils/context'
+], function(utils, context) {
   "use strict";
 
   return {
+    initialize: function() {
+      this.atTop = false;
+      this.atBottom = true;
+    },
+
     getLoadLimit: function() {
       return Math.round((window.screen.height-150)/20);
     },
@@ -43,7 +49,7 @@ define([
         data: data,
         success: function(collection, response, options) {
           delete self._isFetching;
-          self.atBottom = true;
+          self.setAtBottom(true);
 
           var responseIds = response.map(utils.idTransform);
           var responseOverlaps = responseIds.some(function(id) {
@@ -62,7 +68,7 @@ define([
           // Less than the requested limit? Must be at the top
           if(response.length < loadLimit) {
             // NO MORE
-            self.atTop = true;
+            self.setAtTop(true);
           } else {
             self.trimTop();
           }
@@ -103,7 +109,7 @@ define([
           delete self._isFetching;
           if(response.length < loadLimit) {
             // NO MORE
-            self.atTop = true;
+            self.setAtTop(true);
           }
           self.trimBottom();
 
@@ -132,16 +138,20 @@ define([
 
       var data = { afterId: afterId, limit: loadLimit };
 
+      this.trigger('fetch.started');
+
       this.fetch({
         remove: ('remove' in options) ? options.remove : false,
         add: ('add' in options) ? options.add : true,
         merge: ('merge' in options) ? options.merge : true,
         data: data,
         success: function(collection, response, options) {
+          self.trigger('fetch.completed');
+
           delete self._isFetching;
           if(response.length < loadLimit) {
             // NO MORE
-            self.atBottom = true;
+            self.setAtBottom(true);
           }
           self.trimTop();
           self.trigger('scroll.fetch', 'next');
@@ -150,6 +160,7 @@ define([
           if(callback) callback.call(context);
         },
         error: function(err) {
+          self.trigger('fetch.completed');
           if(callback) callback.call(err);
         }
       });
@@ -181,8 +192,8 @@ define([
           });
 
           if(!responseOverlaps) {
-            self.atBottom = false;
-            self.atTop = false;
+            self.setAtBottom(false);
+            self.setAtTop(false);
             // No overlap, we're going to need to delete the existing items
             var existingModels = Object.keys(existingIds)
                                   .map(function(id) {
@@ -211,7 +222,7 @@ define([
       if(this.length > collectionLimit) {
         var forRemoval = this.slice(0, -collectionLimit);
         this.remove(forRemoval);
-        this.atTop = false;
+        this.setAtTop(false);
       }
     },
 
@@ -221,11 +232,28 @@ define([
       if(this.length > collectionLimit) {
         var forRemoval = this.slice(collectionLimit);
         this.remove(forRemoval);
-        this.atBottom = false;
+        this.setAtBottom(false);
       }
     },
 
     getSnapshotState: function() {
+      // If snapshot state has been passed from the server use it once
+      var initialSnapshot = context().snapshots;
+      if(initialSnapshot) {
+        var config = initialSnapshot[this.modelName];
+        if(config) {
+          // Come up with a better algorithm for this
+          this.setAtTop(false);
+          this.setAtBottom(!config.aroundId);
+
+          this.listenToOnce(this, 'snapshot', function() {
+            delete initialSnapshot[this.modelName];
+          });
+        }
+
+        return config;
+      }
+
       // TODO: handle initial load
       if(!this.length) return;
 
@@ -237,6 +265,18 @@ define([
       var end = this.at(this.length - 1).get('id');
 
       return { limit: this.length, beforeInclId: end };
+    },
+
+    setAtTop: function(value) {
+      if(!!value === !!this.atTop) return; // jshint ignore:line
+      this.atTop = !!value;
+      this.trigger('atTopChanged', this.atTop);
+    },
+
+    setAtBottom: function(value) {
+      if(!!value === !!this.atBottom) return; // jshint ignore:line
+      this.atBottom = !!value;
+      this.trigger('atBottomChanged', this.atBottom);
     }
   };
 });
