@@ -77,9 +77,7 @@
 {{>require_wrapper}}
 {{{ bootScript bootScriptName }}}
 
-<script type="text/javascript">
- window.location = '#initial';
-</script>
+{{>set_initial_position}}
 
 <div style="display: none;">
   <form id="upload-form" action="" enctype="multipart/form-data" method="POST">
