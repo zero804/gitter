@@ -8,6 +8,7 @@ var Q               = require('q');
 var lazy            = require('lazy.js');
 var moment          = require('moment');
 var winston         = require('../utils/winston');
+var _               = require('underscore');
 
 var SCORE_STARRED = 50;
 var SCORE_WATCHED = 100;
@@ -22,8 +23,8 @@ var WATCHER_COEFFICIENT = 0.1;
 var FORK_COEFFICIENT = 0.3;
 var STAR_GAZER_COEFFICIENT = 0.05;
 
-function calculateAdditionalScoreFor(item) {
-  var score = item.score;
+function calculateScore(item) {
+  var score = 0;
   var repo = item.repo;
   score += repo.watchers_count * WATCHER_COEFFICIENT;
   if(!repo.fork) {
@@ -42,6 +43,15 @@ function calculateAdditionalScoreFor(item) {
   if(repo.permissions) {
     if(repo.permissions.admin) score += SCORE_ADMIN;
     if(repo.permissions.push) score += SCORE_PUSH;
+  }
+
+  if(repo.is_watched_by_user) score += SCORE_WATCHED;
+
+  if(repo.is_owned_by_user) score += SCORE_OWN;
+
+  if(item.room) {
+    score += SCORE_EXISTING;
+    score += item.room.users.length * SCORE_ROOM_PER_USER;
   }
 
   return score;
@@ -65,85 +75,79 @@ function findReposWithRooms(repoList) {
 
 function suggestedReposForUser(user) {
 
-  function map(score) {
-    return function(repos) {
-      return repos.map(function(repo) {
-        return {
-          score: score,
-          repo: repo
-        };
-      });
-    };
-  }
-
   var ghRepo  = new GithubRepo(user);
   return Q.all([
       // ghRepo.getStarredRepos().then(map(SCORE_STARRED)),
-      ghRepo.getWatchedRepos().then(map(SCORE_WATCHED)),
-      repoService.getReposForUser(user).then(map(SCORE_OWN))
+      ghRepo.getWatchedRepos(),
+      repoService.getReposForUser(user)
     ])
-    .then(function(all) {
-      return lazy(all)
-              .flatten()
-              .reduce(function(scores, item) {
-                var s = scores[item.repo.full_name];
-                var additionalScore = calculateAdditionalScoreFor(item);
-                if(!s) {
-                  s = { score: additionalScore, repo: item.repo };
-                  scores[item.repo.full_name] = s;
-                } else {
-                  s.score += additionalScore;
-                }
-                return scores;
-              }, {});
+    .spread(function(watchedRepos, ownedRepos) {
+      watchedRepos.forEach(function(repo) {
+        repo.is_watched_by_user = true;
+      });
+
+      ownedRepos.forEach(function(repo) {
+        repo.is_owned_by_user = true;
+      });
+
+      return watchedRepos.concat(ownedRepos);
     })
-    .then(function(scores) {
-      return findReposWithRooms(Object.keys(scores))
-        .then(function(troupes) {
-          troupes.forEach(function(troupe) {
-            var s = scores[troupe.uri];
-            if(s) {
-              s.score += SCORE_EXISTING;
-              s.score += troupe.users.length * SCORE_ROOM_PER_USER;
-            }
+    .then(function(repos) {
+      return repos.map(function(repo) {
+        return { repo: repo, score: 0 };
+      });
+    })
+    .then(function(suggestions) {
+
+      var uriMap = {};
+      var uris = [];
+
+      suggestions.forEach(function(suggestion) {
+        var uri = suggestion.repo.full_name;
+
+        uriMap[uri] = suggestion;
+        uris.push(uri);
+      });
+
+      return findReposWithRooms(uris)
+        .then(function(rooms) {
+          rooms.forEach(function(room) {
+            uriMap[room.uri].room = room;
           });
 
-          var troupesByUri = lazy(troupes)
-            .reduce(function(memo, v) { memo[v.uri] = v; return memo; }, {});
-
-          return lazy(scores)
-            .pairs()
-            .filter(function(a) {
-              var uri = a[0];
-              var value = a[1];
-              var repo = value.repo;
-
-              var existingTroupe = troupesByUri[uri];
-
-              // If a troupe exists, always let it through
-              // TODO: check permissions in future
-              if(existingTroupe) return true;
-
-              if(repo.permissions && repo.permissions.admin) return true;
-
-              return false;
-            })
-            .toObject();
+          return _.values(uriMap);
         });
-    })
-    .then(function(scores) {
-        return lazy(scores)
-                .pairs()
-                .sortBy(function(a) {
-                  return a[1].score;
-                })
-                .reverse()
-                .map(function(a) {
-                  return a[1].repo;
-                })
-                .take(6)
-                .toArray();
-    });
 
+    })
+    .then(function(suggestions) {
+      return suggestions.filter(function(suggestion) {
+
+        if(suggestion.room) return true;
+
+        if(suggestion.repo.permissions && suggestion.repo.permissions.admin) return true;
+
+        return false;
+      });
+    })
+    .then(function(suggestions) {
+      suggestions.forEach(function(suggestion) {
+        suggestion.score = calculateScore(suggestion);
+      });
+
+      return suggestions;
+    })
+    .then(function(suggestions) {
+      return suggestions.sort(function(a, b) {
+        return b.score - a.score;
+      });
+    })
+    .then(function(suggestions) {
+      return suggestions.slice(0, 6);
+    })
+    .then(function(suggestions) {
+      return suggestions.map(function(suggestion) {
+        return suggestion.repo;
+      });
+    });
 }
 exports.suggestedReposForUser = suggestedReposForUser;
