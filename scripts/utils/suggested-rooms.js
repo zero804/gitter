@@ -13,10 +13,10 @@ var opts = require("nomnom").option('username', {
 }).parse();
 
 userService.findByUsername(opts.username)
-  .then(suggestedRoomService.suggestedReposForUser)
+  .then(suggestedRoomService.getSuggestions)
   .then(function(repos) {
-    repos.forEach(function(repo) {
-      console.log(repo.full_name);
+    repos.forEach(function(suggestion) {
+      console.log(suggestion.repo.full_name, suggestion.room && suggestion.room.users.length, suggestion.score);
     });
   })
   .delay(1000)
