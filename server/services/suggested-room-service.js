@@ -73,7 +73,7 @@ function findReposWithRooms(repoList) {
     }, { uri: 1, users: 1 });
 }
 
-function suggestedReposForUser(user) {
+function getSuggestions(user) {
 
   var ghRepo  = new GithubRepo(user);
   return Q.all([
@@ -143,11 +143,17 @@ function suggestedReposForUser(user) {
     })
     .then(function(suggestions) {
       return suggestions.slice(0, 6);
-    })
-    .then(function(suggestions) {
-      return suggestions.map(function(suggestion) {
-        return suggestion.repo;
-      });
     });
 }
+
+exports.getSuggestions = getSuggestions;
+
+function suggestedReposForUser(user) {
+  return getSuggestions(user).then(function(suggestions) {
+    return suggestions.map(function(suggestion) {
+      return suggestion.repo;
+    });
+  });
+}
+
 exports.suggestedReposForUser = suggestedReposForUser;
