@@ -44,7 +44,7 @@ define([
         fb.message = 'has no public email.';
         var email = mailto.el({
           subject: 'Gitter Invite',
-          body: this.strTemplate('Hi {{user}}, I\'ve messaged you on Gitter. Join me! {{base}}{{roomUrl}}', { user: user.username, base: context.env('basePath'), roomUrl: context.troupe().get('url') })
+          body: this.strTemplate('Hi {{user}}, I\'ve added you to a room on Gitter. Join me! {{base}}{{roomUrl}}', { user: user.username, base: context.env('basePath'), roomUrl: context.troupe().get('url') })
         });
         fb.action.href = email.href;
         fb.action.text = 'Invite.';
