@@ -57,14 +57,9 @@
 <div class="trpBlankPage"> </div>
 
 {{{ generateTroupeContext troupeContext }}}
-
 {{>require_wrapper}}
 {{{ bootScript bootScriptName }}}
-
-
-<script type="text/javascript">
-window.location = '#initial';
-</script>
+{{>set_initial_position}}
 
 </body>
 </html>

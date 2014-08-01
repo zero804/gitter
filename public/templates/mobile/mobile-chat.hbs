@@ -55,12 +55,7 @@
 
     <div class="chat-input__container  js-chat-input-container" id="chat-input"></div>
   </div>
-  {{#if liveReload}}
-    <script src="//localhost:35729/livereload.js"></script>
-  {{/if}}
-  <script type="text/javascript">
-   window.location = '#initial';
-  </script>
-
+  {{>live_reload}}
+  {{>set_initial_position}}
 </body>
 </html>
