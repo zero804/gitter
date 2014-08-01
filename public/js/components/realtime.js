@@ -319,6 +319,10 @@ define([
   function testConnection(reason) {
     /* Only test the connection if one has already been established */
     if(!client) return;
+
+    /* Wait until the connection is established before attempting the test */
+    if(!clientId) return;
+
     if(pingResponseOutstanding) return;
 
     if(reason !== 'ping') {
