@@ -73,6 +73,20 @@ function findReposWithRooms(repoList) {
     }, { uri: 1, users: 1 });
 }
 
+function filterSuggestions(suggestions, user) {
+  return suggestions.filter(function(suggestion) {
+    if(suggestion.room) {
+      // it's not a good room suggestion if the user is already in the room
+      return !suggestion.room.containsUserId(user.id);
+    }
+
+    if(suggestion.repo.permissions && suggestion.repo.permissions.admin) return true;
+
+    return false;
+
+  });
+}
+
 function getSuggestions(user) {
 
   var ghRepo  = new GithubRepo(user);
@@ -120,14 +134,7 @@ function getSuggestions(user) {
 
     })
     .then(function(suggestions) {
-      return suggestions.filter(function(suggestion) {
-
-        if(suggestion.room) return true;
-
-        if(suggestion.repo.permissions && suggestion.repo.permissions.admin) return true;
-
-        return false;
-      });
+      return filterSuggestions(suggestions, user);
     })
     .then(function(suggestions) {
       suggestions.forEach(function(suggestion) {
