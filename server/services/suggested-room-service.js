@@ -23,7 +23,12 @@ var WATCHER_COEFFICIENT = 0.1;
 var FORK_COEFFICIENT = 0.3;
 var STAR_GAZER_COEFFICIENT = 0.05;
 
+var BILLY_NO_MATES_ROOMS = ['gitterHQ/gitter', 'marionettejs/backbone.marionette'];
+
 function calculateScore(item) {
+  // force billy no mates rooms to only show if there is nothing else
+  if(item.billy_no_mates) return 0;
+
   var score = 0;
   var repo = item.repo;
   score += repo.watchers_count * WATCHER_COEFFICIENT;
@@ -108,7 +113,7 @@ function getSuggestions(user) {
     })
     .then(function(repos) {
       return repos.map(function(repo) {
-        return { repo: repo, score: 0 };
+        return { uri: repo.full_name, repo: repo, score: 0 };
       });
     })
     .then(function(suggestions) {
@@ -117,10 +122,15 @@ function getSuggestions(user) {
       var uris = [];
 
       suggestions.forEach(function(suggestion) {
-        var uri = suggestion.repo.full_name;
+        uriMap[suggestion.uri] = suggestion;
+        uris.push(suggestion.uri);
+      });
 
-        uriMap[uri] = suggestion;
-        uris.push(uri);
+      BILLY_NO_MATES_ROOMS.forEach(function(roomname) {
+        if(uris.indexOf(roomname) < 0) {
+          uriMap[roomname] = { uri: roomname, score: 0, billy_no_mates: true };
+          uris.push(roomname);
+        }
       });
 
       return findReposWithRooms(uris)
@@ -159,6 +169,8 @@ function suggestedReposForUser(user) {
   return getSuggestions(user).then(function(suggestions) {
     return suggestions.map(function(suggestion) {
       return suggestion.repo;
+    }).filter(function(repo) {
+      return !!repo;
     });
   });
 }
