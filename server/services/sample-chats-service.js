@@ -17,8 +17,8 @@ appEvents.localOnly.onChat(function(evt) {
     troupeService.findById(evt.troupeId)
       .then(function(troupe) {
         var sample = {
-          username: evt.model.fromUser.avatarUrlSmall,
-          avatarUrl: evt.model.fromUser.username,
+          avatarUrl: evt.model.fromUser.avatarUrlSmall,
+          username: evt.model.fromUser.username,
           room: troupe.uri
         };
 

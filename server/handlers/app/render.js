@@ -41,7 +41,7 @@ function getAppCache(req) {
 
 function renderHomePage(req, res, next) {
   contextGenerator.generateNonChatContext(req)
-    .then(function(troupeContext) {
+    .then(function (troupeContext) {
       var page, bootScriptName;
 
       if(req.isPhone) {
@@ -66,7 +66,7 @@ function renderHomePage(req, res, next) {
 
 function renderMainFrame(req, res, next, frame) {
   contextGenerator.generateNonChatContext(req)
-    .then(function(troupeContext) {
+    .then(function (troupeContext) {
       var chatAppLocation = '/' + req.uriContext.uri + '/~' + frame + '#initial';
 
       var template, bootScriptName;
@@ -102,7 +102,7 @@ function renderChat(req, res, template, script, next) {
   Q.all([
     contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions } }),
     restful.serializeChatsForTroupe(troupe.id, userId, snapshotOptions)
-    ]).spread(function(troupeContext, chats) {
+    ]).spread(function (troupeContext, chats) {
       var initialChat = _.find(chats, function(chat) { return chat.initial; });
       var initialBottom = !initialChat;
       var githubLink;
@@ -202,12 +202,12 @@ function renderNotLoggedInChatPage(req, res, next) {
  * renderUserNotSignedUp() renders a set template for a 1:1 chat, with an invited user.
  */
 function renderUserNotSignedUp(req, res, next) {
-
   UserService.findByUsername(req.params.roomPart1)
     .then(function (user) {
-      res.render('one-to-one-invited', {
+      res.render('chat-invited-template', {
         appCache: getAppCache(req),
         agent: req.headers['user-agent'],
+        oneToOneInvited: true,
         invitedUser: user,
         troupeName: user.username,
         shareURL: nconf.get('web:basepath') + '/' + req.user.username
