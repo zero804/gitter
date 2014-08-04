@@ -72,18 +72,6 @@ img.emoji {
     }
   }
 
-  // &.burstFinal {
-  // TODO: Last .isViewers.read should always be visible
-  // &.isViewers.chat-item__icon--read:nth-last-child(2) {
-  // .isViewers .chat-item__icon--read:last-child {
-  // // &.isViewers .chat-item__details:last-of-type(1) {
-  //   // .chat-item__icon--read {
-  //     visibility: visible;
-  //     opacity: 0.3;
-  // }
-  // }
-  // }
-
   &.deleted {
     opacity: 0.5;
     .chat-item__text {
@@ -97,7 +85,7 @@ img.emoji {
   }
 
   &:last-child {
-    padding-bottom: 8px;
+    &.burstStart { padding-bottom: 10px; }
   }
 
   @media @small {
