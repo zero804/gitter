@@ -27,7 +27,7 @@
 </head>
 <body class="logged-out">
   {{#if stagingText}}
-  <div class="staging-indicator" style="
+    <div class="staging-indicator" style="
       position: fixed;
       left: 50%;
       top: 0;
@@ -38,17 +38,15 @@
       color: white;
       font-family: 'open sans';
       font-size: 10px;
-      text-align: center;
-  ">
-    {{#if stagingLink}}
-    <a style="text-decoration: none; color:white" href="{{stagingLink}}" target="_new">{{stagingText}}</a>
-    {{else}}
-    {{stagingText}}
-    {{/if}}
-    
-  </div>
+      text-align: center;" >
+      {{#if stagingLink}}
+        <a style="text-decoration: none; color:white" href="{{stagingLink}}" target="_new">{{stagingText}}</a>
+      {{else}}
+        {{stagingText}}
+      {{/if}}
+    </div>
   {{/if}}
-  
+
   {{#isMobile agent}}
     <div class="trpPortraitAlert" id='portrait-alert'>
       <div class="message">
