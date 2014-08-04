@@ -128,11 +128,10 @@ require([
           //  Add to the map
           //this.appendTo(msg);
 
-          var span = $('<span />').appendTo(msg);
-          var link = $('<a />');
-          link.attr({href: '/' + chatMessage.room});
-          link.html(chatMessage.room);
-          link.appendTo(span);
+          var rs = chatMessage.room.split('/');
+          var room = rs[rs.length-1];
+          var html = "<b>" + chatMessage.username + "</b> in <a href='/" + chatMessage.room + "'>" + room + "</a>";
+          var span = $('<span />').html(html).appendTo(msg);
           var img = $('<img />').attr({src: chatMessage.avatarUrl,"class":"avatar"}).appendTo(msg);
 
           msg.css({
@@ -157,7 +156,6 @@ require([
 
         realtime.registerForSnapshots('/sample-chats', function(ss) {
           messages = messages.concat(ss);
-          generate(messages.shift());
         });
 
         realtime.subscribe('/sample-chats', function(msg) {
@@ -168,7 +166,7 @@ require([
           var msg = messages.shift();
           generate(msg);
           if (messages.length < 5) messages.push(msg);
-        }, 2000);
+        }, 2500);
       };
       
       //  And go!
