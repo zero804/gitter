@@ -1,0 +1,12 @@
+{{!-- TODO: old classes have been left there for reference, to be removed --}}
+<div class="chat-input  {{!-- trpChatInputWrapper --}}" id="chat-input-wrapper">
+  <div class="{{!-- trpFileProgressContainer --}}  progress">
+    <div class="{{!-- trpFileProgressBar --}}  progress__bar" id="file-progress-bar"></div>
+  </div>
+  <div class="banner-wrapper  bottom" style="display: none;">
+    <div id="bottom-unread-banner" class="banner slide-away"></div>
+  </div>
+  <div class="{{!-- trpChatInputArea --}}  chat-input__container  js-chat-input-container" id="chat-input">
+    {{{ prerenderView "js/views/chat/tmpl/chatInputView" }}}
+  </div>
+</div>
