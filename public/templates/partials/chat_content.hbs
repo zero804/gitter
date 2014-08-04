@@ -8,8 +8,10 @@
           {{{ chatItemPrerender this lang=../lang locale=../locale}}}
         {{/each}}
       {{/if}}
-      {{! This is a way of forcing the browser to open at the bottom of the screen }}
-      <div id='initial' style="height:0;width:0;overflow:hidden"><a name="initial"/>_</a></div>
+      {{#if initialBottom}}
+        {{! This is a way of forcing the browser to open at the bottom of the screen }}
+        <div id='initial' style="height:0;width:0;overflow:hidden"><a name="initial"/>_</a></div>
+      {{/if}}
     </div>
   </div>
 </div>
