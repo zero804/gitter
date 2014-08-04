@@ -85,7 +85,6 @@ require([
       this.onLoad = function() {
         //  Fade in the background image
         me.bg.fadeIn(me.speeds.slow);//.resizeToParent();
-        console.debug(me.bg, me.speeds.slow);
         
         //  @TODO
         //  Initiate the chat boxes
@@ -123,14 +122,17 @@ require([
         //        'Did anyone see that ludicrous display last night?', '<code>sudo rm -rf /</code>'];
                 
         var generate = function(chatMessage) {
-          //$.getAvatar(function() {
           var pos = random(coords);
           var msg = $('<div class="msg" />');
 
           //  Add to the map
           //this.appendTo(msg);
 
-          var span = $('<span />').html(chatMessage.room).appendTo(msg);
+          var span = $('<span />').appendTo(msg);
+          var link = $('<a />');
+          link.attr({href: '/' + chatMessage.room});
+          link.html(chatMessage.room);
+          link.appendTo(span);
           var img = $('<img />').attr({src: chatMessage.avatarUrl,"class":"avatar"}).appendTo(msg);
 
           msg.css({
@@ -149,7 +151,6 @@ require([
               //msg.remove();
             });
           }, 5000);
-          //});
         };
 
         var messages = [];
