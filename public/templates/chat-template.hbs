@@ -1,89 +1,12 @@
-<!doctype html>
-<html class="no-js" lang="en">
-<head>
-  <meta http-equiv="X-UA-Compatible" content="IE=IE9" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
-	<meta charset="utf-8">
-
-	<title>{{troupeName}} - Gitter</title>
-
-  <style>
-
-  @-webkit-keyframes pulsey {
-    0% { opacity: 0.6; }
-    50% { opacity: 1; }
-    100% { opacity: 0.6; }
-  }
-
-  html.loading .trpContentPanel { background: url("{{ cdn 'images/2/gitter/logo-mark-grey-64.png' }}") center no-repeat; height: 90%; -webkit-animation: pulsey 2s ease-out; -webkit-animation-iteration-count: infinite;  }
-  html.loading .trpContentPanel > * { visibility: hidden; }
-  </style>
-  <base target="_parent">
-  <link rel="stylesheet" href='{{cdn "sprites/services.css" }}'>
-  <link rel="stylesheet" href='{{cdn "bootstrap/css/trp3.css" }}'>
-
-    <!-- Le fav and touch icons -->
-    <link id="favicon" rel="shortcut icon" href='{{cdn "images/2/gitter/favicon5.png" }}'>
-    {{>load_font_css}}
-</head>
-<body class="iframe">
-
-<div class="chat-header" id="header-wrapper">
-  <div id="header">
-    {{{ prerenderView "js/views/app/tmpl/headerViewTemplate" }}}
-  </div>
-  <div class="banner-wrapper" style="display: none;">
-    <div id="unread-banner" class="banner slide-away"></div>
-    <div id="limit-banner" class="banner slide-away"></div>
-  </div>
-</div>
-
-<div class="trpContentPanel" id="content-wrapper">
-  <div class="trpChatPanel" id="chat-frame">
-    <div class="trpChatContainer primary-scroll" id="content-frame">
-      <div class="js-chat-container">
-      {{#each chats}}
-        {{{ chatItemPrerender this lang=../lang locale=../locale}}}
-      {{/each}}
-      </div>      
-      {{#if initialBottom}}
-      {{! This is a way of forcing the browser to open at the bottom of the screen }}
-      <div id='initial' style="height:0;width:0;overflow:hidden"><a name="initial"/>_</a></div>
-      {{/if}}
-    </div>
-  </div>
-</div>
-
-<div class="trpToolbar" id="toolbar-frame">
-  {{{ prerenderView "js/views/righttoolbar/tmpl/rightToolbar" }}}
-</div>
-
-<div class="chat-input  {{!-- trpChatInputWrapper --}}" id="chat-input-wrapper">
-  <div class="{{!-- trpFileProgressContainer --}}  progress">
-    <div class="{{!-- trpFileProgressBar --}}  progress__bar" id="file-progress-bar"></div>
-  </div>
-  <div class="banner-wrapper  bottom" style="display: none;">
-    <div id="bottom-unread-banner" class="banner slide-away"></div>
-  </div>
-  <div class="{{!-- trpChatInputArea --}}  chat-input__container  js-chat-input-container" id="chat-input">
-    {{{ prerenderView "js/views/chat/tmpl/chatInputView" }}}
-  </div>
-</div>
-
+{{!< chat-layout}}
+{{> chat_alert_wrapper}}
+{{> chat_header}}
+{{> chat_content}}
+{{> chat_toolbar}}
+{{> chat_input}}
 <div class="trpBlankPage"></div>
-
+{{> require_wrapper}}
+{{> set_initial_position}}
 {{{ generateTroupeContext troupeContext }}}
-
-{{>require_wrapper}}
 {{{ bootScript bootScriptName }}}
-
-{{>set_initial_position}}
-
-<div style="display: none;">
-  <form id="upload-form" action="" enctype="multipart/form-data" method="POST">
-    <input type="hidden" name="params" value="">
-    <input type="file" name="file" multiple="multiple"/>
-  </form>
-</div>
-</body>
-</html>
+{{> chat_upload}}
