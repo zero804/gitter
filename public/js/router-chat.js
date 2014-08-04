@@ -17,6 +17,9 @@ require([
   'views/app/keyboardView',
   'views/app/addPeopleView',
   'views/app/integrationSettingsModal',
+  'views/app/collaboratorsView',
+  'collections/collaborators',
+
   'components/unread-items-client',
   'components/helpShareIfLonely',
 
@@ -44,7 +47,7 @@ require([
 
 ], function($, Backbone, context, liveContext, appEvents, log, peopleCollectionView, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, RightToolbarView,
-    inviteView, TroupeSettingsView, MarkdownView, KeyboardView, AddPeopleViewModal, IntegrationSettingsModal,
+    inviteView, TroupeSettingsView, MarkdownView, KeyboardView, AddPeopleViewModal, IntegrationSettingsModal, CollaboratorsView, collaboratorsModels,
     unreadItemsClient, helpShareIfLonely, webhookDecorator, issueDecorator, commitDecorator, mentionDecorator,
     embedDecorator, emojiDecorator, UnreadBannerView, HistoryLimitView, HeaderView) {
   "use strict";
@@ -215,7 +218,7 @@ require([
   // Setup the ChatView
 
   var chatCollectionView = new ChatCollectionView({
-    el: $('#content-frame'),
+    el: $('.js-chat-container'),
     collection: itemCollections.chats,
     userCollection: itemCollections.users,
     decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
@@ -246,6 +249,20 @@ require([
     unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
   });
 
+  itemCollections.users.once('sync', function() {
+    if(context().permissions.admin) {
+      if (itemCollections.users.length === 1) { //itemCollections.chats.length === 0)
+        var collaborators = new collaboratorsModels.CollabCollection();
+        collaborators.fetch();
+        collaborators.once('sync', function() {
+          var collaboratorsView = new CollaboratorsView({ collection: collaborators });
+          $('#content-frame').prepend(collaboratorsView.render().el);
+        });
+      }
+    }
+  });
+
+
   // unreadItemsClient.monitorViewForUnreadItems($('#file-list'));
 
   new chatInputView.ChatInputView({
@@ -255,6 +272,7 @@ require([
     userCollection: itemCollections.users,
     rollers: chatCollectionView.rollers
   }).render();
+
 
   var Router = Backbone.Router.extend({
     routes: {
@@ -381,7 +399,7 @@ require([
     setTimeout(promptForHook, 1500);
   }
 
-  helpShareIfLonely();
+  //helpShareIfLonely();
 
   Backbone.history.start();
 });

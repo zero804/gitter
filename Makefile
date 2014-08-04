@@ -13,9 +13,9 @@ GIT_COMMIT ?= $(shell git rev-parse HEAD)
 ASSET_TAG_PREFIX =
 ASSET_TAG = $(ASSET_TAG_PREFIX)$(shell echo $(GIT_COMMIT)|cut -c 1-6)
 ifeq ($(FAST_BUILD), 1)
-CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/ )
+CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/ public/bootstrap/css/)
 else
-CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/ public-compile-cache/)
+CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/ public/bootstrap/css/ public-compile-cache/)
 endif
 
 PUBLIC_EXCLUDING_JS = $(shell ls -d public/*|grep -v ^public/js$)
@@ -170,12 +170,13 @@ npm:
 grunt: clean
 	mkdir output
 	mkdir -p public-processed/js
+	grunt -no-color less
 	for i in $(PUBLIC_EXCLUDING_JS); \
 		do cp -R $$i public-processed/; \
 	done
 	if [ -d public-compile-cache/js/ ] && [ -n $$(find public-compile-cache/js/ -maxdepth 1 -type f -name '*' -print -quit) ]; then cp public-compile-cache/js/* public-processed/js/; fi
 	./build-scripts/copy-templates.sh
-	grunt -no-color less requirejs
+	grunt -no-color requirejs
 	./build-scripts/selective-js-compile.sh
 	rm -rf public-compile-cache
 	mkdir -p public-compile-cache/js

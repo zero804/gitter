@@ -14,7 +14,7 @@ var NotificationCollector = function(options) {
 util.inherits(NotificationCollector, EventEmitter);
 
 NotificationCollector.prototype.incomingNotification = function(userId, itemType, items, troupeId) {
-  if(['chat', 'file', 'request'].indexOf(itemType) < 0) return false;
+  if(itemType !== 'chat') return false;
 
   var key = userId + ':' + troupeId;
   var itemsMapped = items.map(function(itemId) { return { itemType: itemType, itemId: itemId }; });

@@ -1,0 +1,15 @@
+<div class="welcome-modal__collaborator">
+  <img src="{{avatar_url}}">
+  <p>
+    {{login}}
+    {{#if message}}
+      <span class='message'>
+        {{message}} {{#if action.text}}<a href={{action.href}}>{{action.text}}</a>{{/if}}
+      </span>
+    {{/if}}
+  </p>
+
+  {{#unless added}}
+  <a href='#' class='trpButton trpBtnGreen  add'>Add</a>
+  {{/unless}}
+</div>

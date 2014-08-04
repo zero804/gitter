@@ -5,7 +5,7 @@ define([
   'use strict';
 
   function showModal() {
-    window.location.hash = context.getTroupe().security === 'PRIVATE' ? 'add' : 'inv';
+    window.location.hash = 'welcome'; // context.getTroupe().security === 'PRIVATE' ? 'add' : 'inv';
   }
 
   function getUserCount(cb) {

@@ -27,7 +27,14 @@ define([
     showBanner: function() {
       var $banner = this.$el;
       var unreadCount = this.getUnreadCount();
-      var message = (unreadCount > 1) ? unreadCount+' unread messages' : '1 unread message';
+      var message;
+      if(unreadCount === 1) {
+        message = '1 unread message';
+      } else if(unreadCount > 99) {
+        message = '99+ unread messages';
+      } else {
+        message = unreadCount +' unread messages';
+      }
 
       $banner.html(template({message: message}));
       $banner.parent().show();

@@ -185,6 +185,12 @@ define([
         self._onDataChange(message);
       });
 
+      function getState() {
+        return self.getSnapshotState();
+      }
+
+      var stateProvider = this.getSnapshotState && getState;
+
       realtime.registerForSnapsnots(this.url, function(snapshot) {
         self.trigger('request');
         /**
@@ -215,7 +221,7 @@ define([
         self._onInitialLoad();
         self.trigger('sync');
         self.trigger('snapshot');
-      });
+      }, stateProvider);
 
       this.subscription.errback(function(error) {
         log('Subscription error for ' + self.url, error);
@@ -307,6 +313,10 @@ define([
       var operation = data.operation;
       var newModel = data.model;
       var id = newModel.id;
+
+      if(this.ignoreDataChange) {
+        if(this.ignoreDataChange(data)) return;
+      }
 
       if(this.transformModel) newModel = this.transformModel(newModel);
       var parsed = new this.model(newModel, { parse: true });

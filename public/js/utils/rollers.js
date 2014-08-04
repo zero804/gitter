@@ -11,8 +11,9 @@ define(['mutant'], function(Mutant) {
   /** @const */ var TOP_OFFSET = 300;
 
   /* Put your scrolling panels on rollers */
-  function Rollers(target) {
+  function Rollers(target, childContainer) {
     this._target = target;
+    this._childContainer = childContainer || target;
     this._mutationHandlers = {};
     this._mutationHandlers[TRACK_BOTTOM] = this.updateTrackBottom.bind(this);
     this._mutationHandlers[TRACK_NO_PASS] = this.updateTrackNoPass.bind(this);
@@ -20,7 +21,7 @@ define(['mutant'], function(Mutant) {
 
     this._nopass = null;
     this._stableElement = null;
-    this._mode = TRACK_BOTTOM;
+    this.initTrackingMode();
 
     var adjustScroll = this.adjustScroll.bind(this);
 
@@ -61,29 +62,56 @@ define(['mutant'], function(Mutant) {
       }
     },
 
+    initTrackingMode: function() {
+      if(this.isScrolledToBottom()) {
+        this._mode = TRACK_BOTTOM;
+      } else {
+        // Default to stable mode
+        this.stable();
+      }
+    },
+
+    stable: function() {
+      var target = this._target;
+
+      this._nopass = null;
+      this._mode = STABLE;
+
+      this._stableElement = this.getBottomMostVisibleElement();
+
+      // TODO: check that the element is within the targets DOM heirachy
+      var scrollBottom = target.scrollTop + target.clientHeight;
+      var stableElementTop = this._stableElement.offsetTop - target.offsetTop;
+
+      // Calculate an record the distance of the stable element to the bottom of the view
+      this._stableElementFromBottom = scrollBottom - stableElementTop;
+    },
+
+    setModeLocked: function(value) {
+      this.modeLocked = value;
+      if(!value) {
+        this.trackLocation();
+      }
+    },
+
     cancelTrackUntil: function() {
       if(!this._nopass) return;
 
       this._nopass = null;
 
-      var target = this._target;
+      this.initTrackingMode();
+    },
 
+    disableTrackBottom: function() {
+      this.disableTrackBottom = true;
+
+    },
+
+    enableTrackBottom: function() {
+      this.disableTrackBottom = true;
       if(this.isScrolledToBottom()) {
-        this._mode = TRACK_BOTTOM;
-      } else {
-        this._mode = STABLE;
-
-        this._stableElement = this.getBottomMostVisibleElement();
-
-        // TODO: check that the element is within the targets DOM heirachy
-        var scrollBottom = target.scrollTop + target.clientHeight;
-        var stableElementTop = this._stableElement.offsetTop - target.offsetTop;
-
-        // Calculate an record the distance of the stable element to the bottom of the view
-        this._stableElementFromBottom = scrollBottom - stableElementTop;
-
+        this.trackLocation();
       }
-
     },
 
     isScrolledToBottom: function() {
@@ -163,7 +191,6 @@ define(['mutant'], function(Mutant) {
       }
     },
 
-
     updateStableTracking: function() {
       if(!this._stableElement) return;
       var target = this._target;
@@ -181,20 +208,22 @@ define(['mutant'], function(Mutant) {
 
       var atBottom = target.scrollTop >= target.scrollHeight - target.clientHeight - BOTTOM_MARGIN;
 
-      if(atBottom) {
-        if(this._nopass) {
-          if(this._mode != TRACK_NO_PASS) {
-            this._mode = TRACK_NO_PASS;
+      if(!this.modeLocked) {
+        if(atBottom) {
+          if(this._nopass) {
+            if(this._mode != TRACK_NO_PASS) {
+              this._mode = TRACK_NO_PASS;
 
+            }
+          } else {
+            if(this._mode != TRACK_BOTTOM) {
+              this._mode = TRACK_BOTTOM;
+            }
           }
         } else {
-          if(this._mode != TRACK_BOTTOM) {
-            this._mode = TRACK_BOTTOM;
+          if(this._mode != STABLE) {
+            this._mode = STABLE;
           }
-        }
-      } else {
-        if(this._mode != STABLE) {
-          this._mode = STABLE;
         }
       }
 
@@ -221,8 +250,7 @@ define(['mutant'], function(Mutant) {
       var scrollTop = this._target.scrollTop;
       var clientHeight = this._target.clientHeight;
       var max = scrollTop + clientHeight;
-      var target = this._target;
-      var children = target.children;
+      var children = this._childContainer.children;
 
       for(var i = children.length - 1; i >= 0; i--) {
         var child = children[i];
