@@ -1,0 +1,42 @@
+/*jshint globalstrict:true, trailing:false, unused:true, node:true */
+"use strict";
+
+var appEvents     = require('../app-events');
+var troupeService = require('./troupe-service');
+var bayeux        = require('../web/bayeux');
+
+var sampleChats = [];
+var c = 0;
+var samplesChannel = '/sample-chats';
+var bayeuxClient = bayeux.client;
+
+appEvents.localOnly.onChat(function(evt) { 
+  if (evt.operation === 'create') {
+    c++;
+
+    troupeService.findById(evt.troupeId)
+      .then(function(troupe) {
+        var sample = {
+          username: evt.model.fromUser.avatarUrlSmall,
+          avatarUrl: evt.model.fromUser.username,
+          room: troupe.uri
+        };
+
+        sampleChats.push(sample);
+        if (sampleChats.length > 10) sampleChats.shift();
+
+        if (c === 10) {
+          bayeuxClient.publish(samplesChannel, sample);
+          c = 0;
+        }
+      });
+  }
+});
+
+function getSamples() {
+  return sampleChats;
+}
+
+module.exports = {
+  getSamples: getSamples
+};

@@ -243,7 +243,7 @@ define([
         }
       });
 
-      realtime.registerForSnapsnots(url, function(snapshot) {
+      realtime.registerForSnapshots(url, function(snapshot) {
           store.preload(snapshot);
       });
     }
