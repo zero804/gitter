@@ -32,9 +32,8 @@
 @import "welcome-tips";
 /* end of new stuff*/
 
-.boxhack {
-  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-  -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+.border-box-sizing() {
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
 
@@ -153,7 +152,7 @@ label {
 }
 
 .gtrInput {
-  .boxhack;
+  .border-box-sizing;
   .trpBodyMedium;
 
   width: 100%;
@@ -2528,7 +2527,7 @@ ul.roster {
 // TODO: as we progress with the css refactoring this will have to be changed. Walter.
 .popover-content {
   .invited {
-    .boxhack;
+    .border-box-sizing;
     background-color: hsl(0, 60%, 70%);
     padding: 10px;
     line-height: 10px;
@@ -2552,7 +2551,7 @@ ul.roster {
 }
 
 .trpPopoverDetails {
-  .boxhack;
+  .border-box-sizing;
   float: right;
   max-width: 340px;
   margin-left: 12px;
