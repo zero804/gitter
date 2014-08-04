@@ -285,7 +285,7 @@ function getSuggestions(user, lang) {
         return b.score - a.score;
       });
 
-      return suggestions.slice(0, 10);
+      return suggestions.slice(0, 6);
     });
 }
 
