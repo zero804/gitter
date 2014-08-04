@@ -7,14 +7,14 @@ define([
   'hbs!./tmpl/userHomeTemplate',
   'hbs!./tmpl/userHomeEmptyOrgView',
   './homeOrgCollectionView',
-  './homeRepoCollectionView',
+  './suggested-room-collection-view',
   'utils/is-mobile'
-], function($, Marionette, backbone, context, troupeCollections, userHomeTemplate, userHomeEmptyOrgViewTemplate, OrgCollectionView, RepoCollectionView, isMobile) {
+], function($, Marionette, backbone, context, troupeCollections, userHomeTemplate, userHomeEmptyOrgViewTemplate, OrgCollectionView, SuggestedCollectionView, isMobile) {
   "use strict";
 
-  var suggestedRoomsCollection = new backbone.Collection();
-  suggestedRoomsCollection.url = '/api/v1/user/' + context.getUserId() + '/rooms?suggested=1';
-  suggestedRoomsCollection.fetch();
+  var suggestedRoomCollection = new backbone.Collection();
+  suggestedRoomCollection.url = '/api/v1/user/' + context.getUserId() + '/rooms?suggested=1';
+  suggestedRoomCollection.fetch();
 
   return Marionette.Layout.extend({
     template: userHomeTemplate,
@@ -35,7 +35,7 @@ define([
         collection: troupeCollections.orgs,
         emptyView: Marionette.ItemView.extend({ template: userHomeEmptyOrgViewTemplate })
       }));
-      this.suggestedRooms.show(new RepoCollectionView({ collection: suggestedRoomsCollection }));
+      this.suggestedRooms.show(new SuggestedCollectionView({ collection: suggestedRoomCollection }));
     },
 
     serializeData: function() {
