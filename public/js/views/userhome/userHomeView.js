@@ -12,9 +12,9 @@ define([
 ], function($, Marionette, backbone, context, troupeCollections, userHomeTemplate, userHomeEmptyOrgViewTemplate, OrgCollectionView, RepoCollectionView, isMobile) {
   "use strict";
 
-  var suggestionCollection = new backbone.Collection();
-  suggestionCollection.url = '/api/v1/user/' + context.getUserId() + '/rooms?suggested=1';
-  suggestionCollection.fetch();
+  var suggestedRoomsCollection = new backbone.Collection();
+  suggestedRoomsCollection.url = '/api/v1/user/' + context.getUserId() + '/rooms?suggested=1';
+  suggestedRoomsCollection.fetch();
 
   return Marionette.Layout.extend({
     template: userHomeTemplate,
@@ -26,7 +26,7 @@ define([
 
     regions: {
       orgs: "#org-list",
-      repos: "#repo-list"
+      suggestedRooms: "#suggested-room-list"
     },
 
     onRender: function() {
@@ -35,7 +35,7 @@ define([
         collection: troupeCollections.orgs,
         emptyView: Marionette.ItemView.extend({ template: userHomeEmptyOrgViewTemplate })
       }));
-      this.repos.show(new RepoCollectionView({ collection: suggestionCollection }));
+      this.suggestedRooms.show(new RepoCollectionView({ collection: suggestedRoomsCollection }));
     },
 
     serializeData: function() {
