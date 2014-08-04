@@ -1,24 +1,24 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var env               = require('../utils/env');
-var logger            = env.logger;
-var nconf             = env.config;
-var stats             = env.stats;
+var env                 = require('../utils/env');
+var logger              = env.logger;
+var nconf               = env.config;
+var stats               = env.stats;
 
-var faye              = require('./faye-node');
-var fayeRedis         = require('faye-redis');
-var oauth             = require('../services/oauth-service');
-var troupeService     = require('../services/troupe-service');
-var presenceService   = require('../services/presence-service');
-var restful           = require('../services/restful');
-var shutdown          = require('shutdown');
-var contextGenerator  = require('./context-generator');
-var appVersion        = require('./appVersion');
-var mongoUtils        = require('../utils/mongo-utils');
-var StatusError       = require('statuserror');
-var bayeuxExtension   = require('./bayeux/extension');
-var Q                 = require('q');
+var faye                = require('./faye-node');
+var fayeRedis           = require('faye-redis');
+var oauth               = require('../services/oauth-service');
+var troupeService       = require('../services/troupe-service');
+var presenceService     = require('../services/presence-service');
+var restful             = require('../services/restful');
+var shutdown            = require('shutdown');
+var contextGenerator    = require('./context-generator');
+var appVersion          = require('./appVersion');
+var mongoUtils          = require('../utils/mongo-utils');
+var StatusError         = require('statuserror');
+var bayeuxExtension     = require('./bayeux/extension');
+var Q                   = require('q');
 
 var version = appVersion.getVersion();
 
@@ -41,7 +41,7 @@ var routes = [
   { re: /^\/api\/v1\/user\/(\w+)$/,
     validator: validateUserForUserSubscription },
   { re: /^\/api\/v1\/ping(\/\w+)?$/,
-    validator: validateUserForPingSubscription }
+    validator: validateUserForPingSubscription },
 ];
 
 var superClientPassword = nconf.get('ws:superClientPassword');
@@ -245,11 +245,20 @@ var authenticator = bayeuxExtension({
   privateState: true,
   incoming: function(message, req, callback) {
     var ext = message.ext || {};
-
+    var connectionType = getConnectionType(ext.connType);
     var token = ext.token;
 
     if(!token) {
-      return callback(new StatusError(401, "Access token required"));
+
+      message._private.authenticator = {
+        userId: null,
+        connectionType: connectionType,
+        client: ext.client,
+      };
+
+      return callback(null, message);
+
+      //return callback(new StatusError(401, "Access token required"));
     }
 
     oauth.validateAccessTokenAndClient(ext.token, function(err, tokenInfo) {
@@ -269,7 +278,7 @@ var authenticator = bayeuxExtension({
         client: oauthClient.name
       });
 
-      var connectionType = getConnectionType(ext.connType);
+
 
       message._private.authenticator = {
         userId: userId,
@@ -357,6 +366,7 @@ function authorizeSubscribe(message, callback) {
 
     var match = null;
 
+    console.log('*** message', message)
     var hasMatch = routes.some(function(route) {
       var m = route.re.exec(message.subscription);
       if(m) {
