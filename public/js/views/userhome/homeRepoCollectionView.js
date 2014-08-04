@@ -18,15 +18,22 @@ define([
       this.setRerenderOnChange(true);
     },
     getRenderData: function() {
-      return this.model.toJSON();
+      var suggestion = this.model.toJSON();
+
+      return {
+        avatarUrl: suggestion.avatarUrl + 's=48',
+        name: suggestion.uri,
+        description: suggestion.description,
+        userCount: suggestion.userCount
+      };
     },
     events: function() {
       return isMobile() ? { tap: 'navigate' } : { click: 'navigate' };
     },
     navigate: function() {
-      var url = '/' + this.model.get('uri');
-      var name = this.model.get('name');
-      appEvents.trigger('navigation', url, 'chat', name);
+      var uri = this.model.get('uri');
+      var url = '/' + uri;
+      appEvents.trigger('navigation', url, 'chat', uri);
     }
   });
 
