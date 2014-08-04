@@ -6,7 +6,6 @@ var assert = require('assert');
 var request = require('./request-wrapper');
 
 function createClient(user, token) {
-  // assert(token, 'token required');
   var client = github.client(token, { request: request });
 
   return client;
