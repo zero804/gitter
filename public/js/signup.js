@@ -1,7 +1,9 @@
 require([
-  'jquery'
+  'jquery',
+  'components/realtime',
+  'utils/context'
  ],
-  function($) {
+  function($, realtime, context) {
     "use strict";
 
     require([
@@ -60,6 +62,18 @@ require([
             window.mixpanel.track('arrow-click', { arrow: 'arrow-2' });
         }
     });
+
+    function onSample(chat) {
+      console.debug('sample', chat);
+    }
+
+    function onSnapshot(snapshot) {
+      console.debug('snapshot', snapshot);
+    }
+
+    realtime.registerForSnapshots('/sample-chats', onSnapshot);
+    realtime.subscribe('/sample-chats', onSample, context);
+
 
 });
 
