@@ -3,7 +3,7 @@ define([
   'jquery-hammer',
   'marionette',
   'views/base',
-  'hbs!./tmpl/homeRepoListItem',
+  'hbs!./tmpl/suggested-room-list-item',
   'utils/appevents',
   'utils/is-mobile'
 ], function($hammer, Marionette, TroupeViews, repoListItemTemplate, appEvents, isMobile) {
