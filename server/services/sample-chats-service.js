@@ -12,7 +12,6 @@ var bayeuxClient = bayeux.client;
 
 appEvents.localOnly.onChat(function(evt) { 
   if (evt.operation === 'create') {
-    c++;
 
     troupeService.findById(evt.troupeId)
       .then(function(troupe) {
@@ -22,12 +21,16 @@ appEvents.localOnly.onChat(function(evt) {
           room: troupe.uri
         };
 
-        sampleChats.push(sample);
-        if (sampleChats.length > 10) sampleChats.shift();
+        if (troupe.security === 'PUBLIC') {
+          c++;
 
-        if (c === 10) {
-          bayeuxClient.publish(samplesChannel, sample);
-          c = 0;
+          sampleChats.push(sample);
+          if (sampleChats.length > 10) sampleChats.shift();
+
+          if (c === 10) {
+            bayeuxClient.publish(samplesChannel, sample);
+            c = 0;
+          }
         }
       });
   }
