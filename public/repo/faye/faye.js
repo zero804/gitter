@@ -2,7 +2,7 @@
 'use strict';
 
 var Faye = {
-  VERSION:          '1.0.1',
+  VERSION:          '1.0.3',
 
   BAYEUX_VERSION:   '1.0',
   ID_LENGTH:        160,
@@ -1150,7 +1150,7 @@ Faye.Client = Faye.Class({
       version:                  Faye.BAYEUX_VERSION,
       supportedConnectionTypes: [this._dispatcher.connectionType]
 
-    }, function(response) {
+    }, {}, function(response) {
 
       if (response.successful) {
         this._state = this.CONNECTED;
@@ -1204,7 +1204,7 @@ Faye.Client = Faye.Class({
       clientId:       this._dispatcher.clientId,
       connectionType: this._dispatcher.connectionType
 
-    }, this._cycleConnection, this);
+    }, {}, this._cycleConnection, this);
   },
 
   // Request                              Response
@@ -1224,7 +1224,7 @@ Faye.Client = Faye.Class({
       channel:  Faye.Channel.DISCONNECT,
       clientId: this._dispatcher.clientId
 
-    }, function(response) {
+    }, {}, function(response) {
       if (response.successful) this._dispatcher.close();
     }, this);
 
@@ -1267,7 +1267,7 @@ Faye.Client = Faye.Class({
         clientId:     this._dispatcher.clientId,
         subscription: channel
 
-      }, function(response) {
+      }, {}, function(response) {
         if (!response.successful) {
           subscription.setDeferredStatus('failed', Faye.Error.parse(response.error));
           return this._channels.unsubscribe(channel, callback, context);
@@ -1309,7 +1309,7 @@ Faye.Client = Faye.Class({
         clientId:     this._dispatcher.clientId,
         subscription: channel
 
-      }, function(response) {
+      }, {}, function(response) {
         if (!response.successful) return;
 
         var channels = [].concat(response.subscription);
@@ -1324,7 +1324,7 @@ Faye.Client = Faye.Class({
   // MAY include:   * clientId            MAY include:   * id
   //                * id                                 * error
   //                * ext                                * ext
-  publish: function(channel, data) {
+  publish: function(channel, data, options) {
     var publication = new Faye.Publication();
 
     this.connect(function() {
@@ -1335,7 +1335,7 @@ Faye.Client = Faye.Class({
         data:     data,
         clientId: this._dispatcher.clientId
 
-      }, function(response) {
+      }, options, function(response) {
         if (response.successful)
           publication.setDeferredStatus('succeeded');
         else
@@ -1352,7 +1352,7 @@ Faye.Client = Faye.Class({
     this._cycleConnection();
   },
 
-  _sendMessage: function(message, callback, context) {
+  _sendMessage: function(message, options, callback, context) {
     message.id = this._generateMessageId();
 
     var timeout = this._advice.timeout
@@ -1362,7 +1362,7 @@ Faye.Client = Faye.Class({
     this.pipeThroughExtensions('outgoing', message, null, function(message) {
       if (!message) return;
       if (callback) this._responseCallbacks[message.id] = [callback, context];
-      this._dispatcher.sendMessage(message, timeout);
+      this._dispatcher.sendMessage(message, timeout, options || {});
     }, this);
   },
 
@@ -1496,19 +1496,27 @@ Faye.Dispatcher = Faye.Class({
     }, this);
   },
 
-  sendMessage: function(message, timeout) {
+  sendMessage: function(message, timeout, options) {
     if (!this._transport) return;
+    options = options || {};
 
     var self     = this,
         id       = message.id,
+        attempts = options.attempts,
+        deadline = options.deadline && new Date().getTime() + (options.deadline * 1000),
+
         envelope = this._envelopes[id] = this._envelopes[id] ||
-                   {message: message, timeout: timeout, request: null, timer: null};
+                   {message: message, timeout: timeout, attempts: attempts, deadline: deadline};
 
     if (envelope.request || envelope.timer) return;
 
+    if (this._attemptsExhausted(envelope) || this._deadlinePassed(envelope)) {
+      delete this._envelopes[id];
+      return;
+    }
+
     envelope.timer = Faye.ENV.setTimeout(function() {
-      self.debug('Delivery of message ? timed out', id);
-      self.handleError(message, false);
+      self.handleError(message);
     }, timeout * 1000);
 
     envelope.request = this._transport.sendMessage(message);
@@ -1534,7 +1542,7 @@ Faye.Dispatcher = Faye.Class({
         request  = envelope && envelope.request,
         self     = this;
 
-    if (!envelope || !envelope.request) return;
+    if (!request) return;
 
     this.debug('handleError');
 
@@ -1563,6 +1571,20 @@ Faye.Dispatcher = Faye.Class({
     if (this._state === this.DOWN) return;
     this._state = this.DOWN;
     this._client.trigger('transport:down');
+  },
+
+  _attemptsExhausted: function(envelope) {
+    if (envelope.attempts === undefined) return false;
+    envelope.attempts -= 1;
+    if (envelope.attempts >= 0) return false;
+    return true;
+  },
+
+  _deadlinePassed: function(envelope) {
+    var deadline = envelope.deadline;
+    if (deadline === undefined) return false;
+    if (new Date().getTime() <= deadline) return false;
+    return true;
   }
 });
 
@@ -2277,7 +2299,15 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
         this._handleError(messages);
       }
     }, this);
+
     this.connect();
+    var self = this;
+
+    return {
+      abort: function() {
+        self.close();
+      }
+    };
   },
 
   connect: function() {

@@ -24,6 +24,7 @@ module.exports = {
     installTroupeSubResource('users', 'users');
     installTroupeSubResource('bans', 'bans');
     installTroupeSubResource('channels', 'channels');
+    installTroupeSubResource('collaborators', 'collaborators');
 
     var chatResource = installTroupeSubResource('chatMessages', 'chat-messages');
     var chatReadBy = new Resource('readBy', require('./troupes/chat-read-by'), app);

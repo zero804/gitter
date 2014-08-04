@@ -16,34 +16,34 @@ var mockito = require('jsmockito').JsMockito;
 
 Q.longStackSupport = true;
 
-beforeEach(fixtureLoader(fixture, {
-  troupeCanRemove: {
-    security: 'PUBLIC',
-    githubType: 'REPO',
-    users: ['userFavourite', 'userLeave', 'userToRemove', 'userRemoveNonAdmin', 'userRemoveAdmin']
-  },
-  troupeCannotRemove: {
-    security: 'PRIVATE',
-    githubType: 'ONETOONE',
-    users: ['userToRemove', 'userRemoveAdmin']
-  },
-  troupeEmpty: {
-    security: 'PUBLIC',
-    githubType: 'REPO',
-    users: []
-  },
-  userFavourite: {},
-  userLeave: {},
-  userToRemove: {},
-  userRemoveNonAdmin: {},
-  userRemoveAdmin: {}
-}));
-
-afterEach(function() {
-  fixture.cleanup();
-});
-
 describe('remove-service', function() {
+
+  beforeEach(fixtureLoader(fixture, {
+    troupeCanRemove: {
+      security: 'PUBLIC',
+      githubType: 'REPO',
+      users: ['userFavourite', 'userLeave', 'userToRemove', 'userRemoveNonAdmin', 'userRemoveAdmin']
+    },
+    troupeCannotRemove: {
+      security: 'PRIVATE',
+      githubType: 'ONETOONE',
+      users: ['userToRemove', 'userRemoveAdmin']
+    },
+    troupeEmpty: {
+      security: 'PUBLIC',
+      githubType: 'REPO',
+      users: []
+    },
+    userFavourite: {},
+    userLeave: {},
+    userToRemove: {},
+    userRemoveNonAdmin: {},
+    userRemoveAdmin: {}
+  }));
+
+  afterEach(function() {
+    fixture.cleanup();
+  });
 
   describe('#removeFavourite', function() {
 

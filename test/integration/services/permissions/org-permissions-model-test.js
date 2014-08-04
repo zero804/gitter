@@ -18,16 +18,7 @@ var orgMemberMethodMock;
 var URI;
 var SECURITY;
 
-beforeEach(function() {
-  URI = 'x';
-  SECURITY = null;
 
-  orgMemberMethodMock = mockito.mockFunction();
-
-  permissionsModel = testRequire.withProxies("./services/permissions/org-permissions-model", {
-    '../github/github-org-service': GitHubOrgServiceMocker,
-  });
-});
 
 var ALL_RIGHTS = ['create', 'join', 'admin', 'adduser', 'view'];
 var ALL_RIGHTS_TESTS = ALL_RIGHTS.map(function(right) {
@@ -57,6 +48,17 @@ var FIXTURES = [{
 }];
 
 describe('org room permissions', function() {
+  beforeEach(function() {
+    URI = 'x';
+    SECURITY = null;
+
+    orgMemberMethodMock = mockito.mockFunction();
+
+    permissionsModel = testRequire.withProxies("./services/permissions/org-permissions-model", {
+      '../github/github-org-service': GitHubOrgServiceMocker,
+    });
+  });
+
   testGenerator(FIXTURES, function(name, meta) {
     var RIGHT = meta.right;
     var USER = meta.user ? { username: 'gitterbob' } : null;

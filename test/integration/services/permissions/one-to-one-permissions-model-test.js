@@ -15,14 +15,7 @@ var Q = require('q');
 //   admin: false
 // };
 
-var ALL_RIGHTS = ['create', 'join', 'admin', 'adduser', 'view'];
-var ALL_RIGHTS_TESTS = ALL_RIGHTS.map(function(right) {
-  return {
-    meta: {
-      right: right
-    }
-  };
-});
+describe('ONETOONE', function() {
 
 // All of our fixtures
 var FIXTURES = [{
@@ -55,8 +48,6 @@ var FIXTURES = [{
     { right: 'admin', expectedResult: false },
   ]
 }];
-
-describe('ONETOONE', function() {
 
   testGenerator(FIXTURES, function(name, meta) {
     var SECURITY = meta.security;

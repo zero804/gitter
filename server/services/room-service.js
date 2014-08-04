@@ -28,7 +28,7 @@ var StatusError        = require('statuserror');
 var eventService       = require('./event-service');
 var emailNotificationService = require('./email-notification-service');
 var canBeInvited       = require('./invited-permissions-service');
-var isValidEmail       = require('email-validator').validate;
+var emailAddressService = require('./email-address-service');
 
 function localUriLookup(uri, opts) {
   return uriLookupService.lookupUri(uri)
@@ -652,26 +652,31 @@ function addUserToRoom(troupe, instigatingUser, usernameToAdd) {
           return troupe.saveQ();
         })
         .then(function() {
+          // invited users dont have github tokens yet
+          var options = user.state === 'INVITED' ? { githubTokenUser: instigatingUser } : {};
+
+          return emailAddressService(user, options);
+        }).then(function(emailAddress) {
 
           var notification;
 
           if(user.state === 'INVITED') {
-            if(user.emails && isValidEmail(user.emails[0])) {
+            if(emailAddress) {
               emailNotificationService.sendInvitation(instigatingUser, user, troupe);
               notification = 'email_invite_sent';
             } else {
               notification = 'unreachable_for_invite';
             }
           } else {
-            emailNotificationService.addedToRoomNotification(instigatingUser, user, troupe)
+            emailNotificationService.addedToRoomNotification(instigatingUser, user, troupe);
             notification = 'email_notification_sent';
           }
 
-          stats.event('user_added', {
-            userId: user.id,
+          stats.event('user_added_someone', {
+            userId: instigatingUser.id,
+            addedUserId: user.id,
             notification: notification,
-            troupeId: troupe.id,
-            instigatingUserId: instigatingUser.id
+            troupeId: troupe.id
           });
 
           return user;

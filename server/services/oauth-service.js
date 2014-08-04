@@ -1,47 +1,50 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var env = require('../utils/env');
-var stats = env.stats;
-var nconf = env.config;
+var WEB_INTERNAL_CLIENT_KEY = 'web-internal';
+
+var env    = require('../utils/env');
+var stats  = env.stats;
+var nconf  = env.config;
 var logger = env.logger;
 
-var redisClient = env.redis.getClient();
+var redisClient        = env.redis.getClient();
 
 var persistenceService = require("./persistence-service");
-var random = require('../utils/random');
-var Q = require('q');
-var userService = require('./user-service');
-var moment = require('moment');
-var onMongoConnect = require('../utils/on-mongo-connect');
+var random             = require('../utils/random');
+var Q                  = require('q');
+var userService        = require('./user-service');
+var moment             = require('moment');
 
-var WEB_INTERNAL_CLIENT_KEY = 'web-internal';
-var webInternalClientId = null;
+var webInternalClientId;
 var ircClientId;
 
 var cacheTimeout = 60; /* 60 seconds */
 
-onMongoConnect(function() {
-  logger.verbose('Loading oauth ids');
+function loadWebClientId() {
+  if(webInternalClientId) return Q.resolve(webInternalClientId);
 
-  /* Load webInternalClientId once at startup */
-  persistenceService.OAuthClient.findOne({ clientKey: WEB_INTERNAL_CLIENT_KEY }, function(err, oauthClient) {
-    if(err) throw new Error("Unable to load internal clientKey " + WEB_INTERNAL_CLIENT_KEY + ": " + err);
+  /* Load webInternalClientId once */
+  return persistenceService.OAuthClient.findOneQ({ clientKey: WEB_INTERNAL_CLIENT_KEY })
+    .then(function(oauthClient) {
+      if(!oauthClient) throw new Error("Unable to load internal client id.");
 
-    if(!oauthClient) throw new Error("Unable to load internal client id. Have you loaded it into mongo?");
+      webInternalClientId = oauthClient._id;
+      return webInternalClientId;
+    });
+}
 
-    webInternalClientId = oauthClient._id;
-  });
+function loadIrcClientId() {
+  if(ircClientId) return Q.resolve(ircClientId);
 
-  persistenceService.OAuthClient.findOne({ clientKey: nconf.get('irc:clientKey') }, function(err, oauthClient) {
-    if(err) throw new Error("Unable to load internal clientKey " + nconf.get('irc:clientKey') + ": " + err);
+  /* Load ircClientId once */
+  return persistenceService.OAuthClient.findOneQ({ clientKey: nconf.get('irc:clientKey') })
+    .then(function(oauthClient) {
+      if(!oauthClient) throw new Error("Unable to load IRC client id.");
 
-    if(!oauthClient) throw new Error("Unable to load internal client id. Have you loaded it into mongo?");
-
-    ircClientId = oauthClient._id;
-  });
-
-});
+      ircClientId = oauthClient._id;
+      return ircClientId;
+    });
+}
 
 var tokenLookupCachePrefix = "token:c:";
 var tokenLookupCache = {
@@ -92,15 +95,13 @@ var tokenValidationCache = {
   }
 };
 
-
-
-
 exports.findClientById = function(id, callback) {
   persistenceService.OAuthClient.findById(id, callback);
 };
 
 exports.saveAuthorizationCode = function(code, client, redirectUri, user, callback) {
-
+  // TODO: anyone care to explain why this is happening here. Seems like an odd place
+  // to me? --AN
   var properties = {};
   properties['Last login from ' + client.tag] = new Date();
   stats.userUpdate(user, properties);
@@ -191,7 +192,7 @@ exports.findClientByClientKey = function(clientKey, callback) {
 
 function findOrCreateToken(userId, clientId, callback) {
   if(!userId) return Q.reject('userId required').nodeify(callback);
-  if(!clientId) return Q.reject('userId required').nodeify(callback);
+  if(!clientId) return Q.reject('clientId required').nodeify(callback);
 
   return tokenLookupCache.get(userId, clientId)
     .then(function(token) {
@@ -234,26 +235,36 @@ exports.findOrCreateToken = findOrCreateToken;
 // TODO: move some of this functionality into redis for speed
 // TODO: make the web tokens expire
 exports.findOrGenerateWebToken = function(userId, callback) {
-  return findOrCreateToken(userId, webInternalClientId, callback);
+  return loadWebClientId()
+    .then(function(clientId) {
+      return findOrCreateToken(userId, clientId);
+    })
+    .nodeify(callback);
 };
 
 exports.generateAnonWebToken = function(callback) {
-  return random.generateToken()
-    .then(function(token) {
+  return Q.all([
+      loadWebClientId(),
+      random.generateToken()
+    ])
+    .spread(function(clientId, token) {
       return persistenceService.OAuthAccessToken.createQ({
-        token: token,
-        userId: null,
-        clientId: webInternalClientId,
-        expires: moment().add('days', 7).toDate()
-      }).then(function() {
-        return token;
-      });
+          token: token,
+          userId: null,
+          clientId: clientId,
+          expires: moment().add('days', 7).toDate()
+        })
+        .thenResolve(token);
     })
     .nodeify(callback);
 };
 
 exports.findOrGenerateIRCToken = function(userId, callback) {
-  return findOrCreateToken(userId, ircClientId, callback);
+  return loadIrcClientId()
+    .then(function(clientId) {
+      return findOrCreateToken(userId, clientId);
+    })
+    .nodeify(callback);
 };
 
 exports.testOnly = {

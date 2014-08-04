@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var leanTroupeDao = require('./daos/lean-troupe-dao');
@@ -28,17 +27,13 @@ function getPlanType(troupeId) {
       if(!uri) throw new StatusError(500, 'Bad URI ' + uri);
 
       var userOrOrg = uri.split('/', 1).shift();
-
       return billingService.findActivePlan(userOrOrg)
         .then(function(plan) {
-          var history;
-          if(!plan) {
-            return 'free-private'
-          }
+          if(!plan) return 'free-private';
 
           return plan.plan;
-        })
-    })
+        });
+    });
 }
 exports.getPlanType = getPlanTypeCached;
 
@@ -66,7 +61,6 @@ function getPlanTypeCached(troupeId) {
 exports.getMaxHistoryMessageDate = function(troupeId) {
   return getPlanTypeCached(troupeId)
     .then(function(planType) {
-
       // TODO Remove after enabling billing
       if (env.config.get("premium:disabled")) return null;
 
@@ -83,4 +77,4 @@ exports.getMaxHistoryMessageDate = function(troupeId) {
               .subtract(unit, value)
               .toDate();
     });
-}
+};

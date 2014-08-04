@@ -8,9 +8,14 @@ var premiumOrThrow       = require('./premium-or-throw');
 var appEvents            = require('../../app-events');
 var userIsInRoom         = require('../user-in-room');
 
-function githubFailurePermissionsModel(user, right, uri, security, originalError) {
+function githubFailurePermissionsModel(user, right, uri, security) {
+  if(right === 'admin') {
+    winston.warn('Disable admin permissions while offline');
+    return Q.resolve(false);
+  }
+
   // We can't help out. Send the original error out
-  if(right !== 'view' && right !== 'join') throw originalError;
+  if(right !== 'view' && right !== 'join') return Q.reject(new Error("Permission " + right + " not available offline"));
 
   // Public room? Let them in
   if(security === 'PUBLIC') return Q.resolve(true);
@@ -18,14 +23,14 @@ function githubFailurePermissionsModel(user, right, uri, security, originalError
   // Private room? Let the user in if they're already in the room.
   if(security === 'PRIVATE') return userIsInRoom(uri, user);
 
-  throw originalError;
+  return Q.reject(new Error("Unable to process permissions offline"));
 }
 
 /**
  * REPO permissions model
  */
 module.exports = function repoPermissionsModel(user, right, uri, security, options) {
-  var options = options || {};
+  options = options || {};
   // Security can be null for old repos
   if(security && (security !== 'PRIVATE' && security !== 'PUBLIC')) {
     return Q.reject(new Error('Unknown repo security: ' + security));
@@ -101,10 +106,15 @@ module.exports = function repoPermissionsModel(user, right, uri, security, optio
     })
     .catch(function(err) {
       if(err.errno && err.syscall || err.statusCode >= 500) {
-        winston.error('Repo: ' + err, { exception: err });
+        winston.error('An error occurred processing repo-permissions: ' + err, { exception: err });
         // GitHub call failed and may be down.
         // We can fall back to whether the user is already in the room
-        return githubFailurePermissionsModel(user, right, uri, security);
+        return githubFailurePermissionsModel(user, right, uri, security)
+          .fail(function(nextError) {
+            winston.warn('Unable to process offline permissions: ' + nextError, { exception: nextError });
+
+            throw err; // Throw the original error
+          });
       }
 
       throw err;

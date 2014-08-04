@@ -152,7 +152,7 @@ function install() {
                 user.gravatarImageUrl = githubUserProfile.avatar_url;
                 user.githubId         = githubUserProfile.id;
                 user.githubUserToken  = accessToken;
-                user.state            = 'ACTIVE';
+                user.state            = undefined;
 
                 user.save(function(err) {
                   if (err) logger.error("Failed to update GH token for user ", user.username);
@@ -188,8 +188,7 @@ function install() {
                 emails:             githubUserProfile.email ? [githubUserProfile.email] : [],
                 gravatarImageUrl:   githubUserProfile.avatar_url,
                 githubUserToken:    accessToken,
-                githubId:           githubUserProfile.id,
-                state:              'ACTIVE'
+                githubId:           githubUserProfile.id
               };
 
               logger.verbose('About to create GitHub user ', githubUser);

@@ -1,6 +1,6 @@
 {
   "name": "gitter-webapp",
-  "version": "3.8.0",
+  "version": "4.2.2",
   "private": true,
   "dependencies": {
     "winston": "^0.7.3",
@@ -30,7 +30,6 @@
     "apn": "~1.4.4",
     "cube": "^0.2.12",
     "nomnom": "~1.6.2",
-    "faye": "^1.0.1",
     "faye-redis": "git://github.com/gitterHQ/faye-redis-node#v0.3.0",
     "mongoose": "3.8.8",
     "mongodb": "^1.3.23",
@@ -54,25 +53,30 @@
     "parse-links": "~0.1.0",
     "troupe-passport-github": "git://github.com/troupe/passport-github.git#v0.1.8d",
     "text-filter": "~0.1.0",
-    "marked": "git://github.com/gitterHQ/marked.git#v0.4.1",
     "highlight.js": "~8.0.0",
     "xregexp": "^2.0.0",
     "heapdump": "^0.2.9",
     "memwatch": "^0.2.2",
     "node-statsd": "0.0.7",
     "raven": "^0.6.2",
-    "gitter-services": "git+ssh://git@github.com:gitterHQ/services.git#1.2.0",
+    "gitter-services": "git+ssh://git@github.com:gitterHQ/services.git#1.3.1",
     "statuserror": "0.0.1",
     "dolph": "0.0.4",
     "sitemap": "https://registry.npmjs.org/sitemap/-/sitemap-0.7.2.tgz",
     "redis-sentinel-client": "^0.1.5",
-    "gitter-env": "git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.8.2",
+    "gitter-env": "git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.8.4",
     "shutdown": "^0.2.3",
     "i18n-2": "^0.4.6",
     "stringformat": "0.0.5",
     "node-resque": "^0.8.3",
+    "csprng": "^0.1.1",
+    "faye-websocket": "^0.7.2",
+    "tough-cookie": "^0.12.1",
     "emailify": "~0.0.2",
-    "email-validator": "^1.0.0"
+    "email-validator": "^1.0.0",
+    "worker-farm": "^0.3.1",
+    "htmlencode": "0.0.4",
+    "gitter-marked": "^0.4.2"
   },
   "devDependencies": {
     "better-assert": "1.0.0",
@@ -114,6 +118,6 @@
   "main": "web.js",
   "scripts": {
     "start": "nodemon web.js",
-    "test": "make test"
+    "test": "mocha test/integration/ --recursive -R spec"
   }
 }

@@ -12,12 +12,9 @@
 .menu {
 
   &, & * {
-    .boxhack;
+    .border-box-sizing;
   }
 
-  /* vars */
-  @menu-width: 250px;
-  
   /* visibility */
   display: inline-block;
   overflow: hidden;
@@ -25,12 +22,12 @@
   /* positioning */
   z-index: @l10;
   position: fixed;
-  left: 0em;
-  top: 0em;
-  margin-top: 0px;
+  left: 0;
+  top: 0;
+  margin-top: 0;
 
   /* dimensions */
-  width: @menu-width;
+  width: 250px;
   height: 100%;
   padding: 0;
 
@@ -47,22 +44,12 @@
     background-color: @trpDarkBlue;
   }
 
-  /* sub components */
-  .menu__container {
-    height: 100%;
-    overflow: hidden;
-  }
-
   .nano-pane {
     left: 0;
   }
 
   a {
     text-decoration: none;
-  }
-
-  li {
-    line-height: 26px;
   }
 
   /* media queries */
@@ -73,7 +60,7 @@
 
     &.visible {
       transition-delay: 0.3s;
-      left: 0px;
+      left: 0;
     }
   }
 
@@ -82,7 +69,6 @@
     width: 250px;
     height: 100%;
     position: absolute;
-    padding: 10px;
   }
 }
 
@@ -123,7 +109,6 @@
   }
 
   .menu-header__profile {
-    // padding-bottom: 4px; ? unecessary?
     overflow: hidden;
     clear: both;
     width: 100%;
@@ -133,8 +118,6 @@
     display: inline-block;
     line-height: 2em;
     float: left;
-    // vertical-align: top;
-    // padding-top: 4px;
     font-weight: 300;
     font-size: 16px;
     margin-left: 10px;
@@ -188,7 +171,6 @@
       margin-top: 8px;
       padding-bottom: 0;
       & .item {
-        padding-left: 0;
         margin-bottom: 8px;
         &:last-child {
           margin-bottom: 0;
@@ -234,7 +216,6 @@
     font-family: @fontSans;
     height: 28px;
     padding: 0 4px 0 7px;
-    // padding: 13px 4px 13px 7px;
     color: rgba(255,255,255, 0.7);
     width: 100%;
     margin: 0;
@@ -263,12 +244,9 @@
 
 .menu-content {
 
-  // width: 100%;
   position: absolute;
   top: 100px;
-  // right: 0px;
   bottom: 60px;
-  // left: 0px;
   
   .transition(200ms);
 
@@ -276,7 +254,7 @@
     max-width: 106%;
   }
 
-  body.hover &.nano.pushed {
+  &.nano.pushed {
     top: 180px;
     .transition(400ms);
   }
@@ -322,7 +300,6 @@
       & .list-toggle {
         opacity: 0;
         float: right;
-        // .transition300ms;
       }
 
       body.hover &:hover > .list-toggle {
@@ -357,21 +334,6 @@
       }
     }
   }
-
-  @media @mobile {
-    position: static;
-    // top: 110px;
-    .menu-list__item {
-      .menu-list__header {
-        margin-left: 0;
-      }
-
-      li {
-        padding-left: 0;
-        margin-bottom: 2px;
-      }
-    }
-  }
 }
 
 .menu-actions {
@@ -380,23 +342,4 @@
   right: 0px;
   bottom: 0px;
   left: 0px; 
-}
-
-.trpTroupeUnreadCounter {
-  .boxhack;
-  -webkit-border-radius: 4px;
-     -moz-border-radius: 4px;
-          border-radius: 4px;
-  display: inline-block;
-  padding: 0 4px;
-  font-size: 10px;
-  font-weight: bold;
-  line-height: 14px;
-  color: white;
-  white-space: nowrap;
-  vertical-align: middle;
-  background-color: #1dce73;
-  @media @mobile {
-    padding: 1px 4px 0px;
-  }
 }

@@ -20,6 +20,7 @@ module.exports =  function(req, res, next) {
     if(parts.length !== 3) return '';
 
     return service.getIssueState(parts[0] + '/' + parts[1], parts[2])
+      .timeout(2500)
       .fail(function(err) {
 
         winston.warn('Unable to obtain issue state for ' +

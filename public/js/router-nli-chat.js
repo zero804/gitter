@@ -68,7 +68,7 @@ require([
   new HeaderView({ model: context.troupe(), el: '#header' });
 
   new ChatCollectionView({
-    el: $('#content-frame'),
+    el: $('.js-chat-container'),
     collection: itemCollections.chats,
     userCollection: itemCollections.users,
     decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]

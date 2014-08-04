@@ -192,7 +192,7 @@ function createExpectedFixtures(expected, done) {
       mentions:     f.mentions,
       issues:       f.issues,
       meta:         f.meta,
-      sent:         f.sent, 
+      sent:         f.sent,
       editedAt:     f.editedAt,
       readBy:       f.readBy,
     });
