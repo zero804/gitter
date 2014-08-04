@@ -31,8 +31,7 @@ define([
     onRender: function() {
       $('#header-wrapper').hide();
       this.orgs.show(new OrgCollectionView({
-        collection: troupeCollections.orgs,
-        emptyView: Marionette.ItemView.extend({ template: userHomeEmptyOrgViewTemplate })
+        collection: troupeCollections.orgs
       }));
       this.repos.show(new RepoCollectionView({ collection: reposCollection }));
     },

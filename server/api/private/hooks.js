@@ -1,5 +1,7 @@
-/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
+
+var env           = require('../../utils/env');
+var stats         = env.stats;
 
 var crypto        = require('crypto');
 var winston       = require('../../utils/winston');
@@ -7,46 +9,64 @@ var eventService  = require('../../services/event-service');
 var troupeService = require('../../services/troupe-service');
 var checkRepoPrivacy = require('../../services/check-repo-privacy');
 var winston       = require('../../utils/winston');
+var StatusError   = require('statuserror');
 
+// TODO: this is just horrible
 var passphrase = 'wyElt0ian8waunt8';
 
-module.exports = function(req, res) {
-  var troupeId;
+// This is a bit of a hack, but it's somewhat useful:
+// check to see whether a repo has been made public
+function checkRepo(meta) {
+  var service = meta.service;
+  var event = meta.event;
+  var repo = meta.repo;
 
+  if(service === 'github' && event === 'public' && repo) {
+    stats.event('webhook.github.public');
+
+    /* Do this asynchronously */
+    checkRepoPrivacy(repo)
+      .fail(function(err) {
+        winston.error('Repo privacy check failed: ' + err, { exception: err });
+      });
+  }
+}
+
+function decipherHash(hash) {
   try {
-    var decipher  = crypto.createDecipher('aes256', passphrase);
-    troupeId      = decipher.update(req.params.hash, 'hex', 'utf8') + decipher.final('utf8');
+    var decipher = crypto.createDecipher('aes256', passphrase);
+    return decipher.update(hash, 'hex', 'utf8') + decipher.final('utf8');
   } catch(err) {
-    res.send(400, 'Invalid Troupe hash');
-    return;
+  }
+}
+
+module.exports = function(req, res, next) {
+  var troupeId = decipherHash(req.params.hash);
+  if(!troupeId) {
+    stats.event('webhook.invalid.hash');
+    return next(new StatusError(400, 'Invalid Troupe hash'));
   }
 
   var message = req.body.message;
   var meta    = req.body.meta;
   var payload = req.body.payload;
 
-  troupeService.findById(troupeId, function(err, troupe) {
-    eventService.newEventToTroupe(troupe, null, message, meta, payload, function(err) {
-      if (err) winston.error('Error creating Event: ' + err);
-    });
-  });
-
-  // This is a bit of a hack, but it's somewhat useful:
-  // check to see whether a repo has been made public
   if(meta) {
-    var service = meta.service;
-    var event = meta.event;
-    var repo = meta.repo;
-
-    if(service === 'github' && event === 'public' && repo) {
-      /* Do this asynchronously */
-      checkRepoPrivacy(repo)
-        .fail(function(err) {
-          winston.error('Repo privacy check failed: ' + err, { exception: err });
-        });
-    }
+    checkRepo(meta);
   }
 
-  res.send('OK');
+  return troupeService.findById(troupeId)
+    .then(function(troupe) {
+      return eventService.newEventToTroupe(troupe, null, message, meta, payload);
+    })
+    .then(function() {
+      stats.event('webhook.receive.success');
+      res.send('OK');
+    })
+    .fail(function(err) {
+      stats.event('webhook.receive.failure');
+      if (err) winston.error('Error creating event: ' + err, { exception: err });
+      next(err);
+    });
 };
 

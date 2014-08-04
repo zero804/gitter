@@ -17,44 +17,6 @@ Q.longStackSupport = true;
 var troupeService = testRequire("./services/troupe-service");
 var persistence = testRequire("./services/persistence-service");
 
-before(fixtureLoader(fixture, {
-  user1: { },
-  user2: { },
-  user3: { },
-  troupeOrg1: {
-    githubType: 'ORG',
-    users: ['user1', 'user2']
-  },
-  troupeRepo: {
-    security: 'PRIVATE',
-    githubType: 'REPO',
-    users: ['user1', 'user2']
-  },
-  troupeBan: {
-    security: 'PUBLIC',
-    githubType: 'REPO',
-    users: ['userBan', 'userBanAdmin']
-  },
-  userBan: { },
-  userBanAdmin: {},
-  troupeCanRemove: {
-    security: 'PUBLIC',
-    githubType: 'REPO',
-    users: ['userToRemove', 'userRemoveNonAdmin', 'userRemoveAdmin']
-  },
-  troupeCannotRemove: {
-    security: 'PRIVATE',
-    githubType: 'ONETOONE',
-    users: ['userToRemove', 'userRemoveAdmin']
-  },
-  userToRemove: {},
-  userRemoveNonAdmin: {},
-  userRemoveAdmin: {}
-}));
-
-after(function() {
-  fixture.cleanup();
-});
 
 function makeRoomAssertions(room, usersAllowedIn, usersNotAllowedIn) {
   return Q.resolve(true);
@@ -93,6 +55,44 @@ function makeRoomAssertions(room, usersAllowedIn, usersNotAllowedIn) {
 }
 
 describe('room-service', function() {
+  before(fixtureLoader(fixture, {
+    user1: { },
+    user2: { },
+    user3: { },
+    troupeOrg1: {
+      githubType: 'ORG',
+      users: ['user1', 'user2']
+    },
+    troupeRepo: {
+      security: 'PRIVATE',
+      githubType: 'REPO',
+      users: ['user1', 'user2']
+    },
+    troupeBan: {
+      security: 'PUBLIC',
+      githubType: 'REPO',
+      users: ['userBan', 'userBanAdmin']
+    },
+    userBan: { },
+    userBanAdmin: {},
+    troupeCanRemove: {
+      security: 'PUBLIC',
+      githubType: 'REPO',
+      users: ['userToRemove', 'userRemoveNonAdmin', 'userRemoveAdmin']
+    },
+    troupeCannotRemove: {
+      security: 'PRIVATE',
+      githubType: 'ONETOONE',
+      users: ['userToRemove', 'userRemoveAdmin']
+    },
+    userToRemove: {},
+    userRemoveNonAdmin: {},
+    userRemoveAdmin: {}
+  }));
+
+  after(function() {
+    fixture.cleanup();
+  });
 
   describe('classic functionality', function() {
 
@@ -258,6 +258,9 @@ describe('room-service', function() {
         './email-notification-service': {
           sendInvitation: stubs.onInviteEmail,
           addedToRoomNotification: function() {}
+        },
+        './email-address-service': function() {
+          return Q.resolve('a@b.com');
         }
       });
     }
@@ -341,26 +344,6 @@ describe('room-service', function() {
       };
 
       service.addUserToRoom(troupe, {}, 'test-user').fail(done);
-    });
-
-    it('doesnt send emails to invalid addresses', function(done) {
-      var service = createRoomServiceWithStubs({
-        addUser: true,
-        findByUsernameResult: null,
-        inviteByUsernameResult: { username: 'test-user', id: 'test-user-id', state: 'INVITED', emails: ['NOT A VALID EMAIL'] },
-        canBeInvited: true,
-        onInviteEmail: function() {
-          assert(false, 'invite should not be sent');
-        }
-      });
-
-      var troupe = {
-        containsUserId: function() { return false; },
-        addUserById: function() {},
-        saveQ: function() {}
-      };
-
-      service.addUserToRoom(troupe, {}, 'test-user').nodeify(done);
     });
 
     it('fails with 403 when adding someone to who cant be invited', function(done) {

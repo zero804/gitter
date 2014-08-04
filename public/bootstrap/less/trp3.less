@@ -16,23 +16,24 @@
 @import "trp3Mail";
 @import "trp3Files";
 @import "trp3People";
-@import "trpUserhome";
+@import "userhome";
 
 @import "nanoScroller";
 @import "trpInvites";
 
 /* new stuff */
 @import "menu";
+@import "menu-list-item";
 @import "chat";
 @import "chat-container";
 @import "chat-item";
 @import "chat-input";
 @import "chat-header";
+@import "welcome-tips";
 /* end of new stuff*/
 
-.boxhack {
-  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-  -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+.border-box-sizing() {
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
 
@@ -121,7 +122,6 @@ a {
 
 h2 {
   font-family: @fontSans;
-  color: #162e34;
   font-weight: 400;
 }
 
@@ -152,7 +152,7 @@ label {
 }
 
 .gtrInput {
-  .boxhack;
+  .border-box-sizing;
   .trpBodyMedium;
 
   width: 100%;
@@ -1158,59 +1158,6 @@ body.dragging .list-favourites li.placeholder {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
 
-  li {
-    padding-left: 4px;
-    margin-left: 12px;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    cursor: pointer;
-    padding-bottom: 2px;
-    list-style: none;
-  }
-
-  li:hover, li.selected {
-    border-radius: 4px 0 0 4px;
-    background-color: rgba(255,255,255,0.2);
-
-    @media @mobile {
-      background-color: transparent;
-    }
-
-    &.chatting:after {
-      display: none;
-    }
-  }
-
-  @-webkit-keyframes pulse_animation {
-    0% { box-shadow: 0 0 0px #1bee82; color: #1bee82; }
-    50% { box-shadow: 0 0 8px #1bee82; color: @trpGreen; }
-    100% { box-shadow: 0 0 0px #1bee82; color: #1bee82;  }
-  }
-
-  li.chatting {
-    /*background-color: red;*/
-  }
-
-  li.chatting:after {
-    display: inline-block;
-    width: 5px;
-    height: 5px;
-    border-radius: 50em;
-    background-color: #1dce73;
-    position: relative;
-    top: 13px;
-    right: 13px;
-    content: ' ';
-    float: right
-  }
-
-  li.chatting.chatting-now:after {
-    -webkit-animation-name: 'pulse_animation';
-      -webkit-animation-duration: 800ms;
-      -webkit-animation-iteration-count: infinite;
-      -webkit-animation-timing-function: linear;
-  }
-
   span {
     display: inline-block;
     color: white;
@@ -1279,26 +1226,6 @@ ul li.placeholder:before {
 .trpTroupeList li:hover .item-close {
   display: inline-block;
 }
-
-.trpTroupeList li .item-unread-badge{
-  float: right;
-  margin-right: 8px;
-  display: none;
-}
-
-.trpTroupeList li .item-unread-badge.mention .trpTroupeUnreadCounter {
-  background-color: @trpRed;
-  font-weight: 300;
-}
-
-.trpTroupeList li .item-unread-badge.shown{
-  display: inline;
-}
-
-.trpTroupeList li:hover .item-unread-badge {
-  display: none;
-}
-
 
 .item-close {
   float: right;
@@ -1456,23 +1383,6 @@ ul li.placeholder:before {
 	border: 2px solid white;
 	*/
 }
-
-// .trpTroupeUnreadCounter {
-//   -webkit-border-radius: 4px;
-//      -moz-border-radius: 4px;
-//           border-radius: 4px;
-//   display: inline-block;
-//   padding: 0 5px 1px;
-//   font-size: 10px;
-//   font-weight: bold;
-//   height: 16px;
-//   line-height: 16px;
-//   color: white;
-//   white-space: nowrap;
-//   // vertical-align: baseline;
-//   vertical-align: middle;
-//   background-color: @trpGreen;
-// }
 
 .trpTroupeName {
 	vertical-align: top;
@@ -1651,36 +1561,6 @@ ul li.placeholder:before {
 
 .trpProfileItem a {
 	color: #333;
-}
-
-.trpAlertWrapper {
-	width: 100%;
-	height: 120px;
-	top: 60px;
-	background-color: @trpGreen;
-	text-align: center;
-	position: fixed;
-	z-index: 1080;
-	overflow: hidden;
-	display: none;
-}
-
-.trpAlertContainer {
-	text-align: center;
-	overflow: hidden;
-}
-
-.trpAlertContent {
-	.trpH3;
-	min-width: 718px;
-	text-align: left;
-	color: #333;
-	padding-top: 14px;
-	color: white;
-}
-
-.trpAlertTitle {
-	margin-bottom: 10px;
 }
 
 .trpChatPanel {
@@ -2007,6 +1887,10 @@ ul.roster {
       color: red;
     }
   }
+}
+
+.github-issue {
+  position: relative;
 }
 
 .github-issue-opened {
@@ -2643,7 +2527,7 @@ ul.roster {
 // TODO: as we progress with the css refactoring this will have to be changed. Walter.
 .popover-content {
   .invited {
-    .boxhack;
+    .border-box-sizing;
     background-color: hsl(0, 60%, 70%);
     padding: 10px;
     line-height: 10px;
@@ -2667,7 +2551,7 @@ ul.roster {
 }
 
 .trpPopoverDetails {
-  .boxhack;
+  .border-box-sizing;
   float: right;
   max-width: 340px;
   margin-left: 12px;

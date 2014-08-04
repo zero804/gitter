@@ -1,28 +1,27 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var env              = require('../utils/env');
-var stats            = env.stats;
+var env                  = require('../utils/env');
+var stats                = env.stats;
 
-var persistence   = require("./persistence-service");
-var collections   = require("../utils/collections");
-var troupeService = require("./troupe-service");
-var userService   = require("./user-service");
-var unsafeHtml    = require('../utils/unsafe-html');
-var processChat   = require('../utils/process-chat');
-var appEvents     = require('../app-events');
-var Q             = require('q');
-var mongoUtils    = require('../utils/mongo-utils');
-var moment        = require('moment');
-var roomCapabilities = require('./room-capabilities');
-var StatusError   = require('statuserror');
-var _ = require('underscore');
+var persistence          = require("./persistence-service");
+var collections          = require("../utils/collections");
+var troupeService        = require("./troupe-service");
+var userService          = require("./user-service");
+var processChat          = require('../utils/process-chat-isolated');
+var appEvents            = require('../app-events');
+var Q                    = require('q');
+var mongoUtils           = require('../utils/mongo-utils');
+var moment               = require('moment');
+var roomCapabilities     = require('./room-capabilities');
+var StatusError          = require('statuserror');
+var unreadItemService    = require('./unread-item-service');
+var _                    = require('underscore');
 
 /*
  * Hey Trouper!
  * Bump the version if you modify the behaviour of TwitterText.
  */
-var VERSION_INITIAL; /* = undefined; All previous versions are null due to a bug */
+// var VERSION_INITIAL; /* = undefined; All previous versions are null due to a bug */
 var VERSION_SWITCH_TO_SERVER_SIDE_RENDERING = 5;
 var MAX_CHAT_MESSAGE_LENGTH = 4096;
 
@@ -38,7 +37,7 @@ var ObjectID = require('mongodb').ObjectID;
  */
 exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
   return Q.fcall(function() {
-    if(!troupe) throw 404;
+    if(!troupe) throw new StatusError(404, 'Unknown room');
 
     /* You have to have text */
     if(!data.text && data.text !== "" /* Allow empty strings for now */) throw new StatusError(400, 'Text is required');
@@ -47,8 +46,9 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
     if(!troupeService.userHasAccessToTroupe(user, troupe)) throw new StatusError(403, 'Access denied');
 
     // TODO: validate message
-    var parsedMessage = processChat(data.text);
-
+    return processChat(data.text);
+  })
+  .then(function(parsedMessage) {
     var chatMessage = new persistence.ChatMessage({
       fromUserId: user.id,
       toTroupeId: troupe.id,
@@ -81,7 +81,8 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
       chatMessage.urls      = parsedMessage.urls;
       chatMessage.mentions  = mentions;
       chatMessage.issues    = parsedMessage.issues;
-      chatMessage._md       = CURRENT_META_DATA_VERSION;
+      chatMessage._md       = parsedMessage.markdownProcessingFailed ?
+                                -CURRENT_META_DATA_VERSION : CURRENT_META_DATA_VERSION;
 
       return chatMessage.saveQ()
         .then(function() {
@@ -121,130 +122,204 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
     });
   })
   .nodeify(callback);
-
-
-
-
 };
 
 exports.updateChatMessage = function(troupe, chatMessage, user, newText, callback) {
-  var age = (Date.now() - chatMessage.sent.valueOf()) / 1000;
-  if(age > MAX_CHAT_EDIT_AGE_SECONDS) {
-    return callback("You can no longer edit this message");
-  }
+  return Q.fcall(function() {
+      var age = (Date.now() - chatMessage.sent.valueOf()) / 1000;
+      if(age > MAX_CHAT_EDIT_AGE_SECONDS) {
+        return callback("You can no longer edit this message");
+      }
 
-  if(chatMessage.toTroupeId != troupe.id) {
-    return callback("Permission to edit this chat message is denied.");
-  }
+      if(chatMessage.toTroupeId != troupe.id) {
+        return callback("Permission to edit this chat message is denied.");
+      }
 
-  if(chatMessage.fromUserId != user.id) {
-    return callback("Permission to edit this chat message is denied.");
-  }
+      if(chatMessage.fromUserId != user.id) {
+        return callback("Permission to edit this chat message is denied.");
+      }
 
-  // If the user has been kicked out of the troupe...
-  if(!troupeService.userHasAccessToTroupe(user, troupe)) {
-    return callback("Permission to edit this chat message is denied.");
-  }
+      // If the user has been kicked out of the troupe...
+      if(!troupeService.userHasAccessToTroupe(user, troupe)) {
+        return callback("Permission to edit this chat message is denied.");
+      }
 
-  chatMessage.text = newText;
+      chatMessage.text = newText;
+      return processChat(newText);
+    })
+    .then(function(parsedMessage) {
+      chatMessage.html  = parsedMessage.html;
+      chatMessage.editedAt = new Date();
 
-  var parsedMessage = processChat(newText);
-  chatMessage.html  = parsedMessage.html;
+      // Metadata
+      chatMessage.urls      = parsedMessage.urls;
+      chatMessage.mentions  = parsedMessage.mentions;
+      chatMessage.issues    = parsedMessage.issues;
+      chatMessage._md       = parsedMessage.markdownProcessingFailed ?
+                                -CURRENT_META_DATA_VERSION : CURRENT_META_DATA_VERSION;
 
-
-  chatMessage.editedAt = new Date();
-
-  // Metadata
-  chatMessage.urls      = parsedMessage.urls;
-  chatMessage.mentions  = parsedMessage.mentions;
-  chatMessage.issues    = parsedMessage.issues;
-  chatMessage._md       = CURRENT_META_DATA_VERSION;
-
-  chatMessage.save(function(err) {
-    if(err) return callback(err);
-
-    return callback(null, chatMessage);
-  });
+      return chatMessage.saveQ()
+        .thenResolve(chatMessage);
+    })
+    .nodeify(callback);
 };
 
 exports.findById = function(id, callback) {
-  persistence.ChatMessage.findById(id, function(err, chatMessage) {
-    callback(err, chatMessage);
-  });
+  return persistence.ChatMessage.findByIdQ(id)
+    .nodeify(callback);
 };
 
  exports.findByIds = function(ids, callback) {
-  if(!ids || !ids.length) return callback(null, []);
+  if(!ids || !ids.length) return Q.resolve([]).nodeify(callback);
 
-  persistence.ChatMessage
+  return persistence.ChatMessage
     .where('_id')['in'](collections.idsIn(ids))
-    .exec(callback);
+    .execQ()
+    .nodeify(callback);
 };
 
-function massageMessages(message) {
-  if('html' in message && 'text' in message) {
+// function massageMessages(message) {
+//   if('html' in message && 'text' in message) {
 
-    if(message._md == VERSION_INITIAL) {
-      var text = unsafeHtml(message.text);
-      var d = processChat(text);
+//     if(message._md == VERSION_INITIAL) {
+//       var text = unsafeHtml(message.text);
+//       var d = processChat(text);
 
-      message.text      = text;
-      message.html      = d.html;
-      message.urls      = d.urls;
-      message.mentions  = d.mentions;
-      message.issues    = d.issues;
-    }
-  }
+//       message.text      = text;
+//       message.html      = d.html;
+//       message.urls      = d.urls;
+//       message.mentions  = d.mentions;
+//       message.issues    = d.issues;
+//     }
+//   }
 
-  return message;
+//   return message;
+// }
+
+/* This is much more cacheable than searching less than a date */
+function getDateOfFirstMessageInRoom(troupeId) {
+  return persistence.ChatMessage
+    .where('toTroupeId', troupeId)
+    .limit(1)
+    .select({ sent: 1 })
+    .sort({ _id: 'asc' })
+    .lean()
+    .execQ()
+    .then(function(r) {
+      if(!r.length) return null;
+      return r[0].sent;
+    });
 }
 
+function findFirstUnreadMessageId(troupeId, userId) {
+  var d = Q.defer();
+  unreadItemService.getFirstUnreadItem(userId, troupeId, 'chat', d.makeNodeResolver());
+  return d.promise.spread(function(minId) {
+    return minId;
+  });
+}
+
+/**
+ * Returns a promise of
+ * [ messages, limitReached]
+ */
 exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
-  return roomCapabilities.getMaxHistoryMessageDate(troupeId)
-    .then(function(maxHistoryDate) {
-      var q = persistence.ChatMessage
-        .where('toTroupeId', troupeId);
+  var findMarker;
+  if(options.marker === 'first-unread' && options.userId) {
+    findMarker = findFirstUnreadMessageId(troupeId, options.userId);
+  }
+
+  return Q.all([
+      roomCapabilities.getMaxHistoryMessageDate(troupeId),
+      findMarker
+    ])
+    .spread(function(maxHistoryDate, markerId) {
+      if(!markerId && !options.aroundId) {
+        var q = persistence.ChatMessage
+          .where('toTroupeId', troupeId);
+
+        var sentOrder = 'desc';
+
+        if(options.beforeId) {
+          var beforeId = new ObjectID(options.beforeId);
+          q = q.where('_id').lt(beforeId);
+        }
+
+        if(options.beforeInclId) {
+          var beforeInclId = new ObjectID(options.beforeInclId);
+          q = q.where('_id').lte(beforeInclId); // Note: less than *or equal to*
+        }
+
+        if(options.afterId) {
+          // Reverse the initial order for afterId
+          var afterId = new ObjectID(options.afterId);
+          sentOrder = 'asc';
+          q = q.where('_id').gt(afterId);
+        }
+
+        if(maxHistoryDate) {
+          q = q.where('sent').gte(maxHistoryDate);
+        }
+
+        return [
+          q.sort(options.sort || { sent: sentOrder })
+            .limit(options.limit || 50)
+            .skip(options.skip || 0)
+            .execQ()
+            .then(function(results) {
+              // results = results.map(massageMessages);
+              if(sentOrder === 'desc') {
+                return results.reverse();
+              }
+
+              return results;
+            }),
+            maxHistoryDate
+          ];
+      }
+
+      var aroundId = new ObjectID(markerId || options.aroundId);
+
+      var q1 = persistence.ChatMessage
+                .where('toTroupeId', troupeId)
+                .sort({ sent: 'desc' })
+                .limit(Math.floor(options.limit / 2) || 25)
+                .where('_id').lte(aroundId);
+
+      var q2 = persistence.ChatMessage
+                .where('toTroupeId', troupeId)
+                .sort({ sent: 'asc' })
+                .limit(Math.ceil(options.limit / 2) || 25)
+                .where('_id').gt(aroundId);
 
       if(maxHistoryDate) {
-        q = q.where('sent').gte(maxHistoryDate);
+        q1 = q1.where('sent').gte(maxHistoryDate);
+        q2 = q2.where('sent').gte(maxHistoryDate);
       }
 
-      if(options.startId) {
-        var startId = new ObjectID(options.startId);
-        q = q.where('_id').gte(startId);
-      }
-
-      if(options.beforeId) {
-        var beforeId = new ObjectID(options.beforeId);
-        q = q.where('_id').lt(beforeId);
-      }
-
-      return q.sort(options.sort || { sent: 'desc' })
-        .limit(options.limit || 50)
-        .skip(options.skip || 0)
-        .execQ()
-        .then(function(results) {
-          return [results.map(massageMessages).reverse(), maxHistoryDate];
+      /* Around case */
+      return Q.all([
+        q1.execQ(),
+        q2.execQ(),
+        ])
+        .spread(function(a, b) {
+          return [[].concat(a.reverse(), b), maxHistoryDate];
         });
     })
     .spread(function(results, maxHistoryDate) {
-      if (!maxHistoryDate) return callback(null, results, false);
+      if (!maxHistoryDate) return [results, false];
 
-      var q = persistence.ChatMessage
-              .where('toTroupeId', troupeId)
-              .limit(1)
-              .where('sent')
-              .lte(maxHistoryDate);
-
-      return q.execQ().then(function(_results) {
-        var limitReached = _results.length !== 0;
-        callback(null, results, limitReached);
-      });
+      return [
+        results,
+        getDateOfFirstMessageInRoom(troupeId)
+          .then(function(firstMessageSent) {
+            return !!(firstMessageSent && firstMessageSent < maxHistoryDate);
+          })
+      ];
     })
-    .fail(function(err) {
-      callback(err);
-    });
-    //.nodeify(callback)
+    .nodeify(callback);
+
+
 };
 
 exports.findChatMessagesForTroupeForDateRange = function(troupeId, startDate, endDate) {
@@ -254,22 +329,16 @@ exports.findChatMessagesForTroupeForDateRange = function(troupeId, startDate, en
               .where('toTroupeId', troupeId)
               .where('sent').gte(startDate)
               .where('sent').lte(endDate)
-              .sort({sent: 'asc'});
+              .sort({ sent: 'asc' });
 
-      return q.exec().then(function(results) {
-        var chats;
-        var limitReached;
+      return q.execQ()
+        .then(function(results) {
+          if (maxHistoryDate > startDate) {
+            return [[], true];
+          }
 
-        if (maxHistoryDate > startDate) {
-          chats = [];
-          limitReached = true;
-          return Q.all([chats, limitReached]);
-        } else {
-          chats = results.map(massageMessages);
-          limitReached = false;
-          return Q.all([chats, limitReached]);
-        }
-      });
+          return [results, false];
+        });
     });
 };
 

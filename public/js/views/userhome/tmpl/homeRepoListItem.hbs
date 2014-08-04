@@ -1,1 +1,11 @@
-<span class="github-REPO">{{name}}</span>
+<div class="room-avatar">
+  <img src="{{avatar_url}}" width="48" height="48">
+  <p>{{name}}</p>
+  {{#unless room}}
+  <p class='topic'>{{description}}</p>
+  {{/unless}}
+  {{#if room}}
+  <p class='topic'>{{room.topic}}</p>
+  <p class='user-count'>{{room.userCount}} people</p>
+  {{/if}}
+</div>

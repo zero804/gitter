@@ -48,6 +48,9 @@ define([
         if (itemCollections.events.length >0) {
           this.$el.find('#activity-header').show();
           itemCollections.events.off('add reset sync', null, this);
+        } else {
+          this.$el.find('#activity-header').show();
+          this.$el.find('#activity-tip').show();
         }
       }, this);
     },

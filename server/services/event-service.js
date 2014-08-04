@@ -1,35 +1,40 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var persistence   = require("./persistence-service");
-var processChat   = require('../utils/process-chat');
+var processChat   = require('../utils/process-chat-isolated');
 var appEvents     = require("../app-events");
 var ObjectID      = require('mongodb').ObjectID;
+var Q             = require('q');
+var StatusError   = require('statuserror');
 
 exports.newEventToTroupe = function(troupe, user, text, meta, payload, callback) {
-  if(!troupe) return callback("Invalid troupe");
-  if(!text) return callback("Text required");
+  text = text ? "" + text : "";
 
-  text = "" + text;
+  return Q.fcall(function() {
+      if(!troupe) throw new StatusError(500, "Invalid troupe");
+      if(!text) throw new StatusError(400, "Text required");
 
-  var event = new persistence.Event();
+      return processChat(text);
+    })
+    .then(function(parsed) {
+      var event = new persistence.Event();
 
-  event.fromUserId = user ? user.id : null;
-  event.toTroupeId = troupe.id;
-  event.sent       = new Date();
-  event.text       = text;
-  var parsed       = processChat(text);
-  event.html       = parsed.html;
-  event.meta       = meta;
-  event.payload    = payload;
+      event.fromUserId = user ? user.id : null;
+      event.toTroupeId = troupe.id;
+      event.sent       = new Date();
+      event.text       = text;
+      event.html       = parsed.html;
+      event.meta       = meta;
+      event.payload    = payload;
 
-  event.save(function (err) {
-    if(err) return callback(err);
+      return event.saveQ()
+        .then(function() {
+          appEvents.hookEvent({ username: 'gitter', room: troupe.uri, text: text });
+          return event;
+        });
 
-    appEvents.hookEvent({username: 'gitter', room: troupe.uri, text: text});
-
-    return callback(null, event);
-  });
+    })
+    .nodeify(callback);
 };
 
 exports.findEventsForTroupe = function(troupeId, options, callback) {
@@ -46,12 +51,12 @@ exports.findEventsForTroupe = function(troupeId, options, callback) {
     q = q.where('_id').lt(beforeId);
   }
 
-  q.sort(options.sort || { sent: 'desc' })
+  return q.sort(options.sort || { sent: 'desc' })
     .limit(options.limit || 20)
     .skip(options.skip || 0)
-    .exec(function(err, results) {
-      if(err) return callback(err);
-
-      return callback(null, results.reverse());
-    });
+    .execQ()
+    .then(function(results) {
+      return results.reverse();
+    })
+    .nodeify(callback);
 };

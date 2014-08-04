@@ -7,6 +7,7 @@ var restful           = require('../../services/restful');
 var UserService       = require('../../services/user-service');
 var appVersion        = require('../../web/appVersion');
 var burstCalculator   = require('../../utils/burst-calculator');
+var _                 = require('underscore');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -39,28 +40,28 @@ function getAppCache(req) {
 }
 
 function renderHomePage(req, res, next) {
-  contextGenerator.generateNonChatContext(req, function(err, troupeContext) {
-    if(err) return next(err);
+  contextGenerator.generateNonChatContext(req)
+    .then(function(troupeContext) {
+      var page, bootScriptName;
 
-    var page, bootScriptName;
+      if(req.isPhone) {
+        page = 'mobile/mobile-app';
+        bootScriptName = 'mobile-userhome';
+      } else {
+        page = 'userhome-template';
+        bootScriptName = 'userhome';
+      }
 
-    if(req.isPhone) {
-      page = 'mobile/mobile-app';
-      bootScriptName = 'mobile-userhome';
-    } else {
-      page = 'userhome-template';
-      bootScriptName = 'userhome';
-    }
-
-    res.render(page, {
-      useAppCache: !!nconf.get('web:useAppCache'),
-      bootScriptName: bootScriptName,
-      troupeName: req.uriContext.uri,
-      troupeContext: troupeContext,
-      agent: req.headers['user-agent'],
-      isUserhome: true,
-    });
-  });
+      res.render(page, {
+        useAppCache: !!nconf.get('web:useAppCache'),
+        bootScriptName: bootScriptName,
+        troupeName: req.uriContext.uri,
+        troupeContext: troupeContext,
+        agent: req.headers['user-agent'],
+        isUserhome: true,
+      });
+    })
+    .fail(next);
 }
 
 function renderMainFrame(req, res, next, frame) {
@@ -91,26 +92,30 @@ function renderMainFrame(req, res, next, frame) {
     .fail(next);
 }
 
-function renderChatPage(req, res, next) {
+function renderChat(req, res, template, script, next) {
   var troupe = req.uriContext.troupe;
   var userId = req.user && req.user.id;
+  var aroundId = req.query.at;
+
+  var snapshotOptions = { limit: INITIAL_CHAT_COUNT, aroundId: aroundId };
 
   Q.all([
-    contextGenerator.generateTroupeContext(req),
-    restful.serializeChatsForTroupe(troupe.id, userId, { limit: INITIAL_CHAT_COUNT })
-    ]).spread(function (troupeContext, chats) {
-
+    contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions } }),
+    restful.serializeChatsForTroupe(troupe.id, userId, snapshotOptions)
+    ]).spread(function(troupeContext, chats) {
+      var initialChat = _.find(chats, function(chat) { return chat.initial; });
+      var initialBottom = !initialChat;
       var githubLink;
 
       if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
         githubLink = 'https://github.com/' + req.uriContext.uri;
       }
 
-      res.render('chat-template', {
+      res.render(template, {
         layout: 'chat-layout',
         isRepo: troupe.githubType === 'REPO',
         appCache: getAppCache(req),
-        bootScriptName: 'router-chat',
+        bootScriptName: script,
         githubLink: githubLink,
         troupeName: req.uriContext.uri,
         troupeTopic: troupeContext.troupe.topic,
@@ -118,53 +123,36 @@ function renderChatPage(req, res, next) {
         troupeFavourite: troupeContext.troupe.favourite,
         user: troupeContext.user,
         troupeContext: troupeContext,
+        initialBottom: initialBottom,
         chats: burstCalculator(chats),
         agent: req.headers['user-agent'],
       });
 
     })
     .fail(next);
+}
+
+function renderChatPage(req, res, next) {
+  return renderChat(req, res, 'chat-template', 'router-chat', next);
 }
 
 function renderMobileUserHome(req, res, next) {
-  contextGenerator.generateNonChatContext(req, function(err, troupeContext) {
-    if(err) return next(err);
-
-    res.render('mobile/mobile-app', {
-      useAppCache: !!nconf.get('web:useAppCache'),
-      bootScriptName: 'mobile-userhome',
-      troupeName: req.uriContext.uri,
-      troupeContext: troupeContext,
-      agent: req.headers['user-agent'],
-      isUserhome: true,
-    });
-  });
+  contextGenerator.generateNonChatContext(req)
+    .then(function(troupeContext) {
+      res.render('mobile/mobile-app', {
+        useAppCache: !!nconf.get('web:useAppCache'),
+        bootScriptName: 'mobile-userhome',
+        troupeName: req.uriContext.uri,
+        troupeContext: troupeContext,
+        agent: req.headers['user-agent'],
+        isUserhome: true,
+      });
+    })
+    .fail(next);
 }
 
 function renderMobileChat(req, res, next) {
-  var troupe = req.uriContext.troupe;
-
-  var userId = req.user && req.user.id;
-
-  Q.all([
-    contextGenerator.generateTroupeContext(req),
-      restful.serializeChatsForTroupe(troupe.id, userId, { limit: INITIAL_CHAT_COUNT })
-    ]).spread(function(troupeContext, chats) {
-      burstCalculator(chats);
-      res.render('mobile/mobile-app', {
-        appCache: getAppCache(req),
-        bootScriptName: 'mobile-app',
-        troupeName: req.uriContext.uri,
-        troupeTopic: troupeContext.troupe.topic,
-        troupeFavourite: troupeContext.troupe.favourite,
-        user: troupeContext.user,
-        troupeContext: troupeContext,
-        chats: burstCalculator(chats),
-        agent: req.headers['user-agent'],
-      });
-
-    })
-    .fail(next);
+  return renderChat(req, res, 'mobile/mobile-chat', 'mobile-app', next);
 }
 
 function renderMobileNativeChat(req, res) {
@@ -203,55 +191,12 @@ function renderMobileNativeUserhome(req, res) {
 }
 
 function renderMobileNotLoggedInChat(req, res, next) {
-  var troupe = req.uriContext.troupe;
-
-  Q.all([
-    contextGenerator.generateTroupeContext(req),
-    restful.serializeChatsForTroupe(troupe.id, null, { limit: INITIAL_CHAT_COUNT })
-    ]).spread(function(troupeContext, chats) {
-      res.render('mobile/mobile-app', {
-        bootScriptName: 'mobile-nli-app',
-        troupeName: req.uriContext.uri,
-        troupeTopic: troupeContext.troupe.topic,
-        troupeFavourite: troupeContext.troupe.favourite,
-        troupeContext: troupeContext,
-        chats: burstCalculator(chats),
-        agent: req.headers['user-agent']
-      });
-
-    })
-    .fail(next);
+  return renderChat(req, res, 'mobile/mobile-app', 'mobile-nli-app', next);
 }
 
 
 function renderNotLoggedInChatPage(req, res, next) {
-  var troupe = req.uriContext.troupe;
-
-  Q.all([
-    contextGenerator.generateTroupeContext(req),
-    restful.serializeChatsForTroupe(troupe.id, null, { limit: INITIAL_CHAT_COUNT })
-    ]).spread(function (troupeContext, chats) {
-
-      var githubLink;
-
-      if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
-        githubLink = 'https://github.com/' + req.uriContext.uri;
-      }
-
-      res.render('chat-nli-template', {
-        isRepo: troupe.githubType === 'REPO',
-        appCache: getAppCache(req),
-        bootScriptName: 'router-nli-chat',
-        githubLink: githubLink,
-        troupeName: req.uriContext.uri,
-        troupeTopic: troupeContext.troupe.topic,
-        troupeContext: troupeContext,
-        chats: burstCalculator(chats),
-        agent: req.headers['user-agent']
-      });
-
-    })
-    .fail(next);
+  return renderChat(req, res, 'chat-nli-template', 'router-nli-chat', next);
 }
 
 /**
@@ -274,6 +219,33 @@ function renderUserNotSignedUp(req, res, next) {
     .fail(next);
 }
 
+function renderUserNotSignedUpMainFrame(req, res, next, frame) {
+  contextGenerator.generateNonChatContext(req)
+    .then(function(troupeContext) {
+      var chatAppLocation = '/' + req.params.roomPart1 + '/~' + frame + '#initial';
+
+      var template, bootScriptName;
+      if(req.user) {
+        template = 'app-template';
+        bootScriptName = 'router-app';
+      } else {
+        template = 'app-nli-template';
+        bootScriptName = 'router-nli-app';
+      }
+
+      res.render(template, {
+        appCache: getAppCache(req),
+        bootScriptName: bootScriptName,
+        troupeName: req.params.roomPart1,
+        troupeContext: troupeContext,
+        chatAppLocation: chatAppLocation,
+        agent: req.headers['user-agent'],
+        stagingText: stagingText,
+        stagingLink: stagingLink,
+      });
+    }).fail(next);
+}
+
 
 module.exports = exports = {
   renderHomePage: renderHomePage,
@@ -285,5 +257,6 @@ module.exports = exports = {
   renderNotLoggedInChatPage: renderNotLoggedInChatPage,
   renderMobileNativeChat: renderMobileNativeChat,
   renderMobileNativeUserhome: renderMobileNativeUserhome,
-  renderUserNotSignedUp: renderUserNotSignedUp
+  renderUserNotSignedUp: renderUserNotSignedUp,
+  renderUserNotSignedUpMainFrame: renderUserNotSignedUpMainFrame
 };

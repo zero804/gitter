@@ -2,6 +2,7 @@
 "use strict";
 
 var url = require('url');
+var StatusError = require('statuserror');
 
 function repoTokenFirst(user) {
   return user && (user.githubToken || user.githubUserToken)  || '';
@@ -51,7 +52,7 @@ module.exports = function(tokenPriority) {
 
     return d.promise.spread(function(response, body) {
       if(response.statusCode >= 400) {
-        throw response;
+        throw new StatusError(response.statusCode, body && body.message);
       }
 
       if(response.statusCode !== 200) {

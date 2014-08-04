@@ -82,7 +82,7 @@ function ChatStrategy(options)  {
     return {
       id: item._id,
       text: item.text,
-      status: item.status, 
+      status: item.status,
       html: item.html,
       sent: formatDate(item.sent),
       editedAt: formatDate(item.editedAt),
@@ -91,6 +91,7 @@ function ChatStrategy(options)  {
       room: troupeStrategy ? troupeStrategy.map(item.toTroupeId) : undefined,
       readBy: item.readBy ? item.readBy.length : undefined,
       urls: item.urls || [],
+      initial: options.initialId && item._id == options.initialId || undefined,
       mentions: item.mentions ? item.mentions.map(function(m) {
           return {
             screenName: m.screenName,
