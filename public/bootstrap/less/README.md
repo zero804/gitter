@@ -93,6 +93,7 @@
 @import 'chat.less';
 @import 'toolbar.less';
 @import 'chat-item.less';
+@import 'welcome-tips.less';
 
 /* Media Queries */
 // @media only screen and (min-width: 50em) {

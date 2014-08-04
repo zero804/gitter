@@ -57,7 +57,7 @@ define([
       this.dialogRegion = modalRegion;
 
       if (hasScrollBars()) {
-        $(".js-chat-container").addClass("scroller");
+        $(".primary-scroll").addClass("scroller");
         $(".js-chat-input-container").addClass("scrollpush");
         $("#room-content").addClass("scroller");
       }

@@ -73,46 +73,26 @@ define([
     });
   }
 
-  // Query issues has the form { issue: [callbacks] }
-  var queryIssues = {};
-  var throttledQuery = _.throttle(function() {
-    var workingQueryIssues = queryIssues;
-    queryIssues = {};
-
-    var issues = Object.keys(workingQueryIssues);
-    if(!issues.length) return;
-
-    // Better chance of caching if sorted
-    issues.sort();
-
-    $.ajax({
-      url: '/api/private/issue-state',
-      data: issues.map(function(r) { return { name: 'q', value: r }; }),
-      success: function(states) {
-        issues.forEach(function(issue, index) {
-          var state = states[index] || '';
-          var callbacks = workingQueryIssues[issue];
-
-          callbacks.forEach(function(callback) {
-            callback(state);
-          });
-        });
-      }
-    });
-  }, 100, { leading: false });
+  var localCache = { };
 
   function addIssue(repo, issueNumber, callback) {
     var issue = repo + '/' + issueNumber;
-
-    var callbacks = queryIssues[issue];
-    if(!callbacks) {
-      callbacks = [callback];
-      queryIssues[issue] = callbacks;
-    } else {
-      callbacks.push(callback);
+    var localResult = localCache[issue];
+    if(localResult) {
+      setTimeout(function() { callback(localResult); }, 0);
+      return;
     }
 
-    throttledQuery();
+    $.ajax({
+      url: '/api/private/issue-state',
+      data: { q: issue },
+      success: function(states) {
+        localCache[issue] = states[0];
+        setTimeout(function() { delete localCache[issue]; }, 60000);
+        callback(states[0]);
+      }
+    });
+
   }
 
   var IssueModel = Backbone.Model.extend({

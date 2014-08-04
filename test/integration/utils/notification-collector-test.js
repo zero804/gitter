@@ -33,7 +33,6 @@ describe('notification-collection', function() {
       done();
     });
 
-    underTest.incomingNotification('user1-on', 'file', ['f1','f2'], 'troupeId1');
     underTest.incomingNotification('user1-on', 'chat', ['c1','c2'], 'troupeId1');
     underTest.incomingNotification('user1-on', 'chat', ['c1','c2'], 'troupeId2');
   });
