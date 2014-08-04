@@ -57,3 +57,20 @@ e.g `./scripts/utils/unread.js trevorah`
 Lists out the rooms suggested to a user. Requires a username.
 
 e.g `./scripts/utils/suggested-rooms.js trevorah`
+
+Upgrading gitter-services to add support for more services
+----------------------------------------------------------
+Recently merged a pull request for [gitter-services](https://github.com/gitterHQ/services)? then read on...
+
+### Prerequisites
+Before you proceed, make sure you have done the following:
+1. pushed a tagged release of gitter-services to github
+2. updated the gitter-services dependency in [webhookshandler](https://bitbucket.org/troupe/webhookshandler) via npm
+3. deployed the new webhookshandler (dont worry, your new service wont be accessible unless someone is adept at guessing urls)
+
+### Updating gitter-services
+Once you are sure the above is done, preform the following:
+1. update the version of the `gitter-services` dependency in package.json (dont forget about npm-shrinkwrap)
+2. `npm install`
+3. `make sprites`
+4. commit your changes and release!

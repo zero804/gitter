@@ -740,21 +740,13 @@ define([
     modal.show();
   };
 
-   TroupeViews.ConfirmationModal = TroupeViews.Modal.extend({
+  TroupeViews.ConfirmationModal = TroupeViews.Modal.extend({
     initialize: function(options) {
       options.view = new TroupeViews.ConfirmationView(options);
       TroupeViews.Modal.prototype.initialize.call(this, options);
     }
 
-   });
-
-  // appEvents.once('firstCollectionLoaded', function hideLoadingAmusement() {
-  //   var h = $('html'), b = $('.trpContentPanel');
-  //   b.fadeOut({ complete: function() {
-  //     h.removeClass('loading');
-  //   }});
-  //   b.fadeIn({ duration: 'fast' });
-  // });
+  });
 
   return TroupeViews;
 });
