@@ -5,7 +5,6 @@ var repoService     = require('./repo-service');
 var GithubRepo      = require("./github/github-repo-service");
 var persistence     = require("./persistence-service");
 var Q               = require('q');
-var winston         = require('../utils/winston');
 var _               = require('underscore');
 
 var HILIGHTED_ROOMS = [{
@@ -153,17 +152,14 @@ function processCategory(name, items, context) {
 
 
 /* This seems to be a very badly performing query! */
-function findReposWithRooms(repoList) {
-  if(repoList.length === 0) return Q.resolve([]);
+function findRooms(uriList) {
+  if(uriList.length === 0) return Q.resolve([]);
 
-  var uris = repoList.map(function(r) {
+  var uris = uriList.map(function(r) {
     return r && r.toLowerCase();
   });
 
-  winston.info("Querying reposWithRooms for " + uris.length + " repositories");
-
   return persistence.Troupe.findQ({
-      // githubType: 'REPO',
       lcUri: { $in: uris }
     }, { uri: 1, users: 1 });
 }
@@ -250,7 +246,7 @@ function getSuggestions(user, lang) {
     .then(function(suggestions) {
       var uris = Object.keys(suggestions);
 
-      return findReposWithRooms(uris)
+      return findRooms(uris)
         .then(function(rooms) {
           rooms.forEach(function(room) {
             suggestions[room.uri].room = room;
