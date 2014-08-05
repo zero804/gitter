@@ -41,6 +41,7 @@ exports.serializeChatsForTroupe = function(troupeId, userId, options, callback) 
     .spread(function(chatMessages/*, limitReached*/) {
       var strategy = new restSerializer.ChatStrategy({
         notLoggedIn: !userId,
+        unread: options.unread,
         initialId: initialId,
         currentUserId: userId,
         troupeId: troupeId

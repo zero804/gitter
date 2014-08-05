@@ -92,12 +92,19 @@ function renderMainFrame(req, res, next, frame) {
     .fail(next);
 }
 
-function renderChat(req, res, opts /*template, script*/, next) {
+function renderChat(req, res, opts, next) {
   var troupe = req.uriContext.troupe;
-  var userId = req.user && req.user.id;
   var aroundId = req.query.at;
+  var embedded = opts.embedded;
+  
+  var user = req.user;
+  var userId = user && user.id;
 
-  var snapshotOptions = { limit: INITIAL_CHAT_COUNT, aroundId: aroundId };
+  var snapshotOptions = { 
+    limit: INITIAL_CHAT_COUNT, 
+    aroundId: aroundId, 
+    unread: embedded ? false : undefined // Embedded views already have items marked as unread=false
+  };
 
   Q.all([
     contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions } }),
@@ -113,7 +120,7 @@ function renderChat(req, res, opts /*template, script*/, next) {
         githubLink = 'https://github.com/' + req.uriContext.uri;
       }
       
-      if (!troupeContext.user) classNames.push("logged-out");
+      if (!user) classNames.push("logged-out");
       
       res.render(opts.template, {
         isRepo: troupe.githubType === 'REPO',
@@ -124,7 +131,7 @@ function renderChat(req, res, opts /*template, script*/, next) {
         troupeTopic: troupeContext.troupe.topic,
         oneToOne: troupe.oneToOne,
         troupeFavourite: troupeContext.troupe.favourite,
-        user: troupeContext.user,
+        user: user,
         troupeContext: troupeContext,
         initialBottom: initialBottom,
         chats: burstCalculator(chats),
@@ -219,6 +226,7 @@ function renderEmbeddedChat(req, res, next) {
   return renderChat(req, res, {
     template: 'chat-embed-template',
     script: 'router-embed-chat',
+    embedded: true,
     classNames: [ 'embedded' ]
   }, next);
 }

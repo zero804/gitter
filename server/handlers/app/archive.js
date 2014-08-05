@@ -101,7 +101,7 @@ exports.chatArchive = [
           .spread(function(chatMessages, limitReached) {
 
             var strategy = new restSerializer.ChatStrategy({
-              notLoggedIn: true,
+              unread: false, // All chats are read in the archive
               troupeId: troupeId
             });
 

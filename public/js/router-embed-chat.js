@@ -34,7 +34,7 @@ require([
     el: $('.js-chat-container'),
     collection: itemCollections.chats,
     userCollection: itemCollections.users,
-    decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
+    decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator],
   }).render();
   
   itemCollections.chats.on('add', function (item) {
