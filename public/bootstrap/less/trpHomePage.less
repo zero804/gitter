@@ -5,47 +5,43 @@
 @import "homepage-reset.less";
 @import "homepage-mobile.less" (max-width: 1100px);
 
-/**
- *   Transitions and animations
- */
-
-
- @-webkit-keyframes dropdown {
-   0% {
-     top: -100px;
-   }
-
-   40% {
-     top: 0;
-   }
-
-   50% {
-   top: 4px;
-   }
-
-   60% {
-    top: 0;
-   }
-
-   70% {
-    top: 0;
-   }
-
-   100% {
-    top: 0;
-   }
+// Transitions and animations
+@-webkit-keyframes dropdown {
+ 0% {
+   top: -100px;
  }
 
- @-webkit-keyframes tuck-legs {
-   0% {
+ 40% {
+   top: 0;
+ }
+
+ 50% {
+ top: 4px;
+ }
+
+ 60% {
+  top: 0;
+ }
+
+ 70% {
+  top: 0;
+ }
+
+ 100% {
+  top: 0;
+ }
+}
+
+@-webkit-keyframes tuck-legs {
+  0% {
     height: 20px;
-   }
+  }
 
-   40% {
-     height: 20px;
-   }
+  40% {
+    height: 20px;
+  }
 
-   50% {
+  50% {
     height: 16px;
   }
 
@@ -53,53 +49,51 @@
     height: 20px;
   }
 
-   100% {
+  100% {
     height: 20px;
-   }
- }
+  }
+}
 
- @-webkit-keyframes appear {
-   0% {
+@-webkit-keyframes appear {
+  0% {
     opacity: 0;
-   }
+  }
 
-   100% {
+  100% {
     opacity: 1;
-   }
- }
+  }
+}
 
- @-webkit-keyframes tuck-arms {
-   0% {
+@-webkit-keyframes tuck-arms {
+  0% {
     top: 0;
     height: 15px;
-   }
+  }
 
-   40% {
+  40% {
     top: 0;
     height: 15px;
-   }
+  }
 
-   50% {
+  50% {
     top: 4px;
      height: 11px;
-   }
+  }
 
-   60% {
+  60% {
     top: 4px;
     height: 11px;
-   }
+  }
 
-   90% {
+  90% {
     top: 4px;
     height: 11px;
-   }
+  }
 
-   100% {
+  100% { }
+}
 
-   }
- }
-
- .menu-animation {
+.menu-animation {
   -webkit-animation-delay: 2s; /* Safari and Chrome */
   animation-delay: 2s;
   -webkit-animation-duration: 1s;
@@ -107,9 +101,9 @@
   -webkit-animation-fill-mode: forwards; /* Safari and Chrome */
   animation-fill-mode: forwards;
   opacity: 0;
- }
+}
 
- .logo-animation {
+.logo-animation {
   -webkit-animation-delay: 1s; /* Safari and Chrome */
    animation-delay: 1s;
   -webkit-animation-duration: 1s;
@@ -120,18 +114,18 @@
    animation-timing-function: linear;
    -webkit-animation-fill-mode: forwards; /* Safari and Chrome */
     animation-fill-mode: forwards;
- }
+}
 
- .logo-holder {
+.logo-holder {
    -webkit-animation-name: dropdown;
    -moz-webkit-animation-name: dropdown;
    position: relative;
    width: 20px;
    height: 20px;
    top: -100px;
- }
+}
 
- .logo-left-arm {
+.logo-left-arm {
   -webkit-animation-name: tuck-arms;
   -moz-webkit-animation-name: tuck-arms;
   position: absolute;
@@ -140,9 +134,9 @@
   background-color: white;
   width: 2px;
   height: 15px;
- }
+}
 
- .logo-body-left {
+.logo-body-left {
   -webkit-animation-name: tuck-legs;
   -moz-webkit-animation-name: tuck-legs;
   position: absolute;
@@ -151,9 +145,9 @@
   width: 2px;
   top: 4px;
   height: 20px;
- }
+}
 
- .logo-body-right {
+.logo-body-right {
   -webkit-animation-name: tuck-legs;
   -moz-webkit-animation-name: tuck-legs;
   position: absolute;
@@ -162,9 +156,9 @@
   width: 2px;
   top: 4px;
   height: 20px;
- }
+}
 
- .logo-right-arm {
+.logo-right-arm {
   -webkit-animation-name: tuck-arms;
   -moz-webkit-animation-name: tuck-arms;
   position: absolute;
@@ -173,15 +167,15 @@
   background-color: white;
   width: 2px;
   height: 11px;
- }
+}
 
- .logo-image {
-   -webkit-animation-name: appear;
-   -moz-webkit-animation-name: appear;
-   position: absolute;
-   top: 0;
-   left: 10px;
- }
+.logo-image {
+  -webkit-animation-name: appear;
+  -moz-webkit-animation-name: appear;
+  position: absolute;
+  top: 0;
+  left: 10px;
+}
 
  .top-navigation {
    -webkit-animation-name: appear;
@@ -771,8 +765,6 @@ h1, h2, h3, h4, blockquote p {
       }
 
 
-
-
 /**
  *   Integrations panel
  */
@@ -812,6 +804,7 @@ h1, h2, h3, h4, blockquote p {
     width: 400px;
   }
     #integrations-panel .loves ul {
+      max-width: 150px;
       position: relative;
       left: 150px;
       top: -47px;
