@@ -463,12 +463,18 @@ h1, h2, h3, h4, blockquote p {
   }
     #intro-panel .msg {
       position: absolute;
+      transform: translate3d(0,0,0);
+      -webkit-transform: translate3d(0,0,0);
 
       display: block;
       width: 400px;
       margin-left: -200px;
 
       text-align: center;
+    }
+    #intro-panel .msg a {
+      text-decoration: none;
+      color: inherit;
     }
     #intro-panel .avatar, .msg span {
       display: inline-block;
