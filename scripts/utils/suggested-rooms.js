@@ -24,7 +24,7 @@ userService.findByUsername(opts.username)
   })
   .then(function(repos) {
     repos.forEach(function(suggestion) {
-      console.log(suggestion.uri, suggestion.room && suggestion.room.users.length, suggestion.score);
+      console.log(suggestion.uri, suggestion.room && suggestion.room.users.length, suggestion.scores);
     });
   })
   .delay(1000)
