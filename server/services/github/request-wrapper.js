@@ -10,7 +10,18 @@ var publicTokenPool = require('./public-token-pool');
 
 module.exports = publicTokenPool(
                     fetchAllPages(
-                    logFailingRequest(
-                    requestWithRetry({ maxRetries: 3 },
-                    logRateLimit(
-                    request)))));
+                      logFailingRequest(
+                        requestWithRetry({ maxRetries: 3 },
+                          logRateLimit(
+                            request)))));
+
+module.exports.fastRequest = publicTokenPool(
+                                logFailingRequest(
+                                  logRateLimit(
+                                    request)));
+
+module.exports.firstPageOnlyRequest = publicTokenPool(
+                                        logFailingRequest(
+                                          requestWithRetry({ maxRetries: 3 },
+                                            logRateLimit(
+                                              request))));

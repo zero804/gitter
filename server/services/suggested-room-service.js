@@ -193,7 +193,7 @@ function getPreferredComputerLanguages(suggestions) {
 function getSuggestedRepoMap(user) {
   var ghRepo  = new GithubRepo(user);
   return Q.all([
-      ghRepo.getStarredRepos(),
+      ghRepo.getRecentlyStarredRepos(),
       ghRepo.getWatchedRepos(),
       repoService.getReposForUser(user)
     ])
