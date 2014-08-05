@@ -307,15 +307,3 @@ function getSuggestions(user, localeLanguage) {
 }
 
 exports.getSuggestions = getSuggestions;
-
-function suggestedReposForUser(user) {
-  return getSuggestions(user).then(function(suggestions) {
-    return suggestions.map(function(suggestion) {
-      return suggestion.repo;
-    }).filter(function(repo) {
-      return !!repo;
-    });
-  });
-}
-
-exports.suggestedReposForUser = suggestedReposForUser;
