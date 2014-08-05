@@ -1,13 +1,11 @@
 require([
   'jquery',
-  'components/realtime',
-  'utils/context',
   'utils/tracking' // no ref
  ],
-  function($, realtime, context) {
+  function($) {
     "use strict";
 
-    function random(a) {return a[Math.floor(Math.random()*a.length)]; }
+    //function random(a) {return a[Math.floor(Math.random()*a.length)]; }
 
     $('#arrow-1').click(function() {
       if (window.mixpanel) window.mixpanel.track('arrow-click', { arrow: 'arrow-1' });
@@ -116,6 +114,8 @@ require([
           [340, 95], [490, 141], [531, 206], [579, 268], [345, 104],
           [532, 21], [218, 48], [384, 226], [153, 226], [420, 157]
         ];
+        
+        var messages = [];
 
         //  And have some random messages
         //var messages = ['Hey guys, how’s it going?', 'Hey everyone!', 'Anyone looking at <b>#146</b>?',
@@ -147,6 +147,7 @@ require([
 
           setTimeout(function() {
             coords.push(pos);
+            messages.push(chatMessage);
 
             msg.children().removeClass('enter').animate({opacity: 0}, function() {
               msg.remove();
@@ -154,22 +155,15 @@ require([
           }, 5000);
         };
 
-        var messages = [];
-
-        realtime.registerForSnapshots('/sample-chats', function(ss) {
-          messages = messages.concat(ss);
+        $.get('/api/private/sample-chats', function(data) {
+          messages = data;
+          setInterval(function() {
+            var msg = messages.shift();
+            var pos = coords.shift();
+            if (msg && pos) generate(msg, pos);
+          }, 2500);
         });
 
-        realtime.subscribe('/sample-chats', function(msg) {
-          messages.push(msg);
-        }, context);
-
-        setInterval(function() {
-          var msg = messages.shift();
-          var pos = coords.shift();
-          generate(msg, pos);
-          if (messages.length < 5) messages.push(msg);
-        }, 2500);
       };
 
       //  And go!

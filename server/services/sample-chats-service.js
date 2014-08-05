@@ -3,12 +3,12 @@
 
 var appEvents     = require('../app-events');
 var troupeService = require('./troupe-service');
-var bayeux        = require('../web/bayeux');
+//var bayeux        = require('../web/bayeux');
 
 var sampleChats = [];
-var c = 0;
+//var c = 0;
 var samplesChannel = '/sample-chats';
-var bayeuxClient = bayeux.client;
+//var bayeuxClient = bayeux.client;
 
 appEvents.localOnly.onChat(function(evt) { 
   if (evt.operation === 'create') {
@@ -22,15 +22,15 @@ appEvents.localOnly.onChat(function(evt) {
         };
 
         if (troupe.security === 'PUBLIC') {
-          c++;
+          //c++;
 
           sampleChats.push(sample);
-          if (sampleChats.length > 10) sampleChats.shift();
+          if (sampleChats.length > 30) sampleChats.shift();
 
-          if (c === 10) {
-            bayeuxClient.publish(samplesChannel, sample);
-            c = 0;
-          }
+          //if (c === 10) {
+          //  bayeuxClient.publish(samplesChannel, sample);
+          //  c = 0;
+          //}
         }
       });
   }
