@@ -9,64 +9,64 @@ var _               = require('underscore');
 
 var HILIGHTED_ROOMS = [{
   uri: 'gitterHQ/gitter',
-  lang: 'en'
+  localeLanguage: 'en'
 }, {
   uri: 'marionettejs/backbone.marionette',
   language: 'JavaScript',
-  lang: 'en'
+  localeLanguage: 'en'
 },{
   uri: 'LaravelRUS/chat',
   channel: true,
   language: 'PHP',
-  lang: 'ru'
+  localeLanguage: 'ru'
 }, {
   uri: 'gitterHQ/nodejs',
   chanel: true,
   language: 'JavaScript',
-  lang: 'en'
+  localeLanguage: 'en'
 }, {
   uri: 'lotus/chat',
   chanel: true,
   language: 'Ruby',
-  lang: 'en'
+  localeLanguage: 'en'
 },{
   uri: 'rom-rb/chat',
   chanel: true,
   language: 'Ruby',
-  lang: 'en'
+  localeLanguage: 'en'
 }, {
   uri: 'webpack/webpack',
   language: 'JavaScript',
-  lang: 'en'
+  localeLanguage: 'en'
 }, {
   uri: 'ruby-vietnam/chat',
   chanel: true,
   language: 'Ruby',
-  lang: 'vi'
+  localeLanguage: 'vi'
 }, {
   uri: 'require-lx/group',
   language: 'JavaScript',
-  lang: 'en'
+  localeLanguage: 'en'
 }, {
   uri: 'angular-ui/ng-grid',
   language: 'JavaScript',
-  lang: 'en'
+  localeLanguage: 'en'
 }, {
   uri: 'opscode/supermarket',
   language: 'Ruby',
-  lang: 'en'
+  localeLanguage: 'en'
 }, {
   uri: 'MahApps/MahApps.Metro',
   language: 'PowerShell',
-  lang: 'en'
+  localeLanguage: 'en'
 }, {
   uri: 'sympy/sympy',
   language: 'Python',
-  lang: 'en'
+  localeLanguage: 'en'
 }, {
   uri: 'rogeriopvl/erebot',
   language: 'JavaScript',
-  lang: 'es'
+  localeLanguage: 'es'
 }];
 
 var CATEGORIES = {
@@ -105,11 +105,11 @@ var CATEGORIES = {
   programmingLanguage: function(item, context) {
     var language = item.repo && item.repo.language || item.language;
     if(!language) return;
-    return context.languageScores[language] || 0;
+    return context.preferredComputerLanguages[language] || 0;
   },
   userLanguage: function(item, context) {
-    if(!context.lang || !item.lang) return;
-    return item.lang === context.lang ? 1 : 0;
+    if(!context.localeLanguage || !item.localeLanguage) return;
+    return item.localeLanguage === context.localeLanguage ? 1 : 0;
   },
   highlighted: function(item) {
     return item.highlighted ? 1 : 0;
@@ -180,7 +180,7 @@ function filterSuggestions(suggestions, user) {
   });
 }
 
-function getLanguageScores(suggestions) {
+function getPreferredComputerLanguages(suggestions) {
   var result = {};
   suggestions.forEach(function(item) {
     var repo = item.repo;
@@ -192,7 +192,7 @@ function getLanguageScores(suggestions) {
 }
 
 
-function getSuggestions(user, lang) {
+function getSuggestions(user, localeLanguage) {
 
   var ghRepo  = new GithubRepo(user);
   return Q.all([
@@ -220,7 +220,7 @@ function getSuggestions(user, lang) {
         if(!suggestions[room.uri]) {
           suggestions[room.uri] = { uri: room.uri, language: room.language };
         }
-        suggestions[room.uri].lang = room.lang;
+        suggestions[room.uri].localeLanguage = room.localeLanguage;
         suggestions[room.uri].highlighted = true;
       });
 
@@ -260,12 +260,12 @@ function getSuggestions(user, lang) {
       return filterSuggestions(suggestions, user);
     })
     .then(function(suggestions) {
-      var languageScores = getLanguageScores(suggestions);
+      var preferredComputerLanguages = getPreferredComputerLanguages(suggestions);
 
       Object.keys(CATEGORIES).forEach(function(name) {
         processCategory(name, suggestions, {
-          languageScores: languageScores,
-          lang: lang
+          preferredComputerLanguages: preferredComputerLanguages,
+          localeLanguage: localeLanguage
         });
       });
 
