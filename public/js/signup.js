@@ -42,7 +42,7 @@ require([
        */
       this.init = function() {
         //  Wait until all images have loaded
-        $(window).load(this.onLoad);
+        $(window).ready(this.onLoad);
 
         //  Start the map conversation thing
         this.map();
@@ -114,7 +114,7 @@ require([
           [340, 95], [490, 141], [531, 206], [579, 268], [345, 104],
           [532, 21], [218, 48], [384, 226], [153, 226], [420, 157]
         ];
-        
+
         var messages = [];
 
         //  And have some random messages
