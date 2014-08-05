@@ -37,6 +37,14 @@ var MODULES = [
       exclude: ["core-libraries"]
   },
   {
+      name: "router-embed-chat",
+      include: [
+        "views/widgets/avatar",
+        "views/widgets/timeago"
+      ],
+      exclude: ["core-libraries"]
+  },
+  {
       name: "router-nli-chat",
       include: [
         "views/widgets/avatar",

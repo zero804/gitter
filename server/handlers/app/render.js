@@ -198,6 +198,10 @@ function renderNotLoggedInChatPage(req, res, next) {
   return renderChat(req, res, 'chat-nli-template', 'router-nli-chat', next);
 }
 
+function renderEmbeddedChat(req, res, next) {
+  return renderChat(req, res, 'chat-embed-template', 'router-embed-chat', next);
+}
+
 /**
  * renderUserNotSignedUp() renders a set template for a 1:1 chat, with an invited user.
  */
@@ -250,6 +254,7 @@ module.exports = exports = {
   renderMainFrame: renderMainFrame,
   renderMobileChat: renderMobileChat,
   renderMobileUserHome: renderMobileUserHome,
+  renderEmbeddedChat: renderEmbeddedChat,
   renderMobileNotLoggedInChat: renderMobileNotLoggedInChat,
   renderNotLoggedInChatPage: renderNotLoggedInChatPage,
   renderMobileNativeChat: renderMobileNativeChat,

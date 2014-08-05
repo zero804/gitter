@@ -78,15 +78,32 @@ var chatMiddlewarePipeline = [
   }
 ];
 
+var embedMiddlewarePipeline = [
+  appMiddleware.uriContextResolverMiddleware,
+  appMiddleware.isPhoneMiddleware,
+  function (req, res, next) {
+    if(!req.uriContext.troupe) return next(404);
+    appRender.renderEmbeddedChat(req, res, next);
+  }
+];
+
 
 module.exports = {
     install: function(app) {
+      
       [
         '/:roomPart1/~chat',                         // ORG or ONE_TO_ONE
         '/:roomPart1/:roomPart2/~chat',              // REPO or ORG_CHANNEL or ADHOC
         '/:roomPart1/:roomPart2/:roomPart3/~chat'    // CUSTOM REPO_ROOM
       ].forEach(function(path) {
         app.get(path, chatMiddlewarePipeline);
+      });
+      
+      [
+        '/:roomPart1/:roomPart2/~embed',              // REPO or ORG_CHANNEL or ADHOC
+        '/:roomPart1/:roomPart2/:roomPart3/~embed'    // CUSTOM REPO_ROOM
+      ].forEach(function(path) {
+        app.get(path, embedMiddlewarePipeline);
       });
 
 
