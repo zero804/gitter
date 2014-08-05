@@ -127,7 +127,7 @@ function processCategory(name, items, context) {
   var values = items.map(function(f) {
     return valueFunc(f, context);
   }).filter(function(f) {
-    return f !== undefined && f !== null;
+    return typeof f === 'number';
   });
   if(!values.length) return;
   var max = _.max(values);
@@ -137,7 +137,7 @@ function processCategory(name, items, context) {
 
   items.forEach(function(item) {
     var score = valueFunc(item, context);
-    if(score === undefined || score === null) return;
+    if(typeof score != 'number') return;
     var rank = ((score - min) / (max - min)) * 100;
     if(coefficient > 0) {
       rank = rank * coefficient;
