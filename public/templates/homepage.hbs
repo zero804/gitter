@@ -42,12 +42,8 @@
               <a href="#apps-panel">Apps</a>
             </div>
 
-            <a class="btn login tooltip-container" href="/login/github?action=login">
+            <a class="btn login" href="/login/github?action=login">
               <b>Log in</b> <span class="no-small">with Github</span>
-
-              <span class="tooltip bottom">
-                By clicking &ldquo;Log in&rdquo;, you agree to our Terms and Conditions.
-              </span>
             </a>
           </div>
         </nav>
@@ -60,13 +56,15 @@
           <h1>{{ __ "Where developers come to talk." }}</h1>
           <p>We host thousands of public communities where developers from all around the world come together to talk about the future of programming, build better products, and share the best cat GIFs</a>.</p>
 
-          <a class="btn signup tooltip-container" href="/login/github?action=signup&button=1">
+          <a class="btn signup" href="/login/github?action=signup&button=1">
             <img src="{{cdn 'images/2/gitter/home/github.png'}}"> <b>Sign up</b> with Github
-
-            <span class="tooltip bottom">
-              By clicking &ldquo;Sign up&rdquo;, you agree to our Terms and Conditions.
-            </span>
           </a>
+          <div class="legal">
+            <span>
+              By signing up you agree to our <a href="https://gitter.zendesk.com/hc/en-us/sections/200274872-Legal-documentation" target="_blank">Terms and Conditions</a>.
+            </span>
+          </div>
+
 
           <ul class="mini-features-list">
             <li>
@@ -388,9 +386,9 @@
             <span>&copy; 2014 Troupe Technology Ltd. All rights reserved.</span>
 
             <a href="http://suport.gitter.im" target="_blank">Support</a>
-            <a href="https://developer.gitter.im">API</a>
-            <a href="/blog">Blog</a>
-            <a href="/twitter">Twitter</a>
+            <a href="https://developer.gitter.im" target="_blank">API</a>
+            <a href="https://blog.gitter.im" target="_blank">Blog</a>
+            <a href="https://twitter.com/gitchat" target="_blank">Twitter</a>
           </small>
         </div>
       </footer>
