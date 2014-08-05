@@ -92,7 +92,7 @@ function renderMainFrame(req, res, next, frame) {
     .fail(next);
 }
 
-function renderChat(req, res, template, script, next) {
+function renderChat(req, res, opts /*template, script*/, next) {
   var troupe = req.uriContext.troupe;
   var userId = req.user && req.user.id;
   var aroundId = req.query.at;
@@ -103,18 +103,22 @@ function renderChat(req, res, template, script, next) {
     contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions } }),
     restful.serializeChatsForTroupe(troupe.id, userId, snapshotOptions)
     ]).spread(function (troupeContext, chats) {
+      
       var initialChat = _.find(chats, function(chat) { return chat.initial; });
       var initialBottom = !initialChat;
       var githubLink;
+      var classNames = opts.classNames || [];
 
       if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
         githubLink = 'https://github.com/' + req.uriContext.uri;
       }
-
-      res.render(template, {
+      
+      if (!troupeContext.user) classNames.push("logged-out");
+      
+      res.render(opts.template, {
         isRepo: troupe.githubType === 'REPO',
         appCache: getAppCache(req),
-        bootScriptName: script,
+        bootScriptName: opts.script,
         githubLink: githubLink,
         troupeName: req.uriContext.uri,
         troupeTopic: troupeContext.troupe.topic,
@@ -124,6 +128,7 @@ function renderChat(req, res, template, script, next) {
         troupeContext: troupeContext,
         initialBottom: initialBottom,
         chats: burstCalculator(chats),
+        classNames: classNames.join(' '),
         agent: req.headers['user-agent'],
       });
 
@@ -132,7 +137,10 @@ function renderChat(req, res, template, script, next) {
 }
 
 function renderChatPage(req, res, next) {
-  return renderChat(req, res, 'chat-template', 'router-chat', next);
+  return renderChat(req, res, {
+    template: 'chat-template',
+    script: 'router-chat'
+  }, next);
 }
 
 function renderMobileUserHome(req, res, next) {
@@ -151,7 +159,10 @@ function renderMobileUserHome(req, res, next) {
 }
 
 function renderMobileChat(req, res, next) {
-  return renderChat(req, res, 'mobile/mobile-chat', 'mobile-app', next);
+  return renderChat(req, res, {
+    template: 'mobile/mobile-chat',
+    script: 'mobile-app'
+  }, next);
 }
 
 function renderMobileNativeChat(req, res) {
@@ -190,16 +201,26 @@ function renderMobileNativeUserhome(req, res) {
 }
 
 function renderMobileNotLoggedInChat(req, res, next) {
-  return renderChat(req, res, 'mobile/mobile-app', 'mobile-nli-app', next);
+  return renderChat(req, res, {
+    template: 'mobile/mobile-app',
+    script: 'mobile-nli-app'
+  }, next);
 }
 
 
 function renderNotLoggedInChatPage(req, res, next) {
-  return renderChat(req, res, 'chat-nli-template', 'router-nli-chat', next);
+  return renderChat(req, res, {
+    template: 'chat-nli-template',
+    script: 'router-nli-chat'
+  }, next);
 }
 
 function renderEmbeddedChat(req, res, next) {
-  return renderChat(req, res, 'chat-embed-template', 'router-embed-chat', next);
+  return renderChat(req, res, {
+    template: 'chat-embed-template',
+    script: 'router-embed-chat',
+    classNames: [ 'embedded' ]
+  }, next);
 }
 
 /**

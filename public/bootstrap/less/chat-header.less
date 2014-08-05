@@ -1,5 +1,7 @@
 .chat-header {
 
+  body.embedded & { right: 0; }
+
   .border-box-sizing;
   .transition500ms;
 
@@ -190,6 +192,7 @@
 }
 
 .chat-header__settings {
+  body.embedded & { visibility: hidden; }
   float: right;
   // padding: 0px 10px;
   text-align: center;
