@@ -18,7 +18,7 @@ module.exports = {
     }
 
     if(req.query.suggested) {
-      return suggestedRoomService.getSuggestions(req.user)
+      return suggestedRoomService.getSuggestions(req.user, req.i18n.getLocale())
         .then(function(repos) {
           var strategy = new restSerializer.SuggestedRoomStrategy();
           return restSerializer.serialize(repos, strategy);
