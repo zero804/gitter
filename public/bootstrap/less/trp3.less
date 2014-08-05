@@ -601,11 +601,13 @@ body.logged-out {
     }
   }
 
-
   .trpContentPanel {
     bottom: 0;
   }
+}
 
+body.embedded {
+  .trpContentPanel { bottom: 0; } 
 }
 
 .trpButtonMedium, .trpButtonBig {
@@ -1418,10 +1420,13 @@ ul li.placeholder:before {
 }
 
 .trpChatPanel {
+  
+  body.embedded & {
+    margin-right: 0;
+  }
+  
   display: block;
 	margin-right: @rightMarginFull;
-/*	min-height: 600px;
-	height: 100%;*/
 	text-align: left;
 	text-align: center;
   .transition500ms;
