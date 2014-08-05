@@ -365,8 +365,7 @@ function authorizeSubscribe(message, callback) {
     if(!exists) return callback({ status: 401, message: 'Socket association does not exist' });
 
     var match = null;
-
-    console.log('*** message', message)
+    
     var hasMatch = routes.some(function(route) {
       var m = route.re.exec(message.subscription);
       if(m) {

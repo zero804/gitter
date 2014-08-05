@@ -39,7 +39,12 @@ function ChatStrategy(options)  {
   if(!options) options = {};
 
   var userStategy = options.user ? null : new UserIdStrategy();
-  var unreadItemStategy = new UnreadItemStategy({ itemType: 'chat' });
+  var unreadItemStategy;
+  /* If options.unread has been set, we don't need a strategy */
+  if(options.currentUserId && typeof options.unread === 'undefined') {
+    unreadItemStategy = new UnreadItemStategy({ itemType: 'chat' });    
+  }
+  
   var troupeStrategy = options.includeTroupe ? new TroupeIdStrategy(options) : null;
 
   this.preload = function(items, callback) {
@@ -55,7 +60,7 @@ function ChatStrategy(options)  {
       });
     }
 
-    if(options.currentUserId) {
+    if(unreadItemStategy) {
       strategies.push({
         strategy: unreadItemStategy,
         data: { userId: options.currentUserId, troupeId: options.troupeId }
@@ -74,11 +79,15 @@ function ChatStrategy(options)  {
 
   this.map = function(item) {
     var unread;
-    if(options.notLoggedIn) {
-      unread = false;
+    
+    if(unreadItemStategy) {
+      unread = unreadItemStategy.map(item._id);
     } else {
-      unread = options.currentUserId ? unreadItemStategy.map(item._id) : true;
+      /* We're not looking up the unread items, but clients can request the state */
+      unread = typeof options.unread !== 'undefined' ? options.unread : true; /* defaults to true */
     }
+    
+    
     return {
       id: item._id,
       text: item.text,
