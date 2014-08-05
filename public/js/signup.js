@@ -121,18 +121,18 @@ require([
         //var messages = ['Hey guys, how’s it going?', 'Hey everyone!', 'Anyone looking at <b>#146</b>?',
         //        'Did anyone see that ludicrous display last night?', '<code>sudo rm -rf /</code>'];
                 
-        var generate = function(chatMessage) {
-          var pos = random(coords);
+        var generate = function(chatMessage, pos) {
           var msg = $('<div class="msg" />');
 
-          //  Add to the map
+          // Add to the map
           //this.appendTo(msg);
 
-          var rs = chatMessage.room.split('/');
-          var room = rs[rs.length-1];
+          var room = chatMessage.room.split('/').pop();
           var html = "<b>" + chatMessage.username + "</b> in <a href='/" + chatMessage.room + "'>" + room + "</a>";
           var span = $('<span />').html(html).appendTo(msg);
-          var img = $('<img />').attr({src: chatMessage.avatarUrl,"class":"avatar"}).appendTo(msg);
+
+          var img = $('<img />').attr({src: chatMessage.avatarUrl,"class":"avatar"});
+          img.appendTo(msg);
 
           msg.css({
             left: pos[0],
@@ -146,8 +146,10 @@ require([
           });
 
           setTimeout(function() {
+            coords.push(pos);
+
             msg.children().removeClass('enter').animate({opacity: 0}, function() {
-              //msg.remove();
+              msg.remove();
             });
           }, 5000);
         };
@@ -164,7 +166,8 @@ require([
 
         setInterval(function() {
           var msg = messages.shift();
-          generate(msg);
+          var pos = coords.shift();
+          generate(msg, pos);
           if (messages.length < 5) messages.push(msg);
         }, 2500);
       };
