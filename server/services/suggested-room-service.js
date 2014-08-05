@@ -112,12 +112,12 @@ var CATEGORIES = {
     return item.localeLanguage === context.localeLanguage ? 1 : 0;
   },
   highlighted: function(item) {
-    return item.highlighted ? 1 : 0;
+    return item.highlighted ? 0 : 1;
   }
 };
 
 var CATEGORY_COEFFICIENTS = {
-  userLanguage: 2
+  // use this to apply a multiplier to a category
 };
 
 function processCategory(name, items, context) {
