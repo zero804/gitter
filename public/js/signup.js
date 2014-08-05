@@ -1,11 +1,12 @@
 require([
   'jquery',
+  'utils/context',
   'utils/tracking' // no ref
  ],
-  function($) {
+  function($, context) {
     "use strict";
 
-    //function random(a) {return a[Math.floor(Math.random()*a.length)]; }
+    function random(a) {return a[Math.floor(Math.random()*a.length)]; }
 
     $('#arrow-1').click(function() {
       if (window.mixpanel) window.mixpanel.track('arrow-click', { arrow: 'arrow-1' });
@@ -14,6 +15,65 @@ require([
     $('#arrow-2').click(function() {
       if (window.mixpanel) window.mixpanel.track('arrow-click', { arrow: 'arrow-2' });
     });
+
+    var featuredRooms  = [{
+      uri: 'marionettejs/backbone.marionette',
+      language: 'JavaScript',
+      localeLanguage: 'en'
+    },{
+      uri: 'LaravelRUS/chat',
+      channel: true,
+      language: 'PHP',
+      localeLanguage: 'ru'
+    }, {
+      uri: 'gitterHQ/nodejs',
+      chanel: true,
+      language: 'JavaScript',
+      localeLanguage: 'en'
+    }, {
+      uri: 'lotus/chat',
+      chanel: true,
+      language: 'Ruby',
+      localeLanguage: 'en'
+    },{
+      uri: 'rom-rb/chat',
+      chanel: true,
+      language: 'Ruby',
+      localeLanguage: 'en'
+    }, {
+      uri: 'webpack/webpack',
+      language: 'JavaScript',
+      localeLanguage: 'en'
+    }, {
+      uri: 'ruby-vietnam/chat',
+      chanel: true,
+      language: 'Ruby',
+      localeLanguage: 'vi'
+    }, {
+      uri: 'require-lx/group',
+      language: 'JavaScript',
+      localeLanguage: 'en'
+    }, {
+      uri: 'angular-ui/ng-grid',
+      language: 'JavaScript',
+      localeLanguage: 'en'
+    }, {
+      uri: 'opscode/supermarket',
+      language: 'Ruby',
+      localeLanguage: 'en'
+    }, {
+      uri: 'MahApps/MahApps.Metro',
+      language: 'PowerShell',
+      localeLanguage: 'en'
+    }, {
+      uri: 'sympy/sympy',
+      language: 'Python',
+      localeLanguage: 'en'
+    }, {
+      uri: 'rogeriopvl/erebot',
+      language: 'JavaScript',
+      localeLanguage: 'es'
+    }];
 
     /**
      *   Main app stuff is in here
@@ -84,9 +144,8 @@ require([
         //  Fade in the background image
         me.bg.fadeIn(me.speeds.slow);//.resizeToParent();
 
-        //  @TODO
         //  Initiate the chat boxes
-        //  @TODO
+        me.embedChats();
 
         //  Make the apps panel start on scroll
         me.appsPanel();
@@ -117,15 +176,8 @@ require([
 
         var messages = [];
 
-        //  And have some random messages
-        //var messages = ['Hey guys, how’s it going?', 'Hey everyone!', 'Anyone looking at <b>#146</b>?',
-        //        'Did anyone see that ludicrous display last night?', '<code>sudo rm -rf /</code>'];
-
         var generate = function(chatMessage, pos) {
           var msg = $('<div class="msg" />');
-
-          // Add to the map
-          //this.appendTo(msg);
 
           var room = chatMessage.room.split('/').pop();
           var html = "<b>" + chatMessage.username + "</b> in <a href='/" + chatMessage.room + "'>" + room + "</a>";
@@ -166,12 +218,33 @@ require([
 
       };
 
+      this.embedChats = function() {
+        var navs = $('.communities-tabs a');
+
+        navs.each(function(i) {
+          if (i === 0) return;
+
+          var room = random(featuredRooms);
+          var roomName = room.uri.split('/').shift(); //.pop();
+          var roomOwner = room.uri.split('/').shift();
+
+          $(this).html(
+            '<img src="https://avatars.githubusercontent.com/' + roomOwner + '?s=48" width="48" height="48">' +
+            '<h3>' + roomName + '</h3>' +
+            '<em>' + room.language + '</em>');
+
+          $(this).click(function() {
+            $('#embedded-chat').attr({src: '/' + room.uri + '/~embed'});
+          })
+        });
+        
+      };
+
       //  And go!
       this.init();
     };
 
     new Gitter({});
-
 });
 
 
