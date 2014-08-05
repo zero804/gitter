@@ -4,7 +4,6 @@
 var sampleChatsService = require('../../services/sample-chats-service');
 
 module.exports =  function(req, res) {
-  console.log('*** OK');
   var samples = sampleChatsService.getSamples().reverse();
   res.send(samples);
 }
