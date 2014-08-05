@@ -191,9 +191,7 @@ function getPreferredComputerLanguages(suggestions) {
   return result;
 }
 
-
-function getSuggestions(user, localeLanguage) {
-
+function getSuggestedRepoMap(user) {
   var ghRepo  = new GithubRepo(user);
   return Q.all([
       ghRepo.getStarredRepos(),
@@ -216,47 +214,71 @@ function getSuggestions(user, localeLanguage) {
       watchedRepos.forEach(addSuggestion('is_watched_by_user'));
       ownedRepos.forEach(addSuggestion('is_owned_by_user'));
 
-      HILIGHTED_ROOMS.forEach(function(room) {
-        if(!suggestions[room.uri]) {
-          suggestions[room.uri] = { uri: room.uri, language: room.language };
-        }
-        suggestions[room.uri].localeLanguage = room.localeLanguage;
-        suggestions[room.uri].highlighted = true;
-      });
+      return suggestions;
+    });
+}
 
-      // Find suggestions that a) are not channels but b) don't have repos
-      var missingUris = _.values(suggestions).filter(function(item) {
-        return !item.channel && !item.repo;
-      }).map(function(item) {
-        return item.uri;
-      });
+function addHighlightedRooms(suggestionMap) {
+  HILIGHTED_ROOMS.forEach(function(room) {
+    if(!suggestionMap[room.uri]) {
+      suggestionMap[room.uri] = { uri: room.uri, language: room.language };
+    }
+    suggestionMap[room.uri].localeLanguage = room.localeLanguage;
+    suggestionMap[room.uri].highlighted = true;
+  });
 
-      return Q.all(missingUris.map(function(uri) {
-          return ghRepo.getRepo(uri)
-            .then(function(result) {
-              if(result) {
-                if(suggestions[uri]) {
-                  suggestions[uri].repo = result;
-                }
-              }
-            });
-        }))
-        .thenResolve(suggestions);
-    })
-    .then(function(suggestions) {
-      var uris = Object.keys(suggestions);
+  return suggestionMap;
+}
 
-      return findRooms(uris)
-        .then(function(rooms) {
-          rooms.forEach(function(room) {
-            suggestions[room.uri].room = room;
-          });
+function addMissingGithubData(suggestionMap, user) {
+  var ghRepo = new GithubRepo(user);
 
-          return _.values(suggestions);
+  // Find suggestions that a) are not channels but b) don't have repos
+  var missingUris = _.values(suggestionMap).filter(function(item) {
+    return !item.channel && !item.repo;
+  }).map(function(item) {
+    return item.uri;
+  });
+
+  return Q.all(missingUris.map(function(uri) {
+      return ghRepo.getRepo(uri)
+        .then(function(result) {
+          if(result) {
+            if(suggestionMap[uri]) {
+              suggestionMap[uri].repo = result;
+            }
+          }
         });
+    }))
+    .thenResolve(suggestionMap);
+}
 
+function addMissingGitterData(suggestionMap) {
+  var uris = Object.keys(suggestionMap);
+
+  return findRooms(uris)
+    .then(function(rooms) {
+      rooms.forEach(function(room) {
+        suggestionMap[room.uri].room = room;
+      });
     })
-    .then(function(suggestions) {
+    .thenResolve(suggestionMap);
+}
+
+
+function getSuggestions(user, localeLanguage) {
+
+  return getSuggestedRepoMap(user)
+    .then(function(suggestionMap) {
+      suggestionMap = addHighlightedRooms(suggestionMap);
+
+      return addMissingGithubData(suggestionMap, user);
+    })
+    .then(function(suggestionMap) {
+      return addMissingGitterData(suggestionMap);
+    })
+    .then(function(suggestionMap) {
+      var suggestions = _.values(suggestionMap);
       return filterSuggestions(suggestions, user);
     })
     .then(function(suggestions) {
