@@ -3,7 +3,6 @@
 
 var restSerializer   = require("../../serializers/rest-serializer");
 var repoService      = require("../../services/repo-service");
-var suggestedRoomService      = require("../../services/suggested-room-service");
 var createTextFilter = require('text-filter');
 
 function indexQuery(req, res, next) {
@@ -38,7 +37,7 @@ module.exports = {
     var strategyOptions = { currentUserId: req.user.id };
     if (req.query.include_users) strategyOptions.mapUsers = true;
 
-    suggestedRoomService.suggestedReposForUser(req.user)
+    repoService.getReposForUser(req.user)
       .then(function(repos) {
         var strategy = new restSerializer.GithubRepoStrategy(strategyOptions);
 
