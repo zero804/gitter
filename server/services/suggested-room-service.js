@@ -290,12 +290,12 @@ function getSuggestions(user, localeLanguage) {
         });
       });
 
-      suggestions = suggestions.filter(function(item) {
-        return item.categories >= 1;
-      });
-
       suggestions.forEach(function(item) {
-        item.score = item.score / item.categories;
+        if(item.categories) {
+          item.score = item.score / item.categories;
+        } else {
+          item.score = 0;
+        }
       });
 
       suggestions.sort(function(a, b) {
