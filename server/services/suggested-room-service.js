@@ -164,19 +164,18 @@ function findRooms(uriList) {
     }, { uri: 1, users: 1 });
 }
 
-function filterSuggestions(suggestions, user) {
+function removeUselessSuggestions(suggestions, user) {
   return suggestions.filter(function(suggestion) {
     if(suggestion.room) {
       // it's not a good room suggestion if the user is already in the room
       return !suggestion.room.containsUserId(user.id);
+    } else if(suggestion.repo) {
+      // if no room exists but a repo exists, then the user must be the repo admin to create that repo room
+      return suggestion.repo.permissions && suggestion.repo.permissions.admin;
+    } else {
+      // if no room exists and the user cannot create it, then its an impossible suggestion
+      return false;
     }
-
-    if(!suggestion.repo) return true; // No repo? It's a suggestion
-
-    if(suggestion.repo.permissions && suggestion.repo.permissions.admin) return true;
-
-    return false;
-
   });
 }
 
@@ -279,7 +278,7 @@ function getSuggestions(user, localeLanguage) {
     })
     .then(function(suggestionMap) {
       var suggestions = _.values(suggestionMap);
-      return filterSuggestions(suggestions, user);
+      return removeUselessSuggestions(suggestions, user);
     })
     .then(function(suggestions) {
       var preferredComputerLanguages = getPreferredComputerLanguages(suggestions);
