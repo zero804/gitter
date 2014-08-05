@@ -21,17 +21,17 @@ var HILIGHTED_ROOMS = [{
   localeLanguage: 'ru'
 }, {
   uri: 'gitterHQ/nodejs',
-  chanel: true,
+  channel: true,
   language: 'JavaScript',
   localeLanguage: 'en'
 }, {
   uri: 'lotus/chat',
-  chanel: true,
+  channel: true,
   language: 'Ruby',
   localeLanguage: 'en'
 },{
   uri: 'rom-rb/chat',
-  chanel: true,
+  channel: true,
   language: 'Ruby',
   localeLanguage: 'en'
 }, {
@@ -40,7 +40,7 @@ var HILIGHTED_ROOMS = [{
   localeLanguage: 'en'
 }, {
   uri: 'ruby-vietnam/chat',
-  chanel: true,
+  channel: true,
   language: 'Ruby',
   localeLanguage: 'vi'
 }, {
