@@ -5,7 +5,7 @@ require([
   'log!router-chat',
   'views/app/chatIntegratedView',
   'views/chat/chatCollectionView',
-  'collections/instances/integrated-items',
+  'collections/chat',
 
   'views/chat/decorators/webhookDecorator',
   'views/chat/decorators/issueDecorator',
@@ -22,28 +22,31 @@ require([
   'components/bug-reporting',   // No ref
   'components/ajax-errors',     // No ref
 
-], function($, Backbone, context, log, ChatIntegratedView, ChatCollectionView, itemCollections,
+], function($, Backbone, context, log, ChatIntegratedView, ChatCollectionView, chatModels,
   webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator,
   HistoryLimitView) {
   
   "use strict";
 
   new ChatIntegratedView({ el: 'body' });
+  
+  var chatCollection = new chatModels.ChatCollection(null, { listen: true });
+  chatCollection.listen();
 
   var chatCollectionView = new ChatCollectionView({
     el: $('.js-chat-container'),
-    collection: itemCollections.chats,
-    userCollection: itemCollections.users,
+    collection: chatCollection,
+    // userCollection: itemCollections.users, // do we need the user collection?
     decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator],
   }).render();
   
-  itemCollections.chats.on('add', function (item) {
+  chatCollection.on('add', function (item) {
     setTimeout(item.set.bind(item, 'unread', false), 500);
   });
 
   new HistoryLimitView.Top({
     el: '#limit-banner',
-    collection: itemCollections.chats,
+    collection: chatCollection,
     chatCollectionView: chatCollectionView
   }).render();
   
