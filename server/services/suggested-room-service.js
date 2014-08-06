@@ -182,6 +182,7 @@ function removeUselessSuggestions(suggestions, user) {
 function getPreferredComputerLanguages(suggestions) {
   var result = {};
   suggestions.forEach(function(item) {
+    if(!item.is_starred_by_user || !item.is_watched_by_user || !item.is_owned_by_user) return;
     var repo = item.repo;
     if(!repo || !repo.language) return;
     result[repo.language] = result[repo.language] ? result[repo.language] + 1 : 1;
