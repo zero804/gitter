@@ -18,59 +18,72 @@ require([
 
     var featuredRooms  = [{
       uri: 'marionettejs/backbone.marionette',
+      shortName: 'Marionette',
       language: 'JavaScript',
       localeLanguage: 'en'
     },{
       uri: 'LaravelRUS/chat',
+      shortName: 'LaravelRUS',
       channel: true,
       language: 'PHP',
       localeLanguage: 'ru'
     }, {
       uri: 'gitterHQ/nodejs',
+      shortName: '#nodejs',
       chanel: true,
       language: 'JavaScript',
       localeLanguage: 'en'
     }, {
       uri: 'lotus/chat',
+      shortName: 'Lotus',
       chanel: true,
       language: 'Ruby',
       localeLanguage: 'en'
     },{
       uri: 'rom-rb/chat',
+      shortName: 'rom-rb',
       chanel: true,
       language: 'Ruby',
       localeLanguage: 'en'
     }, {
       uri: 'webpack/webpack',
+      shortName: 'WebPack',
       language: 'JavaScript',
       localeLanguage: 'en'
     }, {
       uri: 'ruby-vietnam/chat',
+      shortName: 'Ruby Vietnam',
       chanel: true,
       language: 'Ruby',
       localeLanguage: 'vi'
     }, {
       uri: 'require-lx/group',
+      shortName: 'require-lx',
       language: 'JavaScript',
       localeLanguage: 'en'
     }, {
       uri: 'angular-ui/ng-grid',
+      shortName: 'Angular UI',
       language: 'JavaScript',
       localeLanguage: 'en'
     }, {
       uri: 'opscode/supermarket',
+      shortName: 'Supermarket',
       language: 'Ruby',
       localeLanguage: 'en'
     }, {
       uri: 'MahApps/MahApps.Metro',
+      shortName:'MahApps.Metro',
       language: 'PowerShell',
       localeLanguage: 'en'
     }, {
       uri: 'sympy/sympy',
+      shortName: 'Sympy',
       language: 'Python',
       localeLanguage: 'en'
     }, {
       uri: 'rogeriopvl/erebot',
+      shortName: 'erebot',
       language: 'JavaScript',
       localeLanguage: 'es'
     }];
@@ -222,15 +235,19 @@ require([
         var navs = $('.communities-tabs a');
 
         navs.each(function(i) {
-          if (i === 0) return;
+          if (i === 0) {
+            $(this).click(function() {
+              $('#embedded-chat').attr({src: '/gitterHQ/gitter/~embed'});
+            })
+            return;
+          }
 
           var room = random(featuredRooms);
-          var roomName = room.uri.split('/').shift(); //.pop();
           var roomOwner = room.uri.split('/').shift();
 
           $(this).html(
             '<img src="https://avatars.githubusercontent.com/' + roomOwner + '?s=48" width="48" height="48">' +
-            '<h3>' + roomName + '</h3>' +
+            '<h3>' + room.shortName + '</h3>' +
             '<em>' + room.language + '</em>');
 
           $(this).click(function() {
