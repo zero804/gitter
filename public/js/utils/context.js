@@ -156,8 +156,17 @@ define([
   };
 
   context.getAccessToken = function(callback) {
-    var token = window.bearerToken || ctx.accessToken;
-    callback(token);
+    var iterations = 0;
+    function checkToken() {
+      // This is a very rough first attempt
+      var token = window.bearerToken || ctx.accessToken;
+      if(token) return callback(token);
+
+      iterations++;
+      if(iterations > 5) return window.reload(true);
+      setTimeout(checkToken, 100);
+    }
+    checkToken();
   };
 
   context.isLoggedIn = function() {
