@@ -42,12 +42,8 @@
               <a href="#apps-panel">Apps</a>
             </div>
 
-            <a class="btn login tooltip-container" href="/login/github?action=login">
+            <a class="btn login" href="/login/github?action=login">
               <b>Log in</b> <span class="no-small">with Github</span>
-
-              <span class="tooltip bottom">
-                By clicking &ldquo;Log in&rdquo;, you agree to our Terms and Conditions.
-              </span>
             </a>
           </div>
         </nav>
@@ -60,13 +56,15 @@
           <h1>{{ __ "Where developers come to talk." }}</h1>
           <p>We host thousands of public communities where developers from all around the world come together to talk about the future of programming, build better products, and share the best cat GIFs</a>.</p>
 
-          <a class="btn signup tooltip-container" href="/login/github?action=signup&button=1">
+          <a class="btn signup" href="/login/github?action=signup&button=1">
             <img src="{{cdn 'images/2/gitter/home/github.png'}}"> <b>Sign up</b> with Github
-
-            <span class="tooltip bottom">
-              By clicking &ldquo;Sign up&rdquo;, you agree to our Terms and Conditions.
-            </span>
           </a>
+          <div class="legal">
+            <span>
+              By signing up you agree to our <a href="https://gitter.zendesk.com/hc/en-us/sections/200274872-Legal-documentation" target="_blank">Terms and Conditions</a>.
+            </span>
+          </div>
+
 
           <ul class="mini-features-list">
             <li>
@@ -233,7 +231,7 @@
 
               <ul>
                 <li><b>Unlimited</b> public rooms</li>
-                <li><b>0</b> private rooms</li>
+                <li><b>1</b> private room*</li>
                 <li><b>2 weeks’</b> chat history</li>
               </ul>
 
@@ -252,9 +250,8 @@
 
               <ul>
                 <li><b>Unlimited</b> public rooms</li>
-                <li><b>Unlimited</b> private chats</li>
-                <li><b>0</b> private rooms</li>
-                <li><b>2 weeks’</b> chat history</li>
+                <li><b>Unlimited</b> private rooms**</li>
+                <li><b>Unlimited</b> chat history</li>
               </ul>
 
               <a class="btn signup full" href="#"><b>Get started</b> for free</a>
@@ -266,7 +263,7 @@
 
             <article class="price mix">
               <header>
-                <b>Startup</b>
+                <b>Bronze</b>
 
                 <h1>
                   $2
@@ -276,8 +273,7 @@
 
               <ul>
                 <li><b>Unlimited</b> public rooms</li>
-                <li><b>Unlimited</b> private rooms</li>
-                <li><b>Unlimited</b> users</li>
+                <li><b>Unlimited</b> private rooms***</li>
                 <li><b>6 months’</b> chat history</li>
               </ul>
 
@@ -286,7 +282,7 @@
 
             <article class="price orange">
               <header>
-                <b>Big leagues</b>
+                <b>Silver</b>
 
                 <h1>
                   $5
@@ -296,14 +292,20 @@
 
               <ul>
                 <li><b>Unlimited</b> public rooms</li>
-                <li><b>Unlimited</b> private rooms</li>
-                <li><b>Unlimited</b> users</li>
-                <li><b>6 months’</b> chat history</li>
-                <li><b>Integration</b> support</li>
+                <li><b>Unlimited</b> private rooms***</li>
+                <li><b>Unlimited</b> chat history</li>
               </ul>
 
               <a class="btn signup full" href="#"><b>Get started</b> for free</a>
             </article>
+          </div>
+          <div class="fine-print">
+            <p>* Our free plan includes one private room per organisation you belong to on GitHub</p>
+            <p>** Our Individual plan allows you to create private rooms using your personal account as the owner</p>
+            <p>*** Our organisation plans allow you to create private rooms using your GitHub organisation as the owner</p>
+            <div class="legal">
+              By signing up you agree to our <a href="https://gitter.zendesk.com/hc/en-us/sections/200274872-Legal-documentation" target="_blank">Terms and Conditions</a>.
+            </div>
           </div>
         </div>
       </section>
@@ -321,7 +323,7 @@
 
           <h1>Get Gitter now!</h1>
           <p>Gitter is available in all modern browsers as well as apps for desktops and mobile phones.</p>
-          <p>We currently have a apps for OSX, iOS and Chrome and are working on Android, Linux and Windows.</p>
+          <p>We currently have apps for OSX, iOS and Chrome and are working on Android, Linux and Windows. We also have a sweet little <a href="https://irc.gitter.im" target="_blank">IRC bridge</a>.</p>
 
           <p>
             <a class="btn secondary osx" href="/apps">Download <span class="no-small">(OS X)</span></a>
@@ -334,7 +336,7 @@
         <div class="wrap">
           <h1>By developers, for developers</h1>
           <p>Gitter is built in London by a team of developers just like you. Hell even the product guy writes code, although we generally end up rewriting those bits.
-          <p>If you're even around Silicon Roundabout, give us a shout, we love meeting up with other developers.</p>
+          <p>If you're ever around Silicon Roundabout, give us a shout, we love meeting up with other developers.</p>
 
           <ul class="team">
             <li>
@@ -388,9 +390,9 @@
             <span>&copy; 2014 Troupe Technology Ltd. All rights reserved.</span>
 
             <a href="http://suport.gitter.im" target="_blank">Support</a>
-            <a href="https://developer.gitter.im">API</a>
-            <a href="/blog">Blog</a>
-            <a href="/twitter">Twitter</a>
+            <a href="https://developer.gitter.im" target="_blank">API</a>
+            <a href="https://blog.gitter.im" target="_blank">Blog</a>
+            <a href="https://twitter.com/gitchat" target="_blank">Twitter</a>
           </small>
         </div>
       </footer>
