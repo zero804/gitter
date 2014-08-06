@@ -18,75 +18,95 @@ require([
 
     var featuredRooms  = [{
       uri: 'marionettejs/backbone.marionette',
-      shortName: 'Marionette',
+      name: 'Marionette',
       language: 'JavaScript',
-      localeLanguage: 'en'
+      locale: 'en'
     },{
       uri: 'LaravelRUS/chat',
-      shortName: 'LaravelRUS',
+      name: 'LaravelRUS',
       channel: true,
       language: 'PHP',
-      localeLanguage: 'ru'
+      locale: 'ru'
     }, {
       uri: 'gitterHQ/nodejs',
-      shortName: '#nodejs',
+      name: '#nodejs',
       chanel: true,
       language: 'JavaScript',
-      localeLanguage: 'en'
+      locale: 'en'
     }, {
       uri: 'lotus/chat',
-      shortName: 'Lotus',
+      name: 'Lotus',
       chanel: true,
       language: 'Ruby',
-      localeLanguage: 'en'
+      locale: 'en'
     },{
       uri: 'rom-rb/chat',
-      shortName: 'rom-rb',
+      name: 'rom-rb',
       chanel: true,
       language: 'Ruby',
-      localeLanguage: 'en'
+      locale: 'en'
     }, {
       uri: 'webpack/webpack',
-      shortName: 'WebPack',
+      name: 'WebPack',
       language: 'JavaScript',
-      localeLanguage: 'en'
+      locale: 'en'
     }, {
       uri: 'ruby-vietnam/chat',
-      shortName: 'Ruby Vietnam',
+      name: 'Ruby Vietnam',
       chanel: true,
       language: 'Ruby',
-      localeLanguage: 'vi'
+      locale: 'vi'
     }, {
       uri: 'require-lx/group',
-      shortName: 'require-lx',
+      name: "require('lx')",
       language: 'JavaScript',
-      localeLanguage: 'en'
+      locale: 'en'
     }, {
       uri: 'angular-ui/ng-grid',
-      shortName: 'Angular UI',
+      name: 'Angular UI',
       language: 'JavaScript',
-      localeLanguage: 'en'
+      locale: 'en'
     }, {
       uri: 'opscode/supermarket',
-      shortName: 'Supermarket',
+      name: 'Supermarket',
       language: 'Ruby',
-      localeLanguage: 'en'
+      locale: 'en'
     }, {
       uri: 'MahApps/MahApps.Metro',
-      shortName:'MahApps.Metro',
+      name:'MahApps.Metro',
       language: 'PowerShell',
-      localeLanguage: 'en'
+      locale: 'en'
     }, {
       uri: 'sympy/sympy',
-      shortName: 'Sympy',
+      name: 'Sympy',
       language: 'Python',
-      localeLanguage: 'en'
+      locale: 'en'
     }, {
       uri: 'rogeriopvl/erebot',
-      shortName: 'erebot',
+      name: 'erebot',
       language: 'JavaScript',
-      localeLanguage: 'es'
+      locale: 'es'
     }];
+
+    var active = [];
+ 
+    function roomByLocale(locale) {
+      var _room;
+      featuredRooms.forEach(function(room) {
+        if (room.locale === locale) _room = room;
+      });
+      return _room || randomRoom();
+    }
+
+    function randomRoom() {
+      var room = random(featuredRooms);
+      if (active.indexOf(room.name) === -1) {
+        active.push(room.name);
+        return room;
+      } else {
+        return randomRoom();
+      }
+    }
 
     /**
      *   Main app stuff is in here
@@ -234,27 +254,34 @@ require([
       this.embedChats = function() {
         var navs = $('.communities-tabs a');
 
-        navs.each(function(i) {
-          if (i === 0) {
-            $(this).click(function() {
-              $('#embedded-chat').attr({src: '/gitterHQ/gitter/~embed'});
-            })
-            return;
-          }
+        function link(a, room) {
+          var owner = room.uri.split('/').shift();
 
-          var room = random(featuredRooms);
-          var roomOwner = room.uri.split('/').shift();
-
-          $(this).html(
-            '<img src="https://avatars.githubusercontent.com/' + roomOwner + '?s=48" width="48" height="48">' +
-            '<h3>' + room.shortName + '</h3>' +
+          $(a).html(
+            '<img src="https://avatars.githubusercontent.com/' + owner + '?s=48" width="48" height="48">' +
+            '<h3>' + room.name + '</h3>' +
             '<em>' + room.language + '</em>');
 
-          $(this).click(function() {
+          $(a).click(function() {
             $('#embedded-chat').attr({src: '/' + room.uri + '/~embed'});
-          })
-        });
-        
+          });
+        }
+
+        var a0 = navs[0];
+        var room0 = {name: 'GitterHQ', uri: 'gitterHQ/gitter', language: "Let's talk about Gitter!"}
+        link(a0, room0);
+
+        var a1 = navs[1];
+        var room1 = roomByLocale(context.lang());
+        link(a1, room1);
+
+        var a2 = navs[2];
+        var room2 = randomRoom();
+        link(a2, room2);
+
+        var a3 = navs[3];
+        var room3 = randomRoom();
+        link(a3, room3);
       };
 
       //  And go!
@@ -263,6 +290,3 @@ require([
 
     new Gitter({});
 });
-
-
-
