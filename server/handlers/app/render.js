@@ -95,7 +95,8 @@ function renderMainFrame(req, res, next, frame) {
 function renderChat(req, res, opts, next) {
   var troupe = req.uriContext.troupe;
   var aroundId = req.query.at;
-  var embedded = opts.embedded;
+  var embedded = (typeof opts.embedded !== 'undefined') ? opts.embedded : false;
+  var extras = (typeof opts.extras !== 'undefined') ? opts.extras : {};
   
   var user = req.user;
   var userId = user && user.id;
@@ -107,8 +108,8 @@ function renderChat(req, res, opts, next) {
   };
 
   Q.all([
-    contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions } }),
-    restful.serializeChatsForTroupe(troupe.id, userId, snapshotOptions)
+      contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, embedded: embedded }),
+      restful.serializeChatsForTroupe(troupe.id, userId, snapshotOptions)
     ]).spread(function (troupeContext, chats) {
       
       var initialChat = _.find(chats, function(chat) { return chat.initial; });
@@ -122,7 +123,7 @@ function renderChat(req, res, opts, next) {
       
       if (!user) classNames.push("logged-out");
       
-      res.render(opts.template, {
+      res.render(opts.template, _.extend({
         isRepo: troupe.githubType === 'REPO',
         appCache: getAppCache(req),
         bootScriptName: opts.script,
@@ -137,7 +138,7 @@ function renderChat(req, res, opts, next) {
         chats: burstCalculator(chats),
         classNames: classNames.join(' '),
         agent: req.headers['user-agent'],
-      });
+      }, extras));
 
     })
     .fail(next);
@@ -227,7 +228,10 @@ function renderEmbeddedChat(req, res, next) {
     template: 'chat-embed-template',
     script: 'router-embed-chat',
     embedded: true,
-    classNames: [ 'embedded' ]
+    classNames: [ 'embedded' ],
+    extras: {
+      usersOnline: req.troupe.users.length
+    }
   }, next);
 }
 

@@ -226,6 +226,8 @@ define([
     },
 
     getEditTooltip: function() {
+      if (this.isEmbedded()) return "You can't edit on embedded chats.";
+      
       if(this.hasBeenEdited()) {
         return "Edited shortly after being sent";
       }
@@ -266,6 +268,10 @@ define([
       var age = Date.now() - this.model.get('sent').valueOf();
       return age <= EDIT_WINDOW;
     },
+    
+    isEmbedded: function () {
+      return context().embedded;
+    },
 
     isOld: function() {
       var age = Date.now() - this.model.get('sent').valueOf();
@@ -273,7 +279,7 @@ define([
     },
 
     canEdit: function() {
-      return this.isOwnMessage() && this.isInEditablePeriod();
+      return this.isOwnMessage() && this.isInEditablePeriod() && !this.isEmbedded();
     },
 
     hasBeenEdited: function() {
