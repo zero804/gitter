@@ -26,11 +26,14 @@
 @import "menu-list-item";
 @import "chat";
 @import "chat-container";
+@import "chat-header";
 @import "chat-item";
 @import "chat-input";
-@import "chat-header";
+@import "chat-embed";
 @import "welcome-tips";
 /* end of new stuff*/
+
+@embedded_footer_height: 78px; // this determines the height of the embed footer, as well as its position and the position for the content panel
 
 .border-box-sizing() {
   -moz-box-sizing: border-box;
@@ -607,7 +610,7 @@ body.logged-out {
 }
 
 body.embedded {
-  .trpContentPanel { bottom: 0; } 
+  .trpContentPanel { bottom: @embedded_footer_height } 
 }
 
 .trpButtonMedium, .trpButtonBig {

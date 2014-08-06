@@ -28,6 +28,7 @@ module.exports = {
     expressHbs.registerHelper('generateTroupeContext', require('./hbs-helpers').generateTroupeContext);
     expressHbs.registerAsyncHelper('prerenderView', require('./prerender-helper'));
     expressHbs.registerHelper('chatItemPrerender', require('./prerender-chat-helper'));
+    expressHbs.registerHelper('pluralize', require('./hbs-helpers').pluralize);
 
     app.locals({
       googleTrackingId: config.get("web:trackingId"),

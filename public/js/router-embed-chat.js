@@ -41,6 +41,7 @@ require([
   }).render();
   
   chatCollection.on('add', function (item) {
+    console.log(item);
     setTimeout(item.set.bind(item, 'unread', false), 500);
   });
 
