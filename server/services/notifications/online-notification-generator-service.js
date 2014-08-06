@@ -28,6 +28,7 @@ var titleTemplates = compile({
   "chat": "{{#if troupe.oneToOne}}New chat from {{{fromUser.displayName}}}{{else}}New chat on {{{troupe.uri}}}{{/if}}"
 });
 
+// TODO: get rid of this...
 var linkTemplates = compile({
   "chat": "{{{troupeUrl}}}"
 });

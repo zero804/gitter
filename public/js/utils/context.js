@@ -155,12 +155,9 @@ define([
     return window.troupeEnv && window.troupeEnv[envName];
   };
 
-  context.getAccessToken = function() {
-    return context.getBearerToken() || ctx.accessToken;
-  };
-
-  context.getBearerToken = function() {
-    return window.bearerToken;
+  context.getAccessToken = function(callback) {
+    var token = window.bearerToken || ctx.accessToken;
+    callback(token);
   };
 
   context.isLoggedIn = function() {
