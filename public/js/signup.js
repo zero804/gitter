@@ -188,7 +188,7 @@ require([
         var pos = me.apps.position().top;
         var win = $(window);
         var offset = 150;
-
+        // we need to listen to this only until the class is added
         win.scroll(function() {
           if(win.scrollTop() + offset >= pos) {
             me.apps.addClass('visible');
