@@ -15,14 +15,14 @@ function createClient(token, options) {
 
 module.exports = exports = {
   user: function(user, options) {
-    if(!user) return createClient(null, options);
+    if(!user) return createClient(undefined, options);
 
     assert(user, 'user required');
     var token = user.githubUserToken || user.githubToken;
     return createClient(token, options);
   },
   full: function(user, options) {
-    if(!user) return createClient(null, options);
+    if(!user) return createClient(undefined, options);
 
     assert(user, 'user required');
     var token = user.githubToken || user.githubUserToken;
