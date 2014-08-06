@@ -50,9 +50,13 @@ define([
           itemCollections.events.off('add reset sync', null, this);
         } else {
           if (context().permissions.admin) {
+            if(context().isNativeDesktopApp) {
+              this.$el.find('#activity-tip a').attr({target: '_blank'});
+            }
             this.$el.find('#activity-header').show();
             this.$el.find('#activity-tip').show();
           }
+
         }
       }, this);
     },
