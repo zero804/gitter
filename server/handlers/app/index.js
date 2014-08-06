@@ -17,7 +17,7 @@ function saveRoom(req) {
 }
 
 function isNewUser(user, callback) {
-  recentRoomService.findBestTroupeForUser(user)
+  return recentRoomService.findBestTroupeForUser(user)
     .then(function(room) {
       return !room;
     })
