@@ -9,6 +9,7 @@ var badCredentialsCheck = require('./bad-credentials-check');
 function GitHubRepoService(user) {
   this.user = user;
   this.client = createClient.full(user);
+  this.firstPageClient = createClient.full(user, { firstPageOnly: true });
 }
 
 
@@ -79,10 +80,10 @@ function getIssuesWithState(repo, state) {
 };
 
 
-GitHubRepoService.prototype.getStarredRepos = function() {
+GitHubRepoService.prototype.getRecentlyStarredRepos = function() {
   var d = Q.defer();
 
-  var ghme = this.client.me();
+  var ghme = this.firstPageClient.me();
   ghme.starred(createClient.makeResolver(d));
 
   return d.promise
