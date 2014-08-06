@@ -5,6 +5,7 @@ var troupeService = require("../../services/troupe-service");
 var restful = require("../../services/restful");
 var restSerializer = require("../../serializers/rest-serializer");
 var recentRoomService = require('../../services/recent-room-service');
+var suggestedRoomService = require('../../services/suggested-room-service');
 var roomService = require('../../services/room-service');
 var removeService = require('../../services/remove-service');
 var Q = require('q');
@@ -14,6 +15,18 @@ module.exports = {
   index: function(req, res, next) {
     if(!req.user) {
       return res.send(403);
+    }
+
+    if(req.query.suggested) {
+      return suggestedRoomService.getSuggestions(req.user, req.i18n.getLocale())
+        .then(function(repos) {
+          var strategy = new restSerializer.SuggestedRoomStrategy();
+          return restSerializer.serialize(repos, strategy);
+        })
+        .then(function(serialized) {
+          res.send(serialized);
+        })
+        .fail(next);
     }
 
     restful.serializeTroupesForUser(req.resourceUser.id)
