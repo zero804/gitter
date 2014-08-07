@@ -303,7 +303,7 @@ function getSuggestions(user, localeLanguage) {
         return b.score - a.score;
       });
 
-      return suggestions.slice(0, 6);
+      return suggestions.slice(0, 8);
     });
 }
 
