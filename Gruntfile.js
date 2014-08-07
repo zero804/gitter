@@ -333,7 +333,7 @@ module.exports = function( grunt ) {
           "public/bootstrap/css/archive.css" : "public/bootstrap/less/archive.less",
           "public/bootstrap/css/mtrp.css": "public/bootstrap/less/mtrp.less",
           "public/bootstrap/css/signup.css": "public/bootstrap/less/signup.less",
-          "public/bootstrap/css/trpHomePage.css": "public/bootstrap/less/trpHomePage.less",
+          "public/bootstrap/css/homepage.css": "public/bootstrap/less/homepage.less",
           "public/bootstrap/css/trpAppsPage.css": "public/bootstrap/less/trpAppsPage.less",
           "public/bootstrap/css/trpChat.css": "public/bootstrap/less/trpChat.less",
           "public/bootstrap/css/trpFiles.css": "public/bootstrap/less/trpFiles.less",
