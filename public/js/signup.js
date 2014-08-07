@@ -6,7 +6,7 @@ require([
   function($, context) {
     "use strict";
 
-    function random(a) {return a[Math.floor(Math.random()*a.length)]; }
+    function random(a) {return a[Math.floor(Math.random() * a.length)]; }
 
     $('#arrow-1').click(function() {
       if (window.mixpanel) window.mixpanel.track('arrow-click', { arrow: 'arrow-1' });
@@ -15,81 +15,83 @@ require([
     $('#arrow-2').click(function() {
       if (window.mixpanel) window.mixpanel.track('arrow-click', { arrow: 'arrow-2' });
     });
-
-    var featuredRooms  = [{
-      uri: 'marionettejs/backbone.marionette',
-      name: 'Marionette',
-      language: 'JavaScript',
-      locale: 'en'
-    },{
-      uri: 'LaravelRUS/chat',
-      name: 'LaravelRUS',
-      channel: true,
-      language: 'PHP',
-      locale: 'ru'
-    }, {
-      uri: 'gitterHQ/nodejs',
-      name: '#nodejs',
-      chanel: true,
-      language: 'JavaScript',
-      locale: 'en'
-    }, {
-      uri: 'lotus/chat',
-      name: 'Lotus',
-      chanel: true,
-      language: 'Ruby',
-      locale: 'en'
-    },{
-      uri: 'rom-rb/chat',
-      name: 'rom-rb',
-      chanel: true,
-      language: 'Ruby',
-      locale: 'en'
-    }, {
-      uri: 'webpack/webpack',
-      name: 'WebPack',
-      language: 'JavaScript',
-      locale: 'en'
-    }, {
-      uri: 'ruby-vietnam/chat',
-      name: 'Ruby Vietnam',
-      chanel: true,
-      language: 'Ruby',
-      locale: 'vi'
-    }, {
-      uri: 'require-lx/group',
-      name: "require('lx')",
-      language: 'JavaScript',
-      locale: 'en'
-    }, {
-      uri: 'angular-ui/ng-grid',
-      name: 'Angular UI',
-      language: 'JavaScript',
-      locale: 'en'
-    }, {
-      uri: 'opscode/supermarket',
-      name: 'Supermarket',
-      language: 'Ruby',
-      locale: 'en'
-    }, {
-      uri: 'MahApps/MahApps.Metro',
-      name:'MahApps.Metro',
-      language: 'PowerShell',
-      locale: 'en'
-    }, {
-      uri: 'sympy/sympy',
-      name: 'Sympy',
-      language: 'Python',
-      locale: 'en'
-    }, {
-      uri: 'rogeriopvl/erebot',
-      name: 'erebot',
-      language: 'JavaScript',
-      locale: 'es'
-    }];
+    
+    var featuredRooms  = [
+      { uri: 'marionettejs/backbone.marionette',
+        name: 'Marionette',
+        language: 'JavaScript',
+        locale: 'en'
+      },
+      { uri: 'LaravelRUS/chat',
+        name: 'LaravelRUS',
+        channel: true,
+        language: 'PHP',
+        locale: 'ru'
+      },
+      { uri: 'gitterHQ/nodejs',
+        name: '#nodejs',
+        chanel: true,
+        language: 'JavaScript',
+        locale: 'en'
+      },
+      { uri: 'lotus/chat',
+        name: 'Lotus',
+        chanel: true,
+        language: 'Ruby',
+        locale: 'en'
+      },
+      { uri: 'rom-rb/chat',
+        name: 'rom-rb',
+        chanel: true,
+        language: 'Ruby',
+        locale: 'en'
+      },
+      { uri: 'webpack/webpack',
+        name: 'WebPack',
+        language: 'JavaScript',
+        locale: 'en'
+      },
+      { uri: 'ruby-vietnam/chat',
+        name: 'Ruby Vietnam',
+        chanel: true,
+        language: 'Ruby',
+        locale: 'vi'
+      },
+      { uri: 'require-lx/group',
+        name: "require('lx')",
+        language: 'JavaScript',
+        locale: 'en'
+      },
+      { uri: 'angular-ui/ng-grid',
+        name: 'Angular UI',
+        language: 'JavaScript',
+        locale: 'en'
+      },
+      { uri: 'opscode/supermarket',
+        name: 'Supermarket',
+        language: 'Ruby',
+        locale: 'en'
+      },
+      { uri: 'MahApps/MahApps.Metro',
+        name:'MahApps.Metro',
+        language: 'PowerShell',
+        locale: 'en'
+      },
+      { uri: 'sympy/sympy',
+        name: 'Sympy',
+        language: 'Python',
+        locale: 'en'
+      },
+      { uri: 'rogeriopvl/erebot',
+        name: 'erebot',
+        language: 'JavaScript',
+        locale: 'es'
+      }
+    ];
 
     var active = [];
  
+    // TODO: malditogeek comment
     function roomByLocale(locale) {
       var rooms = featuredRooms.filter(function(r) { return r.locale === locale;});
       if (rooms.length) {
@@ -100,6 +102,7 @@ require([
       } 
     }
 
+    // TODO: malditogeek comment
     function randomRoom() {
       var room = random(featuredRooms);
       if (active.indexOf(room.name) === -1) {
@@ -111,59 +114,42 @@ require([
     }
 
     /**
-     *   Main app stuff is in here
+     *  Gitter() hadnles front-page client-side stuff
+     *  inside the scope of Gitter we have a window argument which is simply
      */
-    var Gitter = function() {
-      /**
-       *   Cache the "this" object for when context changes
-       */
-      var me = this;
-
-      /**
-       *   Where do we append our elements?
-       */
-      this.mapEl = $('.map');
-      this.bg = $('#intro-panel > .bg');
-      this.apps = $('#apps-panel');
-
-      this.speeds = {
-        default: 350,
-        fast: 150,
-        slow: 800
+    var Gitter = function (window) {
+      // ui elements
+      var ui = {
+        map: $('.map'),
+        apps: $('#apps-panel'),
+        blockquotes: $('#testimonials-panel blockquote'),
+        integration: $('.loves li')
       };
 
-      /**
-       *   What happens when we start up?
-       */
+      // initialises all the things
       this.init = function() {
-        //  Wait until all images have loaded
-        $(window).ready(this.onLoad);
-
-        //  Start the map conversation thing
-        this.map();
-
-        //  Cycle blockquotes
-        this.cycle($('#testimonials-panel blockquote'), 7000);
-        this.cycle($('.loves li'), 2500);
-
-        $('.team a').attr('target', '_blank');
+        this.embedChats(); // embedded chats
+        this.appsPanel(); // #app-panel for animation
+        this.map(); //  map conversations
+        
+        this.cycle(ui.blockquotes, 7000); // cycle blockquotes
+        this.cycle(ui.integration, 2500); // cycle blockquotes
 
         $('.tooltip-container').on('mouseout', function() {
-          var me = $(this);
-
-          me.addClass('out');
-          setTimeout(function() { me.removeClass('out'); }, 400);
-        }).on('mouseover', function() {
+          $(this).addClass('out');
+          setTimeout(function () { $(this).removeClass('out'); }, 400);
+        }).on('mouseover', function () {
           $(this).removeClass('out');
         });
       };
 
+      // TODO: comment, since "el designer" was the author
       this.cycle = function(el, speed) {
         el.first().addClass('visible');
 
         el.parent().css('height', el.outerHeight());
 
-        setInterval(function() {
+        setInterval(function () {
           var active = el.filter('.visible').removeClass('visible').addClass('going');
           var target = active.next();
 
@@ -175,32 +161,25 @@ require([
         }, speed || 4000);
       };
 
-      this.onLoad = function() {
-        //  Fade in the background image
-        me.bg.fadeIn(me.speeds.slow);//.resizeToParent();
-
-        //  Initiate the chat boxes
-        me.embedChats();
-
-        //  Make the apps panel start on scroll
-        me.appsPanel();
-      };
-
-      this.appsPanel = function() {
-        var pos = me.apps.position().top;
-        var win = $(window);
-        var offset = 150;
-        // we need to listen to this only until the class is added
-        win.scroll(function() {
-          if(win.scrollTop() + offset >= pos) {
-            me.apps.addClass('visible');
+      // handles the sliding of the devices onto #apps-panel
+      this.appsPanel = function () {
+        var POS = ui.apps.position().top;
+        var OFFSET = 150;
+        
+        // handleScroll() handles the scrolling event, adds the visible class and detaches itself from the window
+        function handleScroll (e) {
+          e.preventDefault();
+          if (window.scrollTop() + OFFSET >= POS) {
+            ui.apps.addClass('visible');
+            window.off('scroll', handleScroll);
           }
-        });
+        }
+        
+        // if the div hasn't got the class visible the attach event listener
+        if (!ui.apps.hasClass('visible')) window.on('scroll', handleScroll);
       };
 
-      /**
-       *   Generate pseudo-random conversations
-       */
+      // generates pseudo-random conversations for the map TODO: malditogeek comment
       this.map = function() {
         //  Make sure we don't randomly generate people in the ocean
         var coords = [
@@ -224,7 +203,7 @@ require([
           msg.css({
             left: pos[0],
             top: pos[1]
-          }).appendTo(me.mapEl);
+          }).appendTo(ui.map);
 
           span.css('left', (400 - span.outerWidth()) / 2);
 
@@ -242,17 +221,18 @@ require([
           }, 5000);
         };
 
-        $.get('/api/private/sample-chats', function(data) {
+        /* fetches sample chats and sets an interval to loop through them */
+        $.get('/api/private/sample-chats', function (data) {
           messages = data;
-          setInterval(function() {
+          setInterval(function () {
             var msg = messages.shift();
             var pos = coords.shift();
             if (msg && pos) generate(msg, pos);
           }, 2500);
         });
-
       };
 
+      // generates pseudo-random conversations for the map TODO: malditogeek comment
       this.embedChats = function() {
         var navs = $('.communities-tabs a');
 
@@ -285,10 +265,11 @@ require([
         var room3 = randomRoom();
         link(a3, room3);
       };
-
-      //  And go!
-      this.init();
+      
+      // initialise
+      window.ready(this.init.bind(this));
     };
-
-    new Gitter({});
+         
+    
+    new Gitter($(window));
 });
