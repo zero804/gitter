@@ -91,11 +91,13 @@ require([
     var active = [];
  
     function roomByLocale(locale) {
-      var _room;
-      featuredRooms.forEach(function(room) {
-        if (room.locale === locale) _room = room;
-      });
-      return _room || randomRoom();
+      var rooms = featuredRooms.filter(function(r) { return r.locale === locale;});
+      if (rooms.length) {
+        active.push(rooms[0].name);
+        return rooms[0];
+      } else {
+        return randomRoom();
+      } 
     }
 
     function randomRoom() {
@@ -268,7 +270,7 @@ require([
         }
 
         var a0 = navs[0];
-        var room0 = {name: 'GitterHQ', uri: 'gitterHQ/gitter', language: "Let's talk about Gitter!"}
+        var room0 = {name: 'GitterHQ', uri: 'gitterHQ/gitter', language: "Let's talk about Gitter!"};
         link(a0, room0);
 
         var a1 = navs[1];
