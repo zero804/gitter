@@ -189,7 +189,7 @@ sprites:
 
 security-check:
 	grunt retire
-	grunt validate-shrinkwrap
+	grunt validate-shrinkwrap --force
 
 version-files:
 	@echo GIT COMMIT: $(GIT_COMMIT)
