@@ -1,20 +1,10 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var request = require('request');
 var Q = require('q');
 var wrap = require('./github-cache-wrapper');
-var logFailingRequest = require('./log-failing-request');
-var logRateLimit = require('./log-rate-limit');
-var publicTokenPool = require('./public-token-pool');
 var badCredentialsCheck = require('./bad-credentials-check');
-
-// no retries or multipage requests, unlike request-wrapper
-var loggedRequest = publicTokenPool(
-                      logFailingRequest(
-                        logRateLimit(
-                          request)));
-
+var requestWrapper = require('./request-wrapper');
 
 var Search = function(user) {
   this.token = user && (user.githubUserToken || user.githubToken) || '';
@@ -42,7 +32,7 @@ function requestGithubUserSearch(searchString, token) {
     json: true
   };
 
-  loggedRequest(options, d.makeNodeResolver());
+  requestWrapper.fastRequest(options, d.makeNodeResolver());
 
   return d.promise.spread(function(response, body) {
     if(response.statusCode >= 400) {

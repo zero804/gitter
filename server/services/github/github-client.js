@@ -5,27 +5,28 @@ var github = require('octonode');
 var assert = require('assert');
 var request = require('./request-wrapper');
 
-function createClient(user, token) {
-  // assert(token, 'token required');
-  var client = github.client(token, { request: request });
+function createClient(token, options) {
+  options = options || {};
+  var requestClient = options.firstPageOnly ? request.firstPageOnlyRequest : request;
+  var client = github.client(token, { request: requestClient });
 
   return client;
 }
 
 module.exports = exports = {
-  user: function(user) {
-    if(!user) return createClient();
+  user: function(user, options) {
+    if(!user) return createClient(undefined, options);
 
     assert(user, 'user required');
     var token = user.githubUserToken || user.githubToken;
-    return createClient(user, token);
+    return createClient(token, options);
   },
-  full: function(user) {
-    if(!user) return createClient();
+  full: function(user, options) {
+    if(!user) return createClient(undefined, options);
 
     assert(user, 'user required');
     var token = user.githubToken || user.githubUserToken;
-    return createClient(user, token);
+    return createClient(token, options);
   },
   makeResolver: function(defer) {
     /* Similar to Q's makeNodeResolver, but ensures that the result is

@@ -32,9 +32,8 @@
 @import "welcome-tips";
 /* end of new stuff*/
 
-.boxhack {
-  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-  -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+.border-box-sizing() {
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
 
@@ -153,7 +152,7 @@ label {
 }
 
 .gtrInput {
-  .boxhack;
+  .border-box-sizing;
   .trpBodyMedium;
 
   width: 100%;
@@ -163,7 +162,7 @@ label {
   margin-bottom: 15px;
   box-shadow: none;
   display: inline-block;
-  padding: 9px;
+  padding: 0px 9px;
   border: 1px solid @trpGrey;
   background-color: fade(@trpGrey, 50%);
   border-radius: 4px;
@@ -834,96 +833,6 @@ body.logged-out {
   }
 }
 
-// .trpLeftMenuProfile {
-//   .trpBodyMedium;
-//   padding: 4px;
-//   margin: 8px;
-//   cursor: pointer;
-//   height: 32px;
-//   overflow: hidden;
-//   border-radius: 4px;
-
-//   .avatar-s {
-//     width: 32px;
-//     height: 32px;
-//   }
-
-//   .transition(200ms);
-// }
-
-// .trpLeftMenuProfile.active {
-//   background-color: rgba(255,255,255,0.2);
-//   height: 116px;
-
-//   .transition(400ms);
-// }
-
-// .trpLeftMenuProfileHeader {
-//   padding-bottom: 4px;
-// }
-
-// .trpLeftMenuProfileMenu {
-//   box-sizing: border-box;
-//   -moz-box-sizing: border-box;
-//   padding-bottom: 12px;
-//   overflow: hidden;
-//   width: 100%;
-//   color: white;
-//   .trpBodyMedium;
-//   font-weight: 300;
-//   line-height: 24px;
-//   box-sizing: border-box;
-//   -moz-box-sizing: border-box;
-
-//   a {
-//     color: white;
-//     text-decoration: none;
-//   }
-
-//   .item {
-//     padding-left: 10px;
-//   }
-
-//   .item:hover {
-//     border-radius: 4px;
-//     background-color: rgba(255,255,255,0.2);
-//   }
-
-//   li {
-//     list-style: none;
-//   }
-
-//   li.item .icon-home {
-//     .prepend-home-icon()
-//   }
-
-//   li.item .icon-signout {
-//     .prepend-home-signout()
-//   }
-
-//   li.item .icon-apps {
-//     .prepend-home-apps()
-//   }
-
-// }
-
-// .trpLeftMenuProfile:hover {
-//   background-color: rgba(255,255,255,0.2);
-// }
-
-// .trpLeftMenuProfileName {
-//   display: inline-block;
-//   vertical-align: top;
-//   padding-top: 4px;
-//   font-weight: 300;
-//   font-size: 16px;
-//   margin-left: 8px;
-//   max-width: 187px;
-//   overflow: hidden;
-//   text-overflow: ellipsis;
-//   white-space: nowrap;
-// }
-
 .trpLeftMenuContainer {
   height: 100%;
   overflow: hidden;
@@ -935,21 +844,6 @@ body.logged-out {
   top: 100px;
   .transition(200ms);
 }
-
-// .trpLeftMenu .nano.pushed {
-//   top: 180px;
-//   .transition(400ms);
-// }
-
-// .trpLeftMenuActions {
-// 	position: absolute;
-// 	bottom: 10px;
-// 	overflow: hidden;
-//   box-sizing: border-box;
-//   -moz-box-sizing: border-box;
-//   padding: 0 10px;
-//   width: 100%;
-// }
 
 .trpLeftMenuWrapper {
   display: inline-block;
@@ -995,47 +889,6 @@ body.logged-out {
 .trpLeftMenuSpacer {
 	height: 100px;
 }
-
-// .trpLeftMenuSearch {
-//   background-color: transparent;
-//   border: 1px solid rgba(255,255,255, 0.6);
-//   border-radius: 4px;
-//   width: 220px;
-//   font-size: 15px;
-//   font-weight: 100;
-//   font-family: @fontSans;
-//   padding: 2px 4px 2px 6px;
-//   color: rgba(255,255,255, 0.7);
-//   margin-bottom: 16px;
-//   margin-left: 10px;
-// }
-
-// .trpSearchContainer {
-//   position: relative;
-
-//   .trpLeftMenuSearch:focus ~ .trpSearchClear {
-//     opacity: 0.8;
-//   }
-// }
-
-// .trpSearchClear {
-//   position: absolute;
-//   right: 15px;
-//   top: 5px;
-//   cursor: pointer;
-//   opacity: 0;
-//   -webkit-transition: opacity 0.2s linear;
-//   -moz-transition: opacity 0.2s linear;
-//   -o-transition: opacity 0.2s linear;
-//   transition: opacity 0.2s linear;
-// }
-
-// .trpSearchClear:before {
-//   font-family: 'troupe-icons';
-//   content: '\e827';
-//   font-size: 14px;
-//   -webkit-font-smoothing: antialiased;
-// }
 
 .disabled {
   color: #CCC;
@@ -1660,7 +1513,7 @@ ul li.placeholder:before {
     opacity: 0;
     }
 
-    #people-header, #top-header, #request-header, #repo-info {
+    #people-header, #top-header, #request-header, #repo-info, #activity-tip {
       display: none;
     }
 
@@ -2060,12 +1913,6 @@ ul.roster {
   padding-top: 16px;
 }
 
-// .trpToolbarList {
-//   display: inline-block;
-// 	vertical-align: top;
-//   width: 100%;
-// }
-
 .trpToolbarListContent {
   padding-left: 10px;
 }
@@ -2117,205 +1964,6 @@ ul.roster {
   }
 
 }
-
-
-// .trpFileProgressContainer {
-//   position: absolute;
-//   top: -2px;
-//   left: 0;
-//   right: 0;
-//   background-color: transparent;
-//   width: 100%;
-//   height: 2px;
-// }
-
-// .trpFileProgressBar {
-//   background-color: @trpGreen;
-//   box-shadow: 0px 0px 1px 1px @trpGreen;
-//   overflow: hidden;
-//   width: 0;
-//   display: none;
-//   transition: width 0.5s;
-//   transition-timing-function: ease;
-// }
-
-.trpHeaderWrapper {
-  // padding-bottom: 10px;
-  // position: fixed;
-  // -moz-box-sizing: border-box;
-  // box-sizing: border-box;
-  // top: 0;
-  // background-color: rgba(255, 255, 255, 0.97);
-  // border-bottom: 1px solid rgba(0,0,0,0.05);
-  // z-index: 1;
-  // .transition500ms;
-  // left: 0;
-  // right: @rightMarginFull;
-
-  // @media @mid {
-  //   right: @rightMarginMid;
-  // }
-
-  // @media @small {
-  //   right: @rightMarginSmall
-  // }
-
-  // .trpHeaderArea {
-  //   display: block;
-  //   .transition500ms;
-  // }
-
-  // .trpHeaderContainer {
-  //   display: inline-block;
-  //   width: 100%;
-  //   padding-left: 46px;
-
-  //   // -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-  //   // -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-  //   // box-sizing: border-box;         /* Opera/IE 8+ */
-
-  //   & h1 a:hover {
-  //     text-decoration: none;
-  //   }
-
-  //   @media @mid {
-  //     padding-left: 20px;
-  //   }
-
-  //   @media @small {
-  //     padding-left: 30px;
-  //   }
-
-  // }
-
-  // .trpTroupeFavourite {
-  //   float: left;
-  //   cursor: pointer;
-  //   display: inline-block;
-  //   margin-left: 4px;
-  //   margin-right: 18px;
-  //   margin-top: 10px;
-
-  //   @media @mid {
-  //     margin-left: 16px;
-  //     margin-right: 13px;
-  //   }
-
-  // }
-
-  // h1 {
-  //   font-family: 'Open Sans';
-  //   font-weight: 300;
-  //   font-size: 22px;
-  //   color: #333;
-  //   display: inline;
-  //   vertical-align: middle;
-  // }
-
-  // #trpTopic {
-  //   font-family: @fontSans;
-  //   font-size: 13px;
-  //   color: #777;
-  //   min-height: 1em;
-  //   margin: -5px 0 0 0;
-  //   .user-select(text);
-
-  //   a {
-  //     color: #666;
-  //   }
-
-  //   a:hover {
-  //     color: @trpLightBlue;
-  //   }
-
-  //   .trpTopicInput {
-  //     width: 100%;
-  //     font-size: 13px;
-  //     line-height: 120%;
-  //     margin-bottom: 0;
-  //     resize: none;
-  //   }
-
-  // }
-
-  // .gtrNameTopic {
-  //   margin-right: 60px;
-  //   margin-left: 50px;
-
-  //   @media @mid {
-  //     margin-left: 55px;
-  //   }
-  // }
-
-  // .dropdown-toggle {
-
-  // }
-
-  // .settingsCog {
-  //   float: right;
-  //   margin-top: 15px;
-  //   margin-right: 12px;
-  // }
-
-//   .activityFeedToggle {
-//     float: right;
-//     margin-top: 15px;
-//     margin-right: 12px;
-//     cursor: pointer;
-//     opacity: 0.4;
-//     transition:all .5s ease-in-out;
-
-//     &.show-activity {
-//       color: @trpGreen;
-//       opacity: 0.8;
-//       transition:all 0.1s ease-in-out;
-//     }
-
-//   }
-
-//   .activityFeedToggle:hover {
-//     opacity: 1;
-//   }
-
-//   .activityFeedToggle:before {
-//       font-family: 'troupe-icons';
-//       /*content: '\e81a';*/
-//     /*  content: '\e81e';*/
-//       content: '\e82c';
-//       margin-right: 8px;
-//       width: 12px;
-//       font-size: 20px;
-//       -webkit-font-smoothing: antialiased;
-//   }
-
-//   .dropdown-toggle:before {
-//       font-family: 'troupe-icons';
-//       /*content: '\e81a';*/
-//     /*  content: '\e81e';*/
-//       content: '\e823';
-//       margin-right: 8px;
-//       width: 12px;
-//       font-size: 20px;
-//   }
-
-//   .dropdown-toggle {
-//     cursor: pointer;
-//     opacity: 0.4;
-//     transition:all .5s ease-in-out;
-//   }
-
-//   .dropdown-toggle:hover {
-//     opacity: 1;
-//   }
-
-//   .dropdown-menu {
-//     .trpBodyMedium;
-//     right: 0;
-//     left: auto;
-//   }
-
-}
-
 
 .markdown-help-content {
   .trpBodyMedium;
@@ -2528,7 +2176,7 @@ ul.roster {
 // TODO: as we progress with the css refactoring this will have to be changed. Walter.
 .popover-content {
   .invited {
-    .boxhack;
+    .border-box-sizing;
     background-color: hsl(0, 60%, 70%);
     padding: 10px;
     line-height: 10px;
@@ -2552,7 +2200,7 @@ ul.roster {
 }
 
 .trpPopoverDetails {
-  .boxhack;
+  .border-box-sizing;
   float: right;
   max-width: 340px;
   margin-left: 12px;
@@ -2572,7 +2220,7 @@ ul.trpUserDetails {
   margin-bottom: 0;
 
   & li {
-    width: 100%;
+    max-width: 100%;
     padding: 2px 0 2px 20px;
     overflow-x: hidden;
     font-size: 14px;

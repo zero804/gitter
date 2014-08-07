@@ -38,39 +38,28 @@ define([
     callback(message);
   };
 
-  var subscribeOptions = {};
-
   var ClientAuth = function() {};
   ClientAuth.prototype.outgoing = function(message, callback) {
-    if(message.channel == '/meta/handshake') {
-      clientId = null;
-      log("Rehandshaking realtime connection");
+    if(message.channel !== '/meta/handshake') return callback(message);
 
-      if(!message.ext) { message.ext = {}; }
-      var ext = message.ext;
-      var accessToken = context.getAccessToken();
-      var mobile = isMobile();
+    clientId = null;
+    log("Rehandshaking realtime connection");
 
-      ext.token      = accessToken;
-      ext.version    = context.env('version');
-      ext.troupeId   = context.getTroupeId();
-      ext.connType   = mobile ? 'mobile' : 'online';
-      ext.client     = mobile ? 'mobweb' : 'web';
-      ext.eyeballs   = eyeballState ? 1 : 0;
+    context.getAccessToken(function(accessToken) {
+      if(!message.ext) message.ext = {};
+        var ext = message.ext;
+        var mobile = isMobile();
 
-    } else if(message.channel == '/meta/subscribe') {
-      if(!message.ext) { message.ext = {}; }
+        ext.token      = accessToken;
+        ext.version    = context.env('version');
+        ext.troupeId   = context.getTroupeId();
+        ext.connType   = mobile ? 'mobile' : 'online';
+        ext.client     = mobile ? 'mobweb' : 'web';
+        ext.eyeballs   = eyeballState ? 1 : 0;
 
-      var options = subscribeOptions[message.subscription];
-      if(options) {
-        message.ext = _.extend(message.ext, options);
-        delete subscribeOptions[message.channel];
-      }
 
-      message.ext.eyeballs = eyeballState ? 1 : 0;
-    }
-
-    callback(message);
+       callback(message);
+     });
   };
 
   var updateTimers;
@@ -132,8 +121,13 @@ define([
     this._stateProvider = {};
   };
 
+  var subscribeOptions = {};
   SnapshotExtension.prototype.outgoing = function(message, callback) {
     if(message.channel == '/meta/subscribe') {
+      if(!message.ext) { message.ext = {}; }
+
+      message.ext.eyeballs = eyeballState ? 1 : 0;
+
       var stateProvider = this._stateProvider[message.subscription];
       if(stateProvider) {
         var snapshotState = stateProvider();
@@ -142,6 +136,15 @@ define([
           message.ext.snapshot = snapshotState;
         }
       }
+
+      // These are temporary options to overlay
+      var options = subscribeOptions[message.subscription];
+      if(options) {
+        message.ext = _.extend(message.ext, options);
+        delete subscribeOptions[message.channel];
+      }
+
+
     }
 
     callback(message);
@@ -374,9 +377,8 @@ define([
     },
 
     subscribe: function(channel, callback, context, options) {
-      if(options && options.snapshot === false) {
-        subscribeOptions[channel] = { snapshot: false };
-      }
+      // Temporary options to pass onto the subscription message
+      subscribeOptions[channel] = options;
 
       return getOrCreateClient().subscribe(channel, callback, context);
     },
