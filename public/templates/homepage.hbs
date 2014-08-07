@@ -22,7 +22,7 @@
         {{>load_font_css}}
     </head>
     <body>
-      <header id="intro-panel">
+      <header id="intro-panel" class='bg-animation'>
         <nav class="site-nav">
           <div class="wrap">
 
@@ -86,8 +86,6 @@
             </li>
           </ul>
         </div>
-
-        <img src="{{cdn 'images/2/gitter/home/banner.jpg'}}" class="bg bg-animation" alt="">
       </header>
 
       <section id="communities-panel">
@@ -132,7 +130,7 @@
             </nav>
 
             <div class="chat-frame">
-              <iframe id="embedded-chat" src="/gitterHQ/gitter/~embed"></iframe>
+              {{!-- <iframe id="embedded-chat" src="/gitterHQ/gitter/~embed"></iframe> --}}
             </div>
           </div>
         </div>
