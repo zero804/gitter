@@ -9,10 +9,10 @@ var FAKE_USER = { username: 'gittertestbot', githubToken: '8e8ec7658e8a3bc645cfb
 var suggestionService = testRequire("./services/suggested-room-service");
 
 describe('suggested-room-service', function() {
-  it('should get 6 suggestions', function(done) {
+  it('should get 8 suggestions', function(done) {
     return suggestionService.getSuggestions(FAKE_USER)
       .then(function(suggestions) {
-        assert(suggestions.length, 6);
+        assert(suggestions.length, 8);
       })
       .nodeify(done);
   });
