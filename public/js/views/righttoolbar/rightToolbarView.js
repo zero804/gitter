@@ -49,8 +49,17 @@ define([
           this.$el.find('#activity-header').show();
           itemCollections.events.off('add reset sync', null, this);
         } else {
-          this.$el.find('#activity-header').show();
-          this.$el.find('#activity-tip').show();
+          if (context().permissions.admin) {
+            if(context().isNativeDesktopApp) {
+              this.$el.find('#activity-tip a').attr({
+                target: '_blank',
+                href: window.location.origin + '/' + context.troupe().get('uri') + '#integrations'
+              });
+            }
+            this.$el.find('#activity-header').show();
+            this.$el.find('#activity-tip').show();
+          }
+
         }
       }, this);
     },

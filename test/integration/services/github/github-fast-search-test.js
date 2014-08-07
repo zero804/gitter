@@ -10,12 +10,14 @@ var FAKE_USER = { username: 'gittertestbot', githubToken: '64c1d90a8c60d2ee75fc5
 describe('github-fast-search', function() {
   it('has type:user flag formatted correctly', function(done) {
     var Search = testRequire.withProxies('./services/github/github-fast-search', {
-      request: function(options) {
-        var querystring = options.uri.split('?')[1];
+      './request-wrapper': {
+          fastRequest: function(options) {
+          var querystring = options.uri.split('?')[1];
 
-        assert.equal(querystring, 'q=tony+type:user&access_token=64c1d90a8c60d2ee75fc5b3d3f7881d94559fec8');
+          assert.equal(querystring, 'q=tony+type:user&access_token=64c1d90a8c60d2ee75fc5b3d3f7881d94559fec8');
 
-        done();
+          done();
+        }
       },
       './github-cache-wrapper': function(x) { return x; }
     });
@@ -29,9 +31,10 @@ describe('github-fast-search', function() {
 
   it('adds a credentials flag to a 403 response error', function(done) {
     var Search = testRequire.withProxies('./services/github/github-fast-search', {
-      request: function(options, callback) {
-        callback(null, {statusCode: 403});
-
+      './request-wrapper': {
+        fastRequest: function(options, callback) {
+          callback(null, { statusCode: 403 }, null);
+        }
       },
       './github-cache-wrapper': function(x) { return x; }
     });
