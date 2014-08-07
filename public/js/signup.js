@@ -30,19 +30,19 @@ require([
       },
       { uri: 'gitterHQ/nodejs',
         name: '#nodejs',
-        chanel: true,
+        channel: true,
         language: 'JavaScript',
         locale: 'en'
       },
       { uri: 'lotus/chat',
         name: 'Lotus',
-        chanel: true,
+        channel: true,
         language: 'Ruby',
         locale: 'en'
       },
       { uri: 'rom-rb/chat',
         name: 'rom-rb',
-        chanel: true,
+        channel: true,
         language: 'Ruby',
         locale: 'en'
       },
@@ -53,7 +53,7 @@ require([
       },
       { uri: 'ruby-vietnam/chat',
         name: 'Ruby Vietnam',
-        chanel: true,
+        channel: true,
         language: 'Ruby',
         locale: 'vi'
       },
