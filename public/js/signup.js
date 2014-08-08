@@ -224,25 +224,34 @@ require([
       });
     }
 
+    function cycleElements($els, time) {
+      $els.first().addClass('visible');
+      $els.parent().css('height', $els.outerHeight());
+
+      setInterval(function () {
+        var active = $els.filter('.visible').removeClass('visible').addClass('going');
+        var target = active.next();
+
+        if(!target.length) {
+          target = $els.first();
+        }
+
+        target.removeClass('going').addClass('visible');
+      }, time);
+    }
+
     /**
      *  Gitter() hadnles front-page client-side stuff
      *  inside the scope of Gitter we have a window argument which is simply
      */
     var Gitter = function (window) {
-      // ui elements
-      var ui = {
-        blockquotes: $('#testimonials-panel blockquote'),
-        integration: $('.loves li')
-      };
-
       // initialises all the things
       this.init = function() {
         initEmbedPanel();
         initAppsPanelScrollListener();
         initMapMessages();
-        
-        this.cycle(ui.blockquotes, 7000); // cycle blockquotes
-        this.cycle(ui.integration, 2500); // cycle blockquotes
+        cycleElements($('#testimonials-panel blockquote'), 7000);
+        cycleElements($('.loves li'), 2500);
 
         $('.tooltip-container').on('mouseout', function() {
           $(this).addClass('out');
@@ -250,24 +259,6 @@ require([
         }).on('mouseover', function () {
           $(this).removeClass('out');
         });
-      };
-
-      // TODO: comment, since "el designer" was the author
-      this.cycle = function(el, speed) {
-        el.first().addClass('visible');
-
-        el.parent().css('height', el.outerHeight());
-
-        setInterval(function () {
-          var active = el.filter('.visible').removeClass('visible').addClass('going');
-          var target = active.next();
-
-          if(!target.length) {
-            target = el.first();
-          }
-
-          target.removeClass('going').addClass('visible');
-        }, speed || 4000);
       };
       
       // initialise
