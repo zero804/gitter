@@ -8,6 +8,11 @@ require([
     "use strict";
 
     function random(a) {return a[Math.floor(Math.random() * a.length)]; }
+
+    function shuffle(array){
+      for(var j, x, i = array.length; i; j = Math.floor(Math.random() * i), x = array[--i], array[i] = array[j], array[j] = x);
+      return array;
+    }
     
     var featuredRooms  = [
       { uri: 'marionettejs/backbone.marionette',
@@ -157,11 +162,11 @@ require([
 
     function initMapMessages() {
       //  Make sure we don't randomly generate people in the ocean
-      var coords = [
+      var coords = shuffle([
         [64, 113], [150, 142], [194, 222], [345, 221], [275, 70],
         [340, 95], [490, 141], [531, 206], [579, 268], [345, 104],
         [532, 21], [218, 48], [384, 226], [153, 226], [420, 157]
-      ];
+      ]);
 
       var $map = $('.map');
 
@@ -173,12 +178,13 @@ require([
 
           if(!chatMessage || !pos) return;
 
+          messages.push(chatMessage);
+          coords.push(pos);
+
           var $el = createMessageBubble(chatMessage, pos);
           addMessageBubbleToMap($el, $map);
 
           setTimeout(function() {
-            coords.push(pos);
-            messages.push(chatMessage);
             removeMessageBubbleFromMap($el);
           }, 5000);
 
