@@ -114,6 +114,39 @@ require([
       }
     }
 
+    function initEmbedPanel() {
+      var rooms = [
+        { name: 'GitterHQ', uri: 'gitterHQ/gitter', language: "Let's talk about Gitter!" },
+        roomByLocale(context.lang()),
+        randomRoom(),
+        randomRoom()
+      ];
+
+      var navs = $('.communities-tabs a');
+
+      navs.each(function() {
+        var $this = $(this);
+        var tabIndex = $this.data().tabIndex;
+
+        var room = rooms[tabIndex];
+        var owner = room.uri.split('/')[0];
+
+        $this.html(
+          '<img src="https://avatars.githubusercontent.com/' + owner + '?s=48" width="48" height="48">' +
+          '<h3>' + room.name + '</h3>' +
+          '<em>' + room.language + '</em>');
+      });
+
+      navs.on('click', function() {
+        var $this = $(this);
+        var tabIndex = $this.data().tabIndex;
+
+        navs.removeClass('active');
+        $this.addClass('active');
+        $('#embedded-chat').attr({src: '/' + rooms[tabIndex].uri + '/~embed'});
+      });
+    }
+
     function initAppsPanelScrollListener() {
       var $panel =  $('#apps-panel');
       var $window = $(window);
@@ -144,7 +177,7 @@ require([
 
       // initialises all the things
       this.init = function() {
-        this.embedChats(); // embedded chats
+        initEmbedPanel();
         initAppsPanelScrollListener();
         this.map(); //  map conversations
         
@@ -228,41 +261,6 @@ require([
             var pos = coords.shift();
             if (msg && pos) generate(msg, pos);
           }, 2500);
-        });
-      };
-
-      // generates pseudo-random conversations for the map TODO: malditogeek comment
-      this.embedChats = function() {
-
-        var rooms = [
-          { name: 'GitterHQ', uri: 'gitterHQ/gitter', language: "Let's talk about Gitter!" },
-          roomByLocale(context.lang()),
-          randomRoom(),
-          randomRoom()
-        ];
-
-        var navs = $('.communities-tabs a');
-
-        navs.each(function() {
-          var $this = $(this);
-          var tabIndex = $this.data().tabIndex;
-
-          var room = rooms[tabIndex];
-          var owner = room.uri.split('/')[0];
-
-          $this.html(
-            '<img src="https://avatars.githubusercontent.com/' + owner + '?s=48" width="48" height="48">' +
-            '<h3>' + room.name + '</h3>' +
-            '<em>' + room.language + '</em>');
-        });
-
-        navs.on('click', function() {
-          var $this = $(this);
-          var tabIndex = $this.data().tabIndex;
-
-          navs.removeClass('active');
-          $this.addClass('active');
-          $('#embedded-chat').attr({src: '/' + rooms[tabIndex].uri + '/~embed'});
         });
       };
       
