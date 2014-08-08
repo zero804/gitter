@@ -236,36 +236,37 @@ require([
 
       // generates pseudo-random conversations for the map TODO: malditogeek comment
       this.embedChats = function() {
+
+        var rooms = [
+          { name: 'GitterHQ', uri: 'gitterHQ/gitter', language: "Let's talk about Gitter!" },
+          roomByLocale(context.lang()),
+          randomRoom(),
+          randomRoom()
+        ];
+
         var navs = $('.communities-tabs a');
 
-        function link(a, room) {
-          var owner = room.uri.split('/').shift();
+        navs.each(function() {
+          var $this = $(this);
+          var tabIndex = $this.data().tabIndex;
 
-          $(a).html(
+          var room = rooms[tabIndex];
+          var owner = room.uri.split('/')[0];
+
+          $this.html(
             '<img src="https://avatars.githubusercontent.com/' + owner + '?s=48" width="48" height="48">' +
             '<h3>' + room.name + '</h3>' +
             '<em>' + room.language + '</em>');
+        });
 
-          $(a).click(function() {
-            $('#embedded-chat').attr({src: '/' + room.uri + '/~embed'});
-          });
-        }
+        navs.on('click', function() {
+          var $this = $(this);
+          var tabIndex = $this.data().tabIndex;
 
-        var a0 = navs[0];
-        var room0 = {name: 'GitterHQ', uri: 'gitterHQ/gitter', language: "Let's talk about Gitter!"};
-        link(a0, room0);
-
-        var a1 = navs[1];
-        var room1 = roomByLocale(context.lang());
-        link(a1, room1);
-
-        var a2 = navs[2];
-        var room2 = randomRoom();
-        link(a2, room2);
-
-        var a3 = navs[3];
-        var room3 = randomRoom();
-        link(a3, room3);
+          navs.removeClass('active');
+          $this.addClass('active');
+          $('#embedded-chat').attr({src: '/' + rooms[tabIndex].uri + '/~embed'});
+        });
       };
       
       // initialise
