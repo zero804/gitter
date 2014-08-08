@@ -487,97 +487,111 @@ h1:after, h2:after {
   border-right: 6px solid transparent;
   border-top: 6px solid #ebebeb;
 }
-        .msg span.enter {
-          top: -66px;
-        }
-      #intro-panel .avatar.enter, .msg span.enter {
-        opacity: 1;
-        -webkit-transform: scale(1);
-      }
-    #intro-panel .map .bg {
-      position: static;
-      display: block;
-      width: 657px;
-      height: 342px;
-    }
 
-  #intro-panel h1 {
-    padding-top: 100px;
-    width: 500px;
+.msg span.enter {
+  top: -66px;
+}
 
-    font-size: 60px;
-    line-height: 72px;
-    letter-spacing: -1px;
+#intro-panel .avatar.enter, .msg span.enter {
+  opacity: 1;
+  -webkit-transform: scale(1);
+}
 
-    color: #fff;
+#intro-panel .map .bg {
+  position: static;
+  display: block;
+  width: 657px;
+  height: 342px;
+}
+
+#intro-panel h1 {
+  padding-top: 100px;
+  width: 500px;
+
+  font-size: 60px;
+  line-height: 72px;
+  letter-spacing: -1px;
+
+  color: #fff;
+}
+
+#intro-panel h2 {
+  margin-bottom: 8px;
+
+  font-size: 24px;
+  line-height: 28px;
+  letter-spacing: normal;
+
+  color: #fff;
+}
+
+#intro-panel h2:after {
+  display: none;
+}
+
+#intro-panel p {
+  width: 450px;
+  margin: 60px 0 40px;
+
+  font-size: 21px;
+  line-height: 30px;
+}
+
+#intro-panel li a {
+  color: #fff;
+  text-decoration: none;
+
+  border-bottom: 1px solid rgba(255,255,255,.2);
+}
+
+#intro-panel p a:hover {
+  border-color: rgba(255,255,255,.4);
+}
+
+#intro-panel p + .btn {
+  margin-bottom: 20px;
+}
+
+#intro-panel ul {
+  overflow: hidden;
+  padding: 50px 0 30px;
+}
+
+#intro-panel li {
+  position: relative;
+
+  float: left;
+  padding: 0 55px 0 115px;
+}
+
+#intro-panel li:last-child {
+  padding-right: 0;
+}
+
+#intro-panel ul img {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+#intro-panel ul span {
+  display: inline-block;
+  width: 210px;
+
+  font-size: 16px;
+  line-height: 25px;
+}
+
+#intro-panel .legal {
+  margin-bottom: 40px;
+  opacity: 0.8;
+
+  a {
+    text-decoration: none;
+    color: inherit;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
   }
-  #intro-panel h2 {
-    margin-bottom: 8px;
-
-    font-size: 24px;
-    line-height: 28px;
-    letter-spacing: normal;
-
-    color: #fff;
-  }
-    #intro-panel h2:after {
-      display: none;
-    }
-  #intro-panel p {
-    width: 450px;
-    margin: 60px 0 40px;
-
-    font-size: 21px;
-    line-height: 30px;
-  }
-    #intro-panel li a {
-      color: #fff;
-      text-decoration: none;
-
-      border-bottom: 1px solid rgba(255,255,255,.2);
-    }
-      #intro-panel p a:hover {
-        border-color: rgba(255,255,255,.4);
-      }
-    #intro-panel p + .btn {
-      margin-bottom: 20px;
-    }
-  #intro-panel ul {
-    overflow: hidden;
-    padding: 50px 0 30px;
-  }
-    #intro-panel li {
-      position: relative;
-
-      float: left;
-      padding: 0 55px 0 115px;
-    }
-      #intro-panel li:last-child {
-        padding-right: 0;
-      }
-    #intro-panel ul img {
-      position: absolute;
-      left: 0;
-      top: 0;
-    }
-    #intro-panel ul span {
-      display: inline-block;
-      width: 210px;
-
-      font-size: 16px;
-      line-height: 25px;
-    }
-    #intro-panel .legal {
-      margin-bottom: 40px;
-      opacity: 0.8;
-
-      a {
-        text-decoration: none;
-        color: inherit;
-        border-bottom: 1px solid rgba(255,255,255,0.2);
-      }
-    }
-
+}
 
 .site-nav {
   position: absolute;
@@ -588,43 +602,46 @@ h1:after, h2:after {
 
   padding-top: 60px;
 }
-  .site-nav.sticky {
-    position: fixed;
-    background: #fff;
+
+.site-nav.sticky {
+  position: fixed;
+  background: #fff;
+}
+
+.site-nav a {
+  float: left;
+  margin-right: 60px;
+
+  line-height: 26px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-decoration: none;
+
+  color: #fff;
+  opacity: .5;
+
+  &:last-child {
+    margin-right: 0px;
   }
-  .site-nav a {
-    float: left;
-    margin-right: 60px;
+}
 
-    line-height: 26px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    text-decoration: none;
+.site-nav a:hover, .site-nav .btn {
+  opacity: .75;
+}
 
-    color: #fff;
-    opacity: .5;
-    
-    &:last-child {
-      margin-right: 0px;
-    }
-  }
-    .site-nav a:hover, .site-nav .btn {
-      opacity: .75;
-    }
-    .site-nav .active {
-      opacity: 1;
-    }
-  .site-nav .btn {
-    float: right;
-    margin: -7px 0 0;
+.site-nav .active {
+  opacity: 1;
+}
 
-    line-height: 1;
-    font-weight: 600;
+.site-nav .btn {
+  float: right;
+  margin: -7px 0 0;
 
-    background: rgba(0,0,0,.2);
-  }
+  line-height: 1;
+  font-weight: 600;
 
-
+  background: rgba(0,0,0,.2);
+}
 
 /**
  *   Communities panel
@@ -759,60 +776,71 @@ h1:after, h2:after {
 
   color: #918b80;
 }
-  #integrations-panel .wrap, #apps-panel .wrap {
-    position: relative;
-  }
-  #integrations-panel h1, #integrations-panel h1 + p,
+
+#integrations-panel .wrap, #apps-panel .wrap {
+  position: relative;
+}
+
+#integrations-panel h1, #integrations-panel h1 + p,
   #apps-panel h1, #apps-panel h1 + p,
   footer h1, footer h1 + p,
   #testimonials-panel h1, #testimonials-panel h1 + p {
-    width: 450px;
-    color: #726c61;
-  }
-    #integrations-panel p, #apps-panel p, footer p, #testimonials-panel p {
-      padding: 15px 0;
-      width: 450px;
-    }
-      #integrations-panel h1 + p, #apps-panel h1 + p, footer h1 + p, #testimonials-panel h1 + p {
-        padding-top: 15px;
+  width: 450px;
+  color: #726c61;
+}
 
-        font-size: 21px;
-        line-height: 30px;
-      }
-  #integrations-panel .loves {
-    position: absolute;
-    right: 0;
-    top: 40%;
+#integrations-panel p, #apps-panel p, footer p, #testimonials-panel p {
+  padding: 15px 0;
+  width: 450px;
+}
 
-    width: 400px;
-  }
-    #integrations-panel .loves ul {
-      max-width: 150px;
-      position: relative;
-      left: 150px;
-      top: -47px;
-    }
-    #integrations-panel .loves li {
-      position: absolute;
-      left: 0;
-      top: 0;
-    }
-      #integrations-panel .loves li img {
-        pointer-events: none;
-        opacity: 0;
+#integrations-panel h1 + p, #apps-panel h1 + p, footer h1 + p, #testimonials-panel h1 + p {
+  padding-top: 15px;
 
-        width: 150px;
-        height: auto;
-      }
-        #integrations-panel .loves li.visible img {
-          opacity: 1;
-        }
-        #integrations-panel .loves li.going {
-          top: -40px;
-        }
-  #integrations-panel a {
-    color: inherit;
-  }
+  font-size: 21px;
+  line-height: 30px;
+}
+
+#integrations-panel .loves {
+  position: absolute;
+  right: 0;
+  top: 40%;
+
+  width: 400px;
+}
+
+#integrations-panel .loves ul {
+  max-width: 150px;
+  position: relative;
+  left: 150px;
+  top: -47px;
+}
+
+#integrations-panel .loves li {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+#integrations-panel .loves li img {
+  pointer-events: none;
+  opacity: 0;
+
+  width: 150px;
+  height: auto;
+}
+
+#integrations-panel .loves li.visible img {
+  opacity: 1;
+}
+
+#integrations-panel .loves li.going {
+  top: -40px;
+}
+
+#integrations-panel a {
+  color: inherit;
+}
 
 
 /**
