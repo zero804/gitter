@@ -1,9 +1,10 @@
 require([
   'jquery',
   'utils/context',
+  'hbs!./map-message',
   'utils/tracking' // no ref
  ],
-  function($, context) {
+  function($, context, mapMessageTemplate) {
     "use strict";
 
     function random(a) {return a[Math.floor(Math.random() * a.length)]; }
@@ -191,21 +192,22 @@ require([
         var messages = [];
 
         var generate = function(chatMessage, pos) {
-          var msg = $('<div class="msg" />');
 
-          var room = chatMessage.room.split('/').pop();
-          var html = "<b>" + chatMessage.username + "</b> in <a href='/" + chatMessage.room + "'>" + room + "</a>";
-          var span = $('<span />').html(html).appendTo(msg);
-
-          var img = $('<img />').attr({src: chatMessage.avatarUrl,"class":"avatar"});
-          img.appendTo(msg);
-
-          msg.css({
+          var html = mapMessageTemplate({
+            username: chatMessage.username,
+            avatarUrl: chatMessage.avatarUrl,
+            fullRoomName: chatMessage.room,
+            roomName: chatMessage.room.split('/').pop(),
             left: pos[0],
             top: pos[1]
-          }).appendTo(ui.map);
+          });
 
-          span.css('left', (400 - span.outerWidth()) / 2);
+          var msg = $(html);
+
+          msg.appendTo(ui.map);
+
+          var $span = msg.find('span');
+          $span.css('left', (400 - $span.outerWidth()) / 2);
 
           msg.children('img').load(function() {
             msg.children().addClass('enter');
