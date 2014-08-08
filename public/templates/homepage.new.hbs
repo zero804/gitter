@@ -1,92 +1,81 @@
-<!doctype html>
+<!DOCTYPE html>
 <html class="no-js" lang="">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Gitter &mdash; where developers come to talk.</title>
 
-        <title>Gitter &mdash; where developers come to talk.</title>
+    <link rel="stylesheet" href="{{cdn 'bootstrap/css/trpHomePage.css' }}">
+    <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/2/gitter/favicon-normal.ico' }}">
 
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-
-        <link rel="stylesheet" href="{{cdn 'bootstrap/css/homepage.css' }}">
-
-        <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/2/gitter/favicon-normal.ico' }}">
-
-        <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
-        <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
-        {{>require_wrapper}}
-
-        {{{bootScript "signup" }}}
-        {{{ generateEnv }}}
-        {{>load_font_css}}
-    </head>
-    <body>
-      <header id="intro-panel" class='bg-animation'>
-        <nav class="site-nav">
-          <div class="wrap">
-
-            <a href="/" class="logo">
-              <div class="logo-holder logo-animation">
-                  <div class="logo-left-arm logo-animation"></div>
-                  <div class="logo-body-left logo-animation"></div>
-                  <div class="logo-body-right logo-animation"></div>
-                  <div class="logo-right-arm logo-animation"></div>
-              </div>
-              <img src="{{ cdn 'images/2/gitter/home/logo.png' }}" alt="Gitter" title="Gitter logo" class="logo-image menu-animation">
-            </a>
-
-            <div class="top-navigation menu-animation">
-              <a href="#integrations-panel">Integrations</a>
-              <a href="#pricing-panel">Pricing</a>
-              <a href="#apps-panel">Apps</a>
-            </div>
-
-            <a class="btn login" href="/login/github?action=login">
-              <b>Log in</b> <span class="no-small">with Github</span>
-            </a>
+    <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
+    <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+  </head>
+  <body>
+    <header id="intro-panel">
+      <div class="site-nav">
+        <a href="/" class="logo">
+          <div class="logo-holder logo-animation">
+            <div class="logo-left-arm logo-animation"></div>
+            <div class="logo-body-left logo-animation"></div>
+            <div class="logo-body-right logo-animation"></div>
+            <div class="logo-right-arm logo-animation"></div>
           </div>
-        </nav>
-
-        <div class="wrap">
-        <div class="map">
-          <img class="bg" src="{{cdn 'images/2/gitter/home/map.png'}}" alt="There should be a map here">
-        </div>
-
-          <h1>{{ __ "Where developers come to talk." }}</h1>
-          <p>We host thousands of public communities where developers from all around the world come together to talk about the future of programming, build better products, and share the best cat GIFs</a>.</p>
-
-          <a class="btn signup" href="/login/github?action=signup&button=1">
-            <img src="{{cdn 'images/2/gitter/home/github.png'}}"> <b>Sign up</b> with Github
-          </a>
-          <div class="legal">
-            <span>
-              By signing up you agree to our <a href="https://gitter.zendesk.com/hc/en-us/sections/200274872-Legal-documentation" target="_blank">Terms and Conditions</a>.
-            </span>
-          </div>
-
-
-          <ul class="mini-features-list">
-            <li>
-              <img src="{{cdn 'images/2/gitter/home/quill.png'}}" alt="Quill icon">
-              <h2>Markdown power</h2>
-              <span>Ever wanted full markdown support in chat? How about syntax highlighting?<br>Yip, we got your back.</span>
-            </li>
-
-            <li>
-              <img src="{{cdn 'images/2/gitter/home/shield.png'}}" alt="Shield icon">
-              <h2>Private conversations</h2>
-              <span>Public rooms are awesome (and free), but we get that some stuff is private. So we've got <a href="#pricing-panel">plans for that</a>.</span>
-            </li>
-
-            <li>
-              <img src="{{cdn 'images/2/gitter/home/cloud.png'}}" alt="Shield icon">
-              <h2>Developer friendly</h2>
-              <span>This is a picture of a cloud against a background of clouds. OMG! We <a href="#integrations-panel">integrate</a> with a bunch of stuff in the cloud. </span>
-            </li>
+          <img src="{{ cdn 'images/2/gitter/home/logo.png' }}" alt="Gitter" title="Gitter logo" class="logo-image menu-animation">
+        </a>
+        <nav class="top-navigation menu-animation">
+          <ul>
+            <a href="#integrations-panel"><li>Integrations</li></a>
+            <a href="#pricing-panel"> <li>Pricing</li></a>
+            <a href="#apps-panel"><li>Apps</li></a>  
           </ul>
+        </nav>
+        <a class="btn login" href="/login/github?action=login">Log in with Github</a>
+      </div>
+
+      <div class="map">
+        <img class="bg" src="{{ cdn 'images/2/gitter/home/map.png' }}" alt="There should be a map here">
+      </div>
+
+        <h1>{{ __ "Where developers come to talk." }}</h1>
+        <p>We host thousands of public communities where developers from all around the world come together to talk about the future of programming, build better products, and share the best cat GIFs</a>.</p>
+
+        <a class="btn signup" href="/login/github?action=signup&button=1">
+          <img src="{{ cdn 'images/2/gitter/home/github.png' }}"> <b>Sign up</b> with Github
+        </a>
+        <div class="legal">
+          <span>
+            By signing up you agree to our <a href="https://gitter.zendesk.com/hc/en-us/sections/200274872-Legal-documentation" target="_blank">Terms and Conditions</a>.
+          </span>
         </div>
-      </header>
+
+
+        <ul class="mini-features-list">
+          <li>
+            <img src="{{cdn 'images/2/gitter/home/quill.png'}}" alt="Quill icon">
+            <h2>Markdown power</h2>
+            <span>Ever wanted full markdown support in chat? How about syntax highlighting?<br>Yip, we got your back.</span>
+          </li>
+
+          <li>
+            <img src="{{cdn 'images/2/gitter/home/shield.png'}}" alt="Shield icon">
+            <h2>Private conversations</h2>
+            <span>Public rooms are awesome (and free), but we get that some stuff is private. So we've got <a href="#pricing-panel">plans for that</a>.</span>
+          </li>
+
+          <li>
+            <img src="{{cdn 'images/2/gitter/home/cloud.png'}}" alt="Shield icon">
+            <h2>Developer friendly</h2>
+            <span>This is a picture of a cloud against a background of clouds. OMG! We <a href="#integrations-panel">integrate</a> with a bunch of stuff in the cloud. </span>
+          </li>
+        </ul>
+      </div>
+
+      <img src="{{cdn 'images/2/gitter/home/banner.jpg'}}" class="bg" alt="">
+    </header>
 
       <section id="communities-panel">
         <div class="wrap">
@@ -327,8 +316,8 @@
           <ul class="team">
             <li>
               <b>Mike</b>
-              <a target="_blank" href="https://twitter.com/mydigitalself"><img src="{{cdn 'images/2/gitter/home/twitter.png'}}" alt="Twitter"></a>
-              <a target="_blank" href="https://github.com/mydigitalself"><img src="{{cdn 'images/2/gitter/home/github.png'}}" alt="Github"></a>
+              <a href="https://twitter.com/mydigitalself"><img src="{{cdn 'images/2/gitter/home/twitter.png'}}" alt="Twitter"></a>
+              <a href="https://github.com/mydigitalself"><img src="{{cdn 'images/2/gitter/home/github.png'}}" alt="Github"></a>
 
               <img src="{{cdn 'images/2/gitter/home/mike.jpeg'}}">
               <span class="mask"></span>
@@ -336,8 +325,8 @@
 
             <li>
               <b>Andrew</b>
-              <a target="_blank" href="https://twitter.com/suprememoocow"><img src="{{cdn 'images/2/gitter/home/twitter.png'}}" alt="Twitter"></a>
-              <a target="_blank" href="https://github.com/suprememoocow"><img src="{{cdn 'images/2/gitter/home/github.png'}}" alt="Github"></a>
+              <a href="https://twitter.com/suprememoocow"><img src="{{cdn 'images/2/gitter/home/twitter.png'}}" alt="Twitter"></a>
+              <a href="https://github.com/suprememoocow"><img src="{{cdn 'images/2/gitter/home/github.png'}}" alt="Github"></a>
 
               <img src="{{cdn 'images/2/gitter/home/andrew.jpeg'}}">
               <span class="mask"></span>
@@ -345,8 +334,8 @@
 
             <li>
               <b>Mauro</b>
-              <a target="_blank" href="https://twitter.com/malditogeek"><img src="{{cdn 'images/2/gitter/home/twitter.png'}}" alt="Twitter"></a>
-              <a target="_blank" href="https://github.com/malditogeek"><img src="{{cdn 'images/2/gitter/home/github.png'}}" alt="Github"></a>
+              <a href="https://twitter.com/malditogeek"><img src="{{cdn 'images/2/gitter/home/twitter.png'}}" alt="Twitter"></a>
+              <a href="https://github.com/malditogeek"><img src="{{cdn 'images/2/gitter/home/github.png'}}" alt="Github"></a>
 
               <img src="{{cdn 'images/2/gitter/home/mauro.png'}}">
               <span class="mask"></span>
@@ -354,8 +343,8 @@
 
             <li>
               <b>Andy</b>
-              <a target="_blank" href="https://twitter.com/trevorah_"><img src="{{cdn 'images/2/gitter/home/twitter.png'}}" alt="Twitter"></a>
-              <a target="_blank" href="https://github.com/trevorah"><img src="{{cdn 'images/2/gitter/home/github.png'}}" alt="Github"></a>
+              <a href="https://twitter.com/andytrevorah"><img src="{{cdn 'images/2/gitter/home/twitter.png'}}" alt="Twitter"></a>
+              <a href="https://github.com/trevorah"><img src="{{cdn 'images/2/gitter/home/github.png'}}" alt="Github"></a>
 
               <img src="{{cdn 'images/2/gitter/home/andy.jpeg'}}">
               <span class="mask"></span>
@@ -363,8 +352,8 @@
 
             <li>
               <b>Walter</b>
-              <a target="_blank" href="https://twitter.com/waltfy"><img src="{{cdn 'images/2/gitter/home/twitter.png'}}" alt="Twitter"></a>
-              <a target="_blank" href="https://github.com/waltervascarvalho"><img src="{{cdn 'images/2/gitter/home/github.png'}}" alt="Github"></a>
+              <a href="https://twitter.com/waltfy"><img src="{{cdn 'images/2/gitter/home/twitter.png'}}" alt="Twitter"></a>
+              <a href="https://github.com/waltervascarvalho"><img src="{{cdn 'images/2/gitter/home/github.png'}}" alt="Github"></a>
 
               <img src="{{cdn 'images/2/gitter/home/walter.jpeg'}}">
               <span class="mask"></span>
@@ -382,7 +371,9 @@
           </small>
         </div>
       </footer>
-
-
     </body>
+    {{>require_wrapper}}
+    {{{bootScript "signup" }}}
+    {{{ generateEnv }}}
+    {{>load_font_css}}
 </html>
