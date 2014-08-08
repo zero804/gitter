@@ -10,6 +10,10 @@ var MODULES = [
       exclude: ["core-libraries"]
   },
   {
+      name: "homepage",
+      exclude: ["core-libraries"]
+  },
+  {
       name: "router-app",
       include: [
         "utils/tracking",
