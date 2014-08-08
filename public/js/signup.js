@@ -163,6 +163,67 @@ require([
       });
     }
 
+    function initMapMessages() {
+      //  Make sure we don't randomly generate people in the ocean
+      var coords = [
+        [64, 113], [150, 142], [194, 222], [345, 221], [275, 70],
+        [340, 95], [490, 141], [531, 206], [579, 268], [345, 104],
+        [532, 21], [218, 48], [384, 226], [153, 226], [420, 157]
+      ];
+
+      var $map = $('.map');
+
+      $.get('/api/private/sample-chats', function(messages) {
+
+        setInterval(function() {
+          var chatMessage = messages.shift();
+          var pos = coords.shift();
+
+          if(!chatMessage || !pos) return;
+
+          var $el = createMessageBubble(chatMessage, pos);
+          addMessageBubbleToMap($el, $map);
+
+          setTimeout(function() {
+            coords.push(pos);
+            messages.push(chatMessage);
+            removeMessageBubbleFromMap($el);
+          }, 5000);
+
+        }, 2500);
+      });
+    }
+
+    function createMessageBubble(chatMessage, pos) {
+      var html = mapMessageTemplate({
+        username: chatMessage.username,
+        avatarUrl: chatMessage.avatarUrl,
+        fullRoomName: chatMessage.room,
+        roomName: chatMessage.room.split('/').pop(),
+        left: pos[0],
+        top: pos[1]
+      });
+
+      return $(html);
+    }
+
+    function addMessageBubbleToMap($message, $map) {
+      $message.appendTo($map);
+
+      var $span = $message.find('span');
+      $span.css('left', (400 - $span.outerWidth()) / 2);
+
+      $message.children('img').load(function() {
+        $message.children().addClass('enter');
+      });
+    }
+
+    function removeMessageBubbleFromMap($message) {
+      $message.children().removeClass('enter').animate({opacity: 0}, function() {
+        $message.remove();
+      });
+    }
+
     /**
      *  Gitter() hadnles front-page client-side stuff
      *  inside the scope of Gitter we have a window argument which is simply
@@ -170,7 +231,6 @@ require([
     var Gitter = function (window) {
       // ui elements
       var ui = {
-        map: $('.map'),
         blockquotes: $('#testimonials-panel blockquote'),
         integration: $('.loves li')
       };
@@ -179,7 +239,7 @@ require([
       this.init = function() {
         initEmbedPanel();
         initAppsPanelScrollListener();
-        this.map(); //  map conversations
+        initMapMessages();
         
         this.cycle(ui.blockquotes, 7000); // cycle blockquotes
         this.cycle(ui.integration, 2500); // cycle blockquotes
@@ -208,60 +268,6 @@ require([
 
           target.removeClass('going').addClass('visible');
         }, speed || 4000);
-      };
-
-      // generates pseudo-random conversations for the map TODO: malditogeek comment
-      this.map = function() {
-        //  Make sure we don't randomly generate people in the ocean
-        var coords = [
-          [64, 113], [150, 142], [194, 222], [345, 221], [275, 70],
-          [340, 95], [490, 141], [531, 206], [579, 268], [345, 104],
-          [532, 21], [218, 48], [384, 226], [153, 226], [420, 157]
-        ];
-
-        var messages = [];
-
-        var generate = function(chatMessage, pos) {
-
-          var html = mapMessageTemplate({
-            username: chatMessage.username,
-            avatarUrl: chatMessage.avatarUrl,
-            fullRoomName: chatMessage.room,
-            roomName: chatMessage.room.split('/').pop(),
-            left: pos[0],
-            top: pos[1]
-          });
-
-          var msg = $(html);
-
-          msg.appendTo(ui.map);
-
-          var $span = msg.find('span');
-          $span.css('left', (400 - $span.outerWidth()) / 2);
-
-          msg.children('img').load(function() {
-            msg.children().addClass('enter');
-          });
-
-          setTimeout(function() {
-            coords.push(pos);
-            messages.push(chatMessage);
-
-            msg.children().removeClass('enter').animate({opacity: 0}, function() {
-              msg.remove();
-            });
-          }, 5000);
-        };
-
-        /* fetches sample chats and sets an interval to loop through them */
-        $.get('/api/private/sample-chats', function (data) {
-          messages = data;
-          setInterval(function () {
-            var msg = messages.shift();
-            var pos = coords.shift();
-            if (msg && pos) generate(msg, pos);
-          }, 2500);
-        });
       };
       
       // initialise
