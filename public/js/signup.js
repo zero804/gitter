@@ -8,14 +8,6 @@ require([
     "use strict";
 
     function random(a) {return a[Math.floor(Math.random() * a.length)]; }
-
-    $('#arrow-1').click(function() {
-      if (window.mixpanel) window.mixpanel.track('arrow-click', { arrow: 'arrow-1' });
-    });
-
-    $('#arrow-2').click(function() {
-      if (window.mixpanel) window.mixpanel.track('arrow-click', { arrow: 'arrow-2' });
-    });
     
     var featuredRooms  = [
       { uri: 'marionettejs/backbone.marionette',
@@ -252,13 +244,6 @@ require([
         initMapMessages();
         cycleElements($('#testimonials-panel blockquote'), 7000);
         cycleElements($('.loves li'), 2500);
-
-        $('.tooltip-container').on('mouseout', function() {
-          $(this).addClass('out');
-          setTimeout(function () { $(this).removeClass('out'); }, 400);
-        }).on('mouseover', function () {
-          $(this).removeClass('out');
-        });
       };
       
       // initialise
