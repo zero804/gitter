@@ -122,9 +122,9 @@ require([
         randomRoom()
       ];
 
-      var navs = $('.communities-tabs a');
+      var tabs = $('.communities-tabs a');
 
-      navs.each(function() {
+      tabs.each(function() {
         var $this = $(this);
         var tabIndex = $this.data().tabIndex;
 
@@ -137,11 +137,11 @@ require([
           '<em>' + room.language + '</em>');
       });
 
-      navs.on('click', function() {
+      tabs.on('click', function() {
         var $this = $(this);
         var tabIndex = $this.data().tabIndex;
 
-        navs.removeClass('active');
+        tabs.removeClass('active');
         $this.addClass('active');
         $('#embedded-chat').attr({src: '/' + rooms[tabIndex].uri + '/~embed'});
       });
