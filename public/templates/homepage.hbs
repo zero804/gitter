@@ -22,7 +22,7 @@
         {{>load_font_css}}
     </head>
     <body>
-      <header id="intro-panel" class='bg-animation'>
+      <header id="intro-panel">
         <nav class="site-nav">
           <div class="wrap">
 
@@ -47,12 +47,8 @@
             </a>
           </div>
         </nav>
-
         <div class="wrap">
-        <div class="map">
-          <img class="bg" src="{{cdn 'images/2/gitter/home/map.png'}}" alt="There should be a map here">
-        </div>
-
+          <div class="map"><img class="bg" src="{{cdn 'images/2/gitter/home/map.png'}}" alt="There should be a map here"></div>
           <h1>{{ __ "Where developers come to talk." }}</h1>
           <p>We host thousands of public communities where developers from all around the world come together to talk about the future of programming, build better products, and share the best cat GIFs</a>.</p>
 
@@ -86,6 +82,7 @@
             </li>
           </ul>
         </div>
+        <div class='bg-animation'>{{!-- the div below is responsible for the fadein of the background --}}</div>
       </header>
 
       <section id="communities-panel">
