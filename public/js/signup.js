@@ -147,13 +147,13 @@ require([
     function initAppsPanelScrollListener() {
       var $panel =  $('#apps-panel');
       var $window = $(window);
-      var OFFSET = 150;
 
       $window.on('scroll', function(e) {
         e.preventDefault();
 
-        var panelDistance = $panel.position().top;
-        if($window.scrollTop() + OFFSET >= panelDistance) {
+        var hasScrolledHalfwayThroughPanel = $window.scrollTop() + $window.height() / 2 > $panel.position().top;
+
+        if(hasScrolledHalfwayThroughPanel) {
           $panel.addClass('visible');
           $window.off('scroll');
         }
