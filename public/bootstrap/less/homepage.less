@@ -31,6 +31,11 @@
   100% { opacity: 1; }
 }
 
+.disappear__keyframes() {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 .tuck-legs__keyframes() {
   0% { height: 20px; }
   40% { height: 20px; }
@@ -61,6 +66,12 @@
 @-o-keyframes       appear { .appear__keyframes; }
 @keyframes          appear { .appear__keyframes; }
 
+@-webkit-keyframes  disappear { .disappear__keyframes; }
+@-moz-keyframes     disappear { .disappear__keyframes; }
+@-ms-keyframes      disappear { .disappear__keyframes; }
+@-o-keyframes       disappear { .disappear__keyframes; }
+@keyframes          disappear { .disappear__keyframes; }
+
 @-webkit-keyframes  tuck-legs { .tuck-legs__keyframes; }
 @-moz-keyframes     tuck-legs { .tuck-legs__keyframes; }
 @-ms-keyframes      tuck-legs { .tuck-legs__keyframes; }
@@ -77,6 +88,17 @@
 .menu-animation {
   .vendor(animation, appear 1s linear 2s 1 normal forwards);
   .vendor(opacity, 0);
+}
+
+.bg-animation {
+  .vendor(animation, disappear 1s linear 0.5s);
+  position: absolute;
+  background: #231f20;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0;
 }
 
 .logo-animation {
