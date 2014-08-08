@@ -114,6 +114,22 @@ require([
       }
     }
 
+    function initAppsPanelScrollListener() {
+      var $panel =  $('#apps-panel');
+      var $window = $(window);
+      var OFFSET = 150;
+
+      $window.on('scroll', function(e) {
+        e.preventDefault();
+
+        var panelDistance = $panel.position().top;
+        if($window.scrollTop() + OFFSET >= panelDistance) {
+          $panel.addClass('visible');
+          $window.off('scroll');
+        }
+      });
+    }
+
     /**
      *  Gitter() hadnles front-page client-side stuff
      *  inside the scope of Gitter we have a window argument which is simply
@@ -122,7 +138,6 @@ require([
       // ui elements
       var ui = {
         map: $('.map'),
-        apps: $('#apps-panel'),
         blockquotes: $('#testimonials-panel blockquote'),
         integration: $('.loves li')
       };
@@ -130,7 +145,7 @@ require([
       // initialises all the things
       this.init = function() {
         this.embedChats(); // embedded chats
-        this.appsPanel(); // #app-panel for animation
+        initAppsPanelScrollListener();
         this.map(); //  map conversations
         
         this.cycle(ui.blockquotes, 7000); // cycle blockquotes
@@ -160,24 +175,6 @@ require([
 
           target.removeClass('going').addClass('visible');
         }, speed || 4000);
-      };
-
-      // handles the sliding of the devices onto #apps-panel
-      this.appsPanel = function () {
-        var POS = ui.apps.position().top;
-        var OFFSET = 150;
-        
-        // handleScroll() handles the scrolling event, adds the visible class and detaches itself from the window
-        function handleScroll (e) {
-          e.preventDefault();
-          if (window.scrollTop() + OFFSET >= POS) {
-            ui.apps.addClass('visible');
-            window.off('scroll', handleScroll);
-          }
-        }
-        
-        // if the div hasn't got the class visible the attach event listener
-        if (!ui.apps.hasClass('visible')) window.on('scroll', handleScroll);
       };
 
       // generates pseudo-random conversations for the map TODO: malditogeek comment
