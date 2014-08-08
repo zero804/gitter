@@ -238,24 +238,11 @@ require([
       }, time);
     }
 
-    /**
-     *  Gitter() hadnles front-page client-side stuff
-     *  inside the scope of Gitter we have a window argument which is simply
-     */
-    var Gitter = function (window) {
-      // initialises all the things
-      this.init = function() {
-        initEmbedPanel();
-        initAppsPanelScrollListener();
-        initMapMessages();
-        cycleElements($('#testimonials-panel blockquote'), 7000);
-        cycleElements($('.loves li'), 2500);
-      };
-      
-      // initialise
-      window.ready(this.init.bind(this));
-    };
-         
-    
-    new Gitter($(window));
+    $(window).ready(function() {
+      initEmbedPanel();
+      initAppsPanelScrollListener();
+      initMapMessages();
+      cycleElements($('#testimonials-panel blockquote'), 7000);
+      cycleElements($('.loves li'), 2500);
+    });
 });
