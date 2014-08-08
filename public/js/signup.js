@@ -6,7 +6,9 @@ require([
  ], function($, context, mapMessageTemplate) {
   "use strict";
 
-  function random(a) {return a[Math.floor(Math.random() * a.length)]; }
+  function random(array) {
+    return array[Math.floor(Math.random() * array.length)];
+  }
 
   function shuffle(array){
     for(var j, x, i = array.length; i; j = Math.floor(Math.random() * i), x = array[--i], array[i] = array[j], array[j] = x);
@@ -88,7 +90,6 @@ require([
 
   var active = [];
 
-  // TODO: malditogeek comment
   function roomByLocale(locale) {
     var rooms = featuredRooms.filter(function(r) { return r.locale === locale;});
     if (rooms.length) {
@@ -99,7 +100,6 @@ require([
     }
   }
 
-  // TODO: malditogeek comment
   function randomRoom() {
     var room = random(featuredRooms);
     if (active.indexOf(room.name) === -1) {
@@ -180,8 +180,8 @@ require([
         messages.push(chatMessage);
         coords.push(pos);
 
-        var $el = createMessageBubble(chatMessage, pos);
-        addMessageBubbleToMap($el, $map);
+        var $el = createMessageElement(chatMessage, pos);
+        addMessageElementToMap($el, $map);
 
         setTimeout(function() {
           removeMessageBubbleFromMap($el);
@@ -191,7 +191,7 @@ require([
     });
   }
 
-  function createMessageBubble(chatMessage, pos) {
+  function createMessageElement(chatMessage, pos) {
     var html = mapMessageTemplate({
       username: chatMessage.username,
       avatarUrl: chatMessage.avatarUrl,
@@ -204,7 +204,7 @@ require([
     return $(html);
   }
 
-  function addMessageBubbleToMap($message, $map) {
+  function addMessageElementToMap($message, $map) {
     $message.appendTo($map);
 
     var $span = $message.find('span');
