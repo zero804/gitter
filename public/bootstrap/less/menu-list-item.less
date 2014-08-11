@@ -1,4 +1,4 @@
-@-webkit-keyframes pulse_animation {
+@keyframes pulse_animation {
   0% { box-shadow: 0 0 0px #1bee82; color: #1bee82; }
   50% { box-shadow: 0 0 8px #1bee82; color: @trpGreen; }
   100% { box-shadow: 0 0 0px #1bee82; color: #1bee82;  }
@@ -40,10 +40,10 @@
 }
 
 .menu-list-item.chatting.chatting-now:after {
-  -webkit-animation-name: 'pulse_animation';
-  -webkit-animation-duration: 800ms;
-  -webkit-animation-iteration-count: infinite;
-  -webkit-animation-timing-function: linear;
+  animation-name: 'pulse_animation';
+  animation-duration: 800ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
 }
 
 .menu-list-item .item-unread-badge {
@@ -61,9 +61,7 @@
 }
 
 .menu-list-item .item-unread-badge .trpTroupeUnreadCounter {
-  -webkit-border-radius: 4px;
-     -moz-border-radius: 4px;
-          border-radius: 4px;
+  border-radius: 4px;
   display: inline-block;
   padding: 0 4px;
   font-size: 10px;

@@ -370,17 +370,17 @@ module.exports = function( grunt ) {
     },
 
     autoprefixer: {
-      // web: {
-      //   browsers: [
-      //     'last 4 Safari versions',
-      //     'last 4 Firefox versions',
-      //     'last 4 Chrome versions',
-      //     'IE >= 10'],
-      //   expand: true,
-      //   flatten: true,
-      //   src: WEB_CSS,
-      //   dest: 'public/bootstrap/css/'
-      // },
+      web: {
+        browsers: [
+          'last 4 Safari versions',
+          'last 4 Firefox versions',
+          'last 4 Chrome versions',
+          'IE >= 10'],
+        expand: true,
+        flatten: true,
+        src: WEB_CSS,
+        dest: 'public/bootstrap/css/'
+      },
       mobile: {
         browsers: [
           'last 4 ios_saf versions',
