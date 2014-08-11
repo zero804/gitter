@@ -1,21 +1,21 @@
 
-@import "animate.less";
+/*@import "animate.less";*/
 @import "trp3Vars.less";
 
-@-webkit-keyframes pulsate {
-    0% {-webkit-transform: scale(1, 1); }
-    35% {-webkit-transform: scale(1, 1); }
-    50% {-webkit-transform: scale(0.75, 0.75); }
-    65% {-webkit-transform: scale(1, 1);}
-    100% {-webkit-transform: scale(1, 1); }
+@keyframes pulsate {
+    0% { transform: scale(1, 1); }
+    35% { transform: scale(1, 1); }
+    50% { transform: scale(0.75, 0.75); }
+    65% { transform: scale(1, 1);}
+    100% { transform: scale(1, 1); }
 }
 
-@-webkit-keyframes pulsate-retina {
-    0% {-webkit-transform: scale(1, 1); }
-    35% {-webkit-transform: scale(1, 1); }
-    50% {-webkit-transform: scale(0.75, 0.75); }
-    65% {-webkit-transform: scale(1, 1);}
-    100% {-webkit-transform: scale(1, 1);}
+@keyframes pulsate-retina {
+    0% { transform: scale(1, 1); }
+    35% { transform: scale(1, 1); }
+    50% { transform: scale(0.75, 0.75); }
+    65% { transform: scale(1, 1);}
+    100% { transform: scale(1, 1);}
 }
 
 /* Mixin */
@@ -24,34 +24,29 @@
 }
 
 .user-select(@type) {
-  -webkit-user-select: @type;
-   -khtml-user-select: @type;
-     -moz-user-select: @type;
-      -ms-user-select: @type;
-          user-select: @type;
+  user-select: @type;
 }
 
 .trpPeopleListItem.unread {
-      -webkit-animation: pulsate 3s ease-out;
-    -webkit-animation-iteration-count: infinite;
-
+    animation: pulsate 3s ease-out;
+    animation-iteration-count: infinite;
 }
 
 .trpDisplayPicture {
 	display: inline-block;
   text-align: center;
   box-sizing: border-box;
-  -moz-box-sizing: border-box;
-    -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  
   &.unread {
-    -webkit-animation: pulsate 3s ease-out;
-    -webkit-animation-iteration-count: infinite;
+    animation: pulsate 3s ease-out;
+    animation-iteration-count: infinite;
   }
 
   @media @retina {
     &.unread {
-      -webkit-animation: pulsate-retina 3s ease-out;
-      -webkit-animation-iteration-count: infinite;
+      animation: pulsate-retina 3s ease-out;
+      animation-iteration-count: infinite;
     }
   }
 }
@@ -149,18 +144,14 @@ a .trpDisplayPicture {
 
 .view.synced {
   opacity: 1.0;
-  -webkit-transform: translate3d(0,0,0);
+  transform: translate3d(0,0,0);
   transition: opacity 0.2s ease-in-out;
-  -moz-transition: opacity 0.2s ease-in-out;
-  -webkit-transition: opacity 0.2s ease-in-out;
 }
 
 .view.syncing {
   opacity: 0.4;
-  -webkit-transform: translate3d(0,0,0);
+  transform: translate3d(0,0,0);
   transition: opacity .25s ease-in-out;
-  -moz-transition: opacity .25s ease-in-out;
-  -webkit-transition: opacity .25s ease-in-out;
 }
 
 .view.syncerror .trpChatBox {
@@ -216,7 +207,7 @@ a .trpDisplayPicture {
     position: absolute; display: block; content: '';
     border-bottom: 1px solid white;
     height: 100%; width: 100%;
-    box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;
+    box-sizing: border-box; 
 }
 
 .trpDisplayPicture {
@@ -227,16 +218,10 @@ a .trpDisplayPicture {
 
   @invitedGray: 0;
   @invitedOpacity: 0.3;
-  @MSinvitedOpacity: @invitedOpacity * 100; /* DO NOT CHANGE */
+  @MSinvitedOpacity: @invitedOpacity * 100; /* DO NOT CHANGE */ /* OH YEAH? WHY NOT? */
 
   opacity: @invitedOpacity;
-  filter: alpha(opacity=@MSinvitedOpacity);
-
-  -webkit-filter: grayscale(@invitedGray);
-     -moz-filter: grayscale(@invitedGray);
-       -o-filter: grayscale(@invitedGray);
-      -ms-filter: grayscale(@invitedGray);
-          filter: grayscale(@invitedGray);
+  filter: grayscale(@invitedGray);
 
   .trpStatus {
     display: none;
@@ -254,13 +239,6 @@ a .trpDisplayPicture {
 .trpDisplayPicture.busy .trpStatus {
   background-color: #ff2400;
 }
-
-/*.trpDisplayPicture.online:before {
-  content: '\e830';
-  font-family: 'troupe-icons';
-  font-size: 9px;
-  -webkit-font-smoothing: antialiased;
-}*/
 
 .trpButtonGreen {
 	.trpBodyMedium;
