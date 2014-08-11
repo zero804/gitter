@@ -163,7 +163,9 @@ define([
       if(token) return callback(token);
 
       iterations++;
-      if(iterations > 5) return window.reload(true);
+      if(iterations > 50) {
+        return window.location.reload(true);
+      }
       setTimeout(checkToken, 100);
     }
     checkToken();
