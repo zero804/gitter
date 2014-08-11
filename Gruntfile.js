@@ -116,6 +116,46 @@ var MODULES = [
   }
 ];
 
+var LESS_ROOTS = [
+  { name: "trp3"                               },
+  { name: "archive"                            },
+  { name: "mtrp",             only: 'mobile'   },
+  { name: "signup"                             },
+  { name: "trpHomePage"                        },
+  { name: "trpAppsPage"                        },
+  { name: "trpChat"                            },
+  { name: "trpMobileApp",      only: 'mobile'  },
+  { name: "trpMobileUserhome", only: 'mobile'  },
+  { name: "trpNativeChat",     only: 'ios'     },
+  { name: "trpGeneric"                         },
+  { name: "trpHooks"                           },
+  { name: "gitter-login"      }
+];
+
+var LESS_MAP = LESS_ROOTS.reduce(function(memo, file) {
+  var css = 'public/bootstrap/css/' + file.name + '.css';
+  memo[css] = 'public/bootstrap/less/' + file.name + '.less';
+  return memo;
+}, {});
+
+var MOBILE_ONLY_CSS = LESS_ROOTS.filter(function(file) {
+  return file.only == 'mobile';
+}).map(function(file) {
+  return 'public/bootstrap/css/' + file.name + '.css';
+});
+
+var IOS_ONLY_CSS = LESS_ROOTS.filter(function(file) {
+  return file.only == 'ios';
+}).map(function(file) {
+  return 'public/bootstrap/css/' + file.name + '.css';
+});
+
+var WEB_CSS = LESS_ROOTS.filter(function(file) {
+  return !file.only;
+}).map(function(file) {
+  return 'public/bootstrap/css/' + file.name + '.css';
+});
+
 // Unfortunately we can't upgrade to the latest closure
 // as it won't let you mix strict and unstrict code
 var CLOSURE_PATH = 'build-scripts/closure-v20130722';
@@ -274,7 +314,7 @@ module.exports = function( grunt ) {
           'public/bootstrap/less/*.less',
           'public/bootstrap/less/bootstrap/*.less'
         ],
-        tasks: 'less',
+        tasks: ['less:dev','autoprefixer'],
         options: {
           livereload: true
         }
@@ -316,29 +356,48 @@ module.exports = function( grunt ) {
     less: {
       production: {
         options: {
-          paths: ["public/bootstrap/less"],
           compress: true,
           yuicompress: true
         },
-        files: {
-          "public/bootstrap/css/trp3.css" : "public/bootstrap/less/trp3.less",
-          "public/bootstrap/css/archive.css" : "public/bootstrap/less/archive.less",
-          "public/bootstrap/css/mtrp.css": "public/bootstrap/less/mtrp.less",
-          "public/bootstrap/css/signup.css": "public/bootstrap/less/signup.less",
-          "public/bootstrap/css/trpHomePage.css": "public/bootstrap/less/trpHomePage.less",
-          "public/bootstrap/css/trpAppsPage.css": "public/bootstrap/less/trpAppsPage.less",
-          "public/bootstrap/css/trpChat.css": "public/bootstrap/less/trpChat.less",
-          "public/bootstrap/css/trpFiles.css": "public/bootstrap/less/trpFiles.less",
-          "public/bootstrap/css/trpMails.css": "public/bootstrap/less/trpMails.less",
-          "public/bootstrap/css/trpPeople.css": "public/bootstrap/less/trpPeople.less",
-          "public/bootstrap/css/trpMobileApp.css": "public/bootstrap/less/trpMobileApp.less",
-          "public/bootstrap/css/trpMobileUserhome.css": "public/bootstrap/less/trpMobileUserhome.less",
-          "public/bootstrap/css/trpNativeChat.css": "public/bootstrap/less/trpNativeChat.less",
-          "public/bootstrap/css/trpStart.css": "public/bootstrap/less/trpStart.less",
-          "public/bootstrap/css/trpGeneric.css": "public/bootstrap/less/trpGeneric.less",
-          "public/bootstrap/css/trpHooks.css": "public/bootstrap/less/trpHooks.less",
-          "public/bootstrap/css/gitter-login.css": "public/bootstrap/less/gitter-login.less"
-        }
+        files: LESS_MAP
+      },
+      dev: {
+        options: {
+          compress: false
+        },
+        files: LESS_MAP
+      }
+    },
+
+    autoprefixer: {
+      // web: {
+      //   browsers: [
+      //     'last 4 Safari versions',
+      //     'last 4 Firefox versions',
+      //     'last 4 Chrome versions',
+      //     'IE >= 10'],
+      //   expand: true,
+      //   flatten: true,
+      //   src: WEB_CSS,
+      //   dest: 'public/bootstrap/css/'
+      // },
+      mobile: {
+        browsers: [
+          'last 4 ios_saf versions',
+          'last 4 and_chr versions',
+          'last 4 and_ff versions',
+          'last 2 ie_mob versions'],
+        expand: true,
+        flatten: true,
+        src: MOBILE_ONLY_CSS,
+        dest: 'public/bootstrap/css/'
+      },
+      ios: {
+        browsers: ['ios_saf >= 6'],
+        expand: true,
+        flatten: true,
+        src: IOS_ONLY_CSS,
+        dest: 'public/bootstrap/css/'
       }
     },
 
@@ -471,7 +530,8 @@ module.exports = function( grunt ) {
   /* using matchdep to load all grunt related modules */
   require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
-  grunt.registerTask('process', ['jsonlint', 'less', 'requirejs', 'closure-compiler']);
+  grunt.registerTask('css', ['less:production', 'autoprefixer']);
+  grunt.registerTask('process', ['jsonlint', 'css', 'requirejs', 'closure-compiler']);
   grunt.registerTask('manglejs', ['uglify']);
   grunt.registerTask('process-no-min', ['less', 'requirejs']);
   grunt.registerTask('client-libs', ['bowerRequireWrapper']);

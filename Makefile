@@ -170,7 +170,7 @@ npm:
 grunt: clean
 	mkdir output
 	mkdir -p public-processed/js
-	grunt -no-color less
+	grunt -no-color css
 	for i in $(PUBLIC_EXCLUDING_JS); \
 		do cp -R $$i public-processed/; \
 	done
