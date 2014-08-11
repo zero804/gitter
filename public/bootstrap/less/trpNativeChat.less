@@ -33,10 +33,10 @@ body, #mainPage, #content, .contentBody {
 }
 
 body {
-	margin: 0px;
+	margin: 0;
 	position: relative;
 	min-height: 300px;
-	.user-select(none);
+	user-select: none;
 }
 
 html, body {
@@ -71,9 +71,9 @@ a {
 // and block out the detail text that we dont want than making only the
 // small message content selectable.
 .trpChatItemContainer {
-	.user-select(text);
+	user-select: text;
 	.trpChatDetails {
-		.user-select(none);
+		user-select: none;
 	}
 }
 
