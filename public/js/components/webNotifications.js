@@ -62,9 +62,11 @@ define([
     notifications.notify({
       id: 'realtime-error',
       className: 'notification-error',
-      content: "Can't connect to server, retrying....",
-      timeout: Infinity
-      /* TODO: make this persistent and clear it when the persistentOutageCleared event occurs */
+      content: "Unable to establish a realtime connection with the server… Retrying",
+      timeout: Infinity,
+      click: function() {
+        window.location.reload(true);
+      }
     });
   });
 
