@@ -4,7 +4,7 @@ define([
   'utils/context',
   'utils/appevents',
   'collections/instances/troupes',
-  'views/toolbar/troupeCollectionView',
+  'views/menu/troupeCollectionView',
   'log!troupeMenu',
   'cocktail',
   'views/keyboard-events-mixin',

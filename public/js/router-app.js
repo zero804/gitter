@@ -4,7 +4,7 @@ require([
   'backbone',
   'underscore',
   'views/app/appIntegratedView',
-  'views/toolbar/troupeMenu',
+  'views/menu/troupeMenu',
   'collections/instances/troupes',
   'components/titlebar',
   'components/realtime',
