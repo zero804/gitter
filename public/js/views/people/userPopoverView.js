@@ -10,7 +10,7 @@ define([
 ], function(Marionette, Backbone, Popover, template, footerTemplate, appEvents, context, cdn) {
   "use strict";
 
-  var failoverImage = cdn('images/gitter/logo-mark-grey-64.png');
+  var failoverImage = cdn('images/logo-mark-grey-64.png');
 
   function largeAvatar(url) {
     if(!url) return failoverImage;

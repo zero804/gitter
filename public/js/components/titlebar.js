@@ -9,7 +9,7 @@ define([
   }
 
   function updateFavicon(unreadCount) {
-    var image = (unreadCount > 0) ? '/images/gitter/favicon-unread.ico' : '/images/2/gitter/favicon-read.ico';
+    var image = (unreadCount > 0) ? '/images/favicon-unread.ico' : '/images/2/gitter/favicon-read.ico';
     $('#favicon').attr('href', image);
   }
 
