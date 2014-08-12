@@ -4,13 +4,12 @@ define([
   'marionette',
   'utils/appevents',
   'views/app/uiVars',
-  'views/widgets/avatar',
   'components/modal-region',
   'utils/scrollbar-detect',
   'cocktail',
   'views/keyboard-events-mixin',
   'transloadit'
-], function($, context, Marionette, appEvents, uiVars, AvatarView, modalRegion, hasScrollBars, cocktail, KeyboardEventsMixin) {
+], function($, context, Marionette, appEvents, uiVars, modalRegion, hasScrollBars, cocktail, KeyboardEventsMixin) {
   "use strict";
 
   var touchEvents = {

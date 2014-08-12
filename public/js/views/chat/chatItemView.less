@@ -1,7 +1,11 @@
-img.emoji {
-  height: 20px;
-  width: 20px;
-}
+@import "../widgets/avatar";
+@import "../popover";
+@import "chatInputView";
+@import "../unread-item-view-mixin";
+
+// Other items required by this library
+@import "highlight.less";
+
 
 .trpChatContainer .isViewers:last-child .chat-item__details .chat-item__icon--read {
   visibility: visible;
@@ -168,7 +172,6 @@ img.emoji {
 
 .chat-item__icon {
   .trpBodyTiny;
-  .trpHand;
   cursor: pointer;
   -webkit-transition: opacity 0.2s ease;
   -moz-transition: opacity 0.2s ease;
@@ -321,3 +324,4 @@ img.emoji {
   .trpDisplayPicture;
   float: left;
 }
+

@@ -2,9 +2,6 @@ require([
   'jquery',
   'backbone',
   'utils/context',
-  // 'components/live-context',
-  // 'utils/appevents',
-  // 'views/people/peopleCollectionView',
   'views/app/chatIntegratedView',
   'views/chat/chatCollectionView',
   'collections/instances/integrated-items',
@@ -29,8 +26,6 @@ require([
   'components/ajax-errors'      // No ref
 
 ], function($, Backbone, context,
-    // liveContext,
-    // peopleCollectionView,
     ChatIntegratedView,
     ChatCollectionView, itemCollections, RightToolbarView,
     webhookDecorator, issueDecorator, commitDecorator, mentionDecorator,

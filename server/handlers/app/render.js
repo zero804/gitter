@@ -55,6 +55,7 @@ function renderHomePage(req, res, next) {
       res.render(page, {
         useAppCache: !!nconf.get('web:useAppCache'),
         bootScriptName: bootScriptName,
+        cssFileName: "styles/" + bootScriptName + ".css",
         troupeName: req.uriContext.uri,
         troupeContext: troupeContext,
         agent: req.headers['user-agent'],
@@ -81,6 +82,7 @@ function renderMainFrame(req, res, next, frame) {
       res.render(template, {
         appCache: getAppCache(req),
         bootScriptName: bootScriptName,
+        cssFileName: "styles/" + bootScriptName + ".css",
         troupeName: req.uriContext.uri,
         troupeContext: troupeContext,
         chatAppLocation: chatAppLocation,
@@ -115,6 +117,7 @@ function renderChat(req, res, template, script, next) {
         isRepo: troupe.githubType === 'REPO',
         appCache: getAppCache(req),
         bootScriptName: script,
+        cssFileName: "styles/" + script + ".css", // css filename matches bootscript
         githubLink: githubLink,
         troupeName: req.uriContext.uri,
         troupeTopic: troupeContext.troupe.topic,
@@ -233,6 +236,7 @@ function renderUserNotSignedUpMainFrame(req, res, next, frame) {
       res.render(template, {
         appCache: getAppCache(req),
         bootScriptName: bootScriptName,
+        cssFileName: "styles/" + bootScriptName + ".css",
         troupeName: req.params.roomPart1,
         troupeContext: troupeContext,
         chatAppLocation: chatAppLocation,

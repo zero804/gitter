@@ -117,19 +117,30 @@ var MODULES = [
 ];
 
 var LESS_ROOTS = [
-  { name: "trp3"                               },
   { name: "archive"                            },
-  { name: "mtrp",             only: 'mobile'   },
+  { name: "mobile-login",           only: 'mobile'   },
   { name: "signup"                             },
   { name: "trpHomePage"                        },
   { name: "trpAppsPage"                        },
-  { name: "trpChat"                            },
-  { name: "trpMobileApp",      only: 'mobile'  },
-  { name: "trpMobileUserhome", only: 'mobile'  },
-  { name: "trpNativeChat",     only: 'ios'     },
-  { name: "trpGeneric"                         },
+  { name: "generic-layout"                     },
   { name: "trpHooks"                           },
-  { name: "gitter-login"      }
+  { name: "gitter-login"                       },
+
+  // Bootscript root less files
+  { name: 'router-chat'                        },
+  { name: 'router-app'                         },
+  { name: 'router-nli-app'                     },
+  { name: 'router-nli-chat'                    },
+  { name: 'mobile-app',             only: 'mobile'            },
+  { name: 'mobile-nli-app',         only: 'mobile'           },
+  { name: 'router-archive-home'                },
+  { name: 'router-archive-chat'                },
+  { name: 'userhome'                           },
+  { name: 'mobile-userhome',        only: 'mobile'            },
+  { name: 'mobile-native-chat',     only: 'ios'    },
+  { name: 'mobile-native-userhome', only: 'ios'    },
+
+
 ];
 
 var LESS_MAP = LESS_ROOTS.reduce(function(memo, file) {
