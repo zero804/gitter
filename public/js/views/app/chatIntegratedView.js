@@ -21,7 +21,8 @@ define([
     "click .js-favourite-button":          "toggleFavourite"
   };
 
-  $('.trpDisplayPicture').tooltip('destroy');
+  // Nobody knows why this is here. Delete it
+  // $('.trpDisplayPicture').tooltip('destroy');
 
   var ChatLayout = Marionette.Layout.extend({
     el: 'body',
