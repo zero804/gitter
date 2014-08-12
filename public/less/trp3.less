@@ -11,18 +11,8 @@
 
 @import "trp3Chat";
 // @import "userhome-legacy";
+@import "base-transition-mixins";
 
-.transition300ms() {
-  .transition(300ms);
-}
-
-.transition100ms() {
-  .transition(100ms);
-}
-
-.transition500ms() {
-  .transition(500ms);
-}
 
 @keyframes spin {
   0%   { transform: rotate(0deg); }
@@ -52,10 +42,6 @@
 .isLoading {
   .prepend-octicon('\f00a');
   // display: none;
-}
-
-.transition(@time) {
-  transition: all @time ease-in-out;
 }
 
 html {
