@@ -1,4 +1,5 @@
 @import "base-zindex-levels";
+@import "base-transition-mixins";
 
 /* Imports for child views */
 @import "../menu/troupeCollectionView";
@@ -6,6 +7,145 @@
 @import "profileView";
 @import "orgCollectionView";
 @import "nanoScroller";
+
+.trpLeftMenuHotspot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 30px;
+  height: 100%;
+  z-index: 10;
+  display: inline-block;
+}
+
+.trpLeftMenuWrapper {
+  display: inline-block;
+  .trpBodyText;
+  padding-left: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.trpLeftMenuToolbar {
+  padding-left: 26px;
+  padding-bottom: 12px;
+}
+
+.trpLeftMenuToolbarItems {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.trpLeftMenuToolbarItems li {
+  display: inline-block;
+  padding-right: 8px;
+}
+
+.trpLeftMenuIcon {
+  opacity: 0.6;
+  padding: 5px;
+}
+
+.selected {
+  opacity: 1;
+}
+
+
+.unread-normal .trpLeftMenuIcon[data-list="list-troupes"], .unread-one2one .trpLeftMenuIcon[data-list="list-users"] {
+  background-color: @trpPurple;
+  border: 1px solid white;
+  border-radius: 50em;
+}
+
+.trpLeftMenuSpacer {
+  height: 100px;
+}
+
+.trpTroupeList {
+  display: inline-block;
+  list-style-type: none;
+  margin: 0 0 18px 0;
+}
+
+.trpTroupeList a {
+  display: inline-block;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trpTroupeListSearch {
+  padding-left: 8px;
+}
+
+.trpLeftMenuButton, .trpNewTroupeButton {
+  display: inline-block;
+  width: 210px;
+  .trpBodyMedium;
+  margin-top: 20px;
+  background-color: white;
+  padding: 12px;
+  color: @trpGreen;
+}
+
+.trpMenuTab {
+ text-align: center;
+  box-sizing:border-box;
+  -moz-box-sizing: border-box;
+  color: white;
+  font-family: @fontSans;
+  font-size: 12px;
+  position: fixed;
+  left: -25px;
+  top: 110px;
+  width: 25px;
+  line-height: 30px;
+  z-index: 1000;
+  border-radius: 0 2px 2px 0;
+  background-color: #1dce73;
+  transition:all .5s ease-in-out;
+  transition-delay: 0s;
+
+  &.login {
+    width: auto;
+    display: none;
+    padding: 0 1em;
+  }
+
+  @media @small {
+  left: 0;
+  transition-delay: 0.5s;
+
+    &.leftCollapse {
+      left: -25px;
+      transition-delay: 0;
+    }
+  }
+}
+
+.trpUnreadBadge {
+  display: none;
+  position: absolute;
+  right: -9px;
+  top: -9px;
+  width: 15px;
+  height: 15px;
+  background-color: @trpPurple;
+  border-radius: 50em;
+  .trpBodyTiny;
+  color: white;
+  text-align: center;
+  border: 2px solid white;
+}
+
+.trpUnreadBadgeCount {
+  display: inline-block;
+  margin-top: 1px;
+  width: 15px;
+  text-align: center;
+}
 
 // TODO: this rule only appears to be used on mobile. Confirm....
 .menu {
@@ -345,4 +485,67 @@
   right: 0px;
   bottom: 0px;
   left: 0px; 
+}
+
+
+
+
+body.dragging .trpTroupeList {
+
+}
+
+.list-favourites {
+  .transition300ms;
+}
+
+body.dragging .list-favourites {
+  min-height: 25px;
+/*  padding: 20px 0;
+  .transition300ms;*/
+/*  padding-top: 20px;
+  padding-bottom: 20px;*/
+  background-color: rgba(255,255,255,0.1);
+  border-top: 1px dashed rgba(255,255,255,0.2);
+  border-bottom: 1px dashed rgba(255,255,255,0.2);
+  padding: 5px 0;
+  .transition300ms;
+}
+
+body.dragging .list-favourites li:first-child {
+  padding-top: 27px;
+}
+
+body.dragging .list-favourites li:last-child {
+  padding-bottom: 27px;
+}
+
+body.dragging .list-favourites li.placeholder {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+.trpTroupeList {
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+
+  span {
+    display: inline-block;
+    color: white;
+    white-space: nowrap;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+  }
+
+  span.disabled {
+    color: #ccc;
+  }
+}
+
+
+.trpTroupeListSearch {
+  padding-left: 8px;
 }

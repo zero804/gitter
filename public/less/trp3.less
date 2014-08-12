@@ -41,7 +41,6 @@
 
 .isLoading {
   .prepend-octicon('\f00a');
-  // display: none;
 }
 
 html {
@@ -117,251 +116,6 @@ label {
 
 }
 
-.gtrOwnerDD {
-  position: relative;
-}
-
-.gtrDDAvatar:before {
-  margin-left: -20px;
-}
-
-.gtrDDAvatar {
-  height: 20px;
-  width: 20px;
-  content: ' ';
-  background-size: contain;
-  display: inline-block;
-  border-radius: 3px;
-}
-
-.gtrDDButton {
-  vertical-align: middle;
-  margin-right: 14px;
-  position: relative;
-  margin-left: 7px;
-
-  .dropdown-menu {
-    max-height: 138px;
-    overflow-y: auto;
-  }
-
-  img {
-    vertical-align: middle;
-    margin-top: -2px;
-  }
-}
-
-.gtrDDButton:before {
-  position: absolute;
-  top: 7px;
-  right: 14px;
-  display: block;
-  width: 0;
-  height: 0;
-  content: "";
-  border: 4px solid;
-  border-right-color: transparent;
-  border-left-color: transparent;
-  border-bottom-color: transparent;
-}
-
-
-.gtrDDText {
-  padding-left: 35px;
-  margin-left: -32px;
-  width: 150px;
-  padding-right: 20px;
-}
-
-
-.gtrSlash {
-  float: left;
-  padding-top: 35px;
-  font-size: 18px;
-  margin: 0 12px 0 0;
-}
-
-.gtrRoomName {
-  height: 100px;
-}
-
-.gtrRoomPermissions {
-  clear: both;
-
-  input {
-    float: left;
-    margin: 8px 12px 0 4px;
-  }
-
-  .permission-row {
-    margin: 8px 0;
-  }
-
-  label {
-    display: inline;
-  }
-
-  .description {
-    display: block;
-    margin-left: 61px;
-    font-size: 14px;
-  }
-
-  .permission-label {
-    margin-left: 8px;
-  }
-
-  .gtrAutoJoin {
-    margin-top: 12px;
-    .transition300ms;
-    input {
-      margin-right: 8px;
-    }
-
-    &.disabled {
-      opacity: 0;
-    }
-    .permission-label {
-      vertical-align: middle;
-      padding-top: 4px;
-      padding-left: 22px;
-    }
-
-  }
-
-  .icon-public {
-    .prepend-globe-icon;
-    &:before {
-      font-size: 22px;
-      padding-top: 8px;
-      margin-top: -4px;
-    }
-  }
-
-  .github-REPO {
-    .prepend-repo-icon;
-    &:before {
-      font-size: 24px;
-      padding-top: 8px;
-    }
-  }
-
-  .icon-channel {
-    .prepend-channel-icon;
-    &:before {
-      font-size: 22px;
-      padding-top: 8px;
-      margin-top: -4px;
-    }
-  }
-
-  .github-ORG {
-    .prepend-org-icon;
-    &:before {
-      font-size: 24px;
-      padding-top: 8px;
-    }
-  }
-
-  .github-LOCK {
-    .prepend-lock-icon;
-    &:before {
-      font-size: 24px;
-      padding-top: 8px;
-    }
-  }
-
-}
-
-.gtrPeopleAddRoster {
-  .trpBodyMedium;
-  &__adding {
-    p { margin: 0; }
-    margin-left: 10px;
-    padding-bottom: 15px;
-  }
-}
-
-.gtrPeopleRosterItem {
-  // .trpBodyMedium;
-  width: 100%;
-  cursor: default;
-  margin-bottom: 8px;
-  overflow: hidden;
-
-  &__avatar {
-    float: left;
-  }
-
-  &__content {
-
-    margin-left: 39px;
-    line-height: 30px;
-
-    p {
-      margin-bottom: 0;
-      padding-left: 24px !important;
-
-      a {
-        text-decoration: underline;
-      }
-
-      &.added {
-        .prepend-octicon('\f03a');
-
-        &::before {
-          color: hsl(100, 60%, 70%);
-        }
-      }
-
-      &.invited {
-        .prepend-octicon('\f03c');
-
-        &::before {
-          color: hsl(0, 0%, 75%);
-        }
-      }
-
-      &.unreachable {
-        .prepend-octicon('\f081');
-
-        &::before {
-          color: hsl(0, 60%, 70%);
-        }
-      }
-    }
-  }
-
-  &:last-child {
-    margin-bottom: 10px;
-  }
-
-  .username {
-    color: #999;
-  }
-
-  &:hover .remove {
-    opacity: 1;
-  }
-
-  .remove {
-    float: right;
-    .prepend-icon-clear();
-    cursor: pointer;
-    opacity: 0.6;
-    .transition300ms;
-  }
-
-  .remove:before {
-    position: inherit;
-  }
-
-  .remove:hover {
-    color: @trpRed;
-  }
-
-
-}
 
 .modal textarea.hidden-input {
   .trpBodyMedium;
@@ -501,15 +255,15 @@ a:hover {
   }
 }
 
-.trpLeftMenuHotspot {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 30px;
-	height: 100%;
-	z-index: 1010;
-	display: inline-block;
-}
+// .trpLeftMenuHotspot {
+// 	position: fixed;
+// 	top: 0;
+// 	left: 0;
+// 	width: 30px;
+// 	height: 100%;
+// 	z-index: 1010;
+// 	display: inline-block;
+// }
 
 body.logged-out {
   .menu {
@@ -845,68 +599,6 @@ body.logged-out {
   cursor: pointer;
 }
 
-
-
-body.dragging .trpTroupeList {
-
-}
-
-.list-favourites {
-  .transition300ms;
-}
-
-body.dragging .list-favourites {
-  min-height: 25px;
-/*  padding: 20px 0;
-  .transition300ms;*/
-/*  padding-top: 20px;
-  padding-bottom: 20px;*/
-  background-color: rgba(255,255,255,0.1);
-  border-top: 1px dashed rgba(255,255,255,0.2);
-  border-bottom: 1px dashed rgba(255,255,255,0.2);
-  padding: 5px 0;
-  .transition300ms;
-}
-
-body.dragging .list-favourites li:first-child {
-  padding-top: 27px;
-}
-
-body.dragging .list-favourites li:last-child {
-  padding-bottom: 27px;
-}
-
-body.dragging .list-favourites li.placeholder {
-  padding-top: 0px;
-  padding-bottom: 0px;
-}
-
-.trpTroupeList {
-	margin: 0;
-  width: 100%;
-  box-sizing: border-box;
-  -moz-box-sizing: border-box;
-
-  span {
-    display: inline-block;
-    color: white;
-    white-space: nowrap;
-    max-width: 180px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    vertical-align: middle;
-  }
-
-  span.disabled {
-    color: #ccc;
-  }
-}
-
-
-.trpTroupeListSearch {
-	padding-left: 8px;
-}
-
 body.dragging, body.dragging * {
   cursor: move !important;
 }
@@ -1014,41 +706,6 @@ ul li.placeholder:before {
 */
 .trpNewTroupeButton {
   border-radius: 0 4px 4px 0;
-}
-
-.trpMenuTab {
- text-align: center;
-  box-sizing:border-box;
-  -moz-box-sizing: border-box;
-  color: white;
-  font-family: @fontSans;
-  font-size: 12px;
-  position: fixed;
-  left: -25px;
-  top: 110px;
-  width: 25px;
-  line-height: 30px;
-  z-index: 1000;
-  border-radius: 0 2px 2px 0;
-  background-color: #1dce73;
-  transition:all .5s ease-in-out;
-  transition-delay: 0s;
-
-  &.login {
-    width: auto;
-    display: none;
-    padding: 0 1em;
-  }
-
-  @media @small {
-  left: 0;
-  transition-delay: 0.5s;
-
-    &.leftCollapse {
-      left: -25px;
-      transition-delay: 0;
-    }
-  }
 }
 
 .trpUserHome {
