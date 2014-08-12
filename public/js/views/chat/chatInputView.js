@@ -212,7 +212,7 @@ define([
           template: function(emoji) {
             return emojiListItemTemplate({
               emoji: emoji,
-              emojiUrl: cdn('images/2/gitter/emoji/' + emoji + '.png')
+              emojiUrl: cdn('images/gitter/emoji/' + emoji + '.png')
             });
           },
           replace: function (value) {
