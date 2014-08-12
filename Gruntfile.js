@@ -133,7 +133,7 @@ var LESS_ROOTS = [
 ];
 
 var LESS_MAP = LESS_ROOTS.reduce(function(memo, file) {
-  var css = 'public/bootstrap/css/' + file.name + '.css';
+  var css = 'public/styles/' + file.name + '.css';
   memo[css] = 'public/bootstrap/less/' + file.name + '.less';
   return memo;
 }, {});
@@ -141,19 +141,19 @@ var LESS_MAP = LESS_ROOTS.reduce(function(memo, file) {
 var MOBILE_ONLY_CSS = LESS_ROOTS.filter(function(file) {
   return file.only == 'mobile';
 }).map(function(file) {
-  return 'public/bootstrap/css/' + file.name + '.css';
+  return 'public/styles/' + file.name + '.css';
 });
 
 var IOS_ONLY_CSS = LESS_ROOTS.filter(function(file) {
   return file.only == 'ios';
 }).map(function(file) {
-  return 'public/bootstrap/css/' + file.name + '.css';
+  return 'public/styles/' + file.name + '.css';
 });
 
 var WEB_CSS = LESS_ROOTS.filter(function(file) {
   return !file.only;
 }).map(function(file) {
-  return 'public/bootstrap/css/' + file.name + '.css';
+  return 'public/styles/' + file.name + '.css';
 });
 
 // Unfortunately we can't upgrade to the latest closure
@@ -379,7 +379,7 @@ module.exports = function( grunt ) {
         expand: true,
         flatten: true,
         src: WEB_CSS,
-        dest: 'public/bootstrap/css/'
+        dest: 'public/styles/'
       },
       mobile: {
         browsers: [
@@ -390,14 +390,14 @@ module.exports = function( grunt ) {
         expand: true,
         flatten: true,
         src: MOBILE_ONLY_CSS,
-        dest: 'public/bootstrap/css/'
+        dest: 'public/styles/'
       },
       ios: {
         browsers: ['ios_saf >= 6'],
         expand: true,
         flatten: true,
         src: IOS_ONLY_CSS,
-        dest: 'public/bootstrap/css/'
+        dest: 'public/styles/'
       }
     },
 

@@ -58,3 +58,4 @@ dump.rdb
 heapdump-*.heapsnapshot
 ASSET_TAG
 public-compile-cache
+public/styles
