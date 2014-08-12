@@ -1,11 +1,22 @@
 // Our fonts
 
-@fontSerif: 'StagWeb-Light', serif;
-@fontSans: 'Open Sans', 'HelveticaNeue-Light', sans-serif;
-@fontThin: 'Open Sans', serif;
+@fontSerif: 'AppleSDGothicNeo-Medium', 'StagWeb-Light', serif;
+/*@fontSansLight: 'StagSansWeb-Light', sans-serif;*/
+@fontSans: 'AppleSDGothicNeo-Medium','Open Sans', 'HelveticaNeue-Light', sans-serif;
+@fontThin: 'StagWeb-Thin', serif;
 
 @bodyPadding:	 20px;
 @bodyFont: 14px;
+
+@font-face {
+    font-family: "troupe-icons";
+    src: url("../fonts/troupe-icons.woff") format('woff');
+}
+
+@font-face {
+    font-family: "octicons";
+    src: url("../fonts/octicons.woff") format('woff');
+}
 
 .trpH1 {
   font-family: @fontSans;
@@ -19,7 +30,7 @@
 
 .trpH3 {
   font-family: @fontSans;
-  font-size: 18px; 
+  font-size: 16px; 
 }
 
 .trpH4 {
@@ -42,27 +53,12 @@
   font-size: 14px; 
 }
 
-.trpBodyMediumSmall {
-  font-family: @fontSans;
-  font-size: 13px; 
-}
-
 .trpBodySmall {
   font-family: @fontSans;
   font-size: 12px;
-  line-height: 18px;
 }
 
 .trpBodyTiny {
   font-family: @fontSans;
   font-size: 9px;
-}
-
-@font-face {
-    font-family: "troupe-icons";
-    src: url("../../fonts/troupe-icons.woff") format('woff');
-}
-@font-face {
-    font-family: "octicons";
-    src: url("../../fonts/octicons.woff") format('woff');
 }

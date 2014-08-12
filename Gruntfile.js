@@ -134,7 +134,7 @@ var LESS_ROOTS = [
 
 var LESS_MAP = LESS_ROOTS.reduce(function(memo, file) {
   var css = 'public/styles/' + file.name + '.css';
-  memo[css] = 'public/bootstrap/less/' + file.name + '.less';
+  memo[css] = 'public/less/' + file.name + '.less';
   return memo;
 }, {});
 
@@ -311,8 +311,8 @@ module.exports = function( grunt ) {
     watch: {
       less: {
         files: [
-          'public/bootstrap/less/*.less',
-          'public/bootstrap/less/bootstrap/*.less'
+          'public/less/*.less',
+          'public/less/bootstrap/*.less'
         ],
         tasks: ['less:dev','autoprefixer'],
         options: {
