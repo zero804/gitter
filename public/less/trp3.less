@@ -10,26 +10,7 @@
 @import "trpButtons";
 
 @import "trp3Chat";
-@import "trp3Mail";
-@import "trp3Files";
-@import "trp3People";
-@import "userhome";
-
-@import "nanoScroller";
-@import "trpInvites";
-
-/* new stuff */
-@import "menu";
-@import "menu-list-item";
-@import "chat";
-@import "chat-container";
-@import "chat-item";
-@import "chat-input";
-@import "chat-header";
-@import "welcome-tips";
-/* end of new stuff*/
-
-@import "../js/views/app/markdownView.less";
+// @import "userhome-legacy";
 
 .transition300ms() {
   .transition(300ms);
@@ -878,71 +859,6 @@ body.logged-out {
   cursor: pointer;
 }
 
-.gtrActivityList {
-  list-style-type: none;
-  margin: 0;
-  .trpBodyMediumSmall;
-
-  .commits {
-    display: none;
-  }
-
-  li {
-    border-bottom: 1px dotted rgba(100,100,100,0.1);
-    padding: 7px 7px 7px 15px;
-    line-height: 20px;
-    cursor: default;
-  }
-
-  li:hover {
-    background-color: rgba(230,230,230,1);
-    color: black;
-
-    .gtrActivityItemText .mention {
-      border: 1px solid fade(@trpGrey,50%);
-      background-color: fade(@trpGrey,30%);
-    }
-  }
-
-  .activity-detail {
-    font-size: 12px;
-    line-height: 16px;
-  }
-
-  .activity-commit {
-    font-size: 12px;
-    line-height: 20px;
-    margin: 0;
-  }
-
-  .activity-time {
-    opacity: 1;
-    font-size: 11px;
-    position: absolute;
-    right: 4px;
-    top: 2px;
-    color: rgba(100,100,100,0.4);
-    z-index: 100;
-  }
-
-}
-
-.activity-expand {
-  cursor: pointer;
-
-  ul {
-    list-style: none;
-    margin: 0;
-  }
-
-}
-
-.gtrActivityItemText {
-  vertical-align: middle;
-  display: inline-block;
-  opacity: 0.8;
-  width: 205px;
-}
 
 
 body.dragging .trpTroupeList {
@@ -1812,35 +1728,6 @@ ul.roster {
 }
 
 
-.trpToolbarContent {
-  display: inline-block;
-  width: 100%;
-  vertical-align: top;
-  height: 100%;
-  overflow: auto;
-  overflow-x: hidden;
-
-  table, tr, td {
-    border-spacing: 0;
-    padding: 0;
-    margin: 0;
-  }
-
-
-  @media @mid {
-
-    padding-left: 4px;
-
-    .trpToolbarHeader.divider:first-child {
-      border-bottom: 0;
-    }
-
-    .trpToolbarList {
-      max-height: 40%;
-    }
-
-  }
-}
 
 #file-nano .content {
   bottom: 40px;
@@ -1939,14 +1826,6 @@ ul.roster {
 	width: 100%;
 }
 
-.frame-people {
-	overflow: auto;
-}
-
-.frame-people .view {
-	float: left;
-}
-
 .notification-center {
   width: 300px;
 	position: fixed;
@@ -1996,20 +1875,6 @@ ul.roster {
 
 .qq-upload-list {
 	bottom: 75px;
-}
-
-.trpToolbarContent .qq-upload.button {
-	position: absolute;
-	width: 200px;
-	height: 32px;
-}
-
-.trpToolbarContent input {
-  top: 2px;
-  width: 32px;
-  height: 32px;
-  overflow: hidden;
-  left: 20px;
 }
 
 .button-choose-avatar input {

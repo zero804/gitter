@@ -1,14 +1,13 @@
-@l1:  100;   /* deep -> Root UI Components */ 
-@l2:  200;
-@l3:  300;
-@l4:  400;
-@l5:  500;
-@l6:  600;
-@l7:  700;
-@l8:  800;
-@l9:  900;
-@l10: 1000;  /* shallow -> Popups and others */
+@import "base-zindex-levels";
 
+/* Imports for child views */
+@import "../menu/troupeCollectionView";
+@import "searchView";
+@import "profileView";
+@import "orgCollectionView";
+@import "nanoScroller";
+
+// TODO: this rule only appears to be used on mobile. Confirm....
 .menu {
 
   &, & * {
@@ -71,6 +70,8 @@
     position: absolute;
   }
 }
+
+/* Rules for this view */
 
 .menu-header {
   .trpBodyMedium;
@@ -180,6 +181,7 @@
   }
 }
 
+
 .menu-search {
   text-align: center;
   width: 92%;
@@ -241,6 +243,7 @@
     display: none;
   }
 }
+
 
 .menu-content {
 

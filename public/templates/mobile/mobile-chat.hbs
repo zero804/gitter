@@ -7,11 +7,7 @@
 
   <title>{{troupeName}}</title>
 
-  {{#if isUserhome}}
-  <link rel="stylesheet" href='{{ cdn "styles/trpMobileUserhome.css"}}'>
-  {{else}}
-  <link rel="stylesheet" href='{{ cdn "styles/trpMobileApp.css"}}'>
-  {{/if}}
+  <link rel="stylesheet" href='{{ cdn cssFileName }}'>
 
   {{{ generateTroupeContext troupeContext }}}
 
