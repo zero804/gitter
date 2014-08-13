@@ -106,10 +106,8 @@ img.emoji {
 .chat-item__aside { float: left; }
 
 .chat-item__container {
+  .border-box-sizing;
   padding: 14px 30px 0px 44px;
-  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-  -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-  box-sizing: border-box;         /* Opera/IE 8+ */
   display: inline-block;
   text-align: left;
   width: 100%;
@@ -122,10 +120,6 @@ img.emoji {
       color: #888;
     }
   }
-
-  // .burstContinued & {
-  //   padding: 0 30px 0 44px;
-  // }
 
   @media @mid {
     padding: padding: 8px 30px 0px 32px;
@@ -179,12 +173,10 @@ img.emoji {
   width: 16px;
   height: 16px;
   color: transparent;
-  // margin-left: 2px;
   line-height: 9px;
   vertical-align: middle;
   opacity: 0.5;
   visibility: hidden;
-  // display: none;
   overflow-x: hidden;
   background-size: cover;
   background-repeat: no-repeat;
@@ -204,13 +196,11 @@ img.emoji {
 
   .chat-item:hover & {
     visibility: visible;
-    // display: inline-block;
     opacity: 1;
   }
   
   .isViewers & {
     visibility: visible;
-    // display: inline-block;
   }
 
   @media @retina {
@@ -219,11 +209,11 @@ img.emoji {
 }
 
 .chat-item__icon--edit {
+  
   .chat-item__icon;
 
   .isViewers.chat-item:hover & {
     visibility: visible;
-    // display: inline-block;
     opacity: 1;
   }
 
@@ -297,7 +287,7 @@ img.emoji {
   background-color: @status_bg;
   border: 2px solid darken(@status_bg, 1%);
   width: 89.5%;
-  margin: 0.625/2em 5.25% 0.625/2em;
+  margin: 1em 5.25% 0.3125em;
   padding: 0.625em;
   border-radius: 3px;
 

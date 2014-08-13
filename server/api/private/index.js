@@ -64,9 +64,12 @@ module.exports = {
         authMiddleware,
         require('./org-members.js'));
 
-
     app.post(apiRoot + '/private/statsc',
         authMiddleware,
         require('./statsc.js'));
+
+    app.get(apiRoot + '/private/sample-chats',
+        require('./sample-chats.js'));
+
   }
 };

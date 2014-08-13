@@ -132,3 +132,9 @@ exports.generateTroupeContext = function(troupeContext, parameters) {
           'window.troupeContext = ' + safeJson(JSON.stringify(troupeContext)) + ';' +
           '</script>';
 };
+
+// credit to @lazd (https://github.com/lazd) - https://github.com/wycats/handlebars.js/issues/249
+exports.pluralize = function(number, singular, plural) {
+  if (number === 1) return singular;
+  return (typeof plural === 'string') ? plural : singular + 's';
+};

@@ -413,7 +413,7 @@ define([
       return getOrCreateClient();
     },
 
-    registerForSnapsnots: function(channel, listener, stateProvider) {
+    registerForSnapshots: function(channel, listener, stateProvider) {
       return snapshotExtension.registerForSnapshots(channel, listener, stateProvider);
     }
 

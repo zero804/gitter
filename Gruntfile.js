@@ -10,6 +10,10 @@ var MODULES = [
       exclude: ["core-libraries"]
   },
   {
+      name: "homepage",
+      exclude: ["core-libraries"]
+  },
+  {
       name: "router-app",
       include: [
         "utils/tracking",
@@ -30,6 +34,14 @@ var MODULES = [
   },
   {
       name: "router-chat",
+      include: [
+        "views/widgets/avatar",
+        "views/widgets/timeago"
+      ],
+      exclude: ["core-libraries"]
+  },
+  {
+      name: "router-embed-chat",
       include: [
         "views/widgets/avatar",
         "views/widgets/timeago"
@@ -325,7 +337,7 @@ module.exports = function( grunt ) {
           "public/bootstrap/css/archive.css" : "public/bootstrap/less/archive.less",
           "public/bootstrap/css/mtrp.css": "public/bootstrap/less/mtrp.less",
           "public/bootstrap/css/signup.css": "public/bootstrap/less/signup.less",
-          "public/bootstrap/css/trpHomePage.css": "public/bootstrap/less/trpHomePage.less",
+          "public/bootstrap/css/homepage.css": "public/bootstrap/less/homepage.less",
           "public/bootstrap/css/trpAppsPage.css": "public/bootstrap/less/trpAppsPage.less",
           "public/bootstrap/css/trpChat.css": "public/bootstrap/less/trpChat.less",
           "public/bootstrap/css/trpFiles.css": "public/bootstrap/less/trpFiles.less",
@@ -421,15 +433,6 @@ module.exports = function( grunt ) {
       'jquery.validation':  {
         files : {
           'output/client-libs/jquery.validation/jquery.validate-amd.js': ['output/client-libs/jquery.validation/jquery.validate.js']
-        },
-        modules: {
-          'jquery': 'jQuery'
-        },
-        exports: 'jQuery'
-      },
-      'jquery-carousel': {
-        files : {
-          'output/client-libs/jquery-carousel/jquery.carouFredSel-6.2.1.amd.js': ['output/client-libs/jquery-carousel/jquery.carouFredSel-6.2.1.js']
         },
         modules: {
           'jquery': 'jQuery'
