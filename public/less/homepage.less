@@ -1,21 +1,6 @@
 @import "homepage-reset.less";
 @import "homepage-mobile.less";
 
-/* prefixer, pass a property that you want to prefix and a value and voila */
-.vendor(@property, @value) {
-  -webkit-@{property}: @value;
-   -khtml-@{property}: @value;
-     -moz-@{property}: @value;
-          @{property}: @value;
-}
-
-.transition (@transition) {
-  -webkit-transition: @transition;
-  -moz-transition:    @transition;
-  -ms-transition:     @transition;
-  -o-transition:      @transition;
-}
-
 /* Defining & Setting Keyframes */
 .dropdown__keyframes() {
   0% { top: -100px; }
@@ -52,45 +37,20 @@
   100% { }
 }
 
-/* this repetition sure is annoying but LESS doesn't support a better solution */
-@-webkit-keyframes  dropdown { .dropdown__keyframes; }
-@-moz-keyframes     dropdown { .dropdown__keyframes; }
-@-ms-keyframes      dropdown { .dropdown__keyframes; }
-@-o-keyframes       dropdown { .dropdown__keyframes; }
-@keyframes          dropdown { .dropdown__keyframes; }
-
-@-webkit-keyframes  appear { .appear__keyframes; }
-@-moz-keyframes     appear { .appear__keyframes; }
-@-ms-keyframes      appear { .appear__keyframes; }
-@-o-keyframes       appear { .appear__keyframes; }
-@keyframes          appear { .appear__keyframes; }
-
-@-webkit-keyframes  disappear { .disappear__keyframes; }
-@-moz-keyframes     disappear { .disappear__keyframes; }
-@-ms-keyframes      disappear { .disappear__keyframes; }
-@-o-keyframes       disappear { .disappear__keyframes; }
-@keyframes          disappear { .disappear__keyframes; }
-
-@-webkit-keyframes  tuck-legs { .tuck-legs__keyframes; }
-@-moz-keyframes     tuck-legs { .tuck-legs__keyframes; }
-@-ms-keyframes      tuck-legs { .tuck-legs__keyframes; }
-@-o-keyframes       tuck-legs { .tuck-legs__keyframes; }
-@keyframes          tuck-legs { .tuck-legs__keyframes; }
-
-@-webkit-keyframes  tuck-arms { .tuck-arms__keyframes; }
-@-moz-keyframes     tuck-arms { .tuck-arms__keyframes; }
-@-ms-keyframes      tuck-arms { .tuck-arms__keyframes; }
-@-o-keyframes       tuck-arms { .tuck-arms__keyframes; }
-@keyframes          tuck-arms { .tuck-arms__keyframes; }
+@keyframes dropdown { .dropdown__keyframes; }
+@keyframes appear { .appear__keyframes; }
+@keyframes disappear { .disappear__keyframes; }
+@keyframes tuck-legs { .tuck-legs__keyframes; }
+@keyframes tuck-arms { .tuck-arms__keyframes; }
 
 /* animations */
 .menu-animation {
-  .vendor(animation, appear 1s linear 2s 1 normal forwards);
-  .vendor(opacity, 0);
+  animation: appear 1s linear 2s 1 normal forwards;
+  opacity: 0;
 }
 
 .bg-animation {
-  .vendor(animation, disappear 1s linear 0.5s);
+  animation: disappear 1s linear 0.5s;
   position: absolute;
   background: #231f20;
   top: 0;
@@ -101,12 +61,12 @@
 }
 
 .logo-animation {
-  .vendor(animation, dropdown 1s linear 1s 1 normal forwards);
-  .vendor(transform, translate3d(0,0,0));
+  animation: dropdown 1s linear 1s 1 normal forwards;
+  transform: translate3d(0,0,0);
 }
 
 .logo-left-arm {
-  .vendor(animation-name, tuck-arms);
+  animation-name: tuck-arms;
   position: absolute;
   left: 0;
   top: 0;
@@ -116,7 +76,7 @@
 }
 
 .logo-body-left {
-  .vendor(animation-name, tuck-legs);
+  animation-name: tuck-legs;
   position: absolute;
   background-color: white;
   left: 5px;
@@ -126,7 +86,7 @@
 }
 
 .logo-body-right {
-  .vendor(animation-name, tuck-legs);
+  animation-name: tuck-legs;
   position: absolute;
   background-color: white;
   left: 10px;
@@ -136,7 +96,7 @@
 }
 
 .logo-right-arm {
-  .vendor(animation-name, tuck-arms);
+  animation-name: tuck-arms;
   position: absolute;
   left: 15px;
   top: 4px;
@@ -146,7 +106,7 @@
 }
 
 .logo-image {
-  .vendor(animation-name, appear);
+  animation-name: appear;
   position: absolute;
   top: 0;
   left: 10px;
@@ -155,31 +115,29 @@
 a {
   cursor: pointer;
   @transition: opacity .1s ease-in-out, color .2s ease-in, background .15s ease-out, box-shadow .05s ease-in-out, border-color .15s;
-  .vendor(transition, @transition);
+  transition: @transition;
 }
 
 .avatar, .msg span {
-  -webkit-transition: -webkit-transform .2s cubic-bezier(.31, -.13,.5, 1.39), opacity .05s cubic-bezier(.31, -.13,.5, 1.39), top .25s;
-  -moz-transition: -moz-transform .2 cubic-bezier(.31, -.13,.5, 1.39)s, opacity .05s cubic-bezier(.31, -.13,.5, 1.39), top .25s;
   transition: transform .2s cubic-bezier(.31, -.13,.5, 1.39), opacity .05s cubic-bezier(.31, -.13,.5, 1.39), top .25s;
 }
 
 #apps-panel .devices, #apps-panel .phone {
-  .vendor(transition, left .66s cubic-bezier(.31, -.13,.5, 1.39));
+  transition: left .66s cubic-bezier(.31, -.13,.5, 1.39);
 }
 
 #apps-panel .phone {
-  .vendor(transition-delay, .2s);
+  transition:delay, .2s;
 }
 
 #apps-panel .devices .screenshot, blockquote, .loves li, .loves li img {
   @transition: opacity .4s .75s ease-in, top .45s .75s;
-  .vendor(transition, @transition);
+  transition: @transition;
 }
 
 .tooltip {
   @transition: margin-top .3s cubic-bezier(.31, -.13,.5, 1.39), opacity .3s cubic-bezier(.31, -.13,.5, 1.39);
-  .vendor(transition, @transition);
+  transition: @transition;
 }
 
 /**
@@ -389,7 +347,7 @@ h1:after, h2:after {
  */
 #intro-panel {
   background: url('../images/home/banner.jpg') no-repeat center center;
-  .vendor(background-size, cover);
+  background-size: cover;
   z-index: 9999;
 
   .logo-holder {
@@ -422,8 +380,8 @@ h1:after, h2:after {
 }
 
 #intro-panel .bg {
-  .vendor(animation, appear 1s linear 0.25s 1 normal forwards);
-  .vendor(opacity, 0);
+  animation: appear 1s linear 0.25s 1 normal forwards;
+  opacity: 0;
   position: absolute;
   left: 0;
   right: 0;
@@ -436,7 +394,6 @@ h1:after, h2:after {
 
   /* Give the impression it's just a background-image */
   pointer-events: none;
-  -webkit-user-select: none;
   user-select: none;
 }
 
@@ -453,7 +410,6 @@ h1:after, h2:after {
 #intro-panel .msg {
   position: absolute;
   transform: translate3d(0,0,0);
-  -webkit-transform: translate3d(0,0,0);
 
   display: block;
   width: 400px;
@@ -475,7 +431,7 @@ h1:after, h2:after {
   border-radius: 18px;
 
   opacity: 0;
-  -webkit-transform: scale(0);
+  transform: scale(0);
 }
 
 .msg span {
@@ -516,7 +472,7 @@ h1:after, h2:after {
 
 #intro-panel .avatar.enter, .msg span.enter {
   opacity: 1;
-  -webkit-transform: scale(1);
+  transform: scale(1);
 }
 
 #intro-panel .map .bg {
@@ -1117,7 +1073,6 @@ h1:after, h2:after {
   margin-top: -60px;
 
   pointer-events: none;
-  -webkit-user-select: none;
 }
 
 #apps-panel.visible .devices {
