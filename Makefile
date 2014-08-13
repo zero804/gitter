@@ -18,7 +18,7 @@ else
 CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/ public/styles/ public-compile-cache/)
 endif
 
-PUBLIC_EXCLUDING_JS = $(shell ls -d public/*|grep -v ^public/js$)
+PUBLIC_EXCLUDING_JS := $(shell ls -d public/*|grep -v ^public/js$)
 
 .PHONY: clean test perf-test-xunit perf-test test-xunit test-in-browser test-in-browser-xunit test-coverage prepare-for-end-to-end-testing end-to-end-test
 
