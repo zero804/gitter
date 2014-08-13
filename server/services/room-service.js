@@ -628,54 +628,70 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
 }
 exports.createCustomChildRoom = createCustomChildRoom;
 
+/**
+ * notifyInvitedUser() informs an invited user
+ *
+ * fromUser       User - the inviter
+ * invitedUser    User - the invited user
+ * room           Room - the room in context
+ * opts           Object - token & others
+ *
+ * returns        User - the invited user
+ */
+function notifyInvitedUser(fromUser, invitedUser, room, isNewUser) {
+  // invited users dont have github tokens yet
+  var options = invitedUser.state === 'INVITED' ? { githubTokenUser: fromUser } : {};
+  // get the email address
+  return emailAddressService(invitedUser, options)
+    .then(function (emailAddress) {
+      var notification;
+
+      if (invitedUser.state === 'INVITED') {
+        if (emailAddress) {
+          notification = 'email_invite_sent';
+          emailNotificationService.sendInvitation(fromUser, invitedUser, room);
+        } else {
+          notification = 'unreachable_for_invite';
+        }
+      } else {
+        emailNotificationService.addedToRoomNotification(fromUser, invitedUser, room);
+        notification = 'email_notification_sent';
+      }
+
+      var metrics = {
+        notification: notification,
+        troupeId: room.id,
+        to: invitedUser.username,
+        from: fromUser.username,
+      };
+      
+      if (isNewUser) stats.event("new_invited_user", _.extend(metrics, { userId: fromUser.id })); // this should happen only once
+      stats.event('user_added_someone', _.extend(metrics, { userId: fromUser.id }));
+    })
+    .thenResolve(invitedUser);
+}
+
 function addUserToRoom(room, instigatingUser, usernameToAdd) {
-  return roomPermissionsModel(instigatingUser, 'adduser', room)
-    .then(function (access) {
-      if(!access) throw new StatusError(403, 'You do not have permission to add people to this room.');
+  return Q.all([
+    roomPermissionsModel(instigatingUser, 'adduser', room),
+    canBeInvited({ username: usernameToAdd }, room, instigatingUser)
+  ]).spread(function (canInvite, canJoin) {
+      if (!canInvite) throw new StatusError(403, 'You do not have permission to add people to this room.');
+      if (!canJoin)   throw new StatusError(403, usernameToAdd + ' does not have permission to join this room.');
       return userService.findByUsername(usernameToAdd);
     })
     .then(function (existingUser) {
-      return existingUser || userService.createGhostUser(usernameToAdd);
+      if (existingUser && room.containsUserId(existingUser.id)) throw new StatusError(409, usernameToAdd + ' is already in this room.');
+      
+      var isNewUser = !existingUser;
+      
+      return [existingUser || userService.createGhostUser(usernameToAdd), isNewUser];
     })
-    .then(function (invitedUser) {
-      if(room.containsUserId(invitedUser.id)) throw new StatusError(409, usernameToAdd + ' is already in this room.');
-
-      return canBeInvited(invitedUser, room, instigatingUser)
-        .then(function(hasPermissionToJoin) {
-          if(!hasPermissionToJoin) throw new StatusError(403, usernameToAdd + ' does not have permission to join this room.');
-
-          room.addUserById(invitedUser.id);
-          return room.saveQ();
-        })
-        .then(function() {
-          // invited users dont have github tokens yet
-          var options = invitedUser.state === 'INVITED' ? { githubTokenUser: instigatingUser } : {};
-
-          return emailAddressService(invitedUser, options);
-        }).then(function(emailAddress) {
-
-          var notification;
-          
-          if(invitedUser.state === 'INVITED') {
-            if(emailAddress) {
-              emailNotificationService.sendInvitation(instigatingUser, invitedUser, room);
-              notification = 'email_invite_sent';
-            } else {
-              notification = 'unreachable_for_invite';
-            }
-          } else {
-            emailNotificationService.addedToRoomNotification(instigatingUser, invitedUser, room);
-            notification = 'email_notification_sent';
-          }
-
-          stats.event('user_added_someone', {
-            userId: instigatingUser.id,
-            addedUserId: invitedUser.id,
-            notification: notification,
-            troupeId: room.id
-          });
-
-          return invitedUser;
+    .spread(function (invitedUser, isNewUser) {
+      room.addUserById(invitedUser.id);
+      return room.saveQ()
+        .then(function () {
+          return notifyInvitedUser(instigatingUser, invitedUser, room, isNewUser);
         });
     });
 }
