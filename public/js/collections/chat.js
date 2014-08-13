@@ -90,6 +90,11 @@ define([
       });
     },
     parse: function (collection) {
+      if(collection.length && collection[0].limitReached) {
+        collection.shift();
+        this.trigger('limitReached');
+      }
+
       return burstCalculator.parse(collection);
     },
     findModelForOptimisticMerge: function (newModel) {
