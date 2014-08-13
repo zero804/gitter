@@ -31,13 +31,11 @@ module.exports = {
     return roomService.addUserToRoom(req.troupe, req.user, username)
       .then(function(userAdded) {
 
-        // invited users dont have github tokens yet
-        var options = userAdded.state === 'INVITED' ? { githubTokenUser: req.user } : {};
         var strategy = new restSerializer.UserStrategy();
 
         return [
           restSerializer.serializeQ(userAdded, strategy),
-          emailAddressService(userAdded, options)
+          emailAddressService(userAdded)
         ];
       })
       .spread(function(serializedUser, email) {
