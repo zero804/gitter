@@ -34,17 +34,15 @@ module.exports = {
         var strategy = new restSerializer.ChatStrategy({
           currentUserId: userId,
           troupeId: req.troupe.id,
-          initialId: aroundId
+          initialId: aroundId,
+          limitReached: limitReached
         });
 
         return [restSerializer.serialize(chatMessages, strategy), limitReached];
       })
       .spread(function(serialized, limitReached) {
         if(limitReached) {
-          // Consider whether storing this in a header is a good idea
-          // as headers don't get used to generate etags and therefore
-          // result in cache nastiness
-          res.set('LimitReached', 'true');
+          res.status(206); // Partial content
         }
 
         res.send(serialized);
