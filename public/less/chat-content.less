@@ -1,6 +1,10 @@
 // See public/templates/partials/chat_content.hbs
 .chat-container {
   .trpBodyMedium;
+  
+  & > div:first-child { padding-top: 72px; }
+  
+  body.embedded & > div:first-child { padding-top: 0; }
 
   &-invited {
 

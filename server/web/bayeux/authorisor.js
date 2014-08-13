@@ -10,6 +10,7 @@ var StatusError       = require('statuserror');
 var bayeuxExtension   = require('./extension');
 var Q                 = require('q');
 var userCanAccessRoom = require('../../services/user-can-access-room');
+var sampleChatsService = require('../../services/sample-chats-service');
 
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
@@ -30,8 +31,15 @@ var routes = [
   { re: /^\/api\/v1\/user\/(\w+)$/,
     validator: validateUserForUserSubscription },
   { re: /^\/api\/v1\/ping(\/\w+)?$/,
-    validator: validateUserForPingSubscription }
+    validator: validateUserForPingSubscription },
+  { re: /^\/sample-chats$/,
+    validator: validateUserForPingSubscription,
+    populator: populateSampleChatsCollection }
 ];
+
+function populateSampleChatsCollection() {
+  return Q.resolve({data: sampleChatsService.getSamples()});
+}
 
 // This strategy ensures that a user can access a URL under a troupe URL
 function validateUserForSubTroupeSubscription(options) {
@@ -107,24 +115,7 @@ function populateSubTroupeCollection(options) {
 
   switch(collection) {
     case "chatMessages":
-      var beforeId, afterId, marker, limit, beforeInclId, aroundId;
-      if(snapshot) {
-        aroundId = snapshot.aroundId;
-        beforeInclId = snapshot.beforeInclId;
-        beforeId = snapshot.beforeId;
-        afterId = snapshot.afterId;
-        marker = snapshot.marker;
-        limit = snapshot.limit;
-      }
-
-      var chatOptions = {
-        limit: limit,
-        aroundId: aroundId,
-        beforeInclId: beforeInclId,
-        beforeId: beforeId,
-        afterId: afterId,
-        marker: marker
-      };
+      var chatOptions = snapshot || {};
 
       return restful.serializeChatsForTroupe(troupeId, userId, chatOptions)
         .then(arrayToSnapshot);

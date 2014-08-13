@@ -1,232 +1,385 @@
 <!doctype html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no"/>
-<link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon-unread.ico' }}">
-<link rel="stylesheet" href="{{cdn 'styles/trpHomePage.css' }}">
-<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
-<title>Gitter - Chat, for GitHub</title>
-    {{>require_wrapper}}
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    {{{bootScript "signup" }}}
-    {{{ generateEnv }}}
-    {{>load_font_css}}
-</head>
+        <title>Gitter &mdash; Where developers come to talk.</title>
 
-<body>
-  <div class="menu-container" style="">
-    <div class="strip" style="text-align: left;">
-      <div class="logo-container"></div>
-      <div class="signup-container">
-        <div style="font-size: 14px; letter-spacing: 0.5px">
-           <a href="#features" class="button scroll-link text" id="about" style="text-decoration: none; color: white;" >Features</a>
-          <a href="#pricing" class="button scroll-link text" id="about" style="text-decoration: none; color: white; margin-right: 20px" >Pricing</a>
-          <a target="_top" href="/login/github?action=login" class="button blur" id="login" style="text-decoration: none; color: white;">Existing user login</a>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="pager-container" style="">
-    <div class="strip">
-      <div class="pager" id="pager">
-        <a href="#" class="no-dec">
-          <div class="pager-item"></div>
-        </a>
-        <a href="#" class="no-dec">
-          <div class="pager-item"></div>
-        </a>
-        <a href="#" class="no-dec">
-          <div class="pager-item"></div>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="carousel" style="overflow: hidden; height: 720px;">
-      <div class="outer-container" style="display: block; float: left; width: 100%">
-        <div class="container hero-container">
-          <div id="first">
-            <div class="strip" style="color:white; text-shadow: 0 0 0 transparent,1px 1px 2px rgba(0,0,0,0.2); text-align: left">
-              <div class="hero">
-                <div style="display: inline-block; margin-bottom: 10px">
-                  <h1 style="margin-top: 0">Talk smarter</h1>
-                </div>
-                <div style="letter-spacing: 0.05em; font-size: 1.3em">
-                  Gitter is communications for developers. <span class="nomobile">Find out how Gitter can work for you. <i class="fa fa-chevron-right arrow next" id="arrow-1"></i></span>
-                </div>
-                <a href="/login/github?action=signup&button=1" class="button green mt60" id="signup1" style="text-decoration: none; color: white">Sign up with GitHub</a>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="stylesheet" href="{{cdn 'styles/homepage.css' }}">
+
+        <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon-normal.ico' }}">
+
+        <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
+        <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+        {{>require_wrapper}}
+
+        {{{bootScript "homepage" }}}
+        {{{ generateEnv }}}
+        {{>load_font_css}}
+    </head>
+    <body>
+      <header id="intro-panel">
+        <nav class="site-nav">
+          <div class="wrap">
+
+            <a href="/" class="logo">
+              <div class="logo-holder logo-animation">
+                  <div class="logo-left-arm logo-animation"></div>
+                  <div class="logo-body-left logo-animation"></div>
+                  <div class="logo-body-right logo-animation"></div>
+                  <div class="logo-right-arm logo-animation"></div>
               </div>
+              <img src="{{ cdn 'images/home/logo.png' }}" alt="Gitter" title="Gitter logo" class="logo-image menu-animation">
+            </a>
+
+            <div class="top-navigation menu-animation">
+              <a href="#integrations-panel">Integrations</a>
+              <a href="#pricing-panel">Pricing</a>
+              <a href="#apps-panel">Apps</a>
             </div>
-            <br>
-          </div>
-        </div>
-      </div>
-      <div class="outer-container" style="display: block; float: left; width: 100%">
-        <div class="container os-container">
-          <div id="second">
-            <div class="strip" style="color:white; text-shadow: 0 0 0 transparent,1px 1px 2px rgba(0,0,0,0.2); text-align: left">
-              <div class="hero" style="width:100%">
-                <div style="display:inline-block">
-                  <div style="display: inline-block; margin-bottom: 10px">
-                    <h1 style="margin-top: 0">Stronger communities</h1>
-                  </div>
-                  <div style="letter-spacing: 0.05em; font-size: 1.3em">
-                    Gitter provides free public chat rooms for open source projects on GitHub. <br>
-                    <br>
-                    Full markdown support, emoji and issue integration. Smart notifications.<br>
-                    Activity feed with multiple 3rd party integrations.
-                  </div>
-                  <span>
-                    <a href="/login/github?action=signup&button=4" class="button green mt60" id="signup1" style="text-decoration: none; color: white;">Sign up with GitHub</a>
-                  </span>
 
-                  <span class="button blur next" id="arrow-2">
-                    <span>Gitter for teams & business</span>
-                    <i class="fa fa-chevron-right arrow small"></i>
-                  </span>
-                </div>
-
-                {{!--
-                <div style="display: inline-block; max-width: 400px; max-height: 400px; overflow: hidden; float: right; margin-top: 150px">
-                  <h2>Live from angular/angular.js</h2>
-                  <div class="chat-item">
-                    <img src="https://avatars.githubusercontent.com/u/15655" class="avatar">
-                    <div class="chat-from">petebacondarwin</div>
-                    <div class="chat-text">I agree we should go with form submit raising the $flushInputs event by default and wait and see if people come up with a good reason to add a disable feature - in which case it would be an attribute of form or property on FormController.</div>
-                  </div>
-                  <div class="chat-item">
-                    <img src="https://avatars.githubusercontent.com/u/1764161" class="avatar">
-                    <div class="chat-from">shahata</div>
-                    <div class="chat-text">for textInputType the $$phase test was already there. do you have any idea why?</div>
-                  </div>
-                  <div class="chat-item">
-                    <img src="https://avatars.githubusercontent.com/u/1764161" class="avatar">
-                    <div class="chat-from">shahata</div>
-                    <div class="chat-text">found the reason: angular/angular.js#5293</div>
-                  </div>
-                  <div class="chat-item">
-                    <img src="https://avatars.githubusercontent.com/u/1764161" class="avatar">
-                    <div class="chat-from">shahata</div>
-                    <div class="chat-text">for textInputType the $$phase test was already there. do you have any idea why?</div>
-                  </div>
-                  <div class="chat-item">
-                    <img src="https://avatars.githubusercontent.com/u/15655" class="avatar">
-                    <div class="chat-from">petebacondarwin</div>
-                    <div class="chat-text">hmmm, not pretty</div>
-                  </div>
-                </div>--}}
-              </div>
-            </div>
+            <a class="btn login" href="/login/github?action=login">
+              <b>Log in</b> <span class="no-small">with Github</span>
+            </a>
           </div>
-          <br>
+        </nav>
+        <div class="wrap">
+          <div class="map"><img class="bg" src="{{cdn 'images/home/map.png'}}" alt="There should be a map here"></div>
+          <h1>{{ __ "Where developers come to talk." }}</h1>
+          <p>We host thousands of public communities where developers from all around the world come together to talk about the future of programming, build better products, and share the best cat GIFs</a>.</p>
+
+          <a class="btn signup" href="/login/github?action=signup&button=1">
+            <img src="{{cdn 'images/home/github.png'}}"> <b>Sign up</b> with Github
+          </a>
+          <div class="legal">
+            <span>
+              By signing up you agree to our <a href="https://gitter.zendesk.com/hc/en-us/sections/200274872-Legal-documentation" target="_blank">Terms and Conditions</a>.
+            </span>
+          </div>
+
+
+          <ul class="mini-features-list">
+            <li>
+              <img src="{{cdn 'images/home/quill.png'}}" alt="Quill icon">
+              <h2>Markdown power</h2>
+              <span>Ever wanted full markdown support in chat? How about syntax highlighting?<br>Yip, we got your back.</span>
+            </li>
+
+            <li>
+              <img src="{{cdn 'images/home/shield.png'}}" alt="Shield icon">
+              <h2>Private conversations</h2>
+              <span>Public rooms are awesome (and free), but we get that some stuff is private. So we've got <a href="#pricing-panel">plans for that</a>.</span>
+            </li>
+
+            <li>
+              <img src="{{cdn 'images/home/cloud.png'}}" alt="Shield icon">
+              <h2>Developer friendly</h2>
+              <span>This is a picture of a cloud against a background of clouds. OMG! We <a href="#integrations-panel">integrate</a> with a bunch of stuff in the cloud. </span>
+            </li>
+          </ul>
         </div>
-      </div>
-      <div class="outer-container" style="display: block; float: left; width: 100%">
-        <div class="container work-container">
-          <div id="first">
-            <div class="strip" style="color:white; text-shadow: 0 0 0 transparent,1px 1px 2px rgba(0,0,0,0.2); text-align: left">
-              <div class="hero" style="width: 100%">
-                <div style="display: inline-block">
-                  <div style="display: inline-block; margin-bottom: 10px">
-                    <h1 style="margin-top: 0">Tighter teams</h1>
-                  </div>
-                  <div style="letter-spacing: 0.05em; font-size: 1.3em">
-                    Gitter brings teams together in a way that email can't. <br><br>
-                    Real-time messaging built specifically to help teams communicate better. <br>
-                    Simple to use, with powerful integrations into GitHub and other services.
-                  </div>
-                  <a href="/login/github?action=signup&button=5" class="button green mt60" id="signup1" style="text-decoration: none; color: white">Sign up with GitHub</a>
-                </div>
-                {{!--<div style="display: inline-block; max-width: 400px; max-height: 400px; overflow: hidden; float: right">
-                  <div style="margin-top: 40px">
-                    <h2>You're in great company</h2>
-                    <img src="{{ cdn 'images/logo-flatiron.png' }}" width="100" class="client-logo"><img class="client-logo" src="{{ cdn 'images/2/gitter/logo-storify.png' }}" width="100"><img class="client-logo" src="{{ cdn 'images/2/gitter/logo-revolt.png' }}" width="100">
-                  </div>
-                </div>--}}
-              </div>
+        <div class='bg-animation'>{{!-- the div below is responsible for the fadein of the background --}}</div>
+      </header>
+
+      <section id="communities-panel">
+        <div class="wrap">
+          <h1>
+            Some of our communities
+
+            <a class="btn secondary" href="//gitter.im/login/github?action=signup&button=1">
+              Create your own
+            </a>
+          </h1>
+
+          <div class="communities">
+            <nav class="communities-tabs">
+              <a class="active" data-tab-index="0">
+                <img src="https://avatars1.githubusercontent.com/u/5990364?s=200" width="48" height="48">
+
+                <h3>GitterHQ</h3>
+                <em>Let’s talk about Gitter!</em>
+              </a>
+
+              <a data-tab-index="1">
+                <img src="https://avatars1.githubusercontent.com/u/5990364?s=200" width="48" height="48">
+
+                <h3>GitterHQ</h3>
+                <em>Let’s talk about Gitter!</em>
+              </a>
+
+              <a data-tab-index="2">
+                <img src="https://avatars1.githubusercontent.com/u/5990364?s=200" width="48" height="48">
+
+                <h3>GitterHQ</h3>
+                <em>Let’s talk about Gitter!</em>
+              </a>
+
+              <a data-tab-index="3">
+                <img src="https://avatars1.githubusercontent.com/u/5990364?s=200" width="48" height="48">
+
+                <h3>GitterHQ</h3>
+                <em>Let’s talk about Gitter!</em>
+              </a>
+            </nav>
+
+            <div class="chat-frame">
+              <iframe id="embedded-chat" src="/gitterHQ/gitter/~embed"></iframe>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
+      </section>
 
+      <section id="integrations-panel">
+        <div class="wrap">
+          <h1>Integrated with your workflow</h1>
+          <p>Gitter is built on top of GitHub and is tightly integrated with your organisations, repositories, issues and activity.</p>
+          <p>We provide integrations with Trello, Jenkins, Travis, Heroku, Sentry, BitBucket, HuBoard, Logentries, Pagerduty & Sprintly. We also accept custom webhooks, have an <a href="https://github.com/gitterHQ/services" target="_blank">open source repository</a> for integrations as well as a <a href="http://developer.gitter.im" target="_blank">flexible API</a>.</p>
 
-  <div class="container" style="background-color: white; padding: 0; margin: 0">
-    <div class="strip feature" style="padding: 0; margin: 40px 0 0 0; text-align: center">
-      <h2 style="text-align: center;">Simple, powerful messaging.</h2>
-      <img src="{{ cdn 'images/screenshot-small@2x.png' }}" width="920" style="margin-top: 20px; margin-bottom: 40px"></div>
-    </div>
-  </div>
-  <div class="container" style="background-color: #162e34; padding: 60px 0;">
-    <div class="strip">
-       <span style="opacity: 0.8; color: white">Interested? Gitter is in beta right now, but feel free to give it a go. </span><br><br>
-      <a href="/login/github?action=signup&amp;button=2" class="button green" id="signup2" style="text-decoration: none; color: white">Sign up with GitHub</a>
-    </div>
-  </div><div class="container" style="background-color: white; padding: 10px 0">
-  <a name="features" id="features"> </a>
-      <div class="strip feature">
-        <h2 style="text-align: center">So smart, it even knows your issues</h2>
-        <div style="text-align: center"><img src="{{ cdn 'images/issue.png' }}" width="600"></div><br>
-        <h2 style="text-align: center">And talks markdown, including formatted code</h2>
-        <div style="text-align: center"><img src="{{ cdn 'images/code.png' }}" width="700"></div><br><br>
-      </div>
-    </div>
-
-    <div class="container" style="background-color: #eee">
-      <div class="strip feature">
-        <div style="display: inline-block; vertical-align: top; max-width: 620px; margin-top: 60px">
-          <h2 style="margin-top: 0">Integrated with the products you use</h2>
-          <div style="text-align: left">Integrations with Github, BitBucket, Heroku, Jenkins, Travis, Trello, Huboard and Sprintly.</p><p>Fully customisable API to integrate into your own environments.</div>
+          <div class="loves">
+            <img src="{{cdn 'images/home/gitter-loves.png'}}" alt="Gitter loves">
+            <ul>
+              <li><img src="{{cdn 'images/home/github-logo.jpg'}}" title="Github"></li>
+              <li><img src="{{cdn 'images/home/gitlab-logo.jpg'}}" title="Gitlab"></li>
+              <li><img src="{{cdn 'images/home/bitbucket-logo.jpg'}}" title="Bitbucket"></li>
+              <li><img src="{{cdn 'images/home/heroku-logo.jpg'}}" title="Heroku"></li>
+              <li><img src="{{cdn 'images/home/huboard-logo.jpg'}}" title="Huboard"></li>
+              <li><img src="{{cdn 'images/home/jenkins-logo.jpg'}}" title="Jenkins"></li>
+              <li><img src="{{cdn 'images/home/pagerduty-logo.jpg'}}" title="Pagerduty"></li>
+              <li><img src="{{cdn 'images/home/logentries-logo.jpg'}}" title="Logentries"></li>
+              <li><img src="{{cdn 'images/home/sprintly-logo.jpg'}}" title="Sprintly"></li>
+              <li><img src="{{cdn 'images/home/travis-logo.jpg'}}"  title="Travis"></li>
+              <li><img src="{{cdn 'images/home/trello-logo.jpg'}}" title="Trello"></li>
+              <li><img src="{{cdn 'images/home/sentry-logo.jpg'}}" title="Trello"></li>
+            </ul>
+          </div>
         </div>
-        <div style="display: inline-block; float: right; vertical-align: top;" style=""><img src="{{ cdn 'images/activity.png' }}" width="250rs"></div>
-      </div>
-    </div>
+      </section>
 
-    <div class="container" style="background-color: #162e34; padding-bottom: 30px">
-      <div class="strip feature" style="text-align: center">
-        <h2 style="text-align: center; color: white">Other awesome features</h2>
-        <span style="color: white; line-height: 150%">Know who's seen any message. <span style="opacity: 0.6">Edit messages after you've sent them. </span>Full emoji support. <span style="opacity: 0.6">Special Lurk Mode.</span> IRC bridge.<br>
-        <span style="opacity:0.6;">Automatically embeds content like Gists, YouTube, pictures of cats and other stuff.</span> Desktop notifications and @mentions.<br>
-        Infinite chat history stored in the cloud. Will soon be searchable too. <span style='opacity: 0.6'>Phew, that's a lot and we're building more constantly.</span></span>
-      </div>
-    </div>
+      <section id="testimonials-panel">
+        <div class="wrap">
+          <div class="quotes">
+            <blockquote>
+              <img src="{{cdn 'images/home/samccone.jpeg'}}">
 
-    <div class="container" style="background-color: #eee; margin-top: -5px">
-      <div class="strip feature">
-        <div style="display: inline-block; vertical-align: top; max-width: 620px; margin-top: 60px">
-          <h2 style="margin-top: 0">Available everywhere that has internet</h2>
-          <div style="text-align: left">Desktop app for Mac. Windows, iPhone and Android coming soon.<br><br>Works perfectly in mobile web browsers.<br><br>
-            Available via IRC clients too.</p></div>
+              <cite><b>Sam Saccone</b><span class="no-small">, Marionette.js Lead</span>:</cite>
+              <p>Gitter has helped to bring the Marionette community together, turning it into a thriving collaborative environment that has been exceedingly benificial to both our endusers and maintainers.</p>
+            </blockquote>
+
+            <blockquote>
+              <img src="{{cdn 'images/home/dscape.jpeg'}}">
+
+              <cite><b>Nuno Job</b><span class="no-small">, Founder YLD</span>:</cite>
+              <p>Gitter helped us shape our distributed company culture. We use Github everyday, and Gitter is how we communicate around our work. Team spirit has gone up and we can see how much more people collaborate.</p>
+            </blockquote>
+
+            <blockquote>
+              <img src="{{cdn 'images/home/avi.jpeg'}}">
+
+              <cite><b>Avi Flombaum</b><span class="no-small">, Dean @ Flatiron School</span>:</cite>
+              <p>AWESOME!</p>
+            </blockquote>
+
+            <blockquote>
+              <img src="{{cdn 'images/home/diasdavid.jpeg'}}">
+
+              <cite><b>David Dias</b><span class="no-small">, LXJS Conference Organiser</span>:</cite>
+              <p>Gitter was an essential tool, not only for organising LXJS but to create a thriving community amongst our attendees before, during and even after the conference.</p>
+            </blockquote>
+          </div>
+
+          <h1>Loved by our users</h1>
+          <p>Gitter is nothing without the people using it day in and day out.</p>
+          <p>We asked a few of them what Gitter means to them, this is what they had to say. If you love Gitter, Tweet us <a href="https://twitter.com/gitchat" target="_blank">@gitchat</a> and we'll update these quotes every month.<br><br></p>
         </div>
-        <div style="display: inline-block; float: right; vertical-align: top; margin-right: 80px; margin-top: 10px" style=""><img src="{{ cdn 'images/iphone-screenshot.png' }}" height="284"></div>
-      </div>
-    </div>
+      </section>
 
-    <div class="container" style="background-color: #162e34; padding-bottom: 30px">
-      <a name="pricing" id="pricing"> </a>
-      <div class="strip feature" style="text-align: center">
-        <h2 style="text-align: center; color: white">What does it cost?</h2>
-        <span style="color: white; line-height: 150%">During our Beta period, Gitter is available for free. Rest assured public conversations will always be free. No ads.<br>
-          <span style="opacity: 0.6"> We'll work out a great, affordable price for private conversations, which will include a free tier.</span></span>
-      </div>
-    </div>
+      <section id="pricing-panel">
+        <div class="wrap">
+          <div class="half">
+            <h1>Personal pricing</h1>
+
+            <article class="price ghost">
+              <header>
+                <b>Free</b>
+
+                <h1>
+                  $0
+                  <b>Forever</b>
+                </h1>
+              </header>
+
+              <ul>
+                <li><b>Unlimited</b> public rooms</li>
+                <li><b>1</b> private room*</li>
+                <li><b>2 weeks’</b> chat history</li>
+              </ul>
+
+              <a class="btn signup full" href="#"><b>Get started</b> for free</a>
+            </article>
+
+            <article class="price purple">
+              <header>
+                <b>Individual</b>
+
+                <h1>
+                  $2
+                  <b>monthly</b>
+                </h1>
+              </header>
+
+              <ul>
+                <li><b>Unlimited</b> public rooms</li>
+                <li><b>Unlimited</b> private rooms**</li>
+                <li><b>Unlimited</b> chat history</li>
+              </ul>
+
+              <a class="btn signup full" href="#"><b>Get started</b> for free</a>
+            </article>
+          </div>
+
+          <div class="half">
+            <h1>Organisation pricing</h1>
+
+            <article class="price mix">
+              <header>
+                <b>Bronze</b>
+
+                <h1>
+                  $2
+                  <b>per user/month</b>
+                </h1>
+              </header>
+
+              <ul>
+                <li><b>Unlimited</b> public rooms</li>
+                <li><b>Unlimited</b> private rooms***</li>
+                <li><b>6 months’</b> chat history</li>
+              </ul>
+
+              <a class="btn signup full" href="#"><b>Get started</b> for free</a>
+            </article>
+
+            <article class="price orange">
+              <header>
+                <b>Silver</b>
+
+                <h1>
+                  $5
+                  <b>per user/month</b>
+                </h1>
+              </header>
+
+              <ul>
+                <li><b>Unlimited</b> public rooms</li>
+                <li><b>Unlimited</b> private rooms***</li>
+                <li><b>Unlimited</b> chat history</li>
+              </ul>
+
+              <a class="btn signup full" href="#"><b>Get started</b> for free</a>
+            </article>
+          </div>
+          <div class="wrap fine-print">
+            <p>* Our free plan includes one private room per organisation you belong to on GitHub</p>
+            <p>** Our Individual plan allows you to create private rooms using your personal account as the owner</p>
+            <p>*** Our organisation plans allow you to create private rooms using your GitHub organisation as the owner</p>
+            <div class="legal">
+              By signing up you agree to our <a href="https://gitter.zendesk.com/hc/en-us/sections/200274872-Legal-documentation" target="_blank">Terms and Conditions</a>.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="apps-panel">
+        <div class="wrap">
+          <div class="devices">
+            <div class="laptop">
+              <img class="screenshot" src="{{cdn 'images/home/screenshot.png'}}">
+              <img class="computer" src="{{cdn 'images/home/laptop.png'}}">
+            </div>
+
+            <img class="phone" src="{{cdn 'images/home/phone.png'}}">
+          </div>
+
+          <h1>Get Gitter now!</h1>
+          <p>Gitter is available in all modern browsers as well as apps for desktops and mobile phones.</p>
+          <p>We currently have apps for OSX, iOS and Chrome and are working on Android, Linux and Windows. We also have a sweet little <a href="https://irc.gitter.im" target="_blank">IRC bridge</a>.</p>
+
+          <p>
+            <a class="btn secondary osx" href="/apps">Download <span class="no-small">(OS X)</span></a>
+            <a class="btn outline" href="/apps">All apps</a>
+          </p>
+          </div>
+      </section>
+
+      <footer id="bottom-panel">
+        <div class="wrap">
+          <h1>By developers, for developers</h1>
+          <p>Gitter is built in London by a team of developers just like you. Hell even the product guy writes code, although we generally end up rewriting those bits.
+          <p>If you're ever around Silicon Roundabout, give us a shout, we love meeting up with other developers.</p>
+
+          <ul class="team">
+            <li>
+              <b>Mike</b>
+              <a target="_blank" href="https://twitter.com/mydigitalself"><img src="{{cdn 'images/home/twitter.png'}}" alt="Twitter"></a>
+              <a target="_blank" href="https://github.com/mydigitalself"><img src="{{cdn 'images/home/github.png'}}" alt="Github"></a>
+
+              <img src="{{cdn 'images/home/mike.jpeg'}}">
+              <span class="mask"></span>
+            </li>
+
+            <li>
+              <b>Andrew</b>
+              <a target="_blank" href="https://twitter.com/suprememoocow"><img src="{{cdn 'images/home/twitter.png'}}" alt="Twitter"></a>
+              <a target="_blank" href="https://github.com/suprememoocow"><img src="{{cdn 'images/home/github.png'}}" alt="Github"></a>
+
+              <img src="{{cdn 'images/home/andrew.jpeg'}}">
+              <span class="mask"></span>
+            </li>
+
+            <li>
+              <b>Mauro</b>
+              <a target="_blank" href="https://twitter.com/malditogeek"><img src="{{cdn 'images/home/twitter.png'}}" alt="Twitter"></a>
+              <a target="_blank" href="https://github.com/malditogeek"><img src="{{cdn 'images/home/github.png'}}" alt="Github"></a>
+
+              <img src="{{cdn 'images/home/mauro.png'}}">
+              <span class="mask"></span>
+            </li>
+
+            <li>
+              <b>Andy</b>
+              <a target="_blank" href="https://twitter.com/trevorah_"><img src="{{cdn 'images/home/twitter.png'}}" alt="Twitter"></a>
+              <a target="_blank" href="https://github.com/trevorah"><img src="{{cdn 'images/home/github.png'}}" alt="Github"></a>
+
+              <img src="{{cdn 'images/home/andy.jpeg'}}">
+              <span class="mask"></span>
+            </li>
+
+            <li>
+              <b>Walter</b>
+              <a target="_blank" href="https://twitter.com/waltfy"><img src="{{cdn 'images/home/twitter.png'}}" alt="Twitter"></a>
+              <a target="_blank" href="https://github.com/waltervascarvalho"><img src="{{cdn 'images/home/github.png'}}" alt="Github"></a>
+
+              <img src="{{cdn 'images/home/walter.jpeg'}}">
+              <span class="mask"></span>
+            </li>
+
+          </ul>
+
+          <small>
+            <span>&copy; 2014 Troupe Technology Ltd. All rights reserved.</span>
+
+            <a href="http://suport.gitter.im" target="_blank">Support</a>
+            <a href="https://developer.gitter.im" target="_blank">API</a>
+            <a href="https://blog.gitter.im" target="_blank">Blog</a>
+            <a href="https://twitter.com/gitchat" target="_blank">Twitter</a>
+          </small>
+        </div>
+      </footer>
 
 
-    <div class="container" style="background-color: white;padding: 40px 0">
-      <div class="strip">
-        <span style="opacity: 0.8; color: black">Interested? Gitter is in beta right now, but don't let that stop you. </span><br><br>
-        <a href="/login/github?action=signup&amp;button=3" class="button green" id="signup3" style="text-decoration: none; color: white">My brain can't handle the awesome. Sign me up!</a>
-      </div>
-    </div>
-
-  </div>
-
-  <script>
-
-
-
-  </script>
-
-
-  </body>
-  </html>
+    </body>
+</html>
