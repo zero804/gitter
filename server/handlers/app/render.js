@@ -103,17 +103,21 @@ function renderChat(req, res, opts, next) {
   var user = req.user;
   var userId = user && user.id;
 
-  var snapshotOptions = { 
-    limit: INITIAL_CHAT_COUNT, 
-    aroundId: aroundId, 
+  var snapshotOptions = {
+    limit: INITIAL_CHAT_COUNT,
+    aroundId: aroundId,
     unread: embedded ? false : undefined // Embedded views already have items marked as unread=false
   };
 
+  var serializerOptions = _.defaults({
+    disableLimitReachedMessage: true
+  }, snapshotOptions);
+
   Q.all([
       contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, embedded: embedded }),
-      restful.serializeChatsForTroupe(troupe.id, userId, snapshotOptions)
+      restful.serializeChatsForTroupe(troupe.id, userId, serializerOptions)
     ]).spread(function (troupeContext, chats) {
-      
+
       var initialChat = _.find(chats, function(chat) { return chat.initial; });
       var initialBottom = !initialChat;
       var githubLink;
@@ -122,9 +126,9 @@ function renderChat(req, res, opts, next) {
       if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
         githubLink = 'https://github.com/' + req.uriContext.uri;
       }
-      
+
       if (!user) classNames.push("logged-out");
-      
+
       res.render(opts.template, _.extend({
         isRepo: troupe.githubType === 'REPO',
         appCache: getAppCache(req),
