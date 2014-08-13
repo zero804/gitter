@@ -628,62 +628,58 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
 }
 exports.createCustomChildRoom = createCustomChildRoom;
 
-function addUserToRoom(troupe, instigatingUser, usernameToAdd) {
-  return roomPermissionsModel(instigatingUser, 'adduser', troupe)
-    .then(function(access) {
+function addUserToRoom(room, instigatingUser, usernameToAdd) {
+  return roomPermissionsModel(instigatingUser, 'adduser', room)
+    .then(function (access) {
       if(!access) throw new StatusError(403, 'You do not have permission to add people to this room.');
-
       return userService.findByUsername(usernameToAdd);
     })
-    .then(function(existingUser) {
+    .then(function (existingUser) {
       return existingUser || userService.createGhostUser(usernameToAdd);
     })
-    .then(function(user) {
+    .then(function (invitedUser) {
+      if(room.containsUserId(invitedUser.id)) throw new StatusError(409, usernameToAdd + ' is already in this room.');
 
-      if(troupe.containsUserId(user.id)) {
-        throw new StatusError(409, usernameToAdd + ' is already in this room.');
-      }
-
-      return canBeInvited(user, troupe, instigatingUser)
+      return canBeInvited(invitedUser, room, instigatingUser)
         .then(function(hasPermissionToJoin) {
           if(!hasPermissionToJoin) throw new StatusError(403, usernameToAdd + ' does not have permission to join this room.');
 
-          troupe.addUserById(user.id);
-          return troupe.saveQ();
+          room.addUserById(invitedUser.id);
+          return room.saveQ();
         })
         .then(function() {
           // invited users dont have github tokens yet
-          var options = user.state === 'INVITED' ? { githubTokenUser: instigatingUser } : {};
+          var options = invitedUser.state === 'INVITED' ? { githubTokenUser: instigatingUser } : {};
 
-          return emailAddressService(user, options);
+          return emailAddressService(invitedUser, options);
         }).then(function(emailAddress) {
 
           var notification;
-
-          if(user.state === 'INVITED') {
+          
+          if(invitedUser.state === 'INVITED') {
             if(emailAddress) {
-              emailNotificationService.sendInvitation(instigatingUser, user, troupe);
+              emailNotificationService.sendInvitation(instigatingUser, invitedUser, room);
               notification = 'email_invite_sent';
             } else {
               notification = 'unreachable_for_invite';
             }
           } else {
-            emailNotificationService.addedToRoomNotification(instigatingUser, user, troupe);
+            emailNotificationService.addedToRoomNotification(instigatingUser, invitedUser, room);
             notification = 'email_notification_sent';
           }
 
           stats.event('user_added_someone', {
             userId: instigatingUser.id,
-            addedUserId: user.id,
+            addedUserId: invitedUser.id,
             notification: notification,
-            troupeId: troupe.id
+            troupeId: room.id
           });
 
-          return user;
+          return invitedUser;
         });
-
     });
 }
+
 exports.addUserToRoom = addUserToRoom;
 
 function revalidatePermissionsForUsers(room) {
