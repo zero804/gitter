@@ -8,9 +8,8 @@ var logger              = env.logger;
 var mailerService       = require("./mailer-service");
 var crypto              = require('crypto');
 var passphrase          = config.get('email:unsubscribeNotificationsSecret');
-var Q                   = require('q');
 var userSettingsService = require('./user-settings-service');
-var emailAddressService = require('./email-address-service')
+var emailAddressService = require('./email-address-service');
 
 module.exports = {
 
@@ -67,11 +66,11 @@ module.exports = {
     var senderName = fromUser.displayName;
     var recipientName = toUser.displayName;
 
-    return emailAddressService(toUser, { githubTokenUser: fromUser })
+    return emailAddressService(toUser)
       .then(function(email) {
         if (!email) return;
 
-        stats.event('invitation_sent', {userId: toUser.id, email: email});
+        stats.event('invitation_sent', { userId: toUser.id, email: email });
 
         return mailerService.sendEmail({
           templateFile: "invitation",
