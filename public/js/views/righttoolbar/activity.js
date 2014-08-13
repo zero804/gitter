@@ -29,7 +29,6 @@ define([
   'hbs!./tmpl/trello',
   'hbs!./tmpl/prerendered',
 
-
   'cocktail'
 ], function(
   _,

@@ -1,4 +1,10 @@
-define(['marionette', 'jquery-hammer'], function(Marionette, $hammer) {
+define([
+  'backbone',
+  'marionette',
+  'jquery-hammer'
+], function(Backbone, Marionette, $hammer) {
+  "use strict";
+
   return Marionette.ItemView.extend({
     initialize: function(options) {
       this.$el = $hammer(this.$el).hammer();

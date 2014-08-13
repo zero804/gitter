@@ -1,0 +1,78 @@
+// This stuff doesn't have a proper home yet
+
+.avatar-xs {
+  position: relative;
+  border-radius: 4px;
+  width: 20px;
+  height: 20px;
+  background-size: cover;
+}
+
+.trpTroupeAvatar {
+  background-color: rgba(255,255,255,0.1);
+}
+
+.trpDisplayPicture {
+  display: inline-block;
+  text-align: center;
+  box-sizing: border-box;
+  transform: translate3d(0, 0, 0);
+  
+  &.unread {
+    animation: pulsate 3s ease-out;
+    animation-iteration-count: infinite;
+  }
+
+  @media @retina {
+    &.unread {
+      animation: pulsate-retina 3s ease-out;
+      animation-iteration-count: infinite;
+    }
+  }
+}
+
+a .trpDisplayPicture {
+  color: white;
+}
+
+
+.avatar-xxs {
+  position: relative;
+  border-radius: 4px;
+  width: 16px;
+  height: 16px;
+  background-size: cover;
+}
+
+.avatar-l {
+  width: 128px;
+  height: 128px;
+  border-radius: 4px;
+}
+
+.avatar-s {
+  position: relative;
+  height: 30px;
+  width: 30px;
+  border-radius: 4px;
+  background-size: cover;
+
+
+ .trpTroupeAvatarText {
+  .trpBodySmall;
+  color: white;
+  padding-top: 6px;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+
+}
+
+.avatar-m {
+  position: relative;
+  height: 120px;
+  width: 120px;
+  background-size: contain;
+  border-radius: 6px;
+}

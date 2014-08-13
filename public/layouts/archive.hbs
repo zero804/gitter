@@ -18,13 +18,13 @@
       100% { opacity: 0.6; }
   }
 
-  html.loading .trpContentPanel { background: url("{{ cdn 'images/2/gitter/logo-mark-grey-64.png' }}") center no-repeat; height: 90%; -webkit-animation: pulsey 2s ease-out; -webkit-animation-iteration-count: infinite;  }
+  html.loading .trpContentPanel { background: url("{{ cdn 'images/logo-mark-grey-64.png' }}") center no-repeat; height: 90%; -webkit-animation: pulsey 2s ease-out; -webkit-animation-iteration-count: infinite;  }
   html.loading .trpContentPanel > * { visibility: hidden; }
   </style>
   <base target="_parent">
   <link rel="stylesheet" href='{{cdn "sprites/services.css" }}'>
-  <link rel="stylesheet" href='{{cdn "bootstrap/css/archive.css" }}'>
-  <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/2/gitter/favicon.ico' }}">
+  <link rel="stylesheet" href='{{cdn cssFileName }}'>
+  <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon.ico' }}">
   {{>load_font_css}}
 </head>
 <body class="logged-out">

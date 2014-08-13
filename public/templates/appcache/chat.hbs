@@ -3,18 +3,18 @@ CACHE MANIFEST
 
 {{! Unfortunately we can't use the appcache with a CDN }}
 CACHE:
-{{ cdn 'bootstrap/css/trpNativeChat.css' 			 appcache=true }}
+{{ cdn 'styles/mobile-native-chat.css' 			  appcache=true }}
 {{#if minified}}
-{{ cdn 'js/core-libraries.min.js' 					 appcache=true }}
-{{ cdn 'js/mobile-native-chat.min.js' appcache=true }}
+{{ cdn 'js/core-libraries.min.js' 					     appcache=true }}
+{{ cdn 'js/mobile-native-chat.min.js'            appcache=true }}
 {{else}}
-{{ cdn 'js/core-libraries.js'            appcache=true }}
-{{ cdn 'js/mobile-native-chat.js' appcache=true }}
+{{ cdn 'js/core-libraries.js'                    appcache=true }}
+{{ cdn 'js/mobile-native-chat.js'                appcache=true }}
 {{/if}}
-{{ cdn 'images/2/favicon8.ico' 					     appcache=true }}
-{{ cdn 'images/2/avatar-default-s.png' 			     appcache=true }}
-{{ cdn 'images/2/icon-edit.png' 					 appcache=true }}
-{{ cdn 'images/2/troupe-ajax-guy-green.gif' 		 appcache=true }}
+{{ cdn 'images/favicon8.ico' 					         appcache=true }}
+{{ cdn 'images/avatar-default-s.png' 			     appcache=true }}
+{{ cdn 'images/icon-edit.png' 					       appcache=true }}
+{{ cdn 'images/troupe-ajax-guy-green.gif' 		 appcache=true }}
 
 NETWORK:
 *

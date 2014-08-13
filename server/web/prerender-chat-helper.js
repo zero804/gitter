@@ -45,7 +45,7 @@ var favicons = {
   sprintly:   'https://sprint.ly/favicon.ico',
   travis:     'https://travis-ci.org/favicon.ico',
   trello:     'https://trello.com/favicon.ico',
-  gitter:     'https://gitter.im/images/2/gitter/favicon5.png'
+  gitter:     'https://gitter.im/images/favicon5.png'
 };
 
 var webhookTemplates = ['bitbucket', 'generic', 'github', 'jenkins', 'sprintly', 'travis', 'trello', 'gitter'].reduce(function(memo, v) {

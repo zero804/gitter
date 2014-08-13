@@ -1,0 +1,94 @@
+@import "base-avatar";
+
+@import "../controls/dropdown";
+@import "../controls/typeahead";
+
+.gtrPeopleAddRoster {
+  .trpBodyMedium;
+  &__adding {
+    p { margin: 0; }
+    margin-left: 10px;
+    padding-bottom: 15px;
+  }
+}
+
+.gtrPeopleRosterItem {
+  // .trpBodyMedium;
+  width: 100%;
+  cursor: default;
+  margin-bottom: 8px;
+  overflow: hidden;
+
+  &__avatar {
+    float: left;
+  }
+
+  &__content {
+
+    margin-left: 39px;
+    line-height: 30px;
+
+    p {
+      margin-bottom: 0;
+      padding-left: 24px !important;
+
+      a {
+        text-decoration: underline;
+      }
+
+      &.added {
+        .prepend-octicon('\f03a');
+
+        &::before {
+          color: hsl(100, 60%, 70%);
+        }
+      }
+
+      &.invited {
+        .prepend-octicon('\f03c');
+
+        &::before {
+          color: hsl(0, 0%, 75%);
+        }
+      }
+
+      &.unreachable {
+        .prepend-octicon('\f081');
+
+        &::before {
+          color: hsl(0, 60%, 70%);
+        }
+      }
+    }
+  }
+
+  &:last-child {
+    margin-bottom: 10px;
+  }
+
+  .username {
+    color: #999;
+  }
+
+  &:hover .remove {
+    opacity: 1;
+  }
+
+  .remove {
+    float: right;
+    .prepend-icon-clear();
+    cursor: pointer;
+    opacity: 0.6;
+    .transition300ms;
+  }
+
+  .remove:before {
+    position: inherit;
+  }
+
+  .remove:hover {
+    color: @trpRed;
+  }
+
+
+}
