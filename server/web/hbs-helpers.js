@@ -23,7 +23,7 @@ var troupeEnv = {
   homeUrl: nconf.get('web:homeurl'),
   badgeBaseUrl: nconf.get('web:badgeBaseUrl'),
   embedBaseUrl: nconf.get('web:embedBaseUrl'),
-  mixpanelToken: nconf.get("stats:mixpanel:token"),
+  mixpanelToken: nconf.get("stats:mixpanel:enabled") && nconf.get("stats:mixpanel:token"),
   googleTrackingId: nconf.get("web:trackingId"),
   goSquaredTrackingId: nconf.get("web:goSquaredId"),
   env: env,
