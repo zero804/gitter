@@ -636,7 +636,7 @@ function addUserToRoom(troupe, instigatingUser, usernameToAdd) {
       return userService.findByUsername(usernameToAdd);
     })
     .then(function(existingUser) {
-      return existingUser || userService.inviteByUsername(usernameToAdd);
+      return existingUser || userService.createGhostUser(usernameToAdd);
     })
     .then(function(user) {
 

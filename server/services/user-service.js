@@ -62,7 +62,7 @@ function newUser(options, callback) {
 }
 
 var userService = {
-  inviteByUsername: function(username, user, callback) {
+  createGhostUser: function(username, user, callback) {
     var githubUser = new githubUserService(user);
 
     return githubUser.getUser(username)
