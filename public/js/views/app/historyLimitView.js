@@ -20,6 +20,7 @@ define([
 
       this.listenTo(this.collection, 'limitReached', function(atLimit) {
         this.atLimit = atLimit;
+        this.showHide();
       });
     },
     showHide: function() {
@@ -41,10 +42,13 @@ define([
       $banner.html(template({ message: message }));
       $banner.parent().show();
 
+      clearTimeout(this.removeTimeout);
+
       // cant have slide away animation on the same render as a display:none change
       setTimeout(function() {
         $banner.removeClass('slide-away');
       }, 0);
+
     },
     hideBanner: function() {
       if(!this.showing) return;
@@ -54,7 +58,8 @@ define([
 
       $banner.addClass('slide-away');
 
-      setTimeout(function() {
+      if(this.removeTimeout) return;
+      this.removeTimeout = setTimeout(function() {
         $banner.parent().hide();
       }, 500);
     },
