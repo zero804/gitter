@@ -37,7 +37,7 @@ module.exports = {
     var strategyOptions = { currentUserId: req.user.id };
     if (req.query.include_users) strategyOptions.mapUsers = true;
 
-    repoService.suggestedReposForUser(req.user)
+    repoService.getReposForUser(req.user)
       .then(function(repos) {
         var strategy = new restSerializer.GithubRepoStrategy(strategyOptions);
 

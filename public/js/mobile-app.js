@@ -7,7 +7,7 @@ require([
   'components/unread-items-client',
   'backbone',
   'components/modal-region',
-  'views/toolbar/troupeMenu',
+  'views/menu/troupeMenu',
   'views/app/mobileAppView',
   'views/chat/decorators/emojiDecorator',
   'views/chat/decorators/mobileDecorator',

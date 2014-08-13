@@ -38,90 +38,84 @@ define([
     callback(message);
   };
 
-  var subscribeOptions = {};
-
   var ClientAuth = function() {};
   ClientAuth.prototype.outgoing = function(message, callback) {
-    if(message.channel == '/meta/handshake') {
-      clientId = null;
-      log("Rehandshaking realtime connection");
+    if(message.channel !== '/meta/handshake') return callback(message);
 
-      if(!message.ext) { message.ext = {}; }
-      var ext = message.ext;
-      var accessToken = context.getAccessToken();
-      var mobile = isMobile();
+    clientId = null;
+    log("Rehandshaking realtime connection");
 
-      ext.token      = accessToken;
-      ext.version    = context.env('version');
-      ext.troupeId   = context.getTroupeId();
-      ext.connType   = mobile ? 'mobile' : 'online';
-      ext.client     = mobile ? 'mobweb' : 'web';
-      ext.eyeballs   = eyeballState ? 1 : 0;
+    context.getAccessToken(function(accessToken) {
+      if(!message.ext) message.ext = {};
+        var ext = message.ext;
+        var mobile = isMobile();
 
-    } else if(message.channel == '/meta/subscribe') {
-      if(!message.ext) { message.ext = {}; }
+        ext.token      = accessToken;
+        ext.version    = context.env('version');
+        ext.troupeId   = context.getTroupeId();
+        ext.connType   = mobile ? 'mobile' : 'online';
+        ext.client     = mobile ? 'mobweb' : 'web';
+        ext.eyeballs   = eyeballState ? 1 : 0;
 
-      var options = subscribeOptions[message.subscription];
-      if(options) {
-        message.ext = _.extend(message.ext, options);
-        delete subscribeOptions[message.channel];
-      }
 
-      message.ext.eyeballs = eyeballState ? 1 : 0;
-    }
-
-    callback(message);
+       callback(message);
+     });
   };
 
   var updateTimers;
 
   ClientAuth.prototype.incoming = function(message, callback) {
-    if(message.channel == '/meta/handshake') {
-      if(message.successful) {
-        var ext = message.ext;
-        if(ext) {
-          if(ext.appVersion && ext.appVersion !== context.env('version')) {
+    if(message.channel !== '/meta/handshake') return callback(message);
 
-            log('Application version mismatch');
-            if(!updateTimers) {
-              // Give the servers time to complete the upgrade
-              updateTimers = [setTimeout(function() {
-                /* 10 minutes */
-                $(document).trigger('app.version.mismatch');
-                appEvents.trigger('stats.event', 'reload.warning.10m');
-              }, 10 * 60000), setTimeout(function() {
-                /* 1 hour */
-                $(document).trigger('app.version.mismatch');
-                appEvents.trigger('stats.event', 'reload.warning.1hr');
-              }, 60 * 60000), setTimeout(function() {
-                /* 6 hours */
-                appEvents.trigger('stats.event', 'reload.forced');
-                setTimeout(function() {
-                  window.location.reload(true);
-                }, 30000); // Give the stat time to send
+    if(message.successful) {
+      var ext = message.ext;
+      if(ext) {
+        if(ext.appVersion && ext.appVersion !== context.env('version')) {
 
-              }, 360 * 60000)];
-            }
+          log('Application version mismatch');
+          if(!updateTimers) {
+            // Give the servers time to complete the upgrade
+            updateTimers = [setTimeout(function() {
+              /* 10 minutes */
+              $(document).trigger('app.version.mismatch');
+              appEvents.trigger('stats.event', 'reload.warning.10m');
+            }, 10 * 60000), setTimeout(function() {
+              /* 1 hour */
+              $(document).trigger('app.version.mismatch');
+              appEvents.trigger('stats.event', 'reload.warning.1hr');
+            }, 60 * 60000), setTimeout(function() {
+              /* 6 hours */
+              appEvents.trigger('stats.event', 'reload.forced');
+              setTimeout(function() {
+                window.location.reload(true);
+              }, 30000); // Give the stat time to send
 
-          } else if(updateTimers) {
-            updateTimers.forEach(function(t) {
-              clearTimeout(t);
-            });
-            updateTimers = null;
+            }, 360 * 60000)];
           }
 
-          if(ext.context) {
-            var c = ext.context;
-            if(c.troupe) context.setTroupe(c.troupe);
-            if(c.user) context.setUser(c.user);
-          }
+        } else if(updateTimers) {
+          updateTimers.forEach(function(t) {
+            clearTimeout(t);
+          });
+          updateTimers = null;
         }
-        if(clientId !== message.clientId) {
-          clientId = message.clientId;
-          log("Realtime reestablished. New id is " + clientId);
-          appEvents.trigger('realtime:newConnectionEstablished');
+
+        if(ext.context) {
+          var c = ext.context;
+          if(c.troupe) context.setTroupe(c.troupe);
+          if(c.user) context.setUser(c.user);
         }
       }
+
+      // New clientId?
+      if(clientId !== message.clientId) {
+        clientId = message.clientId;
+        log("Realtime reestablished. New id is " + clientId);
+        appEvents.trigger('realtime:newConnectionEstablished');
+      }
+
+      // Clear any transport problem indicators
+      transportUp();
     }
 
     callback(message);
@@ -132,8 +126,13 @@ define([
     this._stateProvider = {};
   };
 
+  var subscribeOptions = {};
   SnapshotExtension.prototype.outgoing = function(message, callback) {
     if(message.channel == '/meta/subscribe') {
+      if(!message.ext) { message.ext = {}; }
+
+      message.ext.eyeballs = eyeballState ? 1 : 0;
+
       var stateProvider = this._stateProvider[message.subscription];
       if(stateProvider) {
         var snapshotState = stateProvider();
@@ -142,6 +141,15 @@ define([
           message.ext.snapshot = snapshotState;
         }
       }
+
+      // These are temporary options to overlay
+      var options = subscribeOptions[message.subscription];
+      if(options) {
+        message.ext = _.extend(message.ext, options);
+        delete subscribeOptions[message.channel];
+      }
+
+
     }
 
     callback(message);
@@ -248,47 +256,59 @@ define([
   var websocketsDisabled = isMobile();
   var persistentOutageStartTime;
 
+  function transportDown(persistentOutageTimeout, initialConnection) {
+    var c = context.env('websockets');
+    var timeout = persistentOutageTimeout || c.options && c.options.timeout * 1.2 || 60;
+
+    if(!connectionFailureTimeout) {
+      connectionFailureTimeout = setTimeout(function() {
+        if(!persistentOutage) {
+          persistentOutageStartTime = Date.now();
+          persistentOutage = true;
+          log('realtime: persistent outage');
+          appEvents.trigger('connectionFailure');
+
+          // Don't disable websockets on the initial connection
+          if(!initialConnection && !websocketsDisabled) {
+            log('realtime: disabling websockets');
+            client.disable('websockets');
+          }
+        }
+      }, timeout * 1000);
+    }
+  }
+
+  function transportUp() {
+    if(connectionFailureTimeout) {
+      clearTimeout(connectionFailureTimeout);
+      connectionFailureTimeout = null;
+    }
+
+    if(persistentOutage) {
+      appEvents.trigger('stats.event', 'faye.outage.restored');
+      appEvents.trigger('stats.time', 'faye.outage.restored.time', Date.now() - persistentOutageStartTime);
+      persistentOutage = false;
+      persistentOutageStartTime = null;
+      log('realtime: persistent outage restored');
+      appEvents.trigger('connectionRestored');
+    }
+  }
+
   function getOrCreateClient() {
     if(client) return client;
     client = createClient();
 
+    // Initially, the transport is down
+    transportDown(10 /* seconds */, true /* initial connection */);
+
     client.on('transport:down', function() {
       log('realtime: transport down');
-
-      var c = context.env('websockets');
-      var timeout = c.options && c.options.timeout || 60;
-
-      if(!connectionFailureTimeout) {
-        connectionFailureTimeout = setTimeout(function() {
-          if(!persistentOutage) {
-            persistentOutageStartTime = Date.now();
-            persistentOutage = true;
-            log('realtime: persistent outage');
-            appEvents.trigger('connectionFailure');
-
-            if(!websocketsDisabled) {
-              log('realtime: disabling websockets');
-              client.disable('websockets');
-            }
-          }
-        }, timeout * 2 * 1000);
-      }
+      transportDown();
     });
 
     client.on('transport:up', function() {
       log('realtime: transport up');
-      if(connectionFailureTimeout) {
-        clearTimeout(connectionFailureTimeout);
-      }
-
-      if(persistentOutage) {
-        appEvents.trigger('stats.event', 'faye.outage.restored');
-        appEvents.trigger('stats.time', 'faye.outage.restored.time', Date.now() - persistentOutageStartTime);
-        persistentOutage = false;
-        persistentOutageStartTime = null;
-        log('realtime: persistent outage restored');
-        appEvents.trigger('connectionRestored');
-      }
+      transportUp();
     });
 
     return client;
@@ -374,9 +394,8 @@ define([
     },
 
     subscribe: function(channel, callback, context, options) {
-      if(options && options.snapshot === false) {
-        subscribeOptions[channel] = { snapshot: false };
-      }
+      // Temporary options to pass onto the subscription message
+      subscribeOptions[channel] = options;
 
       return getOrCreateClient().subscribe(channel, callback, context);
     },

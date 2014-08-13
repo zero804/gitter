@@ -2,7 +2,7 @@ require([
   'views/userhome/userHomeView',
   'jquery',
   'utils/appevents',
-  'views/toolbar/troupeMenu',
+  'views/menu/troupeMenu',
   'views/app/mobileAppView',
   'components/csrf'             // No ref
   ], function(UserHomeView, $, appEvents, TroupeMenu, MobileAppView) {

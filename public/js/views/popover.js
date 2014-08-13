@@ -149,7 +149,7 @@ define([
       var $e = this.render().$el;
       var e = this.el;
 
-      $e.detach().css({ /*top: 0,*/ /*left: 0,*/ display: 'block' });
+      $e.detach().css({ left: 'auto', display: 'block' });
       $e.insertAfter($('body'));
       this.reposition();
 

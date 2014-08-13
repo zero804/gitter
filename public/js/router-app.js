@@ -4,7 +4,7 @@ require([
   'backbone',
   'underscore',
   'views/app/appIntegratedView',
-  'views/toolbar/troupeMenu',
+  'views/menu/troupeMenu',
   'collections/instances/troupes',
   'components/titlebar',
   'components/realtime',
@@ -51,7 +51,7 @@ require([
       } else {
         hash = windowHash;
       }
-      chatIFrame.contentWindow.location.assign(state + hash);
+      chatIFrame.contentWindow.location.replace(state + hash);
     }
   }
 
@@ -87,15 +87,15 @@ require([
     // so /moo/ goes to /moo/-/chat but
     // /moo/foo goes to /moo/foo/chat
     var frameUrl = url + '/~' + type;
-    titlebarUpdater.setRoomName(title);
 
     pushState(frameUrl, title, url);
+    titlebarUpdater.setRoomName(title);
     updateContent(frameUrl);
   });
 
   // Revert to a previously saved state
   window.onpopstate = function(e) {
-    updateContent(e.state);
+    updateContent(e.state || window.location.pathname + '/~chat');
     appEvents.trigger('track', window.location.pathname + window.location.hash);
     return true;
   };

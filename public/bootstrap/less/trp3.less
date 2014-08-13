@@ -165,7 +165,7 @@ label {
   margin-bottom: 15px;
   box-shadow: none;
   display: inline-block;
-  padding: 9px;
+  padding: 0px 9px;
   border: 1px solid @trpGrey;
   background-color: fade(@trpGrey, 50%);
   border-radius: 4px;
@@ -1521,7 +1521,7 @@ ul li.placeholder:before {
     opacity: 0;
     }
 
-    #people-header, #top-header, #request-header, #repo-info {
+    #people-header, #top-header, #request-header, #repo-info, #activity-tip {
       display: none;
     }
 
@@ -2228,7 +2228,7 @@ ul.trpUserDetails {
   margin-bottom: 0;
 
   & li {
-    width: 100%;
+    max-width: 100%;
     padding: 2px 0 2px 20px;
     overflow-x: hidden;
     font-size: 14px;
