@@ -1,0 +1,262 @@
+
+/*@import "animate.less";*/
+@import "trp3Vars.less";
+
+@keyframes pulsate {
+    0% { transform: scale(1, 1); }
+    35% { transform: scale(1, 1); }
+    50% { transform: scale(0.75, 0.75); }
+    65% { transform: scale(1, 1);}
+    100% { transform: scale(1, 1); }
+}
+
+@keyframes pulsate-retina {
+    0% { transform: scale(1, 1); }
+    35% { transform: scale(1, 1); }
+    50% { transform: scale(0.75, 0.75); }
+    65% { transform: scale(1, 1);}
+    100% { transform: scale(1, 1);}
+}
+
+/* Mixin */
+.defaultHidden () {
+  display: none;
+}
+
+.trpPadV14 {
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+.trpIB {
+  display: inline-block;
+}
+
+.trpVTop {
+  vertical-align: top;
+}
+
+.view.synced {
+  opacity: 1.0;
+  transform: translate3d(0,0,0);
+  transition: opacity 0.2s ease-in-out;
+}
+
+.view.syncing {
+  opacity: 0.4;
+  transform: translate3d(0,0,0);
+  transition: opacity .25s ease-in-out;
+}
+
+.view.syncerror .trpChatBox {
+  background-color: #edb2bd;
+}
+
+.view.syncerror .trpChatFrom {
+  color: #888;
+}
+
+.view.syncerror .trpChatTime {
+  color: #888;
+}
+
+.trpStatus {
+  position: absolute;
+  top: 5px;
+  left: -6px;
+  border-radius: 5em;
+  border: 2px solid white;
+  width: 7px;
+  height: 7px;
+  display: block;
+}
+
+.DPUnreadCount {
+  .defaultHidden;
+  position: absolute;
+  top: 5px;
+  right: -8px;
+  border-radius: 5em;
+  border: 1px solid white;
+  width: 14px;
+  height: 14px;
+  background-color: @trpGreen;
+}
+
+.trpAvatarContainer {
+  width: 48px;
+  height: 48px;
+  display: inline-block
+}
+
+.trpDisplayPicture.admin {
+  border-bottom: 2px solid #34495e;
+}
+
+.trpDisplayPicture.contributor {
+  border-bottom: 2px solid #3498db;
+}
+
+.trpDisplayPicture.admin:before, .trpDisplayPicture.contributor:before {
+    position: absolute; display: block; content: '';
+    border-bottom: 1px solid white;
+    height: 100%; width: 100%;
+    box-sizing: border-box; 
+}
+
+.trpDisplayPicture {
+  border-bottom: 2px solid transparent;
+}
+
+.trpDisplayPicture.invited {
+
+  @invitedGray: 0;
+  @invitedOpacity: 0.3;
+  @MSinvitedOpacity: @invitedOpacity * 100; /* DO NOT CHANGE */ /* OH YEAH? WHY NOT? */
+
+  opacity: @invitedOpacity;
+  filter: grayscale(@invitedGray);
+
+  .trpStatus {
+    display: none;
+  }
+}
+
+.trpDisplayPicture.online .trpStatus{
+  background-color: #06ff00;
+}
+
+.trpDisplayPicture.offline .trpStatus {
+  background-color: #fcb316;
+}
+
+.trpDisplayPicture.busy .trpStatus {
+  background-color: #ff2400;
+}
+
+.trpButtonGreen {
+	.trpBodyMedium;
+	margin-top: 12px;
+	padding: 12px;
+	background-color: @trpGreen;
+	color: white;
+}
+
+.trpButtonAction {
+	cursor: pointer;
+}
+
+.trpButtonMenu {
+	float: right;
+	cursor: pointer;
+}
+
+.trpButtonGreen a {
+	color: white;
+}
+
+.trpMainButton {
+	display: block;
+}
+
+.trpButtonMenuItems {
+	display: none;
+}
+
+.trpButtonMenuItem {
+	display: block;
+	padding-top: 10px;
+}
+
+.trpHand {
+	cursor: pointer;
+}
+
+.trpInput {
+  border: 1px solid @trpGrey;
+  padding: 8px;
+  .trpBodyMedium;
+  color: @trpDarkGrey;
+  border-radius: 0px;
+  margin-bottom: 4px;
+}
+
+.trpFormItem {
+  vertical-align: middle;
+  margin-bottom: 6px;
+}
+
+
+.trpFormLabel {
+  width: 100px;
+  .trpBodyMedium;
+  color: #333;
+  display: inline-block;
+}
+
+.trpFormInputAction {
+  display: inline-block;
+  vertical-align: middle;
+  .trpBodySmall;
+  margin-left: 6px;
+}
+
+
+.trpInputSmall {
+  border: 1px solid @trpGrey;
+  padding: 4px;
+  border-radius: 0px;
+  .trpBodySmall;
+  color: @trpDarkGrey;
+}
+
+.tooltip {
+
+  .trpBodySmall;
+}
+
+.tooltip-inner {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trpHomeActionPanel {
+  width: 317px;
+  text-align: center;
+}
+
+.trpHelpBox {
+  display: inline-block;
+  min-height: 24px;
+  vertical-align: top;
+  border-radius: 0px;
+  .trpBodyMedium;
+  padding: 12px 12px;
+  line-height: 150%;
+  color: #333;
+}
+
+.trpUsername {
+  display: inline-block;
+  .trpBodySmall;
+  margin-left: 20px;
+  padding-top: 14px;
+}
+
+.trpSuggestion {
+  background-color: @trpBgColor2;
+  display: inline-block;
+  .trpBodySmall;
+  padding: 4px 12px 3px 10px;
+  border-radius: 2px;
+  margin-right: 4px;
+}
+
+.trpSuggestionAvailable:hover {
+  background-color: @trpGreen;
+}
+
+.trpSuggestionAvailable {
+  .trpHand;
+}

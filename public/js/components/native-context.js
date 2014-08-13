@@ -7,7 +7,7 @@ define([
 
   $(document).on('app.version.mismatch', function() {
     try {
-      if(window.applicationCache.status == 1) {
+      if(window.applicationCache.status === window.applicationCache.IDLE) {
         log('Attempting to update application cache');
         window.applicationCache.update();
       }

@@ -1,0 +1,86 @@
+
+.gtrActivityList {
+  list-style-type: none;
+  margin: 0;
+  .trpBodyMediumSmall;
+
+  .commits {
+    display: none;
+  }
+
+  li {
+    border-bottom: 1px dotted rgba(100,100,100,0.1);
+    padding: 7px 7px 7px 15px;
+    line-height: 20px;
+    cursor: default;
+  }
+
+  li:hover {
+    background-color: rgba(230,230,230,1);
+    color: black;
+
+    .gtrActivityItemText .mention {
+      border: 1px solid fade(@trpGrey,50%);
+      background-color: fade(@trpGrey,30%);
+    }
+  }
+
+  .activity-detail {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .activity-commit {
+    font-size: 12px;
+    line-height: 20px;
+    margin: 0;
+  }
+
+  .activity-time {
+    opacity: 1;
+    font-size: 11px;
+    position: absolute;
+    right: 4px;
+    top: 2px;
+    color: rgba(100,100,100,0.4);
+    z-index: 100;
+  }
+
+}
+
+.activity-expand {
+  cursor: pointer;
+
+  ul {
+    list-style: none;
+    margin: 0;
+  }
+
+}
+
+.gtrActivityItemText {
+  vertical-align: middle;
+  display: inline-block;
+  opacity: 0.8;
+  width: 205px;
+  
+  .mention {
+    border: 1px solid fade(@trpGrey,40%);
+    background-color: fade(@trpGrey,20%);
+    border-radius: 2px;
+    padding: 0 4px;
+    font-size: 11px;
+    cursor: pointer;
+  }
+
+  .issue {
+    font-size: 11px;
+  }
+
+  .commit {
+    font-size: 11px;
+  }
+
+  
+}
+

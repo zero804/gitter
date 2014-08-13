@@ -15,14 +15,14 @@
       100% { opacity: 0.6; }
   }
 
-  html.loading .trpContentPanel { background: url("{{ cdn 'images/2/gitter/logo-mark-grey-64.png' }}") center no-repeat; height: 90%; -webkit-animation: pulsey 2s ease-out; -webkit-animation-iteration-count: infinite;  }
+  html.loading .trpContentPanel { background: url("{{ cdn 'images/logo-mark-grey-64.png' }}") center no-repeat; height: 90%; -webkit-animation: pulsey 2s ease-out; -webkit-animation-iteration-count: infinite;  }
   html.loading .trpContentPanel > * { visibility: hidden; }
   </style>
 
-  <link rel="stylesheet" href='{{cdn "bootstrap/css/trp3.css" }}'>
+  <link rel="stylesheet" href='{{cdn cssFileName }}'>
 
     <!-- Le fav and touch icons -->
-    <link id="favicon" rel="shortcut icon" href='{{cdn "images/2/gitter/favicon5.png" }}'>
+    <link id="favicon" rel="shortcut icon" href='{{cdn "images/favicon5.png" }}'>
     {{>load_font_css}}
 </head>
 <body class="logged-out">
@@ -50,9 +50,9 @@
   {{#isMobile agent}}
     <div class="trpPortraitAlert" id='portrait-alert'>
       <div class="message">
-        <img class="ipad-icon" src='{{cdn "images/2/icon-rotate-ipad.png"}}'>
+        <img class="ipad-icon" src='{{cdn "images/icon-rotate-ipad.png"}}'>
         <p>Rotate iPad for better experience.</p>
-        <img class="logo" src='{{cdn "images/2/menu-toggle.png" }}'>
+        <img class="logo" src='{{cdn "images/menu-toggle.png" }}'>
       </div>
     </div>
   {{/isMobile}}
