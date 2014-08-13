@@ -96,8 +96,6 @@ exports.chatArchive = [
           previousDate = null;
         }
 
-
-
         return chatService.findChatMessagesForTroupeForDateRange(troupeId, startDate.toDate(), endDate.toDate())
           .spread(function(chatMessages, limitReached) {
 

@@ -7,6 +7,8 @@ var getVersion        = require('../get-model-version');
 var UserIdStrategy    = require('./user-id-strategy');
 var TroupeIdStrategy  = require('./troupe-id-strategy');
 
+var LIMIT_REACHED_MESSAGE = "You have more messages in your history. Upgrade your plan to see them";
+
 function formatDate(d) {
   return d ? d.toISOString() : null;
 }
@@ -42,10 +44,11 @@ function ChatStrategy(options)  {
   var unreadItemStategy;
   /* If options.unread has been set, we don't need a strategy */
   if(options.currentUserId && typeof options.unread === 'undefined') {
-    unreadItemStategy = new UnreadItemStategy({ itemType: 'chat' });    
+    unreadItemStategy = new UnreadItemStategy({ itemType: 'chat' });
   }
-  
+
   var troupeStrategy = options.includeTroupe ? new TroupeIdStrategy(options) : null;
+  var defaultUnreadStatus = options.unread === undefined ? true : !!options.unread;
 
   this.preload = function(items, callback) {
     var users = items.map(function(i) { return i.fromUserId; });
@@ -78,16 +81,8 @@ function ChatStrategy(options)  {
   };
 
   this.map = function(item) {
-    var unread;
-    
-    if(unreadItemStategy) {
-      unread = unreadItemStategy.map(item._id);
-    } else {
-      /* We're not looking up the unread items, but clients can request the state */
-      unread = typeof options.unread !== 'undefined' ? options.unread : true; /* defaults to true */
-    }
-    
-    
+    var unread = unreadItemStategy ? unreadItemStategy.map(item._id) : defaultUnreadStatus;
+
     return {
       id: item._id,
       text: item.text,
@@ -113,6 +108,19 @@ function ChatStrategy(options)  {
     };
 
   };
+
+  if(options.limitReached && !options.disableLimitReachedMessage) {
+    this.post = function(serialized) {
+      // Push a fake message
+      serialized.unshift({
+        limitReached: true,
+        text: LIMIT_REACHED_MESSAGE,
+        html: LIMIT_REACHED_MESSAGE
+      });
+
+      return serialized;
+    };
+  }
 }
 
 module.exports = ChatStrategy;

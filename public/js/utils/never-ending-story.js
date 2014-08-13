@@ -7,6 +7,8 @@ define(['underscore', 'backbone', 'log!nes'], function(_, Backbone, log) {
     this._reverse = options && options.reverse;
     this._prevScrollTop = 0;
     this._prevScrollTime = Date.now();
+    this._nearTop = false;
+    this._nearBottom = false;
     this._scrollHandler = this.scroll.bind(this);
     this.scrollRateLimited = _.throttle(this.scrollRate.bind(this), 100, { leading: false });
     this.enable();
@@ -27,18 +29,26 @@ define(['underscore', 'backbone', 'log!nes'], function(_, Backbone, log) {
       var deltaTop = prevScrollTop - scrollTop;
       var deltaBottom = prevScrollBottom - scrollBottom;
 
-      if(deltaTop > 0) {
+      var halfClientHeight = target.clientHeight/2;
+      var nearTop = scrollTop < halfClientHeight;
+      var nearBottom = scrollBottom < halfClientHeight;
+
+      if(deltaTop > 0 && nearTop) {
         /* We're scrolling towards the top */
-        if(scrollTop < target.clientHeight/2) {
-          // log('approaching.top (margin)');
-          this.trigger('approaching.top');
-        }
-      } else if(deltaBottom > 0) {
+        this.trigger('approaching.top');
+      } else if(deltaBottom > 0 && nearBottom) {
         /* We're scrolling towards the bottom */
-        if(scrollBottom < target.clientHeight/2) {
-          // log('approaching.bottom (margin)');
-          this.trigger('approaching.bottom');
-        }
+        this.trigger('approaching.bottom');
+      }
+
+      if(this._nearTop != nearTop) {
+        this._nearTop = nearTop;
+        this.trigger('near.top.changed', nearTop);
+      }
+
+      if(this._nearBottom != nearBottom) {
+        this._nearBottom = nearBottom;
+        this.trigger('near.bottom.changed', nearBottom);
       }
 
       this.scrollRateLimited();

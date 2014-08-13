@@ -63,10 +63,17 @@ require([
   new HeaderView({ model: context.troupe(), el: '#header' });
 
   new ChatCollectionView({
-    el: $('.js-chat-container'),
+    el: '#chat-container',
     collection: itemCollections.chats,
     userCollection: itemCollections.users,
-    decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
+    decorators: [
+      webhookDecorator,
+      issueDecorator,
+      commitDecorator,
+      mentionDecorator,
+      embedDecorator,
+      emojiDecorator
+    ]
   }).render();
 
 
