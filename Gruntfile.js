@@ -10,6 +10,10 @@ var MODULES = [
       exclude: ["core-libraries"]
   },
   {
+      name: "homepage",
+      exclude: ["core-libraries"]
+  },
+  {
       name: "router-app",
       include: [
         "utils/tracking",
@@ -30,6 +34,14 @@ var MODULES = [
   },
   {
       name: "router-chat",
+      include: [
+        "views/widgets/avatar",
+        "views/widgets/timeago"
+      ],
+      exclude: ["core-libraries"]
+  },
+  {
+      name: "router-embed-chat",
       include: [
         "views/widgets/avatar",
         "views/widgets/timeago"
@@ -117,26 +129,26 @@ var MODULES = [
 ];
 
 var LESS_ROOTS = [
-  { name: "archive"                            },
-  { name: "mobile-login",           only: 'mobile'   },
+  { name: "mobile-login",           only: 'mobile' },
   { name: "signup"                             },
-  { name: "trpHomePage"                        },
   { name: "trpAppsPage"                        },
   { name: "generic-layout"                     },
   { name: "trpHooks"                           },
   { name: "gitter-login"                       },
 
   // Bootscript root less files
+  { name: 'homepage'                           },
   { name: 'router-chat'                        },
   { name: 'router-app'                         },
   { name: 'router-nli-app'                     },
   { name: 'router-nli-chat'                    },
-  { name: 'mobile-app',             only: 'mobile'            },
-  { name: 'mobile-nli-app',         only: 'mobile'           },
+  { name: 'router-embed-chat'                  },
+  { name: 'mobile-app',             only: 'mobile' },
+  { name: 'mobile-nli-app',         only: 'mobile' },
   { name: 'router-archive-home'                },
   { name: 'router-archive-chat'                },
   { name: 'userhome'                           },
-  { name: 'mobile-userhome',        only: 'mobile'            },
+  { name: 'mobile-userhome',        only: 'mobile' },
   { name: 'mobile-native-chat',     only: 'ios'    },
   { name: 'mobile-native-userhome', only: 'ios'    },
 
@@ -491,15 +503,6 @@ module.exports = function( grunt ) {
       'jquery.validation':  {
         files : {
           'output/client-libs/jquery.validation/jquery.validate-amd.js': ['output/client-libs/jquery.validation/jquery.validate.js']
-        },
-        modules: {
-          'jquery': 'jQuery'
-        },
-        exports: 'jQuery'
-      },
-      'jquery-carousel': {
-        files : {
-          'output/client-libs/jquery-carousel/jquery.carouFredSel-6.2.1.amd.js': ['output/client-libs/jquery-carousel/jquery.carouFredSel-6.2.1.js']
         },
         modules: {
           'jquery': 'jQuery'

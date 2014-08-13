@@ -280,7 +280,6 @@ install-client-libs:
 	cp output/client-libs/hbs/Handlebars.js public/repo/hbs/Handlebars.js
 	cp output/client-libs/hbs/hbs/json2.js public/repo/hbs/json2.js
 	cp output/client-libs/jquery.validation/jquery.validate-amd.js public/repo/jquery.validation/jquery.validation.js
-	cp output/client-libs/jquery-carousel/jquery.carouFredSel-6.2.1.amd.js public/repo/jquery-carousel/jquery.carouFredSel-6.2.1.js
 	cp output/client-libs/hammerjs/dist/jquery.hammer.min.js public/repo/hammerjs/jquery.hammer.js
 	cp output/client-libs/mocha/mocha-amd.js public/repo/mocha/mocha.js
 	cp output/client-libs/mocha/mocha.css public/repo/mocha/mocha.css

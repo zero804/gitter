@@ -73,7 +73,6 @@ require([
   });
 
   // Called from the OSX native client for faster page loads
-
   window.gitterLoader = function(url) {
     var frameUrl = url + '/~chat';
     titlebarUpdater.setRoomName(url);
