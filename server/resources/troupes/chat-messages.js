@@ -30,7 +30,6 @@ module.exports = {
     return chatService.findChatMessagesForTroupe(req.troupe.id, options)
       .spread(function(chatMessages, limitReached) {
         var userId = req.user && req.user.id;
-
         var strategy = new restSerializer.ChatStrategy({
           currentUserId: userId,
           troupeId: req.troupe.id,
