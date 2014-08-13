@@ -280,7 +280,9 @@ describe('room-service', function() {
           assert.equal(id, 'test-user-id');
           done();
         },
-        saveQ: function() {}
+        saveQ: function() {
+          return Q.resolve();
+        }
       };
       service.addUserToRoom(troupe, {}, 'test-user').fail(done);
     });
@@ -299,6 +301,7 @@ describe('room-service', function() {
         addUserById: function() {},
         saveQ: function() {
           done();
+          return Q.resolve();
         }
       };
       service.addUserToRoom(troupe, {}, 'test-user').fail(done);
@@ -316,7 +319,9 @@ describe('room-service', function() {
       var troupe = {
         containsUserId: function() { return false; },
         addUserById: function() {},
-        saveQ: function() {}
+        saveQ: function() {
+          return Q.resolve();
+        }
       };
 
       service.addUserToRoom(troupe, {}, 'test-user')
@@ -340,7 +345,9 @@ describe('room-service', function() {
       var troupe = {
         containsUserId: function() { return false; },
         addUserById: function() {},
-        saveQ: function() {}
+        saveQ: function() {
+          return Q.resolve();
+        }
       };
 
       service.addUserToRoom(troupe, {}, 'test-user').fail(done);
