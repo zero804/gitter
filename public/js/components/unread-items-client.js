@@ -5,11 +5,10 @@ define([
   './realtime',
   'log!unread-items-client',
   'backbone',
-  './csrf',
   'utils/appevents',
   'utils/dataset-shim',
   'utils/double-hash'
-], function($, _, context, realtime, log, Backbone, csrf, appEvents, dataset, DoubleHash) {
+], function($, _, context, realtime, log, Backbone, appEvents, dataset, DoubleHash) {
   "use strict";
 
   function limit(fn, context, timeout) {
@@ -209,7 +208,6 @@ define([
         contentType: "application/json",
         data: JSON.stringify(queue),
         async: async,
-        beforeSend: csrf,
         type: "POST",
         global: false,
         success: function() {

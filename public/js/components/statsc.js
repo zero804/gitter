@@ -1,10 +1,9 @@
 define([
   'jquery',
   'underscore',
-  './csrf',
   'utils/appevents',
   'log!stats'
-], function($, _, csrf, appEvents, log) {
+], function($, _, appEvents, log) {
   "use strict";
 
   var statQueue = [];
@@ -31,7 +30,6 @@ define([
       dataType: 'text',
       contentType: "application/json",
       data: JSON.stringify(sendQueue),
-      beforeSend: csrf,
       global: false,
       type: "POST",
       error: function() {

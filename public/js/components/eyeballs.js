@@ -3,9 +3,8 @@ define([
   'utils/context',
   './realtime',
   'log!eyeballs',
-  './csrf',
   'utils/appevents'
-], function($, context, realtime, log, csrf, appEvents) {
+], function($, context, realtime, log, appEvents) {
   "use strict";
 
   var eyesOnState = true;
@@ -30,7 +29,6 @@ define([
         on: value
       },
       dataType: 'text',
-      beforeSend: csrf,
       async: !synchronous,
       global: false,
       type: "POST",
@@ -201,7 +199,6 @@ define([
     $.ajax({
       url: '/api/v1/ping',
       global: false,
-      beforeSend: csrf,
       type: "GET",
       success: function(/*data*/) {
       },

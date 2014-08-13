@@ -155,12 +155,20 @@ define([
     return window.troupeEnv && window.troupeEnv[envName];
   };
 
-  context.getAccessToken = function() {
-    return context.getBearerToken() || ctx.accessToken;
-  };
+  context.getAccessToken = function(callback) {
+    var iterations = 0;
+    function checkToken() {
+      // This is a very rough first attempt
+      var token = window.bearerToken || ctx.accessToken;
+      if(token) return callback(token);
 
-  context.getBearerToken = function() {
-    return window.bearerToken;
+      iterations++;
+      if(iterations > 50) {
+        return window.location.reload(true);
+      }
+      setTimeout(checkToken, 100);
+    }
+    checkToken();
   };
 
   context.isLoggedIn = function() {

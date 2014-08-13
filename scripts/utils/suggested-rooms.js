@@ -3,20 +3,28 @@
 "use strict";
 
 var userService = require('../../server/services/user-service');
-var repoService = require('../../server/services/repo-service');
+var suggestedRoomService = require('../../server/services/suggested-room-service');
 var shutdown = require('shutdown');
 
-var opts = require("nomnom").option('username', {
-  position: 0,
-  required: true,
-  help: "username to look up e.g trevorah"
-}).parse();
+var opts = require("nomnom")
+  .option('username', {
+    position: 0,
+    required: true,
+    help: "username to look up e.g trevorah"
+  })
+  .option('language', {
+    default: 'en',
+    help: "human language"
+  })
+  .parse();
 
 userService.findByUsername(opts.username)
-  .then(repoService.suggestedReposForUser)
+  .then(function(user) {
+    return suggestedRoomService.getSuggestions(user, opts.language);
+  })
   .then(function(repos) {
-    repos.forEach(function(repo) {
-      console.log(repo.full_name);
+    repos.forEach(function(suggestion) {
+      console.log(suggestion.uri, suggestion.room && suggestion.room.users.length, suggestion.scores);
     });
   })
   .delay(1000)
