@@ -10,9 +10,9 @@ var username = 'test-user';
 
 function createServiceWithStubData(callback) {
   return testRequire.withProxies('./services/invited-permissions-service', {
-    './permissions-model': function(user, right, uri, roomType, security) {
+    './username-permissions-model': function(username, right, uri, roomType, security) {
       return Q.fcall(function() {
-        return callback(user, right, uri, roomType, security);
+        return callback(username, right, uri, roomType, security);
       });
     }
   });
