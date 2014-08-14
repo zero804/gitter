@@ -148,7 +148,8 @@ define([
     template: template,
 
     initialize: function() {
-      appEvents.triggerParent('track-event', 'welcome-add-user-suggestions', { count: this.collection.length });
+      var ctx = context();
+      appEvents.triggerParent('track-event', 'welcome-add-user-suggestions', { count: this.collection.length, security: ctx.troupe.security });
     },
 
     onRender: function() {
@@ -162,6 +163,7 @@ define([
     },
 
     clickAddButton: function() {
+      appEvents.triggerParent('track-event', 'welcome-search-clicked');
       window.location.href = "#add";
     },
 
