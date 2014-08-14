@@ -53,7 +53,6 @@ getAllUsers(function(err, users) {
             },
             function(err, res) {
               if (err) console.log(err);
-              console.log("did something");
               callback();
             });
           });

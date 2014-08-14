@@ -132,13 +132,14 @@ function install() {
               // Update an existing user
               if(user) {
 
-                // If the user was in the DB already but was invited, notify MixPanel
+                // If the user was in the DB already but was invited, notify stats services
                 if (user.state === 'INVITED') {
                   stats.event("invite_accepted", {
                     userId: user.id,
                     method: 'github_oauth',
                     username: user.username
                   });
+
                   stats.event("new_user", {
                     userId: user.id,
                     method: 'github_oauth',
@@ -200,7 +201,6 @@ function install() {
 
                 req.logIn(user, function(err) {
                   if (err) { return done(err); }
-
                   stats.event("new_user", {
                     userId: user.id,
                     distinctId: mixpanel.getMixpanelDistinctId(req.cookies),
