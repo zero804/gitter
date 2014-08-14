@@ -219,6 +219,13 @@ function findFirstUnreadMessageId(troupeId, userId) {
   });
 }
 
+function historyForTroupeExceedsDate(troupeId, maxHistoryDate) {
+  return getDateOfFirstMessageInRoom(troupeId)
+    .then(function(firstMessageSent) {
+      return !!(firstMessageSent && firstMessageSent < maxHistoryDate);
+    });
+}
+
 /**
  * Returns a promise of
  * [ messages, limitReached]
@@ -228,6 +235,9 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
   if(options.marker === 'first-unread' && options.userId) {
     findMarker = findFirstUnreadMessageId(troupeId, options.userId);
   }
+
+  var limit = options.limit || 50;
+  var skip = options.skip || 0;
 
   return Q.all([
       roomCapabilities.getMaxHistoryMessageDate(troupeId),
@@ -261,35 +271,37 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
           q = q.where('sent').gte(maxHistoryDate);
         }
 
-        return [
-          q.sort(options.sort || { sent: sentOrder })
-            .limit(options.limit || 50)
-            .skip(options.skip || 0)
-            .execQ()
-            .then(function(results) {
-              // results = results.map(massageMessages);
-              if(sentOrder === 'desc') {
-                return results.reverse();
-              }
+        return q.sort(options.sort || { sent: sentOrder }) .limit(limit)
+          .skip(skip)
+          .execQ()
+          .then(function(results) {
+            var limitReached = false;
 
-              return results;
-            }),
-            maxHistoryDate
-          ];
+            if(sentOrder === 'desc') {
+              results.reverse();
+              if(maxHistoryDate && results.length < limit) {
+                limitReached = historyForTroupeExceedsDate(troupeId, maxHistoryDate);
+              }
+            }
+
+            return [results, limitReached];
+          });
       }
 
       var aroundId = new ObjectID(markerId || options.aroundId);
 
+      var halfLimit = Math.floor(options.limit / 2) || 25;
+
       var q1 = persistence.ChatMessage
                 .where('toTroupeId', troupeId)
                 .sort({ sent: 'desc' })
-                .limit(Math.floor(options.limit / 2) || 25)
+                .limit(halfLimit)
                 .where('_id').lte(aroundId);
 
       var q2 = persistence.ChatMessage
                 .where('toTroupeId', troupeId)
                 .sort({ sent: 'asc' })
-                .limit(Math.ceil(options.limit / 2) || 25)
+                .limit(halfLimit)
                 .where('_id').gt(aroundId);
 
       if(maxHistoryDate) {
@@ -303,19 +315,15 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
         q2.execQ(),
         ])
         .spread(function(a, b) {
-          return [[].concat(a.reverse(), b), maxHistoryDate];
-        });
-    })
-    .spread(function(results, maxHistoryDate) {
-      if (!maxHistoryDate) return [results, false];
+          var limitReached = false;
 
-      return [
-        results,
-        getDateOfFirstMessageInRoom(troupeId)
-          .then(function(firstMessageSent) {
-            return !!(firstMessageSent && firstMessageSent < maxHistoryDate);
-          })
-      ];
+          // Got back less results than we were expecting?
+          if(maxHistoryDate && a.length < halfLimit) {
+            limitReached = historyForTroupeExceedsDate(troupeId, maxHistoryDate);
+          }
+
+          return [[].concat(a.reverse(), b), limitReached];
+        });
     })
     .nodeify(callback);
 

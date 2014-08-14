@@ -10,7 +10,6 @@ var StatusError       = require('statuserror');
 var bayeuxExtension   = require('./extension');
 var Q                 = require('q');
 var userCanAccessRoom = require('../../services/user-can-access-room');
-var sampleChatsService = require('../../services/sample-chats-service');
 
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
@@ -31,15 +30,8 @@ var routes = [
   { re: /^\/api\/v1\/user\/(\w+)$/,
     validator: validateUserForUserSubscription },
   { re: /^\/api\/v1\/ping(\/\w+)?$/,
-    validator: validateUserForPingSubscription },
-  { re: /^\/sample-chats$/,
-    validator: validateUserForPingSubscription,
-    populator: populateSampleChatsCollection }
+    validator: validateUserForPingSubscription }
 ];
-
-function populateSampleChatsCollection() {
-  return Q.resolve({data: sampleChatsService.getSamples()});
-}
 
 // This strategy ensures that a user can access a URL under a troupe URL
 function validateUserForSubTroupeSubscription(options) {
