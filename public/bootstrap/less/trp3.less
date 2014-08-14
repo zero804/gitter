@@ -610,7 +610,7 @@ body.logged-out {
 }
 
 body.embedded {
-  .trpContentPanel { bottom: @embedded_footer_height } 
+  .trpContentPanel { bottom: @embedded_footer_height }
 }
 
 .trpButtonMedium, .trpButtonBig {
@@ -1423,11 +1423,11 @@ ul li.placeholder:before {
 }
 
 .trpChatPanel {
-  
+
   body.embedded & {
     margin-right: 0;
   }
-  
+
   display: block;
 	margin-right: @rightMarginFull;
 	text-align: left;
@@ -1496,7 +1496,8 @@ ul li.placeholder:before {
 
   .trpToolbarList {
     min-height: 40px;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
 
     ul {
       list-style: none;
