@@ -34,6 +34,7 @@ define([
       var uri = this.model.get('uri');
       var url = '/' + uri;
       appEvents.trigger('navigation', url, 'chat', uri);
+      appEvents.trigger('track-event', 'suggested-room-click', { uri: uri });
     }
   });
 
