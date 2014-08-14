@@ -24,13 +24,7 @@ describe("email-address-service", function() {
       publicEmail: 'public@email.com'
     });
 
-    var options = {
-      githubTokenUser: {
-        githubToken: 'token'
-      }
-    };
-
-    service({ username: 'test-user' }, options)
+    service({ username: 'test-user' })
       .then(function(email) {
         assert.equal(email, 'public@email.com');
       }).nodeify(done);
@@ -39,24 +33,6 @@ describe("email-address-service", function() {
   it('returns nothing if the public email address is invalid', function(done) {
     var service = createEmailAddressService({
       publicEmail: 'DONT EMAIL ME'
-    });
-
-    var options = {
-      githubTokenUser: {
-        githubToken: 'token'
-      }
-    };
-
-    service({ username: 'test-user' }, options)
-      .then(function(email) {
-        assert(!email);
-      }).nodeify(done);
-  });
-
-  it('returns nothing if it has no tokens', function(done) {
-    var service = createEmailAddressService({
-      privateEmail: 'private@email.com',
-      publicEmail: 'public@email.com'
     });
 
     service({ username: 'test-user' })
