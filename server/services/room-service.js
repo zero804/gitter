@@ -27,7 +27,7 @@ var collections        = require('../utils/collections');
 var StatusError        = require('statuserror');
 var eventService       = require('./event-service');
 var emailNotificationService = require('./email-notification-service');
-var canBeInvited       = require('./invited-permissions-service');
+var canUserBeInvitedToJoinRoom = require('./invited-permissions-service');
 var emailAddressService = require('./email-address-service');
 
 function localUriLookup(uri, opts) {
@@ -672,7 +672,7 @@ function notifyInvitedUser(fromUser, invitedUser, room, isNewUser) {
 function addUserToRoom(room, instigatingUser, usernameToAdd) {
   return Q.all([
     roomPermissionsModel(instigatingUser, 'adduser', room),
-    canBeInvited({ username: usernameToAdd }, room, instigatingUser)
+    canUserBeInvitedToJoinRoom(usernameToAdd, room, instigatingUser)
   ]).spread(function (canInvite, canJoin) {
       if (!canInvite) throw new StatusError(403, 'You do not have permission to add people to this room.');
       if (!canJoin)   throw new StatusError(403, usernameToAdd + ' does not have permission to join this room.');
