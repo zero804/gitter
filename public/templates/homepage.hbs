@@ -15,11 +15,11 @@
 
         <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
         <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
-        {{>require_wrapper}}
+        {{> require_wrapper }}
 
-        {{{bootScript "homepage" }}}
+        {{{ bootScript "homepage" }}}
         {{{ generateEnv }}}
-        {{>load_font_css}}
+        {{> load_font_css }}
     </head>
     <body>
       <header id="intro-panel">
@@ -42,7 +42,7 @@
               <a href="#apps-panel">Apps</a>
             </div>
 
-            <a class="btn login" href="/login/github?action=login">
+            <a class="btn login" href="/login/github?action=login&actionSource=intro-login">
               <b>Log in</b> <span class="no-small">with Github</span>
             </a>
           </div>
@@ -52,7 +52,7 @@
           <h1>{{ __ "Where developers come to talk." }}</h1>
           <p>We host thousands of public communities where developers from all around the world come together to talk about the future of programming, build better products, and share the best cat GIFs</a>.</p>
 
-          <a class="btn signup" href="/login/github?action=signup&button=intro">
+          <a class="btn signup" href="/login/github?action=signup&actionSource=intro-signup">
             <img src="{{cdn 'images/home/github.png'}}"> <b>Sign up</b> with Github
           </a>
           <div class="legal">
@@ -90,7 +90,7 @@
           <h1>
             Some of our communities
 
-            <a class="btn secondary" href="/login/github?action=signup&button=communities">
+            <a class="btn secondary" href="/login/github?action=signup&actionSource=communities">
               Create your own
             </a>
           </h1>
@@ -218,7 +218,7 @@
                 <li><b>2 weeks’</b> chat history</li>
               </ul>
 
-              <a class="btn signup full" href="/login/github?action=signup&button=pricing.free"><b>Get started</b> for free</a>
+              <a class="btn signup full" href="/login/github?action=signup&actionSource=pricing.free"><b>Get started</b> for free</a>
             </article>
 
             <article class="price purple">

@@ -128,7 +128,7 @@ function install() {
 
         } else {
           return userService.findByGithubIdOrUsername(githubUserProfile.id, githubUserProfile.login)
-            .then(function(user) {
+            .then(function (user) {
               // Update an existing user
               if(user) {
 
@@ -200,12 +200,13 @@ function install() {
 
                 req.logIn(user, function(err) {
                   if (err) { return done(err); }
-
+                  
                   stats.event("new_user", {
                     userId: user.id,
                     distinctId: mixpanel.getMixpanelDistinctId(req.cookies),
                     method: 'github_oauth',
-                    username: user.username
+                    username: user.username,
+                    actionSource: req.session.actionSource
                   });
 
                   return done(null, user);
