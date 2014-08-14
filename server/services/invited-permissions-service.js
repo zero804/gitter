@@ -1,16 +1,16 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var permissionsModel = require('./permissions-model');
+var usernamePermissionsModel = require('./username-permissions-model');
 var Q = require('q');
 
 
-function canUserBeInvitedToJoinRoom(userToBeInvited, troupe, instigatingUser) {
+function canUserBeInvitedToJoinRoom(usernameToBeInvited, troupe, instigatingUser) {
   var validator;
 
   function roomUserValidator(securityRoomUri, githubType) {
-    return function(userToBeInvited) {
-      return permissionsModel(userToBeInvited, 'join', securityRoomUri, githubType, null, { githubTokenUser: instigatingUser });
+    return function(usernameToBeInvited) {
+      return usernamePermissionsModel(usernameToBeInvited, 'join', securityRoomUri, githubType, null, { githubTokenUser: instigatingUser });
     };
   }
 
@@ -58,7 +58,7 @@ function canUserBeInvitedToJoinRoom(userToBeInvited, troupe, instigatingUser) {
       return Q.reject(400);
   }
 
-  return validator(userToBeInvited);
+  return validator(usernameToBeInvited);
 }
 
 module.exports = canUserBeInvitedToJoinRoom;

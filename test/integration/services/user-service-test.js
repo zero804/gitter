@@ -33,7 +33,7 @@ describe("User Service", function() {
   it('should be able to create a \'ghost\' user using his username', function(done) {
     var userService = testRequire("./services/user-service");
 
-    userService.createGhostUser('node-gitter')
+    userService.createInvitedUser('node-gitter')
     .then(function(user) {
       assert.equal(user.username,'node-gitter');
       assert.equal(user.state, 'INVITED');
