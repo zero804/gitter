@@ -5,7 +5,7 @@ var permissionsModel = require('./permissions-model');
 var Q = require('q');
 
 
-function canUserBeInvitedToJoinRoom(userToBeInvited, troupe, instigatingUser) {
+function canUserBeInvitedToJoinRoom(usernameToBeInvited, troupe, instigatingUser) {
   var validator;
 
   function roomUserValidator(securityRoomUri, githubType) {
@@ -58,7 +58,7 @@ function canUserBeInvitedToJoinRoom(userToBeInvited, troupe, instigatingUser) {
       return Q.reject(400);
   }
 
-  return validator(userToBeInvited);
+  return validator({ username: usernameToBeInvited });
 }
 
 module.exports = canUserBeInvitedToJoinRoom;
