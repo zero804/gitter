@@ -639,10 +639,8 @@ exports.createCustomChildRoom = createCustomChildRoom;
  * returns        User - the invited user
  */
 function notifyInvitedUser(fromUser, invitedUser, room, isNewUser) {
-  // invited users dont have github tokens yet
-  var options = invitedUser.state === 'INVITED' ? { githubTokenUser: fromUser } : {};
   // get the email address
-  return emailAddressService(invitedUser, options)
+  return emailAddressService(invitedUser)
     .then(function (emailAddress) {
       var notification;
 
@@ -664,7 +662,7 @@ function notifyInvitedUser(fromUser, invitedUser, room, isNewUser) {
         to: invitedUser.username,
         from: fromUser.username,
       };
-      
+
       if (isNewUser) stats.event("new_invited_user", _.extend(metrics, { userId: fromUser.id })); // this should happen only once
       stats.event('user_added_someone', _.extend(metrics, { userId: fromUser.id }));
     })
@@ -682,9 +680,9 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
     })
     .then(function (existingUser) {
       if (existingUser && room.containsUserId(existingUser.id)) throw new StatusError(409, usernameToAdd + ' is already in this room.');
-      
+
       var isNewUser = !existingUser;
-      
+
       return [existingUser || userService.createGhostUser(usernameToAdd), isNewUser];
     })
     .spread(function (invitedUser, isNewUser) {
