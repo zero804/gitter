@@ -248,8 +248,8 @@ describe('room-service', function() {
           return Q.resolve(stubs.canBeInvited);
         },
         './user-service': {
-          createGhostUser: function() {
-            return Q.resolve(stubs.createGhostUserResult);
+          createInvitedUser: function() {
+            return Q.resolve(stubs.createInvitedUserResult);
           },
           findByUsername: function() {
             return Q.resolve(stubs.findByUsernameResult);
@@ -269,7 +269,7 @@ describe('room-service', function() {
       var service = createRoomServiceWithStubs({
         addUser: true,
         findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
-        createGhostUserResult: null,
+        createInvitedUserResult: null,
         canBeInvited: true,
         onInviteEmail: function() {}
       });
@@ -291,7 +291,7 @@ describe('room-service', function() {
       var service = createRoomServiceWithStubs({
         addUser: true,
         findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
-        createGhostUserResult: null,
+        createInvitedUserResult: null,
         canBeInvited: true,
         onInviteEmail: function() {}
       });
@@ -311,7 +311,7 @@ describe('room-service', function() {
       var service = createRoomServiceWithStubs({
         addUser: true,
         findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
-        createGhostUserResult: null,
+        createInvitedUserResult: null,
         canBeInvited: true,
         onInviteEmail: function() {}
       });
@@ -335,7 +335,7 @@ describe('room-service', function() {
       var service = createRoomServiceWithStubs({
         addUser: true,
         findByUsernameResult: null,
-        createGhostUserResult: { username: 'test-user', id: 'test-user-id', state: 'INVITED', emails: ['a@b.com']},
+        createInvitedUserResult: { username: 'test-user', id: 'test-user-id', state: 'INVITED', emails: ['a@b.com']},
         canBeInvited: true,
         onInviteEmail: function() {
           done();
@@ -357,7 +357,7 @@ describe('room-service', function() {
       var service = createRoomServiceWithStubs({
         addUser: true,
         findByUsernameResult: null,
-        createGhostUserResult: { username: 'test-user', id: 'test-user-id', state: 'INVITED' },
+        createInvitedUserResult: { username: 'test-user', id: 'test-user-id', state: 'INVITED' },
         canBeInvited: false,
         onInviteEmail: function() {}
       });
@@ -377,7 +377,7 @@ describe('room-service', function() {
       var service = createRoomServiceWithStubs({
         addUser: true,
         findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
-        createGhostUserResult: null,
+        createInvitedUserResult: null,
         canBeInvited: true,
         onInviteEmail: function() {}
       });
@@ -397,7 +397,7 @@ describe('room-service', function() {
       var service = createRoomServiceWithStubs({
         addUser: false,
         findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
-        createGhostUserResult: null,
+        createInvitedUserResult: null,
         canBeInvited: true,
         onInviteEmail: function() {}
       });

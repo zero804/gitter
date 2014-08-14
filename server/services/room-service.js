@@ -683,7 +683,7 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
 
       var isNewUser = !existingUser;
 
-      return [existingUser || userService.createGhostUser(usernameToAdd), isNewUser];
+      return [existingUser || userService.createInvitedUser(usernameToAdd), isNewUser];
     })
     .spread(function (invitedUser, isNewUser) {
       room.addUserById(invitedUser.id);
