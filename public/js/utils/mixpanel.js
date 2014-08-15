@@ -40,15 +40,9 @@ define([
 
     mixpanel.init(trackingId);
     if (context.isAuthed()) {
-      var userId = context.getUserId();
-      if(userId) {
-        mixpanel.identify(userId);
-      }
-
       var user = context.getUser();
-      if(user) {
-        mixpanel.name_tag(user.username);
+      if (user) {
+        mixpanel.identify(user.id);
       }
     }
-
 });
