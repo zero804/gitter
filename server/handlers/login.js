@@ -18,6 +18,17 @@ var rememberMe     = require('../web/middlewares/rememberme-middleware');
 var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
 var GithubMeService  = require("../services/github/github-me-service");
 
+/** TODO move onto its own method once we find the need for it elsewhere
+ * isRelativeURL() checks if the URL is relative
+ *
+ * url      String - the url to be check 
+ * @return  Boolean - the result of the check
+ */
+function isRelativeURL(url) {
+  var relativeUrl = new RegExp('^\/[^/]');
+  return relativeUrl.test(url);
+}
+
 module.exports = {
   install: function(app) {
     // Redirect user to GitHub OAuth authorization page.
@@ -28,6 +39,11 @@ module.exports = {
         // adds the source of the action to the session (for tracking how users 'come in' to the app)
         req.session.source = query.source;
         
+        // checks if we have a relative url path and adds it to the session
+        if (query.returnTo && isRelativeURL(query.returnTo)) {
+          req.session.returnTo = query.returnTo;
+        }
+
         //send data to stats service
         if (query.action == 'login') {
           stats.event("login_clicked", {
