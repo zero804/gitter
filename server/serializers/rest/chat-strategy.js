@@ -43,7 +43,7 @@ function ChatStrategy(options)  {
   var userStategy = options.user ? null : new UserIdStrategy();
   var unreadItemStategy;
   /* If options.unread has been set, we don't need a strategy */
-  if(options.currentUserId && typeof options.unread === 'undefined') {
+  if(options.currentUserId && options.unread === undefined) {
     unreadItemStategy = new UnreadItemStategy({ itemType: 'chat' });
   }
 

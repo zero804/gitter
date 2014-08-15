@@ -41,7 +41,7 @@ exports.generateSocketContext = function(userId, troupeId) {
     });
 };
 
-exports.generateTroupeContext = function(req, options) {
+exports.generateTroupeContext = function(req, extras) {
   var user = req.user;
   var uriContext = req.uriContext;
   assert(uriContext);
@@ -79,7 +79,7 @@ exports.generateTroupeContext = function(req, options) {
       permissions: {
         admin: adminAccess
       },
-      extras: options
+      extras: extras
     });
   });
 };
