@@ -48,6 +48,7 @@ define([
     })(window);
   }
 
+
   function trackPageView(routeName) {
     if (window.mixpanel) {
       var loggedOutUserRoom = false;

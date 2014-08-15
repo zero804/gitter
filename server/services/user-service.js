@@ -3,6 +3,7 @@
 
 var env                       = require('../utils/env');
 var stats                     = env.stats;
+var _                         = require('underscore');
 // var sechash                   = require('sechash');
 var winston                   = require('../utils/winston');
 var assert                    = require('assert');
@@ -11,12 +12,14 @@ var collections               = require("../utils/collections");
 var uriLookupService          = require('./uri-lookup-service');
 var Q                         = require('q');
 var githubUserService         = require('./github/github-user-service');
+var emailAddressService       = require('./email-address-service');
+var mongooseUtils             = require('../utils/mongoose-utils');
 
 /**
  * Creates a new user
  * @return the promise of a new user
  */
-function newUser(options, callback) {
+function newUser(options) {
   var githubId = options.githubId;
 
   assert(githubId, 'githubId required');
@@ -44,21 +47,26 @@ function newUser(options, callback) {
     }
   });
 
-  return persistence.User.findOneAndUpdateQ(
-    { githubId: githubId },
-    {
+  return mongooseUtils.upsert(persistence.User, { githubId: githubId }, {
       $setOnInsert: insertFields
-    },
-    {
-      upsert: true
+    })
+    .spread(function(user, numAffected, raw) {
+      if(raw.updatedExisting) return user;
+
+      // New record was inserted
+      return emailAddressService(user)
+        .then(function(email) {
+          stats.userUpdate(_.extend({ email: email, mixpanelId : options.mixpanelId }, user.toJSON()));
+        })
+        .thenResolve(user);
+
     })
     .then(function(user) {
       // Reserve the URI for the user so that we don't need to figure it out
       // manually later (which will involve dodgy calls to github)
       return uriLookupService.reserveUriForUsername(user._id, user.username)
         .thenResolve(user);
-    })
-    .nodeify(callback);
+    });
 }
 
 var userService = {
