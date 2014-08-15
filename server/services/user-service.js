@@ -56,7 +56,7 @@ function newUser(options) {
       // New record was inserted
       return emailAddressService(user)
         .then(function(email) {
-          stats.userUpdate(_.extend({ email: email }, user.toJSON()));
+          stats.userUpdate(_.extend({ email: email, mixpanelId : options.mixpanelId }, user.toJSON()));
         })
         .thenResolve(user);
 

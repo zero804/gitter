@@ -189,7 +189,8 @@ function install() {
                 emails:             githubUserProfile.email ? [githubUserProfile.email] : [],
                 gravatarImageUrl:   githubUserProfile.avatar_url,
                 githubUserToken:    accessToken,
-                githubId:           githubUserProfile.id
+                githubId:           githubUserProfile.id,
+                mixpanelId:         mixpanel.getMixpanelDistinctId(req.cookies)
               };
 
               logger.verbose('About to create GitHub user ', githubUser);
