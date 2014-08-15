@@ -1,6 +1,7 @@
 define([
   'jquery',
   'utils/context',
+  'utils/room-name-trimmer',
   'marionette',
   'hbs!./tmpl/troupeListItem',
   'utils/appevents',
@@ -9,7 +10,7 @@ define([
   'cocktail',
   'utils/dataset-shim',
   'jquery-sortable' // No ref
-], function($, context, Marionette, troupeListItemTemplate, appEvents, moment,  TroupeViews, cocktail, dataset) {
+], function($, context, roomNameTrimmer, Marionette, troupeListItemTemplate, appEvents, moment,  TroupeViews, cocktail, dataset) {
   "use strict";
 
   /* @const */
@@ -17,20 +18,6 @@ define([
 
   /* @const */
   var MAX_NAME_LENGTH = 25;
-
-  function trimName(uri) {
-    if(uri.length <= MAX_NAME_LENGTH) return uri;
-
-    var parts = uri.split('/');
-    for(var i = 1; i < parts.length; i++) {
-      var sub = parts.slice(i).join('/');
-      if(sub.length <= MAX_NAME_LENGTH) {
-        return sub;
-      }
-    }
-
-    return parts.pop();
-  }
 
   var TroupeItemView = Marionette.ItemView.extend({
     tagName: 'li',
@@ -45,7 +32,7 @@ define([
     },
     serializeData: function() {
       var data = this.model.toJSON();
-      data.name = trimName(data.name);
+      data.name = roomNameTrimmer(data.name, MAX_NAME_LENGTH);
       return data;
     },
     onItemClose: function(e) {
