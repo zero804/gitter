@@ -38,13 +38,15 @@ exports.serializeChatsForTroupe = function(troupeId, userId, options, callback) 
   var initialId = options.aroundId;
 
   return chatService.findChatMessagesForTroupe(troupeId, options)
-    .spread(function(chatMessages/*, limitReached*/) {
+    .spread(function(chatMessages, limitReached) {
       var strategy = new restSerializer.ChatStrategy({
         notLoggedIn: !userId,
-        unread: options.unread,
         initialId: initialId,
         currentUserId: userId,
-        troupeId: troupeId
+        troupeId: troupeId,
+        limitReached: limitReached,
+        unread: options.unread,
+        disableLimitReachedMessage: options.disableLimitReachedMessage
       });
 
       return restSerializer.serialize(chatMessages, strategy);

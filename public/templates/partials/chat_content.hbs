@@ -1,13 +1,15 @@
 <div class="trpContentPanel" id="content-wrapper">
   <div class="trpChatPanel" id="chat-frame">
-    <div class="trpChatContainer  chat-container  js-chat-container  primary-scroll" id="content-frame">
-      {{#if oneToOneInvited}}
-        {{> chat_invited}}
-      {{else}}
-        {{#each chats}}
-          {{{ chatItemPrerender this lang=../lang locale=../locale}}}
-        {{/each}}
-      {{/if}}
+    <div class="trpChatContainer primary-scroll chat-container" id="content-frame">
+      <div id="chat-container">
+        {{#if oneToOneInvited}}
+          {{> chat_invited}}
+        {{else}}
+          {{#each chats}}
+            {{{ chatItemPrerender this lang=../lang locale=../locale}}}
+          {{/each}}
+        {{/if}}
+      </div>
       {{#if initialBottom}}
         {{! This is a way of forcing the browser to open at the bottom of the screen }}
         <div id='initial' style="height:0;width:0;overflow:hidden"><a name="initial"/>_</a></div>

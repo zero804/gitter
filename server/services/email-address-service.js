@@ -11,9 +11,9 @@ function getPrivateEmailAddress(user) {
   return ghMe.getEmail();
 }
 
-function getValidPublicEmailAddress(user, githubTokenUser) {
-  var ghUser = new GitHubUserService(githubTokenUser);
-  return ghUser.getUser(user.username)
+function getValidPublicEmailAddress(username) {
+  var ghUser = new GitHubUserService();
+  return ghUser.getUser(username)
     .then(function(user) {
       if(user.email && isValidEmail(user.email)) {
         return user.email;
@@ -21,14 +21,12 @@ function getValidPublicEmailAddress(user, githubTokenUser) {
     });
 }
 
-module.exports = function(user, options) {
-  var options = options || {};
+module.exports = function(user) {
+  if(!user) return Q.reject(new Error('User required'));
 
   if(user.githubUserToken || user.githubToken) {
     return getPrivateEmailAddress(user);
-  } else if(options.githubTokenUser) {
-    return getValidPublicEmailAddress(user, options.githubTokenUser);
-  } else {
-    return Q.resolve(undefined);
   }
+
+  return getValidPublicEmailAddress(user.username);
 };

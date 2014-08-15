@@ -8,7 +8,7 @@ module.exports =  function(req, res) {
 
   var roomUri = req.query.room;
 
-  roomService.findOrCreateRoom(req.user, roomUri, {ignoreCase: true}).then(function(room) {
+  roomService.findOrCreateRoom(req.user, roomUri, { ignoreCase: true }).then(function(room) {
     if (!room.troupe) {
       res.send({allowed: false});
       return;

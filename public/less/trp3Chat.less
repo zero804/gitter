@@ -1,0 +1,786 @@
+@import "icon-mixins.less";
+
+// img.emoji {
+//   height: 20px;
+//   width: 20px;
+// }
+
+// .trpChatText .mention {
+//   border: 1px solid fade(@trpGrey,40%);
+//   background-color: fade(@trpGrey,20%);
+//   border-radius: 2px;
+//   padding: 0 4px;
+//   font-size: 13px;
+//   cursor: pointer;
+// }
+
+// .trpChatBox.mention .trpChatText .mention {
+//   border: 1px solid fade(@trpLightBlue, 20%);
+//   background-color: fade(@trpLightBlue, 20%);
+// }
+
+.issue {
+  border: 1px solid fade(@trpGrey,40%);
+  background-color: fade(@trpGrey,20%);
+  border-radius: 2px;
+  padding: 0 4px;
+  font-size: 13px;
+  color: black;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.commit {
+  border: 1px solid fade(@trpAsbestos,30%);
+  background-color: fade(@trpAsbestos,20%);
+  border-radius: 2px;
+  padding: 0 4px;
+  font-size: 13px;
+  color: black;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.commit-popover-title {
+  height: 20px;
+  position: relative;
+  a {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+}
+
+.commit-popover-body {
+  float: left;
+  width: 100%;
+
+  ul.file-list {
+    list-style: none;
+    margin-left: 0;
+  }
+  .modified {
+    .prepend-diff-modified();
+    font-size: small;
+    &:before {
+      color: @trpYellow;
+    }
+  }
+  .added {
+    .prepend-diff-added();
+    font-size: small;
+    &:before {
+      color: @trpGreen;
+    }
+  }
+  .removed {
+    .prepend-diff-removed();
+    font-size: small;
+    &:before {
+      color: @trpRed;
+    }
+  }
+}
+
+.popover-footer a.open-in-github {
+  float: right;
+  line-height: 22px;
+  &:hover{
+    text-decoration: none;
+  }
+}
+
+.commit:hover {
+  text-decoration: none;
+  background-color: fade(@trpAsbestos, 40%);
+}
+
+a.issue:hover {
+  text-decoration: none;
+}
+
+.issue.open {
+  border: 1px solid fade(@trpGreen, 20%);
+  background-color: fade(@trpGreen, 20%);
+}
+
+.issue.open:hover {
+  background-color: fade(@trpGreen, 40%);
+}
+
+.issue.closed {
+  border: 1px solid fade(@trpRed, 20%);
+  background-color: fade(@trpRed, 20%);
+}
+
+.issue.closed:hover {
+  background-color: fade(@trpRed, 40%)
+}
+
+.issue-popover-body {
+  float: left;
+  width: 100%;
+}
+
+// blockquote {
+//   margin-bottom: 0;
+//   font-size: 14px;
+//   font-weight: 300;
+//   line-height: 27.5px;
+// }
+
+.trpChatContainer {
+  box-sizing: border-box;
+  text-align: center;
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  // & .chat-item:last-child {
+  //   padding-bottom: 8px !important;
+  // }
+}
+
+// .trpChatContainer div:nth-child(odd) .chat-item__container {
+//   // background-color: #f3f8f1;
+// }
+
+// .trpChatContainer > div:first-child {
+//   padding-top: 72px;
+// }
+
+// .trpChatInputContainer {
+//   text-align: center;
+//   display: inline-block;
+//   width: 100%;
+//   padding: 0 44px;
+//   position: relative;
+//   -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+//   -moz-box-sizing: border-box;     /* Firefox, other Gecko */
+//   box-sizing: border-box;         /* Opera/IE 8+ */
+
+//   @media @mid {
+//     padding: 0 32px;
+//     padding-right: 42px;
+//   }
+//   @media @small {
+//     padding: 0 42px 0 42px;
+//   }
+//   @media @mobile {
+//     padding: 0 12px;
+//   }
+// }
+
+// .trpChatInputAvatar {
+//   float: left;
+// }
+
+// .trpChatInputArea {
+
+//   @media @mid {
+//     .avatar-s {
+//       width: 24px;
+//       height: 24px;
+//     }
+//   }
+
+//   @media @mobile {
+//     background-color: white;
+//     padding-top: 5px;
+//     position: absolute;
+//     bottom: 0;
+//     width: 100%;
+//     border-top: 1px solid @trpBgColor;
+
+//     .avatar-s {
+//       width: 24px;
+//       height:24px;
+//     }
+//   }
+// }
+
+// .trpChatInputBox {
+// 	display: block;
+// 	background-color: white;
+// /*	height: 58px;*/
+// 	vertical-align: top;
+// 	border-radius: 5px 5px 5px 5px;
+// 	margin-left: 52px;
+//   margin-bottom: 0px;
+
+//   @media @mid {
+//     margin-left: 40px;
+//   }
+
+//   @media @mobile {
+//     background-color: white;
+//     margin-left: 24px;
+//     padding: 0 12px;
+//   }
+
+// }
+
+code {
+  border: 1px solid fade(@trpGrey,40%);
+  background-color: fade(@trpGrey,20%);
+  border-radius: 2px;
+  padding: 0 4px;
+  font-size: 14px;
+  overflow-x: auto;
+  word-wrap: normal;
+}
+
+pre code {
+  border-radius: 6px;
+  border: none;
+}
+
+blockquote {
+  margin-bottom: 0;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 27.5px;
+}
+
+// .trpChatEdit {
+//   display: inline-block;
+//   text-align: right;
+//   width: 16px;
+//   height: 16px;
+//   color: transparent;
+//   margin-left: 2px;
+//   background-image: url('../images/icon-edit.png');
+//   background-repeat: no-repeat;
+//   line-height:9px;
+//   vertical-align: middle;
+//   opacity: 0;
+//   overflow-x: hidden;
+//   .trpBodyTiny;
+//   .trpHand;
+//   -webkit-transition: opacity 0.2s ease;
+//   -moz-transition: opacity 0.2s ease;
+//   -o-transition: opacity 0.2s ease;
+//   transition: opacity 0.2s ease;
+//   background-size: cover;
+
+//   @media @mobile {
+//     background-image: url('../images/icon-edit-24@2x.png');
+//     width: 24px;
+//     height: 24px;
+//     float: right;
+//     margin-right: -16px;
+//   }
+
+//   @media @retina {
+//     background-image: url('../images/icon-edit@2x.png');
+//   }
+// }
+
+// .trpChatReadBy {
+//   display: inline-block;
+//   text-align: right;
+//   width: 16px;
+//   height: 16px;
+//   color: transparent;
+//   margin-left: 2px;
+//   background-image: url('../images/icon-read.png');
+//   background-repeat: no-repeat;
+//   line-height:9px;
+//   vertical-align: middle;
+//   opacity: 0;
+//   overflow-x: hidden;
+//   .trpBodyTiny;
+//   .trpHand;
+//   -webkit-transition: opacity 0.2s ease;
+//   -moz-transition: opacity 0.2s ease;
+//   -o-transition: opacity 0.2s ease;
+//   transition: opacity 0.2s ease;
+//   background-size: cover;
+
+
+//   /* Own and has been read */
+//   .isViewers .trpChatBox &.readBySome {
+//     opacity: 0.5;
+//   }
+
+//   /* Hover and has been read */
+//   .trpChatBox:hover &.readBySome {
+//     opacity: 1;
+//   }
+
+//   @media @retina {
+//       background-image: url('../images/icon-read@2x.png');
+//   }
+
+// }
+
+
+.popoverReadBy span {
+  margin-right: 5px;
+}
+
+
+// .trpChatAvatar {
+//   float: left;
+// }
+
+// .trpChatAvatar .avatar-s {
+//   width: 30px;
+//   height: 30px;
+//   @media @mobile {
+//     width: 24px;
+//     height: 24px;
+//   }
+// }
+
+// .trpChatInput,
+// .trpChatInputBoxTextArea {
+// 	display: block;
+// 	width: 100%;
+// 	outline: none;
+// 	.trpBodyMedium;
+// 	padding-left: 5px;
+// 	border: 0px;
+// 	resize: none;
+// 	margin: 1px;
+// 	box-shadow: none;
+// 	height: 44px;
+// }
+
+// .trpChatInputBoxTextArea:focus {
+//   outline: none;
+// }
+
+// .trpChatInputBoxTextArea {
+//   overflow: hidden;
+//   padding: 5px;
+//   margin: -5px 0 0 -5px;
+//   margin-bottom: 12px;
+//   color: black;
+
+//   @media @mobile {
+//     background-color: white;
+//     padding: 0;
+//     margin: 0;
+//   }
+// }
+
+// .trpChatItem pre {
+//   margin: 4px 0 0 0;
+// }
+
+// code {
+//   border: 1px solid fade(@trpGrey,40%);
+//   background-color: fade(@trpGrey,20%);
+//   border-radius: 2px;
+//   padding: 0 4px;
+//   font-size: 14px;
+//   overflow-x: auto;
+//   word-wrap: normal;
+// }
+
+// pre code {
+//   border-radius: 6px;
+//   border: none;
+// }
+
+// .trpChatItemContainer:last-child .trpChatItem {
+//   padding-bottom: 16px;
+// }
+
+// .chat-item .deleted {
+//   opacity: 0.5;
+
+//   .trpChatText {
+//     opacity: 0.6;
+//   }
+
+// }
+
+// @import 'chat-item.less';
+
+// .trpChatItem {
+// 	display: inline-block;
+// 	clear: left;
+//   width: 100%;
+//   text-align: left;
+//   padding: 8px 30px 8px 44px;
+//   -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+//   -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+//   box-sizing: border-box;         /* Opera/IE 8+ */
+
+//   @media @small {
+//     padding: 12px 12px;
+//   }
+
+//   @media @mid {
+//     padding: 12px 32px;
+
+//     .avatar-s {
+//       width: 24px;
+//       height: 24px;
+//     }
+//   }
+
+//   &.status {
+//     @status_bg: hsl(220, 65%, 97%);
+
+//     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+//     -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+//     box-sizing: border-box;         /* Opera/IE 8+ */
+//     width: 100%;
+//     overflow: hidden;
+
+//     .wrapper {
+//       text-align: center;
+//       background-color: @status_bg;
+//       border: 2px solid darken(@status_bg, 1%);
+//       border-radius: 3px;
+//       padding: 10px;
+//     }
+
+//     .mention {
+//       margin: 0;
+//     }
+
+//     .trpChatAvatar {
+//       float: center;
+//       display: inline-block;
+//     }
+
+//     .trpChatBox {
+//       margin: 0;
+//     }
+
+//     .trpChatBox {
+//       text-align: center;
+//       // display: inline-block;
+//     }
+
+//     .icons {
+//       float: right;
+//       position: relative;
+//       top: 0px;
+//       right: 0px;
+//     }
+
+//   }
+
+//   @media @mobile {
+//     padding: 12px 12px;
+//   }
+
+// }
+
+// .trpChatItemContainer {
+// /*  border-bottom: 1px solid #ecf1ed;*/
+//   -webkit-transition: background-color 0.5s linear;
+//   -moz-transition: background-color 0.5s linear;
+//   -o-transition: background-color 0.5s linear;
+//   transition: background-color 0.5s linear;
+//   border-top: 1px solid transparent;
+
+//   @media @small {
+//     padding-left: 10px;
+//   }
+
+//   @media @mobile {
+//     padding-left: 0;
+//   }
+// /*  &:hover {
+//     background-color: #ecf1ed;
+//   };*/
+
+//   &.unread, &.reading {
+//     background-color: fade(@trpGreen, 20%);
+//     border-top: 1px solid fade(@trpGreen, 25%);
+//     -webkit-transition: background-color 0.5s linear;
+//     -moz-transition: background-color 0.5s linear;
+//     -o-transition: background-color 0.5s linear;
+//     transition: background-color 0.5s linear;
+//   }
+
+// }
+
+
+
+
+// .trpChatItem {
+//   .embed {
+//     border: 0px;
+//     margin-top: 5px;
+
+//     &.embed-limited {
+//       max-height: 500px;
+//       overflow-y: auto;
+//     }
+
+//     h2 {
+//       font-size: 1.5em;
+//       line-height: normal;
+//     }
+//     h3 {
+//       font-size: 1.17em;
+//       line-height: normal;
+//     }
+//   }
+//   .rich {
+//     margin-top: 10px;
+//   }
+//   .trpFileVersionThumbnail {
+//     border: 1px solid #e6ebe6;
+//     padding: 4px;
+//     background-color: white;
+//     width: 180px;
+//     height: 180px;
+//   }
+
+//   @media @mobile {
+//     .trpFileVersionThumbnail {
+//       width: 180px;
+//       height: 180px;
+//     }
+//   }
+
+//   .notification-icon {
+//     width: 16px;
+//     height: 16px;
+//     vertical-align: middle;
+//     margin-right: 5px;
+//     margin-left: 3px;
+//   }
+
+//   .webhook {
+//     background: transparent !important;
+//     font-size: 12px;
+//     opacity: 0.8;
+//   }
+
+//   .commits {
+//     font-size: 12px;
+//     list-style: none;
+//     padding-left: 0;
+//     margin-left: 0;
+//     margin-bottom: 0;
+//     padding-bottom: 0;
+//     display: none;
+
+//     li {
+//       line-height: 18px;
+//     }
+
+//   }
+
+//   .whicon {
+//     display: inline-block;
+//     float: left;
+//   }
+
+//   .whbody {
+//     display: inline-block;
+//     width: 90%;
+//     float: left;
+
+//     a {
+//       cursor: pointer;
+//     }
+
+//     .commits {
+//       display: none;
+//     }
+//   }
+// }
+
+// .trpChatBox {
+// 	min-height: 24px;
+// 	vertical-align: top;
+// 	border-radius: 5px 5px 5px 5px;
+//   .trpBodyMedium;
+// 	padding: 0px 12px;
+// 	line-height: 140%;
+// 	margin-left: 40px;
+// 	color: black;
+
+//   @media @mid {
+//     margin-left: 30px;
+//   }
+
+//   @media @mobile {
+//     margin-left: 24px;
+//   }
+
+// }
+
+// .view .trpChatBox, .trpChatItem {
+// 	-webkit-transition: background-color 0.5s linear;
+//   -moz-transition: background-color 0.5s linear;
+//   -o-transition: background-color 0.5s linear;
+//   transition: background-color 0.5s linear;
+// }
+
+// .view .trpChatFrom, .trpChatTime {
+// 	-webkit-transition: color 0.3s linear;
+//   -moz-transition: color 0.3s linear;
+//   -o-transition: color 0.3s linear;
+//   transition: color 0.3s linear;
+// }
+
+// .trpChatDetails{
+//   display: block;
+//   color: #999;
+//   font-size: 12px;
+//   margin: -4px 0 0px 0;
+//   padding: 0;
+// }
+
+
+// .trpChatTime, .trpChatReads {
+// 	display: inline-block;
+//   color: #AAA;
+// }
+
+// // by default, don't show the edit icon
+// .trpChatEdit {
+//   display: none;
+// }
+
+// // show the edit icon if the viewer canEdit or the message has been edited
+// .isViewers .trpChatEdit, .hasBeenEdited .trpChatEdit {
+//   display: inline-block;
+// }
+
+// // if the message has been edited always show the edit icon (not just on hover)
+// .hasBeenEdited .trpChatEdit {
+//   display: inline-block;
+// }
+
+// // show the edit and read icons only when hovered over.
+// // hide the edit and read buttons by default, so they can be shown on hover.
+// .trpChatEdit, .trpChatReads {
+//   visibility: hidden;
+// }
+
+// .trpChatItemContainer:hover .trpChatEdit,
+// .trpChatItemContainer:hover .trpChatReads {
+//   visibility: visible;
+
+//   @media @mobile {
+//     visibility: hidden;
+//   }
+
+// }
+
+// .trpChatItemContainer.cantEdit .trpChatBox:hover .trpChatEdit {
+//   @media @mobile {
+//     visibility: hidden;
+//   }
+// }
+
+// .isOld .trpChatEdit {
+//   display: none;
+// }
+
+// .trpCompactView .trpChatReads {
+//   display: none;
+// }
+
+// // gray out the edit and read icons by default
+// .trpChatEdit, .trpChatReads {
+//   opacity: 0.8;
+// }
+
+// if the viewer can edit the message, dont gray it out
+// .canEdit .trpChatEdit:hover {
+//   opacity: 0.9;
+//   transition: opacity .25s ease-in-out;
+//   -moz-transition: opacity .25s ease-in-out;
+//   -webkit-transition: opacity .25s ease-in-out;
+// }
+
+// .canEdit .trpChatEdit {
+//   @media @mobile {
+//     visibility: hidden;
+//     display: inline-block;
+//   }
+// }
+
+// .canEdit .trpChatEdit:hover {
+//   @media @mobile {
+//     visibility: hidden;
+//     display: inline-block;
+//   }
+// }
+
+// .trpChatBox:hover > .trpChatDetails > .trpChatEdit.force-show {
+//   visibility: visible;
+// }
+
+
+/*
+// hide the timeago when hovered
+:hover > .trpChatTime {
+  display: none;
+}
+*/
+
+// .trpChatFrom {
+// 	display: inline-block;
+//   vertical-align: middle;
+//   @media @mobile {
+//     max-width: 100px;
+//     overflow: hidden;
+//     white-space: nowrap;
+//   }
+// }
+
+// .trpChatText {
+// 	margin: 0;
+// 	padding: 0;
+//   word-wrap: break-word;
+//   user-select: text;
+
+//   a.link {
+//     color: @trpLightBlue;
+//   }
+// }
+
+.missing {
+  font-size: smaller;
+  opacity: 0.5;
+  font-style: italic;
+}
+
+.issue-popover-title {
+  height: 20px;
+  position: relative;
+  a {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 50px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  span {
+    position: absolute;
+    right: 0;
+  }
+}
+
+// .trpChatTime {
+//   opacity: 0.8;
+//   vertical-align: middle;
+// }
+
+.frame-chat {
+  position: relative; // required for scroll calculations
+}
+
+

@@ -1,0 +1,89 @@
+@import "parentSelectView";
+
+.gtrRoomPermissions {
+  clear: both;
+
+  input {
+    float: left;
+    margin: 8px 12px 0 4px;
+  }
+
+  .permission-row {
+    margin: 8px 0;
+  }
+
+  label {
+    display: inline;
+  }
+
+  .description {
+    display: block;
+    margin-left: 61px;
+    font-size: 14px;
+  }
+
+  .permission-label {
+    margin-left: 8px;
+  }
+
+  .gtrAutoJoin {
+    margin-top: 12px;
+    .transition300ms;
+    input {
+      margin-right: 8px;
+    }
+
+    &.disabled {
+      opacity: 0;
+    }
+    .permission-label {
+      vertical-align: middle;
+      padding-top: 4px;
+      padding-left: 22px;
+    }
+
+  }
+
+  .icon-public {
+    .prepend-globe-icon;
+    &:before {
+      font-size: 22px;
+      padding-top: 8px;
+      margin-top: -4px;
+    }
+  }
+
+  .github-REPO {
+    .prepend-repo-icon;
+    &:before {
+      font-size: 24px;
+      padding-top: 8px;
+    }
+  }
+
+  .icon-channel {
+    .prepend-channel-icon;
+    &:before {
+      font-size: 22px;
+      padding-top: 8px;
+      margin-top: -4px;
+    }
+  }
+
+  .github-ORG {
+    .prepend-org-icon;
+    &:before {
+      font-size: 24px;
+      padding-top: 8px;
+    }
+  }
+
+  .github-LOCK {
+    .prepend-lock-icon;
+    &:before {
+      font-size: 24px;
+      padding-top: 8px;
+    }
+  }
+
+}
