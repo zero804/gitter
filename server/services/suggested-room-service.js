@@ -7,67 +7,69 @@ var persistence     = require("./persistence-service");
 var Q               = require('q');
 var _               = require('underscore');
 
-var HILIGHTED_ROOMS = [{
-  uri: 'gitterHQ/gitter',
-  localeLanguage: 'en'
-}, {
-  uri: 'marionettejs/backbone.marionette',
-  language: 'JavaScript',
-  localeLanguage: 'en'
-},{
-  uri: 'LaravelRUS/chat',
-  channel: true,
-  language: 'PHP',
-  localeLanguage: 'ru'
-}, {
-  uri: 'gitterHQ/nodejs',
-  channel: true,
-  language: 'JavaScript',
-  localeLanguage: 'en'
-}, {
-  uri: 'lotus/chat',
-  channel: true,
-  language: 'Ruby',
-  localeLanguage: 'en'
-},{
-  uri: 'rom-rb/chat',
-  channel: true,
-  language: 'Ruby',
-  localeLanguage: 'en'
-}, {
-  uri: 'webpack/webpack',
-  language: 'JavaScript',
-  localeLanguage: 'en'
-}, {
-  uri: 'ruby-vietnam/chat',
-  channel: true,
-  language: 'Ruby',
-  localeLanguage: 'vi'
-}, {
-  uri: 'require-lx/group',
-  language: 'JavaScript',
-  localeLanguage: 'en'
-}, {
-  uri: 'angular-ui/ng-grid',
-  language: 'JavaScript',
-  localeLanguage: 'en'
-}, {
-  uri: 'opscode/supermarket',
-  language: 'Ruby',
-  localeLanguage: 'en'
-}, {
-  uri: 'MahApps/MahApps.Metro',
-  language: 'PowerShell',
-  localeLanguage: 'en'
-}, {
-  uri: 'sympy/sympy',
-  language: 'Python',
-  localeLanguage: 'en'
-}, {
-  uri: 'rogeriopvl/erebot',
-  language: 'JavaScript',
-  localeLanguage: 'es'
-}];
+var HILIGHTED_ROOMS = [
+  {
+    uri: 'gitterHQ/gitter',
+    localeLanguage: 'en'
+  }, {
+    uri: 'marionettejs/backbone.marionette',
+    language: 'JavaScript',
+    localeLanguage: 'en'
+  },{
+    uri: 'LaravelRUS/chat',
+    channel: true,
+    language: 'PHP',
+    localeLanguage: 'ru'
+  }, {
+    uri: 'gitterHQ/nodejs',
+    channel: true,
+    language: 'JavaScript',
+    localeLanguage: 'en'
+  }, {
+    uri: 'lotus/chat',
+    channel: true,
+    language: 'Ruby',
+    localeLanguage: 'en'
+  },{
+    uri: 'rom-rb/chat',
+    channel: true,
+    language: 'Ruby',
+    localeLanguage: 'en'
+  }, {
+    uri: 'webpack/webpack',
+    language: 'JavaScript',
+    localeLanguage: 'en'
+  }, {
+    uri: 'ruby-vietnam/chat',
+    channel: true,
+    language: 'Ruby',
+    localeLanguage: 'vi'
+  }, {
+    uri: 'require-lx/group',
+    language: 'JavaScript',
+    localeLanguage: 'en'
+  }, {
+    uri: 'angular-ui/ng-grid',
+    language: 'JavaScript',
+    localeLanguage: 'en'
+  }, {
+    uri: 'opscode/supermarket',
+    language: 'Ruby',
+    localeLanguage: 'en'
+  }, {
+    uri: 'MahApps/MahApps.Metro',
+    language: 'PowerShell',
+    localeLanguage: 'en'
+  }, {
+    uri: 'sympy/sympy',
+    language: 'Python',
+    localeLanguage: 'en'
+  }, {
+    uri: 'rogeriopvl/erebot',
+    language: 'JavaScript',
+    localeLanguage: 'es'
+  }
+];
 
 var CATEGORIES = {
   pushTime: function(item) {
