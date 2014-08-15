@@ -119,9 +119,9 @@ define([
 
       var avatarUrl;
       if (this.avatarSize == 'm') {
-        avatarUrl = user.avatarUrlMedium || '/images/2/avatar-default-m.png';
+        avatarUrl = user.avatarUrlMedium || '/images/avatar-default-m.png';
       } else {
-        avatarUrl = user.avatarUrlSmall || '/images/2/avatar-default-s.png';
+        avatarUrl = user.avatarUrlSmall || '/images/avatar-default-s.png';
       }
 
       var online = user.id === currentUserId || !!user.online; // only the people view tries to show avatar status so there is a model object, it won't necessarily work in other cases

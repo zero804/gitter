@@ -55,6 +55,7 @@ function renderHomePage(req, res, next) {
       res.render(page, {
         useAppCache: !!nconf.get('web:useAppCache'),
         bootScriptName: bootScriptName,
+        cssFileName: "styles/" + bootScriptName + ".css",
         troupeName: req.uriContext.uri,
         troupeContext: troupeContext,
         agent: req.headers['user-agent'],
@@ -81,6 +82,7 @@ function renderMainFrame(req, res, next, frame) {
       res.render(template, {
         appCache: getAppCache(req),
         bootScriptName: bootScriptName,
+        cssFileName: "styles/" + bootScriptName + ".css",
         troupeName: req.uriContext.uri,
         troupeContext: troupeContext,
         chatAppLocation: chatAppLocation,
@@ -97,21 +99,25 @@ function renderChat(req, res, opts, next) {
   var aroundId = req.query.at;
   var embedded = (typeof opts.embedded !== 'undefined') ? opts.embedded : false;
   var extras = (typeof opts.extras !== 'undefined') ? opts.extras : {};
-  
+  var script = opts.script;
   var user = req.user;
   var userId = user && user.id;
 
-  var snapshotOptions = { 
-    limit: INITIAL_CHAT_COUNT, 
-    aroundId: aroundId, 
+  var snapshotOptions = {
+    limit: INITIAL_CHAT_COUNT,
+    aroundId: aroundId,
     unread: embedded ? false : undefined // Embedded views already have items marked as unread=false
   };
 
+  var serializerOptions = _.defaults({
+    disableLimitReachedMessage: true
+  }, snapshotOptions);
+
   Q.all([
       contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, embedded: embedded }),
-      restful.serializeChatsForTroupe(troupe.id, userId, snapshotOptions)
+      restful.serializeChatsForTroupe(troupe.id, userId, serializerOptions)
     ]).spread(function (troupeContext, chats) {
-      
+
       var initialChat = _.find(chats, function(chat) { return chat.initial; });
       var initialBottom = !initialChat;
       var githubLink;
@@ -120,13 +126,14 @@ function renderChat(req, res, opts, next) {
       if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
         githubLink = 'https://github.com/' + req.uriContext.uri;
       }
-      
+
       if (!user) classNames.push("logged-out");
-      
+
       res.render(opts.template, _.extend({
         isRepo: troupe.githubType === 'REPO',
         appCache: getAppCache(req),
-        bootScriptName: opts.script,
+        bootScriptName: script,
+        cssFileName: "styles/" + script + ".css", // css filename matches bootscript
         githubLink: githubLink,
         troupeName: req.uriContext.uri,
         troupeTopic: troupeContext.troupe.topic,
@@ -270,6 +277,7 @@ function renderUserNotSignedUpMainFrame(req, res, next, frame) {
       res.render(template, {
         appCache: getAppCache(req),
         bootScriptName: bootScriptName,
+        cssFileName: "styles/" + bootScriptName + ".css",
         troupeName: req.params.roomPart1,
         troupeContext: troupeContext,
         chatAppLocation: chatAppLocation,

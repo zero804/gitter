@@ -1,46 +1,66 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'jquery',
   'backbone',
   'utils/context',
   'hbs!./tmpl/limitBannerTemplate'
-  ], function($, Backbone, context, template)  {
+  ], function(Backbone, context, template)  {
   "use strict";
 
-  var TopBannerView = Backbone.View.extend({
+  return Backbone.View.extend({
     events: {
       'click button.main': 'onMainButtonClick'
     },
     initialize: function(options) {
       this.chatCollectionView = options.chatCollectionView;
-      this.listenTo(this.collection, 'limitReached', this.showBanner);
+
+      this.listenTo(this.chatCollectionView, 'near.top.changed', function(nearTop) {
+        this.nearTop = nearTop;
+        this.showHide();
+      });
+
+      this.listenTo(this.collection, 'limitReached', function(atLimit) {
+        this.atLimit = atLimit;
+        this.showHide();
+      });
+    },
+    showHide: function() {
+      if(this.atLimit && this.nearTop) {
+        this.showBanner();
+      } else {
+        this.hideBanner();
+      }
     },
     render: function() {
-      //this.showBanner();
       return this;
     },
     showBanner: function() {
+      if(this.showing) return;
+      this.showing = true;
       var $banner = this.$el;
       var message = 'You have more messages in your history. Upgrade your plan to see them';
 
-      $banner.html(template({message: message}));
+      $banner.html(template({ message: message }));
       $banner.parent().show();
+
+      clearTimeout(this.removeTimeout);
 
       // cant have slide away animation on the same render as a display:none change
       setTimeout(function() {
         $banner.removeClass('slide-away');
       }, 0);
+
     },
     hideBanner: function() {
+      if(!this.showing) return;
+      this.showing = false;
+
       var $banner = this.$el;
-      var self = this;
 
       $banner.addClass('slide-away');
 
-      setTimeout(function() {
-        if(self.getUnreadCount() === 0) {
-          $banner.parent().hide();
-        }
+      if(this.removeTimeout) return;
+      this.removeTimeout = setTimeout(function() {
+        $banner.parent().hide();
       }, 500);
     },
     onMainButtonClick: function() {
@@ -48,9 +68,5 @@ define([
     }
   });
 
-
-  return {
-    Top: TopBannerView,
-  };
 
 });

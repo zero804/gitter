@@ -70,7 +70,7 @@ function newUser(options) {
 }
 
 var userService = {
-  createGhostUser: function(username, user, callback) {
+  createInvitedUser: function(username, user, callback) {
     var githubUser = new githubUserService(user);
 
     return githubUser.getUser(username)
@@ -85,15 +85,6 @@ var userService = {
         };
 
         return newUser(gitterUser);
-      })
-      .then(function(user) {
-        stats.event("new_invited_user", {
-          userId: user.id,
-          method: 'added_to_room',
-          username: user.username
-        });
-
-        return user;
       })
       .nodeify(callback);
   },

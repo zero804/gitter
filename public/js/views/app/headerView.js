@@ -6,7 +6,7 @@ define([
   'autolink',
   'components/notifications',
   'views/controls/dropdown'
-], function($, context, Marionette, Backbone, /*headerViewTemplate, */ autolink, notifications, Dropdown)  {
+], function($, context, Marionette, Backbone, autolink, notifications, Dropdown)  {
   "use strict";
 
   return Marionette.ItemView.extend({

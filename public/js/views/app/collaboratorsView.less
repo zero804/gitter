@@ -1,0 +1,139 @@
+@import "trpFonts.less";
+
+.js-share-button {
+  display: none;
+}
+
+.welcome-modal__close {
+  cursor: pointer;
+  transition: all 300ms ease-in-out;
+  float: right;
+  opacity: 0.2;
+  margin: 20px;
+  &:before {
+    font-family: 'troupe-icons';
+    content: '\e827';
+    font-size: 14px;
+  }
+  &:hover {
+    opacity: 0.4;
+  }
+}
+
+.welcome-modal__header {
+  padding: 10px;
+  border-bottom: 1px solid rgba(200,200,200,0.3);
+  h2 {
+    text-align: left;
+    font-family: @fontSans;
+    font-size: 22px;
+    padding: 0 10px;
+  }
+  img {
+    vertical-align: middle;
+    height: 48px;
+    width: 48px;
+  }
+}
+
+.welcome-modal__explain {
+  padding: 20px 0 0 20px;
+  p {
+    display: none;
+  }
+}
+
+.welcome-modal__collaborators {
+  font-size: 14px;
+  font-family: @fontSans;
+  text-align: left;
+  background: #f4f5f6;
+  border-radius: 5px;
+  margin: 20px 40px;
+
+  ul {
+    list-style: none;
+    margin: 0;
+    max-height: 250px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 10px 20px;
+    background-color: rgba(255,255,255,0.6);
+  }
+
+  li {
+    display: inline-block;
+    width: 265px;
+    margin-right: 40px;
+  }
+}
+
+.welcome-modal__collaborator {
+  display: inline-block;
+  width: 265px;
+  max-width: 100%;
+  line-height: 22px;
+  border-radius: 4px;
+  box-sizing: border-box;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  padding: 10px 0;
+
+  img {
+    margin-right: 20px;
+    border-radius: 4px;
+    float: left;
+    width: 48px;
+    height: 48px;
+  }
+
+  p {
+    float: left;
+    max-width: 70%;
+    margin: 0px;
+    white-space: normal;
+    //text-overflow: ellipsis;
+    //overflow: hidden;
+  }
+
+  .add {
+    float: right;
+  }
+
+  .message {
+    color: #888;
+
+    a {
+    color: @trpLightBlue;
+    }
+
+  }
+
+}
+
+.welcome-modal__no-suggestions {
+  padding: 20px 0;
+  text-align: center;
+
+  a {
+    text-decoration: underline;
+  }
+}
+
+.welcome-modal__footer {
+  padding: 20px 0 20px 20px;
+}
+
+.welcome-modal__footer-button {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+#activity-tip {
+  color: #666;
+  margin: 14px;
+  a {
+    color: #333;
+  }
+ }

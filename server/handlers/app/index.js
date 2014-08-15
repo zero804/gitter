@@ -16,14 +16,6 @@ function saveRoom(req) {
   }
 }
 
-function isNewUser(user, callback) {
-  return recentRoomService.findBestTroupeForUser(user)
-    .then(function(room) {
-      return !room;
-    })
-    .nodeify(callback);
-}
-
 var mainFrameMiddlewarePipeline = [
   appMiddleware.uriContextResolverMiddleware,
   appMiddleware.isPhoneMiddleware,
@@ -33,14 +25,7 @@ var mainFrameMiddlewarePipeline = [
       if(req.isPhone) {
         appRender.renderMobileUserHome(req, res, next, 'home');
       } else {
-        isNewUser(req.user, function(err, isNew) {
-          if(!err && isNew) {
-            // render homepage with no left manu
-            appRender.renderHomePage(req, res, next);
-          } else {
-            appRender.renderMainFrame(req, res, next, 'home');
-          }
-        });
+        appRender.renderMainFrame(req, res, next, 'home');
       }
       return;
     }

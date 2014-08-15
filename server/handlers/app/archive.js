@@ -43,6 +43,7 @@ exports.datesList = [
                   archives: true,
                   troupeContext: troupeContext,
                   bootScriptName: 'router-archive-home',
+                  cssFileName: 'styles/router-archive-home.css',
                   troupeTopic: troupe.topic,
                   githubLink: '/' + req.uriContext.uri,
                   troupeName: req.uriContext.uri,
@@ -94,8 +95,6 @@ exports.chatArchive = [
         if(moment(previousDate).startOf('day').isBefore(moment([2013, 11, 1]))) {
           previousDate = null;
         }
-
-
 
         return chatService.findChatMessagesForTroupeForDateRange(troupeId, startDate.toDate(), endDate.toDate())
           .spread(function(chatMessages, limitReached) {
@@ -159,6 +158,7 @@ exports.chatArchive = [
                 archiveChats: true,
                 isRepo: troupe.githubType === 'REPO',
                 bootScriptName: 'router-archive-chat',
+                cssFileName: 'styles/router-archive-chat.css',
                 githubLink: '/' + req.uriContext.uri,
                 user: user,
                 troupeContext: troupeContext,
