@@ -81,6 +81,22 @@ function localUriLookup(uri, opts) {
     });
 }
 
+/**
+ * sendJoinStats() sends information to MixPanels about a join_room event
+ *
+ * user       User
+ * room       Troupe 
+ * tracking   Object - contains stats info
+ */
+function sendJoinStats(user, room, tracking) {
+  console.log('arguments\n\n\n\n\n\n', arguments, '\n\n\n\n\n');
+  stats.event("join_room", {
+    userId: user.id,
+    utm_content: tracking && tracking.utm_content,
+    room_uri: room.uri
+  });
+}
+
 function applyAutoHooksForRepoRoom(user, troupe) {
   validate.expect(user, 'user is required');
   validate.expect(troupe, 'troupe is required');
@@ -205,7 +221,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
                 })
                 .then(function(troupe) {
                   var hookCreationFailedDueToMissingScope;
-
+                  
                   if(nonce == troupe._nonce) {
                     serializeCreateEvent(troupe);
 
@@ -262,10 +278,6 @@ function ensureAccessControl(user, troupe, access) {
       if(troupe.containsUserId(user.id)) return Q.resolve(troupe);
 
       troupe.addUserById(user.id);
-
-      stats.event("join_room", {
-        userId: user.id,
-      });
 
       // IRC -- these should be centralised - in troupe.addUserById perhaps?
       appEvents.userJoined({user: user, room: troupe});
@@ -361,7 +373,7 @@ function findOrCreateRoom(user, uri, options) {
               .spread(function(troupe, otherUser) {
                 return { oneToOne: true, troupe: troupe, otherUser: otherUser };
               });
-          })
+          });
 
       }
 
@@ -369,8 +381,12 @@ function findOrCreateRoom(user, uri, options) {
 
       /* Didn't find a user, but we may have found another room */
       return findOrCreateNonOneToOneRoom(user, uriLookup && uriLookup.troupe, uri, options)
-        .spread(function(troupe, access, hookCreationFailedDueToMissingScope, didCreate) {
-
+        .spread(function (troupe, access, hookCreationFailedDueToMissingScope, didCreate) {
+          // if the user has been granted access to the room, send join stats for the cases of being the owner or just joining the room
+          if(access && (didCreate || !troupe.containsUserId(user.id))) {
+            sendJoinStats(user, troupe, options.tracking);
+          }
+           
           return ensureAccessControl(user, troupe, access)
             .then(function(troupe) {
               return { oneToOne: false, troupe: troupe, hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope, didCreate: didCreate };
@@ -605,8 +621,10 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
           {
             upsert: true
           })
-          .then(function(newRoom) {
-
+          .then(function (newRoom) {
+            // channel has now been created. Send join stats for owner joining.
+            sendJoinStats(user, newRoom, options.tracking);
+            
             // TODO handle adding the user in the event that they didn't create the room!
             if(newRoom._nonce === nonce) {
               serializeCreateEvent(newRoom);
