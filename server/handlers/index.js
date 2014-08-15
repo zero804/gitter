@@ -14,5 +14,6 @@ module.exports = {
     require('./unsubscribe').install(app);
     require('./in-browser-tests').install(app);
     require('./robots').install(app);
+    require('./home').install(app);
   }
 };
