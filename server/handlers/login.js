@@ -25,21 +25,22 @@ module.exports = {
       function (req, res, next) {
         var query = req.query;
         
-        // sets the action source for tracking to the session (tracking how users 'come in' to the app)
-        req.session.actionSource = query.actionSource;
+        // adds the source of the action to the session (for tracking how users 'come in' to the app)
+        req.session.source = query.source;
         
         //send data to stats service
         if (query.action == 'login') {
           stats.event("login_clicked", {
             distinctId: mixpanel.getMixpanelDistinctId(req.cookies),
-            method: 'github_oauth'
+            method: 'github_oauth',
+            button: query.source
           });
         }
         if (query.action == 'signup') {
           stats.event("signup_clicked", {
             distinctId: mixpanel.getMixpanelDistinctId(req.cookies),
             method: 'github_oauth',
-            button: query.actionSource
+            button: query.source
           });
         }
         next();

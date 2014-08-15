@@ -92,7 +92,7 @@ function sendJoinStats(user, room, tracking) {
   console.log('arguments\n\n\n\n\n\n', arguments, '\n\n\n\n\n');
   stats.event("join_room", {
     userId: user.id,
-    utm_content: tracking && tracking.utm_content,
+    source: tracking && tracking.source,
     room_uri: room.uri
   });
 }

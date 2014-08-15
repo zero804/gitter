@@ -18,7 +18,7 @@ function normaliseUrl(params) {
 
 function uriContextResolverMiddleware(req, res, next) {
   var uri = normaliseUrl(req.params);
-  var tracking = { utm_content: req.query.utm_content };
+  var tracking = { source: req.query.source };
   
   return roomService.findOrCreateRoom(req.user, uri, { tracking: tracking })
     .then(function(uriContext) {
