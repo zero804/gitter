@@ -206,7 +206,7 @@ function install() {
                     distinctId: mixpanel.getMixpanelDistinctId(req.cookies),
                     method: 'github_oauth',
                     username: user.username,
-                    actionSource: req.session.actionSource
+                    source: req.session.source
                   });
 
                   return done(null, user);
