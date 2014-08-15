@@ -94,19 +94,17 @@ function renderMainFrame(req, res, next, frame) {
     .fail(next);
 }
 
-function renderChat(req, res, opts, next) {
+function renderChat(req, res, options, next) {
   var troupe = req.uriContext.troupe;
   var aroundId = req.query.at;
-  var embedded = (typeof opts.embedded !== 'undefined') ? opts.embedded : false;
-  var extras = (typeof opts.extras !== 'undefined') ? opts.extras : {};
-  var script = opts.script;
+  var script = options.script;
   var user = req.user;
   var userId = user && user.id;
 
   var snapshotOptions = {
     limit: INITIAL_CHAT_COUNT,
     aroundId: aroundId,
-    unread: embedded ? false : undefined // Embedded views already have items marked as unread=false
+    unread: options.unread // Unread can be true, false or undefined
   };
 
   var serializerOptions = _.defaults({
@@ -114,14 +112,14 @@ function renderChat(req, res, opts, next) {
   }, snapshotOptions);
 
   Q.all([
-      contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, embedded: embedded }),
+      contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions } }),
       restful.serializeChatsForTroupe(troupe.id, userId, serializerOptions)
     ]).spread(function (troupeContext, chats) {
 
       var initialChat = _.find(chats, function(chat) { return chat.initial; });
       var initialBottom = !initialChat;
       var githubLink;
-      var classNames = opts.classNames || [];
+      var classNames = options.classNames || [];
 
       if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
         githubLink = 'https://github.com/' + req.uriContext.uri;
@@ -129,23 +127,25 @@ function renderChat(req, res, opts, next) {
 
       if (!user) classNames.push("logged-out");
 
-      res.render(opts.template, _.extend({
-        isRepo: troupe.githubType === 'REPO',
-        appCache: getAppCache(req),
-        bootScriptName: script,
-        cssFileName: "styles/" + script + ".css", // css filename matches bootscript
-        githubLink: githubLink,
-        troupeName: req.uriContext.uri,
-        troupeTopic: troupeContext.troupe.topic,
-        oneToOne: troupe.oneToOne,
-        troupeFavourite: troupeContext.troupe.favourite,
-        user: user,
-        troupeContext: troupeContext,
-        initialBottom: initialBottom,
-        chats: burstCalculator(chats),
-        classNames: classNames.join(' '),
-        agent: req.headers['user-agent'],
-      }, extras));
+      var renderOptions = _.extend({
+          isRepo: troupe.githubType === 'REPO',
+          appCache: getAppCache(req),
+          bootScriptName: script,
+          cssFileName: "styles/" + script + ".css", // css filename matches bootscript
+          githubLink: githubLink,
+          troupeName: req.uriContext.uri,
+          troupeTopic: troupeContext.troupe.topic,
+          oneToOne: troupe.oneToOne,
+          troupeFavourite: troupeContext.troupe.favourite,
+          user: user,
+          troupeContext: troupeContext,
+          initialBottom: initialBottom,
+          chats: burstCalculator(chats),
+          classNames: classNames.join(' '),
+          agent: req.headers['user-agent'],
+        }, options.extras);
+
+      res.render(options.template, renderOptions);
 
     })
     .fail(next);
@@ -218,7 +218,8 @@ function renderMobileNativeUserhome(req, res) {
 function renderMobileNotLoggedInChat(req, res, next) {
   return renderChat(req, res, {
     template: 'mobile/mobile-app',
-    script: 'mobile-nli-app'
+    script: 'mobile-nli-app',
+    unread: false // Not logged in users see chats as read
   }, next);
 }
 
@@ -226,7 +227,8 @@ function renderMobileNotLoggedInChat(req, res, next) {
 function renderNotLoggedInChatPage(req, res, next) {
   return renderChat(req, res, {
     template: 'chat-nli-template',
-    script: 'router-nli-chat'
+    script: 'router-nli-chat',
+    unread: false // Not logged in users see chats as read
   }, next);
 }
 
@@ -234,7 +236,7 @@ function renderEmbeddedChat(req, res, next) {
   return renderChat(req, res, {
     template: 'chat-embed-template',
     script: 'router-embed-chat',
-    embedded: true,
+    unread: false, // Embedded users see chats as read
     classNames: [ 'embedded' ],
     extras: {
       usersOnline: req.troupe.users.length
