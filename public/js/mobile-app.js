@@ -2,6 +2,7 @@ require([
   'jquery',
   'utils/appevents',
   'collections/chat',
+  'collections/users',
   'views/chat/chatCollectionView',
   'views/chat/chatInputView',
   'components/unread-items-client',
@@ -13,7 +14,7 @@ require([
   'views/chat/decorators/mobileDecorator',
   'views/app/troupeSettingsView',
   'components/csrf'                             // No ref
-  ], function($, appEvents, chatModels, ChatCollectionView, chatInputView,
+  ], function($, appEvents, chatModels, userModels, ChatCollectionView, chatInputView,
     unreadItemsClient, Backbone, modalRegion, TroupeMenu, MobileAppView,
     emojiDecorator, mobileDecorator, TroupeSettingsView) {
   "use strict";
@@ -32,6 +33,9 @@ require([
 
   var chatCollection = new chatModels.ChatCollection();
   chatCollection.listen();
+  
+  var userCollection = new userModels.UserCollection();
+  userCollection.listen();
 
   var chatCollectionView = new ChatCollectionView({
     el: $('#content-frame'),
@@ -44,6 +48,7 @@ require([
   new chatInputView.ChatInputView({
     el: $('#chat-input'),
     collection: chatCollection,
+    userCollection: userCollection,
     rollers: chatCollectionView.rollers
   }).render();
 
@@ -66,7 +71,6 @@ require([
   });
 
   new Router();
-
 
   $('html').removeClass('loading');
 
