@@ -1,6 +1,9 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var env = require('../utils/env');
+var config = env.config;
+
 var Q = require('q');
 var GitHubMeService = require('./github/github-me-service');
 var GitHubUserService = require('./github/github-user-service');
@@ -21,12 +24,12 @@ function getValidPublicEmailAddress(username) {
     });
 }
 
-module.exports = function(user) {
-  if(!user) return Q.reject(new Error('User required'));
-
-  if(user.githubUserToken || user.githubToken) {
-    return getPrivateEmailAddress(user);
-  }
-
+module.exports = function (user) {
+  if (!user) return Q.reject(new Error('User required'));
+  
+  if (config.get('email:toAddress')) return config.get('email:toAddress'); // test email address, should be set in `config.user-overrides.json`
+  
+  if (user.githubUserToken || user.githubToken) { return getPrivateEmailAddress(user); }
+  
   return getValidPublicEmailAddress(user.username);
 };
