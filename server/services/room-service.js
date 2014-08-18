@@ -89,7 +89,6 @@ function localUriLookup(uri, opts) {
  * tracking   Object - contains stats info
  */
 function sendJoinStats(user, room, tracking) {
-  console.log('arguments\n\n\n\n\n\n', arguments, '\n\n\n\n\n');
   stats.event("join_room", {
     userId: user.id,
     source: tracking && tracking.source,
@@ -386,6 +385,10 @@ function findOrCreateRoom(user, uri, options) {
           if(access && (didCreate || !troupe.containsUserId(user.id))) {
             sendJoinStats(user, troupe, options.tracking);
           }
+          
+          if (access && didCreate) {
+            emailNotificationService.createdRoomNotification(user, troupe);  // now the san email to the room', wne
+          }
            
           return ensureAccessControl(user, troupe, access)
             .then(function(troupe) {
@@ -622,8 +625,10 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
             upsert: true
           })
           .then(function (newRoom) {
-            // channel has now been created. Send join stats for owner joining.
-            sendJoinStats(user, newRoom, options.tracking);
+            
+            
+            emailNotificationService.createdRoomNotification(user, newRoom); // send an email to the room's owner
+            sendJoinStats(user, newRoom, options.tracking); // now the channel has now been created, send join stats for owner joining
             
             // TODO handle adding the user in the event that they didn't create the room!
             if(newRoom._nonce === nonce) {
