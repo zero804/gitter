@@ -27,36 +27,49 @@ getAllUsers(function(err, users) {
     };
 
     var intercom = new Intercom(options);
-    winston.verbose("[intercom] Importing users: ", users.length);
+    console.log("[intercom] Importing users: ", users.length);
 
-    async.eachLimit(users, 20,
+    async.eachLimit(users, 10,
       function(user, callback){
         if (user.state !== 'INVITED') {
           var created_at = new Date(user._id.getTimestamp());
           emailAddressService(user).nodeify(function(err, email) {
-            if (err) return callback(err);
-            intercom.createUser({
-              "email" : email,
-              "user_id" : user.id,
-              "name" : user.displayName,
-              "created_at" : created_at,
-              "username" : user.username,
-              // "companies" : [
-              //   {
-              //     "id" : 6,
-              //     "name" : "Intercom",
-              //     "created_at" : 103201,
-              //     "plan" : "Messaging",
-              //     "monthly_spend" : 50
-              //   }
-              // ],
-            },
-            function(err, res) {
-              if (err) console.log(err);
+            if (err) {
+               console.log("*************** Email error " + err);
+              // return callback(err);
+            }
+
+            if (email) {
+              console.log("Going to create a user in Intercom with " + user.username);
+              intercom.createUser({
+                "email" : email,
+                "user_id" : user.id,
+                "name" : user.displayName,
+                "created_at" : created_at,
+                "username" : user.username,
+                // "companies" : [
+                //   {
+                //     "id" : 6,
+                //     "name" : "Intercom",
+                //     "created_at" : 103201,
+                //     "plan" : "Messaging",
+                //     "monthly_spend" : 50
+                //   }
+                // ],
+              },
+              function(err, res) {
+                if (err) console.log(err);
+                console.log("Successfully added: " + user.username);
+                callback();
+              });
+            } else {
+              console.log("Skipping " + user.username + " because they have an email address of " + user.email);
               callback();
-            });
+            }
+
           });
         } else {
+          console.log("Skipping " + user.username + " because they are " + user.state);
           callback();
         }
       },
