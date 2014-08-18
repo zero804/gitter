@@ -29,7 +29,7 @@ getAllUsers(function(err, users) {
     var intercom = new Intercom(options);
     winston.verbose("[intercom] Importing users: ", users.length);
 
-    async.each(users,
+    async.eachLimit(users, 20,
       function(user, callback){
         if (user.state !== 'INVITED') {
           var created_at = new Date(user._id.getTimestamp());
