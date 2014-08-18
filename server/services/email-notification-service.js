@@ -104,9 +104,12 @@ module.exports = {
       .then(function (email) {
         var shareURL = config.get('web:basepath') + '/' + room.uri;
         
-        stats.event('created_room_email_sent', {userId: user.id, email: email});
+        // TODO move the generation of tweet links into it's own function?
+        var twitterURL = (isPublic) ? 'http://twitter.com/intent/tweet?url=' + shareURL + '&text=' + encodeURIComponent('I have just created the room ' + room.name) + '&via=gitchat' : undefined; // if the room is public we shall have a tweet link
         
-        var twitterURL = (isPublic) ? 'http://twitter.com/intent/tweet?url=' + shareURL + '&text=' + encodeURIComponent('I have just created the room ' + room.name) + '&via=gitchat' : undefined;
+        if (config.get('email:toAddress')) email = config.get('email:toAddress'); // test email address, should be set in `config.user-overrides.json`
+        
+        stats.event('created_room_email_sent', {userId: user.id, email: email}); // TODO this should be sent on the "success" callback of the promise, not here
 
         return mailerService.sendEmail({
           templateFile: "created_room",
