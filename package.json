@@ -53,7 +53,7 @@
     "parse-links": "~0.1.0",
     "troupe-passport-github": "git://github.com/troupe/passport-github.git#v0.1.8d",
     "text-filter": "~0.1.0",
-    "highlight.js": "~8.0.0",
+    "highlight.js": "git://github.com/gitterHQ/highlight.js#6523cbb6e3f2a9374ea96e82f977ef57ef8cdf59",
     "xregexp": "^2.0.0",
     "heapdump": "^0.2.9",
     "memwatch": "^0.2.2",
