@@ -36,7 +36,7 @@ define([
 
   /* This value is also in chatItemView! */
   /** @const */
-  var EDIT_WINDOW = 240000;
+  var EDIT_WINDOW = 1000 * 60 * 10; // 10 minutes
 
   /** @const */
   var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];
