@@ -3,17 +3,17 @@
 
 .chat-header {
 
-  body.embedded & { right: 0; }
-
-  box-sizing: border-box;
   .transition500ms;
+  
+  body.embedded & { right: 0; }
+  box-sizing: border-box;
 
   z-index: @l1;
   position: fixed;
   top: 0;
   right: @rightMarginFull;
   left: 0;
-  // height: 68px;
+  
   padding: 0px 20px 10px 50px;
 
   background-color: rgba(255, 255, 255, 0.97);
@@ -64,7 +64,7 @@
     button {
       .trpButton;
       position: absolute;
-      height: 100%;
+      height:              %;
       padding: 4px 11px;
       color: white;
       background-color: fade(@trpGreen, 90%);
@@ -148,13 +148,13 @@
 }
 
 .chat-header__content {
+  white-space: nowrap;
   box-sizing: border-box;
-  // overflow: hidden;
-  // float: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  
   width: auto;
   margin: 0 40px;
-  // display: inline-block;
-  word-wrap: break-word;
 
   .topic-input {
     width: 100%;
@@ -170,7 +170,6 @@
     font-size: 22px;
     color: #333;
     display: inline;
-    vertical-align: middle;
     
     &:hover {
       text-decoration: none;
