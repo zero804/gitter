@@ -60,6 +60,7 @@ function renderHomePage(req, res, next) {
         troupeContext: troupeContext,
         agent: req.headers['user-agent'],
         isUserhome: true,
+        billingBaseUrl: nconf.get('web:billingBaseUrl')
       });
     })
     .fail(next);
