@@ -36,7 +36,7 @@ define([
 
   /* This value is also in chatItemView! */
   /** @const */
-  var EDIT_WINDOW = 240000;
+  var EDIT_WINDOW = 1000 * 60 * 10; // 10 minutes
 
   /** @const */
   var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];
@@ -81,11 +81,13 @@ define([
       this.chatCollectionView = options.chatCollectionView;
       this.composeMode = new ComposeMode();
       this.userCollection = options.userCollection;
+      
       this.listenTo(appEvents, 'input.append', function(text, options) {
         if(this.inputBox) {
           this.inputBox.append(text, options);
         }
       });
+      
       this.listenTo(appEvents, 'focus.request.chat', function() {
         if(this.inputBox) {
           this.inputBox.$el.focus();
@@ -131,6 +133,7 @@ define([
         composeMode: this.composeMode,
         value: data.value
       });
+      
       this.inputBox = inputBox;
 
       this.$el.find('.compose-mode-toggle, .md-help').tooltip({placement: 'left'});
@@ -175,11 +178,11 @@ define([
           search: function(term, callback) {
             var lowerTerm = term.toLowerCase();
             var loggedInUsername = context.user().get('username').toLowerCase();
-
-            var matches = userCollection && userCollection.filter(function(user) {
+            
+            var matches = userCollection && userCollection.filter(function (user) {
               var username = user.get('username').toLowerCase();
 
-              if(username === loggedInUsername) return false;
+              if (username === loggedInUsername) return false; // do not include the current user in the matches
 
               var displayName = (user.get('displayName') || '').toLowerCase();
 
@@ -242,6 +245,7 @@ define([
       $textarea.on('textComplete:show', function() {
         $textarea.attr('data-prevent-keys', 'on');
       });
+      
       $textarea.on('textComplete:hide', function() {
         // Defer change to make sure the last key event is prevented
         setTimeout(function() {

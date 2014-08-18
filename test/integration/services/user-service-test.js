@@ -47,10 +47,7 @@ describe("User Service", function() {
     var persistence = testRequire("./services/persistence-service");
     return persistence.User.findOneAndRemoveQ({ githubId: - 1})
       .then(function() {
-        return userService.findOrCreateUserForGithubId({ githubId: -1, username: '__test__gitter_007' })
-      })
-      .then(function() {
-        console.log(arguments);
+        return userService.findOrCreateUserForGithubId({ githubId: -1, username: '__test__gitter_007' });
       })
       .nodeify(done);
   });
