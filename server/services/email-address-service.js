@@ -15,7 +15,7 @@ function getValidPublicEmailAddress(username) {
   var ghUser = new GitHubUserService();
   return ghUser.getUser(username)
     .then(function(user) {
-      if(user.email && isValidEmail(user.email)) {
+      if(user && user.email && isValidEmail(user.email)) {
         return user.email;
       }
     });

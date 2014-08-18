@@ -59,7 +59,8 @@ define([
         if (window.troupeContext) loggedOutUserRoom = true;
       }
       
-      var isUserHome = '/' + context().user.username === routeName; // checks whether the user is at his home view
+      var username = context().user && context().user.username;
+      var isUserHome = (username) ? '/' + username === routeName : false; // if we have an username then check if it matches the routeName
 
       window.mixpanel.track('pageView', { pageName: routeName, loggedOutUserRoom: loggedOutUserRoom, isUserHome: isUserHome });
     }
