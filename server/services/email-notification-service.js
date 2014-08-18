@@ -58,8 +58,6 @@ module.exports = {
         logger.error('Unable to send unread items notifications: ' + err, { exception: err });
         throw err;
       });
-
-
   },
 
   sendInvitation: function(fromUser, toUser, room) {
@@ -85,6 +83,50 @@ module.exports = {
           }
         });
     });
+  },
+  
+  /**
+   * createdRoomNotification() emails suggested actions for created rooms (`PUBLIC` or `PRIVATE`)
+   *
+   * user     User - the room's owner 
+   * room     Room - the room
+   */
+  createdRoomNotification: function (user, room) {
+    var plaintext = user.id + ',' + 'created_room';
+    var cipher    = crypto.createCipher('aes256', passphrase);
+    var hash      = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
+    var emailBasePath = config.get("email:emailBasePath");
+    var unsubscribeUrl = emailBasePath + '/settings/unsubscribe/' + hash;
+    
+    var isPublic = (room && room.security === 'PUBLIC') ? true : false;
+    
+    return emailAddressService(user)
+      .then(function (email) {
+        var shareURL = config.get('web:basepath') + '/' + room.uri;
+        
+        stats.event('created_room_email_sent', {userId: user.id, email: email});
+        
+        var twitterURL = (isPublic) ? 'http://twitter.com/intent/tweet?url=' + shareURL + '&text=' + encodeURIComponent('I have just created the room ' + room.name) + '&via=gitchat' : undefined;
+
+        return mailerService.sendEmail({
+          templateFile: "created_room",
+          from: 'Gitter Notifications <support@gitter.im>',
+          to: email,
+          unsubscribe: unsubscribeUrl,
+          subject: "Recently Created Room",
+          data: {
+            user: user,
+            room: room,
+            shareURL: shareURL,
+            twitterURL: twitterURL,
+            unsubscribeUrl: unsubscribeUrl
+          }
+        });
+      })
+      .fail(function (err) {
+        logger.error('Unable to send unread items notifications: ' + err, { exception: err });
+        throw err;
+      });
   },
 
   addedToRoomNotification: function(fromUser, toUser, room) {

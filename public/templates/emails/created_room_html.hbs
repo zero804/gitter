@@ -1,0 +1,32 @@
+          <table class="container">
+            <tr>
+              <td>
+                <table class="row">
+                  <tr>
+                    <td class="wrapper last">
+                      <table class="twelve columns">
+                        <tr>
+                          <td>
+                            <h1>Hello {{ user.displayName }}!</h1>
+                            <br>
+                            <p>You've just created <strong>{{ room.name }}</strong> ({{ room.security }}) on Gitter.</p>
+                            <br>
+                              <table>
+                                <tr>
+                                  <td><a href="{{ shareURL }}" style="text-decoration: none" class="button-green">Share this link directly.</a></td>
+                                </tr>
+                                {{#if twitterURL}}
+                                  <tr>
+                                    <td><a href="{{twitterURL}}" style="text-decoration: none" target="_blank" class="button-green">Tweet about it!</a></td>
+                                  </tr>
+                                {{/if}}
+                              </table>
+                            <br><br>
+                            <p><small>To unsubscribe from these notifications, click <a href="{{ unsubscribeUrl }}">here</a>. </small></p>
+                          </td>
+                          <td class="expander"></td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
