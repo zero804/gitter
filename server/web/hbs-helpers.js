@@ -138,3 +138,7 @@ exports.pluralize = function(number, singular, plural) {
   if (number === 1) return singular;
   return (typeof plural === 'string') ? plural : singular + 's';
 };
+
+exports.toLowerCase = function (str) {
+  return str.toLowerCase();
+};

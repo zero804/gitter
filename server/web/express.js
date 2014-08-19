@@ -29,6 +29,7 @@ module.exports = {
     expressHbs.registerAsyncHelper('prerenderView', require('./prerender-helper'));
     expressHbs.registerHelper('chatItemPrerender', require('./prerender-chat-helper'));
     expressHbs.registerHelper('pluralize', require('./hbs-helpers').pluralize);
+    expressHbs.registerHelper('toLowerCase', require('./hbs-helpers').toLowerCase);
 
     app.locals({
       googleTrackingId: config.get("web:trackingId"),
