@@ -17,7 +17,7 @@ define([
       return {
         displayName: user.displayName || user.username,
         user: userModel,
-        username: user.username
+        billingUrl: context.env('billingUrl')
       };
     },
     homeClicked: function(e) {
