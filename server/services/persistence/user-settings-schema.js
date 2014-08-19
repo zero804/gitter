@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var mongoose      = require('../../utils/mongoose-q');
@@ -15,4 +14,13 @@ var UserSettingsSchema = new Schema({
 UserSettingsSchema.index({ userId: 1 }, { unique: true });
 UserSettingsSchema.schemaTypeName = 'UserSettingsSchema';
 
-exports = UserSettingsSchema;
+module.exports = {
+  install: function(mongooseConnection) {
+    var model = mongooseConnection.model('UserSettings', UserSettingsSchema);
+
+    return {
+      model: model,
+      schema: UserSettingsSchema
+    };
+  }
+};

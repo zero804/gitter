@@ -235,64 +235,6 @@ var userService = {
       });
   },
 
-  // setUserLocation: function(userId, location, callback) {
-  //   stats.event("location_submission", {
-  //     userId: userId
-  //   });
-
-  //   userService.findById(userId, function(err, user) {
-  //     if(err) return callback(err);
-  //     if(!user) return callback(err);
-
-  //     /* Save new history */
-  //     new persistence.UserLocationHistory({
-  //       userId: user.id,
-  //       timestamp: location.timestamp,
-  //       coordinate: {
-  //           lon:  location.lon,
-  //           lat: location.lat
-  //       },
-  //       speed: location.speed
-  //     }).save(function(err) {
-  //       if(err) winston.error("User location history save failed: ", err);
-  //     });
-
-  //     function persistUserLocation(named) {
-  //       function nullIfUndefined(v) { return v ? v : null; }
-
-  //       if(!named) named = {};
-
-  //       user.location.timestamp = location.timestamp;
-  //       user.location.coordinate.lon = location.lon;
-  //       user.location.coordinate.lat = location.lat;
-  //       user.location.speed = location.speed;
-  //       user.location.altitude = location.altitude;
-  //       user.location.named.place = nullIfUndefined(named.place);
-  //       user.location.named.region = nullIfUndefined(named.region);
-  //       user.location.named.countryCode = nullIfUndefined(named.countryCode);
-
-  //       user.save(function(err) {
-  //         return callback(err, user);
-  //       });
-  //     }
-
-  //     geocodingService.reverseGeocode( { lat: location.lat, lon: location.lon }, function(err, namedLocation) {
-  //       if(err || !namedLocation) {
-  //         winston.error("Reverse geocoding failure ", err);
-  //         persistUserLocation(null);
-  //         return;
-  //       } else {
-  //         winston.info("User location (" + location.lon + "," + location.lat + ") mapped to " + namedLocation.name);
-  //         persistUserLocation({
-  //           place: namedLocation.name,
-  //           region: namedLocation.region.name,
-  //           countryCode: namedLocation.country.code
-  //         });
-  //       }
-  //     });
-  //   });
-  // },
-
   deleteAllUsedInvitesForUser: function(user) {
     persistence.Invite.remove({ userId: user.id, status: "USED" });
   },

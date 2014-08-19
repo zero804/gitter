@@ -85,7 +85,7 @@ function localUriLookup(uri, opts) {
  * sendJoinStats() sends information to MixPanels about a join_room event
  *
  * user       User
- * room       Troupe 
+ * room       Troupe
  * tracking   Object - contains stats info
  */
 function sendJoinStats(user, room, tracking) {
@@ -220,7 +220,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
                 })
                 .then(function(troupe) {
                   var hookCreationFailedDueToMissingScope;
-                  
+
                   if(nonce == troupe._nonce) {
                     serializeCreateEvent(troupe);
 
@@ -385,11 +385,11 @@ function findOrCreateRoom(user, uri, options) {
           if(access && (didCreate || !troupe.containsUserId(user.id))) {
             sendJoinStats(user, troupe, options.tracking);
           }
-          
+
           if (access && didCreate) {
             emailNotificationService.createdRoomNotification(user, troupe);  // now the san email to the room', wne
           }
-           
+
           return ensureAccessControl(user, troupe, access)
             .then(function(troupe) {
               return { oneToOne: false, troupe: troupe, hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope, didCreate: didCreate };
@@ -625,10 +625,10 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
             upsert: true
           })
           .then(function (newRoom) {
-            
+
             emailNotificationService.createdRoomNotification(user, newRoom); // send an email to the room's owner
             sendJoinStats(user, newRoom, options.tracking); // now the channel has now been created, send join stats for owner joining
-            
+
             // TODO handle adding the user in the event that they didn't create the room!
             if(newRoom._nonce === nonce) {
               serializeCreateEvent(newRoom);
@@ -882,12 +882,10 @@ function banUserFromRoom(room, username, requestingUser, callback) {
           if(existingBan) {
             return existingBan;
           } else {
-            var ban = new persistence.TroupeBannedUser({
+            var ban = room.addUserBan({
               userId: user.id,
               bannedBy: requestingUser.id
             });
-
-            room.bans.push(ban);
 
             room.removeUserById(user.id);
 
