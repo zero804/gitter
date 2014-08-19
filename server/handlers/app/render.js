@@ -13,6 +13,9 @@ var _                 = require('underscore');
 var INITIAL_CHAT_COUNT = 50;
 
 var stagingText, stagingLink;
+var dnsPrefetch = (nconf.get('cdn:hosts') || []).concat([
+  nconf.get('ws:hostname')
+]);
 
 /* App tag */
 var staging = nconf.get('STAGING');
@@ -90,6 +93,7 @@ function renderMainFrame(req, res, next, frame) {
         agent: req.headers['user-agent'],
         stagingText: stagingText,
         stagingLink: stagingLink,
+        dnsPrefetch: dnsPrefetch
       });
     })
     .fail(next);
@@ -144,6 +148,7 @@ function renderChat(req, res, options, next) {
           chats: burstCalculator(chats),
           classNames: classNames.join(' '),
           agent: req.headers['user-agent'],
+          dnsPrefetch: dnsPrefetch
         }, options.extras);
 
       res.render(options.template, renderOptions);
@@ -169,6 +174,7 @@ function renderMobileUserHome(req, res, next) {
         troupeContext: troupeContext,
         agent: req.headers['user-agent'],
         isUserhome: true,
+        dnsPrefetch: dnsPrefetch
       });
     })
     .fail(next);
