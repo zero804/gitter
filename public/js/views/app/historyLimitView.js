@@ -1,9 +1,10 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
+  'jquery',
   'marionette',
   'utils/context',
   'hbs!./tmpl/limitBannerTemplate'
-  ], function(Marionette, context, template)  {
+  ], function($, Marionette, context, template)  {
   "use strict";
 
   return Marionette.ItemView.extend({
@@ -36,6 +37,7 @@ define([
       this.showing = true;
       var $e = this.$el;
 
+      $(document.body).addClass('banner-top');
       $e.parent().show();
 
       clearTimeout(this.removeTimeout);
@@ -53,6 +55,7 @@ define([
       var $e = this.$el;
 
       $e.addClass('slide-away');
+      $(document.body).removeClass('banner-top');
 
       if(this.removeTimeout) return;
       this.removeTimeout = setTimeout(function() {
