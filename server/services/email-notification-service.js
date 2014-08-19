@@ -128,6 +128,8 @@ module.exports = {
           data: {
             user: user,
             room: room,
+            isPublic: isPublic,
+            isOrg: isOrg,
             roomType: room.security.toLowerCase(),
             shareURL: shareURL,
             twitterURL: twitterURL,

@@ -24,6 +24,10 @@
                               </table>
                               <br />
                               <p>Or just share the url {{ shareURL }}</p>
+                              <br />
+                              {{#if isOrg}}
+                                <p>Note that only people within your organisation can join this room.</p>
+                              {{/if}}
                             <br><br>
                             <p><small>To unsubscribe from these notifications, click <a href="{{ unsubscribeUrl }}">here</a>. </small></p>
                           </td>
