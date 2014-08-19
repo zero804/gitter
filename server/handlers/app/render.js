@@ -130,7 +130,6 @@ function renderChat(req, res, options, next) {
 
       var avatarUrl = "https://avatars.githubusercontent.com/" + troupe.uri.split('/')[0];
       var isPrivate = troupe.security !== "PUBLIC";
-      var lockTooltip = generateTooltip(troupe);
 
       var renderOptions = _.extend({
           isRepo: troupe.githubType === 'REPO',
@@ -148,7 +147,6 @@ function renderChat(req, res, options, next) {
           chats: burstCalculator(chats),
           classNames: classNames.join(' '),
           agent: req.headers['user-agent'],
-          lockTooltip: lockTooltip,
           isPrivate: isPrivate,
           avatarUrl: avatarUrl
         }, options.extras);
@@ -298,37 +296,6 @@ function renderUserNotSignedUpMainFrame(req, res, next, frame) {
     }).fail(next);
 }
 
-function generateTooltip(troupe) {
-
-  if (troupe.security === 'PUBLIC') return 'Anyone can join';
-
-  var tooltip;
-  switch(troupe.githubType) {
-    case 'REPO':
-      tooltip = 'Only repo contributors can join';
-      break;
-    case 'ORG':
-      tooltip = 'Only org members can join';
-      break;
-    case 'REPO_CHANNEL':
-      var repoName = troupe.uri.split('/')[1];
-      var repoRealm = troupe.security === 'PRIVATE' ? 'Only invited users' : 'Anyone in' + repoName;
-      tooltip = repoRealm + ' can join';
-      break;
-    case 'ORG_CHANNEL':
-      var orgName = troupe.uri.split('/')[0];
-      var orgRealm = troupe.security === 'PRIVATE' ? 'Only invited users' : 'Anyone in ' + orgName;
-      tooltip = orgRealm + ' can join';
-      break;
-    case 'USER_CHANNEL':
-      tooltip = 'Only invited users can join';
-      break;
-    default:
-      tooltip = 'Only invited users can join';
-  }
-
-  return tooltip;
-}
 
 
 module.exports = exports = {
