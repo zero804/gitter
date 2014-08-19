@@ -54,54 +54,44 @@
   white-space: nowrap;
 }
 
-.menu-header__options {
+.profile-menu {
   .trpBodyMedium;
   padding-bottom: 12px;
+  margin: 0;
   overflow: hidden;
   width: 100%;
   margin-top: 8px;
   color: white;
   font-weight: 300;
   line-height: 24px;
+}
 
-  a {
-    color: white;
-    text-decoration: none;
+.profile-menu__item {
+  list-style: none;
+}
+
+.profile-menu__link {
+  display: inline-block;
+  width: 100%;
+  padding-left: 10px;
+
+  color: white;
+  text-decoration: none;
+
+  body.hover &:hover {
+    border-radius: 4px;
+    background-color: rgba(255,255,255,0.2);
   }
+}
 
-  .item {
-    padding-left: 10px;
+.profile-menu__home {
+  .prepend-home-icon();
+}
 
-    body.hover &:hover {
-      border-radius: 4px;
-      background-color: rgba(255,255,255,0.2);
-    }
-  }
+.profile-menu__signout {
+  .prepend-home-signout();
+}
 
-  li {
-    list-style: none;
-  }
-
-  li.item .icon-home {
-    .prepend-home-icon()
-  }
-
-  li.item .icon-signout {
-    .prepend-home-signout()
-  }
-
-  li.item .icon-apps {
-    .prepend-home-apps()
-  }
-
-  @media @mobile {
-    margin-top: 8px;
-    padding-bottom: 0;
-    & .item {
-      margin-bottom: 8px;
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-  }
+.profile-menu__apps {
+  .prepend-home-apps();
 }
