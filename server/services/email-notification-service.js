@@ -3,7 +3,7 @@
 
 var env                 = require('../utils/env');
 var config              = env.config;
-var stats               = env.stats;
+
 var logger              = env.logger;
 var mailerService       = require("./mailer-service");
 var crypto              = require('crypto');
@@ -30,8 +30,6 @@ module.exports = {
           return;
         }
 
-        stats.event('unread_notification_sent', {userId: user.id, email: email});
-
         var emailBasePath = config.get("email:emailBasePath");
         var unsubscribeUrl = emailBasePath + '/settings/unsubscribe/' + hash;
         var canChangeNotifySettings = troupesWithUnreadCounts.some(function(troupeWithUnreadCounts) {
@@ -45,6 +43,10 @@ module.exports = {
           to: email,
           unsubscribe: unsubscribeUrl,
           subject: "Activity on Gitter",
+          tracking: {
+            event: 'unread_notification_sent',
+            data: { userId: user.id, email: email }
+          },
           data: {
             canChangeNotifySettings: canChangeNotifySettings,
             user: user,
@@ -68,13 +70,15 @@ module.exports = {
       .then(function(email) {
         if (!email) return;
 
-        stats.event('invitation_sent', { userId: toUser.id, email: email });
-
         return mailerService.sendEmail({
           templateFile: "invitation",
           from: senderName + ' <support@gitter.im>',
           to: email,
           subject: '[' + room.uri + '] Join the chat on Gitter',
+          tracking: {
+            event: 'invitation_sent',
+            data: { userId: user.id, email: email }
+          },
           data: {
             roomUri: room.uri,
             roomUrl: config.get("email:emailBasePath") + '/' + room.uri,
@@ -106,8 +110,6 @@ module.exports = {
         
         // TODO move the generation of tweet links into it's own function?
         var twitterURL = (isPublic) ? 'http://twitter.com/intent/tweet?url=' + shareURL + '&text=' + encodeURIComponent('I have just created the room ' + room.name) + '&via=gitchat' : undefined; // if the room is public we shall have a tweet link
-        
-        stats.event('created_room_email_sent', {userId: user.id, email: email}); // TODO this should be sent on the "success" callback of the promise, not here
 
         return mailerService.sendEmail({
           templateFile: "created_room",
@@ -115,6 +117,10 @@ module.exports = {
           to: email,
           unsubscribe: unsubscribeUrl,
           subject: "Recently Created Room",
+          tracking: {
+            event: 'created_room_email_sent',
+            data: { userId: user.id, email: email }
+          },
           data: {
             user: user,
             room: room,
@@ -154,13 +160,15 @@ module.exports = {
               return;
             }
 
-            stats.event('added_to_room_notification_sent', {userId: toUser.id, email: email});
-
             return mailerService.sendEmail({
               templateFile: "added_to_room",
               from: senderName + ' <support@gitter.im>',
               to: email,
               subject: '[' + room.uri + '] You\'ve been added to a new room on Gitter',
+              tracking: {
+                event: 'added_to_room_notification_sent',
+                data: { userId: toUser.id, email: email }
+              },
               data: {
                 roomUri: room.uri,
                 roomUrl: config.get("email:emailBasePath") + '/' + room.uri,
@@ -171,7 +179,5 @@ module.exports = {
             });
         });
     });
-
   }
-
 };

@@ -27,7 +27,7 @@ function getValidPublicEmailAddress(username) {
 module.exports = function (user) {
   if (!user) return Q.reject(new Error('User required'));
   
-  if (config.get('email:toAddress')) return config.get('email:toAddress'); // test email address, should be set in `config.user-overrides.json`
+  if (config.get('email:toAddress')) return Q.resolve(config.get('email:toAddress')); // test email address, should be set in `config.user-overrides.json`
   
   if (user.githubUserToken || user.githubToken) { return getPrivateEmailAddress(user); }
   

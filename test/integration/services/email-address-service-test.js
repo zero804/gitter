@@ -6,7 +6,7 @@ var testRequire = require('./../test-require');
 var Q = require('q');
 var assert = require('assert');
 
-describe("email-address-service", function() {
+describe.only("email-address-service", function() {
 
   it('gets private email addresses', function(done) {
     var service = createEmailAddressService({
@@ -14,8 +14,21 @@ describe("email-address-service", function() {
     });
 
     service({ username: 'test-user', githubToken: 'token'})
-      .then(function(email) {
+      .then(function (email) {
         assert.equal(email, 'private@email.com');
+      }).nodeify(done);
+  });
+  
+  it('obeys overriding set by email:toAddress', function (done) {
+    var overrideEmail = 'test@overriding.com';
+    
+    var service = createEmailAddressService({
+      overrideEmail: overrideEmail
+    });
+    
+    service({ username: 'test-user' })
+      .then(function (email) {
+        assert.equal(email, overrideEmail);
       }).nodeify(done);
   });
 
@@ -25,7 +38,7 @@ describe("email-address-service", function() {
     });
 
     service({ username: 'test-user' })
-      .then(function(email) {
+      .then(function (email) {
         assert.equal(email, 'public@email.com');
       }).nodeify(done);
   });
@@ -36,7 +49,7 @@ describe("email-address-service", function() {
     });
 
     service({ username: 'test-user' })
-      .then(function(email) {
+      .then(function (email) {
         assert(!email);
       }).nodeify(done);
   });
@@ -44,6 +57,7 @@ describe("email-address-service", function() {
 });
 
 function createEmailAddressService(stubData) {
+  
   var GitHubMeService = function() {};
   GitHubMeService.prototype.getEmail = function() {
     return Q.resolve(stubData.privateEmail);
@@ -53,8 +67,17 @@ function createEmailAddressService(stubData) {
   GitHubUserService.prototype.getUser = function() {
     return Q.resolve({ email: stubData.publicEmail });
   };
+  
+  var env = {
+    config: {
+      get: function () {
+        return stubData.overrideEmail;
+      }
+    }
+  };
 
   return testRequire.withProxies('./services/email-address-service', {
+    '../utils/env': env,
     './github/github-me-service': GitHubMeService,
     './github/github-user-service': GitHubUserService
   });
