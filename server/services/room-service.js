@@ -626,7 +626,6 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
           })
           .then(function (newRoom) {
             
-            
             emailNotificationService.createdRoomNotification(user, newRoom); // send an email to the room's owner
             sendJoinStats(user, newRoom, options.tracking); // now the channel has now been created, send join stats for owner joining
             
