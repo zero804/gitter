@@ -6,7 +6,7 @@ var testRequire = require('./../test-require');
 var Q = require('q');
 var assert = require('assert');
 
-describe.only("email-address-service", function() {
+describe("email-address-service", function() {
 
   it('gets private email addresses', function(done) {
     var service = createEmailAddressService({
