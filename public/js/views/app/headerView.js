@@ -10,6 +10,38 @@ define([
 ], function($, context, Marionette, Backbone, autolink, notifications, Dropdown)  {
   "use strict";
 
+  function generateTooltip(troupe) {
+ 
+    if (troupe.get('security') === 'PUBLIC') return 'Anyone can join';
+  
+    var tooltip;
+    switch(troupe.get('githubType')) {
+      case 'REPO':
+        tooltip = 'Only repo contributors can join';
+        break;
+      case 'ORG':
+        tooltip = 'Only org members can join';
+        break;
+      case 'REPO_CHANNEL':
+        var repoName = troupe.uri.split('/')[1];
+        var repoRealm = troupe.get('security') === 'PRIVATE' ? 'Only invited users' : 'Anyone in' + repoName;
+        tooltip = repoRealm + ' can join';
+        break;
+      case 'ORG_CHANNEL':
+        var orgName = troupe.uri.split('/')[0];
+        var orgRealm = troupe.get('security') === 'PRIVATE' ? 'Only invited users' : 'Anyone in ' + orgName;
+        tooltip = orgRealm + ' can join';
+        break;
+      case 'USER_CHANNEL':
+        tooltip = 'Only invited users can join';
+        break;
+      default:
+        tooltip = 'Only invited users can join';
+    }
+  
+    return tooltip;
+  }
+
   return Marionette.ItemView.extend({
 
     modelEvents: {
@@ -52,6 +84,10 @@ define([
       } else {
         this.ui.favourite.css({ visibility: 'hidden' });
       }
+
+      $('.js-chat-name').attr('title', generateTooltip(context.troupe()));
+      $('.js-chat-name').tooltip({placement: 'right'});
+
       this.redisplay();
     },
 
@@ -187,13 +223,12 @@ define([
       }
     },
 
-    redisplay: function(e) {
+    redisplay: function() {
       var model = this.model;
       //this.ui.name.text(model.get('name'));
       this.ui.topic.text(model.get('topic'));
       autolink(this.ui.topic[0]);
       this.ui.favourite.toggleClass('favourite', !!model.get('favourite'));
-      $('.js-chat-name').tooltip({placement: 'right'});
     },
 
 

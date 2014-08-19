@@ -13,38 +13,6 @@ var roomCapabilities = require('../../services/room-capabilities');
 var burstCalculator   = require('../../utils/burst-calculator');
 var roomPermissionsModel = require('../../services/room-permissions-model');
 
-function generateTooltip(troupe) {
-
-  if (troupe.security === 'PUBLIC') return 'Anyone can join';
-
-  var tooltip;
-  switch(troupe.githubType) {
-    case 'REPO':
-      tooltip = 'Only repo contributors can join';
-      break;
-    case 'ORG':
-      tooltip = 'Only org members can join';
-      break;
-    case 'REPO_CHANNEL':
-      var repoName = troupe.uri.split('/')[1];
-      var repoRealm = troupe.security === 'PRIVATE' ? 'Only invited users' : 'Anyone in' + repoName;
-      tooltip = repoRealm + ' can join';
-      break;
-    case 'ORG_CHANNEL':
-      var orgName = troupe.uri.split('/')[0];
-      var orgRealm = troupe.security === 'PRIVATE' ? 'Only invited users' : 'Anyone in ' + orgName;
-      tooltip = orgRealm + ' can join';
-      break;
-    case 'USER_CHANNEL':
-      tooltip = 'Only invited users can join';
-      break;
-    default:
-      tooltip = 'Only invited users can join';
-  }
-
-  return tooltip;
-}
-
 exports.datesList = [
   appMiddleware.uriContextResolverMiddleware,
   function(req, res, next) {
@@ -63,7 +31,6 @@ exports.datesList = [
         var roomUrl = '/api/v1/rooms/' + troupe.id;
         var avatarUrl = "https://avatars.githubusercontent.com/" + troupe.uri.split('/')[0];
         var isPrivate = troupe.security !== "PUBLIC";
-        var lockTooltip = generateTooltip(troupe);
 
         return roomPermissionsModel(user, 'admin', troupe)
           .then(function(access) {
@@ -88,8 +55,7 @@ exports.datesList = [
                   accessToken: req.accessToken,
                   public: troupe.security === 'PUBLIC',
                   avatarUrl: avatarUrl,
-                  isPrivate: isPrivate,
-                  lockTooltip: lockTooltip
+                  isPrivate: isPrivate
                 });
 
               });
@@ -190,7 +156,6 @@ exports.chatArchive = [
 
             var avatarUrl = "https://avatars.githubusercontent.com/" + troupe.uri.split('/')[0];
             var isPrivate = troupe.security !== "PUBLIC";
-            var lockTooltip = generateTooltip(troupe);
 
             return roomCapabilities.getPlanType(troupe.id).then(function(plan) {
               var historyHorizon = roomCapabilities.getMessageHistory(plan);
@@ -216,7 +181,6 @@ exports.chatArchive = [
                 accessToken: req.accessToken,
                 avatarUrl: avatarUrl,
                 isPrivate: isPrivate,
-                lockTooltip: lockTooltip,
 
                 /* For prerendered archive-navigation-view */
                 previousDate: previousDateFormatted,
