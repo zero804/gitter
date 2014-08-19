@@ -28,13 +28,15 @@
   }
 }
 
+@banner-height:        45px;
+
 .banner-wrapper {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -35px;
+  bottom: (-@banner-height);
   overflow: hidden;
-  height: 35px;
+  height: @banner-height;
   z-index: -1;
 
   .transition500ms();
@@ -54,7 +56,6 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 35px;
 
     .transition500ms();
     &.slide-away {
@@ -69,8 +70,9 @@
       color: white;
       background-color: fade(@trpGreen, 90%);
       border-width: 0 0 0 0;
-
+      
       &:hover {
+        outline: none;
         background-color: darken(@trpGreen, 5%);
       }
 
@@ -79,6 +81,7 @@
         width: 100%;
         .trpBodyMedium;
         text-align: left;
+        padding: 10px;
         border-radius: 0 0 4px 4px;
       }
 
