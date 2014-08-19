@@ -77,7 +77,6 @@ function createExports(schemas) {
 
   Object.keys(schemas).forEach(function(key) {
     var module = schemas[key];
-    console.log(key, module);
     var m = module.install(mongoose);
 
     ex[key] = m.model;
