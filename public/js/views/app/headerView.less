@@ -4,7 +4,7 @@
 .chat-header {
 
   .transition500ms;
-  
+
   body.embedded & { right: 0; }
   box-sizing: border-box;
 
@@ -13,7 +13,7 @@
   top: 0;
   right: @rightMarginFull;
   left: 0;
-  
+
   padding: 10px 26px;// 20px 10px 50px;
 
   background-color: rgba(255, 255, 255, 0.97);
@@ -113,27 +113,37 @@
 }
 
 .chat-header__favourite {
-  float: right;
+  display: inline-block;
   // padding: 0px 25px 0px 0px;
   text-align: center;
   line-height: 51px;
   margin: 0px 0px 0px 10px;
- 
+
   i {
     cursor: pointer;
+    opacity: 0.4;
+    transition: opacity .2s ease-in-out;
   }
 
   //.prepend-star-icon()
+
+
+  i:hover {
+    opacity: 1;
+  }
+
+  i.favourite {
+    opacity: 1;
+  }
 
   /**/
   i:before {
     font-family: 'octicons';
     content: '\f02a';
     font-size: 20px;
-    transition: opacity .1s ease-in-out;
+
     font-style: normal;
     font-smoothing: antialiased;
-    color: lightgrey;
   }
 
   i.favourite:before {
@@ -141,20 +151,20 @@
     content: '\f02a';
     color: #f1c40f;
     font-size: 20px;
-    transition: opacity .1s ease-in-out;
     font-style: normal;
     font-smoothing: antialiased;
     color: #f1c40f;
+    opacity: 1;
   }
+
 }
 
 
 .chat-header__content {
   box-sizing: border-box;
   overflow: hidden;
-  float: left;
   width: auto;
-  margin: 0px 0px 0px 20px;
+  margin: 0 38px 0 68px;
 
   .topic-input {
     width: 95%;
@@ -173,7 +183,8 @@
     color: #333;
     display: inline;
     line-height: 22px;
-    
+    margin-right: 10px;
+
     a:hover {
       text-decoration: none;
     }
@@ -185,7 +196,9 @@
       font-size: 16px;
       font-style: normal;
       font-smoothing: antialiased;
-      text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+      position: relative;
+      top: -2px;
+      left: 5px;
   }
 
   p {
@@ -208,10 +221,14 @@
   }
 }
 
+.chat-header__buttons {
+  float: right;
+  width: 68px;
+}
+
 .chat-header__settings {
   body.embedded & { visibility: hidden; }
-  float: right;
-  // padding: 0px 10px;
+  display: inline-block;
   text-align: center;
   line-height: 51px;
   margin: 0px 0px 0px 10px;
@@ -219,7 +236,7 @@
   i {
     cursor: pointer;
     opacity: 0.4;
-    transition: opacity .1s ease-in-out;
+    transition: opacity .2s ease-in-out;
   }
 
   i:before {
@@ -237,10 +254,12 @@
 .chat-header__avatar {
   float: left;
   box-sizing: border-box;
+  margin-left: 4px;
+  margin-top: 2px;
 
   img {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     border-radius: 4px;
   }
 }
