@@ -2,6 +2,21 @@
   <img src='{{avatarUrl}}'>
 </div>
 
+<div class="chat-header__buttons">
+{{#if user}}
+  <div class="chat-header__favourite">
+    <i class="js-favourite-button  {{#if troupeFavourite}}favourite{{/if}}"></i>
+  </div>
+  {{#unless archives}}
+    {{#unless oneToOne}}
+  <div class="chat-header__settings">
+    <i class="js-chat-settings" data-toggle="dropdown"></i>
+  </div>
+    {{/unless}}
+  {{/unless}}
+{{/if}}
+</div>
+
 
 <div class="chat-header__content">
   <h1 class='js-chat-name {{#if isPrivate}}private{{/if}}' title="{{lockTooltip}}">
@@ -22,22 +37,3 @@
     {{/oneToOne}}
   </p>
 </div>
-
-
-{{#unless archives}}
-  {{#unless oneToOne}}
-    {{#if user}}
-      <div class="chat-header__settings">
-        <i class="js-chat-settings" data-toggle="dropdown"></i>
-      </div>
-    {{/if}}
-  {{/unless}}
-{{/unless}}
-
-
-{{#if user}}
-  <div class="chat-header__favourite">
-    <i class="js-favourite-button  {{#if troupeFavourite}}favourite{{/if}}"></i>
-  </div>
-{{/if}}
-
