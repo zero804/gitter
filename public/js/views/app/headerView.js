@@ -10,6 +10,7 @@ define([
   "use strict";
 
   return Marionette.ItemView.extend({
+
     modelEvents: {
       change: 'redisplay'
     },
@@ -179,7 +180,6 @@ define([
 
     },
 
-
     requestBrowserNotificationsPermission: function() {
       if(context().desktopNotifications) {
         notifications.enable();
@@ -192,7 +192,8 @@ define([
       this.ui.topic.text(model.get('topic'));
       autolink(this.ui.topic[0]);
       this.ui.favourite.toggleClass('favourite', !!model.get('favourite'));
-    }
+    },
+
 
   });
 

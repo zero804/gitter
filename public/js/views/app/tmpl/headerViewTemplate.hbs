@@ -7,11 +7,19 @@
     {{/if}}
   {{/unless}}
 {{/unless}}
+
 {{#if user}}
   <div class="chat-header__favourite">
     <i class="js-favourite-button  {{#if troupeFavourite}}favourite{{/if}}" width="24" height="24"></i>
   </div>
 {{/if}}
+
+{{#if isPrivate}}
+  <div class="chat-header__private">
+    <i class="private" width="24" height="24"></i>
+  </div>
+{{/if}}
+
 <div class="chat-header__content">
   <h1 class='js-chat-name'>
     {{#if githubLink}}

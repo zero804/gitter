@@ -130,6 +130,7 @@ function renderChat(req, res, options, next) {
 
       var renderOptions = _.extend({
           isRepo: troupe.githubType === 'REPO',
+          isPrivate: troupe.security !== "PUBLIC",
           appCache: getAppCache(req),
           bootScriptName: script,
           cssFileName: "styles/" + script + ".css", // css filename matches bootscript
