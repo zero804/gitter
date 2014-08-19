@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "winston": "^0.7.3",
-    "express": "^3.16.0",
+    "express": "^3.16.7",
     "express-resource": "1.0.0",
     "connect-redis": "~1.4.6",
     "express-hbs": "^0.7.9",
@@ -78,8 +78,7 @@
     "htmlencode": "0.0.4",
     "gitter-marked": "^0.4.2",
     "intercom.io": "~0.0.8",
-    "async": "~0.9.0",
-    "express-session": "trevorah/session"
+    "async": "~0.9.0"
   },
   "devDependencies": {
     "better-assert": "1.0.0",
