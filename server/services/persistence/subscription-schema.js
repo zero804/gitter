@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var mongoose      = require('../../utils/mongoose-q');
@@ -22,4 +21,13 @@ SubscriptionSchema.index({ userId: 1, plan: 1 }, { unique: false });
 SubscriptionSchema.index({ lcUri: 1 }, { unique: true });
 SubscriptionSchema.schemaTypeName = 'SubscriptionSchema';
 
-module.exports = SubscriptionSchema;
+module.exports = {
+  install: function(mongooseConnection) {
+    var model = mongooseConnection.model('Subscription', SubscriptionSchema);
+
+    return {
+      model: model,
+      schema: SubscriptionSchema
+    };
+  }
+};
