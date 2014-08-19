@@ -33,74 +33,74 @@
     width: 32px;
     height: 32px;
   }
+}
 
-  .menu-header__profile {
-    overflow: hidden;
-    clear: both;
-    width: 100%;
-  }
+.menu-header__profile {
+  overflow: hidden;
+  clear: both;
+  width: 100%;
+}
 
-  .menu-header__name {
-    display: inline-block;
-    line-height: 2em;
-    float: left;
-    font-weight: 300;
-    font-size: 16px;
-    margin-left: 10px;
-    max-width: 182px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+.menu-header__name {
+  display: inline-block;
+  line-height: 2em;
+  float: left;
+  font-weight: 300;
+  font-size: 16px;
+  margin-left: 10px;
+  max-width: 182px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-  .menu-header__options {
-    .trpBodyMedium;
-    padding-bottom: 12px;
-    overflow: hidden;
-    width: 100%;
-    margin-top: 8px;
+.menu-header__options {
+  .trpBodyMedium;
+  padding-bottom: 12px;
+  overflow: hidden;
+  width: 100%;
+  margin-top: 8px;
+  color: white;
+  font-weight: 300;
+  line-height: 24px;
+
+  a {
     color: white;
-    font-weight: 300;
-    line-height: 24px;
+    text-decoration: none;
+  }
 
-    a {
-      color: white;
-      text-decoration: none;
+  .item {
+    padding-left: 10px;
+
+    body.hover &:hover {
+      border-radius: 4px;
+      background-color: rgba(255,255,255,0.2);
     }
+  }
 
-    .item {
-      padding-left: 10px;
+  li {
+    list-style: none;
+  }
 
-      body.hover &:hover {
-        border-radius: 4px;
-        background-color: rgba(255,255,255,0.2);
-      }
-    }
+  li.item .icon-home {
+    .prepend-home-icon()
+  }
 
-    li {
-      list-style: none;
-    }
+  li.item .icon-signout {
+    .prepend-home-signout()
+  }
 
-    li.item .icon-home {
-      .prepend-home-icon()
-    }
+  li.item .icon-apps {
+    .prepend-home-apps()
+  }
 
-    li.item .icon-signout {
-      .prepend-home-signout()
-    }
-
-    li.item .icon-apps {
-      .prepend-home-apps()
-    }
-
-    @media @mobile {
-      margin-top: 8px;
-      padding-bottom: 0;
-      & .item {
-        margin-bottom: 8px;
-        &:last-child {
-          margin-bottom: 0;
-        }
+  @media @mobile {
+    margin-top: 8px;
+    padding-bottom: 0;
+    & .item {
+      margin-bottom: 8px;
+      &:last-child {
+        margin-bottom: 0;
       }
     }
   }
