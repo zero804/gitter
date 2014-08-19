@@ -57,8 +57,7 @@ define([
         ext.client     = mobile ? 'mobweb' : 'web';
         ext.eyeballs   = eyeballState ? 1 : 0;
 
-
-       callback(message);
+        callback(message);
      });
   };
 

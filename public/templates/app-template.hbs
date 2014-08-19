@@ -4,24 +4,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=IE10" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
   	<meta charset="utf-8">
-
   	<title>{{troupeName}} - Gitter</title>
-
-    <style>
-
-      @-webkit-keyframes pulsey {
-          0% { opacity: 0.6; }
-          50% { opacity: 1; }
-          100% { opacity: 0.6; }
-      }
-
-      html.loading .trpContentPanel { background: url("{{ cdn 'images/logo-mark-grey-64.png' }}") center no-repeat; height: 90%; -webkit-animation: pulsey 2s ease-out; -webkit-animation-iteration-count: infinite;  }
-      html.loading .trpContentPanel > * { visibility: hidden; }
-    </style>
-
-    <!-- Le fav and touch icons -->
     <link rel="stylesheet" href='{{cdn cssFileName }}'>
     <link id="favicon" rel="shortcut icon" href='{{cdn "images/favicon-read.ico" }}'>
+    {{#each dnsPrefetch}}
+    <link rel="dns-prefetch" href="{{ this }}">
+    {{/each}}
     {{>load_font_css}}
   </head>
   <body class='hover'>

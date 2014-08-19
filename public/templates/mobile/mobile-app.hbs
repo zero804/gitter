@@ -19,7 +19,9 @@
   {{{bootScript bootScriptName }}}
   <link rel="apple-touch-icon" href='{{ cdn "images/touch-icon-iphone.png" }}'>
   <link rel="shortcut icon" href='{{ cdn "images/favicon5.png"}}'>
-
+  {{#each dnsPrefetch}}
+  <link rel="dns-prefetch" href="{{ this }}">
+  {{/each}}
   <style>
     html.loading body {
       background: url("{{ cdn 'images/logo-mark-grey-64.png' }}") center no-repeat;

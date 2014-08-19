@@ -8,7 +8,7 @@ var UserTroupeLastAccessSchema = new Schema({
   userId: ObjectId,
   troupes: Schema.Types.Mixed
 });
-UserTroupeLastAccessSchema.index({ userId: 1 });
+UserTroupeLastAccessSchema.index({ userId: 1 }); // Should be unique no?
 UserTroupeLastAccessSchema.schemaTypeName = 'UserTroupeLastAccessSchema';
 
 module.exports = {
