@@ -3,51 +3,35 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Login to Gitter</title>
+    <title>Gitter &mdash; Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
 
+    <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon-normal.ico' }}">
+    
     <link href='{{cdn "styles/gitter-login.css" }}' rel="stylesheet">
-    <link id="favicon" rel="shortcut icon" href='{{cdn "images/favicon5.png" }}'>
-
-    {{>require_wrapper}}
+  </head>
+  
+  <body>
+    <div class='background'>
+      <div class='login'>
+        <header>
+          <div class='logo'>
+            {{> logo_man}}
+            <img src="{{ cdn 'images/home/logo_nomargin@2x.png' }}" alt="Gitter" title="Gitter logo" class="menu-animation">
+          </div>
+        </header>
+        <section class='menu-animation'>
+          <h1>Where developers come to talk.</h1>
+          <p><a class='btn transparent' href="/login/github?action=login&source=login_page-login">Login</a></p>
+          <p class='or'>Or</p>
+          <p><a class='btn signup' href="/login/github?action=signup&source=login_page-signup"><img src="{{cdn 'images/home/github.png'}}"> Signup with GitHub</a></p>
+        </section>
+      </div>
+    </div>
+    {{>load_font_css}}
+    {{> require_wrapper }}
     {{{ bootScript "signup" }}}
     {{{ generateEnv }}}
-    {{>load_font_css}}
-  </head>
-  <style>
-  html, body {
-
-  }
-  </style>
-  <body>
-
-<div class="outer-container" style="height: 100%">
-    <div class="container hero-container" style="height: 100%">
-      <div class="strip" style="text-align: left;">
-        <div class="logo-container"></div>
-      </div>
-      <Br><br>
-      <div>
-        <div class="strip" style="color:white; text-shadow: 0 0 0 transparent,1px 1px 2px rgba(0,0,0,0.2); text-align: left">
-          <div class="hero">
-            <div style="display: inline-block; background-color: rgba(0,0,0,0.75); padding: 0 10px; margin-bottom: 10px">
-              <h1 style="margin: 16px; color: #1bee82">The chat you've always wanted</h1>
-            </div>
-            <div style="" class="subtext">
-              Messaging for people who make software. Integrated with your team, projects and your code.
-            </div>
-          </div>
-        </div>
-        <div class="strip" style="text-align: left; margin-top: 24px; margin-bottom: 20px;">
-          <a target="_top" href="/login/github?action=login" class="button green" id="login" style="text-decoration: none; color: white">Login with GitHub</a>
-        </div>
-      </div>
-      <!-- <div class="strip"><img src="{{ cdn "images/screenshot-small.png" }}" width="920" style="border-radius: 2px 2px 0 0"></div> -->
-    </div>
-
-
-
+    {{> live_reload }}
   </body>
 </html>
