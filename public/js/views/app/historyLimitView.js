@@ -1,12 +1,13 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'backbone',
+  'marionette',
   'utils/context',
   'hbs!./tmpl/limitBannerTemplate'
-  ], function(Backbone, context, template)  {
+  ], function(Marionette, context, template)  {
   "use strict";
 
-  return Backbone.View.extend({
+  return Marionette.ItemView.extend({
+    template: template,
     events: {
       'click button.main': 'onMainButtonClick'
     },
@@ -30,23 +31,18 @@ define([
         this.hideBanner();
       }
     },
-    render: function() {
-      return this;
-    },
     showBanner: function() {
       if(this.showing) return;
       this.showing = true;
-      var $banner = this.$el;
-      var message = 'You have more messages in your history. Upgrade your plan to see them';
+      var $e = this.$el;
 
-      $banner.html(template({ message: message }));
-      $banner.parent().show();
+      $e.parent().show();
 
       clearTimeout(this.removeTimeout);
 
       // cant have slide away animation on the same render as a display:none change
       setTimeout(function() {
-        $banner.removeClass('slide-away');
+        $e.removeClass('slide-away');
       }, 0);
 
     },
@@ -54,13 +50,13 @@ define([
       if(!this.showing) return;
       this.showing = false;
 
-      var $banner = this.$el;
+      var $e = this.$el;
 
-      $banner.addClass('slide-away');
+      $e.addClass('slide-away');
 
       if(this.removeTimeout) return;
       this.removeTimeout = setTimeout(function() {
-        $banner.parent().hide();
+        $e.parent().hide();
       }, 500);
     },
     onMainButtonClick: function() {
