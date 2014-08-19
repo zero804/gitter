@@ -40,19 +40,17 @@ require([
 
   appView.leftMenuRegion.show(new TroupeMenuView({ }));
 
-  function updateContent(state) {
-    if(state) {
-      // TODO: update the title....
-      context.setTroupeId(undefined);
-      var hash;
-      var windowHash = window.location.hash;
-      if(!windowHash || windowHash === '#') {
-        hash = '#initial';
-      } else {
-        hash = windowHash;
-      }
-      chatIFrame.contentWindow.location.replace(state + hash);
+  function updateContent(iframeUrl) {
+    // TODO: update the title....
+    context.setTroupeId(undefined);
+    var hash;
+    var windowHash = window.location.hash;
+    if(!windowHash || windowHash === '#') {
+      hash = '#initial';
+    } else {
+      hash = windowHash;
     }
+    chatIFrame.contentWindow.location.replace(iframeUrl + hash);
   }
 
   var titlebarUpdater = new TitlebarUpdater();
