@@ -14,7 +14,7 @@
   right: @rightMarginFull;
   left: 0;
   
-  padding: 0px 20px 10px 50px;
+  padding: 10px 26px;// 20px 10px 50px;
 
   background-color: rgba(255, 255, 255, 0.97);
   border-bottom: 1px solid rgba(0,0,0,0.05);
@@ -117,62 +117,47 @@
   // padding: 0px 25px 0px 0px;
   text-align: center;
   line-height: 51px;
-  
+  margin: 0px 0px 0px 10px;
+ 
   i {
     cursor: pointer;
   }
 
-  /* normal */
+  //.prepend-star-icon()
+
+  /**/
   i:before {
-    font-family: 'troupe-icons';
-    content: '\e825';
-    opacity: 0.3;
-    width: 12px;
+    font-family: 'octicons';
+    content: '\f02a';
     font-size: 20px;
     transition: opacity .1s ease-in-out;
     font-style: normal;
     font-smoothing: antialiased;
+    color: lightgrey;
   }
 
   i.favourite:before {
-    font-family: 'troupe-icons';
-    content: '\e826';
+    font-family: 'octicons';
+    content: '\f02a';
     color: #f1c40f;
-    opacity: 1;
-    width: 12px;
     font-size: 20px;
     transition: opacity .1s ease-in-out;
     font-style: normal;
     font-smoothing: antialiased;
+    color: #f1c40f;
   }
-}
-
-.chat-header__private {
-  float: left;
-  // padding: 0px 25px 0px 0px;
-  text-align: center;
-  line-height: 51px;
-  
-  i {
-    cursor: pointer;
-  }
- 
-  .prepend-lock-icon()
-
 }
 
 
 .chat-header__content {
-  white-space: nowrap;
   box-sizing: border-box;
   overflow: hidden;
-  text-overflow: ellipsis;
-  
+  float: left;
   width: auto;
-  margin: 0 40px;
+  margin: 0px 0px 0px 20px;
 
   .topic-input {
-    width: 100%;
+    width: 95%;
     font-size: 13px;
     line-height: 120%;
     margin-bottom: 10px;
@@ -180,24 +165,39 @@
   }
 
   h1 {
+    white-space: nowrap;
+    text-overflow: ellipsis;
     font-family: @fontSans;
     font-weight: 300;
     font-size: 22px;
     color: #333;
     display: inline;
+    line-height: 22px;
     
-    &:hover {
+    a:hover {
       text-decoration: none;
     }
   }
 
+  .private:after {
+      font-family: 'octicons';
+      content: '\f06a';
+      font-size: 16px;
+      font-style: normal;
+      font-smoothing: antialiased;
+      text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+  }
+
   p {
+    white-space: normal;
+    word-wrap: break-word;
     font-family: @fontSans;
     font-size: 13px;
     color: #777;
     min-height: 1em;
-    margin: -5px 0 0 0;
+    margin: 3px 0px;
     user-select: text;
+
     a {
       color: #666;
     }
@@ -214,6 +214,7 @@
   // padding: 0px 10px;
   text-align: center;
   line-height: 51px;
+  margin: 0px 0px 0px 10px;
 
   i {
     cursor: pointer;
@@ -222,10 +223,10 @@
   }
 
   i:before {
-    font-family: 'troupe-icons';
-    content: '\e823';
+    font-family: 'octicons';
+    content: '\f031';
     font-style: normal;
-    font-size: 20px;
+    font-size: 18px;
   }
 
   i:hover {
@@ -233,3 +234,13 @@
   }
 }
 
+.chat-header__avatar {
+  float: left;
+  box-sizing: border-box;
+
+  img {
+    width: 48px;
+    height: 48px;
+    border-radius: 4px;
+  }
+}
