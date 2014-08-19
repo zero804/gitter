@@ -5,7 +5,8 @@ define([
   'backbone',
   'autolink',
   'components/notifications',
-  'views/controls/dropdown'
+  'views/controls/dropdown',
+  'bootstrap_tooltip' // No ref
 ], function($, context, Marionette, Backbone, autolink, notifications, Dropdown)  {
   "use strict";
 
@@ -188,10 +189,11 @@ define([
 
     redisplay: function(e) {
       var model = this.model;
-      this.ui.name.text(model.get('name'));
+      //this.ui.name.text(model.get('name'));
       this.ui.topic.text(model.get('topic'));
       autolink(this.ui.topic[0]);
       this.ui.favourite.toggleClass('favourite', !!model.get('favourite'));
+      $('.js-chat-name').tooltip({placement: 'right'});
     },
 
 
