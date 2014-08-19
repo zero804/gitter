@@ -7,7 +7,6 @@ var config          = env.config;
 var express        = require('express');
 var passport       = require('passport');
 var expressHbs     = require('express-hbs');
-var expressSession = require('express-session');
 var path           = require('path');
 var rememberMe     = require('./middlewares/rememberme-middleware');
 var I18n           = require('i18n-2');
@@ -87,7 +86,7 @@ module.exports = {
       next();
     });
 
-    app.use(expressSession({
+    app.use(express.session({
       secret: config.get('web:sessionSecret'),
       key: config.get('web:cookiePrefix') + 'session',
       store: sessionStore,
