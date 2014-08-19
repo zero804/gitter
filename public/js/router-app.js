@@ -73,6 +73,7 @@ require([
   });
 
   // Called from the OSX native client for faster page loads
+  // when clicking on a chat notification
   window.gitterLoader = function(url) {
     var frameUrl = url + '/~chat';
     titlebarUpdater.setRoomName(url);
@@ -82,10 +83,6 @@ require([
   };
 
   appEvents.on('navigation', function(url, type, title) {
-    // This is a bit hacky..
-    // Add a /-/ if the path only has one component
-    // so /moo/ goes to /moo/-/chat but
-    // /moo/foo goes to /moo/foo/chat
     var frameUrl = url + '/~' + type;
 
     pushState(frameUrl, title, url);
@@ -95,7 +92,16 @@ require([
 
   // Revert to a previously saved state
   window.onpopstate = function(e) {
-    updateContent(e.state || window.location.pathname + '/~chat');
+    var iframeUrl = e.state;
+
+    if(!iframeUrl) {
+      // state is new i.e first page in history or new navigation
+      // so we have to guess the iframe url
+      var type = context.user().get('url') === window.location.pathname ? 'home' : 'chat';
+      iframeUrl = window.location.pathname + '/~' + type;
+    }
+
+    updateContent(iframeUrl);
     appEvents.trigger('track', window.location.pathname + window.location.hash);
     return true;
   };
