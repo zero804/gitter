@@ -262,9 +262,6 @@ require([
     }
   });
 
-
-  // unreadItemsClient.monitorViewForUnreadItems($('#file-list'));
-
   new chatInputView.ChatInputView({
     el: $('#chat-input'),
     collection: itemCollections.chats,
