@@ -1,0 +1,101 @@
+.menu-header {
+  .trpBodyMedium;
+  width: 92%;
+  margin: 10px auto 0;
+  padding: 0.3125em;
+  margin-bottom: 10px;
+  cursor: pointer;
+  height: 41px;
+  overflow: hidden;
+  border-radius: 4px;
+
+  .transition(200ms);
+
+  &.active {
+    .hover & {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    height: 140px;
+    padding-bottom: 0.3125 + 0.3125em;
+
+    .transition(400ms);
+  }
+
+  body.hover &:hover {
+    background-color: rgba(255,255,255,0.2);
+  }
+
+  .trpDisplayPicture {
+    float: left;
+  }
+
+  .avatar-s {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.menu-header__profile {
+  overflow: hidden;
+  clear: both;
+  width: 100%;
+}
+
+.menu-header__name {
+  display: inline-block;
+  line-height: 2em;
+  float: left;
+  font-weight: 300;
+  font-size: 16px;
+  margin-left: 10px;
+  max-width: 182px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-menu {
+  .trpBodyMedium;
+  padding-bottom: 12px;
+  margin: 0;
+  overflow: hidden;
+  width: 100%;
+  margin-top: 8px;
+  color: white;
+  font-weight: 300;
+  line-height: 24px;
+}
+
+.profile-menu__item {
+  list-style: none;
+}
+
+.profile-menu__link {
+  display: inline-block;
+  width: 100%;
+  padding-left: 10px;
+
+  color: white;
+  text-decoration: none;
+
+  body.hover &:hover {
+    border-radius: 4px;
+    background-color: rgba(255,255,255,0.2);
+  }
+}
+
+.profile-menu__home {
+  .prepend-home-icon();
+}
+
+.profile-menu__signout {
+  .prepend-home-signout();
+}
+
+.profile-menu__apps {
+  .prepend-home-apps();
+}
+
+.profile-menu__billing {
+  .prepend-billing();
+}
