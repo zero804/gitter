@@ -10,7 +10,9 @@ var winston           = require('../../utils/winston');
 var execPreloads      = require('../exec-preloads');
 var getVersion        = require('../get-model-version');
 var UserIdStrategy    = require('./user-id-strategy');
+
 var env               = require('../../utils/env');
+var premiumDisabled   = env.config.get('premium:disabled');
 
 /**
  *
@@ -109,39 +111,42 @@ function LurkTroupeForUserStrategy(options) {
 
     return false;
   };
-
 }
 
-function PremiumRoomStrategy() {
+function RoomPlanStrategy() {
   var premium = {};
-
-  this.preload = function(troupes, callback) {
+  
+  var getOrgOrUserFromURI = function (uri) {
+    return uri.split('/', 1).shift();
+  };
+  
+  this.preload = function (troupes, callback) {
+    
     var uris = troupes.map(function(troupe) {
       if(!troupe.uri) return; // one-to-one
-
-      return troupe.uri.split('/', 1).shift();
-    }).filter(function(f) {
-      return !!f;
+      return getOrgOrUserFromURI(troupe.uri);
+    }).filter(function(room) {
+      return !!room; // this removes the `undefined` left behind (one-to-ones)
     });
 
-    var uris = _.uniq(uris);
+    uris = _.uniq(uris);
+    
     return billingService.findActivePlans(uris)
       .then(function(subscriptions) {
         subscriptions.forEach(function(subscription) {
-          return premium[subscription.uri] = subscription.plan; // true;
+          premium[subscription.uri] = subscription.plan; // true;
         });
 
         return true;
       })
       .nodeify(callback);
-  }
+  };
 
   this.map = function(troupe) {
-    if(!troupe || !troupe.uri) return undefined;
-
-    // TODO remove when premium goes live
-    return env.config.get('premium:disabled') ? true : premium[troupe.uri];
-  }
+    if (!troupe || !troupe.uri) return undefined;
+    var orgOrUser = getOrgOrUserFromURI(troupe.uri); 
+    return premium[orgOrUser];
+  };
 }
 
 function TroupeStrategy(options) {
@@ -155,7 +160,7 @@ function TroupeStrategy(options) {
   var favouriteStrategy = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
   var lurkStrategy = currentUserId ? new LurkTroupeForUserStrategy(options) : null;
   var userIdStategy = new UserIdStrategy(options);
-  var premiumRoomStrategy = new PremiumRoomStrategy(options);
+  var roomPlanStrategy = new RoomPlanStrategy(options);
 
   this.preload = function(items, callback) {
 
@@ -191,7 +196,7 @@ function TroupeStrategy(options) {
     }
 
     strategies.push({
-      strategy: premiumRoomStrategy,
+      strategy: roomPlanStrategy,
       data: items
     });
 
@@ -228,10 +233,15 @@ function TroupeStrategy(options) {
       }
     }
   }
+  
   var shownWarning = false;
+  
   this.map = function(item) {
 
-    var troupeName, troupeUrl, otherUser;
+    var troupeName, troupeUrl, otherUser, plan;
+
+    plan = roomPlanStrategy.map(item);
+    
     if(item.oneToOne) {
       if(currentUserId) {
         otherUser =  mapOtherUser(item.users);
@@ -275,7 +285,8 @@ function TroupeStrategy(options) {
       url: troupeUrl,
       githubType: item.githubType,
       security: item.security,
-      premium: premiumRoomStrategy.map(item),
+      premium: premiumDisabled ? true : !!plan,
+      plan: plan,
       noindex: item.noindex,
       v: getVersion(item)
     };

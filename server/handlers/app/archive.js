@@ -29,6 +29,8 @@ exports.datesList = [
         }
 
         var roomUrl = '/api/v1/rooms/' + troupe.id;
+        var avatarUrl = "https://avatars.githubusercontent.com/" + troupe.uri.split('/')[0];
+        var isPrivate = troupe.security !== "PUBLIC";
 
         return roomPermissionsModel(user, 'admin', troupe)
           .then(function(access) {
@@ -51,7 +53,9 @@ exports.datesList = [
                   noindex: troupe.noindex,
                   roomUrl: roomUrl,
                   accessToken: req.accessToken,
-                  public: troupe.security === 'PUBLIC'
+                  public: troupe.security === 'PUBLIC',
+                  avatarUrl: avatarUrl,
+                  isPrivate: isPrivate
                 });
 
               });
@@ -60,6 +64,7 @@ exports.datesList = [
       .fail(next);
   }
 ];
+
 
 exports.chatArchive = [
   appMiddleware.uriContextResolverMiddleware,
@@ -149,6 +154,9 @@ exports.chatArchive = [
             var billingUrl = env.config.get('web:billingBaseUrl') + '/bill/' + req.uriContext.uri.split('/')[0];
             var roomUrl = '/api/v1/rooms/' + troupe.id;
 
+            var avatarUrl = "https://avatars.githubusercontent.com/" + troupe.uri.split('/')[0];
+            var isPrivate = troupe.security !== "PUBLIC";
+
             return roomCapabilities.getPlanType(troupe.id).then(function(plan) {
               var historyHorizon = roomCapabilities.getMessageHistory(plan);
 
@@ -171,6 +179,8 @@ exports.chatArchive = [
                 noindex: troupe.noindex,
                 roomUrl: roomUrl,
                 accessToken: req.accessToken,
+                avatarUrl: avatarUrl,
+                isPrivate: isPrivate,
 
                 /* For prerendered archive-navigation-view */
                 previousDate: previousDateFormatted,

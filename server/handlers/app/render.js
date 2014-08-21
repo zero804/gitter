@@ -120,7 +120,6 @@ function renderChat(req, res, options, next) {
       contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions } }),
       restful.serializeChatsForTroupe(troupe.id, userId, serializerOptions)
     ]).spread(function (troupeContext, chats) {
-
       var initialChat = _.find(chats, function(chat) { return chat.initial; });
       var initialBottom = !initialChat;
       var githubLink;
@@ -132,6 +131,9 @@ function renderChat(req, res, options, next) {
 
       if (!user) classNames.push("logged-out");
 
+      var avatarUrl = "https://avatars.githubusercontent.com/" + ((troupeContext.troupe.oneToOne) ? troupeContext.troupe.name : troupe.uri.split('/')[0]);
+      var isPrivate = troupe.security !== "PUBLIC";
+
       var renderOptions = _.extend({
           isRepo: troupe.githubType === 'REPO',
           appCache: getAppCache(req),
@@ -140,6 +142,7 @@ function renderChat(req, res, options, next) {
           githubLink: githubLink,
           troupeName: req.uriContext.uri,
           troupeTopic: troupeContext.troupe.topic,
+          plan: troupeContext.troupe.plan,
           oneToOne: troupe.oneToOne,
           troupeFavourite: troupeContext.troupe.favourite,
           user: user,
@@ -148,7 +151,9 @@ function renderChat(req, res, options, next) {
           chats: burstCalculator(chats),
           classNames: classNames.join(' '),
           agent: req.headers['user-agent'],
-          dnsPrefetch: dnsPrefetch
+          dnsPrefetch: dnsPrefetch,
+          isPrivate: isPrivate,
+          avatarUrl: avatarUrl
         }, options.extras);
 
       res.render(options.template, renderOptions);
@@ -296,6 +301,7 @@ function renderUserNotSignedUpMainFrame(req, res, next, frame) {
       });
     }).fail(next);
 }
+
 
 
 module.exports = exports = {

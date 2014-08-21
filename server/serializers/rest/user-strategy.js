@@ -11,7 +11,9 @@ var GitHubRepoService = require('../../services/github/github-repo-service');
 var execPreloads      = require('../exec-preloads');
 var getVersion        = require('../get-model-version');
 var billingService    = require('../../services/billing-service');
+
 var env               = require('../../utils/env');
+var premiumDisabled   = env.config.get('premium:disabled');
 
 
 function UserPremiumStatusStrategy() {
@@ -31,9 +33,8 @@ function UserPremiumStatusStrategy() {
   };
 
   this.map = function(userId) {
-    return env.config.get('premium:disabled') ? true : !!usersWithPlans[userId];
+    return usersWithPlans[userId];
   };
-
 }
 
 function UserRoleInTroupeStrategy(options) {
@@ -109,7 +110,6 @@ function UserPresenceInTroupeStrategy(troupeId) {
   this.map = function(userId) {
     return !!onlineUsers[userId];
   };
-
 }
 
 function setAvatarSize(url, size) {
