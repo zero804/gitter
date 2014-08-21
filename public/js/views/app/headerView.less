@@ -28,7 +28,7 @@
   }
 }
 
-@banner-height:        45px;
+@banner-height:        40px;
 
 body.banner-top {
   .chat-container > div:first-child {
@@ -62,17 +62,18 @@ body.banner-top {
     top: 0;
     left: 0;
     right: 0;
-
+    height: @banner-height;
+    
     .transition500ms();
     &.slide-away {
-      top: -35px;
+      top: (-@banner-height);
     }
 
     button {
       .trpButton;
       position: absolute;
-      height:              %;
-      padding: 4px 11px;
+      // height:              %;
+      // padding: 4px 11px;
       color: white;
       background-color: fade(@trpGreen, 90%);
       border-width: 0 0 0 0;
@@ -83,6 +84,10 @@ body.banner-top {
       }
 
       &.main {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
         left: 0;
         width: 100%;
         .trpBodyMedium;
@@ -92,6 +97,9 @@ body.banner-top {
       }
 
       &.side {
+        position: absolute;
+        top: 0;
+        bottom: 0;
         right: 0;
         .trpBodySmall;
         border-left-width: 2px;
