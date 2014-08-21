@@ -132,6 +132,9 @@ function renderChat(req, res, options, next) {
 
       if (!user) classNames.push("logged-out");
 
+      var avatarUrl = "https://avatars.githubusercontent.com/" + troupe.uri.split('/')[0];
+      var isPrivate = troupe.security !== "PUBLIC";
+
       var renderOptions = _.extend({
           isRepo: troupe.githubType === 'REPO',
           appCache: getAppCache(req),
@@ -148,7 +151,9 @@ function renderChat(req, res, options, next) {
           chats: burstCalculator(chats),
           classNames: classNames.join(' '),
           agent: req.headers['user-agent'],
-          dnsPrefetch: dnsPrefetch
+          dnsPrefetch: dnsPrefetch,
+          isPrivate: isPrivate,
+          avatarUrl: avatarUrl
         }, options.extras);
 
       res.render(options.template, renderOptions);
@@ -296,6 +301,7 @@ function renderUserNotSignedUpMainFrame(req, res, next, frame) {
       });
     }).fail(next);
 }
+
 
 
 module.exports = exports = {
