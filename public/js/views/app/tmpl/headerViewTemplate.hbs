@@ -1,29 +1,37 @@
-{{#unless archives}}
-  {{#unless oneToOne}}
-    {{#if user}}
-      <div class="chat-header__settings">
-        <i class="js-chat-settings" data-toggle="dropdown"></i>
-      </div>
-    {{/if}}
-  {{/unless}}
-{{/unless}}
+<div class="chat-header__avatar">
+  <img src='{{avatarUrl}}' class='{{plan}}'>
+</div>
+
+<div class="chat-header__buttons">
 {{#if user}}
   <div class="chat-header__favourite">
-    <i class="js-favourite-button  {{#if troupeFavourite}}favourite{{/if}}" width="24" height="24"></i>
+    <i class="js-favourite-button  {{#if troupeFavourite}}favourite{{/if}}"></i>
   </div>
+  {{#unless archives}}
+    {{#unless oneToOne}}
+  <div class="chat-header__settings">
+    <i class="js-chat-settings" data-toggle="dropdown"></i>
+  </div>
+    {{/unless}}
+  {{/unless}}
 {{/if}}
+</div>
+
+
 <div class="chat-header__content">
-  <h1 class='js-chat-name'>
+  <h1 class='js-chat-name {{#if isPrivate}}private{{/if}}' title="{{lockTooltip}}">
     {{#if githubLink}}
       <a href="{{githubLink}}" target="_blank">{{troupeName}}</a>
     {{else}}
       {{troupeName}}
     {{/if}}
   </h1>
+
   <p class="js-chat-topic">
     {{#unless oneToOne}}
       {{troupeTopic}}
     {{/unless}}
+
     {{#oneToOne}}
       <a href="http://github.com{{troupeUri}}" target="_blank">github.com{{troupeUri}}</a>
     {{/oneToOne}}

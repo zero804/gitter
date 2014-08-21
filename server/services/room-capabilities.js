@@ -11,6 +11,7 @@ var Q = require('q');
 var PLAN_TYPE_MESSAGE_HISTORY = {
   'unlimited': null,
   'silver': null,
+  'personal': null,
   'bronze': [6, 'months'],
   'free-private': [14, 'days']
 };
