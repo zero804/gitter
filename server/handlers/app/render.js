@@ -120,7 +120,6 @@ function renderChat(req, res, options, next) {
       contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions } }),
       restful.serializeChatsForTroupe(troupe.id, userId, serializerOptions)
     ]).spread(function (troupeContext, chats) {
-      console.log('#room', troupeContext);
       var initialChat = _.find(chats, function(chat) { return chat.initial; });
       var initialBottom = !initialChat;
       var githubLink;
@@ -132,7 +131,7 @@ function renderChat(req, res, options, next) {
 
       if (!user) classNames.push("logged-out");
 
-      var avatarUrl = "https://avatars.githubusercontent.com/" + troupe.uri.split('/')[0];
+      var avatarUrl = "https://avatars.githubusercontent.com/" + ((troupeContext.troupe.oneToOne) ? troupeContext.troupe.name : troupe.uri.split('/')[0]);
       var isPrivate = troupe.security !== "PUBLIC";
 
       var renderOptions = _.extend({
