@@ -128,20 +128,20 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
   return Q.fcall(function() {
       var age = (Date.now() - chatMessage.sent.valueOf()) / 1000;
       if(age > MAX_CHAT_EDIT_AGE_SECONDS) {
-        return callback("You can no longer edit this message");
+        throw new StatusError(400, "You can no longer edit this message");
       }
 
       if(chatMessage.toTroupeId != troupe.id) {
-        return callback("Permission to edit this chat message is denied.");
+        throw new StatusError(403, "Permission to edit this chat message is denied.");
       }
 
       if(chatMessage.fromUserId != user.id) {
-        return callback("Permission to edit this chat message is denied.");
+        throw new StatusError(403, "Permission to edit this chat message is denied.");
       }
 
       // If the user has been kicked out of the troupe...
       if(!troupeService.userHasAccessToTroupe(user, troupe)) {
-        return callback("Permission to edit this chat message is denied.");
+        throw new StatusError(403, "Permission to edit this chat message is denied.");
       }
 
       chatMessage.text = newText;
