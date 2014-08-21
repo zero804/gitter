@@ -1,5 +1,6 @@
 @import "base-zindex-levels";
 @import "../controls/dropdown";
+@import "colors";
 
 .chat-header {
 
@@ -273,10 +274,30 @@ body.banner-top {
   box-sizing: border-box;
   margin-left: 4px;
   margin-top: 2px;
+  background-color: white;
+  position: relative;
 
   img {
     width: 44px;
     height: 44px;
+    
     border-radius: 4px;
+    
+    padding-bottom: 4px;
+    background-color: @free;
+    
+    &.personal { background-color: @personal; }
+    &.bronze { background-color: @bronze; }
+    &.silver { background-color: @silver; } 
+  }
+  
+  &:after {
+    position: absolute;
+    display: block;
+    content: '';
+    background: white;
+    height: 1px;
+    bottom: 8px;
+    width: 100%;
   }
 }

@@ -334,7 +334,8 @@ module.exports = function( grunt ) {
     watch: {
       less: {
         files: [
-          'public/less/*.less',
+          'public/js/**/*.less',
+          'public/less/**/*.less',
           'public/less/bootstrap/*.less'
         ],
         tasks: ['less:dev','autoprefixer'],
