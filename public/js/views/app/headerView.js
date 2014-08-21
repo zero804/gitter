@@ -17,10 +17,10 @@ define([
     var tooltip;
     switch(troupe.get('githubType')) {
       case 'REPO':
-        tooltip = 'Only repo contributors can join';
+        tooltip = 'All repo collaborators can join';
         break;
       case 'ORG':
-        tooltip = 'Only org members can join';
+        tooltip = 'All org members can join';
         break;
       case 'REPO_CHANNEL':
         var repoName = troupe.get('uri').split('/')[1];
