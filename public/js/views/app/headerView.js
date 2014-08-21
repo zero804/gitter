@@ -11,9 +11,9 @@ define([
   "use strict";
 
   function generateTooltip(troupe) {
- 
+    
     if (troupe.get('security') === 'PUBLIC') return 'Anyone can join';
-  
+    
     var tooltip;
     switch(troupe.get('githubType')) {
       case 'REPO':
@@ -23,12 +23,12 @@ define([
         tooltip = 'Only org members can join';
         break;
       case 'REPO_CHANNEL':
-        var repoName = troupe.uri.split('/')[1];
+        var repoName = troupe.get('uri').split('/')[1];
         var repoRealm = troupe.get('security') === 'PRIVATE' ? 'Only invited users' : 'Anyone in' + repoName;
         tooltip = repoRealm + ' can join';
         break;
       case 'ORG_CHANNEL':
-        var orgName = troupe.uri.split('/')[0];
+        var orgName = troupe.get('uri').split('/')[0];
         var orgRealm = troupe.get('security') === 'PRIVATE' ? 'Only invited users' : 'Anyone in ' + orgName;
         tooltip = orgRealm + ' can join';
         break;
@@ -47,6 +47,7 @@ define([
     modelEvents: {
       change: 'redisplay'
     },
+    
     ui: {
       cog: '.js-chat-settings',
       dropdownMenu: '#cog-dropdown',
@@ -54,6 +55,7 @@ define([
       name: '.js-chat-name',
       favourite: '.js-favourite-button'
     },
+    
     events: {
       'click @ui.cog': 'showDropdown',
       'click #leave-room': 'leaveRoom',
