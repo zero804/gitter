@@ -283,22 +283,22 @@ body.banner-top {
     height: 44px;
     
     border-radius: 4px;
-    
-    padding-bottom: 4px;
     background-color: @free;
     
-    &.personal { background-color: @personal; }
-    &.bronze { background-color: @bronze; }
-    &.silver { background-color: @silver; } 
-  }
-  
-  &:after {
-    position: absolute;
-    display: block;
-    content: '';
-    background: white;
-    height: 1px;
-    bottom: 8px;
-    width: 100%;
+    .faux-border() {
+      &:after {
+        position: absolute;
+        display: block;
+        content: '';
+        background: white;
+        height: 1px;
+        bottom: 8px;
+        width: 100%;
+      }
+    }
+    
+    &.personal { padding-bottom: 4px; background-color: @personal; .faux-border(); }
+    &.bronze { padding-bottom: 4px; background-color: @bronze; .faux-border(); }
+    &.silver { padding-bottom: 4px; background-color: @silver; .faux-border() ;} 
   }
 }
