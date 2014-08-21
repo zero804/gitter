@@ -3,6 +3,7 @@ define([
   'marionette',
   'utils/context',
   'utils/appevents',
+  'utils/is-mobile',
   'collections/instances/troupes',
   'views/menu/troupeCollectionView',
   'log!troupeMenu',
@@ -13,7 +14,7 @@ define([
   './profileView',
   './orgCollectionView',
   'nanoscroller' //no ref
-], function($, Marionette, context, appEvents, troupeCollections, TroupeCollectionView, log, cocktail, KeyboardEventsMixin, template, SearchView, ProfileView, OrgCollectionView) {
+], function($, Marionette, context, appEvents, isMobile, troupeCollections, TroupeCollectionView, log, cocktail, KeyboardEventsMixin, template, SearchView, ProfileView, OrgCollectionView) {
   "use strict";
 
   var View = Marionette.Layout.extend({
@@ -127,6 +128,13 @@ define([
       if (key === '0') return this.navigateTo(9);
       var index = parseInt(key, 10) - 1;
       this.navigateTo(index);
+    },
+
+    serializeData: function() {
+      return {
+        showFooterButtons: !isMobile(),
+        showSearch: !isMobile()
+      };
     },
 
     onRender: function() {
