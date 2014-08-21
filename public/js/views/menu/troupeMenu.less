@@ -146,7 +146,6 @@
   text-align: center;
 }
 
-// TODO: this rule only appears to be used on mobile. Confirm....
 .menu {
 
   &, & * {
@@ -154,7 +153,8 @@
   }
 
   /* visibility */
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 
   /* positioning */
@@ -274,20 +274,12 @@
 
 
 .menu-content {
-
-  position: absolute;
-  top: 100px;
-  bottom: 60px;
-  
-  .transition(200ms);
+  // vertically expand as much as possible
+  flex: 1;
+  height: 100%;
 
   &.has-scrollbar {
     max-width: 106%;
-  }
-
-  &.nano.pushed {
-    top: 193px;
-    .transition(400ms);
   }
 
   .menu-content__wrapper {
@@ -369,10 +361,6 @@
 
 .menu-actions {
   padding: 8px;
-  position: absolute;
-  right: 0px;
-  bottom: 0px;
-  left: 0px; 
 }
 
 

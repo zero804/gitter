@@ -17,8 +17,8 @@ define([
   "use strict";
 
   var View = Marionette.Layout.extend({
+    className: 'menu',
     template: template,
-    tagName: 'span',
     selectedListIcon: "icon-troupes",
 
     regions: {
