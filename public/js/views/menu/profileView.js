@@ -2,8 +2,9 @@ define([
   'utils/context',
   'views/base',
   'utils/appevents',
+  'utils/is-mobile',
   'hbs!./tmpl/profile',
-], function(context, TroupeViews, appEvents, template) {
+], function(context, TroupeViews, appEvents, isMobile, template) {
   "use strict";
 
   return TroupeViews.Base.extend({
@@ -17,7 +18,8 @@ define([
       return {
         displayName: user.displayName || user.username,
         user: userModel,
-        billingUrl: context.env('billingUrl')
+        billingUrl: context.env('billingUrl'),
+        showExternalLinks: !isMobile()
       };
     },
     homeClicked: function(e) {

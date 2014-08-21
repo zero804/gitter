@@ -6,12 +6,14 @@
   <li id="link-home" class="profile-menu__item profile-menu__link">
     <span class="profile-menu__home">Home</span>
   </li>
+  {{#if showExternalLinks }}
   <li class="profile-menu__item">
     <a href="{{billingUrl}}" class="profile-menu__link"><span class="profile-menu__billing">Billing</span></a>
   </li>
   <li class="profile-menu__item">
     <a href="/apps" class="profile-menu__link"><span class="profile-menu__apps">Get Gitter Apps</span></a>
   </li>
+  {{/if}}
   <li class="profile-menu__item">
     <a href="/signout" class="profile-menu__link"><span class="profile-menu__signout">Signout</span></a>
   </li>
