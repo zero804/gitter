@@ -45,7 +45,10 @@
     {{/isMobile}}
 
     <div class="trpLeftMenuHotspot" id="left-menu-hotspot"></div>
-    <div class="trpLeftMenu  menu" id="left-menu"></div>
+    <div class="trpLeftMenu" id="left-menu">
+      {{!-- anything inside #left-menu will be wiped once the view is rendered. This is just placeholder  --}}
+      <div class="menu"></div>
+    </div>
 
     <div class="trpMenuTab unread-count" id="menu-toggle-button">{{#if unreadCount}}{{unreadCount}}{{else}}0{{/if}}</div>
 

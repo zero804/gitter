@@ -3,6 +3,7 @@ define([
   'marionette',
   'utils/context',
   'utils/appevents',
+  'utils/is-mobile',
   'collections/instances/troupes',
   'views/menu/troupeCollectionView',
   'log!troupeMenu',
@@ -13,12 +14,12 @@ define([
   './profileView',
   './orgCollectionView',
   'nanoscroller' //no ref
-], function($, Marionette, context, appEvents, troupeCollections, TroupeCollectionView, log, cocktail, KeyboardEventsMixin, template, SearchView, ProfileView, OrgCollectionView) {
+], function($, Marionette, context, appEvents, isMobile, troupeCollections, TroupeCollectionView, log, cocktail, KeyboardEventsMixin, template, SearchView, ProfileView, OrgCollectionView) {
   "use strict";
 
   var View = Marionette.Layout.extend({
+    className: 'menu',
     template: template,
-    tagName: 'span',
     selectedListIcon: "icon-troupes",
 
     regions: {
@@ -29,9 +30,16 @@ define([
       orgs: "#left-menu-list-orgs"
     },
 
-    events: {
-      "click #search-clear-icon" : "onSearchClearIconClick",
-      "click #left-menu-profile" : "onClickProfileMenu"
+    events: function() {
+      var events = {
+        'click #search-clear-icon': 'onSearchClearIconClick'
+      };
+
+      if(!isMobile()) {
+        events['click #left-menu-profile'] = 'toggleHeaderExpansion';
+      }
+
+      return events;
     },
 
     keyboardEvents: {
@@ -47,10 +55,6 @@ define([
     initialize: function() {
       // this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
       this.repoList = false;
-      var ua = navigator.userAgent.toLowerCase();
-      if (ua.indexOf('gitter/') >= 0) {
-        this.isGitterApp = true;
-      }
       var self = this;
       $(window).on('showSearch', function() {
         self.showSearch();
@@ -129,6 +133,14 @@ define([
       this.navigateTo(index);
     },
 
+    serializeData: function() {
+      return {
+        showFooterButtons: !isMobile(),
+        showSearch: !isMobile(),
+        showExapandedHeader: isMobile()
+      };
+    },
+
     onRender: function() {
 
       this.profile.show(new ProfileView());
@@ -161,7 +173,7 @@ define([
       var $nano = this.$el.find('.nano');
       this.regionManager.forEach(function(region) {
         region.currentView.on('render', function() {
-          $nano.nanoScroller();
+          $nano.nanoScroller({ iOSNativeScrolling: true });
         });
       });
 
@@ -176,14 +188,8 @@ define([
       this.$el.find('#list-search-input').focus();
     },
 
-    onClickProfileMenu: function() {
-      if (this.isGitterApp) {
-        appEvents.trigger('navigation', context.getUser().url, 'home', '');
-        return;
-      }
-
-      $('#left-menu-profile').toggleClass('active');
-      $('#left-menu-scroll').toggleClass('pushed');
+    toggleHeaderExpansion: function() {
+      $('#left-menu-profile').toggleClass('menu-header--expanded');
     },
 
     hideSearch: function() {
