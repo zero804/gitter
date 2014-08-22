@@ -30,9 +30,16 @@ define([
       orgs: "#left-menu-list-orgs"
     },
 
-    events: {
-      "click #search-clear-icon" : "onSearchClearIconClick",
-      "click #left-menu-profile" : "onClickProfileMenu"
+    events: function() {
+      var events = {
+        'click #search-clear-icon': 'onSearchClearIconClick'
+      };
+
+      if(!isMobile()) {
+        events['click #left-menu-profile'] = 'toggleHeaderExpansion';
+      }
+
+      return events;
     },
 
     keyboardEvents: {
@@ -181,10 +188,8 @@ define([
       this.$el.find('#list-search-input').focus();
     },
 
-    onClickProfileMenu: function() {
-      if(!isMobile()) {
-        $('#left-menu-profile').toggleClass('menu-header--expanded');
-      }
+    toggleHeaderExpansion: function() {
+      $('#left-menu-profile').toggleClass('menu-header--expanded');
     },
 
     hideSearch: function() {
