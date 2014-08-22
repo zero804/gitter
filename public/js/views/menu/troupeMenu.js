@@ -129,7 +129,8 @@ define([
     serializeData: function() {
       return {
         showFooterButtons: !isMobile(),
-        showSearch: !isMobile()
+        showSearch: !isMobile(),
+        showExapandedHeader: isMobile()
       };
     },
 
@@ -181,8 +182,9 @@ define([
     },
 
     onClickProfileMenu: function() {
-      $('#left-menu-profile').toggleClass('active');
-      $('#left-menu-scroll').toggleClass('pushed');
+      if(!isMobile()) {
+        $('#left-menu-profile').toggleClass('menu-header--expanded');
+      }
     },
 
     hideSearch: function() {
