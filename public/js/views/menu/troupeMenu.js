@@ -166,7 +166,7 @@ define([
       var $nano = this.$el.find('.nano');
       this.regionManager.forEach(function(region) {
         region.currentView.on('render', function() {
-          $nano.nanoScroller();
+          $nano.nanoScroller({ iOSNativeScrolling: true });
         });
       });
 
