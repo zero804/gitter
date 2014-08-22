@@ -48,10 +48,6 @@ define([
     initialize: function() {
       // this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
       this.repoList = false;
-      var ua = navigator.userAgent.toLowerCase();
-      if (ua.indexOf('gitter/') >= 0) {
-        this.isGitterApp = true;
-      }
       var self = this;
       $(window).on('showSearch', function() {
         self.showSearch();
@@ -185,11 +181,6 @@ define([
     },
 
     onClickProfileMenu: function() {
-      if (this.isGitterApp) {
-        appEvents.trigger('navigation', context.getUser().url, 'home', '');
-        return;
-      }
-
       $('#left-menu-profile').toggleClass('active');
       $('#left-menu-scroll').toggleClass('pushed');
     },
