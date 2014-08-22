@@ -1,8 +1,10 @@
-<div id="left-menu-profile" class="menu-header"></div>
+<div id="left-menu-profile" class="menu-header {{#if showExapandedHeader}}menu-header--expanded{{/if}}"></div>
+{{#if showSearch}}
 <div class="menu-search">
   <input class="menu-search__input" id="list-search-input" placeholder="Search"/>
   <span class="menu-search__clear" id="search-clear-icon"></span>
 </div>
+{{/if}}
 <div class="nano  menu-content" id="left-menu-scroll">
   <div class="content  nano-content  menu-content__wrapper" style="outline: none">
     <div class="menu-list" id="list-mega">
@@ -25,6 +27,8 @@
     </div>
   </div>
 </div>
+{{#if showFooterButtons}}
 <div class="menu-actions">
   <a class="trpButtonMedium trpBtnWhite gtrCreateRoomButton" href="#createroom">Create a room</a>
 </div>
+{{/if}}
