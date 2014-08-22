@@ -307,10 +307,9 @@ define([
      * composeModeAutoFillCodeBlock() automatically toggles compose mode and creates a Marked down codeblock template
      */
     composeModeAutoFillCodeBlock: function (event) {
-      event.preventDefault(); // shouldn't allow the creation of a new line
-      
       var inputBox = this.inputBox.$el;
       if (inputBox.val() !== '```') return; // only continue if the content is '```'
+      event.preventDefault(); // shouldn't allow the creation of a new line
       if (!this.composeMode.isEnabled()) this.toggleComposeMode(event); // switch to compose mode if not already in
 
       inputBox.val(function (index, val) {

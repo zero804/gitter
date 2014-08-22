@@ -134,7 +134,7 @@ body.banner-top {
   display: inline-block;
   // padding: 0px 25px 0px 0px;
   text-align: center;
-  line-height: 51px;
+  line-height: 49px;
   margin: 0px 0px 0px 10px;
 
   i {
@@ -144,7 +144,6 @@ body.banner-top {
   }
 
   //.prepend-star-icon()
-
 
   i:hover {
     opacity: 1;
@@ -250,7 +249,7 @@ body.banner-top {
   body.embedded & { visibility: hidden; }
   display: inline-block;
   text-align: center;
-  line-height: 51px;
+  line-height: 49px;
   margin: 0px 0px 0px 10px;
 
   i {
@@ -272,34 +271,36 @@ body.banner-top {
 }
 
 .chat-header__avatar {
+  @side: 48px;
+  height: @side;
   float: left;
   box-sizing: border-box;
-  margin-left: 4px;
-  margin-top: 2px;
   background-color: white;
   position: relative;
 
   img {
-    width: 44px;
-    height: 44px;
+    width: @side;
+    height: @side;
     
     border-radius: 4px;
     background-color: @free;
-    
-    .faux-border() {
-      &:after {
-        position: absolute;
-        display: block;
-        content: '';
-        background: white;
-        height: 1px;
-        bottom: 8px;
-        width: 100%;
-      }
-    }
-    
-    &.personal { padding-bottom: 4px; background-color: @personal; .faux-border(); }
-    &.bronze { padding-bottom: 4px; background-color: @bronze; .faux-border(); }
-    &.silver { padding-bottom: 4px; background-color: @silver; .faux-border() ;} 
   }
+  
+  .faux-border(@bg) {
+    &:after {
+      position: absolute;
+      display: inline-block;
+      content: '';
+      background: @bg;
+      height: 4px;
+      border-top: 1px solid rgba(255, 255, 255, 1);
+      bottom: 0px;
+      width: 100%;
+      border-radius: 0 0 4px 4px;  
+    }
+  }
+  
+  &.personal { .faux-border(@personal); }
+  &.bronze { .faux-border(@bronze); }
+  &.silver { .faux-border(@silver); } 
 }
