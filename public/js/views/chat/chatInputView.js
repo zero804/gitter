@@ -54,6 +54,25 @@ define([
     var stringBoolean = window.localStorage.getItem('compose_mode_enabled') || 'false';
     this.disabled = JSON.parse(stringBoolean);
   };
+  
+  /**
+   * setCaretPosition() moves the caret on a given text element
+   * credits to http://blog.vishalon.net/index.php/javascript-getting-and-setting-caret-position-in-textarea/
+   */
+  var setCaretPosition = function (el, pos) {
+    if (el.setSelectionRange) {
+      el.focus();
+      el.setSelectionRange(pos,pos);
+      return;
+    } else if (el.createTextRange) {
+      var range = el.createTextRange();
+      range.collapse(true);
+      range.moveEnd('character', pos);
+      range.moveStart('character', pos);
+      range.select();
+      return;
+    }
+  };
 
   ComposeMode.prototype.toggle = function() {
     this.disabled = !this.disabled;
@@ -73,6 +92,7 @@ define([
     },
 
     keyboardEvents: {
+      'chat.compose.auto': 'composeModeAutoFillCodeBlock',
       'chat.toggle': 'toggleComposeMode'
     },
 
@@ -267,7 +287,7 @@ define([
       this.listenTo(this.inputBox, 'editLast', this.editLast);
     },
 
-    toggleComposeMode: function(event) {
+    toggleComposeMode: function (event) {
       if(!event.origin) event.preventDefault();
 
       this.composeMode.toggle();
@@ -281,6 +301,22 @@ define([
 
       var placeholder = isComposeModeEnabled ? PLACEHOLDER_COMPOSE_MODE : PLACEHOLDER;
       this.$el.find('textarea').attr('placeholder', placeholder).focus();
+    },
+    
+    /**
+     * composeModeAutoFillCodeBlock() automatically toggles compose mode and creates a Marked down codeblock template
+     */
+    composeModeAutoFillCodeBlock: function (event) {
+      event.preventDefault(); // shouldn't allow the creation of a new line
+      
+      var inputBox = this.inputBox.$el;
+      if (inputBox.val() !== '```') return; // only continue if the content is '```'
+      if (!this.composeMode.isEnabled()) this.toggleComposeMode(event); // switch to compose mode if not already in
+
+      inputBox.val(function (index, val) {
+        return val + '\n\n```'; // 1. create the code block
+      });
+      setCaretPosition(inputBox[0], 4); // 2. move caret inside the block (textarea)
     },
 
     /**
