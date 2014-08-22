@@ -6,7 +6,9 @@ var contextGenerator  = require('../../web/context-generator');
 var restful           = require('../../services/restful');
 var UserService       = require('../../services/user-service');
 var appVersion        = require('../../web/appVersion');
+
 var burstCalculator   = require('../../utils/burst-calculator');
+var avatar   = require('../../utils/avatar');
 var _                 = require('underscore');
 
 /* How many chats to send back */
@@ -130,8 +132,8 @@ function renderChat(req, res, options, next) {
       }
 
       if (!user) classNames.push("logged-out");
-
-      var avatarUrl = "https://avatars.githubusercontent.com/" + ((troupeContext.troupe.oneToOne) ? troupeContext.troupe.name : troupe.uri.split('/')[0]);
+      
+      // var avatarUrl = "https://avatars.githubusercontent.com/" + ((troupeContext.troupe.oneToOne) ? troupeContext.troupe.name : troupe.uri.split('/')[0]);
       var isPrivate = troupe.security !== "PUBLIC";
 
       var renderOptions = _.extend({
@@ -153,7 +155,7 @@ function renderChat(req, res, options, next) {
           agent: req.headers['user-agent'],
           dnsPrefetch: dnsPrefetch,
           isPrivate: isPrivate,
-          avatarUrl: avatarUrl
+          avatarUrl: avatar(troupeContext.troupe)
         }, options.extras);
 
       res.render(options.template, renderOptions);
