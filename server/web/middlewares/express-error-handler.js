@@ -62,6 +62,10 @@ module.exports = function(err, req, res, next) {
     // Send to statsd
     stats.event('client_error_5xx', { userId: userId, url: req.url });
 
+    extraTemplateValues = {
+      title: 'Error ' + status
+    };
+
     logger.error("An unexpected error occurred", {
        method: req.method,
        url: req.url,
@@ -75,16 +79,22 @@ module.exports = function(err, req, res, next) {
 
   } else if(status === 404) {
     stats.event('client_error_404', { userId: userId });
+    extraTemplateValues = {
+      title: 'Page Not Found'
+    };
 
-    template = '404';
+    template = status.toString();
     stack = null;
   } else if(status === 402) {
     /* HTTP 402 = Payment required */
-    template = '402';
+    template = status.toString();
+    template = '500';
     stack = null;
+
     extraTemplateValues = {
-      billingUrl: config.get('web:billingBaseUrl')  + '/bill/' + err.uri
-    }
+      billingUrl: config.get('web:billingBaseUrl')  + '/bill/' + err.uri,
+      title: 'Payment Required'
+    };
 
     stats.event('client_error_402', { userId: userId });
   } else if(status >= 400 && status < 500) {

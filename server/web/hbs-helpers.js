@@ -142,3 +142,23 @@ exports.pluralize = function(number, singular, plural) {
 exports.toLowerCase = function (str) {
   return str.toLowerCase();
 };
+
+// FIXME REMOVE THIS ONCE THE NEW ERRORS PAGES ARE DONE
+exports.typewriter = function (el, str) {
+  return util.format('<script type="text/javascript">\n' +
+    'var text = "%s";' +
+    'var input = $("%s");' +
+    'input.select();' +
+    'setTimeout(startTyping, 1000, input, text);' +
+    'function startTyping(input, text) {' +
+      'for ( var i = 0; i < text.length; i++ ) {' +
+        'setTimeout(addText,120*i, input, text.charAt(i));' +
+      '}' +
+    '}' +
+    'function addText(i,c) {' +
+      'if (c !== "-") i.val( i.val() + c );' +
+    '}' +
+  '</script>',
+    str,
+    el);
+};
