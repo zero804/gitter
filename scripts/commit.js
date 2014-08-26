@@ -90,18 +90,10 @@ function ReadmeUpdater(context) {
   var client = new Client(context.token);
 
   function doForkIfRequired() {
-    return client.get(format('/repos/%s', context.sourceRepo), {})
-      .then(function(repo) {
-        // User has permission to modified the source repo
-        if(repo.permissions.push) {
-          return repo.full_name;
-        }
-
-        // Create a fork
-        return client.post(format('/repos/%s/forks', context.sourceRepo), { })
-          .then(function(fork) {
-            return fork.full_name;
-          });
+    // Create a fork
+    return client.post(format('/repos/%s/forks', context.sourceRepo), { })
+      .then(function(fork) {
+        return fork.full_name;
       });
   }
 
@@ -203,8 +195,8 @@ function ReadmeUpdater(context) {
         var commitRequest = {
           "message": "Added Gitter badge",
           "author": {
-            "name": "The Gitter Badge Bot",
-            "email": "badgebot@gitter.im",
+            "name": "The Gitter Badger",
+            "email": "badger@gitter.im",
             "date": new Date().toISOString()
           },
           "parents": [latestCommitSha],
@@ -251,9 +243,9 @@ function ReadmeUpdater(context) {
 
 function updateFileAndCreatePullRequest(sourceRepo, user, primaryBranch, branchPrefix, badgeContent) {
   return new ReadmeUpdater({
-    token: '',
+    token: '***REMOVED***',
     sourceRepo: sourceRepo,
-    user: user,
+    user: 'gitter-badger',
     primaryBranch: primaryBranch,
     branchPrefix: branchPrefix,
     badgeContent: badgeContent
