@@ -122,7 +122,7 @@ function serializeModel(model, callback) {
 
 function eagerLoadStrategies() {
   Object.keys(restSerializer).forEach(function(key) {
-    restSerializer[key];
+    restSerializer[key]; // NB! Force the lazy-loading of strategies
   });
 }
 
