@@ -919,27 +919,27 @@ presenceService.validateUsers = validateUsers;
 // -------------------------------------------------------------------
 
 presenceService.on('userOnline', function(userId) {
-  winston.info("presence: User " + userId + " connected.");
+  winston.verbose("presence: User " + userId + " connected.");
 });
 
 presenceService.on('userOffline', function(userId) {
-  winston.info("presence: User " + userId + " disconnected.");
+  winston.verbose("presence: User " + userId + " disconnected.");
 });
 
 presenceService.on('userJoinedTroupe', function(userId, troupeId) {
   /* User joining this troupe for the first time.... */
-  winston.info("presence: User " + userId + " has just joined " + troupeId);
+  winston.verbose("presence: User " + userId + " has just joined " + troupeId);
   appEvents.userLoggedIntoTroupe(userId, troupeId);
 });
 
 presenceService.on('userLeftTroupe', function(userId, troupeId) {
-  winston.info("presence: User " + userId + " is gone from " + troupeId);
+  winston.verbose("presence: User " + userId + " is gone from " + troupeId);
 
   appEvents.userLoggedOutOfTroupe(userId, troupeId);
 });
 
 presenceService.on('troupeEmpty', function(troupeId) {
-  winston.info("presence: The last user has disconnected from troupe " + troupeId);
+  winston.verbose("presence: The last user has disconnected from troupe " + troupeId);
 });
 
 presenceService.testOnly = {
