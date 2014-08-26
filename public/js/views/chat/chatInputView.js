@@ -54,7 +54,7 @@ define([
     var stringBoolean = window.localStorage.getItem('compose_mode_enabled') || 'false';
     this.disabled = JSON.parse(stringBoolean);
   };
-  
+
   /**
    * setCaretPosition() moves the caret on a given text element
    * credits to http://blog.vishalon.net/index.php/javascript-getting-and-setting-caret-position-in-textarea/
@@ -101,13 +101,13 @@ define([
       this.chatCollectionView = options.chatCollectionView;
       this.composeMode = new ComposeMode();
       this.userCollection = options.userCollection;
-      
+
       this.listenTo(appEvents, 'input.append', function(text, options) {
         if(this.inputBox) {
           this.inputBox.append(text, options);
         }
       });
-      
+
       this.listenTo(appEvents, 'focus.request.chat', function() {
         if(this.inputBox) {
           this.inputBox.$el.focus();
@@ -153,7 +153,7 @@ define([
         composeMode: this.composeMode,
         value: data.value
       });
-      
+
       this.inputBox = inputBox;
 
       this.$el.find('.compose-mode-toggle, .md-help').tooltip({placement: 'left'});
@@ -198,7 +198,7 @@ define([
           search: function(term, callback) {
             var lowerTerm = term.toLowerCase();
             var loggedInUsername = context.user().get('username').toLowerCase();
-            
+
             var matches = userCollection && userCollection.filter(function (user) {
               var username = user.get('username').toLowerCase();
 
@@ -265,7 +265,7 @@ define([
       $textarea.on('textComplete:show', function() {
         $textarea.attr('data-prevent-keys', 'on');
       });
-      
+
       $textarea.on('textComplete:hide', function() {
         // Defer change to make sure the last key event is prevented
         setTimeout(function() {
@@ -288,7 +288,7 @@ define([
     },
 
     toggleComposeMode: function (event) {
-      if(!event.origin) event.preventDefault();
+      if(event && !event.origin) event.preventDefault();
 
       this.composeMode.toggle();
       var isComposeModeEnabled = this.composeMode.isEnabled();
@@ -302,19 +302,26 @@ define([
       var placeholder = isComposeModeEnabled ? PLACEHOLDER_COMPOSE_MODE : PLACEHOLDER;
       this.$el.find('textarea').attr('placeholder', placeholder).focus();
     },
-    
+
     /**
      * composeModeAutoFillCodeBlock() automatically toggles compose mode and creates a Marked down codeblock template
      */
     composeModeAutoFillCodeBlock: function (event) {
       var inputBox = this.inputBox.$el;
       if (inputBox.val() !== '```') return; // only continue if the content is '```'
+      var wasInChatMode = !this.composeMode.isEnabled();
+
       event.preventDefault(); // shouldn't allow the creation of a new line
-      if (!this.composeMode.isEnabled()) this.toggleComposeMode(event); // switch to compose mode if not already in
+
+      if (wasInChatMode) {
+        this.toggleComposeMode(event); // switch to compose mode
+        this.listenToOnce(this.inputBox, 'save', this.toggleComposeMode); // if we were in chat mode make sure that we set the state back to chat mode
+      }
 
       inputBox.val(function (index, val) {
         return val + '\n\n```'; // 1. create the code block
       });
+
       setCaretPosition(inputBox[0], 4); // 2. move caret inside the block (textarea)
     },
 
