@@ -2,6 +2,7 @@
 
 var env               = require('../../utils/env');
 var logger            = env.logger;
+var stats             = env.stats;
 
 var presenceService   = require('../../services/presence-service');
 var restful           = require('../../services/restful');
@@ -12,25 +13,32 @@ var Q                 = require('q');
 var userCanAccessRoom = require('../../services/user-can-access-room');
 
 // Strategies for authenticating that a user can subscribe to the given URL
-var routes = [
-  { re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)$/,
-    validator: validateUserForSubTroupeSubscription },
-  { re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)\/(\w+)$/,
+var routes = [{
+    re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)$/,
+    validator: validateUserForSubTroupeSubscription
+  }, {
+    re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)\/(\w+)$/,
     validator: validateUserForSubTroupeSubscription,
-    populator: populateSubTroupeCollection },
-  { re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)\/(\w+)\/(\w+)\/(\w+)$/,
+    populator: populateSubTroupeCollection
+  }, {
+    re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)\/(\w+)\/(\w+)\/(\w+)$/,
     validator: validateUserForSubTroupeSubscription,
-    populator: populateSubSubTroupeCollection },
-  { re: /^\/api\/v1\/user\/(\w+)\/(\w+)$/,
+    populator: populateSubSubTroupeCollection
+  }, {
+    re: /^\/api\/v1\/user\/(\w+)\/(\w+)$/,
     validator: validateUserForUserSubscription,
-    populator: populateSubUserCollection },
-  { re: /^\/api\/v1\/user\/(\w+)\/(?:troupes|rooms)\/(\w+)\/unreadItems$/,
+    populator: populateSubUserCollection
+  }, {
+    re: /^\/api\/v1\/user\/(\w+)\/(?:troupes|rooms)\/(\w+)\/unreadItems$/,
     validator: validateUserForUserSubscription,
-    populator: populateUserUnreadItemsCollection },
-  { re: /^\/api\/v1\/user\/(\w+)$/,
-    validator: validateUserForUserSubscription },
-  { re: /^\/api\/v1\/ping(\/\w+)?$/,
-    validator: validateUserForPingSubscription }
+    populator: populateUserUnreadItemsCollection
+  }, {
+    re: /^\/api\/v1\/user\/(\w+)$/,
+    validator: validateUserForUserSubscription
+  }, {
+    re: /^\/api\/v1\/ping(\/\w+)?$/,
+    validator: validateUserForPingSubscription
+  }
 ];
 
 // This strategy ensures that a user can access a URL under a troupe URL
@@ -71,8 +79,10 @@ function validateUserForUserSubscription(options) {
   return Q.resolve(result);
 }
 
-function arrayToSnapshot(data) {
-  return { data: data };
+function arrayToSnapshot(type) {
+  return function(data) {
+    return { type: type, data: data };
+  };
 }
 
 function populateSubUserCollection(options) {
@@ -89,7 +99,7 @@ function populateSubUserCollection(options) {
     case "rooms":
     case "troupes":
       return restful.serializeTroupesForUser(userId)
-        .then(arrayToSnapshot);
+        .then(arrayToSnapshot('user.rooms'));
 
     default:
       logger.error('Unable to provide snapshot for ' + collection);
@@ -110,15 +120,15 @@ function populateSubTroupeCollection(options) {
       var chatOptions = snapshot || {};
 
       return restful.serializeChatsForTroupe(troupeId, userId, chatOptions)
-        .then(arrayToSnapshot);
+        .then(arrayToSnapshot('room.chatMessages'));
 
     case "users":
       return restful.serializeUsersForTroupe(troupeId, userId)
-        .then(arrayToSnapshot);
+        .then(arrayToSnapshot('room.users'));
 
     case "events":
       return restful.serializeEventsForTroupe(troupeId, userId)
-        .then(arrayToSnapshot);
+        .then(arrayToSnapshot('room.events'));
 
     default:
       logger.error('Unable to provide snapshot for ' + collection);
@@ -137,7 +147,7 @@ function populateSubSubTroupeCollection(options) {
   switch(collection + '-' + subCollection) {
     case "chatMessages-readBy":
       return restful.serializeReadBysForChat(troupeId, subId)
-        .then(arrayToSnapshot);
+        .then(arrayToSnapshot('room.chatMessages.readBy'));
 
 
     default:
@@ -158,7 +168,7 @@ function populateUserUnreadItemsCollection(options) {
   }
 
   return restful.serializeUnreadItemsForTroupe(troupeId, userId)
-    .then(arrayToSnapshot);
+    .then(arrayToSnapshot('user.room.unreadItems'));
 }
 
 // Authorize a sbscription message
@@ -250,8 +260,13 @@ module.exports = bayeuxExtension({
 
       if(!exists) return callback(new StatusError(401, "Snapshot failed. Socket not associated"));
 
+      var startTime = Date.now();
+
       populator({ userId: userId, match: m, snapshot: snapshot })
         .then(function(snapshot) {
+          stats.responseTime('bayeux.snapshot.time', Date.now() - startTime);
+          stats.responseTime('bayeux.snapshot.time.' + snapshot.type, Date.now() - startTime);
+
           if(snapshot) {
             if(!message.ext) message.ext = {};
             message.ext.snapshot = snapshot.data;
