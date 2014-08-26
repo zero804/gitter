@@ -1,7 +1,6 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var userService       = require("../../services/user-service");
 var troupeService     = require("../../services/troupe-service");
 var presenceService   = require("../../services/presence-service");
 var Q                 = require("q");
@@ -11,7 +10,7 @@ var GitHubRepoService = require('../../services/github/github-repo-service');
 var execPreloads      = require('../exec-preloads');
 var getVersion        = require('../get-model-version');
 var billingService    = require('../../services/billing-service');
-
+var leanUserDao       = require('../../services/daos/user-dao').lean;
 
 function UserPremiumStatusStrategy() {
   var usersWithPlans;
@@ -57,7 +56,7 @@ function UserRoleInTroupeStrategy(options) {
 
         if(options.currentUser) userPromise = Q.resolve(options.currentUser);
         if(options.currentUserId) {
-          userPromise = userService.findById(options.currentUserId);
+          userPromise = leanUserDao.findById(options.currentUserId);
         }
 
         if(userPromise) {

@@ -62,20 +62,20 @@ TroupeMentionCountStategy.prototype = {
 };
 
 function LastTroupeAccessTimesForUserStrategy(options) {
-  var self = this;
   var userId = options.userId || options.currentUserId;
+  var timesIndexed;
 
   this.preload = function(data, callback) {
     recentRoomService.getTroupeLastAccessTimesForUser(userId, function(err, times) {
       if(err) return callback(err);
-      self.times = times;
+      timesIndexed = times;
       callback();
     });
   };
 
   this.map = function(id) {
     // No idea why, but sometimes these dates are converted to JSON as {}, hence the weirdness below
-    return self.times[id] ? new Date(self.times[id].valueOf()).toISOString() : undefined;
+    return timesIndexed[id] ? new Date(timesIndexed[id].valueOf()).toISOString() : undefined;
   };
 }
 LastTroupeAccessTimesForUserStrategy.prototype = {
