@@ -29,4 +29,9 @@ function SearchResultsStrategy(options) {
 
 }
 
+SearchResultsStrategy.prototype = {
+  name: 'SearchResultsStrategy'
+};
+
+
 module.exports = SearchResultsStrategy;

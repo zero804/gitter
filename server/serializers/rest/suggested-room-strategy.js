@@ -20,6 +20,10 @@ function SuggestedRoomStrategy() {
       description: suggestedRoom.room && suggestedRoom.room.topic || suggestedRoom.repo && suggestedRoom.repo.description
     };
   };
-
 }
+
+SuggestedRoomStrategy.prototype = {
+  name: 'SuggestedRoomStrategy'
+};
+
 module.exports = SuggestedRoomStrategy;
