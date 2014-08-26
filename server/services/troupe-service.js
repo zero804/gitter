@@ -17,8 +17,7 @@ var ObjectID                 = require('mongodb').ObjectID;
 var _                        = require('underscore');
 var assert                   = require('assert');
 var roomPermissionsModel     = require('./room-permissions-model');
-var leanTroupeDao            = require('./daos/lean-troupe-dao');
-var StatusError              = require('statuserror');
+var leanTroupeDao            = require('./daos/troupe-dao').lean;
 var promiseUtils             = require('../utils/promise-utils');
 
 function findByUri(uri, callback) {
@@ -27,16 +26,6 @@ function findByUri(uri, callback) {
   return persistence.Troupe.findOneQ({ lcUri: lcUri })
     .nodeify(callback);
 }
-
-function findAllByUri(uris, callback) {
-  if(!uris || !uris.length) return Q.resolve([]).nodeify(callback);
-
-  var lcUris = uris.map(function(f) { return f.toLowerCase(); });
-
-  return persistence.Troupe.where('lcUri').in(lcUris).execQ()
-    .nodeify(callback);
-}
-
 
 function findByIds(ids, callback) {
   if(!ids || !ids.length) return Q.resolve([]).nodeify(callback);
@@ -610,7 +599,6 @@ function deleteTroupe(troupe, callback) {
 
 module.exports = {
   findByUri: findByUri,
-  findAllByUri: findAllByUri,
   findById: findById,
   findByIds: findByIds,
   findAllTroupesForUser: findAllTroupesForUser,

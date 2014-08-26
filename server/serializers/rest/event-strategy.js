@@ -58,4 +58,9 @@ function EventStrategy(options) {
   };
 }
 
+EventStrategy.prototype = {
+  name: 'EventStrategy'
+};
+
+
 module.exports = EventStrategy;

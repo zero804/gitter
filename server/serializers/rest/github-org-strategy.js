@@ -1,9 +1,6 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var troupeService     = require("../../services/troupe-service");
-var _                 = require("underscore");
-var collections       = require("../../utils/collections");
 var execPreloads      = require('../exec-preloads');
 var TroupeUriStrategy = require('./troupe-uri-strategy');
 var billingService    = require('../../services/billing-service');
@@ -31,6 +28,11 @@ function OrgPlanStrategy() {
     return orgsWithPlans[orgUri];
   };
 }
+
+OrgPlanStrategy.prototype = {
+  name: 'OrgPlanStrategy'
+};
+
 
 function GitHubOrgStrategy(options) {
   var troupeUriStrategy = new TroupeUriStrategy(options);
@@ -60,5 +62,9 @@ function GitHubOrgStrategy(options) {
     };
   };
 }
+
+GitHubOrgStrategy.prototype = {
+  name: 'GitHubOrgStrategy'
+};
 
 module.exports = GitHubOrgStrategy;

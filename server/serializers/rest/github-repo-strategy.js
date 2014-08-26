@@ -1,33 +1,33 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var troupeService     = require("../../services/troupe-service");
 var collections       = require("../../utils/collections");
 var execPreloads      = require('../exec-preloads');
 var TroupeStrategy    = require('./troupe-strategy');
+var leanTroupeDao     = require('../../services/daos/troupe-dao').lean;
 
 function GithubRepoStrategy(options) {
 
   var troupeStrategy = new TroupeStrategy(options);
-  var self = this;
+  var troupesIndexed;
 
   this.preload = function(userAdminRepos, callback) {
     var repos = userAdminRepos.map(function(repo) { return repo.full_name; });
 
-    troupeService.findAllByUri(repos, function(err, troupes) {
-      if (err) callback(err);
+    return leanTroupeDao.findByUris(repos)
+      .then(function(troupes) {
+        troupesIndexed = collections.indexByProperty(troupes, 'uri');
 
-      self.troupes = collections.indexByProperty(troupes, 'uri');
-
-      execPreloads([{
-        strategy: troupeStrategy,
-        data: troupes
-      }], callback);
-    });
+        return execPreloads([{
+          strategy: troupeStrategy,
+          data: troupes
+        }]);
+      })
+      .nodeify(callback);
   };
 
   this.map = function(item) {
-    var room = self.troupes[item.full_name];
+    var room = troupesIndexed[item.full_name];
     return {
       id:           item.id,
       name:         item.full_name,
@@ -40,4 +40,10 @@ function GithubRepoStrategy(options) {
   };
 
 }
+
+GithubRepoStrategy.prototype = {
+  name: 'GithubRepoStrategy'
+};
+
+
 module.exports = GithubRepoStrategy;

@@ -12,9 +12,6 @@ var execPreloads      = require('../exec-preloads');
 var getVersion        = require('../get-model-version');
 var billingService    = require('../../services/billing-service');
 
-var env               = require('../../utils/env');
-var premiumDisabled   = env.config.get('premium:disabled');
-
 
 function UserPremiumStatusStrategy() {
   var usersWithPlans;
@@ -36,6 +33,9 @@ function UserPremiumStatusStrategy() {
     return usersWithPlans[userId];
   };
 }
+UserPremiumStatusStrategy.prototype = {
+  name: 'UserPremiumStatusStrategy'
+};
 
 function UserRoleInTroupeStrategy(options) {
   var contributors;
@@ -95,6 +95,9 @@ function UserRoleInTroupeStrategy(options) {
     return contributors && contributors[username];
   };
 }
+UserRoleInTroupeStrategy.prototype = {
+  name: 'UserRoleInTroupeStrategy'
+};
 
 function UserPresenceInTroupeStrategy(troupeId) {
   var onlineUsers;
@@ -111,6 +114,9 @@ function UserPresenceInTroupeStrategy(troupeId) {
     return !!onlineUsers[userId];
   };
 }
+UserPresenceInTroupeStrategy.prototype = {
+  name: 'UserPresenceInTroupeStrategy'
+};
 
 function setAvatarSize(url, size) {
   var sizeText;
@@ -187,6 +193,9 @@ function UserStrategy(options) {
     };
   };
 }
+UserStrategy.prototype = {
+  name: 'UserStrategy'
+};
 
 
 module.exports = UserStrategy;

@@ -14,8 +14,8 @@ function formatDate(d) {
 }
 
 function UnreadItemStategy(options) {
-  var self = this;
   var itemType = options.itemType;
+  var unreadItemsHash;
 
   this.preload = function(data, callback) {
     unreadItemService.getUnreadItems(data.userId, data.troupeId, itemType, function(err, ids) {
@@ -26,15 +26,20 @@ function UnreadItemStategy(options) {
         hash[id] = true;
       });
 
-      self.unreadIds = hash;
+      unreadItemsHash = hash;
       callback(null);
     });
   };
 
   this.map = function(id) {
-    return !!self.unreadIds[id];
+    return !!unreadItemsHash[id];
   };
 }
+
+UnreadItemStategy.prototype = {
+  name: 'UnreadItemStategy'
+};
+
 
 
 function ChatStrategy(options)  {
@@ -122,5 +127,9 @@ function ChatStrategy(options)  {
     };
   }
 }
+
+ChatStrategy.prototype = {
+  name: 'ChatStrategy'
+};
 
 module.exports = ChatStrategy;
