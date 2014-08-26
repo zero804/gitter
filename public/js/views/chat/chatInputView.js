@@ -315,7 +315,7 @@ define([
 
       if (wasInChatMode) {
         this.toggleComposeMode(event); // switch to compose mode
-        this.listenToOnce(this.inputBox, 'save', this.toggleComposeMode); // if we were in chat mode make sure that we set the state back to chat mode
+        this.listenToOnce(this.inputBox, 'save', this.toggleComposeMode.bind(this, null)); // if we were in chat mode make sure that we set the state back to chat mode
       }
 
       inputBox.val(function (index, val) {
