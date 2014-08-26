@@ -5,25 +5,11 @@
   padding: 0.3125em;
   margin-bottom: 10px;
   cursor: pointer;
-  height: 41px;
+  max-height: 41px;
   overflow: hidden;
   border-radius: 4px;
 
   .transition(200ms);
-
-  &.active {
-    .hover & {
-      background-color: rgba(255, 255, 255, 0.2);
-    }
-    height: 140px;
-    padding-bottom: 0.3125 + 0.3125em;
-
-    .transition(400ms);
-  }
-
-  body.hover &:hover {
-    background-color: rgba(255,255,255,0.2);
-  }
 
   .trpDisplayPicture {
     float: left;
@@ -33,6 +19,18 @@
     width: 32px;
     height: 32px;
   }
+}
+
+.menu-header--expanded {
+  // css animations dont work for height: auto,
+  // but we can use a rough max-height instead.
+  max-height: 200px;
+  .transition(400ms);
+}
+
+body.hover .menu-header:hover,
+body.hover .menu-header--expanded {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .menu-header__profile {
@@ -56,7 +54,6 @@
 
 .profile-menu {
   .trpBodyMedium;
-  padding-bottom: 12px;
   margin: 0;
   overflow: hidden;
   width: 100%;
