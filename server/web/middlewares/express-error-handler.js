@@ -88,7 +88,6 @@ module.exports = function(err, req, res, next) {
   } else if(status === 402) {
     /* HTTP 402 = Payment required */
     template = status.toString();
-    template = '500';
     stack = null;
 
     extraTemplateValues = {
