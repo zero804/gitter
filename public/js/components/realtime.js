@@ -126,8 +126,11 @@ define([
   };
 
   var subscribeOptions = {};
+  var subscribeTimers = {};
   SnapshotExtension.prototype.outgoing = function(message, callback) {
     if(message.channel == '/meta/subscribe') {
+      subscribeTimers[message.subscription] = Date.now();           // Record start time
+
       if(!message.ext) { message.ext = {}; }
 
       message.ext.eyeballs = eyeballState ? 1 : 0;
@@ -156,6 +159,14 @@ define([
 
   SnapshotExtension.prototype.incoming = function(message, callback) {
     if(message.channel == '/meta/subscribe' && message.ext && message.ext.snapshot) {
+
+      // Add some statistics into the mix
+      var startTime = subscribeTimers[message.subscription];
+      if(startTime) {
+        delete subscribeTimers[message.subscription];
+        appEvents.trigger('stats.time', 'faye.subscribe.time', Date.now() - startTime);
+      }
+
       var listeners = this._listeners[message.subscription];
       var snapshot = message.ext.snapshot;
 
