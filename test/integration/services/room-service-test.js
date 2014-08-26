@@ -17,7 +17,6 @@ Q.longStackSupport = true;
 var troupeService = testRequire("./services/troupe-service");
 var persistence = testRequire("./services/persistence-service");
 
-
 function makeRoomAssertions(room, usersAllowedIn, usersNotAllowedIn) {
   return Q.resolve(true);
 
@@ -139,7 +138,7 @@ describe('room-service', function() {
     });
 
     it('should create a room for a repo ignoring the case', function(done) {
-      return persistence.Troupe.findOneAndRemoveQ({ lcuri: 'gitterhq/sandbox' })
+      return persistence.Troupe.findOneAndRemoveQ({ lcUri: 'gitterhq/sandbox' })
         .then(function() {
           var permissionsModelMock = mockito.mockFunction();
           var roomService = testRequire.withProxies("./services/room-service", {
@@ -166,7 +165,7 @@ describe('room-service', function() {
     });
 
   it('should redirect a user when a URI is in the wrong case and the room is to be created', function(done) {
-    return persistence.Troupe.findOneAndRemoveQ({ lcuri: 'gitterhq/sandbox' })
+    return persistence.Troupe.findOneAndRemoveQ({ lcUri: 'gitterhq/sandbox' })
       .then(function() {
         var permissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {

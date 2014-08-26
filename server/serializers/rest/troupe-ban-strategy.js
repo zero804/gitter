@@ -25,5 +25,9 @@ function TroupeBanStrategy(options) {
     };
   };
 }
+TroupeBanStrategy.prototype = {
+  name: 'TroupeBanStrategy'
+};
+
 
 module.exports = TroupeBanStrategy;

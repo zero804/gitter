@@ -7,9 +7,8 @@ var collections       = require("../../utils/collections");
 var UserStrategy      = require('./user-strategy');
 
 function UserIdStrategy(options) {
-  var self = this;
-
   var userStategy = new UserStrategy(options);
+  var usersIndexed;
 
   this.preload = function(ids, callback) {
     userService.findByIds(ids, function(err, users) {
@@ -18,16 +17,20 @@ function UserIdStrategy(options) {
         return callback(err);
       }
 
-      self.users = collections.indexById(users);
+      usersIndexed = collections.indexById(users);
       userStategy.preload(users, callback);
     });
   };
 
   this.map = function(id) {
-    var user = self.users[id];
+    var user = usersIndexed[id];
     return userStategy.map(user);
   };
 }
+
+UserIdStrategy.prototype = {
+  name: 'UserIdStrategy'
+};
 
 module.exports = UserIdStrategy;
 

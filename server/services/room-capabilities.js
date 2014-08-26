@@ -1,6 +1,6 @@
 "use strict";
 
-var leanTroupeDao = require('./daos/lean-troupe-dao');
+var leanTroupeDao = require('./daos/troupe-dao').lean;
 var billingService = require('./billing-service');
 var StatusError = require('statuserror');
 var moment = require('moment');
