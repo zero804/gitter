@@ -8,7 +8,7 @@ var UserTroupeFavouritesSchema = new Schema({
   userId: { type: ObjectId },
   favs: Schema.Types.Mixed
 });
-UserTroupeFavouritesSchema.index({ userId: 1 }); // Should be unique no?
+UserTroupeFavouritesSchema.index({ userId: 1 }, { unique: true }); // Should be unique no?
 UserTroupeFavouritesSchema.schemaTypeName = 'UserTroupeFavourites';
 
 module.exports = {
