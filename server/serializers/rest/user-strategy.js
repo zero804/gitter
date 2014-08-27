@@ -7,6 +7,7 @@ var Q                 = require("q");
 var winston           = require('../../utils/winston');
 var collections       = require("../../utils/collections");
 var GitHubRepoService = require('../../services/github/github-repo-service');
+var GithubContributorService = require('../../services/github/github-contributor-service');
 var execPreloads      = require('../exec-preloads');
 var getVersion        = require('../get-model-version');
 var billingService    = require('../../services/billing-service');
@@ -66,22 +67,25 @@ function UserRoleInTroupeStrategy(options) {
             var uri = troupe.uri;
             ownerLogin = uri.split('/')[0];
 
-            var repoService = new GitHubRepoService(user);
-            return repoService.getContributors(uri);
+            var contributorService = new GithubContributorService(user);
+            return contributorService.getContributors(uri)
+              .timeout(1000)
+              .catch(function(err) {
+                /* Github Repo failure. Die quietely */
+                winston.info('Contributor fetch failed: ' + err);
+                return [];
+              });
           });
         }
       })
-      .fail(function(err) {
-        /* Github Repo failure. Die quietely */
-        winston.error('UserRoleInTroupeStrategy unable to get contributors' + err, { exception: err });
-        return;
-      })
       .then(function(githubContributors) {
-        if(!githubContributors) return;
         contributors = {};
-        githubContributors.forEach(function(user) {
-          contributors[user.login] = 'contributor';
-        });
+
+        if(githubContributors) {
+          githubContributors.forEach(function(login) {
+            contributors[login] = 'contributor';
+          });
+        }
 
         // Temporary stop-gap solution until we can figure out
         // who the admins are
