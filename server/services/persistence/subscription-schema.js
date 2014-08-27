@@ -18,7 +18,9 @@ var SubscriptionSchema = new Schema({
 
 SubscriptionSchema.index({ userId: 1 }, { unique: false });
 SubscriptionSchema.index({ userId: 1, plan: 1 }, { unique: false });
+SubscriptionSchema.index({ userId: 1, subscriptionType: 1, status: 1 }, { unique: false });
 SubscriptionSchema.index({ lcUri: 1 }, { unique: true });
+
 SubscriptionSchema.schemaTypeName = 'SubscriptionSchema';
 
 module.exports = {

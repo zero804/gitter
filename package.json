@@ -48,7 +48,7 @@
     "restler-q": "0.0.3",
     "octonode": "^0.6.4",
     "jwt-simple": "~0.1.0",
-    "snappy-cache": "0.0.4",
+    "snappy-cache": "^0.1.1",
     "lazy.js": "~0.2.1",
     "parse-links": "~0.1.0",
     "troupe-passport-github": "git://github.com/troupe/passport-github.git#v0.1.8d",

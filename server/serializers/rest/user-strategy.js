@@ -1,20 +1,17 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var userService       = require("../../services/user-service");
 var troupeService     = require("../../services/troupe-service");
 var presenceService   = require("../../services/presence-service");
 var Q                 = require("q");
 var winston           = require('../../utils/winston');
 var collections       = require("../../utils/collections");
 var GitHubRepoService = require('../../services/github/github-repo-service');
+var GithubContributorService = require('../../services/github/github-contributor-service');
 var execPreloads      = require('../exec-preloads');
 var getVersion        = require('../get-model-version');
 var billingService    = require('../../services/billing-service');
-
-var env               = require('../../utils/env');
-var premiumDisabled   = env.config.get('premium:disabled');
-
+var leanUserDao       = require('../../services/daos/user-dao').lean;
 
 function UserPremiumStatusStrategy() {
   var usersWithPlans;
@@ -36,6 +33,9 @@ function UserPremiumStatusStrategy() {
     return usersWithPlans[userId];
   };
 }
+UserPremiumStatusStrategy.prototype = {
+  name: 'UserPremiumStatusStrategy'
+};
 
 function UserRoleInTroupeStrategy(options) {
   var contributors;
@@ -57,7 +57,7 @@ function UserRoleInTroupeStrategy(options) {
 
         if(options.currentUser) userPromise = Q.resolve(options.currentUser);
         if(options.currentUserId) {
-          userPromise = userService.findById(options.currentUserId);
+          userPromise = leanUserDao.findById(options.currentUserId);
         }
 
         if(userPromise) {
@@ -67,22 +67,25 @@ function UserRoleInTroupeStrategy(options) {
             var uri = troupe.uri;
             ownerLogin = uri.split('/')[0];
 
-            var repoService = new GitHubRepoService(user);
-            return repoService.getContributors(uri);
+            var contributorService = new GithubContributorService(user);
+            return contributorService.getContributors(uri)
+              .timeout(1000)
+              .catch(function(err) {
+                /* Github Repo failure. Die quietely */
+                winston.info('Contributor fetch failed: ' + err);
+                return [];
+              });
           });
         }
       })
-      .fail(function(err) {
-        /* Github Repo failure. Die quietely */
-        winston.error('UserRoleInTroupeStrategy unable to get contributors' + err, { exception: err });
-        return;
-      })
       .then(function(githubContributors) {
-        if(!githubContributors) return;
         contributors = {};
-        githubContributors.forEach(function(user) {
-          contributors[user.login] = 'contributor';
-        });
+
+        if(githubContributors) {
+          githubContributors.forEach(function(login) {
+            contributors[login] = 'contributor';
+          });
+        }
 
         // Temporary stop-gap solution until we can figure out
         // who the admins are
@@ -95,6 +98,9 @@ function UserRoleInTroupeStrategy(options) {
     return contributors && contributors[username];
   };
 }
+UserRoleInTroupeStrategy.prototype = {
+  name: 'UserRoleInTroupeStrategy'
+};
 
 function UserPresenceInTroupeStrategy(troupeId) {
   var onlineUsers;
@@ -111,6 +117,9 @@ function UserPresenceInTroupeStrategy(troupeId) {
     return !!onlineUsers[userId];
   };
 }
+UserPresenceInTroupeStrategy.prototype = {
+  name: 'UserPresenceInTroupeStrategy'
+};
 
 function setAvatarSize(url, size) {
   var sizeText;
@@ -187,6 +196,9 @@ function UserStrategy(options) {
     };
   };
 }
+UserStrategy.prototype = {
+  name: 'UserStrategy'
+};
 
 
 module.exports = UserStrategy;

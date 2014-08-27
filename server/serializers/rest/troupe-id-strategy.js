@@ -9,7 +9,7 @@ var TroupeStrategy    = require('./troupe-strategy');
 
 function TroupeIdStrategy(options) {
   var troupeStrategy = new TroupeStrategy(options);
-  var self = this;
+  var troupesIndexed;
 
   this.preload = function(ids, callback) {
     troupeService.findByIds(ids, function(err, troupes) {
@@ -17,7 +17,7 @@ function TroupeIdStrategy(options) {
         winston.error("Error loading troupes", { exception: err });
         return callback(err);
       }
-      self.troupes = collections.indexById(troupes);
+      troupesIndexed = collections.indexById(troupes);
 
       execPreloads([{
         strategy: troupeStrategy,
@@ -28,7 +28,7 @@ function TroupeIdStrategy(options) {
   };
 
   this.map = function(troupeId) {
-    var troupe = self.troupes[troupeId];
+    var troupe = troupesIndexed[troupeId];
     if(!troupe) {
       winston.warn("Unable to locate troupeId ", { troupeId: troupeId });
       return null;
@@ -38,6 +38,10 @@ function TroupeIdStrategy(options) {
   };
 
 }
+TroupeIdStrategy.prototype = {
+  name: 'TroupeIdStrategy'
+};
+
 
 
 module.exports = TroupeIdStrategy;
