@@ -16,7 +16,7 @@ module.exports = {
       case 'REPO':
         var repoUri = _uri[0] + '/' + _uri[1];
         var ghRepo = new RepoService(req.user);
-        return ghRepo.getContributors(repoUri)
+        return ghRepo.getCollaborators(repoUri)
         .then(function(contributors) {
           var filtered = contributors.filter(function(c) { return c.login !== req.user.username; });
           return res.send(filtered);
