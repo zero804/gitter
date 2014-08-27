@@ -14,20 +14,9 @@
   </head>
   <body class='hover'>
     {{#if stagingText}}
-      <div class="staging-indicator" style="
-        position: fixed;
-        left: 50%;
-        top: 0;
-        padding: 2px 10px;
-        background-color: #1dce73;
-        border-radius: 0 0 4px 4px;
-        z-index: 100000;
-        color: white;
-        font-family: 'open sans';
-        font-size: 10px;
-        text-align: center;" >
+      <div class="staging-indicator">
         {{#if stagingLink}}
-          <a style="text-decoration: none; color:white" href="{{stagingLink}}" target="_new">{{stagingText}}</a>
+          <a href="{{stagingLink}}" target="_blank">{{stagingText}}</a>
         {{else}}
           {{stagingText}}
         {{/if}}
