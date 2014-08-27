@@ -34,6 +34,10 @@ function AllUnreadItemCountStategy(options) {
   };
 }
 
+AllUnreadItemCountStategy.prototype = {
+  name: 'AllUnreadItemCountStategy'
+};
+
 /**
  *
  */
@@ -53,25 +57,30 @@ function TroupeMentionCountStategy(options) {
     return self.mentionCounts[id] ? self.mentionCounts[id] : 0;
   };
 }
-
+TroupeMentionCountStategy.prototype = {
+  name: 'TroupeMentionCountStategy'
+};
 
 function LastTroupeAccessTimesForUserStrategy(options) {
-  var self = this;
   var userId = options.userId || options.currentUserId;
+  var timesIndexed;
 
   this.preload = function(data, callback) {
     recentRoomService.getTroupeLastAccessTimesForUser(userId, function(err, times) {
       if(err) return callback(err);
-      self.times = times;
+      timesIndexed = times;
       callback();
     });
   };
 
   this.map = function(id) {
     // No idea why, but sometimes these dates are converted to JSON as {}, hence the weirdness below
-    return self.times[id] ? new Date(self.times[id].valueOf()).toISOString() : undefined;
+    return timesIndexed[id] ? new Date(timesIndexed[id].valueOf()).toISOString() : undefined;
   };
 }
+LastTroupeAccessTimesForUserStrategy.prototype = {
+  name: 'LastTroupeAccessTimesForUserStrategy'
+};
 
 function FavouriteTroupesForUserStrategy(options) {
   var self = this;
@@ -92,6 +101,9 @@ function FavouriteTroupesForUserStrategy(options) {
     return favs;
   };
 }
+FavouriteTroupesForUserStrategy.prototype = {
+  name: 'FavouriteTroupesForUserStrategy'
+};
 
 function LurkTroupeForUserStrategy(options) {
   var currentUserId = options.currentUserId;
@@ -112,16 +124,20 @@ function LurkTroupeForUserStrategy(options) {
     return false;
   };
 }
+LurkTroupeForUserStrategy.prototype = {
+  name: 'LurkTroupeForUserStrategy'
+};
+
 
 function RoomPlanStrategy() {
   var premium = {};
-  
+
   var getOrgOrUserFromURI = function (uri) {
     return uri.split('/', 1).shift();
   };
-  
+
   this.preload = function (troupes, callback) {
-    
+
     var uris = troupes.map(function(troupe) {
       if(!troupe.uri) return; // one-to-one
       return getOrgOrUserFromURI(troupe.uri);
@@ -130,7 +146,7 @@ function RoomPlanStrategy() {
     });
 
     uris = _.uniq(uris);
-    
+
     return billingService.findActivePlans(uris)
       .then(function(subscriptions) {
         subscriptions.forEach(function(subscription) {
@@ -144,10 +160,13 @@ function RoomPlanStrategy() {
 
   this.map = function(troupe) {
     if (!troupe || !troupe.uri) return undefined;
-    var orgOrUser = getOrgOrUserFromURI(troupe.uri); 
+    var orgOrUser = getOrgOrUserFromURI(troupe.uri);
     return premium[orgOrUser];
   };
 }
+RoomPlanStrategy.prototype = {
+  name: 'RoomPlanStrategy'
+};
 
 function TroupeStrategy(options) {
   if(!options) options = {};
@@ -233,15 +252,15 @@ function TroupeStrategy(options) {
       }
     }
   }
-  
+
   var shownWarning = false;
-  
+
   this.map = function(item) {
 
     var troupeName, troupeUrl, otherUser, plan;
 
     plan = roomPlanStrategy.map(item);
-    
+
     if(item.oneToOne) {
       if(currentUserId) {
         otherUser =  mapOtherUser(item.users);
@@ -292,5 +311,9 @@ function TroupeStrategy(options) {
     };
   };
 }
+
+TroupeStrategy.prototype = {
+  name: 'TroupeStrategy'
+};
 
 module.exports = TroupeStrategy;

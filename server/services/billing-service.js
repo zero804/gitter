@@ -16,7 +16,7 @@ exports.findActivePersonalPlansForUsers = function(userIds) {
     subscriptionType: 'USER',
     status: 'CURRENT'
   });
-}
+};
 
 exports.findActiveOrgPlans = function(orgUris) {
   if(!orgUris || !orgUris.length) return Q.resolve([]);
@@ -26,7 +26,7 @@ exports.findActiveOrgPlans = function(orgUris) {
     subscriptionType: 'ORG',
     status: 'CURRENT'
   });
-}
+};
 
 exports.findActivePlan = function(uri) {
   var lcUri = toLowerCase(uri);
@@ -36,7 +36,7 @@ exports.findActivePlan = function(uri) {
     status: 'CURRENT'
   });
 
-}
+};
 
 exports.findActivePlans = function(uris) {
   if(!uris || !uris.length) return Q.resolve([]);

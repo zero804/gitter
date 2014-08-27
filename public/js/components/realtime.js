@@ -165,8 +165,11 @@ define([
       if(startTime) {
         delete subscribeTimers[message.subscription];
         var totalTime = Date.now() - startTime;
-        appEvents.trigger('stats.time', 'faye.subscribe.time', totalTime);
+
         if(totalTime > 400) {
+          var lastPart = message.subscription.split(/\//).pop();
+          appEvents.trigger('stats.time', 'faye.subscribe.time.' + lastPart, totalTime);
+
           log('Subscription to ' + message.subscription + ' took ' + totalTime + 'ms');
         }
       }

@@ -5,6 +5,7 @@ var SnappyCache = require('snappy-cache');
 var Q = require('q');
 var redis = require('../../utils/redis');
 var config = require('../../utils/config');
+var _ = require('underscore');
 
 function getKeys(method, contextValues, args) {
   var arr = [method]
@@ -16,10 +17,15 @@ function getKeys(method, contextValues, args) {
           .join(':');
 }
 
-function wrap(service, contextFunction) {
+function wrap(service, contextFunction, options) {
   if(!config.get('github:caching')) return service;
+  if(!options) options = {};
 
-  var sc = new SnappyCache({ prefix: 'sc:', redis: redis.getClient(), ttl: 120 });
+  var sc = new SnappyCache(_.defaults(options, {
+    prefix: 'sc:',
+    redis: redis.getClient(),
+    ttl: config.get('github:cache-timeout')
+  }));
 
   Object.keys(service.prototype).forEach(function(value) {
     var v = service.prototype[value];
