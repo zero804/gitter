@@ -1101,9 +1101,9 @@
       }
     },
     "gitter-env": {
-      "version": "0.10.1",
-      "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.10.1",
-      "resolved": "git+ssh://git@github.com:gitterHQ/gitter-env.git#3e9f913917d1c43705ffa3e5145f8474eb4f4656",
+      "version": "0.11.0",
+      "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.11.0",
+      "resolved": "git+ssh://git@github.com:gitterHQ/gitter-env.git#825c32d45640328f1b6e7615914ff0a89dd5a5db",
       "dependencies": {
         "async": {
           "version": "0.8.0",
@@ -1150,9 +1150,9 @@
           "resolved": "https://registry.npmjs.org/redis/-/redis-0.10.3.tgz"
         },
         "underscore": {
-          "version": "1.6.0",
+          "version": "1.7.0",
           "from": "underscore@^1.6.0",
-          "resolved": "https://registry.npmjs.org/underscore/-/underscore-1.6.0.tgz"
+          "resolved": "https://registry.npmjs.org/underscore/-/underscore-1.7.0.tgz"
         },
         "clockout": {
           "version": "0.0.1",
