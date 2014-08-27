@@ -36,7 +36,7 @@ define([
         tooltip = 'Only invited users can join';
         break;
       default:
-        tooltip = 'Only invited users can join';
+        tooltip = troupe.get('oneToOne') ? 'This chat is just between you two' : 'Only invited users can join';
     }
   
     return tooltip;
