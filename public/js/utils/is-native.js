@@ -3,6 +3,6 @@ define([], function() {
   return function(userAgentString) {
     var stringToTest = userAgentString || navigator.userAgent;
 
-    return stringToTest.toLowerCase().indexOf('gitter/') >= 0;
+    return stringToTest.toLowerCase().indexOf('gitter') >= 0;
   };
 });
