@@ -109,8 +109,9 @@ var FIXTURES = [{
           { right: 'view',    expectedResult: true  } // Edge case: we know the room is public, allow access
         ]
       }]
-    },{
-      name: 'in private user repos',
+    },
+    {
+      name: 'in private user repos (from early adopters)',
       meta: {
         security: 'PRIVATE'
       },
@@ -118,6 +119,7 @@ var FIXTURES = [{
         name: 'with push access',
         meta: {
           repo: { private: true, permissions: { push: true }, owner: { login: USERNAME, type: 'User' } },
+          ownerIsEarlyAdopter: true,
           expectedResult: true // Users with push access have full rights
         },
         tests: [
@@ -131,6 +133,7 @@ var FIXTURES = [{
         name: 'with no permissions',
         meta: {
           repo: { private: true, owner: { login: USERNAME, type: 'User' }  },
+          ownerIsEarlyAdopter: true,
           expectedResult: false
         },
         tests: [
@@ -141,7 +144,46 @@ var FIXTURES = [{
           { right: 'view',    expectedResult: true  }
         ]
       }]
-    }]
+    },
+    {
+      name: 'in private user repos',
+      meta: {
+        security: 'PRIVATE'
+      },
+      tests: [{
+        name: 'with push access',
+        meta: {
+          repo: { private: true, permissions: { push: true }, owner: { login: USERNAME, type: 'User' } },
+          ownerIsEarlyAdopter: false,
+          expectedResult: true // Users with push access have full rights
+        },
+        tests: [
+          { right: 'create',  expectedResult: 'throw', expectedErrStatus: 402 },
+          { right: 'join',    expectedResult: 'throw', expectedErrStatus: 402 },
+          { right: 'admin',   expectedResult: true },
+          { right: 'adduser', expectedResult: true },
+          { right: 'view',    expectedResult: 'throw', expectedErrStatus: 402 }
+        ]
+      }, {
+        name: 'with no permissions',
+        meta: {
+          repo: { private: true, owner: { login: USERNAME, type: 'User' }  },
+          ownerIsEarlyAdopter: false,
+          expectedResult: false
+        },
+        tests: [
+          { right: 'create',  expectedResult: false },
+          { right: 'join',    expectedResult: 'throw', expectedErrStatus: 402},
+          { right: 'admin',   expectedResult: false },
+          { right: 'adduser', expectedResult: true },
+          { right: 'view',    expectedResult: 'throw', expectedErrStatus: 402}
+        ]
+      }]
+    }
+
+
+
+]
   }, {
     name: 'premium users',
     meta: {
@@ -222,8 +264,10 @@ var FIXTURES = [{
       meta: {
         premiumOrg: false
       },
-      tests: [{
-        name: 'in private repos',
+      tests: [
+
+        {
+        name: 'in private repos (early adopters)',
         meta: {
           security: 'PRIVATE'
         },
@@ -231,6 +275,7 @@ var FIXTURES = [{
           name: 'with push access',
           meta: {
             repo: { private: true, permissions: { push: true }, owner: { login: ORG, type: 'Organization' } },
+            ownerIsEarlyAdopter: true
           },
           tests: [
             { right: 'create',  expectedResult: 'throw', expectedErrStatus: 402  }, // Cannot create a private room in a free org
@@ -243,6 +288,7 @@ var FIXTURES = [{
           name: 'with no permissions',
           meta: {
             repo: { private: true, owner: { type: 'Organization', login: ORG } },
+            ownerIsEarlyAdopter: true
           },
           tests: [
             { right: 'create',  expectedResult: false },
@@ -252,9 +298,58 @@ var FIXTURES = [{
             { right: 'view',    expectedResult: true  }
           ]
         }]
-      }]
+      },
+
+        {
+        name: 'in private repos',
+        meta: {
+          security: 'PRIVATE'
+        },
+        tests: [{
+          name: 'with push access',
+          meta: {
+            repo: { private: true, permissions: { push: true }, owner: { login: ORG, type: 'Organization' } },
+            ownerIsEarlyAdopter: false
+          },
+          tests: [
+            { right: 'create',  expectedResult: 'throw', expectedErrStatus: 402  }, // Cannot create a private room in a free org
+            { right: 'join',    expectedResult: 'throw', expectedErrStatus: 402  },
+            { right: 'admin',   expectedResult: true  },
+            { right: 'adduser', expectedResult: true  },
+            { right: 'view',    expectedResult: 'throw', expectedErrStatus: 402  }
+          ]
+        }, {
+          name: 'with no permissions',
+          meta: {
+            repo: { private: true, owner: { type: 'Organization', login: ORG } },
+            ownerIsEarlyAdopter: false
+          },
+          tests: [
+            { right: 'create',  expectedResult: false },
+            { right: 'join',    expectedResult: 'throw', expectedErrStatus: 402  },
+            { right: 'admin',   expectedResult: false },
+            { right: 'adduser', expectedResult: true  },
+            { right: 'view',    expectedResult: 'throw', expectedErrStatus: 402  },
+          ]
+        }]
+      }
+
+
+      ]
     }]
   }]
+}, {
+  name: 'security has changed to private (early adopter)',
+  meta: {
+    repo: { private: true, owner: { type: 'Organization', login: ORG } },
+    security: 'PUBLIC',
+    user: true,
+    premiumOrg: false,
+    premiumUser: false,
+    right: 'join',
+    ownerIsEarlyAdopter: true,
+    expectedResult: true
+  }
 }, {
   name: 'security has changed to private',
   meta: {
@@ -264,8 +359,11 @@ var FIXTURES = [{
     premiumOrg: false,
     premiumUser: false,
     right: 'join',
-    expectedResult: true
+    ownerIsEarlyAdopter: false,
+    expectedResult: 'throw',
+    expectedErrStatus: 402
   }
+
 }, {
   name: 'security has changed to public',
   meta: {
@@ -305,6 +403,7 @@ describe('repo-permissions', function() {
       var permissionsModel;
       var getRepoMethodMock = mockito.mockFunction();
       var premiumOrThrowMock = mockito.mockFunction();
+      var ownerIsEarlyAdopterMock = mockito.mockFunction();
 
       ORG = 'ORG';
       URI = 'ORG/REPO';
@@ -312,7 +411,8 @@ describe('repo-permissions', function() {
 
       permissionsModel = testRequire.withProxies("./services/permissions/repo-permissions-model", {
         '../github/github-repo-service': createMockGitHubRepoService(getRepoMethodMock),
-        './premium-or-throw': premiumOrThrowMock
+        './premium-or-throw': premiumOrThrowMock,
+        '../owner-is-early-adopter': ownerIsEarlyAdopterMock
       });
 
       mockito.when(premiumOrThrowMock)().then(function(uri, callback) {
@@ -338,6 +438,11 @@ describe('repo-permissions', function() {
       mockito.when(getRepoMethodMock)().then(function(uri) {
         assert.equal(uri, URI);
         return Q.resolve(meta.repo);
+      });
+
+      mockito.when(ownerIsEarlyAdopterMock)().then(function(uri) {
+        assert(uri, URI);
+        return Q.resolve(!!meta.ownerIsEarlyAdopter);
       });
 
       permissionsModel(USER, RIGHT, URI, SECURITY)
