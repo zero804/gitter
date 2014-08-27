@@ -288,7 +288,7 @@ function TroupeStrategy(options) {
     }
 
     return {
-      id: item.id,
+      id: item.id || item._id,
       name: troupeName,
       topic: item.topic,
       uri: item.uri,
