@@ -176,50 +176,7 @@ var FIXTURES = [{
           { right: 'view',    expectedResult: 'throw', expectedErrStatus: 402}
         ]
       }]
-    }, {
-      name: 'test github api call failure',
-      meta: {
-        githubApiCallFailure: true,
-      },
-      tests: [
-        {
-          right: 'create',
-          expectedResult: 'throw'
-        },
-        {
-          right: 'admin',
-          expectedResult: false
-        },
-        {
-          right: 'adduser',
-          expectedResult: 'throw'
-        },
-        {
-          right: 'view',
-          expectedResult: 'throw',
-          security: 'PRIVATE',
-          userIsInRoom: false
-        },
-        {
-          right: 'join',
-          expectedResult: 'throw',
-          security: 'PRIVATE',
-          userIsInRoom: false
-        },
-        {
-          right: 'view',
-          expectedResult: true,
-          security: 'PUBLIC',
-        },
-        {
-          right: 'join',
-          expectedResult: true,
-          security: 'PUBLIC'
-        }
-
-      ]
-    }
-]
+    }]
   }, {
     name: 'premium users',
     meta: {
@@ -422,6 +379,60 @@ var FIXTURES = [{
     right: 'create',
     expectedResult: false
   }
+},{
+  name: 'test github api call failure',
+  meta: {
+    premiumOrg: false,
+    premiumUser: false,
+    githubApiCallFailure: true,
+    user: true,
+  },
+  tests: [
+    {
+      right: 'create',
+      security: 'PUBLIC',
+      expectedResult: 'throw'
+    },
+    {
+      right: 'admin',
+      security: 'PUBLIC',
+      expectedResult: false
+    },
+    {
+      right: 'adduser',
+      security: 'PUBLIC',
+      expectedResult: 'throw'
+    },
+    {
+      name: 'user is in private room',
+      meta: {
+        userIsInRoom: true,
+        security: 'PRIVATE',
+        expectedResult: true,
+      },
+      tests: [{ right: 'view' }, { right: 'join' }]
+    },
+    {
+      name: 'user is not in private room',
+      meta: {
+        userIsInRoom: false,
+        security: 'PRIVATE',
+        expectedResult: false,
+      },
+      tests: [{ right: 'view' }, { right: 'join' }]
+    },
+    {
+      right: 'view',
+      expectedResult: true,
+      security: 'PUBLIC',
+    },
+    {
+      right: 'join',
+      expectedResult: true,
+      security: 'PUBLIC'
+    }
+
+  ]
 }];
 
 describe('repo-permissions', function() {
@@ -456,11 +467,8 @@ describe('repo-permissions', function() {
       });
 
       mockito.when(userIsInRoomMock)().then(function(uri, user) {
-        if(USER_IS_IN_ROOM === true) {
-          Q.resolve(true);
-        }
-        if(USER_IS_IN_ROOM === false) {
-          Q.resolve(false);
+        if(USER_IS_IN_ROOM === true || USER_IS_IN_ROOM === false) {
+          return Q.resolve(USER_IS_IN_ROOM);
         }
 
         assert(false, 'Unexpected call to userIsInRoom: ' + uri + ', ' + user);
@@ -508,7 +516,7 @@ describe('repo-permissions', function() {
           if(EXPECTED !== 'throw') {
             assert.strictEqual(result, EXPECTED);
           } else {
-            assert(false, 'Expected the permission model to throw an exception');
+            assert(false, 'Expected the permission model to throw an exception, instead got ' + result);
           }
         }, function(err) {
           if(EXPECTED !== 'throw') throw err;
