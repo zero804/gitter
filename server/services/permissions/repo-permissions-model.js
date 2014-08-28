@@ -7,6 +7,8 @@ var Q                    = require('q');
 var premiumOrThrow       = require('./premium-or-throw');
 var appEvents            = require('../../app-events');
 var userIsInRoom         = require('../user-in-room');
+var ownerIsEarlyAdopter  = require('../owner-is-early-adopter');
+
 
 function githubFailurePermissionsModel(user, right, uri, security) {
   if(right === 'admin') {
@@ -22,6 +24,15 @@ function githubFailurePermissionsModel(user, right, uri, security) {
 
   // Private room? Let the user in if they're already in the room.
   if(security === 'PRIVATE') return userIsInRoom(uri, user);
+
+  //if(security === 'PRIVATE') return userIsInRoom(uri, user).then(function(inRoom) {
+  //  if (!inRoom) return Q.resolve(false);
+  //  return ownerIsEarlyAdopter(uri).then(function(isEarlyAdopter) {
+  //    if (isEarlyAdopter) return Q.resolve(true);
+  //    var owner = uri.split('/')[0];
+  //    return premiumOrThrow(owner);
+  //  });
+  //});
 
   return Q.reject(new Error("Unable to process permissions offline"));
 }
@@ -70,10 +81,20 @@ module.exports = function repoPermissionsModel(user, right, uri, security, optio
 
       var perms = repoInfo.permissions;
       var isAdmin = perms && (perms.push || perms.admin);
+      
 
       switch(right) {
         case 'view':
         case 'join':
+          if(!repoInfo.private) return true;
+
+          return ownerIsEarlyAdopter(uri).then(function(isEarlyAdopter) {
+            if (isEarlyAdopter) return Q.resolve(true);
+            return premiumOrThrow(repoInfo.owner.login);
+          });
+
+          break;
+
         case 'adduser':
           return true;
 
