@@ -17,6 +17,7 @@ module.exports = {
 
           // when the viewer is not logged in:
           res.render('homepage', {
+            billingBaseUrl: nconf.get('web:billingBaseUrl')
           });
         });
 
