@@ -55,9 +55,9 @@ var FIXTURES = [{
           { name: 'allow create of a public channel',
             security: 'PUBLIC', expectedResult: true },
           { name: 'deny create of a private channel for free user',
-            security: 'PRIVATE', expectedResult: 'throw', expectedErrStatus: 402, premiumUser: false },
+            security: 'PRIVATE', expectedResult: 'throw', expectedErrStatus: 402, premiumOwner: false },
           { name: 'allow create of a private channel for premium user',
-            security: 'PRIVATE', expectedResult: true, premiumUser: true },
+            security: 'PRIVATE', expectedResult: true, premiumOwner: true },
         ]
       }
     ]
@@ -76,10 +76,20 @@ var FIXTURES = [{
         security: 'PRIVATE'
       },
       tests: [
-        { userIsInRoom: true, expectedResult: true,
-          tests: [ { right: 'join' }, { right: 'view' }] },
-        { userIsInRoom: false, expectedResult: false,
-          tests: [ { right: 'join' }, { right: 'view' }] }
+
+        { userIsInRoom: true, ownerIsEarlyAdopter: true, premiumOwner: true, expectedResult: true,
+          tests: [{ right: 'view' }, { right: 'join' }] },
+        { userIsInRoom: true, ownerIsEarlyAdopter: true, premiumOwner: false, expectedResult: true,
+          tests: [{ right: 'view' }, { right: 'join' }] },
+        { userIsInRoom: true, ownerIsEarlyAdopter: false, premiumOwner: true, expectedResult: true,
+          tests: [{ right: 'view' }, { right: 'join' }] },
+
+        { userIsInRoom: true, ownerIsEarlyAdopter: false, premiumOwner: false, expectedResult: 'throw', expectedErrStatus: 402,
+          tests: [{ right: 'view' }, { right: 'join' }] },
+
+        { userIsInRoom: false, ownerIsEarlyAdopter: false, premiumOwner: false, expectedResult: false,
+          tests: [{ right: 'view' }, { right: 'join' }] },
+
       ]
     }]
   }, {
@@ -126,29 +136,32 @@ describe('user-channel-permissions', function() {
 
       var premiumOrThrowMock = mockito.mockFunction();
       var userIsInRoomMock = mockito.mockFunction();
+      var ownerIsEarlyAdopterMock = mockito.mockFunction();
+
 
       var permissionsModel = testRequire.withProxies("./services/permissions/user-channel-permissions-model", {
         './premium-or-throw': premiumOrThrowMock,
-        '../user-in-room': userIsInRoomMock
+        '../user-in-room': userIsInRoomMock,
+        '../owner-is-early-adopter': ownerIsEarlyAdopterMock
       });
 
-      mockito.when(premiumOrThrowMock)().then(function(uri) {
+      mockito.when(premiumOrThrowMock)().then(function() {
         return Q.fcall(function() {
-          if(USER && uri === USER.username) {
-            if(meta.premiumUser) return true;
-
-            throw new StatusError(402, 'Fail');
-          }
-
-          assert(false, 'Unknown uri ' + uri);
+          if (meta.premiumOwner) return true;
+          throw new StatusError(402, 'Fail');
         });
 
       });
 
       mockito.when(userIsInRoomMock)().then(function(uri, user) {
-        assert(uri, URI);
-        assert(user, USER);
+        assert.strictEqual(uri, URI);
+        assert.strictEqual(user, USER);
         return Q.resolve(!!meta.userIsInRoom);
+      });
+
+      mockito.when(ownerIsEarlyAdopterMock)().then(function(uri) {
+        assert.strictEqual(uri, URI);
+        return Q.resolve(!!meta.ownerIsEarlyAdopter);
       });
 
       permissionsModel(USER, RIGHT, URI, SECURITY)

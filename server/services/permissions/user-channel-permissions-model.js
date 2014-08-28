@@ -1,9 +1,10 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var Q                    = require('q');
-var userIsInRoom         = require('../user-in-room');
-var premiumOrThrow       = require('./premium-or-throw');
+var Q                     = require('q');
+var userIsInRoom          = require('../user-in-room');
+var premiumOrThrow        = require('./premium-or-throw');
+var ownerIsEarlyAdopter   = require('../owner-is-early-adopter');
 
 var ALLOWED_USER_CHANNEL_SECURITY_VALUES = {
   PRIVATE: 1,
@@ -28,13 +29,23 @@ module.exports = function userChannelPermissionsModel(user, right, uri, security
 
   var userUri = uri.split('/').slice(0, -1).join('/');
 
+
   switch(right) {
     case 'join':
+
     case 'view':
       switch(security) {
         case 'PUBLIC': return Q.resolve(true);
         case 'PRIVATE':
-          return userIsInRoom(uri, user);
+          return userIsInRoom(uri, user).then(function(inRoom) {
+            if (!inRoom) return Q.resolve(false);
+
+            return ownerIsEarlyAdopter(uri).then(function(isEarlyAdopter) {
+              if (isEarlyAdopter) return Q.resolve(true);
+              return premiumOrThrow(userUri);
+            });
+          })
+
         /* No inherited security for user channels */
         default:
           throw 'Unknown security: ' + security;

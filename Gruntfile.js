@@ -134,7 +134,7 @@ var LESS_ROOTS = [
   { name: "trpAppsPage"                        },
   { name: "generic-layout"                     },
   { name: "trpHooks"                           },
-  { name: "gitter-login"                       },
+  { name: "login"                              },
 
   // Bootscript root less files
   { name: 'homepage'                           },

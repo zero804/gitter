@@ -133,7 +133,6 @@ function renderChat(req, res, options, next) {
 
       if (!user) classNames.push("logged-out");
       
-      // var avatarUrl = "https://avatars.githubusercontent.com/" + ((troupeContext.troupe.oneToOne) ? troupeContext.troupe.name : troupe.uri.split('/')[0]);
       var isPrivate = troupe.security !== "PUBLIC";
 
       var renderOptions = _.extend({

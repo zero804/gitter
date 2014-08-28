@@ -26,6 +26,7 @@ module.exports = function orgPermissionsModel(user, right, uri, security, option
     .catch(function(err) {
       if(err.errno && err.syscall || err.statusCode >= 500) {
         logger.error('GitHub member call failed: ' + err, { exception: err });
+
         // GitHub call failed and may be down.
         // We can fall back to whether the user is already in the room
         return userIsInRoom(uri, user);
