@@ -115,7 +115,7 @@ module.exports = function repoPermissionsModel(user, right, uri, security, optio
 
     })
     .catch(function(err) {
-      if(err.errno && err.syscall || err.status >= 500) {
+      if(err.errno && err.syscall || err.statusCode >= 500) {
         winston.error('An error occurred processing repo-permissions: ' + err, { exception: err });
         // GitHub call failed and may be down.
         // We can fall back to whether the user is already in the room

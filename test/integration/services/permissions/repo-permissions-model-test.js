@@ -490,7 +490,9 @@ describe('repo-permissions', function() {
         assert.strictEqual(uri, URI);
 
         if(GITHUB_API_CALL_FAILURE) {
-          return Q.reject(new StatusError(502, 'Github is down'));
+          var e = new Error('Github is down');
+          e.statusCode = 502;
+          return Q.reject(e);
         }
 
         return Q.resolve(meta.repo);
