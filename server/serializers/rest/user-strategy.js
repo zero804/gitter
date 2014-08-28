@@ -6,12 +6,11 @@ var presenceService   = require("../../services/presence-service");
 var Q                 = require("q");
 var winston           = require('../../utils/winston');
 var collections       = require("../../utils/collections");
-var GitHubRepoService = require('../../services/github/github-repo-service');
 var GithubContributorService = require('../../services/github/github-contributor-service');
 var execPreloads      = require('../exec-preloads');
 var getVersion        = require('../get-model-version');
 var billingService    = require('../../services/billing-service');
-var leanUserDao       = require('../../services/daos/user-dao').lean;
+var leanUserDao       = require('../../services/daos/user-dao').full;
 
 function UserPremiumStatusStrategy() {
   var usersWithPlans;
