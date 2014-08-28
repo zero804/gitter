@@ -1,6 +1,3 @@
-
-/*jslint node:true, unused:true*/
-/*global describe:true, it:true, beforeEach */
 "use strict";
 
 var testRequire = require('../../test-require');
@@ -436,12 +433,12 @@ describe('repo-permissions', function() {
       });
 
       mockito.when(getRepoMethodMock)().then(function(uri) {
-        assert.equal(uri, URI);
+        assert.strictEqual(uri, URI);
         return Q.resolve(meta.repo);
       });
 
       mockito.when(ownerIsEarlyAdopterMock)().then(function(uri) {
-        assert(uri, URI);
+        assert.strictEqual(uri, URI);
         return Q.resolve(!!meta.ownerIsEarlyAdopter);
       });
 

@@ -145,7 +145,7 @@ describe('user-channel-permissions', function() {
         '../owner-is-early-adopter': ownerIsEarlyAdopterMock
       });
 
-      mockito.when(premiumOrThrowMock)().then(function(uri) {
+      mockito.when(premiumOrThrowMock)().then(function() {
         return Q.fcall(function() {
           if (meta.premiumOwner) return true;
           throw new StatusError(402, 'Fail');
@@ -154,13 +154,13 @@ describe('user-channel-permissions', function() {
       });
 
       mockito.when(userIsInRoomMock)().then(function(uri, user) {
-        assert(uri, URI);
-        assert(user, USER);
+        assert.strictEqual(uri, URI);
+        assert.strictEqual(user, USER);
         return Q.resolve(!!meta.userIsInRoom);
       });
 
       mockito.when(ownerIsEarlyAdopterMock)().then(function(uri) {
-        assert(uri, URI);
+        assert.strictEqual(uri, URI);
         return Q.resolve(!!meta.ownerIsEarlyAdopter);
       });
 
