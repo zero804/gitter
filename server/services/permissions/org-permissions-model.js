@@ -24,7 +24,7 @@ module.exports = function orgPermissionsModel(user, right, uri, security, option
   var ghOrg = new GitHubOrgService(options.githubTokenUser || user);
   return ghOrg.member(uri, user.username)
     .catch(function(err) {
-      if(err.errno && err.syscall || err.status >= 500) {
+      if(err.errno && err.syscall || err.statusCode >= 500) {
         logger.error('GitHub member call failed: ' + err, { exception: err });
         // GitHub call failed and may be down.
         // We can fall back to whether the user is already in the room
