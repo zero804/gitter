@@ -15,6 +15,7 @@ function GitHubOrgServiceMocker() {
 
 var permissionsModel;
 var orgMemberMethodMock;
+var userIsInRoomMock;
 var URI;
 var SECURITY;
 
@@ -45,6 +46,27 @@ var FIXTURES = [{
     expectedResult: false
   },
   tests: ALL_RIGHTS_TESTS
+}, {
+  name: 'Github API failure',
+  meta: {
+    user: true,
+    githubApiCallFailure: true
+  },
+  tests: [{
+    name: 'user is in room',
+    meta: {
+      expectedResult: true,
+      userIsInRoom: true
+    },
+    tests: ALL_RIGHTS_TESTS
+  }, {
+    name: 'user is not in room',
+    meta: {
+      expectedResult: 'throw',
+      userIsInRoom: false
+    },
+    tests: ALL_RIGHTS_TESTS
+  }]
 }];
 
 describe('org room permissions', function() {
@@ -53,9 +75,11 @@ describe('org room permissions', function() {
     SECURITY = null;
 
     orgMemberMethodMock = mockito.mockFunction();
+    userIsInRoomMock = mockito.mockFunction();
 
     permissionsModel = testRequire.withProxies("./services/permissions/org-permissions-model", {
       '../github/github-org-service': GitHubOrgServiceMocker,
+      '../user-in-room': userIsInRoomMock
     });
   });
 
@@ -63,15 +87,44 @@ describe('org room permissions', function() {
     var RIGHT = meta.right;
     var USER = meta.user ? { username: 'gitterbob' } : null;
     var EXPECTED = meta.expectedResult;
+    var GITHUB_API_CALL_FAILURE = meta.githubApiCallFailure;
+    var USER_IS_IN_ROOM = meta.userIsInRoom;
 
     it('should ' + (EXPECTED ? 'allow' : 'deny') + ' ' + RIGHT, function(done) {
+      mockito.when(userIsInRoomMock)()
+        .then(function(uri, user) {
+
+          if(USER_IS_IN_ROOM === true || USER_IS_IN_ROOM === false) {
+            return Q.resolve(USER_IS_IN_ROOM);
+          }
+
+          assert(false, 'Unexpected call to userIsInRoom: ' + uri + ', ' + user);
+        });
+
       mockito.when(orgMemberMethodMock)().then(function() {
+        if(GITHUB_API_CALL_FAILURE) {
+          var e = new Error('Github is down');
+          e.statusCode = 502;
+          return Q.reject(e);
+        }
+
         return Q.resolve(!!meta.org);
       });
 
       permissionsModel(USER, RIGHT, URI, SECURITY)
         .then(function(result) {
+          if(EXPECTED === 'throw') {
+            assert(false, 'Expected permissions model to throw an error');
+          }
+
           assert.strictEqual(result, EXPECTED);
+        })
+        .fail(function(err) {
+          if(EXPECTED !== 'throw') {
+            throw err;
+          }
+
+          // Expected a throw. All is good.
         })
         .nodeify(done);
     });
