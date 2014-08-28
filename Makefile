@@ -18,8 +18,6 @@ else
 CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/ public/styles/ public-compile-cache/)
 endif
 
-PUBLIC_EXCLUDING_JS := $(shell ls -d public/*|grep -v ^public/js$)
-
 .PHONY: clean test perf-test-xunit perf-test test-xunit test-in-browser test-in-browser-xunit test-coverage prepare-for-end-to-end-testing end-to-end-test
 
 clean:
@@ -171,8 +169,8 @@ grunt: clean
 	mkdir output
 	mkdir -p public-processed/js
 	grunt -no-color css
-	for i in $(PUBLIC_EXCLUDING_JS); \
-		do cp -R $$i public-processed/; \
+	for i in $$(ls -d public/*|grep -v ^public/js); do \
+		cp -vR $$i public-processed/; \
 	done
 	if [ -d public-compile-cache/js/ ] && [ -n $$(find public-compile-cache/js/ -maxdepth 1 -type f -name '*' -print -quit) ]; then cp public-compile-cache/js/* public-processed/js/; fi
 	./build-scripts/copy-templates.sh

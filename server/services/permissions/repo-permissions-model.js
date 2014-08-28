@@ -7,6 +7,8 @@ var Q                    = require('q');
 var premiumOrThrow       = require('./premium-or-throw');
 var appEvents            = require('../../app-events');
 var userIsInRoom         = require('../user-in-room');
+var ownerIsEarlyAdopter  = require('../owner-is-early-adopter');
+
 
 function githubFailurePermissionsModel(user, right, uri, security) {
   if(right === 'admin') {
@@ -74,6 +76,14 @@ module.exports = function repoPermissionsModel(user, right, uri, security, optio
       switch(right) {
         case 'view':
         case 'join':
+          if(!repoInfo.private) return true;
+
+          return ownerIsEarlyAdopter(uri)
+            .then(function(isEarlyAdopter) {
+              if (isEarlyAdopter) return true;
+              return premiumOrThrow(repoInfo.owner.login);
+            });
+
         case 'adduser':
           return true;
 

@@ -64,7 +64,7 @@ body.banner-top {
     left: 0;
     right: 0;
     height: @banner-height;
-    
+
     .transition500ms();
     &.slide-away {
       top: (-@banner-height);
@@ -78,7 +78,7 @@ body.banner-top {
       color: white;
       background-color: fade(@trpGreen, 90%);
       border-width: 0 0 0 0;
-      
+
       &:hover {
         outline: none;
         background-color: darken(@trpGreen, 5%);
@@ -217,7 +217,7 @@ body.banner-top {
       position: relative;
       top: -2px;
       left: 5px;
-      color: #e9dba5; // github's color for lock?
+      color: #333; // github's color for lock?
   }
 
   p {
@@ -281,11 +281,11 @@ body.banner-top {
   img {
     width: @side;
     height: @side;
-    
+
     border-radius: 4px;
     background-color: @free;
   }
-  
+
   .faux-border(@bg) {
     &:after {
       position: absolute;
@@ -296,11 +296,11 @@ body.banner-top {
       border-top: 1px solid rgba(255, 255, 255, 1);
       bottom: 0px;
       width: 100%;
-      border-radius: 0 0 4px 4px;  
+      border-radius: 0 0 4px 4px;
     }
   }
-  
+
   &.personal { .faux-border(@personal); }
   &.bronze { .faux-border(@bronze); }
-  &.silver { .faux-border(@silver); } 
+  &.silver { .faux-border(@silver); }
 }

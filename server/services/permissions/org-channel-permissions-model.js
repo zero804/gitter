@@ -3,6 +3,7 @@
 
 var userIsInRoom           = require('../user-in-room');
 var premiumOrThrow         = require('./premium-or-throw');
+var ownerIsEarlyAdopter    = require('../owner-is-early-adopter');
 
 var commonPermissionsModel = require('./common-org-repo-channel-permissions-model');
 var orgPermissionsModel    = require('./org-permissions-model');
@@ -10,4 +11,4 @@ var orgPermissionsModel    = require('./org-permissions-model');
 /**
  * ORG_CHANNEL permissions model
  */
-module.exports = commonPermissionsModel(orgPermissionsModel, userIsInRoom, premiumOrThrow);
+module.exports = commonPermissionsModel(orgPermissionsModel, userIsInRoom, premiumOrThrow, ownerIsEarlyAdopter);
