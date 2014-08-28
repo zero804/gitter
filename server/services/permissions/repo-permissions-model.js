@@ -28,6 +28,16 @@ function githubFailurePermissionsModel(user, right, uri, security) {
   return Q.reject(new Error("Unable to process permissions offline"));
 }
 
+function checkAndNotifyPrivicyMismatch(isPrivateRepo, roomPrivicy, uri) {
+  if(isPrivateRepo && roomPrivicy !== 'PRIVATE') {
+    winston.warn('Repo now private, updating our permissions');
+    appEvents.repoPermissionsChangeDetected(uri, true);
+  } else if(!isPrivateRepo && roomPrivicy !== 'PUBLIC') {
+    winston.warn('Repo now public, updating our permissions');
+    appEvents.repoPermissionsChangeDetected(uri, false);
+  }
+}
+
 /**
  * REPO permissions model
  */
@@ -49,26 +59,16 @@ module.exports = function repoPermissionsModel(user, right, uri, security, optio
   var repoService = new GitHubRepoService(options.githubTokenUser || user);
   return repoService.getRepo(uri)
     .then(function(repoInfo) {
-      /* Can't see the repo? no access */
-      if(!repoInfo) {
-        if(security !== 'PRIVATE') {
-          if(right !== 'create') {
-            winston.warn('Unable to access repo, but not set as private. Notifying');
-            appEvents.repoPermissionsChangeDetected(uri, true);
-          }
-        }
-        return false;
+
+      // privicy wont change if the room hasnt been created yet
+      if(right !== 'create') {
+        // cant find the repo? its probably private
+        var isPrivateRepo = repoInfo ? repoInfo.private : true;
+        checkAndNotifyPrivicyMismatch(isPrivateRepo, security, uri);
       }
 
-      if(right !== 'create') {
-        if(repoInfo.private && security !== 'PRIVATE') {
-          winston.warn('Repo private, updating our permissions');
-          appEvents.repoPermissionsChangeDetected(uri, true);
-        } else if(!repoInfo.private && security !== 'PUBLIC') {
-          winston.warn('Repo public, updating our permissions');
-          appEvents.repoPermissionsChangeDetected(uri, false);
-        }
-      }
+      /* Can't see the repo? no access */
+      if(!repoInfo) return false;
 
       var perms = repoInfo.permissions;
       var isAdmin = perms && (perms.push || perms.admin);
