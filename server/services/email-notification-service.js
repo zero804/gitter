@@ -88,11 +88,11 @@ module.exports = {
         });
     });
   },
-  
+
   /**
    * createdRoomNotification() emails suggested actions for created rooms (`PUBLIC` or `PRIVATE`)
    *
-   * user     User - the room's owner 
+   * user     User - the room's owner
    * room     Room - the room
    */
   createdRoomNotification: function (user, room) {
@@ -101,17 +101,17 @@ module.exports = {
     var hash      = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
     var emailBasePath = config.get("email:emailBasePath");
     var unsubscribeUrl = emailBasePath + '/settings/unsubscribe/' + hash;
-    
+
     var isPublic = (room && room.security === 'PUBLIC') ? true : false;
     var isOrg = (room && room.security === 'ORG_ROOM') ? true : false;
-    
+
     // TODO maybe logic can be better?
     if (!isPublic && !isOrg) return; // we only want to send emails if the room is a public or an org room
-    
+
     return emailAddressService(user)
       .then(function (email) {
         var shareURL = config.get('web:basepath') + '/' + room.uri;
-        
+
         // TODO move the generation of tweet links into it's own function?
         var twitterURL = (isPublic) ? 'http://twitter.com/intent/tweet?url=' + shareURL + '&text=' + encodeURIComponent('I have just created ' + room.name) + '&via=gitchat' : undefined; // if the room is public we shall have a tweet link
 
@@ -120,7 +120,7 @@ module.exports = {
           from: 'Gitter Notifications <support@gitter.im>',
           to: email,
           unsubscribe: unsubscribeUrl,
-          subject: "Recently Created Room",
+          subject: "Your new chat room on Gitter",
           tracking: {
             event: 'created_room_email_sent',
             data: { userId: user.id, email: email }
