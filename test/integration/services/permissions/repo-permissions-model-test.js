@@ -176,10 +176,49 @@ var FIXTURES = [{
           { right: 'view',    expectedResult: 'throw', expectedErrStatus: 402}
         ]
       }]
+    }, {
+      name: 'test github api call failure',
+      meta: {
+        githubApiCallFailure: true,
+      },
+      tests: [
+        {
+          right: 'create',
+          expectedResult: 'throw'
+        },
+        {
+          right: 'admin',
+          expectedResult: false
+        },
+        {
+          right: 'adduser',
+          expectedResult: 'throw'
+        },
+        {
+          right: 'view',
+          expectedResult: 'throw',
+          security: 'PRIVATE',
+          userIsInRoom: false
+        },
+        {
+          right: 'join',
+          expectedResult: 'throw',
+          security: 'PRIVATE',
+          userIsInRoom: false
+        },
+        {
+          right: 'view',
+          expectedResult: true,
+          security: 'PUBLIC',
+        },
+        {
+          right: 'join',
+          expectedResult: true,
+          security: 'PUBLIC'
+        }
+
+      ]
     }
-
-
-
 ]
   }, {
     name: 'premium users',
@@ -394,6 +433,8 @@ describe('repo-permissions', function() {
       var USER = meta.user ? { username: USERNAME } : null;
       var EXPECTED = meta.expectedResult;
       var SECURITY = meta.security;
+      var GITHUB_API_CALL_FAILURE = !!meta.githubApiCallFailure;
+      var USER_IS_IN_ROOM = meta.userIsInRoom;
 
       // ---------------------------------------------
 
@@ -401,6 +442,7 @@ describe('repo-permissions', function() {
       var getRepoMethodMock = mockito.mockFunction();
       var premiumOrThrowMock = mockito.mockFunction();
       var ownerIsEarlyAdopterMock = mockito.mockFunction();
+      var userIsInRoomMock = mockito.mockFunction();
 
       ORG = 'ORG';
       URI = 'ORG/REPO';
@@ -409,7 +451,19 @@ describe('repo-permissions', function() {
       permissionsModel = testRequire.withProxies("./services/permissions/repo-permissions-model", {
         '../github/github-repo-service': createMockGitHubRepoService(getRepoMethodMock),
         './premium-or-throw': premiumOrThrowMock,
-        '../owner-is-early-adopter': ownerIsEarlyAdopterMock
+        '../owner-is-early-adopter': ownerIsEarlyAdopterMock,
+        '../user-in-room': userIsInRoomMock
+      });
+
+      mockito.when(userIsInRoomMock)().then(function(uri, user) {
+        if(USER_IS_IN_ROOM === true) {
+          Q.resolve(true);
+        }
+        if(USER_IS_IN_ROOM === false) {
+          Q.resolve(false);
+        }
+
+        assert(false, 'Unexpected call to userIsInRoom: ' + uri + ', ' + user);
       });
 
       mockito.when(premiumOrThrowMock)().then(function(uri, callback) {
@@ -434,6 +488,11 @@ describe('repo-permissions', function() {
 
       mockito.when(getRepoMethodMock)().then(function(uri) {
         assert.strictEqual(uri, URI);
+
+        if(GITHUB_API_CALL_FAILURE) {
+          return Q.reject(new StatusError(502, 'Github is down'));
+        }
+
         return Q.resolve(meta.repo);
       });
 
