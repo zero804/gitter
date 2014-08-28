@@ -25,15 +25,6 @@ function githubFailurePermissionsModel(user, right, uri, security) {
   // Private room? Let the user in if they're already in the room.
   if(security === 'PRIVATE') return userIsInRoom(uri, user);
 
-  //if(security === 'PRIVATE') return userIsInRoom(uri, user).then(function(inRoom) {
-  //  if (!inRoom) return Q.resolve(false);
-  //  return ownerIsEarlyAdopter(uri).then(function(isEarlyAdopter) {
-  //    if (isEarlyAdopter) return Q.resolve(true);
-  //    var owner = uri.split('/')[0];
-  //    return premiumOrThrow(owner);
-  //  });
-  //});
-
   return Q.reject(new Error("Unable to process permissions offline"));
 }
 
@@ -81,19 +72,17 @@ module.exports = function repoPermissionsModel(user, right, uri, security, optio
 
       var perms = repoInfo.permissions;
       var isAdmin = perms && (perms.push || perms.admin);
-      
 
       switch(right) {
         case 'view':
         case 'join':
           if(!repoInfo.private) return true;
 
-          return ownerIsEarlyAdopter(uri).then(function(isEarlyAdopter) {
-            if (isEarlyAdopter) return Q.resolve(true);
-            return premiumOrThrow(repoInfo.owner.login);
-          });
-
-          break;
+          return ownerIsEarlyAdopter(uri)
+            .then(function(isEarlyAdopter) {
+              if (isEarlyAdopter) return true;
+              return premiumOrThrow(repoInfo.owner.login);
+            });
 
         case 'adduser':
           return true;
@@ -126,7 +115,7 @@ module.exports = function repoPermissionsModel(user, right, uri, security, optio
 
     })
     .catch(function(err) {
-      if(err.errno && err.syscall || err.statusCode >= 500) {
+      if(err.errno && err.syscall || err.status >= 500) {
         winston.error('An error occurred processing repo-permissions: ' + err, { exception: err });
         // GitHub call failed and may be down.
         // We can fall back to whether the user is already in the room
