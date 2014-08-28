@@ -4,7 +4,7 @@
 var collections       = require("../../utils/collections");
 var execPreloads      = require('../exec-preloads');
 var TroupeStrategy    = require('./troupe-strategy');
-var leanTroupeDao     = require('../../services/daos/troupe-dao').lean;
+var leanTroupeDao     = require('../../services/daos/troupe-dao').full;
 
 function GithubRepoStrategy(options) {
 
