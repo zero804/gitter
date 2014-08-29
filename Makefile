@@ -13,12 +13,10 @@ GIT_COMMIT ?= $(shell git rev-parse HEAD)
 ASSET_TAG_PREFIX =
 ASSET_TAG = $(ASSET_TAG_PREFIX)$(shell echo $(GIT_COMMIT)|cut -c 1-6)
 ifeq ($(FAST_BUILD), 1)
-CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/ public/bootstrap/css/)
+CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/ public/styles/)
 else
-CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/ public/bootstrap/css/ public-compile-cache/)
+CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/ public/styles/ public-compile-cache/)
 endif
-
-PUBLIC_EXCLUDING_JS = $(shell ls -d public/*|grep -v ^public/js$)
 
 .PHONY: clean test perf-test-xunit perf-test test-xunit test-in-browser test-in-browser-xunit test-coverage prepare-for-end-to-end-testing end-to-end-test
 
@@ -170,9 +168,9 @@ npm:
 grunt: clean
 	mkdir output
 	mkdir -p public-processed/js
-	grunt -no-color less
-	for i in $(PUBLIC_EXCLUDING_JS); \
-		do cp -R $$i public-processed/; \
+	grunt -no-color css
+	for i in $$(ls -d public/*|grep -v ^public/js); do \
+		cp -vR $$i public-processed/; \
 	done
 	if [ -d public-compile-cache/js/ ] && [ -n $$(find public-compile-cache/js/ -maxdepth 1 -type f -name '*' -print -quit) ]; then cp public-compile-cache/js/* public-processed/js/; fi
 	./build-scripts/copy-templates.sh
@@ -280,7 +278,6 @@ install-client-libs:
 	cp output/client-libs/hbs/Handlebars.js public/repo/hbs/Handlebars.js
 	cp output/client-libs/hbs/hbs/json2.js public/repo/hbs/json2.js
 	cp output/client-libs/jquery.validation/jquery.validate-amd.js public/repo/jquery.validation/jquery.validation.js
-	cp output/client-libs/jquery-carousel/jquery.carouFredSel-6.2.1.amd.js public/repo/jquery-carousel/jquery.carouFredSel-6.2.1.js
 	cp output/client-libs/hammerjs/dist/jquery.hammer.min.js public/repo/hammerjs/jquery.hammer.js
 	cp output/client-libs/mocha/mocha-amd.js public/repo/mocha/mocha.js
 	cp output/client-libs/mocha/mocha.css public/repo/mocha/mocha.css

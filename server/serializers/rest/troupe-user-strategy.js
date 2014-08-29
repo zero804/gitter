@@ -15,5 +15,8 @@ function TroupeUserStrategy(options) {
     return userIdStategy.map(troupeUser.userId);
   };
 }
+TroupeUserStrategy.prototype = {
+  name: 'TroupeUserStrategy'
+};
 
 module.exports = TroupeUserStrategy;

@@ -17,7 +17,6 @@ Q.longStackSupport = true;
 var troupeService = testRequire("./services/troupe-service");
 var persistence = testRequire("./services/persistence-service");
 
-
 function makeRoomAssertions(room, usersAllowedIn, usersNotAllowedIn) {
   return Q.resolve(true);
 
@@ -139,7 +138,7 @@ describe('room-service', function() {
     });
 
     it('should create a room for a repo ignoring the case', function(done) {
-      return persistence.Troupe.findOneAndRemoveQ({ lcuri: 'gitterhq/sandbox' })
+      return persistence.Troupe.findOneAndRemoveQ({ lcUri: 'gitterhq/sandbox' })
         .then(function() {
           var permissionsModelMock = mockito.mockFunction();
           var roomService = testRequire.withProxies("./services/room-service", {
@@ -166,7 +165,7 @@ describe('room-service', function() {
     });
 
   it('should redirect a user when a URI is in the wrong case and the room is to be created', function(done) {
-    return persistence.Troupe.findOneAndRemoveQ({ lcuri: 'gitterhq/sandbox' })
+    return persistence.Troupe.findOneAndRemoveQ({ lcUri: 'gitterhq/sandbox' })
       .then(function() {
         var permissionsModelMock = mockito.mockFunction();
         var roomService = testRequire.withProxies("./services/room-service", {
@@ -248,8 +247,8 @@ describe('room-service', function() {
           return Q.resolve(stubs.canBeInvited);
         },
         './user-service': {
-          inviteByUsername: function() {
-            return Q.resolve(stubs.inviteByUsernameResult);
+          createInvitedUser: function() {
+            return Q.resolve(stubs.createInvitedUserResult);
           },
           findByUsername: function() {
             return Q.resolve(stubs.findByUsernameResult);
@@ -269,7 +268,7 @@ describe('room-service', function() {
       var service = createRoomServiceWithStubs({
         addUser: true,
         findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
-        inviteByUsernameResult: null,
+        createInvitedUserResult: null,
         canBeInvited: true,
         onInviteEmail: function() {}
       });
@@ -280,7 +279,9 @@ describe('room-service', function() {
           assert.equal(id, 'test-user-id');
           done();
         },
-        saveQ: function() {}
+        saveQ: function() {
+          return Q.resolve();
+        }
       };
       service.addUserToRoom(troupe, {}, 'test-user').fail(done);
     });
@@ -289,7 +290,7 @@ describe('room-service', function() {
       var service = createRoomServiceWithStubs({
         addUser: true,
         findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
-        inviteByUsernameResult: null,
+        createInvitedUserResult: null,
         canBeInvited: true,
         onInviteEmail: function() {}
       });
@@ -299,6 +300,7 @@ describe('room-service', function() {
         addUserById: function() {},
         saveQ: function() {
           done();
+          return Q.resolve();
         }
       };
       service.addUserToRoom(troupe, {}, 'test-user').fail(done);
@@ -308,7 +310,7 @@ describe('room-service', function() {
       var service = createRoomServiceWithStubs({
         addUser: true,
         findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
-        inviteByUsernameResult: null,
+        createInvitedUserResult: null,
         canBeInvited: true,
         onInviteEmail: function() {}
       });
@@ -316,7 +318,9 @@ describe('room-service', function() {
       var troupe = {
         containsUserId: function() { return false; },
         addUserById: function() {},
-        saveQ: function() {}
+        saveQ: function() {
+          return Q.resolve();
+        }
       };
 
       service.addUserToRoom(troupe, {}, 'test-user')
@@ -330,7 +334,7 @@ describe('room-service', function() {
       var service = createRoomServiceWithStubs({
         addUser: true,
         findByUsernameResult: null,
-        inviteByUsernameResult: { username: 'test-user', id: 'test-user-id', state: 'INVITED', emails: ['a@b.com']},
+        createInvitedUserResult: { username: 'test-user', id: 'test-user-id', state: 'INVITED', emails: ['a@b.com']},
         canBeInvited: true,
         onInviteEmail: function() {
           done();
@@ -340,7 +344,9 @@ describe('room-service', function() {
       var troupe = {
         containsUserId: function() { return false; },
         addUserById: function() {},
-        saveQ: function() {}
+        saveQ: function() {
+          return Q.resolve();
+        }
       };
 
       service.addUserToRoom(troupe, {}, 'test-user').fail(done);
@@ -350,7 +356,7 @@ describe('room-service', function() {
       var service = createRoomServiceWithStubs({
         addUser: true,
         findByUsernameResult: null,
-        inviteByUsernameResult: { username: 'test-user', id: 'test-user-id', state: 'INVITED' },
+        createInvitedUserResult: { username: 'test-user', id: 'test-user-id', state: 'INVITED' },
         canBeInvited: false,
         onInviteEmail: function() {}
       });
@@ -370,7 +376,7 @@ describe('room-service', function() {
       var service = createRoomServiceWithStubs({
         addUser: true,
         findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
-        inviteByUsernameResult: null,
+        createInvitedUserResult: null,
         canBeInvited: true,
         onInviteEmail: function() {}
       });
@@ -390,7 +396,7 @@ describe('room-service', function() {
       var service = createRoomServiceWithStubs({
         addUser: false,
         findByUsernameResult: { username: 'test-user', id: 'test-user-id' },
-        inviteByUsernameResult: null,
+        createInvitedUserResult: null,
         canBeInvited: true,
         onInviteEmail: function() {}
       });

@@ -79,6 +79,13 @@ require([
       },{
       name: 'room.enter',
       scope: 'other'
+    },{
+      name: 'chat.compose.auto',
+      scope: 'input.chat'
+    }],
+    'shift+enter': [{
+      name: 'chat.compose.auto',
+      scope: 'input.chat'
     }],
     'up': [{
       name: 'room.up',

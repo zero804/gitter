@@ -1,0 +1,24 @@
+<div class="menu-header__profile">
+  {{ widget "avatar" model=user size='s' }}
+  <div class="menu-header__name">{{displayName}}</div>
+</div>
+<ul id="profile-menu" class="profile-menu">
+  <li id="link-home" class="profile-menu__item profile-menu__link">
+    <span class="profile-menu__home">Home</span>
+  </li>
+  {{#if showBilling}}
+  <li class="profile-menu__item">
+    <a href="{{billingUrl}}/accounts" target="_blank" class="profile-menu__link"><span class="profile-menu__billing">Billing</span></a>
+  </li>
+  {{/if}}
+  {{#if showGetApps}}
+  <li class="profile-menu__item">
+    <a href="/apps" target="_blank" class="profile-menu__link"><span class="profile-menu__apps">Get Gitter Apps</span></a>
+  </li>
+  {{/if}}
+  {{#if showSignout}}
+  <li class="profile-menu__item">
+    <a href="/signout" class="profile-menu__link"><span class="profile-menu__signout">Signout</span></a>
+  </li>
+  {{/if}}
+</ul>

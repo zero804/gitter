@@ -23,7 +23,7 @@ var troupeEnv = {
   homeUrl: nconf.get('web:homeurl'),
   badgeBaseUrl: nconf.get('web:badgeBaseUrl'),
   embedBaseUrl: nconf.get('web:embedBaseUrl'),
-  mixpanelToken: nconf.get("stats:mixpanel:token"),
+  mixpanelToken: nconf.get("stats:mixpanel:enabled") && nconf.get("stats:mixpanel:token"),
   googleTrackingId: nconf.get("web:trackingId"),
   goSquaredTrackingId: nconf.get("web:goSquaredId"),
   env: env,
@@ -131,4 +131,34 @@ exports.generateTroupeContext = function(troupeContext, parameters) {
           'window.troupeEnv = ' + safeJson(JSON.stringify(env)) + ';' +
           'window.troupeContext = ' + safeJson(JSON.stringify(troupeContext)) + ';' +
           '</script>';
+};
+
+// credit to @lazd (https://github.com/lazd) - https://github.com/wycats/handlebars.js/issues/249
+exports.pluralize = function(number, singular, plural) {
+  if (number === 1) return singular;
+  return (typeof plural === 'string') ? plural : singular + 's';
+};
+
+exports.toLowerCase = function (str) {
+  return str.toLowerCase();
+};
+
+// FIXME REMOVE THIS ONCE THE NEW ERRORS PAGES ARE DONE
+exports.typewriter = function (el, str) {
+  return util.format('<script type="text/javascript">\n' +
+    'var text = "%s";' +
+    'var input = $("%s");' +
+    'input.select();' +
+    'setTimeout(startTyping, 1000, input, text);' +
+    'function startTyping(input, text) {' +
+      'for ( var i = 0; i < text.length; i++ ) {' +
+        'setTimeout(addText,120*i, input, text.charAt(i));' +
+      '}' +
+    '}' +
+    'function addText(i,c) {' +
+      'if (c !== "-") i.val( i.val() + c );' +
+    '}' +
+  '</script>',
+    str,
+    el);
 };

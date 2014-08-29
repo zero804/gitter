@@ -27,7 +27,7 @@ var collections        = require('../utils/collections');
 var StatusError        = require('statuserror');
 var eventService       = require('./event-service');
 var emailNotificationService = require('./email-notification-service');
-var canBeInvited       = require('./invited-permissions-service');
+var canUserBeInvitedToJoinRoom = require('./invited-permissions-service');
 var emailAddressService = require('./email-address-service');
 
 function localUriLookup(uri, opts) {
@@ -79,6 +79,21 @@ function localUriLookup(uri, opts) {
 
       return null;
     });
+}
+
+/**
+ * sendJoinStats() sends information to MixPanels about a join_room event
+ *
+ * user       User
+ * room       Troupe
+ * tracking   Object - contains stats info
+ */
+function sendJoinStats(user, room, tracking) {
+  stats.event("join_room", {
+    userId: user.id,
+    source: tracking && tracking.source,
+    room_uri: room.uri
+  });
 }
 
 function applyAutoHooksForRepoRoom(user, troupe) {
@@ -263,10 +278,6 @@ function ensureAccessControl(user, troupe, access) {
 
       troupe.addUserById(user.id);
 
-      stats.event("join_room", {
-        userId: user.id,
-      });
-
       // IRC -- these should be centralised - in troupe.addUserById perhaps?
       appEvents.userJoined({user: user, room: troupe});
 
@@ -361,7 +372,7 @@ function findOrCreateRoom(user, uri, options) {
               .spread(function(troupe, otherUser) {
                 return { oneToOne: true, troupe: troupe, otherUser: otherUser };
               });
-          })
+          });
 
       }
 
@@ -369,7 +380,15 @@ function findOrCreateRoom(user, uri, options) {
 
       /* Didn't find a user, but we may have found another room */
       return findOrCreateNonOneToOneRoom(user, uriLookup && uriLookup.troupe, uri, options)
-        .spread(function(troupe, access, hookCreationFailedDueToMissingScope, didCreate) {
+        .spread(function (troupe, access, hookCreationFailedDueToMissingScope, didCreate) {
+          // if the user has been granted access to the room, send join stats for the cases of being the owner or just joining the room
+          if(access && (didCreate || !troupe.containsUserId(user.id))) {
+            sendJoinStats(user, troupe, options.tracking);
+          }
+
+          if (access && didCreate) {
+            emailNotificationService.createdRoomNotification(user, troupe);  // now the san email to the room', wne
+          }
 
           return ensureAccessControl(user, troupe, access)
             .then(function(troupe) {
@@ -605,7 +624,10 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
           {
             upsert: true
           })
-          .then(function(newRoom) {
+          .then(function (newRoom) {
+
+            emailNotificationService.createdRoomNotification(user, newRoom); // send an email to the room's owner
+            sendJoinStats(user, newRoom, options.tracking); // now the channel has now been created, send join stats for owner joining
 
             // TODO handle adding the user in the event that they didn't create the room!
             if(newRoom._nonce === nonce) {
@@ -628,62 +650,72 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
 }
 exports.createCustomChildRoom = createCustomChildRoom;
 
-function addUserToRoom(troupe, instigatingUser, usernameToAdd) {
-  return roomPermissionsModel(instigatingUser, 'adduser', troupe)
-    .then(function(access) {
-      if(!access) throw new StatusError(403, 'You do not have permission to add people to this room.');
+/**
+ * notifyInvitedUser() informs an invited user
+ *
+ * fromUser       User - the inviter
+ * invitedUser    User - the invited user
+ * room           Room - the room in context
+ * opts           Object - token & others
+ *
+ * returns        User - the invited user
+ */
+function notifyInvitedUser(fromUser, invitedUser, room, isNewUser) {
+  // get the email address
+  return emailAddressService(invitedUser)
+    .then(function (emailAddress) {
+      var notification;
 
-      return userService.findByUsername(usernameToAdd);
-    })
-    .then(function(existingUser) {
-      return existingUser || userService.inviteByUsername(usernameToAdd);
-    })
-    .then(function(user) {
-
-      if(troupe.containsUserId(user.id)) {
-        throw new StatusError(409, usernameToAdd + ' is already in this room.');
+      if (invitedUser.state === 'INVITED') {
+        if (emailAddress) {
+          notification = 'email_invite_sent';
+          emailNotificationService.sendInvitation(fromUser, invitedUser, room);
+        } else {
+          notification = 'unreachable_for_invite';
+        }
+      } else {
+        emailNotificationService.addedToRoomNotification(fromUser, invitedUser, room);
+        notification = 'email_notification_sent';
       }
 
-      return canBeInvited(user, troupe, instigatingUser)
-        .then(function(hasPermissionToJoin) {
-          if(!hasPermissionToJoin) throw new StatusError(403, usernameToAdd + ' does not have permission to join this room.');
+      var metrics = {
+        notification: notification,
+        troupeId: room.id,
+        to: invitedUser.username,
+        from: fromUser.username,
+      };
 
-          troupe.addUserById(user.id);
-          return troupe.saveQ();
-        })
-        .then(function() {
-          // invited users dont have github tokens yet
-          var options = user.state === 'INVITED' ? { githubTokenUser: instigatingUser } : {};
+      if (isNewUser) stats.event("new_invited_user", _.extend(metrics, { userId: fromUser.id })); // this should happen only once
+      stats.event('user_added_someone', _.extend(metrics, { userId: fromUser.id }));
+    })
+    .thenResolve(invitedUser);
+}
 
-          return emailAddressService(user, options);
-        }).then(function(emailAddress) {
+function addUserToRoom(room, instigatingUser, usernameToAdd) {
+  return Q.all([
+    roomPermissionsModel(instigatingUser, 'adduser', room),
+    canUserBeInvitedToJoinRoom(usernameToAdd, room, instigatingUser)
+  ]).spread(function (canInvite, canJoin) {
+      if (!canInvite) throw new StatusError(403, 'You do not have permission to add people to this room.');
+      if (!canJoin)   throw new StatusError(403, usernameToAdd + ' does not have permission to join this room.');
+      return userService.findByUsername(usernameToAdd);
+    })
+    .then(function (existingUser) {
+      if (existingUser && room.containsUserId(existingUser.id)) throw new StatusError(409, usernameToAdd + ' is already in this room.');
 
-          var notification;
+      var isNewUser = !existingUser;
 
-          if(user.state === 'INVITED') {
-            if(emailAddress) {
-              emailNotificationService.sendInvitation(instigatingUser, user, troupe);
-              notification = 'email_invite_sent';
-            } else {
-              notification = 'unreachable_for_invite';
-            }
-          } else {
-            emailNotificationService.addedToRoomNotification(instigatingUser, user, troupe);
-            notification = 'email_notification_sent';
-          }
-
-          stats.event('user_added_someone', {
-            userId: instigatingUser.id,
-            addedUserId: user.id,
-            notification: notification,
-            troupeId: troupe.id
-          });
-
-          return user;
+      return [existingUser || userService.createInvitedUser(usernameToAdd), isNewUser];
+    })
+    .spread(function (invitedUser, isNewUser) {
+      room.addUserById(invitedUser.id);
+      return room.saveQ()
+        .then(function () {
+          return notifyInvitedUser(instigatingUser, invitedUser, room, isNewUser);
         });
-
     });
 }
+
 exports.addUserToRoom = addUserToRoom;
 
 function revalidatePermissionsForUsers(room) {
@@ -850,12 +882,10 @@ function banUserFromRoom(room, username, requestingUser, callback) {
           if(existingBan) {
             return existingBan;
           } else {
-            var ban = new persistence.TroupeBannedUser({
+            var ban = room.addUserBan({
               userId: user.id,
               bannedBy: requestingUser.id
             });
-
-            room.bans.push(ban);
 
             room.removeUserById(user.id);
 

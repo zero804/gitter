@@ -11,13 +11,11 @@ define(['underscore', 'backbone', 'utils/context'], function(_, Backbone, contex
   var appEvents = {
     triggerParent: function() {
       var args = Array.prototype.slice.call(arguments, 0);
-
       window.parent.postMessage(JSON.stringify({
         child_window_event: args
       }), basePath);
     }
   };
-
 
   window.addEventListener("message", function(e) {
     if (e.origin !== basePath) return;

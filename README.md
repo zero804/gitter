@@ -13,7 +13,7 @@ Redis 2.8 (Sentinel 2 is shipped with Redis 2.8) & MongoDB 2.4 must be installed
 Getting Started
 ---------------
 1.  `npm install`
-2.  `grunt less`
+2.  `grunt css`
 3.  `./mongodb.sh`
 4.  `./redis.sh`
 5.  `./scripts/mongo/init-dev-mongo.sh`
@@ -60,7 +60,7 @@ e.g `./scripts/utils/suggested-rooms.js trevorah`
 
 Upgrading gitter-services to add support for more services
 ----------------------------------------------------------
-Recently merged a pull request for [gitter-services](https://github.com/gitterHQ/services)? then read on...
+Recently merged a pull request for [gitter-services](https://github.com/gitterHQ/services)? then read on…
 
 ### Prerequisites
 Before you proceed, make sure you have done the following:

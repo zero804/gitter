@@ -7,13 +7,15 @@ var getVersion        = require('../get-model-version');
 var UserIdStrategy    = require('./user-id-strategy');
 var TroupeIdStrategy  = require('./troupe-id-strategy');
 
+var LIMIT_REACHED_MESSAGE = "You have more messages in your history. Upgrade your plan to see them";
+
 function formatDate(d) {
   return d ? d.toISOString() : null;
 }
 
 function UnreadItemStategy(options) {
-  var self = this;
   var itemType = options.itemType;
+  var unreadItemsHash;
 
   this.preload = function(data, callback) {
     unreadItemService.getUnreadItems(data.userId, data.troupeId, itemType, function(err, ids) {
@@ -24,23 +26,34 @@ function UnreadItemStategy(options) {
         hash[id] = true;
       });
 
-      self.unreadIds = hash;
+      unreadItemsHash = hash;
       callback(null);
     });
   };
 
   this.map = function(id) {
-    return !!self.unreadIds[id];
+    return !!unreadItemsHash[id];
   };
 }
+
+UnreadItemStategy.prototype = {
+  name: 'UnreadItemStategy'
+};
+
 
 
 function ChatStrategy(options)  {
   if(!options) options = {};
 
   var userStategy = options.user ? null : new UserIdStrategy();
-  var unreadItemStategy = new UnreadItemStategy({ itemType: 'chat' });
+  var unreadItemStategy;
+  /* If options.unread has been set, we don't need a strategy */
+  if(options.currentUserId && options.unread === undefined) {
+    unreadItemStategy = new UnreadItemStategy({ itemType: 'chat' });
+  }
+
   var troupeStrategy = options.includeTroupe ? new TroupeIdStrategy(options) : null;
+  var defaultUnreadStatus = options.unread === undefined ? true : !!options.unread;
 
   this.preload = function(items, callback) {
     var users = items.map(function(i) { return i.fromUserId; });
@@ -55,7 +68,7 @@ function ChatStrategy(options)  {
       });
     }
 
-    if(options.currentUserId) {
+    if(unreadItemStategy) {
       strategies.push({
         strategy: unreadItemStategy,
         data: { userId: options.currentUserId, troupeId: options.troupeId }
@@ -73,12 +86,8 @@ function ChatStrategy(options)  {
   };
 
   this.map = function(item) {
-    var unread;
-    if(options.notLoggedIn) {
-      unread = false;
-    } else {
-      unread = options.currentUserId ? unreadItemStategy.map(item._id) : true;
-    }
+    var unread = unreadItemStategy ? unreadItemStategy.map(item._id) : defaultUnreadStatus;
+
     return {
       id: item._id,
       text: item.text,
@@ -104,6 +113,23 @@ function ChatStrategy(options)  {
     };
 
   };
+
+  if(options.limitReached && !options.disableLimitReachedMessage) {
+    this.post = function(serialized) {
+      // Push a fake message
+      serialized.unshift({
+        limitReached: true,
+        text: LIMIT_REACHED_MESSAGE,
+        html: LIMIT_REACHED_MESSAGE
+      });
+
+      return serialized;
+    };
+  }
 }
+
+ChatStrategy.prototype = {
+  name: 'ChatStrategy'
+};
 
 module.exports = ChatStrategy;

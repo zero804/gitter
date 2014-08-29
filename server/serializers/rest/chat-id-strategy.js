@@ -9,7 +9,7 @@ var execPreloads      = require('../exec-preloads');
 
 function ChatIdStrategy(options) {
   var chatStrategy = new ChatStrategy(options);
-  var self = this;
+  var chatsIndexed;
 
   this.preload = function(ids, callback) {
     chatService.findByIds(ids, function(err, chats) {
@@ -17,7 +17,7 @@ function ChatIdStrategy(options) {
         winston.error("Error loading chats", { exception: err });
         return callback(err);
       }
-      self.chats = collections.indexById(chats);
+      chatsIndexed = collections.indexById(chats);
 
       execPreloads([{
         strategy: chatStrategy,
@@ -28,7 +28,7 @@ function ChatIdStrategy(options) {
   };
 
   this.map = function(chatId) {
-    var chat = self.chats[chatId];
+    var chat = chatsIndexed[chatId];
     if(!chat) {
       winston.warn("Unable to locate chatId ", { chatId: chatId });
       return null;
@@ -38,5 +38,9 @@ function ChatIdStrategy(options) {
   };
 
 }
+ChatIdStrategy.prototype = {
+  name: 'ChatIdStrategy'
+};
+
 
 module.exports = ChatIdStrategy;

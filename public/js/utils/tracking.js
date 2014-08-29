@@ -48,18 +48,21 @@ define([
     })(window);
   }
 
+
   function trackPageView(routeName) {
-    if(window.mixpanel) {
+    if (window.mixpanel) {
       var loggedOutUserRoom = false;
       if (context.getUserId()) {
         window.mixpanel.register({ userStatus: 'ACTIVE'});
       } else {
-
         // if the user is in the app and does not have a user id, they must be logged out user viewing a room
         if (window.troupeContext) loggedOutUserRoom = true;
       }
+      
+      var username = context().user && context().user.username;
+      var isUserHome = (username) ? '/' + username === routeName : false; // if we have an username then check if it matches the routeName
 
-      window.mixpanel.track('pageView', { pageName: routeName, loggedOutUserRoom: loggedOutUserRoom });
+      window.mixpanel.track('pageView', { pageName: routeName, loggedOutUserRoom: loggedOutUserRoom, isUserHome: isUserHome });
     }
 
     var gs = window._gs;

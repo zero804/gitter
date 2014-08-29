@@ -29,8 +29,7 @@
     "zepto": "~1.0.0",
     "hopscotch": "https://github.com/linkedin/hopscotch/archive/master.zip",
     "cocktail": "https://github.com/onsi/cocktail/archive/master.zip",
-    "backbone-sorted-collection": "~0.3.5",
-    "jquery-carousel" : "http://dev7studios.com/downloads/66"
+    "backbone-sorted-collection": "~0.3.5"
   },
   "devDependencies": {
     "assert": "~0.0.1",

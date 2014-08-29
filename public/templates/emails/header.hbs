@@ -14,7 +14,13 @@
   padding:0;
 }
 
-body{
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+body {
   width:100% !important;
   min-width: 100%;
   -webkit-text-size-adjust:100%;
@@ -710,6 +716,13 @@ body.outlook p {
       border-radius: 5px;
       color: white;
     }
+    
+    .button-twitter {
+      background-color: #55acee;
+      padding: 6px 14px;
+      border-radius: 5px;
+      color: white;
+    }
 
     table.promo {
       background-color: #eee;
@@ -829,7 +842,7 @@ body.outlook p {
                         <table class="twelve columns">
                           <tr>
                             <td>
-                              <img src="{{cdn 'images/2/gitter/logo-text-blue-pink.png' email=true}}" class="logo" alt="Gitter">
+                              <img src="{{cdn 'images/logo-text-blue-pink.png' email=true}}" class="logo" alt="Gitter">
                             </td>
                             <td class="expander"></td>
                           </tr>

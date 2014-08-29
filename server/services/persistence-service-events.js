@@ -110,11 +110,6 @@ exports.install = function(persistenceService) {
     // TODO: deal with user deletion!
   });
 
-  // MixPanel tracking
-  schemas.UserSchema.post('save', function(model) {
-    stats.userUpdate(model);
-  });
-
   function chatUrlExtractor(model) {
     return "/rooms/" + model.toTroupeId + "/chatMessages";
   }

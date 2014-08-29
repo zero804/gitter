@@ -3,14 +3,13 @@
 
 var env                 = require('../utils/env');
 var config              = env.config;
-var stats               = env.stats;
+
 var logger              = env.logger;
 var mailerService       = require("./mailer-service");
 var crypto              = require('crypto');
 var passphrase          = config.get('email:unsubscribeNotificationsSecret');
-var Q                   = require('q');
 var userSettingsService = require('./user-settings-service');
-var emailAddressService = require('./email-address-service')
+var emailAddressService = require('./email-address-service');
 
 module.exports = {
 
@@ -31,8 +30,6 @@ module.exports = {
           return;
         }
 
-        stats.event('unread_notification_sent', {userId: user.id, email: email});
-
         var emailBasePath = config.get("email:emailBasePath");
         var unsubscribeUrl = emailBasePath + '/settings/unsubscribe/' + hash;
         var canChangeNotifySettings = troupesWithUnreadCounts.some(function(troupeWithUnreadCounts) {
@@ -46,6 +43,10 @@ module.exports = {
           to: email,
           unsubscribe: unsubscribeUrl,
           subject: "Activity on Gitter",
+          tracking: {
+            event: 'unread_notification_sent',
+            data: { userId: user.id, email: email }
+          },
           data: {
             canChangeNotifySettings: canChangeNotifySettings,
             user: user,
@@ -59,25 +60,25 @@ module.exports = {
         logger.error('Unable to send unread items notifications: ' + err, { exception: err });
         throw err;
       });
-
-
   },
 
   sendInvitation: function(fromUser, toUser, room) {
     var senderName = fromUser.displayName;
     var recipientName = toUser.displayName;
 
-    return emailAddressService(toUser, { githubTokenUser: fromUser })
+    return emailAddressService(toUser)
       .then(function(email) {
         if (!email) return;
-
-        stats.event('invitation_sent', {userId: toUser.id, email: email});
 
         return mailerService.sendEmail({
           templateFile: "invitation",
           from: senderName + ' <support@gitter.im>',
           to: email,
           subject: '[' + room.uri + '] Join the chat on Gitter',
+          tracking: {
+            event: 'invitation_sent',
+            data: { userId: user.id, email: email }
+          },
           data: {
             roomUri: room.uri,
             roomUrl: config.get("email:emailBasePath") + '/' + room.uri,
@@ -86,6 +87,60 @@ module.exports = {
           }
         });
     });
+  },
+
+  /**
+   * createdRoomNotification() emails suggested actions for created rooms (`PUBLIC` or `PRIVATE`)
+   *
+   * user     User - the room's owner
+   * room     Room - the room
+   */
+  createdRoomNotification: function (user, room) {
+    var plaintext = user.id + ',' + 'created_room';
+    var cipher    = crypto.createCipher('aes256', passphrase);
+    var hash      = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
+    var emailBasePath = config.get("email:emailBasePath");
+    var unsubscribeUrl = emailBasePath + '/settings/unsubscribe/' + hash;
+
+    var isPublic = (room && room.security === 'PUBLIC') ? true : false;
+    var isOrg = (room && room.security === 'ORG_ROOM') ? true : false;
+
+    // TODO maybe logic can be better?
+    if (!isPublic && !isOrg) return; // we only want to send emails if the room is a public or an org room
+
+    return emailAddressService(user)
+      .then(function (email) {
+        var shareURL = config.get('web:basepath') + '/' + room.uri;
+
+        // TODO move the generation of tweet links into it's own function?
+        var twitterURL = (isPublic) ? 'http://twitter.com/intent/tweet?url=' + shareURL + '&text=' + encodeURIComponent('I have just created ' + room.name) + '&via=gitchat' : undefined; // if the room is public we shall have a tweet link
+
+        return mailerService.sendEmail({
+          templateFile: "created_room",
+          from: 'Gitter Notifications <support@gitter.im>',
+          to: email,
+          unsubscribe: unsubscribeUrl,
+          subject: "Your new chat room on Gitter",
+          tracking: {
+            event: 'created_room_email_sent',
+            data: { userId: user.id, email: email }
+          },
+          data: {
+            user: user,
+            room: room,
+            isPublic: isPublic,
+            isOrg: isOrg,
+            roomType: room.security.toLowerCase(),
+            shareURL: shareURL,
+            twitterURL: twitterURL,
+            unsubscribeUrl: unsubscribeUrl
+          }
+        });
+      })
+      .fail(function (err) {
+        logger.error('Unable to send unread items notifications: ' + err, { exception: err });
+        throw err;
+      });
   },
 
   addedToRoomNotification: function(fromUser, toUser, room) {
@@ -112,13 +167,15 @@ module.exports = {
               return;
             }
 
-            stats.event('added_to_room_notification_sent', {userId: toUser.id, email: email});
-
             return mailerService.sendEmail({
               templateFile: "added_to_room",
               from: senderName + ' <support@gitter.im>',
               to: email,
               subject: '[' + room.uri + '] You\'ve been added to a new room on Gitter',
+              tracking: {
+                event: 'added_to_room_notification_sent',
+                data: { userId: toUser.id, email: email }
+              },
               data: {
                 roomUri: room.uri,
                 roomUrl: config.get("email:emailBasePath") + '/' + room.uri,
@@ -129,7 +186,5 @@ module.exports = {
             });
         });
     });
-
   }
-
 };

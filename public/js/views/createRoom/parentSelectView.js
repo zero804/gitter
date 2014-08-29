@@ -112,7 +112,7 @@ define([
       }
 
       if  (m.get('type') === 'repo') {
-        this.ui.avatar.css("background-image", "url(../../images/2/gitter/icon-repo.png)");
+        this.ui.avatar.css("background-image", "url(../../images/icon-repo.png)");
       } else {
         this.ui.avatar.css("background-image", "url(" + m.get('avatarUrl') + ")");
       }

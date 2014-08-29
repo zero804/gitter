@@ -27,7 +27,11 @@ define([
   var OLD_TIMEOUT = 3600000; /*1 hour*/
 
   /* @const */
-  var EDIT_WINDOW = 240000;
+  var EDIT_WINDOW = 1000 * 60 * 10; // 10 minutes
+  
+  var msToMinutes = function (ms) {
+    return ms / (60 * 1000);
+  };
 
   var mouseEvents = {
     'click .js-chat-item-edit':       'toggleEdit',
@@ -226,12 +230,14 @@ define([
     },
 
     getEditTooltip: function() {
+      if (this.isEmbedded()) return "You can't edit on embedded chats.";
+      
       if(this.hasBeenEdited()) {
         return "Edited shortly after being sent";
       }
 
       if(this.canEdit()) {
-        return "Edit within 4 minutes of sending";
+        return "Edit within " + msToMinutes(EDIT_WINDOW) + " minutes of sending";
       }
 
       if(this.isOwnMessage()) {
@@ -266,6 +272,10 @@ define([
       var age = Date.now() - this.model.get('sent').valueOf();
       return age <= EDIT_WINDOW;
     },
+    
+    isEmbedded: function () {
+      return context().embedded;
+    },
 
     isOld: function() {
       var age = Date.now() - this.model.get('sent').valueOf();
@@ -273,7 +283,7 @@ define([
     },
 
     canEdit: function() {
-      return this.isOwnMessage() && this.isInEditablePeriod();
+      return this.isOwnMessage() && this.isInEditablePeriod() && !this.isEmbedded();
     },
 
     hasBeenEdited: function() {

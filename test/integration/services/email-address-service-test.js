@@ -14,8 +14,21 @@ describe("email-address-service", function() {
     });
 
     service({ username: 'test-user', githubToken: 'token'})
-      .then(function(email) {
+      .then(function (email) {
         assert.equal(email, 'private@email.com');
+      }).nodeify(done);
+  });
+  
+  it('obeys overriding set by email:toAddress', function (done) {
+    var overrideEmail = 'test@overriding.com';
+    
+    var service = createEmailAddressService({
+      overrideEmail: overrideEmail
+    });
+    
+    service({ username: 'test-user' })
+      .then(function (email) {
+        assert.equal(email, overrideEmail);
       }).nodeify(done);
   });
 
@@ -24,14 +37,8 @@ describe("email-address-service", function() {
       publicEmail: 'public@email.com'
     });
 
-    var options = {
-      githubTokenUser: {
-        githubToken: 'token'
-      }
-    };
-
-    service({ username: 'test-user' }, options)
-      .then(function(email) {
+    service({ username: 'test-user' })
+      .then(function (email) {
         assert.equal(email, 'public@email.com');
       }).nodeify(done);
   });
@@ -41,26 +48,8 @@ describe("email-address-service", function() {
       publicEmail: 'DONT EMAIL ME'
     });
 
-    var options = {
-      githubTokenUser: {
-        githubToken: 'token'
-      }
-    };
-
-    service({ username: 'test-user' }, options)
-      .then(function(email) {
-        assert(!email);
-      }).nodeify(done);
-  });
-
-  it('returns nothing if it has no tokens', function(done) {
-    var service = createEmailAddressService({
-      privateEmail: 'private@email.com',
-      publicEmail: 'public@email.com'
-    });
-
     service({ username: 'test-user' })
-      .then(function(email) {
+      .then(function (email) {
         assert(!email);
       }).nodeify(done);
   });
@@ -68,6 +57,7 @@ describe("email-address-service", function() {
 });
 
 function createEmailAddressService(stubData) {
+  
   var GitHubMeService = function() {};
   GitHubMeService.prototype.getEmail = function() {
     return Q.resolve(stubData.privateEmail);
@@ -77,8 +67,17 @@ function createEmailAddressService(stubData) {
   GitHubUserService.prototype.getUser = function() {
     return Q.resolve({ email: stubData.publicEmail });
   };
+  
+  var env = {
+    config: {
+      get: function () {
+        return stubData.overrideEmail;
+      }
+    }
+  };
 
   return testRequire.withProxies('./services/email-address-service', {
+    '../utils/env': env,
     './github/github-me-service': GitHubMeService,
     './github/github-user-service': GitHubUserService
   });

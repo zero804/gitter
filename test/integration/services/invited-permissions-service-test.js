@@ -6,14 +6,13 @@ var testRequire = require('../test-require');
 var assert = require("assert");
 var Q = require('q');
 
-var user = { username: 'test-user'};
-
+var username = 'test-user';
 
 function createServiceWithStubData(callback) {
   return testRequire.withProxies('./services/invited-permissions-service', {
-    './permissions-model': function(user, right, uri, roomType, security) {
+    './username-permissions-model': function(username, right, uri, roomType, security) {
       return Q.fcall(function() {
-        return callback(user, right, uri, roomType, security);
+        return callback(username, right, uri, roomType, security);
       });
     }
   });
@@ -30,7 +29,7 @@ describe('invited-permissions-service', function() {
         return true;
       });
 
-      service(user, room).then(function(isAllowed) {
+      service(username, room).then(function(isAllowed) {
         assert(isAllowed);
       }).nodeify(done);
     });
@@ -40,7 +39,7 @@ describe('invited-permissions-service', function() {
         return false;
       });
 
-      service(user, room).then(function(isAllowed) {
+      service(username, room).then(function(isAllowed) {
         assert(!isAllowed);
       }).nodeify(done);
     });
@@ -56,7 +55,7 @@ describe('invited-permissions-service', function() {
         return true;
       });
 
-      service(user, room).then(function(isAllowed) {
+      service(username, room).then(function(isAllowed) {
         assert(isAllowed);
       }).nodeify(done);
     });
@@ -66,7 +65,7 @@ describe('invited-permissions-service', function() {
         return false;
       });
 
-      service(user, room).then(function(isAllowed) {
+      service(username, room).then(function(isAllowed) {
         assert(!isAllowed);
       }).nodeify(done);
     });
@@ -82,7 +81,7 @@ describe('invited-permissions-service', function() {
         return true;
       });
 
-      service(user, room).then(function(isAllowed) {
+      service(username, room).then(function(isAllowed) {
         assert(!isAllowed);
       }).nodeify(done);
     });
@@ -92,7 +91,7 @@ describe('invited-permissions-service', function() {
         return false;
       });
 
-      service(user, room).then(function(isAllowed) {
+      service(username, room).then(function(isAllowed) {
         assert(!isAllowed);
       }).nodeify(done);
     });
@@ -108,7 +107,7 @@ describe('invited-permissions-service', function() {
         return true;
       });
 
-      service(user, room).then(function(isAllowed) {
+      service(username, room).then(function(isAllowed) {
         assert(isAllowed);
       }).nodeify(done);
     });
@@ -118,7 +117,7 @@ describe('invited-permissions-service', function() {
         return false;
       });
 
-      service(user, room).then(function(isAllowed) {
+      service(username, room).then(function(isAllowed) {
         assert(isAllowed);
       }).nodeify(done);
     });
@@ -134,7 +133,7 @@ describe('invited-permissions-service', function() {
         return true;
       });
 
-      service(user, room).then(function(isAllowed) {
+      service(username, room).then(function(isAllowed) {
         assert(isAllowed);
       }).nodeify(done);
     });
@@ -144,7 +143,7 @@ describe('invited-permissions-service', function() {
         return false;
       });
 
-      service(user, room).then(function(isAllowed) {
+      service(username, room).then(function(isAllowed) {
         assert(isAllowed);
       }).nodeify(done);
     });
@@ -160,7 +159,7 @@ describe('invited-permissions-service', function() {
         return true;
       });
 
-      service(user, room).then(function(isAllowed) {
+      service(username, room).then(function(isAllowed) {
         assert(isAllowed);
       }).nodeify(done);
     });
@@ -170,7 +169,7 @@ describe('invited-permissions-service', function() {
         return false;
       });
 
-      service(user, room).then(function(isAllowed) {
+      service(username, room).then(function(isAllowed) {
         assert(!isAllowed);
       }).nodeify(done);
     });
@@ -182,7 +181,7 @@ describe('invited-permissions-service', function() {
         done();
       });
 
-      service(user, room).fail(done);
+      service(username, room).fail(done);
     });
 
   });
@@ -196,7 +195,7 @@ describe('invited-permissions-service', function() {
         return true;
       });
 
-      service(user, room).then(function(isAllowed) {
+      service(username, room).then(function(isAllowed) {
         assert(isAllowed);
       }).nodeify(done);
     });
@@ -206,7 +205,7 @@ describe('invited-permissions-service', function() {
         return false;
       });
 
-      service(user, room).then(function(isAllowed) {
+      service(username, room).then(function(isAllowed) {
         assert(isAllowed);
       }).nodeify(done);
     });
@@ -222,7 +221,7 @@ describe('invited-permissions-service', function() {
         return true;
       });
 
-      service(user, room).then(function(isAllowed) {
+      service(username, room).then(function(isAllowed) {
         assert(isAllowed);
       }).nodeify(done);
     });
@@ -232,7 +231,7 @@ describe('invited-permissions-service', function() {
         return false;
       });
 
-      service(user, room).then(function(isAllowed) {
+      service(username, room).then(function(isAllowed) {
         assert(isAllowed);
       }).nodeify(done);
     });
@@ -248,7 +247,7 @@ describe('invited-permissions-service', function() {
         return true;
       });
 
-      service(user, room).then(function(isAllowed) {
+      service(username, room).then(function(isAllowed) {
         assert(isAllowed);
       }).nodeify(done);
     });
@@ -258,7 +257,7 @@ describe('invited-permissions-service', function() {
         return false;
       });
 
-      service(user, room).then(function(isAllowed) {
+      service(username, room).then(function(isAllowed) {
         assert(!isAllowed);
       }).nodeify(done);
     });
@@ -270,7 +269,7 @@ describe('invited-permissions-service', function() {
         done();
       });
 
-      service(user, room).fail(done);
+      service(username, room).fail(done);
     });
 
   });
@@ -284,7 +283,7 @@ describe('invited-permissions-service', function() {
         return true;
       });
 
-      service(user, room).then(function(isAllowed) {
+      service(username, room).then(function(isAllowed) {
         assert(isAllowed);
       }).nodeify(done);
     });
@@ -294,7 +293,7 @@ describe('invited-permissions-service', function() {
         return false;
       });
 
-      service(user, room).then(function(isAllowed) {
+      service(username, room).then(function(isAllowed) {
         assert(isAllowed);
       }).nodeify(done);
     });

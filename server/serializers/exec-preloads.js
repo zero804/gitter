@@ -1,7 +1,13 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 'use strict';
 
-var Q                 = require("q");
+var Q      = require("q");
+var env    = require('../utils/env');
+var logger = env.logger;
+var nconf  = env.config;
+var stats  = env.stats;
+
+var maxSerializerTime = nconf.get('serializer:warning-period');
 
 function execPreloads(preloads, callback) {
   if(!preloads) return callback();
@@ -9,16 +15,25 @@ function execPreloads(preloads, callback) {
   var promises = preloads.map(function(i) {
     var deferred = Q.defer();
     i.strategy.preload(i.data, deferred.makeNodeResolver());
-    return deferred.promise;
+    var start = Date.now();
+    return deferred.promise
+      .then(function() {
+        var time = Date.now() - start;
+
+        if(time > maxSerializerTime) {
+          stats.responseTime('serializer.slow.preload', time);
+
+          logger.warn('Strategy took a excessive amount of time to complete', {
+            strategy: i.strategy.name,
+            time: time
+          });
+        }
+      });
   });
 
-  Q.all(promises)
-      .then(function() {
-        callback();
-      })
-      .fail(function(err) {
-        callback(err);
-      });
+  return Q.all(promises)
+      .thenResolve() // No need to send back the results
+      .nodeify(callback);
 }
 
 
