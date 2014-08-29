@@ -10,10 +10,12 @@ var username = 'test-user';
 
 function createServiceWithStubData(callback) {
   return testRequire.withProxies('./services/invited-permissions-service', {
-    './username-permissions-model': function(username, right, uri, roomType, security) {
-      return Q.fcall(function() {
-        return callback(username, right, uri, roomType, security);
-      });
+    './github/github-members': {
+      isMember: function(username, uri, githubType) {
+        return Q.fcall(function() {
+          return callback(username, uri, githubType);
+        });
+      }
     }
   });
 }
@@ -45,8 +47,8 @@ describe('invited-permissions-service', function() {
     });
 
     it('queries the correct repo', function(done) {
-      var service = createServiceWithStubData(function(user, right, uri, roomType) {
-        assert.equal(roomType, 'REPO');
+      var service = createServiceWithStubData(function(username, uri, githubType) {
+        assert.equal(githubType, 'REPO');
         assert.equal(uri, 'gitterHQ/gitter');
         done();
       });
@@ -81,8 +83,8 @@ describe('invited-permissions-service', function() {
     });
 
     it('queries the correct org', function(done) {
-      var service = createServiceWithStubData(function(user, right, uri, roomType) {
-        assert.equal(roomType, 'ORG');
+      var service = createServiceWithStubData(function(username, uri, githubType) {
+        assert.equal(githubType, 'ORG');
         assert.equal(uri, 'gitterHQ');
         done();
       });
@@ -195,8 +197,8 @@ describe('invited-permissions-service', function() {
     });
 
     it('queries the correct org', function(done) {
-      var service = createServiceWithStubData(function(user, right, uri, roomType) {
-        assert.equal(roomType, 'ORG');
+      var service = createServiceWithStubData(function(username, uri, githubType) {
+        assert.equal(githubType, 'ORG');
         assert.equal(uri, 'gitterHQ');
         done();
       });
@@ -283,8 +285,8 @@ describe('invited-permissions-service', function() {
     });
 
     it('queries the correct repo', function(done) {
-      var service = createServiceWithStubData(function(user, right, uri, roomType) {
-        assert.equal(roomType, 'REPO');
+      var service = createServiceWithStubData(function(username, uri, githubType) {
+        assert.equal(githubType, 'REPO');
         assert.equal(uri, 'gitterHQ/gitter');
         done();
       });

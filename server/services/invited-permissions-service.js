@@ -1,7 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var usernamePermissionsModel = require('./username-permissions-model');
+var githubMembers = require('./github/github-members');
 var Q = require('q');
 
 function canUserBeInvitedToJoinRoom(usernameToBeInvited, troupe, instigatingUser) {
@@ -47,7 +47,7 @@ function canUserBeInvitedToJoinRoom(usernameToBeInvited, troupe, instigatingUser
 }
 
 function canUserJoinRoomWithUri(username, uri, githubType, githubTokenUser) {
-  return usernamePermissionsModel(username, 'join', uri, githubType, null, { githubTokenUser: githubTokenUser });
+  return githubMembers.isMember(username, uri, githubType, githubTokenUser);
 }
 
 module.exports = canUserBeInvitedToJoinRoom;
