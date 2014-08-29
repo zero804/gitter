@@ -77,3 +77,12 @@ exports.cloneSchema = function(schema) {
   return new Schema(tree);
 }
 
+/*
+ * Returns a promise [document, numAffected, raw]
+ */
+exports.upsert = function(schema, query, setOperation) {
+  return schema.updateQ(query, setOperation, { upsert: true })
+    .spread(function(numAffected, raw) {
+      return [schema.findOneQ(query), numAffected, raw];
+    });
+}

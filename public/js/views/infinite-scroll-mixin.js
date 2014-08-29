@@ -19,6 +19,11 @@ define([
         this.collection.fetchMoreAfter({});
       });
 
+      this.listenTo(scroll, 'near.top.changed', function(nearTop) {
+        this.nearTop = nearTop;
+        this.trigger('near.top.changed', nearTop);
+      });
+
       this.scroll = scroll;
     },
 

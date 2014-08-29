@@ -7,22 +7,18 @@
 
   <title>{{troupeName}}</title>
 
-  {{#if isUserhome}}
-  <link rel="stylesheet" href='{{ cdn "bootstrap/css/trpMobileUserhome.css"}}'>
-  {{else}}
-  <link rel="stylesheet" href='{{ cdn "bootstrap/css/trpMobileApp.css"}}'>
-  {{/if}}
+  <link rel="stylesheet" href='{{ cdn cssFileName }}'>
 
   {{{ generateTroupeContext troupeContext }}}
 
   {{>require_wrapper}}
   {{{bootScript bootScriptName }}}
-  <link rel="apple-touch-icon" href='{{ cdn "images/2/gitter/touch-icon-iphone.png" }}'>
-  <link rel="shortcut icon" href='{{ cdn "images/2/gitter/favicon5.png"}}'>
+  <link rel="apple-touch-icon" href='{{ cdn "images/touch-icon-iphone.png" }}'>
+  <link rel="shortcut icon" href='{{ cdn "images/favicon5.png"}}'>
 
   <style>
     html.loading body {
-      background: url("{{ cdn 'images/2/gitter/logo-mark-grey-64.png' }}") center no-repeat;
+      background: url("{{ cdn 'images/logo-mark-grey-64.png' }}") center no-repeat;
       height: 90%;
     }
     html.loading body > * { visibility: hidden; }
@@ -36,7 +32,7 @@
   <div id="mainPage">
     <header>
       <div id="showTroupesButton">
-        <img src='{{cdn "images/2/gitter/icon-more@2x.png" }}' width="16" height="16" id="menu-toggle" style="margin-left: 8px">
+        <img src='{{cdn "images/icon-more@2x.png" }}' width="16" height="16" id="menu-toggle" style="margin-left: 8px">
       </div>
       <span class="trpTitle">{{troupeName}}</span>
     </header>

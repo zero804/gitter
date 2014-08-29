@@ -82,10 +82,15 @@ require([
 
 
   var cal = new CalHeatMap();
+
+  var today = new Date();
+  var elevenFullMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 11, 1);
+  var gitterLaunchDate = new Date(2013, 10, 1); // 1 November 2013
+
   cal.init({
-    start: new Date(Date.now() - 340 * 86400 * 1000),
-    maxDate: new Date(),
-    minDate: new Date(2013, 10, 1), // 1 November 2013
+    start: elevenFullMonthsAgo, // eleven months + this partial month = 12 blocks shown
+    maxDate: today,
+    minDate: gitterLaunchDate,
     range: 12,
     domain: "month",
     subDomain: "day",

@@ -4,7 +4,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=IE9" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
   <link href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href='{{cdn "bootstrap/css/trpHooks.css" }}' type='text/css'>
+  <link rel="stylesheet" href='{{cdn "styles/trpHooks.css" }}' type='text/css'>
   <link rel="stylesheet" href='{{cdn "sprites/services.css" }}' type='text/css'>
 </head>
 
@@ -52,7 +52,7 @@
   <form class="add-integration" method="post">
     <input type="hidden" name="service" value="{{id}}">
     <input type="hidden" name="accessToken" value="{{../accessToken}}">
-    <button class="trpButtonMedium trpBtnLightGrey" type="submit"><img src='{{../cdnRoot}}images/2/icon-{{id}}@2x.png' width="16" height="16">{{name}}</button>
+    <button class="trpButtonMedium trpBtnLightGrey" type="submit"><img src='{{../cdnRoot}}images/icon-{{id}}@2x.png' width="16" height="16">{{name}}</button>
   </form>
   {{/each}}
   {{#each openServices}}

@@ -1,0 +1,98 @@
+.menu-header {
+  .trpBodyMedium;
+  width: 92%;
+  margin: 10px auto 0;
+  padding: 0.3125em;
+  margin-bottom: 10px;
+  cursor: pointer;
+  max-height: 41px;
+  overflow: hidden;
+  border-radius: 4px;
+
+  .transition(200ms);
+
+  .trpDisplayPicture {
+    float: left;
+  }
+
+  .avatar-s {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.menu-header--expanded {
+  // css animations dont work for height: auto,
+  // but we can use a rough max-height instead.
+  max-height: 200px;
+  .transition(400ms);
+}
+
+body.hover .menu-header:hover,
+body.hover .menu-header--expanded {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.menu-header__profile {
+  overflow: hidden;
+  clear: both;
+  width: 100%;
+}
+
+.menu-header__name {
+  display: inline-block;
+  line-height: 2em;
+  float: left;
+  font-weight: 300;
+  font-size: 16px;
+  margin-left: 10px;
+  max-width: 182px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-menu {
+  .trpBodyMedium;
+  margin: 0;
+  overflow: hidden;
+  width: 100%;
+  margin-top: 8px;
+  color: white;
+  font-weight: 300;
+  line-height: 24px;
+}
+
+.profile-menu__item {
+  list-style: none;
+}
+
+.profile-menu__link {
+  display: inline-block;
+  width: 100%;
+  padding-left: 10px;
+
+  color: white;
+  text-decoration: none;
+
+  body.hover &:hover {
+    border-radius: 4px;
+    background-color: rgba(255,255,255,0.2);
+  }
+}
+
+.profile-menu__home {
+  .prepend-home-icon();
+}
+
+.profile-menu__signout {
+  .prepend-home-signout();
+}
+
+.profile-menu__apps {
+  .prepend-home-apps();
+}
+
+.profile-menu__billing {
+  .prepend-billing();
+}

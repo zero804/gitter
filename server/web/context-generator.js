@@ -8,6 +8,7 @@ var crypto           = require("crypto");
 var roomPermissionsModel = require('../services/room-permissions-model');
 var assert           = require("assert");
 var Q                = require('q');
+var _                = require('underscore');
 
 /**
  * Returns the promise of a mini-context
@@ -40,12 +41,10 @@ exports.generateSocketContext = function(userId, troupeId) {
     });
 };
 
-exports.generateTroupeContext = function(req, options) {
+exports.generateTroupeContext = function(req, extras) {
   var user = req.user;
   var uriContext = req.uriContext;
   assert(uriContext);
-
-  var snapshots = options && options.snapshots;
 
   var troupe = req.uriContext.troupe;
   var homeUser = req.uriContext.oneToOne && req.uriContext.otherUser; // The users page being looked at
@@ -77,10 +76,10 @@ exports.generateTroupeContext = function(req, options) {
       troupe: serializedTroupe,
       desktopNotifications: desktopNotifications,
       troupeHash: troupeHash,
-      snapshots: snapshots,
       permissions: {
         admin: adminAccess
-      }
+      },
+      extras: extras
     });
   });
 };
@@ -164,9 +163,10 @@ function serializeTroupe(troupe, user) {
 
 function createTroupeContext(req, options) {
   var events = req.session && req.session.events;
-  if(events) { req.session.events = []; }
+  var extras = (typeof options.extras !== 'undefined') ? options.extras : {};
+  if (events) { req.session.events = []; }
 
-  return {
+  return _.extend({
     user: options.user,
     troupe: options.troupe,
     homeUser: options.homeUser,
@@ -177,7 +177,6 @@ function createTroupeContext(req, options) {
     troupeHash: options.troupeHash,
     isNativeDesktopApp: isNativeDesktopApp(req),
     permissions: options.permissions,
-    snapshots: options.snapshots,
     locale: req.i18n.locales[req.i18n.locale]
-  };
+  }, extras);
 }

@@ -30,7 +30,16 @@ function serialize(items, strat, callback) {
       return d.reject(err);
     }
 
-    d.resolve(pkg(items.map(strat.map).filter(function(f) { return f !== undefined; })));
+    var serialized = items.map(strat.map)
+      .filter(function(f) {
+        return f !== undefined;
+      });
+
+    if(strat.post) {
+      serialized = strat.post(serialized);
+    }
+
+    d.resolve(pkg(serialized));
   });
 
   return d.promise.nodeify(callback);
@@ -113,7 +122,7 @@ function serializeModel(model, callback) {
 
 function eagerLoadStrategies() {
   Object.keys(restSerializer).forEach(function(key) {
-    restSerializer[key];
+    restSerializer[key]; // NB! Force the lazy-loading of strategies
   });
 }
 

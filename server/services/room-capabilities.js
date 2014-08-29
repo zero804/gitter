@@ -1,6 +1,6 @@
 "use strict";
 
-var leanTroupeDao = require('./daos/lean-troupe-dao');
+var leanTroupeDao = require('./daos/troupe-dao').lean;
 var billingService = require('./billing-service');
 var StatusError = require('statuserror');
 var moment = require('moment');
@@ -11,6 +11,7 @@ var Q = require('q');
 var PLAN_TYPE_MESSAGE_HISTORY = {
   'unlimited': null,
   'silver': null,
+  'personal': null,
   'bronze': [6, 'months'],
   'free-private': [14, 'days']
 };

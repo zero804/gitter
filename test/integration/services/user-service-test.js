@@ -30,10 +30,10 @@ describe("User Service", function() {
       .nodeify(done);
   });
 
-  it('should be able to invite a user using his username', function(done) {
+  it('should be able to create a \'ghost\' user using his username', function(done) {
     var userService = testRequire("./services/user-service");
 
-    userService.inviteByUsername('node-gitter')
+    userService.createInvitedUser('node-gitter')
     .then(function(user) {
       assert.equal(user.username,'node-gitter');
       assert.equal(user.state, 'INVITED');
@@ -41,6 +41,16 @@ describe("User Service", function() {
     .nodeify(done);
   });
 
+  it('should create new users', function(done) {
+
+    var userService = testRequire("./services/user-service");
+    var persistence = testRequire("./services/persistence-service");
+    return persistence.User.findOneAndRemoveQ({ githubId: - 1})
+      .then(function() {
+        return userService.findOrCreateUserForGithubId({ githubId: -1, username: '__test__gitter_007' });
+      })
+      .nodeify(done);
+  });
 
 
 

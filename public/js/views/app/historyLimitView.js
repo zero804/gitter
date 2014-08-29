@@ -1,46 +1,65 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
-  'backbone',
+  'marionette',
   'utils/context',
   'hbs!./tmpl/limitBannerTemplate'
-  ], function($, Backbone, context, template)  {
+  ], function($, Marionette, context, template)  {
   "use strict";
 
-  var TopBannerView = Backbone.View.extend({
+  return Marionette.ItemView.extend({
+    template: template,
     events: {
       'click button.main': 'onMainButtonClick'
     },
     initialize: function(options) {
       this.chatCollectionView = options.chatCollectionView;
-      this.listenTo(this.collection, 'limitReached', this.showBanner);
+
+      this.listenTo(this.chatCollectionView, 'near.top.changed', function(nearTop) {
+        this.nearTop = nearTop;
+        this.showHide();
+      });
+
+      this.listenTo(this.collection, 'limitReached', function(atLimit) {
+        this.atLimit = atLimit;
+        this.showHide();
+      });
     },
-    render: function() {
-      //this.showBanner();
-      return this;
+    showHide: function() {
+      if(this.atLimit && this.nearTop) {
+        this.showBanner();
+      } else {
+        this.hideBanner();
+      }
     },
     showBanner: function() {
-      var $banner = this.$el;
-      var message = 'You have more messages in your history. Upgrade your plan to see them';
+      if(this.showing) return;
+      this.showing = true;
+      var $e = this.$el;
 
-      $banner.html(template({message: message}));
-      $banner.parent().show();
+      $(document.body).addClass('banner-top');
+      $e.parent().show();
+
+      clearTimeout(this.removeTimeout);
 
       // cant have slide away animation on the same render as a display:none change
       setTimeout(function() {
-        $banner.removeClass('slide-away');
+        $e.removeClass('slide-away');
       }, 0);
+
     },
     hideBanner: function() {
-      var $banner = this.$el;
-      var self = this;
+      if(!this.showing) return;
+      this.showing = false;
 
-      $banner.addClass('slide-away');
+      var $e = this.$el;
 
-      setTimeout(function() {
-        if(self.getUnreadCount() === 0) {
-          $banner.parent().hide();
-        }
+      $e.addClass('slide-away');
+      $(document.body).removeClass('banner-top');
+
+      if(this.removeTimeout) return;
+      this.removeTimeout = setTimeout(function() {
+        $e.parent().hide();
       }, 500);
     },
     onMainButtonClick: function() {
@@ -48,9 +67,5 @@ define([
     }
   });
 
-
-  return {
-    Top: TopBannerView,
-  };
 
 });

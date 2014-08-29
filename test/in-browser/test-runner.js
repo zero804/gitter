@@ -14,6 +14,8 @@ require([
       'in-browser/roster-test',
       'in-browser/chat-scroll-test',
       'in-browser/is-android-test',
+      'in-browser/is-mobile-test',
+      'in-browser/is-native-test',
       'in-browser/mixpanel-test',
       'in-browser/realtime-test',
       'in-browser/unread-items-client-test',

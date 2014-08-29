@@ -1,6 +1,8 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var env            = require('../utils/env');
+var stats          = env.stats;
 
 var nodemailer     = require('nodemailer');
 var troupeTemplate = require('../utils/troupe-template');
@@ -40,6 +42,8 @@ troupeTemplate.compile("emails/header", function(err, t) {
 
 exports.sendEmail = function(options, done) {
   var d = Q.defer();
+  
+  var tracking = options.tracking || {}; // avoids failure if no tracking information is present
 
   var htmlTemplateFile = "emails/" + options.templateFile + "_html";
 
@@ -82,12 +86,14 @@ exports.sendEmail = function(options, done) {
           headers: headers
         }, function(err, response){
 
-          if(err) {
+          if (err) {
             winston.error("SMTP Email Error", { exception: err });
             return d.reject(err);
           }
-
+          
           winston.info("Email sent successfully through SMTP", { message: response.message });
+          stats.event(tracking.event, tracking.data);
+          
           d.resolve();
         });
       });

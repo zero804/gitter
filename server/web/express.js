@@ -7,7 +7,6 @@ var config          = env.config;
 var express        = require('express');
 var passport       = require('passport');
 var expressHbs     = require('express-hbs');
-var expressSession = require('express-session');
 var path           = require('path');
 var rememberMe     = require('./middlewares/rememberme-middleware');
 var I18n           = require('i18n-2');
@@ -29,6 +28,9 @@ module.exports = {
     expressHbs.registerHelper('generateTroupeContext', require('./hbs-helpers').generateTroupeContext);
     expressHbs.registerAsyncHelper('prerenderView', require('./prerender-helper'));
     expressHbs.registerHelper('chatItemPrerender', require('./prerender-chat-helper'));
+    expressHbs.registerHelper('pluralize', require('./hbs-helpers').pluralize);
+    expressHbs.registerHelper('toLowerCase', require('./hbs-helpers').toLowerCase);
+    expressHbs.registerHelper('typewriter', require('./hbs-helpers').typewriter);
 
     app.locals({
       googleTrackingId: config.get("web:trackingId"),
@@ -86,7 +88,7 @@ module.exports = {
       next();
     });
 
-    app.use(expressSession({
+    app.use(express.session({
       secret: config.get('web:sessionSecret'),
       key: config.get('web:cookiePrefix') + 'session',
       store: sessionStore,

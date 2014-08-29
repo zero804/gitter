@@ -3,6 +3,7 @@
 
 var env                       = require('../utils/env');
 var stats                     = env.stats;
+var _                         = require('underscore');
 // var sechash                   = require('sechash');
 var winston                   = require('../utils/winston');
 var assert                    = require('assert');
@@ -11,12 +12,14 @@ var collections               = require("../utils/collections");
 var uriLookupService          = require('./uri-lookup-service');
 var Q                         = require('q');
 var githubUserService         = require('./github/github-user-service');
+var emailAddressService       = require('./email-address-service');
+var mongooseUtils             = require('../utils/mongoose-utils');
 
 /**
  * Creates a new user
  * @return the promise of a new user
  */
-function newUser(options, callback) {
+function newUser(options) {
   var githubId = options.githubId;
 
   assert(githubId, 'githubId required');
@@ -44,25 +47,30 @@ function newUser(options, callback) {
     }
   });
 
-  return persistence.User.findOneAndUpdateQ(
-    { githubId: githubId },
-    {
+  return mongooseUtils.upsert(persistence.User, { githubId: githubId }, {
       $setOnInsert: insertFields
-    },
-    {
-      upsert: true
+    })
+    .spread(function(user, numAffected, raw) {
+      if(raw.updatedExisting) return user;
+
+      // New record was inserted
+      return emailAddressService(user)
+        .then(function(email) {
+          stats.userUpdate(_.extend({ email: email, mixpanelId : options.mixpanelId }, user.toJSON()));
+        })
+        .thenResolve(user);
+
     })
     .then(function(user) {
       // Reserve the URI for the user so that we don't need to figure it out
       // manually later (which will involve dodgy calls to github)
       return uriLookupService.reserveUriForUsername(user._id, user.username)
         .thenResolve(user);
-    })
-    .nodeify(callback);
+    });
 }
 
 var userService = {
-  inviteByUsername: function(username, user, callback) {
+  createInvitedUser: function(username, user, callback) {
     var githubUser = new githubUserService(user);
 
     return githubUser.getUser(username)
@@ -77,15 +85,6 @@ var userService = {
         };
 
         return newUser(gitterUser);
-      })
-      .then(function(user) {
-        stats.event("new_invited_user", {
-          userId: user.id,
-          method: 'added_to_room',
-          username: user.username
-        });
-
-        return user;
       })
       .nodeify(callback);
   },
@@ -235,64 +234,6 @@ var userService = {
         return user && user.username;
       });
   },
-
-  // setUserLocation: function(userId, location, callback) {
-  //   stats.event("location_submission", {
-  //     userId: userId
-  //   });
-
-  //   userService.findById(userId, function(err, user) {
-  //     if(err) return callback(err);
-  //     if(!user) return callback(err);
-
-  //     /* Save new history */
-  //     new persistence.UserLocationHistory({
-  //       userId: user.id,
-  //       timestamp: location.timestamp,
-  //       coordinate: {
-  //           lon:  location.lon,
-  //           lat: location.lat
-  //       },
-  //       speed: location.speed
-  //     }).save(function(err) {
-  //       if(err) winston.error("User location history save failed: ", err);
-  //     });
-
-  //     function persistUserLocation(named) {
-  //       function nullIfUndefined(v) { return v ? v : null; }
-
-  //       if(!named) named = {};
-
-  //       user.location.timestamp = location.timestamp;
-  //       user.location.coordinate.lon = location.lon;
-  //       user.location.coordinate.lat = location.lat;
-  //       user.location.speed = location.speed;
-  //       user.location.altitude = location.altitude;
-  //       user.location.named.place = nullIfUndefined(named.place);
-  //       user.location.named.region = nullIfUndefined(named.region);
-  //       user.location.named.countryCode = nullIfUndefined(named.countryCode);
-
-  //       user.save(function(err) {
-  //         return callback(err, user);
-  //       });
-  //     }
-
-  //     geocodingService.reverseGeocode( { lat: location.lat, lon: location.lon }, function(err, namedLocation) {
-  //       if(err || !namedLocation) {
-  //         winston.error("Reverse geocoding failure ", err);
-  //         persistUserLocation(null);
-  //         return;
-  //       } else {
-  //         winston.info("User location (" + location.lon + "," + location.lat + ") mapped to " + namedLocation.name);
-  //         persistUserLocation({
-  //           place: namedLocation.name,
-  //           region: namedLocation.region.name,
-  //           countryCode: namedLocation.country.code
-  //         });
-  //       }
-  //     });
-  //   });
-  // },
 
   deleteAllUsedInvitesForUser: function(user) {
     persistence.Invite.remove({ userId: user.id, status: "USED" });

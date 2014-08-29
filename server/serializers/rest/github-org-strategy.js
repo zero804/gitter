@@ -1,23 +1,21 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var troupeService     = require("../../services/troupe-service");
-var _                 = require("underscore");
-var collections       = require("../../utils/collections");
 var execPreloads      = require('../exec-preloads');
 var TroupeUriStrategy = require('./troupe-uri-strategy');
 var billingService    = require('../../services/billing-service');
+
 var env               = require('../../utils/env');
+var premiumDisabled   = env.config.get('premium:disabled');
 
-
-function OrgPremiumStatusStrategy() {
+function OrgPlanStrategy() {
   var orgsWithPlans;
 
   this.preload = function(orgUris, callback) {
     return billingService.findActiveOrgPlans(orgUris)
       .then(function(subscriptions) {
         orgsWithPlans = subscriptions.reduce(function(memo, s) {
-          memo[s.uri] = true;
+          memo[s.uri] = s.plan;
           return memo;
         }, {});
 
@@ -27,15 +25,18 @@ function OrgPremiumStatusStrategy() {
   };
 
   this.map = function(orgUri) {
-    // TODO remove when premium goes live
-    return env.config.get('premium:disabled') ? true : !!orgsWithPlans[orgUri];
+    return orgsWithPlans[orgUri];
   };
-
 }
+
+OrgPlanStrategy.prototype = {
+  name: 'OrgPlanStrategy'
+};
+
 
 function GitHubOrgStrategy(options) {
   var troupeUriStrategy = new TroupeUriStrategy(options);
-  var premiumStatusStrategy = new OrgPremiumStatusStrategy();
+  var planStrategy = new OrgPlanStrategy();
 
   this.preload = function(orgs, callback) {
     var orgUris = orgs.map(function(org) { return org.login; });
@@ -44,23 +45,26 @@ function GitHubOrgStrategy(options) {
       strategy: troupeUriStrategy,
       data: orgUris
     },{
-      strategy: premiumStatusStrategy,
+      strategy: planStrategy,
       data: orgUris
     }], callback);
   };
 
   this.map = function(item) {
+    var plan = planStrategy.map(item.login);
     return {
       id: item.id,
       name: item.login,
       avatar_url: item.avatar_url,
       room: troupeUriStrategy.map(item.login),
-      premium: premiumStatusStrategy.map(item.login)
+      premium: premiumDisabled ? true : !!plan, // TODO remove when premium goes live
+      plan: plan
     };
   };
-
 }
 
-
+GitHubOrgStrategy.prototype = {
+  name: 'GitHubOrgStrategy'
+};
 
 module.exports = GitHubOrgStrategy;

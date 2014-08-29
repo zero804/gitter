@@ -191,7 +191,7 @@ define([
 
       var stateProvider = this.getSnapshotState && getState;
 
-      realtime.registerForSnapsnots(this.url, function(snapshot) {
+      realtime.registerForSnapshots(this.url, function(snapshot) {
         self.trigger('request');
         /**
          * Don't remove items from the collections, as there is a greater

@@ -1,0 +1,54 @@
+// Base
+@import "base-avatar";
+
+// Required views
+@import "../people/peopleCollectionView";
+@import "activity.less";
+
+.trpToolbarContent {
+  display: inline-block;
+  width: 100%;
+  vertical-align: top;
+  height: 100%;
+  overflow: auto;
+  overflow-x: hidden;
+
+  table, tr, td {
+    border-spacing: 0;
+    padding: 0;
+    margin: 0;
+  }
+
+
+  @media @mid {
+
+    padding-left: 4px;
+
+    .trpToolbarHeader.divider:first-child {
+      border-bottom: 0;
+    }
+
+    .trpToolbarList {
+      max-height: 40%;
+    }
+
+  }
+}
+
+.trpToolbarContent .qq-upload.button {
+  position: absolute;
+  width: 200px;
+  height: 32px;
+}
+
+.trpToolbarContent input {
+  top: 2px;
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+  left: 20px;
+}
+
+.trpToolbarContent .trpTroupeAvatar {
+    background-color: rgba(0,0,0,0.9);
+}

@@ -16,4 +16,13 @@ var UserTroupeSettingsSchema = new Schema({
 UserTroupeSettingsSchema.index({ userId: 1, troupeId: 1 }, { unique: true });
 UserTroupeSettingsSchema.schemaTypeName = 'UserTroupeSettingsSchema';
 
-exports = UserTroupeSettingsSchema;
+module.exports = {
+  install: function(mongooseConnection) {
+    var model = mongooseConnection.model('UserTroupeSettings', UserTroupeSettingsSchema);
+
+    return {
+      model: model,
+      schema: UserTroupeSettingsSchema
+    };
+  }
+};

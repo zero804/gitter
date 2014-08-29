@@ -76,8 +76,10 @@ describe('room-capabilities', function() {
       var PLAN = meta.plan;
 
       var roomCapabilities = testRequire.withProxies("./services/room-capabilities", {
-        './daos/lean-troupe-dao': {
-          findByIdRequired: findByIdRequiredMock
+        './daos/troupe-dao': {
+          lean: {
+            findByIdRequired: findByIdRequiredMock
+          }
         },
         './billing-service': {
           findActivePlan: findActivePlanMock

@@ -1,99 +1,10 @@
-
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>Gitter - Error {{status}}</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-    <meta name="google-site-verification" content="nnoWjW8hKT4umkqn1UrCdVHtLs8Q2pDi5ek0x5PUHug" />
-
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
-    <link rel="shortcut icon" href='{{cdn "images/2/gitter/favicon-error.ico" }}'>
-    <style type="text/css">
-      body {
-        background-color: #ecf1ec;
-      }
-
-      .image {
-         position: absolute;
-         top: 40%;
-         left: 45%;
-         margin-left: -32px; /* Half the width */
-      }
-
-      .error {
-        position: absolute;
-        top: 40%;
-        left: 45%;
-        margin-left: 50px;
-        font-family: 'Open Sans', 'Sans';
-        font-size: 24px;
-        color: #666;
-        width: 600px;
-      }
-
-      .error-text {
-        font-size: 18px;
-      }
-
-      .error-input {
-        font-size: 22px;
-        border: 0;
-        outline: 0;
-        padding: 0;
-        margin: 0;
-        background: transparent;
-      }
-
-      .error-input:focus {
-        border: 0;
-        outline: 0;
-
-      }
-
-      a {
-        color: #2980b9;
-      }
-
-    </style>
-
-  </head>
-
-  <body>
-
-    <a href="{{homeUrl}}"><img class="image" src="{{cdn 'images/2/gitter/icon-logo-red-64@2x.png' }}" width="64" title="The sad face"></a>
-
-    <div class="error">
-      Gitter<br>
-      <input id="error-text" class="error-input" size="25"><br><br>
-      {{#if stack}}
-      <pre style="font-size:small">{{{stack}}}</pre>
-      {{/if}}
-    </div>
-
-
-<script>
-
-  var text = "{{status}} error, oh no---------------- :(-------- sorry";
-  var input = $( "#error-text" );
-  input.select();
-  setTimeout(startTyping, 1000, input, text);
-
-
-function startTyping(input, text) {
-
-  for ( var i = 0; i < text.length; i++ )
-  {
-    setTimeout(addText,120*i, input, text.charAt(i));
-  }
-}
-
-function addText(i,c) {
-  if (c !== '-') i.val( i.val() + c );
-}
-
-
-</script>
-
-  </body>
-</html>
+{{!< error-layout}}
+<a href="{{homeUrl}}"><img class="image" src="{{cdn 'images/icon-logo-red-64@2x.png' }}" width="64" title="The sad face"></a>
+<div class="error">
+  Gitter<br>
+  <input id="error-text" class="error-input" size="55"><br><br>
+  {{#if stack}}
+    <pre style="font-size:small">{{{ stack }}}</pre>
+  {{/if}}
+</div>
+{{{ typewriter "#error-text" "Something went wrong. We\'re sorry.------ :(" }}}

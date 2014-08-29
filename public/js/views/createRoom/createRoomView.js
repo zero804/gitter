@@ -361,7 +361,7 @@ define([
           self.dialog.showActions();
           self.dialog.hidePremium();
         }
-        
+
 
         if(animated === false) {
           arrayToJq(true).show();
@@ -430,7 +430,7 @@ define([
       { action: "create", text: "Create", className: "trpBtnGreen action" },
       { action: "back", text: "Back", className: "trpBtnLightGrey action" },
       { action: "cancel", text: "Cancel", className: "trpBtnLightGrey action"},
-      { action: "get-plan", text: "Get Plan", className: "trpBtnGreen premium hidden"}
+      { action: "get-plan", text: "Get Premium", className: "trpBtnGreen premium hidden"}
     ]
   });
 

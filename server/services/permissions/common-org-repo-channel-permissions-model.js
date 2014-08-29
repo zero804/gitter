@@ -9,6 +9,7 @@ var ALLOWED_SECURITY_VALUES = {
   INHERITED: 1
 };
 
+
 /**
  * COMMON_ORG_REPO_CHANNEL permissions model
  *
@@ -17,7 +18,7 @@ var ALLOWED_SECURITY_VALUES = {
  * `userIsInRoom` and `premiumOrThrow` MUST BE required from the original module,
  * otherwise the tests will fail because `proxyquire` will not apply its replacements
  */
-module.exports = function(delegatePermissionsModel, userIsInRoom, premiumOrThrow) {
+module.exports = function(delegatePermissionsModel, userIsInRoom, premiumOrThrow, ownerIsEarlyAdopter) {
 
   return function commonChannelPermissionsModel(user, right, uri, security) {
     if(!ALLOWED_SECURITY_VALUES.hasOwnProperty(security)) {
@@ -36,13 +37,25 @@ module.exports = function(delegatePermissionsModel, userIsInRoom, premiumOrThrow
     var uriLastPart = uriParts.slice(0, -1).join('/');
     var uriFirstPart = uriParts[0];
 
+
     switch(right) {
       case 'join':
       case 'view':
         switch(security) {
           case 'PUBLIC': return Q.resolve(true);
           case 'PRIVATE':
-            return userIsInRoom(uri, user);
+            return userIsInRoom(uri, user)
+              .then(function(inRoom) {
+                if (!inRoom) return false;
+
+                return ownerIsEarlyAdopter(uri)
+                  .then(function(isEarlyAdopter) {
+                    if (isEarlyAdopter) return true;
+
+                    return premiumOrThrow(uriFirstPart);
+                  });
+              });
+
 
           case 'INHERITED':
             return delegatePermissionsModel(user, right, uriLastPart);

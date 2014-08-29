@@ -49,20 +49,6 @@ describe('process-chat', function() {
         });
       });
     });
-
-    describe('should gracefully handle known trouble markdown', function() {
-
-      it('visual studio', function(done) {
-        var f = path.join(__dirname, 'markdown-conversions', 'visual-studio.badmarkdown');
-        var badMarkdown = fs.readFileSync(f, { encoding: 'utf8' });
-        processChat(badMarkdown, function(err, result) {
-          if(err) return done(err);
-
-          assert(result.markdownProcessingFailed, 'Expected a failure with known bad markdown');
-          done();
-        });
-      });
-    });
   });
 
   describe('performance tests', function() {

@@ -21,6 +21,14 @@ var resolveUserInRoom = function(res) {
   };
 };
 
+var resolveOwnerIsEarlyAdopter = function(res) {
+  return function(uri) {
+    assert.equal(uri, URI);
+    return Q.resolve(res);
+  };
+};
+
+
 var resolvePermission = function(res) {
   return function(user, right, repo) {
     assert.equal(repo, PARENT_URI);
@@ -74,11 +82,13 @@ var tests = {
     join: {
       allow: {
         name: 'should allow somebody already in the room to join',
-        inRoom: resolveUserInRoom(true)
+        inRoom: resolveUserInRoom(true),
+        ownerIsEarlyAdopter: resolveOwnerIsEarlyAdopter(true)
       },
       deny: {
-        name: 'should deny join to somebody not already in the room',
-        inRoom: resolveUserInRoom(false)
+        name: 'should deny join to somebody not in the room',
+        inRoom: resolveUserInRoom(false),
+        ownerIsEarlyAdopter: resolveOwnerIsEarlyAdopter(true)
       },
     },
     adduser: {
@@ -190,6 +200,7 @@ var FIXTURES = _.map(tests, function(rights, security) {
 
 var premiumOrThrowMock = mockito.mockFunction();
 var userIsInRoomMock = mockito.mockFunction();
+var ownerIsEarlyAdopterMock = mockito.mockFunction();
 
 var generate = function(name, permsMock, permsModel) {
   describe(name + ' channel permissions', function() {
@@ -205,6 +216,7 @@ var generate = function(name, permsMock, permsModel) {
         });
         mockito.when(userIsInRoomMock)().then(meta.inRoom);
         mockito.when(permsMock)().then(meta.permission);
+        mockito.when(ownerIsEarlyAdopterMock)().then(meta.ownerIsEarlyAdopter);
 
         permsModel(USER, RIGHT, URI, SECURITY)
           .then(function(result) {
@@ -221,7 +233,8 @@ var orgPermissionsMock = mockito.mockFunction();
 var orgPermissionsModel = testRequire.withProxies("./services/permissions/org-channel-permissions-model", {
   './org-permissions-model': orgPermissionsMock,
   './premium-or-throw': premiumOrThrowMock,
-  '../user-in-room': userIsInRoomMock
+  '../user-in-room': userIsInRoomMock,
+  '../owner-is-early-adopter': ownerIsEarlyAdopterMock
 });
 generate('org', orgPermissionsMock, orgPermissionsModel);
 
@@ -229,6 +242,7 @@ var repoPermissionsMock = mockito.mockFunction();
 var repoPermissionsModel = testRequire.withProxies("./services/permissions/repo-channel-permissions-model", {
   './repo-permissions-model': repoPermissionsMock,
   './premium-or-throw': premiumOrThrowMock,
-  '../user-in-room': userIsInRoomMock
+  '../user-in-room': userIsInRoomMock,
+  '../owner-is-early-adopter': ownerIsEarlyAdopterMock
 });
 generate('repo', repoPermissionsMock, repoPermissionsModel);

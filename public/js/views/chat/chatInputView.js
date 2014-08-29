@@ -36,7 +36,7 @@ define([
 
   /* This value is also in chatItemView! */
   /** @const */
-  var EDIT_WINDOW = 240000;
+  var EDIT_WINDOW = 1000 * 60 * 10; // 10 minutes
 
   /** @const */
   var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];
@@ -53,6 +53,25 @@ define([
   var ComposeMode = function() {
     var stringBoolean = window.localStorage.getItem('compose_mode_enabled') || 'false';
     this.disabled = JSON.parse(stringBoolean);
+  };
+
+  /**
+   * setCaretPosition() moves the caret on a given text element
+   * credits to http://blog.vishalon.net/index.php/javascript-getting-and-setting-caret-position-in-textarea/
+   */
+  var setCaretPosition = function (el, pos) {
+    if (el.setSelectionRange) {
+      el.focus();
+      el.setSelectionRange(pos,pos);
+      return;
+    } else if (el.createTextRange) {
+      var range = el.createTextRange();
+      range.collapse(true);
+      range.moveEnd('character', pos);
+      range.moveStart('character', pos);
+      range.select();
+      return;
+    }
   };
 
   ComposeMode.prototype.toggle = function() {
@@ -73,6 +92,7 @@ define([
     },
 
     keyboardEvents: {
+      'chat.compose.auto': 'composeModeAutoFillCodeBlock',
       'chat.toggle': 'toggleComposeMode'
     },
 
@@ -81,11 +101,13 @@ define([
       this.chatCollectionView = options.chatCollectionView;
       this.composeMode = new ComposeMode();
       this.userCollection = options.userCollection;
+
       this.listenTo(appEvents, 'input.append', function(text, options) {
         if(this.inputBox) {
           this.inputBox.append(text, options);
         }
       });
+
       this.listenTo(appEvents, 'focus.request.chat', function() {
         if(this.inputBox) {
           this.inputBox.$el.focus();
@@ -131,6 +153,7 @@ define([
         composeMode: this.composeMode,
         value: data.value
       });
+
       this.inputBox = inputBox;
 
       this.$el.find('.compose-mode-toggle, .md-help').tooltip({placement: 'left'});
@@ -176,10 +199,10 @@ define([
             var lowerTerm = term.toLowerCase();
             var loggedInUsername = context.user().get('username').toLowerCase();
 
-            var matches = userCollection && userCollection.filter(function(user) {
+            var matches = userCollection && userCollection.filter(function (user) {
               var username = user.get('username').toLowerCase();
 
-              if(username === loggedInUsername) return false;
+              if (username === loggedInUsername) return false; // do not include the current user in the matches
 
               var displayName = (user.get('displayName') || '').toLowerCase();
 
@@ -212,7 +235,7 @@ define([
           template: function(emoji) {
             return emojiListItemTemplate({
               emoji: emoji,
-              emojiUrl: cdn('images/2/gitter/emoji/' + emoji + '.png')
+              emojiUrl: cdn('images/emoji/' + emoji + '.png')
             });
           },
           replace: function (value) {
@@ -242,6 +265,7 @@ define([
       $textarea.on('textComplete:show', function() {
         $textarea.attr('data-prevent-keys', 'on');
       });
+
       $textarea.on('textComplete:hide', function() {
         // Defer change to make sure the last key event is prevented
         setTimeout(function() {
@@ -263,8 +287,8 @@ define([
       this.listenTo(this.inputBox, 'editLast', this.editLast);
     },
 
-    toggleComposeMode: function(event) {
-      if(!event.origin) event.preventDefault();
+    toggleComposeMode: function (event) {
+      if(event && !event.origin) event.preventDefault();
 
       this.composeMode.toggle();
       var isComposeModeEnabled = this.composeMode.isEnabled();
@@ -277,6 +301,28 @@ define([
 
       var placeholder = isComposeModeEnabled ? PLACEHOLDER_COMPOSE_MODE : PLACEHOLDER;
       this.$el.find('textarea').attr('placeholder', placeholder).focus();
+    },
+
+    /**
+     * composeModeAutoFillCodeBlock() automatically toggles compose mode and creates a Marked down codeblock template
+     */
+    composeModeAutoFillCodeBlock: function (event) {
+      var inputBox = this.inputBox.$el;
+      if (inputBox.val() !== '```') return; // only continue if the content is '```'
+      var wasInChatMode = !this.composeMode.isEnabled();
+
+      event.preventDefault(); // shouldn't allow the creation of a new line
+
+      if (wasInChatMode) {
+        this.toggleComposeMode(event); // switch to compose mode
+        this.listenToOnce(this.inputBox, 'save', this.toggleComposeMode.bind(this, null)); // if we were in chat mode make sure that we set the state back to chat mode
+      }
+
+      inputBox.val(function (index, val) {
+        return val + '\n\n```'; // 1. create the code block
+      });
+
+      setCaretPosition(inputBox[0], 4); // 2. move caret inside the block (textarea)
     },
 
     /**

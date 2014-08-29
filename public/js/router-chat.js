@@ -218,7 +218,7 @@ require([
   // Setup the ChatView
 
   var chatCollectionView = new ChatCollectionView({
-    el: $('.js-chat-container'),
+    el: '#chat-container',
     collection: itemCollections.chats,
     userCollection: itemCollections.users,
     decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
@@ -238,7 +238,7 @@ require([
     chatCollectionView: chatCollectionView
   }).render();
 
-  new HistoryLimitView.Top({
+  new HistoryLimitView({
     el: '#limit-banner',
     collection: itemCollections.chats,
     chatCollectionView: chatCollectionView
@@ -261,9 +261,6 @@ require([
       }
     }
   });
-
-
-  // unreadItemsClient.monitorViewForUnreadItems($('#file-list'));
 
   new chatInputView.ChatInputView({
     el: $('#chat-input'),

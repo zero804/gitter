@@ -86,6 +86,14 @@ module.exports = function(options) {
           if(failureStat) stats.eventHF(failureStat);
 
           var error = makeError(err);
+          var loggedError;
+
+          // If error status is less than 500 don't log a stacktrace
+          if(err.status && err.status < 500) {
+            loggedError = { message: err.message, status: err.status };
+          } else {
+            loggedError = err;
+          }
 
           // Don't mask previous errors
           if(!outgoingMessage.error) {
@@ -93,7 +101,7 @@ module.exports = function(options) {
           }
 
           logger.error('bayeux: extension ' + name + '[incoming] failed: ' + error, {
-            exception: err,
+            exception: loggedError, // May not be the original error depending on status
             channel: outgoingMessage.channel,
             token: outgoingMessage.ext && outgoingMessage.ext.token,
             subscription: outgoingMessage.subscription,

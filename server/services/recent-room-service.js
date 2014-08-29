@@ -189,8 +189,7 @@ function updateFavourite(userId, troupeId, favouritePosition) {
 }
 
 function findFavouriteTroupesForUser(userId, callback) {
-
-  return persistence.UserTroupeFavourites.findOneQ({ userId: userId})
+  return persistence.UserTroupeFavourites.findOneQ({ userId: userId }, { favs: 1 }, { lean: true })
     .then(function(userTroupeFavourites) {
       if(!userTroupeFavourites || !userTroupeFavourites.favs) return {};
 
