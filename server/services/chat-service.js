@@ -53,8 +53,9 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
       fromUserId: user.id,
       toTroupeId: troupe.id,
       sent: new Date(),
-      text: data.text,                // Keep the raw message.
-      status: data.status,            // Checks if it is a status update
+      text: data.text,                    // Keep the raw message.
+      status: data.status,                // Checks if it is a status update
+      pub:  troupe.security === 'PUBLIC' || undefined, // Public room - useful for sampling
       html: parsedMessage.html
     });
 
@@ -122,6 +123,16 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
     });
   })
   .nodeify(callback);
+};
+
+// Returns some recent public chats
+exports.getRecentPublicChats = function() {
+  return persistence.ChatMessage
+            .where({ pub: true })
+            .sort({ _id: -1 })
+            .limit(50)
+            .execQ();
+
 };
 
 exports.updateChatMessage = function(troupe, chatMessage, user, newText, callback) {
