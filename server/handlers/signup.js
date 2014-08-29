@@ -9,8 +9,7 @@ module.exports = {
       app.get(nconf.get('web:homeurl'),
         require('../web/middlewares/unawesome-browser'),
         function(req, res, next) {
-
-          if(req.user) {
+          if(req.user && req.query.redirect !== 'no') {
             loginUtils.redirectUserToDefaultTroupe(req, res, next);
             return;
           }
@@ -25,7 +24,11 @@ module.exports = {
         app.get('/',
           function(req, res) {
             if(req.user) {
-              res.relativeRedirect(nconf.get('web:homeurl'));
+              if(req.query.redirect === 'no') {
+                res.relativeRedirect(nconf.get('web:homeurl') + '?redirect=no');
+              } else {
+                res.relativeRedirect(nconf.get('web:homeurl'));
+              }
               return;
             }
 
