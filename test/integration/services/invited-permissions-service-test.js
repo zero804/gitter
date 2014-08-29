@@ -44,6 +44,16 @@ describe('invited-permissions-service', function() {
       }).nodeify(done);
     });
 
+    it('queries the correct repo', function(done) {
+      var service = createServiceWithStubData(function(user, right, uri, roomType) {
+        assert.equal(roomType, 'REPO');
+        assert.equal(uri, 'gitterHQ/gitter');
+        done();
+      });
+
+      service(username, room).fail(done);
+    });
+
   });
 
   describe('org room', function() {
@@ -68,6 +78,16 @@ describe('invited-permissions-service', function() {
       service(username, room).then(function(isAllowed) {
         assert(!isAllowed);
       }).nodeify(done);
+    });
+
+    it('queries the correct org', function(done) {
+      var service = createServiceWithStubData(function(user, right, uri, roomType) {
+        assert.equal(roomType, 'ORG');
+        assert.equal(uri, 'gitterHQ');
+        done();
+      });
+
+      service(username, room).fail(done);
     });
 
   });
