@@ -5,6 +5,11 @@ var githubMembers = require('./github/github-members');
 var Q = require('q');
 
 function canUserBeInvitedToJoinRoom(usernameToBeInvited, troupe, instigatingUser) {
+  if(troupe.security === 'PUBLIC') {
+    // anyone can join public rooms
+    return Q.resolve(true);
+  }
+
   switch(troupe.githubType) {
     case 'REPO':
       return githubMembers.isMember(usernameToBeInvited, troupe.uri, 'REPO', instigatingUser);
@@ -20,7 +25,6 @@ function canUserBeInvitedToJoinRoom(usernameToBeInvited, troupe, instigatingUser
     case 'ORG_CHANNEL':
       switch(troupe.security) {
         case 'PRIVATE':
-        case 'PUBLIC':
           /* Anyone can be added */
           return Q.resolve(true);
 

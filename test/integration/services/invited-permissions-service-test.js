@@ -24,45 +24,88 @@ describe('invited-permissions-service', function() {
 
   describe('repo room', function() {
 
-    var room = { uri: 'gitterHQ/gitter', githubType: 'REPO' };
+    describe('(public)', function() {
 
-    it('allows invites if user can join', function(done) {
-      var service = createServiceWithStubData(function() {
-        return true;
+      var room = {
+        uri: 'gitterHQ/gitter',
+        githubType: 'REPO',
+        security: 'PUBLIC'
+      };
+
+      it('allows collaborators to be invited', function(done) {
+        var service = createServiceWithStubData(function() {
+          return true;
+        });
+
+        service(username, room).then(function(isAllowed) {
+          assert(isAllowed);
+        }).nodeify(done);
       });
 
-      service(username, room).then(function(isAllowed) {
-        assert(isAllowed);
-      }).nodeify(done);
+      it('allows non-collaborators to be invited', function(done) {
+        var service = createServiceWithStubData(function() {
+          return false;
+        });
+
+        service(username, room).then(function(isAllowed) {
+          assert(isAllowed);
+        }).nodeify(done);
+      });
+
     });
 
-    it('doesnt allow invites if user cant join', function(done) {
-      var service = createServiceWithStubData(function() {
-        return false;
+    describe('(private)', function() {
+
+      var room = {
+        uri: 'gitterHQ/gitter',
+        githubType: 'REPO',
+        security: 'PRIVATE'
+      };
+
+      it('allows collaborators to be invited', function(done) {
+        var service = createServiceWithStubData(function() {
+          return true;
+        });
+
+        service(username, room).then(function(isAllowed) {
+          assert(isAllowed);
+        }).nodeify(done);
       });
 
-      service(username, room).then(function(isAllowed) {
-        assert(!isAllowed);
-      }).nodeify(done);
-    });
+      it('doesnt allow non-collaborators to be invited', function(done) {
+        var service = createServiceWithStubData(function() {
+          return false;
+        });
 
-    it('queries the correct repo', function(done) {
-      var service = createServiceWithStubData(function(username, uri, githubType) {
-        assert.equal(githubType, 'REPO');
-        assert.equal(uri, 'gitterHQ/gitter');
-        done();
+        service(username, room).then(function(isAllowed) {
+          assert(!isAllowed);
+        }).nodeify(done);
       });
 
-      service(username, room).fail(done);
+      it('queries the correct repo', function(done) {
+
+        var service = createServiceWithStubData(function(username, uri, githubType) {
+          assert.equal(githubType, 'REPO');
+          assert.equal(uri, 'gitterHQ/gitter');
+          done();
+        });
+
+        service(username, room).fail(done);
+      });
+
     });
 
   });
 
   describe('org room', function() {
 
-    var room = { uri: 'gitterHQ', githubType: 'ORG' };
+    var room = {
+      uri: 'gitterHQ',
+      githubType: 'ORG',
+      security: 'PRIVATE'
+    };
 
-    it('allows invites if user can join', function(done) {
+    it('allows members to be invited', function(done) {
       var service = createServiceWithStubData(function() {
         return true;
       });
@@ -72,7 +115,7 @@ describe('invited-permissions-service', function() {
       }).nodeify(done);
     });
 
-    it('doesnt allow invites if user cant join', function(done) {
+    it('doesnt allow non-members to be invited', function(done) {
       var service = createServiceWithStubData(function() {
         return false;
       });
@@ -96,7 +139,11 @@ describe('invited-permissions-service', function() {
 
   describe('one to one room', function() {
 
-    var room = { uri: 'trevorah', githubType: 'ONETOONE' };
+    var room = {
+      uri: 'trevorah',
+      githubType: 'ONETOONE',
+      security: 'PRIVATE'
+    };
 
     it('doesnt allow invites even if user can join', function(done) {
       var service = createServiceWithStubData(function() {
