@@ -103,53 +103,6 @@ describe('permissions-model', function() {
       permissionsModel(user, 'join', 'uri', 'ORG', 'PUBLIC');
     });
 
-    it('destroys the optional github user token (if supplied)', function(done) {
-      var user = {
-        username: 'gitterbob',
-        destroyTokens: function() {
-          assert(false, 'user token should not be destroyed');
-        }
-      };
-
-      var tokenUser = {
-        username: 'usemytokens',
-        destroyTokens: function() {
-          done();
-        }
-      };
-
-      permissionsModel(user, 'join', 'uri', 'ORG', 'PUBLIC', { githubTokenUser: tokenUser });
-    });
-
-    it('saves the destruction of the optional github user token (if supplied)', function(done) {
-      var user = {
-        username: 'gitterbob',
-        destroyTokens: function() {
-          assert(false, 'user token should not be destroyed');
-        }
-      };
-
-      var tokenUser = {
-        username: 'usemytokens',
-        destroyTokens: function() {},
-        saveQ: function() {
-          done();
-        }
-      };
-
-      permissionsModel(user, 'join', 'uri', 'ORG', 'PUBLIC', { githubTokenUser: tokenUser });
-    });
-
-  });
-
-  it('passes options through', function(done) {
-    mockito.when(userBannedFromRoomMock)().then(function() { return Q.resolve(false); });
-    mockito.when(orgPermissionsModelMock)().then(function(user, right, uri, security, options) {
-      assert.equal(options.someoption, 'iamhere');
-      done();
-    });
-
-    permissionsModel({}, 'join', 'uri', 'ORG', 'PUBLIC', { someoption: 'iamhere' });
   });
 
 });
