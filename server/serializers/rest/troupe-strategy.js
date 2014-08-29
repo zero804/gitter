@@ -256,7 +256,6 @@ function TroupeStrategy(options) {
   var shownWarning = false;
 
   this.map = function(item) {
-
     var troupeName, troupeUrl, otherUser, plan;
 
     plan = roomPlanStrategy.map(item);
@@ -272,7 +271,6 @@ function TroupeStrategy(options) {
           otherUser = null;
         }
       }
-
 
       if(otherUser) {
         troupeName = otherUser.displayName;
