@@ -7,10 +7,10 @@ var Q = require('q');
 function canUserBeInvitedToJoinRoom(usernameToBeInvited, troupe, instigatingUser) {
   switch(troupe.githubType) {
     case 'REPO':
-      return canUserJoinRoomWithUri(usernameToBeInvited, troupe.uri, 'REPO', instigatingUser);
+      return githubMembers.isMember(usernameToBeInvited, troupe.uri, 'REPO', instigatingUser);
 
     case 'ORG':
-      return canUserJoinRoomWithUri(usernameToBeInvited, troupe.uri, 'ORG', instigatingUser);
+      return githubMembers.isMember(usernameToBeInvited, troupe.uri, 'ORG', instigatingUser);
 
     case 'ONETOONE':
       /* Nobody can be added */
@@ -28,7 +28,7 @@ function canUserBeInvitedToJoinRoom(usernameToBeInvited, troupe, instigatingUser
           var parentUri = troupe.uri.split('/').slice(0, -1).join('/');
           var parentRoomType = troupe.githubType === 'REPO_CHANNEL' ? 'REPO' : 'ORG';
 
-          return canUserJoinRoomWithUri(usernameToBeInvited, parentUri, parentRoomType, instigatingUser);
+          return githubMembers.isMember(usernameToBeInvited, parentUri, parentRoomType, instigatingUser);
 
         default:
           /* Dont know what kind of permission this is */
@@ -44,10 +44,6 @@ function canUserBeInvitedToJoinRoom(usernameToBeInvited, troupe, instigatingUser
       /* Dont know what kind of room this is */
       return Q.reject(400);
   }
-}
-
-function canUserJoinRoomWithUri(username, uri, githubType, githubTokenUser) {
-  return githubMembers.isMember(username, uri, githubType, githubTokenUser);
 }
 
 module.exports = canUserBeInvitedToJoinRoom;

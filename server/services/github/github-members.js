@@ -35,6 +35,8 @@ function getMembers(uri, githubType, githubTokenUser) {
   }
 }
 
+module.exports.getMembers = getMembers;
+
 function isMember(username, uri, githubType, githubTokenUser) {
   return getMembers(uri, githubType, githubTokenUser)
     .then(function(members) {
@@ -42,5 +44,4 @@ function isMember(username, uri, githubType, githubTokenUser) {
     });
 }
 
-module.exports.getMembers = getMembers;
 module.exports.isMember = isMember;
