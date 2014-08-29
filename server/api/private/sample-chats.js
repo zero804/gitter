@@ -3,7 +3,10 @@
 
 var sampleChatsService = require('../../services/sample-chats-service');
 
-module.exports =  function(req, res) {
-  var samples = sampleChatsService.getSamples().reverse();
-  res.send(samples);
-}
+module.exports =  function(req, res, next) {
+  return sampleChatsService.getSamples()
+    .then(function(samples) {
+      res.send(samples);
+    })
+    .fail(next);
+};

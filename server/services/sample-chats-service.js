@@ -1,43 +1,37 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var appEvents     = require('../app-events');
-var troupeService = require('./troupe-service');
+var chatService = require('./chat-service');
+var restSerializer = require('../serializers/rest-serializer');
+var Q = require('q');
 
-var sampleUsers = [];
-var sampleChats = [];
-
-appEvents.localOnly.onChat(function(evt) { 
-  if (evt.operation === 'create') {
-
-    troupeService.findById(evt.troupeId)
-      .then(function(troupe) {
-        var sample = {
-          avatarUrl: evt.model.fromUser.avatarUrlSmall,
-          username: evt.model.fromUser.username,
-          room: troupe.uri
-        };
-
-        if (troupe.security === 'PUBLIC') {
-
-          // Display only one message per user
-          if (sampleUsers.indexOf(sample.username) === -1) {
-            sampleUsers.push(sample.username);
-            sampleChats.push(sample);
-          }
-
-          // Keep only 30 msgs
-          if (sampleChats.length > 30) {
-            sampleUsers.shift();
-            sampleChats.shift();
-          }
-        }
-      });
-  }
-});
-
+var cachedSamples = null;
 function getSamples() {
-  return sampleChats;
+  if(cachedSamples) return Q.resolve(cachedSamples);
+
+  return chatService.getRecentPublicChats()
+    .then(function(chatMessage) {
+      // Remove any duplicate users
+      var users = {};
+      return chatMessage.filter(function(chatMessage) {
+        if(users[chatMessage.fromUserId]) return false;
+        users[chatMessage.fromUserId] = true;
+        return true;
+      });
+    })
+    .then(function(sampleChatMessages) {
+      var sampleChatStrategy = new restSerializer.SampleChatStrategy();
+      var results = restSerializer.serialize(sampleChatMessages, sampleChatStrategy);
+
+      cachedSamples = results;
+
+      // Keep them cached for 30 seconds
+      setTimeout(function() {
+        cachedSamples = null;
+      }, 30000);
+
+      return results;
+    });
 }
 
 module.exports = {
