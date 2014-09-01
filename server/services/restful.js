@@ -6,9 +6,11 @@ var troupeService       = require("./troupe-service");
 var restSerializer      = require("../serializers/rest-serializer");
 var unreadItemService   = require("./unread-item-service");
 var chatService         = require("./chat-service");
+var userService         = require("./user-service");
 var eventService        = require("./event-service");
 var Q                   = require('q');
 var roomService         = require('./room-service');
+var GithubMe            = require('./github/github-me-service');
 var _                   = require('underscore');
 
 var DEFAULT_CHAT_COUNT_LIMIT = 30;
@@ -93,4 +95,26 @@ exports.serializeEventsForTroupe = function(troupeId, userId, callback) {
       return restSerializer.serialize(events, strategy);
     })
     .nodeify(callback);
+};
+
+exports.serializeOrgsForUser = function(user, options) {
+  var ghUser = new GithubMe(user);
+
+  var strategyOptions = { currentUserId: user.id, mapUsers: options && options.mapUsers };
+
+  return ghUser.getOrgs()
+    .then(function(ghOrgs) {
+      var strategy = new restSerializer.GithubOrgStrategy(strategyOptions);
+
+      return restSerializer.serialize(ghOrgs, strategy);
+    });
+};
+
+exports.serializeOrgsForUserId = function(userId, options) {
+  return userService.findById(userId)
+    .then(function(user) {
+      if(!user) return [];
+
+      return exports.serializeOrgsForUser(user, options);
+    });
 };
