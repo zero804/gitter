@@ -44,6 +44,23 @@ function GitHubRepoService(user) {
     });
 };
 
+/**
+ *  Returns repo stargazers
+ */
+ GitHubRepoService.prototype.getStargazers = function(repo) {
+  var ghrepo = this.client.repo(repo);
+  var d = Q.defer();
+  ghrepo.stargazers(createClient.makeResolver(d));
+  return d.promise
+    .fail(badCredentialsCheck)
+    .fail(function(err) {
+      if(err.statusCode == 404) return;
+      throw err;
+    });
+};
+
+
+
 function getIssuesWithState(repo, state) {
   var d = Q.defer();
 
