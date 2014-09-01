@@ -54,7 +54,6 @@ exports.cdn = function(url, parameters) {
 exports.bootScript = function(url, parameters) {
   var options = parameters.hash;
 
-  var requireScript;
   var cdnFunc  = (options.skipCdn) ? function(a) { return '/' + a; } : cdn;
   var skipCore = options.skipCore;
 
