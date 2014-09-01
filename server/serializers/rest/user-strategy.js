@@ -81,8 +81,8 @@ function UserRoleInTroupeStrategy(options) {
         contributors = {};
 
         if(githubContributors) {
-          githubContributors.forEach(function(login) {
-            contributors[login] = 'contributor';
+          githubContributors.forEach(function(contributor) {
+            contributors[contributor.login] = 'contributor';
           });
         }
 
