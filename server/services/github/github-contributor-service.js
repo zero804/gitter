@@ -21,9 +21,7 @@ GitHubContributorService.prototype.getContributors = function(repo) {
     .then(function(contributors) {
       if(!contributors) return [];
 
-      return contributors.map(function(contributor) {
-        return contributor.login;
-      });
+      return contributors;
     })
     .fail(badCredentialsCheck);
 };
