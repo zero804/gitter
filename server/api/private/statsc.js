@@ -49,13 +49,10 @@ module.exports =  function(req, res) {
   }
 
   res.format({
-    text: function() {
-      res.send('OK');
-    },
     json: function() {
       res.send({ success: true });
     },
-    html: function() {
+    default: function() {
       res.send('OK');
     }
   });
