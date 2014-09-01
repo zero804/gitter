@@ -163,7 +163,22 @@ define([
     events: {
       'click .js-close': 'dismiss',
       'click #add-button' : 'clickAddButton',
-      'click #share-button' : 'clickShareButton'
+      'click #share-button' : 'clickShareButton',
+      'click .js-twitter': 'shareOnTwitter',
+      'click .js-badge': 'createBadge'
+    },
+
+    shareOnTwitter: function() {
+      var text = escape('Just created a room on Gitter for ' + context.troupe().get('uri') + ':');
+      window.open('https://twitter.com/share?' +
+        'text=' + text + 
+        '&url=https://gitter.im/' + context.troupe().get('uri') +
+        '&related=gitchat' + 
+        '&hashtags=gitchat'
+      );
+    },
+
+    createBadge: function() {
     },
 
     clickAddButton: function() {
