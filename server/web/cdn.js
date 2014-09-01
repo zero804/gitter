@@ -7,6 +7,8 @@ var appVersion = require('./appVersion');
 var hosts, hostLength, cdnPrefix;
 
 function passthrough(url, options) {
+  if(!url) url = ""; // This should not be happening
+
   var nonrelative = options && options.nonrelative;
   var email = options && options.email;
   var prefix;
@@ -19,6 +21,8 @@ function passthrough(url, options) {
 }
 
 function cdnSingle(url, options) {
+  if(!url) url = ""; // This should not be happening
+
   var nonrelative = options && options.nonrelative;
   var appcache = options && options.appcache;
   var email = options && options.email;
@@ -40,6 +44,8 @@ function cdnSingle(url, options) {
 }
 
 function cdnMulti(url, options) {
+  if(!url) url = ""; // This should not be happening
+
   var email = options && options.email;
   var appcache = options && options.appcache;
 
