@@ -69,7 +69,7 @@ module.exports = {
     return emailAddressService(toUser)
       .then(function(email) {
         if (!email) return;
-
+        console.log("TOUSERID: " + toUser.id);
         return mailerService.sendEmail({
           templateFile: "invitation",
           from: senderName + ' <support@gitter.im>',
@@ -77,7 +77,7 @@ module.exports = {
           subject: '[' + room.uri + '] Join the chat on Gitter',
           tracking: {
             event: 'invitation_sent',
-            data: { userId: user.id, email: email }
+            data: { userId: toUser.id, email: email }
           },
           data: {
             roomUri: room.uri,
