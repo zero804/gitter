@@ -5,7 +5,7 @@ define([
   "use strict";
 
   var OrgModel = TroupeCollections.Model.extend({
-    idAttribute: 'id'
+    idAttribute: 'name' // Unusual...
   });
 
   var OrgCollection = TroupeCollections.LiveCollection.extend({

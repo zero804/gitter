@@ -126,10 +126,12 @@ define([
       if(!id) return;
 
       var self = this;
+      var idAttribute = this.model.prototype.idAttribute || 'id';
 
       var actionPerformed = false;
 
       function done(model) {
+        clearTimeout(timeoutRef);
         log('Waitor completed with model', model);
 
         self.off('add', check, id);
@@ -149,12 +151,12 @@ define([
       }
 
       function check(model) {
-        if(model && model.id === id) {
+        if(model && model[idAttribute] === id) {
           done(model);
         }
       }
 
-      setTimeout(function() {
+      var timeoutRef = setTimeout(function() {
         done();
       }, timeout);
 
@@ -312,7 +314,8 @@ define([
       var self = this;
       var operation = data.operation;
       var newModel = data.model;
-      var id = newModel.id;
+      var idAttribute = this.model.prototype.idAttribute || 'id';
+      var id = newModel[idAttribute];
 
       if(this.ignoreDataChange) {
         if(this.ignoreDataChange(data)) return;
