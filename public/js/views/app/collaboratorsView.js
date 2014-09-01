@@ -149,7 +149,11 @@ define([
 
     initialize: function() {
       var ctx = context();
-      appEvents.triggerParent('track-event', 'welcome-add-user-suggestions', { count: this.collection.length, security: ctx.troupe.security });
+      appEvents.triggerParent('track-event', 'welcome-add-user-suggestions', { 
+        uri: ctx.troupe.uri,
+        security: ctx.troupe.security,
+        count: this.collection.length 
+      });
     },
 
     onRender: function() {
