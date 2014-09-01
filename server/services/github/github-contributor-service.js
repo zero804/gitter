@@ -31,7 +31,7 @@ module.exports = wrap(GitHubContributorService, function() {
 }, {
   policy: 'two-tier',
   hotTTL: 600,    /* 10 minutes cache */
-  coldTTL: 43200, /* half a day cold cache */
+  coldTTL: 14400, /* 4 hours cold cache */
   coolRefetchTimeout: 0.5 /* max time per call */
 });
 
