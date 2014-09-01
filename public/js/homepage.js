@@ -2,18 +2,12 @@ require([
   'jquery',
   'utils/context',
   'hbs!./map-message',
+  'utils/room-name-trimmer',
   'utils/tracking' // no ref
- ], function($, context, mapMessageTemplate) {
+ ], function($, context, mapMessageTemplate, roomNameTrimmer) {
   "use strict";
 
-  function random(array) {
-    return array[Math.floor(Math.random() * array.length)];
-  }
-
-  function shuffle(array){
-    for(var j, x, i = array.length; i; j = Math.floor(Math.random() * i), x = array[--i], array[i] = array[j], array[j] = x);
-    return array;
-  }
+  var active = [];
 
   var featuredRooms  = [
     { uri: 'marionettejs/backbone.marionette',
@@ -88,7 +82,14 @@ require([
     }
   ];
 
-  var active = [];
+  function random(array) {
+    return array[Math.floor(Math.random() * array.length)];
+  }
+
+  function shuffle(array){
+    for(var j, x, i = array.length; i; j = Math.floor(Math.random() * i), x = array[--i], array[i] = array[j], array[j] = x);
+    return array;
+  }
 
   function roomByLocale(locale) {
     var rooms = featuredRooms.filter(function(r) { return r.locale === locale;});
@@ -169,14 +170,13 @@ require([
 
     var $map = $('.map');
 
-    $.get('/api/private/sample-chats', function(messages) {
+    $.get('/api/private/sample-chats', function (messages) {
 
       setInterval(function() {
         var chatMessage = messages.shift();
         var pos = coords.shift();
 
         if(!chatMessage || !pos) return;
-
         messages.push(chatMessage);
         coords.push(pos);
 
@@ -184,10 +184,10 @@ require([
         addMessageElementToMap($el, $map);
 
         setTimeout(function() {
-          removeMessageBubbleFromMap($el);
-        }, 5000);
+          removeItemFromMap($el);
+        }, 2000);
 
-      }, 2500);
+      }, 2000);
     });
   }
 
@@ -196,7 +196,7 @@ require([
       username: chatMessage.username,
       avatarUrl: chatMessage.avatarUrl,
       fullRoomName: chatMessage.room,
-      roomName: chatMessage.room.split('/').pop(),
+      roomName: roomNameTrimmer(chatMessage.room),
       left: pos[0],
       top: pos[1]
     });
@@ -215,10 +215,20 @@ require([
     });
   }
 
-  function removeMessageBubbleFromMap($message) {
-    $message.children().removeClass('enter').animate({opacity: 0}, function() {
-      $message.remove();
+  function removeItemFromMap($message) {
+    // console.log('$message.children():', $message.children());
+    var children = $message.children();
+    $(children[0]).removeClass('enter').animate({ opacity: 0 }, function () {
+      setTimeout(function () {
+        $message.children().removeClass('enter').animate({ opacity: 0 }, function () {
+          $message.remove();
+        });
+      }, 7500);
+
     });
+    // $message.children().removeClass('enter').animate({opacity: 0}, function() {
+    //   $message.remove();
+    // });
   }
 
   function cycleElements($els, time) {
