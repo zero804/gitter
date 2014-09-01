@@ -4,7 +4,7 @@ var nconf             = require('../../utils/config');
 var Q                 = require('q');
 var contextGenerator  = require('../../web/context-generator');
 var restful           = require('../../services/restful');
-var UserService       = require('../../services/user-service');
+var userService       = require('../../services/user-service');
 var appVersion        = require('../../web/appVersion');
 
 var burstCalculator   = require('../../utils/burst-calculator');
@@ -132,7 +132,7 @@ function renderChat(req, res, options, next) {
       }
 
       if (!user) classNames.push("logged-out");
-      
+
       var isPrivate = troupe.security !== "PUBLIC";
 
       var renderOptions = _.extend({
@@ -261,9 +261,10 @@ function renderEmbeddedChat(req, res, next) {
  * renderUserNotSignedUp() renders a set template for a 1:1 chat, with an invited user.
  */
 function renderUserNotSignedUp(req, res, next) {
-  UserService.findByUsername(req.params.roomPart1)
+  userService.findByUsername(req.params.roomPart1)
     .then(function (user) {
       res.render('chat-invited-template', {
+        cssFileName: "styles/router-nli-chat.css", // TODO: this shouldn't be hardcoded as this
         appCache: getAppCache(req),
         agent: req.headers['user-agent'],
         oneToOneInvited: true,
