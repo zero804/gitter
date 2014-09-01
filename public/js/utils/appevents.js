@@ -1,4 +1,8 @@
-define(['underscore', 'backbone', 'utils/context'], function(_, Backbone, context) {
+define([
+  'underscore',
+  'backbone',
+  'utils/context'
+], function(_, Backbone, context) {
   "use strict";
 
   var basePath = context.env('basePath');
