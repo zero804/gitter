@@ -216,7 +216,6 @@ require([
   }
 
   function removeItemFromMap($message) {
-    // console.log('$message.children():', $message.children());
     var children = $message.children();
     $(children[0]).removeClass('enter').animate({ opacity: 0 }, function () {
       setTimeout(function () {
