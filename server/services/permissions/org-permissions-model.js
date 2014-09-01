@@ -11,8 +11,7 @@ var Q                    = require('q');
 /**
  * ORG permissions model
  */
-module.exports = function orgPermissionsModel(user, right, uri, security, options) {
-  options = options || {};
+module.exports = function orgPermissionsModel(user, right, uri, security) {
   // Security is only for child rooms
   if(security) {
     return Q.reject(new Error('orgs do not have security'));
@@ -21,7 +20,7 @@ module.exports = function orgPermissionsModel(user, right, uri, security, option
   // For now, only authenticated users can be members of orgs
   if(!user) return Q.resolve(false);
 
-  var ghOrg = new GitHubOrgService(options.githubTokenUser || user);
+  var ghOrg = new GitHubOrgService(user);
   return ghOrg.member(uri, user.username)
     .catch(function(err) {
       if(err.errno && err.syscall || err.statusCode >= 500) {
