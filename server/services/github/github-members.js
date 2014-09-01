@@ -7,22 +7,22 @@ var Q = require('q');
 
 function getRepoMembers(uri, instigatingUser) {
   var repo = new GithubRepoService(instigatingUser);
-    return repo.getCollaborators(uri)
-      .then(function(collaborators) {
-        return collaborators.map(function(collaborator) {
-          return collaborator.login;
-        });
+  return repo.getCollaborators(uri)
+    .then(function(collaborators) {
+      return collaborators.map(function(collaborator) {
+        return collaborator.login;
       });
+    });
 }
 
 function getOrgMembers(uri, instigatingUser) {
   var org = new GithubOrgService(instigatingUser);
-    return org.members(uri)
-      .then(function(members) {
-        return members.map(function(members) {
-          return members.login;
-        });
+  return org.members(uri)
+    .then(function(members) {
+      return members.map(function(members) {
+        return members.login;
       });
+    });
 }
 
 function getMembers(uri, githubType, instigatingUser) {
