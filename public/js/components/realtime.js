@@ -411,6 +411,8 @@ define([
     },
 
     subscribe: function(channel, callback, context, options) {
+      log('Subscribing to ' + channel);
+
       // Temporary options to pass onto the subscription message
       subscribeOptions[channel] = options;
 
