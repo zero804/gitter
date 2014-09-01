@@ -150,7 +150,7 @@ define([
       var e = this.el;
 
       $e.detach().css({ left: 'auto', display: 'block' });
-      $e.insertAfter($('body'));
+      $e.appendTo($('body'));
       this.reposition();
 
       $e.removeClass('popover-hidden');
