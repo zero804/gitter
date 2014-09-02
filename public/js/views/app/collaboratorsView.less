@@ -47,7 +47,7 @@
 .welcome-modal__collaborators {
   font-size: 14px;
   font-family: @fontSans;
-  text-align: center;
+  text-align: left;
   background: #f4f5f6;
   border-radius: 5px;
   margin: 20px 40px;
@@ -142,23 +142,24 @@
 
 .welcome-modal__share {
   padding: 10px 0 10px 10px;
-  text-align: center;
 
-  .share-on-gh {
-    &:before {
-      font-family: 'octicons';
-      content: '\f00a';
-      font-size: 20px;
-      padding: 0px 10px 0px 0px;
-    }
-  }
+  //.share-on-gh {
+  //  &:before {
+  //    font-family: 'octicons';
+  //    content: '\f00a';
+  //    font-size: 20px;
+  //    padding: 0px 10px 0px 0px;
+  //  }
+  //}
+
   .share-on-tw {
-    &:before {
-      font-family: 'octicons';
-      content: '\f077';
-      font-size: 20px;
-      padding: 0px 10px 0px 0px;
-    }
+    background: #55acee;
+  //  &:before {
+  //    font-family: 'octicons';
+  //    content: '\f077';
+  //    font-size: 20px;
+  //    padding: 0px 10px 0px 0px;
+  //  }
   }
 
   .pr-status {
@@ -167,5 +168,5 @@
 }
 
 .search {
-  padding: 10px 0 10px 0;
+  padding: 10px 0 10px 20px;
 }
