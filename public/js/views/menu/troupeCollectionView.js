@@ -21,7 +21,7 @@ define([
 
   var TroupeItemView = Marionette.ItemView.extend({
     tagName: 'li',
-    className: 'menu-list-item',
+    className: 'room-list-item',
     template: roomListItemTemplate,
     modelEvents: {
       'change:unreadItems change:lurk change:activity change:mentions': 'render'

@@ -9,7 +9,7 @@ define([
 
   var OrgItemView = Marionette.ItemView.extend({
     tagName: 'li',
-    className: 'menu-list-item',
+    className: 'room-list-item',
     template: orgListItemTemplate,
     modelEvents: {
       change: 'render',
