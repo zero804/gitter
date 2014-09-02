@@ -6,9 +6,10 @@ var cdn             = require("./cdn");
 var _               = require('underscore');
 var appVersion      = require('./appVersion');
 var safeJson        = require('../utils/safe-json');
-var env             = process.env['NODE_ENV'];
+var env             = process.env.NODE_ENV;
 var minifiedDefault = nconf.get("web:minified");
 var util            = require('util');
+var moment          = require('moment');
 
 var cdns;
 if(nconf.get("cdn:use")) {
@@ -96,7 +97,6 @@ exports.bootScript = function(url, parameters) {
          asyncScript,
          url,
          cdnFunc("repo/requirejs/requirejs.js", cdnOptions));
-
 };
 
 exports.isMobile = function(agent, options) {
@@ -141,6 +141,28 @@ exports.pluralize = function(number, singular, plural) {
 exports.toLowerCase = function (str) {
   return str.toLowerCase();
 };
+
+exports.pad = function(options) {
+  var content = "" + options.fn(this);
+  var width = options.hash.width || 40;
+  var directionRight = options.hash.direction ? options.hash.direction == "right" : true;
+
+  while (content.length < width) {
+    if (directionRight) {
+      content+=" ";
+    } else  {
+      content=" " + content;
+    }
+  }
+  return content;
+};
+
+exports.oneLine = function(options) {
+  var content = "" + options.fn(this);
+  content=content.replace(/\n/g,"");
+  return content;
+};
+
 
 // FIXME REMOVE THIS ONCE THE NEW ERRORS PAGES ARE DONE
 exports.typewriter = function (el, str) {

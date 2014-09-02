@@ -3,8 +3,13 @@ Hi there,
 
 This is what you missed while you were away.
 
-{{#each troupesWithUnreadCounts}}
-{{#if troupe.oneToOne}}{{troupe.name}}{{else}}{{troupe.uri}}{{/if}}: {{__n "%d unread message" "%d unread messages" unreadCount}}
+{{#each troupesWithUnreadCounts}}{{#oneLine}}
+{{#if troupe.oneToOne}}
+{{troupe.name}}
+{{else}}
+{{troupe.uri}}
+{{/if}}: {{__n "%d unread message" "%d unread messages" unreadCount}}
+{{/oneLine}}
 {{../emailBasePath}}{{troupe.url}}
 {{/each}}
 
