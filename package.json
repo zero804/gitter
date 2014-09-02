@@ -46,7 +46,7 @@
     "winston-logstash-udp": "0.0.4",
     "i18n": "~0.4.1",
     "restler-q": "0.0.3",
-    "octonode": "^0.6.4",
+    "octonode": "git://github.com/pksunkara/octonode.git#6dae7e054c9903191164fbd43ec69bbbe454499f",
     "jwt-simple": "~0.1.0",
     "snappy-cache": "^0.1.1",
     "lazy.js": "~0.2.1",

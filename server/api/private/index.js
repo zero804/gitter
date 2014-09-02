@@ -77,5 +77,10 @@ module.exports = {
     app.get(apiRoot + '/private/sample-chats',
         require('./sample-chats.js'));
 
+    app.post(apiRoot + '/private/create-badge',
+        authMiddleware,
+        require('./create-badge-pr.js'));
+
+
   }
 };
