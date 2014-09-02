@@ -6,7 +6,9 @@ var winston = require('../utils/winston');
 var fs      = require('fs');
 var path    = require('path');
 
-/* This method should move */
+/**
+ * Serialize some items using a strategy, returning a promise
+ */
 function serialize(items, strat, callback) {
   var d = Q.defer();
 

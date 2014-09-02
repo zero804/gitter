@@ -8,30 +8,27 @@ var execPreloads = require('./exec-preloads');
 function idStrategyGenerator(name, FullObjectStrategy, loaderFunction) {
   var Strategy = function IdStrategy(options) {
     var strategy = new FullObjectStrategy(options);
-    var self = this;
+    var objectHash;
 
     this.preload = function(ids, callback) {
-      loaderFunction(ids, function(err, fullObjects) {
-        if(err) {
-          winston.error("Error loading objects", { exception: err });
-          return callback(err);
-        }
+      return loaderFunction(ids)
+        .then(function(fullObjects) {
+          objectHash = collections.indexById(fullObjects);
 
-        self.objectHash = collections.indexById(fullObjects);
-
-        execPreloads([{
-          strategy: strategy,
-          data: fullObjects
-        }], callback);
-
-      });
+          return execPreloads([{
+            strategy: strategy,
+            data: fullObjects
+          }]);
+        })
+        .nodeify(callback);
     };
 
+
     this.map = function(id) {
-      var fullObject = self.objectHash[id];
+      var fullObject = objectHash[id];
 
       if(!fullObject) {
-        winston.warn("Unable to locate object ", { id: id });
+        winston.warn("Unable to locate object ", { id: id, strategy: Strategy.prototype.name });
         return null;
       }
 

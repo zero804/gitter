@@ -16,6 +16,7 @@ var roomCapabilities     = require('./room-capabilities');
 var StatusError          = require('statuserror');
 var unreadItemService    = require('./unread-item-service');
 var _                    = require('underscore');
+var mongooseUtils        = require('../utils/mongoose-utils');
 
 /*
  * Hey Trouper!
@@ -183,13 +184,11 @@ exports.findById = function(id, callback) {
     .nodeify(callback);
 };
 
- exports.findByIds = function(ids, callback) {
-  if(!ids || !ids.length) return Q.resolve([]).nodeify(callback);
-
-  return persistence.ChatMessage
-    .where('_id')['in'](collections.idsIn(ids))
-    .execQ()
-    .nodeify(callback);
+/**
+ * Returns a promise of chats with given ids
+ */
+exports.findByIds = function(ids, callback) {
+  return mongooseUtils.findByIds(persistence.ChatMessage, ids, callback);
 };
 
 // function massageMessages(message) {

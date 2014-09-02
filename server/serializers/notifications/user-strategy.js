@@ -1,6 +1,19 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+function setAvatarSize(url, size) {
+  var sizeText;
+  if(!url || typeof url !== "string") return null;
+  if(size=='m') sizeText="s=128";
+  if(size=='s') sizeText="s=60";
+
+  if(url.indexOf('?') >= 0) {
+    return url + '&' + sizeText;
+  }
+
+  return url + '?' + sizeText;
+}
+
 function UserStrategy(options) {
   options = options ? options : {};
 
@@ -14,7 +27,9 @@ function UserStrategy(options) {
     return {
       id: user.id,
       username: user.username,
-      displayName: user.getDisplayName()
+      displayName: user.getDisplayName(),
+      avatarUrlSmall: setAvatarSize(user.gravatarImageUrl,'s'),
+      avatarUrlMedium: setAvatarSize(user.gravatarImageUrl,'m'),
     };
   };
 }
