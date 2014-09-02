@@ -174,6 +174,11 @@ define([
       this.regionManager.forEach(function(region) {
         region.currentView.on('render', function() {
           $nano.nanoScroller({ iOSNativeScrolling: true });
+          if(window.navigator.userAgent.indexOf('Chrome/37.') >= 0) {
+            // chrome 37 bug: https://code.google.com/p/chromium/issues/detail?id=408705
+            // causes nanoscroller bug: https://github.com/jamesflorentino/nanoScrollerJS/issues/255
+            $nano.find('.nano-content').css('right', '0');
+          }
         });
       });
 
