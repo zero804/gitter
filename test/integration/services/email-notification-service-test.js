@@ -27,6 +27,21 @@ var EMAIL_DATA = [
       {
         "id": "5405bfdd66579b000004df1a",
         "text": "GOOD STUFF",
+        "html": "GOOD STUFF",
+        "sent": "2014-09-02T13:02:21.343Z",
+        "mentions": [],
+        "fromUser": {
+          "id": "53cf8aa8fe44f8028eb727fb",
+          "username": "gitterawesome",
+          "displayName": "gitterawesome",
+          "avatarUrlSmall": "https://avatars.githubusercontent.com/u/7022301?v=2&s=60",
+          "avatarUrlMedium": "https://avatars.githubusercontent.com/u/7022301?v=2&s=128"
+        }
+      },
+      {
+        "id": "5405bfdd66579b000004df1a",
+        "text": "AWesome",
+        "html": "AWesome",
         "sent": "2014-09-02T13:02:21.343Z",
         "mentions": [],
         "fromUser": {
@@ -37,6 +52,7 @@ var EMAIL_DATA = [
           "avatarUrlMedium": "https://avatars.githubusercontent.com/u/7022301?v=2&s=128"
         }
       }
+
     ]
   }
 ];
@@ -48,7 +64,7 @@ describe('email-notification-service', function() {
   beforeEach(function() {
     emailNotificationService = testRequire.withProxies("./services/email-notification-service", {
       './email-address-service': function() {
-        return Q.resolve('mike.bartlett@gmail.com');
+        return Q.resolve('andrewn@datatribe.net');
       }
     });
   });

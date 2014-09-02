@@ -25,7 +25,7 @@
                         <tr>
                           <td style="max-width: 400px; width: 400px;">
                             <h2>{{#if troupe.oneToOne}}{{troupe.name}}{{else}}{{troupe.uri}}{{/if}}</h1>
-                            <h4>{{__n "%d unread message" "%d unread messages" unreadCount}}</h4>
+                            <h4>{{__n "%d unread message" "%d unread messages" unreadCount}}</h4>                           
                             <p>{{#unless troupe.oneToOne}}<a href="{{../../emailBasePath}}{{troupe.url}}#notifications" style="color: #2980b9;">Notification settings</a>{{/unless}}&nbsp;</p>
                             <br>
                           </td>
@@ -33,6 +33,14 @@
                             <a href="{{../emailBasePath}}{{troupe.url}}#utm_source=notification&utm_medium=email&utm_campaign=unread-notifications" style="text-decoration: none" class="button-green">Read</a>
                           </td>
                           <td class="expander"></td>
+                        </tr>
+                        {{#each chats}}
+                        <tr>
+                          <td colspan="3"><img height="24" width="24" src="{{fromUser.avatarUrlSmall}}">{{fromUser.username}}: {{{html}}}</td>
+                        </tr>
+                        {{/each}}
+                        <tr>
+                          <td colspan="3"><hr></td>
                         </tr>
                       </table>
                     </td>

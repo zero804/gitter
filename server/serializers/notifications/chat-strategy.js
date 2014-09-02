@@ -36,6 +36,7 @@ function ChatStrategy(options)  {
     return {
       id: item._id,
       text: item.text,
+      html: item.html,
       sent: item.sent,
       mentions: item.mentions,
       fromUser: options.user ? options.user : userStategy.map(item.fromUserId),
