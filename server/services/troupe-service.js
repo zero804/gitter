@@ -19,6 +19,7 @@ var assert                   = require('assert');
 var roomPermissionsModel     = require('./room-permissions-model');
 var leanTroupeDao            = require('./daos/troupe-dao').lean;
 var promiseUtils             = require('../utils/promise-utils');
+var mongooseUtils            = require('../utils/mongoose-utils');
 
 function findByUri(uri, callback) {
   var lcUri = uri.toLowerCase();
@@ -28,12 +29,7 @@ function findByUri(uri, callback) {
 }
 
 function findByIds(ids, callback) {
-  if(!ids || !ids.length) return Q.resolve([]).nodeify(callback);
-
-  return persistence.Troupe
-    .where('_id')['in'](collections.idsIn(ids))
-    .execQ()
-    .nodeify(callback);
+  return mongooseUtils.findByIds(persistence.Troupe, ids, callback);
 }
 
 function findById(id, callback) {

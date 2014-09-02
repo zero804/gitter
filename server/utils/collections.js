@@ -23,19 +23,25 @@ exports.extract = function(propertyName) {
 
 exports.indexById = function(array) {
   var a = {};
-  array.forEach(function(item) {
-    a[item.id || item._id] = item;
-  });
-
+  if(array) {
+    array.forEach(function(item) {
+      if(item) {
+        a[item.id || item._id] = item;
+      }
+    });
+  }
   return a;
 };
 
 exports.indexByProperty = function(array, propertyName) {
   var a = {};
-  array.forEach(function(item) {
-    a[item[propertyName]] = item;
-  });
-
+  if(array) {
+    array.forEach(function(item) {
+      if(item) {
+        a[item[propertyName]] = item;
+      }
+    });
+  }
   return a;
 };
 
