@@ -127,10 +127,13 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
 
 // Returns some recent public chats
 exports.getRecentPublicChats = function() {
+  var twentyFourHoursAgo = new Date(Date.now() - 86400000);
+
   return persistence.ChatMessage
             .where({ pub: true })
+            .where({ sent: { $gt: twentyFourHoursAgo} })
             .sort({ _id: -1 })
-            .limit(50)
+            .limit(100)
             .execQ();
 
 };
