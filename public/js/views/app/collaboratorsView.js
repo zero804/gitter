@@ -206,7 +206,7 @@ define([
           btn.disabled = false;
         },
         success: function (res) {
-          st.html('We just created a PR for you! <a href=' + res.html_url + ' target="_blank">Badge Pull Request &rarr;</a>');
+          st.html('We just created a PR for you! <a href=' + res.html_url + ' target="_blank">Review and merge &rarr;</a>');
         }
       });
     },
