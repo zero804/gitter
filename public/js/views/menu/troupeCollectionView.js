@@ -3,14 +3,14 @@ define([
   'utils/context',
   'utils/room-name-trimmer',
   'marionette',
-  'hbs!./tmpl/troupeListItem',
+  'hbs!./tmpl/room-list-item',
   'utils/appevents',
   'utils/momentWrapper',
   'views/base',
   'cocktail',
   'utils/dataset-shim',
   'jquery-sortable' // No ref
-], function($, context, roomNameTrimmer, Marionette, troupeListItemTemplate, appEvents, moment,  TroupeViews, cocktail, dataset) {
+], function($, context, roomNameTrimmer, Marionette, roomListItemTemplate, appEvents, moment,  TroupeViews, cocktail, dataset) {
   "use strict";
 
   /* @const */
@@ -21,8 +21,8 @@ define([
 
   var TroupeItemView = Marionette.ItemView.extend({
     tagName: 'li',
-    className: 'menu-list-item',
-    template: troupeListItemTemplate,
+    className: 'room-list-item',
+    template: roomListItemTemplate,
     modelEvents: {
       'change:unreadItems change:lurk change:activity change:mentions': 'render'
     },
