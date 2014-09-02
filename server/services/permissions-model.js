@@ -30,13 +30,11 @@ var ALL_RIGHTS = {
 /**
  * Main entry point
  */
-function permissionsModel(user, right, uri, roomType, security, options) {
+function permissionsModel(user, right, uri, roomType, security) {
   function log(x) {
     winston.verbose('Permission', { user: user && user.username, uri: uri, roomType: roomType, granted: x, right: right });
     return x;
   }
-
-  var options = options || {};
 
   if(!right) return Q.reject(new Error('right required'));
 
@@ -70,15 +68,14 @@ function permissionsModel(user, right, uri, roomType, security, options) {
     .then(function(banned) {
       if(banned) return false;
 
-      return submodel(user, right, uri, security, options)
+      return submodel(user, right, uri, security)
         .then(log)
         .fail(function(err) {
           if(err && err.gitterAction === 'logout_destroy_user_tokens') {
             winston.warn('User tokens have been revoked. Destroying tokens');
 
-            var tokenUser = options.githubTokenUser || user;
-            tokenUser.destroyTokens();
-            return tokenUser.saveQ()
+            user.destroyTokens();
+            return user.saveQ()
               .thenReject(err);
           }
 

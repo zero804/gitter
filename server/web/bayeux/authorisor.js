@@ -101,6 +101,10 @@ function populateSubUserCollection(options) {
       return restful.serializeTroupesForUser(userId)
         .then(arrayToSnapshot('user.rooms'));
 
+    case "orgs":
+      return restful.serializeOrgsForUserId(userId)
+        .then(arrayToSnapshot('user.orgs'));
+
     default:
       logger.error('Unable to provide snapshot for ' + collection);
   }
