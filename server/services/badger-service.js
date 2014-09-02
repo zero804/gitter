@@ -135,7 +135,7 @@ function ReadmeUpdater(context) {
     var pullRequestHead = pullRequestHeadFromBranch(branchRef);
 
     var prRequest = {
-      title: 'Add a Gitter badge to the readme',
+      title: 'Add a Gitter badge to the README',
       body: 'Adds the Gitter badge to the repository.',
       base: 'master',
       head: pullRequestHead
@@ -197,9 +197,9 @@ function ReadmeUpdater(context) {
           "author": {
             "name": "The Gitter Badger",
             "email": "badger@gitter.im",
-            "date": new Date().toISOString()
+            "date": new Date().toISOString().replace(/\.\d+/,'') // GitHub doesn't consider milliseconds as part of ISO8601
           },
-          "parents": [latestCommitSha],
+          "parents": [latestCommitSha], 
           "tree": tree.sha
         };
 
