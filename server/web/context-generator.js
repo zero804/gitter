@@ -163,7 +163,7 @@ function serializeTroupe(troupe, user) {
 
 function createTroupeContext(req, options) {
   var events = req.session && req.session.events;
-  var extras = (typeof options.extras !== 'undefined') ? options.extras : {};
+  var extras = options.extras || {};
   if (events) { req.session.events = []; }
 
   return _.extend({

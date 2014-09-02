@@ -12,6 +12,7 @@ var WHITELIST = [
 '/api/v1/apn',
 '/login/oauth/token',
 '/login/oauth/authorize/decision',
+'/api/private/subscription/',
 '/faye'
 ];
 

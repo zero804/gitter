@@ -25,6 +25,15 @@ function create(lean) {
     });
   };
 
+  module.findByOwnerUri = function(userOrOrg, fields) {
+    var lcUserOrOrg = userOrOrg.toLowerCase();
+
+    var re = new RegExp('^' + lcUserOrOrg + '($|/)');
+
+    return persistence.Troupe
+              .findQ({ lcUri: re }, fields, { lean: lean });
+  };
+
   return module;
 
 }

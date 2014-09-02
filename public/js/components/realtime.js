@@ -231,6 +231,11 @@ define([
     callback(message);
   };
 
+  var BRIDGE_NOTIFICATIONS = {
+    user_notification: 1,
+    activity: 1
+  };
+
   function createClient() {
     var c = context.env('websockets');
     c.options.reuseTransport = false; // TODO: consider if we need this
@@ -256,7 +261,12 @@ define([
 
       if(user.id) {
         userSubscription = client.subscribe('/api/v1/user/' + user.id, function(message) {
-          if (message.notification === 'user_notification' || message.notification === 'activity') {
+          if(message.operation === 'patch' && message.model && message.model.id === user.id) {
+            // Patch the updates onto the user
+            user.set(message.model);
+          }
+
+          if(BRIDGE_NOTIFICATIONS[message.notification]) {
             appEvents.trigger(message.notification, message);
           }
         });
@@ -411,6 +421,8 @@ define([
     },
 
     subscribe: function(channel, callback, context, options) {
+      log('Subscribing to ' + channel);
+
       // Temporary options to pass onto the subscription message
       subscribeOptions[channel] = options;
 
