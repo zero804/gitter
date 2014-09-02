@@ -1,19 +1,17 @@
 define([
   'utils/context',
-  './base',
-  'backbone'
-], function(context, TroupeCollections, Backbone) {
+  './base'
+], function(context, TroupeCollections) {
   "use strict";
 
   var OrgModel = TroupeCollections.Model.extend({
-    idAttribute: 'id'
+    idAttribute: 'name' // Unusual...
   });
 
-  var OrgCollection = Backbone.Collection.extend({
+  var OrgCollection = TroupeCollections.LiveCollection.extend({
     model: OrgModel,
     initialize: function() {
       this.url = "/api/v1/user/" + context.getUserId() + "/orgs";
-      // this.listenTo(this, 'change:name', this.replicateContext);
     }
   });
 

@@ -10,6 +10,17 @@ define([
 
   var ItemModel = Backbone.Model.extend({
     idAttribute: "uri",
+    constructor: function(underlyingModel, mappingFunction) {
+      // XXX: TODO: deal with minor memory leak here
+      this.mappingFunction = mappingFunction;
+      var attributes = mappingFunction(underlyingModel);
+      Backbone.Model.call(this, attributes);
+      this.listenTo(underlyingModel, 'change', this.underlyingChanged);
+    },
+    underlyingChanged: function(model) {
+      var attributes = this.mappingFunction(model);
+      this.set(attributes);
+    }
   });
 
   function comparator(a, b) {
@@ -46,39 +57,43 @@ define([
   }
 
   function modelFromRepoTroupe(m) {
-    return new ItemModel({
-      id: m.get('id'),
-      uri: m.get('uri'),
-      name: m.get('name'),
-      premium: m.get('premium'),
-      type: 'repo',
-      repoType: true
+    return new ItemModel(m, function(m) {
+      return {
+        id: m.get('id'),
+        uri: m.get('uri'),
+        name: m.get('name'),
+        premium: m.get('premium'),
+        type: 'repo',
+        repoType: true
+      };
     });
   }
 
-  function modelFromUser() {
-    var user = context.user();
-
-    return new ItemModel({
-      uri: user.get('username'),
-      name: user.get('username'),
-      avatarUrl: user.get('avatarUrlSmall'),
-      premium: user.get('premium'),
-      type: 'user',
-      userType: true
+  function modelFromUser(m) {
+    return new ItemModel(m, function(m) {
+      return {
+        uri: m.get('username'),
+        name: m.get('username'),
+        avatarUrl: m.get('avatarUrlSmall'),
+        premium: m.get('premium'),
+        type: 'user',
+        userType: true
+      };
     });
   }
 
 
-  function modelFromOrg(a) {
-    return new ItemModel({
-      id: a.get('room').id,
-      uri: a.get('room').uri,
-      premium: a.get('premium'),
-      name: a.get('name'),
-      avatarUrl: a.get('avatar_url'),
-      type: 'org',
-      orgType: true
+  function modelFromOrg(m) {
+    return new ItemModel(m, function(m) {
+      return {
+        id: m.get('room').id,
+        uri: m.get('room').uri,
+        premium: m.get('premium'),
+        name: m.get('name'),
+        avatarUrl: m.get('avatar_url'),
+        type: 'org',
+        orgType: true
+      };
     });
   }
 
@@ -170,7 +185,7 @@ define([
         mapper = modelFromRepoTroupe;
       } else {
         if(uri === context.user().get('username')) {
-          var userModel = modelFromUser();
+          var userModel = modelFromUser(context.user());
           this.selected(userModel);
           return userModel;
         }
@@ -230,7 +245,7 @@ define([
 
         return self.orgsCollection.filter(function(m) {
           return !!m.get('room');
-        }).map(modelFromOrg).concat(modelFromUser());
+        }).map(modelFromOrg).concat(modelFromUser(context.user()));
       }
     }
 

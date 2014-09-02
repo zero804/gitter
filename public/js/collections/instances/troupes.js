@@ -16,9 +16,6 @@ define([
   'use strict';
 
   var orgsCollection = new orgModels.OrgCollection(null, { listen: true });
-  // XXX: Why are we doing a fetch on this collection?
-  orgsCollection.fetch();
-
   var troupeCollection = new troupeModels.TroupeCollection(null, { listen: true });
 
   unreadItemsClient.installTroupeListener(troupeCollection);

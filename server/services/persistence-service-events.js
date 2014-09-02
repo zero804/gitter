@@ -3,7 +3,7 @@
 
 var env = require('../utils/env');
 var logger = env.logger;
-var stats = env.stats;
+var Q = require('q');
 
 var appEvents = require("../app-events");
 var restSerializer = require("../serializers/rest-serializer");
@@ -15,6 +15,7 @@ var restSerializer = require("../serializers/rest-serializer");
 // TODO: move this into its own module
 function serializeEvent(url, operation, model, callback) {
   if(!url) { return Q.resolve().nodeify(callback); }
+
   logger.verbose("Serializing " + operation + " to " + url);
 
   // TODO: consider swapping out the HEAVY WEIGHT restSerializer here for the
@@ -31,7 +32,7 @@ function serializeEvent(url, operation, model, callback) {
         appEvents.dataChange2(url, operation, serializedModel);
       }
 
-      return serializedModel
+      return serializedModel;
     })
     .nodeify(callback);
 }
