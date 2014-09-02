@@ -19,7 +19,7 @@ define([
   /* @const */
   var MAX_NAME_LENGTH = 25;
 
-  var TroupeItemView = Marionette.ItemView.extend({
+  var RoomListItemView = Marionette.ItemView.extend({
     tagName: 'li',
     className: 'room-list-item',
     template: roomListItemTemplate,
@@ -134,7 +134,7 @@ define([
   var CollectionView = Marionette.CollectionView.extend({
     tagName: 'ul',
     className: 'trpTroupeList',
-    itemView: TroupeItemView,
+    itemView: RoomListItemView,
 
     initialize: function(options) {
       if(options.rerenderOnSort) {
