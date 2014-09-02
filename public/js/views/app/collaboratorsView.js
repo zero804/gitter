@@ -160,7 +160,7 @@ define([
         'text=' + text + 
         '&url=https://gitter.im/' + context.troupe().get('uri') +
         '&related=gitchat' + 
-        '&hashtags=gitchat';
+        '&via=gitchat';
 
       return url;
     },
@@ -206,7 +206,7 @@ define([
           btn.disabled = false;
         },
         success: function (res) {
-          st.html('We just created a PR for you: <a href=' + res.html_url + ' target="_blank">Badge Pull Request</a>');
+          st.html('We just created a PR for you! <a href=' + res.html_url + ' target="_blank">Badge Pull Request &rarr;</a>');
         }
       });
     },
