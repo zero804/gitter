@@ -186,7 +186,7 @@ sprites:
 	@node scripts/generate-service-sprite.js
 
 security-check:
-	grunt retire
+	grunt retire --force
 	grunt validate-shrinkwrap --force
 
 version-files:

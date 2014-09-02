@@ -14,7 +14,9 @@ function getSamples() {
       // Remove any duplicate users
       var users = {};
       return chatMessage.filter(function(chatMessage) {
-        if(users[chatMessage.fromUserId]) return false;
+        if(users[chatMessage.fromUserId]) {
+          return false;
+        }
         users[chatMessage.fromUserId] = true;
         return true;
       });
