@@ -147,6 +147,24 @@ define([
     },
     template: template,
 
+    serializeData: function() {
+      return {
+        public: context.troupe().get('security') === 'PUBLIC',
+        twitterLink: this.generateTwitterLink()
+      };
+    },
+
+    generateTwitterLink: function() {
+      var text = escape('Just created a room on Gitter for ' + context.troupe().get('uri') + ':');
+      var url = 'https://twitter.com/share?' +
+        'text=' + text + 
+        '&url=https://gitter.im/' + context.troupe().get('uri') +
+        '&related=gitchat' + 
+        '&hashtags=gitchat';
+
+      return url;
+    },
+
     initialize: function() {
       var ctx = context();
       appEvents.triggerParent('track-event', 'welcome-add-user-suggestions', { 
@@ -156,29 +174,41 @@ define([
       });
     },
 
-    onRender: function() {
-      if (context.troupe().get('security') == 'PUBLIC') this.$el.find('.js-share-button').show();
-    },
+    //onRender: function() {
+    //  if (context.troupe().get('security') == 'PUBLIC') this.$el.find('.js-share-button').show();
+    //},
 
     events: {
       'click .js-close': 'dismiss',
       'click #add-button' : 'clickAddButton',
       'click #share-button' : 'clickShareButton',
-      'click .js-twitter': 'shareOnTwitter',
       'click .js-badge': 'createBadge'
     },
 
-    shareOnTwitter: function() {
-      var text = escape('Just created a room on Gitter for ' + context.troupe().get('uri') + ':');
-      window.open('https://twitter.com/share?' +
-        'text=' + text + 
-        '&url=https://gitter.im/' + context.troupe().get('uri') +
-        '&related=gitchat' + 
-        '&hashtags=gitchat'
-      );
-    },
-
     createBadge: function() {
+      var btn = this.$el.find('.js-badge')[0];
+      var st = this.$el.find('.pr-status');
+      st.html('Hold on...');
+      btn.disabled = true;
+
+      $.ajax({
+        url: '/api/private/create-badge',
+        contentType: "application/json",
+        dataType: "json",
+        type: "POST",
+        data: JSON.stringify({ 
+          uri: context.troupe().get('uri')
+        }),
+        context: this,
+        timeout: 45 * 1000,
+        error: function() {
+          st.html('Oops, something went wront. Try again. (Is there a README.md in your project?)');
+          btn.disabled = false;
+        },
+        success: function (res) {
+          st.html('We just created a PR for you: <a href=' + res.html_url + ' target="_blank">Badge Pull Request</a>');
+        }
+      });
     },
 
     clickAddButton: function() {
