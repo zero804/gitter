@@ -64,6 +64,12 @@ module.exports = {
         authMiddleware,
         require('./org-members.js'));
 
+    app.post(apiRoot + '/private/subscription/:userOrOrg',
+        require('./subscription-created.js'));
+
+    app.delete(apiRoot + '/private/subscription/:userOrOrg',
+        require('./subscription-deleted.js'));
+
     app.post(apiRoot + '/private/statsc',
         authMiddleware,
         require('./statsc.js'));
