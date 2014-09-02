@@ -8,11 +8,15 @@
 <div class="nano  menu-content" id="left-menu-scroll">
   <div class="content  nano-content  menu-content__wrapper" style="outline: none">
     <div class="menu-list" id="list-mega">
-      <!-- `#recentTroupesList` & `#OrgsList` need to be checked for JS hooks, if so replace with `js-*` -->
+      {{!-- `#recentTroupesList` & `#OrgsList` need to be checked for JS hooks, if so replace with `js-*` --}}
       <div class='menu-list__item' id="recentTroupesList">
         <div class="menu-list__header">All Conversations</div>
-        <div class="list-favourites  menu-list__section--fav" id="list-favs"><!-- put filtered favourites in here--></div>
-        <div class="list-recents  menu-list__section--recent" id="list-recents"><!-- put filtered recents in here. remember also that notifications will appear in here if they aren't in favourites--></div>
+        <div class="list-favourites  menu-list__section--fav" id="list-favs">
+          {{!-- put filtered favourites in here --}}
+        </div>
+        <div class="list-recents  menu-list__section--recent" id="list-recents">
+          {{!-- put filtered recents in here. remember also that notifications will appear in here if they aren't in favourites --}}
+        </div>
       </div>
       <div class='menu-list__item' id="OrgsList">
         <div class="menu-list__header">Your Organizations</div>
