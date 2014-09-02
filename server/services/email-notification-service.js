@@ -113,7 +113,7 @@ module.exports = {
         var shareURL = config.get('web:basepath') + '/' + room.uri;
 
         // TODO move the generation of tweet links into it's own function?
-        var twitterURL = (isPublic) ? 'http://twitter.com/intent/tweet?url=' + shareURL + '&text=' + encodeURIComponent('I have just created ' + room.name) + '&via=gitchat' : undefined; // if the room is public we shall have a tweet link
+        var twitterURL = (isPublic) ? 'http://twitter.com/intent/tweet?url=' + shareURL + '&text=' + encodeURIComponent('I have just created ' + room.uri) + '&via=gitchat' : undefined; // if the room is public we shall have a tweet link
 
         return mailerService.sendEmail({
           templateFile: "created_room",
