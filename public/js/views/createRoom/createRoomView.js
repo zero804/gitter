@@ -182,8 +182,18 @@ define([
     },
 
     parentSelected: function(model, animated) {
+      if(this.selectedModel) {
+        this.stopListening(this.selectedModel, 'change:premium', this.selectedModelPremiumChanged);
+      }
+
       this.selectedModel = model;
+      this.listenTo(this.selectedModel, 'change:premium', this.selectedModelPremiumChanged);
+
       this.recalcView(animated);
+    },
+
+    selectedModelPremiumChanged: function() {
+      this.recalcView(true);
     },
 
     selectedOptionsRequireUpgrade: function() {
