@@ -133,7 +133,7 @@ define([
 
   var CollectionView = Marionette.CollectionView.extend({
     tagName: 'ul',
-    className: 'trpTroupeList',
+    className: 'room-list',
     itemView: RoomListItemView,
 
     initialize: function(options) {
