@@ -1,7 +1,7 @@
 {{#if ethereal}}
-  <span class="room-list-item__icon github-REPO" title="{{title}}">{{name}}</span>
+  <span class="room-list-item__name {{iconClass}}" title="{{title}}">{{name}}</span>
 {{else}}
-  <span class="room-list-item__icon github-{{githubType}}" title="{{title}}">{{name}}</span>
+  <span class="room-list-item__name {{iconClass}}}" title="{{title}}">{{name}}</span>
 
   <div class="room-list-item__labels">
     <span class="js-unread-badge room-list-item__unread-badge">{{unreadItems}}</span>
