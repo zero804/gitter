@@ -74,11 +74,6 @@ require([
       name: 'Sympy',
       language: 'Python',
       locale: 'en'
-    },
-    { uri: 'rogeriopvl/erebot',
-      name: 'erebot',
-      language: 'JavaScript',
-      locale: 'es'
     }
   ];
 
