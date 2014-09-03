@@ -13,13 +13,10 @@
   line-height: 26px;
 }
 
-.room-list-item:hover, .room-list-item.selected {
+body.hover .room-list-item:hover,
+.room-list-item.selected {
   border-radius: 4px 0 0 4px;
   background-color: rgba(255,255,255,0.2);
-
-  @media @mobile {
-    background-color: transparent;
-  }
 
   &.chatting:after {
     display: none;
