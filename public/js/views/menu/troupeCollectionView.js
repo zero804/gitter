@@ -3,14 +3,14 @@ define([
   'utils/context',
   'utils/room-name-trimmer',
   'marionette',
-  'hbs!./tmpl/troupeListItem',
+  'hbs!./tmpl/room-list-item',
   'utils/appevents',
   'utils/momentWrapper',
   'views/base',
   'cocktail',
   'utils/dataset-shim',
   'jquery-sortable' // No ref
-], function($, context, roomNameTrimmer, Marionette, troupeListItemTemplate, appEvents, moment,  TroupeViews, cocktail, dataset) {
+], function($, context, roomNameTrimmer, Marionette, roomListItemTemplate, appEvents, moment,  TroupeViews, cocktail, dataset) {
   "use strict";
 
   /* @const */
@@ -19,16 +19,16 @@ define([
   /* @const */
   var MAX_NAME_LENGTH = 25;
 
-  var TroupeItemView = Marionette.ItemView.extend({
+  var RoomListItemView = Marionette.ItemView.extend({
     tagName: 'li',
-    className: 'menu-list-item',
-    template: troupeListItemTemplate,
+    className: 'room-list-item',
+    template: roomListItemTemplate,
     modelEvents: {
       'change:unreadItems change:lurk change:activity change:mentions': 'render'
     },
     events: {
-      'click':              'clicked',
-      'click .item-close':  'onItemClose'
+      'click': 'clicked',
+      'click .js-close-button': 'onItemClose'
     },
     serializeData: function() {
       var data = this.model.toJSON();
@@ -36,8 +36,7 @@ define([
       return data;
     },
     onItemClose: function(e) {
-      //may not need this e.preventDefault stuff, had this because of the old <A HREF>
-      e.preventDefault();
+      // stop click event triggering navigate
       e.stopPropagation();
 
       $.ajax({
@@ -60,11 +59,10 @@ define([
 
       if(!!first && !m.changed) return;
 
-      var unreadBadge = e.find('.item-unread-badge');
+      var unreadBadge = e.find('.js-unread-badge');
       var lurk = self.model.get('lurk');
       var mentions = self.model.get('mentions');
       var ui = self.model.get('unreadItems');
-      var redisplayBadge = false;
       var f = self.model.get('favourite');
       var activity = self.model.get('activity');
 
@@ -83,7 +81,7 @@ define([
 
 
       var text = getBadgeText() || "";
-      unreadBadge.find('span').text(text);
+      unreadBadge.text(text);
       unreadBadge.toggleClass('shown', !!text);
       unreadBadge.toggleClass('mention', !!mentions);
 
@@ -133,8 +131,8 @@ define([
 
   var CollectionView = Marionette.CollectionView.extend({
     tagName: 'ul',
-    className: 'trpTroupeList',
-    itemView: TroupeItemView,
+    className: 'room-list',
+    itemView: RoomListItemView,
 
     initialize: function(options) {
       if(options.rerenderOnSort) {

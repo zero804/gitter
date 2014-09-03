@@ -2,8 +2,8 @@
 @import "base-transition-mixins";
 
 /* Imports for child views */
-@import "../menu/troupeCollectionView";
-@import "searchView";
+@import "room-list";
+@import "room-list-item";
 @import "profileView";
 @import "orgCollectionView";
 @import "nanoScroller";
@@ -60,24 +60,6 @@
 
 .trpLeftMenuSpacer {
   height: 100px;
-}
-
-.trpTroupeList {
-  display: inline-block;
-  list-style-type: none;
-  margin: 0 0 18px 0;
-}
-
-.trpTroupeList a {
-  display: inline-block;
-  color: white;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.trpTroupeListSearch {
-  padding-left: 8px;
 }
 
 .trpLeftMenuButton, .trpNewTroupeButton {
@@ -359,13 +341,6 @@
   padding: 8px;
 }
 
-
-
-
-body.dragging .trpTroupeList {
-
-}
-
 .list-favourites {
   .transition300ms;
 }
@@ -394,31 +369,6 @@ body.dragging .list-favourites li:last-child {
 body.dragging .list-favourites li.placeholder {
   padding-top: 0px;
   padding-bottom: 0px;
-}
-
-.trpTroupeList {
-  margin: 0;
-  width: 100%;
-  box-sizing: border-box;
-
-  span {
-    display: inline-block;
-    color: white;
-    white-space: nowrap;
-    max-width: 195px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    vertical-align: middle;
-  }
-
-  span.disabled {
-    color: #ccc;
-  }
-}
-
-
-.trpTroupeListSearch {
-  padding-left: 8px;
 }
 
 .trpLeftMenuLoggedOut {
