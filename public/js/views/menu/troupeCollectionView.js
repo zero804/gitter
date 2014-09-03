@@ -27,8 +27,8 @@ define([
       'change:unreadItems change:lurk change:activity change:mentions': 'render'
     },
     events: {
-      'click':              'clicked',
-      'click .item-close':  'onItemClose'
+      'click': 'clicked',
+      'click .js-room-list-item__close': 'onItemClose'
     },
     serializeData: function() {
       var data = this.model.toJSON();
@@ -36,8 +36,7 @@ define([
       return data;
     },
     onItemClose: function(e) {
-      //may not need this e.preventDefault stuff, had this because of the old <A HREF>
-      e.preventDefault();
+      // stop click event triggering navigate
       e.stopPropagation();
 
       $.ajax({
