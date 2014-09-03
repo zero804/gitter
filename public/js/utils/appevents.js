@@ -23,7 +23,13 @@ define([
 
   window.addEventListener("message", function(e) {
     if (e.origin !== basePath) return;
-    var data = JSON.parse(e.data);
+    var data;
+    try {
+      data = JSON.parse(e.data);
+    } catch(e) {
+      // Ignore badly formatted messages from extensions
+      return;
+    }
 
     if(data.child_window_event) {
       appEvents.trigger.apply(appEvents, data.child_window_event);
