@@ -115,7 +115,7 @@ define([
       // filter the suggestions from the user search service
       this.findUsers(query, function(suggestions) {
         var additional = suggestions.filter(function(user) {
-            return !self.collection.findWhere({ uri: user.username });
+            return !self.collection.findWhere({ url: '/' + user.username });
           }).map(function(user) {
             return new Backbone.Model({
               id: user.id,
