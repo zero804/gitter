@@ -58,15 +58,14 @@ body.hover .room-list-item:hover,
   display: none;
 }
 
-.room-list-item .item-unread-badge.shown {
-  display: inline;
+.room-list-item__labels {
+  float: right;
+  margin-right: 8px;
 }
 
-.room-list-item:hover .item-unread-badge {
+.room-list-item__unread-badge {
   display: none;
-}
 
-.room-list-item .item-unread-badge .trpTroupeUnreadCounter {
   border-radius: 4px;
   display: inline-block;
   padding: 0 4px;
@@ -82,7 +81,15 @@ body.hover .room-list-item:hover,
   }
 }
 
-.room-list-item .item-unread-badge.mention .trpTroupeUnreadCounter {
+body.hover .room-list-item:hover .room-list-item__unread-badge {
+  display: none;
+}
+
+.room-list-item__unread-badge.shown {
+  display: inline;
+}
+
+.room-list-item__unread-badge.mention {
   background-color: @trpRed;
   font-weight: 300;
 }
@@ -112,8 +119,6 @@ body.hover .room-list-item:hover,
 
 .room-list-item__close {
   display: none;
-  float: right;
   opacity: 0.3;
-  margin-right: 9px;
   .transition300ms;
 }

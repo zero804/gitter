@@ -28,7 +28,7 @@ define([
     },
     events: {
       'click': 'clicked',
-      'click .js-room-list-item__close': 'onItemClose'
+      'click .js-close-button': 'onItemClose'
     },
     serializeData: function() {
       var data = this.model.toJSON();
@@ -59,11 +59,10 @@ define([
 
       if(!!first && !m.changed) return;
 
-      var unreadBadge = e.find('.item-unread-badge');
+      var unreadBadge = e.find('.js-unread-badge');
       var lurk = self.model.get('lurk');
       var mentions = self.model.get('mentions');
       var ui = self.model.get('unreadItems');
-      var redisplayBadge = false;
       var f = self.model.get('favourite');
       var activity = self.model.get('activity');
 
@@ -82,7 +81,7 @@ define([
 
 
       var text = getBadgeText() || "";
-      unreadBadge.find('span').text(text);
+      unreadBadge.text(text);
       unreadBadge.toggleClass('shown', !!text);
       unreadBadge.toggleClass('mention', !!mentions);
 
