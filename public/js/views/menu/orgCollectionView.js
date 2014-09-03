@@ -31,7 +31,7 @@ define([
 
   return Marionette.CollectionView.extend({
     tagName: 'ul',
-    className: 'trpTroupeList',
+    className: 'room-list',
     itemView: OrgItemView
   });
 
