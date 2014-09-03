@@ -88,7 +88,13 @@ require([
       return;
     }
 
-    var message = JSON.parse(e.data);
+    var message;
+    try {
+      message = JSON.parse(e.data);
+    } catch(e) {
+      return; // Ignore non-json from extensions
+    }
+
     log('Received message ', message);
 
     switch(message.type) {
