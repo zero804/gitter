@@ -1,0 +1,36 @@
+.room-list {
+  list-style-type: none;
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+
+  span {
+    display: inline-block;
+    color: white;
+    white-space: nowrap;
+    max-width: 195px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+  }
+
+  span.disabled {
+    color: #ccc;
+  }
+}
+
+.room-list a {
+  display: inline-block;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.room-list li .item-close {
+  display: none;
+}
+
+.room-list li:hover .item-close {
+  display: inline-block;
+}
