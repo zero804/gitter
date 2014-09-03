@@ -19,6 +19,21 @@ define([
   /* @const */
   var MAX_NAME_LENGTH = 25;
 
+  function getIconClass(model) {
+    var iconName = model.get('githubType').toLowerCase();
+
+    // repo_channel, user_channel etc
+    if(iconName.indexOf('channel') >= 0) {
+      iconName = 'channel';
+    }
+
+    if(model.get('favourite')) {
+      iconName = 'favourite';
+    }
+
+    return 'room-list-item__name--' + iconName;
+  }
+
   var RoomListItemView = Marionette.ItemView.extend({
     tagName: 'li',
     className: 'room-list-item',
@@ -33,6 +48,7 @@ define([
     serializeData: function() {
       var data = this.model.toJSON();
       data.name = roomNameTrimmer(data.name, MAX_NAME_LENGTH);
+      data.iconClass = getIconClass(this.model);
       return data;
     },
     onItemClose: function(e) {
@@ -63,10 +79,7 @@ define([
       var lurk = self.model.get('lurk');
       var mentions = self.model.get('mentions');
       var ui = self.model.get('unreadItems');
-      var f = self.model.get('favourite');
       var activity = self.model.get('activity');
-
-      e.toggleClass('item-fav', !!f);
 
       function getBadgeText() {
         if(mentions) return "@";
@@ -180,10 +193,6 @@ define([
             var collectionItem = self.roomsCollection.get(dataset.get(el, 'id'));
             collectionItem.set('favourite', favPosition);
             collectionItem.save();
-            // if ($(container.el).attr('id') == 'list-favs') {
-            //   // do whatever else needs to be done to add to favourites and store positions
-              item.addClass("item-fav");
-            // }
           }
           cancelDrop = false;
           _super(item, container);
