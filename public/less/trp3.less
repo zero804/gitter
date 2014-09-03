@@ -49,7 +49,6 @@ body {
 	height: 100%;
 	margin: 0;
 	overflow: hidden;
-	/*overflow-x: hidden;*/
   background-color: white;
   .user-select(none);
 }
@@ -252,16 +251,6 @@ a:hover {
   }
 }
 
-// .trpLeftMenuHotspot {
-// 	position: fixed;
-// 	top: 0;
-// 	left: 0;
-// 	width: 30px;
-// 	height: 100%;
-// 	z-index: 1010;
-// 	display: inline-block;
-// }
-
 body.logged-out {
   .menu {
     width: 350px;
@@ -332,45 +321,9 @@ body.logged-out {
   width: 100%;
 }
 
-// .trpLeftMenu {
-	// display: inline-block;
-	// position: fixed;
-	// width: @leftMarginFull;
-	// left: 0px;
-	// top: 0px;
-	// background-color: lighten(@trpDarkBlue,5%);
-	// height: 100%;
-	// color: white;
-	// z-index: 1012;
-	// margin-top: 0px;
-	// overflow: hidden;
- //  transition: background-color 0.3s ease-in-out 0s, left .5s ease-in-out 0.3s;
- //  background-clip: padding-box;
-
- //  .nano-pane {
- //    left: 0;
- //  }
-
- //  &:hover {
- //    background-color: @trpDarkBlue;
- //  }
-// }
-
 #people-roster {
   margin-left: 6px;
 }
-
-// .trpLeftMenu .trpToolbarHeader {
-//   margin-left: 12px;
-//   padding-top: 0;
-//   padding-bottom: 2px;
-//   opacity: 0.6;
-//   font-weight: 400;
-//   width: 240px;
-//   box-sizing: border-box;
-//   -moz-box-sizing: border-box;
-//   padding-right: 9px;
-// }
 
 .trpToolbarHeaderItem {
   display: inline-block;
@@ -389,20 +342,6 @@ body.logged-out {
 .trpToolbarHeaderItem.selected {
   opacity: 1;
 }
-
-// .trpToolbarHeader .list-toggle {
-//   opacity: 0;
-//   float: right;
-//   .transition300ms;
-// }
-
-// .trpToolbarHeader:hover >.list-toggle {
-//   opacity: 0.8;
-// }
-
-// .trpLeftMenuList {
-//   margin-bottom: 20px;
-// }
 
 .github-ORG {
   .prepend-org-icon;
@@ -552,7 +491,6 @@ ul li.placeholder {
   height: 25px;
   background-color: rgba(155,155,155,0.1);
   border-radius: 0 4px 4px 0;
-  /*border: 1px dashed rgba(255,255,255,0.2);*/
   border-left: 0;
   color: white;
 }
@@ -599,10 +537,6 @@ ul li.placeholder:before {
   border-right: 0;
 }
 
-/*.trpNewPersonButton:hover {
-  border-right: 1px solid cyan;
-}
-*/
 .trpNewTroupeButton {
   border-radius: 0 4px 4px 0;
 }
@@ -641,29 +575,6 @@ ul li.placeholder:before {
 	margin-top: 1px;
 	width: 15px;
 	text-align: center;
-}
-
-.trpTroupeBadge {
-  /*
-  display: inline-block;
-	margin-left: -11px;
-	*/
-}
-
-.trpTroupeBadge:before {
-	/*
-	content: "";
-	display: inline-block;
-	position: relative;
-	left: -8px;
-	width: 7px;
-	height: 7px;
-	border-radius: 50em;
-	vertical-align: top;
-	margin-top: 5px;
-	background-color: @trpPurple;
-	border: 2px solid white;
-	*/
 }
 
 .trpTroupeName {
@@ -706,21 +617,15 @@ ul li.placeholder:before {
 }
 
 .trpContentPanel {
-/*  display: inline-block;*/
   position: fixed;
 	background-color: white;
 	margin-left: 0px;
 /*  height is now specified in the html for as it renders better before the css is loaded*/
 	width: 100%;
 	text-align: center;
-/*	padding-top: 40px;*/
 	top: 0px;
   bottom: 70px;
   right: 0px;
-  /* this min height isn't the best solution*/
-  /* we need the content panel to take up the entire middle of the screen*/
-  /* so that the mouseover event to close the left menu on it gets triggered */
-  // min-height: 400px;
   overflow: none;
   .transition500ms;
 }
@@ -803,7 +708,6 @@ ul li.placeholder:before {
   display: inline-block;
 	float: left;
 	padding-top: 12px;
-/*	border-top: 2px solid @trpGreen;*/
 	margin: 0;
   padding-right: 10px;
 }
@@ -813,7 +717,6 @@ ul li.placeholder:before {
 	float: left;
 	padding-top: 14px;
 	padding-left: 12px;
-/*	border-top: 2px solid @trpGreen;*/
 	margin: 0;
 }
 
@@ -824,9 +727,7 @@ ul li.placeholder:before {
 	vertical-align: top;
 	display: inline-block;
 	padding-top: 18px;
-/*	border-top: 2px solid #1dce73;*/
 	margin: 0;
-/*  display: none;*/
 	width: 132px;
 	overflow: hidden;
 	white-space: nowrap;
@@ -865,8 +766,6 @@ ul li.placeholder:before {
 
 .trpHomePanel {
     display: block;
-  /*  min-height: 600px;
-    height: 100%;*/
     text-align: left;
     text-align: center;
     .transition500ms;
@@ -875,7 +774,6 @@ ul li.placeholder:before {
 
 .trpToolbar {
   color: #333;
-/*  border-left: 2px solid @trpGreen;*/
   font-family: @fontSans;
   font-size: 14px;
   position: fixed;
@@ -889,7 +787,6 @@ ul li.placeholder:before {
   background-color: @trpBgColor;
   z-index: 400;
   .transition500ms;
-  /*margin-right: -2px;*/
 
   p {
     font-family: 'Open Sans';
@@ -1428,8 +1325,6 @@ ul.roster {
     @media @mid {
 
       width:240px;
-      /*box-shadow: 3px 3px #d3dfd3, -1px 3px 3px 2px rgba(68,68,68,0.2);*/
-/*      box-shadow: -2px 1px 6px -2px rgba(50, 50, 50, 0.55);*/
       border-left: 4px solid rgba(211, 223, 211, 0.6);
       background-clip: padding-box;
     }
