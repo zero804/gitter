@@ -507,40 +507,6 @@ ul li.placeholder:before {
       border-right: none;
 }
 
-.trpNewPersonButton, .trpNewTroupeButton {
-  border: 1px solid rgba(255,255,255,0.6);
-  display: inline-block;
-  box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  padding: 4px 6px 6px 6px;
-  margin-bottom: 2px;
-  color: white;
-  text-align: center;
-  width: 50%;
-  cursor: pointer;
-  background-color: rgba(255,255,255,0.1);
-  .trpBodyMedium;
-}
-
-.trpNewPersonButton:hover, .trpNewTroupeButton:hover {
-  background-color: white;
-  color: #162e34;
-  border-color: white;
-}
-
-.trpNewPersonButton:hover + .trpNewTroupeButton {
-  border-left: 1px solid white;
-}
-
-.trpNewPersonButton {
-  border-radius: 4px 0 0 4px;
-  border-right: 0;
-}
-
-.trpNewTroupeButton {
-  border-radius: 0 4px 4px 0;
-}
-
 .trpUserHome {
   margin-left: 88px;
 
@@ -553,41 +519,6 @@ ul li.placeholder:before {
   margin-left: 22px;
   margin-bottom: -2px;
   display: inline-block;
-}
-
-.trpUnreadBadge {
-	display: none;
-	position: absolute;
-	right: -9px;
-	top: -9px;
-	width: 15px;
-	height: 15px;
-	background-color: @trpPurple;
-	border-radius: 50em;
-	.trpBodyTiny;
-	color: white;
-	text-align: center;
-	border: 2px solid white;
-}
-
-.trpUnreadBadgeCount {
-  display: inline-block;
-	margin-top: 1px;
-	width: 15px;
-	text-align: center;
-}
-
-.trpTroupeName {
-	vertical-align: top;
-	padding-left: 8px;
-	text-overflow: ellipsis;
-	max-width: 230px;
-	overflow: hidden;
-	white-space: nowrap;
-}
-
-.trpTroupeName.selected a {
-	text-decoration: underline;
 }
 
 .trpFramePanel {
@@ -642,108 +573,8 @@ ul li.placeholder:before {
   display: none;
 }
 
-.trpTroupeSettings, .trpTroupeMoreActions, .trpTroupeHelp {
-  padding: 12px 0 12px 10px;
-  @media @mid {
-    display: inline-block;
-    width: 100%;
-    padding-left: 18px;
-    opacity: 0.6;
-  }
-}
-
-.trpTroupeFavourite .trpActionsMenuLabel {
-  display: none;
-}
-
-.trpTroupeFavourite .trpActionsMenuLabel.unfavourited {
-  display: inline-block;
-  @media @mid {
-    display: none;
-  }
-}
-
-.trpTroupeFavourite.favourited .trpActionsMenuLabel.unfavourited {
-  display: none;
-  @media @mid {
-    display: none;
-  }
-}
-
-.trpTroupeFavourite.favourited .trpActionsMenuLabel.favourited {
-  display: inline-block;
-  @media @mid {
-    display: none;
-  }
-}
-
-.trpTroupeSettings img {
-  padding-right: 10px;
-}
-
 .trpTroupeHelp img {
   margin-right: 10px;
-}
-
-.trpHeaderTitle {
-  display: block;
-	.trpH1;
-	text-align: left;
-	color: #333;
-	padding-top: 6px;
-	padding-left: 14px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden
-}
-
-.trpHeaderToolbar {
-  float: right;
-  display: inline-block;
-	vertical-align: top;
-	text-align: left;
-}
-
-.trpSettingsButton {
-  display: inline-block;
-	float: left;
-	padding-top: 12px;
-	margin: 0;
-  padding-right: 10px;
-}
-
-.trpProfileButton {
-  display: inline-block;
-	float: left;
-	padding-top: 14px;
-	padding-left: 12px;
-	margin: 0;
-}
-
-.trpProfileMenu {
-	font-family: @fontSans;
-	font-size: 14px;
-	color: #333;
-	vertical-align: top;
-	display: inline-block;
-	padding-top: 18px;
-	margin: 0;
-	width: 132px;
-	overflow: hidden;
-	white-space: nowrap;
-}
-
-.trpProfileItem {
-  display: inline-block;
-	padding-left: 14px;
-}
-
-.trpProfileItem a:hover {
-	color: #1dce73;
-}
-
-.trpProfileItem a {
-	color: #333;
 }
 
 .trpChatPanel {
@@ -1151,32 +982,6 @@ ul.roster {
   cursor: pointer;
 }
 
-
-
-#file-nano .content {
-  bottom: 40px;
-}
-
-#file-nano .pane {
-  bottom: 40px;
-}
-
-#file-nano .trpToolbarList {
-  padding-bottom: 0px;
-}
-
-#mail-nano .content {
-  bottom: 40px;
-}
-
-#mail-nano .pane {
-  bottom: 40px;
-}
-
-#mail-nano .trpToolbarList {
-  padding-bottom: 0px;
-}
-
 .divider {
   border-bottom: 1px solid @trpBgAccent;
 }
@@ -1215,10 +1020,6 @@ ul.roster {
 	.trpBodySmall;
 	padding: 4px 6px;
 	letter-spacing: 1px;
-}
-
-.trpDetailViewContainer {
-
 }
 
 .login-content {
