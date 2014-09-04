@@ -2,23 +2,20 @@
   <div class="welcome-modal__close js-close"></div>
 
   <div class="welcome-modal__header">
-    {{#if public}}
+    {{#if shareable}}
     <h2>Get started: Spread the word</h2>
     {{/if}}
-    {{#unless public}}
+    {{#unless shareable}}
     <h2>Get started: Add some colleagues</h2>
     {{/unless}}
   </div>
 
   <ul id="list"></ul>
-  <div class="search">
-    <a href='#add'>Search for other users &rarr;</a>
-  </div>
 
-
-  {{#if public}}
+  {{#if shareable}}
   <div class="welcome-modal__share">
-    <a class='trpButtonMedium trpBtnBlue button share-on-tw js-twitter' href='{{twitterLink}}' target='_blank'>Announce on Twitter</a>
+    <a class='trpButtonMedium trpBtnGrey button' href='#add'>Search other users</a>
+    <a class='trpButtonMedium trpBtnGrey button share-on-tw js-twitter' href='{{twitterLink}}' target='_blank'>Share on Twitter</a>
     <button class='trpButtonMedium trpBtnBlue button share-on-gh js-badge'>Add a Badge on GitHub</button>
     <div class='pr-status'></div>
   </div>
