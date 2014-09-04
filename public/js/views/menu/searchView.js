@@ -27,6 +27,7 @@ define([
 
       this.user_queries = {};
       this.repo_queries = {};
+      this.channel_queries = {};
       this.troupes = options.troupes;
       this.collection = new Backbone.Collection();
       this.collection.comparator = function(m) { return -m.get('people');};
@@ -171,6 +172,26 @@ define([
 
       });
 
+      // filter the suggestions from the channel search service
+      this.findChannels(query, function(suggestions) {
+        var additional = suggestions.filter(function(channel) {
+            return !self.collection.findWhere({ uri: channel.uri });
+          }).map(function(channel) {
+            return new Backbone.Model({
+              id: channel.id,
+              name: channel.name,
+              uri: channel.uri,
+              url: channel.url,
+              githubType: channel.githubType,
+              ethereal: false,
+              people: channel.userCount
+            });
+          });
+
+        self.collection.set(additional, { remove: false, add: true, merge: true });
+
+      });
+
       // set the initial local search results
       self.collection.set(results, { remove: true, add: true, merge: true });
 
@@ -282,6 +303,42 @@ define([
           });
 
           callback(self.repo_queries[query]);
+        }
+      }});
+    },
+
+    findChannels: function(query, callback) {
+      var self = this;
+
+      if (!query)
+        return;
+
+      // if we have done this query already, don't fetch it again (this could be problematic).
+      if (this.channel_queries[query]) {
+        setTimeout(function() { callback(self.channel_queries[query]); }, 0); // simulate async callback
+        return;
+      }
+
+      // if a superset of this query was empty, so is this one
+      var emptyPreviously = _.some(this.channel_queries, function(v,k) {
+        return query.toLowerCase().indexOf(k.toLowerCase()) === 0 && v.length === 0;
+      });
+
+      if (emptyPreviously) {
+        setTimeout(function() { callback([]); }, 0);
+        return;
+      }
+
+      $.ajax({ url: '/api/v1/channel-search', data : { q: query }, success: function(data) {
+
+        if (data.results) {
+          if (!self.channel_queries[query]) self.channel_queries[query] = [];
+
+          self.channel_queries[query] = _.uniq(self.channel_queries[query].concat(data.results), function(s) {
+            return s.name;
+          });
+
+          callback(self.channel_queries[query]);
         }
       }});
     },
