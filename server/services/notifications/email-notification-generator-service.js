@@ -1,21 +1,21 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var env                      = require('../../utils/env');
-var logger                   = env.logger;
+var env                       = require('../../utils/env');
+var logger                    = env.logger;
 var config                    = env.config;
-var stats                    = env.stats;
+var stats                     = env.stats;
 
-var _                        = require("underscore");
-var troupeService            = require("../troupe-service");
-var userService              = require("../user-service");
-var unreadItemService        = require("../unread-item-service");
-var serializer               = require('../../serializers/notification-serializer');
-var moment                   = require('moment');
-var Q                        = require('q');
-var collections              = require('../../utils/collections');
-var emailNotificationService = require('../email-notification-service');
-var userSettingsService      = require('../user-settings-service');
+var _                         = require("underscore");
+var troupeService             = require("../troupe-service");
+var userService               = require("../user-service");
+var unreadItemService         = require("../unread-item-service");
+var serializer                = require('../../serializers/notification-serializer');
+var moment                    = require('moment');
+var Q                         = require('q');
+var collections               = require('../../utils/collections');
+var emailNotificationService  = require('../email-notification-service');
+var userSettingsService       = require('../user-settings-service');
 var userTroupeSettingsService = require('../user-troupe-settings-service');
 
 var filterTestValues = config.get('notifications:filterTestValues');
@@ -169,37 +169,69 @@ function sendEmailNotifications(since) {
       var count = 0;
 
       return Q.all(userIds.map(function(userId) {
-          var user = userHash[userId];
-          if(!user) return;
+        var user = userHash[userId];
+        if(!user) return;
 
-          var strategy = new serializer.TroupeStrategy({ recipientUserId: user.id });
+        var strategy = new serializer.TroupeStrategy({ recipientUserId: user.id });
 
-          var unreadItemsForTroupe = userTroupeUnreadHash[user.id];
-          var troupeIds = Object.keys(unreadItemsForTroupe);
-          var troupes = troupeIds
-                          .map(function(troupeId) { return troupeHash[troupeId]; })
-                          .filter(collections.predicates.notNull);
+        var unreadItemsForTroupe = userTroupeUnreadHash[user.id];
+        var troupeIds = Object.keys(unreadItemsForTroupe);
+        var troupes = troupeIds
+                        .map(function(troupeId) { return troupeHash[troupeId]; })
+                        .filter(collections.predicates.notNull);
 
-          return serializer.serializeQ(troupes, strategy)
-            .then(function(serializedTroupes) {
-              var troupeData = serializedTroupes.map(function(t) {
-                  var a = userTroupeUnreadHash[userId];
-                  var b = a && a[t.id];
-                  var unreadCount = b && b.length;
-                  return { troupe: t, unreadCount: unreadCount };
+        return serializer.serialize(troupes, strategy)
+          .then(function(serializedTroupes) {
+            var troupeData = serializedTroupes.map(function(t) {
+                var a = userTroupeUnreadHash[userId];
+                var b = a && a[t.id];
+                var unreadCount = b && b.length;
+
+                if(b) {
+                  b.sort();
+                }
+
+                return { troupe: t, unreadCount: unreadCount, unreadItems: b };
+              }).filter(function(d) {
+                return !!d.unreadCount; // This needs to be one or more
+              });
+
+            // Somehow we've ended up with no chat messages?
+            if(!troupeData.length) return;
+
+            var chatIdsForUser = troupeData.reduce(function(memo, d) {
+              return memo.concat(d.unreadItems.slice(-3));
+            }, []);
+
+            var chatStrategy = new serializer.ChatIdStrategy({ recipientUserId: user.id });
+            return serializer.serializeExcludeNulls(chatIdsForUser, chatStrategy)
+              .then(function(chats) {
+                var chatsIndexed = collections.indexById(chats);
+
+                troupeData.forEach(function(d) {
+                  // Reassemble the chats for the troupe
+                  d.chats = d.unreadItems.slice(-3).reduce(function(memo, chatId) {
+                    var chat = chatsIndexed[chatId];
+                    if(chat) {
+                      memo.push(chat);
+                    }
+                    return memo;
+                  }, []);
                 });
 
-              count++;
-              return emailNotificationService.sendUnreadItemsNotification(user, troupeData)
-                .fail(function(err) {
-                  if(err.gitterAction === 'logout_destroy_user_tokens') {
-                    stats.event('logout_destroy_user_tokens', { userId: user.id });
+                count++;
+                return emailNotificationService.sendUnreadItemsNotification(user, troupeData)
+                  .fail(function(err) {
+                    if(err.gitterAction === 'logout_destroy_user_tokens') {
+                      stats.event('logout_destroy_user_tokens', { userId: user.id });
 
-                    user.destroyTokens();
-                    return user.saveQ();
-                  }
-                });
-            });
+                      user.destroyTokens();
+                      return user.saveQ();
+                    }
+                  });
+
+              });
+          });
 
         }))
         .then(function() {

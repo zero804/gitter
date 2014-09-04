@@ -4,9 +4,12 @@
 var fs          = require('fs');
 var handlebars  = require('handlebars');
 var i18n        = require('./i18n');
+var hbsHelpers  = require('../web/hbs-helpers');
 
 // TODO: add caching!
-handlebars.registerHelper('cdn', require('../web/hbs-helpers').cdn);
+handlebars.registerHelper('cdn', hbsHelpers.cdn);
+handlebars.registerHelper('pad', hbsHelpers.pad);
+handlebars.registerHelper('oneLine', hbsHelpers.oneLine);
 
 // register hbs helpers in res.locals' context which provides this.locale
 handlebars.registerHelper('__', function () {
