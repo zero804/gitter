@@ -173,7 +173,7 @@ define([
       });
 
       // filter the suggestions from the channel search service
-      this.findPublicChannels(query, function(suggestions) {
+      this.findChannels(query, function(suggestions) {
         var additional = suggestions.filter(function(channel) {
             return !self.collection.findWhere({ uri: channel.uri });
           }).map(function(channel) {
@@ -307,7 +307,7 @@ define([
       }});
     },
 
-    findPublicChannels: function(query, callback) {
+    findChannels: function(query, callback) {
       var self = this;
 
       if (!query)
@@ -329,7 +329,7 @@ define([
         return;
       }
 
-      $.ajax({ url: '/api/v1/public-channel-search', data : { q: query }, success: function(data) {
+      $.ajax({ url: '/api/v1/channel-search', data : { q: query }, success: function(data) {
 
         if (data.results) {
           if (!self.channel_queries[query]) self.channel_queries[query] = [];

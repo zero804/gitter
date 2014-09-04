@@ -33,9 +33,9 @@ module.exports = {
         authMiddleware,
         require('./repo-info.js'));
 
-    app.get(apiRoot + '/v1/public-channel-search',
+    app.get(apiRoot + '/v1/channel-search',
         authMiddleware,
-        require('./public-channel-search.js'));
+        require('./channel-search.js'));
 
     app.get(apiRoot + '/v1/public-repo-search',
         authMiddleware,
