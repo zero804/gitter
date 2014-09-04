@@ -5,7 +5,7 @@ var channelService = require('../../services/channel-service');
 var restSerializer   = require("../../serializers/rest-serializer");
 
 module.exports =  function(req, res, next) {
-  channelService.findPublicChannels(req.user, req.query.q)
+  channelService.findChannels(req.user, req.query.q)
     .then(function(troupes) {
       var strategy = new restSerializer.SearchResultsStrategy({
         resultItemStrategy: new restSerializer.TroupeStrategy({ currentUserId: req.user.id })

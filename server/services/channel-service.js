@@ -25,14 +25,6 @@ function findPublicChannels(user, query) {
     return { lcUri: re };
   });
 
-  var channelQuery = { $or: [
-    { githubType: 'REPO_CHANNEL' },
-    { githubType: 'ORG_CHANNEL' },
-    { githubType: 'USER_CHANNEL' }
-  ] };
-
-  filterQueries.push(channelQuery);
-
   return persistence.Troupe
     .find({
       $and: filterQueries,
@@ -40,7 +32,8 @@ function findPublicChannels(user, query) {
         { security: 'PUBLIC' },
         { security: null },
         { security: { $exists: false } }
-      ]
+      ],
+      githubType: { $in: ['REPO_CHANNEL', 'ORG_CHANNEL', 'USER_CHANNEL'] }
     })
     .limit(20)
     .execQ()
@@ -51,4 +44,34 @@ function findPublicChannels(user, query) {
     });
 }
 
-exports.findPublicChannels = findPublicChannels;
+function findPrivateChannelsWithUser(user, query) {
+
+  var filters = createRegExpsForQuery(query);
+  if(!filters.length) return Q.resolve([]);
+
+  var filterQueries = filters.map(function(re) {
+    return { lcUri: re };
+  });
+
+  return persistence.Troupe
+    .find({
+      $and: filterQueries,
+      users: { $elemMatch: { userId: user.id } },
+      security: 'PRIVATE',
+      githubType: { $in: ['REPO_CHANNEL', 'ORG_CHANNEL', 'USER_CHANNEL'] }
+    })
+    .limit(20)
+    .execQ();
+}
+
+function findChannels(user, query) {
+  return Q.all([
+    findPublicChannels(user, query),
+    findPrivateChannelsWithUser(user, query)
+  ])
+  .spread(function(publicChannels, privateChannels) {
+    return publicChannels.concat(privateChannels);
+  });
+}
+
+exports.findChannels = findChannels;
