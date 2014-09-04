@@ -33,7 +33,7 @@ module.exports = {
     expressHbs.registerHelper('typewriter', require('./hbs-helpers').typewriter);
 
     app.locals({
-      googleTrackingId: config.get("web:trackingId"),
+      googleTrackingId: config.get("stats:ga:key"),
       liveReload: config.get('web:liveReload')
     });
 

@@ -1,0 +1,141 @@
+@keyframes pulse_animation {
+  0% { box-shadow: 0 0 0px #1bee82; color: #1bee82; }
+  50% { box-shadow: 0 0 8px #1bee82; color: @trpGreen; }
+  100% { box-shadow: 0 0 0px #1bee82; color: #1bee82;  }
+}
+
+.room-list-item {
+  padding-left: 4px;
+  margin-left: 12px;
+  cursor: pointer;
+  padding-bottom: 2px;
+  list-style: none;
+  line-height: 26px;
+}
+
+body.hover .room-list-item:hover,
+.room-list-item.selected {
+  border-radius: 4px 0 0 4px;
+  background-color: rgba(255,255,255,0.2);
+
+  &.chatting:after {
+    display: none;
+  }
+}
+
+.room-list-item.chatting:after {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50em;
+  background-color: #1dce73;
+  position: relative;
+  top: 13px;
+  right: 13px;
+  content: ' ';
+  float: right
+}
+
+.room-list-item.chatting.chatting-now:after {
+  animation-name: 'pulse_animation';
+  animation-duration: 800ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+.room-list-item__name {
+  display: inline-block;
+}
+
+.room-list-item__name--favourite {
+  .prepend-fav-icon;
+}
+
+.room-list-item__name--repo {
+  .prepend-repo-icon;
+}
+
+.room-list-item__name--channel {
+  .prepend-channel-icon;
+}
+
+.room-list-item__name--org {
+  .prepend-org-icon;
+}
+
+.room-list-item__name--onetoone {
+  .prepend-121-icon;
+}
+
+.room-list-item span {
+  color: white;
+  white-space: nowrap;
+  max-width: 195px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+.room-list-item .item-unread-badge {
+  float: right;
+  margin-right: 8px;
+  display: none;
+}
+
+.room-list-item__labels {
+  float: right;
+  margin-right: 8px;
+}
+
+.room-list-item__unread-badge {
+  display: none;
+
+  border-radius: 4px;
+  display: inline-block;
+  padding: 0 4px;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 14px;
+  color: white;
+  white-space: nowrap;
+  vertical-align: middle;
+  background-color: @trpGreen;
+}
+
+body.hover .room-list-item:hover .room-list-item__unread-badge {
+  display: none;
+}
+
+.room-list-item__unread-badge.shown {
+  display: inline;
+}
+
+.room-list-item__unread-badge.mention {
+  background-color: @trpRed;
+  font-weight: 300;
+}
+
+.room-list-item__close:before {
+  font-family: 'troupe-icons';
+  content: '\e827';
+  font-size: 14px;
+}
+
+.room-list-item__close:hover {
+  opacity: 0.8;
+}
+
+.room-list-item:hover .room-list-item__close {
+  display: inline-block;
+}
+
+.dragged .room-list-item__close,
+#list-search .room-list-item__close {
+  display: none;
+}
+
+.room-list-item__close {
+  display: none;
+  opacity: 0.3;
+  .transition300ms;
+}

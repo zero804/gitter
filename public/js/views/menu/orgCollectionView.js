@@ -2,14 +2,14 @@
 define([
   'utils/context',
   'marionette',
-  'hbs!./tmpl/orgListItem',
+  'hbs!./tmpl/org-list-item',
   'utils/appevents'
 ], function(context, Marionette, orgListItemTemplate, appEvents) {
   "use strict";
 
   var OrgItemView = Marionette.ItemView.extend({
     tagName: 'li',
-    className: 'menu-list-item',
+    className: 'room-list-item',
     template: orgListItemTemplate,
     modelEvents: {
       change: 'render',
@@ -31,7 +31,7 @@ define([
 
   return Marionette.CollectionView.extend({
     tagName: 'ul',
-    className: 'trpTroupeList',
+    className: 'room-list',
     itemView: OrgItemView
   });
 
