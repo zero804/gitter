@@ -25,7 +25,7 @@
                         <tr>
                           <td>
                             <h2>{{#if troupe.oneToOne}}{{troupe.name}}{{else}}{{troupe.uri}}{{/if}}</h1>
-                            <h4>{{__n "%d unread message" "%d unread messages" unreadCount}}</h4>
+                            <h4>{{__n "%d unread message" "%d unread messages" unreadCount}}{{#if truncated}} (showing {{chats.length}} most recent){{/if}}</h4>
                             <br>
                             {{#each chats}}
                             <table>
@@ -35,7 +35,7 @@
                               </tr>
                               <tr>
                                 <td></td>
-                                <td>{{{text}}}</td>
+                                <td>{{text}}</td>
                               </tr>
                             </table>
                             <br>
