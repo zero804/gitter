@@ -3,6 +3,7 @@
 
 var testRequire   = require('../test-require');
 var Q             = require('q');
+var assert        = require('assert');
 
 var EMAIL_DATA = [
   {
@@ -56,7 +57,7 @@ var EMAIL_DATA = [
   }, {
         "troupe": {
           "id": "53d61acc1a1c8bd81c69ce23",
-          "uri": "gitterHQ/gitter",
+          "uri": "gitterHQ/nibbles",
           "oneToOne": false,
           "userIds": [
             "53ce4c02d6d7c494a3f737a9",
@@ -122,4 +123,159 @@ describe('email-notification-service', function() {
       .nodeify(done);
   });
 
+  it('should generate nice subject lines', function() {
+    // One room
+    var subject = emailNotificationService.testOnly.calculateSubjectForUnreadEmail([{
+      troupe: {
+        uri: 'gitterHQ'
+      }
+    }]);
+
+    assert.equal('Unread messages in gitterHQ', subject);
+
+    // Two rooms
+    subject = emailNotificationService.testOnly.calculateSubjectForUnreadEmail([{
+      troupe: {
+        uri: 'gitterHQ'
+      }
+    }, {
+      troupe: {
+        uri: 'troupe'
+      }
+    }]);
+
+    assert.equal('Unread messages in gitterHQ and troupe', subject);
+
+    // One user, one troupe
+    subject = emailNotificationService.testOnly.calculateSubjectForUnreadEmail([{
+      troupe: {
+        oneToOne: true,
+        user: {
+          username: 'suprememoocow'
+        }
+      }
+    }, {
+      troupe: {
+        uri: 'troupe'
+      }
+    }]);
+
+    assert.equal('Unread messages in suprememoocow and troupe', subject);
+
+    // One user
+    subject = emailNotificationService.testOnly.calculateSubjectForUnreadEmail([{
+      troupe: {
+        oneToOne: true,
+        user: {
+          username: 'suprememoocow'
+        }
+      }
+    }]);
+
+    assert.equal('Unread messages from suprememoocow', subject);
+
+    // Three user s
+    subject = emailNotificationService.testOnly.calculateSubjectForUnreadEmail([{
+      troupe: {
+        uri: 'troupe'
+      }
+    }, {
+      troupe: {
+        oneToOne: true,
+        user: {
+          username: 'mydigitalshelf'
+        }
+      },
+    }, {
+      troupe: {
+        oneToOne: true,
+        user: {
+          username: 'trevorah'
+        }
+      }
+    }]);
+
+    assert.equal('Unread messages in troupe, mydigitalshelf and one other', subject);
+
+    // two rooms one user
+    subject = emailNotificationService.testOnly.calculateSubjectForUnreadEmail([{
+      troupe: {
+        oneToOne: true,
+        user: {
+          username: 'suprememoocow'
+        }
+      },
+    }, {
+      troupe: {
+        oneToOne: true,
+        user: {
+          username: 'mydigitalshelf'
+        }
+      },
+    }, {
+      troupe: {
+        oneToOne: true,
+        user: {
+          username: 'trevorah'
+        }
+      }
+    }]);
+
+    assert.equal('Unread messages from suprememoocow, mydigitalshelf and one other', subject);
+
+
+    // Four user s
+    subject = emailNotificationService.testOnly.calculateSubjectForUnreadEmail([{
+      troupe: {
+        uri: 'troupe'
+      }
+    }, {
+      troupe: {
+        oneToOne: true,
+        user: {
+          username: 'mydigitalshelf'
+        }
+      },
+    }, {
+      troupe: {
+        oneToOne: true,
+        user: {
+          username: 'trevorah'
+        }
+      }
+    }, {
+      troupe: {
+        oneToOne: true,
+        user: {
+          username: 'walter'
+        }
+      }
+    }]);
+
+    assert.equal('Unread messages in troupe, mydigitalshelf and 2 others', subject);
+
+    // Three user s
+    subject = emailNotificationService.testOnly.calculateSubjectForUnreadEmail([{
+      troupe: {
+        uri: 'this_is_a_very_long_org/with_a_very_long_repo/and_then_a_channel'
+      }
+    }, {
+      troupe: {
+        oneToOne: true,
+        user: {
+          username: 'mydigitalshelf'
+        }
+      },
+    }, {
+      troupe: {
+        oneToOne: true,
+        user: {
+          username: 'trevorah'
+        }
+      }
+    }]);
+
+    assert.equal('Unread messages in and_then_a_channel, mydigitalshelf and one other', subject);
+
+  });
 });
