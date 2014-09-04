@@ -198,11 +198,7 @@ var userService = {
   },
 
   findByIds: function(ids, callback) {
-    if(!ids || !ids.length) return Q.resolve([]).nodeify(callback);
-
-    return persistence.User.where('_id')['in'](collections.idsIn(ids))
-      .execQ()
-      .nodeify(callback);
+    return mongooseUtils.findByIds(persistence.User, ids, callback);
   },
 
   findByUsernames: function(usernames, callback) {
