@@ -1,10 +1,12 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
-var Q = require('q');
-var _ = require('underscore');
+var Q           = require('q');
+var _           = require('underscore');
+var collections = require('./collections');
+var mongoUtils  = require('./mongo-utils');
 
-var mongoose = require('mongoose-q')(require('mongoose'), {spread:true});
-var Schema = mongoose.Schema;
+var mongoose    = require('mongoose-q')(require('mongoose'), {spread:true});
+var Schema      = mongoose.Schema;
 
 exports.attachNotificationListenersToSchema = function (schema, options) {
   var ignoredPaths = options.ignoredPaths;
@@ -75,7 +77,7 @@ exports.cloneSchema = function(schema) {
   delete tree.id;
   delete tree._id;
   return new Schema(tree);
-}
+};
 
 /*
  * Returns a promise [document, numAffected, raw]
@@ -85,4 +87,15 @@ exports.upsert = function(schema, query, setOperation) {
     .spread(function(numAffected, raw) {
       return [schema.findOneQ(query), numAffected, raw];
     });
-}
+};
+
+/**
+ * Returns a promise of documents
+ */
+exports.findByIds = function(Model, ids, callback) {
+  if(!ids || !ids.length) return Q.resolve([]).nodeify(callback);
+
+  return Model.where('_id')['in'](mongoUtils.asObjectIDs(collections.idsIn(ids)))
+    .execQ()
+    .nodeify(callback);
+};

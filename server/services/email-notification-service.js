@@ -10,6 +10,53 @@ var crypto              = require('crypto');
 var passphrase          = config.get('email:unsubscribeNotificationsSecret');
 var userSettingsService = require('./user-settings-service');
 var emailAddressService = require('./email-address-service');
+var roomNameTrimmer     = require('../utils/room-name-trimmer');
+
+/*
+ * Return a nice sane
+ */
+function calculateSubjectForUnreadEmail(troupesWithUnreadCounts) {
+  var allOneToOne = true;
+  var roomNames = troupesWithUnreadCounts.map(function(d) {
+    if(d.troupe.oneToOne) {
+      return d.troupe.user.username;
+    } else {
+      allOneToOne = false;
+      return roomNameTrimmer(d.troupe.uri);
+    }
+  });
+
+  switch(roomNames.length) {
+    case 0: return "Unread messages on Gitter"; // Wha??
+    case 1:
+      if(allOneToOne) {
+        return "Unread messages from " + roomNames[0];
+      } else {
+        return "Unread messages in " + roomNames[0];
+      }
+      break;
+    case 2:
+      if(allOneToOne) {
+        return "Unread messages from " + roomNames[0] + ' and ' + roomNames[1];
+      } else {
+        return "Unread messages in " + roomNames[0] + ' and ' + roomNames[1];
+      }
+      break;
+    case 3:
+      if(allOneToOne) {
+        return "Unread messages from " + roomNames[0] + ', ' + roomNames[1] + ' and one other';
+      } else {
+        return "Unread messages in " + roomNames[0] + ', ' + roomNames[1] + ' and one other';
+      }
+      break;
+    default:
+      if(allOneToOne) {
+        return "Unread messages from " + roomNames[0] + ', ' + roomNames[1] + ' and ' + (roomNames.length - 2) + ' others';
+      } else {
+        return "Unread messages in " + roomNames[0] + ', ' + roomNames[1] + ' and ' + (roomNames.length - 2) + ' others';
+      }
+  }
+}
 
 module.exports = {
 
@@ -18,7 +65,7 @@ module.exports = {
     var cipher    = crypto.createCipher('aes256', passphrase);
     var hash      = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
 
-    if (user.state && user.state === 'INVITED') {
+    if (user.state === 'INVITED') {
       logger.info('Skipping email notification for ' + user.username + ', in INVITED state.');
       return;
     }
@@ -36,13 +83,19 @@ module.exports = {
           return !troupeWithUnreadCounts.troupe.oneToOne;
         });
 
+        troupesWithUnreadCounts.forEach(function(d) {
+            d.truncated = d.chats.length < d.unreadCount;
+          }
+        );
+
+        var subject = calculateSubjectForUnreadEmail(troupesWithUnreadCounts);
 
         return mailerService.sendEmail({
           templateFile: "unread_notification",
           from: 'Gitter Notifications <support@gitter.im>',
           to: email,
           unsubscribe: unsubscribeUrl,
-          subject: "Activity on Gitter",
+          subject: subject,
           tracking: {
             event: 'unread_notification_sent',
             data: { userId: user.id, email: email }
@@ -113,7 +166,7 @@ module.exports = {
         var shareURL = config.get('web:basepath') + '/' + room.uri;
 
         // TODO move the generation of tweet links into it's own function?
-        var twitterURL = (isPublic) ? 'http://twitter.com/intent/tweet?url=' + shareURL + '&text=' + encodeURIComponent('I have just created ' + room.name) + '&via=gitchat' : undefined; // if the room is public we shall have a tweet link
+        var twitterURL = (isPublic) ? 'http://twitter.com/intent/tweet?url=' + shareURL + '&text=' + encodeURIComponent('I have just created ' + room.uri) + '&via=gitchat' : undefined; // if the room is public we shall have a tweet link
 
         return mailerService.sendEmail({
           templateFile: "created_room",
@@ -187,4 +240,8 @@ module.exports = {
         });
     });
   }
+};
+
+module.exports.testOnly = {
+  calculateSubjectForUnreadEmail: calculateSubjectForUnreadEmail
 };
