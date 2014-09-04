@@ -7,6 +7,13 @@ define([
   var cordova = window.cordova;
   var noop = function() {};
 
+  function getUriFromUrl(url) {
+    var parser = document.createElement('a');
+    parser.href = url;
+
+    return parser.pathname.substring(1);
+  }
+
   function getIdForUri(uri, cb) {
     $.post('/api/v1/rooms', { uri: uri }, function() {
       $.get('/api/v1/rooms', function(rooms) {
@@ -39,14 +46,15 @@ define([
   };
 
   return {
-    navigate: function(pathname) {
+    navigate: function(url) {
       if(!cordova) return;
 
-      var roomName = pathname.substring(1);
-      getIdForUri(roomName, function(err, id) {
+      var uri = getUriFromUrl(url);
+
+      getIdForUri(uri, function(err, id) {
         if(err || !id) return;
 
-        updateNativeContext(id, roomName);
+        updateNativeContext(id, uri);
         window.location.href = '/mobile/chat#' + id;
       });
     },
