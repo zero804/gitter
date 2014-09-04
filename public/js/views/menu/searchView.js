@@ -5,15 +5,15 @@ define([
   'underscore',
   'backbone',
   'utils/text-filter',
-  './troupeCollectionView',
+  './room-collection-view',
   'collections/instances/troupes',
   'cocktail',
   'views/keyboard-events-mixin'
-], function(context, appEvents, $, _, Backbone, textFilter, TroupeCollectionView, troupeCollections, cocktail, KeyboardEventsMixin
+], function(context, appEvents, $, _, Backbone, textFilter, RoomCollectionView, troupeCollections, cocktail, KeyboardEventsMixin
 ) {
   "use strict";
 
-  var View = TroupeCollectionView.extend({
+  var View = RoomCollectionView.extend({
 
     keyboardEvents: {
       'search.prev': 'onKeySearchPrev',

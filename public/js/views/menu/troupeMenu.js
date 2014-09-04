@@ -5,7 +5,7 @@ define([
   'utils/appevents',
   'utils/is-mobile',
   'collections/instances/troupes',
-  'views/menu/troupeCollectionView',
+  'views/menu/room-collection-view',
   'log!troupeMenu',
   'cocktail',
   'views/keyboard-events-mixin',
@@ -14,7 +14,7 @@ define([
   './profileView',
   './orgCollectionView',
   'nanoscroller' //no ref
-], function($, Marionette, context, appEvents, isMobile, troupeCollections, TroupeCollectionView, log, cocktail, KeyboardEventsMixin, template, SearchView, ProfileView, OrgCollectionView) {
+], function($, Marionette, context, appEvents, isMobile, troupeCollections, RoomCollectionView, log, cocktail, KeyboardEventsMixin, template, SearchView, ProfileView, OrgCollectionView) {
   "use strict";
 
   var View = Marionette.Layout.extend({
@@ -146,7 +146,7 @@ define([
       this.profile.show(new ProfileView());
 
       // mega-list: recent troupe view
-      this.favs.show(new TroupeCollectionView({
+      this.favs.show(new RoomCollectionView({
         collection: troupeCollections.favourites,
         rerenderOnSort: true,
         draggable: true,
@@ -154,7 +154,7 @@ define([
         roomsCollection: troupeCollections.troupes
       }));
 
-      this.recent.show(new TroupeCollectionView({
+      this.recent.show(new RoomCollectionView({
         collection: troupeCollections.recentRoomsNonFavourites,
         rerenderOnSort: true,
         draggable: true,
