@@ -80,6 +80,7 @@ function TroupeStrategy(options) {
       name: item.oneToOne ? user && user.displayName : item.name,
       uri: item.uri,
       oneToOne: item.oneToOne,
+      user: user,
       userIds: item.getUserIds(),
       url: item.oneToOne ? user && user && getHomeUrl(user) : "/" + item.uri,
       urlUserMap: item.oneToOne && getUrlUserMap(item),
