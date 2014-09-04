@@ -36,13 +36,17 @@ module.exports = {
           return !troupeWithUnreadCounts.troupe.oneToOne;
         });
 
+        troupesWithUnreadCounts.forEach(function(d) {
+            d.truncated = d.chats.length < d.unreadCount;
+          }
+        );
 
         return mailerService.sendEmail({
           templateFile: "unread_notification",
           from: 'Gitter Notifications <support@gitter.im>',
           to: email,
           unsubscribe: unsubscribeUrl,
-          subject: "Activity on Gitter",
+          subject: "Your unread messages on Gitter",
           tracking: {
             event: 'unread_notification_sent',
             data: { userId: user.id, email: email }

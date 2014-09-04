@@ -67,7 +67,7 @@ var EMAIL_DATA = [
           "urlUserMap": false,
           "nameUserMap": false
         },
-        "unreadCount": 1,
+        "unreadCount": 50,
         "unreadItems": [
           "5405bfdd66579b000004df1a"
         ],
