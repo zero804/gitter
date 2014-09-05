@@ -240,6 +240,22 @@ function bind(on) {
 
     onRepoPermissionsChangeDetected: function(callback) {
       on('repo_perm_change', callback);
+    },
+
+    userTroupeLurkModeChange: function(data) {
+      emit('user_troupe_lurk_mode_change', data);
+    },
+
+    onUserTroupeLurkModeChange: function(callback) {
+      on('user_troupe_lurk_mode_change', callback);
+    },
+
+    newLurkActivity: function(data) {
+      emit('new_lurk_activity', data);
+    },
+
+    onNewLurkActivity: function(callback) {
+      on('new_lurk_activity', callback);
     }
 
   };

@@ -17,7 +17,7 @@ function findFailbackChannel(channel) {
 
   for(var i = 0; i < res.length; i++) {
     var m = channel.match(res[i]);
-    if(m) return channel.replace(/\/rooms\//, '/troupes/');
+    if(m) return channel.replace(/\/rooms\//, '/troupes/');  // Consider dropping this soon
   }
 }
 
@@ -187,6 +187,17 @@ exports.install = function() {
   });
 
 
+  appEvents.localOnly.onNewLurkActivity(function(data) {
+    var userId = data.userId;
+    var troupeId = data.troupeId;
+
+    publish("/api/v1/user/" + userId, {
+      notification: "activity",
+      troupeId: troupeId
+    });
+
+  });
+
   appEvents.localOnly.onNewUnreadItem(function(data) {
     var userId = data.userId;
     var troupeId = data.troupeId;
@@ -212,6 +223,18 @@ exports.install = function() {
     publish("/api/v1/user/" + userId + '/rooms/' + troupeId + '/unreadItems', {
       notification: "unread_items_removed",
       items: items
+    });
+
+  });
+
+  appEvents.localOnly.onUserTroupeLurkModeChange(function(data) {
+    var userId = data.userId;
+    var troupeId = data.troupeId;
+    var lurk = data.lurk;
+
+    publish("/api/v1/user/" + userId + '/rooms/' + troupeId + '/unreadItems', {
+      notification: "lurk_change",
+      lurk: lurk
     });
 
   });

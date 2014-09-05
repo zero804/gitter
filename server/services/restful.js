@@ -11,7 +11,9 @@ var eventService        = require("./event-service");
 var Q                   = require('q');
 var roomService         = require('./room-service');
 var GithubMe            = require('./github/github-me-service');
+var isUserLurkingInRoom = require('./is-user-lurking-in-room');
 var _                   = require('underscore');
+
 
 var DEFAULT_CHAT_COUNT_LIMIT = 30;
 
@@ -72,9 +74,19 @@ exports.serializeUsersForTroupe = function(troupeId, userId, callback) {
 };
 
 exports.serializeUnreadItemsForTroupe = function(troupeId, userId, callback) {
-  var d = Q.defer();
-  unreadItemService.getUnreadItemsForUser(userId, troupeId, d.makeNodeResolver());
-  return d.promise.nodeify(callback);
+  return isUserLurkingInRoom(userId, troupeId)
+    .then(function(isLurking) {
+      if(isLurking) {
+        return {
+          _meta: { lurk: true }
+        };
+      }
+
+      var d = Q.defer();
+      unreadItemService.getUnreadItemsForUser(userId, troupeId, d.makeNodeResolver());
+      return d.promise;
+    })
+    .nodeify(callback);
 };
 
 exports.serializeReadBysForChat = function(troupeId, chatId, callback) {

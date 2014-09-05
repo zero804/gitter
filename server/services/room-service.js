@@ -29,6 +29,8 @@ var eventService       = require('./event-service');
 var emailNotificationService = require('./email-notification-service');
 var canUserBeInvitedToJoinRoom = require('./invited-permissions-service');
 var emailAddressService = require('./email-address-service');
+var troupeDao          = require('./daos/troupe-dao').full;
+var mongoUtils         = require('../utils/mongo-utils');
 
 function localUriLookup(uri, opts) {
   return uriLookupService.lookupUri(uri)
@@ -947,3 +949,27 @@ function unbanUserFromRoom(room, troupeBan, username, requestingUser, callback) 
     .nodeify(callback);
 }
 exports.unbanUserFromRoom = unbanUserFromRoom;
+
+function updateTroupeLurkForUserId(userId, troupeId, lurk) {
+  lurk = !!lurk; // Force boolean
+  var setOperation;
+  if(lurk) {
+    setOperation = { $set: { "users.$.lurk" : !!lurk } };
+  } else {
+    setOperation = { $unset: { "users.$.lurk" : "" } };
+  }
+
+  return persistence.Troupe.updateQ({
+      _id: mongoUtils.asObjectID(troupeId),
+      'users.userId': mongoUtils.asObjectID(userId)
+    }, setOperation)
+  .then(function(count) {
+    // Odd, user not found
+    if(!count) return;
+
+    appEvents.userTroupeLurkModeChange({ userId: userId, troupeId: troupeId, lurk: lurk });
+    // TODO: in future get rid of this but this collection is used by the native clients
+    appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lurk: lurk });
+  });
+}
+exports.updateTroupeLurkForUserId = updateTroupeLurkForUserId;

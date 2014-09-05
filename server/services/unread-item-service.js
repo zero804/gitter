@@ -169,6 +169,7 @@ function newItem(troupeId, creatorUserId, itemType, itemId) {
     .then(function(troupe) {
       var userIdsWithLurk = troupe.users;
       var userIds = Object.keys(userIdsWithLurk);
+
       if(creatorUserId) {
         userIds = userIds.filter(function(userId) {
           return ("" + userId) != ("" + creatorUserId);
@@ -178,12 +179,20 @@ function newItem(troupeId, creatorUserId, itemType, itemId) {
       // Publish out an new item event
       var data = {};
       data[itemType] = [itemId];
-      userIds.forEach(function(userId) {
-        appEvents.newUnreadItem(userId, troupeId, data);
-      });
 
       var userIdsForNotify = userIds.filter(function(u) {
         return !userIdsWithLurk[u];
+      });
+
+      // Send out troupe activity blink for lurking users
+      userIds.forEach(function(u) {
+        if(userIdsWithLurk[u]) {
+          // Lurking, send them an activity "ping"
+          appEvents.newLurkActivity({ userId: u, troupeId: troupeId });
+        } else {
+          // Not lurking, send them the full update
+          appEvents.newUnreadItem(u, troupeId, data);
+        }
       });
 
       if(!userIdsForNotify.length) return;
