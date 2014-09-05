@@ -970,6 +970,11 @@ function updateTroupeLurkForUserId(userId, troupeId, lurk) {
     appEvents.userTroupeLurkModeChange({ userId: userId, troupeId: troupeId, lurk: lurk });
     // TODO: in future get rid of this but this collection is used by the native clients
     appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lurk: lurk });
+
+    if(lurk) {
+      // Delete all the chats in Redis for this person too
+      return unreadItemService.markAllChatsRead(userId, troupeId, { member: true });
+    }
   });
 }
 exports.updateTroupeLurkForUserId = updateTroupeLurkForUserId;
