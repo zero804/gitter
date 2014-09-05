@@ -67,7 +67,7 @@ define([
         self._menuAnimating = false;
       }, 350);
 
-      $("#left-menu").addClass("visible");
+      $("#left-menu .js-menu").addClass("visible");
       $("#mini-left-menu, #mini-left-menu-container").addClass("active");
       $("#iframe-panel, #menu-toggle-button").addClass("leftCollapse");
 
@@ -90,7 +90,7 @@ define([
 
       $("#mini-left-menu, #mini-left-menu-container").removeClass("active");
       $("#iframe-panel, #menu-toggle-button").removeClass("leftCollapse");
-      $("#left-menu").removeClass("visible");
+      $("#left-menu .js-menu").removeClass("visible");
 
       this.leftmenu = false;
     },
