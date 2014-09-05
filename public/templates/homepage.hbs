@@ -12,9 +12,6 @@
         <link rel="stylesheet" href="{{cdn 'styles/homepage.css' }}">
 
         <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon-normal.ico' }}">
-
-        <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
-        <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
         <script src="//cdn.optimizely.com/js/590160700.js"></script>
         {{> load_font_css }}
     </head>
@@ -384,6 +381,9 @@
 
       {{{ bootScript "homepage" }}}
       {{{ generateEnv }}}
+
+              <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
+        <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
 
     </body>
 </html>
