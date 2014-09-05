@@ -122,7 +122,6 @@ module.exports = {
     return emailAddressService(toUser)
       .then(function(email) {
         if (!email) return;
-        console.log("TOUSERID: " + toUser.id);
         return mailerService.sendEmail({
           templateFile: "invitation",
           from: senderName + ' <support@gitter.im>',
