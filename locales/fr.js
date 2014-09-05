@@ -1,3 +1,3 @@
 {
-  "%s ago": "il ya %s"
+  "%s ago": "il y a %s"
 }
