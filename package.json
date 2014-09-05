@@ -48,7 +48,7 @@
     "nodemailer": "0.3.14",
     "nomnom": "~1.6.2",
     "oauth2orize": "~1.0.0",
-    "octonode": "^0.6.4",
+    "octonode": "git://github.com/pksunkara/octonode.git#6dae7e054c9903191164fbd43ec69bbbe454499f",
     "parse-links": "~0.1.0",
     "passport": "0.1.15",
     "passport-http": "0.2.2",
