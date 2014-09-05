@@ -104,7 +104,8 @@ function ChatStrategy(options)  {
       mentions: item.mentions ? item.mentions.map(function(m) {
           return {
             screenName: m.screenName,
-            userId: m.userId
+            userId: m.userId,
+            group: m.group
           };
         }) : [],
       issues: item.issues || [],

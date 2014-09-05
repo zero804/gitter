@@ -14,7 +14,8 @@ var ChatMessageSchema = new Schema({
   urls:       Array,    // TODO: schema-ify this
   mentions: [{
     screenName: { type: String, required: true },
-    userId:     { type: ObjectId }
+    userId:     { type: ObjectId },
+    group:      { type: Boolean, required: false }, // True iff screenname is a group
   }],
   issues:     Array, // TODO: schema-ify this
   meta:       Schema.Types.Mixed,
