@@ -61,15 +61,27 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
     });
 
     /* Look through the mentions and attempt to tie the mentions to userIds */
-    var mentionUserNames = parsedMessage.mentions.map(function(mention) {
-      return mention.screenName;
-    });
+    var mentionUserNames = parsedMessage.mentions
+      .filter(function(m) {
+        return !m.group;
+      })
+      .map(function(mention) {
+        return mention.screenName;
+      });
+
 
     return userService.findByUsernames(mentionUserNames)
       .then(function(users) {
       var usersIndexed = collections.indexByProperty(users, 'username');
 
       var mentions = parsedMessage.mentions.map(function(mention) {
+        if(mention.group) {
+          return {
+            screenName: mention.screenName,
+            group: true
+          };
+        }
+
         var user = usersIndexed[mention.screenName];
         var userId = user && user.id;
 
@@ -88,13 +100,6 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
 
       return chatMessage.saveQ()
         .then(function() {
-
-          // setTimeout(function() {
-          //   troupe.users.forEach(function(troupeUser) {
-          //     require('./unread-item-service').markItemsRead(troupeUser.userId, troupe.id, [chatMessage.id], [], { member: true });
-          //   });
-
-          // }, 100);
 
           var statMetadata = _.extend({
             userId: user.id,

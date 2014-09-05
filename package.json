@@ -22,7 +22,7 @@
     "faye-redis": "git://github.com/gitterHQ/faye-redis-node#v0.3.0",
     "faye-websocket": "^0.7.2",
     "gitter-env": "git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.12.1",
-    "gitter-marked": "^0.4.3",
+    "gitter-marked": "^0.5.1",
     "gitter-services": "git+ssh://git@github.com:gitterHQ/services.git#1.4.0",
     "handlebars": "~1.1.2",
     "heapdump": "^0.2.9",

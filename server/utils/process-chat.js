@@ -105,6 +105,11 @@ module.exports = exports = function processChat(text) {
     return util.format('<span data-link-type="mention" data-screen-name="%s" class="mention">%s</span>', screenName, text);
   };
 
+  renderer.groupmention = function(name, text) {
+    mentions.push({ screenName: name, group: true });
+    return util.format('<span data-link-type="groupmention" data-group-name="%s" class="groupmention">%s</span>', name, text);
+  };
+
   renderer.email = function(href, title, text) {
     checkForIllegalUrl(href);
 

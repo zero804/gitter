@@ -697,13 +697,6 @@ function newMention(troupeId, chatId, userIds, usersHash) {
   if(!troupeId) { winston.error("newMention failed. Troupe cannot be null"); return Q.resolve(); }
   if(!chatId) { winston.error("newMention failed. itemId cannot be null"); return Q.resolve(); }
 
-  // Publish out an new item event
-  // var data = {};
-  // data[itemType] = [itemId];
-  // userIds.forEach(function(userId) {
-  //   appEvents.newUnreadItem(userId, troupeId, data);
-  // });
-
   if(!userIds.length) return;
 
 
@@ -805,12 +798,33 @@ function detectAndCreateMentions(troupeId, creatingUserId, chat) {
       if(!usersHash) return;
 
       var userIds = chat.mentions
+            .filter(function(mention) {
+              // Only use this for people mentions
+              return mention.userId && !mention.group;
+            })
             .map(function(mention) {
               return mention.userId;
             });
 
+      // Handle all group with a special-case
+      // In future, resolve this against github teams
+      var allGroupMention = chat.mentions
+            .filter(function(mention) {
+              // Only use this for people mentions
+              return mention.group && mention.screenName === 'all';
+            }).length >= 1;
+
+      var mentionMemberUserIds;
+      if(allGroupMention) {
+        // Add everyone except the person creating the message
+        mentionMemberUserIds = Object.keys(usersHash).filter(function(u) {
+          return "" + u !== "" + creatingUserId;
+        });
+      } else {
+        mentionMemberUserIds = [];
+      }
+
       var mentionLurkerAndNonMemberUserIds = [];
-      var mentionMemberUserIds = [];
 
       var lookupUsers = [];
 
