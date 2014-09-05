@@ -1,14 +1,14 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var troupeService = require("../../services/troupe-service");
-var restful = require("../../services/restful");
-var restSerializer = require("../../serializers/rest-serializer");
-var recentRoomService = require('../../services/recent-room-service');
+var troupeService        = require("../../services/troupe-service");
+var restful              = require("../../services/restful");
+var restSerializer       = require("../../serializers/rest-serializer");
+var recentRoomService    = require('../../services/recent-room-service');
 var suggestedRoomService = require('../../services/suggested-room-service');
-var roomService = require('../../services/room-service');
-var removeService = require('../../services/remove-service');
-var Q = require('q');
+var roomService          = require('../../services/room-service');
+var removeService        = require('../../services/remove-service');
+var Q                    = require('q');
 
 module.exports = {
   id: 'userTroupe',
@@ -74,7 +74,7 @@ module.exports = {
     }
 
     if('lurk' in updatedTroupe) {
-      promises.push(troupeService.updateTroupeLurkForUserId(userId, troupeId, updatedTroupe.lurk));
+      promises.push(roomService.updateTroupeLurkForUserId(userId, troupeId, updatedTroupe.lurk));
     }
 
     return Q.all(promises)

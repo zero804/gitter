@@ -479,26 +479,6 @@ function toggleSearchIndexing(user, troupe, bool) {
     });
 }
 
-function updateTroupeLurkForUserId(userId, troupeId, lurk) {
-  return findById(troupeId)
-    .then(function(troupe) {
-      var troupeUser = troupe.users.filter(function(troupeUser) { return troupeUser.userId == userId; })[0];
-      if(troupeUser) {
-        troupeUser.lurk = !!lurk;
-      }
-
-      /* Don't send out the traditional updates to all users */
-      troupe._skipTroupeMiddleware = true;
-
-      return troupe.saveQ();
-    })
-    .then(function() {
-      // TODO: in future get rid of this but this collection is used by the native clients
-      appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, lurk: !!lurk });
-    });
-}
-
-
 function findAllUserIdsForTroupes(troupeIds, callback) {
   if(!troupeIds.length) return callback(null, []);
 
@@ -628,7 +608,6 @@ module.exports = {
   findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe,
 
   updateTopic: updateTopic,
-  updateTroupeLurkForUserId: updateTroupeLurkForUserId,
   toggleSearchIndexing: toggleSearchIndexing
 
 };
