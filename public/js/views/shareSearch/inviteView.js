@@ -17,6 +17,11 @@ define([
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
     },
 
+    events: {
+      'mouseover .copy-button' : 'createClipboard',
+      'click .js-badge': 'createBadge'
+    },
+
     menuItemClicked: function(button) {
       switch(button) {
         case 'add':
@@ -81,16 +86,8 @@ define([
     },
 
     getRenderData: function() {
-      var isOrg = false;
-      var isRepo = false;
-
-      if (context.getTroupe().githubType == 'REPO') {
-        isRepo = true;
-      }
-
-      if (context.getTroupe().githubType == 'ORG') {
-        isOrg = true;
-      }
+      var room = context.getTroupe();
+      var isPublicRepo = (room.githubType === 'REPO' && room.security === 'PUBLIC');
 
       var badgeUrl = this.getBadgeUrl(); // to get a badge with a room just pass in context.getTroupe().uri
       var shareUrl = this.getShareUrl({
@@ -99,9 +96,8 @@ define([
         });
 
       return {
+        isPublicRepo: isPublicRepo,
         hasFlash: this.detectFlash(),
-        isRepo : isRepo,
-        isOrg : isOrg,
         url: shareUrl,
         badgeUrl: badgeUrl,
         badgeMD: this.getBadgeMD({
@@ -112,13 +108,33 @@ define([
       };
     },
 
-    events: {
-      'mouseover .copy-button' :      'createClipboard'
+
+    createBadge: function() {
+      var btn = this.$el.find('.js-badge')[0];
+      var st = this.$el.find('.pr-status');
+      st.html('Hold on...');
+      btn.disabled = true;
+
+      $.ajax({
+        url: '/api/private/create-badge',
+        contentType: "application/json",
+        dataType: "json",
+        type: "POST",
+        data: JSON.stringify({
+          uri: context.troupe().get('uri')
+        }),
+        context: this,
+        timeout: 45 * 1000,
+        error: function() {
+          st.html('Oops, something went wront. Try again. (Is there a README.md in your project?)');
+          btn.disabled = false;
+        },
+        success: function (res) {
+          st.html('We just created a PR for you! <a href=' + res.html_url + ' target="_blank">Review and merge &rarr;</a>');
+        }
+      });
     },
 
-    afterRender: function() {
-
-    },
 
   });
 
