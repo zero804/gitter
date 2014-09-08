@@ -256,6 +256,20 @@
     font-size: 13px;
     cursor: pointer;
   }
+
+  .embed {
+    max-width: 500px;
+    iframe {
+      max-width: 100%;
+      max-height: 281px;
+    }
+    &.embed-limited {
+      max-width: 100%;
+      iframe {
+        max-height: none;
+      }
+    }
+  }
 }
 
 .chat-item__content {
