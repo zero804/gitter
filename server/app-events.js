@@ -256,6 +256,14 @@ function bind(on) {
 
     onNewLurkActivity: function(callback) {
       on('new_lurk_activity', callback);
+    },
+
+    markAllRead: function(data) {
+      emit('mark_all_read', data);
+    },
+
+    onMarkAllRead: function(callback) {
+      on('mark_all_read', callback);
     }
 
   };

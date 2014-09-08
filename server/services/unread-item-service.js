@@ -466,10 +466,16 @@ exports.listTroupeUsersForEmailNotifications = function(horizonTime, emailLatchE
  * Mark many items as read, for a single user and troupe
  */
 exports.markItemsRead = function(userId, troupeId, itemIds, mentionIds, options) {
+  // Configure options
+  if(!options) options = {};
+  // { member : default true }
+  if(options.member === undefined) options.member = true;
+  // { recordAsRead: default truw }
+  if(options.recordAsRead === undefined) options.recordAsRead = true;
+
   var now = Date.now();
 
   var allIds = [];
-  var member = options && 'member' in options ? options.member :  true;
 
   if(itemIds) allIds = allIds.concat(itemIds);
   if(mentionIds) allIds = allIds.concat(mentionIds);
@@ -477,12 +483,14 @@ exports.markItemsRead = function(userId, troupeId, itemIds, mentionIds, options)
   appEvents.unreadItemsRemoved(userId, troupeId, { chat: itemIds }); // TODO: update
 
   return Q.all([
-    markItemsOfTypeRead(userId, troupeId, 'chat', allIds, member),
+    markItemsOfTypeRead(userId, troupeId, 'chat', allIds, options.member),
     setLastReadTimeForUser(userId, troupeId, now),
-    mentionIds && mentionIds.length && removeMentionForUser(userId, troupeId, mentionIds, member)
+    mentionIds && mentionIds.length && removeMentionForUser(userId, troupeId, mentionIds, options.member)
     ])
     .then(function() {
-      if(options && options.recordAsRead === false) return;
+      if(!options.recordAsRead) {
+        return;
+      }
 
       // For the moment, we're only bothering with chats for this
       return readByService.recordItemsAsRead(userId, troupeId, { chat: allIds }); // TODO: drop the hash
@@ -492,6 +500,8 @@ exports.markItemsRead = function(userId, troupeId, itemIds, mentionIds, options)
 
 exports.markAllChatsRead = function(userId, troupeId, options) {
   if(!options) options = {};
+  appEvents.markAllRead({ userId: userId, troupeId: troupeId });
+
   return exports.getUnreadItems(userId, troupeId, 'chat')
     .then(function(chatIds) {
       if(!chatIds.length) return;
