@@ -158,11 +158,11 @@ define([
     },
 
     generateTwitterLink: function() {
-      var text = escape('Just created a room on Gitter for ' + context.troupe().get('uri') + ':');
+      var text = escape('Join the chat room on Gitter for ' + context.troupe().get('uri') + ':');
       var url = 'https://twitter.com/share?' +
-        'text=' + text + 
+        'text=' + text +
         '&url=https://gitter.im/' + context.troupe().get('uri') +
-        '&related=gitchat' + 
+        '&related=gitchat' +
         '&via=gitchat';
 
       return url;
@@ -170,10 +170,10 @@ define([
 
     initialize: function() {
       var ctx = context();
-      appEvents.triggerParent('track-event', 'welcome-add-user-suggestions', { 
+      appEvents.triggerParent('track-event', 'welcome-add-user-suggestions', {
         uri: ctx.troupe.uri,
         security: ctx.troupe.security,
-        count: this.collection.length 
+        count: this.collection.length
       });
     },
 
@@ -199,7 +199,7 @@ define([
         contentType: "application/json",
         dataType: "json",
         type: "POST",
-        data: JSON.stringify({ 
+        data: JSON.stringify({
           uri: context.troupe().get('uri')
         }),
         context: this,
