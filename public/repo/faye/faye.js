@@ -2373,6 +2373,8 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
       var pending = self._pending ? self._pending.toArray() : [];
       delete self._pending;
 
+      self.info('Websocket terminated, ? pending messages', pending.length);
+
       if (wasConnected) {
         self._handleError(pending, true);
       } else if (self._everConnected) {
