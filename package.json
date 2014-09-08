@@ -94,7 +94,7 @@
     "grunt-contrib-watch": "^0.6.1",
     "grunt-handlebars-requirejs": "^0.1.0",
     "grunt-nsp-shrinkwrap": "0.0.3",
-    "grunt-retire": "^0.2.6",
+    "grunt-retire": "^0.2.7",
     "grunt-wrap": "~0.2.0",
     "istanbul": "~0.1.46",
     "jquery-builder": "~0.5.0",
