@@ -239,5 +239,15 @@ exports.install = function() {
 
   });
 
+
+  appEvents.localOnly.onMarkAllRead(function(data) {
+    var userId = data.userId;
+    var troupeId = data.troupeId;
+
+    publish("/api/v1/user/" + userId + '/rooms/' + troupeId + '/unreadItems', {
+      notification: "mark_all_read"
+    });
+
+  });
 };
 

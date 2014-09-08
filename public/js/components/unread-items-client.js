@@ -177,6 +177,12 @@ define([
 
     disableLurkMode: function() {
       this._lurkMode = false;
+    },
+
+    markAllRead: function() {
+      // Remove from the add tarpit and the current tarpit
+      this._unreadItemsRemoved(this._addTarpit._marshall());
+      this._unreadItemsRemoved(this._marshall());
     }
 
   });
@@ -264,6 +270,11 @@ define([
           // Unread items removed
           case 'unread_items_removed':
             store._unreadItemsRemoved(message.items);
+            break;
+
+          // New unread items
+          case 'mark_all_read':
+            store.markAllRead();
             break;
 
           // Lurk mode switched on/off
