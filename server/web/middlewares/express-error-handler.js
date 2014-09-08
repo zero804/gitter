@@ -50,7 +50,9 @@ module.exports = function(err, req, res, next) {
 
   /* Got a 401, the user isn't logged in and this is a browser? */
   if(status === 401 && req.accepts(['json','html']) === 'html' && !req.user) {
-    req.session.returnTo = req.url.replace(/\/~chat$/,"");
+    if(req.session) {
+      req.session.returnTo = req.url.replace(/\/~chat$/,"");
+    }
     res.redirect('/login');
     return;
   }
