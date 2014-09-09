@@ -7,24 +7,24 @@
   </div>
   <div class='chat-item__content'>
     {{#if initial}}
-    {{! This is a way of forcing the browser to open at the bottom of the screen }}
-    <div id='initial' style="position:relative;top:-120px; left: 0; height:0;width:0;overflow:hidden"><a name="initial"/>_</a></div>
+      {{! This is a way of forcing the browser to open at the bottom of the screen }}
+      <div id='initial' style="position:relative;top:-120px; left: 0; height:0;width:0;overflow:hidden"><a name="initial"/>_</a></div>
     {{/if}}
-
     <div class='chat-item__details'>
       <div class='chat-item__from'>{{username}}</div>
       <div class='chat-item__time'>{{widget "timeago" time=sent lang=lang locale=locale}}</div>
       {{#if readByText}}
         {{#if compactView}}
-          <span class="chat-item__icon--read  js-chat-item-readby">{{readByText}}</span>
+          <span class="chat-item__icon--read  js-chat-item-readby"></span>
         {{else}}
-          <div class="chat-item__icon--read  js-chat-item-readby">{{readByText}}</div>
+          <div class="chat-item__icon--read  js-chat-item-readby"></div>
         {{/if}}
       {{/if}}
       <div class='chat-item__icon--edit  js-chat-item-edit'></div>
+      {{#if isCollapsible}}<div class='chat-item__icon--{{#if collapsed}}expand{{else}}collapse{{/if}}  js-chat-item-collapse '></div>{{/if}}
     </div>
     <div class='chat-item__text  js-chat-item-text'>
-      {{{html}}}
+      {{{ html }}}
     </div>
   </div>
 </div>

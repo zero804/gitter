@@ -28,13 +28,14 @@ define([
 
   /* @const */
   var EDIT_WINDOW = 1000 * 60 * 10; // 10 minutes
-  
+
   var msToMinutes = function (ms) {
     return ms / (60 * 1000);
   };
 
   var mouseEvents = {
     'click .js-chat-item-edit':       'toggleEdit',
+    'click .js-chat-item-collapse':       'toggleCollapse',
     'click .js-chat-item-readby':     'showReadBy',
     'mouseover .js-chat-item-readby': 'showReadByIntent',
     'click .webhook':           'expandActivity'
@@ -63,11 +64,16 @@ define([
     },
 
     initialize: function(options) {
+
       this.listenToOnce(this.model, 'change:unread', function() {
-        if(!this.model.get('unread')) {
+        if (!this.model.get('unread')) {
           this.$el.removeClass('unread');
         }
       });
+
+      // TODO
+      this.model.set('isCollapsible', false);
+      this.model.set('collapsed', false); // FIXME: this needs to be pulled from server?
 
       this._oneToOne = context.inOneToOneTroupeContext();
 
@@ -88,6 +94,7 @@ define([
         var oldInMS = this.model.get('sent').valueOf() + OLD_TIMEOUT - Date.now();
         setTimeout(timeChange, oldInMS + 50);
       }
+      this.render();
     },
 
     template: function (serializedData) {
@@ -119,7 +126,12 @@ define([
 
     onChange: function() {
       var changed = this.model.changed;
-      if ('html' in changed /*|| 'text' in changed || 'urls' in changed || 'mentions' in changed*/) {
+
+      if ('collapsed' in changed || 'isCollapsible' in changed) {
+        // we need to render the changed element
+        return this.render();
+      }
+      if ('html' in changed/*|| 'text' in changed || 'urls' in changed || 'mentions' in changed*/) {
         this.renderText();
       }
 
@@ -145,7 +157,7 @@ define([
       // var links = this.model.get('urls') || [];
       // var mentions = this.model.get('mentions') || [];
       var issues = [];
-      if(context.troupe().get('githubType') === 'REPO') {
+      if (context.troupe().get('githubType') === 'REPO') {
         issues = this.model.get('issues') || [];
       }
 
@@ -160,19 +172,21 @@ define([
 
       this.$el.find('.js-chat-item-text').html(html);
 
-      _.each(this.decorators, function(decorator) {
+      _.each(this.decorators, function (decorator) {
         decorator.decorate(this);
       }, this);
     },
 
-    afterRender: function() {
+    afterRender: function () {
       this.renderText();
       this.updateRender();
       this.timeChange();
 
       if (!this.compactView) {
         var editIcon = this.$el.find('.js-chat-item-edit');
+        var collapseIcon = this.$el.find('.js-chat-item-collapse');
         editIcon.tooltip({ container: 'body', title: this.getEditTooltip.bind(this) });
+        collapseIcon.tooltip({ container: 'body', title: this.getCollapseTooltip.bind(this) });
       }
     },
 
@@ -231,7 +245,7 @@ define([
 
     getEditTooltip: function() {
       if (this.isEmbedded()) return "You can't edit on embedded chats.";
-      
+
       if(this.hasBeenEdited()) {
         return "Edited shortly after being sent";
       }
@@ -245,6 +259,18 @@ define([
       }
 
       return  "You can't edit someone else's message";
+    },
+
+    getCollapseTooltip: function() {
+      if (this.model.get('collapsed')) {
+        return  "Show media.";
+      }
+      return "Hide media.";
+    },
+
+    getCollapsedTooltip: function() {
+      // also for expanded
+      return  "Displaying message, click here to collapse.";
     },
 
     focusInput: function() {
@@ -272,7 +298,7 @@ define([
       var age = Date.now() - this.model.get('sent').valueOf();
       return age <= EDIT_WINDOW;
     },
-    
+
     isEmbedded: function () {
       return context().embedded;
     },
@@ -314,6 +340,11 @@ define([
       }
     },
 
+    // deals with collapsing images and embeds
+    toggleCollapse: function () {
+      this.model.set('collapsed', !this.model.get('collapsed'));
+    },
+
     showText: function() {
       this.renderText();
 
@@ -322,7 +353,6 @@ define([
         this.inputBox.remove();
         delete this.inputBox;
       }
-
     },
 
     showInput: function() {
