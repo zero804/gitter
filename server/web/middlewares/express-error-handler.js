@@ -50,8 +50,17 @@ module.exports = function(err, req, res, next) {
 
   /* Got a 401, the user isn't logged in and this is a browser? */
   if(status === 401 && req.accepts(['json','html']) === 'html' && !req.user) {
-    req.session.returnTo = req.url.replace(/\/~chat$/,"");
-    res.redirect('/login');
+    var returnUrl = req.url.replace(/\/~(\w+)$/,"");
+
+    if(req.session) {
+      req.session.returnTo = returnUrl;
+      res.redirect('/login');
+    } else {
+      // This should not really be happening but
+      // may do if the gitter client isn't doing
+      // oauth properly
+      res.redirect('/login?returnTo=' + encodeURIComponent(returnUrl));
+    }
     return;
   }
 

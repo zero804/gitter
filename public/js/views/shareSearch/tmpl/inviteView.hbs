@@ -1,23 +1,30 @@
 <div class="trpModalBody">
   People can join this chat room with the link below.<br>
 </div>
-<div class="hidden-input">
-<input value="{{url}}" onclick="this.select()"/ style="margin-right: 4px;">{{#hasFlash}}<div class="trpButtonMedium trpBtnGreen copy-button" data-copy-text="{{url}}">Copy</div>{{/hasFlash}}
-</div>
-{{#isRepo}}
-  <span class="trpBodyMedium" style="opacity: 0.6">Only members of private repos can join.<br>For public repos, anyone can join.</span>
-  {{/isRepo}}
 
-  {{#isOrg}}
-  <span class="trpBodyMedium" style="opacity: 0.6">Only members of this organisation can join this chat room.</span>
-  {{/isOrg}}
+<div class="hidden-input">
+  <input value="{{url}}" onclick="this.select()"/ style="margin-right: 4px;">{{#hasFlash}}
+  <div class="trpButtonMedium trpBtnGreen copy-button" data-copy-text="{{url}}">Copy</div>{{/hasFlash}}</div>
 </div>
+
 <br><br>
+
+{{#isPublicRepo}}
 <div class="trpModalBody" style="border-top: 1px solid #EEE; padding-top: 8px">
-How about a nice badge?
+  How about a badge? 
+  <img src="{{badgeUrl}}" {{#hasFlash}}class="copy-button"{{/hasFlash}} data-copy-text="{{badgeMD}}" style="vertical-align: middle;">
 </div>
+
+<button class='trpButtonMedium trpBtnBlue button share-on-gh js-badge'>Add a Badge on GitHub</button>
+<div class="trpModalBody">
+  <br>
+  <div class='pr-status'></div>
+</div>
+
+<!--
 <img src="{{badgeUrl}}" {{#hasFlash}}class="copy-button"{{/hasFlash}} data-copy-text="{{badgeMD}}"><br>
 {{#hasFlash}}<span class="trpBodySmall" style="opacity: 0.6">Click badge to copy markdown.</span>{{/hasFlash}}
 {{^hasFlash}}<textarea class="trpBodySmall hidden-input" style="width: 500px; margin-top: 8px">{{badgeMD}}</textarea>{{/hasFlash}}
-<br><br>
-</div>
+-->
+
+{{/isPublicRepo}}
