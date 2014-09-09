@@ -2291,6 +2291,7 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
       }
 
       if (socket.readyState !== 1) {
+        this.close();
         this._handleError(messages);
         return;
       }
@@ -2298,6 +2299,7 @@ Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
       try {
         socket.send(Faye.toJSON(messages));
       } catch(e) {
+        this.close();
         this._handleError(messages);
         return;
       }
