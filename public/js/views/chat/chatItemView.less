@@ -2,6 +2,7 @@
 @import "../popover";
 @import "chatInputView";
 @import "../unread-item-view-mixin";
+@import "../../../less/animate/animate";
 
 // Other items required by this library
 @import "highlight.less";
@@ -15,7 +16,7 @@
   transition: background-color 0.5s linear;
   // border-top: 1px solid transparent;
 
-  /* this handles all styles for burst start */  
+  /* this handles all styles for burst start */
   &.burstStart {
     padding-bottom: 2px;
   }
@@ -24,7 +25,7 @@
   &.burstContinued {
 
     .chat-item__container {
-      padding: 0px 30px 0px 44px;
+      padding: 0px 30px 0px 30px;
     }
 
     .chat-item__content {
@@ -50,7 +51,7 @@
     }
 
     .chat-item__text {
-      margin-left: 50px;
+      margin-left: 64px;
     }
 
     .chat-item__time {
@@ -101,7 +102,6 @@
       height: 24px;
     }
   }
-
 }
 
 .chat-item__aside { float: left; }
@@ -172,7 +172,6 @@
   text-align: right;
   width: 16px;
   height: 16px;
-  color: transparent;
   line-height: 9px;
   vertical-align: middle;
   opacity: 0.5;
@@ -198,7 +197,7 @@
     visibility: visible;
     opacity: 1;
   }
-  
+
   .isViewers & {
     visibility: visible;
   }
@@ -209,7 +208,7 @@
 }
 
 .chat-item__icon--edit {
-  
+
   .chat-item__icon;
 
   .isViewers.chat-item:hover & {
@@ -218,9 +217,53 @@
   }
 
   background-image: url('../images/icon-edit.png');
-  
+
   @media @retina {
     background-image: url('../images/icon-edit@2x.png');
+  }
+}
+
+.chat-item__icon--collapse {
+  .chat-item__icon;
+  background-image: none;
+
+  .chat-item:hover & {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  &::after {
+    content: "\f0cc";
+    font-family: 'octicons';
+    font-style: normal;
+    font-variant: normal;
+    -webkit-font-smoothing: antialiased;
+    font-size: 16px;
+    width: 16px;
+    line-height: 16px;
+    text-align: center;
+  }
+}
+
+.chat-item__icon--expand {
+  .chat-item__icon;
+  background-image: none;
+
+  .chat-item:hover & {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  &::after {
+    content: "\f039";
+    font-family: 'octicons';
+    font-style: normal;
+    font-variant: normal;
+    -webkit-font-smoothing: antialiased;
+    font-size: 16px;
+    width: 16px;
+    line-height: 16px;
+    text-align: center;
   }
 }
 
@@ -258,6 +301,13 @@
   }
 
   .embed {
+    position: relative;
+
+    // &:hover {
+    //   transition: opacity .25s ease-in-out;
+    //   opacity: 0;
+    // }
+
     max-width: 500px;
     iframe {
       max-width: 100%;
@@ -325,4 +375,3 @@
   .trpDisplayPicture;
   float: left;
 }
-
