@@ -62,6 +62,7 @@ define([
     DoubleHash.call(this);
 
     this._maxItems = 100;
+    this._lurkMode = false;
 
     this._addTarpit = new Tarpit(ADD_TIMEOUT, _.bind(this._promote, this));
     this._deleteTarpit = new Tarpit(REMOVE_TIMEOUT);
@@ -71,6 +72,7 @@ define([
 
   _.extend(UnreadItemStore.prototype, Backbone.Events, DoubleHash.prototype, {
     _unreadItemAdded: function(itemType, itemId) {
+      if(this._lurkMode) return; // No adding in lurk mode
       if(this._deleteTarpit._contains(itemType, itemId)) return;
       if(this._contains(itemType, itemId)) return;
 
@@ -90,6 +92,10 @@ define([
     },
 
     _markItemRead: function(itemType, itemId, mentioned) {
+      if(this._lurkMode && !mentioned) {
+        // Lurk mode, but no mention, don't mark as read
+        return;
+      }
       this._unreadItemRemoved(itemType, itemId);
       this.trigger('itemMarkedRead', itemType, itemId, mentioned);
     },
@@ -110,7 +116,7 @@ define([
     },
 
     _recount: function() {
-      var newValue = this._count();
+      var newValue = this._lurkMode ? 0 : this._count();
 
       if(this._currentCountValue !== newValue) {
         this._currentCountValue = newValue;
@@ -122,12 +128,14 @@ define([
     },
 
     _currentCount: function() {
-      if(this._currentCountValue) return this._currentCountValue;
+      if(!this._lurkMode  && this._currentCountValue) return this._currentCountValue;
 
       return 0;
     },
 
     _unreadItemsAdded: function(items) {
+      if(this._lurkMode) return; // No adding in lurk mode
+
       _iteratePreload(items, function(itemType, itemId) {
         this._unreadItemAdded(itemType, itemId);
       }, this);
@@ -144,6 +152,8 @@ define([
     },
 
     preload: function(items) {
+      if(this._lurkMode) return;
+
       _iteratePreload(items, function(itemType, itemId) {
         log('Preload of ' + itemType + ':' + itemId);
 
@@ -156,6 +166,23 @@ define([
         // Instantly promote it...
         this._promote(itemType, itemId);
       }, this);
+    },
+
+    enableLurkMode: function() {
+      this._lurkMode = true;
+      // Remove from the add tarpit and the current tarpit
+      this._unreadItemsRemoved(this._addTarpit._marshall());
+      this._unreadItemsRemoved(this._marshall());
+    },
+
+    disableLurkMode: function() {
+      this._lurkMode = false;
+    },
+
+    markAllRead: function() {
+      // Remove from the add tarpit and the current tarpit
+      this._unreadItemsRemoved(this._addTarpit._marshall());
+      this._unreadItemsRemoved(this._marshall());
     }
 
   });
@@ -232,17 +259,42 @@ define([
       var store = this._store;
 
       var url = '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId() + '/unreadItems';
+
       realtime.subscribe(url, function(message) {
-        if(message.notification === 'unread_items') {
-          store._unreadItemsAdded(message.items);
-        } else if(message.notification === 'unread_items_removed') {
-          var items = message.items;
-          store._unreadItemsRemoved(items);
+        switch(message.notification) {
+          // New unread items
+          case 'unread_items':
+            store._unreadItemsAdded(message.items);
+            break;
+
+          // Unread items removed
+          case 'unread_items_removed':
+            store._unreadItemsRemoved(message.items);
+            break;
+
+          // New unread items
+          case 'mark_all_read':
+            store.markAllRead();
+            break;
+
+          // Lurk mode switched on/off
+          case 'lurk_change':
+            if(message.lurk) {
+              store.enableLurkMode();
+            } else {
+              store.disableLurkMode();
+            }
+            break;
         }
       });
 
       realtime.registerForSnapshots(url, function(snapshot) {
+        var lurk = snapshot._meta && snapshot._meta.lurk;
+        if(lurk) {
+          store.enableLurkMode();
+        } else {
           store.preload(snapshot);
+        }
       });
     }
   });

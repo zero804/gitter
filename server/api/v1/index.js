@@ -33,6 +33,10 @@ module.exports = {
         authMiddleware,
         require('./repo-info.js'));
 
+    app.get(apiRoot + '/v1/channel-search',
+        authMiddleware,
+        require('./channel-search.js'));
+
     app.get(apiRoot + '/v1/public-repo-search',
         authMiddleware,
         require('./public-repo-search.js'));

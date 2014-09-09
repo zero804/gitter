@@ -169,6 +169,7 @@ function newItem(troupeId, creatorUserId, itemType, itemId) {
     .then(function(troupe) {
       var userIdsWithLurk = troupe.users;
       var userIds = Object.keys(userIdsWithLurk);
+
       if(creatorUserId) {
         userIds = userIds.filter(function(userId) {
           return ("" + userId) != ("" + creatorUserId);
@@ -178,12 +179,20 @@ function newItem(troupeId, creatorUserId, itemType, itemId) {
       // Publish out an new item event
       var data = {};
       data[itemType] = [itemId];
-      userIds.forEach(function(userId) {
-        appEvents.newUnreadItem(userId, troupeId, data);
-      });
 
       var userIdsForNotify = userIds.filter(function(u) {
         return !userIdsWithLurk[u];
+      });
+
+      // Send out troupe activity blink for lurking users
+      userIds.forEach(function(u) {
+        if(userIdsWithLurk[u]) {
+          // Lurking, send them an activity "ping"
+          appEvents.newLurkActivity({ userId: u, troupeId: troupeId });
+        } else {
+          // Not lurking, send them the full update
+          appEvents.newUnreadItem(u, troupeId, data);
+        }
       });
 
       if(!userIdsForNotify.length) return;
@@ -457,10 +466,16 @@ exports.listTroupeUsersForEmailNotifications = function(horizonTime, emailLatchE
  * Mark many items as read, for a single user and troupe
  */
 exports.markItemsRead = function(userId, troupeId, itemIds, mentionIds, options) {
+  // Configure options
+  if(!options) options = {};
+  // { member : default true }
+  if(options.member === undefined) options.member = true;
+  // { recordAsRead: default truw }
+  if(options.recordAsRead === undefined) options.recordAsRead = true;
+
   var now = Date.now();
 
   var allIds = [];
-  var member = options && 'member' in options ? options.member :  true;
 
   if(itemIds) allIds = allIds.concat(itemIds);
   if(mentionIds) allIds = allIds.concat(mentionIds);
@@ -468,12 +483,14 @@ exports.markItemsRead = function(userId, troupeId, itemIds, mentionIds, options)
   appEvents.unreadItemsRemoved(userId, troupeId, { chat: itemIds }); // TODO: update
 
   return Q.all([
-    markItemsOfTypeRead(userId, troupeId, 'chat', allIds, member),
+    markItemsOfTypeRead(userId, troupeId, 'chat', allIds, options.member),
     setLastReadTimeForUser(userId, troupeId, now),
-    mentionIds && mentionIds.length && removeMentionForUser(userId, troupeId, mentionIds, member)
+    mentionIds && mentionIds.length && removeMentionForUser(userId, troupeId, mentionIds, options.member)
     ])
     .then(function() {
-      if(options && options.recordAsRead === false) return;
+      if(!options.recordAsRead) {
+        return;
+      }
 
       // For the moment, we're only bothering with chats for this
       return readByService.recordItemsAsRead(userId, troupeId, { chat: allIds }); // TODO: drop the hash
@@ -483,6 +500,8 @@ exports.markItemsRead = function(userId, troupeId, itemIds, mentionIds, options)
 
 exports.markAllChatsRead = function(userId, troupeId, options) {
   if(!options) options = {};
+  appEvents.markAllRead({ userId: userId, troupeId: troupeId });
+
   return exports.getUnreadItems(userId, troupeId, 'chat')
     .then(function(chatIds) {
       if(!chatIds.length) return;
@@ -688,13 +707,6 @@ function newMention(troupeId, chatId, userIds, usersHash) {
   if(!troupeId) { winston.error("newMention failed. Troupe cannot be null"); return Q.resolve(); }
   if(!chatId) { winston.error("newMention failed. itemId cannot be null"); return Q.resolve(); }
 
-  // Publish out an new item event
-  // var data = {};
-  // data[itemType] = [itemId];
-  // userIds.forEach(function(userId) {
-  //   appEvents.newUnreadItem(userId, troupeId, data);
-  // });
-
   if(!userIds.length) return;
 
 
@@ -796,12 +808,33 @@ function detectAndCreateMentions(troupeId, creatingUserId, chat) {
       if(!usersHash) return;
 
       var userIds = chat.mentions
+            .filter(function(mention) {
+              // Only use this for people mentions
+              return mention.userId && !mention.group;
+            })
             .map(function(mention) {
               return mention.userId;
             });
 
+      // Handle all group with a special-case
+      // In future, resolve this against github teams
+      var allGroupMention = chat.mentions
+            .filter(function(mention) {
+              // Only use this for people mentions
+              return mention.group && mention.screenName === 'all';
+            }).length >= 1;
+
+      var mentionMemberUserIds;
+      if(allGroupMention) {
+        // Add everyone except the person creating the message
+        mentionMemberUserIds = Object.keys(usersHash).filter(function(u) {
+          return "" + u !== "" + creatingUserId;
+        });
+      } else {
+        mentionMemberUserIds = [];
+      }
+
       var mentionLurkerAndNonMemberUserIds = [];
-      var mentionMemberUserIds = [];
 
       var lookupUsers = [];
 
