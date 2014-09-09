@@ -1,11 +1,35 @@
 <div class="welcome-modal__collaborators">
   <div class="welcome-modal__close js-close"></div>
+
   <div class="welcome-modal__header">
-    <h2>Get started, add some people</h2>
+    {{#if shareable}}
+    <h2>Get started: Spread the word</h2>
+    {{/if}}
+    {{#unless shareable}}
+    <h2>Get started: Add some colleagues</h2>
+    {{/unless}}
   </div>
+
   <ul id="list"></ul>
 
+  {{#if shareable}}
+  <div class="welcome-modal__share">
+    <a class='trpButtonMedium trpBtnLightGrey button' href='#add'>Search other users</a>
+    <a class='trpButtonMedium trpBtnLightGrey button share-on-tw js-twitter' href='{{twitterLink}}' target='_blank'>Share on Twitter</a>
+    <button class='trpButtonMedium trpBtnBlue button share-on-gh js-badge'>Add a Badge on GitHub</button>
+    <div class='pr-status'></div>
+  </div>
+  {{/if}}
+
+  <!--
   <div class="welcome-modal__footer">
-    <div class="welcome-modal__footer-button"><button class='trpButtonMedium trpBtnBlue button' id="add-button" href='#add'>Search for other users</button></div>
-    <div class="welcome-modal__footer-button"><button class='trpButtonMedium trpBtnBlue button js-share-button' id="share-button" href='#add'>Share this room</button></div>
+    <div class="welcome-modal__footer-button">
+      <button class='trpButtonMedium trpBtnBlue button' id="add-button" href='#add'>Search for other users</button>
+    </div>
+    <div class="welcome-modal__footer-button">
+      <button class='trpButtonMedium trpBtnBlue button js-share-button' id="share-button" href='#add'>Share this room</button>
+    </div>
+  </div>
+  -->
+
 </div>

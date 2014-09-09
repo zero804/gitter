@@ -147,23 +147,71 @@ define([
     },
     template: template,
 
+    serializeData: function() {
+      var _public = context.troupe().get('security') === 'PUBLIC';
+      var _repo   = context.troupe().get('githubType') === 'REPO';
+
+      return {
+        shareable: _public && _repo,
+        twitterLink: this.generateTwitterLink()
+      };
+    },
+
+    generateTwitterLink: function() {
+      var text = escape('Join the chat room on Gitter for ' + context.troupe().get('uri') + ':');
+      var url = 'https://twitter.com/share?' +
+        'text=' + text +
+        '&url=https://gitter.im/' + context.troupe().get('uri') +
+        '&related=gitchat' +
+        '&via=gitchat';
+
+      return url;
+    },
+
     initialize: function() {
       var ctx = context();
-      appEvents.triggerParent('track-event', 'welcome-add-user-suggestions', { 
+      appEvents.triggerParent('track-event', 'welcome-add-user-suggestions', {
         uri: ctx.troupe.uri,
         security: ctx.troupe.security,
-        count: this.collection.length 
+        count: this.collection.length
       });
     },
 
-    onRender: function() {
-      if (context.troupe().get('security') == 'PUBLIC') this.$el.find('.js-share-button').show();
-    },
+    //onRender: function() {
+    //  if (context.troupe().get('security') == 'PUBLIC') this.$el.find('.js-share-button').show();
+    //},
 
     events: {
       'click .js-close': 'dismiss',
       'click #add-button' : 'clickAddButton',
-      'click #share-button' : 'clickShareButton'
+      'click #share-button' : 'clickShareButton',
+      'click .js-badge': 'createBadge'
+    },
+
+    createBadge: function() {
+      var btn = this.$el.find('.js-badge')[0];
+      var st = this.$el.find('.pr-status');
+      st.html('Hold on...');
+      btn.disabled = true;
+
+      $.ajax({
+        url: '/api/private/create-badge',
+        contentType: "application/json",
+        dataType: "json",
+        type: "POST",
+        data: JSON.stringify({
+          uri: context.troupe().get('uri')
+        }),
+        context: this,
+        timeout: 45 * 1000,
+        error: function() {
+          st.html('Oops, something went wront. Try again. (Is there a README.md in your project?)');
+          btn.disabled = false;
+        },
+        success: function (res) {
+          st.html('We just created a PR for you! <a href=' + res.html_url + ' target="_blank">Review and merge &rarr;</a>');
+        }
+      });
     },
 
     clickAddButton: function() {

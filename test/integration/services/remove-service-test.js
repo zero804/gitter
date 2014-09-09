@@ -9,6 +9,7 @@ var Q = require('q');
 var fixture = {};
 var troupeService = testRequire('./services/troupe-service');
 var recentRoomService = testRequire('./services/recent-room-service');
+var roomService = testRequire('./services/room-service');
 var userIsInRoom = testRequire('./services/user-in-room');
 var appEvents = testRequire('./app-events');
 
@@ -114,7 +115,7 @@ describe('remove-service', function() {
     it('should remove user from the room if lurking', function(done) {
       createFav()
       .then(function() { // Set user as lurking
-        return troupeService.updateTroupeLurkForUserId(fixture.userFavourite.id, fixture.troupeCanRemove.id, true);
+        return roomService.updateTroupeLurkForUserId(fixture.userFavourite.id, fixture.troupeCanRemove.id, true);
       })
       .then(function() { // Get updated troupe
         return troupeService.findById(fixture.troupeCanRemove.id);
