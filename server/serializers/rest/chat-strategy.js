@@ -50,13 +50,13 @@ function CollapsedItemStrategy(options) {
 
   this.preload = function(data, callback) {
     collapsedChatsService.getHash(userId, roomId)
-      .then(function(hash) {
+      .then(function (hash) {
         itemsHash = hash;
       })
       .nodeify(callback);
   };
 
-  this.map = function(chatId) {
+  this.map = function (chatId) {
     return itemsHash[chatId] ? true : undefined; // Don't send false,
   };
 }
@@ -75,7 +75,7 @@ function ChatStrategy(options)  {
     unreadItemStategy = new UnreadItemStategy({ itemType: 'chat' });
   }
 
-  if(options.currentUserId && options.troupeId) {
+  if (options.currentUserId && options.troupeId) {
     collapsedItemStategy = new CollapsedItemStrategy({ userId: options.currentUserId, roomId: options.troupeId });
   }
 
