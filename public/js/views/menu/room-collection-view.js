@@ -45,6 +45,12 @@ define([
       'click': 'clicked',
       'click .js-close-button': 'onItemClose'
     },
+    initialize: function() {
+      var self = this;
+      appEvents.on('navigation', function() {
+        self.render();
+      });
+    },
     serializeData: function() {
       var data = this.model.toJSON();
       data.name = roomNameTrimmer(data.name, MAX_NAME_LENGTH);
@@ -65,6 +71,8 @@ define([
 
     onRender: function() {
       var self = this;
+
+      this.$el.toggleClass('room-list-item--current-room', this.model.get('url') === window.location.pathname);
 
       var m = self.model;
       dataset.set(self.el, 'id', m.id);
