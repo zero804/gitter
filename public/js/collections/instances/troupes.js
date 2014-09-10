@@ -21,35 +21,31 @@ define([
   unreadItemsClient.installTroupeListener(troupeCollection);
 
   /* Utils for comparators, perhaps this should go somewhere useful? */
-  function nullish(a) {
-    return a === null || a === undefined || a === 0;
-  }
-
   function naturalComparator(a, b) {
     if(a === b) return 0;
     return a > b ? 1 : -1;
   }
 
-  function reverseNaturalComparator(a, b) {
-    if(a === b) return 0;
-    return a > b ? -1 : 1;
+  var sections = ['lastMentionTime', 'lastUnreadItemTime', 'lastAccessTimeNoSync'];
+
+  function getSectionRank(roomModel) {
+    if(roomModel.get('lastMentionTime')) {
+      return 0;
+    } else if(roomModel.get('lastUnreadItemTime')) {
+      return 1;
+    } else if(roomModel.get('lastAccessTimeNoSync')) {
+      return 2;
+    } else {
+      return 3;
+    }
   }
 
-  /* Sort, order things that are not null before things that are null */
-  function existenceComparator(a, b) {
-    if(!nullish(a)) {
-      if(!nullish(b)) {
-        return 0;
-      } else {
-        return -1;
-      }
-    } else {
-      if(!nullish(b)) {
-        return 1;
-      } else {
-        return null;
-      }
-    }
+  function sectionTimeComparator(a, b, sectionRank) {
+    var property = sections[sectionRank];
+
+    if(!property) return 0;
+
+    return b.get(property).valueOf() - a.get(property).valueOf();
   }
 
   /* ---- end of comparators ---- */
@@ -78,38 +74,15 @@ define([
     return !m.get('favourite') && (m.get('lastAccessTime') || m.get('unreadItems') || m.get('mentions'));
   });
 
-  /**
-   * Sorting goes like this:
-   * Unread items first, sorted by name, alphabetically,
-   * followed by order of most recent access
-   */
   recentRoomsNonFavourites.setSort(function(a, b) {
-    var c = existenceComparator(a.get('mentions'), b.get('mentions'));
-    if(c === 0) {
-      /** Both sides have mentions, compare by name */
-      return naturalComparator(a.get('name'), b.get('name'));
-    } else if(c === null) {
-      /* Neither side has mentions, compare by lastAccessTime, descending */
+    var aSectionRank = getSectionRank(a);
+    var bSectionRank = getSectionRank(b);
 
-      c = existenceComparator(a.get('unreadItems'), b.get('unreadItems'));
-      if(c === 0) {
-        /** Both sides have unreadItems, compare by name */
-        return naturalComparator(a.get('name'), b.get('name'));
-      } else if(c === null) {
-        /* Neither side has unreadItems, compare by lastAccessTime, descending */
-        var aLastAccessTime = a.get('lastAccessTime');
-        var bLastAccessTime = b.get('lastAccessTime');
-
-        return reverseNaturalComparator(aLastAccessTime && aLastAccessTime.valueOf(), bLastAccessTime && bLastAccessTime.valueOf());
-      } else {
-        return c;
-      }
-
+    if(aSectionRank === bSectionRank) {
+      return sectionTimeComparator(a, b, aSectionRank);
     } else {
-      return c;
+      return aSectionRank - bSectionRank;
     }
-
-
   });
 
   // Sync up with the context

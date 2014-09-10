@@ -135,7 +135,6 @@ define([
       setTimeout(function() {
         // Make things feel a bit more responsive, but not too responsive
         self.clearSearch();
-        model.set('lastAccessTime', moment());
       }, 150);
 
       appEvents.trigger('navigation', model.get('url'), 'chat', model.get('name'), model.id);
