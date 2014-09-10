@@ -127,10 +127,10 @@ define([
     onChange: function() {
       var changed = this.model.changed;
 
-      if ('collapsed' in changed || 'isCollapsible' in changed) {
-        // we need to render the changed element
-        return this.render();
-      }
+      // if ('collapsed' in changed || 'isCollapsible' in changed) {
+      //   // we need to render the changed element
+      //   return this.render();
+      // }
       if ('html' in changed/*|| 'text' in changed || 'urls' in changed || 'mentions' in changed*/) {
         this.renderText();
       }
@@ -239,7 +239,17 @@ define([
         }
 
         readByLabel.text(readByCount ? this.getReadByText(readByCount) : '');
+      }
 
+      if(!changes || 'collapsed' in changes) {
+        var collapsed = this.model.get('collapsed');
+        var embeds =  this.$el.find('.embed');
+
+        if(collapsed) {
+          embeds.removeClass('animateIn').addClass('animateOut');
+        } else {
+          embeds.removeClass('animateOut').addClass('animateIn');
+        }
       }
     },
 

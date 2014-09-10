@@ -2,7 +2,9 @@
 @import "../popover";
 @import "chatInputView";
 @import "../unread-item-view-mixin";
-@import "../../../less/animate/animate";
+
+@import "animate/flippers/flipInX";
+@import "animate/flippers/flipOutX";
 
 // Other items required by this library
 @import "highlight.less";
@@ -307,6 +309,22 @@
     //   transition: opacity .25s ease-in-out;
     //   opacity: 0;
     // }
+    transition: all 500ms ease-in-out;
+
+    &.animateIn {
+      // transform: scaleY(1);
+      .animated(500ms);
+      // .flipInX();  
+    }
+    
+    &.animateOut {
+      max-height: 0;
+      overflow: hidden;
+
+      // transform: scaleY(0);
+      .animated(500ms);
+      // .flipOutX();  
+    }
 
     max-width: 500px;
     iframe {
