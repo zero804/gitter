@@ -16,7 +16,7 @@ var redisClient_del = Q.nbind(redisClient.del, redisClient);
 
 How this works:
 
-In redis, each user:room has a ZSET, containing at most MAX_ITEMS items.
+In redis, each user:room has a ZSET, containing at most MAX_ITEMS items. Defined in: gitter-webapp/redis-lua/collapsed/update.lua
 
  - When a new item is added, it's added to the ZSET using the current time as it's ranking
 
@@ -24,10 +24,10 @@ In redis, each user:room has a ZSET, containing at most MAX_ITEMS items.
    using ZREMRANGEBYRANK
 
 */
-
 function getUserRoomKey(userId, roomId) {
   return "col:" + userId + ":" + roomId;
 }
+exports.getUserRoomKey = getUserRoomKey;
 
 /**
  * Sets the collapsed state of an item
@@ -37,7 +37,6 @@ function getUserRoomKey(userId, roomId) {
 function update(userId, roomId, chatId, collapsed) {
   var keys = [getUserRoomKey(userId, roomId)];
   var values = [Date.now(), chatId, collapsed ? 1 : 0];
-
   return runScript('update', keys, values);
 }
 exports.update = update;
@@ -69,4 +68,3 @@ function removeAll(userId, roomId) {
   return redisClient_del(getUserRoomKey(userId, roomId));
 }
 exports.removeAll = removeAll;
-

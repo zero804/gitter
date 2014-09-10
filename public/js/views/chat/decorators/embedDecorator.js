@@ -9,8 +9,10 @@ define([
 
   function embed(chatItemView) {
     var model = chatItemView.model;
-    if (model.get('collapsed')) return; // NOTE: this is super important because it avoids the images getting embedded
+
     var isCollapsible = false;
+    if (model.get('collapsed')) return model.set('isCollapsible', true); // NOTE: this is super important because it avoids the images getting embedded
+
     chatItemView.$el
       .find('a.link')
       .each(function (index, el) {

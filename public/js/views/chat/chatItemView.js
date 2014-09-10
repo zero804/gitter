@@ -16,10 +16,11 @@ define([
   'views/unread-item-view-mixin',
   'utils/appevents',
   'cocktail',
+  'utils/collapsed-item-client',
   'views/keyboard-events-mixin',
   'bootstrap_tooltip', // No ref
 ], function($, _, context, chatModels, AvatarView, Marionette, TroupeViews, uiVars, Popover,
-  chatItemTemplate, statusItemTemplate, chatInputView, UnreadItemViewMixin, appEvents, cocktail, KeyboardEventMixins) {
+  chatItemTemplate, statusItemTemplate, chatInputView, UnreadItemViewMixin, appEvents, cocktail, chatCollapse, KeyboardEventMixins) {
 
   "use strict";
 
@@ -70,10 +71,6 @@ define([
           this.$el.removeClass('unread');
         }
       });
-
-      // TODO
-      this.model.set('isCollapsible', false);
-      this.model.set('collapsed', false); // FIXME: this needs to be pulled from server?
 
       this._oneToOne = context.inOneToOneTroupeContext();
 
@@ -127,11 +124,7 @@ define([
     onChange: function() {
       var changed = this.model.changed;
 
-      // if ('collapsed' in changed || 'isCollapsible' in changed) {
-      //   // we need to render the changed element
-      //   return this.render();
-      // }
-      if ('html' in changed/*|| 'text' in changed || 'urls' in changed || 'mentions' in changed*/) {
+      if ('html' in changed || 'collapsed' in changed/*|| 'text' in changed || 'urls' in changed || 'mentions' in changed*/) {
         this.renderText();
       }
 
@@ -197,7 +190,7 @@ define([
       this.$el.toggleClass('isOld', this.isOld());
     },
 
-    updateRender: function(changes) {
+    updateRender: function (changes) {
 
       if(!changes || 'fromUser' in changes) {
         this.$el.toggleClass('isViewers', this.isOwnMessage());
@@ -217,7 +210,7 @@ define([
       }
 
       /* Don't run on the initial (changed=undefined) as its done in the template */
-      if(changes && 'readBy' in changes) {
+      if (changes && 'readBy' in changes) {
         var readByCount = this.model.get('readBy');
         var oldValue = this.model.previous('readBy');
 
@@ -245,7 +238,7 @@ define([
         var collapsed = this.model.get('collapsed');
         var embeds =  this.$el.find('.embed');
 
-        if(collapsed) {
+        if (collapsed) {
           embeds.removeClass('animateIn').addClass('animateOut');
         } else {
           embeds.removeClass('animateOut').addClass('animateIn');
@@ -352,7 +345,15 @@ define([
 
     // deals with collapsing images and embeds
     toggleCollapse: function () {
-      this.model.set('collapsed', !this.model.get('collapsed'));
+      var chatId = this.model.get('id');
+      var collapsed = this.model.get('collapsed');
+
+      if (collapsed) {
+        chatCollapse.uncollapse(chatId);
+      } else {
+        chatCollapse.collapse(chatId);
+      }
+      this.model.set('collapsed', !collapsed);
     },
 
     showText: function() {
