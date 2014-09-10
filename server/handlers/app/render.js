@@ -90,6 +90,7 @@ function renderMainFrame(req, res, next, frame) {
         bootScriptName: bootScriptName,
         cssFileName: "styles/" + bootScriptName + ".css",
         troupeName: req.uriContext.uri,
+        ownerName: req.uriContext.uri.split('/')[0],
         troupeContext: troupeContext,
         chatAppLocation: chatAppLocation,
         agent: req.headers['user-agent'],

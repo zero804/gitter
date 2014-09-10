@@ -57,25 +57,25 @@ define([
 
   });
 
-  // websocket notifications
-  appEvents.on('connectionFailure', function() {
-    notifications.notify({
-      id: 'realtime-error',
-      className: 'notification-error',
-      content: "Unable to establish a realtime connection with the server… Retrying",
-      timeout: Infinity,
-      click: function() {
-        window.location.reload(true);
-      }
-    });
-  });
+  // // websocket notifications
+  // appEvents.on('connectionFailure', function() {
+  //   notifications.notify({
+  //     id: 'realtime-error',
+  //     className: 'notification-error',
+  //     content: "Unable to establish a realtime connection with the server… Retrying",
+  //     timeout: Infinity,
+  //     click: function() {
+  //       window.location.reload(true);
+  //     }
+  //   });
+  // });
 
-  appEvents.on('connectionRestored', function() {
-    notifications.notify({
-      id: 'realtime-error',
-      action: 'hide'
-    });
-  });
+  // appEvents.on('connectionRestored', function() {
+  //   notifications.notify({
+  //     id: 'realtime-error',
+  //     action: 'hide'
+  //   });
+  // });
 
 
   $(window).on('beforeunload', function(){
