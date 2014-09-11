@@ -188,7 +188,15 @@ define([
       $e.removeClass('dropdown-hidden');
 
       if(!this.mutant) {
-        this.mutant = new Mutant(e, this.mutationReposition, { scope: this, timeout: 20 });
+        this.mutant = new Mutant(e, this.mutationReposition, {
+          scope: this,
+          timeout: 20,
+          transitions: true,
+          observers: {
+            attributes: true,
+            characterData: true
+          }
+        });
       }
     },
 
