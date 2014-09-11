@@ -26,9 +26,10 @@ define([
   /* @const */
   var OLD_TIMEOUT = 3600000; /*1 hour*/
 
+  // This needs to be adjusted in chatInputView as well as chat-server on the server
   /* @const */
   var EDIT_WINDOW = 1000 * 60 * 10; // 10 minutes
-  
+
   var msToMinutes = function (ms) {
     return ms / (60 * 1000);
   };
@@ -231,7 +232,7 @@ define([
 
     getEditTooltip: function() {
       if (this.isEmbedded()) return "You can't edit on embedded chats.";
-      
+
       if(this.hasBeenEdited()) {
         return "Edited shortly after being sent";
       }
@@ -272,7 +273,7 @@ define([
       var age = Date.now() - this.model.get('sent').valueOf();
       return age <= EDIT_WINDOW;
     },
-    
+
     isEmbedded: function () {
       return context().embedded;
     },

@@ -21,15 +21,16 @@ var mongooseUtils        = require('../utils/mongoose-utils');
 /*
  * Hey Trouper!
  * Bump the version if you modify the behaviour of TwitterText.
- */
+ *
 // var VERSION_INITIAL; /* = undefined; All previous versions are null due to a bug */
 var VERSION_SWITCH_TO_SERVER_SIDE_RENDERING = 5;
 var MAX_CHAT_MESSAGE_LENGTH = 4096;
 
 var CURRENT_META_DATA_VERSION = VERSION_SWITCH_TO_SERVER_SIDE_RENDERING;
 
+// If you edit this, you need to update the client too.
 /* @const */
-var MAX_CHAT_EDIT_AGE_SECONDS = 300;
+var MAX_CHAT_EDIT_AGE_SECONDS = 600;
 
 var ObjectID = require('mongodb').ObjectID;
 
