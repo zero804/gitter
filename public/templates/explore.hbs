@@ -1,14 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head></head>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon-normal.ico' }}">
+    <style type="text/css">
+      .avatar {
+        float: left;
+        border-radius: 3px;
+        margin-right: 8px;
+      }
+
+      .room-list {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .room-list-item {
+        margin-bottom: 20px;
+        min-height: 40px;
+      }
+
+      .room-heading {
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .user-count {
+        float: right;
+      }
+    </style>
+  </head>
   <body>
-    <h1>Explore</h1>
+    <h1><a href="/explore">Explore</a></h1>
     {{#each tags}}
     <h2><a href="/explore/tags/{{name}}">{{name}}</a></h2>
-    <ul>
+    <ul class="room-list">
     {{#each rooms}}
-      <li>
-        <h3><a href="/{{uri}}">{{uri}}</a></h3>
+      <li class="room-list-item">
+        <img class="avatar" src="https://avatars.githubusercontent.com/{{owner}}?s=80" width="40" height="40">
+        <h3 class="room-heading"><a href="/{{uri}}">{{uri}}</a></h3>
+        <small>{{#if topic}}{{topic}}{{else}}<i>No topic</i>{{/if}}</small>
+        <small class="user-count">Users: {{users.length}}</small>
       </li>
     {{/each}}
     </ul>

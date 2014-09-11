@@ -6,6 +6,11 @@ var Q = require('q');
 
 var DEFAULT_TAGS = ['gitter', 'test', 'repo'];
 
+function getRoomRenderData(room) {
+  room.owner = room.uri.split('/')[0];
+  return room;
+}
+
 module.exports = {
   install: function(app) {
     app.get('/explore', function (req, res, next) {
@@ -14,7 +19,9 @@ module.exports = {
           .then(function(rooms) {
             return {
               name: tag,
-              rooms: rooms.splice(0, 6)
+              rooms: rooms.splice(0, 6).map(function(room) {
+                return getRoomRenderData(room);
+              })
             };
           });
       });
@@ -29,7 +36,12 @@ module.exports = {
       return suggestedService.getTaggedRooms(req.params.tag)
         .then(function(rooms) {
           res.render('explore', {
-            tags: [{ name: req.params.tag, rooms: rooms }]
+            tags: [{
+              name: req.params.tag,
+              rooms: rooms.map(function(room) {
+                return getRoomRenderData(room);
+              })
+            }]
           });
         })
         .fail(next);
