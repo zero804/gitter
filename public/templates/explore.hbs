@@ -3,10 +3,15 @@
   <head></head>
   <body>
     <h1>Explore</h1>
+    {{#each tags}}
+    <h2><a href="/explore/tags/{{name}}">{{name}}</a></h2>
     <ul>
-      {{#each rooms}}
-      <li>{{this}}</li>
-      {{/each}}
+    {{#each rooms}}
+      <li>
+        <h3><a href="/{{uri}}">{{uri}}</a></h3>
+      </li>
+    {{/each}}
     </ul>
+    {{/each}}
   </body>
 </html>
