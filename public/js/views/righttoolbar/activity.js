@@ -1,14 +1,12 @@
 define([
   'underscore',
   'marionette',
-  'utils/context',
   'utils/appevents',
   'views/base',
   'views/chat/decorators/issueDecorator',
   'views/chat/decorators/commitDecorator',
   'views/chat/decorators/mentionDecorator',
   'log!activity',
-  'hbs!./tmpl/activityStream',
 
   'hbs!./tmpl/githubPush',
   'hbs!./tmpl/githubIssues',
@@ -33,14 +31,12 @@ define([
 ], function(
   _,
   Marionette,
-  context,
   appEvents,
   TroupeViews,
   issueDecorator,
   commitDecorator,
   mentionDecorator,
   log,
-  activityStreamTemplate,
 
   githubPushTemplate,
   githubIssuesTemplate,
@@ -244,28 +240,12 @@ define([
     }
   });
 
-  var ItemsView = Marionette.CollectionView.extend({
+  var ActivityView = Marionette.CollectionView.extend({
     tagName: 'ul',
-    className: 'gtrActivityList'
+    className: 'gtrActivityList',
+    itemView: ActivityItemView
   });
-  cocktail.mixin(ItemsView, TroupeViews.SortableMarionetteView);
-
-  var ActivityView = TroupeViews.Base.extend({
-    template: activityStreamTemplate,
-
-    initialize: function(/*options*/) {
-      this.data = {};
-      this.collectionView = new ItemsView({
-         collection: this.collection,
-        itemView: ActivityItemView
-      });
-    },
-
-    afterRender: function() {
-      this.$el.find('.events').append(this.collectionView.render().el);
-    }
-  });
-
+  cocktail.mixin(ActivityView, TroupeViews.SortableMarionetteView);
 
   return ActivityView;
 
