@@ -51,4 +51,3 @@ ChatStrategy.prototype = {
 };
 
 module.exports = ChatStrategy;
-

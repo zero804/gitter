@@ -81,13 +81,14 @@ define(['jquery-iframely', 'utils/context'], function ($, context) {
     });
   }
 
+  // image decorator
   function parse(url, cb) {
     var providerName = supported(url);
-    var imageUrl     = url.match(/https?:\/\/([\w-:\.\/%]+)(\.jpe?g|\.gif|\.png)/i);
+    var imageUrl = url.match(/https?:\/\/([\w-:\.\/%]+)(\.jpe?g|\.gif|\.png)/i);
 
     if (iframelySupported(url)) {
       fetchAndRenderIframely(url, cb);
-    } else if(providerName) {
+    } else if (providerName) {
       fetch(oEmbedProviders[providerName], url, cb);
     } else if (imageUrl) {
       var imgTag = '<img src="' + imageUrl[0] + '">';

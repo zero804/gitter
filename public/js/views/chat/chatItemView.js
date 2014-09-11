@@ -16,10 +16,11 @@ define([
   'views/unread-item-view-mixin',
   'utils/appevents',
   'cocktail',
+  'utils/collapsed-item-client',
   'views/keyboard-events-mixin',
   'bootstrap_tooltip', // No ref
 ], function($, _, context, chatModels, AvatarView, Marionette, TroupeViews, uiVars, Popover,
-  chatItemTemplate, statusItemTemplate, chatInputView, UnreadItemViewMixin, appEvents, cocktail, KeyboardEventMixins) {
+  chatItemTemplate, statusItemTemplate, chatInputView, UnreadItemViewMixin, appEvents, cocktail, chatCollapse, KeyboardEventMixins) {
 
   "use strict";
 
@@ -36,6 +37,7 @@ define([
 
   var mouseEvents = {
     'click .js-chat-item-edit':       'toggleEdit',
+    'click .js-chat-item-collapse':       'toggleCollapse',
     'click .js-chat-item-readby':     'showReadBy',
     'mouseover .js-chat-item-readby': 'showReadByIntent',
     'click .webhook':           'expandActivity'
@@ -64,8 +66,10 @@ define([
     },
 
     initialize: function(options) {
+      this.rollers = options.rollers;
+
       this.listenToOnce(this.model, 'change:unread', function() {
-        if(!this.model.get('unread')) {
+        if (!this.model.get('unread')) {
           this.$el.removeClass('unread');
         }
       });
@@ -89,6 +93,7 @@ define([
         var oldInMS = this.model.get('sent').valueOf() + OLD_TIMEOUT - Date.now();
         setTimeout(timeChange, oldInMS + 50);
       }
+      this.render();
     },
 
     template: function (serializedData) {
@@ -120,7 +125,8 @@ define([
 
     onChange: function() {
       var changed = this.model.changed;
-      if ('html' in changed /*|| 'text' in changed || 'urls' in changed || 'mentions' in changed*/) {
+
+      if ('html' in changed) {
         this.renderText();
       }
 
@@ -146,7 +152,7 @@ define([
       // var links = this.model.get('urls') || [];
       // var mentions = this.model.get('mentions') || [];
       var issues = [];
-      if(context.troupe().get('githubType') === 'REPO') {
+      if (context.troupe().get('githubType') === 'REPO') {
         issues = this.model.get('issues') || [];
       }
 
@@ -161,19 +167,21 @@ define([
 
       this.$el.find('.js-chat-item-text').html(html);
 
-      _.each(this.decorators, function(decorator) {
+      _.each(this.decorators, function (decorator) {
         decorator.decorate(this);
       }, this);
     },
 
-    afterRender: function() {
+    afterRender: function () {
       this.renderText();
       this.updateRender();
       this.timeChange();
 
       if (!this.compactView) {
         var editIcon = this.$el.find('.js-chat-item-edit');
+        var collapseIcon = this.$el.find('.js-chat-item-collapse');
         editIcon.tooltip({ container: 'body', title: this.getEditTooltip.bind(this) });
+        collapseIcon.tooltip({ container: 'body', title: this.getCollapseTooltip.bind(this) });
       }
     },
 
@@ -185,7 +193,7 @@ define([
     },
 
     updateRender: function(changes) {
-
+      var self = this;
       if(!changes || 'fromUser' in changes) {
         this.$el.toggleClass('isViewers', this.isOwnMessage());
       }
@@ -204,7 +212,7 @@ define([
       }
 
       /* Don't run on the initial (changed=undefined) as its done in the template */
-      if(changes && 'readBy' in changes) {
+      if (changes && 'readBy' in changes) {
         var readByCount = this.model.get('readBy');
         var oldValue = this.model.previous('readBy');
 
@@ -224,10 +232,39 @@ define([
             readByLabel.toggleClass('readBySome', !!readByCount);
           }
         }
+      }
 
-        readByLabel.text(readByCount ? this.getReadByText(readByCount) : '');
+      if(changes && 'collapsed' in changes) {
+        var collapsed = this.model.get('collapsed');
+        if(collapsed) {
+          this.collapseEmbeds();
+        } else {
+          this.expandEmbeds();
+        }
 
       }
+
+      if(!changes || 'isCollapsible' in changes) {
+        var isCollapsible = this.model.get('isCollapsible');
+
+        if(isCollapsible) {
+          if(this.$el.find('.js-chat-item-collapse').length) return;
+
+          var collapseElement = $(document.createElement('div'));
+          collapseElement.addClass('js-chat-item-collapse');
+          if(this.model.get('collapsed')) {
+            collapseElement.addClass('chat-item__icon--expand');
+          } else {
+            collapseElement.addClass('chat-item__icon--collapse');
+          }
+
+          this.$el.find('.js-chat-item-details').append(collapseElement);
+        } else {
+          this.$el.find('.js-chat-item-collapse').remove();
+        }
+      }
+
+
     },
 
     getEditTooltip: function() {
@@ -246,6 +283,18 @@ define([
       }
 
       return  "You can't edit someone else's message";
+    },
+
+    getCollapseTooltip: function() {
+      if (this.model.get('collapsed')) {
+        return  "Show media.";
+      }
+      return "Hide media.";
+    },
+
+    getCollapsedTooltip: function() {
+      // also for expanded
+      return  "Displaying message, click here to collapse.";
     },
 
     focusInput: function() {
@@ -315,6 +364,57 @@ define([
       }
     },
 
+    // deals with collapsing images and embeds
+    toggleCollapse: function () {
+      var chatId = this.model.get('id');
+      var collapsed = this.model.get('collapsed');
+
+      if (collapsed) {
+        chatCollapse.uncollapse(chatId);
+      } else {
+        chatCollapse.collapse(chatId);
+      }
+      this.model.set('collapsed', !collapsed);
+    },
+
+    collapseEmbeds: function() {
+      var self = this;
+      var embeds = self.$el.find('.embed');
+
+      if(self.rollers) {
+        embeds.each(function(i, e) {
+          self.rollers.startTransition(e, 500);
+        });
+      }
+
+
+      embeds.addClass('animateOut');
+
+      // Remove after
+      setTimeout(function() {
+        self.renderText();
+      }, 600);
+    },
+
+    expandEmbeds: function() {
+      var self = this;
+      self.expanding = true; // Used by the embed decorator
+      self.renderText();
+
+      // Give the browser a second to
+      setTimeout(function() {
+        var embeds =  self.$el.find('.embed');
+
+        if(self.rollers) {
+          embeds.each(function(i, e) {
+            self.rollers.startTransition(e, 500);
+          });
+        }
+
+        embeds.removeClass('animateOut');
+      }, 1);
+    },
+
     showText: function() {
       this.renderText();
 
@@ -323,7 +423,6 @@ define([
         this.inputBox.remove();
         delete this.inputBox;
       }
-
     },
 
     showInput: function() {
