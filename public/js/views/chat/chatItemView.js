@@ -27,6 +27,7 @@ define([
   /* @const */
   var OLD_TIMEOUT = 3600000; /*1 hour*/
 
+  // This needs to be adjusted in chatInputView as well as chat-server on the server
   /* @const */
   var EDIT_WINDOW = 1000 * 60 * 10; // 10 minutes
 
