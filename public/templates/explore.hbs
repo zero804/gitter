@@ -30,12 +30,19 @@
       .user-count {
         float: right;
       }
+
+      .see-all-link {
+        float: right;
+      }
     </style>
   </head>
   <body>
     <h1><a href="/explore">Explore</a></h1>
     {{#each tags}}
-    <h2><a href="/explore/tags/{{name}}">{{name}}</a></h2>
+    <header>
+      <a class="see-all-link" href="/explore/tags/{{name}}">See all ></a>
+      <h2>{{name}}</h2>
+    </header>
     <ul class="room-list">
     {{#each rooms}}
       <li class="room-list-item">
