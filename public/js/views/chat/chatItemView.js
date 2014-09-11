@@ -64,6 +64,7 @@ define([
     },
 
     initialize: function(options) {
+      this.rollers = options.rollers;
 
       this.listenToOnce(this.model, 'change:unread', function() {
         if (!this.model.get('unread')) {
@@ -198,7 +199,7 @@ define([
     },
 
     updateRender: function(changes) {
-
+      var self = this;
       if(!changes || 'fromUser' in changes) {
         this.$el.toggleClass('isViewers', this.isOwnMessage());
       }
@@ -241,15 +242,18 @@ define([
         readByLabel.text(readByCount ? this.getReadByText(readByCount) : '');
       }
 
-      if(!changes || 'collapsed' in changes) {
+      if(changes && 'collapsed' in changes) {
         var collapsed = this.model.get('collapsed');
         var embeds =  this.$el.find('.embed');
 
-        if(collapsed) {
-          embeds.removeClass('animateIn').addClass('animateOut');
-        } else {
-          embeds.removeClass('animateOut').addClass('animateIn');
+        if(this.rollers) {
+          embeds.each(function(i, e) {
+            self.rollers.startTransition(e, 500);
+          });
         }
+
+        embeds.toggleClass('animateIn', !collapsed);
+        embeds.toggleClass('animateOut', collapsed);
       }
     },
 
