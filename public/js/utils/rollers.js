@@ -25,7 +25,7 @@ define(['mutant'], function(Mutant) {
 
     var adjustScroll = this.adjustScroll.bind(this);
 
-    this.mutant = new Mutant(target, adjustScroll);
+    this.mutant = new Mutant(target, adjustScroll, { transitions: true, observers: { attributes: true, characterData: true  } } );
 
     target.addEventListener('scroll', this.trackLocation.bind(this), false);
     window.addEventListener('resize', adjustScroll, false);
@@ -127,6 +127,14 @@ define(['mutant'], function(Mutant) {
       var target = this._target;
       var scrollTop = target.scrollHeight - target.clientHeight;
       target.scrollTop = scrollTop;
+    },
+
+    startTransition: function(element, maxTimeMs) {
+      this.mutant.startTransition(element, maxTimeMs);
+    },
+
+    endTransition: function(element) {
+      this.mutant.endTransition(element);
     },
 
     /*
