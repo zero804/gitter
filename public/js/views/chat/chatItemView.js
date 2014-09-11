@@ -378,6 +378,7 @@ define([
 
     collapseEmbeds: function() {
       var self = this;
+      clearTimeout(self.embedTimeout);
       var embeds = self.$el.find('.embed');
 
       if(self.rollers) {
@@ -386,23 +387,37 @@ define([
         });
       }
 
-
       embeds.addClass('animateOut');
 
       // Remove after
-      setTimeout(function() {
+      self.embedTimeout = setTimeout(function() {
         self.renderText();
       }, 600);
     },
 
     expandEmbeds: function() {
       var self = this;
-      self.expanding = true; // Used by the embed decorator
+      clearTimeout(self.embedTimeout);
+
+      // Used by the decorator
+      self.expandFunction = function(embed) {
+        embed.addClass('animateOut');
+        setTimeout(function() {
+
+          if(self.rollers) {
+            self.rollers.startTransition(embed, 500);
+          }
+
+          embed.removeClass('animateOut');
+
+        }, 10);
+      };
+
       self.renderText();
 
       // Give the browser a second to
-      setTimeout(function() {
-        var embeds =  self.$el.find('.embed');
+      self.embedTimeout = setTimeout(function() {
+        var embeds = self.$el.find('.embed');
 
         if(self.rollers) {
           embeds.each(function(i, e) {
@@ -411,7 +426,7 @@ define([
         }
 
         embeds.removeClass('animateOut');
-      }, 1);
+      }, 10);
     },
 
     showText: function() {
