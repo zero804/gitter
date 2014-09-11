@@ -48,15 +48,6 @@ module.exports =  function(req, res) {
     logger.error('Problem dealing with stats: ' + e, { exception: e });
   }
 
-  res.format({
-    json: function() {
-      res.send({ success: true });
-    },
-    default: function() {
-      res.send('OK');
-    }
-  });
-
-
+  res.send('OK');
 };
 
