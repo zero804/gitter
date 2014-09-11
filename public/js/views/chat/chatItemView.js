@@ -231,13 +231,10 @@ define([
             readByLabel.toggleClass('readBySome', !!readByCount);
           }
         }
-
-        readByLabel.text(readByCount ? this.getReadByText(readByCount) : '');
       }
 
       if(changes && 'collapsed' in changes) {
         var collapsed = this.model.get('collapsed');
-        var self = this;
         if(collapsed) {
           this.collapseEmbeds();
         } else {
