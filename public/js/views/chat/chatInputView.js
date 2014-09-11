@@ -34,7 +34,7 @@ define([
   /** @const */
   var EXTRA_PADDING = 20;
 
-  /* This value is also in chatItemView! */
+  /* This value is also in chatItemView and in chat-service on the server*/
   /** @const */
   var EDIT_WINDOW = 1000 * 60 * 10; // 10 minutes
 
