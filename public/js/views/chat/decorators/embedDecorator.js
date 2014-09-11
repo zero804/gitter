@@ -10,9 +10,12 @@ define([
   function embed(chatItemView) {
     var model = chatItemView.model;
 
-    var isCollapsible = false;
-    if (model.get('collapsed')) return model.set('isCollapsible', true); // NOTE: this is super important because it avoids the images getting embedded
+    if (model.get('collapsed')) {
+      model.set('isCollapsible', true); // NOTE: this is super important because it avoids the images getting embedded
+      return;
+    }
 
+    var isCollapsible = false;
     chatItemView.$el
       .find('a.link')
       .each(function (index, el) {
@@ -22,6 +25,9 @@ define([
             if (embed && embed.html) {
               var $embed = $(document.createElement('div'));
               $embed.addClass('embed');
+              if(chatItemView.expanding) {
+                $embed.addClass('animateOut');
+              }
 
               if (embed.limitHeight) {
                 $embed.addClass('embed-limited');
@@ -36,6 +42,7 @@ define([
           });
         }
       });
+
     model.set('isCollapsible', isCollapsible);
   }
 
