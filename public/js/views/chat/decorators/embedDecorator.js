@@ -25,8 +25,8 @@ define([
             if (embed && embed.html) {
               var $embed = $(document.createElement('div'));
               $embed.addClass('embed');
-              if(chatItemView.expanding) {
-                $embed.addClass('animateOut');
+              if(chatItemView.expandFunction) {
+                chatItemView.expandFunction($embed);
               }
 
               if (embed.limitHeight) {
