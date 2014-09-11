@@ -23,7 +23,7 @@ var findRooms = function (limit) {
 };
 
 // run
-findRooms(20)
+findRooms(50)
   .then(function (rooms) {
     console.log('rooms:', rooms.length);
     return Q.all(rooms.map(function (room) {
@@ -41,4 +41,7 @@ findRooms(20)
       console.log('tags:', tags);
       console.log('---------\n');
     });
+  })
+  .catch(function (err) {
+    console.log('err:', err);
   });

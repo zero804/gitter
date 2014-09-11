@@ -17,7 +17,11 @@ var dedupe = function (val, i, arr) { return arr.indexOf(val) === i; };
 // removes undefined and null values from array
 var clean = function (val) { return !!(val); };
 
-var ensureLowerCase = function (item) { return item.toLowerCase(); };
+var format = function (item) { return item.toLowerCase().replace('\'s', ''); };
+
+var removeLitterTags = function (item) {
+  return /^[\w_-]+$/.test(item);
+};
 
 /**
  * detect() detects the language of a String
@@ -81,7 +85,8 @@ var mergeTags = function (/* arrays */) {
 
   return [].concat.apply([], args)
     .filter(clean) // remove null and undefined values
-    .map(ensureLowerCase)
+    .map(format)
+    .filter(removeLitterTags)
     .filter(dedupe)
     .slice(0, MAX_TAGS);
 };
