@@ -7,6 +7,8 @@ define([
   'views/chat/decorators/commitDecorator',
   'views/chat/decorators/mentionDecorator',
   'log!activity',
+  'utils/context',
+  'hbs!./tmpl/activity-tip',
 
   'hbs!./tmpl/githubPush',
   'hbs!./tmpl/githubIssues',
@@ -37,6 +39,8 @@ define([
   commitDecorator,
   mentionDecorator,
   log,
+  context,
+  activityTipTemplate,
 
   githubPushTemplate,
   githubIssuesTemplate,
@@ -240,10 +244,23 @@ define([
     }
   });
 
+  var EmptyActivityView = TroupeViews.Base.extend({
+    id: 'activity-tip',
+    template: activityTipTemplate,
+    getRenderData: function() {
+      return {
+        isAdmin: context().permissions.admin,
+        isNativeDesktopApp: context().isNativeDesktopApp,
+        integrationsUrl: window.location.origin + window.location.pathname + '#integrations'
+      };
+    }
+  });
+
   var ActivityView = Marionette.CollectionView.extend({
     tagName: 'ul',
     className: 'gtrActivityList',
-    itemView: ActivityItemView
+    itemView: ActivityItemView,
+    emptyView: EmptyActivityView
   });
   cocktail.mixin(ActivityView, TroupeViews.SortableMarionetteView);
 
