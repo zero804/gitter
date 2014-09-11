@@ -125,7 +125,7 @@ define([
     onChange: function() {
       var changed = this.model.changed;
 
-      if ('html' in changed || 'collapsed' in changed/*|| 'text' in changed || 'urls' in changed || 'mentions' in changed*/) {
+      if ('html' in changed) {
         this.renderText();
       }
 
@@ -237,17 +237,36 @@ define([
 
       if(changes && 'collapsed' in changes) {
         var collapsed = this.model.get('collapsed');
-        var embeds =  this.$el.find('.embed');
-
-        if(this.rollers) {
-          embeds.each(function(i, e) {
-            self.rollers.startTransition(e, 500);
-          });
+        var self = this;
+        if(collapsed) {
+          this.collapseEmbeds();
+        } else {
+          this.expandEmbeds();
         }
 
-        embeds.toggleClass('animateIn', !collapsed);
-        embeds.toggleClass('animateOut', collapsed);
       }
+
+      if(!changes || 'isCollapsible' in changes) {
+        var isCollapsible = this.model.get('isCollapsible');
+
+        if(isCollapsible) {
+          if(this.$el.find('.js-chat-item-collapse').length) return;
+
+          var collapseElement = $(document.createElement('div'));
+          collapseElement.addClass('js-chat-item-collapse');
+          if(this.model.get('collapsed')) {
+            collapseElement.addClass('chat-item__icon--expand');
+          } else {
+            collapseElement.addClass('chat-item__icon--collapse');
+          }
+
+          this.$el.find('.js-chat-item-details').append(collapseElement);
+        } else {
+          this.$el.find('.js-chat-item-collapse').remove();
+        }
+      }
+
+
     },
 
     getEditTooltip: function() {
@@ -358,6 +377,44 @@ define([
         chatCollapse.collapse(chatId);
       }
       this.model.set('collapsed', !collapsed);
+    },
+
+    collapseEmbeds: function() {
+      var self = this;
+      var embeds = self.$el.find('.embed');
+
+      if(self.rollers) {
+        embeds.each(function(i, e) {
+          self.rollers.startTransition(e, 500);
+        });
+      }
+
+
+      embeds.addClass('animateOut');
+
+      // Remove after
+      setTimeout(function() {
+        self.renderText();
+      }, 600);
+    },
+
+    expandEmbeds: function() {
+      var self = this;
+      self.expanding = true; // Used by the embed decorator
+      self.renderText();
+
+      // Give the browser a second to
+      setTimeout(function() {
+        var embeds =  self.$el.find('.embed');
+
+        if(self.rollers) {
+          embeds.each(function(i, e) {
+            self.rollers.startTransition(e, 500);
+          });
+        }
+
+        embeds.removeClass('animateOut');
+      }, 1);
     },
 
     showText: function() {
