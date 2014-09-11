@@ -6,7 +6,7 @@ var collapsedChatService = require('../../../server/services/collapsed-chats-ser
 
 Q.longStackSupport = true;
 
-describe.only('collapsed-chats-service', function() {
+describe('collapsed-chats-service', function() {
 
   var blockTimer = require('../block-timer');
   before(blockTimer.on);
