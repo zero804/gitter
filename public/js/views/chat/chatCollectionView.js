@@ -33,7 +33,8 @@ define([
     itemViewOptions: function(item) {
       var options = {
         userCollection: this.userCollection,
-        decorators: this.decorators
+        decorators: this.decorators,
+        rollers: this.rollers
       };
 
       if(item && item.id) {
