@@ -310,3 +310,15 @@ function getSuggestions(user, localeLanguage) {
 }
 
 exports.getSuggestions = getSuggestions;
+
+function getTaggedRooms(tag) {
+  // fake it til we make it
+  return persistence.Troupe.find({
+    security: 'PUBLIC',
+    uri: new RegExp('.*' + tag + '.*'),
+    githubType: 'REPO'
+  }).limit(30).execQ();
+
+}
+
+exports.getTaggedRooms = getTaggedRooms;
