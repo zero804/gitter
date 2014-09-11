@@ -45,6 +45,27 @@ define([
       'click': 'clicked',
       'click .js-close-button': 'onItemClose'
     },
+    initialize: function() {
+      this.updateCurrentRoom();
+
+      this.listenTo(appEvents, 'navigation', function(url) {
+        // strip off query params etc
+        var parser = document.createElement('a');
+        parser.href = url;
+
+        this.updateCurrentRoom(parser.pathname);
+      });
+    },
+    updateCurrentRoom: function(newUrl) {
+      var url = newUrl || window.location.pathname;
+      var isCurrentRoom = this.model.get('url') === url;
+
+      if(this.isCurrentRoom !== isCurrentRoom) {
+        // cannot be stored on the model as it will get wiped by faye
+        this.isCurrentRoom = isCurrentRoom;
+        this.render();
+      }
+    },
     serializeData: function() {
       var data = this.model.toJSON();
       data.name = roomNameTrimmer(data.name, MAX_NAME_LENGTH);
@@ -65,6 +86,8 @@ define([
 
     onRender: function() {
       var self = this;
+
+      this.$el.toggleClass('room-list-item--current-room', this.isCurrentRoom);
 
       var m = self.model;
       dataset.set(self.el, 'id', m.id);
@@ -154,34 +177,7 @@ define([
         this.makeDraggable(options.dropTarget);
       }
       this.roomsCollection = options.roomsCollection;
-
-      this.listenTo(appEvents, 'navigation', function(url) {
-        // strip off query params etc
-        var parser = document.createElement('a');
-        parser.href = url;
-
-        this.updateCurrentRoom(parser.pathname);
-      });
-      // we listen to all as no other setup seems to work when you favourite/unfavourite
-      // the current room
-      this.listenTo(this.collection, 'all', function() {
-        this.updateCurrentRoom();
-      });
     },
-
-    onRender: function() {
-      this.updateCurrentRoom();
-    },
-
-    updateCurrentRoom: function(url) {
-      var currentUrl = url || window.location.pathname;
-
-      this.children.forEach(function(roomItemView) {
-        var roomUrl = roomItemView.model.get('url');
-        roomItemView.$el.toggleClass('room-list-item--current-room', currentUrl === roomUrl);
-      }, this);
-    },
-
     makeDraggable: function(drop) {
       var cancelDrop = false;
       var self = this;
