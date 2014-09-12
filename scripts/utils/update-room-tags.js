@@ -1,10 +1,16 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
+
+/**
+ * update-room-tags script
+ * ====
+ *
+ * a procedure that will look for all rooms in given environment updating their tags
+ */
 'use strict';
 
 var Q = require('Q');
 var persistence = require('../../server/services/persistence-service');
 var GitHubService = require('../../server/services/github/github-repo-service');
-var fs = require('fs');
 
 var autoTagger = require('../../server/utils/room-tagger');
 
@@ -24,10 +30,32 @@ var findRooms = function (limit) {
     .execQ();
 };
 
-// creates a github service for each user, to avoiding flooding one token
-var createGithubService = function (user) {
-  console.log('createGithubService() ====================');
-  return new GitHubService(/*user*/);
+// context is a room, wrapper around Github service
+var fetchGithubInfo = function () {
+  var github = new GitHubService(/*user*/);
+  return github.getRepo(this.lcUri);
+};
+
+// context is room, returns a promise that returns an array containing -> [room, repo]
+var combineInfo = function (repo) {
+  return Q.all([ this, repo ]);
+};
+
+// function to be called with filters, returns an array of rooms filtered by whether it's empty or not
+var ignoreEmptyRooms = function (rooms) {
+  return rooms.filter(function (room) {
+    return room.users.length !== 0;
+  });
+};
+
+// responsible for getting the GH information and then combining the result into an array, once resolved
+var prepareRooms = function (rooms) {
+  return Q.all(rooms.map(function (room) {
+    var id = room.users[0].userId;
+    return persistence.User.findByIdQ(id)
+      .then(fetchGithubInfo.bind(room))
+      .then(combineInfo.bind(room));
+  }));
 };
 
 // deals with [room, info] returning an array of rooms with the added tags
@@ -40,45 +68,24 @@ var tagRooms = function (result) {
 };
 
 // iterates to the now tagged rooms and saves them
+// FIXME: actually save them
 var saveRooms = function (rooms) {
   console.log('saveRooms() ====================');
   console.log('will save', rooms.length);
   return Q.all(
     rooms.map(function (room) {
       // should save all the rooms
-      console.log('room.uri:', room.uri, '| tags: ', rooms.tags.length);
+      console.log('room.uri:', room.uri, '| tags: ', room.tags.length);
     })
   );
 };
 
-// find all rooms
+// reponsible for running the procedure
 findRooms(10)
-  .then(function (rooms) {
-    // console.log('found', rooms.length);
-    return Q.all(
-      rooms
-        .filter(function (room) {
-          // console.log('filtering rooms');
-          return room.users.length !== 0;
-        })
-        .map(function (room) {
-          // console.log('mapping rooms');
-          var id = room.users[0].userId;
-          return persistence.User.findByIdQ(id)
-            .then(createGithubService)
-            .then(function (github) {
-              // console.log('github service created...');
-              // console.log('getting repo info...');
-              return github.getRepo(room.lcUri);
-            })
-            .then(function (repo) {
-              // console.log('got repo info.');
-              return Q.all([ room, repo ]);
-            });
-        }));
-  })
+  .then(ignoreEmptyRooms)
+  .then(prepareRooms)
   .then(tagRooms)
-  .then(saveRooms)
+  // .then(saveRooms)
   .catch(function (err) {
-    console.log('err:', err);
+    console.log('err:', err.stack);
   });
