@@ -1361,6 +1361,1210 @@
         ]
     },
     {
+        "_id": "52fe23915e986b0712ef73a2",
+        "__v": 60,
+        "_nonce": 1933,
+        "_tv": 72,
+        "dateLastSecurityCheck": "2014-04-10T21:07:37.063Z",
+        "githubType": "REPO",
+        "lcUri": "require-lx/group",
+        "security": "PUBLIC",
+        "topic": "Issues about the group, manuals and stuff.",
+        "uri": "require-lx/group",
+        "users": [
+            {
+                "_id": "52fe2391ddb9607d28f878ec",
+                "userId": "529c6f08ed5ab0b3bf04e023"
+            },
+            {
+                "_id": "52fe25de561048555f000319",
+                "userId": "52f90f375e986b0712ef6b59"
+            },
+            {
+                "_id": "52fe287ac8dc04545f0000eb",
+                "userId": "52fe27ae5e986b0712ef73a4"
+            },
+            {
+                "_id": "52fe2d58e26a2e7e280003af",
+                "userId": "52fe2ab95e986b0712ef73b1"
+            },
+            {
+                "_id": "52fe3172561048555f00041b",
+                "userId": "52fe316f5e986b0712ef764f"
+            },
+            {
+                "_id": "52fe333bc8dc04545f00013c",
+                "lurk": true,
+                "userId": "52c06eeced5ab0b3bf0524ff"
+            },
+            {
+                "_id": "52fe3bb069f9629868000018",
+                "userId": "52fa113e5e986b0712ef6bfb"
+            },
+            {
+                "_id": "52fe400d12d8fa6f740000af",
+                "userId": "529f311ced5ab0b3bf04edb2"
+            },
+            {
+                "_id": "52fe463a533dbb9968000151",
+                "userId": "52fe46395e986b0712ef7680"
+            },
+            {
+                "_id": "52ffaf00ecd7e3327b001379",
+                "userId": "52ffaeff5e986b0712ef7744"
+            },
+            {
+                "_id": "5301d10e94ba754a6e002f53",
+                "userId": "5301d10e5e986b0712ef785f"
+            },
+            {
+                "_id": "53020210f158ff65420001ac",
+                "userId": "530200665e986b0712ef787b"
+            },
+            {
+                "_id": "53021948f158ff65420003e2",
+                "userId": "530219475e986b0712ef78d7"
+            },
+            {
+                "_id": "530323aeb4f28b1c38000286",
+                "userId": "529c69b3ed5ab0b3bf04d14b"
+            },
+            {
+                "_id": "53035474fb6a8c8e7e001074",
+                "userId": "530354745e986b0712ef7b3a"
+            },
+            {
+                "_id": "53036cf5304f23c73000005e",
+                "userId": "53036cf55e986b0712ef7ced"
+            },
+            {
+                "_id": "53038973304f23c730000111",
+                "userId": "52fe2c8f5e986b0712ef73d2"
+            },
+            {
+                "_id": "5303ba12ba7004692a000874",
+                "userId": "52fe56585e986b0712ef7687"
+            },
+            {
+                "_id": "53049532234d17f0090002f7",
+                "userId": "52fcb6b35e986b0712ef7109"
+            },
+            {
+                "_id": "530521dc394e3c6a4300037d",
+                "userId": "530521dc5e986b0712ef7e7e"
+            },
+            {
+                "_id": "530933ea80b7a3b92d0007c8",
+                "userId": "530933ea5e986b0712efa646"
+            },
+            {
+                "_id": "530cbab78b3326483400348b",
+                "userId": "52fe37ab5e986b0712ef7669"
+            },
+            {
+                "_id": "532c66e0595551cc2a000242",
+                "userId": "52f906cf5e986b0712ef6b51"
+            },
+            {
+                "_id": "533bf0325c7112814400143a",
+                "userId": "52d06e60ed5ab0b3bf053be6"
+            },
+            {
+                "_id": "5347beb3e2ce4faa350006b5",
+                "userId": "5347beb35e986b0712f02ed4"
+            },
+            {
+                "_id": "534c6759a081341502007b79",
+                "userId": "534c67595e986b0712f033f8"
+            },
+            {
+                "_id": "535ce0337f25180441002584",
+                "userId": "535ce033fe5536b46433d801"
+            },
+            {
+                "_id": "53762dd18456dc9b5c883fa4",
+                "userId": "52fcb7915e986b0712ef710e"
+            },
+            {
+                "_id": "53762f43f121b4446b78c69d",
+                "lurk": true,
+                "userId": "53176de65e986b0712efcd33"
+            },
+            {
+                "_id": "53763008e9c9dc843a67d598",
+                "userId": "531853025e986b0712efd172"
+            },
+            {
+                "_id": "5376387a3d1cd1456bae5d6d",
+                "userId": "52d020e2ed5ab0b3bf053b8b"
+            },
+            {
+                "_id": "5377d4508456dc9b5c8848cd",
+                "userId": "53176b325e986b0712efcd2b"
+            },
+            {
+                "_id": "5377d8253d1cd1456bae822b",
+                "userId": "532f0e865e986b0712eff7f5"
+            },
+            {
+                "_id": "5378dfafd0b034833aea8a6e",
+                "lurk": false,
+                "userId": "529c6deded5ab0b3bf04dd0e"
+            },
+            {
+                "_id": "5379fead3135807d4142524e",
+                "userId": "53126caa5e986b0712efc369"
+            },
+            {
+                "_id": "537a035e06ff26e31fb1eabc",
+                "userId": "537a035e048862e761fa1e9d"
+            },
+            {
+                "_id": "538666e26316663074786b5b",
+                "userId": "538666e2048862e761fa2e3f"
+            },
+            {
+                "_id": "53ad8d1234360b7a27df5501",
+                "lurk": true,
+                "userId": "5298e319ed5ab0b3bf04c984"
+            },
+            {
+                "_id": "53dad1dbf7115fde5db0617e",
+                "userId": "530491075e986b0712ef7df5"
+            },
+            {
+                "_id": "53e07a6734fbc5780e2d390e",
+                "userId": "52f900c25e986b0712ef6b48"
+            },
+            {
+                "_id": "53ec447c15473559351cac03",
+                "userId": "53ec447c107e137846baa9ad"
+            },
+            {
+                "_id": "53ec6eb919aed5991a7a7b4c",
+                "userId": "53ec6e19107e137846baa9c6"
+            },
+            {
+                "_id": "53f777f7511afe0824dbb91b",
+                "userId": "53f777f7163965c9bc1ffe16"
+            },
+            {
+                "_id": "540878ac5d3c19741972e87d",
+                "userId": "5408782e163965c9bc202963"
+            },
+            {
+                "_id": "540cdd81581cf52b78da0b06",
+                "userId": "53e96afe107e137846baa428"
+            }
+        ],
+        "tags": [
+            "javascript",
+            "nodejs",
+            "meetup",
+            "group",
+            "lisbon"
+        ]
+    },
+    {
+        "_id": "532c637f5e986b0712eff659",
+        "__v": 41,
+        "_nonce": 73633,
+        "_tv": 50,
+        "dateLastSecurityCheck": "2014-04-10T11:25:50.128Z",
+        "githubType": "REPO",
+        "lcUri": "gitterhq/services",
+        "security": "PUBLIC",
+        "topic": "The things that power your Gitter activity feed",
+        "uri": "gitterHQ/services",
+        "users": [
+            {
+                "_id": "532c637f04ef992e24600804",
+                "userId": "529c6c1fed5ab0b3bf04d813"
+            },
+            {
+                "_id": "533d3176be761a545a0007ce",
+                "userId": "5298e2d5ed5ab0b3bf04c980"
+            },
+            {
+                "_id": "53432ada4b951237360000e0",
+                "userId": "5298e353ed5ab0b3bf04c98a"
+            },
+            {
+                "_id": "534343760d8f2aac1e00047f",
+                "userId": "529c6e17ed5ab0b3bf04dd84"
+            },
+            {
+                "_id": "5343f8d0b94809aa1e00060c",
+                "userId": "529c6ea4ed5ab0b3bf04df0e"
+            },
+            {
+                "_id": "534e833a12515ae22a0020ef",
+                "userId": "5298e319ed5ab0b3bf04c984"
+            },
+            {
+                "_id": "534e83c112515ae22a002107",
+                "userId": "52f1001e5e986b0712ef4d7b"
+            },
+            {
+                "_id": "534e864a784d0a11610008cf",
+                "userId": "529c69c2ed5ab0b3bf04d176"
+            },
+            {
+                "_id": "534e864e0ae55866450021f0",
+                "userId": "534e864e5e986b0712f036b7"
+            },
+            {
+                "_id": "534e870e0db396e12a000912",
+                "lurk": true,
+                "userId": "534e870e5e986b0712f036bd"
+            },
+            {
+                "_id": "534e92cc38eecf1261002380",
+                "userId": "534e92cb5e986b0712f036d6"
+            },
+            {
+                "_id": "534e9f97a44e5590020003f3",
+                "userId": "52c84152ed5ab0b3bf053164"
+            },
+            {
+                "_id": "53599834c88c872c7d000a2c",
+                "userId": "5346bfb05e986b0712f02d60"
+            },
+            {
+                "_id": "535bac7f856b620341000436",
+                "userId": "5307169f5e986b0712ef9cdf"
+            },
+            {
+                "_id": "535e2ec68e14937902004adc",
+                "userId": "535e2ae1fe5536b46433d8f4"
+            },
+            {
+                "_id": "53667a7e91ab64b23187efa7",
+                "userId": "53667a7e048862e761fa05b2"
+            },
+            {
+                "_id": "537695ccd630c49c5c885671",
+                "userId": "533bebfc5e986b0712f00d66"
+            },
+            {
+                "_id": "5381d061374a6c1e3ba4a8dc",
+                "userId": "5298e787ed5ab0b3bf04c99c"
+            },
+            {
+                "_id": "538477aaeafc3b9a6d45b2bb",
+                "userId": "537c8131048862e761fa233d"
+            },
+            {
+                "_id": "539993ef7474a51d3002c3e4",
+                "userId": "53998cc3a9176b500d1cdc73"
+            },
+            {
+                "_id": "53bf897b070a736a220d8690",
+                "lurk": true,
+                "userId": "52f355f75e986b0712ef62e7"
+            },
+            {
+                "_id": "53c5aa4cc4f33b977a475f5b",
+                "userId": "53c5a103107e137846ba6bf0"
+            },
+            {
+                "_id": "53d661d208ed57c253c8e2f1",
+                "userId": "52d003b479f882e923000005"
+            },
+            {
+                "_id": "53ddcf979d667450151704d3",
+                "userId": "53d31592107e137846ba7fee"
+            },
+            {
+                "_id": "53eb4f72203979c368efe2bf",
+                "userId": "52f215315e986b0712ef5d66"
+            },
+            {
+                "_id": "53f1a64919aed5991a7af5f2",
+                "userId": "52f221a25e986b0712ef5dd7"
+            },
+            {
+                "_id": "53f60723b67e210324c37eae",
+                "userId": "537a1c08048862e761fa1ed5"
+            },
+            {
+                "_id": "53f60ba4a95ba6df7eeffd70",
+                "userId": "53df6c94107e137846ba90dd"
+            },
+            {
+                "_id": "53f64094b060082c2624aa32",
+                "userId": "532794755e986b0712efedba"
+            },
+            {
+                "_id": "53fc52f6a95ba6df7ef0d520",
+                "userId": "530c96425e986b0712efb345"
+            },
+            {
+                "_id": "53fc98c3511afe0824dc683e",
+                "userId": "53fc98c3163965c9bc200884"
+            },
+            {
+                "_id": "54016c99910d490c25708125",
+                "userId": "53e632b5107e137846ba9fc3"
+            }
+        ],
+        "tags": [
+            "javascript",
+            "things",
+            "power",
+            "gitter",
+            "activity",
+            "feed"
+        ]
+    },
+    {
+        "_id": "534054165e986b0712f01510",
+        "__v": 42,
+        "_nonce": 80811,
+        "_tv": 66,
+        "dateLastSecurityCheck": "2014-04-09T15:39:40.175Z",
+        "githubType": "REPO",
+        "lcUri": "jsdelivr/jsdelivr",
+        "security": "PUBLIC",
+        "topic": "A free Open Source CDN for webmasters and developers",
+        "uri": "jsdelivr/jsdelivr",
+        "users": [
+            {
+                "_id": "5340541636646aab51ba5fae",
+                "userId": "533ec05d5e986b0712f01381"
+            },
+            {
+                "_id": "5340548a9f44a4ad510022ca",
+                "userId": "533f2efb5e986b0712f0141d"
+            },
+            {
+                "_id": "53408590c0a369550a000aca",
+                "userId": "529c6c56ed5ab0b3bf04d8ad"
+            },
+            {
+                "_id": "53408973add196560a0025b5",
+                "lurk": true,
+                "userId": "529c6c46ed5ab0b3bf04d881"
+            },
+            {
+                "_id": "53412689c0a369550a000cbd",
+                "lurk": false,
+                "userId": "533edc8b5e986b0712f013b8"
+            },
+            {
+                "_id": "534267100716e2535c00441b",
+                "lurk": false,
+                "userId": "533ec4ad5e986b0712f0138d"
+            },
+            {
+                "_id": "534267c37689fd525c00128c",
+                "userId": "534267c35e986b0712f016b9"
+            },
+            {
+                "_id": "53431230e3b4a96237000baa",
+                "userId": "533f024f5e986b0712f013f1"
+            },
+            {
+                "_id": "5346d406f4d9bdab350001d5",
+                "userId": "533f71f05e986b0712f0145c"
+            },
+            {
+                "_id": "536154aa3925f6214a721318",
+                "userId": "536154a9048862e761fa01a5"
+            },
+            {
+                "_id": "537113f4724bdf5a0660eaa1",
+                "userId": "537113f4048862e761fa0ecf"
+            },
+            {
+                "_id": "5373825f88a372060ff2c67a",
+                "userId": "5373825e048862e761fa150a"
+            },
+            {
+                "_id": "537ba7ba4bbcc2e41f9ce19f",
+                "lurk": true,
+                "userId": "537ba7b9048862e761fa21d3"
+            },
+            {
+                "_id": "538764580abbc18c49a4ff2a",
+                "userId": "53876458048862e761fa30e6"
+            },
+            {
+                "_id": "53890fd068d5417b4fbaaf8a",
+                "userId": "53890fd0048862e761fa3321"
+            },
+            {
+                "_id": "538d42fc845e5f1d201e0d3c",
+                "userId": "538d42fc048862e761fa4260"
+            },
+            {
+                "_id": "539bef18f5f524f0473728de",
+                "userId": "5346a6cb5e986b0712f02cf9"
+            },
+            {
+                "_id": "53a0bfd706c95f554ff6d426",
+                "userId": "53a0bfd7a9176b500d1ce55b"
+            },
+            {
+                "_id": "53a869fc0841dcbd195c1a16",
+                "userId": "53a869fba9176b500d1ceff7"
+            },
+            {
+                "_id": "53da9ace2c0f8bd823ebd305",
+                "userId": "53da9ace107e137846ba8b32"
+            },
+            {
+                "_id": "53dacbf72c0f8bd823ebda0b",
+                "lurk": false,
+                "userId": "53dacbf6107e137846ba8b8c"
+            },
+            {
+                "_id": "53e4fe8a4b0196527d54b901",
+                "userId": "53e4fe89107e137846ba9eae"
+            },
+            {
+                "_id": "53f8d058a95ba6df7ef04c54",
+                "userId": "53f8d057163965c9bc200067"
+            },
+            {
+                "_id": "53fc9a83b67e210324c4fb5a",
+                "userId": "53fc9a82163965c9bc20088f"
+            },
+            {
+                "_id": "53fd21fb81f0a80446de5045",
+                "userId": "53fd21fb163965c9bc200a20"
+            },
+            {
+                "_id": "54036134be50c00d251e2fce",
+                "userId": "54036134163965c9bc201869"
+            },
+            {
+                "_id": "540976b3f4fd6462704af39f",
+                "userId": "540976b2163965c9bc202cb3"
+            },
+            {
+                "_id": "540de654aa04d686484a6687",
+                "userId": "540de654163965c9bc203513"
+            },
+            {
+                "_id": "5410c5dcf7585d3b2fa90c1e",
+                "userId": "5410c5dc163965c9bc203d9d"
+            }
+        ],
+        "tags": [
+            "javascript",
+            "free",
+            "open",
+            "source",
+            "cdn",
+            "webmasters"
+        ]
+    },
+    {
+        "_id": "53ad3813a9176b500d1cf821",
+        "__v": 40,
+        "_nonce": 56178,
+        "_tv": 45,
+        "dateLastSecurityCheck": "2014-06-27T09:23:31.197Z",
+        "githubType": "REPO",
+        "lcUri": "lxjs/training-node-webkit",
+        "security": "PUBLIC",
+        "topic": "",
+        "uri": "LXJS/training-node-webkit",
+        "users": [
+            {
+                "_id": "53ad3813b7f5a3321716d952",
+                "lurk": true,
+                "userId": "53ad3805a9176b500d1cf819"
+            },
+            {
+                "_id": "53ad74a41a0b13e94128fc74",
+                "userId": "53a9fffca9176b500d1cf3b2"
+            },
+            {
+                "_id": "53ad7628b7f5a3321716dfd8",
+                "userId": "52d06e60ed5ab0b3bf053be6"
+            },
+            {
+                "_id": "53ad774e34360b7a27df5218",
+                "userId": "5305e6995e986b0712ef8275"
+            },
+            {
+                "_id": "53ad775349386a79414b7897",
+                "userId": "52fe37ab5e986b0712ef7669"
+            },
+            {
+                "_id": "53ad776149386a79414b78a0",
+                "userId": "53ad7760a9176b500d1cf8c5"
+            },
+            {
+                "_id": "53ad7769fb184633179b6079",
+                "userId": "53ad7768a9176b500d1cf8cb"
+            },
+            {
+                "_id": "53ad776a1a0b13e94128fcdc",
+                "userId": "53ab1c66a9176b500d1cf51d"
+            },
+            {
+                "_id": "53ad778ab857188427d95070",
+                "userId": "529c6cb8ed5ab0b3bf04d9be"
+            },
+            {
+                "_id": "53ad7797b857188427d95071",
+                "userId": "53ad7796a9176b500d1cf8d1"
+            },
+            {
+                "_id": "53ad779749386a79414b78a8",
+                "userId": "52fb8fc95e986b0712ef6eff"
+            },
+            {
+                "_id": "53ad77a3b7f5a3321716e010",
+                "userId": "52d41ce5ed5ab0b3bf053ec1"
+            },
+            {
+                "_id": "53ad77bd49386a79414b78b2",
+                "userId": "5298e2d5ed5ab0b3bf04c980"
+            },
+            {
+                "_id": "53ad77be49386a79414b78b3",
+                "userId": "5298e319ed5ab0b3bf04c984"
+            },
+            {
+                "_id": "53ad77c934360b7a27df523b",
+                "userId": "53ad723da9176b500d1cf8b5"
+            },
+            {
+                "_id": "53ad77c9fb184633179b6094",
+                "userId": "53ad77c5a9176b500d1cf8d7"
+            },
+            {
+                "_id": "53ad77c949386a79414b78b4",
+                "userId": "533061745e986b0712eff9fd"
+            },
+            {
+                "_id": "53ad77cab857188427d95087",
+                "userId": "536a279c048862e761fa097b"
+            },
+            {
+                "_id": "53ad77df1a0b13e94128fced",
+                "userId": "52d42310ed5ab0b3bf053ecd"
+            },
+            {
+                "_id": "53ad77e41a0b13e94128fcef",
+                "userId": "53ad77dfa9176b500d1cf8db"
+            },
+            {
+                "_id": "53ad77e449386a79414b78bb",
+                "userId": "52ffcaee5e986b0712ef7775"
+            },
+            {
+                "_id": "53ad7832fb184633179b60be",
+                "lurk": true,
+                "userId": "53ad7832a9176b500d1cf8df"
+            },
+            {
+                "_id": "53ad78331a0b13e94128fd01",
+                "userId": "53ad7833a9176b500d1cf8e3"
+            },
+            {
+                "_id": "53ad787249386a79414b78ef",
+                "userId": "53ad7872a9176b500d1cf8e7"
+            },
+            {
+                "_id": "53ad789cb857188427d950db",
+                "userId": "53ad789ba9176b500d1cf8eb"
+            },
+            {
+                "_id": "53ad78bc1a0b13e94128fd1d",
+                "userId": "53ad78ada9176b500d1cf8ef"
+            },
+            {
+                "_id": "53ad792434360b7a27df5273",
+                "userId": "53ad7906a9176b500d1cf8f3"
+            },
+            {
+                "_id": "53ad792db7f5a3321716e066",
+                "userId": "53ad4bfca9176b500d1cf873"
+            },
+            {
+                "_id": "53ad79591a0b13e94128fd3b",
+                "userId": "53ad7959a9176b500d1cf8f7"
+            },
+            {
+                "_id": "53ad796d1a0b13e94128fd3c",
+                "userId": "53ad3818a9176b500d1cf828"
+            },
+            {
+                "_id": "53ad79b4fb184633179b6153",
+                "userId": "53ad79b4a9176b500d1cf8ff"
+            },
+            {
+                "_id": "53ad79d7b857188427d95143",
+                "userId": "52fe2f435e986b0712ef73d9"
+            },
+            {
+                "_id": "53ad875a1a0b13e94128fef0",
+                "userId": "530491075e986b0712ef7df5"
+            },
+            {
+                "_id": "53aef8bf957b91a05830b48f",
+                "userId": "529c69b3ed5ab0b3bf04d14b"
+            },
+            {
+                "_id": "53aef96619942ec932f294dc",
+                "userId": "52fa113e5e986b0712ef6bfb"
+            },
+            {
+                "_id": "53aef9739b03d3c832201f1c",
+                "userId": "538666e2048862e761fa2e3f"
+            },
+            {
+                "_id": "53aefa01506acca1586cd216",
+                "userId": "53aef993a9176b500d1cfb68"
+            },
+            {
+                "_id": "54072a97e334931839c0188c",
+                "userId": "540729a9163965c9bc202288"
+            },
+            {
+                "_id": "540cc18044e849753151144f",
+                "userId": "52c00775ed5ab0b3bf0524ae"
+            }
+        ],
+        "tags": [
+            "javascript"
+        ]
+    },
+    {
+        "_id": "53327d1d5e986b0712effece",
+        "__v": 46,
+        "_nonce": 40845,
+        "_tv": 54,
+        "dateLastSecurityCheck": "2014-04-10T00:07:38.044Z",
+        "githubType": "REPO",
+        "lcUri": "azu/promises-book",
+        "security": "PUBLIC",
+        "topic": "[WIP] JavaScript Promises Book",
+        "uri": "azu/promises-book",
+        "users": [
+            {
+                "_id": "53327d1d3f3e2a3d6f4c8b0b",
+                "lurk": false,
+                "userId": "529c6eeded5ab0b3bf04dfd8"
+            },
+            {
+                "_id": "53328096974b27ab46000265",
+                "userId": "530ff5805e986b0712efc06a"
+            },
+            {
+                "_id": "533284ccd64a5d3e6f000a60",
+                "lurk": true,
+                "userId": "530cad845e986b0712efb3cb"
+            },
+            {
+                "_id": "533285dd974b27ab46000281",
+                "lurk": true,
+                "userId": "533285dd5e986b0712effed4"
+            },
+            {
+                "_id": "5332904d974b27ab460002aa",
+                "userId": "52f2e5ad5e986b0712ef617d"
+            },
+            {
+                "_id": "5332c404af88dbac46001162",
+                "userId": "52daaea1ed5ab0b3bf05483f"
+            },
+            {
+                "_id": "5332cec50fd5023d6f000497",
+                "userId": "5306d15e5e986b0712ef9ac8"
+            },
+            {
+                "_id": "5332efdbaf88dbac460016f1",
+                "userId": "531d15b25e986b0712efdab2"
+            },
+            {
+                "_id": "5333d5d867ce767632000709",
+                "userId": "529c6b21ed5ab0b3bf04d54c"
+            },
+            {
+                "_id": "5339e4d6f7db77eb4b0004c8",
+                "userId": "530bc3845e986b0712efadc1"
+            },
+            {
+                "_id": "5347cf67e2ce4faa3500076e",
+                "userId": "530b4b0b5e986b0712efabc8"
+            },
+            {
+                "_id": "53668dc9aa6b125d0a61c22f",
+                "userId": "53668dc9048862e761fa05c2"
+            },
+            {
+                "_id": "536c5c4a0c8f780251f3ab8a",
+                "userId": "536c5c4a048862e761fa0b5c"
+            },
+            {
+                "_id": "536c5fda9c6ea58c56eafa77",
+                "userId": "535357a85e986b0712f03adc"
+            },
+            {
+                "_id": "5375e0a403f19d3850f4f5a6",
+                "userId": "5355dddc5e986b0712f03c7f"
+            },
+            {
+                "_id": "5375f89303f19d3850f4faa3",
+                "lurk": false,
+                "userId": "530b78205e986b0712efaccd"
+            },
+            {
+                "_id": "53772685f121b4446b78ccca",
+                "userId": "529c6d18ed5ab0b3bf04dac6"
+            },
+            {
+                "_id": "537ad3624eff907b41370862",
+                "userId": "530ae2205e986b0712efa7bc"
+            },
+            {
+                "_id": "53864f53f2d689a4441c2d2a",
+                "userId": "53864f53048862e761fa2e24"
+            },
+            {
+                "_id": "5386d8176316663074786f5e",
+                "lurk": false,
+                "userId": "5359b5035e986b0712f0460c"
+            },
+            {
+                "_id": "5386db277b4ae0a544367522",
+                "userId": "537c2a9e048862e761fa22b1"
+            },
+            {
+                "_id": "5394836f105e1ce444d0e432",
+                "userId": "5394836f048862e761fa4acf"
+            },
+            {
+                "_id": "539775c5abf7816d2bc7e5d8",
+                "userId": "539775c5a9176b500d1cda1b"
+            },
+            {
+                "_id": "53a8826d13930bd3793ce7f8",
+                "userId": "529c69dded5ab0b3bf04d1c2"
+            },
+            {
+                "_id": "53a8deb49e3a48be197e69ae",
+                "userId": "53a8deb3a9176b500d1cf0fe"
+            },
+            {
+                "_id": "53aa34056419315d3e85d4cb",
+                "userId": "529c6a24ed5ab0b3bf04d28a"
+            },
+            {
+                "_id": "53ae9cd1957b91a05830acf8",
+                "userId": "53ae9cd0a9176b500d1cfaa0"
+            },
+            {
+                "_id": "53aec26e506acca1586ccc3d",
+                "userId": "53aec26ea9176b500d1cfaf8"
+            },
+            {
+                "_id": "53c7c7d1a67f2645713be6cb",
+                "userId": "53c7c7d0107e137846ba6f55"
+            },
+            {
+                "_id": "53d67dce5b886a946d63d7fd",
+                "userId": "53d67dce107e137846ba83ce"
+            },
+            {
+                "_id": "53d8bb831973b49015475152",
+                "userId": "53d8bb82107e137846ba8798"
+            },
+            {
+                "_id": "53f4273f17a6882726fb2d52",
+                "userId": "530c36705e986b0712efb0fe"
+            },
+            {
+                "_id": "53f58977511afe0824db7a0f",
+                "userId": "53f58976163965c9bc1ff393"
+            }
+        ],
+        "tags": [
+            "javascript"
+        ]
+    },
+    {
+        "_id": "53a9d46ca9176b500d1cf360",
+        "__v": 36,
+        "_nonce": 51743,
+        "_tv": 37,
+        "dateLastSecurityCheck": "2014-06-29T20:44:14.466Z",
+        "githubType": "REPO",
+        "lcUri": "bitpay/bitauth",
+        "security": "PUBLIC",
+        "topic": "Authenticate with web services utilizing the same strategy as Bitcoin.",
+        "uri": "bitpay/bitauth",
+        "users": [
+            {
+                "_id": "53a9d46cc34a3b0577fdae7f",
+                "userId": "529c6db5ed5ab0b3bf04dc75"
+            },
+            {
+                "_id": "53b315de7f15377d5ed24bb9",
+                "userId": "53b315dd107e137846ba5290"
+            },
+            {
+                "_id": "53b31f988f1d517a5b4fef67",
+                "userId": "52cef0eded5ab0b3bf053929"
+            },
+            {
+                "_id": "53b328e733fa11a45d98da29",
+                "userId": "53a87385a9176b500d1cf038"
+            },
+            {
+                "_id": "53b332d68f1d517a5b4ff2c1",
+                "userId": "53b332d6107e137846ba52c0"
+            },
+            {
+                "_id": "53b33e6de67088a35d4dc3d1",
+                "userId": "53b33e6d107e137846ba52cd"
+            },
+            {
+                "_id": "53b346ae67abfb7e5ec364ed",
+                "userId": "53b346ae107e137846ba52de"
+            },
+            {
+                "_id": "53b347818f1d517a5b4ff648",
+                "userId": "53b34781107e137846ba52e2"
+            },
+            {
+                "_id": "53b363105b76de795bbcb730",
+                "userId": "53b36310107e137846ba5300"
+            },
+            {
+                "_id": "53b36cf77f15377d5ed253db",
+                "userId": "53b36cf7107e137846ba5317"
+            },
+            {
+                "_id": "53b36e5b7f15377d5ed253f2",
+                "userId": "53a846eea9176b500d1cef7c"
+            },
+            {
+                "_id": "53b376047f15377d5ed2548c",
+                "userId": "53b37604107e137846ba5327"
+            },
+            {
+                "_id": "53b3907933fa11a45d98ea1a",
+                "userId": "53b39079107e137846ba534c"
+            },
+            {
+                "_id": "53b3e7ade67088a35d4dd317",
+                "userId": "53b3e7ad107e137846ba53fc"
+            },
+            {
+                "_id": "53b3edd25b76de795bbcc39c",
+                "userId": "53b3edd1107e137846ba5413"
+            },
+            {
+                "_id": "53b3fbec67abfb7e5ec384cf",
+                "userId": "53063b425e986b0712ef9305"
+            },
+            {
+                "_id": "53b40dcd6adf46df45507434",
+                "userId": "53b40dcd107e137846ba546e"
+            },
+            {
+                "_id": "53b43a6f2bd40dc5164c4fed",
+                "userId": "53b43a6f107e137846ba54cd"
+            },
+            {
+                "_id": "53b4456bcb5bd98a07653219",
+                "userId": "53b444cd107e137846ba54d9"
+            },
+            {
+                "_id": "53b45479255049571cdaea68",
+                "userId": "53b45478107e137846ba5519"
+            },
+            {
+                "_id": "53b4721c58c850c6414ab8f1",
+                "userId": "5365b9d6048862e761fa0543"
+            },
+            {
+                "_id": "53b5bc7b889d0047671a1129",
+                "userId": "530473175e986b0712ef7de0"
+            },
+            {
+                "_id": "53b9faeb956438af28470551",
+                "userId": "53b9faeb107e137846ba5b7b"
+            },
+            {
+                "_id": "53ba100522f9ec5a3d28a2d5",
+                "userId": "53ba1005107e137846ba5bd5"
+            },
+            {
+                "_id": "53bec0617262d8490dbfefdc",
+                "userId": "53bec061107e137846ba63bf"
+            },
+            {
+                "_id": "53c6bbffc4f33b977a477afd",
+                "userId": "53c6bbff107e137846ba6d88"
+            },
+            {
+                "_id": "53c85edec4f33b977a47a474",
+                "userId": "52fcee2a5e986b0712ef71c0"
+            },
+            {
+                "_id": "53c9c5e162d09a8825f441b4",
+                "userId": "53c9c5e1107e137846ba7254"
+            },
+            {
+                "_id": "53ccc1da8ffe3de25c246da9",
+                "userId": "53ccc1da107e137846ba7492"
+            },
+            {
+                "_id": "53d978b73d8f108b13ea1c9b",
+                "userId": "53d978b7107e137846ba890a"
+            },
+            {
+                "_id": "53da45b5856867da6575a186",
+                "userId": "53d95945107e137846ba88c8"
+            },
+            {
+                "_id": "53db9836665b84c628f15034",
+                "userId": "53db9836107e137846ba8d05"
+            },
+            {
+                "_id": "53dc0f24250758ed15166e3c",
+                "userId": "5314d0225e986b0712efc644"
+            },
+            {
+                "_id": "53f47eab9766ebd97e1cc310",
+                "userId": "53f47eaa163965c9bc1ff113"
+            },
+            {
+                "_id": "540f772fc48bc8027c6cd36e",
+                "userId": "540f772e163965c9bc2039c9"
+            }
+        ],
+        "tags": [
+            "javascript",
+            "authenticate",
+            "web",
+            "services",
+            "utilizing",
+            "strategy"
+        ]
+    },
+    {
+        "_id": "53b629eb107e137846ba5806",
+        "__v": 116,
+        "_nonce": 56054,
+        "_tv": 130,
+        "dateLastSecurityCheck": "2014-07-04T04:13:31.370Z",
+        "githubType": "REPO",
+        "lcUri": "codefellows/sea-c16-javascript",
+        "security": "PUBLIC",
+        "topic": "Code repository for the Foundation 2 Night Course",
+        "uri": "codefellows/sea-c16-javascript",
+        "users": [
+            {
+                "_id": "53b629eb5170214667c5904d",
+                "lurk": false,
+                "userId": "53b1d82b107e137846ba5020"
+            },
+            {
+                "_id": "53b6322079dbf1bf7f93af26",
+                "userId": "536429dc048862e761fa045c"
+            },
+            {
+                "_id": "53b6df6622f9ec5a3d286657",
+                "userId": "53b6df66107e137846ba58bc"
+            },
+            {
+                "_id": "53b730c10a10ced7298b6662",
+                "userId": "53b730c1107e137846ba58ff"
+            },
+            {
+                "_id": "53b7644ed05b6c5b3d5b3fae",
+                "userId": "53b7644e107e137846ba5910"
+            },
+            {
+                "_id": "53b861580a10ced7298b814c",
+                "userId": "53b86158107e137846ba5976"
+            },
+            {
+                "_id": "53b8884f0a10ced7298b84fc",
+                "userId": "53b8884f107e137846ba5980"
+            },
+            {
+                "_id": "53b8946a3f43a1ae2829ed0f",
+                "userId": "53b8946a107e137846ba5988"
+            },
+            {
+                "_id": "53b8fb330a10ced7298b8e6f",
+                "userId": "53b8fb33107e137846ba59db"
+            },
+            {
+                "_id": "53b9f0a7124fdad62957f0f5",
+                "userId": "53b9f0a7107e137846ba5b6c"
+            },
+            {
+                "_id": "53baf510c97709a61dd42fda",
+                "userId": "53baf510107e137846ba5d3b"
+            },
+            {
+                "_id": "53bb129968352f7653b0e6ed",
+                "userId": "53bb1299107e137846ba5d60"
+            },
+            {
+                "_id": "53bb4ed568c481a116349617",
+                "userId": "53bb4ed5107e137846ba5de1"
+            },
+            {
+                "_id": "53bb52870532aba9664798c3",
+                "userId": "53bb5287107e137846ba5de8"
+            },
+            {
+                "_id": "53bb52ba68c481a1163496c4",
+                "userId": "53bb52ba107e137846ba5dec"
+            },
+            {
+                "_id": "53bb52dec97709a61dd43959",
+                "lurk": false,
+                "userId": "5367c684048862e761fa0697"
+            },
+            {
+                "_id": "53bb530068352f7653b0ecd1",
+                "userId": "53bb5300107e137846ba5df0"
+            },
+            {
+                "_id": "53bb534068352f7653b0ecd8",
+                "userId": "53bb5340107e137846ba5df4"
+            },
+            {
+                "_id": "53bb5368c97709a61dd43969",
+                "userId": "53bb5368107e137846ba5df8"
+            },
+            {
+                "_id": "53bb578dc97709a61dd439cf",
+                "userId": "53bb578c107e137846ba5dfc"
+            },
+            {
+                "_id": "53bb61479ac007d970fee36f",
+                "userId": "53bb6146107e137846ba5e02"
+            },
+            {
+                "_id": "53bbac1368352f7653b0f4be",
+                "userId": "538f6da9048862e761fa458f"
+            },
+            {
+                "_id": "53bc216968352f7653b10018",
+                "lurk": false,
+                "userId": "53bc2168107e137846ba5f94"
+            },
+            {
+                "_id": "53bc46db9ac007d970fef921",
+                "userId": "53bc46db107e137846ba5fdf"
+            },
+            {
+                "_id": "53bc4ffe0532aba96647d19a",
+                "userId": "53bc4ffe107e137846ba5fed"
+            },
+            {
+                "_id": "53bc50e09ac007d970fefa16",
+                "userId": "5367c697048862e761fa069a"
+            },
+            {
+                "_id": "53bc85350532aba96647db61",
+                "userId": "53bc8535107e137846ba601a"
+            },
+            {
+                "_id": "53bc858b68352f7653b109b5",
+                "userId": "533aeacd5e986b0712f00c26"
+            },
+            {
+                "_id": "53bc99cf9ac007d970ff0095",
+                "userId": "53bad0d3107e137846ba5cfd"
+            },
+            {
+                "_id": "53bca4f668c481a11634dcd0",
+                "userId": "53bca4f6107e137846ba603d"
+            },
+            {
+                "_id": "53bcaa11736141c546c910c1",
+                "userId": "53bcaa11107e137846ba6047"
+            },
+            {
+                "_id": "53bcd2db736141c546c916a7",
+                "userId": "53bcd2db107e137846ba6079"
+            },
+            {
+                "_id": "53bd8cc2f2f9781b1b4c624b",
+                "userId": "53bd8cc2107e137846ba6211"
+            },
+            {
+                "_id": "53bdaab7090cf5a71da8b37d",
+                "userId": "53bdaab6107e137846ba622e"
+            },
+            {
+                "_id": "53bdb9c2f2f9781b1b4c6bd6",
+                "userId": "53bca721107e137846ba6041"
+            },
+            {
+                "_id": "53bdd151090cf5a71da8ba44",
+                "userId": "53bdd0d1107e137846ba624d"
+            },
+            {
+                "_id": "53bdefb57c1acadd42d9606e",
+                "userId": "53bdefb5107e137846ba627e"
+            },
+            {
+                "_id": "53bef9db754757d8535845c2",
+                "userId": "53bef9db107e137846ba6416"
+            },
+            {
+                "_id": "53bf09cfdc133ed653e88b05",
+                "userId": "53bf09cf107e137846ba6433"
+            },
+            {
+                "_id": "53c4cdec19840bc2547d50bd",
+                "userId": "53bf89ba107e137846ba6502"
+            },
+            {
+                "_id": "53c5affec4f33b977a475ffe",
+                "userId": "53c5affe107e137846ba6c12"
+            },
+            {
+                "_id": "53c74677c4f33b977a47890a",
+                "userId": "53c74677107e137846ba6eaa"
+            },
+            {
+                "_id": "53c768b66372e13a0476247d",
+                "userId": "53bd7d53107e137846ba61ed"
+            },
+            {
+                "_id": "53cd561262d09a8825f490a1",
+                "lurk": false,
+                "userId": "5367c6a5048862e761fa069d"
+            },
+            {
+                "_id": "53dd6e8f43419b5d1a6c469d",
+                "userId": "53b6fe86107e137846ba58d5"
+            },
+            {
+                "_id": "53ed545619aed5991a7a9670",
+                "userId": "53e26a46107e137846ba9959"
+            },
+            {
+                "_id": "54059bc2e84e4800675a5fe9",
+                "userId": "53c4a7bf107e137846ba6a21"
+            }
+        ],
+        "tags": [
+            "javascript",
+            "code",
+            "repository",
+            "foundation",
+            "night"
+        ]
+    },
+    {
         "_id": "537a26b2048862e761fa1eea",
         "__v": 138,
         "_nonce": 2721,
@@ -4298,10 +5502,515 @@
         ]
     },
     {
+        "_id": "53a01026a9176b500d1ce417",
+        "__v": 35,
+        "_nonce": 72031,
+        "_tv": 39,
+        "dateLastSecurityCheck": "2014-06-17T09:53:42.623Z",
+        "githubType": "REPO",
+        "lcUri": "jcubic/jquery.terminal",
+        "security": "PUBLIC",
+        "topic": "JQuery Terminal Emulator",
+        "uri": "jcubic/jquery.terminal",
+        "users": [
+            {
+                "_id": "53a01026b5140fef47c8c644",
+                "userId": "529c6e2fed5ab0b3bf04ddc8"
+            },
+            {
+                "_id": "53d298e642fcf02f38ff6110",
+                "userId": "53d298e6107e137846ba7ed6"
+            },
+            {
+                "_id": "53d2bb658bf108681a2a78c9",
+                "userId": "53d2bb65107e137846ba7f00"
+            },
+            {
+                "_id": "53d2bc02e3142f9641edb239",
+                "lurk": true,
+                "userId": "53d2bc02107e137846ba7f07"
+            },
+            {
+                "_id": "53d2c0ea817cbd691ad40751",
+                "userId": "53d2c0e9107e137846ba7f17"
+            },
+            {
+                "_id": "53d2c0f7e388c46213de6ff2",
+                "userId": "53d2c0f6107e137846ba7f1c"
+            },
+            {
+                "_id": "53d2c178e388c46213de7011",
+                "userId": "53d2c178107e137846ba7f25"
+            },
+            {
+                "_id": "53d2c23e42fcf02f38ff6aa6",
+                "lurk": false,
+                "userId": "53d2c224107e137846ba7f29"
+            },
+            {
+                "_id": "53d2c251e388c46213de704a",
+                "userId": "53d2c251107e137846ba7f2e"
+            },
+            {
+                "_id": "53d2c3b1817cbd691ad407eb",
+                "userId": "53d2c3b0107e137846ba7f36"
+            },
+            {
+                "_id": "53d2c54c8bf108681a2a7a0c",
+                "userId": "53d2c54c107e137846ba7f43"
+            },
+            {
+                "_id": "53d2c66de3142f9641edb377",
+                "lurk": true,
+                "userId": "53d2c66c107e137846ba7f4b"
+            },
+            {
+                "_id": "53d2c6eae3142f9641edb387",
+                "userId": "53d2c6ea107e137846ba7f52"
+            },
+            {
+                "_id": "53d2d565e3142f9641edb52d",
+                "userId": "53d2d565107e137846ba7f82"
+            },
+            {
+                "_id": "53d2f119e388c46213de77e4",
+                "userId": "53d2f119107e137846ba7fa1"
+            },
+            {
+                "_id": "53d30c4aa8b4347e7f05a0d0",
+                "userId": "53d30c4a107e137846ba7fcc"
+            },
+            {
+                "_id": "53d390bca8b4347e7f05ad9d",
+                "userId": "5301313d5e986b0712ef780c"
+            },
+            {
+                "_id": "53d50fcbe3142f9641edf099",
+                "userId": "53d50fcb107e137846ba81ec"
+            },
+            {
+                "_id": "53d5387b8bf108681a2abb4f",
+                "userId": "53d5387b107e137846ba8235"
+            },
+            {
+                "_id": "53d5b282e388c46213ded323",
+                "userId": "53d5b282107e137846ba8287"
+            },
+            {
+                "_id": "53d6acd9b9341e4507ec4086",
+                "userId": "529c6a22ed5ab0b3bf04d284"
+            },
+            {
+                "_id": "53d7b9d9f7a17491152f8478",
+                "userId": "53d7b9d8107e137846ba85dc"
+            },
+            {
+                "_id": "53d9b86e17a842ff19a939e6",
+                "userId": "53d9b86e107e137846ba8947"
+            },
+            {
+                "_id": "53da997dcc4a65df5de9e8c1",
+                "userId": "53da997d107e137846ba8b2b"
+            },
+            {
+                "_id": "53e03c8934fbc5780e2d33c9",
+                "userId": "53e03c89107e137846ba93a8"
+            },
+            {
+                "_id": "53e08aeff34f35ce5a17093a",
+                "userId": "52c12e7ced5ab0b3bf052539"
+            },
+            {
+                "_id": "53e4c34a5dadfca92edaaac3",
+                "userId": "53e4c34a107e137846ba9e08"
+            },
+            {
+                "_id": "540e02de581cf52b78da2881",
+                "userId": "53fe086c163965c9bc200cde"
+            }
+        ],
+        "tags": [
+            "javascript",
+            "jquery",
+            "terminal",
+            "emulator"
+        ]
+    },
+    {
+        "_id": "530cab4b5e986b0712efb3a7",
+        "__v": 48,
+        "_nonce": 15656,
+        "_tv": 58,
+        "dateLastSecurityCheck": "2014-04-09T14:21:50.809Z",
+        "githubType": "REPO",
+        "lcUri": "dbashford/mimosa",
+        "security": "PUBLIC",
+        "topic": "A lighting-fast, modular, next generation browser development tool.",
+        "uri": "dbashford/mimosa",
+        "users": [
+            {
+                "_id": "530cabe8059d24c263000b91",
+                "userId": "530cabb35e986b0712efb3ac"
+            },
+            {
+                "_id": "530cb5427a68c1b16300629e",
+                "userId": "530cb5425e986b0712efb3f4"
+            },
+            {
+                "_id": "530cb7b38b33264834003420",
+                "lurk": false,
+                "userId": "530cb7b35e986b0712efb409"
+            },
+            {
+                "_id": "530cbd71059d24c263000c0f",
+                "userId": "530cbd715e986b0712efb457"
+            },
+            {
+                "_id": "530cd35f9df7839369000039",
+                "userId": "530cab365e986b0712efb3a5"
+            },
+            {
+                "_id": "530ce8e1fe14481f760002d8",
+                "userId": "530ce8c55e986b0712efb51a"
+            },
+            {
+                "_id": "530cf426f0b35e9569000425",
+                "userId": "530cf4265e986b0712efb538"
+            },
+            {
+                "_id": "530e9d4780be3fa60e000229",
+                "userId": "530e9d465e986b0712efbd69"
+            },
+            {
+                "_id": "530fff8c4908b68041000374",
+                "userId": "530fff8c5e986b0712efc074"
+            },
+            {
+                "_id": "53104cbe4a2534f4350014af",
+                "userId": "53104cbe5e986b0712efc0c8"
+            },
+            {
+                "_id": "531249788b8ba6f335000d7d",
+                "userId": "531249775e986b0712efc34a"
+            },
+            {
+                "_id": "531420134a2534f4350054d0",
+                "userId": "531420135e986b0712efc513"
+            },
+            {
+                "_id": "531e96d1a0b143921c001ab8",
+                "userId": "531e96d15e986b0712efdcbf"
+            },
+            {
+                "_id": "5328a99b266753fb5f000802",
+                "userId": "530ad95e5e986b0712efa798"
+            },
+            {
+                "_id": "53294c876bf03584550003a1",
+                "userId": "53294c875e986b0712efef90"
+            },
+            {
+                "_id": "532ccb51750d6ecd2a0013b7",
+                "userId": "532ccb515e986b0712eff6c7"
+            },
+            {
+                "_id": "533521cae374cadc4e0013da",
+                "userId": "533521c95e986b0712f0050e"
+            },
+            {
+                "_id": "5337b9c84ed93a0e7a000a26",
+                "lurk": false,
+                "userId": "530cb3865e986b0712efb3eb"
+            },
+            {
+                "_id": "533940ad4ed93a0e7a0010b5",
+                "userId": "533940ad5e986b0712f008ef"
+            },
+            {
+                "_id": "534156a3add196560a00306b",
+                "userId": "529c6af4ed5ab0b3bf04d4cc"
+            },
+            {
+                "_id": "5362535c723f92204a09fc02",
+                "lurk": false,
+                "userId": "5362535c048862e761fa028e"
+            },
+            {
+                "_id": "536927b392fad21024cf81be",
+                "userId": "536927b3048862e761fa0862"
+            },
+            {
+                "_id": "536950398a4de90f243ab8a4",
+                "userId": "53695039048862e761fa08bd"
+            },
+            {
+                "_id": "5384b8cc8bc544f908b6d0e0",
+                "userId": "5384b8cc048862e761fa2b5c"
+            },
+            {
+                "_id": "53a2013568f2f27561593a07",
+                "userId": "53874986048862e761fa30b2"
+            },
+            {
+                "_id": "53c66839c4f33b977a4771b1",
+                "userId": "53c66838107e137846ba6cef"
+            },
+            {
+                "_id": "53e0d24a34fbc5780e2d4211",
+                "userId": "53be893a107e137846ba6367"
+            },
+            {
+                "_id": "53e0ecec6362d8c742a24c04",
+                "userId": "53e0ecec107e137846ba9570"
+            },
+            {
+                "_id": "53e22bcc6362d8c742a297b7",
+                "userId": "53e22bcc107e137846ba98c0"
+            },
+            {
+                "_id": "53e85591997dd8537dba8a6c",
+                "userId": "53bc366b107e137846ba5fc2"
+            },
+            {
+                "_id": "53f139a819aed5991a7aecf4",
+                "userId": "53e7536c107e137846baa0c5",
+                "lurk": true
+            },
+            {
+                "_id": "53f58367a95ba6df7eefeee7",
+                "userId": "53f58366163965c9bc1ff38c"
+            },
+            {
+                "_id": "5405101bbf683cf71c321628",
+                "userId": "5405101b163965c9bc201bba"
+            },
+            {
+                "_id": "54063f145280cd68242ab43f",
+                "userId": "54063f14163965c9bc201f69"
+            },
+            {
+                "_id": "5406b591d30dfe3a380013bc",
+                "userId": "53fc9a82163965c9bc20088f"
+            }
+        ],
+        "tags": [
+            "javascript",
+            "lightning-fast",
+            "modular",
+            "generation",
+            "browser",
+            "development"
+        ]
+    },
+    {
+        "_id": "537b3f00048862e761fa20b5",
+        "__v": 60,
+        "_nonce": 22452,
+        "_tv": 93,
+        "dateLastSecurityCheck": "2014-05-20T11:39:44.927Z",
+        "githubType": "REPO",
+        "lcUri": "totaljs/framework",
+        "security": "PUBLIC",
+        "topic": "Free web application framework for building Web sites and Web applications using JavaScript, HTML and CSS. Node.js (MVC) web application framework.",
+        "uri": "totaljs/framework",
+        "users": [
+            {
+                "_id": "537b3f0006ff26e31fb1f402",
+                "lurk": false,
+                "userId": "52f4e3765e986b0712ef66d5"
+            },
+            {
+                "_id": "537b447a2b35f8b8505552ff",
+                "lurk": true,
+                "userId": "537b4479048862e761fa20c6"
+            },
+            {
+                "_id": "537b694a4bbcc2e41f9cd4ab",
+                "userId": "537b688d048862e761fa2136"
+            },
+            {
+                "_id": "537cbd8e7cd9fc1a3438d83a",
+                "lurk": true,
+                "userId": "534fe7cd5e986b0712f0389b"
+            },
+            {
+                "_id": "537e20451c99a8fc160050e9",
+                "userId": "537e2044048862e761fa2556"
+            },
+            {
+                "_id": "537ef238872adf2043718b1f",
+                "userId": "537ef238048862e761fa2664"
+            },
+            {
+                "_id": "5381b8991b76b3986dac0b00",
+                "lurk": true,
+                "userId": "52cf0eb6ed5ab0b3bf053954"
+            },
+            {
+                "_id": "5381b8e61b76b3986dac0b02",
+                "userId": "5381b8e6048862e761fa28fb"
+            },
+            {
+                "_id": "53859b9c8bc544f908b6f06f",
+                "userId": "53859b9c048862e761fa2ca0"
+            },
+            {
+                "_id": "538b991f68d5417b4fbabc12",
+                "userId": "538b991e048862e761fa34c2"
+            },
+            {
+                "_id": "538ea9f7035daa316de47d52",
+                "userId": "529c6c59ed5ab0b3bf04d8b5"
+            },
+            {
+                "_id": "5393da2885511d7d120656fc",
+                "userId": "5393da28048862e761fa4a94"
+            },
+            {
+                "_id": "5394b8a79f7852fb38f57637",
+                "lurk": true,
+                "userId": "5394b8a6048862e761fa4b08"
+            },
+            {
+                "_id": "5395ec91105e1ce444d0ec5e",
+                "userId": "5395ec91a9176b500d1cd7ef"
+            },
+            {
+                "_id": "5399cc628ffa39a52fbef86c",
+                "userId": "5399cc61a9176b500d1cdcf0"
+            },
+            {
+                "_id": "539a01e87474a51d3002cb63",
+                "lurk": true,
+                "userId": "539a01e8a9176b500d1cdd53"
+            },
+            {
+                "_id": "539b25e2753302a42f1a2662",
+                "userId": "539b25e2a9176b500d1cdec5"
+            },
+            {
+                "_id": "539bcc1acac2719123d2104a",
+                "userId": "539bcc1aa9176b500d1cdf95"
+            },
+            {
+                "_id": "539c845ab5140fef47c8a361",
+                "userId": "539c845aa9176b500d1ce01c"
+            },
+            {
+                "_id": "53a33c0df4920d7661798f01",
+                "userId": "53a33c0da9176b500d1cea75"
+            },
+            {
+                "_id": "53a612168efc164113cb0f90",
+                "userId": "53a61216a9176b500d1ced4e"
+            },
+            {
+                "_id": "53b7459322f9ec5a3d286e34",
+                "lurk": false,
+                "userId": "53b74592107e137846ba590a"
+            },
+            {
+                "_id": "53bdf2b5f2f9781b1b4c7564",
+                "userId": "53bdf2b5107e137846ba6286"
+            },
+            {
+                "_id": "53c14c8bb3cff4c504a35408",
+                "userId": "53c14c8b107e137846ba66e5"
+            },
+            {
+                "_id": "53c299661b20a2fb26889fd7",
+                "userId": "53c29966107e137846ba67b1"
+            },
+            {
+                "_id": "53c7ef7e6372e13a04763166",
+                "lurk": false,
+                "userId": "53c7ef7e107e137846ba6fa6"
+            },
+            {
+                "_id": "53c87382b20cddcc7cbf78c1",
+                "userId": "53c87381107e137846ba703c"
+            },
+            {
+                "_id": "53caa30e2a7248a45a8faa06",
+                "userId": "53caa30d107e137846ba730e"
+            },
+            {
+                "_id": "53d7ab8493f725b04aea3af0",
+                "lurk": true,
+                "userId": "53cd2374107e137846ba750c"
+            },
+            {
+                "_id": "53df987df2a6fccd5a29f49a",
+                "userId": "53df987d107e137846ba9181"
+            },
+            {
+                "_id": "53e02f41f2a6fccd5a2a04a3",
+                "userId": "530c43355e986b0712efb121"
+            },
+            {
+                "_id": "53e09c4946ebfbbc5306d4a7",
+                "userId": "53e09c49107e137846ba948a"
+            },
+            {
+                "_id": "53e14c8734fbc5780e2d5071",
+                "userId": "529c6e24ed5ab0b3bf04ddaa"
+            },
+            {
+                "_id": "53e7bb2d5dadfca92edaea1d",
+                "userId": "53e7bade107e137846baa136",
+                "lurk": true
+            },
+            {
+                "_id": "53e8f3a9203979c368efa80a",
+                "userId": "53a2596ea9176b500d1ce8d8"
+            },
+            {
+                "_id": "53f0137cd4f19b5c0219b0ec",
+                "userId": "53f0137c107e137846baaf3d"
+            },
+            {
+                "_id": "53f1e511d1462d9a1aa64938",
+                "userId": "53f1e511107e137846bab1b5"
+            },
+            {
+                "_id": "53f34dd19766ebd97e1c6e03",
+                "userId": "53f34dd1107e137846bab55a"
+            },
+            {
+                "_id": "53f3b1c89766ebd97e1c9365",
+                "userId": "53f3b1c8163965c9bc1fef51"
+            },
+            {
+                "_id": "53f63c6f9766ebd97e1d3cf0",
+                "userId": "53f36e6c163965c9bc1feea2"
+            },
+            {
+                "_id": "5400da9399d4cf8171142ce9",
+                "userId": "5400d270163965c9bc201549"
+            },
+            {
+                "_id": "5400dab499d4cf8171142cef",
+                "userId": "5400dab4163965c9bc20156c"
+            },
+            {
+                "_id": "54113cfbdc77eb4157f99748",
+                "userId": "54113cfb163965c9bc203ea5"
+            }
+        ],
+        "tags": [
+            "javascript",
+            "free",
+            "web",
+            "application",
+            "framework",
+            "building"
+        ]
+    },
+    {
         "_id": "529f74f4ed5ab0b3bf04ef26",
-        "__v": 379,
+        "__v": 380,
         "_nonce": 58854,
-        "_tv": 594,
+        "_tv": 595,
         "dateLastSecurityCheck": "2014-04-09T17:07:37.819Z",
         "githubType": "REPO",
         "lcUri": "webpack/webpack",
@@ -5414,6 +7123,10 @@
             {
                 "_id": "5412c9e2c0e34158028731e1",
                 "userId": "537b16eb048862e761fa2091"
+            },
+            {
+                "_id": "5412e095d4ef5f5702a0c5ee",
+                "userId": "53b3d8c9107e137846ba53d6"
             }
         ],
         "tags": [
@@ -6655,10 +8368,218 @@
         ]
     },
     {
+        "_id": "52fcc0ca5e986b0712ef714f",
+        "__v": 55,
+        "_nonce": 49141,
+        "_tv": 68,
+        "dateLastSecurityCheck": "2014-04-10T15:15:10.345Z",
+        "githubType": "REPO",
+        "lcUri": "joyent/node",
+        "security": "PUBLIC",
+        "topic": "evented I/O for v8 javascript",
+        "uri": "joyent/node",
+        "users": [
+            {
+                "_id": "52fcc0ca071bae352406ce49",
+                "userId": "52fcc05c5e986b0712ef714a"
+            },
+            {
+                "_id": "5303bf08ba7004692a0008e3",
+                "userId": "5303b6045e986b0712ef7d55"
+            },
+            {
+                "_id": "530621823b5920f571000053",
+                "userId": "529c6cb9ed5ab0b3bf04d9c0"
+            },
+            {
+                "_id": "530621f89844f35d3d000059",
+                "userId": "530621e75e986b0712ef880e"
+            },
+            {
+                "_id": "53069b173c64fafd3a0007c3",
+                "userId": "529c6c4bed5ab0b3bf04d88d"
+            },
+            {
+                "_id": "530cb17a8b33264834003361",
+                "userId": "530cb1555e986b0712efb3e1"
+            },
+            {
+                "_id": "530dcfd14196b01e760004c8",
+                "userId": "530dcfad5e986b0712efb9d9"
+            },
+            {
+                "_id": "5316171d6d17e9282d0001aa",
+                "userId": "531617095e986b0712efc876"
+            },
+            {
+                "_id": "531674607792580b0e000893",
+                "userId": "529c6e8fed5ab0b3bf04ded2"
+            },
+            {
+                "_id": "532f37b67aa882d5530036ee",
+                "lurk": true,
+                "userId": "532f262d5e986b0712eff818"
+            },
+            {
+                "_id": "5333049f0fd5023d6f0006ad",
+                "userId": "529c6ea5ed5ab0b3bf04df11"
+            },
+            {
+                "_id": "53341e8efcc34e783a0001eb",
+                "userId": "53341e855e986b0712f00270"
+            },
+            {
+                "_id": "5334fe121906b120060010fc",
+                "userId": "5334f92f5e986b0712f004ca"
+            },
+            {
+                "_id": "5339376221cb2c081500102c",
+                "userId": "533923795e986b0712f008c6"
+            },
+            {
+                "_id": "53397a6cf7db77eb4b0000cc",
+                "lurk": true,
+                "userId": "533968f05e986b0712f0097b"
+            },
+            {
+                "_id": "533ad958f7db77eb4b000ba4",
+                "userId": "53341d6f5e986b0712f0026c"
+            },
+            {
+                "_id": "5342ef0837d05864700001d8",
+                "userId": "530e9d465e986b0712efbd69"
+            },
+            {
+                "_id": "5344ebae3bceade839000561",
+                "lurk": true,
+                "userId": "533285dd5e986b0712effed4"
+            },
+            {
+                "_id": "534daeda74d5ac654500030e",
+                "lurk": true,
+                "userId": "5342ba3e5e986b0712f01734"
+            },
+            {
+                "_id": "534eb035f8527dd00300028e",
+                "userId": "534da3735e986b0712f0359b"
+            },
+            {
+                "_id": "537d9e5156336eb82b38338f",
+                "userId": "537d9e39048862e761fa24e2"
+            },
+            {
+                "_id": "53876d22b3f33ddc03563bcf",
+                "userId": "538766e1048862e761fa30f6"
+            },
+            {
+                "_id": "53a1dbe1250ae08a7886881f",
+                "userId": "53a1dbc3a9176b500d1ce814"
+            },
+            {
+                "_id": "53dff23f46ebfbbc5306c52a",
+                "userId": "53dbb2b3107e137846ba8d4d"
+            },
+            {
+                "_id": "53e142930f93816e422f1350",
+                "userId": "5377afb0048862e761fa1bf4"
+            },
+            {
+                "_id": "53e3ae0d997dd8537db9db83",
+                "userId": "5367c684048862e761fa0697"
+            },
+            {
+                "_id": "53e4c4fc997dd8537dba1687",
+                "userId": "529c6a41ed5ab0b3bf04d2dc"
+            },
+            {
+                "_id": "53e894f64b0196527d550357",
+                "userId": "5305cf755e986b0712ef7f24"
+            },
+            {
+                "_id": "53e8bb498173a95a35560b37",
+                "userId": "529c6b21ed5ab0b3bf04d54c"
+            },
+            {
+                "_id": "53ed0dd219aed5991a7a8f4a",
+                "userId": "529c6b75ed5ab0b3bf04d635"
+            },
+            {
+                "_id": "53eda56bd1462d9a1aa5ae2f",
+                "userId": "53eda1d5107e137846baabf1"
+            },
+            {
+                "_id": "53f2065619aed5991a7b00ce",
+                "userId": "53f20651107e137846bab23c"
+            },
+            {
+                "_id": "53f2cd9179bef15c6ff64591",
+                "userId": "53ea68e9107e137846baa6a9"
+            },
+            {
+                "_id": "53f4355cb67e210324c305f5",
+                "userId": "53f3f7ad163965c9bc1feffe"
+            },
+            {
+                "_id": "53f48c2917a6882726fb460b",
+                "userId": "53770ea3048862e761fa1af6"
+            },
+            {
+                "_id": "53f491cc511afe0824db5d31",
+                "userId": "53f32d4b107e137846bab4d7"
+            },
+            {
+                "_id": "53f61bedb67e210324c387d3",
+                "userId": "529c6f31ed5ab0b3bf04e092"
+            },
+            {
+                "_id": "53f6aafe55ae96f67c05b428",
+                "userId": "53f6aaea163965c9bc1ffb7c"
+            },
+            {
+                "_id": "53f7c1df55ae96f67c05fd1d",
+                "userId": "52f868075e986b0712ef6a71",
+                "lurk": true
+            },
+            {
+                "_id": "53f7e73655ae96f67c06026f",
+                "userId": "53f7e721163965c9bc1fff31"
+            },
+            {
+                "_id": "53f8fc9a511afe0824dbdbe9",
+                "userId": "5398e6bea9176b500d1cdbba"
+            },
+            {
+                "_id": "540762de2af47072164b0646",
+                "userId": "5407605c163965c9bc202407"
+            },
+            {
+                "_id": "5407716ee334931839c0326e",
+                "userId": "54076e2c163965c9bc20244d"
+            },
+            {
+                "_id": "540f44cac48bc8027c6ccd5c",
+                "userId": "540f44ba163965c9bc2038e4"
+            },
+            {
+                "_id": "540fe8d5954399037c445367",
+                "userId": "540fe47b163965c9bc203a76"
+            },
+            {
+                "_id": "54120abee5ec09cf4d269d0d",
+                "userId": "54120a29163965c9bc2040b9"
+            }
+        ],
+        "tags": [
+            "javascript",
+            "evented",
+            "v8"
+        ]
+    },
+    {
         "_id": "530e2a135e986b0712efbc5a",
-        "__v": 137,
+        "__v": 138,
         "_nonce": 10698,
-        "_tv": 183,
+        "_tv": 184,
         "dateLastSecurityCheck": "2014-04-09T15:03:08.603Z",
         "githubType": "REPO",
         "lcUri": "angular/angular.js",
@@ -7089,6 +9010,10 @@
             {
                 "_id": "54116d98dc77eb4157f99bd4",
                 "userId": "54116d84163965c9bc203f1d"
+            },
+            {
+                "_id": "5412e12089ad263942b54aa5",
+                "userId": "536a279c048862e761fa097b"
             }
         ],
         "tags": [
@@ -7809,6 +9734,205 @@
             "code",
             "editor",
             "web"
+        ]
+    },
+    {
+        "_id": "53f62176163965c9bc1ff890",
+        "githubType": "REPO",
+        "lcUri": "derbyjs/derby",
+        "uri": "derbyjs/derby",
+        "_nonce": 28983,
+        "topic": "MVC framework making it easy to write realtime, collaborative applications that run in both Node.js and browsers",
+        "security": "PUBLIC",
+        "dateLastSecurityCheck": "2014-08-21T16:42:30.719Z",
+        "users": [
+            {
+                "_id": "53f62176b060082c2624a58d",
+                "userId": "53f61c3c163965c9bc1ff84e"
+            },
+            {
+                "_id": "53f6218e511afe0824db8d17",
+                "userId": "53f60ce7163965c9bc1ff598"
+            },
+            {
+                "_id": "53f6219b511afe0824db8d19",
+                "userId": "53f60cd4163965c9bc1ff58e"
+            },
+            {
+                "_id": "53f621a0511afe0824db8d1a",
+                "userId": "53f615cc163965c9bc1ff7aa",
+                "lurk": false
+            },
+            {
+                "_id": "53f621a7b060082c2624a597",
+                "userId": "52bf8ce3ed5ab0b3bf052458"
+            },
+            {
+                "_id": "53f621a8511afe0824db8d1c",
+                "userId": "53f61e04163965c9bc1ff86e"
+            },
+            {
+                "_id": "53f6291f511afe0824db8e4b",
+                "userId": "53f61c05163965c9bc1ff849"
+            },
+            {
+                "_id": "53f63401b67e210324c3912b",
+                "userId": "53f633da163965c9bc1ff984"
+            },
+            {
+                "_id": "53f63f86b060082c2624a9fb",
+                "userId": "537b4479048862e761fa20c6",
+                "lurk": true
+            },
+            {
+                "_id": "53f64b3eb67e210324c39855",
+                "userId": "53f64b2c163965c9bc1ffa3a"
+            },
+            {
+                "_id": "53f663139766ebd97e1d4a91",
+                "userId": "53f61551163965c9bc1ff788"
+            },
+            {
+                "_id": "53f680449766ebd97e1d52b6",
+                "userId": "53f68044163965c9bc1ffaec"
+            },
+            {
+                "_id": "53f6bfa9b060082c2624baa2",
+                "userId": "53f60ce6163965c9bc1ff596",
+                "lurk": true
+            },
+            {
+                "_id": "53f6c18255ae96f67c05b882",
+                "userId": "53f6c181163965c9bc1ffbb0"
+            },
+            {
+                "_id": "53f6ca2fb060082c2624bc16",
+                "userId": "53f6ca2f163965c9bc1ffbcc"
+            },
+            {
+                "_id": "53f6f40955ae96f67c05c2a8",
+                "userId": "53f6f409163965c9bc1ffc3d"
+            },
+            {
+                "_id": "53f6f4e1a95ba6df7ef01d38",
+                "userId": "53f6f4e0163965c9bc1ffc41"
+            },
+            {
+                "_id": "53f6fd9bb67e210324c3c32c",
+                "userId": "53f6fd9b163965c9bc1ffc87"
+            },
+            {
+                "_id": "53f76d8ba95ba6df7ef02c7c",
+                "userId": "53f76d8b163965c9bc1ffdd7"
+            },
+            {
+                "_id": "53f7c33d511afe0824dbc20f",
+                "userId": "52c00775ed5ab0b3bf0524ae"
+            },
+            {
+                "_id": "53f7e722511afe0824dbc551",
+                "userId": "53f7e722163965c9bc1fff33",
+                "lurk": true
+            },
+            {
+                "_id": "53f985c755ae96f67c06399f",
+                "userId": "53f985c6163965c9bc200118"
+            },
+            {
+                "_id": "53f9ea36b67e210324c44e7b",
+                "userId": "53f9ea01163965c9bc200192",
+                "lurk": true
+            },
+            {
+                "_id": "53fb2eb855ae96f67c06a22c",
+                "userId": "52f637405e986b0712ef6968"
+            },
+            {
+                "_id": "53fb7acbb67e210324c4b70a",
+                "userId": "53fb7acb163965c9bc20044e"
+            },
+            {
+                "_id": "53fb9369511afe0824dc4c34",
+                "userId": "53fb935b163965c9bc200489"
+            },
+            {
+                "_id": "53fbecdd55ae96f67c06d67d",
+                "userId": "53fbecdd163965c9bc2005cb"
+            },
+            {
+                "_id": "53fc78a0511afe0824dc6538",
+                "userId": "53fc77dd163965c9bc2007d5"
+            },
+            {
+                "_id": "53fd95405cd78d3d69c42146",
+                "userId": "529c6e1aed5ab0b3bf04dd8d"
+            },
+            {
+                "_id": "53ff37615cd78d3d69c44dbe",
+                "userId": "532d79db5e986b0712eff728",
+                "lurk": false
+            },
+            {
+                "_id": "540089543bc4be0f6f2ab3a0",
+                "userId": "53ff2bf4163965c9bc200fc3"
+            },
+            {
+                "_id": "5404402e4bf867767ce2716d",
+                "userId": "52a4aad0ed5ab0b3bf04fac2",
+                "lurk": true
+            },
+            {
+                "_id": "54067346d9026e6d57b1ba2b",
+                "userId": "54067331163965c9bc201fa0",
+                "lurk": false
+            },
+            {
+                "_id": "5406d50fd9026e6d57b1cd87",
+                "userId": "5406d4cd163965c9bc20204b"
+            },
+            {
+                "_id": "5406e9dc5280cd68242ac4cc",
+                "userId": "5406e9dc163965c9bc202091"
+            },
+            {
+                "_id": "540ab5b2581cf52b78d9ddaa",
+                "userId": "540ab597163965c9bc203065"
+            },
+            {
+                "_id": "540b4621ccac5085486c4557",
+                "userId": "53f32d4b107e137846bab4d7",
+                "lurk": true
+            },
+            {
+                "_id": "540f1e39ea576142573ed671",
+                "userId": "540f1e25163965c9bc203884"
+            },
+            {
+                "_id": "540f8f7fdc77eb4157f96d37",
+                "userId": "540f8f50163965c9bc2039ef"
+            },
+            {
+                "_id": "5411c3e2dc77eb4157f9a4f3",
+                "userId": "5411c3e0163965c9bc203ff3"
+            },
+            {
+                "_id": "54120a29d14802b25c0586c3",
+                "userId": "54120a29163965c9bc2040b9"
+            },
+            {
+                "_id": "5412ac18c0e34158028729bb",
+                "userId": "5412ac18163965c9bc2041b8"
+            }
+        ],
+        "_tv": 59,
+        "__v": 45,
+        "tags": [
+            "javascript",
+            "mvc",
+            "framework",
+            "making",
+            "easy",
+            "write"
         ]
     }
 ]

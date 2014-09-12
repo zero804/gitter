@@ -4,7 +4,7 @@
 var Q = require('Q');
 var persistence = require('../../server/services/persistence-service');
 var GitHubService = require('../../server/services/github/github-repo-service');
-var github = new GitHubService();
+var fs = require('fs');
 
 var autoTagger = require('../../server/utils/room-tagger');
 
@@ -15,31 +15,57 @@ var findRooms = function (limit) {
 
   return persistence.Troupe
     .find({
+      $where: 'this.users.length > 25',
       security: 'PUBLIC',
       githubType: 'REPO'
     })
+    .lean()
     .limit(limit)
     .execQ();
 };
 
 // run
-findRooms(50)
+findRooms(100)
   .then(function (rooms) {
-    console.log('rooms:', rooms.length);
     return Q.all(rooms.map(function (room) {
-      return Q.all([
-        room,
-        github.getRepo(room.lcUri)
-      ]);
+      return persistence.User
+        .findByIdQ(room.users[0].userId)
+        .then(function (user) {
+          console.log('user:', user);
+          var github = new GitHubService();
+
+          return Q.all([
+            room,
+            github.getRepo(room.lcUri)
+          ]);
+        });
     }));
   })
   .then(function (result) {
-    result.forEach(function (data) {
-      // data -> [room, repo]
-      var tags = autoTagger(data[0], data[1]);
-      console.log(data[0].lcUri, ':');
-      console.log('tags:', tags);
-      console.log('---------\n');
+    return Q.all(result.map(function (data) {
+        data[0].tags = autoTagger(data[0], data[1]);
+        return data[0];
+      })
+    );
+  })
+  .then(function (rooms) {
+    var criteria = 'php';
+    console.log('rooms.length:', rooms.length);
+    rooms = rooms.filter(function (room) {
+      return room.tags.indexOf(criteria) >= 0;
+      // console.log(room.uri, '====================');
+      // console.log('room.users.length:', room.users.length);
+      // console.log('room.tags:', room.tags);
+      // console.log('\n');
+    });
+    console.log('rooms.length:', rooms.length);
+
+    fs.writeFile('rooms_'+criteria+'.json', JSON.stringify(rooms, null, 4), function(err) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log('saved json');
+      }
     });
   })
   .catch(function (err) {
