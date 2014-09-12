@@ -1,0 +1,2561 @@
+[
+    {
+        "__v": 29,
+        "_id": "530b7e305e986b0712efacee",
+        "_nonce": 98466,
+        "_tv": 30,
+        "dateLastSecurityCheck": "2014-04-09T19:09:08.051Z",
+        "githubType": "REPO",
+        "lcUri": "flatiron-school-students/rake-todo-ruby-004",
+        "security": "PUBLIC",
+        "topic": "",
+        "uri": "flatiron-school-students/rake-todo-ruby-004",
+        "users": [
+            {
+                "_id": "530b7e30134937ca6349655f",
+                "userId": "530691615e986b0712ef97bd"
+            },
+            {
+                "_id": "530b7e5e722bbdb063000f6b",
+                "userId": "5307c5a55e986b0712efa335"
+            },
+            {
+                "_id": "530b7ea7059d24c263000530",
+                "userId": "530694ad5e986b0712ef97da"
+            },
+            {
+                "_id": "530b7ea7fdf67eca63001893",
+                "userId": "5306d7b05e986b0712ef9b1a"
+            },
+            {
+                "_id": "530b7ea9e4df3e473400055c",
+                "userId": "5306cb675e986b0712ef9a97"
+            },
+            {
+                "_id": "530b7eab722bbdb063000f6e",
+                "userId": "5306a7df5e986b0712ef9892"
+            },
+            {
+                "_id": "530b7eab7a68c1b1630046d8",
+                "userId": "5306d4e95e986b0712ef9af0"
+            },
+            {
+                "_id": "530b7eb9722bbdb063000f6f",
+                "userId": "530754be5e986b0712ef9e4a"
+            },
+            {
+                "_id": "530b7ebd7a68c1b1630046db",
+                "userId": "5306b2ee5e986b0712ef98fe"
+            },
+            {
+                "_id": "530b7ec5e4df3e473400055d",
+                "userId": "530613cf5e986b0712ef831e"
+            },
+            {
+                "_id": "530b83f9059d24c263000547",
+                "userId": "530757005e986b0712ef9e5a"
+            },
+            {
+                "_id": "530b932ee4df3e47340005ba",
+                "userId": "53077fcc5e986b0712ef9f2a"
+            },
+            {
+                "_id": "530b93fde4df3e47340005bf",
+                "userId": "530695fa5e986b0712ef97ed"
+            },
+            {
+                "_id": "530ba3ed8b33264834001c41",
+                "userId": "530695c35e986b0712ef97e4"
+            },
+            {
+                "_id": "530ba435059d24c263000602",
+                "userId": "53077ed15e986b0712ef9f18"
+            },
+            {
+                "_id": "530bb551e4df3e473400068c",
+                "userId": "5306c77c5e986b0712ef9a71"
+            },
+            {
+                "_id": "530bc316fdf67eca63001f2f",
+                "userId": "5307622b5e986b0712ef9e81"
+            },
+            {
+                "_id": "530bf4087a68c1b16300517a",
+                "userId": "53077f765e986b0712ef9f24"
+            },
+            {
+                "_id": "531771e095046bda3d00084c",
+                "userId": "53077f085e986b0712ef9f1b"
+            },
+            {
+                "_id": "53177821a53b890f7b000855",
+                "userId": "530b68185e986b0712efac8c"
+            },
+            {
+                "_id": "53177c75d0ce21107b0021fa",
+                "userId": "530691ad5e986b0712ef97c1"
+            },
+            {
+                "_id": "53205f3c6f23f1526d000802",
+                "userId": "5306e8cb5e986b0712ef9b92"
+            },
+            {
+                "_id": "5321dbc610191c9a190006be",
+                "userId": "5321db7f5e986b0712efe19e"
+            },
+            {
+                "_id": "533584bcd85b8d064e00023d",
+                "userId": "5330846a5e986b0712effa31"
+            },
+            {
+                "_id": "533c5124784c7ef140000173",
+                "userId": "533c50a95e986b0712f00e1e"
+            },
+            {
+                "_id": "5342f9bbe3b4a962370008ba",
+                "userId": "530f93a25e986b0712efbfd9"
+            },
+            {
+                "_id": "5344a5373bceade8390004de",
+                "userId": "52f09a915e986b0712ef4874"
+            },
+            {
+                "_id": "5347014e4cce1c3e68000286",
+                "userId": "533d6d775e986b0712f0100d"
+            },
+            {
+                "_id": "5354f488cb5c4c2c5d003a5a",
+                "userId": "5322b34b5e986b0712efe2cb"
+            },
+            {
+                "_id": "538e3c8c6176823955b4cdae",
+                "userId": "538e3c35048862e761fa4425"
+            }
+        ],
+        "tags": [
+            "ruby"
+        ]
+    },
+    {
+        "_id": "52efe5e75e986b0712ef46e9",
+        "__v": 41,
+        "_nonce": 18179,
+        "_tv": 42,
+        "dateLastSecurityCheck": "2014-04-18T12:38:29.265Z",
+        "githubType": "REPO",
+        "lcUri": "codegram/spinach",
+        "security": "PUBLIC",
+        "topic": "Spinach is a BDD framework on top of Gherkin.",
+        "uri": "codegram/spinach",
+        "users": [
+            {
+                "_id": "52efe5e7b7edf66745548719",
+                "userId": "52efe53e5e986b0712ef46e3"
+            },
+            {
+                "_id": "52efe87a8b396a674500016b",
+                "userId": "5298e788ed5ab0b3bf04c99f"
+            },
+            {
+                "_id": "52f1ff75409b1fee5d00060b",
+                "userId": "52f1ff755e986b0712ef5c89"
+            },
+            {
+                "_id": "52f481eb7fee0b7e2b0007bb",
+                "userId": "52f481ea5e986b0712ef6651"
+            },
+            {
+                "_id": "52f8bf066c468c834f002bbc",
+                "userId": "52f8bf065e986b0712ef6ae5"
+            },
+            {
+                "_id": "52fabc3115a24f4b3c0017d1",
+                "userId": "52fabc315e986b0712ef6d50"
+            },
+            {
+                "_id": "52fe2afec8dc04545f000100",
+                "userId": "52fe2afe5e986b0712ef73b9"
+            },
+            {
+                "_id": "52ffa0826276ed6d380012af",
+                "userId": "529c69c2ed5ab0b3bf04d176"
+            },
+            {
+                "_id": "52ffba9094ba754a6e001413",
+                "userId": "52ffba8f5e986b0712ef7751"
+            },
+            {
+                "_id": "530177ee6276ed6d38002a2d",
+                "userId": "530177ee5e986b0712ef7821"
+            },
+            {
+                "_id": "5307356ba5a52eef440008ca",
+                "userId": "5307356a5e986b0712ef9d8f"
+            },
+            {
+                "_id": "530add5e7a68c1b1630036cc",
+                "userId": "530add5d5e986b0712efa7a5"
+            },
+            {
+                "_id": "530df1ecfe14481f760018a3",
+                "userId": "530df1ec5e986b0712efba8d"
+            },
+            {
+                "_id": "5318af3b95046bda3d000fd0",
+                "userId": "5318af3b5e986b0712efd250"
+            },
+            {
+                "_id": "531a45e69e50bfa550003856",
+                "userId": "531a45e65e986b0712efd5dd"
+            },
+            {
+                "_id": "531f184fd016f2537900251b",
+                "userId": "531f184f5e986b0712efde00"
+            },
+            {
+                "_id": "53228cab85e91728510003c0",
+                "userId": "529c6bbfed5ab0b3bf04d703"
+            },
+            {
+                "_id": "5329a500d62127384d0000d3",
+                "userId": "5329a5005e986b0712eff008"
+            },
+            {
+                "_id": "53359fa64ed93a0e7a000091",
+                "userId": "53359fa65e986b0712f0065e"
+            },
+            {
+                "_id": "53394fb3fe04f9713e0010fb",
+                "userId": "53394fb35e986b0712f0091e"
+            },
+            {
+                "_id": "53511cc544308ce95200117d",
+                "userId": "53511cc45e986b0712f0399f"
+            },
+            {
+                "_id": "53520f0d41796f6d62006418",
+                "userId": "53520f0d5e986b0712f03a4b"
+            },
+            {
+                "_id": "53639225723f92204a0a339a",
+                "userId": "53639225048862e761fa03a6"
+            },
+            {
+                "_id": "5363977c91ab64b231879ac5",
+                "userId": "5363977c048862e761fa03b2"
+            },
+            {
+                "_id": "53986767bb684861572fdd51",
+                "userId": "53986767a9176b500d1cdb15"
+            },
+            {
+                "_id": "53ad72e41a0b13e94128fc25",
+                "userId": "5344252a5e986b0712f019bc"
+            },
+            {
+                "_id": "53b6e2bd3f43a1ae2829ccc6",
+                "userId": "53b6e2bd107e137846ba58c5"
+            },
+            {
+                "_id": "53b7272a124fdad62957bcd3",
+                "userId": "534fe6275e986b0712f03898"
+            },
+            {
+                "_id": "53fa567fa95ba6df7ef08dca",
+                "userId": "53fa567f163965c9bc200221"
+            },
+            {
+                "_id": "53fae8cb9766ebd97e1e34f5",
+                "userId": "53ef0336107e137846baade0"
+            },
+            {
+                "_id": "5400e8d3910d490c257076a2",
+                "userId": "54008c4c163965c9bc2012a3"
+            },
+            {
+                "_id": "541020a0ea576142573f1643",
+                "userId": "541020a0163965c9bc203b84"
+            }
+        ],
+        "tags": [
+            "ruby",
+            "spinach",
+            "bdd",
+            "framework",
+            "top",
+            "gherkin"
+        ]
+    },
+    {
+        "_id": "52fa87435e986b0712ef6cf1",
+        "__v": 52,
+        "_nonce": 80702,
+        "_tv": 60,
+        "dateLastSecurityCheck": "2014-04-09T18:47:20.092Z",
+        "githubType": "REPO",
+        "lcUri": "rebelidealist/stripe-ruby-mock",
+        "security": "PUBLIC",
+        "topic": "A mocking library for testing stripe ruby",
+        "uri": "rebelidealist/stripe-ruby-mock",
+        "users": [
+            {
+                "_id": "52fa8743d096656e76da3d2a",
+                "lurk": false,
+                "userId": "529c69c5ed5ab0b3bf04d17e"
+            },
+            {
+                "_id": "52fb4b0c63098eb31300022b",
+                "userId": "52fb4b0c5e986b0712ef6e28"
+            },
+            {
+                "_id": "52fc2ee9f81b534675000886",
+                "userId": "52fc2ee95e986b0712ef7054",
+                "lurk": true
+            },
+            {
+                "_id": "52fdec777143af9012000e5c",
+                "userId": "529c6f45ed5ab0b3bf04e0c9"
+            },
+            {
+                "_id": "530ba624722bbdb063001065",
+                "userId": "530ba6235e986b0712efad56"
+            },
+            {
+                "_id": "530fcb9e09b62b8141000aeb",
+                "userId": "529c6a31ed5ab0b3bf04d2ae"
+            },
+            {
+                "_id": "5313be898b8ba6f335001212",
+                "userId": "5313be895e986b0712efc4b9"
+            },
+            {
+                "_id": "5316c4acee1be3db3d000ed2",
+                "userId": "5316c4ac5e986b0712efc9e5"
+            },
+            {
+                "_id": "5316fa91a53b890f7b0004fc",
+                "userId": "5316fa905e986b0712efcc26"
+            },
+            {
+                "_id": "5317396cd0ce21107b001a3d",
+                "userId": "5317396c5e986b0712efcc96"
+            },
+            {
+                "_id": "531e5c72b5b163901c0005b0",
+                "userId": "531e5c725e986b0712efdc8b"
+            },
+            {
+                "_id": "53272a2d527c4c383e0001aa",
+                "lurk": true,
+                "userId": "53272a2d5e986b0712efecea"
+            },
+            {
+                "_id": "532c6928595551cc2a000253",
+                "userId": "529c6d34ed5ab0b3bf04db13"
+            },
+            {
+                "_id": "53305694c6b1828a05000138",
+                "userId": "533056945e986b0712eff9e6"
+            },
+            {
+                "_id": "533193bae41920754200226c",
+                "userId": "533193ba5e986b0712effd3e"
+            },
+            {
+                "_id": "5332eaf2fc77fb20260016ea",
+                "userId": "529c6a5ced5ab0b3bf04d325"
+            },
+            {
+                "_id": "533592a18a38950915000054",
+                "userId": "533592a05e986b0712f00647"
+            },
+            {
+                "_id": "5335db0afe04f9713e00028d",
+                "userId": "5335db0a5e986b0712f00698"
+            },
+            {
+                "_id": "5339962de17bcb9b5b00071c",
+                "userId": "5339962c5e986b0712f00a13"
+            },
+            {
+                "_id": "533b220ccb38b182440033ae",
+                "userId": "533b220c5e986b0712f00c9a"
+            },
+            {
+                "_id": "533f45a60716e2535c00128f",
+                "userId": "533f45a55e986b0712f0142c"
+            },
+            {
+                "_id": "534bfe9ef4d9bdab35006f4e",
+                "userId": "529c6b16ed5ab0b3bf04d52d"
+            },
+            {
+                "_id": "534c553f8d3925140200232e",
+                "userId": "534c553f5e986b0712f033e8"
+            },
+            {
+                "_id": "534df03c38eecf1261001199",
+                "userId": "534df03c5e986b0712f03608"
+            },
+            {
+                "_id": "5363e42c723f92204a0a4556",
+                "lurk": true,
+                "userId": "5363e42c048862e761fa0426"
+            },
+            {
+                "_id": "5373c4c688a372060ff2cba9",
+                "userId": "5373c4c6048862e761fa1563"
+            },
+            {
+                "_id": "5385ef6f7052f4f954ae1a72",
+                "userId": "5385ef6f048862e761fa2d31"
+            },
+            {
+                "_id": "538db0508d1425fe6b9d9fa9",
+                "userId": "538db04f048862e761fa42d9"
+            },
+            {
+                "_id": "5390850e6f74798c7c705b01",
+                "userId": "5390850e048862e761fa4764"
+            },
+            {
+                "_id": "539d9ff5f5f524f047374e16",
+                "userId": "529c6e8fed5ab0b3bf04ded1"
+            },
+            {
+                "_id": "539f8191b5140fef47c8c0b2",
+                "lurk": true,
+                "userId": "539f8191a9176b500d1ce35d"
+            },
+            {
+                "_id": "53a04d632ebd479c4496d8f9",
+                "userId": "537b9f08048862e761fa21bb"
+            },
+            {
+                "_id": "53b15edae67088a35d4d9381",
+                "userId": "53b15ed9107e137846ba4e26"
+            },
+            {
+                "_id": "53b52574cb5bd98a07654a56",
+                "userId": "53b52574107e137846ba5670"
+            },
+            {
+                "_id": "53b9d96922f9ec5a3d289e2f",
+                "userId": "53b9d968107e137846ba5b51"
+            },
+            {
+                "_id": "53bbf0ed68352f7653b0fb19",
+                "userId": "53bbf0ed107e137846ba5f17"
+            },
+            {
+                "_id": "53bdd771967763a81d8aecee",
+                "userId": "53bdd771107e137846ba625d"
+            },
+            {
+                "_id": "53c8e9218e82f86b263cf810",
+                "userId": "53c8e921107e137846ba70b9"
+            },
+            {
+                "_id": "53cd23f88ffe3de25c2477f6",
+                "userId": "52fb41b25e986b0712ef6dec"
+            },
+            {
+                "_id": "53dbb9fc43419b5d1a6c0b29",
+                "userId": "53dbb9fc107e137846ba8d5b"
+            },
+            {
+                "_id": "53e29ab734fbc5780e2d73eb",
+                "userId": "52fd04595e986b0712ef71db"
+            },
+            {
+                "_id": "53ebd91415473559351c9aba",
+                "userId": "53ebd914107e137846baa941"
+            },
+            {
+                "_id": "53efd319d4f19b5c0219aa78",
+                "userId": "53efd218107e137846baaf0f"
+            },
+            {
+                "_id": "53f2089cfa0350e74aa34098",
+                "userId": "53f2089c107e137846bab252"
+            },
+            {
+                "_id": "53f5cfee9766ebd97e1d1847",
+                "userId": "5346a2585e986b0712f02cf0"
+            },
+            {
+                "_id": "53fb34409766ebd97e1e4a92",
+                "userId": "53fb3440163965c9bc200395",
+                "lurk": true
+            },
+            {
+                "_id": "53fb84d8511afe0824dc4a60",
+                "userId": "53fb84d8163965c9bc200462"
+            },
+            {
+                "_id": "53fd0f5a81f0a80446de4d45",
+                "userId": "53fd0f59163965c9bc200a0b"
+            },
+            {
+                "_id": "540f75e0c48bc8027c6cd350",
+                "userId": "540f75e0163965c9bc2039c1"
+            }
+        ],
+        "tags": [
+            "ruby",
+            "mocking",
+            "library",
+            "testing",
+            "stripe"
+        ]
+    },
+    {
+        "_id": "5375dfac048862e761fa18e6",
+        "__v": 64,
+        "_nonce": 4568,
+        "_tv": 90,
+        "dateLastSecurityCheck": "2014-05-16T09:51:40.626Z",
+        "githubType": "REPO",
+        "lcUri": "refinery/refinerycms",
+        "security": "PUBLIC",
+        "topic": "An extendable Ruby on Rails CMS that supports Rails 3.2 and 4.0",
+        "uri": "refinery/refinerycms",
+        "users": [
+            {
+                "_id": "5375dfacaa0efdf04cd72c6e",
+                "lurk": false,
+                "userId": "5375dafd048862e761fa18db"
+            },
+            {
+                "_id": "5375dfbacc638f3750e666a0",
+                "lurk": false,
+                "userId": "5375df50048862e761fa18e2"
+            },
+            {
+                "_id": "5375e06cbabfe6ef4c12d273",
+                "lurk": false,
+                "userId": "5375e06c048862e761fa18eb"
+            },
+            {
+                "_id": "5375e205cc638f3750e666db",
+                "userId": "529c6cbded5ab0b3bf04d9ca"
+            },
+            {
+                "_id": "5375e757afaab292381da335",
+                "userId": "5375e757048862e761fa1910"
+            },
+            {
+                "_id": "5375ecaababfe6ef4c12d374",
+                "lurk": false,
+                "userId": "5375eca9048862e761fa191c"
+            },
+            {
+                "_id": "5375f78daa0efdf04cd731d8",
+                "userId": "5375f78d048862e761fa1932"
+            },
+            {
+                "_id": "537961833d1cd1456bae9d6c",
+                "lurk": false,
+                "userId": "52f3eba55e986b0712ef6428"
+            },
+            {
+                "_id": "538101e4b2dc973205058848",
+                "userId": "5379dd50048862e761fa1e45"
+            },
+            {
+                "_id": "538fe7546f74798c7c705505",
+                "userId": "538fe753048862e761fa4657"
+            },
+            {
+                "_id": "539034e5cf015b8d7c43d085",
+                "lurk": true,
+                "userId": "539034e5048862e761fa46c6"
+            },
+            {
+                "_id": "539da53b5ed9059023171c73",
+                "userId": "539da53ba9176b500d1ce0be",
+                "lurk": true
+            },
+            {
+                "_id": "539dcf9ab5140fef47c8ae1c",
+                "userId": "539dcf9aa9176b500d1ce0fb"
+            },
+            {
+                "_id": "53a261702a19f1bc31ff4f4f",
+                "userId": "53a0b473a9176b500d1ce532"
+            },
+            {
+                "_id": "53a2dc772a19f1bc31ff54d9",
+                "userId": "53a2dc76a9176b500d1ce96d"
+            },
+            {
+                "_id": "53a71c00f4920d76617a0584",
+                "userId": "53a71c00a9176b500d1cedd8"
+            },
+            {
+                "_id": "53a8c42c742e6cd47990748b",
+                "userId": "53a8c42ca9176b500d1cf0d3"
+            },
+            {
+                "_id": "53a994f2fbed1ce62c15f139",
+                "userId": "53a994a8a9176b500d1cf2e4"
+            },
+            {
+                "_id": "53ab315f49386a79414b0492",
+                "userId": "53a870a9a9176b500d1cf02b"
+            },
+            {
+                "_id": "53b1e92567abfb7e5ec31aff",
+                "userId": "53b1e924107e137846ba504e"
+            },
+            {
+                "_id": "53b2b2cb8f1d517a5b4fd222",
+                "userId": "53b2b2cb107e137846ba51b6"
+            },
+            {
+                "_id": "53b30f3e67abfb7e5ec35ac5",
+                "userId": "53b30f3e107e137846ba527e"
+            },
+            {
+                "_id": "53bace9f68352f7653b0deb5",
+                "userId": "53bace9e107e137846ba5cf8"
+            },
+            {
+                "_id": "53c96dc782f194a55ae635f7",
+                "userId": "53c96dc7107e137846ba71c6"
+            },
+            {
+                "_id": "53d1647fcce1439f60221e9d",
+                "lurk": false,
+                "userId": "53d1647f107e137846ba7d14"
+            },
+            {
+                "_id": "53d2f18de388c46213de77f9",
+                "userId": "53d2f18d107e137846ba7fa8"
+            },
+            {
+                "_id": "53d7a7ffc3c7636d4c8a0f8d",
+                "userId": "53bd1325107e137846ba6111"
+            },
+            {
+                "_id": "53d96a9217a842ff19a929f4",
+                "userId": "53d96a92107e137846ba8903"
+            },
+            {
+                "_id": "53da4fbd856867da6575a2ad",
+                "userId": "53da4fbc107e137846ba8a46"
+            },
+            {
+                "_id": "53da8c96217a0bc528be1cc8",
+                "userId": "53da8c96107e137846ba8b14"
+            },
+            {
+                "_id": "53daa138217a0bc528be2014",
+                "userId": "53daa138107e137846ba8b49"
+            },
+            {
+                "_id": "53dba5d02c0f8bd823ebf18c",
+                "userId": "53dba5d0107e137846ba8d2c"
+            },
+            {
+                "_id": "53dbf94043419b5d1a6c1a58",
+                "userId": "53dbf940107e137846ba8ddf"
+            },
+            {
+                "_id": "53e1fa17191293bb53afad2b",
+                "lurk": true,
+                "userId": "53e1fa16107e137846ba9858"
+            },
+            {
+                "_id": "53e6af21997dd8537dba5dce",
+                "userId": "53c1e800107e137846ba6743"
+            },
+            {
+                "_id": "53e8ef43203979c368efa79d",
+                "userId": "53e8ef43107e137846baa377"
+            },
+            {
+                "_id": "53e952c2d1462d9a1aa4a8f6",
+                "lurk": false,
+                "userId": "53e952c1107e137846baa41a"
+            },
+            {
+                "_id": "53f4af5417a6882726fb4ff3",
+                "userId": "53f4af54163965c9bc1ff1a2"
+            },
+            {
+                "_id": "53f6e4d0b060082c2624be86",
+                "userId": "53f6e4cf163965c9bc1ffc0d"
+            },
+            {
+                "_id": "53f9cc8e55ae96f67c064b80",
+                "userId": "53f9cc8d163965c9bc200160"
+            },
+            {
+                "_id": "53fa5d38b67e210324c469c2",
+                "userId": "53fa5d38163965c9bc200229"
+            },
+            {
+                "_id": "53fc3f32a95ba6df7ef0d2b0",
+                "userId": "53fc3f31163965c9bc2006bd"
+            },
+            {
+                "_id": "53fdcf66b67e210324c537f7",
+                "userId": "53fdcf66163965c9bc200be8",
+                "lurk": false
+            },
+            {
+                "_id": "53fe0d5681f0a80446de8cd6",
+                "userId": "53fe0d56163965c9bc200cfb"
+            },
+            {
+                "_id": "5404a5471ddeefe561b0c903",
+                "userId": "5298e353ed5ab0b3bf04c98a",
+                "lurk": true
+            },
+            {
+                "_id": "5407bb6718c22a690d56ae72",
+                "userId": "5407bb67163965c9bc202669"
+            },
+            {
+                "_id": "540a4ac8ac867976316aa6f1",
+                "userId": "540a4ac8163965c9bc202f7d"
+            },
+            {
+                "_id": "540b4ca3cf6e922c78981ab3",
+                "userId": "540b4ca3163965c9bc203143"
+            },
+            {
+                "_id": "5412ad48d14802b25c05960b",
+                "userId": "529c6b26ed5ab0b3bf04d559"
+            },
+            {
+                "_id": "5412c196f3981bce4d7e119f",
+                "userId": "5412c195163965c9bc2041d5"
+            },
+            {
+                "_id": "5412d73bf3981bce4d7e13a1",
+                "userId": "5412d73b163965c9bc204217"
+            }
+        ],
+        "tags": [
+            "ruby",
+            "extendable",
+            "rails",
+            "cms",
+            "supports"
+        ]
+    },
+    {
+        "_id": "53062de85e986b0712ef8d7d",
+        "__v": 190,
+        "_nonce": 86780,
+        "_tv": 330,
+        "dateLastSecurityCheck": "2014-04-09T13:43:45.159Z",
+        "githubType": "REPO",
+        "lcUri": "opscode/supermarket",
+        "security": "PUBLIC",
+        "topic": "Chef's new Community platform",
+        "uri": "opscode/supermarket",
+        "users": [
+            {
+                "_id": "53062f87557f35f97700023c",
+                "userId": "53062f875e986b0712ef8e55"
+            },
+            {
+                "_id": "53065038d0d58f2a02000048",
+                "userId": "530650385e986b0712ef9597"
+            },
+            {
+                "_id": "5306565bb3544c140200018e",
+                "userId": "5306565b5e986b0712ef95f6"
+            },
+            {
+                "_id": "5307689f80b7a3b92d000067",
+                "userId": "5307689e5e986b0712ef9ea5"
+            },
+            {
+                "_id": "530d21714196b01e760001f7",
+                "userId": "530d21715e986b0712efb5a8"
+            },
+            {
+                "_id": "530d21919769ff4138000796",
+                "userId": "529c6c77ed5ab0b3bf04d908"
+            },
+            {
+                "_id": "530d22f69769ff41380007b5",
+                "lurk": false,
+                "userId": "5306358f5e986b0712ef912f"
+            },
+            {
+                "_id": "530f4e82d244d52b36000730",
+                "userId": "530f4e825e986b0712efbeff"
+            },
+            {
+                "_id": "530f5502cced0d2a36000205",
+                "userId": "530f55015e986b0712efbf3c"
+            },
+            {
+                "_id": "530fcbf909b62b8141000af7",
+                "lurk": false,
+                "userId": "530fcbf95e986b0712efc044"
+            },
+            {
+                "_id": "5310b5fa4908b680410006d9",
+                "lurk": true,
+                "userId": "5310b5f95e986b0712efc1a5"
+            },
+            {
+                "_id": "5314bf14d00c70f70c0003af",
+                "lurk": false,
+                "userId": "5314bf145e986b0712efc603"
+            },
+            {
+                "_id": "5314c3eb9ed749a83e000482",
+                "userId": "5314c3ea5e986b0712efc619"
+            },
+            {
+                "_id": "53174c62429bbf0a0e000708",
+                "userId": "53174c265e986b0712efccdf"
+            },
+            {
+                "_id": "5318c58f95046bda3d001066",
+                "userId": "5318c58e5e986b0712efd28a"
+            },
+            {
+                "_id": "531ba41fd0ce21107b007b42",
+                "userId": "531ba41f5e986b0712efd78e"
+            },
+            {
+                "_id": "53209c2ed57899536d0025b6",
+                "userId": "53209c2d5e986b0712efdfba"
+            },
+            {
+                "_id": "5329f71fd62127384d0003b8",
+                "userId": "5329f71e5e986b0712eff09e"
+            },
+            {
+                "_id": "532b4754563f77e219000609",
+                "userId": "532b47545e986b0712eff519"
+            },
+            {
+                "_id": "532b47dd2ef9c64e6e000617",
+                "lurk": true,
+                "userId": "532b47dd5e986b0712eff51c"
+            },
+            {
+                "_id": "533068993c6d36c1640000cf",
+                "userId": "533068995e986b0712effa0c"
+            },
+            {
+                "_id": "53307ad80e5415c2640004e5",
+                "userId": "53307ad75e986b0712effa1c"
+            },
+            {
+                "_id": "53307c71473aa3792300053f",
+                "lurk": true,
+                "userId": "53307c705e986b0712effa1f"
+            },
+            {
+                "_id": "53307d41e419207542000560",
+                "userId": "53307d415e986b0712effa22"
+            },
+            {
+                "_id": "53307fc4e4192075420005a7",
+                "userId": "53307fc35e986b0712effa27"
+            },
+            {
+                "_id": "533080f4c489dd74420001bc",
+                "lurk": true,
+                "userId": "529c69fced5ab0b3bf04d21a"
+            },
+            {
+                "_id": "53308592e419207542000664",
+                "userId": "533085925e986b0712effa3a"
+            },
+            {
+                "_id": "53308fa6c489dd7442000229",
+                "lurk": false,
+                "userId": "53308fa65e986b0712effa45"
+            },
+            {
+                "_id": "5330983de419207542000876",
+                "userId": "5330983d5e986b0712effa56"
+            },
+            {
+                "_id": "53309c68c489dd7442000297",
+                "lurk": true,
+                "userId": "529c6e8fed5ab0b3bf04ded1"
+            },
+            {
+                "_id": "5330a5d45d623677230002ba",
+                "userId": "5310be425e986b0712efc1b6"
+            },
+            {
+                "_id": "5330a5e15d623677230002bb",
+                "lurk": false,
+                "userId": "5330a5e15e986b0712effa7b"
+            },
+            {
+                "_id": "5330ad850e5415c264000ae5",
+                "userId": "5330ad855e986b0712effab9"
+            },
+            {
+                "_id": "5330c1b4c489dd74420003b8",
+                "userId": "5330c1b45e986b0712effac4"
+            },
+            {
+                "_id": "5330c377473aa37923000d24",
+                "lurk": true,
+                "userId": "5330c3775e986b0712effacb"
+            },
+            {
+                "_id": "5330c39de419207542000d11",
+                "userId": "5330c39d5e986b0712effacf"
+            },
+            {
+                "_id": "5331014cc489dd7442000522",
+                "userId": "5310dea85e986b0712efc208"
+            },
+            {
+                "_id": "533102bf5d62367723000501",
+                "userId": "533102be5e986b0712effb15"
+            },
+            {
+                "_id": "53310e0c5d6236772300052e",
+                "userId": "5314a0295e986b0712efc5d1"
+            },
+            {
+                "_id": "53313c890e5415c2640017af",
+                "userId": "53313c895e986b0712effb45"
+            },
+            {
+                "_id": "53314a08473aa379230018fb",
+                "lurk": true,
+                "userId": "53314a085e986b0712effb64"
+            },
+            {
+                "_id": "5331925ee419207542002231",
+                "userId": "5331925e5e986b0712effd39"
+            },
+            {
+                "_id": "5331b8dcbe103ec32700004d",
+                "lurk": false,
+                "userId": "5331b8dc5e986b0712effdaa"
+            },
+            {
+                "_id": "5331d1d9ce4e7698510003d1",
+                "userId": "5331d1d95e986b0712effdfd"
+            },
+            {
+                "_id": "5332b9c6af88dbac46001021",
+                "lurk": true,
+                "userId": "5332b9c65e986b0712efff21"
+            },
+            {
+                "_id": "53330ded64cd70a745000075",
+                "lurk": false,
+                "userId": "53330dec5e986b0712efffd0"
+            },
+            {
+                "_id": "5335501c7f27f28e6b001811",
+                "userId": "5335501b5e986b0712f0053c"
+            },
+            {
+                "_id": "533582819c5555e65d000097",
+                "lurk": true,
+                "userId": "533582805e986b0712f0060e"
+            },
+            {
+                "_id": "533847574ed93a0e7a000bf4",
+                "lurk": true,
+                "userId": "533847565e986b0712f00819"
+            },
+            {
+                "_id": "533b0710cb38b18244003083",
+                "userId": "533b07105e986b0712f00c6b"
+            },
+            {
+                "_id": "534696693e10a2313f000127",
+                "userId": "530650a45e986b0712ef95a3"
+            },
+            {
+                "_id": "5347efbae2ce4faa350008c6",
+                "userId": "5347efba5e986b0712f02f31"
+            },
+            {
+                "_id": "5347fd39a08134150200218b",
+                "userId": "53064fcc5e986b0712ef958d"
+            },
+            {
+                "_id": "534cfbe38d392514020027c0",
+                "userId": "534cfbe35e986b0712f03486"
+            },
+            {
+                "_id": "534e33b0784d0a11610005f6",
+                "userId": "534e33b05e986b0712f03643"
+            },
+            {
+                "_id": "534f042ba44e559002001d39",
+                "userId": "5343416b5e986b0712f01828"
+            },
+            {
+                "_id": "534f068e384eae9031000189",
+                "lurk": true,
+                "userId": "534f06525e986b0712f03764"
+            },
+            {
+                "_id": "534f553e7a0de39132001351",
+                "userId": "534f553e5e986b0712f03793"
+            },
+            {
+                "_id": "53501ead44308ce9520003f4",
+                "lurk": false,
+                "userId": "53501ead5e986b0712f03904"
+            },
+            {
+                "_id": "53589087bbffe1b52a002508",
+                "userId": "534344c75e986b0712f01832"
+            },
+            {
+                "_id": "535ebdbcb93fd5a059002391",
+                "userId": "535ebdb5fe5536b46433d9cc"
+            },
+            {
+                "_id": "535ff5307f2518044100a089",
+                "userId": "535ff530fe5536b46433db7d"
+            },
+            {
+                "_id": "53679f703925f6214a725eb0",
+                "lurk": false,
+                "userId": "53679f70048862e761fa065a"
+            },
+            {
+                "_id": "53691cc892fad21024cf7f40",
+                "userId": "53691cc7048862e761fa0852"
+            },
+            {
+                "_id": "536a581b675b3b9c6f45c1f1",
+                "lurk": false,
+                "userId": "536a581a048862e761fa09a3"
+            },
+            {
+                "_id": "536c51920c8f780251f3aa15",
+                "userId": "536c4fd4048862e761fa0b52"
+            },
+            {
+                "_id": "536c7904b7f06ac60dc11420",
+                "userId": "529c6e23ed5ab0b3bf04dda5"
+            },
+            {
+                "_id": "537523c088a372060ff2def4",
+                "userId": "5375236a048862e761fa1707"
+            },
+            {
+                "_id": "537523da88a372060ff2def9",
+                "userId": "5375239b048862e761fa170d"
+            },
+            {
+                "_id": "538092d11b76b3986dac0788",
+                "userId": "538092d0048862e761fa2853"
+            },
+            {
+                "_id": "539148b8cf015b8d7c440311",
+                "userId": "539148b7048862e761fa4864"
+            },
+            {
+                "_id": "53953b5f85511d7d120671cc",
+                "userId": "53953b5fa9176b500d1cd743"
+            },
+            {
+                "_id": "5398b70aba627b806e1eb868",
+                "userId": "5398b70aa9176b500d1cdb87"
+            },
+            {
+                "_id": "53997345d6180feb1a945668",
+                "lurk": true,
+                "userId": "53997345a9176b500d1cdc33"
+            },
+            {
+                "_id": "5399b2a6753302a42f1a141d",
+                "lurk": true,
+                "userId": "5399b2a6a9176b500d1cdcd1"
+            },
+            {
+                "_id": "53a14b1a30d549ac7f82a7be",
+                "userId": "539b02f0a9176b500d1cde77"
+            },
+            {
+                "_id": "53a3078b68f2f275615946b2",
+                "lurk": false,
+                "userId": "53a3078ba9176b500d1cea15"
+            },
+            {
+                "_id": "53b346288f1d517a5b4ff617",
+                "userId": "53b34603107e137846ba52da"
+            },
+            {
+                "_id": "53b4208b57a2ffc616a3c921",
+                "lurk": true,
+                "userId": "53b4208a107e137846ba5497"
+            },
+            {
+                "_id": "53b48f43cb5bd98a07653a9d",
+                "userId": "538ce0da048862e761fa41da"
+            },
+            {
+                "_id": "53b5156347ece471413efafb",
+                "userId": "53b51563107e137846ba565a"
+            },
+            {
+                "_id": "53b62ad9c68191c67fbdcd84",
+                "userId": "53b62ad9107e137846ba580d"
+            },
+            {
+                "_id": "53b65a5279dbf1bf7f93b259",
+                "lurk": true,
+                "userId": "53b65a51107e137846ba5829"
+            },
+            {
+                "_id": "53baab1e736141c546c8a370",
+                "lurk": false,
+                "userId": "529c6aa1ed5ab0b3bf04d3e7"
+            },
+            {
+                "_id": "53baab43d6828fb556be336d",
+                "lurk": true,
+                "userId": "5298e319ed5ab0b3bf04c984"
+            },
+            {
+                "_id": "53bb15649ac007d970fedc82",
+                "userId": "53bb1563107e137846ba5d6d"
+            },
+            {
+                "_id": "53bb6a639ac007d970fee42f",
+                "userId": "53bb6a62107e137846ba5e07"
+            },
+            {
+                "_id": "53bb79c068352f7653b0f02e",
+                "userId": "53bb79bf107e137846ba5e18"
+            },
+            {
+                "_id": "53bc2b4dc97709a61dd44dc1",
+                "userId": "53bc2b4d107e137846ba5f9f"
+            },
+            {
+                "_id": "53bc499168c481a11634cca2",
+                "userId": "53bc4990107e137846ba5fe4"
+            },
+            {
+                "_id": "53bde149ff97d6dc42a9df81",
+                "userId": "53bde149107e137846ba626c"
+            },
+            {
+                "_id": "53c1ab4a277a61c604704d93",
+                "userId": "53c1ab4a107e137846ba6733"
+            },
+            {
+                "_id": "53c440b1c4f33b977a4736e4",
+                "userId": "53c440b1107e137846ba697b"
+            },
+            {
+                "_id": "53c53c47a67f2645713ba5d1",
+                "lurk": false,
+                "userId": "53c53c47107e137846ba6b32"
+            },
+            {
+                "_id": "53c572b84811ae467143dd85",
+                "lurk": false,
+                "userId": "53c572b8107e137846ba6b90"
+            },
+            {
+                "_id": "53c770ca8e82f86b263caebc",
+                "userId": "53c770ca107e137846ba6ed9"
+            },
+            {
+                "_id": "53cae3a58ffe3de25c2444b1",
+                "userId": "53cae3a5107e137846ba7354"
+            },
+            {
+                "_id": "53cd2d8882f194a55ae6ae7a",
+                "userId": "53cd2d87107e137846ba7528"
+            },
+            {
+                "_id": "53ceb862a3e83c4a6c9292cf",
+                "lurk": false,
+                "userId": "53ceb861107e137846ba7733"
+            },
+            {
+                "_id": "53cf7c06b3f3024b6c615c4a",
+                "userId": "53cf7c06107e137846ba7889"
+            },
+            {
+                "_id": "53cfc262135a8c586a0c01e5",
+                "userId": "53cfc262107e137846ba7939"
+            },
+            {
+                "_id": "53cffb0a135a8c586a0c12e1",
+                "lurk": true,
+                "userId": "529c9bd9ed5ab0b3bf04e1c4"
+            },
+            {
+                "_id": "53d05673717fb5c704b45fb8",
+                "userId": "53d05673107e137846ba7a22"
+            },
+            {
+                "_id": "53d0569ef3aa2a576abc50cb",
+                "userId": "53d0569e107e137846ba7a26"
+            },
+            {
+                "_id": "53d056a3717fb5c704b45fc1",
+                "lurk": true,
+                "userId": "531908ef5e986b0712efd31a"
+            },
+            {
+                "_id": "53d058e0f3aa2a576abc50fd",
+                "userId": "53d058e0107e137846ba7a31"
+            },
+            {
+                "_id": "53d1552263abd6322c204858",
+                "userId": "53ab3de4a9176b500d1cf546"
+            },
+            {
+                "_id": "53d171b338e5d9332cb92345",
+                "userId": "53d171b3107e137846ba7d4a"
+            },
+            {
+                "_id": "53d17c0163abd6322c204d34",
+                "userId": "53d17c01107e137846ba7d5e"
+            },
+            {
+                "_id": "53d2932da8b4347e7f0593ae",
+                "userId": "53d2932c107e137846ba7ebf"
+            },
+            {
+                "_id": "53d3a0d8e3142f9641edc853",
+                "userId": "53d3a0d7107e137846ba80b3"
+            },
+            {
+                "_id": "53d5370ae3142f9641edf447",
+                "userId": "53d53709107e137846ba822f"
+            },
+            {
+                "_id": "53d82bb92b45a1010d472e60",
+                "lurk": false,
+                "userId": "53d82bb9107e137846ba86f7"
+            },
+            {
+                "_id": "53dff2614a36037b0e8ad50d",
+                "userId": "53dff261107e137846ba9315"
+            },
+            {
+                "_id": "53e0a0324a36037b0e8af460",
+                "lurk": false,
+                "userId": "53e0a032107e137846ba949d"
+            },
+            {
+                "_id": "53e1ac6f46ebfbbc5306f1e4",
+                "userId": "5337abc15e986b0712f007a3"
+            },
+            {
+                "_id": "53e2d5ed191293bb53afe9c0",
+                "userId": "53e2d5ed107e137846ba9a06"
+            },
+            {
+                "_id": "53e4465d997dd8537db9fdb4",
+                "userId": "529a87eaed5ab0b3bf04d0af"
+            },
+            {
+                "_id": "53e47d8bfd8cb79033b1c4b8",
+                "userId": "53e47d29107e137846ba9d81"
+            },
+            {
+                "_id": "53ebea73203979c368eff918",
+                "userId": "53ebea73107e137846baa960"
+            },
+            {
+                "_id": "53ec6eb4da54fbc468d4f5cb",
+                "userId": "53ec6e19107e137846baa9c6"
+            },
+            {
+                "_id": "53ef67ccd1462d9a1aa5fa02",
+                "userId": "53ef67b0107e137846baae6e"
+            },
+            {
+                "_id": "53ef9bbada54fbc468d58eef",
+                "userId": "53ef9b9e107e137846baaeba"
+            },
+            {
+                "_id": "53f3487117a6882726faec6e",
+                "userId": "53bed505107e137846ba63e3"
+            },
+            {
+                "_id": "53f43c7e511afe0824db5314",
+                "userId": "53f43c7e163965c9bc1ff056"
+            },
+            {
+                "_id": "53fc32d09766ebd97e1e8a98",
+                "userId": "53fc3254163965c9bc200699",
+                "lurk": true
+            },
+            {
+                "_id": "53fc754555ae96f67c06f4e4",
+                "userId": "53fc725c163965c9bc2007c5"
+            },
+            {
+                "_id": "53fec2edb67e210324c56d86",
+                "userId": "53fe6dff163965c9bc200e45"
+            },
+            {
+                "_id": "53fef46e511afe0824dc8438",
+                "userId": "53fef382163965c9bc200f31"
+            },
+            {
+                "_id": "53ffe865f295e2702299024c",
+                "userId": "53fd3d6b163965c9bc200a4a"
+            },
+            {
+                "_id": "54042158b9f5db8071c63e7d",
+                "userId": "54001e6c163965c9bc201193"
+            },
+            {
+                "_id": "5407472ee334931839c023b0",
+                "userId": "5407472d163965c9bc202365"
+            },
+            {
+                "_id": "5407660487223d1739eaef1d",
+                "userId": "53062dcd5e986b0712ef8d6c"
+            },
+            {
+                "_id": "54078e1c87223d1739eaf3eb",
+                "userId": "54078dfe163965c9bc2025c3"
+            },
+            {
+                "_id": "540c307b44e8497531510843",
+                "userId": "540ac5a5163965c9bc203083"
+            }
+        ],
+        "tags": [
+            "ruby",
+            "chef",
+            "community",
+            "platform"
+        ]
+    },
+    {
+        "_id": "52f1049d5e986b0712ef4f45",
+        "__v": 135,
+        "_nonce": 15427,
+        "_tv": 144,
+        "dateLastSecurityCheck": "2014-04-10T06:12:31.121Z",
+        "githubType": "REPO",
+        "lcUri": "rails/rails",
+        "security": "PUBLIC",
+        "topic": "Ruby on Rails",
+        "uri": "rails/rails",
+        "users": [
+            {
+                "_id": "52f1049d086e6bd838e84509",
+                "userId": "52f1039a5e986b0712ef4ed0"
+            },
+            {
+                "_id": "52f109076f0913fb030000f3",
+                "userId": "529c6a8ded5ab0b3bf04d3b0"
+            },
+            {
+                "_id": "52f20c5d6cd044ec5d003844",
+                "userId": "52e25be05e986b0712ef2da2"
+            },
+            {
+                "_id": "52f20ec9409b1fee5d0006d0",
+                "userId": "52f209e15e986b0712ef5cf2"
+            },
+            {
+                "_id": "52f2d96549cf426161000083",
+                "userId": "529c6c71ed5ab0b3bf04d8f8"
+            },
+            {
+                "_id": "52f8e8fb54fc8d3214002e83",
+                "userId": "52f8e8ba5e986b0712ef6b11"
+            },
+            {
+                "_id": "52fdddc8a59e286846000db8",
+                "userId": "52fdda325e986b0712ef7363"
+            },
+            {
+                "_id": "5300fc75e8410a317b00078d",
+                "userId": "529c69c2ed5ab0b3bf04d176"
+            },
+            {
+                "_id": "5304ee56164bbb566d0002ae",
+                "userId": "529c6e75ed5ab0b3bf04de8a"
+            },
+            {
+                "_id": "53061d03b35ac36437000057",
+                "userId": "530617fd5e986b0712ef8481"
+            },
+            {
+                "_id": "53061e9aa14530e42d00002b",
+                "userId": "53061e895e986b0712ef86da"
+            },
+            {
+                "_id": "53061ee2a14530e42d00002f",
+                "userId": "53061ee15e986b0712ef86ff"
+            },
+            {
+                "_id": "53062682557f35f9770000c0",
+                "userId": "5306264e5e986b0712ef8a21"
+            },
+            {
+                "_id": "53063078f74484d24a000025",
+                "userId": "529c6b5ded5ab0b3bf04d5f3"
+            },
+            {
+                "_id": "53063a2d82d709567f000189",
+                "userId": "53063a035e986b0712ef92aa"
+            },
+            {
+                "_id": "53063badf74484d24a0001ef",
+                "userId": "53063b765e986b0712ef9314"
+            },
+            {
+                "_id": "53064272f74484d24a0002ce",
+                "userId": "52d1ea42a53d0e7476000005"
+            },
+            {
+                "_id": "530645d4fb83f79b38000183",
+                "userId": "529c6ceded5ab0b3bf04da50"
+            },
+            {
+                "_id": "53069e2ed0d58f2a02000223",
+                "userId": "53069daa5e986b0712ef9820"
+            },
+            {
+                "_id": "5306c94db3544c1402000b32",
+                "lurk": true,
+                "userId": "5306b5375e986b0712ef9921"
+            },
+            {
+                "_id": "53073c8ab3544c14020013b2",
+                "userId": "530738775e986b0712ef9db6"
+            },
+            {
+                "_id": "5307413d8a5acbda44000274",
+                "userId": "529c6ddded5ab0b3bf04dce2"
+            },
+            {
+                "_id": "5307a3c380b7a3b92d00021d",
+                "userId": "530613cf5e986b0712ef831e"
+            },
+            {
+                "_id": "530b3660059d24c263000370",
+                "userId": "530b34cd5e986b0712efa9ed"
+            },
+            {
+                "_id": "53104bea09b62b81410014aa",
+                "userId": "53104bb45e986b0712efc0c3"
+            },
+            {
+                "_id": "5315e856cda82b5b6a000076",
+                "userId": "53052ef85e986b0712ef7e9b"
+            },
+            {
+                "_id": "531694b0a53b890f7b00032a",
+                "userId": "5316944d5e986b0712efc988"
+            },
+            {
+                "_id": "531f462f6f23f1526d00009a",
+                "userId": "531f3e185e986b0712efde2b"
+            },
+            {
+                "_id": "532b0520855349c90e000698",
+                "userId": "532b05155e986b0712eff468"
+            },
+            {
+                "_id": "5339901b51f53cec4b0005ea",
+                "userId": "533990075e986b0712f009e8"
+            },
+            {
+                "_id": "533b3528e17bcb9b5b00362e",
+                "userId": "52f106205e986b0712ef4fe9"
+            },
+            {
+                "_id": "533dabe2bd3398116c0004ed",
+                "userId": "533daa8c5e986b0712f010df"
+            },
+            {
+                "_id": "53430cc137d058647000030f",
+                "userId": "5306565b5e986b0712ef95f6"
+            },
+            {
+                "_id": "534470643bceade8390003c7",
+                "userId": "52f0fc345e986b0712ef4c19"
+            },
+            {
+                "_id": "5344709c152a234317000dbf",
+                "userId": "534359ff5e986b0712f01856"
+            },
+            {
+                "_id": "534470a23bceade8390003c9",
+                "userId": "534470565e986b0712f01a3a"
+            },
+            {
+                "_id": "5346ae9a3e10a2313f000293",
+                "userId": "529c69bced5ab0b3bf04d164"
+            },
+            {
+                "_id": "534a4ba0a081341502004b20",
+                "userId": "529c6a5ded5ab0b3bf04d329"
+            },
+            {
+                "_id": "5351cb3b27e475ea52005c21",
+                "userId": "5351cb3b5e986b0712f03a33"
+            },
+            {
+                "_id": "53590fb9bfb238125800997b",
+                "userId": "53188f3c5e986b0712efd213"
+            },
+            {
+                "_id": "535928cc2380ff38190003fb",
+                "lurk": false,
+                "userId": "535927de5e986b0712f04551"
+            },
+            {
+                "_id": "5359a775ff7a5f817e000a97",
+                "userId": "53597aa85e986b0712f045c3"
+            },
+            {
+                "_id": "5363334291ab64b231878ad8",
+                "userId": "529c6a75ed5ab0b3bf04d36b"
+            },
+            {
+                "_id": "5371f819e5054dd22464acda",
+                "userId": "536cd356048862e761fa0bc6"
+            },
+            {
+                "_id": "5375d640083ffc643278657f",
+                "userId": "5375d61f048862e761fa18b4"
+            },
+            {
+                "_id": "5375f524babfe6ef4c12d3e6",
+                "userId": "5375f4e8048862e761fa192d"
+            },
+            {
+                "_id": "5377ee65f121b4446b78d061",
+                "userId": "5377ec30048862e761fa1c5e"
+            },
+            {
+                "_id": "5378d26ee9c9dc843a6812c2",
+                "userId": "5378d252048862e761fa1d25"
+            },
+            {
+                "_id": "5379b298e9c9dc843a68287d",
+                "userId": "5377def9048862e761fa1c4a"
+            },
+            {
+                "_id": "537a3a424bbcc2e41f9ca511",
+                "lurk": false,
+                "userId": "5375d5f0048862e761fa18b0"
+            },
+            {
+                "_id": "537adb9a4eff907b4137087f",
+                "userId": "537adb82048862e761fa2048"
+            },
+            {
+                "_id": "537b71df2b35f8b850555548",
+                "userId": "537b6ff9048862e761fa214a"
+            },
+            {
+                "_id": "537b77154bbcc2e41f9cd7e2",
+                "userId": "537b76f3048862e761fa215e"
+            },
+            {
+                "_id": "537d15b3872adf20437142be",
+                "userId": "537d0d76048862e761fa243b"
+            },
+            {
+                "_id": "53861c780591d031747785b9",
+                "userId": "53861c6e048862e761fa2d9c"
+            },
+            {
+                "_id": "53866a7d7b4ae0a544366766",
+                "userId": "538628b0048862e761fa2dc1"
+            },
+            {
+                "_id": "53870e9ef2d689a4441c3466",
+                "userId": "53870e60048862e761fa300d"
+            },
+            {
+                "_id": "5388efba4ae4751b716ed355",
+                "userId": "534723695e986b0712f02e0f"
+            },
+            {
+                "_id": "538fa4ee6f74798c7c705308",
+                "userId": "534ecee85e986b0712f0373a"
+            },
+            {
+                "_id": "53975885712048b37f212080",
+                "userId": "5396277da9176b500d1cd84c"
+            },
+            {
+                "_id": "539d30c35ed9059023171932",
+                "userId": "539d2bc8a9176b500d1ce076"
+            },
+            {
+                "_id": "539dfe1ae815e53c701bb61f",
+                "userId": "5375dafd048862e761fa18db"
+            },
+            {
+                "_id": "53a846220841dcbd195c1760",
+                "userId": "53a84622a9176b500d1cef78"
+            },
+            {
+                "_id": "53aa71c99082a8a11bd4fff1",
+                "userId": "53a994a8a9176b500d1cf2e4"
+            },
+            {
+                "_id": "53ad87db1a0b13e94128ff09",
+                "userId": "53ad7760a9176b500d1cf8c5"
+            },
+            {
+                "_id": "53b15f42e67088a35d4d9390",
+                "userId": "53b15ed9107e137846ba4e26"
+            },
+            {
+                "_id": "53b551d6255049571cdb061c",
+                "userId": "53b551b8107e137846ba56dc"
+            },
+            {
+                "_id": "53b56e30889d00476719fe51",
+                "userId": "53b56e2f107e137846ba571a"
+            },
+            {
+                "_id": "53b6e032124fdad62957b719",
+                "userId": "53b6e017107e137846ba58c1"
+            },
+            {
+                "_id": "53baf6290532aba9664786f3",
+                "userId": "53baf629107e137846ba5d41"
+            },
+            {
+                "_id": "53be9a0a754757d853582d9b",
+                "userId": "53be99dc107e137846ba638f"
+            },
+            {
+                "_id": "53bf0e21dc133ed653e88b7b",
+                "userId": "53bf0e0d107e137846ba644a"
+            },
+            {
+                "_id": "53c8f89eb20cddcc7cbf8fa2",
+                "userId": "52f662a35e986b0712ef698b"
+            },
+            {
+                "_id": "53ce8d5ea3e83c4a6c928e14",
+                "userId": "529c6c86ed5ab0b3bf04d932"
+            },
+            {
+                "_id": "53d0a23b135a8c586a0c3227",
+                "userId": "53d06279107e137846ba7a3b"
+            },
+            {
+                "_id": "53d36b8ce3142f9641edc33d",
+                "userId": "53a8ee3da9176b500d1cf115"
+            },
+            {
+                "_id": "53d7680ab9341e4507ec54d9",
+                "userId": "53d64fce107e137846ba8365"
+            },
+            {
+                "_id": "53d97844b6944e8a13b6011d",
+                "userId": "533d6e6e5e986b0712f01016"
+            },
+            {
+                "_id": "53e0949446ebfbbc5306d3b6",
+                "userId": "53e0945d107e137846ba9462"
+            },
+            {
+                "_id": "53e0bfce46ebfbbc5306d85f",
+                "userId": "53d4c61a107e137846ba81ab"
+            },
+            {
+                "_id": "53e0c746191293bb53af630e",
+                "userId": "53e0c33f107e137846ba94f2"
+            },
+            {
+                "_id": "53e2582f191293bb53afc973",
+                "userId": "53e255d7107e137846ba992b"
+            },
+            {
+                "_id": "53e25b5b191293bb53afca55",
+                "userId": "53e220a1107e137846ba9892"
+            },
+            {
+                "_id": "53e26d066362d8c742a2ae76",
+                "userId": "53e26bd9107e137846ba9960"
+            },
+            {
+                "_id": "53e389d946ebfbbc53072565",
+                "userId": "53c644e0107e137846ba6cb2"
+            },
+            {
+                "_id": "53e3d5db19fad5aa2e47f082",
+                "userId": "53d37524107e137846ba808d"
+            },
+            {
+                "_id": "53e476f14b0196527d54a9ec",
+                "userId": "53e3998b107e137846ba9b8e"
+            },
+            {
+                "_id": "53e6903d4b0196527d54da36",
+                "userId": "529c6c4eed5ab0b3bf04d895"
+            },
+            {
+                "_id": "53e8a118997dd8537dba9aaa",
+                "userId": "53e8a0d9107e137846baa286"
+            },
+            {
+                "_id": "53e8c124d1462d9a1aa47ff7",
+                "userId": "529c6b21ed5ab0b3bf04d54c"
+            },
+            {
+                "_id": "53e9621fd1462d9a1aa4ab1a",
+                "userId": "538f4665048862e761fa4524"
+            },
+            {
+                "_id": "53ebb77ad1462d9a1aa537dd",
+                "userId": "53d8ac64107e137846ba877a"
+            },
+            {
+                "_id": "53ebb79d15473559351c94b9",
+                "userId": "53a2fc0aa9176b500d1ce9db"
+            },
+            {
+                "_id": "53f2cfd979bef15c6ff6462c",
+                "userId": "53bf1ea7107e137846ba6473"
+            },
+            {
+                "_id": "53f4fe41a95ba6df7eefe175",
+                "userId": "53d1463a107e137846ba7cde"
+            },
+            {
+                "_id": "53f6144e511afe0824db8a78",
+                "userId": "5298e319ed5ab0b3bf04c984"
+            },
+            {
+                "_id": "53f61a5d17a6882726fbb056",
+                "userId": "53f61a16163965c9bc1ff819"
+            },
+            {
+                "_id": "53f63169b060082c2624a7ed",
+                "userId": "529c6ee5ed5ab0b3bf04dfc0"
+            },
+            {
+                "_id": "53f708bf55ae96f67c05c86b",
+                "userId": "53f708af163965c9bc1ffccb"
+            },
+            {
+                "_id": "53f78b8055ae96f67c05ef2f",
+                "userId": "53f78b5c163965c9bc1ffe75"
+            },
+            {
+                "_id": "53f809c0b67e210324c40317",
+                "userId": "5377f13d048862e761fa1c76",
+                "lurk": false
+            },
+            {
+                "_id": "53f9060fb67e210324c420b9",
+                "userId": "53f905c5163965c9bc2000a3"
+            },
+            {
+                "_id": "53fbb7b15cd78d3d69c3ed15",
+                "userId": "53e875a3107e137846baa1f5"
+            },
+            {
+                "_id": "53fc513855ae96f67c06eb56",
+                "userId": "52fb29e05e986b0712ef6d8b"
+            },
+            {
+                "_id": "53fc59dbacddf2821136b919",
+                "userId": "5298e353ed5ab0b3bf04c98a"
+            },
+            {
+                "_id": "53fc892d5cd78d3d69c403a7",
+                "userId": "53fc891c163965c9bc20083d"
+            },
+            {
+                "_id": "5402302e910d490c25709048",
+                "userId": "529c6f11ed5ab0b3bf04e03c"
+            },
+            {
+                "_id": "541047f2dc77eb4157f97e6f",
+                "userId": "54104740163965c9bc203bf2"
+            },
+            {
+                "_id": "54114697c48bc8027c6d00d6",
+                "userId": "541145ea163965c9bc203ec9"
+            },
+            {
+                "_id": "5412ded8b76334b35c36419c",
+                "userId": "5412deae163965c9bc204230"
+            }
+        ],
+        "tags": [
+            "ruby",
+            "rails"
+        ]
+    },
+    {
+        "_id": "52f1005a5e986b0712ef4d8d",
+        "__v": 230,
+        "_nonce": 17693,
+        "_tv": 285,
+        "dateLastSecurityCheck": "2014-04-09T15:59:44.869Z",
+        "githubType": "REPO",
+        "lcUri": "gitlabhq/gitlabhq",
+        "security": "PUBLIC",
+        "topic": "Project management and code hosting  application. Follow us on twitter @gitlabhq. Please read FAQ for answers to common questions/problems: http://git.io/nGFiig",
+        "uri": "gitlabhq/gitlabhq",
+        "users": [
+            {
+                "_id": "52f1005ac047cbd9385ca2e0",
+                "lurk": true,
+                "userId": "52f1001e5e986b0712ef4d7b"
+            },
+            {
+                "_id": "52f130866cd044ec5d000a26",
+                "userId": "52f0e26d5e986b0712ef491e"
+            },
+            {
+                "_id": "52f949a89198cc143a0000c5",
+                "userId": "52f949a85e986b0712ef6b88"
+            },
+            {
+                "_id": "52fcb956f81b5346750011ff",
+                "userId": "529c69c2ed5ab0b3bf04d176"
+            },
+            {
+                "_id": "52fcbfb1c37570ab360012a0",
+                "lurk": false,
+                "userId": "52fcbfb15e986b0712ef7143"
+            },
+            {
+                "_id": "52fcbff902db4b4575000450",
+                "userId": "52fcbff95e986b0712ef7145"
+            },
+            {
+                "_id": "52fcc3dc9ddaa8352400046d",
+                "userId": "52fcc3dc5e986b0712ef7156"
+            },
+            {
+                "_id": "52fd045902db4b45750005a2",
+                "userId": "52fd04595e986b0712ef71db"
+            },
+            {
+                "_id": "52fd2e54eb5f63dc530000cc",
+                "lurk": false,
+                "userId": "52fd2e545e986b0712ef7220"
+            },
+            {
+                "_id": "52fde7aceb5f63dc530002ee",
+                "userId": "52fde7ab5e986b0712ef7382"
+            },
+            {
+                "_id": "52ffc51bba53416c38000468",
+                "userId": "52ffc4f55e986b0712ef7769"
+            },
+            {
+                "_id": "5303577d5cbe1d452200000f",
+                "userId": "530357435e986b0712ef7b3e"
+            },
+            {
+                "_id": "530372528d5da8c8300001fd",
+                "userId": "530372525e986b0712ef7cf7"
+            },
+            {
+                "_id": "530462b8ba7004692a001361",
+                "lurk": true,
+                "userId": "52b461b9ed5ab0b3bf051bb8"
+            },
+            {
+                "_id": "53051b186730e3307f00031b",
+                "userId": "53051b185e986b0712ef7e64"
+            },
+            {
+                "_id": "5305f626abaf273d55000052",
+                "userId": "5305f6265e986b0712ef8287"
+            },
+            {
+                "_id": "5306318fd3f4abd14a00001f",
+                "userId": "52bf9aaaed5ab0b3bf05245c"
+            },
+            {
+                "_id": "5307108ababaaa3c54000554",
+                "userId": "5307108a5e986b0712ef9c9e"
+            },
+            {
+                "_id": "5308fadb80b7a3b92d000734",
+                "userId": "5308fada5e986b0712efa5fb"
+            },
+            {
+                "_id": "5309ea5661ef6dba2d002807",
+                "userId": "5309ea545e986b0712efa6d7"
+            },
+            {
+                "_id": "530cbbac722bbdb06300164f",
+                "userId": "529c6ef8ed5ab0b3bf04dff7"
+            },
+            {
+                "_id": "530e123d8249934038000690",
+                "lurk": true,
+                "userId": "529c6b39ed5ab0b3bf04d58e"
+            },
+            {
+                "_id": "530f6e4c8b8ba6f335000059",
+                "userId": "530f6e4b5e986b0712efbf7f"
+            },
+            {
+                "_id": "53104c337bfe198c0c001484",
+                "userId": "53104c325e986b0712efc0c6"
+            },
+            {
+                "_id": "53106b7709b62b81410017c6",
+                "userId": "53106b765e986b0712efc121"
+            },
+            {
+                "_id": "5311be8009b62b81410031a6",
+                "userId": "5311be805e986b0712efc2d4"
+            },
+            {
+                "_id": "531256e109b62b81410039e6",
+                "userId": "531256e15e986b0712efc353"
+            },
+            {
+                "_id": "531266dd09b62b8141003abb",
+                "userId": "531266dd5e986b0712efc362"
+            },
+            {
+                "_id": "5313bef209b62b8141004d82",
+                "userId": "5313bef25e986b0712efc4bd"
+            },
+            {
+                "_id": "53143e704908b680410013b1",
+                "userId": "53143e705e986b0712efc52a"
+            },
+            {
+                "_id": "531482fe8b8ba6f335001573",
+                "userId": "531482fd5e986b0712efc57b"
+            },
+            {
+                "_id": "5316515bd0ce21107b000515",
+                "userId": "5316515b5e986b0712efc912"
+            },
+            {
+                "_id": "5318573695046bda3d000d6e",
+                "userId": "531857085e986b0712efd181"
+            },
+            {
+                "_id": "53197fd8ee1be3db3d0053de",
+                "userId": "53197fd75e986b0712efd3b7"
+            },
+            {
+                "_id": "531a5788ecc9303b1c000684",
+                "userId": "531a57885e986b0712efd5f3"
+            },
+            {
+                "_id": "531b56d46fba4acb4d000d21",
+                "userId": "531b56d45e986b0712efd741"
+            },
+            {
+                "_id": "531c78eb2fcb80776c000044",
+                "userId": "529c6e64ed5ab0b3bf04de5a"
+            },
+            {
+                "_id": "531dcbb2a0b143921c00056a",
+                "userId": "531dcbb25e986b0712efdbd7"
+            },
+            {
+                "_id": "532055d7c8d49fa31d001d07",
+                "userId": "532055d65e986b0712efdf48"
+            },
+            {
+                "_id": "532202fa7d44689a2b0000c4",
+                "userId": "532202fa5e986b0712efe1ba"
+            },
+            {
+                "_id": "53224e0f1a81ce2a51000b12",
+                "userId": "53224e0e5e986b0712efe25d"
+            },
+            {
+                "_id": "5325b56feb7570341500052c",
+                "userId": "529c6a62ed5ab0b3bf04d336"
+            },
+            {
+                "_id": "53271054a07578031600355c",
+                "lurk": true,
+                "userId": "532710545e986b0712efec9d"
+            },
+            {
+                "_id": "532711f1d443b46b74000bbb",
+                "userId": "532711f05e986b0712efecb0"
+            },
+            {
+                "_id": "5327a62f527c4c383e001088",
+                "lurk": false,
+                "userId": "5327a62e5e986b0712efedc9"
+            },
+            {
+                "_id": "53291025266753fb5f001142",
+                "userId": "532910255e986b0712efef63"
+            },
+            {
+                "_id": "5329b801542d553d49000804",
+                "userId": "5329b8015e986b0712eff040"
+            },
+            {
+                "_id": "532b50a8e714889245000008",
+                "userId": "532b50a85e986b0712eff538"
+            },
+            {
+                "_id": "532b67ec9a198206780000ad",
+                "userId": "52fe878d5e986b0712ef76ac"
+            },
+            {
+                "_id": "532c131dd16417d04f0003e1",
+                "userId": "532c131d5e986b0712eff5c0"
+            },
+            {
+                "_id": "532c31c07aa882d5530002a4",
+                "userId": "532c31bf5e986b0712eff5e2"
+            },
+            {
+                "_id": "532dee476dd31b2e24002462",
+                "lurk": true,
+                "userId": "532dee475e986b0712eff77a"
+            },
+            {
+                "_id": "532fd6bb7aa882d553004222",
+                "userId": "532fd6ba5e986b0712eff8da"
+            },
+            {
+                "_id": "53302d72750d6ecd2a004c03",
+                "userId": "53302d725e986b0712eff927"
+            },
+            {
+                "_id": "53318755e74c000e5f0005e0",
+                "userId": "533187555e986b0712effbbd"
+            },
+            {
+                "_id": "53319227e74c000e5f000762",
+                "userId": "533192275e986b0712effd36"
+            },
+            {
+                "_id": "53343080cf2b75e12f000489",
+                "userId": "533430805e986b0712f002df"
+            },
+            {
+                "_id": "53348e6e0943be1f060001c9",
+                "userId": "53348e6e5e986b0712f0045c"
+            },
+            {
+                "_id": "533857a5518f75723e003262",
+                "userId": "533857a45e986b0712f00832"
+            },
+            {
+                "_id": "533933092369110d7a004394",
+                "userId": "530317005e986b0712ef7977"
+            },
+            {
+                "_id": "53393a414ed93a0e7a00106c",
+                "userId": "52efab835e986b0712ef4505"
+            },
+            {
+                "_id": "533a88673794899c5b00086c",
+                "userId": "533a88675e986b0712f00b68"
+            },
+            {
+                "_id": "533b0f6451f53cec4b003133",
+                "userId": "529c69e4ed5ab0b3bf04d1d6"
+            },
+            {
+                "_id": "533b3301e17bcb9b5b0035f2",
+                "lurk": true,
+                "userId": "533b33015e986b0712f00cb4"
+            },
+            {
+                "_id": "533bccb751f53cec4b0042bc",
+                "userId": "5330df465e986b0712effaf0"
+            },
+            {
+                "_id": "533c315833387b211a0000ce",
+                "userId": "533c31585e986b0712f00de3"
+            },
+            {
+                "_id": "533c7ec3dced492249000a25",
+                "lurk": true,
+                "userId": "533c7ec35e986b0712f00ebb"
+            },
+            {
+                "_id": "533ebc6fadd196560a000361",
+                "userId": "533ebc6e5e986b0712f01373"
+            },
+            {
+                "_id": "533ecfea7689fd525c000228",
+                "userId": "533ecfe95e986b0712f013b0"
+            },
+            {
+                "_id": "5347f2112d304d3f68001f7a",
+                "userId": "5347f2115e986b0712f02f39"
+            },
+            {
+                "_id": "534806a18d39251402000aa8",
+                "userId": "534806a05e986b0712f02f64"
+            },
+            {
+                "_id": "534b9b47e2ce4faa35001bac",
+                "userId": "534b9b475e986b0712f032c4"
+            },
+            {
+                "_id": "534c1883f4d9bdab3500727c",
+                "userId": "534c18835e986b0712f033ae"
+            },
+            {
+                "_id": "534daec1784d0a11610002e9",
+                "userId": "5342ba3e5e986b0712f01734"
+            },
+            {
+                "_id": "53554883b47be42d5d00d27f",
+                "lurk": true,
+                "userId": "535548825e986b0712f03c2b"
+            },
+            {
+                "_id": "535642bf8bf9dfd646002f69",
+                "userId": "535642bf5e986b0712f03cc2"
+            },
+            {
+                "_id": "5357039658a61e1158000a4e",
+                "lurk": true,
+                "userId": "535703965e986b0712f03d7c"
+            },
+            {
+                "_id": "5357783ebfb23812580039a3",
+                "userId": "529c69feed5ab0b3bf04d220"
+            },
+            {
+                "_id": "53579a04e2c5ecb72a0043d3",
+                "userId": "53579a035e986b0712f04216"
+            },
+            {
+                "_id": "5357d1bbbbffe1b52a00189a",
+                "userId": "5357d1bb5e986b0712f043c6"
+            },
+            {
+                "_id": "5357da38bbffe1b52a00196a",
+                "userId": "5357da385e986b0712f043d3"
+            },
+            {
+                "_id": "5357ecd40a8c580a78001b0f",
+                "userId": "529c69f8ed5ab0b3bf04d20e"
+            },
+            {
+                "_id": "5357f63e58a61e1158001b7f",
+                "lurk": false,
+                "userId": "529c6da8ed5ab0b3bf04dc52"
+            },
+            {
+                "_id": "535be2e07f25180441001188",
+                "userId": "535be2e0fe5536b46433d799"
+            },
+            {
+                "_id": "535df6e0856b62034100175b",
+                "userId": "535df6dffe5536b46433d8bf"
+            },
+            {
+                "_id": "535fa43c856b620341002e91",
+                "lurk": true,
+                "userId": "535fa3d1fe5536b46433daa9"
+            },
+            {
+                "_id": "536114cdaa6b125d0a60feac",
+                "userId": "536114cd048862e761fa0053"
+            },
+            {
+                "_id": "5365b9d7d9f2edb1318f1538",
+                "userId": "5365b9d6048862e761fa0543"
+            },
+            {
+                "_id": "53667abad9f2edb1318f1ce1",
+                "userId": "53667a7e048862e761fa05b2"
+            },
+            {
+                "_id": "5367cde33925f6214a7261aa",
+                "userId": "5367cde3048862e761fa06af"
+            },
+            {
+                "_id": "5368f06bf4e70a12199fe244",
+                "userId": "5368f06b048862e761fa080c"
+            },
+            {
+                "_id": "536a5c5003651bde06723f2e",
+                "userId": "536a5c4f048862e761fa09ab"
+            },
+            {
+                "_id": "536c8925d4f075c70dce9b74",
+                "userId": "536c8925048862e761fa0b81"
+            },
+            {
+                "_id": "536cd2e9d4f075c70dce9fe8",
+                "userId": "536cd1e6048862e761fa0bc2"
+            },
+            {
+                "_id": "536d32eb4391305b06dec394",
+                "userId": "536b9ea5048862e761fa0ab2"
+            },
+            {
+                "_id": "53764116e9c9dc843a67d978",
+                "userId": "53764115048862e761fa19a5"
+            },
+            {
+                "_id": "537939b7e9c9dc843a681c12",
+                "userId": "529c6d83ed5ab0b3bf04dbec"
+            },
+            {
+                "_id": "5379b947d630c49c5c889154",
+                "userId": "5379b947048862e761fa1dec"
+            },
+            {
+                "_id": "537a960f4bbcc2e41f9cb30b",
+                "userId": "537a960f048862e761fa1ff2"
+            },
+            {
+                "_id": "537c97d44bbcc2e41f9d05cf",
+                "userId": "537c97d4048862e761fa236b"
+            },
+            {
+                "_id": "537dd53c07ab03fd162b8180",
+                "userId": "537dd53c048862e761fa251b"
+            },
+            {
+                "_id": "53811c24b2dc9732050589da",
+                "userId": "53811c23048862e761fa2896"
+            },
+            {
+                "_id": "53834e97eafc3b9a6d458f21",
+                "lurk": true,
+                "userId": "53834e96048862e761fa29ef"
+            },
+            {
+                "_id": "5388b98bf8c8161a6948a85a",
+                "userId": "530bc3f95e986b0712efadc8"
+            },
+            {
+                "_id": "538cede5845e5f1d201e024a",
+                "userId": "538cede5048862e761fa41f8"
+            },
+            {
+                "_id": "538d67045c406cfa6a592097",
+                "userId": "538d6703048862e761fa429a"
+            },
+            {
+                "_id": "538f6a92915444112e6c4793",
+                "lurk": false,
+                "userId": "538f6a92048862e761fa4581"
+            },
+            {
+                "_id": "538f6bda9694cc852a0383b6",
+                "userId": "538f6bda048862e761fa458a"
+            },
+            {
+                "_id": "53905ce86f74798c7c7058e4",
+                "userId": "53905ce8048862e761fa4701"
+            },
+            {
+                "_id": "5391079c915444112e6c56d2",
+                "userId": "5391079c048862e761fa4834"
+            },
+            {
+                "_id": "539351cb85511d7d12064c8e",
+                "userId": "5393519a048862e761fa4a35"
+            },
+            {
+                "_id": "5395228fd0c302e5447d9448",
+                "userId": "5395228ea9176b500d1cd730"
+            },
+            {
+                "_id": "539c85fdb5140fef47c8a371",
+                "userId": "539c85fda9176b500d1ce022"
+            },
+            {
+                "_id": "539da376e815e53c701bb2d7",
+                "lurk": false,
+                "userId": "539da375a9176b500d1ce0b8"
+            },
+            {
+                "_id": "53a156ce8033415f4f3a0938",
+                "userId": "53a156cea9176b500d1ce622"
+            },
+            {
+                "_id": "53a1582f4c4141b37f3acbfd",
+                "lurk": true,
+                "userId": "53a1582ea9176b500d1ce626"
+            },
+            {
+                "_id": "53a262987601a16d2db4f728",
+                "userId": "53a26298a9176b500d1ce8e4"
+            },
+            {
+                "_id": "53a4e0131787f40e5dab66f1",
+                "userId": "539dc3a7a9176b500d1ce0e1"
+            },
+            {
+                "_id": "53a7df8d1787f40e5dab7bd1",
+                "userId": "53a7df8da9176b500d1ceee0"
+            },
+            {
+                "_id": "53a92c06742e6cd479908390",
+                "userId": "53a92c06a9176b500d1cf19d"
+            },
+            {
+                "_id": "53a968ec2c5635960b7e9183",
+                "userId": "53a968eca9176b500d1cf23a"
+            },
+            {
+                "_id": "53aae44c7023f28a40a27f90",
+                "lurk": true,
+                "userId": "53aae44ca9176b500d1cf4c7"
+            },
+            {
+                "_id": "53aaee96af7664c835ae4aff",
+                "userId": "53aaee96a9176b500d1cf4e1"
+            },
+            {
+                "_id": "53ac3e7249386a79414b3ae1",
+                "userId": "53ac3e72a9176b500d1cf6c4"
+            },
+            {
+                "_id": "53ac653f34360b7a27df38fa",
+                "userId": "53ac653ea9176b500d1cf713"
+            },
+            {
+                "_id": "53ae9c15735df18265a464b1",
+                "userId": "53ae9c15a9176b500d1cfa9b"
+            },
+            {
+                "_id": "53afc214735df18265a484de",
+                "userId": "53afc214a9176b500d1cfc4a"
+            },
+            {
+                "_id": "53b296b77f15377d5ed23ce0",
+                "userId": "53b296b7107e137846ba5182"
+            },
+            {
+                "_id": "53ba859d956438af28471ebb",
+                "userId": "53ba859d107e137846ba5c63"
+            },
+            {
+                "_id": "53bd2d05736141c546c929b4",
+                "userId": "53bd2d05107e137846ba614c"
+            },
+            {
+                "_id": "53c3f6b4842ed3c15436044b",
+                "userId": "53c3f6b4107e137846ba68dc"
+            },
+            {
+                "_id": "53c50e6a19840bc2547d5ef7",
+                "userId": "53c50e69107e137846ba6af0"
+            },
+            {
+                "_id": "53c62acd19840bc2547d9e6d",
+                "userId": "53c62acd107e137846ba6c7e"
+            },
+            {
+                "_id": "53c64d37b20cddcc7cbf070d",
+                "userId": "53c64d37107e137846ba6cc9",
+                "lurk": true
+            },
+            {
+                "_id": "53c68832b20cddcc7cbf14e6",
+                "lurk": false,
+                "userId": "53c68832107e137846ba6d12"
+            },
+            {
+                "_id": "53c6e38c27d1d3db4658dd00",
+                "userId": "53c6e38c107e137846ba6e22"
+            },
+            {
+                "_id": "53c9ecd38ffe3de25c2430cb",
+                "userId": "53c9ecb8107e137846ba7277"
+            },
+            {
+                "_id": "53cc2231a3a8a5e35c40d079",
+                "userId": "53cae3a5107e137846ba7354"
+            },
+            {
+                "_id": "53cd4dece5dcc789252d8cc5",
+                "userId": "5370cd56048862e761fa0e37"
+            },
+            {
+                "_id": "53d2669ae388c46213de5952",
+                "userId": "53d26699107e137846ba7e70"
+            },
+            {
+                "_id": "53d5e3dfe3142f9641ee054e",
+                "lurk": true,
+                "userId": "530672595e986b0712ef970e"
+            },
+            {
+                "_id": "53d932d8947ad7fe19c9673f",
+                "userId": "53d932d8107e137846ba887b"
+            },
+            {
+                "_id": "53d934e1947ad7fe19c96785",
+                "userId": "53d934e0107e137846ba8880"
+            },
+            {
+                "_id": "53d993663d8f108b13ea221d",
+                "userId": "53d06279107e137846ba7a3b"
+            },
+            {
+                "_id": "53db591b665b84c628f140ad",
+                "userId": "53db591b107e137846ba8c7d"
+            },
+            {
+                "_id": "53dd2d1a61b666f0302ce5c1",
+                "userId": "53dd2d1a107e137846ba8eed"
+            },
+            {
+                "_id": "53e253e346ebfbbc53070419",
+                "userId": "53e253e3107e137846ba9926"
+            },
+            {
+                "_id": "53e4f0f0fd8cb79033b1e384",
+                "userId": "53e4f0f0107e137846ba9e86"
+            },
+            {
+                "_id": "53e51f0a5dadfca92edab5c6",
+                "userId": "53e51f0a107e137846ba9ef2"
+            },
+            {
+                "_id": "53edc17615473559351cd664",
+                "userId": "53edc175107e137846baac06"
+            },
+            {
+                "_id": "53ede6b1d1462d9a1aa5ba6c",
+                "userId": "53ede6b1107e137846baac42"
+            },
+            {
+                "_id": "53ee72ab15473559351ce9b5",
+                "userId": "53ee72ab107e137846baad44"
+            },
+            {
+                "_id": "53eeeead15473559351cf4a4",
+                "userId": "53eeee9d107e137846baadc5"
+            },
+            {
+                "_id": "53f1440e96c2328634a184c1",
+                "userId": "53ebcdde107e137846baa92d"
+            },
+            {
+                "_id": "53f196bad1462d9a1aa63831",
+                "userId": "53f196ba107e137846bab0de"
+            },
+            {
+                "_id": "53f1d83819aed5991a7afb61",
+                "userId": "53f1d7fe107e137846bab197"
+            },
+            {
+                "_id": "53f33977fa1871e36cfaeec1",
+                "userId": "53f33711107e137846bab4f4"
+            },
+            {
+                "_id": "53f4c6e6a95ba6df7eefda87",
+                "userId": "53f4c6e6163965c9bc1ff1dd",
+                "lurk": true
+            },
+            {
+                "_id": "53f58f3517a6882726fb89da",
+                "userId": "53f58f35163965c9bc1ff398"
+            },
+            {
+                "_id": "53f607aa17a6882726fba846",
+                "userId": "537a1c08048862e761fa1ed5"
+            },
+            {
+                "_id": "53f62c87b67e210324c38e52",
+                "userId": "53f62c86163965c9bc1ff921"
+            },
+            {
+                "_id": "53f64e9d55ae96f67c059b2a",
+                "userId": "535c1c0ffe5536b46433d7c1"
+            },
+            {
+                "_id": "53f72c9ba95ba6df7ef02412",
+                "userId": "5394f516a9176b500d1cd726"
+            },
+            {
+                "_id": "53fe52a081f0a80446dea37c",
+                "userId": "530754be5e986b0712ef9e4a"
+            },
+            {
+                "_id": "53fef92481f0a80446dec643",
+                "userId": "53fef924163965c9bc200f45",
+                "lurk": true
+            },
+            {
+                "_id": "53ff492d81f0a80446dee1c2",
+                "userId": "53ff492d163965c9bc20104f"
+            },
+            {
+                "_id": "5404f08fbf683cf71c321375",
+                "userId": "529c6e08ed5ab0b3bf04dd5a"
+            },
+            {
+                "_id": "54066c0d3d41676924bdc857",
+                "userId": "52f104775e986b0712ef4f30"
+            },
+            {
+                "_id": "54085526e6ddeb6a0dc49262",
+                "userId": "54085526163965c9bc2028ce"
+            },
+            {
+                "_id": "54085c7a52df0af50360da87",
+                "userId": "54085c7a163965c9bc202901"
+            },
+            {
+                "_id": "54087b55d5b23e73666d5bfb",
+                "userId": "54087b55163965c9bc202970"
+            },
+            {
+                "_id": "540b1dc3aa04d6864849ee4c",
+                "userId": "540b1dc3163965c9bc2030f7"
+            },
+            {
+                "_id": "540e843a44e8497531514252",
+                "userId": "540e843a163965c9bc2036b3"
+            },
+            {
+                "_id": "540f7743954399037c443ce7",
+                "userId": "540f7743163965c9bc2039cd"
+            },
+            {
+                "_id": "540fe4abdc77eb4157f97524",
+                "userId": "540fe4ab163965c9bc203a7b"
+            },
+            {
+                "_id": "54102f28954399037c4465e3",
+                "userId": "54102f28163965c9bc203ba8"
+            },
+            {
+                "_id": "5410aa6f954399037c448ed4",
+                "userId": "5410aa60163965c9bc203d56"
+            }
+        ],
+        "tags": [
+            "ruby",
+            "open",
+            "source",
+            "software",
+            "collaborate",
+            "code"
+        ]
+    }
+]
