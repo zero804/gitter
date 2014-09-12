@@ -2,47 +2,59 @@
 "use strict";
 
 var suggestedService = require('../services/suggested-room-service');
+var userService = require('../services/user-service');
 var Q = require('q');
 
 var DEFAULT_TAGS = ['gitter', 'test', 'repo'];
 
+function isActiveUser(user) {
+  return user.state !== 'INVITED';
+}
+
 function getRoomRenderData(room) {
-  room.owner = room.uri.split('/')[0];
-  return room;
+  var userIds = room.users.map(function(user) { return user.userId; });
+  return userService.findByIds(userIds)
+    .then(function(users) {
+      return {
+        room: room,
+        owner: room.uri.split('/')[0],
+        activeUsers: users.filter(isActiveUser)
+      };
+    });
+}
+
+function processTagResult(tag, rooms) {
+  return Q.all(rooms.map(getRoomRenderData))
+    .then(function(roomsWithExtraData) {
+      return {
+        tag: tag,
+        rooms: roomsWithExtraData
+      };
+    });
+}
+
+function getRenderDataForTag(tag) {
+  return suggestedService.getTaggedRooms(tag)
+    .then(function(rooms) {
+      return processTagResult(tag, rooms);
+    });
 }
 
 module.exports = {
   install: function(app) {
     app.get('/explore', function (req, res, next) {
-      var promises = DEFAULT_TAGS.map(function(tag) {
-        return suggestedService.getTaggedRooms(tag)
-          .then(function(rooms) {
-            return {
-              name: tag,
-              rooms: rooms.splice(0, 6).map(function(room) {
-                return getRoomRenderData(room);
-              })
-            };
-          });
-      });
-      return Q.all(promises)
-        .then(function(tags) {
-            res.render('explore', { tags: tags });
+      return Q.all(DEFAULT_TAGS.map(getRenderDataForTag))
+        .then(function(tagRenderDataList) {
+            res.render('explore', { tags: tagRenderDataList });
           })
           .fail(next);
     });
 
     app.get('/explore/tags/:tag', function (req, res, next) {
-      return suggestedService.getTaggedRooms(req.params.tag)
-        .then(function(rooms) {
-          res.render('explore', {
-            tags: [{
-              name: req.params.tag,
-              rooms: rooms.map(function(room) {
-                return getRoomRenderData(room);
-              })
-            }]
-          });
+      return getRenderDataForTag(req.params.tag)
+        .then(function(tagRenderData) {
+          console.log(tagRenderData);
+          res.render('explore', { tags: [tagRenderData] });
         })
         .fail(next);
     });

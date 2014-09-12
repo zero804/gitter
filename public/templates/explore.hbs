@@ -58,9 +58,9 @@
     {{#each rooms}}
       <li class="room-list-item">
         <img class="avatar" src="https://avatars.githubusercontent.com/{{owner}}?s=80" width="40" height="40">
-        <h3 class="room-heading"><a href="/{{uri}}">{{uri}}</a></h3>
-        <small>{{#if topic}}{{topic}}{{else}}<i>No topic</i>{{/if}}</small>
-        <small class="user-count">Users: {{users.length}}</small>
+        <h3 class="room-heading"><a href="/{{room.uri}}">{{room.uri}}</a></h3>
+        <small>{{#if room.topic}}{{room.topic}}{{else}}<i>No topic</i>{{/if}}</small>
+        <small class="user-count">Users: {{activeUsers.length}}</small>
       </li>
     {{/each}}
     </ul>
