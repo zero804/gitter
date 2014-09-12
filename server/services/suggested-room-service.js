@@ -6,6 +6,9 @@ var GithubRepo      = require("./github/github-repo-service");
 var persistence     = require("./persistence-service");
 var Q               = require('q');
 var _               = require('underscore');
+var javascriptRooms = require('../../scripts/utils/rooms_javascript');
+var rubyRooms       = require('../../scripts/utils/rooms_ruby');
+var phpRooms        = require('../../scripts/utils/rooms_php');
 
 var HILIGHTED_ROOMS = [
   {
@@ -313,12 +316,19 @@ exports.getSuggestions = getSuggestions;
 
 function getTaggedRooms(tag) {
   // fake it til we make it
-  return persistence.Troupe.find({
-    security: 'PUBLIC',
-    uri: new RegExp('.*' + tag + '.*'),
-    githubType: 'REPO'
-  }).limit(30).execQ();
-
+  if(tag === 'javascript') {
+    return Q.resolve(javascriptRooms);
+  } else if(tag === 'ruby') {
+    return Q.resolve(rubyRooms);
+  } else if(tag === 'php') {
+    return Q.resolve(phpRooms);
+  } else {
+    return persistence.Troupe.find({
+      security: 'PUBLIC',
+      uri: new RegExp('.*' + tag + '.*'),
+      githubType: 'REPO'
+    }).limit(30).execQ();
+  }
 }
 
 exports.getTaggedRooms = getTaggedRooms;

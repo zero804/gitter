@@ -5,7 +5,7 @@ var suggestedService = require('../services/suggested-room-service');
 var userService = require('../services/user-service');
 var Q = require('q');
 
-var DEFAULT_TAGS = ['gitter', 'test', 'repo'];
+var DEFAULT_TAGS = ['javascript', 'ruby', 'php'];
 
 function isActiveUser(user) {
   return user.state !== 'INVITED';
