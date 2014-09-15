@@ -314,21 +314,30 @@ function getSuggestions(user, localeLanguage) {
 
 exports.getSuggestions = getSuggestions;
 
-function getTaggedRooms(tag) {
+function getTaggedRooms(_tags) {
+  var tags = []; // default tags
+  tags = tags.concat(_tags);
+
+  return persistence.Troupe
+    .where('security').equals('PUBLIC')
+    .where('tags').in(tags)
+    .limit(50)
+    .execQ();
+
   // fake it til we make it
-  if(tag === 'javascript') {
-    return Q.resolve(javascriptRooms);
-  } else if(tag === 'ruby') {
-    return Q.resolve(rubyRooms);
-  } else if(tag === 'php') {
-    return Q.resolve(phpRooms);
-  } else {
-    return persistence.Troupe.find({
-      security: 'PUBLIC',
-      uri: new RegExp('.*' + tag + '.*'),
-      githubType: 'REPO'
-    }).limit(30).execQ();
-  }
+  //if(tag === 'javascript') {
+  //  return Q.resolve(javascriptRooms);
+  //} else if(tag === 'ruby') {
+  //  return Q.resolve(rubyRooms);
+  //} else if(tag === 'php') {
+  //  return Q.resolve(phpRooms);
+  //} else {
+  //  return persistence.Troupe.find({
+  //    security: 'PUBLIC',
+  //    uri: new RegExp('.*' + tag + '.*'),
+  //    githubType: 'REPO'
+  //  }).limit(30).execQ();
+  //}
 }
 
 exports.getTaggedRooms = getTaggedRooms;
