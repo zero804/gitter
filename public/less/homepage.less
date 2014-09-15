@@ -1221,3 +1221,9 @@ footer small a:hover {
   background: linear-gradient(rgba(40,40,40,0), rgba(40,40,40,.5));
 
 }
+
+.desktopOnly {
+  @desktopOnly_bp: 36.25em;
+  display: none;
+  @media only screen and (min-width: @desktopOnly_bp) { display: inline; }
+}
