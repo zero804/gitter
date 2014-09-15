@@ -83,6 +83,57 @@
         text-align: center;
         line-height: 2em;
       }
+
+      .room-item {
+        box-sizing: border-box;
+        /*max-width: 500px;*/
+        /* cursor: pointer; */
+        background-color: #222222;
+        color: white;
+        /* padding: 0.625em; */
+        margin-bottom: 20px;
+      }
+      .room-item * {
+        box-sizing: border-box;
+      }
+
+      .room-item h1,
+      .room-item h2,
+      .room-item h3,
+      .room-item h4,
+      .room-item h5 {
+        margin: 0;
+      }
+      .room-item header {
+        background-color: #3b3b3b;
+        padding: 0.625em;
+        overflow: hidden;
+      }
+      .room-item__avatar {
+        color: black;
+        float: left;
+        width: 25%;
+      }
+      .room-item__avatar img {
+        max-width: 100%;
+      }
+      .room-item__head {
+        width: 75%;
+        padding: 0 0.625em;
+        float: right;
+        text-align: right;
+      }
+      .room-item__content {
+        border-top: 0.3em solid #2e2e2e;
+        text-align: center;
+        padding: 1.25em;
+      }
+      .room-item__foot {
+        text-transform: uppercase;
+        padding: 0.625em;
+        background-color: #6e6e6e;
+      }
+
     </style>
   </head>
   <body>
@@ -98,17 +149,28 @@
       We host thousands of public communities where developers come to talk.<br/>Here are some of our favourite javascript rooms.
     </p>
     {{#each tags}}
-    <header>
-      <a class="see-all-link" href="/explore/tags/{{name}}">See all ></a>
-      <h2>{{name}}</h2>
-    </header>
     <ul class="room-list">
     {{#each rooms}}
-      <li class="room-list-item">
-        <img class="avatar" src="https://avatars.githubusercontent.com/{{owner}}?s=80" width="40" height="40">
-        <h3 class="room-heading"><a href="/{{room.uri}}">{{room.uri}}</a></h3>
-        <small>{{#if room.topic}}{{room.topic}}{{else}}<i>No topic</i>{{/if}}</small>
-        <small class="user-count">Users: {{activeUsers.length}}</small>
+      <li class='room-item'>
+        <header>
+          <div class="room-item__avatar">
+            <img src="https://avatars.githubusercontent.com/{{owner}}?v=2&s=200">
+          </div>
+          <div class='room-item__head'>
+            <h1>{{room.uri}}</h1>
+            <small><span class="octicon octicon-location"></span> Nowheresville, USA</small>
+            <p>{{room.topic}}</p>
+          </div>
+        </header>
+        <div class='room-item__content'>
+          <h2>SOMETHING INTERESTING HERE</h2>
+          <p>BUT WHAT?</p>
+        </div>
+        <div class='room-item__foot'>
+          <small>{{activeUsers.length}} online</small>
+          •
+          <small>00k messages</small>
+        </div>
       </li>
     {{/each}}
     </ul>
