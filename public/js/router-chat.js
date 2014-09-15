@@ -19,9 +19,9 @@ require([
   'views/app/integrationSettingsModal',
   'views/app/collaboratorsView',
   'collections/collaborators',
+  'collections/chat-search',
 
   'components/unread-items-client',
-  'components/helpShareIfLonely',
 
   'views/chat/decorators/webhookDecorator',
   'views/chat/decorators/issueDecorator',
@@ -45,10 +45,13 @@ require([
   'components/ajax-errors',     // No ref
   'components/focus-events'     // No ref
 
-], function($, Backbone, context, liveContext, appEvents, log, peopleCollectionView, ChatIntegratedView, chatInputView,
+], function($, Backbone, context, liveContext, appEvents, log,
+    peopleCollectionView, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, RightToolbarView,
-    inviteView, TroupeSettingsView, MarkdownView, KeyboardView, AddPeopleViewModal, IntegrationSettingsModal, CollaboratorsView, collaboratorsModels,
-    unreadItemsClient, helpShareIfLonely, webhookDecorator, issueDecorator, commitDecorator, mentionDecorator,
+    inviteView, TroupeSettingsView, MarkdownView, KeyboardView,
+    AddPeopleViewModal, IntegrationSettingsModal, CollaboratorsView,
+    collaboratorsModels, chatSearchModels,
+    unreadItemsClient, webhookDecorator, issueDecorator, commitDecorator, mentionDecorator,
     embedDecorator, emojiDecorator, UnreadBannerView, HistoryLimitView, HeaderView) {
   "use strict";
 
@@ -212,17 +215,22 @@ require([
 
   new HeaderView({ model: context.troupe(), el: '#header' });
 
-  // instantiate user email collection
-  // var userEmailCollection = new UserEmailCollection.UserEmailCollection();
-
   // Setup the ChatView
-
   var chatCollectionView = new ChatCollectionView({
     el: '#chat-container',
     collection: itemCollections.chats,
     userCollection: itemCollections.users,
     decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
   }).render();
+
+  var chatSearchCollection = new chatSearchModels.ChatSearchCollection([], { });
+  var chatSearchCollectionView = new ChatCollectionView({
+    el: '#search-container',
+    collection: chatSearchCollection,
+    userCollection: itemCollections.users,
+    decorators: []
+  }).render();
+  chatSearchCollection.fetch({ data: { q: 'SAD'} });
 
   var unreadChatsModel = unreadItemsClient.acrossTheFold();
 
