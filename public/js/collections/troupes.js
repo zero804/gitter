@@ -7,6 +7,43 @@ define([
 
   var TroupeModel = TroupeCollections.Model.extend({
     idAttribute: "id",
+    initialize: function(options) {
+
+      // this model will be cloned and destroyed with every update.
+      // only the original will be created with every attribute in the options object.
+      var isOriginalModel = !!options.url;
+
+      if(isOriginalModel) {
+        // we need to set these attributes when the original is created.
+        // if we set them on every clone, then all these attributes would change when navigating to a room.
+        // this would make the left menu room list reorder itself all the time.
+
+        if(this.get('lastAccessTime')) {
+          this.set('lastAccessTimeNoSync', this.get('lastAccessTime').clone());
+        }
+
+        if(this.get('unreadItems')) {
+          this.set('lastUnreadItemTime', moment());
+        }
+
+        if(this.get('mentions')) {
+          this.set('lastMentionTime', moment());
+        }
+      }
+
+      this.on('change:unreadItems', function(model, unreadItems) {
+        if(unreadItems) {
+          this.set('lastUnreadItemTime', moment());
+        }
+      }, this);
+
+      this.on('change:mentions', function(model, mentions) {
+        if(mentions) {
+          this.set('lastMentionTime', moment());
+        }
+      }, this);
+
+    },
     parse: function(message) {
       if(typeof message.lastAccessTime === 'string') {
         message.lastAccessTime = moment(message.lastAccessTime, moment.defaultFormat);
