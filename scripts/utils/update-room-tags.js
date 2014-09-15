@@ -30,12 +30,11 @@ var findRooms = function (limit) {
 
   return persistence.Troupe
     .find({
-      'users.1': { $exists: true },
+      'users.1': { $exists: true }, // this essentially queries for non-empty rooms efficiently
       tags: { $exists: false },
       security: 'PUBLIC',
       githubType: 'REPO'
     })
-    // .lean()
     .limit(limit)
     .execQ();
 };
