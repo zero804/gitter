@@ -3,7 +3,7 @@
 var env                  = require('../utils/env');
 var stats                = env.stats;
 
-var persistence          = require("./persistence-service");
+var ChatMessage          = require("./persistence-service").ChatMessage;
 var collections          = require("../utils/collections");
 var troupeService        = require("./troupe-service");
 var userService          = require("./user-service");
@@ -51,7 +51,7 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
     return processChat(data.text);
   })
   .then(function(parsedMessage) {
-    var chatMessage = new persistence.ChatMessage({
+    var chatMessage = new ChatMessage({
       fromUserId: user.id,
       toTroupeId: troupe.id,
       sent: new Date(),
@@ -136,7 +136,7 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
 exports.getRecentPublicChats = function() {
   var twentyFourHoursAgo = new Date(Date.now() - 86400000);
 
-  return persistence.ChatMessage
+  return ChatMessage
             .where({ pub: true })
             .where({ sent: { $gt: twentyFourHoursAgo} })
             .sort({ _id: -1 })
@@ -186,7 +186,7 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
 };
 
 exports.findById = function(id, callback) {
-  return persistence.ChatMessage.findByIdQ(id)
+  return ChatMessage.findByIdQ(id)
     .nodeify(callback);
 };
 
@@ -194,7 +194,7 @@ exports.findById = function(id, callback) {
  * Returns a promise of chats with given ids
  */
 exports.findByIds = function(ids, callback) {
-  return mongooseUtils.findByIds(persistence.ChatMessage, ids, callback);
+  return mongooseUtils.findByIds(ChatMessage, ids, callback);
 };
 
 // function massageMessages(message) {
@@ -217,7 +217,7 @@ exports.findByIds = function(ids, callback) {
 
 /* This is much more cacheable than searching less than a date */
 function getDateOfFirstMessageInRoom(troupeId) {
-  return persistence.ChatMessage
+  return ChatMessage
     .where('toTroupeId', troupeId)
     .limit(1)
     .select({ sent: 1 })
@@ -264,7 +264,7 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
     ])
     .spread(function(maxHistoryDate, markerId) {
       if(!markerId && !options.aroundId) {
-        var q = persistence.ChatMessage
+        var q = ChatMessage
           .where('toTroupeId', troupeId);
 
         var sentOrder = 'desc';
@@ -290,7 +290,8 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
           q = q.where('sent').gte(maxHistoryDate);
         }
 
-        return q.sort(options.sort || { sent: sentOrder }) .limit(limit)
+        return q.sort(options.sort || { sent: sentOrder })
+          .limit(limit)
           .skip(skip)
           .execQ()
           .then(function(results) {
@@ -311,13 +312,13 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
 
       var halfLimit = Math.floor(options.limit / 2) || 25;
 
-      var q1 = persistence.ChatMessage
+      var q1 = ChatMessage
                 .where('toTroupeId', troupeId)
                 .sort({ sent: 'desc' })
                 .limit(halfLimit)
                 .where('_id').lte(aroundId);
 
-      var q2 = persistence.ChatMessage
+      var q2 = ChatMessage
                 .where('toTroupeId', troupeId)
                 .sort({ sent: 'asc' })
                 .limit(halfLimit)
@@ -352,7 +353,7 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
 exports.findChatMessagesForTroupeForDateRange = function(troupeId, startDate, endDate) {
   return roomCapabilities.getMaxHistoryMessageDate(troupeId)
     .then(function(maxHistoryDate) {
-      var q = persistence.ChatMessage
+      var q = ChatMessage
               .where('toTroupeId', troupeId)
               .where('sent').gte(startDate)
               .where('sent').lte(endDate)
@@ -370,7 +371,7 @@ exports.findChatMessagesForTroupeForDateRange = function(troupeId, startDate, en
 };
 
 exports.findDatesForChatMessages = function(troupeId, callback) {
-  return persistence.ChatMessage.aggregateQ([
+  return ChatMessage.aggregateQ([
     { $match: { toTroupeId: mongoUtils.asObjectID(troupeId) } },
     { $project: {
         _id: 0,
@@ -408,7 +409,7 @@ exports.findDatesForChatMessages = function(troupeId, callback) {
 };
 
 exports.findDailyChatActivityForRoom = function(troupeId, start, end, callback) {
-  return persistence.ChatMessage.aggregateQ([
+  return ChatMessage.aggregateQ([
     { $match: {
         toTroupeId: mongoUtils.asObjectID(troupeId),
         sent: {
@@ -444,4 +445,46 @@ exports.findDailyChatActivityForRoom = function(troupeId, start, end, callback) 
     }, {});
   })
   .nodeify(callback);
+};
+
+/**
+ * Search for messages in a room using a full-text index.
+ *
+ * Returns promise [messages, limitReached]
+ */
+exports.searchChatMessagesForRoom = function(troupeId, textQuery, options) {
+  if(!options) options = {};
+
+  var limit = options.limit || 50;
+  var skip = options.skip || 0;
+
+  return roomCapabilities.getMaxHistoryMessageDate(troupeId)
+    .then(function(maxHistoryDate) {
+      var findInaccessibleResults;
+      var q = ChatMessage
+        .find(
+          { toTroupeId: troupeId, $text : { $search : textQuery } },
+          { score : { $meta: "textScore" } })
+        .sort({ score : { $meta : 'textScore' } })
+        .limit(limit)
+        .skip(skip);
+
+      if(maxHistoryDate) {
+        q = q.where('sent').gte(maxHistoryDate);
+        findInaccessibleResults = ChatMessage
+          .count({
+            toTroupeId: troupeId,
+            sent: { $lt: maxHistoryDate },
+            $text : { $search : textQuery }
+          })
+          .execQ();
+      }
+
+      return Q.all([q.execQ(), findInaccessibleResults])
+        .spread(function(results, inaccessibleCount) {
+          // For now always return limitRearched false
+          return [results, !!inaccessibleCount];
+        });
+
+    });
 };
