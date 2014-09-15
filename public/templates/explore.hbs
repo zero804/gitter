@@ -3,7 +3,7 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon-normal.ico' }}">
-    <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:700,400,300">
+    <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,100">
     <style type="text/css">
       * {
         font-family: proxima-nova-alt,"Proxima Nova Alt",sans-serif;
@@ -45,11 +45,54 @@
       .see-all-link {
         float: right;
       }
+
+      .page-header {
+        height: 85%;
+        background-color: #231f20;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .logo {
+        opacity: 0.3;
+        height: 16px;
+      }
+
+      html {
+        height: 100%;
+      }
+
+      body {
+        height: 100%;
+        margin: 0;
+      }
+
+      nav {
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 8px;
+      }
+
+      .title {
+        text-transform: uppercase;
+        color: #fff;
+        font-weight: 100;
+        letter-spacing: 0.1em;
+        text-align: center;
+        line-height: 2em;
+      }
     </style>
   </head>
   <body>
-    <header>
-      <h1>Explore</h1>
+    <header class="page-header">
+      <nav>
+        <a href="/" >
+          <img class="logo" src="/images/logo-text-white-32.png" alt="Gitter" title="Gitter logo">
+        </a>
+      </nav>
+      <h1 class="title">Explore<br/>javascript</h1>
     </header>
     <p>
       We host thousands of public communities where developers come to talk.<br/>Here are some of our favourite javascript rooms.
