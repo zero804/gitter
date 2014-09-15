@@ -9,12 +9,6 @@
         font-family: proxima-nova-alt,"Proxima Nova Alt",sans-serif;
       }
 
-      h1, h2, h3, h4 {
-        font-family: DP,sans-serif;
-        font-weight: normal;
-        letter-spacing: -1px;
-      }
-
       .avatar {
         float: left;
         border-radius: 3px;
@@ -86,7 +80,7 @@
         background-color: #222222;
         color: white;
         /* padding: 0.625em; */
-        margin-bottom: 20px;
+        margin-bottom: 0.625em;
       }
       .room-item * {
         box-sizing: border-box;
@@ -98,19 +92,27 @@
       .room-item h4,
       .room-item h5 {
         margin: 0;
+        font-weight: 100;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       .room-item header {
+        /*float: right;*/
         background-color: #3b3b3b;
         padding: 0.625em;
         overflow: hidden;
+        /*text-align: right;*/
       }
       .room-item__avatar {
         color: black;
         float: left;
-        width: 25%;
+        width: 40px;
+        margin-right: 0.625em;
       }
       .room-item__avatar img {
         max-width: 100%;
+        border-radius: 3px;
       }
       .room-item__head {
         width: 75%;
@@ -149,18 +151,14 @@
       <li class='room-item'>
         <header>
           <div class="room-item__avatar">
-            <img src="https://avatars.githubusercontent.com/{{owner}}?v=2&s=200">
+            <img src="https://avatars.githubusercontent.com/{{owner}}?s=80">
           </div>
-          <div class='room-item__head'>
-            <h1>{{room.uri}}</h1>
-            <small><span class="octicon octicon-location"></span> Nowheresville, USA</small>
-            <p>{{room.topic}}</p>
-          </div>
+          <h3>{{room.uri}}</h3>
+          {{!-- <div class='room-item__head'> --}}
+            {{!-- <small><span class="octicon octicon-location"></span> Nowheresville, USA</small> --}}
+            <small>{{room.topic}}</small>
+          {{!-- </div> --}}
         </header>
-        <div class='room-item__content'>
-          <h2>SOMETHING INTERESTING HERE</h2>
-          <p>BUT WHAT?</p>
-        </div>
         <div class='room-item__foot'>
           <small>{{activeUsers.length}} online</small>
           •
