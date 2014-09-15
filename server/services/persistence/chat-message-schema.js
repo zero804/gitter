@@ -26,6 +26,7 @@ var ChatMessageSchema = new Schema({
   _md:        Number, // Meta parse version
 });
 ChatMessageSchema.index({ toTroupeId: 1, sent: -1 });
+ChatMessageSchema.index({ toTroupeId: 1, text: 'text' });
 ChatMessageSchema.schemaTypeName = 'ChatMessageSchema';
 
 module.exports = {
