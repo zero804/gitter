@@ -7,10 +7,7 @@ require([
   'log!router-chat',
   'views/people/peopleCollectionView',
   'views/app/chatIntegratedView',
-  'views/chat/chatInputView',
-  'views/chat/chatCollectionView',
   'collections/instances/integrated-items',
-  'views/righttoolbar/rightToolbarView',
   'views/shareSearch/inviteView',
   'views/app/troupeSettingsView',
   'views/app/markdownView',
@@ -19,20 +16,9 @@ require([
   'views/app/integrationSettingsModal',
   'views/app/collaboratorsView',
   'collections/collaborators',
-  'collections/chat-search',
 
   'components/unread-items-client',
 
-  'views/chat/decorators/webhookDecorator',
-  'views/chat/decorators/issueDecorator',
-  'views/chat/decorators/commitDecorator',
-  'views/chat/decorators/mentionDecorator',
-  'views/chat/decorators/embedDecorator',
-  'views/chat/decorators/emojiDecorator',
-  'views/app/unreadBannerView',
-  'views/app/historyLimitView',
-
-  'views/app/headerView',
 
   'components/statsc',          // No ref
   'views/widgets/preload',      // No ref
@@ -46,13 +32,10 @@ require([
   'components/focus-events'     // No ref
 
 ], function($, Backbone, context, liveContext, appEvents, log,
-    peopleCollectionView, ChatIntegratedView, chatInputView,
-    ChatCollectionView, itemCollections, RightToolbarView,
+    peopleCollectionView, ChatIntegratedView, itemCollections,
     inviteView, TroupeSettingsView, MarkdownView, KeyboardView,
     AddPeopleViewModal, IntegrationSettingsModal, CollaboratorsView,
-    collaboratorsModels, chatSearchModels,
-    unreadItemsClient, webhookDecorator, issueDecorator, commitDecorator, mentionDecorator,
-    embedDecorator, emojiDecorator, UnreadBannerView, HistoryLimitView, HeaderView) {
+    collaboratorsModels, unreadItemsClient) {
   "use strict";
 
   $(document).on("click", "a", function(e) {
@@ -210,53 +193,36 @@ require([
     else notifyRemoveError('User '+ username +' was not found in this room.');
   });
 
-  var appView = new ChatIntegratedView({ el: 'body' });
-  new RightToolbarView({ el: "#toolbar-frame" });
+  // new RightToolbarView({ el: "#toolbar-frame" });
 
-  new HeaderView({ model: context.troupe(), el: '#header' });
+  // new HeaderView({ model: context.troupe(), el: '#header' });
 
   // Setup the ChatView
-  var chatCollectionView = new ChatCollectionView({
-    el: '#chat-container',
-    collection: itemCollections.chats,
-    userCollection: itemCollections.users,
-    decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
-  }).render();
+  // var chatCollectionView = new ChatCollectionView({
+  //   el: '#chat-container',
+  //   collection: itemCollections.chats,
+  //   userCollection: itemCollections.users,
+  //   decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
+  // }).render();
 
-  var chatSearchCollection = new chatSearchModels.ChatSearchCollection([], { });
-  var chatSearchCollectionView = new ChatCollectionView({
-    el: '#search-container',
-    collection: chatSearchCollection,
-    userCollection: itemCollections.users,
-    decorators: []
-  }).render();
-  chatSearchCollection.fetch({ data: { q: 'SAD'} });
+  // Setup the chat search view
+  // var chatSearchCollection = new chatSearchModels.ChatSearchCollection([], { });
+  // var chatSearchCollectionView = new ChatCollectionView({
+  //   el: '#search-container',
+  //   collection: chatSearchCollection,
+  //   userCollection: itemCollections.users,
+  //   decorators: []
+  // }).render();
 
-  var unreadChatsModel = unreadItemsClient.acrossTheFold();
+  // chatSearchCollection.fetchSearch('moo');
+  // chatCollectionView.$el.hide();
 
-  new UnreadBannerView.Top({
-    el: '#unread-banner',
-    model: unreadChatsModel,
-    chatCollectionView: chatCollectionView
-  }).render();
-
-  new UnreadBannerView.Bottom({
-    el: '#bottom-unread-banner',
-    model: unreadChatsModel,
-    chatCollectionView: chatCollectionView
-  }).render();
-
-  new HistoryLimitView({
-    el: '#limit-banner',
-    collection: itemCollections.chats,
-    chatCollectionView: chatCollectionView
-  }).render();
-
-
-  itemCollections.chats.once('sync', function() {
-    unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
+  var appView = new ChatIntegratedView({
+    el: 'body'
   });
 
+
+  // This may require a better home
   itemCollections.users.once('sync', function() {
     if(context().permissions.admin) {
       if (itemCollections.users.length === 1) { //itemCollections.chats.length === 0)
@@ -269,15 +235,6 @@ require([
       }
     }
   });
-
-  new chatInputView.ChatInputView({
-    el: $('#chat-input'),
-    collection: itemCollections.chats,
-    chatCollectionView: chatCollectionView,
-    userCollection: itemCollections.users,
-    rollers: chatCollectionView.rollers
-  }).render();
-
 
   var Router = Backbone.Router.extend({
     routes: {

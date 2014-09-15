@@ -19,7 +19,6 @@ define([
   'utils/platform-keys',
   'bootstrap_tooltip', // No ref
   'jquery-textcomplete', // No ref
-  'utils/sisyphus-cleaner' // No ref
 ], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate,
   emojiListItemTemplate, moment, hasScrollBars, isMobile, emoji, drafty, cdn, commands,
   cocktail, KeyboardEventsMixin, platformKeys) {

@@ -1,7 +1,8 @@
 define([
+  'underscore',
   '../utils/utils',
   '../utils/context'
-], function(utils, context) {
+], function(_, utils, context) {
   "use strict";
 
   return {
@@ -31,7 +32,7 @@ define([
 
       var loadLimit = this.getLoadLimit();
 
-      var data = { limit: loadLimit /* Latest is the default */ };
+      var data = _.defaults(this.getQuery && this.getQuery(), { limit: loadLimit /* Latest is the default */ });
 
       var existingIds = utils.index(this.pluck('id'), utils.identityTransform);
 
@@ -89,7 +90,9 @@ define([
 
       var loadLimit = this.getLoadLimit();
 
-      var data = { beforeId: beforeId, limit: loadLimit };
+      var data = _.defaults(this.getQuery && this.getQuery(), { beforeId: beforeId, limit: loadLimit });
+
+      // var data = { beforeId: beforeId, limit: loadLimit };
       var self = this;
 
       this.fetch({
@@ -126,8 +129,8 @@ define([
       }
 
       var loadLimit = this.getLoadLimit();
-
-      var data = { afterId: afterId, limit: loadLimit };
+      var data = _.defaults(this.getQuery && this.getQuery(), { afterId: afterId, limit: loadLimit });
+      // var data = { afterId: afterId, limit: loadLimit };
 
       this.trigger('fetch.started');
 
@@ -165,7 +168,7 @@ define([
 
       var existingIds = utils.index(this.pluck('id'), utils.identityTransform);
 
-      var data = { marker: marker, limit: loadLimit };
+      var data = _.defaults(this.getQuery && this.getQuery(), { marker: marker, limit: loadLimit });
       var self = this;
 
       this.fetch({
