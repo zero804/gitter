@@ -4,6 +4,7 @@
 var suggestedService = require('../services/suggested-room-service');
 var userService = require('../services/user-service');
 var RepoService = require('../services/github/github-repo-service');
+var roomNameTrimmer = require('../utils/room-name-trimmer');
 var Q = require('q');
 
 var DEFAULT_TAGS = ['javascript', 'ruby', 'php'];
@@ -23,7 +24,7 @@ function getRoomRenderData(room, user) {
     return {
       room: room,
       repo: repo,
-      owner: room.uri.split('/')[0],
+      shortName: roomNameTrimmer(room.uri),
       activeUsers: users.filter(isActiveUser)
     };
   });
