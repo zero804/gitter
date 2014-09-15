@@ -3,7 +3,7 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon-normal.ico' }}">
-    <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,100">
+    {{!-- <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,100"> --}}
     <style type="text/css">
       html {
         box-sizing: border-box;
@@ -14,7 +14,11 @@
       }
 
       * {
-        font-family: proxima-nova-alt,"Proxima Nova Alt",sans-serif;
+        font-family: proxima-nova-alt, "Proxima Nova Alt", sans-serif;
+      }
+
+      h1, h2 {
+        margin: 0;
       }
 
       .avatar {
@@ -46,12 +50,14 @@
       }
 
       .page-header {
-        height: 85%;
-        background-color: #231f20;
-        background: url(../../../images/home/banner.jpg) no-repeat center center;
+        height: 75%;
+        /*padding: 1.875em;*/
+        background: url('../../images/home/banner.jpg') no-repeat center center;
+        background-size: cover;
         display: flex;
         justify-content: center;
         align-items: center;
+        text-align: center;
       }
 
       .logo {
@@ -80,17 +86,26 @@
         text-decoration: none;
       }
 
+      h1 {
+        font-weight: 400;
+      }
+
       .title {
         text-transform: uppercase;
         color: #fff;
-        font-weight: 100;
         letter-spacing: 0.1em;
         text-align: center;
+<<<<<<< Updated upstream
         line-height: 2em;
         font-size: 10vw;
+=======
+        font-size: 3em;
+        /*line-height: 2em;*/
+>>>>>>> Stashed changes
       }
 
       .room-item {
+        opacity: 0.8;
         flex: 1 0 250px;
         /*max-width: 500px;*/
         /* cursor: pointer; */
@@ -99,9 +114,13 @@
         /* padding: 0.625em; */
         margin-right: 0.625em;
         margin-bottom: 0.625em;
-
+        border-radius: 6px;
         display: flex;
         flex-direction: column;
+      }
+
+      .room-item:hover {
+        opacity: 1;
       }
 
       .room-item h1,
@@ -181,5 +200,7 @@
       </li>
     {{/each}}
     </ul>
+    <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
+    <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
   </body>
 </html>
