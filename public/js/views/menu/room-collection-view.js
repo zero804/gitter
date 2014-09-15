@@ -45,6 +45,27 @@ define([
       'click': 'clicked',
       'click .js-close-button': 'onItemClose'
     },
+    initialize: function() {
+      this.updateCurrentRoom();
+
+      this.listenTo(appEvents, 'navigation', function(url) {
+        // strip off query params etc
+        var parser = document.createElement('a');
+        parser.href = url;
+
+        this.updateCurrentRoom(parser.pathname);
+      });
+    },
+    updateCurrentRoom: function(newUrl) {
+      var url = newUrl || window.location.pathname;
+      var isCurrentRoom = this.model.get('url') === url;
+
+      if(this.isCurrentRoom !== isCurrentRoom) {
+        // cannot be stored on the model as it will get wiped by faye
+        this.isCurrentRoom = isCurrentRoom;
+        this.render();
+      }
+    },
     serializeData: function() {
       var data = this.model.toJSON();
       data.name = roomNameTrimmer(data.name, MAX_NAME_LENGTH);
@@ -65,6 +86,8 @@ define([
 
     onRender: function() {
       var self = this;
+
+      this.$el.toggleClass('room-list-item--current-room', this.isCurrentRoom);
 
       var m = self.model;
       dataset.set(self.el, 'id', m.id);
@@ -135,7 +158,6 @@ define([
       setTimeout(function() {
         // Make things feel a bit more responsive, but not too responsive
         self.clearSearch();
-        model.set('lastAccessTime', moment());
       }, 150);
 
       appEvents.trigger('navigation', model.get('url'), 'chat', model.get('name'), model.id);
@@ -156,7 +178,6 @@ define([
       }
       this.roomsCollection = options.roomsCollection;
     },
-
     makeDraggable: function(drop) {
       var cancelDrop = false;
       var self = this;

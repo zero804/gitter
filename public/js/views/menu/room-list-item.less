@@ -13,14 +13,20 @@
   line-height: 26px;
 }
 
-body.hover .room-list-item:hover,
-.room-list-item.selected {
+body.hover .room-list-item:hover:not(.room-list-item--current-room),
+.room-list-item.selected:not(.room-list-item--current-room) {
   border-radius: 4px 0 0 4px;
   background-color: rgba(255,255,255,0.2);
 
   &.chatting:after {
     display: none;
   }
+}
+
+.room-list-item--current-room {
+  border-radius: 4px 0 0 4px;
+  background-color: white;
+  color: lighten(@trpDarkBlue, 5%);
 }
 
 .room-list-item.chatting:after {
@@ -68,7 +74,6 @@ body.hover .room-list-item:hover,
 }
 
 .room-list-item span {
-  color: white;
   white-space: nowrap;
   max-width: 195px;
   overflow: hidden;
