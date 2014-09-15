@@ -16,8 +16,9 @@ body {
   font-family: proxima-nova-alt, "Proxima Nova Alt", sans-serif;
 }
 
-h1, h2 {
+h1, h2, h3, h4, h5 {
   margin: 0;
+  font-weight: 100;
 }
 
 .avatar {
@@ -64,15 +65,6 @@ h1, h2 {
   height: 16px;
 }
 
-// html {
-//   height: 100%;
-// }
-
-// body {
-//   height: 100%;
-//   margin: 0;
-// }
-
 nav {
   position: absolute;
   top: 0;
@@ -99,17 +91,20 @@ h1 {
   /*line-height: 2em;*/
 }
 
+@AVATAR_SIZE: 4 * 0.625em;
+
 .room-item {
   opacity: 0.8;
   flex: 1 0 250px;
   /*max-width: 500px;*/
   /* cursor: pointer; */
-  background-color: #222222;
+  background-color: @dark;
+  border: 2px solid @dark;
   color: white;
   /* padding: 0.625em; */
-  margin-right: 0.625em;
-  margin-bottom: 0.625em;
-  border-radius: 6px;
+  // margin-right: 0.625em;
+  // margin-bottom: 0.625em;
+  // border-radius: 6px;
   display: flex;
   flex-direction: column;
 }
@@ -123,41 +118,52 @@ h1 {
 .room-item h3,
 .room-item h4,
 .room-item h5 {
-  margin: 0;
-  font-weight: 100;
-  line-height: 40px;
+  // line-height: 40px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .room-item section {
   background-color: #3b3b3b;
   padding: 0.625em;
   overflow: hidden;
   flex-grow: 1;
 }
+
+
 .room-item header {
   margin-bottom: 0.625em;
+  height: @AVATAR_SIZE;
+  line-height: @AVATAR_SIZE;
 }
+
 .room-item__avatar {
   float: left;
-  width: 40px;
+  width: @AVATAR_SIZE;
   margin-right: 0.625em;
   border-radius: 3px;
 }
+
 .room-item__head {
-  width: 75%;
   padding: 0 0.625em;
   float: right;
   text-align: right;
 }
+
 .room-item__content {
   border-top: 0.3em solid #2e2e2e;
   text-align: center;
   padding: 1.25em;
 }
+
 .room-item__foot {
   text-transform: uppercase;
   padding: 0.625em;
   background-color: #6e6e6e;
+}
+
+.intro {
+  text-align: center;
+  font-size: 1.4em;
 }
