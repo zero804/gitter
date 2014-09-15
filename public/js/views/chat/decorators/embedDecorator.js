@@ -19,10 +19,12 @@ define([
     chatItemView.$el
       .find('a.link')
       .each(function (index, el) {
-        isCollapsible = true;
         if (el.childElementCount === 0 && (el.innerText || el.textContent) === el.href) {
+
           oEmbed.parse(el.href, function (embed) {
             if (embed && embed.html) {
+              isCollapsible = true;
+
               var $embed = $(document.createElement('div'));
               $embed.addClass('embed');
               if(chatItemView.expandFunction) {
