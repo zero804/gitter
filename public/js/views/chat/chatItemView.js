@@ -388,6 +388,8 @@ define([
         });
       }
 
+      embeds.css("overflow", undefined);
+      embeds.css("max-height", "0");
       embeds.addClass('animateOut');
 
       // Remove after
@@ -416,9 +418,6 @@ define([
       // Used by the decorator
       self.expandFunction = function(embed) {
         embed.addClass('animateOut');
-        embed.css("max-height", undefined);
-        embed.css("overflow", undefined);
-
 
         setTimeout(function() {
 
