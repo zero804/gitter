@@ -66,6 +66,7 @@
     }
 
     @media @mobile {
+      .chat-item__container { padding: 0px 30px 0px 44px }
       .chat-item__details { display: none; }
       .chat-item__text {
         margin: 0;
@@ -209,8 +210,10 @@
 .chat-item__icon--edit {
 
   .chat-item__icon;
+  display: none; // if it isn't the viewers message should not show at all
 
   .isViewers.chat-item:hover & {
+    display: inline-block;
     visibility: visible;
     opacity: 1;
   }
