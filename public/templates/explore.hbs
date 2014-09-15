@@ -16,6 +16,8 @@
       }
 
       .room-list {
+        display: flex;
+        flex-wrap: wrap;
         list-style: none;
         padding-left: 0;
       }
@@ -80,12 +82,17 @@
 
       .room-item {
         box-sizing: border-box;
+        flex: 1 0 250px;
         /*max-width: 500px;*/
         /* cursor: pointer; */
         background-color: #222222;
         color: white;
         /* padding: 0.625em; */
+        margin-right: 0.625em;
         margin-bottom: 0.625em;
+
+        display: flex;
+        flex-direction: column;
       }
       .room-item * {
         box-sizing: border-box;
@@ -107,6 +114,7 @@
         background-color: #3b3b3b;
         padding: 0.625em;
         overflow: hidden;
+        flex-grow: 1;
       }
       .room-item header {
         margin-bottom: 0.625em;
@@ -153,14 +161,12 @@
     <ul class="room-list">
     {{#each rooms}}
       <li class='room-item'>
-        <a href="/{{room.uri}}">
-          <section>
-            <header>
-              <img class="room-item__avatar" src="{{repo.owner.avatar_url}}&s=80"><h3>{{room.uri}}</h3>
-            </header>
-            <small>{{repo.description}}</small>
-          </section>
-        </a>
+        <section>
+          <header>
+            <img class="room-item__avatar" src="{{repo.owner.avatar_url}}&s=80"><h3>{{room.uri}}</h3>
+          </header>
+          <small>{{repo.description}}</small>
+        </section>
         <div class='room-item__foot'>
           <small>{{room.users.length}} online</small>
           •
