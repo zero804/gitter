@@ -56,7 +56,7 @@ var extract = function (str, lang) {
 };
 
 /**
- * getContentBlob() gets the text
+ * getContentBlob() gets the extractable parts from the repo and the room and concatenates them
  *
  * room     Room - the room object
  * repo     Object - the information from GitHub
@@ -66,7 +66,9 @@ var getContentBlob = function (room, repo) {
   return [
     // room.topic,
     repo.description
-  ].join(' ');
+  ].reduce(function (prev, curr) {
+    return prev + ' ' + curr;
+  });
 };
 
 // returns a set of known attributes from github
@@ -93,10 +95,11 @@ var mergeTags = function (/* arrays */) {
 
 // module will take a Room Obejct and a Repo Object (from GitHub) and return an array of tags.
 module.exports = function autoTag(room, repo) {
-  repo = (typeof repo !== 'undefined') ? repo : {}; // setting default, in case we have no GitHub data
+  repo = repo || {}; // setting default, in case we have no GitHub data
+
   var content = getContentBlob(room, repo);
   var languages = detect(content);
-  var keywords = extract(content, languages[0]);
+  var keywords = extract(content, languages[0]); // top language
   var gh_keywords = getRepoKeywords(repo);
 
   return mergeTags(gh_keywords, keywords);
