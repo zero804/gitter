@@ -98,25 +98,23 @@
       .room-item h5 {
         margin: 0;
         font-weight: 100;
+        line-height: 40px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }
-      .room-item header {
-        /*float: right;*/
+      .room-item section {
         background-color: #3b3b3b;
         padding: 0.625em;
         overflow: hidden;
-        /*text-align: right;*/
+      }
+      .room-item header {
+        margin-bottom: 0.625em;
       }
       .room-item__avatar {
-        color: black;
         float: left;
         width: 40px;
         margin-right: 0.625em;
-      }
-      .room-item__avatar img {
-        max-width: 100%;
         border-radius: 3px;
       }
       .room-item__head {
@@ -156,13 +154,12 @@
     {{#each rooms}}
       <li class='room-item'>
         <a href="/{{room.uri}}">
-          <header>
-            <div class="room-item__avatar">
-              <img src="https://avatars.githubusercontent.com/{{owner}}?s=80">
-            </div>
-            <h3>{{room.uri}}</h3>
-              <small>{{repo.description}}</small>
-          </header>
+          <section>
+            <header>
+              <img class="room-item__avatar" src="{{repo.owner.avatar_url}}&s=80"><h3>{{room.uri}}</h3>
+            </header>
+            <small>{{repo.description}}</small>
+          </section>
         </a>
         <div class='room-item__foot'>
           <small>{{room.users.length}} online</small>
