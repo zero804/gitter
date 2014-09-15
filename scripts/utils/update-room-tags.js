@@ -1,5 +1,4 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
-
 /**
  * update-room-tags script
  * ====
@@ -11,8 +10,18 @@
 var Q = require('Q');
 var persistence = require('../../server/services/persistence-service');
 var GitHubService = require('../../server/services/github/github-repo-service');
+var throat = require('throat');
 
-var autoTagger = require('../../server/utils/room-tagger');
+var roomTagger = require('../../server/utils/room-tagger');
+
+if (process.env.NODE_ENV === 'prod') {
+  console.log('tried to run script on:', process.env.NODE_ENV);
+  console.log('exiting...');
+  return process.exit(1);
+}
+
+// @const
+var CONCURRENCY_LIMIT = 5;
 
 // gets list of rooms from DB
 var findRooms = function (limit) {
@@ -21,28 +30,33 @@ var findRooms = function (limit) {
 
   return persistence.Troupe
     .find({
-      // $where: 'this.users.length > 25',
+      'users.1': { $exists: true },
+      tags: { $exists: false },
       security: 'PUBLIC',
       githubType: 'REPO'
     })
-    .lean()
+    // .lean()
     .limit(limit)
     .execQ();
 };
 
 // context is a room, wrapper around Github service
-var fetchGithubInfo = function () {
-  var github = new GitHubService(/*user*/);
+var fetchGithubInfo = function (user) {
+  console.log('fetchGithubInfo() ====================');
+  if (user === null) console.log('user not found, using standard token');
+  user = user || undefined;
+  var github = new GitHubService(user);
   return github.getRepo(this.lcUri);
 };
 
 // context is room, returns a promise that returns an array containing -> [room, repo]
 var combineInfo = function (repo) {
-  return Q.all([ this, repo ]);
+  return [this, repo];
 };
 
 // function to be called with filters, returns an array of rooms filtered by whether it's empty or not
-var ignoreEmptyRooms = function (rooms) {
+var removeEmptyRooms = function (rooms) {
+  console.log('total rooms:', rooms.length);
   return rooms.filter(function (room) {
     return room.users.length !== 0;
   });
@@ -50,42 +64,56 @@ var ignoreEmptyRooms = function (rooms) {
 
 // responsible for getting the GH information and then combining the result into an array, once resolved
 var prepareRooms = function (rooms) {
-  return Q.all(rooms.map(function (room) {
-    var id = room.users[0].userId;
-    return persistence.User.findByIdQ(id)
-      .then(fetchGithubInfo.bind(room))
-      .then(combineInfo.bind(room));
-  }));
+  console.log('non-empty rooms:', rooms.length);
+  return Q.all(
+    // notice the limit on concurrent calls
+    rooms.map(throat(CONCURRENCY_LIMIT, function (room) {
+      var id = room.users[0].userId;
+      return persistence.User.findByIdQ(id)
+        .then(fetchGithubInfo.bind(room))
+        .catch(function () {
+          return null;
+        })
+        .then(combineInfo.bind(room));
+    })
+  ));
 };
 
 // deals with [room, info] returning an array of rooms with the added tags
 var tagRooms = function (result) {
   console.log('tagRooms() ====================');
-  return result.map(function (data) {
-    data[0].tags = autoTagger(data[0], data[1]); // tagging
-    return data[0];
+  return result.filter(function (data) {
+    return !!(data);
+  }).map(function (data) {
+    var room = data[0];
+    var repo = data[1];
+    room.tags = roomTagger(room, repo); // tagging
+    return room;
   });
 };
 
 // iterates to the now tagged rooms and saves them
-// FIXME: actually save them
 var saveRooms = function (rooms) {
   console.log('saveRooms() ====================');
-  console.log('will save', rooms.length);
   return Q.all(
     rooms.map(function (room) {
-      // should save all the rooms
-      console.log('room.uri:', room.uri, '| tags: ', room.tags.length);
+      console.log('room:', room);
+      return room.saveQ()
+        .then(console.log.bind(console))
+        .catch(function (err) {
+          return null;
+        });
     })
   );
 };
 
 // reponsible for running the procedure
-findRooms(10)
-  .then(ignoreEmptyRooms)
+findRooms(20)
+  .then(removeEmptyRooms)
   .then(prepareRooms)
   .then(tagRooms)
-  // .then(saveRooms)
+  .then(saveRooms)
+  .then(process.exit)
   .catch(function (err) {
     console.log('err:', err.stack);
   });
