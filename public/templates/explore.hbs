@@ -64,6 +64,11 @@
         padding: 8px;
       }
 
+      a {
+        color:inherit;
+        text-decoration: none;
+      }
+
       .title {
         text-transform: uppercase;
         color: #fff;
@@ -149,16 +154,18 @@
     <ul class="room-list">
     {{#each rooms}}
       <li class='room-item'>
-        <header>
-          <div class="room-item__avatar">
-            <img src="https://avatars.githubusercontent.com/{{owner}}?s=80">
-          </div>
-          <h3>{{room.uri}}</h3>
-          {{!-- <div class='room-item__head'> --}}
-            {{!-- <small><span class="octicon octicon-location"></span> Nowheresville, USA</small> --}}
-            <small>{{room.topic}}</small>
-          {{!-- </div> --}}
-        </header>
+        <a href="/{{room.uri}}">
+          <header>
+            <div class="room-item__avatar">
+              <img src="https://avatars.githubusercontent.com/{{owner}}?s=80">
+            </div>
+            <h3>{{room.uri}}</h3>
+            {{!-- <div class='room-item__head'> --}}
+              {{!-- <small><span class="octicon octicon-location"></span> Nowheresville, USA</small> --}}
+              <small>{{room.topic}}</small>
+            {{!-- </div> --}}
+          </header>
+        </a>
         <div class='room-item__foot'>
           <small>{{room.users.length}} online</small>
           •
