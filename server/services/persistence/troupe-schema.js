@@ -78,6 +78,7 @@ module.exports = {
       dateDeleted: { type: Date },
       dateLastSecurityCheck: { type: Date },
       noindex: { type: Boolean, 'default': false},
+      tags: { type: Array },
       _nonce: { type: Number },
       _tv: { type: 'MongooseNumber', 'default': 0 }
     });
