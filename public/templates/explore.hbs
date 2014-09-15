@@ -5,6 +5,14 @@
     <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon-normal.ico' }}">
     <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,100">
     <style type="text/css">
+      html {
+        box-sizing: border-box;
+      }
+
+      *, *:before, *:after {
+        box-sizing: inherit;
+      }
+
       * {
         font-family: proxima-nova-alt,"Proxima Nova Alt",sans-serif;
       }
@@ -81,7 +89,6 @@
       }
 
       .room-item {
-        box-sizing: border-box;
         flex: 1 0 250px;
         /*max-width: 500px;*/
         /* cursor: pointer; */
@@ -93,9 +100,6 @@
 
         display: flex;
         flex-direction: column;
-      }
-      .room-item * {
-        box-sizing: border-box;
       }
 
       .room-item h1,
