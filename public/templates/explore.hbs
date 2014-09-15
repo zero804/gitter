@@ -30,10 +30,10 @@
           <header>
             <img class="room-item__avatar" src="{{repo.owner.avatar_url}}&s=80"><h3>{{shortName}}</h3>
           </header>
-          <small>{{repo.description}}</small>
+          <small>{{ repo.description }}</small>
         </section>
         <div class='room-item__foot'>
-          <small>{{room.users.length}} online</small>
+          <small><span class="octicon octicon-person"></span> {{ room.users.length }} Online</small>
           •
           <small>00k messages</small>
         </div>
@@ -41,6 +41,8 @@
     {{/each}}
     </ul>
     <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/2.0.2/octicons.min.css">
     <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+    {{> live_reload}}
   </body>
 </html>
