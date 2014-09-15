@@ -145,12 +145,13 @@
           <img class="logo" src="/images/logo-text-white-32.png" alt="Gitter" title="Gitter logo">
         </a>
       </nav>
-      <h1 class="title">Explore<br/>javascript</h1>
+      <h1 class="title">Explore<br/>{{tag}}</h1>
     </header>
-    <p>
-      We host thousands of public communities where developers come to talk.<br/>Here are some of our favourite javascript rooms.
-    </p>
-    {{#each tags}}
+    <section>
+      <p>
+        We host thousands of public communities where developers come to talk.<br/>Here are some of our favourite {{tag}} rooms.
+      </p>
+    </section>
     <ul class="room-list">
     {{#each rooms}}
       <li class='room-item'>
@@ -160,10 +161,7 @@
               <img src="https://avatars.githubusercontent.com/{{owner}}?s=80">
             </div>
             <h3>{{room.uri}}</h3>
-            {{!-- <div class='room-item__head'> --}}
-              {{!-- <small><span class="octicon octicon-location"></span> Nowheresville, USA</small> --}}
-              <small>{{room.topic}}</small>
-            {{!-- </div> --}}
+              <small>{{repo.description}}</small>
           </header>
         </a>
         <div class='room-item__foot'>
@@ -174,6 +172,5 @@
       </li>
     {{/each}}
     </ul>
-    {{/each}}
   </body>
 </html>
