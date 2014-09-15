@@ -150,8 +150,6 @@ a {
 .room-item h5 {
   // line-height: 40px;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .room-item section {
@@ -166,6 +164,32 @@ a {
   margin-bottom: 0.625em;
   height: @AVATAR_SIZE;
   line-height: @AVATAR_SIZE;
+}
+
+.collapsable-repo-name {
+  display: flex;
+}
+
+.collapsable-repo-name .collapsable-repo-name__child {
+  display: inline-block;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  flex-shrink: 1000;
+  transition: flex-shrink 300ms ease-in-out;
+}
+
+.collapsable-repo-name span:not(.collapsable-repo-name__child) {
+  flex-shrink: 0;
+}
+
+.collapsable-repo-name .collapsable-repo-name__child:last-child,
+.collapsable-repo-name .collapsable-repo-name__child:hover {
+  flex-shrink: 0.01;
+}
+
+.collapsable-repo-name .collapsable-repo-name__child:last-child ~ .collapsable-repo-name__child,
+.collapsable-repo-name .collapsable-repo-name__child:hover ~ .collapsable-repo-name__child {
+  flex-shrink: 1000;
 }
 
 .room-item__avatar {
