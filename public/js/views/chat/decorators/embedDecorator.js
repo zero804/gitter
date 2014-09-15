@@ -20,10 +20,12 @@ define([
       .find('a.link')
       .each(function (index, el) {
         if (el.childElementCount === 0 && (el.innerText || el.textContent) === el.href) {
-
           oEmbed.parse(el.href, function (embed) {
             if (embed && embed.html) {
-              isCollapsible = true;
+              if(!isCollapsible) {
+                model.set('isCollapsible', true);
+                isCollapsible = true;
+              }
 
               var $embed = $(document.createElement('div'));
               $embed.addClass('embed');
@@ -45,7 +47,6 @@ define([
         }
       });
 
-    model.set('isCollapsible', isCollapsible);
   }
 
   var decorator = {
