@@ -26,7 +26,7 @@ define([
 
   /* @const */
   var OLD_TIMEOUT = 3600000; /*1 hour*/
-
+  var MAX_HEIGHT = 800; /* This value also in chatItemView.less */
   // This needs to be adjusted in chatInputView as well as chat-server on the server
   /* @const */
   var EDIT_WINDOW = 1000 * 60 * 10; // 10 minutes
@@ -400,9 +400,26 @@ define([
       var self = this;
       clearTimeout(self.embedTimeout);
 
+      function adjustMaxHeight(embeds) {
+        setTimeout(function() {
+          embeds.each(function(i, e) {
+            var h = $(e).height();
+            if(h <= MAX_HEIGHT) {
+              $(e).css("max-height", h + "px");
+            } else {
+              $(e).css("overflow", "hidden");
+            }
+          });
+        }, 3000);
+      }
+
       // Used by the decorator
       self.expandFunction = function(embed) {
         embed.addClass('animateOut');
+        embed.css("max-height", undefined);
+        embed.css("overflow", undefined);
+
+
         setTimeout(function() {
 
           if(self.rollers) {
@@ -410,13 +427,13 @@ define([
           }
 
           embed.removeClass('animateOut');
-
+          adjustMaxHeight(embed);
         }, 10);
       };
 
       self.renderText();
 
-      // Give the browser a second to
+      // Give the browser a second to load the content
       self.embedTimeout = setTimeout(function() {
         var embeds = self.$el.find('.embed');
 
@@ -427,6 +444,8 @@ define([
         }
 
         embeds.removeClass('animateOut');
+
+        adjustMaxHeight(embeds);
       }, 10);
     },
 

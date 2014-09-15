@@ -125,7 +125,8 @@ define(['jquery-iframely', 'utils/context'], function ($, context) {
 
   iframelyProviders.push(new RegExp("youtube\\.com/watch"));
   iframelyProviders.push(new RegExp("instagr\\.?am(\\.com)?/p/"));
-  iframelyProviders.push(new RegExp("gist\\.github\\.com/.+/.+"));
+  // 15 Sep 2014: disabling gist provider until we can do something better
+  // iframelyProviders.push(new RegExp("gist\\.github\\.com/.+/.+"));
   iframelyProviders.push(new RegExp("cloudup\\.com"));
   iframelyProviders.push(new RegExp("cl\\.ly/.+"));
   iframelyProviders.push(new RegExp("dl\\.dropboxusercontent\\.com"));

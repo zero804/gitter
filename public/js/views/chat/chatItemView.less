@@ -303,7 +303,10 @@
     position: relative;
     transition: max-height 500ms;
     overflow: hidden;
-    max-height: 500px;
+    
+    // If you adjust this value (below), you'll also need 
+    // to adjust the MAX_HEIGHT value in chatItemView.js 
+    max-height: 800px;
 
     &.animateOut {
       max-height: 0;
