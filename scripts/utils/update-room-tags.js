@@ -108,7 +108,7 @@ var saveRooms = function (rooms) {
 
 // reponsible for running the procedure
 findRooms(20)
-  .then(removeEmptyRooms)
+  .then(removeEmptyRooms) // TODO: Remove, as the query already does the job of filtering empty rooms.
   .then(prepareRooms)
   .then(tagRooms)
   .then(saveRooms)
