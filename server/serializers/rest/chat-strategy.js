@@ -2,6 +2,7 @@
 "use strict";
 
 var unreadItemService = require("../../services/unread-item-service");
+var collapsedChatsService = require('../../services/collapsed-chats-service');
 var execPreloads      = require('../exec-preloads');
 var getVersion        = require('../get-model-version');
 var UserIdStrategy    = require('./user-id-strategy');
@@ -42,14 +43,40 @@ UnreadItemStategy.prototype = {
 
 
 
+function CollapsedItemStrategy(options) {
+  var itemsHash;
+  var userId = options.userId;
+  var roomId = options.roomId;
+
+  this.preload = function(data, callback) {
+    collapsedChatsService.getHash(userId, roomId)
+      .then(function (hash) {
+        itemsHash = hash;
+      })
+      .nodeify(callback);
+  };
+
+  this.map = function (chatId) {
+    return itemsHash[chatId] ? true : undefined; // Don't send false,
+  };
+}
+
+CollapsedItemStrategy.prototype = {
+  name: 'CollapsedItemStrategy'
+};
+
 function ChatStrategy(options)  {
   if(!options) options = {};
 
   var userStategy = options.user ? null : new UserIdStrategy();
-  var unreadItemStategy;
+  var unreadItemStategy, collapsedItemStategy;
   /* If options.unread has been set, we don't need a strategy */
   if(options.currentUserId && options.unread === undefined) {
     unreadItemStategy = new UnreadItemStategy({ itemType: 'chat' });
+  }
+
+  if (options.currentUserId && options.troupeId) {
+    collapsedItemStategy = new CollapsedItemStrategy({ userId: options.currentUserId, roomId: options.troupeId });
   }
 
   var troupeStrategy = options.includeTroupe ? new TroupeIdStrategy(options) : null;
@@ -75,6 +102,13 @@ function ChatStrategy(options)  {
       });
     }
 
+    if(collapsedItemStategy) {
+      strategies.push({
+        strategy: collapsedItemStategy,
+        data: null
+      });
+    }
+
     if(troupeStrategy) {
       strategies.push({
         strategy: troupeStrategy,
@@ -87,6 +121,7 @@ function ChatStrategy(options)  {
 
   this.map = function(item) {
     var unread = unreadItemStategy ? unreadItemStategy.map(item._id) : defaultUnreadStatus;
+    var collapsed = collapsedItemStategy && collapsedItemStategy.map(item._id);
 
     return {
       id: item._id,
@@ -97,6 +132,7 @@ function ChatStrategy(options)  {
       editedAt: formatDate(item.editedAt),
       fromUser: options.user ? options.user : userStategy.map(item.fromUserId),
       unread: unread,
+      collapsed: collapsed,
       room: troupeStrategy ? troupeStrategy.map(item.toTroupeId) : undefined,
       readBy: item.readBy ? item.readBy.length : undefined,
       urls: item.urls || [],
