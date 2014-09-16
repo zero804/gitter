@@ -73,11 +73,8 @@ require([
   // Called from the OSX native client for faster page loads
   // when clicking on a chat notification
   window.gitterLoader = function(url) {
-    var frameUrl = url + '/~chat';
-    titlebarUpdater.setRoomName(url);
-
-    pushState(frameUrl, url, url);
-    updateContent(frameUrl);
+    var title = url.replace(/^\//,'');
+    appEvents.trigger('navigation', url, 'chat', title);
   };
 
   appEvents.on('navigation', function(url, type, title) {
