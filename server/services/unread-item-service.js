@@ -471,9 +471,11 @@ exports.listTroupeUsersForEmailNotifications = function(horizonTime, emailLatchE
 exports.markItemsRead = function(userId, troupeId, itemIds, mentionIds, options) {
   // Configure options
   if(!options) options = {};
+
   // { member : default true }
   if(options.member === undefined) options.member = true;
-  // { recordAsRead: default truw }
+
+  // { recordAsRead: default true }
   if(options.recordAsRead === undefined) options.recordAsRead = true;
 
   var now = Date.now();
