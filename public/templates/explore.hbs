@@ -30,20 +30,24 @@
       <ul class="room-list">
         {{#each rooms}}
           <li class='room-item'>
-            <section>
-              <header>
-                <img class="room-item__avatar" src="{{repo.owner.avatar_url}}&s=80">
-                <h3 class="collapsable-repo-name">
-                  <span class="collapsable-repo-name__child">{{repo.owner.login}}</span><span>/</span><span class="collapsable-repo-name__child">{{repo.name}}</span>
-                </h3>
-              </header>
+            <header>
+              <img class="room-item__avatar" src="{{repo.owner.avatar_url}}&s=80">
+              <h3 class="collapsable-repo-name">
+                <span class="collapsable-repo-name__child">{{repo.owner.login}}</span><span>/</span><span class="collapsable-repo-name__child">{{repo.name}}</span>
+              </h3>
+            </header>
+            <section class='room-item__description'>
               <small>{{ repo.description }}</small>
             </section>
-            <div class='room-item__foot'>
+            {{!-- <section class='room-item__content'>
+              <p>Some content, content about something.</p>
+              <p>111233213213</p>
+            </section> --}}
+            <footer>
               <small><span class="octicon octicon-person"></span> {{ room.users.length }} Online</small>
               •
               <small>00k messages</small>
-            </div>
+            </footer>
           </li>
         {{/each}}
       </ul>
