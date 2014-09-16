@@ -1,5 +1,22 @@
 @import 'colors';
 
+@font-face {
+  font-family: 'DP';
+
+  /* For older versions of IE */
+  src: url('../fonts/dp.eot');
+
+  /* Standard syntax */
+  src: url('../fonts/dp.eot?#iefix') format('embedded-opentype'),
+       url('../fonts/dp.woff') format('woff'),
+       url('../fonts/dp.ttf') format('truetype'),
+       url('../fonts/dp.svg#dp') format('svg');
+
+  /* Apply synthetic bolding/italics */
+  font-weight: normal;
+  font-style: normal;
+}
+
 html {
   box-sizing: border-box;
 }
@@ -14,15 +31,26 @@ body {
 
 * {
   font-family: proxima-nova-alt, "Proxima Nova Alt", sans-serif;
+  smoothing: antialiased;
+  font-smoothing: grayscale;
 }
 
 h1, h2, h3, h4, h5 {
   margin: 0;
-  font-weight: 100;
+  font-weight: 400;
 }
 
-ul {
+p {
+  font-weight: 300;
+}
+
+p, ul {
   margin: 0;
+}
+
+.wrap {
+  max-width: 75em;
+  margin: 0 auto;
 }
 
 .avatar {
@@ -55,21 +83,55 @@ ul {
 }
 
 .page-header {
-  height: 75%;
-  /*padding: 1.875em;*/
+  color: #fff;
+  padding: 1.875em 1.25em;
   background: url('../../images/home/banner.jpg') no-repeat center center;
   background-size: cover;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   text-align: center;
+  font-family: DP, sans-serif;
+
+  .octicon-heart {
+    color: desaturate(@red, 20%);
+  }
+
+  p {
+    margin: 1em 0 1.8125em;
+    font-size: 1.2em;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  h1 {
+    letter-spacing: 0.1em;
+    text-align: center;
+    line-height: 1.4em;
+    font-size: 10vw;
+    text-transform: uppercase;
+    font-weight: 300;
+  }
+
+  &__search {
+    width: 100%;
+    border: none;
+    font-size: 1em;
+    height: 4 * 0.625em;
+    padding: 0 0.5em;
+    max-width: 600px;
+    border-radius: 4px;
+    font-family: proxima-nova-alt, "Proxima Nova Alt", sans-serif;
+  }
 }
 
 .introduction {
   background-color: @light;
   color: #7d7669;
-  padding: 65px 10px;
+  padding: 0.625em;
   text-align: center;
+
+  p {
+    margin-top: 0.625em;
+  }
 }
 
 .logo {
@@ -98,16 +160,6 @@ a {
   text-decoration: none;
 }
 
-.title {
-  text-transform: uppercase;
-  color: #fff;
-  letter-spacing: 0.1em;
-  text-align: center;
-  line-height: 2em;
-  font-size: 10vw;
-  font-weight: 100;
-}
-
 // if you change this, make sure to change the image url "s" param.
 // it has to be double to support retina displays.
 @AVATAR_SIZE: 40px;
@@ -128,17 +180,17 @@ a {
   opacity: 1;
 }
 
-.room-item:nth-child(2n) {
-  flex-grow: 2;
-}
+// .room-item:nth-child(2n) {
+//   flex-grow: 2;
+// }
 
-.room-item:nth-child(3n) {
-  flex-grow: 0.5;
-}
+// .room-item:nth-child(3n) {
+//   flex-grow: 0.5;
+// }
 
-.room-item:nth-child(5n) {
-  flex-grow: 2;
-}
+// .room-item:nth-child(5n) {
+//   flex-grow: 2;
+// }
 
 .room-item h1,
 .room-item h2,
