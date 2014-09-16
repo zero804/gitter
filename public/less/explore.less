@@ -22,6 +22,7 @@ html {
 }
 
 body {
+  background-color: @light;
   margin: 0;
 }
 
@@ -46,6 +47,10 @@ p {
 
 p, ul {
   margin: 0;
+}
+
+textarea:focus, input:focus{
+    outline: 0;
 }
 
 .wrap {
@@ -83,20 +88,19 @@ p, ul {
 }
 
 .page-header {
-  color: #fff;
+  background-color: white;
   padding: 1.875em 1.25em;
-  background: url('../../images/home/banner.jpg') no-repeat center center;
-  background-size: cover;
   text-align: center;
   font-family: DP, sans-serif;
+  border-bottom: 0.625em solid darken(@light, 2%);
 
   .octicon-heart {
     color: desaturate(@red, 20%);
   }
 
   p {
-    margin: 1em 0 1.8125em;
-    font-size: 1.2em;
+    margin: 1.05em 0 1.8125em;
+    font-size: 1.25em;
     &:last-child {
       margin-bottom: 0;
     }
@@ -112,15 +116,22 @@ p, ul {
   }
 
   &__search {
+    -webkit-appearance: none;
+    color: @dark;
     width: 100%;
-    border: none;
+    border: 3px solid darken(@light, 5%);
+    background-color: rgba(255, 255, 255, 0.9);
     font-size: 1em;
     height: 4 * 0.625em;
-    padding: 0 0.5em;
+    padding: 0 0.7em 0 0.4em;
     max-width: 600px;
     border-radius: 4px;
     font-family: proxima-nova-alt, "Proxima Nova Alt", sans-serif;
   }
+}
+
+.page-content {
+  padding: 0.625em;
 }
 
 .introduction {

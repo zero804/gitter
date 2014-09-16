@@ -14,36 +14,40 @@
             <img class="logo" src="/images/logo-text-white-32.png" alt="Gitter" title="Gitter logo">
           </a>
         </nav> --}}
-        <h1 class="title">Explore <b>Gitter,</b></h1>
-        <p>and find great chat rooms <b>&amp;</b> communitites we <span class="octicon octicon-heart"></span>.</p>
+        <h1 class="title">Explore <b>Gitter</b></h1>
+        <p>and find great chat rooms <b>&amp;</b> communitites we <span class="octicon octicon-heart"></span></p>
         {{!-- <h1>{{ tag }}</h1> --}}
-        <p><input class='page-header__search' type='text' placeholder='Search for tags... e.g. node' /></p>
+        <form>
+          <p><input name='searchTerm' id='searchTerm' class='page-header__search' type='search' placeholder='Search for tags... e.g. node' /></p>
+        </form>
       </div>
     </header>
     {{!-- <section class="introduction"> --}}
       {{!-- <p>Gitter hosts thousands of public communities where developers come to talk.</p> --}}
       {{!-- <p>Browse through some of our favourite {{ tag }} rooms.</p> --}}
     {{!-- </section> --}}
-    <ul class="room-list">
-    {{#each rooms}}
-      <li class='room-item'>
-        <section>
-          <header>
-            <img class="room-item__avatar" src="{{repo.owner.avatar_url}}&s=80">
-            <h3 class="repo-name">
-              <span class="repo-name__collapsable">{{repo.owner.login}}</span><span>/</span><span class="repo-name__collapsable">{{repo.name}}</span>
-            </h3>
-          </header>
-          <small>{{ repo.description }}</small>
-        </section>
-        <div class='room-item__foot'>
-          <small><span class="octicon octicon-person"></span> {{ room.users.length }} Online</small>
-          •
-          <small>00k messages</small>
-        </div>
-      </li>
-    {{/each}}
-    </ul>
+    <div class='page-content'>
+      <ul class="room-list">
+        {{#each rooms}}
+          <li class='room-item'>
+            <section>
+              <header>
+                <img class="room-item__avatar" src="{{repo.owner.avatar_url}}&s=80">
+                <h3 class="collapsable-repo-name">
+                  <span class="collapsable-repo-name__child">{{repo.owner.login}}</span><span>/</span><span class="collapsable-repo-name__child">{{repo.name}}</span>
+                </h3>
+              </header>
+              <small>{{ repo.description }}</small>
+            </section>
+            <div class='room-item__foot'>
+              <small><span class="octicon octicon-person"></span> {{ room.users.length }} Online</small>
+              •
+              <small>00k messages</small>
+            </div>
+          </li>
+        {{/each}}
+      </ul>
+    </div>
     <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/2.0.2/octicons.min.css">
     <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
