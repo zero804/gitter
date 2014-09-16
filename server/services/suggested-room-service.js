@@ -315,6 +315,16 @@ function getSuggestions(user, localeLanguage) {
 exports.getSuggestions = getSuggestions;
 
 function getTaggedRooms(_tags) {
+  //fake it til we make it
+  if(_tags === 'javascript') {
+   return Q.resolve(javascriptRooms);
+  } else if(_tags === 'ruby') {
+   return Q.resolve(rubyRooms);
+  } else if(_tags === 'php') {
+   return Q.resolve(phpRooms);
+  }
+
+
   var tags = []; // default tags
   tags = tags.concat(_tags);
 
