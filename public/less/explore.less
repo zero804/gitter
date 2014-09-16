@@ -92,7 +92,6 @@ textarea:focus, input:focus{
   padding: 1.875em 1.25em;
   text-align: center;
   font-family: DP, sans-serif;
-  border-bottom: 0.625em solid darken(@light, 2%);
 
   .octicon-heart {
     color: desaturate(@red, 20%);
@@ -127,6 +126,12 @@ textarea:focus, input:focus{
     max-width: 600px;
     border-radius: 4px;
     font-family: proxima-nova-alt, "Proxima Nova Alt", sans-serif;
+  }
+
+  @media (min-width: 64em) {
+    h1 {
+      font-size: 3vw;
+    }
   }
 }
 
