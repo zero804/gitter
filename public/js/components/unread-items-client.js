@@ -72,7 +72,6 @@ define([
 
   _.extend(UnreadItemStore.prototype, Backbone.Events, DoubleHash.prototype, {
     _unreadItemAdded: function(itemType, itemId) {
-      if(this._lurkMode) return; // No adding in lurk mode
       if(this._deleteTarpit._contains(itemType, itemId)) return;
       if(this._contains(itemType, itemId)) return;
 
@@ -96,6 +95,7 @@ define([
         // Lurk mode, but no mention, don't mark as read
         return;
       }
+
       this._unreadItemRemoved(itemType, itemId);
       this.trigger('itemMarkedRead', itemType, itemId, mentioned);
     },
@@ -116,7 +116,7 @@ define([
     },
 
     _recount: function() {
-      var newValue = this._lurkMode ? 0 : this._count();
+      var newValue = this._count();
 
       if(this._currentCountValue !== newValue) {
         this._currentCountValue = newValue;
@@ -128,14 +128,12 @@ define([
     },
 
     _currentCount: function() {
-      if(!this._lurkMode  && this._currentCountValue) return this._currentCountValue;
+      if(this._currentCountValue) return this._currentCountValue;
 
       return 0;
     },
 
     _unreadItemsAdded: function(items) {
-      if(this._lurkMode) return; // No adding in lurk mode
-
       _iteratePreload(items, function(itemType, itemId) {
         this._unreadItemAdded(itemType, itemId);
       }, this);
@@ -152,8 +150,6 @@ define([
     },
 
     preload: function(items) {
-      if(this._lurkMode) return;
-
       _iteratePreload(items, function(itemType, itemId) {
         log('Preload of ' + itemType + ':' + itemId);
 
@@ -214,6 +210,8 @@ define([
 
     _onWindowUnload: function() {
       if(this._buffer._count() > 0) {
+        // This causes mainthread locks in Safari
+        // TODO: send to the parent frame?
         this._send({ sync: true });
       }
     },
@@ -292,9 +290,9 @@ define([
         var lurk = snapshot._meta && snapshot._meta.lurk;
         if(lurk) {
           store.enableLurkMode();
-        } else {
-          store.preload(snapshot);
         }
+
+        store.preload(snapshot);
       });
     }
   });
@@ -421,17 +419,23 @@ define([
 
       }
 
-      this._foldCount(topBound, bottomBound);
+      this._foldCount();
     },
 
     _foldCount: function() {
+      var chats = this._store._getItemsOfType('chat');
+      if(!chats.length) {
+        // If there are no unread items, save the effort.
+        acrossTheFoldModel.set('unreadAbove', 0);
+        acrossTheFoldModel.set('unreadBelow', 0);
+        return;
+      }
+
       var above = 0;
       var below = 0;
 
       var topBound = this._scrollElement.scrollTop;
       var bottomBound = topBound + this._scrollElement.clientHeight;
-
-      var chats = this._store._getItemsOfType('chat');
 
       var allItems = this._scrollElement.querySelectorAll('.chat-item');
       var chatAboveIndex = _.sortedIndex(allItems, topBound - 1, function(item) {
@@ -453,6 +457,7 @@ define([
         if(typeof item === 'number') return item;
         return item.offsetTop;
       });
+
       var chatBelowView = allItems[chatBelowIndex];
       if(chatBelowView) {
         var belowItemId = dataset.get(chatBelowView, 'itemId');
@@ -462,7 +467,6 @@ define([
           });
         }
       }
-
       acrossTheFoldModel.set('unreadAbove', above);
       acrossTheFoldModel.set('unreadBelow', below);
     },
@@ -582,7 +586,6 @@ define([
 
     monitorViewForUnreadItems: function($el) {
       var unreadItemStore = getUnreadItemStoreReq();
-
       return new TroupeUnreadItemsViewportMonitor($el, unreadItemStore);
     }
   };
