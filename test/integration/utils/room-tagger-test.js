@@ -32,7 +32,7 @@ describe('room-tagger', function () {
       'javascript',
       'php',
       'extensively'
-    ], 'tags differ');
+    ]);
   });
 
   it('should work without repo information', function () {
@@ -46,6 +46,6 @@ describe('room-tagger', function () {
       'english',
       'danish',
       'pidgin'
-    ], 'tags differ');
+    ]);
   });
 });
