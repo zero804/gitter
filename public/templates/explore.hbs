@@ -8,21 +8,22 @@
   </head>
   <body>
     <header class="page-header">
-      <nav>
-        <a href="/" >
-          <img class="logo" src="/images/logo-text-white-32.png" alt="Gitter" title="Gitter logo">
-        </a>
-      </nav>
-      <h1 class="title">Explore<br/>{{tag}}</h1>
+      <div class='wrap'>
+        {{!-- <nav>
+          <a href="/" >
+            <img class="logo" src="/images/logo-text-white-32.png" alt="Gitter" title="Gitter logo">
+          </a>
+        </nav> --}}
+        <h1 class="title">Explore <b>Gitter,</b></h1>
+        <p>and find great chat rooms <b>&amp;</b> communitites we <span class="octicon octicon-heart"></span>.</p>
+        {{!-- <h1>{{ tag }}</h1> --}}
+        <p><input class='page-header__search' type='text' placeholder='Search for tags... e.g. node' /></p>
+      </div>
     </header>
-    <section class="introduction">
-      <h1>
-        We host thousands of public communities where developers come to talk.
-        <br/>
-        <br/>
-        Here are some of our favourite {{tag}} rooms:
-      </h1>
-    </section>
+    {{!-- <section class="introduction"> --}}
+      {{!-- <p>Gitter hosts thousands of public communities where developers come to talk.</p> --}}
+      {{!-- <p>Browse through some of our favourite {{ tag }} rooms.</p> --}}
+    {{!-- </section> --}}
     <ul class="room-list">
     {{#each rooms}}
       <li class='room-item'>
