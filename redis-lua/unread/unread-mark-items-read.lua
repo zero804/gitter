@@ -34,14 +34,16 @@ for i, item_id in ipairs(itemIds) do
       card = redis.call("ZCARD", user_troupe_key)
     end
   end
-
+  
   -- This should actually be taken care of by a call to
   -- remove-user-mentions, but we do it here too
   -- in order to prevent consistency problems
 
   if card == 0 then
-    if redis.call("DEL", user_troupe_mention_key) > 0 or 
-       redis.call("SREM", user_mention_key, troupe_id) > 0 then
+    local r1 = redis.call("DEL", user_troupe_mention_key) > 0
+    local r2 = redis.call("SREM", user_mention_key, troupe_id) > 0
+    
+    if r1 or r2 then
        -- Even though the cardinality was zero
        -- items exists
        flag = 1
