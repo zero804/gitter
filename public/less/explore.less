@@ -226,11 +226,11 @@ a {
   line-height: @AVATAR_SIZE;
 }
 
-.collapsable-repo-name {
+.repo-name {
   display: flex;
 }
 
-.collapsable-repo-name .collapsable-repo-name__child {
+.repo-name__collapsable {
   display: inline-block;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -238,17 +238,17 @@ a {
   transition: flex-shrink 300ms ease-in-out;
 }
 
-.collapsable-repo-name span:not(.collapsable-repo-name__child) {
+.repo-name span:not(.repo-name__collapsable) {
   flex-shrink: 0;
 }
 
-.collapsable-repo-name .collapsable-repo-name__child:last-child,
-.collapsable-repo-name .collapsable-repo-name__child:hover {
+.repo-name__collapsable:last-child,
+.repo-name__collapsable:hover {
   flex-shrink: 0.01;
 }
 
-.collapsable-repo-name .collapsable-repo-name__child:last-child ~ .collapsable-repo-name__child,
-.collapsable-repo-name .collapsable-repo-name__child:hover ~ .collapsable-repo-name__child {
+.repo-name__collapsable:last-child ~ .repo-name__collapsable,
+.repo-name__collapsable:hover ~ .repo-name__collapsable {
   flex-shrink: 1000;
 }
 
