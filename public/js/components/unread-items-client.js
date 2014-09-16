@@ -175,11 +175,28 @@ define([
       this._lurkMode = false;
     },
 
-    markAllRead: function() {
+    markAllReadNotification: function() {
       // Remove from the add tarpit and the current tarpit
       this._unreadItemsRemoved(this._addTarpit._marshall());
       this._unreadItemsRemoved(this._marshall());
+    },
+
+    markAllRead: function() {
+      $.ajax({
+        url: "/api/v1/user/" + context.getUserId() + "/rooms/" + context.getTroupeId() + "/unreadItems/all",
+        data: "",
+        type: "DELETE",
+        global: true,
+        context: this,
+        success: function() {
+          // Remove from the add tarpit and the current tarpit
+          this._unreadItemsRemoved(this._addTarpit._marshall());
+          this._unreadItemsRemoved(this._marshall());
+        }
+      });
+
     }
+
 
   });
 
@@ -233,14 +250,24 @@ define([
         contentType: "application/json",
         data: JSON.stringify(queue),
         async: async,
+        context: this,
         type: "POST",
         global: false,
         success: function() {
         },
         error: function() {
+          log('Error posting unread items to server. Will attempt again in 5s');
+          // Unable to send messages, requeue them and try again in 5s
+          var self = this;
+          setTimeout(function() {
+            _iteratePreload(queue, function(itemType, itemId) {
+              self._buffer._add(itemType, itemId);
+            }, self);
+
+            self._sendLimited();
+          }, 5000);
         }
       });
-
     }
   };
 
@@ -272,7 +299,7 @@ define([
 
           // New unread items
           case 'mark_all_read':
-            store.markAllRead();
+            store.markAllReadNotification();
             break;
 
           // Lurk mode switched on/off
@@ -569,6 +596,11 @@ define([
       }
 
       return unreadItemStore._hasItemBeenMarkedAsRead(itemType, itemId);
+    },
+
+    markAllRead: function() {
+      var unreadItemStore = getUnreadItemStoreReq();
+      unreadItemStore.markAllRead();
     },
 
     syncCollections: function(collections) {

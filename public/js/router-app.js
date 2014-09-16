@@ -176,12 +176,11 @@ require([
         realtime.testConnection('chat.' + reason);
         break;
 
-      case 'chat.edit.show':
-        appEvents.trigger('chat.edit.show');
-        break;
-
+      // No parameters
       case 'chat.edit.hide':
-        appEvents.trigger('chat.edit.hide');
+      case 'chat.edit.show':
+      case 'ajaxError':
+        appEvents.trigger(message.type);
         break;
 
       case 'keyboard':
