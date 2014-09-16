@@ -154,6 +154,8 @@ exports.install = function() {
 
     var mentionUrl = "/api/v1/user/" + userId + "/rooms";
     if(data.op === 'add' && total === 1 && !member) {
+      // User is not a member of the room but they're just been mentioned.
+      // We need to send them a create to add the room to their collection
       var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
 
       restSerializer.serializeQ(troupeId, strategy)
@@ -166,7 +168,8 @@ exports.install = function() {
         });
 
     } else if(data.op === 'remove' && total === 0 && !member) {
-      // Simulate a remove
+      // User is not a member of the room, and they're
+      // mention is gone. Remove the room from their troupe collection
       publish(mentionUrl, {
         operation: 'remove',
         model: {

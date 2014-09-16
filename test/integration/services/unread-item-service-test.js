@@ -340,7 +340,7 @@ describe('mentions', function() {
       }]
     };
 
-    mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupe));
+    // mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupe));
     mockito.when(userServiceMock).findByIds().then(function(userIds) {
       assert.equal(userIds.length, 2);
       assert(_.find(userIds, function(i) { return i == userId; }));
@@ -387,7 +387,7 @@ describe('mentions', function() {
       }
     });
 
-    return unreadItemService.testOnly.detectAndCreateMentions(troupeId, undefined, chat)
+    return unreadItemService.testOnly.detectAndCreateMentions(troupeId, troupe, undefined, chat)
       .then(function() {
         assert.equal(c, 1);
         assert.equal(y, 2);

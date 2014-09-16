@@ -22,7 +22,7 @@
     "faye-redis": "git://github.com/gitterHQ/faye-redis-node#v0.3.0",
     "faye-websocket": "^0.7.2",
     "gitter-env": "git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.12.1",
-    "gitter-marked": "^0.5.1",
+    "gitter-marked": "^0.6.0",
     "gitter-services": "git+ssh://git@github.com:gitterHQ/services.git#1.4.0",
     "handlebars": "~1.1.2",
     "heapdump": "^0.2.9",
@@ -76,10 +76,11 @@
     "useragent": "2.0.6",
     "winston": "^0.7.3",
     "winston-logstash-udp": "0.0.4",
-    "worker-farm": "^0.3.1",
+    "worker-farm": "^1.0.1",
     "xml2js": "0.2.2",
     "xregexp": "^2.0.0",
-    "throat": "~1.0.0"
+    "throat": "~1.0.0",
+    "katex": "^0.1.0"
   },
   "devDependencies": {
     "better-assert": "1.0.0",

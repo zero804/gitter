@@ -71,7 +71,6 @@ module.exports = {
         require('./subscription-deleted.js'));
 
     app.post(apiRoot + '/private/statsc',
-        authMiddleware,
         require('./statsc.js'));
 
     app.get(apiRoot + '/private/sample-chats',
