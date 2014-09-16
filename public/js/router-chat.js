@@ -17,9 +17,6 @@ require([
   'views/app/collaboratorsView',
   'collections/collaborators',
 
-  'components/unread-items-client',
-
-
   'components/statsc',          // No ref
   'views/widgets/preload',      // No ref
   'filtered-collection',        // No ref
@@ -35,7 +32,7 @@ require([
     peopleCollectionView, ChatIntegratedView, itemCollections,
     inviteView, TroupeSettingsView, MarkdownView, KeyboardView,
     AddPeopleViewModal, IntegrationSettingsModal, CollaboratorsView,
-    collaboratorsModels, unreadItemsClient) {
+    collaboratorsModels) {
   "use strict";
 
   $(document).on("click", "a", function(e) {
@@ -166,6 +163,10 @@ require([
     postMessage({type: 'focus', focus: 'out', event: event});
   });
 
+  appEvents.on('ajaxError', function() {
+    postMessage({ type: 'ajaxError' });
+  });
+
   var notifyRemoveError = function(message) {
     appEvents.triggerParent('user_notification', {
       title: 'Failed to remove user',
@@ -235,6 +236,15 @@ require([
       }
     }
   });
+
+  new chatInputView.ChatInputView({
+    el: $('#chat-input'),
+    collection: itemCollections.chats,
+    chatCollectionView: chatCollectionView,
+    userCollection: itemCollections.users,
+    rollers: chatCollectionView.rollers
+  }).render();
+
 
   var Router = Backbone.Router.extend({
     routes: {

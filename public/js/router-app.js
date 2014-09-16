@@ -73,11 +73,8 @@ require([
   // Called from the OSX native client for faster page loads
   // when clicking on a chat notification
   window.gitterLoader = function(url) {
-    var frameUrl = url + '/~chat';
-    titlebarUpdater.setRoomName(url);
-
-    pushState(frameUrl, url, url);
-    updateContent(frameUrl);
+    var title = url.replace(/^\//,'');
+    appEvents.trigger('navigation', url, 'chat', title);
   };
 
   appEvents.on('navigation', function(url, type, title) {
@@ -176,12 +173,11 @@ require([
         realtime.testConnection('chat.' + reason);
         break;
 
-      case 'chat.edit.show':
-        appEvents.trigger('chat.edit.show');
-        break;
-
+      // No parameters
       case 'chat.edit.hide':
-        appEvents.trigger('chat.edit.hide');
+      case 'chat.edit.show':
+      case 'ajaxError':
+        appEvents.trigger(message.type);
         break;
 
       case 'keyboard':
