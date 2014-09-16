@@ -239,10 +239,23 @@ a {
     flex-shrink: 0;
     border-top: 1px solid hsl(0, 0%, 90%);
     text-transform: uppercase;
+    display: flex;
+    flex-direction: row;
+
+    small {
+      text-align: center;
+      flex-grow: 1;
+
+      &:first-child {
+        text-align: left;
+      }
+
+      &:last-child {
+        text-align: right;
+      }
+    }
   }
-
 }
-
 
 // .room-item__head {
 //   padding: 0 0.625em;
