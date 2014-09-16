@@ -31,7 +31,6 @@ require([
   'views/chat/decorators/emojiDecorator',
   'views/app/unreadBannerView',
   'views/app/historyLimitView',
-
   'views/app/headerView',
 
   'components/statsc',          // No ref
@@ -178,6 +177,10 @@ require([
   });
   appEvents.on('focus.request.app.out', function(event) {
     postMessage({type: 'focus', focus: 'out', event: event});
+  });
+
+  appEvents.on('ajaxError', function() {
+    postMessage({ type: 'ajaxError' });
   });
 
   var notifyRemoveError = function(message) {
