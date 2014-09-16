@@ -155,7 +155,15 @@ define([
 
       $e.removeClass('popover-hidden');
 
-      this.mutant = new Mutant(e, this.reposition, { scope: this, timeout: 20 });
+      this.mutant = new Mutant(e, this.reposition, {
+        scope: this,
+        timeout: 20,
+        transitions: true,
+        observers: {
+          attributes: true,
+          characterData: true
+        }
+      });
     },
 
     reposition: function() {

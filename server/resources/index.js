@@ -47,6 +47,9 @@ module.exports = {
     var unreadItems = new Resource('unreadItems', require('./user/unread-items'), app);
     userTroupeResource.add(unreadItems);
 
+    var collapsedItems = new Resource('collapsedItems', require('./user/collapsed-items'), app);
+    userTroupeResource.add(collapsedItems);
+
     installUserSubResource('orgs',        'orgs');
     installUserSubResource('repos',       'repos');
     installUserSubResource('channels',    'channels');
