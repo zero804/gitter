@@ -5,6 +5,7 @@ var marked    = require('gitter-marked');
 var highlight = require('highlight.js');
 var _         = require('underscore');
 var util      = require('util');
+var katex     = require('katex');
 var matcher   = require('./github-url-matcher');
 
 var options = { gfm: true, tables: true, sanitize: true, breaks: true, linkify: true, skipComments: true };
@@ -50,6 +51,11 @@ module.exports = exports = function processChat(text) {
   // Highlight code blocks
   renderer.code = function(code) {
     return util.format('<pre><code>%s</code></pre>', highlight.highlightAuto(code).value);
+  };
+
+  // Highlight code blocks
+  renderer.latex = function(latexCode) {
+    return katex.renderToString(latexCode);
   };
 
   // Extract urls mentions and issues from paragraphs
