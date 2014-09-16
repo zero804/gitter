@@ -2295,29 +2295,23 @@
       "resolved": "https://registry.npmjs.org/winston-logstash-udp/-/winston-logstash-udp-0.0.4.tgz"
     },
     "worker-farm": {
-      "version": "0.3.1",
-      "from": "worker-farm@",
-      "resolved": "https://registry.npmjs.org/worker-farm/-/worker-farm-0.3.1.tgz",
+      "version": "1.0.1",
+      "from": "worker-farm@latest",
+      "resolved": "https://registry.npmjs.org/worker-farm/-/worker-farm-1.0.1.tgz",
       "dependencies": {
-        "xtend": {
-          "version": "2.1.2",
-          "from": "xtend@~2.1.1",
-          "dependencies": {
-            "object-keys": {
-              "version": "0.4.0",
-              "from": "object-keys@~0.4.0"
-            }
-          }
-        },
         "errno": {
           "version": "0.1.1",
-          "from": "errno@~0.1.0",
+          "from": "errno@>=0.1.1 <0.2.0-0",
           "dependencies": {
             "prr": {
               "version": "0.0.0",
               "from": "prr@~0.0.0"
             }
           }
+        },
+        "xtend": {
+          "version": "4.0.0",
+          "from": "xtend@>=4.0.0 <4.1.0-0"
         }
       }
     },
