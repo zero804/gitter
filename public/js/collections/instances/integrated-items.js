@@ -34,10 +34,13 @@ define([
   }
 
   // send out a change event to avatar widgets that are not necessarily connected to a model object.
+  /*
+  this stuff is no longer required?
   userCollection.on('change:username change:displayName change:avatarUrlSmall change:avatarUrlMedium', function(model) {
     // TODO: move this into appevents
     $(document).trigger("avatar:change", model.toJSON());
   });
+  */
 
   // Keep the unread items up to date on the model
   // This allows the unread items client to mark model items as read

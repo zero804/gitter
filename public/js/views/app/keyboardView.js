@@ -1,16 +1,14 @@
 define([
   'jquery',
+  'marionette',
   'utils/platform-keys',
   'views/base',
   'hbs!./tmpl/keyboardTemplate'
-], function($, platformKeys, TroupeViews, keyboardTemplate ) {
+], function($, Marionette, platformKeys, TroupeViews, keyboardTemplate ) {
   "use strict";
 
-  var View = TroupeViews.Base.extend({
+  var View = Marionette.ItemView.extend({
     template: keyboardTemplate,
-    events: {
-
-    },
 
     initialize: function() {
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
@@ -29,16 +27,7 @@ define([
       }
     },
 
-    closeSettings : function () {
-      this.dialog.hide();
-      this.dialog = null;
-    },
-
-    afterRender: function() {
-
-    },
-
-    getRenderData: function() {
+    serializeData: function() {
       return {
         cmdKey: platformKeys.cmd,
         roomKey: platformKeys.room,
