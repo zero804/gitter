@@ -2,8 +2,9 @@ define([
   'jquery',
   'backbone',
   'utils/context',
-  'hbs!./tmpl/unreadBannerTemplate'
-  ], function($, Backbone, context, template)  {
+  'hbs!./tmpl/unreadBannerTemplate',
+  'components/unread-items-client'
+  ], function($, Backbone, context, template, unreadItemsClient)  {
   "use strict";
 
   var BottomBannerView = Backbone.View.extend({
@@ -88,13 +89,7 @@ define([
       this.chatCollectionView.scrollToFirstUnread();
     },
     onSideButtonClick: function() {
-      if(this.getUnreadCount() < 1) return;
-
-      $.ajax({
-        url: "/api/v1/user/" + context.getUserId() + "/rooms/" + context.getTroupeId() + "/unreadItems/all",
-        data: "",
-        type: "DELETE",
-      });
+      unreadItemsClient.markAllRead();
     }
   });
 

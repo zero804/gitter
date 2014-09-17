@@ -153,7 +153,9 @@ function upgradeKeyToSortedSet(key, userBadgeKey, troupeId, callback) {
 
 /**
  * New item added
- * @return {promise} promise of nothing
+ * @return {promise} promise of result from troupeService.findUserIdsForTroupeWithLurk(troupeId)
+ *
+ * Why return such an odd value? It's used by the next caller.
  */
 function newItem(troupeId, creatorUserId, itemType, itemId) {
   function reject(msg) {
@@ -197,7 +199,8 @@ function newItem(troupeId, creatorUserId, itemType, itemId) {
 
       if(!userIdsForNotify.length) return;
 
-      return newItemForUsers(troupeId, itemType, itemId, userIdsForNotify);
+      return newItemForUsers(troupeId, itemType, itemId, userIdsForNotify)
+        .thenResolve(troupe);
     });
 }
 
@@ -468,9 +471,11 @@ exports.listTroupeUsersForEmailNotifications = function(horizonTime, emailLatchE
 exports.markItemsRead = function(userId, troupeId, itemIds, mentionIds, options) {
   // Configure options
   if(!options) options = {};
+
   // { member : default true }
   if(options.member === undefined) options.member = true;
-  // { recordAsRead: default truw }
+
+  // { recordAsRead: default true }
   if(options.recordAsRead === undefined) options.recordAsRead = true;
 
   var now = Date.now();
@@ -796,112 +801,117 @@ function getTroupeIdsWithUnreadChats(userId, callback) {
 /**
  * Returns a promise of nothing
  */
-function detectAndCreateMentions(troupeId, creatingUserId, chat) {
+function detectAndCreateMentions(troupeId, troupe, creatingUserId, chat) {
   if(!chat.mentions || !chat.mentions.length) return Q.resolve();
 
   /* Figure out what type of room this is */
-  return troupeService.findUserIdsForTroupeWithLurk(troupeId)
-    .then(function(troupe) {
-      var oneToOne = troupe.githubType === 'ONETOONE';
+  var oneToOne = troupe.githubType === 'ONETOONE';
 
-      var usersHash = troupe.users;
-      if(!usersHash) return;
+  var usersHash = troupe.users;
+  if(!usersHash) return;
 
-      var userIds = chat.mentions
-            .filter(function(mention) {
-              // Only use this for people mentions
-              return mention.userId && !mention.group;
-            })
-            .map(function(mention) {
-              return mention.userId;
-            });
-
-      // Handle all group with a special-case
-      // In future, resolve this against github teams
-      var allGroupMention = chat.mentions
-            .filter(function(mention) {
-              // Only use this for people mentions
-              return mention.group && mention.screenName === 'all';
-            }).length >= 1;
-
-      var mentionMemberUserIds;
-      if(allGroupMention) {
-        // Add everyone except the person creating the message
-        mentionMemberUserIds = Object.keys(usersHash).filter(function(u) {
-          return "" + u !== "" + creatingUserId;
+  var userIds = chat.mentions
+        .filter(function(mention) {
+          // Only use this for people mentions
+          return mention.userId && !mention.group;
+        })
+        .map(function(mention) {
+          return mention.userId;
         });
-      } else {
-        mentionMemberUserIds = [];
-      }
 
-      var mentionLurkerAndNonMemberUserIds = [];
+  // Handle all group with a special-case
+  // In future, resolve this against github teams
+  var allGroupMention = chat.mentions
+        .filter(function(mention) {
+          // Only use this for people mentions
+          return mention.group && mention.screenName === 'all';
+        }).length >= 1;
 
-      var lookupUsers = [];
-
-      userIds.forEach(function(userId) {
-        if(!userId) return;
-
-        /* Don't be mentioning yourself yo */
-        if(userId == creatingUserId) return;
-
-        if(userId in usersHash) {
-          var lurk = usersHash[userId];
-
-          /* User is in the room? Always mention */
-          if(lurk) {
-            mentionLurkerAndNonMemberUserIds.push(userId);
-          } else {
-            mentionMemberUserIds.push(userId);
-          }
-          return;
-        }
-
-        if(!oneToOne) {
-          /* We'll need to use the permissions-model to determine if they'll be allowed in */
-          lookupUsers.push(userId);
-        }
-
-      });
-
-      var lookup;
-      if(lookupUsers.length) {
-        lookup = userService.findByIds(lookupUsers);
-      } else {
-        lookup = Q.resolve([]);
-      }
-
-      return lookup.then(function(users) {
-        if(!users.length) return;
-
-        return Q.all(users.map(function(user) {
-          return roomPermissionsModel(user, 'join', troupe)
-            .then(function(access) {
-              if(access) {
-                mentionLurkerAndNonMemberUserIds.push(user.id);
-              }
-
-            });
-        }));
-
-      }).then(function() {
-        /**
-         * Lurkers and non members wont have an unread item, so the first thing
-         * we'll need to do is create an unread item for them. Only then can we push the
-         * mention
-         */
-        if(mentionLurkerAndNonMemberUserIds.length) {
-          return newItemForUsers(troupeId, 'chat', chat.id, mentionLurkerAndNonMemberUserIds)
-            .then(function() {
-              var allUserIds = mentionLurkerAndNonMemberUserIds.concat(mentionMemberUserIds);
-              return newMention(troupeId, chat.id, allUserIds, usersHash);
-            });
-        } else {
-          return newMention(troupeId, chat.id, mentionMemberUserIds, usersHash);
-        }
-      });
-
-
+  var mentionMemberUserIds;
+  if(allGroupMention) {
+    // Add everyone except the person creating the message
+    mentionMemberUserIds = Object.keys(usersHash).filter(function(u) {
+      return "" + u !== "" + creatingUserId;
     });
+  } else {
+    mentionMemberUserIds = [];
+  }
+
+  var mentionLurkerAndNonMemberUserIds = [];
+
+  var lookupUsers = [];
+
+  userIds.forEach(function(userId) {
+    if(!userId) return;
+
+    /* Don't be mentioning yourself yo */
+    if(userId == creatingUserId) return;
+
+    if(userId in usersHash) {
+      var lurk = usersHash[userId];
+
+      /* User is in the room? Always mention */
+      if(lurk) {
+        mentionLurkerAndNonMemberUserIds.push(userId);
+      } else {
+        mentionMemberUserIds.push(userId);
+      }
+      return;
+    }
+
+    if(!oneToOne) {
+      /* We'll need to use the permissions-model to determine if they'll be allowed in */
+      lookupUsers.push(userId);
+    }
+
+  });
+
+  var lookup;
+  if(lookupUsers.length) {
+    lookup = userService.findByIds(lookupUsers);
+  } else {
+    lookup = Q.resolve([]);
+  }
+
+  return lookup.then(function(users) {
+    if(!users.length) return;
+
+    return Q.all(users.map(function(user) {
+      return roomPermissionsModel(user, 'join', troupe)
+        .then(function(access) {
+          if(access) {
+            mentionLurkerAndNonMemberUserIds.push(user.id);
+          }
+
+        });
+    }));
+
+  }).then(function() {
+    /**
+     * Lurkers and non members wont have an unread item, so the first thing
+     * we'll need to do is create an unread item for them. Only then can we push the
+     * mention
+     */
+    if(mentionLurkerAndNonMemberUserIds.length) {
+      return newItemForUsers(troupeId, 'chat', chat.id, mentionLurkerAndNonMemberUserIds)
+        .then(function() {
+          var allUserIds = mentionLurkerAndNonMemberUserIds.concat(mentionMemberUserIds);
+          return newMention(troupeId, chat.id, allUserIds, usersHash);
+        })
+        .then(function() {
+          var data = {
+            chat: [chat.id]
+          };
+
+          mentionLurkerAndNonMemberUserIds.forEach(function(userId) {
+            // Lurkers never recieved a newUnreadItem. Send it to them
+            appEvents.newUnreadItem(userId, troupeId, data);
+          });
+        });
+    } else {
+      return newMention(troupeId, chat.id, mentionMemberUserIds, usersHash);
+    }
+  });
 
 }
 
@@ -928,8 +938,8 @@ exports.install = function() {
 
     if(operation === 'create') {
       promise = newItem(troupeId, creatingUserId, 'chat', modelId)
-        .then(function() {
-          return detectAndCreateMentions(troupeId, creatingUserId, model);
+        .then(function(troupe) {
+          return detectAndCreateMentions(troupeId, troupe, creatingUserId, model);
         });
 
     } else if(operation === 'remove') {
