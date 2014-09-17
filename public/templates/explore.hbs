@@ -8,12 +8,14 @@
   </head>
   <body>
     <header class="page-header">
+      <div class='wrap--large'>
+        {{!-- <nav> --}}
+          {{!-- <a href="/" > --}}
+          <img class="logo" src="/images/logo-text-white-32.png" alt="Gitter" title="Gitter logo">
+          {{!-- </a> --}}
+        {{!-- </nav> --}}
+      </div>
       <div class='wrap'>
-        {{!-- <nav>
-          <a href="/" >
-            <img class="logo" src="/images/logo-text-white-32.png" alt="Gitter" title="Gitter logo">
-          </a>
-        </nav> --}}
         <h1 class="title">Explore <b>Gitter</b></h1>
         <p>Find great chat rooms <b>&amp;</b> communitites we <span class="octicon octicon-heart"></span></p>
         {{!-- <h1>{{ tag }}</h1> --}}
@@ -22,42 +24,46 @@
         </form>
       </div>
     </header>
-    {{!-- <section class="introduction"> --}}
-      {{!-- <p>Gitter hosts thousands of public communities where developers come to talk.</p> --}}
-      {{!-- <p>Browse through some of our favourite {{ tag }} rooms.</p> --}}
-    {{!-- </section> --}}
+    <section class="introduction">
+      <p>Displaying results for: {{ tag }}</p>
+    </section>
     <div class='page-content'>
-      {{#if rooms}}
-        <ul class="room-list">
-          {{#each rooms}}
-            <li class='room-item'>
-              <header>
-                <img class="room-item__avatar" src="{{ repo.owner.avatar_url }}&s=80">
-                <h3 class="repo-name">
-                  <span class="repo-name__collapsable">{{ repo.owner.login }}</span><span>/</span><span class="repo-name__collapsable">{{ repo.name }}</span>
-                </h3>
-              </header>
-              <section class='room-item__description'>
-                <small>{{ repo.description }}</small>
-              </section>
-              <section class='room-item__content'>
-                {{!-- <p>Some content, content about something.</p> --}}
-                {{!-- <p>111233213213</p> --}}
-              </section>
-              <footer>
-                <small><span class="octicon octicon-organization"></span> {{ room.users.length }} people</small>
-                <small><span class="octicon octicon-comment-discussion"></span> 100k messages</small>
-              </footer>
-            </li>
-          {{/each}}
-        </ul>
-      {{/if}}
-      {{#unless rooms}}
-        <h1><span class="mega-octicon octicon-stop"></span> Damn</h1>
-        <h2>there are no rooms with the tags: {{ tag }}.</h2>
-        <p>Why don't you create it dude?</p>
-      {{/unless}}
+      <div class='wrap--large'>
+        {{#if rooms}}
+          <ul class="room-list">
+            {{#each rooms}}
+              <li class='room-item'>
+                <header>
+                  <img class="room-item__avatar" src="{{ repo.owner.avatar_url }}&s=80">
+                  <h3 class="repo-name">
+                    <span class="repo-name__collapsable">{{ repo.owner.login }}</span><span>/</span><span class="repo-name__collapsable">{{ repo.name }}</span>
+                  </h3>
+                </header>
+                <section class='room-item__description'>
+                  <small>{{ repo.description }}</small>
+                </section>
+                <section class='room-item__content'>
+                  {{!-- <p>Some content, content about something.</p> --}}
+                  {{!-- <p>111233213213</p> --}}
+                </section>
+                <footer>
+                  <small><span class="octicon octicon-organization"></span> {{ room.users.length }} people</small>
+                  <small><span class="octicon octicon-comment-discussion"></span> 100k messages</small>
+                </footer>
+              </li>
+            {{/each}}
+          </ul>
+        {{/if}}
+        {{#unless rooms}}
+          <h1><span class="mega-octicon octicon-stop"></span> Damn</h1>
+          <h2>there are no rooms with the tags: {{ tag }}.</h2>
+          <p>Why don't you create it dude?</p>
+        {{/unless}}
+      </div>
     </div>
+    <footer>
+      <p>Gitter is proud to host thousands of public communities, where developers come together to talk.</p>
+    </footer>
     <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/2.0.2/octicons.min.css">
     <script type="text/javascript">try{Typekit.load();}catch(e){}</script>

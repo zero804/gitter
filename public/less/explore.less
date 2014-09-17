@@ -22,7 +22,7 @@ html {
 }
 
 body {
-  background-color: @light;
+  background-color: @dark;
   margin: 0;
 }
 
@@ -58,6 +58,11 @@ textarea:focus, input:focus{
   margin: 0 auto;
 }
 
+.wrap--large {
+  .wrap;
+  max-width: 93.75em;
+}
+
 .avatar {
   float: left;
   border-radius: 3px;
@@ -70,13 +75,6 @@ textarea:focus, input:focus{
   list-style: none;
   padding-left: 0;
   margin: 0;
-}
-
-.room-heading {
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .user-count {
@@ -136,18 +134,21 @@ textarea:focus, input:focus{
 }
 
 .page-content {
+  background-color: @light;
   padding: 0.625em;
 }
 
 .introduction {
-  background-color: @light;
+  background-color: darken(@light, 10%);
   color: #7d7669;
-  padding: 0.625em;
+  padding: 2 * 0.625em;
   text-align: center;
+}
 
-  p {
-    margin-top: 0.625em;
-  }
+footer {
+  color: @light;
+  padding: 3 * 0.625em;
+  text-align: center;
 }
 
 .logo {
@@ -185,7 +186,8 @@ a {
   @color: white;
 
   opacity: 0.8;
-  flex: 1 0 250px;
+  flex: 1 0 16.625em;
+  max-width: 31.25em;
   // max-height: 10em;
   cursor: pointer;
   border: 4px solid transparent;
@@ -198,12 +200,21 @@ a {
   }
 
   header {
+    border-top: 0.4em solid @personal;
     border-radius: 3px 3px 0 0;
     background-color: @color;
     padding: 0.625em;
     height: @AVATAR_SIZE + 2 * 0.625em;
     line-height: @AVATAR_SIZE;
     overflow: hidden;
+  }
+
+  &:nth-child(3n + 3) header {
+    border-top: 0.4em solid @silver;
+  }
+
+  &:nth-child(2n + 1) header {
+    border-top: 0.4em solid @bronze;
   }
 
   &__avatar {
@@ -227,22 +238,23 @@ a {
       left: 0;
       right: 0;
       height: 2 * 0.625em;
-      background: linear-gradient(to bottom, transparent, white);
+      background: linear-gradient(to bottom, transparent, @color);
     }
   }
 
   &__content {
-    background-color: white;
+    background-color: @color;
     flex-grow: 1;
     padding: 0.625em;
   }
 
   footer {
-    background-color: darken(@color, 10%);
+    background-color: @color;
+    color: #444;
     border-radius: 0 0 3px 3px;
     padding: 0.625em;
     flex-shrink: 0;
-    border-top: 1px solid hsl(0, 0%, 90%);
+    border-top: 1px dotted hsl(0, 0%, 90%);
     text-transform: uppercase;
     display: flex;
     flex-direction: row;
