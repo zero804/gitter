@@ -22,6 +22,7 @@ define([
         if (el.childElementCount === 0 && (el.innerText || el.textContent) === el.href) {
           oEmbed.parse(el.href, function (embed) {
             if (embed && embed.html) {
+
               if(!isCollapsible) {
                 model.set('isCollapsible', true);
                 isCollapsible = true;
@@ -37,7 +38,16 @@ define([
                 $embed.addClass('embed-limited');
               }
 
-              $embed.html(embed.html);
+              var _iframe = embed.html;
+              var iframewidth   = _iframe.match(/width="(\d+)"/);
+              var iframeheight  = _iframe.match(/height="(\d+)"/);
+
+              if (iframewidth && iframewidth[1] > 640 || iframeheight && iframeheight[1] > 480) {
+                _iframe = _iframe.replace(/width="\d+"/,'width="' + iframewidth[1]/2 + '"');
+                _iframe = _iframe.replace(/height="\d+"/,'height="' + iframeheight[1]/2 + '"');
+              }
+
+              $embed.html(_iframe);
               $(el).after($embed);
 
               // any iframely iframes will resize once content loads
