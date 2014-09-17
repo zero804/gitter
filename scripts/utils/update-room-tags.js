@@ -1,16 +1,12 @@
+#!/usr/bin/env node
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
-/**
- * update-room-tags script
- * ====
- *
- * a procedure that will look for all rooms in given environment updating their tags
- */
 'use strict';
 
 var Q = require('Q');
 var persistence = require('../../server/services/persistence-service');
 var GitHubService = require('../../server/services/github/github-repo-service');
 var throat = require('throat');
+var shutdown = require('shutdown');
 
 var roomTagger = require('../../server/utils/room-tagger');
 
@@ -114,5 +110,8 @@ findRooms(20)
   .then(saveRooms)
   .then(process.exit)
   .catch(function (err) {
-    console.log('err:', err.stack);
+    console.error(err.stack);
+  })
+  .fin(function() {
+    shutdown.shutdownGracefully();
   });
