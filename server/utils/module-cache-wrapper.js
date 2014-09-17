@@ -22,17 +22,38 @@ function generateKey(moduleName, instanceId, propertyName, args) {
   return parts.map(encodeURIComponent).join(':');
 }
 
-module.exports = function(moduleName, module) {
+function wrapFunction(moduleName, instanceId, propertyName, func) {
   return function() {
     var args = Array.prototype.slice.apply(arguments);
-    var key = generateKey(moduleName, null, null, args);
+    var key = generateKey(moduleName, instanceId, propertyName, args);
 
     var d = Q.defer();
     cache.lookup(key, function(cb) {
-      module.apply(null, args).nodeify(cb);
+      func.apply(null, args).nodeify(cb);
     }, d.makeNodeResolver());
 
     // assuming that the wrapped function returns a promise
     return d.promise;
   };
+}
+
+module.exports = function(moduleName, module) {
+  if(typeof module === 'function') {
+    return wrapFunction(moduleName, null, null, module);
+  } else if(typeof module === 'object') {
+    var wrapped = {};
+
+    Object.keys(module).forEach(function(key) {
+      var property = module[key];
+      if(typeof property === 'function') {
+        wrapped[key] = wrapFunction(moduleName, null, key, property);
+      } else {
+        wrapped[key] = property;
+      }
+    });
+
+    return wrapped;
+  }
+
+
 };

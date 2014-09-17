@@ -15,12 +15,12 @@ function getWrapper(lookupFunc) {
 
 describe('module-cache-wrapper', function() {
 
-  describe('single function modules', function() {
+  describe('wrapping single function modules', function() {
 
     var module = function(name) {
       return Q.resolve('hello ' + name);
     };
-    
+
     it('looks up correct key', function(done) {
       var wrapper = getWrapper(function(key) {
         assert.equal(key, 'my-module:::world');
@@ -48,6 +48,38 @@ describe('module-cache-wrapper', function() {
 
       var wrapped = wrapper('my-module', module);
       wrapped('world').then(function(result) {
+        assert.equal(result, 'hello world');
+        done();
+      });
+    });
+
+  });
+
+  describe('wrapping multi function modules', function() {
+
+    var module = {
+      addPrefix: function(name) {
+        return Q.resolve('hello ' + name);
+      }
+    };
+
+    it('looks up correct key', function(done) {
+      var wrapper = getWrapper(function(key) {
+        assert.equal(key, 'my-module::addPrefix:world');
+        done();
+      });
+
+      var wrapped = wrapper('my-module', module);
+      wrapped.addPrefix('world');
+    });
+
+    it('calls function correctly on cache miss', function(done) {
+      var wrapper = getWrapper(function(key, cachedFunc, cb) {
+        cachedFunc(cb);
+      });
+
+      var wrapped = wrapper('my-module', module);
+      wrapped.addPrefix('world').then(function(result) {
         assert.equal(result, 'hello world');
         done();
       });
