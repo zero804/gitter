@@ -1,10 +1,11 @@
 define([
   'jquery',
   'underscore',
+  'marionette',
   './base',
   'mutant',
   'hbs!./tmpl/popover',
-], function( $, _, TroupeViews, Mutant, popoverTemplate) {
+], function( $, _, Marionette, TroupeViews, Mutant, popoverTemplate) {
   "use strict";
 
   var ARROW_WIDTH_PX = 10;
@@ -45,7 +46,7 @@ define([
     return max;
   }
 
-  var Popover = TroupeViews.Base.extend({
+  var Popover = Marionette.ItemView.extend({
     template: popoverTemplate,
     className: "popover",
     initialize: function(options) {
@@ -69,17 +70,16 @@ define([
 
       this.$targetElement.on('mouseenter', this.enter);
       this.$targetElement.on('mouseleave', this.leave);
-
-      this.addCleanup(function() {
+      this.once('close', function() {
         if(this.mutant) this.mutant.disconnect();
       });
     },
 
-    getRenderData: function() {
+    serializeData: function() {
       return this.options;
     },
 
-    afterRender: function() {
+    onRender: function() {
       var $e = this.$el;
 
       this.view.parentPopover = this;
@@ -127,10 +127,6 @@ define([
     },
 
     onClose: function() {
-      // if(singleton && singleton !== this) {
-      //   singleton = null;
-      // }
-
       this.$el.off('mouseenter', this.enter);
       this.$el.off('mouseleave', this.leave);
 
@@ -141,11 +137,6 @@ define([
     },
 
     show: function () {
-      // if(singleton && singleton !== this) {
-      //   singleton.hide();
-      // }
-      // singleton = this;
-
       var $e = this.render().$el;
       var e = this.el;
 
@@ -241,14 +232,6 @@ define([
         return "left";
       }
 
-      // var panel = $target.offsetParent();
-      // if(!panel) return 'right';
-
-      // if($target.offset().left + div.width() + 20 >= panel[0].clientWidth) {
-      //   return 'left';
-      // }
-
-      // return 'right';
     },
 
     applyPlacement: function(offset, placement){

@@ -165,7 +165,7 @@ define([
         $commit.on('click', showPopover);
         $commit.on('mouseover', showPopoverLater);
 
-        view.addCleanup(function() {
+        view.once('close', function() {
           $commit.off('click', showPopover);
           $commit.off('mouseover', showPopoverLater);
         });

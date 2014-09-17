@@ -1,29 +1,16 @@
 define([
-  'require',
   'jquery',
   'underscore',
   'backbone',
-  'utils/appevents',
   'marionette',
   'hbs!./tmpl/modal',
   'hbs!./tmpl/loading',
-  'hbs!./tmpl/confirmationView',
   'log!base-views',
   'utils/detect-compact',
   '../template/helpers/all' // No ref
-], function(require, $, _, Backbone, appEvents, Marionette, modalTemplate,
-  loadingTemplate, confirmationViewTemplate, log, detectCompact) {
+], function($, _, Backbone, Marionette, modalTemplate,
+  loadingTemplate, log, detectCompact) {
   "use strict";
-
-  /* From http://coenraets.org/blog/2012/01/backbone-js-lessons-learned-and-improved-sample-app/ */
-  Backbone.View.prototype.close = function () {
-    if (this.beforeClose) {
-      this.beforeClose();
-    }
-    this.remove();
-    this.stopListening();
-    this.unbind();
-  };
 
   var TroupeViews = {};
 
@@ -41,163 +28,8 @@ define([
   window._troupeIsIE9 = isIE9;
   if (userAgentTabletFragment) window._troupeIsTablet = true;
 
-  var cachedWidgets = {};
-  TroupeViews.preloadWidgets = function(widgets) {
-    var keys = _.keys(widgets);
-    _.each(keys, function(key) {
-      var value = widgets[key];
-      cachedWidgets[key] = value;
-    });
-  };
 
-  TroupeViews.Base = Backbone.View.extend({
-    template: null,
-    autoClose: true,
-    compactView: compactView,
-
-    constructor: function(options) {
-      Backbone.View.prototype.constructor.apply(this, arguments);
-      if(!options) options = {};
-      if(options.template) this.template = options.template;
-
-      if(this.model) {
-        if(this.rerenderOnChange) this.setRerenderOnChange();
-
-        // TODO: move this into the
-        this.listenTo(this.model, 'syncStatusChange', function(newState) {
-          var e = this.$el.find('.view').first();
-          if(newState != 'synced')  e.removeClass('synced');
-          if(newState != 'syncing')  e.removeClass('syncing');
-          if(newState != 'syncerror')  e.removeClass('syncerror');
-
-          if(newState) e.addClass(newState);
-
-        });
-      }
-
-      this.addCleanup(function() {
-        this.stopListening();
-      });
-    },
-
-    setRerenderOnChange: function() {
-      this.listenTo(this.model, 'change', this.rerender);
-    },
-
-    rerender: function() {
-      this.removeSubViews(this.$el);
-      if (this.$el.tooltip)
-        this.$el.tooltip('destroy');
-      this.render();
-    },
-
-    addCleanup: function(callback) {
-      this.once('cleanup', callback.bind(this));
-    },
-
-    getRenderData: function() {
-      if (this.data) {
-        return this.data;
-      }
-
-      if (this.model) {
-        return this.model.toJSON();
-      }
-
-      if (this.collection) {
-        return { items: this.collection.toJSON() };
-      }
-
-      return {};
-    },
-
-    renderInternal: function(data) {
-      function replaceElementWithWidget(element, Widget, options) {
-          var widget = new Widget(options.model);
-          widget.render();
-          $(element).replaceWith(widget.el);
-      }
-      var generatedText = this.template(data);
-      var dom = $($.parseHTML(generatedText));
-      dom.addClass("view");
-
-      if(data.renderViews) {
-        dom.find('view').each(function () {
-          var id = this.getAttribute('data-id'),
-          attrs = data.renderViews[id];
-          var self = this;
-          var CachedWidget = cachedWidgets[attrs.widgetName];
-          if(CachedWidget) {
-            replaceElementWithWidget(this, CachedWidget, attrs);
-          } else {
-            require(['views/widgets/' + attrs.widgetName], function(Widget) {
-              cachedWidgets[attrs.widgetName] = Widget;
-              replaceElementWithWidget(self, Widget, attrs);
-            });
-          }
-        });
-      }
-
-      if(this.onDomRender) this.onDomRender(dom);
-
-      if(this.model && this.model.syncState) {
-        dom.addClass(this.model.syncState);
-      }
-      this.$el.html(dom);
-      return dom;
-    },
-
-    render: function() {
-      var data = this.getRenderData() || {};
-      data.compactView = compactView;
-      data.isIE9 = isIE9;
-      this.renderInternal(data);
-      if(this.afterRender) { this.afterRender(data); }
-
-      // Bit dodgy this next line as it could cause IE circular ref problems
-      this.el._view = this;
-      return this;
-    },
-
-    removeSubViews: function($el) {
-      $el.find('.view').each(function(index, viewElement) {
-        if(viewElement._view) {
-          log('Removing ', viewElement._view);
-
-          viewElement._view.close();
-          viewElement._view = null;
-        }
-      });
-    },
-
-    close: function () {
-      this.trigger('cleanup');
-      if (this.beforeClose) {
-        this.beforeClose();
-      }
-
-      this.remove();
-      this.removeSubViews(this.$el);
-
-      if (this.onClose) { this.onClose(); }
-      this.trigger('close');
-      this.off();
-      this.el._view = null;
-    },
-
-    disableForm: function($form) {
-      $form = $form || this.$el.find('form');
-      $form.find('button, input[type=submit]').attr('disabled', true);
-    },
-
-    enableForm: function($form) {
-      $form = $form || this.$el.find('form');
-      $form.find('button, input[type=submit]').removeAttr('disabled');
-    }
-
-  });
-
-  TroupeViews.Modal =   TroupeViews.Base.extend({
+  TroupeViews.Modal = Marionette.ItemView.extend({
     template: modalTemplate,
     className: "modal",
 
@@ -223,7 +55,7 @@ define([
       this.view = this.options.view || this.view;
     },
 
-    getRenderData: function() {
+    serializeData: function() {
       var menuItems = this.menuItems || this.options.menuItems;
       return {
         hideHeader: this.options.hideHeader,
@@ -243,7 +75,7 @@ define([
       this.trigger('menuItemClicked', action);
     },
 
-    afterRender: function() {
+    onRender: function() {
       var self = this;
       this.$el.hide();
 
@@ -643,7 +475,7 @@ define([
     }
   };
 
-  TroupeViews.LoadingView =  TroupeViews.Base.extend({
+  TroupeViews.LoadingView = Marionette.ItemView.extend({
     template: loadingTemplate
   });
 
@@ -700,7 +532,11 @@ define([
 
   };
 
-  TroupeViews.ConfirmationView = TroupeViews.Base.extend({
+  /*
+
+  Not used
+
+  TroupeViews.ConfirmationView = Marionette.ItemView.extend({
     template: confirmationViewTemplate,
 
     initialize: function(options) {
@@ -708,19 +544,18 @@ define([
       if(options.confirmationView) this.confirmationView = options.confirmationView;
     },
 
-    getRenderData: function() {
+    serializeData: function() {
       return {
         body: this.body
       };
     },
 
-    afterRender: function() {
+    onRender: function() {
       if(this.confirmationView) {
         this.$el.find('#confirmation').append(this.confirmationView.render().el);
       }
     }
   });
-
 
   TroupeViews.confirm = function (message, handlers) {
     var events = handlers || {};
@@ -747,6 +582,7 @@ define([
     }
 
   });
+  */
 
   return TroupeViews;
 });
