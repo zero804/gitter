@@ -5,7 +5,7 @@
 var testRequire    = require('../../test-require');
 var assert         = require("assert");
 var GithubOrgService = testRequire('./services/github/github-org-service');
-var FAKE_USER = { username: 'gittertestbot', githubToken: '64c1d90a8c60d2ee75fc5b3d3f7881d94559fec8'};
+var FAKE_USER = { username: 'gittertestbot', githubToken: '***REMOVED***'};
 
 describe('github-org-service', function() {
   it('members should fetch members', function(done) {
@@ -78,32 +78,10 @@ describe('github-org-service', function() {
   });
 
 
-  xit('member should return mtbtesting is not a member of ADOBE', function(done) {
-    var gh = new GithubOrgService({ username: 'mbtesting', githubToken: 'e00b7680cd3665d50ebd6f0fe0ba3e49e2600c67'});
+  it('member should return gittertestbot is not a member of ADOBE', function(done) {
+    var gh = new GithubOrgService(FAKE_USER);
 
-    gh.member('adobe','mbtesting')
-      .then(function(isMember) {
-        assert(!isMember);
-      })
-      .nodeify(done);
-  });
-
-
-  it('member should that suprememoocow is a member of gitterTest', function(done) {
-    var gh = new GithubOrgService({ username: 'suprememoocow', githubToken: '23cc53bcfa09e8ff22a03cf8a73e1115f987b0e6'});
-
-    gh.member('gitterTest','suprememoocow')
-      .then(function(isMember) {
-        assert(!isMember);
-      })
-      .nodeify(done);
-  });
-
-
-  it('member should that suprememoocow is not a member of gitterTest', function(done) {
-    var gh = new GithubOrgService({ username: 'suprememoocow', githubToken: '23cc53bcfa09e8ff22a03cf8a73e1115f987b0e6'});
-
-    gh.member('gitterTest','suprememoocow')
+    gh.member('adobe', FAKE_USER.username)
       .then(function(isMember) {
         assert(!isMember);
       })
