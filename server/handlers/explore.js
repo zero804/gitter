@@ -2,30 +2,20 @@
 "use strict";
 
 var suggestedService = require('../services/suggested-room-service');
-var userService = require('../services/user-service');
 var RepoService = require('../services/github/github-repo-service');
 var Q = require('q');
 
 var DEFAULT_TAGS = ['javascript', 'ruby', 'php'];
 
-function isActiveUser(user) {
-  return user.state !== 'INVITED';
-}
-
 function getRoomRenderData(room, user) {
   var repoService = new RepoService(user);
-  var userIds = room.users.map(function(user) { return user.userId; });
-  return Q.all([
-    repoService.getRepo(room.uri),
-    userService.findByIds(userIds)
-  ])
-  .spread(function(repo, users) {
-    return {
-      room: room,
-      repo: repo,
-      activeUsers: users.filter(isActiveUser)
-    };
-  });
+  return repoService.getRepo(room.uri)
+    .then(function(repo) {
+      return {
+        room: room,
+        repo: repo
+      };
+    });
 }
 
 function processTagResult(tag, rooms) {
