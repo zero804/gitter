@@ -124,8 +124,10 @@ define(['jquery-iframely', 'utils/context'], function ($, context) {
   addOEmbedProvider("slideshare",   ["slideshare.net"],                                 "//www.slideshare.net/api/oembed/2",{format:'jsonp'});
 
   iframelyProviders.push(new RegExp("youtube\\.com/watch"));
+  iframelyProviders.push(/https?:\/\/youtu\.be\//);
   iframelyProviders.push(new RegExp("instagr\\.?am(\\.com)?/p/"));
-  iframelyProviders.push(new RegExp("gist\\.github\\.com/.+/.+"));
+  // 15 Sep 2014: disabling gist provider until we can do something better
+  // iframelyProviders.push(new RegExp("gist\\.github\\.com/.+/.+"));
   iframelyProviders.push(new RegExp("cloudup\\.com"));
   iframelyProviders.push(new RegExp("cl\\.ly/.+"));
   iframelyProviders.push(new RegExp("dl\\.dropboxusercontent\\.com"));

@@ -76,15 +76,14 @@ exports.serializeUsersForTroupe = function(troupeId, userId, callback) {
 exports.serializeUnreadItemsForTroupe = function(troupeId, userId, callback) {
   return isUserLurkingInRoom(userId, troupeId)
     .then(function(isLurking) {
-      if(isLurking) {
-        return {
-          _meta: { lurk: true }
-        };
-      }
-
       var d = Q.defer();
       unreadItemService.getUnreadItemsForUser(userId, troupeId, d.makeNodeResolver());
-      return d.promise;
+      return d.promise.then(function(x) {
+        if(isLurking) {
+          x._meta = { lurk: true };
+        }
+        return x;
+      });
     })
     .nodeify(callback);
 };
