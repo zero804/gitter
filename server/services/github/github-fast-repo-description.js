@@ -2,9 +2,9 @@
 "use strict";
 
 var createClient = require('./github-client');
+var wrapper = require('../../utils/module-cache-wrapper');
 var badCredentialsCheck = require('./bad-credentials-check');
 var Q = require('q');
-
 
 function getRepoInfo(repoName) {
   var client = createClient.full();
@@ -19,8 +19,10 @@ function getRepoInfo(repoName) {
     });
 }
 
-module.exports = function(repoName) {
+function getDescription(repoName) {
   return getRepoInfo(repoName).then(function(repoInfo) {
     return repoInfo.description;
   });
-};
+}
+
+module.exports = wrapper('github-fast-repo-description', getDescription);
