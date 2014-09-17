@@ -15,7 +15,7 @@
           </a>
         </nav> --}}
         <h1 class="title">Explore <b>Gitter</b></h1>
-        <p>and find great chat rooms <b>&amp;</b> communitites we <span class="octicon octicon-heart"></span></p>
+        <p>Find great chat rooms <b>&amp;</b> communitites we <span class="octicon octicon-heart"></span></p>
         {{!-- <h1>{{ tag }}</h1> --}}
         <form>
           <p><input name='searchTerm' id='searchTerm' class='page-header__search' type='search' placeholder='Search for tags... e.g. node' /></p>
@@ -27,29 +27,36 @@
       {{!-- <p>Browse through some of our favourite {{ tag }} rooms.</p> --}}
     {{!-- </section> --}}
     <div class='page-content'>
-      <ul class="room-list">
-        {{#each rooms}}
-          <li class='room-item'>
-            <header>
-              <img class="room-item__avatar" src="{{repo.owner.avatar_url}}&s=80">
-              <h3 class="repo-name">
-                <span class="repo-name__collapsable">{{repo.owner.login}}</span><span>/</span><span class="repo-name__collapsable">{{repo.name}}</span>
-              </h3>
-            </header>
-            <section class='room-item__description'>
-              <small>{{ repo.description }}</small>
-            </section>
-            {{!-- <section class='room-item__content'>
-              <p>Some content, content about something.</p>
-              <p>111233213213</p>
-            </section> --}}
-            <footer>
-              <small><span class="octicon octicon-organization"></span> {{ room.users.length }} people</small>
-              <small><span class="octicon octicon-mail"></span> 100k messages</small>
-            </footer>
-          </li>
-        {{/each}}
-      </ul>
+      {{#if rooms}}
+        <ul class="room-list">
+          {{#each rooms}}
+            <li class='room-item'>
+              <header>
+                <img class="room-item__avatar" src="{{ repo.owner.avatar_url }}&s=80">
+                <h3 class="repo-name">
+                  <span class="repo-name__collapsable">{{ repo.owner.login }}</span><span>/</span><span class="repo-name__collapsable">{{ repo.name }}</span>
+                </h3>
+              </header>
+              <section class='room-item__description'>
+                <small>{{ repo.description }}</small>
+              </section>
+              <section class='room-item__content'>
+                {{!-- <p>Some content, content about something.</p> --}}
+                {{!-- <p>111233213213</p> --}}
+              </section>
+              <footer>
+                <small><span class="octicon octicon-organization"></span> {{ room.users.length }} people</small>
+                <small><span class="octicon octicon-comment-discussion"></span> 100k messages</small>
+              </footer>
+            </li>
+          {{/each}}
+        </ul>
+      {{/if}}
+      {{#unless rooms}}
+        <h1><span class="mega-octicon octicon-stop"></span> Damn</h1>
+        <h2>there are no rooms with the tags: {{ tag }}.</h2>
+        <p>Why don't you create it dude?</p>
+      {{/unless}}
     </div>
     <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/2.0.2/octicons.min.css">
