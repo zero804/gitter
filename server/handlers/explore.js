@@ -2,18 +2,19 @@
 "use strict";
 
 var suggestedService = require('../services/suggested-room-service');
-var RepoService = require('../services/github/github-repo-service');
+var repoDescription = require('../services/github/github-fast-repo-description');
 var Q = require('q');
 
 var DEFAULT_TAGS = ['javascript', 'ruby', 'php'];
 
-function getRoomRenderData(room, user) {
-  var repoService = new RepoService(user);
-  return repoService.getRepo(room.uri)
-    .then(function(repo) {
+function getRoomRenderData(room) {
+  return repoDescription(room.uri)
+    .then(function(description) {
       return {
         room: room,
-        repo: repo
+        repoOwner: room.uri.split('/')[0],
+        repoName: room.uri.split('/')[1],
+        repoDescription: description
       };
     });
 }
