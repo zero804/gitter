@@ -3,6 +3,7 @@
 
 var RepoService = require('./github-repo-service');
 var wrapper = require('../../utils/cache-wrapper');
+var config = require('../../utils/config');
 
 function getDescription(repoName) {
   var repoService = new RepoService();
@@ -11,4 +12,6 @@ function getDescription(repoName) {
   });
 }
 
-module.exports = wrapper('github-fast-repo-description', getDescription, { ttl: 20 });
+module.exports = wrapper('github-fast-repo-description', getDescription, {
+  ttl: config.get('github:fast-repo-description-cache-timeout')
+});
