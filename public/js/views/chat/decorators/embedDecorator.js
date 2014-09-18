@@ -6,6 +6,43 @@ define([
 ], function($, oEmbed) {
 
   "use strict";
+  var MAX_HEIGHT = 640;
+  var MAX_WIDTH = 640;
+
+  function adjustBounds($fragment) {
+    var iframe;
+    if(!$fragment.length) return;
+    if($fragment[0].tagName === 'IFRAME') {
+      iframe = $fragment;
+    } else {
+      iframe = $fragment.find('iframe');
+      if(iframe.length === 0) return;
+    }
+
+    var height = iframe.attr('height') || 0;
+    var width = iframe.attr('width') || 0;
+
+    var scale;
+    if(height > MAX_HEIGHT) {
+      scale = MAX_HEIGHT / height;
+      height = MAX_HEIGHT;
+      width = width * scale;
+    }
+
+    if(width > MAX_WIDTH) {
+      scale = MAX_WIDTH / width;
+      width = MAX_WIDTH;
+      height = height * scale;
+    }
+
+    if(height) {
+      iframe.attr('height', Math.round(height));
+    }
+
+    if(width) {
+      iframe.attr('width', Math.round(width));
+    }
+  }
 
   function embed(chatItemView) {
     var model = chatItemView.model;
@@ -28,6 +65,9 @@ define([
                 isCollapsible = true;
               }
 
+              var embeddedContent = $($.parseHTML(embed.html, null, true));
+              adjustBounds(embeddedContent);
+
               var $embed = $(document.createElement('div'));
               $embed.addClass('embed');
               if(chatItemView.expandFunction) {
@@ -38,20 +78,11 @@ define([
                 $embed.addClass('embed-limited');
               }
 
-              var _iframe = embed.html;
-              var iframewidth   = _iframe.match(/width="(\d+)"/);
-              var iframeheight  = _iframe.match(/height="(\d+)"/);
-
-              if (iframewidth && iframewidth[1] > 640 || iframeheight && iframeheight[1] > 480) {
-                _iframe = _iframe.replace(/width="\d+"/,'width="' + iframewidth[1]/2 + '"');
-                _iframe = _iframe.replace(/height="\d+"/,'height="' + iframeheight[1]/2 + '"');
-              }
-
-              $embed.html(_iframe);
+              $embed.html(embeddedContent);
               $(el).after($embed);
 
               // any iframely iframes will resize once content loads
-              $.iframely.registerIframesIn(chatItemView.$el);
+              $.iframely.registerIframesIn($embed);
             }
           });
         }
