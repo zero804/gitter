@@ -108,7 +108,6 @@ findRooms(20)
   .then(prepareRooms)
   .then(tagRooms)
   .then(saveRooms)
-  .then(process.exit)
   .catch(function (err) {
     console.error(err.stack);
   })
