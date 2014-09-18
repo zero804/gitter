@@ -3,18 +3,23 @@
 
 var suggestedService = require('../services/suggested-room-service');
 var repoDescription = require('../services/github/github-fast-repo-description');
+var getRoughMessageCount = require('../services/chat-service').getRoughMessageCount;
 var Q = require('q');
 
 var DEFAULT_TAGS = ['javascript', 'ruby', 'php'];
 
 function getRoomRenderData(room) {
-  return repoDescription(room.uri)
-    .then(function(description) {
+  return Q.all([
+      repoDescription(room.uri),
+      getRoughMessageCount(room.id)
+    ])
+    .spread(function(description, messageCount) {
       return {
         room: room,
         repoOwner: room.uri.split('/')[0],
         repoName: room.uri.split('/')[1],
-        repoDescription: description
+        repoDescription: description,
+        messageCount: messageCount
       };
     });
 }

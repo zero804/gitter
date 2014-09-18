@@ -2,6 +2,7 @@
 
 var env                  = require('../utils/env');
 var stats                = env.stats;
+var config               = env.config;
 
 var persistence          = require("./persistence-service");
 var collections          = require("../utils/collections");
@@ -17,6 +18,7 @@ var StatusError          = require('statuserror');
 var unreadItemService    = require('./unread-item-service');
 var _                    = require('underscore');
 var mongooseUtils        = require('../utils/mongoose-utils');
+var cacheWrapper         = require('../utils/cache-wrapper');
 
 /*
  * Hey Trouper!
@@ -228,6 +230,15 @@ function getDateOfFirstMessageInRoom(troupeId) {
       return r[0].sent;
     });
 }
+
+/*
+ * this does a massive query, so it has to be cached for a long time
+ */
+exports.getRoughMessageCount = cacheWrapper('getRoughMessageCount', function(troupeId) {
+  return persistence.ChatMessage.countQ({ toTroupeId: troupeId });
+}, {
+  ttl: config.get('chat-service:get-rough-message-count-cache-timeout')
+});
 
 function findFirstUnreadMessageId(troupeId, userId) {
   var d = Q.defer();
