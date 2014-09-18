@@ -37,6 +37,13 @@ define([
 
     onItemviewSelected: function(childView) {
       var id = childView.model.id;
+      var inCollection = !!this.chatCollection.get(id);
+
+      if(inCollection) {
+        this.chatView.scrollToChatId(id);
+        return;
+      }
+
       this.chatCollection.fetchAtPoint({ aroundId: id }, {}, function() {
         this.chatView.scrollToChatId(id);
       }, this);
