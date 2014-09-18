@@ -171,6 +171,16 @@ define([
       this.$el.scrollTop(scrollFromTop + pageHeight);
     },
 
+    scrollToChatId: function(id) {
+      var model = this.collection.get(id);
+      if(!model) return;
+
+      var view = this.children.findByModel(model);
+      if(!view) return;
+      this.rollers.scrollToElement(view.el, { centre: true });
+      return true;
+    },
+
     getFetchData: function() {
       log("Loading next message chunk.");
 

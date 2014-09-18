@@ -155,13 +155,27 @@ define(['mutant'], function(Mutant) {
     /*
      * Scroll to the bottom and switch the mode to TRACK_BOTTOM
      */
-    scrollToElement: function(element) {
+    scrollToElement: function(element, options) {
       var target = this._target;
-      var scrollTop = element.offsetTop - TOP_OFFSET;
+      var scrollTop;
+      if(options && options.centre) {
+        // Centre the element in the viewport
+        var elementHeight = element.offsetHeight;
+        var viewportHeight = target.clientHeight;
+        if(elementHeight < viewportHeight) {
+          scrollTop = Math.floor(element.offsetTop + elementHeight/2 - viewportHeight/2);
+        }
+      }
+
+      if(!scrollTop) {
+        scrollTop = element.offsetTop - TOP_OFFSET;
+      }
+
       if(scrollTop < 0) scrollTop = 0;
       target.scrollTop = scrollTop;
 
-      this.trackUntil(element);
+      this.stable();
+      // this.trackUntil(element, true/*force*/);
     },
 
     /*

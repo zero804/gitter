@@ -38,14 +38,16 @@ define([
 
   var mouseEvents = {
     'click .js-chat-item-edit':       'toggleEdit',
-    'click .js-chat-item-collapse':       'toggleCollapse',
+    'click .js-chat-item-collapse':   'toggleCollapse',
     'click .js-chat-item-readby':     'showReadBy',
     'mouseover .js-chat-item-readby': 'showReadByIntent',
-    'click .webhook':           'expandActivity'
+    'click .webhook':                 'expandActivity',
+    "click":                          'chatSelected'
   };
 
   var touchEvents = {
     'click .js-chat-item-edit':       'toggleEdit',
+    "click":                          'chatSelected'
   };
 
   var ChatItemView = Marionette.ItemView.extend({
@@ -510,6 +512,10 @@ define([
 
       popover.show();
       ReadByPopover.singleton(this, popover);
+    },
+
+    chatSelected: function() {
+      this.triggerMethod('selected');
     }
   });
 

@@ -194,34 +194,11 @@ require([
     else notifyRemoveError('User '+ username +' was not found in this room.');
   });
 
-  // new RightToolbarView({ el: "#toolbar-frame" });
-
-  // new HeaderView({ model: context.troupe(), el: '#header' });
-
-  // Setup the ChatView
-  // var chatCollectionView = new ChatCollectionView({
-  //   el: '#chat-container',
-  //   collection: itemCollections.chats,
-  //   userCollection: itemCollections.users,
-  //   decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
-  // }).render();
-
-  // Setup the chat search view
-  // var chatSearchCollection = new chatSearchModels.ChatSearchCollection([], { });
-  // var chatSearchCollectionView = new ChatCollectionView({
-  //   el: '#search-container',
-  //   collection: chatSearchCollection,
-  //   userCollection: itemCollections.users,
-  //   decorators: []
-  // }).render();
-
-  // chatSearchCollection.fetchSearch('moo');
-  // chatCollectionView.$el.hide();
-
   var appView = new ChatIntegratedView({
     el: 'body'
   });
 
+  appView.showSearchMode();
 
   // This may require a better home
   itemCollections.users.once('sync', function() {
@@ -236,15 +213,6 @@ require([
       }
     }
   });
-
-  new chatInputView.ChatInputView({
-    el: $('#chat-input'),
-    collection: itemCollections.chats,
-    chatCollectionView: chatCollectionView,
-    userCollection: itemCollections.users,
-    rollers: chatCollectionView.rollers
-  }).render();
-
 
   var Router = Backbone.Router.extend({
     routes: {
