@@ -6,7 +6,7 @@ var testRequire     = require('../../test-require');
 var assert          = require("assert");
 var GithubMeService = testRequire('./services/github/github-me-service');
 
-var FAKE_USER = { username: 'gittertestbot', githubToken: '64c1d90a8c60d2ee75fc5b3d3f7881d94559fec8'};
+var FAKE_USER = { username: 'gittertestbot', githubToken: '***REMOVED***'};
 
 describe('github-me-service', function() {
   it('members should detailed emailed', function(done) {
