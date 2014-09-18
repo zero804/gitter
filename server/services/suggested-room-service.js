@@ -322,6 +322,7 @@ exports.getSuggestions = getSuggestions;
  */
 function fetchByTags(tags) {
   // fake it til we make it
+  // TODO: WE MADE IT MA!
   if (tags.indexOf('javascript') >= 0) {
    return Q.resolve(javascriptRooms);
   }
