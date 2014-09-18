@@ -3,15 +3,8 @@
 
 var SnappyCache = require('snappy-cache');
 var redis = require('../utils/redis');
-var config = require('../utils/config');
 var Q = require('q');
 var assert = require('assert');
-
-var cache = new SnappyCache({
-  prefix: 'sc:',
-  redis: redis.getClient(),
-  ttl: config.get('github:cache-timeout')
-});
 
 function generateKey(moduleName, instanceId, propertyName, args) {
   var parts = [
@@ -23,13 +16,13 @@ function generateKey(moduleName, instanceId, propertyName, args) {
   return parts.map(encodeURIComponent).join(':');
 }
 
-function wrapFunction(moduleName, propertyName, func, getInstanceIdFunc) {
+function wrapFunction(cache, moduleName, func, funcName, getInstanceIdFunc) {
   return function() {
     var args = Array.prototype.slice.apply(arguments);
     var self = this;
 
     var instanceId = getInstanceIdFunc ? getInstanceIdFunc(this) : '';
-    var key = generateKey(moduleName, instanceId, propertyName, args);
+    var key = generateKey(moduleName, instanceId, funcName, args);
 
     var d = Q.defer();
     cache.lookup(key, function(cb) {
@@ -41,13 +34,13 @@ function wrapFunction(moduleName, propertyName, func, getInstanceIdFunc) {
   };
 }
 
-function wrapObject(moduleName, module, getInstanceIdFunc) {
+function wrapObject(cache, moduleName, obj, getInstanceIdFunc) {
   var wrapped = {};
 
-  Object.keys(module).forEach(function(key) {
-    var property = module[key];
+  Object.keys(obj).forEach(function(key) {
+    var property = obj[key];
     if(typeof property === 'function') {
-      wrapped[key] = wrapFunction(moduleName, key, property, getInstanceIdFunc);
+      wrapped[key] = wrapFunction(cache, moduleName, property, key, getInstanceIdFunc);
     } else {
       wrapped[key] = property;
     }
@@ -56,28 +49,35 @@ function wrapObject(moduleName, module, getInstanceIdFunc) {
   return wrapped;
 }
 
-function wrapClass(moduleName, Klass, getInstanceIdFunc) {
+function wrapClass(cache, moduleName, Klass, getInstanceIdFunc) {
   var Wrapped = function() {
     Klass.apply(this, arguments);
   };
 
-  Wrapped.prototype = wrapObject(moduleName, Klass.prototype, getInstanceIdFunc);
+  Wrapped.prototype = wrapObject(cache, moduleName, Klass.prototype, getInstanceIdFunc);
 
   return Wrapped;
 }
 
 module.exports = function(moduleName, module, options) {
+
+  var cache = new SnappyCache({
+    prefix: 'sc:',
+    redis: redis.getClient(),
+    ttl: options && options.ttl || 0
+  });
+
   if(typeof module === 'function') {
     if(module.prototype && Object.keys(module.prototype).length) {
       // its a class
       assert(options && options.getInstanceId, 'options.getInstanceId required');
-      return wrapClass(moduleName, module, options.getInstanceId);
+      return wrapClass(cache, moduleName, module, options.getInstanceId);
     } else {
       // its a function
-      return wrapFunction(moduleName, null, module);
+      return wrapFunction(cache, moduleName, module);
     }
   } else if(typeof module === 'object') {
     // its a collection of functions
-    return wrapObject(moduleName, module);
+    return wrapObject(cache, moduleName, module);
   }
 };
