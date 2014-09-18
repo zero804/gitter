@@ -32,7 +32,8 @@ define([
 
       var loadLimit = this.getLoadLimit();
 
-      var data = _.defaults(this.getQuery && this.getQuery(), { limit: loadLimit /* Latest is the default */ });
+      var data = this.getQuery && this.getQuery() || {};
+      data = _.defaults(data, { limit: loadLimit /* Latest is the default */ });
 
       var existingIds = utils.index(this.pluck('id'), utils.identityTransform);
 
@@ -90,7 +91,8 @@ define([
 
       var loadLimit = this.getLoadLimit();
 
-      var data = _.defaults(this.getQuery && this.getQuery(), { beforeId: beforeId, limit: loadLimit });
+      var data = this.getQuery && this.getQuery() || {};
+      data = _.defaults(data, { beforeId: beforeId, limit: loadLimit });
 
       // var data = { beforeId: beforeId, limit: loadLimit };
       var self = this;
@@ -129,7 +131,8 @@ define([
       }
 
       var loadLimit = this.getLoadLimit();
-      var data = _.defaults(this.getQuery && this.getQuery(), { afterId: afterId, limit: loadLimit });
+      var data = this.getQuery && this.getQuery() || {};
+      data = _.defaults(data, { afterId: afterId, limit: loadLimit });
       // var data = { afterId: afterId, limit: loadLimit };
 
       this.trigger('fetch.started');
@@ -159,8 +162,8 @@ define([
       });
     },
 
-    fetchFromMarker: function(marker, options, callback, context) {
-      if(this.atTop) return; // Already at the top
+    fetchAtPoint: function(query, options, callback, context) {
+      // if(this.atTop) return; // Already at the top
       if(this._isFetching) return;
       this._isFetching = true;
 
@@ -168,7 +171,8 @@ define([
 
       var existingIds = utils.index(this.pluck('id'), utils.identityTransform);
 
-      var data = _.defaults(this.getQuery && this.getQuery(), { marker: marker, limit: loadLimit });
+      var data = this.getQuery && this.getQuery() || {};
+      data = _.defaults(data, query, { limit: loadLimit });
       var self = this;
 
       this.fetch({
@@ -206,6 +210,10 @@ define([
           if(callback) callback.call(err);
         }
       });
+    },
+
+    fetchFromMarker: function(marker, options, callback, context) {
+      return this.fetchAtPoint({ marker: marker }, options, callback, context);
     },
 
     trimTop: function() {

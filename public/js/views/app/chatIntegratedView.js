@@ -6,6 +6,7 @@ define([
   'views/app/uiVars',
   'views/chat/chatInputView',
   'collections/instances/integrated-items',
+  'collections/chat-search',
   'components/modal-region',
   'utils/scrollbar-detect',
   'cocktail',
@@ -22,13 +23,14 @@ define([
   'views/app/headerView',
   'components/unread-items-client',
   'views/righttoolbar/rightToolbarView',
+  'views/search/searchView',
 
   'transloadit'  // No ref
 ], function($, context, Marionette, appEvents, uiVars, chatInputView, itemCollections,
-    modalRegion, hasScrollBars, cocktail, KeyboardEventsMixin, ChatCollectionView,
+    chatSearchModels, modalRegion, hasScrollBars, cocktail, KeyboardEventsMixin, ChatCollectionView,
     webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator,
     emojiDecorator, UnreadBannerView, HistoryLimitView, HeaderView, unreadItemsClient,
-    RightToolbarView) {
+    RightToolbarView, SearchView) {
   "use strict";
 
   var touchEvents = {
@@ -63,7 +65,7 @@ define([
     },
 
     initialize: function() {
-      new RightToolbarView({ el: "#toolbar-frame" });
+      this.rightToolbar = new RightToolbarView({ el: "#toolbar-content" });
 
       new HeaderView({ model: context.troupe(), el: '#header' });
 
@@ -75,6 +77,8 @@ define([
         decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
       }).render();
 
+      var chatSearchCollection = new chatSearchModels.ChatSearchCollection([], { });
+
       this.chatInputView = new chatInputView.ChatInputView({
         el: '#chat-input',
         collection: itemCollections.chats,
@@ -83,8 +87,14 @@ define([
         rollers: chatCollectionView.rollers
       }).render();
 
-      var unreadChatsModel = unreadItemsClient.acrossTheFold();
+      this.searchView = new SearchView({
+        el: '#search-panel',
+        collection: chatSearchCollection,
+        chatCollection: itemCollections.chats,
+        chatView: chatCollectionView
+      }).render();
 
+      var unreadChatsModel = unreadItemsClient.acrossTheFold();
 
       itemCollections.chats.once('sync', function() {
         unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
@@ -108,7 +118,7 @@ define([
         chatCollectionView: chatCollectionView
       }).render();
 
-
+      this.chatCollectionView = chatCollectionView;
       this.dialogRegion = modalRegion;
 
       if (hasScrollBars()) {
@@ -251,6 +261,13 @@ define([
       el.on('dragenter', ignoreEvent);
       el.on('dragover',  ignoreEvent);
       el.on('drop',      dropEvent);
+    },
+
+    showSearchMode: function() {
+      this.rightToolbar.$el.hide();
+      // this.chatInputView.$el.hide();
+      // this.chatSearchCollectionView.$el.show();
+      this.searchView.$el.show();
     }
   });
 
