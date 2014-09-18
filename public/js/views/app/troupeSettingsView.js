@@ -1,4 +1,5 @@
 define([
+  'marionette',
   'jquery',
   'underscore',
   'utils/context',
@@ -7,11 +8,11 @@ define([
   'hbs!./tmpl/troupeSettingsTemplate',
   'log!troupe-settings-view',
   'components/notifications'
-], function($, _, context, TroupeViews, itemCollections, troupeSettingsTemplate, log, notifications) {
+], function(Marionette, $, _, context, TroupeViews, itemCollections, troupeSettingsTemplate, log, notifications) {
   "use strict";
 
 
-  var View = TroupeViews.Base.extend({
+  var View = Marionette.ItemView.extend({
     template: troupeSettingsTemplate,
     events: {
       'click #save-troupe-settings': 'saveSettings',
@@ -76,14 +77,14 @@ define([
       this.dialog = null;
     },
 
-    afterRender: function() {
+    onRender: function() {
       if (this.settings) {
         this.setLurkButton();
         this.$el.find("#notification-options").val(this.settings);
       }
     },
 
-    getRenderData: function() {
+    serializeData: function() {
       return _.extend({},
         context.getTroupe(), {
           lurk: context.troupe().get('lurk'),
