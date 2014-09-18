@@ -8,12 +8,12 @@ var testRequire = require('../test-require');
 function getWrapper(lookupFunc) {
   var MockSnappyCache = function() {};
   MockSnappyCache.prototype.lookup = lookupFunc;
-  return testRequire.withProxies('./utils/module-cache-wrapper', {
+  return testRequire.withProxies('./utils/cache-wrapper', {
     'snappy-cache': MockSnappyCache
   });
 }
 
-describe('module-cache-wrapper', function() {
+describe('cache-wrapper', function() {
 
   describe('wrapping single function modules', function() {
 

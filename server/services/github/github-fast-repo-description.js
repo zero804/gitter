@@ -2,7 +2,7 @@
 "use strict";
 
 var RepoService = require('./github-repo-service');
-var wrapper = require('../../utils/module-cache-wrapper');
+var wrapper = require('../../utils/cache-wrapper');
 
 function getDescription(repoName) {
   var repoService = new RepoService();
