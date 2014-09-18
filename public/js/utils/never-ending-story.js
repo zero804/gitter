@@ -11,6 +11,7 @@ define(['underscore', 'backbone', 'log!nes'], function(_, Backbone, log) {
     this._nearBottom = false;
     this._scrollHandler = this.scroll.bind(this);
     this.scrollRateLimited = _.throttle(this.scrollRate.bind(this), 100, { leading: false });
+    this._contentWrapper = options && options.contentWrapper;
     this.enable();
   }
   _.extend(NeverEndingStory.prototype, Backbone.Events, {
@@ -69,7 +70,7 @@ define(['underscore', 'backbone', 'log!nes'], function(_, Backbone, log) {
       this._prevScrollBottomRate = scrollBottom;
       this._prevScrollTimeRate = now;
 
-      if(!prevScrollTime || this.loading) return;
+      if(!prevScrollTime) return;
 
       var deltaTop = prevScrollTop - scrollTop;
       var deltaBottom = prevScrollBottom - scrollBottom;
@@ -82,7 +83,6 @@ define(['underscore', 'backbone', 'log!nes'], function(_, Backbone, log) {
         speed = deltaTop / timeDelta;
         timeToLimit = scrollTop / speed;
         if(timeToLimit < 600) {
-          // log('approaching.top (rate)');
           this.trigger('approaching.top');
         }
         return;
@@ -95,15 +95,10 @@ define(['underscore', 'backbone', 'log!nes'], function(_, Backbone, log) {
         timeToLimit = scrollBottom / speed;
 
         if(timeToLimit < 600) {
-          // log('approaching.bottom (rate)');
           this.trigger('approaching.bottom');
         }
       }
 
-    },
-
-    loadComplete: function() {
-      this.loading = false;
     },
 
     scrollToOrigin: function() {
@@ -117,10 +112,22 @@ define(['underscore', 'backbone', 'log!nes'], function(_, Backbone, log) {
     },
 
     enable: function() {
+      var self = this;
+
       if(!this._enabled) {
         log('enabling scroll listener');
         this._target.addEventListener('scroll', this._scrollHandler, false);
         this._enabled = true;
+
+        // If we have a content wrapper and it's smaller than the
+        // client area, we need to load more content immediately
+        if(this._contentWrapper) {
+          setTimeout(function() {
+            if(self._contentWrapper.offsetHeight < self._target.clientHeight) {
+              self.trigger('approaching.top');
+            }
+          }, 10);
+        }
       }
     },
 
