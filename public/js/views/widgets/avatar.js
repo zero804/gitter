@@ -1,25 +1,25 @@
 define([
-  'jquery',
   'backbone',
-  'underscore',
+  'marionette',
   'utils/context',
-  'views/base',
   'hbs!./tmpl/avatar',
   'views/people/userPopoverView',
+  'views/behaviors/widgets',
   'bootstrap_tooltip',                // No ref
-], function($, Backbone, _, context, TroupeViews, template, UserPopoverView) {
-
+], function(Backbone, Marionette, context, template, UserPopoverView, widgets) {
   "use strict";
 
-  return TroupeViews.Base.extend({
+  var AvatarWidget = Marionette.ItemView.extend({
     tagName: 'span',
     template: template,
     events: {
       'mouseover': 'showDetailIntent',
       'click':     'showDetail'
     },
+    modelEvents: {
+      change: 'update'
+    },
     initialize: function (options) {
-      var self = this;
       this.user = options.user ? options.user : {};
       this.showEmail = options.showEmail || {};
       this.showBadge = options.showBadge;
@@ -32,7 +32,8 @@ define([
       // once this widget has the id of the user,
       // it will listen to changes on the global user collection,
       // so that it knows when to update.
-      var avatarChange = _.bind(function(event, user) {
+      /*
+      var avatarChange = _.bind(function(e, user) {
         if(user.id !== self.getUserId()) return;
 
         if(self.user) {
@@ -49,13 +50,13 @@ define([
           avatarChange({}, model);
         });
       } else {
-        // Unfortunately we can't use listenTo with jquery events
-        $(document).on('avatar:change', avatarChange);
-        this.addCleanup(function() {
-          $(document).off('avatar:change', avatarChange);
-        });
-
+        // // Unfortunately we can't use listenTo with jquery events
+        // $(document).on('avatar:change', avatarChange);
+        // this.once('close', function() {
+        //   $(document).off('avatar:change', avatarChange);
+        // });
       }
+      */
     },
 
     showDetailIntent: function(e) {
@@ -83,7 +84,7 @@ define([
     },
 
     update: function () {
-      var data = this.getRenderData();
+      var data = this.serializeData();
       this.updatePresence(data);
       this.updateAvatar(data);
       this.updateTooltip(data);
@@ -112,7 +113,7 @@ define([
       return null;
     },
 
-    getRenderData: function() {
+    serializeData: function() {
       var currentUserId = context.getUserId();
 
       var user = this.model ? this.model.toJSON() : this.user;
@@ -150,21 +151,24 @@ define([
     },
 
     // TODO: use base classes render() method
-    render: function() {
-      var data = this.getRenderData();
-      var dom = this.template(data);
-      this.$el.html(dom);
-
-      if (this.showTooltip && !window._troupeCompactView && (this.model ? this.model.get('displayName') : this.user.displayName)) {
-        this.$el.find(':first-child').tooltip({
-          html : false,
-          placement : this.tooltipPlacement,
-          container: "body"
-        });
+    onRender: function() {
+      var displayName;
+      if(this.model) {
+        displayName = this.model.get('displayName');
+      } else if(this.user) {
+        displayName = this.user.displayName;
       }
-      return this;
+
+      if(!this.showTooltip || window._troupeCompactView || !displayName) return;
+      this.$el.find(':first-child').tooltip({
+        html: false,
+        placement : this.tooltipPlacement,
+        container: "body"
+      });
     }
 
   });
 
+  widgets.register({ avatar: AvatarWidget });
+  return AvatarWidget;
 });

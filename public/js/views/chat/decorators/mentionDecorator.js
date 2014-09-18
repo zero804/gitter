@@ -52,7 +52,7 @@ define([
       $mentions.on('click', clickMention);
       $mentions.on('mouseover', hoverIntent);
 
-      chatItemView.addCleanup(function() {
+      chatItemView.once('close', function() {
         $mentions.off('click', clickMention);
         $mentions.off('mouseover', hoverIntent);
       });
