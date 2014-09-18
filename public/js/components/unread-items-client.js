@@ -18,6 +18,9 @@ define([
   function _iteratePreload(items, fn, context) {
     var keys = _.keys(items);
     _.each(keys, function(itemType) {
+      // Ignore the meta
+      if(itemType === '_meta') return;
+
       _.each(items[itemType], function(itemId) {
         fn.call(context, itemType, itemId);
       });
