@@ -20,10 +20,11 @@ module.exports = {
 
           var lang = locales.best(supported);
           var template;
-          if(lang.code === 'en') {
+
+          if(lang.language === 'en') {
             template = 'homepage';
           } else {
-            template = 'homepage-' + lang.code;
+            template = 'homepage-' + lang.language;
           }
 
           // when the viewer is not logged in:
