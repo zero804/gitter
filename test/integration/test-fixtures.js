@@ -33,7 +33,7 @@ function generateGithubId() {
 }
 
 function generateGithubToken() {
-  return '64c1d90a8c60d2ee75fc5b3d3f7881d94559fec8';
+  return '***REMOVED***';
 }
 
 function createBaseFixture() {

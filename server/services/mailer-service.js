@@ -11,6 +11,10 @@ var winston        = require('../utils/winston');
 var Q              = require('q');
 var emailify       = require('emailify');
 
+var mandrillClient = require('mandrill-api/mandrill');
+var mandrill = new mandrillClient.Mandrill(env.config.get('mandrill:apiKey'));
+var cdn = require('../web/cdn');
+
 var logEmailToLogger = nconf.get('logging:logEmailContents');
 
 var smtpTransport = nodemailer.createTransport("SMTP", {
@@ -41,6 +45,10 @@ troupeTemplate.compile("emails/header", function(err, t) {
 });
 
 exports.sendEmail = function(options, done) {
+  if (options.templateFile === 'added_to_room') return addedToRoomViaMandrill(options, done);
+  if (options.templateFile === 'invitation')    return invitationViaMandrill(options, done);
+
+
   var d = Q.defer();
   
   var tracking = options.tracking || {}; // avoids failure if no tracking information is present
@@ -103,3 +111,84 @@ exports.sendEmail = function(options, done) {
   return d.promise.nodeify(done);
 };
 
+function addedToRoomViaMandrill(options, done) {
+  var d = Q.defer();
+  var templateName = 'added-to-room';
+
+  var data = options.data;
+  var templateContent = [];
+  //var templateContent = [
+  //  {name: 'recipient', content: '<h1>Hello ' + data.recipientName + '!</h1>'},
+  //  {name: 'addedmsg',  content: '<p><strong>' + data.senderName + '</strong> just added you to the ' + data.roomUri + ' chat on Gitter.</p>'},
+  //  {name: 'roomurl',   content: '<td><a href="' + data.roomUrl + '" style="text-decoration: none" class="button-green">Open the room</a></td>'},
+  //  {name: 'unsub',     content: '<p>To unsubscribe from these notifications, click <a href="' + data.unsubscribeUrl + '">here</a>.</p>'}
+  //];
+
+  var message = {
+    subject:    options.subject,
+    from_email: 'support@gitter.com',
+    from_name:  options.fromName,
+    to:         [{email: options.to, type: 'to'}],
+    tags:       ['added-to-room'], // used for A/B testing
+    merge_vars: [{
+      rcpt: options.to, 
+      vars: [
+       {name: 'NAME',    content: data.recipientName},
+       {name: 'SENDER',  content: data.senderName},
+       {name: 'ROOMURI', content: data.roomUri},
+       {name: 'ROOMURL', content: data.roomUrl},
+       {name: 'UNSUB',   content: data.unsubscribeUrl},
+       {name: 'LOGOURL', content: cdn('images/logo-text-blue-pink.png', {email: true})}
+      ]
+    }]
+  };
+
+  mandrill.messages.sendTemplate({
+    template_name:    templateName, 
+    template_content: templateContent,
+    message:          message
+  }, function() {
+    d.resolve();
+  }, function(err) {
+    d.reject(err);
+  });
+
+  return d.promise.nodeify(done);
+}
+
+function invitationViaMandrill(options, done) {
+  var d = Q.defer();
+  var templateName = 'invitation';
+
+  var data = options.data;
+  var templateContent = [];
+  var message = {
+    subject:    options.subject,
+    from_email: 'support@gitter.com',
+    from_name:  options.fromName,
+    to:         [{email: options.to, type: 'to'}],
+    tags:       ['invitation'], // used for A/B testing
+    merge_vars: [{
+      rcpt: options.to, 
+      vars: [
+       {name: 'NAME',    content: data.recipientName},
+       {name: 'SENDER',  content: data.senderName},
+       {name: 'ROOMURI', content: data.roomUri},
+       {name: 'ROOMURL', content: data.roomUrl},
+       {name: 'LOGOURL', content: cdn('images/logo-text-blue-pink.png', {email: true})}
+      ]
+    }]
+  };
+
+  mandrill.messages.sendTemplate({
+    template_name:    templateName, 
+    template_content: templateContent,
+    message:          message
+  }, function() {
+    d.resolve();
+  }, function(err) {
+    d.reject(err);
+  });
+
+  return d.promise.nodeify(done);
+}

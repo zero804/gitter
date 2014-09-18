@@ -5,7 +5,7 @@
 var testRequire = require('../../test-require');
 var assert = require("assert");
 
-var FAKE_USER = { username: 'gittertestbot', githubToken: '64c1d90a8c60d2ee75fc5b3d3f7881d94559fec8'};
+var FAKE_USER = { username: 'gittertestbot', githubToken: '***REMOVED***'};
 
 describe('github-fast-search', function() {
   it('has type:user flag formatted correctly', function(done) {
@@ -14,7 +14,7 @@ describe('github-fast-search', function() {
           fastRequest: function(options) {
           var querystring = options.uri.split('?')[1];
 
-          assert.equal(querystring, 'q=tony+type:user&access_token=64c1d90a8c60d2ee75fc5b3d3f7881d94559fec8');
+          assert.equal(querystring, 'q=tony+type:user&access_token=***REMOVED***');
 
           done();
         }
