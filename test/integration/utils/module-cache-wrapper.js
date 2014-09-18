@@ -87,4 +87,48 @@ describe('module-cache-wrapper', function() {
 
   });
 
+  describe('wrapping class modules', function() {
+
+    var Klass = function(prefix) {
+      this.prefix = prefix;
+    };
+    Klass.prototype.addPrefix = function(name) {
+      return Q.resolve(this.prefix + ' ' + name);
+    };
+
+    it('looks up correct key', function(done) {
+      var wrapper = getWrapper(function(key) {
+        assert.equal(key, 'my-module:hello:addPrefix:world');
+        done();
+      });
+
+      var Wrapped = wrapper('my-module', Klass, {
+        getInstanceId: function(obj) {
+          return obj.prefix;
+        }
+      });
+
+      var wrapped = new Wrapped('hello');
+      wrapped.addPrefix('world');
+    });
+
+    it('calls method correctly on cache miss', function(done) {
+      var wrapper = getWrapper(function(key, cachedFunc, cb) {
+        cachedFunc(cb);
+      });
+
+      var Wrapped = wrapper('my-module', Klass, {
+        getInstanceId: function(obj) {
+          return obj.prefix;
+        }
+      });
+      var wrapped = new Wrapped('hello');
+      wrapped.addPrefix('world').then(function(result) {
+        assert.equal(result, 'hello world');
+        done();
+      });
+    });
+
+  });
+
 });
