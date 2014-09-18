@@ -222,6 +222,7 @@ module.exports = {
             return mailerService.sendEmail({
               templateFile: "added_to_room",
               from: senderName + ' <support@gitter.im>',
+              fromName: senderName,
               to: email,
               subject: '[' + room.uri + '] You\'ve been added to a new room on Gitter',
               tracking: {
