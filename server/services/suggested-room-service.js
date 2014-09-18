@@ -314,40 +314,31 @@ function getSuggestions(user, localeLanguage) {
 
 exports.getSuggestions = getSuggestions;
 
-function getTaggedRooms(_tags) {
-  //fake it til we make it
-  if(_tags === 'javascript') {
+/**
+ * fetchByTags() retrives rooms that match a given set of tags
+ *
+ * tags     Array the querying tags
+ * @return  Promise promise of matching rooms
+ */
+function fetchByTags(tags) {
+  // fake it til we make it
+  if (tags.indexOf('javascript') >= 0) {
    return Q.resolve(javascriptRooms);
-  } else if(_tags === 'ruby') {
-   return Q.resolve(rubyRooms);
-  } else if(_tags === 'php') {
-   return Q.resolve(phpRooms);
   }
+  /*else if (tags === 'ruby') {
+   return Q.resolve(rubyRooms);
+  } else if (tags === 'php') {
+   return Q.resolve(phpRooms);
+  }*/
 
-
-  var tags = []; // default tags
-  tags = tags.concat(_tags);
+  // limit by 8 tags to avoid mega queries
+  tags = tags.slice(0, 8);
 
   return persistence.Troupe
     .where('security').equals('PUBLIC')
     .where('tags').in(tags)
-    .limit(50)
+    .limit(30)
     .execQ();
-
-  // fake it til we make it
-  //if(tag === 'javascript') {
-  //  return Q.resolve(javascriptRooms);
-  //} else if(tag === 'ruby') {
-  //  return Q.resolve(rubyRooms);
-  //} else if(tag === 'php') {
-  //  return Q.resolve(phpRooms);
-  //} else {
-  //  return persistence.Troupe.find({
-  //    security: 'PUBLIC',
-  //    uri: new RegExp('.*' + tag + '.*'),
-  //    githubType: 'REPO'
-  //  }).limit(30).execQ();
-  //}
 }
 
-exports.getTaggedRooms = getTaggedRooms;
+exports.fetchByTags = fetchByTags;
