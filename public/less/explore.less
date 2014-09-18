@@ -1,4 +1,6 @@
 @import 'colors';
+@import 'buttons';
+@import 'pills';
 
 @font-face {
   font-family: 'DP';
@@ -17,9 +19,22 @@
   font-style: normal;
 }
 
+// if you change this, make sure to change the image url "s" param.
+// it has to be double to support retina displays.
+@AVATAR_SIZE: 4 * 0.625em; // @const
+
 html {
   box-sizing: border-box;
 }
+
+// html {
+//   height: 100%;
+// }
+
+// body {
+//   height: 100%;
+//   margin: 0;
+// }
 
 body {
   background-color: @dark;
@@ -56,6 +71,7 @@ textarea:focus, input:focus{
 .wrap {
   max-width: 75em;
   margin: 0 auto;
+  overflow: hidden;
 }
 
 .wrap--large {
@@ -67,14 +83,6 @@ textarea:focus, input:focus{
   float: left;
   border-radius: 3px;
   margin-right: 8px;
-}
-
-.room-list {
-  display: flex;
-  flex-wrap: wrap;
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
 }
 
 .user-count {
@@ -90,6 +98,21 @@ textarea:focus, input:focus{
   padding: 1.875em 1.25em;
   text-align: center;
   font-family: DP, sans-serif;
+
+  .logo {
+    // float: left;
+    height: 40px;
+    svg {
+      width: 23px;
+      height: 40px;
+      fill: @dark;
+    }
+    margin-bottom: 1.25em;
+  }
+
+  nav {
+    float: right;
+  }
 
   .octicon-heart {
     color: desaturate(@red, 20%);
@@ -133,43 +156,42 @@ textarea:focus, input:focus{
   }
 }
 
-.page-content {
-  background-color: @light;
-  padding: 0.625em;
-}
-
-.introduction {
+.page-result {
   background-color: darken(@light, 10%);
   color: #7d7669;
   padding: 2 * 0.625em;
   text-align: center;
 }
 
+.page-content {
+  background-color: @light;
+  padding: 0.625em;
+
+  &__room-list {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
+
+  &__new-room {
+    text-align: center;
+    padding: 4 * 0.625em;
+    h1 {
+      margin-bottom: 0.625em;
+    }
+  }
+}
+
 footer {
   color: @light;
-  padding: 3 * 0.625em;
+  padding: 4 * 0.625em;
   text-align: center;
-}
 
-.logo {
-  opacity: 0.3;
-  height: 16px;
-}
-
-html {
-  height: 100%;
-}
-
-body {
-  height: 100%;
-  margin: 0;
-}
-
-nav {
-  position: absolute;
-  top: 0;
-  left: 0;
-  padding: 8px;
+  p {
+    margin-bottom: 2 * 0.625em;
+  }
 }
 
 a {
@@ -177,20 +199,14 @@ a {
   text-decoration: none;
 }
 
-// if you change this, make sure to change the image url "s" param.
-// it has to be double to support retina displays.
-@AVATAR_SIZE: 4 * 0.625em;
-
 .room-item {
 
   @color: white;
 
-  opacity: 0.8;
-  flex: 1 0 16.625em;
-  max-width: 31.25em;
-  // max-height: 10em;
-  cursor: pointer;
-  border: 4px solid transparent;
+  opacity: 0.7;
+  flex: 1 0 15.625em;
+  margin: 0.8em;
+  max-height: 10em;
   color: #333;
   display: flex;
   flex-direction: column;
@@ -200,7 +216,7 @@ a {
   }
 
   header {
-    border-top: 0.4em solid @personal;
+    // border-top: 0.4em solid @personal;
     border-radius: 3px 3px 0 0;
     background-color: @color;
     padding: 0.625em;
@@ -209,13 +225,13 @@ a {
     overflow: hidden;
   }
 
-  &:nth-child(3n + 3) header {
-    border-top: 0.4em solid @silver;
-  }
+  // &:nth-child(3n + 3) header {
+  //   border-top: 0.4em solid @silver;
+  // }
 
-  &:nth-child(2n + 1) header {
-    border-top: 0.4em solid @bronze;
-  }
+  // &:nth-child(2n + 1) header {
+  //   border-top: 0.4em solid @bronze;
+  // }
 
   &__avatar {
     float: left;
@@ -273,52 +289,6 @@ a {
     }
   }
 }
-
-// .room-item__head {
-//   padding: 0 0.625em;
-//   float: right;
-//   text-align: right;
-// }
-
-// .room-item section {
-//   position: relative;
-//   background-color: white;
-//   padding: 0.625em;
-//   overflow: hidden;
-//   flex-grow: 1;
-// }
-
-// // adds the fade out for rooms with long descriptions
-// .room-item section:after {
-//   content: "";
-//   position: absolute;
-//   bottom: 0;
-//   left: 0;
-//   right: 0;
-//   height: 2 * 0.625em;
-//   background: linear-gradient(to bottom, transparent, white);
-// }
-
-// .room-item header {
-//   margin-bottom: 0.625em;
-//   height: @AVATAR_SIZE;
-//   line-height: @AVATAR_SIZE;
-// }
-
-// .room-item__content {
-//   border-top: 0.3em solid #2e2e2e;
-//   text-align: center;
-//   padding: 1.25em;
-// }
-
-// .room-item__foot {
-//   flex-shrink: 0;
-//   border-top: 1px solid hsl(0, 0%, 90%);
-//   text-transform: uppercase;
-//   padding: 0.625em;
-//   text-align: center;
-//   background-color: white;
-// }
 
 .room-item h1,
 .room-item h2,

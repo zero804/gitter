@@ -9,30 +9,37 @@
   <body>
     <header class="page-header">
       <div class='wrap--large'>
+        <div class='logo'>{{> logo }}</div>
         {{!-- <nav> --}}
           {{!-- <a href="/" > --}}
-          <img class="logo" src="/images/logo-text-white-32.png" alt="Gitter" title="Gitter logo">
+          {{!-- <img class="logo" src="/images/logo-text-white-32.png" alt="Gitter" title="Gitter logo"> --}}
+
           {{!-- </a> --}}
         {{!-- </nav> --}}
       </div>
       <div class='wrap'>
         <h1 class="title">Explore <b>Gitter</b></h1>
         <p>Find great chat rooms <b>&amp;</b> communitites we <span class="octicon octicon-heart"></span></p>
-        {{!-- <h1>{{ tag }}</h1> --}}
-        <form>
-          <p><input name='searchTerm' id='searchTerm' class='page-header__search' type='search' placeholder='Search for tags... e.g. node' /></p>
+        {{!-- <h1>{{ tags }}</h1> --}}
+        <form action='/explore/tags'>
+          <p><input name='search' id='search' class='page-header__search' type='search' placeholder='Search for tags... e.g. node' /></p>
         </form>
+        <p>or try one of our selected tags: <a href='/explore/tags/javascript'><span class='pill--primary'>JavaScript</span></a> <a href='/explore/tags/ruby'><span class='pill--primary'>Ruby</span></a> or <a href='/explore/tags/php'><span class='pill--primary'>PHP</span></a></p>
       </div>
     </header>
-    <section class="introduction">
-      <p>Displaying results for: {{ tag }}</p>
+    <section class="page-result">
+      {{#if rooms}}
+        <p>Displaying results for: <b>{{ tags }}</b></p>
+      {{else}}
+        <p><span class="octicon octicon-stop"></span> Damn. No results found for: <b>{{ tags }}</b></p>
+      {{/if}}
     </section>
     <div class='page-content'>
       <div class='wrap--large'>
         {{#if rooms}}
-          <ul class="room-list">
+          <div class="page-content__room-list">
             {{#each rooms}}
-              <li class='room-item'>
+              <a class='room-item' href="{{ room.uri }}">
                 <header>
                   <img class="room-item__avatar" src="https://avatars.githubusercontent.com/{{repoOwner}}?s=80">
                   <h3 class="repo-name">
@@ -44,25 +51,24 @@
                 </section>
                 <section class='room-item__content'>
                   {{!-- <p>Some content, content about something.</p> --}}
-                  {{!-- <p>111233213213</p> --}}
                 </section>
                 <footer>
-                  <small><span class="octicon octicon-organization"></span> {{ room.users.length }} people</small>
-                  <small><span class="octicon octicon-comment-discussion"></span> {{ messageCount }} messages</small>
+                  <small><span class="octicon octicon-organization"></span> {{ room.users.length }} {{ pluralize room.users.length 'person' 'people'}}</small>
+                  <small><span class="octicon octicon-comment-discussion"></span> {{ formatNumber messageCount }} {{ pluralize messageCount 'message' 'messages'}}</small>
                 </footer>
-              </li>
+              </a>
             {{/each}}
-          </ul>
+          </div>
         {{/if}}
-        {{#unless rooms}}
-          <h1><span class="mega-octicon octicon-stop"></span> Damn</h1>
-          <h2>there are no rooms with the tags: {{ tag }}.</h2>
-          <p>Why don't you create it dude?</p>
-        {{/unless}}
+        <div class='page-content__new-room'>
+          <h1><span class="mega-octicon octicon-search"></span> Haven't found what you're looking for?</h1>
+          <a href='https://gitter.im' class='btn--primary'><span class="octicon octicon-plus"></span> Create Your Own Room</a>
+        </div>
       </div>
     </div>
     <footer>
-      <p>Gitter is proud to host thousands of public communities, where developers come together to talk.</p>
+      <p>Our team is <b>proud</b> to host thousands of public conversations for open-source communities, for free. <b>Gitter</b>, where developers come together to talk.</p>
+      <a href='https://gitter.im' class='btn--secondary'><span class="octicon octicon-telescope"></span> Find out more</a>
     </footer>
     <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/2.0.2/octicons.min.css">
