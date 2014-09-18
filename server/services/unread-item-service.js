@@ -197,7 +197,7 @@ function newItem(troupeId, creatorUserId, itemType, itemId) {
         }
       });
 
-      if(!userIdsForNotify.length) return;
+      if(!userIdsForNotify.length) return troupe;
 
       return newItemForUsers(troupeId, itemType, itemId, userIdsForNotify)
         .thenResolve(troupe);
