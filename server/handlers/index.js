@@ -9,6 +9,7 @@ module.exports = {
     require('./signout').install(app);
     require('./login').install(app);
     require('./apps').install(app);
+    require('./explore').install(app);
     require('./test-data').install(app);
     require('./unawesome-browser').install(app);
     require('./unsubscribe').install(app);
