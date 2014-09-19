@@ -26,7 +26,7 @@ define([
 
   /* @const */
   var OLD_TIMEOUT = 3600000; /*1 hour*/
-  var MAX_HEIGHT = 800; /* This value also in chatItemView.less */
+  var MAX_HEIGHT = 640; /* This value also in chatItemView.less */
   // This needs to be adjusted in chatInputView as well as chat-server on the server
   /* @const */
   var EDIT_WINDOW = 1000 * 60 * 10; // 10 minutes
