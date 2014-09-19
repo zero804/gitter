@@ -6,9 +6,6 @@ var GithubRepo      = require("./github/github-repo-service");
 var persistence     = require("./persistence-service");
 var Q               = require('q');
 var _               = require('underscore');
-var javascriptRooms = require('../../scripts/utils/rooms_javascript');
-var rubyRooms       = require('../../scripts/utils/rooms_ruby');
-var phpRooms        = require('../../scripts/utils/rooms_php');
 
 var HILIGHTED_ROOMS = [
   {
@@ -321,17 +318,6 @@ exports.getSuggestions = getSuggestions;
  * @return  Promise promise of matching rooms
  */
 function fetchByTags(tags) {
-  // fake it til we make it
-  // TODO: WE MADE IT MA!
-  if (tags.indexOf('javascript') >= 0) {
-   return Q.resolve(javascriptRooms);
-  }
-  /*else if (tags === 'ruby') {
-   return Q.resolve(rubyRooms);
-  } else if (tags === 'php') {
-   return Q.resolve(phpRooms);
-  }*/
-
   // limit by 8 tags to avoid mega queries
   tags = tags.slice(0, 8);
 
