@@ -364,10 +364,11 @@ define([
       }
     },
 
-    // deals with collapsing images and embeds
-    toggleCollapse: function () {
+    setCollapse: function (state) {
+      state = !!state;
       var chatId = this.model.get('id');
-      var collapsed = this.model.get('collapsed');
+      var collapsed = !!this.model.get('collapsed');
+      if(state === collapsed) return;
 
       if (collapsed) {
         chatCollapse.uncollapse(chatId);
@@ -375,6 +376,12 @@ define([
         chatCollapse.collapse(chatId);
       }
       this.model.set('collapsed', !collapsed);
+    },
+
+    // deals with collapsing images and embeds
+    toggleCollapse: function () {
+      var collapsed = this.model.get('collapsed');
+      this.setCollapse(!collapsed);
     },
 
     collapseEmbeds: function() {

@@ -9,5 +9,13 @@ module.exports = {
       function (req, res) {
         res.redirect('/' + req.user.username);
       });
+
+    // This is used from the explore page
+    app.get('/home/createroom',
+      ensureLoggedIn,
+      function (req, res) {
+        res.redirect('/' + req.user.username + '#createroom');
+      });
+
   }
 };
