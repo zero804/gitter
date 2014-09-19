@@ -202,7 +202,6 @@ define([
     },
 
     updateRender: function(changes) {
-      var self = this;
       if(!changes || 'fromUser' in changes) {
         this.$el.toggleClass('isViewers', this.isOwnMessage());
       }
