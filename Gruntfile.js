@@ -124,6 +124,9 @@ var MODULES = [
   },
   {
       name: "just-tracking"
+  },
+  {
+      name: "explore"
   }
 ];
 
