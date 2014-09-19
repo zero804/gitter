@@ -1,3 +1,4 @@
+/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
 var mongoose      = require('../../utils/mongoose-q');
@@ -9,6 +10,8 @@ var Q              = require('q');
 var restSerializer = require('../../serializers/rest-serializer');
 var appEvents      = require("../../app-events");
 var _              = require("underscore");
+var tagger         = require('../../utils/room-tagger');
+var RepoService    = require('../github/github-repo-service');
 
 
 function serializeEvent(url, operation, model, callback) {
@@ -66,11 +69,14 @@ module.exports = {
       name: { type: String },
       topic: { type: String, 'default':'' },
       uri: { type: String },
+      tags: [String],
       lcUri: { type: String, 'default': function() { return this.uri ? this.uri.toLowerCase() : null; }  },
       githubType: { type: String, 'enum': ['REPO', 'ORG', 'ONETOONE', 'REPO_CHANNEL', 'ORG_CHANNEL', 'USER_CHANNEL'], required: true },
       status: { type: String, "enum": ['ACTIVE', 'DELETED'], "default": 'ACTIVE'},
       oneToOne: { type: Boolean, "default": false },
       users: [TroupeUserSchema],
+      // USER COUNT MAY NOT BE UP TO DATE. ONLY USE IT FOR QUERIES, NOT FOR ITERATION ETC.
+      userCount: { type: Number, 'default': function() { return this.users ? this.users.length : 0; } },
       bans: [TroupeBannedUserSchema],
       parentId: { type: ObjectId, required: false },
       ownerUserId: { type: ObjectId, required: false }, // For channels under a user /suprememoocow/custom
@@ -96,7 +102,38 @@ module.exports = {
     TroupeSchema.index({ "users.userId": 1,  "users.deactivated": 2 });
     TroupeSchema.pre('save', function (next) {
       this.lcUri =  this.uri ? this.uri.toLowerCase() : null;
+      this.userCount =  this.users ? this.users.length : 0;
       next();
+    });
+
+    TroupeSchema.pre('save', function (next) {
+      if(this.security !== 'PUBLIC' ||
+        !(this.users && this.users.length) ||
+        this.tags && this.tags.length) {
+        // not worth tagging, or already tagged.
+        return next();
+      }
+
+      if(this.githubType === 'REPO') {
+        var repoService = new RepoService(this.users[0]);
+        var self = this;
+
+        repoService.getRepo(this.uri)
+          .then(function(repo) {
+            assert(repo, 'repo lookup failed');
+
+            self.tags = tagger(self, repo);
+          })
+          .catch(function(err) {
+            winston.warn('repo lookup or tagging failed, skipping tagging for now', { exception: err });
+          })
+          .finally(function() {
+            next();
+          });
+      } else {
+        this.tags = tagger(this);
+        next();
+      }
     });
 
     TroupeSchema.methods.getUserIds = function() {

@@ -58,6 +58,11 @@ Lists out the rooms suggested to a user. Requires a username.
 
 e.g `./scripts/utils/suggested-rooms.js trevorah`
 
+### update-room-tags.js
+Updates the tags used by the explore page.
+
+e.g `./scripts/utils/update-room-tags.js`
+
 Upgrading gitter-services to add support for more services
 ----------------------------------------------------------
 Recently merged a pull request for [gitter-services](https://github.com/gitterHQ/services)? then read on…

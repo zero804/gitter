@@ -127,6 +127,7 @@ define([
         data: JSON.stringify({
           uri: context.troupe().get('uri')
         }),
+        global: false,
         context: this,
         timeout: 45 * 1000,
         error: function() {
