@@ -132,11 +132,28 @@ exports.install = function() {
     var troupeId = data.troupeId;
     var total = data.total;
 
+    // TODO: this is deprecated. Remove after 18 October 2014
     publish("/api/v1/user/" + userId, {
       notification: "troupe_unread",
       troupeId: troupeId,
-      totalUnreadItems: total
+      totalUnreadItems: total,
+      DEPRECATED: true
     });
+
+    var url = "/api/v1/user/" + userId + "/rooms";
+    var message = {
+      operation: 'patch',
+      model: {
+        id: troupeId,
+        unreadItems: total
+      }
+    };
+    if(total === 0) {
+      message.model.mentions = 0;
+    }
+
+    // Just patch the mention count
+    publish(url, message);
 
   });
 
@@ -146,10 +163,12 @@ exports.install = function() {
     var total = data.total;
     var member = data.member;
 
+    // TODO: this is deprecated. Remove after 18 October 2014
     publish("/api/v1/user/" + userId, {
       notification: "troupe_mention",
       troupeId: troupeId,
-      mentions: total
+      mentions: total,
+      DEPRECATED: true
     });
 
     var mentionUrl = "/api/v1/user/" + userId + "/rooms";
@@ -206,10 +225,11 @@ exports.install = function() {
     var troupeId = data.troupeId;
     var items = data.items;
 
-    publish("/api/v1/user/" + userId, {
-      notification: "activity",
-      troupeId: troupeId
-    });
+    // This should only be for lurking users
+    // publish("/api/v1/user/" + userId, {
+    //   notification: "activity",
+    //   troupeId: troupeId
+    // });
 
     publish("/api/v1/user/" + userId + '/rooms/' + troupeId + '/unreadItems', {
       notification: "unread_items",
