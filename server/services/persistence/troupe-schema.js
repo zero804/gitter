@@ -73,7 +73,7 @@ module.exports = {
       oneToOne: { type: Boolean, "default": false },
       users: [TroupeUserSchema],
       // USER COUNT MAY NOT BE UP TO DATE. ONLY USE IT FOR QUERIES, NOT FOR ITERATION ETC.
-      userCount: { type: Number, 'default': function() { return this.users ? this.users.length : null; } },
+      userCount: { type: Number, 'default': function() { return this.users ? this.users.length : 0; } },
       bans: [TroupeBannedUserSchema],
       parentId: { type: ObjectId, required: false },
       ownerUserId: { type: ObjectId, required: false }, // For channels under a user /suprememoocow/custom
@@ -99,7 +99,7 @@ module.exports = {
     TroupeSchema.index({ "users.userId": 1,  "users.deactivated": 2 });
     TroupeSchema.pre('save', function (next) {
       this.lcUri =  this.uri ? this.uri.toLowerCase() : null;
-      this.userCount =  this.users ? this.users.length : null;
+      this.userCount =  this.users ? this.users.length : 0;
       next();
     });
 
