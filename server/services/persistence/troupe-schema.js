@@ -118,9 +118,9 @@ module.exports = {
         var repoService = new RepoService(this.users[0]);
         var self = this;
 
-        return repoService.getRepo(this.uri)
+        repoService.getRepo(this.uri)
           .then(function(repo) {
-            assert(repo, 'repo required');
+            assert(repo, 'repo lookup failed');
 
             self.tags = tagger(self, repo);
           })
