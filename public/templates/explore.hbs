@@ -32,7 +32,7 @@
         {{#if rooms}}
           <div class="page-content__room-list">
             {{#each rooms}}
-              <a class='room-item' href="/{{ room.uri }}">
+              <a class='room-item' href="/{{ room.uri }}?source=explore">
                 <header>
                   <img class="room-item__avatar" src="https://avatars.githubusercontent.com/{{ owner }}?s=80">
                   <h3 class="repo-name">
@@ -73,6 +73,9 @@
     <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/2.0.2/octicons.min.css">
     <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+    {{> require_wrapper }}
+    {{{ bootScript 'just-tracking' }}}
+    {{{ generateEnv }}}
     {{> live_reload}}
   </body>
 </html>

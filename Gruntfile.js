@@ -125,6 +125,9 @@ var MODULES = [
         "views/widgets/timeago"
       ],
       exclude: ["core-libraries"]
+  },
+  {
+      name: "just-tracking"
   }
 ];
 
