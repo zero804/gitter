@@ -338,6 +338,7 @@ function fetchByTags(tags) {
   return persistence.Troupe
     .where('security').equals('PUBLIC')
     .where('tags').in(tags)
+    .sort({ userCount: -1 })
     .limit(30)
     .execQ();
 }
