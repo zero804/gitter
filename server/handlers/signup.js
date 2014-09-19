@@ -11,7 +11,7 @@ module.exports = {
       app.get(nconf.get('web:homeurl'),
         require('../web/middlewares/unawesome-browser'),
         function(req, res, next) {
-          var locales = new locale.Locales(req.headers["accept-language"]);
+          var locales = new locale.Locales([req.query.lang, req.headers["accept-language"]]);
 
           if(req.user && req.query.redirect !== 'no') {
             loginUtils.redirectUserToDefaultTroupe(req, res, next);
@@ -20,10 +20,11 @@ module.exports = {
 
           var lang = locales.best(supported);
           var template;
-          if(lang.code === 'en') {
+
+          if(lang.language === 'en') {
             template = 'homepage';
           } else {
-            template = 'homepage-' + lang.code;
+            template = 'homepage-' + lang.language;
           }
 
           // when the viewer is not logged in:
