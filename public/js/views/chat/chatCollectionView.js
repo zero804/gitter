@@ -6,7 +6,6 @@ define([
   'log!chat-collection-view',
   'collections/chat',
   'views/widgets/avatar',
-  'views/infinite-scroll-mixin',
   'components/unread-items-client',
   'marionette',
   'views/base',
@@ -14,21 +13,28 @@ define([
   './chatItemView',
   'utils/rollers',
   'cocktail',
-  'bootstrap_tooltip' // No ref
-], function($, _, context, log, chatModels, AvatarView, InfiniteScrollMixin, unreadItemsClient,
-    Marionette, TroupeViews, appEvents, chatItemView, Rollers, cocktail /* tooltip*/) {
+  'views/behaviors/infinite-scroll' //No ref
+], function($, _, context, log, chatModels, AvatarView, unreadItemsClient,
+    Marionette, TroupeViews, appEvents, chatItemView, Rollers, cocktail) {
   "use strict";
 
   /** @const */
   var PAGE_SIZE = 20;
 
+  var SCROLL_ELEMENT = "#content-frame";
+
   /*
    * View
    */
   var ChatCollectionView = Marionette.CollectionView.extend({
+    behaviors: {
+      InfiniteScroll: {
+        reverseScrolling: true,
+        scrollElementSelector: SCROLL_ELEMENT,
+      }
+    },
+
     itemView: chatItemView.ChatItemView,
-    // footer: '#initial', // Used to force the browser to display the bottom of the screen from the outset
-    reverseScrolling: true,
 
     itemViewOptions: function(item) {
       var options = {
@@ -44,7 +50,6 @@ define([
       return options;
     },
 
-    scrollElementSelector: "#content-frame",
 
     // This nasty thing changes the CSS rule for the first chat item to prevent a high headerView from covering it
     // We do this instead of jQuery because the first-child selector can
@@ -73,7 +78,7 @@ define([
         resizer = setTimeout(self.adjustTopPadding, 100);
       });
 
-      var contentFrame = document.querySelector(this.scrollElementSelector);
+      var contentFrame = document.querySelector(SCROLL_ELEMENT);
 
       this.rollers = new Rollers(contentFrame, this.el);
 
@@ -113,7 +118,7 @@ define([
     },
 
     scrollToFirstUnreadBelow: function() {
-      var contentFrame = document.querySelector(this.scrollElementSelector);
+      var contentFrame = document.querySelector(SCROLL_ELEMENT);
 
       var unreadItems = contentFrame.querySelectorAll('.unread');
       var viewportBottom = this.rollers.getScrollBottom() + 1;
@@ -203,7 +208,7 @@ define([
     }
 
   });
-  cocktail.mixin(ChatCollectionView, TroupeViews.SortableMarionetteView, InfiniteScrollMixin);
+  cocktail.mixin(ChatCollectionView, TroupeViews.SortableMarionetteView);
 
   return ChatCollectionView;
 });

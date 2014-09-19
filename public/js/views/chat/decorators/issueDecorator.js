@@ -155,7 +155,7 @@ define([
         $issue.on('click', showPopover);
         $issue.on('mouseover', showPopoverLater);
 
-        view.addCleanup(function() {
+        view.once('close', function() {
           $issue.off('click', showPopover);
           $issue.off('mouseover', showPopoverLater);
         });
