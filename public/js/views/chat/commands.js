@@ -210,6 +210,26 @@ define([
       }
     },
     {
+      command: 'collapse',
+      description: 'Collapse chat messages with embedded media',
+      completion: 'collapse ',
+      regexp: /^\/collapse/,
+      action: function(view) {
+        appEvents.trigger('command.collapse.chat');
+        view.reset();
+      }
+    },
+    {
+      command: 'expand',
+      description: 'Expand chat messages with embedded media',
+      completion: 'expand ',
+      regexp: /^\/expand/,
+      action: function(view) {
+        appEvents.trigger('command.expand.chat');
+        view.reset();
+      }
+    },
+    {
       command: 'topic foo',
       description: 'Set room topic to foo',
       criteria: function() {

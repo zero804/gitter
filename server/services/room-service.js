@@ -214,7 +214,8 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
                     users:  user ? [{
                       _id: new ObjectID(),
                       userId: user._id
-                    }] : []
+                    }] : [],
+                    userCount: user ? 1 : 0
                   }
                 },
                 {
@@ -620,7 +621,8 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
               ownerUserId: parentTroupe ? null : user._id,
               _nonce: nonce,
               githubType: githubType,
-              users:  user ? [{ _id: new ObjectID(), userId: user._id }] : []
+              users:  user ? [{ _id: new ObjectID(), userId: user._id }] : [],
+              userCount:  user ? 1 : 0
             }
           },
           {

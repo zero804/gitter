@@ -183,3 +183,9 @@ exports.typewriter = function (el, str) {
     str,
     el);
 };
+
+exports.formatNumber = function (n) {
+  if (n < 1000) return n;
+  if (n < 1000000) return (n / 1000).toFixed(1) + 'k';
+  return (n / 100000).toFixed(1) + 'm';
+};
