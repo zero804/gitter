@@ -1253,9 +1253,8 @@
       }
     },
     "gitter-marked": {
-      "version": "0.6.0",
-      "from": "gitter-marked@^0.6.0",
-      "resolved": "https://registry.npmjs.org/gitter-marked/-/gitter-marked-0.6.0.tgz"
+      "version": "0.6.1",
+      "from": "gitter-marked@^0.6.1"
     },
     "gitter-services": {
       "version": "1.4.0",
