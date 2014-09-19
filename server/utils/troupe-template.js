@@ -5,6 +5,7 @@ var fs          = require('fs');
 var handlebars  = require('handlebars');
 var i18n        = require('./i18n');
 var hbsHelpers  = require('../web/hbs-helpers');
+var Q           = require('q');
 
 // TODO: add caching!
 handlebars.registerHelper('cdn', hbsHelpers.cdn);
@@ -22,13 +23,15 @@ handlebars.registerHelper('__n', function () {
 
 module.exports = {
   compile : function(sourceFile, callback) {
+    var d = Q.defer();
     var sourceFileName = __dirname + '/../../public/templates/' + sourceFile + '.hbs';
 
     fs.readFile(sourceFileName, 'utf-8', function (err, source) {
-      if (err) return callback(err);
+      if (err) return d.reject(err);
       var template = handlebars.compile(source);
-      callback(null, template);
+      d.resolve(template);
     });
 
+    return d.promise.nodeify(callback);
   }
 };

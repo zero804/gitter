@@ -302,7 +302,8 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
     status: 'ACTIVE',
     githubType: 'ONETOONE',
     users: [ { _id: new ObjectID(), userId: userId1 },
-             { _id: new ObjectID(), userId: userId2 }]
+             { _id: new ObjectID(), userId: userId2 }],
+    userCount: 2
   };
 
   // Remove undefined fields

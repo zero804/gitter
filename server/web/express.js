@@ -31,6 +31,7 @@ module.exports = {
     expressHbs.registerHelper('pluralize', require('./hbs-helpers').pluralize);
     expressHbs.registerHelper('toLowerCase', require('./hbs-helpers').toLowerCase);
     expressHbs.registerHelper('typewriter', require('./hbs-helpers').typewriter);
+    expressHbs.registerHelper('formatNumber', require('./hbs-helpers').formatNumber);
 
     app.locals({
       googleTrackingId: config.get("stats:ga:key"),
