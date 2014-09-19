@@ -7,7 +7,7 @@ var ROOM = {
 
 var REPO = {
   name: 'testREPO',
-  language: "JavaScript",
+  language: 'JavaScript',
   owner: {
     login: 'testUser1'
   },
@@ -21,20 +21,24 @@ var REPO = {
 describe('room-tagger', function () {
 
   it('should work with repo information', function () {
-    assert.deepEqual(roomTagger(ROOM, REPO), ['javascript']);
+    assert.deepEqual(roomTagger(ROOM, REPO), [
+      'javascript',
+      'skills',
+      'include',
+      'testing',
+      'php',
+      'extensively'
+    ]);
   });
 
-  it.skip('should work without repo information', function () {
+  it('should work without repo information', function () {
     assert.deepEqual(roomTagger(ROOM), [
       'skills',
       'include',
       'testing',
       'javascript',
       'php',
-      'extensively',
-      'english',
-      'danish',
-      'pidgin'
+      'extensively'
     ]);
   });
 });
