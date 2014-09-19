@@ -1,10 +1,12 @@
 /* jshint node:true */
 "use strict";
 
-var format = require('util').format;
-var github = require('octonode');
-var _ = require('underscore');
-var Q = require('q');
+var format               = require('util').format;
+var github               = require('octonode');
+var _                    = require('underscore');
+var Q                    = require('q');
+var troupeTemplate       = require('../utils/troupe-template');
+var templatePromise      = troupeTemplate.compile('github-pull-request-body');
 
 function Client(token) {
   var client = github.client(token);
@@ -53,14 +55,6 @@ function urlForGithubClient(url) {
   return url;
 }
 
-function getRepoNameFromBranchUrl(url) {
-  url = urlForGithubClient(url);
-  var m = /\/repos\/([\w\-]+)\/([\w\-]+)\/.*/.exec(url);
-  if(!m) return;
-
-  return m[1] + '/' + m[2];
-}
-
 function pullRequestHeadFromBranch(branch) {
   var branchName = branch.ref.replace(/^.*\//, '');
   var m = /\/repos\/([\w\-]+)\/.*/.exec(branch.url);
@@ -69,25 +63,44 @@ function pullRequestHeadFromBranch(branch) {
   return m[1] + ':' + branchName;
 }
 
-function injectBadgeIntoMarkdown(content, badgeContent) {
-  var lines = content.split(/\n/);
+function findIdealLineForInsert(lines) {
+  if(lines.length === 0) return 0;
   var i = 0;
   var seenHeader = false;
+
   for(;i < lines.length;i++) {
     if(/^\s*(\#+|={3,}|-{3,})/.test(lines[i])) {
       seenHeader = true;
     } else {
-      // No longer a header
-      break;
+      if(seenHeader) break;
     }
   }
-  lines.splice(i, 0, badgeContent);
+
+  return i;
+}
+
+function injectBadgeIntoMarkdown(content, badgeContent) {
+  var lines = content.split(/\n/);
+  var idealLine = findIdealLineForInsert(lines) || 0;
+
+  lines.splice(idealLine, 0, badgeContent);
 
   return lines.join('\n');
 }
 
 function ReadmeUpdater(context) {
   var client = new Client(context.token);
+
+  function findMainBranch() {
+    return client.get(format('/repos/%s', context.sourceRepo), { })
+      .then(function(repo) {
+        if(!context.primaryBranch) {
+          context.primaryBranch = repo.default_branch;
+        }
+
+        return repo;
+      });
+  }
 
   function doForkIfRequired() {
     // Create a fork
@@ -131,17 +144,26 @@ function ReadmeUpdater(context) {
       });
   }
 
+  function generatePRBody() {
+    return templatePromise.then(function(template) {
+      return template(context);
+    });
+  }
+
   function createPullRequest(branchRef) {
     var pullRequestHead = pullRequestHeadFromBranch(branchRef);
 
-    var prRequest = {
-      title: 'Add a Gitter badge to the README',
-      body: 'Adds the Gitter badge to the repository.',
-      base: 'master',
-      head: pullRequestHead
-    };
+    return generatePRBody()
+      .then(function(body) {
+        var prRequest = {
+          title: 'Add a Gitter chat badge to ' + context.readmeFileName,
+          body: body,
+          base: context.primaryBranch,
+          head: pullRequestHead
+        };
 
-    return client.post(format('/repos/%s/pulls', context.sourceRepo), prRequest);
+        return client.post(format('/repos/%s/pulls', context.sourceRepo), prRequest);
+      });
   }
 
   function prepareTreeForCommit(branchRef) {
@@ -159,6 +181,7 @@ function ReadmeUpdater(context) {
                 .then(function(content) {
                   content = injectBadgeIntoMarkdown(content, context.badgeContent);
 
+                  context.readmeFileName = existingReadme.path;
                   var readme = {
                     path: existingReadme.path,
                     mode: existingReadme.mode,
@@ -173,11 +196,13 @@ function ReadmeUpdater(context) {
                 });
             }
 
+            existingReadme.path = 'README.md';
+
             // No readme file exists
             var readme = {
               path: 'README.md',
               mode: "100644",
-              content: "HELLO"
+              content: ""
             };
 
             return {
@@ -199,7 +224,7 @@ function ReadmeUpdater(context) {
             "email": "badger@gitter.im",
             "date": new Date().toISOString().replace(/\.\d+/,'') // GitHub doesn't consider milliseconds as part of ISO8601
           },
-          "parents": [latestCommitSha], 
+          "parents": [latestCommitSha],
           "tree": tree.sha
         };
 
@@ -216,8 +241,8 @@ function ReadmeUpdater(context) {
   }
 
   this.perform = function() {
-    // Firstly, decide whether to create a fork
-    return doForkIfRequired()
+    return findMainBranch()
+      .then(doForkIfRequired)
       .then(function(destinationRepo) {
         context.destinationRepo = destinationRepo;
         // Create the branch where we'll do the work
@@ -241,12 +266,11 @@ function ReadmeUpdater(context) {
   };
 }
 
-function updateFileAndCreatePullRequest(sourceRepo, user, primaryBranch, branchPrefix, badgeContent) {
+function updateFileAndCreatePullRequest(sourceRepo, user, branchPrefix, badgeContent) {
   return new ReadmeUpdater({
     token: '***REMOVED***',
     sourceRepo: sourceRepo,
-    user: 'gitter-badger',
-    primaryBranch: primaryBranch,
+    user: user,
     branchPrefix: branchPrefix,
     badgeContent: badgeContent
   }).perform();
