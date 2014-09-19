@@ -5,6 +5,7 @@
 var Q = require('Q');
 var persistence = require('../../server/services/persistence-service');
 var GitHubService = require('../../server/services/github/github-repo-service');
+var assert = require('assert');
 var throat = require('throat');
 var shutdown = require('shutdown');
 
@@ -29,59 +30,68 @@ var findRooms = function (limit) {
       'users.1': { $exists: true }, // this essentially queries for non-empty rooms efficiently
       tags: { $exists: false },
       security: 'PUBLIC',
-      githubType: 'REPO'
     })
     .limit(limit)
     .execQ();
 };
 
-// context is a room, wrapper around Github service
-var fetchGithubInfo = function (user) {
+var logArrayLength = function(roomList) {
+  console.log('room list:', roomList.length);
+  return roomList;
+};
+
+var fetchGithubInfo = function (uri, user) {
   console.log('fetchGithubInfo() ====================');
-  if (user === null) console.log('user not found, using standard token');
-  user = user || undefined;
   var github = new GitHubService(user);
-  return github.getRepo(this.lcUri);
+  return github.getRepo(uri);
 };
 
-// context is room, returns a promise that returns an array containing -> [room, repo]
-var combineInfo = function (repo) {
-  return [this, repo];
-};
-
-// function to be called with filters, returns an array of rooms filtered by whether it's empty or not
-var removeEmptyRooms = function (rooms) {
-  console.log('total rooms:', rooms.length);
-  return rooms.filter(function (room) {
-    return room.users.length !== 0;
-  });
-};
-
-// responsible for getting the GH information and then combining the result into an array, once resolved
-var prepareRooms = function (rooms) {
-  console.log('non-empty rooms:', rooms.length);
-  return Q.all(
-    // notice the limit on concurrent calls
-    rooms.map(throat(CONCURRENCY_LIMIT, function (room) {
-      var id = room.users[0].userId;
-      return persistence.User.findByIdQ(id)
-        .then(fetchGithubInfo.bind(room))
-        .catch(function () {
-          return null;
-        })
-        .then(combineInfo.bind(room));
+var attachRepoInfoForRepoRoom = function (room) {
+  return persistence.User.findByIdQ(room.users[0].id)
+    .then(function(user) {
+      return fetchGithubInfo(room.uri, user);
     })
-  ));
+    .then(function(repo) {
+      assert(repo, 'github repo fetch returned falsy');
+      return {
+        room: room,
+        repo: repo
+      };
+    })
+    .catch(function(err) {
+      console.error(err.stack);
+      return null;
+    });
 };
 
-// deals with [room, info] returning an array of rooms with the added tags
-var tagRooms = function (result) {
+var attachRepoInfoToRooms = function (rooms) {
+  return Q.all(
+    rooms.map(
+      throat(CONCURRENCY_LIMIT, function (room) {
+        if (room.githubType === 'REPO') {
+          return attachRepoInfoForRepoRoom(room);
+        } else {
+          return { room: room };
+        }
+      })
+    )
+  );
+};
+
+var filterFailedRooms = function (roomContainers) {
+  var newRoomContainers = roomContainers.filter(function(roomContainer) {
+    return !!roomContainer;
+  });
+  console.log('rooms that failed to get github data:', roomContainers.length - newRoomContainers.length);
+  return newRoomContainers;
+};
+
+// deals with { room: room, repo:repo } returning an array of rooms with the added tags
+var tagRooms = function (roomContainers) {
   console.log('tagRooms() ====================');
-  return result.filter(function (data) {
-    return !!(data);
-  }).map(function (data) {
-    var room = data[0];
-    var repo = data[1];
+  return roomContainers.map(function (roomContainer) {
+    var room = roomContainer.room;
+    var repo = roomContainer.repo;
     room.tags = roomTagger(room, repo); // tagging
     return room;
   });
@@ -92,9 +102,7 @@ var saveRooms = function (rooms) {
   console.log('saveRooms() ====================');
   return Q.all(
     rooms.map(function (room) {
-      console.log('room:', room);
       return room.saveQ()
-        .then(console.log.bind(console))
         .catch(function (err) {
           return null;
         });
@@ -104,10 +112,14 @@ var saveRooms = function (rooms) {
 
 // reponsible for running the procedure
 findRooms(20)
-  .then(removeEmptyRooms) // TODO: Remove, as the query already does the job of filtering empty rooms.
-  .then(prepareRooms)
+  .then(logArrayLength)
+  .then(attachRepoInfoToRooms)
+  .then(logArrayLength)
+  .then(filterFailedRooms)
+  .then(logArrayLength)
   .then(tagRooms)
   .then(saveRooms)
+  .then(logArrayLength)
   .catch(function (err) {
     console.error(err.stack);
   })
