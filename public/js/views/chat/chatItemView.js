@@ -19,6 +19,7 @@ define([
   'views/keyboard-events-mixin',
   'views/behaviors/unread-items',  // No ref
   'views/behaviors/widgets',      // No ref
+  'views/behaviors/sync-status',  // No ref
   'bootstrap_tooltip',            // No ref
 ], function($, _, context, chatModels, AvatarView, Marionette, TroupeViews, uiVars, Popover,
   chatItemTemplate, statusItemTemplate, chatInputView, appEvents, cocktail, chatCollapse, KeyboardEventMixins) {
@@ -58,7 +59,8 @@ define([
       Widgets: {},
       UnreadItems: {
         unreadItemType: 'chat',
-      }
+      },
+      SyncStatus: {}
     },
     isEditing: false,
 
