@@ -19,21 +19,21 @@ require([
     });
   });
 
-  $(ui.pills).on('click', function (e) {if (prevent) e.preventDefault();
+  $(ui.pills).on('click', function (e) {
     appEvents.trigger('track-event', 'explore_pills_click', {
       tag: e.target.innerText.toLowerCase()
     });
   });
 
-  $(ui.tile).on('click', function (e) {if (prevent) e.preventDefault();
+  $(ui.tile).on('click', function (e) {
     appEvents.trigger('track-event', 'explore_room_click');
   });
 
-  $(ui.createNew).on('click', function (e) {if (prevent) e.preventDefault();
+  $(ui.createNew).on('click', function (e) {
     appEvents.trigger('track-event', 'explore_room_createNew');
   });
 
-  $(ui.findOut).on('click', function (e) {if (prevent) e.preventDefault();
+  $(ui.findOut).on('click', function (e) {
     appEvents.trigger('track-event', 'explore_room_about');
   });
 });
