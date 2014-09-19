@@ -12,6 +12,6 @@ module.exports = function trim(name, maxLength) {
     if (sub.length <= maxLength) return sub; // trying to compose a smaller part that makes sense
   }
 
-  // if all else fails, return the first part only
+  // if all else fails, return the last part only
   return parts.pop();
 };
