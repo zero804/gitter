@@ -1,3 +1,4 @@
+/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
 var mongoose      = require('../../utils/mongoose-q');
@@ -9,6 +10,8 @@ var Q              = require('q');
 var restSerializer = require('../../serializers/rest-serializer');
 var appEvents      = require("../../app-events");
 var _              = require("underscore");
+var tagger         = require('../../utils/room-tagger');
+var RepoService    = require('../github/github-repo-service');
 
 
 function serializeEvent(url, operation, model, callback) {
@@ -101,6 +104,36 @@ module.exports = {
       this.lcUri =  this.uri ? this.uri.toLowerCase() : null;
       this.userCount =  this.users ? this.users.length : 0;
       next();
+    });
+
+    TroupeSchema.pre('save', function (next) {
+      if(this.security !== 'PUBLIC' ||
+        !(this.users && this.users.length) ||
+        this.tags && this.tags.length) {
+        // not worth tagging, or already tagged.
+        return next();
+      }
+
+      if(this.githubType === 'REPO') {
+        var repoService = new RepoService(this.users[0]);
+        var self = this;
+
+        repoService.getRepo(this.uri)
+          .then(function(repo) {
+            assert(repo, 'repo lookup failed');
+
+            self.tags = tagger(self, repo);
+          })
+          .catch(function(err) {
+            winston.warn('repo lookup or tagging failed, skipping tagging for now', { exception: err });
+          })
+          .finally(function() {
+            next();
+          });
+      } else {
+        this.tags = tagger(this);
+        next();
+      }
     });
 
     TroupeSchema.methods.getUserIds = function() {
