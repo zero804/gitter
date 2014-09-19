@@ -101,16 +101,8 @@ define([
         this.rollers.setModeLocked(false);
       });
 
-      // this.listenTo(this.collection, 'scroll.fetch', function() {
-      //   if(this.rollers.isScrolledToBottom() && !this.collection.atBottom) {
-      //     // The user has forced the scroll bar all the way to the bottom,
-      //     // fetch the latest
-      //     this.collection.fetchLatest({}, function() {
-      //       self.rollers.setModeLocked(false);
-      //       self.rollers.scrollToBottom();
-      //     });
-      //   }
-      // });
+      this.listenTo(appEvents, 'command.collapse.chat', this.collapseChats);
+      this.listenTo(appEvents, 'command.expand.chat', this.expandChats);
     },
 
     scrollToFirstUnread: function() {
@@ -190,6 +182,29 @@ define([
         beforeId: lowestId,
         limit: PAGE_SIZE
       };
+    },
+    findLastCollapsibleChat: function() {
+      var c = this.collection;
+      for(var i = c.length - 1; i >= 0; i--) {
+        var m = c.at(i);
+        if(m.get('isCollapsible')) {
+          return m;
+        }
+      }
+    },
+    setLastCollapsibleChat: function(state) {
+      var last = this.findLastCollapsibleChat();
+      if(!last) return;
+      var chatItem = this.children.findByModel(last);
+      if(chatItem) chatItem.setCollapse(state);
+    },
+    /* Collapses the most recent chat with embedded media */
+    collapseChats: function() {
+      this.setLastCollapsibleChat(true);
+    },
+    /* Expands the most recent chat with embedded media */
+    expandChats: function() {
+      this.setLastCollapsibleChat(false);
     }
 
   });
