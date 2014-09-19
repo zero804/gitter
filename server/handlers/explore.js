@@ -46,7 +46,7 @@ module.exports = {
   install: function (app) {
 
     // route to handle search only
-    app.get('/explore/tags', function (req, res) {
+    app.get('/explore/(tags)?', function (req, res) {
       var search = req.query.search;
       var tags = (search) ? search.split(/[ ,]+/).map(trim).sort().join(',') : DEFAULT_TAGS.join(',');
       res.redirect('/explore/tags/' + tags);
