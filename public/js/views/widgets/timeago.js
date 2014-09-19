@@ -1,17 +1,16 @@
 define([
-  'views/base',
+  'marionette',
   'utils/momentWrapper',
   'utils/context',
   'utils/locale'
-], function(TroupeViews, moment, context, locale) {
-  /*jslint browser: true*/
+], function(Marionette, moment, context, locale) {
   "use strict";
 
   var maxDaysBeforeDateDisplay = 1;
 
   var lang = context.lang();
 
-  return TroupeViews.Base.extend({
+  return Marionette.ItemView.extend({
     tagName: 'span',
     initialize: function(options) {
       this.time = moment(options.time);

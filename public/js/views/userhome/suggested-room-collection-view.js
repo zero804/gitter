@@ -2,22 +2,23 @@
 define([
   'jquery-hammer',
   'marionette',
-  'views/base',
   'hbs!./tmpl/suggested-room-list-item',
   'utils/appevents',
   'utils/is-mobile'
-], function($hammer, Marionette, TroupeViews, repoListItemTemplate, appEvents, isMobile) {
+], function($hammer, Marionette, repoListItemTemplate, appEvents, isMobile) {
   "use strict";
 
-  var TroupeItemView = TroupeViews.Base.extend({
+  var SuggestedRoomItemView = Marionette.ItemView.extend({
     tagName: 'li',
     className: 'suggested-room-list-item',
     template: repoListItemTemplate,
+    modelEvents: {
+      change: 'render'
+    },
     initialize: function() {
       this.$el = $hammer(this.$el).hammer();
-      this.setRerenderOnChange(true);
     },
-    getRenderData: function() {
+    serializeData: function() {
       var suggestion = this.model.toJSON();
 
       return {
@@ -41,7 +42,7 @@ define([
   return Marionette.CollectionView.extend({
     tagName: 'ul',
     className: 'suggested-room-list',
-    itemView: TroupeItemView
+    itemView: SuggestedRoomItemView
   });
 
 });

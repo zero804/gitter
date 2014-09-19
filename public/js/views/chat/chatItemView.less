@@ -1,7 +1,7 @@
 @import "../widgets/avatar";
 @import "../popover";
 @import "chatInputView";
-@import "../unread-item-view-mixin";
+@import "../behaviors/unread-items";
 
 // Other items required by this library
 @import "highlight.less";
@@ -23,6 +23,31 @@
     padding-bottom: 2px;
   }
 
+
+  &.synced {
+    opacity: 1.0;
+    transform: translate3d(0,0,0);
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  &.syncing {
+    opacity: 0.4;
+    transform: translate3d(0,0,0);
+    transition: opacity .25s ease-in-out;
+  }
+
+  &.syncerror {
+    background-color: #edb2bd;
+  }
+
+  &.syncerror .chat-item__from {
+    color: #888;
+  }
+
+  &.syncerror .chat-item__time {
+    color: #888;
+  }
+  
   /* this handles all styles for burst continuation */
   &.burstContinued {
 

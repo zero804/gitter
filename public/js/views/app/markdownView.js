@@ -1,16 +1,13 @@
 define([
-  'jquery',
+  'marionette',
   'utils/platform-keys',
   'views/base',
   'hbs!./tmpl/markdownTemplate'
-], function($, platformKeys, TroupeViews, markdownTemplate ) {
+], function(Marionette,platformKeys, TroupeViews, markdownTemplate ) {
   "use strict";
 
-  var View = TroupeViews.Base.extend({
+  var View = Marionette.ItemView.extend({
     template: markdownTemplate,
-    events: {
-
-    },
 
     initialize: function() {
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
@@ -27,20 +24,7 @@ define([
           this.dialog.hide();
           break;
       }
-    },
-
-    closeSettings : function () {
-      this.dialog.hide();
-      this.dialog = null;
-    },
-
-    afterRender: function() {
-
-    },
-
-    getRenderData: function() {
-
-    },
+    }
   });
 
   return TroupeViews.Modal.extend({
