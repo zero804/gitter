@@ -6,10 +6,6 @@ var MODULES = [
     ]
   },
   {
-      name: "signup",
-      exclude: ["core-libraries"]
-  },
-  {
       name: "homepage",
       exclude: ["core-libraries"]
   },
