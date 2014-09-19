@@ -64,11 +64,13 @@ var extract = function (str, lang) {
  */
 var getContentBlob = function (room, repo) {
   return [
-    // room.topic,
+    room.topic,
     repo.description
-  ].reduce(function (prev, curr) {
+  ]
+  .filter(clean)
+  .reduce(function (prev, curr) {
     return prev + ' ' + curr;
-  });
+  }, '');
 };
 
 // returns a set of known attributes from github

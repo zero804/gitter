@@ -15,15 +15,17 @@ function trim(str) {
 
 function getRoomRenderData(room) {
   return Q.all([
-      repoDescription(room.uri),
+      room.githubType === 'REPO' ? repoDescription(room.uri) : room.topic,
       getRoughMessageCount(room.id)
     ])
     .spread(function(description, messageCount) {
+      var roomNameParts = room.uri.split('/');
+
       return {
         room: room,
-        repoOwner: room.uri.split('/')[0],
-        repoName: room.uri.split('/')[1],
-        repoDescription: description,
+        owner: roomNameParts[0],
+        roomNameParts: roomNameParts,
+        description: description,
         messageCount: messageCount
       };
     });
