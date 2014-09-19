@@ -28,7 +28,7 @@ define([
 
   /* @const */
   var OLD_TIMEOUT = 3600000; /*1 hour*/
-  var MAX_HEIGHT = 800; /* This value also in chatItemView.less */
+  var MAX_HEIGHT = 640; /* This value also in chatItemView.less */
   // This needs to be adjusted in chatInputView as well as chat-server on the server
   /* @const */
   var EDIT_WINDOW = 1000 * 60 * 10; // 10 minutes
@@ -373,10 +373,11 @@ define([
       }
     },
 
-    // deals with collapsing images and embeds
-    toggleCollapse: function () {
+    setCollapse: function (state) {
+      state = !!state;
       var chatId = this.model.get('id');
-      var collapsed = this.model.get('collapsed');
+      var collapsed = !!this.model.get('collapsed');
+      if(state === collapsed) return;
 
       if (collapsed) {
         chatCollapse.uncollapse(chatId);
@@ -384,6 +385,12 @@ define([
         chatCollapse.collapse(chatId);
       }
       this.model.set('collapsed', !collapsed);
+    },
+
+    // deals with collapsing images and embeds
+    toggleCollapse: function () {
+      var collapsed = this.model.get('collapsed');
+      this.setCollapse(!collapsed);
     },
 
     collapseEmbeds: function() {
