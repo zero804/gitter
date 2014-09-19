@@ -1,10 +1,19 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 'use strict';
 
+
+/*
+ *
+ * DEPRECATED, use cache-wrapper instead
+ *
+ */
+
+
 var SnappyCache = require('snappy-cache');
 var Q = require('q');
 var redis = require('../../utils/redis');
 var config = require('../../utils/config');
+var winston = require('../../utils/winston');
 var _ = require('underscore');
 
 function getKeys(method, contextValues, args) {
@@ -18,6 +27,8 @@ function getKeys(method, contextValues, args) {
 }
 
 function wrap(service, contextFunction, options) {
+  winston.warn('github-cache-wrapper deprecated, use cache-wrapper instead');
+
   if(!config.get('github:caching')) return service;
   if(!options) options = {};
 
