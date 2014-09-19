@@ -325,7 +325,7 @@ function fetchByTags(tags) {
     .where('security').equals('PUBLIC')
     .where('tags').in(tags)
     .sort({ userCount: -1 })
-    .limit(30)
+    .limit(50)
     .execQ();
 }
 
