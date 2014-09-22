@@ -1,30 +1,28 @@
-<div class="trpModalBody">
-  People can join this chat room with the link below.<br>
-</div>
+<h3 class="invite-view__heading">
+  People can join this chat room with the link below.
+</h3>
 
-<div class="hidden-input">
-  <input value="{{url}}" onclick="this.select()"/ style="margin-right: 4px;">{{#hasFlash}}
-  <div class="trpButtonMedium trpBtnGreen copy-button" data-copy-text="{{url}}">Copy</div>{{/hasFlash}}</div>
-</div>
+<input class="invite-view__copy-field" value="{{url}}" onclick="this.select();">
+{{#if hasFlash}}
 
-<br><br>
+<div class="trpButtonMedium trpBtnGreen copy-button" data-copy-text="{{url}}">Copy</div>
+{{/if}}
 
-{{#isPublicRepo}}
-<div class="trpModalBody" style="border-top: 1px solid #EEE; padding-top: 8px">
-  How about a badge? 
-  <img src="{{badgeUrl}}" {{#hasFlash}}class="copy-button"{{/hasFlash}} data-copy-text="{{badgeMD}}" style="vertical-align: middle;">
-</div>
+<br>
+<br>
+
+<div class="invite-view__divider"></div>
+
+{{#if isPublicRepo}}
+<h3 class="invite-view__heading">
+  How about a badge? <img class="invite-view__badge" src="{{badgeUrl}}">
+</h3>
 
 <button class='trpButtonMedium trpBtnBlue button share-on-gh js-badge'>Add a Badge on GitHub</button>
+
 <div class="trpModalBody">
   <br>
   <div class='pr-status'></div>
 </div>
 
-<!--
-<img src="{{badgeUrl}}" {{#hasFlash}}class="copy-button"{{/hasFlash}} data-copy-text="{{badgeMD}}"><br>
-{{#hasFlash}}<span class="trpBodySmall" style="opacity: 0.6">Click badge to copy markdown.</span>{{/hasFlash}}
-{{^hasFlash}}<textarea class="trpBodySmall hidden-input" style="width: 500px; margin-top: 8px">{{badgeMD}}</textarea>{{/hasFlash}}
--->
-
-{{/isPublicRepo}}
+{{/if}}
