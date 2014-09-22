@@ -58,7 +58,7 @@ define([
         // if the user is in the app and does not have a user id, they must be logged out user viewing a room
         if (window.troupeContext) loggedOutUserRoom = true;
       }
-      
+
       var username = context().user && context().user.username;
       var isUserHome = (username) ? '/' + username === routeName : false; // if we have an username then check if it matches the routeName
 
@@ -95,8 +95,6 @@ define([
       window.mixpanel.track(eventName, data);
     }
   });
-
-  trackPageView(window.location.pathname);
 
   return {
     trackError: trackError
