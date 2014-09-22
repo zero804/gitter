@@ -12,6 +12,7 @@ define([
 
   var View = Marionette.ItemView.extend({
     template: template,
+    className: 'invite-view',
 
     initialize: function() {
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
