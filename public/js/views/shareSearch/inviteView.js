@@ -36,26 +36,17 @@ define([
       }
     },
 
-    // composes a share url based on a room url and a qs
-    getShareUrl: function (opts) {
-      opts = opts || {};
-      var roomUrl = (typeof opts.roomUrl !== 'undefined') ? opts.roomUrl : 'gitterHQ/gitter';
-      var qs = (typeof opts.qs !== 'undefined') ? opts.qs : '';
-      return context.env('basePath') + '/' + roomUrl + qs;
+    getShareUrl: function() {
+      return context.env('basePath') + '/' + context.getTroupe().uri + '?utm_source=share-link&utm_medium=link&utm_campaign=share-link';
     },
 
-    // gets the badge url, please pass in the room URI (not url)
-    getBadgeUrl: function (content) {
-      content = (typeof content !== 'undefined') ? content : 'JOIN ROOM';
-      return context.env('badgeBaseUrl') + '/' + content + '.svg';
+    getBadgeUrl: function() {
+      return context.env('badgeBaseUrl') + '/Join Chat.svg';
     },
 
-    getBadgeMD: function (opts) {
-      opts = opts || {};
-      var alt = (typeof opts.alt !== 'undefined') ? opts.alt : 'Gitter';
-      var badgeUrl = (typeof opts.badgeUrl !== 'undefined') ? opts.badgeUrl : this.getBadgeUrl();
-      var shareUrl = (typeof opts.shareUrl !== 'undefined') ? opts.shareUrl : this.getShareUrl();
-      return "[![" + alt + "](" + badgeUrl + ")](" + shareUrl + ")";
+    getBadgeMD: function() {
+      var linkUrl = context.env('basePath') + '/' + context.getTroupe().uri + '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge';
+      return '[![Gitter](' + this.getBadgeUrl() + ')](' + linkUrl + ')';
     },
 
     detectFlash: function() {
@@ -94,22 +85,12 @@ define([
       var room = context.getTroupe();
       var isPublicRepo = (room.githubType === 'REPO' && room.security === 'PUBLIC');
 
-      var badgeUrl = this.getBadgeUrl(); // to get a badge with a room just pass in context.getTroupe().uri
-      var shareUrl = this.getShareUrl({
-          roomUrl: context.getTroupe().uri,
-          qs: '?utm_source=badge&utm_medium=badge&utm_campaign=share-badge'
-        });
-
       return {
         isPublicRepo: isPublicRepo,
         hasFlash: this.detectFlash(),
-        url: shareUrl,
-        badgeUrl: badgeUrl,
-        badgeMD: this.getBadgeMD({
-          alt: 'Gitter',
-          badgeUrl: badgeUrl,
-          shareUrl: shareUrl
-        })
+        url: this.getShareUrl(),
+        badgeUrl: this.getBadgeUrl(),
+        badgeMD: this.getBadgeMD()
       };
     },
 
