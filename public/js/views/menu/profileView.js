@@ -5,6 +5,7 @@ define([
   'utils/is-mobile',
   'utils/is-native',
   'hbs!./tmpl/profile',
+  'views/behaviors/widgets'      // No ref
 ], function(context, Marionette, appEvents, isMobile, isNative, template) {
   "use strict";
 
@@ -12,6 +13,9 @@ define([
     template: template,
     events: {
       "click #link-home": 'homeClicked'
+    },
+    behaviors: {
+      Widgets: {}
     },
     serializeData: function() {
       var user = context.getUser();
