@@ -5,8 +5,12 @@ var format               = require('util').format;
 var github               = require('octonode');
 var _                    = require('underscore');
 var Q                    = require('q');
+var conf                 = require('../utils/config');
 var troupeTemplate       = require('../utils/troupe-template');
 var templatePromise      = troupeTemplate.compile('github-pull-request-body');
+var env                  = require('../utils/env');
+var logger               = env.logger;
+var stats                = env.stats;
 
 function Client(token) {
   var client = github.client(token);
@@ -275,4 +279,24 @@ function updateFileAndCreatePullRequest(sourceRepo, user, branchPrefix, badgeCon
     badgeContent: badgeContent
   }).perform();
 }
-exports.updateFileAndCreatePullRequest = updateFileAndCreatePullRequest;
+
+function sendBadgePullRequest(repo, user) {
+  var imageUrl = conf.get('web:badgeBaseUrl') + '/Join Chat.svg';
+  var linkUrl =  conf.get('web:basepath') + '/' + repo + '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge';
+  var markdown = '[![Gitter](' + imageUrl + ')](' + linkUrl + ')';
+
+  return updateFileAndCreatePullRequest(repo, user.username, 'gitter-badge', markdown)
+    .then(function (pr) {
+      stats.event('badger.succeeded', { userId: user.id });
+      return pr;
+    })
+    .fail(function(err) {
+      stats.event('badger.failed', { userId: user.id });
+      logger.error("Badger failed", { exception: err, uri: repo });
+
+      // dont swollow this error, the client needs to be notified of our failure
+      throw err;
+    });
+}
+
+exports.sendBadgePullRequest = sendBadgePullRequest;
