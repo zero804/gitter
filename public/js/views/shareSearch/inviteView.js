@@ -1,16 +1,16 @@
 
 define([
   'jquery',
-  'underscore',
+  'marionette',
   'utils/context',
   'views/base',
   'utils/cdn',
   'hbs!./tmpl/inviteView',
   'zeroclipboard'
-], function($, _, context, TroupeViews, cdn, template, ZeroClipboard) {
+], function($, Marionette, context, TroupeViews, cdn, template, ZeroClipboard) {
   "use strict";
 
-  var View = TroupeViews.Base.extend({
+  var View = Marionette.ItemView.extend({
     template: template,
 
     initialize: function() {
@@ -58,19 +58,23 @@ define([
     },
 
     detectFlash: function() {
-      if (navigator.plugins != null && navigator.plugins.length > 0){
-              return navigator.plugins["Shockwave Flash"] && true;
-          }
-          if(~navigator.appVersion.indexOf("MSIE") && !~navigator.userAgent.indexOf("Opera")){
-              try{
-                  return new ActiveXObject("ShockwaveFlash.ShockwaveFlash") && true;
-              } catch(e){}
-          }
-          return false;
+      if (navigator.plugins && navigator.plugins["Shockwave Flash"]) {
+        return true;
+      }
+
+      if(~navigator.appVersion.indexOf("MSIE") && !~navigator.userAgent.indexOf("Opera")){
+        try{
+          new window.ActiveXObject("ShockwaveFlash.ShockwaveFlash");
+          return true;
+        } catch(e) {
+          // Ignore the failure
+        }
+      }
+
+      return false;
     },
 
     createClipboard : function(ev) {
-
       if(this.clip) return;
 
       ZeroClipboard.setMoviePath( cdn('repo/zeroclipboard/ZeroClipboard.swf') );
@@ -85,7 +89,7 @@ define([
       });
     },
 
-    getRenderData: function() {
+    serializeData: function() {
       var room = context.getTroupe();
       var isPublicRepo = (room.githubType === 'REPO' && room.security === 'PUBLIC');
 

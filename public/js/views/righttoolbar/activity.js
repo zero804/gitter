@@ -193,11 +193,13 @@ define([
 
 
 
-  var ActivityItemView = TroupeViews.Base.extend({
+  var ActivityItemView = Marionette.ItemView.extend({
     tagName: 'li',
+    modelEvents: {
+      change: 'render'
+    },
 
-    initialize: function(/*options*/) {
-      this.setRerenderOnChange();
+    initialize: function() {
       var meta = this.model.get('meta');
       var service = meta.service;
 
@@ -213,7 +215,7 @@ define([
       }
     },
 
-    getRenderData: function() {
+    serializeData: function() {
       try{
         var meta    = this.model.get('meta');
         var payload = this.model.get('payload');
@@ -237,17 +239,17 @@ define([
       }
     },
 
-    afterRender: function() {
+    onRender: function() {
       issueDecorator.decorate(this);
       commitDecorator.decorate(this);
       mentionDecorator.decorate(this);
     }
   });
 
-  var EmptyActivityView = TroupeViews.Base.extend({
+  var EmptyActivityView = Marionette.ItemView.extend({
     id: 'activity-tip',
     template: activityTipTemplate,
-    getRenderData: function() {
+    serializeData: function() {
       return {
         isAdmin: context().permissions.admin,
         isNativeDesktopApp: context().isNativeDesktopApp,

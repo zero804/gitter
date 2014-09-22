@@ -1,14 +1,15 @@
 define([
+  'marionette',
   'utils/context',
   'views/base',
   'hbs!./tmpl/integrationSettingsTemplate',
-], function(context, TroupeViews, template) {
+], function(Marionette, context, TroupeViews, template) {
   "use strict";
 
-  var View = TroupeViews.Base.extend({
+  var View = Marionette.ItemView.extend({
     template: template,
 
-    getRenderData: function() {
+    serializeData: function() {
       return context.getTroupe();
     }
   });

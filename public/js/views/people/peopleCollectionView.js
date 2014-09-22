@@ -1,70 +1,71 @@
 define([
   'marionette',
-  'backbone',
   'views/base',
-  'hbs!./tmpl/peopleItemView',
+  'views/widgets/avatar',
   'hbs!./tmpl/peopleCollectionView',
   'hbs!./tmpl/remainingView'
-], function(Marionette, Backbone, TroupeViews, peopleItemViewTemplate, peopleCollectionViewTemplate, remainingViewTempate) {
+], function(Marionette, TroupeViews, AvatarView, collectionTemplate, remainingTempate) {
   "use strict";
-
-  var PeopleItemView = TroupeViews.Base.extend({
-    tagName: 'li',
-    template: peopleItemViewTemplate,
-
-    initialize: function(/*options*/) {
-      this.setRerenderOnChange();
-    }
-  });
 
   var PeopleCollectionView = Marionette.CollectionView.extend({
     tagName: 'ul',
     className: 'roster',
-    itemView: PeopleItemView,
+    itemView: AvatarView,
+    itemViewOptions: function() {
+      return { tagName: 'li', showStatus: true, tooltipPlacement: 'left' };
+    },
     initialize: function() {
       this.listenTo(this.collection, 'sort reset', this.render);
     }
   });
 
-  var RemainingView = Backbone.View.extend({
+  var RemainingView = Marionette.ItemView.extend({
     tagName: 'p',
     className: 'remaining',
-    template: remainingViewTempate,
+    template: remainingTempate,
     initialize: function(options) {
-      this.roster = options.roster;
-      this.users = options.users;
-      this.listenTo(this.roster, 'add remove reset', this.render);
-      this.listenTo(this.users, 'add remove reset', this.render);
+      this.rosterCollection = options.rosterCollection;
+      this.userCollection = options.userCollection;
+      this.listenTo(this.rosterCollection, 'add remove reset', this.render);
+      this.listenTo(this.userCollection, 'add remove reset', this.render);
     },
-    render: function() {
-      var remainingCount = this.users.length - this.roster.length;
-      this.$el.html(this.template({
+    serializeData: function() {
+      var remainingCount = this.userCollection.length - this.rosterCollection.length;
+      return {
         remainingCount: remainingCount,
         plural: remainingCount > 1
-      }));
+      };
+    },
+    onRender: function() {
+      var remainingCount = this.userCollection.length - this.rosterCollection.length;
+
       this.$el.toggleClass('showFull', remainingCount > 0);
-      this.$el.toggleClass('showMid', this.roster.length > 10);
-      return this;
+      this.$el.toggleClass('showMid', this.rosterCollection.length > 10);
     }
   });
 
-  var ExpandableRosterView = TroupeViews.Base.extend({
-    template: peopleCollectionViewTemplate,
+  var ExpandableRosterView = Marionette.Layout.extend({
+    template: collectionTemplate,
 
-    initialize: function(options) {
-      this.rosterView = new PeopleCollectionView({
-        collection: options.rosterCollection
-      });
-      this.remainingView = new RemainingView({
-        roster: options.rosterCollection,
-        users: options.userCollection
-      });
+    regions: {
+      roster: "#roster",
+      remaining: "#remaining"
     },
 
-    afterRender: function() {
-      this.$el.find('.frame-people')
-        .append(this.rosterView.render().el)
-        .append(this.remainingView.render().el);
+    initialize: function(options) {
+      this.rosterCollection = options.rosterCollection;
+      this.userCollection = options.userCollection;
+    },
+
+    onRender: function() {
+      this.roster.show(new PeopleCollectionView({
+        collection: this.rosterCollection
+      }));
+
+      this.remaining.show(new RemainingView({
+        rosterCollection: this.rosterCollection,
+        userCollection: this.userCollection
+      }));
     }
   });
 
