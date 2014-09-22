@@ -70,9 +70,10 @@ define([
       gs('track');
     }
 
-    if(trackingId) {
-      ga('send', 'event', 'route', routeName);
-    }
+    // Removing this for now as it's affecting our bounce rate
+    // if(trackingId) {
+    //   ga('send', 'event', 'route', routeName);
+    // }
 
   }
 
@@ -95,6 +96,8 @@ define([
       window.mixpanel.track(eventName, data);
     }
   });
+
+  trackPageView(window.location.pathname);
 
   return {
     trackError: trackError
