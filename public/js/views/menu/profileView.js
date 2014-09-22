@@ -1,19 +1,19 @@
 define([
   'utils/context',
-  'views/base',
+  'marionette',
   'utils/appevents',
   'utils/is-mobile',
   'utils/is-native',
   'hbs!./tmpl/profile',
-], function(context, TroupeViews, appEvents, isMobile, isNative, template) {
+], function(context, Marionette, appEvents, isMobile, isNative, template) {
   "use strict";
 
-  return TroupeViews.Base.extend({
+  return Marionette.ItemView.extend({
     template: template,
     events: {
       "click #link-home": 'homeClicked'
     },
-    getRenderData: function() {
+    serializeData: function() {
       var user = context.getUser();
       var userModel = context.user();
 

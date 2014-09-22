@@ -13,14 +13,16 @@ define([
   'hbs!./tmpl/chatItemView',
   'hbs!./tmpl/statusItemView',
   'views/chat/chatInputView',
-  'views/unread-item-view-mixin',
   'utils/appevents',
   'cocktail',
   'utils/collapsed-item-client',
   'views/keyboard-events-mixin',
-  'bootstrap_tooltip', // No ref
+  'views/behaviors/unread-items',  // No ref
+  'views/behaviors/widgets',      // No ref
+  'views/behaviors/sync-status',  // No ref
+  'bootstrap_tooltip',            // No ref
 ], function($, _, context, chatModels, AvatarView, Marionette, TroupeViews, uiVars, Popover,
-  chatItemTemplate, statusItemTemplate, chatInputView, UnreadItemViewMixin, appEvents, cocktail, chatCollapse, KeyboardEventMixins) {
+  chatItemTemplate, statusItemTemplate, chatInputView, appEvents, cocktail, chatCollapse, KeyboardEventMixins) {
 
   "use strict";
 
@@ -47,11 +49,17 @@ define([
     'click .js-chat-item-edit':       'toggleEdit',
   };
 
-  var ChatItemView = TroupeViews.Base.extend({
+  var ChatItemView = Marionette.ItemView.extend({
     attributes: {
       class: 'chat-item'
     },
-    unreadItemType: 'chat',
+    behaviors: {
+      Widgets: {},
+      UnreadItems: {
+        unreadItemType: 'chat',
+      },
+      SyncStatus: {}
+    },
     isEditing: false,
 
     events: uiVars.isMobile ? touchEvents : mouseEvents,
@@ -96,14 +104,15 @@ define([
       this.render();
     },
 
-    template: function (serializedData) {
-      if (serializedData.status) {
-        return statusItemTemplate(serializedData);
+    template: function(data) {
+      if (data.status) {
+        return statusItemTemplate(data);
       }
-      return chatItemTemplate(serializedData);
+
+      return chatItemTemplate(data);
     },
 
-    getRenderData: function() {
+    serializeData: function() {
       var data = this.model.toJSON();
 
       if (data.fromUser) {
@@ -172,7 +181,7 @@ define([
       }, this);
     },
 
-    afterRender: function () {
+    onRender: function () {
       this.renderText();
       this.updateRender();
       this.timeChange();
@@ -514,10 +523,6 @@ define([
   });
 
   cocktail.mixin(ChatItemView, KeyboardEventMixins);
-
-  if (context.isLoggedIn()) {
-    cocktail.mixin(ChatItemView, UnreadItemViewMixin);
-  }
 
   var ReadByView = Marionette.CollectionView.extend({
     itemView: AvatarView,

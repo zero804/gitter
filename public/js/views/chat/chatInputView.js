@@ -1,5 +1,6 @@
 define([
   'log!chat-input',
+  'marionette',
   'jquery',
   'utils/context',
   'views/base',
@@ -20,7 +21,7 @@ define([
   'bootstrap_tooltip', // No ref
   'jquery-textcomplete', // No ref
   'utils/sisyphus-cleaner' // No ref
-], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate,
+], function(log, Marionette, $, context, TroupeViews, appEvents, template, listItemTemplate,
   emojiListItemTemplate, moment, hasScrollBars, isMobile, emoji, drafty, cdn, commands,
   cocktail, KeyboardEventsMixin, platformKeys) {
   "use strict";
@@ -84,9 +85,11 @@ define([
     return this.disabled;
   };
 
-  var ChatInputView = TroupeViews.Base.extend({
+  var ChatInputView = Marionette.ItemView.extend({
     template: template,
-
+    behaviors: {
+      Widgets: {}
+    },
     events: {
       'click .compose-mode-toggle': 'toggleComposeMode'
     },
@@ -121,7 +124,7 @@ define([
       return 'Switch to '+ mode +' mode ('+ platformKeys.cmd +' + /)';
     },
 
-    getRenderData: function() {
+    serializeData: function() {
       var isComposeModeEnabled = this.composeMode.isEnabled();
       var placeholder;
 
@@ -143,15 +146,18 @@ define([
       };
     },
 
-    afterRender: function(data) {
+    onRender: function() {
       if (!window._troupeIsTablet) $("#chat-input-textarea").focus();
+
+      // TODO: why we using global $?
+      var textAreaValue = $("#chat-input-textarea").val();
 
       var inputBox = new ChatInputBoxView({
         el: this.$el.find('.js-chat-input-text-area'),
         rollers: this.rollers,
         chatCollectionView: this.chatCollectionView,
         composeMode: this.composeMode,
-        value: data.value
+        value: textAreaValue
       });
 
       this.inputBox = inputBox;
@@ -332,7 +338,7 @@ define([
      * @return <Boolean>
      */
     isStatusMessage: function (message) {
-      return /^\/me /.test(message); // if it starts with '/me' it should be a status update
+      return (/^\/me /).test(message); // if it starts with '/me' it should be a status update
     },
 
     /**
@@ -455,7 +461,7 @@ define([
       if(offsetHeight == height) {
         return;
       }
-      var overflow = height < scrollHeight ? 'scroll' : '';
+      // var overflow = height < scrollHeight ? 'scroll' : '';
       $el.height(height);
       if (!editMode) {
         var css = {};
@@ -463,7 +469,8 @@ define([
         if(compact) {
           css['padding-bottom'] = (height + EXTRA_PADDING) + 'px';
         } else {
-          css['bottom'] = ($('#chat-input-wrapper').outerHeight()) + 'px';
+          // TODO: why the $?
+          css.bottom = ($('#chat-input-wrapper').outerHeight()) + 'px';
         }
 
         log('Applying ', css, ' to ', frameChat);
@@ -483,7 +490,7 @@ define([
     }
   };
 
-  var ChatInputBoxView = TroupeViews.Base.extend({
+  var ChatInputBoxView = Marionette.ItemView.extend({
     events: {
       "keyup":    "onKeyUp",
       "focusout": "onFocusOut"

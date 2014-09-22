@@ -2,6 +2,7 @@
 /* global define:false */
 define([
   'views/base',
+  'marionette',
   'hbs!./tmpl/github',
   'hbs!./tmpl/githubPush',
   'hbs!./tmpl/bitbucket',
@@ -11,6 +12,7 @@ define([
   'hbs!./tmpl/trello'
 ], function(
   TroupeViews,
+  Marionette,
   githubTemplate,
   githubPushTemplate,
   bitbucketTemplate,
@@ -34,36 +36,34 @@ define([
     var template = serviceTemplates[service];
     if(!template) return null;
 
-    var view = TroupeViews.Base.extend({
+    var view = Marionette.ItemView.extend({
       template: template
     });
 
     return view;
   }
 
-  function selectGithubView(event) {
-    var eventView;
+  var GithubView = Marionette.ItemView.extend({
+    template: githubTemplate
+  });
 
+  var GithubPushView = Marionette.ItemView.extend({
+    template: githubPushTemplate,
+    events: {
+      'click .toggleCommits': 'toggleCommits'
+    },
+    toggleCommits: function() {
+      this.$el.find('.commits').slideToggle(100);
+    }
+  });
+
+  function selectGithubView(event) {
     switch (event) {
       case 'push':
-        eventView = TroupeViews.Base.extend({
-          template: githubPushTemplate,
-          events: {
-            'click .toggleCommits': 'toggleCommits'
-          },
-          toggleCommits: function() {
-            this.$el.find('.commits').slideToggle(100);
-          }
-        });
-        break;
+        return GithubPushView;
       default:
-        eventView = TroupeViews.Base.extend({
-          template: githubTemplate
-        });
-        break;
+        return GithubView;
     }
-
-    return eventView;
   }
 
   function showNotificationIcon(chatItemView, meta) {

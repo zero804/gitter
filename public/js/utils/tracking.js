@@ -58,7 +58,7 @@ define([
         // if the user is in the app and does not have a user id, they must be logged out user viewing a room
         if (window.troupeContext) loggedOutUserRoom = true;
       }
-      
+
       var username = context().user && context().user.username;
       var isUserHome = (username) ? '/' + username === routeName : false; // if we have an username then check if it matches the routeName
 
@@ -70,9 +70,10 @@ define([
       gs('track');
     }
 
-    if(trackingId) {
-      ga('send', 'event', 'route', routeName);
-    }
+    // Removing this for now as it's affecting our bounce rate
+    // if(trackingId) {
+    //   ga('send', 'event', 'route', routeName);
+    // }
 
   }
 
