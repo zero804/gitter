@@ -3,8 +3,8 @@
 </h3>
 
 <input class="invite-view__copy-field" value="{{url}}" onclick="this.select();">
-{{#if hasFlash}}
 
+{{#if hasFlash}}
 <div class="trpButtonMedium trpBtnGreen copy-button" data-copy-text="{{url}}">Copy</div>
 {{/if}}
 
@@ -18,7 +18,12 @@
   How about a badge? <img class="invite-view__badge" src="{{badgeUrl}}">
 </h3>
 
-<button class='trpButtonMedium trpBtnBlue button share-on-gh js-badge'>Add a Badge on GitHub</button>
+<input class="invite-view__copy-field" value="{{badgeMD}}" onclick="this.select();">
+
+{{#if hasFlash}}
+<div class="trpButtonMedium trpBtnGreen copy-button" data-copy-text="{{badgeMD}}">Copy</div>
+{{/if}}
+<button class='trpButtonMedium trpBtnBlue button share-on-gh js-badge'>Pull Request</button>
 
 <div class="trpModalBody">
   <br>
