@@ -35,7 +35,7 @@ module.exports = {
 
         return [
           restSerializer.serializeQ(userAdded, strategy),
-          emailAddressService(userAdded)
+          emailAddressService(userAdded, req.user)
         ];
       })
       .spread(function(serializedUser, email) {
