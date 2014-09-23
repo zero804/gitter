@@ -95,10 +95,10 @@ define([
 
     serializeData: function() {
       var room = context.getTroupe();
-      var isPublicRepo = (room.githubType === 'REPO' && room.security === 'PUBLIC');
 
       return {
-        isPublicRepo: isPublicRepo,
+        isRepo: room.githubType === 'REPO',
+        isPublic: room.security === 'PUBLIC',
         hasFlash: this.detectFlash(),
         url: this.getShareUrl(),
         badgeUrl: this.getBadgeUrl(),
