@@ -10,19 +10,7 @@ define([
 ], function($, Marionette, context, TroupeViews, cdn, template, ZeroClipboard) {
   "use strict";
 
-  function createClipboard(target, text) {
-    ZeroClipboard.setMoviePath( cdn('repo/zeroclipboard/ZeroClipboard.swf') );
-    ZeroClipboard.Client.prototype.zIndex = 100000;
-    var clip = new ZeroClipboard.Client();
-    clip.setText(text);
-    clip.glue(target);
-
-    clip.addEventListener('onComplete', function() {
-      $(target).text('Copied!');
-    });
-
-    return clip;
-  }
+  ZeroClipboard.config({ swfPath: cdn('repo/zeroclipboard/ZeroClipboard.swf') });
 
   var View = Marionette.ItemView.extend({
     template: template,
@@ -33,8 +21,6 @@ define([
     },
 
     events: {
-      'mouseover .js-copy-link' : 'createLinkClipboard',
-      'mouseover .js-copy-markdown' : 'createMarkdownClipboard',
       'click .js-badge': 'sendBadgePullRequest'
     },
 
@@ -81,18 +67,6 @@ define([
       return false;
     },
 
-    createLinkClipboard: function(e) {
-      if(this.linkClipboard) return;
-
-      this.linkClipboard = createClipboard(e.target, this.getShareUrl());
-    },
-
-    createMarkdownClipboard: function(e) {
-      if(this.markdownClipboard) return;
-
-      this.markdownClipboard = createClipboard(e.target, this.getBadgeMD());
-    },
-
     serializeData: function() {
       var room = context.getTroupe();
 
@@ -104,6 +78,16 @@ define([
         badgeUrl: this.getBadgeUrl(),
         badgeMD: this.getBadgeMD()
       };
+    },
+
+    onRender: function() {
+      // ZeroClipboard instances are left hanging around
+      // even after this view is closed.
+      // 500pts will be awarded if you can fix this.
+      var clipboard = new ZeroClipboard(this.$el.find('.js-copy'));
+      clipboard.on('aftercopy', function(e) {
+        $(e.target).text('Copied!');
+      });
     },
 
     sendBadgePullRequest: function(e) {
@@ -132,7 +116,6 @@ define([
         }
       });
     }
-
   });
 
   var Modal = TroupeViews.Modal.extend({
