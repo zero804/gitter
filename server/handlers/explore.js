@@ -38,7 +38,7 @@ function processTagResult(rooms) {
 
 function getSearchName(tags) {
   return tags.map(function(tag) {
-    var m = /^lang:(\w+)/.match(tag);
+    var m = /^lang:(\w+)/.exec(tag);
     if(!m || !m[1]) return tag;
 
     var lang = langs.where("1", m[1]);
@@ -46,13 +46,6 @@ function getSearchName(tags) {
 
     return lang.local;
   });
-}
-
-function createResponseData(tags, rooms) {
-  return {
-    tags: tags.join(', '),
-    rooms: rooms
-  };
 }
 
 
@@ -70,9 +63,14 @@ module.exports = {
       var tags = req.params.tags.split(',');
       suggestedService.fetchByTags(tags)
         .then(processTagResult)
-        .then(createResponseData.bind(null, tags))
-        .then(function (data) {
-          res.render('explore', data);
+        .then(function (rooms) {
+          var searchNames = getSearchName(tags);
+          res.render('explore', {
+            tags: tags.join(', '),
+            searchName: searchNames.join(', '),
+            rooms: rooms,
+            isLoggedIn: !!req.user
+          });
         })
         .fail(next);
     });
