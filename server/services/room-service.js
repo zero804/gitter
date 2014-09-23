@@ -31,6 +31,7 @@ var canUserBeInvitedToJoinRoom = require('./invited-permissions-service');
 var emailAddressService = require('./email-address-service');
 var troupeDao          = require('./daos/troupe-dao').full;
 var mongoUtils         = require('../utils/mongo-utils');
+var badger             = require('./badger-service');
 
 function localUriLookup(uri, opts) {
   return uriLookupService.lookupUri(uri)
@@ -248,6 +249,14 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
                         logger.verbose('Skipping hook creation. User does not have permissions');
                         hookCreationFailedDueToMissingScope = true;
                       }
+                    }
+
+                    if(githubType === 'REPO' && security === 'PUBLIC') {
+                      /* Do this asynchronously */
+                      badger.sendBadgePullRequest(uri, user)
+                        .catch(function(err) {
+                          logger.error('Unable to send pull request for new room', { exception: err });
+                        });
                     }
                   }
 
