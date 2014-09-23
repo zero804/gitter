@@ -14,7 +14,7 @@
 
 {{#if isPublicRepo}}
 <h3 class="invite-view__heading">
-  How about a badge? <img class="invite-view__badge" src="{{badgeUrl}}">
+  How about a badge like this: <img class="invite-view__badge" src="{{badgeUrl}}">
 </h3>
 
 
@@ -24,9 +24,6 @@
   {{#if hasFlash}}
   <button class="invite-view__button invite-view__button--copy js-copy-markdown">Copy</button>
   {{/if}}
-  <button class='invite-view__button invite-view__button--pull-request js-badge'>Pull Request</button>
+  <button class='invite-view__button invite-view__button--pull-request js-badge'>Send Pull Request</button>
 </div>
-
-<div class='pr-status'></div>
-
 {{/if}}
