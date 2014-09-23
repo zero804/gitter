@@ -35,7 +35,7 @@ define([
     events: {
       'mouseover .js-copy-link' : 'createLinkClipboard',
       'mouseover .js-copy-markdown' : 'createMarkdownClipboard',
-      'click .js-badge': 'createBadge'
+      'click .js-badge': 'sendBadgePullRequest'
     },
 
     menuItemClicked: function(button) {
@@ -106,10 +106,10 @@ define([
       };
     },
 
-    createBadge: function() {
-      var btn = this.$el.find('.js-badge')[0];
-      var st = this.$el.find('.pr-status');
-      st.html('Hold on...');
+    sendBadgePullRequest: function(e) {
+      var btn = e.target;
+      var $btn = $(btn);
+      $btn.text('Sending...');
       btn.disabled = true;
 
       $.ajax({
@@ -124,15 +124,14 @@ define([
         context: this,
         timeout: 45 * 1000,
         error: function() {
-          st.html('Oops, something went wront. Try again. (Is there a README.md in your project?)');
+          $btn.text('Failed. Try again?');
           btn.disabled = false;
         },
-        success: function (res) {
-          st.html('We just created a PR for you! <a href=' + res.html_url + ' target="_blank">Review and merge &rarr;</a>');
+        success: function() {
+          $btn.text('Pull Request sent!');
         }
       });
-    },
-
+    }
 
   });
 
