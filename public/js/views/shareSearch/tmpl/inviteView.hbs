@@ -10,13 +10,12 @@
   {{/if}}
 </div>
 
+{{#if isRepo}}
 <div class="invite-view__divider"></div>
 
-{{#if isPublicRepo}}
 <h3 class="invite-view__heading">
   How about a badge like this: <img class="invite-view__badge" src="{{badgeUrl}}">
 </h3>
-
 
 <div class="invite-view__copy-text">
   <input class="invite-view__copy-field" value="{{badgeMD}}" onclick="this.select();">
@@ -24,6 +23,9 @@
   {{#if hasFlash}}
   <button class="invite-view__button invite-view__button--copy js-copy-markdown">Copy</button>
   {{/if}}
+
+  {{#if isPublic}}
   <button class='invite-view__button invite-view__button--pull-request js-badge'>Send Pull Request</button>
+  {{/if}}
 </div>
 {{/if}}
