@@ -35,6 +35,7 @@ module.exports = {
 
     app.locals({
       googleTrackingId: config.get("stats:ga:key"),
+      googleTrackingDomain: config.get("stats:ga:domain"),
       liveReload: config.get('web:liveReload')
     });
 

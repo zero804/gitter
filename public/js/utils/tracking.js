@@ -6,6 +6,7 @@ define([
   "use strict";
 
   var trackingId = context.env('googleTrackingId');
+  var trackingDomain = context.env('googleTrackingDomain') || 'gitter.im'; // Remove this default 23/10/2014;
   var ga;
   var gosquared;
 
@@ -17,7 +18,7 @@ define([
 
     ga = window.ga;
 
-    ga('create', trackingId, 'gitter.im');
+    ga('create', trackingId, trackingDomain);
     ga('send', 'pageview');
   }
 

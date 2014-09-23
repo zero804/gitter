@@ -5,6 +5,7 @@ var suggestedService = require('../services/suggested-room-service');
 var repoDescription = require('../services/github/github-fast-repo-description');
 var getRoughMessageCount = require('../services/chat-service').getRoughMessageCount;
 var Q = require('q');
+var langs = require('langs');
 
 // @const
 var DEFAULT_TAGS = ['javascript', 'ruby', 'php'].sort();
@@ -35,12 +36,18 @@ function processTagResult(rooms) {
   return Q.all(rooms.map(getRoomRenderData));
 }
 
-function createResponseData(tags, rooms) {
-  return {
-    tags: tags.join(', '),
-    rooms: rooms
-  };
+function getSearchName(tags) {
+  return tags.map(function(tag) {
+    var m = /^lang:(\w+)/.exec(tag);
+    if(!m || !m[1]) return tag;
+
+    var lang = langs.where("1", m[1]);
+    if(!lang || !lang.local) return m[1];
+
+    return lang.local;
+  });
 }
+
 
 module.exports = {
   install: function (app) {
@@ -56,9 +63,14 @@ module.exports = {
       var tags = req.params.tags.split(',');
       suggestedService.fetchByTags(tags)
         .then(processTagResult)
-        .then(createResponseData.bind(null, tags))
-        .then(function (data) {
-          res.render('explore', data);
+        .then(function (rooms) {
+          var searchNames = getSearchName(tags);
+          res.render('explore', {
+            tags: tags.join(', '),
+            searchName: searchNames.join(', '),
+            rooms: rooms,
+            isLoggedIn: !!req.user
+          });
         })
         .fail(next);
     });
