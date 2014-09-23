@@ -13,17 +13,43 @@
         <div class='logo'>{{> logo }}</div>
       </div>
       <div class='wrap'>
-        <h1 class="title">Explore <b>Gitter</b></h1>
-        <p>Find great chat rooms <b>&amp;</b> communitites we <span class="octicon octicon-heart"></span></p>
-        <form action='/explore/tags' class='js-search-form'>
-          <p><input name='search' id='search' class='page-header__search' type='search' placeholder='Search for tags... e.g. node' /></p>
-        </form>
-        <p>or try one of our selected tags: <a href='/explore/tags/javascript' class='js-pills'><span class='pill--primary'>JavaScript</span></a> <a href='/explore/tags/ruby' class='js-pills'><span class='pill--primary'>Ruby</span></a> or <a href='/explore/tags/php' class='js-pills'><span class='pill--primary'>PHP</span></a></p>
+        {{#if isLoggedIn }}
+          <h1 class="title">Explore <b>Gitter</b></h1>
+          <form action='/explore/tags' class='js-search-form'>
+            <p><input name='search' id='search' class='page-header__search' type='search' placeholder='Search for tags... e.g. node' /></p>
+          </form>
+          <p>or try one of our selected tags: <a href='/explore/tags/javascript' class='js-pills'><span class='pill--primary'>JavaScript</span></a> <a href='/explore/tags/ruby' class='js-pills'><span class='pill--primary'>Ruby</span></a> or <a href='/explore/tags/php' class='js-pills'><span class='pill--primary'>PHP</span></a></p>
+        {{else}}
+          <h1 class="title">Chat for <b>GitHub</b>.</h1>
+          <div class='page-header__features'>
+            <div class='feature'>
+              <p><span class="mega-octicon octicon-comment-discussion"></span></p>
+              <h2>Unlimited Free Chats</h2>
+              <p><small>As well as free private one-to-one chats and private team plans starting from as little as $2 per user per month.</small></p>
+            </div>
+            <div class='feature'>
+              <p><span class="mega-octicon octicon-file-code"></span></p>
+              <h2>Developer Focused Chat</h2>
+              <p><small>Markdown, syntax highlighting and even LaTeX. Auto-completion of GitHub #issues, @usernames and more. Real-time integration with the services that matter to devs.</small></p>
+            </div>
+            <div class='feature'>
+              <p><span class="mega-octicon octicon-organization"></span></p>
+              <h2>Be Part of Your Community</h2>
+              <p><small>Ask questions, help other users or discuss the next big feature. Open source is only as strong as the community it’s build by. So get involved.</small></p>
+            </div>
+          </div>
+          <p><a href='/home/createroom' class='btn--primary  js-sign-up'>Sign up with <span class="octicon octicon-mark-github"></span></a></p>
+          <p><small>or <a href="/x?redirect=no#pricing-panel">check out the premium plans</a></small></p>
+        {{/if}}
       </div>
     </header>
     <section class="page-result">
       {{#if rooms}}
-        <p>Displaying results for: <b>{{ tags }}</b></p>
+        {{#if isLoggedIn }}
+          <p>Displaying results for: <b>{{ tags }}</b></p>
+        {{else}}
+          <p>Here's a selection of <b>{{ tags }}</b> rooms:</p>
+        {{/if}}
       {{else}}
         <p><span class="octicon octicon-stop"></span> Damn. Sorry about that. No results found for: <b>{{ tags }}</b></p>
       {{/if}}

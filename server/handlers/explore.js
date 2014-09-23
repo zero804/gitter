@@ -5,6 +5,7 @@ var suggestedService = require('../services/suggested-room-service');
 var repoDescription = require('../services/github/github-fast-repo-description');
 var getRoughMessageCount = require('../services/chat-service').getRoughMessageCount;
 var Q = require('q');
+var _ = require('underscore');
 
 // @const
 var DEFAULT_TAGS = ['javascript', 'ruby', 'php'].sort();
@@ -58,7 +59,9 @@ module.exports = {
         .then(processTagResult)
         .then(createResponseData.bind(null, tags))
         .then(function (data) {
-          res.render('explore', data);
+          res.render('explore', _.extend(data, {
+            isLoggedIn: !!req.user
+          }));
         })
         .fail(next);
     });

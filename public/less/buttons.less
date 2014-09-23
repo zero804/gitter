@@ -1,5 +1,8 @@
 @import 'colors';
 
+@colors: @green, @orange;
+@names: primary, secondary;
+
 .btn(@bg: @dark, @text: white, @height: 40px, @padding: 12px) {
 
   display: inline-block;
@@ -22,27 +25,20 @@
   color: @text;
 
   &:hover {
+    border: none;
     box-shadow: inset 0 0 0 250px rgba(0, 0, 0, 0.05);
   }
 }
 
-.btn_fill(@bg: @dark) {
-  .btn(@bg);
-  width: 100%;
-}
+.generate(@colors, @names, btn);
 
-.btn_fill--primary {
-  .btn_fill(@green);
-}
+.generate(@a, @b, @gen, @i: length(@a)) when (@i > 0) {
+  @color: extract(@a, @i);
+  @name:  extract(@b, @i);
 
-.btn {
-  .btn(@gray);
-}
+  .@{gen}--@{name} {
+    .btn(@color);
+  }
 
-.btn--primary {
-  .btn(@green);
-}
-
-.btn--secondary {
-  .btn(@orange);
+  .generate(@a, @b, @gen, (@i - 1));
 }
