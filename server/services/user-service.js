@@ -8,7 +8,6 @@ var _                         = require('underscore');
 var winston                   = require('../utils/winston');
 var assert                    = require('assert');
 var persistence               = require("./persistence-service");
-var collections               = require("../utils/collections");
 var uriLookupService          = require('./uri-lookup-service');
 var Q                         = require('q');
 var githubUserService         = require('./github/github-user-service');

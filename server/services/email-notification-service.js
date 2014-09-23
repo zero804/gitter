@@ -116,8 +116,9 @@ module.exports = {
   },
 
   sendInvitation: function(fromUser, toUser, room) {
-    var senderName = fromUser.displayName;
-    var recipientName = toUser.displayName;
+    var senderName = (fromUser.displayName || fromUser.username).split(' ')[0];
+    var recipientName = (toUser.displayName || toUser.username).split(' ')[0];
+    var fromName = (fromUser.displayName || fromUser.username);
 
     return emailAddressService(toUser)
       .then(function(email) {
@@ -125,6 +126,7 @@ module.exports = {
         return mailerService.sendEmail({
           templateFile: "invitation",
           from: senderName + ' <support@gitter.im>',
+          fromName: fromName,
           to: email,
           subject: '[' + room.uri + '] Join the chat on Gitter',
           tracking: {
@@ -202,8 +204,9 @@ module.exports = {
     var emailBasePath   = config.get("email:emailBasePath");
     var unsubscribeUrl  = emailBasePath + '/settings/unsubscribe/' + hash;
 
-    var senderName = fromUser.displayName;
-    var recipientName = toUser.displayName;
+    var senderName = (fromUser.displayName || fromUser.username).split(' ')[0];
+    var recipientName = (toUser.displayName || toUser.username).split(' ')[0];
+    var fromName = (fromUser.displayName || fromUser.username);
 
     userSettingsService.getUserSettings(toUser.id, 'unread_notifications_optout')
       .then(function(optout) {
@@ -222,7 +225,7 @@ module.exports = {
             return mailerService.sendEmail({
               templateFile: "added_to_room",
               from: senderName + ' <support@gitter.im>',
-              fromName: senderName,
+              fromName: fromName,
               to: email,
               subject: '[' + room.uri + '] You\'ve been added to a new room on Gitter',
               tracking: {

@@ -17,6 +17,7 @@ var mixpanel               = require('../web/mixpanelUtils');
 var useragentTagger        = require('../utils/user-agent-tagger');
 var GitHubStrategy         = require('troupe-passport-github').Strategy;
 var GitHubMeService        = require('../services/github/github-me-service');
+var gaCookieParser         = require('../utils/ga-cookie-parser');
 
 function installApi() {
   /**
@@ -106,6 +107,8 @@ function install() {
   installApi();
 
   function githubOauthCallback(req, accessToken, refreshToken, params, _profile, done) {
+    var googleAnalyticsUniqueId = gaCookieParser(req);
+
     var githubMeService = new GitHubMeService({ githubUserToken: accessToken });
     return githubMeService.getUser()
       .then(function(githubUserProfile) {
@@ -137,14 +140,16 @@ function install() {
                   stats.event("invite_accepted", {
                     userId: user.id,
                     method: 'github_oauth',
-                    username: user.username
+                    username: user.username,
+                    googleAnalyticsUniqueId: googleAnalyticsUniqueId
                   });
 
                   stats.event("new_user", {
                     userId: user.id,
                     method: 'github_oauth',
                     username: user.username,
-                    source: 'invited'
+                    source: 'invited',
+                    googleAnalyticsUniqueId: googleAnalyticsUniqueId
                   });
                 }
 
@@ -208,7 +213,8 @@ function install() {
                     distinctId: mixpanel.getMixpanelDistinctId(req.cookies),
                     method: 'github_oauth',
                     username: user.username,
-                    source: req.session.source
+                    source: req.session.source,
+                    googleAnalyticsUniqueId: googleAnalyticsUniqueId
                   });
 
                   return done(null, user);
