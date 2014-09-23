@@ -1,6 +1,6 @@
 {
   "name": "gitter-webapp",
-  "version": "5.2.2",
+  "version": "5.9.1",
   "dependencies": {
     "apn": {
       "version": "1.4.4",
@@ -14,12 +14,7 @@
     },
     "async": {
       "version": "0.9.0",
-<<<<<<< HEAD
-      "from": "https://registry.npmjs.org/async/-/async-0.9.0.tgz",
-      "resolved": "https://registry.npmjs.org/async/-/async-0.9.0.tgz"
-=======
       "from": "async@~0.9.0"
->>>>>>> Get email from commits
     },
     "batch-stream": {
       "version": "0.1.0",
@@ -64,7 +59,7 @@
           "from": "redis@0.10.x"
         },
         "debug": {
-          "version": "1.0.4",
+          "version": "2.0.0",
           "from": "debug@*",
           "dependencies": {
             "ms": {
@@ -81,11 +76,7 @@
     },
     "csprng": {
       "version": "0.1.1",
-<<<<<<< HEAD
-      "from": "csprng@",
-=======
       "from": "csprng@^0.1.1",
->>>>>>> Get email from commits
       "dependencies": {
         "sequin": {
           "version": "0.1.0",
@@ -104,11 +95,13 @@
           "dependencies": {
             "bson": {
               "version": "0.2.5",
-              "from": "bson@0.2.5"
+              "from": "bson@0.2.5",
+              "resolved": "https://registry.npmjs.org/bson/-/bson-0.2.5.tgz"
             },
             "kerberos": {
               "version": "0.0.3",
-              "from": "kerberos@0.0.3"
+              "from": "kerberos@0.0.3",
+              "resolved": "https://registry.npmjs.org/kerberos/-/kerberos-0.0.3.tgz"
             }
           }
         },
@@ -191,45 +184,6 @@
     },
     "email-validator": {
       "version": "1.0.1",
-<<<<<<< HEAD
-      "from": "https://registry.npmjs.org/email-validator/-/email-validator-1.0.1.tgz",
-      "resolved": "https://registry.npmjs.org/email-validator/-/email-validator-1.0.1.tgz"
-    },
-    "emailify": {
-      "version": "0.0.2",
-      "from": "https://registry.npmjs.org/emailify/-/emailify-0.0.2.tgz",
-      "resolved": "https://registry.npmjs.org/emailify/-/emailify-0.0.2.tgz",
-      "dependencies": {
-        "outcome": {
-          "version": "0.0.18",
-          "from": "https://registry.npmjs.org/outcome/-/outcome-0.0.18.tgz",
-          "resolved": "https://registry.npmjs.org/outcome/-/outcome-0.0.18.tgz"
-        },
-        "jsdom": {
-          "version": "0.2.19",
-          "from": "https://registry.npmjs.org/jsdom/-/jsdom-0.2.19.tgz",
-          "resolved": "https://registry.npmjs.org/jsdom/-/jsdom-0.2.19.tgz",
-          "dependencies": {
-            "htmlparser": {
-              "version": "1.7.7",
-              "from": "https://registry.npmjs.org/htmlparser/-/htmlparser-1.7.7.tgz",
-              "resolved": "https://registry.npmjs.org/htmlparser/-/htmlparser-1.7.7.tgz"
-            },
-            "cssom": {
-              "version": "0.2.5",
-              "from": "https://registry.npmjs.org/cssom/-/cssom-0.2.5.tgz",
-              "resolved": "https://registry.npmjs.org/cssom/-/cssom-0.2.5.tgz"
-            },
-            "cssstyle": {
-              "version": "0.2.14",
-              "from": "https://registry.npmjs.org/cssstyle/-/cssstyle-0.2.14.tgz",
-              "resolved": "https://registry.npmjs.org/cssstyle/-/cssstyle-0.2.14.tgz",
-              "dependencies": {
-                "cssom": {
-                  "version": "0.3.0",
-                  "from": "https://registry.npmjs.org/cssom/-/cssom-0.3.0.tgz",
-                  "resolved": "https://registry.npmjs.org/cssom/-/cssom-0.3.0.tgz"
-=======
       "from": "email-validator@^1.0.0"
     },
     "emailify": {
@@ -259,26 +213,11 @@
                 "cssom": {
                   "version": "0.3.0",
                   "from": "cssom@0.3.x"
->>>>>>> Get email from commits
                 }
               }
             },
             "contextify": {
               "version": "0.1.8",
-<<<<<<< HEAD
-              "from": "https://registry.npmjs.org/contextify/-/contextify-0.1.8.tgz",
-              "resolved": "https://registry.npmjs.org/contextify/-/contextify-0.1.8.tgz",
-              "dependencies": {
-                "bindings": {
-                  "version": "1.2.1",
-                  "from": "https://registry.npmjs.org/bindings/-/bindings-1.2.1.tgz",
-                  "resolved": "https://registry.npmjs.org/bindings/-/bindings-1.2.1.tgz"
-                },
-                "nan": {
-                  "version": "1.0.0",
-                  "from": "https://registry.npmjs.org/nan/-/nan-1.0.0.tgz",
-                  "resolved": "https://registry.npmjs.org/nan/-/nan-1.0.0.tgz"
-=======
               "from": "contextify@0.1.x",
               "dependencies": {
                 "bindings": {
@@ -288,7 +227,6 @@
                 "nan": {
                   "version": "1.0.0",
                   "from": "nan@~1.0.0"
->>>>>>> Get email from commits
                 }
               }
             }
@@ -296,40 +234,16 @@
         },
         "optimist": {
           "version": "0.3.7",
-<<<<<<< HEAD
-          "from": "https://registry.npmjs.org/optimist/-/optimist-0.3.7.tgz",
-          "resolved": "https://registry.npmjs.org/optimist/-/optimist-0.3.7.tgz",
-          "dependencies": {
-            "wordwrap": {
-              "version": "0.0.2",
-              "from": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.2.tgz",
-              "resolved": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.2.tgz"
-=======
           "from": "optimist@~0.3.5",
           "dependencies": {
             "wordwrap": {
               "version": "0.0.2",
               "from": "wordwrap@~0.0.2"
->>>>>>> Get email from commits
             }
           }
         },
         "vows": {
           "version": "0.6.4",
-<<<<<<< HEAD
-          "from": "https://registry.npmjs.org/vows/-/vows-0.6.4.tgz",
-          "resolved": "https://registry.npmjs.org/vows/-/vows-0.6.4.tgz",
-          "dependencies": {
-            "eyes": {
-              "version": "0.1.8",
-              "from": "https://registry.npmjs.org/eyes/-/eyes-0.1.8.tgz",
-              "resolved": "https://registry.npmjs.org/eyes/-/eyes-0.1.8.tgz"
-            },
-            "diff": {
-              "version": "1.0.8",
-              "from": "https://registry.npmjs.org/diff/-/diff-1.0.8.tgz",
-              "resolved": "https://registry.npmjs.org/diff/-/diff-1.0.8.tgz"
-=======
           "from": "vows@0.6.x",
           "dependencies": {
             "eyes": {
@@ -339,57 +253,27 @@
             "diff": {
               "version": "1.0.8",
               "from": "diff@~1.0.3"
->>>>>>> Get email from commits
             }
           }
         },
         "plugin": {
           "version": "0.0.15",
-<<<<<<< HEAD
-          "from": "https://registry.npmjs.org/plugin/-/plugin-0.0.15.tgz",
-          "resolved": "https://registry.npmjs.org/plugin/-/plugin-0.0.15.tgz",
-=======
           "from": "plugin@0.0.x",
->>>>>>> Get email from commits
           "dependencies": {
             "tq": {
               "version": "0.0.1",
-              "from": "https://registry.npmjs.org/tq/-/tq-0.0.1.tgz",
+              "from": "tq@0.0.1",
               "resolved": "https://registry.npmjs.org/tq/-/tq-0.0.1.tgz"
             },
             "structr": {
               "version": "0.1.0",
-              "from": "https://registry.npmjs.org/structr/-/structr-0.1.0.tgz",
+              "from": "structr@0.1.0",
               "resolved": "https://registry.npmjs.org/structr/-/structr-0.1.0.tgz"
             }
           }
         },
         "step": {
           "version": "0.0.5",
-<<<<<<< HEAD
-          "from": "https://registry.npmjs.org/step/-/step-0.0.5.tgz",
-          "resolved": "https://registry.npmjs.org/step/-/step-0.0.5.tgz"
-        },
-        "colors": {
-          "version": "0.6.2",
-          "from": "https://registry.npmjs.org/colors/-/colors-0.6.2.tgz",
-          "resolved": "https://registry.npmjs.org/colors/-/colors-0.6.2.tgz"
-        },
-        "sprintf": {
-          "version": "0.1.3",
-          "from": "https://registry.npmjs.org/sprintf/-/sprintf-0.1.3.tgz",
-          "resolved": "https://registry.npmjs.org/sprintf/-/sprintf-0.1.3.tgz"
-        },
-        "celeri": {
-          "version": "0.2.16",
-          "from": "https://registry.npmjs.org/celeri/-/celeri-0.2.16.tgz",
-          "resolved": "https://registry.npmjs.org/celeri/-/celeri-0.2.16.tgz",
-          "dependencies": {
-            "structr": {
-              "version": "0.2.4",
-              "from": "https://registry.npmjs.org/structr/-/structr-0.2.4.tgz",
-              "resolved": "https://registry.npmjs.org/structr/-/structr-0.2.4.tgz"
-=======
           "from": "step@0.0.x"
         },
         "colors": {
@@ -407,29 +291,14 @@
             "structr": {
               "version": "0.2.4",
               "from": "structr@0.2.x"
->>>>>>> Get email from commits
             },
             "colors": {
               "version": "0.5.1",
-              "from": "https://registry.npmjs.org/colors/-/colors-0.5.1.tgz",
+              "from": "colors@0.5.1",
               "resolved": "https://registry.npmjs.org/colors/-/colors-0.5.1.tgz"
             },
             "tq": {
               "version": "0.1.0",
-<<<<<<< HEAD
-              "from": "https://registry.npmjs.org/tq/-/tq-0.1.0.tgz",
-              "resolved": "https://registry.npmjs.org/tq/-/tq-0.1.0.tgz"
-            },
-            "crema": {
-              "version": "0.1.5",
-              "from": "https://registry.npmjs.org/crema/-/crema-0.1.5.tgz",
-              "resolved": "https://registry.npmjs.org/crema/-/crema-0.1.5.tgz",
-              "dependencies": {
-                "strscanner": {
-                  "version": "0.0.8",
-                  "from": "https://registry.npmjs.org/strscanner/-/strscanner-0.0.8.tgz",
-                  "resolved": "https://registry.npmjs.org/strscanner/-/strscanner-0.0.8.tgz"
-=======
               "from": "tq@<=0.1.0"
             },
             "crema": {
@@ -439,26 +308,11 @@
                 "strscanner": {
                   "version": "0.0.8",
                   "from": "strscanner@0.0.x"
->>>>>>> Get email from commits
                 }
               }
             },
             "beanpoll": {
               "version": "0.2.19",
-<<<<<<< HEAD
-              "from": "https://registry.npmjs.org/beanpoll/-/beanpoll-0.2.19.tgz",
-              "resolved": "https://registry.npmjs.org/beanpoll/-/beanpoll-0.2.19.tgz",
-              "dependencies": {
-                "dolce": {
-                  "version": "0.0.14",
-                  "from": "https://registry.npmjs.org/dolce/-/dolce-0.0.14.tgz",
-                  "resolved": "https://registry.npmjs.org/dolce/-/dolce-0.0.14.tgz",
-                  "dependencies": {
-                    "sift": {
-                      "version": "0.0.18",
-                      "from": "https://registry.npmjs.org/sift/-/sift-0.0.18.tgz",
-                      "resolved": "https://registry.npmjs.org/sift/-/sift-0.0.18.tgz"
-=======
               "from": "beanpoll@<0.3.0",
               "dependencies": {
                 "dolce": {
@@ -468,39 +322,22 @@
                     "sift": {
                       "version": "0.0.18",
                       "from": "sift@*"
->>>>>>> Get email from commits
                     }
                   }
                 },
                 "comerr": {
-<<<<<<< HEAD
-                  "version": "0.0.6",
-                  "from": "https://registry.npmjs.org/comerr/-/comerr-0.0.6.tgz",
-                  "resolved": "https://registry.npmjs.org/comerr/-/comerr-0.0.6.tgz"
-=======
                   "version": "0.0.7",
                   "from": "comerr@0.0.x"
->>>>>>> Get email from commits
                 }
               }
             },
             "disposable": {
               "version": "0.0.5",
-<<<<<<< HEAD
-              "from": "https://registry.npmjs.org/disposable/-/disposable-0.0.5.tgz",
-              "resolved": "https://registry.npmjs.org/disposable/-/disposable-0.0.5.tgz"
-            },
-            "underscore": {
-              "version": "1.2.4",
-              "from": "https://registry.npmjs.org/underscore/-/underscore-1.2.4.tgz",
-              "resolved": "https://registry.npmjs.org/underscore/-/underscore-1.2.4.tgz"
-=======
               "from": "disposable@<0.2.0"
             },
             "underscore": {
               "version": "1.2.4",
               "from": "underscore@1.2.x"
->>>>>>> Get email from commits
             }
           }
         }
@@ -1069,59 +906,25 @@
     },
     "express-hbs": {
       "version": "0.7.11",
-<<<<<<< HEAD
-      "from": "https://registry.npmjs.org/express-hbs/-/express-hbs-0.7.11.tgz",
-      "resolved": "https://registry.npmjs.org/express-hbs/-/express-hbs-0.7.11.tgz",
-=======
       "from": "express-hbs@^0.7.9",
->>>>>>> Get email from commits
       "dependencies": {
         "handlebars": {
-          "version": "2.0.0-alpha.4",
-          "from": "https://registry.npmjs.org/handlebars/-/handlebars-2.0.0-alpha.4.tgz",
-          "resolved": "https://registry.npmjs.org/handlebars/-/handlebars-2.0.0-alpha.4.tgz",
+          "version": "2.0.0",
+          "from": "handlebars@^2.0.0",
+          "resolved": "https://registry.npmjs.org/handlebars/-/handlebars-2.0.0.tgz",
           "dependencies": {
             "optimist": {
               "version": "0.3.7",
-<<<<<<< HEAD
-              "from": "https://registry.npmjs.org/optimist/-/optimist-0.3.7.tgz",
-              "resolved": "https://registry.npmjs.org/optimist/-/optimist-0.3.7.tgz",
-              "dependencies": {
-                "wordwrap": {
-                  "version": "0.0.2",
-                  "from": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.2.tgz",
-                  "resolved": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.2.tgz"
-=======
               "from": "optimist@~0.3",
               "dependencies": {
                 "wordwrap": {
                   "version": "0.0.2",
                   "from": "wordwrap@~0.0.2"
->>>>>>> Get email from commits
                 }
               }
             },
             "uglify-js": {
               "version": "2.3.6",
-<<<<<<< HEAD
-              "from": "https://registry.npmjs.org/uglify-js/-/uglify-js-2.3.6.tgz",
-              "resolved": "https://registry.npmjs.org/uglify-js/-/uglify-js-2.3.6.tgz",
-              "dependencies": {
-                "async": {
-                  "version": "0.2.10",
-                  "from": "https://registry.npmjs.org/async/-/async-0.2.10.tgz",
-                  "resolved": "https://registry.npmjs.org/async/-/async-0.2.10.tgz"
-                },
-                "source-map": {
-                  "version": "0.1.38",
-                  "from": "https://registry.npmjs.org/source-map/-/source-map-0.1.38.tgz",
-                  "resolved": "https://registry.npmjs.org/source-map/-/source-map-0.1.38.tgz",
-                  "dependencies": {
-                    "amdefine": {
-                      "version": "0.1.0",
-                      "from": "https://registry.npmjs.org/amdefine/-/amdefine-0.1.0.tgz",
-                      "resolved": "https://registry.npmjs.org/amdefine/-/amdefine-0.1.0.tgz"
-=======
               "from": "uglify-js@~2.3",
               "dependencies": {
                 "async": {
@@ -1135,7 +938,6 @@
                     "amdefine": {
                       "version": "0.1.0",
                       "from": "amdefine@>=0.0.4"
->>>>>>> Get email from commits
                     }
                   }
                 }
@@ -1145,25 +947,6 @@
         },
         "js-beautify": {
           "version": "1.4.2",
-<<<<<<< HEAD
-          "from": "https://registry.npmjs.org/js-beautify/-/js-beautify-1.4.2.tgz",
-          "resolved": "https://registry.npmjs.org/js-beautify/-/js-beautify-1.4.2.tgz",
-          "dependencies": {
-            "config-chain": {
-              "version": "1.1.8",
-              "from": "https://registry.npmjs.org/config-chain/-/config-chain-1.1.8.tgz",
-              "resolved": "https://registry.npmjs.org/config-chain/-/config-chain-1.1.8.tgz",
-              "dependencies": {
-                "proto-list": {
-                  "version": "1.2.3",
-                  "from": "https://registry.npmjs.org/proto-list/-/proto-list-1.2.3.tgz",
-                  "resolved": "https://registry.npmjs.org/proto-list/-/proto-list-1.2.3.tgz"
-                },
-                "ini": {
-                  "version": "1.2.1",
-                  "from": "https://registry.npmjs.org/ini/-/ini-1.2.1.tgz",
-                  "resolved": "https://registry.npmjs.org/ini/-/ini-1.2.1.tgz"
-=======
           "from": "js-beautify@~1.4.2",
           "dependencies": {
             "config-chain": {
@@ -1177,26 +960,11 @@
                 "ini": {
                   "version": "1.2.1",
                   "from": "ini@1"
->>>>>>> Get email from commits
                 }
               }
             },
             "mkdirp": {
               "version": "0.3.5",
-<<<<<<< HEAD
-              "from": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.3.5.tgz",
-              "resolved": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.3.5.tgz"
-            },
-            "nopt": {
-              "version": "2.1.2",
-              "from": "https://registry.npmjs.org/nopt/-/nopt-2.1.2.tgz",
-              "resolved": "https://registry.npmjs.org/nopt/-/nopt-2.1.2.tgz",
-              "dependencies": {
-                "abbrev": {
-                  "version": "1.0.5",
-                  "from": "https://registry.npmjs.org/abbrev/-/abbrev-1.0.5.tgz",
-                  "resolved": "https://registry.npmjs.org/abbrev/-/abbrev-1.0.5.tgz"
-=======
               "from": "mkdirp@0.3.5"
             },
             "nopt": {
@@ -1206,7 +974,6 @@
                 "abbrev": {
                   "version": "1.0.5",
                   "from": "abbrev@1"
->>>>>>> Get email from commits
                 }
               }
             }
@@ -1214,30 +981,6 @@
         },
         "readdirp": {
           "version": "0.3.3",
-<<<<<<< HEAD
-          "from": "https://registry.npmjs.org/readdirp/-/readdirp-0.3.3.tgz",
-          "resolved": "https://registry.npmjs.org/readdirp/-/readdirp-0.3.3.tgz",
-          "dependencies": {
-            "graceful-fs": {
-              "version": "2.0.3",
-              "from": "https://registry.npmjs.org/graceful-fs/-/graceful-fs-2.0.3.tgz",
-              "resolved": "https://registry.npmjs.org/graceful-fs/-/graceful-fs-2.0.3.tgz"
-            },
-            "minimatch": {
-              "version": "0.2.14",
-              "from": "https://registry.npmjs.org/minimatch/-/minimatch-0.2.14.tgz",
-              "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-0.2.14.tgz",
-              "dependencies": {
-                "lru-cache": {
-                  "version": "2.5.0",
-                  "from": "https://registry.npmjs.org/lru-cache/-/lru-cache-2.5.0.tgz",
-                  "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-2.5.0.tgz"
-                },
-                "sigmund": {
-                  "version": "1.0.0",
-                  "from": "https://registry.npmjs.org/sigmund/-/sigmund-1.0.0.tgz",
-                  "resolved": "https://registry.npmjs.org/sigmund/-/sigmund-1.0.0.tgz"
-=======
           "from": "readdirp@~0.3.1",
           "dependencies": {
             "graceful-fs": {
@@ -1255,7 +998,6 @@
                 "sigmund": {
                   "version": "1.0.0",
                   "from": "sigmund@~1.0.0"
->>>>>>> Get email from commits
                 }
               }
             }
@@ -1278,7 +1020,7 @@
           "resolved": "https://registry.npmjs.org/methods/-/methods-0.0.1.tgz"
         },
         "debug": {
-          "version": "1.0.4",
+          "version": "2.0.0",
           "from": "debug@*",
           "dependencies": {
             "ms": {
@@ -1295,11 +1037,7 @@
       "dependencies": {
         "async": {
           "version": "0.2.10",
-<<<<<<< HEAD
-          "from": "async@~0.2"
-=======
           "from": "async@~0.2.9"
->>>>>>> Get email from commits
         },
         "glob": {
           "version": "3.2.11",
@@ -1307,11 +1045,7 @@
           "dependencies": {
             "inherits": {
               "version": "2.0.1",
-<<<<<<< HEAD
-              "from": "inherits@2"
-=======
               "from": "inherits@~2.0.1"
->>>>>>> Get email from commits
             },
             "minimatch": {
               "version": "0.3.0",
@@ -1348,11 +1082,7 @@
     },
     "faye-websocket": {
       "version": "0.7.2",
-<<<<<<< HEAD
-      "from": "faye-websocket@",
-=======
       "from": "faye-websocket@^0.7.2",
->>>>>>> Get email from commits
       "dependencies": {
         "websocket-driver": {
           "version": "0.3.5",
@@ -1361,15 +1091,9 @@
       }
     },
     "gitter-env": {
-<<<<<<< HEAD
-      "version": "0.13.0",
-      "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.13.0",
-      "resolved": "git+ssh://git@github.com:gitterHQ/gitter-env.git#fee8625e7d776c6fff14175d5a684b2e4a276b1f",
-=======
       "version": "0.12.1",
       "from": "gitter-env@git+ssh://git@github.com:gitterHQ/gitter-env.git#71a65a31bcdbf99bd99dde5178798753a2379646",
       "resolved": "git+ssh://git@github.com:gitterHQ/gitter-env.git#71a65a31bcdbf99bd99dde5178798753a2379646",
->>>>>>> Get email from commits
       "dependencies": {
         "async": {
           "version": "0.8.0",
@@ -1392,11 +1116,7 @@
               "from": "async@0.2.9"
             },
             "ini": {
-<<<<<<< HEAD
-              "version": "1.3.0",
-=======
               "version": "1.2.1",
->>>>>>> Get email from commits
               "from": "ini@1.x.x"
             },
             "optimist": {
@@ -1447,7 +1167,8 @@
       "dependencies": {
         "require-all": {
           "version": "0.0.8",
-          "from": "require-all@0.0.8"
+          "from": "require-all@0.0.8",
+          "resolved": "https://registry.npmjs.org/require-all/-/require-all-0.0.8.tgz"
         },
         "qs": {
           "version": "1.2.2",
@@ -1482,11 +1203,7 @@
               "from": "async@~0.2.6"
             },
             "source-map": {
-<<<<<<< HEAD
-              "version": "0.1.37",
-=======
               "version": "0.1.38",
->>>>>>> Get email from commits
               "from": "source-map@~0.1.7",
               "dependencies": {
                 "amdefine": {
@@ -1501,12 +1218,7 @@
     },
     "heapdump": {
       "version": "0.2.10",
-<<<<<<< HEAD
-      "from": "https://registry.npmjs.org/heapdump/-/heapdump-0.2.10.tgz",
-      "resolved": "https://registry.npmjs.org/heapdump/-/heapdump-0.2.10.tgz"
-=======
       "from": "heapdump@^0.2.9"
->>>>>>> Get email from commits
     },
     "highlight.js": {
       "version": "8.1.0-gitter",
@@ -1515,7 +1227,7 @@
     },
     "htmlencode": {
       "version": "0.0.4",
-      "from": "htmlencode@",
+      "from": "htmlencode@0.0.4",
       "resolved": "https://registry.npmjs.org/htmlencode/-/htmlencode-0.0.4.tgz"
     },
     "i18n": {
@@ -1523,15 +1235,11 @@
       "from": "i18n@~0.4.1",
       "dependencies": {
         "sprintf": {
-<<<<<<< HEAD
-          "version": "0.1.3",
-=======
           "version": "0.1.4",
->>>>>>> Get email from commits
           "from": "sprintf@>=0.1.1"
         },
         "debug": {
-          "version": "1.0.4",
+          "version": "2.0.0",
           "from": "debug@*",
           "dependencies": {
             "ms": {
@@ -1547,11 +1255,7 @@
       "from": "i18n-2@^0.4.6",
       "dependencies": {
         "sprintf": {
-<<<<<<< HEAD
-          "version": "0.1.3",
-=======
           "version": "0.1.4",
->>>>>>> Get email from commits
           "from": "sprintf@>=0.1.1"
         }
       }
@@ -1563,57 +1267,28 @@
     },
     "intercom.io": {
       "version": "0.0.8",
-<<<<<<< HEAD
-      "from": "https://registry.npmjs.org/intercom.io/-/intercom.io-0.0.8.tgz",
-      "resolved": "https://registry.npmjs.org/intercom.io/-/intercom.io-0.0.8.tgz",
-=======
       "from": "intercom.io@~0.0.8",
->>>>>>> Get email from commits
       "dependencies": {
         "request": {
           "version": "2.34.0",
-          "from": "https://registry.npmjs.org/request/-/request-2.34.0.tgz",
+          "from": "request@2.34.0",
           "resolved": "https://registry.npmjs.org/request/-/request-2.34.0.tgz",
           "dependencies": {
             "json-stringify-safe": {
               "version": "5.0.0",
-<<<<<<< HEAD
-              "from": "https://registry.npmjs.org/json-stringify-safe/-/json-stringify-safe-5.0.0.tgz",
-              "resolved": "https://registry.npmjs.org/json-stringify-safe/-/json-stringify-safe-5.0.0.tgz"
-            },
-            "forever-agent": {
-              "version": "0.5.2",
-              "from": "https://registry.npmjs.org/forever-agent/-/forever-agent-0.5.2.tgz",
-              "resolved": "https://registry.npmjs.org/forever-agent/-/forever-agent-0.5.2.tgz"
-=======
               "from": "json-stringify-safe@~5.0.0"
             },
             "forever-agent": {
               "version": "0.5.2",
               "from": "forever-agent@~0.5.0"
->>>>>>> Get email from commits
             },
             "mime": {
               "version": "1.2.11",
-              "from": "https://registry.npmjs.org/mime/-/mime-1.2.11.tgz",
+              "from": "mime@~1.2.9",
               "resolved": "https://registry.npmjs.org/mime/-/mime-1.2.11.tgz"
             },
             "form-data": {
               "version": "0.1.4",
-<<<<<<< HEAD
-              "from": "https://registry.npmjs.org/form-data/-/form-data-0.1.4.tgz",
-              "resolved": "https://registry.npmjs.org/form-data/-/form-data-0.1.4.tgz",
-              "dependencies": {
-                "combined-stream": {
-                  "version": "0.0.5",
-                  "from": "https://registry.npmjs.org/combined-stream/-/combined-stream-0.0.5.tgz",
-                  "resolved": "https://registry.npmjs.org/combined-stream/-/combined-stream-0.0.5.tgz",
-                  "dependencies": {
-                    "delayed-stream": {
-                      "version": "0.0.5",
-                      "from": "https://registry.npmjs.org/delayed-stream/-/delayed-stream-0.0.5.tgz",
-                      "resolved": "https://registry.npmjs.org/delayed-stream/-/delayed-stream-0.0.5.tgz"
-=======
               "from": "form-data@~0.1.0",
               "dependencies": {
                 "combined-stream": {
@@ -1623,7 +1298,6 @@
                     "delayed-stream": {
                       "version": "0.0.5",
                       "from": "delayed-stream@0.0.5"
->>>>>>> Get email from commits
                     }
                   }
                 }
@@ -1631,30 +1305,6 @@
             },
             "tunnel-agent": {
               "version": "0.3.0",
-<<<<<<< HEAD
-              "from": "https://registry.npmjs.org/tunnel-agent/-/tunnel-agent-0.3.0.tgz",
-              "resolved": "https://registry.npmjs.org/tunnel-agent/-/tunnel-agent-0.3.0.tgz"
-            },
-            "http-signature": {
-              "version": "0.10.0",
-              "from": "https://registry.npmjs.org/http-signature/-/http-signature-0.10.0.tgz",
-              "resolved": "https://registry.npmjs.org/http-signature/-/http-signature-0.10.0.tgz",
-              "dependencies": {
-                "assert-plus": {
-                  "version": "0.1.2",
-                  "from": "https://registry.npmjs.org/assert-plus/-/assert-plus-0.1.2.tgz",
-                  "resolved": "https://registry.npmjs.org/assert-plus/-/assert-plus-0.1.2.tgz"
-                },
-                "asn1": {
-                  "version": "0.1.11",
-                  "from": "https://registry.npmjs.org/asn1/-/asn1-0.1.11.tgz",
-                  "resolved": "https://registry.npmjs.org/asn1/-/asn1-0.1.11.tgz"
-                },
-                "ctype": {
-                  "version": "0.5.2",
-                  "from": "https://registry.npmjs.org/ctype/-/ctype-0.5.2.tgz",
-                  "resolved": "https://registry.npmjs.org/ctype/-/ctype-0.5.2.tgz"
-=======
               "from": "tunnel-agent@~0.3.0"
             },
             "http-signature": {
@@ -1672,41 +1322,11 @@
                 "ctype": {
                   "version": "0.5.2",
                   "from": "ctype@0.5.2"
->>>>>>> Get email from commits
                 }
               }
             },
             "oauth-sign": {
               "version": "0.3.0",
-<<<<<<< HEAD
-              "from": "https://registry.npmjs.org/oauth-sign/-/oauth-sign-0.3.0.tgz",
-              "resolved": "https://registry.npmjs.org/oauth-sign/-/oauth-sign-0.3.0.tgz"
-            },
-            "hawk": {
-              "version": "1.0.0",
-              "from": "https://registry.npmjs.org/hawk/-/hawk-1.0.0.tgz",
-              "resolved": "https://registry.npmjs.org/hawk/-/hawk-1.0.0.tgz",
-              "dependencies": {
-                "hoek": {
-                  "version": "0.9.1",
-                  "from": "https://registry.npmjs.org/hoek/-/hoek-0.9.1.tgz",
-                  "resolved": "https://registry.npmjs.org/hoek/-/hoek-0.9.1.tgz"
-                },
-                "boom": {
-                  "version": "0.4.2",
-                  "from": "https://registry.npmjs.org/boom/-/boom-0.4.2.tgz",
-                  "resolved": "https://registry.npmjs.org/boom/-/boom-0.4.2.tgz"
-                },
-                "cryptiles": {
-                  "version": "0.2.2",
-                  "from": "https://registry.npmjs.org/cryptiles/-/cryptiles-0.2.2.tgz",
-                  "resolved": "https://registry.npmjs.org/cryptiles/-/cryptiles-0.2.2.tgz"
-                },
-                "sntp": {
-                  "version": "0.2.4",
-                  "from": "https://registry.npmjs.org/sntp/-/sntp-0.2.4.tgz",
-                  "resolved": "https://registry.npmjs.org/sntp/-/sntp-0.2.4.tgz"
-=======
               "from": "oauth-sign@~0.3.0"
             },
             "hawk": {
@@ -1728,42 +1348,28 @@
                 "sntp": {
                   "version": "0.2.4",
                   "from": "sntp@0.2.x"
->>>>>>> Get email from commits
                 }
               }
             },
             "aws-sign2": {
               "version": "0.5.0",
-<<<<<<< HEAD
-              "from": "https://registry.npmjs.org/aws-sign2/-/aws-sign2-0.5.0.tgz",
-              "resolved": "https://registry.npmjs.org/aws-sign2/-/aws-sign2-0.5.0.tgz"
-=======
               "from": "aws-sign2@~0.5.0"
->>>>>>> Get email from commits
             }
           }
         },
         "qs": {
           "version": "0.6.6",
-<<<<<<< HEAD
-          "from": "https://registry.npmjs.org/qs/-/qs-0.6.6.tgz",
-=======
           "from": "qs@~0.6.0",
->>>>>>> Get email from commits
           "resolved": "https://registry.npmjs.org/qs/-/qs-0.6.6.tgz"
         },
         "lodash": {
           "version": "2.4.1",
-<<<<<<< HEAD
-          "from": "https://registry.npmjs.org/lodash/-/lodash-2.4.1.tgz",
-=======
           "from": "lodash@~2.4.1",
->>>>>>> Get email from commits
           "resolved": "https://registry.npmjs.org/lodash/-/lodash-2.4.1.tgz"
         },
         "debug": {
           "version": "0.8.1",
-          "from": "https://registry.npmjs.org/debug/-/debug-0.8.1.tgz",
+          "from": "debug@0.8.1",
           "resolved": "https://registry.npmjs.org/debug/-/debug-0.8.1.tgz"
         }
       }
@@ -1790,14 +1396,6 @@
     "jwt-simple": {
       "version": "0.1.0",
       "from": "jwt-simple@~0.1.0"
-<<<<<<< HEAD
-    },
-    "katex": {
-      "version": "0.1.0",
-      "from": "katex@",
-      "resolved": "https://registry.npmjs.org/katex/-/katex-0.1.0.tgz"
-=======
->>>>>>> Get email from commits
     },
     "keyword-extractor": {
       "version": "0.0.9",
@@ -1824,18 +1422,6 @@
     "lazy.js": {
       "version": "0.2.1",
       "from": "lazy.js@~0.2.1"
-<<<<<<< HEAD
-    },
-    "locale": {
-      "version": "0.0.17",
-      "from": "locale@"
-    },
-    "mandrill-api": {
-      "version": "1.0.40",
-      "from": "mandrill-api@1.0.40",
-      "resolved": "https://registry.npmjs.org/mandrill-api/-/mandrill-api-1.0.40.tgz"
-=======
->>>>>>> Get email from commits
     },
     "memwatch": {
       "version": "0.2.2",
@@ -1903,69 +1489,69 @@
     },
     "mongoose": {
       "version": "3.8.8",
-      "from": "https://registry.npmjs.org/mongoose/-/mongoose-3.8.8.tgz",
+      "from": "mongoose@3.8.8",
       "resolved": "https://registry.npmjs.org/mongoose/-/mongoose-3.8.8.tgz",
       "dependencies": {
         "hooks": {
           "version": "0.2.1",
-          "from": "https://registry.npmjs.org/hooks/-/hooks-0.2.1.tgz",
+          "from": "hooks@0.2.1",
           "resolved": "https://registry.npmjs.org/hooks/-/hooks-0.2.1.tgz"
         },
         "mongodb": {
           "version": "1.3.23",
-          "from": "https://registry.npmjs.org/mongodb/-/mongodb-1.3.23.tgz",
+          "from": "mongodb@~1.3.18",
           "resolved": "https://registry.npmjs.org/mongodb/-/mongodb-1.3.23.tgz",
           "dependencies": {
             "bson": {
               "version": "0.2.5",
-              "from": "https://registry.npmjs.org/bson/-/bson-0.2.5.tgz",
+              "from": "bson@0.2.5",
               "resolved": "https://registry.npmjs.org/bson/-/bson-0.2.5.tgz"
             },
             "kerberos": {
               "version": "0.0.3",
-              "from": "https://registry.npmjs.org/kerberos/-/kerberos-0.0.3.tgz",
+              "from": "kerberos@0.0.3",
               "resolved": "https://registry.npmjs.org/kerberos/-/kerberos-0.0.3.tgz"
             }
           }
         },
         "ms": {
           "version": "0.1.0",
-          "from": "https://registry.npmjs.org/ms/-/ms-0.1.0.tgz",
+          "from": "ms@0.1.0",
           "resolved": "https://registry.npmjs.org/ms/-/ms-0.1.0.tgz"
         },
         "sliced": {
           "version": "0.0.5",
-          "from": "https://registry.npmjs.org/sliced/-/sliced-0.0.5.tgz",
+          "from": "sliced@0.0.5",
           "resolved": "https://registry.npmjs.org/sliced/-/sliced-0.0.5.tgz"
         },
         "muri": {
           "version": "0.3.1",
-          "from": "https://registry.npmjs.org/muri/-/muri-0.3.1.tgz",
+          "from": "muri@0.3.1",
           "resolved": "https://registry.npmjs.org/muri/-/muri-0.3.1.tgz"
         },
         "mpromise": {
           "version": "0.4.3",
-          "from": "https://registry.npmjs.org/mpromise/-/mpromise-0.4.3.tgz",
+          "from": "mpromise@0.4.3",
           "resolved": "https://registry.npmjs.org/mpromise/-/mpromise-0.4.3.tgz"
         },
         "mpath": {
           "version": "0.1.1",
-          "from": "https://registry.npmjs.org/mpath/-/mpath-0.1.1.tgz",
+          "from": "mpath@0.1.1",
           "resolved": "https://registry.npmjs.org/mpath/-/mpath-0.1.1.tgz"
         },
         "regexp-clone": {
           "version": "0.0.1",
-          "from": "https://registry.npmjs.org/regexp-clone/-/regexp-clone-0.0.1.tgz",
+          "from": "regexp-clone@0.0.1",
           "resolved": "https://registry.npmjs.org/regexp-clone/-/regexp-clone-0.0.1.tgz"
         },
         "mquery": {
           "version": "0.5.3",
-          "from": "https://registry.npmjs.org/mquery/-/mquery-0.5.3.tgz",
+          "from": "mquery@0.5.3",
           "resolved": "https://registry.npmjs.org/mquery/-/mquery-0.5.3.tgz",
           "dependencies": {
             "debug": {
               "version": "0.7.4",
-              "from": "https://registry.npmjs.org/debug/-/debug-0.7.4.tgz",
+              "from": "debug@0.7.4",
               "resolved": "https://registry.npmjs.org/debug/-/debug-0.7.4.tgz"
             }
           }
@@ -1984,21 +1570,11 @@
     },
     "node-resque": {
       "version": "0.8.7",
-<<<<<<< HEAD
-      "from": "https://registry.npmjs.org/node-resque/-/node-resque-0.8.7.tgz",
-      "resolved": "https://registry.npmjs.org/node-resque/-/node-resque-0.8.7.tgz",
-      "dependencies": {
-        "redis": {
-          "version": "0.10.3",
-          "from": "https://registry.npmjs.org/redis/-/redis-0.10.3.tgz",
-          "resolved": "https://registry.npmjs.org/redis/-/redis-0.10.3.tgz"
-=======
       "from": "node-resque@^0.8.3",
       "dependencies": {
         "redis": {
           "version": "0.10.3",
           "from": "redis@~0.10.3"
->>>>>>> Get email from commits
         }
       }
     },
@@ -2022,7 +1598,7 @@
           "from": "mailcomposer@>= 0.1.11",
           "dependencies": {
             "mimelib": {
-              "version": "0.2.16",
+              "version": "0.2.17",
               "from": "mimelib@~0.2.15",
               "dependencies": {
                 "encoding": {
@@ -2043,11 +1619,7 @@
             },
             "mime": {
               "version": "1.2.11",
-<<<<<<< HEAD
-              "from": "mime@~1.2.7"
-=======
               "from": "mime@~1.2.11"
->>>>>>> Get email from commits
             },
             "he": {
               "version": "0.3.6",
@@ -2293,7 +1865,8 @@
         },
         "cookie": {
           "version": "0.1.0",
-          "from": "cookie@0.1.0"
+          "from": "cookie@0.1.0",
+          "resolved": "https://registry.npmjs.org/cookie/-/cookie-0.1.0.tgz"
         }
       }
     },
@@ -2330,45 +1903,6 @@
     },
     "request": {
       "version": "2.40.0",
-<<<<<<< HEAD
-      "from": "https://registry.npmjs.org/request/-/request-2.40.0.tgz",
-      "resolved": "https://registry.npmjs.org/request/-/request-2.40.0.tgz",
-      "dependencies": {
-        "qs": {
-          "version": "1.0.2",
-          "from": "https://registry.npmjs.org/qs/-/qs-1.0.2.tgz",
-          "resolved": "https://registry.npmjs.org/qs/-/qs-1.0.2.tgz"
-        },
-        "json-stringify-safe": {
-          "version": "5.0.0",
-          "from": "https://registry.npmjs.org/json-stringify-safe/-/json-stringify-safe-5.0.0.tgz",
-          "resolved": "https://registry.npmjs.org/json-stringify-safe/-/json-stringify-safe-5.0.0.tgz"
-        },
-        "mime-types": {
-          "version": "1.0.2",
-          "from": "https://registry.npmjs.org/mime-types/-/mime-types-1.0.2.tgz",
-          "resolved": "https://registry.npmjs.org/mime-types/-/mime-types-1.0.2.tgz"
-        },
-        "forever-agent": {
-          "version": "0.5.2",
-          "from": "https://registry.npmjs.org/forever-agent/-/forever-agent-0.5.2.tgz",
-          "resolved": "https://registry.npmjs.org/forever-agent/-/forever-agent-0.5.2.tgz"
-        },
-        "form-data": {
-          "version": "0.1.4",
-          "from": "https://registry.npmjs.org/form-data/-/form-data-0.1.4.tgz",
-          "resolved": "https://registry.npmjs.org/form-data/-/form-data-0.1.4.tgz",
-          "dependencies": {
-            "combined-stream": {
-              "version": "0.0.5",
-              "from": "https://registry.npmjs.org/combined-stream/-/combined-stream-0.0.5.tgz",
-              "resolved": "https://registry.npmjs.org/combined-stream/-/combined-stream-0.0.5.tgz",
-              "dependencies": {
-                "delayed-stream": {
-                  "version": "0.0.5",
-                  "from": "https://registry.npmjs.org/delayed-stream/-/delayed-stream-0.0.5.tgz",
-                  "resolved": "https://registry.npmjs.org/delayed-stream/-/delayed-stream-0.0.5.tgz"
-=======
       "from": "request@~2.40.0",
       "dependencies": {
         "qs": {
@@ -2398,52 +1932,21 @@
                 "delayed-stream": {
                   "version": "0.0.5",
                   "from": "delayed-stream@0.0.5"
->>>>>>> Get email from commits
                 }
               }
             },
             "mime": {
               "version": "1.2.11",
-<<<<<<< HEAD
-              "from": "https://registry.npmjs.org/mime/-/mime-1.2.11.tgz",
-              "resolved": "https://registry.npmjs.org/mime/-/mime-1.2.11.tgz"
-            },
-            "async": {
-              "version": "0.9.0",
-              "from": "https://registry.npmjs.org/async/-/async-0.9.0.tgz",
-              "resolved": "https://registry.npmjs.org/async/-/async-0.9.0.tgz"
-=======
               "from": "mime@~1.2.11"
->>>>>>> Get email from commits
             }
           }
         },
         "tunnel-agent": {
           "version": "0.4.0",
-          "from": "https://registry.npmjs.org/tunnel-agent/-/tunnel-agent-0.4.0.tgz",
-          "resolved": "https://registry.npmjs.org/tunnel-agent/-/tunnel-agent-0.4.0.tgz"
+          "from": "tunnel-agent@~0.4.0"
         },
         "http-signature": {
           "version": "0.10.0",
-<<<<<<< HEAD
-          "from": "https://registry.npmjs.org/http-signature/-/http-signature-0.10.0.tgz",
-          "resolved": "https://registry.npmjs.org/http-signature/-/http-signature-0.10.0.tgz",
-          "dependencies": {
-            "assert-plus": {
-              "version": "0.1.2",
-              "from": "https://registry.npmjs.org/assert-plus/-/assert-plus-0.1.2.tgz",
-              "resolved": "https://registry.npmjs.org/assert-plus/-/assert-plus-0.1.2.tgz"
-            },
-            "asn1": {
-              "version": "0.1.11",
-              "from": "https://registry.npmjs.org/asn1/-/asn1-0.1.11.tgz",
-              "resolved": "https://registry.npmjs.org/asn1/-/asn1-0.1.11.tgz"
-            },
-            "ctype": {
-              "version": "0.5.2",
-              "from": "https://registry.npmjs.org/ctype/-/ctype-0.5.2.tgz",
-              "resolved": "https://registry.npmjs.org/ctype/-/ctype-0.5.2.tgz"
-=======
           "from": "http-signature@~0.10.0",
           "dependencies": {
             "assert-plus": {
@@ -2457,45 +1960,19 @@
             "ctype": {
               "version": "0.5.2",
               "from": "ctype@0.5.2"
->>>>>>> Get email from commits
             }
           }
         },
         "oauth-sign": {
           "version": "0.3.0",
-<<<<<<< HEAD
-          "from": "https://registry.npmjs.org/oauth-sign/-/oauth-sign-0.3.0.tgz",
-          "resolved": "https://registry.npmjs.org/oauth-sign/-/oauth-sign-0.3.0.tgz"
-=======
           "from": "oauth-sign@~0.3.0"
->>>>>>> Get email from commits
         },
         "hawk": {
           "version": "1.1.1",
-          "from": "https://registry.npmjs.org/hawk/-/hawk-1.1.1.tgz",
-          "resolved": "https://registry.npmjs.org/hawk/-/hawk-1.1.1.tgz",
+          "from": "hawk@1.1.1",
           "dependencies": {
             "hoek": {
               "version": "0.9.1",
-<<<<<<< HEAD
-              "from": "https://registry.npmjs.org/hoek/-/hoek-0.9.1.tgz",
-              "resolved": "https://registry.npmjs.org/hoek/-/hoek-0.9.1.tgz"
-            },
-            "boom": {
-              "version": "0.4.2",
-              "from": "https://registry.npmjs.org/boom/-/boom-0.4.2.tgz",
-              "resolved": "https://registry.npmjs.org/boom/-/boom-0.4.2.tgz"
-            },
-            "cryptiles": {
-              "version": "0.2.2",
-              "from": "https://registry.npmjs.org/cryptiles/-/cryptiles-0.2.2.tgz",
-              "resolved": "https://registry.npmjs.org/cryptiles/-/cryptiles-0.2.2.tgz"
-            },
-            "sntp": {
-              "version": "0.2.4",
-              "from": "https://registry.npmjs.org/sntp/-/sntp-0.2.4.tgz",
-              "resolved": "https://registry.npmjs.org/sntp/-/sntp-0.2.4.tgz"
-=======
               "from": "hoek@0.9.x"
             },
             "boom": {
@@ -2509,23 +1986,16 @@
             "sntp": {
               "version": "0.2.4",
               "from": "sntp@0.2.x"
->>>>>>> Get email from commits
             }
           }
         },
         "aws-sign2": {
           "version": "0.5.0",
-<<<<<<< HEAD
-          "from": "https://registry.npmjs.org/aws-sign2/-/aws-sign2-0.5.0.tgz",
-          "resolved": "https://registry.npmjs.org/aws-sign2/-/aws-sign2-0.5.0.tgz"
-=======
           "from": "aws-sign2@~0.5.0"
->>>>>>> Get email from commits
         },
         "stringstream": {
           "version": "0.0.4",
-          "from": "https://registry.npmjs.org/stringstream/-/stringstream-0.0.4.tgz",
-          "resolved": "https://registry.npmjs.org/stringstream/-/stringstream-0.0.4.tgz"
+          "from": "stringstream@~0.0.4"
         }
       }
     },
@@ -2554,10 +2024,6 @@
       "version": "0.2.4",
       "from": "shutdown@^0.2.3",
       "dependencies": {
-        "async": {
-          "version": "0.9.0",
-          "from": "async@^0.9.0"
-        },
         "debug": {
           "version": "1.0.4",
           "from": "debug@^1.0.2",
@@ -2577,13 +2043,8 @@
     },
     "snappy-cache": {
       "version": "0.1.1",
-<<<<<<< HEAD
-      "from": "snappy-cache@latest",
-      "resolved": "https://registry.npmjs.org/snappy-cache/-/snappy-cache-0.0.4.tgz",
-=======
       "from": "snappy-cache@0.1.1",
       "resolved": "https://registry.npmjs.org/snappy-cache/-/snappy-cache-0.1.1.tgz",
->>>>>>> Get email from commits
       "dependencies": {
         "snappy": {
           "version": "2.1.3",
@@ -2638,17 +2099,10 @@
     },
     "tough-cookie": {
       "version": "0.12.1",
-<<<<<<< HEAD
-      "from": "tough-cookie@",
-      "dependencies": {
-        "punycode": {
-          "version": "1.3.0",
-=======
       "from": "tough-cookie@^0.12.1",
       "dependencies": {
         "punycode": {
           "version": "1.3.1",
->>>>>>> Get email from commits
           "from": "punycode@>=0.2.0"
         }
       }
@@ -2836,22 +2290,11 @@
     },
     "worker-farm": {
       "version": "1.0.1",
-<<<<<<< HEAD
-      "from": "worker-farm@latest",
-=======
       "from": "https://registry.npmjs.org/worker-farm/-/worker-farm-1.0.1.tgz",
->>>>>>> Get email from commits
       "resolved": "https://registry.npmjs.org/worker-farm/-/worker-farm-1.0.1.tgz",
       "dependencies": {
         "errno": {
           "version": "0.1.1",
-<<<<<<< HEAD
-          "from": "errno@>=0.1.1 <0.2.0-0",
-          "dependencies": {
-            "prr": {
-              "version": "0.0.0",
-              "from": "prr@~0.0.0"
-=======
           "from": "errno@0.1.1",
           "resolved": "https://registry.npmjs.org/errno/-/errno-0.1.1.tgz",
           "dependencies": {
@@ -2859,18 +2302,13 @@
               "version": "0.0.0",
               "from": "prr@0.0.0",
               "resolved": "https://registry.npmjs.org/prr/-/prr-0.0.0.tgz"
->>>>>>> Get email from commits
             }
           }
         },
         "xtend": {
           "version": "4.0.0",
-<<<<<<< HEAD
-          "from": "xtend@>=4.0.0 <4.1.0-0"
-=======
           "from": "xtend@4.0.0",
           "resolved": "https://registry.npmjs.org/xtend/-/xtend-4.0.0.tgz"
->>>>>>> Get email from commits
         }
       }
     },
@@ -2888,8 +2326,6 @@
     "xregexp": {
       "version": "2.0.0",
       "from": "xregexp@^2.0.0"
-<<<<<<< HEAD
-=======
     },
     "katex": {
       "version": "0.1.0",
@@ -2904,7 +2340,6 @@
       "version": "0.0.17",
       "from": "https://registry.npmjs.org/locale/-/locale-0.0.17.tgz",
       "resolved": "https://registry.npmjs.org/locale/-/locale-0.0.17.tgz"
->>>>>>> Get email from commits
     }
   }
 }
