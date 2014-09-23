@@ -114,15 +114,10 @@ exports.sendEmail = function(options, done) {
 function addedToRoomViaMandrill(options, done) {
   var d = Q.defer();
   var templateName = 'added-to-room';
+  var tracking = options.tracking || {};
 
   var data = options.data;
   var templateContent = [];
-  //var templateContent = [
-  //  {name: 'recipient', content: '<h1>Hello ' + data.recipientName + '!</h1>'},
-  //  {name: 'addedmsg',  content: '<p><strong>' + data.senderName + '</strong> just added you to the ' + data.roomUri + ' chat on Gitter.</p>'},
-  //  {name: 'roomurl',   content: '<td><a href="' + data.roomUrl + '" style="text-decoration: none" class="button-green">Open the room</a></td>'},
-  //  {name: 'unsub',     content: '<p>To unsubscribe from these notifications, click <a href="' + data.unsubscribeUrl + '">here</a>.</p>'}
-  //];
 
   var message = {
     subject:    options.subject,
@@ -148,6 +143,7 @@ function addedToRoomViaMandrill(options, done) {
     template_content: templateContent,
     message:          message
   }, function() {
+    stats.event(tracking.event, tracking.data);
     d.resolve();
   }, function(err) {
     d.reject(err);
@@ -159,6 +155,7 @@ function addedToRoomViaMandrill(options, done) {
 function invitationViaMandrill(options, done) {
   var d = Q.defer();
   var templateName = 'invitation';
+  var tracking = options.tracking || {};
 
   var data = options.data;
   var templateContent = [];
@@ -185,6 +182,7 @@ function invitationViaMandrill(options, done) {
     template_content: templateContent,
     message:          message
   }, function() {
+    stats.event(tracking.event, tracking.data);
     d.resolve();
   }, function(err) {
     d.reject(err);
