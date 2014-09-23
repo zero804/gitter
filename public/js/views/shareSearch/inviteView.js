@@ -10,6 +10,20 @@ define([
 ], function($, Marionette, context, TroupeViews, cdn, template, ZeroClipboard) {
   "use strict";
 
+  function createClipboard(target, text) {
+    ZeroClipboard.setMoviePath( cdn('repo/zeroclipboard/ZeroClipboard.swf') );
+    ZeroClipboard.Client.prototype.zIndex = 100000;
+    var clip = new ZeroClipboard.Client();
+    clip.setText(text);
+    clip.glue(target);
+
+    clip.addEventListener('onComplete', function() {
+      $(target).text('Copied!');
+    });
+
+    return clip;
+  }
+
   var View = Marionette.ItemView.extend({
     template: template,
     className: 'invite-view',
@@ -19,7 +33,8 @@ define([
     },
 
     events: {
-      'mouseover .copy-button' : 'createClipboard',
+      'mouseover .js-copy-link' : 'createLinkClipboard',
+      'mouseover .js-copy-markdown' : 'createMarkdownClipboard',
       'click .js-badge': 'createBadge'
     },
 
@@ -66,19 +81,16 @@ define([
       return false;
     },
 
-    createClipboard : function(ev) {
-      if(this.clip) return;
+    createLinkClipboard: function(e) {
+      if(this.linkClipboard) return;
 
-      ZeroClipboard.setMoviePath( cdn('repo/zeroclipboard/ZeroClipboard.swf') );
-      ZeroClipboard.Client.prototype.zIndex = 100000;
-      var clip = new ZeroClipboard.Client();
-      clip.setText($(ev.target).data('copy-text'));
-      clip.glue(ev.target);
-      this.clip=clip;
+      this.linkClipboard = createClipboard(e.target, this.getShareUrl());
+    },
 
-      clip.addEventListener( 'onComplete', function() {
-        $('.close').click();
-      });
+    createMarkdownClipboard: function(e) {
+      if(this.markdownClipboard) return;
+
+      this.markdownClipboard = createClipboard(e.target, this.getBadgeMD());
     },
 
     serializeData: function() {
@@ -93,7 +105,6 @@ define([
         badgeMD: this.getBadgeMD()
       };
     },
-
 
     createBadge: function() {
       var btn = this.$el.find('.js-badge')[0];
