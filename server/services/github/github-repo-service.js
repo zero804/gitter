@@ -45,6 +45,23 @@ function GitHubRepoService(user) {
 };
 
 /**
+ * 
+ */
+ GitHubRepoService.prototype.getCommits = function(repo, options) {
+  options = options || {};
+  var ghrepo = (options.firstPage ? this.firstPageClient : this.client).repo(repo, options);
+  var d = Q.defer();
+  ghrepo.commits(createClient.makeResolver(d));
+  return d.promise
+    .fail(badCredentialsCheck)
+    .fail(function(err) {
+      if(err.statusCode == 404) return;
+      throw err;
+    });
+};
+
+
+/**
  *  Returns repo stargazers
  */
  GitHubRepoService.prototype.getStargazers = function(repo) {
@@ -127,6 +144,19 @@ GitHubRepoService.prototype.getRepos = function() {
   return d.promise
     .fail(badCredentialsCheck);
 };
+
+
+GitHubRepoService.prototype.getReposForUser = function(username, options) {
+  var d = Q.defer();
+  options = options || {};
+
+  var ghme = (options.firstPage ? this.firstPageClient : this.client).user(username);
+  ghme.repos(createClient.makeResolver(d));
+
+  return d.promise
+    .fail(badCredentialsCheck);
+};
+
 
 // module.exports = GitHubRepoService;
 module.exports = wrap(GitHubRepoService, function() {
