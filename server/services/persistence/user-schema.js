@@ -8,6 +8,10 @@ var assert   = require('assert');
 var UserSchema = new Schema({
   displayName: { type: String },
   emails: [String],                            // Secondary email addresses
+  invitedEmail: { type: String },
+  inviteReminderSent: { type: Date },
+  invitedByUser: ObjectId,
+  invitedToRoom: ObjectId,
   username: { type: String, required: true },
   confirmationCode: {type: String },
   gravatarImageUrl: { type: String },
