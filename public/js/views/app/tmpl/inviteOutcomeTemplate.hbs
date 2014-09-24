@@ -1,0 +1,11 @@
+{{#if added}}
+{{login}} <span class="message">was added.</span>
+{{/if}}
+
+{{#if invited}}
+{{login}} <span class="message">has been invited to Gitter.</span>
+{{/if}}
+
+{{#if unreachable}}
+<input type='email' placeholder='Enter {{login}} email'><a href='#' class='trpButton trpBtnGreen js-invite'>Invite</a>
+{{/if}}
