@@ -14,7 +14,7 @@ var githubUserService         = require('./github/github-user-service');
 var emailAddressService       = require('./email-address-service');
 var mongooseUtils             = require('../utils/mongoose-utils');
 
-/**
+/** FIXME: the insert fields should simply extend from options or a key in options.
  * Creates a new user
  * @return the promise of a new user
  */
@@ -31,6 +31,8 @@ function newUser(options) {
     githubScopes:       options.githubScopes,
     gravatarImageUrl:   options.gravatarImageUrl,
     username:           options.username,
+    invitedByUser:      options.invitedByUser,
+    invitedToRoom:      options.invitedToRoom,
     displayName:        options.displayName,
     state:              options.state
   };
@@ -69,20 +71,34 @@ function newUser(options) {
 }
 
 var userService = {
-  createInvitedUser: function(username, user, callback) {
+
+  /**
+   * createdInvitedUser() creates an invited user
+   *
+   * username   String - username used to fetch information from GitHub
+   * user       User - user sending the invite
+   * roomId     ObjectID - the room to whic the user has been invited to
+   * callback   Function - to be called once finished
+   */
+  createInvitedUser: function(username, user, roomId, callback) {
     var githubUser = new githubUserService(user);
+    console.log('#user:', user);
 
     return githubUser.getUser(username)
       .then(function (githubUser) {
 
+        // this will be used with newUser below, however you must also add the options to newUser?
         var gitterUser = {
           username:           githubUser.login,
           displayName:        githubUser.name || githubUser.login,
           gravatarImageUrl:   githubUser.avatar_url,
           githubId:           githubUser.id,
+          invitedByUser:      user._id,
+          invitedToRoom:      roomId,
           state:              'INVITED'
         };
 
+        // this does not actually create a user here, please follow through?!
         return newUser(gitterUser);
       })
       .nodeify(callback);

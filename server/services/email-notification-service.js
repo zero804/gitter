@@ -11,6 +11,8 @@ var passphrase          = config.get('email:unsubscribeNotificationsSecret');
 var userSettingsService = require('./user-settings-service');
 var emailAddressService = require('./email-address-service');
 var roomNameTrimmer     = require('../utils/room-name-trimmer');
+var mongoUtils          = require('../utils/mongo-utils');
+var moment              = require('moment');
 
 /*
  * Return a nice sane
@@ -115,25 +117,32 @@ module.exports = {
       });
   },
 
-  sendInvitation: function(fromUser, toUser, room) {
+  sendInvitation: function(fromUser, toUser, room, isReminder) {
+    console.log('sendInvitation() ====================');
+    isReminder = (typeof isReminder !== 'undefined') ? isReminder : false;
     var senderName = (fromUser.displayName || fromUser.username).split(' ')[0];
     var recipientName = (toUser.displayName || toUser.username).split(' ')[0];
     var fromName = (fromUser.displayName || fromUser.username);
+
+    var template = (isReminder) ? 'invitation-reminder' : 'invitation';
+    var eventName = (isReminder) ? 'invitation_reminder_sent' : 'invitation_sent';
+    var date = moment(mongoUtils.getTimestampFromObjectId(toUser._id)).format('Do MMMM YYYY');
 
     return emailAddressService(toUser)
       .then(function(email) {
         if (!email) return;
         return mailerService.sendEmail({
-          templateFile: "invitation",
+          templateFile: template,
           from: senderName + ' <support@gitter.im>',
           fromName: fromName,
           to: email,
           subject: '[' + room.uri + '] Join the chat on Gitter',
           tracking: {
-            event: 'invitation_sent',
+            event: eventName,
             data: { userId: toUser.id, email: email }
           },
           data: {
+            date: date,
             roomUri: room.uri,
             roomUrl: config.get("email:emailBasePath") + '/' + room.uri,
             senderName: senderName,
