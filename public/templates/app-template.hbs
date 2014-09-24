@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
   	<meta charset="utf-8">
   	<title>{{troupeName}} - Gitter</title>
-    <meta property="og:title" content="{{troupeName}}"/>
-    <meta property="og:description" content="Where developers come to talk."/>
-    <meta property="og:type" content="gitterim:room"/>
-    <meta property="og:image" content="https://avatars.githubusercontent.com/gitterHQ"/>
+    {{#each socialMetadata}}
+    <meta property="{{@key}}" content="{{this}}"/>
+    {{/each}}
     <link rel="stylesheet" href='{{cdn cssFileName }}'>
 
     {{!-- if you change this, you must change the favicon reference in titlebar.js --}}

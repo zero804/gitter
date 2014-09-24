@@ -85,12 +85,22 @@ function renderMainFrame(req, res, next, frame) {
         bootScriptName = 'router-nli-app';
       }
 
+      var roomName = req.uriContext.uri;
+      var owner = roomName.split('/')[0];
+
+      var socialMetadata = {
+        'og:title': roomName,
+        'og:description': 'Where developers come to talk.',
+        'og:type': 'gitterim:room',
+        'og:image': 'https://avatars.githubusercontent.com/' + owner
+      };
+
       res.render(template, {
+        socialMetadata: socialMetadata,
         appCache: getAppCache(req),
         bootScriptName: bootScriptName,
         cssFileName: "styles/" + bootScriptName + ".css",
         troupeName: req.uriContext.uri,
-        ownerName: req.uriContext.uri.split('/')[0],
         troupeContext: troupeContext,
         chatAppLocation: chatAppLocation,
         agent: req.headers['user-agent'],
