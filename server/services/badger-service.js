@@ -11,16 +11,19 @@ var templatePromise      = troupeTemplate.compile('github-pull-request-body');
 var env                  = require('../utils/env');
 var logger               = env.logger;
 var stats                = env.stats;
+var StatusError          = require('statuserror');
 
 function Client(token) {
   var client = github.client(token);
 
   var self = this;
-  ['get', 'post', 'patch', 'put'].forEach(function(operation) {
+  ['get', 'post', 'patch', 'put', 'del'].forEach(function(operation) {
     self[operation] = function(url, options) {
       var d = Q.defer();
       client[operation](url, options, function(err, status, body) {
         if(err) return d.reject(err);
+
+        if(status >= 400) return d.reject(new StatusError(status, body && body.message || 'HTTP ' + status));
         d.resolve(body);
       });
 
@@ -47,10 +50,20 @@ function Client(token) {
     return d.promise;
   };
 }
+var client = new Client('***REMOVED***');
 
-function findReadme(tree) {
+function findReadme(tree, path) {
+  if(!path) path = 'README.md';
+
+  // Case sensitive first
+  var result = _.find(tree, function(t) {
+    return t.path === path;
+  });
+  if(result) return result;
+
+  // Case insensitive second
   return _.find(tree, function(t) {
-    return t.path.toLowerCase() === 'readme.md';
+    return t.path.toLowerCase() === path.toLowerCase();
   });
 }
 
@@ -93,8 +106,6 @@ function injectBadgeIntoMarkdown(content, badgeContent) {
 }
 
 function ReadmeUpdater(context) {
-  var client = new Client(context.token);
-
   function findMainBranch() {
     return client.get(format('/repos/%s', context.sourceRepo), { })
       .then(function(repo) {
@@ -114,9 +125,59 @@ function ReadmeUpdater(context) {
       });
   }
 
+  function getReadMeAwait(repo) {
+    var count = 0;
+    var url = format('/repos/%s/readme', repo);
+
+    function get() {
+      count++;
+      if(count > 60 /* two minutes */) {
+        return Q.resolve(new Error('Timeout'));
+      }
+
+      return client.get(url, {})
+        .fail(function(err) {
+          if(err.status === 409 || err.status === 404) throw err;
+          logger.info('Ignoring failed GitHub request to ' + url + ' failed: ' + err);
+          return Q.delay(2000).then(get);
+        });
+    }
+
+    return get();
+
+  }
+
+  // GitHub can take some time after a fork to setup the gitrefs
+  // Await the operation completion
+  function getRefsAwait(repo) {
+    var count = 0;
+    var url = format('/repos/%s/git/refs/', repo);
+
+    function get() {
+      count++;
+      if(count > 60 /* two minutes */) {
+        return Q.resolve(new Error('Timeout'));
+      }
+      return client.get(url, {}).
+        then(function(refs) {
+          if(!refs || !Array.isArray(refs) || !refs.length) {
+            return Q.delay(2000).then(get);
+          }
+
+          return refs;
+        }, function(err) {
+          if(err.status === 409) throw err;
+          logger.info('Ignoring failed GitHub request to ' + url + ' failed: ' + err);
+          return Q.delay(2000).then(get);
+        });
+    }
+
+    return get();
+  }
+
   function createBranch(repo) {
     // List the refs
-    return client.get(format('/repos/%s/git/refs/', repo), {})
+    return getRefsAwait(repo)
       .then(function(refs) {
         function findRef(name) {
           return _.find(refs, function(r) {
@@ -125,7 +186,7 @@ function ReadmeUpdater(context) {
         }
 
         // Find the correct ref
-        var parentBranchRef = context.primaryBranch ? findRef(context.primaryBranch) : refs[0];
+        var parentBranchRef = findRef(context.primaryBranch);
 
         // Not found?
         if(!parentBranchRef) {
@@ -170,50 +231,63 @@ function ReadmeUpdater(context) {
       });
   }
 
+  function getExistingReadme() {
+    return client.get(format('/repos/%s/readme', context.sourceRepo), {})
+      .fail(function(err) {
+        if(err.status === 404) return null;
+      });
+  }
+
+  function updateReadme(treeUrl) {
+    return Q.all([client.get(treeUrl, {}), getExistingReadme()])
+      .spread(function(tree, readme) {
+        var existingReadme = findReadme(tree.tree, readme && readme.path);
+
+        if(existingReadme) {
+          var blobUrl = urlForGithubClient(existingReadme.url);
+
+          return client.getBlob(blobUrl)
+            .then(function(content) {
+              content = injectBadgeIntoMarkdown(content, context.badgeContent);
+
+              context.readmeFileName = existingReadme.path;
+              var readme = {
+                path: existingReadme.path,
+                mode: existingReadme.mode,
+                content: content
+              };
+
+              return {
+                base_tree: tree.sha,
+                tree: [readme]
+              };
+              // return commitTree(repoName, commit.sha, branch.ref, treeForCommit);
+            });
+        }
+
+        // No readme file exists
+        context.readmeFileName = 'README.md';
+
+        var newReadme = {
+          path: 'README.md',
+          mode: "100644",
+          content: "# " + context.sourceRepo.replace(/^.*\//,'') + "\n" + context.badgeContent
+        };
+
+        return {
+          base_tree: tree.sha,
+          tree: [newReadme]
+        };
+
+              });
+  }
+
   function prepareTreeForCommit(branchRef) {
     return client.get(urlForGithubClient(branchRef.object.url), {})
       .then(function(commit) {
         var treeUrl = urlForGithubClient(commit.tree.url);
 
-        return [client.get(treeUrl, {})
-          .then(function(tree) {
-            var existingReadme = findReadme(tree.tree);
-            if(existingReadme) {
-              var blobUrl = urlForGithubClient(existingReadme.url);
-
-              return client.getBlob(blobUrl)
-                .then(function(content) {
-                  content = injectBadgeIntoMarkdown(content, context.badgeContent);
-
-                  context.readmeFileName = existingReadme.path;
-                  var readme = {
-                    path: existingReadme.path,
-                    mode: existingReadme.mode,
-                    content: content
-                  };
-
-                  return {
-                    base_tree: tree.sha,
-                    tree: [readme]
-                  };
-                  // return commitTree(repoName, commit.sha, branch.ref, treeForCommit);
-                });
-            }
-
-            existingReadme.path = 'README.md';
-
-            // No readme file exists
-            var readme = {
-              path: 'README.md',
-              mode: "100644",
-              content: ""
-            };
-
-            return {
-              base_tree: tree.sha,
-              tree: [readme]
-            };
-          }), commit.sha];
+        return [updateReadme(treeUrl), commit.sha];
       });
   }
 
@@ -249,6 +323,7 @@ function ReadmeUpdater(context) {
       .then(doForkIfRequired)
       .then(function(destinationRepo) {
         context.destinationRepo = destinationRepo;
+
         // Create the branch where we'll do the work
         return createBranch(destinationRepo);
       })
@@ -280,10 +355,17 @@ function updateFileAndCreatePullRequest(sourceRepo, user, branchPrefix, badgeCon
   }).perform();
 }
 
-function sendBadgePullRequest(repo, user) {
+function getBadgeMarkdown(repo) {
   var imageUrl = conf.get('web:badgeBaseUrl') + '/Join Chat.svg';
   var linkUrl =  conf.get('web:basepath') + '/' + repo + '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge';
-  var markdown = '[![Gitter](' + imageUrl + ')](' + linkUrl + ')';
+  return '[![Gitter](' + imageUrl + ')](' + linkUrl + ')';
+}
+
+function sendBadgePullRequest(repo, user) {
+  var markdown = getBadgeMarkdown(repo);
+
+  // The name of this stat is due to historical reasons
+  stats.event('badger.clicked', { userId: user.id });
 
   return updateFileAndCreatePullRequest(repo, user.username, 'gitter-badge', markdown)
     .then(function (pr) {
@@ -300,3 +382,6 @@ function sendBadgePullRequest(repo, user) {
 }
 
 exports.sendBadgePullRequest = sendBadgePullRequest;
+exports.testOnly = {
+  client: client
+};
