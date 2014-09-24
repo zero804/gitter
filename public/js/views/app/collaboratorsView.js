@@ -6,64 +6,79 @@ define([
   'hbs!./tmpl/collaboratorsView',
   'hbs!./tmpl/collaboratorsItemView',
   'hbs!./tmpl/collaboratorsEmptyView',
+  'hbs!./tmpl/inviteOutcomeTemplate',
   'utils/appevents',
-], function($, Marionette, context, mailto, template, itemTemplate, emptyViewTemplate, appEvents) {
+], function($, Marionette, context, mailto, template, itemTemplate, emptyViewTemplate, inviteOutcomeTemplate, appEvents) {
   "use strict";
+
+  var InviteOutcomeView = Marionette.ItemView.extend({
+    template: inviteOutcomeTemplate,
+    tagName: 'span',
+    initialize: function(options) {
+      this.model  = options.model;
+      this.user   = options.user;
+    },
+    events: {
+      'click .js-invite': 'inviteUser'
+    },
+    inviteUser: function() {
+      var self = this;
+      this.$('.js-invite').hide();
+      var email = this.$('input')[0].value;
+
+      var data = {
+        userid: this.user.id,
+        email: email,
+        roomid: context.getTroupeId()
+      };
+
+      $.ajax({
+        url: '/api/private/invite-user',
+        contentType: "application/json",
+        dataType: "json",
+        type: "POST",
+        data: JSON.stringify(data),
+        context: this,
+        timeout: 45 * 1000,
+        error: function() {
+        },
+        success: function () {
+          self.user.invited = true;
+          self.user.email = email;
+          self.render();
+        }
+      });
+    },
+    serializeData: function() {
+      var user = this.user;
+      var data = {};
+      data.login = user.username;
+
+      if (!user.invited) {
+        data.added = true;
+      } else if (user.invited && user.email) {
+        data.invited = true;
+      } else {
+        data.unreachable = true;
+      }
+
+      return data;
+    },
+
+  });
 
   var ItemView = Marionette.ItemView.extend({
     modelEvents: {
       "change": "render"
     },
     events: {
-      'click .add': 'addUserToRoom'
+      'click .js-add': 'addUserToRoom'
     },
     template: itemTemplate,
     tagName: 'li',
 
-    /*
-     * computeFeedback() produces feedback for the action of adding a user to a room
-     *
-     * user    Object - user object in which the logic is applied to
-     * returns Object - contans the outcome `class` and the message to be displayed on the current item.
-     */
-    computeFeedback: function (user) {
-      var fb = {
-        outcome: null,
-        message: null,
-        action: { href: null, text: null }
-      };
-
-      if (!user.invited) {
-        fb.outcome = 'added';
-        fb.message = 'was added.';
-      } else if (user.invited && user.email) {
-        fb.outcome = 'invited';
-        fb.message = 'has been invited to Gitter.';
-      } else {
-        fb.outcome = 'unreachable';
-        fb.message = 'has no public email.';
-        var email = mailto.el({
-          subject: 'Gitter Invite',
-          body: this.strTemplate('Hi {{user}}, I\'ve added you to a room on Gitter. Join me! {{base}}{{roomUrl}}', { user: user.username, base: context.env('basePath'), roomUrl: context.troupe().get('url') })
-        });
-        fb.action.href = email.href;
-        fb.action.text = 'Invite.';
-      }
-
-      return fb;
-    },
-
-    strTemplate: function (str, o) {
-      return str.replace(/{{([a-z_$]+)}}/gi, function (m, k) {
-          return (typeof o[k] !== 'undefined' ? o[k] : '');
-      });
-    },
 
     handleError: function (res, status, message) {
-      //var json = res.responseJSON;
-      //this.ui.loading.toggleClass('hide');
-      //this.showValidationMessage((json) ? json.error : res.status + ': ' + res.statusText);
-      //this.typeahead.clear();
     },
 
     /**
@@ -77,7 +92,8 @@ define([
 
       appEvents.triggerParent('track-event', 'welcome-add-user-click');
 
-      this.$('.add').hide();
+      this.$('.js-add').hide();
+      var self = this;
 
       var m = this.model;
 
@@ -91,16 +107,8 @@ define([
         timeout: 45 * 1000,
         error: this.handleError,
         success: function (res) {
-          //this.ui.loading.toggleClass('hide');
-          var feedback = this.computeFeedback(res.user);
-          if (res.user.email) m.set('email', res.user.email);
-          m.set({
-            message: feedback.message,
-            outcome: feedback.outcome,
-            action: feedback.action,
-            timeAdded: Date.now(),
-            added: true
-          });
+          var view = new InviteOutcomeView({user: res.user, model: m});
+          self.$('.outcome').html(view.render().el);
         }
       });
     },
@@ -153,8 +161,7 @@ define([
 
       return {
         shareable: _public && _repo,
-        twitterLink: this.generateTwitterLink(),
-        roomUrl: window.location.origin + context.troupe().get('url')
+        twitterLink: this.generateTwitterLink()
       };
     },
 
