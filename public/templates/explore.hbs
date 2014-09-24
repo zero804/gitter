@@ -46,12 +46,12 @@
     <section class="page-result">
       {{#if rooms}}
         {{#if isLoggedIn }}
-          <p>Displaying results for: <b>{{ tags }}</b></p>
+          <p>Displaying results for: <b>{{ searchName }}</b></p>
         {{else}}
-          <p>Here's a selection of <b>{{ tags }}</b> rooms:</p>
+          <p>Here's a selection of <b>{{ searchName }}</b> rooms:</p>
         {{/if}}
       {{else}}
-        <p><span class="octicon octicon-stop"></span> Damn. Sorry about that. No results found for: <b>{{ tags }}</b></p>
+        <p><span class="octicon octicon-stop"></span>Sorry about that. No results found for: <b>{{ searchName }}</b></p>
       {{/if}}
     </section>
     <div class='page-content'>
