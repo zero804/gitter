@@ -150,25 +150,29 @@ function ReadmeUpdater(context) {
   // GitHub can take some time after a fork to setup the gitrefs
   // Await the operation completion
   function getRefsAwait(repo) {
-    var count = 0;
+    var delay = 1000;
     var url = format('/repos/%s/git/refs/', repo);
+    var start = Date.now();
 
     function get() {
-      count++;
-      if(count > 60 /* two minutes */) {
-        return Q.resolve(new Error('Timeout'));
+      var timeTaken = (Date.now() - start) / 1000;
+      if(timeTaken > 300 /* 5 minutes */) {
+        return Q.reject(new Error('Timeout awaiting git data for ' + repo + ' after ' + timeTaken + 's'));
       }
+
+      // Exponential backoff
+      delay = Math.floor(delay * 1.1);
+
       return client.get(url, {}).
         then(function(refs) {
           if(!refs || !Array.isArray(refs) || !refs.length) {
-            return Q.delay(2000).then(get);
+            return Q.delay(delay).then(get);
           }
 
           return refs;
         }, function(err) {
-          if(err.status === 409) throw err;
           logger.info('Ignoring failed GitHub request to ' + url + ' failed: ' + err);
-          return Q.delay(2000).then(get);
+          return Q.delay(delay).then(get);
         });
     }
 
