@@ -5,10 +5,10 @@ var format               = require('util').format;
 var github               = require('octonode');
 var _                    = require('underscore');
 var Q                    = require('q');
-var conf                 = require('../utils/config');
-var troupeTemplate       = require('../utils/troupe-template');
+var conf                 = require('../../utils/config');
+var troupeTemplate       = require('../../utils/troupe-template');
 var templatePromise      = troupeTemplate.compile('github-pull-request-body');
-var env                  = require('../utils/env');
+var env                  = require('../../utils/env');
 var logger               = env.logger;
 var stats                = env.stats;
 
