@@ -5,6 +5,8 @@ var env                = require('../utils/env');
 var logger             = env.logger;
 var nconf              = env.config;
 var stats              = env.stats;
+var errorReporter      = env.errorReporter;
+
 
 var ObjectID           = require('mongodb').ObjectID;
 var Q                  = require('q');
@@ -29,7 +31,6 @@ var eventService       = require('./event-service');
 var emailNotificationService = require('./email-notification-service');
 var canUserBeInvitedToJoinRoom = require('./invited-permissions-service');
 var emailAddressService = require('./email-address-service');
-var troupeDao          = require('./daos/troupe-dao').full;
 var mongoUtils         = require('../utils/mongo-utils');
 var badger             = require('./badger-service');
 
@@ -255,6 +256,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
                       /* Do this asynchronously */
                       badger.sendBadgePullRequest(uri, user)
                         .catch(function(err) {
+                          errorReporter(err, { uri: uri, user: user.username });
                           logger.error('Unable to send pull request for new room', { exception: err });
                         });
                     }
