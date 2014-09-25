@@ -86,10 +86,8 @@ function renderMainFrame(req, res, next, frame) {
         bootScriptName = 'router-nli-app';
       }
 
-      var roomName = req.uriContext.uri;
-
       res.render(template, {
-        socialMetadata: social.getMetadata({ roomName: roomName }),
+        socialMetadata: social.getMetadata({ room: req.troupe }),
         appCache: getAppCache(req),
         bootScriptName: bootScriptName,
         cssFileName: "styles/" + bootScriptName + ".css",
