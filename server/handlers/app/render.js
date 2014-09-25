@@ -44,6 +44,26 @@ function getAppCache(req) {
   return req.url + '.appcache';
 }
 
+function getSocialMetadata(options) {
+  var roomName = options && options.roomName;
+  var owner = roomName && roomName.split('/')[0];
+
+  var title = roomName || 'Gitter';
+  var image = 'https://avatars.githubusercontent.com/' + ( owner || 'gitterHQ' );
+
+  return {
+    'og:title': title,
+    'og:description': 'Where developers come to talk.',
+    'og:type': 'gitterim:room',
+    'og:image': image,
+    'twitter:card': 'summary',
+    'twitter:site': '@gitterHQ',
+    'twitter:title': title,
+    'twitter:description': 'Where developers come to talk.',
+    'twitter:image': image
+  };
+}
+
 function renderHomePage(req, res, next) {
   contextGenerator.generateNonChatContext(req)
     .then(function (troupeContext) {
@@ -85,12 +105,14 @@ function renderMainFrame(req, res, next, frame) {
         bootScriptName = 'router-nli-app';
       }
 
+      var roomName = req.uriContext.uri;
+
       res.render(template, {
+        socialMetadata: getSocialMetadata({ roomName: roomName }),
         appCache: getAppCache(req),
         bootScriptName: bootScriptName,
         cssFileName: "styles/" + bootScriptName + ".css",
         troupeName: req.uriContext.uri,
-        ownerName: req.uriContext.uri.split('/')[0],
         troupeContext: troupeContext,
         chatAppLocation: chatAppLocation,
         agent: req.headers['user-agent'],
