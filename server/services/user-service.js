@@ -92,7 +92,7 @@ var userService = {
           displayName:        githubUser.name || githubUser.login,
           gravatarImageUrl:   githubUser.avatar_url,
           githubId:           githubUser.id,
-          invitedByUser:      user._id,
+          invitedByUser:      user && user._id,
           invitedToRoom:      roomId,
           state:              'INVITED'
         };
