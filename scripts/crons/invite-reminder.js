@@ -40,6 +40,11 @@ function index(users, invitees, rooms) {
   ]);
 }
 
+function markAsReminded(user) {
+  user.inviteReminderSent = new Date();
+  return user.saveQ();
+}
+
 // run the script
 persistenceService.User
   .findQ({ state: 'INVITED', inviteReminderSent: { $exists: false }, invitedByUser: { $exists: true }, invitedToRoom: { $exists: true } })
@@ -47,23 +52,23 @@ persistenceService.User
   .spread(populate)
   .spread(index)
   .spread(function (users, invitees, rooms) {
+    console.log('attempting to sent reminder to', users, 'user(s)');
     return Q.all(users.map(function (user) {
       var fromUser = invitees[user.invitedByUser];
-      var toUser = user;
       var room = rooms[user.invitedToRoom];
-      return emailNotificationService.sendInvitation(fromUser, toUser, room, true)
-        .then(function () {
-          user.inviteReminderSent = new Date();
-          return users;
-          // return persistenceService.User.saveQ(user);
+      return emailNotificationService.sendInvitation(fromUser, user, room, true)
+        .then(markAsReminded.bind(null, user))
+        .catch(function (err) {
+          // TODO: what can we do to make sure we do not email a user twice, in case we can't save the state;
+          throw err;
         });
     }));
   })
   .then(function (users) {
-    console.log('users.length:', users.length);
+    console.log('invitation reminder sent to', users.length, 'user(s)');
+    console.log('exiting...:');
     process.exit();
   })
   .catch(function (err) {
-    console.log('catch() ====================');
     console.log(err);
   });
