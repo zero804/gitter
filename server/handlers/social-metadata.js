@@ -1,6 +1,8 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
+var nconf = require('../utils/config');
+
 function getMetadata(options) {
   var roomName = options && options.roomName;
   var owner = roomName && roomName.split('/')[0];
@@ -11,8 +13,9 @@ function getMetadata(options) {
   return {
     'og:title': title,
     'og:description': 'Where developers come to talk.',
-    'og:type': roomName ? 'gitterim:room' : 'website',
+    'og:type': 'website',
     'og:image': image,
+    'fb:app_id': nconf.get('facebook:app-id'),
     'twitter:card': 'summary',
     'twitter:site': '@gitterHQ',
     'twitter:title': title,
