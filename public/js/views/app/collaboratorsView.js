@@ -11,27 +11,37 @@ define([
 ], function($, Marionette, context, mailto, template, itemTemplate, emptyViewTemplate, inviteOutcomeTemplate, appEvents) {
   "use strict";
 
-  var InviteOutcomeView = Marionette.ItemView.extend({
-    template: inviteOutcomeTemplate,
-    tagName: 'span',
-    initialize: function(options) {
-      this.model  = options.model;
-      this.user   = options.user;
+  var ItemView = Marionette.ItemView.extend({
+
+    modelEvents: {
+      "change": "render"
     },
+
     events: {
+      'click .js-add': 'addUserToRoom',
       'click .js-invite': 'inviteUser'
     },
-    inviteUser: function() {
-      var self = this;
-      this.$('.js-invite').hide();
+
+    tagName: 'div',
+
+    className: 'welcome-modal__collaborator',
+
+    template: itemTemplate,
+
+    handleError: function (res, status, message) {
+      this.$('.js-content').text(message);
+    },
+
+    inviteUser: function () {
       var email = this.$('input')[0].value;
+      var m = this.model;
 
       var data = {
         userid: this.user.id,
         email: email,
         roomid: context.getTroupeId()
       };
-
+      this.$('.js-content').text('Loading...');
       $.ajax({
         url: '/api/private/invite-user',
         contentType: "application/json",
@@ -40,45 +50,13 @@ define([
         data: JSON.stringify(data),
         context: this,
         timeout: 45 * 1000,
-        error: function() {
-        },
+        error: this.handleError,
         success: function () {
-          self.user.invited = true;
-          self.user.email = email;
-          self.render();
+          m.set('added', true);
+          m.set('feedback', 'was invited.');
+          // self.user.email = email;
         }
       });
-    },
-    serializeData: function() {
-      var user = this.user;
-      var data = {};
-      data.login = user.username;
-
-      if (!user.invited) {
-        data.added = true;
-      } else if (user.invited && user.email) {
-        data.invited = true;
-      } else {
-        data.unreachable = true;
-      }
-
-      return data;
-    },
-
-  });
-
-  var ItemView = Marionette.ItemView.extend({
-    modelEvents: {
-      "change": "render"
-    },
-    events: {
-      'click .js-add': 'addUserToRoom'
-    },
-    template: itemTemplate,
-    tagName: 'li',
-
-
-    handleError: function (res, status, message) {
     },
 
     /**
@@ -90,12 +68,11 @@ define([
       e.stopPropagation();
       e.preventDefault();
 
+      var m = this.model;
+
       appEvents.triggerParent('track-event', 'welcome-add-user-click');
 
-      this.$('.js-add').hide();
-      var self = this;
-
-      var m = this.model;
+      this.$('.js-content').text('Loading...');
 
       $.ajax({
         url: '/api/v1/rooms/' + context.getTroupeId()  + '/users',
@@ -107,12 +84,22 @@ define([
         timeout: 45 * 1000,
         error: this.handleError,
         success: function (res) {
-          var view = new InviteOutcomeView({user: res.user, model: m});
-          self.$('.outcome').html(view.render().el);
+          var user = res.user;
+          this.user = user;
+
+          if (!user.invited) {
+            m.set('added', true);
+            m.set('feedback', 'was added.');
+          } else if (user.invited && user.email) {
+            m.set('added', true);
+            m.set('feedback', 'was invited.');
+          } else {
+            m.set('added', false);
+            m.set('unreachable', true);
+          }
         }
       });
     },
-
   });
 
   var EmptyView = Marionette.ItemView.extend({
@@ -141,9 +128,11 @@ define([
   });
 
   var View = Marionette.CompositeView.extend({
-    itemViewContainer: '#list',
+
+    itemViewContainer: '.js-container',
     itemView: ItemView,
     emptyView: EmptyView,
+
     itemViewOptions: function() {
       if (!this.collection.length) {
         return {
@@ -153,6 +142,7 @@ define([
         };
       }
     },
+
     template: template,
 
     serializeData: function() {
