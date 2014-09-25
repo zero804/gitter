@@ -7,7 +7,6 @@ var persistenceService = require('../../server/services/persistence-service');
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
 var emailNotificationService = require('../../server/services/email-notification-service');
-var Q = require('Q');
 
 var logger = require('../../server/utils/env').logger;
 
