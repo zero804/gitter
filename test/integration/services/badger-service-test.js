@@ -9,6 +9,9 @@ var badgerService = testRequire('./services/badger-service');
 var client = badgerService.testOnly.client;
 
 describe('badger-service', function() {
+  // Skip tests in the automated test as they create too much noise
+  if(process.env.NODE_ENV === 'test') return;
+
   this.timeout(100000);
   it('should create pull requests for repos that do not have a master branch', function(done) {
     return badgerService.sendBadgePullRequest('gittertestbot/does-not-have-a-master-branch', USER)

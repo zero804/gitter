@@ -6,6 +6,7 @@ var contextGenerator  = require('../../web/context-generator');
 var restful           = require('../../services/restful');
 var userService       = require('../../services/user-service');
 var appVersion        = require('../../web/appVersion');
+var social            = require('../social-metadata');
 
 var burstCalculator   = require('../../utils/burst-calculator');
 var avatar   = require('../../utils/avatar');
@@ -86,11 +87,11 @@ function renderMainFrame(req, res, next, frame) {
       }
 
       res.render(template, {
+        socialMetadata: social.getMetadata({ room: req.troupe }),
         appCache: getAppCache(req),
         bootScriptName: bootScriptName,
         cssFileName: "styles/" + bootScriptName + ".css",
         troupeName: req.uriContext.uri,
-        ownerName: req.uriContext.uri.split('/')[0],
         troupeContext: troupeContext,
         chatAppLocation: chatAppLocation,
         agent: req.headers['user-agent'],

@@ -1,6 +1,6 @@
 {
   "name": "gitter-webapp",
-  "version": "5.9.1",
+  "version": "6.1.0",
   "private": true,
   "dependencies": {
     "apn": "~1.4.4",

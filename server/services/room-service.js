@@ -7,7 +7,6 @@ var nconf              = env.config;
 var stats              = env.stats;
 var errorReporter      = env.errorReporter;
 
-
 var ObjectID           = require('mongodb').ObjectID;
 var Q                  = require('q');
 var request            = require('request');
@@ -33,6 +32,8 @@ var canUserBeInvitedToJoinRoom = require('./invited-permissions-service');
 var emailAddressService = require('./email-address-service');
 var mongoUtils         = require('../utils/mongo-utils');
 var badger             = require('./badger-service');
+
+var badgerEnabled      = nconf.get('autoPullRequest:enabled');
 
 function localUriLookup(uri, opts) {
   return uriLookupService.lookupUri(uri)
@@ -253,12 +254,15 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
                     }
 
                     if(githubType === 'REPO' && security === 'PUBLIC') {
-                      /* Do this asynchronously */
-                      badger.sendBadgePullRequest(uri, user)
-                        .catch(function(err) {
-                          errorReporter(err, { uri: uri, user: user.username });
-                          logger.error('Unable to send pull request for new room', { exception: err });
-                        });
+                      if(badgerEnabled) {
+                        /* Do this asynchronously */
+
+                        badger.sendBadgePullRequest(uri, user)
+                          .catch(function(err) {
+                            errorReporter(err, { uri: uri, user: user.username });
+                            logger.error('Unable to send pull request for new room', { exception: err });
+                          });
+                      }
                     }
                   }
 
@@ -720,7 +724,7 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
 
       var isNewUser = !existingUser;
 
-      return [existingUser || userService.createInvitedUser(usernameToAdd), isNewUser];
+      return [existingUser || userService.createInvitedUser(usernameToAdd, instigatingUser, room._id), isNewUser];
     })
     .spread(function (invitedUser, isNewUser) {
       room.addUserById(invitedUser.id);

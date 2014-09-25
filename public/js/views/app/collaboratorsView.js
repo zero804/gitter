@@ -153,7 +153,8 @@ define([
 
       return {
         shareable: _public && _repo,
-        twitterLink: this.generateTwitterLink()
+        twitterLink: this.generateTwitterLink(),
+        roomUrl: window.location.origin + context.troupe().get('url')
       };
     },
 
