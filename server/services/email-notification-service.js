@@ -118,7 +118,6 @@ module.exports = {
   },
 
   sendInvitation: function(fromUser, toUser, room, isReminder) {
-    console.log('sendInvitation() ====================');
     isReminder = (typeof isReminder !== 'undefined') ? isReminder : false;
     var senderName = (fromUser.displayName || fromUser.username).split(' ')[0];
     var recipientName = (toUser.displayName || toUser.username).split(' ')[0];

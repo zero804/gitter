@@ -32,20 +32,11 @@ function mapInviteesAndRooms(users) {
 
 // fetches the invitees and rooms from database
 function populate(users, invitees, rooms) {
-  return Q.all([
+  return [
     users,
     userService.findByIds(invitees),
     troupeService.findByIds(rooms)
-  ]);
-}
-
-// fetches the invitees and rooms from database
-function index(users, invitees, rooms) {
-  return Q.all([
-    users,
-    collections.indexById(invitees),
-    collections.indexById(rooms)
-  ]);
+  ];
 }
 
 function markAsReminded(user) {
@@ -58,10 +49,12 @@ persistenceService.User
   .findQ({ state: 'INVITED', inviteReminderSent: { $exists: false }, invitedByUser: { $exists: true }, invitedToRoom: { $exists: true } })
   .then(mapInviteesAndRooms)
   .spread(populate)
-  .spread(index)
   .spread(function (users, invitees, rooms) {
     console.log('attempting to sent reminder to', users, 'user(s)');
-    return Q.all(users.map(function (user) {
+    invitees = collections.indexById(invitees);
+    rooms = collections.indexById(rooms);
+
+    return users.map(function (user) {
       var fromUser = invitees[user.invitedByUser];
       var room = rooms[user.invitedToRoom];
       return emailNotificationService.sendInvitation(fromUser, user, room, true)
@@ -69,11 +62,11 @@ persistenceService.User
         .catch(function () {
           logger.error('Couldn\'t notify user:', user.displayName, 'id ->', user._id);
         });
-    }));
+    });
   })
   .then(function (users) {
     console.log('invitation reminder sent to', users.length, 'user(s)');
-    console.log('exiting...:');
+    console.log('exiting...');
     process.exit();
   })
   .catch(function (err) {
