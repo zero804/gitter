@@ -50,7 +50,7 @@ persistenceService.User
   .then(mapInviteesAndRooms)
   .spread(populate)
   .spread(function (users, invitees, rooms) {
-    console.log('attempting to sent reminder to', users, 'user(s)');
+    logger.info('attempting to sent reminder to', users, 'user(s)');
     invitees = collections.indexById(invitees);
     rooms = collections.indexById(rooms);
 
@@ -65,8 +65,8 @@ persistenceService.User
     });
   })
   .then(function (users) {
-    console.log('invitation reminder sent to', users.length, 'user(s)');
-    console.log('exiting...');
+    logger.info('invitation reminder sent to', users.length, 'user(s)');
+    logger.info('exiting...');
     process.exit();
   })
   .catch(function (err) {
