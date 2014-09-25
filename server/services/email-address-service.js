@@ -29,8 +29,8 @@ function getValidPublicEmailAddress(username) {
 }
 
 // Try to get email from the user commits if the user has at least one repo
-function getEmailFromCommit(user, _user) {
-  var ghRepo = new GitHubRepoService(_user || user);
+function getEmailFromCommit(user) {
+  var ghRepo = new GitHubRepoService(user);
 
   return ghRepo.getReposForUser(user.username, {firstPage: true})
   .then(function(repos) {
@@ -51,25 +51,29 @@ function getEmailFromCommit(user, _user) {
   });
 }
 
-module.exports = function (user, _user) {
+module.exports = function (user) {
   if (!user) return Q.reject(new Error('User required'));
-  
+
   // test email address, should be set in `config.user-overrides.json`
-  if (config.get('email:toAddress')) return Q.resolve(config.get('email:toAddress')); 
+  var testEmail = config.get('email:toAddress');
+  if (testEmail) return Q.resolve(testEmail);
+
+  if (user.invitedEmail) return Q.resolve(user.invitedEmail);
 
   if (user.githubUserToken || user.githubToken) { return getPrivateEmailAddress(user); }
-  
+
+  // attempt to get a public email address
   return getValidPublicEmailAddress(user.username)
-  .then(function(email) {
-    if (email) return email;
-    return getEmailFromCommit(user, _user);
-  })
-  .then(function(emailFromCommit) {
-    if (emailFromCommit) return emailFromCommit;
-    stats.event('email-from-commit-failed', {username: user.username}); // sadpanda
-    return null;
-  })
-  .fail(function() {
-    return null;
-  });
+    .then(function (email) {
+      if (email) return email; // we have found a public email address
+      return getEmailFromCommit(user); // try get an email from commit
+    })
+    .then(function (emailFromCommit) {
+      if (emailFromCommit) return emailFromCommit;
+      stats.event('email-from-commit-failed', { username: user.username }); // sadpanda
+      return null;
+    })
+    .catch(function () {
+      return null;
+    });
 };
