@@ -349,29 +349,31 @@ function ReadmeUpdater(context) {
   };
 }
 
-function updateFileAndCreatePullRequest(sourceRepo, user, branchPrefix, badgeContent) {
+function updateFileAndCreatePullRequest(sourceRepo, user, branchPrefix) {
   return new ReadmeUpdater({
     token: '***REMOVED***',
     sourceRepo: sourceRepo,
     user: user,
     branchPrefix: branchPrefix,
-    badgeContent: badgeContent
+    badgeContent: getBadgeMarkdown(sourceRepo, 'badge'),
+    badgeContentBody: getBadgeMarkdown(sourceRepo, 'body_badge')
   }).perform();
 }
 
-function getBadgeMarkdown(repo) {
+function getBadgeMarkdown(repo, content) {
+  var contentLink = content ? '&utm_content=' + content : '';
+
   var imageUrl = conf.get('web:badgeBaseUrl') + '/Join Chat.svg';
-  var linkUrl =  conf.get('web:basepath') + '/' + repo + '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge';
+  var linkUrl =  conf.get('web:basepath') + '/' + repo + '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge' + contentLink;
   return '[![Gitter](' + imageUrl + ')](' + linkUrl + ')';
 }
 
 function sendBadgePullRequest(repo, user) {
-  var markdown = getBadgeMarkdown(repo);
 
   // The name of this stat is due to historical reasons
   stats.event('badger.clicked', { userId: user.id });
 
-  return updateFileAndCreatePullRequest(repo, user.username, 'gitter-badge', markdown)
+  return updateFileAndCreatePullRequest(repo, user.username, 'gitter-badge')
     .then(function (pr) {
       stats.event('badger.succeeded', { userId: user.id });
       return pr;
