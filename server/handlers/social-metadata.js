@@ -4,22 +4,24 @@
 var nconf = require('../utils/config');
 
 function getMetadata(options) {
-  var roomName = options && options.roomName;
-  var owner = roomName && roomName.split('/')[0];
+  var room = options && options.room;
 
-  var title = roomName || 'Gitter';
+  var owner = room && room.uri && room.uri.split('/')[0];
   var image = 'https://avatars.githubusercontent.com/' + ( owner || 'gitterHQ' );
+
+  var title = room && room.uri || 'Gitter';
+  var description = room && room.topic || 'Where developers come to talk.';
 
   return {
     'og:title': title,
-    'og:description': 'Where developers come to talk.',
+    'og:description': description,
     'og:type': 'website',
     'og:image': image,
     'fb:app_id': nconf.get('facebook:app-id'),
     'twitter:card': 'summary',
     'twitter:site': '@gitterHQ',
     'twitter:title': title,
-    'twitter:description': 'Where developers come to talk.',
+    'twitter:description': description,
     'twitter:image': image
   };
 }
