@@ -19,7 +19,7 @@ function getMetadata(options) {
     'og:image': image,
     'fb:app_id': nconf.get('facebook:app-id'),
     'twitter:card': 'summary',
-    'twitter:site': '@gitterHQ',
+    'twitter:site': '@gitchat',
     'twitter:title': title,
     'twitter:description': description,
     'twitter:image': image
