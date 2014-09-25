@@ -82,7 +82,6 @@ var userService = {
    */
   createInvitedUser: function(username, user, roomId, callback) {
     var githubUser = new githubUserService(user);
-    console.log('#user:', user);
 
     return githubUser.getUser(username)
       .then(function (githubUser) {
