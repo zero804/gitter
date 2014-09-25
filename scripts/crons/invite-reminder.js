@@ -9,6 +9,14 @@ var troupeService = require('../../server/services/troupe-service');
 var emailNotificationService = require('../../server/services/email-notification-service');
 var Q = require('Q');
 
+var logger = require('../../server/utils/env').logger;
+
+// if something goes terribly wrong use this
+function die(err) {
+  logger.error('Catastrophic error: ' + err,  { exception: err });
+  process.exit(1);
+}
+
 // gets a list of invitees and room ids, returns an array containing: [ users (Array), invitees (Array), rooms (Array)].
 function mapInviteesAndRooms(users) {
   var invitees = [];
@@ -42,7 +50,7 @@ function index(users, invitees, rooms) {
 
 function markAsReminded(user) {
   user.inviteReminderSent = new Date();
-  return user.saveQ();
+  return user.saveQ().catch(die);
 }
 
 // run the script
@@ -58,9 +66,8 @@ persistenceService.User
       var room = rooms[user.invitedToRoom];
       return emailNotificationService.sendInvitation(fromUser, user, room, true)
         .then(markAsReminded.bind(null, user))
-        .catch(function (err) {
-          // TODO: what can we do to make sure we do not email a user twice, in case we can't save the state;
-          throw err;
+        .catch(function () {
+          logger.error('Couldn\'t notify user:', user.displayName, 'id ->', user._id);
         });
     }));
   })
@@ -70,5 +77,5 @@ persistenceService.User
     process.exit();
   })
   .catch(function (err) {
-    console.log(err);
+    logger.error(err);
   });
