@@ -6,6 +6,7 @@ var contextGenerator  = require('../../web/context-generator');
 var restful           = require('../../services/restful');
 var userService       = require('../../services/user-service');
 var appVersion        = require('../../web/appVersion');
+var social            = require('../social-metadata');
 
 var burstCalculator   = require('../../utils/burst-calculator');
 var avatar   = require('../../utils/avatar');
@@ -42,26 +43,6 @@ switch(nconf.get('NODE_ENV')) {
 function getAppCache(req) {
   if(!nconf.get('web:useAppCache')) return;
   return req.url + '.appcache';
-}
-
-function getSocialMetadata(options) {
-  var roomName = options && options.roomName;
-  var owner = roomName && roomName.split('/')[0];
-
-  var title = roomName || 'Gitter';
-  var image = 'https://avatars.githubusercontent.com/' + ( owner || 'gitterHQ' );
-
-  return {
-    'og:title': title,
-    'og:description': 'Where developers come to talk.',
-    'og:type': 'gitterim:room',
-    'og:image': image,
-    'twitter:card': 'summary',
-    'twitter:site': '@gitterHQ',
-    'twitter:title': title,
-    'twitter:description': 'Where developers come to talk.',
-    'twitter:image': image
-  };
 }
 
 function renderHomePage(req, res, next) {
@@ -108,7 +89,7 @@ function renderMainFrame(req, res, next, frame) {
       var roomName = req.uriContext.uri;
 
       res.render(template, {
-        socialMetadata: getSocialMetadata({ roomName: roomName }),
+        socialMetadata: social.getMetadata({ roomName: roomName }),
         appCache: getAppCache(req),
         bootScriptName: bootScriptName,
         cssFileName: "styles/" + bootScriptName + ".css",

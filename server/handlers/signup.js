@@ -4,6 +4,7 @@
 var loginUtils = require('../web/login-utils');
 var nconf      = require('../utils/config');
 var locale     = require("locale");
+var social     = require('./social-metadata');
 var supported  = new locale.Locales(["en", "ru", "ja"]);
 
 module.exports = {
@@ -29,6 +30,7 @@ module.exports = {
 
           // when the viewer is not logged in:
           res.render(template, {
+            socialMetadata: social.getMetadata(),
             billingBaseUrl: nconf.get('web:billingBaseUrl')
           });
         });
