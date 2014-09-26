@@ -47,7 +47,6 @@ module.exports = {
         res.send(200, { success: true, user: serializedUser });
       })
       .catch(function (err) {
-        console.log('ERROR:', err);
         res.send(err.status, err);
       })
       .fail(next);
