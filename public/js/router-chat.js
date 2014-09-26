@@ -278,7 +278,7 @@ require([
     routes: {
       // TODO: get rid of the pipes
       "": "hideModal",
-      "inv": "inv",
+      "share": "share",
       "people": "people",
       "notifications": "notifications",
       "markdown": "markdown",
@@ -319,7 +319,7 @@ require([
       }
     },
 
-    inv: function() {
+    share: function() {
       appView.dialogRegion.show(new shareView.Modal({}));
     }
 

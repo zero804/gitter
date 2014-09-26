@@ -106,7 +106,7 @@ define([
         var url = this.model.get('url');
 
         if(context.troupe().get('security') !== 'PRIVATE')
-          menuItems.push({ title: 'Share this chat room', href: '#inv' });
+          menuItems.push({ title: 'Share this chat room', href: '#share' });
 
         menuItems.push({ divider: true });
         menuItems.push({ title: 'Notifications', href: '#notifications' });

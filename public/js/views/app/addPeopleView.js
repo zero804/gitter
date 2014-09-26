@@ -77,7 +77,7 @@ define([
       switch (button) {
         case 'share':
           this.dialog.hide();
-          window.location.hash = "#inv";
+          window.location.hash = "#share";
           break;
 
         case 'done':
