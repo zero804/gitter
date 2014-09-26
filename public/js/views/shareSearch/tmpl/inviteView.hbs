@@ -2,20 +2,20 @@
   Classic
 </h3>
 
-<div class="invite-view__copy-text">
+<section class="invite-view__section">
   <input class="invite-view__copy-field" value="{{url}}" onclick="this.select();">
 
   {{#if hasFlash}}
   <button class="invite-view__button invite-view__button--copy js-copy" data-clipboard-text="{{url}}">Copy</button>
   {{/if}}
-</div>
+</section>
 
 {{#if isRepo}}
 <h3 class="invite-view__heading">
   README badge ( <img class="invite-view__badge" src="{{badgeUrl}}"> )
 </h3>
 
-<div class="invite-view__copy-text">
+<section class="invite-view__section">
   <input class="invite-view__copy-field" value="{{badgeMD}}" onclick="this.select();">
 
   {{#if hasFlash}}
@@ -25,7 +25,7 @@
   {{#if isPublic}}
   <button class='invite-view__button invite-view__button--pull-request js-badge'>Send Pull Request</button>
   {{/if}}
-</div>
+</section>
 {{/if}}
 
 {{#if isPublic}}
@@ -33,8 +33,8 @@
   Strangers and Grandmas
 </h3>
 
-<div class="invite-view__copy-text">
+<section class="invite-view__section">
   <a href="{{twitterUrl}}" target="_blank" class="invite-view__button invite-view__button--twitter">Share on Twitter</a>
   <a href="{{facebookUrl}}" target="_blank" class="invite-view__button invite-view__button--facebook">Share on Facebook</a>
-</div>
+</section>
 {{/if}}
