@@ -1,25 +1,20 @@
 <div class="welcome-modal__collaborators">
   <div class="welcome-modal__close js-close"></div>
-
   <div class="welcome-modal__header">
     {{#if shareable}}
-    <h2>Get started: Spread the word</h2>
+      <h2>Get Started: Spread the word</h2>
+    {{else}}
+      <h2>Get Started: Add some colleagues</h2>
     {{/if}}
-    {{#unless shareable}}
-    <h2>Get started: Add some colleagues</h2>
-    {{/unless}}
   </div>
-
-  <ul id="list"></ul>
-
+  <div class='welcome-modal__container  js-container'></div>
   {{#if shareable}}
-  <div class="welcome-modal__share">
-    <a class='trpButtonMedium trpBtnLightGrey button' href='#add'>Search other users</a>
-    <a class='trpButtonMedium trpBtnLightGrey button share-on-tw js-twitter' href='{{twitterLink}}' target='_blank'>Share on Twitter</a>
-    <a class="trpButtonMedium trpBtnLightGrey button" target="_blank" href="http://www.facebook.com/sharer/sharer.php?u={{roomUrl}}">Share on Facebook</a>
-  </div>
+    <div class="welcome-modal__share">
+      <a class='trpButtonMedium trpBtnLightGrey button' href='#add'>Search other users</a>
+      <a class='trpButtonMedium trpBtnLightGrey button share-on-tw js-twitter' href='{{ twitterLink }}' target='_blank'>Share on Twitter</a>
+      <a class="trpButtonMedium trpBtnLightGrey button" target="_blank" href="http://www.facebook.com/sharer/sharer.php?u={{ roomUrl }}">Share on Facebook</a>
+    </div>
   {{/if}}
-
   <!--
   <div class="welcome-modal__footer">
     <div class="welcome-modal__footer-button">
@@ -30,5 +25,4 @@
     </div>
   </div>
   -->
-
 </div>
