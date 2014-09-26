@@ -3,18 +3,19 @@ define([
   'jquery',
   'marionette',
   'utils/context',
+  'utils/social',
   'views/base',
   'utils/cdn',
-  'hbs!./tmpl/inviteView',
+  'hbs!./tmpl/share',
   'zeroclipboard'
-], function($, Marionette, context, TroupeViews, cdn, template, ZeroClipboard) {
+], function($, Marionette, context, social, TroupeViews, cdn, template, ZeroClipboard) {
   "use strict";
 
   ZeroClipboard.config({ swfPath: cdn('repo/zeroclipboard/ZeroClipboard.swf') });
 
   var View = Marionette.ItemView.extend({
     template: template,
-    className: 'invite-view',
+    className: 'share-view',
 
     initialize: function() {
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
@@ -76,7 +77,9 @@ define([
         hasFlash: this.detectFlash(),
         url: this.getShareUrl(),
         badgeUrl: this.getBadgeUrl(),
-        badgeMD: this.getBadgeMD()
+        badgeMD: this.getBadgeMD(),
+        twitterUrl: social.generateTwitterShareUrl(),
+        facebookUrl: social.generateFacebookShareUrl()
       };
     },
 
