@@ -31,7 +31,7 @@ define([
     handleError: function (res, status, message) {
       if (res.responseJSON.status === 409) {
         this.model.set('added', true);
-        this.model.set('feedback', 'is already here.');
+        this.model.set('feedback', 'was already invited.');
         return;
       }
       this.$('.js-content').text(message);
