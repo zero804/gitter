@@ -29,13 +29,13 @@ module.exports = {
     var username = req.body.username;
 
     return roomService.addUserToRoom(req.troupe, req.user, username)
-      .then(function(userAdded) {
+      .then(function (addedUser) {
 
         var strategy = new restSerializer.UserStrategy();
 
         return [
-          restSerializer.serializeQ(userAdded, strategy),
-          emailAddressService(userAdded, req.user)
+          restSerializer.serializeQ(addedUser, strategy),
+          emailAddressService(addedUser, req.user)
         ];
       })
       .spread(function(serializedUser, email) {
@@ -45,6 +45,9 @@ module.exports = {
         }
 
         res.send(200, { success: true, user: serializedUser });
+      })
+      .catch(function (err) {
+        res.send(err.status, err);
       })
       .fail(next);
   },
