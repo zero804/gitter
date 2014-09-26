@@ -15,7 +15,7 @@ define([
 
   var View = Marionette.ItemView.extend({
     template: template,
-    className: 'invite-view',
+    className: 'share-view',
 
     initialize: function() {
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
