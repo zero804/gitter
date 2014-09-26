@@ -1,0 +1,40 @@
+<h3 class="share-view__heading">
+  Classic
+</h3>
+
+<section class="share-view__section">
+  <input class="share-view__copy-field" value="{{url}}" onclick="this.select();">
+
+  {{#if hasFlash}}
+  <button class="share-view__button share-view__button--copy js-copy" data-clipboard-text="{{url}}">Copy</button>
+  {{/if}}
+</section>
+
+{{#if isRepo}}
+<h3 class="share-view__heading">
+  README badge ( <img class="share-view__badge" src="{{badgeUrl}}"> )
+</h3>
+
+<section class="share-view__section">
+  <input class="share-view__copy-field" value="{{badgeMD}}" onclick="this.select();">
+
+  {{#if hasFlash}}
+  <button class="share-view__button share-view__button--copy js-copy" data-clipboard-text="{{badgeMD}}">Copy</button>
+  {{/if}}
+
+  {{#if isPublic}}
+  <button class='share-view__button share-view__button--pull-request js-badge'>Send Pull Request</button>
+  {{/if}}
+</section>
+{{/if}}
+
+{{#if isPublic}}
+<h3 class="share-view__heading">
+  Strangers and Grandmas
+</h3>
+
+<section class="share-view__section">
+  <a href="{{twitterUrl}}" target="_blank" class="share-view__button share-view__button--twitter">Share on Twitter</a>
+  <a href="{{facebookUrl}}" target="_blank" class="share-view__button share-view__button--facebook">Share on Facebook</a>
+</section>
+{{/if}}
