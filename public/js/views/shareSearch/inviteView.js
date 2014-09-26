@@ -3,11 +3,12 @@ define([
   'jquery',
   'marionette',
   'utils/context',
+  'utils/social',
   'views/base',
   'utils/cdn',
   'hbs!./tmpl/inviteView',
   'zeroclipboard'
-], function($, Marionette, context, TroupeViews, cdn, template, ZeroClipboard) {
+], function($, Marionette, context, social, TroupeViews, cdn, template, ZeroClipboard) {
   "use strict";
 
   ZeroClipboard.config({ swfPath: cdn('repo/zeroclipboard/ZeroClipboard.swf') });
@@ -76,7 +77,9 @@ define([
         hasFlash: this.detectFlash(),
         url: this.getShareUrl(),
         badgeUrl: this.getBadgeUrl(),
-        badgeMD: this.getBadgeMD()
+        badgeMD: this.getBadgeMD(),
+        twitterUrl: social.generateTwitterShareUrl(),
+        facebookUrl: social.generateFacebookShareUrl()
       };
     },
 

@@ -11,8 +11,6 @@
 </div>
 
 {{#if isRepo}}
-<div class="invite-view__divider"></div>
-
 <h3 class="invite-view__heading">
   How about a badge like this: <img class="invite-view__badge" src="{{badgeUrl}}">
 </h3>
@@ -29,3 +27,12 @@
   {{/if}}
 </div>
 {{/if}}
+
+<h3 class="invite-view__heading">
+  Tell people about it!
+</h3>
+
+<div class="invite-view__copy-text">
+  <a href="{{twitterUrl}}" target="_blank" class="invite-view__button invite-view__button--twitter">Share on Twitter</a>
+  <a href="{{facebookUrl}}" target="_blank" class="invite-view__button invite-view__button--facebook">Share on Facebook</a>
+</div>

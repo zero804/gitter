@@ -6,13 +6,15 @@
 
 .invite-view__heading {
   font-size: 16px;
+  line-height: 1em;
   font-weight: normal;
   margin-bottom: 12px;
 }
 
 .invite-view__copy-text {
   display: flex;
-  margin-bottom: 42px;
+  justify-content: center;
+  margin-bottom: 24px;
 }
 
 .invite-view__copy-field {
@@ -39,6 +41,10 @@
   .trpButtonMedium;
   flex-shrink: 0;
   margin-left: 8px;
+
+  &:hover {
+    text-decoration: none;
+  }
 }
 
 .invite-view__button--copy {
@@ -47,6 +53,19 @@
 
 .invite-view__button--pull-request {
   .trpBtnBlue;
+}
+
+.invite-view__button--twitter {
+  background-color: @twitter-blue;
+  color: white;
+  border-bottom: 2px solid darken(@twitter-blue, 10%);
+  margin-left: 0;
+}
+
+.invite-view__button--facebook {
+  background-color: @facebook-blue;
+  color: white;
+  border-bottom: 2px solid darken(@facebook-blue, 10%);
 }
 
 .invite-view__divider {
