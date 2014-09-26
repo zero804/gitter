@@ -165,7 +165,6 @@ define([
       // search results collection view
       this.searchView = new SearchView({ troupes: troupeCollections.troupes, $input: this.$el.find('#list-search-input') });
       this.search.show(this.searchView);
-
       // Organizations collection view
       this.orgs.show(new OrgCollectionView({ collection: troupeCollections.orgs }));
 
