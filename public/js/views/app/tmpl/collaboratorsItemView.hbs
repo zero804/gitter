@@ -1,12 +1,12 @@
 <img src='{{ avatar_url }}'>
 <div class='content js-content'>
   {{#if added}}
-    <p>{{ login }} <b>{{ feedback }}</b></p>
+    <p><span class='limit'>{{ login }}</span> <span><b>{{ feedback }}</b></span></p>
   {{else}}
     {{#if unreachable}}
       <p><input type='email' placeholder="Enter {{ login }}'s email"></p>
     {{else}}
-      <p>{{ login }}</p>
+      <p><span class='limit'>{{ login }}</span></p>
     {{/if}}
   {{/if}}
 </div>

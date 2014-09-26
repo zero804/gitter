@@ -29,6 +29,11 @@ define([
     template: itemTemplate,
 
     handleError: function (res, status, message) {
+      if (res.responseJSON.status === 409) {
+        this.model.set('added', true);
+        this.model.set('feedback', 'is already here.');
+        return;
+      }
       this.$('.js-content').text(message);
     },
 
@@ -53,8 +58,7 @@ define([
         error: this.handleError,
         success: function () {
           m.set('added', true);
-          m.set('feedback', 'was invited.');
-          // self.user.email = email;
+          m.set('feedback', 'has been invited. ✓');
         }
       });
     },
@@ -89,10 +93,10 @@ define([
 
           if (!user.invited) {
             m.set('added', true);
-            m.set('feedback', 'was added.');
+            m.set('feedback', 'was added. ✓');
           } else if (user.invited && user.email) {
             m.set('added', true);
-            m.set('feedback', 'was invited.');
+            m.set('feedback', 'has been invited. ✓');
           } else {
             m.set('added', false);
             m.set('unreachable', true);
