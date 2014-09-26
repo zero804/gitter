@@ -6,7 +6,7 @@ define([
   'utils/social',
   'views/base',
   'utils/cdn',
-  'hbs!./tmpl/inviteView',
+  'hbs!./tmpl/share',
   'zeroclipboard'
 ], function($, Marionette, context, social, TroupeViews, cdn, template, ZeroClipboard) {
   "use strict";
