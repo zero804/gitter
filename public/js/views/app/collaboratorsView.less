@@ -106,6 +106,21 @@
 
     p {
       margin: 0;
+      height: 40px;
+    }
+
+    span {
+      white-space: nowrap;
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      &.limit {
+        max-width: 100px;
+        &:hover {
+          max-width: 100%;
+          transition: all 0.25s ease;
+        }
+      }
     }
 
     input {
