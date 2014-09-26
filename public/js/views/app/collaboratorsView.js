@@ -196,7 +196,7 @@ define([
 
 
     clickShareButton: function() {
-      window.location.href = "#inv";
+      window.location.href = "#share";
     },
 
     dismiss: function() {
