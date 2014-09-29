@@ -2,13 +2,13 @@ define([
   'jquery',
   'marionette',
   'utils/context',
-  'utils/mailto-gen',
+  'utils/social',
   'hbs!./tmpl/collaboratorsView',
   'hbs!./tmpl/collaboratorsItemView',
   'hbs!./tmpl/collaboratorsEmptyView',
   'hbs!./tmpl/inviteOutcomeTemplate',
   'utils/appevents',
-], function($, Marionette, context, mailto, template, itemTemplate, emptyViewTemplate, inviteOutcomeTemplate, appEvents) {
+], function($, Marionette, context, social, template, itemTemplate, emptyViewTemplate, inviteOutcomeTemplate, appEvents) {
   "use strict";
 
   var ItemView = Marionette.ItemView.extend({
@@ -161,24 +161,11 @@ define([
     template: template,
 
     serializeData: function() {
-      var _public = context.troupe().get('security') === 'PUBLIC';
-      var _repo   = context.troupe().get('githubType') === 'REPO';
-
       return {
-        shareable: _public && _repo,
-        twitterLink: this.generateTwitterLink()
+        isPublic: context.troupe().get('security') === 'PUBLIC',
+        twitterLink: social.generateTwitterShareUrl(),
+        facebookLink: social.generateFacebookShareUrl()
       };
-    },
-
-    generateTwitterLink: function() {
-      var text = escape('Join the chat room on Gitter for ' + context.troupe().get('uri') + ':');
-      var url = 'https://twitter.com/share?' +
-        'text=' + text +
-        '&url=https://gitter.im/' + context.troupe().get('uri') +
-        '&related=gitchat' +
-        '&via=gitchat';
-
-      return url;
     },
 
     initialize: function() {
