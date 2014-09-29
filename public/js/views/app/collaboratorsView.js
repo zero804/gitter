@@ -119,6 +119,7 @@ define([
 
   var EmptyView = Marionette.ItemView.extend({
     template: emptyViewTemplate,
+    className: 'welcome-modal__no-suggestions',
     initialize: function(options) {
       this.model.set("security", options.security);
       this.model.set("githubType", options.githubType);
