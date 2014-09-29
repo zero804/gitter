@@ -28,6 +28,16 @@ module.exports = {
   create: function(req, res, next) {
     var username = req.body.username;
 
+    function maskEmail(email) {
+      return email
+        .split('@')
+        .map(function (item, index) {
+          if (index === 0) return item.slice(0, 4) + '****';
+          return item;
+        })
+        .join('@');
+    }
+
     return roomService.addUserToRoom(req.troupe, req.user, username)
       .then(function (addedUser) {
 
@@ -35,13 +45,13 @@ module.exports = {
 
         return [
           restSerializer.serializeQ(addedUser, strategy),
-          emailAddressService(addedUser, req.user)
+          emailAddressService(addedUser)
         ];
       })
       .spread(function(serializedUser, email) {
 
-        if(serializedUser.invited && email) {
-          serializedUser.email = email;
+        if (serializedUser.invited && email) {
+          serializedUser.email = maskEmail(email);
         }
 
         res.send(200, { success: true, user: serializedUser });

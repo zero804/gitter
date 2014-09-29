@@ -18,8 +18,8 @@ define([
     },
 
     events: {
+      'submit form': 'inviteUser',
       'click .js-add': 'addUserToRoom',
-      'click .js-invite': 'inviteUser'
     },
 
     tagName: 'div',
@@ -29,24 +29,38 @@ define([
     template: itemTemplate,
 
     handleError: function (res, status, message) {
-      if (res.responseJSON.status === 409) {
-        this.model.set('added', true);
-        this.model.set('feedback', 'was already invited.');
-        return;
-      }
-      this.$('.js-content').text(message);
+      if (res.responseJSON.status === 409) return this.done('already in room.');
+      this.done(message, '');
     },
 
-    inviteUser: function () {
-      var email = this.$('input')[0].value;
+    toggleLoading: function () {
+      var model = this.model;
+      var isLoading = model.get('loading');
+      model.set('loading', !isLoading);
+    },
+
+    done: function (feedback, email) {
       var m = this.model;
+      this.toggleLoading();
+      m.set('done', true);
+      m.set('name', email || m.get('login'));
+      m.set('feedback', feedback);
+    },
+
+    inviteUser: function (e) {
+      e.preventDefault();
+
+      var inputEmail = this.$('input')[0];
+      var email = inputEmail.value;
 
       var data = {
         userid: this.user.id,
         email: email,
         roomid: context.getTroupeId()
       };
-      this.$('.js-content').text('Loading...');
+
+      this.toggleLoading();
+
       $.ajax({
         url: '/api/private/invite-user',
         contentType: "application/json",
@@ -57,8 +71,7 @@ define([
         timeout: 45 * 1000,
         error: this.handleError,
         success: function () {
-          m.set('added', true);
-          m.set('feedback', 'has been invited. ✓');
+          this.done('was invited.', email);
         }
       });
     },
@@ -76,7 +89,7 @@ define([
 
       appEvents.triggerParent('track-event', 'welcome-add-user-click');
 
-      this.$('.js-content').text('Loading...');
+      this.toggleLoading();
 
       $.ajax({
         url: '/api/v1/rooms/' + context.getTroupeId()  + '/users',
@@ -92,13 +105,11 @@ define([
           this.user = user;
 
           if (!user.invited) {
-            m.set('added', true);
-            m.set('feedback', 'was added. ✓');
+            this.done('was added.');
           } else if (user.invited && user.email) {
-            m.set('added', true);
-            m.set('feedback', 'has been invited. ✓');
+            this.done('was invited.', user.email);
           } else {
-            m.set('added', false);
+            this.toggleLoading(); // stop loading
             m.set('unreachable', true);
           }
         }

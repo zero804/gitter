@@ -104,6 +104,10 @@
     overflow: hidden;
     flex-grow: 1;
 
+    form {
+      margin: 0;
+    }
+
     p {
       margin: 0;
       height: 40px;
@@ -123,11 +127,16 @@
       }
     }
 
-    input {
+    input[type='email'] {
       margin-bottom: 4px;
       font-size: 12px;
       padding: 0px 4px;
-      width: 100%;
+      width: 70%;
+    }
+
+    input[type='submit'] {
+      margin-top: 5px;
+      float: right;
     }
   }
 
