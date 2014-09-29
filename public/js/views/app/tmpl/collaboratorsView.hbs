@@ -11,18 +11,8 @@
   {{#if shareable}}
     <div class="welcome-modal__share">
       <a class='trpButtonMedium trpBtnLightGrey button' href='#add'>Search other users</a>
-      <a class='trpButtonMedium trpBtnLightGrey button share-on-tw js-twitter' href='{{ twitterLink }}' target='_blank'>Share on Twitter</a>
-      <a class="trpButtonMedium trpBtnLightGrey button" target="_blank" href="{{ facebookLink }}">Share on Facebook</a>
+      <a class="share-button share-button--twitter" href='{{ twitterLink }}' target='_blank'><img src="{{cdn "images/icon-twitter-white.png" }}" class="share-button__icon"><span>Tweet</span></a>
+      <a class="share-button share-button--facebook" target="_blank" href="{{ facebookLink }}"><img src="{{cdn "images/icon-facebook-white.png" }}" class="share-button__icon"><span>Share</span></a>
     </div>
   {{/if}}
-  <!--
-  <div class="welcome-modal__footer">
-    <div class="welcome-modal__footer-button">
-      <button class='trpButtonMedium trpBtnBlue button' id="add-button" href='#add'>Search for other users</button>
-    </div>
-    <div class="welcome-modal__footer-button">
-      <button class='trpButtonMedium trpBtnBlue button js-share-button' id="share-button" href='#add'>Share this room</button>
-    </div>
-  </div>
-  -->
 </div>
