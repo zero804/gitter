@@ -32,6 +32,8 @@ var canUserBeInvitedToJoinRoom = require('./invited-permissions-service');
 var emailAddressService = require('./email-address-service');
 var mongoUtils         = require('../utils/mongo-utils');
 var badger             = require('./badger-service');
+var userSettingsService = require('./user-settings-service');
+
 
 var badgerEnabled      = nconf.get('autoPullRequest:enabled');
 
@@ -255,9 +257,15 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
 
                     if(githubType === 'REPO' && security === 'PUBLIC') {
                       if(badgerEnabled) {
-                        /* Do this asynchronously */
+                        /* Do this asynchronously (don't chain the promise) */
+                        userSettingsService.getUserSettings(user.id, 'badger_optout')
+                          .then(function(badgerOptOut) {
+                            // If the user has opted out never send the pull request
+                            if(badgerOptOut) return;
 
-                        badger.sendBadgePullRequest(uri, user)
+                            // Badgers Go!
+                            return badger.sendBadgePullRequest(uri, user);
+                          })
                           .catch(function(err) {
                             errorReporter(err, { uri: uri, user: user.username });
                             logger.error('Unable to send pull request for new room', { exception: err });
