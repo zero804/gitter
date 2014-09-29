@@ -46,7 +46,12 @@ function getRenderer(renderContext) {
   var renderer = new marked.Renderer();
 
   // Highlight code blocks
-  renderer.code = function(code) {
+  renderer.code = function(code, lang) {
+    lang = (lang + '').toLowerCase();
+
+    if (highlight.listLanguages().indexOf(lang) !== -1)
+      return util.format('<pre><code class="%s">%s</code></pre>', lang, highlight.highlight(lang, code).value);
+
     return util.format('<pre><code>%s</code></pre>', highlight.highlightAuto(code).value);
   };
 
