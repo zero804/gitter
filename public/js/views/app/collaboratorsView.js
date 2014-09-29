@@ -150,11 +150,8 @@ define([
     template: template,
 
     serializeData: function() {
-      var _public = context.troupe().get('security') === 'PUBLIC';
-      var _repo   = context.troupe().get('githubType') === 'REPO';
-
       return {
-        shareable: _public && _repo,
+        isPublic: context.troupe().get('security') === 'PUBLIC',
         twitterLink: social.generateTwitterShareUrl(),
         facebookLink: social.generateFacebookShareUrl()
       };
