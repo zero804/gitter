@@ -15,6 +15,10 @@
   margin-bottom: 24px;
 }
 
+.share-view__section > *:not(:last-child) {
+  margin-right: 8px;
+}
+
 .share-view__copy-field {
   font-family: 'Open Sans','HelveticaNeue-Light',sans-serif;
   font-size: 14px;
@@ -46,32 +50,10 @@
 
 .share-view__button--copy {
   .trpBtnGreen;
-  margin-left: 8px;
 }
 
 .share-view__button--pull-request {
   .trpBtnBlue;
-  margin-left: 8px;
-}
-
-.share-view__button--twitter {
-  background-color: @twitter-blue;
-  color: white;
-  border-bottom: 2px solid darken(@twitter-blue, 10%);
-}
-
-.share-view__button--facebook {
-  background-color: @facebook-blue;
-  color: white;
-  border-bottom: 2px solid darken(@facebook-blue, 10%);
-  margin-left: 8px;
-}
-
-.share-view__icon {
-  float: left;
-  height: 16px;
-  padding-right: 6px;
-  vertical-align: middle;
 }
 
 .share-view__badge {
