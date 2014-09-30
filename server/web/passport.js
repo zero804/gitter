@@ -19,9 +19,9 @@ var GitHubStrategy         = require('troupe-passport-github').Strategy;
 var GitHubMeService        = require('../services/github/github-me-service');
 var gaCookieParser         = require('../utils/ga-cookie-parser');
 
-var Mixpanel  = require('mixpanel');
-var token     = config.get("stats:mixpanel:token");
-var _mixpanel  = Mixpanel.init(token);
+var Mixpanel    = require('mixpanel');
+var token       = config.get("stats:mixpanel:token");
+if (token) var _mixpanel   = Mixpanel.init(token);
 
 
 function installApi() {
@@ -144,7 +144,7 @@ function install() {
                 if (user.state === 'INVITED') {
 
                   // IMPORTANT: Do not remove this and do it ONLY once.
-                  _mixpanel.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id);
+                  if (_mixpanel) _mixpanel.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id); // WIP
                   // IMPORTANT
 
                   stats.event("new_user", {
@@ -208,7 +208,7 @@ function install() {
                 logger.verbose('Created GitHub user ', user.toObject());
 
                 // IMPORTANT: Do not remove this and do it ONLY once.
-                _mixpanel.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id);
+                if (_mixpanel) _mixpanel.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id); // WIP
                 // IMPORTANT
 
                 req.logIn(user, function(err) {
