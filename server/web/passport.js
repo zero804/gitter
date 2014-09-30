@@ -132,6 +132,19 @@ function install() {
         } else {
           return userService.findByGithubIdOrUsername(githubUserProfile.id, githubUserProfile.login)
             .then(function (user) {
+
+              if (req.session && (!user || user.state === 'INVITED')) {
+
+                var events = req.session.events;
+
+                if (!events) {
+                  events = [];
+                  req.session.events = events;
+                }
+
+                events.push('new_user_signup');
+              }
+
               // Update an existing user
               if(user) {
 
@@ -207,7 +220,7 @@ function install() {
 
                 req.logIn(user, function(err) {
                   if (err) { return done(err); }
-                  
+
                   stats.event("new_user", {
                     userId: user.id,
                     distinctId: mixpanel.getMixpanelDistinctId(req.cookies),
