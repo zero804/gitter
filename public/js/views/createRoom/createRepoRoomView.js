@@ -24,7 +24,7 @@ define([
     repoSelected: function(r) {
       if(!r) return;
 
-      appEvents.trigger('navigation', '/' + r.get('uri'), 'chat#inv', r.get('name'));
+      appEvents.trigger('navigation', '/' + r.get('uri'), 'chat#share', r.get('name'));
       this.dialog.hide();
     },
 

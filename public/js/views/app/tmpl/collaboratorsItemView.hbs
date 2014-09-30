@@ -1,15 +1,25 @@
-<div class="welcome-modal__collaborator">
-  <img src="{{avatar_url}}">
-  <p>
-    {{login}}
-    {{#if message}}
-      <span class='message'>
-        {{message}} {{#if action.text}}<a href={{action.href}}>{{action.text}}</a>{{/if}}
-      </span>
+<img src='{{ avatar_url }}'>
+<div class='content js-content'>
+  {{#if loading}}
+    <p><i class='spinner'></i> Adding...</p>
+  {{else}}
+    {{#if done}}
+      <p><span class='limit'>{{ name }}</span> <span><b>{{ feedback }}</b></span></p>
+    {{else}}
+      {{#if unreachable}}
+        <form>
+          <p><input type='email' placeholder="Enter {{ login }}'s email" required><input type='submit' value='Invite' href='#' class='trpButton trpBtnGreen js-invite' /></p>
+        </form>
+      {{else}}
+        <p>{{ login }}</p>
+      {{/if}}
     {{/if}}
-  </p>
-
-  {{#unless added}}
-  <a href='#' class='trpButton trpBtnGreen  add'>Add</a>
-  {{/unless}}
+  {{/if}}
 </div>
+{{#unless loading}}
+  <div class='action js-action'>
+    {{#unless unreachable}}
+      <a href='#' class='trpButton trpBtnGreen js-add'>Add</a>
+    {{/unless}}
+  </div>
+{{/unless}}
