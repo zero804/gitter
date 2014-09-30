@@ -19,6 +19,11 @@ var GitHubStrategy         = require('troupe-passport-github').Strategy;
 var GitHubMeService        = require('../services/github/github-me-service');
 var gaCookieParser         = require('../utils/ga-cookie-parser');
 
+var Mixpanel  = require('mixpanel');
+var token     = config.get("stats:mixpanel:token");
+var _mixpanel  = Mixpanel.init(token);
+
+
 function installApi() {
   /**
    * BearerStrategy
@@ -137,12 +142,10 @@ function install() {
 
                 // If the user was in the DB already but was invited, notify stats services
                 if (user.state === 'INVITED') {
-                  stats.event("invite_accepted", {
-                    userId: user.id,
-                    method: 'github_oauth',
-                    username: user.username,
-                    googleAnalyticsUniqueId: googleAnalyticsUniqueId
-                  });
+
+                  // IMPORTANT: Do not remove this and do it ONLY once.
+                  _mixpanel.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id);
+                  // IMPORTANT
 
                   stats.event("new_user", {
                     userId: user.id,
@@ -195,7 +198,6 @@ function install() {
                 gravatarImageUrl:   githubUserProfile.avatar_url,
                 githubUserToken:    accessToken,
                 githubId:           githubUserProfile.id,
-                mixpanelId:         mixpanel.getMixpanelDistinctId(req.cookies)
               };
 
               logger.verbose('About to create GitHub user ', githubUser);
@@ -205,12 +207,15 @@ function install() {
 
                 logger.verbose('Created GitHub user ', user.toObject());
 
+                // IMPORTANT: Do not remove this and do it ONLY once.
+                _mixpanel.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id);
+                // IMPORTANT
+
                 req.logIn(user, function(err) {
                   if (err) { return done(err); }
                   
                   stats.event("new_user", {
                     userId: user.id,
-                    distinctId: mixpanel.getMixpanelDistinctId(req.cookies),
                     method: 'github_oauth',
                     username: user.username,
                     source: req.session.source,
