@@ -78,13 +78,7 @@ module.exports = {
           var query = req.query;
 
           // checks if we have a relative url path and adds it to the session
-          if (query.uri) {
-            req.session.returnTo = config.get('web:basepath') + '/' + query.uri;
-          }
-
-          stats.event("login_invited", {
-            distinctId: mixpanel.getMixpanelDistinctId(req.cookies)
-          });
+          if (query.uri) req.session.returnTo = config.get('web:basepath') + '/' + query.uri;
 
           res.render('login_invited', {
             username: query.welcome,
