@@ -1,0 +1,39 @@
+@import 'colors';
+@import 'trpButtons.less';
+
+.share-button {
+  // trpButtonMedium is gross, but it works for now
+  .trpButtonMedium;
+
+  // case in point as to why trpButtonMedium sucks
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.share-button--twitter {
+  background-color: @twitter-blue;
+  color: white;
+  border-bottom: 2px solid darken(@twitter-blue, 10%);
+
+  &:hover {
+    border-bottom-color: @twitter-blue;
+  }
+}
+
+.share-button--facebook {
+  background-color: @facebook-blue;
+  color: white;
+  border-bottom: 2px solid darken(@facebook-blue, 10%);
+
+  &:hover {
+    border-bottom-color: @facebook-blue;
+  }
+}
+
+.share-button__icon {
+  float: left;
+  height: 16px;
+  padding-right: 6px;
+  vertical-align: middle;
+}
