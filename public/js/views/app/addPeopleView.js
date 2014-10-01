@@ -1,20 +1,18 @@
-
 define([
   'jquery',
-  'underscore',
   'marionette',
   'backbone',
   'cocktail',
   'views/base',
   'utils/context',
-  'utils/mailto-gen',
+  'components/apiClient',
   'hbs!./tmpl/addPeople',
   'hbs!./tmpl/userSearchItem',
-  'hbs!./tmpl/addItemTemplate',
-  'views/controls/dropdown',
-  'views/controls/typeahead'
-], function($, _, Marionette, Backbone, cocktail, TroupeViews, context, mailto, template, userSearchItemTemplate,
-  itemTemplate, Dropdown, Typeahead) {
+  'hbs!./tmpl/addPeopleItemView',
+  'views/controls/typeahead',
+  'views/behaviors/widgets'      // No ref
+], function($, Marionette, Backbone, cocktail, TroupeViews, context, apiClient, template, userSearchItemTemplate,
+  itemTemplate, Typeahead) {
   "use strict";
 
   var UserSearchModel = Backbone.Model.extend({
@@ -30,9 +28,46 @@ define([
   });
 
   var RowView = Marionette.ItemView.extend({
+    events: {
+      'submit form': 'invite'
+    },
+    modelEvents: {
+      'change': 'render'
+    },
+    behaviors: {
+      Widgets: {}
+    },
+    ui: {
+      email: "input[type=email]"
+    },
     tagName: "div",
     className: "gtrPeopleRosterItem",
-    template: itemTemplate
+    template: itemTemplate,
+    invite: function(e) {
+      e.preventDefault();
+      var model = this.model;
+      var email = this.ui.email.val();
+
+      var data = {
+        username: this.model.get('username'),
+        email: email,
+        roomId: context.getTroupeId()
+      };
+
+      apiClient.post('/api/private/invite-user', data)
+        .then(function() {
+          model.set({
+            email: email,
+            unreachable: false,
+            invited: true,
+            added: false
+          });
+        })
+        .fail(function() {
+          console.log(arguments);
+        });
+
+    }
   });
 
   var View = Marionette.CompositeView.extend({
@@ -109,41 +144,7 @@ define([
       this.showMessage(this.ui.success);
     },
 
-    /*
-     * computeFeedback() produces feedback for the action of adding a user to a room
-     *
-     * user    Object - user object in which the logic is applied to
-     * returns Object - contans the outcome `class` and the message to be displayed on the current item.
-     */
-    computeFeedback: function (user) {
-      var fb = {
-        outcome: null,
-        message: null,
-        action: { href: null, text: null }
-      };
-
-      if (!user.invited) {
-        fb.outcome = 'added';
-        fb.message = 'was added.';
-      } else if (user.invited && user.email) {
-        fb.outcome = 'invited';
-        fb.message = 'has been invited to Gitter.';
-      } else {
-        fb.outcome = 'unreachable';
-        fb.message = 'is not on Gitter and has no public email.';
-        var email = mailto.el({
-          subject: 'Gitter Invite',
-          body: this.strTemplate('Hi {{user}}, I\'ve added you to a room on Gitter. Join me! {{base}}{{roomUrl}}', { user: user.username, base: context.env('basePath'), roomUrl: context.troupe().get('url') })
-        });
-        fb.action.href = email.href;
-        fb.action.text = 'Invite.';
-      }
-
-      return fb;
-    },
-
-
-    handleError: function (res, status, message) {
+    handleError: function (res/*, status, message*/) {
       var json = res.responseJSON;
       this.ui.loading.toggleClass('hide');
       this.showValidationMessage((json) ? json.error : res.status + ': ' + res.statusText);
@@ -168,14 +169,17 @@ define([
         error: this.handleError,
         success: function (res) {
           this.ui.loading.toggleClass('hide');
-          var feedback = this.computeFeedback(res.user);
-          if (res.user.email) m.set('email', res.user.email);
+          var user = res.user;
           m.set({
-            message: feedback.message,
-            outcome: feedback.outcome,
-            action: feedback.action,
-            timeAdded: Date.now()
+            added: !user.invited,
+            invited: user.invited && user.email,
+            unreachable: user.invited && !user.email,
+            timeAdded: Date.now(),
+            email: user.email,
+            user: user,
+            username: user.username
           });
+
           this.collection.add(m);
           this.typeahead.clear();
         }

@@ -4,8 +4,9 @@
 var Q                  = require('q');
 var lazy               = require('lazy.js');
 var troupeService      = require('./troupe-service');
-var roomService        = require('./room-service');
+var mongoUtils         = require('../utils/mongo-utils');
 var persistence        = require('./persistence-service');
+var assert             = require('assert');
 var appEvents          = require('../app-events');
 var winston            = require('../utils/winston');
 var moment             = require('moment');
@@ -59,6 +60,8 @@ function generateRoomListForUser(userId) {
  */
 function removeRecentRoomForUser(userId, roomId, isMember) {
   winston.verbose('recent-rooms: removeRecentRoomForUser');
+  assert(mongoUtils.isLikeObjectId(userId));
+  assert(mongoUtils.isLikeObjectId(roomId));
 
   return Q.all([
       clearFavourite(userId, roomId),

@@ -92,7 +92,6 @@ define([
     initialize: function(options) {
       options.placement = 'horizontal';
       options.minHeight = '88px';
-
       var username, displayName;
 
       if (this.model) {
