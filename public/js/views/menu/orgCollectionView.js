@@ -3,9 +3,8 @@ define([
   'utils/context',
   'marionette',
   'hbs!./tmpl/org-list-item',
-  'hbs!./tmpl/org-list-empty-view',
   'utils/appevents'
-], function(context, Marionette, orgListItemTemplate, orgListEmptyViewTemplate, appEvents) {
+], function(context, Marionette, orgListItemTemplate, appEvents) {
   "use strict";
 
   var OrgItemView = Marionette.ItemView.extend({
