@@ -67,7 +67,7 @@ module.exports = {
 
     return roomService.removeUserFromRoom(req.troupe, user, req.user)
       .then(function() {
-        recentRoomService.removeRecentRoomForUser(user.id, req.troupe);
+        recentRoomService.removeRecentRoomForUser(user.id, req.troupe.id);
       })
       .then(function() {
         appEvents.userLeft({user: req.user, room: req.troupe});
