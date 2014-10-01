@@ -712,7 +712,6 @@ function notifyInvitedUser(fromUser, invitedUser, room, isNewUser) {
         from: fromUser.username,
       };
 
-      if (isNewUser) stats.event("new_invited_user", _.extend(metrics, { userId: invitedUser.id })); // this should happen only once
       stats.event('user_added_someone', _.extend(metrics, { userId: fromUser.id }));
     })
     .thenResolve(invitedUser);
