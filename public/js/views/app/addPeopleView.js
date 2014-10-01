@@ -79,7 +79,6 @@ define([
     itemViewContainer: ".gtrPeopleAddRoster",
     itemView: RowView,
     template: template,
-    onChildViewInviteError: function() { window.alert('mooo')},
     ui: {
       input: 'input.gtrInput',
       share: '.js-add-people-share',
