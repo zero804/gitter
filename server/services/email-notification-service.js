@@ -138,7 +138,7 @@ module.exports = {
           subject: '[' + room.uri + '] Join the chat on Gitter',
           tracking: {
             event: eventName,
-            data: { userId: toUser.id, email: email }
+            data: { email: email }
           },
           data: {
             date: date,

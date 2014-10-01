@@ -1,7 +1,5 @@
 @import 'colors';
 
-@import 'trpButtons.less';
-
 @colors: @green, @orange;
 @names: primary, secondary;
 
@@ -32,8 +30,7 @@
   }
 }
 
-// dont generate the new buttons styles until we are using them
-// .generate(@colors, @names, btn);
+.generate(@colors, @names, btn);
 
 .generate(@a, @b, @gen, @i: length(@a)) when (@i > 0) {
   @color: extract(@a, @i);
@@ -44,41 +41,4 @@
   }
 
   .generate(@a, @b, @gen, (@i - 1));
-}
-
-.share-button {
-  // trpButtonMedium is gross, but it works for now
-  .trpButtonMedium;
-
-  // case in point as to why trpButtonMedium sucks
-  &:hover {
-    text-decoration: none;
-  }
-}
-
-.share-button--twitter {
-  background-color: @twitter-blue;
-  color: white;
-  border-bottom: 2px solid darken(@twitter-blue, 10%);
-
-  &:hover {
-    border-bottom-color: @twitter-blue;
-  }
-}
-
-.share-button--facebook {
-  background-color: @facebook-blue;
-  color: white;
-  border-bottom: 2px solid darken(@facebook-blue, 10%);
-
-  &:hover {
-    border-bottom-color: @facebook-blue;
-  }
-}
-
-.share-button__icon {
-  float: left;
-  height: 16px;
-  padding-right: 6px;
-  vertical-align: middle;
 }
