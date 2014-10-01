@@ -48,6 +48,8 @@ define([
       var model = this.model;
       var email = this.ui.email.val();
 
+      var self = this;
+
       var data = {
         username: this.model.get('username'),
         email: email,
@@ -63,8 +65,11 @@ define([
             added: false
           });
         })
-        .fail(function() {
-          console.log(arguments);
+        .fail(function(e) {
+          var json = e.responseJSON;
+          var message = json && (json.message || json.error) || "Unable to invite user to Gitter";
+
+          self.trigger('invite:error', message);
         });
 
     }
@@ -74,7 +79,7 @@ define([
     itemViewContainer: ".gtrPeopleAddRoster",
     itemView: RowView,
     template: template,
-
+    onChildViewInviteError: function() { window.alert('mooo')},
     ui: {
       input: 'input.gtrInput',
       share: '.js-add-people-share',
@@ -94,7 +99,13 @@ define([
 
         this.collection = new ResultsCollection();
       }
+
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
+    },
+
+    onItemviewInviteError: function(itemView, message) {
+      this.ui.loading.toggleClass('hide', true);
+      this.showValidationMessage(message);
     },
 
     selected: function (m) {
@@ -144,10 +155,11 @@ define([
       this.showMessage(this.ui.success);
     },
 
-    handleError: function (res/*, status, message*/) {
+    handleError: function (res, status, message) {
       var json = res.responseJSON;
       this.ui.loading.toggleClass('hide');
-      this.showValidationMessage((json) ? json.error : res.status + ': ' + res.statusText);
+      var m = json && json.message || message || 'Error';
+      this.showValidationMessage(m);
       this.typeahead.clear();
     },
 
