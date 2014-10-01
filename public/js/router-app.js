@@ -1,4 +1,5 @@
 require([
+  'require',
   'utils/appevents',
   'utils/context',
   'backbone',
@@ -21,7 +22,7 @@ require([
   'components/csrf',                      // No ref
   'components/ajax-errors',               // No ref
   'components/focus-events'               // No ref
-], function(appEvents, context, Backbone, _, AppIntegratedView, TroupeMenuView, troupeCollections,
+], function(require, appEvents, context, Backbone, _, AppIntegratedView, TroupeMenuView, troupeCollections,
   TitlebarUpdater, realtime, createRoomView, createRepoRoomView, chooseRoomView, log) {
   "use strict";
 
@@ -309,4 +310,11 @@ require([
   ], function(/*tracking*/) {
     // No need to do anything here
   });
+
+  if (context.popEvent('new_user_signup')) {
+    require(['twitter-oct'], function (twitterOct) {
+      twitterOct.trackPid('l4t99');
+    });
+  }
+
 });
