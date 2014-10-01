@@ -82,7 +82,7 @@ module.exports = {
 
     app.post(apiRoot + '/private/invite-user',
         authMiddleware,
-        require('./manual-invite.js'));
+        require('./invite-user.js'));
 
   }
 };
