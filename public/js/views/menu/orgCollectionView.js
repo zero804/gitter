@@ -36,30 +36,9 @@ define([
     }
   });
 
-  var EmptyView = Marionette.ItemView.extend({
-    tagName: 'li',
-    className: 'room-list-item',
-    template: orgListEmptyViewTemplate,
-
-
-    modelEvents: {
-      change: 'render',
-    },
-
-    events: {
-      click: 'goHome'
-    },
-
-    goHome: function (e) {
-      e.preventDefault();
-      appEvents.trigger('navigation', context.getUser().url, 'home', ''); // TODO: figure out a title
-    }
-  });
-
   return Marionette.CollectionView.extend({
     tagName: 'ul',
     className: 'room-list',
-    emptyView: EmptyView,
     itemView: OrgItemView
   });
 
