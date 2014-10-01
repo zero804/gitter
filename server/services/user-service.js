@@ -51,16 +51,17 @@ function newUser(options) {
   return mongooseUtils.upsert(persistence.User, { githubId: githubId }, {
       $setOnInsert: insertFields
     })
-    .spread(function(user, numAffected, raw) {
-      if(raw.updatedExisting) return user;
+    .spread(function(user/*, numAffected, raw*/) {
+      //if(raw.updatedExisting) return user;
 
       // New record was inserted
-      return emailAddressService(user)
-        .then(function(email) {
-          stats.userUpdate(_.extend({ email: email, mixpanelId : options.mixpanelId }, user.toJSON()));
-        })
-        .thenResolve(user);
+      //return emailAddressService(user)
+      //  .then(function(email) {
+      //    stats.userUpdate(_.extend({ email: email, mixpanelId : options.mixpanelId }, user.toJSON()));
+      //  })
+      //  .thenResolve(user);
 
+      return user;
     })
     .then(function(user) {
       // Reserve the URI for the user so that we don't need to figure it out
