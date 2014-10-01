@@ -1,21 +1,25 @@
-.invite-view {
+.share-view {
   font-family: 'Open Sans','HelveticaNeue-Light',sans-serif;
-  // font-size: 16px;
   color: #333;
 }
 
-.invite-view__heading {
+.share-view__heading {
   font-size: 16px;
+  line-height: 1em;
   font-weight: normal;
   margin-bottom: 12px;
 }
 
-.invite-view__copy-text {
+.share-view__section {
   display: flex;
-  margin-bottom: 42px;
+  margin-bottom: 24px;
 }
 
-.invite-view__copy-field {
+.share-view__section > *:not(:last-child) {
+  margin-right: 8px;
+}
+
+.share-view__copy-field {
   font-family: 'Open Sans','HelveticaNeue-Light',sans-serif;
   font-size: 14px;
   outline: 0;
@@ -35,26 +39,23 @@
   }
 }
 
-.invite-view__button {
+.share-view__button {
   .trpButtonMedium;
   flex-shrink: 0;
-  margin-left: 8px;
+
+  &:hover {
+    text-decoration: none;
+  }
 }
 
-.invite-view__button--copy {
+.share-view__button--copy {
   .trpBtnGreen;
 }
 
-.invite-view__button--pull-request {
+.share-view__button--pull-request {
   .trpBtnBlue;
 }
 
-.invite-view__divider {
-  height: 1px;
-  margin-bottom: 8px;
-  background-color: #eee;
-}
-
-.invite-view__badge {
+.share-view__badge {
   vertical-align: middle;
 }

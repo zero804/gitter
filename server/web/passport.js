@@ -19,6 +19,11 @@ var GitHubStrategy         = require('troupe-passport-github').Strategy;
 var GitHubMeService        = require('../services/github/github-me-service');
 var gaCookieParser         = require('../utils/ga-cookie-parser');
 
+var Mixpanel    = require('mixpanel');
+var token       = config.get("stats:mixpanel:token");
+if (token) var _mixpanel   = Mixpanel.init(token);
+
+
 function installApi() {
   /**
    * BearerStrategy
@@ -132,17 +137,28 @@ function install() {
         } else {
           return userService.findByGithubIdOrUsername(githubUserProfile.id, githubUserProfile.login)
             .then(function (user) {
+
+              if (req.session && (!user || user.state === 'INVITED')) {
+
+                var events = req.session.events;
+
+                if (!events) {
+                  events = [];
+                  req.session.events = events;
+                }
+
+                events.push('new_user_signup');
+              }
+
               // Update an existing user
               if(user) {
 
                 // If the user was in the DB already but was invited, notify stats services
                 if (user.state === 'INVITED') {
-                  stats.event("invite_accepted", {
-                    userId: user.id,
-                    method: 'github_oauth',
-                    username: user.username,
-                    googleAnalyticsUniqueId: googleAnalyticsUniqueId
-                  });
+
+                  // IMPORTANT: Do not remove this and do it ONLY once.
+                  if (_mixpanel) _mixpanel.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id); // WIP
+                  // IMPORTANT
 
                   stats.event("new_user", {
                     userId: user.id,
@@ -195,7 +211,6 @@ function install() {
                 gravatarImageUrl:   githubUserProfile.avatar_url,
                 githubUserToken:    accessToken,
                 githubId:           githubUserProfile.id,
-                mixpanelId:         mixpanel.getMixpanelDistinctId(req.cookies)
               };
 
               logger.verbose('About to create GitHub user ', githubUser);
@@ -205,12 +220,15 @@ function install() {
 
                 logger.verbose('Created GitHub user ', user.toObject());
 
+                // IMPORTANT: Do not remove this and do it ONLY once.
+                if (_mixpanel) _mixpanel.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id); // WIP
+                // IMPORTANT
+
                 req.logIn(user, function(err) {
                   if (err) { return done(err); }
-                  
+
                   stats.event("new_user", {
                     userId: user.id,
-                    distinctId: mixpanel.getMixpanelDistinctId(req.cookies),
                     method: 'github_oauth',
                     username: user.username,
                     source: req.session.source,

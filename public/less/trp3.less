@@ -1,7 +1,7 @@
 @charset "UTF-8";
 @import "bootstrap/bootstrap";
 
-@import "trp3Colours";
+@import "colors";
 @import "trpFonts";
 @import "icon-mixins";
 
@@ -17,8 +17,18 @@
     100% { opacity: 0.2; }
 }
 
+@keyframes spin {
+  0%   {transform: rotate(0deg)}
+  100% {transform: rotate(360deg)}
+}
+
 .pulse {
   animation: pulsey 2s linear infinite;
+}
+
+.spinner {
+  .prepend-octicon('\f087');
+  animation: spin 1s infinite linear;
 }
 
 .isLoading {

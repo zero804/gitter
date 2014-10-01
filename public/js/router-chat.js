@@ -11,7 +11,7 @@ require([
   'views/chat/chatCollectionView',
   'collections/instances/integrated-items',
   'views/righttoolbar/rightToolbarView',
-  'views/shareSearch/inviteView',
+  'views/share/share-view',
   'views/app/troupeSettingsView',
   'views/app/markdownView',
   'views/app/keyboardView',
@@ -46,7 +46,7 @@ require([
 
 ], function($, Backbone, context, liveContext, appEvents, log, peopleCollectionView, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, RightToolbarView,
-    inviteView, TroupeSettingsView, MarkdownView, KeyboardView, AddPeopleViewModal, IntegrationSettingsModal, CollaboratorsView, collaboratorsModels,
+    shareView, TroupeSettingsView, MarkdownView, KeyboardView, AddPeopleViewModal, IntegrationSettingsModal, CollaboratorsView, collaboratorsModels,
     unreadItemsClient, helpShareIfLonely, webhookDecorator, issueDecorator, commitDecorator, mentionDecorator,
     embedDecorator, emojiDecorator, UnreadBannerView, HistoryLimitView, HeaderView) {
   "use strict";
@@ -278,7 +278,7 @@ require([
     routes: {
       // TODO: get rid of the pipes
       "": "hideModal",
-      "inv": "inv",
+      "share": "share",
       "people": "people",
       "notifications": "notifications",
       "markdown": "markdown",
@@ -319,8 +319,8 @@ require([
       }
     },
 
-    inv: function() {
-      appView.dialogRegion.show(new inviteView.Modal({}));
+    share: function() {
+      appView.dialogRegion.show(new shareView.Modal({}));
     }
 
   });
