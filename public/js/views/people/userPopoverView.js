@@ -51,19 +51,19 @@ define([
     },
     events: {
       'click #button-onetoone': function() {
+        this.parentPopover.hide();
         var username = this.model.get('login');
         appEvents.trigger('navigation', '/' + username, 'chat', username, this.model.id);
-        this.parentPopover.hide();
       },
       'click #button-mention': function() {
+        this.parentPopover.hide();
         var username = this.model.get('login');
         appEvents.trigger('input.append', '@' + username);
-        this.parentPopover.hide();
       },
       'click #button-remove': function() {
+        this.parentPopover.hide();
         var username = this.model.get('login');
         appEvents.trigger('command.room.remove', username);
-        this.parentPopover.hide();
       }
     },
     serializeData: function() {
@@ -111,6 +111,7 @@ define([
 
       ghModel.fetch({
         success: function (model) {
+          // This is pretty yucky
           model.set('invited', model.get('state') === 'INVITED');
         }
       });
