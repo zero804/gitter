@@ -27,5 +27,7 @@ module.exports = {
         res.redirect(mobileUrl);
       }).fail(next);
     });
+
+    app.get('/mobile/embedded-chat', appRender.renderMobileNativeEmbeddedChat);
   }
 };
