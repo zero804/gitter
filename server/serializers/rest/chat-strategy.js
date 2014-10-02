@@ -141,6 +141,7 @@ function ChatStrategy(options)  {
           return {
             screenName: m.screenName,
             userId: m.userId,
+            userIds: m.userIds, // For groups
             group: m.group
           };
         }) : [],
