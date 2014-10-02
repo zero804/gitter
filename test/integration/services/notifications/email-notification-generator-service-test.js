@@ -166,8 +166,8 @@ describe('email-notification-generator-service', function() {
       })
       .then(function(chat) {
         return Q.all([
-          underlyingUnreadItemService.markAllChatsRead(fixture.user1, fixture.troupe1),
-          underlyingUnreadItemService.markAllChatsRead(fixture.user3, fixture.troupe1)
+          underlyingUnreadItemService.markAllChatsRead(fixture.user1.id, fixture.troupe1.id),
+          underlyingUnreadItemService.markAllChatsRead(fixture.user3.id, fixture.troupe1.id)
         ]);
       })
       .then(function() {
