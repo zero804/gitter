@@ -3,6 +3,27 @@ define([
 ], function(Backbone) {
   "use strict";
 
+
+  // "?foo=bar&fish=chips" -> { foo: bar, fish: chips }
+  function parseQueryString(qs) {
+    if(!(qs && qs.length > 1)) return {};
+
+    var qsObj = {};
+
+    try {
+      qs.substring(1).split('&').forEach(function(pair) {
+        var splitPair = pair.split('=');
+        qsObj[splitPair[0]] = splitPair[1];
+      });
+
+      return qsObj;
+    } catch(err) {
+      return {};
+    }
+  }
+
+  var queryStringTroupeContext = parseQueryString(window.location.search);
+
   var ctx = window.troupeContext || {};
 
   var WatchableModel = Backbone.Model.extend({
@@ -34,6 +55,8 @@ define([
 
       window.localStorage.lastTroupeId = id;
       troupeModel = { id: id };
+    } else if(queryStringTroupeContext.troupeId) {
+      troupeModel = { id: queryStringTroupeContext.troupeId };
     }
 
     return new WatchableModel(troupeModel);
@@ -159,7 +182,7 @@ define([
     var iterations = 0;
     function checkToken() {
       // This is a very rough first attempt
-      var token = window.bearerToken || ctx.accessToken;
+      var token = window.bearerToken || queryStringTroupeContext.bearerToken || ctx.accessToken;
       if(token) return callback(token);
 
       iterations++;
