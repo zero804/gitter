@@ -54,9 +54,9 @@ define([
       var email = inputEmail.value;
 
       var data = {
-        userid: this.user.id,
+        userId: this.user.id,
         email: email,
-        roomid: context.getTroupeId()
+        roomId: context.getTroupeId()
       };
 
       this.toggleLoading();

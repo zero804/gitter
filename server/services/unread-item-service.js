@@ -504,6 +504,9 @@ exports.markItemsRead = function(userId, troupeId, itemIds, mentionIds, options)
 };
 
 exports.markAllChatsRead = function(userId, troupeId, options) {
+  assert(mongoUtils.isLikeObjectId(userId));
+  assert(mongoUtils.isLikeObjectId(troupeId));
+
   if(!options) options = {};
   appEvents.markAllRead({ userId: userId, troupeId: troupeId });
 
