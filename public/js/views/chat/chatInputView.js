@@ -198,7 +198,7 @@ define([
           }
         },
         {
-          match: /(^|\s)@([a-zA-Z0-9_\-]*)$/,
+          match: /(^|\s)@(@?[a-zA-Z0-9_\-]*)$/,
           maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
           search: function(term, callback) {
             var lowerTerm = term.toLowerCase();
@@ -214,33 +214,7 @@ define([
               return (username.indexOf(lowerTerm) === 0 || displayName.indexOf(lowerTerm) === 0);
             });
 
-
-            if(term === '') {
-              if(context().permissions.admin) {
-                // This is a bit of a hack for now
-                matches.unshift(new Backbone.Model({ username: '@all', displayName: 'Group' }));
-              }
-            }
-
-            callback(matches);
-          },
-          template: function(user) {
-            return listItemTemplate({
-              name: user.get('username'),
-              description: user.get('displayName')
-            });
-          },
-          replace: function(user) {
-              return '$1@' + user.get('username') + ' ';
-          }
-        },
-        {
-          match: /(^|\s)@@([a-zA-Z0-9_\-]*)$/,
-          maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
-          search: function(term, callback) {
-            var lowerTerm = term.toLowerCase();
-            var matches = [];
-            if('all'.indexOf(lowerTerm) === 0) {
+            if(!lowerTerm || '@all'.indexOf(lowerTerm) === 0) {
               if(context().permissions.admin) {
                 // This is a bit of a hack for now
                 matches.unshift(new Backbone.Model({ username: '@all', displayName: 'Group' }));
