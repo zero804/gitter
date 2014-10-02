@@ -195,6 +195,12 @@ function renderMobileChat(req, res, next) {
   }, next);
 }
 
+function renderMobileNativeEmbeddedChat(req, res) {
+  res.render('mobile/native-embedded-chat-app', {
+    troupeContext: {}
+  });
+}
+
 function renderMobileNativeChat(req, res) {
   /*
    * All native chats are served from one endpoint so we can appcache one page.
@@ -317,6 +323,7 @@ module.exports = exports = {
   renderEmbeddedChat: renderEmbeddedChat,
   renderMobileNotLoggedInChat: renderMobileNotLoggedInChat,
   renderNotLoggedInChatPage: renderNotLoggedInChatPage,
+  renderMobileNativeEmbeddedChat: renderMobileNativeEmbeddedChat,
   renderMobileNativeChat: renderMobileNativeChat,
   renderMobileNativeUserhome: renderMobileNativeUserhome,
   renderUserNotSignedUp: renderUserNotSignedUp,
