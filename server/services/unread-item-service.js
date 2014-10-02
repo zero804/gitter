@@ -859,41 +859,25 @@ function detectAndCreateMentions(troupeId, troupe, creatingUserId, chat) {
   var usersHash = troupe.users;
   if(!usersHash) return;
 
-  var userIds = chat.mentions
-        .filter(function(mention) {
-          // Only use this for people mentions
-          return mention.userId && !mention.group;
-        })
-        .map(function(mention) {
-          return mention.userId;
+  var uniqueUserIds = {};
+  chat.mentions.forEach(function(mention) {
+    if(mention.group) {
+      if(mention.userIds) {
+        mention.userIds.forEach(function(userId) {
+          uniqueUserIds[userId] = true;
         });
+      }
+    } else {
+      uniqueUserIds[mention.userId] = true;
+    }
+  });
 
-  // Handle all group with a special-case
-  // In future, resolve this against github teams
-  var allGroupMention = _.flatten(chat.mentions
-        .filter(function(mention) {
-          // Only use this for people mentions
-          return mention.group && Array.isArray(mention.userIds);
-        })
-        .map(function(mention) {
-          return mention.userIds;
-        }));
-
-  var mentionMemberUserIds;
-  if(allGroupMention.length) {
-    // Add everyone except the person creating the message
-    mentionMemberUserIds = allGroupMention;
-  } else {
-    mentionMemberUserIds = [];
-  }
-
+  var mentionMemberUserIds = [];
   var mentionLurkerAndNonMemberUserIds = [];
 
   var lookupUsers = [];
 
-  userIds.forEach(function(userId) {
-    if(!userId) return;
-
+  Object.keys(uniqueUserIds).forEach(function(userId) {
     /* Don't be mentioning yourself yo */
     if(userId == creatingUserId) return;
 
