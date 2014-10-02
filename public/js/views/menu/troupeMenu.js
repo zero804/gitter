@@ -31,7 +31,7 @@ define([
     initialize: function (options) {
       this.collectionView = options.collectionView;
       this.collection = this.collectionView.collection;
-      this.collection.once('sync', this.display.bind(this));
+      this.collection.once('sync add reset remove', this.display.bind(this));
     },
 
     serializeData: function () {
@@ -41,6 +41,11 @@ define([
     },
 
     onRender: function () {
+      if (this.collection.length) {
+        this.$el.show();
+      } else {
+        this.$el.hide();
+      }
       this.list.show(this.collectionView);
     },
 
