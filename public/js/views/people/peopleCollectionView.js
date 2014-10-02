@@ -20,7 +20,7 @@ define([
   });
 
   var RemainingView = Marionette.ItemView.extend({
-    tagName: 'p',
+    // tagName: 'p',
     className: 'remaining',
     template: remainingTempate,
     initialize: function(options) {
@@ -37,9 +37,15 @@ define([
       };
     },
     onRender: function() {
+      var showMore = this.$('.js-show-more');
+      showMore.hide();
       var remainingCount = this.userCollection.length - this.rosterCollection.length;
 
-      this.$el.toggleClass('showFull', remainingCount > 0);
+      if (remainingCount > 0) {
+        showMore.show();
+        this.$el.toggleClass('showFull');
+      }
+
       this.$el.toggleClass('showMid', this.rosterCollection.length > 10);
     }
   });
