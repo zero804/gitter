@@ -12,11 +12,17 @@ define([
   var userId = context.getUserId();
 
   function mentionsUser(message) {
+    if(!userId) return false;
+
     var m = message.mentions;
     if (!m) return false;
+
     for (var i = 0; i < m.length; i++) {
-      if(userId && m[i].userId === userId) return true;
+      var mention = m[i];
+      if(!mention.group && mention.userId === userId) return true;
+      if(mention.group && mention.userIds && mention.userIds.indexOf(userId) >= 0) return true;
     }
+
     return false;
   }
 

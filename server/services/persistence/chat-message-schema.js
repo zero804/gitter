@@ -15,6 +15,7 @@ var ChatMessageSchema = new Schema({
   mentions: [{
     screenName: { type: String, required: true },
     userId:     { type: ObjectId },
+    userIds:    { type: [ObjectId] },
     group:      { type: Boolean, required: false }, // True iff screenname is a group
   }],
   issues:     Array, // TODO: schema-ify this

@@ -72,21 +72,31 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
         return mention.screenName;
       });
 
-
     return userService.findByUsernames(mentionUserNames)
       .then(function(users) {
       var usersIndexed = collections.indexByProperty(users, 'username');
 
       var mentions = parsedMessage.mentions.map(function(mention) {
+        var groupUserIds;
         if(mention.group) {
+          if(mention.screenName === 'all') {
+            groupUserIds = troupe.users.map(function(troupeUser) {
+              return troupeUser.userId;
+            }).filter(function(troupeUserId) {
+
+              return String(troupeUserId) !== String(user.id);
+            });
+          }
+
           return {
             screenName: mention.screenName,
-            group: true
+            group: true,
+            userIds: groupUserIds
           };
         }
 
-        var user = usersIndexed[mention.screenName];
-        var userId = user && user.id;
+        var mentionUser = usersIndexed[mention.screenName];
+        var userId = mentionUser && mentionUser.id;
 
         return {
           screenName: mention.screenName,
