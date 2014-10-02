@@ -198,6 +198,11 @@ define([
     },
 
     onRender: function () {
+      var self = this;
+      setTimeout(function() {
+        self.ui.input.focus();
+      }, 10);
+
       this.typeahead = new Typeahead({
         collection: new UserSearchCollection(),
         itemTemplate: userSearchItemTemplate,
