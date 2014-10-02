@@ -6,16 +6,57 @@ define([
   'utils/is-mobile',
   'collections/instances/troupes',
   'views/menu/room-collection-view',
+  './suggested-collection-view',
   'log!troupeMenu',
   'cocktail',
   'views/keyboard-events-mixin',
   'hbs!./tmpl/troupeMenu',
+  'hbs!./tmpl/collection-wrapper-view',
   './searchView',
   './profileView',
   './orgCollectionView',
   'nanoscroller' //no ref
-], function($, Marionette, context, appEvents, isMobile, troupeCollections, RoomCollectionView, log, cocktail, KeyboardEventsMixin, template, SearchView, ProfileView, OrgCollectionView) {
+], function ($, Marionette, context, appEvents, isMobile, troupeCollections, RoomCollectionView, SuggestedCollectionView, log, cocktail, KeyboardEventsMixin, template, CollectionWrapperViewTemplate, SearchView, ProfileView, OrgCollectionView) {
   "use strict";
+
+  // wraps a view to give us more control of when to display it or not
+  var CollectionWrapperView = Marionette.Layout.extend({
+
+    regions: {
+      list: "#list"
+    },
+
+    template: CollectionWrapperViewTemplate,
+
+    initialize: function (options) {
+      this.collectionView = options.collectionView;
+      this.collection = this.collectionView.collection;
+      this.collection.once('sync add reset remove', this.display.bind(this));
+    },
+
+    serializeData: function () {
+      return {
+        header: this.options.header
+      };
+    },
+
+    onRender: function () {
+      if (this.collection.length) {
+        this.$el.show();
+      } else {
+        this.$el.hide();
+      }
+      this.list.show(this.collectionView);
+    },
+
+    display: function () {
+      if (this.collection.length > 0) {
+        this.$el.show();
+      } else {
+        this.$el.hide();
+      }
+    }
+  });
 
   var View = Marionette.Layout.extend({
     className: 'js-menu menu',
@@ -27,7 +68,8 @@ define([
       recent: "#list-recents",
       favs: "#list-favs",
       search: "#left-menu-list-search",
-      orgs: "#left-menu-list-orgs"
+      orgs: "#left-menu-list-orgs",
+      suggested: '#left-menu-list-suggested'
     },
 
     events: function() {
@@ -70,6 +112,23 @@ define([
         var index = self.getIndexForId(id);
         if (index) self.selectedIndex = index;
       });
+
+      // nanoscroller has to be reset when regions are rerendered
+      this.regionManager.forEach(function (region) {
+        self.listenTo(region, 'show', function () {
+          var $nano = this.$el.find('.nano');
+          $nano.nanoScroller({ iOSNativeScrolling: true });
+        });
+      });
+
+      // determining whether we should show the suggested rooms or not
+      var hasItems = troupeCollections.troupes && !!(troupeCollections.troupes.length);
+
+      if (hasItems) {
+        this.showSuggestedOrSetFlag();
+      } else {
+        troupeCollections.troupes.once('sync', this.showSuggestedOrSetFlag.bind(this));
+      }
     },
 
     getIndexForId: function(id) {
@@ -141,7 +200,10 @@ define([
       };
     },
 
-    onRender: function() {
+    onRender: function () {
+      this.isRendered = true;
+
+      if (this.shouldShowSuggestions) this.showSuggested();
 
       this.profile.show(new ProfileView());
 
@@ -167,17 +229,12 @@ define([
       this.search.show(this.searchView);
 
       // Organizations collection view
-      this.orgs.show(new OrgCollectionView({ collection: troupeCollections.orgs }));
-
-      // nanoscroller has to be reset when regions are rerendered
-      var $nano = this.$el.find('.nano');
-      this.regionManager.forEach(function(region) {
-        region.currentView.on('render', function() {
-          $nano.nanoScroller({ iOSNativeScrolling: true });
-        });
-      });
-
+      this.orgs.show(new CollectionWrapperView({
+        collectionView: new OrgCollectionView({ collection: troupeCollections.orgs }),
+        header: 'Your Organizations'
+      }));
     },
+
     /* the clear icon shouldn't be available at all times? */
     onSearchClearIconClick: function() {
       $('#list-search-input').val('');
@@ -202,6 +259,21 @@ define([
       this.$el.find('#list-search').show();
     },
 
+    // IMPORTANT: if the view is already rendered then just show the region, else set a property that can be used by onRender()
+    showSuggestedOrSetFlag: function () {
+      if (this.isRendered) this.showSuggested();
+      else this.shouldShowSuggestions = true;
+    },
+
+    showSuggested: function () {
+      if (troupeCollections.troupes.length >= 8) {
+        return;
+      }
+      this.suggested.show(new CollectionWrapperView({
+        collectionView: new SuggestedCollectionView({ collection: troupeCollections.suggested }),
+        header: 'Suggested Rooms'
+      }));
+    }
   });
 
   cocktail.mixin(View, KeyboardEventsMixin);

@@ -17,6 +17,7 @@ define([
 
   var orgsCollection = new orgModels.OrgCollection(null, { listen: true });
   var troupeCollection = new troupeModels.TroupeCollection(null, { listen: true });
+  var suggestedCollection = new troupeModels.SuggestedTroupeCollection(null, { listen: false });
 
   unreadItemsClient.installTroupeListener(troupeCollection);
 
@@ -113,8 +114,8 @@ define([
   return {
     /* All rooms */
     troupes: troupeCollection,
-
     /* Filtered rooms */
+    suggested: suggestedCollection,
     favourites: favourites,
     recentRoomsNonFavourites: recentRoomsNonFavourites,
     orgs: orgsCollection
