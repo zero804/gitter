@@ -3,7 +3,7 @@ define([], function () {
   "use strict";
 
   return function trim(name, maxLength) {
-    maxLength = maxLength || 25 ; // defaults to 25
+    maxLength = maxLength || 25; // defaults to 25
 
     if (name.length < maxLength) return name; // avoid computing
 
