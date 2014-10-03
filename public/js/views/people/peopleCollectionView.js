@@ -42,28 +42,20 @@ define([
       var remainingCount = this.userCollection.length - this.rosterCollection.length;
       return {
         remainingCount: remainingCount,
-        plural: remainingCount > 1
+        plural: remainingCount > 1,
+        isOneToOne: context.inOneToOneTroupeContext()
       };
     },
 
     onRender: function() {
-      this.ui.addMore.hide();
-      this.ui.showMore.hide();
-
-      if (context.inOneToOneTroupeContext()) {
-        return;
-      } else {
-        this.ui.addMore.show();
-      }
-
       var remainingCount = this.userCollection.length - this.rosterCollection.length;
+      this.ui.showMore.hide();
+      this.$el.toggleClass('showMid', this.rosterCollection.length > 10);
 
       if (remainingCount > 0) {
         this.ui.showMore.show();
         this.$el.toggleClass('showFull');
       }
-
-      this.$el.toggleClass('showMid', this.rosterCollection.length > 10);
     }
   });
 
