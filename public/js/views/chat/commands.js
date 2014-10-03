@@ -117,7 +117,7 @@ define([
     {
       command: 'lurk',
       description: 'Lurk in the room',
-      completion: 'lurk',
+      completion: 'lurk ',
       regexp: /^\/lurk/,
       criteria: function() {
         return !context.inOneToOneTroupeContext();
