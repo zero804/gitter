@@ -8,11 +8,12 @@
 
   <title>Gitter</title>
 
-  <link rel="stylesheet" href='{{ cdn "styles/mobile-native-chat.css" }}'>
+  {{!-- has to be relative so it can be served off a file:///x/y/z/Gitter.app url with no host --}}
+  <link rel="stylesheet" href="../styles/mobile-native-chat.css">
 
-  {{{ generateTroupeContext troupeContext accessToken=accessToken page='chat' }}}
+  {{{ generateTroupeContext troupeContext page='chat' }}}
 
-  <link rel="shortcut icon" href='{{ cdn "images/favicon.ico" appcache=appCache }}'>
+  <link rel="shortcut icon" href="../images/favicon.ico">
 
 </head>
 <body>
@@ -27,7 +28,7 @@
   </div>
 
   {{>require_wrapper}}
-  {{{ bootScript "mobile-native-embedded-chat" }}}
+  {{{ bootScript "mobile-native-embedded-chat" root="../" }}}
 
 </body>
 </html>
