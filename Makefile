@@ -246,6 +246,14 @@ clean-client-libs:
 clean-temp-client-libs:
 	rm -rf output/client-libs/ output/js-temp
 
+clean-embedded-chat:
+	rm -rf output/embedded output/embedded.tgz
+
+embedded-chat:
+	mkdir -p output/embedded/mobile
+	wget localhost:5000/mobile/embedded-chat --output-document output/embedded/mobile/embedded-chat.html
+	cd public-processed && find . -type f ! -name "*.gz" ! -name "*.md5" -exec gcp --parents {} ../output/embedded \;
+	cd output && tar -zcf embedded.tgz embedded
 
 fetch-client-libs:
 	bower install
