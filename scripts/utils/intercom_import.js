@@ -31,7 +31,7 @@ getAllUsers(function(err, users) {
 
     async.eachLimit(users, 20,
       function(user, callback){
-        if (user.state !== 'INVITED') {
+        if (user.isActive()) {
           var created_at = new Date(user._id.getTimestamp());
           emailAddressService(user).nodeify(function(err, email) {
             if (err) {
