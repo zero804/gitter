@@ -1,10 +1,11 @@
 define([
   'marionette',
+  'utils/context',
   'views/base',
   'views/widgets/avatar',
   'hbs!./tmpl/peopleCollectionView',
   'hbs!./tmpl/remainingView'
-], function(Marionette, TroupeViews, AvatarView, collectionTemplate, remainingTempate) {
+], function(Marionette, context, TroupeViews, AvatarView, collectionTemplate, remainingTempate) {
   "use strict";
 
   var PeopleCollectionView = Marionette.CollectionView.extend({
@@ -20,15 +21,23 @@ define([
   });
 
   var RemainingView = Marionette.ItemView.extend({
-    // tagName: 'p',
+
+    ui: {
+      showMore: '.js-show-more',
+      addMore: '.js-add-more'
+    },
+
     className: 'remaining',
+
     template: remainingTempate,
+
     initialize: function(options) {
       this.rosterCollection = options.rosterCollection;
       this.userCollection = options.userCollection;
       this.listenTo(this.rosterCollection, 'add remove reset', this.render);
       this.listenTo(this.userCollection, 'add remove reset', this.render);
     },
+
     serializeData: function() {
       var remainingCount = this.userCollection.length - this.rosterCollection.length;
       return {
@@ -36,13 +45,21 @@ define([
         plural: remainingCount > 1
       };
     },
+
     onRender: function() {
-      var showMore = this.$('.js-show-more');
-      showMore.hide();
+      this.ui.addMore.hide();
+      this.ui.showMore.hide();
+
+      if (context.inOneToOneTroupeContext()) {
+        return;
+      } else {
+        this.ui.addMore.show();
+      }
+
       var remainingCount = this.userCollection.length - this.rosterCollection.length;
 
       if (remainingCount > 0) {
-        showMore.show();
+        this.ui.showMore.show();
         this.$el.toggleClass('showFull');
       }
 
