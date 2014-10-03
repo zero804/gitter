@@ -336,6 +336,52 @@ function removeItem(troupeId, itemType, itemId) {
   });
 }
 
+/*
+  This ensures that if all else fails, we clear out the unread items
+  It should only have any effect when data is inconsistent
+*/
+function ensureAllItemsRead(userId, troupeId, member) {
+  assert(userId, 'Expected userId');
+  assert(troupeId, 'Expected troupeId');
+
+  var itemType = 'chat';
+
+  var keys = [
+      "ub:" + userId,
+      "unread:" + itemType + ":" + userId + ":" + troupeId,
+      EMAIL_NOTIFICATION_HASH_KEY,
+      "m:" + userId + ":" + troupeId,
+      "m:" + userId,
+      'uel:' + troupeId + ":" + userId
+    ];
+
+  var values = [troupeId, userId];
+
+  return runScript('unread-ensure-all-read', keys, values)
+    .then(function(flag) {
+      var badgeUpdate = flag & 1;
+
+      // Notify the user
+      appEvents.troupeUnreadCountsChange({
+        userId: userId,
+        troupeId: troupeId,
+        total: 0
+      });
+
+      appEvents.troupeMentionCountsChange({
+        userId: userId,
+        troupeId: troupeId,
+        total: 0,
+        op: 'remove',
+        member: member
+      });
+
+      if(badgeUpdate) {
+        republishBadgeForUser(userId);
+      }
+    });
+}
+
 /**
  * Mark an item in a troupe as having been read by a user
  * @return {promise} promise of nothing
@@ -512,7 +558,7 @@ exports.markAllChatsRead = function(userId, troupeId, options) {
 
   return exports.getUnreadItems(userId, troupeId, 'chat')
     .then(function(chatIds) {
-      if(!chatIds.length) return;
+      if(!chatIds.length) return ensureAllItemsRead(userId, troupeId, options);
 
       if(!('recordAsRead' in options)) options.recordAsRead = false;
       /* Don't mark the items as read */
@@ -813,40 +859,25 @@ function detectAndCreateMentions(troupeId, troupe, creatingUserId, chat) {
   var usersHash = troupe.users;
   if(!usersHash) return;
 
-  var userIds = chat.mentions
-        .filter(function(mention) {
-          // Only use this for people mentions
-          return mention.userId && !mention.group;
-        })
-        .map(function(mention) {
-          return mention.userId;
+  var uniqueUserIds = {};
+  chat.mentions.forEach(function(mention) {
+    if(mention.group) {
+      if(mention.userIds) {
+        mention.userIds.forEach(function(userId) {
+          uniqueUserIds[userId] = true;
         });
+      }
+    } else {
+      uniqueUserIds[mention.userId] = true;
+    }
+  });
 
-  // Handle all group with a special-case
-  // In future, resolve this against github teams
-  var allGroupMention = chat.mentions
-        .filter(function(mention) {
-          // Only use this for people mentions
-          return mention.group && mention.screenName === 'all';
-        }).length >= 1;
-
-  var mentionMemberUserIds;
-  if(allGroupMention) {
-    // Add everyone except the person creating the message
-    mentionMemberUserIds = Object.keys(usersHash).filter(function(u) {
-      return "" + u !== "" + creatingUserId;
-    });
-  } else {
-    mentionMemberUserIds = [];
-  }
-
+  var mentionMemberUserIds = [];
   var mentionLurkerAndNonMemberUserIds = [];
 
   var lookupUsers = [];
 
-  userIds.forEach(function(userId) {
-    if(!userId) return;
-
+  Object.keys(uniqueUserIds).forEach(function(userId) {
     /* Don't be mentioning yourself yo */
     if(userId == creatingUserId) return;
 
