@@ -67,8 +67,8 @@ module.exports = {
     var cipher    = crypto.createCipher('aes256', passphrase);
     var hash      = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
 
-    if (user.state === 'INVITED') {
-      logger.info('Skipping email notification for ' + user.username + ', in INVITED state.');
+    if (!user.isActive()) {
+      logger.info('Skipping email notification for ' + user.username + ', not active state.');
       return;
     }
 
