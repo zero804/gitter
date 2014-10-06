@@ -148,17 +148,18 @@ define([
     },
 
     onRender: function() {
-      if (!window._troupeIsTablet) $("#chat-input-textarea").focus();
+      var $textarea = this.$el.find('#chat-input-textarea');
 
-      // TODO: why we using global $?
-      var textAreaValue = $("#chat-input-textarea").val();
+      // firefox only respects the "autofocus" attr if it is present on source html
+      // also, dont show keyboard right away on mobile
+      if(!this.compactView) $textarea.focus();
 
       var inputBox = new ChatInputBoxView({
-        el: this.$el.find('.js-chat-input-text-area'),
+        el: $textarea,
         rollers: this.rollers,
         chatCollectionView: this.chatCollectionView,
         composeMode: this.composeMode,
-        value: textAreaValue
+        value: $textarea.val()
       });
 
       this.inputBox = inputBox;
@@ -166,7 +167,6 @@ define([
       this.$el.find('.compose-mode-toggle, .md-help').tooltip({placement: 'left'});
       var userCollection = this.userCollection;
 
-      var $textarea = this.$el.find('textarea');
 
       $textarea.textcomplete([
         {
