@@ -1,12 +1,12 @@
-<div class="{{!-- trpChatInputContainer --}}  chat-input__area">
-  <div class="{{!-- trpChatInputButtons --}}  chat-input__buttons">
+<div class="chat-input__area">
+  <div class="chat-input__buttons">
     <div class="compose-mode-toggle {{#if isComposeModeEnabled}}active{{/if}}" title="{{composeModeToggleTitle}}"></div>
     <a href="#markdown" style="text-decoration: none"><div class="md-help" title="{{showMarkdownTitle}}"></div></a>
   </div>
-  <div class="{{!-- trpChatInputAvatar --}}  chat-input__avatar">
+  <div class="chat-input__avatar">
     {{ widget "avatar" model=user size='s' showTooltip=false }}
   </div>
-  <form class="{{!-- trpChatInputBox --}}  chat-input__box" name="chat">
-    <textarea class="{{!-- trpChatInputBoxTextArea --}}  chat-input__text-area  js-chat-input-text-area" name="chat" id="chat-input-textarea" placeholder="{{placeholder}}" autofocus="autofocus" maxlength="4096"></textarea>
+  <form class="chat-input__box" name="chat">
+    <textarea class="chat-input__text-area  js-chat-input-text-area" name="chat" id="chat-input-textarea" placeholder="{{placeholder}}" {{#if autofocus}}autofocus{{/if}} maxlength="4096"></textarea>
   </form>
 </div>
