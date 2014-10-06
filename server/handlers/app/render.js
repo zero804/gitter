@@ -73,9 +73,12 @@ function renderHomePage(req, res, next) {
 }
 
 function renderMainFrame(req, res, next, frame) {
+  console.log('renderMainFrame() ====================');
   contextGenerator.generateNonChatContext(req)
     .then(function (troupeContext) {
+
       var chatAppLocation = '/' + req.uriContext.uri + '/~' + frame + '#initial';
+      console.log('chatAppLocation:', chatAppLocation);
 
       var template, bootScriptName;
       if(req.user) {
@@ -265,7 +268,6 @@ function renderEmbeddedChat(req, res, next) {
 function renderUserNotSignedUp(req, res, next) {
   userService.findByUsername(req.params.roomPart1)
     .then(function (user) {
-      console.log('#user:', user);
       res.render('chat-invited-template', {
         cssFileName: "styles/router-nli-chat.css", // TODO: this shouldn't be hardcoded as this
         appCache: getAppCache(req),

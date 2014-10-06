@@ -17,9 +17,16 @@ function saveRoom(req) {
 }
 
 var mainFrameMiddlewarePipeline = [
+  function (req, res, next) { console.log('mainFrameMiddlewarePipeline'); next(); },
   appMiddleware.uriContextResolverMiddleware,
   appMiddleware.isPhoneMiddleware,
-  function(req, res, next) {
+  function (req, res, next) {
+
+    if (req.uriContext.accessDenied) {
+      console.log('should render the new page for', req.uriContext.accessDenied.uri);
+      // appRender.renderSomething(req, res, next, 'home');
+      // return res.send('hi');
+    }
 
     if (req.uriContext.ownUrl) {
       if(req.isPhone) {
@@ -53,6 +60,7 @@ var mainFrameMiddlewarePipeline = [
 ];
 
 var chatMiddlewarePipeline = [
+  function (req, res, next) { console.log('chatMiddlewarePipeline'); next(); },
   appMiddleware.uriContextResolverMiddleware,
   appMiddleware.isPhoneMiddleware,
   function (req, res, next) {
@@ -90,7 +98,7 @@ var embedMiddlewarePipeline = [
 
 module.exports = {
     install: function(app) {
-      
+
       [
         '/:roomPart1/~chat',                         // ORG or ONE_TO_ONE
         '/:roomPart1/:roomPart2/~chat',              // REPO or ORG_CHANNEL or ADHOC
@@ -98,7 +106,7 @@ module.exports = {
       ].forEach(function(path) {
         app.get(path, chatMiddlewarePipeline);
       });
-      
+
       [
         '/:roomPart1/:roomPart2/~embed',              // REPO or ORG_CHANNEL or ADHOC
         '/:roomPart1/:roomPart2/:roomPart3/~embed'    // CUSTOM REPO_ROOM
