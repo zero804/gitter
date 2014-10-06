@@ -8,6 +8,7 @@ var config                 = env.config;
 var stats                  = env.stats;
 
 var _                      = require('underscore');
+var moment                 = require('moment');
 var userService            = require('../services/user-service');
 var passport               = require('passport');
 var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
@@ -134,7 +135,7 @@ function install() {
           return userService.findByGithubIdOrUsername(githubUserProfile.id, githubUserProfile.login)
             .then(function (user) {
 
-              if (req.session && (!user || user.state === 'INVITED')) {
+              if (req.session && (!user || user.isInvited())) {
 
                 var events = req.session.events;
 
@@ -150,7 +151,7 @@ function install() {
               if(user) {
 
                 // If the user was in the DB already but was invited, notify stats services
-                if (user.state === 'INVITED') {
+                if (user.isInvited()) {
 
                   // IMPORTANT: The alias can only happen ONCE. Do not remove.
                   stats.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id, function() {
@@ -215,6 +216,13 @@ function install() {
                 githubId:           githubUserProfile.id,
               };
 
+              var githubUserAgeHours;
+              if(githubUserProfile.created_at) {
+                var createdAt = moment(githubUserProfile.created_at);
+                var duration = moment.duration(Date.now() - createdAt.valueOf());
+                githubUserAgeHours = duration.asHours();
+              }
+
               logger.verbose('About to create GitHub user ', githubUser);
 
               userService.findOrCreateUserForGithubId(githubUser, function(err, user) {
@@ -224,7 +232,7 @@ function install() {
 
                 // IMPORTANT: The alias can only happen ONCE. Do not remove.
                 stats.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id, function(err) {
-                  if (err) console.error('[mixpanel] Error aliasing user:', err);
+                  if (err) logger.error('Error aliasing user:', { exception: err });
 
                   stats.event("new_user", {
                     userId: user.id,
@@ -233,6 +241,16 @@ function install() {
                     source: req.session.source,
                     googleAnalyticsUniqueId: googleAnalyticsUniqueId
                   });
+
+                  // Flag the user as a new github user if they've created
+                  // their account in the last two hours
+                  if(githubUserAgeHours < 2) {
+                    stats.event("new_github_user", {
+                      userId: user.id,
+                      username: user.username,
+                      googleAnalyticsUniqueId: googleAnalyticsUniqueId
+                    });
+                  }
 
                   stats.userUpdate(user);
                 });

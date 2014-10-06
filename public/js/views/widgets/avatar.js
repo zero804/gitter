@@ -146,7 +146,9 @@ define([
         online: online,
         offline: !online,
         role: user.role,
-        invited: user.invited
+        invited: user.invited,
+        removed: user.removed,
+        inactive: user.removed || user.invited
       };
     },
 

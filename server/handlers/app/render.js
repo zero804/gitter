@@ -271,6 +271,7 @@ function renderEmbeddedChat(req, res, next) {
 function renderUserNotSignedUp(req, res, next) {
   userService.findByUsername(req.params.roomPart1)
     .then(function (user) {
+      console.log('#user:', user);
       res.render('chat-invited-template', {
         cssFileName: "styles/router-nli-chat.css", // TODO: this shouldn't be hardcoded as this
         appCache: getAppCache(req),
@@ -278,7 +279,8 @@ function renderUserNotSignedUp(req, res, next) {
         oneToOneInvited: true,
         invitedUser: user,
         troupeName: user.username,
-        shareURL: nconf.get('web:basepath') + '/' + req.user.username
+        shareURL: nconf.get('web:basepath') + '/' + req.user.username,
+        avatarUrl: user.gravatarImageUrl
       });
     })
     .fail(next);
