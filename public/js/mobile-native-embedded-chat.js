@@ -54,7 +54,8 @@ require([
     el: $('#chat-input'),
     collection: chatCollection,
     rollers: chatCollectionView.rollers,
-    userCollection: userCollection
+    userCollection: userCollection,
+    compactView: true
   }).render();
 
   $('html').removeClass('loading');

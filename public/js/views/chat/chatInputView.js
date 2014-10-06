@@ -103,6 +103,7 @@ define([
       this.chatCollectionView = options.chatCollectionView;
       this.composeMode = new ComposeMode();
       this.userCollection = options.userCollection;
+      this.compactView = options.compactView;
 
       this.listenTo(appEvents, 'input.append', function(text, options) {
         if(this.inputBox) {
