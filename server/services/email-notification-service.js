@@ -13,6 +13,7 @@ var emailAddressService = require('./email-address-service');
 var roomNameTrimmer     = require('../utils/room-name-trimmer');
 var mongoUtils          = require('../utils/mongo-utils');
 var moment              = require('moment');
+var Q                   = require('q');
 
 /*
  * Return a nice sane
@@ -67,9 +68,9 @@ module.exports = {
     var cipher    = crypto.createCipher('aes256', passphrase);
     var hash      = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
 
-    if (!user.isActive()) {
+    if (user.state) {
       logger.info('Skipping email notification for ' + user.username + ', not active state.');
-      return;
+      return Q.resolve();
     }
 
     return emailAddressService(user)
