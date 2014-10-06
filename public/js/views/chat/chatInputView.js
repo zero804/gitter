@@ -140,6 +140,7 @@ define([
         user: context.user(),
         isComposeModeEnabled: this.composeMode.isEnabled(),
         placeholder: placeholder,
+        autofocus: !this.compactView,
         composeModeToggleTitle: this.getComposeModeTitle(),
         showMarkdownTitle: 'Markdown help ('+ platformKeys.cmd +' + '+ platformKeys.gitter +' + m)',
         value: $("#chat-input-textarea").val()
