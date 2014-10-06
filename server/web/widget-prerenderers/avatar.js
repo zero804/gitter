@@ -22,7 +22,8 @@ module.exports = exports = function(template) {
       avatarSize: avatarSize,
       id: user.id,
       showStatus: showStatus,
-      showBadge: showBadge
+      showBadge: showBadge,
+      inactive: !!user.state
     });
 
     return r;

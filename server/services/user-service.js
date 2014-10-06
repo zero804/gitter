@@ -1,9 +1,6 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var env                       = require('../utils/env');
-var stats                     = env.stats;
-var _                         = require('underscore');
 // var sechash                   = require('sechash');
 var winston                   = require('../utils/winston');
 var assert                    = require('assert');
@@ -11,7 +8,6 @@ var persistence               = require("./persistence-service");
 var uriLookupService          = require('./uri-lookup-service');
 var Q                         = require('q');
 var githubUserService         = require('./github/github-user-service');
-var emailAddressService       = require('./email-address-service');
 var mongooseUtils             = require('../utils/mongoose-utils');
 
 /** FIXME: the insert fields should simply extend from options or a key in options.
@@ -137,20 +133,6 @@ var userService = {
     return persistence.User.findByIdQ(id).nodeify(callback);
   },
 
-  githubUserExists: function(username, callback) {
-    return persistence.User.countQ({ username: username })
-      .then(function(count) {
-        return !!count;
-      })
-      .nodeify(callback);
-  },
-
-  getUserState: function(username, callback) {
-    return persistence.User.findOneQ({ username: username })
-      .then(function (user) { return user.state; })
-      .nodeify(callback);
-  },
-
   /**
    * Returns a hash of booleans if the given usernames exist in gitter
    */
@@ -248,8 +230,7 @@ var userService = {
 
   deleteAllUsedInvitesForUser: function(user) {
     persistence.Invite.remove({ userId: user.id, status: "USED" });
-  },
-
+  }
 
 };
 
