@@ -1,4 +1,5 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
+#!/usr/bin/env node
+/* jshint node:true */
 "use strict";
 
 var express  = require('express');
@@ -8,7 +9,7 @@ var redis    = require('../server/utils/redis');
 
 var opts = require("nomnom")
   .option('output', {
-     abbr: '0',
+     abbr: 'o',
      required: true,
      help: 'Output'
   })

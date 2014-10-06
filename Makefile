@@ -251,9 +251,12 @@ clean-embedded-chat:
 
 embedded-chat:
 	mkdir -p output/embedded/mobile
-	wget localhost:5000/mobile/embedded-chat --output-document output/embedded/mobile/embedded-chat.html
-	cd public-processed && find . -type f ! -name "*.gz" ! -name "*.md5" -exec gcp --parents {} ../output/embedded \;
-	cd output && tar -zcf embedded.tgz embedded
+	NODE_ENV=prod ./build-scripts/render-embedded-chat.js  -o output/embedded/mobile/embedded-chat.html
+	echo public-processed/js/core-libraries.min.js > output/embedded-resources.txt
+	echo public-processed/js/mobile-native-embedded-chat.min.js >> output/embedded-resources.txt
+	ls public-processed/images/emoji/*  >> output/embedded-resources.txt
+	./build-scripts/extract-urls.js public-processed/styles/mobile-native-chat.css >> output/embedded-resources.txt
+	./build-scripts/copy-embedded-resources.sh
 
 fetch-client-libs:
 	bower install
