@@ -19,11 +19,13 @@ function normaliseUrl(params) {
 function uriContextResolverMiddleware(req, res, next) {
   var uri = normaliseUrl(req.params);
   var tracking = { source: req.query.source };
-  
+
   return roomService.findOrCreateRoom(req.user, uri, { tracking: tracking })
     .then(function(uriContext) {
 
-      if(!uriContext || (!uriContext.troupe && !uriContext.ownUrl)) {
+      if (uriContext && uriContext.accessDenied && uriContext.accessDenied.githubType === 'ORG') {
+        console.log('#here');
+      } else if (!uriContext || (!uriContext.troupe && !uriContext.ownUrl)) {
         if(!req.user) {
           throw 401;
         }

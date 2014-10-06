@@ -369,7 +369,13 @@ function findOrCreateRoom(user, uri, options) {
         if(uriLookup.troupe) {
           return roomPermissionsModel(null, 'view', uriLookup.troupe)
             .then(function(access) {
-              if(!access) return;
+              if(!access) {
+                return {
+                  accessDenied: {
+                    githubType: uriLookup.troupe.githubType,
+                    uri: uriLookup.troupe.uri
+                }};
+              }
 
               return { troupe: uriLookup.troupe };
             });
