@@ -210,7 +210,7 @@ define([
             this._unreadItemsRemoved(this._marshall());
           }
         });
-      }. this);
+      }, this);
 
     }
 
@@ -287,7 +287,7 @@ define([
           }
         });
 
-      });
+      }, this);
 
     }
   };
