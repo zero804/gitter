@@ -28,23 +28,36 @@ module.exports = {
   create: function(req, res, next) {
     var username = req.body.username;
 
+    function maskEmail(email) {
+      return email
+        .split('@')
+        .map(function (item, index) {
+          if (index === 0) return item.slice(0, 4) + '****';
+          return item;
+        })
+        .join('@');
+    }
+
     return roomService.addUserToRoom(req.troupe, req.user, username)
-      .then(function(userAdded) {
+      .then(function (addedUser) {
 
         var strategy = new restSerializer.UserStrategy();
 
         return [
-          restSerializer.serializeQ(userAdded, strategy),
-          emailAddressService(userAdded)
+          restSerializer.serializeQ(addedUser, strategy),
+          emailAddressService(addedUser)
         ];
       })
       .spread(function(serializedUser, email) {
 
-        if(serializedUser.invited && email) {
-          serializedUser.email = email;
+        if (serializedUser.invited && email) {
+          serializedUser.email = maskEmail(email);
         }
 
         res.send(200, { success: true, user: serializedUser });
+      })
+      .catch(function (err) {
+        res.send(err.status, err);
       })
       .fail(next);
   },
@@ -54,7 +67,7 @@ module.exports = {
 
     return roomService.removeUserFromRoom(req.troupe, user, req.user)
       .then(function() {
-        recentRoomService.removeRecentRoomForUser(user.id, req.troupe);
+        recentRoomService.removeRecentRoomForUser(user.id, req.troupe.id);
       })
       .then(function() {
         appEvents.userLeft({user: req.user, room: req.troupe});

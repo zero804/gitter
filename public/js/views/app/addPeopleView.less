@@ -12,6 +12,11 @@
   }
 }
 
+.gtrPeopleRosterItem__form {
+  padding: 0;
+  margin: 0;
+}
+
 .gtrPeopleRosterItem {
   // .trpBodyMedium;
   width: 100%;
@@ -24,10 +29,20 @@
   }
 
   &__content {
-
-    margin-left: 39px;
-    line-height: 30px;
-
+    display: flex;
+    
+    /* Give the avatar some space to the right */
+    .trpDisplayPicture {
+      margin-right: 8px;
+    }
+    
+    > * {
+      align-self: center;
+    }
+    
+    
+    
+/*
     p {
       margin-bottom: 0;
       padding-left: 24px !important;
@@ -60,6 +75,12 @@
         }
       }
     }
+    */
+  }
+  
+  &__input {
+    flex-grow: 1;
+    margin-right: 8px;
   }
 
   &:last-child {

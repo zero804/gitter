@@ -5,6 +5,7 @@ var env                = require('../utils/env');
 var logger             = env.logger;
 var nconf              = env.config;
 var stats              = env.stats;
+var errorReporter      = env.errorReporter;
 
 var ObjectID           = require('mongodb').ObjectID;
 var Q                  = require('q');
@@ -29,8 +30,12 @@ var eventService       = require('./event-service');
 var emailNotificationService = require('./email-notification-service');
 var canUserBeInvitedToJoinRoom = require('./invited-permissions-service');
 var emailAddressService = require('./email-address-service');
-var troupeDao          = require('./daos/troupe-dao').full;
 var mongoUtils         = require('../utils/mongo-utils');
+var badger             = require('./badger-service');
+var userSettingsService = require('./user-settings-service');
+
+
+var badgerEnabled      = nconf.get('autoPullRequest:enabled');
 
 function localUriLookup(uri, opts) {
   return uriLookupService.lookupUri(uri)
@@ -214,7 +219,8 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
                     users:  user ? [{
                       _id: new ObjectID(),
                       userId: user._id
-                    }] : []
+                    }] : [],
+                    userCount: user ? 1 : 0
                   }
                 },
                 {
@@ -246,6 +252,24 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
                       if(githubType === 'REPO') {
                         logger.verbose('Skipping hook creation. User does not have permissions');
                         hookCreationFailedDueToMissingScope = true;
+                      }
+                    }
+
+                    if(githubType === 'REPO' && security === 'PUBLIC') {
+                      if(badgerEnabled) {
+                        /* Do this asynchronously (don't chain the promise) */
+                        userSettingsService.getUserSettings(user.id, 'badger_optout')
+                          .then(function(badgerOptOut) {
+                            // If the user has opted out never send the pull request
+                            if(badgerOptOut) return;
+
+                            // Badgers Go!
+                            return badger.sendBadgePullRequest(uri, user);
+                          })
+                          .catch(function(err) {
+                            errorReporter(err, { uri: uri, user: user.username });
+                            logger.error('Unable to send pull request for new room', { exception: err });
+                          });
                       }
                     }
                   }
@@ -620,7 +644,8 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
               ownerUserId: parentTroupe ? null : user._id,
               _nonce: nonce,
               githubType: githubType,
-              users:  user ? [{ _id: new ObjectID(), userId: user._id }] : []
+              users:  user ? [{ _id: new ObjectID(), userId: user._id }] : [],
+              userCount:  user ? 1 : 0
             }
           },
           {
@@ -662,11 +687,16 @@ exports.createCustomChildRoom = createCustomChildRoom;
  *
  * returns        User - the invited user
  */
-function notifyInvitedUser(fromUser, invitedUser, room, isNewUser) {
+function notifyInvitedUser(fromUser, invitedUser, room/*, isNewUser*/) {
   // get the email address
   return emailAddressService(invitedUser)
     .then(function (emailAddress) {
       var notification;
+
+      if(invitedUser.state === 'REMOVED') {
+        stats.event('user_added_removed_user');
+        return; // This has been removed
+      }
 
       if (invitedUser.state === 'INVITED') {
         if (emailAddress) {
@@ -687,7 +717,6 @@ function notifyInvitedUser(fromUser, invitedUser, room, isNewUser) {
         from: fromUser.username,
       };
 
-      if (isNewUser) stats.event("new_invited_user", _.extend(metrics, { userId: invitedUser.id })); // this should happen only once
       stats.event('user_added_someone', _.extend(metrics, { userId: fromUser.id }));
     })
     .thenResolve(invitedUser);
@@ -707,7 +736,7 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
 
       var isNewUser = !existingUser;
 
-      return [existingUser || userService.createInvitedUser(usernameToAdd), isNewUser];
+      return [existingUser || userService.createInvitedUser(usernameToAdd, instigatingUser, room._id), isNewUser];
     })
     .spread(function (invitedUser, isNewUser) {
       room.addUserById(invitedUser.id);

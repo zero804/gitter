@@ -9,7 +9,6 @@ var safeJson        = require('../utils/safe-json');
 var env             = process.env.NODE_ENV;
 var minifiedDefault = nconf.get("web:minified");
 var util            = require('util');
-var moment          = require('moment');
 
 var cdns;
 if(nconf.get("cdn:use")) {
@@ -26,6 +25,7 @@ var troupeEnv = {
   embedBaseUrl: nconf.get('web:embedBaseUrl'),
   mixpanelToken: nconf.get("stats:mixpanel:enabled") && nconf.get("stats:mixpanel:token"),
   googleTrackingId: nconf.get("stats:ga:key"),
+  googleTrackingDomain: nconf.get("stats:ga:domain"),
   goSquaredTrackingId: nconf.get("web:goSquaredId"),
   env: env,
   cdns: cdns,
@@ -182,4 +182,10 @@ exports.typewriter = function (el, str) {
   '</script>',
     str,
     el);
+};
+
+exports.formatNumber = function (n) {
+  if (n < 1000) return n;
+  if (n < 1000000) return (n / 1000).toFixed(1) + 'k';
+  return (n / 100000).toFixed(1) + 'm';
 };

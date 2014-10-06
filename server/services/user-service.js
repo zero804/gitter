@@ -1,21 +1,16 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var env                       = require('../utils/env');
-var stats                     = env.stats;
-var _                         = require('underscore');
 // var sechash                   = require('sechash');
 var winston                   = require('../utils/winston');
 var assert                    = require('assert');
 var persistence               = require("./persistence-service");
-var collections               = require("../utils/collections");
 var uriLookupService          = require('./uri-lookup-service');
 var Q                         = require('q');
 var githubUserService         = require('./github/github-user-service');
-var emailAddressService       = require('./email-address-service');
 var mongooseUtils             = require('../utils/mongoose-utils');
 
-/**
+/** FIXME: the insert fields should simply extend from options or a key in options.
  * Creates a new user
  * @return the promise of a new user
  */
@@ -32,6 +27,8 @@ function newUser(options) {
     githubScopes:       options.githubScopes,
     gravatarImageUrl:   options.gravatarImageUrl,
     username:           options.username,
+    invitedByUser:      options.invitedByUser,
+    invitedToRoom:      options.invitedToRoom,
     displayName:        options.displayName,
     state:              options.state
   };
@@ -50,16 +47,17 @@ function newUser(options) {
   return mongooseUtils.upsert(persistence.User, { githubId: githubId }, {
       $setOnInsert: insertFields
     })
-    .spread(function(user, numAffected, raw) {
-      if(raw.updatedExisting) return user;
+    .spread(function(user/*, numAffected, raw*/) {
+      //if(raw.updatedExisting) return user;
 
       // New record was inserted
-      return emailAddressService(user)
-        .then(function(email) {
-          stats.userUpdate(_.extend({ email: email, mixpanelId : options.mixpanelId }, user.toJSON()));
-        })
-        .thenResolve(user);
+      //return emailAddressService(user)
+      //  .then(function(email) {
+      //    stats.userUpdate(_.extend({ email: email, mixpanelId : options.mixpanelId }, user.toJSON()));
+      //  })
+      //  .thenResolve(user);
 
+      return user;
     })
     .then(function(user) {
       // Reserve the URI for the user so that we don't need to figure it out
@@ -70,20 +68,33 @@ function newUser(options) {
 }
 
 var userService = {
-  createInvitedUser: function(username, user, callback) {
+
+  /**
+   * createdInvitedUser() creates an invited user
+   *
+   * username   String - username used to fetch information from GitHub
+   * user       User - user sending the invite
+   * roomId     ObjectID - the room to whic the user has been invited to
+   * callback   Function - to be called once finished
+   */
+  createInvitedUser: function(username, user, roomId, callback) {
     var githubUser = new githubUserService(user);
 
     return githubUser.getUser(username)
       .then(function (githubUser) {
 
+        // this will be used with newUser below, however you must also add the options to newUser?
         var gitterUser = {
           username:           githubUser.login,
           displayName:        githubUser.name || githubUser.login,
           gravatarImageUrl:   githubUser.avatar_url,
           githubId:           githubUser.id,
+          invitedByUser:      user && user._id,
+          invitedToRoom:      roomId,
           state:              'INVITED'
         };
 
+        // this does not actually create a user here, please follow through?!
         return newUser(gitterUser);
       })
       .nodeify(callback);
@@ -120,20 +131,6 @@ var userService = {
 
   findById: function(id, callback) {
     return persistence.User.findByIdQ(id).nodeify(callback);
-  },
-
-  githubUserExists: function(username, callback) {
-    return persistence.User.countQ({ username: username })
-      .then(function(count) {
-        return !!count;
-      })
-      .nodeify(callback);
-  },
-
-  getUserState: function(username, callback) {
-    return persistence.User.findOneQ({ username: username })
-      .then(function (user) { return user.state; })
-      .nodeify(callback);
   },
 
   /**
@@ -233,8 +230,7 @@ var userService = {
 
   deleteAllUsedInvitesForUser: function(user) {
     persistence.Invite.remove({ userId: user.id, status: "USED" });
-  },
-
+  }
 
 };
 

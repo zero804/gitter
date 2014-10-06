@@ -37,7 +37,7 @@ define([
           data.blogUrl = data.blog;
         }
       }
-
+      data.inactive = data.invited || data.removed;
       data.avatarUrl = largeAvatar(data.avatar_url);
 
       return data;
@@ -51,19 +51,19 @@ define([
     },
     events: {
       'click #button-onetoone': function() {
+        this.parentPopover.hide();
         var username = this.model.get('login');
         appEvents.trigger('navigation', '/' + username, 'chat', username, this.model.id);
-        this.parentPopover.hide();
       },
       'click #button-mention': function() {
+        this.parentPopover.hide();
         var username = this.model.get('login');
         appEvents.trigger('input.append', '@' + username);
-        this.parentPopover.hide();
       },
       'click #button-remove': function() {
+        this.parentPopover.hide();
         var username = this.model.get('login');
         appEvents.trigger('command.room.remove', username);
-        this.parentPopover.hide();
       }
     },
     serializeData: function() {
@@ -80,6 +80,7 @@ define([
         }
       }
 
+      data.inactive = data.invited || data.removed;
       data.chatPrivately = chatPrivately;
       data.mentionable = mentionable;
       data.removable = removable;
@@ -92,7 +93,6 @@ define([
     initialize: function(options) {
       options.placement = 'horizontal';
       options.minHeight = '88px';
-
       var username, displayName;
 
       if (this.model) {
@@ -109,12 +109,7 @@ define([
       });
 
       ghModel.url = '/api/private/gh/users/' + username;
-
-      ghModel.fetch({
-        success: function (model) {
-          model.set('invited', model.get('state') === 'INVITED');
-        }
-      });
+      ghModel.fetch();
 
       options.footerView = new UserPopoverFooterView({ model: ghModel });
 

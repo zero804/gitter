@@ -53,6 +53,15 @@ define([
     }
   }, { modelType: 'troupe' });
 
+  var SuggestedTroupeCollection = TroupeCollections.LiveCollection.extend({
+    model: TroupeModel,
+
+    initialize: function () {
+      this.url = "/api/v1/user/" + context.getUserId() + "/rooms?suggested=1";
+      this.fetch();
+    }
+  });
+
   var TroupeCollection = TroupeCollections.LiveCollection.extend({
     model: TroupeModel,
     initialize: function() {
@@ -126,6 +135,7 @@ define([
   });
 
   return {
+    SuggestedTroupeCollection: SuggestedTroupeCollection,
     TroupeCollection: TroupeCollection,
     TroupeModel:      TroupeModel
   };

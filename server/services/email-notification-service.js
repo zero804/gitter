@@ -11,6 +11,9 @@ var passphrase          = config.get('email:unsubscribeNotificationsSecret');
 var userSettingsService = require('./user-settings-service');
 var emailAddressService = require('./email-address-service');
 var roomNameTrimmer     = require('../utils/room-name-trimmer');
+var mongoUtils          = require('../utils/mongo-utils');
+var moment              = require('moment');
+var Q                   = require('q');
 
 /*
  * Return a nice sane
@@ -65,9 +68,9 @@ module.exports = {
     var cipher    = crypto.createCipher('aes256', passphrase);
     var hash      = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
 
-    if (user.state === 'INVITED') {
-      logger.info('Skipping email notification for ' + user.username + ', in INVITED state.');
-      return;
+    if (user.state) {
+      logger.info('Skipping email notification for ' + user.username + ', not active state.');
+      return Q.resolve();
     }
 
     return emailAddressService(user)
@@ -115,23 +118,31 @@ module.exports = {
       });
   },
 
-  sendInvitation: function(fromUser, toUser, room) {
-    var senderName = fromUser.displayName;
-    var recipientName = toUser.displayName;
+  sendInvitation: function(fromUser, toUser, room, isReminder) {
+    isReminder = (typeof isReminder !== 'undefined') ? isReminder : false;
+    var senderName = (fromUser.displayName || fromUser.username).split(' ')[0];
+    var recipientName = (toUser.displayName || toUser.username).split(' ')[0];
+    var fromName = (fromUser.displayName || fromUser.username);
+
+    var template = (isReminder) ? 'invitation-reminder' : 'invitation';
+    var eventName = (isReminder) ? 'invitation_reminder_sent' : 'invitation_sent';
+    var date = moment(mongoUtils.getTimestampFromObjectId(toUser._id)).format('Do MMMM YYYY');
 
     return emailAddressService(toUser)
       .then(function(email) {
         if (!email) return;
         return mailerService.sendEmail({
-          templateFile: "invitation",
+          templateFile: template,
           from: senderName + ' <support@gitter.im>',
+          fromName: fromName,
           to: email,
           subject: '[' + room.uri + '] Join the chat on Gitter',
           tracking: {
-            event: 'invitation_sent',
-            data: { userId: toUser.id, email: email }
+            event: eventName,
+            data: { email: email }
           },
           data: {
+            date: date,
             roomUri: room.uri,
             roomUrl: config.get("email:emailBasePath") + '/' + room.uri,
             senderName: senderName,
@@ -202,8 +213,9 @@ module.exports = {
     var emailBasePath   = config.get("email:emailBasePath");
     var unsubscribeUrl  = emailBasePath + '/settings/unsubscribe/' + hash;
 
-    var senderName = fromUser.displayName;
-    var recipientName = toUser.displayName;
+    var senderName = (fromUser.displayName || fromUser.username).split(' ')[0];
+    var recipientName = (toUser.displayName || toUser.username).split(' ')[0];
+    var fromName = (fromUser.displayName || fromUser.username);
 
     userSettingsService.getUserSettings(toUser.id, 'unread_notifications_optout')
       .then(function(optout) {
@@ -222,7 +234,7 @@ module.exports = {
             return mailerService.sendEmail({
               templateFile: "added_to_room",
               from: senderName + ' <support@gitter.im>',
-              fromName: senderName,
+              fromName: fromName,
               to: email,
               subject: '[' + room.uri + '] You\'ve been added to a new room on Gitter',
               tracking: {
