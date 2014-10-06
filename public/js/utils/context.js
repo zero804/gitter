@@ -195,8 +195,21 @@ define([
   };
 
   context.isLoggedIn = function() {
+    // If we're in a context where one cannot be logged out...
+    if(context.env('loggedIn')) return true;
+
     // TODO: this is not ideal. perhaps make this better
     return !!user.id;
+  };
+
+  context.onUserId = function(callback, c) {
+    if(user.id) {
+      callback.call(c, user.id);
+    } else {
+      user.once('change:id', function() {
+        callback.call(c, user.id);
+      });
+    }
   };
 
   context.lang = function() {

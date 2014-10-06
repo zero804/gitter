@@ -34,7 +34,7 @@ require([
   var chatCollection = new chatModels.ChatCollection();
   cacheSync.install(chatCollection);
   chatCollection.listen();
-  
+
   var userCollection = new userModels.UserCollection();
   userCollection.listen();
 
@@ -44,11 +44,11 @@ require([
     decorators: [emojiDecorator, mobileDecorator]
   }).render();
 
-  // unreadItemsClient.syncCollections({
-  //   'chat': chatCollection
-  // });
-  
-  // unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
+  unreadItemsClient.syncCollections({
+    'chat': chatCollection
+  });
+
+  unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
 
   new chatInputView.ChatInputView({
     el: $('#chat-input'),
