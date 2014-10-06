@@ -37,7 +37,7 @@ define([
           data.blogUrl = data.blog;
         }
       }
-
+      data.inactive = data.invited || data.removed;
       data.avatarUrl = largeAvatar(data.avatar_url);
 
       return data;
@@ -80,6 +80,7 @@ define([
         }
       }
 
+      data.inactive = data.invited || data.removed;
       data.chatPrivately = chatPrivately;
       data.mentionable = mentionable;
       data.removable = removable;
@@ -108,13 +109,7 @@ define([
       });
 
       ghModel.url = '/api/private/gh/users/' + username;
-
-      ghModel.fetch({
-        success: function (model) {
-          // This is pretty yucky
-          model.set('invited', model.get('state') === 'INVITED');
-        }
-      });
+      ghModel.fetch();
 
       options.footerView = new UserPopoverFooterView({ model: ghModel });
 

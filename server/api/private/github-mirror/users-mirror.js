@@ -10,20 +10,19 @@ module.exports = function (req, res, next) {
 
   mirror.get(githubUri)
     .then(function (body) {
-      if (body && body.login) {
+      if(!body || !body.login) return res.send(body);
 
-        userService.githubUserExists(body.login, function (err, exists) {
-          if (err) return res.send(body);
+        return userService.findByUsername(body.login)
+          .then(function(user) {
+            body.has_gitter_login = user ? true : undefined;
 
-          body.has_gitter_login = exists;
+            if(user) {
+              body.invited = user.isInvited() ? true : undefined;
+              body.removed = user.isRemoved() ? true : undefined;
+            }
 
-          userService.getUserState(body.login, function (err, state) {
-            body.state = state;
-            return res.send(body);
-          })
-        });
-      } else {
-        res.send(body);
-      }
-  }).fail(next);
+            res.send(body);
+          });
+    })
+    .fail(next);
 };

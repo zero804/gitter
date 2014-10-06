@@ -687,11 +687,16 @@ exports.createCustomChildRoom = createCustomChildRoom;
  *
  * returns        User - the invited user
  */
-function notifyInvitedUser(fromUser, invitedUser, room, isNewUser) {
+function notifyInvitedUser(fromUser, invitedUser, room/*, isNewUser*/) {
   // get the email address
   return emailAddressService(invitedUser)
     .then(function (emailAddress) {
       var notification;
+
+      if(invitedUser.state === 'REMOVED') {
+        stats.event('user_added_removed_user');
+        return; // This has been removed
+      }
 
       if (invitedUser.state === 'INVITED') {
         if (emailAddress) {

@@ -134,7 +134,7 @@ function install() {
           return userService.findByGithubIdOrUsername(githubUserProfile.id, githubUserProfile.login)
             .then(function (user) {
 
-              if (req.session && (!user || user.state === 'INVITED')) {
+              if (req.session && (!user || user.isInvited())) {
 
                 var events = req.session.events;
 
@@ -150,7 +150,7 @@ function install() {
               if(user) {
 
                 // If the user was in the DB already but was invited, notify stats services
-                if (user.state === 'INVITED') {
+                if (user.isInvited()) {
 
                   // IMPORTANT: The alias can only happen ONCE. Do not remove.
                   stats.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id, function() {
