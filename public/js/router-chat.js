@@ -30,7 +30,7 @@ require([
 
 ], function($, Backbone, context, liveContext, appEvents, log,
     peopleCollectionView, ChatIntegratedView, itemCollections,
-    inviteView, TroupeSettingsView, MarkdownView, KeyboardView,
+    shareView, TroupeSettingsView, MarkdownView, KeyboardView,
     AddPeopleViewModal, IntegrationSettingsModal, CollaboratorsView,
     collaboratorsModels) {
   "use strict";
@@ -218,7 +218,7 @@ require([
     routes: {
       // TODO: get rid of the pipes
       "": "hideModal",
-      "inv": "inv",
+      "share": "share",
       "people": "people",
       "notifications": "notifications",
       "markdown": "markdown",
@@ -259,8 +259,8 @@ require([
       }
     },
 
-    inv: function() {
-      appView.dialogRegion.show(new inviteView.Modal({}));
+    share: function() {
+      appView.dialogRegion.show(new shareView.Modal({}));
     }
 
   });

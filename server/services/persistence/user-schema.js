@@ -8,6 +8,10 @@ var assert   = require('assert');
 var UserSchema = new Schema({
   displayName: { type: String },
   emails: [String],                            // Secondary email addresses
+  invitedEmail: { type: String },
+  inviteReminderSent: { type: Date },
+  invitedByUser: ObjectId,
+  invitedToRoom: ObjectId,
   username: { type: String, required: true },
   confirmationCode: {type: String },
   gravatarImageUrl: { type: String },
@@ -169,6 +173,20 @@ UserSchema.methods.hasPassword = function() {
 UserSchema.methods.hasEmail = function(email) {
   return this.email === email || this.emails.some(function(e) { return e === email; });
 };
+
+// Returns true if the user is not INVITED or REMOVED
+UserSchema.methods.isActive = function() {
+  return !this.state;
+};
+
+UserSchema.methods.isInvited = function() {
+  return this.state === 'INVITED';
+};
+
+UserSchema.methods.isRemoved = function() {
+  return this.state === 'REMOVED';
+};
+
 
 module.exports = {
   install: function(mongooseConnection) {

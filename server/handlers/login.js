@@ -73,6 +73,21 @@ module.exports = {
       );
 
     app.get(
+        '/login/invited',
+        function(req, res) {
+          var query = req.query;
+
+          // checks if we have a relative url path and adds it to the session
+          if (query.uri) req.session.returnTo = config.get('web:basepath') + '/' + query.uri;
+
+          res.render('login_invited', {
+            username: query.welcome,
+            uri: query.uri
+          });
+        }
+      );
+
+    app.get(
         '/login/explain',
         function(req, res) {
           res.render('github-explain', {

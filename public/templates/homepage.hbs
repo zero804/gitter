@@ -8,10 +8,9 @@
 
         <meta name="description" content="Where developers come to talk.">
 
-        <meta property="og:title" content="Gitter"/>
-        <meta property="og:description" content="Where developers come to talk."/>
-        <meta property="og:type" content="website"/>
-        <meta property="og:image" content="https://avatars.githubusercontent.com/gitterHQ"/>
+        {{#each socialMetadata}}
+        <meta property="{{@key}}" content="{{this}}"/>
+        {{/each}}
 
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -45,8 +44,8 @@
         </nav>
         <div class="wrap">
           <div class="map"><img class="bg" src="{{cdn 'images/home/map.png'}}" alt="There should be a map here"></div>
-          <h1>Where developers come to talk.</h1>
-          <p>We host thousands of public communities where developers from all around the world come together to talk about the future of programming, build better products, and share the best cat GIFs.</p>
+          <h1>Chat, for GitHub.</h1>
+          <p>Get unlimited public rooms and one-to-one chats, free forever. Private team plans start from $2 per user per month. No credit card required.</p>
 
           <a class="btn signup" href="/login/github?action=signup&source=intro-signup">
             <img src="{{cdn 'images/home/github.png'}}"> <b>Sign up <span class='desktopOnly'>free </span>with Github</b>
@@ -88,6 +87,9 @@
 
             <a class="btn secondary" href="/login/github?action=signup&source=communities">
               Create your own
+            </a>
+            <a class="btn primary" href="/explore/tags/?action=explore&source=homepage">
+              Explore<span class='desktopOnly'> rooms</span>
             </a>
           </h1>
 
@@ -162,7 +164,7 @@
               <img src="{{cdn 'images/home/samccone.jpeg'}}">
 
               <cite><b>Sam Saccone</b><span class="no-small">, Marionette.js Lead</span>:</cite>
-              <p>Gitter has helped to bring the Marionette community together, turning it into a thriving collaborative environment that has been exceedingly benificial to both our endusers and maintainers.</p>
+              <p>Gitter has helped to bring the Marionette community together, turning it into a thriving collaborative environment that has been exceedingly beneficial to both our endusers and maintainers.</p>
             </blockquote>
 
             <blockquote>

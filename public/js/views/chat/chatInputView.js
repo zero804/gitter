@@ -1,9 +1,9 @@
 define([
   'log!chat-input',
+  'backbone',
   'marionette',
   'jquery',
   'utils/context',
-  'views/base',
   'utils/appevents',
   'hbs!./tmpl/chatInputView',
   'hbs!./tmpl/typeaheadListItem',
@@ -20,7 +20,7 @@ define([
   'utils/platform-keys',
   'bootstrap_tooltip', // No ref
   'jquery-textcomplete' // No ref
-], function(log, Marionette, $, context, TroupeViews, appEvents, template, listItemTemplate,
+], function(log, Backbone, Marionette, $, context, appEvents, template, listItemTemplate,
   emojiListItemTemplate, moment, hasScrollBars, isMobile, emoji, drafty, cdn, commands,
   cocktail, KeyboardEventsMixin, platformKeys) {
   "use strict";
@@ -198,7 +198,7 @@ define([
           }
         },
         {
-          match: /(^|\s)@([a-zA-Z0-9_\-]*)$/,
+          match: /(^|\s)@(\/?[a-zA-Z0-9_\-]*)$/,
           maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
           search: function(term, callback) {
             var lowerTerm = term.toLowerCase();
@@ -213,6 +213,13 @@ define([
 
               return (username.indexOf(lowerTerm) === 0 || displayName.indexOf(lowerTerm) === 0);
             });
+
+            if(!lowerTerm || '/all'.indexOf(lowerTerm) === 0) {
+              if(context().permissions.admin) {
+                // This is a bit of a hack for now
+                matches.unshift(new Backbone.Model({ username: '/all', displayName: 'Group' }));
+              }
+            }
 
             callback(matches);
           },

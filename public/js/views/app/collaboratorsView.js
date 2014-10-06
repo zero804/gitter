@@ -2,68 +2,78 @@ define([
   'jquery',
   'marionette',
   'utils/context',
-  'utils/mailto-gen',
+  'utils/social',
   'hbs!./tmpl/collaboratorsView',
   'hbs!./tmpl/collaboratorsItemView',
   'hbs!./tmpl/collaboratorsEmptyView',
+  'hbs!./tmpl/inviteOutcomeTemplate',
   'utils/appevents',
-], function($, Marionette, context, mailto, template, itemTemplate, emptyViewTemplate, appEvents) {
+], function($, Marionette, context, social, template, itemTemplate, emptyViewTemplate, inviteOutcomeTemplate, appEvents) {
   "use strict";
 
   var ItemView = Marionette.ItemView.extend({
+
     modelEvents: {
       "change": "render"
     },
+
     events: {
-      'click .add': 'addUserToRoom'
+      'submit form': 'inviteUser',
+      'click .js-add': 'addUserToRoom',
     },
+
+    tagName: 'div',
+
+    className: 'welcome-modal__collaborator',
+
     template: itemTemplate,
-    tagName: 'li',
-
-    /*
-     * computeFeedback() produces feedback for the action of adding a user to a room
-     *
-     * user    Object - user object in which the logic is applied to
-     * returns Object - contans the outcome `class` and the message to be displayed on the current item.
-     */
-    computeFeedback: function (user) {
-      var fb = {
-        outcome: null,
-        message: null,
-        action: { href: null, text: null }
-      };
-
-      if (!user.invited) {
-        fb.outcome = 'added';
-        fb.message = 'was added.';
-      } else if (user.invited && user.email) {
-        fb.outcome = 'invited';
-        fb.message = 'has been invited to Gitter.';
-      } else {
-        fb.outcome = 'unreachable';
-        fb.message = 'has no public email.';
-        var email = mailto.el({
-          subject: 'Gitter Invite',
-          body: this.strTemplate('Hi {{user}}, I\'ve added you to a room on Gitter. Join me! {{base}}{{roomUrl}}', { user: user.username, base: context.env('basePath'), roomUrl: context.troupe().get('url') })
-        });
-        fb.action.href = email.href;
-        fb.action.text = 'Invite.';
-      }
-
-      return fb;
-    },
-
-    strTemplate: function (str, o) {
-      return str.replace(/{{([a-z_$]+)}}/gi, function (m, k) {
-          return (typeof o[k] !== 'undefined' ? o[k] : '');
-      });
-    },
 
     handleError: function (res, status, message) {
-      //var json = res.responseJSON;
-      //this.ui.loading.toggleClass('hide');
-      //this.showValidationMessage((json) ? json.error : res.status + ': ' + res.statusText);
-      //this.typeahead.clear();
+      if (res.responseJSON.status === 409) return this.done('already in room.');
+      this.done(message, '');
+    },
+
+    toggleLoading: function () {
+      var model = this.model;
+      var isLoading = model.get('loading');
+      model.set('loading', !isLoading);
+    },
+
+    done: function (feedback, email) {
+      var m = this.model;
+      this.toggleLoading();
+      m.set('done', true);
+      m.set('name', email || m.get('login'));
+      m.set('feedback', feedback);
+    },
+
+    inviteUser: function (e) {
+      e.preventDefault();
+
+      var inputEmail = this.$('input')[0];
+      var email = inputEmail.value;
+
+      var data = {
+        userId: this.user.id,
+        email: email,
+        roomId: context.getTroupeId()
+      };
+
+      this.toggleLoading();
+
+      $.ajax({
+        url: '/api/private/invite-user',
+        contentType: "application/json",
+        dataType: "json",
+        type: "POST",
+        data: JSON.stringify(data),
+        context: this,
+        timeout: 45 * 1000,
+        error: this.handleError,
+        success: function () {
+          this.done('was invited.', email);
+        }
+      });
     },
 
     /**
@@ -75,11 +85,11 @@ define([
       e.stopPropagation();
       e.preventDefault();
 
+      var m = this.model;
+
       appEvents.triggerParent('track-event', 'welcome-add-user-click');
 
-      this.$('.add').hide();
-
-      var m = this.model;
+      this.toggleLoading();
 
       $.ajax({
         url: '/api/v1/rooms/' + context.getTroupeId()  + '/users',
@@ -91,24 +101,25 @@ define([
         timeout: 45 * 1000,
         error: this.handleError,
         success: function (res) {
-          //this.ui.loading.toggleClass('hide');
-          var feedback = this.computeFeedback(res.user);
-          if (res.user.email) m.set('email', res.user.email);
-          m.set({
-            message: feedback.message,
-            outcome: feedback.outcome,
-            action: feedback.action,
-            timeAdded: Date.now(),
-            added: true
-          });
+          var user = res.user;
+          this.user = user;
+
+          if (!user.invited) {
+            this.done('was added.');
+          } else if (user.invited && user.email) {
+            this.done('was invited.', user.email);
+          } else {
+            this.toggleLoading(); // stop loading
+            m.set('unreachable', true);
+          }
         }
       });
     },
-
   });
 
   var EmptyView = Marionette.ItemView.extend({
     template: emptyViewTemplate,
+    className: 'welcome-modal__no-suggestions',
     initialize: function(options) {
       this.model.set("security", options.security);
       this.model.set("githubType", options.githubType);
@@ -133,9 +144,11 @@ define([
   });
 
   var View = Marionette.CompositeView.extend({
-    itemViewContainer: '#list',
+
+    itemViewContainer: '.js-container',
     itemView: ItemView,
     emptyView: EmptyView,
+
     itemViewOptions: function() {
       if (!this.collection.length) {
         return {
@@ -145,27 +158,15 @@ define([
         };
       }
     },
+
     template: template,
 
     serializeData: function() {
-      var _public = context.troupe().get('security') === 'PUBLIC';
-      var _repo   = context.troupe().get('githubType') === 'REPO';
-
       return {
-        shareable: _public && _repo,
-        twitterLink: this.generateTwitterLink()
+        isPublic: context.troupe().get('security') === 'PUBLIC',
+        twitterLink: social.generateTwitterShareUrl(),
+        facebookLink: social.generateFacebookShareUrl()
       };
-    },
-
-    generateTwitterLink: function() {
-      var text = escape('Join the chat room on Gitter for ' + context.troupe().get('uri') + ':');
-      var url = 'https://twitter.com/share?' +
-        'text=' + text +
-        '&url=https://gitter.im/' + context.troupe().get('uri') +
-        '&related=gitchat' +
-        '&via=gitchat';
-
-      return url;
     },
 
     initialize: function() {
@@ -185,33 +186,6 @@ define([
       'click .js-close': 'dismiss',
       'click #add-button' : 'clickAddButton',
       'click #share-button' : 'clickShareButton',
-      'click .js-badge': 'createBadge'
-    },
-
-    createBadge: function() {
-      var btn = this.$el.find('.js-badge')[0];
-      var st = this.$el.find('.pr-status');
-      st.html('Hold on...');
-      btn.disabled = true;
-
-      $.ajax({
-        url: '/api/private/create-badge',
-        contentType: "application/json",
-        dataType: "json",
-        type: "POST",
-        data: JSON.stringify({
-          uri: context.troupe().get('uri')
-        }),
-        context: this,
-        timeout: 45 * 1000,
-        error: function() {
-          st.html('Oops, something went wront. Try again. (Is there a README.md in your project?)');
-          btn.disabled = false;
-        },
-        success: function (res) {
-          st.html('We just created a PR for you! <a href=' + res.html_url + ' target="_blank">Review and merge &rarr;</a>');
-        }
-      });
     },
 
     clickAddButton: function() {
@@ -221,7 +195,7 @@ define([
 
 
     clickShareButton: function() {
-      window.location.href = "#inv";
+      window.location.href = "#share";
     },
 
     dismiss: function() {

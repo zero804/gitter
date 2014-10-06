@@ -252,6 +252,8 @@ define(['mutant'], function(Mutant) {
       if(this._mode === STABLE) {
         this._stableElement = this.getBottomMostVisibleElement();
 
+        if (!this._stableElement) return;
+
         // TODO: check that the element is within the targets DOM heirachy
         var scrollBottom = target.scrollTop + target.clientHeight;
         var stableElementTop = this._stableElement.offsetTop - target.offsetTop;

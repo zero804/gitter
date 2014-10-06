@@ -51,7 +51,8 @@ require.config({
     "transloadit":                  "../repo/transloadit/jquery.transloadit2-v2-latest",
     "d3":                           "../repo/d3/d3",
     "cal-heatmap":                  "../repo/cal-heatmap/cal-heatmap",
-    "keymaster":                    "../repo/keymaster/keymaster"
+    "keymaster":                    "../repo/keymaster/keymaster",
+    "twitter-oct":                  "//platform.twitter.com/oct"
   },
   shim: {
     "uservoice": {
@@ -62,6 +63,9 @@ require.config({
     },
     "keymaster": {
       exports: "window.key"
+    },
+    "twitter-oct": {
+      exports: "window.twttr.conversion"
     }
   },
   hbs : {

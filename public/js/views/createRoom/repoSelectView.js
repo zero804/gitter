@@ -39,11 +39,11 @@ define([
     ui: {
       search: "input#search"
     },
-    itemViewContainer: '#list',
     itemView: ItemView,
     emptyView: EmptyView,
     template: template,
     onRender: function() {
+      this.itemViewContainer = this.$el.find('#list');
       liveSearch(this, this.ui.search, 'searchTextChanged', { shortDebounce: 50, longDebounce: 200 });
     },
     searchTextChanged: function(text) {

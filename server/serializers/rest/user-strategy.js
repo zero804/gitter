@@ -190,7 +190,8 @@ function UserStrategy(options) {
       role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.username) || undefined,
       premium: userPremiumStatusStrategy && userPremiumStatusStrategy.map(user.id) || undefined,
       /* TODO: when adding states use user.state and the respective string value desired */
-      invited: user.state === 'INVITED',
+      invited: user.state === 'INVITED' || undefined, // true or undefined
+      removed: user.state === 'REMOVED' || undefined, // true or undefined
       v: getVersion(user)
     };
   };

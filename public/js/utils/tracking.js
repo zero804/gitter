@@ -6,6 +6,7 @@ define([
   "use strict";
 
   var trackingId = context.env('googleTrackingId');
+  var trackingDomain = context.env('googleTrackingDomain') || 'gitter.im'; // Remove this default 23/10/2014;
   var ga;
   var gosquared;
 
@@ -17,7 +18,7 @@ define([
 
     ga = window.ga;
 
-    ga('create', trackingId, 'gitter.im');
+    ga('create', trackingId, trackingDomain);
     ga('send', 'pageview');
   }
 
@@ -51,18 +52,15 @@ define([
 
   function trackPageView(routeName) {
     if (window.mixpanel) {
-      var loggedOutUserRoom = false;
-      if (context.getUserId()) {
+
+      if (context.getUserId()) 
         window.mixpanel.register({ userStatus: 'ACTIVE'});
-      } else {
-        // if the user is in the app and does not have a user id, they must be logged out user viewing a room
-        if (window.troupeContext) loggedOutUserRoom = true;
-      }
-      
+
       var username = context().user && context().user.username;
       var isUserHome = (username) ? '/' + username === routeName : false; // if we have an username then check if it matches the routeName
+      var authenticated = !!context.getUserId();
 
-      window.mixpanel.track('pageView', { pageName: routeName, loggedOutUserRoom: loggedOutUserRoom, isUserHome: isUserHome });
+      window.mixpanel.track('pageView', { pageName: routeName, authenticated: authenticated, isUserHome: isUserHome });
     }
 
     var gs = window._gs;
@@ -70,9 +68,10 @@ define([
       gs('track');
     }
 
-    if(trackingId) {
-      ga('send', 'event', 'route', routeName);
-    }
+    // Removing this for now as it's affecting our bounce rate
+    // if(trackingId) {
+    //   ga('send', 'event', 'route', routeName);
+    // }
 
   }
 

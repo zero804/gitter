@@ -80,6 +80,9 @@ module.exports = {
         authMiddleware,
         require('./create-badge-pr.js'));
 
+    app.post(apiRoot + '/private/invite-user',
+        authMiddleware,
+        require('./invite-user.js'));
 
   }
 };

@@ -1,35 +1,18 @@
 <div class="welcome-modal__collaborators">
   <div class="welcome-modal__close js-close"></div>
-
   <div class="welcome-modal__header">
-    {{#if shareable}}
-    <h2>Get started: Spread the word</h2>
+    {{#if isPublic}}
+      <h2>Get Started: Spread the word</h2>
+    {{else}}
+      <h2>Get Started: Add some colleagues</h2>
     {{/if}}
-    {{#unless shareable}}
-    <h2>Get started: Add some colleagues</h2>
-    {{/unless}}
   </div>
-
-  <ul id="list"></ul>
-
-  {{#if shareable}}
-  <div class="welcome-modal__share">
-    <a class='trpButtonMedium trpBtnLightGrey button' href='#add'>Search other users</a>
-    <a class='trpButtonMedium trpBtnLightGrey button share-on-tw js-twitter' href='{{twitterLink}}' target='_blank'>Share on Twitter</a>
-    <button class='trpButtonMedium trpBtnBlue button share-on-gh js-badge'>Add a Badge on GitHub</button>
-    <div class='pr-status'></div>
-  </div>
-  {{/if}}
-
-  <!--
-  <div class="welcome-modal__footer">
-    <div class="welcome-modal__footer-button">
-      <button class='trpButtonMedium trpBtnBlue button' id="add-button" href='#add'>Search for other users</button>
+  <div class='welcome-modal__container  js-container'></div>
+    <div class="welcome-modal__share">
+      <a class='trpButtonMedium trpBtnLightGrey button' href='#add'>Search other users</a>
+      {{#if isPublic}}
+      <a class="share-button share-button--twitter" href='{{ twitterLink }}' target='_blank'><img src="{{cdn "images/icon-twitter-white.png" }}" class="share-button__icon"><span>Tweet</span></a>
+      <a class="share-button share-button--facebook" target="_blank" href="{{ facebookLink }}"><img src="{{cdn "images/icon-facebook-white.png" }}" class="share-button__icon"><span>Share</span></a>
+      {{/if}}
     </div>
-    <div class="welcome-modal__footer-button">
-      <button class='trpButtonMedium trpBtnBlue button js-share-button' id="share-button" href='#add'>Share this room</button>
-    </div>
-  </div>
-  -->
-
 </div>

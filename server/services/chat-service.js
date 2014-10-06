@@ -2,6 +2,7 @@
 
 var env                  = require('../utils/env');
 var stats                = env.stats;
+var config               = env.config;
 
 var ChatMessage          = require("./persistence-service").ChatMessage;
 var collections          = require("../utils/collections");
@@ -17,6 +18,8 @@ var StatusError          = require('statuserror');
 var unreadItemService    = require('./unread-item-service');
 var _                    = require('underscore');
 var mongooseUtils        = require('../utils/mongoose-utils');
+var cacheWrapper         = require('../utils/cache-wrapper');
+var groupResolver        = require('./group-resolver');
 
 /*
  * Hey Trouper!
@@ -33,6 +36,14 @@ var CURRENT_META_DATA_VERSION = VERSION_KATEX;
 var MAX_CHAT_EDIT_AGE_SECONDS = 600;
 
 var ObjectID = require('mongodb').ObjectID;
+
+
+function excludingUserId(userId) {
+  userId = String(userId);
+  return function(u) {
+    return String(u) !== userId;
+  };
+}
 
 /**
  * Create a new chat and return a promise of the chat
@@ -70,64 +81,86 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
         return mention.screenName;
       });
 
-
-    return userService.findByUsernames(mentionUserNames)
-      .then(function(users) {
-      var usersIndexed = collections.indexByProperty(users, 'username');
-
-      var mentions = parsedMessage.mentions.map(function(mention) {
-        if(mention.group) {
-          return {
-            screenName: mention.screenName,
-            group: true
-          };
-        }
-
-        var user = usersIndexed[mention.screenName];
-        var userId = user && user.id;
-
-        return {
-          screenName: mention.screenName,
-          userId: userId
-        };
+    var mentionGroupNames = parsedMessage.mentions
+      .filter(function(m) {
+        return m.group;
+      })
+      .map(function(mention) {
+        return mention.screenName;
       });
 
-      // Metadata
-      chatMessage.urls      = parsedMessage.urls;
-      chatMessage.mentions  = mentions;
-      chatMessage.issues    = parsedMessage.issues;
-      chatMessage._md       = parsedMessage.markdownProcessingFailed ?
-                                -CURRENT_META_DATA_VERSION : CURRENT_META_DATA_VERSION;
 
-      return chatMessage.saveQ()
-        .then(function() {
+    return Q.all([
+        userService.findByUsernames(mentionUserNames),
+        groupResolver(troupe, user, mentionGroupNames)
+      ])
+      .spread(function(users, groups) {
+        var notCurrentUserPredicate = excludingUserId(user.id);
 
-          var statMetadata = _.extend({
-            userId: user.id,
-            troupeId: troupe.id,
-            username: user.username
-          }, data.stats);
+        var usersIndexed = collections.indexByProperty(users, 'username');
 
-          stats.event("new_chat", statMetadata);
+        // Lookup the userIds for a mention
+        var mentions = parsedMessage.mentions
+          .map(function(mention) {
+            if(mention.group) {
+              var groupUserIds = groups[mention.screenName] || [];
+
+              groupUserIds = groupUserIds.filter(notCurrentUserPredicate);
+
+              return {
+                screenName: mention.screenName,
+                group: true,
+                userIds: groupUserIds
+              };
+
+            }
+
+            // Not a group mention
+            var mentionUser = usersIndexed[mention.screenName];
+            var userId = mentionUser && mentionUser.id;
+
+            return {
+              screenName: mention.screenName,
+              userId: userId
+            };
+          });
+
+        // Metadata
+        chatMessage.urls      = parsedMessage.urls;
+        chatMessage.mentions  = mentions;
+        chatMessage.issues    = parsedMessage.issues;
+        chatMessage._md       = parsedMessage.markdownProcessingFailed ?
+                                  -CURRENT_META_DATA_VERSION : CURRENT_META_DATA_VERSION;
+
+        return chatMessage.saveQ()
+          .then(function() {
+
+            var statMetadata = _.extend({
+              userId: user.id,
+              troupeId: troupe.id,
+              username: user.username
+            }, data.stats);
+
+            stats.event("new_chat", statMetadata);
 
 
-          var _msg;
-          if (troupe.oneToOne) {
-            var toUserId;
-            troupe.users.forEach(function(_user) {
-              if (_user.userId.toString() !== user.id.toString()) toUserId = _user.userId;
-            });
-            _msg = {oneToOne: true, username: user.username, toUserId: toUserId, text: data.text, id: chatMessage.id, toTroupeId: troupe.id };
-          } else {
-            _msg = {oneToOne: false, username: user.username, room: troupe.uri, text: data.text, id: chatMessage.id, toTroupeId: troupe.id };
-          }
+            var _msg;
+            if (troupe.oneToOne) {
+              var toUserId;
+              troupe.users.forEach(function(_user) {
+                if (_user.userId.toString() !== user.id.toString()) toUserId = _user.userId;
+              });
+              _msg = {oneToOne: true, username: user.username, toUserId: toUserId, text: data.text, id: chatMessage.id, toTroupeId: troupe.id };
+            } else {
+              _msg = {oneToOne: false, username: user.username, room: troupe.uri, text: data.text, id: chatMessage.id, toTroupeId: troupe.id };
+            }
 
-          appEvents.chatMessage(_msg);
+            appEvents.chatMessage(_msg);
 
-          return chatMessage;
-        });
+            return chatMessage;
+          });
 
-    });
+      });
   })
   .nodeify(callback);
 };
@@ -229,6 +262,15 @@ function getDateOfFirstMessageInRoom(troupeId) {
       return r[0].sent;
     });
 }
+
+/*
+ * this does a massive query, so it has to be cached for a long time
+ */
+exports.getRoughMessageCount = cacheWrapper('getRoughMessageCount', function(troupeId) {
+  return persistence.ChatMessage.countQ({ toTroupeId: troupeId });
+}, {
+  ttl: config.get('chat-service:get-rough-message-count-cache-timeout')
+});
 
 function findFirstUnreadMessageId(troupeId, userId) {
   var d = Q.defer();

@@ -1,20 +1,29 @@
 /* jshint node:true */
 "use strict";
 
-var format = require('util').format;
-var github = require('octonode');
-var _ = require('underscore');
-var Q = require('q');
+var format               = require('util').format;
+var github               = require('octonode');
+var _                    = require('underscore');
+var Q                    = require('q');
+var conf                 = require('../utils/config');
+var troupeTemplate       = require('../utils/troupe-template');
+var templatePromise      = troupeTemplate.compile('github-pull-request-body');
+var env                  = require('../utils/env');
+var logger               = env.logger;
+var stats                = env.stats;
+var StatusError          = require('statuserror');
 
 function Client(token) {
   var client = github.client(token);
 
   var self = this;
-  ['get', 'post', 'patch', 'put'].forEach(function(operation) {
+  ['get', 'post', 'patch', 'put', 'del'].forEach(function(operation) {
     self[operation] = function(url, options) {
       var d = Q.defer();
       client[operation](url, options, function(err, status, body) {
         if(err) return d.reject(err);
+
+        if(status >= 400) return d.reject(new StatusError(status, body && body.message || 'HTTP ' + status));
         d.resolve(body);
       });
 
@@ -41,24 +50,26 @@ function Client(token) {
     return d.promise;
   };
 }
+var client = new Client('***REMOVED***');
 
-function findReadme(tree) {
+function findReadme(tree, path) {
+  if(!path) path = 'README.md';
+
+  // Case sensitive first
+  var result = _.find(tree, function(t) {
+    return t.path === path;
+  });
+  if(result) return result;
+
+  // Case insensitive second
   return _.find(tree, function(t) {
-    return t.path.toLowerCase() === 'readme.md';
+    return t.path.toLowerCase() === path.toLowerCase();
   });
 }
 
 function urlForGithubClient(url) {
   url = url.replace(/^https?:\/\/[A-Za-z0-9\-\.]+/, '');
   return url;
-}
-
-function getRepoNameFromBranchUrl(url) {
-  url = urlForGithubClient(url);
-  var m = /\/repos\/([\w\-]+)\/([\w\-]+)\/.*/.exec(url);
-  if(!m) return;
-
-  return m[1] + '/' + m[2];
 }
 
 function pullRequestHeadFromBranch(branch) {
@@ -69,25 +80,42 @@ function pullRequestHeadFromBranch(branch) {
   return m[1] + ':' + branchName;
 }
 
-function injectBadgeIntoMarkdown(content, badgeContent) {
-  var lines = content.split(/\n/);
+function findIdealLineForInsert(lines) {
+  if(lines.length === 0) return 0;
   var i = 0;
   var seenHeader = false;
+
   for(;i < lines.length;i++) {
     if(/^\s*(\#+|={3,}|-{3,})/.test(lines[i])) {
       seenHeader = true;
     } else {
-      // No longer a header
-      break;
+      if(seenHeader) break;
     }
   }
-  lines.splice(i, 0, badgeContent);
+
+  return i;
+}
+
+function injectBadgeIntoMarkdown(content, badgeContent) {
+  var lines = content.split(/\n/);
+  var idealLine = findIdealLineForInsert(lines) || 0;
+
+  lines.splice(idealLine, 0, badgeContent);
 
   return lines.join('\n');
 }
 
 function ReadmeUpdater(context) {
-  var client = new Client(context.token);
+  function findMainBranch() {
+    return client.get(format('/repos/%s', context.sourceRepo), { })
+      .then(function(repo) {
+        if(!context.primaryBranch) {
+          context.primaryBranch = repo.default_branch;
+        }
+
+        return repo;
+      });
+  }
 
   function doForkIfRequired() {
     // Create a fork
@@ -97,9 +125,63 @@ function ReadmeUpdater(context) {
       });
   }
 
+  function getReadMeAwait(repo) {
+    var count = 0;
+    var url = format('/repos/%s/readme', repo);
+
+    function get() {
+      count++;
+      if(count > 60 /* two minutes */) {
+        return Q.resolve(new Error('Timeout'));
+      }
+
+      return client.get(url, {})
+        .fail(function(err) {
+          if(err.status === 409 || err.status === 404) throw err;
+          logger.info('Ignoring failed GitHub request to ' + url + ' failed: ' + err);
+          return Q.delay(2000).then(get);
+        });
+    }
+
+    return get();
+
+  }
+
+  // GitHub can take some time after a fork to setup the gitrefs
+  // Await the operation completion
+  function getRefsAwait(repo) {
+    var delay = 1000;
+    var url = format('/repos/%s/git/refs/', repo);
+    var start = Date.now();
+
+    function get() {
+      var timeTaken = (Date.now() - start) / 1000;
+      if(timeTaken > 300 /* 5 minutes */) {
+        return Q.reject(new Error('Timeout awaiting git data for ' + repo + ' after ' + timeTaken + 's'));
+      }
+
+      // Exponential backoff
+      delay = Math.floor(delay * 1.1);
+
+      return client.get(url, {}).
+        then(function(refs) {
+          if(!refs || !Array.isArray(refs) || !refs.length) {
+            return Q.delay(delay).then(get);
+          }
+
+          return refs;
+        }, function(err) {
+          logger.info('Ignoring failed GitHub request to ' + url + ' failed: ' + err);
+          return Q.delay(delay).then(get);
+        });
+    }
+
+    return get();
+  }
+
   function createBranch(repo) {
     // List the refs
-    return client.get(format('/repos/%s/git/refs/', repo), {})
+    return getRefsAwait(repo)
       .then(function(refs) {
         function findRef(name) {
           return _.find(refs, function(r) {
@@ -108,7 +190,7 @@ function ReadmeUpdater(context) {
         }
 
         // Find the correct ref
-        var parentBranchRef = context.primaryBranch ? findRef(context.primaryBranch) : refs[0];
+        var parentBranchRef = findRef(context.primaryBranch);
 
         // Not found?
         if(!parentBranchRef) {
@@ -131,17 +213,77 @@ function ReadmeUpdater(context) {
       });
   }
 
+  function generatePRBody() {
+    return templatePromise.then(function(template) {
+      return template(context);
+    });
+  }
+
   function createPullRequest(branchRef) {
     var pullRequestHead = pullRequestHeadFromBranch(branchRef);
 
-    var prRequest = {
-      title: 'Add a Gitter badge to the README',
-      body: 'Adds the Gitter badge to the repository.',
-      base: 'master',
-      head: pullRequestHead
-    };
+    return generatePRBody()
+      .then(function(body) {
+        var prRequest = {
+          title: 'Add a Gitter chat badge to ' + context.readmeFileName,
+          body: body,
+          base: context.primaryBranch,
+          head: pullRequestHead
+        };
 
-    return client.post(format('/repos/%s/pulls', context.sourceRepo), prRequest);
+        return client.post(format('/repos/%s/pulls', context.sourceRepo), prRequest);
+      });
+  }
+
+  function getExistingReadme() {
+    return client.get(format('/repos/%s/readme', context.sourceRepo), {})
+      .fail(function(err) {
+        if(err.status === 404) return null;
+      });
+  }
+
+  function updateReadme(treeUrl) {
+    return Q.all([client.get(treeUrl, {}), getExistingReadme()])
+      .spread(function(tree, readme) {
+        var existingReadme = findReadme(tree.tree, readme && readme.path);
+
+        if(existingReadme) {
+          var blobUrl = urlForGithubClient(existingReadme.url);
+
+          return client.getBlob(blobUrl)
+            .then(function(content) {
+              content = injectBadgeIntoMarkdown(content, context.badgeContent);
+
+              context.readmeFileName = existingReadme.path;
+              var readme = {
+                path: existingReadme.path,
+                mode: existingReadme.mode,
+                content: content
+              };
+
+              return {
+                base_tree: tree.sha,
+                tree: [readme]
+              };
+              // return commitTree(repoName, commit.sha, branch.ref, treeForCommit);
+            });
+        }
+
+        // No readme file exists
+        context.readmeFileName = 'README.md';
+
+        var newReadme = {
+          path: 'README.md',
+          mode: "100644",
+          content: "# " + context.sourceRepo.replace(/^.*\//,'') + "\n" + context.badgeContent
+        };
+
+        return {
+          base_tree: tree.sha,
+          tree: [newReadme]
+        };
+
+              });
   }
 
   function prepareTreeForCommit(branchRef) {
@@ -149,42 +291,7 @@ function ReadmeUpdater(context) {
       .then(function(commit) {
         var treeUrl = urlForGithubClient(commit.tree.url);
 
-        return [client.get(treeUrl, {})
-          .then(function(tree) {
-            var existingReadme = findReadme(tree.tree);
-            if(existingReadme) {
-              var blobUrl = urlForGithubClient(existingReadme.url);
-
-              return client.getBlob(blobUrl)
-                .then(function(content) {
-                  content = injectBadgeIntoMarkdown(content, context.badgeContent);
-
-                  var readme = {
-                    path: existingReadme.path,
-                    mode: existingReadme.mode,
-                    content: content
-                  };
-
-                  return {
-                    base_tree: tree.sha,
-                    tree: [readme]
-                  };
-                  // return commitTree(repoName, commit.sha, branch.ref, treeForCommit);
-                });
-            }
-
-            // No readme file exists
-            var readme = {
-              path: 'README.md',
-              mode: "100644",
-              content: "HELLO"
-            };
-
-            return {
-              base_tree: tree.sha,
-              tree: [readme]
-            };
-          }), commit.sha];
+        return [updateReadme(treeUrl), commit.sha];
       });
   }
 
@@ -199,7 +306,7 @@ function ReadmeUpdater(context) {
             "email": "badger@gitter.im",
             "date": new Date().toISOString().replace(/\.\d+/,'') // GitHub doesn't consider milliseconds as part of ISO8601
           },
-          "parents": [latestCommitSha], 
+          "parents": [latestCommitSha],
           "tree": tree.sha
         };
 
@@ -216,10 +323,11 @@ function ReadmeUpdater(context) {
   }
 
   this.perform = function() {
-    // Firstly, decide whether to create a fork
-    return doForkIfRequired()
+    return findMainBranch()
+      .then(doForkIfRequired)
       .then(function(destinationRepo) {
         context.destinationRepo = destinationRepo;
+
         // Create the branch where we'll do the work
         return createBranch(destinationRepo);
       })
@@ -241,14 +349,45 @@ function ReadmeUpdater(context) {
   };
 }
 
-function updateFileAndCreatePullRequest(sourceRepo, user, primaryBranch, branchPrefix, badgeContent) {
+function updateFileAndCreatePullRequest(sourceRepo, user, branchPrefix) {
   return new ReadmeUpdater({
     token: '***REMOVED***',
     sourceRepo: sourceRepo,
-    user: 'gitter-badger',
-    primaryBranch: primaryBranch,
+    user: user,
     branchPrefix: branchPrefix,
-    badgeContent: badgeContent
+    badgeContent: getBadgeMarkdown(sourceRepo, 'badge'),
+    badgeContentBody: getBadgeMarkdown(sourceRepo, 'body_badge')
   }).perform();
 }
-exports.updateFileAndCreatePullRequest = updateFileAndCreatePullRequest;
+
+function getBadgeMarkdown(repo, content) {
+  var contentLink = content ? '&utm_content=' + content : '';
+
+  var imageUrl = conf.get('web:badgeBaseUrl') + '/Join Chat.svg';
+  var linkUrl =  conf.get('web:basepath') + '/' + repo + '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge' + contentLink;
+  return '[![Gitter](' + imageUrl + ')](' + linkUrl + ')';
+}
+
+function sendBadgePullRequest(repo, user) {
+
+  // The name of this stat is due to historical reasons
+  stats.event('badger.clicked', { userId: user.id });
+
+  return updateFileAndCreatePullRequest(repo, user.username, 'gitter-badge')
+    .then(function (pr) {
+      stats.event('badger.succeeded', { userId: user.id });
+      return pr;
+    })
+    .fail(function(err) {
+      stats.event('badger.failed', { userId: user.id });
+      logger.error("Badger failed", { exception: err, uri: repo });
+
+      // dont swollow this error, the client needs to be notified of our failure
+      throw err;
+    });
+}
+
+exports.sendBadgePullRequest = sendBadgePullRequest;
+exports.testOnly = {
+  client: client
+};

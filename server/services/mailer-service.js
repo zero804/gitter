@@ -47,10 +47,10 @@ troupeTemplate.compile("emails/header", function(err, t) {
 exports.sendEmail = function(options, done) {
   if (options.templateFile === 'added_to_room') return addedToRoomViaMandrill(options, done);
   if (options.templateFile === 'invitation')    return invitationViaMandrill(options, done);
-
+  if (options.templateFile === 'invitation-reminder')    return invitationViaMandrill(options, done);
 
   var d = Q.defer();
-  
+
   var tracking = options.tracking || {}; // avoids failure if no tracking information is present
 
   var htmlTemplateFile = "emails/" + options.templateFile + "_html";
@@ -98,10 +98,10 @@ exports.sendEmail = function(options, done) {
             winston.error("SMTP Email Error", { exception: err });
             return d.reject(err);
           }
-          
+
           winston.info("Email sent successfully through SMTP", { message: response.message });
           stats.event(tracking.event, tracking.data);
-          
+
           d.resolve();
         });
       });
@@ -114,15 +114,10 @@ exports.sendEmail = function(options, done) {
 function addedToRoomViaMandrill(options, done) {
   var d = Q.defer();
   var templateName = 'added-to-room';
+  var tracking = options.tracking || {};
 
   var data = options.data;
   var templateContent = [];
-  //var templateContent = [
-  //  {name: 'recipient', content: '<h1>Hello ' + data.recipientName + '!</h1>'},
-  //  {name: 'addedmsg',  content: '<p><strong>' + data.senderName + '</strong> just added you to the ' + data.roomUri + ' chat on Gitter.</p>'},
-  //  {name: 'roomurl',   content: '<td><a href="' + data.roomUrl + '" style="text-decoration: none" class="button-green">Open the room</a></td>'},
-  //  {name: 'unsub',     content: '<p>To unsubscribe from these notifications, click <a href="' + data.unsubscribeUrl + '">here</a>.</p>'}
-  //];
 
   var message = {
     subject:    options.subject,
@@ -131,7 +126,7 @@ function addedToRoomViaMandrill(options, done) {
     to:         [{email: options.to, type: 'to'}],
     tags:       ['added-to-room'], // used for A/B testing
     merge_vars: [{
-      rcpt: options.to, 
+      rcpt: options.to,
       vars: [
        {name: 'NAME',    content: data.recipientName},
        {name: 'SENDER',  content: data.senderName},
@@ -144,10 +139,11 @@ function addedToRoomViaMandrill(options, done) {
   };
 
   mandrill.messages.sendTemplate({
-    template_name:    templateName, 
+    template_name:    templateName,
     template_content: templateContent,
     message:          message
   }, function() {
+    stats.event(tracking.event, tracking.data);
     d.resolve();
   }, function(err) {
     d.reject(err);
@@ -158,7 +154,8 @@ function addedToRoomViaMandrill(options, done) {
 
 function invitationViaMandrill(options, done) {
   var d = Q.defer();
-  var templateName = 'invitation';
+  var templateName = options.templateFile;
+  var tracking = options.tracking || {};
 
   var data = options.data;
   var templateContent = [];
@@ -166,25 +163,27 @@ function invitationViaMandrill(options, done) {
     subject:    options.subject,
     from_email: 'support@gitter.com',
     from_name:  options.fromName,
-    to:         [{email: options.to, type: 'to'}],
-    tags:       ['invitation'], // used for A/B testing
+    to:         [{ email: options.to, type: 'to' }],
+    tags:       [options.templateFile], // used for A/B testing
     merge_vars: [{
-      rcpt: options.to, 
+      rcpt: options.to,
       vars: [
-       {name: 'NAME',    content: data.recipientName},
-       {name: 'SENDER',  content: data.senderName},
-       {name: 'ROOMURI', content: data.roomUri},
-       {name: 'ROOMURL', content: data.roomUrl},
-       {name: 'LOGOURL', content: cdn('images/logo-text-blue-pink.png', {email: true})}
+       { name: 'NAME',    content: data.recipientName },
+       { name: 'DATE',  content: data.date },
+       { name: 'SENDER',  content: data.senderName },
+       { name: 'ROOMURI', content: data.roomUri },
+       { name: 'ROOMURL', content: data.roomUrl },
+       { name: 'LOGOURL', content: cdn('images/logo-text-blue-pink.png', { email: true }) }
       ]
     }]
   };
 
   mandrill.messages.sendTemplate({
-    template_name:    templateName, 
+    template_name:    templateName,
     template_content: templateContent,
     message:          message
   }, function() {
+    stats.event(tracking.event, tracking.data);
     d.resolve();
   }, function(err) {
     d.reject(err);
