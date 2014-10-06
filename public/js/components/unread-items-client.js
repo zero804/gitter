@@ -27,6 +27,18 @@ define([
     });
   }
 
+  function onceUserIdSet(callback, c) {
+    var user = context.user();
+
+    if(user.id) {
+      callback.call(c, user.id);
+    } else {
+      user.once('change:id', function() {
+        callback.call(c, user.id);
+      });
+    }
+  }
+
   var ADD_TIMEOUT = 500;
   var REMOVE_TIMEOUT = 600000;
 
@@ -185,18 +197,20 @@ define([
     },
 
     markAllRead: function() {
-      $.ajax({
-        url: "/api/v1/user/" + context.getUserId() + "/rooms/" + context.getTroupeId() + "/unreadItems/all",
-        data: "",
-        type: "DELETE",
-        global: true,
-        context: this,
-        success: function() {
-          // Remove from the add tarpit and the current tarpit
-          this._unreadItemsRemoved(this._addTarpit._marshall());
-          this._unreadItemsRemoved(this._marshall());
-        }
-      });
+      onceUserIdSet(function(userId) {
+        $.ajax({
+          url: "/api/v1/user/" + userId + "/rooms/" + context.getTroupeId() + "/unreadItems/all",
+          data: "",
+          type: "DELETE",
+          global: true,
+          context: this,
+          success: function() {
+            // Remove from the add tarpit and the current tarpit
+            this._unreadItemsRemoved(this._addTarpit._marshall());
+            this._unreadItemsRemoved(this._marshall());
+          }
+        });
+      }, this);
 
     }
 
@@ -242,35 +256,39 @@ define([
     },
 
     _send: function(options) {
-      var queue = this._buffer._marshall();
-      this._buffer = new DoubleHash();
+      onceUserIdSet(function(userId) {
+        var queue = this._buffer._marshall();
+        this._buffer = new DoubleHash();
 
-      var async = !options || !options.sync;
-      var url = '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId() + '/unreadItems';
+        var async = !options || !options.sync;
+        var url = '/api/v1/user/' + userId + '/rooms/' + context.getTroupeId() + '/unreadItems';
 
-      $.ajax({
-        url: url,
-        contentType: "application/json",
-        data: JSON.stringify(queue),
-        async: async,
-        context: this,
-        type: "POST",
-        global: false,
-        success: function() {
-        },
-        error: function() {
-          log('Error posting unread items to server. Will attempt again in 5s');
-          // Unable to send messages, requeue them and try again in 5s
-          var self = this;
-          setTimeout(function() {
-            _iteratePreload(queue, function(itemType, itemId) {
-              self._buffer._add(itemType, itemId);
-            }, self);
+        $.ajax({
+          url: url,
+          contentType: "application/json",
+          data: JSON.stringify(queue),
+          async: async,
+          context: this,
+          type: "POST",
+          global: false,
+          success: function() {
+          },
+          error: function() {
+            log('Error posting unread items to server. Will attempt again in 5s');
+            // Unable to send messages, requeue them and try again in 5s
+            var self = this;
+            setTimeout(function() {
+              _iteratePreload(queue, function(itemType, itemId) {
+                self._buffer._add(itemType, itemId);
+              }, self);
 
-            self._sendLimited();
-          }, 5000);
-        }
-      });
+              self._sendLimited();
+            }, 5000);
+          }
+        });
+
+      }, this);
+
     }
   };
 
@@ -284,47 +302,52 @@ define([
 
   _.extend(TroupeUnreadItemRealtimeSync.prototype, Backbone.Events, {
     _subscribe: function() {
-      var store = this._store;
+      onceUserIdSet(function(userId) {
 
-      var url = '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId() + '/unreadItems';
+        var store = this._store;
 
-      realtime.subscribe(url, function(message) {
-        switch(message.notification) {
-          // New unread items
-          case 'unread_items':
-            store._unreadItemsAdded(message.items);
-            break;
+        var url = '/api/v1/user/' + userId + '/rooms/' + context.getTroupeId() + '/unreadItems';
 
-          // Unread items removed
-          case 'unread_items_removed':
-            store._unreadItemsRemoved(message.items);
-            break;
+        realtime.subscribe(url, function(message) {
+          switch(message.notification) {
+            // New unread items
+            case 'unread_items':
+              store._unreadItemsAdded(message.items);
+              break;
 
-          // New unread items
-          case 'mark_all_read':
-            store.markAllReadNotification();
-            break;
+            // Unread items removed
+            case 'unread_items_removed':
+              store._unreadItemsRemoved(message.items);
+              break;
 
-          // Lurk mode switched on/off
-          case 'lurk_change':
-            if(message.lurk) {
-              store.enableLurkMode();
-            } else {
-              store.disableLurkMode();
-            }
-            break;
-        }
-      });
+            // New unread items
+            case 'mark_all_read':
+              store.markAllReadNotification();
+              break;
 
-      realtime.registerForSnapshots(url, function(snapshot) {
-        var lurk = snapshot._meta && snapshot._meta.lurk;
-        if(lurk) {
-          store.enableLurkMode();
-        }
+            // Lurk mode switched on/off
+            case 'lurk_change':
+              if(message.lurk) {
+                store.enableLurkMode();
+              } else {
+                store.disableLurkMode();
+              }
+              break;
+          }
+        });
 
-        store.preload(snapshot);
-      });
+        realtime.registerForSnapshots(url, function(snapshot) {
+          var lurk = snapshot._meta && snapshot._meta.lurk;
+          if(lurk) {
+            store.enableLurkMode();
+          }
+
+          store.preload(snapshot);
+        });
+
+      }, this);
     }
+
   });
 
   // -----------------------------------------------------
@@ -554,7 +577,9 @@ define([
   function getUnreadItemStore() {
     if(_unreadItemStore) return _unreadItemStore;
 
-    if(context.getUserId() && context.troupe().id) {
+    // TODO: XXX: we'll need to come up with a new way of
+    // figuring out if we're on a not-logged-in page
+    if(context.troupe().id) {
       _unreadItemStore = new UnreadItemStore();
       new ReadItemSender(_unreadItemStore);
       var realtimeSync = new TroupeUnreadItemRealtimeSync(_unreadItemStore);

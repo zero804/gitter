@@ -334,7 +334,12 @@ describe('room-service', function() {
       var service = createRoomServiceWithStubs({
         addUser: true,
         findByUsernameResult: null,
-        createInvitedUserResult: { username: 'test-user', id: 'test-user-id', state: 'INVITED', emails: ['a@b.com']},
+        createInvitedUserResult: {
+          username: 'test-user',
+          id: 'test-user-id',
+          state: 'INVITED',
+          emails: ['a@b.com']
+        },
         canBeInvited: true,
         onInviteEmail: function() {
           done();

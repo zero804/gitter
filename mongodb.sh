@@ -16,19 +16,11 @@ mkdir -p /usr/local/var/mongodb/r0
 mkdir -p /usr/local/var/mongodb/r1
 
 mongod run \
-  -replSet troupeSet \
-  --journal \
-  --port 27017 \
-  --dbpath /usr/local/var/mongodb/r0 \
+  --config $SCRIPT_DIR/config/mongo-server.one.yml \
   --profile=1 \
-  --config $SCRIPT_DIR/config/mongo-server.dev.yml \
   --slowms=15 &
 
 mongod run \
-  -replSet troupeSet \
-  --journal \
-  --port 27018 \
-  --dbpath /usr/local/var/mongodb/r1 \
+  --config $SCRIPT_DIR/config/mongo-server.two.yml \
   --profile=1 \
-  --config $SCRIPT_DIR/config/mongo-server.dev.yml \
   --slowms=15 &
