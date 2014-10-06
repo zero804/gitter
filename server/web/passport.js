@@ -232,7 +232,7 @@ function install() {
 
                 // IMPORTANT: The alias can only happen ONCE. Do not remove.
                 stats.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id, function(err) {
-                  if (err) logger.error('Error aliasing user:', err);
+                  if (err) logger.error('Error aliasing user:', { exception: err });
 
                   stats.event("new_user", {
                     userId: user.id,
