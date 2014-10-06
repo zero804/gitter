@@ -17,6 +17,9 @@ var opts = require("nomnom")
    })
    .parse();
 
+require('../../server/services/kue-workers').startWorkers();
+require('../../server/utils/event-listeners').installLocalEventListeners();
+
 return userRemovalService.removeByUsername(opts.username)
   .delay(5000)
   .then(function() {
