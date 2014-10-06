@@ -28,7 +28,7 @@ module.exports = function(req, res, next) {
       return userService.findByUsernames(usernames);
     })
     .then(function(users) {
-      return users.filter(function(user) { return user.isActive(); });
+      return users.filter(function(user) { return !user.state; });
     })
    .then(function(users) {
      return restSerializer.serializeQ(users, new restSerializer.UserStrategy());

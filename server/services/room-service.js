@@ -693,12 +693,12 @@ function notifyInvitedUser(fromUser, invitedUser, room/*, isNewUser*/) {
     .then(function (emailAddress) {
       var notification;
 
-      if(invitedUser.isRemoved()) {
+      if(invitedUser.state === 'REMOVED') {
         stats.event('user_added_removed_user');
         return; // This has been removed
       }
 
-      if (invitedUser.isInvited()) {
+      if (invitedUser.state === 'INVITED') {
         if (emailAddress) {
           notification = 'email_invite_sent';
           emailNotificationService.sendInvitation(fromUser, invitedUser, room);
