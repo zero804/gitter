@@ -8,7 +8,8 @@ function userHasSignedUp(username) {
   return persistence.User.findOneQ({ username: new RegExp("^" + username + "$", "i") }, 'state', { lean: true })
     .then(function(user) {
       if(!user) return false;
-      if(user.state === 'INVITED') return false;
+      // A user only has state if they're not ACTIVE
+      if(user.state) return false;
 
       return true;
     });
