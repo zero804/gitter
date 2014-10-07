@@ -1,31 +1,15 @@
 define([
-  'jquery',
-  'utils/context'
-], function ($, context) {
+  'components/apiClient'
+], function (apiClient) {
   "use strict";
 
-  var URL = '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId() + '/collapsedItems';
-
   return {
-
     collapse: function (chatId) {
-      $.ajax({
-        url: URL,
-        data: JSON.stringify({
-          chatId: chatId
-        }),
-        contentType: "application/json",
-        type: "POST",
-        global: false
-      });
+      apiClient.userRoom.post('/collapsedItems', { chatId: chatId }, { global: false });
     },
 
     uncollapse: function (chatId) {
-      $.ajax({
-        url: URL + '/' + chatId,
-        type: "DELETE",
-        global: false
-      });
+      apiClient.userRoom.delete('/collapsedItems/' + chatId, { }, { global: false });
     }
   };
 
