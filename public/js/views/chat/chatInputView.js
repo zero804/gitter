@@ -5,6 +5,7 @@ define([
   'jquery',
   'utils/context',
   'utils/appevents',
+  'components/apiClient',
   'hbs!./tmpl/chatInputView',
   'hbs!./tmpl/typeaheadListItem',
   'hbs!./tmpl/emojiTypeaheadListItem',
@@ -20,7 +21,7 @@ define([
   'utils/platform-keys',
   'bootstrap_tooltip', // No ref
   'jquery-textcomplete' // No ref
-], function(log, Backbone, Marionette, $, context, appEvents, template, listItemTemplate,
+], function(log, Backbone, Marionette, $, context, appEvents, apiClient, template, listItemTemplate,
   emojiListItemTemplate, moment, hasScrollBars, isMobile, emoji, drafty, cdn, commands,
   cocktail, KeyboardEventsMixin, platformKeys) {
   "use strict";
@@ -181,8 +182,8 @@ define([
             if(repoName) query.repoName = repoName;
             if(issueNumber) query.issueNumber = issueNumber;
 
-            $.getJSON('/api/v1/rooms/' + context.getTroupeId() + '/issues', query)
-              .done(function(resp) {
+            apiClient.get('/v1/rooms/' + context.getTroupeId() + '/issues', query)
+              .then(function(resp) {
                 callback(resp);
               })
               .fail(function() {
