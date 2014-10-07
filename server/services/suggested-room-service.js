@@ -168,6 +168,11 @@ function findRooms(uriList) {
 
 function removeUselessSuggestions(suggestions, user) {
   return suggestions.filter(function(suggestion) {
+
+    // dont suggest forks as when the urls are shortened in the client,
+    // they look identical to the originals and people get angry
+    if(suggestion.repo && suggestion.repo.fork) return false;
+
     if(suggestion.room) {
       // it's not a good room suggestion if the user is already in the room
       return !suggestion.room.containsUserId(user.id);
