@@ -96,6 +96,9 @@ define([
     user: getClient(function() {
       return '/v1/user/' + context.getUserId();
     }),
+    room: getClient(function() {
+      return '/v1/rooms/' + context.getTroupeId();
+    }),
     userRoom: getClient(function() {
       return '/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId();
     }),
