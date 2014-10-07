@@ -1,19 +1,57 @@
 <div class="trpHomePanel" id="chat-frame">
   <div class="trpHomeContainer" id="content-frame">
+  
+    {{#if prettyWelcome}} 
+
+    <div class="prettyWelcome"> 
+      <h1>Welcome to Gitter!</h1>
+
+      <h2>What's next?</h2>
+      <p>Chat and receive notifications on the go. We also have an IRC bridge and an API.</p>
+      <div class='features'>
+        <ul>
+          <li><a href="http://update.gitter.im/osx/latest" target="_blank">Mac</a></li>
+          <li><a href="http://appstore.com/gitter" target="_blank">iOS</a></li>
+          <li><a href="https://irc.gitter.im" target="_blank">IRC</a></li>
+          <li><a href="https://developer.gitter.im/docs/welcome" target="_blank">API</a></li>
+        </ul>
+      </div>
+      <p><small>Android, Linux and Windows coming soon.</small></p>
+
+      <h2>Talk To Us</h2>
+      <p>We hang out in <a href='https://gitter.im/gitterhq/gitter' target="_blank">#gitterhq/gitter</a> and would love to hear from you. You can also follow <a href="https://twitter.com/gitchat">@gitchat</a> on Twitter for the latest news.</p>
+
+      <h2>Discover Features</h2>
+      <p>Level up your skills: keyboard shortcuts, /commands, file sharing, and other tricks. <a href="https://gitter.zendesk.com/hc/en-us" target="_blank">Learn more &rarr;</a></p>
+
+      <h2>Explore Communities</h2>
+      <p>We host thousands of open source communities and user groups. <a href='/explore' target="_blank">Explore &rarr;</a></p>
+
+      <h2>Gitter Data Liberation Front</h2>
+      <p>Content generated in public rooms is licensed under Creative Commons BY-NC-SA. Export messages easily using the <a href="https://developer.gitter.im" target="_blank">API</a>.</p>
+    </div>
+
+    {{else}}
+
     <div class="trpHomeLogo"></div>
     <br>
     <br>
     <br>
-    <h2>YOUR ORGANISATIONS</h2>
+
+    <h2>YOUR ORGANIZATIONS</h2>
     <div id="org-list"></div>
-    <br>
-    <br>
+
     <h2>SUGGESTED ROOMS</h2>
     {{#if showUpgradeAuthLink}}
     <div class="banner-red">
-      <a id="upgrade-auth" style="color: white" href="/login/upgrade?scopes=repo" target="_new">Want to see your private repositories? Click here to Authorise with GitHub</a>.
+      <a id="upgrade-auth" style="color: white" href="/login/upgrade?scopes=repo" target="_new">
+        Want to see your private repositories? Click here to Authorise with GitHub
+      </a>.
     </div>
     {{/if}}
     <div id="suggested-room-list"></div>
+
+    {{/if}}
+
   </div>
 </div>
