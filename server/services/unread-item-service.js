@@ -661,6 +661,34 @@ exports.getUnreadItems = function(userId, troupeId, itemType, callback) {
     .nodeify(callback);
 };
 
+exports.getAllUnreadItemCounts = function(userId, itemType, callback) {
+  // This requires two separate calls, doesnt work as a lua script
+  // as we can't predict the keys before the first call...
+  return Q.ninvoke(redisClient, "zrange", "ub:" + userId, 0, -1)
+    .then(function(troupeIds) {
+      if(!troupeIds || !troupeIds.length) return [];
+
+      var keys = [];
+      troupeIds.forEach(function(troupeId) {
+        keys.push("unread:" + itemType + ":" + userId + ":" + troupeId);
+        keys.push("m:" + userId + ":" + troupeId);
+      });
+
+      // We use unread-item-count with user-troupes and mentions
+      return runScript('unread-item-count', keys, [])
+        .then(function(counts) {
+          return troupeIds.map(function(troupeId, index) {
+            return {
+              troupeId: troupeId,
+              unreadItems: counts[index * 2],
+              mentions: counts[index * 2 + 1]
+            };
+          });
+        });
+    })
+    .nodeify(callback);
+};
+
 exports.getRoomIdsMentioningUser = function(userId, callback) {
   return redisClient_smembers("m:" + userId)
     .fail(function(err) {
