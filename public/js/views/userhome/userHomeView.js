@@ -53,8 +53,6 @@ define([
       if (window.location.hash.match(/pretty/))
         prettyWelcome = true;
 
-      appEvents.triggerParent('track-event', 'userhomeView', {prettyWelcome: prettyWelcome});
-
       return {
         showUpgradeAuthLink: !isMobile() && !hasPrivateRepoScope,
         prettyWelcome: prettyWelcome
