@@ -102,6 +102,7 @@ describe('push notification generator service', function() {
     var mockSendUserNotification = function(userId, notification) {
       assert.equal(userId, 'userId1234');
       assert.equal(notification.link, '/mobile/chat#serializedId');
+      assert.equal(notification.roomId, 'serializedId');
       assert(notification.message.indexOf('serializedFromUser') >= 0, 'serialized unread chat data not found');
       done();
     };
