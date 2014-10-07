@@ -6,35 +6,75 @@ define([
   /* @const */
   var DEFAULT_TIMEOUT = 15 * 1000;
 
+  /* @const */
+  var JSON_MIME_TYPE = "application/json";
+
+  /* @const */
+  var GET_DEFAULTS = {
+    timeout: DEFAULT_TIMEOUT,
+    dataType: "json"
+  };
+
+  /* @const */
+  var POST_DEFAULTS = {
+    timeout: DEFAULT_TIMEOUT,
+    dataType: "json",
+    contentType: JSON_MIME_TYPE,
+  };
+
+
   // If future this should direct clients to api.gitter.im
   function makeFullUrl(url) {
     // XXX: we need to remove /api/ from all calls to apiClient
-    if(url.indexOf('/api')) return url;
+    if(url.indexOf('/api') === 0) return url;
 
     return '/api' + url;
   }
 
-  // TODO return a proper promise instead of a $.Deferred
-  function operation(method, url, data, options) {
+  function defaults(options, defaultValues) {
     if(!options) options = {};
+    Object.keys(defaultValues).forEach(function(key) {
+      if(options[key] === undefined) {
+        // Only using a shallow clone for simplicity
+        options[key] = defaultValues[key];
+      }
+    });
+    return options;
+  }
 
-    var dataSerialized = method === 'get' ? data : JSON.stringify(data);
+  // TODO return a proper promise instead of a $.Deferred
+  function operation(method, defaultOptions, url, data, options) {
+    options = defaults(options, defaultOptions);
+
+    var dataSerialized;
+    if(options.contentType === JSON_MIME_TYPE) {
+      dataSerialized = JSON.stringify(data);
+    } else {
+      // JQuery will serialize to form data for us
+      dataSerialized = data;
+    }
 
     return $.ajax({
       url: makeFullUrl(url),
-      contentType: method === 'get' ? undefined : "application/json",
-      dataType: "json",
+      contentType: options.contentType,
+      dataType: options.dataType,
       type: method,
-      global: options.global === undefined ? true : options.global,
+      global: options.global,
       data: dataSerialized,
-      context: options.context,
-      timeout: options.timeout || DEFAULT_TIMEOUT
+      context: options.context, // NB: deprecated: cant use with real promises
+      timeout: options.timeout,
+      async: options.async
     });
   }
 
-  return ['get', 'post', 'patch', 'put'].reduce(function(memo, method) {
-    memo[method] = operation.bind(memo, method);
-    return memo;
-  }, {});
+
+  return [['get', GET_DEFAULTS], ['post', POST_DEFAULTS], ['patch', POST_DEFAULTS], ['put', POST_DEFAULTS]]
+    .reduce(function(memo, descriptor) {
+      var method = descriptor[0];
+      var defaultOptions = descriptor[1];
+
+      memo[method] = operation.bind(memo, method, defaultOptions);
+      return memo;
+    }, {});
 
 });
