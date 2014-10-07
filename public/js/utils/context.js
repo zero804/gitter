@@ -1,28 +1,8 @@
 define([
-  'backbone'
-], function(Backbone) {
+  'backbone',
+  './qs'
+], function(Backbone, qs) {
   "use strict";
-
-
-  // "?foo=bar&fish=chips" -> { foo: bar, fish: chips }
-  function parseQueryString(qs) {
-    if(!(qs && qs.length > 1)) return {};
-
-    var qsObj = {};
-
-    try {
-      qs.substring(1).split('&').forEach(function(pair) {
-        var splitPair = pair.split('=');
-        qsObj[splitPair[0]] = splitPair[1];
-      });
-
-      return qsObj;
-    } catch(err) {
-      return {};
-    }
-  }
-
-  var queryStringTroupeContext = parseQueryString(window.location.search);
 
   var ctx = window.troupeContext || {};
 
@@ -55,8 +35,8 @@ define([
 
       window.localStorage.lastTroupeId = id;
       troupeModel = { id: id };
-    } else if(queryStringTroupeContext.troupeId) {
-      troupeModel = { id: queryStringTroupeContext.troupeId };
+    } else if(qs.troupeId) {
+      troupeModel = { id: qs.troupeId };
     }
 
     return new WatchableModel(troupeModel);
@@ -165,9 +145,30 @@ define([
     }
   };
 
-  context.isProfileComplete = function() {
-    return user.get('status') !== 'PROFILE_NOT_COMPLETED';
-  };
+  function initialiseEnv() {
+    var env = window.troupeEnv || {};
+
+    // Allow env through the querystring
+    if(qs.env) {
+      var m;
+      try {
+        m = JSON.parse(qs.env);
+      } catch(e) {
+        // Ignore errors here
+      }
+
+      if(m) {
+        Object.keys(m).forEach(function(k) {
+          env[k] = m[k];
+        });
+      }
+    }
+
+    return env;
+  }
+
+  // Initialise the environment
+  var env = initialiseEnv();
 
   /**
    * The difference between troupeContext and env.
@@ -175,14 +176,14 @@ define([
    * TroupeContext depends on the user and troupe
    */
   context.env = function(envName) {
-    return window.troupeEnv && window.troupeEnv[envName];
+    return env[envName];
   };
 
   context.getAccessToken = function(callback) {
     var iterations = 0;
     function checkToken() {
       // This is a very rough first attempt
-      var token = window.bearerToken || queryStringTroupeContext.bearerToken || ctx.accessToken;
+      var token = window.bearerToken || qs.bearerToken || ctx.accessToken;
       if(token) return callback(token);
 
       iterations++;
