@@ -39,6 +39,49 @@ describe('unread-item-service', function() {
     });
   });
 
+  describe('unread-item-counts', function() {
+    it('should count the number of unread items and mentions a user has', function(done) {
+
+      var troupeId = 'TROUPEID' + Date.now();
+      var itemType = 'chat';
+      var itemId = '51adc86e010285b469000005';
+      var userId1 = 'USER1' + Date.now();
+
+      var creatorUserId = userId1;
+
+      var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
+      var appEventsMock = mockito.spy(testRequire('./app-events'));
+
+      var unreadItemService = testRequire.withProxies("./services/unread-item-service", {
+        './troupe-service': troupeServiceMock,
+        '../app-events': appEventsMock
+      });
+
+      var usersWithLurkHash = {};
+      usersWithLurkHash[userId1] = false;
+
+      var troupe = {
+        githubType: 'REPO',
+        users: usersWithLurkHash
+      };
+
+      mockito.when(troupeServiceMock).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupe));
+
+      unreadItemService.testOnly.newItem(troupeId, creatorUserId, itemType, itemId)
+        .then(function() {
+
+          return unreadItemService.getAllUnreadItemCounts(userId1, itemType)
+            .then(function(items) {
+              assert.equal(items.length, 1);
+              assert.equal(items[0].troupeId, troupeId);
+              assert.equal(items[0].unreadItems, 1);
+              assert.equal(items[0].mentions, 0);
+          });
+        })
+        .nodeify(done);
+    });
+  });
+
   describe('since-filter', function() {
     it('should do what it says on the tin', function() {
       var unreadItemService = testRequire("./services/unread-item-service");
