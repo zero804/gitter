@@ -46,8 +46,9 @@ describe('unread-item-service', function() {
       var itemType = 'chat';
       var itemId = '51adc86e010285b469000005';
       var userId1 = 'USER1' + Date.now();
+      var userId2 = 'USER2' + Date.now();
 
-      var creatorUserId = userId1;
+      var creatorUserId = userId2;
 
       var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
       var appEventsMock = mockito.spy(testRequire('./app-events'));
