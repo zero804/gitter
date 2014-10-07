@@ -135,6 +135,7 @@ function sendNotificationToDevice(notification, badge, device) {
   var message = notification && notification.message;
   var sound = notification && notification.sound;
   var link = notification && notification.link;
+  var roomId = notification && notification.roomId;
 
   if((device.deviceType === 'APPLE' ||
       device.deviceType === 'APPLE-DEV' ||
@@ -155,11 +156,11 @@ function sendNotificationToDevice(notification, badge, device) {
       note.sound = sound;
     }
 
-    if(link) {
+    if(link && roomId) {
       /* For IOS7 push notifications */
       note.contentAvailable = true;
 
-      note.payload = { 'l': link };
+      note.payload = { 'l': link, roomId: roomId };
     }
 
     //note.alert = message;
