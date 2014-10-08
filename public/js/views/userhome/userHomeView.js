@@ -2,14 +2,17 @@ define([
   'jquery',
   'marionette',
   'backbone',
+  'moment',
   'utils/context',
   'collections/instances/troupes',
   'hbs!./tmpl/userHomeTemplate',
   'hbs!./tmpl/userHomeEmptyOrgView',
   './homeOrgCollectionView',
   './suggested-room-collection-view',
-  'utils/is-mobile'
-], function($, Marionette, backbone, context, troupeCollections, userHomeTemplate, userHomeEmptyOrgViewTemplate, OrgCollectionView, SuggestedCollectionView, isMobile) {
+  'utils/is-mobile',
+  'utils/is-native',
+  'utils/appevents'
+], function($, Marionette, backbone, moment, context, troupeCollections, userHomeTemplate, userHomeEmptyOrgViewTemplate, OrgCollectionView, SuggestedCollectionView, isMobile, isNative, appEvents) {
   "use strict";
 
   var suggestedRoomCollection = new backbone.Collection();
@@ -37,12 +40,23 @@ define([
       this.suggestedRooms.show(new SuggestedCollectionView({ collection: suggestedRoomCollection }));
     },
 
+    getUserTimestamp: function(id) {
+      return new Date(parseInt(id.toString().slice(0,8), 16)*1000);
+    },
+
     serializeData: function() {
+      
       var user = context.getUser();
       var hasPrivateRepoScope = !!user.scopes.private_repo;
+      var prettyWelcome = (parseInt(user.id.slice(-1), 16) % 2) === 0;
+
+      // manual override
+      if (window.location.hash.match(/pretty/))
+        prettyWelcome = true;
 
       return {
-        showUpgradeAuthLink: !isMobile() && !hasPrivateRepoScope
+        showUpgradeAuthLink: !isMobile() && !hasPrivateRepoScope,
+        prettyWelcome: !isMobile() && !isNative() && prettyWelcome
       };
     },
 

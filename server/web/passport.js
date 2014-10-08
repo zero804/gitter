@@ -160,7 +160,8 @@ function install() {
                       method: 'github_oauth',
                       username: user.username,
                       source: 'invited',
-                      googleAnalyticsUniqueId: googleAnalyticsUniqueId
+                      googleAnalyticsUniqueId: googleAnalyticsUniqueId,
+                      bucket: ((parseInt(user.id.slice(-1), 16) % 2)) === 0 ? 'even' : 'odd'
                     });
                   });
                 }
@@ -239,7 +240,8 @@ function install() {
                     method: 'github_oauth',
                     username: user.username,
                     source: req.session.source,
-                    googleAnalyticsUniqueId: googleAnalyticsUniqueId
+                    googleAnalyticsUniqueId: googleAnalyticsUniqueId,
+                    bucket: ((parseInt(user.id.slice(-1), 16) % 2)) === 0 ? 'even' : 'odd'
                   });
 
                   // Flag the user as a new github user if they've created
