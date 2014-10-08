@@ -189,3 +189,12 @@ exports.formatNumber = function (n) {
   if (n < 1000000) return (n / 1000).toFixed(1) + 'k';
   return (n / 100000).toFixed(1) + 'm';
 };
+
+/**
+ * githubTypeToClass() takes a GitHub type and provdides a css class
+ */
+exports.githubTypeToClass = function (type) {
+  if (/_CHANNEL/.test(type)) return 'icon-hash';
+  else if (/REPO/.test(type)) return 'octicon-repo';
+  else return 'default';
+};

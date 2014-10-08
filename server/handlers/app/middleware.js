@@ -24,7 +24,7 @@ function uriContextResolverMiddleware(req, res, next) {
     .then(function(uriContext) {
 
       if (uriContext && uriContext.accessDenied && uriContext.accessDenied.githubType === 'ORG') {
-        console.log('#here');
+
       } else if (!uriContext || (!uriContext.troupe && !uriContext.ownUrl)) {
         if(!req.user) {
           throw 401;
