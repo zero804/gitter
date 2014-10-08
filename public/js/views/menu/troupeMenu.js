@@ -31,7 +31,8 @@ define([
     initialize: function (options) {
       this.collectionView = options.collectionView;
       this.collection = this.collectionView.collection;
-      this.collection.once('sync add reset remove', this.display.bind(this));
+
+      this.listenTo(this.collection, 'sync add reset remove', this.display);
     },
 
     serializeData: function () {
