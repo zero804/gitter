@@ -10,8 +10,9 @@ define([
   './homeOrgCollectionView',
   './suggested-room-collection-view',
   'utils/is-mobile',
+  'utils/is-native',
   'utils/appevents'
-], function($, Marionette, backbone, moment, context, troupeCollections, userHomeTemplate, userHomeEmptyOrgViewTemplate, OrgCollectionView, SuggestedCollectionView, isMobile, appEvents) {
+], function($, Marionette, backbone, moment, context, troupeCollections, userHomeTemplate, userHomeEmptyOrgViewTemplate, OrgCollectionView, SuggestedCollectionView, isMobile, isNative, appEvents) {
   "use strict";
 
   var suggestedRoomCollection = new backbone.Collection();
@@ -55,7 +56,7 @@ define([
 
       return {
         showUpgradeAuthLink: !isMobile() && !hasPrivateRepoScope,
-        prettyWelcome: prettyWelcome
+        prettyWelcome: !isMobile() && !isNative() && prettyWelcome
       };
     },
 
