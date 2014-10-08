@@ -43,7 +43,8 @@ define([
     },
     events: {
       'click': 'clicked',
-      'click .js-close-button': 'onItemClose'
+      'click .js-close-button': 'onItemClose',
+      'click .js-leave-button': 'onItemLeave'
     },
     initialize: function() {
       this.updateCurrentRoom();
@@ -82,6 +83,17 @@ define([
         type: "DELETE",
       });
 
+    },
+
+    onItemLeave: function(e) {
+      // stop click event triggering navigate
+      e.stopPropagation();
+
+      $.ajax({
+        url: "/api/v1/rooms/" + this.model.id + "/users/" + context.getUserId(),
+        data: "",
+        type: "DELETE",
+      });
     },
 
     onRender: function() {
