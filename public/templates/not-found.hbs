@@ -14,7 +14,7 @@
     <div>
       {{#each rooms}}
         <a target='_top' href='/{{ uri }}' class='room'>
-          <h2><i class='mega-octicon {{ githubTypeToClass githubType }}'></i> {{ name }}</h2>
+          <h2><i class='mega-octicon {{ githubTypeToClass githubType }}'></i> {{ owner }}</h2>
           <div class='room__details'>
             <small><i class="octicon octicon-organization"></i> {{ userCount }} {{ pluralize userCount 'person' 'people'}}</small>
           </div>
