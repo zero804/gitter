@@ -122,6 +122,8 @@ define(['jquery-iframely', 'utils/context'], function ($, context) {
   addOEmbedProvider("ustream",      ["ustream.tv/recorded/.*"],                         "//www.ustream.tv/oembed");
   addOEmbedProvider("photobucket",  ["photobucket.com/(albums|groups)/.+"],             "//photobucket.com/oembed/");
   addOEmbedProvider("slideshare",   ["slideshare.net"],                                 "//www.slideshare.net/api/oembed/2",{format:'jsonp'});
+  addOEmbedProvider("jsbin",        ["jsbin.com"],                                      "//jsbin.com/oembed",{format:'jsonp'});
+
 
   iframelyProviders.push(new RegExp("youtube\\.com/watch"));
   iframelyProviders.push(/https?:\/\/youtu\.be\//);
