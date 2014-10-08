@@ -212,8 +212,8 @@ post-test-maintain-data:
 
 tarball:
 	mkdir -p output
-	find . -type f -not -name ".*"| grep -Ev '^\./(\.|coverage/|output/|assets/|mongo-backup-|scripts/mongo-backup-|node_modules/).*'|tar -cv --files-from - |gzip -9 - > output/troupe.tgz
-	tar -cvzf output/assets.tgz -C public-processed . > /dev/null
+	find . -type f -not -name ".*"| grep -Ev '^\./(\.|coverage/|output/|assets/|mongo-backup-|scripts/mongo-backup-|node_modules/).*'|tar -c --files-from - |gzip -9 - > output/troupe.tgz
+	tar -czf output/assets.tgz -C public-processed . > /dev/null
 
 search-js-console:
 	if (find public/js -name "*.js" ! -path "*libs*" ! -name log.js |xargs grep -qE '\b(console|debugger)\b'); then \
