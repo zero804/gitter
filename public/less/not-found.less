@@ -1,0 +1,114 @@
+@import 'icon-mixins';
+@import "trpFonts";
+
+html {
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+h1, h2, h3, p {
+  font-weight: normal;
+  margin: 0.625em 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  color: #333;
+  font-family: 'Open Sans';
+  text-rendering: optimizelegibility !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+body > header {
+  padding: 1.25em;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+body > header h1 {
+  margin: 0;
+  line-height: 64px;
+}
+
+body > header img {
+  float: left;
+  border-radius: 4px;
+  margin-right: 1.25em;
+}
+
+.content {
+  padding: 1.25em;
+  max-width: 60em;
+
+  & > p {
+    line-height: 1.8;
+    margin-top: 0;
+  }
+}
+
+.icon-hash {
+  &:before {
+    font-family: 'troupe-icons';
+    font-style: normal;
+    font-variant: normal;
+    content: '\e833';
+  }
+}
+
+.room {
+  display: inline-block;
+  padding: 0.625em;
+  border-radius: 6px;
+  margin-bottom: 0.625em;
+  text-decoration: none !important;
+  width: 100%;
+  color: inherit;
+  overflow: hidden;
+
+  &__details {
+    line-height: 43px;
+    float: right;
+  }
+
+  h2 {
+    margin: 0;
+    display: block;
+    float: left;
+    font-size: 2em;
+
+    i {
+      color: rgb(187, 187, 187);
+      font-size: 25px;
+    }
+  }
+
+  p {
+    clear: both;
+  }
+
+  &:hover {
+    background: rgba(150,150,150,0.2);
+  }
+}
+
+footer {
+  color: rgb(170, 170, 170);
+  width: 100%;
+  padding: 0.625em;
+  font-size: 0.8em;
+
+  .logo {
+    margin-bottom: 0.625em;
+    float: left;
+    svg {
+      fill: rgb(170, 170, 170);
+      @square: 1.25em;
+      width: @square;
+      height: @square;
+    }
+  }
+}

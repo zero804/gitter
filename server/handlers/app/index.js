@@ -17,16 +17,9 @@ function saveRoom(req) {
 }
 
 var mainFrameMiddlewarePipeline = [
-  function (req, res, next) { console.log('mainFrameMiddlewarePipeline'); next(); },
   appMiddleware.uriContextResolverMiddleware,
   appMiddleware.isPhoneMiddleware,
   function (req, res, next) {
-
-    if (req.uriContext.accessDenied) {
-      console.log('should render the new page for', req.uriContext.accessDenied.uri);
-      // appRender.renderSomething(req, res, next, 'home');
-      // return res.send('hi');
-    }
 
     if (req.uriContext.ownUrl) {
       if(req.isPhone) {
@@ -60,10 +53,14 @@ var mainFrameMiddlewarePipeline = [
 ];
 
 var chatMiddlewarePipeline = [
-  function (req, res, next) { console.log('chatMiddlewarePipeline'); next(); },
   appMiddleware.uriContextResolverMiddleware,
   appMiddleware.isPhoneMiddleware,
   function (req, res, next) {
+
+    if (req.uriContext.accessDenied) {
+      return appRender.renderNotFound(req, res, next);
+    }
+
     if(!req.uriContext.troupe) return next(404);
 
     if(req.user) {
