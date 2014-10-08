@@ -4,11 +4,9 @@
 var winston                      = require('../../utils/winston');
 var nconf                        = require('../../utils/config');
 var roomPermissionsModel         = require('../../services/room-permissions-model');
-var oauthService                 = require('../../services/oauth-service');
 var request                      = require('request');
 var uriContextResolverMiddleware = require('./middleware').uriContextResolverMiddleware;
 var jwt                          = require('jwt-simple');
-var Q                            = require('q');
 var cdn                          = require('../../web/cdn');
 var services                     = require('gitter-services');
 var ensureLoggedIn               = require('../../web/middlewares/ensure-logged-in');
@@ -127,59 +125,30 @@ function adminAccessCheck(req, res, next) {
 module.exports = {
     install: function(app) {
 
-      app.get('/settings/integrations/:roomPart1',
-        ensureLoggedIn,
-        uriContextResolverMiddleware,
-        adminAccessCheck,
-        getIntegrations);
+      [
+        '/settings/integrations/:roomPart1',
+        '/settings/integrations/:roomPart1/:roomPart2',
+        '/settings/integrations/:roomPart1/:roomPart2/:roomPart3'
+      ].forEach(function(uri) {
 
-      app.get('/settings/integrations/:roomPart1/:roomPart2',
-        ensureLoggedIn,
-        uriContextResolverMiddleware,
-        adminAccessCheck,
-        getIntegrations);
+        app.get(uri,
+          ensureLoggedIn,
+          uriContextResolverMiddleware({ create: false }),
+          adminAccessCheck,
+          getIntegrations);
 
-      app.get('/settings/integrations/:roomPart1/:roomPart2/:roomPart3',
-        ensureLoggedIn,
-        uriContextResolverMiddleware,
-        adminAccessCheck,
-        getIntegrations);
+        app.del(uri,
+          ensureLoggedIn,
+          uriContextResolverMiddleware({ create: false }),
+          adminAccessCheck,
+          deleteIntegration);
 
-      app.del('/settings/integrations/:roomPart1',
-        ensureLoggedIn,
-        uriContextResolverMiddleware,
-        adminAccessCheck,
-        deleteIntegration);
+        app.post(uri,
+          ensureLoggedIn,
+          uriContextResolverMiddleware({ create: false }),
+          adminAccessCheck,
+          createIntegration);
 
-      app.del('/settings/integrations/:roomPart1/:roomPart2',
-        ensureLoggedIn,
-        uriContextResolverMiddleware,
-        adminAccessCheck,
-        deleteIntegration);
-
-      app.del('/settings/integrations/:roomPart1/:roomPart2/:roomPart3',
-        ensureLoggedIn,
-        uriContextResolverMiddleware,
-        adminAccessCheck,
-        deleteIntegration);
-
-      app.post('/settings/integrations/:roomPart1',
-        ensureLoggedIn,
-        uriContextResolverMiddleware,
-        adminAccessCheck,
-        createIntegration);
-
-      app.post('/settings/integrations/:roomPart1/:roomPart2',
-        ensureLoggedIn,
-        uriContextResolverMiddleware,
-        adminAccessCheck,
-        createIntegration);
-
-      app.post('/settings/integrations/:roomPart1/:roomPart2/:roomPart3',
-        ensureLoggedIn,
-        uriContextResolverMiddleware,
-        adminAccessCheck,
-        createIntegration);
-
+      });
     }
 };
