@@ -9,7 +9,8 @@ define([
   'views/base',
   'cocktail',
   'utils/dataset-shim',
-  'jquery-sortable' // No ref
+  'jquery-sortable', // No ref
+  'bootstrap_tooltip' // No ref
 ], function($, context, roomNameTrimmer, Marionette, roomListItemTemplate, appEvents, moment,  TroupeViews, cocktail, dataset) {
   "use strict";
 
@@ -158,6 +159,10 @@ define([
         // Not lurking
         e.removeClass('chatting chatting-now');
       }
+
+      this.$el.find('.js-close-button').tooltip({placement: 'left'});
+      this.$el.find('.js-leave-button').tooltip({placement: 'left'});
+
     },
     clearSearch: function() {
       $('#list-search-input').val('');
