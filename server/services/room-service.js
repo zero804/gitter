@@ -347,18 +347,31 @@ exports.findAllRoomsIdsForUserIncludingMentions = findAllRoomsIdsForUserIncludin
  * @return The promise of a troupe or nothing.
  */
 function findOrCreateRoom(user, uri, options) {
-  if(!options) options = {};
+  var userId = user && user.id;
+  options = options || {};
   validate.expect(uri, 'uri required');
 
-  var userId = user && user.id;
+  /**
+   * this function returns an object containing accessDenied, which is used by the middlewares to allow the display
+   * of public rooms instead of the standard 404
+   */
+  var denyAccess = function (uriLookup) {
+    return {
+      accessDenied: {
+        githubType: uriLookup.troupe.githubType,
+        uri: uriLookup.troupe.uri
+      }
+    };
+  };
 
   /* First off, try use local data to figure out what this url is for */
   return localUriLookup(uri, options)
-    .then(function(uriLookup) {
+    .then(function (uriLookup) {
       logger.verbose('URI Lookup returned ', { uri: uri, isUser: !!(uriLookup && uriLookup.user), isTroupe: !!(uriLookup && uriLookup.troupe) });
 
       /* Deal with the case of the nonloggedin user first */
       if(!user) {
+
         if(!uriLookup) return null;
 
         if(uriLookup.user) {
@@ -368,15 +381,8 @@ function findOrCreateRoom(user, uri, options) {
 
         if(uriLookup.troupe) {
           return roomPermissionsModel(null, 'view', uriLookup.troupe)
-            .then(function(access) {
-              if(!access) {
-                return {
-                  accessDenied: {
-                    githubType: uriLookup.troupe.githubType,
-                    uri: uriLookup.troupe.uri
-                }};
-              }
-
+            .then(function (access) {
+              if (!access) return denyAccess(uriLookup); // please see comment about denyAccess
               return { troupe: uriLookup.troupe };
             });
         }
@@ -384,7 +390,7 @@ function findOrCreateRoom(user, uri, options) {
         return null;
       }
 
-      /* Lookup found a user? */
+      // IF THE URI HAS A USER THEN ONE-TO-ONE
       if(uriLookup && uriLookup.user) {
         var otherUser = uriLookup.user;
 
@@ -405,14 +411,16 @@ function findOrCreateRoom(user, uri, options) {
                 return { oneToOne: true, troupe: troupe, otherUser: otherUser };
               });
           });
-
       }
 
       logger.verbose('Attempting to access room ' + uri);
 
-      /* Didn't find a user, but we may have found another room */
+      // NEED TO CHECK FOR THE ROOMS
       return findOrCreateNonOneToOneRoom(user, uriLookup && uriLookup.troupe, uri, options)
         .spread(function (troupe, access, hookCreationFailedDueToMissingScope, didCreate) {
+
+          if (!access) return denyAccess(uriLookup); // please see comment about denyAccess
+
           // if the user has been granted access to the room, send join stats for the cases of being the owner or just joining the room
           if(access && (didCreate || !troupe.containsUserId(user.id))) {
             sendJoinStats(user, troupe, options.tracking);

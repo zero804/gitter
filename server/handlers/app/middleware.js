@@ -23,10 +23,12 @@ function uriContextResolverMiddleware(req, res, next) {
   return roomService.findOrCreateRoom(req.user, uri, { tracking: tracking })
     .then(function(uriContext) {
 
-      if (uriContext && uriContext.accessDenied && uriContext.accessDenied.githubType === 'ORG') {
+      var isValid = uriContext && (uriContext.troupe || uriContext.ownUrl);
+      var accessToOrgRoomDenied = uriContext && uriContext.accessDenied && uriContext.accessDenied.githubType === 'ORG';
 
-      } else if (!uriContext || (!uriContext.troupe && !uriContext.ownUrl)) {
-        if(!req.user) {
+      if (!isValid && !accessToOrgRoomDenied) {
+
+        if (!req.user) {
           throw 401;
         }
 
