@@ -45,14 +45,19 @@ define([
     },
 
     serializeData: function() {
-      
+
       var user = context.getUser();
       var hasPrivateRepoScope = !!user.scopes.private_repo;
       var prettyWelcome = (parseInt(user.id.slice(-1), 16) % 2) === 0;
 
       // manual override
-      if (window.location.hash.match(/pretty/))
+      if (window.location.hash.match(/pretty/)) {
         prettyWelcome = true;
+      }
+
+      if (window.location.hash.match(/personality/)) {
+        prettyWelcome = false;
+      }
 
       return {
         showUpgradeAuthLink: !isMobile() && !hasPrivateRepoScope,
