@@ -154,7 +154,7 @@ define([
     },
     clicked: function() {
       var model = this.model;
-      var self=this;
+      var self = this;
       setTimeout(function() {
         // Make things feel a bit more responsive, but not too responsive
         self.clearSearch();

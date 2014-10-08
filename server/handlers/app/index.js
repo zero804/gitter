@@ -17,7 +17,7 @@ function saveRoom(req) {
 }
 
 var mainFrameMiddlewarePipeline = [
-  appMiddleware.uriContextResolverMiddleware,
+  appMiddleware.uriContextResolverMiddleware({ create: 'not-repos' }),
   appMiddleware.isPhoneMiddleware,
   function(req, res, next) {
 
@@ -53,7 +53,7 @@ var mainFrameMiddlewarePipeline = [
 ];
 
 var chatMiddlewarePipeline = [
-  appMiddleware.uriContextResolverMiddleware,
+  appMiddleware.uriContextResolverMiddleware({ create: 'not-repos'}),
   appMiddleware.isPhoneMiddleware,
   function (req, res, next) {
     if(!req.uriContext.troupe) return next(404);
@@ -79,7 +79,7 @@ var chatMiddlewarePipeline = [
 ];
 
 var embedMiddlewarePipeline = [
-  appMiddleware.uriContextResolverMiddleware,
+  appMiddleware.uriContextResolverMiddleware({ create: false }),
   appMiddleware.isPhoneMiddleware,
   function (req, res, next) {
     if(!req.uriContext.troupe) return next(404);
@@ -90,7 +90,7 @@ var embedMiddlewarePipeline = [
 
 module.exports = {
     install: function(app) {
-      
+
       [
         '/:roomPart1/~chat',                         // ORG or ONE_TO_ONE
         '/:roomPart1/:roomPart2/~chat',              // REPO or ORG_CHANNEL or ADHOC
@@ -98,7 +98,7 @@ module.exports = {
       ].forEach(function(path) {
         app.get(path, chatMiddlewarePipeline);
       });
-      
+
       [
         '/:roomPart1/:roomPart2/~embed',              // REPO or ORG_CHANNEL or ADHOC
         '/:roomPart1/:roomPart2/:roomPart3/~embed'    // CUSTOM REPO_ROOM
@@ -112,7 +112,7 @@ module.exports = {
       ].forEach(function(path) {
         app.get(path,
           ensureLoggedIn,
-          appMiddleware.uriContextResolverMiddleware,
+          appMiddleware.uriContextResolverMiddleware({ create: false }),
           appMiddleware.isPhoneMiddleware,
           function(req, res, next) {
             appRender.renderHomePage(req, res, next);
@@ -132,6 +132,14 @@ module.exports = {
         app.get(path + '/archives/all', archive.datesList);
         app.get(path + '/archives/:yyyy(\\d{4})/:mm(\\d{2})/:dd(\\d{2})', archive.chatArchive);
         app.get(path, mainFrameMiddlewarePipeline);
+        app.post(path,
+          appMiddleware.uriContextResolverMiddleware({ create: true }),
+          function(req, res, next) {
+            if(!req.uriContext.troupe || !req.uriContext.ownUrl) return next(404);
+
+            // GET after POST
+            res.redirect(req.uri);
+          });
       });
 
     }
