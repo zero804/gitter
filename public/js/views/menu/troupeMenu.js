@@ -125,12 +125,19 @@ define([
       var hasItems = troupeCollections.troupes && !!(troupeCollections.troupes.length);
 
       if (hasItems) {
-        this.showSuggestedOrSetFlag();
+        if(troupeCollections.troupes.length < 10) {
+          troupeCollections.suggested.fetch();
+        }
       } else {
-        troupeCollections.troupes.once('sync', this.showSuggestedOrSetFlag.bind(this));
+        this.listenToOnce(troupeCollections.troupes, 'sync', function() {
+          if(troupeCollections.troupes.length < 10) {
+            troupeCollections.suggested.fetch();
+          }
+        });
       }
     },
 
+    // WARNING THIS METHOD IS UNSAFE. Fix it
     getIndexForId: function(id) {
       if (!id) return;
       var els = $('#recentTroupesList li');
@@ -203,8 +210,6 @@ define([
     onRender: function () {
       this.isRendered = true;
 
-      if (this.shouldShowSuggestions) this.showSuggested();
-
       this.profile.show(new ProfileView());
 
       // mega-list: recent troupe view
@@ -233,6 +238,12 @@ define([
         collectionView: new OrgCollectionView({ collection: troupeCollections.orgs }),
         header: 'Your Organizations'
       }));
+
+      // Suggested repos (probably hidden at first)
+      this.suggested.show(new CollectionWrapperView({
+        collectionView: new SuggestedCollectionView({ collection: troupeCollections.suggested }),
+        header: 'Suggested Rooms'
+      }));
     },
 
     /* the clear icon shouldn't be available at all times? */
@@ -257,22 +268,6 @@ define([
     showSearch: function() {
       this.$el.find('#list-mega').hide();
       this.$el.find('#list-search').show();
-    },
-
-    // IMPORTANT: if the view is already rendered then just show the region, else set a property that can be used by onRender()
-    showSuggestedOrSetFlag: function () {
-      if (this.isRendered) this.showSuggested();
-      else this.shouldShowSuggestions = true;
-    },
-
-    showSuggested: function () {
-      if (troupeCollections.troupes.length >= 8) {
-        return;
-      }
-      this.suggested.show(new CollectionWrapperView({
-        collectionView: new SuggestedCollectionView({ collection: troupeCollections.suggested }),
-        header: 'Suggested Rooms'
-      }));
     }
   });
 
