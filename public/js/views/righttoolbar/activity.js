@@ -253,7 +253,7 @@ define([
       return {
         isAdmin: context().permissions.admin,
         isNativeDesktopApp: context().isNativeDesktopApp,
-        integrationsUrl: context().isNativeDesktopApp ? window.location.origin + '/' + context.troupe.get('uri') + '#integrations' : '#integrations'
+        integrationsUrl: context().isNativeDesktopApp ? window.location.origin + '/' + context.troupe().get('uri') + '#integrations' : '#integrations'
       };
     }
   });
