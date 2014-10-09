@@ -72,6 +72,7 @@ module.exports = {
       tags: [String],
       lcUri: { type: String, 'default': function() { return this.uri ? this.uri.toLowerCase() : null; }  },
       githubType: { type: String, 'enum': ['REPO', 'ORG', 'ONETOONE', 'REPO_CHANNEL', 'ORG_CHANNEL', 'USER_CHANNEL'], required: true },
+      owner: { type: String },
       status: { type: String, "enum": ['ACTIVE', 'DELETED'], "default": 'ACTIVE'},
       oneToOne: { type: Boolean, "default": false },
       users: [TroupeUserSchema],
