@@ -177,7 +177,11 @@ define([
         self.clearSearch();
       }, 150);
 
-      appEvents.trigger('navigation', model.get('url'), 'chat', model.get('name'), model.id);
+    if(this.model.get('exists') === false) {
+        window.location.hash = '#confirm/' + this.model.get('uri');
+      } else {
+        appEvents.trigger('navigation', model.get('url'), 'chat', model.get('name'), model.id);
+      }
     }
   });
 
