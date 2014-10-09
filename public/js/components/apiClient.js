@@ -1,3 +1,51 @@
+/**
+ * API Client
+ *
+ * This is a basic API client for communicating with the Gitter server.
+ *
+ * Basic Use
+ * ------------
+ *
+ * The basic form of requests is:
+ * apiClient.operation(url, data, options) -> $.Deferrer
+ *
+ * Note that altough the client returns a deferred, it will
+ * in future return a promise.
+ *
+ * apiClient.get('/v1/eyeballs', data, options)
+ * apiClient.post('/v1/eyeballs', data, options)
+ * apiClient.put('/v1/eyeballs', data, options)
+ * apiClient.patch('/v1/eyeballs', data, options)
+ * apiClient.delete('/v1/eyeballs', data, options)
+ *
+ * Note that you should not include /api/ in your URL.
+ *
+ * Advanced usage
+ * ---------------
+ * apiClient.user.post('/collapsedItems', data, options)
+ * apiClient.user.delete('/collapsedItems', data, options)
+ *
+ * These operations will use the current user resource as their root,
+ *
+ * The sub-resources available are:
+ *
+ * Sub Resource       | Root Resource
+ * apiClient.user     | /v1/user/:userId
+ * apiClient.userRoom | /v1/rooms/:roomId/user/:userId
+ * apiClient.room     | /v1/rooms/:roomId
+ *
+ * Example
+ * -------
+ * Send a message to the current room:
+ *
+ * apiClient.room.post('/chatMessages', { text: 'hello from api client' })
+ *   .then(function(response) {
+ *     window.alert('I did a post.');
+ *   })
+ *   .fail(function(xhr) {
+ *     window.alert('I am a failure: ' + xhr.status);
+ *   })
+ */
 define([
   'jquery',
   'utils/context'
