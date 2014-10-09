@@ -20,6 +20,7 @@ var troupeEnv = {
   domain: nconf.get('web:domain'),
   baseServer: nconf.get('web:baseserver'),
   basePath: nconf.get('web:basepath'),
+  apiBasePath: nconf.get('web:apiBasePath'),
   homeUrl: nconf.get('web:homeurl'),
   badgeBaseUrl: nconf.get('web:badgeBaseUrl'),
   embedBaseUrl: nconf.get('web:embedBaseUrl'),

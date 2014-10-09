@@ -15,9 +15,14 @@ define([
 
     XHR.prototype.open = function(method, url, async, user, pass) {
         this._addCredentials = urlMatch(url);
-        var newUrl = url.indexOf('/api') === 0 ? context.env('basePath') + url : url;
 
-        open.call(this, method, newUrl, async, user, pass);
+        if(url.indexOf('/api/') === 0) {
+          var newUrl = context.env('apiBasePath') + url.substring(4);
+          console.warn('api call redirected:', url, '->', newUrl);
+          url = newUrl;
+        }
+
+        open.call(this, method, url, async, user, pass);
     };
 
     XHR.prototype.send = function(data) {
