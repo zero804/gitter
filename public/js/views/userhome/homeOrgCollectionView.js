@@ -2,10 +2,11 @@
 define([
   'jquery-hammer',
   'marionette',
+  'hbs!./tmpl/home-org-view',
   'hbs!./tmpl/homeOrgListItem',
   'utils/appevents',
   'utils/is-mobile'
-], function($hammer, Marionette, orgListItemTemplate, appEvents, isMobile) {
+], function($hammer, Marionette, orgTemplate, orgListItemTemplate, appEvents, isMobile) {
   "use strict";
 
   var OrgItemView = Marionette.ItemView.extend({
@@ -31,10 +32,26 @@ define([
     }
   });
 
-  return Marionette.CollectionView.extend({
-    tagName: 'ul',
-    className: 'suggested-room-list',
-    itemView: OrgItemView
+  return Marionette.CompositeView.extend({
+    collectionEvents: {
+      'add remove reset sync': 'onRender'
+    },
+    ui: {
+      header: '#org-list-header'
+    },
+    itemViewContainer: "#org-list-items",
+    // tagName: 'ul',
+    // className: 'suggested-room-list',
+    template: orgTemplate,
+    itemView: OrgItemView,
+    onRender: function() {
+      if(this.collection.length > 0) {
+        this.ui.header.show();
+      } else {
+        this.ui.header.hide();
+      }
+
+    }
   });
 
 });

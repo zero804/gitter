@@ -10,64 +10,68 @@ var _               = require('underscore');
 var HILIGHTED_ROOMS = [
   {
     uri: 'gitterHQ/gitter',
+    githubType: 'REPO',
     localeLanguage: 'en'
   }, {
     uri: 'marionettejs/backbone.marionette',
     language: 'JavaScript',
+    githubType: 'REPO',
     localeLanguage: 'en'
   },{
     uri: 'LaravelRUS/chat',
     channel: true,
     language: 'PHP',
+    githubType: 'REPO',
     localeLanguage: 'ru'
   }, {
     uri: 'gitterHQ/nodejs',
     channel: true,
     language: 'JavaScript',
+    githubType: 'ORG_CHANNEL',
     localeLanguage: 'en'
   }, {
     uri: 'lotus/chat',
     channel: true,
     language: 'Ruby',
+    githubType: 'REPO',
     localeLanguage: 'en'
   },{
     uri: 'rom-rb/chat',
     channel: true,
     language: 'Ruby',
+    githubType: 'REPO',
     localeLanguage: 'en'
   }, {
     uri: 'webpack/webpack',
     language: 'JavaScript',
+    githubType: 'REPO',
     localeLanguage: 'en'
   }, {
     uri: 'ruby-vietnam/chat',
     channel: true,
     language: 'Ruby',
+    githubType: 'ORG_CHANNEL',
     localeLanguage: 'vi'
-  }, {
-    uri: 'require-lx/group',
-    language: 'JavaScript',
-    localeLanguage: 'en'
   }, {
     uri: 'angular-ui/ng-grid',
     language: 'JavaScript',
+    githubType: 'REPO',
     localeLanguage: 'en'
   }, {
     uri: 'opscode/supermarket',
     language: 'Ruby',
+    githubType: 'REPO',
     localeLanguage: 'en'
   }, {
     uri: 'MahApps/MahApps.Metro',
     language: 'PowerShell',
+    githubType: 'REPO',
     localeLanguage: 'en'
   }, {
     uri: 'sympy/sympy',
     language: 'Python',
+    githubType: 'REPO',
     localeLanguage: 'en'
-  }, {
-    uri: 'rogeriopvl/erebot',
-    language: 'JavaScript',
-    localeLanguage: 'es'
   }
 ];
 
@@ -211,7 +215,11 @@ function getSuggestedRepoMap(user) {
       function addSuggestion(flag) {
         return function(repo) {
           if(!suggestions[repo.full_name]) {
-            suggestions[repo.full_name] = { uri: repo.full_name, repo: repo };
+            suggestions[repo.full_name] = {
+              uri: repo.full_name,
+              repo: repo,
+              githubType: 'REPO'
+            };
           }
           suggestions[repo.full_name][flag] = true;
         };
@@ -228,7 +236,11 @@ function getSuggestedRepoMap(user) {
 function addHighlightedRooms(suggestionMap) {
   HILIGHTED_ROOMS.forEach(function(room) {
     if(!suggestionMap[room.uri]) {
-      suggestionMap[room.uri] = { uri: room.uri, language: room.language };
+      suggestionMap[room.uri] = {
+        uri: room.uri,
+        language: room.language,
+        githubType: room.githubType
+      };
     }
     suggestionMap[room.uri].localeLanguage = room.localeLanguage;
     suggestionMap[room.uri].highlighted = true;

@@ -11,6 +11,7 @@ require([
   'components/realtime',
   'views/createRoom/createRoomView',
   'views/createRoom/createRepoRoomView',
+  'views/createRoom/confirmRepoRoomView',
   'views/createRoom/chooseRoomView',
   'log!router-app',
   'components/statsc',                    // No ref
@@ -23,7 +24,7 @@ require([
   'components/ajax-errors',               // No ref
   'components/focus-events'               // No ref
 ], function(require, appEvents, context, Backbone, _, AppIntegratedView, TroupeMenuView, troupeCollections,
-  TitlebarUpdater, realtime, createRoomView, createRepoRoomView, chooseRoomView, log) {
+  TitlebarUpdater, realtime, createRoomView, createRepoRoomView, confirmRepoRoomView, chooseRoomView, log) {
   "use strict";
 
   var chatIFrame = document.getElementById('content-frame');
@@ -85,6 +86,7 @@ require([
     titlebarUpdater.setRoomName(title);
     updateContent(frameUrl);
   });
+
 
   // Revert to a previously saved state
   window.onpopstate = function(e) {
@@ -243,7 +245,8 @@ require([
       "createcustomroom": "createcustomroom",
       "createcustomroom/:name": "createcustomroom",
       "createreporoom": "createreporoom",
-      "createroom" : "createroom"
+      "createroom" : "createroom",
+      "confirm/*uri" : "confirmRoom"
     },
 
     hideModal: function() {
@@ -298,6 +301,10 @@ require([
 
     createreporoom: function() {
       appView.dialogRegion.show(new createRepoRoomView.Modal());
+    },
+
+    confirmRoom: function(uri) {
+      appView.dialogRegion.show(new confirmRepoRoomView.Modal({ uri: uri }));
     }
   });
 
