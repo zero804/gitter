@@ -39,7 +39,8 @@ var badgerEnabled      = nconf.get('autoPullRequest:enabled');
 
 function localUriLookup(uri, opts) {
   return uriLookupService.lookupUri(uri)
-    .then(function(uriLookup) {
+    .then(function (uriLookup) {
+
       if(!uriLookup) return null;
 
       if(uriLookup.userId) {
@@ -65,7 +66,7 @@ function localUriLookup(uri, opts) {
 
       if(uriLookup.troupeId) {
         return troupeService.findById(uriLookup.troupeId)
-          .then(function(troupe) {
+          .then(function (troupe) {
             if(!troupe) {
               logger.info('Removing stale uri: ' + uri + ' from URI lookups');
 
