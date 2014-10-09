@@ -343,7 +343,7 @@ h1:after, h2:after {
  */
 #intro-panel {
   background: url('../images/home/banner.jpg') no-repeat center center;
-  /*background-size: cover;*/
+  background-size: cover;
   z-index: 9999;
 
   .logo-holder {
@@ -797,7 +797,7 @@ h1:after, h2:after {
 
 #integrations-panel .issues {
   clear: both;
-  padding: 60px 0;
+  // padding: 60px 0;
 
     img {
       width: 500px;
@@ -811,8 +811,9 @@ h1:after, h2:after {
 }
 
 #integrations-panel .integrations {
-  clear: both;
-  padding: 60px 0;
+  // clear: both;
+  overflow: auto;
+  // padding: 60px 0;
 
   p {
     float: left;
@@ -821,7 +822,7 @@ h1:after, h2:after {
 }
 
 #integrations-panel .loves {
-  float: right;
+  // float: right;
   width: 400px;
 }
 
@@ -1267,9 +1268,10 @@ footer small a:hover {
 }
 
 @media (max-width: 900px) {
+  #integrations-panel .issues img,
   #integrations-panel .markdown img {
     float: none;
-    width: auto;
+    width: 100%;
   }
 }
 
