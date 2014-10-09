@@ -14,7 +14,7 @@ var burstCalculator   = require('../../utils/burst-calculator');
 var roomPermissionsModel = require('../../services/room-permissions-model');
 
 exports.datesList = [
-  appMiddleware.uriContextResolverMiddleware,
+  appMiddleware.uriContextResolverMiddleware({ create: false }),
   function(req, res, next) {
     var user = req.user;
     var troupe = req.uriContext.troupe;
@@ -67,7 +67,7 @@ exports.datesList = [
 
 
 exports.chatArchive = [
-  appMiddleware.uriContextResolverMiddleware,
+  appMiddleware.uriContextResolverMiddleware({ create: false }),
   function(req, res, next) {
     var user = req.user;
     var troupe = req.uriContext.troupe;
