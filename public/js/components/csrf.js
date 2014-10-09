@@ -1,6 +1,7 @@
 define([
-  'utils/context'
-], function(context) {
+  'utils/context',
+  'log!csrf'
+], function(context, log) {
   'use strict';
 
   function urlMatch(url) {
@@ -18,7 +19,7 @@ define([
 
         if(url.indexOf('/api/') === 0) {
           var newUrl = context.env('apiBasePath') + url.substring(4);
-          console.warn('api call redirected:', url, '->', newUrl);
+          log('WARNING: api call redirected:', url, '->', newUrl);
           url = newUrl;
         }
 
