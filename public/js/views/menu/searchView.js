@@ -224,6 +224,11 @@ define([
       $.ajax({ url: '/api/v1/user', data : { q: query, type: 'gitter' }, success: function(data) {
 
         if (data.results) {
+
+          data.results.forEach(function(result) {
+            result.exists = true; // Only existing rooms come back in public-repo-search
+          });
+
           if (!self.user_queries[query]) self.user_queries[query] = [];
 
           self.user_queries[query] = _.uniq(self.user_queries[query].concat(data.results), function(s) {
@@ -337,6 +342,11 @@ define([
       $.ajax({ url: '/api/v1/channel-search', data : { q: query }, success: function(data) {
 
         if (data.results) {
+
+          data.results.forEach(function(result) {
+            result.exists = true; // Only existing rooms come back in public-repo-search
+          });
+
           if (!self.channel_queries[query]) self.channel_queries[query] = [];
 
           self.channel_queries[query] = _.uniq(self.channel_queries[query].concat(data.results), function(s) {
