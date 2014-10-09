@@ -296,6 +296,11 @@ define([
       $.ajax({ url: '/api/v1/public-repo-search', data : { q: query }, success: function(data) {
 
         if (data.results) {
+
+          data.results.forEach(function(result) {
+            result.exists = true; // Only existing rooms come back in public-repo-search
+          });
+
           if (!self.repo_queries[query]) self.repo_queries[query] = [];
 
           self.repo_queries[query] = _.uniq(self.repo_queries[query].concat(data.results), function(s) {
