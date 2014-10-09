@@ -230,6 +230,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
                 {
                   $setOnInsert: {
                     lcUri: lcUri,
+                    owner: uri.split('/')[0],
                     uri: officialUri,
                     _nonce: nonce,
                     githubType: githubType,
@@ -687,6 +688,7 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
           {
             $setOnInsert: {
               lcUri: lcUri,
+              owner: uri.split('/')[0],
               uri: uri,
               security: security,
               name: name,
