@@ -5,13 +5,12 @@ define([
   'marionette',
   'hbs!./tmpl/room-list-item',
   'utils/appevents',
-  'utils/momentWrapper',
   'views/base',
   'cocktail',
   'utils/dataset-shim',
   'jquery-sortable', // No ref
   'bootstrap_tooltip' // No ref
-], function($, context, roomNameTrimmer, Marionette, roomListItemTemplate, appEvents, moment,  TroupeViews, cocktail, dataset) {
+], function($, context, roomNameTrimmer, Marionette, roomListItemTemplate, appEvents,  TroupeViews, cocktail, dataset) {
   "use strict";
 
   /* @const */
@@ -177,7 +176,11 @@ define([
         self.clearSearch();
       }, 150);
 
-      appEvents.trigger('navigation', model.get('url'), 'chat', model.get('name'), model.id);
+    if(this.model.get('exists') === false) {
+        window.location.hash = '#confirm/' + this.model.get('uri');
+      } else {
+        appEvents.trigger('navigation', model.get('url'), 'chat', model.get('name'), model.id);
+      }
     }
   });
 
