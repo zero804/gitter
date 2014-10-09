@@ -140,6 +140,7 @@ var LESS_ROOTS = [
 
   // Bootscript root less files
   { name: 'homepage'                           },
+  { name: 'about'                              },
   { name: 'explore'                           },
   { name: 'router-chat'                        },
   { name: 'router-app'                         },

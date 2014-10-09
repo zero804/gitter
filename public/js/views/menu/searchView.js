@@ -144,6 +144,7 @@ define([
               url: '/' + repo.uri,
               githubType: 'REPO',
               ethereal: !repo.room,
+              exists: repo.exists,
               people: repo.room ? repo.room.userCount : 0
             });
           });
@@ -164,6 +165,7 @@ define([
               url: '/' + repo.uri,
               githubType: 'REPO',
               ethereal: !repo.room,
+              exists: true,
               people: repo.room ? repo.room.users.length : 0
             });
           });
@@ -184,6 +186,7 @@ define([
               url: channel.url,
               githubType: channel.githubType,
               ethereal: false,
+              exists: true,
               people: channel.userCount
             });
           });
@@ -332,6 +335,7 @@ define([
       $.ajax({ url: '/api/v1/channel-search', data : { q: query }, success: function(data) {
 
         if (data.results) {
+
           if (!self.channel_queries[query]) self.channel_queries[query] = [];
 
           self.channel_queries[query] = _.uniq(self.channel_queries[query].concat(data.results), function(s) {
@@ -355,7 +359,12 @@ define([
       var model = this.collection.at(this.selectedIndex);
       if(!model) return;
 
-      appEvents.trigger('navigation', model.get('url'), 'chat', model.get('name'), model.id);
+      if(model.get('exists') === false) {
+        window.location.hash = '#confirm/' + model.get('uri');
+      } else {
+        appEvents.trigger('navigation', model.get('url'), 'chat', model.get('name'), model.id);
+      }
+
     },
 
     select: function(i) {
