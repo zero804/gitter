@@ -118,6 +118,69 @@ describe('room-service', function() {
         .nodeify(done);
     });
 
+    it('should deny access but provide public rooms', function (done) {
+
+      var permissionsModelMock = mockito.mockFunction();
+      var uriLookupServiceMock = mockito.mock(testRequire('./services/uri-lookup-service'));
+      var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
+
+      var roomService = testRequire.withProxies('./services/room-service', {
+        './uri-lookup-service': uriLookupServiceMock,
+        './permissions-model': permissionsModelMock,
+        './troupe-service':  troupeServiceMock
+      });
+
+      mockito
+        .when(permissionsModelMock)()
+        .then(function (user, right, uri, githubType) {
+          assert.equal(user.username, fixture.user1.username);
+          assert.equal(right, 'create');
+          assert.equal(uri, 'gitterTest');
+          assert.equal(githubType, 'ORG');
+
+          return Q.resolve(false);
+        });
+
+      mockito
+        .when(uriLookupServiceMock)
+        .lookupUri()
+        .then(function () {
+          return Q.resolve({
+            uri: 'gitterTest',
+            troupeId: '5436981c00062eebf0fbc0d5'
+          });
+        });
+
+      mockito
+        .when(troupeServiceMock)
+        .findById()
+        .then(function (room) {
+          return Q.resolve({
+              _id: '5436981c00062eebf0fbc0d5',
+              githubType: 'ORG',
+              uri: 'gitterTest',
+              security: null,
+              bans: [],
+              oneToOne: false,
+              status: 'ACTIVE',
+              lcUri: 'gitterhq',
+              tags: [],
+              topic: 'Gitter',
+              containsUserId: function () {
+
+              }
+          });
+        });
+
+      // test
+      roomService
+        .findOrCreateRoom(fixture.user1, 'gitterTest')
+        .then(function (uriContext) {
+          assert(uriContext.hasOwnProperty('accessDenied'));
+        })
+        .nodeify(done);
+    });
+
 
     it('should find or create a room for an organization', function(done) {
       var permissionsModelMock = mockito.mockFunction();
