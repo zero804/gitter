@@ -144,6 +144,7 @@ define([
               url: '/' + repo.uri,
               githubType: 'REPO',
               ethereal: !repo.room,
+              exists: repo.exists,
               people: repo.room ? repo.room.userCount : 0
             });
           });
@@ -164,6 +165,7 @@ define([
               url: '/' + repo.uri,
               githubType: 'REPO',
               ethereal: !repo.room,
+              exists: true,
               people: repo.room ? repo.room.users.length : 0
             });
           });
@@ -184,6 +186,7 @@ define([
               url: channel.url,
               githubType: channel.githubType,
               ethereal: false,
+              exists: true,
               people: channel.userCount
             });
           });
@@ -224,11 +227,6 @@ define([
       $.ajax({ url: '/api/v1/user', data : { q: query, type: 'gitter' }, success: function(data) {
 
         if (data.results) {
-
-          data.results.forEach(function(result) {
-            result.exists = true; // Only existing rooms come back in public-repo-search
-          });
-
           if (!self.user_queries[query]) self.user_queries[query] = [];
 
           self.user_queries[query] = _.uniq(self.user_queries[query].concat(data.results), function(s) {
@@ -301,11 +299,6 @@ define([
       $.ajax({ url: '/api/v1/public-repo-search', data : { q: query }, success: function(data) {
 
         if (data.results) {
-
-          data.results.forEach(function(result) {
-            result.exists = true; // Only existing rooms come back in public-repo-search
-          });
-
           if (!self.repo_queries[query]) self.repo_queries[query] = [];
 
           self.repo_queries[query] = _.uniq(self.repo_queries[query].concat(data.results), function(s) {
@@ -343,10 +336,6 @@ define([
 
         if (data.results) {
 
-          data.results.forEach(function(result) {
-            result.exists = true; // Only existing rooms come back in public-repo-search
-          });
-
           if (!self.channel_queries[query]) self.channel_queries[query] = [];
 
           self.channel_queries[query] = _.uniq(self.channel_queries[query].concat(data.results), function(s) {
@@ -370,7 +359,12 @@ define([
       var model = this.collection.at(this.selectedIndex);
       if(!model) return;
 
-      appEvents.trigger('navigation', model.get('url'), 'chat', model.get('name'), model.id);
+      if(model.get('exists') === false) {
+        window.location.hash = '#confirm/' + model.get('uri');
+      } else {
+        appEvents.trigger('navigation', model.get('url'), 'chat', model.get('name'), model.id);
+      }
+
     },
 
     select: function(i) {
