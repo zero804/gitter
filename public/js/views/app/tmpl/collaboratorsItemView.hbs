@@ -19,7 +19,9 @@
 {{#unless loading}}
   <div class='action js-action'>
     {{#unless unreachable}}
-      <a href='#' class='trpButton trpBtnGreen js-add'>Add</a>
+      {{#unless done}}
+        <a href='#' class='trpButton trpBtnGreen js-add'>Add</a>
+      {{/unless}}
     {{/unless}}
   </div>
 {{/unless}}
