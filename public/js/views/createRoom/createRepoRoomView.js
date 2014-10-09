@@ -2,10 +2,11 @@ define([
   'marionette',
   'views/base',
   'utils/context',
+  'components/apiClient',
   './repoSelectView',
   'hbs!./tmpl/createRepoRoom',
   'utils/appevents'
-], function(Marionette, TroupeViews, context, RepoSelectView, template, appEvents) {
+], function(Marionette, TroupeViews, context, apiClient, RepoSelectView, template, appEvents) {
   "use strict";
 
   var View = Marionette.Layout.extend({
@@ -23,9 +24,16 @@ define([
 
     repoSelected: function(r) {
       if(!r) return;
+      var self = this;
+      var uri = r.get('uri');
 
-      appEvents.trigger('navigation', '/' + r.get('uri'), 'chat#share', r.get('name'));
-      this.dialog.hide();
+      apiClient.post('/api/v1/rooms', { uri: uri })
+        .then(function() {
+          self.dialog.hide();
+          appEvents.trigger('navigation', '/' + uri, 'chat', uri, null);
+        })
+        .fail(function(/*xhr*/) {
+        });
     },
 
     menuItemClicked: function(button) {
