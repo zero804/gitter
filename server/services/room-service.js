@@ -356,13 +356,19 @@ function findOrCreateRoom(user, uri, options) {
    * of public rooms instead of the standard 404
    */
   var denyAccess = function (uriLookup) {
+    if (!uriLookup) return null;
+    if (!uriLookup.troupe) return null;
+
+    var troupe = uriLookup.troupe;
+
     return {
       accessDenied: {
-        githubType: uriLookup.troupe.githubType,
-        uri: uriLookup.troupe.uri
+        githubType: troupe && troupe.githubType,
+        uri: troupe && troupe.uri
       }
     };
   };
+
 
   /* First off, try use local data to figure out what this url is for */
   return localUriLookup(uri, options)
@@ -419,8 +425,6 @@ function findOrCreateRoom(user, uri, options) {
       return findOrCreateNonOneToOneRoom(user, uriLookup && uriLookup.troupe, uri, options)
         .spread(function (troupe, access, hookCreationFailedDueToMissingScope, didCreate) {
 
-          if (!access) return denyAccess(uriLookup); // please see comment about denyAccess
-
           // if the user has been granted access to the room, send join stats for the cases of being the owner or just joining the room
           if(access && (didCreate || !troupe.containsUserId(user.id))) {
             sendJoinStats(user, troupe, options.tracking);
@@ -431,8 +435,14 @@ function findOrCreateRoom(user, uri, options) {
           }
 
           return ensureAccessControl(user, troupe, access)
-            .then(function(troupe) {
-              return { oneToOne: false, troupe: troupe, hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope, didCreate: didCreate };
+            .then(function (troupe) {
+              if (!access) return denyAccess(uriLookup); // please see comment about denyAccess
+              return {
+                oneToOne: false,
+                troupe: troupe,
+                hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope,
+                didCreate: didCreate
+              };
             });
         });
     })
