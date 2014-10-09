@@ -141,6 +141,19 @@ function serializeCreateEvent(troupe) {
   serializeEvent(urls, 'create', troupe);
 }
 
+/* Creates a visitor that determines whether a room type creation is allowed */
+function makeRoomTypeCreationFilterFunction(creationFilter) {
+  return function(githubType) {
+    if(!creationFilter) return true; // Default create all
+
+    if(githubType in creationFilter) return creationFilter[githubType];
+
+    if('all' in creationFilter) return creationFilter.all;
+
+    return true; // Default to true
+  };
+}
+
 /**
  * Assuming that oneToOne uris have been handled already,
  * Figure out what this troupe is for
@@ -149,6 +162,8 @@ function serializeCreateEvent(troupe) {
  */
 function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
   if(!options) options = {};
+
+  var roomTypeCreationFilterFunction = makeRoomTypeCreationFilterFunction(options.creationFilter);
 
   if(troupe) {
     logger.verbose('Does user ' + (user && user.username || '~anon~') + ' have access to ' + uri + '?');
@@ -164,6 +179,11 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
   /* From here on we're going to be doing a create */
   return validateUri(user, uri)
     .spread(function(githubType, officialUri, topic) {
+
+      /* Are we going to allow users to create this type of room? */
+      if(!roomTypeCreationFilterFunction(githubType)) {
+        return [null, false];
+      }
 
       logger.verbose('URI validation ' + uri + ' returned ', { type: githubType, uri: officialUri });
 
@@ -390,10 +410,16 @@ function findOrCreateRoom(user, uri, options) {
 
         logger.verbose('Finding or creating a one to one chat');
 
+        var roomTypeCreationFilterFunction = makeRoomTypeCreationFilterFunction(options.creationFilter);
+
+        // Are we allowed to create one-to-one rooms?
+        if(!roomTypeCreationFilterFunction('ONETOONE')) {
+          return null;
+        }
+
         return permissionsModel(user, 'view', otherUser.username, 'ONETOONE', null)
           .then(function(access) {
             if(!access) return null;
-
             return troupeService.findOrCreateOneToOneTroupeIfPossible(userId, otherUser.id)
               .spread(function(troupe, otherUser) {
                 return { oneToOne: true, troupe: troupe, otherUser: otherUser };

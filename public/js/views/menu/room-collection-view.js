@@ -9,7 +9,8 @@ define([
   'views/base',
   'cocktail',
   'utils/dataset-shim',
-  'jquery-sortable' // No ref
+  'jquery-sortable', // No ref
+  'bootstrap_tooltip' // No ref
 ], function($, context, roomNameTrimmer, Marionette, roomListItemTemplate, appEvents, moment,  TroupeViews, cocktail, dataset) {
   "use strict";
 
@@ -43,7 +44,8 @@ define([
     },
     events: {
       'click': 'clicked',
-      'click .js-close-button': 'onItemClose'
+      'click .js-close-button': 'onItemClose',
+      'click .js-leave-button': 'onItemLeave'
     },
     initialize: function() {
       this.updateCurrentRoom();
@@ -82,6 +84,17 @@ define([
         type: "DELETE",
       });
 
+    },
+
+    onItemLeave: function(e) {
+      // stop click event triggering navigate
+      e.stopPropagation();
+
+      $.ajax({
+        url: "/api/v1/rooms/" + this.model.id + "/users/" + context.getUserId(),
+        data: "",
+        type: "DELETE",
+      });
     },
 
     onRender: function() {
@@ -146,6 +159,10 @@ define([
         // Not lurking
         e.removeClass('chatting chatting-now');
       }
+
+      this.$el.find('.js-close-button').tooltip({placement: 'left'});
+      this.$el.find('.js-leave-button').tooltip({placement: 'left'});
+
     },
     clearSearch: function() {
       $('#list-search-input').val('');
@@ -154,7 +171,7 @@ define([
     },
     clicked: function() {
       var model = this.model;
-      var self=this;
+      var self = this;
       setTimeout(function() {
         // Make things feel a bit more responsive, but not too responsive
         self.clearSearch();
