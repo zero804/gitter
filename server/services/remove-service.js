@@ -12,7 +12,7 @@ var roomPermissionsModel = require('./room-permissions-model');
 function checkParameters(room, user) {
   if(!room) return Q.reject(new StatusError(400, 'Room required'));
   if(!user) return Q.reject(new StatusError(400, 'User required'));
-  return Q();
+  return Q.resolve();
 }
 
 // Base removal functions

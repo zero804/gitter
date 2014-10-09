@@ -23,9 +23,11 @@ module.exports = {
     });
     app.get('/mobile/redirect', ensureLoggedIn, function(req, res, next) {
       var desktopUrl = req.query.desktopUrl;
-      converter.desktopToMobile(desktopUrl, req.user).then(function(mobileUrl) {
-        res.redirect(mobileUrl);
-      }).fail(next);
+      converter.desktopToMobile(desktopUrl, req.user)
+        .then(function(mobileUrl) {
+          res.redirect(mobileUrl);
+        })
+        .fail(next);
     });
   }
 };

@@ -173,8 +173,8 @@ function TroupeStrategy(options) {
 
   var currentUserId = options.currentUserId;
 
-  var unreadItemStategy = currentUserId ? new AllUnreadItemCountStategy(options) : null;
-  var mentionCountStrategy = currentUserId ? new TroupeMentionCountStategy(options) : null;
+  var unreadItemStategy = currentUserId && !options.skipUnreadCounts ? new AllUnreadItemCountStategy(options) : null;
+  var mentionCountStrategy = currentUserId && !options.skipUnreadCounts ? new TroupeMentionCountStategy(options) : null;
   var lastAccessTimeStategy = currentUserId ? new LastTroupeAccessTimesForUserStrategy(options) : null;
   var favouriteStrategy = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
   var lurkStrategy = currentUserId ? new LurkTroupeForUserStrategy(options) : null;

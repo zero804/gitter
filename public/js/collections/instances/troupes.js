@@ -93,6 +93,14 @@ define([
         context.troupe().set(model.changed);
       });
     }
+
+    var uri = model.get('uri');
+    if(uri) {
+      // No one-to-ones
+      var suggestions = suggestedCollection.findWhere({ uri: uri });
+      suggestedCollection.remove(suggestions);
+    }
+
   });
 
   appEvents.on('activity', function(message) {

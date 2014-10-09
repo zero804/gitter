@@ -3,6 +3,7 @@
 
 var roomService = require('../../services/room-service');
 var isPhone     = require('../../web/is-phone');
+var StatusError = require('statuserror');
 
 function normaliseUrl(params) {
   if(params.roomPart3) {
@@ -16,46 +17,59 @@ function normaliseUrl(params) {
   return params.roomPart1;
 }
 
-function uriContextResolverMiddleware(req, res, next) {
-  var uri = normaliseUrl(req.params);
-  var tracking = { source: req.query.source };
+function uriContextResolverMiddleware(options) {
 
-  return roomService.findOrCreateRoom(req.user, uri, { tracking: tracking })
-    .then(function(uriContext) {
+  return function(req, res, next) {
+    var uri = normaliseUrl(req.params);
+    var tracking = { source: req.query.source };
 
-      var isValid = uriContext && (uriContext.troupe || uriContext.ownUrl);
-      var accessToOrgRoomDenied = uriContext && uriContext.accessDenied && uriContext.accessDenied.githubType === 'ORG';
+    var creationFilter = {
+      all: false
+    };
 
-      if (!isValid && !accessToOrgRoomDenied) {
+    if(options && options.create) {
+      creationFilter.all = true;
+      if(options.create === 'not-repos') {
+        creationFilter.REPO = false;
+      }
+    }
 
-        if (!req.user) {
-          throw 401;
+    return roomService.findOrCreateRoom(req.user, uri, { tracking: tracking, creationFilter: creationFilter })
+      .then(function(uriContext) {
+
+        var isValid = uriContext && (uriContext.troupe || uriContext.ownUrl);
+        var accessToOrgRoomDenied = uriContext && uriContext.accessDenied && uriContext.accessDenied.githubType === 'ORG';
+
+        if (!isValid && !accessToOrgRoomDenied) {
+          if(!req.user) {
+            throw 401;
+          }
+
+          throw 404;
         }
 
-        throw 404;
-      }
+        var events = req.session.events;
+        if(!events) {
+          events = [];
+          req.session.events = events;
+        }
 
-      var events = req.session.events;
-      if(!events) {
-        events = [];
-        req.session.events = events;
-      }
+        if(uriContext.hookCreationFailedDueToMissingScope) {
+          events.push('hooks_require_additional_public_scope');
+        }
 
-      if(uriContext.hookCreationFailedDueToMissingScope) {
-        events.push('hooks_require_additional_public_scope');
-      }
+        req.troupe = uriContext.troupe;
+        req.uriContext = uriContext;
+        next();
+      })
+      .fail(function(err) {
+        if(err && err.redirect) {
+          return res.relativeRedirect(err.redirect);
+        }
 
-      req.troupe = uriContext.troupe;
-      req.uriContext = uriContext;
-      next();
-    })
-    .fail(function(err) {
-      if(err && err.redirect) {
-        return res.relativeRedirect(err.redirect);
-      }
-
-      next(err);
-    });
+        next(err);
+      });
+  };
 }
 
 function isPhoneMiddleware(req, res, next) {
