@@ -3,12 +3,13 @@ define([
   'underscore',
   'utils/context',
   './realtime',
+  './apiClient',
   'log!unread-items-client',
   'backbone',
   'utils/appevents',
   'utils/dataset-shim',
   'utils/double-hash'
-], function($, _, context, realtime, log, Backbone, appEvents, dataset, DoubleHash) {
+], function($, _, context, realtime, apiClient, log, Backbone, appEvents, dataset, DoubleHash) {
   "use strict";
 
   function limit(fn, context, timeout) {
@@ -197,20 +198,15 @@ define([
     },
 
     markAllRead: function() {
-      onceUserIdSet(function(userId) {
-        $.ajax({
-          url: "/api/v1/user/" + userId + "/rooms/" + context.getTroupeId() + "/unreadItems/all",
-          data: "",
-          type: "DELETE",
-          global: true,
-          context: this,
-          success: function() {
+      var self = this;
+      onceUserIdSet(function() {
+        apiClient.userRoom.delete("/unreadItems/all")
+          .then(function() {
             // Remove from the add tarpit and the current tarpit
-            this._unreadItemsRemoved(this._addTarpit._marshall());
-            this._unreadItemsRemoved(this._marshall());
-          }
-        });
-      }, this);
+            self._unreadItemsRemoved(self._addTarpit._marshall());
+            self._unreadItemsRemoved(self._marshall());
+          });
+      }, self);
 
     }
 
@@ -256,27 +252,21 @@ define([
     },
 
     _send: function(options) {
-      onceUserIdSet(function(userId) {
+      onceUserIdSet(function() {
         var queue = this._buffer._marshall();
         this._buffer = new DoubleHash();
 
         var async = !options || !options.sync;
-        var url = '/api/v1/user/' + userId + '/rooms/' + context.getTroupeId() + '/unreadItems';
+        var self = this;
 
-        $.ajax({
-          url: url,
-          contentType: "application/json",
-          data: JSON.stringify(queue),
-          async: async,
-          context: this,
-          type: "POST",
-          global: false,
-          success: function() {
-          },
-          error: function() {
+        apiClient.userRoom.post('/unreadItems', queue, {
+            async: async,
+            global: false
+          })
+          .fail(function() {
             log('Error posting unread items to server. Will attempt again in 5s');
+
             // Unable to send messages, requeue them and try again in 5s
-            var self = this;
             setTimeout(function() {
               _iteratePreload(queue, function(itemType, itemId) {
                 self._buffer._add(itemType, itemId);
@@ -284,8 +274,7 @@ define([
 
               self._sendLimited();
             }, 5000);
-          }
-        });
+          });
 
       }, this);
 
