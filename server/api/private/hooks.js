@@ -57,6 +57,8 @@ module.exports = function(req, res, next) {
 
   return troupeService.findById(troupeId)
     .then(function(troupe) {
+      if(!troupe) return new StatusError(404);
+
       return eventService.newEventToTroupe(troupe, null, message, meta, payload);
     })
     .then(function() {
