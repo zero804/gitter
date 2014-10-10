@@ -72,6 +72,7 @@ module.exports = {
       tags: [String],
       lcUri: { type: String, 'default': function() { return this.uri ? this.uri.toLowerCase() : null; }  },
       githubType: { type: String, 'enum': ['REPO', 'ORG', 'ONETOONE', 'REPO_CHANNEL', 'ORG_CHANNEL', 'USER_CHANNEL'], required: true },
+      lcOwner: { type: String },
       status: { type: String, "enum": ['ACTIVE', 'DELETED'], "default": 'ACTIVE'},
       oneToOne: { type: Boolean, "default": false },
       users: [TroupeUserSchema],
@@ -97,6 +98,7 @@ module.exports = {
     TroupeSchema.index({ uri: 1 }, { unique: true, sparse: true });
     TroupeSchema.index({ lcUri: 1 }, { unique: true, sparse: true });
     TroupeSchema.index({ parentId: 1 });
+    TroupeSchema.index({ lcOwner: 1 });
     TroupeSchema.index({ ownerUserId: 1 });
     TroupeSchema.index({ "users.userId": 1 });
     TroupeSchema.index({ "users.userId": 1,  "users.deactivated": 2 });
