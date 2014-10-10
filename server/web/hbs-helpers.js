@@ -190,11 +190,16 @@ exports.formatNumber = function (n) {
   return (n / 100000).toFixed(1) + 'm';
 };
 
-/**
+/** FIXME we do not yet cover the ONE-TO-ONE case, also need to do better default values
  * githubTypeToClass() takes a GitHub type and provdides a css class
+ *
  */
 exports.githubTypeToClass = function (type) {
   if (/_CHANNEL/.test(type)) return 'icon-hash';
   else if (/REPO/.test(type)) return 'octicon-repo';
   else return 'default';
+};
+
+exports.getRoomName = function (name) {
+  return name.split('/')[1];
 };

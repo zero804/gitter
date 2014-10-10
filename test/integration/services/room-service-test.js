@@ -176,7 +176,8 @@ describe('room-service', function() {
       roomService
         .findOrCreateRoom(fixture.user1, 'gitterTest')
         .then(function (uriContext) {
-          assert(uriContext.hasOwnProperty('accessDenied'));
+          var githubType = uriContext.accessDenied && uriContext.accessDenied.githubType;
+          assert(githubType === 'ORG');
         })
         .nodeify(done);
     });
@@ -189,7 +190,8 @@ describe('room-service', function() {
         './permissions-model': permissionsModelMock
       });
 
-      mockito.when(permissionsModelMock)().then(function (user, right, uri, githubType) {
+      mockito
+        .when(permissionsModelMock)().then(function (user, right, uri, githubType) {
         assert.equal(user.username, fixture.user1.username);
         assert.equal(right, 'create');
         assert.equal(uri, 'gitterTest');
@@ -198,12 +200,13 @@ describe('room-service', function() {
         return Q.resolve(true);
       });
 
-      return roomService.findOrCreateRoom(fixture.user1, 'gitterTest')
+      return roomService
+        .findOrCreateRoom(fixture.user1, 'gitterTest')
         .then(function (uriContext) {
           assert(uriContext.didCreate);
           assert.equal(uriContext.troupe.uri, 'gitterTest');
         })
-        .then(function () {
+        .finally(function () {
           return persistence.Troupe.removeQ({ uri: 'gitterTest' });
         })
         .nodeify(done);

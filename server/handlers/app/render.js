@@ -242,11 +242,10 @@ function renderMobileNotLoggedInChat(req, res, next) {
 }
 
 function renderNotFound(req, res, next) {
-  // we need to get the org's public stuff
   var org = req.uriContext && req.uriContext.uri;
   var strategy = new restSerializer.TroupeStrategy();
 
-  PersistenceService.Troupe.findQ({ owner: org, security: 'PUBLIC' })
+  return PersistenceService.Troupe.findQ({ lcOwner: org.toLowerCase(), security: 'PUBLIC' })
     .then(function (rooms) {
       return new Q(restSerializer.serialize(rooms, strategy));
     })
