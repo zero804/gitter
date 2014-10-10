@@ -169,112 +169,116 @@ define([
       var userCollection = this.userCollection;
 
 
-      $textarea.textcomplete([
-        {
-          match: /(^|\s)(([\w-_]+\/[\w-_]+)?#(\d*))$/,
-          maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
-          search: function(term, callback) {
-            var terms = term.split('#');
-            var repoName = terms[0];
-            var issueNumber = terms[1];
-            var query = {};
+      if(!isMobile()) {
+        // textcomplete on mobile safari ios 8 causes the keyboard to
+        // immediately hide on focus.
+        $textarea.textcomplete([
+          {
+            match: /(^|\s)(([\w-_]+\/[\w-_]+)?#(\d*))$/,
+            maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
+            search: function(term, callback) {
+              var terms = term.split('#');
+              var repoName = terms[0];
+              var issueNumber = terms[1];
+              var query = {};
 
-            if(repoName) query.repoName = repoName;
-            if(issueNumber) query.issueNumber = issueNumber;
+              if(repoName) query.repoName = repoName;
+              if(issueNumber) query.issueNumber = issueNumber;
 
-            apiClient.get('/v1/rooms/' + context.getTroupeId() + '/issues', query)
-              .then(function(resp) {
-                callback(resp);
-              })
-              .fail(function() {
-                callback([]);
+              $.getJSON('/api/v1/rooms/' + context.getTroupeId() + '/issues', query)
+                .done(function(resp) {
+                  callback(resp);
+                })
+                .fail(function() {
+                  callback([]);
+                });
+            },
+            template: function(issue) {
+              return listItemTemplate({
+                name: issue.number,
+                description: issue.title
               });
-          },
-          template: function(issue) {
-            return listItemTemplate({
-              name: issue.number,
-              description: issue.title
-            });
-          },
-          replace: function(issue) {
-            return '$1$3#' + issue.number + ' ';
-          }
-        },
-        {
-          match: /(^|\s)@(\/?[a-zA-Z0-9_\-]*)$/,
-          maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
-          search: function(term, callback) {
-            var lowerTerm = term.toLowerCase();
-            var loggedInUsername = context.user().get('username').toLowerCase();
-
-            var matches = userCollection && userCollection.filter(function (user) {
-              var username = user.get('username').toLowerCase();
-
-              if (username === loggedInUsername) return false; // do not include the current user in the matches
-
-              var displayName = (user.get('displayName') || '').toLowerCase();
-
-              return (username.indexOf(lowerTerm) === 0 || displayName.indexOf(lowerTerm) === 0);
-            });
-
-            if(!lowerTerm || '/all'.indexOf(lowerTerm) === 0) {
-              if(context().permissions.admin) {
-                // This is a bit of a hack for now
-                matches.unshift(new Backbone.Model({ username: '/all', displayName: 'Group' }));
-              }
+            },
+            replace: function(issue) {
+              return '$1$3#' + issue.number + ' ';
             }
+          },
+          {
+            match: /(^|\s)@(\/?[a-zA-Z0-9_\-]*)$/,
+            maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
+            search: function(term, callback) {
+              var lowerTerm = term.toLowerCase();
+              var loggedInUsername = context.user().get('username').toLowerCase();
 
-            callback(matches);
-          },
-          template: function(user) {
-            return listItemTemplate({
-              name: user.get('username'),
-              description: user.get('displayName')
-            });
-          },
-          replace: function(user) {
-              return '$1@' + user.get('username') + ' ';
-          }
-        },
-        {
-          match: /(^|\s):([\-+\w]*)$/,
-          maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
-          search: function(term, callback) {
-            if(term.length < 1) return callback(SUGGESTED_EMOJI);
+              var matches = userCollection && userCollection.filter(function (user) {
+                var username = user.get('username').toLowerCase();
 
-            var matches = emoji.named.filter(function(emoji) {
-              return emoji.indexOf(term) === 0;
-            });
-            callback(matches);
+                if (username === loggedInUsername) return false; // do not include the current user in the matches
+
+                var displayName = (user.get('displayName') || '').toLowerCase();
+
+                return (username.indexOf(lowerTerm) === 0 || displayName.indexOf(lowerTerm) === 0);
+              });
+
+              if(!lowerTerm || '/all'.indexOf(lowerTerm) === 0) {
+                if(context().permissions.admin) {
+                  // This is a bit of a hack for now
+                  matches.unshift(new Backbone.Model({ username: '/all', displayName: 'Group' }));
+                }
+              }
+
+              callback(matches);
+            },
+            template: function(user) {
+              return listItemTemplate({
+                name: user.get('username'),
+                description: user.get('displayName')
+              });
+            },
+            replace: function(user) {
+                return '$1@' + user.get('username') + ' ';
+            }
           },
-          template: function(emoji) {
-            return emojiListItemTemplate({
-              emoji: emoji,
-              emojiUrl: cdn('images/emoji/' + emoji + '.png')
-            });
+          {
+            match: /(^|\s):([\-+\w]*)$/,
+            maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
+            search: function(term, callback) {
+              if(term.length < 1) return callback(SUGGESTED_EMOJI);
+
+              var matches = emoji.named.filter(function(emoji) {
+                return emoji.indexOf(term) === 0;
+              });
+              callback(matches);
+            },
+            template: function(emoji) {
+              return emojiListItemTemplate({
+                emoji: emoji,
+                emojiUrl: cdn('images/emoji/' + emoji + '.png')
+              });
+            },
+            replace: function (value) {
+              return '$1:' + value + ': ';
+            }
           },
-          replace: function (value) {
-            return '$1:' + value + ': ';
+          {
+            match: /(^)\/(\w*)$/,
+            maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
+            search: function(term, callback) {
+              var matches = commands.getSuggestions(term);
+              callback(matches);
+            },
+            template: function(cmd) {
+              return listItemTemplate({
+                name: cmd.command,
+                description: cmd.description
+              });
+            },
+            replace: function (cmd) {
+              return '$1/' + cmd.completion;
+            }
           }
-        },
-        {
-          match: /(^)\/(\w*)$/,
-          maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
-          search: function(term, callback) {
-            var matches = commands.getSuggestions(term);
-            callback(matches);
-          },
-          template: function(cmd) {
-            return listItemTemplate({
-              name: cmd.command,
-              description: cmd.description
-            });
-          },
-          replace: function (cmd) {
-            return '$1/' + cmd.completion;
-          }
-        }
-      ]);
+        ]);
+      }
 
       // Use 'on' and 'off' instead of proper booleans as attributes are strings
       $textarea.on('textComplete:show', function() {

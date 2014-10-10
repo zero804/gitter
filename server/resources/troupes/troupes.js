@@ -7,6 +7,7 @@ var restful           = require("../../services/restful");
 var restSerializer    = require("../../serializers/rest-serializer");
 var Q                 = require('q');
 var mongoUtils        = require('../../utils/mongo-utils');
+var StatusError       = require('statuserror');
 
 module.exports = {
   id: 'troupe',
@@ -24,29 +25,29 @@ module.exports = {
     if (req.query.include_users) strategyOptions.mapUsers = true;
     var strategy = new restSerializer.TroupeStrategy(strategyOptions);
 
-    restSerializer.serialize(req.troupe, strategy, function(err, serialized) {
-      if(err) return next(err);
-
-      res.send(serialized);
-    });
+    return restSerializer.serialize(req.troupe, strategy)
+      .then(function(serialized) {
+        res.send(serialized);
+      })
+      .fail(next);
   },
 
   create: function(req, res, next) {
     var roomUri = req.query.uri || req.body.uri;
-    if (!roomUri) return res.send('400', {error: 'Missing Room URI'});
+    if (!roomUri) return next(new StatusError(400));
 
-    return roomService.findOrCreateRoom(req.user, roomUri, {ignoreCase: true}).then(function(room) {
-      if (!room.troupe) { return res.send({allowed: false}); }
+    return roomService.findOrCreateRoom(req.user, roomUri, { ignoreCase: true })
+      .then(function(room) {
+        if (!room.troupe) throw new StatusError(403, 'Permission denied');
 
-      var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true, includeRolesForTroupe: room.troupe });
-      restSerializer.serialize(room.troupe, strategy, function(err, serialized) {
-        if (err) return next(err);
+        var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true, includeRolesForTroupe: room.troupe });
 
-        res.send({allowed: true, room: serialized});
-      });
-
-    });
-
+        return restSerializer.serialize(room.troupe, strategy);
+      })
+      .then(function(serialized) {
+        res.send(serialized);
+      })
+      .fail(next);
   },
 
   update: function(req, res, next) {
@@ -90,10 +91,10 @@ module.exports = {
     if(!mongoUtils.isLikeObjectId(id)) return callback();
 
     troupeService.findById(id, function(err, troupe) {
-      if(err) return callback(500);
-      if(!troupe) return callback(404);
+      if(err) return callback(new StatusError(500));
+      if(!troupe) return callback(new StatusError(404));
 
-      if(troupe.status != 'ACTIVE') return callback(404);
+      if(troupe.status != 'ACTIVE') return callback(new StatusError(404));
 
       if(troupe.security === 'PUBLIC' && req.method === 'GET') {
         return callback(null, troupe);
@@ -101,11 +102,11 @@ module.exports = {
 
       /* From this point forward we need a user */
       if(!req.user) {
-        return callback(401);
+        return callback(new StatusError(401));
       }
 
       if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
-        return callback(403);
+        return callback(new StatusError(403));
       }
 
       return callback(null, troupe);

@@ -33,8 +33,13 @@ define([
     },
     navigate: function() {
       var uri = this.model.get('uri');
-      var url = '/' + uri + '?source=suggested';
-      appEvents.trigger('navigation', url, 'chat', uri);
+
+      if(this.model.get('exists')) {
+        var url = '/' + uri + '?source=suggested';
+        appEvents.trigger('navigation', url, 'chat', uri);
+      } else {
+        appEvents.trigger('navigation', '#confirm/' + uri);
+      }
       appEvents.trigger('track-event', 'suggested-room-click', { uri: uri });
     }
   });
