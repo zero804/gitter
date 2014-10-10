@@ -231,7 +231,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
                 {
                   $setOnInsert: {
                     lcUri: lcUri,
-                    owner: uri.split('/')[0],
+                    lcOwner: lcUri.split('/')[0],
                     uri: officialUri,
                     _nonce: nonce,
                     githubType: githubType,
@@ -449,7 +449,7 @@ function findOrCreateRoom(user, uri, options) {
 
       logger.verbose('Attempting to access room ' + uri);
 
-      // NEED TO CHECK FOR THE ROOMS
+      // need to check for the rooms
       return findOrCreateNonOneToOneRoom(user, uriLookup && uriLookup.troupe, uri, options)
         .spread(function (troupe, access, hookCreationFailedDueToMissingScope, didCreate) {
 
@@ -689,7 +689,7 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
           {
             $setOnInsert: {
               lcUri: lcUri,
-              owner: uri.split('/')[0],
+              lcOwner: lcUri.split('/')[0],
               uri: uri,
               security: security,
               name: name,
