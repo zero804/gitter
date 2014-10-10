@@ -1,11 +1,10 @@
 define([
-  'jquery',
   'utils/context',
   'components/apiClient',
   './realtime',
   'log!eyeballs',
   'utils/appevents'
-], function($, context, apiClient, realtime, log, appEvents) {
+], function(context, apiClient, realtime, log, appEvents) {
   "use strict";
 
   var eyesOnState = true;
@@ -194,16 +193,12 @@ define([
 
   // We use this to ensure that the users session does not time out
   window.setInterval(function() {
-    $.ajax({
-      url: '/api/v1/ping',
-      global: false,
-      type: "GET",
-      success: function(/*data*/) {
-      },
-      error: function() {
+    apiClient.get('/v1/ping', undefined, {
+        global: false
+      })
+      .fail(function() {
         log('An error occurred while communicating eyeballs');
-      }
-    });
+      });
   }, PING_POLL);
 
   return {

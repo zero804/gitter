@@ -19,9 +19,9 @@ require([
   'views/app/integrationSettingsModal',
   'views/app/collaboratorsView',
   'collections/collaborators',
+  'components/apiClient',
 
   'components/unread-items-client',
-  'components/helpShareIfLonely',
 
   'views/chat/decorators/webhookDecorator',
   'views/chat/decorators/issueDecorator',
@@ -44,11 +44,13 @@ require([
   'components/ajax-errors',     // No ref
   'components/focus-events'     // No ref
 
-], function($, Backbone, context, liveContext, appEvents, log, peopleCollectionView, ChatIntegratedView, chatInputView,
-    ChatCollectionView, itemCollections, RightToolbarView,
-    shareView, TroupeSettingsView, MarkdownView, KeyboardView, AddPeopleViewModal, IntegrationSettingsModal, CollaboratorsView, collaboratorsModels,
-    unreadItemsClient, helpShareIfLonely, webhookDecorator, issueDecorator, commitDecorator, mentionDecorator,
-    embedDecorator, emojiDecorator, UnreadBannerView, HistoryLimitView, HeaderView) {
+], function($, Backbone, context, liveContext, appEvents, log, peopleCollectionView,
+    ChatIntegratedView, chatInputView, ChatCollectionView, itemCollections,
+    RightToolbarView, shareView, TroupeSettingsView, MarkdownView, KeyboardView,
+    AddPeopleViewModal, IntegrationSettingsModal, CollaboratorsView, collaboratorsModels,
+    apiClient, unreadItemsClient, webhookDecorator, issueDecorator, commitDecorator,
+    mentionDecorator, embedDecorator, emojiDecorator, UnreadBannerView, HistoryLimitView,
+    HeaderView) {
   "use strict";
 
   $(document).on("click", "a", function(e) {
@@ -194,18 +196,14 @@ require([
   appEvents.on('command.room.remove', function(username) {
     var user = itemCollections.users.findWhere({username: username});
     if (user) {
-      $.ajax({
-        url: "/api/v1/rooms/" + context.getTroupeId() + "/users/" + user.id,
-        dataType: "json",
-        type: "DELETE",
-        success: function() {
+      apiClient.room.delete("/users/" + user.id, "")
+        .then(function() {
           itemCollections.users.remove(user);
-        },
-        error: function(jqXHR) {
-          if (jqXHR.status < 500) notifyRemoveError(jqXHR.responseJSON.error);
+        })
+        .fail(function(xhr) {
+          if (xhr.status < 500) notifyRemoveError(xhr.responseJSON.error);
           else notifyRemoveError('');
-        },
-      });
+        });
     }
     else notifyRemoveError('User '+ username +' was not found in this room.');
   });
@@ -363,20 +361,13 @@ require([
 
     window.removeEventListener("message", oauthUpgradeCallback, false);
 
-    $.ajax({
-      dataType: "json",
-      data: {
-        autoConfigureHooks: 1
-      },
-      type: 'PUT',
-      url: '/api/v1/rooms/' + context.getTroupeId(),
-      success: function() {
+    apiClient.room.put('', { autoConfigureHooks: 1 })
+      .then(function() {
         appEvents.trigger('user_notification', {
           title: 'Thank You',
           text: 'Your integrations have been setup.'
         });
-      }
-    });
+      });
   }
 
   function promptForHook() {
