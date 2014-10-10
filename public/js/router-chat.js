@@ -8,7 +8,7 @@ require([
   'views/people/peopleCollectionView',
   'views/app/chatIntegratedView',
   'collections/instances/integrated-items',
-  'views/shareSearch/inviteView',
+  'views/share/share-view',
   'views/app/troupeSettingsView',
   'views/app/markdownView',
   'views/app/keyboardView',

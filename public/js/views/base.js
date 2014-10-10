@@ -7,10 +7,8 @@ define([
   'hbs!./tmpl/loading',
   'log!base-views',
   'utils/detect-compact',
-  './widget-renderer',
   '../template/helpers/all' // No ref
-], function(require, $, _, Backbone, appEvents, Marionette, modalTemplate,
-  loadingTemplate, confirmationViewTemplate, log, detectCompact, widgetRenderer) {
+], function($, _, Backbone, Marionette, modalTemplate, loadingTemplate, log, detectCompact) {
   "use strict";
 
   var TroupeViews = {};
