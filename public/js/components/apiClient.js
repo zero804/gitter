@@ -82,6 +82,7 @@ define([
 
   // If future this should direct clients to api.gitter.im
   function makeFullUrl(baseUrlFunction, url) {
+    if(!url) url = '';
     // XXX: we need to remove /api/ from all calls to apiClient
     if(!baseUrlFunction) {
       // Deprecated functionality
