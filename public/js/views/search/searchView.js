@@ -22,31 +22,20 @@ define([
       'input @ui.input': 'changeDebounce'
     },
 
-    initialize: function(options) {
-      this.bindUIElements();
+    childEvents: {
+      'selected': function () {
+        window.alert('CLICKED');
+      }
+    },
 
-      this.chatView = options.chatView;
-      this.chatCollection = options.chatCollection;
+    initialize: function() {
+      this.bindUIElements();
 
       this.changeDebounce = multiDebounce({ }, function() {
         var text = this.ui.input.val();
         this.collection.fetchSearch(text);
       }, this);
 
-    },
-
-    onItemviewSelected: function(childView) {
-      var id = childView.model.id;
-      var inCollection = !!this.chatCollection.get(id);
-
-      if(inCollection) {
-        this.chatView.scrollToChatId(id);
-        return;
-      }
-
-      this.chatCollection.fetchAtPoint({ aroundId: id }, {}, function() {
-        this.chatView.scrollToChatId(id);
-      }, this);
     }
 
   });
