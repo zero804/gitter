@@ -10,7 +10,11 @@ require([
 
   appEvents.on('navigation', function(url) {
     var rootWindow = window.parent || window;
-    rootWindow.location.href = url;
+    if(url.indexOf('#') === 0) {
+      rootWindow.location.hash = url;
+    } else {
+      rootWindow.location.href = url;
+    }
   });
 
   // Asynchronously load tracker

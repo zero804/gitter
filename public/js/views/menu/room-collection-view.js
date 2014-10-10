@@ -5,12 +5,12 @@ define([
   'marionette',
   'hbs!./tmpl/room-list-item',
   'utils/appevents',
-  'utils/momentWrapper',
   'views/base',
   'cocktail',
   'utils/dataset-shim',
-  'jquery-sortable' // No ref
-], function($, context, roomNameTrimmer, Marionette, roomListItemTemplate, appEvents, moment,  TroupeViews, cocktail, dataset) {
+  'jquery-sortable', // No ref
+  'bootstrap_tooltip' // No ref
+], function($, context, roomNameTrimmer, Marionette, roomListItemTemplate, appEvents,  TroupeViews, cocktail, dataset) {
   "use strict";
 
   /* @const */
@@ -43,7 +43,8 @@ define([
     },
     events: {
       'click': 'clicked',
-      'click .js-close-button': 'onItemClose'
+      'click .js-close-button': 'onItemClose',
+      'click .js-leave-button': 'onItemLeave'
     },
     initialize: function() {
       this.updateCurrentRoom();
@@ -82,6 +83,17 @@ define([
         type: "DELETE",
       });
 
+    },
+
+    onItemLeave: function(e) {
+      // stop click event triggering navigate
+      e.stopPropagation();
+
+      $.ajax({
+        url: "/api/v1/rooms/" + this.model.id + "/users/" + context.getUserId(),
+        data: "",
+        type: "DELETE",
+      });
     },
 
     onRender: function() {
@@ -146,6 +158,10 @@ define([
         // Not lurking
         e.removeClass('chatting chatting-now');
       }
+
+      this.$el.find('.js-close-button').tooltip({placement: 'left'});
+      this.$el.find('.js-leave-button').tooltip({placement: 'left'});
+
     },
     clearSearch: function() {
       $('#list-search-input').val('');
@@ -154,13 +170,17 @@ define([
     },
     clicked: function() {
       var model = this.model;
-      var self=this;
+      var self = this;
       setTimeout(function() {
         // Make things feel a bit more responsive, but not too responsive
         self.clearSearch();
       }, 150);
 
-      appEvents.trigger('navigation', model.get('url'), 'chat', model.get('name'), model.id);
+    if(this.model.get('exists') === false) {
+        window.location.hash = '#confirm/' + this.model.get('uri');
+      } else {
+        appEvents.trigger('navigation', model.get('url'), 'chat', model.get('name'), model.id);
+      }
     }
   });
 

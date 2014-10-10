@@ -58,7 +58,6 @@ define([
 
     initialize: function () {
       this.url = "/api/v1/user/" + context.getUserId() + "/rooms?suggested=1";
-      this.fetch();
     }
   });
 
