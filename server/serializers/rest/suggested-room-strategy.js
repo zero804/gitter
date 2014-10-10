@@ -14,6 +14,7 @@ function SuggestedRoomStrategy() {
   this.map = function(suggestedRoom) {
     return {
       uri: suggestedRoom.uri,
+      githubType: suggestedRoom.githubType,
       avatarUrl: getOwnerAvatarUrl(suggestedRoom),
       exists: !!suggestedRoom.room,
       userCount: suggestedRoom.room && suggestedRoom.room.users.length,

@@ -79,7 +79,7 @@ body.hover .room-list-item:hover:not(.room-list-item--current-room),
 
 .room-list-item span {
   white-space: nowrap;
-  max-width: 195px;
+  max-width: 190px;
   overflow: hidden;
   text-overflow: ellipsis;
   vertical-align: middle;
@@ -130,11 +130,21 @@ body.hover .room-list-item:hover .room-list-item__unread-badge {
   font-size: 14px;
 }
 
-.room-list-item__close:hover {
-  opacity: 0.8;
+.room-list-item__leave {
+  margin-right: 2px;
 }
 
-.room-list-item:hover .room-list-item__close {
+.room-list-item__leave:before {
+  font-family: 'troupe-icons';
+  content: '\e81f';
+  font-size: 14px;
+}
+
+.room-list-item__close:hover, .room-list-item__leave:hover {
+  opacity: 1;
+}
+
+.room-list-item:hover .room-list-item__close, .room-list-item:hover .room-list-item__leave {
   display: inline-block;
 }
 
@@ -143,8 +153,8 @@ body.hover .room-list-item:hover .room-list-item__unread-badge {
   display: none;
 }
 
-.room-list-item__close {
+.room-list-item__close, .room-list-item__leave {
   display: none;
-  opacity: 0.3;
+  opacity: 0.6;
   .transition300ms;
 }

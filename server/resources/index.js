@@ -53,5 +53,6 @@ module.exports = {
     installUserSubResource('orgs',        'orgs');
     installUserSubResource('repos',       'repos');
     installUserSubResource('channels',    'channels');
+    installUserSubResource('unreadItems', 'aggregated-unread-items');
   }
 };
