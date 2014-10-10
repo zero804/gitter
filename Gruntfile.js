@@ -142,6 +142,7 @@ var LESS_ROOTS = [
   { name: 'homepage'                           },
   { name: 'explore'                            },
   { name: 'not-found'                          },
+  { name: 'about'                              },
   { name: 'router-chat'                        },
   { name: 'router-app'                         },
   { name: 'router-nli-app'                     },
