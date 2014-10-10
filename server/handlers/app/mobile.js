@@ -11,6 +11,12 @@ var EXPIRES_MILLISECONDS = EXPIRES_SECONDS * 1000;
 
 module.exports = {
   install: function(app) {
+    app.get('/mobile/embedded-chat', appRender.renderMobileNativeEmbeddedChat);
+
+    /*
+     * DEPRECATED, only used by gitter ios < v1.3.0 
+     * ITS FULL OF APPCACHE MESS
+     */
     app.get('/mobile/chat', ensureLoggedIn, function(req, res, next) {
       res.setHeader('Cache-Control', 'public, max-age=' + EXPIRES_SECONDS);
       res.setHeader('Expires', new Date(Date.now() + EXPIRES_MILLISECONDS).toUTCString());
@@ -29,7 +35,5 @@ module.exports = {
         })
         .fail(next);
     });
-
-    app.get('/mobile/embedded-chat', appRender.renderMobileNativeEmbeddedChat);
   }
 };
