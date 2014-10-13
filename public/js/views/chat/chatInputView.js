@@ -185,8 +185,8 @@ define([
               if(repoName) query.repoName = repoName;
               if(issueNumber) query.issueNumber = issueNumber;
 
-              $.getJSON('/api/v1/rooms/' + context.getTroupeId() + '/issues', query)
-                .done(function(resp) {
+              apiClient.room.get('/issues', query)
+                .then(function(resp) {
                   callback(resp);
                 })
                 .fail(function() {
