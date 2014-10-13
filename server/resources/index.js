@@ -51,7 +51,6 @@ module.exports = {
     userTroupeResource.add(collapsedItems);
 
     installUserSubResource('orgs',        'orgs');
-    installUserSubResource('settings',    'user-settings');
     installUserSubResource('repos',       'repos');
     installUserSubResource('channels',    'channels');
     installUserSubResource('unreadItems', 'aggregated-unread-items');
