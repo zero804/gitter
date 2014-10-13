@@ -1,6 +1,7 @@
 define([
   'jquery',
   'utils/context',
+  'components/apiClient',
   'utils/room-name-trimmer',
   'marionette',
   'hbs!./tmpl/room-list-item',
@@ -10,7 +11,7 @@ define([
   'utils/dataset-shim',
   'jquery-sortable', // No ref
   'bootstrap_tooltip' // No ref
-], function($, context, roomNameTrimmer, Marionette, roomListItemTemplate, appEvents,  TroupeViews, cocktail, dataset) {
+], function($, context, apiClient, roomNameTrimmer, Marionette, roomListItemTemplate, appEvents,  TroupeViews, cocktail, dataset) {
   "use strict";
 
   /* @const */
@@ -77,23 +78,16 @@ define([
       // stop click event triggering navigate
       e.stopPropagation();
 
-      $.ajax({
-        url: "/api/v1/user/" + context.getUserId() + "/rooms/" + this.model.id,
-        data: "",
-        type: "DELETE",
-      });
-
+      // We can't use the userRoom as the room might not be the current one
+      apiClient.user.delete("/rooms/" + this.model.id);
     },
 
     onItemLeave: function(e) {
       // stop click event triggering navigate
       e.stopPropagation();
 
-      $.ajax({
-        url: "/api/v1/rooms/" + this.model.id + "/users/" + context.getUserId(),
-        data: "",
-        type: "DELETE",
-      });
+      // We can't use the room resource as the room might not be the current one
+      apiClient.delete('/v1/rooms/' + this.model.id + '/users/' + context.getUserId());
     },
 
     onRender: function() {

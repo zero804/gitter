@@ -38,6 +38,8 @@ function executeSearch(q, options) {
     });
 }
 
+
+// TODO: Replace this with full-text search
 function getSearchConjunction(res) {
   var displayNameSearch = { displayName: { $in: res } } ;
   var usernameSearch    = { username:    { $in: res } } ;

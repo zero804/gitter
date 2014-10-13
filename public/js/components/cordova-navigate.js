@@ -1,7 +1,6 @@
 define([
-  'jquery',
-  'underscore'
-], function($, _) {
+  'components/apiClient'
+], function(apiClient) {
   "use strict";
 
   var cordova = window.cordova;
@@ -15,12 +14,13 @@ define([
   }
 
   function getIdForUri(uri, cb) {
-    $.post('/api/v1/rooms', { uri: uri }, function() {
-      $.get('/api/v1/rooms', function(rooms) {
-        var room = _.findWhere(rooms, { uri: uri });
+    apiClient.post('/v1/rooms', { uri: uri })
+      .then(function(room) {
         cb(null, room.id);
+      })
+      .fail(function() {
+        return cb(new Error('API call failed'));
       });
-    });
   }
 
   var updateNativeContext = function(url, context, troupeId, altContext, title) {
