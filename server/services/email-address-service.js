@@ -51,14 +51,14 @@ function getEmailFromCommit(user) {
   });
 }
 
-module.exports = function (user) {
+module.exports = function (user, isReminder) {
   if (!user) return Q.reject(new Error('User required'));
 
   // test email address, should be set in `config.user-overrides.json`
   var testEmail = config.get('email:toAddress');
   if (testEmail) return Q.resolve(testEmail);
 
-  if (user.invitedEmail) return Q.resolve(user.invitedEmail);
+  if (isReminder && user.invitedEmail) return Q.resolve(user.invitedEmail);
 
   if (user.githubUserToken || user.githubToken) { return getPrivateEmailAddress(user); }
 
