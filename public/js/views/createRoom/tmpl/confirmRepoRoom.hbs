@@ -1,5 +1,7 @@
 <div class="trpModalBody">
-  <p>The room <strong>{{ uri }}</strong> does not yet exist.</p> 
-  <p>Do you want to create it?</p> 
+  <p>The room <strong>{{ uri }}</strong> does not yet exist.</p>
+  <p><strong>Do you want to create it?</strong></p>
+  <br/>
+  <p><input class='js-add-badge' type='checkbox' checked="true" id='addBadge'/> <label for='addBadge'>Add badge to README on GitHub</label></p>
 </div>
-<div class="trpModalFailure" id="modal-failure" style="display:none">{{error}}</div>
+<div class="trpModalFailure" id="modal-failure" style="display:none">{{ error }}</div>

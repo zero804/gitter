@@ -41,8 +41,8 @@ module.exports = {
 
     var userTroupeResource = installUserSubResource(':res(troupes|rooms)', 'troupes');
 
-    var userSettings = new Resource('settings', require('./user/troupe-settings'), app);
-    userTroupeResource.add(userSettings);
+    var userTroupeSettings = new Resource('settings', require('./user/troupe-settings'), app);
+    userTroupeResource.add(userTroupeSettings);
 
     var unreadItems = new Resource('unreadItems', require('./user/unread-items'), app);
     userTroupeResource.add(unreadItems);
@@ -51,6 +51,7 @@ module.exports = {
     userTroupeResource.add(collapsedItems);
 
     installUserSubResource('orgs',        'orgs');
+    installUserSubResource('settings',    'user-settings');
     installUserSubResource('repos',       'repos');
     installUserSubResource('channels',    'channels');
     installUserSubResource('unreadItems', 'aggregated-unread-items');

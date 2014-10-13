@@ -278,7 +278,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
                     }
 
                     if(githubType === 'REPO' && security === 'PUBLIC') {
-                      if(badgerEnabled) {
+                      if(badgerEnabled && options.addBadge) {
                         /* Do this asynchronously (don't chain the promise) */
                         userSettingsService.getUserSettings(user.id, 'badger_optout')
                           .then(function(badgerOptOut) {

@@ -53,7 +53,8 @@ textarea {
 
 // Identify controls by their labels
 label {
-  display: block;
+
+  display: inline;
   margin-bottom: 5px;
   color: @grayDark;
 }
@@ -300,7 +301,7 @@ select:focus:required:invalid {
   border-color: #ee5f5b;
   &:focus {
     border-color: darken(#ee5f5b, 10%);
-    .box-shadow(0 0 6px lighten(#ee5f5b, 20%));    
+    .box-shadow(0 0 6px lighten(#ee5f5b, 20%));
   }
 }
 
@@ -405,7 +406,7 @@ select:focus:required:invalid {
   }
   .uneditable-input {
     border-left-color: #eee;
-    border-right-color: #ccc;    
+    border-right-color: #ccc;
   }
   .add-on {
     margin-right: 0;
