@@ -128,7 +128,7 @@ module.exports = {
     var eventName = (isReminder) ? 'invitation_reminder_sent' : 'invitation_sent';
     var date = moment(mongoUtils.getTimestampFromObjectId(toUser._id)).format('Do MMMM YYYY');
 
-    return emailAddressService(toUser)
+    return emailAddressService(toUser, isReminder)
       .then(function(email) {
         if (!email) return;
         return mailerService.sendEmail({
