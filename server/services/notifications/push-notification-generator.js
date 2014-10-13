@@ -102,8 +102,7 @@ function notifyUserOfActivitySince(userId, troupeId, since, notificationNumber, 
             message: message.notificationText,
             smsText: message.smsText,
             sound: notificationNumber == 1 ? 'notify.caf' : 'notify-2.caf',
-            link: notificationLink,
-            roomId: troupe.id
+            link: notificationLink
           }, callback);
 
       });
