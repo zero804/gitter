@@ -61,6 +61,36 @@ function calculateSubjectForUnreadEmail(troupesWithUnreadCounts) {
   }
 }
 
+/*
+ * Send invitation and reminder emails to the provided address.
+ */
+function sendInvite(fromUser, toUser, room, email, template, eventName) {
+  if (!email) return;
+
+  var senderName    = (fromUser.displayName || fromUser.username);
+  var recipientName = (toUser.displayName || toUser.username).split(' ')[0];
+  var date          = moment(mongoUtils.getTimestampFromObjectId(toUser._id)).format('Do MMMM YYYY');
+
+  return mailerService.sendEmail({
+    templateFile:   template,
+    from:           senderName + ' <support@gitter.im>',
+    fromName:       senderName,
+    to:             email,
+    subject:        '[' + room.uri + '] Join the chat on Gitter',
+    tracking: {
+      event: eventName,
+      data: { email: email }
+    },
+    data: {
+      date: date,
+      roomUri: room.uri,
+      roomUrl: config.get("email:emailBasePath") + '/' + room.uri,
+      senderName: senderName,
+      recipientName: recipientName
+    }
+  });
+}
+
 module.exports = {
 
   sendUnreadItemsNotification: function(user, troupesWithUnreadCounts) {
@@ -118,38 +148,23 @@ module.exports = {
       });
   },
 
-  sendInvitation: function(fromUser, toUser, room, isReminder) {
-    isReminder = (typeof isReminder !== 'undefined') ? isReminder : false;
-    var senderName = (fromUser.displayName || fromUser.username).split(' ')[0];
-    var recipientName = (toUser.displayName || toUser.username).split(' ')[0];
-    var fromName = (fromUser.displayName || fromUser.username);
-
-    var template = (isReminder) ? 'invitation-reminder' : 'invitation';
-    var eventName = (isReminder) ? 'invitation_reminder_sent' : 'invitation_sent';
-    var date = moment(mongoUtils.getTimestampFromObjectId(toUser._id)).format('Do MMMM YYYY');
-
-    return emailAddressService(toUser, isReminder)
-      .then(function(email) {
-        if (!email) return;
-        return mailerService.sendEmail({
-          templateFile: template,
-          from: senderName + ' <support@gitter.im>',
-          fromName: fromName,
-          to: email,
-          subject: '[' + room.uri + '] Join the chat on Gitter',
-          tracking: {
-            event: eventName,
-            data: { email: email }
-          },
-          data: {
-            date: date,
-            roomUri: room.uri,
-            roomUrl: config.get("email:emailBasePath") + '/' + room.uri,
-            senderName: senderName,
-            recipientName: recipientName
-          }
-        });
+  sendInvitation: function(fromUser, toUser, room) {
+    return emailAddressService(toUser)
+    .then(function(email) {
+      return sendInvite(fromUser, toUser, room, email, 'invitation', 'invitation_sent');
     });
+  },
+
+  sendInvitationReminder: function(fromUser, toUser, room) {
+    var preferStoredEmail = true;
+    return emailAddressService(toUser, preferStoredEmail)
+    .then(function(email) {
+      return sendInvite(fromUser, toUser, room, email, 'invitation-reminder', 'invitation_reminder_sent');
+    });
+  },
+
+  sendManualInvitation: function(fromUser, toUser, room, email) {
+    return sendInvite(fromUser, toUser, room, email, 'invitation', 'invitation_sent');
   },
 
   /**
