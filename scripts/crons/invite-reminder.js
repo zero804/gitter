@@ -57,18 +57,18 @@ persistenceService.User
     return Q.all(users.map(function (user) {
       var fromUser = invitees[user.invitedByUser];
       var room = rooms[user.invitedToRoom];
-      return emailNotificationService.sendInvitation(fromUser, user, room, true)
+      return emailNotificationService.sendInvitationReminder(fromUser, user, room)
         .then(function(x) {
           return x;
         })
         .then(markAsReminded.bind(null, user))
-        .catch(function () {
+        .catch(function (err) {
           logger.error('Couldn\'t notify user: ', user.displayName, ' id ->', user._id);
+          logger.error(err);
         });
     }));
   })
   .then(function (users) {
-    console.log(users);
     logger.info('invitation reminder sent to ' + users.length + ' user(s)');
     logger.info('exiting...');
     process.exit();

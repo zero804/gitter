@@ -226,21 +226,21 @@
 
 
 .prepend-gitter-icon(@charCode) {
-    &::before {
-      font-family: 'troupe-icons';
-      font-style: normal;
-      font-variant: normal;
-      content: @charCode;
-      position: absolute;
-      left: 0;
-      -webkit-font-smoothing: antialiased;
-      font-size: 16px;
-      width: 16px;
-      text-align: center;
-    }
-    position: relative;
-    padding-left: 1.5em;
+  &::before {
+    font-family: 'troupe-icons';
+    font-style: normal;
+    font-variant: normal;
+    content: @charCode;
+    position: absolute;
+    left: 0;
+    -webkit-font-smoothing: antialiased;
+    font-size: 16px;
+    width: 16px;
+    text-align: center;
   }
+  position: relative;
+  padding-left: 1.5em;
+}
 
 .prepend-octicon(@charCode) {
   &::before {

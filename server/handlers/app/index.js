@@ -19,7 +19,7 @@ function saveRoom(req) {
 var mainFrameMiddlewarePipeline = [
   appMiddleware.uriContextResolverMiddleware({ create: 'not-repos' }),
   appMiddleware.isPhoneMiddleware,
-  function(req, res, next) {
+  function (req, res, next) {
 
     if (req.uriContext.ownUrl) {
       if(req.isPhone) {
@@ -56,6 +56,11 @@ var chatMiddlewarePipeline = [
   appMiddleware.uriContextResolverMiddleware({ create: 'not-repos'}),
   appMiddleware.isPhoneMiddleware,
   function (req, res, next) {
+
+    if (req.uriContext.accessDenied) {
+      return appRender.renderNotFound(req, res, next);
+    }
+
     if(!req.uriContext.troupe) return next(404);
 
     if(req.user) {

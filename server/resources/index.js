@@ -41,8 +41,8 @@ module.exports = {
 
     var userTroupeResource = installUserSubResource(':res(troupes|rooms)', 'troupes');
 
-    var userSettings = new Resource('settings', require('./user/troupe-settings'), app);
-    userTroupeResource.add(userSettings);
+    var userTroupeSettings = new Resource('settings', require('./user/troupe-settings'), app);
+    userTroupeResource.add(userTroupeSettings);
 
     var unreadItems = new Resource('unreadItems', require('./user/unread-items'), app);
     userTroupeResource.add(unreadItems);

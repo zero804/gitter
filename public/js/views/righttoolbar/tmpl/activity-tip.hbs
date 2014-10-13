@@ -1,5 +1,5 @@
 {{#if isAdmin}}
 <p>
-  We haven't seen any activity yet. <a href="{{integrationsUrl}}" {{#if isNativeDesktopApp}}target="_blank"{{/if}}>Configure your integrations &rarr;</a>
+  We haven't seen any activity yet. <a href="{{integrationsUrl}}" target="{{#if isNativeDesktopApp}} _blank {{else}} _top {{/if}}">Configure your integrations &rarr;</a>
 </p>
 {{/if}}

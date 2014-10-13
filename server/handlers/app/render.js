@@ -1,12 +1,14 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
-var nconf             = require('../../utils/config');
-var Q                 = require('q');
-var contextGenerator  = require('../../web/context-generator');
-var restful           = require('../../services/restful');
-var userService       = require('../../services/user-service');
-var appVersion        = require('../../web/appVersion');
-var social            = require('../social-metadata');
+var nconf              = require('../../utils/config');
+var Q                  = require('q');
+var contextGenerator   = require('../../web/context-generator');
+var restful            = require('../../services/restful');
+var userService        = require('../../services/user-service');
+var appVersion         = require('../../web/appVersion');
+var social             = require('../social-metadata');
+var PersistenceService = require('../../services/persistence-service');
+var restSerializer     = require("../../serializers/rest-serializer");
 
 var burstCalculator   = require('../../utils/burst-calculator');
 var avatar   = require('../../utils/avatar');
@@ -75,6 +77,7 @@ function renderHomePage(req, res, next) {
 function renderMainFrame(req, res, next, frame) {
   contextGenerator.generateNonChatContext(req)
     .then(function (troupeContext) {
+
       var chatAppLocation = '/' + req.uriContext.uri + '/~' + frame + '#initial';
 
       var template, bootScriptName;
@@ -238,6 +241,24 @@ function renderMobileNotLoggedInChat(req, res, next) {
   }, next);
 }
 
+function renderNotFound(req, res, next) {
+  var org = req.uriContext && req.uriContext.uri;
+  var strategy = new restSerializer.TroupeStrategy();
+
+  return PersistenceService.Troupe.findQ({ lcOwner: org.toLowerCase(), security: 'PUBLIC' })
+    .then(function (rooms) {
+      return new Q(restSerializer.serialize(rooms, strategy));
+    })
+    .then(function (rooms) {
+      res.render('not-found', {
+        cssFileName: "/styles/not-found.css",
+        org: org,
+        rooms: rooms
+      });
+    })
+    .catch(next);
+}
+
 
 function renderNotLoggedInChatPage(req, res, next) {
   return renderChat(req, res, {
@@ -265,7 +286,6 @@ function renderEmbeddedChat(req, res, next) {
 function renderUserNotSignedUp(req, res, next) {
   userService.findByUsername(req.params.roomPart1)
     .then(function (user) {
-      console.log('#user:', user);
       res.render('chat-invited-template', {
         cssFileName: "styles/router-nli-chat.css", // TODO: this shouldn't be hardcoded as this
         appCache: getAppCache(req),
@@ -308,12 +328,11 @@ function renderUserNotSignedUpMainFrame(req, res, next, frame) {
     }).fail(next);
 }
 
-
-
 module.exports = exports = {
   renderHomePage: renderHomePage,
   renderChatPage: renderChatPage,
   renderMainFrame: renderMainFrame,
+  renderNotFound: renderNotFound,
   renderMobileChat: renderMobileChat,
   renderMobileUserHome: renderMobileUserHome,
   renderEmbeddedChat: renderEmbeddedChat,

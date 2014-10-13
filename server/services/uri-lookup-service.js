@@ -16,6 +16,7 @@ var mongoUtils = require('../utils/mongo-utils');
  * @return promise of a UriLookup
  */
 function lookupUri(uri) {
+
   var lcUri = uri.toLowerCase();
 
   winston.verbose('URI lookup: ' + uri);
