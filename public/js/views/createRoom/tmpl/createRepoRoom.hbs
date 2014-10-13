@@ -2,4 +2,10 @@
   <div id="repo-select">
   </div>
 </div>
-{{^privateRepoScope}}<a id="upgrade-auth" style="text-decoration: none" href="/login/upgrade?scopes=repo" target="_blank"><div class="trpModalInfo">Showing public repositories. Click here to enable private repositories.</div></a>{{/privateRepoScope}}
+<div class="trpModalFailure" id="modal-failure" style="display:none"></div>
+<div class="trpModalInfo">
+  {{^privateRepoScope}}
+    <p><a id="upgrade-auth" style="text-decoration: none; color: red;" href="/login/upgrade?scopes=repo" target="_blank">Only showing public repositories. Click here to enable private repositories.</a></p>
+  {{/privateRepoScope}}
+<p><input class='js-add-badge' type='checkbox' checked="true" id='addBadge'/> <label for='addBadge'>Add badge to README on GitHub</label></p>
+</div>
