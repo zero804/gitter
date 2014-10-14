@@ -10,9 +10,8 @@ var useAppCache = nconf.get('web:useAppCache');
 var minified = nconf.get('web:minified');
 
 module.exports = {
-    install: function(app) {
-      app.get('/mobile/chat.appcache',
-    function(req, res, next) {
+  install: function(app) {
+    app.get('/mobile/chat.appcache', function(req, res, next) {
       if(!useAppCache) return next(404);
 
       res.setHeader("Cache-Control", "public, max-age=0");
@@ -25,5 +24,5 @@ module.exports = {
       });
 
     });
-}
+  }
 };
