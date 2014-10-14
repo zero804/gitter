@@ -6,11 +6,16 @@ define([
   './repoSelectView',
   'hbs!./tmpl/createRepoRoom',
   'utils/appevents'
-], function(Marionette, TroupeViews, context, apiClient, RepoSelectView, template, appEvents) {
+], function (Marionette, TroupeViews, context, apiClient, RepoSelectView, template, appEvents) {
   "use strict";
 
   var View = Marionette.Layout.extend({
     template: template,
+
+    ui: {
+      'modalFailure': '#modal-failure',
+      'addBadge': '.js-add-badge'
+    },
 
     regions: {
       repoSelectRegion: '#repo-select',
@@ -26,13 +31,19 @@ define([
       if(!r) return;
       var self = this;
       var uri = r.get('uri');
+      var addBadge = this.ui.addBadge.prop('checked');
 
-      apiClient.post('/api/v1/rooms', { uri: uri })
+      apiClient.post('/api/v1/rooms', { uri: uri, addBadge: addBadge })
         .then(function() {
           self.dialog.hide();
           appEvents.trigger('navigation', '/' + uri, 'chat', uri, null);
         })
         .fail(function(/*xhr*/) {
+          self.ui.modalFailure.text('Unable to create room.');
+          self.ui.modalFailure.slideDown(250);
+          setTimeout(function () {
+            self.ui.modalFailure.slideUp(250);
+          }, 4000);
         });
     },
 

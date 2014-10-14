@@ -16,7 +16,8 @@ define([
     },
 
     ui: {
-      'modalFailure': '#modal-failure'
+      'modalFailure': '#modal-failure',
+      'addBadge': '.js-add-badge'
     },
 
     initialize: function(options) {
@@ -25,7 +26,7 @@ define([
     },
 
     menuItemClicked: function(button) {
-      switch(button) {
+      switch (button) {
         case 'create':
           this.createRoom();
           break;
@@ -38,15 +39,17 @@ define([
 
     createRoom: function() {
       var self = this;
+      var addBadge = this.ui.addBadge.prop('checked');
 
       self.ui.modalFailure.hide();
       var uri = self.model.get('uri');
-      apiClient.post('/api/v1/rooms', { uri: uri })
-        .then(function() {
+
+      apiClient.post('/api/v1/rooms', { uri: uri, addBadge: addBadge })
+        .then(function () {
           self.dialog.hide();
           appEvents.trigger('navigation', '/' + uri, 'chat', uri, null);
         })
-        .fail(function(/*xhr*/) {
+        .fail(function (/*xhr*/) {
           self.model.set('error', 'Unable to create room');
           self.ui.modalFailure.show('fast');
           // Do something here.

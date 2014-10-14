@@ -28,7 +28,7 @@ Mike: ?
 */
 
 var MAX_LINE_LENGTH = 30;
-var MAX_NOTIFICATION_TEXT = 120;
+var MAX_NOTIFICATION_TEXT = 90;
 var MAX_SMS_LENGTH = 160;
 
 var util  = require('util');
