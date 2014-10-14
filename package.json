@@ -86,7 +86,8 @@
     "katex": "^0.1.0",
     "mandrill-api": "~1.0.40",
     "locale": "0.0.17",
-    "langs": "^1.0.1"
+    "langs": "^1.0.1",
+    "cors": "^2.4.2"
   },
   "devDependencies": {
     "better-assert": "1.0.0",
