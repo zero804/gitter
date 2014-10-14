@@ -3,15 +3,20 @@ define([
   'marionette',
   'utils/context',
   'collections/instances/integrated-items',
+  'collections/chat-search',
   'views/people/peopleCollectionView',
+  'views/chat/chatCollectionView',
+  'views/search/searchView',
   './repoInfo',
   './activity',
   'utils/scrollbar-detect'
-], function($, Marionette, context, itemCollections, PeopleCollectionView, repoInfo, ActivityStream, hasScrollBars) {
+], function($, Marionette, context, itemCollections, chatSearchModels, PeopleCollectionView, chatCollectionView, SearchView, repoInfo, ActivityStream, hasScrollBars) {
   "use strict";
 
   var RightToolbarLayout = Marionette.Layout.extend({
+
     regions: {
+      search: '#search-panel',
       people: "#people-roster",
       repo_info: "#repo-info",
       activity: "#activity"
@@ -23,6 +28,11 @@ define([
       'click #people-header' : 'showPeopleList',
       'click #info-header' : 'showRepoInfo',
       'submit #upload-form': 'upload'
+    },
+
+    toggleSearch: function () {
+      // hide all regions and show/hide search...
+
     },
 
     initialize: function() {
@@ -42,6 +52,17 @@ define([
 
       // Activity
       this.activity.show(new ActivityStream({ collection: itemCollections.events }));
+
+      var chatSearchCollection = new chatSearchModels.ChatSearchCollection([], { });
+
+      this.search.show(new SearchView({
+        className: 'search',
+        collection: chatSearchCollection,
+        chatCollection: itemCollections.chats,
+        chatView: chatCollectionView
+      }));
+
+      // this.searchView = .render();
 
       itemCollections.events.on('add reset sync', function() {
 

@@ -198,7 +198,7 @@ require([
     el: 'body'
   });
 
-  appView.showSearchMode();
+  // appView.showSearchMode();
 
   // This may require a better home
   itemCollections.users.once('sync', function() {

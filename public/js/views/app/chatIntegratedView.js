@@ -6,7 +6,6 @@ define([
   'views/app/uiVars',
   'views/chat/chatInputView',
   'collections/instances/integrated-items',
-  'collections/chat-search',
   'components/modal-region',
   'utils/scrollbar-detect',
   'cocktail',
@@ -23,14 +22,11 @@ define([
   'views/app/headerView',
   'components/unread-items-client',
   'views/righttoolbar/rightToolbarView',
-  'views/search/searchView',
-
   'transloadit'  // No ref
-], function($, context, Marionette, appEvents, uiVars, chatInputView, itemCollections,
-    chatSearchModels, modalRegion, hasScrollBars, cocktail, KeyboardEventsMixin, ChatCollectionView,
+], function($, context, Marionette, appEvents, uiVars, chatInputView, itemCollections, modalRegion, hasScrollBars, cocktail, KeyboardEventsMixin, ChatCollectionView,
     webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator,
     emojiDecorator, UnreadBannerView, HistoryLimitView, HeaderView, unreadItemsClient,
-    RightToolbarView, SearchView) {
+    RightToolbarView /*, SearchView*/) {
   "use strict";
 
   var touchEvents = {
@@ -77,21 +73,12 @@ define([
         decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
       }).render();
 
-      var chatSearchCollection = new chatSearchModels.ChatSearchCollection([], { });
-
       this.chatInputView = new chatInputView.ChatInputView({
         el: '#chat-input',
         collection: itemCollections.chats,
         chatCollectionView: chatCollectionView,
         userCollection: itemCollections.users,
         rollers: chatCollectionView.rollers
-      }).render();
-
-      this.searchView = new SearchView({
-        el: '#search-panel',
-        collection: chatSearchCollection,
-        chatCollection: itemCollections.chats,
-        chatView: chatCollectionView
       }).render();
 
       var unreadChatsModel = unreadItemsClient.acrossTheFold();
@@ -264,10 +251,10 @@ define([
     },
 
     showSearchMode: function() {
-      this.rightToolbar.$el.hide();
+      // this.rightToolbar.$el.hide();
       // this.chatInputView.$el.hide();
       // this.chatSearchCollectionView.$el.show();
-      this.searchView.$el.show();
+      // this.searchView.$el.show();
     }
   });
 
