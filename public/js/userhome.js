@@ -3,7 +3,6 @@ require([
   'utils/appevents',
   'backbone',
   'views/createRoom/confirmRepoRoomView',
-  'components/csrf'                             // No ref
 ], function(UserHomeView, appEvents, Backbone, confirmRepoRoomView) {
 
   "use strict";

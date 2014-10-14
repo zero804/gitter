@@ -6,7 +6,6 @@ require([
   'views/menu/troupeMenu',
   'views/app/mobileAppView',
   'views/createRoom/confirmRepoRoomView',
-  'components/csrf'             // No ref
   ], function(UserHomeView, $, appEvents, Backbone, TroupeMenu, MobileAppView, confirmRepoRoomView) {
   "use strict";
 

@@ -1,5 +1,4 @@
 define([
-  'utils/context',
   'utils/appevents',
   'components/apiClient',
   'jquery',
@@ -10,7 +9,7 @@ define([
   'collections/instances/troupes',
   'cocktail',
   'views/keyboard-events-mixin'
-], function(context, appEvents, apiClient, $, _, Backbone, textFilter, RoomCollectionView, troupeCollections, cocktail, KeyboardEventsMixin
+], function(appEvents, apiClient, $, _, Backbone, textFilter, RoomCollectionView, troupeCollections, cocktail, KeyboardEventsMixin
 ) {
   "use strict";
 
