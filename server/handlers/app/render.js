@@ -220,15 +220,7 @@ function renderMobileNativeChat(req, res) {
 }
 
 function renderMobileNativeUserhome(req, res) {
-  /*
-   * Native userhome is served with an appcache.
-   *
-   * This means the embedded troupe context must be minimal as the appcache would make it permanent
-   *
-   * Therefore creating a troupe context is the responibility of the client browser.
-   */
   res.render('mobile/native-userhome-app', {
-    appCache: getAppCache(req),
     bootScriptName: 'mobile-native-userhome',
     troupeContext: {
       userId: req.user.id

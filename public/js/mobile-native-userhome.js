@@ -6,21 +6,9 @@ require([
   'backbone',
   'components/cordova-navigate',
   'views/createRoom/confirmRepoRoomView',
-  'log!mobile-native-userhome',
   'components/csrf'             // No ref
-  ], function(context, UserHomeView, $, appEvents, Backbone, cordovaNavigate, confirmRepoRoomView, log) {
+  ], function(context, UserHomeView, $, appEvents, Backbone, cordovaNavigate, confirmRepoRoomView) {
   "use strict";
-
-  $(document).on('app.version.mismatch', function() {
-    try {
-      if(window.applicationCache.status == 1) {
-        log('Attempting to update application cache');
-        window.applicationCache.update();
-      }
-    } catch(e) {
-      log('Unable to update application cache: ' + e, e);
-    }
-  });
 
   cordovaNavigate.setNativeToUserhome();
 
