@@ -507,10 +507,10 @@ exports.searchChatMessagesForRoom = function(troupeId, textQuery, options) {
         .find(
           { toTroupeId: troupeId, $text : { $search : textQuery } },
           { score : { $meta: "textScore" } })
-        .sort({
-          score : { $meta : "textScore" },
-          sent: -1
-        })
+        // .sort({
+        //   score : { $meta : "textScore" },
+        //   sent: -1
+        // })
         .limit(limit)
         .skip(skip);
 
