@@ -16,7 +16,7 @@ module.exports = {
     app.get('/mobile/home', ensureLoggedIn, appRender.renderMobileNativeUserhome);
 
     /*
-     * DEPRECATED, only used by gitter ios < v1.3.0 
+     * DEPRECATED, only used by gitter ios v1
      * ITS FULL OF APPCACHE MESS
      */
     app.get('/mobile/chat', ensureLoggedIn, function(req, res, next) {
