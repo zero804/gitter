@@ -78,6 +78,11 @@ function serializeObjectId(id) {
   return id.toString();
 }
 
+function createIdForTimestamp(timestamp) {
+    var hexSeconds = Math.floor(timestamp/1000).toString(16);
+    return new ObjectID(hexSeconds + "0000000000000000");
+}
+
 exports.isLikeObjectId = isLikeObjectId;
 exports.asObjectID = asObjectID;
 exports.asObjectIDs = asObjectIDs;
@@ -85,3 +90,4 @@ exports.getDateFromObjectId = getDateFromObjectId;
 exports.getTimestampFromObjectId = getTimestampFromObjectId;
 exports.getNewObjectIdString = getNewObjectIdString;
 exports.serializeObjectId = serializeObjectId;
+exports.createIdForTimestamp = createIdForTimestamp;
