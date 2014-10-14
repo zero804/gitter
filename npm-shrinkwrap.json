@@ -1149,6 +1149,16 @@
       "version": "0.8.0",
       "from": "gitter-marked@^0.8.0"
     },
+    "gitter-passport-http-bearer": {
+      "version": "1.1.0",
+      "from": "gitter-passport-http-bearer@latest",
+      "dependencies": {
+        "passport-strategy": {
+          "version": "1.0.0",
+          "from": "passport-strategy@1.x.x"
+        }
+      }
+    },
     "gitter-services": {
       "version": "1.4.0",
       "from": "gitter-services@git+ssh://git@github.com:gitterHQ/services.git#1.4.0",
@@ -1835,16 +1845,6 @@
     "passport-http": {
       "version": "0.2.2",
       "from": "passport-http@0.2.2",
-      "dependencies": {
-        "pkginfo": {
-          "version": "0.2.3",
-          "from": "pkginfo@0.2.x"
-        }
-      }
-    },
-    "passport-http-bearer": {
-      "version": "0.2.0",
-      "from": "passport-http-bearer@0.2.0",
       "dependencies": {
         "pkginfo": {
           "version": "0.2.3",
