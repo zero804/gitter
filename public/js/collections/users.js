@@ -1,7 +1,8 @@
 define([
   './base',
+  'components/apiClient',
   './smart-users'
-], function(TroupeCollections, SmartUserCollection) {
+], function(TroupeCollections, apiClient, SmartUserCollection) {
   "use strict";
 
   var UserModel = TroupeCollections.Model.extend({
@@ -11,7 +12,7 @@ define([
   var UserCollection = TroupeCollections.LiveCollection.extend({
     model: UserModel,
     modelName: 'user',
-    nestedUrl: "users"
+    url: apiClient.room.channelGenerator('/users')
   });
 
   return {

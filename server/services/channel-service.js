@@ -28,11 +28,7 @@ function findPublicChannels(user, query) {
   return persistence.Troupe
     .find({
       $and: filterQueries,
-      $or: [
-        { security: 'PUBLIC' },
-        { security: null },
-        { security: { $exists: false } }
-      ],
+      security: 'PUBLIC',
       githubType: { $in: ['REPO_CHANNEL', 'ORG_CHANNEL', 'USER_CHANNEL'] }
     })
     .limit(20)

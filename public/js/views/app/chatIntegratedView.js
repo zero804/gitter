@@ -3,13 +3,14 @@ define([
   'utils/context',
   'marionette',
   'utils/appevents',
+  'components/apiClient',
   'views/app/uiVars',
   'components/modal-region',
   'utils/scrollbar-detect',
   'cocktail',
   'views/keyboard-events-mixin',
   'transloadit'
-], function($, context, Marionette, appEvents, uiVars, modalRegion, hasScrollBars, cocktail, KeyboardEventsMixin) {
+], function($, context, Marionette, appEvents, apiClient, uiVars, modalRegion, hasScrollBars, cocktail, KeyboardEventsMixin) {
   "use strict";
 
   var touchEvents = {
@@ -160,15 +161,12 @@ define([
         }
 
         // Generate signature and upload
-        $.ajax({
-          type: 'GET',
-          url: '/api/private/generate-signature',
-          data: {
+        apiClient.priv.get('/generate-signature', {
             room_uri: context.troupe().get('uri'),
             room_id: context.getTroupeId(),
             type: type
-          },
-          success: function(data) {
+          })
+          .then(function(data) {
             formdata.append("signature", data.sig);
 
             var options = {
@@ -188,8 +186,7 @@ define([
             form.unbind('submit.transloadit');
             form.transloadit(options);
             form.submit();
-          }
-        });
+          });
       }
 
       var el = $('body');

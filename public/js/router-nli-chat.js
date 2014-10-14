@@ -22,7 +22,6 @@ require([
   'components/dozy',            // Sleep detection No ref
   'template/helpers/all',       // No ref
   'components/bug-reporting',   // No ref
-  'components/csrf',            // No ref
   'components/ajax-errors'      // No ref
 
 ], function($, Backbone, context,

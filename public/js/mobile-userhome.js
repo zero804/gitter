@@ -2,10 +2,11 @@ require([
   'views/userhome/userHomeView',
   'jquery',
   'utils/appevents',
+  'backbone',
   'views/menu/troupeMenu',
   'views/app/mobileAppView',
-  'components/csrf'             // No ref
-  ], function(UserHomeView, $, appEvents, TroupeMenu, MobileAppView) {
+  'views/createRoom/confirmRepoRoomView',
+  ], function(UserHomeView, $, appEvents, Backbone, TroupeMenu, MobileAppView, confirmRepoRoomView) {
   "use strict";
 
   appEvents.on('navigation', function(url) {
@@ -23,6 +24,17 @@ require([
   new UserHomeView({
     el: $('#content-frame')
   }).render();
+
+  var Router = Backbone.Router.extend({
+    routes: {
+      'confirm/*uri': function(uri) {
+        new confirmRepoRoomView.Modal({ uri: uri }).show();
+      }
+    }
+  });
+
+  new Router();
+  Backbone.history.start();
 
   $('html').removeClass('loading');
 

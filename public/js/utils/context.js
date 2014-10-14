@@ -1,6 +1,7 @@
 define([
-  'backbone'
-], function(Backbone) {
+  'backbone',
+  './qs'
+], function(Backbone, qs) {
   "use strict";
 
   var ctx = window.troupeContext || {};
@@ -34,6 +35,8 @@ define([
 
       window.localStorage.lastTroupeId = id;
       troupeModel = { id: id };
+    } else if(qs.troupeId) {
+      troupeModel = { id: qs.troupeId };
     }
 
     return new WatchableModel(troupeModel);
@@ -142,9 +145,30 @@ define([
     }
   };
 
-  context.isProfileComplete = function() {
-    return user.get('status') !== 'PROFILE_NOT_COMPLETED';
-  };
+  function initialiseEnv() {
+    var env = window.troupeEnv || {};
+
+    // Allow env through the querystring
+    if(qs.env) {
+      var m;
+      try {
+        m = JSON.parse(qs.env);
+      } catch(e) {
+        // Ignore errors here
+      }
+
+      if(m) {
+        Object.keys(m).forEach(function(k) {
+          env[k] = m[k];
+        });
+      }
+    }
+
+    return env;
+  }
+
+  // Initialise the environment
+  var env = initialiseEnv();
 
   /**
    * The difference between troupeContext and env.
@@ -152,14 +176,14 @@ define([
    * TroupeContext depends on the user and troupe
    */
   context.env = function(envName) {
-    return window.troupeEnv && window.troupeEnv[envName];
+    return env[envName];
   };
 
   context.getAccessToken = function(callback) {
     var iterations = 0;
     function checkToken() {
       // This is a very rough first attempt
-      var token = window.bearerToken || ctx.accessToken;
+      var token = window.bearerToken || qs.bearerToken || ctx.accessToken;
       if(token) return callback(token);
 
       iterations++;
@@ -172,8 +196,21 @@ define([
   };
 
   context.isLoggedIn = function() {
+    // If we're in a context where one cannot be logged out...
+    if(context.env('loggedIn')) return true;
+
     // TODO: this is not ideal. perhaps make this better
     return !!user.id;
+  };
+
+  context.onUserId = function(callback, c) {
+    if(user.id) {
+      callback.call(c, user.id);
+    } else {
+      user.once('change:id', function() {
+        callback.call(c, user.id);
+      });
+    }
   };
 
   context.lang = function() {
