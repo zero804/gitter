@@ -10,7 +10,6 @@ require([
   'components/desktopNotifications',      // No ref
   'template/helpers/all',                 // No ref
   'components/bug-reporting',             // No ref
-  'components/csrf',                      // No ref
   'components/ajax-errors'                // No ref
 ], function(appEvents, context, Backbone, AppIntegratedView, TitlebarUpdater, log) {
   "use strict";

@@ -40,7 +40,6 @@ require([
   'template/helpers/all',       // No ref
   'components/eyeballs',        // No ref
   'components/bug-reporting',   // No ref
-  'components/csrf',            // No ref
   'components/ajax-errors',     // No ref
   'components/focus-events'     // No ref
 

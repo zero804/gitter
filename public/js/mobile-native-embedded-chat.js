@@ -12,7 +12,6 @@ require([
   'views/chat/decorators/mobileDecorator',
   'log!mobile-native-chat',
   'components/eyeballs',                        // No ref
-  'components/csrf'                             // No ref
   ], function($, context, cordovaNav, chatModels, userModels, ChatCollectionView, chatInputView, unreadItemsClient, cacheSync,
     emojiDecorator, mobileDecorator, log) {
 

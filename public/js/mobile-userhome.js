@@ -3,8 +3,7 @@ require([
   'jquery',
   'utils/appevents',
   'views/menu/troupeMenu',
-  'views/app/mobileAppView',
-  'components/csrf'             // No ref
+  'views/app/mobileAppView'
   ], function(UserHomeView, $, appEvents, TroupeMenu, MobileAppView) {
   "use strict";
 

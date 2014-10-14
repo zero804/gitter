@@ -1,5 +1,4 @@
 define([
-  'jquery',
   'marionette',
   'backbone',
   'cocktail',
@@ -11,7 +10,7 @@ define([
   'hbs!./tmpl/addPeopleItemView',
   'views/controls/typeahead',
   'views/behaviors/widgets'      // No ref
-], function($, Marionette, Backbone, cocktail, TroupeViews, context, apiClient, template, userSearchItemTemplate,
+], function(Marionette, Backbone, cocktail, TroupeViews, context, apiClient, template, userSearchItemTemplate,
   itemTemplate, Typeahead) {
   "use strict";
 
@@ -20,7 +19,7 @@ define([
   });
 
   var UserSearchCollection = Backbone.Collection.extend({
-    url: '/api/v1/user',
+    url: '/v1/user',
     model: UserSearchModel,
     parse: function (response) {
       return response.results;
