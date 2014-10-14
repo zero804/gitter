@@ -6,7 +6,6 @@ require([
   'backbone',
   'components/cordova-navigate',
   'views/createRoom/confirmRepoRoomView',
-  'components/csrf'             // No ref
   ], function(context, UserHomeView, $, appEvents, Backbone, cordovaNavigate, confirmRepoRoomView) {
   "use strict";
 

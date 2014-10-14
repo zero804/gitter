@@ -80,17 +80,36 @@ define([
       ['delete', POST_DEFAULTS]
     ];
 
-  // If future this should direct clients to api.gitter.im
   function makeFullUrl(baseUrlFunction, url) {
     if(!url) url = '';
-    // XXX: we need to remove /api/ from all calls to apiClient
+
+    var baseUrl = context.env('apiBasePath');
+
     if(!baseUrlFunction) {
-      // Deprecated functionality
-      if(url.indexOf('/api') === 0) return url;
-      return '/api' + url;
+      return baseUrl + url;
     }
 
-    return '/api' + baseUrlFunction() + url;
+    return baseUrl + baseUrlFunction() + url;
+  }
+
+  function makeChannel(baseUrlFunction, url) {
+    if(!url) url = '';
+
+    if(!baseUrlFunction) {
+      return url;
+    }
+
+    return baseUrlFunction() + url;
+  }
+
+  function accessTokenDeferred() {
+    var deferred = $.Deferred();
+
+    context.getAccessToken(function(accessToken) {
+      deferred.resolve(accessToken);
+    });
+
+    return deferred;
   }
 
   // TODO return a proper promise instead of a $.Deferred
@@ -105,17 +124,24 @@ define([
       dataSerialized = data;
     }
 
-    return $.ajax({
-      url: makeFullUrl(baseUrlFunction, url),
-      contentType: options.contentType,
-      dataType: options.dataType,
-      type: method,
-      global: options.global,
-      data: dataSerialized,
-      context: options.context, // NB: deprecated: cant use with real promises
-      timeout: options.timeout,
-      async: options.async
-    });
+    return accessTokenDeferred()
+      .then(function(accessToken) {
+        return $.ajax({
+          url: makeFullUrl(baseUrlFunction, url),
+          contentType: options.contentType,
+          dataType: options.dataType,
+          type: method,
+          global: options.global,
+          data: dataSerialized,
+          context: options.context, // NB: deprecated: cant use with real promises
+          timeout: options.timeout,
+          async: options.async,
+          headers: {
+            'x-access-token': accessToken
+          }
+        });
+      });
+
   }
 
   // Util functions
@@ -130,15 +156,36 @@ define([
     return options;
   }
 
-  function getClient(baseUrl) {
+  function getClient(baseUrlFunction) {
     return OPERATIONS
       .reduce(function(memo, descriptor) {
         var method = descriptor[0];
         var defaultOptions = descriptor[1];
 
-        memo[method] = operation.bind(memo, baseUrl, method, defaultOptions);
+        memo[method] = operation.bind(memo, baseUrlFunction, method, defaultOptions);
         return memo;
-      }, {});
+      }, {
+        url: function(relativeUrl) {
+          return makeFullUrl(baseUrlFunction, relativeUrl);
+        },
+        /**
+         * Returns a function which returns URLs full urls for the
+         * given relative URL
+         */
+        urlGenerator: function(relativeUrl) {
+          return function() {
+            return makeFullUrl(baseUrlFunction, relativeUrl);
+          };
+        },
+        channel: function(relativeUrl) {
+          return makeChannel(baseUrlFunction, relativeUrl);
+        },
+        channelGenerator: function(relativeUrl) {
+          return function() {
+            return makeChannel(baseUrlFunction, relativeUrl);
+          };
+        }
+      });
   }
 
   return defaults(getClient(), {
