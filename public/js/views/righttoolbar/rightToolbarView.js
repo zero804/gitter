@@ -53,14 +53,9 @@ define([
       // Activity
       this.activity.show(new ActivityStream({ collection: itemCollections.events }));
 
-      var chatSearchCollection = new chatSearchModels.ChatSearchCollection([], { });
+      // var chatSearchCollection = new chatSearchModels.ChatSearchCollection([], { });
 
-      this.search.show(new SearchView({
-        className: 'search',
-        collection: chatSearchCollection,
-        chatCollection: itemCollections.chats,
-        chatView: chatCollectionView
-      }));
+      this.search.show(new SearchView({}));
 
       // this.searchView = .render();
 

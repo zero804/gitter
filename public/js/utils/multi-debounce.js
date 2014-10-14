@@ -31,9 +31,10 @@ define([
     // var slowDebounce = _.debounce(executeCallback, longThrottle);
 
     // this function is provided the event i.e. is an EventListener...
-    return function (e) {
-      mostRecent = e.target.value;
-      if (mostRecent.length === 0) return;
+    return function (value) {
+      mostRecent = value;
+      // console.log('mostRecent:', mostRecent);
+      // if (mostRecent.length === 0) return;
       debounce();
 
       // FIXME mostRecent.length is ALWAYS undefined.

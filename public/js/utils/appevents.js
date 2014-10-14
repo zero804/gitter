@@ -21,17 +21,21 @@ define([
     }
   };
 
-  window.addEventListener("message", function(e) {
+  window.addEventListener("message", function (e) {
+    console.debug('message', e.data);
+
+
     if (e.origin !== basePath) return;
     var data;
     try {
       data = JSON.parse(e.data);
-    } catch(e) {
+    } catch (err) {
       // Ignore badly formatted messages from extensions
       return;
     }
 
-    if(data.child_window_event) {
+    if (data.child_window_event) {
+      data.child_window_event.push(e);
       appEvents.trigger.apply(appEvents, data.child_window_event);
     }
   }, false);
