@@ -5,7 +5,6 @@ require([
   'utils/appevents',
   'components/cordova-navigate',
   'log!mobile-native-userhome',
-  'components/csrf'             // No ref
   ], function(context, UserHomeView, $, appEvents, cordovaNavigate, log) {
   "use strict";
 

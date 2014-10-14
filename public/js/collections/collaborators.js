@@ -1,8 +1,8 @@
 define([
-  'utils/context',
+  'components/apiClient',
   './base',
   'backbone'
-], function(context, TroupeCollections, Backbone) {
+], function(apiClient, TroupeCollections, Backbone) {
   "use strict";
 
   var CollabModel = TroupeCollections.Model.extend({
@@ -11,10 +11,7 @@ define([
 
   var CollabCollection = Backbone.Collection.extend({
     model: CollabModel,
-
-    initialize: function() {
-      this.url = "/api/v1/rooms/" + context.getTroupeId() + "/collaborators";
-    }
+    url: apiClient.room.channelGenerator("/collaborators")
   });
 
   return {

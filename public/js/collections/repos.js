@@ -1,9 +1,9 @@
 define([
-  'utils/context',
   './base',
+  'components/apiClient',
   'backbone',
   'cocktail'
-], function(context, TroupeCollections, Backbone, cocktail) {
+], function(TroupeCollections, apiClient, Backbone, cocktail) {
   "use strict";
 
   var RepoModel = TroupeCollections.Model.extend({
@@ -12,9 +12,7 @@ define([
 
   var ReposCollection = Backbone.Collection.extend({
     model: RepoModel,
-    initialize: function() {
-      this.url = "/api/v1/user/" + context.getUserId() + "/repos";
-    },
+    url: apiClient.user.channelGenerator('/repos'),
     comparator: function(a, b) {
       function compare(a, b) {
         if(a === b) return 0;

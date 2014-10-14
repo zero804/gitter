@@ -1,7 +1,6 @@
 require([
   'views/userhome/userHomeView',
-  'utils/appevents',
-  'components/csrf'                             // No ref
+  'utils/appevents'
 ], function(UserHomeView, appEvents) {
 
   "use strict";
