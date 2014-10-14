@@ -198,6 +198,12 @@ function renderMobileChat(req, res, next) {
   }, next);
 }
 
+function renderMobileNativeEmbeddedChat(req, res) {
+  res.render('mobile/native-embedded-chat-app', {
+    troupeContext: {}
+  });
+}
+
 function renderMobileNativeChat(req, res) {
   /*
    * All native chats are served from one endpoint so we can appcache one page.
@@ -217,15 +223,7 @@ function renderMobileNativeChat(req, res) {
 }
 
 function renderMobileNativeUserhome(req, res) {
-  /*
-   * Native userhome is served with an appcache.
-   *
-   * This means the embedded troupe context must be minimal as the appcache would make it permanent
-   *
-   * Therefore creating a troupe context is the responibility of the client browser.
-   */
   res.render('mobile/native-userhome-app', {
-    appCache: getAppCache(req),
     bootScriptName: 'mobile-native-userhome',
     troupeContext: {
       userId: req.user.id
@@ -338,6 +336,7 @@ module.exports = exports = {
   renderEmbeddedChat: renderEmbeddedChat,
   renderMobileNotLoggedInChat: renderMobileNotLoggedInChat,
   renderNotLoggedInChatPage: renderNotLoggedInChatPage,
+  renderMobileNativeEmbeddedChat: renderMobileNativeEmbeddedChat,
   renderMobileNativeChat: renderMobileNativeChat,
   renderMobileNativeUserhome: renderMobileNativeUserhome,
   renderUserNotSignedUp: renderUserNotSignedUp,

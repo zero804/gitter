@@ -1,19 +1,20 @@
 define([
   'jquery',
   'utils/context',
+  'components/apiClient',
   'marionette',
   'backbone',
   'autolink',
   'components/notifications',
   'views/controls/dropdown',
   'bootstrap_tooltip' // No ref
-], function($, context, Marionette, Backbone, autolink, notifications, Dropdown)  {
+], function($, context, apiClient, Marionette, Backbone, autolink, notifications, Dropdown)  {
   "use strict";
 
   function generateTooltip(troupe) {
-    
+
     if (troupe.get('security') === 'PUBLIC') return 'Anyone can join';
-    
+
     var tooltip;
     switch(troupe.get('githubType')) {
       case 'REPO':
@@ -38,7 +39,7 @@ define([
       default:
         tooltip = troupe.get('oneToOne') ? 'This chat is just between you two' : 'Only invited users can join';
     }
-  
+
     return tooltip;
   }
 
@@ -47,7 +48,7 @@ define([
     modelEvents: {
       change: 'redisplay'
     },
-    
+
     ui: {
       cog: '.js-chat-settings',
       dropdownMenu: '#cog-dropdown',
@@ -55,7 +56,7 @@ define([
       name: '.js-chat-name',
       favourite: '.js-favourite-button'
     },
-    
+
     events: {
       'click @ui.cog': 'showDropdown',
       'click #leave-room': 'leaveRoom',
@@ -134,11 +135,7 @@ define([
     leaveRoom: function() {
       if(!context.isLoggedIn()) return;
 
-      $.ajax({
-        url: "/api/v1/rooms/" + context.getTroupeId() + "/users/" + context.getUserId(),
-        data: "",
-        type: "DELETE",
-      });
+      apiClient.userRoom.delete();
     },
 
     toggleFavourite: function() {
@@ -147,25 +144,16 @@ define([
       this.ui.favourite.toggleClass('favourite');
       var isFavourite = this.ui.favourite.hasClass('favourite');
 
-      $.ajax({
-        url: '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId(),
-        contentType: "application/json",
-        dataType: "json",
-        type: "PUT",
-        data: JSON.stringify({ favourite: isFavourite })
-      });
+      apiClient.userRoom.put('', { favourite: isFavourite });
+
     },
 
     saveTopic: function() {
       var topic = this.$el.find('textarea').val();
       context.troupe().set('topic', topic);
-      $.ajax({
-        url: '/api/v1/rooms/' + context.getTroupeId(),
-        contentType: "application/json",
-        dataType: "json",
-        type: "PUT",
-        data: JSON.stringify({ topic: topic })
-      });
+
+      apiClient.room.put('', { topic: topic });
+
       // TODO: once saved topic recalculate the header size
       this.editingTopic = false;
     },

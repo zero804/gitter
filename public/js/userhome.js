@@ -1,21 +1,32 @@
 require([
   'views/userhome/userHomeView',
   'utils/appevents',
-  'components/csrf'                             // No ref
-], function(UserHomeView, appEvents) {
+  'backbone',
+  'views/createRoom/confirmRepoRoomView',
+], function(UserHomeView, appEvents, Backbone, confirmRepoRoomView) {
 
   "use strict";
 
   new UserHomeView({ el: '#content-wrapper' }).render();
 
   appEvents.on('navigation', function(url) {
-    var rootWindow = window.parent || window;
     if(url.indexOf('#') === 0) {
-      rootWindow.location.hash = url;
+      window.location.hash = url;
     } else {
-      rootWindow.location.href = url;
+      (window.parent || window).location.href = url;
     }
   });
+
+  var Router = Backbone.Router.extend({
+    routes: {
+      'confirm/*uri': function(uri) {
+        new confirmRepoRoomView.Modal({ uri: uri }).show();
+      }
+    }
+  });
+
+  new Router();
+  Backbone.history.start();
 
   // Asynchronously load tracker
   require(['utils/tracking'], function() { });

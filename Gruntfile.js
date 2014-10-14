@@ -96,6 +96,15 @@ var MODULES = [
       exclude: ["core-libraries"]
   },
   {
+      name: "mobile-native-embedded-chat",
+      include: [
+        "utils/tracking",
+        "views/widgets/avatar",
+        "views/widgets/timeago"
+      ],
+      exclude: ["core-libraries"]
+  },
+  {
       name: "mobile-app",
       include: [
         "utils/tracking",

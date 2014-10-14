@@ -5,6 +5,7 @@ define([
   'jquery',
   'utils/context',
   'utils/appevents',
+  'components/apiClient',
   'hbs!./tmpl/chatInputView',
   'hbs!./tmpl/typeaheadListItem',
   'hbs!./tmpl/emojiTypeaheadListItem',
@@ -20,7 +21,7 @@ define([
   'utils/platform-keys',
   'bootstrap_tooltip', // No ref
   'jquery-textcomplete' // No ref
-], function(log, Backbone, Marionette, $, context, appEvents, template, listItemTemplate,
+], function(log, Backbone, Marionette, $, context, appEvents, apiClient, template, listItemTemplate,
   emojiListItemTemplate, moment, hasScrollBars, isMobile, emoji, drafty, cdn, commands,
   cocktail, KeyboardEventsMixin, platformKeys) {
   "use strict";
@@ -103,6 +104,7 @@ define([
       this.chatCollectionView = options.chatCollectionView;
       this.composeMode = new ComposeMode();
       this.userCollection = options.userCollection;
+      this.compactView = options.compactView;
 
       this.listenTo(appEvents, 'input.append', function(text, options) {
         if(this.inputBox) {
@@ -139,6 +141,7 @@ define([
         user: context.user(),
         isComposeModeEnabled: this.composeMode.isEnabled(),
         placeholder: placeholder,
+        autofocus: !this.compactView,
         composeModeToggleTitle: this.getComposeModeTitle(),
         showMarkdownTitle: 'Markdown help ('+ platformKeys.cmd +' + '+ platformKeys.gitter +' + m)',
         value: $("#chat-input-textarea").val()
@@ -146,17 +149,18 @@ define([
     },
 
     onRender: function() {
-      if (!window._troupeIsTablet) $("#chat-input-textarea").focus();
+      var $textarea = this.$el.find('#chat-input-textarea');
 
-      // TODO: why we using global $?
-      var textAreaValue = $("#chat-input-textarea").val();
+      // firefox only respects the "autofocus" attr if it is present on source html
+      // also, dont show keyboard right away on mobile
+      if(!this.compactView) $textarea.focus();
 
       var inputBox = new ChatInputBoxView({
-        el: this.$el.find('.js-chat-input-text-area'),
+        el: $textarea,
         rollers: this.rollers,
         chatCollectionView: this.chatCollectionView,
         composeMode: this.composeMode,
-        value: textAreaValue
+        value: $textarea.val()
       });
 
       this.inputBox = inputBox;
@@ -164,7 +168,6 @@ define([
       this.$el.find('.compose-mode-toggle, .md-help').tooltip({placement: 'left'});
       var userCollection = this.userCollection;
 
-      var $textarea = this.$el.find('textarea');
 
       if(!isMobile()) {
         // textcomplete on mobile safari ios 8 causes the keyboard to
@@ -182,8 +185,8 @@ define([
               if(repoName) query.repoName = repoName;
               if(issueNumber) query.issueNumber = issueNumber;
 
-              $.getJSON('/api/v1/rooms/' + context.getTroupeId() + '/issues', query)
-                .done(function(resp) {
+              apiClient.room.get('/issues', query)
+                .then(function(resp) {
                   callback(resp);
                 })
                 .fail(function() {

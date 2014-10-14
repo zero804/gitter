@@ -1,5 +1,3 @@
-/* jshint unused:strict, browser:true,  strict:true */
-/* global define:false */
 define([
   'jquery',
   'underscore',

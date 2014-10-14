@@ -5,10 +5,11 @@ define([
   'collections/instances/troupes',
   'views/base',
   'utils/context',
+  'components/apiClient',
   './parentSelectView',
   'hbs!./tmpl/createRoom',
   'utils/appevents'
-], function($, _, Marionette, troupeCollections, TroupeViews, context, ParentSelectView, template, appEvents) {
+], function($, _, Marionette, troupeCollections, TroupeViews, context, apiClient, ParentSelectView, template, appEvents) {
   "use strict";
 
   var View = Marionette.Layout.extend({
@@ -92,6 +93,7 @@ define([
     },
 
     validateAndCreate: function() {
+      var self = this;
       /* We do a better job on the server with checking names, as we have XRegExp there */
       function safeRoomName(val) {
         if(val.length < 1) return false;
@@ -99,86 +101,103 @@ define([
         return true;
       }
 
-      var ownerModel = this.selectedModel;
+      var ownerModel = self.selectedModel;
       if(!ownerModel) {
-        this.parentSelect.show();
+        self.parentSelect.show();
         return;
       }
 
-      var permissions = this.$el.find('input[type=radio]:visible:checked').val();
-      var channelName = this.ui.roomNameInput.val().trim();
+      var permissions = self.$el.find('input[type=radio]:visible:checked').val();
+      var channelName = self.ui.roomNameInput.val().trim();
       var url;
 
-      if(this.selectedOptionsRequireUpgrade()) {
+      if(self.selectedOptionsRequireUpgrade()) {
         return;
       }
+
+      var payload = { security: permissions.toUpperCase(), name: channelName };
+
+      var promise;
 
       switch(ownerModel.get('type')) {
         case 'user':
           if(permissions !== 'public' && permissions !== 'private') {
-            this.showValidationMessage('Please select the permissions for the room');
+            self.showValidationMessage('Please select the permissions for the room');
             // TODO: better error reporting!
             return;
           }
 
           if(permissions === 'public' && !channelName) {
-            this.showValidationMessage('You need to specify a room name');
-            this.ui.roomNameInput.focus();
+            self.showValidationMessage('You need to specify a room name');
+            self.ui.roomNameInput.focus();
             return;
           }
 
           if(channelName && !safeRoomName(channelName)) {
-            this.showValidationMessage('Please choose a channel name consisting of letter and number characters');
-            this.ui.roomNameInput.focus();
+            self.showValidationMessage('Please choose a channel name consisting of letter and number characters');
+            self.ui.roomNameInput.focus();
             return;
           }
 
-          url = "/api/v1/user/" + context.getUserId() + '/channels';
+          promise = apiClient.user.post('/channels', payload);
           break;
 
         case 'repo':
         case 'org':
           if(permissions !== 'public' && permissions !== 'private' && permissions != 'inherited') {
-            this.showValidationMessage('Please select the permissions for the room');
+            self.showValidationMessage('Please select the permissions for the room');
             // TODO: better error reporting!
             return;
           }
 
           if(!channelName || !safeRoomName(channelName)) {
-            this.showValidationMessage('Please choose a channel name consisting of letter and number characters');
-            this.ui.roomNameInput.focus();
+            self.showValidationMessage('Please choose a channel name consisting of letter and number characters');
+            self.ui.roomNameInput.focus();
             return;
           }
 
-          url = "/api/v1/rooms/" + ownerModel.get('id') + '/channels';
+
+          promise = apiClient.post("/v1/rooms/" + ownerModel.get('id') + '/channels', payload);
       }
 
-      $.ajax({
-        url: url,
-        contentType: "application/json",
-        dataType: "json",
-        type: "POST",
-        data: JSON.stringify({ security: permissions.toUpperCase(), name: channelName }),
-        context: this,
-        statusCode: {
-          400: function(data) {
-            if ($.parseJSON(data.responseText).illegalName) {
-              this.showValidationMessage('Please choose a channel name consisting of letter and number characters');
-              this.ui.roomNameInput.focus();
-            }
-          },
-          403: function() {
-            this.showValidationMessage('You don\'t have permission to create that room');
-          },
-          409: function() {
-            this.showValidationMessage('There is already a Github repository with that name');
-          }
-        },
-        success: function(data) {
-          this.dialog.hide();
+      promise
+        .then(function(data) {
+          self.dialog.hide();
           appEvents.trigger('navigation', data.url , 'chat#add', data.uri);
-        }
-      });
+        })
+        .fail(function(xhr) {
+          var response;
+          try {
+            response = JSON.parse(xhr.responseText);
+          } catch(e) {
+            // Ignore
+          }
+
+          var status = xhr.status;
+          var message = 'Unable to create channel';
+
+          switch(status) {
+            case 400:
+              if (response && response.illegalName) {
+                message = 'Please choose a channel name consisting of letter and number characters';
+                self.ui.roomNameInput.focus();
+              } else {
+                message = 'Validation failed';
+              }
+              break;
+
+            case 403:
+              message = 'You don\'t have permission to create that room';
+
+              self.showValidationMessage();
+              break;
+
+            case 409:
+              message = 'There is already a Github repository with that name';
+          }
+
+          self.showValidationMessage(message);
+        });
     },
 
     parentSelected: function(model, animated) {
@@ -336,19 +355,13 @@ define([
       }
 
       function checkForRepoExistence(repo, cb) {
-        $.ajax({
-          url: '/api/private/gh/repos/' + repo,
-          contentType: "application/json",
-          dataType: "json",
-          global: false, // Don't raise an error globally
-          type: "GET",
-          error: function() {
-            cb(false);
-          },
-          success: function() {
+        apiClient.priv.get('/gh/repos/' + repo)
+          .then(function() {
             cb(true);
-          }
-        });
+          })
+          .fail(function() {
+            cb(false);
+          });
       }
 
       function applyShowHides() {

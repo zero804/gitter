@@ -4,6 +4,7 @@ require([
   'utils/context',
   'views/app/chatIntegratedView',
   'views/app/headerView',
+  'components/apiClient',
   'cal-heatmap',
 
   'views/widgets/preload',      // No ref
@@ -11,12 +12,11 @@ require([
   'components/dozy',            // Sleep detection No ref
   'template/helpers/all',       // No ref
   'components/bug-reporting',   // No ref
-  'components/csrf',            // No ref
   'components/ajax-errors'      // No ref
 
 ], function($, Backbone, context,
     ChatIntegratedView,
-    HeaderView, CalHeatMap) {
+    HeaderView, apiClient, CalHeatMap) {
   "use strict";
 
   $(document).on("click", "a", function(e) {
@@ -33,22 +33,17 @@ require([
 
   $('#noindex').on("change", function() {
     var noindex = $('#noindex')[0].checked;
-    $.ajax({
-      type: 'PUT',
-      url: '/api/v1/rooms/' + context.troupe().id,
-      data: {
-        noindex: !noindex
-      },
-      success: function() {
+
+    apiClient.room.put('', { noindex: !noindex })
+      .then(function() {
         var msg = 'Room indexing disabled. The change will take effect the next time a search engine crawls this room.';
         $('#noindexStatus').html(!noindex ? msg : '');
-      },
-      error: function() {
+      })
+      .fail(function() {
         $('#noindexStatus').html('Oops, something went wrong. Reload and try again.');
-      }
-    });
+      });
   });
- 
+
 
   // When a user clicks an internal link, prevent it from opening in a new window
   $(document).on("click", "a.link", function(e) {

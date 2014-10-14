@@ -93,7 +93,7 @@ define(['underscore'], function(_) {
         // Ensure that both objects contain the same number of properties.
         if (result) {
           for (key in b) {
-            if (_.has(b, key) && !size--) break;
+            if (_.has(b, key) && !(size--)) break;
           }
           result = !size;
         }

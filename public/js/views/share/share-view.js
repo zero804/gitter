@@ -3,12 +3,13 @@ define([
   'jquery',
   'marionette',
   'utils/context',
+  'components/apiClient',
   'utils/social',
   'views/base',
   'utils/cdn',
   'hbs!./tmpl/share',
   'zeroclipboard'
-], function($, Marionette, context, social, TroupeViews, cdn, template, ZeroClipboard) {
+], function($, Marionette, context, apiClient, social, TroupeViews, cdn, template, ZeroClipboard) {
   "use strict";
 
   ZeroClipboard.config({ swfPath: cdn('repo/zeroclipboard/ZeroClipboard.swf') });
@@ -99,25 +100,14 @@ define([
       $btn.text('Sending...');
       btn.disabled = true;
 
-      $.ajax({
-        url: '/api/private/create-badge',
-        contentType: "application/json",
-        dataType: "json",
-        type: "POST",
-        data: JSON.stringify({
-          uri: context.troupe().get('uri')
-        }),
-        global: false,
-        context: this,
-        timeout: 45 * 1000,
-        error: function() {
+      apiClient.priv.post('/create-badge', { uri: context.troupe().get('uri') }, { global: false })
+        .then(function() {
+          $btn.text('Pull Request sent!');
+        })
+        .fail(function() {
           $btn.text('Failed. Try again?');
           btn.disabled = false;
-        },
-        success: function() {
-          $btn.text('Pull Request sent!');
-        }
-      });
+        });
     }
   });
 

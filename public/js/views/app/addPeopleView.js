@@ -1,5 +1,4 @@
 define([
-  'jquery',
   'marionette',
   'backbone',
   'cocktail',
@@ -11,7 +10,7 @@ define([
   'hbs!./tmpl/addPeopleItemView',
   'views/controls/typeahead',
   'views/behaviors/widgets'      // No ref
-], function($, Marionette, Backbone, cocktail, TroupeViews, context, apiClient, template, userSearchItemTemplate,
+], function(Marionette, Backbone, cocktail, TroupeViews, context, apiClient, template, userSearchItemTemplate,
   itemTemplate, Typeahead) {
   "use strict";
 
@@ -20,7 +19,7 @@ define([
   });
 
   var UserSearchCollection = Backbone.Collection.extend({
-    url: '/api/v1/user',
+    url: '/v1/user',
     model: UserSearchModel,
     parse: function (response) {
       return response.results;
@@ -155,11 +154,7 @@ define([
     },
 
     handleError: function (res, status, message) {
-      var json = res.responseJSON;
-      this.ui.loading.toggleClass('hide');
-      var m = json && json.message || message || 'Error';
-      this.showValidationMessage(m);
-      this.typeahead.clear();
+
     },
 
     /**
@@ -168,18 +163,13 @@ define([
      * m    BackboneModel - the user to be added to the room
      */
     addUserToRoom: function (m) {
-      this.ui.loading.toggleClass('hide');
-      $.ajax({
-        url: '/api/v1/rooms/' + context.getTroupeId()  + '/users',
-        contentType: "application/json",
-        dataType: "json",
-        type: "POST",
-        data: JSON.stringify({ username: m.get('username') }),
-        context: this,
-        timeout: 45 * 1000,
-        error: this.handleError,
-        success: function (res) {
-          this.ui.loading.toggleClass('hide');
+      var self = this;
+
+      self.ui.loading.toggleClass('hide');
+
+      apiClient.room.post('/users', { username: m.get('username') })
+        .then(function(res) {
+          self.ui.loading.toggleClass('hide');
           var user = res.user;
           m.set({
             added: !user.invited,
@@ -191,14 +181,21 @@ define([
             username: user.username
           });
 
-          this.collection.add(m);
-          this.typeahead.clear();
-        }
-      });
+          self.collection.add(m);
+          self.typeahead.clear();
+        })
+        .fail(function(xhr) {
+          var json = xhr.responseJSON;
+          self.ui.loading.toggleClass('hide');
+          var m = json && json.message || 'Error';
+          self.showValidationMessage(m);
+          self.typeahead.clear();
+        });
     },
 
     onRender: function () {
       var self = this;
+
       setTimeout(function() {
         self.ui.input.focus();
       }, 10);

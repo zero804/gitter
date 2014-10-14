@@ -20,6 +20,7 @@ var troupeEnv = {
   domain: nconf.get('web:domain'),
   baseServer: nconf.get('web:baseserver'),
   basePath: nconf.get('web:basepath'),
+  apiBasePath: nconf.get('web:apiBasePath'),
   homeUrl: nconf.get('web:homeurl'),
   badgeBaseUrl: nconf.get('web:badgeBaseUrl'),
   embedBaseUrl: nconf.get('web:embedBaseUrl'),
@@ -34,7 +35,7 @@ var troupeEnv = {
   logging: nconf.get("web:consoleLogging"),
   ravenUrl: nconf.get("errorReporting:clientRavenUrl"),
   websockets: {
-    fayeUrl: nconf.get('ws:fayeUrl') || "/faye",
+    fayeUrl: nconf.get('ws:fayeUrl'),
     options: {
       timeout: nconf.get('ws:fayeTimeout'),
       retry: nconf.get('ws:fayeRetry'),
@@ -55,7 +56,15 @@ exports.cdn = function(url, parameters) {
 exports.bootScript = function(url, parameters) {
   var options = parameters.hash;
 
-  var cdnFunc  = (options.skipCdn) ? function(a) { return '/' + a; } : cdn;
+  var cdnFunc;
+  if(options.skipCdn) {
+    cdnFunc = function(a) { return '/' + a; };
+  } else if(options.root) {
+    cdnFunc = function(a) { return options.root + a; };
+  } else {
+    cdnFunc = cdn;
+  }
+
   var skipCore = options.skipCore;
 
   var async    = 'async' in options ? options.async : true;
