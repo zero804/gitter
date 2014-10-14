@@ -42,6 +42,13 @@ module.exports = {
         });
       });
 
+      app.get('/about/teams', function(req, res, next) {
+        res.render('teams', {
+          socialMetadata: social.getMetadata(),
+          billingBaseUrl: nconf.get('web:billingBaseUrl')
+        });
+      });
+
       if (nconf.get('web:homeurl') !== '/') {
         app.get('/',
           function(req, res) {
