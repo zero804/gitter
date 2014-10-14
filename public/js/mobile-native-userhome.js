@@ -3,21 +3,11 @@ require([
   'views/userhome/userHomeView',
   'jquery',
   'utils/appevents',
+  'backbone',
   'components/cordova-navigate',
-  'log!mobile-native-userhome',
-  ], function(context, UserHomeView, $, appEvents, cordovaNavigate, log) {
+  'views/createRoom/confirmRepoRoomView',
+  ], function(context, UserHomeView, $, appEvents, Backbone, cordovaNavigate, confirmRepoRoomView) {
   "use strict";
-
-  $(document).on('app.version.mismatch', function() {
-    try {
-      if(window.applicationCache.status == 1) {
-        log('Attempting to update application cache');
-        window.applicationCache.update();
-      }
-    } catch(e) {
-      log('Unable to update application cache: ' + e, e);
-    }
-  });
 
   cordovaNavigate.setNativeToUserhome();
 
@@ -26,7 +16,13 @@ require([
       el: $('#content-frame')
     }).render();
 
-    appEvents.on('navigation', cordovaNavigate.navigate);
+    appEvents.on('navigation', function(url) {
+      if(url.indexOf('#') === 0) {
+        window.location.hash = url;
+      } else {
+        cordovaNavigate.navigate(url);
+      }
+    });
 
     $('html').removeClass('loading');
   }
@@ -45,5 +41,16 @@ require([
   } else {
     user.once('change', onContextLoad);
   }
+
+  var Router = Backbone.Router.extend({
+    routes: {
+      'confirm/*uri': function(uri) {
+        new confirmRepoRoomView.Modal({ uri: uri }).show();
+      }
+    }
+  });
+
+  new Router();
+  Backbone.history.start();
 
 });
