@@ -19,8 +19,6 @@ define([
 ], function ($, Marionette, context, appEvents, isMobile, troupeCollections, RoomCollectionView, SuggestedCollectionView, log, cocktail, KeyboardEventsMixin, template, CollectionWrapperViewTemplate, SearchView, ProfileView, OrgCollectionView) {
   "use strict";
 
-  console.debug('listening to init-search ====================');
-
   // Reply back to the child iframe
   appEvents.on('init-search', function (payload, evt) {
     var msg = { child_window_event: ['troupes', troupeCollections.troupes] };

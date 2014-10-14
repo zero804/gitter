@@ -15,7 +15,7 @@ define([
   var LocalRooms = Marionette.CollectionView.extend({
     initialize: function () {
       this.listenTo(this.model, 'change', function (m) {
-        console.debug('model changed inside LocalRooms');
+        // 'model changed inside LocalRooms'
       }.bind(this));
     }
   });
@@ -23,7 +23,7 @@ define([
   var ServerRooms = Marionette.CollectionView.extend({
     initialize: function () {
       this.listenTo(this.model, 'change', function (m) {
-        console.debug('model changed inside ServerRooms');
+        // 'model changed inside ServerRooms'
       }.bind(this));
     }
   });
@@ -43,21 +43,21 @@ define([
       }.bind(this));
 
       this.changeDebounce = multiDebounce({ }, function () {
-        console.debug('should fetch server messages');
+        // 'should fetch server messages'
         var text = this.model.get('searchTerm');
         this.collection.fetchSearch(text);
       }, this);
     },
 
     onItemviewSelected: function (childView, model) {
-      console.debug('SELECTED');
+      // 'SELECTED'
 
       this.chatCollection.fetchAtPoint({ aroundId: model.id }, {}, function () {
         try {
           this.chatView.scrollToChatId(model.id);
         } catch (e) {
           // TODO: do something with error? @suprememoocow
-          console.error(e.stack);
+          // e.stack
         }
       }, this);
       // window.alert('CLICKED');
@@ -94,10 +94,10 @@ define([
         this.showResults();
       }.bind(this));
 
-      console.debug('triggering init-search ====================');
+      // 'triggering init-search ====================');
       appEvents.triggerParent('init-search',  { init: true });
       appEvents.on('troupes', function(troupes) {
-        console.debug('Troupes:', troupes)
+        // .debug('Troupes:', troupes)
       });
 
       // TODO: create view for each region, with the searchView model
@@ -107,16 +107,16 @@ define([
     },
 
     handleChange: function (e) {
-      console.debug('setting searchTerm to:', e.target.value);
+      //.debug('setting searchTerm to:', e.target.value);
       this.model.set('searchTerm', e.target.value);
     },
 
     hideResults: function () {
-      console.debug('should hide search');
+      //.debug('should hide search');
     },
 
     showResults: function () {
-      console.debug('showResults() ====================');
+      //.debug('showResults() ====================');
 
       // render results in regions
       // this.localRooms.show(this.LocalRoomsView); // local rooms
