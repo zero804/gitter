@@ -82,6 +82,11 @@
       "from": "https://registry.npmjs.org/consolidate/-/consolidate-0.10.0.tgz",
       "resolved": "https://registry.npmjs.org/consolidate/-/consolidate-0.10.0.tgz"
     },
+    "cors": {
+      "version": "2.4.2",
+      "from": "cors@",
+      "resolved": "https://registry.npmjs.org/cors/-/cors-2.4.2.tgz"
+    },
     "csprng": {
       "version": "0.1.1",
       "from": "https://registry.npmjs.org/csprng/-/csprng-0.1.1.tgz",
