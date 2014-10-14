@@ -3,10 +3,12 @@ require([
   'views/userhome/userHomeView',
   'jquery',
   'utils/appevents',
+  'backbone',
   'components/cordova-navigate',
+  'views/createRoom/confirmRepoRoomView',
   'log!mobile-native-userhome',
   'components/csrf'             // No ref
-  ], function(context, UserHomeView, $, appEvents, cordovaNavigate, log) {
+  ], function(context, UserHomeView, $, appEvents, Backbone, cordovaNavigate, confirmRepoRoomView, log) {
   "use strict";
 
   $(document).on('app.version.mismatch', function() {
@@ -27,7 +29,13 @@ require([
       el: $('#content-frame')
     }).render();
 
-    appEvents.on('navigation', cordovaNavigate.navigate);
+    appEvents.on('navigation', function(url) {
+      if(url.indexOf('#') === 0) {
+        window.location.hash = url;
+      } else {
+        cordovaNavigate.navigate(url);
+      }
+    });
 
     $('html').removeClass('loading');
   }
@@ -46,5 +54,16 @@ require([
   } else {
     user.once('change', onContextLoad);
   }
+
+  var Router = Backbone.Router.extend({
+    routes: {
+      'confirm/*uri': function(uri) {
+        new confirmRepoRoomView.Modal({ uri: uri }).show();
+      }
+    }
+  });
+
+  new Router();
+  Backbone.history.start();
 
 });
