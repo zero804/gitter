@@ -23,6 +23,13 @@ define([
       });
   }
 
+  /**
+   * url: only used in gitter ios v1
+   * context: only used in gitter ios v1
+   * troupeId: used all versions of gitter ios, but only v2 uses it to trigger navigation
+   * url: only used in gitter ios v1
+   * title: used in all versions of gitter ios
+   */
   var updateNativeContext = function(url, context, troupeId, altContext, title) {
     cordova.exec(
       noop,
@@ -38,6 +45,7 @@ define([
     var id = troupe.get('id');
 
     if(id && name) {
+      // this wont break gitter ios v2 as the url param is never used.
       var url = window.location.origin + '/mobile/chat#' + id;
       var context = 'troupe';
       var altContext = 'chat';
@@ -55,7 +63,15 @@ define([
         if(err || !id) return;
 
         updateNativeContext(id, uri);
-        window.location.href = '/mobile/chat#' + id;
+
+        // DEPRECATED
+        // only gitter ios < v1 relies on this
+        // v2 navigates itself via updateNativeContext and the cordova context plugin
+        if(window.navigator.userAgent.indexOf('Gitter/1.') >= 0 ||
+           window.navigator.userAgent.indexOf('GitterBeta/1.') >= 0) {
+          // if you do this in gitter ios v2 and it 404s, things explode.
+          window.location.href = '/mobile/chat#' + id;
+        }
       });
     },
     syncNativeWithWebContext: function(troupe) {
