@@ -22,8 +22,6 @@ define([
   };
 
   window.addEventListener("message", function (e) {
-    console.debug('message', e.data);
-
 
     if (e.origin !== basePath) return;
     var data;

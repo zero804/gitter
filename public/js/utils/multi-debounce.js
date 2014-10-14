@@ -33,7 +33,6 @@ define([
     // this function is provided the event i.e. is an EventListener...
     return function (value) {
       mostRecent = value;
-      // console.log('mostRecent:', mostRecent);
       // if (mostRecent.length === 0) return;
       debounce();
 
