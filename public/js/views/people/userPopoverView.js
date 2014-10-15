@@ -108,7 +108,7 @@ define([
         name: displayName
       });
 
-      ghModel.url = '/api/private/gh/users/' + username;
+      ghModel.url = '/private/gh/users/' + username;
       ghModel.fetch();
 
       options.footerView = new UserPopoverFooterView({ model: ghModel });

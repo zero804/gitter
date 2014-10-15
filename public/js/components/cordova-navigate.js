@@ -62,7 +62,7 @@ define([
       getIdForUri(uri, function(err, id) {
         if(err || !id) return;
 
-        updateNativeContext(id, uri);
+        updateNativeContext(null, null, id, null, uri);
 
         // DEPRECATED
         // only gitter ios < v1 relies on this
