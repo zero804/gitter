@@ -9,8 +9,7 @@ require([
   'components/webNotifications',          // No ref
   'components/desktopNotifications',      // No ref
   'template/helpers/all',                 // No ref
-  'components/bug-reporting',             // No ref
-  'components/ajax-errors'                // No ref
+  'components/bug-reporting'              // No ref
 ], function(appEvents, context, Backbone, AppIntegratedView, TitlebarUpdater, log) {
   "use strict";
 

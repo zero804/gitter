@@ -21,9 +21,7 @@ require([
   'filtered-collection',        // No ref
   'components/dozy',            // Sleep detection No ref
   'template/helpers/all',       // No ref
-  'components/bug-reporting',   // No ref
-  'components/ajax-errors'      // No ref
-
+  'components/bug-reporting'    // No ref
 ], function($, Backbone, context,
     ChatIntegratedView,
     ChatCollectionView, itemCollections, RightToolbarView,

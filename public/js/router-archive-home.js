@@ -11,9 +11,7 @@ require([
   'filtered-collection',        // No ref
   'components/dozy',            // Sleep detection No ref
   'template/helpers/all',       // No ref
-  'components/bug-reporting',   // No ref
-  'components/ajax-errors'      // No ref
-
+  'components/bug-reporting'    // No ref
 ], function($, Backbone, context,
     ChatIntegratedView,
     HeaderView, apiClient, CalHeatMap) {
@@ -91,7 +89,7 @@ require([
     subDomain: "day",
     considerMissingDataAsZero: false,
     displayLegend: false,
-    data: '/api/private/chat-heatmap/' + troupeId + '?start={{d:start}}&end={{d:end}}',
+    data: apiClient.priv.url('/chat-heatmap/' + troupeId + '?start={{d:start}}&end={{d:end}}'),
     onClick: function(date, value) {
       if(!value) return;
 
