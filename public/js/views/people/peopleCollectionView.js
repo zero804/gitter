@@ -41,9 +41,9 @@ define([
     serializeData: function() {
       var remainingCount = this.userCollection.length - this.rosterCollection.length;
       return {
+        showAddBadge: context.isLoggedIn() && !context.inOneToOneTroupeContext(),
         remainingCount: remainingCount,
-        plural: remainingCount > 1,
-        isOneToOne: context.inOneToOneTroupeContext()
+        plural: remainingCount > 1
       };
     },
 
