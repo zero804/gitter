@@ -116,6 +116,11 @@ define([
   function operation(baseUrlFunction, method, defaultOptions, url, data, options) {
     options = defaults(options, defaultOptions);
 
+    // If we're doing a DELETE but have no data, unset the contentType
+    if(method === 'delete' && !data) {
+      delete options.contentType;
+    }
+
     var dataSerialized;
     if(options.contentType === JSON_MIME_TYPE) {
       dataSerialized = JSON.stringify(data);
