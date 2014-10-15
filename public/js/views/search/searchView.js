@@ -8,15 +8,43 @@ define([
   'views/chat/chatCollectionView',
   '../chat/chatItemView',
   'hbs!./tmpl/searchView',
+  'hbs!./tmpl/localRoomTemplate',
   'utils/multi-debounce',
-], function (appEvents, Marionette, _, itemCollections, ChatSearchModels, troupeCollections, chatCollectionView, ChatItemView, template, multiDebounce) {
+  'utils/text-filter'
+], function (appEvents, Marionette, _, itemCollections, ChatSearchModels, troupeCollections, chatCollectionView, ChatItemView, template, localRoomTemplate, multiDebounce, textFilter) {
   "use strict";
 
+  var LocalRoomView = Marionette.ItemView.extend({
+    template: localRoomTemplate
+  });
+
   var LocalRooms = Marionette.CollectionView.extend({
+
+    itemView: LocalRoomView,
+
     initialize: function () {
-      this.listenTo(this.model, 'change', function (m) {
-        // 'model changed inside LocalRooms'
+      this.collection = new Backbone.Collection([]);
+
+      appEvents.triggerParent('init-search',  { init: true });
+      appEvents.on('troupes', function(troupes) {
+        this.rooms = new Backbone.Collection(troupes.map(function(t) { return new Backbone.Model(t); }));
+        console.debug('rooms', this.rooms);
       }.bind(this));
+
+      this.listenTo(this.model, 'change', function (m) {
+        this.search(m.get('searchTerm'));
+      }.bind(this));
+    },
+
+    search: function(query) {
+      var bnc = multiDebounce({ }, function () {
+        var filter = textFilter({ query: query, fields: ['uri']});
+        var filtered = this.rooms.filter(filter);
+        console.debug('results:', filtered);
+        this.collection.add(filtered);
+        console.debug('collection', this.collection);
+      }, this);
+      bnc();
     }
   });
 
@@ -93,12 +121,6 @@ define([
       this.listenTo(this.model, 'change', function () {
         this.showResults();
       }.bind(this));
-
-      appEvents.triggerParent('troupeRequest',  { init: true });
-
-      appEvents.on('troupesResponse', function (troupes) {
-        // debug('Troupes:', troupes)
-      });
 
       // TODO: create view for each region, with the searchView model
       this.ServerMessagesView = new ServerMessages({ model: this.model });
