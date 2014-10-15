@@ -181,6 +181,10 @@ define([
 
   context.getAccessToken = function(callback) {
     var iterations = 0;
+    if(env.anonymous) {
+      return callback();
+    }
+
     function checkToken() {
       // This is a very rough first attempt
       var token = window.bearerToken || qs.bearerToken || ctx.accessToken;

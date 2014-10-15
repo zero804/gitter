@@ -295,9 +295,9 @@ define([
 
         var store = this._store;
 
-        var url = '/api/v1/user/' + userId + '/rooms/' + context.getTroupeId() + '/unreadItems';
+        var subscription = '/api/v1/user/' + userId + '/rooms/' + context.getTroupeId() + '/unreadItems';
 
-        realtime.subscribe(url, function(message) {
+        realtime.subscribe(subscription, function(message) {
           switch(message.notification) {
             // New unread items
             case 'unread_items':

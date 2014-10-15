@@ -124,7 +124,7 @@ UserSchema.methods.destroyTokens = function() {
 
 
 UserSchema.methods.getDisplayName = function() {
-  return this.displayName || this.username || this.email && this.email.split('@')[0] || "Unknown";
+  return this.displayName || this.username || "Unknown";
 };
 
 UserSchema.methods.getFirstName = function() {

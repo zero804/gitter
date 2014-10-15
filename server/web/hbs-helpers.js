@@ -113,11 +113,18 @@ exports.isMobile = function(agent, options) {
   return ((agent.match(/ipad/i)) ? options.fn(this) : null);
 };
 
+function createEnv(context, options) {
+  if(options) {
+    return _.extend({
+      lang: context.lang
+    }, troupeEnv, options);
+  }
+  return troupeEnv;
+}
 exports.generateEnv = function(parameters) {
   var options = parameters.hash;
-  var env = options ? _.extend({
-    lang: this.lang
-  }, troupeEnv, options) : troupeEnv;
+  var env = createEnv(this, options);
+
   return '<script type="text/javascript">' +
           'window.troupeEnv = ' + safeJson(JSON.stringify(env)) + ';' +
           '</script>';
@@ -126,9 +133,7 @@ exports.generateEnv = function(parameters) {
 exports.generateTroupeContext = function(troupeContext, parameters) {
   var options = parameters.hash;
 
-  var env = options ? _.extend({
-    lang: this.lang
-  }, troupeEnv, options) : troupeEnv;
+  var env = createEnv(this, options);
 
   /* Disable the use of CDNs if we're using the appcache as douchey appcache doesn't support CDN fetchs */
   if(options && options.appcache) {
