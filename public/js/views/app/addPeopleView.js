@@ -55,7 +55,7 @@ define([
         roomId: context.getTroupeId()
       };
 
-      apiClient.post('/api/private/invite-user', data)
+      apiClient.post('/private/invite-user', data)
         .then(function() {
           model.set({
             email: email,
