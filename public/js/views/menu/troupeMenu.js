@@ -20,8 +20,8 @@ define([
   "use strict";
 
   // Reply back to the child iframe
-  appEvents.on('init-search', function (payload, evt) {
-    var msg = { child_window_event: ['troupes', troupeCollections.troupes] };
+  appEvents.on('troupeRequest', function (payload, evt) {
+    var msg = { child_window_event: ['troupesResponse', troupeCollections.troupes] };
     evt.source.postMessage(JSON.stringify(msg), evt.origin);
   });
 
