@@ -295,7 +295,7 @@ define([
 
         var store = this._store;
 
-        var subscription = '/api/v1/user/' + userId + '/rooms/' + context.getTroupeId() + '/unreadItems';
+        var subscription = '/v1/user/' + userId + '/rooms/' + context.getTroupeId() + '/unreadItems';
 
         realtime.subscribe(subscription, function(message) {
           switch(message.notification) {
@@ -325,7 +325,7 @@ define([
           }
         });
 
-        realtime.registerForSnapshots(url, function(snapshot) {
+        realtime.registerForSnapshots(subscription, function(snapshot) {
           var lurk = snapshot._meta && snapshot._meta.lurk;
           if(lurk) {
             store.enableLurkMode();
