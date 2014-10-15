@@ -94,10 +94,10 @@ define([
         this.showResults();
       }.bind(this));
 
-      // 'triggering init-search ====================');
-      appEvents.triggerParent('init-search',  { init: true });
-      appEvents.on('troupes', function(troupes) {
-        // .debug('Troupes:', troupes)
+      appEvents.triggerParent('troupeRequest',  { init: true });
+
+      appEvents.on('troupesResponse', function (troupes) {
+        // debug('Troupes:', troupes)
       });
 
       // TODO: create view for each region, with the searchView model
