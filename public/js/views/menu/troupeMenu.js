@@ -75,7 +75,7 @@ define([
       profile: "#left-menu-profile",
       recent: "#list-recents",
       favs: "#list-favs",
-      search: "#left-menu-list-search",
+      // search: "#left-menu-list-search",
       orgs: "#left-menu-list-orgs",
       suggested: '#left-menu-list-suggested'
     },
@@ -106,12 +106,12 @@ define([
       // this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
       this.repoList = false;
       var self = this;
-      $(window).on('showSearch', function() {
-        self.showSearch();
-      });
-      $(window).on('hideSearch', function() {
-        self.hideSearch();
-      });
+      // $(window).on('showSearch', function() {
+      //   self.showSearch();
+      // });
+      // $(window).on('hideSearch', function() {
+      //   self.hideSearch();
+      // });
 
       this.selectedIndex = 0;
       // Keep track of conversation change to select the proper element
@@ -210,7 +210,7 @@ define([
     serializeData: function() {
       return {
         showFooterButtons: !isMobile(),
-        showSearch: !isMobile(),
+        // showSearch: !isMobile(),
         showExapandedHeader: isMobile()
       };
     },
@@ -238,8 +238,8 @@ define([
       }));
 
       // search results collection view
-      this.searchView = new SearchView({ troupes: troupeCollections.troupes, $input: this.$el.find('#list-search-input') });
-      this.search.show(this.searchView);
+      // this.searchView = new SearchView({ troupes: troupeCollections.troupes, $input: this.$el.find('#list-search-input') });
+      // this.search.show(this.searchView);
 
       // Organizations collection view
       this.orgs.show(new CollectionWrapperView({
@@ -255,28 +255,28 @@ define([
     },
 
     /* the clear icon shouldn't be available at all times? */
-    onSearchClearIconClick: function() {
-      $('#list-search-input').val('');
-      this.hideSearch();
-    },
+    // onSearchClearIconClick: function() {
+    //   $('#list-search-input').val('');
+    //   this.hideSearch();
+    // },
 
-    activateSearchList: function() {
-      this.$el.find('#list-search-input').focus();
-    },
+    // activateSearchList: function() {
+    //   this.$el.find('#list-search-input').focus();
+    // },
 
     toggleHeaderExpansion: function() {
       $('#left-menu-profile').toggleClass('menu-header--expanded');
     },
 
-    hideSearch: function() {
-      this.$el.find('#list-search').hide();
-      this.$el.find('#list-mega').show();
-    },
+    // hideSearch: function() {
+    //   this.$el.find('#list-search').hide();
+    //   this.$el.find('#list-mega').show();
+    // },
 
-    showSearch: function() {
-      this.$el.find('#list-mega').hide();
-      this.$el.find('#list-search').show();
-    }
+    // showSearch: function() {
+    //   this.$el.find('#list-mega').hide();
+    //   this.$el.find('#list-search').show();
+    // }
   });
 
   cocktail.mixin(View, KeyboardEventsMixin);
