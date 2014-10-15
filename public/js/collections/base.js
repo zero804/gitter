@@ -212,9 +212,7 @@ define([
       var url = _.result(this, 'url');
       if(!url) throw new Error('URL is required');
 
-      var actualChannel = '/api' + url;
-
-      this.subscription = realtime.subscribe(actualChannel, function(message) {
+      this.subscription = realtime.subscribe(url, function(message) {
         self._onDataChange(message);
       });
 
@@ -224,7 +222,7 @@ define([
 
       var stateProvider = this.getSnapshotState && getState;
 
-      realtime.registerForSnapshots(actualChannel, function(snapshot) {
+      realtime.registerForSnapshots(url, function(snapshot) {
         self.trigger('request');
         /**
          * Don't remove items from the collections, as there is a greater
@@ -257,7 +255,7 @@ define([
       }, stateProvider);
 
       this.subscription.errback(function(error) {
-        log('Subscription error for ' + actualChannel, error);
+        log('Subscription error for ' + url, error);
       });
     },
 
