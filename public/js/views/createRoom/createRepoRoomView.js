@@ -33,7 +33,7 @@ define([
       var uri = r.get('uri');
       var addBadge = this.ui.addBadge.prop('checked');
 
-      apiClient.post('/api/v1/rooms', { uri: uri, addBadge: addBadge })
+      apiClient.post('/v1/rooms', { uri: uri, addBadge: addBadge })
         .then(function() {
           self.dialog.hide();
           appEvents.trigger('navigation', '/' + uri, 'chat', uri, null);

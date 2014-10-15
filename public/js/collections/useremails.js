@@ -34,7 +34,7 @@ define([
     model: exports.UserEmailModel,
     modelName: 'useremail',
     url: function() {
-      return "/api/v1/user/" + context.getUserId() + "/emails";
+      return "/v1/user/" + context.getUserId() + "/emails";
     }
   });
 
