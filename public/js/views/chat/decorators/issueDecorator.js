@@ -97,7 +97,7 @@ define([
     idAttribute: "number",
     urlRoot: function() {
       var repo = this.get('repo');
-      return '/api/private/gh/repos/' + repo + '/issues/';
+      return '/private/gh/repos/' + repo + '/issues/';
     }
   });
 
