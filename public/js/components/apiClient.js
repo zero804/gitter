@@ -48,8 +48,9 @@
  */
 define([
   'jquery',
-  'utils/context'
-], function($, context) {
+  'utils/context',
+  'utils/appevents'
+], function($, context, appEvents) {
   "use strict";
 
   /* @const */
@@ -131,8 +132,10 @@ define([
 
     return accessTokenDeferred()
       .then(function(accessToken) {
-        return $.ajax({
-          url: makeFullUrl(baseUrlFunction, url),
+        var fullUrl = makeFullUrl(baseUrlFunction, url);
+
+        var deferred = $.ajax({
+          url: fullUrl,
           contentType: options.contentType,
           dataType: options.dataType,
           type: method,
@@ -145,9 +148,67 @@ define([
             'x-access-token': accessToken
           }
         });
+
+        /* Don't add this to the 'promise' chain */
+        deferred.fail(function(xhr) {
+          /* Asyncronously notify */
+          handleApiError(xhr, method, fullUrl);
+        });
+
+        return deferred;
       });
 
   }
+
+  // Minimize the number of different errors which are actually the same
+  // This is useful for Sentry http://app.getsentry.com
+  var routes = {
+    githubIssues: /^\/api\/private\/gh\/[^/]+\/[^/]+\/issues/,
+    githubUsers: /^\/api\/private\/gh\/users\//,
+  };
+
+  function findRouteForUrl(url) {
+    var r = Object.keys(routes);
+    for(var i = 0; i < r.length; i++) {
+      var routeName = r[i];
+      var re = routes[routeName];
+
+      if(re.test(url)) return routeName;
+    }
+  }
+
+  function handleApiError(xhr, method, url) {
+    var status = xhr.status;
+
+    var route = findRouteForUrl(url);
+
+    if(xhr.statusText == "error" && status === 404) {
+      /* Unreachable server */
+      appEvents.trigger('bugreport', 'ajaxError: unreachable: '+ method + ' ' + (route || url), {
+        tags: {
+          type: 'ajax',
+          subtype: 'unreachable',
+          url: url
+        }
+      });
+
+    } else if(status < 500) {
+      // 400 errors are the problem of the ajax caller, not the global handler
+      return;
+
+    } else {
+      appEvents.trigger('bugreport', 'ajaxError: HTTP ' + status + ' on ' + method + ' ' + (route || url), {
+        tags: {
+          type: 'ajax',
+          subtype: 'HTTP' + status,
+          url: url
+        }
+      });
+    }
+
+    appEvents.trigger('ajaxError');
+  }
+
 
   // Util functions
   function defaults(options, defaultValues) {
