@@ -1,3 +1,7 @@
+.u-uppercase {
+  text-transform: uppercase;
+}
+
 .search * { box-sizing: border-box; }
 
 .search {
@@ -22,6 +26,10 @@
   left: auto !important;
   width: 100% !important;
   height: 3 * 0.625em;
+}
+
+.search-header {
+  margin-left: 0.625em;
 }
 
 .result {
@@ -53,6 +61,7 @@
 }
 
 .result-content {
+  font-size: 0.8em; // I don't like changing the font-size base value but it seems we have no choice due to ellipsis
   float: left;
   margin-left: 0.625em;
   max-width: 238px;
@@ -60,11 +69,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-// .result-content p {
-//   text-overflow: ellipsis;
-//   white-space: nowrap;
-// }
 
 .btn { height: 30px; }
 .btn-primary { .btn; background-color: red; }

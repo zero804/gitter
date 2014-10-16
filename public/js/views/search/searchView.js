@@ -11,10 +11,11 @@ define([
   '../chat/chatItemView',
   'hbs!./tmpl/search',
   'hbs!./tmpl/result',
+  'utils/momentWrapper',
   'utils/text-filter',
   'utils/multi-debounce',
   'views/keyboard-events-mixin',
-], function (appEvents, Backbone, Marionette, _, cocktail, itemCollections, ChatSearchModels, troupeCollections, chatCollectionView, ChatItemView, searchTemplate, resultTemplate, textFilter, multiDebounce, KeyboardEventsMixin) {
+], function (appEvents, Backbone, Marionette, _, cocktail, itemCollections, ChatSearchModels, troupeCollections, chatCollectionView, ChatItemView, searchTemplate, resultTemplate, moment, textFilter, multiDebounce, KeyboardEventsMixin) {
   "use strict";
 
   var ResultView = Marionette.ItemView.extend({
@@ -37,6 +38,7 @@ define([
     serializeData: function () {
       var data = {};
       var uri = this.model.get('uri');
+      data.detail = this.model.get('githubType');
       data.text = uri;
       data.avatarUrl = 'https://avatars.githubusercontent.com/' + uri.split('/')[0] + '?s=50';
       return data;
@@ -59,6 +61,7 @@ define([
     serializeData: function () {
       var data = {};
       var model = this.model;
+      data.detail = model.get('fromUser').username + ' • ' + model.get('sent').fromNow();
       data.text = model.get('text');
       data.avatarUrl = model.get('fromUser').avatarUrlSmall;
       return data;
