@@ -1,34 +1,92 @@
 define([
   'utils/appevents',
+  'backbone',
   'marionette',
   'underscore',
+  'cocktail',
   'collections/instances/integrated-items',
   'collections/chat-search',
   'collections/instances/troupes',
   'views/chat/chatCollectionView',
   '../chat/chatItemView',
-  'hbs!./tmpl/searchView',
-  'hbs!./tmpl/localRoomTemplate',
+  'hbs!./tmpl/search',
+  'hbs!./tmpl/result',
+  'utils/text-filter',
   'utils/multi-debounce',
-  'utils/text-filter'
-], function (appEvents, Marionette, _, itemCollections, ChatSearchModels, troupeCollections, chatCollectionView, ChatItemView, template, localRoomTemplate, multiDebounce, textFilter) {
+  'views/keyboard-events-mixin',
+], function (appEvents, Backbone, Marionette, _, cocktail, itemCollections, ChatSearchModels, troupeCollections, chatCollectionView, ChatItemView, searchTemplate, resultTemplate, textFilter, multiDebounce, KeyboardEventsMixin) {
   "use strict";
 
-  var LocalRoomView = Marionette.ItemView.extend({
-    template: localRoomTemplate
+  var ResultView = Marionette.ItemView.extend({
+
+    events: {
+      'click': 'handleClick'
+    },
+
+    template: resultTemplate,
+    className: 'result',
+
+    handleClick: function (e) {
+      this.selectedItem(this.model, e);
+    }
   });
 
-  var LocalRooms = Marionette.CollectionView.extend({
+  var LocalResultView = ResultView.extend({
+    // className: 'result--rooms',
 
-    itemView: LocalRoomView,
+    serializeData: function () {
+      var data = {};
+      var uri = this.model.get('uri');
+      data.text = uri;
+      data.avatarUrl = 'https://avatars.githubusercontent.com/' + uri.split('/')[0] + '?s=50';
+      return data;
+    },
+
+    selectedItem: function (model) {
+      appEvents.trigger('navigation', model.get('url'), 'chat', name);
+    }
+  });
+
+  var ServerResultView = ResultView.extend({
+
+    // className: 'result--messages',
 
     initialize: function () {
-      this.collection = new Backbone.Collection([]);
+      this.chatCollection = itemCollections.chats;
+      this.chatView = chatCollectionView;
+    },
 
-      appEvents.triggerParent('init-search',  { init: true });
-      appEvents.on('troupes', function(troupes) {
+    serializeData: function () {
+      var data = {};
+      var model = this.model;
+      data.text = model.get('text');
+      data.avatarUrl = model.get('fromUser').avatarUrlSmall;
+      return data;
+    },
+
+    selectedItem: function (model) {
+      var id = model.get('id');
+
+      this.chatCollection.fetchAtPoint({ aroundId: id }, {}, function () {
+        try {
+          this.chatView.scrollToChatId(id);
+        } catch (e) {
+          // TODO: do something with error? @suprememoocow
+        }
+      }, this);
+    }
+  });
+
+  // local rooms results
+  var LocalRooms = Marionette.CollectionView.extend({
+
+    itemView: LocalResultView,
+
+    initialize: function () {
+
+      appEvents.triggerParent('troupeRequest',  { init: true });
+      appEvents.on('troupesResponse', function(troupes) {
         this.rooms = new Backbone.Collection(troupes.map(function(t) { return new Backbone.Model(t); }));
-        console.debug('rooms', this.rooms);
       }.bind(this));
 
       this.listenTo(this.model, 'change', function (m) {
@@ -40,31 +98,30 @@ define([
       var bnc = multiDebounce({ }, function () {
         var filter = textFilter({ query: query, fields: ['uri']});
         var filtered = this.rooms.filter(filter);
-        console.debug('results:', filtered);
-        this.collection.add(filtered);
-        console.debug('collection', this.collection);
+        this.collection = new Backbone.Collection(filtered);
       }, this);
+
       bnc();
     }
   });
 
-  var ServerRooms = Marionette.CollectionView.extend({
-    initialize: function () {
-      this.listenTo(this.model, 'change', function (m) {
-        // 'model changed inside ServerRooms'
-      }.bind(this));
-    }
-  });
+  // server rooms results
+  // var ServerRooms = Marionette.CollectionView.extend({
+  //   initialize: function () {
+  //     this.listenTo(this.model, 'change', function (m) {
+  //       // 'model changed inside ServerRooms'
+  //     }.bind(this));
+  //   }
+  // });
 
+  // messages results
   var ServerMessages = Marionette.CollectionView.extend({
 
-    itemView: ChatItemView.ChatItemView,
+    itemView: ServerResultView,
 
     initialize: function () {
 
       this.collection = new ChatSearchModels.ChatSearchCollection([], { });
-      this.chatCollection = itemCollections.chats;
-      this.chatView = chatCollectionView;
 
       this.listenTo(this.model, 'change', function (m) {
         this.changeDebounce(m.get('searchTerm'));
@@ -73,27 +130,15 @@ define([
       this.changeDebounce = multiDebounce({ }, function () {
         // 'should fetch server messages'
         var text = this.model.get('searchTerm');
+        if (!text) return;
         this.collection.fetchSearch(text);
       }, this);
-    },
-
-    onItemviewSelected: function (childView, model) {
-      // 'SELECTED'
-
-      this.chatCollection.fetchAtPoint({ aroundId: model.id }, {}, function () {
-        try {
-          this.chatView.scrollToChatId(model.id);
-        } catch (e) {
-          // TODO: do something with error? @suprememoocow
-          // e.stack
-        }
-      }, this);
-      // window.alert('CLICKED');
     }
   });
 
+  // search view
   var Layout = Marionette.Layout.extend({
-    template: template,
+    template: searchTemplate,
 
     className: 'search',
 
@@ -105,6 +150,10 @@ define([
       'localRooms': '.js-search-local-rooms',
       'serverRooms': '.js-search-server-rooms',
       'serverMessages': '.js-search-server-messages'
+    },
+
+    keyboardEvents: {
+      'focus.search': 'activateSearch'
     },
 
     events: {
@@ -124,7 +173,7 @@ define([
 
       // TODO: create view for each region, with the searchView model
       this.ServerMessagesView = new ServerMessages({ model: this.model });
-      this.ServerRoomsView = new ServerRooms({ model: this.model });
+      // this.ServerRoomsView = new ServerRooms({ model: this.model });
       this.LocalRoomsView = new LocalRooms({ model: this.model });
     },
 
@@ -137,63 +186,22 @@ define([
       //.debug('should hide search');
     },
 
+    activateSearch: function () {
+      var input = this.ui.input;
+      // if (input.is(':focus')) return alert('already focused');
+      input.focus();
+    },
+
     showResults: function () {
       //.debug('showResults() ====================');
 
       // render results in regions
-      // this.localRooms.show(this.LocalRoomsView); // local rooms
-      this.serverRooms.show(this.ServerMessagesView); // server chat messages
+      this.localRooms.show(this.LocalRoomsView); // local rooms
+      this.serverMessages.show(this.ServerMessagesView); // server chat messages
     }
   });
 
-  // FIXME DEPRECATED
-  var View = Marionette.CompositeView.extend({
-
-    itemViewContainer: '#search-results',
-
-    itemView: ChatItemView.ChatItemView,
-
-    template: template,
-
-    ui: {
-      input: '.js-search-input'
-    },
-
-    events: {
-      'cut @ui.input': 'changeDebounce',
-      'paste @ui.input': 'changeDebounce',
-      'change @ui.input': 'changeDebounce',
-      'input @ui.input': 'changeDebounce'
-    },
-
-    initialize: function () {
-      if (!this.options.chatView) throw new Error('You must provide a chatView');
-      this.bindUIElements(); // FIXME this is already called by default?
-
-      this.collection = new ChatSearchModels.ChatSearchCollection([], { });
-      this.chatCollection = itemCollections.chats;
-      this.chatView = chatCollectionView;
-
-      this.changeDebounce = multiDebounce({ }, function () {
-        var text = this.ui.input.val();
-        // search server - text messages
-        this.collection.fetchSearch(text);
-        // search server - rooms
-        // search local - rooms
-      }, this);
-    },
-
-    onItemviewSelected: function (childView, model) {
-      this.chatCollection.fetchAtPoint({ aroundId: model.id }, {}, function () {
-        try {
-          this.chatView.scrollToChatId(model.id);
-        } catch (e) {
-          // TODO: do something with error? @suprememoocow
-        }
-      }, this);
-      // window.alert('CLICKED');
-    }
-  });
+  cocktail.mixin(Layout, KeyboardEventsMixin);
 
   return Layout;
 });

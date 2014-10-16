@@ -57,9 +57,9 @@ define([
     },
 
     onKeySearchGo: function() {
-      this.navigateToCurrent();
-      this.$input.val('');
-      this.search('');
+      // this.navigateToCurrent();
+      // this.$input.val('');
+      // this.search('');
     },
 
     onKeySearchEscape: function() {

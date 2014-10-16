@@ -82,7 +82,7 @@ define([
 
     events: function() {
       var events = {
-        'click #search-clear-icon': 'onSearchClearIconClick'
+        // 'click #search-clear-icon': 'onSearchClearIconClick'
       };
 
       if(!isMobile()) {
@@ -145,7 +145,7 @@ define([
       }
     },
 
-    // WARNING THIS METHOD IS UNSAFE. Fix it
+    // FIXME: WARNING -> THIS METHOD IS UNSAFE.
     getIndexForId: function(id) {
       if (!id) return;
       var els = $('#recentTroupesList li');

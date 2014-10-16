@@ -32,7 +32,6 @@ define([
 
     toggleSearch: function () {
       // hide all regions and show/hide search...
-
     },
 
     initialize: function() {
@@ -54,8 +53,19 @@ define([
       this.activity.show(new ActivityStream({ collection: itemCollections.events }));
 
       // var chatSearchCollection = new chatSearchModels.ChatSearchCollection([], { });
+      this.searchView = new SearchView({});
+      // TODO, logic for hiding showing search
+      // this.listenTo(this.searchView.model, 'change', function (m) {
+      //   var el = $('#toolbar-top-content');
 
-      this.search.show(new SearchView({}));
+      //   if (m.get('searchTerm')) {
+      //     el.hide();
+      //   } else {
+      //     el.show();
+      //   }
+      // });
+
+      this.search.show(this.searchView);
 
       // this.searchView = .render();
 

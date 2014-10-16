@@ -523,6 +523,7 @@ define([
     },
 
     chatSelected: function() {
+      // this calls onSelected
       this.triggerMethod('selected', this.model);
     }
   });
