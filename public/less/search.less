@@ -38,11 +38,16 @@
   overflow: hidden;
   display: block;
   box-sizing: border-box;
-  padding: 0.3125em;
+  padding: 0.3125em 0.625em;
+  border-bottom: 1px solid rgb(230, 230, 230);
 }
 
 .result:hover {
   background-color: rgb(220, 220, 220);
+}
+
+.result:last-child {
+  border: none;
 }
 
 .result p {
