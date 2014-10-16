@@ -277,14 +277,9 @@ function addMissingGitterData(suggestionMap) {
 
   return findRooms(uris)
     .then(function(rooms) {
-
-      rooms
-        .filter(function(room) {
-          return !!room;
-        })
-        .forEach(function(room) {
-          suggestionMap[room.uri].room = room;
-        });
+      rooms.forEach(function(room) {
+        suggestionMap[room.uri].room = room;
+      });
     })
     .thenResolve(suggestionMap);
 }
