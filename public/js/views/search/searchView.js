@@ -18,7 +18,8 @@ define([
 ], function (appEvents, Backbone, Marionette, _, cocktail, itemCollections, ChatSearchModels, troupeCollections, chatCollectionView, ChatItemView, searchTemplate, resultTemplate, moment, textFilter, multiDebounce, KeyboardEventsMixin) {
   "use strict";
 
-  var ResultView = Marionette.ItemView.extend({
+  // Result Items Views
+  var ResultItemView = Marionette.ItemView.extend({
 
     events: {
       'click': 'handleClick'
@@ -32,8 +33,7 @@ define([
     }
   });
 
-  var LocalResultView = ResultView.extend({
-    // className: 'result--rooms',
+  var RoomResultItemView = ResultItemView.extend({
 
     serializeData: function () {
       var data = {};
@@ -49,9 +49,7 @@ define([
     }
   });
 
-  var ServerResultView = ResultView.extend({
-
-    // className: 'result--messages',
+  var MessageResultItemView = ResultItemView.extend({
 
     initialize: function () {
       this.chatCollection = itemCollections.chats;
@@ -80,14 +78,17 @@ define([
     }
   });
 
-  // local rooms results
-  var LocalRooms = Marionette.CollectionView.extend({
 
-    itemView: LocalResultView,
+
+  // local rooms results region
+  var RoomsCollectionView = Marionette.CollectionView.extend({
+
+    itemView: RoomResultItemView,
 
     initialize: function () {
       // request troupe from parents
       appEvents.triggerParent('troupeRequest', {});
+
       // once parent has loaded the rooms
       appEvents.on('troupesResponse', function (rooms) {
         this.rooms = new Backbone.Collection(rooms);
@@ -100,7 +101,7 @@ define([
 
     search: function (query) {
       var bnc = multiDebounce({ }, function () {
-        var filter = textFilter({ query: query, fields: ['uri']});
+        var filter = textFilter({ query: query, fields: ['uri'] });
         var filtered = this.rooms.filter(filter);
         this.collection = new Backbone.Collection(filtered);
       }, this);
@@ -109,19 +110,10 @@ define([
     }
   });
 
-  // server rooms results
-  // var ServerRooms = Marionette.CollectionView.extend({
-  //   initialize: function () {
-  //     this.listenTo(this.model, 'change', function (m) {
-  //       // 'model changed inside ServerRooms'
-  //     }.bind(this));
-  //   }
-  // });
+  // server messages results region
+  var MessagesCollectionView = Marionette.CollectionView.extend({
 
-  // messages results
-  var ServerMessages = Marionette.CollectionView.extend({
-
-    itemView: ServerResultView,
+    itemView: MessageResultItemView,
 
     initialize: function () {
 
@@ -140,24 +132,29 @@ define([
     }
   });
 
+
+
   // search view
-  var Layout = Marionette.Layout.extend({
+  var SearchView = Marionette.Layout.extend({
     template: searchTemplate,
 
     className: 'search',
 
     ui: {
+      results: '.js-search-results',
       input: '.js-search-input'
     },
 
     regions: {
-      'localRooms': '.js-search-local-rooms',
-      'serverRooms': '.js-search-server-rooms',
-      'serverMessages': '.js-search-server-messages'
+      rooms: '.js-search-rooms',
+      messages: '.js-search-messages',
     },
 
     keyboardEvents: {
-      'focus.search': 'activateSearch'
+      'focus.search': 'activate',
+      'search.prev': 'navigate',
+      'search.next': 'navigate',
+      'search.go': 'selectSearchItem'
     },
 
     events: {
@@ -168,44 +165,57 @@ define([
     },
 
     initialize: function () {
-
       this.model = new Backbone.Model({ searchTerm: '' });
 
-      this.listenTo(this.model, 'change', function () {
-        this.showResults();
-      }.bind(this));
+      this.listenTo(this.model, 'change:searchTerm', this.run);
 
-      // TODO: create view for each region, with the searchView model
-      this.ServerMessagesView = new ServerMessages({ model: this.model });
-      // this.ServerRoomsView = new ServerRooms({ model: this.model });
-      this.LocalRoomsView = new LocalRooms({ model: this.model });
+      // initialize the views
+      this.LocalRoomsView = new RoomsCollectionView({ model: this.model });
+      this.ServerMessagesView = new MessagesCollectionView({ model: this.model });
+      // this.activeView = this.LocalRoomsView;
+      // this.activeIndex = 0;
     },
 
     handleChange: function (e) {
-      //.debug('setting searchTerm to:', e.target.value);
       this.model.set('searchTerm', e.target.value);
     },
 
     hideResults: function () {
-      //.debug('should hide search');
+      this.ui.results.hide();
     },
 
-    activateSearch: function () {
+    activate: function () {
       var input = this.ui.input;
-      // if (input.is(':focus')) return alert('already focused');
+      if (input.is(':focus')) return/* alert('already focused')*/;
       input.focus();
     },
 
-    showResults: function () {
-      //.debug('showResults() ====================');
+    run: function (m, searchTerm) {
+      if (searchTerm) {
+        this.showResults();
+        this.triggerMethod('search:active');
+      } else {
+        this.hideResults();
+        this.triggerMethod('search:inactive');
+      }
+    },
 
-      // render results in regions
-      this.localRooms.show(this.LocalRoomsView); // local rooms
-      this.serverMessages.show(this.ServerMessagesView); // server chat messages
+    showResults: function () {
+      this.ui.results.show();
+      // render new results in regions
+      this.rooms.show(this.LocalRoomsView); // local rooms
+      this.messages.show(this.ServerMessagesView); // server chat messages
+    },
+
+    navigate: function () {
+    },
+
+    selectSearchItem: function () {
+      // trigger some sort of event
     }
   });
 
-  cocktail.mixin(Layout, KeyboardEventsMixin);
+  cocktail.mixin(SearchView, KeyboardEventsMixin);
 
-  return Layout;
+  return SearchView;
 });
