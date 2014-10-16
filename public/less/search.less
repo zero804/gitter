@@ -26,10 +26,15 @@
 
 .result {
   clear: both;
+  cursor: pointer;
   overflow: hidden;
   display: block;
   box-sizing: border-box;
   padding: 0.3125em;
+}
+
+.result:hover {
+  background-color: rgb(220, 220, 220);
 }
 
 .result p {
@@ -37,9 +42,10 @@
 }
 
 .result-avatar {
+  @size: 30px;
   float: left;
-  height: 50px;
-  width: 50px;
+  height: @size;
+  width: @size;
 }
 
 .result-avatar img {
@@ -49,14 +55,16 @@
 .result-content {
   float: left;
   margin-left: 0.625em;
-  max-width: 198px;
+  max-width: 238px;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.result-content p {
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+// .result-content p {
+//   text-overflow: ellipsis;
+//   white-space: nowrap;
+// }
 
 .btn { height: 30px; }
 .btn-primary { .btn; background-color: red; }

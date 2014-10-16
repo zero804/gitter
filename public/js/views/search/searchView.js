@@ -83,10 +83,11 @@ define([
     itemView: LocalResultView,
 
     initialize: function () {
-
-      appEvents.triggerParent('troupeRequest',  { init: true });
-      appEvents.on('troupesResponse', function(troupes) {
-        this.rooms = new Backbone.Collection(troupes.map(function(t) { return new Backbone.Model(t); }));
+      // request troupe from parents
+      appEvents.triggerParent('troupeRequest', {});
+      // once parent has loaded the rooms
+      appEvents.on('troupesResponse', function (rooms) {
+        this.rooms = new Backbone.Collection(rooms);
       }.bind(this));
 
       this.listenTo(this.model, 'change', function (m) {
@@ -94,7 +95,7 @@ define([
       }.bind(this));
     },
 
-    search: function(query) {
+    search: function (query) {
       var bnc = multiDebounce({ }, function () {
         var filter = textFilter({ query: query, fields: ['uri']});
         var filtered = this.rooms.filter(filter);
