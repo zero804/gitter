@@ -52,22 +52,19 @@ define([
       // Activity
       this.activity.show(new ActivityStream({ collection: itemCollections.events }));
 
-      // var chatSearchCollection = new chatSearchModels.ChatSearchCollection([], { });
+
+      // Search
       this.searchView = new SearchView({});
-      // TODO, logic for hiding showing search
-      // this.listenTo(this.searchView.model, 'change', function (m) {
-      //   var el = $('#toolbar-top-content');
-
-      //   if (m.get('searchTerm')) {
-      //     el.hide();
-      //   } else {
-      //     el.show();
-      //   }
-      // });
-
       this.search.show(this.searchView);
 
-      // this.searchView = .render();
+      // TODO, logic for hiding showing search
+      this.searchView.on("search:active", function () {
+        $('#toolbar-top-content').hide();
+      });
+
+      this.searchView.on("search:inactive", function () {
+        $('#toolbar-top-content').show();
+      });
 
       itemCollections.events.on('add reset sync', function() {
 

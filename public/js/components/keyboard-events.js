@@ -23,13 +23,14 @@ require([
   // - 'other' for the rest
   key.filter = function(event) {
     var scope, tag = event.target || event.srcElement;
+
     if (tag.getAttribute('data-prevent-keys') === 'on') {
       return false; // Prevent triggering
     }
     if (tag.id === 'chat-input-textarea') {
       scope = 'input.chat';
     }
-    else if (tag.id === 'list-search-input') {
+    else if (tag.id === 'list-search-input' || tag.classList.contains('js-search-input')) {
       scope = 'input.search';
     }
     else if (/^trpChatInput/.test(tag.className)) {
