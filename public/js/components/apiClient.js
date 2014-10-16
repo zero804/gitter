@@ -151,8 +151,10 @@ define([
 
         /* Don't add this to the 'promise' chain */
         deferred.fail(function(xhr) {
-          /* Asyncronously notify */
-          handleApiError(xhr, method, fullUrl);
+          if(options.global) {
+            /* Asyncronously notify */
+            handleApiError(xhr, method, fullUrl);
+          }
         });
 
         return deferred;
