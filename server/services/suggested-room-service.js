@@ -278,6 +278,12 @@ function addMissingGitterData(suggestionMap) {
   return findRooms(uris)
     .then(function(rooms) {
       rooms.forEach(function(room) {
+
+        // this lookup fails if the repo has been renamed
+        // this is a bad fix, as it means that we dont attach the room data to a suggestion
+        // so a user could be told to create a room that already exists.
+        if(!suggestionMap[room.uri]) return;
+
         suggestionMap[room.uri].room = room;
       });
     })
