@@ -1,20 +1,64 @@
+.search * { box-sizing: border-box; }
+
 .search {
-  @height: 71px;
-  box-sizing: border-box;
   font-size: 16px;
-  border-bottom: 1px solid rgb(230, 230, 230);
-  padding: 0 0.625em;
-  height: @height;
-  line-height: @height;
 }
 
-.search .search-input {
+.search-input {
+  box-sizing: border-box;
+  @height: 71px;
+  height: @height;
+  line-height: @height;
+  padding: 0 0.625em;
+  border-bottom: 1px solid rgb(230, 230, 230);
+}
+
+.search-input input {
   .trpBodyMedium;
   margin: 0;
   box-sizing: border-box;
-  overflow: auto;
-  top: auto;
-  left: auto;
-  width: 100%;
+  overflow: auto !important;
+  top: auto !important;
+  left: auto !important;
+  width: 100% !important;
   height: 3 * 0.625em;
 }
+
+.result {
+  clear: both;
+  overflow: hidden;
+  display: block;
+  box-sizing: border-box;
+  padding: 0.3125em;
+}
+
+.result p {
+  line-height: normal;
+}
+
+.result-avatar {
+  float: left;
+  height: 50px;
+  width: 50px;
+}
+
+.result-avatar img {
+  border-radius: 4px;
+}
+
+.result-content {
+  float: left;
+  margin-left: 0.625em;
+  max-width: 198px;
+  overflow: hidden;
+}
+
+.result-content p {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn { height: 30px; }
+.btn-primary { .btn; background-color: red; }
+
+// <a class='btn-primary'></a>
