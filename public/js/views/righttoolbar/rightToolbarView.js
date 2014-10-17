@@ -10,7 +10,7 @@ define([
   './repoInfo',
   './activity',
   'utils/scrollbar-detect'
-], function($, Marionette, context, itemCollections, chatSearchModels, PeopleCollectionView, chatCollectionView, SearchView, repoInfo, ActivityStream, hasScrollBars) {
+], function ($, Marionette, context, itemCollections, chatSearchModels, PeopleCollectionView, chatCollectionView, SearchView, repoInfo, ActivityStream, hasScrollBars) {
   "use strict";
 
   var RightToolbarLayout = Marionette.Layout.extend({
@@ -52,17 +52,16 @@ define([
       // Activity
       this.activity.show(new ActivityStream({ collection: itemCollections.events }));
 
-
       // Search
       this.searchView = new SearchView({});
       this.search.show(this.searchView);
 
       // TODO, logic for hiding showing search
-      this.searchView.on("search:active", function () {
+      this.searchView.on("search:show", function () {
         $('#toolbar-top-content').hide();
       });
 
-      this.searchView.on("search:inactive", function () {
+      this.searchView.on("search:hide", function () {
         $('#toolbar-top-content').show();
       });
 
