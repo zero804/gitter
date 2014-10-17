@@ -52,8 +52,14 @@ define([
   var MessageResultItemView = ResultItemView.extend({
 
     initialize: function () {
+      var self = this;
+
       this.chatCollection = itemCollections.chats;
       this.chatView = chatCollectionView;
+
+      appEvents.on('search:run', function (payload) {
+        self.selectedItem(payload.model);
+      });
     },
 
     serializeData: function () {
@@ -132,8 +138,6 @@ define([
     }
   });
 
-
-
   // search view
   var SearchView = Marionette.Layout.extend({
     template: searchTemplate,
@@ -172,8 +176,8 @@ define([
       // initialize the views
       this.LocalRoomsView = new RoomsCollectionView({ model: this.model });
       this.ServerMessagesView = new MessagesCollectionView({ model: this.model });
-      // this.activeView = this.LocalRoomsView;
-      // this.activeIndex = 0;
+
+      // TODO: unify these collections into one
     },
 
     handleChange: function (e) {
@@ -193,10 +197,10 @@ define([
     run: function (m, searchTerm) {
       if (searchTerm) {
         this.showResults();
-        this.triggerMethod('search:active');
+        this.triggerMethod('search:show');
       } else {
         this.hideResults();
-        this.triggerMethod('search:inactive');
+        this.triggerMethod('search:hide');
       }
     },
 
@@ -211,7 +215,8 @@ define([
     },
 
     selectSearchItem: function () {
-      // trigger some sort of event
+      debugger;
+      // appEvents.trigger('search:run', { model: this.activeView.collections.at(this.activeIndex) });
     }
   });
 
