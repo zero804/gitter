@@ -215,7 +215,6 @@ define([
     },
 
     selectSearchItem: function () {
-      debugger;
       // appEvents.trigger('search:run', { model: this.activeView.collections.at(this.activeIndex) });
     }
   });
