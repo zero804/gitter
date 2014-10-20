@@ -169,6 +169,9 @@ define([
       var rooms = new Backbone.FilteredCollection(null, { model: Backbone.Model, collection: this.collection });
       var chats = new Backbone.FilteredCollection(null, { model: Backbone.Model, collection: this.collection });
 
+      this._rooms = rooms;
+      this._chats = chats;
+
       rooms.setFilter(function (model) {
         return !!model.get('uri');
       });
@@ -224,7 +227,8 @@ define([
         var collection = new Backbone.Collection(rooms);
         var filter = textFilter({ query: self.model.get('searchTerm'), fields: ['uri'] });
         var filtered = collection.filter(filter);
-        self.collection.add(filtered, { merge: true });
+        self.collection.remove(self._rooms.models);     // remove previous results
+        self.collection.add(filtered, { merge: true }); // add new matches
       }.bind(this));
 
       // request troupe from parents
