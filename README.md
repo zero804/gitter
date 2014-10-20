@@ -79,3 +79,41 @@ Once you are sure the above is done, preform the following:
 2. `npm install`
 3. `make sprites`
 4. commit your changes and release!
+
+## Setting up ElasticSearch
+
+1. Install ElasticSearch 1.2.2
+  1. `cd $(brew --prefix)`
+  2. `git checkout 97e96ed /usr/local/Library/Formula/elasticsearch.rb`
+  3. `brew install elasticsearch`
+
+2. Install required ElasticSearch plugins
+  1. `/usr/local/Cellar/elasticsearch/1.2.2/bin/plugin  --install elasticsearch/elasticsearch-lang-javascript/2.4.0`
+  2. `/usr/local/Cellar/elasticsearch/1.2.2/bin/plugin   --install com.github.richardwilly98.elasticsearch/elasticsearch-river-mongodb/2.0.1`
+  3. `/usr/local/Cellar/elasticsearch/1.2.2/bin/plugin --install royrusso/elasticsearch-HQ`
+
+3. Start elasticsearch from the root of gitter-webapp: `./start-elasticsearch.sh`
+
+4. Ensure that your ansible repo is up-to-date: git@github.com:troupe/ansible.git
+
+5. In the ansible project, change directory to `roles/elasticsearch/files/elastic-config`
+
+6. Setup the mappings: `./01-create-index-with-mapping`
+
+7. Setup the rivers: `./02-create-rivers`
+
+8. Watch the elasticsearch logs for success, something like:
+
+```
+[2014-10-20 22:04:09,790][INFO ][cluster.metadata         ] [Brain-Child] [_river] update_mapping [gitterUserRiver] (dynamic)
+[2014-10-20 22:04:09,805][INFO ][org.elasticsearch.river.mongodb.Slurper] MongoDBRiver is beginning initial import of gitter.users
+[2014-10-20 22:04:09,810][INFO ][org.elasticsearch.river.mongodb.Slurper] Collection users - count: 8
+[2014-10-20 22:04:09,815][INFO ][org.elasticsearch.river.mongodb.Slurper] Number documents indexed: 8
+[2014-10-20 22:04:11,231][INFO ][org.elasticsearch.river.mongodb.MongoDBRiver] Starting river gitterChatRiver
+[2014-10-20 22:04:13,086][INFO ][org.elasticsearch.river.mongodb.Slurper] Collection chatmessages - count: 22903
+[2014-10-20 22:04:27,307][INFO ][org.elasticsearch.river.mongodb.Slurper] Number documents indexed: 21541
+```
+
+9. Log into HQ: http://localhost:9200/_plugin/HQ -> Connect 
+
+10. Check that there are lots of documents under the Gitter index.
