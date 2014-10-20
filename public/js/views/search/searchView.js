@@ -61,7 +61,7 @@ define([
     },
 
     selectedItem: function () {
-      console.debug('selectedItem() ====================');
+      //debug('selectedItem() ====================');
       appEvents.trigger('navigation', this.model.get('url'), 'chat', name);
     }
   });
@@ -79,7 +79,7 @@ define([
     },
 
     selectedItem: function () {
-      console.debug('selectedItem() ====================');
+      //debug('selectedItem() ====================');
       var id = this.model.get('id');
 
       itemCollections.chats.fetchAtPoint({ aroundId: id }, {}, function () {
@@ -105,7 +105,7 @@ define([
   var SearchNavigationController = Marionette.Controller.extend({
 
     initialize: function (options) {
-      console.debug('SearchNavigationController.initialize() ====================');
+      //debug('SearchNavigationController.initialize() ====================');
       this.collection = options.collection;
 
       // if the collection has changed we need to reset our selection
@@ -115,36 +115,36 @@ define([
     },
 
     swap: function (model) {
-      // console.debug('swap() ====================');
+      // //debug('swap() ====================');
       if (this.selected) this.selected.set('selected', false);
       model.set('selected', true);
       this.selected = model;
     },
 
     next: function () {
-      // console.debug('next() ====================');
+      // //debug('next() ====================');
       var index = this.collection.indexOf(this.selected);
 
       if (index < this.collection.length - 1) {
         this.swap(this.collection.at(index + 1 ));
       }
 
-      // console.debug('new index:', this.collection.indexOf(this.selected));
+      // //debug('new index:', this.collection.indexOf(this.selected));
     },
 
     prev: function () {
-      // console.debug('prev() ====================');
+      // //debug('prev() ====================');
       var index = this.collection.indexOf(this.selected);
 
       if (index > 0) {
         this.swap(this.collection.at(index - 1));
       }
 
-      // console.debug('new index:', this.collection.indexOf(this.selected));
+      // //debug('new index:', this.collection.indexOf(this.selected));
     },
 
     current: function () {
-      // console.debug('current() ====================');
+      // //debug('current() ====================');
       return this.selected;
     },
 
@@ -196,8 +196,8 @@ define([
       this._chats = chats;
 
       this.listenTo(this.collection, 'remove', function () {
-        console.debug('collection:remove() ====================');
-        console.debug('this.collection.length:', this.collection.length);
+        //debug('collection:remove() ====================');
+        //debug('this.collection.length:', this.collection.length);
       });
 
       rooms.setFilter(function (model) {
@@ -236,7 +236,7 @@ define([
     },
 
     run: function (/*model, searchTerm*/) {
-      console.debug('run() ====================');
+      //debug('run() ====================');
       if (this.isEmpty()) {
         this.hideResults();
         this.collection.reset();
@@ -257,13 +257,13 @@ define([
 
       // once parent has loaded the rooms
       appEvents.once('troupesResponse', function (rooms) {
-        console.debug('troupesResponse() ====================');
+        //debug('troupesResponse() ====================');
         var collection = new Backbone.Collection(rooms);
         var filter = textFilter({ query: self.model.get('searchTerm'), fields: ['uri'] });
         var filtered = collection.filter(filter);
-        // console.debug('about to remove() ====================');
+        // //debug('about to remove() ====================');
         // self.collection.remove(self._rooms.models);
-        // console.debug('about to add() ====================');
+        // //debug('about to add() ====================');
         self.collection.add(filtered, { at: 0, merge: true }); // add new matches
       }.bind(this));
 
@@ -301,9 +301,9 @@ define([
     handleGo: function () {
       if (this.isEmpty()) return;
       var selectedItem = this.navigation.current();
-      console.debug('selectedItem:', selectedItem);
+      //debug('selectedItem:', selectedItem);
       selectedItem.trigger('search:selected');
-      console.debug('should submit action at index', selectedItem.get('uri') || selectedItem.get('text'), selectedItem.get('selected'));
+      //debug('should submit action at index', selectedItem.get('uri') || selectedItem.get('text'), selectedItem.get('selected'));
     }
   });
 
