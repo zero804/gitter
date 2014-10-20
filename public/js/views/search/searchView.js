@@ -20,8 +20,9 @@ define([
 
   // Result Items Views
   var ResultItemView = Marionette.ItemView.extend({
+
     events: {
-      'click': 'selectedItem'
+      'click': 'handleClick'
     },
 
     template: resultTemplate,
@@ -31,10 +32,19 @@ define([
     initialize: function () {
       var model = this.model;
       this.$el.toggleClass('selected', !!model.get('selected')); // checks
+
+      this.listenTo(model, 'search:selected', function () {
+        this.handleClick();
+      }.bind(this));
+
       this.listenTo(model, 'change', function (model) {
         this.$el.toggleClass('selected', !!model.get('selected'));
         // scroll into view if needed
       });
+    },
+
+    handleClick: function () {
+      this.selectedItem();
     }
   });
 
@@ -51,8 +61,8 @@ define([
     },
 
     selectedItem: function () {
-      //debug('selectedItem() ====================');
-      appEvents.trigger('navigation', this.get('url'), 'chat', name);
+      console.debug('selectedItem() ====================');
+      appEvents.trigger('navigation', this.model.get('url'), 'chat', name);
     }
   });
 
@@ -69,8 +79,8 @@ define([
     },
 
     selectedItem: function () {
-      //debug('selectedItem() ====================');
-      var id = this.get('id');
+      console.debug('selectedItem() ====================');
+      var id = this.model.get('id');
 
       itemCollections.chats.fetchAtPoint({ aroundId: id }, {}, function () {
         try {
@@ -95,51 +105,51 @@ define([
   var SearchNavigationController = Marionette.Controller.extend({
 
     initialize: function (options) {
+      console.debug('SearchNavigationController.initialize() ====================');
       this.collection = options.collection;
-      this.selected = null;
 
       // if the collection has changed we need to reset our selection
-      this.listenTo(this.collection, 'add remove', function () {
-        this.swap(this.collection.at(0));
+      this.listenTo(this.collection, 'add remove', function (model) {
+       this.swap(this.collection.at(0));
       });
     },
 
     swap: function (model) {
-      //debug('swap() ====================');
+      // console.debug('swap() ====================');
       if (this.selected) this.selected.set('selected', false);
       model.set('selected', true);
       this.selected = model;
     },
 
     next: function () {
-      //debug('next() ====================');
+      // console.debug('next() ====================');
       var index = this.collection.indexOf(this.selected);
 
       if (index < this.collection.length - 1) {
         this.swap(this.collection.at(index + 1 ));
       }
 
-      //debug('new index:', this.collection.indexOf(this.selected));
+      // console.debug('new index:', this.collection.indexOf(this.selected));
     },
 
     prev: function () {
-      //debug('prev() ====================');
+      // console.debug('prev() ====================');
       var index = this.collection.indexOf(this.selected);
 
       if (index > 0) {
         this.swap(this.collection.at(index - 1));
       }
 
-      //debug('new index:', this.collection.indexOf(this.selected));
+      // console.debug('new index:', this.collection.indexOf(this.selected));
     },
 
     current: function () {
-      //debug('current() ====================');
+      // console.debug('current() ====================');
       return this.selected;
     },
 
     reset: function () {
-      this.index = 0;
+      this.selected = this.collection.at(0);
     }
   });
 
@@ -185,6 +195,11 @@ define([
       this._rooms = rooms;
       this._chats = chats;
 
+      this.listenTo(this.collection, 'remove', function () {
+        console.debug('collection:remove() ====================');
+        console.debug('this.collection.length:', this.collection.length);
+      });
+
       rooms.setFilter(function (model) {
         return !!model.get('uri');
       });
@@ -193,12 +208,12 @@ define([
         return !!model.get('text');
       });
 
-      this.navigation = new SearchNavigationController({ collection: this.collection });
+      this.navigation = new SearchNavigationController({ collection: this.collection, rooms: this._rooms });
 
       // initialize the views
       this.localRoomsView = new RoomsCollectionView({ collection: rooms });
       this.serverMessagesView = new MessagesCollectionView({ collection: chats });
-      this.debouncedLocalSearch =  _.debounce(this.localSearch.bind(this), 10);
+      this.debouncedLocalSearch =  _.debounce(this.localSearch.bind(this), 250);
       this.debouncedRemoteSearch = _.debounce(this.remoteSearch.bind(this), 250);
     },
 
@@ -221,12 +236,13 @@ define([
     },
 
     run: function (/*model, searchTerm*/) {
-      //debug('run() ====================');
+      console.debug('run() ====================');
       if (this.isEmpty()) {
         this.hideResults();
         this.collection.reset();
         this.triggerMethod('search:hide');
       } else {
+        // this.collection.reset();
         this.debouncedLocalSearch();
         this.debouncedRemoteSearch();
         this.showResults();
@@ -234,15 +250,21 @@ define([
       }
     },
 
-    localSearch: function() {
+    localSearch: function () {
       var self = this;
+      // self.collection.remove(self._rooms.models);
+      // self._rooms.resetCollection(); // we must clear the current collection
+
       // once parent has loaded the rooms
       appEvents.once('troupesResponse', function (rooms) {
+        console.debug('troupesResponse() ====================');
         var collection = new Backbone.Collection(rooms);
         var filter = textFilter({ query: self.model.get('searchTerm'), fields: ['uri'] });
         var filtered = collection.filter(filter);
-        self.collection.remove(self._rooms.models);     // remove previous results
-        self.collection.add(filtered, { merge: true }); // add new matches
+        // console.debug('about to remove() ====================');
+        // self.collection.remove(self._rooms.models);
+        // console.debug('about to add() ====================');
+        self.collection.add(filtered, { at: 0, merge: true }); // add new matches
       }.bind(this));
 
       // request troupe from parents
@@ -279,7 +301,9 @@ define([
     handleGo: function () {
       if (this.isEmpty()) return;
       var selectedItem = this.navigation.current();
-      //debug('should submit action at index', selectedItem.get('uri') || selectedItem.get('text'), selectedItem.get('selected'));
+      console.debug('selectedItem:', selectedItem);
+      selectedItem.trigger('search:selected');
+      console.debug('should submit action at index', selectedItem.get('uri') || selectedItem.get('text'), selectedItem.get('selected'));
     }
   });
 
