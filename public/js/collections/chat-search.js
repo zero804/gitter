@@ -46,10 +46,10 @@ define([
       return collection;
     },
 
-    fetchSearch: function(queryText) {
+    fetchSearch: function(queryText, callback, context) {
       this.queryText = queryText;
       this.atBottom = false; // TODO: make this nicer
-      this.fetchLatest({ });
+      this.fetchLatest({ }, callback, context);
     }
   });
 
