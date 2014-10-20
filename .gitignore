@@ -44,3 +44,4 @@ heapdump-*.heapsnapshot
 ASSET_TAG
 public-compile-cache
 public/styles
+chats.json
