@@ -20,11 +20,22 @@ define([
 
   // Result Items Views
   var ResultItemView = Marionette.ItemView.extend({
-    modelEvents: {
+    events: {
       'click': 'selectedItem'
     },
+
     template: resultTemplate,
+
     className: 'result',
+
+    initialize: function () {
+      var model = this.model;
+      this.$el.toggleClass('selected', !!model.get('selected')); // checks
+      this.listenTo(model, 'change', function (model) {
+        this.$el.toggleClass('selected', !!model.get('selected'));
+        // scroll into view if needed
+      });
+    }
   });
 
   var RoomResultItemView = ResultItemView.extend({
@@ -32,45 +43,38 @@ define([
     serializeData: function () {
       var data = {};
       var uri = this.model.get('uri');
+      data.selected = this.model.get('selected');
       data.detail = this.model.get('githubType');
       data.text = uri;
       data.avatarUrl = 'https://avatars.githubusercontent.com/' + uri.split('/')[0] + '?s=50';
       return data;
     },
 
-    selectedItem: function (model) {
-      appEvents.trigger('navigation', model.get('url'), 'chat', name);
+    selectedItem: function () {
+      //debug('selectedItem() ====================');
+      appEvents.trigger('navigation', this.get('url'), 'chat', name);
     }
   });
 
   var MessageResultItemView = ResultItemView.extend({
 
-    initialize: function () {
-      var self = this;
-
-      this.chatCollection = itemCollections.chats;
-      this.chatView = chatCollectionView;
-
-      appEvents.on('search:run', function (payload) {
-        self.selectedItem(payload.model);
-      });
-    },
-
     serializeData: function () {
       var data = {};
       var model = this.model;
+      data.selected = model.get('selected');
       data.detail = model.get('fromUser').username + ' • ' + model.get('sent').fromNow();
       data.text = model.get('text');
       data.avatarUrl = model.get('fromUser').avatarUrlSmall;
       return data;
     },
 
-    selectedItem: function (model) {
-      var id = model.get('id');
+    selectedItem: function () {
+      //debug('selectedItem() ====================');
+      var id = this.get('id');
 
-      this.chatCollection.fetchAtPoint({ aroundId: id }, {}, function () {
+      itemCollections.chats.fetchAtPoint({ aroundId: id }, {}, function () {
         try {
-          this.chatView.scrollToChatId(id);
+          chatCollectionView.scrollToChatId(id);
         } catch (e) {
           // TODO: do something with error? @suprememoocow
         }
@@ -91,37 +95,46 @@ define([
   var SearchNavigationController = Marionette.Controller.extend({
 
     initialize: function (options) {
-      // FIXME: When this becomes a Backbone collection make sure to update the other methods.
       this.collection = options.collection;
-      this.selected = this.collection.at(0);
+      this.selected = null;
+
+      // if the collection has changed we need to reset our selection
+      this.listenTo(this.collection, 'add remove', function () {
+        this.swap(this.collection.at(0));
+      });
     },
 
     swap: function (model) {
-      this.selected.set('active', false);
-      this.selected = model.set('active', true);
+      //debug('swap() ====================');
+      if (this.selected) this.selected.set('selected', false);
+      model.set('selected', true);
+      this.selected = model;
     },
 
     next: function () {
-      console.debug('next() ====================');
+      //debug('next() ====================');
       var index = this.collection.indexOf(this.selected);
 
       if (index < this.collection.length - 1) {
-        this.swap(index + 1);
+        this.swap(this.collection.at(index + 1 ));
       }
-      console.debug('this.index:', index);
+
+      //debug('new index:', this.collection.indexOf(this.selected));
     },
 
     prev: function () {
-      console.debug('prev() ====================');
+      //debug('prev() ====================');
       var index = this.collection.indexOf(this.selected);
+
       if (index > 0) {
-        this.swap(index - 1);
+        this.swap(this.collection.at(index - 1));
       }
-      console.debug('this.index:', index);
+
+      //debug('new index:', this.collection.indexOf(this.selected));
     },
 
     current: function () {
-      console.debug('current() ====================');
+      //debug('current() ====================');
       return this.selected;
     },
 
@@ -204,7 +217,8 @@ define([
       input.focus();
     },
 
-    run: function (model, searchTerm) {
+    run: function (/*model, searchTerm*/) {
+      //debug('run() ====================');
       if (this.isEmpty()) {
         this.hideResults();
         this.collection.reset();
@@ -261,7 +275,7 @@ define([
     handleGo: function () {
       if (this.isEmpty()) return;
       var selectedItem = this.navigation.current();
-      console.debug('should submit action at index', selectedItem);
+      //debug('should submit action at index', selectedItem.get('uri') || selectedItem.get('text'), selectedItem.get('selected'));
     }
   });
 
