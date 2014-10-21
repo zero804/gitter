@@ -42,7 +42,7 @@ define([
 
       this.listenTo(model, 'change:selected', function (m, selected) {
         this.$el.toggleClass('selected', !!selected);
-        // TODO: scroll m into view?
+        // FIXME: scroll m into view?
       });
     },
 
@@ -119,6 +119,7 @@ define([
 
     // unselects old and selects new
     swap: function (model) {
+
       if (!model) return;
       if (this.selected) this.selected.set('selected', false);
       model.set('selected', true);
@@ -139,7 +140,9 @@ define([
       return this.selected;
     },
 
-    reset: this.swap.bind(this, this.collection.at(0))
+    reset: function () {
+      this.swap(this.collection.at(0));
+    }
   });
 
   var SearchView = Marionette.Layout.extend({
