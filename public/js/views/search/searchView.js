@@ -6,16 +6,13 @@ define([
   'cocktail',
   'collections/instances/integrated-items',
   'collections/chat-search',
-  'collections/instances/troupes',
   'views/chat/chatCollectionView',
-  '../chat/chatItemView',
   'hbs!./tmpl/search',
   'hbs!./tmpl/result',
-  'utils/momentWrapper',
   'utils/text-filter',
   'utils/multi-debounce',
   'views/keyboard-events-mixin',
-], function (appEvents, Backbone, Marionette, _, cocktail, itemCollections, ChatSearchModels, troupeCollections, chatCollectionView, ChatItemView, searchTemplate, resultTemplate, moment, textFilter, multiDebounce, KeyboardEventsMixin) {
+], function (appEvents, Backbone, Marionette, _, cocktail, itemCollections, ChatSearchModels, chatCollectionView, searchTemplate, resultTemplate, textFilter, multiDebounce, KeyboardEventsMixin) {
   "use strict";
 
   // Result Items Views
@@ -31,15 +28,16 @@ define([
 
     initialize: function () {
       var model = this.model;
-      this.$el.toggleClass('selected', !!model.get('selected')); // checks
+      this.$el.toggleClass('selected', !!model.get('selected')); // checks if it is selected
 
+      // this handles "enter"
       this.listenTo(model, 'search:selected', function () {
-        this.handleClick();
+        this.selectedItem();
       }.bind(this));
 
-      this.listenTo(model, 'change', function (model) {
-        this.$el.toggleClass('selected', !!model.get('selected'));
-        // scroll into view if needed
+      this.listenTo(model, 'change:selected', function (m, selected) {
+        this.$el.toggleClass('selected', !!selected);
+        // TODO: scroll m into view?
       });
     },
 
@@ -61,7 +59,6 @@ define([
     },
 
     selectedItem: function () {
-      //debug('selectedItem() ====================');
       appEvents.trigger('navigation', this.model.get('url'), 'chat', name);
     }
   });
@@ -95,61 +92,50 @@ define([
   // local rooms results region
   var RoomsCollectionView = Marionette.CollectionView.extend({
     itemView: RoomResultItemView
+    // TODO: emptyView - results?
   });
 
   // server messages results region
   var MessagesCollectionView = Marionette.CollectionView.extend({
     itemView: MessageResultItemView
+    // TODO: emptyView - results?
   });
 
+  // we need this to centralize the control of navigation, can take any collection :)
   var SearchNavigationController = Marionette.Controller.extend({
 
     initialize: function (options) {
-      //debug('SearchNavigationController.initialize() ====================');
       this.collection = options.collection;
 
-      // if the collection has changed we need to reset our selection
+      // ensures the first result is selected
       this.listenTo(this.collection, 'add remove', function (model) {
-       this.swap(this.collection.at(0));
+        this.reset();
       });
     },
 
+    // we have to unselect and select a new model
     swap: function (model) {
-      // //debug('swap() ====================');
       if (this.selected) this.selected.set('selected', false);
       model.set('selected', true);
       this.selected = model;
     },
 
     next: function () {
-      // //debug('next() ====================');
       var index = this.collection.indexOf(this.selected);
-
-      if (index < this.collection.length - 1) {
-        this.swap(this.collection.at(index + 1 ));
-      }
-
-      // //debug('new index:', this.collection.indexOf(this.selected));
+      if (index < this.collection.length - 1) this.swap(this.collection.at(index + 1 ));
     },
 
     prev: function () {
-      // //debug('prev() ====================');
       var index = this.collection.indexOf(this.selected);
-
-      if (index > 0) {
-        this.swap(this.collection.at(index - 1));
-      }
-
-      // //debug('new index:', this.collection.indexOf(this.selected));
+      if (index > 0) this.swap(this.collection.at(index - 1));
     },
 
     current: function () {
-      // //debug('current() ====================');
       return this.selected;
     },
 
     reset: function () {
-      this.selected = this.collection.at(0);
+      this.swap(this.collection.at(0));
     }
   });
 
@@ -192,14 +178,6 @@ define([
       var rooms = new Backbone.FilteredCollection(null, { model: Backbone.Model, collection: this.collection });
       var chats = new Backbone.FilteredCollection(null, { model: Backbone.Model, collection: this.collection });
 
-      this._rooms = rooms;
-      this._chats = chats;
-
-      this.listenTo(this.collection, 'remove', function () {
-        //debug('collection:remove() ====================');
-        //debug('this.collection.length:', this.collection.length);
-      });
-
       rooms.setFilter(function (model) {
         return !!model.get('uri');
       });
@@ -208,21 +186,22 @@ define([
         return !!model.get('text');
       });
 
-      this.navigation = new SearchNavigationController({ collection: this.collection, rooms: this._rooms });
+      this._rooms = rooms;
+      this._chats = chats;
+      this.navigation = new SearchNavigationController({
+        collection: this.collection,
+        rooms: this._rooms
+      });
 
       // initialize the views
       this.localRoomsView = new RoomsCollectionView({ collection: rooms });
       this.serverMessagesView = new MessagesCollectionView({ collection: chats });
-      this.debouncedLocalSearch =  _.debounce(this.localSearch.bind(this), 250);
+      this.debouncedLocalSearch =  _.debounce(this.localSearch.bind(this), 50);
       this.debouncedRemoteSearch = _.debounce(this.remoteSearch.bind(this), 250);
     },
 
     isEmpty: function () {
       return !this.model.get('searchTerm');
-    },
-
-    handleChange: function (e) {
-      this.model.set('searchTerm', e.target.value.trim());
     },
 
     hideResults: function () {
@@ -236,13 +215,12 @@ define([
     },
 
     run: function (/*model, searchTerm*/) {
-      //debug('run() ====================');
       if (this.isEmpty()) {
         this.hideResults();
         this.collection.reset();
         this.triggerMethod('search:hide');
       } else {
-        // this.collection.reset();
+        this.collection.reset();
         this.debouncedLocalSearch();
         this.debouncedRemoteSearch();
         this.showResults();
@@ -251,40 +229,38 @@ define([
     },
 
     localSearch: function () {
-      var self = this;
+      // FIXME figure out a way to remove items from collection without messing up render
       // self.collection.remove(self._rooms.models);
       // self._rooms.resetCollection(); // we must clear the current collection
+      // this.collection.remove(this._rooms.models);
 
-      // once parent has loaded the rooms
+      // perform only once in response
       appEvents.once('troupesResponse', function (rooms) {
-        //debug('troupesResponse() ====================');
         var collection = new Backbone.Collection(rooms);
-        var filter = textFilter({ query: self.model.get('searchTerm'), fields: ['uri'] });
+        var filter = textFilter({ query: this.model.get('searchTerm'), fields: ['uri'] });
         var filtered = collection.filter(filter);
-        // //debug('about to remove() ====================');
-        // self.collection.remove(self._rooms.models);
-        // //debug('about to add() ====================');
-        self.collection.add(filtered, { at: 0, merge: true }); // add new matches
+        this.collection.add(filtered, { at: 0, merge: true }); // add new matches
       }.bind(this));
 
-      // request troupe from parents
+      // request troupe from parent frame
       appEvents.triggerParent('troupeRequest', { });
     },
 
     remoteSearch: function() {
-      var self = this;
       var chatSearchCollection = new ChatSearchModels.ChatSearchCollection([], { });
       chatSearchCollection.fetchSearch(this.model.get('searchTerm'), function () {
-        self.collection.add(chatSearchCollection.models, { merge: true });
+        this.collection.add(chatSearchCollection.models, { merge: true });
       }, this);
     },
 
     showResults: function () {
-      this.navigation.reset();
       this.ui.results.show();
-      // render new results in regions
       this.rooms.show(this.localRoomsView); // local rooms
       this.messages.show(this.serverMessagesView); // server chat messages
+    },
+
+    handleChange: function (e) {
+      this.model.set('searchTerm', e.target.value.trim());
     },
 
     handlePrev: function (e) {
@@ -300,10 +276,8 @@ define([
 
     handleGo: function () {
       if (this.isEmpty()) return;
-      var selectedItem = this.navigation.current();
-      //debug('selectedItem:', selectedItem);
-      selectedItem.trigger('search:selected');
-      //debug('should submit action at index', selectedItem.get('uri') || selectedItem.get('text'), selectedItem.get('selected'));
+      var item = this.navigation.current();
+      if (item) item.trigger('search:selected');
     }
   });
 
