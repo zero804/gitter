@@ -15,6 +15,11 @@ define([
 ], function (appEvents, Backbone, Marionette, _, cocktail, itemCollections, ChatSearchModels, chatCollectionView, searchTemplate, resultTemplate, textFilter, multiDebounce, KeyboardEventsMixin) {
   "use strict";
 
+  var EmptyResultsView = Marionette.ItemView.extend({
+    className: 'result-empty',
+    template: _.template('<small>No Results</small>')
+  });
+
   // Result Items Views
   var ResultItemView = Marionette.ItemView.extend({
 
@@ -31,8 +36,8 @@ define([
       this.$el.toggleClass('selected', !!model.get('selected')); // checks if it is selected
 
       // this handles "enter"
-      this.listenTo(model, 'search:selected', function () {
-        this.selectedItem();
+      this.listenTo(model, 'select', function () {
+        this.selectItem();
       }.bind(this));
 
       this.listenTo(model, 'change:selected', function (m, selected) {
@@ -42,7 +47,7 @@ define([
     },
 
     handleClick: function () {
-      this.selectedItem();
+      this.selectItem();
     }
   });
 
@@ -58,7 +63,7 @@ define([
       return data;
     },
 
-    selectedItem: function () {
+    selectItem: function () {
       appEvents.trigger('navigation', this.model.get('url'), 'chat', name);
     }
   });
@@ -75,8 +80,8 @@ define([
       return data;
     },
 
-    selectedItem: function () {
-      //debug('selectedItem() ====================');
+    selectItem: function () {
+      //debug('selectItem() ====================');
       var id = this.model.get('id');
 
       itemCollections.chats.fetchAtPoint({ aroundId: id }, {}, function () {
@@ -91,29 +96,28 @@ define([
 
   // local rooms results region
   var RoomsCollectionView = Marionette.CollectionView.extend({
-    itemView: RoomResultItemView
+    itemView: RoomResultItemView,
     // TODO: emptyView - results?
+    emptyView: EmptyResultsView
   });
 
   // server messages results region
   var MessagesCollectionView = Marionette.CollectionView.extend({
-    itemView: MessageResultItemView
+    itemView: MessageResultItemView,
     // TODO: emptyView - results?
+    emptyView: EmptyResultsView
   });
 
   // we need this to centralize the control of navigation, can take any collection :)
-  var SearchNavigationController = Marionette.Controller.extend({
+  var NavigationController = Marionette.Controller.extend({
 
     initialize: function (options) {
       this.collection = options.collection;
-
-      // ensures the first result is selected
-      this.listenTo(this.collection, 'add remove reset sync', function () {
-        this.reset();
-      });
+      // this ensures the first result is selected
+      this.listenTo(this.collection, 'add remove reset sync', this.reset);
     },
 
-    // we have to unselect and select a new model
+    // unselects old and selects new
     swap: function (model) {
       if (!model) return;
       if (this.selected) this.selected.set('selected', false);
@@ -135,9 +139,7 @@ define([
       return this.selected;
     },
 
-    reset: function () {
-      this.swap(this.collection.at(0));
-    }
+    reset: this.swap.bind(this, this.collection.at(0))
   });
 
   var SearchView = Marionette.Layout.extend({
@@ -174,8 +176,11 @@ define([
 
       this.model = new Backbone.Model({ searchTerm: '' });
       this.listenTo(this.model, 'change:searchTerm', this.run);
+
+      // master collection to enable easier navigation
       this.collection = new Backbone.Collection([]);
 
+      // filtered collections
       var rooms = new Backbone.FilteredCollection(null, { model: Backbone.Model, collection: this.collection });
       var chats = new Backbone.FilteredCollection(null, { model: Backbone.Model, collection: this.collection });
 
@@ -189,10 +194,9 @@ define([
 
       this._rooms = rooms;
       this._chats = chats;
-      this.navigation = new SearchNavigationController({
-        collection: this.collection,
-        rooms: this._rooms
-      });
+
+      // making navigation and filtered collections  accessible
+      this.navigation = new NavigationController({ collection: this.collection });
 
       // initialize the views
       this.localRoomsView = new RoomsCollectionView({ collection: rooms });
@@ -229,17 +233,23 @@ define([
       }
     },
 
-    refreshCollection: function (filteredCollection, newModels, opts) {
+
+    /*
+     * filteredCollection - the collection we are updating
+     * newModels          - the new models to be added
+     * options            - same options as Backbone.Collection.add
+     */
+    refreshCollection: function (filteredCollection, newModels, options) {
       // if the new models are the same as the current filtered collection avoid refresh by returning
       var getId = function (item) { return item.get('id'); };
       if (_.isEqual(newModels.map(getId), filteredCollection.map(getId))) return;
 
       var collection = this.collection;
-      opts = opts || {};
+      options = options || {};
 
       // IMPORTANT: we must remove the current state then add new models and reset filtered collection
       collection.remove(filteredCollection.models);
-      collection.add(newModels, opts);
+      collection.add(newModels, options);
       filteredCollection.resetWith(collection);
     },
 
@@ -289,7 +299,7 @@ define([
     handleGo: function () {
       if (this.isEmpty()) return;
       var item = this.navigation.current();
-      if (item) item.trigger('search:selected');
+      if (item) item.trigger('select');
     }
   });
 
