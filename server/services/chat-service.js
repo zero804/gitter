@@ -20,7 +20,7 @@ var _                    = require('underscore');
 var mongooseUtils        = require('../utils/mongoose-utils');
 var cacheWrapper         = require('../utils/cache-wrapper');
 var groupResolver        = require('./group-resolver');
-
+var chatSearchService    = require('./chat-search-service');
 /*
  * Hey Trouper!
  * Bump the version if you modify the behaviour of TwitterText.
@@ -226,9 +226,10 @@ exports.findById = function(id, callback) {
 /**
  * Returns a promise of chats with given ids
  */
-exports.findByIds = function(ids, callback) {
+function findByIds(ids, callback) {
   return mongooseUtils.findByIds(ChatMessage, ids, callback);
 };
+exports.findByIds = findByIds;
 
 // function massageMessages(message) {
 //   if('html' in message && 'text' in message) {
@@ -495,41 +496,33 @@ exports.findDailyChatActivityForRoom = function(troupeId, start, end, callback) 
  * Returns promise [messages, limitReached]
  */
 exports.searchChatMessagesForRoom = function(troupeId, textQuery, options) {
-  if(!options) options = {};
+  return chatSearchService.searchChatMessagesForRoom(troupeId, textQuery, options)
+    .spread(function(searchResults, limitReached) {
+      // We need to maintain the order of the original results
+      if(searchResults.length === 0) return [[], limitReached];
 
-  var limit = options.limit || 50;
-  var skip = options.skip || 0;
+      var ids = searchResults.map(function(result) {
+        return result.id;
+      });
 
-  return roomCapabilities.getMaxHistoryMessageDate(troupeId)
-    .then(function(maxHistoryDate) {
-      var findInaccessibleResults;
-      var q = ChatMessage
-        .find(
-          { toTroupeId: troupeId, $text : { $search : textQuery } },
-          { score : { $meta: "textScore" } })
-        // .sort({
-        //   score : { $meta : "textScore" },
-        //   sent: -1
-        // })
-        .limit(limit)
-        .skip(skip);
 
-      if(maxHistoryDate) {
-        q = q.where('sent').gte(maxHistoryDate);
-        findInaccessibleResults = ChatMessage
-          .count({
-            toTroupeId: troupeId,
-            sent: { $lt: maxHistoryDate },
-            $text : { $search : textQuery }
-          })
-          .execQ();
-      }
+      return findByIds(ids)
+        .then(function(chats) {
+          // Keep the order the same as the original search results
+          var chatsIndexed = collections.indexById(chats);
+          var chatsOrdered = searchResults
+            .map(function(result) {
+              var chat = chatsIndexed[result.id];
+              if(chat) {
+                chat.highlights = result.highlights;
+              }
+              return chat;
+            })
+            .filter(function(f) {
+              return !!f;
+            });
 
-      return Q.all([q.execQ(), findInaccessibleResults])
-        .spread(function(results, inaccessibleCount) {
-          // For now always return limitRearched false
-          return [results, !!inaccessibleCount];
+          return [chatsOrdered, limitReached];
         });
-
     });
 };
