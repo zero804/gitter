@@ -50,7 +50,7 @@ define([
 
     serializeData: function () {
       var data = {};
-      var uri = this.model.get('uri');
+      var uri = this.model.get('url').replace(/^\//,'');
       data.selected = this.model.get('selected');
       data.detail = this.model.get('githubType');
       data.text = uri;
@@ -180,7 +180,7 @@ define([
       var chats = new Backbone.FilteredCollection(null, { model: Backbone.Model, collection: this.collection });
 
       rooms.setFilter(function (model) {
-        return !!model.get('uri');
+        return !!model.get('url');
       });
 
       chats.setFilter(function (model) {
@@ -248,7 +248,7 @@ define([
       // perform only once in response
       appEvents.once('troupesResponse', function (rooms) {
         var collection = new Backbone.Collection(rooms);
-        var filter = textFilter({ query: this.model.get('searchTerm'), fields: ['uri'] });
+        var filter = textFilter({ query: this.model.get('searchTerm'), fields: ['url', 'name'] });
         var results = collection.filter(filter);
         this.refreshCollection(this._rooms, results, { at: 0, merge: true });
       }.bind(this));
