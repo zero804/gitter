@@ -108,13 +108,14 @@ define([
       this.collection = options.collection;
 
       // ensures the first result is selected
-      this.listenTo(this.collection, 'add remove', function (model) {
+      this.listenTo(this.collection, 'add remove reset sync', function () {
         this.reset();
       });
     },
 
     // we have to unselect and select a new model
     swap: function (model) {
+      if (!model) return;
       if (this.selected) this.selected.set('selected', false);
       model.set('selected', true);
       this.selected = model;
@@ -220,7 +221,7 @@ define([
         this.collection.reset();
         this.triggerMethod('search:hide');
       } else {
-        this.collection.reset();
+        // this.collection.reset();
         this.debouncedLocalSearch();
         this.debouncedRemoteSearch();
         this.showResults();
@@ -228,18 +229,28 @@ define([
       }
     },
 
+    refreshCollection: function (filteredCollection, newModels, opts) {
+      // if the new models are the same as the current filtered collection avoid refresh by returning
+      var getId = function (item) { return item.get('id'); };
+      if (_.isEqual(newModels.map(getId), filteredCollection.map(getId))) return;
+
+      var collection = this.collection;
+      opts = opts || {};
+
+      // IMPORTANT: we must remove the current state then add new models and reset filtered collection
+      collection.remove(filteredCollection.models);
+      collection.add(newModels, opts);
+      filteredCollection.resetWith(collection);
+    },
+
     localSearch: function () {
-      // FIXME figure out a way to remove items from collection without messing up render
-      // self.collection.remove(self._rooms.models);
-      // self._rooms.resetCollection(); // we must clear the current collection
-      // this.collection.remove(this._rooms.models);
 
       // perform only once in response
       appEvents.once('troupesResponse', function (rooms) {
         var collection = new Backbone.Collection(rooms);
         var filter = textFilter({ query: this.model.get('searchTerm'), fields: ['uri'] });
-        var filtered = collection.filter(filter);
-        this.collection.add(filtered, { at: 0, merge: true }); // add new matches
+        var results = collection.filter(filter);
+        this.refreshCollection(this._rooms, results, { at: 0, merge: true });
       }.bind(this));
 
       // request troupe from parent frame
@@ -248,8 +259,9 @@ define([
 
     remoteSearch: function() {
       var chatSearchCollection = new ChatSearchModels.ChatSearchCollection([], { });
+
       chatSearchCollection.fetchSearch(this.model.get('searchTerm'), function () {
-        this.collection.add(chatSearchCollection.models, { merge: true });
+        this.refreshCollection(this._chats, chatSearchCollection.models);
       }, this);
     },
 
