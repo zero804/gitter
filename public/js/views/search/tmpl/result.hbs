@@ -1,8 +1,8 @@
-{{!-- div.result --}}
+{{!-- wrapped by div.result --}}
 <div class='result-avatar'>
   <img src="{{ avatarUrl }}">
 </div>
 <div class='result-content'>
-  <p><small>{{ detail }}</small></p>
+  <p><small>{{ detail }} {{#if sent}} &bull; {{ widget "timeago" time=sent lang=lang locale=locale }}{{/if}}</small></p>
   {{ text }}
 </div>
