@@ -229,7 +229,6 @@ define([
         this.collection.reset();
         this.triggerMethod('search:hide');
       } else {
-        // this.collection.reset();
         this.debouncedLocalSearch();
         this.debouncedRemoteSearch();
         this.showResults();
