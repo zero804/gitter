@@ -69,13 +69,18 @@ define([
   var MessageResultItemView = ResultItemView.extend({
 
     serializeData: function () {
-      var data = {};
       var model = this.model;
-      data.selected = model.get('selected');
-      data.detail = model.get('fromUser').username + ' • ' + model.get('sent').fromNow();
-      data.text = model.get('text');
-      data.avatarUrl = model.get('fromUser').avatarUrlSmall;
-      return data;
+      var fromUser = model.get('fromUser');
+      var username = fromUser && fromUser.username || "";
+      var sent = model.get('sent');
+      var timeago = sent && sent.fromNow(); // XXX: use the timeago widget
+
+      return {
+        selected: model.get('selected'),
+        detail: username + ' • ' + timeago,
+        text: model.get('text'),
+        avatarUrl: fromUser && fromUser.avatarUrlSmall
+      };
     },
 
     selectItem: function () {
