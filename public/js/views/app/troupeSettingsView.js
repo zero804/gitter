@@ -3,12 +3,13 @@ define([
   'jquery',
   'underscore',
   'utils/context',
+  'components/apiClient',
   'views/base',
   'collections/instances/integrated-items',
   'hbs!./tmpl/troupeSettingsTemplate',
   'log!troupe-settings-view',
   'components/notifications'
-], function(Marionette, $, _, context, TroupeViews, itemCollections, troupeSettingsTemplate, log, notifications) {
+], function(Marionette, $, _, context, apiClient, TroupeViews, itemCollections, troupeSettingsTemplate, log, notifications) {
   "use strict";
 
 
@@ -27,22 +28,17 @@ define([
       this.userCollection = itemCollections.users;
 
       this.listenTo(this.model, 'change:lurk', this.setShowUnreadBadgeValue);
-
-      $.ajax({
-        url: '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId() + '/settings/notifications',
-        type: "GET",
-        context: this,
-        success: function(settings) {
-          this.settings = settings && settings.push || "all";
-          this.$el.find("#notification-options").val(this.settings);
-          // this.trigger('settingsLoaded', settings);
-          this.setLurkButton();
-
-        },
-        error: function() {
+      var self = this;
+      apiClient.userRoom.get('/settings/notifications')
+        .then(function(settings) {
+          self.settings = settings && settings.push || "all";
+          self.$el.find("#notification-options").val(self.settings);
+          // self.trigger('settingsLoaded', settings);
+          self.setLurkButton();
+        })
+        .fail(function() {
           log('An error occurred while communicating with notification settings');
-        }
-      });
+        });
     },
 
     formChange: function() {
@@ -105,24 +101,12 @@ define([
         self.setLurkButton();
       }
 
-      $.ajax({
-        url: '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId() + '/settings/notifications',
-        contentType: "application/json",
-        dataType: "json",
-        type: "PUT",
-        data: JSON.stringify({ push: push }),
-        success: done
-      });
+      apiClient.userRoom.put('/settings/notifications', { push: push })
+        .then(done);
 
+      apiClient.userRoom.put('', { lurk: lurk })
+        .then(done);
 
-      $.ajax({
-        url: '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId(),
-        contentType: "application/json",
-        dataType: "json",
-        type: "PUT",
-        data: JSON.stringify({ lurk: lurk }),
-        success: done
-      });
     }
   });
 

@@ -1,7 +1,7 @@
 define([
-  'utils/context',
+  'components/apiClient',
   './base'
-], function(context, TroupeCollections) {
+], function(apiClient, TroupeCollections) {
   "use strict";
 
   var OrgModel = TroupeCollections.Model.extend({
@@ -10,9 +10,7 @@ define([
 
   var OrgCollection = TroupeCollections.LiveCollection.extend({
     model: OrgModel,
-    initialize: function() {
-      this.url = "/api/v1/user/" + context.getUserId() + "/orgs";
-    }
+    url: apiClient.user.channelGenerator('/orgs')
   });
 
   return {

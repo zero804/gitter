@@ -12,8 +12,7 @@ require([
   'views/app/mobileAppView',
   'views/chat/decorators/emojiDecorator',
   'views/chat/decorators/mobileDecorator',
-  'views/app/troupeSettingsView',
-  'components/csrf'                             // No ref
+  'views/app/troupeSettingsView'
   ], function($, appEvents, chatModels, userModels, ChatCollectionView, chatInputView,
     unreadItemsClient, Backbone, modalRegion, TroupeMenu, MobileAppView,
     emojiDecorator, mobileDecorator, TroupeSettingsView) {
@@ -33,7 +32,7 @@ require([
 
   var chatCollection = new chatModels.ChatCollection();
   chatCollection.listen();
-  
+
   var userCollection = new userModels.UserCollection();
   userCollection.listen();
 

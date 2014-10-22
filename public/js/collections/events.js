@@ -1,10 +1,10 @@
 define([
   'underscore',
-  'utils/context',
+  'components/apiClient',
   './base',
   '../utils/momentWrapper',
   'cocktail'
-], function(_, context, TroupeCollections, moment, cocktail) {
+], function(_, apiClient, TroupeCollections, moment, cocktail) {
   "use strict";
 
   var EventModel = TroupeCollections.Model.extend({
@@ -42,7 +42,7 @@ define([
       while (this.length > 20) { this.pop(); }
     },
     modelName: 'event',
-    nestedUrl: "events",
+    url: apiClient.room.channelGenerator('/events'),
     initialSortBy: "-sent",
     sortByMethods: {
       'sent': function(event) {

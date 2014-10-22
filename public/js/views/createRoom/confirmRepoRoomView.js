@@ -44,7 +44,7 @@ define([
       self.ui.modalFailure.hide();
       var uri = self.model.get('uri');
 
-      apiClient.post('/api/v1/rooms', { uri: uri, addBadge: addBadge })
+      apiClient.post('/v1/rooms', { uri: uri, addBadge: addBadge })
         .then(function () {
           self.dialog.hide();
           appEvents.trigger('navigation', '/' + uri, 'chat', uri, null);

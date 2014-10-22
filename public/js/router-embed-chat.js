@@ -15,8 +15,7 @@ require([
   'views/widgets/preload',      // No ref
   'components/dozy',            // Sleep detection No ref
   'template/helpers/all',       // No ref
-  'components/bug-reporting',   // No ref
-  'components/ajax-errors',     // No ref
+  'components/bug-reporting'    // No ref
 
 ], function(ChatIntegratedView, ChatCollectionView, chatModels,
   webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator,

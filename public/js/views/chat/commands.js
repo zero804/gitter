@@ -1,9 +1,9 @@
 define([
   'underscore',
-  'jquery',
   'utils/context',
-  'utils/appevents'
-], function(_, $, context, appEvents) {
+  'utils/appevents',
+  'components/apiClient'
+], function(_, context, appEvents, apiClient) {
   "use strict";
 
   var commandsList = [
@@ -21,42 +21,35 @@ define([
         var userMatch = view.$el.val().match(/\/ban @([\w\-]+)/);
         if (!userMatch) return;
         var user = userMatch[1];
-        $.ajax({
-          url: '/api/v1/rooms/' + context.getTroupeId() + '/bans',
-          contentType: "application/json",
-          dataType: "json",
-          type: "POST",
-          data: JSON.stringify({ username: user }),
-          success: function() {
+
+        apiClient.room.post('/bans', { username: user })
+          .then(function() {
             view.reset();
-          },
-          statusCode: {
-            403: function() {
-              var errorMessage = 'You do not have permission to ban people.';
-              appEvents.triggerParent('user_notification', {
-                title: 'Could not ban user',
-                text: errorMessage,
-                className: 'notification-error'
-              });
-            },
-            400: function(data) {
-              var errorMessage = data.responseJSON.error;
-              appEvents.triggerParent('user_notification', {
-                title: 'Could not ban user',
-                text: errorMessage,
-                className: 'notification-error'
-              });
-            },
-            404: function() {
-              var errorMessage = 'That person does not exist (on Gitter that is)';
-              appEvents.triggerParent('user_notification', {
-                title: 'Could not ban user',
-                text: errorMessage,
-                className: 'notification-error'
-              });
+          })
+          .fail(function(xhr) {
+            var errorMessage;
+            switch(xhr.status) {
+              case 403:
+                errorMessage = 'You do not have permission to ban people.';
+                break;
+
+              case 400:
+                errorMessage = xhr.responseJSON.error;
+                break;
+
+              case 404:
+                errorMessage = 'That person does not exist (on Gitter that is)';
+                break;
+              default:
+                errorMessage = 'Ban failed';
             }
-          }
-        });
+
+            appEvents.triggerParent('user_notification', {
+              title: 'Could not ban user',
+              text: errorMessage,
+              className: 'notification-error'
+            });
+          });
       }
     },
     {
@@ -85,13 +78,10 @@ define([
       action: function(view) {
         var isFavourite = !context.troupe().get('favourite');
 
-        $.ajax({
-          url: '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId(),
-          contentType: "application/json",
-          dataType: "json",
-          type: "PUT",
-          data: JSON.stringify({ favourite: isFavourite })
-        });
+        apiClient.userRoom.put('', { favourite: isFavourite })
+          .then(function() {
+            view.reset();
+          });
 
         view.reset();
       }
@@ -107,11 +97,11 @@ define([
       action: function(view) {
         view.reset();
 
-        $.ajax({
-          url: "/api/v1/rooms/" + context.getTroupeId() + "/users/" + context.getUserId(),
-          data: "",
-          type: "DELETE",
-        });
+        apiClient.userRoom.delete('', { })
+          .then(function() {
+            appEvents.trigger('navigation', context.getUser().url, 'home', ''); // TODO: figure out a title
+          });
+
       }
     },
     {
@@ -135,25 +125,11 @@ define([
           }
         }
 
-        $.ajax({
-          url: '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId() + '/settings/notifications',
-          contentType: "application/json",
-          dataType: "json",
-          type: "PUT",
-          data: JSON.stringify({ push: "mention" }),
-          success: done
-        });
+        apiClient.userRoom.put('/settings/notifications', { push: "mention" })
+          .then(done);
 
-
-        $.ajax({
-          url: '/api/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId(),
-          contentType: "application/json",
-          dataType: "json",
-          type: "PUT",
-          data: JSON.stringify({ lurk: true }),
-          success: done
-        });
-
+        apiClient.userRoom.put('', { lurk: true })
+          .then(done);
       }
     },
     {
@@ -244,13 +220,8 @@ define([
           view.reset();
 
           context.troupe().set('topic', topic);
-          $.ajax({
-            url: '/api/v1/rooms/' + context.getTroupeId(),
-            contentType: "application/json",
-            dataType: "json",
-            type: "PUT",
-            data: JSON.stringify({ topic: topic })
-          });
+
+          apiClient.room.put('', { topic: topic });
         }
       }
     },
@@ -268,33 +239,36 @@ define([
         var userMatch = view.$el.val().match(/\/unban @([\w\-]+)/);
         if (!userMatch) return;
         var user = userMatch[1];
-        $.ajax({
-          url: '/api/v1/rooms/' + context.getTroupeId() + '/bans/' + user,
-          contentType: "application/json",
-          dataType: "json",
-          type: "DELETE",
-          success: function() {
+
+        apiClient.room.delete('/bans/' + user, { })
+          .then(function() {
             view.reset();
-          },
-          statusCode: {
-            403: function() {
-              var errorMessage = 'You do not have permission to unban people.';
-              appEvents.triggerParent('user_notification', {
-                title: 'Could not ban user',
-                text: errorMessage,
-                className: 'notification-error'
-              });
-            },
-            404: function() {
-              var errorMessage = 'That person is not on the banned list.';
-              appEvents.triggerParent('user_notification', {
-                title: 'Could not ban user',
-                text: errorMessage,
-                className: 'notification-error'
-              });
+          })
+          .fail(function(xhr) {
+            var errorMessage;
+            switch(xhr.status) {
+              case 403:
+                errorMessage = 'You do not have permission to unban people.';
+                break;
+
+              case 400:
+                errorMessage = xhr.responseJSON.error;
+                break;
+
+              case 404:
+                errorMessage = 'That person is not on the banned list.';
+                break;
+              default:
+                errorMessage = 'Unban failed';
             }
-          },
-        });
+
+            appEvents.triggerParent('user_notification', {
+              title: 'Could not unban user',
+              text: errorMessage,
+              className: 'notification-error'
+            });
+          });
+
       }
     }
   ];
