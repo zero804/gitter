@@ -20,11 +20,14 @@ define([
     template: _.template('<small>No Results</small>')
   });
 
-  // Result Items Views
   var ResultItemView = Marionette.ItemView.extend({
 
     events: {
-      'click': 'handleClick'
+      'click': 'handleSelect'
+    },
+
+    modelEvents: {
+      'select': 'handleSelect', // this handles "enter"
     },
 
     template: resultTemplate,
@@ -35,18 +38,13 @@ define([
       var model = this.model;
       this.$el.toggleClass('selected', !!model.get('selected')); // checks if it is selected
 
-      // this handles "enter"
-      this.listenTo(model, 'select', function () {
-        this.selectItem();
-      }.bind(this));
-
       this.listenTo(model, 'change:selected', function (m, selected) {
         this.$el.toggleClass('selected', !!selected);
-        // FIXME: scroll m into view?
+        // TODO: longer lists, do we need to scroll m into view?
       });
     },
 
-    handleClick: function () {
+    handleSelect: function () {
       this.selectItem();
     }
   });
@@ -81,7 +79,6 @@ define([
     },
 
     selectItem: function () {
-      //debug('selectItem() ====================');
       var id = this.model.get('id');
 
       itemCollections.chats.fetchAtPoint({ aroundId: id }, {}, function () {
@@ -94,14 +91,12 @@ define([
     }
   });
 
-  // local rooms results region
   var RoomsCollectionView = Marionette.CollectionView.extend({
     itemView: RoomResultItemView,
     // TODO: emptyView - results?
     emptyView: EmptyResultsView
   });
 
-  // server messages results region
   var MessagesCollectionView = Marionette.CollectionView.extend({
     itemView: MessageResultItemView,
     // TODO: emptyView - results?
@@ -168,6 +163,7 @@ define([
       'search.go': 'handleGo'
     },
 
+    // FIXME this redundant reference is a little strange
     events: {
       'cut @ui.input': 'handleChange',
       'paste @ui.input': 'handleChange',
