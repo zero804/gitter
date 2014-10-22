@@ -9,7 +9,7 @@ var troupeTemplate = require('../utils/troupe-template');
 var nconf          = require('../utils/config');
 var winston        = require('../utils/winston');
 var Q              = require('q');
-var emailify       = require('emailify');
+// var emailify       = require('emailify');
 
 var mandrillClient = require('mandrill-api/mandrill');
 var mandrill = new mandrillClient.Mandrill(env.config.get('mandrill:apiKey'));
@@ -64,7 +64,8 @@ exports.sendEmail = function(options, done) {
 
     var compiledHtmlEmail = headerHtml + "\n" + html + "\n" + footerHtml;
 
-    emailify.parse(compiledHtmlEmail, 'utf8', function(err,htmlContent) {
+    // emailify.parse(compiledHtmlEmail, 'utf8', function(err,htmlContent) {
+      var htmlContent = compiledHtmlEmail;
       var plaintextTemplateFile = "emails/" + options.templateFile;
       troupeTemplate.compile(plaintextTemplateFile, function(err, plaintextTemplate) {
         if(err) return d.reject(err);
@@ -106,7 +107,7 @@ exports.sendEmail = function(options, done) {
         });
       });
     });
-  });
+  // });
 
   return d.promise.nodeify(done);
 };
