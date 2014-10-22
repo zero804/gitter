@@ -12,6 +12,7 @@ define([
   'utils/text-filter',
   'utils/multi-debounce',
   'views/keyboard-events-mixin',
+  'views/behaviors/widgets',
 ], function (appEvents, Backbone, Marionette, _, cocktail, itemCollections, ChatSearchModels, chatCollectionView, searchTemplate, resultTemplate, textFilter, multiDebounce, KeyboardEventsMixin) {
   "use strict";
 
@@ -68,16 +69,20 @@ define([
 
   var MessageResultItemView = ResultItemView.extend({
 
+    behaviors: {
+      Widgets: {},
+    },
+
     serializeData: function () {
       var model = this.model;
       var fromUser = model.get('fromUser');
       var username = fromUser && fromUser.username || "";
       var sent = model.get('sent');
-      var timeago = sent && sent.fromNow(); // XXX: use the timeago widget
 
       return {
         selected: model.get('selected'),
-        detail: username + ' • ' + timeago,
+        detail: username,
+        sent: sent,
         text: model.get('text'),
         avatarUrl: fromUser && fromUser.avatarUrlSmall
       };
