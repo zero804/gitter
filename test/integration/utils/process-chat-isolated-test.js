@@ -51,7 +51,7 @@ describe('process-chat', function() {
     });
   });
 
-  describe('performance tests', function() {
+  describe.skip('performance tests', function() {
     listTestPairs().forEach(function(item) {
       it('should handle ' + item.name, function(done) {
         var completed = 0;
