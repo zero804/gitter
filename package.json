@@ -1,6 +1,6 @@
 {
   "name": "gitter-webapp",
-  "version": "6.9.2",
+  "version": "7.0.0",
   "private": true,
   "dependencies": {
     "apn": "~1.4.4",
@@ -22,7 +22,7 @@
     "express3-handlebars": "~0.4.1",
     "faye-redis": "git://github.com/gitterHQ/faye-redis-node#v0.3.0",
     "faye-websocket": "^0.7.2",
-    "gitter-env": "git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.14.0",
+    "gitter-env": "git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.15.0",
     "gitter-marked": "^0.8.0",
     "gitter-services": "git+ssh://git@github.com:gitterHQ/services.git#1.4.0",
     "handlebars": "~1.1.2",
@@ -82,7 +82,7 @@
     "worker-farm": "^1.0.1",
     "xml2js": "0.2.2",
     "xregexp": "^2.0.0",
-    "katex": "^0.1.0",
+    "katex": "0.1.0",
     "mandrill-api": "~1.0.40",
     "locale": "0.0.17",
     "langs": "^1.0.1",
