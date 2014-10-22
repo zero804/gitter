@@ -1,12 +1,7 @@
-/* jshint unused:true, browser:true,  strict:true *//* global define:false */
 define([
   'jquery',
   'underscore',
-  'utils/context',
   'log!chat-collection-view',
-  'collections/chat',
-  'views/widgets/avatar',
-  'components/unread-items-client',
   'marionette',
   'views/base',
   'utils/appevents',
@@ -14,8 +9,7 @@ define([
   'utils/rollers',
   'cocktail',
   'views/behaviors/infinite-scroll' //No ref
-], function($, _, context, log, chatModels, AvatarView, unreadItemsClient,
-    Marionette, TroupeViews, appEvents, chatItemView, Rollers, cocktail) {
+], function($, _, log, Marionette, TroupeViews, appEvents, chatItemView, Rollers, cocktail) {
   "use strict";
 
   /** @const */

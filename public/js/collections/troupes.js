@@ -1,8 +1,10 @@
 define([
   'utils/context',
+  'components/apiClient',
+  'backbone',
   './base',
   '../utils/momentWrapper'
-], function(context, TroupeCollections, moment) {
+], function(context, apiClient, Backbone, TroupeCollections, moment) {
   "use strict";
 
   var TroupeModel = TroupeCollections.Model.extend({
@@ -31,17 +33,17 @@ define([
         }
       }
 
-      this.on('change:unreadItems', function(model, unreadItems) {
+      this.listenTo(this, 'change:unreadItems', function(model, unreadItems) { // jshint unused:true
         if(unreadItems) {
           this.set('lastUnreadItemTime', moment());
         }
-      }, this);
+      });
 
-      this.on('change:mentions', function(model, mentions) {
+      this.listenTo(this, 'change:mentions', function(model, mentions) { // jshint unused:true
         if(mentions) {
           this.set('lastMentionTime', moment());
         }
-      }, this);
+      });
 
     },
     parse: function(message) {
@@ -53,20 +55,17 @@ define([
     }
   }, { modelType: 'troupe' });
 
-  var SuggestedTroupeCollection = TroupeCollections.LiveCollection.extend({
+  var SuggestedTroupeCollection = Backbone.Collection.extend({
     model: TroupeModel,
-
-    initialize: function () {
-      this.url = "/api/v1/user/" + context.getUserId() + "/rooms?suggested=1";
-    }
+    url: apiClient.user.channelGenerator("/rooms?suggested=1") // Querystring in the URL, Hmm...
   });
 
   var TroupeCollection = TroupeCollections.LiveCollection.extend({
     model: TroupeModel,
+    url: apiClient.user.channelGenerator('/rooms'),
     initialize: function() {
       this.listenTo(this, 'change:favourite', this.reorderFavs);
       this.listenTo(this, 'change:lastAccessTime change:lurk', this.resetActivity);
-      this.url = "/api/v1/user/" + context.getUserId() + "/rooms";
     },
 
     resetActivity: function(model) {

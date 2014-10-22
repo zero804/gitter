@@ -1,11 +1,9 @@
 
 define([
-  'jquery-hammer',
   'marionette',
   'hbs!./tmpl/suggested-room-list-item',
-  'utils/appevents',
-  'utils/is-mobile'
-], function($hammer, Marionette, repoListItemTemplate, appEvents, isMobile) {
+  'utils/appevents'
+], function(Marionette, repoListItemTemplate, appEvents) {
   "use strict";
 
   var SuggestedRoomItemView = Marionette.ItemView.extend({
@@ -14,9 +12,6 @@ define([
     template: repoListItemTemplate,
     modelEvents: {
       change: 'render'
-    },
-    initialize: function() {
-      this.$el = $hammer(this.$el).hammer();
     },
     serializeData: function() {
       var suggestion = this.model.toJSON();
@@ -28,8 +23,8 @@ define([
         userCount: suggestion.userCount
       };
     },
-    events: function() {
-      return isMobile() ? { tap: 'navigate' } : { click: 'navigate' };
+    events: {
+      click: 'navigate'
     },
     navigate: function() {
       var uri = this.model.get('uri');

@@ -4,14 +4,15 @@ define([
   'jquery',
   'backbone',
   'marionette',
-  'underscore',
   'utils/context',
+  'components/apiClient',
   'utils/appevents',
+  'utils/momentWrapper',
   'views/popover',
   'hbs!./tmpl/issuePopover',
   'hbs!./tmpl/issuePopoverTitle',
   'hbs!./tmpl/commitPopoverFooter'
-], function($, Backbone, Marionette, _, context, appEvents, Popover, bodyTemplate, titleTemplate, footerTemplate) {
+], function($, Backbone, Marionette, context, apiClient, appEvents, moment, Popover, bodyTemplate, titleTemplate, footerTemplate) {
   "use strict";
 
   var BodyView = Marionette.ItemView.extend({
@@ -83,15 +84,12 @@ define([
       return;
     }
 
-    $.ajax({
-      url: '/api/private/issue-state',
-      data: { q: issue },
-      success: function(states) {
+    apiClient.priv.get('/issue-state', { q: issue })
+      .then(function(states) {
         localCache[issue] = states[0];
         setTimeout(function() { delete localCache[issue]; }, 60000);
         callback(states[0]);
-      }
-    });
+      });
 
   }
 
@@ -99,7 +97,7 @@ define([
     idAttribute: "number",
     urlRoot: function() {
       var repo = this.get('repo');
-      return '/api/private/gh/repos/' + repo + '/issues/';
+      return '/private/gh/repos/' + repo + '/issues/';
     }
   });
 

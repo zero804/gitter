@@ -16,7 +16,7 @@ define([
   "use strict";
 
   var suggestedRoomCollection = new backbone.Collection();
-  suggestedRoomCollection.url = '/api/v1/user/' + context.getUserId() + '/rooms?suggested=1';
+  suggestedRoomCollection.url = '/v1/user/' + context.getUserId() + '/rooms?suggested=1';
   suggestedRoomCollection.fetch();
 
   return Marionette.Layout.extend({

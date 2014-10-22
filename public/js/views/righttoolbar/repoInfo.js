@@ -7,7 +7,7 @@ define([
   "use strict";
 
   var RepoInfoModel = Backbone.Model.extend({
-    url: '/api/v1/repo-info'
+    url: '/v1/repo-info'
   });
 
   var RepoInfoView = Backbone.View.extend({
