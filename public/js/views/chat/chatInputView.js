@@ -506,7 +506,7 @@ define([
   var ChatInputBoxView = Marionette.ItemView.extend({
     events: {
       "keyup":    "onKeyUp",
-      "focusout": "onFocusOut"
+      "blur": "onBlur"
     },
 
     keyboardEvents: {
@@ -548,8 +548,8 @@ define([
       this.chatResizer.resizeInput();
     },
 
-    onFocusOut: function() {
-      if(this.compactView && !this.isTypeaheadShowing()) {
+    onBlur: function() {
+      if(isMobile() && !this.isTypeaheadShowing()) {
         this.processInput();
       }
     },

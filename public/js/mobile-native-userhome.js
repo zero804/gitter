@@ -6,7 +6,8 @@ require([
   'backbone',
   'components/cordova-navigate',
   'views/createRoom/confirmRepoRoomView',
-  ], function(context, UserHomeView, $, appEvents, Backbone, cordovaNavigate, confirmRepoRoomView) {
+  'components/modal-region'
+  ], function(context, UserHomeView, $, appEvents, Backbone, cordovaNavigate, confirmRepoRoomView, modalRegion) {
   "use strict";
 
   cordovaNavigate.setNativeToUserhome();
@@ -45,7 +46,10 @@ require([
   var Router = Backbone.Router.extend({
     routes: {
       'confirm/*uri': function(uri) {
-        new confirmRepoRoomView.Modal({ uri: uri }).show();
+        modalRegion.show(new confirmRepoRoomView.Modal({ uri: uri }));
+      },
+      '': function() {
+        modalRegion.close();
       }
     }
   });

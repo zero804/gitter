@@ -6,7 +6,8 @@ require([
   'views/menu/troupeMenu',
   'views/app/mobileAppView',
   'views/createRoom/confirmRepoRoomView',
-  ], function(UserHomeView, $, appEvents, Backbone, TroupeMenu, MobileAppView, confirmRepoRoomView) {
+  'components/modal-region'
+  ], function(UserHomeView, $, appEvents, Backbone, TroupeMenu, MobileAppView, confirmRepoRoomView, modalRegion) {
   "use strict";
 
   appEvents.on('navigation', function(url) {
@@ -28,7 +29,10 @@ require([
   var Router = Backbone.Router.extend({
     routes: {
       'confirm/*uri': function(uri) {
-        new confirmRepoRoomView.Modal({ uri: uri }).show();
+        modalRegion.show(new confirmRepoRoomView.Modal({ uri: uri }));
+      },
+      '': function() {
+        modalRegion.close();
       }
     }
   });
