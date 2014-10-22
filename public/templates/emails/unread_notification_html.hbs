@@ -1,97 +1,44 @@
-          <table class="container">
-            <tr>
-              <td>
-                <table class="row">
-                  <tr>
-                    <td class="wrapper last">
-                      <table class="twelve columns">
-                        <tr>
-                          <td>
-                            <h1>You have unread messages</h1>
-                            <br><br>
-                          </td>
-                          <td class="expander"></td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-                </table>
+{{#each troupesWithUnreadCounts}}
+        <table class="row">
+          <tr>
+            <td class="wrapper last">
+              <table class="twelve columns">
+                <tr>
+                  <td>
+                    <h2>{{#if troupe.oneToOne}}{{troupe.name}}{{else}}{{troupe.uri}}{{/if}}</h1>
+                    <h4>{{__n "%d unread message" "%d unread messages" unreadCount}}{{#if truncated}} (showing {{chats.length}} most recent){{/if}}</h4>
+                    <br>
+                    {{#each chats}}
+                    <table>
+                      <tr>
+                        <td class="avatar"><img height="24" width="24" src="{{fromUser.avatarUrlSmall}}" class="avatar"></td>
+                        <td class="chat"><strong>{{fromUser.username}}</strong></td>
+                      </tr>
+                      <tr>
+                        <td></td>
+                        <td>{{text}}</td>
+                      </tr>
+                    </table>
+                    <br>
+                    {{/each}}
+                    <table>
+                      <tr>
+                        <td class="avatar">
+                          <a href="{{../emailBasePath}}{{troupe.url}}#utm_source=notification&utm_medium=email&utm_campaign=unread-notifications" style="text-decoration: none" class="button-green">Open chat</a>
+                        </td>
+                        <td class="chat">
+                          {{#unless troupe.oneToOne}}<a href="{{../../emailBasePath}}{{troupe.url}}#notifications" style="color: #2980b9;">Notification settings</a>{{/unless}}&nbsp;
+                        </td>
+                      </tr>
+                    </table>
+                    <br>
+                    <hr>
+                    <br>
+                  </td>
+                  <td class="expander"></td>
+                </tr>
+              </table>
 
-        {{#each troupesWithUnreadCounts}}
-                <table class="row">
-                  <tr>
-                    <td class="wrapper last">
-                      <table class="twelve columns">
-                        <tr>
-                          <td>
-                            <h2>{{#if troupe.oneToOne}}{{troupe.name}}{{else}}{{troupe.uri}}{{/if}}</h1>
-                            <h4>{{__n "%d unread message" "%d unread messages" unreadCount}}{{#if truncated}} (showing {{chats.length}} most recent){{/if}}</h4>
-                            <br>
-                            {{#each chats}}
-                            <table>
-                              <tr>
-                                <td class="avatar"><img height="24" width="24" src="{{fromUser.avatarUrlSmall}}" class="avatar"></td>
-                                <td class="chat"><strong>{{fromUser.username}}</strong></td>
-                              </tr>
-                              <tr>
-                                <td></td>
-                                <td>{{text}}</td>
-                              </tr>
-                            </table>
-                            <br>
-                            {{/each}}
-                            <table>
-                              <tr>
-                                <td class="avatar">
-                                  <a href="{{../emailBasePath}}{{troupe.url}}#utm_source=notification&utm_medium=email&utm_campaign=unread-notifications" style="text-decoration: none" class="button-green">Open chat</a>
-                                </td>
-                                <td class="chat">
-                                  {{#unless troupe.oneToOne}}<a href="{{../../emailBasePath}}{{troupe.url}}#notifications" style="color: #2980b9;">Notification settings</a>{{/unless}}&nbsp;
-                                </td>
-                              </tr>
-                            </table>
-                            <br>
-                            <hr>
-                            <br>
-                          </td>
-                          <td class="expander"></td>
-                        </tr>
-                      </table>
-
-                  </tr>
-                </table>
-        {{/each}}
-                <table class="row">
-                  <tr>
-                    <td class="wrapper">
-                      <table class="twelve columns">
-                        <tr>
-                          <td>
-                            You can customise notification rules per room buy clicking on "Notification settings".<br>
-                            <a href="{{unsubscribeUrl}}" style="text-decoration: none">Unsubscribe</a> to stop receiving all unread message notifications from all conversations.<br>
-                          </td>
-                          <td class="expander"></td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-                </table>
-                <!-- promotion for apps -->
-                <br><br>
-                <table class="row promo">
-                  <tr>
-                    <td class="wrapper">
-                      <table class="twelve columns">
-                        <tr>
-                          <td class="promo-inner">
-                            <h4 style="margin-bottom: 10px">Did you know we have desktop and mobile apps?</h4><br>
-                            <a href="https://gitter.im/apps" style="text-decoration: none;" class="button-green">Find out more</a>
-                          </td>
-                          <td class="expander"></td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-                </table>
-
-
+          </tr>
+        </table>
+{{/each}}
