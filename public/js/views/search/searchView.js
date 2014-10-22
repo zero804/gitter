@@ -205,7 +205,7 @@ define([
       // initialize the views
       this.localRoomsView = new RoomsCollectionView({ collection: rooms });
       this.serverMessagesView = new MessagesCollectionView({ collection: chats });
-      this.debouncedLocalSearch =  _.debounce(this.localSearch.bind(this), 50);
+      this.debouncedLocalSearch =  _.debounce(this.localSearch.bind(this), 20);
       this.debouncedRemoteSearch = _.debounce(this.remoteSearch.bind(this), 250);
     },
 
@@ -237,7 +237,6 @@ define([
       }
     },
 
-
     /*
      * filteredCollection - the collection we are updating
      * newModels          - the new models to be added
@@ -264,7 +263,11 @@ define([
         var collection = new Backbone.Collection(rooms);
         var filter = textFilter({ query: this.model.get('searchTerm'), fields: ['url', 'name'] });
         var results = collection.filter(filter);
-        this.refreshCollection(this._rooms, results, { at: 0, merge: true });
+        try {
+          this.refreshCollection(this._rooms, results, { at: 0, merge: true });
+        } catch (e) {
+          // new Error('Could not perform local search.'); FIXME
+        }
       }.bind(this));
 
       // request troupe from parent frame
@@ -275,8 +278,12 @@ define([
       var chatSearchCollection = new ChatSearchModels.ChatSearchCollection([], { });
 
       chatSearchCollection.fetchSearch(this.model.get('searchTerm'), function () {
-        this.refreshCollection(this._chats, chatSearchCollection.models);
-      }, this);
+        try {
+          this.refreshCollection(this._chats, chatSearchCollection.models);
+        } catch (e) {
+          // new Error('Could not perform remote search.'); FIXME
+        }
+      }.bind(this), this);
     },
 
     showResults: function () {
