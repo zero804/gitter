@@ -87,7 +87,7 @@ Once you are sure the above is done, preform the following:
   2. `git checkout 97e96ed /usr/local/Library/Formula/elasticsearch.rb`
   3. `brew install elasticsearch`
 
-2. Install required ElasticSearch plugins
+2. Install required ElasticSearch plugins (You might need to install the Java SDK)
   1. `/usr/local/Cellar/elasticsearch/1.2.2/bin/plugin  --install elasticsearch/elasticsearch-lang-javascript/2.4.0`
   2. `/usr/local/Cellar/elasticsearch/1.2.2/bin/plugin   --install com.github.richardwilly98.elasticsearch/elasticsearch-river-mongodb/2.0.1`
   3. `/usr/local/Cellar/elasticsearch/1.2.2/bin/plugin --install royrusso/elasticsearch-HQ`
