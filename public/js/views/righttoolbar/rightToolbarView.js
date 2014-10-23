@@ -56,14 +56,14 @@ define([
       this.searchView = new SearchView({});
       this.search.show(this.searchView);
 
-      // TODO, logic for hiding showing search
+      // TODO: need to expand the toolbar...
       this.searchView.on("search:show", function () {
         $('#toolbar-top-content').hide();
-      });
+      }.bind(this));
 
       this.searchView.on("search:hide", function () {
         $('#toolbar-top-content').show();
-      });
+      }.bind(this));
 
       itemCollections.events.on('add reset sync', function() {
 
@@ -82,7 +82,6 @@ define([
     showPeopleList: function() {
       $('#repo-info').hide();
       $('#people-roster').show();
-
       $('#people-header').addClass('selected');
       $('#info-header').removeClass('selected');
     },

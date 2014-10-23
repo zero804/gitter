@@ -18,7 +18,7 @@ define([
 
   var EmptyResultsView = Marionette.ItemView.extend({
     className: 'result-empty',
-    template: _.template('<small>No Results</small>')
+  template: _.template('<small>No Results</small>')
   });
 
   var ResultItemView = Marionette.ItemView.extend({
@@ -41,7 +41,9 @@ define([
 
       this.listenTo(model, 'change:selected', function (m, selected) {
         this.$el.toggleClass('selected', !!selected);
-        // TODO: longer lists, do we need to scroll m into view?
+        if (selected) {
+          // TODO longer lists, do we need to scroll m into view?;
+        }
       });
     },
 
@@ -168,6 +170,7 @@ define([
     // the shortcuts need to be handled at the top level component
     keyboardEvents: {
       'focus.search': 'activate',
+      'search.escape': 'dismiss',
       'search.prev': 'handlePrev',
       'search.next': 'handleNext',
       'search.go': 'handleGo'
@@ -175,6 +178,7 @@ define([
 
     // FIXME this redundant reference is a little strange
     events: {
+      'click .js-activate-search': 'activate',
       'cut @ui.input': 'handleChange',
       'paste @ui.input': 'handleChange',
       'change @ui.input': 'handleChange',
@@ -183,8 +187,19 @@ define([
 
     initialize: function () {
 
-      this.model = new Backbone.Model({ searchTerm: '' });
-      this.listenTo(this.model, 'change:searchTerm', this.run);
+      this.model = new Backbone.Model({ searchTerm: '', active: false });
+
+      this.listenTo(this.model, 'change:searchTerm', function () {
+        if (this.isEmpty()) {
+          this.hide();
+        } else {
+          this.run();
+        }
+      }.bind(this));
+
+      this.listenTo(this.model, 'change:active', function (m, active) {
+        this.$el.toggleClass('active', !!active);
+      });
 
       // master collection to enable easier navigation
       this.collection = new Backbone.Collection([]);
@@ -214,31 +229,45 @@ define([
       this.debouncedRemoteSearch = _.debounce(this.remoteSearch.bind(this), 250);
     },
 
+    isActive: function () {
+      return this.model.get('active');
+    },
+
     isEmpty: function () {
       return !this.model.get('searchTerm');
     },
 
-    hideResults: function () {
-      this.ui.results.hide();
+    dismiss: function () {
+      this.model.set('active', false);
+      this.ui.input.val(function () { return ''; });
+      this.model.set('searchTerm', '');
+      this.hide();
     },
 
     activate: function () {
-      var input = this.ui.input;
-      if (input.is(':focus')) return/* alert('already focused')*/;
-      input.focus();
+      var model = this.model;
+      model.set('active', !this.isActive());
+
+      if (this.isActive()) {
+        var input = this.ui.input;
+        if (input.is(':focus')) return;
+        input.focus();
+      } else {
+        this.dismiss();
+      }
+    },
+
+    hide: function () {
+      this.ui.results.hide();
+      this.collection.reset();
+      this.triggerMethod('search:hide');
     },
 
     run: function (/*model, searchTerm*/) {
-      if (this.isEmpty()) {
-        this.hideResults();
-        this.collection.reset();
-        this.triggerMethod('search:hide');
-      } else {
-        this.debouncedLocalSearch();
-        this.debouncedRemoteSearch();
-        this.showResults();
-        this.triggerMethod('search:show');
-      }
+      this.debouncedLocalSearch();
+      this.debouncedRemoteSearch();
+      this.showResults();
+      this.triggerMethod('search:show');
     },
 
     /*
