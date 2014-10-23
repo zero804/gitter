@@ -27,7 +27,7 @@ module.exports = function(markdown) {
         // hey, at least we got a result!
         // Lets note the error though
         var newError = new StatusError(500, "Markdown processing failed");
-        errorReporter(newError, { text: result.text });
+        errorReporter(newError, { text: markdown });
 
         // ...and pretend it never happened
         return deferred.resolve(result);
