@@ -2,7 +2,7 @@
 "use strict";
 
 var RepoService =  require('../../services/github/github-repo-service');
-var processChat = require('../../utils/process-chat-isolated');
+var processChat = require('../../utils/markdown-processor');
 var winston = require('../../utils/winston');
 var _ = require('underscore');
 

@@ -1,7 +1,7 @@
 "use strict";
 
 var Mirror = require("../../../services/github/github-mirror-service")('repo');
-var processChat = require('../../../utils/process-chat-isolated');
+var processChat = require('../../../utils/markdown-processor');
 var util = require('util');
 var highlight = require('highlight.js');
 
