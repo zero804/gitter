@@ -41,9 +41,7 @@ define([
 
       this.listenTo(model, 'change:selected', function (m, selected) {
         this.$el.toggleClass('selected', !!selected);
-        if (selected) {
-          // TODO longer lists, do we need to scroll m into view?;
-        }
+        if (selected) { /* TODO longer lists, do we need to scroll m into view?; */ }
       });
     },
 
