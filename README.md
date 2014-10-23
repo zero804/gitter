@@ -98,7 +98,7 @@ Once you are sure the above is done, preform the following:
 
 5. In the ansible project, change directory to `roles/elasticsearch/files/elastic-config`
 
-6. Setup the mappings: `./01-create-index-with-mapping`
+6. Setup the mappings: `./01-create-index-with-mapping` (make sure your gitter-webapp is running before doing this...)
 
 7. Setup the rivers: `./02-create-rivers`
 
