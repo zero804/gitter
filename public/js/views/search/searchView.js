@@ -241,7 +241,7 @@ define([
       this.ui.input.val(function () { return ''; });
       this.model.set('searchTerm', '');
       this.hide();
-      if (window.innerWidth < 880) { this.triggerMethod('search:collapse'); }
+      this.triggerMethod('search:collapse');
     },
 
     activate: function () {

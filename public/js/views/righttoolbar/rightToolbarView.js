@@ -57,11 +57,11 @@ define([
       this.search.show(this.searchView);
 
       this.searchView.on("search:expand", function () {
-        $('.trpToolbar').width(function () { return 310; });
+        $('.trpToolbar').addClass('expand');
       });
 
       this.searchView.on("search:collapse", function () {
-        $('.trpToolbar').width(function () { return 70; });
+        $('.trpToolbar').removeClass('expand');
       });
 
       this.searchView.on("search:show", function () {
