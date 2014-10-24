@@ -6,6 +6,7 @@
 @import "activity.less";
 
 .trpToolbar {
+  position: relative;
   color: #333;
   font-family: @fontSans;
   font-size: 14px;
@@ -58,6 +59,10 @@
     max-height: 300px;
   }
 
+  .expand {
+    width: @rightMarginFull;
+  }
+
   @media @mid {
     width: 70px;
     padding-right: 0px;
@@ -65,6 +70,10 @@
 
     &.expanded {
       width: 240px;
+    }
+
+    &.expand {
+      width: @rightMarginFull;
     }
 
     #activity-header {
