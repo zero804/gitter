@@ -56,7 +56,14 @@ define([
       this.searchView = new SearchView({});
       this.search.show(this.searchView);
 
-      // TODO: need to expand the toolbar...
+      this.searchView.on("search:expand", function () {
+        $('.trpToolbar').width(function () { return 310; });
+      });
+
+      this.searchView.on("search:collapse", function () {
+        $('.trpToolbar').width(function () { return 70; });
+      });
+
       this.searchView.on("search:show", function () {
         $('#toolbar-top-content').hide();
       }.bind(this));
