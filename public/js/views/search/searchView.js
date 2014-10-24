@@ -235,16 +235,19 @@ define([
       return !this.model.get('searchTerm');
     },
 
+    // this is used to collapse
     dismiss: function () {
       this.model.set('active', false);
       this.ui.input.val(function () { return ''; });
       this.model.set('searchTerm', '');
       this.hide();
+      this.triggerMethod('search:collapse');
     },
 
     activate: function () {
       var model = this.model;
       model.set('active', !this.isActive());
+      if (window.innerWidth < 880) { this.triggerMethod('search:expand'); }
 
       if (this.isActive()) {
         var input = this.ui.input;
