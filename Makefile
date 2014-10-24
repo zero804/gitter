@@ -212,8 +212,8 @@ post-test-maintain-data:
 
 tarball:
 	mkdir -p output
-	find . -type f -not -name ".*"| grep -Ev '^\./(\.|coverage/|output/|assets/|mongo-backup-|scripts/mongo-backup-|node_modules/).*'|tar -cv --files-from - |gzip -9 - > output/troupe.tgz
-	tar -cvzf output/assets.tgz -C public-processed . > /dev/null
+	find . -type f -not -name ".*"| grep -Ev '^\./(\.|coverage/|output/|assets/|mongo-backup-|scripts/mongo-backup-|node_modules/).*'|tar -c --files-from - |gzip -9 - > output/troupe.tgz
+	tar -czf output/assets.tgz -C public-processed . > /dev/null
 
 search-js-console:
 	if (find public/js -name "*.js" ! -path "*libs*" ! -name log.js |xargs grep -qE '\b(console|debugger)\b'); then \
@@ -246,6 +246,18 @@ clean-client-libs:
 clean-temp-client-libs:
 	rm -rf output/client-libs/ output/js-temp
 
+clean-embedded-chat:
+	rm -rf output/embedded output/embedded.tgz
+
+embedded-chat:
+	mkdir -p output/embedded/mobile
+	NODE_ENV=prod ./build-scripts/render-embedded-chat.js  -o output/embedded/mobile/embedded-chat.html
+	echo public-processed/js/core-libraries.min.js > output/embedded-resources.txt
+	echo public-processed/js/mobile-native-embedded-chat.min.js >> output/embedded-resources.txt
+	echo public-processed/styles/mobile-native-chat.css >> output/embedded-resources.txt
+	ls public-processed/images/emoji/*  >> output/embedded-resources.txt
+	./build-scripts/extract-urls.js public-processed/styles/mobile-native-chat.css >> output/embedded-resources.txt
+	./build-scripts/copy-embedded-resources.sh
 
 fetch-client-libs:
 	bower install

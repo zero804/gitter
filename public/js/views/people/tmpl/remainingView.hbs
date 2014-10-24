@@ -1,7 +1,7 @@
 <div style="clear:both"></div>
-{{#unless isOneToOne}}
+{{#if showAddBadge}}
   <a href="#add" class="trpAddBadge  js-add-more" style="text-decoration: none"><div style="text-align: center;">&#10011; Add</div></a>
-{{/unless}}
+{{/if}}
 <span class='js-show-more'>
   <a href="#people" class="trpMoreBadge" style="text-decoration: none"><div style="text-align: center;">See All</div></a><small>({{remainingCount}} member{{#if plural}}s{{/if}} hidden)</small>
 </span>

@@ -88,6 +88,7 @@ module.exports = function(err, req, res, next) {
 
   } else if(status === 404) {
     stats.event('client_error_404', { userId: userId });
+
     extraTemplateValues = {
       title: 'Page Not Found'
     };

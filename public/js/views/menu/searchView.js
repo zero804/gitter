@@ -1,6 +1,6 @@
 define([
-  'utils/context',
   'utils/appevents',
+  'components/apiClient',
   'jquery',
   'underscore',
   'backbone',
@@ -9,7 +9,7 @@ define([
   'collections/instances/troupes',
   'cocktail',
   'views/keyboard-events-mixin'
-], function(context, appEvents, $, _, Backbone, textFilter, RoomCollectionView, troupeCollections, cocktail, KeyboardEventsMixin
+], function(appEvents, apiClient, $, _, Backbone, textFilter, RoomCollectionView, troupeCollections, cocktail, KeyboardEventsMixin
 ) {
   "use strict";
 
@@ -223,10 +223,10 @@ define([
         return;
       }
 
-      // only search for gitter users so we dont risk linking to 404 pages for github users
-      $.ajax({ url: '/api/v1/user', data : { q: query, type: 'gitter' }, success: function(data) {
+      apiClient.get('/v1/user', { q: query, type: 'gitter' })
+        .then(function(data) {
+          if(!data.results) return;
 
-        if (data.results) {
           if (!self.user_queries[query]) self.user_queries[query] = [];
 
           self.user_queries[query] = _.uniq(self.user_queries[query].concat(data.results), function(s) {
@@ -234,8 +234,7 @@ define([
           });
 
           callback(self.user_queries[query]);
-        }
-      }});
+        });
     },
 
     findRepos: function(query, callback) {
@@ -260,18 +259,17 @@ define([
         return;
       }
 
-      $.ajax({ url: '/api/v1/user/' + context.getUserId() + '/repos', data : { q: query }, success: function(data) {
+      apiClient.user.get('/repos', { q: query })
+        .then(function(data) {
+          if(!data.results) return;
+            if (!self.repo_queries[query]) self.repo_queries[query] = [];
 
-        if (data.results) {
-          if (!self.repo_queries[query]) self.repo_queries[query] = [];
+            self.repo_queries[query] = _.uniq(self.repo_queries[query].concat(data.results), function(s) {
+              return s.name;
+            });
 
-          self.repo_queries[query] = _.uniq(self.repo_queries[query].concat(data.results), function(s) {
-            return s.name;
-          });
-
-          callback(self.repo_queries[query]);
-        }
-      }});
+            callback(self.repo_queries[query]);
+        });
     },
 
     findPublicRepos: function(query, callback) {
@@ -296,9 +294,9 @@ define([
         return;
       }
 
-      $.ajax({ url: '/api/v1/public-repo-search', data : { q: query }, success: function(data) {
-
-        if (data.results) {
+      apiClient.get('/v1/public-repo-search', { q: query })
+        .then(function(data) {
+          if (!data.results) return;
           if (!self.repo_queries[query]) self.repo_queries[query] = [];
 
           self.repo_queries[query] = _.uniq(self.repo_queries[query].concat(data.results), function(s) {
@@ -306,8 +304,7 @@ define([
           });
 
           callback(self.repo_queries[query]);
-        }
-      }});
+        });
     },
 
     findChannels: function(query, callback) {
@@ -332,9 +329,9 @@ define([
         return;
       }
 
-      $.ajax({ url: '/api/v1/channel-search', data : { q: query }, success: function(data) {
-
-        if (data.results) {
+      apiClient.get('/v1/channel-search', { q: query })
+        .then(function(data) {
+          if(!data.results) return;
 
           if (!self.channel_queries[query]) self.channel_queries[query] = [];
 
@@ -343,8 +340,7 @@ define([
           });
 
           callback(self.channel_queries[query]);
-        }
-      }});
+        });
     },
 
     selectPrev: function() {

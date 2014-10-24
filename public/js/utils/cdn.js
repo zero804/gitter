@@ -9,7 +9,16 @@ define([
   var cdnPrefix =  assetTag ? "/_s/" + assetTag : '';
 
   function cdnPassthrough(url) {
-    return "/" + url;
+    // nicest way of supporting embedded mobile chat
+    if(window.location.protocol === 'file:') {
+      var index = window.location.pathname.indexOf('.app/www/build/');
+      // embedded root should be /x/y/z/[Gitter or GitterBeta].app/www/build/
+      var embeddedRoot = window.location.pathname.substring(0, index) + '.app/www/build/' ;
+
+      return embeddedRoot + url;
+    } else {
+      return '/' + url;
+    }
   }
 
   function cdnSingle(url, options) {

@@ -96,6 +96,15 @@ var MODULES = [
       exclude: ["core-libraries"]
   },
   {
+      name: "mobile-native-embedded-chat",
+      include: [
+        "utils/tracking",
+        "views/widgets/avatar",
+        "views/widgets/timeago"
+      ],
+      exclude: ["core-libraries"]
+  },
+  {
       name: "mobile-app",
       include: [
         "utils/tracking",
@@ -140,8 +149,9 @@ var LESS_ROOTS = [
 
   // Bootscript root less files
   { name: 'homepage'                           },
+  { name: 'explore'                            },
+  { name: 'not-found'                          },
   { name: 'about'                              },
-  { name: 'explore'                           },
   { name: 'router-chat'                        },
   { name: 'router-app'                         },
   { name: 'router-nli-app'                     },

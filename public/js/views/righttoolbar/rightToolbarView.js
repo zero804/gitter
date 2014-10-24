@@ -45,7 +45,7 @@ define([
       // Repo info
       if (context.troupe().get('githubType') === 'REPO') {
         var repo = new repoInfo.model();
-        repo.fetch({ data: $.param({repo: context.troupe().get('uri') })});
+        repo.fetch({ data: { repo: context.troupe().get('uri') } });
         this.repo_info.show(new repoInfo.view({ model: repo }));
       }
 

@@ -42,7 +42,7 @@ define([
         add: ('add' in options) ? options.add : true,
         merge: ('merge' in options) ? options.merge : true,
         data: data,
-        success: function(collection, response, options) {
+        success: function(collection, response/*, options*/) { // jshint unused:true
           delete self._isFetching;
           self.setAtBottom(true);
 
