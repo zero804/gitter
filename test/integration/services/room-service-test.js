@@ -95,13 +95,119 @@ describe('room-service', function() {
 
   describe('classic functionality', function() {
 
-    it('should find or create a room for an org', function(done) {
-      var roomService = testRequire("./services/room-service");
+    it('should fail to create a room for an org', function (done) {
+      var permissionsModelMock = mockito.mockFunction();
+
+      var roomService = testRequire.withProxies("./services/room-service", {
+        './permissions-model': permissionsModelMock
+      });
+
+      mockito.when(permissionsModelMock)().then(function (user, right, uri, githubType) {
+        assert.equal(user.username, fixture.user1.username);
+        assert.equal(right, 'create');
+        assert.equal(uri, 'gitterTest');
+        assert.equal(githubType, 'ORG');
+
+        return Q.resolve(false);
+      });
 
       return roomService.findOrCreateRoom(fixture.user1, 'gitterTest')
-        .then(function(uriContext) {
-          assert(!uriContext.oneToOne);
-          assert(!uriContext.troupe);
+        .then(function (uriContext) {
+          assert.equal(uriContext, null);
+        })
+        .nodeify(done);
+    });
+
+    it('should deny access but provide public rooms', function (done) {
+
+      var permissionsModelMock = mockito.mockFunction();
+      var uriLookupServiceMock = mockito.mock(testRequire('./services/uri-lookup-service'));
+      var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
+
+      var roomService = testRequire.withProxies('./services/room-service', {
+        './uri-lookup-service': uriLookupServiceMock,
+        './permissions-model': permissionsModelMock,
+        './troupe-service':  troupeServiceMock
+      });
+
+      mockito
+        .when(permissionsModelMock)()
+        .then(function (user, right, uri, githubType) {
+          assert.equal(user.username, fixture.user1.username);
+          assert.equal(right, 'create');
+          assert.equal(uri, 'gitterTest');
+          assert.equal(githubType, 'ORG');
+
+          return Q.resolve(false);
+        });
+
+      mockito
+        .when(uriLookupServiceMock)
+        .lookupUri()
+        .then(function () {
+          return Q.resolve({
+            uri: 'gitterTest',
+            troupeId: '5436981c00062eebf0fbc0d5'
+          });
+        });
+
+      mockito
+        .when(troupeServiceMock)
+        .findById()
+        .then(function (room) {
+          return Q.resolve({
+              _id: '5436981c00062eebf0fbc0d5',
+              githubType: 'ORG',
+              uri: 'gitterTest',
+              security: null,
+              bans: [],
+              oneToOne: false,
+              status: 'ACTIVE',
+              lcUri: 'gitterhq',
+              tags: [],
+              topic: 'Gitter',
+              containsUserId: function () {
+
+              }
+          });
+        });
+
+      // test
+      roomService
+        .findOrCreateRoom(fixture.user1, 'gitterTest')
+        .then(function (uriContext) {
+          var githubType = uriContext.accessDenied && uriContext.accessDenied.githubType;
+          assert(githubType === 'ORG');
+        })
+        .nodeify(done);
+    });
+
+
+    it('should find or create a room for an organization', function(done) {
+      var permissionsModelMock = mockito.mockFunction();
+
+      var roomService = testRequire.withProxies("./services/room-service", {
+        './permissions-model': permissionsModelMock
+      });
+
+      mockito
+        .when(permissionsModelMock)().then(function (user, right, uri, githubType) {
+        assert.equal(user.username, fixture.user1.username);
+        assert.equal(right, 'create');
+        assert.equal(uri, 'gitterTest');
+        assert.equal(githubType, 'ORG');
+
+        return Q.resolve(true);
+      });
+
+      return roomService
+        .findOrCreateRoom(fixture.user1, 'gitterTest')
+        .then(function (uriContext) {
+          assert(uriContext.didCreate);
+          assert.equal(uriContext.troupe.uri, 'gitterTest');
+        })
+        .finally(function () {
+          return persistence.Troupe.removeQ({ uri: 'gitterTest' });
         })
         .nodeify(done);
     });
@@ -195,8 +301,8 @@ describe('room-service', function() {
       var roomService = testRequire("./services/room-service");
 
       return roomService.findOrCreateRoom(fixture.user1, 'joyent')
-        .then(function(uriContext) {
-          assert(!uriContext.troupe);
+        .then(function (uriContext) {
+          assert(!uriContext);
         })
         .nodeify(done);
     });

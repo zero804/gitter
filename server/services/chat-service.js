@@ -8,7 +8,7 @@ var ChatMessage          = require("./persistence-service").ChatMessage;
 var collections          = require("../utils/collections");
 var troupeService        = require("./troupe-service");
 var userService          = require("./user-service");
-var processChat          = require('../utils/process-chat-isolated');
+var processChat          = require('../utils/markdown-processor');
 var appEvents            = require('../app-events');
 var Q                    = require('q');
 var mongoUtils           = require('../utils/mongo-utils');
@@ -21,15 +21,21 @@ var mongooseUtils        = require('../utils/mongoose-utils');
 var cacheWrapper         = require('../utils/cache-wrapper');
 var groupResolver        = require('./group-resolver');
 var chatSearchService    = require('./chat-search-service');
+var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
+
 /*
  * Hey Trouper!
- * Bump the version if you modify the behaviour of TwitterText.
+ * This is a changelog of sorts for changes to message processing & metadata.
+ * Since version 7, processing is done by a seperate (versioned) module.
+ * so check github.com/gitterHQ/gitter-markdown-processor to see what changes at every major version
  */
 var VERSION_SWITCH_TO_SERVER_SIDE_RENDERING = 5;
 var VERSION_KATEX = 6;
+var VERSION_EXTERNAL_GITTER_MARKDOWN_PROCESSOR = 7;
+
 var MAX_CHAT_MESSAGE_LENGTH = 4096;
 
-var CURRENT_META_DATA_VERSION = VERSION_KATEX;
+var CURRENT_META_DATA_VERSION = markdownMajorVersion;
 
 // If you edit this, you need to update the client too.
 /* @const */

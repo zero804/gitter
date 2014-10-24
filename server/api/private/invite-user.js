@@ -36,7 +36,7 @@ module.exports =  function (req, res, next) {
 
       return user.saveQ()
         .then(function() {
-          return emailService.sendInvitation(req.user, user, room);
+          return emailService.sendManualInvitation(req.user, user, room, email);
         })
         .thenResolve([user, room]);
     })

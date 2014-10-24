@@ -34,11 +34,13 @@ module.exports = {
 
   create: function(req, res, next) {
     var roomUri = req.query.uri || req.body.uri;
+    var addBadge = req.body.addBadge || false;
+
     if (!roomUri) return next(new StatusError(400));
 
-    return roomService.findOrCreateRoom(req.user, roomUri, { ignoreCase: true })
-      .then(function(room) {
-        if (!room.troupe) throw new StatusError(403, 'Permission denied');
+    return roomService.findOrCreateRoom(req.user, roomUri, { ignoreCase: true, addBadge: addBadge })
+      .then(function (room) {
+        if (!room || !room.troupe) throw new StatusError(403, 'Permission denied');
 
         var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true, includeRolesForTroupe: room.troupe });
 

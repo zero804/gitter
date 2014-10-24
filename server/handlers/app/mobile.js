@@ -11,15 +11,18 @@ var EXPIRES_MILLISECONDS = EXPIRES_SECONDS * 1000;
 
 module.exports = {
   install: function(app) {
+    app.get('/mobile/embedded-chat', appRender.renderMobileNativeEmbeddedChat);
+
+    app.get('/mobile/home', ensureLoggedIn, appRender.renderMobileNativeUserhome);
+
+    /*
+     * DEPRECATED, only used by gitter ios v1
+     * ITS FULL OF APPCACHE MESS
+     */
     app.get('/mobile/chat', ensureLoggedIn, function(req, res, next) {
       res.setHeader('Cache-Control', 'public, max-age=' + EXPIRES_SECONDS);
       res.setHeader('Expires', new Date(Date.now() + EXPIRES_MILLISECONDS).toUTCString());
       appRender.renderMobileNativeChat(req, res, next);
-    });
-    app.get('/mobile/home', ensureLoggedIn, function(req, res, next) {
-      res.setHeader('Cache-Control', 'public, max-age=' + EXPIRES_SECONDS);
-      res.setHeader('Expires', new Date(Date.now() + EXPIRES_MILLISECONDS).toUTCString());
-      appRender.renderMobileNativeUserhome(req, res, next);
     });
     app.get('/mobile/redirect', ensureLoggedIn, function(req, res, next) {
       var desktopUrl = req.query.desktopUrl;
