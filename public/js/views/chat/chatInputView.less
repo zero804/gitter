@@ -6,9 +6,9 @@
   box-sizing: border-box;
   .transition500ms;
 
-  position: fixed;
+  position: absolute;
   z-index: @l1;
-  right: @rightMarginFull;
+  right: 0;
   bottom: 0;
   left: 0;
 
@@ -16,14 +16,6 @@
 
   min-height: 70px;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
-
-  @media @mid {
-    right: @rightMarginMid;
-  }
-
-  @media @small {
-    right: @rightMarginSmall;
-  }
 
   &.leftCollapse {
     @media @small {
