@@ -1,9 +1,14 @@
 {{!< chat-layout}}
 {{> chat_alert_wrapper}}
-{{> chat_header}}
-{{> chat_content}}
-{{> chat_toolbar}}
-{{> chat_input}}
+<div style="display: flex; height: 100%;">
+  <div style="position: relative; width: 100%; height: 100%; flex-shrink: 1;">
+    {{> chat_header}}
+    {{> chat_content}}
+    {{> chat_input}}
+  </div>
+  {{> chat_toolbar}}
+</div>
+
 <div class="trpBlankPage"></div>
 {{> require_wrapper}}
 {{> set_initial_position}}
