@@ -56,19 +56,27 @@ define([
       this.searchView = new SearchView({});
       this.search.show(this.searchView);
 
-      this.searchView.on("search:expand", function () {
+      appEvents.on('search:expand', function () {
+
+      });
+
+      appEvents.on('search:collapse', function () {
+
+      });
+
+      this.searchView.on('search:expand', function () {
         $('.trpToolbar').addClass('expand');
       });
 
-      this.searchView.on("search:collapse", function () {
+      this.searchView.on('search:collapse', function () {
         $('.trpToolbar').removeClass('expand');
       });
 
-      this.searchView.on("search:show", function () {
+      this.searchView.on('search:show', function () {
         $('#toolbar-top-content').hide();
       }.bind(this));
 
-      this.searchView.on("search:hide", function () {
+      this.searchView.on('search:hide', function () {
         $('#toolbar-top-content').show();
       }.bind(this));
 
