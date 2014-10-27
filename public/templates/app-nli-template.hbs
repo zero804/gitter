@@ -17,15 +17,7 @@
 </head>
 <body class="logged-out">
 
-  {{#if stagingText}}
-    <div class="staging-indicator">
-      {{#if stagingLink}}
-        <a href="{{stagingLink}}" target="_blank">{{stagingText}}</a>
-      {{else}}
-        {{stagingText}}
-      {{/if}}
-    </div>
-  {{/if}}
+  {{> staging_marker}}
 
   {{#isMobile agent}}
     <div class="trpPortraitAlert" id='portrait-alert'>
