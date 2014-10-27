@@ -113,6 +113,16 @@ define([
       //   self.hideSearch();
       // });
 
+      appEvents.on('menu:hide', function () {
+        self.$el.hide();
+      });
+
+      appEvents.on('menu:show', function () {
+        self.$el.show();
+      });
+
+      console.debug('attached listener() ====================');
+
       this.selectedIndex = 0;
       // Keep track of conversation change to select the proper element
       appEvents.on('context.troupeId', function(id) {
