@@ -56,14 +56,6 @@ define([
       this.searchView = new SearchView({});
       this.search.show(this.searchView);
 
-      appEvents.on('search:expand', function () {
-
-      });
-
-      appEvents.on('search:collapse', function () {
-
-      });
-
       this.searchView.on('search:expand', function () {
         $('.trpToolbar').addClass('expand');
       });
