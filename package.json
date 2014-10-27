@@ -23,7 +23,7 @@
     "faye-redis": "git://github.com/gitterHQ/faye-redis-node#v0.3.0",
     "faye-websocket": "^0.7.2",
     "gitter-env": "git+ssh://git@github.com:gitterHQ/gitter-env.git#v0.15.0",
-    "gitter-markdown-processor": "^7.0.0",
+    "gitter-markdown-processor": "^7.1.1",
     "gitter-services": "git+ssh://git@github.com:gitterHQ/services.git#1.4.0",
     "handlebars": "~1.1.2",
     "heapdump": "^0.2.9",
@@ -85,7 +85,8 @@
     "langs": "^1.0.1",
     "cors": "^2.4.2",
     "elasticsearch": "^2.4.3",
-    "gitter-passport-http-bearer": "^1.1.0"
+    "gitter-passport-http-bearer": "^1.1.0",
+    "cld": "^2.2.0"
   },
   "devDependencies": {
     "better-assert": "1.0.0",
