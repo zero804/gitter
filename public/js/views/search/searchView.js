@@ -12,7 +12,8 @@ define([
   'utils/text-filter',
   'utils/multi-debounce',
   'views/keyboard-events-mixin',
-  'views/behaviors/widgets',
+  'views/behaviors/widgets', // No ref
+  'views/behaviors/highlight' // No ref
 ], function (appEvents, Backbone, Marionette, _, cocktail, itemCollections, ChatSearchModels, chatCollectionView, searchTemplate, resultTemplate, textFilter, multiDebounce, KeyboardEventsMixin) {
   "use strict";
 
@@ -71,6 +72,7 @@ define([
 
     behaviors: {
       Widgets: {},
+      Highlight: {}
     },
 
     serializeData: function () {
