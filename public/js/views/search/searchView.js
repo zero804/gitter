@@ -1,4 +1,6 @@
 define([
+  'jquery',
+  'utils/context',
   'utils/appevents',
   'backbone',
   'marionette',
@@ -13,7 +15,7 @@ define([
   'utils/multi-debounce',
   'views/keyboard-events-mixin',
   'views/behaviors/widgets',
-], function (appEvents, Backbone, Marionette, _, cocktail, itemCollections, ChatSearchModels, chatCollectionView, searchTemplate, resultTemplate, textFilter, multiDebounce, KeyboardEventsMixin) {
+], function ($, context, appEvents, Backbone, Marionette, _, cocktail, itemCollections, ChatSearchModels, chatCollectionView, searchTemplate, resultTemplate, textFilter, multiDebounce, KeyboardEventsMixin) {
   "use strict";
 
   var EmptyResultsView = Marionette.ItemView.extend({
@@ -63,7 +65,11 @@ define([
     },
 
     selectItem: function () {
-      appEvents.trigger('navigation', this.model.get('url'), 'chat', name);
+      if(this.model.get('exists')) {
+        appEvents.trigger('anavigation', this.model.get('url'), 'chat', this.model.get('uri'), null);
+      } else {
+        parent.location.hash = '#confirm/' + this.model.get('uri');
+      }
     }
   });
 
@@ -307,6 +313,7 @@ define([
         var collection = new Backbone.Collection(rooms);
         var filter = textFilter({ query: this.model.get('searchTerm'), fields: ['url', 'name'] });
         var results = collection.filter(filter);
+        if (!results.length) return;
         try {
           this.refreshCollection(this._rooms, results, { at: 0, merge: true });
         } catch (e) {
@@ -319,15 +326,55 @@ define([
     },
 
     remoteSearch: function() {
-      var chatSearchCollection = new ChatSearchModels.ChatSearchCollection([], { });
+      var query = this.model.get('searchTerm');
 
-      chatSearchCollection.fetchSearch(this.model.get('searchTerm'), function () {
+      // Find messages on ElasticSearch
+      var chatSearchCollection = new ChatSearchModels.ChatSearchCollection([], { });
+      chatSearchCollection.fetchSearch(query, function () {
         try {
           this.refreshCollection(this._chats, chatSearchCollection.models);
         } catch (e) {
           // new Error('Could not perform remote search.'); FIXME
         }
       }.bind(this), this);
+
+
+      // Find users, repos and channels on the server
+      var self = this;
+      var rooms = [];
+
+      // Merge local and remote results and refresh the collection
+      var refresh = function() {
+        var merge = self._rooms.models.concat(rooms);
+        var uniq  = _.uniq(merge, false, function(r) { return r.get('url'); });
+        self.refreshCollection(self._rooms, uniq);
+      };
+
+      // 
+      var debouncedRefresh = _.debounce(refresh, 250);
+
+      var cb = function(data) {
+        if (!data.results) return;
+        var models = data.results
+          //.filter(function(r) { return r.room || r.url; }) // we want only repos with rooms, users & channels
+          .map(function(r) {
+            if (r.room) r.id = r.room.id; // use the room id as model id for repos
+            r.url = r.url || '/' + r.uri; 
+            return new Backbone.Model(r); 
+        });
+        rooms = rooms.concat(models);
+        debouncedRefresh();
+      };
+
+      // Find users
+      $.ajax({url: '/api/v1/user', data : { q: query, type: 'gitter' }, success: cb});
+      // Find repos
+      $.ajax({ url: '/api/v1/user/' + context.getUserId() + '/repos', data : { q: query }, success: cb});
+      // Find public repos
+      $.ajax({ url: '/api/v1/public-repo-search', data : { q: query }, success: cb});
+      // find channels
+      $.ajax({ url: '/api/v1/channel-search', data : { q: query }, success: cb});
+
     },
 
     showResults: function () {
