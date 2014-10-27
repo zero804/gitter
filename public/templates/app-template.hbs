@@ -19,16 +19,7 @@
     {{>load_font_css}}
   </head>
   <body class='hover'>
-    {{#if stagingText}}
-      <div class="staging-indicator">
-        {{#if stagingLink}}
-          <a href="{{stagingLink}}" target="_blank">{{stagingText}}</a>
-        {{else}}
-          {{stagingText}}
-        {{/if}}
-      </div>
-    {{/if}}
-
+    {{> staging_marker}}
     {{#isMobile agent}}
       <div class="trpPortraitAlert" id='portrait-alert'>
         <div class="message">
@@ -39,21 +30,20 @@
       </div>
     {{/isMobile}}
 
-    <div class="trpLeftMenuHotspot" id="left-menu-hotspot"></div>
-    <div class="trpLeftMenu" id="left-menu">
-      {{!-- anything inside #left-menu will be wiped once the view is rendered. This is just placeholder  --}}
-      <div class="js-menu menu"></div>
-    </div>
-
-    <div class="trpMenuTab unread-count" id="menu-toggle-button">{{#if unreadCount}}{{unreadCount}}{{else}}0{{/if}}</div>
-
-    <div class="trpFramePanel" id="iframe-panel">
-      <iframe id="content-frame" src="{{chatAppLocation}}" style="width: 100%; height: 100%; border: 0" frameBorder="0"></iframe>
+    <div class='wrap'>
+      <div class="wrap-menu" id="left-menu">
+        <div class="js-menu menu"></div>
+      </div>
+      <div class="trpLeftMenuHotspot" id="left-menu-hotspot"></div>
+      <div class="trpMenuTab unread-count" id="menu-toggle-button">{{#if unreadCount}}{{unreadCount}}{{else}}0{{/if}}</div>
+      <div class="trpFramePanel" id="iframe-panel">
+        <iframe id="content-frame" src="{{chatAppLocation}}" style="width: 100%; height: 100%; border: 0" frameBorder="0"></iframe>
+      </div>
     </div>
 
     {{{ generateTroupeContext troupeContext }}}
-    {{>require_wrapper}}
+    {{> require_wrapper}}
     {{{ bootScript bootScriptName }}}
-    {{>live_reload}}
+    {{> live_reload}}
   </body>
 </html>

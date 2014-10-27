@@ -106,12 +106,14 @@ define([
       // this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
       this.repoList = false;
       var self = this;
-      // $(window).on('showSearch', function() {
-      //   self.showSearch();
-      // });
-      // $(window).on('hideSearch', function() {
-      //   self.hideSearch();
-      // });
+
+      appEvents.on('menu:hide', function () {
+        $('.wrap-menu').addClass('hide');
+      });
+
+      appEvents.on('menu:show', function () {
+        $('.wrap-menu').removeClass('hide');
+      });
 
       this.selectedIndex = 0;
       // Keep track of conversation change to select the proper element
@@ -189,16 +191,6 @@ define([
       }
     },
 
-    // Navigation to previous or next conversation appears tricky as the list of recent conversations is sorted by date
-    //
-    // navigateToNext: function() {
-    //   this.navigateTo(this.selectedIndex + 1);
-    // },
-    //
-    // navigateToPrev: function() {
-    //   this.navigateTo(this.selectedIndex - 1);
-    // },
-
     navigateToRoom: function(e, handler) {
       var keys = handler.key.split('+');
       var key = keys[ keys.length - 1 ];
@@ -254,29 +246,9 @@ define([
       }));
     },
 
-    /* the clear icon shouldn't be available at all times? */
-    // onSearchClearIconClick: function() {
-    //   $('#list-search-input').val('');
-    //   this.hideSearch();
-    // },
-
-    // activateSearchList: function() {
-    //   this.$el.find('#list-search-input').focus();
-    // },
-
     toggleHeaderExpansion: function() {
       $('#left-menu-profile').toggleClass('menu-header--expanded');
-    },
-
-    // hideSearch: function() {
-    //   this.$el.find('#list-search').hide();
-    //   this.$el.find('#list-mega').show();
-    // },
-
-    // showSearch: function() {
-    //   this.$el.find('#list-mega').hide();
-    //   this.$el.find('#list-search').show();
-    // }
+    }
   });
 
   cocktail.mixin(View, KeyboardEventsMixin);
