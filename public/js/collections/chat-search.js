@@ -3,8 +3,9 @@ define([
   './chat',
   'components/apiClient',
   'cocktail',
+  'utils/context',
   './infinite-mixin',
-], function (Backbone, chatModels, apiClient, cocktail, InfiniteCollectionMixin) {
+], function (Backbone, chatModels, apiClient, cocktail, context, InfiniteCollectionMixin) {
   "use strict";
 
   var ChatSearchCollection = Backbone.Collection.extend({
@@ -15,7 +16,7 @@ define([
     queryText: '',
 
     getQuery: function() {
-      return { q: this.queryText };
+      return { q: this.queryText, lang: context.lang() };
     },
 
     parse: function (collection) {
