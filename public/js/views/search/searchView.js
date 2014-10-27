@@ -242,12 +242,22 @@ define([
       this.model.set('searchTerm', '');
       this.hide();
       this.triggerMethod('search:collapse');
+      appEvents.triggerParent('menu:show'); // hide menu
     },
 
     activate: function () {
+
       var model = this.model;
       model.set('active', !this.isActive());
-      if (window.innerWidth < 880) { this.triggerMethod('search:expand'); }
+
+      var innerWidth = window.innerWidth;
+
+      if (innerWidth < 880) {
+        this.triggerMethod('search:expand');
+        if (innerWidth >= 680) {
+          appEvents.triggerParent('menu:hide'); // hide menu
+        }
+      }
 
       if (this.isActive()) {
         var input = this.ui.input;
