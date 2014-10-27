@@ -66,7 +66,7 @@ define([
 
     selectItem: function () {
       if(this.model.get('exists')) {
-        appEvents.trigger('anavigation', this.model.get('url'), 'chat', this.model.get('uri'), null);
+        appEvents.trigger('navigation', this.model.get('url'), 'chat', this.model.get('uri'), null);
       } else {
         parent.location.hash = '#confirm/' + this.model.get('uri');
       }
@@ -314,6 +314,7 @@ define([
         var filter = textFilter({ query: this.model.get('searchTerm'), fields: ['url', 'name'] });
         var results = collection.filter(filter);
         if (!results.length) return;
+        results.map(function(r) { r.set('exists', true); }); // local results always exist
         try {
           this.refreshCollection(this._rooms, results, { at: 0, merge: true });
         } catch (e) {
