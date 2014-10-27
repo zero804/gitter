@@ -84,19 +84,18 @@ Once you are sure the above is done, preform the following:
 
 1. Install ElasticSearch 1.2.2
   1. `cd $(brew --prefix)`
-  2. `git checkout 97e96ed /usr/local/Library/Formula/elasticsearch.rb`
-  3. `brew install elasticsearch`
+  2. `git checkout afe0820 /usr/local/Library/Formula/elasticsearch.rb` - version 1.3.4
+  3. `brew install elasticsearch`  (remember to brew unlink elasticsearch if you've already got another version installed)
 
-2. Install required ElasticSearch plugins (You might need to install [JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html))
-  1. `/usr/local/Cellar/elasticsearch/1.2.2/bin/plugin  --install elasticsearch/elasticsearch-lang-javascript/2.4.0`
-  2. `/usr/local/Cellar/elasticsearch/1.2.2/bin/plugin   --install com.github.richardwilly98.elasticsearch/elasticsearch-river-mongodb/2.0.1`
-  3. `/usr/local/Cellar/elasticsearch/1.2.2/bin/plugin --install royrusso/elasticsearch-HQ`
+2. You might need to install [JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 
-3. Start elasticsearch from the root of gitter-webapp: `./start-elasticsearch.sh`
+3. Ensure that your ansible repo is up-to-date: git@github.com:troupe/ansible.git
 
-4. Ensure that your ansible repo is up-to-date: git@github.com:troupe/ansible.git
+4. In the ansible project, change directory to `roles/elasticsearch/files/elastic-config`
 
-5. In the ansible project, change directory to `roles/elasticsearch/files/elastic-config`
+5. Run ./XX-setup-plugins
+
+5. Start elasticsearch from the root of gitter-webapp: `./start-elasticsearch.sh`
 
 6. Setup the mappings: `./01-create-index-with-mapping` (make sure your gitter-webapp is running before doing this...)
 
