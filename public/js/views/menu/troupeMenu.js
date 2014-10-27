@@ -106,12 +106,6 @@ define([
       // this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
       this.repoList = false;
       var self = this;
-      // $(window).on('showSearch', function() {
-      //   self.showSearch();
-      // });
-      // $(window).on('hideSearch', function() {
-      //   self.hideSearch();
-      // });
 
       appEvents.on('menu:hide', function () {
         self.$el.hide();
@@ -120,8 +114,6 @@ define([
       appEvents.on('menu:show', function () {
         self.$el.show();
       });
-
-      console.debug('attached listener() ====================');
 
       this.selectedIndex = 0;
       // Keep track of conversation change to select the proper element
