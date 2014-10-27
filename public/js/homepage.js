@@ -3,8 +3,9 @@ require([
   'utils/context',
   'hbs!./map-message',
   'utils/room-name-trimmer',
+  'components/apiClient',
   'utils/tracking' // no ref
- ], function($, context, mapMessageTemplate, roomNameTrimmer) {
+ ], function($, context, mapMessageTemplate, roomNameTrimmer, apiClient) {
   "use strict";
 
   var active = [];
@@ -165,25 +166,25 @@ require([
 
     var $map = $('.map');
 
-    $.get('/api/private/sample-chats', function (messages) {
+    apiClient.priv.get('/sample-chats')
+      .then(function(messages) {
+        setInterval(function() {
+          var chatMessage = messages.shift();
+          var pos = coords.shift();
 
-      setInterval(function() {
-        var chatMessage = messages.shift();
-        var pos = coords.shift();
+          if(!chatMessage || !pos) return;
+          messages.push(chatMessage);
+          coords.push(pos);
 
-        if(!chatMessage || !pos) return;
-        messages.push(chatMessage);
-        coords.push(pos);
+          var $el = createMessageElement(chatMessage, pos);
+          addMessageElementToMap($el, $map);
 
-        var $el = createMessageElement(chatMessage, pos);
-        addMessageElementToMap($el, $map);
+          setTimeout(function() {
+            removeItemFromMap($el);
+          }, 2000);
 
-        setTimeout(function() {
-          removeItemFromMap($el);
         }, 2000);
-
-      }, 2000);
-    });
+      });
   }
 
   function createMessageElement(chatMessage, pos) {

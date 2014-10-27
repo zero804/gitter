@@ -14,6 +14,7 @@ module.exports = {
     var beforeId = req.query.beforeId;
     var afterId = req.query.afterId;
     var aroundId = req.query.aroundId;
+    var lang = req.query.lang;
     var marker = req.query.marker;
     var q = req.query.q;
     var userId = req.user && req.user.id;
@@ -24,10 +25,11 @@ module.exports = {
       options = {
         skip: parseInt(skip, 10) || 0,
         limit: parseInt(limit, 10) || 50,
+        lang: lang,
         userId: userId
       };
 
-      query = chatService.searchChatMessagesForRoom(req.troupe.id, "" + q);
+      query = chatService.searchChatMessagesForRoom(req.troupe.id, "" + q, options);
     } else {
       options = {
         skip: parseInt(skip, 10) || 0,

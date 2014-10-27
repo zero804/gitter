@@ -147,6 +147,7 @@ function ChatStrategy(options)  {
         }) : [],
       issues: item.issues || [],
       meta: item.meta || {},
+      highlights: item.highlights,
       v: getVersion(item)
     };
 

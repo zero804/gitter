@@ -20,6 +20,7 @@ var troupeEnv = {
   domain: nconf.get('web:domain'),
   baseServer: nconf.get('web:baseserver'),
   basePath: nconf.get('web:basepath'),
+  apiBasePath: nconf.get('web:apiBasePath'),
   homeUrl: nconf.get('web:homeurl'),
   badgeBaseUrl: nconf.get('web:badgeBaseUrl'),
   embedBaseUrl: nconf.get('web:embedBaseUrl'),
@@ -34,7 +35,7 @@ var troupeEnv = {
   logging: nconf.get("web:consoleLogging"),
   ravenUrl: nconf.get("errorReporting:clientRavenUrl"),
   websockets: {
-    fayeUrl: nconf.get('ws:fayeUrl') || "/faye",
+    fayeUrl: nconf.get('ws:fayeUrl'),
     options: {
       timeout: nconf.get('ws:fayeTimeout'),
       retry: nconf.get('ws:fayeRetry'),
@@ -55,7 +56,15 @@ exports.cdn = function(url, parameters) {
 exports.bootScript = function(url, parameters) {
   var options = parameters.hash;
 
-  var cdnFunc  = (options.skipCdn) ? function(a) { return '/' + a; } : cdn;
+  var cdnFunc;
+  if(options.skipCdn) {
+    cdnFunc = function(a) { return '/' + a; };
+  } else if(options.root) {
+    cdnFunc = function(a) { return options.root + a; };
+  } else {
+    cdnFunc = cdn;
+  }
+
   var skipCore = options.skipCore;
 
   var async    = 'async' in options ? options.async : true;
@@ -104,11 +113,18 @@ exports.isMobile = function(agent, options) {
   return ((agent.match(/ipad/i)) ? options.fn(this) : null);
 };
 
+function createEnv(context, options) {
+  if(options) {
+    return _.extend({
+      lang: context.lang
+    }, troupeEnv, options);
+  }
+  return troupeEnv;
+}
 exports.generateEnv = function(parameters) {
   var options = parameters.hash;
-  var env = options ? _.extend({
-    lang: this.lang
-  }, troupeEnv, options) : troupeEnv;
+  var env = createEnv(this, options);
+
   return '<script type="text/javascript">' +
           'window.troupeEnv = ' + safeJson(JSON.stringify(env)) + ';' +
           '</script>';
@@ -117,9 +133,7 @@ exports.generateEnv = function(parameters) {
 exports.generateTroupeContext = function(troupeContext, parameters) {
   var options = parameters.hash;
 
-  var env = options ? _.extend({
-    lang: this.lang
-  }, troupeEnv, options) : troupeEnv;
+  var env = createEnv(this, options);
 
   /* Disable the use of CDNs if we're using the appcache as douchey appcache doesn't support CDN fetchs */
   if(options && options.appcache) {
@@ -187,4 +201,18 @@ exports.formatNumber = function (n) {
   if (n < 1000) return n;
   if (n < 1000000) return (n / 1000).toFixed(1) + 'k';
   return (n / 100000).toFixed(1) + 'm';
+};
+
+/** FIXME we do not yet cover the ONE-TO-ONE case, also need to do better default values
+ * githubTypeToClass() takes a GitHub type and provdides a css class
+ *
+ */
+exports.githubTypeToClass = function (type) {
+  if (/_CHANNEL/.test(type)) return 'icon-hash';
+  else if (/REPO/.test(type)) return 'octicon-repo';
+  else return 'default';
+};
+
+exports.getRoomName = function (name) {
+  return name.split('/')[1];
 };

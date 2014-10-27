@@ -10,11 +10,20 @@ var expressHbs     = require('express-hbs');
 var path           = require('path');
 var rememberMe     = require('./middlewares/rememberme-middleware');
 var I18n           = require('i18n-2');
+var cors           = require('cors');
 
 // Naughty naughty naught, install some extra methods on the express prototype
 require('./http');
 
 var staticContentDir = path.join(__dirname, '..', '..', config.get('web:staticContent'));
+
+function bindI18n(app) {
+  I18n.expressBind(app, {
+    locales: ['en', 'fr', 'ja', 'de', 'ru', 'es', 'zh', 'pt', 'it', 'nl', 'sv', 'cs', 'pl', 'da', 'ko'],
+    devMode: config.runtimeEnvironment === 'dev',
+    directory: path.join(__dirname, '..', '..', 'locales')
+  });
+}
 
 module.exports = {
   /**
@@ -32,6 +41,8 @@ module.exports = {
     expressHbs.registerHelper('toLowerCase', require('./hbs-helpers').toLowerCase);
     expressHbs.registerHelper('typewriter', require('./hbs-helpers').typewriter);
     expressHbs.registerHelper('formatNumber', require('./hbs-helpers').formatNumber);
+    expressHbs.registerHelper('githubTypeToClass', require('./hbs-helpers').githubTypeToClass);
+    expressHbs.registerHelper('getRoomName', require('./hbs-helpers').getRoomName);
 
     app.locals({
       googleTrackingId: config.get("stats:ga:key"),
@@ -65,12 +76,7 @@ module.exports = {
     app.use(express.json());
     app.use(express.methodOverride());
     app.use(require('./middlewares/ie6-post-caching'));
-
-    I18n.expressBind(app, {
-      locales: ['en', 'fr', 'ja', 'de', 'ru', 'es', 'zh', 'pt', 'it', 'nl', 'sv', 'cs', 'pl', 'da', 'ko'],
-      devMode: config.runtimeEnvironment === 'dev',
-      directory: path.join(__dirname, '..', '..', 'locales')
-    });
+    bindI18n(app);
 
     /* Blanket Middlewares */
     app.use(function(req, res, next) {
@@ -132,8 +138,33 @@ module.exports = {
     app.use(express.methodOverride());
 
     app.use(require('./middlewares/ie6-post-caching'));
+    bindI18n(app);
 
     app.use(passport.initialize());
+
+
+    // API uses CORS
+    var corsOptions = {
+      origin: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+      maxAge: 600, // 10 minutes
+      allowedHeaders: [
+        'content-type',
+        'x-access-token',
+        'accept'
+      ],
+      exposedHeaders: [
+        // Rate limiting with dolph
+        'X-RateLimit-Limit',
+        'X-RateLimit-Remaining',
+        'X-RateLimit-Reset'
+      ]
+    };
+
+    app.use(cors(corsOptions));
+
+    app.options('*', cors(corsOptions));
+
     app.use(app.router);
 
     app.use(require('./middlewares/token-error-handler'));

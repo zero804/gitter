@@ -16,7 +16,7 @@ define([
     if(troupe.id) {
       var client = realtime.getClient();
 
-      subscription = client.subscribe('/api/v1/rooms/' + troupe.id, function(message) {
+      subscription = client.subscribe('/v1/rooms/' + troupe.id, function(message) {
         if(message.notification === 'presence') {
           if(message.status === 'in') {
             appEvents.trigger('userLoggedIntoTroupe', message);

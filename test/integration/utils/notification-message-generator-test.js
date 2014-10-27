@@ -104,7 +104,7 @@ describe('notification-message-generator', function() {
               ]
     });
 
-    assert.equal(message.notificationText, 'gitterHQ/gitter-webapp  \nMike: Yo  \nMike uploaded accounts.xls  \nAndrew: Hey how are you?  \nAndrew uploaded ads.xls');
+    assert.equal(message.notificationText, 'gitterHQ/gitter-webapp  \nMike: Yo  \nMike uploaded accounts.xls  \nAndrew: Hey how are you?');
   });
 
   it('should handle really long content', function() {
@@ -130,7 +130,7 @@ describe('notification-message-generator', function() {
               ]
     }, 'http://localhost/test');
 
-    assert.equal(message.notificationText, 'gitterHQ/gitter-webapp  \nMike: Yo  \nMike uploaded accounts.xls  \nAndrew: Hey how are you?  \nAndrew uploaded ads.xls');
+    assert.equal(message.notificationText, 'gitterHQ/gitter-webapp  \nMike: Yo  \nMike uploaded accounts.xls  \nAndrew: Hey how are you?');
     assert.equal(message.smsText, 'gitterHQ/gitter-webapp\nMike: Yo\nMike uploaded accounts.xls\nAndrew: Hey how are you?\nAndrew uploaded ads.xls\nAndrew: Hey how are you?\nhttp://localhost/test');
 
   });

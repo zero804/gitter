@@ -2,6 +2,9 @@
 
 var Q                    = require('q');
 var roomCapabilities     = require('./room-capabilities');
+var _                    = require('underscore');
+var languageDetector     = require('../utils/language-detector');
+var languageAnalyzerMapper = require('../utils/language-analyzer-mapper');
 
 var elasticsearch = require('elasticsearch');
 var client = new elasticsearch.Client({
@@ -12,17 +15,19 @@ var client = new elasticsearch.Client({
 /* Magic way of figuring out the matching terms so that we can highlight */
 function extractHighlights(text) {
   if(!text) return [];
-  var results = {};
+  var results = [];
   text.forEach(function(t) {
-    t.replace(/<m(\d)>(.*?)<\m(\1)>/g,function(match, c1, c2) {
-      results[c2] = true;
-    });
+    var re = /<m(\d)>(.*?)<\/m\1>/g;
+    var match;
+    while((match = re.exec(t)) !== null) {
+      results[match[1]] = match[2];
+    }
   });
 
-  return Object.keys(results);
+  return results.filter(function(f) { return !!f; });
 }
 
-function performQuery(troupeId, textQuery, maxHistoryDate) {
+function performQuery(troupeId, textQuery, maxHistoryDate, options) {
   /* Horrible hack - rip a from:xyz field out of the textQuery */
   var fromUser;
   textQuery = textQuery.replace(/\bfrom:('[^']*'|"[^"]*"|[^'"]\w*)/g, function(wholeMatch, fromField) {
@@ -31,7 +36,7 @@ function performQuery(troupeId, textQuery, maxHistoryDate) {
   });
 
   var query = {
-    size: 10,
+    size: options.limit || 10,
     timeout: 500,
     index: 'gitter',
     type: 'chat',
@@ -41,7 +46,8 @@ function performQuery(troupeId, textQuery, maxHistoryDate) {
         bool: {
           must: [{
             term: { toTroupeId: String(troupeId) }
-          }]
+          }],
+          should: []
         }
       },
       highlight: {
@@ -49,21 +55,14 @@ function performQuery(troupeId, textQuery, maxHistoryDate) {
         pre_tags: ["<m0>","<m1>","<m2>","<m3>","<m4>","<m5>"],
         post_tags: ["<m0>","</m1>","</m2>","</m3>","</m4>","</m5>"],
         fields: {
-          text: { "term_vector" : "with_positions_offsets" }
-        }
+          text: {
+            matched_fields: ["text"],
+            type : "fvh"
+          }
+        },
       }
     }
   };
-
-  if(textQuery) {
-    query.body.query.bool.must.push({
-      query_string: {
-        default_field: "text",
-        query: textQuery,
-        default_operator: "AND"
-      }
-    });
-  }
 
   if(fromUser) {
     query.body.query.bool.must.push({
@@ -91,7 +90,41 @@ function performQuery(troupeId, textQuery, maxHistoryDate) {
     });
   }
 
-  return Q(client.search(query))
+  var promiseChain;
+
+  if(textQuery) {
+    promiseChain = languageDetector(textQuery)
+      .then(function(detectedLanguage) {
+        var analyzers = { "default": true };
+
+        if(options.lang) {
+          analyzers[languageAnalyzerMapper(options.lang)] = true;
+        }
+
+        if(detectedLanguage) {
+          analyzers[languageAnalyzerMapper(detectedLanguage)] = true;
+        }
+
+        Object.keys(analyzers).forEach(function(analyzer) {
+          query.body.query.bool.should.push({
+            query_string: {
+              default_field: "text",
+              query: textQuery,
+              analyzer: analyzer,
+              default_operator: "AND"
+            }
+          });
+        });
+
+        query.body.query.bool.minimum_should_match = 1;
+
+        return Q(client.search(query));
+      });
+  } else {
+    promiseChain = Q(client.search(query));
+  }
+
+  return promiseChain
     .then(function(response) {
       return response.hits.hits.map(function(hit) {
         return {
@@ -110,15 +143,17 @@ function performQuery(troupeId, textQuery, maxHistoryDate) {
 exports.searchChatMessagesForRoom = function(troupeId, textQuery, options) {
   if(!options) options = {};
 
-  var limit = options.limit || 50;
-  var skip = options.skip || 0;
+  options = _.defaults(options, {
+    limit: 50,
+    skip: 0
+  });
 
   return roomCapabilities.getMaxHistoryMessageDate(troupeId)
     .then(function(maxHistoryDate) {
       var findInaccessibleResults;
 
       // TODO: deal with limit and skip
-      var searchResults = performQuery(troupeId, textQuery, maxHistoryDate);
+      var searchResults = performQuery(troupeId, textQuery, maxHistoryDate, options);
 
       if(maxHistoryDate) {
 //        findInaccessibleResults =

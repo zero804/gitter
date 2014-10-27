@@ -1,11 +1,11 @@
 define([
   'underscore',
-  'utils/context',
+  'components/apiClient',
   'backbone',
   'components/realtime',
   'log!collections',
   './equals'
-], function(_, context, Backbone, realtime, log, equals) {
+], function(_, apiClient, Backbone, realtime, log, equals) {
   "use strict";
 
   var PATCH_TIMEOUT = 2000; // 2000ms before a patch gives up
@@ -14,6 +14,36 @@ define([
 
   var exports = {
     firstLoad: false
+  };
+
+  var methodMap = {
+    'create': 'post',
+    'update': 'put',
+    'patch':  'patch',
+    'delete': 'delete',
+    'read':   'get'
+  };
+
+  Backbone.sync = function(method, model, options) {
+    var url = options.url || _.result(model, 'url');
+    if(!url) throw new Error('URL required');
+
+    var m = methodMap[method];
+
+    var promise;
+    if(m === 'get') {
+      promise = apiClient[m](url, options.data);
+    } else {
+      promise = apiClient[m](url, model);
+    }
+
+    if(options.success) {
+      promise = promise.then(options.success);
+    }
+    if(options.error) {
+      promise = promise.fail(options.error);
+    }
+    return promise;
   };
 
   exports.Model = Backbone.Model.extend({
@@ -99,14 +129,9 @@ define([
 
   // LiveCollection: a collection with realtime capabilities
   exports.LiveCollection = Backbone.Collection.extend({
-    nestedUrl: '',
     modelName: '',
     constructor: function(models, options) {
       Backbone.Collection.prototype.constructor.call(this, models, options);
-      if(!this.url) {
-        var troupeId = options && options.troupeId || context.getTroupeId();
-        this.url = "/api/v1/rooms/" + troupeId + "/" + this.nestedUrl;
-      }
 
       this._loading = false;
 
@@ -183,7 +208,11 @@ define([
       if(this.subscription) return;
       var self = this;
 
-      this.subscription = realtime.subscribe(this.url, function(message) {
+      // this.url or this.url()
+      var url = _.result(this, 'url');
+      if(!url) throw new Error('URL is required');
+
+      this.subscription = realtime.subscribe(url, function(message) {
         self._onDataChange(message);
       });
 
@@ -193,7 +222,7 @@ define([
 
       var stateProvider = this.getSnapshotState && getState;
 
-      realtime.registerForSnapshots(this.url, function(snapshot) {
+      realtime.registerForSnapshots(url, function(snapshot) {
         self.trigger('request');
         /**
          * Don't remove items from the collections, as there is a greater
@@ -226,7 +255,7 @@ define([
       }, stateProvider);
 
       this.subscription.errback(function(error) {
-        log('Subscription error for ' + self.url, error);
+        log('Subscription error for ' + url, error);
       });
     },
 

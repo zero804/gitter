@@ -1,22 +1,17 @@
 define([
   'backbone',
   './chat',
+  'components/apiClient',
   'cocktail',
-  'utils/context',
   './infinite-mixin',
-], function (Backbone, chatModels, cocktail, context, InfiniteCollectionMixin) {
+], function (Backbone, chatModels, apiClient, cocktail, InfiniteCollectionMixin) {
   "use strict";
 
   var ChatSearchCollection = Backbone.Collection.extend({
     model: chatModels.ChatModel,
 
     modelName: 'chat',
-
-    initialize: function() {
-      var troupeId = context.getTroupeId();
-      this.url = "/api/v1/rooms/" + troupeId + "/chatMessages";
-    },
-
+    url: apiClient.room.channelGenerator('/chatMessages'),
     queryText: '',
 
     getQuery: function() {

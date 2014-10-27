@@ -1,10 +1,10 @@
 define([
-  'jquery',
   'utils/context',
+  'components/apiClient',
   './realtime',
   'log!eyeballs',
   'utils/appevents'
-], function($, context, realtime, log, appEvents) {
+], function(context, apiClient, realtime, log, appEvents) {
   "use strict";
 
   var eyesOnState = true;
@@ -22,17 +22,15 @@ define([
     }
 
     var clientId = realtime.getClientId();
-    $.ajax({
-      url: '/api/v1/eyeballs',
-      data: {
+    apiClient.post('/v1/eyeballs', {
         socketId: clientId,
         on: value
-      },
-      dataType: 'text',
-      async: !synchronous,
-      global: false,
-      type: "POST",
-      error: function(xhr) {
+      }, {
+        dataType: 'text',
+        async: !synchronous,
+        global: false
+      })
+      .fail(function(xhr) {
         if(xhr.status !== 400) {
           log('An error occurred while communicating eyeballs');
         } else {
@@ -40,8 +38,7 @@ define([
           log('Eyeballs returned 400. Realtime connection may be dead.');
           appEvents.trigger('eyeballsInvalid', clientId);
         }
-      }
-    });
+      });
   }
 
   function eyeballsOff(synchronous) {
@@ -196,16 +193,12 @@ define([
 
   // We use this to ensure that the users session does not time out
   window.setInterval(function() {
-    $.ajax({
-      url: '/api/v1/ping',
-      global: false,
-      type: "GET",
-      success: function(/*data*/) {
-      },
-      error: function() {
+    apiClient.get('/v1/ping', undefined, {
+        global: false
+      })
+      .fail(function() {
         log('An error occurred while communicating eyeballs');
-      }
-    });
+      });
   }, PING_POLL);
 
   return {

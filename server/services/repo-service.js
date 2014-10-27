@@ -84,11 +84,7 @@ function findPublicReposWithRoom(user, query, options) {
         return { lcUri: re };
       }),
       githubType: 'REPO',
-      $or: [
-        { security: 'PUBLIC' },
-        { security: null },
-        { security: { $exists: false } }
-      ]
+      security: 'PUBLIC'
     })
     .limit(20)
     .execQ()

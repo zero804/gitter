@@ -39,7 +39,8 @@ var badgerEnabled      = nconf.get('autoPullRequest:enabled');
 
 function localUriLookup(uri, opts) {
   return uriLookupService.lookupUri(uri)
-    .then(function(uriLookup) {
+    .then(function (uriLookup) {
+
       if(!uriLookup) return null;
 
       if(uriLookup.userId) {
@@ -65,7 +66,7 @@ function localUriLookup(uri, opts) {
 
       if(uriLookup.troupeId) {
         return troupeService.findById(uriLookup.troupeId)
-          .then(function(troupe) {
+          .then(function (troupe) {
             if(!troupe) {
               logger.info('Removing stale uri: ' + uri + ' from URI lookups');
 
@@ -230,6 +231,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
                 {
                   $setOnInsert: {
                     lcUri: lcUri,
+                    lcOwner: lcUri.split('/')[0],
                     uri: officialUri,
                     _nonce: nonce,
                     githubType: githubType,
@@ -276,7 +278,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
                     }
 
                     if(githubType === 'REPO' && security === 'PUBLIC') {
-                      if(badgerEnabled) {
+                      if(badgerEnabled && options.addBadge) {
                         /* Do this asynchronously (don't chain the promise) */
                         userSettingsService.getUserSettings(user.id, 'badger_optout')
                           .then(function(badgerOptOut) {
@@ -367,18 +369,37 @@ exports.findAllRoomsIdsForUserIncludingMentions = findAllRoomsIdsForUserIncludin
  * @return The promise of a troupe or nothing.
  */
 function findOrCreateRoom(user, uri, options) {
-  if(!options) options = {};
+  var userId = user && user.id;
+  options = options || {};
   validate.expect(uri, 'uri required');
 
-  var userId = user && user.id;
+  /**
+   * this function returns an object containing accessDenied, which is used by the middlewares to allow the display
+   * of public rooms instead of the standard 404
+   */
+  var denyAccess = function (uriLookup) {
+    if (!uriLookup) return null;
+    if (!uriLookup.troupe) return null;
+
+    var troupe = uriLookup.troupe;
+
+    return {
+      accessDenied: {
+        githubType: troupe && troupe.githubType,
+        uri: troupe && troupe.uri
+      }
+    };
+  };
+
 
   /* First off, try use local data to figure out what this url is for */
   return localUriLookup(uri, options)
-    .then(function(uriLookup) {
+    .then(function (uriLookup) {
       logger.verbose('URI Lookup returned ', { uri: uri, isUser: !!(uriLookup && uriLookup.user), isTroupe: !!(uriLookup && uriLookup.troupe) });
 
       /* Deal with the case of the nonloggedin user first */
       if(!user) {
+
         if(!uriLookup) return null;
 
         if(uriLookup.user) {
@@ -388,9 +409,8 @@ function findOrCreateRoom(user, uri, options) {
 
         if(uriLookup.troupe) {
           return roomPermissionsModel(null, 'view', uriLookup.troupe)
-            .then(function(access) {
-              if(!access) return;
-
+            .then(function (access) {
+              if (!access) return denyAccess(uriLookup); // please see comment about denyAccess
               return { troupe: uriLookup.troupe };
             });
         }
@@ -398,7 +418,7 @@ function findOrCreateRoom(user, uri, options) {
         return null;
       }
 
-      /* Lookup found a user? */
+      // IF THE URI HAS A USER THEN ONE-TO-ONE
       if(uriLookup && uriLookup.user) {
         var otherUser = uriLookup.user;
 
@@ -425,14 +445,14 @@ function findOrCreateRoom(user, uri, options) {
                 return { oneToOne: true, troupe: troupe, otherUser: otherUser };
               });
           });
-
       }
 
       logger.verbose('Attempting to access room ' + uri);
 
-      /* Didn't find a user, but we may have found another room */
+      // need to check for the rooms
       return findOrCreateNonOneToOneRoom(user, uriLookup && uriLookup.troupe, uri, options)
         .spread(function (troupe, access, hookCreationFailedDueToMissingScope, didCreate) {
+
           // if the user has been granted access to the room, send join stats for the cases of being the owner or just joining the room
           if(access && (didCreate || !troupe.containsUserId(user.id))) {
             sendJoinStats(user, troupe, options.tracking);
@@ -443,8 +463,14 @@ function findOrCreateRoom(user, uri, options) {
           }
 
           return ensureAccessControl(user, troupe, access)
-            .then(function(troupe) {
-              return { oneToOne: false, troupe: troupe, hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope, didCreate: didCreate };
+            .then(function (troupe) {
+              if (!access) return denyAccess(uriLookup); // please see comment about denyAccess
+              return {
+                oneToOne: false,
+                troupe: troupe,
+                hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope,
+                didCreate: didCreate
+              };
             });
         });
     })
@@ -663,6 +689,7 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
           {
             $setOnInsert: {
               lcUri: lcUri,
+              lcOwner: lcUri.split('/')[0],
               uri: uri,
               security: security,
               name: name,

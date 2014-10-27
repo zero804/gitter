@@ -1,12 +1,10 @@
 
 define([
-  'jquery-hammer',
   'marionette',
   'hbs!./tmpl/home-org-view',
   'hbs!./tmpl/homeOrgListItem',
-  'utils/appevents',
-  'utils/is-mobile'
-], function($hammer, Marionette, orgTemplate, orgListItemTemplate, appEvents, isMobile) {
+  'utils/appevents'
+], function(Marionette, orgTemplate, orgListItemTemplate, appEvents) {
   "use strict";
 
   var OrgItemView = Marionette.ItemView.extend({
@@ -16,14 +14,11 @@ define([
     modelEvents: {
       change: 'render'
     },
-    initialize: function() {
-      this.$el = $hammer(this.$el).hammer();
-    },
     serializeData: function() {
       return this.model.toJSON();
     },
-    events: function() {
-      return isMobile() ? { tap: 'navigate' } : { click: 'navigate' };
+    events: {
+      click: 'navigate'
     },
     navigate: function() {
       var name = this.model.get('name');

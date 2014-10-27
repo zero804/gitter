@@ -3,6 +3,7 @@ define([
   'utils/context',
   'marionette',
   'utils/appevents',
+  'components/apiClient',
   'views/app/uiVars',
   'views/chat/chatInputView',
   'collections/instances/integrated-items',
@@ -23,7 +24,7 @@ define([
   'components/unread-items-client',
   'views/righttoolbar/rightToolbarView',
   'transloadit'  // No ref
-], function($, context, Marionette, appEvents, uiVars, chatInputView, itemCollections, modalRegion, hasScrollBars, cocktail, KeyboardEventsMixin, ChatCollectionView,
+], function($, context, Marionette, appEvents, apiClient, uiVars, chatInputView, itemCollections, modalRegion, hasScrollBars, cocktail, KeyboardEventsMixin, ChatCollectionView,
     webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator,
     emojiDecorator, UnreadBannerView, HistoryLimitView, HeaderView, unreadItemsClient,
     RightToolbarView /*, SearchView*/) {
@@ -212,15 +213,12 @@ define([
         }
 
         // Generate signature and upload
-        $.ajax({
-          type: 'GET',
-          url: '/api/private/generate-signature',
-          data: {
+        apiClient.priv.get('/generate-signature', {
             room_uri: context.troupe().get('uri'),
             room_id: context.getTroupeId(),
             type: type
-          },
-          success: function(data) {
+          })
+          .then(function(data) {
             formdata.append("signature", data.sig);
 
             var options = {
@@ -240,7 +238,6 @@ define([
             form.unbind('submit.transloadit');
             form.transloadit(options);
             form.submit();
-          }
         });
       }
 

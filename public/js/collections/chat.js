@@ -1,12 +1,13 @@
 define([
   'underscore',
   'utils/context',
+  'components/apiClient',
   './base',
   '../utils/momentWrapper',
   '../utils/burst-calculator',
   './infinite-mixin',
   'cocktail'
-], function(_, context, TroupeCollections, moment, burstCalculator, InfiniteCollectionMixin, cocktail) {
+], function(_, context, apiClient, TroupeCollections, moment, burstCalculator, InfiniteCollectionMixin, cocktail) {
   "use strict";
 
   var userId = context.getUserId();
@@ -72,7 +73,7 @@ define([
   var ChatCollection = TroupeCollections.LiveCollection.extend({
     model: ChatModel,
     modelName: 'chat',
-    nestedUrl: "chatMessages",
+    url: apiClient.room.channelGenerator('/chatMessages'),
     initialSortBy: "sent",
     sortByMethods: {
       'sent': function(chat) {
@@ -129,7 +130,7 @@ define([
   var ReadByCollection = TroupeCollections.LiveCollection.extend({
     model: ReadByModel,
     modelName: 'chatReadBy',
-    initialize: function(models, options) {
+    initialize: function(models, options) { // jshint unused:true
       var userCollection = options.userCollection;
       if(userCollection) {
         this.transformModel = function(model) {
@@ -140,8 +141,8 @@ define([
         };
       }
 
-      this.chatMessageId = options.chatMessageId;
-      this.url = "/api/v1/rooms/" + context.getTroupeId() + "/chatMessages/" + this.chatMessageId + "/readBy";
+      var chatMessageId = options.chatMessageId;
+      this.url = apiClient.room.channelGenerator("/chatMessages/" + chatMessageId + "/readBy");
     }
   });
 
