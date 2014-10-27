@@ -75,7 +75,8 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
       text: data.text,                    // Keep the raw message.
       status: data.status,                // Checks if it is a status update
       pub:  troupe.security === 'PUBLIC' || undefined, // Public room - useful for sampling
-      html: parsedMessage.html
+      html: parsedMessage.html,
+      lang: parsedMessage.lang
     });
 
     /* Look through the mentions and attempt to tie the mentions to userIds */
@@ -210,6 +211,7 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
     .then(function(parsedMessage) {
       chatMessage.html  = parsedMessage.html;
       chatMessage.editedAt = new Date();
+      chatMessage.lang = parsedMessage.lang;
 
       // Metadata
       chatMessage.urls      = parsedMessage.urls;
