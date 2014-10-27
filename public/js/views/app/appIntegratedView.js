@@ -70,7 +70,6 @@ define([
       $(".wrap-menu").addClass("show");
       $("#left-menu .js-menu").addClass("visible");
       $("#mini-left-menu, #mini-left-menu-container").addClass("active");
-      appEvents.trigger('search:collapse');
       // $("#iframe-panel, #menu-toggle-button").addClass("leftCollapse");
 
       this.leftmenu = true;
@@ -94,7 +93,6 @@ define([
       // $("#iframe-panel, #menu-toggle-button").removeClass("leftCollapse");
       $("#left-menu .js-menu").removeClass("visible");
       $(".wrap-menu").removeClass("show");
-      appEvents.trigger('search:expand');
 
       this.leftmenu = false;
     },
