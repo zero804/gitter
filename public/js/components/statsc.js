@@ -1,9 +1,9 @@
 define([
-  'jquery',
   'underscore',
   'utils/appevents',
+  'components/apiClient',
   'log!stats'
-], function($, _, appEvents, log) {
+], function(_, appEvents, apiClient, log) {
   "use strict";
 
   var statQueue = [];
@@ -25,17 +25,10 @@ define([
 
     if(!sendQueue.length) return;
 
-    $.ajax({
-      url: '/api/private/statsc',
-      dataType: 'text',
-      contentType: "application/json",
-      data: JSON.stringify(sendQueue),
-      global: false,
-      type: "POST",
-      error: function() {
+    apiClient.priv.post('/statsc', sendQueue, { dataType: 'text' })
+      .fail(function() {
         log('An error occurred while communicating stats');
-      }
-    });
+      });
 
   }
 

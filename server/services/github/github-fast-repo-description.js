@@ -7,9 +7,11 @@ var config = require('../../utils/config');
 
 function getDescription(repoName) {
   var repoService = new RepoService();
-  return repoService.getRepo(repoName).then(function(repo) {
-    return repo.description;
-  });
+  return repoService.getRepo(repoName)
+    .then(function(repo) {
+      if(!repo) return null;
+      return repo.description;
+    });
 }
 
 module.exports = wrapper('github-fast-repo-description', getDescription, {

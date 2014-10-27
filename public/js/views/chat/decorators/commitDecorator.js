@@ -4,11 +4,12 @@ define([
   'jquery',
   'backbone',
   'utils/appevents',
+  'components/apiClient',
   'views/popover',
   'hbs!./tmpl/commitPopover',
   'hbs!./tmpl/commitPopoverTitle',
   'hbs!./tmpl/commitPopoverFooter'
-], function($, Backbone, appEvents, Popover, template, titleTemplate, footerTemplate) {
+], function($, Backbone, appEvents, apiClient, Popover, template, titleTemplate, footerTemplate) {
   "use strict";
 
   var MAX_PATH_LENGTH = 40;
@@ -117,18 +118,24 @@ define([
     });
   }
 
+  function syncModel(repo, sha, model) {
+    var url = '/private/gh/repos/' + repo + '/commits/' + sha;
+    apiClient.get(url, { renderPatchIfSingle: true })
+      .then(function(commit) {
+        model.set(commit);
+      })
+      .fail(function(err) {
+        model.set('error', err.status);
+      });
+  }
+
   var decorator = {
 
     decorate: function(view) {
       view.$el.find('*[data-link-type="commit"]').each(function(){
 
         function showPopover(e) {
-          var url = '/api/private/gh/repos/'+repo+'/commits/'+sha+'?renderPatchIfSingle=true';
-          $.get(url, function(commit) {
-            model.set(commit);
-          }).fail(function(err) {
-            model.set('error', err.status);
-          });
+          syncModel(repo, sha, model);
 
           var popover = createPopover(model, e.target);
           popover.show();
@@ -136,12 +143,7 @@ define([
         }
 
         function showPopoverLater(e) {
-          var url = '/api/private/gh/repos/'+repo+'/commits/'+sha+'?renderPatchIfSingle=true';
-          $.get(url, function(commit) {
-            model.set(commit);
-          }).fail(function(err) {
-            model.set('error', err.status);
-          });
+          syncModel(repo, sha, model);
 
           Popover.hoverTimeout(e, function() {
             var popover = createPopover(model, e.target);

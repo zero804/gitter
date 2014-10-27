@@ -3,12 +3,13 @@ define([
   'marionette',
   'utils/context',
   'utils/social',
+  'components/apiClient',
   'hbs!./tmpl/collaboratorsView',
   'hbs!./tmpl/collaboratorsItemView',
   'hbs!./tmpl/collaboratorsEmptyView',
   'hbs!./tmpl/inviteOutcomeTemplate',
   'utils/appevents',
-], function($, Marionette, context, social, template, itemTemplate, emptyViewTemplate, inviteOutcomeTemplate, appEvents) {
+], function($, Marionette, context, social, apiClient, template, itemTemplate, emptyViewTemplate, inviteOutcomeTemplate, appEvents) {
   "use strict";
 
   var ItemView = Marionette.ItemView.extend({
@@ -28,11 +29,6 @@ define([
 
     template: itemTemplate,
 
-    handleError: function (res, status, message) {
-      if (res.responseJSON.status === 409) return this.done('already in room.');
-      this.done(message, '');
-    },
-
     toggleLoading: function () {
       var model = this.model;
       var isLoading = model.get('loading');
@@ -48,32 +44,24 @@ define([
     },
 
     inviteUser: function (e) {
+      var self = this;
       e.preventDefault();
 
-      var inputEmail = this.$('input')[0];
+      var inputEmail = self.$('input')[0];
       var email = inputEmail.value;
 
       var data = {
-        userId: this.user.id,
+        userId: self.user.id,
         email: email,
         roomId: context.getTroupeId()
       };
 
-      this.toggleLoading();
+      self.toggleLoading();
 
-      $.ajax({
-        url: '/api/private/invite-user',
-        contentType: "application/json",
-        dataType: "json",
-        type: "POST",
-        data: JSON.stringify(data),
-        context: this,
-        timeout: 45 * 1000,
-        error: this.handleError,
-        success: function () {
-          this.done('was invited.', email);
-        }
-      });
+      apiClient.priv.post('/invite-user', data)
+        .then(function(){
+          self.done('was invited.', email);
+        });
     },
 
     /**
@@ -82,6 +70,7 @@ define([
      * m    BackboneModel - the user to be added to the room
      */
     addUserToRoom: function (e) {
+      var self = this;
       e.stopPropagation();
       e.preventDefault();
 
@@ -91,29 +80,24 @@ define([
 
       this.toggleLoading();
 
-      $.ajax({
-        url: '/api/v1/rooms/' + context.getTroupeId()  + '/users',
-        contentType: "application/json",
-        dataType: "json",
-        type: "POST",
-        data: JSON.stringify({ username: m.get('login') }),
-        context: this,
-        timeout: 45 * 1000,
-        error: this.handleError,
-        success: function (res) {
+      apiClient.room.post('/users', { username: m.get('login') })
+        .then(function(res) {
           var user = res.user;
-          this.user = user;
+          self.user = user;
 
           if (!user.invited) {
-            this.done('was added.');
+            self.done('was added.');
           } else if (user.invited && user.email) {
-            this.done('was invited.', user.email);
+            self.done('was invited.', user.email);
           } else {
-            this.toggleLoading(); // stop loading
+            self.toggleLoading(); // stop loading
             m.set('unreachable', true);
           }
-        }
-      });
+        })
+        .fail(function(xhr) {
+          if (xhr.status === 409) return self.done('already in room.');
+          self.done("Unable to add user to room.", '');
+        });
     },
   });
 

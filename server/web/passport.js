@@ -12,7 +12,7 @@ var moment                 = require('moment');
 var userService            = require('../services/user-service');
 var passport               = require('passport');
 var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
-var BearerStrategy         = require('passport-http-bearer').Strategy;
+var BearerStrategy         = require('gitter-passport-http-bearer').Strategy;
 var oauthService           = require('../services/oauth-service');
 var mixpanel               = require('../web/mixpanelUtils');
 var useragentTagger        = require('../utils/user-agent-tagger');
@@ -154,6 +154,7 @@ function install() {
                 if (user.isInvited()) {
 
                   // IMPORTANT: The alias can only happen ONCE. Do not remove.
+                  // IMPORTANT: 'bucket' is a reserved word on MixPanel, that's why we use _bucket
                   stats.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id, function() {
                     stats.event("new_user", {
                       userId: user.id,
@@ -161,7 +162,7 @@ function install() {
                       username: user.username,
                       source: 'invited',
                       googleAnalyticsUniqueId: googleAnalyticsUniqueId,
-                      bucket: ((parseInt(user.id.slice(-1), 16) % 2)) === 0 ? 'even' : 'odd'
+                      _bucket: ((parseInt(user.id.slice(-1), 16) % 2)) === 0 ? 'even' : 'odd'
                     });
                   });
                 }
@@ -232,6 +233,7 @@ function install() {
                 logger.verbose('Created GitHub user ', user.toObject());
 
                 // IMPORTANT: The alias can only happen ONCE. Do not remove.
+                // IMPORTANT: 'bucket' is a reserved word on MixPanel, that's why we use _bucket
                 stats.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id, function(err) {
                   if (err) logger.error('Error aliasing user:', { exception: err });
 
@@ -241,7 +243,7 @@ function install() {
                     username: user.username,
                     source: req.session.source,
                     googleAnalyticsUniqueId: googleAnalyticsUniqueId,
-                    bucket: ((parseInt(user.id.slice(-1), 16) % 2)) === 0 ? 'even' : 'odd'
+                    _bucket: ((parseInt(user.id.slice(-1), 16) % 2)) === 0 ? 'even' : 'odd' //
                   });
 
                   // Flag the user as a new github user if they've created

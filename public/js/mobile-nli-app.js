@@ -7,8 +7,7 @@ require([
   'components/modal-region',
   'views/app/mobileAppView',
   'views/chat/decorators/emojiDecorator',
-  'views/mobile/mobileLoginButton',
-  'components/csrf'                             // No ref
+  'views/mobile/mobileLoginButton'
   ], function($, appEvents, chatModels, ChatCollectionView,
     Backbone, modalRegion, MobileAppView, emojiDecorator, MobileLoginButton) {
   "use strict";

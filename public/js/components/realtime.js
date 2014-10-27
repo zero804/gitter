@@ -8,6 +8,9 @@ define([
 ], function($, _, context, Faye, appEvents, log) {
   "use strict";
 
+  /* @const */
+  var FAYE_PREFIX = '/api';
+
   var logLevel = parseInt(window.localStorage.fayeLogging, 10) || 0;
 
   Faye.logger = {};
@@ -186,6 +189,8 @@ define([
   };
 
   SnapshotExtension.prototype.registerForSnapshots = function(channel, listener, stateProvider) {
+    channel = FAYE_PREFIX + channel;
+
     var list = this._listeners[channel];
     if(list) {
       list.push(listener);
@@ -260,7 +265,7 @@ define([
       }
 
       if(user.id) {
-        userSubscription = client.subscribe('/api/v1/user/' + user.id, function(message) {
+        userSubscription = client.subscribe(FAYE_PREFIX + '/v1/user/' + user.id, function(message) {
           if(message.operation === 'patch' && message.model && message.model.id === user.id) {
             // Patch the updates onto the user
             user.set(message.model);
@@ -390,7 +395,7 @@ define([
       }
     }, 30000);
 
-    client.publish('/api/v1/ping2', { reason: reason })
+    client.publish(FAYE_PREFIX + '/v1/ping2', { reason: reason })
       .then(function() {
 
         pingResponseOutstanding = false;
@@ -421,6 +426,7 @@ define([
     },
 
     subscribe: function(channel, callback, context, options) {
+      channel = FAYE_PREFIX + channel;
       log('Subscribing to ' + channel);
 
       // Temporary options to pass onto the subscription message

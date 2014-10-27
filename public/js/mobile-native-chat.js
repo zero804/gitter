@@ -12,7 +12,6 @@ require([
   'views/chat/decorators/mobileDecorator',
   'log!mobile-native-chat',
   'components/eyeballs',                        // No ref
-  'components/csrf'                             // No ref
   ], function($, context, cordovaNav, chatModels, userModels, ChatCollectionView, chatInputView, unreadItemsClient, cacheSync,
     emojiDecorator, mobileDecorator, log) {
 
@@ -34,7 +33,7 @@ require([
   var chatCollection = new chatModels.ChatCollection();
   cacheSync.install(chatCollection);
   chatCollection.listen();
-  
+
   var userCollection = new userModels.UserCollection();
   userCollection.listen();
 
@@ -47,7 +46,7 @@ require([
   unreadItemsClient.syncCollections({
     'chat': chatCollection
   });
-  
+
   unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
 
   new chatInputView.ChatInputView({
