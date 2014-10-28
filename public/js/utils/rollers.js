@@ -158,6 +158,7 @@ define(['mutant'], function(Mutant) {
     scrollToElement: function(element, options) {
       var target = this._target;
       var scrollTop;
+
       if(options && options.centre) {
         // Centre the element in the viewport
         var elementHeight = element.offsetHeight;

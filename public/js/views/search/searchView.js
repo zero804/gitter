@@ -8,19 +8,18 @@ define([
   'cocktail',
   'collections/instances/integrated-items',
   'collections/chat-search',
-  'views/chat/chatCollectionView',
   'hbs!./tmpl/search',
   'hbs!./tmpl/result',
   'utils/text-filter',
-  'utils/multi-debounce',
   'views/keyboard-events-mixin',
   'views/behaviors/widgets',
-], function ($, context, appEvents, Backbone, Marionette, _, cocktail, itemCollections, ChatSearchModels, chatCollectionView, searchTemplate, resultTemplate, textFilter, multiDebounce, KeyboardEventsMixin) {
+  'utils/multi-debounce',
+], function ($, context, appEvents, Backbone, Marionette, _, cocktail, itemCollections, ChatSearchModels, searchTemplate, resultTemplate, textFilter, KeyboardEventsMixin, multiDebounce) {
   "use strict";
 
   var EmptyResultsView = Marionette.ItemView.extend({
     className: 'result-empty',
-  template: _.template('<small>No Results</small>')
+    template: _.template('<small>No Results</small>')
   });
 
   var ResultItemView = Marionette.ItemView.extend({
@@ -37,7 +36,7 @@ define([
 
     className: 'result',
 
-    initialize: function () {
+    initialize: function (options) {
       var model = this.model;
       this.$el.toggleClass('selected', !!model.get('selected')); // checks if it is selected
 
@@ -97,12 +96,9 @@ define([
     selectItem: function () {
       var id = this.model.get('id');
 
+      // updating the collection around the message to be scrolled to
       itemCollections.chats.fetchAtPoint({ aroundId: id }, {}, function () {
-        try {
-          chatCollectionView.scrollToChatId(id);
-        } catch (e) {
-          // TODO: do something with error? @suprememoocow
-        }
+        appEvents.trigger('chatCollectionView:scrolledToChat', id);
       }, this);
     }
   });
@@ -115,7 +111,6 @@ define([
 
   var MessagesCollectionView = Marionette.CollectionView.extend({
     itemView: MessageResultItemView,
-    // TODO: emptyView - results?
     emptyView: EmptyResultsView
   });
 
@@ -190,7 +185,6 @@ define([
     },
 
     initialize: function () {
-
       this.model = new Backbone.Model({ searchTerm: '', active: false });
 
       this.listenTo(this.model, 'change:searchTerm', function () {
@@ -228,7 +222,7 @@ define([
 
       // initialize the views
       this.localRoomsView = new RoomsCollectionView({ collection: rooms });
-      this.serverMessagesView = new MessagesCollectionView({ collection: chats });
+      this.serverMessagesView = new MessagesCollectionView({ collection: chats, chatCollectionView: this.chatCollectionView });
       this.debouncedLocalSearch =  _.debounce(this.localSearch.bind(this), 20);
       this.debouncedRemoteSearch = _.debounce(this.remoteSearch.bind(this), 250);
     },
@@ -351,7 +345,7 @@ define([
         self.refreshCollection(self._rooms, uniq);
       };
 
-      // 
+      //
       var debouncedRefresh = _.debounce(refresh, 250);
 
       var cb = function(data) {
@@ -360,8 +354,8 @@ define([
           //.filter(function(r) { return r.room || r.url; }) // we want only repos with rooms, users & channels
           .map(function(r) {
             if (r.room) r.id = r.room.id; // use the room id as model id for repos
-            r.url = r.url || '/' + r.uri; 
-            return new Backbone.Model(r); 
+            r.url = r.url || '/' + r.uri;
+            return new Backbone.Model(r);
         });
         rooms = rooms.concat(models);
         debouncedRefresh();

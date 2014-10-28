@@ -5,12 +5,11 @@ define([
   'collections/instances/integrated-items',
   'collections/chat-search',
   'views/people/peopleCollectionView',
-  'views/chat/chatCollectionView',
   'views/search/searchView',
   './repoInfo',
   './activity',
   'utils/scrollbar-detect'
-], function ($, Marionette, context, itemCollections, chatSearchModels, PeopleCollectionView, chatCollectionView, SearchView, repoInfo, ActivityStream, hasScrollBars) {
+], function ($, Marionette, context, itemCollections, chatSearchModels, PeopleCollectionView, SearchView, repoInfo, ActivityStream, hasScrollBars) {
   "use strict";
 
   var RightToolbarLayout = Marionette.Layout.extend({
@@ -34,7 +33,7 @@ define([
       // hide all regions and show/hide search...
     },
 
-    initialize: function() {
+    initialize: function () {
 
       // People View
       this.people.show(new PeopleCollectionView.ExpandableRosterView({
@@ -53,7 +52,7 @@ define([
       this.activity.show(new ActivityStream({ collection: itemCollections.events }));
 
       // Search
-      this.searchView = new SearchView({});
+      this.searchView = new SearchView({ });
       this.search.show(this.searchView);
 
       this.searchView.on('search:expand', function () {
