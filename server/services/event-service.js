@@ -1,7 +1,7 @@
 "use strict";
 
 var persistence   = require("./persistence-service");
-var processChat   = require('../utils/process-chat-isolated');
+var processChat   = require('../utils/markdown-processor');
 var appEvents     = require("../app-events");
 var ObjectID      = require('mongodb').ObjectID;
 var Q             = require('q');
