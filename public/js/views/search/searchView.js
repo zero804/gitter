@@ -11,10 +11,11 @@ define([
   'hbs!./tmpl/search',
   'hbs!./tmpl/result',
   'utils/text-filter',
-  'views/keyboard-events-mixin',
-  'views/behaviors/widgets',
   'utils/multi-debounce',
-], function ($, context, appEvents, Backbone, Marionette, _, cocktail, itemCollections, ChatSearchModels, searchTemplate, resultTemplate, textFilter, KeyboardEventsMixin, multiDebounce) {
+  'views/keyboard-events-mixin',
+  'views/behaviors/widgets', // No ref
+  'views/behaviors/highlight' // No ref
+], function ($, context, appEvents, Backbone, Marionette, _, cocktail, itemCollections, ChatSearchModels, searchTemplate, resultTemplate, textFilter, multiDebounce, KeyboardEventsMixin) {
   "use strict";
 
   var EmptyResultsView = Marionette.ItemView.extend({
@@ -76,6 +77,7 @@ define([
 
     behaviors: {
       Widgets: {},
+      Highlight: {}
     },
 
     serializeData: function () {
@@ -105,7 +107,6 @@ define([
 
   var RoomsCollectionView = Marionette.CollectionView.extend({
     itemView: RoomResultItemView,
-    // TODO: emptyView - results?
     emptyView: EmptyResultsView
   });
 

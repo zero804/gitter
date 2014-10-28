@@ -5,12 +5,7 @@ var roomCapabilities     = require('./room-capabilities');
 var _                    = require('underscore');
 var languageDetector     = require('../utils/language-detector');
 var languageAnalyzerMapper = require('../utils/language-analyzer-mapper');
-
-var elasticsearch = require('elasticsearch');
-var client = new elasticsearch.Client({
-  host: 'localhost:9200',
-  log: 'trace'
-});
+var client               = require('../utils/elasticsearch-client');
 
 /* Magic way of figuring out the matching terms so that we can highlight */
 function extractHighlights(text) {
@@ -60,7 +55,11 @@ function performQuery(troupeId, textQuery, maxHistoryDate, options) {
             type : "fvh"
           }
         },
-      }
+      },
+      sort: [
+        { _score: { order : "desc"} },
+        { sent: { order : "desc"} }
+      ],
     }
   };
 
