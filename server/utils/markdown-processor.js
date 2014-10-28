@@ -6,7 +6,6 @@ var errorReporter = env.errorReporter;
 var stats         = env.stats;
 var Processor     = require('gitter-markdown-processor');
 var shutdown      = require('shutdown');
-var StatusError   = require('statuserror');
 var Q             = require('q');
 
 // processor starts its own process, so lazy load it
@@ -22,14 +21,11 @@ module.exports = function(markdown) {
   processor.process(markdown, function(err, result) {
     if(err) {
       stats.event('markdown.failure');
+      errorReporter(err, { text: markdown, processed: !!result });
 
       if(result) {
         // hey, at least we got a result!
-        // Lets note the error though
-        var newError = new StatusError(500, "Markdown processing failed");
-        errorReporter(newError, { text: markdown });
-
-        // ...and pretend it never happened
+        // ... pretend it never happened
         return deferred.resolve(result);
       } else {
         return deferred.reject(err);
@@ -49,5 +45,5 @@ function createProcessor() {
     p.shutdown(callback);
   });
 
-  return p; 
+  return p;
 }
