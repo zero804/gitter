@@ -1,10 +1,15 @@
 #!/bin/bash -xe
 
 ROOM_URI=$(echo $1 | tr '[:upper:]' '[:lower:]')
+TO_ROOM_URI=$(echo $2 | tr '[:upper:]' '[:lower:]')
 
 if [[ -z $ROOM_URI ]]; then
-  echo usage $0 ROOM_URI
+  echo usage $0 ROOM_URI [TO_ROOM_URI]
   exit 1
+fi
+
+if [[ -z $TO_ROOM_URI ]]; then
+  TO_ROOM_URI=$ROOM_URI
 fi
 
 execute_local() {
@@ -22,7 +27,7 @@ if [[ -z $PROD_ROOM_ID ]]; then
   exit 1
 fi
 
-DEV_ROOM_ID=$(execute_local "db.troupes.findOne({ lcUri: '$ROOM_URI' }, { _id: 1 })._id.valueOf()")
+DEV_ROOM_ID=$(execute_local "db.troupes.findOne({ lcUri: '$TO_ROOM_URI' }, { _id: 1 })._id.valueOf()")
 if [[ -z $DEV_ROOM_ID ]]; then
   echo "Unable to find room in dev"
   exit 1
