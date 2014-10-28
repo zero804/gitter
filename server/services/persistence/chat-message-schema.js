@@ -23,6 +23,7 @@ var ChatMessageSchema = new Schema({
   sent:       { type: Date, "default": Date.now },
   editedAt:   { type: Date, "default": null },
   readBy:     { type: [ObjectId] },
+  lang:       String,
   _tv:        { type: 'MongooseNumber', 'default': 0 },
   _md:        Number, // Meta parse version
 });
