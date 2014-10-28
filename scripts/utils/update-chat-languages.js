@@ -2,7 +2,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 'use strict';
 
-var Q = require('Q');
+var Q = require('q');
 var persistence = require('../../server/services/persistence-service');
 var shutdown = require('shutdown');
 var BatchStream = require('batch-stream');
@@ -13,6 +13,7 @@ var BATCH_SIZE = 200;
 
 // progress logging stuff
 var totalProcessed = 0;
+var success = 0;
 var runCalled = 0;
 
 var batchComplete;
@@ -22,8 +23,13 @@ var batch = new BatchStream({ size : BATCH_SIZE });
 
 var stream = persistence.ChatMessage
   .find({
-    lang: null
+    $or: [{
+      lang: null,
+    }, {
+      lang: { $exists: false }
+    }]
   })
+  .select('text')
   .stream();
 
 stream.pipe(batch);
@@ -66,7 +72,8 @@ batch.on('end', function () {
 function logProgress() {
   console.log(
     '[PROGRESS]',
-    '\tprocessed:', totalProcessed
+    '\tprocessed:', totalProcessed,
+    '\tsuccess:', success
   );
 }
 
@@ -76,13 +83,18 @@ function run(chatMessages) {
   runCalled += 1;
   totalProcessed += chatMessages.length;
 
-  if (runCalled % BATCH_SIZE === 0) logProgress();
-
   return Q.all(chatMessages.map(function(chat) {
     return markdownProcessor(chat.text)
       .then(function(result) {
+        totalProcessed += 1;
+        if(totalProcessed % 1000 === 0) {
+          logProgress();
+        }
         if(result.lang) {
-          return persistence.ChatMessage.findByIdAndUpdateQ(chat.id, { $set: { lang: result.lang }});
+          return persistence.ChatMessage.findByIdAndUpdateQ(chat.id, { $set: { lang: result.lang }})
+            .then(function() {
+              success++;
+            });
         }
       })
       .catch(function (err) {

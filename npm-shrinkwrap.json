@@ -1201,7 +1201,7 @@
       }
     },
     "gitter-markdown-processor": {
-      "version": "7.1.1",
+      "version": "7.1.2",
       "from": "gitter-markdown-processor@latest",
       "dependencies": {
         "gitter-marked": {
