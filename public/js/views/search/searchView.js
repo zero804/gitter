@@ -1,5 +1,6 @@
 define([
   'jquery',
+  'components/apiClient',
   'utils/context',
   'utils/appevents',
   'backbone',
@@ -15,7 +16,7 @@ define([
   'views/keyboard-events-mixin',
   'views/behaviors/widgets', // No ref
   'views/behaviors/highlight' // No ref
-], function ($, context, appEvents, Backbone, Marionette, _, cocktail, itemCollections, ChatSearchModels, searchTemplate, resultTemplate, textFilter, multiDebounce, KeyboardEventsMixin) {
+], function ($, apiClient, context, appEvents, Backbone, Marionette, _, cocktail, itemCollections, ChatSearchModels, searchTemplate, resultTemplate, textFilter, multiDebounce, KeyboardEventsMixin) {
   "use strict";
 
   var EmptyResultsView = Marionette.ItemView.extend({
@@ -148,6 +149,7 @@ define([
     },
 
     reset: function () {
+      // //debug('NavigationController:reset() ====================');
       this.swap(this.collection.at(0));
     }
   });
@@ -188,11 +190,14 @@ define([
     initialize: function () {
       this.model = new Backbone.Model({ searchTerm: '', active: false });
 
+      // FIXME: Make sure this is a good thing
+      var debouncedRun = _.debounce(this.run.bind(this), 125);
+
       this.listenTo(this.model, 'change:searchTerm', function () {
         if (this.isEmpty()) {
           this.hide();
         } else {
-          this.run();
+          debouncedRun();
         }
       }.bind(this));
 
@@ -202,6 +207,8 @@ define([
 
       // master collection to enable easier navigation
       this.collection = new Backbone.Collection([]);
+
+      this.collection.comparator = 'priority';
 
       // filtered collections
       var rooms = new Backbone.FilteredCollection(null, { model: Backbone.Model, collection: this.collection });
@@ -224,8 +231,8 @@ define([
       // initialize the views
       this.localRoomsView = new RoomsCollectionView({ collection: rooms });
       this.serverMessagesView = new MessagesCollectionView({ collection: chats, chatCollectionView: this.chatCollectionView });
-      this.debouncedLocalSearch =  _.debounce(this.localSearch.bind(this), 20);
-      this.debouncedRemoteSearch = _.debounce(this.remoteSearch.bind(this), 500);
+      this.debouncedLocalSearch =  _.debounce(this.localSearch.bind(this), 125);
+      this.debouncedRemoteSearch = _.debounce(this.remoteSearch.bind(this), 250);
     },
 
     isActive: function () {
@@ -276,6 +283,7 @@ define([
     },
 
     run: function (/*model, searchTerm*/) {
+      //debug('run() ====================');
       this.debouncedLocalSearch();
       this.debouncedRemoteSearch();
       this.showResults();
@@ -288,32 +296,39 @@ define([
      * options            - same options as Backbone.Collection.add
      */
     refreshCollection: function (filteredCollection, newModels, options) {
-      // if the new models are the same as the current filtered collection avoid refresh by returning
-      var getId = function (item) { return item.get('id'); };
+      //debug('refreshCollection() ====================');
+      var getId = function (item) { return item.id };
+
+      // if the new models are the same as the current filtered collection avoids flickering by returning
       if (_.isEqual(newModels.map(getId), filteredCollection.map(getId))) return;
 
-      var collection = this.collection;
       options = options || {};
+      var collection = this.collection;
 
-      // IMPORTANT: we must remove the current state then add new models and reset filtered collection
+      if (options.nonDestructive) {
+        var all = filteredCollection.models.concat(newModels);
+        newModels = _.uniq(all, false, function (r) { return r.get('url'); });
+      }
+
       collection.remove(filteredCollection.models);
       collection.add(newModels, options);
       filteredCollection.resetWith(collection);
     },
 
     localSearch: function () {
-
+      //debug('localSearch() ====================');
       // perform only once in response
       appEvents.once('troupesResponse', function (rooms) {
         var collection = new Backbone.Collection(rooms);
         var filter = textFilter({ query: this.model.get('searchTerm'), fields: ['url', 'name'] });
         var results = collection.filter(filter);
-        if (!results.length) return;
-        results.map(function(r) { r.set('exists', true); }); // local results always exist
+
+        results.map(function(r) { r.set('exists', true); r.set('priority', 0); }); // local results always exist
+
         try {
-          this.refreshCollection(this._rooms, results, { at: 0, merge: true });
+          this.refreshCollection(this._rooms, results, { at: this.collection.length, merge: true });
         } catch (e) {
-          // new Error('Could not perform local search.'); FIXME
+          // new Error('Could not perform local search.');
         }
       }.bind(this));
 
@@ -322,18 +337,22 @@ define([
     },
 
     remoteSearch: function() {
+      //debug('remoteSearch() ====================');
+      //time('remoteSearch');
       var query = this.model.get('searchTerm');
 
       // Find messages on ElasticSearch
       var chatSearchCollection = new ChatSearchModels.ChatSearchCollection([], { });
       chatSearchCollection.fetchSearch(query, function () {
         try {
-          this.refreshCollection(this._chats, chatSearchCollection.models);
+          this.refreshCollection(this._chats, chatSearchCollection.models.map(function (item) {
+            item.set('priority', 2);
+            return item;
+          }));
         } catch (e) {
-          // new Error('Could not perform remote search.'); FIXME
+          // new Error('Could not perform remote search.');
         }
       }.bind(this), this);
-
 
       // Find users, repos and channels on the server
       var self = this;
@@ -341,25 +360,27 @@ define([
 
       // Merge local and remote results and refresh the collection
       var refresh = function() {
-        var merge = self._rooms.models.concat(rooms);
-        var uniq  = _.uniq(merge, false, function(r) { return r.get('url'); });
-        self.refreshCollection(self._rooms, uniq);
+        // //debug('about to add remote rooms() ====================');
+        self.refreshCollection(self._rooms, rooms, { nonDestructive: true });
+        //timeEnd('remoteSearch');
       };
 
-      //
-      var debouncedRefresh = _.debounce(refresh, 250);
+      var debouncedRefresh = _.debounce(refresh, 100);
 
-      var cb = function(data) {
+      var cb = function (data) {
+
         if (!data.results) return;
         var models = data.results
-          .slice(0,2)
+          .slice(0, 2)
           .map(function(r) {
             if (r.room) r.id = r.room.id; // use the room id as model id for repos
             r.url = r.url || '/' + r.uri;
+            r.priority = 1;
             return new Backbone.Model(r);
         });
         rooms = rooms.concat(models);
         debouncedRefresh();
+        //refresh();
       };
 
       // Find users
@@ -370,7 +391,6 @@ define([
       $.ajax({ url: '/api/v1/public-repo-search', data : { q: query }, success: cb});
       // find channels
       $.ajax({ url: '/api/v1/channel-search', data : { q: query }, success: cb});
-
     },
 
     showResults: function () {
