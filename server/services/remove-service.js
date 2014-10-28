@@ -6,6 +6,7 @@ var StatusError        = require('statuserror');
 var appEvents          = require('../app-events');
 var recentRoomService  = require('./recent-room-service');
 var roomPermissionsModel = require('./room-permissions-model');
+var unreadItemService = require('./unread-item-service');
 
 // Check parameters
 
@@ -27,8 +28,15 @@ function removeFromRoom(room, userId) {
   return room.saveQ();
 }
 
-function removeFromRoomAndFavourite(room, userId) {
+function removeUnreadCounts(room, userId) {
+  return unreadItemService.markAllChatsRead(room.id, userId);
+}
+
+function removeFromRoomAndFavouriteAndUnread(room, userId) {
   return removeFromRoom(room, userId)
+  .then(function() {
+    return removeUnreadCounts(room, userId);
+  })
   .then(function() {
     return removeFavourite(room, userId, false);
   });
@@ -39,7 +47,7 @@ function removeFromRoomAndFavourite(room, userId) {
 function userLeaveRoom(room, user) {
   return checkParameters(room, user)
   .then(function() {
-    return removeFromRoomAndFavourite(room, user.id);
+    return removeFromRoomAndFavouriteAndUnread(room, user.id);
   });
 }
 
@@ -74,7 +82,7 @@ function removeUserFromRoom(room, user, requestingUser) {
     });
   })
   .then(function() {
-    return removeFromRoomAndFavourite(room, user.id);
+    return removeFromRoomAndFavouriteAndUnread(room, user.id);
   });
 }
 
