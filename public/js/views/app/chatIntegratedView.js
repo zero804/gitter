@@ -62,17 +62,18 @@ define([
     },
 
     initialize: function() {
-      this.rightToolbar = new RightToolbarView({ el: "#toolbar-content" });
 
-      new HeaderView({ model: context.troupe(), el: '#header' });
-
-      // Setup the ChatView
+      // Setup the ChatView - this is instantiated once for the application, and shared between many views
       var chatCollectionView = new ChatCollectionView({
         el: '#chat-container',
         collection: itemCollections.chats,
         userCollection: itemCollections.users,
         decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
       }).render();
+
+      new HeaderView({ model: context.troupe(), el: '#header' });
+
+      this.rightToolbar = new RightToolbarView({ el: "#toolbar-content" });
 
       this.chatInputView = new chatInputView.ChatInputView({
         el: '#chat-input',

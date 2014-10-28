@@ -73,6 +73,8 @@ define([
         resizer = setTimeout(self.adjustTopPadding, 100);
       });
 
+      this.listenTo(appEvents, 'chatCollectionView:scrolledToChat', this.scrollToChatId);
+
       var contentFrame = document.querySelector(SCROLL_ELEMENT);
 
       this.rollers = new Rollers(contentFrame, this.el);
@@ -160,10 +162,11 @@ define([
 
     scrollToChatId: function(id) {
       var model = this.collection.get(id);
-      if(!model) return;
+      if (!model) return;
 
       var view = this.children.findByModel(model);
-      if(!view) return;
+      if (!view) return;
+
       this.rollers.scrollToElement(view.el, { centre: true });
       return true;
     },
