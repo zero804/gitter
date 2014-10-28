@@ -34,9 +34,7 @@ if [[ -z $DEV_USER_ID ]]; then
   exit 1
 fi
 
-# mongoexport -h mongo-replica-member-004 -d gitter -c chatmessages -q "{ toTroupeId: ObjectId('$PROD_ROOM_ID') }" --jsonArray > /tmp/chats.json
-
-# exit 1;
+mongoexport -h mongo-replica-member-004 -d gitter -c chatmessages -q "{ toTroupeId: ObjectId('$PROD_ROOM_ID') }" --jsonArray > /tmp/chats.json
 
 node -e "
   var data = '';
