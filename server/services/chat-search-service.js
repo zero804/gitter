@@ -55,7 +55,11 @@ function performQuery(troupeId, textQuery, maxHistoryDate, options) {
             type : "fvh"
           }
         },
-      }
+      },
+      sort: [
+        { _score: { order : "desc"} },
+        { sent: { order : "desc"} }
+      ],
     }
   };
 
