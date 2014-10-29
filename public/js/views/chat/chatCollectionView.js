@@ -76,7 +76,6 @@ define([
       this.listenTo(appEvents, 'chatCollectionView:scrolledToChat', this.scrollToChatId);
 
       var contentFrame = document.querySelector(SCROLL_ELEMENT);
-
       this.rollers = new Rollers(contentFrame, this.el);
 
       this.userCollection = options.userCollection;
