@@ -69,7 +69,7 @@ Deletes a room and kicks users out. Requires a room uri.
 e.g `./scripts/utils/delete-room.js --uri trevorah/noembed`
 
 ### migrate-messages.js
-Migrates all chat messages from one room to another.
+Migrates all chat messages from one room to another. Requires two rooms.
 
 e.g `./scripts/utils/migrate-messages.js --from trevorah/oldroom --to trevorah/newroom`
 
