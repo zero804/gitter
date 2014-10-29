@@ -308,6 +308,7 @@ define([
       if (options.nonDestructive) {
         var all = filteredCollection.models.concat(newModels);
         newModels = _.uniq(all, false, function (r) { return r.get('url'); });
+        delete options.nonDestructive; // remove it from our options object
       }
 
       collection.remove(filteredCollection.models);
