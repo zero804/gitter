@@ -11,7 +11,9 @@ define(['mutant'], function(Mutant) {
   /** @const */ var TOP_OFFSET = 300;
 
   /* Put your scrolling panels on rollers */
-  function Rollers(target, childContainer) {
+  function Rollers(target, childContainer, options) {
+    options = options || {};
+
     this._target = target;
     this._childContainer = childContainer || target;
     this._mutationHandlers = {};
@@ -21,7 +23,12 @@ define(['mutant'], function(Mutant) {
 
     this._nopass = null;
     this._stableElement = null;
-    this.initTrackingMode();
+
+    if (options.doNotTrack) {
+      this._mode = STABLE;
+    } else {
+      this.initTrackingMode();
+    }
 
     var adjustScroll = this.adjustScroll.bind(this);
 
