@@ -45,7 +45,7 @@ define([
 
       this.listenTo(model, 'change:selected', function (m, selected) {
         this.$el.toggleClass('selected', !!selected);
-        if (selected) { /* TODO longer lists, do we need to scroll m into view?; */ }
+        if (selected) { /* FIXME longer lists, do we need to scroll m into view?; */ }
       });
     },
 
@@ -330,6 +330,7 @@ define([
       if (options.nonDestructive) {
         var all = filteredCollection.models.concat(newModels);
         newModels = _.uniq(all, false, function (r) { return r.get('url'); });
+        delete options.nonDestructive; // remove it from our options object
       }
 
       collection.remove(filteredCollection.models);
