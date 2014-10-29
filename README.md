@@ -63,6 +63,16 @@ Updates the tags used by the explore page.
 
 e.g `./scripts/utils/update-room-tags.js`
 
+### delete-room.js
+Deletes a room and kicks users out. Requires a room uri.
+
+e.g `./scripts/utils/delete-room.js --uri trevorah/noembed`
+
+### migrate-messages.js
+Migrates all chat messages from one room to another. Requires two rooms.
+
+e.g `./scripts/utils/migrate-messages.js --from trevorah/oldroom --to trevorah/newroom`
+
 Upgrading gitter-services to add support for more services
 ----------------------------------------------------------
 Recently merged a pull request for [gitter-services](https://github.com/gitterHQ/services)? then read on…
