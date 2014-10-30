@@ -7,10 +7,7 @@ require([
   'log!router-chat',
   'views/people/peopleCollectionView',
   'views/app/chatIntegratedView',
-  'views/chat/chatInputView',
-  'views/chat/chatCollectionView',
   'collections/instances/integrated-items',
-  'views/righttoolbar/rightToolbarView',
   'views/share/share-view',
   'views/app/troupeSettingsView',
   'views/app/markdownView',
@@ -21,18 +18,6 @@ require([
   'collections/collaborators',
   'components/apiClient',
 
-  'components/unread-items-client',
-
-  'views/chat/decorators/webhookDecorator',
-  'views/chat/decorators/issueDecorator',
-  'views/chat/decorators/commitDecorator',
-  'views/chat/decorators/mentionDecorator',
-  'views/chat/decorators/embedDecorator',
-  'views/chat/decorators/emojiDecorator',
-  'views/app/unreadBannerView',
-  'views/app/historyLimitView',
-  'views/app/headerView',
-
   'components/statsc',          // No ref
   'views/widgets/preload',      // No ref
   'filtered-collection',        // No ref
@@ -42,13 +27,11 @@ require([
   'components/bug-reporting',   // No ref
   'components/focus-events'     // No ref
 
-], function($, Backbone, context, liveContext, appEvents, log, peopleCollectionView,
-    ChatIntegratedView, chatInputView, ChatCollectionView, itemCollections,
-    RightToolbarView, shareView, TroupeSettingsView, MarkdownView, KeyboardView,
-    AddPeopleViewModal, IntegrationSettingsModal, CollaboratorsView, collaboratorsModels,
-    apiClient, unreadItemsClient, webhookDecorator, issueDecorator, commitDecorator,
-    mentionDecorator, embedDecorator, emojiDecorator, UnreadBannerView, HistoryLimitView,
-    HeaderView) {
+], function($, Backbone, context, liveContext, appEvents, log,
+    peopleCollectionView, ChatIntegratedView, itemCollections,
+    shareView, TroupeSettingsView, MarkdownView, KeyboardView,
+    AddPeopleViewModal, IntegrationSettingsModal, CollaboratorsView,
+    collaboratorsModels, apiClient) {
   "use strict";
 
   $(document).on("click", "a", function(e) {
@@ -201,53 +184,18 @@ require([
         .fail(function(xhr) {
           if (xhr.status < 500) notifyRemoveError(xhr.responseJSON.error);
           else notifyRemoveError('');
-        });
+      });
     }
     else notifyRemoveError('User '+ username +' was not found in this room.');
   });
 
-  var appView = new ChatIntegratedView({ el: 'body' });
-  new RightToolbarView({ el: "#toolbar-frame" });
-
-  new HeaderView({ model: context.troupe(), el: '#header' });
-
-  // instantiate user email collection
-  // var userEmailCollection = new UserEmailCollection.UserEmailCollection();
-
-  // Setup the ChatView
-
-  var chatCollectionView = new ChatCollectionView({
-    el: '#chat-container',
-    collection: itemCollections.chats,
-    userCollection: itemCollections.users,
-    decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
-  }).render();
-
-  var unreadChatsModel = unreadItemsClient.acrossTheFold();
-
-  new UnreadBannerView.Top({
-    el: '#unread-banner',
-    model: unreadChatsModel,
-    chatCollectionView: chatCollectionView
-  }).render();
-
-  new UnreadBannerView.Bottom({
-    el: '#bottom-unread-banner',
-    model: unreadChatsModel,
-    chatCollectionView: chatCollectionView
-  }).render();
-
-  new HistoryLimitView({
-    el: '#limit-banner',
-    collection: itemCollections.chats,
-    chatCollectionView: chatCollectionView
-  }).render();
-
-
-  itemCollections.chats.once('sync', function() {
-    unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
+  var appView = new ChatIntegratedView({
+    el: 'body'
   });
 
+  // appView.showSearchMode();
+
+  // This may require a better home
   itemCollections.users.once('sync', function() {
     if(context().permissions.admin) {
       if (itemCollections.users.length === 1) { //itemCollections.chats.length === 0)
@@ -260,15 +208,6 @@ require([
       }
     }
   });
-
-  new chatInputView.ChatInputView({
-    el: $('#chat-input'),
-    collection: itemCollections.chats,
-    chatCollectionView: chatCollectionView,
-    userCollection: itemCollections.users,
-    rollers: chatCollectionView.rollers
-  }).render();
-
 
   var Router = Backbone.Router.extend({
     routes: {
@@ -365,7 +304,7 @@ require([
           title: 'Thank You',
           text: 'Your integrations have been setup.'
         });
-      });
+    });
   }
 
   function promptForHook() {
