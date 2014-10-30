@@ -3,6 +3,7 @@ define([
   'components/apiClient',
   'utils/context',
   'utils/appevents',
+  'utils/rollers',
   'backbone',
   'marionette',
   'underscore',
@@ -16,7 +17,7 @@ define([
   'views/keyboard-events-mixin',
   'views/behaviors/widgets', // No ref
   'views/behaviors/highlight' // No ref
-], function ($, apiClient, context, appEvents, Backbone, Marionette, _, cocktail, itemCollections, ChatSearchModels, searchTemplate, resultTemplate, textFilter, multiDebounce, KeyboardEventsMixin) {
+], function ($, apiClient, context, appEvents, Rollers, Backbone, Marionette, _, cocktail, itemCollections, ChatSearchModels, searchTemplate, resultTemplate, textFilter, multiDebounce, KeyboardEventsMixin) {
   "use strict";
 
   var EmptyResultsView = Marionette.ItemView.extend({
@@ -44,7 +45,7 @@ define([
 
       this.listenTo(model, 'change:selected', function (m, selected) {
         this.$el.toggleClass('selected', !!selected);
-        if (selected) { /* TODO longer lists, do we need to scroll m into view?; */ }
+        if (selected) { /* FIXME longer lists, do we need to scroll m into view?; */ }
       });
     },
 
@@ -108,12 +109,28 @@ define([
 
   var RoomsCollectionView = Marionette.CollectionView.extend({
     itemView: RoomResultItemView,
-    emptyView: EmptyResultsView
+    emptyView: EmptyResultsView,
+    initialize: function() {
+      var target = document.querySelector("#toolbar-content");
+      this.rollers = new Rollers(target, this.el, {doNotTrack: true});
+    },
+    scrollTo: function(v) {
+      console.debug('scrolling rooms');
+      this.rollers.scrollToElement(v.el, {centre: true});
+    }
+
   });
 
   var MessagesCollectionView = Marionette.CollectionView.extend({
     itemView: MessageResultItemView,
-    emptyView: EmptyResultsView
+    emptyView: EmptyResultsView,
+    initialize: function() {
+      var target = document.querySelector("#toolbar-content");
+      this.rollers = new Rollers(target, this.el, {doNotTrack: true});
+    },
+    scrollTo: function(v) {
+      this.rollers.scrollToElement(v.el, {centre: true});
+    }
   });
 
   // we need this to centralize the control of navigation, can take any collection :)
@@ -187,8 +204,13 @@ define([
       'input @ui.input': 'handleChange'
     },
 
+    onRender: function() {
+    },
+
     initialize: function () {
       this.model = new Backbone.Model({ searchTerm: '', active: false });
+  
+
 
       // FIXME: Make sure this is a good thing
       var debouncedRun = _.debounce(this.run.bind(this), 125);
@@ -230,7 +252,7 @@ define([
 
       // initialize the views
       this.localRoomsView = new RoomsCollectionView({ collection: rooms });
-      this.serverMessagesView = new MessagesCollectionView({ collection: chats, chatCollectionView: this.chatCollectionView });
+      this.serverMessagesView = new MessagesCollectionView({ collection: chats });
       this.debouncedLocalSearch =  _.debounce(this.localSearch.bind(this), 125);
       this.debouncedRemoteSearch = _.debounce(this.remoteSearch.bind(this), 250);
     },
@@ -308,6 +330,7 @@ define([
       if (options.nonDestructive) {
         var all = filteredCollection.models.concat(newModels);
         newModels = _.uniq(all, false, function (r) { return r.get('url'); });
+        delete options.nonDestructive; // remove it from our options object
       }
 
       collection.remove(filteredCollection.models);
@@ -407,11 +430,20 @@ define([
       e.preventDefault();
       if (this.isEmpty()) return;
       this.navigation.prev();
+      this.scroll();
     },
 
     handleNext: function () {
       if (this.isEmpty()) return;
       this.navigation.next();
+      this.scroll();
+    },
+
+    scroll: function() {
+      var mv = this.serverMessagesView.children.findByModel(this.navigation.current());
+      if (mv) this.serverMessagesView.scrollTo(mv);
+      var rv = this.localRoomsView.children.findByModel(this.navigation.current());
+      if (rv) this.localRoomsView.scrollTo(rv);
     },
 
     handleGo: function () {
