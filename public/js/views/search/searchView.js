@@ -115,7 +115,6 @@ define([
       this.rollers = new Rollers(target, this.el, {doNotTrack: true});
     },
     scrollTo: function(v) {
-      console.debug('scrolling rooms');
       this.rollers.scrollToElement(v.el, {centre: true});
     }
 
@@ -209,7 +208,7 @@ define([
 
     initialize: function () {
       this.model = new Backbone.Model({ searchTerm: '', active: false });
-  
+
 
 
       // FIXME: Make sure this is a good thing
