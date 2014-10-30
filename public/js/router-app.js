@@ -207,6 +207,7 @@ require([
   appEvents.on('focus.request.chat.in', function(event) {
     postMessage({type: 'focus', focus: 'in', event: event});
   });
+
   appEvents.on('focus.request.chat.out', function(event) {
     postMessage({type: 'focus', focus: 'out', event: event});
   });
@@ -281,7 +282,7 @@ require([
 
       var current = allRoomsCollection.findWhere({ url: '/' + uri });
       if(!current) {
-        reallyOnce(allRoomsCollection, 'reset sync', function() {
+        reallyOnce(allRoomsCollection, 'reset sync', function () {
           current = allRoomsCollection.findWhere({ url: '/' + uri });
           if(current) {
             uri = getParentUri(current);

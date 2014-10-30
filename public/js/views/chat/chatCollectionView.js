@@ -25,6 +25,7 @@ define([
       InfiniteScroll: {
         reverseScrolling: true,
         scrollElementSelector: SCROLL_ELEMENT,
+        contentWrapper: '#chat-container'
       }
     },
 
@@ -72,8 +73,9 @@ define([
         resizer = setTimeout(self.adjustTopPadding, 100);
       });
 
-      var contentFrame = document.querySelector(SCROLL_ELEMENT);
+      this.listenTo(appEvents, 'chatCollectionView:scrolledToChat', this.scrollToChatId);
 
+      var contentFrame = document.querySelector(SCROLL_ELEMENT);
       this.rollers = new Rollers(contentFrame, this.el);
 
       this.userCollection = options.userCollection;
@@ -155,6 +157,17 @@ define([
       var scrollFromTop = this.$el.scrollTop();
       var pageHeight = Math.floor(this.$el.height() * 0.8);
       this.$el.scrollTop(scrollFromTop + pageHeight);
+    },
+
+    scrollToChatId: function(id) {
+      var model = this.collection.get(id);
+      if (!model) return;
+
+      var view = this.children.findByModel(model);
+      if (!view) return;
+
+      this.rollers.scrollToElement(view.el, { centre: true });
+      return true;
     },
 
     getFetchData: function() {

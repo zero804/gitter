@@ -9,7 +9,8 @@ function indexQuery(req, res, next) {
   var search = repoService.getReposForUser(req.user);
 
   return search.then(function(repos) {
-      var filteredRepos = repos.filter(createTextFilter({ query: req.query.q, fields: ['name', 'full_name', 'description']}));
+
+      var filteredRepos = repos.filter(createTextFilter({ query: req.query.q, fields: ['full_name']}));
 
       var strategyOptions = { currentUserId: req.user.id };
       if (req.query.include_users) strategyOptions.mapUsers = true;

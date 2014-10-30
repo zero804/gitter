@@ -5,12 +5,29 @@ define([
   'utils/appevents',
   'components/apiClient',
   'views/app/uiVars',
+  'views/chat/chatInputView',
+  'collections/instances/integrated-items',
   'components/modal-region',
   'utils/scrollbar-detect',
   'cocktail',
   'views/keyboard-events-mixin',
-  'transloadit'
-], function($, context, Marionette, appEvents, apiClient, uiVars, modalRegion, hasScrollBars, cocktail, KeyboardEventsMixin) {
+  'views/chat/chatCollectionView',
+  'views/chat/decorators/webhookDecorator',
+  'views/chat/decorators/issueDecorator',
+  'views/chat/decorators/commitDecorator',
+  'views/chat/decorators/mentionDecorator',
+  'views/chat/decorators/embedDecorator',
+  'views/chat/decorators/emojiDecorator',
+  'views/app/unreadBannerView',
+  'views/app/historyLimitView',
+  'views/app/headerView',
+  'components/unread-items-client',
+  'views/righttoolbar/rightToolbarView',
+  'transloadit'  // No ref
+], function($, context, Marionette, appEvents, apiClient, uiVars, chatInputView, itemCollections, modalRegion, hasScrollBars, cocktail, KeyboardEventsMixin, ChatCollectionView,
+    webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator,
+    emojiDecorator, UnreadBannerView, HistoryLimitView, HeaderView, unreadItemsClient,
+    RightToolbarView /*, SearchView*/) {
   "use strict";
 
   var touchEvents = {
@@ -46,15 +63,51 @@ define([
 
     initialize: function() {
 
-      // new AvatarView({
-      //   el: $('#profile-icon'),
-      //   user: context.getUser(),
-      //   showTooltip: false
-      // }).render();
+      // Setup the ChatView - this is instantiated once for the application, and shared between many views
+      var chatCollectionView = new ChatCollectionView({
+        el: '#chat-container',
+        collection: itemCollections.chats,
+        userCollection: itemCollections.users,
+        decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
+      }).render();
 
-      // // tooltips for the app-template
-      // $('#profile-icon, #home-icon').tooltip();
+      new HeaderView({ model: context.troupe(), el: '#header' });
 
+      this.rightToolbar = new RightToolbarView({ el: "#toolbar-content" });
+
+      this.chatInputView = new chatInputView.ChatInputView({
+        el: '#chat-input',
+        collection: itemCollections.chats,
+        chatCollectionView: chatCollectionView,
+        userCollection: itemCollections.users,
+        rollers: chatCollectionView.rollers
+      }).render();
+
+      var unreadChatsModel = unreadItemsClient.acrossTheFold();
+
+      itemCollections.chats.once('sync', function() {
+        unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
+      });
+
+      new UnreadBannerView.Top({
+        el: '#unread-banner',
+        model: unreadChatsModel,
+        chatCollectionView: chatCollectionView
+      }).render();
+
+      new UnreadBannerView.Bottom({
+        el: '#bottom-unread-banner',
+        model: unreadChatsModel,
+        chatCollectionView: chatCollectionView
+      }).render();
+
+      new HistoryLimitView({
+        el: '#limit-banner',
+        collection: itemCollections.chats,
+        chatCollectionView: chatCollectionView
+      }).render();
+
+      this.chatCollectionView = chatCollectionView;
       this.dialogRegion = modalRegion;
 
       if (hasScrollBars()) {
@@ -186,13 +239,20 @@ define([
             form.unbind('submit.transloadit');
             form.transloadit(options);
             form.submit();
-          });
+        });
       }
 
       var el = $('body');
       el.on('dragenter', ignoreEvent);
       el.on('dragover',  ignoreEvent);
       el.on('drop',      dropEvent);
+    },
+
+    showSearchMode: function() {
+      // this.rightToolbar.$el.hide();
+      // this.chatInputView.$el.hide();
+      // this.chatSearchCollectionView.$el.show();
+      // this.searchView.$el.show();
     }
   });
 

@@ -3,15 +3,19 @@ define([
   'marionette',
   'utils/context',
   'collections/instances/integrated-items',
+  'collections/chat-search',
   'views/people/peopleCollectionView',
+  'views/search/searchView',
   './repoInfo',
   './activity',
   'utils/scrollbar-detect'
-], function($, Marionette, context, itemCollections, PeopleCollectionView, repoInfo, ActivityStream, hasScrollBars) {
+], function ($, Marionette, context, itemCollections, chatSearchModels, PeopleCollectionView, SearchView, repoInfo, ActivityStream, hasScrollBars) {
   "use strict";
 
   var RightToolbarLayout = Marionette.Layout.extend({
+
     regions: {
+      search: '#search-panel',
       people: "#people-roster",
       repo_info: "#repo-info",
       activity: "#activity"
@@ -25,7 +29,11 @@ define([
       'submit #upload-form': 'upload'
     },
 
-    initialize: function() {
+    toggleSearch: function () {
+      // hide all regions and show/hide search...
+    },
+
+    initialize: function () {
 
       // People View
       this.people.show(new PeopleCollectionView.ExpandableRosterView({
@@ -42,6 +50,26 @@ define([
 
       // Activity
       this.activity.show(new ActivityStream({ collection: itemCollections.events }));
+
+      // Search
+      this.searchView = new SearchView({ });
+      this.search.show(this.searchView);
+
+      this.searchView.on('search:expand', function () {
+        $('.trpToolbar').addClass('expand');
+      });
+
+      this.searchView.on('search:collapse', function () {
+        $('.trpToolbar').removeClass('expand');
+      });
+
+      this.searchView.on('search:show', function () {
+        $('#toolbar-top-content').hide();
+      }.bind(this));
+
+      this.searchView.on('search:hide', function () {
+        $('#toolbar-top-content').show();
+      }.bind(this));
 
       itemCollections.events.on('add reset sync', function() {
 
@@ -60,7 +88,6 @@ define([
     showPeopleList: function() {
       $('#repo-info').hide();
       $('#people-roster').show();
-
       $('#people-header').addClass('selected');
       $('#info-header').removeClass('selected');
     },

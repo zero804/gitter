@@ -1,6 +1,10 @@
 {{!< chat-layout}}
 {{> chat_alert_wrapper}}
-{{> chat_header}}
-{{> chat_content}}
-{{> chat_toolbar}}
+<div class="chat-and-toolbar-wrapper">
+  <div class="chat-app">
+    {{> chat_header}}
+    {{> chat_content}}
+  </div>
+  {{> chat_toolbar}}
+</div>
 <div class="trpBlankPage"></div>

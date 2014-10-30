@@ -23,13 +23,14 @@ require([
   // - 'other' for the rest
   key.filter = function(event) {
     var scope, tag = event.target || event.srcElement;
+
     if (tag.getAttribute('data-prevent-keys') === 'on') {
       return false; // Prevent triggering
     }
     if (tag.id === 'chat-input-textarea') {
       scope = 'input.chat';
     }
-    else if (tag.id === 'list-search-input') {
+    else if (tag.id === 'list-search-input' || tag.classList.contains('js-search-input')) {
       scope = 'input.search';
     }
     else if (/^trpChatInput/.test(tag.className)) {
@@ -134,7 +135,7 @@ require([
   }];
 
   keyEvents[cmdKey + '+/, ' + cmdKey + '+' + gitterKey + '+/'] = 'chat.toggle';
-  keyEvents[cmdKey + '+' + gitterKey + '+f'] = 'focus.search';
+  keyEvents[cmdKey + '+' /*+ gitterKey*/ + '+f'] = 'focus.search';
   keyEvents[cmdKey + '+' + gitterKey + '+c'] = 'focus.chat';
   keyEvents[cmdKey + '+' + gitterKey + '+m'] = 'help.markdown';
   keyEvents[cmdKey + '+' + gitterKey + '+k'] = 'help.keyboard';
