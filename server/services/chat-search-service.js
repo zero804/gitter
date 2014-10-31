@@ -51,8 +51,6 @@ function parseQuery(textQuery, userLang) {
           analyzers[languageAnalyzerMapper(detectedLanguage)] = true;
         }
 
-        console.log('analyzers:', analyzers);
-
         return {
           queryString: textQuery,
           fromUser: fromUser,
