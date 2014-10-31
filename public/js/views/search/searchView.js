@@ -1,6 +1,5 @@
 define([
   'jquery',
-  'components/apiClient',
   'utils/context',
   'utils/appevents',
   'utils/rollers',
@@ -12,17 +11,20 @@ define([
   'collections/chat-search',
   'hbs!./tmpl/search',
   'hbs!./tmpl/result',
+  'hbs!./tmpl/no-results',
+  'hbs!./tmpl/upgrade',
   'utils/text-filter',
-  'utils/multi-debounce',
   'views/keyboard-events-mixin',
   'views/behaviors/widgets', // No ref
   'views/behaviors/highlight' // No ref
-], function ($, apiClient, context, appEvents, Rollers, Backbone, Marionette, _, cocktail, itemCollections, ChatSearchModels, searchTemplate, resultTemplate, textFilter, multiDebounce, KeyboardEventsMixin) {
+], function ($, context, appEvents, Rollers, Backbone, Marionette, _, cocktail,
+  itemCollections, ChatSearchModels, searchTemplate, resultTemplate, noResultsTemplate,
+  upgradeTemplate, textFilter, KeyboardEventsMixin) {
   "use strict";
 
   var EmptyResultsView = Marionette.ItemView.extend({
     className: 'result-empty',
-    template: _.template('<small>No Results</small>')
+    template: noResultsTemplate
   });
 
   var ResultItemView = Marionette.ItemView.extend({
@@ -33,20 +35,21 @@ define([
 
     modelEvents: {
       'select': 'handleSelect', // this handles "enter"
+      'change:selected': 'toggleSelected'
     },
 
     template: resultTemplate,
 
     className: 'result',
 
-    initialize: function (options) {
-      var model = this.model;
-      this.$el.toggleClass('selected', !!model.get('selected')); // checks if it is selected
+    initialize: function () {
+      this.toggleSelected();
+    },
 
-      this.listenTo(model, 'change:selected', function (m, selected) {
-        this.$el.toggleClass('selected', !!selected);
-        if (selected) { /* FIXME longer lists, do we need to scroll m into view?; */ }
-      });
+    toggleSelected: function() {
+      var selected = this.model.get('selected');
+      this.$el.toggleClass('selected', !!selected);
+      if (selected) { /* FIXME longer lists, do we need to scroll m into view?; */ }
     },
 
     handleSelect: function () {
@@ -72,6 +75,16 @@ define([
       } else {
         parent.location.hash = '#confirm/' + this.model.get('uri');
       }
+    }
+  });
+
+  var UpgradeView = ResultItemView.extend({
+    className: 'result result-upgrade',
+    template: upgradeTemplate,
+    serializeData: function() {
+      return {
+        billingUrl: context.env('billingUrl')
+      };
     }
   });
 
@@ -121,11 +134,17 @@ define([
   });
 
   var MessagesCollectionView = Marionette.CollectionView.extend({
-    itemView: MessageResultItemView,
     emptyView: EmptyResultsView,
     initialize: function() {
       var target = document.querySelector("#toolbar-content");
       this.rollers = new Rollers(target, this.el, {doNotTrack: true});
+    },
+    getItemView: function(item) {
+      if(item.get('limitReached')) {
+        return UpgradeView;
+      }
+
+      return MessageResultItemView;
     },
     scrollTo: function(v) {
       this.rollers.scrollToElement(v.el, {centre: true});

@@ -19,21 +19,8 @@ define([
       return { q: this.queryText, lang: context.lang() };
     },
 
-    parse: function (collection) {
-      if (collection.length && collection[0].limitReached) {
-        collection.shift();
-        this.trigger('limitReached', true);
-        var atTopChanged = function(atTop) {
-
-          if(!atTop) {
-            this.trigger('limitReached', false);
-            this.stopListening(this, 'atTopChanged', atTopChanged);
-          }
-        }.bind(this);
-
-        this.listenTo(this, 'atTopChanged', atTopChanged);
-      }
-
+    parse: function(collection) {
+      // Why?
       collection.forEach(function(chat) {
         chat.burstFinal = true;
         chat.burstStart = true;
