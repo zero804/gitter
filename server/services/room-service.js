@@ -33,7 +33,7 @@ var emailAddressService = require('./email-address-service');
 var mongoUtils         = require('../utils/mongo-utils');
 var badger             = require('./badger-service');
 var userSettingsService = require('./user-settings-service');
-
+var roomSearchService  = require('./room-search-service');
 
 var badgerEnabled      = nconf.get('autoPullRequest:enabled');
 
@@ -1060,3 +1060,32 @@ function updateTroupeLurkForUserId(userId, troupeId, lurk) {
   });
 }
 exports.updateTroupeLurkForUserId = updateTroupeLurkForUserId;
+
+function searchRooms(userId, queryText, options) {
+
+  return persistence.Troupe
+    .findQ({
+      'users.userId': userId,
+      $or: [{
+          'githubType': 'ORG'
+        },{
+          'security': 'PRIVATE'
+      }]
+    }, {
+      _id: 1
+    })
+    .then(function(rooms) {
+      var privateRoomIds = rooms.map(function(t) {
+        return t._id;
+      });
+
+      return roomSearchService.searchRooms(queryText, userId, privateRoomIds, options);
+    })
+    .then(function(roomIds) {
+      return troupeService.findByIds(roomIds)
+        .then(function(rooms) {
+          return collections.maintainIdOrder(roomIds, rooms);
+        });
+    });
+}
+exports.searchRooms = searchRooms;
