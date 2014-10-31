@@ -85,6 +85,9 @@ define([
       return {
         billingUrl: context.env('billingUrl')
       };
+    },
+    selectItem: function() {
+      // Do nothing for now.
     }
   });
 
