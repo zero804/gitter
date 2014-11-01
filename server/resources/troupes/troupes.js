@@ -21,9 +21,11 @@ function searchRooms(req, res, next) {
   var userId = user && user.id;
   return roomService.searchRooms(userId, req.query.q, options)
     .then(function(rooms) {
-      var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
+      var strategy = new restSerializer.SearchResultsStrategy({
+        resultItemStrategy: new restSerializer.TroupeStrategy({ currentUserId: userId })
+      });
 
-      return restSerializer.serializeQ(rooms, strategy);
+      return restSerializer.serializeQ({ results: rooms }, strategy);
     })
     .then(function(searchResults) {
       res.send(searchResults);

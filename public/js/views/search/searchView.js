@@ -275,7 +275,7 @@ define([
       this.localRoomsView = new RoomsCollectionView({ collection: rooms });
       this.serverMessagesView = new MessagesCollectionView({ collection: chats });
       this.debouncedLocalSearch =  _.debounce(this.localSearch.bind(this), 125);
-      this.debouncedRemoteSearch = _.debounce(this.remoteSearch.bind(this), 250);
+      this.debouncedRemoteSearch = _.debounce(this.remoteSearch.bind(this), 500);
     },
 
     isActive: function () {
@@ -415,7 +415,6 @@ define([
 
         if (!data.results) return;
         var models = data.results
-          .slice(0, 2)
           .map(function(r) {
             if (r.room) r.id = r.room.id; // use the room id as model id for repos
             r.url = r.url || '/' + r.uri;
@@ -428,13 +427,16 @@ define([
       };
 
       // Find users
-      $.ajax({url: '/api/v1/user', data : { q: query, type: 'gitter' }, success: cb});
+      $.ajax({url: '/api/v1/user', data : { q: query, type: 'gitter', limit: 3 }, success: cb});
       // Find repos
-      $.ajax({ url: '/api/v1/user/' + context.getUserId() + '/repos', data : { q: query }, success: cb});
+      $.ajax({ url: '/api/v1/user/' + context.getUserId() + '/repos', data : { q: query, limit: 3 }, success: cb});
       // Find public repos
-      $.ajax({ url: '/api/v1/public-repo-search', data : { q: query }, success: cb});
+      // $.ajax({ url: '/api/v1/public-repo-search', data : { q: query }, success: cb});
       // find channels
-      $.ajax({ url: '/api/v1/channel-search', data : { q: query }, success: cb});
+      // $.ajax({ url: '/api/v1/channel-search', data : { q: query }, success: cb});
+
+      // find channels
+      $.ajax({ url: '/api/v1/rooms', data : { q: query, limit: 5 }, success: cb});
     },
 
     showResults: function () {

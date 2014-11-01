@@ -6,9 +6,10 @@ var repoService      = require("../../services/repo-service");
 var createTextFilter = require('text-filter');
 
 function indexQuery(req, res, next) {
-  var search = repoService.getReposForUser(req.user);
+  var limit = req.query.limit ? parseInt(req.query.limit, 10) : 0;
 
-  return search.then(function(repos) {
+  return repoService.getReposForUser(req.user)
+    .then(function(repos) {
 
       var filteredRepos = repos.filter(createTextFilter({ query: req.query.q, fields: ['full_name']}));
 
@@ -18,6 +19,10 @@ function indexQuery(req, res, next) {
       var strategy = new restSerializer.SearchResultsStrategy({
                             resultItemStrategy: new restSerializer.GithubRepoStrategy(strategyOptions)
                           });
+
+      if(limit) {
+        filteredRepos = filteredRepos.slice(0, limit + 1);
+      }
 
       return restSerializer.serializeQ({ results: filteredRepos }, strategy);
     })
