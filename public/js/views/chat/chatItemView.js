@@ -15,10 +15,11 @@ define([
   'cocktail',
   'utils/collapsed-item-client',
   'views/keyboard-events-mixin',
-  'views/behaviors/unread-items',  // No ref
-  'views/behaviors/widgets',      // No ref
-  'views/behaviors/sync-status',  // No ref
-  'bootstrap_tooltip',            // No ref
+  'views/behaviors/unread-items',   // No ref
+  'views/behaviors/widgets',        // No ref
+  'views/behaviors/sync-status',    // No ref
+  'views/behaviors/highlight',      // No ref
+  'bootstrap_tooltip',              // No ref
 ], function($, _, context, chatModels, AvatarView, Marionette, TroupeViews, uiVars, Popover,
   chatItemTemplate, statusItemTemplate, chatInputView, appEvents, cocktail, chatCollapse, KeyboardEventMixins) {
 
@@ -58,8 +59,10 @@ define([
       UnreadItems: {
         unreadItemType: 'chat',
       },
-      SyncStatus: {}
+      SyncStatus: {},
+      Highlight: {}
     },
+
     isEditing: false,
 
     events: uiVars.isMobile ? touchEvents : mouseEvents,
