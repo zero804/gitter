@@ -118,7 +118,7 @@ define([
 
       // updating the collection around the message to be scrolled to
       itemCollections.chats.fetchAtPoint({ aroundId: id }, {}, function () {
-        appEvents.trigger('chatCollectionView:scrolledToChat', id);
+        appEvents.trigger('chatCollectionView:selectedChat', id, { highlights: this.model.get('highlights') });
       }, this);
     }
   });

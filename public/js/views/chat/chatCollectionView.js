@@ -73,7 +73,11 @@ define([
         resizer = setTimeout(self.adjustTopPadding, 100);
       });
 
-      this.listenTo(appEvents, 'chatCollectionView:scrolledToChat', this.scrollToChatId);
+      this.listenTo(appEvents, 'chatCollectionView:selectedChat', function (id, opts) {
+        var model = this.collection.get(id);
+        this.highlightChat(model, opts.highlights);
+        this.scrollToChatId(model);
+      }.bind(this));
 
       var contentFrame = document.querySelector(SCROLL_ELEMENT);
       this.rollers = new Rollers(contentFrame, this.el);
@@ -159,15 +163,24 @@ define([
       this.$el.scrollTop(scrollFromTop + pageHeight);
     },
 
-    scrollToChatId: function(id) {
-      var model = this.collection.get(id);
-      if (!model) return;
-
-      var view = this.children.findByModel(model);
+    scrollToChat: function (chat) {
+      var view = this.children.findByModel(chat);
       if (!view) return;
 
       this.rollers.scrollToElement(view.el, { centre: true });
       return true;
+    },
+
+    scrollToChatId: function (id) {
+      var model = this.collection.get(id);
+      if (!model) return;
+      this.scrollToChat(model);
+    },
+
+    // used to highlight and "dim" chat messages, the behaviour Highlight responds to these changes.
+    highlightChat: function highlightChat(model, arr) {
+      model.set('highlights', arr || []);
+      setTimeout(highlightChat.bind(null, model), 5000);
     },
 
     getFetchData: function() {
