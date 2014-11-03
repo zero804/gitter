@@ -126,22 +126,25 @@ define([
   var RoomsCollectionView = Marionette.CollectionView.extend({
     itemView: RoomResultItemView,
     emptyView: EmptyResultsView,
+
     initialize: function() {
       var target = document.querySelector("#toolbar-content");
-      this.rollers = new Rollers(target, this.el, {doNotTrack: true});
+      this.rollers = new Rollers(target, this.el, { doNotTrack: true });
     },
-    scrollTo: function(v) {
-      this.rollers.scrollToElement(v.el, {centre: true});
-    }
 
+    scrollTo: function (v) {
+      this.rollers.scrollToElement(v.el, { centre: true });
+    }
   });
 
   var MessagesCollectionView = Marionette.CollectionView.extend({
     emptyView: EmptyResultsView,
+
     initialize: function() {
       var target = document.querySelector("#toolbar-content");
       this.rollers = new Rollers(target, this.el, {doNotTrack: true});
     },
+
     getItemView: function(item) {
       if(item.get('limitReached')) {
         return UpgradeView;
@@ -149,6 +152,7 @@ define([
 
       return MessageResultItemView;
     },
+
     scrollTo: function(v) {
       this.rollers.scrollToElement(v.el, {centre: true});
     }
@@ -219,6 +223,7 @@ define([
     // FIXME this redundant reference is a little strange
     events: {
       'click .js-activate-search': 'activate',
+      'click @ui.input': 'activate',
       'cut @ui.input': 'handleChange',
       'paste @ui.input': 'handleChange',
       'change @ui.input': 'handleChange',
@@ -299,15 +304,14 @@ define([
     activate: function () {
 
       var model = this.model;
-      model.set('active', !this.isActive());
+      model.set('active', true);
 
       var innerWidth = window.innerWidth;
 
+      this.triggerMethod('search:expand');
+
       if (innerWidth < 880) {
-        this.triggerMethod('search:expand');
-        if (innerWidth >= 680) {
-          appEvents.triggerParent('menu:hide'); // hide menu
-        }
+        appEvents.triggerParent('menu:hide'); // hide menu
       }
 
       if (this.isActive()) {
