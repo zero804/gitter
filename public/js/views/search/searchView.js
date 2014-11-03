@@ -1,5 +1,6 @@
 define([
   'jquery',
+  'components/apiClient',
   'utils/context',
   'utils/appevents',
   'utils/rollers',
@@ -12,13 +13,14 @@ define([
   'hbs!./tmpl/search',
   'hbs!./tmpl/result',
   'hbs!./tmpl/no-results',
+  'hbs!./tmpl/no-room-results',
   'hbs!./tmpl/upgrade',
   'utils/text-filter',
   'views/keyboard-events-mixin',
   'views/behaviors/widgets', // No ref
   'views/behaviors/highlight' // No ref
-], function ($, context, appEvents, Rollers, Backbone, Marionette, _, cocktail,
-  itemCollections, ChatSearchModels, searchTemplate, resultTemplate, noResultsTemplate,
+], function ($, apiClient, context, appEvents, Rollers, Backbone, Marionette, _, cocktail,
+  itemCollections, ChatSearchModels, searchTemplate, resultTemplate, noResultsTemplate, noRoomResultsTemplate,
   upgradeTemplate, textFilter, KeyboardEventsMixin) {
   "use strict";
 
@@ -26,6 +28,18 @@ define([
     className: 'result-empty',
     template: noResultsTemplate
   });
+
+  var EmptyRoomResultsView = Marionette.ItemView.extend({
+    className: 'result-empty',
+    events: {
+      'click .js-create-room': 'showCreateRoomModal'
+    },
+    showCreateRoomModal: function() {
+      parent.location.hash = '#createroom';
+    },
+    template: noRoomResultsTemplate
+  });
+
 
   var ResultItemView = Marionette.ItemView.extend({
 
@@ -125,8 +139,7 @@ define([
 
   var RoomsCollectionView = Marionette.CollectionView.extend({
     itemView: RoomResultItemView,
-    emptyView: EmptyResultsView,
-
+    emptyView: EmptyRoomResultsView,
     initialize: function() {
       var target = document.querySelector("#toolbar-content");
       this.rollers = new Rollers(target, this.el, { doNotTrack: true });
@@ -239,7 +252,7 @@ define([
 
 
       // FIXME: Make sure this is a good thing
-      var debouncedRun = _.debounce(this.run.bind(this), 125);
+      var debouncedRun = _.debounce(this.run.bind(this), 100);
 
       this.listenTo(this.model, 'change:searchTerm', function () {
         if (this.isEmpty()) {
@@ -279,7 +292,7 @@ define([
       // initialize the views
       this.localRoomsView = new RoomsCollectionView({ collection: rooms });
       this.serverMessagesView = new MessagesCollectionView({ collection: chats });
-      this.debouncedLocalSearch =  _.debounce(this.localSearch.bind(this), 125);
+      this.debouncedLocalSearch =  _.debounce(this.localSearch.bind(this), 100);
       this.debouncedRemoteSearch = _.debounce(this.remoteSearch.bind(this), 500);
     },
 
@@ -330,7 +343,6 @@ define([
     },
 
     run: function (/*model, searchTerm*/) {
-      //debug('run() ====================');
       this.debouncedLocalSearch();
       this.debouncedRemoteSearch();
       this.showResults();
@@ -364,37 +376,67 @@ define([
     },
 
     localSearch: function () {
-      //debug('localSearch() ====================');
-      // perform only once in response
-      appEvents.once('troupesResponse', function (rooms) {
-        var collection = new Backbone.Collection(rooms);
-        var filter = textFilter({ query: this.model.get('searchTerm'), fields: ['url', 'name'] });
-        var results = collection.filter(filter);
 
-        results.map(function(r) { r.set('exists', true); r.set('priority', 0); }); // local results always exist
+      if (!this._roomscache) {
+        // request troupe from parent frame
+        appEvents.triggerParent('troupeRequest', { });
 
-        try {
-          this.refreshCollection(this._rooms, results, { at: this.collection.length, merge: true });
-        } catch (e) {
-          // new Error('Could not perform local search.');
-        }
-      }.bind(this));
+        appEvents.once('troupesResponse', function (rooms) {
 
-      // request troupe from parent frame
-      appEvents.triggerParent('troupeRequest', { });
+          // filter out the current room
+          var filtered = rooms.filter(function(room) {
+            return room.id !== context.getTroupeId();
+          });
+
+          filtered.forEach(function(room) { 
+            room.exists = true;
+            room.priority = room.githubType.match(/^ORG$/) ? 0 : 1;
+            room.boost    = room.githubType.match(/^ORG$/) ? 1 : 0;
+          });
+
+          var collection = new Backbone.Collection();
+          collection.comparator = function(item) {
+            return -(item.get('boost') + Date.parse(item.get('lastAccessTime')).toString());
+          };
+          collection.add(filtered);
+
+
+          this._roomscache = collection;
+          this.localCacheSearch();
+        }.bind(this));
+      } else {
+        this.localCacheSearch();
+      }
+    },
+
+    localCacheSearch: function() {
+
+      var collection = this._roomscache;
+      var filter = textFilter({ query: this.model.get('searchTerm'), fields: ['url', 'name'] });
+      var results = collection.filter(filter);
+
+      // show the top 4 results only
+      results = results.slice(0,4);
+
+      try {
+        this.refreshCollection(this._rooms, results, { at: this.collection.length, merge: true });
+      } catch (e) {
+        // new Error('Could not perform local search.');
+      }
+  
     },
 
     remoteSearch: function() {
-      //debug('remoteSearch() ====================');
-      //time('remoteSearch');
       var query = this.model.get('searchTerm');
+
+      if (!query) return;
 
       // Find messages on ElasticSearch
       var chatSearchCollection = new ChatSearchModels.ChatSearchCollection([], { });
       chatSearchCollection.fetchSearch(query, function () {
         try {
           this.refreshCollection(this._chats, chatSearchCollection.models.map(function (item) {
-            item.set('priority', 2);
+            item.set('priority', 3);
             return item;
           }));
         } catch (e) {
@@ -404,43 +446,34 @@ define([
 
       // Find users, repos and channels on the server
       var self = this;
-      var rooms = [];
+      var limit = 2;
 
-      // Merge local and remote results and refresh the collection
-      var refresh = function() {
-        // //debug('about to add remote rooms() ====================');
-        self.refreshCollection(self._rooms, rooms, { nonDestructive: true });
-        //timeEnd('remoteSearch');
-      };
+      var users = apiClient.get('/v1/user',                     { q: query, limit: limit, type: 'gitter' });
+      var repos = apiClient.user.get('/repos',                  { q: query, limit: limit});
+      var publicRepos = apiClient.get('/v1/public-repo-search', { q: query, limit: limit});
+      var channels = apiClient.get('/v1/channel-search',        { q: query, limit: limit});
 
-      var debouncedRefresh = _.debounce(refresh, 100);
+      $.when(users, repos, publicRepos, channels)
+        .done(function (u, r, pr, c) {
 
-      var cb = function (data) {
+           u[0].results.map(function(i) { i.exists = true; });
+          pr[0].results.map(function(i) { i.exists = true; });
+           c[0].results.map(function(i) { i.exists = true; });
 
-        if (!data.results) return;
-        var models = data.results
-          .map(function(r) {
+          var results =  [u, r, pr, c]
+          .map(function (data) { return data[0].results; })
+          .reduce(function (fold, arr) { return fold.concat(arr); }, []);
+
+          var _results = results.map(function (r) {
+            if (!r) return;
             if (r.room) r.id = r.room.id; // use the room id as model id for repos
             r.url = r.url || '/' + r.uri;
             r.priority = 1;
             return new Backbone.Model(r);
+          });
+
+          self.refreshCollection(self._rooms, _.compact(_results), { nonDestructive: true });
         });
-        rooms = rooms.concat(models);
-        debouncedRefresh();
-        //refresh();
-      };
-
-      // Find users
-      $.ajax({url: '/api/v1/user', data : { q: query, type: 'gitter', limit: 3 }, success: cb});
-      // Find repos
-      $.ajax({ url: '/api/v1/user/' + context.getUserId() + '/repos', data : { q: query, limit: 3 }, success: cb});
-      // Find public repos
-      // $.ajax({ url: '/api/v1/public-repo-search', data : { q: query }, success: cb});
-      // find channels
-      // $.ajax({ url: '/api/v1/channel-search', data : { q: query }, success: cb});
-
-      // find channels
-      $.ajax({ url: '/api/v1/rooms', data : { q: query, limit: 5 }, success: cb});
     },
 
     showResults: function () {
