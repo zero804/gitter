@@ -68,7 +68,7 @@ define([], function() {
 
     for (var i = 0; i < nodeList.length; ++i) {
       var highlightNode = nodeList[i];
-      var textNode = document.createText(highlightNode.innerText);
+      var textNode = document.createTextNode(highlightNode.innerText);
       highlightNode.parentNode.replaceChild(textNode, highlightNode);
     }
   }
