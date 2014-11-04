@@ -180,7 +180,10 @@ define(['mutant'], function(Mutant) {
       }
 
       if(scrollTop < 0) scrollTop = 0;
-      target.scrollTop = scrollTop;
+
+      window.requestAnimationFrame(function() {
+        target.scrollTop = scrollTop;
+      });
 
       this.stable();
       // this.trackUntil(element, true/*force*/);
