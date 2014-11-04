@@ -12,9 +12,9 @@
 @import "base-transition-mixins";
 
 @keyframes pulsey {
-    0% { opacity: 0.2; }
-    50% { opacity: 1; }
-    100% { opacity: 0.2; }
+    0% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+    100% { opacity: 0.4; }
 }
 
 @keyframes spin {
@@ -24,6 +24,10 @@
 
 .pulse {
   animation: pulsey 2s linear infinite;
+}
+
+.pulse--fast {
+  animation: pulsey 1s linear infinite;
 }
 
 .spinner {

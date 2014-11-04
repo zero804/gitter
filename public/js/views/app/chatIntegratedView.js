@@ -81,7 +81,7 @@ define([
       }).render();
 
       this.listenTo(itemCollections.chats, 'atBottomChanged', function (isBottom) {
-        this.ui.scrollToBottom.toggleClass('u-scale-down', isBottom);
+        this.ui.scrollToBottom.toggleClass('u-scale-zero', isBottom);
       }.bind(this));
 
       new HeaderView({ model: context.troupe(), el: '#header' });

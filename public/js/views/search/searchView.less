@@ -9,7 +9,7 @@
   display: none;
 }
 
-.u-scale-down {
+.u-scale-zero {
   transform: scale(0);
 }
 
@@ -62,6 +62,11 @@
   width: 100%;
   box-sizing: border-box;
   padding: 0 0.625em;
+}
+
+.search-input-search-icon.fetching {
+  .pulse--fast();
+  color: @trpLightBlue;
 }
 
 .search-input input {
