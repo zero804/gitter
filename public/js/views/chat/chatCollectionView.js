@@ -75,9 +75,19 @@ define([
 
       this.listenTo(appEvents, 'chatCollectionView:selectedChat', function (id, opts) {
         var model = this.collection.get(id);
+
+        // clearing previously highlighted chat.
+        this.clearHighlight();
+
+        // highlighting new and replacing "current"
         this.highlightChat(model, opts.highlights);
+        this.highlighted = model;
+
+        // finally scroll to it
         this.scrollToChatId(model);
       }.bind(this));
+
+      this.listenTo(appEvents, 'chatCollectionView:clearHighlight', this.clearHighlight.bind(this));
 
       var contentFrame = document.querySelector(SCROLL_ELEMENT);
       this.rollers = new Rollers(contentFrame, this.el);
@@ -166,7 +176,6 @@ define([
     scrollToChat: function (chat) {
       var view = this.children.findByModel(chat);
       if (!view) return;
-
       this.rollers.scrollToElement(view.el, { centre: true });
       return true;
     },
@@ -178,9 +187,19 @@ define([
     },
 
     // used to highlight and "dim" chat messages, the behaviour Highlight responds to these changes.
-    highlightChat: function highlightChat(model, arr) {
+    // to "dim" simply leave out the arr argument
+    highlightChat: function (model, arr) {
       model.set('highlights', arr || []);
-      setTimeout(highlightChat.bind(null, model), 5000);
+    },
+
+    clearHighlight: function () {
+      var old = this.highlighted;
+      if (!old) return;
+      try {
+        this.highlightChat(old);
+      } catch (e) {
+        log('Could not clear previously highlighted item');
+      }
     },
 
     getFetchData: function() {
@@ -203,6 +222,7 @@ define([
         limit: PAGE_SIZE
       };
     },
+
     findLastCollapsibleChat: function() {
       var c = this.collection;
       for(var i = c.length - 1; i >= 0; i--) {
@@ -212,16 +232,19 @@ define([
         }
       }
     },
+
     setLastCollapsibleChat: function(state) {
       var last = this.findLastCollapsibleChat();
       if(!last) return;
       var chatItem = this.children.findByModel(last);
       if(chatItem) chatItem.setCollapse(state);
     },
+
     /* Collapses the most recent chat with embedded media */
     collapseChats: function() {
       this.setLastCollapsibleChat(true);
     },
+
     /* Expands the most recent chat with embedded media */
     expandChats: function() {
       this.setLastCollapsibleChat(false);

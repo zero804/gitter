@@ -100,7 +100,7 @@ define([
         billingUrl: context.env('billingUrl')
       };
     },
-    selectItem: function() {
+    selectItem: function () {
       // Do nothing for now.
     }
   });
@@ -293,7 +293,7 @@ define([
       this.localRoomsView = new RoomsCollectionView({ collection: rooms });
       this.serverMessagesView = new MessagesCollectionView({ collection: chats });
       this.debouncedLocalSearch =  _.debounce(this.localSearch.bind(this), 100);
-      this.debouncedRemoteSearch = _.debounce(this.remoteSearch.bind(this), 500);
+      this.debouncedRemoteSearch = _.debounce(this.remoteSearch.bind(this), 300);
     },
 
     isActive: function () {
@@ -312,6 +312,7 @@ define([
       this.hide();
       this.triggerMethod('search:collapse');
       appEvents.triggerParent('menu:show'); // hide menu
+      appEvents.trigger('chatCollectionView:clearHighlight'); // remove highlights;
     },
 
     activate: function () {
@@ -388,7 +389,7 @@ define([
             return room.id !== context.getTroupeId();
           });
 
-          filtered.forEach(function(room) { 
+          filtered.forEach(function(room) {
             room.exists = true;
             room.priority = room.githubType.match(/^ORG$/) ? 0 : 1;
             room.boost    = room.githubType.match(/^ORG$/) ? 1 : 0;
@@ -423,7 +424,7 @@ define([
       } catch (e) {
         // new Error('Could not perform local search.');
       }
-  
+
     },
 
     remoteSearch: function() {
