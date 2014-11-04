@@ -13,7 +13,7 @@ exports.searchRooms = function(queryText, userId, privateRoomIds, options) {
   var queryRequest = {
     size: options.limit || 10,
     timeout: 500,
-    index: 'gitter',
+    index: 'gitter-primary',
     type: 'room',
     body: {
       fields: ["_id"],

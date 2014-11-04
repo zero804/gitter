@@ -122,7 +122,7 @@ function performQuery(troupeId, parsedQuery, maxHistoryDate, options) {
   var queryRequest = {
     size: options.limit || 10,
     timeout: 500,
-    index: 'gitter',
+    index: 'gitter-primary',
     type: 'chat',
     body: {
       fields: ["_id"],
@@ -168,7 +168,7 @@ function performQueryForInaccessibleResults(troupeId, parsedQuery, maxHistoryDat
 
   var countRequest = {
     timeout: 500,
-    index: 'gitter',
+    index: 'gitter-primary',
     type: 'chat',
     body: {
       query: query,

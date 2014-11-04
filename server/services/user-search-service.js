@@ -83,7 +83,7 @@ function performQuery(queryString, options) {
   var queryRequest = {
     size: options.limit || 10,
     timeout: 500,
-    index: 'gitter',
+    index: 'gitter-primary',
     type: 'user',
     body: {
       fields: ["_id"],
