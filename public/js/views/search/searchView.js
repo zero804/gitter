@@ -216,7 +216,8 @@ define([
 
     ui: {
       results: '.js-search-results',
-      input: '.js-search-input'
+      input: '.js-search-input',
+      clear: '.js-search-clear-icon'
     },
 
     regions: {
@@ -236,6 +237,7 @@ define([
     // FIXME this redundant reference is a little strange
     events: {
       'click .js-activate-search': 'activate',
+      'click @ui.clear' : 'clearSearch',
       'click @ui.input': 'activate',
       'cut @ui.input': 'handleChange',
       'paste @ui.input': 'handleChange',
@@ -479,6 +481,13 @@ define([
       this.ui.results.show();
       this.rooms.show(this.localRoomsView); // local rooms
       this.messages.show(this.serverMessagesView); // server chat messages
+    },
+
+    clearSearch: function () {
+      // this could probably be done in a more elgant way - sorry MB
+      this.hide();
+      this.ui.input.val('');
+      this.ui.input.focus();
     },
 
     handleChange: function (e) {
