@@ -37,8 +37,9 @@ ElasticSearchLoggingAdapter.prototype.close = function () { };
 
 var client = new elasticsearch.Client({
   hosts: config.get('elasticsearch:hosts'),
+  // Warning: possible memory leak: https://github.com/elasticsearch/elasticsearch-js/issues/71
   sniffOnStart: true,
-  sniffInterval: 60000,
+  sniffInterval: 300000,
   log: ElasticSearchLoggingAdapter
 });
 
