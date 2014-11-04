@@ -7,8 +7,9 @@ define([
   'autolink',
   'components/notifications',
   'views/controls/dropdown',
+  'utils/appevents',
   'bootstrap_tooltip' // No ref
-], function($, context, apiClient, Marionette, Backbone, autolink, notifications, Dropdown)  {
+], function($, context, apiClient, Marionette, Backbone, autolink, notifications, Dropdown, appEvents)  {
   "use strict";
 
   function generateTooltip(troupe) {
@@ -135,7 +136,10 @@ define([
     leaveRoom: function() {
       if(!context.isLoggedIn()) return;
 
-      apiClient.userRoom.delete();
+      apiClient.room.delete('/users/' + context.getUserId(), { })
+        .then(function() {
+          appEvents.trigger('navigation', context.getUser().url, 'home', ''); // TODO: figure out a title
+        });
     },
 
     toggleFavourite: function() {
