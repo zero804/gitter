@@ -97,7 +97,7 @@ define([
       action: function(view) {
         view.reset();
 
-        apiClient.userRoom.delete('', { })
+        apiClient.room.delete('/users/' + context.getUserId(), { })
           .then(function() {
             appEvents.trigger('navigation', context.getUser().url, 'home', ''); // TODO: figure out a title
           });
