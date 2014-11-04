@@ -415,8 +415,8 @@ define([
       var filter = textFilter({ query: this.model.get('searchTerm'), fields: ['url', 'name'] });
       var results = collection.filter(filter);
 
-      // show the top 4 results only
-      results = results.slice(0,4);
+      // show the top 3 results only
+      results = results.slice(0,3);
 
       try {
         this.refreshCollection(this._rooms, results, { at: this.collection.length, merge: true });
@@ -446,21 +446,19 @@ define([
 
       // Find users, repos and channels on the server
       var self = this;
-      var limit = 2;
+      var limit = 3;
 
       var users = apiClient.get('/v1/user',                     { q: query, limit: limit, type: 'gitter' });
       var repos = apiClient.user.get('/repos',                  { q: query, limit: limit});
-      var publicRepos = apiClient.get('/v1/public-repo-search', { q: query, limit: limit});
-      var channels = apiClient.get('/v1/channel-search',        { q: query, limit: limit});
+      var publicRepos = apiClient.get('/v1/rooms',              { q: query, limit: limit});
 
-      $.when(users, repos, publicRepos, channels)
-        .done(function (u, r, pr, c) {
+      $.when(users, repos, publicRepos)
+        .done(function (u, r, pr) {
 
            u[0].results.map(function(i) { i.exists = true; });
           pr[0].results.map(function(i) { i.exists = true; });
-           c[0].results.map(function(i) { i.exists = true; });
 
-          var results =  [u, r, pr, c]
+          var results =  [u, r, pr]
           .map(function (data) { return data[0].results; })
           .reduce(function (fold, arr) { return fold.concat(arr); }, []);
 
