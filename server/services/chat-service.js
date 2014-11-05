@@ -276,7 +276,7 @@ function getDateOfFirstMessageInRoom(troupeId) {
  * this does a massive query, so it has to be cached for a long time
  */
 exports.getRoughMessageCount = cacheWrapper('getRoughMessageCount', function(troupeId) {
-  return persistence.ChatMessage.countQ({ toTroupeId: troupeId });
+  return ChatMessage.countQ({ toTroupeId: troupeId });
 }, {
   ttl: config.get('chat-service:get-rough-message-count-cache-timeout')
 });
