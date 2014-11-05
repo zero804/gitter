@@ -140,7 +140,9 @@ define([
 
   var RoomsCollectionView = Marionette.CollectionView.extend({
     itemView: RoomResultItemView,
+
     emptyView: EmptyRoomResultsView,
+
     initialize: function() {
       var target = document.querySelector("#toolbar-content");
       this.rollers = new Rollers(target, this.el, { doNotTrack: true });
@@ -258,8 +260,10 @@ define([
       this.listenTo(this.model, 'change:fetchingCount', function (m, count) {
         var isFetching = (count !== 0);
         if (!isFetching) {
+          // loaded
           this.ui.searchIcon.toggleClass('fetching', isFetching);
         } else {
+          // still fetching
           this.ui.searchIcon.toggleClass('fetching', isFetching);
         }
       });
@@ -389,6 +393,7 @@ define([
 
       // if the new models are the same as the current filtered collection avoids flickering by returning
       if (_.isEqual(newModels.map(getId), filteredCollection.map(getId))) return;
+      if (this.searchTermOutdated(options.query)) { return; }
 
       options = options || {};
       var collection = this.collection;
@@ -442,16 +447,17 @@ define([
     },
 
     localSearch: function () {
+      var query = this.model.get('searchTerm');
       // the count for local search has already been incremented on run()
       var collection = this.localRoomsCache || [];
-      var filter = textFilter({ query: this.model.get('searchTerm'), fields: ['url', 'name'] });
+      var filter = textFilter({ query: query, fields: ['url', 'name'] });
       var results = collection.filter(filter);
 
       // show the top 3 results only
       results = results.slice(0, 3);
 
       try {
-        this.refreshCollection(this.rooms, results, { at: this.collection.length, merge: true });
+        this.refreshCollection(this.rooms, results, { at: this.collection.length, merge: true, query: query });
       } catch (e) {
         log(new Error('Could not perform local search.').stack);
         this.getLocalRooms(); // try and replace the cache
@@ -466,11 +472,13 @@ define([
       var chatSearchCollection = new ChatSearchModels.ChatSearchCollection([], { });
       this.incrementFetchingCount();
       chatSearchCollection.fetchSearch(query, function () {
+        var results = chatSearchCollection.models.map(function (item) {
+          item.set('priority', 3);
+          return item;
+        });
+
         try {
-          this.refreshCollection(this.chats, chatSearchCollection.models.map(function (item) {
-            item.set('priority', 3);
-            return item;
-          }));
+          this.refreshCollection(this.chats, results, { query: query });
         } catch (e) {
           log(new Error('Could not perform remote search.').stack);
         } finally {
@@ -506,7 +514,7 @@ define([
             return new Backbone.Model(r);
           });
           self.decrementFetchingCount();
-          self.refreshCollection(self.rooms, _.compact(_results), { nonDestructive: true });
+          self.refreshCollection(self.rooms, _.compact(_results), { nonDestructive: true, query: query });
         });
     },
 
@@ -521,6 +529,13 @@ define([
       this.hide();
       this.ui.input.val('');
       this.ui.input.focus();
+    },
+
+    // compares the query term when a request started to the current state
+    searchTermOutdated: function (query) {
+      // assumes that if no query argument is passed in, or is empty then the searchTerm is not outdate
+      if (!query) return false;
+      return query !== this.model.get('searchTerm');
     },
 
     handleChange: function (e) {
