@@ -1,5 +1,6 @@
 define([
   'jquery',
+  'log!search-view',
   'components/apiClient',
   'utils/context',
   'utils/appevents',
@@ -19,7 +20,7 @@ define([
   'views/keyboard-events-mixin',
   'views/behaviors/widgets', // No ref
   'views/behaviors/highlight' // No ref
-], function ($, apiClient, context, appEvents, Rollers, Backbone, Marionette, _, cocktail,
+], function ($, log, apiClient, context, appEvents, Rollers, Backbone, Marionette, _, cocktail,
   itemCollections, ChatSearchModels, searchTemplate, resultTemplate, noResultsTemplate, noRoomResultsTemplate,
   upgradeTemplate, textFilter, KeyboardEventsMixin) {
   "use strict";
@@ -222,8 +223,8 @@ define([
     },
 
     regions: {
-      rooms: '.js-search-rooms',
-      messages: '.js-search-messages',
+      roomsRegion: '.js-search-rooms',
+      messagesRegion: '.js-search-messages',
     },
 
     // the shortcuts need to be handled at the top level component
@@ -235,7 +236,7 @@ define([
       'search.go': 'handleGo'
     },
 
-    // FIXME this redundant reference is a little strange
+    // FIXME this redundant reference is a little strange?
     events: {
       'click .js-activate-search': 'activate',
       'click @ui.clearIcon' : 'clearSearch',
@@ -250,10 +251,9 @@ define([
     },
 
     initialize: function () {
-      this.model = new Backbone.Model({ searchTerm: '', active: false, fetchingCount: 0 });
-
-      // FIXME: Make sure this is a good thing
       var debouncedRun = _.debounce(this.run.bind(this), 100);
+
+      this.model = new Backbone.Model({ searchTerm: '', active: false, fetchingCount: 0 });
 
       this.listenTo(this.model, 'change:fetchingCount', function (m, count) {
         var isFetching = (count !== 0);
@@ -278,7 +278,6 @@ define([
 
       // master collection to enable easier navigation
       this.collection = new Backbone.Collection([]);
-
       this.collection.comparator = 'priority';
 
       // filtered collections
@@ -293,8 +292,9 @@ define([
         return !!model.get('text');
       });
 
-      this._rooms = rooms;
-      this._chats = chats;
+      this.localRoomsCache = null;
+      this.rooms = rooms;
+      this.chats = chats;
 
       // making navigation and filtered collections  accessible
       this.navigation = new NavigationController({ collection: this.collection });
@@ -314,15 +314,19 @@ define([
       return !this.model.get('searchTerm');
     },
 
-    // this is used to collapse
+    // completes hides and clears search state
     dismiss: function () {
-      this.model.set('active', false);
-      this.ui.input.val(function () { return ''; });
-      this.model.set('searchTerm', '');
-      this.hide();
+      var model = this.model;
+
       this.triggerMethod('search:collapse');
       appEvents.triggerParent('menu:show'); // hide menu
       appEvents.trigger('chatCollectionView:clearHighlight'); // remove highlights;
+
+      model.set('active', false);
+      model.set('searchTerm', '');
+
+      this.ui.input.val(function () { return ''; });
+      this.hide();
     },
 
     activate: function () {
@@ -348,13 +352,15 @@ define([
     },
 
     hide: function () {
+      this.triggerMethod('search:hide');
       this.ui.results.hide();
       this.collection.reset();
-      this.triggerMethod('search:hide');
+      this.clearLocalRooms();
     },
 
     run: function (/*model, searchTerm*/) {
-      // this.model.set('fetchingCount', 0); // TODO: this could save our asses
+      if (!this.localRoomsCache) this.getLocalRooms();
+      this.model.set('fetchingCount', 0); // TODO: this could save our asses?
       this.debouncedLocalSearch();
       this.debouncedRemoteSearch();
       this.showResults();
@@ -379,8 +385,6 @@ define([
      * options            - same options as Backbone.Collection.add
      */
     refreshCollection: function (filteredCollection, newModels, options) {
-      //debug('refreshCollection() ====================');
-      this.decrementFetchingCount();
       var getId = function (item) { return item.id };
 
       // if the new models are the same as the current filtered collection avoids flickering by returning
@@ -400,61 +404,62 @@ define([
       filteredCollection.resetWith(collection);
     },
 
-    localSearch: function () {
-
-      if (!this._roomscache) {
-        // request troupe from parent frame
-        appEvents.triggerParent('troupeRequest', { });
-
-        appEvents.once('troupesResponse', function (rooms) {
-
-          // filter out the current room
-          var filtered = rooms.filter(function(room) {
-            return room.id !== context.getTroupeId();
-          });
-
-          filtered.forEach(function(room) {
-            room.exists = true;
-            room.priority = room.githubType.match(/^ORG$/) ? 0 : 1;
-            room.boost    = room.githubType.match(/^ORG$/) ? 1 : 0;
-          });
-
-          var collection = new Backbone.Collection();
-          collection.comparator = function(item) {
-            return -(item.get('boost') + Date.parse(item.get('lastAccessTime')).toString());
-          };
-          collection.add(filtered);
-
-
-          this._roomscache = collection;
-          this.localCacheSearch();
-        }.bind(this));
-      } else {
-        this.localCacheSearch();
-      }
+    // may need some thought in the future
+    clearLocalRooms: function () {
+      this.localRoomsCache = null;
     },
 
+    // handles the response from the parent frame containing local rooms
+    cacheLocalRooms: function (rooms) {
+      var collection = new Backbone.Collection();
 
-    localCacheSearch: function() {
+      var filtered = rooms.filter(function (room) {
+          return room.id !== context.getTroupeId();
+        })
+        .map(function (room) {
+          room.exists = true;
+          room.priority = room.githubType.match(/^ORG$/) ? 0 : 1;
+          room.boost    = room.githubType.match(/^ORG$/) ? 1 : 0;
+          return room;
+        });
 
-      var collection = this._roomscache;
-      this.incrementFetchingCount();
+      collection.comparator = function(item) {
+        return -(item.get('boost') + Date.parse(item.get('lastAccessTime')).toString());
+      };
+
+      collection.add(filtered);
+
+      this.localRoomsCache = collection;
+    },
+
+    // FIXME: this should probably return a promise...
+    // responsible for handling local rooms cache
+    getLocalRooms: function () {
+      // request troupe from parent frame
+      appEvents.triggerParent('troupeRequest', { });
+      // once the response comes back lets cache it!
+      appEvents.once('troupesResponse', this.cacheLocalRooms.bind(this));
+    },
+
+    localSearch: function () {
+      // the count for local search has already been incremented on run()
+      var collection = this.localRoomsCache || [];
       var filter = textFilter({ query: this.model.get('searchTerm'), fields: ['url', 'name'] });
       var results = collection.filter(filter);
 
       // show the top 3 results only
-      results = results.slice(0,3);
+      results = results.slice(0, 3);
 
       try {
-        this.refreshCollection(this._rooms, results, { at: this.collection.length, merge: true });
+        this.refreshCollection(this.rooms, results, { at: this.collection.length, merge: true });
       } catch (e) {
-        // new Error('Could not perform local search.');
+        log(new Error('Could not perform local search.').stack);
+        this.getLocalRooms(); // try and replace the cache
       }
     },
 
     remoteSearch: function() {
       var query = this.model.get('searchTerm');
-
       if (!query) return; // to avoid fetching empty queries
 
       // Find messages on ElasticSearch
@@ -462,12 +467,14 @@ define([
       this.incrementFetchingCount();
       chatSearchCollection.fetchSearch(query, function () {
         try {
-          this.refreshCollection(this._chats, chatSearchCollection.models.map(function (item) {
+          this.refreshCollection(this.chats, chatSearchCollection.models.map(function (item) {
             item.set('priority', 3);
             return item;
           }));
         } catch (e) {
-          // new Error('Could not perform remote search.');
+          log(new Error('Could not perform remote search.').stack);
+        } finally {
+          this.decrementFetchingCount();
         }
       }.bind(this), this);
 
@@ -480,15 +487,16 @@ define([
       var repos = apiClient.user.get('/repos',                  { q: query, limit: limit});
       var publicRepos = apiClient.get('/v1/rooms',              { q: query, limit: limit});
 
+      // TODO: u, r, pr. WTF!? Change the names at some point.
       $.when(users, repos, publicRepos)
         .done(function (u, r, pr) {
 
-           u[0].results.map(function(i) { i.exists = true; });
+          u[0].results.map(function(i) { i.exists = true; });
           pr[0].results.map(function(i) { i.exists = true; });
 
           var results =  [u, r, pr]
-          .map(function (data) { return data[0].results; })
-          .reduce(function (fold, arr) { return fold.concat(arr); }, []);
+            .map(function (data) { return data[0].results; })
+            .reduce(function (fold, arr) { return fold.concat(arr); }, []);
 
           var _results = results.map(function (r) {
             if (!r) return;
@@ -497,14 +505,15 @@ define([
             r.priority = 1;
             return new Backbone.Model(r);
           });
-          self.refreshCollection(self._rooms, _.compact(_results), { nonDestructive: true });
+          self.decrementFetchingCount();
+          self.refreshCollection(self.rooms, _.compact(_results), { nonDestructive: true });
         });
     },
 
     showResults: function () {
       this.ui.results.show();
-      this.rooms.show(this.localRoomsView); // local rooms
-      this.messages.show(this.serverMessagesView); // server chat messages
+      this.roomsRegion.show(this.localRoomsView); // local rooms
+      this.messagesRegion.show(this.serverMessagesView); // server chat messages
     },
 
     clearSearch: function () {
