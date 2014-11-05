@@ -111,7 +111,9 @@ Once you are sure the above is done, preform the following:
 
 7. Setup the rivers: `./02-create-rivers`
 
-8. Watch the elasticsearch logs for success, something like:
+8. Setup the alias: `./03-setup-alias`
+
+9. Watch the elasticsearch logs for success, something like:
 
 ```
 [2014-10-20 22:04:09,790][INFO ][cluster.metadata         ] [Brain-Child] [_river] update_mapping [gitterUserRiver] (dynamic)
@@ -123,6 +125,6 @@ Once you are sure the above is done, preform the following:
 [2014-10-20 22:04:27,307][INFO ][org.elasticsearch.river.mongodb.Slurper] Number documents indexed: 21541
 ```
 
-9. Log into HQ: http://localhost:9200/_plugin/HQ -> Connect 
+10. Log into HQ: http://localhost:9200/_plugin/HQ -> Connect 
 
-10. Check that there are lots of documents under the Gitter index.
+11. Check that there are lots of documents under the Gitter index.
