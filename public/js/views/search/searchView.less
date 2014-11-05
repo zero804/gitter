@@ -1,8 +1,292 @@
 @import "../behaviors/highlight";
 
-.search-panel {
-  .search-panel__search-input { 
+@height: 71px;
+
+// NOTE: I do not endorse the use of !important, but...
+.u-uppercase {
+  text-transform: uppercase;
+}
+
+.u-hide {
+  display: none;
+}
+
+.u-scale-zero {
+  transform: scale(0);
+}
+
+@scrollHelperSize: 50px;
+
+.scrollHelper {
+  @color: rgb(200, 200, 200);
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  height: @scrollHelperSize;
+  width: @scrollHelperSize;
+  border: 3px solid @color;
+  border-radius: @scrollHelperSize / 1.5;
+  background-color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  color: @color;
+  transition: transform 0.1s cubic-bezier(0.17, 0.67, 0.83, 0.67), color 0.25s ease-in, border-color 0.25s ease-in;
+}
+
+.scrollHelper:hover {
+  @color: rgb(150, 150, 150);
+  color: @color;
+  border-color: @color;
+}
+
+.scrollHelper:after {
+  font-family: 'octicons';
+  content: '\f0a3';
+  font-size: 1.6em;
+  line-height: @scrollHelperSize;
+}
+
+.search * { box-sizing: border-box; }
+
+.search {
+  width: 100%;
+  text-align: center;
+}
+
+.search.active .search-toggle i { display: none; }
+.search.active .search-input input { display: inline-block; }
+
+.search-input {
+  font-size: 16px;
+  height: @height;
+  line-height: @height;
+  position: absolute;
+  top: 0;
+  text-align: center;
+  z-index: 100;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0;
+  padding: 0 0.625em;
+  background-color:  #fbfbfb;
+}
+
+.search-input-search-icon.fetching {
+  .pulse--fast();
+  color: @trpLightBlue;
+}
+
+.search-input input {
+  .trpBodyMedium;
+  margin: 0;
+  padding: 0 26px;
+  box-sizing: border-box;
+  overflow: auto !important;
+  top: auto !important;
+  left: auto !important;
+  width: 100% !important;
+  height: 3 * 0.625em;
+  border-radius: 6px;
+  @media @mid {
+    display: none;
   }
-  .search-panel__search-results {
+}
+
+.search-input input:focus {
+  box-shadow: none;
+}
+
+i.search-toggle {
+  z-index: 1000;
+  font-size: 18px;
+  display: none;
+  padding: 0 8px !important;
+  opacity: 0.4;
+  top: 28px;
+  cursor: pointer;
+  .prepend-octicon('\f02e');
+  transition: opacity 0.2s ease-in-out;
+
+  @media @mid {
+    display: inline;
   }
+}
+
+
+.search-toggle i:hover {
+  opacity: 1;
+}
+
+.search.active .search-toggle {
+  display: none;
+}
+
+.search-input-search-icon {
+  top: 2px;
+  left: 16px;
+  .prepend-octicon('\f02e');
+  position: absolute;
+  opacity: 0.6;
+}
+
+.search-input-close-icon {
+  .prepend-icon-clear();
+  position: absolute;
+  top: 1px;
+  right: 8px;
+  display: none;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.search-input-icon {
+  @media @mid {
+    display: none;
+  }
+}
+
+.search.active .search-input-icon {
+    display: inline-block;
+}
+
+.search.fsdfsfsactive .search-input-icon {
+  display: inline-block;
+}
+
+.search.active .search-input-close-icon {
+  opacity: 0.6;
+}
+
+.search.active .search-input-close-icon:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+.search-results {
+  position: relative;
+  line-height: normal;
+  text-align: left;
+  top: @height;
+  z-index: 0;
+}
+
+.search-header {
+  margin-left: 0.625em;
+  font-size: 0.8em;
+  padding: 16px 0 8px 7px;
+  width: 90%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.search-header:first-child {
+  padding-top: 0;
+}
+
+.result {
+  clear: both;
+  cursor: pointer;
+  overflow: hidden;
+  display: block;
+  box-sizing: border-box;
+  padding: 0.4em 0.625em;
+  border-bottom: 1px solid fade(@light,60%);
+}
+
+.result.selected,
+.result:hover {
+  background-color: @light;
+}
+
+.result.selected .result-room {
+  font-weight: 600;
+}
+
+.result.selected .result-message {
+  font-weight: 600;
+}
+
+.result.selected .result-message p.result-detail {
+  font-weight: 400;
+}
+
+.result:last-child {
+  border: none;
+}
+
+.result p {
+  line-height: normal;
+}
+
+.result-empty {
+  padding: 0 0.9em 0 1.2em;
+  font-size: 12px;
+  color: @gray;
+}
+
+.result-empty a {
+  color: @trpLightBlue;
+  text-decoration: underline;
+}
+
+.result-avatar {
+  @size: 24px;
+  float: left;
+  height: @size;
+  width: @size;
+}
+
+.js-search-messages .result-avatar {
+  @size: 16px;
+  width: @size;
+  height: @size;
+}
+
+.result-avatar img {
+  border-radius: 4px;
+}
+
+.result.result-upgrade {
+  border-bottom: none;
+}
+
+.result.result-upgrade:hover {
+  background-color: transparent;
+}
+
+.result-upgrade .result-content.result-message {
+  background-color: @light;
+  height: auto;
+  overflow: auto;
+  white-space: normal;
+  border-radius: 4px;
+  padding: 4px 6px;
+  max-width: 254px;
+  width: 100%;
+  text-align: center;
+}
+
+.result-upgrade .result-content.result-message a {
+  text-decoration: none;
+}
+
+.result-content {
+  font-size: 0.9em; // I don't like changing the font-size base value but it seems we have no choice due to ellipsis
+  float: left;
+  line-height: 1.8em;
+  margin-left: 0.625em;
+  max-width: 230px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.result-content.result-message {
+  font-size: 0.8em;
+  margin-top: -4px;
+}
+
+.result-upgrade
+
+.trpToolbar .result-content p {
+  margin-bottom: 0;
+  margin-top: -3px;
 }

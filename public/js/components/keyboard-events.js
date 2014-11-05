@@ -105,10 +105,6 @@ require([
       name: 'search.next',
       scope: 'input.search'
     }],
-    'right': {
-      name: 'search.go',
-      scope: 'input.search'
-    },
     'tab': {
       name: 'maininput.tab.next',
       scope: ['input.chat', 'input.chat.edit', 'input.search']

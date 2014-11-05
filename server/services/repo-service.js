@@ -86,7 +86,7 @@ function findPublicReposWithRoom(user, query, options) {
       githubType: 'REPO',
       security: 'PUBLIC'
     })
-    .limit(20)
+    .limit(options.limit || 20)
     .execQ()
     .then(function(troupes) {
       return Q.all(troupes.map(function(troupe) {

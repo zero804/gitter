@@ -22,29 +22,111 @@ function extractHighlights(text) {
   return results.filter(function(f) { return !!f; });
 }
 
-function performQuery(troupeId, textQuery, maxHistoryDate, options) {
-  /* Horrible hack - rip a from:xyz field out of the textQuery */
-  var fromUser;
-  textQuery = textQuery.replace(/\bfrom:('[^']*'|"[^"]*"|[^'"]\w*)/g, function(wholeMatch, fromField) {
-    fromUser = fromField;
-    return "";
-  });
+function parseQuery(textQuery, userLang) {
+  return Q.fcall(function() {
+    /* Horrible hack - rip a from:xyz field out of the textQuery */
+    var fromUser;
+    textQuery = textQuery.replace(/\bfrom:('[^']*'|"[^"]*"|[^'"]\w*)/g, function(wholeMatch, fromField) {
+      fromUser = fromField;
+      return "";
+    });
 
+    if(!textQuery) {
+      return {
+        queryString: "",
+        fromUser: fromUser,
+        analyzers: ["default"]
+      };
+    }
+
+    return languageDetector(textQuery)
+      .then(function(detectedLanguage) {
+        var analyzers = { "default": true };
+
+        if(userLang) {
+          analyzers[languageAnalyzerMapper(userLang)] = true;
+        }
+
+        if(detectedLanguage) {
+          analyzers[languageAnalyzerMapper(detectedLanguage)] = true;
+        }
+
+        return {
+          queryString: textQuery,
+          fromUser: fromUser,
+          analyzers: Object.keys(analyzers)
+        };
+
+      });
+
+  });
+}
+
+function getElasticSearchQuery(troupeId, parsedQuery) {
   var query = {
+    bool: {
+      must: [{
+        term: { toTroupeId: String(troupeId) }
+      }],
+      should: []
+    }
+  };
+
+  if(parsedQuery.fromUser) {
+    query.bool.must.push({
+      has_parent: {
+        parent_type: "user",
+        query: {
+          query_string: {
+            query: parsedQuery.fromUser,
+            default_operator: "AND"
+          }
+        }
+      }
+    });
+  }
+
+  if(parsedQuery.queryString) {
+    parsedQuery.analyzers.forEach(function(analyzer) {
+      query.bool.should.push({
+        query_string: {
+          default_field: "text",
+          query: parsedQuery.queryString,
+          analyzer: analyzer,
+          default_operator: "AND"
+        }
+      });
+    });
+
+    query.bool.minimum_should_match = 1;
+  }
+
+
+  return query;
+}
+
+function performQuery(troupeId, parsedQuery, maxHistoryDate, options) {
+  var query = getElasticSearchQuery(troupeId, parsedQuery);
+
+  // Add the max-date term
+  if(maxHistoryDate) {
+    query.bool.must.push({
+      range: {
+        sent: {
+          "gte" : maxHistoryDate,
+        }
+      }
+    });
+  }
+
+  var queryRequest = {
     size: options.limit || 10,
     timeout: 500,
-    index: 'gitter',
+    index: 'gitter-primary',
     type: 'chat',
     body: {
       fields: ["_id"],
-      query: {
-        bool: {
-          must: [{
-            term: { toTroupeId: String(troupeId) }
-          }],
-          should: []
-        }
-      },
+      query: query,
       highlight: {
         order: "score",
         pre_tags: ["<m0>","<m1>","<m2>","<m3>","<m4>","<m5>"],
@@ -63,67 +145,7 @@ function performQuery(troupeId, textQuery, maxHistoryDate, options) {
     }
   };
 
-  if(fromUser) {
-    query.body.query.bool.must.push({
-      has_parent: {
-        parent_type: "user",
-        query: {
-          query_string: {
-            query: fromUser,
-            default_operator: "AND"
-          }
-        }
-      }
-    });
-  }
-
-  // Add the max-date term
-
-  if(maxHistoryDate) {
-    query.body.query.bool.must.push({
-      range: {
-        sent: {
-          "gte" : maxHistoryDate,
-        }
-      }
-    });
-  }
-
-  var promiseChain;
-
-  if(textQuery) {
-    promiseChain = languageDetector(textQuery)
-      .then(function(detectedLanguage) {
-        var analyzers = { "default": true };
-
-        if(options.lang) {
-          analyzers[languageAnalyzerMapper(options.lang)] = true;
-        }
-
-        if(detectedLanguage) {
-          analyzers[languageAnalyzerMapper(detectedLanguage)] = true;
-        }
-
-        Object.keys(analyzers).forEach(function(analyzer) {
-          query.body.query.bool.should.push({
-            query_string: {
-              default_field: "text",
-              query: textQuery,
-              analyzer: analyzer,
-              default_operator: "AND"
-            }
-          });
-        });
-
-        query.body.query.bool.minimum_should_match = 1;
-
-        return Q(client.search(query));
-      });
-  } else {
-    promiseChain = Q(client.search(query));
-  }
-
-  return promiseChain
+  return Q(client.search(queryRequest))
     .then(function(response) {
       return response.hits.hits.map(function(hit) {
         return {
@@ -131,6 +153,31 @@ function performQuery(troupeId, textQuery, maxHistoryDate, options) {
           highlights: hit.highlight && extractHighlights(hit.highlight.text)
         };
       });
+    });
+}
+
+function performQueryForInaccessibleResults(troupeId, parsedQuery, maxHistoryDate)  {
+  var query = getElasticSearchQuery(troupeId, parsedQuery);
+  query.bool.must.push({
+    range: {
+      sent: {
+        "lt" : maxHistoryDate,
+      }
+    }
+  });
+
+  var countRequest = {
+    timeout: 500,
+    index: 'gitter-primary',
+    type: 'chat',
+    body: {
+      query: query,
+    }
+  };
+
+  return Q(client.count(countRequest))
+    .then(function(result) {
+      return result && result.count || 0;
     });
 }
 
@@ -147,22 +194,25 @@ exports.searchChatMessagesForRoom = function(troupeId, textQuery, options) {
     skip: 0
   });
 
-  return roomCapabilities.getMaxHistoryMessageDate(troupeId)
-    .then(function(maxHistoryDate) {
-      var findInaccessibleResults;
+  return parseQuery(textQuery, options.lang)
+    .then(function(parsedQuery) {
 
-      // TODO: deal with limit and skip
-      var searchResults = performQuery(troupeId, textQuery, maxHistoryDate, options);
+        return roomCapabilities.getMaxHistoryMessageDate(troupeId)
+          .then(function(maxHistoryDate) {
+            var findInaccessibleResults;
 
-      if(maxHistoryDate) {
-//        findInaccessibleResults =
-// TODO: find out how many results are missing
-      }
+            // TODO: deal with limit and skip
+            var searchResults = performQuery(troupeId, parsedQuery, maxHistoryDate, options);
 
-      return Q.all([searchResults, findInaccessibleResults])
-        .spread(function(results, inaccessibleCount) {
-          return [results, !!inaccessibleCount];
-        });
+            if(maxHistoryDate) {
+             findInaccessibleResults = performQueryForInaccessibleResults(troupeId, parsedQuery, maxHistoryDate);
+            }
 
+            return Q.all([searchResults, findInaccessibleResults]);
+          })
+          .spread(function(results, inaccessibleCount) {
+            return [results, !!inaccessibleCount];
+          });
     });
+
 };

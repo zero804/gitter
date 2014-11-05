@@ -9,9 +9,37 @@ var Q                 = require('q');
 var mongoUtils        = require('../../utils/mongo-utils');
 var StatusError       = require('statuserror');
 
+
+function searchRooms(req, res, next) {
+  var user = req.user;
+
+  var options = {
+    limit: req.query.limit || 10,
+    skip: req.query.skip
+  };
+
+  var userId = user && user.id;
+  return roomService.searchRooms(userId, req.query.q, options)
+    .then(function(rooms) {
+      var strategy = new restSerializer.SearchResultsStrategy({
+        resultItemStrategy: new restSerializer.TroupeStrategy({ currentUserId: userId })
+      });
+
+      return restSerializer.serializeQ({ results: rooms }, strategy);
+    })
+    .then(function(searchResults) {
+      res.send(searchResults);
+    })
+    .fail(next);
+}
+
 module.exports = {
   id: 'troupe',
   index: function(req, res, next) {
+    if(req.query.q) {
+      return searchRooms(req, res, next);
+    }
+
     restful.serializeTroupesForUser(req.user.id)
       .then(function(serialized) {
         res.send(serialized);

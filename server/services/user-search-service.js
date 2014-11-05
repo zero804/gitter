@@ -2,8 +2,12 @@
 "use strict";
 
 var troupeService = require('./troupe-service');
-var persistence = require("./persistence-service");
-var Q = require('q');
+var persistence   = require("./persistence-service");
+var Q             = require('q');
+var client        = require('../utils/elasticsearch-client');
+var collections   = require('../utils/collections');
+var _             = require('underscore');
+var userService   = require('./user-service');
 
 function createRegExpsForQuery(queryText) {
   var normalized = ("" + queryText).trim().toLowerCase();
@@ -66,13 +70,6 @@ function searchForRegularExpressionsWithinUserIds(userIds, res, fullSearchTerm, 
 }
 
 
-function searchForRegularExpressionsForAllUsers(res, options) {
-  var q = persistence.User.find()
-            .or(getSearchConjunction(res));
-
-  return executeSearch(q, options);
-}
-
 function difference(ids, excludeIds) {
   if(!excludeIds || !excludeIds.length) return ids;
   var o = {};
@@ -82,11 +79,51 @@ function difference(ids, excludeIds) {
   return ids.filter(function(i) { return !o[i]; });
 }
 
+function performQuery(queryString, options) {
+  var queryRequest = {
+    size: options.limit || 10,
+    timeout: 500,
+    index: 'gitter-primary',
+    type: 'user',
+    body: {
+      fields: ["_id"],
+      query: {
+        query_string: {
+          query: queryString,
+          default_operator: "AND"
+        }
+      },
+      sort: [
+        { _score: { order : "desc"} }
+      ],
+    }
+  };
+
+  return Q(client.search(queryRequest))
+    .then(function(response) {
+      return response.hits.hits.map(function(hit) {
+        return hit._id;
+      });
+    });
+}
+
 exports.globalUserSearch = function(queryText, options, callback) {
-  return createRegExpsForQuery(queryText)
-    .then(function(res) {
-      if(!res.length) return [];
-      return searchForRegularExpressionsForAllUsers(res, options);
+  options = _.defaults(options, { limit: 5 });
+  return performQuery(queryText, options)
+    .then(function(userIds) {
+      if(!userIds || !userIds.length) return [];
+      return userService.findByIds(userIds)
+        .then(function(users) {
+          return collections.maintainIdOrder(userIds, users);
+        });
+    })
+    .then(function(results) {
+      return {
+        hasMoreResults: undefined,
+        limit: options.limit,
+        skip: 0,
+        results: results
+      };
     })
     .nodeify(callback);
 };
@@ -134,26 +171,6 @@ exports.searchForUsers = function(userId, queryText, options, callback) {
         });
     })
     .nodeify(callback);
-};
-
-/**
- * Search for implicit connections with whom the user does not have an explicit one-to-one connection
- * @return callback of search results
- */
-exports.searchUnconnectedUsers = function(userId, queryText, options, callback) {
-  return createRegExpsForQuery(queryText)
-    .then(function(regExps) {
-
-      if(!regExps.length) return [];
-
-      return troupeService.findAllUserIdsForUnconnectedImplicitContacts(userId)
-        .then(function(userIds) {
-          return searchForRegularExpressionsWithinUserIds(userIds, regExps, queryText, options);
-        });
-
-    })
-    .nodeify(callback);
-
 };
 
 exports.testOnly = {

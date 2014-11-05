@@ -6,17 +6,21 @@ define([
   "use strict";
 
   var Behavior = Marionette.Behavior.extend({
+
     modelEvents: {
       "change:highlights": "onRender"
     },
 
     onRender: function() {
-      if(!this.view.model) return;
+      if (!this.view.model) return;
       var highlights = this.view.model.get('highlights');
-      if(!highlights || !highlights.length) return;
-      if(this.highlighted) {
+
+      if (this.highlighted) {
         highlight.removeHighlights(this.view.el);
       }
+
+      if (!highlights || !highlights.length) return;
+
       this.highlighted = true;
       highlight.highlight(this.view.el, highlights);
     }

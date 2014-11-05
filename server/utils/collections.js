@@ -45,7 +45,6 @@ exports.indexByProperty = function(array, propertyName) {
   return a;
 };
 
-
 exports.hashArray = function(array) {
   var a = {};
   array.forEach(function(item) {
@@ -53,6 +52,21 @@ exports.hashArray = function(array) {
   });
 
   return a;
+};
+
+/**
+ * Given a list of ids and a list full results,
+ * return the array of full results in the
+ * same order as the ids
+ */
+exports.maintainIdOrder = function(ids, results) {
+  var resultsIndexed = exports.indexById(results);
+  return ids.map(function(id) {
+      return resultsIndexed[id];
+    })
+    .filter(function(f) {
+      return !!f;
+    });
 };
 
 exports.predicates = {
