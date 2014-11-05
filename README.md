@@ -58,6 +58,11 @@ Lists out the rooms suggested to a user. Requires a username.
 
 e.g `./scripts/utils/suggested-rooms.js trevorah`
 
+### whois.js
+Looks up users from ids. Requires user ids.
+
+e.g `./scripts/utils/whois.js 53bec5764bf9c36505409389`
+
 ### update-room-tags.js
 Updates the tags used by the explore page.
 
@@ -89,3 +94,42 @@ Once you are sure the above is done, preform the following:
 2. `npm install`
 3. `make sprites`
 4. commit your changes and release!
+
+## Setting up ElasticSearch
+
+1. Install ElasticSearch 1.2.2
+  1. `cd $(brew --prefix)`
+  2. `git checkout afe0820 /usr/local/Library/Formula/elasticsearch.rb` - version 1.3.4
+  3. `brew install elasticsearch`  (remember to brew unlink elasticsearch if you've already got another version installed)
+
+2. You might need to install [JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+
+3. Ensure that your ansible repo is up-to-date: git@github.com:troupe/ansible.git
+
+4. In the ansible project, change directory to `roles/elasticsearch/files/elastic-config`
+
+5. Run ./XX-setup-plugins
+
+5. Start elasticsearch from the root of gitter-webapp: `./start-elasticsearch.sh`
+
+6. Setup the mappings: `./01-create-index-with-mapping` (make sure your gitter-webapp is running before doing this...)
+
+7. Setup the rivers: `./02-create-rivers`
+
+8. Setup the alias: `./03-setup-alias`
+
+9. Watch the elasticsearch logs for success, something like:
+
+```
+[2014-10-20 22:04:09,790][INFO ][cluster.metadata         ] [Brain-Child] [_river] update_mapping [gitterUserRiver] (dynamic)
+[2014-10-20 22:04:09,805][INFO ][org.elasticsearch.river.mongodb.Slurper] MongoDBRiver is beginning initial import of gitter.users
+[2014-10-20 22:04:09,810][INFO ][org.elasticsearch.river.mongodb.Slurper] Collection users - count: 8
+[2014-10-20 22:04:09,815][INFO ][org.elasticsearch.river.mongodb.Slurper] Number documents indexed: 8
+[2014-10-20 22:04:11,231][INFO ][org.elasticsearch.river.mongodb.MongoDBRiver] Starting river gitterChatRiver
+[2014-10-20 22:04:13,086][INFO ][org.elasticsearch.river.mongodb.Slurper] Collection chatmessages - count: 22903
+[2014-10-20 22:04:27,307][INFO ][org.elasticsearch.river.mongodb.Slurper] Number documents indexed: 21541
+```
+
+10. Log into HQ: http://localhost:9200/_plugin/HQ -> Connect 
+
+11. Check that there are lots of documents under the Gitter index.

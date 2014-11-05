@@ -3,7 +3,150 @@
 
 // Required views
 @import "../people/peopleCollectionView";
+@import "../search/searchView";
 @import "activity.less";
+
+.trpToolbar {
+  position: relative;
+  color: #333;
+  font-family: @fontSans;
+  font-size: 14px;
+  display: inline-block;
+  flex-shrink: 0;
+  height: 100%;
+  width: @rightMarginFull;
+  text-align: left;
+  vertical-align: top;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: fade(@light,20%);
+  z-index: 100;
+  .transition500ms;
+
+  p {
+    font-family: 'Open Sans';
+    font-size: 14px;
+    margin: 0px 0px 5px;
+  }
+
+  small {
+    font-size: 11px;
+  }
+
+ .trpMiniActions {
+    display: none;
+    @media @mid {
+      display: block;
+      opacity: 0.8;
+    }
+  }
+
+  .trpToolbarHeader {
+    padding-left: 14px;
+  }
+
+  .trpToolbarList {
+    min-height: 40px;
+    overflow: auto;
+
+    ul {
+      list-style: none;
+      margin: 0px;
+    }
+  }
+
+  .oneToOne {
+    max-height: 300px;
+  }
+
+  .expand {
+    width: @rightMarginFull;
+  }
+
+  @media @mid {
+    width: 70px;
+    padding-right: 0px;
+    // padding-top: 16px;
+
+    &.expanded {
+      width: 240px;
+    }
+
+    &.expand {
+      width: @rightMarginFull;
+    }
+
+    #activity-header {
+    opacity: 0;
+    }
+
+    #people-header, #top-header, #request-header, #repo-info, #activity-tip {
+      display: none;
+    }
+
+    #people-list .trpToolbarListContent
+    {
+      margin-left: 6px;
+      padding-top: 16px;
+      padding-right: 20px;
+      padding-left: 14px;
+    }
+  }
+
+  .trpRepoInfoContainer {
+    // padding-left: 4px;
+    max-width: 266px;
+    box-sizing: border-box;
+    padding-right: 10px;
+
+    & li {
+      width: 100%;
+      padding: 2px 0 2px 20px;
+      overflow-x: hidden;
+      font-size: 14px;
+      text-overflow: ellipsis;
+      list-style: none;
+    }
+
+    .vcard-stats {
+      border-top: 1px solid fade(@trpGrey, 20%);
+      border-bottom: 1px solid fade(@trpGrey, 20%);
+      padding: 4px 0;
+      margin: 8px 0;
+    }
+
+    .trpTroupeInfoBadge {
+      -webkit-border-radius: 4px;
+         -moz-border-radius: 4px;
+              border-radius: 4px;
+      display: inline-block;
+      padding: 0 5px 1px 5px;
+      font-size: 10px;
+      font-weight: bold;
+      line-height: 14px;
+      color: white;
+      white-space: nowrap;
+      vertical-align: baseline;
+      background-color: @trpLightBlue;
+      margin-top: 3px;
+      float: right;
+      margin-left: 20px;
+    }
+
+    ul {
+      display: inline-block;
+      border: 1px 0 solid @trpGrey;
+
+    }
+
+    h1 {
+      word-wrap: break-word;
+    }
+
+
+  }
+}
 
 .trpToolbarContent {
   display: inline-block;
@@ -22,7 +165,7 @@
 
   @media @mid {
 
-    padding-left: 4px;
+    // padding-left: 4px;
 
     .trpToolbarHeader.divider:first-child {
       border-bottom: 0;

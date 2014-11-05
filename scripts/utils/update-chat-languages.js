@@ -83,6 +83,8 @@ function run(chatMessages) {
   runCalled += 1;
   totalProcessed += chatMessages.length;
 
+  if (runCalled % BATCH_SIZE === 0) logProgress();
+
   return Q.all(chatMessages.map(function(chat) {
     return markdownProcessor(chat.text)
       .then(function(result) {

@@ -19,6 +19,13 @@ define([
 ], function ($, Marionette, context, appEvents, isMobile, troupeCollections, RoomCollectionView, SuggestedCollectionView, log, cocktail, KeyboardEventsMixin, template, CollectionWrapperViewTemplate, SearchView, ProfileView, OrgCollectionView) {
   "use strict";
 
+  // Reply back to the child iframe
+  appEvents.on('troupeRequest', function (payload, evt) {
+    var msg = { child_window_event: ['troupesResponse', troupeCollections.troupes] };
+    evt.source.postMessage(JSON.stringify(msg), evt.origin);
+  });
+
+
   // wraps a view to give us more control of when to display it or not
   var CollectionWrapperView = Marionette.Layout.extend({
 
@@ -68,14 +75,14 @@ define([
       profile: "#left-menu-profile",
       recent: "#list-recents",
       favs: "#list-favs",
-      search: "#left-menu-list-search",
+      // search: "#left-menu-list-search",
       orgs: "#left-menu-list-orgs",
       suggested: '#left-menu-list-suggested'
     },
 
     events: function() {
       var events = {
-        'click #search-clear-icon': 'onSearchClearIconClick'
+        // 'click #search-clear-icon': 'onSearchClearIconClick'
       };
 
       if(!isMobile()) {
@@ -99,12 +106,17 @@ define([
       // this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
       this.repoList = false;
       var self = this;
-      $(window).on('showSearch', function() {
-        self.showSearch();
+
+      var showMenu = function () {
+        $('.wrap-menu').removeClass('hide');
+      };
+
+      appEvents.on('menu:hide', function () {
+        $('.wrap-menu').addClass('hide');
       });
-      $(window).on('hideSearch', function() {
-        self.hideSearch();
-      });
+
+      appEvents.on('menu:show', showMenu);
+      appEvents.on('navigation', showMenu);
 
       this.selectedIndex = 0;
       // Keep track of conversation change to select the proper element
@@ -138,7 +150,7 @@ define([
       }
     },
 
-    // WARNING THIS METHOD IS UNSAFE. Fix it
+    // FIXME: WARNING -> THIS METHOD IS UNSAFE.
     getIndexForId: function(id) {
       if (!id) return;
       var els = $('#recentTroupesList li');
@@ -182,16 +194,6 @@ define([
       }
     },
 
-    // Navigation to previous or next conversation appears tricky as the list of recent conversations is sorted by date
-    //
-    // navigateToNext: function() {
-    //   this.navigateTo(this.selectedIndex + 1);
-    // },
-    //
-    // navigateToPrev: function() {
-    //   this.navigateTo(this.selectedIndex - 1);
-    // },
-
     navigateToRoom: function(e, handler) {
       var keys = handler.key.split('+');
       var key = keys[ keys.length - 1 ];
@@ -203,7 +205,7 @@ define([
     serializeData: function() {
       return {
         showFooterButtons: !isMobile(),
-        showSearch: !isMobile(),
+        // showSearch: !isMobile(),
         showExapandedHeader: isMobile()
       };
     },
@@ -231,8 +233,8 @@ define([
       }));
 
       // search results collection view
-      this.searchView = new SearchView({ troupes: troupeCollections.troupes, $input: this.$el.find('#list-search-input') });
-      this.search.show(this.searchView);
+      // this.searchView = new SearchView({ troupes: troupeCollections.troupes, $input: this.$el.find('#list-search-input') });
+      // this.search.show(this.searchView);
 
       // Organizations collection view
       this.orgs.show(new CollectionWrapperView({
@@ -247,28 +249,8 @@ define([
       }));
     },
 
-    /* the clear icon shouldn't be available at all times? */
-    onSearchClearIconClick: function() {
-      $('#list-search-input').val('');
-      this.hideSearch();
-    },
-
-    activateSearchList: function() {
-      this.$el.find('#list-search-input').focus();
-    },
-
     toggleHeaderExpansion: function() {
       $('#left-menu-profile').toggleClass('menu-header--expanded');
-    },
-
-    hideSearch: function() {
-      this.$el.find('#list-search').hide();
-      this.$el.find('#list-mega').show();
-    },
-
-    showSearch: function() {
-      this.$el.find('#list-mega').hide();
-      this.$el.find('#list-search').show();
     }
   });
 

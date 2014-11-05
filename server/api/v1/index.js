@@ -37,6 +37,7 @@ module.exports = {
         authMiddleware,
         require('./channel-search.js'));
 
+    // Deprecated - remove by 15 November
     app.get(apiRoot + '/v1/public-repo-search',
         authMiddleware,
         require('./public-repo-search.js'));

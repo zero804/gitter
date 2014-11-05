@@ -177,7 +177,6 @@ exports.oneLine = function(options) {
   return content;
 };
 
-
 // FIXME REMOVE THIS ONCE THE NEW ERRORS PAGES ARE DONE
 exports.typewriter = function (el, str) {
   return util.format('<script type="text/javascript">\n' +

@@ -130,36 +130,6 @@ describe("User Search Service", function() {
   });
 
 
-  describe("#searchUnconnectedUsers", function() {
-    var fixture2 = {};
-    before(fixtureLoader(fixture2, {
-      user1: { },
-      user2: { },
-      user3: { },
-      troupe1: {
-        users: ['user1', 'user2', 'user3']
-      }
-    }));
-    after(function() { fixture2.cleanup(); });
-
-    it("should find both test users", function(done) {
-
-
-      return userSearchService.searchUnconnectedUsers(fixture2.user3.id, 'tEst', {})
-        .then(function(searchResults) {
-          assert(searchResults.results.length >= 2, "Expect some users, got " + JSON.stringify(searchResults.results));
-
-          assert(searchResults.results.filter(function(f) { return f.id == fixture2.user3.id; } ).length === 0, "Expect user3 not to be returned" + JSON.stringify(searchResults.results));
-          assert(searchResults.results.filter(function(f) { return f.id == fixture.user1.id; } ).length === 0, "Expect fixture user 1 not to be returned" + JSON.stringify(searchResults.results));
-          assert(searchResults.results.filter(function(f) { return f.id == fixture2.user1.id; } ).length == 1, "Expect test user 2" + JSON.stringify(searchResults.results));
-          assert(searchResults.results.filter(function(f) { return f.id == fixture2.user2.id; } ).length == 1, "Expect test user 3");
-
-        })
-        .nodeify(done);
-
-    });
-  });
-
   before(fixtureLoader(fixture));
   after(function() { fixture.cleanup(); });
 

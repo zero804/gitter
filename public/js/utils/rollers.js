@@ -11,7 +11,9 @@ define(['mutant'], function(Mutant) {
   /** @const */ var TOP_OFFSET = 300;
 
   /* Put your scrolling panels on rollers */
-  function Rollers(target, childContainer) {
+  function Rollers(target, childContainer, options) {
+    options = options || {};
+
     this._target = target;
     this._childContainer = childContainer || target;
     this._mutationHandlers = {};
@@ -21,7 +23,12 @@ define(['mutant'], function(Mutant) {
 
     this._nopass = null;
     this._stableElement = null;
-    this.initTrackingMode();
+
+    if (options.doNotTrack) {
+      this._mode = STABLE;
+    } else {
+      this.initTrackingMode();
+    }
 
     var adjustScroll = this.adjustScroll.bind(this);
 
@@ -155,13 +162,31 @@ define(['mutant'], function(Mutant) {
     /*
      * Scroll to the bottom and switch the mode to TRACK_BOTTOM
      */
-    scrollToElement: function(element) {
+    scrollToElement: function(element, options) {
       var target = this._target;
-      var scrollTop = element.offsetTop - TOP_OFFSET;
-      if(scrollTop < 0) scrollTop = 0;
-      target.scrollTop = scrollTop;
+      var scrollTop;
 
-      this.trackUntil(element);
+      if(options && options.centre) {
+        // Centre the element in the viewport
+        var elementHeight = element.offsetHeight;
+        var viewportHeight = target.clientHeight;
+        if(elementHeight < viewportHeight) {
+          scrollTop = Math.floor(element.offsetTop + elementHeight/2 - viewportHeight/2);
+        }
+      }
+
+      if(!scrollTop) {
+        scrollTop = element.offsetTop - TOP_OFFSET;
+      }
+
+      if(scrollTop < 0) scrollTop = 0;
+
+      window.requestAnimationFrame(function() {
+        target.scrollTop = scrollTop;
+      });
+
+      this.stable();
+      // this.trackUntil(element, true/*force*/);
     },
 
     /*

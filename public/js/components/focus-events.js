@@ -108,7 +108,7 @@ require([
     });
   };
 
-  var eventSplitter = /\s+/;
+  var eventSplitter = /\s+/; // checks for whitespace
 
   _.each(mappings, function(dest, src) {
     if (eventSplitter.test(src)) {

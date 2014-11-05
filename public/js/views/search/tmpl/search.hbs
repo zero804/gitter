@@ -1,0 +1,12 @@
+<i class='search-toggle js-activate-search' class="mega-octicon octicon-search"></i>
+<div class='search-input'>
+  <i class="search-input-search-icon search-input-icon js-search-icon"></i>
+  <i class="search-input-close-icon search-input-icon js-search-clear-icon"></i>
+  <input type="search" class='js-search-input search-input-field' placeholder='Search...' />
+</div>
+<div class='js-search-results search-results' style='display: none;'>
+  <div class='search-header  u-uppercase'>Rooms &amp; People</div>
+  <div class='js-search-rooms'></div>
+  <div class='search-header  u-uppercase'>Messages {{#if isOneToOne}}with {{roomName}}{{else}}in {{roomName}}{{/if}}</div>
+  <div class='js-search-messages'></div>
+</div>

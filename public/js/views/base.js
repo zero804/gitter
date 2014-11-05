@@ -8,8 +8,7 @@ define([
   'log!base-views',
   'utils/detect-compact',
   '../template/helpers/all' // No ref
-], function($, _, Backbone, Marionette, modalTemplate,
-  loadingTemplate, log, detectCompact) {
+], function($, _, Backbone, Marionette, modalTemplate, loadingTemplate, log, detectCompact) {
   "use strict";
 
   var TroupeViews = {};
