@@ -388,7 +388,6 @@ define([
 
     run: function (/*model, searchTerm*/) {
       if (!this.localRoomsCache) this.getLocalRooms();
-      this.model.set('fetchingCount', 0); // TODO: this could save our asses?
       this.debouncedLocalSearch();
       this.debouncedRemoteSearch();
       this.showResults();
@@ -489,6 +488,7 @@ define([
     },
 
     remoteSearch: function() {
+      this.model.set('fetchingCount', 0); // TODO: this could save our asses?
       var query = this.model.get('searchTerm');
       if (!query) return; // to avoid fetching empty queries
 
