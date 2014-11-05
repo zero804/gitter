@@ -217,7 +217,8 @@ define([
     ui: {
       results: '.js-search-results',
       input: '.js-search-input',
-      clear: '.js-search-clear-icon'
+      clearIcon: '.js-search-clear-icon',
+      searchIcon: '.js-search-icon'
     },
 
     regions: {
@@ -237,7 +238,7 @@ define([
     // FIXME this redundant reference is a little strange
     events: {
       'click .js-activate-search': 'activate',
-      'click @ui.clear' : 'clearSearch',
+      'click @ui.clearIcon' : 'clearSearch',
       'click @ui.input': 'activate',
       'cut @ui.input': 'handleChange',
       'paste @ui.input': 'handleChange',
@@ -249,12 +250,19 @@ define([
     },
 
     initialize: function () {
-      this.model = new Backbone.Model({ searchTerm: '', active: false });
-
-
+      this.model = new Backbone.Model({ searchTerm: '', active: false, fetchingCount: 0 });
 
       // FIXME: Make sure this is a good thing
       var debouncedRun = _.debounce(this.run.bind(this), 100);
+
+      this.listenTo(this.model, 'change:fetchingCount', function (m, count) {
+        var isFetching = (count !== 0);
+        if (!isFetching) {
+          this.ui.searchIcon.toggleClass('fetching', isFetching);
+        } else {
+          this.ui.searchIcon.toggleClass('fetching', isFetching);
+        }
+      });
 
       this.listenTo(this.model, 'change:searchTerm', function () {
         if (this.isEmpty()) {
@@ -346,10 +354,23 @@ define([
     },
 
     run: function (/*model, searchTerm*/) {
+      // this.model.set('fetchingCount', 0); // TODO: this could save our asses
       this.debouncedLocalSearch();
       this.debouncedRemoteSearch();
       this.showResults();
       this.triggerMethod('search:show');
+    },
+
+    incrementFetchingCount: function () {
+      var m = this.model;
+      var count = m.get('fetchingCount');
+      m.set('fetchingCount', count + 1);
+    },
+
+    decrementFetchingCount: function () {
+      var m = this.model;
+      var count = m.get('fetchingCount');
+      m.set('fetchingCount', count - 1);
     },
 
     /*
@@ -359,6 +380,7 @@ define([
      */
     refreshCollection: function (filteredCollection, newModels, options) {
       //debug('refreshCollection() ====================');
+      this.decrementFetchingCount();
       var getId = function (item) { return item.id };
 
       // if the new models are the same as the current filtered collection avoids flickering by returning
@@ -412,9 +434,11 @@ define([
       }
     },
 
+
     localCacheSearch: function() {
 
       var collection = this._roomscache;
+      this.incrementFetchingCount();
       var filter = textFilter({ query: this.model.get('searchTerm'), fields: ['url', 'name'] });
       var results = collection.filter(filter);
 
@@ -426,16 +450,16 @@ define([
       } catch (e) {
         // new Error('Could not perform local search.');
       }
-
     },
 
     remoteSearch: function() {
       var query = this.model.get('searchTerm');
 
-      if (!query) return;
+      if (!query) return; // to avoid fetching empty queries
 
       // Find messages on ElasticSearch
       var chatSearchCollection = new ChatSearchModels.ChatSearchCollection([], { });
+      this.incrementFetchingCount();
       chatSearchCollection.fetchSearch(query, function () {
         try {
           this.refreshCollection(this._chats, chatSearchCollection.models.map(function (item) {
@@ -451,6 +475,7 @@ define([
       var self = this;
       var limit = 3;
 
+      this.incrementFetchingCount();
       var users = apiClient.get('/v1/user',                     { q: query, limit: limit, type: 'gitter' });
       var repos = apiClient.user.get('/repos',                  { q: query, limit: limit});
       var publicRepos = apiClient.get('/v1/rooms',              { q: query, limit: limit});
@@ -472,7 +497,6 @@ define([
             r.priority = 1;
             return new Backbone.Model(r);
           });
-
           self.refreshCollection(self._rooms, _.compact(_results), { nonDestructive: true });
         });
     },

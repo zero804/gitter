@@ -32,11 +32,13 @@ define([
 
   var touchEvents = {
     // "click #menu-toggle-button":        "onMenuToggle",
-    "keypress":                         "onKeyPress"
+    "keypress":                         "onKeyPress",
+    'click @ui.scrollToBottom': appEvents.trigger.bind(appEvents, 'chatCollectionView:scrollToBottom')
   };
 
   var mouseEvents = {
-    "click .js-favourite-button":          "toggleFavourite"
+    "click .js-favourite-button":          "toggleFavourite",
+    'click @ui.scrollToBottom': appEvents.trigger.bind(appEvents, 'chatCollectionView:scrollToBottom')
   };
 
   // Nobody knows why this is here. Delete it
@@ -51,6 +53,11 @@ define([
     alertpanel: false,
     files: false,
     originalRightMargin: "",
+
+    ui: {
+      scrollToBottom: '.js-scroll-to-bottom'
+    },
+
     regions: {
     },
 
@@ -63,6 +70,8 @@ define([
 
     initialize: function() {
 
+      this.bindUIElements();
+
       // Setup the ChatView - this is instantiated once for the application, and shared between many views
       var chatCollectionView = new ChatCollectionView({
         el: '#chat-container',
@@ -70,6 +79,10 @@ define([
         userCollection: itemCollections.users,
         decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
       }).render();
+
+      this.listenTo(itemCollections.chats, 'atBottomChanged', function (isBottom) {
+        this.ui.scrollToBottom.toggleClass('u-scale-zero', isBottom);
+      }.bind(this));
 
       new HeaderView({ model: context.troupe(), el: '#header' });
 

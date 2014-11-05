@@ -21,6 +21,7 @@ define([
    * View
    */
   var ChatCollectionView = Marionette.CollectionView.extend({
+
     behaviors: {
       InfiniteScroll: {
         reverseScrolling: true,
@@ -71,6 +72,13 @@ define([
       $(window).resize(function(){
         clearTimeout(resizer);
         resizer = setTimeout(self.adjustTopPadding, 100);
+      });
+
+      this.listenTo(appEvents, 'chatCollectionView:scrollToBottom', function() {
+        this.collection.fetchLatest({}, function () {
+          this.rollers.scrollToBottom();
+          this.clearHighlight();
+        }, this);
       });
 
       this.listenTo(appEvents, 'chatCollectionView:selectedChat', function (id, opts) {
