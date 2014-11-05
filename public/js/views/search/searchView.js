@@ -96,9 +96,24 @@ define([
   var UpgradeView = ResultItemView.extend({
     className: 'result result-upgrade',
     template: upgradeTemplate,
+
+    getOrgName: function(troupe) {
+      if (troupe.get('oneToOne')) return false;
+      return troupe.get('uri').split('/')[0];
+    },
+
     serializeData: function() {
+      var orgName = this.getOrgName(context.troupe());
+      var billingUrl;
+      if (!orgName) {
+        billingUrl=context.env('billingUrl');
+      } else {
+        billingUrl=context.env('billingUrl') + "/orgs/" + orgName;
+      }
+
       return {
-        billingUrl: context.env('billingUrl')
+        billingUrl: billingUrl,
+        orgName: orgName
       };
     },
     selectItem: function () {
@@ -248,6 +263,15 @@ define([
     },
 
     onRender: function() {
+    },
+
+
+
+    serializeData: function() {
+      return {
+        isOneToOne: context.troupe().get('oneToOne'),
+        roomName: context.troupe().get('name')
+      };
     },
 
     initialize: function () {

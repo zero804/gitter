@@ -172,6 +172,9 @@ i.search-toggle {
   margin-left: 0.625em;
   font-size: 0.8em;
   padding: 16px 0 8px 7px;
+  width: 90%;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .search-header:first-child {
@@ -241,6 +244,31 @@ i.search-toggle {
   border-radius: 4px;
 }
 
+.result.result-upgrade {
+  border-bottom: none;
+}
+
+.result.result-upgrade:hover {
+  background-color: transparent;
+}
+
+.result-upgrade .result-content.result-message {
+  background-color: @red;
+  height: auto;
+  overflow: auto;
+  white-space: normal;
+  border-radius: 4px;
+  padding: 4px 6px;
+  max-width: 254px;
+  width: 100%;
+  text-align: center;
+}
+
+.result-upgrade .result-content.result-message a {
+  color: white;
+  text-decoration: none;
+}
+
 .result-content {
   font-size: 0.9em; // I don't like changing the font-size base value but it seems we have no choice due to ellipsis
   float: left;
@@ -255,6 +283,8 @@ i.search-toggle {
 .result-content.result-message {
   font-size: 0.8em;
 }
+
+.result-upgrade
 
 .trpToolbar .result-content p {
   margin-bottom: 0;
