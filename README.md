@@ -58,6 +58,11 @@ Lists out the rooms suggested to a user. Requires a username.
 
 e.g `./scripts/utils/suggested-rooms.js trevorah`
 
+### whois.js
+Looks up users from ids. Requires user ids.
+
+e.g `./scripts/utils/whois.js 53bec5764bf9c36505409389`
+
 ### update-room-tags.js
 Updates the tags used by the explore page.
 
