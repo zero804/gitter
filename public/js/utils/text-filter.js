@@ -9,8 +9,9 @@ define(function () {
                           .filter(function(s) { return !!s; })
                           .filter(function(s, index) { return index < 10; } );
 
-    return parts.map(function(i) {
-      return new RegExp("\\b" + i, "i");
+    return parts.map(function(part) {
+      part = part.replace(/\*|\+|\$/g, '');
+      return new RegExp("\\b" + part, "i");
     });
   }
 

@@ -107,13 +107,16 @@ define([
       this.repoList = false;
       var self = this;
 
+      var showMenu = function () {
+        $('.wrap-menu').removeClass('hide');
+      };
+
       appEvents.on('menu:hide', function () {
         $('.wrap-menu').addClass('hide');
       });
 
-      appEvents.on('menu:show', function () {
-        $('.wrap-menu').removeClass('hide');
-      });
+      appEvents.on('menu:show', showMenu);
+      appEvents.on('navigation', showMenu);
 
       this.selectedIndex = 0;
       // Keep track of conversation change to select the proper element

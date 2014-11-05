@@ -3,13 +3,13 @@ define([
   'marionette',
   'utils/context',
   'collections/instances/integrated-items',
-  'collections/chat-search',
   'views/people/peopleCollectionView',
   'views/search/searchView',
   './repoInfo',
   './activity',
   'utils/scrollbar-detect'
-], function ($, Marionette, context, itemCollections, chatSearchModels, PeopleCollectionView, SearchView, repoInfo, ActivityStream, hasScrollBars) {
+], function ($, Marionette, context, itemCollections, PeopleCollectionView,
+  SearchView, repoInfo, ActivityStream, hasScrollBars) {
   "use strict";
 
   var RightToolbarLayout = Marionette.Layout.extend({

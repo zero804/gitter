@@ -58,6 +58,11 @@ Lists out the rooms suggested to a user. Requires a username.
 
 e.g `./scripts/utils/suggested-rooms.js trevorah`
 
+### whois.js
+Looks up users from ids. Requires user ids.
+
+e.g `./scripts/utils/whois.js 53bec5764bf9c36505409389`
+
 ### update-room-tags.js
 Updates the tags used by the explore page.
 
@@ -111,7 +116,9 @@ Once you are sure the above is done, preform the following:
 
 7. Setup the rivers: `./02-create-rivers`
 
-8. Watch the elasticsearch logs for success, something like:
+8. Setup the alias: `./03-setup-alias`
+
+9. Watch the elasticsearch logs for success, something like:
 
 ```
 [2014-10-20 22:04:09,790][INFO ][cluster.metadata         ] [Brain-Child] [_river] update_mapping [gitterUserRiver] (dynamic)
@@ -123,6 +130,6 @@ Once you are sure the above is done, preform the following:
 [2014-10-20 22:04:27,307][INFO ][org.elasticsearch.river.mongodb.Slurper] Number documents indexed: 21541
 ```
 
-9. Log into HQ: http://localhost:9200/_plugin/HQ -> Connect 
+10. Log into HQ: http://localhost:9200/_plugin/HQ -> Connect 
 
-10. Check that there are lots of documents under the Gitter index.
+11. Check that there are lots of documents under the Gitter index.

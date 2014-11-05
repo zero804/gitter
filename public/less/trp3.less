@@ -12,9 +12,9 @@
 @import "base-transition-mixins";
 
 @keyframes pulsey {
-    0% { opacity: 0.2; }
-    50% { opacity: 1; }
-    100% { opacity: 0.2; }
+    0% { opacity: 0.3; }
+    50% { opacity: 0.9; }
+    100% { opacity: 0.3; }
 }
 
 @keyframes spin {
@@ -24,6 +24,10 @@
 
 .pulse {
   animation: pulsey 2s linear infinite;
+}
+
+.pulse--fast {
+  animation: pulsey 1s linear infinite;
 }
 
 .spinner {
@@ -625,7 +629,7 @@ ul li.placeholder:before {
 
 #people-list {
 
-  margin-top: 71px;
+  margin-top: 55px;
 
   .remaining {
     // display: none;
@@ -887,7 +891,7 @@ ul.roster {
 
 .trpToolbarHeader {
 	font-family: @fontSans;
-	font-size: 12px;
+	font-size: 0.8em;
 	text-transform: uppercase;
 	padding-bottom: 8px;
 	cursor: pointer;
@@ -1015,6 +1019,9 @@ ul.roster {
   cursor: pointer;
   padding-bottom: 12px;
   z-index: 200;
+  /* MB: The below is bad, but not sure how to convert output of RGBA -> Hex without opactiy*/
+  /* E.g. fade(@light,20%) without opacity */
+  background-color: #FBFBFB;
 }
 
 .trpActionsMenuLabel {

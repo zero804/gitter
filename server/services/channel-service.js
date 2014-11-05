@@ -16,7 +16,7 @@ function createRegExpsForQuery(queryText) {
 }
 
 
-function findPublicChannels(user, query) {
+function findPublicChannels(user, query, options) {
 
   var filters = createRegExpsForQuery(query);
   if(!filters.length) return Q.resolve([]);
@@ -31,7 +31,7 @@ function findPublicChannels(user, query) {
       security: 'PUBLIC',
       githubType: { $in: ['REPO_CHANNEL', 'ORG_CHANNEL', 'USER_CHANNEL'] }
     })
-    .limit(20)
+    .limit(options.limit || 20)
     .execQ()
     .then(function(troupes) {
       return Q.all(troupes.filter(function(troupe) {
@@ -40,7 +40,7 @@ function findPublicChannels(user, query) {
     });
 }
 
-function findPrivateChannelsWithUser(user, query) {
+function findPrivateChannelsWithUser(user, query, options) {
 
   var filters = createRegExpsForQuery(query);
   if(!filters.length) return Q.resolve([]);
@@ -56,14 +56,15 @@ function findPrivateChannelsWithUser(user, query) {
       security: 'PRIVATE',
       githubType: { $in: ['REPO_CHANNEL', 'ORG_CHANNEL', 'USER_CHANNEL'] }
     })
-    .limit(20)
+    .limit(options.limit || 20)
     .execQ();
 }
 
-function findChannels(user, query) {
+function findChannels(user, query, options) {
+  options = options || {};
   return Q.all([
-    findPublicChannels(user, query),
-    findPrivateChannelsWithUser(user, query)
+    findPublicChannels(user, query, options),
+    findPrivateChannelsWithUser(user, query, options)
   ])
   .spread(function(publicChannels, privateChannels) {
     return publicChannels.concat(privateChannels);
