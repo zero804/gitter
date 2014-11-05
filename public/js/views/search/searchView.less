@@ -1,5 +1,7 @@
 @import "../behaviors/highlight";
 
+@height: 71px;
+
 // NOTE: I do not endorse the use of !important, but...
 .u-uppercase {
   text-transform: uppercase;
@@ -46,9 +48,15 @@
 .search * { box-sizing: border-box; }
 
 .search {
+  width: 100%;
+  text-align: center;
+}
+
+.search.active .search-toggle i { display: none; }
+.search.active .search-input input { display: inline-block; }
+
+.search-input {
   font-size: 16px;
-  background-color: #fbfbfb;
-  @height: 71px;
   height: @height;
   line-height: @height;
   position: absolute;
@@ -58,13 +66,8 @@
   width: 100%;
   box-sizing: border-box;
   padding: 0;
-}
-
-.search.active .search-toggle i { display: none; }
-.search.active .search-input input { display: inline-block; }
-
-.search-input {
   padding: 0 0.625em;
+  background-color:  #fbfbfb;
 }
 
 .search-input-search-icon.fetching {
@@ -93,10 +96,12 @@
 }
 
 i.search-toggle {
+  z-index: 1000;
   font-size: 18px;
   display: none;
   padding: 0 8px !important;
   opacity: 0.4;
+  top: 28px;
   cursor: pointer;
   .prepend-octicon('\f02e');
   transition: opacity 0.2s ease-in-out;
@@ -159,12 +164,13 @@ i.search-toggle {
   position: relative;
   line-height: normal;
   text-align: left;
-
+  top: @height;
+  z-index: 0;
 }
 
 .search-header {
   margin-left: 0.625em;
-  font-size: 0.7em;
+  font-size: 0.8em;
   padding: 16px 0 8px 7px;
 }
 
