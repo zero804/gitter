@@ -9,14 +9,23 @@ define([
     defaults: {
       reverseScrolling: false,
       scrollElementSelector: null,
+      contentWrapper: null
     },
     initialize: function() {
       var scrollElementSelector = this.options.scrollElementSelector;
       var reverseScrolling = this.options.reverseScrolling;
 
       var scrollElement = scrollElementSelector ? document.querySelector(scrollElementSelector) : this.view.el;
+      var contentWrapperEl;
+      if(this.options.contentWrapper) {
+        contentWrapperEl = scrollElement.querySelector(this.options.contentWrapper);
+      }
 
-      var scroll = new NeverEndingStory(scrollElement, { reverse: reverseScrolling });
+      var scroll = new NeverEndingStory(scrollElement, {
+        reverse: reverseScrolling,
+        contentWrapper: contentWrapperEl
+      });
+
       this.listenTo(scroll, 'approaching.top', function() {
         this.view.collection.fetchMoreBefore({});
       });

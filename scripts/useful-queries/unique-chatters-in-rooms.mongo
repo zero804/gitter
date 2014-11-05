@@ -1,0 +1,14 @@
+rs.slaveOk()
+
+var month = new Date(Date.now() - 86400000 * 31)
+
+var roomId = db.troupes.findOne({ lcUri: 'marionettejs/backbone.marionette' })._id;
+
+var a = db.chatmessages.aggregate([
+  { $match: { sent: { $gt: month }, toTroupeId: roomId } }, 
+  { $project: { t: '$fromUserId' } },
+  { $group: { _id: '$t', s: { $sum: 1 }  } }
+]);
+
+
+

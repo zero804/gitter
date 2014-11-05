@@ -21,10 +21,12 @@ define([
    * View
    */
   var ChatCollectionView = Marionette.CollectionView.extend({
+
     behaviors: {
       InfiniteScroll: {
         reverseScrolling: true,
         scrollElementSelector: SCROLL_ELEMENT,
+        contentWrapper: '#chat-container'
       }
     },
 
@@ -72,8 +74,30 @@ define([
         resizer = setTimeout(self.adjustTopPadding, 100);
       });
 
-      var contentFrame = document.querySelector(SCROLL_ELEMENT);
+      this.listenTo(appEvents, 'chatCollectionView:scrollToBottom', function() {
+        this.collection.fetchLatest({}, function () {
+          this.rollers.scrollToBottom();
+          this.clearHighlight();
+        }, this);
+      });
 
+      this.listenTo(appEvents, 'chatCollectionView:selectedChat', function (id, opts) {
+        var model = this.collection.get(id);
+
+        // clearing previously highlighted chat.
+        this.clearHighlight();
+
+        // highlighting new and replacing "current"
+        this.highlightChat(model, opts.highlights);
+        this.highlighted = model;
+
+        // finally scroll to it
+        this.scrollToChatId(model);
+      }.bind(this));
+
+      this.listenTo(appEvents, 'chatCollectionView:clearHighlight', this.clearHighlight.bind(this));
+
+      var contentFrame = document.querySelector(SCROLL_ELEMENT);
       this.rollers = new Rollers(contentFrame, this.el);
 
       this.userCollection = options.userCollection;
@@ -157,6 +181,35 @@ define([
       this.$el.scrollTop(scrollFromTop + pageHeight);
     },
 
+    scrollToChat: function (chat) {
+      var view = this.children.findByModel(chat);
+      if (!view) return;
+      this.rollers.scrollToElement(view.el, { centre: true });
+      return true;
+    },
+
+    scrollToChatId: function (id) {
+      var model = this.collection.get(id);
+      if (!model) return;
+      this.scrollToChat(model);
+    },
+
+    // used to highlight and "dim" chat messages, the behaviour Highlight responds to these changes.
+    // to "dim" simply leave out the arr argument
+    highlightChat: function (model, arr) {
+      model.set('highlights', arr || []);
+    },
+
+    clearHighlight: function () {
+      var old = this.highlighted;
+      if (!old) return;
+      try {
+        this.highlightChat(old);
+      } catch (e) {
+        log('Could not clear previously highlighted item');
+      }
+    },
+
     getFetchData: function() {
       log("Loading next message chunk.");
 
@@ -177,6 +230,7 @@ define([
         limit: PAGE_SIZE
       };
     },
+
     findLastCollapsibleChat: function() {
       var c = this.collection;
       for(var i = c.length - 1; i >= 0; i--) {
@@ -186,16 +240,19 @@ define([
         }
       }
     },
+
     setLastCollapsibleChat: function(state) {
       var last = this.findLastCollapsibleChat();
       if(!last) return;
       var chatItem = this.children.findByModel(last);
       if(chatItem) chatItem.setCollapse(state);
     },
+
     /* Collapses the most recent chat with embedded media */
     collapseChats: function() {
       this.setLastCollapsibleChat(true);
     },
+
     /* Expands the most recent chat with embedded media */
     expandChats: function() {
       this.setLastCollapsibleChat(false);

@@ -183,15 +183,17 @@ module.exports = {
     var isPublic = (room && room.security === 'PUBLIC') ? true : false;
     var isOrg = (room && room.security === 'ORG_ROOM') ? true : false;
 
+    var recipientName = (user.displayName || user.username).split(' ')[0];
+
     // TODO maybe logic can be better?
     if (!isPublic && !isOrg) return; // we only want to send emails if the room is a public or an org room
 
     return emailAddressService(user)
       .then(function (email) {
-        var shareURL = config.get('web:basepath') + '/' + room.uri;
+        var roomUrl = config.get("email:emailBasePath") + '/' + room.uri;
 
         // TODO move the generation of tweet links into it's own function?
-        var twitterURL = (isPublic) ? 'http://twitter.com/intent/tweet?url=' + shareURL + '&text=' + encodeURIComponent('Join me in the ' + room.uri + ' chat room on Gitter') + '&via=gitchat' : undefined; // if the room is public we shall have a tweet link
+        var twitterURL = (isPublic) ? 'http://twitter.com/intent/tweet?url=' + roomUrl + '&text=' + encodeURIComponent('Join me in the ' + room.uri + ' chat room on Gitter') + '&via=gitchat' : undefined; // if the room is public we shall have a tweet link
 
         return mailerService.sendEmail({
           templateFile: "created_room",
@@ -208,10 +210,12 @@ module.exports = {
             room: room,
             isPublic: isPublic,
             isOrg: isOrg,
+            unsubscribeUrl: unsubscribeUrl,
+            recipientName: recipientName,
             roomType: room.security.toLowerCase(),
-            shareURL: shareURL,
-            twitterURL: twitterURL,
-            unsubscribeUrl: unsubscribeUrl
+            roomUri: room.uri,
+            roomUrl: roomUrl,
+            twitterURL: twitterURL
           }
         });
       })
