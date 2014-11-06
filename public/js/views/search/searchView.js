@@ -279,17 +279,10 @@ define([
     initialize: function () {
       var debouncedRun = _.debounce(this.run.bind(this), 100);
 
-      this.model = new Backbone.Model({ searchTerm: '', active: false, fetchingCount: 0 });
+      this.model = new Backbone.Model({ searchTerm: '', active: false, isLoading: false });
 
-      this.listenTo(this.model, 'change:fetchingCount', function (m, count) {
-        var isFetching = (count !== 0);
-        if (!isFetching) {
-          // loaded
-          this.ui.searchIcon.toggleClass('fetching', isFetching);
-        } else {
-          // still fetching
-          this.ui.searchIcon.toggleClass('fetching', isFetching);
-        }
+      this.listenTo(this.model, 'change:isLoading', function (m, loading) {
+        this.ui.searchIcon.toggleClass('fetching', loading);
       });
 
       this.listenTo(this.model, 'change:searchTerm', function () {
@@ -309,27 +302,25 @@ define([
       this.collection.comparator = 'priority';
 
       // filtered collections
-      var rooms = new Backbone.FilteredCollection(null, { model: Backbone.Model, collection: this.collection });
-      var chats = new Backbone.FilteredCollection(null, { model: Backbone.Model, collection: this.collection });
+      this.rooms = new Backbone.FilteredCollection(null, { model: Backbone.Model, collection: this.collection });
+      this.chats = new Backbone.FilteredCollection(null, { model: Backbone.Model, collection: this.collection });
 
-      rooms.setFilter(function (model) {
+      this.rooms.setFilter(function (model) {
         return !!model.get('url');
       });
 
-      chats.setFilter(function (model) {
+      this.chats.setFilter(function (model) {
         return !!model.get('text');
       });
 
       this.localRoomsCache = null;
-      this.rooms = rooms;
-      this.chats = chats;
 
       // making navigation and filtered collections  accessible
       this.navigation = new NavigationController({ collection: this.collection });
 
       // initialize the views
-      this.localRoomsView = new RoomsCollectionView({ collection: rooms });
-      this.serverMessagesView = new MessagesCollectionView({ collection: chats });
+      this.localRoomsView = new RoomsCollectionView({ collection: this.rooms });
+      this.serverMessagesView = new MessagesCollectionView({ collection: this.chats });
       this.debouncedLocalSearch =  _.debounce(this.localSearch.bind(this), 100);
       this.debouncedRemoteSearch = _.debounce(this.remoteSearch.bind(this), 300);
     },
@@ -392,18 +383,6 @@ define([
       this.debouncedRemoteSearch();
       this.showResults();
       this.triggerMethod('search:show');
-    },
-
-    incrementFetchingCount: function () {
-      var m = this.model;
-      var count = m.get('fetchingCount');
-      m.set('fetchingCount', count + 1);
-    },
-
-    decrementFetchingCount: function () {
-      var m = this.model;
-      var count = m.get('fetchingCount');
-      m.set('fetchingCount', count - 1);
     },
 
     /*
@@ -490,7 +469,6 @@ define([
 
     remoteSearch: function () {
       //debug('remoteSearch() ====================');
-      this.model.set('fetchingCount', 0); // FIXME: this could save our asses?
       var query = this.model.get('searchTerm');
       if (!query) return; // to avoid fetching empty queries
 
@@ -498,12 +476,12 @@ define([
       var messages = this.fetchMessages(query);
       var rooms = this.fetchRooms({ query: query, limit: 3 });
 
-      this.incrementFetchingCount();
+      this.model.set('isLoading', true);
       $.when(messages, rooms)
         .done(function (messages, rooms) {
           //timeEnd('remoteSearch() DONE');
           //debug('====================\n\n\n');
-          this.decrementFetchingCount();
+          this.model.set('isLoading', false);
         }.bind(this));
     },
 
