@@ -428,8 +428,9 @@ define([
       }
 
       collection.remove(filteredCollection.models);
+      // FIXME: URGENT! in addition the .add and .resetWith are taking up 90% of the total time to load a query :(
       collection.add(newModels, options);
-      filteredCollection.resetWith(collection);
+      filteredCollection.resetWith(collection); // TODO: NOTE that removing this completely messes up the ordering.
     },
 
     // may need some thought in the future
@@ -487,59 +488,101 @@ define([
       }
     },
 
-    remoteSearch: function() {
-      this.model.set('fetchingCount', 0); // TODO: this could save our asses?
+    remoteSearch: function () {
+      //debug('remoteSearch() ====================');
+      this.model.set('fetchingCount', 0); // FIXME: this could save our asses?
       var query = this.model.get('searchTerm');
       if (!query) return; // to avoid fetching empty queries
 
-      // Find messages on ElasticSearch
-      var chatSearchCollection = new ChatSearchModels.ChatSearchCollection([], { });
-      this.incrementFetchingCount();
-      chatSearchCollection.fetchSearch(query, function () {
-        var results = chatSearchCollection.models.map(function (item) {
-          item.set('priority', 3);
-          return item;
-        });
+      //time('remoteSearch() DONE');
+      var messages = this.fetchMessages(query);
+      var rooms = this.fetchRooms({ query: query, limit: 3 });
 
-        try {
-          this.refreshCollection(this.chats, results, { query: query });
-        } catch (e) {
-          log(new Error('Could not perform remote search.').stack);
-        } finally {
+      this.incrementFetchingCount();
+      $.when(messages, rooms)
+        .done(function (messages, rooms) {
+          //timeEnd('remoteSearch() DONE');
+          //debug('====================\n\n\n');
           this.decrementFetchingCount();
-        }
-      }.bind(this), this);
+        }.bind(this));
+    },
 
-      // Find users, repos and channels on the server
-      var self = this;
-      var limit = 3;
-
-      this.incrementFetchingCount();
-      var users = apiClient.get('/v1/user',                     { q: query, limit: limit, type: 'gitter' });
-      var repos = apiClient.user.get('/repos',                  { q: query, limit: limit});
-      var publicRepos = apiClient.get('/v1/rooms',              { q: query, limit: limit});
-
-      // TODO: u, r, pr. WTF!? Change the names at some point.
-      $.when(users, repos, publicRepos)
-        .done(function (u, r, pr) {
-
-          u[0].results.map(function(i) { i.exists = true; });
-          pr[0].results.map(function(i) { i.exists = true; });
-
-          var results =  [u, r, pr]
-            .map(function (data) { return data[0].results; })
-            .reduce(function (fold, arr) { return fold.concat(arr); }, []);
-
-          var _results = results.map(function (r) {
-            if (!r) return;
-            if (r.room) r.id = r.room.id; // use the room id as model id for repos
-            r.url = r.url || '/' + r.uri;
-            r.priority = 1;
-            return new Backbone.Model(r);
+    /**
+     * fetchMessages() searches on the server for chat messages
+     *
+     * @param   query     - String
+     *
+     * @return  Deferred  - Promise
+     */
+    fetchMessages: function (query) {
+      var p = $.Deferred();
+      var chatSearchCollection = new ChatSearchModels.ChatSearchCollection([], { });
+      //time('fetchMessages() DONE');
+      chatSearchCollection.fetchSearch(query, function () {
+        var results = chatSearchCollection.models
+          .map(function (item) {
+            item.set('priority', 3); // this ensures that messages are added at the bottom
+            return item;
           });
-          self.decrementFetchingCount();
-          self.refreshCollection(self.rooms, _.compact(_results), { nonDestructive: true, query: query });
-        });
+
+          try {
+            this.refreshCollection(this.chats, results, { query: query }); // we perform the "refresh" of the collection as soon as the results are back
+          } catch (e) {
+            p.reject(e);
+          } finally {
+            //timeEnd('fetchMessages() DONE');
+            p.resolve(results);
+          }
+      }.bind(this));
+
+      return p;
+    },
+
+    /**
+     * fetchRooms() searches on the server for users and repos
+     *
+     * @param   args      - Object
+     *            query   - String, the search term
+     *            limit   - Number, the limit of results
+     *
+     * @return  Deferred  - Promise
+     */
+    fetchRooms: function (args) {
+      var p = $.Deferred();
+      var query = args.query;
+      var limit = typeof args.limit === 'undefined' ? 3 : args.limit;
+
+      var users = apiClient.get('/v1/user', { q: query, limit: limit, type: 'gitter' });
+      var repos = apiClient.user.get('/repos', { q: query, limit: limit });
+      var publicRepos = apiClient.get('/v1/rooms', { q: query, limit: limit });
+      //time('fetchRooms() DONE');
+      $.when(users, repos, publicRepos)
+        .done(function (users, repos, publicRepos) {
+          // FIXME: Explain why we are doing this??
+          users[0].results.map(function (i) { i.exists = true; });
+          publicRepos[0].results.map(function (i) { i.exists = true; });
+          var results = [users, repos, publicRepos]
+            .map(function (data) { return data[0].results; })
+            .reduce(function (fold, arr) { return fold.concat(arr); }, [])
+            .map(function (r) {
+              if (!r) return;
+              if (r.room) r.id = r.room.id; // use the room id as model id for repos
+              r.url = r.url || '/' + r.uri;
+              r.priority = 1;
+              return new Backbone.Model(r);
+            });
+
+          try {
+            this.refreshCollection(this.rooms, _.compact(results), { nonDestructive: true, query: query });
+            //timeEnd('fetchRooms() DONE');
+          } catch (e) {
+            p.reject(e);
+          } finally {
+            p.resolve(results);
+          }
+        }.bind(this));
+
+      return p;
     },
 
     showResults: function () {
