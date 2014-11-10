@@ -255,12 +255,12 @@ define([
             return item;
           });
 
-          try {
-            this.trigger('loaded:messages', results);
-            p.resolve();
-          } catch (e) {
-            p.reject(e);
-          }
+        try {
+          this.trigger('loaded:messages', results);
+          p.resolve();
+        } catch (e) {
+          p.reject(e);
+        }
       }.bind(this));
 
       return p;
