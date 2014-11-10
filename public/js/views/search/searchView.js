@@ -63,7 +63,6 @@ define([
     toggleSelected: function () {
       var selected = this.model.get('selected');
       this.$el.toggleClass('selected', !!selected);
-      // if (selected) { /* FIXME longer lists, do we need to scroll m into view?; */ }
     },
 
     handleSelect: function () {
@@ -177,7 +176,8 @@ define([
     },
 
     getItemView: function (item) {
-      if(item.get('limitReached')) {
+
+      if (item.get('limitReached')) {
         return UpgradeView;
       }
 
