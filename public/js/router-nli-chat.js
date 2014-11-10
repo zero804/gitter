@@ -2,7 +2,7 @@ require([
   'jquery',
   'backbone',
   'utils/context',
-  'views/app/chatIntegratedView',
+  'views/app/chatNliIntegratedView',
   'views/chat/chatCollectionView',
   'collections/instances/integrated-items',
   'views/righttoolbar/rightToolbarView',
@@ -13,7 +13,6 @@ require([
   'views/chat/decorators/mentionDecorator',
   'views/chat/decorators/embedDecorator',
   'views/chat/decorators/emojiDecorator',
-  'views/app/headerView',
 
   'views/people/peopleCollectionView',
 
@@ -23,10 +22,10 @@ require([
   'template/helpers/all',       // No ref
   'components/bug-reporting'    // No ref
 ], function($, Backbone, context,
-    ChatIntegratedView,
+    ChatNliIntegratedView,
     ChatCollectionView, itemCollections, RightToolbarView,
     webhookDecorator, issueDecorator, commitDecorator, mentionDecorator,
-    embedDecorator, emojiDecorator, HeaderView, peopleCollectionView) {
+    embedDecorator, emojiDecorator, peopleCollectionView) {
   "use strict";
 
   $(document).on("click", "a", function(e) {
@@ -54,10 +53,10 @@ require([
     window.parent.location.href = href;
   });
 
-  var appView = new ChatIntegratedView({ el: 'body' });
+  var appView = new ChatNliIntegratedView({ el: 'body' });
   new RightToolbarView({ el: "#toolbar-frame" });
 
-  new HeaderView({ model: context.troupe(), el: '#header' });
+  // new HeaderView({ model: context.troupe(), el: '#header' });
 
   new ChatCollectionView({
     el: '#chat-container',
