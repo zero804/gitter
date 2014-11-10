@@ -248,6 +248,7 @@ define([
       var messages = this.messages;
       var query = args.query;
 
+      messages.reset(); // we must clear the collection before fetching more
       messages.fetchSearch(query, function () {
         var results = messages.models
           .map(function (item) {
@@ -461,8 +462,8 @@ define([
       }.bind(this));
 
       this.listenTo(this.search, 'loaded:messages', function (data) {
-        masterCollection.remove(this.chats.models);
-        masterCollection.add(data, { remove: false });
+        masterCollection.remove(this.chats.models); // we must remove the old chats before adding new ones
+        masterCollection.add(data);
       }.bind(this));
 
       // initialize the views
