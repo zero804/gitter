@@ -291,7 +291,8 @@ define([
               r.url = r.url || '/' + r.uri;
               r.priority = 1;
               return new Backbone.Model(r);
-            });
+            })
+            .filter(this.notCurrentRoom);
 
           try {
             this.trigger('loaded:rooms', results);
@@ -304,10 +305,12 @@ define([
       return p;
     },
 
+    notCurrentRoom: function (room) {
+      return room.id !== context.getTroupeId();
+    },
+
     formatRooms: function (rooms) {
-      return rooms.filter(function (room) {
-          return room.id !== context.getTroupeId();
-        })
+      return rooms.filter(this.notCurrentRoom)
         .map(function (room) {
           room.exists = true;
           room.priority = room.githubType.match(/^ORG$/) ? 0 : 1;
@@ -447,7 +450,7 @@ define([
         return !!model.get('text');
       });
 
-      // making navigation and filtered collections  accessible
+      // making navigation and filtered collections accessible
       this.navigation = new NavigationController({ collection: masterCollection });
       this.search = new SearchController({});
 
@@ -456,8 +459,8 @@ define([
       }.bind(this));
 
       this.listenTo(this.search, 'loaded:rooms', function (data) {
-        var result = this.rooms.models.concat(data);
-        result = _.uniq(result, false, function (r) { return r.get('url'); });
+        var result = [].concat(this.rooms.models, data);
+        result = _.uniq(result, true, function (r) { return r.get('url'); });
         masterCollection.set(result, { remove: false });
       }.bind(this));
 
@@ -469,8 +472,6 @@ define([
       // initialize the views
       this.roomsView = new RoomsCollectionView({ collection: this.rooms });
       this.messagesView = new MessagesCollectionView({ collection: this.chats });
-      this.localSearch =  _.debounce(this.search.local.bind(this.search), 100);
-      this.remoteSearch = _.debounce(this.search.remote.bind(this.search), 250);
     },
 
     isActive: function () {
@@ -531,8 +532,8 @@ define([
 
       this.model.set('isLoading', true);
       $.when(
-          this.localSearch(searchTerm),
-          this.remoteSearch(searchTerm)
+          this.search.local(searchTerm),
+          this.search.remote(searchTerm)
         ).done(function () {
           this.model.set('isLoading', false);
         }.bind(this));
