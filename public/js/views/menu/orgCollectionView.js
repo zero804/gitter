@@ -2,7 +2,7 @@
 define([
   'utils/context',
   'marionette',
-  'hbs!./tmpl/org-list-item',
+  './tmpl/org-list-item.hbs',
   'utils/appevents'
 ], function(context, Marionette, orgListItemTemplate, appEvents) {
   "use strict";

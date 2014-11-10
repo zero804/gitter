@@ -7,7 +7,7 @@ define([
   'utils/context',
   'components/apiClient',
   './parentSelectView',
-  'hbs!./tmpl/createRoom',
+  './tmpl/createRoom.hbs',
   'utils/appevents'
 ], function($, _, Marionette, troupeCollections, TroupeViews, context, apiClient, ParentSelectView, template, appEvents) {
   "use strict";

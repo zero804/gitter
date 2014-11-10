@@ -4,7 +4,7 @@ define([
   'marionette',
   './base',
   'mutant',
-  'hbs!./tmpl/popover',
+  './tmpl/popover.hbs',
 ], function( $, _, Marionette, TroupeViews, Mutant, popoverTemplate) {
   "use strict";
 

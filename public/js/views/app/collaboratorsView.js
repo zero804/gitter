@@ -4,10 +4,10 @@ define([
   'utils/context',
   'utils/social',
   'components/apiClient',
-  'hbs!./tmpl/collaboratorsView',
-  'hbs!./tmpl/collaboratorsItemView',
-  'hbs!./tmpl/collaboratorsEmptyView',
-  'hbs!./tmpl/inviteOutcomeTemplate',
+  './tmpl/collaboratorsView.hbs',
+  './tmpl/collaboratorsItemView.hbs',
+  './tmpl/collaboratorsEmptyView.hbs',
+  './tmpl/inviteOutcomeTemplate.hbs',
   'utils/appevents',
 ], function($, Marionette, context, social, apiClient, template, itemTemplate, emptyViewTemplate, inviteOutcomeTemplate, appEvents) {
   "use strict";

@@ -3,7 +3,7 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'hbs!templates/status/status'
+  'templates/status/status.hbs'
 ], function($, _, Backbone, template){
   "use strict";
 

@@ -3,13 +3,13 @@
 define([
   'views/base',
   'marionette',
-  'hbs!./tmpl/github',
-  'hbs!./tmpl/githubPush',
-  'hbs!./tmpl/bitbucket',
-  'hbs!./tmpl/jenkins',
-  'hbs!./tmpl/travis',
-  'hbs!./tmpl/sprintly',
-  'hbs!./tmpl/trello'
+  './tmpl/github.hbs',
+  './tmpl/githubPush.hbs',
+  './tmpl/bitbucket.hbs',
+  './tmpl/jenkins.hbs',
+  './tmpl/travis.hbs',
+  './tmpl/sprintly.hbs',
+  './tmpl/trello.hbs'
 ], function(
   TroupeViews,
   Marionette,

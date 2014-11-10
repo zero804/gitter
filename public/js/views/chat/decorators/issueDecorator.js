@@ -9,9 +9,9 @@ define([
   'utils/appevents',
   'utils/momentWrapper',
   'views/popover',
-  'hbs!./tmpl/issuePopover',
-  'hbs!./tmpl/issuePopoverTitle',
-  'hbs!./tmpl/commitPopoverFooter'
+  './tmpl/issuePopover.hbs',
+  './tmpl/issuePopoverTitle.hbs',
+  './tmpl/commitPopoverFooter.hbs'
 ], function($, Backbone, Marionette, context, apiClient, appEvents, moment, Popover, bodyTemplate, titleTemplate, footerTemplate) {
   "use strict";
 

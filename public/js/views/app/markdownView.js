@@ -2,7 +2,7 @@ define([
   'marionette',
   'utils/platform-keys',
   'views/base',
-  'hbs!./tmpl/markdownTemplate'
+  './tmpl/markdownTemplate.hbs'
 ], function(Marionette,platformKeys, TroupeViews, markdownTemplate ) {
   "use strict";
 

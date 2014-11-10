@@ -6,9 +6,9 @@ define([
   'utils/appevents',
   'components/apiClient',
   'views/popover',
-  'hbs!./tmpl/commitPopover',
-  'hbs!./tmpl/commitPopoverTitle',
-  'hbs!./tmpl/commitPopoverFooter'
+  './tmpl/commitPopover.hbs',
+  './tmpl/commitPopoverTitle.hbs',
+  './tmpl/commitPopoverFooter.hbs'
 ], function($, Backbone, appEvents, apiClient, Popover, template, titleTemplate, footerTemplate) {
   "use strict";
 

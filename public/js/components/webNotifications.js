@@ -1,7 +1,7 @@
 define([
   'jquery',
   'utils/context',
-  'hbs!./tmpl/notification',
+  './tmpl/notification.hbs',
   'utils/appevents',
   './notify'                              // No reference,
 ], function($, context, template, appEvents){

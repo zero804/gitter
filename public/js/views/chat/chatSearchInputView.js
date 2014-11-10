@@ -1,7 +1,7 @@
 define([
   'underscore',
   'marionette',
-  'hbs!./tmpl/chatSearchInputView',
+  './tmpl/chatSearchInputView.hbs',
   'utils/multi-debounce',
 ], function(_, Marionette, template, multiDebounce) {
   "use strict";

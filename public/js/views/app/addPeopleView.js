@@ -5,9 +5,9 @@ define([
   'views/base',
   'utils/context',
   'components/apiClient',
-  'hbs!./tmpl/addPeople',
-  'hbs!./tmpl/userSearchItem',
-  'hbs!./tmpl/addPeopleItemView',
+  './tmpl/addPeople.hbs',
+  './tmpl/userSearchItem.hbs',
+  './tmpl/addPeopleItemView.hbs',
   'views/controls/typeahead',
   'views/behaviors/widgets'      // No ref
 ], function(Marionette, Backbone, cocktail, TroupeViews, context, apiClient, template, userSearchItemTemplate,

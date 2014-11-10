@@ -6,7 +6,7 @@ define([
   'components/apiClient',
   'views/base',
   'collections/instances/integrated-items',
-  'hbs!./tmpl/troupeSettingsTemplate',
+  './tmpl/troupeSettingsTemplate.hbs',
   'log!troupe-settings-view',
   'components/notifications'
 ], function(Marionette, $, _, context, apiClient, TroupeViews, itemCollections, troupeSettingsTemplate, log, notifications) {
