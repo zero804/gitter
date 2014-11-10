@@ -4,7 +4,7 @@ define([
   'components/apiClient',
   'utils/room-name-trimmer',
   'marionette',
-  'hbs!./tmpl/room-list-item',
+  './tmpl/room-list-item.hbs',
   'utils/appevents',
   'views/base',
   'cocktail',

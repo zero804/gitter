@@ -1,7 +1,7 @@
 
 define([
   'marionette',
-  'hbs!./tmpl/suggested-room-list-item',
+  './tmpl/suggested-room-list-item.hbs',
   'utils/appevents'
 ], function(Marionette, repoListItemTemplate, appEvents) {
   "use strict";

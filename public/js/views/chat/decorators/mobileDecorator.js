@@ -3,7 +3,7 @@
 define([
   'jquery',
   'utils/context',
-  'hbs!./tmpl/link'
+  './tmpl/link.hbs'
 ], function($, context, link) {
   "use strict";
 

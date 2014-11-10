@@ -4,7 +4,7 @@ define([
   'utils/context',
   'components/apiClient',
   './repoSelectView',
-  'hbs!./tmpl/createRepoRoom',
+  './tmpl/createRepoRoom.hbs',
   'utils/appevents'
 ], function (Marionette, TroupeViews, context, apiClient, RepoSelectView, template, appEvents) {
   "use strict";

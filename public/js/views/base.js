@@ -3,8 +3,8 @@ define([
   'underscore',
   'backbone',
   'marionette',
-  'hbs!./tmpl/modal',
-  'hbs!./tmpl/loading',
+  './tmpl/modal.hbs',
+  './tmpl/loading.hbs',
   'log!base-views',
   'utils/detect-compact',
   '../template/helpers/all' // No ref

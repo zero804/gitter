@@ -3,7 +3,7 @@ define([
   'marionette',
   'utils/platform-keys',
   'views/base',
-  'hbs!./tmpl/keyboardTemplate'
+  './tmpl/keyboardTemplate.hbs'
 ], function($, Marionette, platformKeys, TroupeViews, keyboardTemplate ) {
   "use strict";
 

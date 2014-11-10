@@ -4,7 +4,7 @@ define([
   'components/apiClient',
   'utils/appevents',
   'views/base',
-  'hbs!./tmpl/confirmRepoRoom'
+  './tmpl/confirmRepoRoom.hbs'
 ], function(Backbone, Marionette, apiClient, appEvents, TroupeViews, template) {
   "use strict";
 

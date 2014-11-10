@@ -1,6 +1,6 @@
 define([
   'marionette',
-  'hbs!./tmpl/mobileLoginButton'
+  './tmpl/mobileLoginButton.hbs'
 ], function(Marionette, template) {
   "use strict";
 

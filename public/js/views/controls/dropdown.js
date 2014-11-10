@@ -6,7 +6,7 @@ define([
   'cocktail',
   'mutant',
   './selectable-mixin',
-  'hbs!./tmpl/dropdownItem',
+  './tmpl/dropdownItem.hbs',
   'utils/dataset-shim'
 ], function($, _, Marionette, TroupeViews, cocktail, Mutant, SelectableMixin, itemTemplate, dataset) {
   "use strict";

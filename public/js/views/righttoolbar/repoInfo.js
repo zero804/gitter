@@ -2,7 +2,7 @@
 define([
   'jquery',
   'backbone',
-  'hbs!./tmpl/repoInfo'
+  './tmpl/repoInfo.hbs'
 ], function($, Backbone, repoInfoTemplate) {
   "use strict";
 

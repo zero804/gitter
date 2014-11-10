@@ -2,7 +2,7 @@
 define([
   'marionette',
   'views/base',
-  'hbs!./tmpl/chooseRoom',
+  './tmpl/chooseRoom.hbs',
 ], function(Marionette, TroupeViews, template) {
   "use strict";
 

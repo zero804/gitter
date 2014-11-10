@@ -3,8 +3,8 @@ define([
   'utils/context',
   'views/base',
   'views/widgets/avatar',
-  'hbs!./tmpl/peopleCollectionView',
-  'hbs!./tmpl/remainingView'
+  './tmpl/peopleCollectionView.hbs',
+  './tmpl/remainingView.hbs'
 ], function(Marionette, context, TroupeViews, AvatarView, collectionTemplate, remainingTempate) {
   "use strict";
 

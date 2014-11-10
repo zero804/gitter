@@ -1,7 +1,7 @@
 define([
   'utils/room-name-trimmer',
   'marionette',
-  'hbs!./tmpl/suggested-list-item',
+  './tmpl/suggested-list-item.hbs',
   'utils/appevents'
 ], function(roomNameTrimmer, Marionette, suggestedListItemTemplate, appEvents) {
   "use strict";

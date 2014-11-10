@@ -2,7 +2,7 @@ define([
   'jquery',
   'utils/context',
   './webNotifications',
-  'hbs!./tmpl/request',
+  './tmpl/request.hbs',
   './notifications'
 ], function($, context, webNotifications, template, notifications) {
   "use strict";

@@ -3,7 +3,7 @@ define([
   'marionette',
   'utils/momentWrapper',
   'utils/context',
-  'hbs!./tmpl/archive-navigation-view',
+  './tmpl/archive-navigation-view.hbs',
   'cal-heatmap'
 ], function(Marionette, moment, context, template, CalHeatMap) {
   'use strict';

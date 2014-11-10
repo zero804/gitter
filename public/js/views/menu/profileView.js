@@ -4,7 +4,7 @@ define([
   'utils/appevents',
   'utils/is-mobile',
   'utils/is-native',
-  'hbs!./tmpl/profile',
+  './tmpl/profile.hbs',
   'views/behaviors/widgets'      // No ref
 ], function(context, Marionette, appEvents, isMobile, isNative, template) {
   "use strict";

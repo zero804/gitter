@@ -2,7 +2,7 @@ define([
   'marionette',
   'utils/context',
   'views/base',
-  'hbs!./tmpl/integrationSettingsTemplate',
+  './tmpl/integrationSettingsTemplate.hbs',
 ], function(Marionette, context, TroupeViews, template) {
   "use strict";
 

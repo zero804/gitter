@@ -2,7 +2,7 @@ define([
   'jquery',
   'backbone',
   'utils/context',
-  'hbs!./tmpl/unreadBannerTemplate',
+  './tmpl/unreadBannerTemplate.hbs',
   'components/unread-items-client'
   ], function($, Backbone, context, template, unreadItemsClient)  {
   "use strict";

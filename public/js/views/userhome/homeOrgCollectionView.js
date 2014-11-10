@@ -1,8 +1,8 @@
 
 define([
   'marionette',
-  'hbs!./tmpl/home-org-view',
-  'hbs!./tmpl/homeOrgListItem',
+  './tmpl/home-org-view.hbs',
+  './tmpl/homeOrgListItem.hbs',
   'utils/appevents'
 ], function(Marionette, orgTemplate, orgListItemTemplate, appEvents) {
   "use strict";

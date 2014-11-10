@@ -3,7 +3,7 @@ define([
   'jquery',
   'marionette',
   'utils/context',
-  'hbs!./tmpl/limitBannerTemplate'
+  './tmpl/limitBannerTemplate.hbs'
   ], function($, Marionette, context, template)  {
   "use strict";
 

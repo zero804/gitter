@@ -1,8 +1,8 @@
 define([
   'marionette',
   'utils/context',
-  'hbs!./tmpl/parentSelectView',
-  'hbs!./tmpl/parentItemView',
+  './tmpl/parentSelectView.hbs',
+  './tmpl/parentItemView.hbs',
   'views/controls/typeahead',
   'backbone'
 ], function(Marionette, context, template, itemTemplate, Typeahead, Backbone) {

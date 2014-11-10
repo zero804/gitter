@@ -1,7 +1,7 @@
 require([
   'jquery',
   'utils/context',
-  'hbs!./map-message',
+  './map-message.hbs',
   'utils/room-name-trimmer',
   'components/apiClient',
   'utils/tracking' // no ref

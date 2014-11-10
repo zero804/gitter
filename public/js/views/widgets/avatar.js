@@ -2,7 +2,7 @@ define([
   'backbone',
   'marionette',
   'utils/context',
-  'hbs!./tmpl/avatar',
+  './tmpl/avatar.hbs',
   'views/people/userPopoverView',
   'views/behaviors/widgets',
   'bootstrap_tooltip',                // No ref
