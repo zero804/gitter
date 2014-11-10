@@ -323,6 +323,7 @@ define([
 
     clearCache: function () {
       this.cache.reset();
+      this.trigger('cache:clear');
     },
 
     getLocalRooms: function () {
@@ -448,6 +449,10 @@ define([
       // making navigation and filtered collections  accessible
       this.navigation = new NavigationController({ collection: masterCollection });
       this.search = new SearchController({});
+
+      this.listenTo(this.search, 'cache:clear', function (data) {
+        masterCollection.reset();
+      }.bind(this));
 
       this.listenTo(this.search, 'loaded:rooms', function (data) {
         var result = this.rooms.models.concat(data);
