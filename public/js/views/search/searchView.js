@@ -445,32 +445,26 @@ define([
         return !!model.get('text');
       });
 
-      this.localRoomsCache = null;
-
       // making navigation and filtered collections  accessible
       this.navigation = new NavigationController({ collection: masterCollection });
       this.search = new SearchController({});
 
       this.listenTo(this.search, 'loaded:rooms', function (data) {
         var result = this.rooms.models.concat(data);
-        //time('#set:rooms');
         result = _.uniq(result, false, function (r) { return r.get('url'); });
         masterCollection.set(result, { remove: false });
-        //timeEnd('#set:rooms');
       }.bind(this));
 
       this.listenTo(this.search, 'loaded:messages', function (data) {
-        //time('#set:chats');
         masterCollection.remove(this.chats.models);
-        masterCollection.set(data, { remove: false });
-        //timeEnd('#set:chats');
+        masterCollection.add(data, { remove: false });
       }.bind(this));
 
       // initialize the views
       this.roomsView = new RoomsCollectionView({ collection: this.rooms });
       this.messagesView = new MessagesCollectionView({ collection: this.chats });
       this.localSearch =  _.debounce(this.search.local.bind(this.search), 100);
-      this.remoteSearch = _.debounce(this.search.remote.bind(this.search), 500);
+      this.remoteSearch = _.debounce(this.search.remote.bind(this.search), 250);
     },
 
     isActive: function () {
@@ -485,13 +479,6 @@ define([
       this.hide();
       this.ui.input.val('');
       this.ui.input.focus();
-    },
-
-    // compares the query term when a request was sent to the current state
-    searchTermOutdated: function (query) {
-      // assumes that if no query argument is passed in, or is empty then the searchTerm is not outdated
-      if (!query) return false;
-      return query !== this.model.get('searchTerm');
     },
 
     // hides and clears search component's state
