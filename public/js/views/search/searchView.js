@@ -323,7 +323,7 @@ define([
 
     clearCache: function () {
       this.cache.reset();
-      this.trigger('cache:clear');
+      this.trigger('cache:clear', {});
     },
 
     getLocalRooms: function () {
