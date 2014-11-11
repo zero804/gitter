@@ -54,6 +54,11 @@ define([
     attributes: {
       class: 'chat-item'
     },
+
+    ui: {
+      collapse: '.js-chat-item-collapse'
+    },
+
     behaviors: {
       Widgets: {},
       UnreadItems: {
@@ -104,6 +109,7 @@ define([
         var oldInMS = this.model.get('sent').valueOf() + OLD_TIMEOUT - Date.now();
         setTimeout(timeChange, oldInMS + 50);
       }
+
       this.render();
     },
 
@@ -259,10 +265,11 @@ define([
         var isCollapsible = this.model.get('isCollapsible');
 
         if(isCollapsible) {
-          if(this.$el.find('.js-chat-item-collapse').length) return;
+          if (this.$el.find('.js-chat-item-collapse').length) return;
 
           var collapseElement = $(document.createElement('div'));
           collapseElement.addClass('js-chat-item-collapse');
+
           if(this.model.get('collapsed')) {
             collapseElement.addClass('chat-item__icon--expand');
           } else {
@@ -396,9 +403,14 @@ define([
     },
 
     collapseEmbeds: function() {
+      this.bindUIElements();
       var self = this;
-      clearTimeout(self.embedTimeout);
       var embeds = self.$el.find('.embed');
+
+      clearTimeout(self.embedTimeout);
+
+      this.ui.collapse.removeClass('chat-item__icon--collapse');
+      this.ui.collapse.addClass('chat-item__icon--expand');
 
       if(self.rollers) {
         embeds.each(function(i, e) {
@@ -417,8 +429,12 @@ define([
     },
 
     expandEmbeds: function() {
+      this.bindUIElements();
       var self = this;
       clearTimeout(self.embedTimeout);
+
+      this.ui.collapse.removeClass('chat-item__icon--expand');
+      this.ui.collapse.addClass('chat-item__icon--collapse');
 
       function adjustMaxHeight(embeds) {
         setTimeout(function() {
