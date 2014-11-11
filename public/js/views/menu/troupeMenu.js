@@ -1,23 +1,24 @@
-define([
-  'jquery',
-  'marionette',
-  'utils/context',
-  'utils/appevents',
-  'utils/is-mobile',
-  'collections/instances/troupes',
-  'views/menu/room-collection-view',
-  './suggested-collection-view',
-  'log!troupeMenu',
-  'cocktail',
-  'views/keyboard-events-mixin',
-  './tmpl/troupeMenu.hbs',
-  './tmpl/collection-wrapper-view.hbs',
-  './searchView',
-  './profileView',
-  './orgCollectionView',
-  'nanoscroller' //no ref
-], function ($, Marionette, context, appEvents, isMobile, troupeCollections, RoomCollectionView, SuggestedCollectionView, log, cocktail, KeyboardEventsMixin, template, CollectionWrapperViewTemplate, SearchView, ProfileView, OrgCollectionView) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var Marionette = require('marionette');
+var context = require('utils/context');
+var appEvents = require('utils/appevents');
+var isMobile = require('utils/is-mobile');
+var troupeCollections = require('collections/instances/troupes');
+var RoomCollectionView = require('views/menu/room-collection-view');
+var SuggestedCollectionView = require('./suggested-collection-view');
+var log = require('utils/log');
+var cocktail = require('cocktail');
+var KeyboardEventsMixin = require('views/keyboard-events-mixin');
+var template = require('./tmpl/troupeMenu.hbs');
+var CollectionWrapperViewTemplate = require('./tmpl/collection-wrapper-view.hbs');
+var SearchView = require('./searchView');
+var ProfileView = require('./profileView');
+var OrgCollectionView = require('./orgCollectionView');
+require('nanoscroller');
+
+module.exports = (function() {
+
 
   // Reply back to the child iframe
   appEvents.on('troupeRequest', function (payload, evt) {
@@ -257,4 +258,6 @@ define([
   cocktail.mixin(View, KeyboardEventsMixin);
 
   return View;
-});
+
+})();
+

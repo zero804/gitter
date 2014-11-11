@@ -1,21 +1,18 @@
-require([
-  'jquery',
-  'backbone',
-  'utils/context',
-  'views/app/chatIntegratedView',
-  'views/app/headerView',
-  'views/archive/archive-navigation-view',
+"use strict";
+var $ = require('jquery');
+var Backbone = require('backbone');
+var context = require('utils/context');
+var ChatIntegratedView = require('views/app/chatIntegratedView');
+var HeaderView = require('views/app/headerView');
+var ArchiveNavigationView = require('views/archive/archive-navigation-view');
+require('views/widgets/preload');
+require('filtered-collection');
+require('components/dozy');
+require('template/helpers/all');
+require('components/bug-reporting');
 
-  'views/widgets/preload',      // No ref
-  'filtered-collection',        // No ref
-  'components/dozy',            // Sleep detection No ref
-  'template/helpers/all',       // No ref
-  'components/bug-reporting'    // No ref
+module.exports = (function() {
 
-], function($, Backbone, context,
-    ChatIntegratedView,
-    HeaderView, ArchiveNavigationView) {
-  "use strict";
 
   $(document).on("click", "a", function(e) {
     if(this.href) {
@@ -70,4 +67,6 @@ require([
   new Router();
 
   Backbone.history.start();
-});
+
+})();
+

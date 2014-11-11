@@ -1,11 +1,12 @@
-define([
-  'jquery',
-  'marionette',
-  'utils/platform-keys',
-  'views/base',
-  './tmpl/keyboardTemplate.hbs'
-], function($, Marionette, platformKeys, TroupeViews, keyboardTemplate ) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var Marionette = require('marionette');
+var platformKeys = require('utils/platform-keys');
+var TroupeViews = require('views/base');
+var keyboardTemplate = require('./tmpl/keyboardTemplate.hbs');
+
+module.exports = (function() {
+
 
   var View = Marionette.ItemView.extend({
     template: keyboardTemplate,
@@ -47,4 +48,6 @@ define([
         { action: "showMarkdownHelp", text: "Markdown Help ("+ platformKeys.cmd +" + "+ platformKeys.gitter +" + m)", className: "trpBtnBlue trpBtnRight"}
       ]
     });
-  });
+  
+})();
+

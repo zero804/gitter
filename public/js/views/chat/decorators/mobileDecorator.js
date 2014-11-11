@@ -1,11 +1,12 @@
+"use strict";
 /* jshint unused:strict, browser:true, strict:true */
 /* global define:false */
-define([
-  'jquery',
-  'utils/context',
-  './tmpl/link.hbs'
-], function($, context, link) {
-  "use strict";
+var $ = require('jquery');
+var context = require('utils/context');
+var link = require('./tmpl/link.hbs');
+
+module.exports = (function() {
+
 
   function getRoomRepo() {
     var room = context.troupe();
@@ -65,4 +66,6 @@ define([
 
   return decorator;
 
-});
+
+})();
+

@@ -1,10 +1,11 @@
-define([
-  'marionette',
-  'utils/platform-keys',
-  'views/base',
-  './tmpl/markdownTemplate.hbs'
-], function(Marionette,platformKeys, TroupeViews, markdownTemplate ) {
-  "use strict";
+"use strict";
+var Marionette = require('marionette');
+var platformKeys = require('utils/platform-keys');
+var TroupeViews = require('views/base');
+var markdownTemplate = require('./tmpl/markdownTemplate.hbs');
+
+module.exports = (function() {
+
 
   var View = Marionette.ItemView.extend({
     template: markdownTemplate,
@@ -38,4 +39,6 @@ define([
         { action: "showKeyboardShortcuts", text: "Keyboard shortcuts ("+ platformKeys.cmd +" + "+ platformKeys.gitter +" + k)", className: "trpBtnBlue trpBtnRight"}
       ]
     });
-  });
+  
+})();
+

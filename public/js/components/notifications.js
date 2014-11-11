@@ -1,7 +1,8 @@
-define([
-  'utils/appevents'
-], function(appEvents){
-  "use strict";
+"use strict";
+var appEvents = require('utils/appevents');
+
+module.exports = (function() {
+
 
   var Notification = window.Notification;
   var webkitNotifications = window.webkitNotifications;
@@ -80,4 +81,6 @@ define([
     }
   };
 
-});
+
+})();
+

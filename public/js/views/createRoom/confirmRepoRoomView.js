@@ -1,12 +1,13 @@
-define([
-  'backbone',
-  'marionette',
-  'components/apiClient',
-  'utils/appevents',
-  'views/base',
-  './tmpl/confirmRepoRoom.hbs'
-], function(Backbone, Marionette, apiClient, appEvents, TroupeViews, template) {
-  "use strict";
+"use strict";
+var Backbone = require('backbone');
+var Marionette = require('marionette');
+var apiClient = require('components/apiClient');
+var appEvents = require('utils/appevents');
+var TroupeViews = require('views/base');
+var template = require('./tmpl/confirmRepoRoom.hbs');
+
+module.exports = (function() {
+
 
   var View = Marionette.ItemView.extend({
     template: template,
@@ -77,4 +78,6 @@ define([
     Modal: Modal
   };
 
-});
+
+})();
+

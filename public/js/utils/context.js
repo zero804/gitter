@@ -1,8 +1,9 @@
-define([
-  'backbone',
-  './qs'
-], function(Backbone, qs) {
-  "use strict";
+"use strict";
+var Backbone = require('backbone');
+var qs = require('./qs');
+
+module.exports = (function() {
+
 
   var ctx = window.troupeContext || {};
 
@@ -241,4 +242,6 @@ define([
 
   return context;
 
-});
+
+})();
+

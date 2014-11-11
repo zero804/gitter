@@ -1,16 +1,17 @@
-define([
-  'jquery',
-  'underscore',
-  'utils/context',
-  './realtime',
-  './apiClient',
-  'log!unread-items-client',
-  'backbone',
-  'utils/appevents',
-  'utils/dataset-shim',
-  'utils/double-hash'
-], function($, _, context, realtime, apiClient, log, Backbone, appEvents, dataset, DoubleHash) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var _ = require('underscore');
+var context = require('utils/context');
+var realtime = require('./realtime');
+var apiClient = require('./apiClient');
+var log = require('utils/log');
+var Backbone = require('backbone');
+var appEvents = require('utils/appevents');
+var dataset = require('utils/dataset-shim');
+var DoubleHash = require('utils/double-hash');
+
+module.exports = (function() {
+
 
   function limit(fn, context, timeout) {
     return _.debounce(_.bind(fn, context), timeout || 30);
@@ -646,4 +647,6 @@ define([
   unreadItemsClient.UnreadItemStore = UnreadItemStore;
 
   return unreadItemsClient;
-});
+
+})();
+

@@ -1,8 +1,7 @@
-define([
-  'utils/cdn',
-  'handlebars'
-], function (cdn, Handlebars ) {
-  "use strict";
+"use strict";
 
-  Handlebars.registerHelper( 'cdn', cdn);
-});
+var cdn = require('utils/cdn');
+
+var Handlebars = require('handlebars/runtime').default;
+Handlebars.registerHelper( 'cdn', cdn);
+

@@ -1,5 +1,8 @@
-define(['utils/context'], function(context) {
-  "use strict";
+"use strict";
+var context = require('utils/context');
+
+module.exports = (function() {
+
 
   /* Poor mans locale */
 
@@ -21,4 +24,6 @@ define(['utils/context'], function(context) {
 
   };
 
-});
+
+})();
+

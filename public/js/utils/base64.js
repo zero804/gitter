@@ -4,7 +4,10 @@
 *  http://www.webtoolkit.info/
 *
 **/
-define(function() {
+
+
+module.exports = (function() {
+
   var Base64 = {
 
     // private property
@@ -142,4 +145,6 @@ define(function() {
   };
 
   return Base64;
-});
+
+})();
+

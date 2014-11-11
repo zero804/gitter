@@ -1,18 +1,19 @@
-define([
-  'jquery',
-  'utils/context',
-  'components/apiClient',
-  'utils/room-name-trimmer',
-  'marionette',
-  './tmpl/room-list-item.hbs',
-  'utils/appevents',
-  'views/base',
-  'cocktail',
-  'utils/dataset-shim',
-  'jquery-sortable', // No ref
-  'bootstrap_tooltip' // No ref
-], function($, context, apiClient, roomNameTrimmer, Marionette, roomListItemTemplate, appEvents,  TroupeViews, cocktail, dataset) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var context = require('utils/context');
+var apiClient = require('components/apiClient');
+var roomNameTrimmer = require('utils/room-name-trimmer');
+var Marionette = require('marionette');
+var roomListItemTemplate = require('./tmpl/room-list-item.hbs');
+var appEvents = require('utils/appevents');
+var TroupeViews = require('views/base');
+var cocktail = require('cocktail');
+var dataset = require('utils/dataset-shim');
+require('jquery-sortable');
+require('bootstrap_tooltip');
+
+module.exports = (function() {
+
 
   /* @const */
   var MAX_UNREAD = 99;
@@ -254,4 +255,6 @@ define([
 
   return CollectionView;
 
-});
+
+})();
+

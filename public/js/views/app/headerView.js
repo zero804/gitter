@@ -1,16 +1,17 @@
-define([
-  'jquery',
-  'utils/context',
-  'components/apiClient',
-  'marionette',
-  'backbone',
-  'autolink',
-  'components/notifications',
-  'views/controls/dropdown',
-  'utils/appevents',
-  'bootstrap_tooltip' // No ref
-], function($, context, apiClient, Marionette, Backbone, autolink, notifications, Dropdown, appEvents)  {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var context = require('utils/context');
+var apiClient = require('components/apiClient');
+var Marionette = require('marionette');
+var Backbone = require('backbone');
+var autolink = require('autolink');
+var notifications = require('components/notifications');
+var Dropdown = require('views/controls/dropdown');
+var appEvents = require('utils/appevents');
+require('bootstrap_tooltip');
+
+module.exports = (function() {
+
 
   function generateTooltip(troupe) {
 
@@ -226,4 +227,6 @@ define([
 
   });
 
-});
+
+})();
+

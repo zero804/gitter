@@ -1,5 +1,8 @@
-define([], function() {
-  "use strict";
+"use strict";
+
+
+module.exports = (function() {
+
 
   /* THIS IS FOR AN EMERGENCY FIX ONLY. Use hbs double brackets instead {{}} */
 
@@ -23,4 +26,6 @@ define([], function() {
   // HTML escaping
   return safeHtml;
 
-});
+
+})();
+

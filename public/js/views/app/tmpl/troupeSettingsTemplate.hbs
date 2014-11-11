@@ -9,33 +9,19 @@
       <option value="mention">Notify me when somebody mentions me</option>
       <option value="mute">Don't notify me at all</option>
     </select>
+    
     <br>
+    
     <label for="unread-checkbox" class="trpBodyMedium" style="color: black;">
       <input type="checkbox" id="unread-checkbox" name="lurk" value="1" style="display:inline" {{#if lurk}}checked{{/if}}/>
       Hide unread message badge
     </label>
 
     <br>
+    
     <div class="trpBodySmall" style="color: #999">
       Notification settings only apply to you and not to other users.
       <br>
-      {{#if notificationsBlocked}}
-        Notifications have beed disabled by your browser. <a href="/apps" target="new">Download Gitter Apps</a> or change your permissions to receive notifications.
-      {{else}}
-        <a href="/apps" target="new">Download Gitter Apps</a> for always-on desktop notifications.
-      {{/if}}
     </div>
-  </div>
-
-    <div class="trpRequestSubmit">
-      <button type="button" class="trpModalButon trpButtonMedium trpBtnGreen" id="enable-lurk-mode" style="float:right; display:none">Enable Lurk Mode</button>
-      <div class="trpModalButon trpButtonMedium trpBtnGrey" id="is-lurking" style="float:right; display:none; cursor: default">Lurk Mode Activated</div>
-      <button type="submit" class="trpModalButton trpButtonMedium trpBtnLightGrey" id="close-settings">Close</button>
-
-      <br><br>
-  </div>
   </form>
-</div>
-<div id="request_validation" class="trpModalFailure" style="display:none">
-  <div class="trpModalFailureText" id="failure-text"></div>
 </div>

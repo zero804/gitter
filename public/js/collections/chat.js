@@ -1,14 +1,15 @@
-define([
-  'underscore',
-  'utils/context',
-  'components/apiClient',
-  './base',
-  '../utils/momentWrapper',
-  '../utils/burst-calculator',
-  './infinite-mixin',
-  'cocktail'
-], function(_, context, apiClient, TroupeCollections, moment, burstCalculator, InfiniteCollectionMixin, cocktail) {
-  "use strict";
+"use strict";
+var _ = require('underscore');
+var context = require('utils/context');
+var apiClient = require('components/apiClient');
+var TroupeCollections = require('./base');
+var moment = require('../utils/momentWrapper');
+var burstCalculator = require('../utils/burst-calculator');
+var InfiniteCollectionMixin = require('./infinite-mixin');
+var cocktail = require('cocktail');
+
+module.exports = (function() {
+
 
   var userId = context.getUserId();
 
@@ -152,4 +153,6 @@ define([
     ChatModel: ChatModel,
     ChatCollection: ChatCollection
   };
-});
+
+})();
+

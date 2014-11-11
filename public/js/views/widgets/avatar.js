@@ -1,13 +1,14 @@
-define([
-  'backbone',
-  'marionette',
-  'utils/context',
-  './tmpl/avatar.hbs',
-  'views/people/userPopoverView',
-  'views/behaviors/widgets',
-  'bootstrap_tooltip',                // No ref
-], function(Backbone, Marionette, context, template, UserPopoverView, widgets) {
-  "use strict";
+"use strict";
+var Backbone = require('backbone');
+var Marionette = require('marionette');
+var context = require('utils/context');
+var template = require('./tmpl/avatar.hbs');
+var UserPopoverView = require('views/people/userPopoverView');
+var widgets = require('views/behaviors/widgets');
+require('bootstrap_tooltip');
+
+module.exports = (function() {
+
 
   var AvatarWidget = Marionette.ItemView.extend({
     tagName: 'span',
@@ -173,4 +174,6 @@ define([
 
   widgets.register({ avatar: AvatarWidget });
   return AvatarWidget;
-});
+
+})();
+

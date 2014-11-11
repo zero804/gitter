@@ -1,15 +1,16 @@
-define([
-  'jquery',
-  'underscore',
-  'backbone',
-  'marionette',
-  './tmpl/modal.hbs',
-  './tmpl/loading.hbs',
-  'log!base-views',
-  'utils/detect-compact',
-  '../template/helpers/all' // No ref
-], function($, _, Backbone, Marionette, modalTemplate, loadingTemplate, log, detectCompact) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var _ = require('underscore');
+var Backbone = require('backbone');
+var Marionette = require('marionette');
+var modalTemplate = require('./tmpl/modal.hbs');
+var loadingTemplate = require('./tmpl/loading.hbs');
+var log = require('utils/log');
+var detectCompact = require('utils/detect-compact');
+require('../template/helpers/all');
+
+module.exports = (function() {
+
 
   var TroupeViews = {};
 
@@ -584,4 +585,6 @@ define([
   */
 
   return TroupeViews;
-});
+
+})();
+

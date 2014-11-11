@@ -1,10 +1,11 @@
+"use strict";
 
-define([
-  'marionette',
-  './tmpl/suggested-room-list-item.hbs',
-  'utils/appevents'
-], function(Marionette, repoListItemTemplate, appEvents) {
-  "use strict";
+var Marionette = require('marionette');
+var repoListItemTemplate = require('./tmpl/suggested-room-list-item.hbs');
+var appEvents = require('utils/appevents');
+
+module.exports = (function() {
+
 
   var SuggestedRoomItemView = Marionette.ItemView.extend({
     tagName: 'li',
@@ -45,4 +46,6 @@ define([
     itemView: SuggestedRoomItemView
   });
 
-});
+
+})();
+

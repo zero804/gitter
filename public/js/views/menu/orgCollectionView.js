@@ -1,11 +1,12 @@
+"use strict";
 
-define([
-  'utils/context',
-  'marionette',
-  './tmpl/org-list-item.hbs',
-  'utils/appevents'
-], function(context, Marionette, orgListItemTemplate, appEvents) {
-  "use strict";
+var context = require('utils/context');
+var Marionette = require('marionette');
+var orgListItemTemplate = require('./tmpl/org-list-item.hbs');
+var appEvents = require('utils/appevents');
+
+module.exports = (function() {
+
 
   var OrgItemView = Marionette.ItemView.extend({
     tagName: 'li',
@@ -41,4 +42,6 @@ define([
     itemView: OrgItemView
   });
 
-});
+
+})();
+

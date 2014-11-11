@@ -1,5 +1,8 @@
-define(function() {
-  "use strict";
+"use strict";
+
+
+module.exports = (function() {
+
 
   var history;
   var DEBUG = false;
@@ -40,4 +43,6 @@ define(function() {
   // consoleLog.error = consoleApply('error');
 
   return consoleLog;
-});
+
+})();
+

@@ -1,12 +1,13 @@
-define([
-  'backbone',
-  './chat',
-  'components/apiClient',
-  'cocktail',
-  'utils/context',
-  './infinite-mixin',
-], function (Backbone, chatModels, apiClient, cocktail, context, InfiniteCollectionMixin) {
-  "use strict";
+"use strict";
+var Backbone = require('backbone');
+var chatModels = require('./chat');
+var apiClient = require('components/apiClient');
+var cocktail = require('cocktail');
+var context = require('utils/context');
+var InfiniteCollectionMixin = require('./infinite-mixin');
+
+module.exports = (function() {
+
 
   var ChatSearchCollection = Backbone.Collection.extend({
     model: chatModels.ChatModel,
@@ -41,4 +42,6 @@ define([
   return {
     ChatSearchCollection: ChatSearchCollection
   };
-});
+
+})();
+
