@@ -6,8 +6,8 @@ var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
 var webpack = {
   entry: {
-    "router-nli-app": "./router-nli-app.js",
-    "router-nli-chat": "./router-nli-chat.js",
+    "router-nli-app": path.resolve(path.join(__dirname, "./router-nli-app.js")),
+    "router-nli-chat": path.resolve(path.join(__dirname, "./router-nli-chat.js")),
     vendor: ['utils/context',
       'underscore',
       'jquery',
@@ -25,7 +25,8 @@ var webpack = {
   output: {
     path: __dirname + "/../dist",
     filename: "[name].js",
-    chunkFilename: "[id].js"
+    chunkFilename: "[id].js",
+    publicPath: "/assets/"
   },
   module: {
     loaders: [
@@ -64,7 +65,7 @@ var webpack = {
       "autolink": path.resolve(path.join(__dirname, "../repo/autolink/autolink.js")),
       "transloadit": path.resolve(path.join(__dirname, "../repo/transloadit/jquery.transloadit2-v2-latest.js")),
       "oEmbed": path.resolve(path.join(__dirname, "../repo/oEmbed/oEmbed.js")),
-      "underscore": path.resolve(path.join(__dirname, "../repo/underscore/underscore.js")),
+      // "underscore": path.resolve(path.join(__dirname, "../repo/underscore/underscore.js")),
       "moment": path.resolve(path.join(__dirname, "../repo/moment/moment.js"))
     }
   },
@@ -75,4 +76,5 @@ var webpack = {
 };
 console.log(JSON.stringify(webpack, null, "  "));
 module.exports = webpack;
+
 

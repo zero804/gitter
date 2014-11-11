@@ -96,16 +96,12 @@ exports.bootScript = function(url, parameters) {
             asyncScript,
             url,
             cdnFunc("js/core-libraries.min.js", cdnOptions));
-
   }
 
   /* Non minified - use requirejs as the core (development mode) */
-  return util.format("<script type='text/javascript'>window.require_config.baseUrl = '%s';</script>" +
-         "<script %s data-main='%s.js' src='%s' type='text/javascript'></script>",
-         baseUrl,
-         asyncScript,
-         url,
-         cdnFunc("repo/requirejs/requirejs.js", cdnOptions));
+  return util.format("<script type='text/javascript' src='/assets/vendor.bundle.js'></script>" +
+         "<script type='text/javascript' src='/assets/%s.js'></script>",
+         url);
 };
 
 exports.isMobile = function(agent, options) {
