@@ -8,6 +8,6 @@ do
 done
 
 ack log! -l --js |xargs sed -i .backup -Ee "s#log!(.*)'#utils/log'#"
-ack 'require\(.handlebars.\)' -l --js |xargs sed -i .backup -Ee "s#require\(.handlebars.\)#require\('handlebars/runtime'\)#"
+ack 'require\(.handlebars.\)' -l --js |xargs sed -i .backup -Ee "s#require\(.handlebars.\)#require\('handlebars/runtime'\).default#"
 
 find . -name '*.backup' -delete
