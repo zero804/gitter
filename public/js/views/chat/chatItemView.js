@@ -1,29 +1,28 @@
-define([
-  'jquery',
-  'underscore',
-  'utils/context',
-  'collections/chat',
-  'views/widgets/avatar',
-  'marionette',
-  'views/base',
-  'views/app/uiVars',
-  'views/popover',
-  './tmpl/chatItemView.hbs',
-  './tmpl/statusItemView.hbs',
-  'views/chat/chatInputView',
-  'utils/appevents',
-  'cocktail',
-  'utils/collapsed-item-client',
-  'views/keyboard-events-mixin',
-  'views/behaviors/unread-items',   // No ref
-  'views/behaviors/widgets',        // No ref
-  'views/behaviors/sync-status',    // No ref
-  'views/behaviors/highlight',      // No ref
-  'bootstrap_tooltip',              // No ref
-], function($, _, context, chatModels, AvatarView, Marionette, TroupeViews, uiVars, Popover,
-  chatItemTemplate, statusItemTemplate, chatInputView, appEvents, cocktail, chatCollapse, KeyboardEventMixins) {
+"use strict";
+var $ = require('jquery');
+var _ = require('underscore');
+var context = require('utils/context');
+var chatModels = require('collections/chat');
+var AvatarView = require('views/widgets/avatar');
+var Marionette = require('marionette');
+var TroupeViews = require('views/base');
+var uiVars = require('views/app/uiVars');
+var Popover = require('views/popover');
+var chatItemTemplate = require('./tmpl/chatItemView.hbs');
+var statusItemTemplate = require('./tmpl/statusItemView.hbs');
+var chatInputView = require('views/chat/chatInputView');
+var appEvents = require('utils/appevents');
+var cocktail = require('cocktail');
+var chatCollapse = require('utils/collapsed-item-client');
+var KeyboardEventMixins = require('views/keyboard-events-mixin');
+require('views/behaviors/unread-items');
+require('views/behaviors/widgets');
+require('views/behaviors/sync-status');
+require('views/behaviors/highlight');
+require('bootstrap_tooltip');
 
-  "use strict";
+module.exports = (function() {
+
 
   /* @const */
   var OLD_TIMEOUT = 3600000; /*1 hour*/
@@ -558,4 +557,6 @@ define([
     ReadByPopover: ReadByPopover
   };
 
-});
+
+})();
+

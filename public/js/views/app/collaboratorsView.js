@@ -1,16 +1,17 @@
-define([
-  'jquery',
-  'marionette',
-  'utils/context',
-  'utils/social',
-  'components/apiClient',
-  './tmpl/collaboratorsView.hbs',
-  './tmpl/collaboratorsItemView.hbs',
-  './tmpl/collaboratorsEmptyView.hbs',
-  './tmpl/inviteOutcomeTemplate.hbs',
-  'utils/appevents',
-], function($, Marionette, context, social, apiClient, template, itemTemplate, emptyViewTemplate, inviteOutcomeTemplate, appEvents) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var Marionette = require('marionette');
+var context = require('utils/context');
+var social = require('utils/social');
+var apiClient = require('components/apiClient');
+var template = require('./tmpl/collaboratorsView.hbs');
+var itemTemplate = require('./tmpl/collaboratorsItemView.hbs');
+var emptyViewTemplate = require('./tmpl/collaboratorsEmptyView.hbs');
+var inviteOutcomeTemplate = require('./tmpl/inviteOutcomeTemplate.hbs');
+var appEvents = require('utils/appevents');
+
+module.exports = (function() {
+
 
   var ItemView = Marionette.ItemView.extend({
 
@@ -188,4 +189,6 @@ define([
   });
 
   return View;
-});
+
+})();
+

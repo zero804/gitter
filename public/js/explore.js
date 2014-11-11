@@ -1,9 +1,10 @@
-require([
-  'jquery',
-  'utils/appevents',
-  'utils/tracking'
-], function($, appEvents, tracking) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var appEvents = require('utils/appevents');
+var tracking = require('utils/tracking');
+
+module.exports = (function() {
+
 
   var ui = {
     tile: $('.js-room-item'),
@@ -36,4 +37,6 @@ require([
   $(ui.findOut).on('click', function (e) {
     appEvents.trigger('track-event', 'explore_room_about');
   });
-});
+
+})();
+

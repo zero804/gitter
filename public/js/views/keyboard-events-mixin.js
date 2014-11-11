@@ -1,9 +1,10 @@
-define([
-  'underscore',
-  'utils/appevents',
-  'components/keyboard-events' // Make sure keyboard events are setup
-], function(_, appEvents) {
-  "use strict";
+"use strict";
+var _ = require('underscore');
+var appEvents = require('utils/appevents');
+require('components/keyboard-events');
+
+module.exports = (function() {
+
 
   // Bind `keyboardEvents` names to functions or method names, as you would with Backbones' `events`
   // See/change components/keyboard-events for events listeners
@@ -36,4 +37,6 @@ define([
       });
     }
   };
-});
+
+})();
+

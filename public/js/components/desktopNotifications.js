@@ -1,11 +1,12 @@
-define([
-  'jquery',
-  'utils/context',
-  './webNotifications',
-  './tmpl/request.hbs',
-  './notifications'
-], function($, context, webNotifications, template, notifications) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var context = require('utils/context');
+var webNotifications = require('./webNotifications');
+var template = require('./tmpl/request.hbs');
+var notifications = require('./notifications');
+
+module.exports = (function() {
+
 
   if(!context().desktopNotifications) {
     return;
@@ -35,4 +36,6 @@ define([
     notifications.enable();
   }
 
-});
+
+})();
+

@@ -1,12 +1,13 @@
-define([
-  'marionette',
-  'utils/context',
-  './tmpl/parentSelectView.hbs',
-  './tmpl/parentItemView.hbs',
-  'views/controls/typeahead',
-  'backbone'
-], function(Marionette, context, template, itemTemplate, Typeahead, Backbone) {
-  "use strict";
+"use strict";
+var Marionette = require('marionette');
+var context = require('utils/context');
+var template = require('./tmpl/parentSelectView.hbs');
+var itemTemplate = require('./tmpl/parentItemView.hbs');
+var Typeahead = require('views/controls/typeahead');
+var Backbone = require('backbone');
+
+module.exports = (function() {
+
 
   var ItemModel = Backbone.Model.extend({
     idAttribute: "uri",
@@ -251,4 +252,6 @@ define([
 
   });
 
-});
+
+})();
+

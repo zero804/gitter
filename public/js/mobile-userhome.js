@@ -1,14 +1,15 @@
-require([
-  'views/userhome/userHomeView',
-  'jquery',
-  'utils/appevents',
-  'backbone',
-  'views/menu/troupeMenu',
-  'views/app/mobileAppView',
-  'views/createRoom/confirmRepoRoomView',
-  'components/modal-region'
-  ], function(UserHomeView, $, appEvents, Backbone, TroupeMenu, MobileAppView, confirmRepoRoomView, modalRegion) {
-  "use strict";
+"use strict";
+var UserHomeView = require('views/userhome/userHomeView');
+var $ = require('jquery');
+var appEvents = require('utils/appevents');
+var Backbone = require('backbone');
+var TroupeMenu = require('views/menu/troupeMenu');
+var MobileAppView = require('views/app/mobileAppView');
+var confirmRepoRoomView = require('views/createRoom/confirmRepoRoomView');
+var modalRegion = require('components/modal-region');
+
+module.exports = (function() {
+
 
   appEvents.on('navigation', function(url) {
     window.location.href = url;
@@ -42,4 +43,6 @@ require([
 
   $('html').removeClass('loading');
 
-});
+
+})();
+

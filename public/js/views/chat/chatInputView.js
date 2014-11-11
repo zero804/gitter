@@ -1,30 +1,29 @@
-define([
-  'log!chat-input',
-  'backbone',
-  'marionette',
-  'jquery',
-  'utils/context',
-  'utils/appevents',
-  'components/apiClient',
-  './tmpl/chatInputView.hbs',
-  './tmpl/typeaheadListItem.hbs',
-  './tmpl/emojiTypeaheadListItem.hbs',
-  'utils/momentWrapper',
-  'utils/scrollbar-detect',
-  'utils/is-mobile',
-  'utils/emoji',
-  'components/drafty',
-  'utils/cdn',
-  './commands',
-  'cocktail',
-  'views/keyboard-events-mixin',
-  'utils/platform-keys',
-  'bootstrap_tooltip', // No ref
-  'jquery-textcomplete' // No ref
-], function(log, Backbone, Marionette, $, context, appEvents, apiClient, template, listItemTemplate,
-  emojiListItemTemplate, moment, hasScrollBars, isMobile, emoji, drafty, cdn, commands,
-  cocktail, KeyboardEventsMixin, platformKeys) {
-  "use strict";
+"use strict";
+var log = require('utils/log');
+var Backbone = require('backbone');
+var Marionette = require('marionette');
+var $ = require('jquery');
+var context = require('utils/context');
+var appEvents = require('utils/appevents');
+var apiClient = require('components/apiClient');
+var template = require('./tmpl/chatInputView.hbs');
+var listItemTemplate = require('./tmpl/typeaheadListItem.hbs');
+var emojiListItemTemplate = require('./tmpl/emojiTypeaheadListItem.hbs');
+var moment = require('utils/momentWrapper');
+var hasScrollBars = require('utils/scrollbar-detect');
+var isMobile = require('utils/is-mobile');
+var emoji = require('utils/emoji');
+var drafty = require('components/drafty');
+var cdn = require('utils/cdn');
+var commands = require('./commands');
+var cocktail = require('cocktail');
+var KeyboardEventsMixin = require('views/keyboard-events-mixin');
+var platformKeys = require('utils/platform-keys');
+require('bootstrap_tooltip');
+require('jquery-textcomplete');
+
+module.exports = (function() {
+
 
   /** @const */
   var MAX_CHAT_HEIGHT = $(document).height() - $("#header-wrapper").height() - 140;
@@ -636,4 +635,6 @@ define([
   cocktail.mixin(ChatInputBoxView, KeyboardEventsMixin);
 
   return { ChatInputView: ChatInputView, ChatInputBoxView: ChatInputBoxView };
-});
+
+})();
+

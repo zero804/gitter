@@ -1,9 +1,10 @@
-define([
-  'underscore',
-  '../utils/utils',
-  '../utils/context'
-], function(_, utils, context) {
-  "use strict";
+"use strict";
+var _ = require('underscore');
+var utils = require('../utils/utils');
+var context = require('../utils/context');
+
+module.exports = (function() {
+
 
   return {
     initialize: function() {
@@ -279,4 +280,6 @@ define([
       this.trigger('atBottomChanged', this.atBottom);
     }
   };
-});
+
+})();
+

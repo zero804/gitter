@@ -1,15 +1,16 @@
-define([
-  'jquery',
-  'underscore',
-  'marionette',
-  'views/base',
-  'cocktail',
-  'mutant',
-  './selectable-mixin',
-  './tmpl/dropdownItem.hbs',
-  'utils/dataset-shim'
-], function($, _, Marionette, TroupeViews, cocktail, Mutant, SelectableMixin, itemTemplate, dataset) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var _ = require('underscore');
+var Marionette = require('marionette');
+var TroupeViews = require('views/base');
+var cocktail = require('cocktail');
+var Mutant = require('mutant');
+var SelectableMixin = require('./selectable-mixin');
+var itemTemplate = require('./tmpl/dropdownItem.hbs');
+var dataset = require('utils/dataset-shim');
+
+module.exports = (function() {
+
 
   /* Transition period on css */
   var TRANSITION = 160;
@@ -292,4 +293,6 @@ define([
   });
   cocktail.mixin(DropdownMenuView, TroupeViews.SortableMarionetteView, SelectableMixin);
   return DropdownMenuView;
-});
+
+})();
+

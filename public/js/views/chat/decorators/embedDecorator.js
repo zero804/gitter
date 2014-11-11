@@ -1,11 +1,11 @@
+"use strict";
 /* jshint unused:true, browser:true,  strict:true */
 /* global define:false */
-define([
-  'jquery-iframely',
-  'oEmbed',
-], function($, oEmbed) {
+var $ = require('jquery-iframely');
+var oEmbed = require('oEmbed');
 
-  "use strict";
+module.exports = (function() {
+
   var MAX_HEIGHT = 640;
   var MAX_WIDTH = 640;
 
@@ -98,4 +98,6 @@ define([
   };
 
   return decorator;
-});
+
+})();
+

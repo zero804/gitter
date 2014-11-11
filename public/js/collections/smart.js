@@ -1,9 +1,10 @@
-define([
-  'backbone',
-  'underscore',
-  'log!smart-list'
-], function(Backbone, _, log) {
-  "use strict";
+"use strict";
+var Backbone = require('backbone');
+var _ = require('underscore');
+var log = require('utils/log');
+
+module.exports = (function() {
+
 
   function isInvite(model) {
     return model && model.constructor.modelType === 'invite';
@@ -221,4 +222,6 @@ define([
 
   return Collection;
 
-});
+
+})();
+

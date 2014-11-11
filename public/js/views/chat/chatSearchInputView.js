@@ -1,10 +1,11 @@
-define([
-  'underscore',
-  'marionette',
-  './tmpl/chatSearchInputView.hbs',
-  'utils/multi-debounce',
-], function(_, Marionette, template, multiDebounce) {
-  "use strict";
+"use strict";
+var _ = require('underscore');
+var Marionette = require('marionette');
+var template = require('./tmpl/chatSearchInputView.hbs');
+var multiDebounce = require('utils/multi-debounce');
+
+module.exports = (function() {
+
 
   var InputView = Marionette.ItemView.extend({
     template: template,
@@ -32,4 +33,6 @@ define([
   // cocktail.mixin(ChatInputView, KeyboardEventsMixin);
 
   return { InputView: InputView };
-});
+
+})();
+

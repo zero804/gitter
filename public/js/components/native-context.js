@@ -1,9 +1,10 @@
-define([
-  'jquery',
-  '../utils/context',
-  'log!native-context'
-], function($, context, log) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var context = require('../utils/context');
+var log = require('utils/log');
+
+module.exports = (function() {
+
 
   $(document).on('app.version.mismatch', function() {
     try {
@@ -71,4 +72,6 @@ define([
 
   }
 
-});
+
+})();
+

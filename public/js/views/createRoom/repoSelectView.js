@@ -1,20 +1,20 @@
-define([
-  'marionette',
-  'backbone',
-  'views/base',
-  'collections/base',
-  './tmpl/repoSelectView.hbs',
-  './tmpl/repoItemView.hbs',
-  './tmpl/repoEmptyView.hbs',
-  'collections/repos',
-  'cocktail',
-  'views/controls/selectable-mixin',
-  'views/controls/live-search',
-  'utils/dataset-shim',
-  'filtered-collection' /* no ref */
-], function(Marionette, Backbone, TroupeViews, TroupeCollections, template, itemTemplate,
-  emptyTemplate, repoModels, cocktail, SelectableMixin, liveSearch, dataset) {
-  "use strict";
+"use strict";
+var Marionette = require('marionette');
+var Backbone = require('backbone');
+var TroupeViews = require('views/base');
+var TroupeCollections = require('collections/base');
+var template = require('./tmpl/repoSelectView.hbs');
+var itemTemplate = require('./tmpl/repoItemView.hbs');
+var emptyTemplate = require('./tmpl/repoEmptyView.hbs');
+var repoModels = require('collections/repos');
+var cocktail = require('cocktail');
+var SelectableMixin = require('views/controls/selectable-mixin');
+var liveSearch = require('views/controls/live-search');
+var dataset = require('utils/dataset-shim');
+require('filtered-collection');
+
+module.exports = (function() {
+
 
   // TODO: put this somewhere else
   var FilteredLoadingCollection = Backbone.FilteredCollection.extend({ });
@@ -69,4 +69,6 @@ define([
 
   return View;
 
-});
+
+})();
+

@@ -1,12 +1,13 @@
-define([
-  'jquery',
-  'underscore',
-  'marionette',
-  './base',
-  'mutant',
-  './tmpl/popover.hbs',
-], function( $, _, Marionette, TroupeViews, Mutant, popoverTemplate) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var _ = require('underscore');
+var Marionette = require('marionette');
+var TroupeViews = require('./base');
+var Mutant = require('mutant');
+var popoverTemplate = require('./tmpl/popover.hbs');
+
+module.exports = (function() {
+
 
   var ARROW_WIDTH_PX = 10;
 
@@ -364,4 +365,6 @@ define([
   };
 
   return Popover;
-});
+
+})();
+

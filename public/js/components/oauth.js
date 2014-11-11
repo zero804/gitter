@@ -1,7 +1,8 @@
-define([
-  'utils/context'
-], function(context) {
-  "use strict";
+"use strict";
+var context = require('utils/context');
+
+module.exports = (function() {
+
 
   var authToken = context.env('accessToken');
   if(!authToken) return;
@@ -21,4 +22,6 @@ define([
   };
 
 
-});
+
+})();
+

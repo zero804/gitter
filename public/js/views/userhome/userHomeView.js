@@ -1,19 +1,20 @@
-define([
-  'jquery',
-  'marionette',
-  'backbone',
-  'moment',
-  'utils/context',
-  'collections/instances/troupes',
-  './tmpl/userHomeTemplate.hbs',
-  './tmpl/userHomeEmptyOrgView.hbs',
-  './homeOrgCollectionView',
-  './suggested-room-collection-view',
-  'utils/is-mobile',
-  'utils/is-native',
-  'utils/appevents'
-], function($, Marionette, backbone, moment, context, troupeCollections, userHomeTemplate, userHomeEmptyOrgViewTemplate, OrgCollectionView, SuggestedCollectionView, isMobile, isNative, appEvents) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var Marionette = require('marionette');
+var backbone = require('backbone');
+var moment = require('moment');
+var context = require('utils/context');
+var troupeCollections = require('collections/instances/troupes');
+var userHomeTemplate = require('./tmpl/userHomeTemplate.hbs');
+var userHomeEmptyOrgViewTemplate = require('./tmpl/userHomeEmptyOrgView.hbs');
+var OrgCollectionView = require('./homeOrgCollectionView');
+var SuggestedCollectionView = require('./suggested-room-collection-view');
+var isMobile = require('utils/is-mobile');
+var isNative = require('utils/is-native');
+var appEvents = require('utils/appevents');
+
+module.exports = (function() {
+
 
   var suggestedRoomCollection = new backbone.Collection();
   suggestedRoomCollection.url = '/v1/user/' + context.getUserId() + '/rooms?suggested=1';
@@ -80,4 +81,6 @@ define([
 
   });
 
-});
+
+})();
+

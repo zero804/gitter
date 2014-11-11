@@ -34,7 +34,7 @@ var webpack = {
     loaders: [
       {
         test: /\.hbs$/,
-        loader: "handlebars-loader"
+        loader: "handlebars-loader!" + path.resolve(path.join(__dirname, "../../build-scripts/html-min-loader"))
       },
       {
         test: /\.less$/,
@@ -72,7 +72,7 @@ var webpack = {
       "jquery-sortable": path.resolve(path.join(__dirname, "../repo/jquery-sortable/jquery-sortable.js")),
       "nanoscroller": path.resolve(path.join(__dirname, "../repo/nanoscroller/nanoscroller.js")),
       // "underscore": path.resolve(path.join(__dirname, "../repo/underscore/underscore.js")),
-      "moment": path.resolve(path.join(__dirname, "../repo/moment/moment.js"))
+      // "moment": path.resolve(path.join(__dirname, "../repo/moment/moment.js"))
     }
   },
   plugins: [

@@ -1,7 +1,8 @@
-define([
-  'jquery',
-  'views/app/uiVars'
-], function (jQuery, uiVars){
+var jQuery = require('jquery');
+var uiVars = require('views/app/uiVars');
+
+module.exports = (function() {
+
 
 /* ===========================================================
  * bootstrap-tooltip.js v2.3.1
@@ -410,4 +411,6 @@ define([
 }(window.jQuery);
 
 return jQuery;
-});
+
+})();
+

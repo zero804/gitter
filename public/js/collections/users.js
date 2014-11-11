@@ -1,9 +1,10 @@
-define([
-  './base',
-  'components/apiClient',
-  './smart-users'
-], function(TroupeCollections, apiClient, SmartUserCollection) {
-  "use strict";
+"use strict";
+var TroupeCollections = require('./base');
+var apiClient = require('components/apiClient');
+var SmartUserCollection = require('./smart-users');
+
+module.exports = (function() {
+
 
   var UserModel = TroupeCollections.Model.extend({
     idAttribute: "id"
@@ -22,4 +23,6 @@ define([
     UserModel: UserModel
   };
 
-});
+
+})();
+
