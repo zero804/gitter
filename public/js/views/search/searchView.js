@@ -348,7 +348,6 @@ define([
     local: function (query) {
       var p = $.Deferred();
       if (!query) return; // to avoid fetching empty queries
-
       this.getLocalRooms()
         .then(function (rooms) {
           var filter = textFilter({ query: query, fields: ['url', 'name'] });
@@ -414,7 +413,7 @@ define([
     },
 
     initialize: function () {
-      var debouncedRun = _.debounce(this.run.bind(this), 100);
+      var debouncedRun = _.debounce(this.run.bind(this), 250);
 
       this.model = new Backbone.Model({ searchTerm: '', active: false, isLoading: false });
 
