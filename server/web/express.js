@@ -69,6 +69,40 @@ module.exports = {
       maxAge: config.get('web:staticContentExpiryDays') * 86400 * 1000
     }));
 
+    if(true) {
+      var webpackMiddleware = require("webpack-dev-middleware");
+      var webpack = require('webpack');
+
+      app.use(webpackMiddleware(webpack(require('../../public/js/webpack.config')), {
+          // all options optional
+
+          noInfo: false,
+          // display no info to console (only warnings and errors)
+
+          quiet: false,
+          // display nothing to the console
+
+          lazy: false,
+          // switch into lazy mode
+          // that means no watching, but recompilation on every request
+
+          watchDelay: 300,
+          // delay after change (only lazy: false)
+
+          publicPath: "/assets/",
+          // public path to bind the middleware to
+          // use the same as in webpack
+
+          // headers: { "X-Custom-Header": "yes" },
+          // custom headers
+
+          stats: {
+              colors: true
+          }
+          // options for formating the statistics
+      }));
+    }
+
     app.use(env.middlewares.accessLogger);
 
     app.use(express.cookieParser());
