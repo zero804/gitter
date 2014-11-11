@@ -2,7 +2,6 @@
 
 var appEvents = require('utils/appevents');
 var context = require('utils/context');
-var AppIntegratedView = require('views/app/appIntegratedView');
 var TitlebarUpdater = require('components/titlebar');
 var log = require('utils/log');
 require('views/widgets/preload');
