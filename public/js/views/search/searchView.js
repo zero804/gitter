@@ -63,7 +63,6 @@ define([
     toggleSelected: function () {
       var selected = this.model.get('selected');
       this.$el.toggleClass('selected', !!selected);
-      // if (selected) { /* FIXME longer lists, do we need to scroll m into view?; */ }
     },
 
     handleSelect: function () {
@@ -158,7 +157,7 @@ define([
 
     emptyView: EmptyRoomResultsView,
 
-    initialize: function () {
+    initialize: function (/*options*/) {
       var target = document.querySelector("#toolbar-content");
       this.rollers = new Rollers(target, this.el, { doNotTrack: true });
     },
@@ -177,7 +176,8 @@ define([
     },
 
     getItemView: function (item) {
-      if(item.get('limitReached')) {
+
+      if (item.get('limitReached')) {
         return UpgradeView;
       }
 
@@ -248,6 +248,7 @@ define([
       var messages = this.messages;
       var query = args.query;
 
+      messages.reset(); // we must clear the collection before fetching more
       messages.fetchSearch(query, function () {
         var results = messages.models
           .map(function (item) {
@@ -255,12 +256,12 @@ define([
             return item;
           });
 
-          try {
-            this.trigger('loaded:messages', results);
-            p.resolve();
-          } catch (e) {
-            p.reject(e);
-          }
+        try {
+          this.trigger('loaded:messages', results, query);
+          p.resolve();
+        } catch (e) {
+          p.reject(e);
+        }
       }.bind(this));
 
       return p;
@@ -277,7 +278,8 @@ define([
 
       $.when(users, repos, publicRepos)
         .done(function (users, repos, publicRepos) {
-          // FIXME: Explain why we are doing this??
+
+          // assuring that object are uniform since repos have a boolean (exists)
           users[0].results.map(function (i) { i.exists = true; });
           publicRepos[0].results.map(function (i) { i.exists = true; });
 
@@ -289,11 +291,13 @@ define([
               if (r.room) r.id = r.room.id; // use the room id as model id for repos
               r.url = r.url || '/' + r.uri;
               r.priority = 1;
+              r.query = query;
               return new Backbone.Model(r);
-            });
+            })
+            .filter(this.notCurrentRoom);
 
           try {
-            this.trigger('loaded:rooms', results);
+            this.trigger('loaded:rooms', results, query);
             p.resolve(results);
           } catch (e) {
             p.reject(e);
@@ -303,10 +307,12 @@ define([
       return p;
     },
 
+    notCurrentRoom: function (room) {
+      return room.id !== context.getTroupeId();
+    },
+
     formatRooms: function (rooms) {
-      return rooms.filter(function (room) {
-          return room.id !== context.getTroupeId();
-        })
+      return rooms.filter(this.notCurrentRoom)
         .map(function (room) {
           room.exists = true;
           room.priority = room.githubType.match(/^ORG$/) ? 0 : 1;
@@ -323,6 +329,7 @@ define([
 
     clearCache: function () {
       this.cache.reset();
+      this.trigger('cache:clear', {});
     },
 
     getLocalRooms: function () {
@@ -342,13 +349,20 @@ define([
 
     local: function (query) {
       var p = $.Deferred();
-      if (!query) return; // to avoid fetching empty queries
+
+      if (!query) {
+        return p.resolve(); // to avoid fetching empty queries
+      }
 
       this.getLocalRooms()
         .then(function (rooms) {
           var filter = textFilter({ query: query, fields: ['url', 'name'] });
-          rooms = rooms.filter(filter).slice(0, 3); // show the top 3 results only
-          this.trigger('loaded:rooms', rooms);
+          rooms = rooms.filter(filter).slice(0, 3).map(function (item) {
+            item.set('query', query);
+            return item;
+          }); // show the top 3 results only
+
+          this.trigger('loaded:rooms', rooms, query);
           p.resolve();
         }.bind(this));
       return p;
@@ -356,6 +370,11 @@ define([
 
     remote: function (query) {
       var p = $.Deferred();
+
+      if (!query) {
+        return p.resolve(); // to avoid fetching empty queries
+      }
+
       $.when(
         this.fetchMessages({ query: query }),
         this.fetchRooms({ query: query })
@@ -390,7 +409,7 @@ define([
       'search.go': 'handleGo'
     },
 
-    // FIXME this redundant reference is a little strange?
+    // FIXME this redundant reference is a little strange??
     events: {
       'click .js-activate-search': 'activate',
       'click @ui.clearIcon' : 'clearSearchTerm',
@@ -409,7 +428,7 @@ define([
     },
 
     initialize: function () {
-      var debouncedRun = _.debounce(this.run.bind(this), 100);
+      var debouncedRun = _.debounce(this.run.bind(this), 150);
 
       this.model = new Backbone.Model({ searchTerm: '', active: false, isLoading: false });
 
@@ -418,11 +437,7 @@ define([
       });
 
       this.listenTo(this.model, 'change:searchTerm', function () {
-        if (this.isSearchTermEmpty()) {
-          this.hide();
-        } else {
-          debouncedRun();
-        }
+        debouncedRun();
       }.bind(this));
 
       this.listenTo(this.model, 'change:active', function (m, active) {
@@ -445,26 +460,32 @@ define([
         return !!model.get('text');
       });
 
-      // making navigation and filtered collections  accessible
+      // making navigation and filtered collections accessible
       this.navigation = new NavigationController({ collection: masterCollection });
       this.search = new SearchController({});
 
+      this.listenTo(this.search, 'cache:clear', function () {
+        masterCollection.reset();
+      }.bind(this));
+
       this.listenTo(this.search, 'loaded:rooms', function (data) {
-        var result = this.rooms.models.concat(data);
-        result = _.uniq(result, false, function (r) { return r.get('url'); });
-        masterCollection.set(result, { remove: false });
+        var toRemove = this.rooms.models.filter(function (item) {
+          return item.get('query') !== this.model.get('searchTerm');
+        }.bind(this));
+
+        masterCollection.remove(toRemove);
+        masterCollection.set(data, { remove: false });
+        this.rooms.resetWith(masterCollection);
       }.bind(this));
 
       this.listenTo(this.search, 'loaded:messages', function (data) {
-        masterCollection.remove(this.chats.models);
-        masterCollection.add(data, { remove: false });
+        masterCollection.remove(this.chats.models); // we must remove the old chats before adding new ones
+        masterCollection.add(data);
       }.bind(this));
 
       // initialize the views
       this.roomsView = new RoomsCollectionView({ collection: this.rooms });
       this.messagesView = new MessagesCollectionView({ collection: this.chats });
-      this.localSearch =  _.debounce(this.search.local.bind(this.search), 100);
-      this.remoteSearch = _.debounce(this.search.remote.bind(this.search), 250);
     },
 
     isActive: function () {
@@ -523,10 +544,12 @@ define([
     run: function (/*model, searchTerm*/) {
       var searchTerm = this.model.get('searchTerm');
 
+      if (this.isSearchTermEmpty()) return this.hide();
+
       this.model.set('isLoading', true);
       $.when(
-          this.localSearch(searchTerm),
-          this.remoteSearch(searchTerm)
+          this.search.local(searchTerm),
+          this.search.remote(searchTerm)
         ).done(function () {
           this.model.set('isLoading', false);
         }.bind(this));
@@ -566,7 +589,6 @@ define([
       if (item) item.trigger('select');
     },
 
-    // FIXME: could this be done in a better way?
     scroll: function() {
       var mv = this.messagesView.children.findByModel(this.navigation.current());
       if (mv) this.messagesView.scrollTo(mv);
