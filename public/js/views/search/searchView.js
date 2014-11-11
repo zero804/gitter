@@ -116,7 +116,7 @@ define([
     },
 
     selectItem: function () {
-      // Do nothing for now.
+      // FIXME: Do nothing for now.
     }
   });
 
@@ -474,7 +474,7 @@ define([
         }.bind(this));
 
         masterCollection.remove(toRemove);
-        masterCollection.set(data, { remove: false });
+        masterCollection.add(data);
         this.rooms.resetWith(masterCollection);
       }.bind(this));
 
