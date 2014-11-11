@@ -157,7 +157,7 @@ define([
 
     emptyView: EmptyRoomResultsView,
 
-    initialize: function () {
+    initialize: function (/*options*/) {
       var target = document.querySelector("#toolbar-content");
       this.rollers = new Rollers(target, this.el, { doNotTrack: true });
     },
@@ -257,7 +257,7 @@ define([
           });
 
         try {
-          this.trigger('loaded:messages', results);
+          this.trigger('loaded:messages', results, query);
           p.resolve();
         } catch (e) {
           p.reject(e);
@@ -278,7 +278,8 @@ define([
 
       $.when(users, repos, publicRepos)
         .done(function (users, repos, publicRepos) {
-          // FIXME: Explain why we are doing this??
+
+          // assuring that object are uniform since repos have a boolean (exists)
           users[0].results.map(function (i) { i.exists = true; });
           publicRepos[0].results.map(function (i) { i.exists = true; });
 
@@ -290,12 +291,13 @@ define([
               if (r.room) r.id = r.room.id; // use the room id as model id for repos
               r.url = r.url || '/' + r.uri;
               r.priority = 1;
+              r.query = query;
               return new Backbone.Model(r);
             })
             .filter(this.notCurrentRoom);
 
           try {
-            this.trigger('loaded:rooms', results);
+            this.trigger('loaded:rooms', results, query);
             p.resolve(results);
           } catch (e) {
             p.reject(e);
@@ -347,12 +349,20 @@ define([
 
     local: function (query) {
       var p = $.Deferred();
-      if (!query) return; // to avoid fetching empty queries
+
+      if (!query) {
+        return p.resolve(); // to avoid fetching empty queries
+      }
+
       this.getLocalRooms()
         .then(function (rooms) {
           var filter = textFilter({ query: query, fields: ['url', 'name'] });
-          rooms = rooms.filter(filter).slice(0, 3); // show the top 3 results only
-          this.trigger('loaded:rooms', rooms);
+          rooms = rooms.filter(filter).slice(0, 3).map(function (item) {
+            item.set('query', query);
+            return item;
+          }); // show the top 3 results only
+
+          this.trigger('loaded:rooms', rooms, query);
           p.resolve();
         }.bind(this));
       return p;
@@ -360,6 +370,11 @@ define([
 
     remote: function (query) {
       var p = $.Deferred();
+
+      if (!query) {
+        return p.resolve(); // to avoid fetching empty queries
+      }
+
       $.when(
         this.fetchMessages({ query: query }),
         this.fetchRooms({ query: query })
@@ -394,7 +409,7 @@ define([
       'search.go': 'handleGo'
     },
 
-    // FIXME this redundant reference is a little strange?
+    // FIXME this redundant reference is a little strange??
     events: {
       'click .js-activate-search': 'activate',
       'click @ui.clearIcon' : 'clearSearchTerm',
@@ -413,7 +428,7 @@ define([
     },
 
     initialize: function () {
-      var debouncedRun = _.debounce(this.run.bind(this), 250);
+      var debouncedRun = _.debounce(this.run.bind(this), 150);
 
       this.model = new Backbone.Model({ searchTerm: '', active: false, isLoading: false });
 
@@ -422,11 +437,7 @@ define([
       });
 
       this.listenTo(this.model, 'change:searchTerm', function () {
-        if (this.isSearchTermEmpty()) {
-          this.hide();
-        } else {
-          debouncedRun();
-        }
+        debouncedRun();
       }.bind(this));
 
       this.listenTo(this.model, 'change:active', function (m, active) {
@@ -453,14 +464,18 @@ define([
       this.navigation = new NavigationController({ collection: masterCollection });
       this.search = new SearchController({});
 
-      this.listenTo(this.search, 'cache:clear', function (data) {
+      this.listenTo(this.search, 'cache:clear', function () {
         masterCollection.reset();
       }.bind(this));
 
       this.listenTo(this.search, 'loaded:rooms', function (data) {
-        var result = [].concat(this.rooms.models, data);
-        result = _.uniq(result, true, function (r) { return r.get('url'); });
-        masterCollection.set(result, { remove: false });
+        var toRemove = this.rooms.models.filter(function (item) {
+          return item.get('query') !== this.model.get('searchTerm');
+        }.bind(this));
+
+        masterCollection.remove(toRemove);
+        masterCollection.set(data, { remove: false });
+        this.rooms.resetWith(masterCollection);
       }.bind(this));
 
       this.listenTo(this.search, 'loaded:messages', function (data) {
@@ -529,6 +544,8 @@ define([
     run: function (/*model, searchTerm*/) {
       var searchTerm = this.model.get('searchTerm');
 
+      if (this.isSearchTermEmpty()) return this.hide();
+
       this.model.set('isLoading', true);
       $.when(
           this.search.local(searchTerm),
@@ -572,7 +589,6 @@ define([
       if (item) item.trigger('select');
     },
 
-    // FIXME: could this be done in a better way?
     scroll: function() {
       var mv = this.messagesView.children.findByModel(this.navigation.current());
       if (mv) this.messagesView.scrollTo(mv);
