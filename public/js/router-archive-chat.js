@@ -2,7 +2,7 @@ require([
   'jquery',
   'backbone',
   'utils/context',
-  'views/app/chatIntegratedView',
+  'views/app/chatNliIntegratedView',
   'views/app/headerView',
   'views/archive/archive-navigation-view',
 
@@ -13,7 +13,7 @@ require([
   'components/bug-reporting'    // No ref
 
 ], function($, Backbone, context,
-    ChatIntegratedView,
+    ChatNliIntegratedView,
     HeaderView, ArchiveNavigationView) {
   "use strict";
 
@@ -42,7 +42,7 @@ require([
     window.parent.location.href = href;
   });
 
-  var appView = new ChatIntegratedView({ el: 'body' });
+  // var appView = new ChatNliIntegratedView({ el: 'body' });
 
   new HeaderView({ model: context.troupe(), el: '#header' });
 
@@ -55,19 +55,33 @@ require([
     previousDate: archiveContext.previousDate
   }).render();
 
-  var Router = Backbone.Router.extend({
-    routes: {
-      // TODO: get rid of the pipes
-      "": "hideModal",
-    },
+  // Adjust header manually: #nasty
+  var size = $('#header-wrapper').height() + 15 + 'px';
+  var ss = document.styleSheets[2];
+  try {
+    if (ss.insertRule) {
+      ss.insertRule('.trpChatContainer > div:first-child { padding-top: ' + size + ' }', ss.cssRules.length);
+    } else if (ss.addRule) {
+      ss.addRule('.trpChatContainer > div:first-child', 'padding-top:' + size);
+    }
+  } catch (err) {
+    // TODO: Handle the error? WC.
+  }
 
-    hideModal: function() {
-      appView.dialogRegion.close();
-    },
 
-  });
+  // var Router = Backbone.Router.extend({
+  //   routes: {
+  //     // TODO: get rid of the pipes
+  //     "": "hideModal",
+  //   },
 
-  new Router();
+  //   hideModal: function() {
+  //     appView.dialogRegion.close();
+  //   },
+
+  // });
+
+  // new Router();
 
   Backbone.history.start();
 });
