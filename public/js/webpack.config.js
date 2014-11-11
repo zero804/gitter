@@ -8,6 +8,8 @@ var webpack = {
   entry: {
     "router-nli-app": path.resolve(path.join(__dirname, "./router-nli-app.js")),
     "router-nli-chat": path.resolve(path.join(__dirname, "./router-nli-chat.js")),
+    "router-app": path.resolve(path.join(__dirname, "./router-app.js")),
+    "router-chat": path.resolve(path.join(__dirname, "./router-chat.js")),
     vendor: ['utils/context',
       'underscore',
       'jquery',
@@ -65,6 +67,10 @@ var webpack = {
       "autolink": path.resolve(path.join(__dirname, "../repo/autolink/autolink.js")),
       "transloadit": path.resolve(path.join(__dirname, "../repo/transloadit/jquery.transloadit2-v2-latest.js")),
       "oEmbed": path.resolve(path.join(__dirname, "../repo/oEmbed/oEmbed.js")),
+      "zeroclipboard": path.resolve(path.join(__dirname, "../repo/zeroclipboard/zeroclipboard.js")),
+      "backbone-sorted-collection": path.resolve(path.join(__dirname, "../repo/backbone-sorted-collection/backbone-sorted-collection.js")),
+      "jquery-sortable": path.resolve(path.join(__dirname, "../repo/jquery-sortable/jquery-sortable.js")),
+      "nanoscroller": path.resolve(path.join(__dirname, "../repo/nanoscroller/nanoscroller.js")),
       // "underscore": path.resolve(path.join(__dirname, "../repo/underscore/underscore.js")),
       "moment": path.resolve(path.join(__dirname, "../repo/moment/moment.js"))
     }
