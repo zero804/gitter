@@ -1,5 +1,8 @@
-define([], function() {
-  "use strict";
+"use strict";
+
+
+module.exports = (function() {
+
 
   /* Given a match in a node, replace the text with an image */
   function highlightTerm(node, term, index) {
@@ -77,4 +80,6 @@ define([], function() {
     highlight: highlight,
     removeHighlights: removeHighlights
   };
-});
+
+})();
+

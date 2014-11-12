@@ -1,9 +1,10 @@
-define([
-  'backbone',
-  'underscore',
-  'utils/appevents',
-], function(Backbone, _, appEvents) {
-  "use strict";
+"use strict";
+var Backbone = require('backbone');
+var _ = require('underscore');
+var appEvents = require('utils/appevents');
+
+module.exports = (function() {
+
 
   function track(name) {
     appEvents.trigger('track', name);
@@ -165,4 +166,6 @@ define([
 
   });
   return Router;
-});
+
+})();
+

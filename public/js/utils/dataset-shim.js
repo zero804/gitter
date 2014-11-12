@@ -1,6 +1,8 @@
-define([
-], function () {
-  "use strict";
+"use strict";
+
+
+module.exports = (function() {
+
 
   function toAttribute(name) {
     var attribute = name.replace(/[A-Z]/g, function(a) {
@@ -35,4 +37,6 @@ define([
   }
 
 
-});
+
+})();
+

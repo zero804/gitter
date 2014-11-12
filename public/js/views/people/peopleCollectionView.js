@@ -1,12 +1,13 @@
-define([
-  'marionette',
-  'utils/context',
-  'views/base',
-  'views/widgets/avatar',
-  'hbs!./tmpl/peopleCollectionView',
-  'hbs!./tmpl/remainingView'
-], function(Marionette, context, TroupeViews, AvatarView, collectionTemplate, remainingTempate) {
-  "use strict";
+"use strict";
+var Marionette = require('marionette');
+var context = require('utils/context');
+var TroupeViews = require('views/base');
+var AvatarView = require('views/widgets/avatar');
+var collectionTemplate = require('./tmpl/peopleCollectionView.hbs');
+var remainingTempate = require('./tmpl/remainingView.hbs');
+
+module.exports = (function() {
+
 
   var PeopleCollectionView = Marionette.CollectionView.extend({
     tagName: 'ul',
@@ -98,4 +99,6 @@ define([
     Modal: AllUsersModal
   };
 
-});
+
+})();
+

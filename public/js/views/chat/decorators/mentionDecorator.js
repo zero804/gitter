@@ -1,11 +1,12 @@
+"use strict";
 /* jshint unused:true, browser:true,  strict:true */
 /* global define:false */
-define([
-  'utils/context',
-  'views/people/userPopoverView',
-  'utils/dataset-shim'
-  ], function(context, UserPopoverView, dataset) {
-  "use strict";
+var context = require('utils/context');
+var UserPopoverView = require('views/people/userPopoverView');
+var dataset = require('utils/dataset-shim');
+
+module.exports = (function() {
+
 
   function highlightMention(chatItemView) {
     var mentions = chatItemView.model.get('mentions');
@@ -64,4 +65,6 @@ define([
 
   return decorator;
 
-});
+
+})();
+

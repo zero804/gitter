@@ -1,9 +1,10 @@
-require([
-  'jquery',
-  'utils/appevents',
-  'utils/tracking'
-], function($, appEvents, tracking) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var appEvents = require('utils/appevents');
+require('utils/tracking');
+
+module.exports = (function() {
+
 
   var ui = {
     tile: $('.js-room-item'),
@@ -25,15 +26,17 @@ require([
     });
   });
 
-  $(ui.tile).on('click', function (e) {
+  $(ui.tile).on('click', function () {
     appEvents.trigger('track-event', 'explore_room_click');
   });
 
-  $(ui.createNew).on('click', function (e) {
+  $(ui.createNew).on('click', function () {
     appEvents.trigger('track-event', 'explore_room_createNew');
   });
 
-  $(ui.findOut).on('click', function (e) {
+  $(ui.findOut).on('click', function () {
     appEvents.trigger('track-event', 'explore_room_about');
   });
-});
+
+})();
+

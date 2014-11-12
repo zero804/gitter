@@ -1,8 +1,13 @@
-define([], function() {
-  "use strict";
+"use strict";
+
+
+module.exports = (function() {
+
   return function(userAgentString) {
     var stringToTest = userAgentString || navigator.userAgent;
 
     return stringToTest.toLowerCase().indexOf('gitter') >= 0;
   };
-});
+
+})();
+

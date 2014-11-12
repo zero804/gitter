@@ -1,12 +1,13 @@
-define([
-  'underscore',
-  'components/apiClient',
-  'backbone',
-  'components/realtime',
-  'log!collections',
-  './equals'
-], function(_, apiClient, Backbone, realtime, log, equals) {
-  "use strict";
+"use strict";
+var _ = require('underscore');
+var apiClient = require('components/apiClient');
+var Backbone = require('backbone');
+var realtime = require('components/realtime');
+var log = require('utils/log');
+var equals = require('./equals');
+
+module.exports = (function() {
+
 
   var PATCH_TIMEOUT = 2000; // 2000ms before a patch gives up
 
@@ -573,4 +574,6 @@ define([
   // }
 
   return exports;
-});
+
+})();
+

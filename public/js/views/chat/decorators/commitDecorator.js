@@ -1,16 +1,16 @@
-/* jshint unused:strict, browser:true, strict:true */
-/* global define:false */
-define([
-  'jquery',
-  'backbone',
-  'utils/appevents',
-  'components/apiClient',
-  'views/popover',
-  'hbs!./tmpl/commitPopover',
-  'hbs!./tmpl/commitPopoverTitle',
-  'hbs!./tmpl/commitPopoverFooter'
-], function($, Backbone, appEvents, apiClient, Popover, template, titleTemplate, footerTemplate) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var Backbone = require('backbone');
+var appEvents = require('utils/appevents');
+var apiClient = require('components/apiClient');
+var Popover = require('views/popover');
+var template = require('./tmpl/commitPopover.hbs');
+var titleTemplate = require('./tmpl/commitPopoverTitle.hbs');
+var footerTemplate = require('./tmpl/commitPopoverFooter.hbs');
+var moment = require('moment');
+
+module.exports = (function() {
+
 
   var MAX_PATH_LENGTH = 40;
 
@@ -178,4 +178,6 @@ define([
 
   return decorator;
 
-});
+
+})();
+

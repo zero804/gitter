@@ -1,8 +1,9 @@
-define([
-  'jquery',
-  'log!notify'
-], function($, log) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var log = require('utils/log');
+
+module.exports = (function() {
+
 
   $.prototype.notify = function(options) {
     var container = this;
@@ -141,4 +142,6 @@ define([
   }
 
 
-});
+
+})();
+

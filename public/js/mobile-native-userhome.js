@@ -1,14 +1,15 @@
-require([
-  'utils/context',
-  'views/userhome/userHomeView',
-  'jquery',
-  'utils/appevents',
-  'backbone',
-  'components/cordova-navigate',
-  'views/createRoom/confirmRepoRoomView',
-  'components/modal-region'
-  ], function(context, UserHomeView, $, appEvents, Backbone, cordovaNavigate, confirmRepoRoomView, modalRegion) {
-  "use strict";
+"use strict";
+var context = require('utils/context');
+var UserHomeView = require('views/userhome/userHomeView');
+var $ = require('jquery');
+var appEvents = require('utils/appevents');
+var Backbone = require('backbone');
+var cordovaNavigate = require('components/cordova-navigate');
+var confirmRepoRoomView = require('views/createRoom/confirmRepoRoomView');
+var modalRegion = require('components/modal-region');
+
+module.exports = (function() {
+
 
   cordovaNavigate.setNativeToUserhome();
 
@@ -57,4 +58,6 @@ require([
   new Router();
   Backbone.history.start();
 
-});
+
+})();
+

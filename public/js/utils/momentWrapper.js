@@ -1,8 +1,9 @@
-define([
-  'moment',
-  'utils/context'
-], function(moment, context) {
-  "use strict";
+"use strict";
+var moment = require('moment');
+var context = require('utils/context');
+
+module.exports = (function() {
+
 
   moment.calendar = {
     lastDay : '[Yesterday at] LT',
@@ -17,4 +18,6 @@ define([
   moment.defaultFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZ';
 
   return moment;
-});
+
+})();
+

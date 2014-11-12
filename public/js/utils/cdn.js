@@ -1,7 +1,8 @@
-define([
-  'utils/context'
-], function (context ) {
-  "use strict";
+"use strict";
+var context = require('utils/context');
+
+module.exports = (function() {
+
 
   var hosts = context.env('cdns');
   var hostLength = hosts && hosts.length;
@@ -58,4 +59,6 @@ define([
     return cdnMulti;
   }
 
-});
+
+})();
+

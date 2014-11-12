@@ -1,18 +1,18 @@
-define([
-  'marionette',
-  'backbone',
-  'cocktail',
-  'views/base',
-  'utils/context',
-  'components/apiClient',
-  'hbs!./tmpl/addPeople',
-  'hbs!./tmpl/userSearchItem',
-  'hbs!./tmpl/addPeopleItemView',
-  'views/controls/typeahead',
-  'views/behaviors/widgets'      // No ref
-], function(Marionette, Backbone, cocktail, TroupeViews, context, apiClient, template, userSearchItemTemplate,
-  itemTemplate, Typeahead) {
-  "use strict";
+"use strict";
+var Marionette = require('marionette');
+var Backbone = require('backbone');
+var cocktail = require('cocktail');
+var TroupeViews = require('views/base');
+var context = require('utils/context');
+var apiClient = require('components/apiClient');
+var template = require('./tmpl/addPeople.hbs');
+var userSearchItemTemplate = require('./tmpl/userSearchItem.hbs');
+var itemTemplate = require('./tmpl/addPeopleItemView.hbs');
+var Typeahead = require('views/controls/typeahead');
+require('views/behaviors/widgets');
+
+module.exports = (function() {
+
 
   var UserSearchModel = Backbone.Model.extend({
     idAttribute: "id",
@@ -247,4 +247,6 @@ define([
     menuItems: modalButtons
   });
 
-});
+
+})();
+

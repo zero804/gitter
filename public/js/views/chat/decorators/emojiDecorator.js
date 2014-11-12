@@ -1,8 +1,10 @@
+"use strict";
 /* jshint unused:true, browser:true,  strict:true */
 /* global define:false */
-define(['utils/emoji'], function(emoji) {
+var emoji = require('utils/emoji');
 
-  "use strict";
+module.exports = (function() {
+
 
   var emojify = emoji.emojify;
 
@@ -14,4 +16,6 @@ define(['utils/emoji'], function(emoji) {
 
   return decorator;
 
-});
+
+})();
+

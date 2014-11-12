@@ -1,11 +1,12 @@
-define([
-  'jquery',
-  'utils/context',
-  'hbs!./tmpl/notification',
-  'utils/appevents',
-  './notify'                              // No reference,
-], function($, context, template, appEvents){
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var context = require('utils/context');
+var template = require('./tmpl/notification.hbs');
+var appEvents = require('utils/appevents');
+require('./notify');
+
+module.exports = (function() {
+
 
   var notifications = $('<div id="notification-center" class="notification-center"></div>').appendTo('body');
 
@@ -88,4 +89,6 @@ define([
     }
   };
 
-});
+
+})();
+
