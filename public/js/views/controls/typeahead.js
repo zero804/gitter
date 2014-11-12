@@ -1,10 +1,11 @@
-define([
-  'backbone',
-  'marionette',
-  './dropdown',
-  './live-search',
-], function(Backbone, Marionette, Dropdown, liveSearch) {
-  "use strict";
+"use strict";
+var Backbone = require('backbone');
+var Marionette = require('marionette');
+var Dropdown = require('./dropdown');
+var liveSearch = require('./live-search');
+
+module.exports = (function() {
+
 
   var TypeaheadView = Marionette.ItemView.extend({
     tagName: 'input',
@@ -147,4 +148,6 @@ define([
   });
 
   return TypeaheadView;
-});
+
+})();
+

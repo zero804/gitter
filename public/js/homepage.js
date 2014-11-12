@@ -1,12 +1,13 @@
-require([
-  'jquery',
-  'utils/context',
-  'hbs!./map-message',
-  'utils/room-name-trimmer',
-  'components/apiClient',
-  'utils/tracking' // no ref
- ], function($, context, mapMessageTemplate, roomNameTrimmer, apiClient) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var context = require('utils/context');
+var mapMessageTemplate = require('./map-message.hbs');
+var roomNameTrimmer = require('utils/room-name-trimmer');
+var apiClient = require('components/apiClient');
+require('utils/tracking');
+
+module.exports = (function() {
+
 
   var active = [];
 
@@ -249,4 +250,6 @@ require([
     cycleElements($('#testimonials-panel blockquote'), 7000);
     cycleElements($('.loves li'), 2500);
   });
-});
+
+})();
+

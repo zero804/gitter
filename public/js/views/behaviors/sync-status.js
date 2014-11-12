@@ -1,8 +1,9 @@
-define([
-  'marionette',
-  './lookup',
-], function(Marionette, behaviourLookup) {
-  "use strict";
+"use strict";
+var Marionette = require('marionette');
+var behaviourLookup = require('./lookup');
+
+module.exports = (function() {
+
 
   var Behavior = Marionette.Behavior.extend({
     initialize: function() {
@@ -26,4 +27,6 @@ define([
   behaviourLookup.register('SyncStatus', Behavior);
   return Behavior;
 
-});
+
+})();
+

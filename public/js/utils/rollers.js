@@ -1,5 +1,8 @@
-define(['mutant'], function(Mutant) {
-  "use strict";
+"use strict";
+var Mutant = require('mutant');
+
+module.exports = (function() {
+
 
   /** @const */ var TRACK_BOTTOM = 1;
   /** @const */ var TRACK_NO_PASS = 2;
@@ -299,4 +302,6 @@ define(['mutant'], function(Mutant) {
   };
 
   return Rollers;
-});
+
+})();
+

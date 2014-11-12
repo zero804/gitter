@@ -1,10 +1,11 @@
-define([
-  'utils/context',
-  'collections/troupes',
-  './realtime',
-  'log!live-context'
-], function(context, troupeModels, realtime, log) {
-  "use strict";
+"use strict";
+var context = require('utils/context');
+var troupeModels = require('collections/troupes');
+var realtime = require('./realtime');
+var log = require('utils/log');
+
+module.exports = (function() {
+
 
   function attachRoom(room) {
     var userId = context.getUserId();
@@ -53,4 +54,6 @@ define([
 
     }
   };
-});
+
+})();
+

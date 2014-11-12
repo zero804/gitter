@@ -1,10 +1,11 @@
+"use strict";
 
-define([
-  'jquery',
-  'backbone',
-  'hbs!./tmpl/repoInfo'
-], function($, Backbone, repoInfoTemplate) {
-  "use strict";
+var $ = require('jquery');
+var Backbone = require('backbone');
+var repoInfoTemplate = require('./tmpl/repoInfo.hbs');
+
+module.exports = (function() {
+
 
   var RepoInfoModel = Backbone.Model.extend({
     url: '/v1/repo-info'
@@ -25,4 +26,6 @@ define([
     model:  RepoInfoModel,
     view:   RepoInfoView
   };
-});
+
+})();
+

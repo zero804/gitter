@@ -1,11 +1,12 @@
-define([
-  'underscore',
-  'components/apiClient',
-  './base',
-  '../utils/momentWrapper',
-  'cocktail'
-], function(_, apiClient, TroupeCollections, moment, cocktail) {
-  "use strict";
+"use strict";
+var _ = require('underscore');
+var apiClient = require('components/apiClient');
+var TroupeCollections = require('./base');
+var moment = require('../utils/momentWrapper');
+var cocktail = require('cocktail');
+
+module.exports = (function() {
+
 
   var EventModel = TroupeCollections.Model.extend({
     idAttribute: "id",
@@ -69,4 +70,6 @@ define([
     EventModel: EventModel,
     EventCollection: EventCollection
   };
-});
+
+})();
+

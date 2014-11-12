@@ -1,8 +1,9 @@
-define([
-  'log!cache-sync',
-  'utils/context'
-], function(log, context) {
-  "use strict";
+"use strict";
+var log = require('utils/log');
+var context = require('utils/context');
+
+module.exports = (function() {
+
   var PLUGIN = "ChatSnapshot";
 
   function cdvError(callback) {
@@ -80,4 +81,6 @@ define([
     }
   };
 
-});
+
+})();
+

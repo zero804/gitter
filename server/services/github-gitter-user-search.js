@@ -55,26 +55,26 @@ function addGitterDataToGithubUsers(githubUsers, callback) {
 }
 
 module.exports = function(searchQuery, user, options, callback) {
-  var options = options || {};
+  options = options || {};
 
   return Q([
     userSearchService.searchForUsers(user.id, searchQuery, options),
     searchGithubUsers(searchQuery, user).then(addGitterDataToGithubUsers)
   ])
   .spread(function(gitterResults, githubUsers) {
-    var gitterUsers = gitterResults.results
+    var gitterUsers = gitterResults.results;
     var excludedUsername = user.username;
 
     var merged = gitterUsers.concat(githubUsers);
     var noSelfMentions = merged.filter(function(user) {
-      return user.username != excludedUsername
+      return user.username != excludedUsername;
     });
     var deduplicated = _.uniq(noSelfMentions, false, function(user) {
       return user.username;
     });
     var limited = deduplicated.slice(0, options.limit);
 
-    gitterResults.results = limited
+    gitterResults.results = limited;
     return gitterResults;
   })
   .nodeify(callback);
