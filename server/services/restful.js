@@ -60,7 +60,6 @@ exports.serializeChatsForTroupe = function(troupeId, userId, options, callback) 
 };
 
 exports.serializeUsersForTroupe = function(troupeId, userId, options, callback) {
-  console.time('serializeUsersForTroupe');
   return troupeService.findUserIdsForTroupe(troupeId)
     .then(function (userIds) {
 
