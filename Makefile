@@ -212,7 +212,7 @@ post-test-maintain-data:
 
 tarball:
 	mkdir -p output
-	find . -type f -not -name ".*"| grep -Ev '^\./(\.|coverage/|output/|assets/|mongo-backup-|scripts/mongo-backup-|node_modules/).*'|tar -c --files-from - |gzip -9 - > output/troupe.tgz
+	(echo ./.npmrc; find . -type f -not -name ".*"| grep -Ev '^\./(\.|coverage/|output/|assets/|mongo-backup-|scripts/mongo-backup-|node_modules/).*')|tar -c --files-from - |gzip -9 - > output/troupe.tgz
 	tar -czf output/assets.tgz -C public-processed . > /dev/null
 
 search-js-console:
