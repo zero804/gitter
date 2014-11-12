@@ -278,7 +278,6 @@ define([
 
       $.when(users, repos, publicRepos)
         .done(function (users, repos, publicRepos) {
-
           // assuring that object are uniform since repos have a boolean (exists)
           users[0].results.map(function (i) { i.exists = true; });
           publicRepos[0].results.map(function (i) { i.exists = true; });
@@ -550,9 +549,13 @@ define([
       $.when(
           this.search.local(searchTerm),
           this.search.remote(searchTerm)
-        ).done(function () {
+        )
+        .done(function () {
           this.model.set('isLoading', false);
-        }.bind(this));
+        }.bind(this))
+        .fail(function () {
+          this.model.set('isLoading', false);
+        });
 
       this.showResults();
       this.triggerMethod('search:show'); // hide top toolbar content
