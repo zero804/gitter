@@ -131,6 +131,9 @@ define([
   exports.LiveCollection = Backbone.Collection.extend({
     modelName: '',
     constructor: function(models, options) {
+      var defaults = {snapshot: true};
+      options = _.extend(defaults, options);
+
       Backbone.Collection.prototype.constructor.call(this, models, options);
 
       this._loading = false;
@@ -140,7 +143,7 @@ define([
       this.on('request', this._onRequest, this);
 
       if(options && options.listen) {
-        this.listen();
+        this.listen(options);
       }
 
     },
@@ -204,7 +207,7 @@ define([
       this.trigger('loaded');
     },
 
-    listen: function() {
+    listen: function(options) {
       if(this.subscription) return;
       var self = this;
 
@@ -222,37 +225,39 @@ define([
 
       var stateProvider = this.getSnapshotState && getState;
 
-      realtime.registerForSnapshots(url, function(snapshot) {
-        self.trigger('request');
-        /**
-         * Don't remove items from the collections, as there is a greater
-         * chance that they've been added on the client than that they've
-         * been removed from the server. One day we may want to handle the
-         * case that the server object has been removed, but it's not that
-         * likely and doesn't warrant the extra complexity
-         */
-        var options = {
-          parse: true,    /* parse the items */
-          remove: true,
-          add: true,      /* add new items */
-          merge: true     /* merge into items that already exist */
-        };
+      if (options && options.snapshot) {
+        realtime.registerForSnapshots(url, function(snapshot) {
+          self.trigger('request');
+          /**
+           * Don't remove items from the collections, as there is a greater
+           * chance that they've been added on the client than that they've
+           * been removed from the server. One day we may want to handle the
+           * case that the server object has been removed, but it's not that
+           * likely and doesn't warrant the extra complexity
+           */
+          var options = {
+            parse: true,    /* parse the items */
+            remove: true,
+            add: true,      /* add new items */
+            merge: true     /* merge into items that already exist */
+          };
 
-        if(self.length > 0) {
-          /* Remove any presnapshot stuff (cached from previous time) */
-          var forKeeping = self.where({ presnapshot: undefined });
+          if(self.length > 0) {
+            /* Remove any presnapshot stuff (cached from previous time) */
+            var forKeeping = self.where({ presnapshot: undefined });
 
-          // add one by one
-          self.set(snapshot.concat(forKeeping), options);
-        } else {
-          // trash it and add all in one go
-          self.reset(snapshot, options);
-        }
+            // add one by one
+            self.set(snapshot.concat(forKeeping), options);
+          } else {
+            // trash it and add all in one go
+            self.reset(snapshot, options);
+          }
 
-        self._onInitialLoad();
-        self.trigger('sync');
-        self.trigger('snapshot');
-      }, stateProvider);
+          self._onInitialLoad();
+          self.trigger('sync');
+          self.trigger('snapshot');
+        }, stateProvider);
+      }
 
       this.subscription.errback(function(error) {
         log('Subscription error for ' + url, error);

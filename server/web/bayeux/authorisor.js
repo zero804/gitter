@@ -118,6 +118,8 @@ function populateSubTroupeCollection(options) {
   var snapshot = options.snapshot; // Details of the snapshot
   var troupeId = match[1];
   var collection = match[2];
+  
+  console.log('*** ', options, troupeId, collection);
 
   switch(collection) {
     case "chatMessages":
@@ -130,9 +132,9 @@ function populateSubTroupeCollection(options) {
       return restful.serializeUsersForTroupe(troupeId, userId)
         .then(arrayToSnapshot('room.users'));
 
-    case "events":
-      return restful.serializeEventsForTroupe(troupeId, userId)
-        .then(arrayToSnapshot('room.events'));
+    //case "events":
+    //  return restful.serializeEventsForTroupe(troupeId, userId)
+    //    .then(arrayToSnapshot('room.events'));
 
     default:
       logger.error('Unable to provide snapshot for ' + collection);

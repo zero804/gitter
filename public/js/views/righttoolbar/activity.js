@@ -262,7 +262,7 @@ define([
     tagName: 'ul',
     className: 'gtrActivityList',
     itemView: ActivityItemView,
-    emptyView: EmptyActivityView
+    //emptyView: EmptyActivityView
   });
   cocktail.mixin(ActivityView, TroupeViews.SortableMarionetteView);
 
