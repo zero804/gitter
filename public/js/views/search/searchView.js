@@ -471,7 +471,6 @@ define([
         var toRemove = this.rooms.models.filter(function (item) {
           return item.get('query') !== this.model.get('searchTerm');
         }.bind(this));
-
         masterCollection.remove(toRemove);
         masterCollection.add(data);
         this.rooms.resetWith(masterCollection);
@@ -479,6 +478,7 @@ define([
 
       this.listenTo(this.search, 'loaded:messages', function (data) {
         masterCollection.remove(this.chats.models); // we must remove the old chats before adding new ones
+        this.chats.resetWith(masterCollection);
         masterCollection.add(data);
       }.bind(this));
 
@@ -544,7 +544,6 @@ define([
       var searchTerm = this.model.get('searchTerm');
 
       if (this.isSearchTermEmpty()) return this.hide();
-
       this.model.set('isLoading', true);
       $.when(
           this.search.local(searchTerm),
