@@ -125,8 +125,9 @@ function renderChat(req, res, options, next) {
 
   Q.all([
       contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions } }),
-      restful.serializeChatsForTroupe(troupe.id, userId, serializerOptions)
-    ]).spread(function (troupeContext, chats) {
+      restful.serializeChatsForTroupe(troupe.id, userId, serializerOptions),
+      restful.serializeEventsForTroupe(troupe.id, userId)
+    ]).spread(function (troupeContext, chats, activityEvents) {
       var initialChat = _.find(chats, function(chat) { return chat.initial; });
       var initialBottom = !initialChat;
       var githubLink;
@@ -159,7 +160,8 @@ function renderChat(req, res, options, next) {
           agent: req.headers['user-agent'],
           dnsPrefetch: dnsPrefetch,
           isPrivate: isPrivate,
-          avatarUrl: avatar(troupeContext.troupe)
+          avatarUrl: avatar(troupeContext.troupe),
+          activityEvents: activityEvents
         }, options.extras);
 
       res.render(options.template, renderOptions);
