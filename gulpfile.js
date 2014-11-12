@@ -278,3 +278,12 @@ gulp.task('package', ['prepare-app', 'prepare-assets']);
  * default
  */
 gulp.task('default', ['test', 'package']);
+
+
+
+/**
+ * watch
+ */
+ gulp.task('watch', ['css'], function() {
+   gulp.watch('public/less/**/*.less', ['css']);
+ });
