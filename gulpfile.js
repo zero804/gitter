@@ -123,6 +123,11 @@ gulp.task('add-version-files', function(done) {
             hash = 'S' + hash;
           }
 
+          // Use jenkins variables
+          if(branch === 'HEAD' && process.env.GIT_BRANCH) {
+            branch = process.env.GIT_BRANCH;
+          }
+
           fs.writeFileSync('output/app/ASSET_TAG', hash);
           fs.writeFileSync('output/app/GIT_COMMIT', commit);
           fs.writeFileSync('output/app/VERSION', branch);
