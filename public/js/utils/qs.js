@@ -1,5 +1,8 @@
-define([], function() {
-  "use strict";
+"use strict";
+
+
+module.exports = (function() {
+
 
   // "?foo=bar&fish=chips" -> { foo: bar, fish: chips }
   function parse(qs) {
@@ -17,4 +20,6 @@ define([], function() {
   }
 
   return parse(window.location.search);
-});
+
+})();
+

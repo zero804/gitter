@@ -1,4 +1,9 @@
-require(['utils/tracking'], function() {
-  "use strict";
+"use strict";
+require('utils/tracking');
+
+module.exports = (function() {
+
   // No need to do anything here
-});
+
+})();
+

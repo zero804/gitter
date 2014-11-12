@@ -1,7 +1,8 @@
-define([
-  '../utils/context',
-], function(context) {
-  "use strict";
+"use strict";
+var context = require('../utils/context');
+
+module.exports = (function() {
+
 
   var hash = window.location.hash.substring(1);
 
@@ -29,4 +30,6 @@ define([
     context.setTroupeId(troupeId);
   }
 
-});
+
+})();
+

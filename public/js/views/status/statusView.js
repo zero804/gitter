@@ -1,11 +1,12 @@
+"use strict";
 
-define([
-  'jquery',
-  'underscore',
-  'backbone',
-  'hbs!templates/status/status'
-], function($, _, Backbone, template){
-  "use strict";
+var $ = require('jquery');
+var _ = require('underscore');
+var Backbone = require('backbone');
+var template = require('templates/status/status.hbs');
+
+module.exports = (function() {
+
 
   var StatusView = Backbone.View.extend({
     render: function() {
@@ -17,4 +18,6 @@ define([
   });
 
   return StatusView;
-});
+
+})();
+

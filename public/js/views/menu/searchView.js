@@ -1,17 +1,17 @@
-define([
-  'utils/appevents',
-  'components/apiClient',
-  'jquery',
-  'underscore',
-  'backbone',
-  'utils/text-filter',
-  './room-collection-view',
-  'collections/instances/troupes',
-  'cocktail',
-  'views/keyboard-events-mixin'
-], function(appEvents, apiClient, $, _, Backbone, textFilter, RoomCollectionView, troupeCollections, cocktail, KeyboardEventsMixin
-) {
-  "use strict";
+"use strict";
+var appEvents = require('utils/appevents');
+var apiClient = require('components/apiClient');
+var $ = require('jquery');
+var _ = require('underscore');
+var Backbone = require('backbone');
+var textFilter = require('utils/text-filter');
+var RoomCollectionView = require('./room-collection-view');
+var troupeCollections = require('collections/instances/troupes');
+var cocktail = require('cocktail');
+var KeyboardEventsMixin = require('views/keyboard-events-mixin');
+
+module.exports = (function() {
+
 
   var View = RoomCollectionView.extend({
 
@@ -383,4 +383,6 @@ define([
 
   return View;
 
-});
+
+})();
+

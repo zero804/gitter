@@ -1,10 +1,11 @@
+"use strict";
 
-define([
-  'marionette',
-  'views/base',
-  'hbs!./tmpl/chooseRoom',
-], function(Marionette, TroupeViews, template) {
-  "use strict";
+var Marionette = require('marionette');
+var TroupeViews = require('views/base');
+var template = require('./tmpl/chooseRoom.hbs');
+
+module.exports = (function() {
+
 
   var View = Marionette.ItemView.extend({
     template: template,
@@ -58,4 +59,6 @@ define([
     Modal: Modal
   };
 
-});
+
+})();
+

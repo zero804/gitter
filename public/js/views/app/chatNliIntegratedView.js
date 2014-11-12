@@ -1,22 +1,21 @@
-define([
-  'jquery',
-  'utils/context',
-  'marionette',
-  'collections/instances/integrated-items',
-  'components/modal-region',
-  'utils/scrollbar-detect',
-  'views/chat/chatCollectionView',
-  'views/chat/decorators/webhookDecorator',
-  'views/chat/decorators/issueDecorator',
-  'views/chat/decorators/commitDecorator',
-  'views/chat/decorators/mentionDecorator',
-  'views/chat/decorators/embedDecorator',
-  'views/chat/decorators/emojiDecorator',
-  'views/app/headerView'
-], function($, context, Marionette, itemCollections, modalRegion, hasScrollBars,  ChatCollectionView,
-    webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator,
-    emojiDecorator, HeaderView /*, SearchView*/) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var context = require('utils/context');
+var Marionette = require('marionette');
+var itemCollections = require('collections/instances/integrated-items');
+var modalRegion = require('components/modal-region');
+var hasScrollBars = require('utils/scrollbar-detect');
+var ChatCollectionView = require('views/chat/chatCollectionView');
+var webhookDecorator = require('views/chat/decorators/webhookDecorator');
+var issueDecorator = require('views/chat/decorators/issueDecorator');
+var commitDecorator = require('views/chat/decorators/commitDecorator');
+var mentionDecorator = require('views/chat/decorators/mentionDecorator');
+var embedDecorator = require('views/chat/decorators/embedDecorator');
+var emojiDecorator = require('views/chat/decorators/emojiDecorator');
+var HeaderView = require('views/app/headerView');
+
+module.exports = (function() {
+
 
   // Nobody knows why this is here. Delete it
   // $('.trpDisplayPicture').tooltip('destroy');
@@ -68,4 +67,6 @@ define([
   });
 
   return ChatLayout;
-});
+
+})();
+

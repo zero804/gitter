@@ -1,13 +1,14 @@
-define([
-  'utils/context',
-  'marionette',
-  'utils/appevents',
-  'utils/is-mobile',
-  'utils/is-native',
-  'hbs!./tmpl/profile',
-  'views/behaviors/widgets'      // No ref
-], function(context, Marionette, appEvents, isMobile, isNative, template) {
-  "use strict";
+"use strict";
+var context = require('utils/context');
+var Marionette = require('marionette');
+var appEvents = require('utils/appevents');
+var isMobile = require('utils/is-mobile');
+var isNative = require('utils/is-native');
+var template = require('./tmpl/profile.hbs');
+require('views/behaviors/widgets');
+
+module.exports = (function() {
+
 
   return Marionette.ItemView.extend({
     template: template,
@@ -38,4 +39,6 @@ define([
       appEvents.trigger('navigation', context.getUser().url, 'home', ''); // TODO: figure out a title
     }
   });
-});
+
+})();
+

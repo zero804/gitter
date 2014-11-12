@@ -1,29 +1,30 @@
-require([
-  'require',
-  'utils/appevents',
-  'utils/context',
-  'backbone',
-  'underscore',
-  'views/app/appIntegratedView',
-  'views/menu/troupeMenu',
-  'collections/instances/troupes',
-  'components/titlebar',
-  'components/realtime',
-  'views/createRoom/createRoomView',
-  'views/createRoom/createRepoRoomView',
-  'views/createRoom/confirmRepoRoomView',
-  'views/createRoom/chooseRoomView',
-  'log!router-app',
-  'components/statsc',                    // No ref
-  'views/widgets/preload',                // No ref
-  'components/webNotifications',          // No ref
-  'components/desktopNotifications',      // No ref
-  'template/helpers/all',                 // No ref
-  'components/bug-reporting',             // No ref
-  'components/focus-events'               // No ref
-], function(require, appEvents, context, Backbone, _, AppIntegratedView, TroupeMenuView, troupeCollections,
-  TitlebarUpdater, realtime, createRoomView, createRepoRoomView, confirmRepoRoomView, chooseRoomView, log) {
-  "use strict";
+"use strict";
+
+var appEvents = require('utils/appevents');
+var context = require('utils/context');
+var Backbone = require('backbone');
+var _ = require('underscore');
+var AppIntegratedView = require('views/app/appIntegratedView');
+var TroupeMenuView = require('views/menu/troupeMenu');
+var troupeCollections = require('collections/instances/troupes');
+var TitlebarUpdater = require('components/titlebar');
+var realtime = require('components/realtime');
+var createRoomView = require('views/createRoom/createRoomView');
+var createRepoRoomView = require('views/createRoom/createRepoRoomView');
+var confirmRepoRoomView = require('views/createRoom/confirmRepoRoomView');
+var chooseRoomView = require('views/createRoom/chooseRoomView');
+var log = require('utils/log');
+require('components/statsc');
+require('views/widgets/preload');
+require('components/webNotifications');
+require('components/desktopNotifications');
+require('template/helpers/all');
+require('components/bug-reporting');
+require('components/focus-events');
+require('utils/tracking');
+
+module.exports = (function() {
+
 
   var chatIFrame = document.getElementById('content-frame');
   if(window.location.hash) {
@@ -310,17 +311,15 @@ require([
   new Router();
   Backbone.history.start();
 
-  // Asynchronously load tracker
-  require([
-    'utils/tracking'
-  ], function(/*tracking*/) {
-    // No need to do anything here
-  });
-
   if (context.popEvent('new_user_signup')) {
-    require(['twitter-oct'], function (twitterOct) {
+    var $script = require("scriptjs");
+
+    $script("//platform.twitter.com/oct", function() {
+      var twitterOct = window.twttr && window.twttr.conversion;
       twitterOct.trackPid('l4t99');
     });
   }
 
-});
+
+})();
+

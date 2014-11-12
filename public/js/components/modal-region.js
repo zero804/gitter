@@ -1,5 +1,8 @@
-define([], function() {
-  "use strict";
+"use strict";
+
+
+module.exports = (function() {
+
   return {
     currentView: null,
     show: function(view) {
@@ -18,4 +21,6 @@ define([], function() {
       }
     }
   };
-});
+
+})();
+

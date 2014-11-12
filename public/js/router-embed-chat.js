@@ -1,27 +1,22 @@
-require([
-  'views/app/chatIntegratedView',
-  'views/chat/chatCollectionView',
-  'collections/chat',
+"use strict";
+var ChatIntegratedView = require('views/app/chatIntegratedView');
+var ChatCollectionView = require('views/chat/chatCollectionView');
+var chatModels = require('collections/chat');
+var webhookDecorator = require('views/chat/decorators/webhookDecorator');
+var issueDecorator = require('views/chat/decorators/issueDecorator');
+var commitDecorator = require('views/chat/decorators/commitDecorator');
+var mentionDecorator = require('views/chat/decorators/mentionDecorator');
+var embedDecorator = require('views/chat/decorators/embedDecorator');
+var emojiDecorator = require('views/chat/decorators/emojiDecorator');
+var HistoryLimitView = require('views/app/historyLimitView');
+require('components/statsc');
+require('views/widgets/preload');
+require('components/dozy');
+require('template/helpers/all');
+require('components/bug-reporting');
 
-  'views/chat/decorators/webhookDecorator',
-  'views/chat/decorators/issueDecorator',
-  'views/chat/decorators/commitDecorator',
-  'views/chat/decorators/mentionDecorator',
-  'views/chat/decorators/embedDecorator',
-  'views/chat/decorators/emojiDecorator',
-  'views/app/historyLimitView',
+module.exports = (function() {
 
-  'components/statsc',          // No ref
-  'views/widgets/preload',      // No ref
-  'components/dozy',            // Sleep detection No ref
-  'template/helpers/all',       // No ref
-  'components/bug-reporting'    // No ref
-
-], function(ChatIntegratedView, ChatCollectionView, chatModels,
-  webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator,
-  HistoryLimitView) {
-
-  "use strict";
 
   new ChatIntegratedView({ el: 'body' });
 
@@ -45,4 +40,6 @@ require([
     chatCollectionView: chatCollectionView
   }).render();
 
-});
+
+})();
+

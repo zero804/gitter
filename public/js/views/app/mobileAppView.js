@@ -1,9 +1,10 @@
-define([
-  'backbone',
-  'marionette',
-  'jquery-hammer'
-], function(Backbone, Marionette, $hammer) {
-  "use strict";
+"use strict";
+var Backbone = require('backbone');
+var Marionette = require('marionette');
+var $hammer = require('jquery-hammer');
+
+module.exports = (function() {
+
 
   return Marionette.ItemView.extend({
     initialize: function(options) {
@@ -41,4 +42,6 @@ define([
 
   });
 
-});
+
+})();
+
