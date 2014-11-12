@@ -2,7 +2,7 @@
 var $ = require('jquery');
 var Backbone = require('backbone');
 var context = require('utils/context');
-var ChatIntegratedView = require('views/app/chatIntegratedView');
+//var ChatNliIntegratedView = require('views/app/chatNliIntegratedView');
 var HeaderView = require('views/app/headerView');
 var ArchiveNavigationView = require('views/archive/archive-navigation-view');
 require('views/widgets/preload');
@@ -39,7 +39,7 @@ module.exports = (function() {
     window.parent.location.href = href;
   });
 
-  var appView = new ChatIntegratedView({ el: 'body' });
+  // var appView = new ChatNliIntegratedView({ el: 'body' });
 
   new HeaderView({ model: context.troupe(), el: '#header' });
 
@@ -52,21 +52,31 @@ module.exports = (function() {
     previousDate: archiveContext.previousDate
   }).render();
 
-  var Router = Backbone.Router.extend({
-    routes: {
-      // TODO: get rid of the pipes
-      "": "hideModal",
-    },
+  // Adjust header manually: #nasty
+  var size = $('#header-wrapper').height() + 15 + 'px';
+  var ss = document.styleSheets[2];
+  try {
+    if (ss.insertRule) {
+      ss.insertRule('.trpChatContainer > div:first-child { padding-top: ' + size + ' }', ss.cssRules.length);
+    } else if (ss.addRule) {
+      ss.addRule('.trpChatContainer > div:first-child', 'padding-top:' + size);
+    }
+  } catch (err) {
+    // TODO: Handle the error? WC.
+  }
 
-    hideModal: function() {
-      appView.dialogRegion.close();
-    },
 
-  });
+  // var Router = Backbone.Router.extend({
+  //   routes: {
+  //     // TODO: get rid of the pipes
+  //     "": "hideModal",
+  //   },
 
-  new Router();
+  //   hideModal: function() {
+  //     appView.dialogRegion.close();
+  //   },
 
-  Backbone.history.start();
+  // });
 
 })();
 
