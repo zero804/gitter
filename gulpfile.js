@@ -2,6 +2,7 @@
 'use strict';
 
 var gulp = require('gulp');
+var livereload = require('gulp-livereload');
 var gutil = require("gulp-util");
 var webpack = require('gulp-webpack');
 var less = require('gulp-less');
@@ -289,6 +290,7 @@ gulp.task('default', ['test', 'package']);
 /**
  * watch
  */
- gulp.task('watch', ['css'], function() {
-   gulp.watch('public/less/**/*.less', ['css']);
- });
+gulp.task('watch', ['css'], function() {
+  livereload.listen();
+  gulp.watch('public/less/**/*.less', ['css']).on('change', livereload.changed);
+});
