@@ -1,3 +1,7 @@
+/* jshint strict:false */
+/* jshint -W120 */
+/* jshint -W117 */
+
 /**
 *
 *  Base64 encode / decode

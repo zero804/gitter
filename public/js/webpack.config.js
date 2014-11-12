@@ -1,9 +1,9 @@
 /* jshint node:true */
-
 "use strict";
+
 var path = require("path");
-var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
+
 var webpack = {
   entry: {
     "router-nli-app": path.resolve(path.join(__dirname, "./router-nli-app.js")),
@@ -23,7 +23,9 @@ var webpack = {
     "router-archive-home": path.resolve(path.join(__dirname, "./router-archive-home")),
     "router-embed-chat": path.resolve(path.join(__dirname, "./router-embed-chat")),
     "homepage": path.resolve(path.join(__dirname, "./homepage")),
-    vendor: ['utils/context',
+    vendor: [
+      'utils/webpack',
+      'utils/context',
       'underscore',
       'jquery',
       'backbone',
@@ -40,18 +42,14 @@ var webpack = {
   output: {
     path: __dirname + "/../dist",
     filename: "[name].js",
-    chunkFilename: "[id].js",
-    publicPath: "/assets/"
+    chunkFilename: "[id].chunk.js",
+    publicPath: "/js/"
   },
   module: {
     loaders: [
       {
         test: /\.hbs$/,
         loader: "handlebars-loader!" + path.resolve(path.join(__dirname, "../../build-scripts/html-min-loader"))
-      },
-      {
-        test: /\.less$/,
-        loader: ExtractTextPlugin.extract("file-loader")
       }
     ]
   },
@@ -92,11 +90,9 @@ var webpack = {
     }
   },
   plugins: [
-    new CommonsChunkPlugin("vendor", "vendor.bundle.js"),
-    new ExtractTextPlugin("[name].css", { allChunks: false })
+    new CommonsChunkPlugin("vendor", "[name].js")
   ]
 };
-console.log(JSON.stringify(webpack, null, "  "));
 module.exports = webpack;
 
 

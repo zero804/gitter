@@ -1,6 +1,4 @@
 "use strict";
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
-
 
 module.exports = (function() {
 

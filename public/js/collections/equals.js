@@ -1,3 +1,4 @@
+/* jshint -W041 */
 "use strict";
 var _ = require('underscore');
 

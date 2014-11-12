@@ -1,6 +1,4 @@
 "use strict";
-/* jshint unused:strict, browser:true, strict:true */
-/* global define:false */
 var $ = require('jquery');
 var Backbone = require('backbone');
 var appEvents = require('utils/appevents');
@@ -9,6 +7,7 @@ var Popover = require('views/popover');
 var template = require('./tmpl/commitPopover.hbs');
 var titleTemplate = require('./tmpl/commitPopoverTitle.hbs');
 var footerTemplate = require('./tmpl/commitPopoverFooter.hbs');
+var moment = require('moment');
 
 module.exports = (function() {
 

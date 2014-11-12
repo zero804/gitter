@@ -7,7 +7,6 @@ var _               = require('underscore');
 var appVersion      = require('./appVersion');
 var safeJson        = require('../utils/safe-json');
 var env             = process.env.NODE_ENV;
-var minifiedDefault = nconf.get("web:minified");
 var util            = require('util');
 
 var cdns;
@@ -54,54 +53,30 @@ exports.cdn = function(url, parameters) {
 };
 
 exports.bootScript = function(url, parameters) {
+
   var options = parameters.hash;
 
-  var cdnFunc;
-  if(options.skipCdn) {
-    cdnFunc = function(a) { return '/' + a; };
-  } else if(options.root) {
-    cdnFunc = function(a) { return options.root + a; };
-  } else {
-    cdnFunc = cdn;
-  }
-
-  var skipCore = options.skipCore;
-
   var async    = 'async' in options ? options.async : true;
-  var cdnOptions = { appcache: options.appcache };
 
-  var baseUrl = cdnFunc("js/", cdnOptions);
-  var asyncScript = async ? "defer='defer' async='true' " : '';
-
-  if(minifiedDefault) {
-    /* Distribution-ready */
-
-    if(this.minified !== false) {
-      url = url + ".min";
-    }
-
-    if(skipCore) {
-      /* No requirejs */
-      return util.format("<script type='text/javascript'>window.require_config.baseUrl = '%s';</script>" +
-              "<script %s src='%s' type='text/javascript'></script>",
-              baseUrl,
-              asyncScript,
-              cdnFunc(util.format("js/%s.js", url), cdnOptions));
-    }
-
-    /* Standard distribution setup */
-    return util.format("<script type='text/javascript'>window.require_config.baseUrl = '%s';</script>" +
-            "<script %s data-main='%s' src='%s' type='text/javascript'></script>\n",
-            baseUrl,
-            asyncScript,
-            url,
-            cdnFunc("js/core-libraries.min.js", cdnOptions));
+  var baseUrl;
+  if(options.root) {
+    baseUrl = options.root + "js/";
+  } else {
+    baseUrl = cdn("js", { appcache: options.appcache });
   }
+  var asyncScript = async ? "defer='defer' async='true' " : '';
+  var scriptName = url + '.js';
+  var vendorScript = 'vendor.js';
 
-  /* Non minified - use requirejs as the core (development mode) */
-  return util.format("<script type='text/javascript' src='/assets/vendor.bundle.js'></script>" +
-         "<script type='text/javascript' src='/assets/%s.js'></script>",
-         url);
+  return util.format(
+         "<script type='text/javascript' %s src='%s/%s'></script>" +
+         "<script type='text/javascript' %s src='%s/%s'></script>",
+         asyncScript,
+         baseUrl,
+         vendorScript,
+         asyncScript,
+         baseUrl,
+         scriptName);
 };
 
 exports.isMobile = function(agent, options) {
