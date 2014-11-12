@@ -3,6 +3,7 @@ var $ = require('jquery');
 var _ = require('underscore');
 var Marionette = require('marionette');
 var behaviourLookup = require('./lookup');
+require('../widgets/preload');
 
 module.exports = (function() {
 
@@ -82,6 +83,7 @@ module.exports = (function() {
       if(CachedWidget) {
         replaceElementWithWidget(this, CachedWidget, widgetManager, attrs);
       } /*else {
+        NO LONG do async load
         require(['views/widgets/' + attrs.widgetName], function(Widget) {
           cachedWidgets[attrs.widgetName] = Widget;
           replaceElementWithWidget(self, Widget, widgetManager, attrs);
