@@ -1,19 +1,20 @@
+"use strict";
 /* jshint unused:strict, browser:true, strict:true */
 /* global define:false */
-define([
-  'jquery',
-  'backbone',
-  'marionette',
-  'utils/context',
-  'components/apiClient',
-  'utils/appevents',
-  'utils/momentWrapper',
-  'views/popover',
-  'hbs!./tmpl/issuePopover',
-  'hbs!./tmpl/issuePopoverTitle',
-  'hbs!./tmpl/commitPopoverFooter'
-], function($, Backbone, Marionette, context, apiClient, appEvents, moment, Popover, bodyTemplate, titleTemplate, footerTemplate) {
-  "use strict";
+var $ = require('jquery');
+var Backbone = require('backbone');
+var Marionette = require('marionette');
+var context = require('utils/context');
+var apiClient = require('components/apiClient');
+var appEvents = require('utils/appevents');
+var moment = require('utils/momentWrapper');
+var Popover = require('views/popover');
+var bodyTemplate = require('./tmpl/issuePopover.hbs');
+var titleTemplate = require('./tmpl/issuePopoverTitle.hbs');
+var footerTemplate = require('./tmpl/commitPopoverFooter.hbs');
+
+module.exports = (function() {
+
 
   var BodyView = Marionette.ItemView.extend({
     className: 'issue-popover-body',
@@ -163,4 +164,6 @@ define([
 
   return decorator;
 
-});
+
+})();
+

@@ -1,16 +1,17 @@
+"use strict";
 
-define([
-  'jquery',
-  'marionette',
-  'utils/context',
-  'components/apiClient',
-  'utils/social',
-  'views/base',
-  'utils/cdn',
-  'hbs!./tmpl/share',
-  'zeroclipboard'
-], function($, Marionette, context, apiClient, social, TroupeViews, cdn, template, ZeroClipboard) {
-  "use strict";
+var $ = require('jquery');
+var Marionette = require('marionette');
+var context = require('utils/context');
+var apiClient = require('components/apiClient');
+var social = require('utils/social');
+var TroupeViews = require('views/base');
+var cdn = require('utils/cdn');
+var template = require('./tmpl/share.hbs');
+var ZeroClipboard = require('zeroclipboard');
+
+module.exports = (function() {
+
 
   ZeroClipboard.config({ swfPath: cdn('repo/zeroclipboard/ZeroClipboard.swf') });
 
@@ -130,4 +131,6 @@ define([
     Modal: Modal
   };
 
-});
+
+})();
+

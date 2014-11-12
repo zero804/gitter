@@ -1,9 +1,10 @@
-define([
-  'backbone',
-  'underscore',
-  'log!smart-list'
-], function(Backbone, _, log) {
-  "use strict";
+"use strict";
+var Backbone = require('backbone');
+var _ = require('underscore');
+var log = require('utils/log');
+
+module.exports = (function() {
+
 
   // higher index in array, higher rank
   var roleRank = ['contributor', 'admin'];
@@ -207,4 +208,6 @@ define([
     Sorted: MegaCollection
   };
 
-});
+
+})();
+

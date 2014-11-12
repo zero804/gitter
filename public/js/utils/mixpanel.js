@@ -1,7 +1,8 @@
-define([
-  'utils/context'
-], function(context) {
-  "use strict";
+"use strict";
+var context = require('utils/context');
+
+module.exports = (function() {
+
 
   var trackingId = context.env('mixpanelToken');
 
@@ -45,4 +46,6 @@ define([
         mixpanel.identify(user.id);
       }
     }
-});
+
+})();
+

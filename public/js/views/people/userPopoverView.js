@@ -1,14 +1,15 @@
-define([
-  'marionette',
-  'backbone',
-  'views/popover',
-  'hbs!./tmpl/userPopoverView',
-  'hbs!./tmpl/userPopoverFooterView',
-  'utils/appevents',
-  'utils/context',
-  'utils/cdn',
-], function(Marionette, Backbone, Popover, template, footerTemplate, appEvents, context, cdn) {
-  "use strict";
+"use strict";
+var Marionette = require('marionette');
+var Backbone = require('backbone');
+var Popover = require('views/popover');
+var template = require('./tmpl/userPopoverView.hbs');
+var footerTemplate = require('./tmpl/userPopoverFooterView.hbs');
+var appEvents = require('utils/appevents');
+var context = require('utils/context');
+var cdn = require('utils/cdn');
+
+module.exports = (function() {
+
 
   var failoverImage = cdn('images/logo-mark-grey-64.png');
 
@@ -119,4 +120,6 @@ define([
   });
 
   return UserPopoverView;
-});
+
+})();
+

@@ -1,13 +1,14 @@
-define([
-  'marionette',
-  'views/base',
-  'utils/context',
-  'components/apiClient',
-  './repoSelectView',
-  'hbs!./tmpl/createRepoRoom',
-  'utils/appevents'
-], function (Marionette, TroupeViews, context, apiClient, RepoSelectView, template, appEvents) {
-  "use strict";
+"use strict";
+var Marionette = require('marionette');
+var TroupeViews = require('views/base');
+var context = require('utils/context');
+var apiClient = require('components/apiClient');
+var RepoSelectView = require('./repoSelectView');
+var template = require('./tmpl/createRepoRoom.hbs');
+var appEvents = require('utils/appevents');
+
+module.exports = (function() {
+
 
   var View = Marionette.Layout.extend({
     template: template,
@@ -93,4 +94,6 @@ define([
     Modal: Modal
   };
 
-});
+
+})();
+

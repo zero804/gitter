@@ -1,11 +1,12 @@
-define([
-  'utils/context',
-  'components/apiClient',
-  './realtime',
-  'log!eyeballs',
-  'utils/appevents'
-], function(context, apiClient, realtime, log, appEvents) {
-  "use strict";
+"use strict";
+var context = require('utils/context');
+var apiClient = require('components/apiClient');
+var realtime = require('./realtime');
+var log = require('utils/log');
+var appEvents = require('utils/appevents');
+
+module.exports = (function() {
+
 
   var eyesOnState = true;
   var INACTIVITY = 60 * 1000;
@@ -206,4 +207,6 @@ define([
       return eyesOnState;
     }
   };
-});
+
+})();
+

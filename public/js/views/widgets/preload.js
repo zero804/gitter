@@ -1,4 +1,7 @@
-define([
-  './avatar',
-  './timeago'
-], function() {});
+require('./avatar');
+require('./timeago');
+
+module.exports = (function() {
+
+})();
+

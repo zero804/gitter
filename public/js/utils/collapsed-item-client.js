@@ -1,7 +1,8 @@
-define([
-  'components/apiClient'
-], function (apiClient) {
-  "use strict";
+"use strict";
+var apiClient = require('components/apiClient');
+
+module.exports = (function() {
+
 
   return {
     collapse: function (chatId) {
@@ -13,4 +14,6 @@ define([
     }
   };
 
-});
+
+})();
+

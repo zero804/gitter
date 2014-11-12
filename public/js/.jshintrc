@@ -3,10 +3,10 @@
   "browser": true,
   "unused": "strict",
   "loopfunc": true,
-  "strict": true,
+  "globalstrict": true,
   "undef": true,
   "predef": [
-    "define",
+    "module",
     "require"
   ]
 }
