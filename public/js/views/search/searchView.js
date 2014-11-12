@@ -1,29 +1,28 @@
-define([
-  'jquery',
-  'log!search-view',
-  'components/apiClient',
-  'utils/context',
-  'utils/appevents',
-  'utils/rollers',
-  'backbone',
-  'marionette',
-  'underscore',
-  'cocktail',
-  'collections/instances/integrated-items',
-  'collections/chat-search',
-  'hbs!./tmpl/search',
-  'hbs!./tmpl/result',
-  'hbs!./tmpl/no-results',
-  'hbs!./tmpl/no-room-results',
-  'hbs!./tmpl/upgrade',
-  'utils/text-filter',
-  'views/keyboard-events-mixin',
-  'views/behaviors/widgets', // No ref
-  'views/behaviors/highlight' // No ref
-], function ($, log, apiClient, context, appEvents, Rollers, Backbone, Marionette, _, cocktail,
-  itemCollections, ChatSearchModels, searchTemplate, resultTemplate, noResultsTemplate, noRoomResultsTemplate,
-  upgradeTemplate, textFilter, KeyboardEventsMixin) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var log = require('utils/log');
+var apiClient = require('components/apiClient');
+var context = require('utils/context');
+var appEvents = require('utils/appevents');
+var Rollers = require('utils/rollers');
+var Backbone = require('backbone');
+var Marionette = require('marionette');
+var _ = require('underscore');
+var cocktail = require('cocktail');
+var itemCollections = require('collections/instances/integrated-items');
+var ChatSearchModels = require('collections/chat-search');
+var searchTemplate = require('./tmpl/search.hbs');
+var resultTemplate = require('./tmpl/result.hbs');
+var noResultsTemplate = require('./tmpl/no-results.hbs');
+var noRoomResultsTemplate = require('./tmpl/no-room-results.hbs');
+var upgradeTemplate = require('./tmpl/upgrade.hbs');
+var textFilter = require('utils/text-filter');
+var KeyboardEventsMixin = require('views/keyboard-events-mixin');
+require('views/behaviors/widgets');
+require('views/behaviors/highlight');
+
+module.exports = (function() {
+
 
   var EmptyResultsView = Marionette.ItemView.extend({
     className: 'result-empty',
@@ -602,4 +601,6 @@ define([
   cocktail.mixin(SearchView, KeyboardEventsMixin);
 
   return SearchView;
-});
+
+})();
+

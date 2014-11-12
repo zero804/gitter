@@ -1,38 +1,33 @@
-require([
-  'jquery',
-  'backbone',
-  'utils/context',
-  'components/live-context',
-  'utils/appevents',
-  'log!router-chat',
-  'views/people/peopleCollectionView',
-  'views/app/chatIntegratedView',
-  'collections/instances/integrated-items',
-  'views/share/share-view',
-  'views/app/troupeSettingsView',
-  'views/app/markdownView',
-  'views/app/keyboardView',
-  'views/app/addPeopleView',
-  'views/app/integrationSettingsModal',
-  'views/app/collaboratorsView',
-  'collections/collaborators',
-  'components/apiClient',
+"use strict";
+var $ = require('jquery');
+var Backbone = require('backbone');
+var context = require('utils/context');
+var liveContext = require('components/live-context');
+var appEvents = require('utils/appevents');
+var log = require('utils/log');
+var peopleCollectionView = require('views/people/peopleCollectionView');
+var ChatIntegratedView = require('views/app/chatIntegratedView');
+var itemCollections = require('collections/instances/integrated-items');
+var shareView = require('views/share/share-view');
+var TroupeSettingsView = require('views/app/troupeSettingsView');
+var MarkdownView = require('views/app/markdownView');
+var KeyboardView = require('views/app/keyboardView');
+var AddPeopleViewModal = require('views/app/addPeopleView');
+var IntegrationSettingsModal = require('views/app/integrationSettingsModal');
+var CollaboratorsView = require('views/app/collaboratorsView');
+var collaboratorsModels = require('collections/collaborators');
+var apiClient = require('components/apiClient');
+require('components/statsc');
+require('views/widgets/preload');
+require('filtered-collection');
+require('components/dozy');
+require('template/helpers/all');
+require('components/eyeballs');
+require('components/bug-reporting');
+require('components/focus-events');
 
-  'components/statsc',          // No ref
-  'views/widgets/preload',      // No ref
-  'filtered-collection',        // No ref
-  'components/dozy',            // Sleep detection No ref
-  'template/helpers/all',       // No ref
-  'components/eyeballs',        // No ref
-  'components/bug-reporting',   // No ref
-  'components/focus-events'     // No ref
+module.exports = (function() {
 
-], function($, Backbone, context, liveContext, appEvents, log,
-    peopleCollectionView, ChatIntegratedView, itemCollections,
-    shareView, TroupeSettingsView, MarkdownView, KeyboardView,
-    AddPeopleViewModal, IntegrationSettingsModal, CollaboratorsView,
-    collaboratorsModels, apiClient) {
-  "use strict";
 
   $(document).on("click", "a", function(e) {
     if(this.href) {
@@ -330,4 +325,6 @@ require([
   //helpShareIfLonely();
 
   Backbone.history.start();
-});
+
+})();
+

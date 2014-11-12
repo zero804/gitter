@@ -1,16 +1,17 @@
-define([
-  'marionette',
-  'jquery',
-  'underscore',
-  'utils/context',
-  'components/apiClient',
-  'views/base',
-  'collections/instances/integrated-items',
-  'hbs!./tmpl/troupeSettingsTemplate',
-  'log!troupe-settings-view',
-  'components/notifications'
-], function(Marionette, $, _, context, apiClient, TroupeViews, itemCollections, troupeSettingsTemplate, log, notifications) {
-  "use strict";
+"use strict";
+var Marionette = require('marionette');
+var $ = require('jquery');
+var _ = require('underscore');
+var context = require('utils/context');
+var apiClient = require('components/apiClient');
+var TroupeViews = require('views/base');
+var itemCollections = require('collections/instances/integrated-items');
+var troupeSettingsTemplate = require('./tmpl/troupeSettingsTemplate.hbs');
+var log = require('utils/log');
+var notifications = require('components/notifications');
+
+module.exports = (function() {
+
 
 
   var View = Marionette.ItemView.extend({
@@ -117,4 +118,6 @@ define([
         this.view = new View({ });
       }
     });
-  });
+  
+})();
+

@@ -1,8 +1,9 @@
-define([
-  'jquery',
-  'utils/appevents'
-], function($, appEvents) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var appEvents = require('utils/appevents');
+
+module.exports = (function() {
+
 
   function updateLeftMenuBadge(unreadCount) {
     $('.unread-count').text(unreadCount);
@@ -78,4 +79,6 @@ define([
   };
 
   return TitlebarUpdater;
-});
+
+})();
+

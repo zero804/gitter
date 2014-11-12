@@ -1,10 +1,11 @@
-define([
-  'jquery',
-  'marionette',
-  'views/app/uiVars',
-  'components/modal-region'
-  ], function($, Marionette, uiVars, modalRegion) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var Marionette = require('marionette');
+var uiVars = require('views/app/uiVars');
+var modalRegion = require('components/modal-region');
+
+module.exports = (function() {
+
 
   /** @const */
   var BACKSPACE = 8;
@@ -143,4 +144,6 @@ define([
   });
 
   return AppIntegratedLayout;
-});
+
+})();
+

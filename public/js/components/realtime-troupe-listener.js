@@ -1,9 +1,10 @@
-define([
-  'utils/context',
-  './realtime',
-  'utils/appevents'
-], function(context, realtime, appEvents) {
-  "use strict";
+"use strict";
+var context = require('utils/context');
+var realtime = require('./realtime');
+var appEvents = require('utils/appevents');
+
+module.exports = (function() {
+
 
   var subscription;
 
@@ -31,4 +32,6 @@ define([
   });
 
 
-});
+
+})();
+

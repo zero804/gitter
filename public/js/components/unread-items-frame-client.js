@@ -1,10 +1,11 @@
-define([
-  'underscore',
-  'utils/context',
-  'log!unread-items-frame-client',
-  'utils/appevents'
-], function(_, context, log, appEvents) {
-  "use strict";
+"use strict";
+var _ = require('underscore');
+var context = require('utils/context');
+var log = require('utils/log');
+var appEvents = require('utils/appevents');
+
+module.exports = (function() {
+
 
   function limit(fn, context, timeout) {
     return _.throttle(_.bind(fn, context), timeout || 30, { leading: false });
@@ -76,4 +77,6 @@ define([
   unreadItemsClient.TroupeUnreadNotifier = TroupeUnreadNotifier;
 
   return unreadItemsClient;
-});
+
+})();
+

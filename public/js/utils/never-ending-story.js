@@ -1,5 +1,10 @@
-define(['underscore', 'backbone', 'log!nes'], function(_, Backbone, log) {
-  "use strict";
+"use strict";
+var _ = require('underscore');
+var Backbone = require('backbone');
+var log = require('utils/log');
+
+module.exports = (function() {
+
 
   /* Put your scrolling panels on rollers */
   function NeverEndingStory(target, options) {
@@ -143,4 +148,6 @@ define(['underscore', 'backbone', 'log!nes'], function(_, Backbone, log) {
 
 
   return NeverEndingStory;
-});
+
+})();
+

@@ -13,9 +13,9 @@ function passthrough(url, options) {
   var email = options && options.email;
   var prefix;
   if (email) {
-    prefix = nconf.get('email:emailBasePath') + "/";
+    prefix = nconf.get('email:emailBasePath') + "/_s/l/";
   } else {
-    prefix = nonrelative ? nconf.get('web:basepath') + "/" : "/";
+    prefix = nonrelative ? nconf.get('web:basepath') + "/_s/l/" : "/_s/l/";
   }
   return prefix + url;
 }

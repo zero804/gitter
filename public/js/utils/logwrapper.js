@@ -1,5 +1,8 @@
-define([], function() {
-  "use strict";
+"use strict";
+
+
+module.exports = (function() {
+
 
   return function wrap(log, clazz) {
     var p = clazz.prototype;
@@ -21,4 +24,6 @@ define([], function() {
       }
     });
   };
-});
+
+})();
+

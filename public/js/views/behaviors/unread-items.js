@@ -1,12 +1,13 @@
-define([
-  'utils/context',
-  'marionette',
-  'components/unread-items-client',
-  'utils/appevents',
-  'utils/dataset-shim',
-  './lookup',
-], function(context, Marionette, unreadItemsClient, appEvents, dataset, behaviourLookup) {
-  "use strict";
+"use strict";
+var context = require('utils/context');
+var Marionette = require('marionette');
+var unreadItemsClient = require('components/unread-items-client');
+var appEvents = require('utils/appevents');
+var dataset = require('utils/dataset-shim');
+var behaviourLookup = require('./lookup');
+
+module.exports = (function() {
+
 
   var loggedIn = context.isLoggedIn();
 
@@ -51,4 +52,6 @@ define([
   behaviourLookup.register('UnreadItems', Behavior);
   return Behavior;
 
-});
+
+})();
+

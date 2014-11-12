@@ -1,12 +1,13 @@
-define([
-  'jquery',
-  'underscore',
-  'utils/context',
-  'faye',
-  'utils/appevents',
-  'log!realtime'
-], function($, _, context, Faye, appEvents, log) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var _ = require('underscore');
+var context = require('utils/context');
+var Faye = require('faye');
+var appEvents = require('utils/appevents');
+var log = require('utils/log');
+
+module.exports = (function() {
+
 
   /* @const */
   var FAYE_PREFIX = '/api';
@@ -453,4 +454,6 @@ define([
     }
 
   };
-});
+
+})();
+
