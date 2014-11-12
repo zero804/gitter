@@ -117,6 +117,11 @@ gulp.task('add-version-files', function(done) {
         git.revParse({ args: '--abbrev-ref HEAD' }, function (err, branch) {
           if(err) return done(err);
 
+          // Prefix the asset tag with an S
+          if(process.env.STAGED_ENVIRONMENT === 'true') {
+            hash = 'S' + hash;
+          }
+
           fs.writeFileSync('output/app/ASSET_TAG', hash);
           fs.writeFileSync('output/app/GIT_COMMIT', commit);
           fs.writeFileSync('output/app/VERSION', branch);
