@@ -2,7 +2,7 @@
 var $ = require('jquery');
 var Backbone = require('backbone');
 var context = require('utils/context');
-var ChatIntegratedView = require('views/app/chatIntegratedView');
+var ChatNliIntegratedView = require('views/app/chatNliIntegratedView');
 var ChatCollectionView = require('views/chat/chatCollectionView');
 var itemCollections = require('collections/instances/integrated-items');
 var RightToolbarView = require('views/righttoolbar/rightToolbarView');
@@ -12,7 +12,6 @@ var commitDecorator = require('views/chat/decorators/commitDecorator');
 var mentionDecorator = require('views/chat/decorators/mentionDecorator');
 var embedDecorator = require('views/chat/decorators/embedDecorator');
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
-var HeaderView = require('views/app/headerView');
 var peopleCollectionView = require('views/people/peopleCollectionView');
 require('views/widgets/preload');
 require('filtered-collection');
@@ -48,10 +47,10 @@ module.exports = (function() {
     window.parent.location.href = href;
   });
 
-  var appView = new ChatIntegratedView({ el: 'body' });
+  var appView = new ChatNliIntegratedView({ el: 'body' });
   new RightToolbarView({ el: "#toolbar-frame" });
 
-  new HeaderView({ model: context.troupe(), el: '#header' });
+  // new HeaderView({ model: context.troupe(), el: '#header' });
 
   new ChatCollectionView({
     el: '#chat-container',

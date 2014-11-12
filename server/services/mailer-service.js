@@ -44,14 +44,18 @@ var logEmailToLogger = nconf.get('logging:logEmailContents');
 //  headerTemplate = t;
 //});
 
-exports.sendEmail = function(options, done) {
+exports.sendEmail = function(options) {
+  var deferred = Q.defer();
+
   options.templateName = options.templateFile.replace(/\_/g,'-');
 
-  if (options.templateFile === 'added_to_room')       return addedToRoomViaMandrill(options, done);
-  if (options.templateFile === 'invitation')          return invitationViaMandrill(options, done);
-  if (options.templateFile === 'invitation-reminder') return invitationViaMandrill(options, done);
-  if (options.templateFile === 'unread_notification') return unreadViaMandrill(options, done);
-  if (options.templateFile === 'created_room')        return createdRoomViaMandrill(options, done);
+  if (options.templateFile === 'added_to_room')       addedToRoomViaMandrill(options, deferred);
+  if (options.templateFile === 'invitation')          invitationViaMandrill(options,  deferred);
+  if (options.templateFile === 'invitation-reminder') invitationViaMandrill(options,  deferred);
+  if (options.templateFile === 'unread_notification') unreadViaMandrill(options,      deferred);
+  if (options.templateFile === 'created_room')        createdRoomViaMandrill(options, deferred);
+
+  return deferred.promise;
 
 
   //var d = Q.defer();
@@ -114,10 +118,10 @@ exports.sendEmail = function(options, done) {
   //  });
   //// });
 
-  //return d.promise.nodeify(done);
+  //return d.promise.nodeify(deferred);
 };
 
-function addedToRoomViaMandrill(options, done) {
+function addedToRoomViaMandrill(options, deferred) {
 
   var vars = [
     {name: 'NAME',    content: options.data.recipientName},
@@ -128,10 +132,10 @@ function addedToRoomViaMandrill(options, done) {
     {name: 'LOGOURL', content: cdn('images/logo-text-blue-pink.png', {email: true})}
   ];
 
-  return sendMail(vars, options, done);
+  return sendMail(vars, options, deferred);
 }
 
-function invitationViaMandrill(options, done) {
+function invitationViaMandrill(options, deferred) {
 
   var vars = [
     { name: 'NAME',    content: options.data.recipientName },
@@ -142,10 +146,10 @@ function invitationViaMandrill(options, done) {
     { name: 'LOGOURL', content: cdn('images/logo-text-blue-pink.png', { email: true }) }
   ];
 
-  return sendMail(vars, options, done);
+  return sendMail(vars, options, deferred);
 }
 
-function unreadViaMandrill(options, done) {
+function unreadViaMandrill(options, deferred) {
 
   var htmlTemplateFile = "emails/" + options.templateFile + "_html";
   var plaintextTemplateFile = "emails/" + options.templateFile;
@@ -170,12 +174,12 @@ function unreadViaMandrill(options, done) {
         {name: 'PLAINTEXT',  content: plaintext}
       ];
 
-      return sendMail(vars, options, done);
+      return sendMail(vars, options, deferred);
     });
   });
 }
 
-function createdRoomViaMandrill(options, done) {
+function createdRoomViaMandrill(options, deferred) {
   var twitterSnippet = options.data.isPublic ? '<tr><td><br><a href="' + options.data.twitterUrl + '" style="text-decoration: none" target="_blank" class="button-twitter">Share on Twitter</a></td></tr>' : '';
   var orgNote = options.data.isOrg ? '<p>Note that only people within your organisation can join this room.</p>' : '';
 
@@ -191,11 +195,10 @@ function createdRoomViaMandrill(options, done) {
     {name: 'ROOMTYPE',    content: options.data.roomType}
   ];
 
-  return sendMail(vars, options, done);
+  return sendMail(vars, options, deferred);
 }
 
-function sendMail(vars, options, done) {
-  var d = Q.defer();
+function sendMail(vars, options, deferred) {
   var templateName = options.templateName;
   var tracking = options.tracking || {};
 
@@ -213,13 +216,11 @@ function sendMail(vars, options, done) {
     template_content: [],
     message:          message
   }, function() {
-    if(logEmailToLogger) winston.info('Sent email: ' + templateName + ', check Mandrill');
+    if (logEmailToLogger) winston.info('Sent email: ' + templateName + ', check Mandrill');
     stats.event(tracking.event, tracking.data);
-    d.resolve();
+    deferred.resolve();
   }, function(err) {
-    d.reject(err);
+    deferred.reject(err);
   });
-
-  return d.promise.nodeify(done);
 }
 

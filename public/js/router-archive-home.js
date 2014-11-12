@@ -53,21 +53,19 @@ module.exports = (function() {
     window.parent.location.href = href;
   });
 
-  var appView = new ChatIntegratedView({ el: 'body' });
-
   new HeaderView({ model: context.troupe(), el: '#header' });
 
-  var Router = Backbone.Router.extend({
-    routes: {
-      // TODO: get rid of the pipes
-      "": "hideModal",
-    },
+  // var Router = Backbone.Router.extend({
+  //   routes: {
+  //     // TODO: get rid of the pipes
+  //     "": "hideModal",
+  //   },
 
-    hideModal: function() {
-      appView.dialogRegion.close();
-    },
+  //   hideModal: function() {
+  //     appView.dialogRegion.close();
+  //   },
 
-  });
+  // });
 
   var troupeId = context.getTroupeId();
 
@@ -102,9 +100,9 @@ module.exports = (function() {
     }
   });
 
-  new Router();
+  // new Router();
 
-  Backbone.history.start();
+  // Backbone.history.start();
 
 })();
 
