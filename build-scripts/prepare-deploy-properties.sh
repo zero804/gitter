@@ -12,9 +12,9 @@ fi
 
 TARBALL_URL=${BUILD_URL}artifact/output/app.tar.gz 
 ASSETS_TARBALL_URL=${BUILD_URL}artifact/output/assets.tar.gz 
-GIT_COMMIT=$(cat $SCRIPT_DIR/output/app/GIT_COMMIT)
-GIT_BRANCH=$(cat $SCRIPT_DIR/output/app/GIT_BRANCH)
-TAG=$(cat $SCRIPT_DIR/output/app/ASSET_TAG)
+GIT_COMMIT=$(cat $SCRIPT_DIR/../output/app/GIT_COMMIT)
+GIT_BRANCH=$(cat $SCRIPT_DIR/../output/app/GIT_BRANCH)
+TAG=$(cat $SCRIPT_DIR/../output/app/ASSET_TAG)
 EXTRA_VARS=assets_location="${ASSETS_TARBALL_URL} tag=$TAG tarball_location=${TARBALL_URL}"
 
 cat <<EOD
