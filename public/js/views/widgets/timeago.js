@@ -1,10 +1,11 @@
-define([
-  'marionette',
-  'utils/momentWrapper',
-  'utils/context',
-  'utils/locale'
-], function(Marionette, moment, context, locale) {
-  "use strict";
+"use strict";
+var Marionette = require('marionette');
+var moment = require('utils/momentWrapper');
+var context = require('utils/context');
+var locale = require('utils/locale');
+
+module.exports = (function() {
+
 
   var maxDaysBeforeDateDisplay = 1;
 
@@ -70,4 +71,6 @@ define([
 
   });
 
-});
+
+})();
+

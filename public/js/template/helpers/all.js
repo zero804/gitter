@@ -1,9 +1,12 @@
-define([
-  'template/helpers/widget',
-  'template/helpers/cdn',
-  'template/helpers/isMobile'
-], function() {
-  "use strict";
+"use strict";
+require('template/helpers/widget');
+require('template/helpers/cdn');
+require('template/helpers/isMobile');
+
+module.exports = (function() {
+
 
   return null;
-});
+
+})();
+

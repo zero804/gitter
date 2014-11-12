@@ -1,10 +1,11 @@
-define([
-  './base',
-  'components/apiClient',
-  'backbone',
-  'cocktail'
-], function(TroupeCollections, apiClient, Backbone, cocktail) {
-  "use strict";
+"use strict";
+var TroupeCollections = require('./base');
+var apiClient = require('components/apiClient');
+var Backbone = require('backbone');
+var cocktail = require('cocktail');
+
+module.exports = (function() {
+
 
   var RepoModel = TroupeCollections.Model.extend({
     idAttribute: 'id'
@@ -28,4 +29,6 @@ define([
     ReposCollection: ReposCollection,
     RepoModel:       RepoModel
   };
-});
+
+})();
+

@@ -1,8 +1,8 @@
-define([
-  'underscore'
-], function (_) {
+'use strict';
+var _ = require('underscore');
 
-  'use strict';
+module.exports = (function() {
+
 
   /** TODO: would be great if we had an explanation for a slow and fast debounce?
    * function() creates closure for debouncer
@@ -44,4 +44,6 @@ define([
       // }
     };
   };
-});
+
+})();
+

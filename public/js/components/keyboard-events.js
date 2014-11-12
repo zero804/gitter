@@ -1,10 +1,11 @@
-require([
-  'utils/appevents',
-  'utils/platform-keys',
-  'underscore',
-  'keymaster'
-], function(appEvents, platformKeys, _, key) {
-  "use strict";
+"use strict";
+var appEvents = require('utils/appevents');
+var platformKeys = require('utils/platform-keys');
+var _ = require('underscore');
+var key = require('keymaster');
+
+module.exports = (function() {
+
 
   // Attach keyboard events listeners as specified by the keymaster library
   // They will we emitted to appEvents with the `keyboard.` prefix
@@ -183,4 +184,6 @@ require([
     }
   });
 
-});
+
+})();
+

@@ -1,16 +1,17 @@
-define([
-  'jquery',
-  'underscore',
-  'log!chat-collection-view',
-  'marionette',
-  'views/base',
-  'utils/appevents',
-  './chatItemView',
-  'utils/rollers',
-  'cocktail',
-  'views/behaviors/infinite-scroll' //No ref
-], function($, _, log, Marionette, TroupeViews, appEvents, chatItemView, Rollers, cocktail) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var _ = require('underscore');
+var log = require('utils/log');
+var Marionette = require('marionette');
+var TroupeViews = require('views/base');
+var appEvents = require('utils/appevents');
+var chatItemView = require('./chatItemView');
+var Rollers = require('utils/rollers');
+var cocktail = require('cocktail');
+require('views/behaviors/infinite-scroll');
+
+module.exports = (function() {
+
 
   /** @const */
   var PAGE_SIZE = 20;
@@ -262,4 +263,6 @@ define([
   cocktail.mixin(ChatCollectionView, TroupeViews.SortableMarionetteView);
 
   return ChatCollectionView;
-});
+
+})();
+

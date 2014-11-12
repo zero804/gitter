@@ -1,11 +1,12 @@
+"use strict";
 
-define([
-  'marionette',
-  'hbs!./tmpl/home-org-view',
-  'hbs!./tmpl/homeOrgListItem',
-  'utils/appevents'
-], function(Marionette, orgTemplate, orgListItemTemplate, appEvents) {
-  "use strict";
+var Marionette = require('marionette');
+var orgTemplate = require('./tmpl/home-org-view.hbs');
+var orgListItemTemplate = require('./tmpl/homeOrgListItem.hbs');
+var appEvents = require('utils/appevents');
+
+module.exports = (function() {
+
 
   var OrgItemView = Marionette.ItemView.extend({
     tagName: 'li',
@@ -49,4 +50,6 @@ define([
     }
   });
 
-});
+
+})();
+

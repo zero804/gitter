@@ -1,22 +1,24 @@
-define([
-  'utils/context',
-  'underscore',
-  'jquery',
-  'backbone',
-  'marionette',
-  'utils/log',
-  'utils/tracking',
-  'log!core',
-  'backbone.wreqr',
-  'backbone.babysitter',
-  'raven',
-  'keymaster',
-  // The following libraries need to be removed once we've figured out how
-  'handlebars',
-  'hbs',
-  'views/base'
-], function() {
-  "use strict";
+"use strict";
+require('utils/context');
+require('underscore');
+require('jquery');
+require('backbone');
+require('marionette');
+require('utils/log');
+require('utils/tracking');
+require('utils/log');
+require('backbone.wreqr');
+require('backbone.babysitter');
+require('raven');
+require('keymaster');
+require('handlebars/runtime');
+require('hbs');
+require('views/base');
+
+module.exports = (function() {
+
 
   return null;
-});
+
+})();
+

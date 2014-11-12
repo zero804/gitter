@@ -1,33 +1,26 @@
-require([
-  'jquery',
-  'backbone',
-  'utils/context',
-  'views/app/chatIntegratedView',
-  'views/chat/chatCollectionView',
-  'collections/instances/integrated-items',
-  'views/righttoolbar/rightToolbarView',
+"use strict";
+var $ = require('jquery');
+var Backbone = require('backbone');
+var context = require('utils/context');
+var ChatNliIntegratedView = require('views/app/chatNliIntegratedView');
+var ChatCollectionView = require('views/chat/chatCollectionView');
+var itemCollections = require('collections/instances/integrated-items');
+var RightToolbarView = require('views/righttoolbar/rightToolbarView');
+var webhookDecorator = require('views/chat/decorators/webhookDecorator');
+var issueDecorator = require('views/chat/decorators/issueDecorator');
+var commitDecorator = require('views/chat/decorators/commitDecorator');
+var mentionDecorator = require('views/chat/decorators/mentionDecorator');
+var embedDecorator = require('views/chat/decorators/embedDecorator');
+var emojiDecorator = require('views/chat/decorators/emojiDecorator');
+var peopleCollectionView = require('views/people/peopleCollectionView');
+require('views/widgets/preload');
+require('filtered-collection');
+require('components/dozy');
+require('template/helpers/all');
+require('components/bug-reporting');
 
-  'views/chat/decorators/webhookDecorator',
-  'views/chat/decorators/issueDecorator',
-  'views/chat/decorators/commitDecorator',
-  'views/chat/decorators/mentionDecorator',
-  'views/chat/decorators/embedDecorator',
-  'views/chat/decorators/emojiDecorator',
-  'views/app/headerView',
+module.exports = (function() {
 
-  'views/people/peopleCollectionView',
-
-  'views/widgets/preload',      // No ref
-  'filtered-collection',        // No ref
-  'components/dozy',            // Sleep detection No ref
-  'template/helpers/all',       // No ref
-  'components/bug-reporting'    // No ref
-], function($, Backbone, context,
-    ChatIntegratedView,
-    ChatCollectionView, itemCollections, RightToolbarView,
-    webhookDecorator, issueDecorator, commitDecorator, mentionDecorator,
-    embedDecorator, emojiDecorator, HeaderView, peopleCollectionView) {
-  "use strict";
 
   $(document).on("click", "a", function(e) {
     if(this.href) {
@@ -54,10 +47,10 @@ require([
     window.parent.location.href = href;
   });
 
-  var appView = new ChatIntegratedView({ el: 'body' });
+  var appView = new ChatNliIntegratedView({ el: 'body' });
   new RightToolbarView({ el: "#toolbar-frame" });
 
-  new HeaderView({ model: context.troupe(), el: '#header' });
+  // new HeaderView({ model: context.troupe(), el: '#header' });
 
   new ChatCollectionView({
     el: '#chat-container',
@@ -97,4 +90,6 @@ require([
   // liveContext.syncRoom();
 
   Backbone.history.start();
-});
+
+})();
+

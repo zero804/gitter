@@ -1,6 +1,8 @@
-define([
-], function () {
-  "use strict";
+"use strict";
+
+
+module.exports = (function() {
+
 
   // Some innovative scrollbar measuring stuff
   function detect() {
@@ -30,4 +32,6 @@ define([
   };
 
 
-});
+
+})();
+
