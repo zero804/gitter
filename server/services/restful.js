@@ -59,9 +59,11 @@ exports.serializeChatsForTroupe = function(troupeId, userId, options, callback) 
 
 };
 
-exports.serializeUsersForTroupe = function(troupeId, userId, callback) {
+exports.serializeUsersForTroupe = function(troupeId, userId, options, callback) {
+  console.time('serializeUsersForTroupe');
   return troupeService.findUserIdsForTroupe(troupeId)
-    .then(function(userIds) {
+    .then(function (userIds) {
+
       var strategy = new restSerializer.UserIdStrategy({
         showPresenceForTroupeId: troupeId,
         includeRolesForTroupeId: troupeId,
