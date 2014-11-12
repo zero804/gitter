@@ -1,7 +1,7 @@
 "use strict";
 var $ = require('jquery');
 var appEvents = require('utils/appevents');
-var tracking = require('utils/tracking');
+require('utils/tracking');
 
 module.exports = (function() {
 
@@ -26,15 +26,15 @@ module.exports = (function() {
     });
   });
 
-  $(ui.tile).on('click', function (e) {
+  $(ui.tile).on('click', function () {
     appEvents.trigger('track-event', 'explore_room_click');
   });
 
-  $(ui.createNew).on('click', function (e) {
+  $(ui.createNew).on('click', function () {
     appEvents.trigger('track-event', 'explore_room_createNew');
   });
 
-  $(ui.findOut).on('click', function (e) {
+  $(ui.findOut).on('click', function () {
     appEvents.trigger('track-event', 'explore_room_about');
   });
 

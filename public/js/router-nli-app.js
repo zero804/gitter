@@ -90,7 +90,7 @@ module.exports = (function() {
     var message;
     try {
       message = JSON.parse(e.data);
-    } catch(e) {
+    } catch(err) {
       return; // Ignore non-json from extensions
     }
 

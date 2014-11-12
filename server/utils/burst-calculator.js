@@ -1,12 +1,14 @@
+'use strict';
+
 /**
  * setBurstFinal() sets the final burst class for the previous chat item once a new burst happens
  *
- * chatItem `Object` chat-item to be set as burst final 
+ * chatItem `Object` chat-item to be set as burst final
  * void
  */
 var setBurstFinal = function (chatItem) {
   chatItem.burstFinal = true;
-}
+};
 
 /**
   * IMPORTANT: this version differs from client-side calculateBursts() due to backbone access methods!
@@ -22,7 +24,7 @@ var calculateBursts = function (chats) {
 
   var burstUser,
       burstStart;
-  
+
   chats.forEach(function (chat, index) {
 
     var newUser = chat.fromUser && chat.fromUser.username;
@@ -43,7 +45,7 @@ var calculateBursts = function (chats) {
       chat.burstStart = true;
       if (index !== 0) setBurstFinal(chats[index - 1]);
       return;
-    } 
+    }
 
     // get the duration since last burst
     var durationSinceBurstStart = new Date(newSentTime) - new Date(burstStart);
@@ -62,6 +64,6 @@ var calculateBursts = function (chats) {
   });
   return chats;
   // console.timeEnd('calculateBursts');
-}
+};
 
 module.exports = calculateBursts;

@@ -181,7 +181,7 @@ module.exports = (function() {
         add: ('add' in options) ? options.add : true,
         merge: ('merge' in options) ? options.merge : true,
         data: data,
-        success: function(collection, response, options) {
+        success: function(collection, response) {
           delete self._isFetching;
 
           var responseIds = response.map(utils.idTransform);

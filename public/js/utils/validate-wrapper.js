@@ -1,5 +1,6 @@
 "use strict";
 require('jquery-validate');
+var $ = require('jquery');
 
 module.exports = (function() {
 
