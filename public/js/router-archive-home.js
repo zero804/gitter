@@ -1,8 +1,6 @@
 require([
   'jquery',
-  'backbone',
   'utils/context',
-  'views/app/chatIntegratedView',
   'views/app/headerView',
   'components/apiClient',
   'cal-heatmap',
@@ -12,9 +10,7 @@ require([
   'components/dozy',            // Sleep detection No ref
   'template/helpers/all',       // No ref
   'components/bug-reporting'    // No ref
-], function($, Backbone, context,
-    ChatIntegratedView,
-    HeaderView, apiClient, CalHeatMap) {
+], function($, context, HeaderView, apiClient, CalHeatMap) {
   "use strict";
 
   $(document).on("click", "a", function(e) {
@@ -55,21 +51,19 @@ require([
     window.parent.location.href = href;
   });
 
-  var appView = new ChatIntegratedView({ el: 'body' });
-
   new HeaderView({ model: context.troupe(), el: '#header' });
 
-  var Router = Backbone.Router.extend({
-    routes: {
-      // TODO: get rid of the pipes
-      "": "hideModal",
-    },
+  // var Router = Backbone.Router.extend({
+  //   routes: {
+  //     // TODO: get rid of the pipes
+  //     "": "hideModal",
+  //   },
 
-    hideModal: function() {
-      appView.dialogRegion.close();
-    },
+  //   hideModal: function() {
+  //     appView.dialogRegion.close();
+  //   },
 
-  });
+  // });
 
   var troupeId = context.getTroupeId();
 
@@ -104,7 +98,7 @@ require([
     }
   });
 
-  new Router();
+  // new Router();
 
-  Backbone.history.start();
+  // Backbone.history.start();
 });

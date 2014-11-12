@@ -41,7 +41,6 @@ define([
     template: noRoomResultsTemplate
   });
 
-
   var ResultItemView = Marionette.ItemView.extend({
 
     events: {
@@ -61,10 +60,9 @@ define([
       this.toggleSelected();
     },
 
-    toggleSelected: function() {
+    toggleSelected: function () {
       var selected = this.model.get('selected');
       this.$el.toggleClass('selected', !!selected);
-      if (selected) { /* FIXME longer lists, do we need to scroll m into view?; */ }
     },
 
     handleSelect: function () {
@@ -85,7 +83,7 @@ define([
     },
 
     selectItem: function () {
-      if(this.model.get('exists')) {
+      if (this.model.get('exists')) {
         appEvents.trigger('navigation', this.model.get('url'), 'chat', this.model.get('uri'), null);
       } else {
         parent.location.hash = '#confirm/' + this.model.get('uri');
@@ -116,8 +114,9 @@ define([
         orgName: orgName
       };
     },
+
     selectItem: function () {
-      // Do nothing for now.
+      // FIXME: Do nothing for now.
     }
   });
 
@@ -158,7 +157,7 @@ define([
 
     emptyView: EmptyRoomResultsView,
 
-    initialize: function() {
+    initialize: function (/*options*/) {
       var target = document.querySelector("#toolbar-content");
       this.rollers = new Rollers(target, this.el, { doNotTrack: true });
     },
@@ -173,19 +172,20 @@ define([
 
     initialize: function() {
       var target = document.querySelector("#toolbar-content");
-      this.rollers = new Rollers(target, this.el, {doNotTrack: true});
+      this.rollers = new Rollers(target, this.el, { doNotTrack: true });
     },
 
-    getItemView: function(item) {
-      if(item.get('limitReached')) {
+    getItemView: function (item) {
+
+      if (item.get('limitReached')) {
         return UpgradeView;
       }
 
       return MessageResultItemView;
     },
 
-    scrollTo: function(v) {
-      this.rollers.scrollToElement(v.el, {centre: true});
+    scrollTo: function (v) {
+      this.rollers.scrollToElement(v.el, { centre: true });
     }
   });
 
@@ -194,13 +194,11 @@ define([
 
     initialize: function (options) {
       this.collection = options.collection;
-      // this ensures the first result is selected
-      this.listenTo(this.collection, 'add remove reset sync', this.reset);
+      this.listenTo(this.collection, 'add remove reset sync', this.reset); // bring cursor to top on every change to the collection
     },
 
     // unselects old and selects new
     swap: function (model) {
-
       if (!model) return;
       if (this.selected) this.selected.set('selected', false);
       model.set('selected', true);
@@ -208,13 +206,15 @@ define([
     },
 
     next: function () {
-      var index = this.collection.indexOf(this.selected);
-      if (index < this.collection.length - 1) this.swap(this.collection.at(index + 1 ));
+      var collection = this.collection;
+      var index = collection.indexOf(this.selected);
+      if (index < collection.length - 1) this.swap(collection.at(index + 1 ));
     },
 
     prev: function () {
-      var index = this.collection.indexOf(this.selected);
-      if (index > 0) this.swap(this.collection.at(index - 1));
+      var collection = this.collection;
+      var index = collection.indexOf(this.selected);
+      if (index > 0) this.swap(collection.at(index - 1));
     },
 
     current: function () {
@@ -222,8 +222,163 @@ define([
     },
 
     reset: function () {
-      // //debug('NavigationController:reset() ====================');
       this.swap(this.collection.at(0));
+    }
+  });
+
+  var SearchController = Marionette.Controller.extend({
+
+    initialize: function () {
+      this.cache = new Backbone.Collection([]);
+      this.messages = new ChatSearchModels.ChatSearchCollection([], { });
+      this.cache.comparator = function (item) {
+        return -(item.get('boost') + Date.parse(item.get('lastAccessTime')).toString());
+      };
+    },
+
+    fetchLocalRooms: function () {
+      var p = $.Deferred();
+      appEvents.triggerParent('troupeRequest', { }); // request troupe from parent frame
+      appEvents.once('troupesResponse', p.resolve);
+      return p;
+    },
+
+    fetchMessages: function (args) {
+      var p = $.Deferred();
+      var messages = this.messages;
+      var query = args.query;
+
+      messages.reset(); // we must clear the collection before fetching more
+      messages.fetchSearch(query, function () {
+        var results = messages.models
+          .map(function (item) {
+            item.set('priority', 3); // this ensures that messages are added at the bottom
+            return item;
+          });
+
+        try {
+          this.trigger('loaded:messages', results, query);
+          p.resolve();
+        } catch (e) {
+          p.reject(e);
+        }
+      }.bind(this));
+
+      return p;
+    },
+
+    fetchRooms: function (args) {
+      var p = $.Deferred();
+      var query = args.query;
+      var limit = typeof args.limit === 'undefined' ? 3 : args.limit;
+
+      var users = apiClient.get('/v1/user', { q: query, limit: limit, type: 'gitter' });
+      var repos = apiClient.user.get('/repos', { q: query, limit: limit });
+      var publicRepos = apiClient.get('/v1/rooms', { q: query, limit: limit });
+
+      $.when(users, repos, publicRepos)
+        .done(function (users, repos, publicRepos) {
+          // assuring that object are uniform since repos have a boolean (exists)
+          users[0].results.map(function (i) { i.exists = true; });
+          publicRepos[0].results.map(function (i) { i.exists = true; });
+
+          var results = [users, repos, publicRepos]
+            .map(function (data) { return data[0].results; })
+            .reduce(function (fold, arr) { return fold.concat(arr); }, [])
+            .map(function (r) {
+              if (!r) return;
+              if (r.room) r.id = r.room.id; // use the room id as model id for repos
+              r.url = r.url || '/' + r.uri;
+              r.priority = 1;
+              r.query = query;
+              return new Backbone.Model(r);
+            })
+            .filter(this.notCurrentRoom);
+
+          try {
+            this.trigger('loaded:rooms', results, query);
+            p.resolve(results);
+          } catch (e) {
+            p.reject(e);
+          }
+        }.bind(this));
+
+      return p;
+    },
+
+    notCurrentRoom: function (room) {
+      return room.id !== context.getTroupeId();
+    },
+
+    formatRooms: function (rooms) {
+      return rooms.filter(this.notCurrentRoom)
+        .map(function (room) {
+          room.exists = true;
+          room.priority = room.githubType.match(/^ORG$/) ? 0 : 1;
+          room.boost    = room.githubType.match(/^ORG$/) ? 1 : 0;
+          return room;
+        });
+    },
+
+    cacheRooms: function (rooms) {
+      var cache = this.cache;
+      cache.set(this.formatRooms(rooms));
+      return $.Deferred().resolve(cache);
+    },
+
+    clearCache: function () {
+      this.cache.reset();
+      this.trigger('cache:clear', {});
+    },
+
+    getLocalRooms: function () {
+      var p = $.Deferred();
+      var cache = this.cache;
+
+      if (_.isEmpty(cache.models)) {
+        this.fetchLocalRooms()
+          .then(this.cacheRooms.bind(this))
+          .then(p.resolve);
+      } else {
+        p.resolve(cache);
+      }
+
+      return p;
+    },
+
+    local: function (query) {
+      var p = $.Deferred();
+
+      if (!query) {
+        return p.resolve(); // to avoid fetching empty queries
+      }
+
+      this.getLocalRooms()
+        .then(function (rooms) {
+          var filter = textFilter({ query: query, fields: ['url', 'name'] });
+          rooms = rooms.filter(filter).slice(0, 3).map(function (item) {
+            item.set('query', query);
+            return item;
+          }); // show the top 3 results only
+
+          this.trigger('loaded:rooms', rooms, query);
+          p.resolve();
+        }.bind(this));
+      return p;
+    },
+
+    remote: function (query) {
+      var p = $.Deferred();
+
+      if (!query) {
+        return p.resolve(); // to avoid fetching empty queries
+      }
+
+      $.when(
+        this.fetchMessages({ query: query }),
+        this.fetchRooms({ query: query })
+      ).done(p.resolve);
+      return p;
     }
   });
 
@@ -253,21 +408,16 @@ define([
       'search.go': 'handleGo'
     },
 
-    // FIXME this redundant reference is a little strange?
+    // FIXME this redundant reference is a little strange??
     events: {
       'click .js-activate-search': 'activate',
-      'click @ui.clearIcon' : 'clearSearch',
+      'click @ui.clearIcon' : 'clearSearchTerm',
       'click @ui.input': 'activate',
       'cut @ui.input': 'handleChange',
       'paste @ui.input': 'handleChange',
       'change @ui.input': 'handleChange',
       'input @ui.input': 'handleChange'
     },
-
-    onRender: function() {
-    },
-
-
 
     serializeData: function() {
       return {
@@ -277,27 +427,16 @@ define([
     },
 
     initialize: function () {
-      var debouncedRun = _.debounce(this.run.bind(this), 100);
+      var debouncedRun = _.debounce(this.run.bind(this), 150);
 
-      this.model = new Backbone.Model({ searchTerm: '', active: false, fetchingCount: 0 });
+      this.model = new Backbone.Model({ searchTerm: '', active: false, isLoading: false });
 
-      this.listenTo(this.model, 'change:fetchingCount', function (m, count) {
-        var isFetching = (count !== 0);
-        if (!isFetching) {
-          // loaded
-          this.ui.searchIcon.toggleClass('fetching', isFetching);
-        } else {
-          // still fetching
-          this.ui.searchIcon.toggleClass('fetching', isFetching);
-        }
+      this.listenTo(this.model, 'change:isLoading', function (m, loading) {
+        this.ui.searchIcon.toggleClass('fetching', loading);
       });
 
       this.listenTo(this.model, 'change:searchTerm', function () {
-        if (this.isEmpty()) {
-          this.hide();
-        } else {
-          debouncedRun();
-        }
+        debouncedRun();
       }.bind(this));
 
       this.listenTo(this.model, 'change:active', function (m, active) {
@@ -305,68 +444,84 @@ define([
       });
 
       // master collection to enable easier navigation
-      this.collection = new Backbone.Collection([]);
-      this.collection.comparator = 'priority';
+      var masterCollection = new Backbone.Collection([]);
+      masterCollection.comparator = 'priority';
 
       // filtered collections
-      var rooms = new Backbone.FilteredCollection(null, { model: Backbone.Model, collection: this.collection });
-      var chats = new Backbone.FilteredCollection(null, { model: Backbone.Model, collection: this.collection });
+      this.rooms = new Backbone.FilteredCollection(null, { model: Backbone.Model, collection: masterCollection });
+      this.chats = new Backbone.FilteredCollection(null, { model: Backbone.Model, collection: masterCollection });
 
-      rooms.setFilter(function (model) {
+      this.rooms.setFilter(function (model) {
         return !!model.get('url');
       });
 
-      chats.setFilter(function (model) {
+      this.chats.setFilter(function (model) {
         return !!model.get('text');
       });
 
-      this.localRoomsCache = null;
-      this.rooms = rooms;
-      this.chats = chats;
+      // making navigation and filtered collections accessible
+      this.navigation = new NavigationController({ collection: masterCollection });
+      this.search = new SearchController({});
 
-      // making navigation and filtered collections  accessible
-      this.navigation = new NavigationController({ collection: this.collection });
+      this.listenTo(this.search, 'cache:clear', function () {
+        masterCollection.reset();
+      }.bind(this));
+
+      this.listenTo(this.search, 'loaded:rooms', function (data) {
+        var toRemove = this.rooms.models.filter(function (item) {
+          return item.get('query') !== this.model.get('searchTerm');
+        }.bind(this));
+        masterCollection.remove(toRemove);
+        masterCollection.add(data);
+        this.rooms.resetWith(masterCollection);
+      }.bind(this));
+
+      this.listenTo(this.search, 'loaded:messages', function (data) {
+        masterCollection.remove(this.chats.models); // we must remove the old chats before adding new ones
+        this.chats.resetWith(masterCollection);
+        masterCollection.add(data);
+      }.bind(this));
 
       // initialize the views
-      this.localRoomsView = new RoomsCollectionView({ collection: rooms });
-      this.serverMessagesView = new MessagesCollectionView({ collection: chats });
-      this.debouncedLocalSearch =  _.debounce(this.localSearch.bind(this), 100);
-      this.debouncedRemoteSearch = _.debounce(this.remoteSearch.bind(this), 300);
+      this.roomsView = new RoomsCollectionView({ collection: this.rooms });
+      this.messagesView = new MessagesCollectionView({ collection: this.chats });
     },
 
     isActive: function () {
       return this.model.get('active');
     },
 
-    isEmpty: function () {
-      return !this.model.get('searchTerm');
+    isSearchTermEmpty: function () {
+      return _.isEmpty(this.model.get('searchTerm'));
     },
 
-    // completes hides and clears search state
+    clearSearchTerm: function () {
+      this.hide();
+      this.ui.input.val('');
+      this.ui.input.focus();
+    },
+
+    // hides and clears search component's state
     dismiss: function () {
       var model = this.model;
-
+      this.hide();
       this.triggerMethod('search:collapse');
-      appEvents.triggerParent('menu:show'); // hide menu
-      appEvents.trigger('chatCollectionView:clearHighlight'); // remove highlights;
+
+      appEvents.triggerParent('menu:show'); // show menu
+      appEvents.trigger('chatCollectionView:clearHighlight'); // remove highlights
 
       model.set('active', false);
       model.set('searchTerm', '');
 
       this.ui.input.val(function () { return ''; });
-      this.hide();
     },
 
     activate: function () {
-
       var model = this.model;
       model.set('active', true);
-
-      var innerWidth = window.innerWidth;
-
       this.triggerMethod('search:expand');
 
-      if (innerWidth < 880) {
+      if (window.innerWidth < 880) {
         appEvents.triggerParent('menu:hide'); // hide menu
       }
 
@@ -382,214 +537,65 @@ define([
     hide: function () {
       this.triggerMethod('search:hide');
       this.ui.results.hide();
-      this.collection.reset();
-      this.clearLocalRooms();
+      this.search.clearCache();
     },
 
     run: function (/*model, searchTerm*/) {
-      if (!this.localRoomsCache) this.getLocalRooms();
-      this.debouncedLocalSearch();
-      this.debouncedRemoteSearch();
+      var searchTerm = this.model.get('searchTerm');
+
+      if (this.isSearchTermEmpty()) return this.hide();
+      this.model.set('isLoading', true);
+      $.when(
+          this.search.local(searchTerm),
+          this.search.remote(searchTerm)
+        )
+        .done(function () {
+          this.model.set('isLoading', false);
+        }.bind(this))
+        .fail(function () {
+          this.model.set('isLoading', false);
+        });
+
       this.showResults();
-      this.triggerMethod('search:show');
-    },
-
-    incrementFetchingCount: function () {
-      var m = this.model;
-      var count = m.get('fetchingCount');
-      m.set('fetchingCount', count + 1);
-    },
-
-    decrementFetchingCount: function () {
-      var m = this.model;
-      var count = m.get('fetchingCount');
-      m.set('fetchingCount', count - 1);
-    },
-
-    /*
-     * filteredCollection - the collection we are updating
-     * newModels          - the new models to be added
-     * options            - same options as Backbone.Collection.add
-     */
-    refreshCollection: function (filteredCollection, newModels, options) {
-      var getId = function (item) { return item.id };
-
-      // if the new models are the same as the current filtered collection avoids flickering by returning
-      if (_.isEqual(newModels.map(getId), filteredCollection.map(getId))) return;
-      if (this.searchTermOutdated(options.query)) { return; }
-
-      options = options || {};
-      var collection = this.collection;
-
-      if (options.nonDestructive) {
-        var all = filteredCollection.models.concat(newModels);
-        newModels = _.uniq(all, false, function (r) { return r.get('url'); });
-        delete options.nonDestructive; // remove it from our options object
-      }
-
-      collection.remove(filteredCollection.models);
-      collection.add(newModels, options);
-      filteredCollection.resetWith(collection);
-    },
-
-    // may need some thought in the future
-    clearLocalRooms: function () {
-      this.localRoomsCache = null;
-    },
-
-    // handles the response from the parent frame containing local rooms
-    cacheLocalRooms: function (rooms) {
-      var collection = new Backbone.Collection();
-
-      var filtered = rooms.filter(function (room) {
-          return room.id !== context.getTroupeId();
-        })
-        .map(function (room) {
-          room.exists = true;
-          room.priority = room.githubType.match(/^ORG$/) ? 0 : 1;
-          room.boost    = room.githubType.match(/^ORG$/) ? 1 : 0;
-          return room;
-        });
-
-      collection.comparator = function(item) {
-        return -(item.get('boost') + Date.parse(item.get('lastAccessTime')).toString());
-      };
-
-      collection.add(filtered);
-
-      this.localRoomsCache = collection;
-    },
-
-    // FIXME: this should probably return a promise...
-    // responsible for handling local rooms cache
-    getLocalRooms: function () {
-      // request troupe from parent frame
-      appEvents.triggerParent('troupeRequest', { });
-      // once the response comes back lets cache it!
-      appEvents.once('troupesResponse', this.cacheLocalRooms.bind(this));
-    },
-
-    localSearch: function () {
-      var query = this.model.get('searchTerm');
-      // the count for local search has already been incremented on run()
-      var collection = this.localRoomsCache || [];
-      var filter = textFilter({ query: query, fields: ['url', 'name'] });
-      var results = collection.filter(filter);
-
-      // show the top 3 results only
-      results = results.slice(0, 3);
-
-      try {
-        this.refreshCollection(this.rooms, results, { at: this.collection.length, merge: true, query: query });
-      } catch (e) {
-        log(new Error('Could not perform local search.').stack);
-        this.getLocalRooms(); // try and replace the cache
-      }
-    },
-
-    remoteSearch: function() {
-      this.model.set('fetchingCount', 0); // TODO: this could save our asses?
-      var query = this.model.get('searchTerm');
-      if (!query) return; // to avoid fetching empty queries
-
-      // Find messages on ElasticSearch
-      var chatSearchCollection = new ChatSearchModels.ChatSearchCollection([], { });
-      this.incrementFetchingCount();
-      chatSearchCollection.fetchSearch(query, function () {
-        var results = chatSearchCollection.models.map(function (item) {
-          item.set('priority', 3);
-          return item;
-        });
-
-        try {
-          this.refreshCollection(this.chats, results, { query: query });
-        } catch (e) {
-          log(new Error('Could not perform remote search.').stack);
-        } finally {
-          this.decrementFetchingCount();
-        }
-      }.bind(this), this);
-
-      // Find users, repos and channels on the server
-      var self = this;
-      var limit = 3;
-
-      this.incrementFetchingCount();
-      var users = apiClient.get('/v1/user',                     { q: query, limit: limit, type: 'gitter' });
-      var repos = apiClient.user.get('/repos',                  { q: query, limit: limit});
-      var publicRepos = apiClient.get('/v1/rooms',              { q: query, limit: limit});
-
-      // TODO: u, r, pr. WTF!? Change the names at some point.
-      $.when(users, repos, publicRepos)
-        .done(function (u, r, pr) {
-
-          u[0].results.map(function(i) { i.exists = true; });
-          pr[0].results.map(function(i) { i.exists = true; });
-
-          var results =  [u, r, pr]
-            .map(function (data) { return data[0].results; })
-            .reduce(function (fold, arr) { return fold.concat(arr); }, []);
-
-          var _results = results.map(function (r) {
-            if (!r) return;
-            if (r.room) r.id = r.room.id; // use the room id as model id for repos
-            r.url = r.url || '/' + r.uri;
-            r.priority = 1;
-            return new Backbone.Model(r);
-          });
-          self.decrementFetchingCount();
-          self.refreshCollection(self.rooms, _.compact(_results), { nonDestructive: true, query: query });
-        });
+      this.triggerMethod('search:show'); // hide top toolbar content
     },
 
     showResults: function () {
       this.ui.results.show();
-      this.roomsRegion.show(this.localRoomsView); // local rooms
-      this.messagesRegion.show(this.serverMessagesView); // server chat messages
-    },
-
-    clearSearch: function () {
-      // this could probably be done in a more elgant way - sorry MB
-      this.hide();
-      this.ui.input.val('');
-      this.ui.input.focus();
-    },
-
-    // compares the query term when a request started to the current state
-    searchTermOutdated: function (query) {
-      // assumes that if no query argument is passed in, or is empty then the searchTerm is not outdate
-      if (!query) return false;
-      return query !== this.model.get('searchTerm');
+      this.roomsRegion.show(this.roomsView); // local rooms
+      this.messagesRegion.show(this.messagesView); // server chat messages
     },
 
     handleChange: function (e) {
+      e.preventDefault();
       this.model.set('searchTerm', e.target.value.trim());
     },
 
     handlePrev: function (e) {
       e.preventDefault();
-      if (this.isEmpty()) return;
+      if (this.isSearchTermEmpty()) return;
       this.navigation.prev();
       this.scroll();
     },
 
-    handleNext: function () {
-      if (this.isEmpty()) return;
+    handleNext: function (e) {
+      e.preventDefault();
+      if (this.isSearchTermEmpty()) return;
       this.navigation.next();
       this.scroll();
     },
 
-    scroll: function() {
-      var mv = this.serverMessagesView.children.findByModel(this.navigation.current());
-      if (mv) this.serverMessagesView.scrollTo(mv);
-      var rv = this.localRoomsView.children.findByModel(this.navigation.current());
-      if (rv) this.localRoomsView.scrollTo(rv);
-    },
-
     handleGo: function () {
-      if (this.isEmpty()) return;
+      if (this.isSearchTermEmpty()) return;
       var item = this.navigation.current();
       if (item) item.trigger('select');
+    },
+
+    scroll: function() {
+      var mv = this.messagesView.children.findByModel(this.navigation.current());
+      if (mv) this.messagesView.scrollTo(mv);
+      var rv = this.roomsView.children.findByModel(this.navigation.current());
+      if (rv) this.roomsView.scrollTo(rv);
     }
   });
 
