@@ -5,6 +5,7 @@ var context = require('utils/context');
 var template = require('./tmpl/avatar.hbs');
 var UserPopoverView = require('views/people/userPopoverView');
 var widgets = require('views/behaviors/widgets');
+var resolveAvatarUrl = require('utils/resolve-avatar-url');
 require('bootstrap_tooltip');
 
 module.exports = (function() {
@@ -119,13 +120,7 @@ module.exports = (function() {
 
       var user = this.model ? this.model.toJSON() : this.user;
 
-      var avatarUrl;
-
-      if (this.avatarSize == 'm') {
-        avatarUrl = user.avatarUrlMedium || '/images/avatar-default-m.png';
-      } else {
-        avatarUrl = user.avatarUrlSmall || '/images/avatar-default-s.png';
-      }
+      var avatarUrl = resolveAvatarUrl({ username: user.username, size: (this.avatarSize == 'm' ? 60 : 30) });
 
       var online = user.id === currentUserId || !!user.online; // only the people view tries to show avatar status so there is a model object, it won't necessarily work in other cases
 
