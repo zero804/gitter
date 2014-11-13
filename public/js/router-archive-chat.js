@@ -9,6 +9,7 @@ require('filtered-collection');
 require('components/dozy');
 require('template/helpers/all');
 require('components/bug-reporting');
+require('utils/tracking');
 
 // Preload widgets
 require('views/widgets/avatar');
@@ -25,10 +26,8 @@ module.exports = (function() {
         window.location = href;
       }
     }
-
     return true;
   });
-
 
   // When a user clicks an internal link, prevent it from opening in a new window
   $(document).on("click", "a.link", function(e) {
