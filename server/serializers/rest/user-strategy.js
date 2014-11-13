@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var troupeService     = require("../../services/troupe-service");
@@ -177,8 +176,6 @@ function UserStrategy(options) {
         'private_repo': user.hasGitHubScope('repo')
       };
     }
-
-    console.log('lean:', lean);
 
     if (lean) {
       return {
