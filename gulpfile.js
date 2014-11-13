@@ -296,5 +296,5 @@ gulp.task('default', ['test', 'package']);
  */
 gulp.task('watch', ['css'], function() {
   livereload.listen();
-  gulp.watch('public/less/**/*.less', ['css']).on('change', livereload.changed);
+  gulp.watch('public/**/*.less', ['css']).on('change', livereload.changed);
 });
