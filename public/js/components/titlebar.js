@@ -1,16 +1,18 @@
 "use strict";
 var $ = require('jquery');
 var appEvents = require('utils/appevents');
+var cdn = require('../utils/cdn');
 
 module.exports = (function() {
-
+  var faviconUnread = cdn('images/favicon-unread.ico');
+  var faviconRead = cdn('images/favicon-read.ico');
 
   function updateLeftMenuBadge(unreadCount) {
     $('.unread-count').text(unreadCount);
   }
 
   function updateFavicon(unreadCount) {
-    var image = (unreadCount > 0) ? '/images/favicon-unread.ico' : '/images/favicon-read.ico';
+    var image = (unreadCount > 0) ? faviconUnread : faviconRead;
     $('#favicon').attr('href', image);
   }
 
