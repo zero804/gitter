@@ -49,7 +49,7 @@ function chunkUsersIntoWeeks(users) {
     day = thisDate.getDate();
     month = thisDate.getMonth()+1;
     year = thisDate.getFullYear();
-    print(month + "/" + day + "/" + year + "," + counter);
+    print(day + "/" + month + "/" + year + "," + counter);
   }
   // printjson(chunks);
 }
