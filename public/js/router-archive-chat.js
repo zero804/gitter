@@ -17,7 +17,6 @@ require('views/widgets/timeago');
 
 module.exports = (function() {
 
-
   $(document).on("click", "a", function(e) {
     if(this.href) {
       var href = $(this).attr('href');
