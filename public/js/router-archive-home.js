@@ -11,9 +11,9 @@ require('filtered-collection');
 require('components/dozy');
 require('template/helpers/all');
 require('components/bug-reporting');
+require('utils/tracking');
 
 module.exports = (function() {
-
 
   $(document).on("click", "a", function(e) {
     if(this.href) {
@@ -103,6 +103,7 @@ module.exports = (function() {
   // new Router();
 
   // Backbone.history.start();
+
 
 })();
 
