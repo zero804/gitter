@@ -120,6 +120,7 @@ module.exports = (function() {
       var user = this.model ? this.model.toJSON() : this.user;
 
       var avatarUrl;
+
       if (this.avatarSize == 'm') {
         avatarUrl = user.avatarUrlMedium || '/images/avatar-default-m.png';
       } else {
