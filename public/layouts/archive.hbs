@@ -29,16 +29,6 @@
 </head>
 <body class="logged-out">
   <div class="chat-and-toolbar-wrapper">
-    <div class="chat-app">
-      <div class="chat-header" id="header-wrapper">
-        <div id="header">
-          {{{ prerenderView "js/views/app/tmpl/headerViewTemplate" }}}
-        </div>
-      </div>
-
-      {{{body}}}
-    </div>
-
     <div class="trpToolbar" id="toolbar-frame" style="overflow: scroll">
       <div class="gtrArchiveToolbarWrapper">
         {{#if isHomePage}}
@@ -100,6 +90,14 @@
           {{/if}}
         {{/unless}}
       </div>
+    </div>
+    <div class="chat-app">
+      <div class="chat-header" id="header-wrapper">
+        <div id="header">
+          {{{ prerenderView "js/views/app/tmpl/headerViewTemplate" }}}
+        </div>
+      </div>
+      {{{body}}}
     </div>
   </div>
 
