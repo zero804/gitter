@@ -4,8 +4,13 @@
 var path = require("path");
 var CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
 var ContextReplacementPlugin = require("webpack/lib/ContextReplacementPlugin");
+var DedupePlugin = require('webpack/lib/optimize/DedupePlugin');
+var OccurrenceOrderPlugin = require('webpack/lib/optimize/OccurrenceOrderPlugin');
+var UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
 
-var webpack = {
+var devMode = process.env.WEBPACK_DEV_MODE === '1';
+
+var webpackConfig = {
   entry: {
     "router-nli-app": path.resolve(path.join(__dirname, "./router-nli-app.js")),
     "router-nli-chat": path.resolve(path.join(__dirname, "./router-nli-chat.js")),
@@ -91,14 +96,21 @@ var webpack = {
       // "underscore": path.resolve(path.join(__dirname, "../repo/underscore/underscore.js")),
       //"moment": path.resolve(path.join(__dirname, "../repo/moment/moment"))
     },
-    // See http://webpack.github.io/docs/configuration.html#devtool
-    devtool: 'source-map',
   },
   plugins: [
     new CommonsChunkPlugin("vendor", "[name].js"),
     new ContextReplacementPlugin(/moment[\/\\]locale$/, /cs|da|de|en-gb|es|fr|it|ja|ko|nl|pl|pt|ru|sv|zh-cn/)
   ]
 };
-module.exports = webpack;
+
+if(devMode) {
+  // See http://webpack.github.io/docs/configuration.html#devtool
+  webpackConfig.devtool = 'sourcemap';
+} else {
+  webpackConfig.plugins.push(new DedupePlugin());
+  webpackConfig.plugins.push(new OccurrenceOrderPlugin());
+  webpackConfig.plugins.push(new UglifyJsPlugin());
+}
+module.exports = webpackConfig;
 
 
