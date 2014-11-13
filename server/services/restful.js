@@ -66,7 +66,8 @@ exports.serializeUsersForTroupe = function(troupeId, userId, options, callback) 
       var strategy = new restSerializer.UserIdStrategy({
         showPresenceForTroupeId: troupeId,
         includeRolesForTroupeId: troupeId,
-        currentUserId: userId
+        currentUserId: userId,
+        lean: !!options.lean
       });
 
       return restSerializer.serializeExcludeNulls(userIds, strategy);

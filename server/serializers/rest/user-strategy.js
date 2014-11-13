@@ -135,6 +135,7 @@ function setAvatarSize(url, size) {
 
 function UserStrategy(options) {
   options = options ? options : {};
+  var lean = !!options.lean;
   var userRoleInTroupeStrategy = options.includeRolesForTroupeId || options.includeRolesForTroupe ? new UserRoleInTroupeStrategy(options) : null;
   var userPresenceInTroupeStrategy = options.showPresenceForTroupeId ? new UserPresenceInTroupeStrategy(options.showPresenceForTroupeId) : null;
   var userPremiumStatusStrategy = options.showPremiumStatus ? new UserPremiumStatusStrategy() : null;
@@ -176,6 +177,21 @@ function UserStrategy(options) {
         'private_repo': user.hasGitHubScope('repo')
       };
     }
+
+    console.log('lean:', lean);
+
+    if (lean) {
+      return {
+        id: user.id,
+        status: options.includeEmail ? user.status : undefined,
+        username: user.username,
+        online: userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id) || undefined,
+        invited: user.state === 'INVITED' || undefined, // true or undefined
+        removed: user.state === 'REMOVED' || undefined, // true or undefined
+        v: getVersion(user)
+      };
+    }
+
     return {
       id: user.id,
       status: options.includeEmail ? user.status : undefined,

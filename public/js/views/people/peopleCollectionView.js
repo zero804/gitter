@@ -17,7 +17,10 @@ module.exports = (function() {
       return { tagName: 'li', showStatus: true, tooltipPlacement: 'left' };
     },
     initialize: function() {
-      this.listenTo(this.collection, 'sort reset', this.render);
+      this.listenTo(this.collection, 'sort reset', function () {
+        // console.debug('this.collection:', this.collection);
+        this.render();
+      }.bind(this));
     }
   });
 
