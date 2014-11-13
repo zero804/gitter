@@ -3,6 +3,7 @@
 
 var path = require("path");
 var CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
+var ContextReplacementPlugin = require("webpack/lib/ContextReplacementPlugin");
 
 var webpack = {
   entry: {
@@ -36,14 +37,16 @@ var webpack = {
       'backbone.babysitter',
       'handlebars/runtime',
       'raven',
-      'keymaster'
+      'keymaster',
+      'moment'
       ]
   },
   output: {
-    path: __dirname + "/../dist",
+    path: __dirname + "/../../output/assets/js/",
     filename: "[name].js",
     chunkFilename: "[id].chunk.js",
-    publicPath: "/js/"
+    publicPath: "/_s/l/",
+    devtoolModuleFilenameTemplate: "[absolute-resource-path]",
   },
   module: {
     loaders: [
@@ -86,11 +89,14 @@ var webpack = {
       "cal-heatmap": path.resolve(path.join(__dirname, "../repo/cal-heatmap/cal-heatmap.js")),
       "d3": path.resolve(path.join(__dirname, "../repo/d3/d3.js")),
       // "underscore": path.resolve(path.join(__dirname, "../repo/underscore/underscore.js")),
-      // "moment": path.resolve(path.join(__dirname, "../repo/moment/moment.js"))
-    }
+      //"moment": path.resolve(path.join(__dirname, "../repo/moment/moment"))
+    },
+    // See http://webpack.github.io/docs/configuration.html#devtool
+    devtool: 'source-map',
   },
   plugins: [
-    new CommonsChunkPlugin("vendor", "[name].js")
+    new CommonsChunkPlugin("vendor", "[name].js"),
+    new ContextReplacementPlugin(/moment[\/\\]locale$/, /en-gb/)
   ]
 };
 module.exports = webpack;
