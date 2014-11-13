@@ -14,6 +14,10 @@ var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var mobileDecorator = require('views/chat/decorators/mobileDecorator');
 var TroupeSettingsView = require('views/app/troupeSettingsView');
 
+// Preload widgets
+require('views/widgets/avatar');
+require('views/widgets/timeago');
+
 module.exports = (function() {
 
 

@@ -1,6 +1,5 @@
 "use strict";
 var $ = require('jquery');
-var Backbone = require('backbone');
 var context = require('utils/context');
 //var ChatNliIntegratedView = require('views/app/chatNliIntegratedView');
 var HeaderView = require('views/app/headerView');
@@ -12,8 +11,12 @@ require('template/helpers/all');
 require('components/bug-reporting');
 require('utils/tracking');
 
-module.exports = (function() {
+// Preload widgets
+require('views/widgets/avatar');
+require('views/widgets/timeago');
 
+
+module.exports = (function() {
 
   $(document).on("click", "a", function(e) {
     if(this.href) {

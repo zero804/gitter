@@ -1,8 +1,6 @@
 "use strict";
 var $ = require('jquery');
-var Backbone = require('backbone');
 var context = require('utils/context');
-var ChatIntegratedView = require('views/app/chatIntegratedView');
 var HeaderView = require('views/app/headerView');
 var apiClient = require('components/apiClient');
 var CalHeatMap = require('cal-heatmap');
@@ -12,6 +10,7 @@ require('components/dozy');
 require('template/helpers/all');
 require('components/bug-reporting');
 require('utils/tracking');
+
 
 module.exports = (function() {
 
