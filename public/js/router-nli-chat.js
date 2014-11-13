@@ -19,6 +19,11 @@ require('components/dozy');
 require('template/helpers/all');
 require('components/bug-reporting');
 
+// Preload widgets
+require('views/widgets/avatar');
+require('views/widgets/timeago');
+
+
 module.exports = (function() {
 
 

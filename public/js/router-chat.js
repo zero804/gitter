@@ -26,6 +26,11 @@ require('components/eyeballs');
 require('components/bug-reporting');
 require('components/focus-events');
 
+// Preload widgets
+require('views/widgets/avatar');
+require('views/widgets/timeago');
+
+
 module.exports = (function() {
 
 

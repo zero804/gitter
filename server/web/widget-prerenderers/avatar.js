@@ -12,9 +12,9 @@ module.exports = exports = function(template) {
 
     var avatarUrl;
     if (avatarSize == 'm') {
-      avatarUrl = user.avatarUrlMedium || '/images/avatar-default-m.png';
+      avatarUrl = user.avatarUrlMedium;
     } else {
-      avatarUrl = user.avatarUrlSmall || '/images/avatar-default-s.png';
+      avatarUrl = user.avatarUrlSmall;
     }
 
     var r = template({

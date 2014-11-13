@@ -1,6 +1,5 @@
 "use strict";
 var $ = require('jquery');
-var Backbone = require('backbone');
 var context = require('utils/context');
 //var ChatNliIntegratedView = require('views/app/chatNliIntegratedView');
 var HeaderView = require('views/app/headerView');
@@ -10,6 +9,11 @@ require('filtered-collection');
 require('components/dozy');
 require('template/helpers/all');
 require('components/bug-reporting');
+
+// Preload widgets
+require('views/widgets/avatar');
+require('views/widgets/timeago');
+
 
 module.exports = (function() {
 

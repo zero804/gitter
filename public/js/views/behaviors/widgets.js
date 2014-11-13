@@ -3,11 +3,8 @@ var $ = require('jquery');
 var _ = require('underscore');
 var Marionette = require('marionette');
 var behaviourLookup = require('./lookup');
-require('../widgets/preload');
 
 module.exports = (function() {
-
-
   var cachedWidgets = {};
   function register(widgets) {
     var keys = _.keys(widgets);
