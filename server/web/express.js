@@ -72,6 +72,8 @@ module.exports = {
       var webpackMiddleware = require("webpack-dev-middleware");
       var webpack = require('webpack');
 
+      process.env.WEBPACK_DEV_MODE = '1';
+
       app.use(webpackMiddleware(webpack(require('../../public/js/webpack.config')), {
           noInfo: false,
           quiet: false,
