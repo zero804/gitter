@@ -96,7 +96,7 @@ var webpack = {
   },
   plugins: [
     new CommonsChunkPlugin("vendor", "[name].js"),
-    new ContextReplacementPlugin(/moment[\/\\]locale$/, /en-gb/)
+    new ContextReplacementPlugin(/moment[\/\\]locale$/, /cs|da|de|en-gb|es|fr|it|ja|ko|nl|pl|pt|ru|sv|zh-cn/)
   ]
 };
 module.exports = webpack;
