@@ -153,11 +153,15 @@ gulp.task('copy-asset-files', function() {
   return gulp.src([
       'public/fonts/**',
       'public/locales/**', // do we need this
+      'public/images/**',
+      'public/sprites/**',
       'public/repo/**',
     ], { "base" : "./public" })
     .pipe(gulp.dest('output/assets'));
 });
 
+
+// Run this task occassionally and check the results into git...
 gulp.task('compress-images', function() {
   return gulp.src([
       'public/images/**',
@@ -167,7 +171,7 @@ gulp.task('compress-images', function() {
        progressive: true,
        optimizationLevel: 2
      }))
-    .pipe(gulp.dest('output/assets'));
+    .pipe(gulp.dest('./public'));
 });
 
 gulp.task('css-ios', function () {
