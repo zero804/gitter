@@ -11,10 +11,6 @@
     <link href="{{ cdn 'styles/trpAppsPage.css' }}" rel="stylesheet">
     <link href='//fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
     <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon5.png' }}">
-
-    {{>require_wrapper}}
-    {{{ bootScript "just-tracking" }}}
-    {{{ generateEnv }}}
   </head>
 
   <body>
@@ -46,10 +42,8 @@
 
     </div>
 
-
-
-
-
+    {{{ generateEnv }}}
+    {{{ bootScript "just-tracking" }}}
 
   </body>
 </html>
