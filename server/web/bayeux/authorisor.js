@@ -80,7 +80,7 @@ function validateUserForUserSubscription(options) {
 }
 
 function arrayToSnapshot(type) {
-  return function(data) {
+  return function (data) {
     return { type: type, data: data };
   };
 }
@@ -115,7 +115,7 @@ function populateSubUserCollection(options) {
 function populateSubTroupeCollection(options) {
   var userId = options.userId;
   var match = options.match;
-  var snapshot = options.snapshot; // Details of the snapshot
+  var snapshot = options.snapshot || {}; // Details of the snapshot
   var troupeId = match[1];
   var collection = match[2];
   
@@ -123,13 +123,11 @@ function populateSubTroupeCollection(options) {
 
   switch(collection) {
     case "chatMessages":
-      var chatOptions = snapshot || {};
-
-      return restful.serializeChatsForTroupe(troupeId, userId, chatOptions)
+      return restful.serializeChatsForTroupe(troupeId, userId, snapshot)
         .then(arrayToSnapshot('room.chatMessages'));
 
     case "users":
-      return restful.serializeUsersForTroupe(troupeId, userId)
+      return restful.serializeUsersForTroupe(troupeId, userId, snapshot)
         .then(arrayToSnapshot('room.users'));
 
     //case "events":

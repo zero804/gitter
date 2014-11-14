@@ -13,7 +13,7 @@
 
   {{{ generateTroupeContext troupeContext page='chat' loggedIn=true }}}
 
-  <link rel="shortcut icon" href="../images/favicon.ico">
+  <link rel="shortcut icon" href="{{ cdn 'images/favicon.ico' }}">
 
 </head>
 <body>
@@ -27,7 +27,6 @@
     <div class="{{!-- trpChatInputArea --}}  chat-input__container  js-chat-input-container" id="chat-input"></div>
   </div>
 
-  {{>require_wrapper}}
   {{{ bootScript "mobile-native-embedded-chat" root="../" }}}
 
 </body>

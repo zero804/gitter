@@ -20,7 +20,6 @@ var embedDecorator = require('views/chat/decorators/embedDecorator');
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var UnreadBannerView = require('views/app/unreadBannerView');
 var HistoryLimitView = require('views/app/historyLimitView');
-var HeaderView = require('views/app/headerView');
 var unreadItemsClient = require('components/unread-items-client');
 var RightToolbarView = require('views/righttoolbar/rightToolbarView');
 require('transloadit');
@@ -81,8 +80,6 @@ module.exports = (function() {
       this.listenTo(itemCollections.chats, 'atBottomChanged', function (isBottom) {
         this.ui.scrollToBottom.toggleClass('u-scale-zero', isBottom);
       }.bind(this));
-
-      new HeaderView({ model: context.troupe(), el: '#header' });
 
       this.rightToolbar = new RightToolbarView({ el: "#toolbar-content" });
 
