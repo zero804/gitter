@@ -10,7 +10,6 @@
             <div id="people-list">
               <div class="trpToolbarHeader" id="top-header">
                 <div class="trpToolbarHeaderItem selected" id="people-header">
-                  {{!-- {{{ prerenderView "js/views/people/tmpl/peopleCollectionView" }}} --}}
                   People
                 </div>
                 {{#isRepo}}
@@ -20,7 +19,20 @@
                 {{/isRepo}}
               </div>
               <div class="trpToolbarList">
-                <div class="trpToolbarListContent" id="people-roster"></div>
+                <div class="trpToolbarListContent" id="people-roster">
+                  {{{ prerenderView "js/views/people/peopleCollectionView" }}}
+                  {{!-- <span class="frame-people">
+                    <span id="roster">
+                      <ul class="roster">
+                        {{#each users}}
+                          lol
+                          <li>{{{ peopleItemPrerender this }}}</li>
+                        {{/each}}
+                      </ul>
+                    </span>
+                    <span id="remaining"></span>
+                  </span> --}}
+                </div>
                 <div class="trpToolbarListContent" id="repo-info" style="display: none">
               </div>
               <div class="trpToolbarHeader" id="activity-header">ACTIVITY</div>

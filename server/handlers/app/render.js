@@ -120,14 +120,19 @@ function renderChat(req, res, options, next) {
   };
 
   var serializerOptions = _.defaults({
-    disableLimitReachedMessage: true
+    disableLimitReachedMessage: true,
+    lean: true
   }, snapshotOptions);
+
+  console.log('serializerOptions:', serializerOptions);
 
   Q.all([
       contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions } }),
       restful.serializeChatsForTroupe(troupe.id, userId, serializerOptions),
-      restful.serializeEventsForTroupe(troupe.id, userId)
-    ]).spread(function (troupeContext, chats, activityEvents) {
+      restful.serializeEventsForTroupe(troupe.id, userId),
+      restful.serializeUsersForTroupe(troupe.id, userId, serializerOptions)
+    ]).spread(function (troupeContext, chats, activityEvents, users) {
+      console.log('#users:', users);
       var initialChat = _.find(chats, function(chat) { return chat.initial; });
       var initialBottom = !initialChat;
       var githubLink;
@@ -161,7 +166,8 @@ function renderChat(req, res, options, next) {
           dnsPrefetch: dnsPrefetch,
           isPrivate: isPrivate,
           avatarUrl: avatar(troupeContext.troupe),
-          activityEvents: activityEvents
+          activityEvents: activityEvents,
+          users: users
         }, options.extras);
 
       res.render(options.template, renderOptions);
