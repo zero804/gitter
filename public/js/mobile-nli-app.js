@@ -10,6 +10,10 @@ var MobileAppView = require('views/app/mobileAppView');
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var MobileLoginButton = require('views/mobile/mobileLoginButton');
 
+// Preload widgets
+require('views/widgets/avatar');
+require('views/widgets/timeago');
+
 module.exports = (function() {
 
 

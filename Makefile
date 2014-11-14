@@ -17,6 +17,7 @@ CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/
 else
 CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/ public-processed/ public/styles/ public-compile-cache/)
 endif
+PATH := ./node_modules/.bin:$(PATH)
 
 .PHONY: build clean test npm sprites 
 	
