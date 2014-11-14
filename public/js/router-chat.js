@@ -17,6 +17,8 @@ var IntegrationSettingsModal = require('views/app/integrationSettingsModal');
 var CollaboratorsView = require('views/app/collaboratorsView');
 var collaboratorsModels = require('collections/collaborators');
 var apiClient = require('components/apiClient');
+var HeaderView = require('views/app/headerView');
+
 require('components/statsc');
 require('views/widgets/preload');
 require('filtered-collection');
@@ -189,9 +191,8 @@ module.exports = (function() {
     else notifyRemoveError('User '+ username +' was not found in this room.');
   });
 
-  var appView = new ChatIntegratedView({
-    el: 'body'
-  });
+  var appView = new ChatIntegratedView({ el: 'body' });
+  new HeaderView({ model: context.troupe(), el: '#header' });
 
   // appView.showSearchMode();
 
