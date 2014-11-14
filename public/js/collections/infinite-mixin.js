@@ -73,8 +73,8 @@ module.exports = (function() {
 
           if(callback) callback.call(context);
         },
-        error: function(err) {
-          if(callback) callback.call(err);
+        error: function (err) {
+          if (callback) callback.call(context || null, err);
         }
       });
 

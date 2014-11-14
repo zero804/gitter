@@ -1,6 +1,8 @@
 <div class="trpToolbar" id="toolbar-frame">
   <div class="trpToolbarContent" id="toolbar-content">
-    <div id='search-panel'></div>
+    <div id='search-panel'>
+      {{{ prerenderView "js/views/search/tmpl/search" }}}
+    </div>
     <div id="toolbar-top-content" style="height:100%; width: 100%;">
       <table height="100%" width="100%">
         <tr>
@@ -8,11 +10,13 @@
             <div id="people-list">
               <div class="trpToolbarHeader" id="top-header">
                 <div class="trpToolbarHeaderItem selected" id="people-header">
+                  {{!-- {{{ prerenderView "js/views/people/tmpl/peopleCollectionView" }}} --}}
                   People
                 </div>
-                {{#isRepo}}<div class="trpToolbarHeaderItem" id="info-header">
-                  Repo info
-                </div>
+                {{#isRepo}}
+                  <div class="trpToolbarHeaderItem" id="info-header">
+                    Repo info
+                  </div>
                 {{/isRepo}}
               </div>
               <div class="trpToolbarList">
