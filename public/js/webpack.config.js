@@ -36,6 +36,7 @@ var webpackConfig = {
       'jquery',
       'backbone',
       'marionette',
+      'loglevel',
       'utils/log',
       'utils/tracking',
       'backbone.wreqr',
