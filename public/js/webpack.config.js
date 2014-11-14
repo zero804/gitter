@@ -51,7 +51,7 @@ var webpackConfig = {
     path: __dirname + "/../../output/assets/js/",
     filename: "[name].js",
     chunkFilename: "[id].chunk.js",
-    publicPath: "/_s/l/",
+    publicPath: "/_s/l/js/",
     devtoolModuleFilenameTemplate: "[absolute-resource-path]",
   },
   module: {

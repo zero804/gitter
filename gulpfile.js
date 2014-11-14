@@ -264,7 +264,7 @@ gulp.task('webpack', function() {
     .pipe(gulp.dest('output/assets/js'));
 });
 
-gulp.task('build-assets', ['copy-asset-files', 'compress-images', 'css', 'webpack']);
+gulp.task('build-assets', ['copy-asset-files', 'css', 'webpack']);
 
 
 gulp.task('compress-assets', ['build-assets'], function() {
