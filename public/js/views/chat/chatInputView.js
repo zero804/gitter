@@ -460,7 +460,7 @@ module.exports = (function() {
       // css[compact ? 'padding-bottom' : 'margin-bottom'] = '';
       css[compact ? 'padding-bottom' : 'bottom'] = '';
       frameChat.css(css);
-      log('Applying ', css, ' to ', frameChat);
+      log.info('Applying ', css, ' to ', frameChat);
 
       adjustScroll(initial);
     };
@@ -485,7 +485,7 @@ module.exports = (function() {
           css.bottom = ($('#chat-input-wrapper').outerHeight()) + 'px';
         }
 
-        log('Applying ', css, ' to ', frameChat);
+        log.info('Applying ', css, ' to ', frameChat);
         frameChat.css(css);
       }
 

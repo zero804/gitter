@@ -24,11 +24,11 @@ module.exports = (function() {
   $(document).on('app.version.mismatch', function() {
     try {
       if(window.applicationCache.status == 1) {
-        log('Attempting to update application cache');
+        log.info('Attempting to update application cache');
         window.applicationCache.update();
       }
     } catch(e) {
-      log('Unable to update application cache: ' + e, e);
+      log.info('Unable to update application cache: ' + e, e);
     }
   });
 

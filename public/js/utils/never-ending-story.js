@@ -120,7 +120,7 @@ module.exports = (function() {
       var self = this;
 
       if(!this._enabled) {
-        log('enabling scroll listener');
+        log.info('enabling scroll listener');
         this._target.addEventListener('scroll', this._scrollHandler, false);
         this._enabled = true;
 
@@ -138,7 +138,7 @@ module.exports = (function() {
 
     disable: function() {
       if(this._enabled) {
-        log('disabling scroll listener');
+        log.info('disabling scroll listener');
         this._target.removeEventListener('scroll', this._scrollHandler, false);
         this._enabled = false;
       }

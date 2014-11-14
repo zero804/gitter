@@ -33,10 +33,10 @@ module.exports = (function() {
       })
       .fail(function(xhr) {
         if(xhr.status !== 400) {
-          log('An error occurred while communicating eyeballs');
+          log.info('An error occurred while communicating eyeballs');
         } else {
           // The connection is gone...
-          log('Eyeballs returned 400. Realtime connection may be dead.');
+          log.info('Eyeballs returned 400. Realtime connection may be dead.');
           appEvents.trigger('eyeballsInvalid', clientId);
         }
       });
@@ -94,7 +94,7 @@ module.exports = (function() {
       }
 
       document.addEventListener("resume", function() {
-        // log('resume: eyeballs set to ' + eyesOnState);
+        // log.info('resume: eyeballs set to ' + eyesOnState);
 
         updateLastUserInteraction();
         window.setTimeout(function() {
@@ -105,7 +105,7 @@ module.exports = (function() {
       // Cordova specific events
       document.addEventListener("pause", function() {
         eyesOnState = false;
-        // log('pause');
+        // log.info('pause');
 
       }, false);
 
@@ -124,7 +124,7 @@ module.exports = (function() {
     }, false);
 
     window.addEventListener('pagehide', function() {
-      // log('pagehide');
+      // log.info('pagehide');
       eyeballsOff();
     }, false);
 
@@ -176,7 +176,7 @@ module.exports = (function() {
 
       window.setTimeout(function() {
         if(Date.now() - lastUserInteraction > (INACTIVITY - INACTIVITY_POLL)) {
-          log('inactivity');
+          log.info('inactivity');
           inactivity = true;
           stopInactivityPoller();
           eyeballsOff();
@@ -198,7 +198,7 @@ module.exports = (function() {
         global: false
       })
       .fail(function() {
-        log('An error occurred while communicating eyeballs');
+        log.info('An error occurred while communicating eyeballs');
       });
   }, PING_POLL);
 

@@ -108,7 +108,7 @@ module.exports = (function() {
 
   window.addEventListener('message', function(e) {
     if(e.origin !== context.env('basePath')) {
-      log('Ignoring message from ' + e.origin);
+      log.info('Ignoring message from ' + e.origin);
       return;
     }
 
@@ -120,7 +120,7 @@ module.exports = (function() {
       return;
     }
 
-    log('Received message ', message);
+    log.info('Received message ', message);
 
     var makeEvent = function(message) {
       var origin = 'chat';
@@ -128,13 +128,13 @@ module.exports = (function() {
       message.event = {
         origin: origin,
         preventDefault: function() {
-          log('Warning: could not call preventDefault() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
+          log.info('Warning: could not call preventDefault() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
         },
         stopPropagation: function() {
-          log('Warning: could not call stopPropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
+          log.info('Warning: could not call stopPropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
         },
         stopImmediatePropagation: function() {
-          log('Warning: could not call stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
+          log.info('Warning: could not call stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
         }
       };
     };
@@ -158,7 +158,7 @@ module.exports = (function() {
         var count = message.count;
         var troupeId = message.troupeId;
         if(troupeId !== context.getTroupeId()) {
-          log('warning: troupeId mismatch in unreadItemsCount');
+          log.info('warning: troupeId mismatch in unreadItemsCount');
         }
         var v = {
           unreadItems: count

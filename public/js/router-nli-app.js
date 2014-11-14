@@ -87,7 +87,7 @@ module.exports = (function() {
 
   window.addEventListener('message', function(e) {
     if(e.origin !== context.env('basePath')) {
-      log('Ignoring message from ' + e.origin);
+      log.info('Ignoring message from ' + e.origin);
       return;
     }
 
@@ -98,7 +98,7 @@ module.exports = (function() {
       return; // Ignore non-json from extensions
     }
 
-    log('Received message ', message);
+    log.info('Received message ', message);
 
     switch(message.type) {
       case 'context.troupeId':

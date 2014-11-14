@@ -62,7 +62,7 @@ module.exports = (function() {
 
   window.addEventListener('message', function(e) {
     if(e.origin !== context.env('basePath')) {
-      log('Ignoring message from ' + e.origin);
+      log.info('Ignoring message from ' + e.origin);
       return;
     }
 
@@ -74,7 +74,7 @@ module.exports = (function() {
       return;
     }
 
-    log('Received message ', message);
+    log.info('Received message ', message);
 
     var makeEvent = function(message) {
       var origin = 'app';
@@ -82,13 +82,13 @@ module.exports = (function() {
       message.event = {
         origin: origin,
         preventDefault: function() {
-          log('Warning: could not use preventDefault() because the event comes from the `' + this.origin + '` frame');
+          log.info('Warning: could not use preventDefault() because the event comes from the `' + this.origin + '` frame');
         },
         stopPropagation: function() {
-          log('Warning: could not use stopPropagation() because the event comes from the `' + this.origin + '` frame');
+          log.info('Warning: could not use stopPropagation() because the event comes from the `' + this.origin + '` frame');
         },
         stopImmediatePropagation: function() {
-          log('Warning: could not use stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame');
+          log.info('Warning: could not use stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame');
         }
       };
     };
