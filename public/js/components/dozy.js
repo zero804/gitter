@@ -17,7 +17,7 @@ module.exports = (function() {
     last = now;
 
     if(sleepDetected) {
-      log('Sleep detected!');
+      log.info('Sleep detected!');
       appEvents.trigger('reawaken', time);
     }
 

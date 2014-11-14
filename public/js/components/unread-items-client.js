@@ -168,7 +168,7 @@ module.exports = (function() {
 
     preload: function(items) {
       _iteratePreload(items, function(itemType, itemId) {
-        log('Preload of ' + itemType + ':' + itemId);
+        log.info('Preload of ' + itemType + ':' + itemId);
 
         // Have we already marked this item as read?
         if(this._deleteTarpit._contains(itemType, itemId)) return;
@@ -265,7 +265,7 @@ module.exports = (function() {
             global: false
           })
           .fail(function() {
-            log('Error posting unread items to server. Will attempt again in 5s');
+            log.info('Error posting unread items to server. Will attempt again in 5s');
 
             // Unable to send messages, requeue them and try again in 5s
             setTimeout(function() {

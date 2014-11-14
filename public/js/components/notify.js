@@ -54,7 +54,7 @@ module.exports = (function() {
     this.on('mouseenter', /* '.notification',*/ function(e) {
 
       if (container.data('notification-hide-running') === true && e.currentTarget === container[0]) {
-        // log('cancelling timeouts', e);
+        // log.info('cancelling timeouts', e);
         // cancel all hide timeouts
         container.data('notification-hide-running', false);
         container.find('.notification').each(function(n) {
@@ -65,7 +65,7 @@ module.exports = (function() {
 
     this.on('mouseleave', /* '.notification',*/ function(e) {
       if (container.data('notification-hide-running') === false && e.currentTarget === container[0]) {
-        // log('resuming timeouts', e);
+        // log.info('resuming timeouts', e);
         // restart all the hide timeouts
         container.data('notification-hide-running', true);
         container.find('.notification').each(function(n) {
