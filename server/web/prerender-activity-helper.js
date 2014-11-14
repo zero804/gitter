@@ -24,7 +24,7 @@ var serviceTemplates = {
   travis:     'travis',     //travisTemplate,
   sprintly:   'sprintly',   //sprintlyTemplate,
   trello:     'trello',     //trelloTemplate
-};            
+};
 
 var githubTemplates = {
   push:           'githubPush',         //githubPushTemplate,

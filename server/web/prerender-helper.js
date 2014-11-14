@@ -10,7 +10,8 @@ var widgetHelpers = require('./widget-prerenderers');
 
 var baseDir = path.normalize(__dirname + '/../../' + nconf.get('web:staticContent') + '/');
 
-module.exports = exports = function(template, callback) {
+module.exports = exports = function (template, callback) {
+  console.log('handlebars:', handlebars);
   handlebars(baseDir + template + '.hbs', _.extend({}, this, { helpers: widgetHelpers, cache: nconf.get('web:cacheTemplates') }), function (err, result) {
     if (err) {
       winston.error("Unable to prerender: " + err, { exception: err });

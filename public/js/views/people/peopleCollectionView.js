@@ -70,6 +70,7 @@ module.exports = (function() {
 
     initialize: function(options) {
       this.rosterCollection = options.rosterCollection;
+      // console.debug('this.rosterCollection:', this.rosterCollection);
       this.userCollection = options.userCollection;
     },
 
