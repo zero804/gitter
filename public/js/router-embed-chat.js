@@ -1,5 +1,5 @@
 "use strict";
-var ChatIntegratedView = require('views/app/chatIntegratedView');
+var ChatNliIntegratedView = require('views/app/chatNliIntegratedView');
 var ChatCollectionView = require('views/chat/chatCollectionView');
 var chatModels = require('collections/chat');
 var webhookDecorator = require('views/chat/decorators/webhookDecorator');
@@ -9,6 +9,7 @@ var mentionDecorator = require('views/chat/decorators/mentionDecorator');
 var embedDecorator = require('views/chat/decorators/embedDecorator');
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var HistoryLimitView = require('views/app/historyLimitView');
+
 require('components/statsc');
 require('views/widgets/preload');
 require('components/dozy');
@@ -21,9 +22,7 @@ require('views/widgets/timeago');
 
 
 module.exports = (function() {
-
-
-  new ChatIntegratedView({ el: 'body' });
+  new ChatNliIntegratedView({ el: 'body' });
 
   var chatCollection = new chatModels.ChatCollection(null, { listen: true });
   chatCollection.listen();
