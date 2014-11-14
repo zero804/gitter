@@ -12,7 +12,6 @@ var commitDecorator = require('views/chat/decorators/commitDecorator');
 var mentionDecorator = require('views/chat/decorators/mentionDecorator');
 var embedDecorator = require('views/chat/decorators/embedDecorator');
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
-var HeaderView = require('views/app/headerView');
 
 module.exports = (function() {
 
@@ -52,8 +51,6 @@ module.exports = (function() {
       this.listenTo(itemCollections.chats, 'atBottomChanged', function (isBottom) {
         this.ui.scrollToBottom.toggleClass('u-scale-zero', isBottom);
       }.bind(this));
-
-      new HeaderView({ model: context.troupe(), el: '#header' });
 
       this.chatCollectionView = chatCollectionView;
       this.dialogRegion = modalRegion;
