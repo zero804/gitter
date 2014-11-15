@@ -4,7 +4,7 @@ local key_active_users = KEYS[3]
 
 local user_ids = ARGV;
 
--- create a temporary set of all the user ids that we want to catogorize
+-- create a temporary set of all the user ids that we want to categorize
 for i, name in ipairs(user_ids) do
 	redis.call("ZADD", key_working_set, 1, user_ids[i])
 end
