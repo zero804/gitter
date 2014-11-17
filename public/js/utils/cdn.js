@@ -18,7 +18,7 @@ module.exports = (function() {
 
       return embeddedRoot + url;
     } else {
-      return '/' + url;
+      return '/_s/l/' + url;
     }
   }
 

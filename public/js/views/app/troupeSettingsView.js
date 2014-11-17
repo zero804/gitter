@@ -38,7 +38,7 @@ module.exports = (function() {
           self.setLurkButton();
         })
         .fail(function() {
-          log('An error occurred while communicating with notification settings');
+          log.info('An error occurred while communicating with notification settings');
         });
     },
 

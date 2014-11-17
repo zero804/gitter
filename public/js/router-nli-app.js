@@ -4,6 +4,8 @@ var appEvents = require('utils/appevents');
 var context = require('utils/context');
 var TitlebarUpdater = require('components/titlebar');
 var log = require('utils/log');
+var onready = require('./utils/onready');
+
 require('views/widgets/preload');
 require('components/webNotifications');
 require('components/desktopNotifications');
@@ -15,7 +17,7 @@ require('utils/tracking');
 require('views/widgets/avatar');
 
 
-module.exports = (function() {
+onready(function() {
 
 
   var chatIFrame = document.getElementById('content-frame');
@@ -87,7 +89,7 @@ module.exports = (function() {
 
   window.addEventListener('message', function(e) {
     if(e.origin !== context.env('basePath')) {
-      log('Ignoring message from ' + e.origin);
+      log.info('Ignoring message from ' + e.origin);
       return;
     }
 
@@ -98,7 +100,7 @@ module.exports = (function() {
       return; // Ignore non-json from extensions
     }
 
-    log('Received message ', message);
+    log.info('Received message ', message);
 
     switch(message.type) {
       case 'context.troupeId':
@@ -121,5 +123,5 @@ module.exports = (function() {
     }
   });
 
-})();
+});
 

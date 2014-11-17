@@ -439,7 +439,7 @@ module.exports = (function() {
         if(adjView) {
           itemView.$el.insertBefore(adjView.el);
         } else {
-          log("Inserting *after* the bottom for collection ", collectionView.collection.url, adjView, itemView);
+          log.info("Inserting *after* the bottom for collection ", collectionView.collection.url, adjView, itemView);
           /* in this case, the itemViews are not coming in any sequential order  */
           // We can't find an item before, we can't find an item after,
           // just give up and insert at the end. (hopefully this will never happen eh?)

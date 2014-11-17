@@ -4,6 +4,8 @@ var context = require('utils/context');
 var HeaderView = require('views/app/headerView');
 var apiClient = require('components/apiClient');
 var CalHeatMap = require('cal-heatmap');
+var onready = require('./utils/onready');
+
 require('views/widgets/preload');
 require('filtered-collection');
 require('components/dozy');
@@ -12,7 +14,7 @@ require('components/bug-reporting');
 require('utils/tracking');
 
 
-module.exports = (function() {
+onready(function() {
 
   $(document).on("click", "a", function(e) {
     if(this.href) {
@@ -104,5 +106,5 @@ module.exports = (function() {
   // Backbone.history.start();
 
 
-})();
+});
 
