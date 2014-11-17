@@ -246,22 +246,21 @@ module.exports = (function() {
       var p = $.Deferred();
       var messages = this.messages;
       var query = args.query;
+      var self = this;
 
       messages.reset(); // we must clear the collection before fetching more
-      messages.fetchSearch(query, function () {
+      messages.fetchSearch(query, function (err) {
+        if (err) return p.reject(err);
+
         var results = messages.models
           .map(function (item) {
             item.set('priority', 3); // this ensures that messages are added at the bottom
             return item;
           });
 
-        try {
-          this.trigger('loaded:messages', results, query);
-          p.resolve();
-        } catch (e) {
-          p.reject(e);
-        }
-      }.bind(this));
+        self.trigger('loaded:messages', results, query);
+        p.resolve();
+      }, this);
 
       return p;
     },
@@ -294,13 +293,10 @@ module.exports = (function() {
             })
             .filter(this.notCurrentRoom);
 
-          try {
-            this.trigger('loaded:rooms', results, query);
-            p.resolve(results);
-          } catch (e) {
-            p.reject(e);
-          }
-        }.bind(this));
+          this.trigger('loaded:rooms', results, query);
+          p.resolve(results);
+        }.bind(this))
+        .fail(p.reject);
 
       return p;
     },
@@ -373,10 +369,9 @@ module.exports = (function() {
         return p.resolve(); // to avoid fetching empty queries
       }
 
-      $.when(
-        this.fetchMessages({ query: query }),
-        this.fetchRooms({ query: query })
-      ).done(p.resolve);
+      $.when(this.fetchMessages({ query: query }), this.fetchRooms({ query: query }))
+        .done(p.resolve)
+        .fail(p.reject);
       return p;
     }
   });
@@ -540,20 +535,16 @@ module.exports = (function() {
     },
 
     run: function (/*model, searchTerm*/) {
-      var searchTerm = this.model.get('searchTerm');
-
       if (this.isSearchTermEmpty()) return this.hide();
+
+      var searchTerm = this.model.get('searchTerm');
+      var finishedLoading = this.model.set.bind(this.model, 'isLoading', false);
+
       this.model.set('isLoading', true);
-      $.when(
-          this.search.local(searchTerm),
-          this.search.remote(searchTerm)
-        )
-        .done(function () {
-          this.model.set('isLoading', false);
-        }.bind(this))
-        .fail(function () {
-          this.model.set('isLoading', false);
-        });
+
+      $.when(this.search.local(searchTerm), this.search.remote(searchTerm))
+        .done(finishedLoading)
+        .fail(finishedLoading);
 
       this.showResults();
       this.triggerMethod('search:show'); // hide top toolbar content
