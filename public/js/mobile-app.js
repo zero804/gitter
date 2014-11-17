@@ -13,12 +13,13 @@ var MobileAppView = require('views/app/mobileAppView');
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var mobileDecorator = require('views/chat/decorators/mobileDecorator');
 var TroupeSettingsView = require('views/app/troupeSettingsView');
+var onready = require('./utils/onready');
 
 // Preload widgets
 require('views/widgets/avatar');
 require('views/widgets/timeago');
 
-module.exports = (function() {
+onready(function() {
 
 
   new MobileAppView({
@@ -79,5 +80,5 @@ module.exports = (function() {
   Backbone.history.start();
 
 
-})();
+});
 

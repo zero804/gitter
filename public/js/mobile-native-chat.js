@@ -10,18 +10,20 @@ var unreadItemsClient = require('components/unread-items-client');
 var cacheSync = require('components/cache-sync');
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var mobileDecorator = require('views/chat/decorators/mobileDecorator');
+var onready = require('./utils/onready');
+var appEvents = require('./utils/appevents');
+
 var log = require('utils/log');
+
 require('components/eyeballs');
 
 // Preload widgets
 require('views/widgets/avatar');
 require('views/widgets/timeago');
 
+onready(function() {
 
-module.exports = (function() {
-
-
-  $(document).on('app.version.mismatch', function() {
+  appEvents.on('app.version.mismatch', function() {
     try {
       if(window.applicationCache.status == 1) {
         log.info('Attempting to update application cache');
@@ -63,5 +65,5 @@ module.exports = (function() {
   $('html').removeClass('loading');
 
 
-})();
+});
 

@@ -81,11 +81,11 @@ module.exports = (function() {
             // Give the servers time to complete the upgrade
             updateTimers = [setTimeout(function() {
               /* 10 minutes */
-              $(document).trigger('app.version.mismatch');
+              appEvents.trigger('app.version.mismatch');
               appEvents.trigger('stats.event', 'reload.warning.10m');
             }, 10 * 60000), setTimeout(function() {
               /* 1 hour */
-              $(document).trigger('app.version.mismatch');
+              appEvents.trigger('app.version.mismatch');
               appEvents.trigger('stats.event', 'reload.warning.1hr');
             }, 60 * 60000), setTimeout(function() {
               /* 6 hours */

@@ -7,6 +7,7 @@ var appEvents = require('utils/appevents');
 var log = require('utils/log');
 var ChatIntegratedView = require('views/app/chatIntegratedView');
 var itemCollections = require('collections/instances/integrated-items');
+var onready = require('./utils/onready');
 
 var apiClient = require('components/apiClient');
 var HeaderView = require('views/app/headerView');
@@ -25,7 +26,7 @@ require('views/widgets/avatar');
 require('views/widgets/timeago');
 
 
-module.exports = (function() {
+onready(function() {
 
 
   $(document).on("click", "a", function(e) {
@@ -352,6 +353,5 @@ module.exports = (function() {
   }
 
   Backbone.history.start();
-
-})();
+});
 
