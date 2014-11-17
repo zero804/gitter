@@ -1,7 +1,11 @@
-define([
-  'jquery',
-  'views/app/uiVars'
-], function (jQuery, uiVars){
+/* jshint -W014 */
+/* jshint -W004 */
+"use strict";
+
+var jQuery = require('jquery');
+var uiVars = require('views/app/uiVars');
+
+module.exports = (function() {
 
 /* ===========================================================
  * bootstrap-tooltip.js v2.3.1
@@ -31,9 +35,6 @@ define([
 */
 
 !function ($) {
-
-  "use strict"; // jshint ;_;
-
 
  /* TOOLTIP PUBLIC CLASS DEFINITION
   * =============================== */
@@ -181,16 +182,16 @@ define([
         switch (placement) {
           case 'bottom':
             tp = {top: pos.top + pos.height, left: pos.left + pos.width / 2 - actualWidth / 2}
-            break
+            break;
           case 'top':
             tp = {top: pos.top - actualHeight, left: pos.left + pos.width / 2 - actualWidth / 2}
-            break
+            break;
           case 'left':
             tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left - actualWidth}
-            break
+            break;
           case 'right':
             tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width}
-            break
+            break;
         }
 
         this.applyPlacement(tp, placement)
@@ -410,4 +411,6 @@ define([
 }(window.jQuery);
 
 return jQuery;
-});
+
+})();
+

@@ -1,8 +1,9 @@
-define([
-  'utils/context',
-  'collections/instances/integrated-items'
-], function(context, itemCollections) {
-  'use strict';
+'use strict';
+var context = require('utils/context');
+var itemCollections = require('collections/instances/integrated-items');
+
+module.exports = (function() {
+
 
   function showModal() {
     window.location.hash = 'welcome';
@@ -60,4 +61,6 @@ define([
 
   };
 
-});
+
+})();
+

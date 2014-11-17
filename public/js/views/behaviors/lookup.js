@@ -1,7 +1,8 @@
-define([
-  'marionette'
-], function(Marionette) {
-  "use strict";
+"use strict";
+var Marionette = require('marionette');
+
+module.exports = (function() {
+
 
   var hash = {};
 
@@ -15,4 +16,6 @@ define([
     }
   };
 
-});
+
+})();
+

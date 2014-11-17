@@ -1,9 +1,10 @@
-define([
-  'marionette',
-  './lookup',
-  'utils/never-ending-story',
-], function(Marionette, behaviourLookup, NeverEndingStory) {
-  "use strict";
+"use strict";
+var Marionette = require('marionette');
+var behaviourLookup = require('./lookup');
+var NeverEndingStory = require('utils/never-ending-story');
+
+module.exports = (function() {
+
 
   var Behavior = Marionette.Behavior.extend({
     defaults: {
@@ -50,4 +51,6 @@ define([
 
   behaviourLookup.register('InfiniteScroll', Behavior);
   return Behavior;
-});
+
+})();
+

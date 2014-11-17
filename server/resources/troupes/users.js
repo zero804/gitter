@@ -1,6 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var restful = require('../../services/restful');
 var recentRoomService  = require('../../services/recent-room-service');
 var roomService        = require('../../services/room-service');
 var emailAddressService = require('../../services/email-address-service');
@@ -13,16 +14,18 @@ module.exports = {
   id: 'resourceTroupeUser',
 
   index: function(req, res, next) {
-    var strategy = new restSerializer.UserIdStrategy({
-      showPresenceForTroupeId: req.troupe.id,
-      includeRolesForTroupe: req.troupe,
-      currentUser: req.user
-    });
 
-    restSerializer.serializeExcludeNulls(req.troupe.getUserIds(), strategy, function(err, serialized) {
-      if(err) return next(err);
-      res.send(serialized);
-    });
+    var options = {
+      lean: !!req.query.lean
+    };
+
+    restful.serializeUsersForTroupe(req.troupe.id, req.user, options)
+      .then(function (data) {
+        res.send(data);
+      })
+      .catch(function (err) {
+        next(err);
+      });
   },
 
   create: function(req, res, next) {

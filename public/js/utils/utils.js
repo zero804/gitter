@@ -1,6 +1,8 @@
-define([
-], function() {
-  "use strict";
+"use strict";
+
+
+module.exports = (function() {
+
 
   function natural(a, b) {
     if(a === b) return 0;
@@ -83,4 +85,6 @@ define([
     }
   };
 
-});
+
+})();
+

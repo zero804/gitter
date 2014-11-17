@@ -1,16 +1,17 @@
-define([
-  'jquery',
-  'underscore',
-  'marionette',
-  'collections/instances/troupes',
-  'views/base',
-  'utils/context',
-  'components/apiClient',
-  './parentSelectView',
-  'hbs!./tmpl/createRoom',
-  'utils/appevents'
-], function($, _, Marionette, troupeCollections, TroupeViews, context, apiClient, ParentSelectView, template, appEvents) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var _ = require('underscore');
+var Marionette = require('marionette');
+var troupeCollections = require('collections/instances/troupes');
+var TroupeViews = require('views/base');
+var context = require('utils/context');
+var apiClient = require('components/apiClient');
+var ParentSelectView = require('./parentSelectView');
+var template = require('./tmpl/createRoom.hbs');
+var appEvents = require('utils/appevents');
+
+module.exports = (function() {
+
 
   var View = Marionette.Layout.extend({
     template: template,
@@ -462,4 +463,6 @@ define([
     Modal: Modal
   };
 
-});
+
+})();
+

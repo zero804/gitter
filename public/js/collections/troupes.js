@@ -1,11 +1,12 @@
-define([
-  'utils/context',
-  'components/apiClient',
-  'backbone',
-  './base',
-  '../utils/momentWrapper'
-], function(context, apiClient, Backbone, TroupeCollections, moment) {
-  "use strict";
+"use strict";
+var context = require('utils/context');
+var apiClient = require('components/apiClient');
+var Backbone = require('backbone');
+var TroupeCollections = require('./base');
+var moment = require('../utils/momentWrapper');
+
+module.exports = (function() {
+
 
   var TroupeModel = TroupeCollections.Model.extend({
     idAttribute: "id",
@@ -137,4 +138,6 @@ define([
     TroupeCollection: TroupeCollection,
     TroupeModel:      TroupeModel
   };
-});
+
+})();
+

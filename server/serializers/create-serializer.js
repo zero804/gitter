@@ -68,7 +68,9 @@ module.exports = function(serializerDirectory, e) {
 
   function eagerLoadStrategies() {
     Object.keys(e).forEach(function(key) {
+      // jshint -W030
       e[key]; // NB! Force the lazy-loading of strategies
+      // jshint +W030
     });
   }
 

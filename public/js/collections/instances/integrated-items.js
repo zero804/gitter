@@ -1,18 +1,19 @@
+"use strict";
 /* jshint unused:true, browser:true */
-define([
-  'jquery',
-  'underscore',
-  'backbone',
-  '../base',
-  '../users',
-  '../chat',
-  '../events',
-  'utils/appevents',
-  'utils/context',
-  'components/unread-items-client',
-  'components/realtime-troupe-listener'     // No reference
-], function($, _, Backbone, base, userModels, chatModels, eventModels, appEvents, context, unreadItemsClient) {
-  "use strict";
+var $ = require('jquery');
+var _ = require('underscore');
+var Backbone = require('backbone');
+var base = require('../base');
+var userModels = require('../users');
+var chatModels = require('../chat');
+var eventModels = require('../events');
+var appEvents = require('utils/appevents');
+var context = require('utils/context');
+var unreadItemsClient = require('components/unread-items-client');
+require('components/realtime-troupe-listener');
+
+module.exports = (function() {
+
 
   var chatCollection          = new chatModels.ChatCollection(null, { listen: true });
   var userCollection          = new userModels.UserCollection(null, { listen: true });
@@ -58,4 +59,6 @@ define([
     events: eventCollection
   };
 
-});
+
+})();
+

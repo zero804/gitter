@@ -1,17 +1,24 @@
-require([
-  'utils/appevents',
-  'utils/context',
-  'backbone',
-  'views/app/appIntegratedView',
-  'components/titlebar',
-  'log!router-app',
-  'views/widgets/preload',                // No ref
-  'components/webNotifications',          // No ref
-  'components/desktopNotifications',      // No ref
-  'template/helpers/all',                 // No ref
-  'components/bug-reporting'              // No ref
-], function(appEvents, context, Backbone, AppIntegratedView, TitlebarUpdater, log) {
-  "use strict";
+"use strict";
+
+var appEvents = require('utils/appevents');
+var context = require('utils/context');
+var TitlebarUpdater = require('components/titlebar');
+var log = require('utils/log');
+var onready = require('./utils/onready');
+
+require('views/widgets/preload');
+require('components/webNotifications');
+require('components/desktopNotifications');
+require('template/helpers/all');
+require('components/bug-reporting');
+require('utils/tracking');
+
+// Preload widgets
+require('views/widgets/avatar');
+
+
+onready(function() {
+
 
   var chatIFrame = document.getElementById('content-frame');
   if(window.location.hash) {
@@ -24,7 +31,7 @@ require([
     appEvents.trigger('track', url);
   }
 
-  var appView = new AppIntegratedView({ });
+  // var appView = new AppIntegratedView({ });
 
   // appView.leftMenuRegion.show(new TroupeMenuView({ }));
 
@@ -82,18 +89,18 @@ require([
 
   window.addEventListener('message', function(e) {
     if(e.origin !== context.env('basePath')) {
-      log('Ignoring message from ' + e.origin);
+      log.info('Ignoring message from ' + e.origin);
       return;
     }
 
     var message;
     try {
       message = JSON.parse(e.data);
-    } catch(e) {
+    } catch(err) {
       return; // Ignore non-json from extensions
     }
 
-    log('Received message ', message);
+    log.info('Received message ', message);
 
     switch(message.type) {
       case 'context.troupeId':
@@ -116,28 +123,5 @@ require([
     }
   });
 
-  var Router = Backbone.Router.extend({
-    routes: {
-      // TODO: get rid of the pipes
-      "": "hideModal",
-      "createcustomroom": "createcustomroom",
-      "createcustomroom/:name": "createcustomroom",
-      "createreporoom": "createreporoom",
-      "createroom" : "createroom"
-    },
-
-    hideModal: function() {
-      appView.dialogRegion.close();
-    }
-  });
-
-  new Router();
-  Backbone.history.start();
-
-  // Asynchronously load tracker
-  require([
-    'utils/tracking'
-  ], function(/*tracking*/) {
-    // No need to do anything here
-  });
 });
+

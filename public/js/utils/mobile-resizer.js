@@ -1,5 +1,8 @@
-define(['jquery'], function($) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+
+module.exports = (function() {
+
 
   var pixelsToAllowScrolling = 600;
 
@@ -13,4 +16,6 @@ define(['jquery'], function($) {
   return {
     'hideAddressBar': hideAddressBar
   };
-});
+
+})();
+

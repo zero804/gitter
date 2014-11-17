@@ -1,7 +1,8 @@
-define([
-  'underscore'
-], function(_) {
-  "use strict";
+"use strict";
+var _ = require('underscore');
+
+module.exports = (function() {
+
 
   return function(view, $el, method, options) {
     var lastValue;
@@ -53,4 +54,6 @@ define([
   };
 
 
-});
+
+})();
+

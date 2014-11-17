@@ -1,12 +1,13 @@
+'use strict';
 /* jshint unused:true, browser:true,  strict:true *//* global define:false */
-define([
-  'marionette',
-  'utils/momentWrapper',
-  'utils/context',
-  'hbs!./tmpl/archive-navigation-view',
-  'cal-heatmap'
-], function(Marionette, moment, context, template, CalHeatMap) {
-  'use strict';
+var Marionette = require('marionette');
+var moment = require('utils/momentWrapper');
+var context = require('utils/context');
+var template = require('./tmpl/archive-navigation-view.hbs');
+var CalHeatMap = require('cal-heatmap');
+
+module.exports = (function() {
+
 
   var language = context.lang();
 
@@ -85,4 +86,6 @@ define([
     }
   });
 
-});
+
+})();
+

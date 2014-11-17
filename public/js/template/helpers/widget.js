@@ -1,8 +1,7 @@
-define([
-  'handlebars'
-], function ( Handlebars ) {
-  "use strict";
+"use strict";
+var Handlebars = require('handlebars/runtime').default;
 
+module.exports = (function() {
   function Widget( widgetName, model ) {
     if(!this.renderViews) {
       this.renderViews = [];
@@ -18,5 +17,5 @@ define([
 
   Handlebars.registerHelper( 'widget', Widget );
   return Widget;
+})();
 
-});

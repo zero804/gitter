@@ -1,5 +1,8 @@
-define([], function() {
-  "use strict";
+"use strict";
+
+
+module.exports = (function() {
+
 
 	return {
 		panelWidthValue: '280px',
@@ -9,5 +12,6 @@ define([], function() {
 		shiftedMarginValue: '200px',
     isMobile: navigator.userAgent.match(/mobile/i) ? true : false
 	};
-}
-);
+
+})();
+

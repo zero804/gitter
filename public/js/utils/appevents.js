@@ -1,9 +1,10 @@
-define([
-  'underscore',
-  'backbone',
-  'utils/context'
-], function(_, Backbone, context) {
-  "use strict";
+"use strict";
+var _ = require('underscore');
+var Backbone = require('backbone');
+var context = require('utils/context');
+
+module.exports = (function() {
+
 
   var basePath = context.env('basePath');
 
@@ -41,4 +42,6 @@ define([
   _.extend(appEvents, Backbone.Events);
   return appEvents;
 
-});
+
+})();
+

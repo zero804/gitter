@@ -1,5 +1,9 @@
-define(['emojify','utils/cdn'], function(emojify, cdn) {
-  "use strict";
+"use strict";
+var emojify = require('emojify');
+var cdn = require('utils/cdn');
+
+module.exports = (function() {
+
 
   emojify.setConfig({
     img_dir: cdn('images/emoji/')
@@ -10,4 +14,6 @@ define(['emojify','utils/cdn'], function(emojify, cdn) {
     named: emojify.emojiNames
   };
 
-});
+
+})();
+

@@ -1,7 +1,8 @@
-define([
-  'underscore'
-], function(_) {
-  'use strict';
+'use strict';
+var _ = require('underscore');
+
+module.exports = (function() {
+
 
   var EVENTS = ['change', 'keydown', 'click', 'cut', 'paste'];
 
@@ -61,4 +62,6 @@ define([
     return new Drafty(element);
   };
 
-});
+
+})();
+

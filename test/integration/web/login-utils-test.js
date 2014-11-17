@@ -15,15 +15,6 @@ var assert = require('assert');
 describe('login-utils', function() {
 	describe('#whereToNext', function(done) {
 
-		it('should return a one-one url if the user is in not in any troupes and has no username', function() {
-      return loginUtils.whereToNext(fixture.user2)
-        .then(function(url) {
-          assert(url.match(/one-one/),'URL should contain one-one');
-          assert.equal(url, fixture.user2.getHomeUrl());
-        })
-        .nodeify(done);
-		});
-
     it('should return a username url if the user is in not in any troupes and has no username', function() {
       return loginUtils.whereToNext(fixture.user3)
         .then(function(url) {

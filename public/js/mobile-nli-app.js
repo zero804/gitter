@@ -1,16 +1,22 @@
-require([
-  'jquery',
-  'utils/appevents',
-  'collections/chat',
-  'views/chat/chatCollectionView',
-  'backbone',
-  'components/modal-region',
-  'views/app/mobileAppView',
-  'views/chat/decorators/emojiDecorator',
-  'views/mobile/mobileLoginButton'
-  ], function($, appEvents, chatModels, ChatCollectionView,
-    Backbone, modalRegion, MobileAppView, emojiDecorator, MobileLoginButton) {
-  "use strict";
+"use strict";
+
+var $ = require('jquery');
+var appEvents = require('utils/appevents');
+var chatModels = require('collections/chat');
+var ChatCollectionView = require('views/chat/chatCollectionView');
+var Backbone = require('backbone');
+var modalRegion = require('components/modal-region');
+var MobileAppView = require('views/app/mobileAppView');
+var emojiDecorator = require('views/chat/decorators/emojiDecorator');
+var MobileLoginButton = require('views/mobile/mobileLoginButton');
+var onready = require('./utils/onready');
+
+// Preload widgets
+require('views/widgets/avatar');
+require('views/widgets/timeago');
+
+onready(function() {
+
 
   new MobileAppView({
     el: '#mainPage',
@@ -50,4 +56,6 @@ require([
 
   Backbone.history.start();
 
+
 });
+

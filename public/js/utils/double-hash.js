@@ -1,8 +1,9 @@
-define([
-  'underscore',
-  'utils/utils'
-], function(_, utils) {
-  "use strict";
+"use strict";
+var _ = require('underscore');
+var utils = require('utils/utils');
+
+module.exports = (function() {
+
 
   // -----------------------------------------------------
   // Stores value pairs
@@ -100,4 +101,6 @@ define([
 
   return DoubleHash;
 
-});
+
+})();
+

@@ -1,5 +1,9 @@
-define(['underscore'], function(_) {
-  "use strict";
+/* jshint -W041 */
+"use strict";
+var _ = require('underscore');
+
+module.exports = (function() {
+
 
   var ObjProto = Object.prototype;
   var toString = ObjProto.toString;
@@ -109,4 +113,6 @@ define(['underscore'], function(_) {
   return function(a, b) {
     return eq(a, b, [], []);
   };
-});
+
+})();
+

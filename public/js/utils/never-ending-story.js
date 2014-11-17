@@ -1,5 +1,10 @@
-define(['underscore', 'backbone', 'log!nes'], function(_, Backbone, log) {
-  "use strict";
+"use strict";
+var _ = require('underscore');
+var Backbone = require('backbone');
+var log = require('utils/log');
+
+module.exports = (function() {
+
 
   /* Put your scrolling panels on rollers */
   function NeverEndingStory(target, options) {
@@ -115,7 +120,7 @@ define(['underscore', 'backbone', 'log!nes'], function(_, Backbone, log) {
       var self = this;
 
       if(!this._enabled) {
-        log('enabling scroll listener');
+        log.info('enabling scroll listener');
         this._target.addEventListener('scroll', this._scrollHandler, false);
         this._enabled = true;
 
@@ -133,7 +138,7 @@ define(['underscore', 'backbone', 'log!nes'], function(_, Backbone, log) {
 
     disable: function() {
       if(this._enabled) {
-        log('disabling scroll listener');
+        log.info('disabling scroll listener');
         this._target.removeEventListener('scroll', this._scrollHandler, false);
         this._enabled = false;
       }
@@ -143,4 +148,6 @@ define(['underscore', 'backbone', 'log!nes'], function(_, Backbone, log) {
 
 
   return NeverEndingStory;
-});
+
+})();
+

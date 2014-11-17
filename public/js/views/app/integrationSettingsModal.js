@@ -1,10 +1,11 @@
-define([
-  'marionette',
-  'utils/context',
-  'views/base',
-  'hbs!./tmpl/integrationSettingsTemplate',
-], function(Marionette, context, TroupeViews, template) {
-  "use strict";
+"use strict";
+var Marionette = require('marionette');
+var context = require('utils/context');
+var TroupeViews = require('views/base');
+var template = require('./tmpl/integrationSettingsTemplate.hbs');
+
+module.exports = (function() {
+
 
   var View = Marionette.ItemView.extend({
     template: template,
@@ -21,4 +22,6 @@ define([
         this.view = new View({ });
       }
     });
-  });
+  
+})();
+

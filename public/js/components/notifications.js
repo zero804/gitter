@@ -1,7 +1,9 @@
-define([
-  'utils/appevents'
-], function(appEvents){
-  "use strict";
+"use strict";
+var appEvents = require('utils/appevents');
+var cdn = require('../utils/cdn');
+
+module.exports = (function() {
+
 
   var Notification = window.Notification;
   var webkitNotifications = window.webkitNotifications;
@@ -25,7 +27,7 @@ define([
     var link = message.link;
     var title = message.title;
     var text = message.text;
-    var icon = '/images/icon-logo-red-64.png';
+    var icon = cdn('images/icon-logo-red-64.png');
 
     var notification = new Notification(title, { body: text, icon: icon });
 
@@ -80,4 +82,6 @@ define([
     }
   };
 
-});
+
+})();
+

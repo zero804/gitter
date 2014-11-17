@@ -1,11 +1,12 @@
+"use strict";
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
-define([
-  'jquery',
-  'marionette',
-  'utils/context',
-  'hbs!./tmpl/limitBannerTemplate'
-  ], function($, Marionette, context, template)  {
-  "use strict";
+var $ = require('jquery');
+var Marionette = require('marionette');
+var context = require('utils/context');
+var template = require('./tmpl/limitBannerTemplate.hbs');
+
+module.exports = (function() {
+
 
   return Marionette.ItemView.extend({
     template: template,
@@ -68,4 +69,6 @@ define([
   });
 
 
-});
+
+})();
+

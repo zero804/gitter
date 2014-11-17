@@ -1,11 +1,12 @@
-define([
-  'jquery',
-  'backbone',
-  'utils/context',
-  'hbs!./tmpl/unreadBannerTemplate',
-  'components/unread-items-client'
-  ], function($, Backbone, context, template, unreadItemsClient)  {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var Backbone = require('backbone');
+var context = require('utils/context');
+var template = require('./tmpl/unreadBannerTemplate.hbs');
+var unreadItemsClient = require('components/unread-items-client');
+
+module.exports = (function() {
+
 
   var BottomBannerView = Backbone.View.extend({
     events: {
@@ -98,4 +99,6 @@ define([
     Bottom: BottomBannerView
   };
 
-});
+
+})();
+

@@ -1,9 +1,10 @@
-define([
-  'utils/context',
-  'utils/appevents',
-  './mixpanel' // No ref
-], function(context, appEvents) {
-  "use strict";
+"use strict";
+var context = require('utils/context');
+var appEvents = require('utils/appevents');
+require('./mixpanel');
+
+module.exports = (function() {
+
 
   var trackingId = context.env('googleTrackingId');
   var trackingDomain = context.env('googleTrackingDomain') || 'gitter.im'; // Remove this default 23/10/2014;
@@ -100,7 +101,9 @@ define([
   return {
     trackError: trackError
   };
-});
+
+})();
+
 
 
 

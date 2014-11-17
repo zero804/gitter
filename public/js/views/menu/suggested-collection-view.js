@@ -1,10 +1,11 @@
-define([
-  'utils/room-name-trimmer',
-  'marionette',
-  'hbs!./tmpl/suggested-list-item',
-  'utils/appevents'
-], function(roomNameTrimmer, Marionette, suggestedListItemTemplate, appEvents) {
-  "use strict";
+"use strict";
+var roomNameTrimmer = require('utils/room-name-trimmer');
+var Marionette = require('marionette');
+var suggestedListItemTemplate = require('./tmpl/suggested-list-item.hbs');
+var appEvents = require('utils/appevents');
+
+module.exports = (function() {
+
 
   function getRepoClass(data) {
     if(!data.exists) return 'room-list-item__name--suggested';
@@ -49,4 +50,6 @@ define([
     itemView: SuggestedItemView
   });
 
-});
+
+})();
+

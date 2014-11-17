@@ -12,6 +12,8 @@ var rememberMe     = require('./middlewares/rememberme-middleware');
 var I18n           = require('i18n-2');
 var cors           = require('cors');
 
+var devMode        = config.get('dev-mode');
+
 // Naughty naughty naught, install some extra methods on the express prototype
 require('./http');
 
@@ -65,9 +67,32 @@ module.exports = {
       app.enable('view cache');
     }
 
-    app.use(express.static(staticContentDir, {
-      maxAge: config.get('web:staticContentExpiryDays') * 86400 * 1000
-    }));
+
+    if(devMode) {
+      var webpackMiddleware = require("webpack-dev-middleware");
+      var webpack = require('webpack');
+
+      process.env.WEBPACK_DEV_MODE = '1';
+
+      app.use(webpackMiddleware(webpack(require('../../public/js/webpack.config')), {
+          noInfo: false,
+          quiet: false,
+          lazy: false,
+          watchDelay: 300,
+          publicPath: "/_s/l/js/",
+          stats: {
+              colors: true
+          }
+      }));
+
+      app.use('/_s/l/styles', express.static('output/assets/styles', {
+        maxAge: 0
+      }));
+
+      app.use('/_s/l', express.static(staticContentDir, {
+        maxAge: 0
+      }));
+    }
 
     app.use(env.middlewares.accessLogger);
 

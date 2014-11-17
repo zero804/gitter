@@ -1,5 +1,8 @@
-define([], function() {
-  'use strict';
+'use strict';
+
+
+module.exports = (function() {
+
   /**
    * we no longer use sisyphus, so we need to remove any old drafts that it stored
    */
@@ -20,4 +23,6 @@ define([], function() {
     });
   }, 10000);
 
-});
+
+})();
+

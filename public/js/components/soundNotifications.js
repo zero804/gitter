@@ -1,8 +1,9 @@
-define([
-  'jquery',
-  'underscore'
-], function($, _){
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var _ = require('underscore');
+
+module.exports = (function() {
+
 
   function play(sound) {
       var snd = new Audio(sound);
@@ -46,4 +47,6 @@ define([
   }
 
   return module;
-});
+
+})();
+

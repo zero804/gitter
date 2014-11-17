@@ -1,3 +1,4 @@
+"use strict";
 /**
  * API Client
  *
@@ -46,12 +47,12 @@
  *     window.alert('I am a failure: ' + xhr.status);
  *   })
  */
-define([
-  'jquery',
-  'utils/context',
-  'utils/appevents'
-], function($, context, appEvents) {
-  "use strict";
+var $ = require('jquery');
+var context = require('utils/context');
+var appEvents = require('utils/appevents');
+
+module.exports = (function() {
+
 
   /* @const */
   var DEFAULT_TIMEOUT = 15 * 1000;
@@ -271,4 +272,6 @@ define([
     })
   });
 
-});
+
+})();
+

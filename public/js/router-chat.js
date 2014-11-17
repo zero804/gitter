@@ -1,38 +1,33 @@
-require([
-  'jquery',
-  'backbone',
-  'utils/context',
-  'components/live-context',
-  'utils/appevents',
-  'log!router-chat',
-  'views/people/peopleCollectionView',
-  'views/app/chatIntegratedView',
-  'collections/instances/integrated-items',
-  'views/share/share-view',
-  'views/app/troupeSettingsView',
-  'views/app/markdownView',
-  'views/app/keyboardView',
-  'views/app/addPeopleView',
-  'views/app/integrationSettingsModal',
-  'views/app/collaboratorsView',
-  'collections/collaborators',
-  'components/apiClient',
+"use strict";
+var $ = require('jquery');
+var Backbone = require('backbone');
+var context = require('utils/context');
+var liveContext = require('components/live-context');
+var appEvents = require('utils/appevents');
+var log = require('utils/log');
+var ChatIntegratedView = require('views/app/chatIntegratedView');
+var itemCollections = require('collections/instances/integrated-items');
+var onready = require('./utils/onready');
 
-  'components/statsc',          // No ref
-  'views/widgets/preload',      // No ref
-  'filtered-collection',        // No ref
-  'components/dozy',            // Sleep detection No ref
-  'template/helpers/all',       // No ref
-  'components/eyeballs',        // No ref
-  'components/bug-reporting',   // No ref
-  'components/focus-events'     // No ref
+var apiClient = require('components/apiClient');
+var HeaderView = require('views/app/headerView');
 
-], function($, Backbone, context, liveContext, appEvents, log,
-    peopleCollectionView, ChatIntegratedView, itemCollections,
-    shareView, TroupeSettingsView, MarkdownView, KeyboardView,
-    AddPeopleViewModal, IntegrationSettingsModal, CollaboratorsView,
-    collaboratorsModels, apiClient) {
-  "use strict";
+require('components/statsc');
+require('views/widgets/preload');
+require('filtered-collection');
+require('components/dozy');
+require('template/helpers/all');
+require('components/eyeballs');
+require('components/bug-reporting');
+require('components/focus-events');
+
+// Preload widgets
+require('views/widgets/avatar');
+require('views/widgets/timeago');
+
+
+onready(function() {
+
 
   $(document).on("click", "a", function(e) {
     if(this.href) {
@@ -60,7 +55,7 @@ require([
 
   window.addEventListener('message', function(e) {
     if(e.origin !== context.env('basePath')) {
-      log('Ignoring message from ' + e.origin);
+      log.info('Ignoring message from ' + e.origin);
       return;
     }
 
@@ -72,7 +67,7 @@ require([
       return;
     }
 
-    log('Received message ', message);
+    log.info('Received message ', message);
 
     var makeEvent = function(message) {
       var origin = 'app';
@@ -80,13 +75,13 @@ require([
       message.event = {
         origin: origin,
         preventDefault: function() {
-          log('Warning: could not use preventDefault() because the event comes from the `' + this.origin + '` frame');
+          log.info('Warning: could not use preventDefault() because the event comes from the `' + this.origin + '` frame');
         },
         stopPropagation: function() {
-          log('Warning: could not use stopPropagation() because the event comes from the `' + this.origin + '` frame');
+          log.info('Warning: could not use stopPropagation() because the event comes from the `' + this.origin + '` frame');
         },
         stopImmediatePropagation: function() {
-          log('Warning: could not use stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame');
+          log.info('Warning: could not use stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame');
         }
       };
     };
@@ -189,22 +184,28 @@ require([
     else notifyRemoveError('User '+ username +' was not found in this room.');
   });
 
-  var appView = new ChatIntegratedView({
-    el: 'body'
-  });
-
-  // appView.showSearchMode();
+  var appView = new ChatIntegratedView({ el: 'body' });
+  new HeaderView({ model: context.troupe(), el: '#header' });
 
   // This may require a better home
   itemCollections.users.once('sync', function() {
     if(context().permissions.admin) {
       if (itemCollections.users.length === 1) { //itemCollections.chats.length === 0)
-        var collaborators = new collaboratorsModels.CollabCollection();
-        collaborators.fetch();
-        collaborators.once('sync', function() {
-          var collaboratorsView = new CollaboratorsView({ collection: collaborators });
-          $('#content-frame').prepend(collaboratorsView.render().el);
+
+        require.ensure([
+          'views/app/collaboratorsView',
+          'collections/collaborators'],
+          function(require) {
+            var CollaboratorsView = require('views/app/collaboratorsView');
+            var collaboratorsModels = require('collections/collaborators');
+            var collaborators = new collaboratorsModels.CollabCollection();
+            collaborators.fetch();
+            collaborators.once('sync', function() {
+              var collaboratorsView = new CollaboratorsView({ collection: collaborators });
+              $('#content-frame').prepend(collaboratorsView.render().el);
+            });
         });
+
       }
     }
   });
@@ -227,35 +228,59 @@ require([
     },
 
     people: function() {
-      appView.dialogRegion.show(new peopleCollectionView.Modal({ collection: itemCollections.sortedUsers }));
+      require.ensure(['views/people/peopleCollectionView'], function(require) {
+        var peopleCollectionView = require('views/people/peopleCollectionView');
+        appView.dialogRegion.show(new peopleCollectionView.Modal({ collection: itemCollections.sortedUsers }));
+      });
     },
 
     notifications: function() {
-      appView.dialogRegion.show(new TroupeSettingsView({}));
+      require.ensure(['views/app/troupeSettingsView'], function(require) {
+        var TroupeSettingsView = require('views/app/troupeSettingsView');
+        appView.dialogRegion.show(new TroupeSettingsView({}));
+      });
     },
 
     markdown: function() {
-      appView.dialogRegion.show(new MarkdownView({}));
+      require.ensure(['views/app/markdownView'], function(require) {
+        var MarkdownView = require('views/app/markdownView');
+        appView.dialogRegion.show(new MarkdownView({}));
+      });
     },
 
     keys: function() {
-      appView.dialogRegion.show(new KeyboardView({}));
+      require.ensure(['views/app/keyboardView'], function(require) {
+        var KeyboardView = require('views/app/keyboardView');
+        appView.dialogRegion.show(new KeyboardView({}));
+      });
     },
 
     addPeople: function() {
-      appView.dialogRegion.show(new AddPeopleViewModal({}));
+      require.ensure(['views/app/addPeopleView'], function(require) {
+        var AddPeopleViewModal = require('views/app/addPeopleView');
+        appView.dialogRegion.show(new AddPeopleViewModal({}));
+      });
+
     },
 
     integrations: function() {
       if(context().permissions.admin) {
-        appView.dialogRegion.show(new IntegrationSettingsModal({}));
+        require.ensure(['views/app/integrationSettingsModal'], function(require) {
+          var IntegrationSettingsModal = require('views/app/integrationSettingsModal');
+
+          appView.dialogRegion.show(new IntegrationSettingsModal({}));
+        });
       } else {
         window.location = '#';
       }
     },
 
     share: function() {
-      appView.dialogRegion.show(new shareView.Modal({}));
+      require.ensure(['views/share/share-view'], function(require) {
+        var shareView = require('views/share/share-view');
+
+        appView.dialogRegion.show(new shareView.Modal({}));
+      });
     }
 
   });
@@ -327,7 +352,6 @@ require([
     setTimeout(promptForHook, 1500);
   }
 
-  //helpShareIfLonely();
-
   Backbone.history.start();
 });
+

@@ -1,7 +1,8 @@
-define(function () {
+'use strict';
 
-  // This is taken from https://github.com/troupe/text-filter
-  'use strict';
+
+module.exports = (function() {
+
 
   function createRegExpsForQuery(queryText) {
     var normalized = ("" + queryText).trim().toLowerCase();
@@ -45,4 +46,6 @@ define(function () {
 
   };
 
-});
+
+})();
+

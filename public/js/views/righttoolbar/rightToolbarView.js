@@ -1,16 +1,16 @@
-define([
-  'jquery',
-  'marionette',
-  'utils/context',
-  'collections/instances/integrated-items',
-  'views/people/peopleCollectionView',
-  'views/search/searchView',
-  './repoInfo',
-  './activity',
-  'utils/scrollbar-detect'
-], function ($, Marionette, context, itemCollections, PeopleCollectionView,
-  SearchView, repoInfo, ActivityStream, hasScrollBars) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var Marionette = require('marionette');
+var context = require('utils/context');
+var itemCollections = require('collections/instances/integrated-items');
+var PeopleCollectionView = require('views/people/peopleCollectionView');
+var SearchView = require('views/search/searchView');
+var repoInfo = require('./repoInfo');
+var ActivityStream = require('./activity');
+var hasScrollBars = require('utils/scrollbar-detect');
+
+module.exports = (function() {
+
 
   var RightToolbarLayout = Marionette.Layout.extend({
 
@@ -113,4 +113,6 @@ define([
 
   return RightToolbarLayout;
 
-});
+
+})();
+

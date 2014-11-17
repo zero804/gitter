@@ -1,9 +1,10 @@
-require([
-  'jquery',
-  'underscore',
-  'utils/appevents'
-], function($, _, appEvents) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var _ = require('underscore');
+var appEvents = require('utils/appevents');
+
+module.exports = (function() {
+
 
   // Central logic for focus events
   // Listens to specific keyboard events to trigger corresponding 'focus.request' events
@@ -122,4 +123,6 @@ require([
     }
   });
 
-});
+
+})();
+

@@ -1,21 +1,23 @@
-require([
-  'jquery',
-  'backbone',
-  'utils/context',
-  'views/app/chatNliIntegratedView',
-  'views/app/headerView',
-  'views/archive/archive-navigation-view',
+"use strict";
+var $ = require('jquery');
+var context = require('utils/context');
+//var ChatNliIntegratedView = require('views/app/chatNliIntegratedView');
+var HeaderView = require('views/app/headerView');
+var ArchiveNavigationView = require('views/archive/archive-navigation-view');
+var onready = require('./utils/onready');
 
-  'views/widgets/preload',      // No ref
-  'filtered-collection',        // No ref
-  'components/dozy',            // Sleep detection No ref
-  'template/helpers/all',       // No ref
-  'components/bug-reporting'    // No ref
+require('views/widgets/preload');
+require('filtered-collection');
+require('components/dozy');
+require('template/helpers/all');
+require('components/bug-reporting');
+require('utils/tracking');
 
-], function($, Backbone, context,
-    ChatNliIntegratedView,
-    HeaderView, ArchiveNavigationView) {
-  "use strict";
+// Preload widgets
+require('views/widgets/avatar');
+require('views/widgets/timeago');
+
+onready(function() {
 
   $(document).on("click", "a", function(e) {
     if(this.href) {
@@ -25,10 +27,8 @@ require([
         window.location = href;
       }
     }
-
     return true;
   });
-
 
   // When a user clicks an internal link, prevent it from opening in a new window
   $(document).on("click", "a.link", function(e) {
@@ -41,8 +41,6 @@ require([
     e.preventDefault();
     window.parent.location.href = href;
   });
-
-  // var appView = new ChatNliIntegratedView({ el: 'body' });
 
   new HeaderView({ model: context.troupe(), el: '#header' });
 
@@ -68,20 +66,5 @@ require([
     // TODO: Handle the error? WC.
   }
 
-
-  // var Router = Backbone.Router.extend({
-  //   routes: {
-  //     // TODO: get rid of the pipes
-  //     "": "hideModal",
-  //   },
-
-  //   hideModal: function() {
-  //     appView.dialogRegion.close();
-  //   },
-
-  // });
-
-  // new Router();
-
-  Backbone.history.start();
 });
+

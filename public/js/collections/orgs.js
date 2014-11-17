@@ -1,8 +1,9 @@
-define([
-  'components/apiClient',
-  './base'
-], function(apiClient, TroupeCollections) {
-  "use strict";
+"use strict";
+var apiClient = require('components/apiClient');
+var TroupeCollections = require('./base');
+
+module.exports = (function() {
+
 
   var OrgModel = TroupeCollections.Model.extend({
     idAttribute: 'name' // Unusual...
@@ -17,4 +18,6 @@ define([
     OrgCollection:    OrgCollection,
     OrgModel:         OrgModel
   };
-});
+
+})();
+

@@ -1,9 +1,10 @@
-define([
-  'components/apiClient',
-  './base',
-  'backbone'
-], function(apiClient, TroupeCollections, Backbone) {
-  "use strict";
+"use strict";
+var apiClient = require('components/apiClient');
+var TroupeCollections = require('./base');
+var Backbone = require('backbone');
+
+module.exports = (function() {
+
 
   var CollabModel = TroupeCollections.Model.extend({
     idAttribute: 'id'
@@ -18,4 +19,6 @@ define([
     CollabCollection: CollabCollection,
     CollabModel: CollabModel
   };
-});
+
+})();
+

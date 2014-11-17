@@ -1,10 +1,11 @@
-define([
-  'underscore',
-  'utils/context',
-  'utils/appevents',
-  'components/apiClient'
-], function(_, context, appEvents, apiClient) {
-  "use strict";
+"use strict";
+var _ = require('underscore');
+var context = require('utils/context');
+var appEvents = require('utils/appevents');
+var apiClient = require('components/apiClient');
+
+module.exports = (function() {
+
 
   var commandsList = [
     {
@@ -290,4 +291,6 @@ define([
 
   };
 
-});
+
+})();
+

@@ -1,6 +1,8 @@
-define([], function () {
-  // NB: an exact copy of this resides on the server
-  "use strict";
+"use strict";
+
+
+module.exports = (function() {
+
 
   return function trim(name, maxLength) {
     maxLength = maxLength || 25; // defaults to 25
@@ -18,4 +20,6 @@ define([], function () {
     return parts.pop();
   };
 
-});
+
+})();
+

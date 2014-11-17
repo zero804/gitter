@@ -1,8 +1,7 @@
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
-define([
-  /* requires */
-], function () {
-  "use strict";
+"use strict";
+
+module.exports = (function() {
+
 
   /**
    * processHeaders() creates the optional headers string for the mailto protocol
@@ -68,4 +67,6 @@ define([
     str: createAnchorString
   };
 
-});
+
+})();
+

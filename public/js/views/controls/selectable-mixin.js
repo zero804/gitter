@@ -1,7 +1,8 @@
-define([
-  'utils/dataset-shim'
-], function(dataset) {
-  "use strict";
+"use strict";
+var dataset = require('utils/dataset-shim');
+
+module.exports = (function() {
+
 
   function getContainer(self) {
     if(self.$itemViewContainer) return self.$itemViewContainer;
@@ -158,4 +159,6 @@ define([
     }
   };
 
-});
+
+})();
+

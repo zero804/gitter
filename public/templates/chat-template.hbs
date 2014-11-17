@@ -1,16 +1,15 @@
 {{!< chat-layout}}
 {{> chat_alert_wrapper}}
 <div class="chat-and-toolbar-wrapper">
+  {{> chat_toolbar}}
   <div class="chat-app">
     {{> chat_header}}
     {{> chat_content}}
     {{> chat_input}}
   </div>
-  {{> chat_toolbar}}
 </div>
 
 <div class="trpBlankPage"></div>
-{{> require_wrapper}}
 {{> set_initial_position}}
 {{{ generateTroupeContext troupeContext }}}
 {{{ bootScript bootScriptName }}}

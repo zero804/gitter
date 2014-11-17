@@ -1,7 +1,8 @@
-define([
-  'utils/platformDetect'
-], function(platformDetect) {
-  "use strict";
+"use strict";
+var platformDetect = require('utils/platformDetect');
+
+module.exports = (function() {
+
 
   // Set modifier keys for the OS
 
@@ -23,4 +24,6 @@ define([
     };
   }
 
-});
+
+})();
+

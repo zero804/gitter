@@ -1,8 +1,9 @@
-define([
-  'utils/appevents',
-  'log!dozy'
-], function(appEvents, log) {
-  "use strict";
+"use strict";
+var appEvents = require('utils/appevents');
+var log = require('utils/log');
+
+module.exports = (function() {
+
 
   var TIMEOUT = 120000;
   var THRESHOLD = TIMEOUT * 1.5;
@@ -16,10 +17,12 @@ define([
     last = now;
 
     if(sleepDetected) {
-      log('Sleep detected!');
+      log.info('Sleep detected!');
       appEvents.trigger('reawaken', time);
     }
 
   }, TIMEOUT);
 
-});
+
+})();
+

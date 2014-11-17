@@ -1,8 +1,10 @@
+"use strict";
 /* jshint unused:true, browser:true,  strict:true */
 /* global define:false */
-define([], function() {
 
-  "use strict";
+
+module.exports = (function() {
+
 
   function showAvatar(chatItemView, meta) {
   }
@@ -24,4 +26,6 @@ define([], function() {
 
   return decorator;
 
-});
+
+})();
+
