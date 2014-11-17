@@ -1276,18 +1276,6 @@
         }
       }
     },
-    "faye-redis": {
-      "version": "0.3.0",
-      "from": "faye-redis@git://github.com/gitterHQ/faye-redis-node#11aa3dbf5638f40b659397045344096b08e9ca4c",
-      "resolved": "git://github.com/gitterHQ/faye-redis-node#11aa3dbf5638f40b659397045344096b08e9ca4c",
-      "dependencies": {
-        "redis": {
-          "version": "0.12.1",
-          "from": "https://registry.npmjs.org/redis/-/redis-0.12.1.tgz",
-          "resolved": "https://registry.npmjs.org/redis/-/redis-0.12.1.tgz"
-        }
-      }
-    },
     "faye-websocket": {
       "version": "0.7.3",
       "from": "https://registry.npmjs.org/faye-websocket/-/faye-websocket-0.7.3.tgz",
@@ -1374,6 +1362,33 @@
               "resolved": "https://registry.npmjs.org/async/-/async-0.2.10.tgz"
             }
           }
+        }
+      }
+    },
+    "gitter-faye-redis": {
+      "version": "0.4.0",
+      "from": "gitter-faye-redis@*",
+      "dependencies": {
+        "gitter-redis-scripto": {
+          "version": "0.2.0",
+          "from": "gitter-redis-scripto@>=0.2.0 <0.3.0",
+          "dependencies": {
+            "redis": {
+              "version": "0.8.6",
+              "from": "redis@>=0.8.0 <0.9.0",
+              "resolved": "https://registry.npmjs.org/redis/-/redis-0.8.6.tgz"
+            },
+            "debug": {
+              "version": "0.7.4",
+              "from": "debug@>=0.7.0 <0.8.0",
+              "resolved": "https://registry.npmjs.org/debug/-/debug-0.7.4.tgz"
+            }
+          }
+        },
+        "redis": {
+          "version": "0.12.1",
+          "from": "redis@*",
+          "resolved": "https://registry.npmjs.org/redis/-/redis-0.12.1.tgz"
         }
       }
     },
