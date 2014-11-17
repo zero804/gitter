@@ -477,8 +477,8 @@ module.exports = (function() {
 
       this.listenTo(this.search, 'loaded:messages', function (data) {
         masterCollection.remove(this.chats.models); // we must remove the old chats before adding new ones
+        masterCollection.set(data, { remove: false });
         this.chats.resetWith(masterCollection);
-        masterCollection.add(data);
       }.bind(this));
 
       // initialize the views
