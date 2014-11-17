@@ -16,8 +16,7 @@ module.exports = (function() {
 
     regions: {
       search: '#search-panel',
-      repo_info: "#repo-info",
-      activity: "#activity"
+      repo_info: "#repo-info"
     },
 
     events: {
@@ -48,7 +47,10 @@ module.exports = (function() {
       }
 
       // Activity
-      this.activity.show(new ActivityStream({ collection: itemCollections.events }));
+      new ActivityStream({
+        el: $('#activity'),
+        collection: itemCollections.events
+      });
 
       // Search
       this.searchView = new SearchView({ });

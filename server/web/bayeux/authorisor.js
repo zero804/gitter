@@ -128,9 +128,9 @@ function populateSubTroupeCollection(options) {
       return restful.serializeUsersForTroupe(troupeId, userId, snapshot)
         .then(arrayToSnapshot('room.users'));
 
-    //case "events":
-    //  return restful.serializeEventsForTroupe(troupeId, userId)
-    //    .then(arrayToSnapshot('room.events'));
+    case "events":
+      return restful.serializeEventsForTroupe(troupeId, userId)
+        .then(arrayToSnapshot('room.events'));
 
     default:
       logger.error('Unable to provide snapshot for ' + collection);
