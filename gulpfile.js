@@ -16,15 +16,16 @@ var git = require('gulp-git');
 var fs = require('fs');
 var jshint = require('gulp-jshint');
 var imagemin = require('gulp-imagemin');
-var less = require('gulp-less');
 var postcss = require('gulp-postcss');
 var autoprefixer = require('autoprefixer-core');
 var mqpacker = require('css-mqpacker');
 var csswring = require('csswring');
 var mkdirp = require('mkdirp');
+var gulpif = require('gulp-if');
+var sourcemaps = require('gulp-sourcemaps');
 
 /* Don't do clean in gulp, use make */
-
+var DEV_MODE = !!process.env.DEV_MODE;
 
 gulp.task('validate-client-source', function() {
   /* This is a very lax jshint, only looking for major problems */
@@ -179,6 +180,7 @@ gulp.task('css-ios', function () {
     'public/less/mobile-native-chat.less',
     'public/less/mobile-native-userhome.less'
     ])
+    .pipe(gulpif(DEV_MODE, sourcemaps.init()))
     .pipe(less({
       paths: ['public/less']
     }))
@@ -190,6 +192,7 @@ gulp.task('css-ios', function () {
       mqpacker,
       csswring
     ]))
+    .pipe(gulpif(DEV_MODE, sourcemaps.write('output/assets/styles')))
     .pipe(gulp.dest('output/assets/styles'));
 });
 
@@ -200,6 +203,7 @@ gulp.task('css-mobile', function () {
     'public/less/mobile-nli-app.less',
     'public/less/mobile-userhome.less'
     ])
+    .pipe(gulpif(DEV_MODE, sourcemaps.init()))
     .pipe(less({
       paths: ['public/less']
     }))
@@ -215,6 +219,7 @@ gulp.task('css-mobile', function () {
       mqpacker,
       csswring
     ]))
+    .pipe(gulpif(DEV_MODE, sourcemaps.write('output/assets/styles')))
     .pipe(gulp.dest('output/assets/styles'));
 });
 
@@ -238,6 +243,7 @@ gulp.task('css-web', function () {
     'public/less/router-archive-chat.less',
     'public/less/userhome.less'
     ])
+    .pipe(gulpif(DEV_MODE, sourcemaps.init()))
     .pipe(less({
       paths: [  'public/less' ]
     }))
@@ -253,6 +259,7 @@ gulp.task('css-web', function () {
       mqpacker,
       csswring
     ]))
+    .pipe(gulpif(DEV_MODE, sourcemaps.write('output/assets/styles')))
     .pipe(gulp.dest('output/assets/styles'));
 });
 
