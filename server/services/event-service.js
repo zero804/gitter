@@ -56,7 +56,7 @@ exports.findEventsForTroupe = function(troupeId, options, callback) {
     .skip(options.skip || 0)
     .execQ()
     .then(function(results) {
-      return results.reverse();
+      return results;
     })
     .nodeify(callback);
 };

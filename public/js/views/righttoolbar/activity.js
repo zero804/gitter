@@ -1,4 +1,5 @@
 "use strict";
+var $ = require('jquery');
 var _ = require('underscore');
 var Marionette = require('marionette');
 var appEvents = require('utils/appevents');
@@ -27,9 +28,10 @@ var sprintlyTemplate = require('./tmpl/sprintly.hbs');
 var trelloTemplate = require('./tmpl/trello.hbs');
 var prerenderedTemplate = require('./tmpl/prerendered.hbs');
 var cocktail = require('cocktail');
+var compositeTemplate = require('./tmpl/composite.hbs');
+
 
 module.exports = (function() {
-
 
   var serviceTemplates = {
     bitbucket:  bitbucketTemplate,
@@ -224,11 +226,16 @@ module.exports = (function() {
     }
   });
 
-  var ActivityView = Marionette.CollectionView.extend({
-    tagName: 'ul',
-    className: 'gtrActivityList',
+  var ActivityView = Marionette.CompositeView.extend({
+    template: compositeTemplate,
+    itemViewContainer: 'ul',
+
+    initialize: function() {
+      this.listenTo(this.collection, 'snapshot', this.render);
+    },
+
     itemView: ActivityItemView,
-    //emptyView: EmptyActivityView
+    emptyView: EmptyActivityView
   });
   cocktail.mixin(ActivityView, TroupeViews.SortableMarionetteView);
 

@@ -19,7 +19,7 @@ module.exports = (function() {
   var userCollection          = new userModels.UserCollection(null, { listen: true });
   var rosterCollection        = new userModels.RosterCollection(null, { users: userCollection, limit: 21 });
   var sortedUserCollection    = new userModels.SortedUserCollection(null, { users: userCollection});
-  var eventCollection         = new eventModels.EventCollection(null,  { listen: true, snapshot: false });
+  var eventCollection         = new eventModels.EventCollection(null,  { listen: true, snapshot: true });
 
   // update online status of user models
   appEvents.on('userLoggedIntoTroupe', updateUserStatus);

@@ -169,7 +169,7 @@ module.exports = function(model) {
      html:    model.html
    };
 
-   var extra = model.meta.prerendered ? {} : getExtraRenderData(model.meta, meta.payload);
+   var extra = model.meta.prerendered ? {} : getExtraRenderData(model.meta, model.payload);
    var templateData = _.extend(core, extra);
 
   return template(templateData);

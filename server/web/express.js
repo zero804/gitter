@@ -12,6 +12,7 @@ var rememberMe     = require('./middlewares/rememberme-middleware');
 var I18n           = require('i18n-2');
 var cors           = require('cors');
 
+
 var devMode        = config.get('dev-mode');
 
 // Naughty naughty naught, install some extra methods on the express prototype
