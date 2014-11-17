@@ -13,11 +13,18 @@ var mentionDecorator = require('views/chat/decorators/mentionDecorator');
 var embedDecorator = require('views/chat/decorators/embedDecorator');
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var peopleCollectionView = require('views/people/peopleCollectionView');
+var HeaderView = require('views/app/headerView');
+
 require('views/widgets/preload');
 require('filtered-collection');
 require('components/dozy');
 require('template/helpers/all');
 require('components/bug-reporting');
+
+// Preload widgets
+require('views/widgets/avatar');
+require('views/widgets/timeago');
+
 
 module.exports = (function() {
 
@@ -48,6 +55,7 @@ module.exports = (function() {
   });
 
   var appView = new ChatNliIntegratedView({ el: 'body' });
+  new HeaderView({ model: context.troupe(), el: '#header' });
   new RightToolbarView({ el: "#toolbar-frame" });
 
   // new HeaderView({ model: context.troupe(), el: '#header' });

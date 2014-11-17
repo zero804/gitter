@@ -13,6 +13,11 @@ var mobileDecorator = require('views/chat/decorators/mobileDecorator');
 var log = require('utils/log');
 require('components/eyeballs');
 
+// Preload widgets
+require('views/widgets/avatar');
+require('views/widgets/timeago');
+
+
 module.exports = (function() {
 
 

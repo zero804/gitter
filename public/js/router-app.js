@@ -23,6 +23,9 @@ require('components/bug-reporting');
 require('components/focus-events');
 require('utils/tracking');
 
+// Preload widgets
+require('views/widgets/avatar');
+
 module.exports = (function() {
 
 

@@ -13,7 +13,10 @@ module.exports = (function() {
   var UserCollection = TroupeCollections.LiveCollection.extend({
     model: UserModel,
     modelName: 'user',
-    url: apiClient.room.channelGenerator('/users')
+    url: apiClient.room.channelGenerator('/users'),
+    getSnapshotState: function () {
+      return { lean: true };
+    }
   });
 
   return {

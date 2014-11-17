@@ -58,6 +58,7 @@ module.exports = (function() {
 
   function showNotificationIcon(chatItemView, meta) {
 
+    // READ THIS GITTERERS!
     // NB NB NB: update the matching list at
     // server/web/prerender-chat-helper.js
     var favicons = {
@@ -67,6 +68,7 @@ module.exports = (function() {
       sprintly:   'https://sprint.ly/favicon.ico',
       travis:     'https://travis-ci.org/favicon.ico',
       trello:     'https://trello.com/favicon.ico'
+      // READ THE COMMENT ABOVE!
     };
 
     // NB NB NB: update the matching list at
@@ -82,6 +84,7 @@ module.exports = (function() {
       member:         'as member to',
       public:         'made public',
       watch:          'started watching'
+      // READ THE COMMENT ABOVE
     };
 
     var viewData          = meta;

@@ -8,6 +8,9 @@ var MobileAppView = require('views/app/mobileAppView');
 var confirmRepoRoomView = require('views/createRoom/confirmRepoRoomView');
 var modalRegion = require('components/modal-region');
 
+// Preload widgets
+require('views/widgets/avatar');
+
 module.exports = (function() {
 
 

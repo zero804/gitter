@@ -56,25 +56,20 @@ exports.bootScript = function(url, parameters) {
 
   var options = parameters.hash;
 
-  var async    = 'async' in options ? options.async : true;
-
   var baseUrl;
   if(options.root) {
     baseUrl = options.root + "js/";
   } else {
     baseUrl = cdn("js", { appcache: options.appcache });
   }
-  var asyncScript = async ? "defer='defer' async='true' " : '';
   var scriptName = url + '.js';
   var vendorScript = 'vendor.js';
 
   return util.format(
-         "<script type='text/javascript' %s src='%s/%s'></script>" +
-         "<script type='text/javascript' %s src='%s/%s'></script>",
-         asyncScript,
+         "<script type='text/javascript' src='%s/%s'></script>" +
+         "<script type='text/javascript' src='%s/%s'></script>",
          baseUrl,
          vendorScript,
-         asyncScript,
          baseUrl,
          scriptName);
 };

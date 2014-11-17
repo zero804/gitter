@@ -5,9 +5,9 @@ var template = require('./tmpl/parentSelectView.hbs');
 var itemTemplate = require('./tmpl/parentItemView.hbs');
 var Typeahead = require('views/controls/typeahead');
 var Backbone = require('backbone');
+var cdn = require('../../utils/cdn');
 
 module.exports = (function() {
-
 
   var ItemModel = Backbone.Model.extend({
     idAttribute: "uri",
@@ -128,7 +128,7 @@ module.exports = (function() {
       }
 
       if  (m.get('type') === 'repo') {
-        this.ui.avatar.css("background-image", "url(../../images/icon-repo.png)");
+        this.ui.avatar.css("background-image", "url(" + cdn('images/icon-repo.png') + ")");
       } else {
         this.ui.avatar.css("background-image", "url(" + m.get('avatarUrl') + ")");
       }

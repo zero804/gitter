@@ -6,6 +6,10 @@ var confirmRepoRoomView = require('views/createRoom/confirmRepoRoomView');
 var modalRegion = require('components/modal-region');
 require('utils/tracking');
 
+// Preload widgets
+require('views/widgets/avatar');
+require('views/widgets/timeago');
+
 module.exports = (function() {
   new UserHomeView({ el: '#content-wrapper' }).render();
 
