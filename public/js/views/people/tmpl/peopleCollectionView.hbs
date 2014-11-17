@@ -1,4 +1,19 @@
 <span class="frame-people">
-  <span id="roster"></span>
+  <span id="roster">
+    {{#each users}}
+      {{ peopleItemPrerender this }}
+    {{/each}}
+  </span>
   <span id="remaining"></span>
 </span>
+{{!-- <span class="frame-people">
+  <span id="roster">
+    <ul class="roster">
+      {{#each users}}
+        lol
+        <li>{{{ peopleItemPrerender this }}}</li>
+      {{/each}}
+    </ul>
+  </span>
+  <span id="remaining"></span>
+</span> --}}
