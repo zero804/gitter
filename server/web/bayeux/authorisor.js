@@ -118,8 +118,6 @@ function populateSubTroupeCollection(options) {
   var snapshot = options.snapshot || {}; // Details of the snapshot
   var troupeId = match[1];
   var collection = match[2];
-  
-  console.log('*** ', options, troupeId, collection);
 
   switch(collection) {
     case "chatMessages":
