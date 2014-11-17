@@ -132,7 +132,6 @@ function renderChat(req, res, options, next) {
       restful.serializeEventsForTroupe(troupe.id, userId),
       restful.serializeUsersForTroupe(troupe.id, userId, serializerOptions)
     ]).spread(function (troupeContext, chats, activityEvents, users) {
-      console.log('#users:', users);
       var initialChat = _.find(chats, function(chat) { return chat.initial; });
       var initialBottom = !initialChat;
       var githubLink;
