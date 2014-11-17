@@ -28,7 +28,7 @@ module.exports = (function() {
 
     apiClient.priv.post('/statsc', sendQueue, { dataType: 'text' })
       .fail(function() {
-        log('An error occurred while communicating stats');
+        log.info('An error occurred while communicating stats');
       });
 
   }

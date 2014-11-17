@@ -33,7 +33,7 @@ module.exports = (function() {
           break;
 
         default:
-          log("Unknown operation " + operation + ", ignoring");
+          log.info("Unknown operation " + operation + ", ignoring");
 
       }
 

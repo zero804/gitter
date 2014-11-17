@@ -1752,6 +1752,11 @@
       "from": "https://registry.npmjs.org/locale/-/locale-0.0.17.tgz",
       "resolved": "https://registry.npmjs.org/locale/-/locale-0.0.17.tgz"
     },
+    "loglevel": {
+      "version": "1.2.0",
+      "from": "loglevel@*",
+      "resolved": "http://beta-internal:8089/nexus/content/groups/npm/loglevel/-/loglevel-1.2.0.tgz"
+    },
     "mandrill-api": {
       "version": "1.0.41",
       "from": "https://registry.npmjs.org/mandrill-api/-/mandrill-api-1.0.41.tgz",

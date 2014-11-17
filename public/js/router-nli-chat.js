@@ -14,6 +14,7 @@ var embedDecorator = require('views/chat/decorators/embedDecorator');
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var peopleCollectionView = require('views/people/peopleCollectionView');
 var HeaderView = require('views/app/headerView');
+var onready = require('./utils/onready');
 
 require('views/widgets/preload');
 require('filtered-collection');
@@ -25,9 +26,7 @@ require('components/bug-reporting');
 require('views/widgets/avatar');
 require('views/widgets/timeago');
 
-
-module.exports = (function() {
-
+onready(function() {
 
   $(document).on("click", "a", function(e) {
     if(this.href) {
@@ -99,5 +98,5 @@ module.exports = (function() {
 
   Backbone.history.start();
 
-})();
+});
 

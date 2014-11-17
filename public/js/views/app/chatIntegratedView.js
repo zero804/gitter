@@ -75,7 +75,9 @@ module.exports = (function() {
         collection: itemCollections.chats,
         userCollection: itemCollections.users,
         decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
-      }).render();
+      });
+      chatCollectionView.bindUIElements();
+
 
       this.listenTo(itemCollections.chats, 'atBottomChanged', function (isBottom) {
         this.ui.scrollToBottom.toggleClass('u-scale-zero', isBottom);
