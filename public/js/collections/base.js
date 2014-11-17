@@ -1,12 +1,13 @@
-define([
-  'underscore',
-  'components/apiClient',
-  'backbone',
-  'components/realtime',
-  'log!collections',
-  './equals'
-], function(_, apiClient, Backbone, realtime, log, equals) {
-  "use strict";
+"use strict";
+var _ = require('underscore');
+var apiClient = require('components/apiClient');
+var Backbone = require('backbone');
+var realtime = require('components/realtime');
+var log = require('utils/log');
+var equals = require('./equals');
+
+module.exports = (function() {
+
 
   var PATCH_TIMEOUT = 2000; // 2000ms before a patch gives up
 
@@ -146,7 +147,7 @@ define([
     },
 
     addWaiter: function(id, callback, timeout) {
-      log('Waiting for id', id);
+      log.info('Waiting for id', id);
 
       if(!id) return;
 
@@ -157,13 +158,13 @@ define([
 
       function done(model) {
         clearTimeout(timeoutRef);
-        log('Waitor completed with model', model);
+        log.info('Waitor completed with model', model);
 
         self.off('add', check, id);
         self.off('change:id', check, id);
 
         if(actionPerformed) {
-          log('Warning: waitor function called twice.');
+          log.info('Warning: waitor function called twice.');
           return;
         }
         actionPerformed = true;
@@ -255,7 +256,7 @@ define([
       }, stateProvider);
 
       this.subscription.errback(function(error) {
-        log('Subscription error for ' + url, error);
+        log.info('Subscription error for ' + url, error);
       });
     },
 
@@ -307,16 +308,16 @@ define([
     // TODO: make this dude tighter
     applyUpdate: function(operation, existingModel, newAttributes, parsed, options) {
       if(this.operationIsUpToDate(operation, existingModel, newAttributes)) {
-        log('Performing ' + operation, newAttributes);
+        log.info('Performing ' + operation, newAttributes);
 
         existingModel.set(parsed.attributes, options || {});
       } else {
-        log('Ignoring out-of-date update', existingModel.toJSON(), newAttributes);
+        log.info('Ignoring out-of-date update', existingModel.toJSON(), newAttributes);
       }
     },
 
     patch: function(id, newModel, options) {
-      log('Request to patch ' + id + ' with ', newModel, options);
+      log.info('Request to patch ' + id + ' with ', newModel, options);
 
       var self = this;
 
@@ -331,7 +332,7 @@ define([
       /* Existing model does not exist */
       this.addWaiter(id, function(existing) {
         if(!existing) {
-          log('Unable to find model ' + id);
+          log.info('Unable to find model ' + id);
           return;
         }
 
@@ -368,7 +369,7 @@ define([
             if(operation === 'patch') {
               this.addWaiter(id, function(existing) {
                 if(!existing) {
-                  log('Unable to find model ' + id);
+                  log.info('Unable to find model ' + id);
                   return;
                 }
 
@@ -390,7 +391,7 @@ define([
           break;
 
         default:
-          log("Unknown operation " + operation + ", ignoring");
+          log.info("Unknown operation " + operation + ", ignoring");
 
       }
     }
@@ -466,7 +467,7 @@ define([
 
       var self = this;
       this.trigger('search:next');
-      log('Fetch next: ', data);
+      log.info('Fetch next: ', data);
       this.fetch({
         remove: ('remove' in options) ? options.remove : false,
         add: ('add' in options) ? options.add : true,
@@ -568,4 +569,6 @@ define([
   // }
 
   return exports;
-});
+
+})();
+

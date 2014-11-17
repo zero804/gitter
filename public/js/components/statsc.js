@@ -1,10 +1,11 @@
-define([
-  'underscore',
-  'utils/appevents',
-  'components/apiClient',
-  'log!stats'
-], function(_, appEvents, apiClient, log) {
-  "use strict";
+"use strict";
+var _ = require('underscore');
+var appEvents = require('utils/appevents');
+var apiClient = require('components/apiClient');
+var log = require('utils/log');
+
+module.exports = (function() {
+
 
   var statQueue = [];
   var counters = {};
@@ -27,7 +28,7 @@ define([
 
     apiClient.priv.post('/statsc', sendQueue, { dataType: 'text' })
       .fail(function() {
-        log('An error occurred while communicating stats');
+        log.info('An error occurred while communicating stats');
       });
 
   }
@@ -57,4 +58,6 @@ define([
 
 
 
-});
+
+})();
+

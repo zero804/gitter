@@ -1,8 +1,9 @@
-define([
-  'log!cache-sync',
-  'utils/context'
-], function(log, context) {
-  "use strict";
+"use strict";
+var log = require('utils/log');
+var context = require('utils/context');
+
+module.exports = (function() {
+
   var PLUGIN = "ChatSnapshot";
 
   function cdvError(callback) {
@@ -33,11 +34,11 @@ define([
   function ChatCacheSync(collection) {
     var troupeId = context.getTroupeId();
 
-    log('Loading collection from native cache');
+    log.info('Loading collection from native cache');
 
     getChatsForTroupe(troupeId, function(err, result) {
       if(err || !result) return;
-      log('Cache contains ' + result.length + ' items');
+      log.info('Cache contains ' + result.length + ' items');
 
       collection.reset(result, { parse: true });
 
@@ -80,4 +81,6 @@ define([
     }
   };
 
-});
+
+})();
+

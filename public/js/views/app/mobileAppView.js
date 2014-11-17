@@ -1,22 +1,27 @@
-define([
-  'backbone',
-  'marionette',
-  'jquery-hammer'
-], function(Backbone, Marionette, $hammer) {
-  "use strict";
+"use strict";
+var Marionette = require('marionette');
+var $ = require('jquery');
+require('jquery-hammerjs');
+
+module.exports = (function() {
+
 
   return Marionette.ItemView.extend({
-    initialize: function(options) {
-      this.$el = $hammer(this.$el).hammer();
-      if(options.hideMenu) {
-        this.$el.find('#showTroupesButton').hide();
-      }
+    ui: {
+      showTroupesButton: '#showTroupesButton'
     },
 
     events: {
       'tap': 'tap',
-      'touch #showTroupesButton': 'stopClickEvents',
-      'tap #showTroupesButton': 'showHideTroupes'
+      'touch @ui.showTroupesButton': 'stopClickEvents',
+      'tap @ui.showTroupesButton': 'showHideTroupes'
+    },
+
+    initialize: function(options) {
+      this.$el.hammer();
+      if(options.hideMenu) {
+        this.$el.find('#showTroupesButton').hide();
+      }
     },
 
     tap: function() {
@@ -25,20 +30,22 @@ define([
     },
 
     makeAppFullScreen: function() {
-      Backbone.$('html, body').scrollTop(Backbone.$(document).height());
+      $('html, body').scrollTop($(document).height());
     },
 
-    stopClickEvents: function(event) {
-      event.gesture.preventDefault();
-      event.stopPropagation();
+    stopClickEvents: function(e) {
+      e.gesture.preventDefault();
+      e.stopPropagation();
     },
 
-    showHideTroupes: function(event) {
+    showHideTroupes: function(e) {
       this.makeAppFullScreen();
       this.$el.toggleClass('partiallyOffScreen');
-      event.stopPropagation();
+      e.stopPropagation();
     }
 
   });
 
-});
+
+})();
+

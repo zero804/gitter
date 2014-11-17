@@ -1,12 +1,13 @@
-define([
-  'marionette',
-  'utils/context',
-  'hbs!./tmpl/parentSelectView',
-  'hbs!./tmpl/parentItemView',
-  'views/controls/typeahead',
-  'backbone'
-], function(Marionette, context, template, itemTemplate, Typeahead, Backbone) {
-  "use strict";
+"use strict";
+var Marionette = require('marionette');
+var context = require('utils/context');
+var template = require('./tmpl/parentSelectView.hbs');
+var itemTemplate = require('./tmpl/parentItemView.hbs');
+var Typeahead = require('views/controls/typeahead');
+var Backbone = require('backbone');
+var cdn = require('../../utils/cdn');
+
+module.exports = (function() {
 
   var ItemModel = Backbone.Model.extend({
     idAttribute: "uri",
@@ -127,7 +128,7 @@ define([
       }
 
       if  (m.get('type') === 'repo') {
-        this.ui.avatar.css("background-image", "url(../../images/icon-repo.png)");
+        this.ui.avatar.css("background-image", "url(" + cdn('images/icon-repo.png') + ")");
       } else {
         this.ui.avatar.css("background-image", "url(" + m.get('avatarUrl') + ")");
       }
@@ -251,4 +252,6 @@ define([
 
   });
 
-});
+
+})();
+

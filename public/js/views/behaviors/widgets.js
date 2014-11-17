@@ -1,12 +1,12 @@
-define([
-  'jquery',
-  'underscore',
-  'marionette',
-  './lookup'
-], function($, _, Marionette, behaviourLookup) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var _ = require('underscore');
+var Marionette = require('marionette');
+var behaviourLookup = require('./lookup');
 
+module.exports = (function() {
   var cachedWidgets = {};
+
   function register(widgets) {
     var keys = _.keys(widgets);
     _.each(keys, function(key) {
@@ -76,16 +76,17 @@ define([
       var id = this.getAttribute('data-id'),
       attrs = data.renderViews[id];
 
-      var self = this;
+      // var self = this;
       var CachedWidget = cachedWidgets[attrs.widgetName];
       if(CachedWidget) {
         replaceElementWithWidget(this, CachedWidget, widgetManager, attrs);
-      } else {
+      }/*else {
+        NO LONG do async load
         require(['views/widgets/' + attrs.widgetName], function(Widget) {
           cachedWidgets[attrs.widgetName] = Widget;
           replaceElementWithWidget(self, Widget, widgetManager, attrs);
         });
-      }
+      }*/
     });
 
 
@@ -121,4 +122,6 @@ define([
     Behavior: Behavior
   };
 
-});
+
+})();
+

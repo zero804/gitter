@@ -1,29 +1,31 @@
-require([
-  'require',
-  'utils/appevents',
-  'utils/context',
-  'backbone',
-  'underscore',
-  'views/app/appIntegratedView',
-  'views/menu/troupeMenu',
-  'collections/instances/troupes',
-  'components/titlebar',
-  'components/realtime',
-  'views/createRoom/createRoomView',
-  'views/createRoom/createRepoRoomView',
-  'views/createRoom/confirmRepoRoomView',
-  'views/createRoom/chooseRoomView',
-  'log!router-app',
-  'components/statsc',                    // No ref
-  'views/widgets/preload',                // No ref
-  'components/webNotifications',          // No ref
-  'components/desktopNotifications',      // No ref
-  'template/helpers/all',                 // No ref
-  'components/bug-reporting',             // No ref
-  'components/focus-events'               // No ref
-], function(require, appEvents, context, Backbone, _, AppIntegratedView, TroupeMenuView, troupeCollections,
-  TitlebarUpdater, realtime, createRoomView, createRepoRoomView, confirmRepoRoomView, chooseRoomView, log) {
-  "use strict";
+"use strict";
+
+var appEvents = require('utils/appevents');
+var context = require('utils/context');
+var Backbone = require('backbone');
+var _ = require('underscore');
+var AppIntegratedView = require('views/app/appIntegratedView');
+var TroupeMenuView = require('views/menu/troupeMenu');
+var troupeCollections = require('collections/instances/troupes');
+var TitlebarUpdater = require('components/titlebar');
+var realtime = require('components/realtime');
+var log = require('utils/log');
+var onready = require('./utils/onready');
+
+require('components/statsc');
+require('views/widgets/preload');
+require('components/webNotifications');
+require('components/desktopNotifications');
+require('template/helpers/all');
+require('components/bug-reporting');
+require('components/focus-events');
+require('utils/tracking');
+
+// Preload widgets
+require('views/widgets/avatar');
+
+onready(function() {
+
 
   var chatIFrame = document.getElementById('content-frame');
   if(window.location.hash) {
@@ -104,7 +106,7 @@ require([
 
   window.addEventListener('message', function(e) {
     if(e.origin !== context.env('basePath')) {
-      log('Ignoring message from ' + e.origin);
+      log.info('Ignoring message from ' + e.origin);
       return;
     }
 
@@ -116,7 +118,7 @@ require([
       return;
     }
 
-    log('Received message ', message);
+    log.info('Received message ', message);
 
     var makeEvent = function(message) {
       var origin = 'chat';
@@ -124,13 +126,13 @@ require([
       message.event = {
         origin: origin,
         preventDefault: function() {
-          log('Warning: could not call preventDefault() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
+          log.info('Warning: could not call preventDefault() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
         },
         stopPropagation: function() {
-          log('Warning: could not call stopPropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
+          log.info('Warning: could not call stopPropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
         },
         stopImmediatePropagation: function() {
-          log('Warning: could not call stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
+          log.info('Warning: could not call stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
         }
       };
     };
@@ -154,7 +156,7 @@ require([
         var count = message.count;
         var troupeId = message.troupeId;
         if(troupeId !== context.getTroupeId()) {
-          log('warning: troupeId mismatch in unreadItemsCount');
+          log.info('warning: troupeId mismatch in unreadItemsCount');
         }
         var v = {
           unreadItems: count
@@ -253,7 +255,10 @@ require([
     },
 
     createroom: function() {
-      appView.dialogRegion.show(new chooseRoomView.Modal());
+      require.ensure(['views/createRoom/chooseRoomView'], function(require) {
+        var chooseRoomView = require('views/createRoom/chooseRoomView');
+        appView.dialogRegion.show(new chooseRoomView.Modal());
+      });
     },
 
     createcustomroom: function(name) {
@@ -272,7 +277,10 @@ require([
       }
 
       function showWithOptions(options) {
-        appView.dialogRegion.show(new createRoomView.Modal(options));
+        require.ensure(['views/createRoom/createRoomView'], function(require) {
+          var createRoomView = require('views/createRoom/createRoomView');
+          appView.dialogRegion.show(new createRoomView.Modal(options));
+        });
       }
 
       var uri = window.location.pathname.split('/').slice(1).join('/');
@@ -299,28 +307,33 @@ require([
     },
 
     createreporoom: function() {
-      appView.dialogRegion.show(new createRepoRoomView.Modal());
+      require.ensure(['views/createRoom/createRepoRoomView'], function(require) {
+        var createRepoRoomView = require('views/createRoom/createRepoRoomView');
+        appView.dialogRegion.show(new createRepoRoomView.Modal());
+      });
     },
 
     confirmRoom: function(uri) {
-      appView.dialogRegion.show(new confirmRepoRoomView.Modal({ uri: uri }));
+      require.ensure(['views/createRoom/confirmRepoRoomView'], function(require) {
+        var confirmRepoRoomView = require('views/createRoom/confirmRepoRoomView');
+        appView.dialogRegion.show(new confirmRepoRoomView.Modal({ uri: uri }));
+      });
     }
   });
 
   new Router();
   Backbone.history.start();
 
-  // Asynchronously load tracker
-  require([
-    'utils/tracking'
-  ], function(/*tracking*/) {
-    // No need to do anything here
-  });
-
   if (context.popEvent('new_user_signup')) {
-    require(['twitter-oct'], function (twitterOct) {
-      twitterOct.trackPid('l4t99');
+    require.ensure("scriptjs", function(require) {
+      var $script = require("scriptjs");
+      $script("//platform.twitter.com/oct", function() {
+        var twitterOct = window.twttr && window.twttr.conversion;
+        twitterOct.trackPid('l4t99');
+      });
     });
   }
 
+
 });
+

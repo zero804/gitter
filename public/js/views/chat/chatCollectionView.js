@@ -1,16 +1,17 @@
-define([
-  'jquery',
-  'underscore',
-  'log!chat-collection-view',
-  'marionette',
-  'views/base',
-  'utils/appevents',
-  './chatItemView',
-  'utils/rollers',
-  'cocktail',
-  'views/behaviors/infinite-scroll' //No ref
-], function($, _, log, Marionette, TroupeViews, appEvents, chatItemView, Rollers, cocktail) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var _ = require('underscore');
+var log = require('utils/log');
+var Marionette = require('marionette');
+var TroupeViews = require('views/base');
+var appEvents = require('utils/appevents');
+var chatItemView = require('./chatItemView');
+var Rollers = require('utils/rollers');
+var cocktail = require('cocktail');
+require('views/behaviors/infinite-scroll');
+
+module.exports = (function() {
+
 
   /** @const */
   var PAGE_SIZE = 20;
@@ -206,12 +207,12 @@ define([
       try {
         this.highlightChat(old);
       } catch (e) {
-        log('Could not clear previously highlighted item');
+        log.info('Could not clear previously highlighted item');
       }
     },
 
     getFetchData: function() {
-      log("Loading next message chunk.");
+      log.info("Loading next message chunk.");
 
       var ids = this.collection.map(function(m) { return m.get('id'); });
       var lowestId = _.min(ids, function(a, b) {
@@ -221,7 +222,7 @@ define([
       });
 
       if (lowestId === Infinity) {
-        log('No messages loaded, cancelling pagenation (!!)');
+        log.info('No messages loaded, cancelling pagenation (!!)');
         return;
       }
 
@@ -262,4 +263,6 @@ define([
   cocktail.mixin(ChatCollectionView, TroupeViews.SortableMarionetteView);
 
   return ChatCollectionView;
-});
+
+})();
+

@@ -1,17 +1,20 @@
-require([
-  'jquery',
-  'utils/context',
-  'views/app/headerView',
-  'components/apiClient',
-  'cal-heatmap',
+"use strict";
+var $ = require('jquery');
+var context = require('utils/context');
+var HeaderView = require('views/app/headerView');
+var apiClient = require('components/apiClient');
+var CalHeatMap = require('cal-heatmap');
+var onready = require('./utils/onready');
 
-  'views/widgets/preload',      // No ref
-  'filtered-collection',        // No ref
-  'components/dozy',            // Sleep detection No ref
-  'template/helpers/all',       // No ref
-  'components/bug-reporting'    // No ref
-], function($, context, HeaderView, apiClient, CalHeatMap) {
-  "use strict";
+require('views/widgets/preload');
+require('filtered-collection');
+require('components/dozy');
+require('template/helpers/all');
+require('components/bug-reporting');
+require('utils/tracking');
+
+
+onready(function() {
 
   $(document).on("click", "a", function(e) {
     if(this.href) {
@@ -101,4 +104,7 @@ require([
   // new Router();
 
   // Backbone.history.start();
+
+
 });
+

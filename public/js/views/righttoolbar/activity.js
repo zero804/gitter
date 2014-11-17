@@ -1,69 +1,35 @@
-define([
-  'underscore',
-  'marionette',
-  'utils/appevents',
-  'views/base',
-  'views/chat/decorators/issueDecorator',
-  'views/chat/decorators/commitDecorator',
-  'views/chat/decorators/mentionDecorator',
-  'log!activity',
-  'utils/context',
-  'hbs!./tmpl/activity-tip',
+"use strict";
+var _ = require('underscore');
+var Marionette = require('marionette');
+var appEvents = require('utils/appevents');
+var TroupeViews = require('views/base');
+var issueDecorator = require('views/chat/decorators/issueDecorator');
+var commitDecorator = require('views/chat/decorators/commitDecorator');
+var mentionDecorator = require('views/chat/decorators/mentionDecorator');
+var log = require('utils/log');
+var context = require('utils/context');
+var activityTipTemplate = require('./tmpl/activity-tip.hbs');
+var githubPushTemplate = require('./tmpl/githubPush.hbs');
+var githubIssuesTemplate = require('./tmpl/githubIssues.hbs');
+var githubIssueCommentTemplate = require('./tmpl/githubIssueComment.hbs');
+var githubCommitCommentTemplate = require('./tmpl/githubCommitComment.hbs');
+var githubPullRequestTemplate = require('./tmpl/githubPullRequest.hbs');
+var githubGollumTemplate = require('./tmpl/githubGollum.hbs');
+var githubForkTemplate = require('./tmpl/githubFork.hbs');
+var githubMemberTemplate = require('./tmpl/githubMember.hbs');
+var githubPublicTemplate = require('./tmpl/githubPublic.hbs');
+var githubWatchTemplate = require('./tmpl/githubWatch.hbs');
+var bitbucketTemplate = require('./tmpl/bitbucket.hbs');
+var huboardTemplate = require('./tmpl/huboard.hbs');
+var jenkinsTemplate = require('./tmpl/jenkins.hbs');
+var travisTemplate = require('./tmpl/travis.hbs');
+var sprintlyTemplate = require('./tmpl/sprintly.hbs');
+var trelloTemplate = require('./tmpl/trello.hbs');
+var prerenderedTemplate = require('./tmpl/prerendered.hbs');
+var cocktail = require('cocktail');
 
-  'hbs!./tmpl/githubPush',
-  'hbs!./tmpl/githubIssues',
-  'hbs!./tmpl/githubIssueComment',
-  'hbs!./tmpl/githubCommitComment',
-  'hbs!./tmpl/githubPullRequest',
-  'hbs!./tmpl/githubGollum',
-  'hbs!./tmpl/githubFork',
-  'hbs!./tmpl/githubMember',
-  'hbs!./tmpl/githubPublic',
-  'hbs!./tmpl/githubWatch',
+module.exports = (function() {
 
-  'hbs!./tmpl/bitbucket',
-  'hbs!./tmpl/huboard',
-  'hbs!./tmpl/jenkins',
-  'hbs!./tmpl/travis',
-  'hbs!./tmpl/sprintly',
-  'hbs!./tmpl/trello',
-  'hbs!./tmpl/prerendered',
-
-  'cocktail'
-], function(
-  _,
-  Marionette,
-  appEvents,
-  TroupeViews,
-  issueDecorator,
-  commitDecorator,
-  mentionDecorator,
-  log,
-  context,
-  activityTipTemplate,
-
-  githubPushTemplate,
-  githubIssuesTemplate,
-  githubIssueCommentTemplate,
-  githubCommitCommentTemplate,
-  githubPullRequestTemplate,
-  githubGollumTemplate,
-  githubForkTemplate,
-  githubMemberTemplate,
-  githubPublicTemplate,
-  githubWatchTemplate,
-
-  bitbucketTemplate,
-  huboardTemplate,
-  jenkinsTemplate,
-  travisTemplate,
-  sprintlyTemplate,
-  trelloTemplate,
-  prerenderedTemplate,
-
-  cocktail
-) {
-  "use strict";
 
   var serviceTemplates = {
     bitbucket:  bitbucketTemplate,
@@ -234,7 +200,7 @@ define([
       } catch(e) {
         var modelData = this.model && this.model.attributes;
         appEvents.trigger('bugreport', e, { extra: modelData });
-        log('ERROR rendering activity item:', e.message, e.stack, modelData);
+        log.info('ERROR rendering activity item:', e.message, e.stack, modelData);
         return {};
       }
     },
@@ -268,4 +234,6 @@ define([
 
   return ActivityView;
 
-});
+
+})();
+

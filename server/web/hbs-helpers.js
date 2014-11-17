@@ -7,7 +7,6 @@ var _               = require('underscore');
 var appVersion      = require('./appVersion');
 var safeJson        = require('../utils/safe-json');
 var env             = process.env.NODE_ENV;
-var minifiedDefault = nconf.get("web:minified");
 var util            = require('util');
 
 var cdns;
@@ -53,59 +52,28 @@ exports.cdn = function(url, parameters) {
   return cdn(url, parameters ? parameters.hash:null);
 };
 
+function cdnUrlGenerator(url, options) {
+  if(options.root) {
+    return options.root + url;
+  }
+
+  return cdn(url, { appcache: options.appcache });
+}
+
 exports.bootScript = function(url, parameters) {
   var options = parameters.hash;
 
-  var cdnFunc;
-  if(options.skipCdn) {
-    cdnFunc = function(a) { return '/' + a; };
-  } else if(options.root) {
-    cdnFunc = function(a) { return options.root + a; };
-  } else {
-    cdnFunc = cdn;
-  }
+  var baseUrl = cdnUrlGenerator("js/", options);
+  var vendorScriptUrl = cdnUrlGenerator("js/vendor.js", options);
+  var bootScriptUrl = cdnUrlGenerator("js/" + url + ".js", options);
 
-  var skipCore = options.skipCore;
-
-  var async    = 'async' in options ? options.async : true;
-  var cdnOptions = { appcache: options.appcache };
-
-  var baseUrl = cdnFunc("js/", cdnOptions);
-  var asyncScript = async ? "defer='defer' async='true' " : '';
-
-  if(minifiedDefault) {
-    /* Distribution-ready */
-
-    if(this.minified !== false) {
-      url = url + ".min";
-    }
-
-    if(skipCore) {
-      /* No requirejs */
-      return util.format("<script type='text/javascript'>window.require_config.baseUrl = '%s';</script>" +
-              "<script %s src='%s' type='text/javascript'></script>",
-              baseUrl,
-              asyncScript,
-              cdnFunc(util.format("js/%s.js", url), cdnOptions));
-    }
-
-    /* Standard distribution setup */
-    return util.format("<script type='text/javascript'>window.require_config.baseUrl = '%s';</script>" +
-            "<script %s data-main='%s' src='%s' type='text/javascript'></script>\n",
-            baseUrl,
-            asyncScript,
-            url,
-            cdnFunc("js/core-libraries.min.js", cdnOptions));
-
-  }
-
-  /* Non minified - use requirejs as the core (development mode) */
-  return util.format("<script type='text/javascript'>window.require_config.baseUrl = '%s';</script>" +
-         "<script %s data-main='%s.js' src='%s' type='text/javascript'></script>",
+  return util.format(
+         "<script type='text/javascript'>window.webpackPublicPath = '%s';</script>" +
+         "<script type='text/javascript' src='%s'></script>" +
+         "<script type='text/javascript' src='%s'></script>",
          baseUrl,
-         asyncScript,
-         url,
-         cdnFunc("repo/requirejs/requirejs.js", cdnOptions));
+         vendorScriptUrl,
+         bootScriptUrl);
 };
 
 exports.isMobile = function(agent, options) {

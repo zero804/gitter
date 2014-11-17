@@ -1,19 +1,20 @@
+'use strict';
 /* jshint unused:true, browser:true */
-define([
-  'jquery',
-  'underscore',
-  'backbone',
-  'utils/context',
-  '../base',
-  'components/realtime',
-  '../troupes',
-  '../orgs',
-  'components/unread-items-frame-client',
-  'utils/appevents',
-  'backbone-sorted-collection',
-  'filtered-collection' /* no ref */
-], function($, _, Backbone, context, base, realtime, troupeModels, orgModels, unreadItemsClient, appEvents, Sorted) {
-  'use strict';
+var $ = require('jquery');
+var _ = require('underscore');
+var Backbone = require('backbone');
+var context = require('utils/context');
+var base = require('../base');
+var realtime = require('components/realtime');
+var troupeModels = require('../troupes');
+var orgModels = require('../orgs');
+var unreadItemsClient = require('components/unread-items-frame-client');
+var appEvents = require('utils/appevents');
+var Sorted = require('backbone-sorted-collection');
+require('filtered-collection');
+
+module.exports = (function() {
+
 
   var orgsCollection = new orgModels.OrgCollection(null, { listen: true });
   var troupeCollection = new troupeModels.TroupeCollection(null, { listen: true });
@@ -129,4 +130,6 @@ define([
     orgs: orgsCollection
   };
 
-});
+
+})();
+

@@ -45,3 +45,4 @@ ASSET_TAG
 public-compile-cache
 public/styles
 chats.json
+public/dist

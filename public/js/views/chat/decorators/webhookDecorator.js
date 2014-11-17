@@ -1,28 +1,18 @@
+"use strict";
 /* jshint unused:true, browser:true,  strict:true */
 /* global define:false */
-define([
-  'views/base',
-  'marionette',
-  'hbs!./tmpl/github',
-  'hbs!./tmpl/githubPush',
-  'hbs!./tmpl/bitbucket',
-  'hbs!./tmpl/jenkins',
-  'hbs!./tmpl/travis',
-  'hbs!./tmpl/sprintly',
-  'hbs!./tmpl/trello'
-], function(
-  TroupeViews,
-  Marionette,
-  githubTemplate,
-  githubPushTemplate,
-  bitbucketTemplate,
-  jenkinsTemplate,
-  travisTemplate,
-  sprintlyTemplate,
-  trelloTemplate
-) {
+var TroupeViews = require('views/base');
+var Marionette = require('marionette');
+var githubTemplate = require('./tmpl/github.hbs');
+var githubPushTemplate = require('./tmpl/githubPush.hbs');
+var bitbucketTemplate = require('./tmpl/bitbucket.hbs');
+var jenkinsTemplate = require('./tmpl/jenkins.hbs');
+var travisTemplate = require('./tmpl/travis.hbs');
+var sprintlyTemplate = require('./tmpl/sprintly.hbs');
+var trelloTemplate = require('./tmpl/trello.hbs');
 
-  "use strict";
+module.exports = (function() {
+
 
   var serviceTemplates = {
     bitbucket:  bitbucketTemplate,
@@ -68,6 +58,7 @@ define([
 
   function showNotificationIcon(chatItemView, meta) {
 
+    // READ THIS GITTERERS!
     // NB NB NB: update the matching list at
     // server/web/prerender-chat-helper.js
     var favicons = {
@@ -77,6 +68,7 @@ define([
       sprintly:   'https://sprint.ly/favicon.ico',
       travis:     'https://travis-ci.org/favicon.ico',
       trello:     'https://trello.com/favicon.ico'
+      // READ THE COMMENT ABOVE!
     };
 
     // NB NB NB: update the matching list at
@@ -92,6 +84,7 @@ define([
       member:         'as member to',
       public:         'made public',
       watch:          'started watching'
+      // READ THE COMMENT ABOVE
     };
 
     var viewData          = meta;
@@ -135,4 +128,6 @@ define([
 
   return decorator;
 
-});
+
+})();
+

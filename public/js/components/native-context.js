@@ -1,28 +1,28 @@
-define([
-  'jquery',
-  '../utils/context',
-  'log!native-context'
-], function($, context, log) {
-  "use strict";
+"use strict";
+var context = require('../utils/context');
+var log = require('utils/log');
+var appEvents = require('../utils/appevents');
 
-  $(document).on('app.version.mismatch', function() {
+module.exports = (function() {
+
+  appEvents.on('app.version.mismatch', function() {
     try {
       if(window.applicationCache.status === window.applicationCache.IDLE) {
-        log('Attempting to update application cache');
+        log.info('Attempting to update application cache');
         window.applicationCache.update();
       }
     } catch(e) {
-      log('Unable to update application cache: ' + e, e);
+      log.info('Unable to update application cache: ' + e, e);
     }
   });
 
   var cordova = window.cordova;
   if(!cordova) {
-    log('Cordova not detected. Quietly ignoring native-context updates');
+    log.info('Cordova not detected. Quietly ignoring native-context updates');
     return;
   }
 
-  log('Cordova detected, calling TroupeContext.updateContext');
+  log.info('Cordova detected, calling TroupeContext.updateContext');
 
 
 
@@ -57,18 +57,20 @@ define([
         break;
 
       default:
-        log('Unknown context');
+        log.info('Unknown context');
         // Unfortunately older clients will crash without four parameters
         params.push(null, null, null);
     }
-    log('Pushing context: ' + params.join(','));
+    log.info('Pushing context: ' + params.join(','));
 
     try {
       cordova.exec(function() {}, function() {}, "TroupeContext", "updateContext", params);
     } catch(e) {
-      log('Plugin failure', e);
+      log.info('Plugin failure', e);
     }
 
   }
 
-});
+
+})();
+

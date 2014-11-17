@@ -1,4 +1,4 @@
-define([], function (){
+define(['underscore'], function (_){
 
 //     Cocktail.js 0.3.0
 //     (c) 2012 Onsi Fakhouri

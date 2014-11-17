@@ -1,10 +1,17 @@
+/* jshint strict:false */
+/* jshint -W120 */
+/* jshint -W117 */
+
 /**
 *
 *  Base64 encode / decode
 *  http://www.webtoolkit.info/
 *
 **/
-define(function() {
+
+
+module.exports = (function() {
+
   var Base64 = {
 
     // private property
@@ -142,4 +149,6 @@ define(function() {
   };
 
   return Base64;
-});
+
+})();
+

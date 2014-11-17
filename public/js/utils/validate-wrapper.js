@@ -1,7 +1,9 @@
-define([
-  'jquery-validate'
-], function() {
-  "use strict";
+"use strict";
+require('jquery-validate');
+var $ = require('jquery');
+
+module.exports = (function() {
+
 
   $.validator.addMethod(
       "userDisplayName",
@@ -80,4 +82,6 @@ define([
     }
 
   };
-});
+
+})();
+

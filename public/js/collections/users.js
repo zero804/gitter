@@ -1,9 +1,10 @@
-define([
-  './base',
-  'components/apiClient',
-  './smart-users'
-], function(TroupeCollections, apiClient, SmartUserCollection) {
-  "use strict";
+"use strict";
+var TroupeCollections = require('./base');
+var apiClient = require('components/apiClient');
+var SmartUserCollection = require('./smart-users');
+
+module.exports = (function() {
+
 
   var UserModel = TroupeCollections.Model.extend({
     idAttribute: "id"
@@ -12,7 +13,10 @@ define([
   var UserCollection = TroupeCollections.LiveCollection.extend({
     model: UserModel,
     modelName: 'user',
-    url: apiClient.room.channelGenerator('/users')
+    url: apiClient.room.channelGenerator('/users'),
+    getSnapshotState: function () {
+      return { lean: true };
+    }
   });
 
   return {
@@ -22,4 +26,6 @@ define([
     UserModel: UserModel
   };
 
-});
+
+})();
+

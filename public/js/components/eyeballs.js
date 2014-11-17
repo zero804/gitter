@@ -1,11 +1,12 @@
-define([
-  'utils/context',
-  'components/apiClient',
-  './realtime',
-  'log!eyeballs',
-  'utils/appevents'
-], function(context, apiClient, realtime, log, appEvents) {
-  "use strict";
+"use strict";
+var context = require('utils/context');
+var apiClient = require('components/apiClient');
+var realtime = require('./realtime');
+var log = require('utils/log');
+var appEvents = require('utils/appevents');
+
+module.exports = (function() {
+
 
   var eyesOnState = true;
   var INACTIVITY = 60 * 1000;
@@ -32,10 +33,10 @@ define([
       })
       .fail(function(xhr) {
         if(xhr.status !== 400) {
-          log('An error occurred while communicating eyeballs');
+          log.info('An error occurred while communicating eyeballs');
         } else {
           // The connection is gone...
-          log('Eyeballs returned 400. Realtime connection may be dead.');
+          log.info('Eyeballs returned 400. Realtime connection may be dead.');
           appEvents.trigger('eyeballsInvalid', clientId);
         }
       });
@@ -93,7 +94,7 @@ define([
       }
 
       document.addEventListener("resume", function() {
-        // log('resume: eyeballs set to ' + eyesOnState);
+        // log.info('resume: eyeballs set to ' + eyesOnState);
 
         updateLastUserInteraction();
         window.setTimeout(function() {
@@ -104,7 +105,7 @@ define([
       // Cordova specific events
       document.addEventListener("pause", function() {
         eyesOnState = false;
-        // log('pause');
+        // log.info('pause');
 
       }, false);
 
@@ -123,7 +124,7 @@ define([
     }, false);
 
     window.addEventListener('pagehide', function() {
-      // log('pagehide');
+      // log.info('pagehide');
       eyeballsOff();
     }, false);
 
@@ -175,7 +176,7 @@ define([
 
       window.setTimeout(function() {
         if(Date.now() - lastUserInteraction > (INACTIVITY - INACTIVITY_POLL)) {
-          log('inactivity');
+          log.info('inactivity');
           inactivity = true;
           stopInactivityPoller();
           eyeballsOff();
@@ -197,7 +198,7 @@ define([
         global: false
       })
       .fail(function() {
-        log('An error occurred while communicating eyeballs');
+        log.info('An error occurred while communicating eyeballs');
       });
   }, PING_POLL);
 
@@ -206,4 +207,6 @@ define([
       return eyesOnState;
     }
   };
-});
+
+})();
+

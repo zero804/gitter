@@ -1,22 +1,26 @@
-require([
-  'jquery',
-  'utils/appevents',
-  'collections/chat',
-  'collections/users',
-  'views/chat/chatCollectionView',
-  'views/chat/chatInputView',
-  'components/unread-items-client',
-  'backbone',
-  'components/modal-region',
-  'views/menu/troupeMenu',
-  'views/app/mobileAppView',
-  'views/chat/decorators/emojiDecorator',
-  'views/chat/decorators/mobileDecorator',
-  'views/app/troupeSettingsView'
-  ], function($, appEvents, chatModels, userModels, ChatCollectionView, chatInputView,
-    unreadItemsClient, Backbone, modalRegion, TroupeMenu, MobileAppView,
-    emojiDecorator, mobileDecorator, TroupeSettingsView) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var appEvents = require('utils/appevents');
+var chatModels = require('collections/chat');
+var userModels = require('collections/users');
+var ChatCollectionView = require('views/chat/chatCollectionView');
+var chatInputView = require('views/chat/chatInputView');
+var unreadItemsClient = require('components/unread-items-client');
+var Backbone = require('backbone');
+var modalRegion = require('components/modal-region');
+var TroupeMenu = require('views/menu/troupeMenu');
+var MobileAppView = require('views/app/mobileAppView');
+var emojiDecorator = require('views/chat/decorators/emojiDecorator');
+var mobileDecorator = require('views/chat/decorators/mobileDecorator');
+var TroupeSettingsView = require('views/app/troupeSettingsView');
+var onready = require('./utils/onready');
+
+// Preload widgets
+require('views/widgets/avatar');
+require('views/widgets/timeago');
+
+onready(function() {
+
 
   new MobileAppView({
     el: $('#mainPage')
@@ -75,4 +79,6 @@ require([
 
   Backbone.history.start();
 
+
 });
+

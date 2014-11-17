@@ -1,16 +1,17 @@
-define([
-  'jquery',
-  'underscore',
-  'utils/context',
-  './realtime',
-  './apiClient',
-  'log!unread-items-client',
-  'backbone',
-  'utils/appevents',
-  'utils/dataset-shim',
-  'utils/double-hash'
-], function($, _, context, realtime, apiClient, log, Backbone, appEvents, dataset, DoubleHash) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var _ = require('underscore');
+var context = require('utils/context');
+var realtime = require('./realtime');
+var apiClient = require('./apiClient');
+var log = require('utils/log');
+var Backbone = require('backbone');
+var appEvents = require('utils/appevents');
+var dataset = require('utils/dataset-shim');
+var DoubleHash = require('utils/double-hash');
+
+module.exports = (function() {
+
 
   function limit(fn, context, timeout) {
     return _.debounce(_.bind(fn, context), timeout || 30);
@@ -167,7 +168,7 @@ define([
 
     preload: function(items) {
       _iteratePreload(items, function(itemType, itemId) {
-        log('Preload of ' + itemType + ':' + itemId);
+        log.info('Preload of ' + itemType + ':' + itemId);
 
         // Have we already marked this item as read?
         if(this._deleteTarpit._contains(itemType, itemId)) return;
@@ -264,7 +265,7 @@ define([
             global: false
           })
           .fail(function() {
-            log('Error posting unread items to server. Will attempt again in 5s');
+            log.info('Error posting unread items to server. Will attempt again in 5s');
 
             // Unable to send messages, requeue them and try again in 5s
             setTimeout(function() {
@@ -646,4 +647,6 @@ define([
   unreadItemsClient.UnreadItemStore = UnreadItemStore;
 
   return unreadItemsClient;
-});
+
+})();
+

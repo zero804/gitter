@@ -1,34 +1,31 @@
-define([
-  'jquery',
-  'utils/context',
-  'marionette',
-  'utils/appevents',
-  'components/apiClient',
-  'views/app/uiVars',
-  'views/chat/chatInputView',
-  'collections/instances/integrated-items',
-  'components/modal-region',
-  'utils/scrollbar-detect',
-  'cocktail',
-  'views/keyboard-events-mixin',
-  'views/chat/chatCollectionView',
-  'views/chat/decorators/webhookDecorator',
-  'views/chat/decorators/issueDecorator',
-  'views/chat/decorators/commitDecorator',
-  'views/chat/decorators/mentionDecorator',
-  'views/chat/decorators/embedDecorator',
-  'views/chat/decorators/emojiDecorator',
-  'views/app/unreadBannerView',
-  'views/app/historyLimitView',
-  'views/app/headerView',
-  'components/unread-items-client',
-  'views/righttoolbar/rightToolbarView',
-  'transloadit'  // No ref
-], function($, context, Marionette, appEvents, apiClient, uiVars, chatInputView, itemCollections, modalRegion, hasScrollBars, cocktail, KeyboardEventsMixin, ChatCollectionView,
-    webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator,
-    emojiDecorator, UnreadBannerView, HistoryLimitView, HeaderView, unreadItemsClient,
-    RightToolbarView /*, SearchView*/) {
-  "use strict";
+"use strict";
+var $ = require('jquery');
+var context = require('utils/context');
+var Marionette = require('marionette');
+var appEvents = require('utils/appevents');
+var apiClient = require('components/apiClient');
+var uiVars = require('views/app/uiVars');
+var chatInputView = require('views/chat/chatInputView');
+var itemCollections = require('collections/instances/integrated-items');
+var modalRegion = require('components/modal-region');
+var hasScrollBars = require('utils/scrollbar-detect');
+var cocktail = require('cocktail');
+var KeyboardEventsMixin = require('views/keyboard-events-mixin');
+var ChatCollectionView = require('views/chat/chatCollectionView');
+var webhookDecorator = require('views/chat/decorators/webhookDecorator');
+var issueDecorator = require('views/chat/decorators/issueDecorator');
+var commitDecorator = require('views/chat/decorators/commitDecorator');
+var mentionDecorator = require('views/chat/decorators/mentionDecorator');
+var embedDecorator = require('views/chat/decorators/embedDecorator');
+var emojiDecorator = require('views/chat/decorators/emojiDecorator');
+var UnreadBannerView = require('views/app/unreadBannerView');
+var HistoryLimitView = require('views/app/historyLimitView');
+var unreadItemsClient = require('components/unread-items-client');
+var RightToolbarView = require('views/righttoolbar/rightToolbarView');
+require('transloadit');
+
+module.exports = (function() {
+
 
   var touchEvents = {
     // "click #menu-toggle-button":        "onMenuToggle",
@@ -78,13 +75,13 @@ define([
         collection: itemCollections.chats,
         userCollection: itemCollections.users,
         decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
-      }).render();
+      });
+      chatCollectionView.bindUIElements();
+
 
       this.listenTo(itemCollections.chats, 'atBottomChanged', function (isBottom) {
         this.ui.scrollToBottom.toggleClass('u-scale-zero', isBottom);
       }.bind(this));
-
-      new HeaderView({ model: context.troupe(), el: '#header' });
 
       this.rightToolbar = new RightToolbarView({ el: "#toolbar-content" });
 
@@ -272,4 +269,6 @@ define([
   cocktail.mixin(ChatLayout, KeyboardEventsMixin);
 
   return ChatLayout;
-});
+
+})();
+

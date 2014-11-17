@@ -1,9 +1,10 @@
+"use strict";
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
-define([
-  'underscore',
-  'backbone'
-], function (_, Backbone) {
-  "use strict";
+var _ = require('underscore');
+var Backbone = require('backbone');
+
+module.exports = (function() {
+
 
   // const - 5 minutes window to merge messages into previous burst
   var BURST_WINDOW = 5 * 60 * 1000;
@@ -163,4 +164,6 @@ define([
     calc: findSlice,
     parse: parse
   };
-});
+
+})();
+

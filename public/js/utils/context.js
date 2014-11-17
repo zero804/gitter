@@ -1,8 +1,9 @@
-define([
-  'backbone',
-  './qs'
-], function(Backbone, qs) {
-  "use strict";
+"use strict";
+var Backbone = require('backbone');
+var qs = require('./qs');
+
+module.exports = (function() {
+
 
   var ctx = window.troupeContext || {};
 
@@ -192,6 +193,15 @@ define([
 
       iterations++;
       if(iterations > 50) {
+        // Force a reload, but don't do it more than once a minute
+        if(window.sessionStorage) {
+          var forcedReload = parseInt(window.sessionStorage.getItem('forced_reload'), 10);
+          if(forcedReload && Date.now() < forcedReload) {
+            return;
+          }
+
+          window.sessionStorage.setItem('forced_reload', Date.now() + 60000);
+        }
         return window.location.reload(true);
       }
       setTimeout(checkToken, 100);
@@ -241,4 +251,6 @@ define([
 
   return context;
 
-});
+
+})();
+
