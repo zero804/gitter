@@ -7,12 +7,12 @@ var TroupeMenu = require('views/menu/troupeMenu');
 var MobileAppView = require('views/app/mobileAppView');
 var confirmRepoRoomView = require('views/createRoom/confirmRepoRoomView');
 var modalRegion = require('components/modal-region');
+var onready = require('./utils/onready');
 
 // Preload widgets
 require('views/widgets/avatar');
 
-module.exports = (function() {
-
+onready(function() {
 
   appEvents.on('navigation', function(url) {
     window.location.href = url;
@@ -45,7 +45,5 @@ module.exports = (function() {
   Backbone.history.start();
 
   $('html').removeClass('loading');
-
-
-})();
+});
 
