@@ -20,7 +20,8 @@ module.exports = exports = function(template) {
       id: user.id,
       showStatus: showStatus,
       showBadge: showBadge,
-      inactive: !!user.state
+      presenceClass: user.online ? 'online' : 'offline',
+      inactive: user.invited
     });
 
     return r;

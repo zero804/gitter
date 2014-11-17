@@ -70,11 +70,13 @@ module.exports = (function() {
 
     initialize: function(options) {
       this.rosterCollection = options.rosterCollection;
-      // console.debug('this.rosterCollection:', this.rosterCollection);
       this.userCollection = options.userCollection;
+      this.listenTo(this.rosterCollection, 'all', this.render);
+      this.listenTo(this.userCollection, 'all', this.render);
     },
 
     onRender: function() {
+
       this.roster.show(new PeopleCollectionView({
         collection: this.rosterCollection
       }));
