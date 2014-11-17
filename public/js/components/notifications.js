@@ -1,5 +1,6 @@
 "use strict";
 var appEvents = require('utils/appevents');
+var cdn = require('../utils/cdn');
 
 module.exports = (function() {
 
@@ -26,7 +27,7 @@ module.exports = (function() {
     var link = message.link;
     var title = message.title;
     var text = message.text;
-    var icon = '/images/icon-logo-red-64.png';
+    var icon = cdn('images/icon-logo-red-64.png');
 
     var notification = new Notification(title, { body: text, icon: icon });
 

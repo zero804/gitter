@@ -2,6 +2,7 @@
 'use strict';
 
 var gulp = require('gulp');
+var livereload = require('gulp-livereload');
 var gutil = require("gulp-util");
 var webpack = require('gulp-webpack');
 var less = require('gulp-less');
@@ -97,8 +98,7 @@ gulp.task('copy-app-files', function() {
       'public/templates/**',
       'public/layouts/**',
       'public/locales/**',
-      'public/js/**/*.hbs',
-      'public/js/webpack.config.js',
+      'public/js/**',
       'locales/**',
       'scripts/**',
       'server/**',
@@ -116,6 +116,16 @@ gulp.task('add-version-files', function(done) {
 
         git.revParse({ args: '--abbrev-ref HEAD' }, function (err, branch) {
           if(err) return done(err);
+
+          // Prefix the asset tag with an S
+          if(process.env.STAGED_ENVIRONMENT === 'true') {
+            hash = 'S' + hash;
+          }
+
+          // Use jenkins variables
+          if(branch === 'HEAD' && process.env.GIT_BRANCH) {
+            branch = process.env.GIT_BRANCH;
+          }
 
           fs.writeFileSync('output/app/ASSET_TAG', hash);
           fs.writeFileSync('output/app/GIT_COMMIT', commit);
@@ -284,6 +294,7 @@ gulp.task('default', ['test', 'package']);
 /**
  * watch
  */
- gulp.task('watch', ['css'], function() {
-   gulp.watch('public/less/**/*.less', ['css']);
- });
+gulp.task('watch', ['css'], function() {
+  livereload.listen();
+  gulp.watch('public/**/*.less', ['css']).on('change', livereload.changed);
+});

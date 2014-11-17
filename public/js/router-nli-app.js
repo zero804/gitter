@@ -11,6 +11,10 @@ require('template/helpers/all');
 require('components/bug-reporting');
 require('utils/tracking');
 
+// Preload widgets
+require('views/widgets/avatar');
+
+
 module.exports = (function() {
 
 
