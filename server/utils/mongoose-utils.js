@@ -93,9 +93,9 @@ exports.upsert = function(schema, query, setOperation) {
  * Returns a promise of documents
  */
 exports.findByIds = function(Model, ids, callback) {
-  if(!ids || !ids.length) return Q.resolve([]).nodeify(callback);
+  return Q.fcall(function() {
+    if(!ids || !ids.length) return [];
 
-  return Model.where('_id')['in'](mongoUtils.asObjectIDs(collections.idsIn(ids)))
-    .execQ()
-    .nodeify(callback);
+    return Model.where('_id')['in'](mongoUtils.asObjectIDs(collections.idsIn(ids))).execQ();
+  }).nodeify(callback);
 };
