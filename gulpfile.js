@@ -182,7 +182,10 @@ gulp.task('css-ios', function () {
     ])
     .pipe(gulpif(DEV_MODE, sourcemaps.init()))
     .pipe(less({
-      paths: ['public/less']
+      paths: ['public/less'],
+      globalVars: {
+        "target-env": '"mobile"'
+      }
     }))
     .pipe(postcss([
       autoprefixer({
@@ -205,7 +208,10 @@ gulp.task('css-mobile', function () {
     ])
     .pipe(gulpif(DEV_MODE, sourcemaps.init()))
     .pipe(less({
-      paths: ['public/less']
+      paths: ['public/less'],
+      globalVars: {
+        "target-env": '"mobile"'
+      }
     }))
     .pipe(postcss([
       autoprefixer({
@@ -245,7 +251,10 @@ gulp.task('css-web', function () {
     ])
     .pipe(gulpif(DEV_MODE, sourcemaps.init()))
     .pipe(less({
-      paths: [  'public/less' ]
+      paths: ['public/less'],
+      globalVars: {
+        "target-env": '"web"'
+      }
     }))
     .pipe(postcss([
       autoprefixer({

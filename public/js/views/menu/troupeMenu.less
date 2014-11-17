@@ -160,17 +160,19 @@
 
   /* media queries */
   @media @small {
-    background-color: @trpDarkBlue;
-    left: -250px;
-    transition-delay: 0s;
+    & when(@target-env = "web") {
+      background-color: @trpDarkBlue;
+      left: -250px;
+      transition-delay: 0s;
 
-    &.visible {
-      transition-delay: 0.3s;
-      left: 0;
+      &.visible {
+        transition-delay: 0.3s;
+        left: 0;
+      }      
     }
   }
 
-  @media @mobile {
+  & when (@target-env = "mobile") {
     left: 0;
     width: 250px;
     height: 100%;
