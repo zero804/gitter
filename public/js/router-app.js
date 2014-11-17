@@ -10,6 +10,7 @@ var troupeCollections = require('collections/instances/troupes');
 var TitlebarUpdater = require('components/titlebar');
 var realtime = require('components/realtime');
 var log = require('utils/log');
+var onready = require('./utils/onready');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -23,7 +24,7 @@ require('utils/tracking');
 // Preload widgets
 require('views/widgets/avatar');
 
-module.exports = (function() {
+onready(function() {
 
 
   var chatIFrame = document.getElementById('content-frame');
@@ -334,5 +335,5 @@ module.exports = (function() {
   }
 
 
-})();
+});
 

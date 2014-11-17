@@ -4,13 +4,15 @@ var appEvents = require('utils/appevents');
 var Backbone = require('backbone');
 var confirmRepoRoomView = require('views/createRoom/confirmRepoRoomView');
 var modalRegion = require('components/modal-region');
+var onready = require('./utils/onready');
+
 require('utils/tracking');
 
 // Preload widgets
 require('views/widgets/avatar');
 require('views/widgets/timeago');
 
-module.exports = (function() {
+onready(function() {
   new UserHomeView({ el: '#content-wrapper' }).render();
 
   appEvents.on('navigation', function(url) {
@@ -34,5 +36,5 @@ module.exports = (function() {
 
   new Router();
   Backbone.history.start();
-})();
+});
 

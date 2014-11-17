@@ -4,6 +4,8 @@ var appEvents = require('utils/appevents');
 var context = require('utils/context');
 var TitlebarUpdater = require('components/titlebar');
 var log = require('utils/log');
+var onready = require('./utils/onready');
+
 require('views/widgets/preload');
 require('components/webNotifications');
 require('components/desktopNotifications');
@@ -15,7 +17,7 @@ require('utils/tracking');
 require('views/widgets/avatar');
 
 
-module.exports = (function() {
+onready(function() {
 
 
   var chatIFrame = document.getElementById('content-frame');
@@ -121,5 +123,5 @@ module.exports = (function() {
     }
   });
 
-})();
+});
 

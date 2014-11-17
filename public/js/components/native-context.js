@@ -1,12 +1,11 @@
 "use strict";
-var $ = require('jquery');
 var context = require('../utils/context');
 var log = require('utils/log');
+var appEvents = require('../utils/appevents');
 
 module.exports = (function() {
 
-
-  $(document).on('app.version.mismatch', function() {
+  appEvents.on('app.version.mismatch', function() {
     try {
       if(window.applicationCache.status === window.applicationCache.IDLE) {
         log.info('Attempting to update application cache');

@@ -1,10 +1,10 @@
 "use strict";
 var $ = require('jquery');
 var appEvents = require('utils/appevents');
+var onready = require('./utils/onready');
 require('utils/tracking');
 
-module.exports = (function() {
-
+onready(function() {
 
   var ui = {
     tile: $('.js-room-item'),
@@ -38,5 +38,5 @@ module.exports = (function() {
     appEvents.trigger('track-event', 'explore_room_about');
   });
 
-})();
+});
 

@@ -6,15 +6,11 @@ var template = require('./tmpl/userPopoverView.hbs');
 var footerTemplate = require('./tmpl/userPopoverFooterView.hbs');
 var appEvents = require('utils/appevents');
 var context = require('utils/context');
-var cdn = require('utils/cdn');
 
 module.exports = (function() {
 
-
-  var failoverImage = cdn('images/logo-mark-grey-64.png');
-
-  function largeAvatar(url) {
-    if(!url) return failoverImage;
+  function largeAvatar(data) {
+    var url = data.avatar_url ? data.avatar_url : '//avatars.githubusercontent.com/' + data.login + '?';
 
     if(url.indexOf('?') >= 0) {
       return url + '&s=128';
@@ -39,7 +35,7 @@ module.exports = (function() {
         }
       }
       data.inactive = data.invited || data.removed;
-      data.avatarUrl = largeAvatar(data.avatar_url);
+      data.avatarUrl = largeAvatar(data);
 
       return data;
     }

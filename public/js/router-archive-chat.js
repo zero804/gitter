@@ -4,6 +4,8 @@ var context = require('utils/context');
 //var ChatNliIntegratedView = require('views/app/chatNliIntegratedView');
 var HeaderView = require('views/app/headerView');
 var ArchiveNavigationView = require('views/archive/archive-navigation-view');
+var onready = require('./utils/onready');
+
 require('views/widgets/preload');
 require('filtered-collection');
 require('components/dozy');
@@ -15,8 +17,7 @@ require('utils/tracking');
 require('views/widgets/avatar');
 require('views/widgets/timeago');
 
-
-module.exports = (function() {
+onready(function() {
 
   $(document).on("click", "a", function(e) {
     if(this.href) {
@@ -40,8 +41,6 @@ module.exports = (function() {
     e.preventDefault();
     window.parent.location.href = href;
   });
-
-  // var appView = new ChatNliIntegratedView({ el: 'body' });
 
   new HeaderView({ model: context.troupe(), el: '#header' });
 
@@ -67,18 +66,5 @@ module.exports = (function() {
     // TODO: Handle the error? WC.
   }
 
-
-  // var Router = Backbone.Router.extend({
-  //   routes: {
-  //     // TODO: get rid of the pipes
-  //     "": "hideModal",
-  //   },
-
-  //   hideModal: function() {
-  //     appView.dialogRegion.close();
-  //   },
-
-  // });
-
-})();
+});
 
