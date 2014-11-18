@@ -9,8 +9,9 @@ var appVersion         = require('../../web/appVersion');
 var social             = require('../social-metadata');
 var PersistenceService = require('../../services/persistence-service');
 var restSerializer     = require("../../serializers/rest-serializer");
-
 var burstCalculator   = require('../../utils/burst-calculator');
+var userSort = require('../../../public/js/utils/user-sort');
+
 var avatar   = require('../../utils/avatar');
 var _                 = require('underscore');
 
@@ -124,8 +125,6 @@ function renderChat(req, res, options, next) {
     lean: true
   }, snapshotOptions);
 
-  console.log('serializerOptions:', serializerOptions);
-
   Q.all([
       contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions } }),
       restful.serializeChatsForTroupe(troupe.id, userId, serializerOptions),
@@ -166,7 +165,7 @@ function renderChat(req, res, options, next) {
           isPrivate: isPrivate,
           avatarUrl: avatar(troupeContext.troupe),
           activityEvents: activityEvents,
-          users: users
+          users: users.sort(userSort).slice(0, 21)
         }, options.extras);
 
       res.render(options.template, renderOptions);

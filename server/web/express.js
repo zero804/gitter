@@ -41,7 +41,6 @@ module.exports = {
     expressHbs.registerAsyncHelper('prerenderView', require('./prerender-helper'));
     expressHbs.registerHelper('chatItemPrerender', require('./prerender-chat-helper'));
     expressHbs.registerHelper('activityItemPrerender', require('./prerender-activity-helper'));
-    expressHbs.registerHelper('peopleItemPrerender', require('./prerender-user-helper'));
     expressHbs.registerHelper('pluralize', require('./hbs-helpers').pluralize);
     expressHbs.registerHelper('toLowerCase', require('./hbs-helpers').toLowerCase);
     expressHbs.registerHelper('typewriter', require('./hbs-helpers').typewriter);

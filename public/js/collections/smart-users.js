@@ -2,62 +2,9 @@
 var Backbone = require('backbone');
 var _ = require('underscore');
 var log = require('utils/log');
+var usersSort = require('utils/user-sort');
 
 module.exports = (function() {
-
-
-  // higher index in array, higher rank
-  var roleRank = ['contributor', 'admin'];
-
-
-  function compareRoles(userA, userB) {
-    var aRole = userA.get('role');
-    var bRole = userB.get('role');
-
-    return roleRank.indexOf(aRole) - roleRank.indexOf(bRole);
-  }
-
-  /**
-   * inviteStatusDiffer() checks whether the invitation status is different for 2 users
-   *
-   * userA    Backbone.Model - the first item in the comparison
-   * userB    Backbone.Model - the second item in the comparison
-   *
-   * returns  Booean indicates whether the status differ (true) or not (false)
-   */
-  function inviteStatusDiffer (userA, userB) {
-    var aInvited = userA.get('invited');
-    var bInvited = userB.get('invited');
-    if (aInvited !== bInvited) return true;
-    return false;
-  }
-
-  /**
-   * compareInvites() used for sorting, it determines the logic for different situations
-   *
-   * userA    Backbone.Model - the first item in the comparison
-   * userB    Backbone.Model - the second item in the comparison
-   * @return  Number - indicates whether the status differ (true) or not (false)
-   */
-  function compareInvites (userA, userB) {
-    var aInvited = userA.get('invited');
-    var bInvited = userB.get('invited');
-
-    // if only a is invited it should be placed after b
-    if (aInvited && !bInvited) return  -1;
-
-    // if only b is invited it should be placed after a
-    if (!aInvited && bInvited) return  1;
-
-    return 0; // it should never get to this point therefore -> TODO: one can safely remove this line in the future
-  }
-
-  function compareNames(userA, userB) {
-    var aName = userA.get('displayName') || userA.get('username') || '';
-    var bName = userB.get('displayName') || userB.get('username') || '';
-
-    return bName.toLowerCase().localeCompare(aName.toLowerCase());
-  }
 
   var MegaCollection = Backbone.Collection.extend({
     initialize: function(models, options) {
@@ -89,18 +36,7 @@ module.exports = (function() {
     },
 
     // lower in array is better, therefore whatever is returned should be inverted (thus the `-` before each return statement)
-    comparator: function(userA, userB) {
-      var roleDifference = compareRoles(userA, userB);
-
-      // if there is a ranking difference sort by role;
-      if (roleDifference !== 0) return - roleDifference;
-
-      // if the users have a different invite status, sort by whether a user is invited:
-      if (inviteStatusDiffer(userA, userB)) return - compareInvites(userA, userB);
-
-      // by default sort by name
-      return - compareNames(userA, userB);
-    }
+    comparator: usersSort
   });
 
   var LimitedCollection = Backbone.Collection.extend({
@@ -109,6 +45,7 @@ module.exports = (function() {
 
       this.underlying = collection;
       this.limit = options.limit || 10;
+
       this.comparator = function(item) {
         return item._sortIndex;
       };
@@ -177,7 +114,8 @@ module.exports = (function() {
 
       var self = this;
       var removals = [];
-      self.forEach(function(item) {
+
+      self.forEach(function (item) {
         var i = originalOrder[item.id];
 
         if(i >= 0) {

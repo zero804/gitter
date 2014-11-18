@@ -18,6 +18,7 @@ module.exports = exports = function(template) {
       avatarUrl: avatarUrl,
       avatarSize: avatarSize,
       id: user.id,
+      role: user.role,
       showStatus: showStatus,
       showBadge: showBadge,
       presenceClass: user.online ? 'online' : 'offline',
