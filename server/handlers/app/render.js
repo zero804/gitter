@@ -17,6 +17,7 @@ var _                 = require('underscore');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
+var USER_COLLECTION_FOLD = 21;
 
 var stagingText, stagingLink;
 var dnsPrefetch = (nconf.get('cdn:hosts') || []).concat([
@@ -151,6 +152,9 @@ function renderChat(req, res, options, next) {
         integrationsUrl = '#integrations';
       }
 
+      var cutOff = users.length - USER_COLLECTION_FOLD;
+      var remainingCount = (cutOff > 0) ? cutOff : 0;
+
       var renderOptions = _.extend({
           isRepo: troupe.githubType === 'REPO',
           appCache: getAppCache(req),
@@ -172,7 +176,8 @@ function renderChat(req, res, options, next) {
           isPrivate: isPrivate,
           avatarUrl: avatar(troupeContext.troupe),
           activityEvents: activityEvents,
-          users: users.sort(userSort).slice(0, 21),
+          users: users.sort(userSort).slice(0, USER_COLLECTION_FOLD),
+          remainingCount: remainingCount,
           isAdmin: troupeContext.permissions.admin,
           isNativeDesktopApp: troupeContext.isNativeDesktopApp,
           integrationsUrl: integrationsUrl
