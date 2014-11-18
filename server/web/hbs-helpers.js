@@ -52,26 +52,28 @@ exports.cdn = function(url, parameters) {
   return cdn(url, parameters ? parameters.hash:null);
 };
 
-exports.bootScript = function(url, parameters) {
+function cdnUrlGenerator(url, options) {
+  if(options.root) {
+    return options.root + url;
+  }
 
+  return cdn(url, { appcache: options.appcache });
+}
+
+exports.bootScript = function(url, parameters) {
   var options = parameters.hash;
 
-  var baseUrl;
-  if(options.root) {
-    baseUrl = options.root + "js/";
-  } else {
-    baseUrl = cdn("js", { appcache: options.appcache });
-  }
-  var scriptName = url + '.js';
-  var vendorScript = 'vendor.js';
+  var baseUrl = cdnUrlGenerator("js/", options);
+  var vendorScriptUrl = cdnUrlGenerator("js/vendor.js", options);
+  var bootScriptUrl = cdnUrlGenerator("js/" + url + ".js", options);
 
   return util.format(
-         "<script type='text/javascript' src='%s/%s'></script>" +
-         "<script type='text/javascript' src='%s/%s'></script>",
+         "<script type='text/javascript'>window.webpackPublicPath = '%s';</script>" +
+         "<script type='text/javascript' src='%s'></script>" +
+         "<script type='text/javascript' src='%s'></script>",
          baseUrl,
-         vendorScript,
-         baseUrl,
-         scriptName);
+         vendorScriptUrl,
+         bootScriptUrl);
 };
 
 exports.isMobile = function(agent, options) {

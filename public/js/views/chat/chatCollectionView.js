@@ -207,12 +207,12 @@ module.exports = (function() {
       try {
         this.highlightChat(old);
       } catch (e) {
-        log('Could not clear previously highlighted item');
+        log.info('Could not clear previously highlighted item');
       }
     },
 
     getFetchData: function() {
-      log("Loading next message chunk.");
+      log.info("Loading next message chunk.");
 
       var ids = this.collection.map(function(m) { return m.get('id'); });
       var lowestId = _.min(ids, function(a, b) {
@@ -222,7 +222,7 @@ module.exports = (function() {
       });
 
       if (lowestId === Infinity) {
-        log('No messages loaded, cancelling pagenation (!!)');
+        log.info('No messages loaded, cancelling pagenation (!!)');
         return;
       }
 

@@ -204,7 +204,7 @@ module.exports = (function() {
       } catch(e) {
         var modelData = this.model && this.model.attributes;
         appEvents.trigger('bugreport', e, { extra: modelData });
-        log('ERROR rendering activity item:', e.message, e.stack, modelData);
+        log.info('ERROR rendering activity item:', e.message, e.stack, modelData);
         return {};
       }
     },
