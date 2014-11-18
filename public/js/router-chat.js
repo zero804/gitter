@@ -5,17 +5,10 @@ var context = require('utils/context');
 var liveContext = require('components/live-context');
 var appEvents = require('utils/appevents');
 var log = require('utils/log');
-var peopleCollectionView = require('views/people/peopleCollectionView');
 var ChatIntegratedView = require('views/app/chatIntegratedView');
 var itemCollections = require('collections/instances/integrated-items');
-var shareView = require('views/share/share-view');
-var TroupeSettingsView = require('views/app/troupeSettingsView');
-var MarkdownView = require('views/app/markdownView');
-var KeyboardView = require('views/app/keyboardView');
-var AddPeopleViewModal = require('views/app/addPeopleView');
-var IntegrationSettingsModal = require('views/app/integrationSettingsModal');
-var CollaboratorsView = require('views/app/collaboratorsView');
-var collaboratorsModels = require('collections/collaborators');
+var onready = require('./utils/onready');
+
 var apiClient = require('components/apiClient');
 var HeaderView = require('views/app/headerView');
 
@@ -33,7 +26,7 @@ require('views/widgets/avatar');
 require('views/widgets/timeago');
 
 
-module.exports = (function() {
+onready(function() {
 
 
   $(document).on("click", "a", function(e) {
@@ -62,7 +55,7 @@ module.exports = (function() {
 
   window.addEventListener('message', function(e) {
     if(e.origin !== context.env('basePath')) {
-      log('Ignoring message from ' + e.origin);
+      log.info('Ignoring message from ' + e.origin);
       return;
     }
 
@@ -74,7 +67,7 @@ module.exports = (function() {
       return;
     }
 
-    log('Received message ', message);
+    log.info('Received message ', message);
 
     var makeEvent = function(message) {
       var origin = 'app';
@@ -82,13 +75,13 @@ module.exports = (function() {
       message.event = {
         origin: origin,
         preventDefault: function() {
-          log('Warning: could not use preventDefault() because the event comes from the `' + this.origin + '` frame');
+          log.info('Warning: could not use preventDefault() because the event comes from the `' + this.origin + '` frame');
         },
         stopPropagation: function() {
-          log('Warning: could not use stopPropagation() because the event comes from the `' + this.origin + '` frame');
+          log.info('Warning: could not use stopPropagation() because the event comes from the `' + this.origin + '` frame');
         },
         stopImmediatePropagation: function() {
-          log('Warning: could not use stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame');
+          log.info('Warning: could not use stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame');
         }
       };
     };
@@ -194,18 +187,25 @@ module.exports = (function() {
   var appView = new ChatIntegratedView({ el: 'body' });
   new HeaderView({ model: context.troupe(), el: '#header' });
 
-  // appView.showSearchMode();
-
   // This may require a better home
   itemCollections.users.once('sync', function() {
     if(context().permissions.admin) {
       if (itemCollections.users.length === 1) { //itemCollections.chats.length === 0)
-        var collaborators = new collaboratorsModels.CollabCollection();
-        collaborators.fetch();
-        collaborators.once('sync', function() {
-          var collaboratorsView = new CollaboratorsView({ collection: collaborators });
-          $('#content-frame').prepend(collaboratorsView.render().el);
+
+        require.ensure([
+          'views/app/collaboratorsView',
+          'collections/collaborators'],
+          function(require) {
+            var CollaboratorsView = require('views/app/collaboratorsView');
+            var collaboratorsModels = require('collections/collaborators');
+            var collaborators = new collaboratorsModels.CollabCollection();
+            collaborators.fetch();
+            collaborators.once('sync', function() {
+              var collaboratorsView = new CollaboratorsView({ collection: collaborators });
+              $('#content-frame').prepend(collaboratorsView.render().el);
+            });
         });
+
       }
     }
   });
@@ -228,35 +228,59 @@ module.exports = (function() {
     },
 
     people: function() {
-      appView.dialogRegion.show(new peopleCollectionView.Modal({ collection: itemCollections.sortedUsers }));
+      require.ensure(['views/people/peopleCollectionView'], function(require) {
+        var peopleCollectionView = require('views/people/peopleCollectionView');
+        appView.dialogRegion.show(new peopleCollectionView.Modal({ collection: itemCollections.sortedUsers }));
+      });
     },
 
     notifications: function() {
-      appView.dialogRegion.show(new TroupeSettingsView({}));
+      require.ensure(['views/app/troupeSettingsView'], function(require) {
+        var TroupeSettingsView = require('views/app/troupeSettingsView');
+        appView.dialogRegion.show(new TroupeSettingsView({}));
+      });
     },
 
     markdown: function() {
-      appView.dialogRegion.show(new MarkdownView({}));
+      require.ensure(['views/app/markdownView'], function(require) {
+        var MarkdownView = require('views/app/markdownView');
+        appView.dialogRegion.show(new MarkdownView({}));
+      });
     },
 
     keys: function() {
-      appView.dialogRegion.show(new KeyboardView({}));
+      require.ensure(['views/app/keyboardView'], function(require) {
+        var KeyboardView = require('views/app/keyboardView');
+        appView.dialogRegion.show(new KeyboardView({}));
+      });
     },
 
     addPeople: function() {
-      appView.dialogRegion.show(new AddPeopleViewModal({}));
+      require.ensure(['views/app/addPeopleView'], function(require) {
+        var AddPeopleViewModal = require('views/app/addPeopleView');
+        appView.dialogRegion.show(new AddPeopleViewModal({}));
+      });
+
     },
 
     integrations: function() {
       if(context().permissions.admin) {
-        appView.dialogRegion.show(new IntegrationSettingsModal({}));
+        require.ensure(['views/app/integrationSettingsModal'], function(require) {
+          var IntegrationSettingsModal = require('views/app/integrationSettingsModal');
+
+          appView.dialogRegion.show(new IntegrationSettingsModal({}));
+        });
       } else {
         window.location = '#';
       }
     },
 
     share: function() {
-      appView.dialogRegion.show(new shareView.Modal({}));
+      require.ensure(['views/share/share-view'], function(require) {
+        var shareView = require('views/share/share-view');
+
+        appView.dialogRegion.show(new shareView.Modal({}));
+      });
     }
 
   });
@@ -328,9 +352,6 @@ module.exports = (function() {
     setTimeout(promptForHook, 1500);
   }
 
-  //helpShareIfLonely();
-
   Backbone.history.start();
-
-})();
+});
 

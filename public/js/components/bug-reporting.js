@@ -2,6 +2,7 @@
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
 var Raven = require('raven');
+var log = require('utils/log');
 
 module.exports = (function() {
   var ravenUrl = context.env('ravenUrl');
@@ -11,29 +12,13 @@ module.exports = (function() {
   }
 
   function logUnhandledError(message, filename, lineno, colno, error) {
-    var c = window['con' /* prevent detector */ + 'sole'];
-    if(c) {
-      var m = message || error && error.message || 'Unhandler error';
-      var errorInfo = {
+    log.error(message || error && error.message || 'Unhandler error', {
         message: message,
         filename: filename,
         lineno: lineno,
         colno:colno,
         error: error
-      };
-
-      if(c.error) {
-        c.error(m, errorInfo);
-        if(error && error.stack) {
-          c.error(error.stack);
-        }
-      } else if(c.log) {
-        c.log(m, errorInfo);
-        if(error && error.stack) {
-          c.log(error.stack);
-        }
-      }
-    }
+      });
   }
 
   if(ravenUrl) {

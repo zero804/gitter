@@ -9,6 +9,7 @@ var mentionDecorator = require('views/chat/decorators/mentionDecorator');
 var embedDecorator = require('views/chat/decorators/embedDecorator');
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var HistoryLimitView = require('views/app/historyLimitView');
+var onready = require('./utils/onready');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -21,7 +22,7 @@ require('views/widgets/avatar');
 require('views/widgets/timeago');
 
 
-module.exports = (function() {
+onready(function() {
   new ChatNliIntegratedView({ el: 'body' });
 
   var chatCollection = new chatModels.ChatCollection(null, { listen: true });
@@ -45,5 +46,5 @@ module.exports = (function() {
   }).render();
 
 
-})();
+});
 

@@ -9,12 +9,13 @@ var modalRegion = require('components/modal-region');
 var MobileAppView = require('views/app/mobileAppView');
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var MobileLoginButton = require('views/mobile/mobileLoginButton');
+var onready = require('./utils/onready');
 
 // Preload widgets
 require('views/widgets/avatar');
 require('views/widgets/timeago');
 
-module.exports = (function() {
+onready(function() {
 
 
   new MobileAppView({
@@ -56,5 +57,5 @@ module.exports = (function() {
   Backbone.history.start();
 
 
-})();
+});
 
