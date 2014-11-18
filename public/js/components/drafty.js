@@ -16,7 +16,8 @@ module.exports = (function() {
     this.uniqueId = uniqueId;
 
     var value = this.store['drafty_' + this.uniqueId];
-    if(value) {
+
+    if(value && !el.value) {
       el.value = value;
     }
 
@@ -33,6 +34,7 @@ module.exports = (function() {
 
   Drafty.prototype.update = function() {
     var value = this.el.value;
+
     /* Don't save anything too long, as it kills localstorage */
     if(value && value.length > 4096) {
       value = '';
