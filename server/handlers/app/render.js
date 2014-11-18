@@ -124,8 +124,6 @@ function renderChat(req, res, options, next) {
     lean: true
   }, snapshotOptions);
 
-  console.log('serializerOptions:', serializerOptions);
-
   Q.all([
       contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions } }),
       restful.serializeChatsForTroupe(troupe.id, userId, serializerOptions),
@@ -144,6 +142,13 @@ function renderChat(req, res, options, next) {
       if (!user) classNames.push("logged-out");
 
       var isPrivate = troupe.security !== "PUBLIC";
+      var integrationsUrl;
+
+      if (troupeContext.isNativeDesktopApp) {
+         integrationsUrl = nconf.get('web:basepath') + '/' + troupeContext.troupe.uri + '#integrations';
+      } else {
+        integrationsUrl = '#integrations';
+      }
 
       var renderOptions = _.extend({
           isRepo: troupe.githubType === 'REPO',
@@ -166,7 +171,10 @@ function renderChat(req, res, options, next) {
           isPrivate: isPrivate,
           avatarUrl: avatar(troupeContext.troupe),
           activityEvents: activityEvents,
-          users: users
+          users: users,
+          isAdmin: troupeContext.permissions.admin,
+          isNativeDesktopApp: troupeContext.isNativeDesktopApp,
+          integrationsUrl: integrationsUrl
         }, options.extras);
 
       res.render(options.template, renderOptions);
