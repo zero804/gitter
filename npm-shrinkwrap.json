@@ -986,18 +986,6 @@
           "from": "https://registry.npmjs.org/methods/-/methods-1.1.0.tgz",
           "resolved": "https://registry.npmjs.org/methods/-/methods-1.1.0.tgz"
         },
-        "mkdirp": {
-          "version": "0.5.0",
-          "from": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.0.tgz",
-          "resolved": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.0.tgz",
-          "dependencies": {
-            "minimist": {
-              "version": "0.0.8",
-              "from": "https://registry.npmjs.org/minimist/-/minimist-0.0.8.tgz",
-              "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.8.tgz"
-            }
-          }
-        },
         "parseurl": {
           "version": "1.3.0",
           "from": "https://registry.npmjs.org/parseurl/-/parseurl-1.3.0.tgz",
@@ -1290,51 +1278,52 @@
     },
     "gitter-env": {
       "version": "0.15.3",
-      "from": "gitter-env@latest",
+      "from": "gitter-env@0.15.3",
+      "resolved": "http://beta-internal:8089/nexus/content/groups/npm/gitter-env/-/gitter-env-0.15.3.tgz",
       "dependencies": {
         "async": {
           "version": "0.8.0",
-          "from": "async@>=0.8.0 <0.9.0",
+          "from": "https://registry.npmjs.org/async/-/async-0.8.0.tgz",
           "resolved": "https://registry.npmjs.org/async/-/async-0.8.0.tgz"
         },
         "blocked": {
           "version": "1.0.0",
-          "from": "blocked@>=1.0.0 <2.0.0",
+          "from": "https://registry.npmjs.org/blocked/-/blocked-1.0.0.tgz",
           "resolved": "https://registry.npmjs.org/blocked/-/blocked-1.0.0.tgz"
         },
         "clockout": {
           "version": "0.0.1",
-          "from": "clockout@0.0.1",
+          "from": "http://beta-internal:8089/nexus/content/groups/npm/clockout/-/clockout-0.0.1.tgz",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/clockout/-/clockout-0.0.1.tgz"
         },
         "nconf": {
           "version": "0.6.9",
-          "from": "nconf@>=0.6.9 <0.7.0",
+          "from": "https://registry.npmjs.org/nconf/-/nconf-0.6.9.tgz",
           "resolved": "https://registry.npmjs.org/nconf/-/nconf-0.6.9.tgz",
           "dependencies": {
             "async": {
               "version": "0.2.9",
-              "from": "async@0.2.9",
+              "from": "https://registry.npmjs.org/async/-/async-0.2.9.tgz",
               "resolved": "https://registry.npmjs.org/async/-/async-0.2.9.tgz"
             },
             "ini": {
               "version": "1.3.0",
-              "from": "ini@>=1.0.0 <2.0.0",
+              "from": "https://registry.npmjs.org/ini/-/ini-1.3.0.tgz",
               "resolved": "https://registry.npmjs.org/ini/-/ini-1.3.0.tgz"
             },
             "optimist": {
               "version": "0.6.0",
-              "from": "optimist@0.6.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/optimist/-/optimist-0.6.0.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/optimist/-/optimist-0.6.0.tgz",
               "dependencies": {
                 "wordwrap": {
                   "version": "0.0.2",
-                  "from": "wordwrap@>=0.0.2 <0.1.0",
+                  "from": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.2.tgz",
                   "resolved": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.2.tgz"
                 },
                 "minimist": {
                   "version": "0.0.10",
-                  "from": "minimist@>=0.0.1 <0.1.0",
+                  "from": "https://registry.npmjs.org/minimist/-/minimist-0.0.10.tgz",
                   "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.10.tgz"
                 }
               }
@@ -1343,22 +1332,22 @@
         },
         "redis": {
           "version": "0.10.3",
-          "from": "redis@>=0.10.1 <0.11.0",
+          "from": "https://registry.npmjs.org/redis/-/redis-0.10.3.tgz",
           "resolved": "https://registry.npmjs.org/redis/-/redis-0.10.3.tgz"
         },
         "underscore": {
           "version": "1.7.0",
-          "from": "underscore@>=1.6.0 <2.0.0",
+          "from": "https://registry.npmjs.org/underscore/-/underscore-1.7.0.tgz",
           "resolved": "https://registry.npmjs.org/underscore/-/underscore-1.7.0.tgz"
         },
         "universal-analytics": {
           "version": "0.3.6",
-          "from": "universal-analytics@>=0.3.4 <0.4.0",
+          "from": "https://registry.npmjs.org/universal-analytics/-/universal-analytics-0.3.6.tgz",
           "resolved": "https://registry.npmjs.org/universal-analytics/-/universal-analytics-0.3.6.tgz",
           "dependencies": {
             "async": {
               "version": "0.2.10",
-              "from": "async@>=0.2.0 <0.3.0",
+              "from": "https://registry.npmjs.org/async/-/async-0.2.10.tgz",
               "resolved": "https://registry.npmjs.org/async/-/async-0.2.10.tgz"
             }
           }
@@ -1367,27 +1356,29 @@
     },
     "gitter-faye-redis": {
       "version": "0.4.0",
-      "from": "gitter-faye-redis@*",
+      "from": "gitter-faye-redis@0.4.0",
+      "resolved": "http://beta-internal:8089/nexus/content/groups/npm/gitter-faye-redis/-/gitter-faye-redis-0.4.0.tgz",
       "dependencies": {
         "gitter-redis-scripto": {
           "version": "0.2.0",
-          "from": "gitter-redis-scripto@>=0.2.0 <0.3.0",
+          "from": "gitter-redis-scripto@0.2.0",
+          "resolved": "http://beta-internal:8089/nexus/content/groups/npm/gitter-redis-scripto/-/gitter-redis-scripto-0.2.0.tgz",
           "dependencies": {
             "redis": {
               "version": "0.8.6",
-              "from": "redis@>=0.8.0 <0.9.0",
+              "from": "https://registry.npmjs.org/redis/-/redis-0.8.6.tgz",
               "resolved": "https://registry.npmjs.org/redis/-/redis-0.8.6.tgz"
             },
             "debug": {
               "version": "0.7.4",
-              "from": "debug@>=0.7.0 <0.8.0",
+              "from": "https://registry.npmjs.org/debug/-/debug-0.7.4.tgz",
               "resolved": "https://registry.npmjs.org/debug/-/debug-0.7.4.tgz"
             }
           }
         },
         "redis": {
           "version": "0.12.1",
-          "from": "redis@*",
+          "from": "https://registry.npmjs.org/redis/-/redis-0.12.1.tgz",
           "resolved": "https://registry.npmjs.org/redis/-/redis-0.12.1.tgz"
         }
       }
@@ -1484,39 +1475,39 @@
     },
     "handlebars": {
       "version": "1.3.0",
-      "from": "handlebars@>=1.0.0 <2.0.0",
+      "from": "http://beta-internal:8089/nexus/content/groups/npm/handlebars/-/handlebars-1.3.0.tgz",
       "resolved": "http://beta-internal:8089/nexus/content/groups/npm/handlebars/-/handlebars-1.3.0.tgz",
       "dependencies": {
         "optimist": {
           "version": "0.3.7",
-          "from": "optimist@>=0.3.0 <0.4.0",
+          "from": "https://registry.npmjs.org/optimist/-/optimist-0.3.7.tgz",
           "resolved": "https://registry.npmjs.org/optimist/-/optimist-0.3.7.tgz",
           "dependencies": {
             "wordwrap": {
               "version": "0.0.2",
-              "from": "wordwrap@>=0.0.2 <0.1.0",
+              "from": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.2.tgz",
               "resolved": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.2.tgz"
             }
           }
         },
         "uglify-js": {
           "version": "2.3.6",
-          "from": "uglify-js@>=2.3.0 <2.4.0",
+          "from": "https://registry.npmjs.org/uglify-js/-/uglify-js-2.3.6.tgz",
           "resolved": "https://registry.npmjs.org/uglify-js/-/uglify-js-2.3.6.tgz",
           "dependencies": {
             "async": {
               "version": "0.2.10",
-              "from": "async@>=0.2.6 <0.3.0",
+              "from": "https://registry.npmjs.org/async/-/async-0.2.10.tgz",
               "resolved": "https://registry.npmjs.org/async/-/async-0.2.10.tgz"
             },
             "source-map": {
               "version": "0.1.40",
-              "from": "source-map@>=0.1.7 <0.2.0",
+              "from": "https://registry.npmjs.org/source-map/-/source-map-0.1.40.tgz",
               "resolved": "https://registry.npmjs.org/source-map/-/source-map-0.1.40.tgz",
               "dependencies": {
                 "amdefine": {
                   "version": "0.1.0",
-                  "from": "amdefine@>=0.0.4",
+                  "from": "https://registry.npmjs.org/amdefine/-/amdefine-0.1.0.tgz",
                   "resolved": "https://registry.npmjs.org/amdefine/-/amdefine-0.1.0.tgz"
                 }
               }
@@ -1769,7 +1760,7 @@
     },
     "loglevel": {
       "version": "1.2.0",
-      "from": "loglevel@*",
+      "from": "http://beta-internal:8089/nexus/content/groups/npm/loglevel/-/loglevel-1.2.0.tgz",
       "resolved": "http://beta-internal:8089/nexus/content/groups/npm/loglevel/-/loglevel-1.2.0.tgz"
     },
     "mandrill-api": {
@@ -1957,6 +1948,18 @@
       "version": "0.0.13",
       "from": "https://registry.npmjs.org/mongoose-q/-/mongoose-q-0.0.13.tgz",
       "resolved": "https://registry.npmjs.org/mongoose-q/-/mongoose-q-0.0.13.tgz"
+    },
+    "node-gcm": {
+      "version": "0.9.12",
+      "from": "node-gcm@*",
+      "resolved": "http://beta-internal:8089/nexus/content/groups/npm/node-gcm/-/node-gcm-0.9.12.tgz",
+      "dependencies": {
+        "debug": {
+          "version": "0.8.1",
+          "from": "debug@>=0.8.1 <0.9.0",
+          "resolved": "https://registry.npmjs.org/debug/-/debug-0.8.1.tgz"
+        }
+      }
     },
     "node-resque": {
       "version": "0.8.7",
@@ -2523,7 +2526,7 @@
     },
     "scriptjs": {
       "version": "2.5.7",
-      "from": "scriptjs@*",
+      "from": "http://beta-internal:8089/nexus/content/groups/npm/scriptjs/-/scriptjs-2.5.7.tgz",
       "resolved": "http://beta-internal:8089/nexus/content/groups/npm/scriptjs/-/scriptjs-2.5.7.tgz"
     },
     "sechash": {
@@ -2710,119 +2713,107 @@
     },
     "webpack": {
       "version": "1.4.13",
-      "from": "webpack@*",
+      "from": "http://beta-internal:8089/nexus/content/groups/npm/webpack/-/webpack-1.4.13.tgz",
       "resolved": "http://beta-internal:8089/nexus/content/groups/npm/webpack/-/webpack-1.4.13.tgz",
       "dependencies": {
         "esprima": {
           "version": "1.2.2",
-          "from": "esprima@>=1.2.0 <1.3.0",
+          "from": "http://beta-internal:8089/nexus/content/groups/npm/esprima/-/esprima-1.2.2.tgz",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/esprima/-/esprima-1.2.2.tgz"
-        },
-        "mkdirp": {
-          "version": "0.5.0",
-          "from": "mkdirp@>=0.5.0 <0.6.0",
-          "resolved": "http://beta-internal:8089/nexus/content/groups/npm/mkdirp/-/mkdirp-0.5.0.tgz",
-          "dependencies": {
-            "minimist": {
-              "version": "0.0.8",
-              "from": "minimist@0.0.8",
-              "resolved": "http://beta-internal:8089/nexus/content/groups/npm/minimist/-/minimist-0.0.8.tgz"
-            }
-          }
         },
         "optimist": {
           "version": "0.6.1",
-          "from": "optimist@>=0.6.0 <0.7.0",
+          "from": "https://registry.npmjs.org/optimist/-/optimist-0.6.1.tgz",
           "resolved": "https://registry.npmjs.org/optimist/-/optimist-0.6.1.tgz",
           "dependencies": {
             "wordwrap": {
               "version": "0.0.2",
-              "from": "wordwrap@>=0.0.2 <0.1.0",
+              "from": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.2.tgz",
               "resolved": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.2.tgz"
             },
             "minimist": {
               "version": "0.0.10",
-              "from": "minimist@>=0.0.1 <0.1.0",
+              "from": "https://registry.npmjs.org/minimist/-/minimist-0.0.10.tgz",
               "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.10.tgz"
             }
           }
         },
         "uglify-js": {
           "version": "2.4.15",
-          "from": "uglify-js@>=2.4.13 <2.5.0",
+          "from": "https://registry.npmjs.org/uglify-js/-/uglify-js-2.4.15.tgz",
           "resolved": "https://registry.npmjs.org/uglify-js/-/uglify-js-2.4.15.tgz",
           "dependencies": {
             "async": {
               "version": "0.2.10",
-              "from": "async@>=0.2.6 <0.3.0",
+              "from": "https://registry.npmjs.org/async/-/async-0.2.10.tgz",
               "resolved": "https://registry.npmjs.org/async/-/async-0.2.10.tgz"
             },
             "source-map": {
               "version": "0.1.34",
-              "from": "source-map@0.1.34",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/source-map/-/source-map-0.1.34.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/source-map/-/source-map-0.1.34.tgz",
               "dependencies": {
                 "amdefine": {
                   "version": "0.1.0",
-                  "from": "amdefine@>=0.0.4",
+                  "from": "https://registry.npmjs.org/amdefine/-/amdefine-0.1.0.tgz",
                   "resolved": "https://registry.npmjs.org/amdefine/-/amdefine-0.1.0.tgz"
                 }
               }
             },
             "optimist": {
               "version": "0.3.7",
-              "from": "optimist@>=0.3.5 <0.4.0",
+              "from": "https://registry.npmjs.org/optimist/-/optimist-0.3.7.tgz",
               "resolved": "https://registry.npmjs.org/optimist/-/optimist-0.3.7.tgz",
               "dependencies": {
                 "wordwrap": {
                   "version": "0.0.2",
-                  "from": "wordwrap@>=0.0.2 <0.1.0",
+                  "from": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.2.tgz",
                   "resolved": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.2.tgz"
                 }
               }
             },
             "uglify-to-browserify": {
               "version": "1.0.2",
-              "from": "uglify-to-browserify@>=1.0.0 <1.1.0",
+              "from": "https://registry.npmjs.org/uglify-to-browserify/-/uglify-to-browserify-1.0.2.tgz",
               "resolved": "https://registry.npmjs.org/uglify-to-browserify/-/uglify-to-browserify-1.0.2.tgz"
             }
           }
         },
         "enhanced-resolve": {
           "version": "0.7.6",
-          "from": "enhanced-resolve@>=0.7.0 <0.8.0",
+          "from": "http://beta-internal:8089/nexus/content/groups/npm/enhanced-resolve/-/enhanced-resolve-0.7.6.tgz",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/enhanced-resolve/-/enhanced-resolve-0.7.6.tgz",
           "dependencies": {
             "graceful-fs": {
               "version": "2.0.3",
-              "from": "graceful-fs@>=2.0.3 <2.1.0",
+              "from": "https://registry.npmjs.org/graceful-fs/-/graceful-fs-2.0.3.tgz",
               "resolved": "https://registry.npmjs.org/graceful-fs/-/graceful-fs-2.0.3.tgz"
             }
           }
         },
         "memory-fs": {
           "version": "0.1.0",
-          "from": "memory-fs@>=0.1.0 <0.2.0",
+          "from": "http://beta-internal:8089/nexus/content/groups/npm/memory-fs/-/memory-fs-0.1.0.tgz",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/memory-fs/-/memory-fs-0.1.0.tgz"
         },
         "clone": {
           "version": "0.1.18",
-          "from": "clone@>=0.1.15 <0.2.0",
+          "from": "http://beta-internal:8089/nexus/content/groups/npm/clone/-/clone-0.1.18.tgz",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/clone/-/clone-0.1.18.tgz"
         },
         "webpack-core": {
           "version": "0.4.8",
-          "from": "webpack-core@>=0.4.8 <0.5.0",
+          "from": "http://beta-internal:8089/nexus/content/groups/npm/webpack-core/-/webpack-core-0.4.8.tgz",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/webpack-core/-/webpack-core-0.4.8.tgz",
           "dependencies": {
             "source-map": {
               "version": "0.1.40",
-              "from": "source-map@>=0.1.38 <0.2.0",
+              "from": "https://registry.npmjs.org/source-map/-/source-map-0.1.40.tgz",
               "resolved": "https://registry.npmjs.org/source-map/-/source-map-0.1.40.tgz",
               "dependencies": {
                 "amdefine": {
                   "version": "0.1.0",
-                  "from": "amdefine@>=0.0.4",
+                  "from": "https://registry.npmjs.org/amdefine/-/amdefine-0.1.0.tgz",
                   "resolved": "https://registry.npmjs.org/amdefine/-/amdefine-0.1.0.tgz"
                 }
               }
@@ -2831,61 +2822,61 @@
         },
         "node-libs-browser": {
           "version": "0.4.0",
-          "from": "node-libs-browser@>=0.4.0 <0.5.0",
+          "from": "http://beta-internal:8089/nexus/content/groups/npm/node-libs-browser/-/node-libs-browser-0.4.0.tgz",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/node-libs-browser/-/node-libs-browser-0.4.0.tgz",
           "dependencies": {
             "console-browserify": {
               "version": "1.1.0",
-              "from": "console-browserify@>=1.1.0 <2.0.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/console-browserify/-/console-browserify-1.1.0.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/console-browserify/-/console-browserify-1.1.0.tgz",
               "dependencies": {
                 "date-now": {
                   "version": "0.1.4",
-                  "from": "date-now@>=0.1.4 <0.2.0",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/date-now/-/date-now-0.1.4.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/date-now/-/date-now-0.1.4.tgz"
                 }
               }
             },
             "vm-browserify": {
               "version": "0.0.4",
-              "from": "vm-browserify@0.0.4",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/vm-browserify/-/vm-browserify-0.0.4.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/vm-browserify/-/vm-browserify-0.0.4.tgz",
               "dependencies": {
                 "indexof": {
                   "version": "0.0.1",
-                  "from": "indexof@0.0.1",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/indexof/-/indexof-0.0.1.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/indexof/-/indexof-0.0.1.tgz"
                 }
               }
             },
             "crypto-browserify": {
               "version": "3.3.0",
-              "from": "crypto-browserify@>=3.0.0 <4.0.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/crypto-browserify/-/crypto-browserify-3.3.0.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/crypto-browserify/-/crypto-browserify-3.3.0.tgz",
               "dependencies": {
                 "pbkdf2-compat": {
                   "version": "2.0.1",
-                  "from": "pbkdf2-compat@2.0.1",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/pbkdf2-compat/-/pbkdf2-compat-2.0.1.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/pbkdf2-compat/-/pbkdf2-compat-2.0.1.tgz"
                 },
                 "ripemd160": {
                   "version": "0.2.0",
-                  "from": "ripemd160@0.2.0",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/ripemd160/-/ripemd160-0.2.0.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/ripemd160/-/ripemd160-0.2.0.tgz"
                 },
                 "sha.js": {
                   "version": "2.2.6",
-                  "from": "sha.js@2.2.6",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/sha.js/-/sha.js-2.2.6.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/sha.js/-/sha.js-2.2.6.tgz"
                 },
                 "browserify-aes": {
                   "version": "0.4.0",
-                  "from": "browserify-aes@0.4.0",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/browserify-aes/-/browserify-aes-0.4.0.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/browserify-aes/-/browserify-aes-0.4.0.tgz",
                   "dependencies": {
                     "inherits": {
                       "version": "2.0.1",
-                      "from": "inherits@>=2.0.1 <3.0.0",
+                      "from": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz",
                       "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
                     }
                   }
@@ -2894,247 +2885,247 @@
             },
             "http-browserify": {
               "version": "1.7.0",
-              "from": "http-browserify@>=1.3.2 <2.0.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/http-browserify/-/http-browserify-1.7.0.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/http-browserify/-/http-browserify-1.7.0.tgz",
               "dependencies": {
                 "Base64": {
                   "version": "0.2.1",
-                  "from": "Base64@>=0.2.0 <0.3.0",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/Base64/-/Base64-0.2.1.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/Base64/-/Base64-0.2.1.tgz"
                 },
                 "inherits": {
                   "version": "2.0.1",
-                  "from": "inherits@>=2.0.1 <2.1.0",
+                  "from": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz",
                   "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
                 }
               }
             },
             "browserify-zlib": {
               "version": "0.1.4",
-              "from": "browserify-zlib@>=0.1.4 <0.2.0",
+              "from": "https://registry.npmjs.org/browserify-zlib/-/browserify-zlib-0.1.4.tgz",
               "resolved": "https://registry.npmjs.org/browserify-zlib/-/browserify-zlib-0.1.4.tgz",
               "dependencies": {
                 "pako": {
                   "version": "0.2.5",
-                  "from": "pako@>=0.2.0 <0.3.0",
+                  "from": "https://registry.npmjs.org/pako/-/pako-0.2.5.tgz",
                   "resolved": "https://registry.npmjs.org/pako/-/pako-0.2.5.tgz"
                 }
               }
             },
             "https-browserify": {
               "version": "0.0.0",
-              "from": "https-browserify@0.0.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/https-browserify/-/https-browserify-0.0.0.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/https-browserify/-/https-browserify-0.0.0.tgz"
             },
             "tty-browserify": {
               "version": "0.0.0",
-              "from": "tty-browserify@0.0.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/tty-browserify/-/tty-browserify-0.0.0.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/tty-browserify/-/tty-browserify-0.0.0.tgz"
             },
             "constants-browserify": {
               "version": "0.0.1",
-              "from": "constants-browserify@0.0.1",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/constants-browserify/-/constants-browserify-0.0.1.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/constants-browserify/-/constants-browserify-0.0.1.tgz"
             },
             "os-browserify": {
               "version": "0.1.2",
-              "from": "os-browserify@>=0.1.2 <0.2.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/os-browserify/-/os-browserify-0.1.2.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/os-browserify/-/os-browserify-0.1.2.tgz"
             },
             "path-browserify": {
               "version": "0.0.0",
-              "from": "path-browserify@0.0.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/path-browserify/-/path-browserify-0.0.0.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/path-browserify/-/path-browserify-0.0.0.tgz"
             },
             "domain-browser": {
               "version": "1.1.3",
-              "from": "domain-browser@>=1.1.1 <2.0.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/domain-browser/-/domain-browser-1.1.3.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/domain-browser/-/domain-browser-1.1.3.tgz"
             },
             "querystring-es3": {
               "version": "0.2.1",
-              "from": "querystring-es3@>=0.2.0 <0.3.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/querystring-es3/-/querystring-es3-0.2.1.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/querystring-es3/-/querystring-es3-0.2.1.tgz"
             },
             "timers-browserify": {
               "version": "1.1.0",
-              "from": "timers-browserify@>=1.0.1 <2.0.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/timers-browserify/-/timers-browserify-1.1.0.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/timers-browserify/-/timers-browserify-1.1.0.tgz",
               "dependencies": {
                 "process": {
                   "version": "0.5.2",
-                  "from": "process@>=0.5.1 <0.6.0",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/process/-/process-0.5.2.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/process/-/process-0.5.2.tgz"
                 }
               }
             },
             "stream-browserify": {
               "version": "1.0.0",
-              "from": "stream-browserify@>=1.0.0 <2.0.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/stream-browserify/-/stream-browserify-1.0.0.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/stream-browserify/-/stream-browserify-1.0.0.tgz",
               "dependencies": {
                 "inherits": {
                   "version": "2.0.1",
-                  "from": "inherits@>=2.0.1 <2.1.0",
+                  "from": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz",
                   "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
                 }
               }
             },
             "readable-stream": {
               "version": "1.1.13",
-              "from": "readable-stream@>=1.1.13 <2.0.0",
+              "from": "https://registry.npmjs.org/readable-stream/-/readable-stream-1.1.13.tgz",
               "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-1.1.13.tgz",
               "dependencies": {
                 "core-util-is": {
                   "version": "1.0.1",
-                  "from": "core-util-is@>=1.0.0 <1.1.0",
+                  "from": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.1.tgz",
                   "resolved": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.1.tgz"
                 },
                 "isarray": {
                   "version": "0.0.1",
-                  "from": "isarray@0.0.1",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/isarray/-/isarray-0.0.1.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/isarray/-/isarray-0.0.1.tgz"
                 },
                 "inherits": {
                   "version": "2.0.1",
-                  "from": "inherits@>=2.0.1 <2.1.0",
+                  "from": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz",
                   "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
                 }
               }
             },
             "string_decoder": {
               "version": "0.10.31",
-              "from": "string_decoder@>=0.10.25 <0.11.0",
+              "from": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz",
               "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz"
             },
             "punycode": {
               "version": "1.3.2",
-              "from": "punycode@>=1.2.4 <2.0.0",
+              "from": "https://registry.npmjs.org/punycode/-/punycode-1.3.2.tgz",
               "resolved": "https://registry.npmjs.org/punycode/-/punycode-1.3.2.tgz"
             },
             "events": {
               "version": "1.0.2",
-              "from": "events@>=1.0.0 <2.0.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/events/-/events-1.0.2.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/events/-/events-1.0.2.tgz"
             },
             "util": {
               "version": "0.10.3",
-              "from": "util@>=0.10.3 <0.11.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/util/-/util-0.10.3.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/util/-/util-0.10.3.tgz",
               "dependencies": {
                 "inherits": {
                   "version": "2.0.1",
-                  "from": "inherits@2.0.1",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/inherits/-/inherits-2.0.1.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/inherits/-/inherits-2.0.1.tgz"
                 }
               }
             },
             "assert": {
               "version": "1.1.2",
-              "from": "assert@>=1.1.1 <2.0.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/assert/-/assert-1.1.2.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/assert/-/assert-1.1.2.tgz"
             },
             "buffer": {
               "version": "2.8.1",
-              "from": "buffer@>=2.3.0 <3.0.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/buffer/-/buffer-2.8.1.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/buffer/-/buffer-2.8.1.tgz",
               "dependencies": {
                 "base64-js": {
                   "version": "0.0.7",
-                  "from": "base64-js@0.0.7",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/base64-js/-/base64-js-0.0.7.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/base64-js/-/base64-js-0.0.7.tgz"
                 },
                 "ieee754": {
                   "version": "1.1.4",
-                  "from": "ieee754@>=1.1.4 <2.0.0",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/ieee754/-/ieee754-1.1.4.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/ieee754/-/ieee754-1.1.4.tgz"
                 },
                 "is-array": {
                   "version": "1.0.1",
-                  "from": "is-array@>=1.0.1 <2.0.0",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/is-array/-/is-array-1.0.1.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/is-array/-/is-array-1.0.1.tgz"
                 }
               }
             },
             "url": {
               "version": "0.10.1",
-              "from": "url@>=0.10.1 <0.11.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/url/-/url-0.10.1.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/url/-/url-0.10.1.tgz",
               "dependencies": {
                 "punycode": {
                   "version": "1.2.4",
-                  "from": "punycode@1.2.4",
+                  "from": "https://registry.npmjs.org/punycode/-/punycode-1.2.4.tgz",
                   "resolved": "https://registry.npmjs.org/punycode/-/punycode-1.2.4.tgz"
                 }
               }
             },
             "process": {
               "version": "0.7.0",
-              "from": "process@>=0.7.0 <0.8.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/process/-/process-0.7.0.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/process/-/process-0.7.0.tgz"
             }
           }
         },
         "watchpack": {
           "version": "0.1.1",
-          "from": "watchpack@>=0.1.0 <0.2.0",
+          "from": "http://beta-internal:8089/nexus/content/groups/npm/watchpack/-/watchpack-0.1.1.tgz",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/watchpack/-/watchpack-0.1.1.tgz",
           "dependencies": {
             "chokidar": {
               "version": "0.10.5",
-              "from": "chokidar@>=0.10.3 <0.11.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/chokidar/-/chokidar-0.10.5.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/chokidar/-/chokidar-0.10.5.tgz",
               "dependencies": {
                 "readdirp": {
                   "version": "1.1.0",
-                  "from": "readdirp@>=1.1.0 <1.2.0",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/readdirp/-/readdirp-1.1.0.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/readdirp/-/readdirp-1.1.0.tgz",
                   "dependencies": {
                     "graceful-fs": {
                       "version": "2.0.3",
-                      "from": "graceful-fs@>=2.0.0 <2.1.0",
+                      "from": "https://registry.npmjs.org/graceful-fs/-/graceful-fs-2.0.3.tgz",
                       "resolved": "https://registry.npmjs.org/graceful-fs/-/graceful-fs-2.0.3.tgz"
                     },
                     "minimatch": {
                       "version": "0.2.14",
-                      "from": "minimatch@>=0.2.12 <0.3.0",
+                      "from": "https://registry.npmjs.org/minimatch/-/minimatch-0.2.14.tgz",
                       "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-0.2.14.tgz",
                       "dependencies": {
                         "lru-cache": {
                           "version": "2.5.0",
-                          "from": "lru-cache@>=2.0.0 <3.0.0",
+                          "from": "https://registry.npmjs.org/lru-cache/-/lru-cache-2.5.0.tgz",
                           "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-2.5.0.tgz"
                         },
                         "sigmund": {
                           "version": "1.0.0",
-                          "from": "sigmund@>=1.0.0 <1.1.0",
+                          "from": "https://registry.npmjs.org/sigmund/-/sigmund-1.0.0.tgz",
                           "resolved": "https://registry.npmjs.org/sigmund/-/sigmund-1.0.0.tgz"
                         }
                       }
                     },
                     "readable-stream": {
                       "version": "1.0.33",
-                      "from": "readable-stream@>=1.0.26-2 <1.1.0",
+                      "from": "https://registry.npmjs.org/readable-stream/-/readable-stream-1.0.33.tgz",
                       "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-1.0.33.tgz",
                       "dependencies": {
                         "core-util-is": {
                           "version": "1.0.1",
-                          "from": "core-util-is@>=1.0.0 <1.1.0",
+                          "from": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.1.tgz",
                           "resolved": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.1.tgz"
                         },
                         "isarray": {
                           "version": "0.0.1",
-                          "from": "isarray@0.0.1",
+                          "from": "http://beta-internal:8089/nexus/content/groups/npm/isarray/-/isarray-0.0.1.tgz",
                           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/isarray/-/isarray-0.0.1.tgz"
                         },
                         "string_decoder": {
                           "version": "0.10.31",
-                          "from": "string_decoder@>=0.10.0 <0.11.0",
+                          "from": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz",
                           "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz"
                         },
                         "inherits": {
                           "version": "2.0.1",
-                          "from": "inherits@>=2.0.1 <2.1.0",
+                          "from": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz",
                           "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
                         }
                       }
@@ -3143,17 +3134,17 @@
                 },
                 "async-each": {
                   "version": "0.1.6",
-                  "from": "async-each@>=0.1.5 <0.2.0",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/async-each/-/async-each-0.1.6.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/async-each/-/async-each-0.1.6.tgz"
                 },
                 "fsevents": {
                   "version": "0.3.1",
-                  "from": "fsevents@>=0.3.1 <0.4.0",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/fsevents/-/fsevents-0.3.1.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/fsevents/-/fsevents-0.3.1.tgz",
                   "dependencies": {
                     "nan": {
                       "version": "1.3.0",
-                      "from": "nan@>=1.3.0 <1.4.0",
+                      "from": "https://registry.npmjs.org/nan/-/nan-1.3.0.tgz",
                       "resolved": "https://registry.npmjs.org/nan/-/nan-1.3.0.tgz"
                     }
                   }
@@ -3162,14 +3153,14 @@
             },
             "graceful-fs": {
               "version": "3.0.4",
-              "from": "graceful-fs@>=3.0.2 <4.0.0",
+              "from": "https://registry.npmjs.org/graceful-fs/-/graceful-fs-3.0.4.tgz",
               "resolved": "https://registry.npmjs.org/graceful-fs/-/graceful-fs-3.0.4.tgz"
             }
           }
         },
         "tapable": {
           "version": "0.1.8",
-          "from": "tapable@>=0.1.8 <0.2.0",
+          "from": "http://beta-internal:8089/nexus/content/groups/npm/tapable/-/tapable-0.1.8.tgz",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/tapable/-/tapable-0.1.8.tgz"
         }
       }
