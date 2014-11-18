@@ -20,7 +20,7 @@ require('nanoscroller');
 module.exports = (function() {
 
 
-  // Reply back to the child iframe
+  // Reply back to the child iframe - used in search
   appEvents.on('troupeRequest', function (payload, evt) {
     var msg = { child_window_event: ['troupesResponse', troupeCollections.troupes] };
     evt.source.postMessage(JSON.stringify(msg), evt.origin);
