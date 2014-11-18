@@ -11,6 +11,9 @@ var cacheSync = require('components/cache-sync');
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var mobileDecorator = require('views/chat/decorators/mobileDecorator');
 var log = require('utils/log');
+var onready = require('./utils/onready');
+var appEvents = require('./utils/appevents');
+
 require('components/eyeballs');
 
 // Preload widgets
@@ -18,17 +21,15 @@ require('views/widgets/avatar');
 require('views/widgets/timeago');
 
 
-module.exports = (function() {
-
-
-  $(document).on('app.version.mismatch', function() {
+onready(function() {
+  appEvents.on('app.version.mismatch', function() {
     try {
       if(window.applicationCache.status == 1) {
-        log('Attempting to update application cache');
+        log.info('Attempting to update application cache');
         window.applicationCache.update();
       }
     } catch(e) {
-      log('Unable to update application cache: ' + e, e);
+      log.info('Unable to update application cache: ' + e, e);
     }
   });
 
@@ -62,7 +63,5 @@ module.exports = (function() {
   }).render();
 
   $('html').removeClass('loading');
-
-
-})();
+});
 

@@ -9,11 +9,9 @@ var TroupeMenuView = require('views/menu/troupeMenu');
 var troupeCollections = require('collections/instances/troupes');
 var TitlebarUpdater = require('components/titlebar');
 var realtime = require('components/realtime');
-var createRoomView = require('views/createRoom/createRoomView');
-var createRepoRoomView = require('views/createRoom/createRepoRoomView');
-var confirmRepoRoomView = require('views/createRoom/confirmRepoRoomView');
-var chooseRoomView = require('views/createRoom/chooseRoomView');
 var log = require('utils/log');
+var onready = require('./utils/onready');
+
 require('components/statsc');
 require('views/widgets/preload');
 require('components/webNotifications');
@@ -26,7 +24,7 @@ require('utils/tracking');
 // Preload widgets
 require('views/widgets/avatar');
 
-module.exports = (function() {
+onready(function() {
 
 
   var chatIFrame = document.getElementById('content-frame');
@@ -108,7 +106,7 @@ module.exports = (function() {
 
   window.addEventListener('message', function(e) {
     if(e.origin !== context.env('basePath')) {
-      log('Ignoring message from ' + e.origin);
+      log.info('Ignoring message from ' + e.origin);
       return;
     }
 
@@ -120,7 +118,7 @@ module.exports = (function() {
       return;
     }
 
-    log('Received message ', message);
+    log.info('Received message ', message);
 
     var makeEvent = function(message) {
       var origin = 'chat';
@@ -128,13 +126,13 @@ module.exports = (function() {
       message.event = {
         origin: origin,
         preventDefault: function() {
-          log('Warning: could not call preventDefault() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
+          log.info('Warning: could not call preventDefault() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
         },
         stopPropagation: function() {
-          log('Warning: could not call stopPropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
+          log.info('Warning: could not call stopPropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
         },
         stopImmediatePropagation: function() {
-          log('Warning: could not call stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
+          log.info('Warning: could not call stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
         }
       };
     };
@@ -158,7 +156,7 @@ module.exports = (function() {
         var count = message.count;
         var troupeId = message.troupeId;
         if(troupeId !== context.getTroupeId()) {
-          log('warning: troupeId mismatch in unreadItemsCount');
+          log.info('warning: troupeId mismatch in unreadItemsCount');
         }
         var v = {
           unreadItems: count
@@ -257,7 +255,10 @@ module.exports = (function() {
     },
 
     createroom: function() {
-      appView.dialogRegion.show(new chooseRoomView.Modal());
+      require.ensure(['views/createRoom/chooseRoomView'], function(require) {
+        var chooseRoomView = require('views/createRoom/chooseRoomView');
+        appView.dialogRegion.show(new chooseRoomView.Modal());
+      });
     },
 
     createcustomroom: function(name) {
@@ -276,7 +277,10 @@ module.exports = (function() {
       }
 
       function showWithOptions(options) {
-        appView.dialogRegion.show(new createRoomView.Modal(options));
+        require.ensure(['views/createRoom/createRoomView'], function(require) {
+          var createRoomView = require('views/createRoom/createRoomView');
+          appView.dialogRegion.show(new createRoomView.Modal(options));
+        });
       }
 
       var uri = window.location.pathname.split('/').slice(1).join('/');
@@ -303,11 +307,17 @@ module.exports = (function() {
     },
 
     createreporoom: function() {
-      appView.dialogRegion.show(new createRepoRoomView.Modal());
+      require.ensure(['views/createRoom/createRepoRoomView'], function(require) {
+        var createRepoRoomView = require('views/createRoom/createRepoRoomView');
+        appView.dialogRegion.show(new createRepoRoomView.Modal());
+      });
     },
 
     confirmRoom: function(uri) {
-      appView.dialogRegion.show(new confirmRepoRoomView.Modal({ uri: uri }));
+      require.ensure(['views/createRoom/confirmRepoRoomView'], function(require) {
+        var confirmRepoRoomView = require('views/createRoom/confirmRepoRoomView');
+        appView.dialogRegion.show(new confirmRepoRoomView.Modal({ uri: uri }));
+      });
     }
   });
 
@@ -315,14 +325,15 @@ module.exports = (function() {
   Backbone.history.start();
 
   if (context.popEvent('new_user_signup')) {
-    var $script = require("scriptjs");
-
-    $script("//platform.twitter.com/oct", function() {
-      var twitterOct = window.twttr && window.twttr.conversion;
-      twitterOct.trackPid('l4t99');
+    require.ensure("scriptjs", function(require) {
+      var $script = require("scriptjs");
+      $script("//platform.twitter.com/oct", function() {
+        var twitterOct = window.twttr && window.twttr.conversion;
+        twitterOct.trackPid('l4t99');
+      });
     });
   }
 
 
-})();
+});
 

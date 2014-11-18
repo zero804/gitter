@@ -24,10 +24,6 @@ require('jquery-textcomplete');
 
 module.exports = (function() {
 
-
-  /** @const */
-  var MAX_CHAT_HEIGHT = $(document).height() - $("#header-wrapper").height() - 140;
-
   /** @const */
   var MAX_TYPEAHEAD_SUGGESTIONS = isMobile() ? 3 : 8;
 
@@ -49,6 +45,16 @@ module.exports = (function() {
 
   /** @const */
   var PLACEHOLDER_COMPOSE_MODE = PLACEHOLDER+' '+ platformKeys.cmd +'+Enter to send.';
+
+  function calculateMaxHeight() {
+    // TODO: this sucks. normalise everything to HEADER
+    var header = $("#header-wrapper");
+    if(!header.length) header = $("header");
+
+    var headerHeight = header.height();
+
+    return $(document).height() - headerHeight - 140;
+  }
 
   var ComposeMode = function() {
     var stringBoolean = window.localStorage.getItem('compose_mode_enabled') || 'false';
@@ -460,14 +466,15 @@ module.exports = (function() {
       // css[compact ? 'padding-bottom' : 'margin-bottom'] = '';
       css[compact ? 'padding-bottom' : 'bottom'] = '';
       frameChat.css(css);
-      log('Applying ', css, ' to ', frameChat);
+      log.info('Applying ', css, ' to ', frameChat);
 
       adjustScroll(initial);
     };
 
     this.resizeInput = function() {
+      var maxHeight = calculateMaxHeight();
       var scrollHeight = el.scrollHeight;
-      var height = scrollHeight > MAX_CHAT_HEIGHT ? MAX_CHAT_HEIGHT : scrollHeight;
+      var height = scrollHeight > maxHeight ? maxHeight : scrollHeight;
       var offsetHeight = el.offsetHeight;
 
       if(offsetHeight == height) {
@@ -485,7 +492,7 @@ module.exports = (function() {
           css.bottom = ($('#chat-input-wrapper').outerHeight()) + 'px';
         }
 
-        log('Applying ', css, ' to ', frameChat);
+        log.info('Applying ', css, ' to ', frameChat);
         frameChat.css(css);
       }
 

@@ -33,6 +33,12 @@
         <tr>
           <td height="100%" style="vertical-align:top;">
             <div class="trpTroupeRelatedContent" style="height: 100%;" id="room-content">
+              {{#unless activityEvents}}
+                <div id="activity-tip">
+                  <p>We haven't seen any activity yet. <a href="{{integrationsUrl}}" target="{{#if isNativeDesktopApp}} _blank {{else}} _top {{/if}}">Configure your integrations &rarr;</a></p>
+                </div>
+              {{/unless}}
+
               <div class="trpTroupeRelatedContentHolder" id="activity">
                 <ul class="gtrActivityList">
                   {{#each activityEvents}}
@@ -40,6 +46,7 @@
                   {{/each}}
                 </ul>
               </div>
+
             </div>
          </td>
         </tr>

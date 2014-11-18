@@ -143,6 +143,13 @@ function renderChat(req, res, options, next) {
       if (!user) classNames.push("logged-out");
 
       var isPrivate = troupe.security !== "PUBLIC";
+      var integrationsUrl;
+
+      if (troupeContext.isNativeDesktopApp) {
+         integrationsUrl = nconf.get('web:basepath') + '/' + troupeContext.troupe.uri + '#integrations';
+      } else {
+        integrationsUrl = '#integrations';
+      }
 
       var renderOptions = _.extend({
           isRepo: troupe.githubType === 'REPO',
@@ -165,7 +172,10 @@ function renderChat(req, res, options, next) {
           isPrivate: isPrivate,
           avatarUrl: avatar(troupeContext.troupe),
           activityEvents: activityEvents,
-          users: users.sort(userSort).slice(0, 21)
+          users: users.sort(userSort).slice(0, 21),
+          isAdmin: troupeContext.permissions.admin,
+          isNativeDesktopApp: troupeContext.isNativeDesktopApp,
+          integrationsUrl: integrationsUrl
         }, options.extras);
 
       res.render(options.template, renderOptions);
@@ -246,6 +256,7 @@ function renderMobileNotLoggedInChat(req, res, next) {
 }
 
 function renderNotFound(req, res, next) {
+  console.log('renderNotFound() ====================');
   var org = req.uriContext && req.uriContext.uri;
   var strategy = new restSerializer.TroupeStrategy();
 
@@ -265,6 +276,7 @@ function renderNotFound(req, res, next) {
 
 
 function renderNotLoggedInChatPage(req, res, next) {
+  console.log('renderNotLoggedInChatPage() ====================');
   return renderChat(req, res, {
     template: 'chat-nli-template',
     script: 'router-nli-chat',
