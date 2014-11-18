@@ -10,6 +10,7 @@ var pushNotificationService = require("../services/push-notification-service");
 var unreadItemService = require("../services/unread-item-service");
 var apns = require('apn');
 var workerQueue = require('../utils/worker-queue');
+var androidGateway = require('./android-notification-gateway');
 
 var nexmo = require('easynexmo/lib/nexmo');
 nexmo.initialize('0b93c6bc', '483931e4');
@@ -135,6 +136,14 @@ function sendNotificationToDevice(notification, badge, device) {
   var message = notification && notification.message;
   var sound = notification && notification.sound;
   var link = notification && notification.link;
+
+  var testDevice = { deviceId: 'APA91bG6rRnrwmf6CVmllxMAusho7GuzOd4l4AG7kFJyhGvWMDbrWEgkQsAFYuch2lczNXNZgHDfkYBIVYOdcRiID0lsHIxqXwiHF2iruSNnVn8TMvjwy6NEG7gH5NeiAJKU1YRVucYWJKW0JR3oLTP1KXtmSO0Izg' };
+
+  androidGateway.sendNotificationToDevice(notification, badge, testDevice, function(err, data) {
+    if(err) return logger.error('android push notification failed', { err: err });
+
+    if(data) return logger.info(data);
+  });
 
   if((device.deviceType === 'APPLE' ||
       device.deviceType === 'APPLE-DEV' ||
