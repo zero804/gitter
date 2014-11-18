@@ -183,6 +183,7 @@ function UserStrategy(options) {
         status: options.includeEmail ? user.status : undefined,
         username: user.username,
         online: userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id) || undefined,
+        role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.username) || undefined,
         invited: user.state === 'INVITED' || undefined, // true or undefined
         removed: user.state === 'REMOVED' || undefined, // true or undefined
         v: getVersion(user)
