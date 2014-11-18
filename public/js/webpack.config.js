@@ -36,6 +36,7 @@ var webpackConfig = {
       'jquery',
       'backbone',
       'marionette',
+      'loglevel',
       'utils/log',
       'utils/tracking',
       'backbone.wreqr',
@@ -50,7 +51,7 @@ var webpackConfig = {
     path: __dirname + "/../../output/assets/js/",
     filename: "[name].js",
     chunkFilename: "[id].chunk.js",
-    publicPath: "/_s/l/",
+    publicPath: "/_s/l/js/",
     devtoolModuleFilenameTemplate: "[absolute-resource-path]",
   },
   module: {
@@ -99,7 +100,7 @@ var webpackConfig = {
   },
   plugins: [
     new CommonsChunkPlugin("vendor", "[name].js"),
-    new ContextReplacementPlugin(/moment[\/\\]locale$/, /cs|da|de|en-gb|es|fr|it|ja|ko|nl|pl|pt|ru|sv|zh-cn/)
+    new ContextReplacementPlugin(/moment\/lang$/, /cs|da|de|en-gb|es|fr|it|ja|ko|nl|pl|pt|ru|sv|zh-cn/)
   ]
 };
 
@@ -107,8 +108,8 @@ if(devMode) {
   // See http://webpack.github.io/docs/configuration.html#devtool
   webpackConfig.devtool = 'sourcemap';
 } else {
-  webpackConfig.plugins.push(new DedupePlugin());
-  webpackConfig.plugins.push(new OccurrenceOrderPlugin());
+  // webpackConfig.plugins.push(new DedupePlugin());
+  // webpackConfig.plugins.push(new OccurrenceOrderPlugin());
   webpackConfig.plugins.push(new UglifyJsPlugin());
 }
 module.exports = webpackConfig;

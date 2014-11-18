@@ -7,12 +7,12 @@ var Backbone = require('backbone');
 var cordovaNavigate = require('components/cordova-navigate');
 var confirmRepoRoomView = require('views/createRoom/confirmRepoRoomView');
 var modalRegion = require('components/modal-region');
+var onready = require('./utils/onready');
 
 // Preload widgets
 require('views/widgets/avatar');
 
-module.exports = (function() {
-
+onready(function() {
 
   cordovaNavigate.setNativeToUserhome();
 
@@ -60,7 +60,5 @@ module.exports = (function() {
 
   new Router();
   Backbone.history.start();
-
-
-})();
+});
 
