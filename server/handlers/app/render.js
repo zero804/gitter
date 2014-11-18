@@ -180,7 +180,8 @@ function renderChat(req, res, options, next) {
           remainingCount: remainingCount,
           isAdmin: troupeContext.permissions.admin,
           isNativeDesktopApp: troupeContext.isNativeDesktopApp,
-          integrationsUrl: integrationsUrl
+          integrationsUrl: integrationsUrl,
+          placeholder: 'Click here to type a chat message. Supports GitHub flavoured markdown.'
         }, options.extras);
 
       res.render(options.template, renderOptions);
