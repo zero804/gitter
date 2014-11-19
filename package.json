@@ -117,7 +117,7 @@
     "gulp-shrinkwrap": "^1.0.1",
     "gulp-sourcemaps": "^1.2.8",
     "gulp-spawn-mocha": "^0.5.1",
-    "gulp-tar": "^1.3.0",
+    "gulp-tar": "git://github.com/gitterHQ/gulp-tar#d08ac752822c8426f9d64f7886c3fef1a6eac0a8",
     "gulp-using": "0.0.1",
     "gulp-util": "^3.0.1",
     "gulp-webpack": "^1.0.0",
