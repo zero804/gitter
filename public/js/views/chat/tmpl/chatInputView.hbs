@@ -7,6 +7,6 @@
     {{ widget "avatar" model=user size='s' showTooltip=false }}
   </div>
   <form class="chat-input__box" name="chat">
-    <textarea class="chat-input__text-area" name="chat" id="chat-input-textarea" placeholder="{{placeholder}}" {{#if autofocus}}autofocus{{/if}} maxlength="4096"></textarea>
+    <textarea class="chat-input__text-area" name="chat" id="chat-input-textarea" placeholder="{{placeholder}}" {{#if autofocus}}autofocus onfocus="this.value = this.value;"{{/if}} maxlength="4096">{{value}}</textarea>
   </form>
 </div>
