@@ -8,8 +8,6 @@ var handlebars    = require('handlebars');
 var _             = require('underscore');
 var widgetHelpers = require('./widget-prerenderers');
 
-handlebars.registerHelper('widget', widgetHelpers);
-
 var baseDir = path.normalize(__dirname + '/../../' + nconf.get('web:staticContent'));
 
 function compileTemplate (file) {
@@ -18,25 +16,25 @@ function compileTemplate (file) {
 }
 
 var serviceTemplates = {
-  bitbucket:  'bitbucket',  //bitbucketTemplate,
-  huboard:    'huboard',    //huboardTemplate,
-  jenkins:    'jenkins',    //jenkinsTemplate,
-  travis:     'travis',     //travisTemplate,
-  sprintly:   'sprintly',   //sprintlyTemplate,
-  trello:     'trello',     //trelloTemplate
+  bitbucket:  'bitbucket',
+  huboard:    'huboard',
+  jenkins:    'jenkins',
+  travis:     'travis',
+  sprintly:   'sprintly',
+  trello:     'trello',
 };
 
 var githubTemplates = {
-  push:           'githubPush',         //githubPushTemplate,
-  issues:         'githubIssues',       //githubIssuesTemplate,
-  issue_comment:  'githubIssueComment', //githubIssueCommentTemplate,
-  commit_comment: 'githubCommitComment',//githubCommitCommentTemplate,
-  pull_request:   'githubPullRequest',  //githubPullRequestTemplate,
-  gollum:         'githubGollum',       //githubGollumTemplate,
-  fork:           'githubFork',         //githubForkTemplate,
-  member:         'githubMember',       //githubMemberTemplate,
-  public:         'githubPublic',       //githubPublicTemplate,
-  watch:          'githubWatch',        //githubWatchTemplate
+  push:           'githubPush',
+  issues:         'githubIssues',
+  issue_comment:  'githubIssueComment',
+  commit_comment: 'githubCommitComment',
+  pull_request:   'githubPullRequest',
+  gollum:         'githubGollum',
+  fork:           'githubFork',
+  member:         'githubMember',
+  public:         'githubPublic',
+  watch:          'githubWatch',
 };
 
 var decorators = {
@@ -170,7 +168,7 @@ module.exports = function(model) {
    };
 
    var extra = model.meta.prerendered ? {} : getExtraRenderData(model.meta, model.payload);
-   var templateData = _.extend(core, extra);
+   var templateData = _.extend({}, core, extra, widgetHelpers);
 
   return template(templateData);
 };
