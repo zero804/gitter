@@ -610,8 +610,7 @@ module.exports = (function() {
     reset: function() {
       $('#chatInputForm').trigger('reset');
       this.el.value = '';
-      //this.drafty.reset();
-      drafty.reset();
+      this.drafty.reset();
       this.chatResizer.resetInput();
     },
 
