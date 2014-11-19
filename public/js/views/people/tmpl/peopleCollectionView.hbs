@@ -1,4 +1,14 @@
 <span class="frame-people">
-  <span id="roster"></span>
-  <span id="remaining"></span>
+  <span id="roster">
+    <ul class="roster">{{#each users}}<li>{{{ widget 'avatar' user=this showStatus=true }}}</li>{{/each}}</ul></span>
+  <span id="remaining">
+    {{#unless oneToOne}}
+      <a href="#add" class="trpAddBadge  js-add-more" style="text-decoration: none"><div style="text-align: center;">&#10011; Add</div></a>
+    {{/unless}}
+    {{#if remainingCount}}
+      <span class='js-show-more'>
+        <a href="#people" class="trpMoreBadge" style="text-decoration: none"><div style="text-align: center;">See All</div></a><small>({{remainingCount}} {{pluralize remainingCount 'member' 'members'}} hidden)</small>
+      </span>
+    {{/if}}
+  </span>
 </span>

@@ -9,13 +9,15 @@ var appVersion         = require('../../web/appVersion');
 var social             = require('../social-metadata');
 var PersistenceService = require('../../services/persistence-service');
 var restSerializer     = require("../../serializers/rest-serializer");
-
 var burstCalculator   = require('../../utils/burst-calculator');
+var userSort = require('../../../public/js/utils/user-sort');
+
 var avatar   = require('../../utils/avatar');
 var _                 = require('underscore');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
+var USER_COLLECTION_FOLD = 21;
 
 var stagingText, stagingLink;
 var dnsPrefetch = (nconf.get('cdn:hosts') || []).concat([
@@ -120,13 +122,16 @@ function renderChat(req, res, options, next) {
   };
 
   var serializerOptions = _.defaults({
-    disableLimitReachedMessage: true
+    disableLimitReachedMessage: true,
+    lean: true
   }, snapshotOptions);
 
   Q.all([
       contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions } }),
-      restful.serializeChatsForTroupe(troupe.id, userId, serializerOptions)
-    ]).spread(function (troupeContext, chats) {
+      restful.serializeChatsForTroupe(troupe.id, userId, serializerOptions),
+      restful.serializeEventsForTroupe(troupe.id, userId),
+      restful.serializeUsersForTroupe(troupe.id, userId, serializerOptions)
+    ]).spread(function (troupeContext, chats, activityEvents, users) {
       var initialChat = _.find(chats, function(chat) { return chat.initial; });
       var initialBottom = !initialChat;
       var githubLink;
@@ -139,6 +144,16 @@ function renderChat(req, res, options, next) {
       if (!user) classNames.push("logged-out");
 
       var isPrivate = troupe.security !== "PUBLIC";
+      var integrationsUrl;
+
+      if (troupeContext.isNativeDesktopApp) {
+         integrationsUrl = nconf.get('web:basepath') + '/' + troupeContext.troupe.uri + '#integrations';
+      } else {
+        integrationsUrl = '#integrations';
+      }
+
+      var cutOff = users.length - USER_COLLECTION_FOLD;
+      var remainingCount = (cutOff > 0) ? cutOff : 0;
 
       var renderOptions = _.extend({
           isRepo: troupe.githubType === 'REPO',
@@ -159,7 +174,14 @@ function renderChat(req, res, options, next) {
           agent: req.headers['user-agent'],
           dnsPrefetch: dnsPrefetch,
           isPrivate: isPrivate,
-          avatarUrl: avatar(troupeContext.troupe)
+          avatarUrl: avatar(troupeContext.troupe),
+          activityEvents: activityEvents,
+          users: users.sort(userSort).slice(0, USER_COLLECTION_FOLD),
+          remainingCount: remainingCount,
+          isAdmin: troupeContext.permissions.admin,
+          isNativeDesktopApp: troupeContext.isNativeDesktopApp,
+          integrationsUrl: integrationsUrl,
+          placeholder: 'Click here to type a chat message. Supports GitHub flavoured markdown.'
         }, options.extras);
 
       res.render(options.template, renderOptions);
