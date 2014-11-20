@@ -344,7 +344,10 @@ var server = new faye.NodeAdapter({
     subscriberClient: env.redis.createClient(),
     interval: nconf.get('ws:fayeInterval'),
     includeSequence: true,
-    namespace: 'fr:'
+    namespace: 'fr:',
+    statsDelegate: function(category, event) {
+      stats.eventHF('bayeux.' + category + '.' + event, 1);
+    }
   }
 });
 

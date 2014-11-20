@@ -1366,8 +1366,9 @@
       }
     },
     "gitter-faye-redis": {
-      "version": "0.4.2",
-      "from": "gitter-faye-redis@latest",
+      "version": "0.4.3",
+      "from": "gitter-faye-redis@0.4.3",
+      "resolved": "http://beta-internal:8089/nexus/content/groups/npm/gitter-faye-redis/-/gitter-faye-redis-0.4.3.tgz",
       "dependencies": {
         "gitter-redis-scripto": {
           "version": "0.2.0",
