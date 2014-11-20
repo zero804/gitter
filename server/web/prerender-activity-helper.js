@@ -1,19 +1,9 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
-
-var nconf         = require('../utils/config');
-var path          = require('path');
-var fs            = require('fs');
-var handlebars    = require('handlebars');
+var compileTemplate = require('../utils/compile-template');
+var prerenderedTemplate = compileTemplate('/js/views/righttoolbar/tmpl/prerendered');
 var _             = require('underscore');
 var widgetHelpers = require('./widget-prerenderers');
-
-var baseDir = path.normalize(__dirname + '/../../' + nconf.get('web:staticContent'));
-
-function compileTemplate (file) {
-  var buffer = fs.readFileSync(baseDir + '/js/views/righttoolbar/tmpl/' + file + '.hbs');
-  return handlebars.compile(buffer.toString());
-}
 
 var serviceTemplates = {
   bitbucket:  'bitbucket',
@@ -150,12 +140,12 @@ module.exports = function(model) {
    // select template
    if (service == 'github') {
      var event = meta.event;
-     template = compileTemplate(githubTemplates[event]);
+     template = compileTemplate('/js/views/righttoolbar/tmpl/' + githubTemplates[event]);
    } else {
-     if(!meta.prerendered) {
-       template = compileTemplate(serviceTemplates[service]);
+     if (!meta.prerendered) {
+       template = compileTemplate('/js/views/righttoolbar/tmpl/' + serviceTemplates[service]);
      } else {
-       template = compileTemplate('prerendered');
+       template = prerenderedTemplate;
      }
    }
 
