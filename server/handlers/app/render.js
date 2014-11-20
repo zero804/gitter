@@ -262,7 +262,6 @@ function renderMobileNotLoggedInChat(req, res, next) {
 }
 
 function renderNotFound(req, res, next) {
-  console.log('renderNotFound() ====================');
   var org = req.uriContext && req.uriContext.uri;
   var strategy = new restSerializer.TroupeStrategy();
 
@@ -282,7 +281,6 @@ function renderNotFound(req, res, next) {
 
 
 function renderNotLoggedInChatPage(req, res, next) {
-  console.log('renderNotLoggedInChatPage() ====================');
   return renderChat(req, res, {
     template: 'chat-nli-template',
     script: 'router-nli-chat',
