@@ -38,9 +38,13 @@
           </ul>
       </div>
       <div class='menu-list__item' id="left-menu-list-orgs">
-        {{#each orgs}}
-          <p>orgs</p>
-        {{/each}}
+        <ul class="room-list">
+          {{#each orgs}}
+            <li class="room-list-item">
+              {{{ prerenderOrgListItem this }}}
+            </li>
+          {{/each}}
+        </ul>
       </div>
     </div>
   </div>
