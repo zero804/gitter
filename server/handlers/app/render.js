@@ -77,19 +77,28 @@ function renderHomePage(req, res, next) {
 }
 
 function renderMainFrame(req, res, next, frame) {
-  contextGenerator.generateNonChatContext(req)
-    .then(function (troupeContext) {
+  var user = req.user;
+  var userId = user && user.id;
+
+  Q.all([
+    contextGenerator.generateNonChatContext(req),
+    restful.serializeTroupesForUser(userId),
+    restful.serializeOrgsForUserId(userId)
+  ])
+    .spread(function (troupeContext, rooms, orgs) {
 
       var chatAppLocation = '/' + req.uriContext.uri + '/~' + frame + '#initial';
 
       var template, bootScriptName;
-      if(req.user) {
+
+      if (req.user) {
         template = 'app-template';
         bootScriptName = 'router-app';
       } else {
         template = 'app-nli-template';
         bootScriptName = 'router-nli-app';
       }
+
 
       res.render(template, {
         socialMetadata: social.getMetadata({ room: req.troupe }),
@@ -102,7 +111,14 @@ function renderMainFrame(req, res, next, frame) {
         agent: req.headers['user-agent'],
         stagingText: stagingText,
         stagingLink: stagingLink,
-        dnsPrefetch: dnsPrefetch
+        dnsPrefetch: dnsPrefetch,
+        showFooterButtons: true,
+        rooms: {
+          favourites: rooms.filter(function (item) { return !!item.favourite; }),
+          recents: rooms.filter(function (item) { return !!!item.favourite; }),
+          suggested: []
+        },
+        orgs: orgs
       });
     })
     .fail(next);
