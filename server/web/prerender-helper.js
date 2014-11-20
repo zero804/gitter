@@ -9,7 +9,9 @@ var _          = require('underscore');
 var widgetHelpers = require('./widget-prerenderers');
 
 var HELPERS = _.extend(widgetHelpers, {
-  'pluralize': require('./hbs-helpers').pluralize
+  'pluralize': require('./hbs-helpers').pluralize,
+  'profile': require('./prerender-profile-helper'),
+  'prerenderRoomListItem': require('./prerender-room-item-helper')
 });
 
 var baseDir = path.normalize(__dirname + '/../../' + nconf.get('web:staticContent') + '/');

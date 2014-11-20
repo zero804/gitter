@@ -1,10 +1,6 @@
-<div id="left-menu-profile" class="menu-header {{#if showExapandedHeader}}menu-header--expanded{{/if}}"></div>
-{{#if showSearch}}
-<div class="menu-search">
-  <input class="menu-search__input" id="list-search-input" placeholder="Search"/>
-  <span class="menu-search__clear" id="search-clear-icon"></span>
+<div id="left-menu-profile" class="menu-header {{#if showExapandedHeader}}menu-header--expanded{{/if}}">
+  {{{ profile }}}
 </div>
-{{/if}}
 <div class="nano  menu-content" id="left-menu-scroll">
   <div class="content  nano-content  menu-content__wrapper" style="outline: none">
     <div class="menu-list" id="list-mega">
@@ -12,25 +8,45 @@
       <div class='menu-list__item' id="recentTroupesList">
         <div class="menu-list__header">All Conversations</div>
         <div class="list-favourites  menu-list__section--fav" id="list-favs">
+          <ul class="room-list">
           {{!-- put filtered favourites in here --}}
+            {{#each rooms.favourites}}
+              <li class="room-list-item" data-id="{{ this.id }}">
+                {{{ prerenderRoomListItem this }}}
+              </li>
+            {{/each}}
+          </ul>
         </div>
         <div class="list-recents  menu-list__section--recent" id="list-recents">
           {{!-- put filtered recents in here. remember also that notifications will appear in here if they aren't in favourites --}}
+          <ul class="room-list">
+            {{#each rooms.recents}}
+              <li class="room-list-item" data-id="{{ this.id }}">
+                {{{ prerenderRoomListItem this }}}
+              </li>
+            {{/each}}
+          </ul>
         </div>
       </div>
-      <div class='menu-list__item' id="left-menu-list-suggested"></div>
-      <div class='menu-list__item' id="left-menu-list-orgs"></div>
-    </div>
-    <div class="menu-list" style="display:none" id="list-search">
-      <div class='menu-list__item'>
-        <div class="menu-list__header">Search Results</div>
-        <div class='menu-list__item--search' id="left-menu-list-search"></div>
+      <div class='menu-list__item' id="left-menu-list-suggested">
+        <ul class="room-list">
+            {{#each rooms.suggested}}
+              <li class="room-list-item" data-id="{{ this.id }}">
+                {{{ prerenderRoomListItem this }}}
+              </li>
+            {{/each}}
+          </ul>
+      </div>
+      <div class='menu-list__item' id="left-menu-list-orgs">
+        {{#each orgs}}
+          <p>orgs</p>
+        {{/each}}
       </div>
     </div>
   </div>
 </div>
 {{#if showFooterButtons}}
-<div class="menu-actions">
-  <a class="trpButtonMedium trpBtnWhite gtrCreateRoomButton" href="#createroom">Create a room</a>
-</div>
+  <div class="menu-actions">
+    <a class="trpButtonMedium trpBtnWhite gtrCreateRoomButton" href="#createroom">Create a room</a>
+  </div>
 {{/if}}
