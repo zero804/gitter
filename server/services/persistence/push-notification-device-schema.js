@@ -13,6 +13,7 @@ var PushNotificationDeviceSchema = new Schema({
    * We instead store the hex string, which is what apn's pushNotification uses anyway.
    */
   appleToken: String,
+  androidToken: String,
   tokenHash: String,
   deviceType: { type: String, "enum": ['APPLE', 'APPLE-DEV', 'ANDROID', 'TEST', 'SMS']},
   mobileNumber: { type: String },

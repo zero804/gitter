@@ -82,6 +82,33 @@ exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName,
     .nodeify(callback);
 };
 
+exports.registerAndroidDevice = function(deviceId, deviceName, registrationId, appVersion, userId, callback) {
+  winston.verbose("Registering device ", { deviceId: deviceId });
+  var tokenHash = crypto.createHash('md5').update(registrationId).digest('hex');
+
+  return PushNotificationDevice.findOneAndUpdateQ(
+    { deviceId: deviceId },
+    {
+      userId: userId,
+      deviceId: deviceId,
+      androidToken: registrationId,
+      tokenHash: tokenHash,
+      deviceType: 'ANDROID',
+      deviceName: deviceName,
+      timestamp: new Date(),
+      appVersion: appVersion,
+      enabled: true
+    },
+    { upsert: true })
+    .then(function(device) {
+      // After we've update the device, look for other devices that have given us the same token
+      // these are probably phones that have been reset etc, so we need to prune them
+      return findAndRemoveDevicesWithDuplicateTokens(deviceId, 'ANDROID', registrationId, tokenHash)
+        .thenResolve(device);
+    })
+    .nodeify(callback);
+};
+
 exports.registerUser = function(deviceId, userId, callback) {
   PushNotificationDevice.findOneAndUpdate(
     { deviceId: deviceId },
