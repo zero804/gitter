@@ -16,7 +16,6 @@ var opts = require("nomnom")
    })
    .parse();
 
-var message = {};
 
 var sentCount = 0;
 function send() {
@@ -28,6 +27,7 @@ function send() {
     return;
   }
   console.log('SENDING...', sentCount);
+  var message = { number: sentCount };
   bayeux.client.publish('/api/private/diagnostics', message);
   setTimeout(send, opts.wait);
 }
