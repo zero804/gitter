@@ -67,6 +67,9 @@ GitHubOrgService.prototype.getOwners = function(org) {
   ghorg.teams(function(err, teams) {
     if (err) return d.reject(err);
     var owners = teams.filter(function(team) { if (team.slug === 'owners') return team; })[0];
+
+    if (!owners) return d.reject(new Error('Org "' + org + '" has no owners team'));
+
     self.client.team(owners.id).members(createClient.makeResolver(d));
   });
   return d.promise
