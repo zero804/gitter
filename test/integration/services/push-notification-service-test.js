@@ -15,29 +15,20 @@ describe('pushNotificationService', function() {
       //var token = new Buffer('TESTTOKEN');
       var token = 'TESTTOKEN';
 
-      pushNotificationService.registerDevice('DEVICE1', 'TEST', token, 'TESTDEVICE', '1.0.1', '122', function(err, device) {
-        if(err) return done(err);
-
-        // Different device, same token
-        pushNotificationService.registerDevice('DEVICE2', 'TEST', token, 'OTHERTESTDEVICE', '1.0.1', '122', function(err, device) {
-          if(err) return done(err);
-
-          persistenceService.PushNotificationDevice.find({ deviceType: 'TEST', deviceId: 'DEVICE1' }, function(err, devices) {
-            if(err) return done(err);
-
-            assert.equal(devices.length, 0);
-
-            done();
-          });
-        });
-
-
-      });
-
+      pushNotificationService.registerDevice('DEVICE1', 'TEST', token, 'TESTDEVICE', '1.0.1', '122')
+        .then(function() {
+          // Different device, same token
+          return pushNotificationService.registerDevice('DEVICE2', 'TEST', token, 'OTHERTESTDEVICE', '1.0.1', '122');
+        })
+        .then(function() {
+          return persistenceService.PushNotificationDevice.findQ({ deviceType: 'TEST', deviceId: 'DEVICE1' });
+        })
+        .then(function(devices) {
+          assert.equal(devices.length, 0);
+        })
+        .nodeify(done);
     });
-
   });
-
 
   describe('Notification Locking', function() {
     it('should lock user troupe pairs so that users dont get too many notifications', function(done) {
