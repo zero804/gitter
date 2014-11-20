@@ -16,6 +16,11 @@ module.exports = {
         authMiddleware,
         require('./userapn.js'));
 
+    // android devices with google cloud messaging
+    app.post(apiRoot + '/v1/gcm',
+        authMiddleware,
+        require('./gcm.js'));
+
     app.post(apiRoot + '/v1/eyeballs',
         authMiddleware,
         require('./eyeballs.js'));
