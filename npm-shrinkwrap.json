@@ -1366,29 +1366,30 @@
       }
     },
     "gitter-faye-redis": {
-      "version": "0.4.0",
-      "from": "gitter-faye-redis@*",
+      "version": "0.4.2",
+      "from": "gitter-faye-redis@latest",
       "dependencies": {
         "gitter-redis-scripto": {
           "version": "0.2.0",
           "from": "gitter-redis-scripto@>=0.2.0 <0.3.0",
+          "resolved": "http://beta-internal:8089/nexus/content/groups/npm/gitter-redis-scripto/-/gitter-redis-scripto-0.2.0.tgz",
           "dependencies": {
             "redis": {
               "version": "0.8.6",
               "from": "redis@>=0.8.0 <0.9.0",
-              "resolved": "https://registry.npmjs.org/redis/-/redis-0.8.6.tgz"
+              "resolved": "http://beta-internal:8089/nexus/content/groups/npm/redis/-/redis-0.8.6.tgz"
             },
             "debug": {
               "version": "0.7.4",
               "from": "debug@>=0.7.0 <0.8.0",
-              "resolved": "https://registry.npmjs.org/debug/-/debug-0.7.4.tgz"
+              "resolved": "http://beta-internal:8089/nexus/content/groups/npm/debug/-/debug-0.7.4.tgz"
             }
           }
         },
         "redis": {
           "version": "0.12.1",
           "from": "redis@*",
-          "resolved": "https://registry.npmjs.org/redis/-/redis-0.12.1.tgz"
+          "resolved": "http://beta-internal:8089/nexus/content/groups/npm/redis/-/redis-0.12.1.tgz"
         }
       }
     },

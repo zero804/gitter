@@ -343,6 +343,7 @@ var server = new faye.NodeAdapter({
     client: env.redis.getClient(),
     subscriberClient: env.redis.createClient(),
     interval: nconf.get('ws:fayeInterval'),
+    includeSequence: true,
     namespace: 'fr:'
   }
 });
