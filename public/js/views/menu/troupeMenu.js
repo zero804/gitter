@@ -12,7 +12,6 @@ var cocktail = require('cocktail');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var template = require('./tmpl/troupeMenu.hbs');
 var CollectionWrapperViewTemplate = require('./tmpl/collection-wrapper-view.hbs');
-var SearchView = require('./searchView');
 var ProfileView = require('./profileView');
 var OrgCollectionView = require('./orgCollectionView');
 require('nanoscroller');
@@ -232,10 +231,6 @@ module.exports = (function() {
         dropTarget: true,
         roomsCollection: troupeCollections.troupes
       }));
-
-      // search results collection view
-      // this.searchView = new SearchView({ troupes: troupeCollections.troupes, $input: this.$el.find('#list-search-input') });
-      // this.search.show(this.searchView);
 
       // Organizations collection view
       this.orgs.show(new CollectionWrapperView({
