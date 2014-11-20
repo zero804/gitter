@@ -6,10 +6,10 @@ var PREFIX = 'room-list-item__name--';
 
 module.exports = function (room) {
   room = ensurePojo(room);
-  var iconName = room.githubType.toLowerCase();
+  var iconName = room.githubType && room.githubType.toLowerCase();
 
   // repo_channel, user_channel etc
-  if (iconName.indexOf('channel') >= 0) {
+  if (iconName && iconName.indexOf('channel') >= 0) {
     iconName = 'channel';
   }
 
