@@ -12,6 +12,7 @@ var bayeuxExtension   = require('./extension');
 var Q                 = require('q');
 var userCanAccessRoom = require('../../services/user-can-access-room');
 
+// TODO: use a lightweight routing library for this....
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [{
     re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)$/,
@@ -37,6 +38,9 @@ var routes = [{
     validator: validateUserForUserSubscription
   }, {
     re: /^\/api\/v1\/ping(\/\w+)?$/,
+    validator: validateUserForPingSubscription
+  }, {
+    re: /^\/api\/private\/diagnostics$/,
     validator: validateUserForPingSubscription
   }
 ];
