@@ -1,6 +1,7 @@
 "use strict";
 var $ = require('jquery');
 var context = require('utils/context');
+var resolveIconClass = require('utils/resolve-icon-class');
 var apiClient = require('components/apiClient');
 var roomNameTrimmer = require('utils/room-name-trimmer');
 var Marionette = require('marionette');
@@ -20,21 +21,6 @@ module.exports = (function() {
 
   /* @const */
   var MAX_NAME_LENGTH = 25;
-
-  function getIconClass(model) {
-    var iconName = model.get('githubType').toLowerCase();
-
-    // repo_channel, user_channel etc
-    if(iconName.indexOf('channel') >= 0) {
-      iconName = 'channel';
-    }
-
-    if(model.get('favourite')) {
-      iconName = 'favourite';
-    }
-
-    return 'room-list-item__name--' + iconName;
-  }
 
   var RoomListItemView = Marionette.ItemView.extend({
     tagName: 'li',
@@ -72,7 +58,7 @@ module.exports = (function() {
     serializeData: function() {
       var data = this.model.toJSON();
       data.name = roomNameTrimmer(data.name, MAX_NAME_LENGTH);
-      data.iconClass = getIconClass(this.model);
+      data.iconClass = resolveIconClass(this.model);
       return data;
     },
     onItemClose: function(e) {
