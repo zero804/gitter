@@ -21,7 +21,7 @@ var sendNotificationToDevice = function(notification, badge, device, callback) {
     }
   });
 
-  sender.send(message, [device.deviceId], MAX_RETRIES, callback);
+  sender.send(message, [device.androidToken], MAX_RETRIES, callback);
 };
 
 module.exports.sendNotificationToDevice = sendNotificationToDevice;
