@@ -259,7 +259,7 @@ gulp.task('css-web', function () {
     .pipe(postcss([
       autoprefixer({
         browsers: [
-          'last 4 Safari versions',
+          'Safari >= 5',
           'last 4 Firefox versions',
           'last 4 Chrome versions',
           'IE >= 10'],
