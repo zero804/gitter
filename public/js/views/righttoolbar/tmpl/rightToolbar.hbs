@@ -18,7 +18,7 @@
               <div class="trpToolbarListContent" id="people-roster"></div>
               <div class="trpToolbarListContent" id="repo-info" style="display: none">
             </div>
-            <div class="trpToolbarHeader" id="activity-header" style="display: none">ACTIVITY</div>
+            <div class="trpToolbarHeader" id="activity-header">ACTIVITY</div>
           </div>
         </td>
       </tr>
@@ -26,6 +26,11 @@
         <td height="100%" style="vertical-align:top;">
           <div class="trpTroupeRelatedContent" style="height: 100%;" id="room-content">
             <div class="trpTroupeRelatedContentHolder" id="activity">
+              <ul class="gtrActivityList">
+                {{#each activityEvents}}
+                  <li>{{{ activityItemPrerender this }}}</li>
+                {{/each}}
+              </ul>
             </div>
           </div>
        </td>
@@ -45,6 +50,3 @@
     </table>
   </div>
 </div>
-
-
-

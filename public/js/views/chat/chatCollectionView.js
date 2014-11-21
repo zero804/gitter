@@ -41,6 +41,7 @@ module.exports = (function() {
       };
 
       if(item && item.id) {
+        // This allows the chat collection view to bind to an existing element...
         var e = this.$el.find('.model-id-' + item.id)[0];
         if(e) options.el = e;
       }
@@ -265,4 +266,3 @@ module.exports = (function() {
   return ChatCollectionView;
 
 })();
-

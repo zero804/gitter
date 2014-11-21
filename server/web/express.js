@@ -12,6 +12,7 @@ var rememberMe     = require('./middlewares/rememberme-middleware');
 var I18n           = require('i18n-2');
 var cors           = require('cors');
 
+
 var devMode        = config.get('dev-mode');
 
 // Naughty naughty naught, install some extra methods on the express prototype
@@ -39,6 +40,7 @@ module.exports = {
     expressHbs.registerHelper('generateTroupeContext', require('./hbs-helpers').generateTroupeContext);
     expressHbs.registerAsyncHelper('prerenderView', require('./prerender-helper'));
     expressHbs.registerHelper('chatItemPrerender', require('./prerender-chat-helper'));
+    expressHbs.registerHelper('activityItemPrerender', require('./prerender-activity-helper'));
     expressHbs.registerHelper('pluralize', require('./hbs-helpers').pluralize);
     expressHbs.registerHelper('toLowerCase', require('./hbs-helpers').toLowerCase);
     expressHbs.registerHelper('typewriter', require('./hbs-helpers').typewriter);

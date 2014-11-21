@@ -18,9 +18,11 @@ module.exports = exports = function(template) {
       avatarUrl: avatarUrl,
       avatarSize: avatarSize,
       id: user.id,
+      role: user.role,
       showStatus: showStatus,
       showBadge: showBadge,
-      inactive: !!user.state
+      presenceClass: user.online ? 'online' : 'offline',
+      inactive: user.invited
     });
 
     return r;

@@ -356,11 +356,13 @@ function findOnlineUsersForTroupe(troupeId, callback) {
 function categorizeUsersByOnlineStatus(userIds, callback) {
   if(!userIds || userIds.length === 0) return callback(null, {});
 
-  var t = process.hrtime();
-  var key = prefix + "presence_temp_set:" + process.pid + ":" + t[0] + ":" + t[1];
-  var out_key = prefix + "presence_temp_set:" + process.pid + ":" + t[0] + ":" + t[1] + '_out';
+  var time = process.hrtime();
+  var seconds = time[0];
+  var nanoseconds = time[1];
+  var key_working_set = prefix + "presence_temp_set:" + process.pid + ":" + seconds + ":" + nanoseconds;
+  var key_working_output_set = key_working_set + '_out';
 
-  var keys = [key, out_key, ACTIVE_USERS_KEY];
+  var keys = [key_working_set, key_working_output_set, ACTIVE_USERS_KEY];
   var values = userIds;
 
   var d = Q.defer();
