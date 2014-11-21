@@ -3,6 +3,7 @@ var $ = require('jquery');
 var context = require('utils/context');
 var mapMessageTemplate = require('./map-message.hbs');
 var roomNameTrimmer = require('utils/room-name-trimmer');
+var resolveAvatarUrl = require('utils/resolve-avatar-url');
 var apiClient = require('components/apiClient');
 var onready = require('./utils/onready');
 
@@ -125,7 +126,7 @@ function initEmbedPanel() {
     var owner = room.uri.split('/')[0];
 
     $this.html(
-      '<img src="https://avatars.githubusercontent.com/' + owner + '?s=48" width="48" height="48">' +
+      '<img src="' + resolveAvatarUrl({ username: owner, size: 48 }) + '" width="48" height="48">' +
       '<h3>' + room.name + '</h3>' +
       '<em>' + room.language + '</em>');
   });
