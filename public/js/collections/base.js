@@ -44,6 +44,8 @@ module.exports = (function() {
     if(options.error) {
       promise = promise.fail(options.error);
     }
+
+    model.trigger('request', model, null, options);
     return promise;
   };
 
