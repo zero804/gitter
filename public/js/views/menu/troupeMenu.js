@@ -1,5 +1,6 @@
 "use strict";
 var $ = require('jquery');
+var nanoscrollWrapper = require('../../utils/nanoscroll-wrapper');
 var Marionette = require('marionette');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
@@ -15,12 +16,13 @@ var CollectionWrapperViewTemplate = require('./tmpl/collection-wrapper-view.hbs'
 var SearchView = require('./searchView');
 var ProfileView = require('./profileView');
 var OrgCollectionView = require('./orgCollectionView');
+
 require('nanoscroller');
 
 module.exports = (function() {
 
 
-  // Reply back to the child iframe
+  // Reply back to the child iframe - used in search
   appEvents.on('troupeRequest', function (payload, evt) {
     var msg = { child_window_event: ['troupesResponse', troupeCollections.troupes] };
     evt.source.postMessage(JSON.stringify(msg), evt.origin);
@@ -81,6 +83,10 @@ module.exports = (function() {
       suggested: '#left-menu-list-suggested'
     },
 
+    ui: {
+      nano: '.nano'
+    },
+
     events: function() {
       var events = {
         // 'click #search-clear-icon': 'onSearchClearIconClick'
@@ -127,13 +133,6 @@ module.exports = (function() {
         if (index) self.selectedIndex = index;
       });
 
-      // nanoscroller has to be reset when regions are rerendered
-      this.regionManager.forEach(function (region) {
-        self.listenTo(region, 'show', function () {
-          var $nano = this.$el.find('.nano');
-          $nano.nanoScroller({ iOSNativeScrolling: true });
-        });
-      });
 
       // determining whether we should show the suggested rooms or not
       var hasItems = troupeCollections.troupes && !!(troupeCollections.troupes.length);
@@ -214,6 +213,10 @@ module.exports = (function() {
     onRender: function () {
       this.isRendered = true;
 
+      if(!this.nano) {
+        this.nano = nanoscrollWrapper(this.ui.nano[0], { iOSNativeScrolling: true });
+      }
+
       this.profile.show(new ProfileView());
 
       // mega-list: recent troupe view
@@ -260,4 +263,3 @@ module.exports = (function() {
   return View;
 
 })();
-

@@ -16,9 +16,7 @@ module.exports = (function() {
 
     regions: {
       search: '#search-panel',
-      people: "#people-roster",
-      repo_info: "#repo-info",
-      activity: "#activity"
+      repo_info: "#repo-info"
     },
 
     events: {
@@ -34,12 +32,12 @@ module.exports = (function() {
     },
 
     initialize: function () {
-
       // People View
-      this.people.show(new PeopleCollectionView.ExpandableRosterView({
+      new PeopleCollectionView.ExpandableRosterView({
         rosterCollection: itemCollections.roster,
-        userCollection: itemCollections.sortedUsers
-      }));
+        userCollection: itemCollections.sortedUsers,
+        el: $('#people-roster')
+      });
 
       // Repo info
       if (context.troupe().get('githubType') === 'REPO') {
@@ -49,7 +47,10 @@ module.exports = (function() {
       }
 
       // Activity
-      this.activity.show(new ActivityStream({ collection: itemCollections.events }));
+      new ActivityStream({
+        el: $('#activity'),
+        collection: itemCollections.events
+      });
 
       // Search
       this.searchView = new SearchView({ });

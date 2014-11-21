@@ -1,6 +1,7 @@
 "use strict";
 var Marionette = require('marionette');
 var Backbone = require('backbone');
+var resolveAvatarUrl = require('utils/resolve-avatar-url');
 var Popover = require('views/popover');
 var template = require('./tmpl/userPopoverView.hbs');
 var footerTemplate = require('./tmpl/userPopoverFooterView.hbs');
@@ -10,13 +11,7 @@ var context = require('utils/context');
 module.exports = (function() {
 
   function largeAvatar(data) {
-    var url = data.avatar_url ? data.avatar_url : '//avatars.githubusercontent.com/' + data.login + '?';
-
-    if(url.indexOf('?') >= 0) {
-      return url + '&s=128';
-    }
-
-    return url + '?s=128';
+    return resolveAvatarUrl({ username: data.login, size: 128 });
   }
 
   var UserView = Marionette.ItemView.extend({
