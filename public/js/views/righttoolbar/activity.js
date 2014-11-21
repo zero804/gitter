@@ -7,8 +7,6 @@ var issueDecorator = require('views/chat/decorators/issueDecorator');
 var commitDecorator = require('views/chat/decorators/commitDecorator');
 var mentionDecorator = require('views/chat/decorators/mentionDecorator');
 var log = require('utils/log');
-var context = require('utils/context');
-var activityTipTemplate = require('./tmpl/activity-tip.hbs');
 var githubPushTemplate = require('./tmpl/githubPush.hbs');
 var githubIssuesTemplate = require('./tmpl/githubIssues.hbs');
 var githubIssueCommentTemplate = require('./tmpl/githubIssueComment.hbs');
@@ -27,9 +25,11 @@ var sprintlyTemplate = require('./tmpl/sprintly.hbs');
 var trelloTemplate = require('./tmpl/trello.hbs');
 var prerenderedTemplate = require('./tmpl/prerendered.hbs');
 var cocktail = require('cocktail');
+var compositeTemplate = require('./tmpl/composite.hbs');
+require('views/widgets/timeago');
+require('views/behaviors/widgets');
 
 module.exports = (function() {
-
 
   var serviceTemplates = {
     bitbucket:  bitbucketTemplate,
@@ -164,6 +164,10 @@ module.exports = (function() {
     modelEvents: {
       change: 'render'
     },
+    behaviors: {
+      Widgets: {}
+    },
+
 
     initialize: function() {
       var meta = this.model.get('meta');
@@ -212,28 +216,18 @@ module.exports = (function() {
     }
   });
 
-  var EmptyActivityView = Marionette.ItemView.extend({
-    id: 'activity-tip',
-    template: activityTipTemplate,
-    serializeData: function() {
-      return {
-        isAdmin: context().permissions.admin,
-        isNativeDesktopApp: context().isNativeDesktopApp,
-        integrationsUrl: context().isNativeDesktopApp ? window.location.origin + '/' + context.troupe().get('uri') + '#integrations' : '#integrations'
-      };
-    }
-  });
-
-  var ActivityView = Marionette.CollectionView.extend({
-    tagName: 'ul',
-    className: 'gtrActivityList',
+  var ActivityView = Marionette.CompositeView.extend({
+    template: compositeTemplate,
+    itemViewContainer: 'ul#activity-events',
     itemView: ActivityItemView,
-    emptyView: EmptyActivityView
+
+    initialize: function() {
+      this.listenTo(this.collection, 'snapshot', this.render);
+    }
   });
   cocktail.mixin(ActivityView, TroupeViews.SortableMarionetteView);
 
   return ActivityView;
-
 
 })();
 

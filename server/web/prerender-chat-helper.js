@@ -6,24 +6,20 @@
  * Also, this way is much faster, so it's not so bad
  */
 
-var nconf      = require('../utils/config');
-var path       = require('path');
-var fs         = require('fs');
-var _          = require('underscore');
-var syncHandlebars = require('handlebars');
-var widgetHelpers = require('./widget-prerenderers');
+var nconf           = require('../utils/config');
+var compileTemplate = require('../utils/compile-template');
+var path            = require('path');
+var fs              = require('fs');
+var _               = require('underscore');
+var syncHandlebars  = require('handlebars');
+var widgetHelpers   = require('./widget-prerenderers');
 
 var chatWrapper = syncHandlebars.compile('<div class="chat-item model-id-{{id}} {{burstClass}} {{unreadClass}} {{deletedClass}}">{{{inner}}}</div>');
 
 var baseDir = path.normalize(__dirname + '/../../' + nconf.get('web:staticContent'));
 
-function compileTemplate (file) {
-  var buffer = fs.readFileSync(baseDir + '/js/views/chat/tmpl/' + file);
-  return syncHandlebars.compile(buffer.toString());
-}
-
-var chatItemTemplate = compileTemplate('chatItemView.hbs');
-var statusItemTemplate = compileTemplate('statusItemView.hbs');
+var chatItemTemplate = compileTemplate('/js/views/chat/tmpl/chatItemView.hbs');
+var statusItemTemplate = compileTemplate('/js/views/chat/tmpl/statusItemView.hbs');
 
 var human_actions = {
   push:           'pushed',
