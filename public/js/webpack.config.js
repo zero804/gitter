@@ -38,7 +38,6 @@ var webpackConfig = {
       'marionette',
       'loglevel',
       'utils/log',
-      'utils/tracking',
       'backbone.wreqr',
       'backbone.babysitter',
       'handlebars/runtime',
