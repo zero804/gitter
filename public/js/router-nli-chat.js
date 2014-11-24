@@ -57,23 +57,6 @@ onready(function() {
   new HeaderView({ model: context.troupe(), el: '#header' });
   new RightToolbarView({ el: "#toolbar-frame" });
 
-  // new HeaderView({ model: context.troupe(), el: '#header' });
-
-  new ChatCollectionView({
-    el: '#chat-container',
-    collection: itemCollections.chats,
-    userCollection: itemCollections.users,
-    decorators: [
-      webhookDecorator,
-      issueDecorator,
-      commitDecorator,
-      mentionDecorator,
-      embedDecorator,
-      emojiDecorator
-    ]
-  }).render();
-
-
   var Router = Backbone.Router.extend({
     routes: {
       // TODO: get rid of the pipes
@@ -99,4 +82,3 @@ onready(function() {
   Backbone.history.start();
 
 });
-
