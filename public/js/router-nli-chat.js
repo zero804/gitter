@@ -3,15 +3,8 @@ var $ = require('jquery');
 var Backbone = require('backbone');
 var context = require('utils/context');
 var ChatNliIntegratedView = require('views/app/chatNliIntegratedView');
-var ChatCollectionView = require('views/chat/chatCollectionView');
 var itemCollections = require('collections/instances/integrated-items');
 var RightToolbarView = require('views/righttoolbar/rightToolbarView');
-var webhookDecorator = require('views/chat/decorators/webhookDecorator');
-var issueDecorator = require('views/chat/decorators/issueDecorator');
-var commitDecorator = require('views/chat/decorators/commitDecorator');
-var mentionDecorator = require('views/chat/decorators/mentionDecorator');
-var embedDecorator = require('views/chat/decorators/embedDecorator');
-var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var peopleCollectionView = require('views/people/peopleCollectionView');
 var HeaderView = require('views/app/headerView');
 var onready = require('./utils/onready');
@@ -53,7 +46,8 @@ onready(function() {
     window.parent.location.href = href;
   });
 
-  var appView = new ChatNliIntegratedView({ el: 'body' });
+  var appView = new ChatNliIntegratedView({ el: 'body', chatCollection: itemCollections.chats, userCollection: itemCollections.users });
+
   new HeaderView({ model: context.troupe(), el: '#header' });
   new RightToolbarView({ el: "#toolbar-frame" });
 
