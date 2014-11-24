@@ -1,10 +1,11 @@
 "use strict";
 var $ = require('jquery');
 var Marionette = require('marionette');
-var itemCollections = require('collections/instances/integrated-items');
 var modalRegion = require('components/modal-region');
 var hasScrollBars = require('utils/scrollbar-detect');
+
 var ChatCollectionView = require('views/chat/chatCollectionView');
+
 var webhookDecorator = require('views/chat/decorators/webhookDecorator');
 var issueDecorator = require('views/chat/decorators/issueDecorator');
 var commitDecorator = require('views/chat/decorators/commitDecorator');
@@ -35,23 +36,32 @@ module.exports = (function() {
     regions: {
     },
 
-    initialize: function() {
-
+    initialize: function(options) {
       this.bindUIElements();
 
-      // Setup the ChatView - this is instantiated once for the application, and shared between many views
+      this.chatCollection = options.chatCollection;
+      this.userCollection = options.userCollection;
+
+      this.listenTo(this.chatCollection, 'atBottomChanged', function (isBottom) {
+        this.ui.scrollToBottom.toggleClass('u-scale-zero', isBottom);
+      });
+
       var chatCollectionView = new ChatCollectionView({
         el: '#chat-container',
-        collection: itemCollections.chats,
-        userCollection: itemCollections.users,
-        decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
-      }).render();
+        collection: this.chatCollection,
+        userCollection: this.userCollection,
+        decorators: [
+          webhookDecorator,
+          issueDecorator,
+          commitDecorator,
+          mentionDecorator,
+          embedDecorator,
+          emojiDecorator
+        ]
+      });
+      chatCollectionView.bindUIElements();
 
-      this.listenTo(itemCollections.chats, 'atBottomChanged', function (isBottom) {
-        this.ui.scrollToBottom.toggleClass('u-scale-zero', isBottom);
-      }.bind(this));
 
-      this.chatCollectionView = chatCollectionView;
       this.dialogRegion = modalRegion;
 
       if (hasScrollBars()) {
