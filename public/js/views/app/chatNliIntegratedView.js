@@ -1,6 +1,5 @@
 "use strict";
 var $ = require('jquery');
-var context = require('utils/context');
 var Marionette = require('marionette');
 var itemCollections = require('collections/instances/integrated-items');
 var modalRegion = require('components/modal-region');
@@ -66,4 +65,3 @@ module.exports = (function() {
   return ChatLayout;
 
 })();
-
