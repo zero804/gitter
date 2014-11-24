@@ -46,3 +46,9 @@ public-compile-cache
 public/styles
 chats.json
 public/dist
+scripts/graphs/chats.dot
+scripts/graphs/chats2.dot
+scripts/graphs/d.dot
+scripts/graphs/neato3d.png
+scripts/graphs/prod.dot
+scripts/graphs/prod2.dot
