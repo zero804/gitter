@@ -27,8 +27,7 @@ onready(function() {
     window.location.href = url;
   });
 
-  var chatCollection = new chatModels.ChatCollection();
-  chatCollection.listen();
+  var chatCollection = new chatModels.ChatCollection(null, { listen: true });
 
   new ChatCollectionView({
     el: '#content-frame',
@@ -58,4 +57,3 @@ onready(function() {
 
 
 });
-

@@ -1,9 +1,5 @@
 "use strict";
 /* jshint unused:true, browser:true */
-var $ = require('jquery');
-var _ = require('underscore');
-var Backbone = require('backbone');
-var base = require('../base');
 var userModels = require('../users');
 var chatModels = require('../chat');
 var eventModels = require('../events');
@@ -61,4 +57,3 @@ module.exports = (function() {
 
 
 })();
-

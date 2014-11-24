@@ -26,7 +26,6 @@ onready(function() {
   new ChatNliIntegratedView({ el: 'body' });
 
   var chatCollection = new chatModels.ChatCollection(null, { listen: true });
-  chatCollection.listen();
 
   var chatCollectionView = new ChatCollectionView({
     el: '#chat-container',
@@ -47,4 +46,3 @@ onready(function() {
 
 
 });
-
