@@ -1,7 +1,6 @@
 "use strict";
 var $ = require('jquery');
 var context = require('utils/context');
-//var ChatNliIntegratedView = require('views/app/chatNliIntegratedView');
 var HeaderView = require('views/app/headerView');
 var ArchiveNavigationView = require('views/archive/archive-navigation-view');
 var onready = require('./utils/onready');
@@ -67,4 +66,3 @@ onready(function() {
   }
 
 });
-
