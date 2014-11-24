@@ -138,9 +138,7 @@ function upgradeKeyToSortedSet(key, userBadgeKey, troupeId, callback) {
         multi.zrem(userBadgeKey, troupeId);
         multi.zadd(userBadgeKey, itemIdsWithScores.length, troupeId);
 
-        multi.exec(function(err) {
-          if(err) return done(err);
-        });
+        multi.exec(done);
 
       });
 
