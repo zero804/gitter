@@ -7,13 +7,21 @@ module.exports = {
     //     authMiddleware,
     //     require('./location.js'));
 
-    /* APN has no auth requirement as user may not have authenticated */
+    // APN has no auth requirement as user may not have authenticated
+    // and this is used for devices without users
     app.post(apiRoot + '/v1/apn',
         require('./apn.js'));
 
+    // userapn ties together devices from /v1/apn and actual users.
+    // this definitely requires auth
     app.post(apiRoot + '/v1/userapn',
         authMiddleware,
         require('./userapn.js'));
+
+    // android devices with google cloud messaging
+    app.post(apiRoot + '/v1/gcm',
+        authMiddleware,
+        require('./gcm.js'));
 
     app.post(apiRoot + '/v1/eyeballs',
         authMiddleware,
