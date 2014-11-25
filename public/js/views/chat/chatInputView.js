@@ -158,15 +158,18 @@ module.exports = (function() {
 
       // firefox only respects the "autofocus" attr if it is present on source html
       // also, dont show keyboard right away on mobile
-      if(!this.compactView) $textarea.focus();
+      // Also, move the cursor to the end of the textarea text
+      if (!this.compactView) setCaretPosition($textarea[0], $textarea.val().length);
 
       var inputBox = new ChatInputBoxView({
         el: $textarea,
         rollers: this.rollers,
         chatCollectionView: this.chatCollectionView,
         composeMode: this.composeMode,
+        autofocus: !this.compactView,
         value: $textarea.val()
       });
+
 
       this.inputBox = inputBox;
 
@@ -525,6 +528,7 @@ module.exports = (function() {
     // pass in the textarea as el for ChatInputBoxView
     // pass in a scroll delegate
     initialize: function(options) {
+      this.autofocus = options.autofocus;
 
       if(hasScrollBars()) {
         this.$el.addClass("scroller");
@@ -544,9 +548,7 @@ module.exports = (function() {
       });
 
       this.drafty = drafty(this.el);
-      if (options.value) {
-        this.el.value = this.el.value + options.value;
-      }
+
       chatResizer.resetInput(true);
 
       this.chatCollectionView = options.chatCollectionView;
@@ -559,6 +561,7 @@ module.exports = (function() {
         this.processInput();
       }
     },
+
 
     onKeyUp: function() {
       this.chatResizer.resizeInput();

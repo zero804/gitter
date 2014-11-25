@@ -11,7 +11,7 @@ var redis            = require("../utils/redis");
 var winston          = require('../utils/winston');
 var mongoUtils       = require('../utils/mongo-utils');
 var RedisBatcher     = require('../utils/redis-batcher').RedisBatcher;
-var Scripto          = require('redis-scripto');
+var Scripto          = require('gitter-redis-scripto');
 var Q                = require('q');
 var assert           = require('assert');
 var redisClient      = redis.getClient();
@@ -138,9 +138,7 @@ function upgradeKeyToSortedSet(key, userBadgeKey, troupeId, callback) {
         multi.zrem(userBadgeKey, troupeId);
         multi.zadd(userBadgeKey, itemIdsWithScores.length, troupeId);
 
-        multi.exec(function(err) {
-          if(err) return done(err);
-        });
+        multi.exec(done);
 
       });
 

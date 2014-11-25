@@ -21,7 +21,7 @@ var GithubMeService  = require("../services/github/github-me-service");
 /** TODO move onto its own method once we find the need for it elsewhere
  * isRelativeURL() checks if the URL is relative
  *
- * url      String - the url to be check 
+ * url      String - the url to be check
  * @return  Boolean - the result of the check
  */
 function isRelativeURL(url) {
@@ -35,10 +35,10 @@ module.exports = {
     app.get('/login/github',
       function (req, res, next) {
         var query = req.query;
-        
+
         // adds the source of the action to the session (for tracking how users 'come in' to the app)
         req.session.source = query.source;
-        
+
         // checks if we have a relative url path and adds it to the session
         if (query.returnTo && isRelativeURL(query.returnTo)) {
           req.session.returnTo = query.returnTo;
@@ -198,7 +198,7 @@ module.exports = {
     app.get(
       '/login/callback',
       /* 4-nary error handler for /login/callback */
-      function(err, req, res) {
+      function(err, req, res, /* DO NOT DELETE THIS */ next /* DO NOT DELETE THIS! */) {
         logger.error("OAuth failed: " + err);
         if(err.stack) {
           logger.error("OAuth failure callback", err.stack);

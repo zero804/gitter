@@ -1,9 +1,5 @@
 "use strict";
 /* jshint unused:true, browser:true */
-var $ = require('jquery');
-var _ = require('underscore');
-var Backbone = require('backbone');
-var base = require('../base');
 var userModels = require('../users');
 var chatModels = require('../chat');
 var eventModels = require('../events');
@@ -19,7 +15,7 @@ module.exports = (function() {
   var userCollection          = new userModels.UserCollection(null, { listen: true });
   var rosterCollection        = new userModels.RosterCollection(null, { users: userCollection, limit: 21 });
   var sortedUserCollection    = new userModels.SortedUserCollection(null, { users: userCollection});
-  var eventCollection         = new eventModels.EventCollection(null,  { listen: true });
+  var eventCollection         = new eventModels.EventCollection(null,  { listen: true, snapshot: true });
 
   // update online status of user models
   appEvents.on('userLoggedIntoTroupe', updateUserStatus);
@@ -61,4 +57,3 @@ module.exports = (function() {
 
 
 })();
-
