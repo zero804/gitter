@@ -4,6 +4,7 @@ var $ = require('jquery');
 var _ = require('underscore');
 var Backbone = require('backbone');
 var context = require('utils/context');
+var roomSort = require('utils/room-sort');
 var base = require('../base');
 var realtime = require('components/realtime');
 var troupeModels = require('../troupes');
@@ -22,36 +23,6 @@ module.exports = (function() {
 
   unreadItemsClient.installTroupeListener(troupeCollection);
 
-  /* Utils for comparators, perhaps this should go somewhere useful? */
-  function naturalComparator(a, b) {
-    if(a === b) return 0;
-    return a > b ? 1 : -1;
-  }
-
-  var sections = ['lastMentionTime', 'lastUnreadItemTime', 'lastAccessTimeNoSync'];
-
-  function getSectionRank(roomModel) {
-    if(roomModel.get('lastMentionTime')) {
-      return 0;
-    } else if(roomModel.get('lastUnreadItemTime')) {
-      return 1;
-    } else if(roomModel.get('lastAccessTimeNoSync')) {
-      return 2;
-    } else {
-      return 3;
-    }
-  }
-
-  function sectionTimeComparator(a, b, sectionRank) {
-    var property = sections[sectionRank];
-
-    if(!property) return 0;
-
-    return b.get(property).valueOf() - a.get(property).valueOf();
-  }
-
-  /* ---- end of comparators ---- */
-
   function filterTroupeCollection(filter) {
     var c = new Backbone.FilteredCollection(null, { model: troupeModels.TroupeModel, collection: troupeCollection });
     c.setFilter(filter);
@@ -60,32 +31,12 @@ module.exports = (function() {
   }
 
   // collection of favourited troupes
-  var favourites = filterTroupeCollection(function(m) {
-    return m.get('favourite');
-  });
+  var favourites = filterTroupeCollection(roomSort.favourites.filter);
+  favourites.setSort(roomSort.favourites.sort);
 
-  /* Favs are sorted by favourite field in ASC order, with name as a secondary order */
-  favourites.setSort(function(a, b) {
-    var c = naturalComparator(a.get('favourite'), b.get('favourite'));
-    if(c !== 0) return c;
-    return naturalComparator(a.get('name'), b.get('name'));
-  });
-
-  var recentRoomsNonFavourites = filterTroupeCollection(function(m) {
-    /* Not a favourite, but has a lastAccessTime */
-    return !m.get('favourite') && (m.get('lastAccessTime') || m.get('unreadItems') || m.get('mentions'));
-  });
-
-  recentRoomsNonFavourites.setSort(function(a, b) {
-    var aSectionRank = getSectionRank(a);
-    var bSectionRank = getSectionRank(b);
-
-    if(aSectionRank === bSectionRank) {
-      return sectionTimeComparator(a, b, aSectionRank);
-    } else {
-      return aSectionRank - bSectionRank;
-    }
-  });
+  // collection of recent troupes exc. favourites
+  var recentRoomsNonFavourites = filterTroupeCollection(roomSort.recents.filter);
+  recentRoomsNonFavourites.setSort(roomSort.recents.sort);
 
   // Sync up with the context
   troupeCollection.on("add", function(model) {

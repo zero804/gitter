@@ -18,6 +18,7 @@ module.exports = (function() {
     behaviors: {
       Widgets: {}
     },
+
     serializeData: function() {
       var user = context.getUser();
       var userModel = context.user();

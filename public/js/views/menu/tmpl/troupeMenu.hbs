@@ -11,9 +11,7 @@
           <ul class="room-list">
           {{!-- put filtered favourites in here --}}
             {{#each rooms.favourites}}
-              <li class="room-list-item" data-id="{{ this.id }}">
-                {{{ prerenderRoomListItem this }}}
-              </li>
+              <li class="room-list-item" data-id="{{ this.id }}">{{{ prerenderRoomListItem this }}}</li>
             {{/each}}
           </ul>
         </div>
@@ -22,29 +20,17 @@
           <ul class="room-list">
             {{#each rooms.recents}}
               <li class="room-list-item" data-id="{{ this.id }}">
-                {{{ prerenderRoomListItem this }}}
+              {{{ prerenderRoomListItem this }}}
               </li>
-            {{/each}}
-          </ul>
+            {{/each}}</ul>
         </div>
       </div>
-      <div class='menu-list__item' id="left-menu-list-suggested">
-        <ul class="room-list">
-            {{#each rooms.suggested}}
-              <li class="room-list-item" data-id="{{ this.id }}">
-                {{{ prerenderRoomListItem this }}}
-              </li>
-            {{/each}}
-          </ul>
-      </div>
+      <div class='menu-list__item' id="left-menu-list-suggested"></div>
       <div class='menu-list__item' id="left-menu-list-orgs">
-        <ul class="room-list">
-          {{#each orgs}}
-            <li class="room-list-item">
-              {{{ prerenderOrgListItem this }}}
-            </li>
-          {{/each}}
-        </ul>
+        <div class="menu-list__section--orgs" id="list">
+          <div class="menu-list__header">Your Organizations</div>
+          <ul class="room-list">{{#each orgs}}<li class="room-list-item">{{{ prerenderOrgListItem this }}}</li>{{/each}}</ul>
+        </div>
       </div>
     </div>
   </div>

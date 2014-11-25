@@ -170,18 +170,31 @@ module.exports = (function() {
     className: 'room-list',
     itemView: RoomListItemView,
 
+    itemViewOptions: function (item) {
+      var options = {};
+      if (item && item.id) {
+        options.el = this.$el.find('.room-list-item[data-id="' + item.id + '"]')[0];
+      }
+      return options;
+    },
+
     initialize: function(options) {
+      // this.listenTo(this.collection, 'add', this.render);
+
       if(options.rerenderOnSort) {
         this.listenTo(this.collection, 'sort', this.render);
       }
+
       if(options.draggable) {
         this.makeDraggable(options.dropTarget);
       }
       this.roomsCollection = options.roomsCollection;
     },
+
     makeDraggable: function(drop) {
       var cancelDrop = false;
       var self = this;
+
       this.$el.sortable({
         group: 'mega-list',
         pullPlaceholder: false,
