@@ -11,6 +11,7 @@ var PersistenceService = require('../../services/persistence-service');
 var restSerializer     = require("../../serializers/rest-serializer");
 var burstCalculator   = require('../../utils/burst-calculator');
 var userSort = require('../../../public/js/utils/user-sort');
+var roomSort = require('../../../public/js/utils/room-sort');
 
 var avatar   = require('../../utils/avatar');
 var _                 = require('underscore');
@@ -113,10 +114,10 @@ function renderMainFrame(req, res, next, frame) {
         stagingLink: stagingLink,
         dnsPrefetch: dnsPrefetch,
         showFooterButtons: true,
+        user: user,
         rooms: {
-          favourites: rooms.filter(function (item) { return !!item.favourite; }),
-          recents: rooms.filter(function (item) { return !!!item.favourite; }),
-          suggested: []
+          favourites: rooms.filter(roomSort.favourites.filter).sort(roomSort.favourites.sort),
+          recents: rooms.filter(roomSort.recents.filter).sort(roomSort.recents.sort)
         },
         orgs: orgs
       });

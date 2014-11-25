@@ -1,5 +1,5 @@
 'use strict';
-
+var ensurePojo = require('./ensure-pojo');
 // @const - higher index in array, higher rank
 var RANK = ['contributor', 'admin'];
 
@@ -25,15 +25,11 @@ function compareInvites(a, b) {
   }
 }
 
-function ensureIsPOJO(o) {
-  return o.toJSON ? o.toJSON() : o;
-}
-
 // it is worth noticing that we want to sort in a descindencing order, thus the negative results
 module.exports = function (a, b) {
   // normalizing Backbone.Model to POJO
-  a = ensureIsPOJO(a);
-  b = ensureIsPOJO(b);
+  a = ensurePojo(a);
+  b = ensurePojo(b);
 
   var rankDifference = compareRank(a, b); // checks if there is rank difference
 

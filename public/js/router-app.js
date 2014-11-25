@@ -26,7 +26,6 @@ require('views/widgets/avatar');
 
 onready(function() {
 
-
   var chatIFrame = document.getElementById('content-frame');
   if(window.location.hash) {
     var noHashSrc = chatIFrame.src.split('#')[0];
@@ -39,8 +38,6 @@ onready(function() {
   }
 
   var appView = new AppIntegratedView({ });
-
-  appView.leftMenuRegion.show(new TroupeMenuView({ }));
 
   function updateContent(iframeUrl) {
     // TODO: update the title....
