@@ -16,18 +16,25 @@ function useLanguage(language, callback) {
 
 module.exports = exports = function() {
   return function timeagoWidgetHandler(params) {
-    var hash = params.hash;
-    if(!hash) return "";
+    var options = params.hash || {};
 
-    var time = hash.time;
-    if(!time) return "";
+    var time    = options.time;
+    var lang    = options.lang;
+    var locale  = options.locale;
 
-    var lang = hash.lang;
-    var locale = hash.locale;
+    if (!options || !time) return '';
 
     time = moment(time);
 
     var duration = moment.duration(Date.now() - time.valueOf());
+
+    if (options.compact) {
+      if (duration.asDays() >= maxDaysBeforeDateDisplay) {
+        return time.format("MMM DD");
+      } else {
+        return time.format("H:mm");
+      }
+    }
 
     if(duration.asDays() >= maxDaysBeforeDateDisplay) {
       return time.format("LL", { lang: lang });

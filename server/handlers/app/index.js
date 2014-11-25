@@ -56,7 +56,7 @@ var chatMiddlewarePipeline = [
   appMiddleware.uriContextResolverMiddleware({ create: 'not-repos'}),
   appMiddleware.isPhoneMiddleware,
   function (req, res, next) {
-    console.log('chatMiddlewarePipeline() ====================');
+
     if (req.uriContext.accessDenied) {
       return appRender.renderNotFound(req, res, next);
     }

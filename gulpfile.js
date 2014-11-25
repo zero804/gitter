@@ -142,7 +142,7 @@ gulp.task('add-version-files', function(done) {
 gulp.task('build-app', ['copy-app-files', 'add-version-files']);
 
 gulp.task('tar-app', ['build-app'], function () {
-    return gulp.src(['output/app/**'])
+    return gulp.src(['output/app/**'], { stat: true })
       .pipe(tar('app.tar'))
       .pipe(gzip({ append: true, gzipOptions: { level: 9 } }))
       .pipe(gulp.dest('output'));
@@ -259,7 +259,7 @@ gulp.task('css-web', function () {
     .pipe(postcss([
       autoprefixer({
         browsers: [
-          'last 4 Safari versions',
+          'Safari >= 5',
           'last 4 Firefox versions',
           'last 4 Chrome versions',
           'IE >= 10'],

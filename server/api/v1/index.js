@@ -3,23 +3,17 @@
 
 module.exports = {
   install: function(app, apiRoot, authMiddleware) {
-    var resourceApiRoot = apiRoot ? apiRoot.substring(1) + '/' : '';
+    // app.post(apiRoot + '/v1/location',
+    //     authMiddleware,
+    //     require('./location.js'));
 
-    // APN has no auth requirement as user may not have authenticated
-    // and this is used for devices without users
+    /* APN has no auth requirement as user may not have authenticated */
     app.post(apiRoot + '/v1/apn',
         require('./apn.js'));
 
-    // userapn ties together devices from /v1/apn and actual users.
-    // this definitely requires auth
     app.post(apiRoot + '/v1/userapn',
         authMiddleware,
         require('./userapn.js'));
-
-    // android devices with google cloud messaging
-    app.post(apiRoot + '/v1/gcm',
-        authMiddleware,
-        require('./gcm.js'));
 
     app.post(apiRoot + '/v1/eyeballs',
         authMiddleware,
@@ -29,9 +23,8 @@ module.exports = {
         authMiddleware,
         require('./ping.js'));
 
-    app.all(apiRoot + '/v1/sockets', authMiddleware);
-    app.resource(resourceApiRoot + 'v1/sockets',
-        require('./sockets.js'));
+    app.delete(apiRoot + '/v1/sockets/:socketId',
+      require('./sockets.js'));
 
     app.get(apiRoot + '/v1/repo-info',
         authMiddleware,
