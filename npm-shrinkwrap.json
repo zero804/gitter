@@ -1388,6 +1388,18 @@
         }
       }
     },
+    "gitter-faye-redis": {
+      "version": "0.4.4",
+      "from": "gitter-faye-redis@*",
+      "resolved": "http://beta-internal:8089/nexus/content/groups/npm/gitter-faye-redis/-/gitter-faye-redis-0.4.4.tgz",
+      "dependencies": {
+        "redis": {
+          "version": "0.12.1",
+          "from": "redis@*",
+          "resolved": "http://beta-internal:8089/nexus/content/groups/npm/redis/-/redis-0.12.1.tgz"
+        }
+      }
+    },
     "gitter-markdown-processor": {
       "version": "7.1.3",
       "from": "https://registry.npmjs.org/gitter-markdown-processor/-/gitter-markdown-processor-7.1.3.tgz",
