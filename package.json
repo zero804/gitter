@@ -24,7 +24,7 @@
     "express3-handlebars": "~0.4.1",
     "faye-redis": "git://github.com/gitterHQ/faye-redis-node#v0.3.0",
     "faye-websocket": "^0.7.2",
-    "gitter-env": "^0.15.4",
+    "gitter-env": "^0.15.6",
     "gitter-markdown-processor": "^7.1.3",
     "gitter-passport-http-bearer": "^1.1.0",
     "gitter-redis-scripto": "^0.2.0",
