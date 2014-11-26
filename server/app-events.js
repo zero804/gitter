@@ -5,8 +5,8 @@ var events = require('events');
 
 var winston = require('./utils/winston');
 var redis = require('./utils/redis');
-var client = redis.createClient();
-var pubClient = redis.createClient();
+var client = redis.createClient(); // Needs it's own client
+var pubClient = redis.getClient();
 var eventEmitter = new events.EventEmitter();
 var localEventEmitter = new events.EventEmitter();
 var shutdown = require('shutdown');
