@@ -3,6 +3,12 @@ var template = require('../utils/compile-template')('/js/views/menu/tmpl/profile
 var _ = require('underscore');
 
 module.exports = function (model) {
-  var data = _.extend(model, { user: { username: 'phuu' }, displayName: 'Walter Carvalho' });
+  var data = {
+    user: {
+      username: model.username
+    },
+    displayName: model.displayName
+  };
+
   return template(data);
 };
