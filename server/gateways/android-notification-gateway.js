@@ -2,10 +2,11 @@
 "use strict";
 
 var gcm = require('node-gcm');
+var nconf = require('../utils/config');
 
 var MAX_RETRIES = 4;
 
-var sender = new gcm.Sender('AIzaSyDqtgtECRTUmyX7SZK6bllu_Gd9ySc_Oxs');
+var sender = new gcm.Sender(nconf.get('gcm:apiKey'));
 
 var sendNotificationToDevice = function(notification, badge, device, callback) {
   if(!notification) {
