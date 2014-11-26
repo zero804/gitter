@@ -1,7 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var winston = require('../../utils/winston');
+var logger = require('../../utils/env').logger;
 var pushNotificationService = require('../../services/push-notification-service');
 
 module.exports = function(req, res, next) {
@@ -11,7 +11,7 @@ module.exports = function(req, res, next) {
   var appVersion = req.body.version;
   var userId = req.user.id;
 
-  winston.info("GCM device registration", { deviceId: deviceId, deviceName: deviceName });
+  logger.info("GCM device registration", { deviceId: deviceId, deviceName: deviceName });
   pushNotificationService.registerAndroidDevice(deviceId, deviceName, registrationId, appVersion, userId, function(err) {
     if(err) return next(err);
 
