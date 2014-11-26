@@ -1,5 +1,5 @@
 "use strict";
-var $ = require('jquery');
+
 var _ = require('underscore');
 var context = require('utils/context');
 var Faye = require('faye');
@@ -212,10 +212,9 @@ module.exports = (function() {
 
   var snapshotExtension = new SnapshotExtension();
 
-  var AccessTokenFailureExtension = function() {
-  };
-
   var terminating = false;
+
+  var AccessTokenFailureExtension = function() {};
 
   AccessTokenFailureExtension.prototype.incoming = function(message, callback) {
     if(message.error && message.advice && message.advice.reconnect === 'none') {
@@ -238,6 +237,34 @@ module.exports = (function() {
     callback(message);
   };
 
+  var SequenceGapDetectorExtension = function() {
+    this._seq = 0;
+    appEvents.on('realtime:newConnectionEstablished', this.reset, this);
+  };
+
+  SequenceGapDetectorExtension.prototype = {
+    incoming: function(message, callback) {
+      var c = message.ext && message.ext.c;
+      var channel = message.channel;
+      if(c && channel && channel.indexOf('/meta') !== 0) {
+
+        var current = this._seq;
+        this._seq = c;
+
+        if (c !== current + 1) {
+          log.warn('Message on channel ' + channel + ' out of sequence. Expected ' + (current + 1) + ' got ' + c);
+        }
+
+      }
+      callback(message);
+    },
+
+    reset: function() {
+      this._seq = 0;
+    }
+  };
+
+
   var BRIDGE_NOTIFICATIONS = {
     user_notification: 1,
     activity: 1
@@ -256,6 +283,7 @@ module.exports = (function() {
     client.addExtension(new ClientAuth());
     client.addExtension(snapshotExtension);
     client.addExtension(new AccessTokenFailureExtension());
+    client.addExtension(new SequenceGapDetectorExtension());
     client.addExtension(new ErrorLogger());
 
     var userSubscription;
