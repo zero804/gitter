@@ -10,7 +10,8 @@ var rankAttributes = function (fold, attr) {
 var RANK = [
   'lastMentionTime', // most important
   'lastUnreadItemTime',
-  'lastAccessTimeNoSync' // least important
+  'lastAccessTimeNoSync',
+  'lastAccessTime' // least important
 ].reduce(rankAttributes, {});
 
 function natural(a, b) {
@@ -21,14 +22,20 @@ function natural(a, b) {
 function getRank(room) {
   if (room.lastMentionTime) return RANK.lastMentionTime;
   if (room.lastUnreadItemTime) return RANK.lastUnreadItemTime;
-  if (room.lastAccessTimeNoSync) return RANK.lastAccessTimeNoSync;
-  return 3;
+
+  if (room.lastAccessTimeNoSync) {
+    return RANK.lastAccessTimeNoSync;
+  } else if (room.lastAccessTime) {
+    return RANK.lastAccessTime;
+  }
+
+  return Object.keys(RANK).length + 1;
 }
 
 function timeDifference(a, b, rank) {
   var property = Object.keys(RANK)[rank];
   if (!property) return 0;
-  return b[property].valueOf() - a[property].valueOf();
+  return new Date(b[property]).valueOf() - new Date(a[property]).valueOf();
 }
 
 // it is worth noticing that we want to sort in a descindencing order, thus the negative results
@@ -59,7 +66,7 @@ module.exports = {
       var aRank = getRank(a);
       var bRank = getRank(b);
 
-      if(aRank === bRank) {
+      if (aRank === bRank) {
         return timeDifference(a, b, aRank);
       } else {
         return aRank - bRank;
