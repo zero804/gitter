@@ -14,7 +14,7 @@ var logger        = env.logger;
 
 
 var redis         = require('../../utils/redis');
-var redisClient   = redis.createClient();
+var redisClient   = redis.getClient();
 
 function fixUrl(url) {
   return url.replace(nconf.get('transloadit:bucket') + '.s3.amazonaws.com', nconf.get('transloadit:cname'));

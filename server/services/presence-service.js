@@ -708,10 +708,14 @@ function validateUsersSubset(userIds, callback) {
   winston.debug('Validating users', { userIds: userIds });
 
   // Use a new client due to the WATCH semantics (don't use getClient!)
-  var rc = redis.createClient();
-  var redisWatchClient = redis.exposeUnderlyingClient(rc);
+  redis.createTransientClient(function(err, redisWatchClient) {
+    if(err) return callback(done);
 
-  redisWatchClient.once('ready', function() {
+    function done(err) {
+      redis.quit(redisWatchClient);
+      return callback(err);
+    }
+
     redisWatchClient.watch(userIds.map(keyUserLock), introduceDelayForTesting(function(err) {
       if(err) return done(err);
 
@@ -843,11 +847,6 @@ function validateUsersSubset(userIds, callback) {
     }));
   });
 
-  function done(err) {
-    redis.quit(rc);
-    return callback(err);
-  }
-
 
 
 
@@ -953,4 +952,3 @@ presenceService.testOnly = {
 
 
 module.exports = presenceService;
-
