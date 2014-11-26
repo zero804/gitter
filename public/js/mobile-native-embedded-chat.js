@@ -35,12 +35,10 @@ onready(function() {
 
   cordovaNav.syncNativeWithWebContext(context.troupe());
 
-  var chatCollection = new chatModels.ChatCollection();
+  var chatCollection = new chatModels.ChatCollection(null, { listen: true });
   cacheSync.install(chatCollection);
-  chatCollection.listen();
 
-  var userCollection = new userModels.UserCollection();
-  userCollection.listen();
+  var userCollection = new userModels.UserCollection(null, { listen: true });
 
   var chatCollectionView = new ChatCollectionView({
     el: $('#content-frame'),
@@ -64,4 +62,3 @@ onready(function() {
 
   $('html').removeClass('loading');
 });
-

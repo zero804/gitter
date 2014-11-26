@@ -3,8 +3,6 @@
 
 module.exports = {
   install: function(app, apiRoot, authMiddleware) {
-    var resourceApiRoot = apiRoot ? apiRoot.substring(1) + '/' : '';
-
     // app.post(apiRoot + '/v1/location',
     //     authMiddleware,
     //     require('./location.js'));
@@ -25,9 +23,8 @@ module.exports = {
         authMiddleware,
         require('./ping.js'));
 
-    app.all(apiRoot + '/v1/sockets', authMiddleware);
-    app.resource(resourceApiRoot + 'v1/sockets',
-        require('./sockets.js'));
+    app.delete(apiRoot + '/v1/sockets/:socketId',
+      require('./sockets.js'));
 
     app.get(apiRoot + '/v1/repo-info',
         authMiddleware,

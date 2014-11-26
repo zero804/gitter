@@ -1,5 +1,6 @@
 "use strict";
 var $ = require('jquery');
+var nanoscrollWrapper = require('../../utils/nanoscroll-wrapper');
 var Marionette = require('marionette');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
@@ -14,6 +15,7 @@ var template = require('./tmpl/troupeMenu.hbs');
 var CollectionWrapperViewTemplate = require('./tmpl/collection-wrapper-view.hbs');
 var ProfileView = require('./profileView');
 var OrgCollectionView = require('./orgCollectionView');
+
 require('nanoscroller');
 
 module.exports = (function () {
@@ -70,6 +72,7 @@ module.exports = (function () {
     selectedListIcon: "icon-troupes",
 
     ui: {
+      nano: '.nano',
       profile: '#left-menu-profile',
       recent: '#list-recents',
       favs: '#list-favs',
@@ -125,14 +128,6 @@ module.exports = (function () {
         var index = self.getIndexForId(id);
         if (index) self.selectedIndex = index;
       });
-
-      // nanoscroller has to be reset when regions are rerendered
-      // this.regionManager.forEach(function (region) {
-      //   self.listenTo(region, 'show', function () {
-      //     var $nano = this.$el.find('.nano');
-      //     $nano.nanoScroller({ iOSNativeScrolling: true });
-      //   });
-      // });
 
       // determining whether we should show the suggested rooms or not
       var hasItems = troupeCollections.troupes && !!(troupeCollections.troupes.length);
@@ -214,7 +209,9 @@ module.exports = (function () {
     show: function () {
       var ui = this.ui;
 
-      new ProfileView({ el: ui.profile });
+      if(!this.nano) {
+        this.nano = nanoscrollWrapper(this.ui.nano[0], { iOSNativeScrolling: true });
+      }
 
       // mega-list: recent troupe view
       new RoomCollectionView({
@@ -266,4 +263,3 @@ module.exports = (function () {
   return View;
 
 })();
-

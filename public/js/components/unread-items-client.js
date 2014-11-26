@@ -14,7 +14,7 @@ module.exports = (function() {
 
 
   function limit(fn, context, timeout) {
-    return _.debounce(_.bind(fn, context), timeout || 30);
+    return _.throttle(fn.bind(context), timeout || 30, { leading: false });
   }
 
   function _iteratePreload(items, fn, context) {
@@ -381,6 +381,13 @@ module.exports = (function() {
         return;
       }
 
+      this._scrollBounds();
+
+      this._windowScrollLimited();
+    },
+
+    /** Accumulate the scroll bounds, making them larger only */
+    _scrollBounds: function() {
       var scrollTop = this._scrollElement.scrollTop;
       var scrollBottom = scrollTop + this._scrollElement.clientHeight;
 
@@ -391,14 +398,14 @@ module.exports = (function() {
       if(!this._scrollBottom || scrollBottom > this._scrollBottom) {
         this._scrollBottom = scrollBottom;
       }
-
-      this._windowScrollLimited();
     },
 
     _windowScroll: function() {
       if(!this._inFocus) {
         return;
       }
+
+      this._scrollBounds();
 
       var self = this;
 
@@ -649,4 +656,3 @@ module.exports = (function() {
   return unreadItemsClient;
 
 })();
-
