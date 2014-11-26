@@ -4,6 +4,6 @@
 module.exports = {
   install: function(app, apiRoot, authMiddleware) {
     // android devices with google cloud messaging
-    app.post('/gcm', authMiddleware, require('./gcm'));
+    app.post(apiRoot + '/gcm', authMiddleware, require('./gcm'));
   }
 };
