@@ -1,6 +1,6 @@
 'use strict';
 
-var mutant = require('mutant')
+var Mutant = require('mutant');
 var $ = require('jquery');
 var _ = require('underscore');
 require('nanoscroller');
