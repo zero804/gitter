@@ -7,7 +7,7 @@ var nconf             = env.config;
 var stats             = env.stats;
 
 var faye              = require('./faye-node');
-var fayeRedis         = require('faye-redis');
+var fayeRedis         = require('gitter-faye-redis');
 var oauth             = require('../services/oauth-service');
 var presenceService   = require('../services/presence-service');
 var shutdown          = require('shutdown');
@@ -341,9 +341,13 @@ var server = new faye.NodeAdapter({
   engine: {
     type: fayeRedis,
     client: env.redis.getClient(),
-    subscriberClient: env.redis.createClient(),
+    subscriberClient: env.redis.createClient(), // Subscribe. Needs new client
     interval: nconf.get('ws:fayeInterval'),
-    namespace: 'fr:'
+    includeSequence: true,
+    namespace: 'fr:',
+    statsDelegate: function(category, event) {
+      stats.eventHF('bayeux.' + category + '.' + event, 1);
+    }
   }
 });
 
@@ -469,4 +473,3 @@ module.exports = {
     server.attach(httpServer);
   }
 };
-
