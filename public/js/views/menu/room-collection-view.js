@@ -15,7 +15,6 @@ require('bootstrap_tooltip');
 
 module.exports = (function() {
 
-
   /* @const */
   var MAX_UNREAD = 99;
 
@@ -45,7 +44,8 @@ module.exports = (function() {
         this.updateCurrentRoom(parser.pathname);
       });
     },
-    updateCurrentRoom: function(newUrl) {
+
+    updateCurrentRoom: function (newUrl) {
       var url = newUrl || window.location.pathname;
       var isCurrentRoom = this.model.get('url') === url;
 
@@ -55,6 +55,7 @@ module.exports = (function() {
         this.render();
       }
     },
+
     serializeData: function() {
       var data = this.model.toJSON();
       data.name = roomNameTrimmer(data.name, MAX_NAME_LENGTH);
@@ -74,13 +75,22 @@ module.exports = (function() {
       e.stopPropagation();
 
       // We can't use the room resource as the room might not be the current one
-      apiClient.delete('/v1/rooms/' + this.model.id + '/users/' + context.getUserId());
+      apiClient
+        .delete('/v1/rooms/' + this.model.id + '/users/' + context.getUserId())
+        .then(function (response) {
+          // leaving the room that you are in should take you home
+          if (this.model.get('url') === window.location.pathname) {
+            appEvents.trigger('navigation', context.getUser().url, 'home', '');
+          }
+        }.bind(this))
+        .fail(function (err) {
+          // user couldn't leave room
+        });
     },
 
     onRender: function() {
       var self = this;
-
-      this.$el.toggleClass('room-list-item--current-room', this.isCurrentRoom);
+      this.$el.toggleClass('room-list-item--current-room', !!this.isCurrentRoom);
 
       var m = self.model;
       dataset.set(self.el, 'id', m.id);
@@ -179,15 +189,17 @@ module.exports = (function() {
     },
 
     initialize: function(options) {
-      // this.listenTo(this.collection, 'add', this.render);
 
-      if(options.rerenderOnSort) {
-        this.listenTo(this.collection, 'sort', this.render);
+      if (options.rerenderOnSort) {
+        this.listenTo(this.collection, 'sort', function () {
+          this.render();
+        }.bind(this));
       }
 
-      if(options.draggable) {
+      if (options.draggable) {
         this.makeDraggable(options.dropTarget);
       }
+
       this.roomsCollection = options.roomsCollection;
     },
 

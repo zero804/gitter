@@ -11,7 +11,7 @@
           <ul class="room-list">
           {{!-- put filtered favourites in here --}}
             {{#each rooms.favourites}}
-              <li class="room-list-item" data-id="{{ this.id }}">{{{ prerenderRoomListItem this }}}</li>
+              <li class="room-list-item  {{#if selected}}room-list-item--current-room{{/if}}" data-id="{{ this.id }}">{{{ prerenderRoomListItem this }}}</li>
             {{/each}}
           </ul>
         </div>
@@ -19,7 +19,7 @@
           {{!-- put filtered recents in here. remember also that notifications will appear in here if they aren't in favourites --}}
           <ul class="room-list">
             {{#each rooms.recents}}
-              <li class="room-list-item" data-id="{{ this.id }}">
+              <li class="room-list-item {{#if selected}}room-list-item--current-room{{/if}}" data-id="{{ this.id }}">
               {{{ prerenderRoomListItem this }}}
               </li>
             {{/each}}</ul>
