@@ -34,11 +34,8 @@ onready(function() {
     window.location.href = url;
   });
 
-  var chatCollection = new chatModels.ChatCollection();
-  chatCollection.listen();
-
-  var userCollection = new userModels.UserCollection();
-  userCollection.listen();
+  var chatCollection = new chatModels.ChatCollection(null, { listen: true });
+  var userCollection = new userModels.UserCollection(null, { listen: true, limit: 21 });
 
   var chatCollectionView = new ChatCollectionView({
     el: $('#content-frame'),
@@ -81,4 +78,3 @@ onready(function() {
 
 
 });
-
