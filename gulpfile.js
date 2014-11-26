@@ -87,6 +87,16 @@ gulp.task('test', function() {
     }));
 });
 
+gulp.task('localtest', function() {
+  return gulp.src(['./test/integration/**/*.js'], { read: false })
+    .pipe(mocha({
+      reporter: 'spec',
+      env: {
+        NODE_ENV: 'test'
+      }
+    }));
+});
+
 gulp.task('copy-app-files', function() {
   return gulp.src([
       '.npmrc',
