@@ -3,6 +3,9 @@
 
 module.exports = {
   install: function(app, apiRoot, authMiddleware) {
+
+    require('./private').install(app, apiRoot + '/v1/private', authMiddleware);
+
     // app.post(apiRoot + '/v1/location',
     //     authMiddleware,
     //     require('./location.js'));
@@ -17,11 +20,6 @@ module.exports = {
     app.post(apiRoot + '/v1/userapn',
         authMiddleware,
         require('./userapn.js'));
-
-    // android devices with google cloud messaging
-    app.post(apiRoot + '/v1/gcm',
-        authMiddleware,
-        require('./gcm.js'));
 
     app.post(apiRoot + '/v1/eyeballs',
         authMiddleware,
