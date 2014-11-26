@@ -540,33 +540,30 @@ describe('presenceService', function() {
   it('should abort the transaction when correcting the socket and an event occurs for the user', function(done) {
     var userId = 'TESTUSER4' + Date.now();
     var socketId = 'TESTSOCKET5' + Date.now();
-    var troupeId = 'TESTTROUPE4' + Date.now();
 
     presenceService.userSocketConnected(userId, socketId, 'online', 'test', null, null, function(err) {
       if(err) return done(err);
 
-      var redisClient = redis.createClient();
-      redisClient.on('ready', function() {
+      var redisClient = redis.getClient();
 
-        // now mess things up intentionally
-        redisClient.zincrby(presenceService.testOnly.ACTIVE_USERS_KEY, 1, userId, function(err) {
-          if(err) return done(err);
+      // now mess things up intentionally
+      redisClient.zincrby(presenceService.testOnly.ACTIVE_USERS_KEY, 1, userId, function(err) {
+        if(err) return done(err);
 
-          presenceService.testOnly.forceDelay = true;
-          presenceService.testOnly.onAfterDelay = function(callback) {
-            presenceService.socketDisconnected(socketId, callback);
-          };
+        presenceService.testOnly.forceDelay = true;
+        presenceService.testOnly.onAfterDelay = function(callback) {
+          presenceService.socketDisconnected(socketId, callback);
+        };
 
-          presenceService.testOnly.validateUsersSubset([userId], function(err) {
-            presenceService.testOnly.forceDelay = false;
-            presenceService.testOnly.onAfterDelay = null;
+        presenceService.testOnly.validateUsersSubset([userId], function(err) {
+          presenceService.testOnly.forceDelay = false;
+          presenceService.testOnly.onAfterDelay = null;
 
-            assert(err, 'Expected an error');
-            assert(err.rollback, 'Expected a transaction rollback');
-            done();
-          });
-
+          assert(err, 'Expected an error');
+          assert(err.rollback, 'Expected a transaction rollback');
+          done();
         });
+
 
       });
     });
@@ -757,4 +754,3 @@ describe('presenceService', function() {
   });
 
 });
-
