@@ -213,6 +213,8 @@ module.exports = (function () {
         this.nano = nanoscrollWrapper(this.ui.nano[0], { iOSNativeScrolling: true });
       }
 
+      new ProfileView({ el: ui.profile });
+
       // mega-list: recent troupe view
       new RoomCollectionView({
         collection: troupeCollections.favourites,
