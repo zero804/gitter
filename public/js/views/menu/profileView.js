@@ -12,11 +12,17 @@ module.exports = (function() {
 
   return Marionette.ItemView.extend({
     template: template,
+
     events: {
       "click #link-home": 'homeClicked'
     },
+
     behaviors: {
       Widgets: {}
+    },
+
+    initialize: function () {
+      this.render();
     },
 
     serializeData: function() {
