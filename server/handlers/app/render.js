@@ -10,8 +10,20 @@ var social             = require('../social-metadata');
 var PersistenceService = require('../../services/persistence-service');
 var restSerializer     = require("../../serializers/rest-serializer");
 var burstCalculator   = require('../../utils/burst-calculator');
+
 var userSort = require('../../../public/js/utils/user-sort');
 var roomSort = require('../../../public/js/utils/room-sort');
+var roomNameTrimmer = require('../../../public/js/utils/room-name-trimmer');
+
+var trimRoomName = function (room) {
+  room.name = roomNameTrimmer(room.name);
+  return room;
+};
+
+var isSelected = function (uri, room) {
+  room.selected = room.uri === uri;
+  return room;
+};
 
 var avatar   = require('../../utils/avatar');
 var _                 = require('underscore');
@@ -81,6 +93,8 @@ function renderMainFrame(req, res, next, frame) {
   var user = req.user;
   var userId = user && user.id;
 
+  var uri = req.troupe && req.troupe.uri;
+
   Q.all([
     contextGenerator.generateNonChatContext(req),
     restful.serializeTroupesForUser(userId),
@@ -100,6 +114,10 @@ function renderMainFrame(req, res, next, frame) {
         bootScriptName = 'router-nli-app';
       }
 
+      // pre-processing rooms
+      rooms = rooms
+        .map(isSelected.bind(null, uri))
+        .map(trimRoomName);
 
       res.render(template, {
         socialMetadata: social.getMetadata({ room: req.troupe }),
@@ -116,8 +134,12 @@ function renderMainFrame(req, res, next, frame) {
         showFooterButtons: true,
         user: user,
         rooms: {
-          favourites: rooms.filter(roomSort.favourites.filter).sort(roomSort.favourites.sort),
-          recents: rooms.filter(roomSort.recents.filter).sort(roomSort.recents.sort)
+          favourites: rooms
+            .filter(roomSort.favourites.filter)
+            .sort(roomSort.favourites.sort),
+          recents: rooms
+            .filter(roomSort.recents.filter)
+            .sort(roomSort.recents.sort)
         },
         orgs: orgs
       });
