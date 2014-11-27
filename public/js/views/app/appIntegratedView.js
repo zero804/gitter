@@ -1,11 +1,11 @@
 "use strict";
 var $ = require('jquery');
 var Marionette = require('marionette');
+var TroupeMenuView = require('views/menu/troupeMenu')
 var uiVars = require('views/app/uiVars');
 var modalRegion = require('components/modal-region');
 
-module.exports = (function() {
-
+module.exports = (function () {
 
   /** @const */
   var BACKSPACE = 8;
@@ -25,17 +25,15 @@ module.exports = (function() {
     "click #troupe-more-actions":       "toggleTroupeMenu"
   };
 
-  var AppIntegratedLayout = Marionette.Layout.extend({
+  var AppIntegratedLayout = Marionette.ItemView.extend({
 
     el: 'body',
 
-    regions: {
-      leftMenuRegion: "#left-menu"
-    },
-
     events: uiVars.isMobile ? touchEvents : mouseEvents,
 
-    initialize: function() {
+    initialize: function () {
+      this.bindUIElements();
+      this.menu = new TroupeMenuView({ el: this.$el.find('#left-menu') });
       this.dialogRegion = modalRegion;
       this._leftMenuLockCount = 0;
     },

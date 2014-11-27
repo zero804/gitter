@@ -1,6 +1,7 @@
 "use strict";
 var $ = require('jquery');
 var context = require('utils/context');
+var resolveIconClass = require('utils/resolve-icon-class');
 var apiClient = require('components/apiClient');
 var roomNameTrimmer = require('utils/room-name-trimmer');
 var Marionette = require('marionette');
@@ -14,27 +15,11 @@ require('bootstrap_tooltip');
 
 module.exports = (function() {
 
-
   /* @const */
   var MAX_UNREAD = 99;
 
   /* @const */
   var MAX_NAME_LENGTH = 25;
-
-  function getIconClass(model) {
-    var iconName = model.get('githubType').toLowerCase();
-
-    // repo_channel, user_channel etc
-    if(iconName.indexOf('channel') >= 0) {
-      iconName = 'channel';
-    }
-
-    if(model.get('favourite')) {
-      iconName = 'favourite';
-    }
-
-    return 'room-list-item__name--' + iconName;
-  }
 
   var RoomListItemView = Marionette.ItemView.extend({
     tagName: 'li',
@@ -59,7 +44,8 @@ module.exports = (function() {
         this.updateCurrentRoom(parser.pathname);
       });
     },
-    updateCurrentRoom: function(newUrl) {
+
+    updateCurrentRoom: function (newUrl) {
       var url = newUrl || window.location.pathname;
       var isCurrentRoom = this.model.get('url') === url;
 
@@ -69,10 +55,11 @@ module.exports = (function() {
         this.render();
       }
     },
+
     serializeData: function() {
       var data = this.model.toJSON();
       data.name = roomNameTrimmer(data.name, MAX_NAME_LENGTH);
-      data.iconClass = getIconClass(this.model);
+      data.iconClass = resolveIconClass(this.model);
       return data;
     },
     onItemClose: function(e) {
@@ -88,13 +75,22 @@ module.exports = (function() {
       e.stopPropagation();
 
       // We can't use the room resource as the room might not be the current one
-      apiClient.delete('/v1/rooms/' + this.model.id + '/users/' + context.getUserId());
+      apiClient
+        .delete('/v1/rooms/' + this.model.id + '/users/' + context.getUserId())
+        .then(function (response) {
+          // leaving the room that you are in should take you home
+          if (this.model.get('url') === window.location.pathname) {
+            appEvents.trigger('navigation', context.getUser().url, 'home', '');
+          }
+        }.bind(this))
+        .fail(function (err) {
+          // user couldn't leave room
+        });
     },
 
     onRender: function() {
       var self = this;
-
-      this.$el.toggleClass('room-list-item--current-room', this.isCurrentRoom);
+      this.$el.toggleClass('room-list-item--current-room', !!this.isCurrentRoom);
 
       var m = self.model;
       dataset.set(self.el, 'id', m.id);
@@ -184,18 +180,33 @@ module.exports = (function() {
     className: 'room-list',
     itemView: RoomListItemView,
 
-    initialize: function(options) {
-      if(options.rerenderOnSort) {
-        this.listenTo(this.collection, 'sort', this.render);
+    itemViewOptions: function (item) {
+      var options = {};
+      if (item && item.id) {
+        options.el = this.$el.find('.room-list-item[data-id="' + item.id + '"]')[0];
       }
-      if(options.draggable) {
+      return options;
+    },
+
+    initialize: function(options) {
+
+      if (options.rerenderOnSort) {
+        this.listenTo(this.collection, 'sort', function () {
+          this.render();
+        }.bind(this));
+      }
+
+      if (options.draggable) {
         this.makeDraggable(options.dropTarget);
       }
+
       this.roomsCollection = options.roomsCollection;
     },
+
     makeDraggable: function(drop) {
       var cancelDrop = false;
       var self = this;
+
       this.$el.sortable({
         group: 'mega-list',
         pullPlaceholder: false,
