@@ -1973,6 +1973,18 @@
       "from": "mongoose-q@0.0.13",
       "resolved": "http://beta-internal:8089/nexus/content/groups/npm/mongoose-q/-/mongoose-q-0.0.13.tgz"
     },
+    "node-gcm": {
+      "version": "0.9.12",
+      "from": "node-gcm@>=0.9.12 <0.10.0",
+      "resolved": "http://beta-internal:8089/nexus/content/groups/npm/node-gcm/-/node-gcm-0.9.12.tgz",
+      "dependencies": {
+        "debug": {
+          "version": "0.8.1",
+          "from": "debug@>=0.8.1 <0.9.0",
+          "resolved": "http://beta-internal:8089/nexus/content/groups/npm/debug/-/debug-0.8.1.tgz"
+        }
+      }
+    },
     "node-resque": {
       "version": "0.8.7",
       "from": "node-resque@>=0.8.3 <0.9.0",
