@@ -10,6 +10,7 @@ var pushNotificationService = require("../services/push-notification-service");
 var unreadItemService = require("../services/unread-item-service");
 var apns = require('apn');
 var workerQueue = require('../utils/worker-queue');
+var androidGateway = require('./android-notification-gateway');
 
 var nexmo = require('easynexmo/lib/nexmo');
 nexmo.initialize('0b93c6bc', '483931e4');
@@ -191,11 +192,17 @@ function sendNotificationToDevice(notification, badge, device) {
   } else if(device.deviceType === 'SMS') {
     sendSMSMessage(device.mobileNumber, notification.smsText);
     sent = true;
+  } else if(device.deviceType === 'ANDROID') {
+    androidGateway.sendNotificationToDevice(notification, badge, device, function(err, data) {
+      if(err) return logger.error('android push notification failed', { err: err });
+
+      sent = true;
+
+      if(data) return logger.info('gcm push results', data);
+    });
   } else {
     logger.warn('Unknown device type: ' + device.deviceType);
   }
-
-  // Android/google push notification goes here
 
   // Blackberry push goes here
 
