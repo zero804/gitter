@@ -32,7 +32,9 @@
 
     <div class='wrap'>
       <div class="wrap-menu" id="left-menu">
-        <div class="js-menu menu"></div>
+        <div class="js-menu menu">
+          {{{ prerenderView "js/views/menu/tmpl/troupeMenu" }}}
+        </div>
       </div>
       <div class="trpLeftMenuHotspot" id="left-menu-hotspot"></div>
       <div class="trpMenuTab unread-count" id="menu-toggle-button">{{#if unreadCount}}{{unreadCount}}{{else}}0{{/if}}</div>

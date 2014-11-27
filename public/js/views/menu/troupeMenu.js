@@ -6,28 +6,25 @@ var context = require('utils/context');
 var appEvents = require('utils/appevents');
 var isMobile = require('utils/is-mobile');
 var troupeCollections = require('collections/instances/troupes');
-var RoomCollectionView = require('views/menu/room-collection-view');
+var RoomCollectionView = require('./room-collection-view');
 var SuggestedCollectionView = require('./suggested-collection-view');
 var log = require('utils/log');
 var cocktail = require('cocktail');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var template = require('./tmpl/troupeMenu.hbs');
 var CollectionWrapperViewTemplate = require('./tmpl/collection-wrapper-view.hbs');
-var SearchView = require('./searchView');
 var ProfileView = require('./profileView');
 var OrgCollectionView = require('./orgCollectionView');
 
 require('nanoscroller');
 
-module.exports = (function() {
-
+module.exports = (function () {
 
   // Reply back to the child iframe - used in search
   appEvents.on('troupeRequest', function (payload, evt) {
     var msg = { child_window_event: ['troupesResponse', troupeCollections.troupes] };
     evt.source.postMessage(JSON.stringify(msg), evt.origin);
   });
-
 
   // wraps a view to give us more control of when to display it or not
   var CollectionWrapperView = Marionette.Layout.extend({
@@ -41,7 +38,7 @@ module.exports = (function() {
     initialize: function (options) {
       this.collectionView = options.collectionView;
       this.collection = this.collectionView.collection;
-
+      this.listenTo(this.collection, 'sync', this.render);
       this.listenTo(this.collection, 'sync add reset remove', this.display);
     },
 
@@ -69,22 +66,18 @@ module.exports = (function() {
     }
   });
 
-  var View = Marionette.Layout.extend({
+  var View = Marionette.ItemView.extend({
     className: 'js-menu menu',
     template: template,
     selectedListIcon: "icon-troupes",
 
-    regions: {
-      profile: "#left-menu-profile",
-      recent: "#list-recents",
-      favs: "#list-favs",
-      // search: "#left-menu-list-search",
-      orgs: "#left-menu-list-orgs",
-      suggested: '#left-menu-list-suggested'
-    },
-
     ui: {
-      nano: '.nano'
+      nano: '.nano',
+      profile: '#left-menu-profile',
+      recent: '#list-recents',
+      favs: '#list-favs',
+      orgs: '#left-menu-list-orgs',
+      suggested: '#left-menu-list-suggested'
     },
 
     events: function() {
@@ -110,6 +103,9 @@ module.exports = (function() {
     },
 
     initialize: function() {
+      // console.log('troupeMenu:initialize() ====================');
+
+      this.bindUIElements();
       // this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
       this.repoList = false;
       var self = this;
@@ -133,7 +129,6 @@ module.exports = (function() {
         if (index) self.selectedIndex = index;
       });
 
-
       // determining whether we should show the suggested rooms or not
       var hasItems = troupeCollections.troupes && !!(troupeCollections.troupes.length);
 
@@ -148,6 +143,7 @@ module.exports = (function() {
           }
         });
       }
+      this.show();
     },
 
     // FIXME: WARNING -> THIS METHOD IS UNSAFE.
@@ -210,47 +206,53 @@ module.exports = (function() {
       };
     },
 
-    onRender: function () {
-      this.isRendered = true;
+    show: function () {
+      var ui = this.ui;
 
       if(!this.nano) {
         this.nano = nanoscrollWrapper(this.ui.nano[0], { iOSNativeScrolling: true });
       }
 
-      this.profile.show(new ProfileView());
+      new ProfileView({ el: ui.profile });
 
       // mega-list: recent troupe view
-      this.favs.show(new RoomCollectionView({
+      new RoomCollectionView({
         collection: troupeCollections.favourites,
         rerenderOnSort: true,
         draggable: true,
         dropTarget: true,
-        roomsCollection: troupeCollections.troupes
-      }));
+        roomsCollection: troupeCollections.troupes,
+        el: ui.favs
+      });
 
-      this.recent.show(new RoomCollectionView({
+      new RoomCollectionView({
         collection: troupeCollections.recentRoomsNonFavourites,
         rerenderOnSort: true,
         draggable: true,
         dropTarget: true,
-        roomsCollection: troupeCollections.troupes
-      }));
-
-      // search results collection view
-      // this.searchView = new SearchView({ troupes: troupeCollections.troupes, $input: this.$el.find('#list-search-input') });
-      // this.search.show(this.searchView);
+        roomsCollection: troupeCollections.troupes,
+        el: ui.recent
+      });
 
       // Organizations collection view
-      this.orgs.show(new CollectionWrapperView({
+      new CollectionWrapperView({
         collectionView: new OrgCollectionView({ collection: troupeCollections.orgs }),
-        header: 'Your Organizations'
-      }));
+        header: 'Your Organizations',
+        el: ui.orgs
+      });
 
       // Suggested repos (probably hidden at first)
-      this.suggested.show(new CollectionWrapperView({
+      new CollectionWrapperView({
         collectionView: new SuggestedCollectionView({ collection: troupeCollections.suggested }),
-        header: 'Suggested Rooms'
-      }));
+        header: 'Suggested Rooms',
+        el: ui.suggested
+      });
+    },
+
+    onRender: function () {
+      // console.log('onRender() ====================');
+      this.isRendered = true;
+      this.show();
     },
 
     toggleHeaderExpansion: function() {
