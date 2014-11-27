@@ -365,7 +365,7 @@ function getBadgeMarkdown(repo, content) {
 
   var imageUrl = conf.get('web:badgeBaseUrl') + '/Join Chat.svg';
   var linkUrl =  conf.get('web:basepath') + '/' + repo + '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge' + contentLink;
-  return '[![Gitter](' + imageUrl + ')](' + linkUrl + ')';
+  return '\n[![Gitter](' + imageUrl + ')](' + linkUrl + ')';
 }
 
 function sendBadgePullRequest(repo, user) {
