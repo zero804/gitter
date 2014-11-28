@@ -22,7 +22,7 @@ var mainFrameMiddlewarePipeline = [
   function (req, res, next) {
 
     if (req.uriContext.ownUrl) {
-      if(req.isPhone) {
+      if (req.isPhone) {
         appRender.renderMobileUserHome(req, res, next, 'home');
       } else {
         appRender.renderMainFrame(req, res, next, 'home');
@@ -32,6 +32,9 @@ var mainFrameMiddlewarePipeline = [
 
     if(req.isPhone) {
       if(!req.user) {
+        if (req.uriContext.accessDenied) {
+          return appRender.renderNotFound(req, res, next);
+        }
         appRender.renderMobileNotLoggedInChat(req, res, next);
         return;
       }
