@@ -4,14 +4,14 @@
 var PushNotificationDevice = require("./persistence-service").PushNotificationDevice;
 var winston                = require('../utils/winston');
 var nconf                  = require('../utils/config');
-var Fiber                  = require('../utils/fiber');
 var crypto                 = require('crypto');
 var _                      = require('underscore');
+var Q                      = require('q');
 var redis                  = require("../utils/redis");
 var mongoUtils             = require('../utils/mongo-utils');
 var redisClient            = redis.getClient();
 
-var Scripto                = require('redis-scripto');
+var Scripto                = require('gitter-redis-scripto');
 var scriptManager          = new Scripto(redisClient);
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/notify');
 
@@ -30,11 +30,36 @@ function buffersEqual(a,b) {
 
   return true;
 }
+
+function findAndRemoveDevicesWithDuplicateTokens(deviceId, deviceType, deviceToken, tokenHash) {
+  return PushNotificationDevice.findQ({
+      tokenHash: tokenHash,
+      deviceType: deviceType
+    }).then(function(devices) {
+      var devicesToRemove = devices.filter(function(device) {
+        // This device? Skip
+        if(device.deviceId === deviceId) return false;
+
+        // If the hashes are the same, we still need to check that the actual tokens are the same
+        if(device.deviceToken && deviceToken) {
+          if(!buffersEqual(device.deviceToken, deviceToken)) return false;
+        }
+
+        return true;
+      });
+
+      return Q.all(devicesToRemove.map(function(device) {
+        winston.verbose('Removing unused device ' + device.deviceId);
+        return device.removeQ();
+      }));
+    });
+}
+
 exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName, appVersion, appBuild, callback) {
   winston.verbose("Registering device ", { deviceId: deviceId });
   var tokenHash = crypto.createHash('md5').update(deviceToken).digest('hex');
 
-  PushNotificationDevice.findOneAndUpdate(
+  return PushNotificationDevice.findOneAndUpdateQ(
     { deviceId: deviceId },
     {
       deviceId: deviceId,
@@ -47,35 +72,41 @@ exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName,
       appBuild: appBuild,
       enabled: true
     },
-    { upsert: true },
-    function(err, device) {
-      if(err) return callback(err);
-
+    { upsert: true })
+    .then(function(device) {
       // After we've update the device, look for other devices that have given us the same token
       // these are probably phones that have been reset etc, so we need to prune them
-      PushNotificationDevice.find({
-        tokenHash: tokenHash,
-        deviceType: deviceType
-      }, function(err, results) {
-        var fiber = new Fiber();
+      return findAndRemoveDevicesWithDuplicateTokens(deviceId, deviceType, deviceToken, tokenHash)
+        .thenResolve(device);
+    })
+    .nodeify(callback);
+};
 
-        results.forEach(function(device) {
-          // This device? Skip
-          if(device.deviceId == deviceId) return;
+exports.registerAndroidDevice = function(deviceId, deviceName, registrationId, appVersion, userId, callback) {
+  winston.verbose("Registering device ", { deviceId: deviceId });
+  var tokenHash = crypto.createHash('md5').update(registrationId).digest('hex');
 
-          // If the hashes are the same, we still need to check that the actual tokens are the same
-          if(device.deviceToken && deviceToken) {
-            if(!buffersEqual(device.deviceToken, deviceToken)) return;
-          }
-
-          winston.verbose('Removing unused device ' + device.deviceId);
-          device.remove(fiber.waitor());
-        });
-
-        fiber.all().then(function() { callback(null, device); }).fail(callback);
-      });
-
-    });
+  return PushNotificationDevice.findOneAndUpdateQ(
+    { deviceId: deviceId },
+    {
+      userId: userId,
+      deviceId: deviceId,
+      androidToken: registrationId,
+      tokenHash: tokenHash,
+      deviceType: 'ANDROID',
+      deviceName: deviceName,
+      timestamp: new Date(),
+      appVersion: appVersion,
+      enabled: true
+    },
+    { upsert: true })
+    .then(function(device) {
+      // After we've update the device, look for other devices that have given us the same token
+      // these are probably phones that have been reset etc, so we need to prune them
+      return findAndRemoveDevicesWithDuplicateTokens(deviceId, 'ANDROID', registrationId, tokenHash)
+        .thenResolve(device);
+    })
+    .nodeify(callback);
 };
 
 exports.registerUser = function(deviceId, userId, callback) {

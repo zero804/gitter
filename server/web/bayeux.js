@@ -341,7 +341,7 @@ var server = new faye.NodeAdapter({
   engine: {
     type: fayeRedis,
     client: env.redis.getClient(),
-    subscriberClient: env.redis.createClient(),
+    subscriberClient: env.redis.createClient(), // Subscribe. Needs new client
     interval: nconf.get('ws:fayeInterval'),
     includeSequence: true,
     namespace: 'fr:',
@@ -473,4 +473,3 @@ module.exports = {
     server.attach(httpServer);
   }
 };
-

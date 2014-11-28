@@ -11,7 +11,7 @@ var redis            = require("../utils/redis");
 var winston          = require('../utils/winston');
 var mongoUtils       = require('../utils/mongo-utils');
 var RedisBatcher     = require('../utils/redis-batcher').RedisBatcher;
-var Scripto          = require('redis-scripto');
+var Scripto          = require('gitter-redis-scripto');
 var Q                = require('q');
 var assert           = require('assert');
 var redisClient      = redis.getClient();
@@ -67,86 +67,86 @@ function upgradeKeyToSortedSet(key, userBadgeKey, troupeId, callback) {
   winston.verbose('unread-item-key-upgrade: attempting to upgrade ' + key);
 
   // Use a new client due to the WATCH semantics (don't use getClient!)
-  var redisClient = redis.createClient();
-
-  function done(err) {
-    if(err) {
-      winston.verbose('unread-item-key-upgrade: upgrade failed' + err, { exception: err });
-    } else {
-      winston.verbose('unread-item-key-upgrade: upgrade completed successfully');
-    }
-
-    redis.quit(redisClient);
-
-    return callback(err);
-  }
-
-  /**
-   * Fairly certain that we don't need the userBadgeKey in the lock.
-   * If we did so, changes to other userTroupes could starve this
-   * transaction. Also all changes to the specific key on the userBadge
-   * that we are changing will always affect the `key` too so we'll
-   * be safe from inconsistencies that way.
-   *
-   * IF WE'RE GETTING INCONSISTENCIES, review this later!
-   */
-  redisClient.watch(key, function(err) {
-    if(err) return done(err);
-
-    redisClient.type(key, function(err, keyType) {
-      if(err) return done(err);
-
-      /* Go home redis, you're drunk */
-      keyType = ("" + keyType).trim();
-
-      /* If the key isn't a set our job is done */
-      if(keyType != 'set') {
-        winston.verbose('unread-item-key-upgrade: upgrade already happened: type=' + keyType);
-        return done();
+  redis.createTransientClient(function(err, redisClient) {
+    if(err) return callback(err);
+    
+    function done(err) {
+      if(err) {
+        winston.verbose('unread-item-key-upgrade: upgrade failed' + err, { exception: err });
+      } else {
+        winston.verbose('unread-item-key-upgrade: upgrade completed successfully');
       }
 
-      redisClient.smembers(key, function(err, itemIds) {
+      redis.quit(redisClient);
+
+      return callback(err);
+    }
+
+    /**
+     * Fairly certain that we don't need the userBadgeKey in the lock.
+     * If we did so, changes to other userTroupes could starve this
+     * transaction. Also all changes to the specific key on the userBadge
+     * that we are changing will always affect the `key` too so we'll
+     * be safe from inconsistencies that way.
+     *
+     * IF WE'RE GETTING INCONSISTENCIES, review this later!
+     */
+    redisClient.watch(key, function(err) {
+      if(err) return done(err);
+
+      redisClient.type(key, function(err, keyType) {
         if(err) return done(err);
 
-        var multi = redisClient.multi();
+        /* Go home redis, you're drunk */
+        keyType = ("" + keyType).trim();
 
-        var zaddArgs = [key];
+        /* If the key isn't a set our job is done */
+        if(keyType != 'set') {
+          winston.verbose('unread-item-key-upgrade: upgrade already happened: type=' + keyType);
+          return done();
+        }
 
-        var itemIdsWithScores = itemIds.map(function(itemId) {
-          var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
+        redisClient.smembers(key, function(err, itemIds) {
+          if(err) return done(err);
 
-          /* ZADD score member */
-          return [timestamp, itemId];
+          var multi = redisClient.multi();
+
+          var zaddArgs = [key];
+
+          var itemIdsWithScores = itemIds.map(function(itemId) {
+            var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
+
+            /* ZADD score member */
+            return [timestamp, itemId];
+          });
+
+
+          /* Sort by timestamp */
+          itemIdsWithScores.sort(function(a, b) {
+            return a[0] - b[0];
+          });
+
+          /* Truncate down to 100 */
+          itemIdsWithScores = itemIdsWithScores.slice(-100);
+
+          itemIdsWithScores.forEach(function(itemWithScore) {
+            /* ZADD score member */
+            zaddArgs.push(itemWithScore[0], itemWithScore[1]);
+          });
+
+          multi.del(key);
+          multi.zadd.apply(multi, zaddArgs);
+          multi.zrem(userBadgeKey, troupeId);
+          multi.zadd(userBadgeKey, itemIdsWithScores.length, troupeId);
+
+          multi.exec(done);
+
         });
 
-
-        /* Sort by timestamp */
-        itemIdsWithScores.sort(function(a, b) {
-          return a[0] - b[0];
-        });
-
-        /* Truncate down to 100 */
-        itemIdsWithScores = itemIdsWithScores.slice(-100);
-
-        itemIdsWithScores.forEach(function(itemWithScore) {
-          /* ZADD score member */
-          zaddArgs.push(itemWithScore[0], itemWithScore[1]);
-        });
-
-        multi.del(key);
-        multi.zadd.apply(multi, zaddArgs);
-        multi.zrem(userBadgeKey, troupeId);
-        multi.zadd(userBadgeKey, itemIdsWithScores.length, troupeId);
-
-        multi.exec(done);
 
       });
-
-
     });
   });
-
-
 }
 
 /**

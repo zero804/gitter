@@ -457,6 +457,8 @@ describe('mentions', function() {
 
 describe('emailnotifications', function() {
   it('should let you know who needs to be notified by email', function(done) {
+    this.timeout(10000);
+    
     var troupeId = mongoUtils.getNewObjectIdString();
     var userId = mongoUtils.getNewObjectIdString();
     var itemType = 'chat';
@@ -723,4 +725,3 @@ describe('emailnotifications', function() {
 });
 
 });
-
