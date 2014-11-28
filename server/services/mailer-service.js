@@ -180,7 +180,7 @@ function unreadViaMandrill(options, deferred) {
 }
 
 function createdRoomViaMandrill(options, deferred) {
-  var twitterSnippet = options.data.isPublic ? '<tr><td><br><a href="' + options.data.twitterUrl + '" style="text-decoration: none" target="_blank" class="button-twitter">Share on Twitter</a></td></tr>' : '';
+  var twitterSnippet = options.data.isPublic ? '<tr><td><br><a href="' + options.data.twitterURL + '" style="text-decoration: none" target="_blank" class="button-twitter">Share on Twitter</a></td></tr>' : '';
   var orgNote = options.data.isOrg ? '<p>Note that only people within your organisation can join this room.</p>' : '';
 
   var vars = [
@@ -198,6 +198,7 @@ function createdRoomViaMandrill(options, deferred) {
   return sendMail(vars, options, deferred);
 }
 
+// DEPRECATED
 function sendMail(vars, options, deferred) {
   var templateName = options.templateName;
   var tracking = options.tracking || {};
@@ -212,9 +213,9 @@ function sendMail(vars, options, deferred) {
   };
 
   mandrill.messages.sendTemplate({
-    template_name:    templateName,
+    template_name: templateName,
     template_content: [],
-    message:          message
+    message: message
   }, function() {
     if (logEmailToLogger) winston.info('Sent email: ' + templateName + ', check Mandrill');
     stats.event(tracking.event, tracking.data);
@@ -223,4 +224,3 @@ function sendMail(vars, options, deferred) {
     deferred.reject(err);
   });
 }
-
