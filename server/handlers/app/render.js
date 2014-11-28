@@ -21,7 +21,8 @@ var trimRoomName = function (room) {
 };
 
 var isSelected = function (uri, room) {
-  room.selected = room.uri === uri;
+  var roomURI = room.url.substr(1); // we do this because 1-to-1s don't have room.uri
+  room.selected = roomURI === uri;
   return room;
 };
 
@@ -93,7 +94,7 @@ function renderMainFrame(req, res, next, frame) {
   var user = req.user;
   var userId = user && user.id;
 
-  var uri = req.troupe && req.troupe.uri;
+  var uri = req.uriContext && req.uriContext.uri
 
   Q.all([
     contextGenerator.generateNonChatContext(req),
