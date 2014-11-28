@@ -10,7 +10,6 @@ var social             = require('../social-metadata');
 var PersistenceService = require('../../services/persistence-service');
 var restSerializer     = require("../../serializers/rest-serializer");
 var burstCalculator   = require('../../utils/burst-calculator');
-
 var userSort = require('../../../public/js/utils/user-sort');
 var roomSort = require('../../../public/js/utils/room-sort');
 var roomNameTrimmer = require('../../../public/js/utils/room-name-trimmer');
@@ -20,9 +19,8 @@ var trimRoomName = function (room) {
   return room;
 };
 
-var isSelected = function (uri, room) {
-  var roomURI = room.url.substr(1); // we do this because 1-to-1s don't have room.uri
-  room.selected = roomURI === uri;
+var markSelected = function (id, room) {
+  room.selected = room.id === id;
   return room;
 };
 
@@ -94,7 +92,7 @@ function renderMainFrame(req, res, next, frame) {
   var user = req.user;
   var userId = user && user.id;
 
-  var uri = req.uriContext && req.uriContext.uri
+  var selectedRoomId = req.troupe && req.troupe.id;
 
   Q.all([
     contextGenerator.generateNonChatContext(req),
@@ -117,7 +115,7 @@ function renderMainFrame(req, res, next, frame) {
 
       // pre-processing rooms
       rooms = rooms
-        .map(isSelected.bind(null, uri))
+        .map(markSelected.bind(null, selectedRoomId))
         .map(trimRoomName);
 
       res.render(template, {
