@@ -12,6 +12,10 @@ exports.createClient = function() {
   return env.redis.createClient();
 };
 
+exports.createTransientClient = function(callback) {
+  return env.redis.createTransientClient(callback);
+};
+
 exports.quit = function(client) {
   return env.redis.quitClient(client);
 };

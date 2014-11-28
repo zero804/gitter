@@ -3,7 +3,7 @@
 var Q                = require('q');
 var redis            = require("../utils/redis");
 var redisClient      = redis.getClient();
-var Scripto          = require('redis-scripto');
+var Scripto          = require('gitter-redis-scripto');
 
 var scriptManager    = new Scripto(redisClient);
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/collapsed');
