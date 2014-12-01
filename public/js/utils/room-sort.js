@@ -10,8 +10,7 @@ var rankAttributes = function (fold, attr) {
 var RANK = [
   'lastMentionTime', // most important
   'lastUnreadItemTime',
-  'lastAccessTimeNoSync',
-  'lastAccessTime' // least important
+  'lastAccessTimeNoSync'
 ].reduce(rankAttributes, {});
 
 function natural(a, b) {
@@ -19,14 +18,28 @@ function natural(a, b) {
   return a > b ? 1 : -1;
 }
 
+// TODO FIX THIS
 function getRank(room) {
-  if (room.lastMentionTime) return RANK.lastMentionTime;
-  if (room.lastUnreadItemTime) return RANK.lastUnreadItemTime;
+
+  if (room.lastMentionTime) {
+    return RANK.lastMentionTime;
+  } else if (room.mentions) {
+    room.lastMentionTime = room.lastAccessTime;
+    return RANK.lastMentionTime;
+  }
+
+  if (room.lastUnreadItemTime) {
+    return RANK.lastUnreadItemTime;
+  } else if (room.unreadItems) {
+    room.lastUnreadItemTime = room.lastAccessTime;
+    return RANK.lastUnreadItemTime;
+  }
 
   if (room.lastAccessTimeNoSync) {
     return RANK.lastAccessTimeNoSync;
   } else if (room.lastAccessTime) {
-    return RANK.lastAccessTime;
+    room.lastAccessTimeNoSync = room.lastAccessTime;
+    return RANK.lastAccessTimeNoSync;
   }
 
   return Object.keys(RANK).length + 1;
