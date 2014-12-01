@@ -103,7 +103,6 @@ module.exports = (function () {
     },
 
     initialize: function() {
-      // console.log('troupeMenu:initialize() ====================');
 
       this.bindUIElements();
       // this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
@@ -250,7 +249,6 @@ module.exports = (function () {
     },
 
     onRender: function () {
-      // console.log('onRender() ====================');
       this.isRendered = true;
       this.show();
     },
