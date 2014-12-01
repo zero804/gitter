@@ -26,15 +26,15 @@ module.exports = (function() {
         }
 
         if(this.get('unreadItems')) {
-          this.set('lastUnreadItemTime', moment());
+          this.set('lastUnreadItemTime', this.get('lastAccessTime').clone());
         }
 
         if(this.get('mentions')) {
-          this.set('lastMentionTime', moment());
+          this.set('lastMentionTime', this.get('lastAccessTime').clone());
         }
       }
 
-      this.listenTo(this, 'change:unreadItems', function(model, unreadItems) { // jshint unused:true
+      this.listenTo(this, 'change:unreadItems', function (model, unreadItems) { // jshint unused:true
         if(unreadItems) {
           this.set('lastUnreadItemTime', moment());
         }
