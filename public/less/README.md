@@ -73,7 +73,7 @@
 @l10: 1000;   /* shallow -> Popups and others */
 
 /* Type */
-@type: 'Open Sans', 'HelveticaNeue-Light', sans-serif;
+@type: 'Open Sans', 'HelveticaNeue', sans-serif;
 @type_size: 1em;
 @type_base: #444;
 
