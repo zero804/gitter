@@ -18,28 +18,21 @@ function natural(a, b) {
   return a > b ? 1 : -1;
 }
 
-// TODO FIX THIS
 function getRank(room) {
   var defaultTime = room.lastAccessTime || Date.now();
 
-  if (room.lastMentionTime) {
-    return RANK.lastMentionTime;
-  } else if (room.mentions) {
-    room.lastMentionTime = defaultTime;
+  if (room.lastMentionTime || room.mentions) {
+    room.lastMentionTime = room.lastMentionTime || defaultTime;
     return RANK.lastMentionTime;
   }
 
-  if (room.lastUnreadItemTime) {
-    return RANK.lastUnreadItemTime;
-  } else if (room.unreadItems) {
-    room.lastUnreadItemTime = defaultTime;
+  if (room.lastUnreadItemTime || room.unreadItems) {
+    room.lastUnreadItemTime = room.lastUnreadItemTime || defaultTime;
     return RANK.lastUnreadItemTime;
   }
 
-  if (room.lastAccessTimeNoSync) {
-    return RANK.lastAccessTimeNoSync;
-  } else if (room.lastAccessTime) {
-    room.lastAccessTimeNoSync = defaultTime;
+  if (room.lastAccessTimeNoSync || room.lastAccessTime) {
+    room.lastAccessTimeNoSync = room.lastAccessTimeNoSync || defaultTime;
     return RANK.lastAccessTimeNoSync;
   }
 

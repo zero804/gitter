@@ -23,18 +23,10 @@ module.exports = (function() {
         // this would make the left menu room list reorder itself all the time.
 
         // we may not always have a lastAccessTime
-        var time = this.get('lastAccessTime') ? this.get('lastAccessTime').clone() : Date.now();
+        var time = this.get('lastAccessTime');
 
-        if (this.get('lastAccessTime')) {
-          this.set('lastAccessTimeNoSync', time);
-        }
-
-        if (this.get('mentions')) {
-          this.set('lastMentionTime', time);
-        }
-
-        if (this.get('unreadItems')) {
-          this.set('lastUnreadItemTime', time);
+        if (time) {
+          this.set('lastAccessTimeNoSync', time.clone());
         }
       }
 
