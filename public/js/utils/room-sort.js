@@ -20,25 +20,26 @@ function natural(a, b) {
 
 // TODO FIX THIS
 function getRank(room) {
+  var defaultTime = room.lastAccessTime || Date.now();
 
   if (room.lastMentionTime) {
     return RANK.lastMentionTime;
   } else if (room.mentions) {
-    room.lastMentionTime = room.lastAccessTime;
+    room.lastMentionTime = defaultTime;
     return RANK.lastMentionTime;
   }
 
   if (room.lastUnreadItemTime) {
     return RANK.lastUnreadItemTime;
   } else if (room.unreadItems) {
-    room.lastUnreadItemTime = room.lastAccessTime;
+    room.lastUnreadItemTime = defaultTime;
     return RANK.lastUnreadItemTime;
   }
 
   if (room.lastAccessTimeNoSync) {
     return RANK.lastAccessTimeNoSync;
   } else if (room.lastAccessTime) {
-    room.lastAccessTimeNoSync = room.lastAccessTime;
+    room.lastAccessTimeNoSync = defaultTime;
     return RANK.lastAccessTimeNoSync;
   }
 
