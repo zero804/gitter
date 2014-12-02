@@ -16,21 +16,25 @@ module.exports = (function() {
       // only the original will be created with every attribute in the options object.
       var isOriginalModel = !!options.url;
 
-      if(isOriginalModel) {
+      if (isOriginalModel) {
+
         // we need to set these attributes when the original is created.
         // if we set them on every clone, then all these attributes would change when navigating to a room.
         // this would make the left menu room list reorder itself all the time.
 
-        if(this.get('lastAccessTime')) {
-          this.set('lastAccessTimeNoSync', this.get('lastAccessTime').clone());
+        // we may not always have a lastAccessTime
+        var time = this.get('lastAccessTime') ? this.get('lastAccessTime').clone() : Date.now();
+
+        if (this.get('lastAccessTime')) {
+          this.set('lastAccessTimeNoSync', time);
         }
 
-        if(this.get('unreadItems')) {
-          this.set('lastUnreadItemTime', this.get('lastAccessTime').clone());
+        if (this.get('mentions')) {
+          this.set('lastMentionTime', time);
         }
 
-        if(this.get('mentions')) {
-          this.set('lastMentionTime', this.get('lastAccessTime').clone());
+        if (this.get('unreadItems')) {
+          this.set('lastUnreadItemTime', time);
         }
       }
 
