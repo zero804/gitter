@@ -176,8 +176,9 @@ module.exports = (function() {
   });
 
   var CollectionView = Marionette.CollectionView.extend({
-    tagName: 'ul',
-    className: 'room-list',
+    // tagName: 'ul',
+    // className: 'room-list',
+
     itemView: RoomListItemView,
 
     itemViewOptions: function (item) {
@@ -188,13 +189,11 @@ module.exports = (function() {
       return options;
     },
 
-    initialize: function(options) {
+    initialize: function (options) {
       this.bindUIElements();
 
       if (options.rerenderOnSort) {
-        this.listenTo(this.collection, 'sort', function () {
-          this.render();
-        }.bind(this));
+        this.listenTo(this.collection, 'sort', this.bindUIElements);
       }
 
       if (options.draggable) {
@@ -209,43 +208,62 @@ module.exports = (function() {
       var self = this;
 
       this.$el.sortable({
-        group: 'mega-list',
+        group: 'list-mega',
         pullPlaceholder: false,
         drop: drop,
         distance: 8,
-        onDrag: function($item, position) {
-          $(".placeholder").html($item.html());
-          $item.css(position);
+
+        onDrag: function (item, position) {
+          $(".placeholder").html(item.html());
+          item.css(position);
         },
-        isValidTarget: function($item, container) {
-          if (container.el.parent().attr('id') == 'list-favs') {
-            $('.dragged').hide();
-            return true;
-          }
-          else {
-            $('.dragged').show();
-            return false;
-          }
-        },
+
         onDrop: function (item, container, _super) {
+          var position;
           var el = item[0];
-          if (!cancelDrop) {
+          var model = self.roomsCollection.get(dataset.get(el, 'id'));
+          var droppedAt = container.el.parent().attr('id');
+
+          if (droppedAt === 'list-favs') {
             var previousElement = el.previousElementSibling;
-            var favPosition;
-            if(!previousElement) {
-              favPosition = 1;
+
+            if (!previousElement) {
+              position = 1;
             } else {
-              var previousCollectionItem = self.roomsCollection.get(dataset.get(previousElement, 'id'));
-              favPosition = previousCollectionItem.get('favourite') + 1;
+              var previousModel = self.roomsCollection.get(dataset.get(previousElement, 'id'));
+              position = previousModel.get('favourite') + 1;
             }
-            var collectionItem = self.roomsCollection.get(dataset.get(el, 'id'));
-            collectionItem.set('favourite', favPosition);
-            collectionItem.save();
+
+            model.set('favourite', position);
+            model.save();
+          } else if (droppedAt === 'list-recents') {
+            model.set('favourite', false);
+            model.save();
           }
-          cancelDrop = false;
           _super(item, container);
         },
-        onCancel: function(item, container) {
+
+        // onDrop: function (item, container, _super) {
+        //   var el = item[0];
+        //   if (!cancelDrop) {
+        //     var previousElement = el.previousElementSibling;
+        //     var favPosition;
+        //     if(!previousElement) {
+        //       favPosition = 1;
+        //     } else {
+        //       var previousCollectionItem = self.roomsCollection.get(dataset.get(previousElement, 'id'));
+        //       favPosition = previousCollectionItem.get('favourite') + 1;
+        //     }
+        //     var collectionItem = self.roomsCollection.get(dataset.get(el, 'id'));
+        //     collectionItem.set('favourite', favPosition);
+        //     collectionItem.save();
+        //     console.log('saved ====================');
+        //   }
+        //   cancelDrop = false;
+        //   _super(item, container);
+        // },
+
+        onCancel: function (item, container) {
           cancelDrop = true;
           var el = item[0];
 
