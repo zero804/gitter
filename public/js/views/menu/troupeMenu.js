@@ -74,8 +74,8 @@ module.exports = (function () {
     ui: {
       nano: '.nano',
       profile: '#left-menu-profile',
-      recent: '#list-recents',
-      favs: '#list-favs',
+      recent: '#list-recents ul',
+      favs: '#list-favs ul',
       orgs: '#left-menu-list-orgs',
       suggested: '#left-menu-list-suggested'
     },
