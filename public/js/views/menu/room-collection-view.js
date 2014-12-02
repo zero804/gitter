@@ -189,6 +189,7 @@ module.exports = (function() {
     },
 
     initialize: function(options) {
+      this.bindUIElements();
 
       if (options.rerenderOnSort) {
         this.listenTo(this.collection, 'sort', function () {
