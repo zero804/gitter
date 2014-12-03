@@ -39,9 +39,10 @@ module.exports = (function() {
     'click .js-chat-item-edit':       'toggleEdit',
     'click .js-chat-item-collapse':   'toggleCollapse',
     'click .js-chat-item-readby':     'showReadBy',
+    'click .js-chat-item-from':       'mentionUser',
     'mouseover .js-chat-item-readby': 'showReadByIntent',
     'click .webhook':                 'expandActivity',
-    "click":                          'chatSelected'
+    'click':                          'chatSelected'
   };
 
   var touchEvents = {
@@ -536,6 +537,11 @@ module.exports = (function() {
 
       popover.show();
       ReadByPopover.singleton(this, popover);
+    },
+
+    mentionUser: function () {
+      var mention = "@" + this.model.get('fromUser').username + " ";
+      appEvents.trigger('input.append', mention);
     },
 
     chatSelected: function() {
