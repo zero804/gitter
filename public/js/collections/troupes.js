@@ -75,28 +75,28 @@ module.exports = (function() {
       }
     },
 
-    reorderFavs: function(event) {
+    reorderFavs: function(model) {
       /**
-       * We need to do some special reordering in the event of a favourite being positioned
+       * We need to do some special reordering in the model of a favourite being positioned
        * This is to mirror the changes happening on the server
        * @see recent-room-service.js@addTroupeAsFavouriteInPosition
        */
 
       /* This only applies when a fav has been set */
-      if(!event.changed || !event.changed.favourite || this.reordering) {
+      if(!model.changed || !model.changed.favourite || this.reordering) {
         return;
       }
 
       this.reordering = true;
 
-      var favourite = event.changed.favourite;
+      var favourite = model.changed.favourite;
 
       var forUpdate = this
                         .map(function(room) {
                           return { id: room.id, favourite: room.get('favourite') };
                         })
                         .filter(function(room) {
-                          return room.favourite >= favourite && room.id !== event.id;
+                          return room.favourite >= favourite && room.id !== model.id;
                         });
 
       forUpdate.sort(function(a, b) {
