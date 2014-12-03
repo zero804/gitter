@@ -3,13 +3,14 @@ var context = require('utils/context');
 var troupeModels = require('collections/troupes');
 var realtime = require('./realtime');
 var log = require('utils/log');
+var apiClient = require('components/apiClient');
 
 module.exports = (function() {
 
 
   function attachRoom(room) {
-    var userId = context.getUserId();
-    realtime.subscribe('/v1/user/' + userId + '/rooms', function(data) {
+    var url = apiClient.user.channel('/rooms');
+    realtime.subscribe(url, function(data) {
       var operation = data.operation;
       var newModel = data.model;
       var id = newModel.id;

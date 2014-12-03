@@ -50,7 +50,7 @@ module.exports = (function() {
       'click #button-mention': function() {
         this.parentPopover.hide();
         var username = this.model.get('login');
-        appEvents.trigger('input.append', '@' + username);
+        appEvents.trigger('input.append', '@' + username + " ");
       },
       'click #button-remove': function() {
         this.parentPopover.hide();
