@@ -162,12 +162,8 @@ module.exports = (function() {
     clicked: function() {
       var model = this.model;
       var self = this;
-      setTimeout(function() {
-        // Make things feel a bit more responsive, but not too responsive
-        self.clearSearch();
-      }, 150);
 
-    if(this.model.get('exists') === false) {
+      if(this.model.get('exists') === false) {
         window.location.hash = '#confirm/' + this.model.get('uri');
       } else {
         appEvents.trigger('navigation', model.get('url'), 'chat', model.get('name'), model.id);
@@ -176,8 +172,6 @@ module.exports = (function() {
   });
 
   var CollectionView = Marionette.CollectionView.extend({
-    // tagName: 'ul',
-    // className: 'room-list',
 
     itemView: RoomListItemView,
 
@@ -192,9 +186,11 @@ module.exports = (function() {
     initialize: function (options) {
       this.bindUIElements();
 
-      if (options.rerenderOnSort) {
-        this.listenTo(this.collection, 'sort', this.bindUIElements);
-      }
+      // if (options.rerenderOnSort) {
+      //   this.listenTo(this.collection, 'all', function () {
+      //     this.bindUIElements();
+      //   }.bind(this));
+      // }
 
       if (options.draggable) {
         this.makeDraggable(options.dropTarget);

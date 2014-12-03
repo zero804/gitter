@@ -61,7 +61,7 @@ module.exports = {
     },
     filter: function (room) {
       room = ensurePojo(room);
-      return room.favourite >= 0;
+      return !!room.favourite;
     }
   },
 
@@ -81,7 +81,6 @@ module.exports = {
     },
     filter: function (room) {
       room = ensurePojo(room);
-      // is not a favourite && has either of the properties
       return !room.favourite && !!(room.lastAccessTime || room.getunreadItems || room.mentions);
     }
   }
