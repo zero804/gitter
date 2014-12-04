@@ -63,16 +63,14 @@ module.exports = (function() {
       return data;
     },
     onItemClose: function(e) {
-      // stop click event triggering navigate
-      e.stopPropagation();
+      e.stopPropagation(); // no navigation
 
       // We can't use the userRoom as the room might not be the current one
       apiClient.user.delete("/rooms/" + this.model.id);
     },
 
     onItemLeave: function(e) {
-      // stop click event triggering navigate
-      e.stopPropagation();
+      e.stopPropagation(); // no navigation
 
       // We can't use the room resource as the room might not be the current one
       apiClient
@@ -84,7 +82,7 @@ module.exports = (function() {
           }
         }.bind(this))
         .fail(function (err) {
-          // user couldn't leave room
+          // provide feedback to the user?
         });
     },
 
