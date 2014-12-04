@@ -208,7 +208,7 @@ module.exports = (function () {
     show: function () {
       var ui = this.ui;
 
-      if(!this.nano) {
+      if (ui.nano[0] && !this.nano) {
         this.nano = nanoscrollWrapper(this.ui.nano[0], { iOSNativeScrolling: true });
       }
 

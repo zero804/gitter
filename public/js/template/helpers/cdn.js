@@ -3,5 +3,4 @@
 var cdn = require('utils/cdn');
 
 var Handlebars = require('handlebars/runtime').default;
-Handlebars.registerHelper( 'cdn', cdn);
-
+Handlebars.registerHelper('cdn', cdn);
