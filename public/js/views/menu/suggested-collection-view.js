@@ -35,7 +35,7 @@ module.exports = (function() {
       if(this.model.get('exists')) {
         appEvents.trigger('navigation', '/' + this.model.get('uri'), 'chat', this.model.get('uri'), null);
       } else {
-        window.location.hash = '#confirm/' + this.model.get('uri');
+        parent.location.hash = '#confirm/' + this.model.get('uri');
       }
     }
   });
