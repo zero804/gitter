@@ -209,6 +209,19 @@ module.exports = (function() {
           item.css(position);
         },
 
+        isValidTarget: function(item, container) {
+          var droppedAt = container.el.parent().attr('id');
+          if (droppedAt === 'list-favs') {
+            $('.dragged').hide();
+            $('.placeholder').show();
+          }
+          else if (droppedAt === 'list-recents') {
+            $('.dragged').show();
+            $('.placeholder').hide();
+          }
+          return true;
+        },
+
         onDrop: function (item, container, _super) {
           var position;
           var el = item[0];
