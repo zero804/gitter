@@ -100,7 +100,7 @@ function notifyUserOfActivitySince(userId, troupeId, since, notificationNumber, 
 
         pushNotificationGateway.sendUserNotification(userId, {
             roomId: troupe.id,
-            roomName: troupe.name,
+            roomName: troupe.name || troupe.uri,
             message: message.notificationText,
             smsText: message.smsText,
             sound: notificationNumber == 1 ? 'notify.caf' : 'notify-2.caf',
