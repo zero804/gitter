@@ -16,25 +16,21 @@ module.exports = (function() {
       // only the original will be created with every attribute in the options object.
       var isOriginalModel = !!options.url;
 
-      if(isOriginalModel) {
+      if (isOriginalModel) {
+
         // we need to set these attributes when the original is created.
         // if we set them on every clone, then all these attributes would change when navigating to a room.
         // this would make the left menu room list reorder itself all the time.
 
-        if(this.get('lastAccessTime')) {
-          this.set('lastAccessTimeNoSync', this.get('lastAccessTime').clone());
-        }
+        // we may not always have a lastAccessTime
+        var time = this.get('lastAccessTime');
 
-        if(this.get('unreadItems')) {
-          this.set('lastUnreadItemTime', moment());
-        }
-
-        if(this.get('mentions')) {
-          this.set('lastMentionTime', moment());
+        if (time) {
+          this.set('lastAccessTimeNoSync', time.clone());
         }
       }
 
-      this.listenTo(this, 'change:unreadItems', function(model, unreadItems) { // jshint unused:true
+      this.listenTo(this, 'change:unreadItems', function (model, unreadItems) { // jshint unused:true
         if(unreadItems) {
           this.set('lastUnreadItemTime', moment());
         }
@@ -79,28 +75,28 @@ module.exports = (function() {
       }
     },
 
-    reorderFavs: function(event) {
+    reorderFavs: function(model) {
       /**
-       * We need to do some special reordering in the event of a favourite being positioned
+       * We need to do some special reordering in the model of a favourite being positioned
        * This is to mirror the changes happening on the server
        * @see recent-room-service.js@addTroupeAsFavouriteInPosition
        */
 
       /* This only applies when a fav has been set */
-      if(!event.changed || !event.changed.favourite || this.reordering) {
+      if(!model.changed || !model.changed.favourite || this.reordering) {
         return;
       }
 
       this.reordering = true;
 
-      var favourite = event.changed.favourite;
+      var favourite = model.changed.favourite;
 
       var forUpdate = this
                         .map(function(room) {
                           return { id: room.id, favourite: room.get('favourite') };
                         })
                         .filter(function(room) {
-                          return room.favourite >= favourite && room.id !== event.id;
+                          return room.favourite >= favourite && room.id !== model.id;
                         });
 
       forUpdate.sort(function(a, b) {

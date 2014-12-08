@@ -1,10 +1,9 @@
 "use strict";
-require('template/helpers/widget');
-require('template/helpers/cdn');
-require('template/helpers/isMobile');
+require('./widget');
+require('./cdn');
+require('./isMobile');
 
 module.exports = (function() {
-
 
   return null;
 
