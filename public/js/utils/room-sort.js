@@ -10,8 +10,7 @@ var rankAttributes = function (fold, attr) {
 var RANK = [
   'lastMentionTime', // most important
   'lastUnreadItemTime',
-  'lastAccessTimeNoSync',
-  'lastAccessTime' // least important
+  'lastAccessTimeNoSync'
 ].reduce(rankAttributes, {});
 
 function natural(a, b) {
@@ -20,13 +19,21 @@ function natural(a, b) {
 }
 
 function getRank(room) {
-  if (room.lastMentionTime) return RANK.lastMentionTime;
-  if (room.lastUnreadItemTime) return RANK.lastUnreadItemTime;
+  var defaultTime = room.lastAccessTime || Date.now();
 
-  if (room.lastAccessTimeNoSync) {
+  if (room.lastMentionTime || room.mentions) {
+    room.lastMentionTime = room.lastMentionTime || defaultTime;
+    return RANK.lastMentionTime;
+  }
+
+  if (room.lastUnreadItemTime || room.unreadItems) {
+    room.lastUnreadItemTime = room.lastUnreadItemTime || defaultTime;
+    return RANK.lastUnreadItemTime;
+  }
+
+  if (room.lastAccessTimeNoSync || room.lastAccessTime) {
+    room.lastAccessTimeNoSync = room.lastAccessTimeNoSync || defaultTime;
     return RANK.lastAccessTimeNoSync;
-  } else if (room.lastAccessTime) {
-    return RANK.lastAccessTime;
   }
 
   return Object.keys(RANK).length + 1;
@@ -54,7 +61,7 @@ module.exports = {
     },
     filter: function (room) {
       room = ensurePojo(room);
-      return room.favourite;
+      return !!room.favourite;
     }
   },
 
@@ -74,8 +81,7 @@ module.exports = {
     },
     filter: function (room) {
       room = ensurePojo(room);
-      /* Not a favourite, but has a lastAccessTime */
-      return !room.favourite && room.lastAccessTime || room.getunreadItems || room.mentions;
+      return !room.favourite && !!(room.lastAccessTime || room.getunreadItems || room.mentions);
     }
   }
 };

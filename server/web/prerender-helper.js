@@ -10,7 +10,6 @@ var widgetHelpers = require('./widget-prerenderers');
 
 var HELPERS = _.extend(widgetHelpers, {
   'pluralize': require('./hbs-helpers').pluralize,
-  'profile': require('./prerender-profile-helper'),
   'prerenderRoomListItem': require('./prerender-room-item-helper'),
   'prerenderOrgListItem': require('./prerender-org-item-helper'),
 });
