@@ -11,7 +11,7 @@
       <div id='initial' style="position:relative;top:-120px; left: 0; height:0;width:0;overflow:hidden"><a name="initial"/>_</a></div>
     {{/if}}
     <div class='chat-item__details js-chat-item-details'>
-      <div class='chat-item__from'>{{username}}</div>
+      <div class='chat-item__from js-chat-item-from'>{{username}}</div>
       <div class='chat-item__time'>{{widget "timeago" time=sent lang=lang locale=locale}}</div>
       {{#if readByText}}
         {{#if compactView}}
