@@ -20,6 +20,7 @@ module.exports = {
         return r;
     }
 
+    // loop?
     installTroupeSubResource('issues', 'issues');
     installTroupeSubResource('users', 'users');
     installTroupeSubResource('bans', 'bans');

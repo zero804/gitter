@@ -1,18 +1,14 @@
 "use strict";
 var roomNameTrimmer = require('utils/room-name-trimmer');
+var resolveIconClass = require('utils/resolve-icon-class');
 var Marionette = require('marionette');
 var suggestedListItemTemplate = require('./tmpl/suggested-list-item.hbs');
 var appEvents = require('utils/appevents');
 
 module.exports = (function() {
 
-
-  function getRepoClass(data) {
-    if(!data.exists) return 'room-list-item__name--suggested';
-    return 'github-' + data.githubType;
-  }
-
   var SuggestedItemView = Marionette.ItemView.extend({
+
     tagName: 'li',
 
     className: 'room-list-item',
@@ -30,7 +26,7 @@ module.exports = (function() {
     serializeData: function() {
       var data = this.model.toJSON();
       data.uri = roomNameTrimmer(data.uri);
-      data.repoTypeClass = getRepoClass(data);
+      data.repoTypeClass = resolveIconClass(data);
       return data;
     },
 
@@ -39,7 +35,7 @@ module.exports = (function() {
       if(this.model.get('exists')) {
         appEvents.trigger('navigation', '/' + this.model.get('uri'), 'chat', this.model.get('uri'), null);
       } else {
-        window.location.hash = '#confirm/' + this.model.get('uri');
+        parent.location.hash = '#confirm/' + this.model.get('uri');
       }
     }
   });

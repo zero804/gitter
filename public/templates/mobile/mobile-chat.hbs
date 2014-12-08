@@ -5,13 +5,13 @@
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
   <meta charset="utf-8">
 
-  <title>{{troupeName}}</title>
+  <title>{{ troupeName }}</title>
 
   <link rel="stylesheet" href='{{ cdn cssFileName }}'>
 
   {{{ generateTroupeContext troupeContext }}}
-  {{{bootScript bootScriptName }}}
-  
+  {{{ bootScript bootScriptName }}}
+
   <link rel="apple-touch-icon" href='{{ cdn "images/touch-icon-iphone.png" }}'>
   <link rel="shortcut icon" href='{{ cdn "images/favicon5.png"}}'>
 
@@ -24,8 +24,8 @@
   </style>
 </head>
 <body class="with-sideMenu">
-
   <div id="troupeList" class="menu">
+    {{{ prerenderView "js/views/menu/tmpl/troupeMenu" }}}
   </div>
 
   <div id="mainPage">

@@ -1,8 +1,6 @@
-"use strict";
-
+'use strict';
 
 module.exports = (function() {
-
 
   return function trim(name, maxLength) {
     maxLength = maxLength || 25; // defaults to 25
@@ -20,6 +18,4 @@ module.exports = (function() {
     return parts.pop();
   };
 
-
 })();
-
