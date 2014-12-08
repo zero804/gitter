@@ -11,6 +11,18 @@ var PersistenceService = require('../../services/persistence-service');
 var restSerializer     = require("../../serializers/rest-serializer");
 var burstCalculator   = require('../../utils/burst-calculator');
 var userSort = require('../../../public/js/utils/user-sort');
+var roomSort = require('../../../public/js/utils/room-sort');
+var roomNameTrimmer = require('../../../public/js/utils/room-name-trimmer');
+
+var trimRoomName = function (room) {
+  room.name = roomNameTrimmer(room.name);
+  return room;
+};
+
+var markSelected = function (id, room) {
+  room.selected = room.id === id;
+  return room;
+};
 
 var avatar   = require('../../utils/avatar');
 var _                 = require('underscore');
@@ -77,19 +89,34 @@ function renderHomePage(req, res, next) {
 }
 
 function renderMainFrame(req, res, next, frame) {
-  contextGenerator.generateNonChatContext(req)
-    .then(function (troupeContext) {
+  var user = req.user;
+  var userId = user && user.id;
+
+  var selectedRoomId = req.troupe && req.troupe.id;
+
+  Q.all([
+    contextGenerator.generateNonChatContext(req),
+    restful.serializeTroupesForUser(userId),
+    restful.serializeOrgsForUserId(userId)
+  ])
+    .spread(function (troupeContext, rooms, orgs) {
 
       var chatAppLocation = '/' + req.uriContext.uri + '/~' + frame + '#initial';
 
       var template, bootScriptName;
-      if(req.user) {
+
+      if (req.user) {
         template = 'app-template';
         bootScriptName = 'router-app';
       } else {
         template = 'app-nli-template';
         bootScriptName = 'router-nli-app';
       }
+
+      // pre-processing rooms
+      rooms = rooms
+        .map(markSelected.bind(null, selectedRoomId))
+        .map(trimRoomName);
 
       res.render(template, {
         socialMetadata: social.getMetadata({ room: req.troupe }),
@@ -102,7 +129,18 @@ function renderMainFrame(req, res, next, frame) {
         agent: req.headers['user-agent'],
         stagingText: stagingText,
         stagingLink: stagingLink,
-        dnsPrefetch: dnsPrefetch
+        dnsPrefetch: dnsPrefetch,
+        showFooterButtons: true,
+        user: user,
+        rooms: {
+          favourites: rooms
+            .filter(roomSort.favourites.filter)
+            .sort(roomSort.favourites.sort),
+          recents: rooms
+            .filter(roomSort.recents.filter)
+            .sort(roomSort.recents.sort)
+        },
+        orgs: orgs
       });
     })
     .fail(next);

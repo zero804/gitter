@@ -2,6 +2,10 @@
 var BASE = 'https://avatars';
 var GITHUB_URL = '.githubusercontent.com/';
 
+function isClient() {
+  return typeof window !== 'undefined' ? true : false;
+}
+
 function hash(spec) {
   var str = spec.str || '';
   var buckets = spec.buckets || 8; // defaults to 7 buckets
@@ -16,19 +20,40 @@ function hash(spec) {
     }, 0) % buckets; // the number of buckets from 0 to (buckets - 1)
 }
 
+function build(spec) {
+  spec = spec || {};
+  var version = spec.version || 3;
+  var username = spec.username || 'default';
+  var size = spec.size || 30;
+
+  return BASE + hash({ str: username }) + GITHUB_URL + username + '?v=' + version + '&s=' + size;
+}
+
 function getPixelDensity() {
-  if (typeof window !== 'undefined') {
+  if (isClient()) {
     return window.devicePixelRatio || 1;
   }
   return 1;
 }
 
+// TODO: needs improvement.
+function preload(url) {
+  var img;
+  if (isClient()) {
+    img = document.createElement('img');
+    img.src = url;
+  }
+}
+
 // make sure to pass the size for non-retina screens
 module.exports = function (spec) {
-  // some defaults
-  var version = spec.version || 3;
-  var username = spec.username || 'default';
-  var size = (spec.size || 30) * getPixelDensity();
+  var pixelDensity = getPixelDensity();
+  spec.size = (spec.size || 30) * pixelDensity;
+  var url = build(spec);
 
-  return BASE + hash({ str: username}) + GITHUB_URL + username + '?v=' + version + '&s=' + size;
+  if (pixelDensity > 1) {
+    preload(url);
+  }
+
+  return url;
 };

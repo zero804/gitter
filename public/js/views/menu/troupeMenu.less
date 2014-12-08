@@ -168,7 +168,7 @@
       &.visible {
         transition-delay: 0.3s;
         left: 0;
-      }      
+      }
     }
   }
 
@@ -239,6 +239,11 @@
 }
 
 
+@keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 .menu-content {
   // vertically expand as much as possible
   flex: 1;
@@ -264,6 +269,7 @@
     display: inline-block;
     vertical-align: top;
     width: 100%;
+    transition: 0.1s all ease-in;
 
     &.rightCollapse {
       right: 235px;
@@ -275,6 +281,7 @@
 
     .menu-list__item {
       margin-bottom: 20px;
+      // animation: fadein 500ms;
     }
 
     .menu-list__header {

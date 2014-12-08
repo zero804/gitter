@@ -1,6 +1,7 @@
 "use strict";
 var $ = require('jquery');
 var context = require('utils/context');
+var resolveIconClass = require('utils/resolve-icon-class');
 var apiClient = require('components/apiClient');
 var roomNameTrimmer = require('utils/room-name-trimmer');
 var Marionette = require('marionette');
@@ -14,27 +15,11 @@ require('bootstrap_tooltip');
 
 module.exports = (function() {
 
-
   /* @const */
   var MAX_UNREAD = 99;
 
   /* @const */
   var MAX_NAME_LENGTH = 25;
-
-  function getIconClass(model) {
-    var iconName = model.get('githubType').toLowerCase();
-
-    // repo_channel, user_channel etc
-    if(iconName.indexOf('channel') >= 0) {
-      iconName = 'channel';
-    }
-
-    if(model.get('favourite')) {
-      iconName = 'favourite';
-    }
-
-    return 'room-list-item__name--' + iconName;
-  }
 
   var RoomListItemView = Marionette.ItemView.extend({
     tagName: 'li',
@@ -59,7 +44,8 @@ module.exports = (function() {
         this.updateCurrentRoom(parser.pathname);
       });
     },
-    updateCurrentRoom: function(newUrl) {
+
+    updateCurrentRoom: function (newUrl) {
       var url = newUrl || window.location.pathname;
       var isCurrentRoom = this.model.get('url') === url;
 
@@ -69,32 +55,40 @@ module.exports = (function() {
         this.render();
       }
     },
+
     serializeData: function() {
       var data = this.model.toJSON();
       data.name = roomNameTrimmer(data.name, MAX_NAME_LENGTH);
-      data.iconClass = getIconClass(this.model);
+      data.iconClass = resolveIconClass(this.model);
       return data;
     },
     onItemClose: function(e) {
-      // stop click event triggering navigate
-      e.stopPropagation();
+      e.stopPropagation(); // no navigation
 
       // We can't use the userRoom as the room might not be the current one
       apiClient.user.delete("/rooms/" + this.model.id);
     },
 
     onItemLeave: function(e) {
-      // stop click event triggering navigate
-      e.stopPropagation();
+      e.stopPropagation(); // no navigation
 
       // We can't use the room resource as the room might not be the current one
-      apiClient.delete('/v1/rooms/' + this.model.id + '/users/' + context.getUserId());
+      apiClient
+        .delete('/v1/rooms/' + this.model.id + '/users/' + context.getUserId())
+        .then(function (response) {
+          // leaving the room that you are in should take you home
+          if (this.model.get('url') === window.location.pathname) {
+            appEvents.trigger('navigation', context.getUser().url, 'home', '');
+          }
+        }.bind(this))
+        .fail(function (err) {
+          // provide feedback to the user?
+        });
     },
 
     onRender: function() {
       var self = this;
-
-      this.$el.toggleClass('room-list-item--current-room', this.isCurrentRoom);
+      this.$el.toggleClass('room-list-item--current-room', !!this.isCurrentRoom);
 
       var m = self.model;
       dataset.set(self.el, 'id', m.id);
@@ -165,14 +159,9 @@ module.exports = (function() {
     },
     clicked: function() {
       var model = this.model;
-      var self = this;
-      setTimeout(function() {
-        // Make things feel a bit more responsive, but not too responsive
-        self.clearSearch();
-      }, 150);
 
-    if(this.model.get('exists') === false) {
-        window.location.hash = '#confirm/' + this.model.get('uri');
+      if(this.model.get('exists') === false) {
+        window.location.hash = '#confirm/' + model.get('uri');
       } else {
         appEvents.trigger('navigation', model.get('url'), 'chat', model.get('name'), model.id);
       }
@@ -180,60 +169,86 @@ module.exports = (function() {
   });
 
   var CollectionView = Marionette.CollectionView.extend({
-    tagName: 'ul',
-    className: 'room-list',
+
     itemView: RoomListItemView,
 
-    initialize: function(options) {
-      if(options.rerenderOnSort) {
-        this.listenTo(this.collection, 'sort', this.render);
+    itemViewOptions: function (item) {
+      var options = {};
+      if (item && item.id) {
+        options.el = this.$el.find('.room-list-item[data-id="' + item.id + '"]')[0];
+        if (options.el && $(options.el).hasClass('dragged')) {
+          delete options.el;
+        }
       }
-      if(options.draggable) {
+      return options;
+    },
+
+    initialize: function (options) {
+      this.bindUIElements();
+
+      if (options.draggable) {
         this.makeDraggable(options.dropTarget);
       }
+
       this.roomsCollection = options.roomsCollection;
     },
+
     makeDraggable: function(drop) {
       var cancelDrop = false;
       var self = this;
+
       this.$el.sortable({
-        group: 'mega-list',
+        connectWith: '.room-list',
+        group: 'list-mega',
         pullPlaceholder: false,
         drop: drop,
         distance: 8,
-        onDrag: function($item, position) {
-          $(".placeholder").html($item.html());
-          $item.css(position);
+
+        onDrag: function (item, position) {
+          $(".placeholder").html(item.html());
+          item.css(position);
         },
-        isValidTarget: function($item, container) {
-          if (container.el.parent().attr('id') == 'list-favs') {
+
+        isValidTarget: function(item, container) {
+          var droppedAt = container.el.parent().attr('id');
+          if (droppedAt === 'list-favs') {
             $('.dragged').hide();
-            return true;
+            $('.placeholder').show();
           }
-          else {
+          else if (droppedAt === 'list-recents') {
             $('.dragged').show();
-            return false;
+            $('.placeholder').hide();
           }
+          return true;
         },
+
         onDrop: function (item, container, _super) {
+          var position;
           var el = item[0];
+          var model = self.roomsCollection.get(dataset.get(el, 'id'));
+          var droppedAt = container.el.parent().attr('id');
           if (!cancelDrop) {
-            var previousElement = el.previousElementSibling;
-            var favPosition;
-            if(!previousElement) {
-              favPosition = 1;
-            } else {
-              var previousCollectionItem = self.roomsCollection.get(dataset.get(previousElement, 'id'));
-              favPosition = previousCollectionItem.get('favourite') + 1;
+            if (droppedAt === 'list-favs') {
+              var previousElement = el.previousElementSibling;
+
+              if (!previousElement) {
+                position = 1;
+              } else {
+                var previousModel = self.roomsCollection.get(dataset.get(previousElement, 'id'));
+                position = previousModel.get('favourite') + 1;
+              }
+              model.set('favourite', position);
+              model.save();
+            } else if (droppedAt === 'list-recents') {
+              model.set('favourite', null);
+              model.save();
             }
-            var collectionItem = self.roomsCollection.get(dataset.get(el, 'id'));
-            collectionItem.set('favourite', favPosition);
-            collectionItem.save();
           }
           cancelDrop = false;
           _super(item, container);
         },
-        onCancel: function(item, container) {
+
+        onCancel: function (item, container) {
           cancelDrop = true;
           var el = item[0];
 
