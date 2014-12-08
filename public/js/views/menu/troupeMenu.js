@@ -74,8 +74,8 @@ module.exports = (function () {
     ui: {
       nano: '.nano',
       profile: '#left-menu-profile',
-      recent: '#list-recents',
-      favs: '#list-favs',
+      recent: '#list-recents ul',
+      favs: '#list-favs ul',
       orgs: '#left-menu-list-orgs',
       suggested: '#left-menu-list-suggested'
     },
@@ -103,7 +103,6 @@ module.exports = (function () {
     },
 
     initialize: function() {
-      // console.log('troupeMenu:initialize() ====================');
 
       this.bindUIElements();
       // this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
@@ -209,7 +208,7 @@ module.exports = (function () {
     show: function () {
       var ui = this.ui;
 
-      if(!this.nano) {
+      if (ui.nano[0] && !this.nano) {
         this.nano = nanoscrollWrapper(this.ui.nano[0], { iOSNativeScrolling: true });
       }
 
@@ -250,7 +249,6 @@ module.exports = (function () {
     },
 
     onRender: function () {
-      // console.log('onRender() ====================');
       this.isRendered = true;
       this.show();
     },

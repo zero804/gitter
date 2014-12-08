@@ -629,7 +629,9 @@ module.exports = (function() {
       }
       this.chatResizer.resizeInput();
       this.$el.val(current);
-      this.el.setSelectionRange(start, current.length);
+      this.el.setSelectionRange(current.length, current.length);
+      this.el.focus();
+
       this.el.scrollTop = this.el.clientHeight;
     },
 
