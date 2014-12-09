@@ -52,6 +52,7 @@ module.exports = (function() {
       self.recalcViewDebounced = _.debounce(function() {
         self.recalcView(true);
       }, 300);
+      this.bindUIElements();
     },
 
     billingUrl: function() {
@@ -84,13 +85,16 @@ module.exports = (function() {
       this.parentSelect.show();
     },
 
-    showValidationMessage: function(message) {
-      this.ui.validation.text(message);
-      if(message) {
-        this.ui.validation.slideDown('fast');
-      } else {
-        this.ui.validation.slideUp('fast');
-      }
+    showValidationMessage: function (message) {
+      var validation = $(this.ui.validation);
+      if (!message) return validation.slideUp('fast');
+
+      validation.text(message);
+      validation.slideDown('fast');
+
+      setTimeout(function () {
+        validation.slideUp('fast');
+      }, 2000);
     },
 
     validateAndCreate: function() {
@@ -116,7 +120,7 @@ module.exports = (function() {
         return;
       }
 
-      var payload = { security: permissions.toUpperCase(), name: channelName };
+      var payload = { security: permissions && permissions.toUpperCase(), name: channelName };
 
       var promise;
 
@@ -170,17 +174,17 @@ module.exports = (function() {
           var response;
           try {
             response = JSON.parse(xhr.responseText);
-          } catch(e) {
+          } catch (e) {
             // Ignore
           }
 
           var status = xhr.status;
-          var message = 'Unable to create channel';
+          var message = 'Unable to create channel.';
 
-          switch(status) {
+          switch (status) {
             case 400:
               if (response && response.illegalName) {
-                message = 'Please choose a channel name consisting of letter and number characters';
+                message = 'Please choose a channel name consisting of letter and number characters.';
                 self.ui.roomNameInput.focus();
               } else {
                 message = 'Validation failed';
@@ -188,13 +192,12 @@ module.exports = (function() {
               break;
 
             case 403:
-              message = 'You don\'t have permission to create that room';
-
-              self.showValidationMessage();
+              message = 'You don\'t have permission to create that room.';
               break;
 
             case 409:
-              message = 'There is already a Github repository with that name';
+              message = 'There is already a Github repository or a room with that name.';
+              break;
           }
 
           self.showValidationMessage(message);
@@ -202,12 +205,16 @@ module.exports = (function() {
     },
 
     parentSelected: function(model, animated) {
-      if(this.selectedModel) {
+
+      if (this.selectedModel) {
         this.stopListening(this.selectedModel, 'change:premium', this.selectedModelPremiumChanged);
       }
 
       this.selectedModel = model;
-      this.listenTo(this.selectedModel, 'change:premium', this.selectedModelPremiumChanged);
+
+      if (this.selectedModel) {
+        this.listenTo(this.selectedModel, 'change:premium', this.selectedModelPremiumChanged);
+      }
 
       this.recalcView(animated);
     },
@@ -252,9 +259,11 @@ module.exports = (function() {
       return false;
     },
 
-    recalcView: function(animated) {
-      if (!this.ui || !this._uiBindings) { return; }
+    recalcView: function (animated) {
+
+      if (!this._uiBindings) return; // ui may not be bound yet.
       var self = this;
+
       var showHide = {
         'selectParentRequired': false,
         'autoJoin': false,
@@ -273,20 +282,20 @@ module.exports = (function() {
       var parentName = "";
       var createButtonEnabled = true;
 
-      if(model) {
+      if (model) {
         parentName = model.get('name');
         var roomName = this.ui.roomNameInput.val();
         var parentUri = model.get('uri');
 
         switch(model.get('type')) {
           case 'org':
-            [/*'autoJoin', */'permPublic', 'permPrivate', 'permInheritedOrg'].forEach(function(f) { showHide[f] = true; });
+            [/*'autoJoin', */'permPublic', 'permPrivate', 'permInheritedOrg'].forEach(function (f) { showHide[f] = true; });
             checkForRepo = roomName && parentUri + '/' + roomName;
             placeholder = "Required";
             break;
 
           case 'repo':
-            [/*'autoJoin', */'permPublic', 'permPrivate', 'permInheritedRepo'].forEach(function(f) { showHide[f] = true; });
+            [/*'autoJoin', */'permPublic', 'permPrivate', 'permInheritedRepo'].forEach(function (f) { showHide[f] = true; });
             placeholder = "Required";
             break;
 
@@ -309,8 +318,11 @@ module.exports = (function() {
             break;
         }
 
+        createButtonEnabled = false;
         var existing = roomName && troupeCollections.troupes.findWhere({ uri: parentUri + '/' + roomName});
-        if(existing) {
+        createButtonEnabled = !existing;
+
+        if (existing) {
           showHide = {
             'selectParentRequired': false,
             'autoJoin': false,
@@ -324,15 +336,18 @@ module.exports = (function() {
           checkForRepo = null;
         }
       }
-
       showHide.premiumRequired = this.selectedOptionsRequireUpgrade();
-      createButtonEnabled = !showHide.premiumRequired;
 
-      if(checkForRepo) {
-        checkForRepoExistence(checkForRepo, function(exists) {
+      if (showHide.premiumRequired) {
+        createButtonEnabled = !showHide.premiumRequired;
+      }
+
+      if (checkForRepo) {
+        createButtonEnabled = false;
+        checkForRepoExistence(checkForRepo, function (exists) {
           createButtonEnabled = !exists;
 
-          if(exists) {
+          if (exists) {
             showHide = {
               'selectParentRequired': false,
               'autoJoin': false,
@@ -343,12 +358,8 @@ module.exports = (function() {
               'permissionsLabel': false,
               'existing': false
             };
-
             self.showValidationMessage('You cannot create a channel with this name as a repo with the same name already exists.');
-          } else {
-            self.showValidationMessage();
           }
-
           applyShowHides();
         });
       } else {
@@ -357,15 +368,20 @@ module.exports = (function() {
 
       function checkForRepoExistence(repo, cb) {
         apiClient.priv.get('/gh/repos/' + repo)
-          .then(function() {
+          .then(function () {
             cb(true);
           })
-          .fail(function() {
+          .fail(function () {
             cb(false);
           });
       }
 
       function applyShowHides() {
+
+        if (!self.dialog) return; // callback but room has already been created, therefore self.dialog is null
+
+        self.dialog.setButtonState('create', createButtonEnabled); // set button state
+
         function arrayToJq(value) {
           var elements = [];
           Object.keys(showHide).forEach(function(f) {
@@ -376,7 +392,6 @@ module.exports = (function() {
           return $(elements);
         }
 
-        self.dialog.setButtonState('create', createButtonEnabled);
 
         if (showHide.premiumRequired) {
           self.dialog.hideActions();
@@ -396,12 +411,9 @@ module.exports = (function() {
           arrayToJq(true).filter(':hidden').slideDown("fast");
           arrayToJq(false).filter(':visible').slideUp("fast");
 
-          window.setTimeout(function() {
-            this.ui.parentNameLabel.text(parentName);
-            this.ui.roomNameInput.attr('placeholder', placeholder);
-          }.bind(self), 200);
+          self.ui.parentNameLabel.text(parentName);
+          self.ui.roomNameInput.attr('placeholder', placeholder);
         }
-
       }
     },
 
@@ -437,8 +449,6 @@ module.exports = (function() {
     permissionsChange: function() {
       this.recalcViewDebounced();
     }
-
-
   });
 
   var Modal = TroupeViews.Modal.extend({
