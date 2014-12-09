@@ -163,7 +163,6 @@ module.exports = (function() {
         window.location.hash = '#confirm/' + model.get('uri');
       } else {
         if (this.model.get('url') !== window.location.pathname) {
-          console.debug('triggering navigation() ====================');
           appEvents.trigger('navigation', model.get('url'), 'chat', model.get('name'), model.id);
         }
       }
