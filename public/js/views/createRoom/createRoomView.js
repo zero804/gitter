@@ -205,12 +205,16 @@ module.exports = (function() {
     },
 
     parentSelected: function(model, animated) {
-      if(this.selectedModel) {
+
+      if (this.selectedModel) {
         this.stopListening(this.selectedModel, 'change:premium', this.selectedModelPremiumChanged);
       }
 
       this.selectedModel = model;
-      this.listenTo(this.selectedModel, 'change:premium', this.selectedModelPremiumChanged);
+
+      if (this.selectedModel) {
+        this.listenTo(this.selectedModel, 'change:premium', this.selectedModelPremiumChanged);
+      }
 
       this.recalcView(animated);
     },
@@ -256,7 +260,8 @@ module.exports = (function() {
     },
 
     recalcView: function (animated) {
-      if (!this.ui || !this._uiBindings) { return; }
+
+      if (!this._uiBindings) return; // ui may not be bound yet.
       var self = this;
 
       var showHide = {
@@ -372,7 +377,9 @@ module.exports = (function() {
       }
 
       function applyShowHides() {
+
         if (!self.dialog) return; // callback but room has already been created, therefore self.dialog is null
+
         self.dialog.setButtonState('create', createButtonEnabled); // set button state
 
         function arrayToJq(value) {
@@ -404,10 +411,8 @@ module.exports = (function() {
           arrayToJq(true).filter(':hidden').slideDown("fast");
           arrayToJq(false).filter(':visible').slideUp("fast");
 
-          window.setTimeout(function() {
-            $(this.ui.parentNameLabel).text(parentName);
-            $(this.ui.roomNameInput).attr('placeholder', placeholder);
-          }.bind(self), 200);
+          self.ui.parentNameLabel.text(parentName);
+          self.ui.roomNameInput.attr('placeholder', placeholder);
         }
       }
     },
@@ -444,8 +449,6 @@ module.exports = (function() {
     permissionsChange: function() {
       this.recalcViewDebounced();
     }
-
-
   });
 
   var Modal = TroupeViews.Modal.extend({
