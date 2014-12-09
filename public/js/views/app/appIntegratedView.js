@@ -68,7 +68,6 @@ module.exports = (function () {
 
       $("#left-menu .js-menu").addClass("visible");
       $("#mini-left-menu, #mini-left-menu-container").addClass("active");
-      // $("#iframe-panel, #menu-toggle-button").addClass("leftCollapse");
 
       this.leftmenu = true;
     },
@@ -88,7 +87,6 @@ module.exports = (function () {
       }, 350);
 
       $("#mini-left-menu, #mini-left-menu-container").removeClass("active");
-      // $("#iframe-panel, #menu-toggle-button").removeClass("leftCollapse");
       $("#left-menu .js-menu").removeClass("visible");
 
       this.leftmenu = false;
