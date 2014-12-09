@@ -156,7 +156,7 @@ module.exports = (function () {
 
       // listening to events that can affect height, therefore scroll
       this.listenTo(troupeCollections.troupes, 'add remove', function () {
-        initScroller();
+        setTimeout(initScroller, 100); // FIXME: requestAnimation frame does not work here :(
       });
 
       initScroller(); // initalise on startup
