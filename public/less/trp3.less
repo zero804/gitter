@@ -279,12 +279,6 @@ body.logged-out {
     @media @small {
       margin-left: 0px;
     }
-
-    &.leftCollapse {
-      @media @small {
-        left: 350px;
-      }
-    }
   }
 
   .trpContentPanel {
@@ -538,15 +532,6 @@ ul li.placeholder:before {
   @media @small {
     left: @leftMarginSmall;
   }
-
-&.leftCollapse {
-  @media @small {
-    left: @leftMarginFull;
-    right: -250px;
-    transition-delay: 0;
-  }
-}
-
 }
 
 .trpContentPanel {
@@ -716,10 +701,6 @@ ul.roster {
   right: 235px;
 }
 
-.trpToolbar.leftCollapse {
-  right: -250px;
-}
-
 .build-started, .build-pending{
   .prepend-build-start-icon;
 }
@@ -864,13 +845,6 @@ ul.roster {
 
 .github-pull-request {
   .prepend-pull-request;
-}
-
-.trpContentPanel.leftCollapse {
-  @media @small {
-    left: @leftMarginFull;
-    transition-delay: 0;
-  }
 }
 
 .trpToolbar:hover {
