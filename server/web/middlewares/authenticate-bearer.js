@@ -7,7 +7,6 @@ var logger = env.logger;
 
 function getAccessToken(req) {
 
-
   if(req.headers && req.headers['authorization']) {
     var authHeader = req.headers['authorization'];
 
@@ -36,6 +35,14 @@ function getAccessToken(req) {
   if (req.query && req.query['access_token']) {
     return req.query['access_token'];
   }
+
+  // FIXME Hack for the node-webkit app, we *have* to send the token in the user-agent header.
+  // If in the future node-webkit adds support for custom headers we can remove this.
+  if(req.headers && req.headers['user-agent']) {
+    var ua_token = req.headers['user-agent'].match(/Token\/(\w+)/);
+    if (ua_token) return ua_token[1];
+  }
+
 }
 /**
  *
