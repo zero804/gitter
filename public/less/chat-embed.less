@@ -1,4 +1,4 @@
-@embedded_footer_height: 78px; // this determines the height of the embed footer, as well as its position and the position for the content panel
+@embedded_footer_height: 78px;
 
 .trpChatPanel {
   body.embedded & {
@@ -7,7 +7,8 @@
   
 }
 
-.chat-embed-footer {  
+.chat-embed-footer {
+  flex-shrink: 0;
   box-sizing: border-box;
   .trpBodyMedium;
   
@@ -16,11 +17,6 @@
     */
   font-family: proxima-nova-alt,"Proxima Nova Alt",sans-serif !important;
   text-shadow: none;
-  
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
   
   height: @embedded_footer_height;
   line-height: @embedded_footer_height;
