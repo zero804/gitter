@@ -25,9 +25,14 @@ require('utils/tracking');
 require('views/widgets/avatar');
 
 onready(function() {
-
+  var loadingFrame = document.querySelector('.loading-frame');
   var chatIFrame = document.getElementById('content-frame');
-  if(window.location.hash) {
+
+  chatIFrame.addEventListener('load', function (/* e */) {
+    loadingFrame.classList.add('hide');
+  });
+
+  if (window.location.hash) {
     var noHashSrc = chatIFrame.src.split('#')[0];
     chatIFrame.src = noHashSrc + window.location.hash;
   }
@@ -40,16 +45,20 @@ onready(function() {
   var appView = new AppIntegratedView({ });
 
   function updateContent(iframeUrl) {
-    // TODO: update the title....
-    context.setTroupeId(undefined);
     var hash;
     var windowHash = window.location.hash;
-    if(!windowHash || windowHash === '#') {
+
+    context.setTroupeId(undefined); // TODO: update the title....
+
+    if (!windowHash || windowHash === '#') {
       hash = '#initial';
     } else {
       hash = windowHash;
     }
-    chatIFrame.contentWindow.location.replace(iframeUrl + hash);
+
+    chatIFrame.contentWindow.requestAnimationFrame(function () {
+      chatIFrame.contentWindow.location.replace(iframeUrl + hash);
+    });
   }
 
   var titlebarUpdater = new TitlebarUpdater();
@@ -76,9 +85,9 @@ onready(function() {
     appEvents.trigger('navigation', url, 'chat', title);
   };
 
-  appEvents.on('navigation', function(url, type, title) {
+  appEvents.on('navigation', function (url, type, title) {
+    loadingFrame.classList.remove('hide');
     var frameUrl = url + '/~' + type;
-
     pushState(frameUrl, title, url);
     titlebarUpdater.setRoomName(title);
     updateContent(frameUrl);

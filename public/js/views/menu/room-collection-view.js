@@ -159,11 +159,13 @@ module.exports = (function() {
     },
     clicked: function() {
       var model = this.model;
-
       if(this.model.get('exists') === false) {
         window.location.hash = '#confirm/' + model.get('uri');
       } else {
-        appEvents.trigger('navigation', model.get('url'), 'chat', model.get('name'), model.id);
+        if (this.model.get('url') !== window.location.pathname) {
+          console.debug('triggering navigation() ====================');
+          appEvents.trigger('navigation', model.get('url'), 'chat', model.get('name'), model.id);
+        }
       }
     }
   });
