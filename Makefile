@@ -59,11 +59,11 @@ clean-embedded-chat:
 embedded-chat:
 	mkdir -p output/embedded/mobile
 	NODE_ENV=prod ./build-scripts/render-embedded-chat.js  -o output/embedded/mobile/embedded-chat.html
-	echo public-processed/js/core-libraries.min.js > output/embedded-resources.txt
-	echo public-processed/js/mobile-native-embedded-chat.min.js >> output/embedded-resources.txt
-	echo public-processed/styles/mobile-native-chat.css >> output/embedded-resources.txt
-	ls public-processed/images/emoji/*  >> output/embedded-resources.txt
-	./build-scripts/extract-urls.js public-processed/styles/mobile-native-chat.css >> output/embedded-resources.txt
+	echo output/assets/js/vendor.js > output/embedded-resources.txt
+	echo output/assets/js/mobile-native-embedded-chat.js >> output/embedded-resources.txt
+	echo output/assets/styles/mobile-native-chat.css >> output/embedded-resources.txt
+	ls output/assets/images/emoji/*  >> output/embedded-resources.txt
+	./build-scripts/extract-urls.js output/assets/styles/mobile-native-chat.css >> output/embedded-resources.txt
 	./build-scripts/copy-embedded-resources.sh
 
 
