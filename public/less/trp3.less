@@ -318,10 +318,6 @@ body.logged-out {
       margin-left: 0px;
     }
   }
-
-  .trpContentPanel {
-    bottom: 0;
-  }
 }
 
 .trpButtonMedium, .trpButtonBig {
@@ -566,16 +562,11 @@ ul li.placeholder:before {
 }
 
 .trpContentPanel {
-  position: absolute;
+  position: relative;
 	background-color: white;
-	margin-left: 0px;
-  /*  height is now specified in the html for as it renders better before the css is loaded*/
 	width: 100%;
-	text-align: center;
-	top: 0px;
-  bottom: 70px;
-  right: 0px;
-  overflow: none;
+  height: 100%;
+  flex-shrink: 1;
   .transition500ms;
 }
 
@@ -652,12 +643,13 @@ ul li.placeholder:before {
 }
 
 .trpChatPanel {
-
+  position: absolute;
   display: block;
 	text-align: left;
 	text-align: center;
   .transition500ms;
   height: 100%;
+  width: 100%;
 }
 
 .trpHomePanel {

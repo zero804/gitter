@@ -453,23 +453,13 @@ module.exports = (function() {
   cocktail.mixin(ChatInputView, KeyboardEventsMixin);
 
   var ChatCollectionResizer = function(options) {
-    var compact = options.compactView;
     var rollers = options.rollers;
-    var editMode = options.editMode;
 
     var el = options.el;
     var $el = $(el);
 
-    var frameChat = $(compact ? '#content': '#content-wrapper').first();
-
     this.resetInput = function(initial) {
       $el.css({ height: '', 'overflow-y': '' });
-
-      var css = {};
-      // css[compact ? 'padding-bottom' : 'margin-bottom'] = '';
-      css[compact ? 'padding-bottom' : 'bottom'] = '';
-      frameChat.css(css);
-      log.info('Applying ', css, ' to ', frameChat);
 
       adjustScroll(initial);
     };
@@ -483,21 +473,8 @@ module.exports = (function() {
       if(offsetHeight == height) {
         return;
       }
-      // var overflow = height < scrollHeight ? 'scroll' : '';
+
       $el.height(height);
-      if (!editMode) {
-        var css = {};
-
-        if(compact) {
-          css['padding-bottom'] = (height + EXTRA_PADDING) + 'px';
-        } else {
-          // TODO: why the $?
-          css.bottom = ($('#chat-input-wrapper').outerHeight()) + 'px';
-        }
-
-        log.info('Applying ', css, ' to ', frameChat);
-        frameChat.css(css);
-      }
 
       adjustScroll();
     };
@@ -535,9 +512,7 @@ module.exports = (function() {
       }
 
       var chatResizer = new ChatCollectionResizer({
-        compactView: this.compactView,
         el: this.el,
-        editMode: options.editMode,
         rollers: options.rollers
       });
 
