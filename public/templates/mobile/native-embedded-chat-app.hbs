@@ -9,7 +9,7 @@
   <title>Gitter</title>
 
   {{!-- has to be relative so it can be served off a file:///x/y/z/Gitter.app url with no host --}}
-  <link rel="stylesheet" href="../styles/mobile-native-chat.css">
+  <link rel="stylesheet" href="{{ cdn 'styles/mobile-native-chat.css' }}">
 
   {{{ generateTroupeContext troupeContext page='chat' loggedIn=true }}}
 
@@ -18,16 +18,12 @@
 </head>
 <body>
 
-  <div id="mainPage">
-    <div id="content">
-      <div class="contentBody mobile-scroll-class" id="content-frame">
-      </div>
-    </div>
-
-    <div class="{{!-- trpChatInputArea --}}  chat-input__container  js-chat-input-container" id="chat-input"></div>
+  <div id="mainPage" class="chat-app">
+    {{> chat_content}}
+    {{> chat_input}}
   </div>
 
-  {{{ bootScript "mobile-native-embedded-chat" root="../" }}}
+  {{{ bootScript "mobile-native-embedded-chat" }}}
 
 </body>
 </html>
