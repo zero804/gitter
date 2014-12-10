@@ -37,8 +37,8 @@ exports.sendEmail = function(options) {
   var mapper = VALID_TEMPLATES[mandrillTemplateName];
   if(!mapper) return Q.reject('Unknown mandrill template: ' + mandrillTemplateName);
 
-  options.data = mapper(options.data);
   options.templateName = mandrillTemplateName;
+  options.data = mapper(options.data);
 
   return mailer(options);
 };
@@ -68,17 +68,14 @@ function invitationMapping(data) {
 
 function unreadNoticationMapping(data) {
 
-  var htmlTemplateFile = "emails/" + data.templateFile + "_html";
-  var plaintextTemplateFile = "emails/" + data.templateFile;
-
   return {
     NAME:       data.recipientName,
     SENDER:     data.senderName,
     ROOMURI:    data.roomUri,
     ROOMURL:    data.roomUrl,
     UNSUB:      data.unsubscribeUrl,
-    HTML:       applyTemplate(htmlTemplateFile, data),
-    PLAINTEXT:  applyTemplate(plaintextTemplateFile, data),
+    HTML:       applyTemplate("emails/unread_notification_html", data),
+    PLAINTEXT:  applyTemplate("emails/unread_notification", data),
     LOGOURL:    cdn('images/logo-text-blue-pink.png', {email: true})
   };
 
@@ -88,16 +85,16 @@ function createdRoomMapping(data) {
   var twitterSnippet = data.isPublic ? '<tr><td><br><a href="' + data.twitterURL + '" style="text-decoration: none" target="_blank" class="button-twitter">Share on Twitter</a></td></tr>' : '';
   var orgNote = data.isOrg ? '<p>Note that only people within your organisation can join this room.</p>' : '';
 
-  return [
-    {name: 'NAME',        content: data.recipientName},
-    {name: 'SENDER',      content: data.senderName},
-    {name: 'ROOMURI',     content: data.roomUri},
-    {name: 'ROOMURL',     content: data.roomUrl},
-    {name: 'UNSUB',       content: data.unsubscribeUrl},
-    {name: 'LOGOURL',     content: cdn('images/logo-text-blue-pink.png', {email: true})},
-    {name: 'TWITTERURL',  content: twitterSnippet},
-    {name: 'ORGNOTE',     content: orgNote},
-    {name: 'ROOMTYPE',    content: data.roomType}
-  ];
+  return {
+    NAME:        data.recipientName,
+    SENDER:      data.senderName,
+    ROOMURI:     data.roomUri,
+    ROOMURL:     data.roomUrl,
+    UNSUB:       data.unsubscribeUrl,
+    TWITTERURL:  twitterSnippet,
+    ORGNOTE:     orgNote,
+    ROOMTYPE:    data.roomType,
+    LOGOURL:     cdn('images/logo-text-blue-pink.png', {email: true})
+  };
 }
 
