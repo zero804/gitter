@@ -102,7 +102,6 @@ module.exports = (function () {
     },
 
     initialize: function () {
-
       this.bindUIElements();
       // this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
       this.repoList = false;
@@ -141,25 +140,23 @@ module.exports = (function () {
           }
         });
       }
-      this.show();
-      this.setupNanoScroller(troupeCollections);
     },
 
-    setupNanoScroller: function (troupeCollections) {
+    setupNanoScroller: function (collection) {
       var ui = this.ui;
       var target = ui.nano[0];
       if (!target) return;
 
       var initScroller = function () {
-        $(target).nanoScroller();
+        $(target).nanoScroller({ iOSNativeScrolling: true });
       };
 
+      initScroller(); // initalise on startup
+
       // listening to events that can affect height, therefore scroll
-      this.listenTo(troupeCollections.troupes, 'add remove', function () {
+      this.listenTo(collection, 'add remove', function () {
         setTimeout(initScroller, 100); // FIXME: requestAnimation frame does not work here :(
       });
-
-      initScroller(); // initalise on startup
     },
 
     // FIXME: WARNING -> THIS METHOD IS UNSAFE.
@@ -223,6 +220,8 @@ module.exports = (function () {
     },
 
     show: function () {
+      this.setupNanoScroller(troupeCollections.troupes);
+
       var ui = this.ui;
 
       new ProfileView({ el: ui.profile });
@@ -259,6 +258,10 @@ module.exports = (function () {
         header: 'Suggested Rooms',
         el: ui.suggested
       });
+    },
+
+    onRender: function () {
+      this.show();
     },
 
     toggleHeaderExpansion: function() {
