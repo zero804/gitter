@@ -1216,8 +1216,9 @@
       }
     },
     "gitter-env": {
-      "version": "0.17.0",
-      "from": "gitter-env@latest",
+      "version": "0.17.1",
+      "from": "gitter-env@0.17.1",
+      "resolved": "http://beta-internal:8089/nexus/content/groups/npm/gitter-env/-/gitter-env-0.17.1.tgz",
       "dependencies": {
         "async": {
           "version": "0.8.0",
@@ -1264,17 +1265,17 @@
                 "optimist": {
                   "version": "0.6.1",
                   "from": "optimist@>=0.3.4",
-                  "resolved": "https://registry.npmjs.org/optimist/-/optimist-0.6.1.tgz",
+                  "resolved": "http://beta-internal:8089/nexus/content/groups/npm/optimist/-/optimist-0.6.1.tgz",
                   "dependencies": {
                     "wordwrap": {
                       "version": "0.0.2",
                       "from": "wordwrap@>=0.0.2 <0.1.0",
-                      "resolved": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.2.tgz"
+                      "resolved": "http://beta-internal:8089/nexus/content/groups/npm/wordwrap/-/wordwrap-0.0.2.tgz"
                     },
                     "minimist": {
                       "version": "0.0.10",
                       "from": "minimist@>=0.0.1 <0.1.0",
-                      "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.10.tgz"
+                      "resolved": "http://beta-internal:8089/nexus/content/groups/npm/minimist/-/minimist-0.0.10.tgz"
                     }
                   }
                 },
@@ -1354,12 +1355,12 @@
                 "wordwrap": {
                   "version": "0.0.2",
                   "from": "wordwrap@>=0.0.2 <0.1.0",
-                  "resolved": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.2.tgz"
+                  "resolved": "http://beta-internal:8089/nexus/content/groups/npm/wordwrap/-/wordwrap-0.0.2.tgz"
                 },
                 "minimist": {
                   "version": "0.0.10",
                   "from": "minimist@>=0.0.1 <0.1.0",
-                  "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.10.tgz"
+                  "resolved": "http://beta-internal:8089/nexus/content/groups/npm/minimist/-/minimist-0.0.10.tgz"
                 }
               }
             }
@@ -1383,7 +1384,7 @@
             "async": {
               "version": "0.2.10",
               "from": "async@>=0.2.0 <0.3.0",
-              "resolved": "https://registry.npmjs.org/async/-/async-0.2.10.tgz"
+              "resolved": "http://beta-internal:8089/nexus/content/groups/npm/async/-/async-0.2.10.tgz"
             }
           }
         }
