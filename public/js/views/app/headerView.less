@@ -292,3 +292,8 @@ body.banner-top {
   &.bronze { .faux-border(@bronze); }
   &.silver { .faux-border(@silver); }
 }
+
+// stop the header from covering the first chat message
+.chat-container > div:first-child {
+  padding-top: 72px;
+}
