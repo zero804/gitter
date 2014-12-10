@@ -11,6 +11,7 @@ var TitlebarUpdater = require('components/titlebar');
 var realtime = require('components/realtime');
 var log = require('utils/log');
 var onready = require('./utils/onready');
+var $ = require('jquery');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -24,13 +25,24 @@ require('utils/tracking');
 // Preload widgets
 require('views/widgets/avatar');
 
-onready(function() {
-  var loadingFrame = document.querySelector('.loading-frame');
-  var chatIFrame = document.getElementById('content-frame');
+var loading = function (el) {
+  return {
+    show: function () {
+      el.removeClass('hide');
+    },
+    hide: function () {
+      el.addClass('hide');
+    },
+  };
+};
 
-  chatIFrame.addEventListener('load', function (/* e */) {
-    loadingFrame.classList.add('hide');
-  });
+onready(function () {
+  var loadingScreen = loading($('.loading-frame'));
+  var chatIFrame = document.getElementById('content-frame');
+  loadingScreen.show();
+
+  chatIFrame.addEventListener('load', loadingScreen.hide, false);
+  appEvents.on('chatframe:loaded', loadingScreen.hide);
 
   if (window.location.hash) {
     var noHashSrc = chatIFrame.src.split('#')[0];
@@ -86,7 +98,7 @@ onready(function() {
   };
 
   appEvents.on('navigation', function (url, type, title) {
-    loadingFrame.classList.remove('hide');
+    loadingScreen.show();
     var frameUrl = url + '/~' + type;
     pushState(frameUrl, title, url);
     titlebarUpdater.setRoomName(title);
@@ -161,7 +173,7 @@ onready(function() {
       case 'unreadItemsCount':
         var count = message.count;
         var troupeId = message.troupeId;
-        if(troupeId !== context.getTroupeId()) {
+        if (troupeId !== context.getTroupeId()) {
           log.info('warning: troupeId mismatch in unreadItemsCount');
         }
         var v = {
@@ -198,6 +210,10 @@ onready(function() {
       case 'focus':
         makeEvent(message);
         appEvents.trigger('focus.request.' + message.focus, message.event);
+        break;
+
+      case 'chatframe:loaded':
+        appEvents.trigger('chatframe:loaded');
         break;
     }
   });
