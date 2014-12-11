@@ -266,7 +266,7 @@ function renderMobileNativeUserhome(req, res) {
 
 function renderMobileNotLoggedInChat(req, res, next) {
   return renderChat(req, res, {
-    template: 'mobile/mobile-app',
+    template: 'mobile/mobile-nli-chat',
     script: 'mobile-nli-app',
     unread: false // Not logged in users see chats as read
   }, next);

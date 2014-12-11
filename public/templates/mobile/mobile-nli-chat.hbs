@@ -1,0 +1,49 @@
+<!doctype html>
+<html class="no-js loading" lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no"/>
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta charset="utf-8">
+
+  <title>{{troupeName}}</title>
+
+  {{#if isUserhome}}
+  <link rel="stylesheet" href='{{ cdn "styles/mobile-userhome.css"}}'>
+  {{else}}
+  <link rel="stylesheet" href='{{ cdn "styles/mobile-app.css"}}'>
+  {{/if}}
+
+  {{{ generateTroupeContext troupeContext }}}
+  {{{bootScript bootScriptName }}}
+  
+  <link rel="apple-touch-icon" href='{{ cdn "images/touch-icon-iphone.png" }}'>
+  <link rel="shortcut icon" href='{{ cdn "images/favicon5.png"}}'>
+  {{#each dnsPrefetch}}
+  <link rel="dns-prefetch" href="{{ this }}">
+  {{/each}}
+  <style>
+    html.loading body {
+      background: url("{{ cdn 'images/logo-mark-grey-64.png' }}") center no-repeat;
+      height: 90%;
+    }
+    html.loading body > * { visibility: hidden; }
+  </style>
+</head>
+<body class="with-sideMenu">
+
+  <div id="troupeList" class="menu">
+  </div>
+
+  <div id="mainPage" class="chat-app">
+    <header>
+      <div id="showTroupesButton">
+        <img src='{{cdn "images/icon-more@2x.png" }}' width="16" height="16" id="menu-toggle" style="margin-left: 8px">
+      </div>
+      <span class="trpTitle">{{troupeName}}</span>
+    </header>
+    {{> chat_content}}
+    <footer id="login-footer" style="flex-shrink: 0;"></footer>
+  </div>
+  {{>live_reload}}
+</body>
+</html>
