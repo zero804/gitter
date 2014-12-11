@@ -57,8 +57,8 @@ clean-embedded-chat:
 	rm -rf output/embedded output/embedded.tgz
 
 embedded-chat:
-	mkdir -p output/embedded/mobile
-	NODE_ENV=prod ./build-scripts/render-embedded-chat.js  -o output/embedded/mobile/embedded-chat.html
+	mkdir -p output/embedded/www/mobile
+	NODE_ENV=prod ./build-scripts/render-embedded-chat.js  -o output/embedded/www/mobile/embedded-chat.html
 	echo output/assets/js/vendor.js > output/embedded-resources.txt
 	echo output/assets/js/mobile-native-embedded-chat.js >> output/embedded-resources.txt
 	echo output/assets/styles/mobile-native-chat.css >> output/embedded-resources.txt

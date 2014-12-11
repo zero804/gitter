@@ -138,7 +138,7 @@
     "mocha-istanbul": "0.2.0",
     "mocha-phantomjs": "~3.1.6",
     "node-spritesheet": "trevorah/node-spritesheet",
-    "postcss": "^3.0.0",
+    "postcss": "3.0.0",
     "proxyquire": "0.4.0",
     "reduce-function-call": "^1.0.1",
     "requirejs": "^2.1.14",
