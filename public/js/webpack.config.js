@@ -102,12 +102,14 @@ var webpackConfig = {
     new CommonsChunkPlugin("vendor", "[name].js"),
     new ContextReplacementPlugin(/moment\/lang$/, /cs|da|de|en-gb|es|fr|it|ja|ko|nl|pl|pt|ru|sv|zh-cn/)
   ],
-  bail: true
+  bail: true,
+  recordsPath: '/tmp/records.json'
 };
 
 if(devMode) {
   // See http://webpack.github.io/docs/configuration.html#devtool
   webpackConfig.devtool = 'sourcemap';
+  webpackConfig.cache = true;
 } else {
   // webpackConfig.plugins.push(new DedupePlugin());
   // webpackConfig.plugins.push(new OccurrenceOrderPlugin());
