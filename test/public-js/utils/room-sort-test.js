@@ -70,8 +70,8 @@ describe('room-sort', function() {
 
         it('sorts multiple @mentioned rooms by time of last access', function() {
           var collection = new RecentsCollection([
-            { id: 'old_mentions', unread: 1, mentions: 1, lastAccessTime: OLD },
-            { id: 'new_mentions', unread: 1, mentions: 1, lastAccessTime: NEW }
+            { id: 'old_mentions', unread: 3, mentions: 5, lastAccessTime: OLD },
+            { id: 'new_mentions', unread: 5, mentions: 3, lastAccessTime: NEW }
           ]);
 
           collection.sort();
@@ -95,16 +95,64 @@ describe('room-sort', function() {
       });
 
       describe('unread', function() {
-        it.skip('puts them above regular rooms', function() {});
-        it.skip('sorts multiple unread rooms by time of last access', function() {});
-        it.skip('puts unread rooms that havent been accessed at the bottom', function() {});
+        it('puts them above regular rooms', function() {
+          var collection = new RecentsCollection([
+            { id: 'unread', unread: 1 },
+            { id: 'regular' }
+          ]);
+
+          collection.sort();
+
+          assert.deepEqual(id(collection), ['unread', 'regular']);
+        });
+
+        it('sorts multiple unread rooms by time of last access', function() {
+          var collection = new RecentsCollection([
+            { id: 'old_unread', unread: 5, lastAccessTime: OLD },
+            { id: 'new_unread', unread: 1, lastAccessTime: NEW }
+          ]);
+
+          collection.sort();
+
+          assert.deepEqual(id(collection), ['new_unread', 'old_unread']);
+        });
+
+        it('puts unread rooms that havent been accessed at the bottom', function() {
+          var collection = new RecentsCollection([
+            { id: 'never_accessed_unread', unread: 2 },
+            { id: 'accessed_unread', unread: 1, lastAccessTime: NEW }
+          ]);
+
+          collection.sort();
+
+          assert.deepEqual(id(collection), ['accessed_unread', 'never_accessed_unread']);
+        });
         it.skip('doesnt move rooms once they have been accessed', function() {});
         it.skip('doesnt move rooms once they have been read', function() {});
       });
 
       describe('regular', function() {
-        it.skip('sorts multiple rooms by time of last access', function() {});
-        it.skip('puts rooms that havent been accessed at the bottom', function() {});
+        it('sorts multiple rooms by time of last access', function() {
+          var collection = new RecentsCollection([
+            { id: 'old_room', lastAccessTime: OLD },
+            { id: 'new_room', lastAccessTime: NEW }
+          ]);
+
+          collection.sort();
+
+          assert.deepEqual(id(collection), ['new_room', 'old_room']);
+        });
+
+        it('puts rooms that havent been accessed at the bottom', function() {
+          var collection = new RecentsCollection([
+            { id: 'never_accessed_room' },
+            { id: 'accessed_room', lastAccessTime: NEW }
+          ]);
+
+          collection.sort();
+
+          assert.deepEqual(id(collection), ['accessed_room', 'never_accessed_room']);
+        });
         it.skip('doesnt move rooms once they have been accessed', function() {});
         it.skip('promotes rooms if new unread messages arrive', function() {});
       });
