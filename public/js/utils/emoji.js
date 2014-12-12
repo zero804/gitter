@@ -6,7 +6,7 @@ module.exports = (function() {
 
 
   emojify.setConfig({
-    img_dir: cdn('images/emoji/')
+    img_dir: cdn('images/emoji')
   });
 
   return {

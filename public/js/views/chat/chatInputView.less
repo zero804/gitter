@@ -5,16 +5,12 @@
 
   box-sizing: border-box;
   .transition500ms;
-
-  position: absolute;
   z-index: @l1;
-  right: 0;
-  bottom: 0;
-  left: 0;
 
   background-color: white;
 
   min-height: 70px;
+  flex-shrink: 0;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
@@ -47,32 +43,10 @@
   display: block;
   text-align: center;
 
-  &.rightCollapse {
-    margin-right: 510px;
-
-    @media @mid {
-      margin-right: 120px;
-    }
-  }
-
   @media @mid {
     .avatar-s {
       width: 24px;
       height: 24px;
-    }
-  }
-
-  @media @mobile {
-    background-color: white;
-    padding-top: 5px;
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    border-top: 1px solid @trpBgColor;
-
-    .avatar-s {
-      width: 24px;
-      height:24px;
     }
   }
 }
@@ -175,9 +149,7 @@
   }
 
   @media @mobile {
-    background-color: white;
-    margin-left: 24px;
-    padding: 0 10px;
+    margin-left: 34px;
   }
 }
 
@@ -203,11 +175,5 @@
 
   &:focus {
     outline: none;
-  }
-
-  @media @mobile {
-    background-color: white;
-    padding: 0;
-    margin: 0;
   }
 }

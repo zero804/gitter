@@ -318,10 +318,6 @@ body.logged-out {
       margin-left: 0px;
     }
   }
-
-  .trpContentPanel {
-    bottom: 0;
-  }
 }
 
 .trpButtonMedium, .trpButtonBig {
@@ -565,20 +561,6 @@ ul li.placeholder:before {
   .transition500ms;
 }
 
-.trpContentPanel {
-  position: absolute;
-	background-color: white;
-	margin-left: 0px;
-  /*  height is now specified in the html for as it renders better before the css is loaded*/
-	width: 100%;
-	text-align: center;
-	top: 0px;
-  bottom: 70px;
-  right: 0px;
-  overflow: none;
-  .transition500ms;
-}
-
 .loading-frame {
   display: flex;
   justify-content: center;
@@ -651,24 +633,6 @@ ul li.placeholder:before {
   margin-right: 10px;
 }
 
-.trpChatPanel {
-
-  display: block;
-	text-align: left;
-	text-align: center;
-  .transition500ms;
-  height: 100%;
-}
-
-.trpHomePanel {
-    display: block;
-    text-align: left;
-    text-align: center;
-    .transition500ms;
-    height: 100%;
-}
-
-
 #people-list {
 
   margin-top: 55px;
@@ -737,20 +701,6 @@ ul.roster {
 
 .trpMoreBadge:hover {
   background-color: fade(@trpLightBlue, 30%);
-}
-
-// .trpChatInputArea.rightCollapse,
-.trpHeaderContainer.rightCollapse,
-.trpChatPanel.rightCollapse {
-  margin-right: 510px;
-
-  @media @mid {
-    margin-right: 120px;
-  }
-}
-
-.trpToolbar.rightCollapse {
-  right: 235px;
 }
 
 .build-started, .build-pending{
