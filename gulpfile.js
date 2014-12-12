@@ -77,7 +77,7 @@ gulp.task('validate', ['validate-client-source', 'validate-server-source']);
 gulp.task('test', function() {
   mkdirp.sync('output/test-reports/');
 
-  return gulp.src(['./test/integration/**/*.js'], { read: false })
+  return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
     .pipe(mocha({
       reporter: 'xunit-file',
       env: {
@@ -88,7 +88,7 @@ gulp.task('test', function() {
 });
 
 gulp.task('localtest', function() {
-  return gulp.src(['./test/integration/**/*.js'], { read: false })
+  return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
     .pipe(mocha({
       reporter: 'spec',
       env: {
