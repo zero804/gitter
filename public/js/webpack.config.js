@@ -22,7 +22,6 @@ var webpackConfig = {
     "mobile-nli-app": path.resolve(path.join(__dirname, "./mobile-nli-app.js")),
     "mobile-app": path.resolve(path.join(__dirname, "./mobile-app")),
     "mobile-native-embedded-chat": path.resolve(path.join(__dirname, "./mobile-native-embedded-chat")),
-    "mobile-native-chat": path.resolve(path.join(__dirname, "./mobile-native-chat")),
     "mobile-native-userhome": path.resolve(path.join(__dirname, "./mobile-native-userhome")),
     "userhome": path.resolve(path.join(__dirname, "./userhome")),
     "router-archive-chat": path.resolve(path.join(__dirname, "./router-archive-chat")),
