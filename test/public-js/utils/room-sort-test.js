@@ -7,6 +7,8 @@ var roomSort = require('../../../public/js/utils/room-sort');
 var Backbone = require('../../../public/repo/backbone/backbone');
 var assert = require('assert');
 
+var VERY_VERY_OLD = new Date('1066-10-29T12:00:20.250Z');
+var VERY_OLD = new Date('1492-10-29T12:00:20.250Z');
 var OLD = new Date('1985-10-29T12:00:20.250Z');
 var NEW = new Date('2014-10-29T12:00:20.250Z');
 
@@ -90,8 +92,68 @@ describe('room-sort', function() {
           assert.deepEqual(id(collection), ['accessed_mentions', 'never_accessed_mentions']);
         });
 
-        it.skip('doesnt move rooms once they have been accessed', function() {});
-        it.skip('doesnt move rooms once they have been read', function() {});
+        it.skip('doesnt move rooms once they have been accessed', function() {
+          var room = new Backbone.Model({
+            id: 'room',
+            unreadItems: 5,
+            mentions: 3,
+            lastAccessTime: OLD,
+            lastAccessTimeNoSync: OLD
+          });
+          var roomToUpdate = new Backbone.Model({
+            id: 'room_to_update',
+            unreadItems: 3,
+            mentions: 1,
+            lastAccessTime: VERY_OLD,
+            lastAccessTimeNoSync: VERY_OLD
+          });
+          var collection = new RecentsCollection([room, roomToUpdate]);
+
+          collection.sort();
+
+          assert.deepEqual(id(collection), ['room', 'room_to_update']);
+
+          roomToUpdate.set('lastAccessTime', NEW);
+          collection.sort();
+
+          assert.deepEqual(id(collection), ['room', 'room_to_update']);
+        });
+
+        it.skip('doesnt move rooms once they have been read', function() {
+          var room = new Backbone.Model({
+            id: 'room',
+            unreadItems: 1,
+            mentions: 1,
+            lastAccessTime: OLD,
+            lastAccessTimeNoSync: OLD
+          });
+          var roomToUpdate = new Backbone.Model({
+            id: 'room_to_update',
+            unreadItems: 1,
+            mentions: 1,
+            lastAccessTime: VERY_OLD,
+            lastAccessTimeNoSync: VERY_OLD
+          });
+          var veryVeryOldRoom = new Backbone.Model({
+            id: 'very_very_old_room',
+            unreadItems: 1,
+            mentions: 1,
+            lastAccessTime: VERY_VERY_OLD,
+            lastAccessTimeNoSync: VERY_VERY_OLD
+          });
+          var collection = new RecentsCollection([room, roomToUpdate, veryVeryOldRoom]);
+
+          collection.sort();
+
+          assert.deepEqual(id(collection), ['room', 'room_to_update', 'very_very_old_room']);
+
+          roomToUpdate.set('lastAccessTime', NEW);
+          roomToUpdate.set('unreadItems', 0);
+          roomToUpdate.set('mentions', 0);
+          collection.sort();
+
+          assert.deepEqual(id(collection), ['room', 'room_to_update', 'very_very_old_room']);
+        });
       });
 
       describe('unread', function() {
@@ -127,8 +189,55 @@ describe('room-sort', function() {
 
           assert.deepEqual(id(collection), ['accessed_unread', 'never_accessed_unread']);
         });
-        it.skip('doesnt move rooms once they have been accessed', function() {});
-        it.skip('doesnt move rooms once they have been read', function() {});
+
+        it.skip('doesnt move rooms once they have been accessed', function() {
+          var room = new Backbone.Model({ id: 'room', unreadItems: 5, lastAccessTime: OLD, lastAccessTimeNoSync: OLD });
+          var roomToUpdate = new Backbone.Model({ id: 'room_to_update', unreadItems: 3, lastAccessTime: VERY_OLD, lastAccessTimeNoSync: VERY_OLD });
+          var collection = new RecentsCollection([room, roomToUpdate]);
+
+          collection.sort();
+
+          assert.deepEqual(id(collection), ['room', 'room_to_update']);
+
+          roomToUpdate.set('lastAccessTime', NEW);
+          collection.sort();
+
+          assert.deepEqual(id(collection), ['room', 'room_to_update']);
+        });
+
+        it.skip('doesnt move rooms once they have been read', function() {
+          var room = new Backbone.Model({
+            id: 'room',
+            unreadItems: 1,
+            lastAccessTime: OLD,
+            lastAccessTimeNoSync: OLD
+          });
+          var roomToUpdate = new Backbone.Model({
+            id: 'room_to_update',
+            unreadItems: 1,
+            lastAccessTime: VERY_OLD,
+            lastAccessTimeNoSync: VERY_OLD
+          });
+          var veryVeryOldRoom = new Backbone.Model({
+            id: 'very_very_old_room',
+            unreadItems: 1,
+            lastAccessTime: VERY_VERY_OLD,
+            lastAccessTimeNoSync: VERY_VERY_OLD
+          });
+          var collection = new RecentsCollection([room, roomToUpdate, veryVeryOldRoom]);
+
+          collection.sort();
+
+          assert.deepEqual(id(collection), ['room', 'room_to_update', 'very_very_old_room']);
+
+          roomToUpdate.set('lastAccessTime', NEW);
+          roomToUpdate.set('unreadItems', 0);
+          roomToUpdate.set('lastUnreadItemTime', NEW);
+          collection.sort();
+
+          assert.deepEqual(id(collection), ['room', 'room_to_update', 'very_very_old_room']);
+        });
+
       });
 
       describe('regular', function() {
@@ -154,14 +263,28 @@ describe('room-sort', function() {
           assert.deepEqual(id(collection), ['accessed_room', 'never_accessed_room']);
         });
 
-        it.skip('doesnt move rooms once they have been accessed', function() {});
+        it('doesnt move rooms if they are later accessed', function() {
+          var room = new Backbone.Model({ id: 'room', lastAccessTime: OLD, lastAccessTimeNoSync: OLD });
+          var roomToUpdate = new Backbone.Model({ id: 'room_to_update', lastAccessTime: VERY_OLD, lastAccessTimeNoSync: VERY_OLD });
+          var collection = new RecentsCollection([room, roomToUpdate]);
+
+          collection.sort();
+
+          assert.deepEqual(id(collection), ['room', 'room_to_update']);
+
+          roomToUpdate.set('lastAccessTime', NEW);
+          collection.sort();
+
+          assert.deepEqual(id(collection), ['room', 'room_to_update']);
+        });
 
         it('promotes rooms if new unread messages arrive', function() {
-          var room = new Backbone.Model({ id: 'room', lastAccessTime: NEW });
-          var roomToUpdate = new Backbone.Model({ id: 'room_to_update', lastAccessTime: OLD });
+          var room = new Backbone.Model({ id: 'room', lastAccessTime: OLD });
+          var roomToUpdate = new Backbone.Model({ id: 'room_to_update', lastAccessTime: VERY_OLD });
           var collection = new RecentsCollection([room, roomToUpdate]);
 
           roomToUpdate.set('unreadItems', 1);
+          roomToUpdate.set('lastUnreadItemTime', NEW);
 
           collection.sort();
 
