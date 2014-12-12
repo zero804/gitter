@@ -59,8 +59,8 @@ describe('room-sort', function() {
 
         it('puts them above unread rooms', function() {
           var collection = new RecentsCollection([
-            { id: 'unread', unread: 1 },
-            { id: 'mentioned', unread: 1, mentions: 1 }
+            { id: 'unread', unreadItems: 2 },
+            { id: 'mentioned', unreadItems: 1, mentions: 1 }
           ]);
 
           collection.sort();
@@ -70,8 +70,8 @@ describe('room-sort', function() {
 
         it('sorts multiple @mentioned rooms by time of last access', function() {
           var collection = new RecentsCollection([
-            { id: 'old_mentions', unread: 3, mentions: 5, lastAccessTime: OLD },
-            { id: 'new_mentions', unread: 5, mentions: 3, lastAccessTime: NEW }
+            { id: 'old_mentions', unreadItems: 3, mentions: 5, lastAccessTime: OLD },
+            { id: 'new_mentions', unreadItems: 5, mentions: 3, lastAccessTime: NEW }
           ]);
 
           collection.sort();
@@ -81,8 +81,8 @@ describe('room-sort', function() {
 
         it.skip('puts @mentioned rooms that havent been accessed at the bottom', function() {
           var collection = new RecentsCollection([
-            { id: 'never_accessed_mentions', unread: 1, mentions: 1 },
-            { id: 'accessed_mentions', unread: 1, mentions: 1, lastAccessTime: NEW }
+            { id: 'never_accessed_mentions', unreadItems: 1, mentions: 1 },
+            { id: 'accessed_mentions', unreadItems: 1, mentions: 1, lastAccessTime: NEW }
           ]);
 
           collection.sort();
@@ -97,8 +97,8 @@ describe('room-sort', function() {
       describe('unread', function() {
         it('puts them above regular rooms', function() {
           var collection = new RecentsCollection([
-            { id: 'unread', unread: 1 },
-            { id: 'regular' }
+            { id: 'regular' },
+            { id: 'unread', unreadItems: 1 }
           ]);
 
           collection.sort();
@@ -108,8 +108,8 @@ describe('room-sort', function() {
 
         it('sorts multiple unread rooms by time of last access', function() {
           var collection = new RecentsCollection([
-            { id: 'old_unread', unread: 5, lastAccessTime: OLD },
-            { id: 'new_unread', unread: 1, lastAccessTime: NEW }
+            { id: 'old_unread', unreadItems: 5, lastAccessTime: OLD },
+            { id: 'new_unread', unreadItems: 1, lastAccessTime: NEW }
           ]);
 
           collection.sort();
@@ -117,10 +117,10 @@ describe('room-sort', function() {
           assert.deepEqual(id(collection), ['new_unread', 'old_unread']);
         });
 
-        it('puts unread rooms that havent been accessed at the bottom', function() {
+        it.skip('puts unread rooms that havent been accessed at the bottom', function() {
           var collection = new RecentsCollection([
-            { id: 'never_accessed_unread', unread: 2 },
-            { id: 'accessed_unread', unread: 1, lastAccessTime: NEW }
+            { id: 'never_accessed_unread', unreadItems: 2 },
+            { id: 'accessed_unread', unreadItems: 1, lastAccessTime: NEW }
           ]);
 
           collection.sort();
@@ -153,8 +153,21 @@ describe('room-sort', function() {
 
           assert.deepEqual(id(collection), ['accessed_room', 'never_accessed_room']);
         });
+
         it.skip('doesnt move rooms once they have been accessed', function() {});
-        it.skip('promotes rooms if new unread messages arrive', function() {});
+
+        it('promotes rooms if new unread messages arrive', function() {
+          var room = new Backbone.Model({ id: 'room', lastAccessTime: NEW });
+          var roomToUpdate = new Backbone.Model({ id: 'room_to_update', lastAccessTime: OLD });
+          var collection = new RecentsCollection([room, roomToUpdate]);
+
+          roomToUpdate.set('unreadItems', 1);
+
+          collection.sort();
+
+          assert.deepEqual(id(collection), ['room_to_update', 'room']);
+        });
+
       });
 
     });
