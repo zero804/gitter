@@ -1,5 +1,4 @@
 "use strict";
-var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var Backbone = require('backbone');
 var TroupeCollections = require('./base');
