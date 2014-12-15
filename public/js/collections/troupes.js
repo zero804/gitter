@@ -27,17 +27,25 @@ module.exports = (function() {
         if (time) {
           this.set('lastAccessTimeNoSync', time.clone());
         }
+
+        if(this.get('unreadItems')) {
+          this.set('hasHadUnreadItemsAtSomePoint', true);
+        }
+
+        if(this.get('mentions')) {
+          this.set('hasHadMentionsAtSomePoint', true);
+        }
       }
 
       this.listenTo(this, 'change:unreadItems', function (model, unreadItems) { // jshint unused:true
         if(unreadItems) {
-          this.set('lastUnreadItemTime', moment());
+          this.set('hasHadUnreadItemsAtSomePoint', true);
         }
       });
 
       this.listenTo(this, 'change:mentions', function(model, mentions) { // jshint unused:true
         if(mentions) {
-          this.set('lastMentionTime', moment());
+          this.set('hasHadMentionsAtSomePoint', true);
         }
       });
 
