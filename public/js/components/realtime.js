@@ -2,7 +2,7 @@
 
 var _ = require('underscore');
 var context = require('utils/context');
-var Faye = require('faye');
+var FayeClient = require('faye');
 var appEvents = require('utils/appevents');
 var log = require('utils/log');
 
@@ -14,12 +14,12 @@ module.exports = (function() {
 
   // var logLevel = parseInt(window.localStorage.fayeLogging, 10) || 0;
 
-  Faye.logger = {};
-  var logLevels = ['fatal', 'error', 'warn', 'info', 'debug'];
-  logLevels.forEach(function(level) {
-    var llevel = level == 'fatal' ? 'error' : level;
-    Faye.logger[level] = function(msg) { log[llevel]('faye: ' + msg.substring(0, 100)); };
-  });
+  // Faye.logger = {};
+  // var logLevels = ['fatal', 'error', 'warn', 'info', 'debug'];
+  // logLevels.forEach(function(level) {
+  //   var llevel = level == 'fatal' ? 'error' : level;
+  //   Faye.logger[level] = function(msg) { log[llevel]('faye: ' + msg.substring(0, 100)); };
+  // });
 
   var clientId = null;
 
@@ -273,7 +273,7 @@ module.exports = (function() {
   function createClient() {
     var c = context.env('websockets');
     c.options.reuseTransport = false; // TODO: consider if we need this
-    var client = new Faye.Client(c.fayeUrl, c.options);
+    var client = new FayeClient(c.fayeUrl, c.options);
 
     if(websocketsDisabled) {
       /* Testing no websockets */
@@ -444,7 +444,7 @@ module.exports = (function() {
     if(clientIdOnPing === clientId) {
       log.info("Client reset requested");
       clientId = null;
-      client.reset();
+      // client.reset();
     } else {
       log.info("Ignoring reset request as clientId has changed.");
     }
