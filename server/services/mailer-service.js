@@ -2,225 +2,99 @@
 "use strict";
 
 var env            = require('../utils/env');
-var stats          = env.stats;
+var mailer         = env.mailer;
 
-//var nodemailer     = require('nodemailer');
 var troupeTemplate = require('../utils/troupe-template');
-var nconf          = require('../utils/config');
-var winston        = require('../utils/winston');
 var Q              = require('q');
-// var emailify       = require('emailify');
-
-var mandrillClient = require('mandrill-api/mandrill');
-var mandrill = new mandrillClient.Mandrill(env.config.get('mandrill:apiKey'));
-var cdn = require('../web/cdn');
-
-var logEmailToLogger = nconf.get('logging:logEmailContents');
-
-//var smtpTransport = nodemailer.createTransport("SMTP", {
-//    host: 'smtp.mandrillapp.com',
-//    port: 587,
-//    auth : {
-//      user: nconf.get("mandrill:username"),
-//      pass: nconf.get("mandrill:apiKey")
-//    }
-//});
-
-//var footerTemplate = null;
-//var headerTemplate = null;
-//troupeTemplate.compile("emails/footer", function(err, t) {
-//  if(err) {
-//    winston.error("Error. Unable to compile footer template. ", { exception: err });
-//    throw new Error(err);
-//  }
-//  footerTemplate = t;
-//});
-//
-//troupeTemplate.compile("emails/header", function(err, t) {
-//  if(err) {
-//    winston.error("Error. Unable to compile header template. ", { exception: err });
-//    throw new Error(err);
-//  }
-//  headerTemplate = t;
-//});
-
-exports.sendEmail = function(options) {
-  var deferred = Q.defer();
-
-  options.templateName = options.templateFile.replace(/\_/g,'-');
-
-  if (options.templateFile === 'added_to_room')       addedToRoomViaMandrill(options, deferred);
-  if (options.templateFile === 'invitation')          invitationViaMandrill(options,  deferred);
-  if (options.templateFile === 'invitation-reminder') invitationViaMandrill(options,  deferred);
-  if (options.templateFile === 'unread_notification') unreadViaMandrill(options,      deferred);
-  if (options.templateFile === 'created_room')        createdRoomViaMandrill(options, deferred);
-
-  return deferred.promise;
+var cdn            = require('../web/cdn');
 
 
-  //var d = Q.defer();
+var CACHED = { };
+function getCachedTemplate(templateName) {
+  if(CACHED[templateName]) return CACHED[templateName];
+  CACHED[templateName] = troupeTemplate.compile(templateName);
+  return CACHED[templateName];
+}
 
-  //var tracking = options.tracking || {}; // avoids failure if no tracking information is present
+function applyTemplate(templateName, data) {
+  return getCachedTemplate(templateName)
+    .then(function(template) {
+      return template(data);
+    });
+}
 
-  //var htmlTemplateFile = "emails/" + options.templateFile + "_html";
-
-  //troupeTemplate.compile(htmlTemplateFile, function(err, htmlTemplate) {
-  //  if(err) return d.reject(err);
-
-  //  var headerHtml = headerTemplate(options.data);
-  //  var html = htmlTemplate(options.data);
-  //  var footerHtml = footerTemplate(options.data);
-
-  //  var compiledHtmlEmail = headerHtml + "\n" + html + "\n" + footerHtml;
-
-  //  // emailify.parse(compiledHtmlEmail, 'utf8', function(err,htmlContent) {
-  //    var htmlContent = compiledHtmlEmail;
-  //    var plaintextTemplateFile = "emails/" + options.templateFile;
-  //    troupeTemplate.compile(plaintextTemplateFile, function(err, plaintextTemplate) {
-  //      if(err) return d.reject(err);
-
-  //      var plaintext = plaintextTemplate(options.data);
-  //      if(logEmailToLogger) {
-  //        winston.info("Sending email", plaintext);
-  //      }
-
-  //      if(/@troupetest.local/.test(options.from) || /@troupetest.local/.test(options.to)) {
-  //        winston.info('Skipping send for troupetest.local');
-  //        return d.resolve();
-  //      }
-
-  //      var headers;
-  //      if(options.unsubscribe) {
-  //        headers = {
-  //          'List-Unsubscribe': '<' + options.unsubscribe + '>'
-  //        };
-  //      }
-  //      smtpTransport.sendMail({
-  //        from: options.from,
-  //        to: options.to,
-  //        subject: options.subject,
-  //        html: htmlContent,
-  //        text: plaintext,
-  //        headers: headers
-  //      }, function(err, response){
-
-  //        if (err) {
-  //          winston.error("SMTP Email Error", { exception: err });
-  //          return d.reject(err);
-  //        }
-
-  //        winston.info("Email sent successfully through SMTP", { message: response.message });
-  //        stats.event(tracking.event, tracking.data);
-
-  //        d.resolve();
-  //      });
-  //    });
-  //  });
-  //// });
-
-  //return d.promise.nodeify(deferred);
+var VALID_TEMPLATES = {
+  'added-to-room': addedToRoomMapping,
+  'invitation': invitationMapping,
+  'invitation-reminder': invitationMapping,
+  'unread-notification': unreadNoticationMapping,
+  'created-room': createdRoomMapping
 };
 
-function addedToRoomViaMandrill(options, deferred) {
+exports.sendEmail = function(options) {
+  var mandrillTemplateName = options.templateFile.replace(/\_/g,'-');
 
-  var vars = [
-    {name: 'NAME',    content: options.data.recipientName},
-    {name: 'SENDER',  content: options.data.senderName},
-    {name: 'ROOMURI', content: options.data.roomUri},
-    {name: 'ROOMURL', content: options.data.roomUrl},
-    {name: 'UNSUB',   content: options.data.unsubscribeUrl},
-    {name: 'LOGOURL', content: cdn('images/logo-text-blue-pink.png', {email: true})}
-  ];
+  var mapper = VALID_TEMPLATES[mandrillTemplateName];
+  if(!mapper) return Q.reject('Unknown mandrill template: ' + mandrillTemplateName);
 
-  return sendMail(vars, options, deferred);
-}
+  options.templateName = mandrillTemplateName;
+  options.data = mapper(options.data);
 
-function invitationViaMandrill(options, deferred) {
+  return mailer(options);
+};
 
-  var vars = [
-    { name: 'NAME',    content: options.data.recipientName },
-    { name: 'DATE',    content: options.data.date },
-    { name: 'SENDER',  content: options.data.senderName },
-    { name: 'ROOMURI', content: options.data.roomUri },
-    { name: 'ROOMURL', content: options.data.roomUrl },
-    { name: 'LOGOURL', content: cdn('images/logo-text-blue-pink.png', { email: true }) }
-  ];
-
-  return sendMail(vars, options, deferred);
-}
-
-function unreadViaMandrill(options, deferred) {
-
-  var htmlTemplateFile = "emails/" + options.templateFile + "_html";
-  var plaintextTemplateFile = "emails/" + options.templateFile;
-
-  var html;
-  var plaintext;
-
-  troupeTemplate.compile(htmlTemplateFile, function(err, htmlTemplate) {
-    html = htmlTemplate(options.data);
-
-    troupeTemplate.compile(plaintextTemplateFile, function(err, plaintextTemplate) {
-      plaintext = plaintextTemplate(options.data);
-
-      var vars = [
-        {name: 'NAME',       content: options.data.recipientName},
-        {name: 'SENDER',     content: options.data.senderName},
-        {name: 'ROOMURI',    content: options.data.roomUri},
-        {name: 'ROOMURL',    content: options.data.roomUrl},
-        {name: 'UNSUB',      content: options.data.unsubscribeUrl},
-        {name: 'LOGOURL',    content: cdn('images/logo-text-blue-pink.png', {email: true})},
-        {name: 'HTML',       content: html},
-        {name: 'PLAINTEXT',  content: plaintext}
-      ];
-
-      return sendMail(vars, options, deferred);
-    });
-  });
-}
-
-function createdRoomViaMandrill(options, deferred) {
-  var twitterSnippet = options.data.isPublic ? '<tr><td><br><a href="' + options.data.twitterURL + '" style="text-decoration: none" target="_blank" class="button-twitter">Share on Twitter</a></td></tr>' : '';
-  var orgNote = options.data.isOrg ? '<p>Note that only people within your organisation can join this room.</p>' : '';
-
-  var vars = [
-    {name: 'NAME',        content: options.data.recipientName},
-    {name: 'SENDER',      content: options.data.senderName},
-    {name: 'ROOMURI',     content: options.data.roomUri},
-    {name: 'ROOMURL',     content: options.data.roomUrl},
-    {name: 'UNSUB',       content: options.data.unsubscribeUrl},
-    {name: 'LOGOURL',     content: cdn('images/logo-text-blue-pink.png', {email: true})},
-    {name: 'TWITTERURL',  content: twitterSnippet},
-    {name: 'ORGNOTE',     content: orgNote},
-    {name: 'ROOMTYPE',    content: options.data.roomType}
-  ];
-
-  return sendMail(vars, options, deferred);
-}
-
-// DEPRECATED
-function sendMail(vars, options, deferred) {
-  var templateName = options.templateName;
-  var tracking = options.tracking || {};
-
-  var message = {
-    subject:    options.subject,
-    from_email: 'support@gitter.com',
-    from_name:  options.fromName,
-    to:         [{ email: options.to, type: 'to' }],
-    tags:       [options.templateName], // used for A/B testing
-    merge_vars: [{ rcpt: options.to, vars: vars }]
+function addedToRoomMapping(data) {
+  return {
+    NAME:    data.recipientName,
+    SENDER:  data.senderName,
+    ROOMURI: data.roomUri,
+    ROOMURL: data.roomUrl,
+    UNSUB:   data.unsubscribeUrl,
+    LOGOURL: cdn('images/logo-text-blue-pink.png', {email: true})
   };
 
-  mandrill.messages.sendTemplate({
-    template_name: templateName,
-    template_content: [],
-    message: message
-  }, function() {
-    if (logEmailToLogger) winston.info('Sent email: ' + templateName + ', check Mandrill');
-    stats.event(tracking.event, tracking.data);
-    deferred.resolve();
-  }, function(err) {
-    deferred.reject(err);
-  });
 }
+
+function invitationMapping(data) {
+  return {
+    NAME:    data.recipientName,
+    DATE:    data.date,
+    SENDER:  data.senderName,
+    ROOMURI: data.roomUri,
+    ROOMURL: data.roomUrl,
+    LOGOURL: cdn('images/logo-text-blue-pink.png', { email: true })
+  };
+}
+
+function unreadNoticationMapping(data) {
+
+  return {
+    NAME:       data.recipientName,
+    SENDER:     data.senderName,
+    ROOMURI:    data.roomUri,
+    ROOMURL:    data.roomUrl,
+    UNSUB:      data.unsubscribeUrl,
+    HTML:       applyTemplate("emails/unread_notification_html", data),
+    PLAINTEXT:  applyTemplate("emails/unread_notification", data),
+    LOGOURL:    cdn('images/logo-text-blue-pink.png', {email: true})
+  };
+
+}
+
+function createdRoomMapping(data) {
+  var twitterSnippet = data.isPublic ? '<tr><td><br><a href="' + data.twitterURL + '" style="text-decoration: none" target="_blank" class="button-twitter">Share on Twitter</a></td></tr>' : '';
+  var orgNote = data.isOrg ? '<p>Note that only people within your organisation can join this room.</p>' : '';
+
+  return {
+    NAME:        data.recipientName,
+    SENDER:      data.senderName,
+    ROOMURI:     data.roomUri,
+    ROOMURL:     data.roomUrl,
+    UNSUB:       data.unsubscribeUrl,
+    TWITTERURL:  twitterSnippet,
+    ORGNOTE:     orgNote,
+    ROOMTYPE:    data.roomType,
+    LOGOURL:     cdn('images/logo-text-blue-pink.png', {email: true})
+  };
+}
+

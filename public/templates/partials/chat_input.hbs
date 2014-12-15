@@ -1,4 +1,4 @@
-<div class="chat-input" id="chat-input-wrapper">
+<footer class="chat-input" id="chat-input-wrapper">
   <div class="progress">
     <div class="progress__bar" id="file-progress-bar"></div>
   </div>
@@ -6,7 +6,7 @@
     <div id="bottom-unread-banner" class="banner slide-away"></div>
   </div>
   <div class="chat-input__container  js-chat-input-container" id="chat-input">
-    {{{ prerenderView "js/views/chat/tmpl/chatInputView" }}}
+    {{#if user}}{{{ prerenderView "js/views/chat/tmpl/chatInputView" }}}{{/if}}
   </div>
   <div id="search-input"></div>
-</div>
+</footer>

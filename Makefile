@@ -57,13 +57,13 @@ clean-embedded-chat:
 	rm -rf output/embedded output/embedded.tgz
 
 embedded-chat:
-	mkdir -p output/embedded/mobile
-	NODE_ENV=prod ./build-scripts/render-embedded-chat.js  -o output/embedded/mobile/embedded-chat.html
-	echo public-processed/js/core-libraries.min.js > output/embedded-resources.txt
-	echo public-processed/js/mobile-native-embedded-chat.min.js >> output/embedded-resources.txt
-	echo public-processed/styles/mobile-native-chat.css >> output/embedded-resources.txt
-	ls public-processed/images/emoji/*  >> output/embedded-resources.txt
-	./build-scripts/extract-urls.js public-processed/styles/mobile-native-chat.css >> output/embedded-resources.txt
+	mkdir -p output/embedded/www/mobile
+	NODE_ENV=prod ./build-scripts/render-embedded-chat.js  -o output/embedded/www/mobile/embedded-chat.html
+	echo output/assets/js/vendor.js > output/embedded-resources.txt
+	echo output/assets/js/mobile-native-embedded-chat.js >> output/embedded-resources.txt
+	echo output/assets/styles/mobile-native-chat.css >> output/embedded-resources.txt
+	ls output/assets/images/emoji/*  >> output/embedded-resources.txt
+	./build-scripts/extract-urls.js output/assets/styles/mobile-native-chat.css >> output/embedded-resources.txt
 	./build-scripts/copy-embedded-resources.sh
 
 

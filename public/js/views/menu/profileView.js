@@ -41,9 +41,11 @@ module.exports = (function() {
         showSignout: !isNativeResult
       };
     },
-    homeClicked: function(e) {
+    homeClicked: function (e) {
       e.preventDefault();
-      appEvents.trigger('navigation', context.getUser().url, 'home', ''); // TODO: figure out a title
+      if (context().user.url !== window.location.pathname) {
+        appEvents.trigger('navigation', context.getUser().url, 'home', '');
+      }
     }
   });
 

@@ -9,17 +9,13 @@ module.exports = (function() {
   var assetTag = context.env('assetTag');
   var cdnPrefix =  assetTag ? "/_s/" + assetTag : '';
 
-  function cdnPassthrough(url) {
+  function cdnNativeApp(url) {
     // nicest way of supporting embedded mobile chat
-    if(window.location.protocol === 'file:') {
-      var index = window.location.pathname.indexOf('.app/www/build/');
-      // embedded root should be /x/y/z/[Gitter or GitterBeta].app/www/build/
-      var embeddedRoot = window.location.pathname.substring(0, index) + '.app/www/build/' ;
+    return '../' + url;
+  }
 
-      return embeddedRoot + url;
-    } else {
-      return '/_s/l/' + url;
-    }
+  function cdnPassthrough(url) {
+    return '/_s/l/' + url;
   }
 
   function cdnSingle(url, options) {
@@ -51,7 +47,9 @@ module.exports = (function() {
     return prefix + host + cdnPrefix + "/" + url;
   }
 
-  if(!hostLength) {
+  if(window.location.protocol === 'file:') {
+    return cdnNativeApp;
+  } else if(!hostLength) {
     return cdnPassthrough;
   } else if(hostLength == 1) {
     return cdnSingle;

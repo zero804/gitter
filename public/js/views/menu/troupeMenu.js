@@ -1,6 +1,5 @@
 "use strict";
 var $ = require('jquery');
-var nanoscrollWrapper = require('../../utils/nanoscroll-wrapper');
 var Marionette = require('marionette');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
@@ -80,7 +79,7 @@ module.exports = (function () {
       suggested: '#left-menu-list-suggested'
     },
 
-    events: function() {
+    events: function () {
       var events = {
         // 'click #search-clear-icon': 'onSearchClearIconClick'
       };
@@ -102,8 +101,7 @@ module.exports = (function () {
       'room.1 room.2 room.3 room.4 room.5 room.6 room.7 room.8 room.9 room.10': 'navigateToRoom'
     },
 
-    initialize: function() {
-
+    initialize: function () {
       this.bindUIElements();
       // this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
       this.repoList = false;
@@ -142,7 +140,23 @@ module.exports = (function () {
           }
         });
       }
-      this.show();
+    },
+
+    setupNanoScroller: function (collection) {
+      var ui = this.ui;
+      var target = ui.nano[0];
+      if (!target) return;
+
+      var initScroller = function () {
+        $(target).nanoScroller({ iOSNativeScrolling: true });
+      };
+
+      initScroller(); // initalise on startup
+
+      // listening to events that can affect height, therefore scroll
+      this.listenTo(collection, 'add remove', function () {
+        setTimeout(initScroller, 100); // FIXME: requestAnimation frame does not work here :(
+      });
     },
 
     // FIXME: WARNING -> THIS METHOD IS UNSAFE.
@@ -206,11 +220,9 @@ module.exports = (function () {
     },
 
     show: function () {
-      var ui = this.ui;
+      this.setupNanoScroller(troupeCollections.troupes);
 
-      if (ui.nano[0] && !this.nano) {
-        this.nano = nanoscrollWrapper(this.ui.nano[0], { iOSNativeScrolling: true });
-      }
+      var ui = this.ui;
 
       new ProfileView({ el: ui.profile });
 
@@ -249,7 +261,6 @@ module.exports = (function () {
     },
 
     onRender: function () {
-      this.isRendered = true;
       this.show();
     },
 

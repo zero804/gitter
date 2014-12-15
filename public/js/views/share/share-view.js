@@ -45,7 +45,7 @@ module.exports = (function() {
     },
 
     getBadgeUrl: function() {
-      return context.env('badgeBaseUrl') + '/Join Chat.svg';
+      return context.env('badgeBaseUrl') + '/Join%20Chat.svg';
     },
 
     getBadgeMD: function() {
