@@ -7,6 +7,10 @@ function natural(a, b) {
 }
 
 function getRank(room) {
+  // hasHadMentionsAtSomePoint (and the equivalent for unreadItems) is used
+  // to ensure that rooms dont jump around when mentions is updated after a
+  // user visits a room and reads all the mentions.
+  // hasHadMentionsAtSomePoint is not available on the server, so we have a failover.
   if (room.hasHadMentionsAtSomePoint || room.mentions) {
     return 0;
   } else if (room.hasHadUnreadItemsAtSomePoint || room.unreadItems) {
@@ -17,6 +21,9 @@ function getRank(room) {
 }
 
 function timeDifference(a, b) {
+  // lastAccessTimeNoSync is used to ensure that rooms dont jump around when
+  // lastAccessTime is updated after a user visits a room
+  // lastAccessTimeNoSync is not available on the server, so we have a failover.
   var aDate = a.lastAccessTimeNoSync || a.lastAccessTime;
   var bDate = b.lastAccessTimeNoSync || b.lastAccessTime;
 
@@ -33,7 +40,7 @@ function timeDifference(a, b) {
   }
 }
 
-// it is worth noticing that we want to sort in a descindencing order, thus the negative results
+// we want to sort in a descending order, thus the negative results
 module.exports = {
   favourites: {
     sort: function (a, b) {
@@ -41,10 +48,9 @@ module.exports = {
       b = ensurePojo(b);
       var isDifferent = natural(a.favourite, b.favourite);
 
-      // one of them isn't a favourite
       if (isDifferent) return isDifferent; // -1 or 1
 
-      // both favourites, order by name
+      // both favourites of the same rank, order by name
       return natural(a.name, b.name);
     },
     filter: function (room) {
