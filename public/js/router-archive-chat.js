@@ -53,7 +53,7 @@ onready(function() {
   }).render();
 
   // Adjust header manually: #nasty
-  var size = $('#header-wrapper').height() + 15 + 'px';
+  var size = $('#header-wrapper').outerHeight() + 'px';
   var ss = document.styleSheets[2];
   try {
     if (ss.insertRule) {
