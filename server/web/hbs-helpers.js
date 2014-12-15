@@ -57,7 +57,7 @@ function cdnUrlGenerator(url, options) {
     return options.root + url;
   }
 
-  return cdn(url, { appcache: options.appcache });
+  return cdn(url, {});
 }
 
 exports.bootScript = function(url, parameters) {
@@ -102,11 +102,6 @@ exports.generateTroupeContext = function(troupeContext, parameters) {
   var options = parameters.hash;
 
   var env = createEnv(this, options);
-
-  /* Disable the use of CDNs if we're using the appcache as douchey appcache doesn't support CDN fetchs */
-  if(options && options.appcache) {
-    env.cdns = [];
-  }
 
   return '<script type="text/javascript">' +
           'window.troupeEnv = ' + safeJson(JSON.stringify(env)) + ';' +

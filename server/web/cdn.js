@@ -24,15 +24,10 @@ function cdnSingle(url, options) {
   if(!url) url = ""; // This should not be happening
 
   var nonrelative = options && options.nonrelative;
-  var appcache = options && options.appcache;
   var email = options && options.email;
 
   if (email) {
     return nconf.get('email:emailBasePath') + "/_s/l/" + url;
-  }
-
-  if(appcache) {
-    return cdnPrefix + "/" + url;
   }
 
   var prefix = nonrelative ? "https://" : "//";
@@ -47,14 +42,9 @@ function cdnMulti(url, options) {
   if(!url) url = ""; // This should not be happening
 
   var email = options && options.email;
-  var appcache = options && options.appcache;
 
   if (email) {
     return nconf.get('email:emailBasePath') + "/_s/l/" + url;
-  }
-
-  if(appcache) {
-    return cdnPrefix + "/" + url;
   }
 
   var x = 0;

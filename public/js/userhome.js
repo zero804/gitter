@@ -13,7 +13,7 @@ require('views/widgets/avatar');
 require('views/widgets/timeago');
 
 onready(function() {
-  new UserHomeView({ el: '#content-wrapper' }).render();
+  new UserHomeView({ el: '#userhome' }).render();
 
   appEvents.on('navigation', function(url) {
     if(url.indexOf('#') === 0) {

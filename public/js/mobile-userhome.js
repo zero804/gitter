@@ -27,7 +27,7 @@ onready(function() {
   }).render();
 
   new UserHomeView({
-    el: $('#content-frame')
+    el: $('#userhome')
   }).render();
 
   var Router = Backbone.Router.extend({

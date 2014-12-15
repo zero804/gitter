@@ -22,7 +22,6 @@ var webpackConfig = {
     "mobile-nli-app": path.resolve(path.join(__dirname, "./mobile-nli-app.js")),
     "mobile-app": path.resolve(path.join(__dirname, "./mobile-app")),
     "mobile-native-embedded-chat": path.resolve(path.join(__dirname, "./mobile-native-embedded-chat")),
-    "mobile-native-chat": path.resolve(path.join(__dirname, "./mobile-native-chat")),
     "mobile-native-userhome": path.resolve(path.join(__dirname, "./mobile-native-userhome")),
     "userhome": path.resolve(path.join(__dirname, "./userhome")),
     "router-archive-chat": path.resolve(path.join(__dirname, "./router-archive-chat")),
@@ -102,12 +101,14 @@ var webpackConfig = {
     new CommonsChunkPlugin("vendor", "[name].js"),
     new ContextReplacementPlugin(/moment\/lang$/, /cs|da|de|en-gb|es|fr|it|ja|ko|nl|pl|pt|ru|sv|zh-cn/)
   ],
-  bail: true
+  bail: true,
+  recordsPath: '/tmp/records.json'
 };
 
 if(devMode) {
   // See http://webpack.github.io/docs/configuration.html#devtool
   webpackConfig.devtool = 'sourcemap';
+  webpackConfig.cache = true;
 } else {
   // webpackConfig.plugins.push(new DedupePlugin());
   // webpackConfig.plugins.push(new OccurrenceOrderPlugin());

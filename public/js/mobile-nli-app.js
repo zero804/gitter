@@ -30,13 +30,13 @@ onready(function() {
   var chatCollection = new chatModels.ChatCollection(null, { listen: true });
 
   new ChatCollectionView({
-    el: '#content-frame',
+    el: '#chat-container',
     collection: chatCollection,
     decorators: [emojiDecorator]
   }).render();
 
   new MobileLoginButton({
-    el: '#chat-input',
+    el: '#login-footer',
   }).render();
 
   var Router = Backbone.Router.extend({

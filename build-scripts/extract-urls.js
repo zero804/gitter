@@ -45,13 +45,13 @@ css.eachDecl(function(decl) {
 
   if(!d.length) return;
 
-  var hasTtf = d.filter(function(x) {
-    return x.value.indexOf('.ttf') >= 0;
-  });
+  // var hasTtf = d.filter(function(x) {
+  //   return x.value.indexOf('.ttf') >= 0;
+  // });
 
-  if(hasTtf.length) {
-    decl.parent.decls = hasTtf;
-  }
+  // if(hasTtf.length) {
+  //   decl.parent.decls = hasTtf;
+  // }
 
 });
 

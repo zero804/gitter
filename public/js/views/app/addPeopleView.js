@@ -184,7 +184,7 @@ module.exports = (function() {
           self.collection.add(m);
           self.typeahead.clear();
         })
-        .fail(function(xhr) {
+        .fail(function (xhr) {
           var json = xhr.responseJSON;
           self.ui.loading.toggleClass('hide');
           var m = json && json.message || 'Error';

@@ -56,11 +56,6 @@ switch(nconf.get('NODE_ENV')) {
     break;
 }
 
-function getAppCache(req) {
-  if(!nconf.get('web:useAppCache')) return;
-  return req.url + '.appcache';
-}
-
 function renderHomePage(req, res, next) {
   contextGenerator.generateNonChatContext(req)
     .then(function (troupeContext) {
@@ -75,7 +70,6 @@ function renderHomePage(req, res, next) {
       }
 
       res.render(page, {
-        useAppCache: !!nconf.get('web:useAppCache'),
         bootScriptName: bootScriptName,
         cssFileName: "styles/" + bootScriptName + ".css",
         troupeName: req.uriContext.uri,
@@ -120,7 +114,6 @@ function renderMainFrame(req, res, next, frame) {
 
       res.render(template, {
         socialMetadata: social.getMetadata({ room: req.troupe }),
-        appCache: getAppCache(req),
         bootScriptName: bootScriptName,
         cssFileName: "styles/" + bootScriptName + ".css",
         troupeName: req.uriContext.uri,
@@ -195,7 +188,6 @@ function renderChat(req, res, options, next) {
 
       var renderOptions = _.extend({
           isRepo: troupe.githubType === 'REPO',
-          appCache: getAppCache(req),
           bootScriptName: script,
           cssFileName: "styles/" + script + ".css", // css filename matches bootscript
           githubLink: githubLink,
@@ -239,7 +231,6 @@ function renderMobileUserHome(req, res, next) {
   contextGenerator.generateNonChatContext(req)
     .then(function(troupeContext) {
       res.render('mobile/mobile-app', {
-        useAppCache: !!nconf.get('web:useAppCache'),
         bootScriptName: 'mobile-userhome',
         troupeName: req.uriContext.uri,
         troupeContext: troupeContext,
@@ -264,24 +255,6 @@ function renderMobileNativeEmbeddedChat(req, res) {
   });
 }
 
-function renderMobileNativeChat(req, res) {
-  /*
-   * All native chats are served from one endpoint so we can appcache one page.
-   *
-   * This means:
-   * 1. server has no idea what the troupe id is
-   * 2. the embedded troupe context must be minimal as the appcache would make it permanent
-   *
-   * Therefore creating a troupe context is the responibility of the client browser.
-   */
-  res.render('mobile/native-chat-app', {
-    appCache: getAppCache(req),
-    troupeContext: {
-      userId: req.user.id
-    }
-  });
-}
-
 function renderMobileNativeUserhome(req, res) {
   res.render('mobile/native-userhome-app', {
     bootScriptName: 'mobile-native-userhome',
@@ -293,7 +266,7 @@ function renderMobileNativeUserhome(req, res) {
 
 function renderMobileNotLoggedInChat(req, res, next) {
   return renderChat(req, res, {
-    template: 'mobile/mobile-app',
+    template: 'mobile/mobile-nli-chat',
     script: 'mobile-nli-app',
     unread: false // Not logged in users see chats as read
   }, next);
@@ -309,7 +282,7 @@ function renderNotFound(req, res, next) {
     })
     .then(function (rooms) {
       res.render('not-found', {
-        cssFileName: "/styles/not-found.css",
+        cssFileName: "styles/not-found.css",
         org: org,
         rooms: rooms
       });
@@ -346,7 +319,6 @@ function renderUserNotSignedUp(req, res, next) {
     .then(function (user) {
       res.render('chat-invited-template', {
         cssFileName: "styles/router-nli-chat.css", // TODO: this shouldn't be hardcoded as this
-        appCache: getAppCache(req),
         agent: req.headers['user-agent'],
         oneToOneInvited: true,
         invitedUser: user,
@@ -373,7 +345,6 @@ function renderUserNotSignedUpMainFrame(req, res, next, frame) {
       }
 
       res.render(template, {
-        appCache: getAppCache(req),
         bootScriptName: bootScriptName,
         cssFileName: "styles/" + bootScriptName + ".css",
         troupeName: req.params.roomPart1,
@@ -397,7 +368,6 @@ module.exports = exports = {
   renderMobileNotLoggedInChat: renderMobileNotLoggedInChat,
   renderNotLoggedInChatPage: renderNotLoggedInChatPage,
   renderMobileNativeEmbeddedChat: renderMobileNativeEmbeddedChat,
-  renderMobileNativeChat: renderMobileNativeChat,
   renderMobileNativeUserhome: renderMobileNativeUserhome,
   renderUserNotSignedUp: renderUserNotSignedUp,
   renderUserNotSignedUpMainFrame: renderUserNotSignedUpMainFrame

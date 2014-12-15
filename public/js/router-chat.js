@@ -26,8 +26,9 @@ require('views/widgets/avatar');
 require('views/widgets/timeago');
 
 
-onready(function() {
+onready(function () {
 
+  postMessage({ type: "chatframe:loaded" });
 
   $(document).on("click", "a", function(e) {
     if(this.href) {

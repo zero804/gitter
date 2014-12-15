@@ -38,7 +38,7 @@ onready(function() {
   var userCollection = new userModels.UserCollection(null, { listen: true, limit: 21 });
 
   var chatCollectionView = new ChatCollectionView({
-    el: $('#content-frame'),
+    el: $('#chat-container'),
     collection: chatCollection,
     decorators: [emojiDecorator, mobileDecorator]
   }).render();
