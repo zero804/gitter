@@ -95,6 +95,8 @@ function determineDesktopNotifications(user, req) {
   var os = agent.os.family;
   var clientType;
 
+  console.log("********************* OS: " + os + " clientType: " + clientType);
+
   if(os === 'Mac OS X') {
     clientType = 'osx';
   } else if(os.indexOf('Windows') === 0) {
