@@ -462,7 +462,6 @@ function isUserConnectedWithClientType(userId, clientType, callback) {
 
       for(var i = 0; i < replies.length; i++) {
         var ct = replies[i][0];
-        console.log("***** CT is: " + ct + "****** Looking for clientType: + clientType");
         if(ct === clientType || ct === clientTypeBeta) return callback(null, true);
       }
 
