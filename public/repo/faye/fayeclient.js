@@ -2529,12 +2529,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	    CONNECTED: {
 	      socketClosed: "AWAITING_RETRY",
-	      pingTimeout: "CONNECTING",
+	      pingTimeout: "RECONNECTING",
 	      close: "CLOSED"
 	    },
 	    AWAITING_RETRY: {
 	      close: "CLOSED",
-	      connect: "CONNECTING"
+	      connect: "RECONNECTING"
+	    },
+	    RECONNECTING: {
+	      socketClosed: "AWAITING_RETRY",
+	      socketConnected: "CONNECTED",
+	      close: "CLOSED"
 	    },
 	    CLOSED: {
 	      connect: "CONNECTING"
@@ -2655,17 +2660,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	Faye.extend(Socket_Promise.prototype, Faye_Logging);
 
 	var Faye_Transport_WebSocket = Faye.extend(Faye_Class(Faye_Transport, {
-	  CONNECTING:          3,
-	  AWAITING_RETRY:      4,
-	  CONNECTED:           5,
-	  CLOSED:              7,
-
 	  batching:     false,
 	  initialize: function(dispatcher, endpoint) {
 	    Faye_Transport.prototype.initialize.call(this, dispatcher, endpoint);
 
 	    this._state = new Faye_FSM(FSM);
 	    this._state.on('enter:CONNECTING', this._onEnterConnecting.bind(this));
+	    this._state.on('enter:RECONNECTING', this._onEnterConnecting.bind(this));
 	    this._state.on('enter:CONNECTING_INITIAL', this._onEnterConnecting.bind(this));
 	    this._state.on('enter:AWAITING_RETRY', this._onEnterAwaitingRetry.bind(this));
 	    this._state.on('enter:CONNECTED', this._onEnterConnected.bind(this));
@@ -2766,7 +2767,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, this._dispatcher.retry * 1000 || 1000);
 	  },
 
-	  _onEnterConnected: function() {
+	  _onEnterConnected: function(lastState) {
+	    var self = this;
+
 	    this.addTimeout('ping', this._dispatcher.timeout / 2, this._ping, this);
 	    if(!this._onNetworkEventBound) {
 	      this._onNetworkEventBound = this._onNetworkEvent.bind(this);
@@ -2779,6 +2782,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (Faye.ENV.addEventListener) {
 	      connection.addEventListener('online', this._onNetworkEventBound, false);
 	      connection.addEventListener('offline', this._onNetworkEventBound, false);
+	    }
+
+	    this._sleepDetectionLast = Date.now();
+	    this._sleepDetectionTimer = setInterval(function() {
+	      var now = Date.now();
+	      if(self._sleepDetectionLast - now > 60000) {
+	        console.log('SLEEP DETECTED!');
+	        self._ping();
+	      }
+	      self._sleepDetectionLast = now;
+	    }, 30000);
+
+	    if(lastState === 'RECONNECTING') {
+	      setTimeout(function() {
+	        console.info('RESENING connection ');
+	        self._dispatcher._client.connect(function() {
+	          console.log('CONNECT on reconnect got back', arguments);
+	        }, self);
+
+	      }, 0);
 	    }
 	  },
 
@@ -2800,11 +2823,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      connection.removeEventListener('offline', this._onNetworkEventBound, false);
 	    }
 
+	    clearTimeout(this._sleepDetectionTimer);
 
 	    this._rejectPending();
 	  },
 
 	  close: function() {
+	    console.error('CLOSE CALLED')
 	    this._state.transitionIfPossible('close');
 	  },
 
