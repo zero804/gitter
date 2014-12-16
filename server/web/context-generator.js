@@ -99,6 +99,8 @@ function determineDesktopNotifications(user, req) {
     clientType = 'osx';
   } else if(os.indexOf('Windows') === 0) {
     clientType = 'win';
+  } else if (os.indexOf('Linux') === 0) {
+    clientType= 'linux';
   }
 
   if(clientType) {

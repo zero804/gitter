@@ -3,8 +3,6 @@ var apiClient = require('components/apiClient');
 
 module.exports = (function() {
 
-
-  var cordova = window.cordova;
   var noop = function() {};
 
   function getUriFromUrl(url) {
@@ -32,7 +30,7 @@ module.exports = (function() {
    * title: used in all versions of gitter ios
    */
   var updateNativeContext = function(url, context, troupeId, altContext, title) {
-    cordova.exec(
+    window.cordova.exec(
       noop,
       noop,
       "TroupeContext",
@@ -56,7 +54,7 @@ module.exports = (function() {
 
   return {
     navigate: function(url) {
-      if(!cordova) return;
+      if(!window.cordova) return;
 
       var uri = getUriFromUrl(url);
 
@@ -76,7 +74,7 @@ module.exports = (function() {
       });
     },
     syncNativeWithWebContext: function(troupe) {
-      if(!cordova) return;
+      if(!window.cordova) return;
 
       troupe.on('change', function() {
         updateNativeContextWithTroupe(troupe);
@@ -85,7 +83,7 @@ module.exports = (function() {
       updateNativeContextWithTroupe(troupe);
     },
     setNativeToUserhome: function() {
-      if(!cordova) return;
+      if(!window.cordova) return;
 
       updateNativeContext(window.location.href, 'home', null, null, 'Home');
     }
