@@ -253,6 +253,8 @@ module.exports = (function() {
 
         if (c !== current + 1) {
           log.warn('Message on channel ' + channel + ' out of sequence. Expected ' + (current + 1) + ' got ' + c);
+          appEvents.trigger('stats.event', 'faye.sequence');
+          reset(clientId);
         }
 
       }
@@ -444,7 +446,7 @@ module.exports = (function() {
     if(clientIdOnPing === clientId) {
       log.info("Client reset requested");
       clientId = null;
-      // client.reset();
+      client.reset();
     } else {
       log.info("Ignoring reset request as clientId has changed.");
     }
