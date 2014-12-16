@@ -52,7 +52,7 @@ module.exports = (function() {
     // This nasty thing changes the CSS rule for the first chat item to prevent a high headerView from covering it
     // We do this instead of jQuery because the first-child selector can
     adjustTopPadding: function() {
-      var size = $('#header-wrapper').height() + 15 + 'px';
+      var size = $('#header-wrapper').outerHeight() + 'px';
       var ss = document.styleSheets[2];
       try {
         if (ss.insertRule) {

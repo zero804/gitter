@@ -1,51 +1,46 @@
 'use strict';
 var ensurePojo = require('./ensure-pojo');
 
-var rankAttributes = function (fold, attr) {
-  var rank = Object.keys(fold).length;
-  fold[attr] = rank;
-  return fold;
-};
-
-var RANK = [
-  'lastMentionTime', // most important
-  'lastUnreadItemTime',
-  'lastAccessTimeNoSync'
-].reduce(rankAttributes, {});
-
 function natural(a, b) {
   if (a === b) return 0;
   return a > b ? 1 : -1;
 }
 
 function getRank(room) {
-  var defaultTime = room.lastAccessTime || Date.now();
-
-  if (room.lastMentionTime || room.mentions) {
-    room.lastMentionTime = room.lastMentionTime || defaultTime;
-    return RANK.lastMentionTime;
+  // hasHadMentionsAtSomePoint (and the equivalent for unreadItems) is used
+  // to ensure that rooms dont jump around when mentions is updated after a
+  // user visits a room and reads all the mentions.
+  // hasHadMentionsAtSomePoint is not available on the server, so we have a failover.
+  if (room.hasHadMentionsAtSomePoint || room.mentions) {
+    return 0;
+  } else if (room.hasHadUnreadItemsAtSomePoint || room.unreadItems) {
+    return 1;
+  } else {
+    return 2;
   }
-
-  if (room.lastUnreadItemTime || room.unreadItems) {
-    room.lastUnreadItemTime = room.lastUnreadItemTime || defaultTime;
-    return RANK.lastUnreadItemTime;
-  }
-
-  if (room.lastAccessTimeNoSync || room.lastAccessTime) {
-    room.lastAccessTimeNoSync = room.lastAccessTimeNoSync || defaultTime;
-    return RANK.lastAccessTimeNoSync;
-  }
-
-  return Object.keys(RANK).length + 1;
 }
 
-function timeDifference(a, b, rank) {
-  var property = Object.keys(RANK)[rank];
-  if (!property) return 0;
-  return new Date(b[property]).valueOf() - new Date(a[property]).valueOf();
+function timeDifference(a, b) {
+  // lastAccessTimeNoSync is used to ensure that rooms dont jump around when
+  // lastAccessTime is updated after a user visits a room
+  // lastAccessTimeNoSync is not available on the server, so we have a failover.
+  var aDate = a.lastAccessTimeNoSync || a.lastAccessTime;
+  var bDate = b.lastAccessTimeNoSync || b.lastAccessTime;
+
+  if(!aDate && !bDate) {
+    return 0;
+  } else if(!aDate) {
+    // therefore bDate exists and is best
+    return 1;
+  } else if(!bDate) {
+    // therefore aDate exists and is best
+    return -1;
+  } else {
+    return new Date(bDate).valueOf() - new Date(aDate).valueOf();
+  }
 }
 
-// it is worth noticing that we want to sort in a descindencing order, thus the negative results
+// we want to sort in a descending order, thus the negative results
 module.exports = {
   favourites: {
     sort: function (a, b) {
@@ -53,10 +48,9 @@ module.exports = {
       b = ensurePojo(b);
       var isDifferent = natural(a.favourite, b.favourite);
 
-      // one of them isn't a favourite
       if (isDifferent) return isDifferent; // -1 or 1
 
-      // both favourites, order by name
+      // both favourites of the same rank, order by name
       return natural(a.name, b.name);
     },
     filter: function (room) {
@@ -81,7 +75,7 @@ module.exports = {
     },
     filter: function (room) {
       room = ensurePojo(room);
-      return !room.favourite && !!(room.lastAccessTime || room.getunreadItems || room.mentions);
+      return !room.favourite && !!(room.lastAccessTime || room.unreadItems || room.mentions);
     }
   }
 };

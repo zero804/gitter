@@ -24,8 +24,12 @@ onready(function() {
     appEvents.on('navigation', function(url) {
       if(url.indexOf('#') === 0) {
         window.location.hash = url;
-      } else {
+      } else if(window.cordova) {
+        // ios only
         cordovaNavigate.navigate(url);
+      } else {
+        // android
+        window.location.href = url;
       }
     });
 
