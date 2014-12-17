@@ -2,7 +2,7 @@
 
 var _ = require('underscore');
 var context = require('utils/context');
-var FayeClient = require('faye');
+var FayeClient = require('gitter-faye');
 var appEvents = require('utils/appevents');
 var log = require('utils/log');
 
