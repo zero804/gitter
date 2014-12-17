@@ -98,6 +98,7 @@ onready(function () {
   };
 
   appEvents.on('navigation', function (url, type, title) {
+    if (url === window.location.pathname) { return; } // no need to reload frame, we're already there.
     loadingScreen.show();
     var frameUrl = url + '/~' + type;
     pushState(frameUrl, title, url);
