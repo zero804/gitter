@@ -1379,7 +1379,7 @@
       }
     },
     "gitter-faye": {
-      "version": "1.0.3-d",
+      "version": "1.0.3-e",
       "from": "gitter-faye@latest",
       "dependencies": {
         "faye-websocket": {

@@ -2,24 +2,21 @@
 
 var _ = require('underscore');
 var context = require('utils/context');
-var FayeClient = require('gitter-faye');
+var Faye = require('gitter-faye');
 var appEvents = require('utils/appevents');
 var log = require('utils/log');
 
 module.exports = (function() {
 
-
   /* @const */
   var FAYE_PREFIX = '/api';
 
-  // var logLevel = parseInt(window.localStorage.fayeLogging, 10) || 0;
-
-  // Faye.logger = {};
-  // var logLevels = ['fatal', 'error', 'warn', 'info', 'debug'];
-  // logLevels.forEach(function(level) {
-  //   var llevel = level == 'fatal' ? 'error' : level;
-  //   Faye.logger[level] = function(msg) { log[llevel]('faye: ' + msg.substring(0, 100)); };
-  // });
+  Faye.logger = {};
+  var logLevels = ['fatal', 'error', 'warn', 'info', 'debug'];
+  logLevels.forEach(function(level) {
+    var llevel = level == 'fatal' ? 'error' : level;
+    Faye.logger[level] = function(msg) { log[llevel]('faye: ' + msg.substring(0, 100)); };
+  });
 
   var clientId = null;
 
@@ -275,7 +272,7 @@ module.exports = (function() {
   function createClient() {
     var c = context.env('websockets');
     c.options.reuseTransport = false; // TODO: consider if we need this
-    var client = new FayeClient(c.fayeUrl, c.options);
+    var client = new Faye.Client(c.fayeUrl, c.options);
 
     if(websocketsDisabled) {
       /* Testing no websockets */
