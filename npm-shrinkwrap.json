@@ -1379,9 +1379,8 @@
       }
     },
     "gitter-faye": {
-      "version": "1.0.3-c",
+      "version": "1.0.3-d",
       "from": "gitter-faye@latest",
-      "resolved": "http://beta-internal:8089/nexus/content/groups/npm/gitter-faye/-/gitter-faye-1.0.3-c.tgz",
       "dependencies": {
         "faye-websocket": {
           "version": "0.9.0",
@@ -1502,7 +1501,7 @@
                     },
                     "inherits": {
                       "version": "2.0.1",
-                      "from": "inherits@>=2.0.0 <3.0.0",
+                      "from": "inherits@>=2.0.1 <2.1.0",
                       "resolved": "http://beta-internal:8089/nexus/content/groups/npm/inherits/-/inherits-2.0.1.tgz"
                     }
                   }
