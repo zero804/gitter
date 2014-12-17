@@ -6,7 +6,8 @@ var logger            = env.logger;
 var nconf             = env.config;
 var stats             = env.stats;
 
-var faye              = require('./faye-node');
+// var faye              = require('./faye-node');
+var faye              = require('gitter-faye');
 var fayeRedis         = require('gitter-faye-redis');
 var oauth             = require('../services/oauth-service');
 var presenceService   = require('../services/presence-service');
