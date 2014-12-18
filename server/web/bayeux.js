@@ -352,11 +352,13 @@ var server = new faye.NodeAdapter({
   }
 });
 
-/* Add permessage-deflate extension to Faye */
-deflate = deflate.configure({
-  level: zlib.Z_BEST_SPEED
-});
-server.addWebsocketExtension(deflate);
+if(nconf.get('ws:fayePerMessageDeflate')) {
+  /* Add permessage-deflate extension to Faye */
+  deflate = deflate.configure({
+    level: zlib.Z_BEST_SPEED
+  });
+  server.addWebsocketExtension(deflate);
+}
 
 /* Nasty hack, but no way around it */
 server._server._makeResponse = function(message) {
