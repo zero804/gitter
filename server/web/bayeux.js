@@ -6,9 +6,9 @@ var logger            = env.logger;
 var nconf             = env.config;
 var stats             = env.stats;
 
-// var faye              = require('./faye-node');
 var faye              = require('gitter-faye');
 var fayeRedis         = require('gitter-faye-redis');
+var deflate           = require('permessage-deflate');
 var oauth             = require('../services/oauth-service');
 var presenceService   = require('../services/presence-service');
 var shutdown          = require('shutdown');
@@ -351,6 +351,8 @@ var server = new faye.NodeAdapter({
     }
   }
 });
+/* Add permessage-deflate extension to Faye */
+server.addWebsocketExtension(deflate);
 
 /* Nasty hack, but no way around it */
 server._server._makeResponse = function(message) {
