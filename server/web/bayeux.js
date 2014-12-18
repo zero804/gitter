@@ -16,7 +16,7 @@ var contextGenerator  = require('./context-generator');
 var appVersion        = require('./appVersion');
 var StatusError       = require('statuserror');
 var bayeuxExtension   = require('./bayeux/extension');
-
+var zlib              = require('zlib');
 var version = appVersion.getVersion();
 
 var superClientPassword = nconf.get('ws:superClientPassword');
@@ -351,7 +351,11 @@ var server = new faye.NodeAdapter({
     }
   }
 });
+
 /* Add permessage-deflate extension to Faye */
+deflate = deflate.configure({
+  level: zlib.Z_BEST_SPEED
+});
 server.addWebsocketExtension(deflate);
 
 /* Nasty hack, but no way around it */
