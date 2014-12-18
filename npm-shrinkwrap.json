@@ -1379,18 +1379,18 @@
       }
     },
     "gitter-faye": {
-      "version": "1.0.3-g",
+      "version": "1.1.0-a",
       "from": "gitter-faye@latest",
       "dependencies": {
         "faye-websocket": {
-          "version": "0.9.0",
-          "from": "faye-websocket@>=0.8.0",
-          "resolved": "http://beta-internal:8089/nexus/content/groups/npm/faye-websocket/-/faye-websocket-0.9.0.tgz",
+          "version": "0.9.1",
+          "from": "faye-websocket@>=0.9.0",
+          "resolved": "http://beta-internal:8089/nexus/content/groups/npm/faye-websocket/-/faye-websocket-0.9.1.tgz",
           "dependencies": {
             "websocket-driver": {
-              "version": "0.5.0",
-              "from": "websocket-driver@>=0.5.0",
-              "resolved": "http://beta-internal:8089/nexus/content/groups/npm/websocket-driver/-/websocket-driver-0.5.0.tgz",
+              "version": "0.5.1",
+              "from": "websocket-driver@>=0.5.1",
+              "resolved": "http://beta-internal:8089/nexus/content/groups/npm/websocket-driver/-/websocket-driver-0.5.1.tgz",
               "dependencies": {
                 "websocket-extensions": {
                   "version": "0.1.0",
@@ -1418,7 +1418,7 @@
                   "dependencies": {
                     "inherits": {
                       "version": "2.0.1",
-                      "from": "inherits@>=2.0.1 <2.1.0",
+                      "from": "inherits@>=2.0.0 <3.0.0",
                       "resolved": "http://beta-internal:8089/nexus/content/groups/npm/inherits/-/inherits-2.0.1.tgz"
                     },
                     "minimatch": {
@@ -2520,6 +2520,11 @@
           "resolved": "https://registry.npmjs.org/pkginfo/-/pkginfo-0.2.3.tgz"
         }
       }
+    },
+    "permessage-deflate": {
+      "version": "0.1.2",
+      "from": "permessage-deflate@*",
+      "resolved": "http://beta-internal:8089/nexus/content/groups/npm/permessage-deflate/-/permessage-deflate-0.1.2.tgz"
     },
     "q": {
       "version": "1.0.1",
