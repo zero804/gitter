@@ -17,33 +17,32 @@ function getStrategy(modelName) {
 
 function serializeModel(model, callback) {
   return Q.fcall(function() {
-      if(model === null) return;
-      var schema = model.schema;
-      if(!schema) throw new Error("Model does not have a schema");
-      if(!schema.schemaTypeName) throw new Error("Schema does not have a schema name");
+    if (model === null) return;
+    var schema = model.schema;
+    if (!schema) throw new Error("Model does not have a schema");
+    if (!schema.schemaTypeName) throw new Error("Schema does not have a schema name");
 
-      var strategy;
+    var strategy;
 
-      switch(schema.schemaTypeName) {
-        case 'UserSchema':
-          strategy = new serializer.UserStrategy();
-          break;
+    switch(schema.schemaTypeName) {
+      case 'UserSchema':
+        strategy = new serializer.UserStrategy();
+        break;
 
-        case 'TroupeSchema':
-          strategy = new serializer.TroupeStrategy();
-          break;
+      case 'TroupeSchema':
+        strategy = new serializer.TroupeStrategy();
+        break;
 
-        case 'ChatMessageSchema':
-          strategy = new serializer.ChatStrategy();
-          break;
+      case 'ChatMessageSchema':
+        strategy = new serializer.ChatStrategy();
+        break;
+    }
 
-      }
+    if (!strategy) throw new Error("No strategy for " + schema.schemaTypeName);
 
-      if(!strategy) throw new Error("No strategy for " + schema.schemaTypeName);
-
-      return serializer.serialize(model, strategy);
-    })
-    .nodeify(callback);
+    return serializer.serialize(model, strategy);
+  })
+  .nodeify(callback);
 }
 
 var serializer = createSerializer('notifications', {
