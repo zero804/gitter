@@ -33,48 +33,22 @@ onready(function () {
 
   $(document).on("click", "a", function (e) {
     var basePath = context.env('basePath');
-    console.debug('a ====================');
-    console.log('basePath:', basePath);
     var href = e.target.getAttribute('href');
-    var target = e.target.getAttribute('target');
     var path = href.replace(basePath, '');
-    console.log('path:', path);
 
-    if (this.href) {
+    if (href.indexOf('#') >= 0) {
       e.preventDefault();
-
-      if (href.indexOf(basePath) >= 0) {
-        console.log('local:', href);
-
-        if (href.indexOf('#') >= 0) {
-          window.location = href;
-          return;
-        } else if (!isValidRoomUri(path)) {
-          console.log('new window');
-        } else {
-          console.log('trigger navigation');
-        }
-      } else {
-        console.log('external:', href);
-      }
+      window.location = href;
+      return true;
     }
 
-    return true; // ?
+    if (href.indexOf(basePath) >= 0 && isValidRoomUri(path)) {
+        e.preventDefault();
+        appEvents.trigger('navigation', path, 'chat');
+    } else {
+      return true;
+    }
   });
-
-  // // When a user clicks an internal link, prevent it from opening in a new window
-  // $(document).on("click", "a.link", function (e) {
-    console.debug('link ====================');
-  //   var basePath = context.env('basePath');
-  //   var href = e.target.getAttribute('href');
-
-  //   if (!href || href.indexOf(basePath) !== 0) {
-  //     return;
-  //   }
-
-  //   e.preventDefault();
-  //   window.parent.location.href = href;
-  // });
 
   window.addEventListener('message', function(e) {
     if(e.origin !== context.env('basePath')) {
