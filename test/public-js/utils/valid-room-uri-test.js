@@ -6,12 +6,18 @@ var isValidRoomUri = require('../../../public/js/utils/valid-room-uri');
 var RESERVED = require('../../../public/js/utils/vanity-keywords');
 var assert = require('assert');
 
-describe.only('valid-room-uri', function () {
+describe('valid-room-uri', function () {
 
   it('rejects vanity keywords', function () {
     RESERVED.forEach(function (keyword) {
       assert.equal(isValidRoomUri('/' + keyword), false);
     });
+  });
+
+  it('rejects undefined and empty string', function () {
+    assert.equal(isValidRoomUri(), false);
+    assert.equal(isValidRoomUri(''), false);
+    assert.equal(isValidRoomUri('a'), false);
   });
 
   it('rejects archive links', function () {
