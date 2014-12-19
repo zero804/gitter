@@ -5,7 +5,7 @@ var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 var _ = require('underscore');
 
-var NotificationCollector = function(options) {
+var NotificationCollector = function (options) {
   this.collection = {};
   this.userCategorisationStrategy = options.userCategorisationStrategy;
   this.collect = _.throttle(this.collectTimeout.bind(this), options.collectionTime || 500, { leading: false });
@@ -13,14 +13,13 @@ var NotificationCollector = function(options) {
 
 util.inherits(NotificationCollector, EventEmitter);
 
-NotificationCollector.prototype.incomingNotification = function(userId, itemType, items, troupeId) {
-  if(itemType !== 'chat') return false;
-
+NotificationCollector.prototype.incomingNotification = function (userId, itemType, items, troupeId) {
+  if (itemType !== 'chat') return false;
   var key = userId + ':' + troupeId;
-  var itemsMapped = items.map(function(itemId) { return { itemType: itemType, itemId: itemId }; });
+  var itemsMapped = items.map(function (itemId) { return { itemType: itemType, itemId: itemId }; });
 
   var userItem = this.collection[key];
-  if(!userItem) {
+  if (!userItem) {
     this.collection[key] = { userId: userId, troupeId: troupeId, items: itemsMapped };
   } else {
     var i = this.collection[key];
@@ -30,19 +29,19 @@ NotificationCollector.prototype.incomingNotification = function(userId, itemType
   this.collect();
 };
 
-NotificationCollector.prototype.collectTimeout = function() {
+NotificationCollector.prototype.collectTimeout = function () {
   var collection = this.collection;
   this.collection = {};
 
   var self = this;
 
-  var userTroupes = Object.keys(collection).map(function(key) { return collection[key]; });
+  var userTroupes = Object.keys(collection).map(function (key) { return collection[key]; });
 
-  this.userCategorisationStrategy(userTroupes, function(err, categories) {
+  this.userCategorisationStrategy(userTroupes, function (err, categories) {
 
-    Object.keys(categories).forEach(function(category) {
+    Object.keys(categories).forEach(function (category) {
       var userTroupes = categories[category];
-      if(userTroupes && userTroupes.length) {
+      if (userTroupes && userTroupes.length) {
         this.emit('collection:' + category, categories[category]);
       }
     }, self);

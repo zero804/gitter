@@ -14,7 +14,7 @@ var mongoUtils                         = require('../../utils/mongo-utils');
 function getStartTimeForItems(items) {
   if(!items.length) return null;
 
-  var times = items.map(function(id) {
+  var times = items.map(function (id) {
     return mongoUtils.getTimestampFromObjectId(id);
   });
 
@@ -100,26 +100,26 @@ exports.install = function() {
   var pushNotificationGateway = require("../../gateways/push-notification-gateway");
   var notificationCollector = new NotificationCollector({ userCategorisationStrategy: userCategorisationStrategy });
 
-  notificationCollector.on('collection:online', function(userTroupes) {
+  notificationCollector.on('collection:online', function (userTroupes) {
     var notifications = [];
 
-    userTroupes.forEach(function(userTroupe) {
+    userTroupes.forEach(function (userTroupe) {
       var userId = userTroupe.userId;
       var troupeId = userTroupe.troupeId;
       var items = userTroupe.items;
 
-      items.forEach(function(item) {
+      items.forEach(function (item) {
         notifications.push({ itemId: item.itemId, itemType: item.itemType, userId: userId, troupeId: troupeId });
       });
 
     });
 
-    onlineNotificationGeneratorService.sendOnlineNotifications(notifications, function(err) {
+    onlineNotificationGeneratorService.sendOnlineNotifications(notifications, function (err) {
       if(err) winston.error('Error while generating online notifications: ' + err, { exception: err });
     });
   });
 
-  notificationCollector.on('collection:push', function(userTroupes) {
+  notificationCollector.on('collection:push', function (userTroupes) {
     pushNotificationPostbox.postUserTroupes(userTroupes);
   });
 
