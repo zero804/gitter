@@ -30,29 +30,51 @@ onready(function () {
 
   postMessage({ type: "chatframe:loaded" });
 
-  $(document).on("click", "a", function(e) {
-    if(this.href) {
-      var href = $(this).attr('href');
-      if(href.indexOf('#') === 0) {
-        e.preventDefault();
-        window.location = href;
+  $(document).on("click", "a", function (e) {
+    var basePath = context.env('basePath');
+    // console.debug('a ====================');
+    // console.log('basePath:', basePath);
+    var href = e.target.getAttribute('href');
+    var target = e.target.getAttribute('target');
+    var path = href.replace(basePath, '');
+
+    if (this.href) {
+      e.preventDefault();
+
+      // console.log('target:', target);
+
+      if (href.indexOf(basePath) >= 0) {
+        // console.log('local:', href);
+
+        if (href.indexOf('#') >= 0) {
+          window.location = href;
+          return;
+        } else if (path.indexOf('/api') >= 0 || path.indexOf('/explore') >= 0) {
+          // console.log('new window');
+        } else {
+          // console.log('trigger navigation');
+        }
+      } else {
+        // console.log('external:', href);
       }
     }
 
-    return true;
+    return true; // ?
   });
 
-  // When a user clicks an internal link, prevent it from opening in a new window
-  $(document).on("click", "a.link", function(e) {
-    var basePath = context.env('basePath');
-    var href = e.target.getAttribute('href');
-    if(!href || href.indexOf(basePath) !== 0) {
-      return;
-    }
+  // // When a user clicks an internal link, prevent it from opening in a new window
+  // $(document).on("click", "a.link", function (e) {
+    // console.debug('link ====================');
+  //   var basePath = context.env('basePath');
+  //   var href = e.target.getAttribute('href');
 
-    e.preventDefault();
-    window.parent.location.href = href;
-  });
+  //   if (!href || href.indexOf(basePath) !== 0) {
+  //     return;
+  //   }
+
+  //   e.preventDefault();
+  //   window.parent.location.href = href;
+  // });
 
   window.addEventListener('message', function(e) {
     if(e.origin !== context.env('basePath')) {

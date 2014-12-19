@@ -67,6 +67,7 @@ module.exports = {
   },
 
   create: function(req, res, next) {
+    console.log('create() ====================');
     var data = _.clone(req.body);
     data.stats = userAgentTags(req.headers['user-agent']);
 
