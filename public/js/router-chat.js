@@ -5,6 +5,7 @@ var context = require('utils/context');
 var liveContext = require('components/live-context');
 var appEvents = require('utils/appevents');
 var log = require('utils/log');
+var isValidRoomUri = require('utils/valid-room-uri');
 var ChatIntegratedView = require('views/app/chatIntegratedView');
 var itemCollections = require('collections/instances/integrated-items');
 var onready = require('./utils/onready');
@@ -32,30 +33,29 @@ onready(function () {
 
   $(document).on("click", "a", function (e) {
     var basePath = context.env('basePath');
-    // console.debug('a ====================');
-    // console.log('basePath:', basePath);
+    console.debug('a ====================');
+    console.log('basePath:', basePath);
     var href = e.target.getAttribute('href');
     var target = e.target.getAttribute('target');
     var path = href.replace(basePath, '');
+    console.log('path:', path);
 
     if (this.href) {
       e.preventDefault();
 
-      // console.log('target:', target);
-
       if (href.indexOf(basePath) >= 0) {
-        // console.log('local:', href);
+        console.log('local:', href);
 
         if (href.indexOf('#') >= 0) {
           window.location = href;
           return;
-        } else if (path.indexOf('/api') >= 0 || path.indexOf('/explore') >= 0) {
-          // console.log('new window');
+        } else if (!isValidRoomUri(path)) {
+          console.log('new window');
         } else {
-          // console.log('trigger navigation');
+          console.log('trigger navigation');
         }
       } else {
-        // console.log('external:', href);
+        console.log('external:', href);
       }
     }
 
@@ -64,7 +64,7 @@ onready(function () {
 
   // // When a user clicks an internal link, prevent it from opening in a new window
   // $(document).on("click", "a.link", function (e) {
-    // console.debug('link ====================');
+    console.debug('link ====================');
   //   var basePath = context.env('basePath');
   //   var href = e.target.getAttribute('href');
 

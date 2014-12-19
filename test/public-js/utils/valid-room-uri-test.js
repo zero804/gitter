@@ -15,6 +15,13 @@ describe.only('valid-room-uri', function () {
   });
 
   it('rejects archive links', function () {
+    assert.equal(isValidRoomUri('/gitterHQ/gitter/archives/all'), false);
+    assert.equal(isValidRoomUri('/gitterHQ/gitter/archives/2014/12/11'), false);
+  });
 
+  it('accepts room URIs', function () {
+    assert(isValidRoomUri('/gitterHQ/gitter/channel'));
+    assert(isValidRoomUri('/gitterHQ/gitter'));
+    assert(isValidRoomUri('/gitterHQ'));
   });
 });
