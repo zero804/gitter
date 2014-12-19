@@ -9,7 +9,7 @@ var Q                  = require('q');
  * Main entry point
  */
 function roomPermissionsModel(user, right, room) {
-  if(room.oneToOne) {
+  if (room && room.oneToOne) {
     /*
      * TODO: pass the username of the other user through.
      * For the moment, we don't use it, so don't worry too
