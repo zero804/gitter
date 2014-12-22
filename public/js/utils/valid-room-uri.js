@@ -1,6 +1,6 @@
 'use strict';
 
-var RESERVED_RE = new RegExp('^\\/\\b(' + require('./vanity-keywords').join('|') + ')\\b');
+var RESERVED_RE = new RegExp('^\\/(' + require('./vanity-keywords').join('|') + ')\\b');
 
 module.exports = function (name) {
   if (!name) return false;
