@@ -58,6 +58,9 @@ var webpackConfig = {
       {
         test: /\.hbs$/,
         loader: "handlebars-loader" // disable minify for now + path.resolve(path.join(__dirname, "../../build-scripts/html-min-loader"))
+      },{
+        test: path.resolve(path.join(__dirname, "../repo/marionette/marionette.js")),
+        loader: "expose?Marionette"
       }
     ]
   },
