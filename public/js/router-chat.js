@@ -36,13 +36,13 @@ onready(function () {
     var href = e.target.getAttribute('href');
     var path = href.replace(basePath, '');
 
-    if (href.indexOf('#') >= 0) {
+    if (href.indexOf('#') === 0) {
       e.preventDefault();
       window.location = href;
       return true;
     }
 
-    if (href.indexOf(basePath) >= 0 && isValidRoomUri(path)) {
+    if (href.indexOf(basePath) === 0 && isValidRoomUri(path)) {
         e.preventDefault();
         appEvents.trigger('navigation', path, 'chat');
     } else {
