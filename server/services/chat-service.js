@@ -282,11 +282,7 @@ exports.getRoughMessageCount = cacheWrapper('getRoughMessageCount', function(tro
 });
 
 function findFirstUnreadMessageId(troupeId, userId) {
-  var d = Q.defer();
-  unreadItemService.getFirstUnreadItem(userId, troupeId, 'chat', d.makeNodeResolver());
-  return d.promise.spread(function(minId) {
-    return minId;
-  });
+  return unreadItemService.getFirstUnreadItem(userId, troupeId);
 }
 
 function historyForTroupeExceedsDate(troupeId, maxHistoryDate) {

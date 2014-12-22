@@ -76,16 +76,15 @@ exports.serializeUsersForTroupe = function(troupeId, userId, options, callback) 
 };
 
 exports.serializeUnreadItemsForTroupe = function(troupeId, userId, callback) {
-  return isUserLurkingInRoom(userId, troupeId)
-    .then(function(isLurking) {
-      var d = Q.defer();
-      unreadItemService.getUnreadItemsForUser(userId, troupeId, d.makeNodeResolver());
-      return d.promise.then(function(x) {
-        if(isLurking) {
-          x._meta = { lurk: true };
-        }
-        return x;
-      });
+  return Q.all([
+      isUserLurkingInRoom(userId, troupeId),
+      unreadItemService.getUnreadItemsForUser(userId, troupeId)
+    ])
+    .spread(function(isLurking, items) {
+      if(isLurking) {
+        items._meta = { lurk: true };
+      }
+      return items;
     })
     .nodeify(callback);
 };
