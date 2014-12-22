@@ -134,12 +134,9 @@ module.exports = (function() {
 
     _recount: function() {
       var newValue = this._count();
-
-      if(this._currentCountValue !== newValue) {
-        this._currentCountValue = newValue;
-        this.trigger('newcountvalue', newValue);
-        appEvents.trigger('unreadItemsCount', newValue);
-      }
+      this._currentCountValue = newValue;
+      this.trigger('newcountvalue', newValue);
+      appEvents.trigger('unreadItemsCount', newValue);
 
       return newValue;
     },
@@ -425,17 +422,16 @@ module.exports = (function() {
       for(var i = 0; i < unreadItems.length; i++) {
         var element = unreadItems[i];
 
-        var itemType = dataset.get(element, 'itemType');
         var itemId = dataset.get(element, 'itemId');
         var mentioned = dataset.get(element, 'mentioned') === 'true';
 
-        if(itemType && itemId) {
+        if(itemId) {
           var top = element.offsetTop;
 
           if (top >= topBound && top <= bottomBound) {
             var $e = $(element);
 
-            self._store._markItemRead(itemType, itemId, mentioned);
+            self._store._markItemRead('chat', itemId, mentioned);
 
             $e.removeClass('unread').addClass('reading');
             this._addToMarkReadQueue($e);
