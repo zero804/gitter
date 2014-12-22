@@ -9,9 +9,10 @@ var assert = require('assert');
 describe('valid-room-uri', function () {
 
   it('rejects vanity keywords', function () {
-    RESERVED.forEach(function (keyword) {
-      assert.equal(isValidRoomUri('/' + keyword), false);
-    });
+    RESERVED
+      .forEach(function (keyword) {
+        assert.equal(isValidRoomUri('/' + keyword), false);
+      });
   });
 
   it('rejects undefined and empty string', function () {
@@ -26,8 +27,8 @@ describe('valid-room-uri', function () {
   });
 
   it('accepts room URIs', function () {
-    assert(isValidRoomUri('/gitterHQ/gitter/channel'));
-    assert(isValidRoomUri('/gitterHQ/gitter'));
     assert(isValidRoomUri('/gitterHQ'));
+    assert(isValidRoomUri('/gitterHQ/gitter'));
+    assert(isValidRoomUri('/gitterHQ/gitter/channel'));
   });
 });
