@@ -1,10 +1,12 @@
 "use strict";
+var urlUtil = require('url');
 var $ = require('jquery');
 var Backbone = require('backbone');
 var context = require('utils/context');
 var liveContext = require('components/live-context');
 var appEvents = require('utils/appevents');
 var log = require('utils/log');
+var isValidRoomUri = require('utils/valid-room-uri');
 var ChatIntegratedView = require('views/app/chatIntegratedView');
 var itemCollections = require('collections/instances/integrated-items');
 var onready = require('./utils/onready');
@@ -25,33 +27,26 @@ require('components/focus-events');
 require('views/widgets/avatar');
 require('views/widgets/timeago');
 
-
 onready(function () {
 
   postMessage({ type: "chatframe:loaded" });
 
-  $(document).on("click", "a", function(e) {
-    if(this.href) {
-      var href = $(this).attr('href');
-      if(href.indexOf('#') === 0) {
-        e.preventDefault();
-        window.location = href;
-      }
+  $(document).on("click", "a", function (e) {
+    var url = urlUtil.parse(e.target.getAttribute('href'));
+    var internalLink = url.hostname === context.env('baseServer');
+
+    // modals
+    if (url.href.indexOf('#') === 0) {
+      e.preventDefault();
+      window.location = url.hash;
+      return true;
     }
 
-    return true;
-  });
-
-  // When a user clicks an internal link, prevent it from opening in a new window
-  $(document).on("click", "a.link", function(e) {
-    var basePath = context.env('basePath');
-    var href = e.target.getAttribute('href');
-    if(!href || href.indexOf(basePath) !== 0) {
-      return;
+    // internal links to valid rooms shouldn't open in new windows
+    if (internalLink && isValidRoomUri(url.path)) {
+      e.preventDefault();
+      window.parent.location.href = url.href;
     }
-
-    e.preventDefault();
-    window.parent.location.href = href;
   });
 
   window.addEventListener('message', function(e) {
