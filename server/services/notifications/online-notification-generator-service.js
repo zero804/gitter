@@ -12,7 +12,7 @@ var collections               = require('../../utils/collections');
 
 function compile(map) {
   for(var k in map) {
-    if(map.hasOwnProperty(k)) {
+    if (map.hasOwnProperty(k)) {
       map[k] = handlebars.compile(map[k]);
     }
   }
@@ -34,7 +34,8 @@ var linkTemplates = compile({
 });
 
 var senderStrategies = {
-  "chat": function(data) {
+  chat: function (data) {
+    if (!data) return;
     return data.fromUser && data.fromUser.id;
   }
 };
@@ -48,9 +49,9 @@ var senderStrategies = {
  */
 function hashNotificationsByType(notifications) {
   var uniq = {};
-  notifications.forEach(function(notification) {
+  notifications.forEach(function (notification) {
     var a = uniq[notification.itemType];
-    if(!a) {
+    if (!a) {
       a = { };
       uniq[notification.itemType] = a;
     }
@@ -60,7 +61,7 @@ function hashNotificationsByType(notifications) {
 
   var result = {};
 
-  Object.keys(uniq).forEach(function(key) {
+  Object.keys(uniq).forEach(function (key) {
     result[key] = Object.keys(uniq[key]);
   });
 
@@ -76,40 +77,40 @@ function createNotificationMessage(itemType, itemIds, callback) {
 
   var senderStrategy = senderStrategies[itemType];
 
-  if(!template) {
+  if (!template) {
     return callback(null, null);
   }
 
   var Strategy = serializer.getStrategy(itemType + "Id");
-  if(Strategy) {
+  if (Strategy) {
       var strategy = new Strategy({ includeTroupe: true });
 
-    serializer.serialize(itemIds, strategy, function(err, serialized) {
-      if(err) return callback(err);
+    serializer.serialize(itemIds, strategy, function (err, serialized) {
+      if (err) return callback(err);
 
-      var messages = serialized.map(function(data) {
+      var messages = serialized.map(function (data) {
         var senderUserId = senderStrategy && senderStrategy(data);
 
-        if(!senderUserId) return;
+        if (!senderUserId) return;
 
         // Catch-22, we can't figure out the sender until we've done serialization
         // but we can't calculate the troupeUrl (needed _for_ serialization)
         // until we've got the sender. This is only a problem for one to one troupes
         var url = data.troupe.url;
-        if(!url) {
+        if (!url) {
           url = data.troupe.urlUserMap && data.troupe.urlUserMap[senderUserId];
           data.troupe.url = url;
         }
 
         var name = data.troupe.name;
-        if(!name) {
+        if (!name) {
           name = data.troupe.nameUserMap && data.troupe.nameUserMap[senderUserId];
           data.troupe.name = name;
         }
 
         // TODO: sort this ugly hack out
         // This will fit nicely into the new serializer stuff
-        if(data.versions) { data.latestVersion = data.versions[data.versions.length - 1]; }
+        if (data.versions) { data.latestVersion = data.versions[data.versions.length - 1]; }
         data.troupeUrl = url;
 
         var d = {
@@ -122,7 +123,7 @@ function createNotificationMessage(itemType, itemIds, callback) {
         return d;
       });
 
-      messages = messages.filter(function(f) { return !!f; });
+      messages = messages.filter(function (f) { return !!f; });
       callback(null, messages);
     });
   } else {
@@ -135,7 +136,7 @@ function createNotificationMessage(itemType, itemIds, callback) {
 //
 // Takes an array of notification items, which looks like
 // [{ userId / itemType / itemId / troupeId }]
-// callback returns function(err, notificationsWithMessages), with notificationsWithMessages looking like:
+// callback returns function (err, notificationsWithMessages), with notificationsWithMessages looking like:
 // [{ notification / message }]
 //
 function generateNotificationMessages(notificationsItems, callback) {
@@ -143,7 +144,7 @@ function generateNotificationMessages(notificationsItems, callback) {
 
   var hashKeys = Object.keys(notificationTypeHash);
   var promises = [];
-  hashKeys.forEach(function(itemType) {
+  hashKeys.forEach(function (itemType) {
     var itemIds = notificationTypeHash[itemType];
 
     var d = Q.defer();
@@ -152,12 +153,12 @@ function generateNotificationMessages(notificationsItems, callback) {
   });
 
   Q.all(promises)
-    .then(function(concatenatedResults) {
+    .then(function (concatenatedResults) {
       var resultHash = {};
-      hashKeys.forEach(function(itemType, i) {
+      hashKeys.forEach(function (itemType, i) {
         var ids = notificationTypeHash[itemType];
         var results = concatenatedResults[i];
-        results.forEach(function(result, j) {
+        results.forEach(function (result, j) {
           var itemId = ids[j];
           resultHash[itemType + ":" + itemId] = result;
         });
@@ -165,13 +166,13 @@ function generateNotificationMessages(notificationsItems, callback) {
 
       var results = [];
 
-      notificationsItems.forEach(function(notification) {
+      notificationsItems.forEach(function (notification) {
         var itemType = notification.itemType;
         var itemId = notification.itemId;
 
         var message = resultHash[itemType + ":" + itemId];
 
-        if(message) {
+        if (message) {
           results.push({ notification: notification, message: message });
         }
       });
@@ -182,63 +183,66 @@ function generateNotificationMessages(notificationsItems, callback) {
 }
 
 function findMentionOnlyUserIds(notifications, notificationSettings) {
-  return notifications.filter(function(n) {
+  return notifications.filter(function (n) {
 
     var ns = notificationSettings[n.userId + ':' + n.troupeId];
     var notificationSetting = ns && ns.push;
 
     return notificationSetting === 'mention';
-  }).map(function(n) { return n.userId; });
+  }).map(function (n) { return n.userId; });
 }
 
 // Takes an array of notification items, which looks like
 // [{ userId / itemType / itemId / troupeId }]
-exports.sendOnlineNotifications = function(notifications, callback) {
-  userTroupeSettingsService.getMultiUserTroupeSettings(notifications, 'notifications')
-    .then(function(notificationSettings) {
+exports.sendOnlineNotifications = function (notifications, callback) {
+
+  userTroupeSettingsService
+    .getMultiUserTroupeSettings(notifications, 'notifications')
+    .then(function (notificationSettings) {
 
       var userIdsOnMention = findMentionOnlyUserIds(notifications, notificationSettings);
 
-      return userService.findByIds(userIdsOnMention)
-        .then(function(mentionUsers) {
+      return userService
+        .findByIds(userIdsOnMention)
+        .then(function (mentionUsers) {
           var mentionUsersHash = collections.indexById(mentionUsers);
 
           winston.verbose("Spooling online notifications", { count: notifications.length });
 
-          generateNotificationMessages(notifications, function(err, notificationsWithMessages) {
-            if(err) {
+          generateNotificationMessages(notifications, function (err, notificationsWithMessages) {
+            if (err) {
               winston.error("Error while generating notification messages: ", { exception: err });
               return callback(err);
             }
 
-            notificationsWithMessages.forEach(function(notificationsWithMessage) {
+            notificationsWithMessages.forEach(function (notificationsWithMessage) {
               var notification = notificationsWithMessage.notification;
               var message = notificationsWithMessage.message;
 
               var ns = notificationSettings[notification.userId + ':' + notification.troupeId];
               var notificationSetting = ns && ns.push;
-              if(notificationSetting === 'mute') return;
-              if(notificationSetting === 'mention') {
+              if (notificationSetting === 'mute') return;
+              if (notificationSetting === 'mention') {
                 var user = mentionUsersHash[notification.userId];
 
                 var itemType = notification.itemType;
 
-                if(itemType != 'chat') return;
+                if (itemType != 'chat') return;
                 var chat = message.data;
 
-                if(!user || !chat) return;
+                if (!user || !chat) return;
 
-                if(!chat.mentions || !chat.mentions.length) return;
+                if (!chat.mentions || !chat.mentions.length) return;
 
                 var username = user.username;
 
-                var userMentioned = chat.mentions.some(function(mention) {
+                var userMentioned = chat.mentions.some(function (mention) {
                   var re = new RegExp(mention.screenName, 'i');
 
                   return username && username.match(re);
                 });
 
-                if(!userMentioned) return;
+                if (!userMentioned) return;
               }
 
               var n = {
