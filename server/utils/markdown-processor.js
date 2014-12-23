@@ -11,14 +11,14 @@ var Q             = require('q');
 // processor starts its own process, so lazy load it
 var processor;
 
-module.exports = function(markdown) {
+module.exports = function (markdown) {
   if(!processor) {
     processor = createProcessor();
   }
 
   var deferred = Q.defer();
 
-  processor.process(markdown, function(err, result) {
+  processor.process(markdown, function (err, result) {
     if(err) {
       stats.event('markdown.failure');
       errorReporter(err, { text: markdown, processed: !!result });
