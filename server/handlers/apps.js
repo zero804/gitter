@@ -8,7 +8,7 @@ module.exports = {
     install: function(app) {
       app.get(
         '/apps',
-        function(req, res) {
+        function (req, res) {
           var userAgent = req.headers['user-agent'] || '';
           var compactView = userAgent.indexOf("Mobile/") >= 0;
           res.render('apps', {
