@@ -1,4 +1,5 @@
 "use strict";
+var urlUtil = require('url');
 var $ = require('jquery');
 var Backbone = require('backbone');
 var context = require('utils/context');
@@ -26,27 +27,25 @@ require('components/focus-events');
 require('views/widgets/avatar');
 require('views/widgets/timeago');
 
-
 onready(function () {
 
   postMessage({ type: "chatframe:loaded" });
 
   $(document).on("click", "a", function (e) {
-    var basePath = context.env('basePath');
-    var href = e.target.getAttribute('href');
-    var path = href.replace(basePath, '');
+    var url = urlUtil.parse(e.target.getAttribute('href'));
+    var internalLink = url.hostname === context.env('baseServer');
 
-    if (href.indexOf('#') === 0) {
+    // modals
+    if (url.href.indexOf('#') === 0) {
       e.preventDefault();
-      window.location = href;
+      window.location = url.hash;
       return true;
     }
 
-    if (href.indexOf(basePath) === 0 && isValidRoomUri(path)) {
-        e.preventDefault();
-        appEvents.trigger('navigation', path, 'chat');
-    } else {
-      return true;
+    // internal links to valid rooms shouldn't open in new windows
+    if (internalLink && isValidRoomUri(url.path)) {
+      e.preventDefault();
+      window.parent.location.href = url.href;
     }
   });
 
