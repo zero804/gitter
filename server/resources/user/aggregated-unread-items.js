@@ -2,7 +2,6 @@
 "use strict";
 
 var unreadItemService = require("../../services/unread-item-service");
-var troupeService = require('../../services/troupe-service');
 var collections = require('../../utils/collections');
 var restSerializer = require('../../serializers/rest-serializer');
 

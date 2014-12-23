@@ -157,11 +157,32 @@ exports.install = function() {
 
   });
 
+  appEvents.localOnly.onUserMentionedInNonMemberRoom(function(data) {
+    var troupeId = data.troupeId;
+    var userId = data.userId;
+
+    // User is not a member of the room but they're just been mentioned.
+    // We need to send them a create to add the room to their collection
+    var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
+
+    var mentionUrl = "/api/v1/user/" + userId + "/rooms";
+
+
+    restSerializer.serializeQ(troupeId, strategy)
+      .then(function(troupe) {
+        // Simulate a create on the mentions resource
+        publish(mentionUrl, {
+          operation: 'create',
+          model: troupe
+        });
+      });
+  });
+
   appEvents.localOnly.onTroupeMentionCountsChange(function(data) {
     var userId = data.userId;
     var troupeId = data.troupeId;
     var total = data.total;
-    var member = data.member;
+    // var member = data.member;
 
     // TODO: this is deprecated. Remove after 18 October 2014
     publish("/api/v1/user/" + userId, {
@@ -172,39 +193,40 @@ exports.install = function() {
     });
 
     var mentionUrl = "/api/v1/user/" + userId + "/rooms";
-    if(data.op === 'add' && total === 1 && !member) {
-      // User is not a member of the room but they're just been mentioned.
-      // We need to send them a create to add the room to their collection
-      var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
+    // Just patch the mention count
+    publish(mentionUrl, {
+      operation: 'patch',
+      model: {
+        id: troupeId,
+        mentions: total
+      }
+    });
 
-      restSerializer.serializeQ(troupeId, strategy)
-        .then(function(troupe) {
-          // Simulate a create on the mentions resource
-          publish(mentionUrl, {
-            operation: 'create',
-            model: troupe
-          });
-        });
+    // if(data.op === 'add' && total === 1 && !member) {
+    //   // User is not a member of the room but they're just been mentioned.
+    //   // We need to send them a create to add the room to their collection
+    //   var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
 
-    } else if(data.op === 'remove' && total === 0 && !member) {
-      // User is not a member of the room, and they're
-      // mention is gone. Remove the room from their troupe collection
-      publish(mentionUrl, {
-        operation: 'remove',
-        model: {
-          id: troupeId
-        }
-      });
-    } else {
-      // Just patch the mention count
-      publish(mentionUrl, {
-        operation: 'patch',
-        model: {
-          id: troupeId,
-          mentions: total
-        }
-      });
-    }
+    //   restSerializer.serializeQ(troupeId, strategy)
+    //     .then(function(troupe) {
+    //       // Simulate a create on the mentions resource
+    //       publish(mentionUrl, {
+    //         operation: 'create',
+    //         model: troupe
+    //       });
+    //     });
+
+    // } else if(data.op === 'remove' && total === 0 && !member) {
+    //   // User is not a member of the room, and they're
+    //   // mention is gone. Remove the room from their troupe collection
+    //   publish(mentionUrl, {
+    //     operation: 'remove',
+    //     model: {
+    //       id: troupeId
+    //     }
+    //   });
+    // } else {
+    // }
 
   });
 
