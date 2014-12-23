@@ -46,7 +46,14 @@ function TroupeMentionCountStategy(options) {
   var userId = options.userId || options.currentUserId;
 
   this.preload = function(troupeIds, callback) {
-    unreadItemService.getUserMentionCountsForTroupeIds(userId, troupeIds)
+    var operation;
+    if(troupeIds.length <= 5) {
+      operation = unreadItemService.getUserMentionCountsForTroupeIds(userId, troupeIds);
+    } else {
+      operation = unreadItemService.getUserMentionCounts(userId);
+    }
+
+    operation
       .then(function(result) {
         self.mentionCounts = result;
       })

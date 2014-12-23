@@ -5,18 +5,19 @@ local user_troupe_mention_key = KEYS[4]
 local user_mention_key = KEYS[5]
 local user_email_latch_key = KEYS[6];
 
--- Values are lrt timestamp, troupeId followed by itemIds,
 local troupe_id = table.remove(ARGV, 1)
 local user_id = table.remove(ARGV, 1)
-local itemIds = ARGV
+local item_count = tonumber(table.remove(ARGV, 1))
 
 local key_type = redis.call("TYPE", user_troupe_key)["ok"];
 
 local result = {}
 local flag = 0
 local card = -1
+local mention_count = -1
 
-for i, item_id in ipairs(itemIds) do
+for i = 1,item_count do
+  local item_id = table.remove(ARGV, 1)
 
   local removed;
 
@@ -47,6 +48,7 @@ for i, item_id in ipairs(itemIds) do
        -- Even though the cardinality was zero
        -- items exists
        flag = 1
+       mention_count = 0
     end
   end
 
@@ -62,11 +64,31 @@ for i, item_id in ipairs(itemIds) do
 	end
 end
 
+local mentions_removed = false
+
+while #ARGV > 0 do
+  local mention_id = table.remove(ARGV, 1)
+  
+  if redis.call("SREM", user_troupe_mention_key, mention_id) > 0 then
+    mentions_removed = true
+  end
+end
+
+if mentions_removed then
+  mention_count = redis.call("SCARD", user_troupe_mention_key);
+  if mention_count == 0 then
+    -- If mention_count is zero, then this user no longer has any mentions in this troupe
+    -- and we can remove the troupeId from the users mention key
+    redis.call("SREM", user_mention_key, troupe_id)
+  end
+end
+
 -- Remove this user from the list of people who may get an email
 redis.call("DEL", user_email_latch_key);
 redis.call("HDEL", email_hash_key, troupe_id..':'..user_id)
 
 table.insert(result, card)
+table.insert(result, mention_count)
 table.insert(result, flag)
 
 return result
