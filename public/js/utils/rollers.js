@@ -1,5 +1,6 @@
 "use strict";
 var Mutant = require('mutant');
+var RAF = require('utils/raf');
 
 module.exports = (function() {
 
@@ -184,7 +185,7 @@ module.exports = (function() {
 
       if(scrollTop < 0) scrollTop = 0;
 
-      window.requestAnimationFrame(function() {
+      RAF(function () {
         target.scrollTop = scrollTop;
       });
 
