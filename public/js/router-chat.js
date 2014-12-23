@@ -13,6 +13,7 @@ var onready = require('./utils/onready');
 var apiClient = require('components/apiClient');
 var HeaderView = require('views/app/headerView');
 
+require('utils/initial-setup');
 require('components/statsc');
 require('views/widgets/preload');
 require('filtered-collection');

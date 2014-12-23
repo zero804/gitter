@@ -12,7 +12,9 @@ var realtime = require('components/realtime');
 var log = require('utils/log');
 var onready = require('./utils/onready');
 var $ = require('jquery');
+var RAF = require('utils/raf');
 
+require('utils/initial-setup');
 require('components/statsc');
 require('views/widgets/preload');
 require('components/webNotifications');
@@ -68,8 +70,8 @@ onready(function () {
       hash = windowHash;
     }
 
-    chatIFrame.contentWindow.requestAnimationFrame(function () {
-      chatIFrame.contentWindow.location.replace(iframeUrl + hash);
+    RAF(function () {
+      chatIFrame.src = iframeUrl + hash;
     });
   }
 
