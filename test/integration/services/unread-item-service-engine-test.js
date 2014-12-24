@@ -88,8 +88,8 @@ describe('unread-item-service', function() {
               var result = results[index];
               assert.strictEqual(result.userId, userId);
               assert.strictEqual(result.unreadCount, 0);
+              assert.strictEqual(result.mentionCount, undefined);
               assert.strictEqual(result.badgeUpdate, true);
-              assert.strictEqual(result.removedLastMention, false);
             });
 
             return unreadItemServiceEngine.removeItem(troupeId1, itemId1, userIds);
@@ -99,9 +99,42 @@ describe('unread-item-service', function() {
             userIds.forEach(function(userId, index) {
               var result = results[index];
               assert.strictEqual(result.userId, userId);
-              assert.strictEqual(result.unreadCount, -1);
+              assert.strictEqual(result.unreadCount, undefined);
+              assert.strictEqual(result.mentionCount, undefined);
               assert.strictEqual(result.badgeUpdate, false);
-              assert.strictEqual(result.removedLastMention, false);
+            });
+          })
+          .nodeify(done);
+      });
+
+      it('should remove mentions', function(done) {
+        unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, [userId1])
+          .then(function() {
+            return unreadItemServiceEngine.removeItem(troupeId1, itemId1, userIds);
+          })
+          .then(function(results) {
+            assert.deepEqual(results, [{
+              userId: userId1,
+              unreadCount: 0,
+              mentionCount: 0,
+              badgeUpdate: true
+            }, {
+              userId: userId2,
+              unreadCount: 0,
+              mentionCount: undefined,
+              badgeUpdate: true
+            }]);
+
+            return unreadItemServiceEngine.removeItem(troupeId1, itemId1, userIds);
+          })
+          .then(function(results) {
+            assert.strictEqual(results.length, 2);
+            userIds.forEach(function(userId, index) {
+              var result = results[index];
+              assert.strictEqual(result.userId, userId);
+              assert.strictEqual(result.unreadCount, undefined);
+              assert.strictEqual(result.mentionCount, undefined);
+              assert.strictEqual(result.badgeUpdate, false);
             });
           })
           .nodeify(done);

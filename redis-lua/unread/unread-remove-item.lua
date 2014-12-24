@@ -19,6 +19,7 @@ for i = 1,key_count do
 
 	local removed;										-- number of items remove
 	local card = -1; 									-- count post remove
+	local mention_count = -1          -- mention count
 	local flag = 0;                   -- flag 1 means update user badge, 2 means last mention removed
 
 	if key_type == "set" then
@@ -39,10 +40,23 @@ for i = 1,key_count do
 
 	-- No unread items implies no mentions either
 	if card == 0 then
-		redis.call("DEL", user_troupe_mention_key)
-		if redis.call("SREM", user_mention_key, troupe_id) > 0 then
-			flag = flag + 2;
+		local d1 = redis.call("DEL", user_troupe_mention_key)
+		local d2 = redis.call("SREM", user_mention_key, troupe_id);
+		
+		if d1 > 0 or d2 > 0 then
+			mention_count = 0
 		end
+	else
+		local d1 = redis.call("SREM", user_troupe_mention_key, item_id)
+		if d1 > 0 then
+			mention_count = redis.call("SCARD", user_troupe_mention_key)
+			
+			if mention_count == 0 then
+				redis.call("SREM", user_mention_key, troupe_id)
+			end
+		end
+
+		
 	end
 
 
@@ -58,6 +72,7 @@ for i = 1,key_count do
 	end
 
 	table.insert(result, card)
+	table.insert(result, mention_count)
 	table.insert(result, flag)
 end
 

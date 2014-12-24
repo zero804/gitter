@@ -49,9 +49,8 @@ function reject(msg) {
  * Item removed
  * @return {promise} promise of nothing
  */
-function removeItem(troupeId, itemType, itemId) {
+function removeItem(troupeId, itemId) {
   if(!troupeId) return reject("newitem failed. Troupe cannot be null");
-  if(!itemType) return reject("newitem failed. itemType cannot be null");
   if(!itemId) return reject("newitem failed. itemId cannot be null");
 
   return troupeService.findUserIdsForTroupeWithLurk(troupeId)
@@ -61,8 +60,8 @@ function removeItem(troupeId, itemType, itemId) {
 
       // Publish out an unread item removed event
       // TODO: we could actually check whether this user thinks this item is UNREAD
-      var data = {};
-      data[itemType] = [itemId];
+      var data = { chat: [itemId] };
+
       userIds.forEach(function(userId) {
         appEvents.unreadItemsRemoved(userId, troupeId, data);
       });
@@ -75,23 +74,12 @@ function removeItem(troupeId, itemType, itemId) {
         .then(function(removeResults) {
           removeResults.forEach(function(removeResult) {
 
-            /* a negative number means nothing happened */
-            if(removeResult.unreadCount >= 0) {
+            if(removeResult.unreadCount >= 0 || removeResult.mentionCount >= 0) {
               appEvents.troupeUnreadCountsChange({
                 userId: removeResult.userId,
                 troupeId: troupeId,
-                total: removeResult.unreadCount
-              });
-            }
-
-            if(removeResult.removedLastMention) {
-              // Notify the user
-              appEvents.troupeMentionCountsChange({
-                userId: removeResult.userId,
-                troupeId: troupeId,
-                total: 0,
-                op: 'remove',
-                member: true // XXX: may not always be the case
+                total: removeResult.unreadCount,
+                mentions: removeResult.mentionCount
               });
             }
 
@@ -117,13 +105,8 @@ function ensureAllItemsRead(userId, troupeId) {
       appEvents.troupeUnreadCountsChange({
         userId: userId,
         troupeId: troupeId,
-        total: 0
-      });
-
-      appEvents.troupeMentionCountsChange({
-        userId: userId,
-        troupeId: troupeId,
-        total: 0
+        total: 0,
+        mentions: 0
       });
 
     });
@@ -139,39 +122,18 @@ function markItemsOfTypeRead(userId, troupeId, ids, mentionIds) {
 
   return engine.markItemsRead(userId, troupeId, ids, mentionIds || [])
     .then(function(result) {
-      if(result.unreadCount >= 0) {
+      if(result.unreadCount >= 0 || result.mentionCount >= 0) {
         // Notify the user
         appEvents.troupeUnreadCountsChange({
           userId: userId,
           troupeId: troupeId,
-          total: result.unreadCount
-        });
-      }
-
-      if(result.mentionCount >= 0) {
-        // Notify the user
-        appEvents.troupeMentionCountsChange({
-          userId: userId,
-          troupeId: troupeId,
-          total: result.mentionCount
+          total: result.unreadCount,
+          mentions: result.mentionCount
         });
       }
 
     });
 }
-
-// /**
-//  * Mark an item in a troupe as having been read by a user
-//  * @return {promise} promise of nothing
-//  */
-// function setLastReadTimeForUser(userId, troupeId, lastReadTimestamp) {
-//   assert(userId, 'Expected userId');
-//   assert(lastReadTimestamp, 'Expected lastReadTimestamp');
-
-//   return Q.ninvoke(redisClient, "mset",
-//     "lrt:" + userId, lastReadTimestamp,
-//     "lrtt:" + userId + ":" + troupeId, lastReadTimestamp);
-// }
 
 /**
  * Returns a hash of hash {user:troupe:ids} of users who have
@@ -317,28 +279,6 @@ function getOldestId(ids) {
   });
 }
 
-/**
- * Remove the mentions and decrement counters. This will be called when a user reads an item
- */
-function removeMentionForUser(userId, troupeId, itemIds, member) {
-  if(!itemIds.length) return Q.resolve();
-
-  return engine.removeMentionForUser(userId, troupeId, itemIds)
-    .then(function(mentionCount) {
-      if(mentionCount >= 0) {
-        // Notify the user
-        appEvents.troupeMentionCountsChange({
-          userId: userId,
-          troupeId: troupeId,
-          total: mentionCount,
-          op: 'remove',
-          member: member
-        });
-      }
-    });
-
-}
-
 function getTroupeIdsCausingBadgeCount(userId) {
   return engine.getRoomsCausingBadgeCount(userId);
 }
@@ -478,38 +418,21 @@ function onChatCreate(chat, troupeId) {
       // Next, notify all the users with unread count changes
       parsed.notifyUserIds.forEach(function(userId) {
         var unreadCount = results[userId] && results[userId].unreadCount;
+        var mentionCount = results[userId] && results[userId].mentionCount;
 
         // Not lurking, send them the full update
         appEvents.newUnreadItem(userId, troupeId, { chat: [chat.id] });
 
-        if(unreadCount >= 0) {
+        if(unreadCount >= 0 || mentionCount >= 0) {
           // Notify the user
           appEvents.troupeUnreadCountsChange({
             userId: userId,
             troupeId: troupeId,
-            total: unreadCount
+            total: unreadCount,
+            mentions: mentionCount
           });
         }
       });
-
-      parsed.mentionUserIds.forEach(function(userId) {
-        var mentionCount = results[userId] && results[userId].mentionCount;
-        if(mentionCount >= 0) {
-          appEvents.troupeUnreadCountsChange({
-            userId: userId,
-            troupeId: troupeId,
-            total: mentionCount
-          });
-
-          appEvents.troupeMentionCountsChange({
-            userId: userId,
-            troupeId: troupeId,
-            total: mentionCount
-          });
-        }
-      });
-
-
 
       // Next, notify all the lurkers
       parsed.activityOnlyUserIds.forEach(function(userId) {
@@ -533,154 +456,9 @@ function onChat(data) {
   }
 }
 
-// /**
-//  * Returns a promise of nothing
-//  */
-// function detectAndCreateMentions(troupeId, troupe, creatingUserId, chat) {
-//   if(!chat.mentions || !chat.mentions.length) return Q.resolve();
-
-//   /* Figure out what type of room this is */
-//   var oneToOne = troupe.githubType === 'ONETOONE';
-
-//   var usersHash = troupe.users;
-//   if(!usersHash) return;
-
-//   var uniqueUserIds = {};
-//   chat.mentions.forEach(function(mention) {
-//     if(mention.group) {
-//       if(mention.userIds) {
-//         mention.userIds.forEach(function(userId) {
-//           uniqueUserIds[userId] = true;
-//         });
-//       }
-//     } else {
-//       uniqueUserIds[mention.userId] = true;
-//     }
-//   });
-
-//   var mentionMemberUserIds = [];
-//   var mentionLurkerAndNonMemberUserIds = [];
-
-//   var lookupUsers = [];
-
-//   Object.keys(uniqueUserIds).forEach(function(userId) {
-//     /* Don't be mentioning yourself yo */
-//     if(userId == creatingUserId) return;
-
-//     if(userId in usersHash) {
-//       var lurk = usersHash[userId];
-
-//       /* User is in the room? Always mention */
-//       if(lurk) {
-//         mentionLurkerAndNonMemberUserIds.push(userId);
-//       } else {
-//         mentionMemberUserIds.push(userId);
-//       }
-//       return;
-//     }
-
-//     if(!oneToOne) {
-//       /* We'll need to use the permissions-model to determine if they'll be allowed in */
-//       lookupUsers.push(userId);
-//     }
-
-//   });
-
-//   var lookup;
-//   if(lookupUsers.length) {
-//     lookup = userService.findByIds(lookupUsers);
-//   } else {
-//     lookup = Q.resolve([]);
-//   }
-
-//   return lookup.then(function(users) {
-//     if(!users.length) return;
-
-//     return Q.all(users.map(function(user) {
-//       return roomPermissionsModel(user, 'join', troupe)
-//         .then(function(access) {
-//           if(access) {
-//             mentionLurkerAndNonMemberUserIds.push(user.id);
-//           }
-
-//         });
-//     }));
-
-//   }).then(function() {
-//     /**
-//      * Lurkers and non members wont have an unread item, so the first thing
-//      * we'll need to do is create an unread item for them. Only then can we push the
-//      * mention
-//      */
-//     if(mentionLurkerAndNonMemberUserIds.length) {
-//       return engine.newItemForUsers(troupeId, chat.id, mentionLurkerAndNonMemberUserIds)
-//         .then(function() {
-//           var allUserIds = mentionLurkerAndNonMemberUserIds.concat(mentionMemberUserIds);
-//           return newMention(troupeId, chat.id, allUserIds, usersHash);
-//         })
-//         .then(function() {
-//           var data = {
-//             chat: [chat.id]
-//           };
-
-//           mentionLurkerAndNonMemberUserIds.forEach(function(userId) {
-//             // Lurkers never recieved a newUnreadItem. Send it to them
-//             appEvents.newUnreadItem(userId, troupeId, data);
-//           });
-
-//         });
-//     } else {
-//       return newMention(troupeId, chat.id, mentionMemberUserIds, usersHash);
-//     }
-//   });
-
-// }
-
-// function detectAndRemoveMentions(troupeId, creatingUserId, chat) {
-//   if(!chat.mentions) return;
-//   // XXX: remove the mention
-// }
-
 exports.install = function() {
 
   appEvents.localOnly.onChat(onChat);
-
-  // appEvents.localOnly.onChat(function(data) {
-  //   var operation = data.operation;
-  //   var troupeId = data.troupeId;
-  //   var model = data.model;
-
-  //   if(!model) {
-  //     logger.warn('No data model in onDataChangeEvent', { data: data});
-  //     return;
-  //   }
-
-  //   var modelId = model.id;
-  //   var creatingUserId = model.fromUser && model.fromUser.id;
-  //   var promise;
-
-  //   if(operation === 'create') {
-  //     promise = newItem(troupeId, creatingUserId, 'chat', modelId)
-  //       .then(function(troupe) {
-  //         return detectAndCreateMentions(troupeId, troupe, creatingUserId, model);
-  //       });
-
-  //   } else if(operation === 'remove') {
-  //     promise = removeItem(troupeId, 'chat', modelId)
-  //       .then(function() {
-  //         return detectAndRemoveMentions(troupeId, creatingUserId, model);
-  //       });
-  //   }
-
-  //   if(promise) {
-  //     promise.catch(function(err) {
-  //       errorReporter(err, { message: 'unreadItemService.onChat handler failure'});
-  //       logger.error('unreadItemService failure: ' + err, { exception: err });
-  //       throw err;
-  //     });
-  //   }
-
-  // });
 };
 
 exports.testOnly = {

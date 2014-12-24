@@ -195,9 +195,9 @@ function removeItem(troupeId, itemId, userIds) {
       // Results come back as three items per key in sequence
       for(var i = 0; result.length > 0; i++) {
         var troupeUnreadCount   = result.shift();
+        var mentionCount        = result.shift();
         var flag                = result.shift();
         var badgeUpdate         = !!(flag & 1);
-        var removedLastMention  = !!(flag & 2);
         var userId              = userIds[i];
 
         if (badgeUpdate) {
@@ -208,15 +208,15 @@ function removeItem(troupeId, itemId, userIds) {
           engine.emit('unread.count', userId, troupeId, troupeUnreadCount);
         }
 
-        if (removedLastMention) {
-          engine.emit('mention.count', userId, troupeId, 0, 'remove');
+        if (mentionCount >= 0) {
+          engine.emit('mention.count', userId, troupeId, mentionCount);
         }
 
         results.push({
           userId: userId,
-          unreadCount: troupeUnreadCount,
-          badgeUpdate: badgeUpdate,
-          removedLastMention: removedLastMention
+          unreadCount: troupeUnreadCount >= 0 ? troupeUnreadCount : undefined,
+          mentionCount: mentionCount >= 0 ? mentionCount : undefined,
+          badgeUpdate: badgeUpdate
         });
 
       }
