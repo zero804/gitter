@@ -22,7 +22,7 @@ module.exports = (function() {
   // - 'input.search' for the search input
   // - 'input.other' for other inputs (including textarea and select)
   // - 'other' for the rest
-  key.filter = function(event) {
+  key.filter = function (event) {
     var scope, tag = event.target || event.srcElement;
 
     if (tag.getAttribute('data-prevent-keys') === 'on') {
@@ -144,7 +144,7 @@ module.exports = (function() {
   keyEvents[cmdKey + '+' + roomKey + '+enter'] = 'room.enter';
 
   // Go to a conversation by index in list
-  _.each('123456789'.split(''), function(n) {
+  _.each('123456789'.split(''), function (n) {
     keyEvents[cmdKey + '+' + gitterKey + '+' + n] = 'room.' + n;
   });
   keyEvents[cmdKey + '+' + gitterKey + '+0'] = 'room.10';
