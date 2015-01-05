@@ -403,13 +403,10 @@ module.exports = (function() {
       'search.go': 'handleGo'
     },
 
-    // FIXME this redundant reference is a little strange??
     events: {
       'click .js-activate-search': 'activate',
       'click @ui.clearIcon' : 'clearSearchTerm',
       'click @ui.input': 'activate',
-      'cut @ui.input': 'handleChange',
-      'paste @ui.input': 'handleChange',
       'change @ui.input': 'handleChange',
       'input @ui.input': 'handleChange'
     },
@@ -558,7 +555,7 @@ module.exports = (function() {
     },
 
     handleChange: function (e) {
-      e.preventDefault();
+      // e.preventDefault();
       this.model.set('searchTerm', e.target.value.trim());
     },
 
