@@ -5,6 +5,7 @@ var Q = require('q');
 var wrap = require('./github-cache-wrapper');
 var badCredentialsCheck = require('./bad-credentials-check');
 var requestWrapper = require('./request-wrapper');
+var StatusError = require('statuserror');
 
 var Search = function(user) {
   this.token = user && (user.githubUserToken || user.githubToken) || '';
@@ -35,15 +36,9 @@ function requestGithubUserSearch(searchString, token) {
   requestWrapper.fastRequest(options, d.makeNodeResolver());
 
   return d.promise.spread(function(response, body) {
-    if(response.statusCode >= 400) {
-      throw response;
-    }
+    if(response.statusCode !== 200) throw new StatusError(response.statusCode, 'github user search failed');
 
-    if(response.statusCode !== 200) {
-      return response.statusCode;
-    } else {
-      return body;
-    }
+    return body;
   }).fail(badCredentialsCheck);
 }
 
