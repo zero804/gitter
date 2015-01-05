@@ -5,6 +5,7 @@ var Q = require('q');
 var wrap = require('./github-cache-wrapper');
 var badCredentialsCheck = require('./bad-credentials-check');
 var requestWrapper = require('./request-wrapper');
+var StatusError = require('statuserror');
 
 var Search = function(user) {
   this.token = user && (user.githubUserToken || user.githubToken) || '';
@@ -19,7 +20,10 @@ Search.prototype.findUsers = function(searchString, callback) {
 };
 
 function requestGithubUserSearch(searchString, token) {
-  var noOrgsQuerySearchString = 'q=' + searchString + '+type:user';
+  var encodedSearchString = encodeURIComponent(searchString);
+
+  // the '+type:user' part gets mangled by url encoders, so we have to do this by hand
+  var noOrgsQuerySearchString = 'q=' + encodedSearchString + '+type:user';
   var searchUrl = 'https://api.github.com/search/users?' + noOrgsQuerySearchString + '&access_token=' + token;
 
   var d = Q.defer();
@@ -35,15 +39,9 @@ function requestGithubUserSearch(searchString, token) {
   requestWrapper.fastRequest(options, d.makeNodeResolver());
 
   return d.promise.spread(function(response, body) {
-    if(response.statusCode >= 400) {
-      throw response;
-    }
+    if(response.statusCode !== 200) throw new StatusError(response.statusCode, 'github user search failed');
 
-    if(response.statusCode !== 200) {
-      return response.statusCode;
-    } else {
-      return body;
-    }
+    return body;
   }).fail(badCredentialsCheck);
 }
 
