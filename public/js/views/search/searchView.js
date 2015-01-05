@@ -19,11 +19,12 @@ var noRoomResultsTemplate = require('./tmpl/no-room-results.hbs');
 var upgradeTemplate = require('./tmpl/upgrade.hbs');
 var textFilter = require('utils/text-filter');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
+
+require('utils/tracking');
 require('views/behaviors/widgets');
 require('views/behaviors/highlight');
 
 module.exports = (function() {
-
 
   var EmptyResultsView = Marionette.ItemView.extend({
     className: 'result-empty',
@@ -66,6 +67,7 @@ module.exports = (function() {
     },
 
     handleSelect: function () {
+      appEvents.trigger('track-event', 'search_result_selected');
       this.selectItem();
     }
   });
@@ -251,7 +253,10 @@ module.exports = (function() {
 
       messages.reset(); // we must clear the collection before fetching more
       messages.fetchSearch(query, function (err) {
-        if (err) return p.reject(err);
+        if (err) {
+          appEvents.trigger('track-event', 'search_messages_failed');
+          return p.reject(err);
+        }
 
         var results = messages.models
           .map(function (item) {
@@ -297,7 +302,10 @@ module.exports = (function() {
           this.trigger('loaded:rooms', results, query);
           p.resolve(results);
         }.bind(this))
-        .fail(p.reject);
+        .fail(function (err) {
+          appEvents.trigger('track-event', 'search_rooms_failed');
+          p.reject(err);
+        });
 
       return p;
     },
@@ -419,7 +427,7 @@ module.exports = (function() {
     },
 
     initialize: function () {
-      var debouncedRun = _.debounce(this.run.bind(this), 150);
+      var debouncedRun = _.debounce(this.run.bind(this), 250);
 
       this.model = new Backbone.Model({ searchTerm: '', active: false, isLoading: false });
 
@@ -536,12 +544,15 @@ module.exports = (function() {
       if (this.isSearchTermEmpty()) return this.hide();
 
       var searchTerm = this.model.get('searchTerm');
-      var finishedLoading = this.model.set.bind(this.model, 'isLoading', false);
+      var finishedLoading = function () {
+        this.model.set('isLoading', false);
+        appEvents.trigger('track-event', 'search_complete');
+      }.bind(this);
 
       this.model.set('isLoading', true);
 
       $.when(this.search.local(searchTerm), this.search.remote(searchTerm))
-        .done(finishedLoading)
+        .then(finishedLoading)
         .fail(finishedLoading);
 
       this.showResults();
