@@ -31,6 +31,12 @@ function isRelativeURL(url) {
 
 module.exports = {
   install: function(app) {
+    app.get('/login/*', function(req, res, next) {
+      // Fix for Windows Phone
+      req.nonApiRoute = true;
+      next();
+    });
+
     // Redirect user to GitHub OAuth authorization page.
     app.get('/login/github',
       function (req, res, next) {
