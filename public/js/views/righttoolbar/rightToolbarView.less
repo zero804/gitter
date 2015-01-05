@@ -35,14 +35,6 @@
     font-size: 11px;
   }
 
- .trpMiniActions {
-    display: none;
-    @media @mid {
-      display: block;
-      opacity: 0.8;
-    }
-  }
-
   .trpToolbarHeader {
     padding-left: 14px;
   }
@@ -68,7 +60,6 @@
   @media @mid {
     width: 70px;
     padding-right: 0px;
-    // padding-top: 16px;
 
     &.expanded {
       width: 240px;
@@ -82,7 +73,7 @@
     opacity: 0;
     }
 
-    #people-header, #top-header, #request-header, #repo-info, #activity-tip {
+    #people-header, #top-header, #repo-info, #activity-tip {
       display: none;
     }
 
@@ -96,7 +87,6 @@
   }
 
   .trpRepoInfoContainer {
-    // padding-left: 4px;
     max-width: 266px;
     box-sizing: border-box;
     padding-right: 10px;
@@ -117,24 +107,6 @@
       margin: 8px 0;
     }
 
-    .trpTroupeInfoBadge {
-      -webkit-border-radius: 4px;
-         -moz-border-radius: 4px;
-              border-radius: 4px;
-      display: inline-block;
-      padding: 0 5px 1px 5px;
-      font-size: 10px;
-      font-weight: bold;
-      line-height: 14px;
-      color: white;
-      white-space: nowrap;
-      vertical-align: baseline;
-      background-color: @trpLightBlue;
-      margin-top: 3px;
-      float: right;
-      margin-left: 20px;
-    }
-
     ul {
       display: inline-block;
       border: 1px 0 solid @trpGrey;
@@ -144,8 +116,6 @@
     h1 {
       word-wrap: break-word;
     }
-
-
   }
 }
 
@@ -164,26 +134,12 @@
     vertical-align: top;
   }
 
-
   @media @mid {
-
-    // padding-left: 4px;
-
-    .trpToolbarHeader.divider:first-child {
-      border-bottom: 0;
-    }
-
     .trpToolbarList {
       max-height: 40%;
     }
 
   }
-}
-
-.trpToolbarContent .qq-upload.button {
-  position: absolute;
-  width: 200px;
-  height: 32px;
 }
 
 .trpToolbarContent input {
@@ -192,8 +148,4 @@
   height: 32px;
   overflow: hidden;
   left: 20px;
-}
-
-.trpToolbarContent .trpTroupeAvatar {
-    background-color: rgba(0,0,0,0.9);
 }
