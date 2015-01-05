@@ -57,11 +57,11 @@ module.exports = (function() {
       this.search.show(this.searchView);
 
       this.searchView.on('search:expand', function () {
-        $('.trpToolbar').addClass('expand');
+        $('.right-toolbar').addClass('expand');
       });
 
       this.searchView.on('search:collapse', function () {
-        $('.trpToolbar').removeClass('expand');
+        $('.right-toolbar').removeClass('expand');
       });
 
       this.searchView.on('search:show', function () {
