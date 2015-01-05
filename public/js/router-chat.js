@@ -32,7 +32,8 @@ onready(function () {
   postMessage({ type: "chatframe:loaded" });
 
   $(document).on("click", "a", function (e) {
-    var url = urlUtil.parse(e.target.getAttribute('href'));
+    var target = e.target;
+    var url = urlUtil.parse(target.getAttribute('href') || target.parentElement.getAttribute('href'));
     var internalLink = url.hostname === context.env('baseServer');
 
     // modals
