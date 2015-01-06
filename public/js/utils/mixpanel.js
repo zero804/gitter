@@ -3,7 +3,6 @@ var context = require('utils/context');
 
 module.exports = (function() {
 
-
   var trackingId = context.env('mixpanelToken');
 
   if(!trackingId) return;
