@@ -93,7 +93,7 @@ module.exports = (function() {
       if(this._contains(itemType, itemId)) return;
 
       this._addTarpit._add(itemType, itemId);
-      this._recountLimited();
+      /* When the item is promoted, a recount will happen */
     },
 
     _unreadItemRemoved: function(itemType, itemId) {
@@ -133,6 +133,7 @@ module.exports = (function() {
     },
 
     _recount: function() {
+      console.error('_recount', new Error());
       var newValue = this._count();
       this._currentCountValue = newValue;
       this.trigger('newcountvalue', newValue);

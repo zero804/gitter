@@ -120,7 +120,10 @@ onready(function () {
   });
 
   appEvents.on('unreadItemsCount', function(newCount) {
-    postMessage({ type: "unreadItemsCount", count: newCount, troupeId: context.getTroupeId() });
+    var message = { type: "unreadItemsCount", count: newCount, troupeId: context.getTroupeId() };
+
+    log.info('rchat: Posting unread items count ', message);
+    postMessage(message);
   });
 
   // Bubble keyboard events
