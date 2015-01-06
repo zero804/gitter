@@ -21,7 +21,6 @@ module.exports = (function() {
 
     events: {
       'click #upgrade-auth': 'onUpgradeAuthClick',
-      'click .activity-expand' : 'expandActivity',
       'click #people-header' : 'showPeopleList',
       'click #info-header' : 'showRepoInfo',
       'submit #upload-form': 'upload'
@@ -98,10 +97,6 @@ module.exports = (function() {
       $('#repo-info').show();
       $('#people-header').removeClass('selected');
       $('#info-header').addClass('selected');
-    },
-
-    expandActivity: function() {
-      $('.activity-expand .commits').slideToggle();
     }
 
   });
