@@ -6,8 +6,9 @@ var logger            = env.logger;
 var nconf             = env.config;
 var stats             = env.stats;
 
-var faye              = require('./faye-node');
+var faye              = require('gitter-faye');
 var fayeRedis         = require('gitter-faye-redis');
+var deflate           = require('permessage-deflate');
 var oauth             = require('../services/oauth-service');
 var presenceService   = require('../services/presence-service');
 var shutdown          = require('shutdown');
@@ -15,7 +16,7 @@ var contextGenerator  = require('./context-generator');
 var appVersion        = require('./appVersion');
 var StatusError       = require('statuserror');
 var bayeuxExtension   = require('./bayeux/extension');
-
+var zlib              = require('zlib');
 var version = appVersion.getVersion();
 
 var superClientPassword = nconf.get('ws:superClientPassword');
@@ -350,6 +351,14 @@ var server = new faye.NodeAdapter({
     }
   }
 });
+
+if(nconf.get('ws:fayePerMessageDeflate')) {
+  /* Add permessage-deflate extension to Faye */
+  deflate = deflate.configure({
+    level: zlib.Z_BEST_SPEED
+  });
+  server.addWebsocketExtension(deflate);
+}
 
 /* Nasty hack, but no way around it */
 server._server._makeResponse = function(message) {
