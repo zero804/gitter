@@ -160,7 +160,7 @@ module.exports = (function() {
     emptyView: EmptyRoomResultsView,
 
     initialize: function (/*options*/) {
-      var target = document.querySelector("#toolbar-content");
+      var target = document.querySelector("#right-toolbar-layout");
       this.rollers = new Rollers(target, this.el, { doNotTrack: true });
     },
 
@@ -173,7 +173,7 @@ module.exports = (function() {
     emptyView: EmptyResultsView,
 
     initialize: function() {
-      var target = document.querySelector("#toolbar-content");
+      var target = document.querySelector("#right-toolbar-layout");
       this.rollers = new Rollers(target, this.el, { doNotTrack: true });
     },
 
