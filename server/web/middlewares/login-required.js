@@ -5,8 +5,10 @@ var env = require('../../utils/env');
 var logger = env.logger;
 
 module.exports = function(req, res) {
+
   // Are we dealing with an API client? Tell em in HTTP
-  if(req.accepts(['json','html']) === 'json') {
+  // Windows Phone sends accept: */* for oauth logins. Reported by @RReverser
+  if(!req.nonApiRoute && req.accepts(['json','html']) === 'json') {
     /* API client without access, shouldn't really happen :( */
     logger.warn("User is not logged in, denying access");
 

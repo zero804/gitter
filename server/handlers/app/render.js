@@ -256,12 +256,13 @@ function renderMobileNativeEmbeddedChat(req, res) {
 }
 
 function renderMobileNativeUserhome(req, res) {
-  res.render('mobile/native-userhome-app', {
-    bootScriptName: 'mobile-native-userhome',
-    troupeContext: {
-      userId: req.user.id
-    }
-  });
+  contextGenerator.generateNonChatContext(req)
+    .then(function(troupeContext) {
+      res.render('mobile/native-userhome-app', {
+        bootScriptName: 'mobile-native-userhome',
+        troupeContext: troupeContext
+      });
+    });
 }
 
 function renderMobileNotLoggedInChat(req, res, next) {
