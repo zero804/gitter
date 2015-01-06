@@ -100,12 +100,6 @@ module.exports = (function() {
       $('#info-header').addClass('selected');
     },
 
-    onShow: function() {
-       if (hasScrollBars()) {
-        $(".trpToolbarContent").addClass("scroller");
-      }
-    },
-
     expandActivity: function() {
       $('.activity-expand .commits').slideToggle();
     }
