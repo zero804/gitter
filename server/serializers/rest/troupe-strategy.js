@@ -22,11 +22,11 @@ function AllUnreadItemCountStategy(options) {
   var userId = options.userId || options.currentUserId;
 
   this.preload = function(troupeIds, callback) {
-    unreadItemService.getUserUnreadCountsForTroupeIds(userId, troupeIds, function(err, result) {
-      if(err) return callback(err);
-      self.unreadCounts = result;
-      callback();
-    });
+    unreadItemService.getUserUnreadCountsForTroupeIds(userId, troupeIds)
+      .then(function(result) {
+        self.unreadCounts = result;
+      })
+      .nodeify(callback);
   };
 
   this.map = function(id) {
@@ -46,11 +46,18 @@ function TroupeMentionCountStategy(options) {
   var userId = options.userId || options.currentUserId;
 
   this.preload = function(troupeIds, callback) {
-    unreadItemService.getUserMentionCountsForTroupeIds(userId, troupeIds, function(err, result) {
-      if(err) return callback(err);
-      self.mentionCounts = result;
-      callback();
-    });
+    var operation;
+    if(troupeIds.length <= 5) {
+      operation = unreadItemService.getUserMentionCountsForTroupeIds(userId, troupeIds);
+    } else {
+      operation = unreadItemService.getUserMentionCounts(userId);
+    }
+
+    operation
+      .then(function(result) {
+        self.mentionCounts = result;
+      })
+      .nodeify(callback);
   };
 
   this.map = function(id) {

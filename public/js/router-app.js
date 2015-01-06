@@ -5,7 +5,6 @@ var context = require('utils/context');
 var Backbone = require('backbone');
 var _ = require('underscore');
 var AppIntegratedView = require('views/app/appIntegratedView');
-var TroupeMenuView = require('views/menu/troupeMenu');
 var troupeCollections = require('collections/instances/troupes');
 var TitlebarUpdater = require('components/titlebar');
 var realtime = require('components/realtime');
@@ -125,7 +124,7 @@ onready(function () {
 
   window.addEventListener('message', function(e) {
     if(e.origin !== context.env('basePath')) {
-      log.info('Ignoring message from ' + e.origin);
+      log.info('rapp: Ignoring message from ' + e.origin);
       return;
     }
 
@@ -137,7 +136,7 @@ onready(function () {
       return;
     }
 
-    log.info('Received message ', message);
+    log.info('rapp: Received message ', message);
 
     var makeEvent = function(message) {
       var origin = 'chat';
@@ -145,13 +144,13 @@ onready(function () {
       message.event = {
         origin: origin,
         preventDefault: function() {
-          log.info('Warning: could not call preventDefault() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
+          log.warn('rapp: could not call preventDefault() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
         },
         stopPropagation: function() {
-          log.info('Warning: could not call stopPropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
+          log.warn('rapp: could not call stopPropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
         },
         stopImmediatePropagation: function() {
-          log.info('Warning: could not call stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
+          log.warn('rapp: could not call stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame, it must be called from the original frame');
         }
       };
     };
@@ -175,7 +174,7 @@ onready(function () {
         var count = message.count;
         var troupeId = message.troupeId;
         if (troupeId !== context.getTroupeId()) {
-          log.info('warning: troupeId mismatch in unreadItemsCount');
+          log.warning('troupeId mismatch in unreadItemsCount');
         }
         var v = {
           unreadItems: count
@@ -187,6 +186,7 @@ onready(function () {
           v.mentions = 0;
         }
 
+        log.info('rapp: Received unread count message ', { troupeId: troupeId, update: v });
         allRoomsCollection.patch(troupeId, v);
         break;
 
