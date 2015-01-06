@@ -65,10 +65,12 @@ module.exports = (function() {
 
       this.searchView.on('search:show', function () {
         $('#toolbar-top-content').hide();
+        $('#zendesk-footer').hide();
       }.bind(this));
 
       this.searchView.on('search:hide', function () {
         $('#toolbar-top-content').show();
+        $('#zendesk-footer').show();
       }.bind(this));
 
       itemCollections.events.on('add reset sync', function() {
