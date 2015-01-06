@@ -1,5 +1,4 @@
 "use strict";
-var urlUtil = require('url');
 var $ = require('jquery');
 var Backbone = require('backbone');
 var context = require('utils/context');
@@ -33,21 +32,29 @@ onready(function () {
   postMessage({ type: "chatframe:loaded" });
 
   $(document).on("click", "a", function (e) {
-    var target = e.target;
-    var url = urlUtil.parse(target.getAttribute('href') || target.parentElement.getAttribute('href'));
-    var internalLink = url.hostname === context.env('baseServer');
+    var target = e.currentTarget;
+    var internalLink = target.hostname === context.env('baseServer');
+
+    var location = window.location;
 
     // modals
-    if (url.href.indexOf('#') === 0) {
+    if (location.scheme === target.scheme &&
+        location.host === target.host &&
+        location.pathname === target.pathname) {
       e.preventDefault();
-      window.location = url.hash;
+      window.location = target.href;
       return true;
     }
 
     // internal links to valid rooms shouldn't open in new windows
-    if (internalLink && isValidRoomUri(url.path)) {
+    if (internalLink && isValidRoomUri(target.pathname)) {
       e.preventDefault();
-      window.parent.location.href = url.href;
+      var uri = target.pathname.replace(/^\//, '');
+      var type = 'chat';
+      if (uri === context.user().get('username')) {
+        type = 'home';
+      }
+      appEvents.trigger('navigation', target.pathname, type, uri);
     }
   });
 
