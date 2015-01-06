@@ -1,9 +1,9 @@
 <div class="right-toolbar" id="right-toolbar-layout">
-  <header id='search-panel'>
+  <header id="search-panel" class="right-toolbar__header">
     {{{ prerenderView "js/views/search/tmpl/search" }}}
   </header>
 
-  <div id="toolbar-top-content" style="height:100%; width: 100%;">
+  <div id="toolbar-top-content" class="right-toolbar__body">
     <div id="people-list">
       <div class="trpToolbarHeader" id="top-header">
         <div class="trpToolbarHeaderItem selected" id="people-header">
@@ -46,7 +46,7 @@
     </div>
   </div>
 
-  <footer class="trpTroupeActions">
+  <footer class="right-toolbar__footer">
     <a href="http://gitter.zendesk.com" target="_blank" style="text-decoration: none">
       <div class="trpTroupeHelp" id="help-button">
         <div style="display: inline-block; vertical-align: middle; height: 24px" id="help-icon"><img src='{{cdn "images/icon-help-black@2x.png"}}' width="24" height="24"/></div>
