@@ -5,7 +5,6 @@ var context = require('utils/context');
 var Backbone = require('backbone');
 var _ = require('underscore');
 var AppIntegratedView = require('views/app/appIntegratedView');
-var TroupeMenuView = require('views/menu/troupeMenu');
 var troupeCollections = require('collections/instances/troupes');
 var TitlebarUpdater = require('components/titlebar');
 var realtime = require('components/realtime');
