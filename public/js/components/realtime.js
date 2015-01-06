@@ -2,17 +2,14 @@
 
 var _ = require('underscore');
 var context = require('utils/context');
-var Faye = require('faye');
+var Faye = require('gitter-faye');
 var appEvents = require('utils/appevents');
 var log = require('utils/log');
 
 module.exports = (function() {
 
-
   /* @const */
   var FAYE_PREFIX = '/api';
-
-  // var logLevel = parseInt(window.localStorage.fayeLogging, 10) || 0;
 
   Faye.logger = {};
   var logLevels = ['fatal', 'error', 'warn', 'info', 'debug'];
@@ -30,14 +27,14 @@ module.exports = (function() {
   var eyeballState = true;
 
   appEvents.on('eyeballStateChange', function(state) {
-    log.info('Switching eyeball state to ', state);
+    log.info('rt: Switching eyeball state to ', state);
     eyeballState = state;
   });
 
   var ErrorLogger = function() {};
   ErrorLogger.prototype.incoming = function(message, callback) {
     if(message.error) {
-      log.info('Bayeux error', message);
+      log.error('rt: Bayeux error', message);
     }
 
     callback(message);
@@ -48,7 +45,7 @@ module.exports = (function() {
     if(message.channel !== '/meta/handshake') return callback(message);
 
     clientId = null;
-    log.info("Rehandshaking realtime connection");
+    log.info("rt: Rehandshaking realtime connection");
 
     context.getAccessToken(function(accessToken) {
       if(!message.ext) message.ext = {};
@@ -76,7 +73,7 @@ module.exports = (function() {
       if(ext) {
         if(ext.appVersion && ext.appVersion !== context.env('version')) {
 
-          log.info('Application version mismatch');
+          log.info('rt: Application version mismatch');
           if(!updateTimers) {
             // Give the servers time to complete the upgrade
             updateTimers = [setTimeout(function() {
@@ -114,7 +111,7 @@ module.exports = (function() {
       // New clientId?
       if(clientId !== message.clientId) {
         clientId = message.clientId;
-        log.info("Realtime reestablished. New id is " + clientId);
+        log.info("rt: Realtime reestablished. New id is " + clientId);
         appEvents.trigger('realtime:newConnectionEstablished');
       }
 
@@ -175,7 +172,7 @@ module.exports = (function() {
           var lastPart = message.subscription.split(/\//).pop();
           appEvents.trigger('stats.time', 'faye.subscribe.time.' + lastPart, totalTime);
 
-          log.info('Subscription to ' + message.subscription + ' took ' + totalTime + 'ms');
+          log.info('rt: Subscription to ' + message.subscription + ' took ' + totalTime + 'ms');
         }
       }
 
@@ -203,7 +200,7 @@ module.exports = (function() {
 
     if(stateProvider) {
       if(this._stateProvider[channel]) {
-        log.info('Warning: a stateprovider already exists for ' + channel);
+        log.warn('rt: a stateprovider already exists for ' + channel);
       }
 
       this._stateProvider[channel] = stateProvider;
@@ -222,7 +219,7 @@ module.exports = (function() {
       if(!terminating) {
         terminating = true;
         // More needs to be done here!
-        log.info('Access denied', message);
+        log.error('rt: Access denied', message);
 
         window.alert('Realtime communications with the server have been disconnected.');
         if(context.isLoggedIn()) {
@@ -252,7 +249,9 @@ module.exports = (function() {
         this._seq = c;
 
         if (c !== current + 1) {
-          log.warn('Message on channel ' + channel + ' out of sequence. Expected ' + (current + 1) + ' got ' + c);
+          log.warn('rt: Message on channel ' + channel + ' out of sequence. Expected ' + (current + 1) + ' got ' + c);
+          appEvents.trigger('stats.event', 'faye.sequence');
+          reset(clientId);
         }
 
       }
@@ -327,12 +326,12 @@ module.exports = (function() {
         if(!persistentOutage) {
           persistentOutageStartTime = Date.now();
           persistentOutage = true;
-          log.info('realtime: persistent outage');
+          log.info('rt: persistent outage');
           appEvents.trigger('connectionFailure');
 
           // Don't disable websockets on the initial connection
           if(!initialConnection && !websocketsDisabled) {
-            log.info('realtime: disabling websockets');
+            log.info('rt: disabling websockets');
             client.disable('websockets');
           }
         }
@@ -351,7 +350,7 @@ module.exports = (function() {
       appEvents.trigger('stats.time', 'faye.outage.restored.time', Date.now() - persistentOutageStartTime);
       persistentOutage = false;
       persistentOutageStartTime = null;
-      log.info('realtime: persistent outage restored');
+      log.info('rt: persistent outage restored');
       appEvents.trigger('connectionRestored');
     }
   }
@@ -364,12 +363,12 @@ module.exports = (function() {
     transportDown(10 /* seconds */, true /* initial connection */);
 
     client.on('transport:down', function() {
-      log.info('realtime: transport down');
+      log.info('rt: transport down');
       transportDown();
     });
 
     client.on('transport:up', function() {
-      log.info('realtime: transport up');
+      log.info('rt: transport up');
       transportUp();
     });
 
@@ -377,12 +376,12 @@ module.exports = (function() {
   }
 
   appEvents.on('eyeballsInvalid', function(originalClientId) {
-    log.info('Resetting connection after invalid eyeballs');
+    log.info('rt: Resetting connection after invalid eyeballs');
     reset(originalClientId);
   });
 
   appEvents.on('reawaken', function() {
-    log.info('Recycling connection after reawaken');
+    log.info('rt: Recycling connection after reawaken');
     reset(clientId);
   });
 
@@ -390,7 +389,7 @@ module.exports = (function() {
   if(document.addEventListener) {
     document.addEventListener("deviceReady", function() {
       document.addEventListener("online", function() {
-        log.info('realtime: online');
+        log.info('rt: online');
         testConnection('device_ready');
       }, false);
     }, false);
@@ -409,7 +408,7 @@ module.exports = (function() {
 
     if(reason !== 'ping') {
       appEvents.trigger('realtime.testConnection', reason);
-      log.info('Testing connection due to ' + reason);
+      log.info('rt: Testing connection due to ' + reason);
     }
 
     pingResponseOutstanding = true;
@@ -429,9 +428,9 @@ module.exports = (function() {
       .then(function() {
 
         pingResponseOutstanding = false;
-        log.info('Server ping succeeded');
+        log.info('rt: Server ping succeeded');
       }, function(error) {
-        log.info('Server ping failed: ', error);
+        log.warn('rt: Server ping failed: ', error);
         appEvents.trigger('stats.event', 'faye.ping.reset');
 
         pingResponseOutstanding = false;
@@ -442,11 +441,11 @@ module.exports = (function() {
   function reset(clientIdOnPing) {
     if(!client) return;
     if(clientIdOnPing === clientId) {
-      log.info("Client reset requested");
+      log.info("rt: Client reset requested");
       clientId = null;
       client.reset();
     } else {
-      log.info("Ignoring reset request as clientId has changed.");
+      log.info("rt: Ignoring reset request as clientId has changed.");
     }
   }
 
@@ -457,7 +456,7 @@ module.exports = (function() {
 
     subscribe: function(channel, callback, context, options) {
       channel = FAYE_PREFIX + channel;
-      log.info('Subscribing to ' + channel);
+      log.info('rt: Subscribing to ' + channel);
 
       // Temporary options to pass onto the subscription message
       subscribeOptions[channel] = options;

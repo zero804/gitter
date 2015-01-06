@@ -53,7 +53,7 @@ onready(function () {
 
   window.addEventListener('message', function(e) {
     if(e.origin !== context.env('basePath')) {
-      log.info('Ignoring message from ' + e.origin);
+      log.info('rchat: Ignoring message from ' + e.origin);
       return;
     }
 
@@ -65,7 +65,7 @@ onready(function () {
       return;
     }
 
-    log.info('Received message ', message);
+    log.info('rchat: Received message ', message);
 
     var makeEvent = function(message) {
       var origin = 'app';
@@ -73,13 +73,13 @@ onready(function () {
       message.event = {
         origin: origin,
         preventDefault: function() {
-          log.info('Warning: could not use preventDefault() because the event comes from the `' + this.origin + '` frame');
+          log.warn('rchat: could not use preventDefault() because the event comes from the `' + this.origin + '` frame');
         },
         stopPropagation: function() {
-          log.info('Warning: could not use stopPropagation() because the event comes from the `' + this.origin + '` frame');
+          log.warn('rchat: could not use stopPropagation() because the event comes from the `' + this.origin + '` frame');
         },
         stopImmediatePropagation: function() {
-          log.info('Warning: could not use stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame');
+          log.warn('rchat: could not use stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame');
         }
       };
     };
@@ -121,7 +121,10 @@ onready(function () {
   });
 
   appEvents.on('unreadItemsCount', function(newCount) {
-    postMessage({ type: "unreadItemsCount", count: newCount, troupeId: context.getTroupeId() });
+    var message = { type: "unreadItemsCount", count: newCount, troupeId: context.getTroupeId() };
+
+    log.info('rchat: Posting unread items count ', message);
+    postMessage(message);
   });
 
   // Bubble keyboard events
