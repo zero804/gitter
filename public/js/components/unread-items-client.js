@@ -93,7 +93,7 @@ module.exports = (function() {
       if(this._contains(itemType, itemId)) return;
 
       this._addTarpit._add(itemType, itemId);
-      this._recountLimited();
+      /* When the item is promoted, a recount will happen */
     },
 
     _unreadItemRemoved: function(itemType, itemId) {
@@ -134,12 +134,9 @@ module.exports = (function() {
 
     _recount: function() {
       var newValue = this._count();
-
-      if(this._currentCountValue !== newValue) {
-        this._currentCountValue = newValue;
-        this.trigger('newcountvalue', newValue);
-        appEvents.trigger('unreadItemsCount', newValue);
-      }
+      this._currentCountValue = newValue;
+      this.trigger('newcountvalue', newValue);
+      appEvents.trigger('unreadItemsCount', newValue);
 
       return newValue;
     },
@@ -168,7 +165,7 @@ module.exports = (function() {
 
     preload: function(items) {
       _iteratePreload(items, function(itemType, itemId) {
-        log.info('Preload of ' + itemType + ':' + itemId);
+        log.info('uic: Preload of ' + itemType + ':' + itemId);
 
         // Have we already marked this item as read?
         if(this._deleteTarpit._contains(itemType, itemId)) return;
@@ -265,7 +262,7 @@ module.exports = (function() {
             global: false
           })
           .fail(function() {
-            log.info('Error posting unread items to server. Will attempt again in 5s');
+            log.info('uic: Error posting unread items to server. Will attempt again in 5s');
 
             // Unable to send messages, requeue them and try again in 5s
             setTimeout(function() {
@@ -425,17 +422,16 @@ module.exports = (function() {
       for(var i = 0; i < unreadItems.length; i++) {
         var element = unreadItems[i];
 
-        var itemType = dataset.get(element, 'itemType');
         var itemId = dataset.get(element, 'itemId');
         var mentioned = dataset.get(element, 'mentioned') === 'true';
 
-        if(itemType && itemId) {
+        if(itemId) {
           var top = element.offsetTop;
 
           if (top >= topBound && top <= bottomBound) {
             var $e = $(element);
 
-            self._store._markItemRead(itemType, itemId, mentioned);
+            self._store._markItemRead('chat', itemId, mentioned);
 
             $e.removeClass('unread').addClass('reading');
             this._addToMarkReadQueue($e);
@@ -652,6 +648,10 @@ module.exports = (function() {
   unreadItemsClient.DoubleHash = DoubleHash;
   unreadItemsClient.Tarpit = Tarpit;
   unreadItemsClient.UnreadItemStore = UnreadItemStore;
+
+
+  /* Expose */
+  window._unreadItems = unreadItemsClient;
 
   return unreadItemsClient;
 

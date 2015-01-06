@@ -32,7 +32,7 @@ function makeRoomAssertions(room, usersAllowedIn, usersNotAllowedIn) {
         assert(uriLookup);
       })
       .fail(function(err) {
-        console.log('User ' + user.username + ' was incorrectly NOT allowed in the room');
+        // console.log('User ' + user.username + ' was incorrectly NOT allowed in the room');
         throw err;
       });
 
@@ -41,7 +41,7 @@ function makeRoomAssertions(room, usersAllowedIn, usersNotAllowedIn) {
       var failed = 0;
       return roomService.findOrCreateRoom(user, room.uri)
         .then(function() {
-          console.log('User ' + user.username + ' was incorrectly allowed in the room');
+          // console.log('User ' + user.username + ' was incorrectly allowed in the room');
         })
         .fail(function() {
           failed++;

@@ -28,7 +28,7 @@ var webpackConfig = {
     "router-archive-home": path.resolve(path.join(__dirname, "./router-archive-home")),
     "router-embed-chat": path.resolve(path.join(__dirname, "./router-embed-chat")),
     "homepage": path.resolve(path.join(__dirname, "./homepage")),
-    "faye-diagnostics": path.resolve(path.join(__dirname, "./faye-diagnostics")),
+    // "faye-diagnostics": path.resolve(path.join(__dirname, "./faye-diagnostics")),
     vendor: [
       'utils/webpack',
       'utils/context',
@@ -41,6 +41,7 @@ var webpackConfig = {
       'backbone.wreqr',
       'backbone.babysitter',
       'handlebars/runtime',
+      'gitter-faye',
       'raven',
       'keymaster',
       'moment'
@@ -77,7 +78,9 @@ var webpackConfig = {
       "backbone.babysitter": path.resolve(path.join(__dirname, "../repo/backbone.babysitter/backbone.babysitter.js")),
       "backbone": path.resolve(path.join(__dirname, "../repo/backbone/backbone.js")),
       "cocktail": path.resolve(path.join(__dirname, "../repo/cocktail/cocktail.js")),
-      "faye": path.resolve(path.join(__dirname, "../repo/faye/faye.js")),
+      // Faye uses the standard faye module
+      // "faye": '/Users/andrewn/code/opensource/faye/javascript/browser.js',
+      //"faye": path.resolve(path.join(__dirname, "../repo/faye/fayeclient.js")),
       "keymaster": path.resolve(path.join(__dirname, "../repo/keymaster/keymaster.js")),
       "filtered-collection": path.resolve(path.join(__dirname, "../repo/filtered-collection/filtered-collection.js")),
       "emojify": path.resolve(path.join(__dirname, "../repo/emojify/emojify.js")),
