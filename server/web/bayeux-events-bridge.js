@@ -133,6 +133,24 @@ exports.install = function() {
     var total = data.total;
     var mentions = data.mentions;
 
+    // TODO: this is deprecated but still used by the OSX client
+    publish("/api/v1/user/" + userId, {
+      notification: "troupe_unread",
+      troupeId: troupeId,
+      totalUnreadItems: total,
+      DEPRECATED: true
+    });
+
+    if(mentions >= 0) {
+      // TODO: this is deprecated but still used by the OSX client
+      publish("/api/v1/user/" + userId, {
+        notification: "troupe_mention",
+        troupeId: troupeId,
+        mentions: mentions,
+        DEPRECATED: true
+      });
+    }
+
     var url = "/api/v1/user/" + userId + "/rooms";
     var message = {
       operation: 'patch',
