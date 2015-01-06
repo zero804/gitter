@@ -1,9 +1,11 @@
-"use strict";
+'use strict';
 var Handlebars = require('handlebars/runtime').default;
 
-module.exports = (function() {
-  function Widget( widgetName, model ) {
-    if(!this.renderViews) {
+module.exports = (function () {
+
+  function Widget(widgetName, model) {
+
+    if (!this.renderViews) {
       this.renderViews = [];
     }
 
@@ -15,7 +17,7 @@ module.exports = (function() {
     return new Handlebars.SafeString("<view data-id='" + (this.renderViews.length - 1) + "'></view>");
   }
 
-  Handlebars.registerHelper( 'widget', Widget );
+  Handlebars.registerHelper('widget', Widget);
   return Widget;
 })();
 
