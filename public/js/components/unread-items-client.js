@@ -133,7 +133,6 @@ module.exports = (function() {
     },
 
     _recount: function() {
-      console.error('_recount', new Error());
       var newValue = this._count();
       this._currentCountValue = newValue;
       this.trigger('newcountvalue', newValue);
@@ -649,6 +648,10 @@ module.exports = (function() {
   unreadItemsClient.DoubleHash = DoubleHash;
   unreadItemsClient.Tarpit = Tarpit;
   unreadItemsClient.UnreadItemStore = UnreadItemStore;
+
+
+  /* Expose */
+  window._unreadItems = unreadItemsClient;
 
   return unreadItemsClient;
 
