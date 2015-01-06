@@ -10,7 +10,6 @@ require('bootstrap_tooltip');
 
 module.exports = (function() {
 
-
   var AvatarWidget = Marionette.ItemView.extend({
     tagName: 'span',
     template: template,
@@ -22,6 +21,8 @@ module.exports = (function() {
       change: 'update'
     },
     initialize: function (options) {
+      // TODO: is it necessary to listen for updates to the invite status?
+
       this.user = options.user ? options.user : {};
       this.showEmail = options.showEmail || {};
       this.showBadge = options.showBadge;
@@ -29,16 +30,15 @@ module.exports = (function() {
       this.avatarSize = options.size ? options.size : 's';
       this.showTooltip = options.showTooltip !== false;
       this.tooltipPlacement = options.tooltipPlacement || 'vertical';
-      // TODO: is it necessary to listen for updates to the invite status?
 
       // once this widget has the id of the user,
       // it will listen to changes on the global user collection,
       // so that it knows when to update.
       /*
       var avatarChange = _.bind(function(e, user) {
-        if(user.id !== self.getUserId()) return;
+        if (user.id !== self.getUserId()) return;
 
-        if(self.user) {
+        if (self.user) {
           self.user = user;
         }
 
@@ -71,7 +71,7 @@ module.exports = (function() {
       if (this.compactView) return;
       e.preventDefault();
 
-      if(this.popover) return;
+      if (this.popover) return;
 
       this.$el.find(':first-child').tooltip('hide');
 
@@ -104,14 +104,14 @@ module.exports = (function() {
     },
 
     updateTooltip: function(data) {
-      if(this.showTooltip) {
+      if (this.showTooltip) {
         this.$el.find('.trpDisplayPicture').attr('data-original-title', data.tooltip);
       }
     },
 
     getUserId: function() {
-      if(this.model) return this.model.id;
-      if(this.user) return this.user.id;
+      if (this.model) return this.model.id;
+      if (this.user) return this.user.id;
       return null;
     },
 
@@ -120,7 +120,7 @@ module.exports = (function() {
 
       var user = this.model ? this.model.toJSON() : this.user;
 
-      var avatarUrl = resolveAvatarUrl({ username: user.username, size: (this.avatarSize == 'm' ? 60 : 30) });
+      var avatarUrl = resolveAvatarUrl({ username: user.username, size: (this.avatarSize == 'm' ? 60 : 32) });
 
       var online = user.id === currentUserId || !!user.online; // only the people view tries to show avatar status so there is a model object, it won't necessarily work in other cases
 
@@ -152,13 +152,13 @@ module.exports = (function() {
     // TODO: use base classes render() method
     onRender: function() {
       var displayName;
-      if(this.model) {
+      if (this.model) {
         displayName = this.model.get('displayName');
-      } else if(this.user) {
+      } else if (this.user) {
         displayName = this.user.displayName;
       }
 
-      if(!this.showTooltip || window._troupeCompactView || !displayName) return;
+      if (!this.showTooltip || window._troupeCompactView || !displayName) return;
       this.$el.find(':first-child').tooltip({
         html: false,
         placement : this.tooltipPlacement,
