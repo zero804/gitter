@@ -24,8 +24,10 @@ exports.getUserSettings = function(userId, settingsKey) {
 exports.getMultiUserSettings = function(userIds, settingsKey) {
   userIds = userIds.map(function(id) {
     /* Not sure why mongoose isn't converting these */
-    assert(mongoUtils.isLikeObjectId(id));
+    if(!mongoUtils.isLikeObjectId(id)) return;
     return mongoUtils.asObjectID(id);
+  }).filter(function(f) {
+    return !!f;
   });
 
   return persistence.UserSettings.findQ({ userId: { $in: userIds } }, 'userId settings.' + settingsKey, { lean: true })

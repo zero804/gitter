@@ -9,11 +9,11 @@ module.exports = {
   index: function(req, res, next) {
     var userId = req.resourceUser.id;
 
-    unreadItemService.getUnreadItemsForUser(userId, req.userTroupe.id, function(err, data) {
-      if(err) return next(err);
-
-      res.send(data);
-    });
+    unreadItemService.getUnreadItemsForUser(userId, req.userTroupe.id)
+      .then(function(data) {
+        res.send(data);
+      })
+      .catch(next);
   },
 
   create: function(req, res, next) {

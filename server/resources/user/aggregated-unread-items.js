@@ -2,7 +2,6 @@
 "use strict";
 
 var unreadItemService = require("../../services/unread-item-service");
-var troupeService = require('../../services/troupe-service');
 var collections = require('../../utils/collections');
 var restSerializer = require('../../serializers/rest-serializer');
 
@@ -11,7 +10,7 @@ module.exports = {
   index: function(req, res, next) {
     var userId = req.resourceUser.id;
 
-    return unreadItemService.getAllUnreadItemCounts(userId, 'chat')
+    return unreadItemService.getAllUnreadItemCounts(userId)
       .then(function(counts) {
         var troupeIds = counts.map(function(c) { return c.troupeId; });
 

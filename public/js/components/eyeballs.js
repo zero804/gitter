@@ -148,9 +148,10 @@ module.exports = (function() {
     }
   }
 
-  function onBeforeUnload() {
-    eyeballsOff(true);
-  }
+  // function onBeforeUnload() {
+  //   eyeballsOff(true);
+  // }
+  // window.addEventListener("beforeunload", onBeforeUnload, false);
 
   // $(document).on('keydown', updateLastUserInteraction);
   // $(document).on('mousemove', updateLastUserInteraction);
@@ -160,7 +161,6 @@ module.exports = (function() {
   document.addEventListener("mousemove", updateLastUserInteraction, false);
   window.addEventListener("scroll", updateLastUserInteraction, false);
 
-  window.addEventListener("beforeunload", onBeforeUnload, false);
 
   startInactivityPoller();
 

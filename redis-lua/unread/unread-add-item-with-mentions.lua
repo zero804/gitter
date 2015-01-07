@@ -1,8 +1,10 @@
--- Keys are user:troupe keys follows by user:count keys
--- Values are [troupe_id, item_id]
+-- Keys are [user:troupe,user:count] keys followed by [user_troupe_mention_key, user_mention_key]
+-- Values are [usercount, troupe_id, item_id, time, userIds....]
+local user_count = table.remove(ARGV, 1) 
 local troupe_id = table.remove(ARGV, 1)
 local item_id = table.remove(ARGV, 1)
 local time_now = table.remove(ARGV, 1)
+
 
 local email_hash_key = table.remove(KEYS, 1)
 
@@ -15,15 +17,11 @@ for i, user_id in ipairs(userIds) do
   redis.call("HSETNX", email_hash_key, troupe_id..':'..user_id, time_now)
 end
 
-local key_count = #KEYS/2
-
--- local updated_badge_count_positions = {}
--- local for_upgrade = {}
 local result = {};
 
-for i = 1,key_count do
-	local user_troupe_key = KEYS[i]
-	local user_badge_key = KEYS[i + key_count]
+for i = 1,user_count do
+	local user_troupe_key = table.remove(KEYS, 1)
+	local user_badge_key =  table.remove(KEYS, 1)
 
 
   local item_count = -1 -- -1 means do not update
@@ -78,7 +76,26 @@ for i = 1,key_count do
 
   table.insert(result, item_count)
   table.insert(result, update)
-
 end
+
+-- Now deal with the mentions
+while #KEYS > 0 do
+  local user_troupe_mention_key = table.remove(KEYS, 1)
+  local user_mention_key = table.remove(KEYS, 1)
+
+  local count = -1;
+
+  if redis.call("SADD", user_troupe_mention_key, item_id) > 0 then
+    count = redis.call("SCARD", user_troupe_mention_key);
+    -- If count equals exactly one then this is the first time this user has been mentioned in this
+    -- room, so we'll need to add this troupeId to the users mention key
+    if count == 1 then
+      redis.call("SADD", user_mention_key, troupe_id)
+    end
+  end
+
+  table.insert(result, count);
+end
+
 
 return result
