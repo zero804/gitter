@@ -22,7 +22,7 @@ var thrice = times(3);
 
 
 var unreadItemServiceMock = mockito.spy(underlyingUnreadItemService);
-unreadItemServiceMock.install();
+// unreadItemServiceMock.install();
 
 describe('email-notification-generator-service', function() {
   var fixture = {};

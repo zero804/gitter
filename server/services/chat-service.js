@@ -3,6 +3,7 @@
 var env                  = require('../utils/env');
 var stats                = env.stats;
 var config               = env.config;
+var errorReporter        = env.errorReporter;
 
 var ChatMessage          = require("./persistence-service").ChatMessage;
 var collections          = require("../utils/collections");
@@ -21,6 +22,7 @@ var mongooseUtils        = require('../utils/mongoose-utils');
 var cacheWrapper         = require('../utils/cache-wrapper');
 var groupResolver        = require('./group-resolver');
 var chatSearchService    = require('./chat-search-service');
+var unreadItemService    = require('./unread-item-service');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 
 /*
@@ -51,6 +53,66 @@ function excludingUserId(userId) {
   };
 }
 
+/* Resolve userIds for mentions */
+function resolveMentions(troupe, user, parsedMessage) {
+  if (!parsedMessage.mentions || !parsedMessage.mentions.length) {
+    return Q.resolve([]);
+  }
+
+  /* Look through the mentions and attempt to tie the mentions to userIds */
+  var mentionUserNames = parsedMessage.mentions
+    .filter(function(m) {
+      return !m.group;
+    })
+    .map(function(mention) {
+      return mention.screenName;
+    });
+
+  var mentionGroupNames = parsedMessage.mentions
+    .filter(function(m) {
+      return m.group;
+    })
+    .map(function(mention) {
+      return mention.screenName;
+    });
+
+  return Q.all([
+      mentionUserNames.length ? userService.findByUsernames(mentionUserNames) : [],
+      mentionGroupNames.length ? groupResolver(troupe, user, mentionGroupNames) : []
+    ])
+    .spread(function(users, groups) {
+      var notCurrentUserPredicate = excludingUserId(user.id);
+
+      var usersIndexed = collections.indexByProperty(users, 'username');
+
+      // Lookup the userIds for a mention
+      return parsedMessage.mentions
+        .map(function(mention) {
+          if(mention.group) {
+            var groupUserIds = groups[mention.screenName] || [];
+
+            groupUserIds = groupUserIds.filter(notCurrentUserPredicate);
+
+            return {
+              screenName: mention.screenName,
+              group: true,
+              userIds: groupUserIds
+            };
+
+          }
+
+          // Not a group mention
+          var mentionUser = usersIndexed[mention.screenName];
+          var userId = mentionUser && mentionUser.id;
+
+          return {
+            screenName: mention.screenName,
+            userId: userId
+          };
+        });
+      });
+}
+
 /**
  * Create a new chat and return a promise of the chat
  */
@@ -68,105 +130,54 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
     return processChat(data.text);
   })
   .then(function(parsedMessage) {
+    return [parsedMessage, resolveMentions(troupe, user, parsedMessage)];
+  })
+  .spread(function(parsedMessage, mentions) {
     var chatMessage = new ChatMessage({
       fromUserId: user.id,
       toTroupeId: troupe.id,
-      sent: new Date(),
-      text: data.text,                    // Keep the raw message.
-      status: data.status,                // Checks if it is a status update
-      pub:  troupe.security === 'PUBLIC' || undefined, // Public room - useful for sampling
-      html: parsedMessage.html,
-      lang: parsedMessage.lang
+      sent:       new Date(),
+      text:       data.text,                    // Keep the raw message.
+      status:     data.status,                // Checks if it is a status update
+      pub:        troupe.security === 'PUBLIC' || undefined, // Public room - useful for sampling
+      html:       parsedMessage.html,
+      lang:       parsedMessage.lang,
+      urls:       parsedMessage.urls,
+      mentions:   mentions,
+      issues:     parsedMessage.issues,
+      _md:        parsedMessage.markdownProcessingFailed ? -CURRENT_META_DATA_VERSION : CURRENT_META_DATA_VERSION
     });
 
-    /* Look through the mentions and attempt to tie the mentions to userIds */
-    var mentionUserNames = parsedMessage.mentions
-      .filter(function(m) {
-        return !m.group;
-      })
-      .map(function(mention) {
-        return mention.screenName;
-      });
-
-    var mentionGroupNames = parsedMessage.mentions
-      .filter(function(m) {
-        return m.group;
-      })
-      .map(function(mention) {
-        return mention.screenName;
-      });
-
-
-    return Q.all([
-        userService.findByUsernames(mentionUserNames),
-        groupResolver(troupe, user, mentionGroupNames)
-      ])
-      .spread(function(users, groups) {
-        var notCurrentUserPredicate = excludingUserId(user.id);
-
-        var usersIndexed = collections.indexByProperty(users, 'username');
-
-        // Lookup the userIds for a mention
-        var mentions = parsedMessage.mentions
-          .map(function(mention) {
-            if(mention.group) {
-              var groupUserIds = groups[mention.screenName] || [];
-
-              groupUserIds = groupUserIds.filter(notCurrentUserPredicate);
-
-              return {
-                screenName: mention.screenName,
-                group: true,
-                userIds: groupUserIds
-              };
-
-            }
-
-            // Not a group mention
-            var mentionUser = usersIndexed[mention.screenName];
-            var userId = mentionUser && mentionUser.id;
-
-            return {
-              screenName: mention.screenName,
-              userId: userId
-            };
+    return chatMessage.saveQ()
+      .then(function() {
+        // Async add unread items
+        unreadItemService.createChatUnreadItems(user.id, troupe, chatMessage)
+          .catch(function(err) {
+            errorReporter(err, { operation: 'unreadItemService.createChatUnreadItems', chat: chatMessage });
           });
 
-        // Metadata
-        chatMessage.urls      = parsedMessage.urls;
-        chatMessage.mentions  = mentions;
-        chatMessage.issues    = parsedMessage.issues;
-        chatMessage._md       = parsedMessage.markdownProcessingFailed ?
-                                  -CURRENT_META_DATA_VERSION : CURRENT_META_DATA_VERSION;
+        var statMetadata = _.extend({
+          userId: user.id,
+          troupeId: troupe.id,
+          username: user.username
+        }, data.stats);
 
-        return chatMessage.saveQ()
-          .then(function() {
+        stats.event("new_chat", statMetadata);
 
-            var statMetadata = _.extend({
-              userId: user.id,
-              troupeId: troupe.id,
-              username: user.username
-            }, data.stats);
-
-            stats.event("new_chat", statMetadata);
-
-
-            var _msg;
-            if (troupe.oneToOne) {
-              var toUserId;
-              troupe.users.forEach(function(_user) {
-                if (_user.userId.toString() !== user.id.toString()) toUserId = _user.userId;
-              });
-              _msg = {oneToOne: true, username: user.username, toUserId: toUserId, text: data.text, id: chatMessage.id, toTroupeId: troupe.id };
-            } else {
-              _msg = {oneToOne: false, username: user.username, room: troupe.uri, text: data.text, id: chatMessage.id, toTroupeId: troupe.id };
-            }
-
-            appEvents.chatMessage(_msg);
-
-            return chatMessage;
+        var _msg;
+        if (troupe.oneToOne) {
+          var toUserId;
+          troupe.users.forEach(function(_user) {
+            if (_user.userId.toString() !== user.id.toString()) toUserId = _user.userId;
           });
+          _msg = {oneToOne: true, username: user.username, toUserId: toUserId, text: data.text, id: chatMessage.id, toTroupeId: troupe.id };
+        } else {
+          _msg = {oneToOne: false, username: user.username, room: troupe.uri, text: data.text, id: chatMessage.id, toTroupeId: troupe.id };
+        }
 
+        appEvents.chatMessage(_msg);
+
+        return chatMessage;
       });
   })
   .nodeify(callback);
@@ -209,18 +220,29 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
       return processChat(newText);
     })
     .then(function(parsedMessage) {
-      chatMessage.html  = parsedMessage.html;
-      chatMessage.editedAt = new Date();
-      chatMessage.lang = parsedMessage.lang;
+      return [parsedMessage, resolveMentions(troupe, user, parsedMessage)];
+    })
+    .spread(function(parsedMessage, mentions) {
+      chatMessage.html      = parsedMessage.html;
+      chatMessage.editedAt  = new Date();
+      chatMessage.lang      = parsedMessage.lang;
 
       // Metadata
       chatMessage.urls      = parsedMessage.urls;
-      chatMessage.mentions  = parsedMessage.mentions;
+      var originalMentions  = chatMessage.mentions;
+      chatMessage.mentions  = mentions;
       chatMessage.issues    = parsedMessage.issues;
       chatMessage._md       = parsedMessage.markdownProcessingFailed ?
                                 -CURRENT_META_DATA_VERSION : CURRENT_META_DATA_VERSION;
 
       return chatMessage.saveQ()
+        .then(function() {
+          // Async add unread items
+          unreadItemService.updateChatUnreadItems(user.id, troupe, chatMessage, originalMentions)
+            .catch(function(err) {
+              errorReporter(err, { operation: 'unreadItemService.updateChatUnreadItems', chat: chatMessage });
+            });
+        })
         .thenResolve(chatMessage);
     })
     .nodeify(callback);
@@ -236,26 +258,8 @@ exports.findById = function(id, callback) {
  */
 function findByIds(ids, callback) {
   return mongooseUtils.findByIds(ChatMessage, ids, callback);
-};
+}
 exports.findByIds = findByIds;
-
-// function massageMessages(message) {
-//   if('html' in message && 'text' in message) {
-
-//     if(message._md == VERSION_INITIAL) {
-//       var text = unsafeHtml(message.text);
-//       var d = processChat(text);
-
-//       message.text      = text;
-//       message.html      = d.html;
-//       message.urls      = d.urls;
-//       message.mentions  = d.mentions;
-//       message.issues    = d.issues;
-//     }
-//   }
-
-//   return message;
-// }
 
 /* This is much more cacheable than searching less than a date */
 function getDateOfFirstMessageInRoom(troupeId) {
