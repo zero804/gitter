@@ -1,10 +1,12 @@
 "use strict";
 var $ = require('jquery');
+var Backbone = require('backbone');
 var Marionette = require('marionette');
 var context = require('utils/context');
 var itemCollections = require('collections/instances/integrated-items');
 var PeopleCollectionView = require('views/people/peopleCollectionView');
 var SearchView = require('views/search/searchView');
+var SearchInputView = require('views/search/search-input-view');
 var repoInfo = require('./repoInfo');
 var ActivityStream = require('./activity');
 var hasScrollBars = require('utils/scrollbar-detect');
@@ -15,7 +17,7 @@ module.exports = (function() {
   var RightToolbarLayout = Marionette.Layout.extend({
 
     regions: {
-      search: '#search-panel',
+      search: '#search-results',
       repo_info: "#repo-info"
     },
 
@@ -52,7 +54,18 @@ module.exports = (function() {
       });
 
       // Search
-      this.searchView = new SearchView({ });
+      var searchState = new Backbone.Model({
+        searchTerm: '',
+        active: false,
+        isLoading: false
+      });
+
+      new SearchInputView({
+        el: $('#search-input'),
+        model: searchState
+      }).render();
+
+      this.searchView = new SearchView({ model: searchState });
       this.search.show(this.searchView);
 
       this.searchView.on('search:expand', function () {
