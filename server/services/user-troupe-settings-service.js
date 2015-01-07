@@ -27,10 +27,13 @@ exports.getMultiUserTroupeSettings = function(userTroupes, settingsKey) {
   if(!userTroupes.length) return Q.resolve({});
 
   var terms = userTroupes.map(function(userTroupe) {
+    if(!mongoUtils.isLikeObjectId(userTroupe.userId) || !mongoUtils.isLikeObjectId(userTroupe.troupeId)) return;
     var userId = mongoUtils.asObjectID(userTroupe.userId);
     var troupeId = mongoUtils.asObjectID(userTroupe.troupeId);
 
     return { userId: userId, troupeId: troupeId };
+  }).filter(function(f) {
+    return !!f;
   });
 
   return persistence.UserTroupeSettings.findQ({ $or: terms }, 'userId troupeId settings.' + settingsKey, { lean: true })

@@ -83,7 +83,7 @@ module.exports = (function() {
         this.ui.scrollToBottom.toggleClass('u-scale-zero', isBottom);
       }.bind(this));
 
-      this.rightToolbar = new RightToolbarView({ el: "#toolbar-content" });
+      this.rightToolbar = new RightToolbarView({ el: "#right-toolbar-layout" });
 
       this.chatInputView = new chatInputView.ChatInputView({
         el: '#chat-input',
