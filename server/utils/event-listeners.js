@@ -7,7 +7,6 @@ exports.installLocalEventListeners = function() {
   if(!installed) {
     require('../web/bayeux-events-bridge').install();
     require('../services/notifications/notification-generator-service').install();
-    require('../services/unread-item-service').install();
     require('../event-listeners/').install();
 
     installed = true;

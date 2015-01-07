@@ -189,7 +189,6 @@ function removeItem(troupeId, itemId, userIds) {
 
   return runScript('unread-remove-item', keys, [troupeId, itemId])
     .then(function(result) {
-
       var results = [];
 
       // Results come back as three items per key in sequence
