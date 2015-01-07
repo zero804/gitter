@@ -20,7 +20,6 @@ var upgradeTemplate = require('./tmpl/upgrade.hbs');
 var textFilter = require('utils/text-filter');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 
-require('utils/tracking');
 require('views/behaviors/widgets');
 require('views/behaviors/highlight');
 
