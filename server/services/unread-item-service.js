@@ -112,29 +112,6 @@ function ensureAllItemsRead(userId, troupeId) {
 }
 
 /**
- * Mark an item in a troupe as having been read by a user
- * @return {promise} promise of nothing
- */
-function markItemsOfTypeRead(userId, troupeId, ids, mentionIds) {
-  if(!userId) return reject("userId required");
-  if(!troupeId) return reject("troupeId required");
-
-  return engine.markItemsRead(userId, troupeId, ids, mentionIds || [])
-    .then(function(result) {
-      if(result.unreadCount >= 0 || result.mentionCount >= 0) {
-        // Notify the user
-        appEvents.troupeUnreadCountsChange({
-          userId: userId,
-          troupeId: troupeId,
-          total: result.unreadCount,
-          mentions: result.mentionCount
-        });
-      }
-
-    });
-}
-
-/**
  * Returns a hash of hash {user:troupe:ids} of users who have
  * outstanding notifications since before the specified time
  * @return a promise of hash
@@ -146,33 +123,30 @@ exports.listTroupeUsersForEmailNotifications = function(horizonTime, emailLatchE
 /**
  * Mark many items as read, for a single user and troupe
  */
-exports.markItemsRead = function(userId, troupeId, itemIds, mentionIds, options) {
-  // Configure options
-  if(!options) options = {};
+exports.markItemsRead = function(userId, troupeId, itemIds, options) {
+  if(!userId) return reject("userId required");
+  if(!troupeId) return reject("troupeId required");
 
-  // { member : default true }
-  if(options.member === undefined) options.member = true;
+  appEvents.unreadItemsRemoved(userId, troupeId, { chat: itemIds });
 
-  // { recordAsRead: default true }
-  if(options.recordAsRead === undefined) options.recordAsRead = true;
-
-  var allIds = [];
-
-  if(itemIds) allIds = allIds.concat(itemIds);
-  if(mentionIds) allIds = allIds.concat(mentionIds);
-
-  allIds = _.uniq(allIds);
-
-  appEvents.unreadItemsRemoved(userId, troupeId, { chat: itemIds }); // TODO: update
-
-  return markItemsOfTypeRead(userId, troupeId, allIds, mentionIds)
-    .then(function() {
-      if(!options.recordAsRead) {
-        return;
+  return engine.markItemsRead(userId, troupeId, itemIds)
+    .then(function(result) {
+      if(result.unreadCount >= 0 || result.mentionCount >= 0) {
+        // Notify the user
+        appEvents.troupeUnreadCountsChange({
+          userId: userId,
+          troupeId: troupeId,
+          total: result.unreadCount,
+          mentions: result.mentionCount
+        });
       }
 
-      // For the moment, we're only bothering with chats for this
-      return readByService.recordItemsAsRead(userId, troupeId, { chat: allIds }); // TODO: drop the hash
+      var recordAsRead = !options || options.recordAsRead === undefined ? true : options.recordAsRead;
+
+      if(recordAsRead) {
+        return readByService.recordItemsAsRead(userId, troupeId, { chat: itemIds });
+      }
+
     });
 
 };
@@ -192,7 +166,7 @@ exports.markAllChatsRead = function(userId, troupeId, options) {
       if(!('recordAsRead' in options)) options.recordAsRead = false;
 
       /* Don't mark the items as read */
-      return exports.markItemsRead(userId, troupeId, chatIds, null, options);
+      return exports.markItemsRead(userId, troupeId, chatIds, options);
     });
 };
 

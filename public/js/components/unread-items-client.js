@@ -89,8 +89,18 @@ module.exports = (function() {
 
   _.extend(UnreadItemStore.prototype, Backbone.Events, DoubleHash.prototype, {
     _unreadItemAdded: function(itemType, itemId) {
-      if(this._deleteTarpit._contains(itemType, itemId)) return;
-      if(this._contains(itemType, itemId)) return;
+      if(this._deleteTarpit._contains(itemType, itemId)) {
+        /**
+         * Server is resending us the item, we probably need to tell it to mark it as
+         * read a second time
+         */
+        this.trigger('itemMarkedRead', itemType, itemId/*, mentioned*/);
+        return;
+      }
+
+      if(this._contains(itemType, itemId)) {
+        return;
+      }
 
       this._addTarpit._add(itemType, itemId);
       /* When the item is promoted, a recount will happen */
@@ -228,11 +238,6 @@ module.exports = (function() {
 
   ReadItemSender.prototype = {
     _onItemMarkedRead: function(itemType, itemId, mentioned) {
-      // This is a bit of a hack, but seeing as the only itemType is chat, it's forgivable
-      if(mentioned) {
-        itemType = 'mention';
-      }
-
       this._add(itemType, itemId);
     },
 

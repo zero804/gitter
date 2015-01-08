@@ -437,7 +437,7 @@ describe('unread-item-service', function() {
       });
     });
 
-    it('should parse messages with no mentions, no lurkers', function(done) {
+    it('should create messages with no mentions, no lurkers', function(done) {
       unreadItemService.createChatUnreadItems(fromUserId, troupeNoLurkers, chatWithNoMentions)
         .then(function() {
           mockito.verify(appEvents, never()).newUnreadItem(fromUserId, anything(), anything());
@@ -451,7 +451,7 @@ describe('unread-item-service', function() {
         .nodeify(done);
     });
 
-    it('should parse messages with no mentions, some lurkers', function(done) {
+    it('should create messages with no mentions, some lurkers', function(done) {
       unreadItemService.createChatUnreadItems(fromUserId, troupeSomeLurkers, chatWithNoMentions)
         .then(function() {
           mockito.verify(appEvents, never()).newUnreadItem(fromUserId, anything(), anything());
@@ -465,7 +465,7 @@ describe('unread-item-service', function() {
         .nodeify(done);
     });
 
-    it('should parse messages with no mentions, all lurkers', function(done) {
+    it('should create messages with no mentions, all lurkers', function(done) {
       unreadItemService.createChatUnreadItems(fromUserId, troupeAllLurkers, chatWithNoMentions)
         .then(function() {
           mockito.verify(appEvents, never()).newUnreadItem(anything(), anything(), anything());
@@ -478,7 +478,7 @@ describe('unread-item-service', function() {
         .nodeify(done);
     });
 
-    it('should parse messages with user mentions to non lurkers', function(done) {
+    it('should create messages with user mentions to non lurkers', function(done) {
       unreadItemService.createChatUnreadItems(fromUserId, troupeNoLurkers, chatWithSingleMention)
         .then(function() {
           mockito.verify(appEvents, never()).newUnreadItem(fromUserId, anything(), anything());
@@ -492,7 +492,7 @@ describe('unread-item-service', function() {
         .nodeify(done);
     });
 
-    it('should parse messages with user mentions to lurkers', function(done) {
+    it('should create messages with user mentions to lurkers', function(done) {
       unreadItemService.createChatUnreadItems(fromUserId, troupeAllLurkers, chatWithSingleMention)
         .then(function() {
           mockito.verify(appEvents, never()).newUnreadItem(fromUserId, anything(), anything());
@@ -505,7 +505,7 @@ describe('unread-item-service', function() {
         .nodeify(done);
     });
 
-    it('should parse messages with group mentions', function(done) {
+    it('should create messages with group mentions', function(done) {
       unreadItemService.createChatUnreadItems(fromUserId, troupeSomeLurkers, chatWithGroupMention)
         .then(function() {
           mockito.verify(appEvents, never()).newUnreadItem(fromUserId, anything(), anything());
@@ -520,7 +520,7 @@ describe('unread-item-service', function() {
         .nodeify(done);
     });
 
-    it('should parse messages with duplicate mentions', function(done) {
+    it('should create messages with duplicate mentions', function(done) {
 
       unreadItemService.createChatUnreadItems(fromUserId, troupeSomeLurkers, chatWithDuplicateMention)
         .then(function() {
@@ -536,4 +536,126 @@ describe('unread-item-service', function() {
     });
 
   });
+
+  describe('updateChatUnreadItems', function() {
+    var chatId;
+    var troupeId;
+    var fromUserId;
+    var userId1;
+    var userId2;
+    var userId3;
+    var user3;
+    var troupeService;
+    var appEvents;
+    var userService;
+    var roomPermissionsModel;
+    var unreadItemService;
+    var troupeNoLurkers;
+    var troupeSomeLurkers;
+    var troupeAllLurkers;
+    var chatWithNoMentions;
+    var chatWithSingleMention;
+    var chatWithGroupMention;
+    var chatWithDuplicateMention;
+    var chatWithNonMemberMention;
+
+    beforeEach(function() {
+      function makeHash() {
+        var hash = [];
+        for(var i = 0; i < arguments.length; i = i + 2) {
+          hash.push({ userId: arguments[i], lurk: arguments[i + 1] });
+        }
+        return hash;
+      }
+
+      troupeId = mongoUtils.getNewObjectIdString() + "";
+      chatId = mongoUtils.getNewObjectIdString() + "";
+      fromUserId = mongoUtils.getNewObjectIdString() + "";
+      userId1 = mongoUtils.getNewObjectIdString() + "";
+      userId2 = mongoUtils.getNewObjectIdString() + "";
+      userId3 = mongoUtils.getNewObjectIdString() + "";
+      user3 = { id: userId3 };
+
+      chatWithNoMentions = {
+        id: chatId,
+        mentions: []
+      };
+
+      chatWithSingleMention = {
+        id: chatId,
+        mentions: [{
+          userId: userId1
+        }]
+      };
+
+      chatWithGroupMention = {
+        id: chatId,
+        mentions: [{
+          group: true,
+          userIds: [userId1, userId2]
+        }]
+      };
+
+      chatWithDuplicateMention = {
+        id: chatId,
+        mentions: [{
+          userId: userId1
+        }, {
+          userId: userId1
+        }]
+      };
+
+      chatWithNonMemberMention = {
+        id: chatId,
+        mentions: [{
+          userId: userId3
+        }]
+      };
+
+      troupeNoLurkers = {
+        id: troupeId,
+        users: makeHash(fromUserId, false, userId1, false, userId2, false)
+      };
+
+      troupeSomeLurkers = {
+        id: troupeId,
+        users: makeHash(fromUserId, false, userId1, false, userId2, true)
+      };
+
+      troupeAllLurkers = {
+        id: troupeId,
+        users: makeHash(fromUserId, true, userId1, true, userId2, true)
+      };
+
+      troupeService = mockito.mock(testRequire('./services/troupe-service'));
+      userService = mockito.mock(testRequire('./services/user-service'));
+      appEvents = mockito.mock(testRequire('./app-events'));
+      roomPermissionsModel = mockito.mockFunction();
+
+      unreadItemService = testRequire.withProxies("./services/unread-item-service", {
+        './troupe-service': troupeService,
+        './user-service': userService,
+        '../app-events': appEvents,
+        './room-permissions-model': roomPermissionsModel,
+      });
+    });
+
+    it('should handle updates that add mentions to a message with no mentions', function(done) {
+      unreadItemService.updateChatUnreadItems(fromUserId, troupeNoLurkers, chatWithNoMentions, [])
+        .then(function() {
+          mockito.verify(appEvents, never()).newUnreadItem(fromUserId, anything(), anything());
+          mockito.verify(appEvents).newUnreadItem(userId1, troupeId, hasMember("chat", [chatId]));
+          mockito.verify(appEvents).newUnreadItem(userId2, troupeId, hasMember("chat", [chatId]));
+
+          mockito.verify(appEvents, never()).troupeUnreadCountsChange(hasMember('userId', fromUserId));
+          mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId1, troupeId: troupeId, total: 1, mentions: undefined }));
+          mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId2, troupeId: troupeId, total: 1, mentions: undefined  }));
+        })
+        .nodeify(done);
+    });
+
+    /* TODO: more tests here */
+
+  });
+
 });
