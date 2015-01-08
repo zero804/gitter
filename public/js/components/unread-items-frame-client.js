@@ -56,7 +56,7 @@ module.exports = (function() {
         current: currentUnreadTotal
       };
 
-      log.info('troupeUnreadTotalChange', counts);
+      log.info('uf: troupeUnreadTotalChange', counts);
 
       appEvents.trigger('troupeUnreadTotalChange', counts);
 

@@ -47,7 +47,7 @@ module.exports = (function() {
     });
   }
 
-  return {
+  var collections = {
     chats: chatCollection,
     users: userCollection,
     sortedUsers: sortedUserCollection,
@@ -55,5 +55,7 @@ module.exports = (function() {
     events: eventCollection
   };
 
+  window._intergratedCollections = collections;
 
+  return collections;
 })();

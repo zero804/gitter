@@ -71,7 +71,8 @@ module.exports = (function() {
     }
   });
 
-  return {
+
+  var collections = {
     /* All rooms */
     troupes: troupeCollection,
     /* Filtered rooms */
@@ -81,6 +82,8 @@ module.exports = (function() {
     orgs: orgsCollection
   };
 
+  window._troupeCollections = collections;
+  return collections;
 
 })();
 

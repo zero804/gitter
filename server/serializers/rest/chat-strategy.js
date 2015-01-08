@@ -14,22 +14,20 @@ function formatDate(d) {
   return d ? d.toISOString() : null;
 }
 
-function UnreadItemStategy(options) {
-  var itemType = options.itemType;
+function UnreadItemStategy() {
   var unreadItemsHash;
 
   this.preload = function(data, callback) {
-    unreadItemService.getUnreadItems(data.userId, data.troupeId, itemType, function(err, ids) {
-      if(err) return callback(err);
+    unreadItemService.getUnreadItems(data.userId, data.troupeId)
+      .then(function(ids) {
+        var hash = {};
+        ids.forEach(function(id) {
+          hash[id] = true;
+        });
 
-      var hash = {};
-      ids.forEach(function(id) {
-        hash[id] = true;
-      });
-
-      unreadItemsHash = hash;
-      callback(null);
-    });
+        unreadItemsHash = hash;
+      })
+      .nodeify(callback);
   };
 
   this.map = function(id) {
@@ -72,7 +70,7 @@ function ChatStrategy(options)  {
   var unreadItemStategy, collapsedItemStategy;
   /* If options.unread has been set, we don't need a strategy */
   if(options.currentUserId && options.unread === undefined) {
-    unreadItemStategy = new UnreadItemStategy({ itemType: 'chat' });
+    unreadItemStategy = new UnreadItemStategy();
   }
 
   if (options.currentUserId && options.troupeId) {

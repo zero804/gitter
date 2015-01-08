@@ -1,5 +1,6 @@
 "use strict";
-var urlUtil = require('url');
+require('utils/initial-setup');
+
 var $ = require('jquery');
 var Backbone = require('backbone');
 var context = require('utils/context');
@@ -14,7 +15,6 @@ var onready = require('./utils/onready');
 var apiClient = require('components/apiClient');
 var HeaderView = require('views/app/headerView');
 
-require('utils/initial-setup');
 require('components/statsc');
 require('views/widgets/preload');
 require('filtered-collection');
@@ -33,27 +33,35 @@ onready(function () {
   postMessage({ type: "chatframe:loaded" });
 
   $(document).on("click", "a", function (e) {
-    var target = e.target;
-    var url = urlUtil.parse(target.getAttribute('href') || target.parentElement.getAttribute('href'));
-    var internalLink = url.hostname === context.env('baseServer');
+    var target = e.currentTarget;
+    var internalLink = target.hostname === context.env('baseServer');
+
+    var location = window.location;
 
     // modals
-    if (url.href.indexOf('#') === 0) {
+    if (location.scheme === target.scheme &&
+        location.host === target.host &&
+        location.pathname === target.pathname) {
       e.preventDefault();
-      window.location = url.hash;
+      window.location = target.href;
       return true;
     }
 
     // internal links to valid rooms shouldn't open in new windows
-    if (internalLink && isValidRoomUri(url.path)) {
+    if (internalLink && isValidRoomUri(target.pathname)) {
       e.preventDefault();
-      window.parent.location.href = url.href;
+      var uri = target.pathname.replace(/^\//, '');
+      var type = 'chat';
+      if (uri === context.user().get('username')) {
+        type = 'home';
+      }
+      appEvents.trigger('navigation', target.pathname, type, uri);
     }
   });
 
   window.addEventListener('message', function(e) {
     if(e.origin !== context.env('basePath')) {
-      log.info('Ignoring message from ' + e.origin);
+      log.info('rchat: Ignoring message from ' + e.origin);
       return;
     }
 
@@ -65,7 +73,7 @@ onready(function () {
       return;
     }
 
-    log.info('Received message ', message);
+    log.info('rchat: Received message ', message);
 
     var makeEvent = function(message) {
       var origin = 'app';
@@ -73,13 +81,13 @@ onready(function () {
       message.event = {
         origin: origin,
         preventDefault: function() {
-          log.info('Warning: could not use preventDefault() because the event comes from the `' + this.origin + '` frame');
+          log.warn('rchat: could not use preventDefault() because the event comes from the `' + this.origin + '` frame');
         },
         stopPropagation: function() {
-          log.info('Warning: could not use stopPropagation() because the event comes from the `' + this.origin + '` frame');
+          log.warn('rchat: could not use stopPropagation() because the event comes from the `' + this.origin + '` frame');
         },
         stopImmediatePropagation: function() {
-          log.info('Warning: could not use stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame');
+          log.warn('rchat: could not use stopImmediatePropagation() because the event comes from the `' + this.origin + '` frame');
         }
       };
     };
@@ -121,7 +129,10 @@ onready(function () {
   });
 
   appEvents.on('unreadItemsCount', function(newCount) {
-    postMessage({ type: "unreadItemsCount", count: newCount, troupeId: context.getTroupeId() });
+    var message = { type: "unreadItemsCount", count: newCount, troupeId: context.getTroupeId() };
+
+    log.info('rchat: Posting unread items count ', message);
+    postMessage(message);
   });
 
   // Bubble keyboard events
