@@ -1,12 +1,12 @@
 <div class="right-toolbar" id="right-toolbar-layout">
   <header id="search-panel" class="right-toolbar__header">
-    <div id="search-input" class="search">
+    <div id="search-input" class="search-input-view">
       {{{ prerenderView "js/views/search/tmpl/search-input" }}}
     </div>
-    <div id="search-results">
-      {{{ prerenderView "js/views/search/tmpl/search" }}}
-    </div>
   </header>
+  <div id="search-results" class="right-toolbar__body">
+    {{{ prerenderView "js/views/search/tmpl/search" }}}
+  </div>
   <div id="toolbar-top-content" class="right-toolbar__body">
     <div id="people-list">
       <div class="trpToolbarHeader" id="top-header">
