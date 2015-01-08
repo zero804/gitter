@@ -3,6 +3,7 @@
 
 var unreadItemService = require("../../services/unread-item-service");
 var StatusError = require('statuserror');
+var _ = require('underscore');
 
 module.exports = {
   id: 'unreadItem',
@@ -20,9 +21,19 @@ module.exports = {
     var unreadItems = req.body;
     if(!unreadItems) return next(new StatusError(400, 'No body'));
 
-    if(!unreadItems.mention && !unreadItems.chat) return next(new StatusError(400, 'No chat or mention items')); /* You comin at me bro? */
+    var allIds = [];
 
-    return unreadItemService.markItemsRead(req.resourceUser.id, req.userTroupe.id, unreadItems.chat, unreadItems.mention)
+    /* TODO: remove mentions in February 2015 */
+    if(Array.isArray(unreadItems.mention)) allIds = allIds.concat(unreadItems.mention);
+    if(Array.isArray(unreadItems.chat)) allIds = allIds.concat(unreadItems.chat);
+
+    if(Array.isArray(unreadItems.mention) && Array.isArray(unreadItems.chat)) {
+      allIds = _.uniq(allIds);
+    }
+
+    if(!allIds.length) return next(new StatusError(400, 'No chat or mention items')); /* You comin at me bro? */
+
+    return unreadItemService.markItemsRead(req.resourceUser.id, req.userTroupe.id, allIds)
       .then(function() {
         res.format({
           text: function() {

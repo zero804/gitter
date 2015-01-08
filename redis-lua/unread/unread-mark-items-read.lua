@@ -7,7 +7,6 @@ local user_email_latch_key = KEYS[6];
 
 local troupe_id = table.remove(ARGV, 1)
 local user_id = table.remove(ARGV, 1)
-local item_count = tonumber(table.remove(ARGV, 1))
 
 local key_type = redis.call("TYPE", user_troupe_key)["ok"];
 
@@ -15,8 +14,9 @@ local result = {}
 local flag = 0
 local card = -1
 local mention_count = -1
+local mentions_removed = false
 
-for i = 1,item_count do
+while #ARGV > 0 do
   local item_id = table.remove(ARGV, 1)
 
   local removed;
@@ -50,6 +50,11 @@ for i = 1,item_count do
        flag = 1
        mention_count = 0
     end
+  else 
+    -- Remove the mention if it exists too
+    if redis.call("SREM", user_troupe_mention_key, item_id) > 0 then
+      mentions_removed = true
+    end
   end
 
 	-- If this item has not already been removed.....
@@ -62,16 +67,6 @@ for i = 1,item_count do
 			flag = 1
 		end
 	end
-end
-
-local mentions_removed = false
-
-while #ARGV > 0 do
-  local mention_id = table.remove(ARGV, 1)
-  
-  if redis.call("SREM", user_troupe_mention_key, mention_id) > 0 then
-    mentions_removed = true
-  end
 end
 
 if mentions_removed then
