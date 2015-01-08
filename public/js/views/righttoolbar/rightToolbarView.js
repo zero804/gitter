@@ -65,23 +65,25 @@ module.exports = (function() {
         model: searchState
       }).render();
 
-      this.searchView = new SearchView({ model: searchState });
-      this.search.show(this.searchView);
+      var searchView = new SearchView({
+        el: $('#search-results'),
+        model: searchState
+      }).render();
 
-      this.searchView.on('search:expand', function () {
+      searchView.on('search:expand', function () {
         $('.right-toolbar').addClass('expand');
       });
 
-      this.searchView.on('search:collapse', function () {
+      searchView.on('search:collapse', function () {
         $('.right-toolbar').removeClass('expand');
       });
 
-      this.searchView.on('search:show', function () {
+      searchView.on('search:show', function () {
         $('#toolbar-top-content').hide();
         $('#zendesk-footer').hide();
       }.bind(this));
 
-      this.searchView.on('search:hide', function () {
+      searchView.on('search:hide', function () {
         $('#toolbar-top-content').show();
         $('#zendesk-footer').show();
       }.bind(this));

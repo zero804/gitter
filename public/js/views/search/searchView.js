@@ -160,7 +160,7 @@ module.exports = (function() {
     emptyView: EmptyRoomResultsView,
 
     initialize: function (/*options*/) {
-      var target = document.querySelector("#right-toolbar-layout");
+      var target = document.querySelector("#search-results");
       this.rollers = new Rollers(target, this.el, { doNotTrack: true });
     },
 
@@ -173,7 +173,7 @@ module.exports = (function() {
     emptyView: EmptyResultsView,
 
     initialize: function() {
-      var target = document.querySelector("#right-toolbar-layout");
+      var target = document.querySelector("#search-results");
       this.rollers = new Rollers(target, this.el, { doNotTrack: true });
     },
 
@@ -388,12 +388,6 @@ module.exports = (function() {
   var SearchView = Marionette.Layout.extend({
     template: searchTemplate,
 
-    className: 'search',
-
-    ui: {
-      results: '.js-search-results',
-    },
-
     regions: {
       roomsRegion: '.js-search-rooms',
       messagesRegion: '.js-search-messages',
@@ -500,7 +494,7 @@ module.exports = (function() {
 
     hide: function () {
       this.triggerMethod('search:hide');
-      this.ui.results.hide();
+      this.$el.hide();
       this.search.clearCache();
     },
 
@@ -524,7 +518,7 @@ module.exports = (function() {
     },
 
     showResults: function () {
-      this.ui.results.show();
+      this.$el.show();
       this.roomsRegion.show(this.roomsView); // local rooms
       this.messagesRegion.show(this.messagesView); // server chat messages
     },
