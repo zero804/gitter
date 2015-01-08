@@ -1,31 +1,34 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var winston                   = require('../../utils/winston');
-var pushNotificationService   = require("../push-notification-service");
-var userService               = require("../user-service");
-var nconf                     = require('../../utils/config');
-var pushNotificationGateway = require("../../gateways/push-notification-gateway");
-var serializer = require("../../serializers/notification-serializer");
+var winston                      = require('../../utils/winston');
+var pushNotificationService      = require("../push-notification-service");
+var nconf                        = require('../../utils/config');
+var pushNotificationGateway      = require("../../gateways/push-notification-gateway");
+var serializer                   = require("../../serializers/notification-serializer");
 var notificationMessageGenerator = require('../../utils/notification-message-generator');
-var unreadItemService = require('../unread-item-service');
-var Q = require('q');
-var basePath = nconf.get('web:basepath');
+var unreadItemService            = require('../unread-item-service');
+var Q                            = require('q');
+var basePath                     = nconf.get('web:basepath');
 
-function filterUnreadItemsForUserByMention(user, items) {
-  var username = user.username;
-  var displayName = user.displayName;
+function filterUnreadItemsForUserByMention(userId, items) {
+  userId = String(userId);
 
   return {
     // Mentions: ignore all non-chat items
     chat: items.chat.filter(function(chat) {
+      /* Exclude chats without mentions */
       if(!chat.mentions || !chat.mentions.length) return;
 
       return chat.mentions.some(function(mention) {
-        var re = new RegExp(mention.screenName, 'i');
+        if(mention.group) {
+          if(!Array.isArray(mention.userIds)) return false;
+          return mention.userIds.some(function(groupMentionUserId) {
+            return String(groupMentionUserId) === userId;
+          });
+        }
 
-        return username && username.match(re) ||
-                displayName && displayName.match(re);
+        return String(mention.userId) === userId;
       });
 
     })
@@ -68,50 +71,44 @@ function serializeItems(troupeId, recipientUserId, items, callback) {
 function notifyUserOfActivitySince(userId, troupeId, since, notificationNumber, userSetting, callback) {
   winston.verbose('notifyUserOfActivitySince: ', { userId: userId, troupeId: troupeId, since: new Date(since), number: notificationNumber, userSetting: userSetting });
 
-  userService.findById(userId, function(err, user) {
+  unreadItemService.getUnreadItemsForUserTroupeSince(userId, troupeId, since, function(err, unreadItems) {
     if(err) return callback(err);
 
-    unreadItemService.getUnreadItemsForUserTroupeSince(userId, troupeId, since, function(err, unreadItems) {
+    if(!Object.keys(unreadItems).length) {
+      winston.verbose('User has no unread items since ', { userId: userId, troupeId: troupeId, since: since, notificationNumber: notificationNumber} );
+      return callback();
+    }
+
+    serializeItems(troupeId, userId, unreadItems, function(err, serialized) {
       if(err) return callback(err);
 
+      var troupe = serialized.troupe;
+      var items = serialized.serializedItems;
 
-
-      if(!Object.keys(unreadItems).length) {
-        winston.verbose('User has no unread items since ', { userId: userId, troupeId: troupeId, since: since, notificationNumber: notificationNumber} );
-        return callback();
+      if(userSetting == 'mention') {
+        items = filterUnreadItemsForUserByMention(userId, items);
+        // Still want to notify the user?
+        if(!items.chat || !items.chat.length) return callback();
       }
 
-      serializeItems(troupeId, userId, unreadItems, function(err, serialized) {
-        if(err) return callback(err);
+      var notificationLink = '/mobile/chat#' + troupe.id;
+      var smsLink = basePath + troupe.url;
 
-        var troupe = serialized.troupe;
-        var items = serialized.serializedItems;
+      var message = notificationMessageGenerator.generateNotificationMessage(troupe, items, smsLink);
 
-        if(userSetting == 'mention') {
-          items = filterUnreadItemsForUserByMention(user, items);
-          // Still want to notify the user?
-          if(!items.chat || !items.chat.length) return callback();
-        }
-
-        var notificationLink = '/mobile/chat#' + troupe.id;
-        var smsLink = basePath + troupe.url;
-
-        var message = notificationMessageGenerator.generateNotificationMessage(troupe, items, smsLink);
-
-        pushNotificationGateway.sendUserNotification(userId, {
-            roomId: troupe.id,
-            roomName: troupe.name || troupe.uri,
-            message: message.notificationText,
-            smsText: message.smsText,
-            sound: notificationNumber == 1 ? 'notify.caf' : 'notify-2.caf',
-            link: notificationLink
-          }, callback);
-
-      });
+      pushNotificationGateway.sendUserNotification(userId, {
+          roomId: troupe.id,
+          roomName: troupe.name || troupe.uri,
+          message: message.notificationText,
+          smsText: message.smsText,
+          sound: notificationNumber == 1 ? 'notify.caf' : 'notify-2.caf',
+          link: notificationLink
+        }, callback);
 
     });
 
   });
+
 }
 
 
