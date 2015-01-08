@@ -153,7 +153,7 @@ module.exports = (function() {
     },
 
     addWaiter: function(id, callback, timeout) {
-      log.info('Waiting for id', id);
+      log.info('coll: Waiting for id', id);
 
       if(!id) return;
 
@@ -164,13 +164,13 @@ module.exports = (function() {
 
       function done(model) {
         clearTimeout(timeoutRef);
-        log.info('Waitor completed with model', model);
+        log.info('coll: Waitor completed with model', model);
 
         self.off('add', check, id);
         self.off('change:id', check, id);
 
         if(actionPerformed) {
-          log.info('Warning: waitor function called twice.');
+          log.info('coll: Warning: waitor function called twice.');
           return;
         }
         actionPerformed = true;
@@ -264,7 +264,7 @@ module.exports = (function() {
       }
 
       this.subscription.errback(function(error) {
-        log.info('Subscription error for ' + url, error);
+        log.info('coll: Subscription error for ' + url, error);
       });
     },
 
@@ -316,16 +316,16 @@ module.exports = (function() {
     // TODO: make this dude tighter
     applyUpdate: function(operation, existingModel, newAttributes, parsed, options) {
       if(this.operationIsUpToDate(operation, existingModel, newAttributes)) {
-        log.info('Performing ' + operation, newAttributes);
+        log.info('coll: Performing ' + operation, newAttributes);
 
         existingModel.set(parsed.attributes, options || {});
       } else {
-        log.info('Ignoring out-of-date update', existingModel.toJSON(), newAttributes);
+        log.info('coll: Ignoring out-of-date update', existingModel.toJSON(), newAttributes);
       }
     },
 
     patch: function(id, newModel, options) {
-      log.info('Request to patch ' + id + ' with ', newModel, options);
+      log.info('coll: Request to patch ' + id + ' with ', newModel, options);
 
       var self = this;
 
@@ -340,7 +340,7 @@ module.exports = (function() {
       /* Existing model does not exist */
       this.addWaiter(id, function(existing) {
         if(!existing) {
-          log.info('Unable to find model ' + id);
+          log.info('coll: Unable to find model ' + id);
           return;
         }
 
@@ -377,7 +377,7 @@ module.exports = (function() {
             if(operation === 'patch') {
               this.addWaiter(id, function(existing) {
                 if(!existing) {
-                  log.info('Unable to find model ' + id);
+                  log.info('coll: Unable to find model ' + id);
                   return;
                 }
 
@@ -399,7 +399,7 @@ module.exports = (function() {
           break;
 
         default:
-          log.info("Unknown operation " + operation + ", ignoring");
+          log.info("coll: Unknown operation " + operation + ", ignoring");
 
       }
     }
@@ -475,7 +475,7 @@ module.exports = (function() {
 
       var self = this;
       this.trigger('search:next');
-      log.info('Fetch next: ', data);
+      log.info('coll: Fetch next: ', data);
       this.fetch({
         remove: ('remove' in options) ? options.remove : false,
         add: ('add' in options) ? options.add : true,

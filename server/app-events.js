@@ -87,8 +87,6 @@ function bind(on) {
       });
     },
 
-
-
     onUnreadItemsRemoved: function(callback) {
       on('unreadItemRemoved', callback);
     },
@@ -107,6 +105,14 @@ function bind(on) {
 
     onTroupeMentionCountsChange: function(callback) {
       on('troupeMentionCountsChange', callback);
+    },
+
+    userMentionedInNonMemberRoom: function(data) {
+      emit('userMentionedInNonMemberRoom', data);
+    },
+
+    onUserMentionedInNonMemberRoom: function(callback) {
+      on('userMentionedInNonMemberRoom', callback);
     },
 
     userLoggedIntoTroupe: function(userId, troupeId) {

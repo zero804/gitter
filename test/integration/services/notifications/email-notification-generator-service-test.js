@@ -22,7 +22,7 @@ var thrice = times(3);
 
 
 var unreadItemServiceMock = mockito.spy(underlyingUnreadItemService);
-unreadItemServiceMock.install();
+// unreadItemServiceMock.install();
 
 describe('email-notification-generator-service', function() {
   var fixture = {};
@@ -37,6 +37,7 @@ describe('email-notification-generator-service', function() {
 
   it('should send out an email notification for a user with unread items', function(done) {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+    var unreadEngine = testRequire('./services/unread-item-service-engine');
 
     var sendEmailNotifications = testRequire.withProxies('./services/notifications/email-notification-generator-service', {
       '../email-notification-service': emailNotificationServiceMock,
@@ -71,7 +72,7 @@ describe('email-notification-generator-service', function() {
       userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', false),
       ])
       .then(function() {
-        return underlyingUnreadItemService.testOnly.newItem(troupeId, null, 'chat', itemId1);
+        return unreadEngine.newItemWithMentions(troupeId, itemId1, [fixture.user2.id, fixture.user3.id], []);
       })
       .then(function() {
         return sendEmailNotifications(Date.now());
@@ -86,6 +87,7 @@ describe('email-notification-generator-service', function() {
 
   it('SHOULD NOT email somebody who has opted out of notifications 1', function(done) {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+    var unreadEngine = testRequire('./services/unread-item-service-engine');
 
     var sendEmailNotifications = testRequire.withProxies('./services/notifications/email-notification-generator-service', {
       '../email-notification-service': emailNotificationServiceMock,
@@ -115,7 +117,7 @@ describe('email-notification-generator-service', function() {
       userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', true),
       ])
       .then(function() {
-        return underlyingUnreadItemService.testOnly.newItem(troupeId, null, 'chat', itemId1);
+        return unreadEngine.newItemWithMentions(troupeId, itemId1, [fixture.user2.id, fixture.user3.id], []);
       })
       .then(function() {
         return sendEmailNotifications(Date.now() + 10);
@@ -130,6 +132,7 @@ describe('email-notification-generator-service', function() {
 
   it('SHOULD NOT email somebody who has opted out of notifications 2', function(done) {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+    var unreadEngine = testRequire('./services/unread-item-service-engine');
 
     var sendEmailNotifications = testRequire.withProxies('./services/notifications/email-notification-generator-service', {
       '../email-notification-service': emailNotificationServiceMock,
@@ -162,16 +165,16 @@ describe('email-notification-generator-service', function() {
         userTroupeSettingsService.setUserSettings(fixture.user2.id, troupeId, 'notification', { push:  "all" }), // <-- NB
       ])
       .then(function() {
-        return underlyingUnreadItemService.testOnly.newItem(troupeId, null, 'chat', itemId1);
+        return unreadEngine.newItemWithMentions(troupeId, itemId1, [fixture.user2.id, fixture.user3.id], []);
       })
-      .then(function(chat) {
+      .then(function() {
         return Q.all([
           underlyingUnreadItemService.markAllChatsRead(fixture.user1.id, fixture.troupe1.id),
           underlyingUnreadItemService.markAllChatsRead(fixture.user3.id, fixture.troupe1.id)
         ]);
       })
       .then(function() {
-        return underlyingUnreadItemService.testOnly.newItem(troupeId, null, 'chat', itemId2);
+        return unreadEngine.newItemWithMentions(troupeId, itemId2, [fixture.user2.id, fixture.user3.id], []);
       })
       .then(function() {
         return sendEmailNotifications(Date.now(), 1000)
@@ -186,6 +189,7 @@ describe('email-notification-generator-service', function() {
 
 it('SHOULD NOT email somebody who has opted out of notifications set to mention only', function(done) {
   var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+  var unreadEngine = testRequire('./services/unread-item-service-engine');
 
   var sendEmailNotifications = testRequire.withProxies('./services/notifications/email-notification-generator-service', {
     '../email-notification-service': emailNotificationServiceMock,
@@ -217,7 +221,7 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
       userTroupeSettingsService.setUserSettings(fixture.user2.id, fixture.troupe1.id, 'notifications', { push: "mentions" } ), // <-- NB
     ])
     .then(function() {
-      return underlyingUnreadItemService.testOnly.newItem(troupeId, null, 'chat', itemId1);
+      return unreadEngine.newItemWithMentions(troupeId, itemId1, [fixture.user2.id, fixture.user3.id], []);
     })
     .then(function() {
       return sendEmailNotifications(Date.now());
@@ -232,6 +236,7 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
   // TODO: handle mentions
   it('SHOULD email somebody who has not opted out of notifications for a specific troupe', function(done) {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+    var unreadEngine = testRequire('./services/unread-item-service-engine');
 
     var sendEmailNotifications = testRequire.withProxies('./services/notifications/email-notification-generator-service', {
       '../email-notification-service': emailNotificationServiceMock,
@@ -239,8 +244,6 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
     });
 
     var itemId1 = mongoUtils.getNewObjectIdString();
-    var itemId2 = mongoUtils.getNewObjectIdString();
-    var itemId3 = mongoUtils.getNewObjectIdString();
     var troupeId = fixture.troupe1.id;
 
     var u = 0, v = 0;
@@ -264,7 +267,7 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
     Q.all([
       userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', false),
       userTroupeSettingsService.setUserSettings(fixture.user2.id, fixture.troupe1.id, 'notifications', { push: "all" } ), // <-- NB
-      underlyingUnreadItemService.testOnly.newItem(troupeId, null, 'chat', itemId1)
+      unreadEngine.newItemWithMentions(troupeId, itemId1, [fixture.user2.id, fixture.user3.id], [])
       ])
       .then(function() {
         return sendEmailNotifications(Date.now());
