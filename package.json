@@ -147,6 +147,7 @@
     "sinon": "1.5.2",
     "style-loader": "^0.8.2",
     "through2": "^0.6.3",
+    "webpack": "^1.4.15",
     "webpack-dev-middleware": "^1.0.11",
     "xunit-file": "0.0.5"
   },
