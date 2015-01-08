@@ -91,6 +91,11 @@
   }
 }
 
+// remove duplicate close icon in ie10+
+.search-input input::-ms-clear {
+  display: none;
+}
+
 .search-input input:focus {
   box-shadow: none;
 }
