@@ -1,4 +1,5 @@
 "use strict";
+require('utils/initial-setup');
 
 var appEvents = require('utils/appevents');
 var context = require('utils/context');
@@ -13,7 +14,6 @@ var onready = require('./utils/onready');
 var $ = require('jquery');
 var RAF = require('utils/raf');
 
-require('utils/initial-setup');
 require('components/statsc');
 require('views/widgets/preload');
 require('components/webNotifications');
