@@ -160,7 +160,7 @@ module.exports = (function() {
     emptyView: EmptyRoomResultsView,
 
     initialize: function (/*options*/) {
-      var target = document.querySelector("#toolbar-content");
+      var target = document.querySelector("#search-results");
       this.rollers = new Rollers(target, this.el, { doNotTrack: true });
     },
 
@@ -173,7 +173,7 @@ module.exports = (function() {
     emptyView: EmptyResultsView,
 
     initialize: function() {
-      var target = document.querySelector("#toolbar-content");
+      var target = document.querySelector("#search-results");
       this.rollers = new Rollers(target, this.el, { doNotTrack: true });
     },
 
@@ -388,15 +388,6 @@ module.exports = (function() {
   var SearchView = Marionette.Layout.extend({
     template: searchTemplate,
 
-    className: 'search',
-
-    ui: {
-      results: '.js-search-results',
-      input: '.js-search-input',
-      clearIcon: '.js-search-clear-icon',
-      searchIcon: '.js-search-icon'
-    },
-
     regions: {
       roomsRegion: '.js-search-rooms',
       messagesRegion: '.js-search-messages',
@@ -405,18 +396,10 @@ module.exports = (function() {
     // the shortcuts need to be handled at the top level component
     keyboardEvents: {
       'focus.search': 'activate',
-      'search.escape': 'dismiss',
+      'search.escape': 'onEscape',
       'search.prev': 'handlePrev',
       'search.next': 'handleNext',
       'search.go': 'handleGo'
-    },
-
-    events: {
-      'click .js-activate-search': 'activate',
-      'click @ui.clearIcon' : 'clearSearchTerm',
-      'click @ui.input': 'activate',
-      'change @ui.input': 'handleChange',
-      'input @ui.input': 'handleChange'
     },
 
     serializeData: function() {
@@ -429,18 +412,28 @@ module.exports = (function() {
     initialize: function () {
       var debouncedRun = _.debounce(this.run.bind(this), 250);
 
-      this.model = new Backbone.Model({ searchTerm: '', active: false, isLoading: false });
-
-      this.listenTo(this.model, 'change:isLoading', function (m, loading) {
-        this.ui.searchIcon.toggleClass('fetching', loading);
-      });
-
       this.listenTo(this.model, 'change:searchTerm', function () {
         debouncedRun();
       }.bind(this));
 
       this.listenTo(this.model, 'change:active', function (m, active) {
         this.$el.toggleClass('active', !!active);
+
+        if (active) {
+          this.triggerMethod('search:expand');
+
+          if (window.innerWidth < 880) {
+            appEvents.triggerParent('menu:hide'); // hide menu
+          }
+        } else {
+          this.model.set('searchTerm', '');
+          this.hide();
+          this.triggerMethod('search:collapse');
+
+          appEvents.triggerParent('menu:show'); // show menu
+          appEvents.trigger('chatCollectionView:clearHighlight'); // remove highlights
+        }
+
       });
 
       // master collection to enable easier navigation
@@ -487,56 +480,21 @@ module.exports = (function() {
       this.messagesView = new MessagesCollectionView({ collection: this.chats });
     },
 
-    isActive: function () {
-      return this.model.get('active');
-    },
-
     isSearchTermEmpty: function () {
       return _.isEmpty(this.model.get('searchTerm'));
     },
 
-    clearSearchTerm: function () {
-      this.hide();
-      this.ui.input.val('');
-      this.ui.input.focus();
-    },
-
-    // hides and clears search component's state
-    dismiss: function () {
-      var model = this.model;
-      this.hide();
-      this.triggerMethod('search:collapse');
-
-      appEvents.triggerParent('menu:show'); // show menu
-      appEvents.trigger('chatCollectionView:clearHighlight'); // remove highlights
-
-      model.set('active', false);
-      model.set('searchTerm', '');
-
-      this.ui.input.val(function () { return ''; });
-    },
-
     activate: function () {
-      var model = this.model;
-      model.set('active', true);
-      this.triggerMethod('search:expand');
+      this.model.set('active', true);
+    },
 
-      if (window.innerWidth < 880) {
-        appEvents.triggerParent('menu:hide'); // hide menu
-      }
-
-      if (this.isActive()) {
-        var input = this.ui.input;
-        if (input.is(':focus')) return;
-        input.focus();
-      } else {
-        this.dismiss();
-      }
+    onEscape: function () {
+      this.model.set('active', false);
     },
 
     hide: function () {
       this.triggerMethod('search:hide');
-      this.ui.results.hide();
+      this.$el.hide();
       this.search.clearCache();
     },
 
@@ -560,14 +518,9 @@ module.exports = (function() {
     },
 
     showResults: function () {
-      this.ui.results.show();
+      this.$el.show();
       this.roomsRegion.show(this.roomsView); // local rooms
       this.messagesRegion.show(this.messagesView); // server chat messages
-    },
-
-    handleChange: function (e) {
-      // e.preventDefault();
-      this.model.set('searchTerm', e.target.value.trim());
     },
 
     handlePrev: function (e) {
