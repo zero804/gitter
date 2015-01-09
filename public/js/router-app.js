@@ -174,7 +174,7 @@ onready(function () {
         var count = message.count;
         var troupeId = message.troupeId;
         if (troupeId !== context.getTroupeId()) {
-          log.warning('troupeId mismatch in unreadItemsCount');
+          log.warn('troupeId mismatch in unreadItemsCount');
         }
         var v = {
           unreadItems: count
