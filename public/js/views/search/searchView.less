@@ -47,22 +47,20 @@
   line-height: @scrollHelperSize;
 }
 
-.search * { box-sizing: border-box; }
+.search-results * { box-sizing: border-box; }
 
-.search {
+.search-results, .search-input-view {
   width: 100%;
   text-align: center;
 }
 
-.search.active .search-toggle i { display: none; }
-.search.active .search-input input { display: inline-block; }
+.search-input-view.active .search-toggle i { display: none; }
+.search-input-view.active .search-input input { display: inline-block; }
 
 .search-input {
   font-size: 16px;
   height: @height;
   line-height: @height;
-  position: absolute;
-  top: 0;
   text-align: center;
   z-index: 200;
   width: 100%;
@@ -86,11 +84,16 @@
   top: auto !important;
   left: auto !important;
   width: 100% !important;
-  height: 3 * 0.625em;
+  height: 32px;
   border-radius: 6px;
   @media @mid {
     display: none;
   }
+}
+
+// remove duplicate close icon in ie10+
+.search-input input::-ms-clear {
+  display: none;
 }
 
 .search-input input:focus {
@@ -101,12 +104,13 @@ i.search-toggle {
   z-index: 1000;
   font-size: 18px;
   display: none;
-  padding: 0 8px !important;
   opacity: 0.4;
   top: 28px;
+  left: 26px;
   cursor: pointer;
   .prepend-octicon('\f02e');
   transition: opacity 0.2s ease-in-out;
+  position: absolute;
 
   @media @mid {
     display: inline;
@@ -118,7 +122,7 @@ i.search-toggle {
   opacity: 1;
 }
 
-.search.active .search-toggle {
+.search-input-view.active .search-toggle {
   display: none;
 }
 
@@ -145,19 +149,15 @@ i.search-toggle {
   }
 }
 
-.search.active .search-input-icon {
+.search-input-view.active .search-input-icon {
     display: inline-block;
 }
 
-.search.fsdfsfsactive .search-input-icon {
-  display: inline-block;
-}
-
-.search.active .search-input-close-icon {
+.search-input-view.active .search-input-close-icon {
   opacity: 0.6;
 }
 
-.search.active .search-input-close-icon:hover {
+.search-input-view.active .search-input-close-icon:hover {
   opacity: 0.8;
   cursor: pointer;
 }
@@ -166,7 +166,6 @@ i.search-toggle {
   position: relative;
   line-height: normal;
   text-align: left;
-  top: @height;
   z-index: 0;
 }
 
