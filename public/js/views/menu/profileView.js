@@ -6,6 +6,7 @@ var isMobile = require('utils/is-mobile');
 var isNative = require('utils/is-native');
 var template = require('./tmpl/profile.hbs');
 var apiClient = require('components/apiClient');
+var logout = require('utils/logout');
 
 require('views/behaviors/widgets');
 
@@ -54,17 +55,7 @@ module.exports = (function() {
 
     logoutClicked: function(e) {
       e.preventDefault();
-      apiClient.web.post('/logout')
-        .then(function(response) {
-          if(response && response.redirect) {
-            window.location.href = response.redirect;
-          } else {
-            window.location.href = '/';
-          }
-        })
-        .fail(function(e) {
-          window.location.href = '/';
-        })
+      logout();
     }
   });
 
