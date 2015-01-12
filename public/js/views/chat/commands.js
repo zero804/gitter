@@ -276,6 +276,8 @@ module.exports = (function() {
 
   return {
 
+    size: commandsList.length,
+
     getSuggestions: function(term) {
       return commandsList.filter(function(cmd) {
         var elligible = (!cmd.criteria || cmd.criteria()) && cmd.completion;
