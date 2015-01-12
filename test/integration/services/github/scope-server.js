@@ -9,7 +9,7 @@ var expressHbs = require('express-hbs');
 var passportInstall = require('../../../../server/web/passport');
 var passport = require('passport');
 var nconf = require('../../../../server/utils/config');
-var GitHubStrategy = require('troupe-passport-github').Strategy;
+var GitHubStrategy = require('gitter-passport-github').Strategy;
 
 var app = express();
 var server = http.createServer(app);
