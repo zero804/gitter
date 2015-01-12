@@ -19,7 +19,10 @@ Search.prototype.findUsers = function(searchString, callback) {
 };
 
 function requestGithubUserSearch(searchString, token) {
-  var noOrgsQuerySearchString = 'q=' + searchString + '+type:user';
+  var encodedSearchString = encodeURIComponent(searchString);
+
+  // the '+type:user' part gets mangled by url encoders, so we have to do this by hand
+  var noOrgsQuerySearchString = 'q=' + encodedSearchString + '+type:user';
   var searchUrl = 'https://api.github.com/search/users?' + noOrgsQuerySearchString + '&access_token=' + token;
 
   var d = Q.defer();

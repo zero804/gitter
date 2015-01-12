@@ -49,7 +49,7 @@ onready(function() {
   var appView = new ChatNliIntegratedView({ el: 'body', chatCollection: itemCollections.chats, userCollection: itemCollections.users });
 
   new HeaderView({ model: context.troupe(), el: '#header' });
-  new RightToolbarView({ el: "#toolbar-frame" });
+  new RightToolbarView({ el: "#right-toolbar-layout" });
 
   var Router = Backbone.Router.extend({
     routes: {

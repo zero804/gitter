@@ -1652,9 +1652,9 @@
       }
     },
     "gitter-services": {
-      "version": "1.4.0",
-      "from": "gitter-services@git+ssh://git@github.com:gitterHQ/services.git#1.4.0",
-      "resolved": "git+ssh://git@github.com:gitterHQ/services.git#0aec65ec8d512517368d464cf43de489e748e356",
+      "version": "1.5.0",
+      "from": "gitter-services@git+ssh://git@github.com:gitterHQ/services.git#1.5.0",
+      "resolved": "git+ssh://git@github.com:gitterHQ/services.git#14a8e83289942f1dff00afc2fcae7aa6075d049d",
       "dependencies": {
         "require-all": {
           "version": "0.0.8",

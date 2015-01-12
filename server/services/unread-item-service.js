@@ -3,7 +3,6 @@
 
 var env              = require('../utils/env');
 var logger           = env.logger;
-var errorReporter    = env.errorReporter;
 var engine           = require('./unread-item-service-engine');
 var troupeService    = require("./troupe-service");
 var readByService    = require("./readby-service");
@@ -113,29 +112,6 @@ function ensureAllItemsRead(userId, troupeId) {
 }
 
 /**
- * Mark an item in a troupe as having been read by a user
- * @return {promise} promise of nothing
- */
-function markItemsOfTypeRead(userId, troupeId, ids, mentionIds) {
-  if(!userId) return reject("userId required");
-  if(!troupeId) return reject("troupeId required");
-
-  return engine.markItemsRead(userId, troupeId, ids, mentionIds || [])
-    .then(function(result) {
-      if(result.unreadCount >= 0 || result.mentionCount >= 0) {
-        // Notify the user
-        appEvents.troupeUnreadCountsChange({
-          userId: userId,
-          troupeId: troupeId,
-          total: result.unreadCount,
-          mentions: result.mentionCount
-        });
-      }
-
-    });
-}
-
-/**
  * Returns a hash of hash {user:troupe:ids} of users who have
  * outstanding notifications since before the specified time
  * @return a promise of hash
@@ -147,33 +123,30 @@ exports.listTroupeUsersForEmailNotifications = function(horizonTime, emailLatchE
 /**
  * Mark many items as read, for a single user and troupe
  */
-exports.markItemsRead = function(userId, troupeId, itemIds, mentionIds, options) {
-  // Configure options
-  if(!options) options = {};
+exports.markItemsRead = function(userId, troupeId, itemIds, options) {
+  if(!userId) return reject("userId required");
+  if(!troupeId) return reject("troupeId required");
 
-  // { member : default true }
-  if(options.member === undefined) options.member = true;
+  appEvents.unreadItemsRemoved(userId, troupeId, { chat: itemIds });
 
-  // { recordAsRead: default true }
-  if(options.recordAsRead === undefined) options.recordAsRead = true;
-
-  var allIds = [];
-
-  if(itemIds) allIds = allIds.concat(itemIds);
-  if(mentionIds) allIds = allIds.concat(mentionIds);
-
-  allIds = _.uniq(allIds);
-
-  appEvents.unreadItemsRemoved(userId, troupeId, { chat: itemIds }); // TODO: update
-
-  return markItemsOfTypeRead(userId, troupeId, allIds, mentionIds)
-    .then(function() {
-      if(!options.recordAsRead) {
-        return;
+  return engine.markItemsRead(userId, troupeId, itemIds)
+    .then(function(result) {
+      if(result.unreadCount >= 0 || result.mentionCount >= 0) {
+        // Notify the user
+        appEvents.troupeUnreadCountsChange({
+          userId: userId,
+          troupeId: troupeId,
+          total: result.unreadCount,
+          mentions: result.mentionCount
+        });
       }
 
-      // For the moment, we're only bothering with chats for this
-      return readByService.recordItemsAsRead(userId, troupeId, { chat: allIds }); // TODO: drop the hash
+      var recordAsRead = !options || options.recordAsRead === undefined ? true : options.recordAsRead;
+
+      if(recordAsRead) {
+        return readByService.recordItemsAsRead(userId, troupeId, { chat: itemIds });
+      }
+
     });
 
 };
@@ -193,7 +166,7 @@ exports.markAllChatsRead = function(userId, troupeId, options) {
       if(!('recordAsRead' in options)) options.recordAsRead = false;
 
       /* Don't mark the items as read */
-      return exports.markItemsRead(userId, troupeId, chatIds, null, options);
+      return exports.markItemsRead(userId, troupeId, chatIds, options);
     });
 };
 
@@ -283,12 +256,16 @@ function getTroupeIdsCausingBadgeCount(userId) {
   return engine.getRoomsCausingBadgeCount(userId);
 }
 
-function parseMentions(chat, troupe) {
-  var creatorUserId = chat.fromUser && chat.fromUser.id && "" + chat.fromUser.id;
-  var usersHash = troupe.users;
+function parseMentions(fromUserId, troupe, mentions) {
+  var creatorUserId = fromUserId && "" + fromUserId;
+
+  var usersHash = troupe.users.reduce(function(memo, troupeUser) {
+    memo[troupeUser.userId] = 1;
+    return memo;
+  }, {});
 
   var uniqueUserIds = {};
-  chat.mentions.forEach(function(mention) {
+  mentions.forEach(function(mention) {
     if(mention.group) {
       if(mention.userIds) {
         mention.userIds.forEach(function(userId) {
@@ -296,7 +273,9 @@ function parseMentions(chat, troupe) {
         });
       }
     } else {
-      uniqueUserIds[mention.userId] = true;
+      if(mention.userId) {
+        uniqueUserIds[mention.userId] = true;
+      }
     }
   });
 
@@ -308,7 +287,7 @@ function parseMentions(chat, troupe) {
     /* Don't be mentioning yourself yo */
     if(userId == creatorUserId) return;
 
-    if(userId in usersHash) {
+    if(usersHash[userId]) {
       memberUserIds.push(userId);
       return;
     }
@@ -350,66 +329,58 @@ function parseMentions(chat, troupe) {
     });
 }
 
-function parseChat(chat, troupeId) {
-  var creatorUserId = chat.fromUser && chat.fromUser.id && "" + chat.fromUser.id;
+function parseChat(fromUserId, troupe, mentions) {
+  var creatorUserId = fromUserId && "" + fromUserId;
 
-  return troupeService.findUserIdsForTroupeWithLurk(troupeId)
-    .then(function(troupe) {
-      var userIdsWithLurk = troupe.users;
+  var nonActive = [];
+  var active = [];
 
-      var nonActive = [];
-      var active = [];
+  troupe.users.forEach(function(troupeUser) {
+    var userId = troupeUser.userId;
 
-      var keys = Object.keys(userIdsWithLurk);
-      for (var i = 0; i < keys.length; i++) {
-        var userId = keys[i];
+    if (creatorUserId && ("" + userId) === creatorUserId) return;
 
-        if (creatorUserId && ("" + userId) === creatorUserId) continue;
-        var lurking = userIdsWithLurk[userId];
+    if (troupeUser.lurk) {
+      nonActive.push(userId);
+    } else {
+      active.push(userId);
+    }
 
-        if (lurking) {
-          nonActive.push(userId);
-        } else {
-          active.push(userId);
-        }
-      }
+  });
 
-      if(!chat.mentions || !chat.mentions.length) {
-        return {
-          notifyUserIds: active,
-          mentionUserIds: [],
-          activityOnlyUserIds: nonActive,
-          notifyNewRoomUserIds: []
-        };
-      }
+  if(!mentions || !mentions.length) {
+    return Q.resolve({
+      notifyUserIds: active,
+      mentionUserIds: [],
+      activityOnlyUserIds: nonActive,
+      notifyNewRoomUserIds: []
+    });
+  }
 
-      /* Add the mentions into the mix */
-      return parseMentions(chat, troupe)
-        .then(function(parsedMentions) {
-          var notifyUserIdsHash = {};
-          active.forEach(function(userId) { notifyUserIdsHash[userId] = 1; });
-          parsedMentions.mentionUserIds.forEach(function(userId) { notifyUserIdsHash[userId] = 1; });
+  /* Add the mentions into the mix */
+  return parseMentions(fromUserId, troupe, mentions)
+    .then(function(parsedMentions) {
+      var notifyUserIdsHash = {};
+      active.forEach(function(userId) { notifyUserIdsHash[userId] = 1; });
+      parsedMentions.mentionUserIds.forEach(function(userId) { notifyUserIdsHash[userId] = 1; });
 
-          var nonActiveLessMentions = nonActive.filter(function(userId) {
-            return !notifyUserIdsHash[userId];
-          });
+      var nonActiveLessMentions = nonActive.filter(function(userId) {
+        return !notifyUserIdsHash[userId];
+      });
 
-          return {
-            notifyUserIds: Object.keys(notifyUserIdsHash),
-            mentionUserIds: parsedMentions.mentionUserIds,
-            activityOnlyUserIds: nonActiveLessMentions,
-            notifyNewRoomUserIds: parsedMentions.nonMemberUserIds
-          };
-        });
+      return {
+        notifyUserIds: Object.keys(notifyUserIdsHash),
+        mentionUserIds: parsedMentions.mentionUserIds,
+        activityOnlyUserIds: nonActiveLessMentions,
+        notifyNewRoomUserIds: parsedMentions.nonMemberUserIds
+      };
     });
 }
 
-function onChatCreate(chat, troupeId) {
-  return parseChat(chat, troupeId)
-    .then(function(parsed) {
-      return [parsed, engine.newItemWithMentions(troupeId, chat.id, parsed.notifyUserIds, parsed.mentionUserIds)];
-    })
-    .spread(function(parsed, results) {
+function createNewItemsForParsedChat(troupeId, chatId, parsed) {
+  return engine.newItemWithMentions(troupeId, chatId, parsed.notifyUserIds, parsed.mentionUserIds)
+    .then(function(results) {
+
       // Firstly, notify all the notifyNewRoomUserIds with room creation messages
       parsed.notifyNewRoomUserIds.forEach(function(userId) {
         appEvents.userMentionedInNonMemberRoom({ troupeId: troupeId, userId: userId });
@@ -421,7 +392,7 @@ function onChatCreate(chat, troupeId) {
         var mentionCount = results[userId] && results[userId].mentionCount;
 
         // Not lurking, send them the full update
-        appEvents.newUnreadItem(userId, troupeId, { chat: [chat.id] });
+        appEvents.newUnreadItem(userId, troupeId, { chat: [chatId] });
 
         if(unreadCount >= 0 || mentionCount >= 0) {
           // Notify the user
@@ -442,24 +413,59 @@ function onChatCreate(chat, troupeId) {
     });
 }
 
-
-function onChat(data) {
-  if (!data.model) return;
-
-  switch(data.operation) {
-    case 'create': return onChatCreate(data.model, data.troupeId)
-      .catch(function(err) {
-        errorReporter(err, { operation: 'unreadItemService.onChatCreate', chat: data.model });
-      });
-    // case 'update': return onChatUpdate(data.model);
-    // case 'remove': return onChatRemove(data.model);
-  }
+function createChatUnreadItems(fromUserId, troupe, chat) {
+  return parseChat(fromUserId, troupe, chat.mentions)
+    .then(function(parsed) {
+      return createNewItemsForParsedChat(troupe.id, chat.id, parsed);
+    });
 }
+exports.createChatUnreadItems = createChatUnreadItems;
 
-exports.install = function() {
+function updateChatUnreadItems(fromUserId, troupe, chat, originalMentions) {
+  var troupeId = troupe.id;
 
-  appEvents.localOnly.onChat(onChat);
-};
+  var originalMentionUserIds = originalMentions
+    .map(function(mention) {
+      if(mention.userIds.length) return mention.userIds;
+      return mention.userId;
+    })
+    .filter(function(m) {
+      return !!m;
+    });
+
+  /* Arg. Underscore. We need lazy evaluation! */
+  originalMentionUserIds = _.flatten(originalMentionUserIds);
+  originalMentionUserIds = _.uniq(originalMentionUserIds);
+
+  return parseChat(fromUserId, troupe, chat.mentions)
+    .then(function(parsed) {
+      /* No mentions in the original message? Skip the removal */
+      if(!originalMentionUserIds.length) return parsed;
+
+      var removeUserIds = _.union(parsed.notifyUserIds, originalMentionUserIds);
+      return engine.removeItem(troupeId, chat.id, removeUserIds)
+        .then(function(results) {
+
+          results.forEach(function(result) {
+            if(result.unreadCount >= 0 || result.mentionCount >= 0) {
+              // Notify the user
+              appEvents.troupeUnreadCountsChange({
+                userId: result.userId,
+                troupeId: troupeId,
+                total: result.unreadCount,
+                mentions: result.mentionCount
+              });
+            }
+          });
+
+          return parsed;
+        });
+    })
+    .then(function(parsed) {
+      return createNewItemsForParsedChat(troupeId, chat.id, parsed);
+    });
+}
+exports.updateChatUnreadItems = updateChatUnreadItems;
 
 exports.testOnly = {
   getOldestId: getOldestId,

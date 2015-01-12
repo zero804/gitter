@@ -137,6 +137,7 @@ exports.install = function(persistenceService) {
         if(err || !serializedModel) return;
         appEvents.chat('update', model.toTroupeId, serializedModel);
       });
+
       next();
     },
 
