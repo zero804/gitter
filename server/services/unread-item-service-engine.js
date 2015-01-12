@@ -189,7 +189,6 @@ function removeItem(troupeId, itemId, userIds) {
 
   return runScript('unread-remove-item', keys, [troupeId, itemId])
     .then(function(result) {
-
       var results = [];
 
       // Results come back as three items per key in sequence
@@ -266,7 +265,7 @@ function ensureAllItemsRead(userId, troupeId) {
  * Mark an item in a troupe as having been read by a user
  * @return {promise} promise of nothing
  */
-function markItemsRead(userId, troupeId, ids, mentionIds) {
+function markItemsRead(userId, troupeId, ids) {
   var keys = [
       "ub:" + userId,
       "unread:chat:" + userId + ":" + troupeId,
@@ -276,10 +275,7 @@ function markItemsRead(userId, troupeId, ids, mentionIds) {
       'uel:' + troupeId + ":" + userId,
     ];
 
-  var values = [troupeId, userId, ids.length].concat(ids);
-  if(mentionIds && mentionIds.length) {
-    values = values.concat(mentionIds);
-  }
+  var values = [troupeId, userId].concat(ids);
 
   return runScript('unread-mark-items-read', keys, values)
     .then(function(result) {
@@ -300,7 +296,6 @@ function markItemsRead(userId, troupeId, ids, mentionIds) {
         engine.emit('mention.count', userId, troupeId, mentionCount);
       }
 
-      /* TODO: detect last mention */
       return {
         unreadCount: troupeUnreadCount >= 0 ? troupeUnreadCount : undefined,
         mentionCount: mentionCount >= 0 ? mentionCount : undefined,

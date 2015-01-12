@@ -555,10 +555,7 @@ ul li.placeholder:before {
 }
 
 .trpFramePanel {
-  // if you try and fix this weird height, please check the
-  // chat page when not logged in. It gets weird there. A
-  // 100% seems to put the page out by 5px. So weird.
-  height: 99.5%;
+  height: 100%;
   position: relative;
   flex-grow: 1;
   .transition500ms;
@@ -593,20 +590,6 @@ ul li.placeholder:before {
   display: inline-block;
 }
 
-.trpTroupeMoreActions {
-  display: none;
-}
-
-.trpTroupeMoreActions, .trpTroupeHelp {
-  padding: 12px 0 12px 10px;
-  @media @mid {
-    display: inline-block;
-    width: 100%;
-    padding-left: 18px;
-    opacity: 0.6;
-  }
-}
-
 .trpActionsMenuLabel {
   display: none;
 }
@@ -637,8 +620,6 @@ ul li.placeholder:before {
 }
 
 #people-list {
-
-  margin-top: 55px;
 
   .remaining {
     // display: none;
@@ -852,31 +833,6 @@ ul.roster {
   .prepend-pull-request;
 }
 
-.trpToolbar:hover {
-  opacity: 1;
-}
-
-.trpRightPanel:hover + .trpToolbar {
-  opacity: 1;
-}
-
-.trpToolbar .nano {
-	height: 100%;
-}
-
-.trpToolbarSpacer {
-  height: 40px;
-}
-
-#troupe-avatar-region {
-  display: none;
-  @media @mid {
-    display: inline-block;
-    padding-left: 19px;
-    margin-bottom: 13px
-  }
-}
-
 .webhook {
   cursor: pointer;
 }
@@ -885,44 +841,8 @@ ul.roster {
   border-bottom: 1px solid @trpBgAccent;
 }
 
-.divider-top {
-  border-top: 1px solid @trpBgAccent;
-}
-
-.trpToolbarHeader {
-	font-family: @fontSans;
-	font-size: 0.8em;
-	text-transform: uppercase;
-	padding-bottom: 8px;
-	cursor: pointer;
-  padding-top: 16px;
-}
-
 .trpToolbarListContent {
   padding-left: 10px;
-}
-
-.trpItemDetails {
-	padding: 8px 0 8px 0;
-	font-family: @fontSans;
-	font-size: 14px;
-	color: #333;
-	width: 224px;
-}
-
-.trpDetailViewClose {
-  display: inline-block;
-	background-color: @trpGreen;
-	position: absolute;
-	right: 28px;
-	text-align: center;
-	.trpBodySmall;
-	padding: 4px 6px;
-	letter-spacing: 1px;
-}
-
-.login-content {
-	width: 100%;
 }
 
 .notification-center {
@@ -970,10 +890,6 @@ ul.roster {
 
 .notification-error {
 	background: #a44;
-}
-
-.qq-upload-list {
-	bottom: 75px;
 }
 
  .trpLoading {

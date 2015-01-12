@@ -6,7 +6,7 @@
 @import "../search/searchView";
 @import "activity.less";
 
-.trpToolbar {
+.right-toolbar {
   position: relative;
   color: #333;
   font-family: @fontSans;
@@ -35,16 +35,13 @@
     font-size: 11px;
   }
 
- .trpMiniActions {
-    display: none;
-    @media @mid {
-      display: block;
-      opacity: 0.8;
-    }
-  }
-
   .trpToolbarHeader {
+    font-family: @fontSans;
+    font-size: 0.8em;
+    text-transform: uppercase;
+    padding-bottom: 8px;
     padding-left: 14px;
+    cursor: pointer;
   }
 
   .trpToolbarList {
@@ -68,11 +65,6 @@
   @media @mid {
     width: 70px;
     padding-right: 0px;
-    // padding-top: 16px;
-
-    &.expanded {
-      width: 240px;
-    }
 
     &.expand {
       width: @rightMarginFull;
@@ -82,7 +74,7 @@
     opacity: 0;
     }
 
-    #people-header, #top-header, #request-header, #repo-info, #activity-tip {
+    #people-header, #top-header, #repo-info, #activity-tip {
       display: none;
     }
 
@@ -96,7 +88,6 @@
   }
 
   .trpRepoInfoContainer {
-    // padding-left: 4px;
     max-width: 266px;
     box-sizing: border-box;
     padding-right: 10px;
@@ -117,24 +108,6 @@
       margin: 8px 0;
     }
 
-    .trpTroupeInfoBadge {
-      -webkit-border-radius: 4px;
-         -moz-border-radius: 4px;
-              border-radius: 4px;
-      display: inline-block;
-      padding: 0 5px 1px 5px;
-      font-size: 10px;
-      font-weight: bold;
-      line-height: 14px;
-      color: white;
-      white-space: nowrap;
-      vertical-align: baseline;
-      background-color: @trpLightBlue;
-      margin-top: 3px;
-      float: right;
-      margin-left: 20px;
-    }
-
     ul {
       display: inline-block;
       border: 1px 0 solid @trpGrey;
@@ -144,18 +117,10 @@
     h1 {
       word-wrap: break-word;
     }
-
-
   }
 }
 
-.trpToolbarContent {
-  display: inline-block;
-  width: 100%;
-  vertical-align: top;
-  height: 100%;
-  overflow: auto;
-  overflow-x: hidden;
+.right-toolbar {
 
   table, tr, td {
     border-spacing: 0;
@@ -164,15 +129,7 @@
     vertical-align: top;
   }
 
-
   @media @mid {
-
-    // padding-left: 4px;
-
-    .trpToolbarHeader.divider:first-child {
-      border-bottom: 0;
-    }
-
     .trpToolbarList {
       max-height: 40%;
     }
@@ -180,20 +137,39 @@
   }
 }
 
-.trpToolbarContent .qq-upload.button {
-  position: absolute;
-  width: 200px;
-  height: 32px;
+// this is bad, but until the margins/padding is done properly
+// for all <h1>, <p> etc tags in the toolbar, we have to style
+// the individual elements :(
+#activity-header {
+  padding-top: 16px;
 }
 
-.trpToolbarContent input {
-  top: 2px;
-  width: 32px;
-  height: 32px;
-  overflow: hidden;
-  left: 20px;
+.right-toolbar {
+  display: flex;
+  flex-direction: column;
 }
 
-.trpToolbarContent .trpTroupeAvatar {
-    background-color: rgba(0,0,0,0.9);
+.right-toolbar__header {
+  flex-shrink: 0;
+}
+
+.right-toolbar__body {
+  height: 100%;
+  flex-shrink: 1;
+  overflow: auto;
+}
+
+.right-toolbar__footer {
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.trpTroupeHelp {
+  padding: 23px 0 23px 10px;
+  @media @mid {
+    display: inline-block;
+    width: 100%;
+    padding-left: 18px;
+    opacity: 0.6;
+  }
 }
