@@ -34,7 +34,7 @@ module.exports = (function () {
       var isNativeResult = isNative();
 
       return {
-        expanded: this.state.get('expanded'),
+        menuHeaderExpanded: this.state.get('menuHeaderExpanded'),
         isMobile: isMobileResult,
         displayName: user.displayName || user.username,
         user: userModel,
