@@ -237,13 +237,21 @@ function install() {
                 stats.alias(mixpanel.getMixpanelDistinctId(req.cookies), user.id, function(err) {
                   if (err) logger.error('Error aliasing user:', { exception: err });
 
-                  stats.event("new_user", {
-                    userId: user.id,
-                    method: 'github_oauth',
-                    username: user.username,
-                    source: req.session.source,
-                    googleAnalyticsUniqueId: googleAnalyticsUniqueId,
-                    _bucket: ((parseInt(user.id.slice(-1), 16) % 2)) === 0 ? 'even' : 'odd' //
+                  emailAddressService(user)
+                  .then(function(email) {
+                    user.email = email;
+
+                    stats.userUpdate(user);
+
+                    stats.event("new_user", {
+                      userId: user.id,
+                      email: email,
+                      method: 'github_oauth',
+                      username: user.username,
+                      source: req.session.source,
+                      googleAnalyticsUniqueId: googleAnalyticsUniqueId,
+                      _bucket: ((parseInt(user.id.slice(-1), 16) % 2)) === 0 ? 'even' : 'odd' //
+                    });
                   });
 
                   // Flag the user as a new github user if they've created
@@ -255,8 +263,6 @@ function install() {
                       googleAnalyticsUniqueId: googleAnalyticsUniqueId
                     });
                   }
-
-                  stats.userUpdate(user);
                 });
 
                 req.logIn(user, function(err) {
