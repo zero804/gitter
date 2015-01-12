@@ -7,8 +7,7 @@ var isNative = require('utils/is-native');
 var template = require('./tmpl/profile.hbs');
 require('views/behaviors/widgets');
 
-module.exports = (function() {
-
+module.exports = (function () {
 
   return Marionette.ItemView.extend({
     template: template,
@@ -21,11 +20,13 @@ module.exports = (function() {
       Widgets: {}
     },
 
-    initialize: function () {
+    initialize: function (options) {
+      this.state = options.state;
+      this.listenTo(this.state, 'change', this.render);
       this.render();
     },
 
-    serializeData: function() {
+    serializeData: function () {
       var user = context.getUser();
       var userModel = context.user();
 
@@ -33,6 +34,7 @@ module.exports = (function() {
       var isNativeResult = isNative();
 
       return {
+        expanded: this.state.get('expanded'),
         displayName: user.displayName || user.username,
         user: userModel,
         billingUrl: context.env('billingUrl'),
@@ -41,6 +43,7 @@ module.exports = (function() {
         showSignout: !isNativeResult
       };
     },
+
     homeClicked: function (e) {
       e.preventDefault();
       if (context().user.url !== window.location.pathname) {
