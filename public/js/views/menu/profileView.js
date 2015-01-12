@@ -5,6 +5,8 @@ var appEvents = require('utils/appevents');
 var isMobile = require('utils/is-mobile');
 var isNative = require('utils/is-native');
 var template = require('./tmpl/profile.hbs');
+var apiClient = require('components/apiClient');
+
 require('views/behaviors/widgets');
 
 module.exports = (function() {
@@ -14,7 +16,8 @@ module.exports = (function() {
     template: template,
 
     events: {
-      "click #link-home": 'homeClicked'
+      "click #link-home": 'homeClicked',
+      "click #link-logout": 'logoutClicked'
     },
 
     behaviors: {
@@ -41,11 +44,27 @@ module.exports = (function() {
         showSignout: !isNativeResult
       };
     },
+
     homeClicked: function (e) {
       e.preventDefault();
       if (context().user.url !== window.location.pathname) {
         appEvents.trigger('navigation', context.getUser().url, 'home', '');
       }
+    },
+
+    logoutClicked: function(e) {
+      e.preventDefault();
+      apiClient.web.post('/logout')
+        .then(function(response) {
+          if(response && response.redirect) {
+            window.location.href = response.redirect;
+          } else {
+            window.location.href = '/';
+          }
+        })
+        .fail(function(e) {
+          window.location.href = '/';
+        })
     }
   });
 
