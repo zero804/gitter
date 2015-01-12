@@ -83,6 +83,7 @@ function renderHomePage(req, res, next) {
 }
 
 function renderMainFrame(req, res, next, frame) {
+
   var user = req.user;
   var userId = user && user.id;
 
@@ -124,6 +125,7 @@ function renderMainFrame(req, res, next, frame) {
         stagingLink: stagingLink,
         dnsPrefetch: dnsPrefetch,
         showFooterButtons: true,
+        menuHeaderExpanded: false,
         user: user,
         rooms: {
           favourites: rooms
