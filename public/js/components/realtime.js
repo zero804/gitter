@@ -223,7 +223,7 @@ module.exports = (function() {
 
         window.alert('Realtime communications with the server have been disconnected.');
         if(context.isLoggedIn()) {
-          window.parent.location.href = "/signout";
+          window.parent.location.href = "/logout";
         } else {
           window.parent.location.href = "/";
         }

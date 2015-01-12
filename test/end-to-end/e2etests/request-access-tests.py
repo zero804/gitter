@@ -19,7 +19,7 @@ class RequestAccessTests(unittest.TestCase):
 
     @attr('unreliable')
     def testNewUserUnauthenticatedTroupeRequest(self):
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
         self.driver.get(utils.baseUrl("/testtroupe3"))
         thisTime = time.strftime("%Y%m%d%H%M%S", time.gmtime())
 
@@ -56,7 +56,7 @@ class RequestAccessTests(unittest.TestCase):
 
         # TODO: Login as testuser and check invite exists
 
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
         utils.existingUserlogin(self.driver, 'testuser@troupetest.local', '123456')
         self.driver.get(utils.baseUrl("/testtroupe3"))
         time.sleep(1)
@@ -66,7 +66,7 @@ class RequestAccessTests(unittest.TestCase):
 
     @attr('unreliable')
     def testExistingUnauthenticatedRequest(self):
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
         self.driver.get(utils.baseUrl("/testtroupe3"))
         name = self.driver.find_element_by_css_selector('#email')
         name.clear()
@@ -77,7 +77,7 @@ class RequestAccessTests(unittest.TestCase):
         form = self.driver.find_element_by_css_selector('#requestAccess')
         self.driver.find_element_by_id('submit-button').click()
 
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
         utils.existingUserlogin(self.driver, 'testuser@troupetest.local', '123456')
         self.driver.get(utils.baseUrl("/testtroupe3"))
         time.sleep(1)
@@ -89,13 +89,13 @@ class RequestAccessTests(unittest.TestCase):
 
     @attr('unreliable')
     def testExistingAuthenticatedRequest(self):
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
         utils.existingUserlogin(self.driver, 'testuser2@troupetest.local', '123456')
         self.driver.get(utils.baseUrl("/testtroupe3"))
         form = self.driver.find_element_by_css_selector('#requestAccess')
         self.driver.find_element_by_id('submit-button').click()
 
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
         utils.existingUserlogin(self.driver, 'testuser@troupetest.local', '123456')
         self.driver.get(utils.baseUrl("/testtroupe3"))
         time.sleep(1)

@@ -19,12 +19,12 @@ class ChangePasswordTests(unittest.TestCase):
         userJSON = utils.getJSON('/testdata/newUser')
         self.username = userJSON.get('username')
         self.userId = userJSON.get('_id')
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
 
     def testNewUserChangesPasswordAtUserhome(self):
         self.loginFromHomepage(self.username + '@troupetest.local', 'password');
         self.changeProfilePassword('password', 'newpassword')
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
         self.loginFromHomepage(self.username, 'newpassword')
 
         self.assertUserhomeIsCurrentPage(self.username);
@@ -34,7 +34,7 @@ class ChangePasswordTests(unittest.TestCase):
         self.loginFromHomepage(self.username + '@troupetest.local', 'password');
         self.assertAnyTroupeIsCurrentPage()
         self.changeProfilePassword('password', 'newpassword')
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
         self.loginFromHomepage(self.username, 'newpassword')
 
         self.assertAnyTroupeIsCurrentPage();
@@ -46,7 +46,7 @@ class ChangePasswordTests(unittest.TestCase):
         invitee = 'testuser-' + str(uuid.uuid4())
         self.inviteToTroupe(invitee+'@troupetest.local')
 
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
 
         acceptInvite(invitee+'@troupetest.local', self.driver)
         self.driver.find_element_by_id('new-user-signup-button').click()
@@ -55,7 +55,7 @@ class ChangePasswordTests(unittest.TestCase):
         self.assertUserhomeIsCurrentPage('home')
         self.setProfileNameAndPassword('Tester Testerson','password')
 
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
 
         self.loginFromHomepage(invitee+'@troupetest.local', 'password')
 
@@ -68,14 +68,14 @@ class ChangePasswordTests(unittest.TestCase):
         invitee = 'testuser-' + str(uuid.uuid4())
         self.inviteToTroupe(invitee+'@troupetest.local')
 
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
 
         acceptInvite(invitee+'@troupetest.local', self.driver)
         self.driver.find_element_by_id('new-user-signup-button').click()
         self.assertAnyTroupeIsCurrentPage();
         self.setProfileNameAndPassword('Tester Testerson', 'password')
 
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
 
         self.loginFromHomepage(invitee+'@troupetest.local', 'password')
 

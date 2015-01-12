@@ -6,7 +6,7 @@ var logout = require('../web/middlewares/logout');
 
 exports.install = function(app) {
   /* Cheap trick for testing */
-  app.get('/signout',
+  app.get('/logout',
     logout,
     function(req, res) {
       res.relativeRedirect(nconf.get('web:homeurl'));

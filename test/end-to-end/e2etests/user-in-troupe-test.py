@@ -52,7 +52,7 @@ class UserInTroupeTests(unittest.TestCase):
         # self.driver2 = None
 
         print('signing out of Firefox browser')
-        self.driver2.get(utils.baseUrl("/signout"))
+        self.driver2.get(utils.baseUrl("/logout"))
 
         time.sleep(0.5)
 

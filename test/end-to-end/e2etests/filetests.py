@@ -19,7 +19,7 @@ class FileTests(unittest.TestCase):
         utils.existingUserlogin(self.driver, 'testuser@troupetest.local', '123456')
         self.driver.get(utils.baseUrl("/filetesttroupe"))
         self.driver.find_elements_by_class_name('trpFileSmallThumbnail')
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
 
     # This test only runs in IE
     def testFileUpload(self):
@@ -29,7 +29,7 @@ class FileTests(unittest.TestCase):
             self.driver.get(utils.baseUrl("/filetesttroupe"))
             self.driver.find_element_by_name("file").send_keys('c:\\ProgramData\Microsoft\User Account Pictures\user.bmp')
             self.driver.find_elements_by_class_name('trpFileVersionThumbnail')
-            self.driver.get(utils.baseUrl("/signout"))
+            self.driver.get(utils.baseUrl("/logout"))
 
     @attr('unreliable')
     def testPreviewFile(self):
@@ -42,7 +42,7 @@ class FileTests(unittest.TestCase):
             self.driver.find_element_by_class_name("link-preview").click()
             time.sleep(1)
             self.driver.find_element_by_class_name("close").click()
-            self.driver.get(utils.baseUrl("/signout"))
+            self.driver.get(utils.baseUrl("/logout"))
 
     @attr('unreliable')
     def testDeleteFile(self):
@@ -59,4 +59,4 @@ class FileTests(unittest.TestCase):
             newNumberOfImages = self.driver.find_elements_by_class_name("trpFileSmallThumbnailImage")
             if numberOfImages == newNumberOfImages:
                 assert(False)
-            self.driver.get(utils.baseUrl("/signout"))
+            self.driver.get(utils.baseUrl("/logout"))

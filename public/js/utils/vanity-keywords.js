@@ -7,5 +7,5 @@ module.exports = [
   'login',
   'mobile',
   'settings',
-  'signout'
+  'logout'
 ];
