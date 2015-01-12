@@ -9,11 +9,11 @@ var logger                 = env.logger;
 var errorReporter          = env.errorReporter;
 var stats                  = env.stats;
 
-var oauth2orize = require('oauth2orize');
-var passport = require('passport');
-var oauthService = require('../services/oauth-service');
-var random = require('../utils/random');
-var ensureLoggedIn = require('./middlewares/ensure-logged-in');
+var oauth2orize            = require('oauth2orize');
+var passport               = require('passport');
+var oauthService           = require('../services/oauth-service');
+var random                 = require('../utils/random');
+var ensureLoggedIn         = require('./middlewares/ensure-logged-in');
 
 // create OAuth 2.0 server
 var server = oauth2orize.createServer();
