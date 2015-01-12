@@ -106,7 +106,7 @@ module.exports = (function () {
       this.repoList = false;
 
       this.state = new Backbone.Model({
-        expanded: false
+        menuHeaderExpanded: false
       });
 
       var self = this;
@@ -269,7 +269,7 @@ module.exports = (function () {
     },
 
     toggleHeaderExpansion: function() {
-      this.state.set('expanded', !this.state.get('expanded'));
+      this.state.set('menuHeaderExpanded', !this.state.get('menuHeaderExpanded'));
       $('#left-menu-profile').toggleClass('menu-header--expanded');
     }
   });

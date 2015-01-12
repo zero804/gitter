@@ -3,15 +3,17 @@
     {{ widget "avatar" model=user size='s' }}
   </div>
   <div class="menu-header__name">
-    {{ displayName }}
+    <p>{{ displayName }}</p>
   </div>
-  <div class="menu-header__state">
-    {{#if expanded}}
-      <i class="octicon octicon-chevron-up"></i>
-    {{else}}
-      <i class="octicon octicon-chevron-down"></i>
-    {{/if}}
-  </div>
+  {{#unless isMobile}}
+    <div class="menu-header__state">
+      {{#if menuHeaderExpanded}}
+        <i class="octicon octicon-chevron-up"></i>
+      {{else}}
+        <i class="octicon octicon-chevron-down"></i>
+      {{/if}}
+    </div>
+  {{/unless}}
 </div>
 <ul id="profile-menu" class="profile-menu">
   <li id="link-home" class="profile-menu__item profile-menu__link">

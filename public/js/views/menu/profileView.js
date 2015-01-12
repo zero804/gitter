@@ -35,6 +35,7 @@ module.exports = (function () {
 
       return {
         expanded: this.state.get('expanded'),
+        isMobile: isMobileResult,
         displayName: user.displayName || user.username,
         user: userModel,
         billingUrl: context.env('billingUrl'),
