@@ -1,10 +1,12 @@
 "use strict";
 var $ = require('jquery');
+var Backbone = require('backbone');
 var Marionette = require('marionette');
 var context = require('utils/context');
 var itemCollections = require('collections/instances/integrated-items');
 var PeopleCollectionView = require('views/people/peopleCollectionView');
 var SearchView = require('views/search/searchView');
+var SearchInputView = require('views/search/search-input-view');
 var repoInfo = require('./repoInfo');
 var ActivityStream = require('./activity');
 var hasScrollBars = require('utils/scrollbar-detect');
@@ -15,13 +17,12 @@ module.exports = (function() {
   var RightToolbarLayout = Marionette.Layout.extend({
 
     regions: {
-      search: '#search-panel',
+      search: '#search-results',
       repo_info: "#repo-info"
     },
 
     events: {
       'click #upgrade-auth': 'onUpgradeAuthClick',
-      'click .activity-expand' : 'expandActivity',
       'click #people-header' : 'showPeopleList',
       'click #info-header' : 'showRepoInfo',
       'submit #upload-form': 'upload'
@@ -53,23 +54,38 @@ module.exports = (function() {
       });
 
       // Search
-      this.searchView = new SearchView({ });
-      this.search.show(this.searchView);
+      var searchState = new Backbone.Model({
+        searchTerm: '',
+        active: false,
+        isLoading: false
+      });
 
-      this.searchView.on('search:expand', function () {
+      new SearchInputView({
+        el: $('#search-input'),
+        model: searchState
+      }).render();
+
+      var searchView = new SearchView({
+        el: $('#search-results'),
+        model: searchState
+      }).render();
+
+      searchView.on('search:expand', function () {
         $('.right-toolbar').addClass('expand');
       });
 
-      this.searchView.on('search:collapse', function () {
+      searchView.on('search:collapse', function () {
         $('.right-toolbar').removeClass('expand');
       });
 
-      this.searchView.on('search:show', function () {
+      searchView.on('search:show', function () {
         $('#toolbar-top-content').hide();
+        $('#zendesk-footer').hide();
       }.bind(this));
 
-      this.searchView.on('search:hide', function () {
+      searchView.on('search:hide', function () {
         $('#toolbar-top-content').show();
+        $('#zendesk-footer').show();
       }.bind(this));
 
       itemCollections.events.on('add reset sync', function() {
@@ -98,16 +114,6 @@ module.exports = (function() {
       $('#repo-info').show();
       $('#people-header').removeClass('selected');
       $('#info-header').addClass('selected');
-    },
-
-    onShow: function() {
-       if (hasScrollBars()) {
-        $(".trpToolbarContent").addClass("scroller");
-      }
-    },
-
-    expandActivity: function() {
-      $('.activity-expand .commits').slideToggle();
     }
 
   });
