@@ -1,21 +1,21 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var env            = require('../utils/env');
-var stats          = env.stats;
-var logger         = env.logger;
-var config         = env.config;
+var env              = require('../utils/env');
+var stats            = env.stats;
+var logger           = env.logger;
+var config           = env.config;
 
-var passport       = require('passport');
-var client         = require("../utils/redis").getClient();
-var lock           = require("redis-lock")(client);
-var jwt            = require('jwt-simple');
-var uuid           = require('node-uuid');
-var url            = require('url');
-var oauth2         = require('../web/oauth2');
-var mixpanel       = require('../web/mixpanelUtils');
-var rememberMe     = require('../web/middlewares/rememberme-middleware');
-var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
+var passport         = require('passport');
+var client           = require("../utils/redis").getClient();
+var lock             = require("redis-lock")(client);
+var jwt              = require('jwt-simple');
+var uuid             = require('node-uuid');
+var url              = require('url');
+var oauth2           = require('../web/oauth2');
+var mixpanel         = require('../web/mixpanelUtils');
+var rememberMe       = require('../web/middlewares/rememberme-middleware');
+var ensureLoggedIn   = require('../web/middlewares/ensure-logged-in');
 var GithubMeService  = require("../services/github/github-me-service");
 
 /** TODO move onto its own method once we find the need for it elsewhere

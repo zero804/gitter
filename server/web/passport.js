@@ -278,20 +278,22 @@ function install() {
   }
 
   var userStrategy = new GitHubStrategy({
-      clientID:     config.get('github:user_client_id'),
-      clientSecret: config.get('github:user_client_secret'),
-      callbackURL:  config.get('web:basepath') + '/login/callback',
-      skipUserProfile: true,
+      clientID:          config.get('github:user_client_id'),
+      clientSecret:      config.get('github:user_client_secret'),
+      callbackURL:       config.get('web:basepath') + '/login/callback',
+      state:             true,
+      skipUserProfile:   true,
       passReqToCallback: true
     }, githubOauthCallback);
   userStrategy.name = 'github_user';
   passport.use(userStrategy);
 
   var upgradeStrategy = new GitHubStrategy({
-      clientID:     config.get('github:client_id'),
-      clientSecret: config.get('github:client_secret'),
-      callbackURL:  config.get('web:basepath') + '/login/callback',
-      skipUserProfile: true,
+      clientID:          config.get('github:client_id'),
+      clientSecret:      config.get('github:client_secret'),
+      callbackURL:       config.get('web:basepath') + '/login/callback',
+      state:             true,
+      skipUserProfile:   true,
       passReqToCallback: true
     }, githubOauthCallback);
   upgradeStrategy.name = 'github_upgrade';
