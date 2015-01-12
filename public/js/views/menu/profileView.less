@@ -34,22 +34,37 @@ body.hover .menu-header--expanded {
 }
 
 .menu-header__profile {
-  overflow: hidden;
-  clear: both;
+  display: flex;
   width: 100%;
+  font-size: 16px;
 }
 
 .menu-header__name {
-  display: inline-block;
-  line-height: 2em;
-  float: left;
+  flex-grow: 1;
   font-weight: 300;
   font-size: 16px;
-  margin-left: 10px;
-  max-width: 179px;
+  padding-left: 0.625em;
+  padding-right: 0.3125em;
+}
+
+.menu-header__name p {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  margin: 0;
+  height: 2em;
+  line-height: 2em;
+}
+
+.menu-header__avatar {
+  flex-shrink: 0;
+}
+
+.menu-header__state {
+  flex-shrink: 0;
+  padding: 0 0.3125em;
+  height: 32px;
+  line-height: 32px;
 }
 
 .profile-menu {
