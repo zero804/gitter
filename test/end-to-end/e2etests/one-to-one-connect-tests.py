@@ -19,8 +19,8 @@ class OneToOneConnectTests(unittest.TestCase):
 
     @attr('unreliable')
     def testUnathenticatedOnetoOneInviteFlow(self):
-        # signout and visit Test User 1's homepage
-        self.driver.get(utils.baseUrl("/signout"))
+        # logout and visit Test User 1's homepage
+        self.driver.get(utils.baseUrl("/logout"))
         self.driver.get(utils.baseUrl("/testuser1"))
 
         # signup as a new user through the connect modal
@@ -63,7 +63,7 @@ class OneToOneConnectTests(unittest.TestCase):
 
         # TODO: Login as testuser and check invite exists
 
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
         utils.existingUserlogin(self.driver, 'testuser@troupetest.local', '123456')
         utils.showLeftMenu(self.driver)
         self.driver.find_element_by_link_text(name).click()
@@ -87,7 +87,7 @@ class OneToOneConnectTests(unittest.TestCase):
         self.driver.find_element_by_css_selector('.modal-success').is_displayed()
 
         # login as Test User 1
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
         utils.existingUserlogin(self.driver, 'testuser@troupetest.local', '123456')
 
         # open the left menu and ensure the invite is there
@@ -104,7 +104,7 @@ class OneToOneConnectTests(unittest.TestCase):
     @attr('unreliable')
     def testExistingUnauthenticatedOnetoOneInviteFlow(self):
         newUser = utils.signup(self.driver)
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
         self.driver.get(utils.baseUrl("/testuser1"))
 
         form = self.driver.find_element_by_css_selector('#requestAccess')

@@ -20,12 +20,12 @@ class LoginTests(unittest.TestCase):
 
     def testSignInAndSignout(self):
         utils.existingUserlogin(self.driver, self.username+'@troupetest.local', 'password')
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
         self.driver.find_element_by_css_selector('DIV.trpHomeHeroStripContainer')
 
     def testSignInWithUsername(self):
         utils.existingUserlogin(self.driver, self.username, 'password')
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
         self.driver.find_element_by_css_selector('DIV.trpHomeHeroStripContainer')
 
     def testSignInAndNavigateBack(self):

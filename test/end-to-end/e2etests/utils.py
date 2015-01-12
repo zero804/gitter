@@ -87,7 +87,7 @@ def driver():
     driver.delete_all_cookies()
     driver.implicitly_wait(30)
 
-    driver.get(baseUrl("/signout"))
+    driver.get(baseUrl("/logout"))
 
     driver.delete_all_cookies()
 
@@ -113,14 +113,14 @@ def existingUserlogin(driver, usernameValue, passwordValue):
 
 
 def signup(driver):
-    driver.get(baseUrl("/signout"))
+    driver.get(baseUrl("/logout"))
     username = getJSON('/testdata/newUser').get('username')
     existingUserlogin(driver, username+'@troupetest.local', 'password')
 
     return username
 
 def signupWithNewTroupe(driver):
-    driver.get(baseUrl("/signout"))
+    driver.get(baseUrl("/logout"))
     userJSON = getJSON('/testdata/newUser')
     username = userJSON.get('username')
     id = userJSON.get('_id')

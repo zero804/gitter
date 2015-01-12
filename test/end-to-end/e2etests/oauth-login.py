@@ -29,7 +29,7 @@ class OauthLoginTests(unittest.TestCase):
 
         assert("/OAuthCallback" in self.driver.current_url)
 
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
 
     @attr('unreliable')
     def testSigninWithoutCookies(self):

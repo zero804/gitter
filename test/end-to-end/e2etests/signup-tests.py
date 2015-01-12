@@ -19,7 +19,7 @@ class SignupTests(unittest.TestCase):
 
     @attr('thread_safe')
     def testUsernameSelectionUnavailable(self):
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
         emailAddress = generateUniqueEmailAddress()
         self.driver.find_element_by_css_selector('#button-signup').click()
         form = self.driver.find_element_by_css_selector('#signup-form')
@@ -38,7 +38,7 @@ class SignupTests(unittest.TestCase):
 
     @attr('thread_safe')
     def testUsernameSelectionAvailable(self):
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
         emailAddress = generateUniqueEmailAddress()
         self.driver.find_element_by_css_selector('#button-signup').click()
         form = self.driver.find_element_by_css_selector('#signup-form')
@@ -58,7 +58,7 @@ class SignupTests(unittest.TestCase):
 
     @attr('thread_safe')
     def testUsernameSelectionSuggestions(self):
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
         emailAddress = generateUniqueEmailAddress()
         self.driver.find_element_by_css_selector('#button-signup').click()
         form = self.driver.find_element_by_css_selector('#signup-form')
@@ -78,7 +78,7 @@ class SignupTests(unittest.TestCase):
     @attr('thread_safe')
     @attr('phone_compatible')
     def testSignupFromHomePage(self):
-        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/logout"))
         emailAddress = generateUniqueEmailAddress()
         self.driver.find_element_by_css_selector('#button-signup').click()
 
