@@ -25,7 +25,7 @@ require('jquery-textcomplete');
 module.exports = (function() {
 
   /** @const */
-  var MAX_TYPEAHEAD_SUGGESTIONS = isMobile() ? 3 : 8;
+  var MAX_TYPEAHEAD_SUGGESTIONS = isMobile() ? 3 : 10;
 
   /** @const */
   var EXTRA_PADDING = 20;
@@ -184,7 +184,7 @@ module.exports = (function() {
           {
             match: /(^|\s)(([\w-_]+\/[\w-_]+)?#(\d*))$/,
             maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
-            search: function(term, callback) {
+            search: function (term, callback) {
               var terms = term.split('#');
               var repoName = terms[0];
               var issueNumber = terms[1];
@@ -214,7 +214,7 @@ module.exports = (function() {
           {
             match: /(^|\s)@(\/?[a-zA-Z0-9_\-]*)$/,
             maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
-            search: function(term, callback) {
+            search: function (term, callback) {
               var lowerTerm = term.toLowerCase();
               var loggedInUsername = context.user().get('username').toLowerCase();
 
@@ -270,7 +270,7 @@ module.exports = (function() {
           },
           {
             match: /(^)\/(\w*)$/,
-            maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
+            maxCount: commands.size,
             search: function(term, callback) {
               var matches = commands.getSuggestions(term);
               callback(matches);
