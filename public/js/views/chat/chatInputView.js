@@ -25,7 +25,7 @@ require('jquery-textcomplete');
 module.exports = (function() {
 
   /** @const */
-  var MAX_TYPEAHEAD_SUGGESTIONS = isMobile() ? 3 : 8;
+  var MAX_TYPEAHEAD_SUGGESTIONS = isMobile() ? 3 : 12;
 
   /** @const */
   var EXTRA_PADDING = 20;
