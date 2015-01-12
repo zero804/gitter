@@ -63,13 +63,6 @@
   }
 
   @media @mid {
-    width: 70px;
-    padding-right: 0px;
-
-    &.expand {
-      width: @rightMarginFull;
-    }
-
     #activity-header {
     opacity: 0;
     }
@@ -120,14 +113,14 @@
   }
 }
 
-.right-toolbar {
-
-  table, tr, td {
-    border-spacing: 0;
-    padding: 0;
-    margin: 0;
-    vertical-align: top;
+.right-toolbar--collapsible {
+  @media @mid {
+    width: 70px;
+    padding-right: 0px;
   }
+}
+
+.right-toolbar {
 
   @media @mid {
     .trpToolbarList {
