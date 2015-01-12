@@ -1,6 +1,7 @@
 "use strict";
 var $ = require('jquery');
 var Marionette = require('marionette');
+var Backbone = require('backbone');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
 var isMobile = require('utils/is-mobile');
@@ -80,11 +81,9 @@ module.exports = (function () {
     },
 
     events: function () {
-      var events = {
-        // 'click #search-clear-icon': 'onSearchClearIconClick'
-      };
+      var events = {};
 
-      if(!isMobile()) {
+      if (!isMobile()) {
         events['click #left-menu-profile'] = 'toggleHeaderExpansion';
       }
 
@@ -105,6 +104,11 @@ module.exports = (function () {
       this.bindUIElements();
       // this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
       this.repoList = false;
+
+      this.state = new Backbone.Model({
+        expanded: false
+      });
+
       var self = this;
 
       var showMenu = function () {
@@ -119,6 +123,7 @@ module.exports = (function () {
       appEvents.on('navigation', showMenu);
 
       this.selectedIndex = 0;
+
       // Keep track of conversation change to select the proper element
       appEvents.on('context.troupeId', function(id) {
         $('#recentTroupesList li').removeClass('selected');
@@ -189,13 +194,13 @@ module.exports = (function () {
       }
     },
 
-    navigateToCurrent: function() {
+    navigateToCurrent: function () {
       var itemElements = $('#recentTroupesList li');
       itemElements.removeClass('selected');
       $(itemElements[this.selectedIndex]).click();
     },
 
-    navigateTo: function(i) {
+    navigateTo: function (i) {
       var itemElements = $('#recentTroupesList li');
       if (i >= 0 && i < itemElements.length) {
         this.selectedIndex = i;
@@ -203,7 +208,7 @@ module.exports = (function () {
       }
     },
 
-    navigateToRoom: function(e, handler) {
+    navigateToRoom: function (e, handler) {
       var keys = handler.key.split('+');
       var key = keys[ keys.length - 1 ];
       if (key === '0') return this.navigateTo(9);
@@ -214,7 +219,6 @@ module.exports = (function () {
     serializeData: function() {
       return {
         showFooterButtons: !isMobile(),
-        // showSearch: !isMobile(),
         showExapandedHeader: isMobile()
       };
     },
@@ -224,7 +228,7 @@ module.exports = (function () {
 
       var ui = this.ui;
 
-      new ProfileView({ el: ui.profile });
+      new ProfileView({ el: ui.profile, state: this.state });
 
       // mega-list: recent troupe view
       new RoomCollectionView({
@@ -265,6 +269,7 @@ module.exports = (function () {
     },
 
     toggleHeaderExpansion: function() {
+      this.state.set('expanded', !this.state.get('expanded'));
       $('#left-menu-profile').toggleClass('menu-header--expanded');
     }
   });
