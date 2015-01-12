@@ -82,7 +82,7 @@ module.exports = (function() {
       ['delete', POST_DEFAULTS]
     ];
 
-  function makeFullUrl(baseUrlFunction, url) {
+  function makeApiUrl(baseUrlFunction, url) {
     if(!url) url = '';
 
     var baseUrl = context.env('apiBasePath');
@@ -92,6 +92,16 @@ module.exports = (function() {
     }
 
     return baseUrl + baseUrlFunction() + url;
+  }
+
+  function makeWebUrl(baseUrlFunction, url) {
+    if(!url) url = '';
+
+    if(!baseUrlFunction) {
+      return url;
+    }
+
+    return baseUrlFunction() + url;
   }
 
   function makeChannel(baseUrlFunction, url) {
@@ -115,7 +125,7 @@ module.exports = (function() {
   }
 
   // TODO return a proper promise instead of a $.Deferred
-  function operation(baseUrlFunction, method, defaultOptions, url, data, options) {
+  function operation(fullUrlFunction, baseUrlFunction, method, defaultOptions, url, data, options) {
     options = defaults(options, defaultOptions);
 
     // If we're doing a DELETE but have no data, unset the contentType
@@ -133,7 +143,7 @@ module.exports = (function() {
 
     return accessTokenDeferred()
       .then(function(accessToken) {
-        var fullUrl = makeFullUrl(baseUrlFunction, url);
+        var fullUrl = fullUrlFunction(baseUrlFunction, url);
 
         var deferred = $.ajax({
           url: fullUrl,
@@ -225,17 +235,17 @@ module.exports = (function() {
     return options;
   }
 
-  function getClient(baseUrlFunction) {
+  function getClient(fullUrlFunction, baseUrlFunction) {
     return OPERATIONS
       .reduce(function(memo, descriptor) {
         var method = descriptor[0];
         var defaultOptions = descriptor[1];
 
-        memo[method] = operation.bind(memo, baseUrlFunction, method, defaultOptions);
+        memo[method] = operation.bind(memo, fullUrlFunction, baseUrlFunction, method, defaultOptions);
         return memo;
       }, {
         url: function(relativeUrl) {
-          return makeFullUrl(baseUrlFunction, relativeUrl);
+          return fullUrlFunction(baseUrlFunction, relativeUrl);
         },
         /**
          * Returns a function which returns URLs full urls for the
@@ -243,7 +253,7 @@ module.exports = (function() {
          */
         urlGenerator: function(relativeUrl) {
           return function() {
-            return makeFullUrl(baseUrlFunction, relativeUrl);
+            return fullUrlFunction(baseUrlFunction, relativeUrl);
           };
         },
         channel: function(relativeUrl) {
@@ -257,19 +267,20 @@ module.exports = (function() {
       });
   }
 
-  return defaults(getClient(), {
-    user: getClient(function() {
+  return defaults(getClient(makeApiUrl), {
+    user: getClient(makeApiUrl, function() {
       return '/v1/user/' + context.getUserId();
     }),
-    room: getClient(function() {
+    room: getClient(makeApiUrl, function() {
       return '/v1/rooms/' + context.getTroupeId();
     }),
-    userRoom: getClient(function() {
+    userRoom: getClient(makeApiUrl, function() {
       return '/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId();
     }),
-    priv: getClient(function() {
+    priv: getClient(makeApiUrl, function() {
       return '/private';
-    })
+    }),
+    web: getClient(makeWebUrl)
   });
 
 

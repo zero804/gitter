@@ -5,10 +5,21 @@ var nconf = require('../utils/config');
 var logout = require('../web/middlewares/logout');
 
 exports.install = function(app) {
-  /* Cheap trick for testing */
-  app.get('/logout',
+  app.post('/logout',
     logout,
     function(req, res) {
-      res.relativeRedirect(nconf.get('web:homeurl'));
+      res.format({
+        text: function(){
+          res.send('OK');
+        },
+
+        html: function(){
+          res.relativeRedirect(nconf.get('web:homeurl'));
+        },
+
+        json: function(){
+          res.send({ success:true, redirect: nconf.get('web:homeurl') });
+        }
+      });
     });
 };

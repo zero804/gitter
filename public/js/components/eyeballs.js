@@ -194,11 +194,11 @@ module.exports = (function() {
 
   // We use this to ensure that the users session does not time out
   window.setInterval(function() {
-    apiClient.get('/v1/ping', undefined, {
+    apiClient.web.get('/api/v1/ping', undefined, {
         global: false
       })
       .fail(function() {
-        log.info('An error occurred while communicating eyeballs');
+        log.info('An error occurred pinging the server');
       });
   }, PING_POLL);
 
