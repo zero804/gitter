@@ -5,6 +5,11 @@ var nconf = require('../utils/config');
 var logout = require('../web/middlewares/logout');
 
 exports.install = function(app) {
+
+  app.get('/logout', function(req, res, next) {
+    next(405);
+  });
+
   app.post('/logout',
     logout,
     function(req, res) {
