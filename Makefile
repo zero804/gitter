@@ -29,7 +29,6 @@ clean:
 
 test:
 	gulp test
-	./test/redis-lua/run-tests
 
 npm:
 	npm install
