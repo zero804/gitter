@@ -75,7 +75,7 @@ gulp.task('validate', ['validate-client-source', 'validate-server-source']);
 /**
  * test
  */
-gulp.task('test', function() {
+gulp.task('test-mocha', function() {
   mkdirp.sync('output/test-reports/');
 
   return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
