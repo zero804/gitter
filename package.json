@@ -114,6 +114,7 @@
     "gulp-less": "^1.3.6",
     "gulp-livereload": "^2.1.1",
     "gulp-postcss": "^2.0.0",
+    "gulp-shell": "^0.2.11",
     "gulp-shrinkwrap": "^1.0.1",
     "gulp-sourcemaps": "^1.2.8",
     "gulp-spawn-mocha": "^0.5.1",
