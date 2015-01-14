@@ -18,6 +18,7 @@
 --   [1] unread_item_count   // -1 if it has not changed
 --   [2] mention_count       // -1 if it has not changed
 --   [3] flags               // bit 0 (1) indicates that the notify badge for the user needs updating
+--
 
 local user_badge_key = KEYS[1]
 local user_troupe_key = KEYS[2]
