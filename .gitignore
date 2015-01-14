@@ -53,3 +53,5 @@ scripts/graphs/neato3d.png
 scripts/graphs/prod.dot
 scripts/graphs/prod2.dot
 config.user-overrides-not.json
+redis-lua/unread/tests/luacov.report.out
+redis-lua/unread/tests/luacov.stats.out

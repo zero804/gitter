@@ -1,15 +1,15 @@
 -- Keys are [user:troupe,user:count] keys followed by [user_troupe_mention_key, user_mention_key]
 -- Values are [usercount, troupe_id, item_id, time, userIds....]
-local user_count = table.remove(ARGV, 1) 
+local user_count = table.remove(ARGV, 1)
 local troupe_id = table.remove(ARGV, 1)
 local item_id = table.remove(ARGV, 1)
 local time_now = table.remove(ARGV, 1)
-
 
 local email_hash_key = table.remove(KEYS, 1)
 
 local MAX_ITEMS = 100
 local MAX_ITEMS_PLUS_ONE = MAX_ITEMS + 1
+
 
 -- Update values in the email hash with time_now, if a value does not exist
 local userIds = ARGV
@@ -20,42 +20,15 @@ end
 local result = {};
 
 for i = 1,user_count do
-	local user_troupe_key = table.remove(KEYS, 1)
-	local user_badge_key =  table.remove(KEYS, 1)
+  local user_troupe_key = table.remove(KEYS, 1)
+  local user_badge_key =  table.remove(KEYS, 1)
 
 
   local item_count = -1 -- -1 means do not update
   local update = 0 -- bit flags: 1 = badge_update, 2 = upgrade_key
   local key_type = redis.call("TYPE", user_troupe_key)["ok"];
 
-  if key_type == "set" then
-  	if redis.call("SADD", user_troupe_key, item_id) > 0 then
-
-  		-- If this is the first for this troupe for this user, the badge count is going to increment
-  		if tonumber(redis.call("ZINCRBY", user_badge_key, 1, troupe_id)) == 1 then
-        update = 1
-  		end
-
-      item_count = redis.call("SCARD", user_troupe_key)
-
-      -- Figure out if its time to upgrade to a ZSET
-      if item_count >= MAX_ITEMS then
-        update = update + 2
-      end
-
-  	end
-  elseif key_type == "none" then
-    -- this should always return 1
-    if redis.call("SADD", user_troupe_key, item_id) > 0 then
-      item_count = 1;                                               -- key was none
-
-      -- If this is the first for this troupe for this user, the badge count is going to increment
-      if tonumber(redis.call("ZINCRBY", user_badge_key, 1, troupe_id)) == 1 then
-        update = 1
-      end
-
-    end
-  else
+  if key_type == "zset" then
     -- We have a ZSET
     if redis.call("ZADD", user_troupe_key, time_now, item_id) > 0 then
       -- Remove all items below the last 100 ranked items
@@ -71,6 +44,23 @@ for i = 1,user_count do
         -- If items were removed, the set must have exactly 100 items left in it
         item_count = MAX_ITEMS;
       end
+    end
+  else
+    if redis.call("SADD", user_troupe_key, item_id) > 0 then
+
+      -- If this is the first for this troupe for this user, the badge count is going to increment
+      local zincr_result = tonumber(redis.call("ZINCRBY", user_badge_key, 1, troupe_id));
+
+      if zincr_result == 1 then
+        update = 1
+      end
+
+      item_count = redis.call("SCARD", user_troupe_key)
+      -- Figure out if its time to upgrade to a ZSET
+      if item_count >= MAX_ITEMS then
+        update = update + 2
+      end
+
     end
   end
 
