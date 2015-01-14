@@ -1,9 +1,29 @@
--- Keys are [user:troupe,user:count] keys followed by [user_troupe_mention_key, user_mention_key]
--- Values are [usercount, troupe_id, item_id, time, userIds....]
-local user_count = table.remove(ARGV, 1)
-local troupe_id = table.remove(ARGV, 1)
-local item_id = table.remove(ARGV, 1)
-local time_now = table.remove(ARGV, 1)
+--
+-- Mark a whole lot of unread-items as read for a given user
+--
+-- KEYS:
+--   1     email_hash_key      // unread:email_notify               HASH of first unread items for users
+--   Group 1: (user_count entries)
+--   [n]   user_troupe         // unread:chat:<userId>:<troupeId>   SET or ZSET [item=time] of unread items
+--   [n+1] user_badge          // ub:<userId>                       ZSET of [room=unread_count]
+--   Group 2: (remaining entries)
+--   [n]   user_troupe_mention  // m:<userId>:<troupeId>             SET of mentions for user in room
+--   [n+1] user_mention         // m:<userId>                        SET of all troupes with mentions for this user
+--
+-- VALUES
+--   [1] user_count
+--   [2] troupe_id
+--   [3] item_id
+--   [4] time_now
+--   [5..n] user_ids
+--
+-- RETURNS table
+--
+
+local user_count = ARGV[1]
+local troupe_id = ARGV[2]
+local item_id = ARGV[3]
+local time_now = ARGV[4]
 
 local email_hash_key = table.remove(KEYS, 1)
 
@@ -13,19 +33,20 @@ local MAX_ITEMS_PLUS_ONE = MAX_ITEMS + 1
 
 -- Update values in the email hash with time_now, if a value does not exist
 local userIds = ARGV
-for i, user_id in ipairs(userIds) do
+for i = 5, #ARGV do
+  local user_id = ARGV[i]
   redis.call("HSETNX", email_hash_key, troupe_id..':'..user_id, time_now)
 end
 
 local result = {};
 
-for i = 1,user_count do
+for i = 1, user_count do
   local user_troupe_key = table.remove(KEYS, 1)
   local user_badge_key =  table.remove(KEYS, 1)
 
 
   local item_count = -1 -- -1 means do not update
-  local update = 0 -- bit flags: 1 = badge_update, 2 = upgrade_key
+  local flag = 0 -- bit flags: 1 = badge_update, 2 = upgrade_key
   local key_type = redis.call("TYPE", user_troupe_key)["ok"];
 
   if key_type == "zset" then
@@ -52,20 +73,21 @@ for i = 1,user_count do
       local zincr_result = tonumber(redis.call("ZINCRBY", user_badge_key, 1, troupe_id));
 
       if zincr_result == 1 then
-        update = 1
+        flag = 1
       end
 
       item_count = redis.call("SCARD", user_troupe_key)
+
       -- Figure out if its time to upgrade to a ZSET
       if item_count >= MAX_ITEMS then
-        update = update + 2
+        flag = flag + 2
       end
 
     end
   end
 
   table.insert(result, item_count)
-  table.insert(result, update)
+  table.insert(result, flag)
 end
 
 -- Now deal with the mentions
