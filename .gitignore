@@ -55,3 +55,6 @@ scripts/graphs/prod2.dot
 config.user-overrides-not.json
 redis-lua/unread/tests/luacov.report.out
 redis-lua/unread/tests/luacov.stats.out
+test/redis-lua/luacov.report.out
+test/redis-lua/luacov.stats.out
+luacov.report.out
