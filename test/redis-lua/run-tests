@@ -1,0 +1,9 @@
+#!/bin/bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+cd $SCRIPT_DIR
+mkdir -p ../../output/tap/redis-lua
+rm -f luacov.*
+busted -c --output=TAP . >  ../../output/tap/redis-lua/busted.tap
+cat luacov.report.out
