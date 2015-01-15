@@ -5,7 +5,6 @@ var appEvents = require('utils/appevents');
 var isMobile = require('utils/is-mobile');
 var isNative = require('utils/is-native');
 var template = require('./tmpl/profile.hbs');
-var apiClient = require('components/apiClient');
 var logout = require('utils/logout');
 
 require('views/behaviors/widgets');
