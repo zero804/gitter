@@ -9,6 +9,8 @@ var qlimit = require('qlimit');
 var limit = qlimit(3);
 var _ = require('underscore');
 
+var TEST_ITERATIONS = 350;
+
 Q.longStackSupport = true;
 
 describe('unread-item-service-engine-combined', function() {
@@ -87,23 +89,60 @@ describe('unread-item-service-engine-combined', function() {
 
       var count = 0;
       var unreadItems = {};
-      var limit1 = qlimit(1);
+      var mentionItems = {};
 
       srand.seed(seed);
 
-      function validateResult(result) {
+      function enforceLimit() {
+        var u = Object.keys(unreadItems);
+        var l = u.length;
+        if(l > 100) {
+          while(l > 100) {
+            var lowestKey = _.min(u, function(id) {
+              return mongoUtils.getTimestampFromObjectId(id);
+            });
+
+            delete unreadItems[lowestKey];
+            l--;
+          }
+
+        }
+      }
+
+      function compareUnreadItems(reportedUnreadCount) {
+        console.log('comparing results');
+        return unreadItemServiceEngine.getUnreadItems(userId1, troupeId1)
+          .then(function(items) {
+            items.sort();
+            var ourKeys = Object.keys(unreadItems);
+            for(var i = 0; i < ourKeys.length; i++) {
+              if ("" + ourKeys[i] !== "" + items[i]) {
+                // console.log('OUR KEYS (length==' + ourKeys.length + ')', JSON.stringify(ourKeys, null, '  '));
+                // console.log('REDIS KEYS (length==' + items.length + ')', JSON.stringify(items, null, '  '));
+                console.log('>>>> CHECK OUT unread:chat' + userId1 + ':' + troupeId1);
+                assert(false, 'sets do not match. first problem at ' + i + ': ours=' + ourKeys[i] + '. theirs=' + items[i]);
+              }
+            }
+            // assert.deepEqual(ourKeys, items);
+            // assert.strictEqual(ourKeys.length, reportedUnreadCount);
+          });
+      }
+
+      function validateResult(result, expectUnread, expectMentions) {
         if(result.unreadCount >= 0) {
           var unreadItemCount = Object.keys(unreadItems).length;
-          if(result.unreadCount !== unreadItemCount) {
-            assert(unreadItemCount, result.unreadCount);
+          if(unreadItemCount !== result.unreadCount) {
+            return compareUnreadItems();
           }
+        } else {
+          assert(!expectUnread, "Expencted unread items in the results hash but not there");
         }
 
         if(result.mentionCount >= 0) {
-          var mentionCount = Object.keys(unreadItems).filter(function(item) { return unreadItems[item]; }).length;
-          if(result.mentionCount !== mentionCount) {
-            assert(mentionCount, result.mentionCount);
-          }
+          var mentionCount = Object.keys(mentionItems).length;
+          assert.strictEqual(mentionCount, result.mentionCount);
+        } else {
+          assert(!expectMentions, "Expencted mentionCount in " + JSON.stringify(result) + " but not there");
         }
 
 
@@ -111,7 +150,7 @@ describe('unread-item-service-engine-combined', function() {
 
       (function next() {
         count++;
-        if(count > 350) return done();
+        if(count > TEST_ITERATIONS) return done();
 
         var nextOperation = Math.floor(srand.random() * 4);
         [
@@ -124,8 +163,10 @@ describe('unread-item-service-engine-combined', function() {
                 .then(function(result) {
                   var resultForUser = result[userId1];
 
+                  mentionItems[itemId] = true;
                   unreadItems[itemId] = true;
-                  validateResult(resultForUser);
+                  enforceLimit();
+                  return validateResult(resultForUser, true, true);
                 })
                 .nodeify(cb);
           },
@@ -134,15 +175,26 @@ describe('unread-item-service-engine-combined', function() {
             var numberOfItems = Math.floor(srand.random() * 10) + 1;
             // console.log('Add ' + numberOfItems + ' items');
 
-            return Q.all(_.range(numberOfItems).map(limit1(function() {
-                var itemId = nextId();
-                return newItemForUsers(troupeId1, itemId, [userId1])
-                  .then(function(result) {
-                    var resultForUser = result[userId1];
-                    unreadItems[itemId] = false;
-                    validateResult(resultForUser);
+            return _.range(numberOfItems).reduce(function(memo) {
+                function addNewItem() {
+                  var itemId = nextId();
+                  return newItemForUsers(troupeId1, itemId, [userId1])
+                    .then(function(result) {
+                      var resultForUser = result[userId1];
+                      unreadItems[itemId] = false;
+                      enforceLimit();
+
+                      return validateResult(resultForUser, true, false);
+                    });
+                }
+                if(memo) {
+                  return memo.then(function() {
+                    return addNewItem();
                   });
-              })))
+                }
+
+                return addNewItem();
+              }, null)
               .nodeify(cb);
 
           },
@@ -155,13 +207,20 @@ describe('unread-item-service-engine-combined', function() {
             var i = Object.keys(unreadItems);
 
             var forMarkAsRead = i.slice(0, Math.round(i.length * percentageOfItems + 1));
-            // console.log('Mark ' + forMarkAsRead.join(',') + ' items read');
+            var itemsContainedMentions = forMarkAsRead.some(function(itemId) {
+              return unreadItems[itemId];
+            });
+
+            // console.log('Marking ' + forMarkAsRead.length + ' items read');
 
             return markItemsRead(userId1, troupeId1, forMarkAsRead)
               .then(function(result) {
                 forMarkAsRead.forEach(function(itemId) {
                   delete unreadItems[itemId];
+                  delete mentionItems[itemId];
                 });
+
+                return validateResult(result, true, itemsContainedMentions);
               })
               .nodeify(cb);
 
@@ -173,7 +232,9 @@ describe('unread-item-service-engine-combined', function() {
             return ensureAllItemsRead(userId1, troupeId1)
               .then(function(result) {
                 unreadItems = {};
-                validateResult(result);
+                var hadMentionIds = Object.keys(mentionItems).length > 0;
+                mentionItems = {};
+                return validateResult(result, true, hadMentionIds);
               })
               .nodeify(cb);
 

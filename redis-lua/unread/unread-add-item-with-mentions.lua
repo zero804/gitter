@@ -38,6 +38,27 @@ for i = 5, #ARGV do
   redis.call("HSETNX", email_hash_key, troupe_id..':'..user_id, time_now)
 end
 
+local get_timestamp = function(object_id)
+  local timestamp = tonumber(string.sub(object_id,1,8), 16)
+  if timestamp then return timestamp * 1000; end
+  return 1; -- Fallback to using a constant. Redis will sort alphabetically, which is fine
+end
+
+local update_set_to_zset = function(user_troupe_key)
+  local items = redis.call("SMEMBERS", user_troupe_key)
+  local zadd_args = { "ZADD", user_troupe_key }
+
+  for i, item_id in pairs(items) do
+    local timestamp =  get_timestamp(item_id)
+    table.insert(zadd_args, timestamp)
+    table.insert(zadd_args, item_id)
+  end
+
+  redis.call("DEL", user_troupe_key)
+  redis.call(unpack(zadd_args))
+  redis.call("ZREMRANGEBYRANK", user_troupe_key, 0, -MAX_ITEMS_PLUS_ONE)
+end
+
 local result = {};
 
 for i = 1, user_count do
@@ -68,19 +89,22 @@ for i = 1, user_count do
     end
   else
     if redis.call("SADD", user_troupe_key, item_id) > 0 then
-
-      -- If this is the first for this troupe for this user, the badge count is going to increment
-      local zincr_result = tonumber(redis.call("ZINCRBY", user_badge_key, 1, troupe_id));
-
-      if zincr_result == 1 then
-        flag = 1
-      end
-
       item_count = redis.call("SCARD", user_troupe_key)
 
       -- Figure out if its time to upgrade to a ZSET
       if item_count >= MAX_ITEMS then
         flag = flag + 2
+        update_set_to_zset(user_troupe_key)
+        item_count = MAX_ITEMS
+
+        redis.call("ZADD", user_badge_key, MAX_ITEMS, troupe_id)
+      else
+        -- If this is the first for this troupe for this user, the badge count is going to increment
+        local zincr_result = tonumber(redis.call("ZINCRBY", user_badge_key, 1, troupe_id));
+
+        if zincr_result == 1 then
+          flag = 1
+        end
       end
 
     end
