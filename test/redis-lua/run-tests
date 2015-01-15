@@ -2,6 +2,10 @@
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+echo "Using redis host $TEST_REDIS_HOST"
+
+export TEST_REDIS_HOST
+
 cd $SCRIPT_DIR
 mkdir -p ../../output/tap/redis-lua
 rm -f luacov.*
