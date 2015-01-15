@@ -80,6 +80,9 @@ function serializeObjectId(id) {
 
 function createIdForTimestamp(timestamp) {
     var hexSeconds = Math.floor(timestamp/1000).toString(16);
+    while(hexSeconds.length < 8) {
+      hexSeconds = "0" + hexSeconds;
+    }
     return new ObjectID(hexSeconds + "0000000000000000");
 }
 

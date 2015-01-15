@@ -23,6 +23,7 @@ var csswring = require('csswring');
 var mkdirp = require('mkdirp');
 var gulpif = require('gulp-if');
 var sourcemaps = require('gulp-sourcemaps');
+var shell = require('gulp-shell');
 
 /* Don't do clean in gulp, use make */
 var DEV_MODE = !!process.env.DEV_MODE;
@@ -74,7 +75,7 @@ gulp.task('validate', ['validate-client-source', 'validate-server-source']);
 /**
  * test
  */
-gulp.task('test', function() {
+gulp.task('test-mocha', function() {
   mkdirp.sync('output/test-reports/');
 
   return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
@@ -86,6 +87,12 @@ gulp.task('test', function() {
       }
     }));
 });
+
+gulp.task('test-redis-lua', shell.task([
+  './test/redis-lua/run-tests'
+]));
+
+gulp.task('test', ['test-mocha', 'test-redis-lua']);
 
 gulp.task('localtest', function() {
   return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
