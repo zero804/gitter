@@ -5,6 +5,7 @@ var context = require('utils/context');
 var Faye = require('gitter-faye');
 var appEvents = require('utils/appevents');
 var log = require('utils/log');
+var logout = require('utils/logout');
 
 module.exports = (function() {
 
@@ -222,12 +223,7 @@ module.exports = (function() {
         log.error('rt: Access denied', message);
 
         window.alert('Realtime communications with the server have been disconnected.');
-        if(context.isLoggedIn()) {
-          window.parent.location.href = "/logout";
-        } else {
-          window.parent.location.href = "/";
-        }
-
+        logout();
       }
     }
 
