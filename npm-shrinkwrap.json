@@ -1703,9 +1703,9 @@
       }
     },
     "gitter-services": {
-      "version": "1.5.0",
-      "from": "gitter-services@git+ssh://git@github.com:gitterHQ/services.git#1.5.0",
-      "resolved": "git+ssh://git@github.com:gitterHQ/services.git#14a8e83289942f1dff00afc2fcae7aa6075d049d",
+      "version": "1.6.1",
+      "from": "gitter-services@git+ssh://git@github.com:gitterHQ/services.git#1.6.1",
+      "resolved": "git+ssh://git@github.com:gitterHQ/services.git#59b0d626d76c30d34f5a8dc22ca72cba57c8f43d",
       "dependencies": {
         "require-all": {
           "version": "0.0.8",
@@ -2581,6 +2581,11 @@
       "version": "1.0.1",
       "from": "https://registry.npmjs.org/q/-/q-1.0.1.tgz",
       "resolved": "https://registry.npmjs.org/q/-/q-1.0.1.tgz"
+    },
+    "qlimit": {
+      "version": "0.1.1",
+      "from": "qlimit@*",
+      "resolved": "http://beta-internal:8089/nexus/content/groups/npm/qlimit/-/qlimit-0.1.1.tgz"
     },
     "raven": {
       "version": "0.6.3",
