@@ -19,14 +19,14 @@ CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/
 endif
 PATH := ./node_modules/.bin:$(PATH)
 
-.PHONY: build clean test npm sprites 
-	
+.PHONY: build clean test npm sprites
+
 build: clean npm
 	gulp
 
 clean:
 	rm -rf output
-	
+
 test:
 	gulp test
 

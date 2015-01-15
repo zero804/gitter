@@ -178,7 +178,7 @@ describe('unread-item-service', function() {
             return unreadItemServiceEngine.markItemsRead(userId1, troupeId1, [itemId1]);
           })
           .then(function(result) {
-            assert.strictEqual(result.unreadCount, undefined);
+            assert.strictEqual(result.unreadCount, 0);
             assert.strictEqual(result.badgeUpdate, false);
           })
           .nodeify(done);
@@ -200,8 +200,8 @@ describe('unread-item-service', function() {
           })
           .then(function(result) {
             assert.deepEqual(result, {
-              unreadCount: undefined,
-              mentionCount: undefined,
+              unreadCount: 0,
+              mentionCount: 0,
               badgeUpdate: false
             });
 
@@ -591,8 +591,8 @@ describe('unread-item-service', function() {
           })
           .then(function(result) {
             assert.deepEqual(result, {
-              unreadCount: undefined,
-              mentionCount: undefined,
+              unreadCount: 0,
+              mentionCount: 0,
               badgeUpdate: false
             });
 
