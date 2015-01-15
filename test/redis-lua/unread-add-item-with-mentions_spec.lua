@@ -213,13 +213,12 @@ describe("unread-add-item-with-mentions", function()
       });
 
     local result = add_item(ROOM_1, ITEM_1, TIME_NOW, { USER_1 })
-    assert.are.same({ 101, 2 }, result)
+    assert.are.same({ 100, 2 }, result)
 
-    table.insert(items, ITEM_1)
     assertState(USER_1, ROOM_1, {
-        user_room_set_type = 'set',
+        user_room_set_type = 'zset',
         unread_items       = items,
-        user_badge_values  = { ROOM_1, '101' },
+        user_badge_values  = { ROOM_1, '100' },
         email_values  = { [ROOM_1 .. ':' .. USER_1] =  tostring(TIME_NOW) }
       });
 

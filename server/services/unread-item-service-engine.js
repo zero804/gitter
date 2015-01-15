@@ -18,99 +18,6 @@ var engine = new EventEmitter();
 var runScript = Q.nbind(scriptManager.run, scriptManager);
 var redisClient_smembers = Q.nbind(redisClient.smembers, redisClient);
 
-function upgradeKeyToSortedSet(userId, troupeId) {
-  var key = "unread:chat:" + userId + ":" + troupeId;
-  var userBadgeKey = "ub:" + userId;
-
-  winston.verbose('unread-item-key-upgrade: attempting to upgrade ' + key);
-
-  var d = Q.defer();
-
-  // Use a new client due to the WATCH semantics (don't use getClient!)
-  redis.createTransientClient(function(err, redisClient) {
-    if(err) return d.reject(err);
-
-    function done(err) {
-      redis.quit(redisClient);
-
-      if(err) {
-        winston.verbose('unread-item-key-upgrade: upgrade failed' + err, { exception: err });
-        d.reject(err);
-      } else {
-        winston.verbose('unread-item-key-upgrade: upgrade completed successfully');
-        d.resolve();
-      }
-    }
-
-    /**
-     * Fairly certain that we don't need the userBadgeKey in the lock.
-     * If we did so, changes to other userTroupes could starve this
-     * transaction. Also all changes to the specific key on the userBadge
-     * that we are changing will always affect the `key` too so we'll
-     * be safe from inconsistencies that way.
-     *
-     * IF WE'RE GETTING INCONSISTENCIES, review this later!
-     */
-    redisClient.watch(key, function(err) {
-      if(err) return done(err);
-
-      redisClient.type(key, function(err, keyType) {
-        if(err) return done(err);
-
-        /* Go home redis, you're drunk */
-        keyType = ("" + keyType).trim();
-
-        /* If the key isn't a set our job is done */
-        if(keyType !== 'set') {
-          winston.verbose('unread-item-key-upgrade: upgrade already happened: type=' + keyType);
-          return done();
-        }
-
-        redisClient.smembers(key, function(err, itemIds) {
-          if(err) return done(err);
-
-          var multi = redisClient.multi();
-
-          var zaddArgs = [key];
-
-          var itemIdsWithScores = itemIds.map(function(itemId) {
-            var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
-
-            /* ZADD score member */
-            return [timestamp, itemId];
-          });
-
-
-          /* Sort by timestamp */
-          itemIdsWithScores.sort(function(a, b) {
-            return a[0] - b[0];
-          });
-
-          /* Truncate down to 100 */
-          itemIdsWithScores = itemIdsWithScores.slice(-100);
-
-          itemIdsWithScores.forEach(function(itemWithScore) {
-            /* ZADD score member */
-            zaddArgs.push(itemWithScore[0], itemWithScore[1]);
-          });
-
-          multi.del(key);
-          multi.zadd.apply(multi, zaddArgs);
-          multi.zrem(userBadgeKey, troupeId);
-          multi.zadd(userBadgeKey, itemIdsWithScores.length, troupeId);
-
-          multi.exec(done);
-
-        });
-
-
-      });
-    });
-  });
-
-  return d.promise;
-}
-
 /**
  *
  * Note: mentionUserIds must always be a subset of usersIds (or equal)
@@ -136,12 +43,12 @@ function newItemWithMentions(troupeId, itemId, userIds, mentionUserIds) {
   return runScript('unread-add-item-with-mentions', keys, values)
     .then(function(result) {
       var resultHash = {};
-
+      var upgradeCount = 0;
       userIds.forEach(function(userId) {
         var troupeUnreadCount   = result.shift();
         var flag                = result.shift();
         var badgeUpdate         = !!(flag & 1);
-        var upgradeKey          = flag & 2;
+        var upgradedKey          = flag & 2;
 
         if (badgeUpdate) {
           engine.emit('badge.update', userId);
@@ -156,11 +63,16 @@ function newItemWithMentions(troupeId, itemId, userIds, mentionUserIds) {
           badgeUpdate: badgeUpdate
         };
 
-        if(upgradeKey) {
-          // Upgrades can happen asynchoronously
-          upgradeKeyToSortedSet(userId, troupeId);
+        if(upgradedKey) {
+          upgradeCount++;
         }
       });
+
+      if (upgradeCount > 10) {
+        winston.warn('unread-items: upgraded keys for ' + upgradeCount + ' user:troupes');
+      } else if(upgradeCount > 0) {
+        winston.info('unread-items: upgraded keys for ' + upgradeCount + ' user:troupes');
+      }
 
       mentionUserIds.forEach(function(mentionUserId) {
         var mentionCount = result.shift();
@@ -256,6 +168,7 @@ function ensureAllItemsRead(userId, troupeId) {
 
       return {
         unreadCount: 0,
+        mentionCount: 0,
         badgeUpdate: badgeUpdate
       };
     });
