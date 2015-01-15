@@ -58,3 +58,4 @@ redis-lua/unread/tests/luacov.stats.out
 test/redis-lua/luacov.report.out
 test/redis-lua/luacov.stats.out
 luacov.report.out
+sentinel.dev.conf
