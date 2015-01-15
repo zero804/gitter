@@ -2,8 +2,12 @@
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+echo "Using redis host $TEST_REDIS_HOST"
+
+export TEST_REDIS_HOST
+
 cd $SCRIPT_DIR
-mkdir -p ../../output/tap/redis-lua
+mkdir -p ../../output/test-reports/
 rm -f luacov.*
-busted -c --output=TAP . >  ../../output/tap/redis-lua/busted.tap
+busted -c --output=junit . >  ../../output/test-reports/redis-lua.xml
 cat luacov.report.out
