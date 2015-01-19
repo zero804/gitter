@@ -1,6 +1,4 @@
 "use strict";
-/* jshint unused:true, browser:true,  strict:true */
-/* global define:false */
 var $ = require('jquery-iframely');
 var oEmbed = require('oEmbed');
 
@@ -65,7 +63,13 @@ module.exports = (function() {
                 isCollapsible = true;
               }
 
-              var embeddedContent = $($.parseHTML(embed.html, null, true));
+
+              var embeddedContent;
+              if(typeof embed.html === 'string') {
+                embeddedContent = $($.parseHTML(embed.html, null, true));
+              } else {
+                embeddedContent = embed.html;
+              }
               adjustBounds(embeddedContent);
 
               var $embed = $(document.createElement('div'));
