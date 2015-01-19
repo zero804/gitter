@@ -1,25 +1,50 @@
 /* jshint unused:true, browser:true,  strict:true */
 /* global define:false */
-define(['jquery-iframely', 'utils/context'], function ($, context) {
+define(['jquery', 'jquery-iframely', 'utils/context'], function ($, $iframe, context) {
   "use strict";
 
-  var oEmbedProviders = {};
-  var iframelyProviders = [];
-  var lookups = [];
+  var iframelyProviders = ["youtube.com",
+    "www.youtube.com",
+    "youtu.be",
+    "instagram.com",
+    "instagr.am",
+    "instagr.am",
+    "cloudup.com",
+    "cl.ly",
+    "dl.dropboxusercontent.com",
+    "dropbox.com/s",
+    "codepen.io",
+    "gist.github.com",
+    "vine.co",
+    "goo.gl",
+    "twitter.com",
+    "soundcloud.com",
+    "snd.sc",
+    "rd.io",
+    "rdio.com",
+    "www.mixcloud.com",
+    "www.meetup.com",
+    "www.dailymotion.com",
+    "meetu.ps",
+    "open.spotify.com",
+    "stream.tv/recorded",
+    "photobucket.com",
+    "www.slideshare.net",
+    "jsfiddle.net",
+    "speakerdeck.com",
+    "www.behance.net",
+    "dribbble.com",
+    "vimeo.com",
+    "www.flickr.com",
+    "flic.kr",
+    "500px.com"
+    ].map(function(m) {
+      var urlRe = m.replace(/[\.\/]/g, function(f) { return "\\" + f[0]; });
+      return new RegExp('https?:\\/\\/' + urlRe + '\\/.+');
+    });
+
   var embedEnv = context.env('embed');
   $.iframely.defaults.endpoint = embedEnv.basepath+'/'+embedEnv.cacheBuster+'/iframely';
-
-  function addOEmbedProvider(name, patterns, endpoint, opts) {
-    oEmbedProviders[name] = {
-      patterns:   patterns,
-      endpoint:   endpoint,
-      opts:       opts
-    };
-
-    patterns.forEach(function(pattern) {
-      lookups.push({name: name, re: new RegExp(pattern)});
-    });
-  }
 
   function fetchAndRenderIframely(url, cb) {
     $.iframely.getPageData(url, function(error, data) {
@@ -30,78 +55,62 @@ define(['jquery-iframely', 'utils/context'], function ($, context) {
   }
 
   function isIframelyLinkSupported(link) {
-    var supportedRels = ['image', 'player', 'thumbnail', 'app'];
+    var supportedRels = ['reader', 'image', 'player', 'thumbnail', 'app'];
     return supportedRels.some(function(supportedRel) {
       return link.rel.indexOf(supportedRel) > -1;
     });
   }
 
   function canBeLimitedByHeight(link) {
-    var shrinkableRels = ['app'];
+    var shrinkableRels = ['app', 'reader', 'player'];
     return shrinkableRels.some(function(supportedRel) {
       return link.rel.indexOf(supportedRel) > -1;
     });
   }
 
+  function findBestType(type, links) {
+    var filtered = links.filter(function(f) { return f.rel.indexOf(type) >= 0; });
+    if (!filtered.length) return;
+    if (filtered.length == 1) return filtered[0];
+    var responsive = filtered.filter(function(f) { return f.rel.indexOf('responsive') >= 0; });
+
+    if (responsive.length >= 1) return responsive[0];
+
+    var hasAspect = filtered.filter(function(f) { return f.media && f.media['aspect-ratio'] > 0; });
+    if (hasAspect.length >= 1) return hasAspect[0];
+
+    return filtered[0];
+  }
+
+  function findBestLink(links) {
+    var primaryRelTypes = ['player', 'app', 'reader', 'survey', 'image', 'thumbnail'];
+    for(var i = 0; i < primaryRelTypes.length; i++) {
+      var l = findBestType(primaryRelTypes[i], links);
+      if (l) return l;
+    }
+  }
+
+
   function renderBestContent(iframelyData, cb) {
     var match;
     var limitHeight;
-    iframelyData.links.forEach(function(link) {
-      if(!match && isIframelyLinkSupported(link)) {
-        match = link;
-        limitHeight = canBeLimitedByHeight(link);
-      }
-    });
+
+    var match = findBestLink(iframelyData.links);
 
     if(!match) return cb(null);
 
     var $el = $.iframely.generateLinkElement(match, iframelyData);
-    cb({html: $el[0].outerHTML, limitHeight: limitHeight});
-  }
-
-  function fetch(provider, url, cb) {
-    var data = {
-      url:    url,
-      format: 'json'
-    };
-
-    if (provider.opts) {
-      for (var key in provider.opts) {
-        data[key] = provider.opts[key];
-      }
-    }
-
-    $.ajax({
-      url:          provider.endpoint,
-      dataType:     'jsonp',
-      crossDomain:  true,
-      data:         data,
-      success:      function(data) { cb(data); },
-      error:        function() { cb(null); }
-    });
+    cb({html: $el, limitHeight: limitHeight});
   }
 
   // image decorator
   function parse(url, cb) {
-    var providerName = supported(url);
     var imageUrl = url.match(/https?:\/\/(.+)(\.jpe?g|\.gif|\.png)$/i);
 
-    if (iframelySupported(url)) {
+    if (iframelySupported(url) || imageUrl) {
       fetchAndRenderIframely(url, cb);
-    } else if (providerName) {
-      fetch(oEmbedProviders[providerName], url, cb);
-    } else if (imageUrl) {
-      var imgTag = '<img src="' + imageUrl[0] + '">';
-      var embed  = {html: imgTag};
-      cb(embed);
     } else {
       cb(null);
-    }
-  }
-
-  function supported(url) {
-    for (var i = 0; i < lookups.length; i++) {
-      if (url.match(lookups[i].re)) return lookups[i].name;
     }
   }
 
@@ -110,30 +119,6 @@ define(['jquery-iframely', 'utils/context'], function ($, context) {
       return url.match(re);
     });
   }
-
-  // Native oEmbedProviders
-  addOEmbedProvider("spotify",      ["open.spotify.com/(track|album|user)/"],           "//embed.spotify.com/oembed/");
-  addOEmbedProvider("rdio.com",     ["rd.io/.+","rdio.com"],                            "//www.rdio.com/api/oembed/");
-  addOEmbedProvider("Soundcloud",   ["soundcloud.com/.+","snd.sc/.+"],                  "//soundcloud.com/oembed", {format: 'js', maxheight: 200});
-  addOEmbedProvider("twitter",      ["twitter.com/.+"],                                 "//api.twitter.com/1/statuses/oembed.json");
-  addOEmbedProvider("meetup",       ["meetup.(com|ps)/.+"],                             "//api.meetup.com/oembed");
-  addOEmbedProvider("vimeo",        ["vimeo.com/groups/.*/videos/.*", "vimeo.com/.*"],  "//vimeo.com/api/oembed.json");
-  addOEmbedProvider("dailymotion",  ["dailymotion.com/.+"],                             "//www.dailymotion.com/services/oembed");
-  addOEmbedProvider("ustream",      ["ustream.tv/recorded/.*"],                         "//www.ustream.tv/oembed");
-  addOEmbedProvider("photobucket",  ["photobucket.com/(albums|groups)/.+"],             "//photobucket.com/oembed/");
-  addOEmbedProvider("slideshare",   ["slideshare.net"],                                 "//www.slideshare.net/api/oembed/2",{format:'jsonp'});
-  addOEmbedProvider("jsbin",        ["jsbin.com"],                                      "//jsbin.com/oembed",{format:'jsonp'});
-
-
-  iframelyProviders.push(new RegExp("youtube\\.com/watch"));
-  iframelyProviders.push(/https?:\/\/youtu\.be\//);
-  iframelyProviders.push(new RegExp("instagr\\.?am(\\.com)?/p/"));
-  // 15 Sep 2014: disabling gist provider until we can do something better
-  // iframelyProviders.push(new RegExp("gist\\.github\\.com/.+/.+"));
-  iframelyProviders.push(new RegExp("cloudup\\.com"));
-  iframelyProviders.push(new RegExp("cl\\.ly/.+"));
-  iframelyProviders.push(new RegExp("dl\\.dropboxusercontent\\.com"));
-  iframelyProviders.push(new RegExp("dropbox\\.com/s/.+"));
 
   return { parse: parse };
 
