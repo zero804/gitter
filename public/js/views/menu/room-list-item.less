@@ -77,9 +77,13 @@ body.hover .room-list-item:hover:not(.room-list-item--current-room),
   .prepend-121-icon;
 }
 
+body.hover .room-list-item:hover span {
+  max-width: 175px;
+}
+
 .room-list-item span {
   white-space: nowrap;
-  max-width: 190px;
+  max-width: 210px;
   overflow: hidden;
   text-overflow: ellipsis;
   vertical-align: middle;
@@ -111,10 +115,6 @@ body.hover .room-list-item:hover:not(.room-list-item--current-room),
   background-color: @trpGreen;
 }
 
-body.hover .room-list-item:hover .room-list-item__unread-badge {
-  display: none;
-}
-
 .room-list-item__unread-badge.shown {
   display: inline;
 }
@@ -128,10 +128,6 @@ body.hover .room-list-item:hover .room-list-item__unread-badge {
   font-family: 'troupe-icons';
   content: '\e827';
   font-size: 14px;
-}
-
-.room-list-item__leave {
-  margin-right: 2px;
 }
 
 .room-list-item__leave:before {
