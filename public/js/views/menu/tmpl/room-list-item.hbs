@@ -1,18 +1,18 @@
 {{#if ethereal}}
-  <span class="room-list-item__name {{iconClass}}" title="{{title}}">{{name}}</span>
+  <span class="room-list-item__name {{ iconClass }}" title="{{title}}">{{ name }}</span>
 {{else}}
-  <span class="room-list-item__name {{iconClass}}" title="{{title}}">{{name}}</span>
+  <span class="room-list-item__name {{ iconClass }}" title="{{title}}">{{ name }}</span>
   <div class="room-list-item__labels">
-    {{#if unreadItems}}
-      <span class="js-unread-badge room-list-item__unread-badge">{{unreadItems}}</span>
-    {{/if}}
     {{#unless oneToOne}}
       {{#unless mentions}}
-        <span class="js-leave-button room-list-item__leave" data-id="{{id}}" title="Leave"></span>
+        <span class="js-leave-button room-list-item__leave" data-id="{{ id }}" title="Leave"></span>
       {{/unless}}
     {{/unless}}
     {{#unless lurk}}
-      <span class="js-close-button room-list-item__close" data-id="{{id}}" title="Hide"></span>
+      <span class="js-close-button room-list-item__close" data-id="{{ id }}" title="Hide"></span>
     {{/unless}}
+    {{#if unreadItems}}
+      <span class="js-unread-badge room-list-item__unread-badge">{{ unreadItems }}</span>
+    {{/if}}
   </div>
 {{/if}}
