@@ -4,44 +4,6 @@ var oEmbed = require('oEmbed');
 
 module.exports = (function() {
 
-  var MAX_HEIGHT = 640;
-  var MAX_WIDTH = 640;
-
-  function adjustBounds($fragment) {
-    var iframe;
-    if(!$fragment.length) return;
-    if($fragment[0].tagName === 'IFRAME') {
-      iframe = $fragment;
-    } else {
-      iframe = $fragment.find('iframe');
-      if(iframe.length === 0) return;
-    }
-
-    var height = iframe.attr('height') || 0;
-    var width = iframe.attr('width') || 0;
-
-    var scale;
-    if(height > MAX_HEIGHT) {
-      scale = MAX_HEIGHT / height;
-      height = MAX_HEIGHT;
-      width = width * scale;
-    }
-
-    if(width > MAX_WIDTH) {
-      scale = MAX_WIDTH / width;
-      width = MAX_WIDTH;
-      height = height * scale;
-    }
-
-    if(height) {
-      iframe.attr('height', Math.round(height));
-    }
-
-    if(width) {
-      iframe.attr('width', Math.round(width));
-    }
-  }
-
   function embed(chatItemView) {
     var model = chatItemView.model;
 
@@ -53,7 +15,7 @@ module.exports = (function() {
     var isCollapsible = false;
     chatItemView.$el
       .find('a.link')
-      .each(function (index, el) {
+      .each(function (index, el) { // jshint unused:true
         if (el.childElementCount === 0 && (el.innerText || el.textContent) === el.href) {
           oEmbed.parse(el.href, function (embed) {
             if (embed && embed.html) {
@@ -63,14 +25,12 @@ module.exports = (function() {
                 isCollapsible = true;
               }
 
-
               var embeddedContent;
               if(typeof embed.html === 'string') {
                 embeddedContent = $($.parseHTML(embed.html, null, true));
               } else {
                 embeddedContent = embed.html;
               }
-              adjustBounds(embeddedContent);
 
               var $embed = $(document.createElement('div'));
               $embed.addClass('embed');
