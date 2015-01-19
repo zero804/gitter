@@ -227,16 +227,42 @@ function listTroupeUsersForEmailNotifications(horizonTime, emailLatchExpiryTimeS
     .then(function(troupeUserHash) {
       if (!troupeUserHash) return {};
 
+      var userTroupesForNotification = {};
+
       /* Filter out values which are too recent */
-      var filteredKeys = Object.keys(troupeUserHash).filter(function(key) {
+      Object.keys(troupeUserHash).forEach(function(key) {
         var value = troupeUserHash[key];
-        if(value === 'null') return false;
+        if(value === 'null') return;
 
         var oldest = parseInt(value, 10);
-        return oldest <= horizonTime;
+        if (oldest <= horizonTime) {
+          userTroupesForNotification[key] = 1;
+        }
       });
 
-      if(!filteredKeys.length) return {};
+      if(!Object.keys(userTroupesForNotification).length) return {};
+
+      // Find the distinct list of users
+      var distinctUserIds = {};
+      Object.keys(userTroupesForNotification).forEach(function(troupeUserKey) {
+        var troupeUserId = troupeUserKey.split(':');
+        var userId = troupeUserId[1];
+        distinctUserIds[userId] = 1;
+      });
+
+
+      /* Add in all the rooms for the users we are going to email */
+      /* Filter out values which are too recent */
+      Object.keys(troupeUserHash).forEach(function(key) {
+        var troupeUserId = key.split(':');
+        var userId = troupeUserId[1];
+
+        if (distinctUserIds[userId]) {
+          userTroupesForNotification[key] = 1;
+        }
+      });
+
+      var filteredKeys = Object.keys(userTroupesForNotification);
 
       var keys = [EMAIL_NOTIFICATION_HASH_KEY].concat(filteredKeys.map(function(troupeUserKey) {
         return 'uel:' + troupeUserKey;
