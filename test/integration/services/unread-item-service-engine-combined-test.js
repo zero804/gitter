@@ -9,7 +9,7 @@ var qlimit = require('qlimit');
 var limit = qlimit(3);
 var _ = require('underscore');
 
-var TEST_ITERATIONS = 350;
+var TEST_ITERATIONS = 200;
 
 Q.longStackSupport = true;
 
