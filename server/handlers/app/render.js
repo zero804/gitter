@@ -279,7 +279,9 @@ function renderNotFound(req, res, next) {
   var org = req.uriContext && req.uriContext.uri;
   var strategy = new restSerializer.TroupeStrategy();
 
-  return PersistenceService.Troupe.findQ({ lcOwner: org.toLowerCase(), security: 'PUBLIC' })
+  return PersistenceService.Troupe.find({ lcOwner: org.toLowerCase(), security: 'PUBLIC' })
+    .sort({ userCount: 'desc' })
+    .execQ()
     .then(function (rooms) {
       return new Q(restSerializer.serialize(rooms, strategy));
     })
