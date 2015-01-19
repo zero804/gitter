@@ -8,11 +8,10 @@ define(['jquery', 'jquery-iframely', 'utils/context'], function ($, $iframe, con
     "youtu.be",
     "instagram.com",
     "instagr.am",
-    "instagr.am",
     "cloudup.com",
     "cl.ly",
     "dl.dropboxusercontent.com",
-    "dropbox.com/s",
+    "www.dropbox.com/s",
     "codepen.io",
     "gist.github.com",
     "vine.co",
@@ -43,6 +42,8 @@ define(['jquery', 'jquery-iframely', 'utils/context'], function ($, $iframe, con
       return new RegExp('https?:\\/\\/' + urlRe + '\\/.+');
     });
 
+  var MAX_HEIGHT = 640;
+
   var embedEnv = context.env('embed');
   $.iframely.defaults.endpoint = embedEnv.basepath+'/'+embedEnv.cacheBuster+'/iframely';
 
@@ -51,20 +52,6 @@ define(['jquery', 'jquery-iframely', 'utils/context'], function ($, $iframe, con
       if(error) return cb(null);
 
       renderBestContent(data, cb);
-    });
-  }
-
-  function isIframelyLinkSupported(link) {
-    var supportedRels = ['reader', 'image', 'player', 'thumbnail', 'app'];
-    return supportedRels.some(function(supportedRel) {
-      return link.rel.indexOf(supportedRel) > -1;
-    });
-  }
-
-  function canBeLimitedByHeight(link) {
-    var shrinkableRels = ['app', 'reader', 'player'];
-    return shrinkableRels.some(function(supportedRel) {
-      return link.rel.indexOf(supportedRel) > -1;
     });
   }
 
@@ -82,25 +69,46 @@ define(['jquery', 'jquery-iframely', 'utils/context'], function ($, $iframe, con
     return filtered[0];
   }
 
+
+  function findBestImageType(type, links) {
+    var filtered = links.filter(function(f) { return f.rel.indexOf(type) >= 0; });
+    if (!filtered.length) return;
+
+    /* Get closest size to 640 height */
+    filtered.sort(function(a, b) {
+      var aH = Math.abs((a.media && a.media.height || 0) - MAX_HEIGHT);
+      var bH = Math.abs((b.media && b.media.height || 0) - MAX_HEIGHT);
+
+      return aH - bH;
+    });
+
+    return filter[0];
+  }
+
   function findBestLink(links) {
-    var primaryRelTypes = ['player', 'app', 'reader', 'survey', 'image', 'thumbnail'];
+    var primaryRelTypes = ['player', 'app', 'reader', 'survey'];
     for(var i = 0; i < primaryRelTypes.length; i++) {
       var l = findBestType(primaryRelTypes[i], links);
       if (l) return l;
     }
+
+    var image = findBestImageType('image', links);
+    if (image) return image;
+
+    image = findBestImageType('thumbnail', links);
+    if (image) return image;
   }
 
 
   function renderBestContent(iframelyData, cb) {
-    var match;
-    var limitHeight;
-
     var match = findBestLink(iframelyData.links);
 
     if(!match) return cb(null);
 
     var $el = $.iframely.generateLinkElement(match, iframelyData);
-    cb({html: $el, limitHeight: limitHeight});
+    var aspectRatio = match.media && match.media['aspect-ratio'];
+    var maxWidth = aspectRatio && Math.floor(aspectRatio * MAX_HEIGHT);
+    cb({ html: $el, maxWidth: maxWidth });
   }
 
   // image decorator

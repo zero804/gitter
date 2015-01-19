@@ -78,8 +78,8 @@ module.exports = (function() {
                 chatItemView.expandFunction($embed);
               }
 
-              if (embed.limitHeight) {
-                $embed.addClass('embed-limited');
+              if (embed.maxWidth) {
+                $embed.css({ "max-width": embed.maxWidth + "px" });
               }
 
               $embed.html(embeddedContent);
