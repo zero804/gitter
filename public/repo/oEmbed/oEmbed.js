@@ -38,8 +38,8 @@ var iframelyProviders = ["youtube.com",
   "vimeo.com",
   "www.flickr.com",
   "flic.kr",
-  "500px.com",
-  /https?:\/\/www.google\.\w{2,3}(\.\w{2,3})?\/maps/
+  "500px.com" /*,
+  /https?:\/\/www.google\.\w{2,3}(\.\w{2,3})?\/maps/ */
   ].map(function(m) {
     if (typeof m === 'object') return m;
     var urlRe = m.replace(/[\.\/]/g, function(f) { return "\\" + f[0]; });
