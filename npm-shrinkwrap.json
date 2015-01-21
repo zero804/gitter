@@ -1192,9 +1192,8 @@
       }
     },
     "gitter-env": {
-      "version": "0.19.3",
+      "version": "0.19.4",
       "from": "gitter-env@latest",
-      "resolved": "http://beta-internal:8089/nexus/content/groups/npm/gitter-env/-/gitter-env-0.19.3.tgz",
       "dependencies": {
         "async": {
           "version": "0.8.0",
