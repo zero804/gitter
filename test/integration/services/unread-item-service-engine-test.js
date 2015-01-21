@@ -15,11 +15,12 @@ describe('unread-item-service', function() {
 
   describe('single test cases', function() {
 
-    var unreadItemServiceEngine, troupeId1, itemId1, itemId2, itemId3, userId1, userId2, userIds;
+    var unreadItemServiceEngine, troupeId1, itemId1, itemId2, itemId3, userId1, userId2, userIds, troupeId2;
 
     beforeEach(function() {
       unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
       troupeId1 = mongoUtils.getNewObjectIdString();
+      troupeId2 = mongoUtils.getNewObjectIdString();
       userId1 = mongoUtils.getNewObjectIdString();
       userId2 = mongoUtils.getNewObjectIdString();
       itemId1 = mongoUtils.getNewObjectIdString();
@@ -385,6 +386,30 @@ describe('unread-item-service', function() {
               assert(results[userId1][troupeId1]);
             })
             .delay(1100)
+            .then(function() {
+              return unreadItemServiceEngine.listTroupeUsersForEmailNotifications(Date.now(), 1);
+            })
+            .then(function(results) {
+              assert(!results[userId1]);
+            })
+            .nodeify(done);
+        });
+
+        it('should batch up emails for a user', function(done) {
+          return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], [])
+            .delay(500)
+            .then(function() {
+              return unreadItemServiceEngine.newItemWithMentions(troupeId2, itemId2, [userId1], []);
+            })
+            .then(function() {
+              return unreadItemServiceEngine.listTroupeUsersForEmailNotifications(Date.now(), 600);
+            })
+            .then(function(results) {
+              assert(results[userId1]);
+              assert(results[userId1][troupeId1]);
+              assert(results[userId1][troupeId2]);
+            })
+            .delay(100)
             .then(function() {
               return unreadItemServiceEngine.listTroupeUsersForEmailNotifications(Date.now(), 1);
             })
