@@ -1,10 +1,19 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var env            = require('../utils/env');
+
 var mongoose       = require('../utils/mongoose-q');
 var winston        = require('../utils/winston');
 var nconf          = require("../utils/config");
 var shutdown       = require('shutdown');
+
+var mongoDogStats  = require('mongodb-datadog-stats');
+
+mongoDogStats.install(mongoose.mongo, {
+  statsClient: env.createStatsClient(),
+  sampleRate: 0.5
+});
 
 // Install inc and dec number fields in mongoose
 require('mongoose-number')(mongoose);
