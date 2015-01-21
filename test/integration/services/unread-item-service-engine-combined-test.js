@@ -9,12 +9,12 @@ var qlimit = require('qlimit');
 var limit = qlimit(3);
 var _ = require('underscore');
 
-var TEST_ITERATIONS = 350;
+var TEST_ITERATIONS = 200;
 
 Q.longStackSupport = true;
 
 describe('unread-item-service-engine-combined', function() {
-  this.timeout(5000);
+  this.timeout(15000);
 
   describe('integration tests', function() {
     var unreadItemServiceEngine, troupeId1, userId1;

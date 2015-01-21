@@ -9,7 +9,7 @@ module.exports = (function() {
       var highlightElement = document.createElement('em');
       highlightElement.classList.add('highlight');
 
-      highlightElement.innerText = term;
+      highlightElement.textContent = term;
 
       node.splitText(index);
       node.nextSibling.nodeValue = node.nextSibling.nodeValue.substr(term.length, node.nextSibling.nodeValue.length);

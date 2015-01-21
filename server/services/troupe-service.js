@@ -561,12 +561,14 @@ function findAllImplicitContactUserIds(userId, callback) {
 
 function deleteTroupe(troupe, callback) {
   if(troupe.status != 'ACTIVE') return callback("Troupe is not active");
-  if(troupe.users.length !== 1) return callback("Can only delete troupes that have a single user");
-
+  if(!troupe.oneToOne && troupe.users.length !== 1) return callback("Can only delete troupes that have a single user");
   troupe.status = 'DELETED';
   troupe.dateDeleted = new Date();
   troupe.removeUserById(troupe.users[0].userId);
-  troupe.saveQ()
+  if (troupe.oneToOne) {
+    troupe.removeUserById(troupe.users[1].userId);
+  }
+  return troupe.saveQ()
     .then(function() {
       appEvents.troupeDeleted(troupe.id);
     })

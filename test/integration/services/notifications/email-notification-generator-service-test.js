@@ -25,6 +25,7 @@ var unreadItemServiceMock = mockito.spy(underlyingUnreadItemService);
 // unreadItemServiceMock.install();
 
 describe('email-notification-generator-service', function() {
+  this.timeout(5000);
   var fixture = {};
 
   beforeEach(fixtureLoader(fixture, {
