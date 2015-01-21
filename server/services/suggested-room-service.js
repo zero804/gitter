@@ -29,12 +29,6 @@ var HILIGHTED_ROOMS = [
     language: 'JavaScript',
     githubType: 'ORG_CHANNEL',
     localeLanguage: 'en'
-  }, {
-    uri: 'lotus/chat',
-    channel: true,
-    language: 'Ruby',
-    githubType: 'REPO',
-    localeLanguage: 'en'
   },{
     uri: 'rom-rb/chat',
     channel: true,
@@ -55,21 +49,6 @@ var HILIGHTED_ROOMS = [
   }, {
     uri: 'angular-ui/ng-grid',
     language: 'JavaScript',
-    githubType: 'REPO',
-    localeLanguage: 'en'
-  }, {
-    uri: 'opscode/supermarket',
-    language: 'Ruby',
-    githubType: 'REPO',
-    localeLanguage: 'en'
-  }, {
-    uri: 'MahApps/MahApps.Metro',
-    language: 'PowerShell',
-    githubType: 'REPO',
-    localeLanguage: 'en'
-  }, {
-    uri: 'sympy/sympy',
-    language: 'Python',
     githubType: 'REPO',
     localeLanguage: 'en'
   }

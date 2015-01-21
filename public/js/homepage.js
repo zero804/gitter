@@ -61,21 +61,6 @@ var featuredRooms  = [
     name: 'Angular UI',
     language: 'JavaScript',
     locale: 'en'
-  },
-  { uri: 'opscode/supermarket',
-    name: 'Supermarket',
-    language: 'Ruby',
-    locale: 'en'
-  },
-  { uri: 'MahApps/MahApps.Metro',
-    name:'MahApps.Metro',
-    language: 'PowerShell',
-    locale: 'en'
-  },
-  { uri: 'sympy/sympy',
-    name: 'Sympy',
-    language: 'Python',
-    locale: 'en'
   }
 ];
 
