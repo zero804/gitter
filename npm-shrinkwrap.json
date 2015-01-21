@@ -1192,9 +1192,8 @@
       }
     },
     "gitter-env": {
-      "version": "0.19.2",
+      "version": "0.19.5",
       "from": "gitter-env@latest",
-      "resolved": "http://beta-internal:8089/nexus/content/groups/npm/gitter-env/-/gitter-env-0.19.2.tgz",
       "dependencies": {
         "async": {
           "version": "0.8.0",
@@ -1203,13 +1202,8 @@
         },
         "blocked": {
           "version": "1.1.0",
-          "from": "blocked@>=1.0.0 <2.0.0",
+          "from": "blocked@>=1.1.0 <2.0.0",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/blocked/-/blocked-1.1.0.tgz"
-        },
-        "clockout": {
-          "version": "0.0.1",
-          "from": "clockout@0.0.1",
-          "resolved": "http://beta-internal:8089/nexus/content/groups/npm/clockout/-/clockout-0.0.1.tgz"
         },
         "gitter-private-cube": {
           "version": "0.2.12",
