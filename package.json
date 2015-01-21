@@ -23,7 +23,7 @@
     "express-resource": "1.0.0",
     "express3-handlebars": "~0.4.1",
     "faye-websocket": "^0.7.2",
-    "gitter-env": "^0.19.1",
+    "gitter-env": "^0.19.2",
     "gitter-faye": "^1.1.0-a",
     "gitter-faye-redis": "^0.4.4",
     "gitter-markdown-processor": "^7.1.3",
