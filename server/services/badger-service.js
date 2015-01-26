@@ -12,6 +12,7 @@ var env                  = require('../utils/env');
 var logger               = env.logger;
 var stats                = env.stats;
 var StatusError          = require('statuserror');
+var badgeInserter        = require('./badge-inserter');
 
 function Client(token) {
   var client = github.client(token);
@@ -78,31 +79,6 @@ function pullRequestHeadFromBranch(branch) {
   if(!m) return;
 
   return m[1] + ':' + branchName;
-}
-
-function findIdealLineForInsert(lines) {
-  if(lines.length === 0) return 0;
-  var i = 0;
-  var seenHeader = false;
-
-  for(;i < lines.length;i++) {
-    if(/^\s*(\#+|={3,}|-{3,})/.test(lines[i])) {
-      seenHeader = true;
-    } else {
-      if(seenHeader) break;
-    }
-  }
-
-  return i;
-}
-
-function injectBadgeIntoMarkdown(content, badgeContent) {
-  var lines = content.split(/\n/);
-  var idealLine = findIdealLineForInsert(lines) || 0;
-
-  lines.splice(idealLine, 0, badgeContent);
-
-  return lines.join('\n');
 }
 
 function ReadmeUpdater(context) {
@@ -230,7 +206,8 @@ function ReadmeUpdater(context) {
 
           return client.getBlob(blobUrl)
             .then(function(content) {
-              content = injectBadgeIntoMarkdown(content, context.badgeContent);
+              var fileExt = existingReadme.path.split('.').pop();
+              content = badgeInserter(context.sourceRepo, fileExt, content);
 
               context.readmeFileName = existingReadme.path;
               var readme = {
