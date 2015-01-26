@@ -74,7 +74,7 @@ module.exports = (function () {
 
       if (this.handleHide) {
         var hideIcon = this.ui.hide;
-        hideIcon.tooltip({ container: 'body', title: this.options.hideTooltipTitle });
+        hideIcon.tooltip({ container: 'body', title: 'Hide forever' });
       }
     },
 
@@ -287,7 +287,6 @@ module.exports = (function () {
         collectionView: new SuggestedCollectionView({ collection: troupeCollections.suggested }),
         header: 'Suggested Rooms',
         el: ui.suggested,
-        canHide: true,
         // a little bit messy sorry
         handleHide: function () {
           apiClient.user
@@ -296,10 +295,9 @@ module.exports = (function () {
               troupeCollections.suggested.reset(); // is this the correct way of cleaning the collection?
             })
             .fail(function (err) {
-              // TODO: handle case the settings cannot be saved
+              log.error(err);
             });
-        },
-        hideTooltipTitle: "Hide forever."
+        }
       });
     },
 
