@@ -7,17 +7,17 @@ module.exports = {
 
     // Secure the REST API
     ['/v1/:res(troupes|rooms)', '/v1/user'].forEach(function(path) {
-        app.all(apiRoot + path, authMiddleware);
-        app.all(apiRoot + path + '/', authMiddleware);
-        app.all(apiRoot + path + '/*', authMiddleware);
+      app.all(apiRoot + path, authMiddleware);
+      app.all(apiRoot + path + '/', authMiddleware);
+      app.all(apiRoot + path + '/*', authMiddleware);
     });
 
     var troupesResource = app.resource(resourceApiRoot + 'v1/:res(troupes|rooms)',  require('./troupes/troupes'));
 
     function installTroupeSubResource(resourceName, moduleName) {
-        var r = app.resource(resourceName,  require('./troupes/' + moduleName));
-        troupesResource.add(r);
-        return r;
+      var r = app.resource(resourceName,  require('./troupes/' + moduleName));
+      troupesResource.add(r);
+      return r;
     }
 
     // loop?
@@ -34,10 +34,11 @@ module.exports = {
     installTroupeSubResource('events', 'events');
 
     var userResource = app.resource(resourceApiRoot + 'v1/user',  require('./user/user.js'));
+
     function installUserSubResource(resourceName, moduleName) {
-        var r = new Resource(resourceName, require('./user/' + moduleName), app);
-        userResource.add(r);
-        return r;
+      var r = new Resource(resourceName, require('./user/' + moduleName), app);
+      userResource.add(r);
+      return r;
     }
 
     var userTroupeResource = installUserSubResource(':res(troupes|rooms)', 'troupes');
@@ -54,6 +55,7 @@ module.exports = {
     installUserSubResource('orgs',        'orgs');
     installUserSubResource('repos',       'repos');
     installUserSubResource('channels',    'channels');
+    installUserSubResource('settings',    'user-settings');
     installUserSubResource('unreadItems', 'aggregated-unread-items');
   }
 };
