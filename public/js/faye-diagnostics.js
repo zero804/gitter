@@ -6,12 +6,12 @@ var log = require('./utils/log');
 var count = 0;
 function updateCount() {
   var t = document.querySelector('#total');
-  t.innerText = count;
+  t.textContent = count;
 }
 var subscription = realtime.subscribe('/private/diagnostics', function(message) {
   count++;
   var div = document.createElement('DIV');
-  div.innerText = JSON.stringify(message);
+  div.textContent = JSON.stringify(message);
   document.body.appendChild(div);
   updateCount();
   log.info('Message', message);
