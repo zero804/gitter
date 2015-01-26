@@ -125,28 +125,6 @@ function ReadmeUpdater(context) {
       });
   }
 
-  function getReadMeAwait(repo) {
-    var count = 0;
-    var url = format('/repos/%s/readme', repo);
-
-    function get() {
-      count++;
-      if(count > 60 /* two minutes */) {
-        return Q.resolve(new Error('Timeout'));
-      }
-
-      return client.get(url, {})
-        .fail(function(err) {
-          if(err.status === 409 || err.status === 404) throw err;
-          logger.info('Ignoring failed GitHub request to ' + url + ' failed: ' + err);
-          return Q.delay(2000).then(get);
-        });
-    }
-
-    return get();
-
-  }
-
   // GitHub can take some time after a fork to setup the gitrefs
   // Await the operation completion
   function getRefsAwait(repo) {
