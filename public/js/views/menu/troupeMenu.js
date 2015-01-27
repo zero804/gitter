@@ -16,7 +16,11 @@ var CollectionWrapperViewTemplate = require('./tmpl/collection-wrapper-view.hbs'
 var ProfileView = require('./profileView');
 var OrgCollectionView = require('./orgCollectionView');
 
+var apiClient = require('components/apiClient');
+
 require('nanoscroller');
+
+var SUGGESTED_ROOMS_THRESHOLD = 10; // non inclusive
 
 module.exports = (function () {
 
@@ -29,6 +33,14 @@ module.exports = (function () {
   // wraps a view to give us more control of when to display it or not
   var CollectionWrapperView = Marionette.Layout.extend({
 
+    ui: {
+      hide: '.js-hide',
+    },
+
+    events: {
+      'click @ui.hide': 'handleHide'
+    },
+
     regions: {
       list: "#list"
     },
@@ -36,14 +48,18 @@ module.exports = (function () {
     template: CollectionWrapperViewTemplate,
 
     initialize: function (options) {
+      this.bindUIElements();
+
       this.collectionView = options.collectionView;
       this.collection = this.collectionView.collection;
       this.listenTo(this.collection, 'sync', this.render);
       this.listenTo(this.collection, 'sync add reset remove', this.display);
+      this.handleHide = options.handleHide;
     },
 
     serializeData: function () {
       return {
+        canHide: typeof this.handleHide === 'function',
         header: this.options.header
       };
     },
@@ -55,6 +71,11 @@ module.exports = (function () {
         this.$el.hide();
       }
       this.list.show(this.collectionView);
+
+      if (this.handleHide) {
+        var hideIcon = this.ui.hide;
+        hideIcon.tooltip({ container: 'body', title: 'Hide forever' });
+      }
     },
 
     display: function () {
@@ -135,15 +156,19 @@ module.exports = (function () {
       var hasItems = troupeCollections.troupes && !!(troupeCollections.troupes.length);
 
       if (hasItems) {
-        if(troupeCollections.troupes.length < 10) {
-          troupeCollections.suggested.fetch();
-        }
+        this.getSuggestedRooms();
       } else {
         this.listenToOnce(troupeCollections.troupes, 'sync', function() {
-          if(troupeCollections.troupes.length < 10) {
-            troupeCollections.suggested.fetch();
-          }
-        });
+          this.getSuggestedRooms();
+        }.bind(this));
+      }
+    },
+
+    getSuggestedRooms: function () {
+      var suggestedRoomsHidden = context().suggestedRoomsHidden;
+
+      if (!suggestedRoomsHidden && troupeCollections.troupes.length < SUGGESTED_ROOMS_THRESHOLD) {
+        troupeCollections.suggested.fetch();
       }
     },
 
@@ -256,11 +281,22 @@ module.exports = (function () {
         el: ui.orgs
       });
 
-      // Suggested repos (probably hidden at first)
+      // Suggested repos
       new CollectionWrapperView({
         collectionView: new SuggestedCollectionView({ collection: troupeCollections.suggested }),
         header: 'Suggested Rooms',
-        el: ui.suggested
+        el: ui.suggested,
+        // a little bit messy sorry
+        handleHide: function () {
+          apiClient.user
+            .put('/settings/suggestedRoomsHidden', { value: true })
+            .then(function () {
+              troupeCollections.suggested.reset();
+            })
+            .fail(function (err) {
+              log.error(err);
+            });
+        }
       });
     },
 
