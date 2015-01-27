@@ -21,12 +21,12 @@ exports.generateNonChatContext = function(req) {
   return Q.all([
       user ? serializeUser(user) : null,
       user ? determineDesktopNotifications(user, req) : false,
-      user ? userSettingsService.getUserSettings(user.id, 'hideSuggestedRooms') : false,
+      user ? userSettingsService.getUserSettings(user.id, 'suggestedRoomsHidden') : false,
     ])
-    .spread(function (serializedUser, desktopNotifications, hideSuggestedRooms) {
+    .spread(function (serializedUser, desktopNotifications, suggestedRoomsHidden) {
       return createTroupeContext(req, {
         user: serializedUser,
-        hideSuggestedRooms: hideSuggestedRooms,
+        suggestedRoomsHidden: suggestedRoomsHidden,
         desktopNotifications: desktopNotifications,
       });
     });
@@ -177,7 +177,7 @@ function createTroupeContext(req, options) {
     troupe: options.troupe,
     homeUser: options.homeUser,
     accessToken: req.accessToken,
-    hideSuggestedRooms: options.hideSuggestedRooms,
+    suggestedRoomsHidden: options.suggestedRoomsHidden,
     desktopNotifications: options.desktopNotifications,
     events: events,
     troupeUri: options.troupe ? options.troupe.uri : undefined,

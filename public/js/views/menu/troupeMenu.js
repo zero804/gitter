@@ -165,10 +165,9 @@ module.exports = (function () {
     },
 
     getSuggestedRooms: function () {
-      // apiClient.user.put('/settings/hideSuggestedRooms', { value: false });
-      var hideSuggestedRooms = context().hideSuggestedRooms;
+      var suggestedRoomsHidden = context().suggestedRoomsHidden;
 
-      if (!hideSuggestedRooms && troupeCollections.troupes.length < SUGGESTED_ROOMS_THRESHOLD) {
+      if (!suggestedRoomsHidden && troupeCollections.troupes.length < SUGGESTED_ROOMS_THRESHOLD) {
         troupeCollections.suggested.fetch();
       }
     },
@@ -290,7 +289,7 @@ module.exports = (function () {
         // a little bit messy sorry
         handleHide: function () {
           apiClient.user
-            .put('/settings/hideSuggestedRooms', { value: true })
+            .put('/settings/suggestedRoomsHidden', { value: true })
             .then(function () {
               troupeCollections.suggested.reset(); // is this the correct way of cleaning the collection?
             })
