@@ -43,25 +43,6 @@ function Client(token) {
       return d.promise;
     };
   });
-
-  this.getBlob = function(url) {
-    var d = Q.defer();
-    client.request(client.requestOptions({
-      uri: client.buildUrl(url),
-      method: 'GET',
-      headers: {
-        Accept: "application/vnd.github.3.0.raw"
-      },
-      json: false
-    }), function(err, res, body) {
-      if(err) return d.reject(err);
-      if(res.status >= 400) return d.reject(new Error('HTTP ' + res.status));
-
-      return d.resolve(body);
-    });
-
-    return d.promise;
-  };
 }
 var client = new Client('***REMOVED***');
 
@@ -217,28 +198,24 @@ function ReadmeUpdater(context) {
         var existingReadme = findReadme(tree.tree, readme && readme.path);
 
         if(existingReadme) {
-          var blobUrl = urlForGithubClient(existingReadme.url);
 
-          return client.getBlob(blobUrl)
-            .then(function(content) {
-              var fileExt = existingReadme.path.split('.').pop();
+          var content = new Buffer(readme.content, 'base64').toString('utf8');
+          var fileExt = existingReadme.path.split('.').pop();
 
-              content = insertBadge(context.sourceRepo, content, fileExt, context.user);
-              context.insertedplaintext = !badger.hasImageSupport(fileExt);
+          content = insertBadge(context.sourceRepo, content, fileExt, context.user);
+          context.insertedplaintext = !badger.hasImageSupport(fileExt);
 
-              context.readmeFileName = existingReadme.path;
-              var readme = {
-                path: existingReadme.path,
-                mode: existingReadme.mode,
-                content: content
-              };
+          context.readmeFileName = existingReadme.path;
+          var readmeNode = {
+            path: existingReadme.path,
+            mode: existingReadme.mode,
+            content: content
+          };
 
-              return {
-                base_tree: tree.sha,
-                tree: [readme]
-              };
-              // return commitTree(repoName, commit.sha, branch.ref, treeForCommit);
-            });
+          return {
+            base_tree: tree.sha,
+            tree: [readmeNode]
+          };
         }
 
         // No readme file exists
