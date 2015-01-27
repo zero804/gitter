@@ -13,8 +13,8 @@ var userSettingsService = require('../services/user-settings-service');
 var passphrase          = config.get('email:unsubscribeNotificationsSecret');
 
 module.exports = {
-  install: function(app) {
-    app.get('/settings/unsubscribe/:hash', function(req, res, next) {
+  install: function (app) {
+    app.get('/settings/unsubscribe/:hash', function (req, res, next) {
 
       var plaintext;
 
@@ -34,7 +34,7 @@ module.exports = {
       stats.event('unsubscribed_unread_notifications', {userId: userId});
 
       userSettingsService.setUserSettings(userId, 'unread_notifications_optout', 1)
-        .then(function() {
+        .then(function () {
           var msg = "Done. You wont receive notifications like that one in the future.";
 
           res.render('unsubscribe', { layout: 'generic-layout', title: 'Unsubscribe', msg: msg });
@@ -45,14 +45,14 @@ module.exports = {
 
     app.get('/settings/badger/opt-out',
       ensureLoggedIn,
-      function(req, res, next) {
+      function (req, res, next) {
         var userId = req.user.id;
 
         logger.info("User " + userId + " opted-out from auto badgers");
         stats.event('optout_badger', { userId: userId });
 
         return userSettingsService.setUserSettings(userId, 'badger_optout', 1)
-          .then(function() {
+          .then(function () {
             var msg = "Done. We won't send you automatic pull-requests in future.";
 
             res.render('unsubscribe', {
@@ -62,7 +62,6 @@ module.exports = {
             });
           })
           .fail(next);
-
       });
   }
 };
