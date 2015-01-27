@@ -6,6 +6,7 @@ var util = require("util");
 var BaseRetentionAnalyser = require('./base-cohort-analyser');
 var Troupe = require('../../server/services/persistence-service').Troupe;
 var mongoUtils = require('../../server/utils/mongo-utils');
+var collections = require('../../server/utils/collections');
 
 function UserRoomsRetentionAnalyser() {
   BaseRetentionAnalyser.apply(this, arguments);
@@ -40,8 +41,78 @@ UserRoomsRetentionAnalyser.prototype.categoriseUsers = function(allCohortUsers, 
         }, {})
         .value();
 
-      callback(null, categorised);
+      var noneUserIds = _(categorised)
+        .keys()
+        .filter(function(userId) {
+          return categorised[userId] === 'none';
+        })
+        .value();
+
+      if (!noneUserIds.length) return callback(null, categorised);
+
+      var minKey = _(allCohortUsers).keys().min();
+      var minDate = new Date(minKey);
+
+      // Try and do some further analysis of users in no rooms
+      self.supplementInfoForNoRoomUsers(minDate, noneUserIds, function(err, supplementaryUserCategories) {
+        if (err) return callback(err);
+
+        Object.keys(supplementaryUserCategories).forEach(function(userId) {
+          var category = supplementaryUserCategories[userId];
+
+          categorised[userId] = 'left-' + category;
+        });
+
+        return callback(null, categorised);
+
+      });
     });
+};
+
+UserRoomsRetentionAnalyser.prototype.supplementInfoForNoRoomUsers = function(minDate, userIds, callback) {
+  var self = this;
+  var joinRoomEvents = this.db.collection("gitter_join_room_events");
+
+  joinRoomEvents.find({ 'd.userId': { $in: userIds }, t: { $gte: minDate }}, { _id: 0, 'd.userId': 1, 'd.room_uri': 1 }).toArray(function(err, roomJoins) {
+    if (err) return callback(err);
+
+    var troupeLcUris = _(roomJoins).map(function(f) { return f.d.room_uri; }).uniq().map(function(s) { return s.toLowerCase(); }).value();
+
+    Troupe.find({ lcUri: { $in: troupeLcUris }}, { _id: 0, lcUri: 1, githubType: 1, security: 1 }, function(err, troupes) {
+      if (err) return callback(err);
+
+      var troupesIndexed = collections.indexByProperty(troupes, 'lcUri');
+
+      var result = _(roomJoins)
+        .transform(function(result, roomJoinEvent) {
+          var roomUri = roomJoinEvent.d.room_uri;
+
+          var userId = roomJoinEvent.d.userId;
+          if (!userId) return;
+
+          var troupe;
+          if(!roomUri) {
+            troupe = {}; // Will return a result of MIXED
+          } else {
+            troupe = troupesIndexed[roomUri.toLowerCase()] || {};
+          }
+
+          if(result[userId]) {
+            result[userId].push(troupe);
+          } else {
+            result[userId] = [troupe];
+          }
+        }, {})
+        .transform(function(result, rooms, userId) {
+          result[userId] = self.bucketFor(rooms);
+        })
+        .value();
+
+      return callback(null, result);
+
+    });
+
+  });
 };
 
 UserRoomsRetentionAnalyser.prototype.bucketFor = function(roomsList) {
@@ -55,7 +126,7 @@ UserRoomsRetentionAnalyser.prototype.bucketFor = function(roomsList) {
     if(roomType.security === 'PUBLIC') return 'public';
     if(roomType.security === 'INHERITED') return 'private'; // Not strictly true, but good enough for now
 
-    console.log('NO classification for ', roomType);
+    return "unknown";
   });
 
   if (roomPrivacy.every(function(f) { return f === 'private'; })) return 'private';
