@@ -17,14 +17,13 @@ var badger               = require('readme-badger');
 function insertBadge(repo, content, fileExt, user) {
   var imageUrl = conf.get('web:badgeBaseUrl') + '/Join%20Chat.svg';
   var linkUrl =  conf.get('web:basepath') + '/' + repo + '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge';
-  var altText = 'Gitter';
-  var failoverText = 'Join the chat on Gitter: ' + conf.get('web:basepath') + '/' + repo;
+  var altText = 'Join the chat at ' + conf.get('web:basepath') + '/' + repo;
 
-  if(!badger.willFailover(fileExt)) {
+  if(!badger.hasImageSupport(fileExt)) {
     stats.event('badger.insertedplaintext', { userId: user.id, fileExt: fileExt });
   }
 
-  return badger.addBadge(content, fileExt, imageUrl, linkUrl, altText, failoverText);
+  return badger.addBadge(content, fileExt, imageUrl, linkUrl, altText);
 }
 
 function Client(token) {
@@ -191,8 +190,11 @@ function ReadmeUpdater(context) {
 
     return generatePRBody()
       .then(function(body) {
+
+        var badgeOrLink = context.insertedplaintext ? 'link' : 'badge';
+
         var prRequest = {
-          title: 'Add a Gitter chat badge to ' + context.readmeFileName,
+          title: 'Add a Gitter chat ' + badgeOrLink + ' to ' + context.readmeFileName,
           body: body,
           base: context.primaryBranch,
           head: pullRequestHead
@@ -222,6 +224,7 @@ function ReadmeUpdater(context) {
               var fileExt = existingReadme.path.split('.').pop();
 
               content = insertBadge(context.sourceRepo, content, fileExt, context.user);
+              context.insertedplaintext = !badger.hasImageSupport(fileExt);
 
               context.readmeFileName = existingReadme.path;
               var readme = {
@@ -240,6 +243,7 @@ function ReadmeUpdater(context) {
 
         // No readme file exists
         context.readmeFileName = 'README.md';
+        context.insertedplaintext = false;
 
         var newReadme = {
           path: 'README.md',
@@ -268,8 +272,9 @@ function ReadmeUpdater(context) {
     // Create a GIT tree
     return client.post(format('/repos/%s/git/trees', context.destinationRepo), tree)
       .then(function(tree) {
+
         var commitRequest = {
-          "message": "Added Gitter badge",
+          "message": context.insertedplaintext ? "Added Gitter link" : "Added Gitter badge",
           "author": {
             "name": "The Gitter Badger",
             "email": "badger@gitter.im",

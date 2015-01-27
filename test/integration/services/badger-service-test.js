@@ -44,6 +44,39 @@ describe('badger-service', function() {
       .nodeify(done);
   });
 
+  it('should create pull requests for repos that have a textile readme', function(done) {
+    return badgerService.sendBadgePullRequest('gittertestbot/readme-dot-textile', USER)
+      .then(function() {
+      })
+      .fin(function() {
+        return client.del('/repos/gitter-badger/readme-dot-textile', { })
+          .fail(function() {});
+      })
+      .nodeify(done);
+  });
+
+  it('should create pull requests for repos that have a rst readme', function(done) {
+    return badgerService.sendBadgePullRequest('gittertestbot/readme-dot-rst', USER)
+      .then(function() {
+      })
+      .fin(function() {
+        return client.del('/repos/gitter-badger/readme-dot-rst', { })
+          .fail(function() {});
+      })
+      .nodeify(done);
+  });
+
+  it('should create pull requests for repos that have a plaintext readme', function(done) {
+    return badgerService.sendBadgePullRequest('gittertestbot/readme-dot-txt', USER)
+      .then(function() {
+      })
+      .fin(function() {
+        return client.del('/repos/gitter-badger/readme-dot-txt', { })
+          .fail(function() {});
+      })
+      .nodeify(done);
+  });
+
 
 });
 
