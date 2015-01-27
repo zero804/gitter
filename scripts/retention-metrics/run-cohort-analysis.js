@@ -6,6 +6,7 @@ var mongodb = require('mongodb');
 var Db = mongodb.Db;
 var Server = mongodb.Server;
 var utils = require('./cohort-utils');
+var _ = require('lodash');
 
 function die(err) {
   console.error('ERROR');
@@ -116,7 +117,15 @@ function printCSV(results, asPercent) {
     console.log(headerRow.join(','));
     console.log(totalRow.join(','));
 
-    Object.keys(cohort.subcohorts).forEach(function(subcohortKey) {
+    var subCohortsSorted = _(cohort.subcohorts)
+      .keys()
+      .value();
+
+    subCohortsSorted.sort(function(a, b) {
+      return cohort.subcohorts[b].total - cohort.subcohorts[a].total;
+    });
+
+    subCohortsSorted.forEach(function(subcohortKey) {
       var subcohort = cohort.subcohorts[subcohortKey];
       var subcohortSize = subcohort.total;
 
