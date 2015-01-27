@@ -12,7 +12,20 @@ var env                  = require('../utils/env');
 var logger               = env.logger;
 var stats                = env.stats;
 var StatusError          = require('statuserror');
-var badgeInserter        = require('./badge-inserter');
+var badger               = require('readme-badger');
+
+function insertBadge(repo, content, fileExt, user) {
+  var imageUrl = conf.get('web:badgeBaseUrl') + '/Join%20Chat.svg';
+  var linkUrl =  conf.get('web:basepath') + '/' + repo + '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge';
+  var altText = 'Gitter';
+  var failoverText = 'Join the chat on Gitter: ' + conf.get('web:basepath') + '/' + repo;
+
+  if(!badger.willFailover(fileExt)) {
+    stats.event('badger.insertedplaintext', { userId: user.id, fileExt: fileExt });
+  }
+
+  return badger.addBadge(content, fileExt, imageUrl, linkUrl, altText, failoverText);
+}
 
 function Client(token) {
   var client = github.client(token);
@@ -207,7 +220,8 @@ function ReadmeUpdater(context) {
           return client.getBlob(blobUrl)
             .then(function(content) {
               var fileExt = existingReadme.path.split('.').pop();
-              content = badgeInserter(context.sourceRepo, fileExt, content);
+
+              content = insertBadge(context.sourceRepo, content, fileExt, context.user);
 
               context.readmeFileName = existingReadme.path;
               var readme = {
