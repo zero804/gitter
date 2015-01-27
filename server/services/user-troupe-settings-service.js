@@ -47,6 +47,26 @@ exports.getMultiUserTroupeSettings = function(userTroupes, settingsKey) {
     });
 };
 
+exports.getUserTroupeSettingsForUsersInTroupe = function(troupeId, settingsKey, userIds) {
+  if(!userIds.length) return Q.resolve({});
+
+  return persistence.UserTroupeSettings.findQ({
+      $and: [{
+        troupeId: troupeId
+      }, {
+        userId: { $in: userIds }
+      }]
+    }, 'userId settings.' + settingsKey, { lean: true })
+    .then(function(utses) {
+      var hash = utses.reduce(function(memo, uts) {
+        memo[uts.userId] = uts.settings && uts.settings[settingsKey];
+        return memo;
+      }, {});
+
+      return hash;
+    });
+};
+
 
 exports.getAllUserSettings = function(userId, troupeId) {
   /* Not sure why mongoose isn't converting these */

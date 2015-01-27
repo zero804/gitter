@@ -127,7 +127,12 @@ exports.markItemsRead = function(userId, troupeId, itemIds, options) {
   if(!userId) return reject("userId required");
   if(!troupeId) return reject("troupeId required");
 
-  appEvents.unreadItemsRemoved(userId, troupeId, { chat: itemIds });
+  var markAllRead = options && options.markAllRead;
+
+  if(!markAllRead) {
+    // No need to send individual notifications on markAllRead
+    appEvents.unreadItemsRemoved(userId, troupeId, { chat: itemIds });
+  }
 
   return engine.markItemsRead(userId, troupeId, itemIds)
     .then(function(result) {
@@ -164,6 +169,8 @@ exports.markAllChatsRead = function(userId, troupeId, options) {
       if(!chatIds.length) return ensureAllItemsRead(userId, troupeId, options);
 
       if(!('recordAsRead' in options)) options.recordAsRead = false;
+
+      options.markAllRead = true; // Don't send individual item read events
 
       /* Don't mark the items as read */
       return exports.markItemsRead(userId, troupeId, chatIds, options);
