@@ -291,7 +291,7 @@ module.exports = (function () {
           apiClient.user
             .put('/settings/suggestedRoomsHidden', { value: true })
             .then(function () {
-              troupeCollections.suggested.reset(); // is this the correct way of cleaning the collection?
+              troupeCollections.suggested.reset();
             })
             .fail(function (err) {
               log.error(err);
