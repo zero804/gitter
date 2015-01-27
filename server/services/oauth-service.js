@@ -99,9 +99,8 @@ exports.findClientById = function(id, callback) {
   persistenceService.OAuthClient.findById(id, callback);
 };
 
+// this is called when a user actively logs in via oauth
 exports.saveAuthorizationCode = function(code, client, redirectUri, user, callback) {
-  // TODO: anyone care to explain why this is happening here. Seems like an odd place
-  // to me? --AN
   var properties = {};
   properties['Last login from ' + client.tag] = new Date();
   stats.userUpdate(user, properties);
