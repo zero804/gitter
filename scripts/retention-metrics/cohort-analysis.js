@@ -236,7 +236,7 @@ RetentionAnalyser.prototype.rollupUsageIntoWeeks = function(input) {
       timestamp = cohortDate.valueOf();
 
       if (result[timestamp]) {
-        result[timestamp].concat(userIds);
+        result[timestamp] = result[timestamp].concat(userIds);
       } else {
         result[timestamp] = userIds;
       }
