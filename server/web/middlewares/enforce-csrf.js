@@ -9,6 +9,7 @@ var escapeRegExp = require('../../utils/escape-regexp');
 var WHITELIST = [
 '/api/private/hook/',
 '/api/private/transloadit/',
+'/api/private/statsc',
 '/api/v1/apn',
 '/login/oauth/token',
 '/login/oauth/authorize/decision',

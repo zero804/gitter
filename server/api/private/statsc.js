@@ -13,7 +13,7 @@ function handleStats(incomingStats) {
 
     var stat = s.stat;
 
-    if(!stat || typeof stat !== 'string' || !stat.match(/^[\w\-\.]{2,20}$/)) {
+    if(!stat || typeof stat !== 'string' || !stat.match(/^[\w\-\.]{2,80}$/)) {
       /* Ignore */
       return;
     }
