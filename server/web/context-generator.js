@@ -6,6 +6,8 @@ var presenceService  = require("../services/presence-service");
 var useragent        = require("useragent");
 var crypto           = require("crypto");
 var roomPermissionsModel = require('../services/room-permissions-model');
+var userSettingsService = require('../services/user-settings-service');
+
 var assert           = require("assert");
 var Q                = require('q');
 var _                = require('underscore');
@@ -18,11 +20,13 @@ exports.generateNonChatContext = function(req) {
 
   return Q.all([
       user ? serializeUser(user) : null,
-      user ? determineDesktopNotifications(user, req) : false
+      user ? determineDesktopNotifications(user, req) : false,
+      user ? userSettingsService.getUserSettings(user.id, 'suggestedRoomsHidden') : false,
     ])
-    .spread(function(serializedUser, desktopNotifications) {
+    .spread(function (serializedUser, desktopNotifications, suggestedRoomsHidden) {
       return createTroupeContext(req, {
         user: serializedUser,
+        suggestedRoomsHidden: suggestedRoomsHidden,
         desktopNotifications: desktopNotifications,
       });
     });
@@ -173,6 +177,7 @@ function createTroupeContext(req, options) {
     troupe: options.troupe,
     homeUser: options.homeUser,
     accessToken: req.accessToken,
+    suggestedRoomsHidden: options.suggestedRoomsHidden,
     desktopNotifications: options.desktopNotifications,
     events: events,
     troupeUri: options.troupe ? options.troupe.uri : undefined,

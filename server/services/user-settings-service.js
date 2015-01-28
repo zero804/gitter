@@ -54,7 +54,7 @@ exports.getAllUserSettings = function(userId) {
     });
 };
 
-exports.setUserSettings = function(userId, settingsKey, settings) {
+exports.setUserSettings = function (userId, settingsKey, settings) {
   assert(mongoUtils.isLikeObjectId(userId));
   userId = mongoUtils.asObjectID(userId);
 
@@ -62,14 +62,10 @@ exports.setUserSettings = function(userId, settingsKey, settings) {
   setOperation.$set['settings.' + settingsKey] = settings;
   var d = Q.defer();
 
-  persistence.UserSettings.collection.update(
-      { userId: userId },
-      setOperation,
-      { upsert: true },
-      function(err) {
-        if(err) return d.reject(err);
-        return d.resolve();
-      });
+  persistence.UserSettings.collection.update({ userId: userId }, setOperation, { upsert: true }, function (err) {
+    if (err) return d.reject(err);
+    return d.resolve();
+  });
 
   return d.promise;
 };

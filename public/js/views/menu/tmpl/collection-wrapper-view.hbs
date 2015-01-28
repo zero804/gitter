@@ -1,2 +1,9 @@
-<div class="menu-list__header">{{ header }}</div>
+<div class="menu-list__header">
+  <p>{{ header }}</p>
+  {{#if canHide}}
+    <div class='menu-list__header__details'>
+      <a href='#' class='js-hide hide-rooms'></a>
+    </div>
+  {{/if}}
+</div>
 <div class='menu-list__section--orgs' id="list"></div>

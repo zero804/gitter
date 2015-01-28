@@ -272,6 +272,7 @@
     }
 
     .menu-list__header {
+      position: relative;
       font-family: @fontSans;
       font-size: 12px;
       text-transform: uppercase;
@@ -279,6 +280,8 @@
       padding: 0 9px 2px 0;
       opacity: 0.6;
       font-weight: 400;
+      overflow: hidden;
+      clear: both;
 
       & .list-toggle {
         opacity: 0;
@@ -287,6 +290,11 @@
 
       body.hover &:hover > .list-toggle {
         opacity: 0.8;
+      }
+
+      p {
+        margin: 0;
+        float: left;
       }
     }
 
@@ -317,6 +325,21 @@
       }
     }
   }
+}
+
+.menu-list__header__details {
+  float: right;
+}
+
+.menu-list__header__details a {
+  color: white;
+}
+
+.menu-list__header__details .hide-rooms:before {
+  color: white;
+  font-family: troupe-icons;
+  content: '\e827';
+  font-size: 14px;
 }
 
 .menu-actions {

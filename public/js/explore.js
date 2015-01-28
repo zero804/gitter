@@ -22,7 +22,7 @@ onready(function() {
 
   $(ui.pills).on('click', function (e) {
     appEvents.trigger('track-event', 'explore_pills_click', {
-      tag: e.target.innerText.toLowerCase()
+      tag: e.target.textContent.toLowerCase()
     });
   });
 

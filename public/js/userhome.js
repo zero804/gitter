@@ -25,8 +25,10 @@ onready(function() {
 
   var Router = Backbone.Router.extend({
     routes: {
-      'confirm/*uri': function(uri) {
-        modalRegion.show(new confirmRepoRoomView.Modal({ uri: uri }));
+      'confirm/*uri': function (uri) {
+        if (!parent) {
+          modalRegion.show(new confirmRepoRoomView.Modal({ uri: uri }));
+        }
       },
       '': function() {
         modalRegion.close();
