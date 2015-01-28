@@ -20,7 +20,6 @@ var mainFrameMiddlewarePipeline = [
   appMiddleware.uriContextResolverMiddleware({ create: 'not-repos' }),
   appMiddleware.isPhoneMiddleware,
   function (req, res, next) {
-
     if (req.uriContext.ownUrl) {
       if (req.isPhone) {
         appRender.renderMobileUserHome(req, res, next, 'home');
