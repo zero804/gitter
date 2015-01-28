@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /* jshint node:true, unused:true */
 'use strict';
 
@@ -83,6 +84,12 @@ var opts = require("nomnom")
     default: false,
     help: 'Output values as percentages'
   })
+  .option('sort-subcohorts-by-size', {
+    flag: true,
+    required: false,
+    default: false,
+    help: 'Arrange the subcohorts in descending order of size'
+  })
   .parse();
 
 function debug() {
@@ -121,9 +128,11 @@ function printCSV(results, asPercent) {
       .keys()
       .value();
 
-    subCohortsSorted.sort(function(a, b) {
-      return cohort.subcohorts[b].total - cohort.subcohorts[a].total;
-    });
+    if (opts['sort-subcohorts-by-size']) {
+      subCohortsSorted.sort(function(a, b) {
+        return cohort.subcohorts[b].total - cohort.subcohorts[a].total;
+      });
+    }
 
     subCohortsSorted.forEach(function(subcohortKey) {
       var subcohort = cohort.subcohorts[subcohortKey];
