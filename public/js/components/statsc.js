@@ -18,7 +18,7 @@ module.exports = (function() {
 
     sendQueue = sendQueue.concat(Object.keys(sendCounters).map(function(stat) {
       var result = { stat: stat };
-      if(sendCounters[stat] > 1) {
+      if(sendCounters[stat] > 0) {
         result.count = sendCounters[stat];
       }
       return result;
@@ -33,7 +33,7 @@ module.exports = (function() {
 
   }
 
-  var throttledSend = _.throttle(send, 10000, { leading: false });
+  var throttledSend = _.throttle(send, 1000, { leading: false });
 
   appEvents.on('stats.event', function(stat) {
     if(counters[stat]) {
