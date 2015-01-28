@@ -21,7 +21,7 @@ function insertBadge(repo, content, fileExt, user) {
   var altText = 'Join the chat at ' + conf.get('web:basepath') + '/' + repo;
 
   if(!badger.hasImageSupport(fileExt)) {
-    stats.event('badger.insertedplaintext', { userId: user.id, fileExt: fileExt });
+    stats.event('badger.inserted_plaintext', { userId: user.id, fileExt: fileExt });
   }
 
   return badger.addBadge(content, fileExt, imageUrl, linkUrl, altText);
@@ -173,7 +173,7 @@ function ReadmeUpdater(context) {
     return generatePRBody()
       .then(function(body) {
 
-        var badgeOrLink = context.insertedplaintext ? 'link' : 'badge';
+        var badgeOrLink = context.insertedPlaintext ? 'link' : 'badge';
 
         var prRequest = {
           title: 'Add a Gitter chat ' + badgeOrLink + ' to ' + context.readmeFileName,
@@ -204,7 +204,7 @@ function ReadmeUpdater(context) {
           var fileExt = path.extname(existingReadme.path).substring(1);
 
           content = insertBadge(context.sourceRepo, content, fileExt, context.user);
-          context.insertedplaintext = !badger.hasImageSupport(fileExt);
+          context.insertedPlaintext = !badger.hasImageSupport(fileExt);
 
           context.readmeFileName = existingReadme.path;
           var readmeNode = {
@@ -221,7 +221,7 @@ function ReadmeUpdater(context) {
 
         // No readme file exists
         context.readmeFileName = 'README.md';
-        context.insertedplaintext = false;
+        context.insertedPlaintext = false;
 
         var newReadme = {
           path: 'README.md',
@@ -252,7 +252,7 @@ function ReadmeUpdater(context) {
       .then(function(tree) {
 
         var commitRequest = {
-          "message": context.insertedplaintext ? "Added Gitter link" : "Added Gitter badge",
+          "message": context.insertedPlaintext ? "Added Gitter link" : "Added Gitter badge",
           "author": {
             "name": "The Gitter Badger",
             "email": "badger@gitter.im",
