@@ -29,24 +29,24 @@
         <div class="trpHeroSignup trpHeroAppStore">
           <div style="display: inline-block; text-align: center;">
             <img src='{{ cdn "images/macbook-pro.png" }}' style="height: 220px; margin-bottom: 20px"/><br>
-            <a class="trpHomeMenuItem trpButtonMedium trpBtnWhite" href="http://update.gitter.im/osx/latest" target="downloadTarget"> Mac download </a>
-<!--             <a class="trpHomeMenuItem trpButtonMedium trpBtnWhite" href="http://update.trou.pe/windows/latest.html" target="downloadTarget"> Windows download </a> -->
+            <a class="trpHomeMenuItem trpButtonMedium trpBtnWhite" href="http://update.gitter.im/osx/latest" id="osx-download"> Mac download </a>
+            <a class="trpHomeMenuItem trpButtonMedium trpBtnWhite" href="http://update.trou.pe/windows/latest.html" id="windows-download" style="display: none;"> Windows download </a>
           </div>
           <div style="display: inline-block; text-align: center; margin-left: 90px">
             <img src='{{ cdn "images/iphone.png" }}' style="height: 220px; margin-bottom: 20px; opacity: 0.9"/><br>
-            <a class="trpHomeMenuItem trpButtonMedium trpBtnWhite" href="http://appstore.com/gitter" target="_blank" id="button-appstore"> App Store </a>
+            <a class="trpHomeMenuItem trpButtonMedium trpBtnWhite" href="http://appstore.com/gitter" target="_blank"> App Store </a>
           </div>
           <div style="display: inline-block; text-align: center; margin-left: 90px">
             <img src='{{ cdn "images/android.png" }}' style="height: 220px; margin-bottom: 20px; opacity: 0.9"/><br>
-            <a class="trpHomeMenuItem trpButtonMedium trpBtnWhite" href="https://play.google.com/store/apps/details?id=im.gitter.gitter&hl=en_GB" target="_blank" id="button-appstore"> Android</a>
+            <a class="trpHomeMenuItem trpButtonMedium trpBtnWhite" href="https://play.google.com/store/apps/details?id=im.gitter.gitter&hl=en_GB" target="_blank"> Android</a>
           </div>
         </div>
       </div>
 
     </div>
 
-    {{{generateEnv }}}
-    {{{ bootScript "just-tracking" }}}
+    {{{generateEnv anonymous=true }}}
+    {{{ bootScript "apps" }}}
 
   </body>
 </html>
