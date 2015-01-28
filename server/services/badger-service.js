@@ -13,6 +13,7 @@ var logger               = env.logger;
 var stats                = env.stats;
 var StatusError          = require('statuserror');
 var badger               = require('readme-badger');
+var path                 = require('path');
 
 function insertBadge(repo, content, fileExt, user) {
   var imageUrl = conf.get('web:badgeBaseUrl') + '/Join%20Chat.svg';
@@ -200,7 +201,7 @@ function ReadmeUpdater(context) {
         if(existingReadme) {
 
           var content = new Buffer(readme.content, 'base64').toString('utf8');
-          var fileExt = existingReadme.path.split('.').pop();
+          var fileExt = path.extname(existingReadme.path).substring(1);
 
           content = insertBadge(context.sourceRepo, content, fileExt, context.user);
           context.insertedplaintext = !badger.hasImageSupport(fileExt);
