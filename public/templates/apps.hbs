@@ -3,28 +3,20 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
         <title>Gitter Apps</title>
-
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
         <link rel="stylesheet" href="{{cdn 'styles/homepage.css' }}">
-
-
         <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon-normal.ico' }}">
-
         {{> load_font_css }}
     </head>
     <body>
       <header id="intro-panel">
         <nav class="site-nav">
           <div class="wrap">
-
             <a href="/" class="logo">
               {{> logo_man}}
               <img src="{{ cdn 'images/home/logo.png' }}" alt="Gitter" title="Gitter logo" class="logo-image menu-animation">
             </a>
-
             <a class="btn login" href="/login/github?action=login&source=apps-login">
               <b><span class='desktopOnly'>Open Gitter</b>
             </a>
@@ -33,8 +25,6 @@
         <div class='bg-animation'>{{!-- the div below is responsible for the fadein of the background --}}</div>
         <br><br>
       </header>
-
-
       <section id="apps-panel">
         <div class="wrap">
           <div class="devices">
@@ -42,13 +32,10 @@
               <img class="screenshot" src="{{cdn 'images/home/screenshot.png'}}">
               <img class="computer" src="{{cdn 'images/home/laptop.png'}}">
             </div>
-
             <img class="phone" src="{{cdn 'images/home/phone.png'}}">
           </div>
-
           <h1>Official apps</h1>
           <p>We currently have apps for OSX, iOS, Windows and Android with a Linux app coming soon.</p>
-
           <p>
             <a class="btn outline" href="http://update.gitter.im/osx/latest" id="osx-download"><i class="icon-apple"></i>Mac</span></a>
             <a class="btn outline" href="http://update.gitter.im/osx/latest" id="windows-download"><i class="icon-windows"></i>Windows</a>
@@ -59,10 +46,8 @@
             <a class="btn outline" href="https://play.google.com/store/apps/details?id=im.gitter.gitter&hl=en_GB" target="_blank"><i class="icon-android"></i>Android</span></a>
           </p>
           <p><small>We also have a sweet little <a href="https://irc.gitter.im" target="_blank">IRC bridge</a>.</small></p>
-
         </div>
       </section>
-
       <footer id="bottom-panel">
         <div class="wrap">
           <h1>3rd Party Apps</h1>
@@ -74,7 +59,6 @@
           </p>
           <small>
             <span>&copy; 2015 Troupe Technology Ltd. All rights reserved.</span>
-
             <a href="http://support.gitter.im" target="_blank">Support</a>
             <a href="https://developer.gitter.im" target="_blank">API</a>
             <a href="http://blog.gitter.im" target="_blank">Blog</a>
@@ -82,12 +66,9 @@
           </small>
         </div>
       </footer>
-
       {{{ generateEnv anonymous=true }}}
       {{{ bootScript "apps" }}}
-
-              <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
-        <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
-
+      <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
+      <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
     </body>
 </html>
