@@ -205,6 +205,54 @@ h1:after, h2:after {
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'os-icons';
+  src: url('../fonts/os-icons.eot?6409961');
+  src: url('../fonts/os-icons.eot?6409961#iefix') format('embedded-opentype'),
+       url('../fonts/os-icons.woff?6409961') format('woff'),
+       url('../fonts/os-icons.ttf?6409961') format('truetype'),
+       url('../fonts/os-icons.svg?6409961#os-icons') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
+/* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
+/*
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: 'os-icons';
+    src: url('../font/os-icons.svg?6409961#os-icons') format('svg');
+  }
+}
+*/
+ 
+ [class^="icon-"]:before, [class*=" icon-"]:before {
+  font-family: "os-icons";
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+ 
+  display: inline-block;
+  text-decoration: inherit;
+  width: 1em;
+  margin-right: 1.4em;
+  text-align: center;
+  /* opacity: .8; */
+ 
+  /* For safety - reset parent styles, that can break glyph codes*/
+  font-variant: normal;
+  text-transform: none;
+     
+  /* fix buttons height, for twitter bootstrap */
+  line-height: 1em;
+ 
+}
+ 
+.icon-windows:before { content: '\e800'; } /* '' */
+.icon-apple:before { content: '\e801'; } /* '' */
+.icon-android:before { content: '\e802'; } /* '' */
+.icon-linux:before { content: '\e803'; } /* '' */
+
 /**
  *   Buttons and tooltips
  */
@@ -230,7 +278,7 @@ h1:after, h2:after {
   vertical-align: middle;
 }
 
-.btn.osx:before {
+.osx:before {
   content: '';
   position: relative;
   top: 1px;
