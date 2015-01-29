@@ -1,52 +1,97 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Gitter Apps</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
+<!doctype html>
+<html class="no-js" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <link href='{{cdn "styles/trpAppsPage.css" }}' rel="stylesheet">
-    <link href='//fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
-    <link id="favicon" rel="shortcut icon" href='{{cdn "images/favicon-unread.ico" }}'>
-  </head>
+        <title>Gitter Apps</title>
 
-  <body>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <div class="trpHomeHeroStripContainer trpHomeiOSAppHeroStripContainer">
+        <link rel="stylesheet" href="{{cdn 'styles/homepage.css' }}">
 
-      <div class="trpHomeTopStrip">
-        <div class="logo-container"></div>
-      </div>
 
-      <div class="trpHomeHero">
-        <div class="trpHeroText trpHeroMacAppText">
-          Chat all the things, from anywhere.
-          <br><br><br>
+        <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon-normal.ico' }}">
+
+        {{> load_font_css }}
+    </head>
+    <body>
+      <header id="intro-panel">
+        <nav class="site-nav">
+          <div class="wrap">
+
+            <a href="/" class="logo">
+              {{> logo_man}}
+              <img src="{{ cdn 'images/home/logo.png' }}" alt="Gitter" title="Gitter logo" class="logo-image menu-animation">
+            </a>
+
+            <a class="btn login" href="/login/github?action=login&source=intro-login">
+              <b><span class='desktopOnly'>Open Gitter</b>
+            </a>
+          </div>
+        </nav>
+        <div class='bg-animation'>{{!-- the div below is responsible for the fadein of the background --}}</div>
+        <br><br>
+      </header>
+
+
+      <section id="apps-panel">
+        <div class="wrap">
+          <div class="devices">
+            <div class="laptop">
+              <img class="screenshot" src="{{cdn 'images/home/screenshot.png'}}">
+              <img class="computer" src="{{cdn 'images/home/laptop.png'}}">
+            </div>
+
+            <img class="phone" src="{{cdn 'images/home/phone.png'}}">
+          </div>
+
+          <h1>Official apps</h1>
+          <p>We currently have apps for OSX, iOS, Windows and Android with a Linux app coming soon.</p>
+
+          <p>
+            <a class="btn outline" href="http://update.gitter.im/osx/latest" id="osx-download"><i class="icon-apple"></i>Mac</span></a>
+            <a class="btn outline" href="http://update.gitter.im/osx/latest" id="windows-download"><i class="icon-windows"></i>Windows</a>
+            <a class="btn outline" href="/apps" style="opacity: 0.5"><i class="icon-linux"></i>Soon</a>
+          </p>
+          <p>
+            <a class="btn outline" href="http://appstore.com/gitter" target="_blank"><i class="icon-apple"></i>iPhone</span></a>
+            <a class="btn outline" href="https://play.google.com/store/apps/details?id=im.gitter.gitter&hl=en_GB" target="_blank"><i class="icon-android"></i>Android</span></a>
+          </p>
+          <p><small>We also have a sweet little <a href="https://irc.gitter.im" target="_blank">IRC bridge</a>.</small></p>
+
         </div>
-        <div class="trpHeroSignup trpHeroAppStore">
-          <div style="display: inline-block; text-align: center;">
-            <img src='{{ cdn "images/macbook-pro.png" }}' style="height: 220px; margin-bottom: 20px"/><br>
-            <a class="trpHomeMenuItem trpButtonMedium trpBtnWhite" href="http://update.gitter.im/osx/latest" id="osx-download"> Mac download </a>
-            <a class="trpHomeMenuItem trpButtonMedium trpBtnWhite" href="http://update.trou.pe/windows/latest.html" id="windows-download" style="display: none;"> Windows download </a>
-          </div>
-          <div style="display: inline-block; text-align: center; margin-left: 90px">
-            <img src='{{ cdn "images/iphone.png" }}' style="height: 220px; margin-bottom: 20px; opacity: 0.9"/><br>
-            <a class="trpHomeMenuItem trpButtonMedium trpBtnWhite" href="http://appstore.com/gitter" target="_blank"> App Store </a>
-          </div>
-          <div style="display: inline-block; text-align: center; margin-left: 90px">
-            <img src='{{ cdn "images/android.png" }}' style="height: 220px; margin-bottom: 20px; opacity: 0.9"/><br>
-            <a class="trpHomeMenuItem trpButtonMedium trpBtnWhite" href="https://play.google.com/store/apps/details?id=im.gitter.gitter&hl=en_GB" target="_blank"> Android</a>
-          </div>
+      </section>
+
+      <footer id="bottom-panel">
+        <div class="wrap">
+          <h1>3rd Party Apps</h1>
+          <p>These apps have kindly been built by developers using our API</a>. </p>
+          <p>
+            <a class="btn outline" href="http://apps.microsoft.com/windows/en-us/app/gitty/16998cba-b1d7-4d82-a8d0-131a40009168" target="blank">Gitty Windows 8 Modern UI</a>
+          </p>
+          <p>
+            <a class="btn outline" href="https://github.com/huafu/hubot-gitter2" target="_blank">Hubot Adapter</a>
+          </p>
+          <p>
+            <a class="btn outline" href="https://github.com/finnp/gitter-irc-bot" target="_blank">IRC Mirroring Bot</a>
+          </p>
+          <small>
+            <span>&copy; 2015 Troupe Technology Ltd. All rights reserved.</span>
+
+            <a href="http://support.gitter.im" target="_blank">Support</a>
+            <a href="https://developer.gitter.im" target="_blank">API</a>
+            <a href="http://blog.gitter.im" target="_blank">Blog</a>
+            <a href="https://twitter.com/gitchat" target="_blank">Twitter</a>
+          </small>
         </div>
-      </div>
+      </footer>
 
-    </div>
+      {{{ generateEnv anonymous=true }}}
+      {{{ bootScript "apps" }}}
 
-    {{{generateEnv anonymous=true }}}
-    {{{ bootScript "apps" }}}
+              <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
+        <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
 
-  </body>
+    </body>
 </html>
