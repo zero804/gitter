@@ -28,6 +28,7 @@ var webpackConfig = {
     "router-archive-home": path.resolve(path.join(__dirname, "./router-archive-home")),
     "router-embed-chat": path.resolve(path.join(__dirname, "./router-embed-chat")),
     "homepage": path.resolve(path.join(__dirname, "./homepage")),
+    "apps": path.resolve(path.join(__dirname, "./apps.js")),
     // "faye-diagnostics": path.resolve(path.join(__dirname, "./faye-diagnostics")),
     vendor: [
       'utils/webpack',

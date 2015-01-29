@@ -12,6 +12,20 @@ var env                  = require('../utils/env');
 var logger               = env.logger;
 var stats                = env.stats;
 var StatusError          = require('statuserror');
+var badger               = require('readme-badger');
+var path                 = require('path');
+
+function insertBadge(repo, content, fileExt, user) {
+  var imageUrl = conf.get('web:badgeBaseUrl') + '/Join%20Chat.svg';
+  var linkUrl =  conf.get('web:basepath') + '/' + repo + '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge';
+  var altText = 'Join the chat at ' + conf.get('web:basepath') + '/' + repo;
+
+  if(!badger.hasImageSupport(fileExt)) {
+    stats.event('badger.inserted_plaintext', { userId: user.id, fileExt: fileExt });
+  }
+
+  return badger.addBadge(content, fileExt, imageUrl, linkUrl, altText);
+}
 
 function Client(token) {
   var client = github.client(token);
@@ -30,25 +44,6 @@ function Client(token) {
       return d.promise;
     };
   });
-
-  this.getBlob = function(url) {
-    var d = Q.defer();
-    client.request(client.requestOptions({
-      uri: client.buildUrl(url),
-      method: 'GET',
-      headers: {
-        Accept: "application/vnd.github.3.0.raw"
-      },
-      json: false
-    }), function(err, res, body) {
-      if(err) return d.reject(err);
-      if(res.status >= 400) return d.reject(new Error('HTTP ' + res.status));
-
-      return d.resolve(body);
-    });
-
-    return d.promise;
-  };
 }
 var client = new Client('***REMOVED***');
 
@@ -78,31 +73,6 @@ function pullRequestHeadFromBranch(branch) {
   if(!m) return;
 
   return m[1] + ':' + branchName;
-}
-
-function findIdealLineForInsert(lines) {
-  if(lines.length === 0) return 0;
-  var i = 0;
-  var seenHeader = false;
-
-  for(;i < lines.length;i++) {
-    if(/^\s*(\#+|={3,}|-{3,})/.test(lines[i])) {
-      seenHeader = true;
-    } else {
-      if(seenHeader) break;
-    }
-  }
-
-  return i;
-}
-
-function injectBadgeIntoMarkdown(content, badgeContent) {
-  var lines = content.split(/\n/);
-  var idealLine = findIdealLineForInsert(lines) || 0;
-
-  lines.splice(idealLine, 0, badgeContent);
-
-  return lines.join('\n');
 }
 
 function ReadmeUpdater(context) {
@@ -202,8 +172,11 @@ function ReadmeUpdater(context) {
 
     return generatePRBody()
       .then(function(body) {
+
+        var badgeOrLink = context.insertedPlaintext ? 'link' : 'badge';
+
         var prRequest = {
-          title: 'Add a Gitter chat badge to ' + context.readmeFileName,
+          title: 'Add a Gitter chat ' + badgeOrLink + ' to ' + context.readmeFileName,
           body: body,
           base: context.primaryBranch,
           head: pullRequestHead
@@ -226,29 +199,29 @@ function ReadmeUpdater(context) {
         var existingReadme = findReadme(tree.tree, readme && readme.path);
 
         if(existingReadme) {
-          var blobUrl = urlForGithubClient(existingReadme.url);
 
-          return client.getBlob(blobUrl)
-            .then(function(content) {
-              content = injectBadgeIntoMarkdown(content, context.badgeContent);
+          var content = new Buffer(readme.content, 'base64').toString('utf8');
+          var fileExt = path.extname(existingReadme.path).substring(1);
 
-              context.readmeFileName = existingReadme.path;
-              var readme = {
-                path: existingReadme.path,
-                mode: existingReadme.mode,
-                content: content
-              };
+          content = insertBadge(context.sourceRepo, content, fileExt, context.user);
+          context.insertedPlaintext = !badger.hasImageSupport(fileExt);
 
-              return {
-                base_tree: tree.sha,
-                tree: [readme]
-              };
-              // return commitTree(repoName, commit.sha, branch.ref, treeForCommit);
-            });
+          context.readmeFileName = existingReadme.path;
+          var readmeNode = {
+            path: existingReadme.path,
+            mode: existingReadme.mode,
+            content: content
+          };
+
+          return {
+            base_tree: tree.sha,
+            tree: [readmeNode]
+          };
         }
 
         // No readme file exists
         context.readmeFileName = 'README.md';
+        context.insertedPlaintext = false;
 
         var newReadme = {
           path: 'README.md',
@@ -277,8 +250,9 @@ function ReadmeUpdater(context) {
     // Create a GIT tree
     return client.post(format('/repos/%s/git/trees', context.destinationRepo), tree)
       .then(function(tree) {
+
         var commitRequest = {
-          "message": "Added Gitter badge",
+          "message": context.insertedPlaintext ? "Added Gitter link" : "Added Gitter badge",
           "author": {
             "name": "The Gitter Badger",
             "email": "badger@gitter.im",
