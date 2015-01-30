@@ -16,6 +16,7 @@ var contextGenerator  = require('./context-generator');
 var appVersion        = require('./appVersion');
 var StatusError       = require('statuserror');
 var bayeuxExtension   = require('./bayeux/extension');
+var clientUsageStats  = require('../utils/client-usage-stats');
 var zlib              = require('zlib');
 var version = appVersion.getVersion();
 
@@ -60,6 +61,10 @@ var authenticator = bayeuxExtension({
       var user = tokenInfo.user;
       var oauthClient = tokenInfo.client;
       var userId = user && user.id;
+
+      if(user && oauthClient) {
+        clientUsageStats.record(user, oauthClient);
+      }
 
       logger.verbose('bayeux: handshake', {
         appVersion: ext.appVersion,

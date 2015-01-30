@@ -43,7 +43,7 @@ module.exports = function(req, res, next) {
     stats.eventHF('token.authenticated.web');
 
     return oauthService.findOrGenerateWebToken(req.user.id)
-      .then(function(serverToken) {
+      .spread(function(serverToken/*, client */) {
         setAccessToken(req, userId, serverToken);
       })
       .nodeify(next);
@@ -54,7 +54,7 @@ module.exports = function(req, res, next) {
 
   /* Generate an anonymous token */
   return oauthService.generateAnonWebToken()
-    .then(function(token) {
+    .spread(function(token /*, client */) {
       setAccessToken(req, null, token);
     })
     .nodeify(next);
