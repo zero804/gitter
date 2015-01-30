@@ -1,14 +1,11 @@
 "use strict";
-var $ = require('jquery');
-
 require('utils/tracking');
 require('components/statsc');
 
 var appEvents = require('utils/appevents');
 
 function initAppsPanel() {
-  var $panel =  $('#apps-panel');
-  $panel.addClass('visible');
+  document.getElementById('apps-panel').classList.add('visible');
 }
 
 document.getElementById('osx-download').addEventListener('click', function() {
