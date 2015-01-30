@@ -15,23 +15,19 @@ var Q                  = require('q');
 var userService        = require('./user-service');
 var moment             = require('moment');
 
-var webInternalClientId;
 var ircClientId;
 
 var cacheTimeout = 60; /* 60 seconds */
 
-function loadWebClientId() {
-  if(webInternalClientId) return Q.resolve(webInternalClientId);
-
-  /* Load webInternalClientId once */
-  return persistenceService.OAuthClient.findOneQ({ clientKey: WEB_INTERNAL_CLIENT_KEY })
+/* Load webInternalClientId once */
+var webClientPromise = persistenceService.OAuthClient.findOneQ({ clientKey: WEB_INTERNAL_CLIENT_KEY })
     .then(function(oauthClient) {
       if(!oauthClient) throw new Error("Unable to load internal client id.");
+      oauthClient = oauthClient.toJSON();
+      oauthClient.id = oauthClient._id && oauthClient._id.toString();
 
-      webInternalClientId = oauthClient._id;
-      return webInternalClientId;
+      return oauthClient;
     });
-}
 
 function loadIrcClientId() {
   if(ircClientId) return Q.resolve(ircClientId);
@@ -101,10 +97,6 @@ exports.findClientById = function(id, callback) {
 
 // this is called when a user actively logs in via oauth
 exports.saveAuthorizationCode = function(code, client, redirectUri, user, callback) {
-  var properties = {};
-  properties['Last login from ' + client.tag] = new Date();
-  stats.userUpdate(user, properties);
-
   var authCode = new persistenceService.OAuthCode({
       code: code,
       clientId: client.id,
@@ -234,26 +226,26 @@ exports.findOrCreateToken = findOrCreateToken;
 // TODO: move some of this functionality into redis for speed
 // TODO: make the web tokens expire
 exports.findOrGenerateWebToken = function(userId, callback) {
-  return loadWebClientId()
-    .then(function(clientId) {
-      return findOrCreateToken(userId, clientId);
+  return webClientPromise
+    .then(function(client) {
+      return Q.all([findOrCreateToken(userId, client.id), client]);
     })
     .nodeify(callback);
 };
 
 exports.generateAnonWebToken = function(callback) {
   return Q.all([
-      loadWebClientId(),
+      webClientPromise,
       random.generateToken()
     ])
-    .spread(function(clientId, token) {
+    .spread(function(client, token) {
       return persistenceService.OAuthAccessToken.createQ({
           token: token,
           userId: null,
-          clientId: clientId,
+          clientId: client.id,
           expires: moment().add('days', 7).toDate()
         })
-        .thenResolve(token);
+        .thenResolve([token, client]);
     })
     .nodeify(callback);
 };
