@@ -142,6 +142,7 @@ module.exports = {
     app.use(require('./middlewares/authenticate-bearer'));
     app.use(rememberMe.rememberMeMiddleware);
     app.use(require('./middlewares/rate-limiter'));
+    app.use(require('./middlewares/record-client-usage-stats'));
 
     app.use(require('./middlewares/configure-csrf'));
     app.use(require('./middlewares/enforce-csrf'));
@@ -168,6 +169,8 @@ module.exports = {
     bindI18n(app);
 
     app.use(passport.initialize());
+    app.use(require('./middlewares/rate-limiter'));
+    app.use(require('./middlewares/record-client-usage-stats'));
 
 
     // API uses CORS
