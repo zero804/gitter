@@ -10,20 +10,20 @@
         {{> load_font_css }}
     </head>
     <body>
-      <header id="intro-panel">
+      <header id="intro-panel" class="apps-page-header">
         <nav class="site-nav">
           <div class="wrap">
             <a href="/" class="logo">
               {{> logo_man}}
               <img src="{{ cdn 'images/home/logo.png' }}" alt="Gitter" title="Gitter logo" class="logo-image menu-animation">
             </a>
-            <a class="btn login" href="/login/github?action=login&source=apps-login">
-              <b><span class='desktopOnly'>Open Gitter</b>
+            <span class="desktopOnly"><a class="btn login desktopOnly" href="/login/github?action=login&source=apps-login">
+              <b><span>Open Gitter</b>
             </a>
+            </span>
           </div>
         </nav>
         <div class='bg-animation'>{{!-- the div below is responsible for the fadein of the background --}}</div>
-        <br><br>
       </header>
       <section id="apps-panel">
         <div class="wrap">
