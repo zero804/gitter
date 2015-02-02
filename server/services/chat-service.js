@@ -253,6 +253,11 @@ exports.findById = function(id, callback) {
     .nodeify(callback);
 };
 
+exports.findByIdInRoom = function(troupeId, id, callback) {
+  return ChatMessage.findOneQ({ _id: id, toTroupeId: troupeId })
+    .nodeify(callback);
+};
+
 /**
  * Returns a promise of chats with given ids
  */

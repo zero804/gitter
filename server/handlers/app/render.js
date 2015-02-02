@@ -5,6 +5,7 @@ var Q                  = require('q');
 var contextGenerator   = require('../../web/context-generator');
 var restful            = require('../../services/restful');
 var userService        = require('../../services/user-service');
+var chatService        = require('../../services/chat-service');
 var appVersion         = require('../../web/appVersion');
 var social             = require('../social-metadata');
 var PersistenceService = require('../../services/persistence-service');
@@ -83,6 +84,20 @@ function renderHomePage(req, res, next) {
     .fail(next);
 }
 
+function getPermalinkChatForRoom(troupe, chatId) {
+  if (troupe.security !== 'PUBLIC') return Q.resolve();
+
+  return chatService.findByIdInRoom(troupe.id, chatId)
+    .then(function(chat) {
+      var strategy = new restSerializer.ChatStrategy({
+        notLoggedIn: true,
+        troupeId: troupe.id
+      });
+
+      return restSerializer.serialize(chat, strategy);
+    });
+}
+
 function renderMainFrame(req, res, next, frame) {
 
   var user = req.user;
@@ -94,10 +109,10 @@ function renderMainFrame(req, res, next, frame) {
   Q.all([
     contextGenerator.generateNonChatContext(req),
     restful.serializeTroupesForUser(userId),
-    restful.serializeOrgsForUserId(userId)
+    restful.serializeOrgsForUserId(userId),
+    aroundId && getPermalinkChatForRoom(req.troupe, aroundId)
   ])
-    .spread(function (troupeContext, rooms, orgs) {
-
+    .spread(function (troupeContext, rooms, orgs, permalinkChat) {
       var chatAppLocation = url.format({
         pathname: '/' + req.uriContext.uri + '/~' + frame,
         query: {
@@ -121,8 +136,12 @@ function renderMainFrame(req, res, next, frame) {
         .map(markSelected.bind(null, selectedRoomId))
         .map(trimRoomName);
 
+      var socialMetadata = permalinkChat ?
+        social.getMetadataForChatPermalink({ room: req.troupe, chat: permalinkChat  }) :
+        social.getMetadata({ room: req.troupe  });
+
       res.render(template, {
-        socialMetadata: social.getMetadata({ room: req.troupe }),
+        socialMetadata: socialMetadata,
         bootScriptName: bootScriptName,
         cssFileName: "styles/" + bootScriptName + ".css",
         troupeName: req.uriContext.uri,
