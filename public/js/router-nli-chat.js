@@ -8,6 +8,7 @@ var RightToolbarView = require('views/righttoolbar/rightToolbarView');
 var peopleCollectionView = require('views/people/peopleCollectionView');
 var HeaderView = require('views/app/headerView');
 var onready = require('./utils/onready');
+var highlightPermalinkChats = require('./utils/highlight-permalink-chats');
 
 require('views/widgets/preload');
 require('filtered-collection');
@@ -74,5 +75,9 @@ onready(function() {
   // liveContext.syncRoom();
 
   Backbone.history.start();
+
+  if (context().permalinkChatId) {
+    highlightPermalinkChats(appView.chatCollectionView, context().permalinkChatId);
+  }
 
 });
