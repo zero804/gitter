@@ -30,8 +30,13 @@ describe('is-native', function() {
     assert(isNative(userAgent));
   });
 
-  it('detects native osx client is native', function() {
+  it('detects old objective-c native osx client is native', function() {
     var userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.77.4 (KHTML, like Gecko) Gitter/1.153';
+    assert(isNative(userAgent));
+  });
+
+  it('detects node-webkit native osx client is native', function() {
+    var userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.104 Safari/537.36 Gitter/2.0.17 Gitter Token/***REMOVED***';
     assert(isNative(userAgent));
   });
 
