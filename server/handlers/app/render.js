@@ -9,10 +9,11 @@ var appVersion         = require('../../web/appVersion');
 var social             = require('../social-metadata');
 var PersistenceService = require('../../services/persistence-service');
 var restSerializer     = require("../../serializers/rest-serializer");
-var burstCalculator   = require('../../utils/burst-calculator');
-var userSort = require('../../../public/js/utils/user-sort');
-var roomSort = require('../../../public/js/utils/room-sort');
-var roomNameTrimmer = require('../../../public/js/utils/room-name-trimmer');
+var burstCalculator    = require('../../utils/burst-calculator');
+var userSort           = require('../../../public/js/utils/user-sort');
+var roomSort           = require('../../../public/js/utils/room-sort');
+var roomNameTrimmer    = require('../../../public/js/utils/room-name-trimmer');
+var url                =  require('url');
 
 var trimRoomName = function (room) {
   room.name = roomNameTrimmer(room.name);
@@ -86,6 +87,7 @@ function renderMainFrame(req, res, next, frame) {
 
   var user = req.user;
   var userId = user && user.id;
+  var aroundId = req.query.at;
 
   var selectedRoomId = req.troupe && req.troupe.id;
 
@@ -96,7 +98,13 @@ function renderMainFrame(req, res, next, frame) {
   ])
     .spread(function (troupeContext, rooms, orgs) {
 
-      var chatAppLocation = '/' + req.uriContext.uri + '/~' + frame + '#initial';
+      var chatAppLocation = url.format({
+        pathname: '/' + req.uriContext.uri + '/~' + frame,
+        query: {
+          at: aroundId
+        },
+        hash: '#initial'
+      });
 
       var template, bootScriptName;
 

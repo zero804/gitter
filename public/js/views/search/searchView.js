@@ -1,6 +1,5 @@
 "use strict";
 var $ = require('jquery');
-var log = require('utils/log');
 var apiClient = require('components/apiClient');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');

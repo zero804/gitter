@@ -13,6 +13,7 @@ var log = require('utils/log');
 var onready = require('./utils/onready');
 var $ = require('jquery');
 var RAF = require('utils/raf');
+var urlParser = require('utils/url-parser');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -99,9 +100,17 @@ onready(function () {
   };
 
   appEvents.on('navigation', function (url, type, title) {
-    if (url === window.location.pathname) { return; } // no need to reload frame, we're already there.
+    var parsed = urlParser.parse(url);
+    var frameUrl = parsed.pathname + '/~' + type + parsed.search;
+
+    if (parsed.pathname === window.location.pathname) {
+      pushState(frameUrl, title, url);
+      postMessage({ type: 'permalink.navigate', query: urlParser.parseSearch(parsed.search) });
+      return;
+    }
+
     loadingScreen.show();
-    var frameUrl = url + '/~' + type;
+
     pushState(frameUrl, title, url);
     titlebarUpdater.setRoomName(title);
     updateContent(frameUrl);
@@ -217,6 +226,11 @@ onready(function () {
 
       case 'chatframe:loaded':
         appEvents.trigger('chatframe:loaded');
+        break;
+
+      case 'permalink.requested':
+        var url = message.url + '?at=' + message.id;
+        appEvents.trigger('navigation', url,  message.permalinkType, message.uri);
         break;
     }
   });

@@ -55,7 +55,7 @@ onready(function () {
       if (uri === context.user().get('username')) {
         type = 'home';
       }
-      appEvents.trigger('navigation', target.pathname, type, uri);
+      appEvents.trigger('navigation', target.pathname + target.search, type, uri);
     }
   });
 
@@ -103,6 +103,13 @@ onready(function () {
         makeEvent(message);
         appEvents.trigger('focus.request.' + message.focus, message.event);
         break;
+
+      case 'permalink.navigate':
+        var query = message.query;
+        /* Only supports at for now..... */
+        var aroundId = query && query.at;
+        itemCollections.chats.fetchAtPoint({ aroundId: aroundId }, { });
+        break;
     }
   });
 
@@ -118,6 +125,12 @@ onready(function () {
 
   appEvents.on('route', function(hash) {
     postMessage({ type: "route", hash: hash });
+  });
+
+  appEvents.on('permalink.requested', function(type, id) {
+    if (context.inOneToOneTroupeContext()) return; // No permalinks to one-to-one chats
+    var url = context.troupe().get('url');
+    postMessage({ type: "permalink.requested", url: url, permalinkType: type, id: id });
   });
 
   appEvents.on('realtime.testConnection', function(reason) {
