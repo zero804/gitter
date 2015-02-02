@@ -187,7 +187,7 @@ function renderChat(req, res, options, next) {
   }, snapshotOptions);
 
   Q.all([
-      contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions } }),
+      contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, permalinkChatId: aroundId }),
       restful.serializeChatsForTroupe(troupe.id, userId, serializerOptions),
       restful.serializeEventsForTroupe(troupe.id, userId),
       restful.serializeUsersForTroupe(troupe.id, userId, serializerOptions)
