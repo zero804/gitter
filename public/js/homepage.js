@@ -1,5 +1,7 @@
 "use strict";
 var $ = require('jquery');
+
+var appEvents = require('utils/appevents');
 var context = require('utils/context');
 var mapMessageTemplate = require('./map-message.hbs');
 var roomNameTrimmer = require('utils/room-name-trimmer');
