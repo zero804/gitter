@@ -146,7 +146,7 @@ module.exports = (function() {
       var id = this.model.get('id');
 
       // updating the collection around the message to be scrolled to
-      itemCollections.chats.fetchAtPoint({ aroundId: id }, {}, function () {
+      itemCollections.chats.ensureLoaded(id, {}, function (/*err, chatModel*/) {
         appEvents.trigger('chatCollectionView:selectedChat', id, { highlights: this.model.get('highlights') });
       }, this);
     }
