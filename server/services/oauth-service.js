@@ -153,7 +153,7 @@ exports.validateAccessTokenAndClient = function(token, callback) {
           persistenceService.OAuthClient.findByIdQ(clientId),
           userId && userService.findById(userId)
         ])
-        .spread(function(client, user) {
+        .spread(function (client, user) {
           if(!client) {
             logger.warn('Invalid token presented (client not found): ', { token: token });
             return null;

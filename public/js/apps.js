@@ -1,4 +1,6 @@
 "use strict";
+var $ = require('jquery');
+
 require('utils/tracking');
 require('components/statsc');
 
@@ -16,7 +18,6 @@ document.getElementById('windows-download').addEventListener('click', function()
   appEvents.trigger('stats.event', 'apps.windows.download');
 });
 
-$( document ).ready(function() {
+$(document).ready(function() {
   setTimeout(initAppsPanel, 1000);
-
 });
