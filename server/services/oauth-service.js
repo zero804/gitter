@@ -253,7 +253,7 @@ exports.generateAnonWebToken = function(callback) {
          clientId: clientId,
          expires: moment().add('days', 7).toDate()
        })
-        .then(function(token) {
+        .then(function() {
           return [token, client];
         });
     })
