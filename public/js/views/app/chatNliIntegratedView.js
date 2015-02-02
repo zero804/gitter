@@ -61,7 +61,7 @@ module.exports = (function() {
       });
       chatCollectionView.bindUIElements();
 
-
+      this.chatCollectionView = chatCollectionView;
       this.dialogRegion = modalRegion;
 
       if (hasScrollBars()) {

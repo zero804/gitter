@@ -11,7 +11,7 @@ var isValidRoomUri = require('utils/valid-room-uri');
 var ChatIntegratedView = require('views/app/chatIntegratedView');
 var itemCollections = require('collections/instances/integrated-items');
 var onready = require('./utils/onready');
-
+var highlightPermalinkChats = require('./utils/highlight-permalink-chats');
 var apiClient = require('components/apiClient');
 var HeaderView = require('views/app/headerView');
 
@@ -27,31 +27,6 @@ require('components/focus-events');
 // Preload widgets
 require('views/widgets/avatar');
 require('views/widgets/timeago');
-
-// TODO: move this somewhere useful
-function findBurstModels(collection, model) {
-  var startIndex = collection.indexOf(model);
-  var endIndex = startIndex + 1;
-
-  var result = [model];
-
-  if(startIndex < 0) return result;
-
-  if(!model.get('burstStart')) {
-    startIndex--;
-    while(startIndex >= 0 && !collection.at(startIndex).get('burstStart')) {
-      result.shift(collection.at(startIndex));
-      startIndex--;
-    }
-  }
-
-  while(endIndex < collection.length && !collection.at(endIndex).get('burstStart')) {
-    result.push(collection.at(endIndex));
-    endIndex++;
-  }
-
-  return result;
-}
 
 
 onready(function () {
@@ -84,24 +59,6 @@ onready(function () {
       appEvents.trigger('navigation', target.pathname + target.search, type, uri);
     }
   });
-
-  function highlightPermalinkedModel(chatId) {
-    itemCollections.chats.ensureLoaded(chatId, function(err, model) {
-      if (err) return; // Log this?
-
-      if (!model) return;
-
-      var models = findBurstModels(itemCollections.chats, model);
-      models.forEach(function(model) {
-        var view = appView.chatCollectionView.children.findByModel(model);
-        if (view) {
-          view.highlight();
-        }
-      });
-
-      appView.chatCollectionView.scrollToChat(models[0]);
-    });
-  }
 
   window.addEventListener('message', function(e) {
     if(e.origin !== context.env('basePath')) {
@@ -154,7 +111,7 @@ onready(function () {
         var aroundId = query && query.at;
 
         if (aroundId) {
-          highlightPermalinkedModel(aroundId);
+          highlightPermalinkChats(appView.chatCollectionView, aroundId);
         }
         break;
     }
@@ -422,7 +379,7 @@ onready(function () {
   }
 
   if (context().permalinkChatId) {
-    highlightPermalinkedModel(context().permalinkChatId);
+    highlightPermalinkChats(appView.chatCollectionView, context().permalinkChatId);
   }
 
   Backbone.history.start();
