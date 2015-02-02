@@ -53,6 +53,7 @@ function findBurstModels(collection, model) {
   return result;
 }
 
+
 onready(function () {
 
   postMessage({ type: "chatframe:loaded" });
@@ -83,6 +84,24 @@ onready(function () {
       appEvents.trigger('navigation', target.pathname + target.search, type, uri);
     }
   });
+
+  function highlightPermalinkedModel(chatId) {
+    itemCollections.chats.ensureLoaded(chatId, function(err, model) {
+      if (err) return; // Log this?
+
+      if (!model) return;
+
+      var models = findBurstModels(itemCollections.chats, model);
+      models.forEach(function(model) {
+        var view = appView.chatCollectionView.children.findByModel(model);
+        if (view) {
+          view.highlight();
+        }
+      });
+
+      appView.chatCollectionView.scrollToChat(models[0]);
+    });
+  }
 
   window.addEventListener('message', function(e) {
     if(e.origin !== context.env('basePath')) {
@@ -133,22 +152,9 @@ onready(function () {
         var query = message.query;
         /* Only supports at for now..... */
         var aroundId = query && query.at;
+
         if (aroundId) {
-          itemCollections.chats.ensureLoaded(aroundId, function(err, model) {
-            if (err) return; // Log this?
-
-            if (!model) return;
-
-            var models = findBurstModels(itemCollections.chats, model);
-            models.forEach(function(model) {
-              var view = appView.chatCollectionView.children.findByModel(model);
-              if (view) {
-                view.highlight();
-              }
-            });
-
-            appView.chatCollectionView.scrollToChat(models[0]);
-          });
+          highlightPermalinkedModel(aroundId);
         }
         break;
     }
@@ -413,6 +419,10 @@ onready(function () {
 
   if(context.popEvent('hooks_require_additional_public_scope')) {
     setTimeout(promptForHook, 1500);
+  }
+
+  if (context().permalinkChatId) {
+    highlightPermalinkedModel(context().permalinkChatId);
   }
 
   Backbone.history.start();
