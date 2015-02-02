@@ -48,7 +48,9 @@ onready(function () {
     }
 
     // internal links to valid rooms shouldn't open in new windows
-    if (internalLink && isValidRoomUri(target.pathname)) {
+    // hash urls cant be used with appEvents navigation as they may need to open
+    // in a new window (e.g #integrations on desktop).
+    if (internalLink && isValidRoomUri(target.pathname) && !target.hash ) {
       e.preventDefault();
       var uri = target.pathname.replace(/^\//, '');
       var type = 'chat';
