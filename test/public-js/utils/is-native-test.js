@@ -40,6 +40,11 @@ describe('is-native', function() {
     assert(isNative(userAgent));
   });
 
+  it('detects node-webkit native windows client is native', function() {
+    var userAgent = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.104 Safari/537.36 Gitter/2.0.17 Gitter Token/***REMOVED***';
+    assert(isNative(userAgent));
+  });
+
   it('assumes garbage user-agent is not native', function() {
     var userAgent = 'nonsense';
     assert(!isNative(userAgent));
