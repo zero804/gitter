@@ -164,6 +164,7 @@ module.exports = (function() {
     },
 
     fetchAtPoint: function(query, options, callback, context) {
+      if (!options) options = {};
       // if(this.atTop) return; // Already at the top
       if(this._isFetching) return;
       this._isFetching = true;
@@ -215,6 +216,20 @@ module.exports = (function() {
 
     fetchFromMarker: function(marker, options, callback, context) {
       return this.fetchAtPoint({ marker: marker }, options, callback, context);
+    },
+
+    /* Ensure that an item is loaded, and call the callback once it is */
+    ensureLoaded: function(id, callback, context) {
+      var existing = this.get(id);
+      if (existing) {
+        return callback.call(context, null, existing);
+      }
+
+      this.fetchAtPoint({ aroundId: id }, { }, function(err) {
+        if (err) return callback.call(context, err);
+        var existing = this.get(id);
+        return callback.call(context, null, existing);
+      }, this);
     },
 
     trimTop: function() {

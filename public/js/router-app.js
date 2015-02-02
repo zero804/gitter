@@ -230,7 +230,8 @@ onready(function () {
 
       case 'permalink.requested':
         var url = message.url + '?at=' + message.id;
-        appEvents.trigger('navigation', url,  message.permalinkType, message.uri);
+        var frameUrl = message.url + '/~' + message.permalinkType + '?at=' + message.id;
+        pushState(frameUrl, message.permalinkType, url);
         break;
     }
   });

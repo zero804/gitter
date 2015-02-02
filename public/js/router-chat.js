@@ -28,6 +28,31 @@ require('components/focus-events');
 require('views/widgets/avatar');
 require('views/widgets/timeago');
 
+// TODO: move this somewhere useful
+function findBurstModels(collection, model) {
+  var startIndex = collection.indexOf(model);
+  var endIndex = startIndex + 1;
+
+  var result = [model];
+
+  if(startIndex < 0) return result;
+
+  if(!model.get('burstStart')) {
+    startIndex--;
+    while(startIndex >= 0 && !collection.at(startIndex).get('burstStart')) {
+      result.shift(collection.at(startIndex));
+      startIndex--;
+    }
+  }
+
+  while(endIndex < collection.length && !collection.at(endIndex).get('burstStart')) {
+    result.push(collection.at(endIndex));
+    endIndex++;
+  }
+
+  return result;
+}
+
 onready(function () {
 
   postMessage({ type: "chatframe:loaded" });
@@ -108,7 +133,23 @@ onready(function () {
         var query = message.query;
         /* Only supports at for now..... */
         var aroundId = query && query.at;
-        itemCollections.chats.fetchAtPoint({ aroundId: aroundId }, { });
+        if (aroundId) {
+          itemCollections.chats.ensureLoaded(aroundId, function(err, model) {
+            if (err) return; // Log this?
+
+            if (!model) return;
+
+            var models = findBurstModels(itemCollections.chats, model);
+            models.forEach(function(model) {
+              var view = appView.chatCollectionView.children.findByModel(model);
+              if (view) {
+                view.highlight();
+              }
+            });
+
+            appView.chatCollectionView.scrollToChat(models[0]);
+          });
+        }
         break;
     }
   });

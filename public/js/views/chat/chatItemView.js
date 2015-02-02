@@ -552,6 +552,14 @@ module.exports = (function() {
 
     permalink: function() {
       appEvents.trigger('permalink.requested', 'chat', this.model.id);
+    },
+
+    highlight: function() {
+      var self = this;
+      this.$el.addClass('highlight');
+      setTimeout(function() {
+        self.$el.removeClass('highlight');
+      }, 5000);
     }
   });
 
