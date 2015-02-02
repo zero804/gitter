@@ -7,6 +7,7 @@ var useragent        = require("useragent");
 var crypto           = require("crypto");
 var roomPermissionsModel = require('../services/room-permissions-model');
 var userSettingsService = require('../services/user-settings-service');
+var isNative         = require('../../public/js/utils/is-native');
 
 var assert           = require("assert");
 var Q                = require('q');
@@ -119,8 +120,7 @@ function determineDesktopNotifications(user, req) {
 }
 
 function isNativeDesktopApp(req) {
-  var agent = useragent.parse(req.headers['user-agent']);
-  return agent.family === 'Other';
+  return isNative(req.headers['user-agent']);
 }
 
 function serializeUser(user) {
