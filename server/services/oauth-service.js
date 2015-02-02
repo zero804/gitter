@@ -242,7 +242,7 @@ exports.findOrGenerateWebToken = function(userId, callback) {
 };
 
 exports.generateAnonWebToken = function(callback) {
-  return Q.all[(webClientPromise, random.generateToken())]
+  return Q.all([webClientPromise, random.generateToken()])
     .spread(function(client, token) {
       var clientId = client.id;
 
