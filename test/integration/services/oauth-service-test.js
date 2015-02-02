@@ -137,6 +137,24 @@ describe('oauth-service', function() {
     return oauthService.findOrGenerateWebToken(userId)
       .spread(function(token1, client) {
         assert(token1);
+        assert.equal('string', typeof token1);
+        assert(client);
+        assert(client.id);
+        assert(client.name);
+
+        return oauthService.validateAccessTokenAndClient(token1)
+          .then(function(tokenInfo) {
+            assert(tokenInfo);
+          });
+      })
+      .nodeify(done);
+  });
+
+  it('should use validate anonymous tokens', function(done) {
+    return oauthService.generateAnonWebToken()
+      .spread(function(token1, client) {
+        assert(token1);
+        assert.equal('string', typeof token1);
         assert(client);
         assert(client.id);
         assert(client.name);
@@ -155,6 +173,7 @@ describe('oauth-service', function() {
     return oauthService.findOrGenerateWebToken(userId)
       .spread(function(token1, client) {
         assert(token1);
+        assert.equal('string', typeof token1);
         assert(client);
         assert(client.id);
         assert(client.name);
