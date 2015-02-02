@@ -40,6 +40,7 @@ module.exports = (function() {
     'click .js-chat-item-collapse':   'toggleCollapse',
     'click .js-chat-item-readby':     'showReadBy',
     'click .js-chat-item-from':       'mentionUser',
+    'click .chat-item__time':         'permalink',
     'mouseover .js-chat-item-readby': 'showReadByIntent',
     'click .webhook':                 'expandActivity',
     'click':                          'chatSelected'
@@ -547,6 +548,10 @@ module.exports = (function() {
     chatSelected: function() {
       // this calls onSelected
       this.triggerMethod('selected', this.model);
+    },
+
+    permalink: function() {
+      appEvents.trigger('permalink.requested', 'chat', this.model.id);
     }
   });
 
