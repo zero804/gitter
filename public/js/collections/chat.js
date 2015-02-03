@@ -1,5 +1,6 @@
 "use strict";
 var _ = require('underscore');
+var Backbone = require('backbone');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var TroupeCollections = require('./base');
@@ -7,6 +8,7 @@ var moment = require('../utils/momentWrapper');
 var burstCalculator = require('../utils/burst-calculator');
 var InfiniteCollectionMixin = require('./infinite-mixin');
 var cocktail = require('cocktail');
+var log = require('utils/log');
 
 module.exports = (function() {
 
@@ -93,10 +95,22 @@ module.exports = (function() {
         });
       });
 
+      this.listenTo(this, 'sync', function (model) {
+        // Sync is for collections and models
+        if (!(model instanceof Backbone.Model)) return;
+
+        this.checkClientClockSkew(model);
+      });
+
+      this.listenTo(this, 'change:sent', function(model) {
+        this.checkClientClockSkew(model);
+      });
+
       this.listenTo(this, 'reset sync', function () {
         burstCalculator.parse(this);
       });
     },
+
     parse: function (collection) {
       if(collection.length && collection[0].limitReached) {
         collection.shift();
@@ -114,6 +128,7 @@ module.exports = (function() {
 
       return burstCalculator.parse(collection);
     },
+
     findModelForOptimisticMerge: function (newModel) {
       var optimisticModel = this.find(function(model) {
         return !model.id && model.get('text') === newModel.get('text');
@@ -121,6 +136,20 @@ module.exports = (function() {
 
       return optimisticModel;
     },
+
+    checkClientClockSkew: function(model) {
+      var sent = model.attributes.sent;
+      var previousSent = model.previousAttributes().sent;
+
+      if (sent && previousSent) {
+        var diff = sent.valueOf() - previousSent.valueOf();
+        if (diff > 20000) {
+          log.warn('Clock skew is ' + diff + 'ms');
+        }
+
+        this.trigger('clock.skew', diff);
+      }
+    }
   });
   cocktail.mixin(ChatCollection, InfiniteCollectionMixin, TroupeCollections.ReversableCollectionBehaviour);
 

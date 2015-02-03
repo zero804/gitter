@@ -1,5 +1,7 @@
 "use strict";
 var $ = require('jquery');
+
+var appEvents = require('utils/appevents');
 var context = require('utils/context');
 var mapMessageTemplate = require('./map-message.hbs');
 var roomNameTrimmer = require('utils/room-name-trimmer');
@@ -234,5 +236,12 @@ onready(function() {
   initMapMessages();
   cycleElements($('#testimonials-panel blockquote'), 7000);
   cycleElements($('.loves li'), 2500);
+  document.getElementById('osx-download').addEventListener('click', function() {
+    appEvents.trigger('stats.event', 'apps.osx.download.clicked');
+  });
+
+  document.getElementById('windows-download').addEventListener('click', function() {
+    appEvents.trigger('stats.event', 'apps.windows.download');
+  });
 });
 
