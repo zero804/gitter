@@ -39,7 +39,9 @@ describe('oauth-service', function() {
       oauthService.findOrGenerateWebToken(userId),
       oauthService.findOrGenerateWebToken(userId)
       ])
-      .spread(function(token1, token2) {
+      .spread(function(r1, r2) {
+        var token1 = r1[0];
+        var token2 = r2[0];
         assert(token1);
         assert(token2);
         assert.equal(token1, token2);
@@ -51,12 +53,15 @@ describe('oauth-service', function() {
     var userId = mongoUtils.getNewObjectIdString();
 
     return oauthService.findOrGenerateWebToken(userId)
-      .then(function(token1) {
+      .spread(function(token1, client) {
         assert(token1);
+        assert(client);
+
         return oauthService.findOrGenerateWebToken(userId)
-        .then(function(token2) {
+        .spread(function(token2, client2) {
           assert(token2);
           assert.equal(token1, token2);
+          assert.deepEqual(client, client2);
         });
       })
       .nodeify(done);
@@ -130,13 +135,55 @@ describe('oauth-service', function() {
     var userId = fixture.user1.id;
 
     return oauthService.findOrGenerateWebToken(userId)
-      .then(function(token1) {
+      .spread(function(token1, client) {
         assert(token1);
+        assert.equal('string', typeof token1);
+        assert(client);
+        assert(client.id);
+        assert(client.name);
 
         return oauthService.validateAccessTokenAndClient(token1)
           .then(function(tokenInfo) {
             assert(tokenInfo);
           });
+      })
+      .nodeify(done);
+  });
+
+  it('should use validate anonymous tokens', function(done) {
+    return oauthService.generateAnonWebToken()
+      .spread(function(token1, client) {
+        assert(token1);
+        assert.equal('string', typeof token1);
+        assert(client);
+        assert(client.id);
+        assert(client.name);
+
+        return oauthService.validateAccessTokenAndClient(token1)
+          .then(function(tokenInfo) {
+            assert(tokenInfo);
+          });
+      })
+      .nodeify(done);
+  });
+
+  it('should reuse cached tokens', function(done) {
+    var userId = fixture.user1.id;
+
+    return oauthService.findOrGenerateWebToken(userId)
+      .spread(function(token1, client) {
+        assert(token1);
+        assert.equal('string', typeof token1);
+        assert(client);
+        assert(client.id);
+        assert(client.name);
+
+        return oauthService.findOrGenerateWebToken(userId)
+          .spread(function(token2, client2) {
+            assert.equal(token1, token2);
+            assert.deepEqual(client, client2);
+          });
+
       })
       .nodeify(done);
   });

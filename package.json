@@ -1,6 +1,6 @@
 {
   "name": "gitter-webapp",
-  "version": "8.6.0",
+  "version": "8.7.0",
   "private": true,
   "dependencies": {
     "apn": "~1.4.4",
@@ -12,7 +12,7 @@
     "cors": "^2.4.2",
     "csprng": "^0.1.1",
     "diskspace": "0.1.5",
-    "dolph": "0.0.4",
+    "dolph": "^0.1.0",
     "easynexmo": "~0.3.1",
     "elasticsearch": "^2.4.3",
     "email-validator": "^1.0.0",

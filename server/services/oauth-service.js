@@ -1,9 +1,7 @@
 "use strict";
 
 var WEB_INTERNAL_CLIENT_KEY = 'web-internal';
-
 var env    = require('../utils/env');
-var stats  = env.stats;
 var nconf  = env.config;
 var logger = env.logger;
 
@@ -15,23 +13,19 @@ var Q                  = require('q');
 var userService        = require('./user-service');
 var moment             = require('moment');
 
-var webInternalClientId;
 var ircClientId;
 
 var cacheTimeout = 60; /* 60 seconds */
 
-function loadWebClientId() {
-  if(webInternalClientId) return Q.resolve(webInternalClientId);
-
-  /* Load webInternalClientId once */
-  return persistenceService.OAuthClient.findOneQ({ clientKey: WEB_INTERNAL_CLIENT_KEY })
+/* Load webInternalClientId once */
+var webClientPromise = persistenceService.OAuthClient.findOneQ({ clientKey: WEB_INTERNAL_CLIENT_KEY })
     .then(function(oauthClient) {
       if(!oauthClient) throw new Error("Unable to load internal client id.");
+      oauthClient = oauthClient.toJSON();
+      oauthClient.id = oauthClient._id && oauthClient._id.toString();
 
-      webInternalClientId = oauthClient._id;
-      return webInternalClientId;
+      return oauthClient;
     });
-}
 
 function loadIrcClientId() {
   if(ircClientId) return Q.resolve(ircClientId);
@@ -49,16 +43,20 @@ function loadIrcClientId() {
 var tokenLookupCachePrefix = "token:c:";
 var tokenLookupCache = {
   get: function(userId, clientId) {
+    var key = userId + ':' + clientId;
+
     var d = Q.defer();
-    redisClient.get(tokenLookupCachePrefix + userId + ':' + clientId, d.makeNodeResolver());
+    redisClient.get(tokenLookupCachePrefix + key, d.makeNodeResolver());
     return d.promise.catch(function(err) {
       logger.warn('Unable to lookup token in cache ' + err, { exception: err });
     });
   },
 
   set: function(userId, clientId, token) {
+    var key = userId + ':' + clientId;
+
     var d = Q.defer();
-    redisClient.setex(tokenLookupCachePrefix + userId + ':' + clientId, cacheTimeout, token, d.makeNodeResolver());
+    redisClient.setex(tokenLookupCachePrefix + key, cacheTimeout, token, d.makeNodeResolver());
     return d.promise.catch(function(err) {
       logger.warn('Unable to set token lookup in cache ' + err, { exception: err });
     });
@@ -101,10 +99,6 @@ exports.findClientById = function(id, callback) {
 
 // this is called when a user actively logs in via oauth
 exports.saveAuthorizationCode = function(code, client, redirectUri, user, callback) {
-  var properties = {};
-  properties['Last login from ' + client.tag] = new Date();
-  stats.userUpdate(user, properties);
-
   var authCode = new persistenceService.OAuthCode({
       code: code,
       clientId: client.id,
@@ -130,7 +124,6 @@ exports.validateAccessTokenAndClient = function(token, callback) {
       if(cachedInfo) {
         return cachedInfo;
       }
-
       return persistenceService.OAuthAccessToken.findOneQ({ token: token })
         .then(function(accessToken) {
           if(!accessToken) return;
@@ -160,7 +153,7 @@ exports.validateAccessTokenAndClient = function(token, callback) {
           persistenceService.OAuthClient.findByIdQ(clientId),
           userId && userService.findById(userId)
         ])
-        .spread(function(client, user) {
+        .spread(function (client, user) {
           if(!client) {
             logger.warn('Invalid token presented (client not found): ', { token: token });
             return null;
@@ -202,14 +195,19 @@ function findOrCreateToken(userId, clientId, callback) {
       return persistenceService.OAuthAccessToken.findOneQ({
           userId: userId,
           clientId: clientId
-        }).then(function(oauthAccessToken) {
-          if(oauthAccessToken) {
-            return tokenLookupCache.set(userId, clientId, oauthAccessToken.token)
-              .thenResolve(oauthAccessToken.token);
+        }, {
+          _id: -1, token: 1
+        }, {
+          lean: true
+        })
+        .then(function(oauthAccessToken) {
+          if(oauthAccessToken && oauthAccessToken.token) {
+            return oauthAccessToken.token;
           }
 
           return random.generateToken()
             .then(function(token) {
+
               return persistenceService.OAuthAccessToken.findOneAndUpdateQ(
                 { userId: userId, clientId: clientId },
                 {
@@ -220,10 +218,12 @@ function findOrCreateToken(userId, clientId, callback) {
                 {
                   upsert: true
                 }).then(function(result) {
-                  return tokenLookupCache.set(userId, clientId, result.token)
-                    .thenResolve(result.token);
+                  return result.token;
                 });
               });
+            }).then(function(token) {
+              return tokenLookupCache.set(userId, clientId, token)
+                .thenResolve(token);
             });
 
     })
@@ -234,26 +234,28 @@ exports.findOrCreateToken = findOrCreateToken;
 // TODO: move some of this functionality into redis for speed
 // TODO: make the web tokens expire
 exports.findOrGenerateWebToken = function(userId, callback) {
-  return loadWebClientId()
-    .then(function(clientId) {
-      return findOrCreateToken(userId, clientId);
+  return webClientPromise
+    .then(function(client) {
+      return Q.all([findOrCreateToken(userId, client.id), client]);
     })
     .nodeify(callback);
 };
 
 exports.generateAnonWebToken = function(callback) {
-  return Q.all([
-      loadWebClientId(),
-      random.generateToken()
-    ])
-    .spread(function(clientId, token) {
+  return Q.all([webClientPromise, random.generateToken()])
+    .spread(function(client, token) {
+      var clientId = client.id;
+
+      // No userId...
       return persistenceService.OAuthAccessToken.createQ({
-          token: token,
-          userId: null,
-          clientId: clientId,
-          expires: moment().add('days', 7).toDate()
-        })
-        .thenResolve(token);
+         token: token,
+         userId: null,
+         clientId: clientId,
+         expires: moment().add('days', 7).toDate()
+       })
+        .then(function() {
+          return [token, client];
+        });
     })
     .nodeify(callback);
 };
