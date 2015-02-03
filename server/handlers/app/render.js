@@ -356,7 +356,7 @@ function renderChatCard(req, res, next) {
   var aroundId = req.query.at;
 
   return renderChat(req, res, {
-    limit: 10,
+    limit: 20,
     template: 'chat-card-template',
     stylesheet: 'chat-card',
     fetchEvents: false,
