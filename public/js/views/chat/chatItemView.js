@@ -556,9 +556,9 @@ module.exports = (function() {
 
     highlight: function() {
       var self = this;
-      this.$el.addClass('highlight');
+      this.$el.addClass('chat-item__highlighted');
       setTimeout(function() {
-        self.$el.removeClass('highlight');
+        self.$el.removeClass('chat-item__highlighted');
       }, 5000);
     }
   });
