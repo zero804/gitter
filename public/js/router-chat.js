@@ -7,7 +7,6 @@ var context = require('utils/context');
 var liveContext = require('components/live-context');
 var appEvents = require('utils/appevents');
 var log = require('utils/log');
-var isValidRoomUri = require('utils/valid-room-uri');
 var ChatIntegratedView = require('views/app/chatIntegratedView');
 var itemCollections = require('collections/instances/integrated-items');
 var onready = require('./utils/onready');
@@ -33,32 +32,7 @@ onready(function () {
 
   postMessage({ type: "chatframe:loaded" });
 
-  $(document).on("click", "a", function (e) {
-    var target = e.currentTarget;
-    var internalLink = target.hostname === context.env('baseServer');
-
-    var location = window.location;
-
-    // modals
-    if (location.scheme === target.scheme &&
-        location.host === target.host &&
-        location.pathname === target.pathname) {
-      e.preventDefault();
-      window.location = target.href;
-      return true;
-    }
-
-    // internal links to valid rooms shouldn't open in new windows
-    if (internalLink && isValidRoomUri(target.pathname)) {
-      e.preventDefault();
-      var uri = target.pathname.replace(/^\//, '');
-      var type = 'chat';
-      if (uri === context.user().get('username')) {
-        type = 'home';
-      }
-      appEvents.trigger('navigation', target.pathname + target.search, type, uri);
-    }
-  });
+  require('components/link-handler').installLinkHandler();
 
   window.addEventListener('message', function(e) {
     if(e.origin !== context.env('basePath')) {

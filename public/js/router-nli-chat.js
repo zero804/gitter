@@ -1,5 +1,6 @@
 "use strict";
-var $ = require('jquery');
+
+var appEvents = require('utils/appevents');
 var Backbone = require('backbone');
 var context = require('utils/context');
 var ChatNliIntegratedView = require('views/app/chatNliIntegratedView');
@@ -22,29 +23,11 @@ require('views/widgets/timeago');
 
 onready(function() {
 
-  $(document).on("click", "a", function(e) {
-    if(this.href) {
-      var href = $(this).attr('href');
-      if(href.indexOf('#') === 0) {
-        e.preventDefault();
-        window.location = href;
-      }
-    }
+  require('components/link-handler').installLinkHandler();
 
-    return true;
-  });
-
-
-  // When a user clicks an internal link, prevent it from opening in a new window
-  $(document).on("click", "a.link", function(e) {
-    var basePath = context.env('basePath');
-    var href = e.target.getAttribute('href');
-    if(!href || href.indexOf(basePath) !== 0) {
-      return;
-    }
-
-    e.preventDefault();
-    window.parent.location.href = href;
+  appEvents.on('navigation', function(url) {
+    // No pushState here. Open links within the parent...
+    window.parent.location.href = url;
   });
 
   var appView = new ChatNliIntegratedView({ el: 'body', chatCollection: itemCollections.chats, userCollection: itemCollections.users });
