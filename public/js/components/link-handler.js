@@ -24,9 +24,11 @@ function installLinkHandler() {
     }
 
     // internal links to valid rooms shouldn't open in new windows
-    if (internalLink && isValidRoomUri(target.pathname)) {
+    // Except if they have a target
+    var targetWindow = target.target;
+    if (internalLink && isValidRoomUri(target.pathname) && targetWindow !== 'external') {
       e.preventDefault();
-      var uri = target.pathname.replace(/^\//, '');
+      var uri = target.pathname.substring(1);
       var type = 'chat';
       if (uri === context.user().get('username')) {
         type = 'home';
