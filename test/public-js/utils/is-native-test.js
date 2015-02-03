@@ -50,4 +50,14 @@ describe('is-native', function() {
     assert(!isNative(userAgent));
   });
 
+  it('assumes empty user-agent is not native', function() {
+    var userAgent = '';
+    assert(!isNative(userAgent));
+  });
+
+  it('assumes undefined user-agent is not native', function() {
+    var userAgent = undefined;
+    assert(!isNative(userAgent));
+  });
+
 });
