@@ -5,14 +5,17 @@ var Q                  = require('q');
 var contextGenerator   = require('../../web/context-generator');
 var restful            = require('../../services/restful');
 var userService        = require('../../services/user-service');
+var chatService        = require('../../services/chat-service');
 var appVersion         = require('../../web/appVersion');
 var social             = require('../social-metadata');
 var PersistenceService = require('../../services/persistence-service');
 var restSerializer     = require("../../serializers/rest-serializer");
-var burstCalculator   = require('../../utils/burst-calculator');
-var userSort = require('../../../public/js/utils/user-sort');
-var roomSort = require('../../../public/js/utils/room-sort');
-var roomNameTrimmer = require('../../../public/js/utils/room-name-trimmer');
+var burstCalculator    = require('../../utils/burst-calculator');
+var userSort           = require('../../../public/js/utils/user-sort');
+var roomSort           = require('../../../public/js/utils/room-sort');
+var roomNameTrimmer    = require('../../../public/js/utils/room-name-trimmer');
+var isolateBurst       = require('../../../shared/burst/isolate-burst-array');
+var url                =  require('url');
 
 var trimRoomName = function (room) {
   room.name = roomNameTrimmer(room.name);
@@ -82,21 +85,42 @@ function renderHomePage(req, res, next) {
     .fail(next);
 }
 
+function getPermalinkChatForRoom(troupe, chatId) {
+  if (troupe.security !== 'PUBLIC') return Q.resolve();
+
+  return chatService.findByIdInRoom(troupe.id, chatId)
+    .then(function(chat) {
+      var strategy = new restSerializer.ChatStrategy({
+        notLoggedIn: true,
+        troupeId: troupe.id
+      });
+
+      return restSerializer.serialize(chat, strategy);
+    });
+}
+
 function renderMainFrame(req, res, next, frame) {
 
   var user = req.user;
   var userId = user && user.id;
+  var aroundId = req.query.at;
 
   var selectedRoomId = req.troupe && req.troupe.id;
 
   Q.all([
     contextGenerator.generateNonChatContext(req),
     restful.serializeTroupesForUser(userId),
-    restful.serializeOrgsForUserId(userId)
+    restful.serializeOrgsForUserId(userId),
+    aroundId && getPermalinkChatForRoom(req.troupe, aroundId)
   ])
-    .spread(function (troupeContext, rooms, orgs) {
-
-      var chatAppLocation = '/' + req.uriContext.uri + '/~' + frame + '#initial';
+    .spread(function (troupeContext, rooms, orgs, permalinkChat) {
+      var chatAppLocation = url.format({
+        pathname: '/' + req.uriContext.uri + '/~' + frame,
+        query: {
+          at: aroundId
+        },
+        hash: '#initial'
+      });
 
       var template, bootScriptName;
 
@@ -113,8 +137,12 @@ function renderMainFrame(req, res, next, frame) {
         .map(markSelected.bind(null, selectedRoomId))
         .map(trimRoomName);
 
+      var socialMetadata = permalinkChat ?
+        social.getMetadataForChatPermalink({ room: req.troupe, chat: permalinkChat  }) :
+        social.getMetadata({ room: req.troupe  });
+
       res.render(template, {
-        socialMetadata: social.getMetadata({ room: req.troupe }),
+        socialMetadata: socialMetadata,
         bootScriptName: bootScriptName,
         cssFileName: "styles/" + bootScriptName + ".css",
         troupeName: req.uriContext.uri,
@@ -149,7 +177,7 @@ function renderChat(req, res, options, next) {
   var userId = user && user.id;
 
   var snapshotOptions = {
-    limit: INITIAL_CHAT_COUNT,
+    limit: options.limit || INITIAL_CHAT_COUNT,
     aroundId: aroundId,
     unread: options.unread // Unread can be true, false or undefined
   };
@@ -160,10 +188,10 @@ function renderChat(req, res, options, next) {
   }, snapshotOptions);
 
   Q.all([
-      contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions } }),
+      options.generateContext === false ? null : contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, permalinkChatId: aroundId }),
       restful.serializeChatsForTroupe(troupe.id, userId, serializerOptions),
-      restful.serializeEventsForTroupe(troupe.id, userId),
-      restful.serializeUsersForTroupe(troupe.id, userId, serializerOptions)
+      options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
+      options.fetchUsers === false ? null :restful.serializeUsersForTroupe(troupe.id, userId, serializerOptions)
     ]).spread(function (troupeContext, chats, activityEvents, users) {
       var initialChat = _.find(chats, function(chat) { return chat.initial; });
       var initialBottom = !initialChat;
@@ -179,41 +207,48 @@ function renderChat(req, res, options, next) {
       var isPrivate = troupe.security !== "PUBLIC";
       var integrationsUrl;
 
-      if (troupeContext.isNativeDesktopApp) {
+      if (troupeContext && troupeContext.isNativeDesktopApp) {
          integrationsUrl = nconf.get('web:basepath') + '/' + troupeContext.troupe.uri + '#integrations';
       } else {
         integrationsUrl = '#integrations';
       }
 
-      var cutOff = users.length - USER_COLLECTION_FOLD;
+      var cutOff = users ? users.length - USER_COLLECTION_FOLD : 0;
       var remainingCount = (cutOff > 0) ? cutOff : 0;
+      var cssFileName = options.stylesheet ? "styles/" + options.stylesheet + ".css" : "styles/" + script + ".css"; // css filename matches bootscript
+
+      var chatsWithBurst = burstCalculator(chats);
+      if (options.filterChats) {
+        chatsWithBurst = options.filterChats(chatsWithBurst);
+      }
 
       var renderOptions = _.extend({
           isRepo: troupe.githubType === 'REPO',
           bootScriptName: script,
-          cssFileName: "styles/" + script + ".css", // css filename matches bootscript
+          cssFileName: cssFileName,
           githubLink: githubLink,
           troupeName: req.uriContext.uri,
-          troupeTopic: troupeContext.troupe.topic,
-          plan: troupeContext.troupe.plan,
           oneToOne: troupe.oneToOne,
-          troupeFavourite: troupeContext.troupe.favourite,
           user: user,
           troupeContext: troupeContext,
           initialBottom: initialBottom,
-          chats: burstCalculator(chats),
+          chats: chatsWithBurst,
           classNames: classNames.join(' '),
           agent: req.headers['user-agent'],
           dnsPrefetch: dnsPrefetch,
           isPrivate: isPrivate,
-          avatarUrl: avatar(troupeContext.troupe),
           activityEvents: activityEvents,
-          users: users.sort(userSort).slice(0, USER_COLLECTION_FOLD),
+          users: users && users.sort(userSort).slice(0, USER_COLLECTION_FOLD),
           remainingCount: remainingCount,
-          isAdmin: troupeContext.permissions.admin,
-          isNativeDesktopApp: troupeContext.isNativeDesktopApp,
           integrationsUrl: integrationsUrl,
           placeholder: 'Click here to type a chat message. Supports GitHub flavoured markdown.'
+        }, troupeContext && {
+          troupeTopic: troupeContext.troupe.topic,
+          plan: troupeContext.troupe.plan,
+          troupeFavourite: troupeContext.troupe.favourite,
+          avatarUrl: avatar(troupeContext.troupe),
+          isAdmin: troupeContext.permissions.admin,
+          isNativeDesktopApp: troupeContext.isNativeDesktopApp
         }, options.extras);
 
       res.render(options.template, renderOptions);
@@ -316,6 +351,31 @@ function renderEmbeddedChat(req, res, next) {
   }, next);
 }
 
+function renderChatCard(req, res, next) {
+  if (!req.query.at) return next(400);
+  var aroundId = req.query.at;
+
+  return renderChat(req, res, {
+    limit: 20,
+    template: 'chat-card-template',
+    stylesheet: 'chat-card',
+    fetchEvents: false,
+    fetchUsers: false,
+    generateContext: false,
+    unread: false, // Embedded users see chats as read
+    classNames: [ 'card' ],
+    filterChats: function(chats) {
+      // Only show the burst
+      // TODO: move this somewhere useful
+      var permalinkedChat = _.find(chats, function(chat) { return chat.id == aroundId; });
+      if (!permalinkedChat) return [];
+
+      var burstChats = isolateBurst(chats, permalinkedChat);
+      return burstChats;
+    }
+  }, next);
+}
+
 /**
  * renderUserNotSignedUp() renders a set template for a 1:1 chat, with an invited user.
  */
@@ -370,6 +430,7 @@ module.exports = exports = {
   renderMobileChat: renderMobileChat,
   renderMobileUserHome: renderMobileUserHome,
   renderEmbeddedChat: renderEmbeddedChat,
+  renderChatCard: renderChatCard,
   renderMobileNotLoggedInChat: renderMobileNotLoggedInChat,
   renderNotLoggedInChatPage: renderNotLoggedInChatPage,
   renderMobileNativeEmbeddedChat: renderMobileNativeEmbeddedChat,
