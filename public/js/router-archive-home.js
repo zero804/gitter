@@ -5,6 +5,7 @@ var HeaderView = require('views/app/headerView');
 var apiClient = require('components/apiClient');
 var CalHeatMap = require('cal-heatmap');
 var onready = require('./utils/onready');
+var appEvents = require('utils/appevents');
 
 require('views/widgets/preload');
 require('filtered-collection');
@@ -16,16 +17,9 @@ require('utils/tracking');
 
 onready(function() {
 
-  $(document).on("click", "a", function(e) {
-    if(this.href) {
-      var href = $(this).attr('href');
-      if(href.indexOf('#') === 0) {
-        e.preventDefault();
-        window.location = href;
-      }
-    }
-
-    return true;
+  require('components/link-handler').installLinkHandler();
+  appEvents.on('navigation', function(url) {
+    window.location = url;
   });
 
   $('#noindex').on("change", function() {
@@ -55,18 +49,6 @@ onready(function() {
   });
 
   new HeaderView({ model: context.troupe(), el: '#header' });
-
-  // var Router = Backbone.Router.extend({
-  //   routes: {
-  //     // TODO: get rid of the pipes
-  //     "": "hideModal",
-  //   },
-
-  //   hideModal: function() {
-  //     appView.dialogRegion.close();
-  //   },
-
-  // });
 
   var troupeId = context.getTroupeId();
 

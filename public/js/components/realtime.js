@@ -267,7 +267,6 @@ module.exports = (function() {
 
   function createClient() {
     var c = context.env('websockets');
-    c.options.reuseTransport = false; // TODO: consider if we need this
     var client = new Faye.Client(c.fayeUrl, c.options);
 
     if(websocketsDisabled) {
