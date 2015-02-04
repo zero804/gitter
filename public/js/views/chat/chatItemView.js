@@ -550,8 +550,9 @@ module.exports = (function() {
       this.triggerMethod('selected', this.model);
     },
 
-    permalink: function() {
-      appEvents.trigger('permalink.requested', 'chat', this.model.id);
+    permalink: function(e) {
+      /* Holding the Alt key down while clicking adds the permalink to the chat input */
+      appEvents.trigger('permalink.requested', 'chat', this.model, { appendInput: !!e.altKey });
     },
 
     highlight: function() {
