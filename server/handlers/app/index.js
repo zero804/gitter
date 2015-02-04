@@ -94,6 +94,16 @@ var embedMiddlewarePipeline = [
   }
 ];
 
+var cardMiddlewarePipeline = [
+  appMiddleware.uriContextResolverMiddleware({ create: false }),
+  function (req, res, next) {
+    if(!req.uriContext.troupe) return next(404);
+    if(req.uriContext.troupe.security !== 'PUBLIC') return next(403);
+    if(!req.query.at) return next(400);
+    appRender.renderChatCard(req, res, next);
+  }
+];
+
 
 module.exports = {
     install: function(app) {
@@ -111,6 +121,13 @@ module.exports = {
         '/:roomPart1/:roomPart2/:roomPart3/~embed'    // CUSTOM REPO_ROOM
       ].forEach(function(path) {
         app.get(path, embedMiddlewarePipeline);
+      });
+
+      [
+        '/:roomPart1/:roomPart2/~card',              // REPO or ORG_CHANNEL or ADHOC
+        '/:roomPart1/:roomPart2/:roomPart3/~card'    // CUSTOM REPO_ROOM
+      ].forEach(function(path) {
+        app.get(path, cardMiddlewarePipeline);
       });
 
 

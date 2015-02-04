@@ -2,6 +2,7 @@
 
 var $ = require('jquery');
 var appEvents = require('utils/appevents');
+var context = require('utils/context');
 var chatModels = require('collections/chat');
 var ChatCollectionView = require('views/chat/chatCollectionView');
 var Backbone = require('backbone');
@@ -10,6 +11,7 @@ var MobileAppView = require('views/app/mobileAppView');
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var MobileLoginButton = require('views/mobile/mobileLoginButton');
 var onready = require('./utils/onready');
+var highlightPermalinkChats = require('./utils/highlight-permalink-chats');
 
 // Preload widgets
 require('views/widgets/avatar');
@@ -23,13 +25,14 @@ onready(function() {
     hideMenu: true
   });
 
+  require('components/link-handler').installLinkHandler();
   appEvents.on('navigation', function(url) {
     window.location.href = url;
   });
 
   var chatCollection = new chatModels.ChatCollection(null, { listen: true });
 
-  new ChatCollectionView({
+  var chatCollectionView = new ChatCollectionView({
     el: '#chat-container',
     collection: chatCollection,
     decorators: [emojiDecorator]
@@ -55,5 +58,8 @@ onready(function() {
 
   Backbone.history.start();
 
+  if (context().permalinkChatId) {
+    highlightPermalinkChats(chatCollectionView, context().permalinkChatId);
+  }
 
 });

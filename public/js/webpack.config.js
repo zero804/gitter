@@ -66,6 +66,7 @@ var webpackConfig = {
   resolve: {
     alias: {
       "utils": path.resolve(path.join(__dirname, "/utils/")),
+      "shared": path.resolve(path.join(__dirname, "../../shared/")),
       "views": path.resolve(path.join(__dirname, "./views/")),
       "collections": path.resolve(path.join(__dirname, "./collections")),
       "components": path.resolve(path.join(__dirname, "./components")),
