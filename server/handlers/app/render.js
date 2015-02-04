@@ -86,7 +86,7 @@ function renderHomePage(req, res, next) {
 }
 
 function getPermalinkChatForRoom(troupe, chatId) {
-  if (troupe.security !== 'PUBLIC') return Q.resolve();
+  if (!troupe || troupe.security !== 'PUBLIC') return Q.resolve();
 
   return chatService.findByIdInRoom(troupe.id, chatId)
     .then(function(chat) {
