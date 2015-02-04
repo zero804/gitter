@@ -343,7 +343,6 @@ var server = new faye.NodeAdapter({
   mount: '/faye',
   timeout: nconf.get('ws:fayeTimeout'),
   ping: nconf.get('ws:fayePing'),
-  retry: nconf.get('ws:fayeRetry'),
   engine: {
     type: fayeRedis,
     client: env.redis.getClient(),

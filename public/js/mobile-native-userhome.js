@@ -13,6 +13,16 @@ var onready = require('./utils/onready');
 require('views/widgets/avatar');
 
 onready(function() {
+  require('components/link-handler').installLinkHandler();
+  appEvents.on('navigation', function(url) {
+    if(window.cordova) {
+      // ios only
+      cordovaNavigate.navigate(url);
+    } else {
+      // android
+      window.location.href = url;
+    }
+  });
 
   cordovaNavigate.setNativeToUserhome();
 
@@ -20,18 +30,6 @@ onready(function() {
     new UserHomeView({
       el: $('#content-frame')
     }).render();
-
-    appEvents.on('navigation', function(url) {
-      if(url.indexOf('#') === 0) {
-        window.location.hash = url;
-      } else if(window.cordova) {
-        // ios only
-        cordovaNavigate.navigate(url);
-      } else {
-        // android
-        window.location.href = url;
-      }
-    });
 
     $('html').removeClass('loading');
   }
@@ -53,7 +51,7 @@ onready(function() {
 
   var Router = Backbone.Router.extend({
     routes: {
-      'confirm/*uri': function(uri) {
+      'confirmSuggested/*uri': function(uri) {
         modalRegion.show(new confirmRepoRoomView.Modal({ uri: uri }));
       },
       '': function() {
