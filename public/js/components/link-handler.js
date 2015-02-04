@@ -4,10 +4,15 @@ var $ = require('jquery');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
 var isValidRoomUri = require('utils/valid-room-uri');
+var dataset = require('utils/dataset-shim');
 
 function installLinkHandler() {
   $(document).on("click", "a", function (e) {
     var target = e.currentTarget;
+
+    var disableRouting = dataset.get(target, 'disableRouting');
+    if (disableRouting) return; // Propegate the event....
+
     var internalLink = target.hostname === context.env('baseServer');
 
     var location = window.location;
@@ -25,8 +30,7 @@ function installLinkHandler() {
 
     // internal links to valid rooms shouldn't open in new windows
     // Except if they have a target
-    var targetWindow = target.target;
-    if (internalLink && isValidRoomUri(target.pathname) && targetWindow !== 'external') {
+    if (internalLink && isValidRoomUri(target.pathname)) {
       e.preventDefault();
       var uri = target.pathname.substring(1);
       var type = 'chat';

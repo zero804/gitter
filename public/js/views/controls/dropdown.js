@@ -54,6 +54,18 @@ module.exports = (function() {
       return "";
     },
     onRender: function() {
+      /** Add anything in the dataset attribute to the Anchor tag's dataset */
+      var ds = this.model.get('dataset');
+      if(ds) {
+        var a = this.el.querySelector('a');
+
+        if (a) {
+          Object.keys(ds).forEach(function(key) {
+            dataset.set(a, key, ds[key]);
+          });
+        }
+      }
+
       dataset.set(this.el, 'cid', this.model.cid);
     }
   });
