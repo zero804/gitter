@@ -17,7 +17,7 @@ module.exports = (function() {
       this.time = moment(options.time);
       this.compact = options.compact;
       this.position = options.position || "top";
-
+      this.tooltipFormat = options.tooltipFormat || 'LLL';
       var self = this;
 
       function rerender() {
@@ -62,10 +62,10 @@ module.exports = (function() {
         v = this.compact ? this.time.format("H:mm", { lang: lang }) : locale("%s ago", duration.humanize());
       }
 
-      var fullTime = this.time.format("LLL", { lang: lang });
+      var fullTime = this.time.format(this.tooltipFormat, { lang: lang });
       this.$el.html("<span title='" + fullTime + "'>" + v + "</span>");
       if (!window._troupeCompactView) {
-        this.$el.find('[title]').tooltip({ container: 'body', placement: this.position });
+        this.$el.find('[title]').tooltip({ container: 'body', placement: this.position, html: true });
       }
     }
 
