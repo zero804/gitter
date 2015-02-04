@@ -105,9 +105,17 @@ onready(function () {
     postMessage({ type: "route", hash: hash });
   });
 
-  appEvents.on('permalink.requested', function(type, id) {
+  appEvents.on('permalink.requested', function(type, chat, options) {
     if (context.inOneToOneTroupeContext()) return; // No permalinks to one-to-one chats
     var url = context.troupe().get('url');
+    var id = chat.id;
+
+    if (options && options.appendInput) {
+      var fullUrl = window.location.origin + url + '?at=' + id;
+      var formattedDate = chat.get('sent') && chat.get('sent').format('LLL');
+      appEvents.trigger('input.append', ':point_up: [' + formattedDate + '](' + fullUrl + ')');
+    }
+
     postMessage({ type: "permalink.requested", url: url, permalinkType: type, id: id });
   });
 
