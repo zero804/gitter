@@ -133,3 +133,4 @@ Once you are sure the above is done, preform the following:
 10. Log into HQ: http://localhost:9200/_plugin/HQ -> Connect 
 
 11. Check that there are lots of documents under the Gitter index.
+
