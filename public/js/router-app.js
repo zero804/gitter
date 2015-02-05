@@ -100,7 +100,11 @@ onready(function () {
       hash = windowHash;
     }
 
-    /* Use location.replace so as not to affect the history state of the application */
+    /*
+     * Use location.replace so as not to affect the history state of the application
+     *
+     * The history has already been pushed via the pushstate, so we don't want to double up
+     */
     document.querySelector('#content-frame').contentWindow.location.replace(iframeUrl + hash);
   }
 
