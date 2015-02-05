@@ -2,11 +2,12 @@
 "use strict";
 
 var env            = require('../utils/env');
-
+var logger         = env.logger;
 var mongoose       = require('../utils/mongoose-q');
 var winston        = require('../utils/winston');
 var nconf          = require("../utils/config");
 var shutdown       = require('shutdown');
+var mongodbConnString = require('mongodb-connection-string');
 
 var mongoDogStats  = require('mongodb-datadog-stats');
 
@@ -22,7 +23,8 @@ var connection = mongoose.connection;
 
 mongoose.set('debug', nconf.get("mongo:logQueries"));
 
-mongoose.connect(nconf.get("mongo:url"), {
+var mongoConnection = nconf.get("mongo:connection");
+var MONGO_CONNECTION_OPTIONS = {
   server: {
     keepAlive: 1,
     auto_reconnect: true,
@@ -33,13 +35,19 @@ mongoose.connect(nconf.get("mongo:url"), {
     auto_reconnect: true,
     socketOptions: { keepAlive: 1, connectTimeoutMS: 60000 }
   }
-});
+};
+
+mongoose.connect(mongodbConnString.mongo(mongoConnection), MONGO_CONNECTION_OPTIONS);
 
 shutdown.addHandler('mongo', 1, function(callback) {
+  console.log('shutting down mongoose>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
   mongoose.disconnect(callback);
 });
 
+var hasConnected = false;
+
 mongoose.connection.on('open', function() {
+  hasConnected = true;
   if(nconf.get("mongo:profileSlowQueries")) {
 
     mongoose.set('debug', function (collectionName, method, query/*, doc, options*/) {
@@ -74,10 +82,71 @@ mongoose.connection.on('open', function() {
 
 });
 
+var autodiscoveryAttempts = 0;
+function attemptAutoDiscoveryConnection(err) {
+  logger.error('Attempting autodiscovery as connection failed');
+  function die(err) {
+    console.error(err);
+    console.error(err.stack);
+    shutdown.shutdownGracefully(1);
+  }
+
+  if(autodiscoveryAttempts > 0) {
+    logger.error('No autodiscovery already failed. Aborting connection');
+    return die(err);
+  }
+
+  autodiscoveryAttempts++;
+
+  var autoDiscoveryHost = nconf.get('mongo:autoDiscovery:host');
+  var autoDiscoveryPort = nconf.get('mongo:autoDiscovery:port') || 27017;
+
+  if (!autoDiscoveryHost) {
+    logger.error('No autodiscovery host available, unable to autodiscover');
+    return die(err);
+  }
+
+  logger.error('Autodiscovery via ' + autoDiscoveryHost + ":" + autoDiscoveryPort);
+
+  var db = new mongoose.mongo.Db('admin', new mongoose.mongo.Server(autoDiscoveryHost, autoDiscoveryPort), { w: 0, slaveOk: true });
+  db.open(function(err, db) {
+    if (err) {
+      logger.error('Unable to connect to autodiscovery ' + autoDiscoveryHost + ":" + autoDiscoveryPort);
+      return die(err);
+    }
+
+    db.command({ "replSetGetStatus": 1 }, function(err, result) {
+      if (err) return die(err);
+
+      if (mongoConnection.options && mongoConnection.options.replicaSet) {
+        if ( mongoConnection.options.replicaSet !== result.set) {
+          return die(new Error("Autodiscovery host does not have the same replicaset name as that used in the connection"));
+        }
+      }
+
+      var hosts = result.members
+        .filter(function(f) {
+          return f.state === 1 || f.state === 2;
+        }).map(function(f) {
+          return f.name;
+        });
+
+      mongoConnection.hosts = hosts;
+
+      mongoose.connect(mongodbConnString.mongo(mongoConnection), MONGO_CONNECTION_OPTIONS);
+      db.close();
+    });
+
+  });
+
+}
 connection.on('error', function(err) {
   winston.info("MongoDB connection error", { exception: err });
   console.error(err);
   if(err.stack) console.log(err.stack);
+
+  if (hasConnected) return;
+  attemptAutoDiscoveryConnection(err);
 });
 
 function createExports(schemas) {
