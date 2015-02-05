@@ -2076,6 +2076,10 @@
         }
       }
     },
+    "mongodb-arbiter-discovery": {
+      "version": "0.1.1",
+      "from": "mongodb-arbiter-discovery@*"
+    },
     "mongodb-connection-string": {
       "version": "0.1.1",
       "from": "mongodb-connection-string@*"
