@@ -55,6 +55,8 @@ onready(function () {
     chatIFrame.src = noHashSrc + window.location.hash;
   }
 
+  /* TODO: add the link handler here? */
+
   /*
    * Push State Management
    */
