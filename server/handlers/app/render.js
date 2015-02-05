@@ -114,11 +114,13 @@ function renderMainFrame(req, res, next, frame) {
     aroundId && getPermalinkChatForRoom(req.troupe, aroundId)
   ])
     .spread(function (troupeContext, rooms, orgs, permalinkChat) {
+      var chatAppQuery = {};
+      if (aroundId) {
+        chatAppQuery.at = aroundId;
+      }
       var chatAppLocation = url.format({
         pathname: '/' + req.uriContext.uri + '/~' + frame,
-        query: {
-          at: aroundId
-        },
+        query: chatAppQuery,
         hash: '#initial'
       });
 
