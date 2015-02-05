@@ -1,6 +1,6 @@
 {
   "name": "gitter-webapp",
-  "version": "8.6.0",
+  "version": "8.7.3",
   "dependencies": {
     "apn": {
       "version": "1.4.4",
@@ -1352,7 +1352,7 @@
     },
     "gitter-faye": {
       "version": "1.1.0-a",
-      "from": "gitter-faye@1.1.0-a",
+      "from": "http://beta-internal:8089/nexus/content/groups/npm/gitter-faye/-/gitter-faye-1.1.0-a.tgz",
       "resolved": "http://beta-internal:8089/nexus/content/groups/npm/gitter-faye/-/gitter-faye-1.1.0-a.tgz",
       "dependencies": {
         "faye-websocket": {
@@ -1399,11 +1399,6 @@
                       "from": "http://beta-internal:8089/nexus/content/groups/npm/minimatch/-/minimatch-0.3.0.tgz",
                       "resolved": "http://beta-internal:8089/nexus/content/groups/npm/minimatch/-/minimatch-0.3.0.tgz",
                       "dependencies": {
-                        "lru-cache": {
-                          "version": "2.5.0",
-                          "from": "http://beta-internal:8089/nexus/content/groups/npm/lru-cache/-/lru-cache-2.5.0.tgz",
-                          "resolved": "http://beta-internal:8089/nexus/content/groups/npm/lru-cache/-/lru-cache-2.5.0.tgz"
-                        },
                         "sigmund": {
                           "version": "1.0.0",
                           "from": "http://beta-internal:8089/nexus/content/groups/npm/sigmund/-/sigmund-1.0.0.tgz",
@@ -1491,11 +1486,6 @@
               "from": "http://beta-internal:8089/nexus/content/groups/npm/minimatch/-/minimatch-1.0.0.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/minimatch/-/minimatch-1.0.0.tgz",
               "dependencies": {
-                "lru-cache": {
-                  "version": "2.5.0",
-                  "from": "http://beta-internal:8089/nexus/content/groups/npm/lru-cache/-/lru-cache-2.5.0.tgz",
-                  "resolved": "http://beta-internal:8089/nexus/content/groups/npm/lru-cache/-/lru-cache-2.5.0.tgz"
-                },
                 "sigmund": {
                   "version": "1.0.0",
                   "from": "http://beta-internal:8089/nexus/content/groups/npm/sigmund/-/sigmund-1.0.0.tgz",
@@ -1993,10 +1983,20 @@
       "from": "https://registry.npmjs.org/locale/-/locale-0.0.17.tgz",
       "resolved": "https://registry.npmjs.org/locale/-/locale-0.0.17.tgz"
     },
+    "lodash": {
+      "version": "3.1.0",
+      "from": "lodash@*",
+      "resolved": "http://beta-internal:8089/nexus/content/groups/npm/lodash/-/lodash-3.1.0.tgz"
+    },
     "loglevel": {
       "version": "1.2.0",
       "from": "http://beta-internal:8089/nexus/content/groups/npm/loglevel/-/loglevel-1.2.0.tgz",
       "resolved": "http://beta-internal:8089/nexus/content/groups/npm/loglevel/-/loglevel-1.2.0.tgz"
+    },
+    "lru-cache": {
+      "version": "2.5.0",
+      "from": "lru-cache@*",
+      "resolved": "http://beta-internal:8089/nexus/content/groups/npm/lru-cache/-/lru-cache-2.5.0.tgz"
     },
     "mandrill-api": {
       "version": "1.0.41",
@@ -2075,6 +2075,10 @@
           }
         }
       }
+    },
+    "mongodb-connection-string": {
+      "version": "0.1.1",
+      "from": "mongodb-connection-string@*"
     },
     "mongodb-datadog-stats": {
       "version": "0.1.2",

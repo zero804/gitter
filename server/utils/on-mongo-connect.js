@@ -12,7 +12,7 @@ module.exports = function onMongoConnect(callback) {
     d = Q.resolve();
   } else {
     d = Q.defer();
-    mongoose.connection.on('open', d.makeNodeResolver());
+    mongoose.connection.once('open', d.makeNodeResolver());
   }
 
   return d.promise.nodeify(callback);
