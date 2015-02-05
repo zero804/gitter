@@ -135,6 +135,12 @@ a {
   transition: @transition;
 }
 
+// bottom-panel is used in gitter.im/apps.
+// apps should have its own stylesheet. im so sorry - @trevorah.
+#apps-panel .btn, #bottom-panel .btn {
+  margin: 10px 20px 10px 0;
+}
+
 .tooltip {
   @transition: margin-top .3s cubic-bezier(.31, -.13,.5, 1.39), opacity .3s cubic-bezier(.31, -.13,.5, 1.39);
   transition: @transition;
@@ -271,8 +277,6 @@ h1:after, h2:after {
 
   background: #45cba1;
   color: #fff !important;
-
-  margin: 10px 20px 10px 0;
 }
 
 .btn img {
