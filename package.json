@@ -52,6 +52,7 @@
     "mixpanel": "~0.0.19",
     "moment": "git://github.com/gitterHQ/moment#440d7889d9c0c8540cdc7711819f546cc99584a8",
     "mongodb": "^1.4.12",
+    "mongodb-connection-string": "^0.1.1",
     "mongodb-datadog-stats": "^0.1.2",
     "mongoose": "^3.8.21",
     "mongoose-number": "git://github.com/gitterHQ/mongoose-number#74e1653b3fd33427cca93fb325d0b289cbce08c4",
