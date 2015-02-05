@@ -66,7 +66,7 @@ var authenticator = bayeuxExtension({
         clientUsageStats.record(user, oauthClient);
       }
 
-      logger.verbose('bayeux: handshake', {
+      logger.silly('bayeux: handshake', {
         appVersion: ext.appVersion,
         username: user && user.username,
         client: oauthClient.name
@@ -250,7 +250,7 @@ var logging = {
         /* Rate is for the last full 10s period */
         var connType = message.ext && message.ext.connType;
         var handshakeRate = message.ext && message.ext.rate;
-        logger.verbose("bayeux: " + message.channel , { ip: getClientIp(req), connType: connType, rate: handshakeRate });
+        logger.silly("bayeux: " + message.channel , { ip: getClientIp(req), connType: connType, rate: handshakeRate });
         break;
 
       case '/meta/connect':
@@ -259,14 +259,14 @@ var logging = {
         /* Rate is for the last full 10s period */
         var connectRate = message.ext && message.ext.rate;
         if(connectRate && connectRate > 1) {
-          logger.verbose("bayeux: connect" , { ip: getClientIp(req), clientId: message.clientId, rate: connectRate });
+          logger.silly("bayeux: connect" , { ip: getClientIp(req), clientId: message.clientId, rate: connectRate });
         }
         break;
 
       case '/meta/subscribe':
         stats.eventHF('bayeux.subscribe');
 
-        logger.verbose("bayeux: subscribe", { clientId: message.clientId, subs: message.subscription });
+        logger.silly("bayeux: subscribe", { clientId: message.clientId, subs: message.subscription });
         break;
     }
 
@@ -277,7 +277,7 @@ var logging = {
     if(message.channel === '/meta/handshake' ) {
       var ip = getClientIp(req);
       var clientId = message.clientId;
-      logger.verbose("bayeux: handshake complete", { ip: ip, clientId: clientId });
+      logger.silly("bayeux: handshake complete", { ip: ip, clientId: clientId });
     }
     callback(message);
   }
@@ -418,9 +418,10 @@ faye.stringify = function(object) {
 faye.logger = {
 };
 
+var fayeLoggingLevel = nconf.get('ws:fayeLogging');
 var logLevels = ['fatal', 'error', 'warn'];
-if(nconf.get('ws:fayeLogging') === 'info') logLevels.push('info');
-if(nconf.get('ws:fayeLogging') === 'debug') logLevels.push('info', 'debug');
+if(fayeLoggingLevel === 'info') logLevels.push('info');
+if(fayeLoggingLevel === 'debug') logLevels.push('info', 'debug');
 
 logLevels.forEach(function(level) {
   faye.logger[level] = function(msg) { logger[level]('faye: ' + msg.substring(0,180)); };
@@ -452,24 +453,33 @@ module.exports = {
 
     client.addExtension(superClient);
 
-    ['connection:open', 'connection:close'].forEach(function(event) {
-      server._server._engine.bind(event, function(clientId) {
-        logger.verbose("faye-engine: Client " + clientId + ": " + event);
+    if (fayeLoggingLevel === 'debug') {
+      ['connection:open', 'connection:close'].forEach(function(event) {
+        server._server._engine.bind(event, function(clientId) {
+          logger.verbose("faye-engine: Client " + clientId + ": " + event);
+        });
       });
-    });
 
-    /** Some logging */
-    ['handshake', 'disconnect'].forEach(function(event) {
-      server.bind(event, function(clientId) {
-        logger.info("faye-server: Client " + clientId + ": " + event);
+      /** Some logging */
+      ['handshake', 'disconnect'].forEach(function(event) {
+        server.bind(event, function(clientId) {
+          logger.verbose("faye-server: Client " + clientId + ": " + event);
+        });
       });
-    });
+
+      server.bind('disconnect', function(clientId) {
+        // Warning, this event is called simulateously on
+        // all the servers that are connected to the same redis/faye
+        // connection
+        logger.verbose("Client " + clientId + " disconnected");
+      });
+
+    }
 
     server.bind('disconnect', function(clientId) {
       // Warning, this event is called simulateously on
       // all the servers that are connected to the same redis/faye
       // connection
-      logger.info("Client " + clientId + " disconnected");
       presenceService.socketDisconnected(clientId, function(err) {
         if(err && err.status !== 404) {
           logger.error("bayeux: Error while attempting disconnection of socket " + clientId + ": " + err,  { exception: err });
