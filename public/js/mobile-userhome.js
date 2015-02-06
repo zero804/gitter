@@ -14,6 +14,7 @@ require('views/widgets/avatar');
 
 onready(function() {
 
+  require('components/link-handler').installLinkHandler();
   appEvents.on('navigation', function(url) {
     window.location.href = url;
   });
@@ -32,7 +33,7 @@ onready(function() {
 
   var Router = Backbone.Router.extend({
     routes: {
-      'confirm/*uri': function(uri) {
+      'confirmSuggested/*uri': function(uri) {
         modalRegion.show(new confirmRepoRoomView.Modal({ uri: uri }));
       },
       '': function() {

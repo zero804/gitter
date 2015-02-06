@@ -13,6 +13,7 @@ var onready = require('./utils/onready');
 var highlightPermalinkChats = require('./utils/highlight-permalink-chats');
 var apiClient = require('components/apiClient');
 var HeaderView = require('views/app/headerView');
+var frameUtils = require('./utils/frame-utils');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -30,7 +31,18 @@ require('views/widgets/timeago');
 
 onready(function () {
 
-  postMessage({ type: "chatframe:loaded" });
+
+  appEvents.on('navigation', function(url, type, title) {
+    if(frameUtils.hasParentFrameSameOrigin()) {
+      frameUtils.postMessage({ type: "navigation", url: url, urlType: type, title: title});
+    } else {
+      // No pushState here. Open the link directly
+      // Remember that (window.parent === window) when there is no parent frame
+      window.parent.location.href = url;
+    }
+  });
+
+  frameUtils.postMessage({ type: "chatframe:loaded" });
 
   require('components/link-handler').installLinkHandler();
 
@@ -91,18 +103,10 @@ onready(function () {
     }
   });
 
-  function postMessage(message) {
-    parent.postMessage(JSON.stringify(message), context.env('basePath'));
-  }
-
-  postMessage({ type: "context.troupeId", troupeId: context.getTroupeId(), name: context.troupe().get('name') });
-
-  appEvents.on('navigation', function(url, type, title) {
-    postMessage({ type: "navigation", url: url, urlType: type, title: title});
-  });
+  frameUtils.postMessage({ type: "context.troupeId", troupeId: context.getTroupeId(), name: context.troupe().get('name') });
 
   appEvents.on('route', function(hash) {
-    postMessage({ type: "route", hash: hash });
+    frameUtils.postMessage({ type: "route", hash: hash });
   });
 
   appEvents.on('permalink.requested', function(type, chat, options) {
@@ -116,22 +120,22 @@ onready(function () {
       appEvents.trigger('input.append', ':point_up: [' + formattedDate + '](' + fullUrl + ')');
     }
 
-    postMessage({ type: "permalink.requested", url: url, permalinkType: type, id: id });
+    frameUtils.postMessage({ type: "permalink.requested", url: url, permalinkType: type, id: id });
   });
 
   appEvents.on('realtime.testConnection', function(reason) {
-    postMessage({ type: "realtime.testConnection", reason: reason });
+    frameUtils.postMessage({ type: "realtime.testConnection", reason: reason });
   });
 
   appEvents.on('realtime:newConnectionEstablished', function() {
-    postMessage({ type: "realtime.testConnection", reason: 'newConnection' });
+    frameUtils.postMessage({ type: "realtime.testConnection", reason: 'newConnection' });
   });
 
   appEvents.on('unreadItemsCount', function(newCount) {
     var message = { type: "unreadItemsCount", count: newCount, troupeId: context.getTroupeId() };
 
     log.info('rchat: Posting unread items count ', message);
-    postMessage(message);
+    frameUtils.postMessage(message);
   });
 
   // Bubble keyboard events
@@ -146,27 +150,27 @@ onready(function () {
       event: {origin: event.origin},
       handler: handler
     };
-    postMessage(message);
+    frameUtils.postMessage(message);
   });
 
   // Bubble chat toggle events
   appEvents.on('chat.edit.show', function() {
-    postMessage({type: 'chat.edit.show'});
+    frameUtils.postMessage({type: 'chat.edit.show'});
   });
   appEvents.on('chat.edit.hide', function() {
-    postMessage({type: 'chat.edit.hide'});
+    frameUtils.postMessage({type: 'chat.edit.hide'});
   });
 
   // Send focus events to app frame
   appEvents.on('focus.request.app.in', function(event) {
-    postMessage({type: 'focus', focus: 'in', event: event});
+    frameUtils.postMessage({type: 'focus', focus: 'in', event: event});
   });
   appEvents.on('focus.request.app.out', function(event) {
-    postMessage({type: 'focus', focus: 'out', event: event});
+    frameUtils.postMessage({type: 'focus', focus: 'out', event: event});
   });
 
   appEvents.on('ajaxError', function() {
-    postMessage({ type: 'ajaxError' });
+    frameUtils.postMessage({ type: 'ajaxError' });
   });
 
   var notifyRemoveError = function(message) {

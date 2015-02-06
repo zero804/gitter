@@ -18,7 +18,11 @@ require('views/widgets/avatar');
 
 
 onready(function() {
+  require('components/link-handler').installLinkHandler();
 
+  appEvents.on('navigation', function(url/*, type, title*/) {
+    window.location = url;
+  });
 
   var chatIFrame = document.getElementById('content-frame');
   if(window.location.hash) {

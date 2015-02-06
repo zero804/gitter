@@ -1,6 +1,6 @@
 {
   "name": "gitter-webapp",
-  "version": "8.7.3",
+  "version": "8.7.4",
   "dependencies": {
     "apn": {
       "version": "1.4.4",
@@ -1177,8 +1177,9 @@
       }
     },
     "gitter-env": {
-      "version": "0.19.5",
+      "version": "0.20.2",
       "from": "gitter-env@latest",
+      "resolved": "http://beta-internal:8089/nexus/content/groups/npm/gitter-env/-/gitter-env-0.20.2.tgz",
       "dependencies": {
         "async": {
           "version": "0.8.0",
