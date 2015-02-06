@@ -1,6 +1,6 @@
 {
   "name": "gitter-webapp",
-  "version": "8.7.3",
+  "version": "8.7.4",
   "dependencies": {
     "apn": {
       "version": "1.4.4",
@@ -1177,7 +1177,7 @@
       }
     },
     "gitter-env": {
-      "version": "0.19.5",
+      "version": "0.20.0",
       "from": "gitter-env@latest",
       "dependencies": {
         "async": {
@@ -1259,7 +1259,7 @@
                 "diff": {
                   "version": "1.0.8",
                   "from": "diff@>=1.0.3 <1.1.0",
-                  "resolved": "http://beta-internal:8089/nexus/content/groups/npm/diff/-/diff-1.0.8.tgz"
+                  "resolved": "https://registry.npmjs.org/diff/-/diff-1.0.8.tgz"
                 }
               }
             },
