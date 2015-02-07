@@ -12,7 +12,7 @@ var realtime = require('components/realtime');
 var log = require('utils/log');
 var onready = require('./utils/onready');
 var $ = require('jquery');
-var RAF = require('utils/raf');
+var urlParser = require('utils/url-parser');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -37,25 +37,58 @@ var loading = function (el) {
   };
 };
 
+
 onready(function () {
   var loadingScreen = loading($('.loading-frame'));
   var chatIFrame = document.getElementById('content-frame');
+  var titlebarUpdater = new TitlebarUpdater();
+
+
   loadingScreen.show();
 
   chatIFrame.addEventListener('load', loadingScreen.hide, false);
   appEvents.on('chatframe:loaded', loadingScreen.hide);
 
+  // Send the hash to the child
   if (window.location.hash) {
     var noHashSrc = chatIFrame.src.split('#')[0];
     chatIFrame.src = noHashSrc + window.location.hash;
   }
 
+  /* TODO: add the link handler here? */
+
+  /*
+   * Push State Management
+   */
+
+  /* Replace the `null` state on startup with the real state, so that when a client clicks back to the
+   * first page of gitter, we know what the original URL was (instead of null)
+   */
+  window.history.replaceState(chatIFrame.src, '', window.location.href);
+
   function pushState(state, title, url) {
+    if (state == window.history.state) {
+      // Don't repush the same state...
+      return;
+    }
+
+    titlebarUpdater.setRoomName(title);
     window.history.pushState(state, title, url);
     appEvents.trigger('track', url);
   }
 
-  var appView = new AppIntegratedView({ });
+  /* Deal with the popstate */
+  window.onpopstate = function(e) {
+    var iframeUrl = e.state;
+    if(!iframeUrl) {
+      return;
+    }
+
+    updateContent(iframeUrl);
+    appEvents.trigger('track', window.location.pathname + window.location.hash);
+    return;
+  };
+
 
   function updateContent(iframeUrl) {
     var hash;
@@ -69,12 +102,15 @@ onready(function () {
       hash = windowHash;
     }
 
-    RAF(function () {
-      chatIFrame.src = iframeUrl + hash;
-    });
+    /*
+     * Use location.replace so as not to affect the history state of the application
+     *
+     * The history has already been pushed via the pushstate, so we don't want to double up
+     */
+    document.querySelector('#content-frame').contentWindow.location.replace(iframeUrl + hash);
   }
 
-  var titlebarUpdater = new TitlebarUpdater();
+  var appView = new AppIntegratedView({ });
 
   var allRoomsCollection = troupeCollections.troupes;
   allRoomsCollection.on("remove", function(model) {
@@ -82,11 +118,8 @@ onready(function () {
       var username = context.user().get('username');
       var newLocation = '/' + username;
       var newFrame = newLocation + '/~home';
-      var title = '';
 
-      titlebarUpdater.setRoomName(title);
-
-      pushState(newFrame, title, newLocation);
+      pushState(newFrame, username, newLocation);
       updateContent(newFrame);
     }
   });
@@ -99,30 +132,20 @@ onready(function () {
   };
 
   appEvents.on('navigation', function (url, type, title) {
-    if (url === window.location.pathname) { return; } // no need to reload frame, we're already there.
-    loadingScreen.show();
-    var frameUrl = url + '/~' + type;
-    pushState(frameUrl, title, url);
-    titlebarUpdater.setRoomName(title);
-    updateContent(frameUrl);
-  });
+    var parsed = urlParser.parse(url);
+    var frameUrl = parsed.pathname + '/~' + type + parsed.search;
 
-
-  // Revert to a previously saved state
-  window.onpopstate = function(e) {
-    var iframeUrl = e.state;
-
-    if(!iframeUrl) {
-      // state is new i.e first page in history or new navigation
-      // so we have to guess the iframe url
-      var type = context.user().get('url') === window.location.pathname ? 'home' : 'chat';
-      iframeUrl = window.location.pathname + '/~' + type;
+    if (parsed.pathname === window.location.pathname) {
+      pushState(frameUrl, title, url);
+      postMessage({ type: 'permalink.navigate', query: urlParser.parseSearch(parsed.search) });
+      return;
     }
 
-    updateContent(iframeUrl);
-    appEvents.trigger('track', window.location.pathname + window.location.hash);
-    return true;
-  };
+    loadingScreen.show();
+
+    pushState(frameUrl, title, url);
+    updateContent(frameUrl);
+  });
 
   window.addEventListener('message', function(e) {
     if(e.origin !== context.env('basePath')) {
@@ -217,6 +240,13 @@ onready(function () {
 
       case 'chatframe:loaded':
         appEvents.trigger('chatframe:loaded');
+        break;
+
+      case 'permalink.requested':
+        var url = message.url + '?at=' + message.id;
+        var frameUrl = message.url + '/~' + message.permalinkType + '?at=' + message.id;
+        var title = message.url.substring(1);
+        pushState(frameUrl, title, url);
         break;
     }
   });

@@ -9,6 +9,7 @@ body, html {
   padding: 0;
   color: white;
   background: #231f20;
+  overflow: auto;
 }
 
 h1, h2, h3, h4, h5 {
@@ -21,7 +22,7 @@ h1, h2, h3, h4, h5 {
 
 a {
   text-decoration: none;
-  color: inherit;  
+  color: inherit;
 }
 
 p {
@@ -38,20 +39,20 @@ p {
 }
 
 .login {
-  
+
   .btn {
     padding: 0px 25px 0px;
     height: 50px;
-    line-height: 50px;  
+    line-height: 50px;
   }
-  
+
   position: relative;
   max-width: 37.5em;
   margin: 0 auto;
-  
+
   header {
     padding: 2 * 0.625em;
-    
+
     .logo {
       text-align: center;
       .logo-holder {
@@ -62,36 +63,36 @@ p {
         margin: 0 auto 2 * 0.625em;
       }
     }
-    
+
     img {
       width: 6.25em;
     }
   }
-  
+
   section {
     text-align: center;
     padding: 0.625em;
-    
+
     .btn {
       font-weight: 600;
       &.transparent { background: rgba(0, 0, 0, 0.2); }
     }
-    
+
     .or {
       // font-size: 1em;
       // line-height: 0.8em;
       text-transform: uppercase;
     }
   }
-  
+
   @media only screen and (min-width : 600px) {
-    top: 25%; 
-    section { 
+    top: 25%;
+    section {
       h1 {
         margin-bottom: 3 * 0.625em;
       }
     }
-  } 
+  }
 }
 
 .github-icon {

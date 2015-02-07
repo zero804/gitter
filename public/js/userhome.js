@@ -5,7 +5,7 @@ var Backbone = require('backbone');
 var confirmRepoRoomView = require('views/createRoom/confirmRepoRoomView');
 var modalRegion = require('components/modal-region');
 var onready = require('./utils/onready');
-
+var frameUtils = require('./utils/frame-utils');
 require('utils/tracking');
 
 // Preload widgets
@@ -15,20 +15,23 @@ require('views/widgets/timeago');
 onready(function() {
   new UserHomeView({ el: '#userhome' }).render();
 
-  appEvents.on('navigation', function(url) {
-    if(url.indexOf('#') === 0) {
-      window.location.hash = url;
+  require('components/link-handler').installLinkHandler();
+
+  appEvents.on('navigation', function(url, type, title) {
+    if(frameUtils.hasParentFrameSameOrigin()) {
+      frameUtils.postMessage({ type: "navigation", url: url, urlType: type, title: title});
     } else {
-      (window.parent || window).location.href = url;
+      // No pushState here. Open the link directly
+      // Remember that (window.parent === window) when there is no parent frame
+      window.parent.location.href = url;
     }
   });
 
+
   var Router = Backbone.Router.extend({
     routes: {
-      'confirm/*uri': function (uri) {
-        if (!parent) {
-          modalRegion.show(new confirmRepoRoomView.Modal({ uri: uri }));
-        }
+      'confirmSuggested/*uri': function (uri) {
+        modalRegion.show(new confirmRepoRoomView.Modal({ uri: uri }));
       },
       '': function() {
         modalRegion.close();
