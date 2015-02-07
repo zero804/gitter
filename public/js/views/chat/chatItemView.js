@@ -40,6 +40,7 @@ module.exports = (function() {
     'click .js-chat-item-collapse':   'toggleCollapse',
     'click .js-chat-item-readby':     'showReadBy',
     'click .js-chat-item-from':       'mentionUser',
+    'click .js-chat-item-time':       'permalink',
     'mouseover .js-chat-item-readby': 'showReadByIntent',
     'click .webhook':                 'expandActivity',
     'click':                          'chatSelected'
@@ -547,6 +548,19 @@ module.exports = (function() {
     chatSelected: function() {
       // this calls onSelected
       this.triggerMethod('selected', this.model);
+    },
+
+    permalink: function(e) {
+      /* Holding the Alt key down while clicking adds the permalink to the chat input */
+      appEvents.trigger('permalink.requested', 'chat', this.model, { appendInput: !!e.altKey });
+    },
+
+    highlight: function() {
+      var self = this;
+      this.$el.addClass('chat-item__highlighted');
+      setTimeout(function() {
+        self.$el.removeClass('chat-item__highlighted');
+      }, 5000);
     }
   });
 

@@ -30,7 +30,7 @@ var DEV_MODE = !!process.env.DEV_MODE;
 
 gulp.task('validate-client-source', function() {
   /* This is a very lax jshint, only looking for major problems */
-  return gulp.src(['public/js/**/*.js'])
+  return gulp.src(['public/js/**/*.js', 'shared/**/*.js'])
     .pipe(jshint({
       browser: true,
       devel: false,
@@ -53,7 +53,7 @@ gulp.task('validate-client-source', function() {
 
 gulp.task('validate-server-source', function() {
   /* This is a very lax jshint, only looking for major problems */
-  return gulp.src(['server/**/*.js','!server/web/faye-node.js'])
+  return gulp.src(['server/**/*.js', 'shared/**/*.js', '!server/web/faye-node.js'])
     .pipe(jshint({
       node: true,
       // globalstrict: true, // ENABLE
@@ -120,6 +120,7 @@ gulp.task('copy-app-files', function() {
       'locales/**',
       'scripts/**',
       'server/**',
+      'shared/**',
       'redis-lua/**'
     ], { "base" : "." })
     .pipe(gulp.dest('output/app'));
@@ -262,6 +263,7 @@ gulp.task('css-web', function () {
     'public/less/router-nli-app.less',
     'public/less/router-nli-chat.less',
     'public/less/router-embed-chat.less',
+    'public/less/chat-card.less',
     'public/less/router-archive-home.less',
     'public/less/router-archive-chat.less',
     'public/less/userhome.less'

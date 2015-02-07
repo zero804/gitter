@@ -2,77 +2,16 @@
 "use strict";
 
 var env            = require('../utils/env');
-
 var mongoose       = require('../utils/mongoose-q');
 var winston        = require('../utils/winston');
-var nconf          = require("../utils/config");
-var shutdown       = require('shutdown');
-
-var mongoDogStats  = require('mongodb-datadog-stats');
-
-mongoDogStats.install(mongoose.mongo, {
-  statsClient: env.createStatsClient(),
-  sampleRate: 0.5
-});
 
 // Install inc and dec number fields in mongoose
 require('mongoose-number')(mongoose);
 
+/* Establishes a connection to the mongodb server, with fallback, etc */
+env.mongo.configureMongoose(mongoose);
+
 var connection = mongoose.connection;
-
-mongoose.set('debug', nconf.get("mongo:logQueries"));
-
-mongoose.connect(nconf.get("mongo:url"), {
-  server: {
-    keepAlive: 1,
-    auto_reconnect: true,
-    socketOptions: { keepAlive: 1, connectTimeoutMS: 60000 }
-  },
-  replset: {
-    keepAlive: 1,
-    auto_reconnect: true,
-    socketOptions: { keepAlive: 1, connectTimeoutMS: 60000 }
-  }
-});
-
-shutdown.addHandler('mongo', 1, function(callback) {
-  mongoose.disconnect(callback);
-});
-
-mongoose.connection.on('open', function() {
-  if(nconf.get("mongo:profileSlowQueries")) {
-
-    mongoose.set('debug', function (collectionName, method, query/*, doc, options*/) {
-      var collection;
-
-      if(method === 'find' || method === 'findOne') {
-        collection = mongoose.connection.db.collection(collectionName);
-        collection.find(query, function(err, cursor) {
-          if(err) {
-            winston.verbose('Explain plan failed', { exception: err });
-            return;
-          }
-
-          cursor.explain(function(err, plan) {
-            if(err) {
-              winston.verbose('Explain plan failed', { exception: err });
-              return;
-            }
-
-            if(plan.cursor === 'BasicCursor') {
-              // Make sure that all full scans are removed before going into production!
-              winston.warn('Full scan query on ' + collectionName + ' for query ', { query: query, plan: plan });
-            }
-          });
-        });
-      }
-    });
-
-    var MAX = 50;
-    connection.setProfiling(1, MAX, function() {});
-  }
-
-});
 
 connection.on('error', function(err) {
   winston.info("MongoDB connection error", { exception: err });

@@ -34,7 +34,7 @@
       {{#unless activityEvents}}
         {{#if isAdmin}}
         <div id="activity-tip">
-          <p>We haven't seen any activity yet. <a href="{{integrationsUrl}}" target="{{#if isNativeDesktopApp}} _blank {{else}} _top {{/if}}">Configure your integrations &rarr;</a></p>
+          <p>We haven't seen any activity yet. <a href="{{integrationsUrl}}" {{#if isNativeDesktopApp}}data-disable-routing="1" target="_blank"{{/if}}>Configure your integrations &rarr;</a></p>
         </div>
         {{/if}}
       {{/unless}}

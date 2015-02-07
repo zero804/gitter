@@ -72,62 +72,60 @@ describe('oauth-service', function() {
     var clients = [mongoUtils.getNewObjectIdString(), mongoUtils.getNewObjectIdString()];
 
 
-    function nextClient(userId, tokens, i, callback) {
-      if(!i) return callback();
+    function nextClient(userId, tokens, i) {
+      if(!i) return Q.resolve();
       i--;
 
       var clientId = clients[i];
-      oauthService.findOrCreateToken(userId, clientId)
+      return oauthService.findOrCreateToken(userId, clientId)
         .then(function(token) {
           assert(!tokens[token], 'Token is not unique');
           tokens[token] = 1;
           tokens[userId + ':' + clientId] = token;
-          nextClient(userId, tokens, i, callback);
-        })
-        .done();
+          return nextClient(userId, tokens, i);
+        });
     }
 
-    function nextUser(tokens, i, callback) {
-      if(!i) return callback();
+    function nextUser(tokens, i) {
+      if(!i) return Q.resolve();
       i--;
       var userId = users[i];
 
-      nextClient(userId, tokens, clients.length, function(err) {
-        if(err) return callback(err);
-        nextUser(tokens, i, callback);
-      });
+      return nextClient(userId, tokens, clients.length)
+        .then(function() {
+          return nextUser(tokens, i);
+        });
     }
 
     var tokens = {};
-    nextUser(tokens, users.length, function(err) {
-      if(err) return done(err);
+    return nextUser(tokens, users.length)
+      .then(function() {
+        assert.strictEqual(Object.keys(tokens).length, 8);
+        return oauthService.testOnly.invalidateCache()
+          .then(function() {
+            var tokens2 = {};
+            return nextUser(tokens2, users.length)
+              .then(function() {
+                assert(Object.keys(tokens).length);
+                assert.strictEqual(Object.keys(tokens).length, Object.keys(tokens2).length);
 
-      assert.strictEqual(Object.keys(tokens).length, 8);
-      oauthService.testOnly.invalidateCache()
-        .then(function() {
-          var tokens2 = {};
-          nextUser(tokens2, users.length, function(err) {
-            if(err) throw err;
+                Object.keys(tokens2).forEach(function(token) {
+                  assert(tokens[token]);
+                });
 
-            assert(Object.keys(tokens).length);
-            assert.strictEqual(Object.keys(tokens).length, Object.keys(tokens2).length);
+                for(var i = 0; i < users.length; i++) {
+                  var userId = users[i];
+                  for(var j = 0; j < clients.length; j++) {
+                    var clientId = clients[j];
 
-            Object.keys(tokens2).forEach(function(token) {
-              assert(tokens[token]);
+                    assert.strictEqual(tokens[userId + ':' + clientId], tokens2[userId + ':' + clientId]);
+                  }
+                }
+              });
             });
+      })
+      .nodeify(done);
 
-            for(var i = 0; i < users.length; i++) {
-              var userId = users[i];
-              for(var j = 0; j < clients.length; j++) {
-                var clientId = clients[j];
-
-                assert.strictEqual(tokens[userId + ':' + clientId], tokens2[userId + ':' + clientId]);
-              }
-            }
-          });
-        })
-        .nodeify(done);
-    });
   });
 
 

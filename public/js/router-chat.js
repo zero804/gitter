@@ -7,13 +7,13 @@ var context = require('utils/context');
 var liveContext = require('components/live-context');
 var appEvents = require('utils/appevents');
 var log = require('utils/log');
-var isValidRoomUri = require('utils/valid-room-uri');
 var ChatIntegratedView = require('views/app/chatIntegratedView');
 var itemCollections = require('collections/instances/integrated-items');
 var onready = require('./utils/onready');
-
+var highlightPermalinkChats = require('./utils/highlight-permalink-chats');
 var apiClient = require('components/apiClient');
 var HeaderView = require('views/app/headerView');
+var frameUtils = require('./utils/frame-utils');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -28,38 +28,23 @@ require('components/focus-events');
 require('views/widgets/avatar');
 require('views/widgets/timeago');
 
+
 onready(function () {
 
-  postMessage({ type: "chatframe:loaded" });
 
-  $(document).on("click", "a", function (e) {
-    var target = e.currentTarget;
-    var internalLink = target.hostname === context.env('baseServer');
-
-    var location = window.location;
-
-    // modals
-    if (location.scheme === target.scheme &&
-        location.host === target.host &&
-        location.pathname === target.pathname) {
-      e.preventDefault();
-      window.location = target.href;
-      return true;
-    }
-
-    // internal links to valid rooms shouldn't open in new windows
-    // hash urls cant be used with appEvents navigation as they may need to open
-    // in a new window (e.g #integrations on desktop).
-    if (internalLink && isValidRoomUri(target.pathname) && !target.hash ) {
-      e.preventDefault();
-      var uri = target.pathname.replace(/^\//, '');
-      var type = 'chat';
-      if (uri === context.user().get('username')) {
-        type = 'home';
-      }
-      appEvents.trigger('navigation', target.pathname, type, uri);
+  appEvents.on('navigation', function(url, type, title) {
+    if(frameUtils.hasParentFrameSameOrigin()) {
+      frameUtils.postMessage({ type: "navigation", url: url, urlType: type, title: title});
+    } else {
+      // No pushState here. Open the link directly
+      // Remember that (window.parent === window) when there is no parent frame
+      window.parent.location.href = url;
     }
   });
+
+  frameUtils.postMessage({ type: "chatframe:loaded" });
+
+  require('components/link-handler').installLinkHandler();
 
   window.addEventListener('message', function(e) {
     if(e.origin !== context.env('basePath')) {
@@ -105,36 +90,52 @@ onready(function () {
         makeEvent(message);
         appEvents.trigger('focus.request.' + message.focus, message.event);
         break;
+
+      case 'permalink.navigate':
+        var query = message.query;
+        /* Only supports at for now..... */
+        var aroundId = query && query.at;
+
+        if (aroundId) {
+          highlightPermalinkChats(appView.chatCollectionView, aroundId);
+        }
+        break;
     }
   });
 
-  function postMessage(message) {
-    parent.postMessage(JSON.stringify(message), context.env('basePath'));
-  }
-
-  postMessage({ type: "context.troupeId", troupeId: context.getTroupeId(), name: context.troupe().get('name') });
-
-  appEvents.on('navigation', function(url, type, title) {
-    postMessage({ type: "navigation", url: url, urlType: type, title: title});
-  });
+  frameUtils.postMessage({ type: "context.troupeId", troupeId: context.getTroupeId(), name: context.troupe().get('name') });
 
   appEvents.on('route', function(hash) {
-    postMessage({ type: "route", hash: hash });
+    frameUtils.postMessage({ type: "route", hash: hash });
+  });
+
+  appEvents.on('permalink.requested', function(type, chat, options) {
+    if (context.inOneToOneTroupeContext()) return; // No permalinks to one-to-one chats
+    var url = context.troupe().get('url');
+    var id = chat.id;
+
+    if (options && options.appendInput) {
+      var fullUrl = window.location.origin + url + '?at=' + id;
+      var formattedDate = chat.get('sent') && chat.get('sent').format('LLL');
+      appEvents.trigger('input.append', ':point_up: [' + formattedDate + '](' + fullUrl + ')');
+    }
+
+    frameUtils.postMessage({ type: "permalink.requested", url: url, permalinkType: type, id: id });
   });
 
   appEvents.on('realtime.testConnection', function(reason) {
-    postMessage({ type: "realtime.testConnection", reason: reason });
+    frameUtils.postMessage({ type: "realtime.testConnection", reason: reason });
   });
 
   appEvents.on('realtime:newConnectionEstablished', function() {
-    postMessage({ type: "realtime.testConnection", reason: 'newConnection' });
+    frameUtils.postMessage({ type: "realtime.testConnection", reason: 'newConnection' });
   });
 
   appEvents.on('unreadItemsCount', function(newCount) {
     var message = { type: "unreadItemsCount", count: newCount, troupeId: context.getTroupeId() };
 
     log.info('rchat: Posting unread items count ', message);
-    postMessage(message);
+    frameUtils.postMessage(message);
   });
 
   // Bubble keyboard events
@@ -149,27 +150,27 @@ onready(function () {
       event: {origin: event.origin},
       handler: handler
     };
-    postMessage(message);
+    frameUtils.postMessage(message);
   });
 
   // Bubble chat toggle events
   appEvents.on('chat.edit.show', function() {
-    postMessage({type: 'chat.edit.show'});
+    frameUtils.postMessage({type: 'chat.edit.show'});
   });
   appEvents.on('chat.edit.hide', function() {
-    postMessage({type: 'chat.edit.hide'});
+    frameUtils.postMessage({type: 'chat.edit.hide'});
   });
 
   // Send focus events to app frame
   appEvents.on('focus.request.app.in', function(event) {
-    postMessage({type: 'focus', focus: 'in', event: event});
+    frameUtils.postMessage({type: 'focus', focus: 'in', event: event});
   });
   appEvents.on('focus.request.app.out', function(event) {
-    postMessage({type: 'focus', focus: 'out', event: event});
+    frameUtils.postMessage({type: 'focus', focus: 'out', event: event});
   });
 
   appEvents.on('ajaxError', function() {
-    postMessage({ type: 'ajaxError' });
+    frameUtils.postMessage({ type: 'ajaxError' });
   });
 
   var notifyRemoveError = function(message) {
@@ -361,6 +362,10 @@ onready(function () {
 
   if(context.popEvent('hooks_require_additional_public_scope')) {
     setTimeout(promptForHook, 1500);
+  }
+
+  if (context().permalinkChatId) {
+    highlightPermalinkChats(appView.chatCollectionView, context().permalinkChatId);
   }
 
   Backbone.history.start();

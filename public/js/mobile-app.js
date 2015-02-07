@@ -14,6 +14,8 @@ var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var mobileDecorator = require('views/chat/decorators/mobileDecorator');
 var TroupeSettingsView = require('views/app/troupeSettingsView');
 var onready = require('./utils/onready');
+var context = require('utils/context');
+var highlightPermalinkChats = require('./utils/highlight-permalink-chats');
 
 // Preload widgets
 require('views/widgets/avatar');
@@ -21,6 +23,10 @@ require('views/widgets/timeago');
 
 onready(function() {
 
+  require('components/link-handler').installLinkHandler();
+  appEvents.on('navigation', function(url) {
+    window.location.href = url;
+  });
 
   new MobileAppView({
     el: $('#mainPage')
@@ -30,9 +36,6 @@ onready(function() {
     el: $('#troupeList')
   }).render();
 
-  appEvents.on('navigation', function(url) {
-    window.location.href = url;
-  });
 
   var chatCollection = new chatModels.ChatCollection(null, { listen: true });
   var userCollection = new userModels.UserCollection(null, { listen: true, limit: 21 });
@@ -76,5 +79,8 @@ onready(function() {
 
   Backbone.history.start();
 
+  if (context().permalinkChatId) {
+    highlightPermalinkChats(chatCollectionView, context().permalinkChatId);
+  }
 
 });
