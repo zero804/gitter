@@ -104,7 +104,7 @@ onready(function () {
     }
 
     // TEMPORARY FIX FOR IE. Fix properly!
-    if(iframeUrl.substring(1) !== '/') {
+    if(iframeUrl.charAt(0) !== '/') {
       iframeUrl = '/' + iframeUrl;
     }
     /*
