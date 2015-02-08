@@ -115,7 +115,7 @@ onready(function () {
     var id = chat.id;
 
     if (options && options.appendInput) {
-      var fullUrl = window.location.origin + url + '?at=' + id;
+      var fullUrl = context.env('basePath') + url + '?at=' + id;
       var formattedDate = chat.get('sent') && chat.get('sent').format('LLL');
       appEvents.trigger('input.append', ':point_up: [' + formattedDate + '](' + fullUrl + ')');
     }
