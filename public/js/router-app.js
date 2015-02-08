@@ -13,6 +13,7 @@ var log = require('utils/log');
 var onready = require('./utils/onready');
 var $ = require('jquery');
 var urlParser = require('utils/url-parser');
+var RAF = require('utils/raf');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -102,12 +103,19 @@ onready(function () {
       hash = windowHash;
     }
 
+    // TEMPORARY FIX FOR IE. Fix properly!
+    if(iframeUrl.substring(1) !== '/') {
+      iframeUrl = '/' + iframeUrl;
+    }
     /*
      * Use location.replace so as not to affect the history state of the application
      *
      * The history has already been pushed via the pushstate, so we don't want to double up
      */
-    document.querySelector('#content-frame').contentWindow.location.replace(iframeUrl + hash);
+     RAF(function() {
+      // IE seems to prefer this in a new animation-frame
+      document.querySelector('#content-frame').contentWindow.location.replace(iframeUrl + hash);
+     });
   }
 
   var appView = new AppIntegratedView({ });
@@ -132,6 +140,7 @@ onready(function () {
   };
 
   appEvents.on('navigation', function (url, type, title) {
+    log.debug('navigation:', url);
     var parsed = urlParser.parse(url);
     var frameUrl = parsed.pathname + '/~' + type + parsed.search;
 
@@ -148,6 +157,7 @@ onready(function () {
   });
 
   window.addEventListener('message', function(e) {
+    log.debug('rapp: window message: ', e.data);
     if(e.origin !== context.env('basePath')) {
       log.info('rapp: Ignoring message from ' + e.origin);
       return;
@@ -249,7 +259,7 @@ onready(function () {
         pushState(frameUrl, title, url);
         break;
     }
-  });
+  }, false);
 
   function postMessage(message) {
     chatIFrame.contentWindow.postMessage(JSON.stringify(message), context.env('basePath'));
