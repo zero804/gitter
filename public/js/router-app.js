@@ -56,6 +56,7 @@ onready(function () {
   }
 
   /* TODO: add the link handler here? */
+  require('components/link-handler').installLinkHandler();
 
   /*
    * Push State Management
