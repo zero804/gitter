@@ -51,7 +51,7 @@ exports.validateToken = function(token, callback) {
     }, function(result, provider, callback) {
       /* Update upstream caches */
       var userId = result[0];
-      var clientId = result[0];
+      var clientId = result[1];
       return provider.cacheToken(userId, clientId, token, callback);
     })
     .nodeify(callback);

@@ -81,12 +81,12 @@ exports.validateAccessTokenAndClient = function(token, callback) {
         ])
         .spread(function (client, user) {
           if(!client) {
-            logger.warn('Invalid token presented (client not found): ', { token: token });
+            logger.warn('Invalid token presented (client not found): ', { token: token, clientId: clientId });
             return null;
           }
 
           if(userId && !user) {
-           logger.warn('Invalid token presented (user not found): ', { token: token });
+           logger.warn('Invalid token presented (user not found): ', { token: token, userId: userId });
            return null;
           }
 
