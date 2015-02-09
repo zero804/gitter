@@ -1,6 +1,7 @@
-/* global Promise: true, console: true */
 "use strict";
 var $ = require('jquery');
+var _ = require('underscore');
+
 var context = require('utils/context');
 var Marionette = require('marionette');
 var appEvents = require('utils/appevents');
@@ -23,6 +24,7 @@ var UnreadBannerView = require('views/app/unreadBannerView');
 var HistoryLimitView = require('views/app/historyLimitView');
 var unreadItemsClient = require('components/unread-items-client');
 var RightToolbarView = require('views/righttoolbar/rightToolbarView');
+var P = require('es6-promise').Promise;
 require('transloadit');
 
 module.exports = (function () {
@@ -39,10 +41,8 @@ module.exports = (function () {
     'click @ui.scrollToBottom': appEvents.trigger.bind(appEvents, 'chatCollectionView:scrollToBottom')
   };
 
-  // Nobody knows why this is here. Delete it
-  // $('.trpDisplayPicture').tooltip('destroy');
-
   var ChatLayout = Marionette.Layout.extend({
+
     el: 'body',
     leftmenu: false,
     rightpanel: false,
@@ -160,14 +160,17 @@ module.exports = (function () {
     },
 
     updateProgressBar: function (spec) {
+      // console.debug('updateProgressBar() ====================');
       var bar = this.ui.progressBar;
       var value = typeof spec.value === 'number' ? spec.value.toFixed(0) .toString() : spec.value;
       value = value.slice(-1) === '%' ? value : value + '%';
       var timeout = spec.timeout || 200;
-      setTimeout(function () { bar.css('width', value); }.bind(this), timeout);
+      // console.debug(value);
+      setTimeout(function () { bar.css('width', value); }, timeout);
     },
 
     resetProgressBar: function () {
+      // console.debug('resetProgressBar() ====================');
       this.ui.progressBar.hide();
       this.updateProgressBar({
         value: 0,
@@ -176,29 +179,38 @@ module.exports = (function () {
     },
 
     handleUploadProgress: function (done, expected) {
-      var percentage = (done / expected * 100 + 20).toFixed(2) + '%';
-      this.updateProgressBar(percentage);
+      // console.debug('handleUploadProgress() ====================');
+      // console.debug('done, expected:', done, expected);
+      // console.debug('arguments:', arguments);
+      var percentage = (done / expected * 100).toFixed(2) + '%';
+      this.updateProgressBar({ value: percentage, timeout: 0 });
     },
 
     handleUploadStart: function () {
+      // console.debug('handleUploadStart() ====================');
       this.ui.progressBar.show();
     },
 
-    handleUploadSuccess: function () {
-      console.debug('handleUploadSuccess() ====================');
+    handleUploadSuccess: function (res) {
+      // console.debug('handleUploadSuccess() ====================');
+      // console.debug(arguments);
+      this.resetProgressBar();
+      appEvents.triggerParent('user_notification', {
+        title: (res.results.files.length > 1) ? res.results.files.length + ' files uploaded.' : res.results.files[0].name,
+        text: 'Upload complete.'
+      });
     },
 
     handleUploadError: function (err) {
-      console.debug('handleUploadError() ====================');
+      // console.debug('handleUploadError() ====================');
       appEvents.triggerParent('user_notification', {
-        title: "Error uploading file",
+        title: 'Error Uploading File',
         text:  err.message
       });
       this.resetProgressBar();
     },
 
     enableDragAndDrop: function () {
-      var self = this;
 
       function ignoreEvent(e) {
         e.stopPropagation();
@@ -207,73 +219,20 @@ module.exports = (function () {
 
       function dropEvent(e) {
         ignoreEvent(e);
-
-        self.updateProgressBar({ value: 10, timeout: 50 });
-        self.updateProgressBar({ value: 20, timeout: 600 });
-
-        // Prepare formdata
         e = e.originalEvent;
         var files = e.dataTransfer.files;
-        if (files.length === 0) {
-          self.resetProgressBar();
-          return;
-        }
-
-        var formdata = new FormData();
-        var type = '';
-        for(var i = 0; i < files.length; i++) {
-          var file = files[i];
-          var t = file.type.split('/').shift();
-
-          if(!i) {
-            type = t;
-          } else {
-            if(t !== type) {
-              type = '';
-            }
-          }
-
-          formdata.append("file", file);
-        }
-
-        // Generate signature and upload
-        apiClient.priv.get('/generate-signature', {
-            room_uri: context.troupe().get('uri'),
-            room_id: context.getTroupeId(),
-            type: type
-          })
-          .then(function (data) {
-            formdata.append("signature", data.sig);
-
-            var options = {
-              wait: true,
-              modal: false,
-              autoSubmit: false,
-              onStart: self.handleUploadStart,
-              onProgress: self.handleUploadProgress,
-              onSuccess: self.handleUploadSuccess,
-              onError: this.handleUploadError,
-              debug: false,
-              formData: formdata
-            };
-
-            var form = $('#upload-form');
-            form.find('input[name="params"]').attr('value', data.params);
-            form.unbind('submit.transloadit');
-            form.transloadit(options);
-            form.submit();
-        });
+        this.upload(files);
       }
 
       var el = $('body');
       el.on('dragenter', ignoreEvent);
       el.on('dragover', ignoreEvent);
-      el.on('drop', dropEvent);
+      el.on('drop', dropEvent.bind(this));
     },
 
     getFileName: function (file) {
-      console.debug('getFileName() ====================');
-      return new Promise(function (resolve, reject) {
+      // console.debug('getFileName() ====================');
+      return new P(function (resolve, reject) {
         file.getAsString(function (str) {
           if (!str) {
             return reject(new Error('File has no name'));
@@ -284,41 +243,83 @@ module.exports = (function () {
     },
 
     handlePaste: function (evt) {
-      console.debug('handlePaste() ====================');
+      // console.debug('handlePaste() ====================');
       var self = this;
 
       if (evt.originalEvent.clipboardData.items.length > 1) {
         var file = evt.originalEvent.clipboardData.items[1].getAsFile();
         if (file.type.indexOf('image/') < 0) {
-          console.debug('not an image() ====================');
+          // console.debug('not an image() ====================');
           return;
         }
+        // debugger;
         evt.preventDefault();
-        Promise.all([
+        P.all([
             this.getFileName(evt.originalEvent.clipboardData.items[0]),
             file // sync
           ])
           .then(function (values) {
-            self.upload.apply(self, values);
+            values[1].name = values[0];
+            self.upload([values[1]]);
           })
           ['catch'](function (err) {
-            console.debug(err);
+            self.handleUploadError(err);
           });
       }
     },
 
-    upload: function (name, file) {
-      console.debug('upload() ====================');
-      console.debug('name, file:', name, file);
-      this.updateProgressBar({ value: 10, timeout: 50 });
-      this.updateProgressBar({ value: 20, timeout: 600 });
-      // apiClient.priv.get('/generate-signature', {
-      //     room_uri: context.troupe().get('uri'),
-      //     room_id: context.getTroupeId(),
-      //     type: type
-      //   }).then(function () {
-      //     // do some
-      //   });
+    upload: function (files) {
+      // console.debug('upload() ====================');
+      // console.debug(files);
+
+      var options = {
+        wait: true,
+        modal: false,
+        autoSubmit: false,
+        debug: false,
+        onStart: this.handleUploadStart.bind(this),
+        onProgress: this.handleUploadProgress.bind(this),
+        onSuccess: this.handleUploadSuccess.bind(this),
+        onError: this.handleUploadError.bind(this)
+      };
+
+      var data = new FormData();
+      var type = '';
+
+      for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        var t = file.type.split('/').shift();
+
+        if (!i) {
+          type = t;
+        } else {
+          if (t !== type) {
+            type = '';
+          }
+        }
+
+        data.append('file', file);
+        // console.debug('file:', file);
+      }
+
+      // console.debug(data);
+
+      // FIXME: do we need to generate a signature? WC
+      apiClient.priv.get('/generate-signature', {
+          room_uri: context.troupe().get('uri'),
+          room_id: context.getTroupeId(),
+          type: type
+        })
+        .then(function (res) {
+          // console.debug('res', res);
+          data.append("signature", res.sig);
+
+          var form = $('#upload-form');
+          form.find('input[name="params"]').attr('value', res.params);
+          form.unbind('submit.transloadit');
+          form.transloadit(_.extend(options, { formData: data }));
+          form.submit();
+        });
     }
   });
 
