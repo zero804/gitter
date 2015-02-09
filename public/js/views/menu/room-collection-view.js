@@ -75,13 +75,13 @@ module.exports = (function() {
       // We can't use the room resource as the room might not be the current one
       apiClient
         .delete('/v1/rooms/' + this.model.id + '/users/' + context.getUserId())
-        .then(function (response) {
+        .then(function () {
           // leaving the room that you are in should take you home
           if (this.model.get('url') === window.location.pathname) {
             appEvents.trigger('navigation', context.getUser().url, 'home', '');
           }
         }.bind(this))
-        .fail(function (err) {
+        .fail(function () {
           // provide feedback to the user?
         });
     },

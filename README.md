@@ -108,7 +108,7 @@ Once you are sure the above is done, preform the following:
 
 4. In the ansible project, change directory to `roles/elasticsearch/files/elastic-config`
 
-5. Run ./XX-setup-plugins
+5. Run `./XX-setup-plugins`
 
 5. Start elasticsearch from the root of gitter-webapp: `./start-elasticsearch.sh`
 
@@ -133,3 +133,4 @@ Once you are sure the above is done, preform the following:
 10. Log into HQ: http://localhost:9200/_plugin/HQ -> Connect 
 
 11. Check that there are lots of documents under the Gitter index.
+

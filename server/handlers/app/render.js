@@ -86,7 +86,7 @@ function renderHomePage(req, res, next) {
 }
 
 function getPermalinkChatForRoom(troupe, chatId) {
-  if (troupe.security !== 'PUBLIC') return Q.resolve();
+  if (!troupe || troupe.security !== 'PUBLIC') return Q.resolve();
 
   return chatService.findByIdInRoom(troupe.id, chatId)
     .then(function(chat) {
@@ -114,11 +114,13 @@ function renderMainFrame(req, res, next, frame) {
     aroundId && getPermalinkChatForRoom(req.troupe, aroundId)
   ])
     .spread(function (troupeContext, rooms, orgs, permalinkChat) {
+      var chatAppQuery = {};
+      if (aroundId) {
+        chatAppQuery.at = aroundId;
+      }
       var chatAppLocation = url.format({
         pathname: '/' + req.uriContext.uri + '/~' + frame,
-        query: {
-          at: aroundId
-        },
+        query: chatAppQuery,
         hash: '#initial'
       });
 

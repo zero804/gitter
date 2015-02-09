@@ -60,8 +60,14 @@ module.exports = (function() {
       var username = context().user && context().user.username;
       var isUserHome = (username) ? '/' + username === routeName : false; // if we have an username then check if it matches the routeName
       var authenticated = !!context.getUserId();
+      var userAgent = window.navigator.userAgent;
 
-      window.mixpanel.track('pageView', { pageName: routeName, authenticated: authenticated, isUserHome: isUserHome });
+      window.mixpanel.track('pageView', {
+        pageName: routeName,
+        authenticated: authenticated,
+        isUserHome: isUserHome,
+        userAgent: userAgent
+      });
     }
 
     var gs = window._gs;

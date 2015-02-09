@@ -114,7 +114,7 @@ module.exports = (function() {
 
         if(c.permissions && c.permissions.admin) {
           if(c.isNativeDesktopApp) {
-            menuItems.push({ title: 'Integrations', href: window.location.origin + url + '#integrations', target: '_blank', dataset: { disableRouting: 1 } });
+            menuItems.push({ title: 'Integrations', href: context.env('basePath') + url + '#integrations', target: '_blank', dataset: { disableRouting: 1 } });
           } else {
             menuItems.push({ title: 'Integrations', href: '#integrations' });
           }
