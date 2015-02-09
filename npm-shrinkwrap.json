@@ -163,41 +163,41 @@
             "ansi-styles": {
               "version": "1.1.0",
               "from": "ansi-styles@>=1.1.0 <2.0.0",
-              "resolved": "https://registry.npmjs.org/ansi-styles/-/ansi-styles-1.1.0.tgz"
+              "resolved": "http://beta-internal:8089/nexus/content/groups/npm/ansi-styles/-/ansi-styles-1.1.0.tgz"
             },
             "escape-string-regexp": {
               "version": "1.0.2",
               "from": "escape-string-regexp@>=1.0.0 <2.0.0",
-              "resolved": "https://registry.npmjs.org/escape-string-regexp/-/escape-string-regexp-1.0.2.tgz"
+              "resolved": "http://beta-internal:8089/nexus/content/groups/npm/escape-string-regexp/-/escape-string-regexp-1.0.2.tgz"
             },
             "has-ansi": {
               "version": "0.1.0",
               "from": "has-ansi@>=0.1.0 <0.2.0",
-              "resolved": "https://registry.npmjs.org/has-ansi/-/has-ansi-0.1.0.tgz",
+              "resolved": "http://beta-internal:8089/nexus/content/groups/npm/has-ansi/-/has-ansi-0.1.0.tgz",
               "dependencies": {
                 "ansi-regex": {
                   "version": "0.2.1",
                   "from": "ansi-regex@>=0.2.1 <0.3.0",
-                  "resolved": "https://registry.npmjs.org/ansi-regex/-/ansi-regex-0.2.1.tgz"
+                  "resolved": "http://beta-internal:8089/nexus/content/groups/npm/ansi-regex/-/ansi-regex-0.2.1.tgz"
                 }
               }
             },
             "strip-ansi": {
               "version": "0.3.0",
               "from": "strip-ansi@>=0.3.0 <0.4.0",
-              "resolved": "https://registry.npmjs.org/strip-ansi/-/strip-ansi-0.3.0.tgz",
+              "resolved": "http://beta-internal:8089/nexus/content/groups/npm/strip-ansi/-/strip-ansi-0.3.0.tgz",
               "dependencies": {
                 "ansi-regex": {
                   "version": "0.2.1",
                   "from": "ansi-regex@>=0.2.1 <0.3.0",
-                  "resolved": "https://registry.npmjs.org/ansi-regex/-/ansi-regex-0.2.1.tgz"
+                  "resolved": "http://beta-internal:8089/nexus/content/groups/npm/ansi-regex/-/ansi-regex-0.2.1.tgz"
                 }
               }
             },
             "supports-color": {
               "version": "0.2.0",
               "from": "supports-color@>=0.2.0 <0.3.0",
-              "resolved": "https://registry.npmjs.org/supports-color/-/supports-color-0.2.0.tgz"
+              "resolved": "http://beta-internal:8089/nexus/content/groups/npm/supports-color/-/supports-color-0.2.0.tgz"
             }
           }
         },
@@ -651,7 +651,7 @@
               "dependencies": {
                 "inherits": {
                   "version": "2.0.1",
-                  "from": "inherits@2.0.1",
+                  "from": "inherits@>=2.0.1 <2.1.0",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/inherits/-/inherits-2.0.1.tgz"
                 },
                 "statuses": {
@@ -926,7 +926,7 @@
             },
             "mime": {
               "version": "1.2.11",
-              "from": "mime@>=1.2.7 <1.3.0",
+              "from": "mime@>=1.2.11 <1.3.0",
               "resolved": "https://registry.npmjs.org/mime/-/mime-1.2.11.tgz"
             },
             "ms": {
@@ -1031,7 +1031,7 @@
                 "proto-list": {
                   "version": "1.2.3",
                   "from": "proto-list@>=1.2.1 <1.3.0",
-                  "resolved": "https://registry.npmjs.org/proto-list/-/proto-list-1.2.3.tgz"
+                  "resolved": "http://beta-internal:8089/nexus/content/groups/npm/proto-list/-/proto-list-1.2.3.tgz"
                 },
                 "ini": {
                   "version": "1.3.2",
@@ -1053,7 +1053,7 @@
                 "abbrev": {
                   "version": "1.0.5",
                   "from": "abbrev@>=1.0.0 <2.0.0",
-                  "resolved": "https://registry.npmjs.org/abbrev/-/abbrev-1.0.5.tgz"
+                  "resolved": "http://beta-internal:8089/nexus/content/groups/npm/abbrev/-/abbrev-1.0.5.tgz"
                 }
               }
             }
@@ -1567,7 +1567,7 @@
         },
         "extend": {
           "version": "1.3.0",
-          "from": "extend@>=1.3.0 <1.4.0",
+          "from": "extend@>=1.2.1 <2.0.0",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/extend/-/extend-1.3.0.tgz"
         }
       }
@@ -1601,7 +1601,7 @@
             },
             "source-map": {
               "version": "0.1.43",
-              "from": "source-map@>=0.1.0 <0.2.0",
+              "from": "source-map@>=0.1.38 <0.2.0",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/source-map/-/source-map-0.1.43.tgz",
               "dependencies": {
                 "amdefine": {
@@ -1783,7 +1783,7 @@
         },
         "lodash": {
           "version": "2.4.1",
-          "from": "lodash@>=2.4.1 <2.5.0",
+          "from": "lodash@2.4.1",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/lodash/-/lodash-2.4.1.tgz"
         },
         "debug": {
@@ -2008,7 +2008,7 @@
             },
             "readable-stream": {
               "version": "1.0.33",
-              "from": "readable-stream@latest",
+              "from": "readable-stream@>=1.0.26-2 <1.1.0",
               "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-1.0.33.tgz",
               "dependencies": {
                 "core-util-is": {
@@ -2101,7 +2101,7 @@
       "dependencies": {
         "debug": {
           "version": "0.8.1",
-          "from": "debug@>=0.8.1 <0.9.0",
+          "from": "debug@0.8.1",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/debug/-/debug-0.8.1.tgz"
         }
       }
@@ -2164,7 +2164,7 @@
             },
             "mime": {
               "version": "1.2.11",
-              "from": "mime@>=1.2.11 <1.3.0",
+              "from": "mime@>=1.2.7 <1.3.0",
               "resolved": "https://registry.npmjs.org/mime/-/mime-1.2.11.tgz"
             },
             "he": {
@@ -2218,7 +2218,7 @@
         "colors": {
           "version": "0.5.1",
           "from": "colors@>=0.5.0 <0.6.0",
-          "resolved": "https://registry.npmjs.org/colors/-/colors-0.5.1.tgz"
+          "resolved": "http://beta-internal:8089/nexus/content/groups/npm/colors/-/colors-0.5.1.tgz"
         },
         "underscore": {
           "version": "1.4.4",
@@ -2408,7 +2408,7 @@
             },
             "combined-stream": {
               "version": "0.0.7",
-              "from": "combined-stream@>=0.0.5 <0.1.0",
+              "from": "combined-stream@>=0.0.4 <0.1.0",
               "resolved": "https://registry.npmjs.org/combined-stream/-/combined-stream-0.0.7.tgz",
               "dependencies": {
                 "delayed-stream": {
@@ -2818,7 +2818,7 @@
         },
         "request": {
           "version": "2.16.6",
-          "from": "request@>=2.16.0 <2.17.0",
+          "from": "request@>=2.16.2 <2.17.0",
           "resolved": "https://registry.npmjs.org/request/-/request-2.16.6.tgz",
           "dependencies": {
             "form-data": {
@@ -2842,7 +2842,7 @@
             },
             "mime": {
               "version": "1.2.11",
-              "from": "mime@>=1.2.11 <1.3.0",
+              "from": "mime@>=1.2.7 <1.3.0",
               "resolved": "https://registry.npmjs.org/mime/-/mime-1.2.11.tgz"
             },
             "hawk": {
