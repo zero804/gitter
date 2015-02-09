@@ -18,16 +18,14 @@ require('views/widgets/avatar');
 require('views/widgets/timeago');
 
 onready(function() {
-
+  require('components/link-handler').installLinkHandler();
+  appEvents.on('navigation', function(url) {
+    window.location.href = url;
+  });
 
   new MobileAppView({
     el: '#mainPage',
     hideMenu: true
-  });
-
-  require('components/link-handler').installLinkHandler();
-  appEvents.on('navigation', function(url) {
-    window.location.href = url;
   });
 
   var chatCollection = new chatModels.ChatCollection(null, { listen: true });
