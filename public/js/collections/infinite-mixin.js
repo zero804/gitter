@@ -222,13 +222,20 @@ module.exports = (function() {
     ensureLoaded: function(id, callback, context) {
       var existing = this.get(id);
       if (existing) {
-        return callback.call(context, null, existing);
+        if (callback) {
+          callback.call(context, null, existing);
+        }
+        return ;
       }
 
       this.fetchAtPoint({ aroundId: id }, { }, function(err) {
         if (err) return callback.call(context, err);
         var existing = this.get(id);
-        return callback.call(context, null, existing);
+
+        if (callback) {
+          callback.call(context, null, existing);
+        }
+        return;
       }, this);
     },
 
