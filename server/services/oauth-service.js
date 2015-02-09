@@ -9,8 +9,11 @@ var persistenceService = require("./persistence-service");
 var Q                  = require('q');
 var userService        = require('./user-service');
 var tokenProvider      = require('./tokens/');
+var MongooseCachedLookup = require('../utils/mongoose-cached-lookup');
 
 var ircClientId;
+
+var cachedClientLookup = new MongooseCachedLookup({ model: persistenceService.OAuthClient });
 
 /* Load webInternalClientId once */
 var webClientPromise = persistenceService.OAuthClient.findOneQ({ clientKey: WEB_INTERNAL_CLIENT_KEY })
@@ -76,7 +79,7 @@ exports.validateAccessTokenAndClient = function(token, callback) {
 
       // TODO: cache this stuff
       return Q.all([
-          persistenceService.OAuthClient.findByIdQ(clientId),
+          cachedClientLookup.get(clientId),
           userId && userService.findById(userId)
         ])
         .spread(function (client, user) {
