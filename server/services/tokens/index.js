@@ -2,8 +2,9 @@
 var Q = require('q');
 
 var PROVIDERS = [
+  require('./memory-token-provider'),
   require('./redis-token-provider'),
-  require('./token-generator')
+  require('./access-token-provider')
 ];
 
 /**
@@ -20,19 +21,21 @@ function iterateProviders(downstream, upstream) {
 /* Iterative function used internally by iterateProviders */
 function iterateDown(position, downstream, upstream) {
   if(position >= PROVIDERS.length) {
-    return null;
+    return Q.resolve(null);
   }
 
   var provider = PROVIDERS[position];
-  return downstream(provider)
+  var result = downstream(provider, position);
+  return result
     .then(function(result) {
       if (result) {
         /* No upstream providers from this one? */
         if (position === 0) return result;
 
         /* Perform the upstream on all the providers at once */
-        return Q.all(PROVIDERS.slice(0, position - 1).map(function(provider) {
-            return upstream(result, provider);
+        var upstreamProviders = PROVIDERS.slice(0, position);
+        return Q.all(upstreamProviders.map(function(provider, index) {
+            return upstream(result, provider, index);
           }))
           .thenResolve(result);
       }
@@ -73,4 +76,13 @@ exports.deleteToken = function(token) {
   return Q.all(PROVIDERS.map(function(provider) {
     return provider.deleteToken(token);
   }));
+};
+
+
+exports.testOnly = {
+  invalidateCache: function() {
+    return Q.all(PROVIDERS.map(function(provider) {
+      return provider.invalidateCache();
+    }));
+  }
 };

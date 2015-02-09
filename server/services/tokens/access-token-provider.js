@@ -1,12 +1,23 @@
 'use strict';
 
-var persistenceService = require("./persistence-service");
+var persistenceService = require("../persistence-service");
 var random = require('../../utils/random');
+var Q = require('q');
 
 module.exports = {
   getToken: function(userId, clientId) {
-    /* Its much quicker to lookup the token in MongoDB than it is to generate one with randomByes and then attempt and upsert */
+    if (!userId) {
+      return random.generateToken()
+        .then(function(token) {
+          // Anonymous tokens start with a `$`
+          token = "$" + token;
 
+          // Do not save the token to mongodb
+          return token;
+        });
+    }
+
+    /* TODO: confirm: Its much quicker to lookup the token in MongoDB than it is to generate one with randomByes and then attempt and upsert */
     /* Lookup and possible create */
     return persistenceService.OAuthAccessToken.findOneQ({
         userId: userId,
@@ -24,11 +35,6 @@ module.exports = {
         /* Generate a token and attempt an upsert */
         return random.generateToken()
           .then(function(token) {
-            if(!userId) {
-              // Anonymous tokens start with a `$`
-              token = "$" + token;
-            }
-
             return persistenceService.OAuthAccessToken.findOneAndUpdateQ(
               { userId: userId, clientId: clientId },
               {
@@ -53,7 +59,6 @@ module.exports = {
       .then(function(accessToken) {
         if(!accessToken) return null;
 
-
         var clientId = accessToken.clientId;
         var userId = accessToken.userId;   // userId CAN be null
 
@@ -71,5 +76,9 @@ module.exports = {
 
   deleteToken: function(token) {
     return persistenceService.OAuthAccessToken.removeQ({ token: token });
+  },
+
+  invalidateCache: function() {
+    return Q.resolve();
   }
 };

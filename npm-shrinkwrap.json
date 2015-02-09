@@ -1178,144 +1178,144 @@
     },
     "gitter-env": {
       "version": "0.20.2",
-      "from": "gitter-env@latest",
+      "from": "http://beta-internal:8089/nexus/content/groups/npm/gitter-env/-/gitter-env-0.20.2.tgz",
       "resolved": "http://beta-internal:8089/nexus/content/groups/npm/gitter-env/-/gitter-env-0.20.2.tgz",
       "dependencies": {
         "async": {
           "version": "0.8.0",
-          "from": "async@>=0.8.0 <0.9.0",
+          "from": "http://beta-internal:8089/nexus/content/groups/npm/async/-/async-0.8.0.tgz",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/async/-/async-0.8.0.tgz"
         },
         "blocked": {
           "version": "1.1.0",
-          "from": "blocked@>=1.1.0 <2.0.0",
+          "from": "http://beta-internal:8089/nexus/content/groups/npm/blocked/-/blocked-1.1.0.tgz",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/blocked/-/blocked-1.1.0.tgz"
         },
         "gitter-private-cube": {
           "version": "0.2.12",
-          "from": "gitter-private-cube@>=0.2.12 <0.3.0",
+          "from": "http://beta-internal:8089/nexus/content/groups/npm/gitter-private-cube/-/gitter-private-cube-0.2.12.tgz",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/gitter-private-cube/-/gitter-private-cube-0.2.12.tgz",
           "dependencies": {
             "mongodb": {
               "version": "1.3.23",
-              "from": "mongodb@>=1.3.18 <1.4.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/mongodb/-/mongodb-1.3.23.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/mongodb/-/mongodb-1.3.23.tgz",
               "dependencies": {
                 "bson": {
                   "version": "0.2.5",
-                  "from": "bson@0.2.5",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/bson/-/bson-0.2.5.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/bson/-/bson-0.2.5.tgz"
                 },
                 "kerberos": {
                   "version": "0.0.3",
-                  "from": "kerberos@0.0.3",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/kerberos/-/kerberos-0.0.3.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/kerberos/-/kerberos-0.0.3.tgz"
                 }
               }
             },
             "node-static": {
               "version": "0.6.5",
-              "from": "node-static@0.6.5",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/node-static/-/node-static-0.6.5.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/node-static/-/node-static-0.6.5.tgz",
               "dependencies": {
                 "optimist": {
                   "version": "0.6.1",
-                  "from": "optimist@>=0.3.4",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/optimist/-/optimist-0.6.1.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/optimist/-/optimist-0.6.1.tgz",
                   "dependencies": {
                     "wordwrap": {
                       "version": "0.0.2",
-                      "from": "wordwrap@>=0.0.2 <0.1.0",
+                      "from": "http://beta-internal:8089/nexus/content/groups/npm/wordwrap/-/wordwrap-0.0.2.tgz",
                       "resolved": "http://beta-internal:8089/nexus/content/groups/npm/wordwrap/-/wordwrap-0.0.2.tgz"
                     },
                     "minimist": {
                       "version": "0.0.10",
-                      "from": "minimist@>=0.0.1 <0.1.0",
+                      "from": "http://beta-internal:8089/nexus/content/groups/npm/minimist/-/minimist-0.0.10.tgz",
                       "resolved": "http://beta-internal:8089/nexus/content/groups/npm/minimist/-/minimist-0.0.10.tgz"
                     }
                   }
                 },
                 "colors": {
                   "version": "1.0.3",
-                  "from": "colors@>=0.6.0",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/colors/-/colors-1.0.3.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/colors/-/colors-1.0.3.tgz"
                 }
               }
             },
             "pegjs": {
               "version": "0.7.0",
-              "from": "pegjs@0.7.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/pegjs/-/pegjs-0.7.0.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/pegjs/-/pegjs-0.7.0.tgz"
             },
             "vows": {
               "version": "0.7.0",
-              "from": "vows@0.7.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/vows/-/vows-0.7.0.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/vows/-/vows-0.7.0.tgz",
               "dependencies": {
                 "eyes": {
                   "version": "0.1.8",
-                  "from": "eyes@>=0.1.6",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/eyes/-/eyes-0.1.8.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/eyes/-/eyes-0.1.8.tgz"
                 },
                 "diff": {
                   "version": "1.0.8",
-                  "from": "diff@>=1.0.3 <1.1.0",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/diff/-/diff-1.0.8.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/diff/-/diff-1.0.8.tgz"
                 }
               }
             },
             "websocket": {
               "version": "1.0.8",
-              "from": "websocket@1.0.8",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/websocket/-/websocket-1.0.8.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/websocket/-/websocket-1.0.8.tgz"
             },
             "websocket-server": {
               "version": "1.4.4",
-              "from": "websocket-server@1.4.4",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/websocket-server/-/websocket-server-1.4.4.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/websocket-server/-/websocket-server-1.4.4.tgz"
             }
           }
         },
         "gitter-redis-sentinel-client": {
           "version": "0.3.0",
-          "from": "gitter-redis-sentinel-client@>=0.3.0 <0.4.0",
+          "from": "http://beta-internal:8089/nexus/content/groups/npm/gitter-redis-sentinel-client/-/gitter-redis-sentinel-client-0.3.0.tgz",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/gitter-redis-sentinel-client/-/gitter-redis-sentinel-client-0.3.0.tgz",
           "dependencies": {
             "debug": {
               "version": "0.8.1",
-              "from": "debug@>=0.8.0 <0.9.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/debug/-/debug-0.8.1.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/debug/-/debug-0.8.1.tgz"
             }
           }
         },
         "nconf": {
           "version": "0.6.9",
-          "from": "nconf@>=0.6.9 <0.7.0",
+          "from": "http://beta-internal:8089/nexus/content/groups/npm/nconf/-/nconf-0.6.9.tgz",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/nconf/-/nconf-0.6.9.tgz",
           "dependencies": {
             "async": {
               "version": "0.2.9",
-              "from": "async@0.2.9",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/async/-/async-0.2.9.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/async/-/async-0.2.9.tgz"
             },
             "ini": {
               "version": "1.3.2",
-              "from": "ini@>=1.0.0 <2.0.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/ini/-/ini-1.3.2.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/ini/-/ini-1.3.2.tgz"
             },
             "optimist": {
               "version": "0.6.0",
-              "from": "optimist@0.6.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/optimist/-/optimist-0.6.0.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/optimist/-/optimist-0.6.0.tgz",
               "dependencies": {
                 "wordwrap": {
                   "version": "0.0.2",
-                  "from": "wordwrap@>=0.0.2 <0.1.0",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/wordwrap/-/wordwrap-0.0.2.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/wordwrap/-/wordwrap-0.0.2.tgz"
                 },
                 "minimist": {
                   "version": "0.0.10",
-                  "from": "minimist@>=0.0.1 <0.1.0",
+                  "from": "http://beta-internal:8089/nexus/content/groups/npm/minimist/-/minimist-0.0.10.tgz",
                   "resolved": "http://beta-internal:8089/nexus/content/groups/npm/minimist/-/minimist-0.0.10.tgz"
                 }
               }
@@ -1324,27 +1324,27 @@
         },
         "node-statsd": {
           "version": "0.1.1",
-          "from": "node-statsd@>=0.1.1 <0.2.0",
+          "from": "http://beta-internal:8089/nexus/content/groups/npm/node-statsd/-/node-statsd-0.1.1.tgz",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/node-statsd/-/node-statsd-0.1.1.tgz"
         },
         "redis": {
           "version": "0.10.3",
-          "from": "redis@>=0.10.1 <0.11.0",
+          "from": "http://beta-internal:8089/nexus/content/groups/npm/redis/-/redis-0.10.3.tgz",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/redis/-/redis-0.10.3.tgz"
         },
         "underscore": {
           "version": "1.7.0",
-          "from": "underscore@>=1.6.0 <2.0.0",
+          "from": "http://beta-internal:8089/nexus/content/groups/npm/underscore/-/underscore-1.7.0.tgz",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/underscore/-/underscore-1.7.0.tgz"
         },
         "universal-analytics": {
           "version": "0.3.6",
-          "from": "universal-analytics@>=0.3.4 <0.4.0",
+          "from": "http://beta-internal:8089/nexus/content/groups/npm/universal-analytics/-/universal-analytics-0.3.6.tgz",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/universal-analytics/-/universal-analytics-0.3.6.tgz",
           "dependencies": {
             "async": {
               "version": "0.2.10",
-              "from": "async@>=0.2.0 <0.3.0",
+              "from": "http://beta-internal:8089/nexus/content/groups/npm/async/-/async-0.2.10.tgz",
               "resolved": "http://beta-internal:8089/nexus/content/groups/npm/async/-/async-0.2.10.tgz"
             }
           }
@@ -1662,16 +1662,17 @@
     },
     "gitter-redis-scripto": {
       "version": "0.2.2",
-      "from": "gitter-redis-scripto@latest",
+      "from": "gitter-redis-scripto@0.2.2",
+      "resolved": "http://beta-internal:8089/nexus/content/groups/npm/gitter-redis-scripto/-/gitter-redis-scripto-0.2.2.tgz",
       "dependencies": {
         "redis": {
           "version": "0.8.6",
-          "from": "redis@>=0.8.0 <0.9.0",
+          "from": "http://beta-internal:8089/nexus/content/groups/npm/redis/-/redis-0.8.6.tgz",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/redis/-/redis-0.8.6.tgz"
         },
         "debug": {
           "version": "0.7.4",
-          "from": "debug@>=0.7.0 <0.8.0",
+          "from": "http://beta-internal:8089/nexus/content/groups/npm/debug/-/debug-0.7.4.tgz",
           "resolved": "http://beta-internal:8089/nexus/content/groups/npm/debug/-/debug-0.7.4.tgz"
         }
       }
@@ -1995,7 +1996,7 @@
     },
     "lru-cache": {
       "version": "2.5.0",
-      "from": "lru-cache@*",
+      "from": "http://beta-internal:8089/nexus/content/groups/npm/lru-cache/-/lru-cache-2.5.0.tgz",
       "resolved": "http://beta-internal:8089/nexus/content/groups/npm/lru-cache/-/lru-cache-2.5.0.tgz"
     },
     "mandrill-api": {
