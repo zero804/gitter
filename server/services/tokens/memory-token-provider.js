@@ -14,7 +14,6 @@ var userClientCache  = LRU({
 
 module.exports = {
   getToken: function(userId, clientId, callback) {
-    console.log('ARGUMMENTS', arguments);
     if (!userId) return callback();
 
     return callback(null, userClientCache.get(userId + ":" + clientId));
