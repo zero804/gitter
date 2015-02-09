@@ -30,41 +30,44 @@ function iterateProviders(downstream, upstream) {
  * Find a token for a userId/clientId combination.
  * Returns a promise of a token
  */
-exports.getToken = function(userId, clientId) {
+exports.getToken = function(userId, clientId, callback) {
   return iterateProviders(function(provider, callback) {
-    /* Find the token */
-    return provider.getToken(userId, clientId, callback);
-  }, function(token, provider, callback) {
-    /* Update upstream caches */
-    return provider.cacheToken(userId, clientId, token, callback);
-  });
+      /* Find the token */
+      return provider.getToken(userId, clientId, callback);
+    }, function(token, provider, callback) {
+      /* Update upstream caches */
+      return provider.cacheToken(userId, clientId, token, callback);
+    })
+    .nodeify(callback);
 };
 
 /**
  * Validate a token and return a promise of [userId, clientId] or null
  */
-exports.validateToken = function(token) {
+exports.validateToken = function(token, callback) {
   return iterateProviders(function(provider, callback) {
-    /* Find the token... */
-    return provider.validateToken(token, callback);
-  }, function(result, provider, callback) {
-    /* Update upstream caches */
-    var userId = result[0];
-    var clientId = result[0];
-    return provider.cacheToken(userId, clientId, token, callback);
-  });
+      /* Find the token... */
+      return provider.validateToken(token, callback);
+    }, function(result, provider, callback) {
+      /* Update upstream caches */
+      var userId = result[0];
+      var clientId = result[0];
+      return provider.cacheToken(userId, clientId, token, callback);
+    })
+    .nodeify(callback);
 };
 
 /**
  * Delete a token, return a promise of nothing
  */
-exports.deleteToken = function(token) {
+exports.deleteToken = function(token, callback) {
   /* Delete the token from all caches simultaneously */
   return Q.all(PROVIDERS.map(function(provider) {
-    var d = Q.defer();
-    provider.deleteToken(token, d.makeNodeResolver());
-    return d.promise;
-  }));
+      var d = Q.defer();
+      provider.deleteToken(token, d.makeNodeResolver());
+      return d.promise;
+    }))
+    .nodeify(callback);
 };
 
 
