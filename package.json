@@ -47,7 +47,7 @@
     "locale": "0.0.17",
     "lodash": "^3.0.0",
     "loglevel": "^1.2.0",
-    "lru-cache": "http://beta-internal:8089/nexus/content/groups/npm/lru-cache/-/lru-cache-2.5.0.tgz",
+    "lru-cache": "^2.5.0",
     "mandrill-api": "~1.0.40",
     "memwatch": "^0.2.2",
     "mixpanel": "~0.0.19",
