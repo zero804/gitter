@@ -5,18 +5,22 @@ var Q      = require('q');
 var logger = env.logger;
 
 var redisClient        = env.redis.getClient();
-var STANDARD_TTL       = 60;     /* 60 seconds */
-var ANONYMOUS_TTL      = 21600;  /* 6 hours */
+var STANDARD_TTL       = 10 * 60;     /* 10 minutes */
+var ANONYMOUS_TTL      = 21600;       /* 6 hours */
 
 var tokenLookupCachePrefix = "token:c:";
 var tokenValidationCachePrefix = "token:t:";
 
+function getLookupCacheKey(userId, clientId) {
+  return tokenLookupCachePrefix +  (userId || "anon") + ':' + clientId;
+}
+
 module.exports = {
   getToken: function(userId, clientId) {
-    var key = userId + ':' + clientId;
+    if (!userId) return Q.resolve(null);
 
     var d = Q.defer();
-    redisClient.get(tokenLookupCachePrefix + key, function(err, token) {
+    redisClient.get(getLookupCacheKey(userId, clientId), function(err, token) {
       if (err) {
         logger.warn('Unable to lookup token in cache ' + err, { exception: err });
         return d.resolve(null);
@@ -46,17 +50,16 @@ module.exports = {
   },
 
   cacheToken: function(userId, clientId, token) {
-    var key = (userId || "anon") + ':' + clientId;
-
     var d = Q.defer();
     var multi = redisClient.multi();
 
-    var value = userId + ":" + clientId;
-
     var cacheTimeout = userId ? STANDARD_TTL : ANONYMOUS_TTL;
 
-    multi.setex(tokenValidationCachePrefix + token, cacheTimeout, value);
-    multi.setex(tokenLookupCachePrefix + key, cacheTimeout, token);
+    multi.setex(tokenValidationCachePrefix + token, cacheTimeout, (userId || "") + ":" + clientId);
+
+    if(userId) {
+      multi.setex(getLookupCacheKey(userId, clientId), cacheTimeout, token);
+    }
 
     multi.exec(function(err) {
       if (err) {
@@ -77,12 +80,32 @@ module.exports = {
         var userId  = result[0];
         var clientId = result[1];
 
+        // Anonymous tokens don't have this
+        if (!userId) return null;
+
         var d = Q.defer();
-        redisClient.del(tokenValidationCachePrefix + token, tokenLookupCachePrefix + (userId || "anon") + ':' + clientId, d.makeNodeResolver());
+        redisClient.del(tokenValidationCachePrefix + token, getLookupCacheKey(userId, clientId), d.makeNodeResolver());
         return d.promise;
       })
       .catch(function(err) {
         logger.warn('Error while deleting token: ' + err, { exception: err });
       });
+  },
+
+  invalidateCache: function() {
+    var d = Q.defer();
+    redisClient.keys('token:*', function(err, results) {
+      if(err) return d.reject(err);
+
+      if(!results.length) return d.resolve();
+
+      redisClient.del(results, function(err) {
+        if(err) return d.reject(err);
+
+        d.resolve();
+      });
+    });
+
+    return d.promise;
   }
 };
