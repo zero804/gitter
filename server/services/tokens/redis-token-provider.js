@@ -1,7 +1,6 @@
 'use strict';
 
 var env    = require('../../utils/env');
-var Q      = require('q');
 var logger = env.logger;
 
 var redisClient        = env.redis.getClient();
@@ -11,46 +10,29 @@ var ANONYMOUS_TTL      = 21600;       /* 6 hours */
 var tokenLookupCachePrefix = "token:c:";
 var tokenValidationCachePrefix = "token:t:";
 
-function getLookupCacheKey(userId, clientId) {
-  return tokenLookupCachePrefix +  (userId || "anon") + ':' + clientId;
-}
-
 module.exports = {
-  getToken: function(userId, clientId) {
-    if (!userId) return Q.resolve(null);
+  getToken: function(userId, clientId, callback) {
+    if (!userId) return callback();
 
-    var d = Q.defer();
-    redisClient.get(getLookupCacheKey(userId, clientId), function(err, token) {
-      if (err) {
-        logger.warn('Unable to lookup token in cache ' + err, { exception: err });
-        return d.resolve(null);
-      }
-
-      return d.resolve(token);
-    });
-
-    return d.promise;
+    redisClient.get(tokenLookupCachePrefix + userId + ":" + clientId, callback);
   },
 
-  validateToken: function(token) {
-    var d = Q.defer();
-
+  validateToken: function(token, callback) {
     redisClient.get(tokenValidationCachePrefix + token, function(err, value) {
       if (err) {
         logger.warn('Unable to lookup token in cache ' + err, { exception: err });
-        return d.resolve(null);
+        return callback();
       }
 
-      if(!value) return d.resolve(null);
+      if(!value) return callback();
 
-      var parts = ("" + value).split(':');
+      var parts = ("" + value).split(':', 2);
 
-      return d.resolve([parts[0] || null, parts[1]]);
+      return callback(null, [parts[0] || null, parts[1]]);
     });
   },
 
-  cacheToken: function(userId, clientId, token) {
-    var d = Q.defer();
+  cacheToken: function(userId, clientId, token, callback) {
     var multi = redisClient.multi();
 
     var cacheTimeout = userId ? STANDARD_TTL : ANONYMOUS_TTL;
@@ -58,54 +40,38 @@ module.exports = {
     multi.setex(tokenValidationCachePrefix + token, cacheTimeout, (userId || "") + ":" + clientId);
 
     if(userId) {
-      multi.setex(getLookupCacheKey(userId, clientId), cacheTimeout, token);
+      multi.setex(tokenLookupCachePrefix + userId + ":" + clientId, cacheTimeout, token);
     }
 
-    multi.exec(function(err) {
+    multi.exec(callback);
+  },
+
+  deleteToken: function(token, callback) {
+    return this.validateToken(token, function(err, result) {
       if (err) {
-        logger.warn('Unable to set token lookup in cache ' + err, { exception: err });
+        logger.warn('Error while deleting token: ' + err, { exception: err });
+        return callback();
       }
 
-      d.resolve();
+      if (!result) return callback();
+
+      var userId  = result[0];
+      var clientId = result[1];
+
+      // Anonymous tokens don't have this
+      if (!userId) return callback();
+
+      redisClient.del(tokenValidationCachePrefix + token, tokenLookupCachePrefix + userId + ":" + clientId, callback);
     });
-
-    return d.promise;
   },
 
-  deleteToken: function(token) {
-    return this.validateToken(token)
-      .then(function(result) {
-        if (!result) return;
-
-        var userId  = result[0];
-        var clientId = result[1];
-
-        // Anonymous tokens don't have this
-        if (!userId) return null;
-
-        var d = Q.defer();
-        redisClient.del(tokenValidationCachePrefix + token, getLookupCacheKey(userId, clientId), d.makeNodeResolver());
-        return d.promise;
-      })
-      .catch(function(err) {
-        logger.warn('Error while deleting token: ' + err, { exception: err });
-      });
-  },
-
-  invalidateCache: function() {
-    var d = Q.defer();
+  invalidateCache: function(callback) {
     redisClient.keys('token:*', function(err, results) {
-      if(err) return d.reject(err);
+      if(err) return callback(err);
 
-      if(!results.length) return d.resolve();
+      if(!results.length) return callback();
 
-      redisClient.del(results, function(err) {
-        if(err) return d.reject(err);
-
-        d.resolve();
-      });
+      redisClient.del(results, callback);
     });
-
-    return d.promise;
   }
 };

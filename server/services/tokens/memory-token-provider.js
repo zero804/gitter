@@ -1,6 +1,5 @@
 'use strict';
 
-var Q               = require('q');
 var LRU             = require("lru-cache");
 var MAX_TOKEN_AGE   = 10 * 1000 * 60 * 60; // 10 minutes
 var tokenCache      = LRU({
@@ -14,43 +13,43 @@ var userClientCache  = LRU({
 });
 
 module.exports = {
-  getToken: function(userId, clientId) {
-    if (!userId) return Q.resolve(null);
+  getToken: function(userId, clientId, callback) {
+    console.log('ARGUMMENTS', arguments);
+    if (!userId) return callback();
 
-    return Q.resolve(userClientCache.get(userId + ":" + clientId));
+    return callback(null, userClientCache.get(userId + ":" + clientId));
   },
 
-  validateToken: function(token) {
-    return Q.resolve(tokenCache.get(token));
+  validateToken: function(token, callback) {
+    return callback(null, tokenCache.get(token));
   },
 
-  cacheToken: function(userId, clientId, token) {
+  cacheToken: function(userId, clientId, token, callback) {
     tokenCache.set(token, [userId, clientId]);
     if (userId) {
       userClientCache.set(userId + ":" + clientId, token);
     }
-
-    return Q.resolve();
+    return callback();
   },
 
-  deleteToken: function(token) {
+  deleteToken: function(token, callback) {
     var result = tokenCache.get(token);
-    if (!result) return Q.resolve();
+    if (!result) return callback();
 
     tokenCache.del(token);
 
     var userId = result[0];
-    if (!userId) return Q.resolve();
+    if (!userId) return callback();
 
     var clientId = result[1];
     userClientCache.del(userId + ":" + clientId);
 
-    return Q.resolve();
+    return callback();
   },
 
-  invalidateCache: function() {
+  invalidateCache: function(callback) {
     tokenCache.reset();
     userClientCache.reset();
-    return Q.resolve();
+    return callback();
   }
 };

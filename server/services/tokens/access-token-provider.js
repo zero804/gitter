@@ -2,10 +2,9 @@
 
 var persistenceService = require("../persistence-service");
 var random = require('../../utils/random');
-var Q = require('q');
 
 module.exports = {
-  getToken: function(userId, clientId) {
+  getToken: function(userId, clientId, callback) {
     if (!userId) {
       return random.generateToken()
         .then(function(token) {
@@ -14,7 +13,8 @@ module.exports = {
 
           // Do not save the token to mongodb
           return token;
-        });
+        })
+        .nodeify(callback);
     }
 
     /* TODO: confirm: Its much quicker to lookup the token in MongoDB than it is to generate one with randomByes and then attempt and upsert */
@@ -48,11 +48,12 @@ module.exports = {
                 return result.token;
               });
           });
-      });
+      })
+      .nodeify(callback);
 
   },
 
-  validateToken: function(token) {
+  validateToken: function(token, callback) {
     return persistenceService.OAuthAccessToken.findOne({ token: token }, { _id: 0, userId: 1, clientId: 1 })
       .lean()
       .execQ()
@@ -65,20 +66,20 @@ module.exports = {
         if(!clientId) return null; // unknown client
 
         return [userId, clientId];
-      });
-
+      })
+      .nodeify(callback);
   },
 
-  cacheToken: function(userId, clientId, token) { // jshint unused:false
-    // This is the terminating access provider. Should never need to cache
-    return Q.resolve();
+  cacheToken: function(userId, clientId, token, callback) {
+    return callback();
   },
 
-  deleteToken: function(token) {
-    return persistenceService.OAuthAccessToken.removeQ({ token: token });
+  deleteToken: function(token, callback) {
+    return persistenceService.OAuthAccessToken.removeQ({ token: token })
+      .nodeify(callback);
   },
 
-  invalidateCache: function() {
-    return Q.resolve();
+  invalidateCache: function(callback) {
+    return callback();
   }
 };
