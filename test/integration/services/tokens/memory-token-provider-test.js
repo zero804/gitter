@@ -7,6 +7,4 @@ describe('memory-token-provider', function() {
 
   require('./provider-tests-common')(memoryTokenProvider);
 
-
-
 });
