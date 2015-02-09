@@ -1661,9 +1661,8 @@
       }
     },
     "gitter-redis-scripto": {
-      "version": "0.2.1",
-      "from": "gitter-redis-scripto@0.2.1",
-      "resolved": "http://beta-internal:8089/nexus/content/groups/npm/gitter-redis-scripto/-/gitter-redis-scripto-0.2.1.tgz",
+      "version": "0.2.2",
+      "from": "gitter-redis-scripto@latest",
       "dependencies": {
         "redis": {
           "version": "0.8.6",

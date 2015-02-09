@@ -31,7 +31,6 @@ require('views/widgets/timeago');
 
 onready(function () {
 
-
   appEvents.on('navigation', function(url, type, title) {
     if(frameUtils.hasParentFrameSameOrigin()) {
       frameUtils.postMessage({ type: "navigation", url: url, urlType: type, title: title});
@@ -41,8 +40,6 @@ onready(function () {
       window.parent.location.href = url;
     }
   });
-
-  frameUtils.postMessage({ type: "chatframe:loaded" });
 
   require('components/link-handler').installLinkHandler();
 
