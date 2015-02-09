@@ -15,6 +15,7 @@ var $ = require('jquery');
 var urlParser = require('utils/url-parser');
 var RAF = require('utils/raf');
 
+require('es6-promise').polyfill();
 require('components/statsc');
 require('views/widgets/preload');
 require('components/webNotifications');
@@ -37,7 +38,6 @@ var loading = function (el) {
     },
   };
 };
-
 
 onready(function () {
   var loadingScreen = loading($('.loading-frame'));
@@ -104,7 +104,7 @@ onready(function () {
     }
 
     // TEMPORARY FIX FOR IE. Fix properly!
-    if(iframeUrl.charAt(0) !== '/') {
+    if (iframeUrl.charAt(0) !== '/') {
       iframeUrl = '/' + iframeUrl;
     }
     /*
@@ -398,7 +398,5 @@ onready(function () {
       });
     });
   }
-
-
 });
 

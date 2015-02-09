@@ -15,6 +15,7 @@ var apiClient = require('components/apiClient');
 var HeaderView = require('views/app/headerView');
 var frameUtils = require('./utils/frame-utils');
 
+require('es6-promise').polyfill();
 require('components/statsc');
 require('views/widgets/preload');
 require('filtered-collection');
