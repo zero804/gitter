@@ -146,6 +146,8 @@ gulp.task('add-version-files', function(done) {
             branch = process.env.GIT_BRANCH;
           }
 
+          mkdirp.sync('output/app/');
+
           fs.writeFileSync('output/app/ASSET_TAG', hash);
           fs.writeFileSync('output/app/GIT_COMMIT', commit);
           fs.writeFileSync('output/app/VERSION', branch);
