@@ -213,15 +213,15 @@ module.exports = (function () {
       }
 
       this.$el.on('dragenter', function (e) {
-        ignoreEvent(e);
         counter++;
         dragOverlay.toggleClass('hide', false);
+        ignoreEvent(e);
       });
 
       this.$el.on('dragleave', function (e) {
-        ignoreEvent(e);
         counter--;
         dragOverlay.toggleClass('hide', counter === 0);
+        ignoreEvent(e);
       });
 
       this.$el.on('dragover', ignoreEvent);
