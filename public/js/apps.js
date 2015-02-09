@@ -1,21 +1,19 @@
 "use strict";
-var $ = require('jquery');
 
 require('utils/tracking');
-require('components/statsc');
-
 var appEvents = require('utils/appevents');
+var $ = require('jquery');
 
 function initAppsPanel() {
   document.getElementById('apps-panel').classList.add('visible');
 }
 
 document.getElementById('osx-download').addEventListener('click', function() {
-  appEvents.trigger('stats.event', 'apps.osx.download.clicked');
+  appEvents.trigger('track-event', 'desktop_client_download', { downloadOs: 'osx' });
 });
 
 document.getElementById('windows-download').addEventListener('click', function() {
-  appEvents.trigger('stats.event', 'apps.windows.download');
+  appEvents.trigger('track-event', 'desktop_client_download', { downloadOs: 'windows' });
 });
 
 $(document).ready(function() {
