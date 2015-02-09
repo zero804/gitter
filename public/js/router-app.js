@@ -15,7 +15,6 @@ var $ = require('jquery');
 var urlParser = require('utils/url-parser');
 var RAF = require('utils/raf');
 
-require('es6-promise').polyfill();
 require('components/statsc');
 require('views/widgets/preload');
 require('components/webNotifications');
