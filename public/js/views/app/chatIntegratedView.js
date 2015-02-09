@@ -43,13 +43,6 @@ module.exports = (function () {
   var ChatLayout = Marionette.Layout.extend({
 
     el: 'body',
-    leftmenu: false,
-    rightpanel: false,
-    profilemenu: false,
-    shifted: false,
-    alertpanel: false,
-    files: false,
-    originalRightMargin: "",
 
     ui: {
       scrollToBottom: '.js-scroll-to-bottom',
@@ -76,7 +69,6 @@ module.exports = (function () {
         decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
       });
       chatCollectionView.bindUIElements();
-
 
       this.listenTo(itemCollections.chats, 'atBottomChanged', function (isBottom) {
         this.ui.scrollToBottom.toggleClass('u-scale-zero', isBottom);
@@ -125,7 +117,7 @@ module.exports = (function () {
         $("#room-content").addClass("scroller");
       }
 
-      this.enableDragAndDrop();
+      this.setupDragAndDrop();
     },
 
     onKeyBackspace: function (e) {
@@ -201,8 +193,7 @@ module.exports = (function () {
       this.resetProgressBar();
     },
 
-    enableDragAndDrop: function () {
-      var el = $('body');
+    setupDragAndDrop: function () {
       var dragOverlay = this.ui.dragOverlay;
       var counter = 0;
       var self = this;
@@ -221,20 +212,20 @@ module.exports = (function () {
         self.upload(files);
       }
 
-      el.on('dragenter', function (e) {
+      this.$el.on('dragenter', function (e) {
         ignoreEvent(e);
         counter++;
         dragOverlay.toggleClass('hide', false);
       });
 
-      el.on('dragleave', function (e) {
+      this.$el.on('dragleave', function (e) {
         ignoreEvent(e);
         counter--;
         dragOverlay.toggleClass('hide', counter === 0);
       });
 
-      el.on('dragover', ignoreEvent);
-      el.on('drop', dropEvent.bind(this));
+      this.$el.on('dragover', ignoreEvent);
+      this.$el.on('drop', dropEvent.bind(this));
     },
 
     isImage: function (blob) {
