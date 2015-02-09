@@ -566,7 +566,6 @@ ul li.placeholder:before {
   justify-content: center;
   align-items: center;
   top: 0;
-  height: 100%;
   position: absolute;
   right: 0;
   left: 0;
@@ -578,9 +577,30 @@ ul li.placeholder:before {
   transition: visibility 0s 0.2s, opacity 0.2s;
 }
 
+.js-drag-overlay {
+  cursor: auto;
+  z-index: 1000;
+  color: rgb(100, 100, 100);
+  margin: 0.625em;
+  border: 5px dashed rgb(150, 150, 150);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  position: absolute;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.5);
+  visibility: visible;
+  opacity: 1;
+  transition-delay: 0s;
+  transition: visibility 0s 0.2s, opacity 0.2s;
+}
+
+.js-drag-overlay.hide,
 .loading-frame.hide {
   display: none;
-  // visibility: hidden;
   opacity: 0;
 }
 
