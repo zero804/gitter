@@ -1,7 +1,7 @@
 'use strict';
 
 var LRU             = require("lru-cache");
-var MAX_TOKEN_AGE   = 10 * 1000 * 60 * 60; // 10 minutes
+var MAX_TOKEN_AGE   = 2 * 60000; // 2 minutes
 var tokenCache      = LRU({
   max: 2048,
   maxAge: MAX_TOKEN_AGE
