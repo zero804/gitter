@@ -59,9 +59,9 @@ module.exports = {
       var clientId = result[1];
 
       // Anonymous tokens don't have this
-      if (!userId) return callback();
+      if (!userId) return redisClient.del(tokenValidationCachePrefix + token, callback);
 
-      redisClient.del(tokenValidationCachePrefix + token, tokenLookupCachePrefix + userId + ":" + clientId, callback);
+      return redisClient.del(tokenValidationCachePrefix + token, tokenLookupCachePrefix + userId + ":" + clientId, callback);
     });
   },
 
