@@ -22,7 +22,7 @@ module.exports = (function() {
       var data = this.model.toJSON();
       data.uri = roomNameTrimmer(data.uri);
       data.repoTypeClass = resolveIconClass(data);
-      data.linkUrl = data.exists ? this.model.get('uri') : '#confirm/' + this.model.get('uri');
+      data.linkUrl = data.exists ? '/' + this.model.get('uri') : '#confirm/' + this.model.get('uri');
       return data;
     }
   });
