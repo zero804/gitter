@@ -195,7 +195,7 @@ module.exports = (function () {
 
     setupDragAndDrop: function () {
       var dragOverlay = this.ui.dragOverlay;
-      var counter = 0;
+      var counter = 0; // IMPORTANT: when dragging moving over child nodes will cause dragenter and dragleave, so we need to keep this count, if it's zero means that we should hide the overlay
       var self = this;
 
       function ignoreEvent(e) {
@@ -204,7 +204,7 @@ module.exports = (function () {
       }
 
       function dropEvent(e) {
-        counter = 0;
+        counter = 0; // reset the counter
         dragOverlay.toggleClass('hide', true);
         ignoreEvent(e);
         e = e.originalEvent;
@@ -238,7 +238,7 @@ module.exports = (function () {
 
       if (evt.clipboardData.items.length === 1) {
         blob = evt.clipboardData.items[0].getAsFile();
-        if (!blob || !this.isImage(blob)) {
+        if (!blob || !this.isImage(blob)) { // FIXME: is this the correct behaviour?
           return;
         } else {
           evt.preventDefault();
