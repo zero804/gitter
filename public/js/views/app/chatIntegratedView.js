@@ -1,3 +1,4 @@
+/* global Promise: true, console: true */
 "use strict";
 var $ = require('jquery');
 var context = require('utils/context');
@@ -24,8 +25,7 @@ var unreadItemsClient = require('components/unread-items-client');
 var RightToolbarView = require('views/righttoolbar/rightToolbarView');
 require('transloadit');
 
-module.exports = (function() {
-
+module.exports = (function () {
 
   var touchEvents = {
     // "click #menu-toggle-button":        "onMenuToggle",
@@ -35,6 +35,7 @@ module.exports = (function() {
 
   var mouseEvents = {
     "click .js-favourite-button":          "toggleFavourite",
+    'paste': 'handlePaste',
     'click @ui.scrollToBottom': appEvents.trigger.bind(appEvents, 'chatCollectionView:scrollToBottom')
   };
 
@@ -52,7 +53,8 @@ module.exports = (function() {
     originalRightMargin: "",
 
     ui: {
-      scrollToBottom: '.js-scroll-to-bottom'
+      scrollToBottom: '.js-scroll-to-bottom',
+      progressBar: '#file-progress-bar'
     },
 
     regions: {
@@ -65,7 +67,7 @@ module.exports = (function() {
       'quote': 'onKeyQuote'
     },
 
-    initialize: function() {
+    initialize: function () {
 
       this.bindUIElements();
 
@@ -95,7 +97,7 @@ module.exports = (function() {
 
       var unreadChatsModel = unreadItemsClient.acrossTheFold();
 
-      itemCollections.chats.once('sync', function() {
+      itemCollections.chats.once('sync', function () {
         unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
       });
 
@@ -129,18 +131,18 @@ module.exports = (function() {
       this.enableDragAndDrop();
     },
 
-    onKeyBackspace: function(e) {
+    onKeyBackspace: function (e) {
       e.stopPropagation();
       e.preventDefault();
     },
 
-    onKeyQuote: function(e) {
+    onKeyQuote: function (e) {
       e.preventDefault();
       e.stopPropagation();
       this.quoteText();
     },
 
-    getSelectionText: function() {
+    getSelectionText: function () {
       var text = "";
       if (window.getSelection) {
         text = window.getSelection().toString();
@@ -150,59 +152,70 @@ module.exports = (function() {
       return text;
     },
 
-    quoteText: function() {
+    quoteText: function () {
       var selectedText = this.getSelectionText();
       if (selectedText.length > 0) {
         appEvents.trigger('input.append', "> " + selectedText, { newLine: true });
       }
     },
 
-    enableDragAndDrop: function() {
-      var progressBar = $('#file-progress-bar');
+    updateProgressBar: function (spec) {
+      var bar = this.ui.progressBar;
+      var value = typeof spec.value === 'number' ? spec.value.toFixed(0) .toString() : spec.value;
+      value = value.slice(-1) === '%' ? value : value + '%';
+      var timeout = spec.timeout || 200;
+      setTimeout(function () { bar.css('width', value); }.bind(this), timeout);
+    },
+
+    resetProgressBar: function () {
+      this.ui.progressBar.hide();
+      this.updateProgressBar({
+        value: 0,
+        timeout: 0
+      });
+    },
+
+    handleUploadProgress: function (done, expected) {
+      var percentage = (done / expected * 100 + 20).toFixed(2) + '%';
+      this.updateProgressBar(percentage);
+    },
+
+    handleUploadStart: function () {
+      this.ui.progressBar.show();
+    },
+
+    handleUploadSuccess: function () {
+      console.debug('handleUploadSuccess() ====================');
+    },
+
+    handleUploadError: function (err) {
+      console.debug('handleUploadError() ====================');
+      appEvents.triggerParent('user_notification', {
+        title: "Error uploading file",
+        text:  err.message
+      });
+      this.resetProgressBar();
+    },
+
+    enableDragAndDrop: function () {
+      var self = this;
 
       function ignoreEvent(e) {
         e.stopPropagation();
         e.preventDefault();
       }
 
-      function start() {}
-
-      function progress(bytesReceived, bytesExpected) {
-        var percentage = (bytesReceived / bytesExpected * 100 + 20).toFixed(2) + '%';
-        setTimeout(function(){ progressBar.css('width', percentage); }, 200);
-      }
-
-      function reset() {
-        progressBar.hide(function() {
-          progressBar.css('width', '0%');
-        });
-      }
-
-      function error(assembly) {
-        if (assembly) {
-          appEvents.triggerParent('user_notification', {
-            title: "Error uploading file",
-            text:  assembly.message
-          });
-        }
-        progressBar.hide(function() {
-          progressBar.css('width', '0%');
-        });
-      }
-
       function dropEvent(e) {
-        e.stopPropagation();
-        e.preventDefault();
+        ignoreEvent(e);
 
-        progressBar.show();
-        setTimeout(function(){ progressBar.css('width', '10%'); }, 50);
-        setTimeout(function(){ progressBar.css('width', '20%'); }, 600);
+        self.updateProgressBar({ value: 10, timeout: 50 });
+        self.updateProgressBar({ value: 20, timeout: 600 });
 
         // Prepare formdata
         e = e.originalEvent;
         var files = e.dataTransfer.files;
         if (files.length === 0) {
-          reset();
+          self.resetProgressBar();
           return;
         }
 
@@ -229,17 +242,17 @@ module.exports = (function() {
             room_id: context.getTroupeId(),
             type: type
           })
-          .then(function(data) {
+          .then(function (data) {
             formdata.append("signature", data.sig);
 
             var options = {
               wait: true,
               modal: false,
               autoSubmit: false,
-              onStart: start,
-              onProgress: progress,
-              onSuccess: reset,
-              onError: error,
+              onStart: self.handleUploadStart,
+              onProgress: self.handleUploadProgress,
+              onSuccess: self.handleUploadSuccess,
+              onError: this.handleUploadError,
               debug: false,
               formData: formdata
             };
@@ -254,15 +267,58 @@ module.exports = (function() {
 
       var el = $('body');
       el.on('dragenter', ignoreEvent);
-      el.on('dragover',  ignoreEvent);
-      el.on('drop',      dropEvent);
+      el.on('dragover', ignoreEvent);
+      el.on('drop', dropEvent);
     },
 
-    showSearchMode: function() {
-      // this.rightToolbar.$el.hide();
-      // this.chatInputView.$el.hide();
-      // this.chatSearchCollectionView.$el.show();
-      // this.searchView.$el.show();
+    getFileName: function (file) {
+      console.debug('getFileName() ====================');
+      return new Promise(function (resolve, reject) {
+        file.getAsString(function (str) {
+          if (!str) {
+            return reject(new Error('File has no name'));
+          }
+          return resolve(str);
+        });
+      });
+    },
+
+    handlePaste: function (evt) {
+      console.debug('handlePaste() ====================');
+      var self = this;
+
+      if (evt.originalEvent.clipboardData.items.length > 1) {
+        var file = evt.originalEvent.clipboardData.items[1].getAsFile();
+        if (file.type.indexOf('image/') < 0) {
+          console.debug('not an image() ====================');
+          return;
+        }
+        evt.preventDefault();
+        Promise.all([
+            this.getFileName(evt.originalEvent.clipboardData.items[0]),
+            file // sync
+          ])
+          .then(function (values) {
+            self.upload.apply(self, values);
+          })
+          ['catch'](function (err) {
+            console.debug(err);
+          });
+      }
+    },
+
+    upload: function (name, file) {
+      console.debug('upload() ====================');
+      console.debug('name, file:', name, file);
+      this.updateProgressBar({ value: 10, timeout: 50 });
+      this.updateProgressBar({ value: 20, timeout: 600 });
+      // apiClient.priv.get('/generate-signature', {
+      //     room_uri: context.troupe().get('uri'),
+      //     room_id: context.getTroupeId(),
+      //     type: type
+      //   }).then(function () {
+      //     // do some
+      //   });
     }
   });
 
