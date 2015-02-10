@@ -13,7 +13,8 @@ function installLinkHandler() {
     var disableRouting = dataset.get(target, 'disableRouting');
     if (disableRouting) return; // Propegate the event....
 
-    var internalLink = target.hostname === context.env('baseServer');
+    var targetOrigin = target.protocol + '//' + target.host;
+    var internalLink = targetOrigin === context.env('basePath');
 
     var location = window.location;
 
