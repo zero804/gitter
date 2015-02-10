@@ -6,46 +6,32 @@
     <title>Gitter OAuth Failed</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link href="{{ cdn 'styles/trpAppsPage.css' }}" rel="stylesheet">
-    <link href='//fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
-    <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon5.png' }}">
+    <link href="{{ cdn 'styles/oauth-error-page.css' }}" rel="stylesheet">
+    <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon-normal.ico' }}">
   </head>
 
   <body>
-    <div class="trpHomeHeroStripContainer trpHomeiOSAppHeroStripContainer">
-
-      <div class="trpHomeTopStrip">
-        <div class="trpHomeLogo">{{^compactView}}<a href="{{homeUrl}}">{{/compactView}}<img src="{{ cdn 'images/logo-text-white-64.png' }}" height="64">{{^compactView}}</a>{{/compactView}}</div>
-      </div>
-
-      <div class="trpHomeHero">
-        <div class="trpHeroText failure">
-          <p>We're terribly sorry about this, but your OAuth request is incorrect :(</p>
-          {{#if clientMismatch}}
-          <br>
-          <p>The supplied client credentials don't match: either the <code>client_id</code> or the 
-            <code>redirect_uri</code> wasn't <em>exactly</em> right.
-          </p>
-          {{/if}}
-          {{#if missingParams}}
-            <p>Your request didn&apos;t include some of the required OAuth parameters: <code>{{missingParams}}</code>
-          {{/if}}
-          {{#if incorrectResponseType}}
-            <p>Your request had the incorrect <code>response_type</code> parameter.
-          {{/if}}
-          <br>
-            <p>If you can't resolve this issue, please <a href="http://support.gitter.im" style="color: white">contact support</a>.</p>
-          
-        </div>
-
-      </div>
-
+    <div class="center-panel">
+      <h1>Your OAuth request is incorrect</h1>
+      {{#if clientMismatch}}
+      <p>The supplied client credentials don't match: either the <code>client_id</code> or the <code>redirect_uri</code> wasn't <em>exactly</em> right.</p>
+      {{/if}}
+      {{#if missingParams}}
+      <p>Your request didn&apos;t include some of the required OAuth parameters:</p>
+      <ul>
+        {{#each missingParams}}
+        <li><code>{{this}}</code></li>
+        {{/each}}
+      </ul>
+      {{/if}}
+      {{#if incorrectResponseType}}
+      <p>Your request had the incorrect <code>response_type</code> parameter.</p>
+      {{/if}}
+      <p>If you can't resolve this issue, please <a href="http://support.gitter.im" target="_blank">contact support</a>.</p>
     </div>
 
-
-
-
-
+    <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
+    <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
 
   </body>
 </html>
