@@ -20,6 +20,14 @@ var redisClient_smembers = Q.nbind(redisClient.smembers, redisClient);
 
 var UNREAD_BATCH_SIZE = 100;
 
+/**
+ * Given an array of userIds and an array of mentionUserIds, returns an array of
+ * { userIds: [...], mentionUserIds: [...] }
+ * such that:
+ * a) the `userIds` of any member of the result does not exceed UNREAD_BATCH_SIZE
+ * b) the `mentionUserIds` will appear in the same batch as the corresponding element `userIds`,
+ *    such that for any element of the result, `member.memberUserIds` ⊆ `member.userIds`
+ */
 function getNewItemBatches(userIds, mentionUserIds) {
   var mentionUsersHash = mentionUserIds.reduce(function(memo, mentionUserId) {
     memo[mentionUserId] = true;
@@ -31,6 +39,7 @@ function getNewItemBatches(userIds, mentionUserIds) {
   }
 
   var length = userIds.length;
+  /* Preallocate the array to the correct size */
   var results = new Array(~~(userIds.length / UNREAD_BATCH_SIZE) + ((userIds.length % UNREAD_BATCH_SIZE) === 0 ? 0 : 1));
 
   for (var i = 0, count = 0; i < length; i += UNREAD_BATCH_SIZE, count++) {
