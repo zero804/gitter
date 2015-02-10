@@ -34,7 +34,7 @@ module.exports = (function () {
     'click @ui.scrollToBottom': appEvents.trigger.bind(appEvents, 'chatCollectionView:scrollToBottom')
   };
 
-  var mouseEvents = {
+  var standardEvents = {
     "click .js-favourite-button":          "toggleFavourite",
     'paste': 'handlePaste',
     'click @ui.scrollToBottom': appEvents.trigger.bind(appEvents, 'chatCollectionView:scrollToBottom')
@@ -50,7 +50,7 @@ module.exports = (function () {
       dragOverlay: '.js-drag-overlay'
     },
 
-    events: uiVars.isMobile ? touchEvents : mouseEvents,
+    events: uiVars.isMobile ? touchEvents : standardEvents,
 
     keyboardEvents: {
       'backspace': 'onKeyBackspace',
@@ -195,7 +195,7 @@ module.exports = (function () {
 
     setupDragAndDrop: function () {
       var dragOverlay = this.ui.dragOverlay;
-      var counter = 0; // IMPORTANT: when dragging moving over child nodes will cause dragenter and dragleave, so we need to keep this count, if it's zero means that we should hide the overlay
+      var counter = 0; // IMPORTANT: when dragging moving over child nodes will cause dragenter and dragleave, so we need to keep this count, if it's zero means that we should hide the overlay. WC.
       var self = this;
 
       function ignoreEvent(e) {
@@ -234,11 +234,17 @@ module.exports = (function () {
 
     handlePaste: function (evt) {
       evt = evt.originalEvent || evt;
+      var clipboard = evt.clipboardData;
       var blob = null;
 
-      if (evt.clipboardData.items.length === 1) {
-        blob = evt.clipboardData.items[0].getAsFile();
-        if (!blob || !this.isImage(blob)) { // FIXME: is this the correct behaviour?
+      if (!clipboard || !clipboard.items) {
+        return; // Safari + FF, don't support pasting images in. Ignore and perform default behaviour. WC.
+      }
+
+      // TODO: ensure this is the correct behaviour, although only works on Chrome. WC.
+      if (clipboard.items.length === 1) {
+        blob = clipboard.items[0].getAsFile();
+        if (!blob || !this.isImage(blob)) {
           return;
         } else {
           evt.preventDefault();
@@ -249,7 +255,7 @@ module.exports = (function () {
 
     upload: function (files) {
 
-      var options = {
+      var DEFAULT_OPTIONS = {
         wait: true,
         modal: false,
         autoSubmit: false,
@@ -278,8 +284,7 @@ module.exports = (function () {
         data.append('file', file);
       }
 
-      // FIXME: do we need to generate a signature for every file? WC
-      apiClient.priv.get('/generate-signature', {
+      apiClient.priv.get('/generate-signature', { // FIXME: do we need to generate a signature for every file? WC
           room_uri: context.troupe().get('uri'),
           room_id: context.getTroupeId(),
           type: type
@@ -290,7 +295,7 @@ module.exports = (function () {
           var form = $('#upload-form');
           form.find('input[name="params"]').attr('value', res.params);
           form.unbind('submit.transloadit');
-          form.transloadit(_.extend(options, { formData: data }));
+          form.transloadit(_.extend(DEFAULT_OPTIONS, { formData: data }));
           form.submit();
         });
     }
