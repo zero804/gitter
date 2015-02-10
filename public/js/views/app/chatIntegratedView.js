@@ -232,6 +232,9 @@ module.exports = (function () {
       return /image\//.test(blob.type);
     },
 
+    /**
+     * handles pasting, image-only for now
+     */
     handlePaste: function (evt) {
       evt = evt.originalEvent || evt;
       var clipboard = evt.clipboardData;
