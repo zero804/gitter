@@ -3,33 +3,24 @@
 
 var loginUtils = require('../web/login-utils');
 var nconf      = require('../utils/config');
-var locale     = require("locale");
 var social     = require('./social-metadata');
-var supported  = new locale.Locales(["en", "ru", "ja"]);
 
 module.exports = {
     install: function(app) {
       app.get(nconf.get('web:homeurl'),
         require('../web/middlewares/unawesome-browser'),
         function(req, res, next) {
-          var locales = new locale.Locales([req.query.lang, req.headers["accept-language"]]);
 
           if(req.user && req.query.redirect !== 'no') {
             loginUtils.redirectUserToDefaultTroupe(req, res, next);
             return;
           }
 
-          var lang = locales.best(supported);
-          var template;
-
-          if(lang.language === 'en') {
-            template = 'homepage';
-          } else {
-            template = 'homepage-' + lang.language;
-          }
-
+          var locale = req.i18n.getLocale();
           // when the viewer is not logged in:
-          res.render(template, {
+          res.render('homepage', {
+            useOptimizely: locale === 'en',
+            wordy: locale === 'ru',
             socialMetadata: social.getMetadata(),
             billingBaseUrl: nconf.get('web:billingBaseUrl')
           });
