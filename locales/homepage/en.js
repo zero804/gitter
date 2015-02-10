@@ -61,5 +61,6 @@
 	"Support": "Support",
 	"API": "API",
 	"Blog": "Blog",
-	"Twitter": "Twitter"
+	"Twitter": "Twitter",
+	"Gitter &mdash; Where developers come to talk.": "Gitter &mdash; Where developers come to talk."
 }
