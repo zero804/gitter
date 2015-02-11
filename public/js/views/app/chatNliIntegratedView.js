@@ -6,6 +6,7 @@ var hasScrollBars = require('utils/scrollbar-detect');
 
 var ChatCollectionView = require('views/chat/chatCollectionView');
 
+var webhookDecorator = require('views/chat/decorators/webhookDecorator');
 var issueDecorator = require('views/chat/decorators/issueDecorator');
 var commitDecorator = require('views/chat/decorators/commitDecorator');
 var mentionDecorator = require('views/chat/decorators/mentionDecorator');
@@ -50,6 +51,7 @@ module.exports = (function() {
         collection: this.chatCollection,
         userCollection: this.userCollection,
         decorators: [
+          webhookDecorator,
           issueDecorator,
           commitDecorator,
           mentionDecorator,

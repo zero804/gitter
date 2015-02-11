@@ -14,6 +14,7 @@ var hasScrollBars = require('utils/scrollbar-detect');
 var cocktail = require('cocktail');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var ChatCollectionView = require('views/chat/chatCollectionView');
+var webhookDecorator = require('views/chat/decorators/webhookDecorator');
 var issueDecorator = require('views/chat/decorators/issueDecorator');
 var commitDecorator = require('views/chat/decorators/commitDecorator');
 var mentionDecorator = require('views/chat/decorators/mentionDecorator');
@@ -65,7 +66,7 @@ module.exports = (function() {
         el: '#chat-container',
         collection: itemCollections.chats,
         userCollection: itemCollections.users,
-        decorators: [issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
+        decorators: [webhookDecorator, issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
       });
       chatCollectionView.bindUIElements();
 
