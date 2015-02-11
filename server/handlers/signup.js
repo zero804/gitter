@@ -4,6 +4,7 @@
 var loginUtils = require('../web/login-utils');
 var nconf      = require('../utils/config');
 var social     = require('./social-metadata');
+var langs      = require('langs');
 
 module.exports = {
     install: function(app) {
@@ -17,10 +18,28 @@ module.exports = {
           }
 
           var locale = req.i18n.getLocale();
+          var requested = req.headers["accept-language"] || "";
+          requested = requested.split(";")[0] || "";
+          requested = requested.split(/,\s*/)[0];
+          requested = requested.split("-")[0];
+
+          var requestLangCode, requestLangLocalName;
+          if (locale !== requested) {
+            var requestLang = langs.where("1", requested);
+            if (requestLang) {
+              requestLangCode = requestLang["1"];
+              requestLangLocalName = requestLang.local;
+            }
+          }
+
           // when the viewer is not logged in:
           res.render('homepage', {
             useOptimizely: locale === 'en',
             wordy: locale === 'ru',
+            translationRequired: locale !== requested,
+            requestLangCode: requestLangCode,
+            requestLangLocalName: requestLangLocalName,
+            translated: req.i18n.__("Translated By"),
             socialMetadata: social.getMetadata(),
             billingBaseUrl: nconf.get('web:billingBaseUrl')
           });

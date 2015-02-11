@@ -62,5 +62,6 @@
 	"Support": "Поддержка",
 	"API": "API",
 	"Blog": "Блог",
-	"Twitter": "Twitter"
+	"Twitter": "Twitter",
+	"Translated By": ""
 }

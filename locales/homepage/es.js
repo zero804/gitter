@@ -62,5 +62,6 @@
 	"API": "API",
 	"Blog": "Blog",
 	"Twitter": "Twitter",
-  "Gitter &mdash; Where developers come to talk.": "Gitter &mdash; Donde los desarrolladores vienen a conversar."
+  "Gitter &mdash; Where developers come to talk.": "Gitter &mdash; Donde los desarrolladores vienen a conversar.",
+	"Translated By": ""
 }

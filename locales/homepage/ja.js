@@ -62,5 +62,6 @@
 	"API": "API",
 	"Blog": "ブログ",
 	"Twitter": "Twitter",
-	"Gitter &mdash; Where developers come to talk.": "Gitter &mdash; 開発者が話をする場所"
+	"Gitter &mdash; Where developers come to talk.": "Gitter &mdash; 開発者が話をする場所",
+	"Translated By": ""
 }

@@ -41,7 +41,7 @@
     "jade": "0.28.1",
     "jwt-simple": "~0.1.0",
     "keyword-extractor": "0.0.9",
-    "langs": "^1.0.1",
+    "langs": "https://registry.npmjs.org/langs/-/langs-1.0.1.tgz",
     "languagedetect": "^1.1.1",
     "lazy.js": "~0.2.1",
     "locale": "0.0.17",
