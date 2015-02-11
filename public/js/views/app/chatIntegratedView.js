@@ -27,7 +27,7 @@ var RightToolbarView = require('views/righttoolbar/rightToolbarView');
 
 require('transloadit');
 
-module.exports = (function () {
+module.exports = (function() {
 
   var touchEvents = {
     "keypress":                         "onKeyPress",
@@ -57,7 +57,7 @@ module.exports = (function () {
       'quote': 'onKeyQuote'
     },
 
-    initialize: function () {
+    initialize: function() {
 
       this.bindUIElements();
 
@@ -70,7 +70,7 @@ module.exports = (function () {
       });
       chatCollectionView.bindUIElements();
 
-      this.listenTo(itemCollections.chats, 'atBottomChanged', function (isBottom) {
+      this.listenTo(itemCollections.chats, 'atBottomChanged', function(isBottom) {
         this.ui.scrollToBottom.toggleClass('u-scale-zero', isBottom);
       }.bind(this));
 
@@ -86,7 +86,7 @@ module.exports = (function () {
 
       var unreadChatsModel = unreadItemsClient.acrossTheFold();
 
-      itemCollections.chats.once('sync', function () {
+      itemCollections.chats.once('sync', function() {
         unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
       });
 
@@ -120,18 +120,18 @@ module.exports = (function () {
       this.setupDragAndDrop();
     },
 
-    onKeyBackspace: function (e) {
+    onKeyBackspace: function(e) {
       e.stopPropagation();
       e.preventDefault();
     },
 
-    onKeyQuote: function (e) {
+    onKeyQuote: function(e) {
       e.preventDefault();
       e.stopPropagation();
       this.quoteText();
     },
 
-    getSelectionText: function () {
+    getSelectionText: function() {
       var text = "";
       if (window.getSelection) {
         text = window.getSelection().toString();
@@ -141,22 +141,21 @@ module.exports = (function () {
       return text;
     },
 
-    quoteText: function () {
+    quoteText: function() {
       var selectedText = this.getSelectionText();
       if (selectedText.length > 0) {
         appEvents.trigger('input.append', "> " + selectedText, { newLine: true });
       }
     },
 
-    updateProgressBar: function (spec) {
+    updateProgressBar: function(spec) {
       var bar = this.ui.progressBar;
-      var value = typeof spec.value === 'number' ? spec.value.toFixed(0) .toString() : spec.value;
-      value = value.slice(-1) === '%' ? value : value + '%';
+      var value = spec.value && spec.value.toFixed(0) + '%';
       var timeout = spec.timeout || 200;
-      setTimeout(function () { bar.css('width', value); }, timeout);
+      setTimeout(function() { bar.css('width', value); }, timeout);
     },
 
-    resetProgressBar: function () {
+    resetProgressBar: function() {
       this.ui.progressBar.hide();
       this.updateProgressBar({
         value: 0,
@@ -164,18 +163,16 @@ module.exports = (function () {
       });
     },
 
-    handleUploadProgress: function (done, expected) {
-      var percentage = (done / expected * 100).toFixed(2) + '%';
-      this.updateProgressBar({ value: percentage, timeout: 0 });
+    handleUploadProgress: function(done, expected) {
+      this.updateProgressBar({ value: (done / expected * 100), timeout: 0 });
     },
 
-    handleUploadStart: function () {
+    handleUploadStart: function() {
       this.ui.progressBar.show();
     },
 
-    handleUploadSuccess: function (res) {
+    handleUploadSuccess: function(res) {
       this.resetProgressBar();
-
       if (!res.results.files) {
         return;
       }
@@ -185,7 +182,7 @@ module.exports = (function () {
       });
     },
 
-    handleUploadError: function (err) {
+    handleUploadError: function(err) {
       appEvents.triggerParent('user_notification', {
         title: 'Error Uploading File',
         text:  err.message
@@ -193,7 +190,7 @@ module.exports = (function () {
       this.resetProgressBar();
     },
 
-    setupDragAndDrop: function () {
+    setupDragAndDrop: function() {
       var dragOverlay = this.ui.dragOverlay;
       var counter = 0; // IMPORTANT: when dragging moving over child nodes will cause dragenter and dragleave, so we need to keep this count, if it's zero means that we should hide the overlay. WC.
       var self = this;
@@ -212,13 +209,13 @@ module.exports = (function () {
         self.upload(files);
       }
 
-      this.$el.on('dragenter', function (e) {
+      this.$el.on('dragenter', function(e) {
         counter++;
         dragOverlay.toggleClass('hide', false);
         ignoreEvent(e);
       });
 
-      this.$el.on('dragleave', function (e) {
+      this.$el.on('dragleave', function(e) {
         counter--;
         dragOverlay.toggleClass('hide', counter === 0);
         ignoreEvent(e);
@@ -228,14 +225,14 @@ module.exports = (function () {
       this.$el.on('drop', dropEvent.bind(this));
     },
 
-    isImage: function (blob) {
+    isImage: function(blob) {
       return /image\//.test(blob.type);
     },
 
     /**
      * handles pasting, image-only for now
      */
-    handlePaste: function (evt) {
+    handlePaste: function(evt) {
       evt = evt.originalEvent || evt;
       var clipboard = evt.clipboardData;
       var blob = null;
@@ -244,7 +241,6 @@ module.exports = (function () {
         return; // Safari + FF, don't support pasting images in. Ignore and perform default behaviour. WC.
       }
 
-      // TODO: ensure this is the correct behaviour, although only works on Chrome. WC.
       if (clipboard.items.length === 1) {
         blob = clipboard.items[0].getAsFile();
         if (!blob || !this.isImage(blob)) {
@@ -256,7 +252,7 @@ module.exports = (function () {
       }
     },
 
-    upload: function (files) {
+    upload: function(files) {
 
       var DEFAULT_OPTIONS = {
         wait: true,
@@ -292,7 +288,7 @@ module.exports = (function () {
           room_id: context.getTroupeId(),
           type: type
         })
-        .then(function (res) {
+        .then(function(res) {
           data.append("signature", res.sig);
 
           var form = $('#upload-form');
