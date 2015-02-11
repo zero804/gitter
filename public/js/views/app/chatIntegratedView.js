@@ -27,6 +27,8 @@ var RightToolbarView = require('views/righttoolbar/rightToolbarView');
 
 require('transloadit');
 
+var PROGRESS_THRESHOLD = 62.5;
+
 module.exports = (function() {
 
   var touchEvents = {
@@ -164,7 +166,7 @@ module.exports = (function() {
     },
 
     handleUploadProgress: function(done, expected) {
-      this.updateProgressBar({ value: (done / expected * 100), timeout: 0 });
+      this.updateProgressBar({ value: PROGRESS_THRESHOLD + (done/expected) * (100 - PROGRESS_THRESHOLD), timeout: 0 });
     },
 
     handleUploadStart: function() {
@@ -173,9 +175,10 @@ module.exports = (function() {
 
     handleUploadSuccess: function(res) {
       this.resetProgressBar();
+      var n = parseInt(res.fields.numberOfFiles, 10);
       appEvents.triggerParent('user_notification', {
         title: 'Upload complete',
-        text: 'File(s) uploaded successfully.'
+        text: (n > 1 ? n + ' files' : 'file') + ' uploaded successfully.'
       });
     },
 
@@ -250,6 +253,17 @@ module.exports = (function() {
     },
 
     upload: function(files) {
+      this.ui.progressBar.show();
+
+      this.updateProgressBar({
+        value: 0,
+        timeout: 0
+      });
+
+      this.updateProgressBar({
+        value: PROGRESS_THRESHOLD,
+        timeout: 200
+      });
 
       var DEFAULT_OPTIONS = {
         wait: true,
@@ -262,7 +276,7 @@ module.exports = (function() {
         onError: this.handleUploadError.bind(this)
       };
 
-      var data = new FormData();
+      var formData = new FormData();
       var type = '';
 
       for (var i = 0; i < files.length; i++) {
@@ -277,8 +291,10 @@ module.exports = (function() {
           }
         }
 
-        data.append('file', file);
+        formData.append('file', file);
       }
+
+      formData.append('numberOfFiles', files.length);
 
       apiClient.priv.get('/generate-signature', {
           room_uri: context.troupe().get('uri'),
@@ -286,12 +302,12 @@ module.exports = (function() {
           type: type
         })
         .then(function(res) {
-          data.append("signature", res.sig);
+          formData.append("signature", res.sig);
 
           var form = $('#upload-form');
           form.find('input[name="params"]').attr('value', res.params);
           form.unbind('submit.transloadit');
-          form.transloadit(_.extend(DEFAULT_OPTIONS, { formData: data }));
+          form.transloadit(_.extend(DEFAULT_OPTIONS, { formData: formData }));
           form.submit();
         });
     }
