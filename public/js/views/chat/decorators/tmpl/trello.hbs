@@ -1,0 +1,11 @@
+<div class="whicon">
+  <img class="notification-icon" src="{{favicon}}">
+</div>
+
+<div class="whbody">
+  {{#if from}}
+  Card {{#if cardUrl}}'<a href="{{cardUrl}}" target="_blank">{{card}}</a>'{{else}}'{{card}}'{{/if}} {{action}} from '{{from}}' to '{{to}}' by {{author}} on board <a href="{{url}}" target="_blank">{{board}}</a>
+  {{else}}
+    Card {{#if cardUrl}}'<a href="{{cardUrl}}" target="_blank">{{card}}</a>'{{else}}'{{card}}'{{/if}} {{action}} by {{author}} on board <a href="{{url}}" target="_blank">{{board}}</a>
+  {{/if}}
+</div>
