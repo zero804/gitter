@@ -62,5 +62,6 @@
 	"API": "API",
 	"Blog": "Blog",
 	"Twitter": "Twitter",
-	"Gitter &mdash; Where developers come to talk.": "Gitter &mdash; Onde desenvolvedores vêm conversar."
+	"Gitter &mdash; Where developers come to talk.": "Gitter &mdash; Onde desenvolvedores vêm conversar.",
+	"Translated By": "<a href='https://github.com/mariojunior' target='_blank'>Mario Junior</a>"
 }
