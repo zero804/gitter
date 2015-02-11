@@ -173,12 +173,9 @@ module.exports = (function() {
 
     handleUploadSuccess: function(res) {
       this.resetProgressBar();
-      if (!res.results.files) {
-        return;
-      }
       appEvents.triggerParent('user_notification', {
-        title: 'Upload complete.',
-        text: (res.results.files.length > 1) ? res.results.files.length + ' files uploaded.' : 'File uploaded successfully.'
+        title: 'Upload complete',
+        text: 'File(s) uploaded successfully.'
       });
     },
 
