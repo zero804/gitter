@@ -5,7 +5,7 @@
 	"Existing user login": "Iniciar sesión",
 	"login": "Iniciar sesión",
 	"Chat, for GitHub.": "Chat, para GitHub.",
-	"Get unlimited public rooms and one-to-one chats, free forever. Private team plans start from $2 per user per month. No credit card required.": "Salas públicas y conversaciones uno-a-uno ilimitadas, para siempre. Planes para equipos desde $2 por usuario por mes. Sin tarjeta de credito.",
+	"Get unlimited public rooms and one-to-one chats, free forever. Private team plans start from $2 per user per month. No credit card required.": "Salas públicas y conversaciones uno-a-uno ilimitadas, para siempre. Planes para equipos desde $2 por usuario por mes. Sin tarjeta de crédito.",
 	"Sign up free with Github": "Regístrate gratis con Github",
 	"Sign up with Github": "Regístrate con Github",
 	"By signing up you agree to our <a %s>Terms and Conditions</a>": "Registrándote aceptas nuestros <a %s>Términos y Condiciones</a>",
@@ -14,7 +14,7 @@
 	"Yip, we got your back.": "Sip, te tenemos cubierto.",
 	"Private conversations": "Conversaciones privadas",
 	"Public rooms are awesome (and free), but we get that some stuff is private. So we've got <a %s>plans for that</a>.": "Las salas públicas son geniales (y gratis), pero sabemos que a veces necesitas privacidad. Tenemos <a %s>planes para eso</a>.",
-	"Developer friendly": "Hecho para desarrolladores",
+	"Developer friendly": "Para desarrolladores",
 	"This is a picture of a cloud against a background of clouds. OMG! We <a %s>integrate</a> with a bunch of stuff in the cloud.": "Esta es una foto de La Nube con un fondo de nubes. OMG! Nosotros nos <a %s>integramos</a> con un montón de servicios en La Nube.",
 	"Some of our communities": "Algunas de nuestras comunidades",
 	"Create your own": "Crea tu propia comunidad",
@@ -48,7 +48,7 @@
 	"Our organisation plans allow you to create private rooms using your GitHub organisation as the owner": "Nuestros planes para organizaciones te permiten crear salas privadas para estas mismas",
 	"Prices may be subject to VAT. By signing up you agree to our <a %s>Terms and Conditions</a>.": "Precios sujetos a VAT. Registrándote aceptas nuestros <a %s>Términos y condiciones</a>.",
 	"Get Gitter now!": "Regístrate ahora!",
-	"Gitter is available in all modern browsers as well as apps for desktops and mobile phones.": "Gitter esta disponible en todos los navegadores modernos así como en aplicaciones de escritorio y móbil.",
+	"Gitter is available in all modern browsers as well as apps for desktops and mobile phones.": "Gitter esta disponible en todos los navegadores modernos así como en aplicaciones de escritorio y móvil.",
 	"We currently have apps for OSX, iOS, Android and Windows with a Linux app coming soon. We also have a sweet little <a %s>IRC bridge</a>": "De momento tenemos aplicaciones para OSX, iOS, Android, Windows y Linux. También tenemos una interfaz con <a %s>IRC</a>",
 	"Mac": "Mac",
 	"Windows": "Windows",
@@ -62,5 +62,5 @@
 	"API": "API",
 	"Blog": "Blog",
 	"Twitter": "Twitter",
-	"Gitter &mdash; Where developers come to talk.": "Gitter &mdash; Where developers come to talk."
+  "Gitter &mdash; Where developers come to talk.": "Gitter &mdash; Donde los desarrolladores vienen a conversar."
 }
