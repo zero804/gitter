@@ -124,23 +124,27 @@ module.exports = {
         var subject = calculateSubjectForUnreadEmail(troupesWithUnreadCounts);
 
         return mailerService.sendEmail({
-          templateFile: "unread_notification",
-          from: 'Gitter Notifications <support@gitter.im>',
-          to: email,
-          unsubscribe: unsubscribeUrl,
-          subject: subject,
-          tracking: {
-            event: 'unread_notification_sent',
-            data: { userId: user.id, email: email }
-          },
-          data: {
-            canChangeNotifySettings: canChangeNotifySettings,
-            user: user,
-            emailBasePath: emailBasePath,
-            troupesWithUnreadCounts: troupesWithUnreadCounts,
-            unsubscribeUrl: unsubscribeUrl
-          }
-        });
+            templateFile: "unread_notification",
+            from: 'Gitter Notifications <support@gitter.im>',
+            to: email,
+            unsubscribe: unsubscribeUrl,
+            subject: subject,
+            tracking: {
+              event: 'unread_notification_sent',
+              data: { userId: user.id, email: email }
+            },
+            data: {
+              canChangeNotifySettings: canChangeNotifySettings,
+              user: user,
+              emailBasePath: emailBasePath,
+              troupesWithUnreadCounts: troupesWithUnreadCounts,
+              unsubscribeUrl: unsubscribeUrl
+            }
+          })
+          .fail(function(err) {
+            logger.error('Email send failed: ' + err, { email: email, subject: subject, exception: err });
+            throw err;
+          });
       })
       .fail(function(err) {
         logger.error('Unable to send unread items notifications: ' + err, { exception: err });
