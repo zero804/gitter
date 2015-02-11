@@ -53,13 +53,10 @@ module.exports = function(req, res, next) {
   i18n.setLocaleFromQuery(req);
   I18n.registerMethods(res.locals, req);
 
-  console.log('locale', req.i18n.getLocale());
-
-
   /*  Setup i18n */
-  // if(req.i18n && req.i18n.prefLocale) {
-  //   req.i18n.setLocale(req.i18n.prefLocale);
-  // }
+  if(req.i18n && req.i18n.prefLocale) {
+    req.i18n.setLocale(req.i18n.prefLocale);
+  }
 
   /* i18n stuff */
   res.locals.locale = req.i18n;
