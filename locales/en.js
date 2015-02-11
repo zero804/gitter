@@ -1,4 +1,7 @@
 {
 	"%s ago": "%s ago",
-	"Where developers come to talk.": "Where developers come to talk."
+	"%d unread message": {
+		"one": "%d unread message",
+		"other": "%d unread messages"
+	}
 }

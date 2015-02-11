@@ -231,29 +231,29 @@ h1:after, h2:after {
   }
 }
 */
- 
+
  [class^="icon-"]:before, [class*=" icon-"]:before {
   font-family: "os-icons";
   font-style: normal;
   font-weight: normal;
   speak: none;
- 
+
   display: inline-block;
   text-decoration: inherit;
   width: 1em;
   margin-right: 1.4em;
   text-align: center;
   /* opacity: .8; */
- 
+
   /* For safety - reset parent styles, that can break glyph codes*/
   font-variant: normal;
   text-transform: none;
-     
+
   /* fix buttons height, for twitter bootstrap */
   line-height: 1em;
- 
+
 }
- 
+
 .icon-windows:before { content: '\e800'; } /* '' */
 .icon-apple:before { content: '\e801'; } /* '' */
 .icon-android:before { content: '\e802'; } /* '' */
@@ -1290,3 +1290,10 @@ footer small a:hover {
   display: none;
   @media only screen and (min-width: @desktopOnly_bp) { display: inline; }
 }
+
+.exceptDesktop {
+  @exceptDesktop_bp: 36.25em;
+  display: none;
+  @media only screen and (max-width: @exceptDesktop_bp) { display: inline; }
+}
+
