@@ -7,5 +7,6 @@ module.exports = [
   'login',
   'mobile',
   'settings',
-  'logout'
+  'logout',
+  'apps'
 ];
