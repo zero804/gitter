@@ -50,13 +50,13 @@ function getI18nOptions(req) {
 module.exports = function(req, res, next) {
   var opt = getI18nOptions(req);
   var i18n = req.i18n = new I18n(opt);
-  i18n.setLocaleFromQuery(req);
   I18n.registerMethods(res.locals, req);
 
   /*  Setup i18n */
   if(req.i18n && req.i18n.prefLocale) {
     req.i18n.setLocale(req.i18n.prefLocale);
   }
+  i18n.setLocaleFromQuery(req);
 
   /* i18n stuff */
   res.locals.locale = req.i18n;
