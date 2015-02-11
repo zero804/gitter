@@ -386,6 +386,17 @@
             <a href="http://blog.gitter.im" target="_blank">{{ __ "Blog" }}</a>
             <a href="https://twitter.com/gitchat" target="_blank">{{ __ "Twitter" }}</a>
           </small>
+          {{#if translationRequired}}
+          <p class="translation">
+            <a href="https://github.com/gitterHQ/gitter-translations">Want this in {{ requestLangLocalName}}?</a>
+          </p>
+          {{else}}
+            {{#if translated}}
+            <p class="translation">
+              <a href="https://github.com/gitterHQ/gitter-translations">Translation</a>  kindly done by {{{ translated }}}.
+            </p>
+            {{/if}}
+          {{/if}}
 
         </div>
       </footer>
