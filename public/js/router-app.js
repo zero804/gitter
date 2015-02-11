@@ -38,7 +38,6 @@ var loading = function (el) {
   };
 };
 
-
 onready(function () {
   var loadingScreen = loading($('.loading-frame'));
   var chatIFrame = document.getElementById('content-frame');
@@ -105,7 +104,7 @@ onready(function () {
     }
 
     // TEMPORARY FIX FOR IE. Fix properly!
-    if(iframeUrl.charAt(0) !== '/') {
+    if (iframeUrl.charAt(0) !== '/') {
       iframeUrl = '/' + iframeUrl;
     }
     /*
@@ -399,7 +398,5 @@ onready(function () {
       });
     });
   }
-
-
 });
 
