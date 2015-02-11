@@ -280,7 +280,7 @@ module.exports = (function() {
         data.append('file', file);
       }
 
-      apiClient.priv.get('/generate-signature', { // FIXME: do we need to generate a signature for every file? WC
+      apiClient.priv.get('/generate-signature', {
           room_uri: context.troupe().get('uri'),
           room_id: context.getTroupeId(),
           type: type
