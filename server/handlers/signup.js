@@ -32,6 +32,9 @@ module.exports = {
             }
           }
 
+          var translatedBy = req.i18n.__("Translated By");
+          if (translatedBy === "Translated By") translatedBy = "";
+
           // when the viewer is not logged in:
           res.render('homepage', {
             useOptimizely: locale === 'en',
@@ -39,7 +42,7 @@ module.exports = {
             translationRequired: locale !== requested,
             requestLangCode: requestLangCode,
             requestLangLocalName: requestLangLocalName,
-            translated: req.i18n.__("Translated By"),
+            translated: translatedBy,
             socialMetadata: social.getMetadata(),
             billingBaseUrl: nconf.get('web:billingBaseUrl')
           });
