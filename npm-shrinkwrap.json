@@ -1,6 +1,6 @@
 {
   "name": "gitter-webapp",
-  "version": "8.9.0",
+  "version": "8.9.6",
   "dependencies": {
     "apn": {
       "version": "1.4.4",
@@ -1542,9 +1542,9 @@
       }
     },
     "gitter-services": {
-      "version": "1.7.0",
-      "from": "gitter-services@git+ssh://git@github.com:gitterHQ/services.git#1.7.0",
-      "resolved": "git+ssh://git@github.com:gitterHQ/services.git#53377eb9c2182c46ceda4fcabd87ecfc47ebdc19",
+      "version": "1.8.0",
+      "from": "gitter-services@git+ssh://git@github.com:gitterHQ/services.git#1.8.0",
+      "resolved": "git+ssh://git@github.com:gitterHQ/services.git#ddf2fbb972afdf4b7ba1ccb1d9a27719724ddea1",
       "dependencies": {
         "require-all": {
           "version": "0.0.8",
