@@ -4,7 +4,7 @@
 	"Apps": "Aplicativos",
 	"Existing user login": "Usuários existentes login",
 	"login": "login",
-	"Chat, for GitHub.": "Chat, for GitHub.",
+	"Chat, for GitHub.": "Chat, para GitHub.",
 	"Get unlimited public rooms and one-to-one chats, free forever. Private team plans start from $2 per user per month. No credit card required.": "Obtenha salas de conversas públicas ou um-a-um, grátis! Há Planos para Times privados começando a partir de $2 por usuário/mês. Não precisa informar seu cartão de crédito no cadastro.",
 	"Sign up free with Github": "Entre agora com sua conta GitHub, grátis!",
 	"Sign up with Github": "Entre com GitHub",
