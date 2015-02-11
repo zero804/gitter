@@ -14,19 +14,21 @@ var serializer                = require('../../serializers/notification-serializ
 var moment                    = require('moment');
 var Q                         = require('q');
 var collections               = require('../../utils/collections');
+var mongoUtils                = require('../../utils/mongo-utils');
 var emailNotificationService  = require('../email-notification-service');
 var userSettingsService       = require('../user-settings-service');
 var userTroupeSettingsService = require('../user-troupe-settings-service');
 
 var filterTestValues = config.get('notifications:filterTestValues');
 
-
+var qlimit = require('qlimit');
+var limit = qlimit(10);
 
 var timeBeforeNextEmailNotificationS = config.get('notifications:timeBeforeNextEmailNotificationMins') * 60;
 var emailNotificationsAfterMins = config.get('notifications:emailNotificationsAfterMins');
 
 function isTestId(id) {
-  return id.indexOf('USER') === 0 || id.indexOf('TROUPE') === 0;
+  return id.indexOf('USER') === 0 || id.indexOf('TROUPE') === 0 || !mongoUtils.isLikeObjectId(id);
 }
 
 function sendEmailNotifications(since) {
@@ -135,7 +137,6 @@ function sendEmailNotifications(since) {
         return Object.keys(userTroupeUnreadHash[userId]);
       }));
 
-
       return Q.all([
           userIds,
           userService.findByIds(userIds),
@@ -168,7 +169,8 @@ function sendEmailNotifications(since) {
 
       var count = 0;
 
-      return Q.all(userIds.map(function(userId) {
+      // Limit the loop to 10 simultaneous sends
+      return Q.all(userIds.map(limit(function(userId) {
         var user = userHash[userId];
         if(!user) return;
 
@@ -233,7 +235,7 @@ function sendEmailNotifications(since) {
               });
           });
 
-        }))
+        })))
         .then(function() {
           var time = Date.now() - start;
           logger.info("Sent unread notification emails to " + count + " users in " + time + "ms");

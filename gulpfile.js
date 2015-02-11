@@ -97,10 +97,7 @@ gulp.task('test', ['test-mocha', 'test-redis-lua']);
 gulp.task('localtest', function() {
   return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
     .pipe(mocha({
-      reporter: 'spec',
-      env: {
-        NODE_ENV: 'test'
-      }
+      reporter: 'spec'
     }));
 });
 
