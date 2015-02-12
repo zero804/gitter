@@ -684,9 +684,10 @@ describe('unread-item-service', function() {
 
   describe('unread-batches', function() {
     var unreadItemServiceEngine;
-
+    var batchSize;
     beforeEach(function() {
       unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
+      batchSize = unreadItemServiceEngine.testOnly.UNREAD_BATCH_SIZE;
     });
 
     it('should batch a single batch with no mentions', function() {
@@ -701,22 +702,24 @@ describe('unread-item-service', function() {
 
 
     it('should handle large batches', function() {
+      var TOTAL = 900;
+
       var userIds = [];
       var mentionUserIds = [];
-      for(var i = 0; i < 900; i++) {
+      for(var i = 0; i < TOTAL; i++) {
         userIds.push(i);
         if(i % 3 === 0) {
           mentionUserIds.push(i);
         }
       }
-
+      var expectedNumberOfBatches = Math.floor(TOTAL / batchSize) + (TOTAL % batchSize === 0 ? 0 : 1);
       var batches = unreadItemServiceEngine.testOnly.getNewItemBatches(userIds, mentionUserIds);
-      assert.strictEqual(3, batches.length);
-      for(var j = 0; j < 3; j++) {
+      assert.strictEqual(expectedNumberOfBatches, batches.length);
+      for(var j = 0; j < expectedNumberOfBatches; j++) {
         var expectedUsers = [];
         var expectedMentions = [];
-        for(var k = 0; k < 300; k++) {
-          var id  = j * 300 + k;
+        for(var k = 0; k < batchSize; k++) {
+          var id  = j * batchSize + k;
 
           expectedUsers.push(id);
           if(id % 3 === 0) {
@@ -729,6 +732,7 @@ describe('unread-item-service', function() {
       });
 
     it('should handle large batches #2', function() {
+      var TOTAL = 905;
       var userIds = [];
       var mentionUserIds = [];
       for(var i = 0; i < 905; i++) {
@@ -738,15 +742,16 @@ describe('unread-item-service', function() {
         }
       }
 
+      var expectedNumberOfBatches = Math.floor(TOTAL / batchSize) + (TOTAL % batchSize === 0 ? 0 : 1);
       var batches = unreadItemServiceEngine.testOnly.getNewItemBatches(userIds, mentionUserIds);
-      assert.strictEqual(4, batches.length);
-      for(var j = 0; j < 4; j++) {
+      assert.strictEqual(expectedNumberOfBatches, batches.length);
+      for(var j = 0; j < expectedNumberOfBatches; j++) {
         var expectedUsers = [];
         var expectedMentions = [];
-        for(var k = 0; k < 300; k++) {
-          var id  = j * 300 + k;
+        for(var k = 0; k < batchSize; k++) {
+          var id  = j * batchSize + k;
 
-          if(id >= 905) break;
+          if(id >= TOTAL) break;
 
           expectedUsers.push(id);
           if(id % 3 === 0) {

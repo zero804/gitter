@@ -549,6 +549,7 @@ engine.getBadgeCountsForUserIds = getBadgeCountsForUserIds;
 engine.getRoomsCausingBadgeCount = getRoomsCausingBadgeCount;
 
 engine.testOnly = {
-  getNewItemBatches: getNewItemBatches
+  getNewItemBatches: getNewItemBatches,
+  UNREAD_BATCH_SIZE: UNREAD_BATCH_SIZE
 };
 module.exports = engine;

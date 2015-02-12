@@ -127,6 +127,7 @@ describe('email-notification-service', function() {
   });
 
   it('should send emails about unread items', function(done) {
+    this.timeout(30000);
     var user = { id: "5405bfdd66579b000004df1a" };
 
     return emailNotificationService.sendUnreadItemsNotification(user, EMAIL_DATA)
@@ -134,6 +135,8 @@ describe('email-notification-service', function() {
   });
 
   it('should send emails about unread items in spanish', function(done) {
+    this.timeout(30000);
+
     lang = 'es';
     var user = { id: "5405bfdd66579b000004df1a" };
 
