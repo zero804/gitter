@@ -1,7 +1,7 @@
 'use strict';
 
 var LRU = require("lru-cache");
-var Q = require("Q");
+var Q = require("q");
 var mongoUtils = require('./mongo-utils');
 var _ = require('underscore');
 
