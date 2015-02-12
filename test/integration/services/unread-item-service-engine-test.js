@@ -13,6 +13,11 @@ describe('unread-item-service', function() {
   before(blockTimer.on);
   after(blockTimer.off);
 
+  // Allow redis to connect properly
+  before(function(done) {
+    setTimeout(done, 1000);
+  });
+
   describe('single test cases', function() {
 
     var unreadItemServiceEngine, troupeId1, itemId1, itemId2, itemId3, userId1, userId2, userIds, troupeId2;
@@ -677,6 +682,86 @@ describe('unread-item-service', function() {
     });
   });
 
+  describe('unread-batches', function() {
+    var unreadItemServiceEngine;
+
+    beforeEach(function() {
+      unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
+    });
+
+    it('should batch a single batch with no mentions', function() {
+      var batch = unreadItemServiceEngine.testOnly.getNewItemBatches(['a', 'b', 'c'], []);
+      assert.deepEqual([ { userIds: ['a', 'b', 'c'], mentionUserIds: [] }], batch);
+    });
+
+    it('should batch a single batch with some mentions', function() {
+      var batch = unreadItemServiceEngine.testOnly.getNewItemBatches(['a', 'b', 'c'], ['a']);
+      assert.deepEqual([ { userIds: ['a', 'b', 'c'], mentionUserIds: ['a'] }], batch);
+    });
+
+
+    it('should handle large batches', function() {
+      var userIds = [];
+      var mentionUserIds = [];
+      for(var i = 0; i < 900; i++) {
+        userIds.push(i);
+        if(i % 3 === 0) {
+          mentionUserIds.push(i);
+        }
+      }
+
+      var batches = unreadItemServiceEngine.testOnly.getNewItemBatches(userIds, mentionUserIds);
+      assert.strictEqual(3, batches.length);
+      for(var j = 0; j < 3; j++) {
+        var expectedUsers = [];
+        var expectedMentions = [];
+        for(var k = 0; k < 300; k++) {
+          var id  = j * 300 + k;
+
+          expectedUsers.push(id);
+          if(id % 3 === 0) {
+            expectedMentions.push(id);
+          }
+        }
+        assert.deepEqual(expectedUsers, batches[j].userIds);
+        assert.deepEqual(expectedMentions, batches[j].mentionUserIds);
+      }
+      });
+
+    it('should handle large batches #2', function() {
+      var userIds = [];
+      var mentionUserIds = [];
+      for(var i = 0; i < 905; i++) {
+        userIds.push(i);
+        if(i % 3 === 0) {
+          mentionUserIds.push(i);
+        }
+      }
+
+      var batches = unreadItemServiceEngine.testOnly.getNewItemBatches(userIds, mentionUserIds);
+      assert.strictEqual(4, batches.length);
+      for(var j = 0; j < 4; j++) {
+        var expectedUsers = [];
+        var expectedMentions = [];
+        for(var k = 0; k < 300; k++) {
+          var id  = j * 300 + k;
+
+          if(id >= 905) break;
+
+          expectedUsers.push(id);
+          if(id % 3 === 0) {
+            expectedMentions.push(id);
+          }
+        }
+        assert.deepEqual(expectedUsers, batches[j].userIds);
+        assert.deepEqual(expectedMentions, batches[j].mentionUserIds);
+      }
+    });
+
+
+
+  });
+
   describe('integration tests', function() {
     var unreadItemServiceEngine, troupeId1, troupeId2, troupeId3,
     userId1, userId2, itemId1, itemId2, itemId3, userIds;
@@ -884,6 +969,53 @@ describe('unread-item-service', function() {
 
         expectBadgeCounts([ [userId1, 0] ]),
         ],done);
+    });
+
+    it('should handle unread items in very large rooms', function(done) {
+      var SIZE = 2000;
+      var userIds = [];
+      var mentionUserIds = [];
+      for(var i = 0; i < SIZE; i++) {
+        userIds.push(i);
+        if(i % 3 === 0) {
+          mentionUserIds.push(i);
+        }
+      }
+
+      return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, mentionUserIds)
+        .then(function(result) {
+          for(var j = 0; j < SIZE; j++) {
+            assert(result[j]);
+            assert.strictEqual(result[j].unreadCount, 1);
+            assert.strictEqual(result[j].badgeUpdate, true);
+            if (j % 3 === 0) {
+              assert.strictEqual(result[j].mentionCount, 1);
+            }
+          }
+
+          var userIds = [];
+          var mentionUserIds = [];
+          for(var i = 0; i < SIZE; i++) {
+            userIds.push(i);
+            if(i % 3 === 0) {
+              mentionUserIds.push(i);
+            }
+          }
+
+          return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId2, userIds, mentionUserIds);
+        })
+        .then(function(result) {
+          for(var j = 0; j < SIZE; j++) {
+            assert(result[j]);
+            assert.strictEqual(result[j].unreadCount, 2);
+            assert.strictEqual(result[j].badgeUpdate, false);
+            if (j % 3 === 0) {
+              assert.strictEqual(result[j].mentionCount, 2);
+            }
+          }
+
+        })
+        .nodeify(done);
     });
 
   });
