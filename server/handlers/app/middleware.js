@@ -3,7 +3,7 @@
 
 var roomService = require('../../services/room-service');
 var isPhone     = require('../../web/is-phone');
-var StatusError = require('statuserror');
+var url         = require('url');
 
 function normaliseUrl(params) {
   if(params.roomPart3) {
@@ -15,6 +15,14 @@ function normaliseUrl(params) {
   }
 
   return params.roomPart1;
+}
+
+function getRedirectUrl(roomUrl, req) {
+  // Figure out what the subframe is and add it to the URL, along with the original querystring
+  var m = req.path.match(/\/~\w+$/);
+  var frame = m && m[0] || "";
+  var finalUrl = url.format({ pathname: roomUrl + frame, query: req.query });
+  return finalUrl;
 }
 
 function uriContextResolverMiddleware(options) {
@@ -64,11 +72,12 @@ function uriContextResolverMiddleware(options) {
       })
       .fail(function(err) {
         if(err && err.redirect) {
-          return res.relativeRedirect(err.redirect);
+          return res.relativeRedirect(getRedirectUrl(err.redirect, req));
         }
 
-        next(err);
-      });
+        throw err;
+      })
+      .fail(next);
   };
 }
 
