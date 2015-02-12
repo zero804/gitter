@@ -7,7 +7,7 @@ var _               = require('underscore');
 var assert          = require("assert");
 var GithubContibutorService = testRequire('./services/github/github-contributor-service');
 
-describe('github-contributor-service', function() {
+describe('github-contributor-service #slow', function() {
   it('members should detailed emailed', function(done) {
     var gh = new GithubContibutorService(null);
 

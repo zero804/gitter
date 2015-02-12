@@ -12,7 +12,7 @@ describe('mongo-utils', function() {
 
   // The millisecond value seems to float around in some instances, so this test
   // is designed to be spread out over several milliseconds to test this theory
-  it('should return the right time, no matter what the current time', function(done) {
+  it('should return the right time, no matter what the current time #slow', function(done) {
 
     function doLater(i) {
       var d = Q.defer();
@@ -42,7 +42,7 @@ describe('mongo-utils', function() {
 
   // The millisecond value seems to float around in some instances, so this test
   // is designed to be spread out over several milliseconds to test this theory
-  it('should return the right time, no matter what the current time', function(done) {
+  it('should return the right time, no matter what the current time #slow', function(done) {
     var id = new ObjectID();
     var t = id.getTimestamp().getTime();
 

@@ -58,7 +58,7 @@ describe('collapsed-chats-service', function() {
       .catch(done);
   });
 
-  it('should have a maximum of ' + MAX_ITEMS + ' items', function (done) {
+  it('should have a maximum of ' + MAX_ITEMS + ' items #slow', function (done) {
     var amount = 150; // keep this above 100
 
     batchAdd(amount)
@@ -76,7 +76,7 @@ describe('collapsed-chats-service', function() {
       .catch(done);
   });
 
-  it('should remove all chat items', function (done) {
+  it('should remove all chat items #slow', function (done) {
     batchAdd(100)
       .then(collapsedChatService.removeAll.bind(null, USER, ROOM))
       .then(collapsedChatService.getHash.bind(null, USER, ROOM))

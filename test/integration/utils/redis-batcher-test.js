@@ -15,7 +15,7 @@ describe('redis-batcher', function() {
     workerQueue.startScheduler();
   });
 
-  it('should batch tasks together', function(done) {
+  it('should batch tasks together #slow', function(done) {
     var RedisBatcher = testRequire('./utils/redis-batcher').RedisBatcher;
 
     var underTest = new RedisBatcher('test1-' + uuid.v4(), 0);
@@ -53,7 +53,7 @@ describe('redis-batcher', function() {
 
   });
 
-  it('should keep separate keys separate', function(done) {
+  it('should keep separate keys separate #slow', function(done) {
     var RedisBatcher = testRequire('./utils/redis-batcher').RedisBatcher;
 
     var underTest = new RedisBatcher('test2-' + uuid.v4(), 0);

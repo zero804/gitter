@@ -13,7 +13,7 @@ var TEST_ITERATIONS = 200;
 
 Q.longStackSupport = true;
 
-describe('unread-item-service-engine-combined', function() {
+describe('unread-item-service-engine-combined #slow', function() {
   this.timeout(15000);
 
   describe('integration tests', function() {

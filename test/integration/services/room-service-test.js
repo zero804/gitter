@@ -93,7 +93,7 @@ describe('room-service', function() {
     fixture.cleanup();
   });
 
-  describe('classic functionality', function() {
+  describe('classic functionality #slow', function() {
 
     it('should fail to create a room for an org', function (done) {
       var permissionsModelMock = mockito.mockFunction();
@@ -118,7 +118,7 @@ describe('room-service', function() {
         .nodeify(done);
     });
 
-    it('should deny access but provide public rooms', function (done) {
+    it('should deny access but provide public rooms #slow', function (done) {
 
       var permissionsModelMock = mockito.mockFunction();
       var uriLookupServiceMock = mockito.mock(testRequire('./services/uri-lookup-service'));
@@ -525,7 +525,7 @@ describe('room-service', function() {
 
   });
 
-  describe('custom rooms', function() {
+  describe('custom rooms #slow', function() {
 
     describe('::org::', function() {
 
@@ -1032,7 +1032,7 @@ describe('room-service', function() {
   });
 
   describe('bans', function() {
-    it('should ban users from rooms', function(done) {
+    it('should ban users from rooms #slow', function(done) {
       var roomPermissionsModelMock = mockito.mockFunction();
 
       var roomService = testRequire.withProxies("./services/room-service", {
