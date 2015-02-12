@@ -20,6 +20,7 @@ var GitHubStrategy         = require('gitter-passport-github').Strategy;
 var GitHubMeService        = require('../services/github/github-me-service');
 var gaCookieParser         = require('../utils/ga-cookie-parser');
 var emailAddressService    = require('../services/email-address-service');
+var userSettingsService    = require('../services/user-settings-service');
 
 function installApi() {
   /**
@@ -181,10 +182,17 @@ function install() {
                   var properties = useragentTagger(req.headers['user-agent']);
 
                   emailAddressService(user)
-                  .then(function(email) {
-                    user.email = email;
-                    stats.userUpdate(user, properties);
-                  });
+                    .then(function(email) {
+                      user.email = email;
+                      stats.userUpdate(user, properties);
+                    });
+
+                  if (req.i18n && req.i18n.locale) {
+                    userSettingsService.setUserSettings(user.id, 'lang', req.i18n.locale)
+                      .catch(function(err) {
+                        logger.error("Failed to save lang user setting", { userId: user.id, lang: req.i18n.locale, exception: err });
+                      });
+                  }
 
                   stats.event("user_login", _.extend({
                     userId: user.id,
