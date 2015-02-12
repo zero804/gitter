@@ -58,10 +58,6 @@
     max-height: 300px;
   }
 
-  .expand {
-    width: @rightMarginFull;
-  }
-
   @media @mid {
     #activity-header {
     opacity: 0;
@@ -113,7 +109,9 @@
   }
 }
 
-.right-toolbar--collapsible {
+// if the toolbar is collapsable and viewport is mid size or smaller, then collapse.
+// ...Unless the toolbar has been expanded (like if search has been activated).
+.right-toolbar--collapsible:not(.right-toolbar--expanded) {
   @media @mid {
     width: 70px;
     padding-right: 0px;
