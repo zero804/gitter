@@ -10,7 +10,7 @@ var client = badgerService.testOnly.client;
 
 describe('badger-service', function() {
   // Skip tests in the automated test as they create too much noise
-  if(process.env.NODE_ENV === 'test') return;
+  if(process.env.NODE_ENV === 'test' || process.env.SKIP_BADGER_TESTS) return;
 
   this.timeout(100000);
   it('should create pull requests for repos that do not have a master branch', function(done) {
