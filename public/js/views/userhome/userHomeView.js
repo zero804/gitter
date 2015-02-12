@@ -2,16 +2,13 @@
 var $ = require('jquery');
 var Marionette = require('marionette');
 var backbone = require('backbone');
-var moment = require('moment');
 var context = require('utils/context');
 var troupeCollections = require('collections/instances/troupes');
 var userHomeTemplate = require('./tmpl/userHomeTemplate.hbs');
-var userHomeEmptyOrgViewTemplate = require('./tmpl/userHomeEmptyOrgView.hbs');
 var OrgCollectionView = require('./homeOrgCollectionView');
 var SuggestedCollectionView = require('./suggested-room-collection-view');
 var isMobile = require('utils/is-mobile');
 var isNative = require('utils/is-native');
-var appEvents = require('utils/appevents');
 
 module.exports = (function() {
 
@@ -61,6 +58,7 @@ module.exports = (function() {
       }
 
       return {
+        basePath: context.env('basePath'),
         showUpgradeAuthLink: !isMobile() && !hasPrivateRepoScope,
         prettyWelcome: !isMobile() && !isNative() && prettyWelcome
       };
