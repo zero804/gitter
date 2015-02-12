@@ -14,11 +14,12 @@ var roomNameTrimmer     = require('../../public/js/utils/room-name-trimmer');
 var mongoUtils          = require('../utils/mongo-utils');
 var moment              = require('moment');
 var Q                   = require('q');
+var i18nFactory         = require('../utils/i18n-factory');
 
 /*
  * Return a nice sane
  */
-function calculateSubjectForUnreadEmail(troupesWithUnreadCounts) {
+function calculateSubjectForUnreadEmail(i18n, troupesWithUnreadCounts) {
   var allOneToOne = true;
   var roomNames = troupesWithUnreadCounts.map(function(d) {
     if(d.troupe.oneToOne) {
@@ -30,33 +31,26 @@ function calculateSubjectForUnreadEmail(troupesWithUnreadCounts) {
   });
 
   switch(roomNames.length) {
-    case 0: return "Unread messages on Gitter"; // Wha??
+    case 0: return i18n.__("Unread messages on Gitter"); // Wha??
     case 1:
       if(allOneToOne) {
-        return "Unread messages from " + roomNames[0];
+        return i18n.__("Unread messages from %s", roomNames[0]);
       } else {
-        return "Unread messages in " + roomNames[0];
+        return i18n.__("Unread messages in %s", roomNames[0]);
       }
       break;
     case 2:
       if(allOneToOne) {
-        return "Unread messages from " + roomNames[0] + ' and ' + roomNames[1];
+        return i18n.__("Unread messages from %s and %s", roomNames[0], roomNames[1]);
       } else {
-        return "Unread messages in " + roomNames[0] + ' and ' + roomNames[1];
-      }
-      break;
-    case 3:
-      if(allOneToOne) {
-        return "Unread messages from " + roomNames[0] + ', ' + roomNames[1] + ' and one other';
-      } else {
-        return "Unread messages in " + roomNames[0] + ', ' + roomNames[1] + ' and one other';
+        return i18n.__("Unread messages in %s and %s", roomNames[0], roomNames[1]);
       }
       break;
     default:
       if(allOneToOne) {
-        return "Unread messages from " + roomNames[0] + ', ' + roomNames[1] + ' and ' + (roomNames.length - 2) + ' others';
+        return i18n.__n("Unread messages from %%s, %%s and one other", "Unread messages from %%s, %%s and %d others", roomNames.length - 2, roomNames[0], roomNames[1]);
       } else {
-        return "Unread messages in " + roomNames[0] + ', ' + roomNames[1] + ' and ' + (roomNames.length - 2) + ' others';
+        return i18n.__n("Unread messages in %%s, %%s and one other", "Unread messages in %%s, %%s and %d others", roomNames.length - 2, roomNames[0], roomNames[1]);
       }
   }
 }
@@ -103,11 +97,16 @@ module.exports = {
       return Q.resolve();
     }
 
-    return emailAddressService(user)
-      .then(function(email) {
+    return Q.all([emailAddressService(user), userSettingsService.getUserSettings(user.id, 'lang')])
+      .spread(function(email, lang) {
         if(!email) {
           logger.info('Skipping email notification for ' + user.username + ' as they have no primary confirmed email');
           return;
+        }
+
+        var i18n = i18nFactory.get();
+        if (lang) {
+          i18n.setLocale(lang);
         }
 
         var emailBasePath = config.get("email:emailBasePath");
@@ -121,8 +120,7 @@ module.exports = {
           }
         );
 
-        var subject = calculateSubjectForUnreadEmail(troupesWithUnreadCounts);
-
+        var subject = calculateSubjectForUnreadEmail(i18n, troupesWithUnreadCounts);
         return mailerService.sendEmail({
             templateFile: "unread_notification",
             from: 'Gitter Notifications <support@gitter.im>',
@@ -134,6 +132,8 @@ module.exports = {
               data: { userId: user.id, email: email }
             },
             data: {
+              lang: lang,
+              i18n: i18n,
               canChangeNotifySettings: canChangeNotifySettings,
               user: user,
               emailBasePath: emailBasePath,
