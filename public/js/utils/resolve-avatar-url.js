@@ -8,7 +8,7 @@ function isClient() {
 
 function hash(spec) {
   var str = spec.str || '';
-  var buckets = spec.buckets || 8; // defaults to 7 buckets
+  var buckets = spec.buckets || 6; // defaults to 5 buckets
   if (!str) return str;
 
   return str
