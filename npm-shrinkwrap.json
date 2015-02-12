@@ -1819,6 +1819,11 @@
       "from": "http://beta-internal:8089/nexus/content/groups/npm/loglevel/-/loglevel-1.2.0.tgz",
       "resolved": "http://beta-internal:8089/nexus/content/groups/npm/loglevel/-/loglevel-1.2.0.tgz"
     },
+    "lru-cache": {
+      "version": "2.5.0",
+      "from": "lru-cache@>=2.5.0 <3.0.0",
+      "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-2.5.0.tgz"
+    },
     "mandrill-api": {
       "version": "1.0.41",
       "from": "https://registry.npmjs.org/mandrill-api/-/mandrill-api-1.0.41.tgz",
