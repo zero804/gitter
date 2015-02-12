@@ -1,10 +1,10 @@
 <!doctype html>
-<html class="no-js" lang="en">
+<html class="no-js" lang="{{ lang }}">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-        <title>Gitter &mdash; Where developers come to talk.</title>
+        <title>{{{ __ "Gitter &mdash; Where developers come to talk." }}}</title>
 
         <meta name="description" content="Where developers come to talk.">
 
@@ -16,12 +16,11 @@
 
         <link rel="stylesheet" href="{{cdn 'styles/homepage.css' }}">
 
-
         <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon-normal.ico' }}">
-        <script src="//cdn.optimizely.com/js/590160700.js"></script>
+        {{#if useOptimizely}}<script src="//cdn.optimizely.com/js/590160700.js"></script>{{/if }}
         {{> load_font_css }}
     </head>
-    <body>
+    <body  {{#if wordy}}class="wordy"{{/if}}>
       <header id="intro-panel">
         <nav class="site-nav">
           <div class="wrap">
@@ -32,27 +31,27 @@
             </a>
 
             <div class="top-navigation menu-animation">
-              <a href="#integrations-panel">Integrations</a>
-              <a href="#pricing-panel">Pricing</a>
-              <a href="#apps-panel">Apps</a>
+              <a href="#integrations-panel">{{ __ "Integrations" }}</a>
+              <a href="#pricing-panel">{{ __ "Pricing" }}</a>
+              <a href="#apps-panel">{{ __ "Apps" }}</a>
             </div>
 
             <a class="btn login" href="/login/github?action=login&source=intro-login">
-              <b><span class='desktopOnly'>Existing user </span>login</b>
+              <b><span class='desktopOnly'>{{ __ "Existing user login"}}</span><span class='exceptDesktop'>{{ __ "login"}}</span></b>
             </a>
           </div>
         </nav>
         <div class="wrap">
           <div class="map"><img class="bg" src="{{cdn 'images/home/map.png'}}" alt="There should be a map here"></div>
-          <h1>Chat, for GitHub.</h1>
-          <p>Get unlimited public rooms and one-to-one chats, free forever. Private team plans start from $2 per user per month. No credit card required.</p>
+          <h1>{{ __ "Chat, for GitHub."}}</h1>
+          <p>{{ __ "Get unlimited public rooms and one-to-one chats, free forever. Private team plans start from $2 per user per month. No credit card required." }}</p>
 
           <a class="btn signup" href="/login/github?action=signup&source=intro-signup">
-            <img src="{{cdn 'images/home/github.png'}}"> <b>Sign up <span class='desktopOnly'>free </span>with Github</b>
+            <img src="{{cdn 'images/home/github.png'}}"> <b><span class='desktopOnly'>{{  __ "Sign up free with Github" }}</span><span class='exceptDesktop'>{{ __ "Sign up with Github"}}</span></b>
           </a>
           <div class="legal">
             <span>
-              By signing up you agree to our <a href="https://gitter.zendesk.com/hc/en-us/sections/200274872-Legal-documentation" target="_blank">Terms and Conditions</a>.
+              {{{ __ "By signing up you agree to our <a %s>Terms and Conditions</a>" "href='https://gitter.zendesk.com/hc/en-us/sections/200274872-Legal-documentation' target='_blank'" }}}.
             </span>
           </div>
 
@@ -60,20 +59,20 @@
           <ul class="mini-features-list">
             <li>
               <img src="{{cdn 'images/home/quill.png'}}" alt="Quill icon">
-              <h2>Markdown power</h2>
-              <span>Ever wanted full markdown support in chat? How about syntax highlighting?<br>Yip, we got your back.</span>
+              <h2>{{ __ "Markdown power" }}</h2>
+              <span>{{ __ "Ever wanted full markdown support in chat? How about syntax highlighting?"}}<br>{{ __ "Yip, we got your back."}}</span>
             </li>
 
             <li>
               <img src="{{cdn 'images/home/shield.png'}}" alt="Shield icon">
-              <h2>Private conversations</h2>
-              <span>Public rooms are awesome (and free), but we get that some stuff is private. So we've got <a href="#pricing-panel">plans for that</a>.</span>
+              <h2>{{ __ "Private conversations"}}</h2>
+              <span>{{{ __ "Public rooms are awesome (and free), but we get that some stuff is private. So we've got <a %s>plans for that</a>." "href='#pricing-panel'"}}}</span>
             </li>
 
             <li>
               <img src="{{cdn 'images/home/cloud.png'}}" alt="Shield icon">
-              <h2>Developer friendly</h2>
-              <span>This is a picture of a cloud against a background of clouds. OMG! We <a href="#integrations-panel">integrate</a> with a bunch of stuff in the cloud. </span>
+              <h2>{{ __ "Developer friendly" }}</h2>
+              <span>{{{ __ "This is a picture of a cloud against a background of clouds. OMG! We <a %s>integrate</a> with a bunch of stuff in the cloud." "href='#integrations-panel'" }}}</span>
             </li>
           </ul>
         </div>
@@ -83,13 +82,14 @@
       <section id="communities-panel">
         <div class="wrap">
           <h1>
-            Some of our communities
+            {{ __ "Some of our communities"}}
 
             <a class="btn secondary" href="/login/github?action=signup&source=communities">
-              Create your own
+              {{ __ "Create your own"}}
             </a>
             <a class="btn primary" href="/explore/tags/?action=explore&source=homepage">
-              Explore<span class='desktopOnly'> rooms</span>
+              <span class='desktopOnly'>{{ __ "Explore rooms"}}</span>
+              <span class='exceptDesktop'>{{ __ "Explore"}}</span>
             </a>
           </h1>
 
@@ -133,9 +133,9 @@
 
       <section id="integrations-panel">
         <div class="wrap">
-          <h1>Integrated with your workflow</h1>
-          <p>Gitter is built on top of GitHub and is tightly integrated with your organisations, repositories, issues and activity.</p>
-          <p>We provide integrations with Trello, Jenkins, Travis CI, Heroku, Sentry, BitBucket, HuBoard, Logentries, Pagerduty & Sprintly. We also accept custom webhooks, have an <a href="https://github.com/gitterHQ/services" target="_blank">open source repository</a> for integrations as well as a <a href="http://developer.gitter.im" target="_blank">flexible API</a>.</p>
+          <h1>{{ __ "Integrated with your workflow"}}</h1>
+          <p>{{ __ "Gitter is built on top of GitHub and is tightly integrated with your organisations, repositories, issues and activity."}}</p>
+          <p>{{{ __ "We provide integrations with Trello, Jenkins, Travis CI, Heroku, Sentry, BitBucket, HuBoard, Logentries, Pagerduty &amp; Sprintly. We also accept custom webhooks, have an <a %s>open source repository</a> for integrations as well as a <a %s>flexible API</a>." "href='https://github.com/gitterHQ/services' target='_blank'" " href='http://developer.gitter.im' target='_blank'" }}}</p>
 
           <div class="loves">
             <img src="{{cdn 'images/home/gitter-loves.png'}}" alt="Gitter loves">
@@ -197,103 +197,103 @@
 
           </div>
 
-          <h1>Loved by our users</h1>
-          <p>Gitter is nothing without the people using it day in and day out.</p>
-          <p>We asked a few what Gitter means to them, this is what they had to say. If you love Gitter, Tweet us <a href="https://twitter.com/gitchat" target="_blank">@gitchat</a> and we'll update these quotes every month.<br><br></p>
+          <h1>{{ __ "Loved by our users" }}</h1>
+          <p>{{ __ "Gitter is nothing without the people using it day in and day out." }}</p>
+          <p>{{{ __ "We asked a few what Gitter means to them, this is what they had to say. If you love Gitter, Tweet us <a %s>%s</a> and we'll update these quotes every month." "href='https://twitter.com/gitchat' target='_blank'" "@gitchat" }}}<br><br></p>
         </div>
       </section>
 
       <section id="pricing-panel">
         <div class="wrap">
           <div class="half">
-            <h1>Personal pricing</h1>
+            <h1>{{ __ "Personal pricing" }}</h1>
 
             <article class="price ghost">
               <header>
-                <b>Free</b>
+                <b>{{ __ "Free" }}</b>
 
                 <h1>
                   $0
-                  <b>Forever</b>
+                  <b>{{ __ "Forever"}}</b>
                 </h1>
               </header>
 
               <ul>
-                <li><b>Unlimited</b> public rooms</li>
-                <li><b>1</b> private room*</li>
-                <li><b>2 weeks’</b> chat history</li>
+                <li>{{{ __ "<b>Unlimited</b> public rooms"}}}</li>
+                <li>{{{ __ "<b>1</b> private room"}}}*</li>
+                <li>{{{ __ "<b>2 weeks’</b> chat history" }}}</li>
               </ul>
 
-              <a class="btn signup full" href="/login/github?action=signup&source=pricing.free"><b>Get started</b> for free</a>
+              <a class="btn signup full" href="/login/github?action=signup&source=pricing.free">{{{ __ "<b>Get started</b> for free"}}}</a>
             </article>
 
             <article class="price purple">
               <header>
-                <b>Individual</b>
+                <b>{{ __ "Individual"}}</b>
 
                 <h1>
                   $2
-                  <b>monthly</b>
+                  <b>{{ __ "monthly"}}</b>
                 </h1>
               </header>
 
               <ul>
-                <li><b>Unlimited</b> public rooms</li>
-                <li><b>Unlimited</b> private rooms**</li>
-                <li><b>Unlimited</b> chat history</li>
+                <li>{{{ __ "<b>Unlimited</b> public rooms"}}}</li>
+                <li>{{{ __ "<b>Unlimited</b> private rooms"}}}**</li>
+                <li>{{{ __ "<b>Unlimited</b> chat history"}}}</li>
               </ul>
 
-              <a class="btn signup full" href="{{billingBaseUrl}}/plan/personal"><b>Purchase</b> now</a>
+              <a class="btn signup full" href="{{billingBaseUrl}}/plan/personal">{{{ __ "<b>Purchase</b> now" }}}</a>
             </article>
           </div>
 
           <div class="half">
-            <h1>Organisation pricing</h1>
+            <h1>{{ __ "Organisation pricing"}}</h1>
 
             <article class="price mix">
               <header>
-                <b>Bronze</b>
+                <b>{{ __ "Bronze" }}</b>
 
                 <h1>
                   $2
-                  <b>per user/month</b>
+                  <b>{{ __ "per user/month" }}</b>
                 </h1>
               </header>
 
               <ul>
-                <li><b>Unlimited</b> public rooms</li>
-                <li><b>Unlimited</b> private rooms***</li>
-                <li><b>6 months’</b> chat history</li>
+                <li>{{{ __ "<b>Unlimited</b> public rooms" }}} </li>
+                <li>{{{ __ "<b>Unlimited</b> private rooms" }}} ***</li>
+                <li>{{{ __ "<b>6 months’</b> chat history" }}}</li>
               </ul>
 
-              <a class="btn signup full" href="{{billingBaseUrl}}/plan/bronze"><b>Purchase</b> now</a>
+              <a class="btn signup full" href="{{billingBaseUrl}}/plan/bronze">{{{ __ "<b>Purchase</b> now" }}}</a>
             </article>
 
             <article class="price orange">
               <header>
-                <b>Silver</b>
+                <b>{{ __ "Silver"}}</b>
 
                 <h1>
                   $5
-                  <b>per user/month</b>
+                  <b>{{ __ "per user/month"}}</b>
                 </h1>
               </header>
 
               <ul>
-                <li><b>Unlimited</b> public rooms</li>
-                <li><b>Unlimited</b> private rooms***</li>
-                <li><b>Unlimited</b> chat history</li>
+                <li>{{{ __ "<b>Unlimited</b> public rooms" }}}</li>
+                <li>{{{ __ "<b>Unlimited</b> private rooms" }}}***</li>
+                <li>{{{ __ "<b>Unlimited</b> chat history" }}}</li>
               </ul>
 
-              <a class="btn signup full" href="{{billingBaseUrl}}/plan/silver"><b>Purchase</b> now</a>
+              <a class="btn signup full" href="{{billingBaseUrl}}/plan/silver">{{{ __ "<b>Purchase</b> now" }}}</a>
             </article>
           </div>
           <div class="wrap fine-print">
-            <p>* Our free plan includes one private room per organisation you belong to on GitHub</p>
-            <p>** Our Individual plan allows you to create private rooms using your personal account as the owner</p>
-            <p>*** Our organisation plans allow you to create private rooms using your GitHub organisation as the owner</p>
+            <p>* {{ __ "Our free plan includes one private room per organisation you belong to on GitHub"}}</p>
+            <p>** {{ __ "Our Individual plan allows you to create private rooms using your personal account as the owner" }}</p>
+            <p>*** {{ __ "Our organisation plans allow you to create private rooms using your GitHub organisation as the owner"}}</p>
             <div class="legal">
-              Prices may be subject to VAT. By signing up you agree to our <a href="https://gitter.zendesk.com/hc/en-us/sections/200274872-Legal-documentation" target="_blank">Terms and Conditions</a>.
+              {{{ __ "Prices may be subject to VAT. By signing up you agree to our <a %s>Terms and Conditions</a>." "href='https://gitter.zendesk.com/hc/en-us/sections/200274872-Legal-documentation' target='_blank'" }}}
             </div>
           </div>
         </div>
@@ -310,27 +310,27 @@
             <img class="phone" src="{{cdn 'images/home/phone.png'}}">
           </div>
 
-          <h1>Get Gitter now!</h1>
-          <p>Gitter is available in all modern browsers as well as apps for desktops and mobile phones.</p>
-          <p>We currently have apps for OSX, iOS, Android and Windows with a Linux app coming soon. We also have a sweet little <a href="https://irc.gitter.im" target="_blank">IRC bridge</a>.</p>
+          <h1>{{ __ "Get Gitter now!"}}</h1>
+          <p>{{ __ "Gitter is available in all modern browsers as well as apps for desktops and mobile phones."}}</p>
+          <p>{{{ __ "We currently have apps for OSX, iOS, Android and Windows with a Linux app coming soon. We also have a sweet little <a %s>IRC bridge</a>" "href='https://irc.gitter.im' target='_blank'" }}}.</p>
 
           <p>
-            <a class="btn outline" href="http://update.gitter.im/osx/latest" id="osx-download"><i class="icon-apple"></i>Mac</span></a>
-            <a class="btn outline" href="http://update.gitter.im/win/latest" id="windows-download"><i class="icon-windows"></i>Windows</a>
-            <a class="btn outline" href="/apps" style="opacity: 0.5"><i class="icon-linux"></i>Coming soon</a>
+            <a class="btn outline" href="http://update.gitter.im/osx/latest" id="osx-download"><i class="icon-apple"></i>{{ __ "Mac"}}</span></a>
+            <a class="btn outline" href="http://update.gitter.im/win/latest" id="windows-download"><i class="icon-windows"></i>{{ __ "Windows" }}</a>
+            <a class="btn outline" href="/apps" style="opacity: 0.5"><i class="icon-linux"></i>{{ __ "Coming soon" }}</a>
           </p>
           <p>
-            <a class="btn outline" href="http://appstore.com/gitter" target="_blank"><i class="icon-apple"></i>iPhone</span></a>
-            <a class="btn outline" href="https://play.google.com/store/apps/details?id=im.gitter.gitter&hl=en_GB" target="_blank"><i class="icon-android"></i>Android</span></a>
+            <a class="btn outline" href="http://appstore.com/gitter" target="_blank"><i class="icon-apple"></i>{{ __ "iPhone" }}</span></a>
+            <a class="btn outline" href="https://play.google.com/store/apps/details?id=im.gitter.gitter&hl=en_GB" target="_blank"><i class="icon-android"></i>{{ __ "Android" }}</span></a>
           </p>
           </div>
       </section>
 
       <footer id="bottom-panel">
         <div class="wrap">
-          <h1>By developers, for developers</h1>
-          <p>Gitter is built in London by a team of developers just like you. Hell even the product guy writes code, although we generally end up rewriting those bits.</p>
-          <p>If you're ever around Silicon Roundabout, give us a shout, we love meeting up with other developers.</p>
+          <h1>{{ __ "By developers, for developers"}}</h1>
+          <p>{{ __ "Gitter is built in London by a team of developers just like you. Hell even the product guy writes code, although we generally end up rewriting those bits." }}</p>
+          <p>{{ __ "If you're ever around Silicon Roundabout, give us a shout, we love meeting up with other developers." }}</p>
 
           <ul class="team">
             <li>
@@ -379,22 +379,32 @@
             </li>
 
           </ul>
-
           <small>
             <span>&copy; 2015 Troupe Technology Ltd. All rights reserved.</span>
-
-            <a href="http://support.gitter.im" target="_blank">Support</a>
-            <a href="https://developer.gitter.im" target="_blank">API</a>
-            <a href="http://blog.gitter.im" target="_blank">Blog</a>
-            <a href="https://twitter.com/gitchat" target="_blank">Twitter</a>
+            <a href="http://support.gitter.im" target="_blank">{{ __ "Support" }}</a>
+            <a href="https://developer.gitter.im" target="_blank">{{ __ "API" }}</a>
+            <a href="http://blog.gitter.im" target="_blank">{{ __ "Blog" }}</a>
+            <a href="https://twitter.com/gitchat" target="_blank">{{ __ "Twitter" }}</a>
           </small>
+          {{#if translationRequired}}
+          <p class="translation">
+            <a href="https://github.com/gitterHQ/gitter-translations">Want this in {{ requestLangLocalName}}?</a>
+          </p>
+          {{else}}
+            {{#if translated}}
+            <p class="translation">
+              <a href="https://github.com/gitterHQ/gitter-translations">Translation</a>  kindly done by {{{ translated }}}.
+            </p>
+            {{/if}}
+          {{/if}}
+
         </div>
       </footer>
 
       {{{ generateEnv anonymous=true }}}
       {{{ bootScript "homepage" }}}
 
-              <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
+        <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
         <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
 
     </body>
