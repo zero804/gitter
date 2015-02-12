@@ -18,65 +18,115 @@ var engine = new EventEmitter();
 var runScript = Q.nbind(scriptManager.run, scriptManager);
 var redisClient_smembers = Q.nbind(redisClient.smembers, redisClient);
 
+var UNREAD_BATCH_SIZE = 100;
+
+/**
+ * Given an array of userIds and an array of mentionUserIds, returns an array of
+ * { userIds: [...], mentionUserIds: [...] }
+ * such that:
+ * a) the `userIds` of any member of the result does not exceed UNREAD_BATCH_SIZE
+ * b) the `mentionUserIds` will appear in the same batch as the corresponding element `userIds`,
+ *    such that for any element of the result, `member.memberUserIds` ⊆ `member.userIds`
+ */
+function getNewItemBatches(userIds, mentionUserIds) {
+  var mentionUsersHash = mentionUserIds.reduce(function(memo, mentionUserId) {
+    memo[mentionUserId] = true;
+    return memo;
+  }, {});
+
+  function userIsMentioned(userId) {
+    return mentionUsersHash[userId];
+  }
+
+  var length = userIds.length;
+  /* Preallocate the array to the correct size */
+  var results = new Array(~~(userIds.length / UNREAD_BATCH_SIZE) + ((userIds.length % UNREAD_BATCH_SIZE) === 0 ? 0 : 1));
+
+  for (var i = 0, count = 0; i < length; i += UNREAD_BATCH_SIZE, count++) {
+    var batch = userIds.slice(i, i + UNREAD_BATCH_SIZE);
+    var mentionBatch = batch.filter(userIsMentioned);
+
+    results[count] = { userIds: batch, mentionUserIds: mentionBatch };
+  }
+
+  return results;
+}
+
 /**
  *
  * Note: mentionUserIds must always be a subset of usersIds (or equal)
  */
 function newItemWithMentions(troupeId, itemId, userIds, mentionUserIds) {
-  if(!userIds.length) return Q.resolve([]);
+  if(!userIds.length) return Q.resolve({});
 
-  // Now talk to redis and do the update
-  var keys = [EMAIL_NOTIFICATION_HASH_KEY];
-  userIds.forEach(function(userId) {
-    keys.push("unread:chat:" + userId + ":" + troupeId);
-    keys.push("ub:" + userId);
-  });
-
-  mentionUserIds.forEach(function(mentionUserId) {
-    keys.push("m:" + mentionUserId + ":" + troupeId);
-    keys.push("m:" + mentionUserId);
-  });
+  var batches = getNewItemBatches(userIds, mentionUserIds);
 
   var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
-  var values = [userIds.length, troupeId, itemId, timestamp].concat(userIds);
 
-  return runScript('unread-add-item-with-mentions', keys, values)
-    .then(function(result) {
-      var resultHash = {};
-      var upgradeCount = 0;
-      userIds.forEach(function(userId) {
-        var troupeUnreadCount   = result.shift();
-        var flag                = result.shift();
-        var badgeUpdate         = !!(flag & 1);
-        var upgradedKey          = flag & 2;
+  return Q.all(batches.map(function(batch) {
+      var batchUserIds = batch.userIds;
+      var batchMentionIds = batch.mentionUserIds;
 
-        if (badgeUpdate) {
-          engine.emit('badge.update', userId);
-        }
-
-        if (troupeUnreadCount >= 0) {
-          engine.emit('unread.count', userId, troupeId, troupeUnreadCount);
-        }
-
-        resultHash[userId] = {
-          unreadCount: troupeUnreadCount >= 0 ? troupeUnreadCount : undefined,
-          badgeUpdate: badgeUpdate
-        };
-
-        if(upgradedKey) {
-          upgradeCount++;
-        }
+      // Now talk to redis and do the update
+      var keys = [EMAIL_NOTIFICATION_HASH_KEY];
+      batchUserIds.forEach(function(userId) {
+        keys.push("unread:chat:" + userId + ":" + troupeId);
+        keys.push("ub:" + userId);
       });
 
-      if (upgradeCount > 10) {
-        winston.warn('unread-items: upgraded keys for ' + upgradeCount + ' user:troupes');
-      } else if(upgradeCount > 0) {
-        winston.info('unread-items: upgraded keys for ' + upgradeCount + ' user:troupes');
-      }
+      batchMentionIds.forEach(function(mentionUserId) {
+        keys.push("m:" + mentionUserId + ":" + troupeId);
+        keys.push("m:" + mentionUserId);
+      });
 
-      mentionUserIds.forEach(function(mentionUserId) {
-        var mentionCount = result.shift();
-        resultHash[mentionUserId].mentionCount = mentionCount >= 0 ? mentionCount : undefined;
+      var values = [batchUserIds.length, troupeId, itemId, timestamp].concat(batchUserIds);
+
+      return runScript('unread-add-item-with-mentions', keys, values);
+    }))
+    .then(function(results) {
+      var resultHash = {};
+
+      results.forEach(function(result, index) {
+        var batch = batches[index];
+        var batchUserIds = batch.userIds;
+        var batchMentionIds = batch.mentionUserIds;
+
+        var upgradeCount = 0;
+        batchUserIds.forEach(function(userId) {
+          var troupeUnreadCount   = result.shift();
+          var flag                = result.shift();
+          var badgeUpdate         = !!(flag & 1);
+          var upgradedKey          = flag & 2;
+
+          if (badgeUpdate) {
+            engine.emit('badge.update', userId);
+          }
+
+          if (troupeUnreadCount >= 0) {
+            engine.emit('unread.count', userId, troupeId, troupeUnreadCount);
+          }
+
+          resultHash[userId] = {
+            unreadCount: troupeUnreadCount >= 0 ? troupeUnreadCount : undefined,
+            badgeUpdate: badgeUpdate
+          };
+
+          if(upgradedKey) {
+            upgradeCount++;
+          }
+        });
+
+        if (upgradeCount > 10) {
+          winston.warn('unread-items: upgraded keys for ' + upgradeCount + ' user:troupes');
+        } else if(upgradeCount > 0) {
+          winston.info('unread-items: upgraded keys for ' + upgradeCount + ' user:troupes');
+        }
+
+        batchMentionIds.forEach(function(mentionUserId) {
+          var mentionCount = result.shift();
+          resultHash[mentionUserId].mentionCount = mentionCount >= 0 ? mentionCount : undefined;
+        });
+
       });
 
       return resultHash;
@@ -498,4 +548,7 @@ engine.getRoomsMentioningUser = getRoomsMentioningUser;
 engine.getBadgeCountsForUserIds = getBadgeCountsForUserIds;
 engine.getRoomsCausingBadgeCount = getRoomsCausingBadgeCount;
 
+engine.testOnly = {
+  getNewItemBatches: getNewItemBatches
+};
 module.exports = engine;
