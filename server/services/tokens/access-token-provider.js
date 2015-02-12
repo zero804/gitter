@@ -1,0 +1,85 @@
+'use strict';
+
+var persistenceService = require("../persistence-service");
+var random = require('../../utils/random');
+
+module.exports = {
+  getToken: function(userId, clientId, callback) {
+    if (!userId) {
+      return random.generateToken()
+        .then(function(token) {
+          // Anonymous tokens start with a `$`
+          token = "$" + token;
+
+          // Do not save the token to mongodb
+          return token;
+        })
+        .nodeify(callback);
+    }
+
+    /* TODO: confirm: Its much quicker to lookup the token in MongoDB than it is to generate one with randomByes and then attempt and upsert */
+    /* Lookup and possible create */
+    return persistenceService.OAuthAccessToken.findOneQ({
+        userId: userId,
+        clientId: clientId
+      }, {
+        _id: 0, token: 1
+      }, {
+        lean: true
+      })
+      .then(function(oauthAccessToken) {
+        if(oauthAccessToken && oauthAccessToken.token) {
+          return oauthAccessToken.token;
+        }
+
+        /* Generate a token and attempt an upsert */
+        return random.generateToken()
+          .then(function(token) {
+            return persistenceService.OAuthAccessToken.findOneAndUpdateQ(
+              { userId: userId, clientId: clientId },
+              {
+                $setOnInsert: {
+                  token: token
+                }
+              },
+              {
+                upsert: true
+              }).then(function(result) {
+                return result.token;
+              });
+          });
+      })
+      .nodeify(callback);
+
+  },
+
+  validateToken: function(token, callback) {
+    return persistenceService.OAuthAccessToken.findOne({ token: token }, { _id: 0, userId: 1, clientId: 1 })
+      .lean()
+      .execQ()
+      .then(function(accessToken) {
+        if(!accessToken) return null;
+
+        var clientId = accessToken.clientId;
+        var userId = accessToken.userId;   // userId CAN be null
+
+        if(!clientId) return null; // unknown client
+
+        return [userId, clientId];
+      })
+      .nodeify(callback);
+  },
+
+  cacheToken: function(userId, clientId, token, callback) {
+    return callback();
+  },
+
+  deleteToken: function(token, callback) {
+    return persistenceService.OAuthAccessToken.removeQ({ token: token })
+      .nodeify(callback);
+  },
+
+  invalidateCache: function(callback) {
+    return callback();
+  }
+};
