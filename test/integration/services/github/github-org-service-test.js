@@ -7,7 +7,7 @@ var assert         = require("assert");
 var GithubOrgService = testRequire('./services/github/github-org-service');
 var GITTER_TEST_BOT = { username: 'gittertestbot', githubToken: '***REMOVED***'};
 
-describe('github-org-service', function() {
+describe('github-org-service #slow', function() {
 
   describe('members', function() {
 

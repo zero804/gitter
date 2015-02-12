@@ -247,7 +247,7 @@ describe('unread-item-service', function() {
 
     describe('listTroupeUsersForEmailNotifications', function() {
 
-      it('should list users for email notifications', function(done) {
+      it('should list users for email notifications #slow', function(done) {
         unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, [])
           .then(function() {
             return unreadItemServiceEngine.listTroupeUsersForEmailNotifications(Date.now(), 1);
@@ -349,7 +349,7 @@ describe('unread-item-service', function() {
         });
 
 
-        it('should not email somebody until the email timeout period has expired', function(done) {
+        it('should not email somebody until the email timeout period has expired #slow', function(done) {
           return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], [])
             .then(function() {
               return unreadItemServiceEngine.listTroupeUsersForEmailNotifications(Date.now(), 1);
@@ -381,7 +381,7 @@ describe('unread-item-service', function() {
             .nodeify(done);
         });
 
-        it('should not email somebody twice if no new messages have arrived', function(done) {
+        it('should not email somebody twice if no new messages have arrived #slow', function(done) {
           return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], [])
             .then(function() {
               return unreadItemServiceEngine.listTroupeUsersForEmailNotifications(Date.now(), 1);
@@ -400,7 +400,7 @@ describe('unread-item-service', function() {
             .nodeify(done);
         });
 
-        it('should batch up emails for a user', function(done) {
+        it('should batch up emails for a user #slow', function(done) {
           return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], [])
             .delay(500)
             .then(function() {
@@ -976,7 +976,7 @@ describe('unread-item-service', function() {
         ],done);
     });
 
-    it('should handle unread items in very large rooms', function(done) {
+    it('should handle unread items in very large rooms #slow', function(done) {
       var SIZE = 2000;
       var userIds = [];
       var mentionUserIds = [];

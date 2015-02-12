@@ -99,7 +99,21 @@ gulp.task('localtest', function() {
     .pipe(mocha({
       reporter: 'spec',
       env: {
-        SKIP_BADGER_TESTS: 1
+        SKIP_BADGER_TESTS: 1,
+        DISABLE_CONSOLE_LOGGING: 1
+      }
+    }));
+});
+
+gulp.task('fasttest', function() {
+  return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
+    .pipe(mocha({
+      reporter: 'spec',
+      grep: '#slow',
+      invert: true,
+      env: {
+        SKIP_BADGER_TESTS: 1,
+        DISABLE_CONSOLE_LOGGING: 1
       }
     }));
 });

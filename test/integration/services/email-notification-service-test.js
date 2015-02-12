@@ -126,7 +126,7 @@ describe('email-notification-service', function() {
     });
   });
 
-  it('should send emails about unread items', function(done) {
+  it('should send emails about unread items #slow', function(done) {
     this.timeout(30000);
     var user = { id: "5405bfdd66579b000004df1a" };
 
@@ -134,7 +134,7 @@ describe('email-notification-service', function() {
       .nodeify(done);
   });
 
-  it('should send emails about unread items in spanish', function(done) {
+  it('should send emails about unread items in spanish  #slow', function(done) {
     this.timeout(30000);
 
     lang = 'es';

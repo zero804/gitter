@@ -36,7 +36,7 @@ describe('email-notification-generator-service', function() {
   }));
   afterEach(function() { fixture.cleanup(); });
 
-  it('should send out an email notification for a user with unread items', function(done) {
+  it('should send out an email notification for a user with unread items #slow', function(done) {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
     var unreadEngine = testRequire('./services/unread-item-service-engine');
 
@@ -86,7 +86,7 @@ describe('email-notification-generator-service', function() {
 
   });
 
-  it('SHOULD NOT email somebody who has opted out of notifications 1', function(done) {
+  it('SHOULD NOT email somebody who has opted out of notifications 1 #slow', function(done) {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
     var unreadEngine = testRequire('./services/unread-item-service-engine');
 
@@ -131,7 +131,7 @@ describe('email-notification-generator-service', function() {
   });
 
 
-  it('SHOULD NOT email somebody who has opted out of notifications 2', function(done) {
+  it('SHOULD NOT email somebody who has opted out of notifications 2 #slow', function(done) {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
     var unreadEngine = testRequire('./services/unread-item-service-engine');
 
@@ -188,7 +188,7 @@ describe('email-notification-generator-service', function() {
   });
 
 
-it('SHOULD NOT email somebody who has opted out of notifications set to mention only', function(done) {
+it('SHOULD NOT email somebody who has opted out of notifications set to mention only #slow', function(done) {
   var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
   var unreadEngine = testRequire('./services/unread-item-service-engine');
 
@@ -235,7 +235,7 @@ it('SHOULD NOT email somebody who has opted out of notifications set to mention 
 });
 
   // TODO: handle mentions
-  it('SHOULD email somebody who has not opted out of notifications for a specific troupe', function(done) {
+  it('SHOULD email somebody who has not opted out of notifications for a specific troupe #slow', function(done) {
     var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
     var unreadEngine = testRequire('./services/unread-item-service-engine');
 

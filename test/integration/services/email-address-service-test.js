@@ -18,14 +18,14 @@ describe("email-address-service", function() {
         assert.equal(email, 'private@email.com');
       }).nodeify(done);
   });
-  
+
   it('obeys overriding set by email:toAddress', function (done) {
     var overrideEmail = 'test@overriding.com';
-    
+
     var service = createEmailAddressService({
       overrideEmail: overrideEmail
     });
-    
+
     service({ username: 'test-user' })
       .then(function (email) {
         assert.equal(email, overrideEmail);
@@ -43,7 +43,7 @@ describe("email-address-service", function() {
       }).nodeify(done);
   });
 
-  it('returns nothing if the public email address is invalid', function(done) {
+  it('returns nothing if the public email address is invalid #slow', function(done) {
     var service = createEmailAddressService({
       publicEmail: 'DONT EMAIL ME'
     });
@@ -57,7 +57,7 @@ describe("email-address-service", function() {
 });
 
 function createEmailAddressService(stubData) {
-  
+
   var GitHubMeService = function() {};
   GitHubMeService.prototype.getEmail = function() {
     return Q.resolve(stubData.privateEmail);
@@ -67,7 +67,7 @@ function createEmailAddressService(stubData) {
   GitHubUserService.prototype.getUser = function() {
     return Q.resolve({ email: stubData.publicEmail });
   };
-  
+
   var env = {
     config: {
       get: function () {
