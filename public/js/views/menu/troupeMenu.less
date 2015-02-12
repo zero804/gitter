@@ -178,65 +178,6 @@
   }
 }
 
-.menu-search {
-  text-align: center;
-  width: 92%;
-  margin: 0 auto 0;
-  padding: 0 0 10px;
-  position: relative;
-
-  .menu-search__clear {
-
-    position: absolute;
-    right: 5px;
-    top: 5px;
-    cursor: pointer;
-    opacity: 0;
-    -webkit-transition: opacity 0.2s linear;
-    -moz-transition: opacity 0.2s linear;
-    -o-transition: opacity 0.2s linear;
-    transition: opacity 0.2s linear;
-
-    &:before {
-      font-family: 'troupe-icons';
-      content: '\e827';
-      font-size: 14px;
-      -webkit-font-smoothing: antialiased;
-    }
-  }
-
-  .menu-search__input {
-    background-color: rgba(255,255,255, 0.15);
-    border: 1px solid rgba(255,255,255, 0.25);
-    border-radius: 4px;
-    font-size: 15px;
-    font-weight: 400;
-    font-family: @fontSans;
-    height: 28px;
-    padding: 0 4px 0 7px;
-    color: rgba(255,255,255, 0.7);
-    width: 100%;
-    margin: 0;
-
-    .transition(200ms);
-
-    &::-ms-clear {
-      display: none;
-    }
-
-    &:focus {
-      color: hsl(0, 0%, 10%);
-      background-color: rgba(255,255,255, 0.95);
-    }
-
-    &:focus ~ .menu-search__clear {
-      opacity: 1;
-      color: hsl(0, 0%, 70%);
-    }
-  }
-}
-
-
 @keyframes fadein {
   from { opacity: 0; }
   to   { opacity: 1; }
