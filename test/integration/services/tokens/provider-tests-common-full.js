@@ -160,12 +160,16 @@ module.exports = function(underTest) {
 
     });
 
-    it('should handle legacy persisted tokens during the transition period', function(done) {
+    it('should handle legacy persisted tokens during the transition period #slow', function(done) {
+      this.setTimeout(4000);
       return persistenceService.OAuthAccessToken.findOneAndUpdate(
         { userId: null, clientId: clientId },
         {
           $setOnInsert: {
-            token: 'test-' + Math.random() + Date.now()
+            token: 'test-' + Math.random() + Date.now(),
+            clientId: clientId,
+            userId: null,
+            expires: new Date(Date.now() + 100000)
           }
         },
         {
