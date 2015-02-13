@@ -8,22 +8,14 @@
 @import "orgCollectionView";
 @import "nanoScroller";
 
+
+@menuWidth: 250px;
+
 .wrap {
   display: flex;
   position: absolute;
   height: 100%;
   width: 100%;
-}
-
-.wrap-menu {
-  width: 250px;
-  @media @small {
-    width: 0;
-  }
-}
-
-.wrap-menu.hide {
-  display: none;
 }
 
 .trpLeftMenuHotspot {
@@ -68,7 +60,6 @@
 .selected {
   opacity: 1;
 }
-
 
 .unread-normal .trpLeftMenuIcon[data-list="list-troupes"], .unread-one2one .trpLeftMenuIcon[data-list="list-users"] {
   background-color: @trpPurple;
@@ -118,27 +109,26 @@
   /* visibility */
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 
   /* positioning */
   z-index: @l10;
-  position: fixed;
-  left: 0;
-  top: 0;
-  margin-top: 0;
+  transform: translateX(-@menuWidth);
+  margin-right: -@menuWidth;
 
   /* dimensions */
-  width: 250px;
+  flex-shrink: 0;
+  flex-grow: 0;
+  width: @menuWidth;
   height: 100%;
-  padding: 0;
 
   /* colors */
   background-color: lighten(@trpDarkBlue, 5%);
   color: white;
 
   /* effects */
-  background-clip: padding-box;
-  transition: background-color 0.3s ease-in-out 0s, left .5s ease-in-out 0.3s;
+  transition: background-color 0.3s ease-in-out,
+              transform        0.5s ease-in-out,
+              margin           0.5s ease-in-out;
 
   /* states */
   body.hover &:hover {
@@ -156,26 +146,38 @@
     width: 100%;
   }
 
-  /* media queries */
-  @media @small {
-    & when(@target-env = "web") {
-      background-color: @trpDarkBlue;
-      left: -250px;
-      transition-delay: 0s;
+  // & when (@target-env = "mobile") {
+  //   left: 0;
+  //   width: 250px;
+  //   height: 100%;
+  //   position: absolute;
+  // }
+}
 
-      &.visible {
-        transition-delay: 0.3s;
-        left: 0;
-      }
-    }
-  }
+body.hover .menu:hover {
+  transform: translateX(0);
+}
 
-  & when (@target-env = "mobile") {
-    left: 0;
-    width: 250px;
-    height: 100%;
-    position: absolute;
+.menu:not(.menu--collapsed) {
+  @media @mid-min {
+    margin-right: 0;
+    transform: translateX(0);
   }
+}
+
+.menu__hotspot {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -25px;
+  width: 25px;
+}
+
+.menu__tab {
+  background-color: red;
+  top: 25%;
+  position: absolute;
+  width: 100%;
 }
 
 @keyframes fadein {
