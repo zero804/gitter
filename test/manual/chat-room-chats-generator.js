@@ -4,6 +4,7 @@ var Q = require('q');
 var qlimit = require('qlimit');
 var chatService = require('../../server/services/chat-service');
 var loremIpsum = require('lorem-ipsum');
+var dictionary = require('lorem-ipsum/lib/dictionary').words;
 
 var opts = require("nomnom")
 .option('room', {
@@ -38,6 +39,7 @@ Q.all([
       return chatService.newChatMessageToTroupe(room, user, { text: loremIpsum({
             count: Math.round(Math.random() * 5) + 1,
             unit: 'paragraph',
+            words: dictionary.concat('![Cat](http://thecatapi.com/api/images/get?format=src&type=gif&cb=' + Date.now() + ')'),
             sentenceLowerBound: 1,
             sentenceUpperBound: 15,
             paragraphLowerBound: 1,
