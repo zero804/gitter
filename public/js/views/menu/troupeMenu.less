@@ -8,9 +8,6 @@
 @import "orgCollectionView";
 @import "nanoScroller";
 
-
-@menuWidth: 250px;
-
 .wrap {
   display: flex;
   position: absolute;
@@ -100,6 +97,8 @@
   }
 }
 
+@menuWidth: 250px;
+
 .menu {
 
   &, & * {
@@ -111,9 +110,11 @@
   flex-direction: column;
 
   /* positioning */
+  position: relative;
   z-index: @l10;
-  transform: translateX(-@menuWidth);
-  margin-right: -@menuWidth;
+  // slide menu to the left
+  margin-left: -@menuWidth;
+  margin-right: 0;
 
   /* dimensions */
   flex-shrink: 0;
@@ -155,13 +156,17 @@
 }
 
 body.hover .menu:hover {
-  transform: translateX(0);
+  // slide menu to the right
+  margin-left: 0;
+  margin-right: -@menuWidth;
 }
 
-.menu:not(.menu--collapsed) {
-  @media @mid-min {
+@media @mid-min {
+  .menu:not(.menu--collapsed),
+  body.hover .menu:hover:not(.menu--collapsed) {
+    // stop menu sliding around and inline it
+    margin-left: 0;
     margin-right: 0;
-    transform: translateX(0);
   }
 }
 
