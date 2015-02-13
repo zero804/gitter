@@ -328,18 +328,25 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
         if(options.beforeId) {
           var beforeId = new ObjectID(options.beforeId);
           q = q.where('_id').lt(beforeId);
+          // Also add sent as this helps mongo by using the { troupeId, sent } index
+          q = q.where('sent').lte(beforeId.getTimestamp());
         }
 
         if(options.beforeInclId) {
           var beforeInclId = new ObjectID(options.beforeInclId);
           q = q.where('_id').lte(beforeInclId); // Note: less than *or equal to*
+          // Also add sent as this helps mongo by using the { troupeId, sent } index
+          q = q.where('sent').lte(beforeInclId.getTimestamp());
         }
 
         if(options.afterId) {
           // Reverse the initial order for afterId
           var afterId = new ObjectID(options.afterId);
+
           sentOrder = 'asc';
           q = q.where('_id').gt(afterId);
+          // Also add sent as this helps mongo by using the { troupeId, sent } index
+          q = q.where('sent').gte(afterId.getTimestamp());
         }
 
         if(maxHistoryDate) {
@@ -372,13 +379,15 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
                 .where('toTroupeId', troupeId)
                 .sort({ sent: 'desc' })
                 .limit(halfLimit)
-                .where('_id').lte(aroundId);
+                .where('_id').lte(aroundId)
+                .where('sent').lte(aroundId.getTimestamp());
 
       var q2 = ChatMessage
                 .where('toTroupeId', troupeId)
                 .sort({ sent: 'asc' })
                 .limit(halfLimit)
-                .where('_id').gt(aroundId);
+                .where('_id').gt(aroundId)
+                .where('sent').gte(aroundId.getTimestamp());
 
       if(maxHistoryDate) {
         q1 = q1.where('sent').gte(maxHistoryDate);
