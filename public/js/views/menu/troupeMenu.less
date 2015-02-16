@@ -170,19 +170,50 @@ body.hover .menu:hover {
   }
 }
 
+@tabWidth: 25px;
+
 .menu__hotspot {
   position: absolute;
   top: 0;
   bottom: 0;
-  right: -25px;
-  width: 25px;
+  right: -@tabWidth;
+  width: @tabWidth;
+  overflow-x: hidden;
+
+  transition: right 0.5s ease-in-out 0.5s,
+              width 0.5s ease-in-out 0.5s;
+}
+
+body.hover .menu:hover .menu__hotspot {
+  // slide hotspot away when menu is hovered
+  right: 0;
+  width: 0;
+
+  transition-delay: 0s;
+}
+
+@media @mid-min {
+  .menu:not(.menu--collapsed) .menu__hotspot {
+    // slide hotspot away when menu is inline
+    right: 0;
+    width: 0;
+
+    transition-delay: 0s;
+  }
 }
 
 .menu__tab {
-  background-color: red;
+  background-color: @troupe-green;
   top: 25%;
+  right: 0;
   position: absolute;
-  width: 100%;
+  width: @tabWidth;
+  border-radius: 0 4px 4px 0;
+
+  font-family: Open Sans,HelveticaNeue,sans-serif;
+  font-size: 12px;
+  line-height: 30px;
+  text-align: center;
 }
 
 @keyframes fadein {
