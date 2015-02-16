@@ -92,11 +92,6 @@
               transform        0.5s ease-in-out,
               margin           0.5s ease-in-out;
 
-  /* states */
-  body.hover &:hover {
-    background-color: @trpDarkBlue;
-  }
-
   .nano-pane {
     left: 0;
   }
@@ -107,19 +102,22 @@
     display: inline-block;
     width: 100%;
   }
+}
 
-  // & when (@target-env = "mobile") {
-  //   left: 0;
-  //   width: 250px;
-  //   height: 100%;
-  //   position: absolute;
-  // }
+// mobile override until it uses the same left menu
+// show/hide as desktop
+.menu.menu--mobile {
+  position: absolute;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 body.hover .menu:hover {
   // slide menu to the right
   margin-left: 0;
   margin-right: -@menuWidth;
+
+  background-color: @trpDarkBlue;
 }
 
 @media @mid-min {

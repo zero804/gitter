@@ -155,6 +155,7 @@ function renderMainFrame(req, res, next, frame) {
         stagingLink: stagingLink,
         dnsPrefetch: dnsPrefetch,
         showFooterButtons: true,
+        showUnreadTab: true,
         menuHeaderExpanded: false,
         user: user,
         rooms: {
