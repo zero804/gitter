@@ -33,7 +33,7 @@ module.exports = (function () {
 
     initialize: function () {
       this.bindUIElements();
-      this.menu = new TroupeMenuView({ el: this.$el.find('#left-menu') }).show();
+      this.menu = new TroupeMenuView({ el: this.$el.find('#menu') }).show();
       this.dialogRegion = modalRegion;
       this._leftMenuLockCount = 0;
     },

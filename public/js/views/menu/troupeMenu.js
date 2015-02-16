@@ -142,6 +142,10 @@ module.exports = (function () {
 
       appEvents.on('menu:show', showMenu);
       appEvents.on('navigation', showMenu);
+      appEvents.on('troupeUnreadTotalChange', function(values) {
+        var unreadText = values.overall || ' ';
+        self.$el.find('#menu-tab-unread-count').text(unreadText);
+      });
 
       this.selectedIndex = 0;
 
