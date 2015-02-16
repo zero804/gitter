@@ -248,7 +248,8 @@ module.exports = (function () {
     serializeData: function() {
       return {
         showFooterButtons: !isMobile(),
-        showExapandedHeader: isMobile()
+        showExapandedHeader: isMobile(),
+        showUnreadTab: !isMobile()
       };
     },
 
