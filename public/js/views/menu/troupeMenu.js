@@ -88,7 +88,7 @@ module.exports = (function () {
   });
 
   var View = Marionette.ItemView.extend({
-    className: 'js-menu menu',
+    className: 'menu',
     template: template,
     selectedListIcon: "icon-troupes",
 
@@ -133,11 +133,11 @@ module.exports = (function () {
       var self = this;
 
       var showMenu = function () {
-        $('#menu').removeClass('menu--collapsed');
+        this.$el.removeClass('menu--collapsed');
       };
 
       appEvents.on('menu:hide', function () {
-        $('#menu').addClass('menu--collapsed');
+        this.$el.addClass('menu--collapsed');
       });
 
       appEvents.on('menu:show', showMenu);
