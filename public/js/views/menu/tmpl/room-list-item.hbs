@@ -1,20 +1,19 @@
 {{#if ethereal}}
   <span class="room-list-item__name {{ iconClass }}" title="{{ title }}">{{ name }}</span>
 {{else}}
-  <i class='icon-{{ iconClass }}'></i>
+  <i class='room-list-item__icon icon-{{ iconClass }}'></i>
   <span class="room-list-item__name" title="{{title}}">{{ name }}</span>
-  <div class="room-list-item__labels">
   {{#unless oneToOne}}
     {{#unless mentions}}
-      <i class="room-list-item__icon octicon octicon-x {{ iconClass }}"></i>
-      {{!-- <i class="room-list-item__action js-leave-button" data-id="{{ id }}" title="Leave"></i> --}}
+      {{!-- <i class="room-list-item__icon icon-logout"></i> --}}
+      <i class="room-list-item__action js-leave-button icon-logout" data-id="{{ id }}" title="Leave"></i>
     {{/unless}}
   {{/unless}}
   {{#unless lurk}}
-    <i class="room-list-item__icon octicon octicon-x {{ iconClass }}"></i>
-    {{!-- <i class="room-list-item__action js-close-button room-list-item__close" data-id="{{ id }}" title="Hide"></i> --}}
+    {{!-- <i class="room-list-item__icon js-close-button icon-cancel-circle {{ iconClass }}" data-id="{{ id }}" title="Hide"></i> --}}
+    <i class="room-list-item__action js-close-button icon-cancel-circle" data-id="{{ id }}" title="Hide"></i>
   {{/unless}}
   {{#if unreadItems}}
-    {{!-- <i class="room-list-item__action js-unread-badge room-list-item__unread-badge">{{ unreadItems }}</i> --}}
+    <i class="js-unread-badge room-list-item__unread-badge">{{ unreadItems }}</i>
   {{/if}}
 {{/if}}
