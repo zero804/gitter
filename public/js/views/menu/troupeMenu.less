@@ -15,47 +15,8 @@
   width: 100%;
 }
 
-.trpLeftMenuWrapper {
-  display: inline-block;
-  .trpBodyText;
-  padding-left: 20px;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.trpLeftMenuToolbar {
-  padding-left: 26px;
-  padding-bottom: 12px;
-}
-
-.trpLeftMenuToolbarItems {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.trpLeftMenuToolbarItems li {
-  display: inline-block;
-  padding-right: 8px;
-}
-
-.trpLeftMenuIcon {
-  opacity: 0.6;
-  padding: 5px;
-}
-
 .selected {
   opacity: 1;
-}
-
-.unread-normal .trpLeftMenuIcon[data-list="list-troupes"], .unread-one2one .trpLeftMenuIcon[data-list="list-users"] {
-  background-color: @trpPurple;
-  border: 1px solid white;
-  border-radius: 50em;
-}
-
-.trpLeftMenuSpacer {
-  height: 100px;
 }
 
 @menuWidth: 250px;
@@ -212,7 +173,6 @@ body.hover .menu:hover .menu__hotspot {
 
     .menu-list__item {
       margin-bottom: 20px;
-      // animation: fadein 500ms;
     }
 
     .menu-list__header {
@@ -300,10 +260,6 @@ body.hover .menu:hover .menu__hotspot {
 
 body.dragging .list-favourites {
   min-height: 25px;
-/*  padding: 20px 0;
-  .transition300ms;*/
-/*  padding-top: 20px;
-  padding-bottom: 20px;*/
   background-color: rgba(255,255,255,0.1);
   border-top: 1px dashed rgba(255,255,255,0.2);
   border-bottom: 1px dashed rgba(255,255,255,0.2);
@@ -324,14 +280,46 @@ body.dragging .list-favourites li.placeholder {
   padding-bottom: 0px;
 }
 
-.trpLeftMenuLoggedOut {
-  bottom: 0;
-  height: 400px;
-  left: 0;
-  margin: auto;
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 100%;
+.nli-menu {
+    &, & * {
+    box-sizing: border-box;
+  }
+
+  display: flex;
+  flex-grow: 0;
+  flex-shrink: 0;
+
+  height: 100%;
+  width: 350px;
+  padding: 20px;
+
+  overflow-y: auto;
+  align-items: center;
+  justify-content: center;
+
+  background-color: lighten(@trpDarkBlue, 5%);
+  color: white;
 }
 
+.nli-menu__intro {
+  max-height: 100%;
+
+  p {
+    font-family: Open Sans,HelveticaNeue,sans-serif;
+    font-size: 14px;
+    margin-bottom: 40px;
+  }
+}
+
+.nli-menu__logo {
+  background-image: url('../images/logo-text-white-48@2x.png');
+  background-size: contain;
+
+  width: 244px;
+  height: 48px;
+  margin-bottom: 40px;
+
+  @media @retina {
+    background-image: url('../images/logo-text-white-48@2x.png');
+  }
+}

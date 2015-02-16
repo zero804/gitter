@@ -30,26 +30,14 @@
   {{/isMobile}}
 
   <div class='wrap'>
-    <div class="wrap-menu" id="left-menu">
-      <div class="trpLeftMenu menu">
-        <div class="trpLeftMenuContainer">
-          <div class="trpLeftMenuLoggedOut">
-            <div class="trpLeftMenuLogo">
-              <div class="logo-container"></div>
-            </div>
-            <div class="trpLeftMenuInfo">
-              <p>Gitter provides free public chat rooms for open source repositories on GitHub.</p>
-              <br>
-              <o>You can also use Gitter for private conversations amongst your organisation.</p>
-            </div>
-            <div class="trpLeftMenuSignup">
-              <a href="/login/github?action=login&source=leftmenu-1" class="trpButtonBig trpBtnGreen gtrCreateRoomButton">Login with GitHub to start talking</a>
-            </div>
-          </div>
-        </div>
+    <nav class="nli-menu">
+      <div class="nli-menu__intro">
+        <div class="nli-menu__logo"></div>
+        <p>Gitter provides free public chat rooms for open source repositories on GitHub.</p>
+        <p>You can also use Gitter for private conversations amongst your organisation.</p>
+        <a href="/login/github?action=login&source=leftmenu-1" class="trpButtonBig trpBtnGreen gtrCreateRoomButton">Login with GitHub to start talking</a>
       </div>
-    </div>
-    <div class="login">Login</div>
+    </nav>
     <div class="trpFramePanel" id="iframe-panel">
       <iframe id="content-frame" src="{{chatAppLocation}}" style="display: block; width: 100%; height: 100%; border: 0;" frameBorder="0"></iframe>
     </div>
