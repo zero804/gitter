@@ -10,6 +10,10 @@ module.exports = function (room) {
     iconName = 'hash';
   }
 
+  if (iconName && iconName.indexOf('onetoone') >= 0) {
+    iconName = 'mention';
+  }
+
   if (iconName === 'org') {
     iconName = 'organization';
   }

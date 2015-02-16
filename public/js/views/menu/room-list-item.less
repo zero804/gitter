@@ -5,8 +5,10 @@
 }
 
 @room-list-item-height: 26px;
+@right-space: 0 0.625/2em 0 0;
 
 .room-list-item {
+  align-items: center;
   display: flex;
   flex-grow: 1;
   list-style: none;
@@ -19,15 +21,12 @@
   align-self: flex-start;
   flex-shrink: 0;
   line-height: @room-list-item-height;
-  padding: 0 0.625/2em 0 0;
+  padding: @right-space;
 }
 
 .room-list-item__name {
   display: inline-block;
-  padding: 0 0.625/2em 0 0;
-}
-
-.room-list-item span {
+  padding: @right-space;
   flex-grow: 1;
   line-height: @room-list-item-height;
   white-space: nowrap;
@@ -36,11 +35,41 @@
   overflow: hidden;
 }
 
+.room-list-item__unread-badge {
+  flex-shrink: 0;
+  display: none;
+  border-radius: 4px;
+  display: block;
+  padding: 0 4px;
+  font-size: 10px;
+  height: 15px;
+  line-height: 15px;
+  font-weight: 700;
+  color: white;
+  white-space: nowrap;
+  background-color: @trpGreen;
+  margin-right: 0.8em;
+}
+
+.room-list-item__unread-badge.shown {
+  display: inline;
+}
+
+.room-list-item__unread-badge.mention {
+  background-color: @trpRed;
+  font-weight: 300;
+}
+
 .room-list-item__action {
-  padding: 0 0.625/2em 0 0;
+  display: none;
+  padding: @right-space;
   align-self: flex-end;
   flex-shrink: 0;
   line-height: @room-list-item-height;
+}
+
+body.hover .room-list-item:hover .room-list-item__action {
+  display: inline-block;
 }
 
 body.hover .room-list-item:hover:not(.room-list-item--current-room),
@@ -117,41 +146,6 @@ body.hover .room-list-item:hover:not(.room-list-item--current-room),
 //   overflow: hidden;
 //   text-overflow: ellipsis;
 //   vertical-align: middle;
-// }
-
-// .room-list-item .item-unread-badge {
-//   float: right;
-//   margin-right: 8px;
-//   display: none;
-// }
-
-// .room-list-item__labels {
-//   float: right;
-//   margin-right: 8px;
-// }
-
-// .room-list-item__unread-badge {
-//   display: none;
-
-//   border-radius: 4px;
-//   display: inline-block;
-//   padding: 0 4px;
-//   font-size: 10px;
-//   font-weight: bold;
-//   line-height: 14px;
-//   color: white;
-//   white-space: nowrap;
-//   vertical-align: middle;
-//   background-color: @trpGreen;
-// }
-
-// .room-list-item__unread-badge.shown {
-//   display: inline;
-// }
-
-// .room-list-item__unread-badge.mention {
-//   background-color: @trpRed;
-//   font-weight: 300;
 // }
 
 // .room-list-item__close:before {
