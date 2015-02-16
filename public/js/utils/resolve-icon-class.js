@@ -1,21 +1,22 @@
 'use strict';
 var ensurePojo = require('./ensure-pojo');
 
-// @const
-var PREFIX = 'room-list-item__name--';
-
 module.exports = function (room) {
   room = ensurePojo(room);
   var iconName = room.githubType && room.githubType.toLowerCase();
 
   // repo_channel, user_channel etc
   if (iconName && iconName.indexOf('channel') >= 0) {
-    iconName = 'channel';
+    iconName = 'hash';
+  }
+
+  if (iconName === 'org') {
+    iconName = 'organization';
   }
 
   if (room.favourite) {
-    iconName = 'favourite';
+    iconName = 'star-1';
   }
 
-  return PREFIX + iconName;
+  return iconName;
 };
