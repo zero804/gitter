@@ -1,12 +1,14 @@
 <div class="chat-input__area">
-  <div class="chat-input__buttons">
-    <div class="compose-mode-toggle {{#if isComposeModeEnabled}}active{{/if}}" title="{{ composeModeToggleTitle }}"></div>
-    <a href="#markdown" style="text-decoration: none"><div class="md-help" title="{{ showMarkdownTitle }}"></div></a>
-  </div>
   <div class="chat-input__avatar">
     {{ widget "avatar" model=user size='s' showTooltip=false }}
   </div>
   <form class="chat-input__box" name="chat">
     <textarea class="chat-input__text-area" name="chat" id="chat-input-textarea" placeholder="{{placeholder}}" {{#if autofocus}}autofocus onfocus="this.value = this.value;"{{/if}} maxlength="4096">{{value}}</textarea>
   </form>
+  <div class="chat-input__buttons">
+    <a href="#" class='js-toggle-compose-mode' title='{{ composeModeToggleTitle }}'><i class='icon-{{#if isComposeModeEnabled}}keyboard-1{{else}}chat-alt{{/if}}'></i></a>
+    <a href='#markdown' class='js-md-help' style='text-decoration: none; display: block;' title='{{ showMarkdownTitle }}'><i class='icon-doc-text'></i></a>
+    {{!-- <div class="compose-mode-toggle " title="{{ composeModeToggleTitle }}"></div> --}}
+    {{!-- <a href="#markdown" style="text-decoration: none; display: block;"><div class="md-help" title="{{ showMarkdownTitle }}"></div></a> --}}
+  </div>
 </div>
