@@ -133,11 +133,11 @@ module.exports = (function () {
       var self = this;
 
       var showMenu = function () {
-        this.$el.removeClass('menu--collapsed');
+        self.$el.removeClass('menu--collapsed');
       };
 
       appEvents.on('menu:hide', function () {
-        this.$el.addClass('menu--collapsed');
+        self.$el.addClass('menu--collapsed');
       });
 
       appEvents.on('menu:show', showMenu);
