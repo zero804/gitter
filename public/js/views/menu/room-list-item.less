@@ -11,7 +11,6 @@ i {
 }
 
 @room-list-item-height: 26px;
-@right-space: 0 0.625/2em 0 0;
 
 .room-list-item {
   align-items: center;
@@ -28,12 +27,12 @@ i {
   align-self: flex-start;
   flex-shrink: 0;
   line-height: @room-list-item-height;
-  padding: @right-space;
+  padding: 0 0.625em 0 0;
 }
 
 .room-list-item__name {
   display: inline-block;
-  padding: @right-space;
+  padding: 0 0.625em 0 0;
   flex-grow: 1;
   line-height: @room-list-item-height;
   white-space: nowrap;
@@ -44,11 +43,14 @@ i {
 
 .room-list-item__action {
   display: none;
-  padding: @right-space;
   align-self: flex-end;
   flex-shrink: 0;
   line-height: @room-list-item-height;
   text-align: right;
+}
+
+.room-list-item .room-list-item__action:last-of-type {
+  padding-right: 0.625/2em;
 }
 
 body.hover .room-list-item:hover .room-list-item__action {
