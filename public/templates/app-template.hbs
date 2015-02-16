@@ -34,8 +34,6 @@
       <nav class="menu" id="menu">
         {{{ prerenderView "js/views/menu/tmpl/troupeMenu" }}}
       </nav>
-      <div class="trpLeftMenuHotspot" id="left-menu-hotspot"></div>
-      <div class="trpMenuTab unread-count" id="menu-toggle-button">{{#if unreadCount}}{{unreadCount}}{{else}}0{{/if}}</div>
       <div class="trpFramePanel" id="iframe-panel">
         <iframe id="content-frame" src="{{ chatAppLocation }}" style="width: 100%; height: 100%; border: 0" frameBorder="0"></iframe>
         <div class="loading-frame hide">
