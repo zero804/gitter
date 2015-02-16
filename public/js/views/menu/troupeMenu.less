@@ -171,6 +171,7 @@ body.hover .menu:hover {
 }
 
 @tabWidth: 25px;
+@tabHeight: 30px;
 
 .menu__hotspot {
   position: absolute;
@@ -204,15 +205,17 @@ body.hover .menu:hover .menu__hotspot {
 
 .menu__tab {
   background-color: @troupe-green;
-  top: 25%;
+  top: 110px;
   right: 0;
   position: absolute;
   width: @tabWidth;
+  height: @tabHeight;
+
   border-radius: 0 4px 4px 0;
 
   font-family: Open Sans,HelveticaNeue,sans-serif;
   font-size: 12px;
-  line-height: 30px;
+  line-height: @tabHeight;
   text-align: center;
 }
 
