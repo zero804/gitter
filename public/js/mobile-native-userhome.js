@@ -11,6 +11,7 @@ var onready = require('./utils/onready');
 
 // Preload widgets
 require('views/widgets/avatar');
+require('components/ping');
 
 onready(function() {
   require('components/link-handler').installLinkHandler();
