@@ -1,6 +1,5 @@
 @import "../behaviors/highlight";
 
-// NOTE: I do not endorse the use of !important, but...
 .u-uppercase {
   text-transform: uppercase;
 }
@@ -13,7 +12,7 @@
   transform: scale(0);
 }
 
-/* what is the scrollHelper? WC */
+/* TODO: move this out into it's on file. This is the scroll to bottom dude.  WC */
 @scrollHelperSize: 50px;
 
 .scrollHelper {
@@ -46,7 +45,10 @@
   line-height: @scrollHelperSize;
 }
 
-.search-results * { box-sizing: border-box; }
+.search *,
+.search-results * {
+  box-sizing: border-box;
+}
 
 .search, .search-results {
   width: 100%;
@@ -58,6 +60,9 @@
   justify-content: center;
   align-items: center;
 }
+
+.search.active .search__toggle { display: none; }
+.search.active .search-input { display: block; }
 
 .search__toggle {
   font-size: 18px;
@@ -71,14 +76,8 @@
   }
 }
 
-.search.active .search__toggle { display: none; }
-
 .search__toggle:hover {
   opacity: 1;
-}
-
-.search.active .search__toggle {
-  display: none;
 }
 
 .search-input {
@@ -99,12 +98,10 @@
   margin: 0;
   padding: 0 10px 0 26px;
   box-sizing: border-box;
-  width: 100% !important;
+  width: 100%;
   height: 32px;
   border-radius: 6px;
 }
-
-.search.active .search-input input { display: inline-block; }
 
 // remove duplicate close icon in ie10+
 .search-input input::-ms-clear {
@@ -135,10 +132,6 @@
   opacity: 0.6;
   cursor: pointer;
   transition: opacity 0.2s ease-in-out;
-}
-
-.search.active .search-input__clear {
-  display: block;
 }
 
 .search-input__clear:hover {

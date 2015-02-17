@@ -1,6 +1,7 @@
 "use strict";
 
 var Marionette = require('marionette');
+var RAF = require('utils/raf');
 var template = require('./tmpl/search-input.hbs');
 
 var SearchInputView = Marionette.ItemView.extend({
@@ -55,8 +56,8 @@ var SearchInputView = Marionette.ItemView.extend({
 
     var $input = this.ui.input;
 
-    if (isActive) {
-      if (!$input.is(':focus')) $input.focus();
+    if (isActive && !$input.is(':focus')) {
+      $input.focus();
     } else {
       $input.val('');
     }
