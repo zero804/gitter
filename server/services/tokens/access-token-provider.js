@@ -5,17 +5,7 @@ var random = require('../../utils/random');
 
 module.exports = {
   getToken: function(userId, clientId, callback) {
-    if (!userId) {
-      return random.generateToken()
-        .then(function(token) {
-          // Anonymous tokens start with a `$`
-          token = "$" + token;
-
-          // Do not save the token to mongodb
-          return token;
-        })
-        .nodeify(callback);
-    }
+    if (!userId) return callback();
 
     /* TODO: confirm: Its much quicker to lookup the token in MongoDB than it is to generate one with randomByes and then attempt and upsert */
     /* Lookup and possible create */
