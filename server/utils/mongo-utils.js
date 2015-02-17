@@ -3,6 +3,7 @@
 
 var winston = require('./winston');
 var ObjectID = require('mongodb').ObjectID;
+var _ = require('underscore');
 
 function asObjectID(id) {
   if(!id) {
@@ -86,6 +87,17 @@ function createIdForTimestamp(timestamp) {
     return new ObjectID(hexSeconds + "0000000000000000");
 }
 
+function fieldInPredicate(fieldName, values, additionalClauses) {
+  var predicate = {};
+  if (values.length === 1) {
+    predicate[fieldName] = values[0];
+  } else {
+    predicate[fieldName] = { $in: values };
+  }
+
+  return _.defaults(predicate, additionalClauses);
+}
+
 exports.isLikeObjectId = isLikeObjectId;
 exports.asObjectID = asObjectID;
 exports.asObjectIDs = asObjectIDs;
@@ -94,3 +106,4 @@ exports.getTimestampFromObjectId = getTimestampFromObjectId;
 exports.getNewObjectIdString = getNewObjectIdString;
 exports.serializeObjectId = serializeObjectId;
 exports.createIdForTimestamp = createIdForTimestamp;
+exports.fieldInPredicate = fieldInPredicate;

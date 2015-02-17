@@ -7,11 +7,9 @@ var appEvents = require('utils/appevents');
 
 module.exports = (function() {
 
-
   var eyesOnState = true;
   var INACTIVITY = 60 * 1000;
   var INACTIVITY_POLL = 10 * 1000;
-  var PING_POLL = 10 * 60 * 1000;
 
   function send(value, synchronous) {
     if(!realtime.getClientId()) {
@@ -191,16 +189,6 @@ module.exports = (function() {
     window.clearTimeout(inactivityTimer);
     inactivityTimer = null;
   }
-
-  // We use this to ensure that the users session does not time out
-  window.setInterval(function() {
-    apiClient.web.get('/api/v1/ping', undefined, {
-        global: false
-      })
-      .fail(function() {
-        log.info('An error occurred pinging the server');
-      });
-  }, PING_POLL);
 
   return {
     getEyeBalls: function() {

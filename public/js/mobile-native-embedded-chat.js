@@ -15,6 +15,7 @@ var onready = require('./utils/onready');
 var appEvents = require('./utils/appevents');
 
 require('components/eyeballs');
+require('components/ping');
 
 // Preload widgets
 require('views/widgets/avatar');
