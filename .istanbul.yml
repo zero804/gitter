@@ -1,0 +1,15 @@
+verbose: false
+instrumentation:
+    save-baseline: true
+    baseline-file: ./output/coverage/coverage-baseline.json
+reporting:
+    print: summary
+    reports:
+        - lcov
+        - cobertura
+    dir: ./output/coverage
+    watermarks:
+        statements: [50, 80]
+        lines: [50, 80]
+        functions: [50, 80]
+        branches: [50, 80]
