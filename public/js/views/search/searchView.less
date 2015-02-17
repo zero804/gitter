@@ -1,7 +1,5 @@
 @import "../behaviors/highlight";
 
-@height: 71px;
-
 // NOTE: I do not endorse the use of !important, but...
 .u-uppercase {
   text-transform: uppercase;
@@ -15,6 +13,7 @@
   transform: scale(0);
 }
 
+/* what is the scrollHelper? WC */
 @scrollHelperSize: 50px;
 
 .scrollHelper {
@@ -49,42 +48,62 @@
 
 .search-results * { box-sizing: border-box; }
 
-.search-results, .search-input-view {
+.search, .search-results {
   width: 100%;
   text-align: center;
 }
 
-.search-input-view.active .search-toggle i { display: none; }
-.search-input-view.active .search-input input { display: inline-block; }
+.search {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.search__toggle {
+  font-size: 18px;
+  display: none;
+  opacity: 0.4;
+  cursor: pointer;
+  transition: opacity 0.2s ease-in-out;
+
+  @media @mid {
+    display: block;
+  }
+}
+
+.search.active .search__toggle { display: none; }
+
+.search__toggle:hover {
+  opacity: 1;
+}
+
+.search.active .search__toggle {
+  display: none;
+}
 
 .search-input {
+  box-sizing: border-box;
   font-size: 16px;
-  height: @height;
-  line-height: @height;
-  text-align: center;
   z-index: 200;
   width: 100%;
-  box-sizing: border-box;
-  padding: 0;
   padding: 0 0.625em;
-  background-color:  #fbfbfb;
+
+  @media @mid {
+    display: none;
+  }
 }
 
 .search-input input {
   .trpBodyMedium;
   margin: 0;
-  padding: 0 26px;
+  padding: 0 10px 0 26px;
   box-sizing: border-box;
-  overflow: auto !important;
-  top: auto !important;
-  left: auto !important;
   width: 100% !important;
   height: 32px;
   border-radius: 6px;
-  @media @mid {
-    display: none;
-  }
 }
+
+.search.active .search-input input { display: inline-block; }
 
 // remove duplicate close icon in ie10+
 .search-input input::-ms-clear {
@@ -95,35 +114,10 @@
   box-shadow: none;
 }
 
-i.search-toggle {
-  z-index: 1000;
-  font-size: 18px;
-  display: none;
-  opacity: 0.4;
-  top: 28px;
-  left: 26px;
-  cursor: pointer;
-  // .prepend-octicon('\f02e');
-  transition: opacity 0.2s ease-in-out;
-  position: absolute;
-
-  @media @mid {
-    display: inline;
-  }
-}
-
-.search-toggle i:hover {
-  opacity: 1;
-}
-
-.search-input-view.active .search-toggle {
-  display: none;
-}
-
 .search-input__icon {
   position: absolute;
-  top: 3px;
-  left: 14px;
+  top: 24px;
+  left: 13px;
   opacity: 0.6;
 }
 
@@ -146,15 +140,15 @@ i.search-toggle {
   }
 }
 
-.search-input-view.active .search-input-icon {
+.search.active .search-input-icon {
     display: inline-block;
 }
 
-.search-input-view.active .search-input-close-icon {
+.search.active .search-input-close-icon {
   opacity: 0.6;
 }
 
-.search-input-view.active .search-input-close-icon:hover {
+.search.active .search-input-close-icon:hover {
   opacity: 0.8;
   cursor: pointer;
 }
