@@ -84,5 +84,9 @@ module.exports = {
 
       redisClient.del(results, callback);
     });
+  },
+
+  testOnly: {
+    tokenValidationCachePrefix: tokenValidationCachePrefix
   }
 };
