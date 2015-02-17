@@ -77,10 +77,14 @@ gulp.task('validate', ['validate-client-source', 'validate-server-source']);
  */
 gulp.task('test-mocha', function() {
   mkdirp.sync('output/test-reports/');
+  mkdirp.sync('output/coverage-reports/');
 
   return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
     .pipe(mocha({
       reporter: 'xunit-file',
+      istanbul: {
+        dir: 'output/coverage-reports/'
+      },
       env: {
         XUNIT_FILE: 'output/test-reports/integration.xml',
         NODE_ENV: 'test'
