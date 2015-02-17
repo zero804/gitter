@@ -10,7 +10,7 @@ var troupeCollections = require('collections/instances/troupes');
 var cocktail = require('cocktail');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 
-// FIXME: THIS IS ACTUALLY THE RESULTS VIEW ONLY. WC.
+// FIXME: RENAME TO SearchResultsView. WC.
 
 module.exports = (function() {
 
