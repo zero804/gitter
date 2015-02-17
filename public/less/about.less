@@ -1350,6 +1350,12 @@ footer small a:hover {
   @media only screen and (min-width: @desktopOnly_bp) { display: inline; }
 }
 
+.exceptDesktop {
+  @exceptDesktop_bp: 36.25em;
+  display: none;
+  @media only screen and (max-width: @exceptDesktop_bp) { display: inline; }
+}
+
 @media (max-width: 900px) {
   #integrations-panel .issues img,
   #integrations-panel .markdown img {

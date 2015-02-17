@@ -1,5 +1,7 @@
 "use strict";
 var $ = require('jquery');
+var _ = require('underscore');
+
 var context = require('utils/context');
 var Marionette = require('marionette');
 var appEvents = require('utils/appevents');
@@ -22,43 +24,35 @@ var UnreadBannerView = require('views/app/unreadBannerView');
 var HistoryLimitView = require('views/app/historyLimitView');
 var unreadItemsClient = require('components/unread-items-client');
 var RightToolbarView = require('views/righttoolbar/rightToolbarView');
+
 require('transloadit');
+
+var PROGRESS_THRESHOLD = 62.5;
 
 module.exports = (function() {
 
-
   var touchEvents = {
-    // "click #menu-toggle-button":        "onMenuToggle",
     "keypress":                         "onKeyPress",
     'click @ui.scrollToBottom': appEvents.trigger.bind(appEvents, 'chatCollectionView:scrollToBottom')
   };
 
-  var mouseEvents = {
+  var standardEvents = {
     "click .js-favourite-button":          "toggleFavourite",
+    'paste': 'handlePaste',
     'click @ui.scrollToBottom': appEvents.trigger.bind(appEvents, 'chatCollectionView:scrollToBottom')
   };
 
-  // Nobody knows why this is here. Delete it
-  // $('.trpDisplayPicture').tooltip('destroy');
-
   var ChatLayout = Marionette.Layout.extend({
+
     el: 'body',
-    leftmenu: false,
-    rightpanel: false,
-    profilemenu: false,
-    shifted: false,
-    alertpanel: false,
-    files: false,
-    originalRightMargin: "",
 
     ui: {
-      scrollToBottom: '.js-scroll-to-bottom'
+      scrollToBottom: '.js-scroll-to-bottom',
+      progressBar: '#file-progress-bar',
+      dragOverlay: '.js-drag-overlay'
     },
 
-    regions: {
-    },
-
-    events: uiVars.isMobile ? touchEvents : mouseEvents,
+    events: uiVars.isMobile ? touchEvents : standardEvents,
 
     keyboardEvents: {
       'backspace': 'onKeyBackspace',
@@ -78,8 +72,7 @@ module.exports = (function() {
       });
       chatCollectionView.bindUIElements();
 
-
-      this.listenTo(itemCollections.chats, 'atBottomChanged', function (isBottom) {
+      this.listenTo(itemCollections.chats, 'atBottomChanged', function(isBottom) {
         this.ui.scrollToBottom.toggleClass('u-scale-zero', isBottom);
       }.bind(this));
 
@@ -126,7 +119,7 @@ module.exports = (function() {
         $("#room-content").addClass("scroller");
       }
 
-      this.enableDragAndDrop();
+      this.setupDragAndDrop();
     },
 
     onKeyBackspace: function(e) {
@@ -157,112 +150,166 @@ module.exports = (function() {
       }
     },
 
-    enableDragAndDrop: function() {
-      var progressBar = $('#file-progress-bar');
+    updateProgressBar: function(spec) {
+      var bar = this.ui.progressBar;
+      var value = spec.value && spec.value.toFixed(0) + '%';
+      var timeout = spec.timeout || 200;
+      setTimeout(function() { bar.css('width', value); }, timeout);
+    },
+
+    resetProgressBar: function() {
+      this.ui.progressBar.hide();
+      this.updateProgressBar({
+        value: 0,
+        timeout: 0
+      });
+    },
+
+    handleUploadProgress: function(done, expected) {
+      this.updateProgressBar({ value: PROGRESS_THRESHOLD + (done/expected) * (100 - PROGRESS_THRESHOLD), timeout: 0 });
+    },
+
+    handleUploadStart: function() {
+      this.ui.progressBar.show();
+    },
+
+    handleUploadSuccess: function(res) {
+      this.resetProgressBar();
+      var n = parseInt(res.fields.numberOfFiles, 10);
+      appEvents.triggerParent('user_notification', {
+        title: 'Upload complete',
+        text: (n > 1 ? n + ' files' : 'file') + ' uploaded successfully.'
+      });
+    },
+
+    handleUploadError: function(err) {
+      appEvents.triggerParent('user_notification', {
+        title: 'Error Uploading File',
+        text:  err.message
+      });
+      this.resetProgressBar();
+    },
+
+    setupDragAndDrop: function() {
+      var dragOverlay = this.ui.dragOverlay;
+      var counter = 0; // IMPORTANT: when dragging moving over child nodes will cause dragenter and dragleave, so we need to keep this count, if it's zero means that we should hide the overlay. WC.
+      var self = this;
 
       function ignoreEvent(e) {
         e.stopPropagation();
         e.preventDefault();
       }
 
-      function start() {}
-
-      function progress(bytesReceived, bytesExpected) {
-        var percentage = (bytesReceived / bytesExpected * 100 + 20).toFixed(2) + '%';
-        setTimeout(function(){ progressBar.css('width', percentage); }, 200);
-      }
-
-      function reset() {
-        progressBar.hide(function() {
-          progressBar.css('width', '0%');
-        });
-      }
-
-      function error(assembly) {
-        if (assembly) {
-          appEvents.triggerParent('user_notification', {
-            title: "Error uploading file",
-            text:  assembly.message
-          });
-        }
-        progressBar.hide(function() {
-          progressBar.css('width', '0%');
-        });
-      }
-
       function dropEvent(e) {
-        e.stopPropagation();
-        e.preventDefault();
-
-        progressBar.show();
-        setTimeout(function(){ progressBar.css('width', '10%'); }, 50);
-        setTimeout(function(){ progressBar.css('width', '20%'); }, 600);
-
-        // Prepare formdata
+        counter = 0; // reset the counter
+        dragOverlay.toggleClass('hide', true);
+        ignoreEvent(e);
         e = e.originalEvent;
         var files = e.dataTransfer.files;
-        if (files.length === 0) {
-          reset();
-          return;
-        }
-
-        var formdata = new FormData();
-        var type = '';
-        for(var i = 0; i < files.length; i++) {
-          var file = files[i];
-          var t = file.type.split('/').shift();
-
-          if(!i) {
-            type = t;
-          } else {
-            if(t !== type) {
-              type = '';
-            }
-          }
-
-          formdata.append("file", file);
-        }
-
-        // Generate signature and upload
-        apiClient.priv.get('/generate-signature', {
-            room_uri: context.troupe().get('uri'),
-            room_id: context.getTroupeId(),
-            type: type
-          })
-          .then(function(data) {
-            formdata.append("signature", data.sig);
-
-            var options = {
-              wait: true,
-              modal: false,
-              autoSubmit: false,
-              onStart: start,
-              onProgress: progress,
-              onSuccess: reset,
-              onError: error,
-              debug: false,
-              formData: formdata
-            };
-
-            var form = $('#upload-form');
-            form.find('input[name="params"]').attr('value', data.params);
-            form.unbind('submit.transloadit');
-            form.transloadit(options);
-            form.submit();
-        });
+        self.upload(files);
       }
 
-      var el = $('body');
-      el.on('dragenter', ignoreEvent);
-      el.on('dragover',  ignoreEvent);
-      el.on('drop',      dropEvent);
+      this.$el.on('dragenter', function(e) {
+        counter++;
+        dragOverlay.toggleClass('hide', false);
+        ignoreEvent(e);
+      });
+
+      this.$el.on('dragleave', function(e) {
+        counter--;
+        dragOverlay.toggleClass('hide', counter === 0);
+        ignoreEvent(e);
+      });
+
+      this.$el.on('dragover', ignoreEvent);
+      this.$el.on('drop', dropEvent.bind(this));
     },
 
-    showSearchMode: function() {
-      // this.rightToolbar.$el.hide();
-      // this.chatInputView.$el.hide();
-      // this.chatSearchCollectionView.$el.show();
-      // this.searchView.$el.show();
+    isImage: function(blob) {
+      return /image\//.test(blob.type);
+    },
+
+    /**
+     * handles pasting, image-only for now
+     */
+    handlePaste: function(evt) {
+      evt = evt.originalEvent || evt;
+      var clipboard = evt.clipboardData;
+      var blob = null;
+
+      if (!clipboard || !clipboard.items) {
+        return; // Safari + FF, don't support pasting images in. Ignore and perform default behaviour. WC.
+      }
+
+      if (clipboard.items.length === 1) {
+        blob = clipboard.items[0].getAsFile();
+        if (!blob || !this.isImage(blob)) {
+          return;
+        } else {
+          evt.preventDefault();
+          this.upload([blob]);
+        }
+      }
+    },
+
+    upload: function(files) {
+      this.ui.progressBar.show();
+
+      this.updateProgressBar({
+        value: 0,
+        timeout: 0
+      });
+
+      this.updateProgressBar({
+        value: PROGRESS_THRESHOLD,
+        timeout: 200
+      });
+
+      var DEFAULT_OPTIONS = {
+        wait: true,
+        modal: false,
+        autoSubmit: false,
+        debug: false,
+        onStart: this.handleUploadStart.bind(this),
+        onProgress: this.handleUploadProgress.bind(this),
+        onSuccess: this.handleUploadSuccess.bind(this),
+        onError: this.handleUploadError.bind(this)
+      };
+
+      var formData = new FormData();
+      var type = '';
+
+      for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        var t = file.type.split('/').shift();
+
+        if (!i) {
+          type = t;
+        } else {
+          if (t !== type) {
+            type = '';
+          }
+        }
+
+        formData.append('file', file);
+      }
+
+      formData.append('numberOfFiles', files.length);
+
+      apiClient.priv.get('/generate-signature', {
+          room_uri: context.troupe().get('uri'),
+          room_id: context.getTroupeId(),
+          type: type
+        })
+        .then(function(res) {
+          formData.append("signature", res.sig);
+
+          var form = $('#upload-form');
+          form.find('input[name="params"]').attr('value', res.params);
+          form.unbind('submit.transloadit');
+          form.transloadit(_.extend(DEFAULT_OPTIONS, { formData: formData }));
+          form.submit();
+        });
     }
   });
 

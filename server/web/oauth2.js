@@ -159,7 +159,7 @@ exports.authorization = [
     if(err.clientMismatch || missingParams.length || incorrectResponseType) {
       res.render('oauth_authorize_failed', {
         clientMismatch: !!err.clientMismatch,
-        missingParams: missingParams.length && missingParams.join(','),
+        missingParams: missingParams.length && missingParams,
         incorrectResponseType: incorrectResponseType,
       });
     } else {
