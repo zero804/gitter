@@ -10,6 +10,8 @@ var troupeCollections = require('collections/instances/troupes');
 var cocktail = require('cocktail');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 
+// FIXME: THIS IS ACTUALLY THE RESULTS VIEW ONLY. WC.
+
 module.exports = (function() {
 
   var View = RoomCollectionView.extend({
