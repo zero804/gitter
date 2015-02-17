@@ -13,14 +13,18 @@ var devMode =config.runtimeEnvironment === 'dev';
 
 function getLocales(localeDir) {
   var files = fs.readdirSync(localeDir);
-  return files
+  /* EN must always appear first */
+  return ['en'].concat(files
     .filter(function(file) {
       var fullName = path.join(localeDir, file);
       return fs.statSync(fullName).isFile() && path.extname(file) === '.js';
     })
     .map(function(file) {
       return path.basename(file, '.js');
-    });
+    })
+    .filter(function(lang) {
+      return lang !== 'en';
+    }));
 }
 
 var locales = getLocales(localesDir);
