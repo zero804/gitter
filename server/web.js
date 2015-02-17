@@ -29,7 +29,8 @@ require('./web/graceful-shutdown').install(server, app);
 
 var RedisStore = require('connect-redis')(express);
 var sessionStore = new RedisStore({
-  client: redis.getClient()
+  client: redis.getClient(),
+  ttl: nconf.get('web:sessionTTL')
 });
 
 require('./web/express').installFull(app, server, sessionStore);

@@ -23,6 +23,7 @@ require('template/helpers/all');
 require('components/bug-reporting');
 require('components/focus-events');
 require('utils/tracking');
+require('components/ping');
 
 // Preload widgets
 require('views/widgets/avatar');
