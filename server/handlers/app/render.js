@@ -308,7 +308,9 @@ function renderMobileNotLoggedInChat(req, res, next) {
   return renderChat(req, res, {
     template: 'mobile/mobile-nli-chat',
     script: 'mobile-nli-app',
-    unread: false // Not logged in users see chats as read
+    unread: false, // Not logged in users see chats as read
+    fetchEvents: false,
+    fetchUsers: false
   }, next);
 }
 
@@ -347,6 +349,8 @@ function renderEmbeddedChat(req, res, next) {
     script: 'router-embed-chat',
     unread: false, // Embedded users see chats as read
     classNames: [ 'embedded' ],
+    fetchEvents: false,
+    fetchUsers: false,
     extras: {
       usersOnline: req.troupe.users.length
     }
