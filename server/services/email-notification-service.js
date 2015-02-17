@@ -97,6 +97,7 @@ module.exports = {
       return Q.resolve();
     }
 
+    // Re-enable all #lang!!
     // Disabling localised emails until we have more content
     // return Q.all([emailAddressService(user), userSettingsService.getUserSettings(user.id, 'lang')])
     //  .spread(function(email, lang) {
@@ -108,7 +109,7 @@ module.exports = {
         }
 
         var i18n = i18nFactory.get();
-        // Disabling localised emails until we have more content
+        // #lang Disabling localised emails until we have more content
         // if (lang) {
         //   i18n.setLocale(lang);
         // }
@@ -136,7 +137,7 @@ module.exports = {
               data: { userId: user.id, email: email }
             },
             data: {
-              // Disabling localised emails until we have more content
+              // #lang Disabling localised emails until we have more content
               // lang: lang,
               i18n: i18n,
               canChangeNotifySettings: canChangeNotifySettings,
