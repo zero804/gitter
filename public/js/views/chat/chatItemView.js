@@ -264,17 +264,23 @@ module.exports = (function() {
 
       if(!changes || 'isCollapsible' in changes) {
         var isCollapsible = this.model.get('isCollapsible');
-
+        // FIXME: can we avoid creating an element? WC
         if(isCollapsible) {
           if (this.$el.find('.js-chat-item-collapse').length) return;
 
           var collapseElement = $(document.createElement('div'));
+          var icon = $(document.createElement('i'));
+          icon.addClass('icon-fold');
+
+          collapseElement.append(icon);
           collapseElement.addClass('js-chat-item-collapse');
 
           if(this.model.get('collapsed')) {
+            icon.addClass('icon-unfold');
             collapseElement.addClass('chat-item__icon--expand');
           } else {
             collapseElement.addClass('chat-item__icon--collapse');
+            icon.addClass('icon-fold');
           }
 
           this.$el.find('.js-chat-item-details').append(collapseElement);
@@ -407,11 +413,14 @@ module.exports = (function() {
       this.bindUIElements();
       var self = this;
       var embeds = self.$el.find('.embed');
+      var icon = this.ui.collapse.find('i');
 
       clearTimeout(self.embedTimeout);
 
       this.ui.collapse.removeClass('chat-item__icon--collapse');
       this.ui.collapse.addClass('chat-item__icon--expand');
+      icon.removeClass('icon-fold');
+      icon.addClass('icon-unfold');
 
       if(self.rollers) {
         embeds.each(function(i, e) {
@@ -433,7 +442,10 @@ module.exports = (function() {
       this.bindUIElements();
       var self = this;
       clearTimeout(self.embedTimeout);
+      var icon = this.ui.collapse.find('i');
 
+      icon.addClass('icon-fold');
+      icon.removeClass('icon-unfold');
       this.ui.collapse.removeClass('chat-item__icon--expand');
       this.ui.collapse.addClass('chat-item__icon--collapse');
 
