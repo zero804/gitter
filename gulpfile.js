@@ -97,10 +97,7 @@ gulp.task('test', ['test-mocha', 'test-redis-lua']);
 gulp.task('localtest', function() {
   return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
     .pipe(mocha({
-      reporter: 'spec',
-      env: {
-        NODE_ENV: 'test'
-      }
+      reporter: 'spec'
     }));
 });
 
@@ -145,6 +142,8 @@ gulp.task('add-version-files', function(done) {
           if(branch === 'HEAD' && process.env.GIT_BRANCH) {
             branch = process.env.GIT_BRANCH;
           }
+
+          mkdirp.sync('output/app/');
 
           fs.writeFileSync('output/app/ASSET_TAG', hash);
           fs.writeFileSync('output/app/GIT_COMMIT', commit);
@@ -251,6 +250,7 @@ gulp.task('css-web', function () {
   gulp.src([
     'public/less/signup.less',
     'public/less/trpAppsPage.less',
+    'public/less/oauth-error-page.less',
     'public/less/generic-layout.less',
     'public/less/trpHooks.less',
     'public/less/login.less',

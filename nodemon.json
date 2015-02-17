@@ -1,6 +1,6 @@
 {
-  "watch": ["server", "public/templates"],
-  "ext": "js,hbs",
+  "watch": ["server"],
+  "ext": "js",
   "env": {
     "NODEMON": "1"
   }
