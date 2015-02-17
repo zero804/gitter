@@ -29,7 +29,7 @@
     "gitter-passport-github": "^0.1.8-e",
     "gitter-passport-http-bearer": "^1.1.0",
     "gitter-redis-scripto": "^0.2.2",
-    "gitter-services": "git+ssh://git@github.com:gitterHQ/services.git#1.8.0",
+    "gitter-services": "git+ssh://git@github.com:gitterHQ/services.git#1.9.0",
     "handlebars": "^1.3.0",
     "heapdump": "^0.2.9",
     "highlight.js": "git://github.com/gitterHQ/highlight.js#6523cbb6e3f2a9374ea96e82f977ef57ef8cdf59",
