@@ -119,6 +119,9 @@ gulp.task('fasttest', function() {
       reporter: 'spec',
       grep: '#slow',
       invert: true,
+      istanbul: {
+        dir: 'output/coverage-reports/'
+      },
       env: {
         SKIP_BADGER_TESTS: 1,
         DISABLE_CONSOLE_LOGGING: 1
