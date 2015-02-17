@@ -82,12 +82,14 @@ gulp.task('test-mocha', function() {
   return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
     .pipe(mocha({
       reporter: 'xunit-file',
+      timeout: 10000,
       istanbul: {
         dir: 'output/coverage-reports/'
       },
       env: {
         XUNIT_FILE: 'output/test-reports/integration.xml',
-        NODE_ENV: 'test'
+        NODE_ENV: 'test',
+        Q_DEBUG: 1
       }
     }));
 });
@@ -102,9 +104,11 @@ gulp.task('localtest', function() {
   return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
     .pipe(mocha({
       reporter: 'spec',
+      timeout: 10000,
       env: {
         SKIP_BADGER_TESTS: 1,
-        DISABLE_CONSOLE_LOGGING: 1
+        DISABLE_CONSOLE_LOGGING: 1,
+        Q_DEBUG: 1
       }
     }));
 });
