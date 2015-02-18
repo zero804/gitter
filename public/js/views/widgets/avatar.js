@@ -5,7 +5,7 @@ var context = require('utils/context');
 var template = require('./tmpl/avatar.hbs');
 var UserPopoverView = require('views/people/userPopoverView');
 var widgets = require('views/behaviors/widgets');
-var resolveAvatarUrl = require('utils/resolve-avatar-url');
+var resolveAvatarUrl = require('shared/avatars/resolve-avatar-url');
 require('bootstrap_tooltip');
 
 module.exports = (function() {

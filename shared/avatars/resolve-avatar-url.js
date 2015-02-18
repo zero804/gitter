@@ -1,36 +1,35 @@
 'use strict';
+var targetEnv = require('targetenv');
 var BASE = 'https://avatars';
 var GITHUB_URL = '.githubusercontent.com/';
 
-function isClient() {
-  return typeof window !== 'undefined' ? true : false;
-}
+function hash(str) {
+  var buckets = 6; // defaults to 5 buckets
 
-function hash(spec) {
-  var str = spec.str || '';
-  var buckets = spec.buckets || 6; // defaults to 5 buckets
-  if (!str) return str;
+  if (!str || !str.length) return 1;
+  var f = 0;
+  for(var i = 0; i < str.length; i++) {
+    f += str.charCodeAt(i);
+  }
 
-  return str
-    .trim()
-    .split('')
-    .reduce(function (fold, c) {
-      fold += c.charCodeAt();
-      return fold;
-    }, 0) % buckets; // the number of buckets from 0 to (buckets - 1)
+  return f % buckets;
 }
 
 function build(spec) {
-  spec = spec || {};
+  if (!spec || !spec.username) {
+    /* Best we can do */
+    return "https://avatars1.githubusercontent.com/u/0";
+  }
+
   var version = spec.version || 3;
-  var username = spec.username || 'default';
+  var username = spec.username;
   var size = spec.size || 30;
 
-  return BASE + hash({ str: username }) + GITHUB_URL + username + '?v=' + version + '&s=' + size;
+  return BASE + hash(username) + GITHUB_URL + username + '?v=' + version + '&s=' + size;
 }
 
 function getPixelDensity() {
-  if (isClient()) {
+  if (targetEnv.isBrowser) {
     return window.devicePixelRatio || 1;
   }
   return 1;
@@ -39,7 +38,7 @@ function getPixelDensity() {
 // TODO: needs improvement.
 function preload(url) {
   var img;
-  if (isClient()) {
+  if (targetEnv.isBrowser) {
     img = document.createElement('img');
     img.src = url;
   }
