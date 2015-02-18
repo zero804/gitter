@@ -10,10 +10,26 @@ module.exports = dolph({
   limit: 100,
   expiry: 60,
   applyLimit: function(req) {
-    return !!(req.user && req.authInfo && req.authInfo.client);
+    if (req.user) return true;
+    if (req.authInfo && req.authInfo.accessToken) return true;
+    return false;
   },
   keyFunction: function(req) {
-    return req.user.id + ':' + req.authInfo.client.id;
+    if (req.user) {
+      if (req.authInfo && req.authInfo.client) {
+        return req.user.id + ':' + req.authInfo.client.id;
+      }
+
+      return req.user.id;
+    }
+
+    // Anonymous access tokens
+    if (req.authInfo && req.authInfo.accessToken) {
+      return req.authInfo.accessToken;
+    }
+
+    /* Should never get here */
+    return "anonymous";
   },
   redisClient: redisClient
 });

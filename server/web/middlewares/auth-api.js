@@ -6,12 +6,12 @@ var rateLimiter = require('./rate-limiter');
 var logoutDestroyTokens = require('./logout-destroy-tokens');
 
 function ensureLoggedIn(req, res, next) {
-  if(!req.user) {
-    res.send(401, { error: true, loginRequired: true });
-    return;
+  /* Bearer strategy must return a user. If the user is { _anonymous: true }, it should be null */
+  if (req.user && req.user._anonymous) {
+    req.user = null;
   }
 
-  if(req.user.isMissingTokens()) {
+  if(req.user && req.user.isMissingTokens()) {
     return logoutDestroyTokens(req, res, next);
   }
 

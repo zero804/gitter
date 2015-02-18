@@ -110,8 +110,6 @@ module.exports = (function() {
         var oldInMS = this.model.get('sent').valueOf() + OLD_TIMEOUT - Date.now();
         setTimeout(timeChange, oldInMS + 50);
       }
-
-      this.render();
     },
 
     template: function(data) {
@@ -269,17 +267,17 @@ module.exports = (function() {
 
           var collapseElement = $(document.createElement('div'));
           var icon = $(document.createElement('i'));
-          icon.addClass('icon-fold');
+          icon.addClass('octicon');
 
           collapseElement.append(icon);
           collapseElement.addClass('js-chat-item-collapse');
 
           if(this.model.get('collapsed')) {
-            icon.addClass('icon-unfold');
+            icon.addClass('octicon-unfold');
             collapseElement.addClass('chat-item__icon--expand');
           } else {
             collapseElement.addClass('chat-item__icon--collapse');
-            icon.addClass('icon-fold');
+            icon.addClass('octicon-fold');
           }
 
           this.$el.find('.js-chat-item-details').append(collapseElement);
@@ -418,8 +416,8 @@ module.exports = (function() {
 
       this.ui.collapse.removeClass('chat-item__icon--collapse');
       this.ui.collapse.addClass('chat-item__icon--expand');
-      icon.removeClass('icon-fold');
-      icon.addClass('icon-unfold');
+      icon.removeClass('octicon-fold');
+      icon.addClass('octicon-unfold');
 
       if(self.rollers) {
         embeds.each(function(i, e) {
@@ -443,8 +441,8 @@ module.exports = (function() {
       clearTimeout(self.embedTimeout);
       var icon = this.ui.collapse.find('i');
 
-      icon.addClass('icon-fold');
-      icon.removeClass('icon-unfold');
+      icon.addClass('octicon-fold');
+      icon.removeClass('octicon-unfold');
       this.ui.collapse.removeClass('chat-item__icon--expand');
       this.ui.collapse.addClass('chat-item__icon--collapse');
 

@@ -129,3 +129,17 @@ exports.findByFieldInValue = function(Model, field, values, callback) {
     return Model.where(field).in(values).execQ();
   }).nodeify(callback);
 };
+
+exports.addIdToLean = function(object) {
+  if (object && object._id) { object.id = object._id.toString(); }
+  return object;
+};
+
+exports.addIdToLeanArray = function(objects) {
+  if (objects) {
+    objects.forEach(function(f) {
+      if (f && f._id) { f.id = f._id.toString(); }
+    });
+  }
+  return objects;
+};
