@@ -378,9 +378,12 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
         return q.sort(options.sort || { sent: sentOrder })
           .limit(limit)
           .skip(skip)
+          .lean()
           .execQ()
           .then(function(results) {
             var limitReached = false;
+
+            mongooseUtils.addIdToLeanArray(results);
 
             if(sentOrder === 'desc') {
               results.reverse();
@@ -402,6 +405,7 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
                 .where('sent').lte(sentBefore(aroundId))
                 .where('_id').lte(aroundId)
                 .sort({ sent: 'desc' })
+                .lean()
                 .limit(halfLimit);
 
       var q2 = ChatMessage
@@ -409,6 +413,7 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
                 .where('sent').gte(sentAfter(aroundId))
                 .where('_id').gt(aroundId)
                 .sort({ sent: 'asc' })
+                .lean()
                 .limit(halfLimit);
 
       if (useHints) {
@@ -428,6 +433,9 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
         ])
         .spread(function(a, b) {
           var limitReached = false;
+
+          mongooseUtils.addIdToLeanArray(a);
+          mongooseUtils.addIdToLeanArray(b);
 
           // Got back less results than we were expecting?
           if(maxHistoryDate && a.length < halfLimit) {
