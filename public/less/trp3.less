@@ -288,64 +288,8 @@ a:hover {
   }
 }
 
-body.logged-out {
-
-  .wrap-menu {
-    width: 350px;
-  }
-
-  .menu {
-    width: 350px;
-
-    @media @small {
-      left:-350px;
-      transition-delay: 0s;
-
-        &.visible {
-          transition-delay: 0.3s;
-          left: 0px;
-        }
-    }
-  }
-
-  .trpLeftMenuTab {
-    width: 50px;
-  }
-
-
-  .trpFramePanel {
-    @media @small {
-      margin-left: 0px;
-    }
-  }
-}
-
 .trpButtonMedium, .trpButtonBig {
   .transition300ms;
-}
-
-.trpLeftMenuLogo {
-  padding: 20px;
-
-  .logo-container {
-    float: left;
-    background-image: url('../images/logo-text-white-48.png');
-    width: 244px;
-    height: 48px;
-    margin-bottom: 20px;
-
-    @media @retina {
-      background-image: url('../images/logo-text-white-48@2x.png');
-      background-size: contain;
-    }
-  }
-}
-
-.trpLeftMenuInfo {
-  .trpBodyMedium;
-  margin-bottom: 20px;
-  clear: both;
-  padding: 20px;
 }
 
 .trpLeftMenuSignup {
@@ -440,54 +384,8 @@ body.logged-out {
   }
 }
 
-.trpLeftMenuContainer {
-  height: 100%;
-  overflow: hidden;
-}
-
-.trpLeftMenuWrapper {
-  display: inline-block;
-	.trpBodyMedium;
-	overflow-y: auto;
-	overflow-x: hidden;
-  font-weight: 300;
-}
-
-.trpLeftMenuToolbar {
-	padding-left: 26px;
-	padding-bottom: 12px;
-	width: 280px;
-}
-
-.trpLeftMenuToolbarItems {
-	margin: 0;
-	padding: 0;
-	list-style: none;
-}
-
-.trpLeftMenuToolbarItems li {
-	display: inline-block;
-	padding-right: 8px;
-}
-
-.trpLeftMenuIcon {
-	opacity: 0.6;
-	padding: 5px;
-}
-
 .selected {
 	opacity: 1;
-}
-
-
-.unread-normal .trpLeftMenuIcon[data-list="list-troupes"], .unread-one2one .trpLeftMenuIcon[data-list="list-users"] {
-	background-color: @trpPurple;
-	border: 1px solid white;
-	border-radius: 50em;
-}
-
-.trpLeftMenuSpacer {
-	height: 100px;
 }
 
 .disabled {
