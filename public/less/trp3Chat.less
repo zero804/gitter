@@ -1,5 +1,3 @@
-// @import "icon-mixins.less";
-
 .issue {
   border: 1px solid fade(@trpGrey,40%);
   background-color: fade(@trpGrey,20%);
@@ -46,21 +44,18 @@
     margin-left: 0;
   }
   .modified {
-    // .prepend-diff-modified();
     font-size: small;
     &:before {
       color: @trpYellow;
     }
   }
   .added {
-    // .prepend-diff-added();
     font-size: small;
     &:before {
       color: @trpGreen;
     }
   }
   .removed {
-    // .prepend-diff-removed();
     font-size: small;
     &:before {
       color: @trpRed;
