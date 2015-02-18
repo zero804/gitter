@@ -9,6 +9,7 @@ var stats                  = env.stats;
 
 var _                      = require('underscore');
 var moment                 = require('moment');
+var url                    = require('url');
 var userService            = require('../services/user-service');
 var passport               = require('passport');
 var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
@@ -21,6 +22,15 @@ var GitHubMeService        = require('../services/github/github-me-service');
 var gaCookieParser         = require('../utils/ga-cookie-parser');
 var emailAddressService    = require('../services/email-address-service');
 var userSettingsService    = require('../services/user-settings-service');
+
+
+function getGravatarVersion(avatarUrl) {
+  try {
+    var parsed = url.parse(avatarUrl, true, true);
+    return parsed.query.v || undefined;
+  } catch(e) {
+  }
+}
 
 function installApi() {
   /**
@@ -173,8 +183,12 @@ function install() {
 
                 user.username         = githubUserProfile.login;
                 user.displayName      = githubUserProfile.name || githubUserProfile.login;
-                user.gravatarImageUrl = githubUserProfile.avatar_url;
+                user.gravatarImageUrl = githubUserProfile.avatar_url; // TODO: deprecate this
                 user.githubId         = githubUserProfile.id;
+                var gravatarVersion   = getGravatarVersion(githubUserProfile.avatar_url);
+                if (gravatarVersion) {
+                  user.gravatarVersion = getGravatarVersion(githubUserProfile.avatar_url);
+                }
                 user.githubUserToken  = accessToken;
                 user.state            = undefined;
 
@@ -224,7 +238,8 @@ function install() {
                 username:           githubUserProfile.login,
                 displayName:        githubUserProfile.name || githubUserProfile.login,
                 emails:             githubUserProfile.email ? [githubUserProfile.email] : [],
-                gravatarImageUrl:   githubUserProfile.avatar_url,
+                gravatarImageUrl:   githubUserProfile.avatar_url, // TODO: Deprecate this....
+                gravatarVersion:    getGravatarVersion(githubUserProfile.avatar_url),
                 githubUserToken:    accessToken,
                 githubId:           githubUserProfile.id,
               };
@@ -242,6 +257,14 @@ function install() {
                 if (err) return done(err);
 
                 logger.verbose('Created GitHub user ', user.toObject());
+
+                // Save the locale of the new user
+                if (req.i18n && req.i18n.locale) {
+                  userSettingsService.setUserSettings(user.id, 'lang', req.i18n.locale)
+                    .catch(function(err) {
+                      logger.error("Failed to save lang user setting", { userId: user.id, lang: req.i18n.locale, exception: err });
+                    });
+                }
 
                 // IMPORTANT: The alias can only happen ONCE. Do not remove.
                 // IMPORTANT: 'bucket' is a reserved word on MixPanel, that's why we use _bucket
