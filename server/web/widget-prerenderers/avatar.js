@@ -1,7 +1,7 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var resolveAvatarUrl = require('../../../public/js/utils/resolve-avatar-url');
+var resolveAvatarUrl = require('../../../shared/avatars/resolve-avatar-url');
 
 module.exports = exports = function(template) {
   return function avatarWidgetHandler(params) {
