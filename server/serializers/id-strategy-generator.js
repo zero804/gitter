@@ -1,7 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var winston = require('../utils/winston');
+// var winston = require('../utils/winston');
 var collections = require("../utils/collections");
 var execPreloads = require('./exec-preloads');
 
@@ -28,7 +28,7 @@ function idStrategyGenerator(name, FullObjectStrategy, loaderFunction) {
       var fullObject = objectHash[id];
 
       if(!fullObject) {
-        winston.warn("Unable to locate object ", { id: id, strategy: Strategy.prototype.name });
+        // winston.warn("Unable to locate object ", { id: id, strategy: Strategy.prototype.name });
         return null;
       }
 
