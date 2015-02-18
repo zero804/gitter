@@ -264,7 +264,6 @@ module.exports = (function() {
 
       if(!changes || 'isCollapsible' in changes) {
         var isCollapsible = this.model.get('isCollapsible');
-        // FIXME: can we avoid creating an element? WC
         if(isCollapsible) {
           if (this.$el.find('.js-chat-item-collapse').length) return;
 
