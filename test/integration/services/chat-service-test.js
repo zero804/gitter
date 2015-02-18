@@ -76,7 +76,7 @@ describe('chatService', function() {
       });
       done();
     });
-  })
+  });
 
   describe('Message entities', function() {
     it('should collect metadata from the message text', function(done) {
@@ -96,6 +96,77 @@ describe('chatService', function() {
       });
 
     });
+  });
+
+  describe('Finding messages', function() {
+    var chat1, chat2, chat3;
+
+    before(function(done) {
+      return chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'A' })
+        .then(function(chat) {
+          chat1 = chat.id;
+          return chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'B' });
+        })
+        .then(function(chat) {
+          chat2 = chat.id;
+          return chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'C' }) ;
+        })
+        .then(function(chat) {
+          chat3 = chat.id;
+
+          return chatService.findChatMessagesForTroupe(fixture.troupe1.id, { aroundId: chat2 });
+        })
+        .nodeify(done);
+    });
+
+    it('should find messages using aroundId', function(done) {
+      return chatService.findChatMessagesForTroupe(fixture.troupe1.id, { aroundId: chat2 })
+        .then(function(result) {
+          var chats = result[0];
+          assert(chats.length >= 3);
+          assert.strictEqual(chats.filter(function(f) { return f.id == chat1; }).length, 1);
+          assert.strictEqual(chats.filter(function(f) { return f.id == chat2; }).length, 1);
+          assert.strictEqual(chats.filter(function(f) { return f.id == chat3; }).length, 1);
+        })
+        .nodeify(done);
+    });
+
+    it('should find messages using beforeId', function(done) {
+      return chatService.findChatMessagesForTroupe(fixture.troupe1.id, { beforeId: chat2 })
+        .then(function(result) {
+          var chats = result[0];
+          assert(chats.length >= 1);
+          assert.strictEqual(chats.filter(function(f) { return f.id == chat1; }).length, 1);
+          assert.strictEqual(chats.filter(function(f) { return f.id == chat2; }).length, 0);
+          assert.strictEqual(chats.filter(function(f) { return f.id == chat3; }).length, 0);
+        })
+        .nodeify(done);
+    });
+
+    it('should find messages using beforeInclId', function(done) {
+      return chatService.findChatMessagesForTroupe(fixture.troupe1.id, { beforeInclId: chat2 })
+        .then(function(result) {
+          var chats = result[0];
+          assert(chats.length >= 2);
+          assert.strictEqual(chats.filter(function(f) { return f.id == chat1; }).length, 1);
+          assert.strictEqual(chats.filter(function(f) { return f.id == chat2; }).length, 1);
+          assert.strictEqual(chats.filter(function(f) { return f.id == chat3; }).length, 0);
+        })
+        .nodeify(done);
+    });
+
+    it('should find messages using afterId', function(done) {
+      return chatService.findChatMessagesForTroupe(fixture.troupe1.id, { afterId: chat2 })
+        .then(function(result) {
+          var chats = result[0];
+          assert(chats.length >= 1);
+          assert.strictEqual(chats.filter(function(f) { return f.id == chat1; }).length, 0);
+          assert.strictEqual(chats.filter(function(f) { return f.id == chat2; }).length, 0);
+          assert.strictEqual(chats.filter(function(f) { return f.id == chat3; }).length, 1);
+        })
+        .nodeify(done);
+    });
+
   });
 
 });
