@@ -84,6 +84,7 @@
     "snappy-cache": "^0.1.1",
     "statuserror": "0.0.1",
     "stringformat": "0.0.5",
+    "tap-file": "0.0.2",
     "temp": "0.4.0",
     "text-filter": "~0.1.0",
     "throat": "~1.0.0",

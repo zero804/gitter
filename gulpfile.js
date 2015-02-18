@@ -81,12 +81,13 @@ gulp.task('test-mocha', function() {
 
   return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
     .pipe(mocha({
-      reporter: 'xunit-file',
+      reporter: 'tap-file',
       timeout: 10000,
       istanbul: {
         dir: 'output/coverage-reports/'
       },
       env: {
+        TAP_FILE: "output/test-reports/tests.tap",
         XUNIT_FILE: 'output/test-reports/integration.xml',
         NODE_ENV: 'test',
         Q_DEBUG: 1
@@ -116,10 +117,11 @@ gulp.task('localtest', function() {
 gulp.task('fasttest', function() {
   return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
     .pipe(mocha({
-      reporter: 'spec',
+      reporter: 'nyan',
       grep: '#slow',
       invert: true,
       env: {
+        TAP_FILE: "output/test-reports/tests.tap",
         SKIP_BADGER_TESTS: 1,
         DISABLE_CONSOLE_LOGGING: 1
       }

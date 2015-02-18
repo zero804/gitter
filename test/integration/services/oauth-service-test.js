@@ -67,7 +67,9 @@ describe('oauth-service', function() {
       .nodeify(done);
   });
 
-  it('should use uncached tokens', function(done) {
+  it('should use uncached tokens #slow', function(done) {
+    this.timeout(20000);
+
     var users = [mongoUtils.getNewObjectIdString(), mongoUtils.getNewObjectIdString()];
     var clients = [mongoUtils.getNewObjectIdString(), mongoUtils.getNewObjectIdString()];
 
