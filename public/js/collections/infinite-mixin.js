@@ -103,7 +103,7 @@ module.exports = (function() {
         add: ('add' in options) ? options.add : true,
         merge: ('merge' in options) ? options.merge : true,
         data: data,
-        success: function(collection, response) {
+        success: function(collection, response) {  // jshint unused:true
           delete self._isFetching;
           if(response.length < loadLimit) {
             // NO MORE
@@ -143,7 +143,7 @@ module.exports = (function() {
         add: ('add' in options) ? options.add : true,
         merge: ('merge' in options) ? options.merge : true,
         data: data,
-        success: function(collection, response) {
+        success: function(collection, response) { // jshint unused:true
           self.trigger('fetch.completed');
 
           delete self._isFetching;
@@ -182,7 +182,7 @@ module.exports = (function() {
         add: ('add' in options) ? options.add : true,
         merge: ('merge' in options) ? options.merge : true,
         data: data,
-        success: function(collection, response) {
+        success: function(collection, response) { // jshint unused:true
           delete self._isFetching;
 
           var responseIds = response.map(utils.idTransform);
