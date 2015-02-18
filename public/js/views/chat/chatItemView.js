@@ -111,7 +111,7 @@ module.exports = (function() {
         setTimeout(timeChange, oldInMS + 50);
       }
 
-      this.render();
+      // this.render();
     },
 
     template: function(data) {
