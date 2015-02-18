@@ -17,16 +17,6 @@ var roomNameTrimmer    = require('../../../public/js/utils/room-name-trimmer');
 var isolateBurst       = require('../../../shared/burst/isolate-burst-array');
 var url                =  require('url');
 
-var trimRoomName = function (room) {
-  room.name = roomNameTrimmer(room.name);
-  return room;
-};
-
-var markSelected = function (id, room) {
-  room.selected = room.id === id;
-  return room;
-};
-
 var avatar   = require('../../utils/avatar');
 var _                 = require('underscore');
 
@@ -136,8 +126,15 @@ function renderMainFrame(req, res, next, frame) {
 
       // pre-processing rooms
       rooms = rooms
-        .map(markSelected.bind(null, selectedRoomId))
-        .map(trimRoomName);
+        .filter(function(f) {
+          /* For some reason there can be null rooms. TODO: fix this upstream */
+          return !!f;
+        })
+        .map(function(room) {
+          room.selected = room.id == selectedRoomId;
+          room.name = roomNameTrimmer(room.name);
+          return room;
+        });
 
       var socialMetadata = permalinkChat ?
         social.getMetadataForChatPermalink({ room: req.troupe, chat: permalinkChat  }) :
@@ -155,6 +152,7 @@ function renderMainFrame(req, res, next, frame) {
         stagingLink: stagingLink,
         dnsPrefetch: dnsPrefetch,
         showFooterButtons: true,
+        showUnreadTab: true,
         menuHeaderExpanded: false,
         user: user,
         rooms: {

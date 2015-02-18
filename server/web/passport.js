@@ -35,17 +35,20 @@ function installApi() {
   /* This is ONLY used to API clients, not WEB clients!! */
   passport.use(new BearerStrategy(
     function(accessToken, done) {
-
       return oauthService.validateAccessTokenAndClient(accessToken)
         .then(function(tokenInfo) {
           // Token not found
           if(!tokenInfo) return done();
 
-          // Anonymous tokens cannot be used for Bearer tokens
-          if(!tokenInfo.user) return done();
-
           var user = tokenInfo.user;
           var client = tokenInfo.client;
+
+          if (!client) return done();
+
+          if (!user) {
+            /* This will be converted to null in auth-api.js */
+            user = { _anonymous: true };
+          }
           // Not yet needed var accessToken = tokenInfo.accessToken;
           done(null, user, { client: client, accessToken: accessToken });
         })
