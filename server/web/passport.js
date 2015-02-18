@@ -9,7 +9,6 @@ var stats                  = env.stats;
 
 var _                      = require('underscore');
 var moment                 = require('moment');
-var url                    = require('url');
 var userService            = require('../services/user-service');
 var passport               = require('passport');
 var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
@@ -20,17 +19,9 @@ var useragentTagger        = require('../utils/user-agent-tagger');
 var GitHubStrategy         = require('gitter-passport-github').Strategy;
 var GitHubMeService        = require('../services/github/github-me-service');
 var gaCookieParser         = require('../utils/ga-cookie-parser');
+var extractGravatarVersion = require('../utils/extract-gravatar-version');
 var emailAddressService    = require('../services/email-address-service');
 var userSettingsService    = require('../services/user-settings-service');
-
-
-function getGravatarVersion(avatarUrl) {
-  try {
-    var parsed = url.parse(avatarUrl, true, true);
-    return parsed.query.v || undefined;
-  } catch(e) {
-  }
-}
 
 function installApi() {
   /**
@@ -185,9 +176,9 @@ function install() {
                 user.displayName      = githubUserProfile.name || githubUserProfile.login;
                 user.gravatarImageUrl = githubUserProfile.avatar_url; // TODO: deprecate this
                 user.githubId         = githubUserProfile.id;
-                var gravatarVersion   = getGravatarVersion(githubUserProfile.avatar_url);
+                var gravatarVersion   = extractGravatarVersion(githubUserProfile.avatar_url);
                 if (gravatarVersion) {
-                  user.gravatarVersion = getGravatarVersion(githubUserProfile.avatar_url);
+                  user.gravatarVersion = extractGravatarVersion(githubUserProfile.avatar_url);
                 }
                 user.githubUserToken  = accessToken;
                 user.state            = undefined;
@@ -239,7 +230,7 @@ function install() {
                 displayName:        githubUserProfile.name || githubUserProfile.login,
                 emails:             githubUserProfile.email ? [githubUserProfile.email] : [],
                 gravatarImageUrl:   githubUserProfile.avatar_url, // TODO: Deprecate this....
-                gravatarVersion:    getGravatarVersion(githubUserProfile.avatar_url),
+                gravatarVersion:    extractGravatarVersion(githubUserProfile.avatar_url),
                 githubUserToken:    accessToken,
                 githubId:           githubUserProfile.id,
               };
