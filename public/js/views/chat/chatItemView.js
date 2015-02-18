@@ -110,8 +110,6 @@ module.exports = (function() {
         var oldInMS = this.model.get('sent').valueOf() + OLD_TIMEOUT - Date.now();
         setTimeout(timeChange, oldInMS + 50);
       }
-
-      // this.render();
     },
 
     template: function(data) {
