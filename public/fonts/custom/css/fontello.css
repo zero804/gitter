@@ -20,6 +20,11 @@
 */
 
  [class^="icon-"]:before, [class*=" icon-"]:before {
+
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
   font-family: "fontello";
   font-style: normal;
   font-weight: normal;
