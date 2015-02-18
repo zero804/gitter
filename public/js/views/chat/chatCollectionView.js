@@ -89,7 +89,7 @@ module.exports = (function() {
         // clearing previously highlighted chat.
         this.clearHighlight();
 
-        if (!this.model) return;
+        if (!model) return;
 
         // highlighting new and replacing "current"
         this.highlightChat(model, opts.highlights);
