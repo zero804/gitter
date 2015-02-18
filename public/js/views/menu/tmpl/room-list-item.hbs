@@ -1,7 +1,7 @@
 {{#if ethereal}}
   <span class="room-list-item__name {{ iconClass }}" title="{{ title }}">{{ name }}</span>
 {{else}}
-  <i class='room-list-item__icon icon-{{ iconClass }}'></i>
+  <i class='room-list-item__icon {{ iconClass }}'></i>
   <span class="room-list-item__name" title="{{title}}">{{ name }}</span>
   {{#unless oneToOne}}
     {{#unless mentions}}
