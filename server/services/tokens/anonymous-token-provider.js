@@ -7,14 +7,14 @@ var crypto     = require('crypto');
 var password   = 'soapP2igs1Od2gen';
 
 function encrypt(tokenPair) {
-  var cipher = crypto.createCipher('aes-128-cbc', password);
-  return cipher.update(tokenPair, 'utf8', 'hex') + cipher.final('hex');
+  var cipher = crypto.createCipher('aes128', password);
+  return cipher.update(tokenPair, 'ascii', 'base64') + cipher.final('base64');
 }
 
 function decrypt(encrypted) {
   try {
-    var decipher = crypto.createDecipher('aes-128-cbc', password);
-    return decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8');
+    var decipher = crypto.createDecipher('aes128', password);
+    return decipher.update(encrypted, 'base64', 'ascii') + decipher.final('ascii');
   } catch(e) {
     return null;
   }
