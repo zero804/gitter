@@ -5,7 +5,6 @@
   position: relative;
 
   box-sizing: border-box;
-  .transition500ms;
   z-index: @l1;
 
   background-color: white;
@@ -38,7 +37,6 @@
 
 .chat-input__container {
   box-sizing: border-box;
-  .transition300ms;
 
   margin-top: 10px;
   display: block;
@@ -86,7 +84,7 @@
 
   .md-help {
     opacity: 0.5;
-    .transition300ms;
+    .transition300ms(opacity);
 
     &:before {
       font-family: 'troupe-icons';
@@ -106,7 +104,7 @@
   .compose-mode-toggle {
     margin-bottom: 4px;
     opacity: 0.5;
-    .transition300ms;
+    .transition300ms(opacity);
     cursor: pointer;
     .prepend-pencil-off;
     height: 20px;
