@@ -11,11 +11,12 @@ function toLowerCase(value) {
 exports.findActivePersonalPlansForUsers = function(userIds) {
   if(!userIds || !userIds.length) return Q.resolve([]);
 
-  return persistence.Subscription.findQ({
-    userId: { $in: userIds.map(mongoUtils.asObjectID) },
+  var query = mongoUtils.fieldInPredicate('userId', userIds.map(mongoUtils.asObjectID), {
     subscriptionType: 'USER',
     status: 'CURRENT'
   });
+
+  return persistence.Subscription.findQ(query);
 };
 
 exports.findActiveOrgPlans = function(orgUris) {
