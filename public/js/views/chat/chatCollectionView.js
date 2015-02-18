@@ -89,13 +89,15 @@ module.exports = (function() {
         // clearing previously highlighted chat.
         this.clearHighlight();
 
+        if (!this.model) return;
+
         // highlighting new and replacing "current"
         this.highlightChat(model, opts.highlights);
         this.highlighted = model;
 
         // finally scroll to it
         this.scrollToChatId(model);
-      }.bind(this));
+      });
 
       this.listenTo(appEvents, 'chatCollectionView:clearHighlight', this.clearHighlight.bind(this));
 
