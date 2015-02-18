@@ -88,7 +88,7 @@ module.exports = (function () {
   });
 
   var View = Marionette.ItemView.extend({
-    className: 'js-menu menu',
+    className: 'menu',
     template: template,
     selectedListIcon: "icon-troupes",
 
@@ -133,15 +133,19 @@ module.exports = (function () {
       var self = this;
 
       var showMenu = function () {
-        $('.wrap-menu').removeClass('hide');
+        self.$el.removeClass('menu--collapsed');
       };
 
       appEvents.on('menu:hide', function () {
-        $('.wrap-menu').addClass('hide');
+        self.$el.addClass('menu--collapsed');
       });
 
       appEvents.on('menu:show', showMenu);
       appEvents.on('navigation', showMenu);
+      appEvents.on('troupeUnreadTotalChange', function(values) {
+        var unreadText = values.overall || ' ';
+        self.$el.find('#menu-tab-unread-count').text(unreadText);
+      });
 
       this.selectedIndex = 0;
 
@@ -244,7 +248,8 @@ module.exports = (function () {
     serializeData: function() {
       return {
         showFooterButtons: !isMobile(),
-        showExapandedHeader: isMobile()
+        showExapandedHeader: isMobile(),
+        showUnreadTab: !isMobile()
       };
     },
 
