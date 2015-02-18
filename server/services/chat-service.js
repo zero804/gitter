@@ -301,6 +301,21 @@ function historyForTroupeExceedsDate(troupeId, maxHistoryDate) {
     });
 }
 
+
+/**
+ * Mongo timestamps have a resolution down to the second, whereas
+ * sent times have a resolution down to the milliseond.
+ * To ensure that there is an overlap, we need to slightly
+ * extend the search range using these two functions.
+ */
+function sentBefore(objectId) {
+  return new Date(objectId.getTimestamp().valueOf() + 1000);
+}
+
+function sentAfter(objectId) {
+  return new Date(objectId.getTimestamp().valueOf() - 1000);
+}
+
 /**
  * Returns a promise of
  * [ messages, limitReached]
@@ -329,14 +344,14 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
           var beforeId = new ObjectID(options.beforeId);
           q = q.where('_id').lt(beforeId);
           // Also add sent as this helps mongo by using the { troupeId, sent } index
-          q = q.where('sent').lte(beforeId.getTimestamp());
+          q = q.where('sent').lte(sentBefore(beforeId));
         }
 
         if(options.beforeInclId) {
           var beforeInclId = new ObjectID(options.beforeInclId);
           q = q.where('_id').lte(beforeInclId); // Note: less than *or equal to*
           // Also add sent as this helps mongo by using the { troupeId, sent } index
-          q = q.where('sent').lte(beforeInclId.getTimestamp());
+          q = q.where('sent').lte(sentBefore(beforeInclId));
         }
 
         if(options.afterId) {
@@ -346,7 +361,7 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
           sentOrder = 'asc';
           q = q.where('_id').gt(afterId);
           // Also add sent as this helps mongo by using the { troupeId, sent } index
-          q = q.where('sent').gte(afterId.getTimestamp());
+          q = q.where('sent').gte(sentAfter(afterId));
         }
 
         if(maxHistoryDate) {
@@ -380,14 +395,14 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
                 .sort({ sent: 'desc' })
                 .limit(halfLimit)
                 .where('_id').lte(aroundId)
-                .where('sent').lte(aroundId.getTimestamp());
+                .where('sent').lte(sentBefore(aroundId));
 
       var q2 = ChatMessage
                 .where('toTroupeId', troupeId)
                 .sort({ sent: 'asc' })
                 .limit(halfLimit)
                 .where('_id').gt(aroundId)
-                .where('sent').gte(aroundId.getTimestamp());
+                .where('sent').gte(sentAfter(aroundId));
 
       if(maxHistoryDate) {
         q1 = q1.where('sent').gte(maxHistoryDate);
