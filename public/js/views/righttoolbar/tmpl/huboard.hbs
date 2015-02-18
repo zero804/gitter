@@ -1,4 +1,5 @@
 <div class="huboard">
+  <div class="service-sprite huboard-logo"></div>
   <div class="activity-time">{{widget "timeago" time=sent compact=true position="left"}}</div>
 
   <span class="gtrActivityItemText"><span class='mention' data-link-type="mention" data-screen-name="{{meta.user}}">{{meta.user}}</span> {{meta.action}} <span class="issue" data-link-type="issue" data-issue="{{meta.number}}" data-issue-repo="{{meta.repo}}">#{{meta.number}}</span> {{#if meta.assignee}}to <span class='mention' data-link-type="mention" data-screen-name="{{meta.assignee}}">{{meta.assignee}}</span>{{else}}{{context}}{{/if}}</span>
