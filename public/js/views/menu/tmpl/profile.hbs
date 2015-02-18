@@ -8,20 +8,20 @@
   {{#unless isMobile}}
     <div class="menu-header__state">
       {{#if menuHeaderExpanded}}
-        <i class="icon-chevron-up"></i>
+        <i class="octicon octicon-chevron-up"></i>
       {{else}}
-        <i class="icon-chevron-down"></i>
+        <i class="octicon octicon-chevron-down"></i>
       {{/if}}
     </div>
   {{/unless}}
 </div>
 <ul id="profile-menu" class="profile-menu">
   <li id="link-home" class="profile-menu__item profile-menu__link">
-    <span class="profile-menu__home"><i class='icon-home'></i> Home</span>
+    <span class="profile-menu__home"><i class='octicon octicon-home'></i> Home</span>
   </li>
   {{#if showBilling}}
   <li class="profile-menu__item">
-    <a href="{{billingUrl}}/accounts" target="_blank" class="profile-menu__link"><span class="profile-menu__billing" data-disable-routing="1"><i class='icon-credit-card'></i> Billing</span></a>
+    <a href="{{billingUrl}}/accounts" target="_blank" class="profile-menu__link"><span class="profile-menu__billing" data-disable-routing="1"><i class='octicon octicon-credit-card'></i> Billing</span></a>
   </li>
   {{/if}}
   {{#if showGetApps}}
