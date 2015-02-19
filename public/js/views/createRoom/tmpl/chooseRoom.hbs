@@ -1,26 +1,32 @@
 <div class="trpModalBody">
-  <div id="permissions" class="gtrRoomPermissions">
-    <div id="perm-select-inherited" class="permission-row">
-      <label>
-        <div><input id="radio-custom" name="roomType" type="radio" checked value="channel"></div>
-        <span class="icon-hash">
-          <span id="channel" class="permission-label">
-            Channel
-          </span>
-        </span>
-       <span class="description">Create a custom room, you can define permissions and add people individually. </span>
+  <div id="permissions">
+    <div id="perm-select-inherited" class="permission">
+      <div class='permission__input permission__input--offtop'>
+        <input id="radio-custom" name="roomType" type="radio" checked value="channel">
+      </div>
+      <label for='radio-custom'>
+        <div class='permission__icon permission__icon--large'>
+          <i class="icon-hash"></i>
+        </div>
+        <div>
+          <h3>Channel</h3>
+          <p>Create a custom room, you can define permissions and add people individually. </p>
+        </div>
       </label>
     </div>
     <br>
-    <div id="perm-select-public" class="permission-row">
-      <label>
-        <div><input id="radio-repo" name="roomType" type="radio" value="repo-room"></div>
-        <span class="octicon octicon-repo">
-          <span class="permission-label">
-            Repository
-          </span>
-        </span>
-        <span class="description">Create a room from a GitHub repository.</span>
+    <div id="perm-select-public" class="permission">
+      <div class='permission__input permission__input--offtop'>
+        <input id="radio-repo" name="roomType" type="radio" value="repo-room">
+      </div>
+      <label for='radio-repo'>
+        <div class='permission__icon permission__icon--large'>
+          <i class="octicon octicon-repo"></i>
+        </div>
+        <div>
+          <h3>Repository</h3>
+          <p>Create a room from a GitHub repository.</p>
+        </div>
       </label>
     </div>
   </div>
