@@ -1,6 +1,7 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
+var GitHubMeService   = require('../../services/github/github-me-service');
 var GitHubOrgService   = require('../../services/github/github-org-service');
 var restSerializer     = require("../../serializers/rest-serializer");
 var userService        = require('../../services/user-service');
@@ -25,14 +26,12 @@ module.exports = function(req, res, next) {
           });
       }
 
-      var ghOrg = new GitHubOrgService(req.user);
-      return ghOrg.getOwners(uri)
-        .then(function(owners) {
-          // If the user requesting the members list happens to be one of the owners  we'll return a
-          // list of the org members that are also Gitter users, just that intersection.
-          if (!owners.some(function(owner) { return owner.login === user.username; }))
-            throw new StatusError(403);
+      var ghMe = new GitHubMeService(user);
+      return ghMe.isOrgAdmin(uri)
+        .then(function(isAdmin) {
+          if (!isAdmin) throw new StatusError(403);
 
+          var ghOrg = new GitHubOrgService(user);
           return ghOrg.members(uri);
         });
     })

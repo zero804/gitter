@@ -41,16 +41,6 @@ describe('github-org-service #slow', function() {
         .nodeify(done);
     });
 
-    it('should return a list of users in the owners team in an org', function(done) {
-      var gh = new GithubOrgService(GITTER_TEST_BOT);
-
-      gh.getOwners('gitterHQ')
-        .then(function(members) {
-          assert(members.some(function(member) { return member.login === 'suprememoocow'; }));
-        })
-        .nodeify(done);
-    });
-
     it('should return false if a user checks that it is in an org that it is not a member of', function(done) {
       var gh = new GithubOrgService(GITTER_TEST_BOT);
 

@@ -60,6 +60,7 @@ GitHubOrgService.prototype.getRepos = function(org) {
 
 };
 
+// Deprecated by new GitHub memberships API
 GitHubOrgService.prototype.getOwners = function(org) {
   var ghorg  = this.client.org(org);
   var d = Q.defer();
@@ -71,6 +72,17 @@ GitHubOrgService.prototype.getOwners = function(org) {
     if (!owners) return d.reject(new Error('Org "' + org + '" has no owners team'));
 
     self.client.team(owners.id).members(createClient.makeResolver(d));
+  });
+  return d.promise
+    .fail(badCredentialsCheck);
+};
+
+GitHubOrgService.prototype.getMembership = function(org, username) {
+  var ghorg  = this.client.org(org);
+  var d = Q.defer();
+  ghorg.getMembership(username, function(err, membership) {
+    if (err) return d.reject(err);
+    d.resolve(membership);
   });
   return d.promise
     .fail(badCredentialsCheck);

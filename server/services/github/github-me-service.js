@@ -40,6 +40,7 @@ GitHubMeService.prototype.getEmail = function() {
 
 };
 
+// TODO: evaluate with upcoming changes
 GitHubMeService.prototype.getOrgs = function() {
   var d = Q.defer();
 
@@ -49,6 +50,31 @@ GitHubMeService.prototype.getOrgs = function() {
   return d.promise
     .fail(badCredentialsCheck);
 };
+
+GitHubMeService.prototype.getOrgMembership = function(org) {
+  var d = Q.defer();
+
+  var ghme = this.client.me();
+  ghme.getOrgMembership(org, createClient.makeResolver(d));
+
+  return d.promise
+    .fail(badCredentialsCheck);
+};
+
+GitHubMeService.prototype.isOrgAdmin = function(org) {
+  return this.getOrgMembership(org)
+    .then(function(membership) {
+      if (!membership) return false;
+      if (membership.state !== "active") return false;
+      return membership.role === "admin";
+    })
+    .catch(function(err) {
+      if (err.statusCode === 404) return false;
+      throw err;
+    });
+};
+
+
 
 // module.exports = GitHubMeService;
 module.exports = wrap(GitHubMeService, function() {
