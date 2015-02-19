@@ -18,19 +18,39 @@
 
   <ul class="trpUserDetails">
     {{#if company}}
-      <li><i class='octicon octicon-organization'></i>{{ company }}</li>
+      <li>
+        <div class='trpUserDetails__icon'>
+          <i class='octicon octicon-organization'></i>
+        </div>
+        <span>{{ company }}</span>
+      </li>
     {{/if}}
 
     {{#if location}}
-      <li><i class='octicon octicon-location'></i>{{ location }}</li>
+      <li>
+        <div class='trpUserDetails__icon'>
+          <i class='octicon octicon-location'></i>
+        </div>
+        <span>{{ location }}</span>
+      </li>
     {{/if}}
 
     {{#if email}}
-      <li><i class='octicon octicon-mail'></i> <a class="email" href="mailto:{{email}}">{{ email }}</a></li>
+      <li>
+        <div class='trpUserDetails__icon'>
+          <i class='octicon octicon-mail'></i>
+        </div>
+        <a class="email" href="mailto:{{email}}">{{ email }}</a>
+      </li>
     {{/if}}
 
     {{#if blog}}
-      <li><i class='octicon octicon-link'> <a target="_blank" href="{{blogUrl}}" class="url" rel="nofollow me"></i>{{ blog }}</a></li>
+      <li>
+        <div class='trpUserDetails__icon'>
+          <i class='octicon octicon-link'></i>
+        </div>
+        <a target="_blank" href="{{blogUrl}}" class="url" rel="nofollow me">{{ blog }}</a>
+      </li>
     {{/if}}
   </ul>
 </div>
