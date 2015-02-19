@@ -1,45 +1,35 @@
 @import "parentSelectView";
 
-.gtrRoomPermissions {
-  clear: both;
+.permission {
+  display: flex !important;
+}
 
-  input {
-    float: left;
-    margin: 8px 12px 0 4px;
-  }
+.permission__icon {
+  text-align: center;
+  flex-shrink: 0;
+  padding: 0 5px;
+}
 
-  .permission-row {
-    margin: 8px 0;
-  }
+.permission__icon--large {
+  width: 32px;
+  padding: 5px 5px 0;
+}
 
-  label {
-    display: inline;
-  }
+.permission__icon--large i {
+  font-size: 25px;
+}
 
-  .description {
-    display: block;
-    margin-left: 61px;
-    font-size: 14px;
-  }
+.permission label {
+  display: flex;
+}
 
-  .permission-label {
-    margin-left: 8px;
-  }
+.permission__input {
+  width: 16px;
+  text-align: center;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
 
-  .gtrAutoJoin {
-    margin-top: 12px;
-    .transition300ms(opacity);
-    input {
-      margin-right: 8px;
-    }
-
-    &.disabled {
-      opacity: 0;
-    }
-    .permission-label {
-      vertical-align: middle;
-      padding-top: 4px;
-      padding-left: 22px;
-    }
-  }
+.permission__input--offtop {
+  margin-top: 5px;
 }
