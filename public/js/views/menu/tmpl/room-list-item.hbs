@@ -7,12 +7,10 @@
   <span class="room-list-item__name" title="{{title}}">{{ name }}</span>
   {{#unless oneToOne}}
     {{#unless mentions}}
-      {{!-- <i class="room-list-item__icon icon-logout"></i> --}}
       <i class="room-list-item__action js-leave-button icon-logout" data-id="{{ id }}" title="Leave"></i>
     {{/unless}}
   {{/unless}}
   {{#unless lurk}}
-    {{!-- <i class="room-list-item__icon js-close-button icon-cancel-circle {{ iconClass }}" data-id="{{ id }}" title="Hide"></i> --}}
     <i class="room-list-item__action js-close-button icon-cancel-circle" data-id="{{ id }}" title="Hide"></i>
   {{/unless}}
   {{#if unreadItems}}

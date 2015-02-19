@@ -334,8 +334,6 @@ module.exports = (function() {
         .tooltip('fixTitle')
         .tooltip('hide');
 
-      // this.$el.find('.compose-mode-toggle')
-
       var placeholder = isComposeModeEnabled ? PLACEHOLDER_COMPOSE_MODE : PLACEHOLDER;
       this.$el.find('textarea').attr('placeholder', placeholder).focus();
       this.render();
