@@ -2,10 +2,11 @@
 
 var env    = require('../../utils/env');
 var logger = env.logger;
+var conf   = env.config;
 
 var redisClient        = env.redis.getClient();
 var STANDARD_TTL       = 10 * 60;     /* 10 minutes */
-var ANONYMOUS_TTL      = 21600;       /* 6 hours */
+var ANONYMOUS_TTL      = conf.get('web:sessionTTL') + 60; /* One minute more than the session age */
 
 var tokenLookupCachePrefix = "token:c:";
 var tokenValidationCachePrefix = "token:t:";
@@ -18,7 +19,8 @@ module.exports = {
   },
 
   validateToken: function(token, callback) {
-    redisClient.get(tokenValidationCachePrefix + token, function(err, value) {
+    var redisKey = tokenValidationCachePrefix + token;
+    redisClient.get(redisKey, function(err, value) {
       if (err) {
         logger.warn('Unable to lookup token in cache ' + err, { exception: err });
         return callback();
@@ -27,8 +29,17 @@ module.exports = {
       if(!value) return callback();
 
       var parts = ("" + value).split(':', 2);
+      var userId = parts[0] || null;
+      var clientId = parts[1];
 
-      return callback(null, [parts[0] || null, parts[1]]);
+      if (!userId) {
+        /* Async refresh the token for an anonymous user */
+        redisClient.expire(redisKey, ANONYMOUS_TTL, function(err) {
+          if (err) logger.warn('Unable to refresh expires for token ', { exception: err });
+        });
+      }
+
+      return callback(null, [userId, clientId]);
     });
   },
 
@@ -73,5 +84,9 @@ module.exports = {
 
       redisClient.del(results, callback);
     });
+  },
+
+  testOnly: {
+    tokenValidationCachePrefix: tokenValidationCachePrefix
   }
 };

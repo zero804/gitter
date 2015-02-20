@@ -28,6 +28,7 @@ describe('recent-room-service', function() {
     });
 
     it('should rearrange the order of favourites correctly',function(done) {
+      this.timeout(10000);
 
       function getFavs() {
         return recentRoomService.findFavouriteTroupesForUser(fixture.user1.id);

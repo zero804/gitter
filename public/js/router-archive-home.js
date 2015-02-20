@@ -13,6 +13,7 @@ require('components/dozy');
 require('template/helpers/all');
 require('components/bug-reporting');
 require('utils/tracking');
+require('components/ping');
 
 
 onready(function() {

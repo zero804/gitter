@@ -97,17 +97,22 @@ module.exports = {
       return Q.resolve();
     }
 
-    return Q.all([emailAddressService(user), userSettingsService.getUserSettings(user.id, 'lang')])
-      .spread(function(email, lang) {
+    // Re-enable all #lang!!
+    // Disabling localised emails until we have more content
+    // return Q.all([emailAddressService(user), userSettingsService.getUserSettings(user.id, 'lang')])
+    //  .spread(function(email, lang) {
+     return emailAddressService(user)
+      .then(function(email) {
         if(!email) {
           logger.info('Skipping email notification for ' + user.username + ' as they have no primary confirmed email');
           return;
         }
 
         var i18n = i18nFactory.get();
-        if (lang) {
-          i18n.setLocale(lang);
-        }
+        // #lang Disabling localised emails until we have more content
+        // if (lang) {
+        //   i18n.setLocale(lang);
+        // }
 
         var emailBasePath = config.get("email:emailBasePath");
         var unsubscribeUrl = emailBasePath + '/settings/unsubscribe/' + hash;
@@ -132,7 +137,8 @@ module.exports = {
               data: { userId: user.id, email: email }
             },
             data: {
-              lang: lang,
+              // #lang Disabling localised emails until we have more content
+              // lang: lang,
               i18n: i18n,
               canChangeNotifySettings: canChangeNotifySettings,
               user: user,

@@ -1,7 +1,7 @@
 "use strict";
 var Marionette = require('marionette');
 var Backbone = require('backbone');
-var resolveAvatarUrl = require('utils/resolve-avatar-url');
+var resolveAvatarUrl = require('shared/avatars/resolve-avatar-url');
 var Popover = require('views/popover');
 var template = require('./tmpl/userPopoverView.hbs');
 var footerTemplate = require('./tmpl/userPopoverFooterView.hbs');
