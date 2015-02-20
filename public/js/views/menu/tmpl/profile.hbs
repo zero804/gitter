@@ -17,21 +17,39 @@
 </div>
 <ul id="profile-menu" class="profile-menu">
   <li id="link-home" class="profile-menu__item profile-menu__link">
-    <span class="profile-menu__home">Home</span>
+    <div class='profile-menu__icon'>
+      <i class='octicon octicon-home'></i>
+    </div>
+    <span>Home</span>
   </li>
   {{#if showBilling}}
   <li class="profile-menu__item">
-    <a href="{{billingUrl}}/accounts" target="_blank" class="profile-menu__link"><span class="profile-menu__billing" data-disable-routing="1">Billing</span></a>
+    <a href="{{billingUrl}}/accounts" target="_blank" class="profile-menu__link" data-disable-routing="1">
+      <div class='profile-menu__icon'>
+        <i class='octicon octicon-credit-card'></i>
+      </div>
+      <span>Billing</span>
+    </a>
   </li>
   {{/if}}
   {{#if showGetApps}}
   <li class="profile-menu__item">
-    <a href="/apps" target="_blank" class="profile-menu__link"><span class="profile-menu__apps">Get Gitter Apps</span></a>
+    <a href="/apps" target="_blank" class="profile-menu__link">
+      <div class='profile-menu__icon'>
+        <i class='icon-download'></i>
+      </div>
+      <span>Get Gitter Apps</span>
+    </a>
   </li>
   {{/if}}
   {{#if showSignout}}
   <li class="profile-menu__item">
-    <a id="link-logout" href="/logout" class="profile-menu__link"><span class="profile-menu__logout">Signout</span></a>
+    <a id="link-logout" href="/logout" class="profile-menu__link">
+      <div class='profile-menu__icon'>
+        <i class='icon-logout'></i>
+      </div>
+      <span>Signout</span>
+    </a>
   </li>
   {{/if}}
 </ul>

@@ -260,45 +260,26 @@
 
 .chat-item__icon--collapse {
   .chat-item__icon;
+  height: auto;
+  font-size: 14px;
   background-image: none;
 
   .chat-item:hover & {
     visibility: visible;
     opacity: 1;
-  }
-
-  &::after {
-    content: "\f0cc";
-    font-family: 'octicons';
-    font-style: normal;
-    font-variant: normal;
-    -webkit-font-smoothing: antialiased;
-    font-size: 16px;
-    width: 16px;
-    line-height: 16px;
-    text-align: center;
   }
 }
 
 .chat-item__icon--expand {
   .chat-item__icon;
+  width: auto;
+  height: auto;
+  font-size: 14px;
   background-image: none;
 
   .chat-item:hover & {
     visibility: visible;
     opacity: 1;
-  }
-
-  &::after {
-    content: "\f039";
-    font-family: 'octicons';
-    font-style: normal;
-    font-variant: normal;
-    -webkit-font-smoothing: antialiased;
-    font-size: 16px;
-    width: 16px;
-    line-height: 16px;
-    text-align: center;
   }
 }
 
