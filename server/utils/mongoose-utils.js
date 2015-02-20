@@ -94,8 +94,52 @@ exports.upsert = function(schema, query, setOperation) {
  */
 exports.findByIds = function(Model, ids, callback) {
   return Q.fcall(function() {
-    if(!ids || !ids.length) return [];
+    if (!ids || !ids.length) return [];
 
+    /* Special case for a single ID */
+    if (ids.length === 1) {
+      return Model.findByIdQ(ids[0])
+        .then(function(doc) {
+          if (doc) return [doc];
+          return [];
+        });
+    }
+
+    /* Usual case */
     return Model.where('_id')['in'](mongoUtils.asObjectIDs(collections.idsIn(ids))).execQ();
   }).nodeify(callback);
+};
+
+exports.findByFieldInValue = function(Model, field, values, callback) {
+  return Q.fcall(function() {
+    if (!values || !values.length) return [];
+
+    /* Special case for a single value */
+    if (values.length === 1) {
+      var query = {};
+      query[field] = values[0];
+      return Model.findOneQ(query)
+        .then(function(doc) {
+          if (doc) return [doc];
+          return [];
+        });
+    }
+
+    /* Usual case */
+    return Model.where(field).in(values).execQ();
+  }).nodeify(callback);
+};
+
+exports.addIdToLean = function(object) {
+  if (object && object._id) { object.id = object._id.toString(); }
+  return object;
+};
+
+exports.addIdToLeanArray = function(objects) {
+  if (objects) {
+    objects.forEach(function(f) {
+      if (f && f._id) { f.id = f._id.toString(); }
+    });
+  }
+  return objects;
 };

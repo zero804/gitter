@@ -3,7 +3,7 @@
   background-size: 96px 96px;
 }
 
-.service-sprite.jenkins-frown {
+.service-sprite.huboard-logo {
   width: 16px;
   height: 16px;
   background-position: 0 0;
@@ -63,37 +63,37 @@
   background-position: -48px 0;
 }
 
-.service-sprite.drone-frown {
+.service-sprite.dockerhub-logo {
   width: 16px;
   height: 16px;
   background-position: -48px -16px;
 }
 
-.service-sprite.drone-logo {
+.service-sprite.drone-frown {
   width: 16px;
   height: 16px;
   background-position: -48px -32px;
 }
 
-.service-sprite.drone-smile {
+.service-sprite.drone-logo {
   width: 16px;
   height: 16px;
   background-position: 0 -48px;
 }
 
-.service-sprite.gitlab-logo {
+.service-sprite.drone-smile {
   width: 16px;
   height: 16px;
   background-position: -16px -48px;
 }
 
-.service-sprite.heroku-logo {
+.service-sprite.gitlab-logo {
   width: 16px;
   height: 16px;
   background-position: -32px -48px;
 }
 
-.service-sprite.huboard-logo {
+.service-sprite.heroku-logo {
   width: 16px;
   height: 16px;
   background-position: -48px -48px;
@@ -105,94 +105,100 @@
   background-position: -64px 0;
 }
 
-.service-sprite.jenkins-logo {
+.service-sprite.jenkins-frown {
   width: 16px;
   height: 16px;
   background-position: -64px -16px;
 }
 
-.service-sprite.jenkins-meh {
+.service-sprite.jenkins-logo {
   width: 16px;
   height: 16px;
   background-position: -64px -32px;
 }
 
-.service-sprite.jenkins-smile {
+.service-sprite.jenkins-meh {
   width: 16px;
   height: 16px;
   background-position: -64px -48px;
 }
 
-.service-sprite.logentries-error {
+.service-sprite.jenkins-smile {
   width: 16px;
   height: 16px;
   background-position: 0 -64px;
 }
 
-.service-sprite.logentries-logo {
+.service-sprite.logentries-error {
   width: 16px;
   height: 16px;
   background-position: -16px -64px;
 }
 
-.service-sprite.pagerduty-logo {
+.service-sprite.logentries-logo {
   width: 16px;
   height: 16px;
   background-position: -32px -64px;
 }
 
-.service-sprite.pivotaltracker-logo {
+.service-sprite.pagerduty-logo {
   width: 16px;
   height: 16px;
   background-position: -48px -64px;
 }
 
-.service-sprite.sentry-error {
+.service-sprite.pivotaltracker-logo {
   width: 16px;
   height: 16px;
   background-position: -64px -64px;
 }
 
-.service-sprite.sentry-logo {
+.service-sprite.sentry-error {
   width: 16px;
   height: 16px;
   background-position: -80px 0;
 }
 
-.service-sprite.sprintly-columns {
+.service-sprite.sentry-logo {
   width: 16px;
   height: 16px;
   background-position: -80px -16px;
 }
 
-.service-sprite.sprintly-logo {
+.service-sprite.sprintly-columns {
   width: 16px;
   height: 16px;
   background-position: -80px -32px;
 }
 
-.service-sprite.travis-frown {
+.service-sprite.sprintly-logo {
   width: 16px;
   height: 16px;
   background-position: -80px -48px;
 }
 
-.service-sprite.travis-logo {
+.service-sprite.travis-frown {
   width: 16px;
   height: 16px;
   background-position: -80px -64px;
 }
 
-.service-sprite.travis-meh {
+.service-sprite.travis-logo {
   width: 16px;
   height: 16px;
   background-position: 0 -80px;
 }
 
-.service-sprite.travis-smile {
+.service-sprite.travis-meh {
   width: 16px;
   height: 16px;
   background-position: -16px -80px;
+}
+
+.service-sprite.travis-smile {
+  width: 16px;
+  height: 16px;
+  background-position: -32px -80px;
 }
 
 

@@ -11,21 +11,23 @@ function toLowerCase(value) {
 exports.findActivePersonalPlansForUsers = function(userIds) {
   if(!userIds || !userIds.length) return Q.resolve([]);
 
-  return persistence.Subscription.findQ({
-    userId: { $in: userIds.map(mongoUtils.asObjectID) },
+  var query = mongoUtils.fieldInPredicate('userId', userIds.map(mongoUtils.asObjectID), {
     subscriptionType: 'USER',
     status: 'CURRENT'
   });
+
+  return persistence.Subscription.findQ(query);
 };
 
 exports.findActiveOrgPlans = function(orgUris) {
   if(!orgUris || !orgUris.length) return Q.resolve([]);
 
-  return persistence.Subscription.findQ({
-    lcUri: { $in: orgUris.map(toLowerCase) },
+  var query = mongoUtils.fieldInPredicate('lcUri', orgUris.map(toLowerCase), {
     subscriptionType: 'ORG',
     status: 'CURRENT'
   });
+
+  return persistence.Subscription.findQ(query);
 };
 
 exports.findActivePlan = function(uri) {
@@ -41,8 +43,9 @@ exports.findActivePlan = function(uri) {
 exports.findActivePlans = function(uris) {
   if(!uris || !uris.length) return Q.resolve([]);
 
-  return persistence.Subscription.findQ({
-    lcUri: { $in: uris.map(toLowerCase) },
+  var query = mongoUtils.fieldInPredicate('lcUri', uris.map(toLowerCase), {
     status: 'CURRENT'
   });
-}
+
+  return persistence.Subscription.findQ(query);
+};

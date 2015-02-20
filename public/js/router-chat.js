@@ -27,6 +27,7 @@ require('components/focus-events');
 // Preload widgets
 require('views/widgets/avatar');
 require('views/widgets/timeago');
+require('components/ping');
 
 
 onready(function () {

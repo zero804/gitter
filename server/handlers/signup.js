@@ -33,7 +33,8 @@ module.exports = {
           }
 
           var translatedBy = req.i18n.__("Translated By");
-          if (translatedBy === "Translated By") translatedBy = "";
+          /* i18n doesn't like empty strings. Use a dash as a proxy */
+          if (translatedBy === "-") translatedBy = "";
 
           // when the viewer is not logged in:
           res.render('homepage', {

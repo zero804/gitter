@@ -4,6 +4,8 @@
 var userSearchService = require("./user-search-service");
 var userService = require("./user-service");
 var githubSearchService = require("./github/github-fast-search");
+var extractGravatarVersion = require('../utils/extract-gravatar-version');
+
 var Q = require('q');
 var _ = require('underscore');
 
@@ -14,8 +16,9 @@ function searchGithubUsers(query, user, callback) {
       return {
         username: user.login,
         gravatarImageUrl: user.avatar_url,
-        getDisplayName: function() {},
-        getHomeUrl: function() {}
+        gravatarVersion: extractGravatarVersion(user.avatar_url),
+        getDisplayName: function() {}, // Remove, deprecated
+        getHomeUrl: function() {}  // Remove, deprecated
       };
     });
 
@@ -24,7 +27,7 @@ function searchGithubUsers(query, user, callback) {
   .nodeify(callback);
 }
 
-function addGitterDataToGithubUsers(githubUsers, callback) {
+function addGitterDataToGithubUsers(githubUsers) {
   var usernames = githubUsers.map(function(user) {
     return user.username;
   });
