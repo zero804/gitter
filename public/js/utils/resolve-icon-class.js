@@ -12,7 +12,7 @@ module.exports = function (room) {
   }
 
   if (iconName && iconName.indexOf('onetoone') > -1) {
-    iconName = 'icon-mention';
+    iconName = 'icon-at';
   }
 
   if (iconName && iconName.indexOf('repo') > -1) {
