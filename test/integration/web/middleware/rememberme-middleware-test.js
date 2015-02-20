@@ -49,7 +49,7 @@ describe('rememberme-middleware', function() {
     });
   });
 
-  it('should validate a token for a user twice in quick succession', function(done) {
+  it('should validate a token for a user twice in quick succession #slow', function(done) {
     rememberMeMiddleware.testOnly.setTokenGracePeriodMillis(100);
 
     rememberMeMiddleware.testOnly.generateAuthToken(fixture.user1.id, function(err, key, token) {

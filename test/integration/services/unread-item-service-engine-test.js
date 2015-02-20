@@ -13,6 +13,11 @@ describe('unread-item-service', function() {
   before(blockTimer.on);
   after(blockTimer.off);
 
+  // Allow redis to connect properly
+  before(function(done) {
+    setTimeout(done, 1000);
+  });
+
   describe('single test cases', function() {
 
     var unreadItemServiceEngine, troupeId1, itemId1, itemId2, itemId3, userId1, userId2, userIds, troupeId2;
@@ -242,7 +247,7 @@ describe('unread-item-service', function() {
 
     describe('listTroupeUsersForEmailNotifications', function() {
 
-      it('should list users for email notifications', function(done) {
+      it('should list users for email notifications #slow', function(done) {
         unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, [])
           .then(function() {
             return unreadItemServiceEngine.listTroupeUsersForEmailNotifications(Date.now(), 1);
@@ -344,7 +349,7 @@ describe('unread-item-service', function() {
         });
 
 
-        it('should not email somebody until the email timeout period has expired', function(done) {
+        it('should not email somebody until the email timeout period has expired #slow', function(done) {
           return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], [])
             .then(function() {
               return unreadItemServiceEngine.listTroupeUsersForEmailNotifications(Date.now(), 1);
@@ -376,7 +381,7 @@ describe('unread-item-service', function() {
             .nodeify(done);
         });
 
-        it('should not email somebody twice if no new messages have arrived', function(done) {
+        it('should not email somebody twice if no new messages have arrived #slow', function(done) {
           return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], [])
             .then(function() {
               return unreadItemServiceEngine.listTroupeUsersForEmailNotifications(Date.now(), 1);
@@ -395,7 +400,7 @@ describe('unread-item-service', function() {
             .nodeify(done);
         });
 
-        it('should batch up emails for a user', function(done) {
+        it('should batch up emails for a user #slow', function(done) {
           return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, [userId1], [])
             .delay(500)
             .then(function() {
@@ -677,6 +682,91 @@ describe('unread-item-service', function() {
     });
   });
 
+  describe('unread-batches', function() {
+    var unreadItemServiceEngine;
+    var batchSize;
+    beforeEach(function() {
+      unreadItemServiceEngine = testRequire('./services/unread-item-service-engine');
+      batchSize = unreadItemServiceEngine.testOnly.UNREAD_BATCH_SIZE;
+    });
+
+    it('should batch a single batch with no mentions', function() {
+      var batch = unreadItemServiceEngine.testOnly.getNewItemBatches(['a', 'b', 'c'], []);
+      assert.deepEqual([ { userIds: ['a', 'b', 'c'], mentionUserIds: [] }], batch);
+    });
+
+    it('should batch a single batch with some mentions', function() {
+      var batch = unreadItemServiceEngine.testOnly.getNewItemBatches(['a', 'b', 'c'], ['a']);
+      assert.deepEqual([ { userIds: ['a', 'b', 'c'], mentionUserIds: ['a'] }], batch);
+    });
+
+
+    it('should handle large batches', function() {
+      var TOTAL = 900;
+
+      var userIds = [];
+      var mentionUserIds = [];
+      for(var i = 0; i < TOTAL; i++) {
+        userIds.push(i);
+        if(i % 3 === 0) {
+          mentionUserIds.push(i);
+        }
+      }
+      var expectedNumberOfBatches = Math.floor(TOTAL / batchSize) + (TOTAL % batchSize === 0 ? 0 : 1);
+      var batches = unreadItemServiceEngine.testOnly.getNewItemBatches(userIds, mentionUserIds);
+      assert.strictEqual(expectedNumberOfBatches, batches.length);
+      for(var j = 0; j < expectedNumberOfBatches; j++) {
+        var expectedUsers = [];
+        var expectedMentions = [];
+        for(var k = 0; k < batchSize; k++) {
+          var id  = j * batchSize + k;
+
+          expectedUsers.push(id);
+          if(id % 3 === 0) {
+            expectedMentions.push(id);
+          }
+        }
+        assert.deepEqual(expectedUsers, batches[j].userIds);
+        assert.deepEqual(expectedMentions, batches[j].mentionUserIds);
+      }
+      });
+
+    it('should handle large batches #2', function() {
+      var TOTAL = 905;
+      var userIds = [];
+      var mentionUserIds = [];
+      for(var i = 0; i < 905; i++) {
+        userIds.push(i);
+        if(i % 3 === 0) {
+          mentionUserIds.push(i);
+        }
+      }
+
+      var expectedNumberOfBatches = Math.floor(TOTAL / batchSize) + (TOTAL % batchSize === 0 ? 0 : 1);
+      var batches = unreadItemServiceEngine.testOnly.getNewItemBatches(userIds, mentionUserIds);
+      assert.strictEqual(expectedNumberOfBatches, batches.length);
+      for(var j = 0; j < expectedNumberOfBatches; j++) {
+        var expectedUsers = [];
+        var expectedMentions = [];
+        for(var k = 0; k < batchSize; k++) {
+          var id  = j * batchSize + k;
+
+          if(id >= TOTAL) break;
+
+          expectedUsers.push(id);
+          if(id % 3 === 0) {
+            expectedMentions.push(id);
+          }
+        }
+        assert.deepEqual(expectedUsers, batches[j].userIds);
+        assert.deepEqual(expectedMentions, batches[j].mentionUserIds);
+      }
+    });
+
+
+
+  });
+
   describe('integration tests', function() {
     var unreadItemServiceEngine, troupeId1, troupeId2, troupeId3,
     userId1, userId2, itemId1, itemId2, itemId3, userIds;
@@ -884,6 +974,53 @@ describe('unread-item-service', function() {
 
         expectBadgeCounts([ [userId1, 0] ]),
         ],done);
+    });
+
+    it('should handle unread items in very large rooms #slow', function(done) {
+      var SIZE = 2000;
+      var userIds = [];
+      var mentionUserIds = [];
+      for(var i = 0; i < SIZE; i++) {
+        userIds.push(i);
+        if(i % 3 === 0) {
+          mentionUserIds.push(i);
+        }
+      }
+
+      return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, mentionUserIds)
+        .then(function(result) {
+          for(var j = 0; j < SIZE; j++) {
+            assert(result[j]);
+            assert.strictEqual(result[j].unreadCount, 1);
+            assert.strictEqual(result[j].badgeUpdate, true);
+            if (j % 3 === 0) {
+              assert.strictEqual(result[j].mentionCount, 1);
+            }
+          }
+
+          var userIds = [];
+          var mentionUserIds = [];
+          for(var i = 0; i < SIZE; i++) {
+            userIds.push(i);
+            if(i % 3 === 0) {
+              mentionUserIds.push(i);
+            }
+          }
+
+          return unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId2, userIds, mentionUserIds);
+        })
+        .then(function(result) {
+          for(var j = 0; j < SIZE; j++) {
+            assert(result[j]);
+            assert.strictEqual(result[j].unreadCount, 2);
+            assert.strictEqual(result[j].badgeUpdate, false);
+            if (j % 3 === 0) {
+              assert.strictEqual(result[j].mentionCount, 2);
+            }
+          }
+
+        })
+        .nodeify(done);
     });
 
   });

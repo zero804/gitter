@@ -103,7 +103,7 @@ module.exports = (function() {
         add: ('add' in options) ? options.add : true,
         merge: ('merge' in options) ? options.merge : true,
         data: data,
-        success: function(collection, response) {
+        success: function(collection, response) {  // jshint unused:true
           delete self._isFetching;
           if(response.length < loadLimit) {
             // NO MORE
@@ -143,7 +143,7 @@ module.exports = (function() {
         add: ('add' in options) ? options.add : true,
         merge: ('merge' in options) ? options.merge : true,
         data: data,
-        success: function(collection, response) {
+        success: function(collection, response) { // jshint unused:true
           self.trigger('fetch.completed');
 
           delete self._isFetching;
@@ -182,7 +182,7 @@ module.exports = (function() {
         add: ('add' in options) ? options.add : true,
         merge: ('merge' in options) ? options.merge : true,
         data: data,
-        success: function(collection, response) {
+        success: function(collection, response) { // jshint unused:true
           delete self._isFetching;
 
           var responseIds = response.map(utils.idTransform);
@@ -220,22 +220,20 @@ module.exports = (function() {
 
     /* Ensure that an item is loaded, and call the callback once it is */
     ensureLoaded: function(id, callback, context) {
+      function done(err, item)  {
+        if (callback) {
+          callback.call(context, err, item);
+        }
+      }
+
       var existing = this.get(id);
       if (existing) {
-        if (callback) {
-          callback.call(context, null, existing);
-        }
-        return ;
+        return done(null, existing);
       }
 
       this.fetchAtPoint({ aroundId: id }, { }, function(err) {
-        if (err) return callback.call(context, err);
-        var existing = this.get(id);
-
-        if (callback) {
-          callback.call(context, null, existing);
-        }
-        return;
+        if (err) return done(err);
+        return done(null, this.get(id));
       }, this);
     },
 

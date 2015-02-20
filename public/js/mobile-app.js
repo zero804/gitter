@@ -20,6 +20,7 @@ var highlightPermalinkChats = require('./utils/highlight-permalink-chats');
 // Preload widgets
 require('views/widgets/avatar');
 require('views/widgets/timeago');
+require('components/ping');
 
 onready(function() {
 

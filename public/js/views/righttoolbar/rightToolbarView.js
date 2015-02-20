@@ -71,11 +71,11 @@ module.exports = (function() {
       }).render();
 
       searchView.on('search:expand', function () {
-        $('.right-toolbar').addClass('expand');
+        $('.right-toolbar').addClass('right-toolbar--expanded');
       });
 
       searchView.on('search:collapse', function () {
-        $('.right-toolbar').removeClass('expand');
+        $('.right-toolbar').removeClass('right-toolbar--expanded');
       });
 
       searchView.on('search:show', function () {
