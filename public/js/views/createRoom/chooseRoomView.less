@@ -1,7 +1,16 @@
 @import "parentSelectView";
 
 .permission {
-  display: flex !important;
+  display: flex;
+  padding-bottom: 5px;
+}
+
+.permission h3 {
+  line-height: 1;
+}
+
+.permission.hide {
+  display: none;
 }
 
 .permission__icon {
@@ -10,13 +19,9 @@
   padding: 0 5px;
 }
 
-.permission__icon i {
-  width: 16px;
-}
-
 .permission__icon--large {
   width: 32px;
-  padding: 5px 5px 0;
+  padding: 0 5px;
 }
 
 .permission__icon--large i {
@@ -32,8 +37,4 @@
   text-align: center;
   flex-grow: 0;
   flex-shrink: 0;
-}
-
-.permission__input--offtop {
-  margin-top: 5px;
 }
