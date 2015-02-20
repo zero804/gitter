@@ -117,7 +117,7 @@ gulp.task('localtest', function() {
 gulp.task('fasttest', function() {
   return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
     .pipe(mocha({
-      reporter: 'nyan',
+      reporter: 'spec',
       grep: '#slow',
       invert: true,
       env: {
