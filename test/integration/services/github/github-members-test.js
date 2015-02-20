@@ -6,7 +6,7 @@ var testRequire = require('../../test-require');
 var assert = require('assert');
 var Q = require('q');
 
-describe('github-members', function() {
+describe('github-members #slow', function() {
 
   it('throws if there isnt a proper githubType', function(done) {
     var githubMembers = testRequire('./services/github/github-members');

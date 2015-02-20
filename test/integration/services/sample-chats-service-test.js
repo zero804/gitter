@@ -5,7 +5,7 @@ var sampleChatsService = testRequire("./services/sample-chats-service");
 
 describe('sample-chats-service', function() {
 
-  it('should return sample chats', function(done) {
+  it('should return sample chats #slow', function(done) {
     sampleChatsService.getSamples()
       .then(function(chats) {
         console.log(chats);

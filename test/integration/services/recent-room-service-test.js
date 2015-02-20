@@ -5,16 +5,10 @@
 var testRequire = require('../test-require');
 var assert = require('assert');
 var fixtureLoader = require('../test-fixtures');
-var winston = require('winston');
 
 
 var recentRoomService = testRequire("./services/recent-room-service");
 var persistenceService = testRequire("./services/persistence-service");
-
-function printFavs(favs) {
-  var f = JSON.parse(JSON.stringify(favs));
-  winston.info('Favourites', f);
-}
 
 describe('recent-room-service', function() {
   describe('ordering', function() {
@@ -34,79 +28,65 @@ describe('recent-room-service', function() {
     });
 
     it('should rearrange the order of favourites correctly',function(done) {
+      this.timeout(10000);
 
       function getFavs() {
         return recentRoomService.findFavouriteTroupesForUser(fixture.user1.id);
       }
 
-      winston.info('Setting ' + fixture.troupe1.id + ' in position 1');
-
       recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe1.id, 1)
         .then(getFavs)
         .then(function(favs) {
-          printFavs(favs);
           assert.equal(favs[fixture.troupe1.id], 1);
         })
         .then(function() {
-          winston.info('Setting ' + fixture.troupe2.id + ' in position 1');
           return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe2.id, 1);
         })
         .then(getFavs)
         .then(function(favs) {
-          printFavs(favs);
           assert.equal(favs[fixture.troupe1.id], 2);
           assert.equal(favs[fixture.troupe2.id], 1);
         })
         .then(function() {
-          winston.info('Setting ' + fixture.troupe2.id + ' in position 3');
           return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe2.id, 3);
         })
         .then(getFavs)
         .then(function(favs) {
-          printFavs(favs);
           assert.equal(favs[fixture.troupe1.id], 2);
           assert.equal(favs[fixture.troupe2.id], 3);
         })
         .then(function() {
-          winston.info('Setting ' + fixture.troupe3.id + ' in position 1');
           return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe3.id, 1);
         })
         .then(getFavs)
         .then(function(favs) {
-          printFavs(favs);
           assert.equal(favs[fixture.troupe3.id], 1);
           assert.equal(favs[fixture.troupe1.id], 2);
           assert.equal(favs[fixture.troupe2.id], 3);
         })
         .then(function() {
-          winston.info('Setting ' + fixture.troupe2.id + ' in position 2');
           return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe2.id, 2);
         })
         .then(getFavs)
         .then(function(favs) {
-          printFavs(favs);
           assert.equal(favs[fixture.troupe3.id], 1);
           assert.equal(favs[fixture.troupe2.id], 2);
           assert.equal(favs[fixture.troupe1.id], 3);
         })
         .then(function() {
-          winston.info('Setting ' + fixture.troupe1.id + ' in position 4');
           return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe1.id, 4);
         })
         .then(getFavs)
         .then(function(favs) {
-          printFavs(favs);
           assert.equal(favs[fixture.troupe3.id], 1);
           assert.equal(favs[fixture.troupe2.id], 2);
           assert.equal(favs[fixture.troupe1.id], 4);
         })
         .then(function() {
-          winston.info('Setting ' + fixture.troupe4.id + ' in position 1');
           return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe4.id, 1);
         })
         .then(getFavs)
         .then(function(favs) {
-          printFavs(favs);
           assert.equal(favs[fixture.troupe4.id], 1);
           assert.equal(favs[fixture.troupe3.id], 2);
           assert.equal(favs[fixture.troupe2.id], 3);

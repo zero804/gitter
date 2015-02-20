@@ -25,6 +25,8 @@ var chatSearchService    = require('./chat-search-service');
 var unreadItemService    = require('./unread-item-service');
 var markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 
+var useHints = true;
+
 /*
  * Hey Trouper!
  * This is a changelog of sorts for changes to message processing & metadata.
@@ -271,8 +273,8 @@ function getDateOfFirstMessageInRoom(troupeId) {
   return ChatMessage
     .where('toTroupeId', troupeId)
     .limit(1)
-    .select({ sent: 1 })
-    .sort({ _id: 'asc' })
+    .select({ _id: 0, sent: 1 })
+    .sort({ sent: 'asc' })
     .lean()
     .execQ()
     .then(function(r) {
@@ -280,6 +282,7 @@ function getDateOfFirstMessageInRoom(troupeId) {
       return r[0].sent;
     });
 }
+exports.getDateOfFirstMessageInRoom = getDateOfFirstMessageInRoom;
 
 /*
  * this does a massive query, so it has to be cached for a long time
@@ -299,6 +302,21 @@ function historyForTroupeExceedsDate(troupeId, maxHistoryDate) {
     .then(function(firstMessageSent) {
       return !!(firstMessageSent && firstMessageSent < maxHistoryDate);
     });
+}
+
+
+/**
+ * Mongo timestamps have a resolution down to the second, whereas
+ * sent times have a resolution down to the milliseond.
+ * To ensure that there is an overlap, we need to slightly
+ * extend the search range using these two functions.
+ */
+function sentBefore(objectId) {
+  return new Date(objectId.getTimestamp().valueOf() + 1000);
+}
+
+function sentAfter(objectId) {
+  return new Date(objectId.getTimestamp().valueOf() - 1000);
 }
 
 /**
@@ -327,31 +345,45 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
 
         if(options.beforeId) {
           var beforeId = new ObjectID(options.beforeId);
+          // Also add sent as this helps mongo by using the { troupeId, sent } index
+          q = q.where('sent').lte(sentBefore(beforeId));
           q = q.where('_id').lt(beforeId);
         }
 
         if(options.beforeInclId) {
           var beforeInclId = new ObjectID(options.beforeInclId);
+          // Also add sent as this helps mongo by using the { troupeId, sent } index
+          q = q.where('sent').lte(sentBefore(beforeInclId));
           q = q.where('_id').lte(beforeInclId); // Note: less than *or equal to*
         }
 
         if(options.afterId) {
           // Reverse the initial order for afterId
-          var afterId = new ObjectID(options.afterId);
           sentOrder = 'asc';
+
+          var afterId = new ObjectID(options.afterId);
+          // Also add sent as this helps mongo by using the { troupeId, sent } index
+          q = q.where('sent').gte(sentAfter(afterId));
           q = q.where('_id').gt(afterId);
         }
 
-        if(maxHistoryDate) {
+        if (useHints) {
+          q.hint({ toTroupeId: 1, sent: -1 });
+        }
+
+        if (maxHistoryDate) {
           q = q.where('sent').gte(maxHistoryDate);
         }
 
         return q.sort(options.sort || { sent: sentOrder })
           .limit(limit)
           .skip(skip)
+          .lean()
           .execQ()
           .then(function(results) {
             var limitReached = false;
+
+            mongooseUtils.addIdToLeanArray(results);
 
             if(sentOrder === 'desc') {
               results.reverse();
@@ -370,17 +402,26 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
 
       var q1 = ChatMessage
                 .where('toTroupeId', troupeId)
+                .where('sent').lte(sentBefore(aroundId))
+                .where('_id').lte(aroundId)
                 .sort({ sent: 'desc' })
-                .limit(halfLimit)
-                .where('_id').lte(aroundId);
+                .lean()
+                .limit(halfLimit);
 
       var q2 = ChatMessage
                 .where('toTroupeId', troupeId)
+                .where('sent').gte(sentAfter(aroundId))
+                .where('_id').gt(aroundId)
                 .sort({ sent: 'asc' })
-                .limit(halfLimit)
-                .where('_id').gt(aroundId);
+                .lean()
+                .limit(halfLimit);
 
-      if(maxHistoryDate) {
+      if (useHints) {
+        q1.hint({ toTroupeId: 1, sent: -1 });
+        q2.hint({ toTroupeId: 1, sent: -1 });
+      }
+
+      if (maxHistoryDate) {
         q1 = q1.where('sent').gte(maxHistoryDate);
         q2 = q2.where('sent').gte(maxHistoryDate);
       }
@@ -392,6 +433,9 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
         ])
         .spread(function(a, b) {
           var limitReached = false;
+
+          mongooseUtils.addIdToLeanArray(a);
+          mongooseUtils.addIdToLeanArray(b);
 
           // Got back less results than we were expecting?
           if(maxHistoryDate && a.length < halfLimit) {
@@ -539,3 +583,10 @@ exports.searchChatMessagesForRoom = function(troupeId, textQuery, options) {
         });
     });
 };
+
+exports.testOnly = {
+  setUseHints: function(value) {
+    useHints = value;
+  }
+};
+

@@ -11,6 +11,7 @@ require('utils/tracking');
 // Preload widgets
 require('views/widgets/avatar');
 require('views/widgets/timeago');
+require('components/ping');
 
 onready(function() {
   new UserHomeView({ el: '#userhome' }).render();

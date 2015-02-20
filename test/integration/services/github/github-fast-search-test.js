@@ -7,7 +7,7 @@ var assert = require("assert");
 
 var FAKE_USER = { username: 'gittertestbot', githubToken: '***REMOVED***'};
 
-describe('github-fast-search', function() {
+describe('github-fast-search #slow', function() {
   it('has type:user flag formatted correctly', function(done) {
     var Search = testRequire.withProxies('./services/github/github-fast-search', {
       './request-wrapper': {

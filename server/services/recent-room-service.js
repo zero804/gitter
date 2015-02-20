@@ -59,7 +59,6 @@ function generateRoomListForUser(userId) {
  * Called when the user removes a room from the left hand menu.
  */
 function removeRecentRoomForUser(userId, roomId, isMember) {
-  winston.verbose('recent-rooms: removeRecentRoomForUser');
   assert(mongoUtils.isLikeObjectId(userId));
   assert(mongoUtils.isLikeObjectId(roomId));
 
@@ -74,8 +73,6 @@ function removeRecentRoomForUser(userId, roomId, isMember) {
  * Internal call
  */
 function addTroupeAsFavouriteInLastPosition(userId, troupeId) {
-  winston.verbose('recent-rooms: addTroupeAsFavouriteInLastPosition');
-
   return findFavouriteTroupesForUser(userId)
     .then(function(userTroupeFavourites) {
       var lastPosition = lazy(userTroupeFavourites)
@@ -85,8 +82,6 @@ function addTroupeAsFavouriteInLastPosition(userId, troupeId) {
 
       var setOp = {};
       setOp['favs.' + troupeId] = lastPosition;
-
-      winston.verbose('recent-rooms: using position ' + lastPosition);
 
       return persistence.UserTroupeFavourites.updateQ(
         { userId: userId },
@@ -98,12 +93,8 @@ function addTroupeAsFavouriteInLastPosition(userId, troupeId) {
 
 
 function addTroupeAsFavouriteInPosition(userId, troupeId, position) {
-  winston.verbose('recent-rooms: addTroupeAsFavouriteInPosition ' + position);
-
   return findFavouriteTroupesForUser(userId)
     .then(function(userTroupeFavourites) {
-      winston.verbose('recent-rooms: user favourites before: ', userTroupeFavourites);
-
       var values = lazy(userTroupeFavourites)
         .pairs()
         .filter(function(a) {
@@ -141,8 +132,6 @@ function addTroupeAsFavouriteInPosition(userId, troupeId, position) {
       var update = {$set: set};
       if (!_.isEmpty(inc)) update.$inc = inc; // Empty $inc is invalid
 
-      winston.verbose('recent-rooms: Issuing changes: ', update);
-
       return persistence.UserTroupeFavourites.updateQ(
         { userId: userId },
         update,
@@ -153,8 +142,6 @@ function addTroupeAsFavouriteInPosition(userId, troupeId, position) {
 }
 
 function clearFavourite(userId, troupeId) {
-  winston.verbose('recent-rooms: clearFavourite', { userId: userId, troupeId: troupeId });
-
   var setOp = {};
   setOp['favs.' + troupeId] = 1;
 
@@ -166,7 +153,6 @@ function clearFavourite(userId, troupeId) {
 }
 
 function updateFavourite(userId, troupeId, favouritePosition) {
-  winston.verbose('recent-rooms: updateFavourite', { userId: userId, troupeId: troupeId, position: favouritePosition});
   var op;
 
   if(favouritePosition) {
@@ -183,8 +169,6 @@ function updateFavourite(userId, troupeId, favouritePosition) {
 
 
   return op.then(function(position) {
-    winston.verbose('recent-rooms: position is now: ' + position);
-
     // TODO: in future get rid of this but this collection is used by the native clients
     appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, favourite: position });
   });
@@ -249,8 +233,6 @@ function saveUserTroupeLastAccessWithLimit(userId, troupeId) {
  * Returns a promise of nothing
  */
 function saveLastVisitedTroupeforUserId(userId, troupeId, callback) {
-  winston.verbose("recent-rooms: Saving last visited Troupe for user: " + userId+ " to troupe " + troupeId);
-
   var lastAccessTime = new Date();
 
   var setOp = {};

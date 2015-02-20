@@ -30,7 +30,7 @@ describe("User Service", function() {
       .nodeify(done);
   });
 
-  it('should be able to create a \'ghost\' user using his username', function(done) {
+  it('should be able to create a \'ghost\' user using his username #slow', function(done) {
     var userService = testRequire("./services/user-service");
 
     userService.createInvitedUser('node-gitter')
