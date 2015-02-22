@@ -1,95 +1,40 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var Q = require('q');
 var wrap = require('./github-cache-wrapper');
-var createClient = require('./github-client');
-var badCredentialsCheck = require('./bad-credentials-check');
+var gittercat = require('./gittercat-client');
+var userTokenSelector = require('./user-token-selector').full;
 
 function GitHubOrgService(user) {
   this.user = user;
-  this.client = createClient.full(user);
+  this.accessToken = userTokenSelector(user);
 }
 
 /**
  * Returns the details of an org
  */
 GitHubOrgService.prototype.getOrg = function(org) {
-  var ghorg  = this.client.org(org);
-  var d = Q.defer();
-  ghorg.info(createClient.makeResolver(d));
-
-  return d.promise
-    .fail(badCredentialsCheck)
-    .fail(function(err) {
-      if(err.statusCode === 404) return null;
-      throw err;
-    });
+  return gittercat.org.get(org, { accessToken: this.accessToken });
 };
 
 /**
  * Returns the list of users with publisized membership to an organisation
  */
 GitHubOrgService.prototype.members = function(org) {
-  var ghorg  = this.client.org(org);
-  var d = Q.defer();
-  ghorg.members(createClient.makeResolver(d));
-  return d.promise
-    .fail(badCredentialsCheck);
+  return gittercat.orgMember.listMembers(org, { accessToken: this.accessToken });
 };
 
 GitHubOrgService.prototype.member = function(org, username) {
-  var ghorg  = this.client.org(org);
-  var d = Q.defer();
-  ghorg.member(username, createClient.makeResolver(d));
-
-  return d.promise
-    .fail(badCredentialsCheck)
-    .fail(function(err) {
-      if(err.statusCode === 404) return false;
-      throw err;
-    });
+  return gittercat.orgMember.checkMembershipForUser(org, username, { accessToken: this.accessToken });
 };
 
 GitHubOrgService.prototype.getRepos = function(org) {
-  var ghorg  = this.client.org(org);
-  var d = Q.defer();
-  ghorg.repos(createClient.makeResolver(d));
-  return d.promise
-    .fail(badCredentialsCheck);
-
-};
-
-// Deprecated by new GitHub memberships API
-GitHubOrgService.prototype.getOwners = function(org) {
-  var ghorg  = this.client.org(org);
-  var d = Q.defer();
-  var self = this;
-  ghorg.teams(function(err, teams) {
-    if (err) return d.reject(err);
-    var owners = teams.filter(function(team) { if (team.slug === 'owners') return team; })[0];
-
-    if (!owners) return d.reject(new Error('Org "' + org + '" has no owners team'));
-
-    self.client.team(owners.id).members(createClient.makeResolver(d));
-  });
-  return d.promise
-    .fail(badCredentialsCheck);
+  return gittercat.repo.listForOrg(org, { accessToken: this.accessToken });
 };
 
 GitHubOrgService.prototype.getMembership = function(org, username) {
-  var ghorg  = this.client.org(org);
-  var d = Q.defer();
-  ghorg.getMembership(username, function(err, membership) {
-    if (err) return d.reject(err);
-    d.resolve(membership);
-  });
-  return d.promise
-    .fail(badCredentialsCheck);
+  return gittercat.orgMember.getMembershipForUser(org, username, { accessToken: this.accessToken });
 };
 
-
-// module.exports = GitHubOrgService;
 module.exports = wrap(GitHubOrgService, function() {
-  return [this.user && (this.user.githubUserToken || this.user.githubToken) || ''];
+  return [this.accessToken || ''];
 });

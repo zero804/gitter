@@ -1,29 +1,17 @@
 "use strict";
 
-var Q = require('q');
 var wrap = require('./github-cache-wrapper');
-var createClient = require('./github-client');
-var badCredentialsCheck = require('./bad-credentials-check');
+var gittercat = require('./gittercat-client');
+var userTokenSelector = require('./user-token-selector').full;
 
 function GitHubContributorService(user) {
   this.user = user;
-  this.client = createClient.full(user);
+  this.accessToken = userTokenSelector(user);
 }
 
 /** Returns an array of usernames of all contributors to a repo */
 GitHubContributorService.prototype.getContributors = function(repo) {
-  var d = Q.defer();
-
-  var ghrepo = this.client.repo(repo);
-  ghrepo.contributors(createClient.makeResolver(d));
-
-  return d.promise
-    .then(function(contributors) {
-      if(!contributors) return [];
-
-      return contributors;
-    })
-    .fail(badCredentialsCheck);
+  return gittercat.repo.listContributors(repo, { accessToken: this.accessToken });
 };
 
 module.exports = wrap(GitHubContributorService, function() {

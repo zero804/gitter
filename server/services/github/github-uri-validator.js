@@ -1,17 +1,13 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var GitHubOrgService = require('./github-org-service');
 var GitHubRepoService = require('./github-repo-service');
 var Q = require('q');
-var winston = require('../../utils/winston');
 
 function validateOrgUri(user, uri) {
   var orgService = new GitHubOrgService(user);
   return orgService.getOrg(uri)
     .then(function(org) {
-      winston.verbose('URI ' + uri + ' is an org?' + !!org);
-
       if(org) return ['ORG', org.login, org.name];
 
       return [];
@@ -33,7 +29,6 @@ function validateRepoUri(user, uri) {
  * @returns promise of ORG / REPO or null
  */
 function validateUri(user, uri) {
-  winston.verbose('Attempting to validate uri ' + uri + ' with GitHub');
   var parts = uri.split('/');
   if(parts.length == 1) {
     /** Its a user or org.

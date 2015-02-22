@@ -61,6 +61,18 @@ describe('github-org-service #slow', function() {
         .nodeify(done);
     });
 
+    it('should return membership information for an org', function(done) {
+      var gh = new GithubOrgService(GITTER_TEST_BOT);
+
+      gh.getMembership('gitterTest', 'gittertestbot')
+        .then(function(membership) {
+          assert('gitterTest', membership.organization.login);
+          assert('gittertestbot', membership.user.login);
+        })
+        .nodeify(done);
+    });
+
+
   });
 
 });
