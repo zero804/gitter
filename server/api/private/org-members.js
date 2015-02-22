@@ -8,6 +8,17 @@ var userService        = require('../../services/user-service');
 var StatusError        = require('statuserror');
 var Q                  = require('q');
 
+function listOrgMembers(user, uri) {
+  var ghMe = new GitHubMeService(user);
+  return ghMe.isOrgAdmin(uri)
+    .then(function(isAdmin) {
+      if (!isAdmin) throw new StatusError(403);
+
+      var ghOrg = new GitHubOrgService(user);
+      return ghOrg.members(uri);
+    });
+}
+
 /* Only org owners get to call this service */
 module.exports = function(req, res, next) {
   var uri = req.params.orgUri;
@@ -20,20 +31,11 @@ module.exports = function(req, res, next) {
         return userService.findById(req.query.on_behalf_of)
           .then(function(user) {
             if(!user) throw new StatusError(404);
-
-            var ghOrg = new GitHubOrgService(user);
-            return ghOrg.members(uri);
+            return listOrgMembers(user, uri);
           });
       }
 
-      var ghMe = new GitHubMeService(user);
-      return ghMe.isOrgAdmin(uri)
-        .then(function(isAdmin) {
-          if (!isAdmin) throw new StatusError(403);
-
-          var ghOrg = new GitHubOrgService(user);
-          return ghOrg.members(uri);
-        });
+      return listOrgMembers(req.user, uri);
     })
     .then(function(orgMembers) {
       var usernames = orgMembers.map(function(user) { return user.login; });

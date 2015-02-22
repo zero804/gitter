@@ -53,6 +53,11 @@ module.exports = exports = function(request) {
 
 
   return function requestWrapper(options, callback) {
+    /* Allow clients to disable this */
+    if (options.firstPageOnly) {
+      return request(options, callback);
+    }
+
     /* Always fetch 100 items per page */
     options = updatePerPage(options);
 

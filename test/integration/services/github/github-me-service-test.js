@@ -54,6 +54,52 @@ describe('github-me-service #slow', function() {
   });
 
 
+  it('should return that you are and org admin when you are', function(done) {
+    var gh = new GithubMeService(FAKE_USER);
+
+    gh.isOrgAdmin('gitterTest')
+      .then(function(isOrgMember) {
+        assert(isOrgMember);
+      })
+      .nodeify(done);
+
+  });
+
+  it('should return that you are and org member when you are', function(done) {
+    var gh = new GithubMeService(FAKE_USER);
+
+    gh.isOrgMember('gitterTest')
+      .then(function(isOrgMember) {
+        assert(isOrgMember);
+      })
+      .nodeify(done);
+
+  });
+
+  it('should return org membership', function(done) {
+    var gh = new GithubMeService(FAKE_USER);
+
+    gh.getOrgMembership('gitterTest')
+      .then(function(membership) {
+        assert('gitterTest', membership.organization.login);
+        assert('gittertestbot', membership.user.login);
+      })
+      .nodeify(done);
+
+  });
+
+  it('should list all orgs the user is a member of', function(done) {
+    var gh = new GithubMeService(FAKE_USER);
+
+    gh.getOrgs()
+      .then(function(membership) {
+        assert(Array.isArray(membership));
+        assert(membership.length > 1);
+      })
+      .nodeify(done);
+
+  });
+
 
 
 
