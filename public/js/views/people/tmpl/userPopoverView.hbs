@@ -18,19 +18,39 @@
 
   <ul class="trpUserDetails">
     {{#if company}}
-    <li class="github-ORG">{{company}}</li>
+      <li>
+        <div class='trpUserDetails__icon'>
+          <i class='octicon octicon-organization'></i>
+        </div>
+        <span>{{ company }}</span>
+      </li>
     {{/if}}
 
     {{#if location}}
-    <li class="github-LOCATION">{{location}}</li>
+      <li>
+        <div class='trpUserDetails__icon'>
+          <i class='octicon octicon-location'></i>
+        </div>
+        <span>{{ location }}</span>
+      </li>
     {{/if}}
 
     {{#if email}}
-    <li class="github-MAIL"><a class="email" href="mailto:{{email}}">{{email}}</a></li>
+      <li>
+        <div class='trpUserDetails__icon'>
+          <i class='octicon octicon-mail'></i>
+        </div>
+        <a class="email" href="mailto:{{email}}">{{ email }}</a>
+      </li>
     {{/if}}
 
     {{#if blog}}
-    <li class="github-LINK"><a target="_blank" href="{{blogUrl}}" class="url" rel="nofollow me">{{blog}}</a></li>
+      <li>
+        <div class='trpUserDetails__icon'>
+          <i class='octicon octicon-link'></i>
+        </div>
+        <a target="_blank" href="{{blogUrl}}" class="url" rel="nofollow me">{{ blog }}</a>
+      </li>
     {{/if}}
   </ul>
 </div>

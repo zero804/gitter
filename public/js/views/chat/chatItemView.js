@@ -262,17 +262,22 @@ module.exports = (function() {
 
       if(!changes || 'isCollapsible' in changes) {
         var isCollapsible = this.model.get('isCollapsible');
-
         if(isCollapsible) {
           if (this.$el.find('.js-chat-item-collapse').length) return;
 
           var collapseElement = $(document.createElement('div'));
+          var icon = $(document.createElement('i'));
+          icon.addClass('octicon');
+
+          collapseElement.append(icon);
           collapseElement.addClass('js-chat-item-collapse');
 
           if(this.model.get('collapsed')) {
+            icon.addClass('octicon-unfold');
             collapseElement.addClass('chat-item__icon--expand');
           } else {
             collapseElement.addClass('chat-item__icon--collapse');
+            icon.addClass('octicon-fold');
           }
 
           this.$el.find('.js-chat-item-details').append(collapseElement);
@@ -405,11 +410,14 @@ module.exports = (function() {
       this.bindUIElements();
       var self = this;
       var embeds = self.$el.find('.embed');
+      var icon = this.ui.collapse.find('i');
 
       clearTimeout(self.embedTimeout);
 
       this.ui.collapse.removeClass('chat-item__icon--collapse');
       this.ui.collapse.addClass('chat-item__icon--expand');
+      icon.removeClass('octicon-fold');
+      icon.addClass('octicon-unfold');
 
       if(self.rollers) {
         embeds.each(function(i, e) {
@@ -431,7 +439,10 @@ module.exports = (function() {
       this.bindUIElements();
       var self = this;
       clearTimeout(self.embedTimeout);
+      var icon = this.ui.collapse.find('i');
 
+      icon.addClass('octicon-fold');
+      icon.removeClass('octicon-unfold');
       this.ui.collapse.removeClass('chat-item__icon--expand');
       this.ui.collapse.addClass('chat-item__icon--collapse');
 

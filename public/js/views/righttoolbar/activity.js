@@ -157,8 +157,6 @@ module.exports = (function() {
     return extra;
   }
 
-
-
   var ActivityItemView = Marionette.ItemView.extend({
     tagName: 'li',
     modelEvents: {
@@ -186,7 +184,7 @@ module.exports = (function() {
     },
 
     serializeData: function() {
-      try{
+      try {
         var meta    = this.model.get('meta');
         var payload = this.model.get('payload');
         var sent    = this.model.get('sent');
@@ -201,7 +199,7 @@ module.exports = (function() {
 
         var extra = meta.prerendered ? {} : getExtraRenderData(meta, payload);
         return _.extend(core, extra);
-      } catch(e) {
+      } catch (e) {
         var modelData = this.model && this.model.attributes;
         appEvents.trigger('bugreport', e, { extra: modelData });
         log.info('ERROR rendering activity item:', e.message, e.stack, modelData);

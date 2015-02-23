@@ -9,10 +9,16 @@
   }
 
   li {
+    position: relative;
     border-bottom: 1px dotted rgba(100,100,100,0.1);
     padding: 7px 7px 7px 15px;
     line-height: 20px;
     cursor: default;
+  }
+
+  li i {
+    position: absolute;
+    top: 10px;
   }
 
   li:hover {
@@ -53,6 +59,7 @@
   display: inline-block;
   opacity: 0.8;
   width: 205px;
+  padding-left: 1.5em;
 
   .mention {
     border: 1px solid fade(@trpGrey,40%);
