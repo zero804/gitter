@@ -14,8 +14,8 @@ describe('github-fast-search #slow', function() {
 
     search.findUsers('andrew newdigate')
       .then(function(results) {
-        assert(Array.isArray(results.items));
-        assert(results.items[0]);
+        assert(Array.isArray(results));
+        assert(results[0]);
       })
       .nodeify(done);
   });
