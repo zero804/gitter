@@ -81,7 +81,7 @@ gulp.task('test-mocha', function() {
 
   return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
     .pipe(mocha({
-      reporter: 'tap-file',
+      reporter: 'xunit-file',
       timeout: 10000,
       istanbul: {
         dir: 'output/coverage-reports/'
