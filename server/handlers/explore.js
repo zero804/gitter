@@ -2,7 +2,6 @@
 "use strict";
 
 var suggestedService = require('../services/suggested-room-service');
-var repoDescription = require('../services/github/github-fast-repo-description');
 var getRoughMessageCount = require('../services/chat-service').getRoughMessageCount;
 var Q = require('q');
 var langs = require('langs');
@@ -15,18 +14,15 @@ function trim(str) {
 }
 
 function getRoomRenderData(room) {
-  return Q.all([
-      room.githubType === 'REPO' ? repoDescription(room.uri) : room.topic,
-      getRoughMessageCount(room.id)
-    ])
-    .spread(function(description, messageCount) {
+  return getRoughMessageCount(room.id)
+    .then(function(messageCount) {
       var roomNameParts = room.uri.split('/');
 
       return {
         room: room,
         owner: roomNameParts[0],
         roomNameParts: roomNameParts,
-        description: description,
+        description: room.topic,
         messageCount: messageCount
       };
     });
