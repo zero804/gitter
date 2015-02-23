@@ -20,65 +20,65 @@
       </dd>
     </dl>
   </div>
-  <div id="permissions" class="gtrRoomPermissions">
-    <label id="permissions-label"><strong>Permissions</strong></label>
-    <div id="perm-select-public" class="permission-row">
-      <label>
-        <div><input name="permissions" type="radio" value="public"></div>
-        <span class="icon-public">
-          <span class="permission-label">
-            <strong>Public</strong>
-          </span>
-        </span>
-        <span class="description">Anyone in the world can join.</span>
+  <div id="permissions">
+    <h3>Permissions</h3>
+    <div id="perm-select-public" class="permission">
+      <div class='permission__input'>
+        <input name="permissions" id="perm-select-public-input"  type="radio" value="public">
+      </div>
+      <label for='perm-select-public-input'>
+        <div class='permission__icon permission__icon--large'>
+          <i class="octicon octicon-globe"></i>
+        </div>
+        <div class='permission__details'>
+          <span><strong>Public</strong></span>
+          <p>Anyone in the world can join.</p>
+        </div>
       </label>
     </div>
 
-    <div id="perm-select-inherited-org" class="permission-row">
-      <label>
-        <div><input name="permissions" type="radio" value="inherited"></div>
-        <span class="github-ORG">
-          <span id="perm-inherited-label" class="permission-label">
-           <strong>Organisation</strong>
-          </span>
-        </span>
-        <span class="description">Anyone in <strong id="parent-name">orgName</strong> can join. </span>
+    <div id="perm-select-inherited-org" class="permission">
+      <div class='permission__input'>
+        <input name="permissions" id="perm-select-inherited-org-input"  type="radio" value="inherited">
+      </div>
+      <label for='perm-select-inherited-org-input'>
+        <div class='permission__icon permission__icon--large'>
+          <i class="octicon octicon-organization"></i>
+        </div>
+        <div class='permission__details'>
+          <span><strong>Organisation</strong></span>
+          <p>Anyone in <strong id="parent-name">orgName</strong> can join. </p>
+        </div>
       </label>
     </div>
 
-    <div id="perm-select-inherited-repo" class="permission-row">
-      <label>
-        <div><input name="permissions" type="radio" value="inherited"></div>
-        <span class="github-REPO">
-          <span id="perm-inherited-label" class="permission-label">
-            <strong>Repository</strong>
-          </span>
-        </span>
-        <span class="description">Anyone in <strong id="parent-name">repoName</strong> can join. </span>
+    <div id="perm-select-inherited-repo" class="permission">
+      <div class='permission__input'>
+        <input name="permissions" id="perm-select-inherited-repo-input" type="radio" value="inherited">
+      </div>
+      <label for='perm-select-inherited-repo-input'>
+        <div class='permission__icon permission__icon--large'>
+          <i class="octicon octicon-repo"></i>
+        </div>
+        <div class='permission__details'>
+          <span><strong>Repository</strong></span>
+          <p>Anyone in <strong id="parent-name">repoName</strong> can join. </p>
+        </div>
       </label>
     </div>
 
-<!--     <div id="perm-select-existing-repo" class="permission-row">
-      <label>
-        <div><input name="permissions" type="radio" value="inherited"></div>
-        <span class="github-REPO">
-          <span id="perm-inherited-label" class="permission-label">
-            <strong>Repository</strong>
-          </span>
-        </span>
-        <span class="description">Anyone who can access <strong id="parent-name">repoName</strong> can join. </span>
-      </label>
-    </div> -->
-
-    <div id="perm-select-private" class="permission-row">
-      <label>
-        <div><input name="permissions" type="radio"  value="private"></div>
-        <span class="github-LOCK">
-          <span class="permission-label">
-            <strong>Private</strong>
-          </span>
-        </span>
-        <span class="description">Only people added to the room can join.</span>
+    <div id="perm-select-private" class="permission">
+      <div class='permission__input'>
+        <input name="permissions" id="perm-select-private-input" type="radio" value="inherited">
+      </div>
+      <label for='perm-select-private-input'>
+        <div class='permission__icon permission__icon--large'>
+          <i class="octicon octicon-lock"></i>
+        </div>
+        <div class='permission__details'>
+          <span><strong>Private</strong></span>
+          <p>Only people added to the room can join. </p>
+        </div>
       </label>
     </div>
 

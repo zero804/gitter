@@ -10,6 +10,7 @@ var execPreloads      = require('../exec-preloads');
 var getVersion        = require('../get-model-version');
 var billingService    = require('../../services/billing-service');
 var leanUserDao       = require('../../services/daos/user-dao').full;
+var resolveAvatarUrl  = require('../../../shared/avatars/resolve-avatar-url');
 
 function UserPremiumStatusStrategy() {
   var usersWithPlans;
@@ -119,19 +120,6 @@ UserPresenceInTroupeStrategy.prototype = {
   name: 'UserPresenceInTroupeStrategy'
 };
 
-function setAvatarSize(url, size) {
-  var sizeText;
-  if(!url || typeof url !== "string") return null;
-  if(size=='m') sizeText="s=128";
-  if(size=='s') sizeText="s=60";
-
-  if(url.indexOf('?') >= 0) {
-    return url + '&' + sizeText;
-  }
-
-  return url + '?' + sizeText;
-}
-
 function UserStrategy(options) {
   options = options ? options : {};
   var lean = !!options.lean;
@@ -184,6 +172,7 @@ function UserStrategy(options) {
         username: user.username,
         online: userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id) || undefined,
         role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.username) || undefined,
+        gv: user.gravatarVersion,
         invited: user.state === 'INVITED' || undefined, // true or undefined
         removed: user.state === 'REMOVED' || undefined, // true or undefined
         v: getVersion(user)
@@ -197,8 +186,9 @@ function UserStrategy(options) {
       displayName: options.exposeRawDisplayName ? user.displayName : user.getDisplayName(),
       fallbackDisplayName: options.exposeRawDisplayName && user.getDisplayName(),
       url: user.getHomeUrl(),
-      avatarUrlSmall: setAvatarSize(user.gravatarImageUrl,'s'),
-      avatarUrlMedium: setAvatarSize(user.gravatarImageUrl,'m'),
+      avatarUrlSmall: resolveAvatarUrl({ username: user.username, version: user.gravatarVersion, size: 60 }),
+      avatarUrlMedium: resolveAvatarUrl({ username: user.username, version: user.gravatarVersion, size: 128 }),
+      gv: user.gravatarVersion,
       scopes: scopes,
       online: userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id) || undefined,
       role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.username) || undefined,

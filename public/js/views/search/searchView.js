@@ -4,7 +4,7 @@ var apiClient = require('components/apiClient');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
 var Rollers = require('utils/rollers');
-var resolveAvatarUrl = require('utils/resolve-avatar-url');
+var resolveAvatarUrl = require('shared/avatars/resolve-avatar-url');
 var Backbone = require('backbone');
 var Marionette = require('marionette');
 var _ = require('underscore');
@@ -415,7 +415,6 @@ module.exports = (function() {
       }.bind(this));
 
       this.listenTo(this.model, 'change:active', function (m, active) {
-        this.$el.toggleClass('active', !!active);
 
         if (active) {
           this.triggerMethod('search:expand');

@@ -3,7 +3,6 @@
 
 @import "colors";
 @import "trpFonts";
-@import "icon-mixins";
 
 @import "trpModals";
 @import "trp3Common";
@@ -12,9 +11,9 @@
 @import "base-transition-mixins";
 
 @keyframes pulsey {
-    0% { opacity: 0.3; }
-    50% { opacity: 0.9; }
-    100% { opacity: 0.3; }
+  0% { opacity: 0.3; }
+  50% { opacity: 0.9; }
+  100% { opacity: 0.3; }
 }
 
 @keyframes spin {
@@ -66,15 +65,6 @@
 
 .pulse--fast {
   animation: pulsey 1s linear infinite;
-}
-
-.spinner {
-  .prepend-octicon('\f087');
-  animation: spin 1s infinite linear;
-}
-
-.isLoading {
-  .prepend-octicon('\f00a');
 }
 
 html {
@@ -217,13 +207,13 @@ ul.scrollList a {
   border-radius: 10px;
   background: rgba(100,100,100,0.2);
   margin-right: 1px;
-  .transition300ms;
+  .transition300ms(opacity);
 }
 .scroller:hover::-webkit-scrollbar-thumb {
   border-radius: 10px;
   background: rgba(100,100,100,0.4);
   margin-right: 1px;
-  .transition300ms;
+  .transition300ms(opacity);
 }
 .scroller::-webkit-scrollbar-thumb:window-inactive {
   background: rgba(0,0,0,0.1);
@@ -288,66 +278,6 @@ a:hover {
   }
 }
 
-body.logged-out {
-
-  .wrap-menu {
-    width: 350px;
-  }
-
-  .menu {
-    width: 350px;
-
-    @media @small {
-      left:-350px;
-      transition-delay: 0s;
-
-        &.visible {
-          transition-delay: 0.3s;
-          left: 0px;
-        }
-    }
-  }
-
-  .trpLeftMenuTab {
-    width: 50px;
-  }
-
-
-  .trpFramePanel {
-    @media @small {
-      margin-left: 0px;
-    }
-  }
-}
-
-.trpButtonMedium, .trpButtonBig {
-  .transition300ms;
-}
-
-.trpLeftMenuLogo {
-  padding: 20px;
-
-  .logo-container {
-    float: left;
-    background-image: url('../images/logo-text-white-48.png');
-    width: 244px;
-    height: 48px;
-    margin-bottom: 20px;
-
-    @media @retina {
-      background-image: url('../images/logo-text-white-48@2x.png');
-      background-size: contain;
-    }
-  }
-}
-
-.trpLeftMenuInfo {
-  .trpBodyMedium;
-  margin-bottom: 20px;
-  clear: both;
-  padding: 20px;
-}
-
 .trpLeftMenuSignup {
   box-sizing: border-box;
   padding: 0 20px;
@@ -361,7 +291,7 @@ body.logged-out {
 .trpToolbarHeaderItem {
   display: inline-block;
   opacity: 0.5;
-  .transition300ms;
+  .transition300ms(opacity);
 }
 
 .trpToolbarHeaderItem:hover {
@@ -374,70 +304,6 @@ body.logged-out {
 
 .trpToolbarHeaderItem.selected {
   opacity: 1;
-}
-
-.github-ORG {
-  .prepend-org-icon;
-  &:before {
-    font-size: 16px;
-  }
-}
-
-.github-ORG_CHANNEL {
-  .prepend-channel-icon;
-  &:before {
-    font-size: 16px;
-  }
-}
-
-.github-REPO {
-  .prepend-repo-icon;
-  &:before {
-    font-size: 16px;
-  }
-}
-
-.github-REPO_CHANNEL {
-  .prepend-channel-icon;
-  &:before {
-    font-size: 16px;
-  }
-}
-
-.github-USER_CHANNEL {
-  .prepend-channel-icon;
-  &:before {
-    font-size: 16px;
-  }
-}
-
-.github-LOCATION {
-  .prepend-icon-location;
-  &:before {
-    font-size: 16px;
-  }
-}
-
-.github-MAIL {
-  .prepend-icon-mail;
-  &:before {
-    font-size: 16px;
-  }
-}
-
-.github-LINK {
-  .prepend-icon-link;
-  &:before {
-    font-size: 16px;
-  }
-}
-
-
-.github-ONETOONE {
-  .prepend-121-icon;
-  &:before {
-    font-size: 16px;
-  }
 }
 
 .trpLeftMenuContainer {
@@ -477,17 +343,6 @@ body.logged-out {
 
 .selected {
 	opacity: 1;
-}
-
-
-.unread-normal .trpLeftMenuIcon[data-list="list-troupes"], .unread-one2one .trpLeftMenuIcon[data-list="list-users"] {
-	background-color: @trpPurple;
-	border: 1px solid white;
-	border-radius: 50em;
-}
-
-.trpLeftMenuSpacer {
-	height: 100px;
 }
 
 .disabled {
@@ -558,7 +413,6 @@ ul li.placeholder:before {
   height: 100%;
   position: relative;
   flex-grow: 1;
-  .transition500ms;
 }
 
 .loading-frame {
@@ -635,10 +489,6 @@ ul li.placeholder:before {
   }
 }
 
-.trpTroupeHelp img {
-  margin-right: 10px;
-}
-
 #people-list {
 
   .remaining {
@@ -686,7 +536,7 @@ ul.roster {
   padding: 0 5px;
   margin-right: 4px;
   font-size: 11px;
-  .transition300ms;
+  .transition300ms(background-color);
   margin-bottom: 12px;
 
   @media @mid {
@@ -707,22 +557,6 @@ ul.roster {
   background-color: fade(@trpLightBlue, 30%);
 }
 
-.build-started, .build-pending{
-  .prepend-build-start-icon;
-}
-
-.build-failure {
-  .prepend-build-failed-icon;
-}
-
-.build-fixed {
-  .prepend-build-passed-icon;
-}
-
-.build-failing, .build-broken, .build-failed {
-   .prepend-build-failed-icon;
-}
-
 .build-failure, .build-failing, .build-broken, .build-failed {
   color: @trpRed;
 
@@ -731,47 +565,11 @@ ul.roster {
   }
 }
 
-.build-passed, .build-success{
-  .prepend-build-passed-icon;
-}
-
-.trello-card-voted {
-  .prepend-trello-card-vote;
-}
-
-.trello-card-created {
-  .prepend-trello-card-create;
-}
-
-.trello-card-updated {
-  .prepend-trello-card-update;
-}
-
-.trello-card-commented {
-  .prepend-trello-card-update;
-}
-
-.github-push {
-  .prepend-push-icon;
-}
-
-.sprintly {
-  .prepend-icon-sprintly;
-}
-
-.huboard {
-  .prepend-icon-huboard;
-}
-
-.bitbucket {
-  .prepend-icon-bitbucket;
-}
-
 .prerendered {
-  position: relative;
+  // position: relative;
   .service-sprite {
     position: absolute;
-    top: 3px;
+    top: 10px;
     opacity: 0.8;
   }
   .gtrActivityItemText {
@@ -787,70 +585,6 @@ ul.roster {
       color: red;
     }
   }
-}
-
-.github-issue {
-  position: relative;
-}
-
-.github-issue-opened {
-  .prepend-issue-opened;
-}
-
-.github-issue-closed {
-  .prepend-issue-closed;
-}
-
-.github-issue-reopened {
-  .prepend-issue-reopened;
-}
-
-.github-issue-labeled {
-  .prepend-issue-labeled;
-}
-
-.github-issue-unlabeled {
-  .prepend-issue-unlabeled;
-}
-
-.github-issue-assigned {
-  .prepend-issue-assigned;
-}
-
-.github-issue-unassigned {
-  .prepend-issue-unassigned;
-}
-
-.github-member-add {
-  .prepend-member-add;
-}
-
-.github-public {
-  .prepend-public;
-}
-
-.github-watch {
-  .prepend-watch;
-}
-
-.github-wiki {
-  .prepend-wiki;
-}
-
-.github-fork {
-  .prepend-fork;
-}
-
-.github-comment, .github-issue_comment, .github-commit_comment{
-  .prepend-comment;
-}
-
-.github-sync {
-  .prepend-sync;
-}
-
-.github-pull-request {
-  .prepend-pull-request;
 }
 
 .webhook {
@@ -955,7 +689,7 @@ ul.roster {
   cursor: pointer;
   padding-bottom: 12px;
   z-index: 200;
-  /* MB: The below is bad, but not sure how to convert output of RGBA -> Hex without opactiy*/
+  /* MB: The below is bad, but not sure how to convert output of RGBA -> Hex without opacity*/
   /* E.g. fade(@light,20%) without opacity */
   background-color: #FBFBFB;
 }
@@ -1030,11 +764,17 @@ ul.trpUserDetails {
 
   & li {
     max-width: 100%;
-    padding: 2px 0 2px 20px;
+    padding: 2px 0;
     overflow-x: hidden;
     font-size: 14px;
     text-overflow: ellipsis;
   }
+}
+
+.trpUserDetails__icon {
+  display: inline-block;
+  width: 20px;
+  text-align: center;
 }
 
 .trpUserDetailActions {
@@ -1048,21 +788,4 @@ ul.trpUserDetails {
   border-bottom: 1px solid #eee;
   padding: 4px 2px;
   margin-bottom: 4px;
-}
-
-.octicon-organisation {
-  .prepend-icon-organisation();
-}
-.octicon-location {
-  .prepend-icon-location();
-}
-.octicon-link {
-  .prepend-icon-link();
-}
-.octicon-clock {
-  .prepend-icon-clock();
-}
-
-.octicon-mail {
-  .prepend-icon-mail();
 }

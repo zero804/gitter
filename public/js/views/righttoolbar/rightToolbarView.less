@@ -23,7 +23,8 @@
   bottom: 0;
   background-color: fade(@light,20%);
   z-index: 100;
-  .transition500ms;
+
+  transition: width 200ms ease-in-out;
 
   p {
     font-family: 'Open Sans';
@@ -141,13 +142,18 @@
 }
 
 .right-toolbar__header {
+  height: 70px;
+  border-bottom: 1px solid rgb(240, 240, 240);
   flex-shrink: 0;
+  display: flex;
+  align-items: stretch;
 }
 
 .right-toolbar__body {
   height: 100%;
   flex-shrink: 1;
   overflow: auto;
+  padding-top: 10px;
 }
 
 .right-toolbar__footer {
@@ -155,12 +161,18 @@
   width: 100%;
 }
 
-.trpTroupeHelp {
-  padding: 23px 0 23px 10px;
+.support {
+  box-sizing: border-box;
+  text-align: center;
+  border-top: 1px solid rgba(0, 0, 0, .05);
+  padding: 25px 10px;
   @media @mid {
     display: inline-block;
     width: 100%;
-    padding-left: 18px;
     opacity: 0.6;
   }
+}
+
+.support:hover {
+  background-color: rgba(241,240,237,.4);
 }

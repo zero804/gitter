@@ -1,5 +1,6 @@
+
 {
-  "watch": ["server"],
+  "watch": ["server", "shared"],
   "ext": "js",
   "env": {
     "NODEMON": "1"

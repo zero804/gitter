@@ -4,8 +4,6 @@
 
 .chat-header {
 
-  .transition500ms;
-
   box-sizing: border-box;
 
   z-index: @l1;
@@ -35,7 +33,6 @@ body.banner-top {
   height: @banner-height;
   z-index: -1;
 
-  .transition500ms();
   margin-left: 44px;
   margin-right: 40px;
   @media @mid {
@@ -54,7 +51,6 @@ body.banner-top {
     right: 0;
     height: @banner-height;
 
-    .transition500ms();
     &.slide-away {
       top: (-@banner-height);
     }
@@ -130,39 +126,18 @@ body.banner-top {
     cursor: pointer;
     opacity: 0.4;
     transition: opacity .2s ease-in-out;
+    font-size: 20px;
+    font-style: normal;
   }
-
-  //.prepend-star-icon()
 
   i:hover {
     opacity: 1;
   }
 
-  i.favourite {
+  .favourite {
     opacity: 1;
-  }
-
-  /**/
-  i:before {
-    font-family: 'octicons';
-    content: '\f02a';
-    font-size: 20px;
-
-    font-style: normal;
-    font-smoothing: antialiased;
-  }
-
-  i.favourite:before {
-    font-family: 'octicons';
-    content: '\f02a';
     color: #f1c40f;
-    font-size: 20px;
-    font-style: normal;
-    font-smoothing: antialiased;
-    color: #f1c40f;
-    opacity: 1;
   }
-
 }
 
 
@@ -197,18 +172,6 @@ body.banner-top {
     }
   }
 
-  .private:after {
-      font-family: 'octicons';
-      content: '\f06a';
-      font-size: 16px;
-      font-style: normal;
-      font-smoothing: antialiased;
-      position: relative;
-      top: -2px;
-      left: 5px;
-      color: #666;
-  }
-
   p {
     white-space: normal;
     word-wrap: break-word;
@@ -229,6 +192,18 @@ body.banner-top {
   }
 }
 
+.chat-header__content h1 .octicon-lock:before {
+  font-size: 16px;
+  position: relative;
+  top: -3px;
+  left: 5px;
+  color: #666;
+}
+
+.chat-header__content .icon-lock {
+  font-size: 16px;
+}
+
 .chat-header__buttons {
   float: right;
 }
@@ -244,13 +219,6 @@ body.banner-top {
     cursor: pointer;
     opacity: 0.4;
     transition: opacity .2s ease-in-out;
-  }
-
-  i:before {
-    font-family: 'octicons';
-    content: '\f031';
-    font-style: normal;
-    font-size: 18px;
   }
 
   i:hover {

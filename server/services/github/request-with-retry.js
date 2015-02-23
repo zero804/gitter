@@ -10,6 +10,11 @@ module.exports = exports = function(options, request) {
   var exponentialBackoffFactor = options.exponentialBackoffFactor || 1;
 
   return function requestWrapper(options, callback) {
+    /* Allow callers to disable retry */
+    if (options.noRetry) {
+      return request(options, callback);
+    }
+
     function attempt() {
       var start = Date.now();
 

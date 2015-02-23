@@ -582,8 +582,8 @@ exports.searchChatMessagesForRoom = function(troupeId, textQuery, options) {
           return [chatsOrdered, limitReached];
         });
     });
-};
 
+};
 exports.testOnly = {
   setUseHints: function(value) {
     useHints = value;

@@ -4,13 +4,60 @@
   100% { box-shadow: 0 0 0px #1bee82; color: #1bee82;  }
 }
 
+@room-list-item-height: 26px;
+
 .room-list-item {
-  padding-left: 4px;
-  margin-left: 12px;
-  cursor: pointer;
-  padding-bottom: 2px;
+  align-items: center;
+  display: flex;
+  flex-grow: 1;
   list-style: none;
-  line-height: 26px;
+  cursor: pointer;
+  line-height: @room-list-item-height;
+  padding: 0 0 0 4px;
+}
+
+.room-list-item__icon {
+  flex-grow: 0;
+  flex-shrink: 0;
+  font-size: 16px;
+  text-align: center;
+  align-self: flex-start;
+  line-height: @room-list-item-height;
+  padding: 0 0.625/2em 0 0;
+  width: 29px;
+}
+
+.room-list-item__name {
+  display: inline-block;
+  padding: 0 10px 0 0;
+  flex-grow: 1;
+  line-height: @room-list-item-height;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: block;
+  overflow: hidden;
+}
+
+.room-list-item__action {
+  display: none;
+  align-self: flex-end;
+  flex-shrink: 0;
+  line-height: @room-list-item-height;
+  text-align: right;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+
+.room-list-item__action:hover {
+  opacity: 1;
+}
+
+.room-list-item .room-list-item__action:last-of-type {
+  padding-right: 0.625/2em;
+}
+
+body.hover .room-list-item:hover .room-list-item__action {
+  display: inline-block;
 }
 
 body.hover .room-list-item:hover:not(.room-list-item--current-room),
@@ -21,6 +68,31 @@ body.hover .room-list-item:hover:not(.room-list-item--current-room),
   &.chatting:after {
     display: none;
   }
+}
+
+.room-list-item__unread-badge {
+  flex-shrink: 0;
+  display: none;
+  border-radius: 4px;
+  display: block;
+  padding: 0 4px;
+  font-size: 10px;
+  height: 15px;
+  line-height: 15px;
+  font-weight: 700;
+  color: white;
+  white-space: nowrap;
+  background-color: @trpGreen;
+  margin-right: 0.8em;
+}
+
+.room-list-item__unread-badge.shown {
+  display: inline;
+}
+
+.room-list-item__unread-badge.mention {
+  background-color: @trpRed;
+  font-weight: 300;
 }
 
 .room-list-item--current-room {
@@ -36,10 +108,8 @@ body.hover .room-list-item:hover:not(.room-list-item--current-room),
   border-radius: 50em;
   background-color: #1dce73;
   position: relative;
-  top: 13px;
   right: 10px;
   content: ' ';
-  float: right
 }
 
 .room-list-item.chatting.chatting-now:after {
@@ -49,108 +119,7 @@ body.hover .room-list-item:hover:not(.room-list-item--current-room),
   animation-timing-function: linear;
 }
 
-.room-list-item__name {
-  display: inline-block;
-}
-
-.room-list-item__name--favourite {
-  .prepend-fav-icon;
-}
-
-.room-list-item__name--repo {
-  .prepend-repo-icon;
-}
-
-.room-list-item__name--channel {
-  .prepend-channel-icon;
-}
-
-.room-list-item__name--org {
-  .prepend-org-icon;
-}
-
-.room-list-item__name--suggested {
-  .prepend-watch;
-};
-
-.room-list-item__name--onetoone {
-  .prepend-121-icon;
-}
-
-body.hover .room-list-item:hover span {
-  max-width: 165px;
-}
-
-.room-list-item span {
-  white-space: nowrap;
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  vertical-align: middle;
-}
-
-.room-list-item .item-unread-badge {
-  float: right;
-  margin-right: 8px;
-  display: none;
-}
-
-.room-list-item__labels {
-  float: right;
-  margin-right: 8px;
-}
-
-.room-list-item__unread-badge {
-  display: none;
-
-  border-radius: 4px;
-  display: inline-block;
-  padding: 0 4px;
-  font-size: 10px;
-  font-weight: bold;
-  line-height: 14px;
-  color: white;
-  white-space: nowrap;
-  vertical-align: middle;
-  background-color: @trpGreen;
-}
-
-.room-list-item__unread-badge.shown {
-  display: inline;
-}
-
-.room-list-item__unread-badge.mention {
-  background-color: @trpRed;
-  font-weight: 300;
-}
-
-.room-list-item__close:before {
-  font-family: 'troupe-icons';
-  content: '\e827';
-  font-size: 14px;
-}
-
-.room-list-item__leave:before {
-  font-family: 'troupe-icons';
-  content: '\e81f';
-  font-size: 14px;
-}
-
-.room-list-item__close:hover, .room-list-item__leave:hover {
-  opacity: 1;
-}
-
-.room-list-item:hover .room-list-item__close, .room-list-item:hover .room-list-item__leave {
-  display: inline-block;
-}
-
 .dragged .room-list-item__close,
 #list-search .room-list-item__close {
   display: none;
-}
-
-.room-list-item__close, .room-list-item__leave {
-  display: none;
-  opacity: 0.6;
-  .transition300ms;
 }

@@ -7,10 +7,6 @@ module.exports = (function() {
   var faviconUnread = cdn('images/favicon-unread.ico');
   var faviconRead = cdn('images/favicon-read.ico');
 
-  function updateLeftMenuBadge(unreadCount) {
-    $('.unread-count').text(unreadCount);
-  }
-
   function updateFavicon(unreadCount) {
     var image = (unreadCount > 0) ? faviconUnread : faviconRead;
     $('#favicon').attr('href', image);
@@ -45,7 +41,6 @@ module.exports = (function() {
       self.setUnread(values.overall, !!values.current);
 
       var unreadCount = values.overall;
-      updateLeftMenuBadge(unreadCount);
       updateFavicon(unreadCount);
     });
   }

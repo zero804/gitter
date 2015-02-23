@@ -4,47 +4,20 @@
 
 var testRequire = require('../../test-require');
 var assert = require("assert");
+var Search = testRequire('./services/github/github-fast-search');
 
 var FAKE_USER = { username: 'gittertestbot', githubToken: '***REMOVED***'};
 
 describe('github-fast-search #slow', function() {
-  it('has type:user flag formatted correctly', function(done) {
-    var Search = testRequire.withProxies('./services/github/github-fast-search', {
-      './request-wrapper': {
-          fastRequest: function(options) {
-          var querystring = options.uri.split('?')[1];
-
-          assert.equal(querystring, 'q=tony+type:user&access_token=***REMOVED***');
-
-          done();
-        }
-      },
-      './github-cache-wrapper': function(x) { return x; }
-    });
-
+  it('should find suprememoocow', function(done) {
     var search = new Search(FAKE_USER);
 
-    search.findUsers('tony', function(err) {
-      if(err) done(err);
-    });
+    search.findUsers('andrew newdigate')
+      .then(function(results) {
+        assert(Array.isArray(results));
+        assert(results[0]);
+      })
+      .nodeify(done);
   });
 
-  it('adds a credentials flag to a 403 response error', function(done) {
-    var Search = testRequire.withProxies('./services/github/github-fast-search', {
-      './request-wrapper': {
-        fastRequest: function(options, callback) {
-          callback(null, { statusCode: 403 }, null);
-        }
-      },
-      './github-cache-wrapper': function(x) { return x; }
-    });
-
-    var search = new Search(FAKE_USER);
-
-    search.findUsers('tony', function(err) {
-      assert.equal(err.gitterAction,'logout_destroy_user_tokens');
-
-      done();
-    });
-  });
 });
