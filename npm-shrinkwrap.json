@@ -2635,7 +2635,7 @@
       "resolved": "http://beta-internal:4873/temp/-/temp-0.4.0.tgz"
     },
     "tentacles": {
-      "version": "0.1.7",
+      "version": "0.1.8",
       "from": "tentacles@latest",
       "dependencies": {
         "lodash": {
@@ -2671,7 +2671,7 @@
                     "isarray": {
                       "version": "0.0.1",
                       "from": "isarray@0.0.1",
-                      "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
+                      "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
                     },
                     "string_decoder": {
                       "version": "0.10.31",
@@ -2742,12 +2742,12 @@
                 "asn1": {
                   "version": "0.1.11",
                   "from": "asn1@0.1.11",
-                  "resolved": "http://beta-internal:4873/asn1/-/asn1-0.1.11.tgz"
+                  "resolved": "https://registry.npmjs.org/asn1/-/asn1-0.1.11.tgz"
                 },
                 "ctype": {
                   "version": "0.5.3",
                   "from": "ctype@0.5.3",
-                  "resolved": "http://beta-internal:4873/ctype/-/ctype-0.5.3.tgz"
+                  "resolved": "https://registry.npmjs.org/ctype/-/ctype-0.5.3.tgz"
                 }
               }
             },
@@ -2801,7 +2801,7 @@
                 "delayed-stream": {
                   "version": "0.0.5",
                   "from": "delayed-stream@0.0.5",
-                  "resolved": "http://beta-internal:4873/delayed-stream/-/delayed-stream-0.0.5.tgz"
+                  "resolved": "https://registry.npmjs.org/delayed-stream/-/delayed-stream-0.0.5.tgz"
                 }
               }
             },
