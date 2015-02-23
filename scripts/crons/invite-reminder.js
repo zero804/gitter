@@ -46,7 +46,7 @@ function populate(users, invitees, rooms) {
 
 function markAsReminded(user) {
   user.inviteReminderSent = new Date();
-  return user.saveQ().catch(die);
+  return user.saveQ().catch(die); // This seems a bit nasty?
 }
 
 // run the script
