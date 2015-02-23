@@ -5,6 +5,15 @@ var getCollaboratorForRoom = testRequire('./services/collaborators-service');
 var FAKE_USER = { username: 'gittertestbot', githubToken: '***REMOVED***'};
 var assert = require('assert');
 
+
+function assertNoDuplicates(collaborators) {
+  var logins = {};
+  collaborators.forEach(function(collaborator) {
+    assert(!logins[collaborator.login]);
+    logins[collaborator.login] = true;
+  });
+}
+
 describe('collaborators-service #slow', function() {
 
   it('should return collaborators for a PUBLIC REPO', function(done) {
@@ -12,6 +21,7 @@ describe('collaborators-service #slow', function() {
       .then(function(collaborators) {
         assert(Array.isArray(collaborators));
         assert(collaborators.length > 0);
+        assertNoDuplicates(collaborators);
       })
       .nodeify(done);
   });
@@ -30,6 +40,17 @@ describe('collaborators-service #slow', function() {
 
         assert(Array.isArray(collaborators));
         assert(collaborators.length > 0);
+        assertNoDuplicates(collaborators);
+      })
+      .nodeify(done);
+  });
+
+  it('should return collaborators for a unknown REPO', function(done) {
+    return getCollaboratorForRoom({ security: 'PUBLIC',  githubType: 'REPO', uri: 'troupe/xyz' }, FAKE_USER)
+      .then(function(collaborators) {
+        assert(Array.isArray(collaborators));
+        assert(collaborators.length > 0);
+        assertNoDuplicates(collaborators);
       })
       .nodeify(done);
   });
@@ -48,6 +69,17 @@ describe('collaborators-service #slow', function() {
 
         assert(Array.isArray(collaborators));
         assert(collaborators.length > 0);
+        assertNoDuplicates(collaborators);
+      })
+      .nodeify(done);
+  });
+
+  it('should return collaborators for an USER', function(done) {
+    return getCollaboratorForRoom({ githubType: 'USER', uri: 'gittertestbot' }, FAKE_USER)
+      .then(function(collaborators) {
+        assert(Array.isArray(collaborators));
+        assert(collaborators.length > 0);
+        assertNoDuplicates(collaborators);
       })
       .nodeify(done);
   });
