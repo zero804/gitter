@@ -1,4 +1,4 @@
 #!/bin/bash
 
 npm prune
-npm install --dev
+npm install
