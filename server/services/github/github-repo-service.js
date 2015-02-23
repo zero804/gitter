@@ -70,6 +70,10 @@ GitHubRepoService.prototype.getWatchedRepos = function() {
   return gittercat.watching.listForAuthUser({ accessToken: this.accessToken });
 };
 
+GitHubRepoService.prototype.getAllReposForAuthUser = function() {
+  return gittercat.repo.listForAuthUser({ accessToken: this.accessToken });
+};
+
 /** TODO: deprecated */
 GitHubRepoService.prototype.getReposForUser = function(username, options) {
   return gittercat.repo.listForUser(username, { firstPageOnly: options && options.firstPage,  accessToken: this.accessToken });
