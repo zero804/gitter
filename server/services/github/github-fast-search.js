@@ -15,6 +15,9 @@ Search.prototype.findUsers = function(searchString, callback) {
       firstPageOnly: true,
       noRetry: true
     })
+    .then(function(body) {
+      return body && body.items || [];
+    })
     .nodeify(callback);
 };
 

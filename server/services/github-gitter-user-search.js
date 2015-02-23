@@ -11,20 +11,21 @@ var _ = require('underscore');
 
 function searchGithubUsers(query, user, callback) {
   var search = new githubSearchService(user);
-  return search.findUsers(query).then(function(users) {
-    var results = users.map(function (user) {
-      return {
-        username: user.login,
-        gravatarImageUrl: user.avatar_url,
-        gravatarVersion: extractGravatarVersion(user.avatar_url),
-        getDisplayName: function() {}, // Remove, deprecated
-        getHomeUrl: function() {}  // Remove, deprecated
-      };
-    });
+  return search.findUsers(query)
+    .then(function(users) {
+      var results = users.map(function (user) {
+        return {
+          username: user.login,
+          gravatarImageUrl: user.avatar_url,
+          gravatarVersion: extractGravatarVersion(user.avatar_url),
+          getDisplayName: function() {}, // Remove, deprecated
+          getHomeUrl: function() {}  // Remove, deprecated
+        };
+      });
 
-    return results;
-  })
-  .nodeify(callback);
+      return results;
+    })
+    .nodeify(callback);
 }
 
 function addGitterDataToGithubUsers(githubUsers) {
