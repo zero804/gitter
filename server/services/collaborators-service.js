@@ -8,6 +8,8 @@ var MeService           = require('./github/github-me-service');
 var Q                   = require('q');
 
 function withoutCurrentUser(users, user) {
+  if (!users || !users.length) return [];
+
   return users.filter(function(u) { return u.login !== user.username; });
 }
 
@@ -16,6 +18,10 @@ function getContributors(uri, user) {
   return ghRepo.getContributors(uri)
     .then(function(contributors) {
       return withoutCurrentUser(contributors, user);
+    })
+    .fail(function() {
+      /* Probably don't have access */
+      return [];
     });
 }
 
@@ -34,9 +40,13 @@ function getCollaborators(uri, user) {
 function getStargazers(uri, user) {
   var ghRepo = new RepoService(user);
   return ghRepo.getStargazers(uri)
-  .then(function(stargazers) {
-    return withoutCurrentUser(stargazers, user);
-  });
+    .then(function(stargazers) {
+      return withoutCurrentUser(stargazers, user);
+    })
+    .fail(function() {
+      /* Probably don't have access */
+      return [];
+    });
 }
 
 function getCollaboratorsForRepo(repoUri, security, user) {
@@ -89,6 +99,18 @@ function getCollaboratorsForUser(user) {
 
 }
 
+function deduplicate(collaborators) {
+  var deduped = [];
+  var logins = {};
+  collaborators.forEach(function(collaborator) {
+    if (!collaborator) return;
+    if (logins[collaborator.login]) return;
+    logins[collaborator.login] = 1;
+    deduped.push(collaborator);
+  });
+  return deduped;
+}
+
 module.exports = function getCollaboratorForRoom(room, user) {
   var roomType  = room.githubType.split('_')[0];
   var security  = room.security;
@@ -97,14 +119,17 @@ module.exports = function getCollaboratorForRoom(room, user) {
   switch(roomType) {
     case 'REPO': // REPOs and REPO_CHANNELs
       var repoUri = _uri[0] + '/' + _uri[1];
-      return getCollaboratorsForRepo(repoUri, security, user);
+      return getCollaboratorsForRepo(repoUri, security, user)
+        .then(deduplicate);
 
     case 'ORG': // ORGs and ORG_CHANNELs
       var orgUri = _uri[0];
-      return getCollaboratorsForOrg(orgUri, user);
+      return getCollaboratorsForOrg(orgUri, user)
+        .then(deduplicate);
 
     case 'USER': // USER_CHANNELs
-      return getCollaboratorsForUser(user);
+      return getCollaboratorsForUser(user)
+        .then(deduplicate);
 
     default:
       return Q.resolve([]);
