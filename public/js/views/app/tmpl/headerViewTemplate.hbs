@@ -1,32 +1,31 @@
 <div class="chat-header__avatar  {{plan}}">
   <img src='{{avatarUrl}}'>
 </div>
-
 <div class="chat-header__buttons">
 {{#if user}}
   <div class="chat-header__favourite">
-    <i class="js-favourite-button  {{#if troupeFavourite}}favourite{{/if}}"></i>
+    <i class="js-favourite-button icon-star-1 {{#if troupeFavourite}}favourite{{/if}}"></i>
   </div>
   {{#unless archives}}
     {{#unless oneToOne}}
-  <div class="chat-header__settings">
-    <i class="js-chat-settings" data-toggle="dropdown"></i>
-  </div>
+      <div class="chat-header__settings">
+        <i class="js-chat-settings octicon octicon-tools" data-toggle="dropdown"></i>
+      </div>
     {{/unless}}
   {{/unless}}
 {{/if}}
 </div>
-
-
 <div class="chat-header__content">
-  <h1 class='js-chat-name {{#if isPrivate}}private{{/if}}' title="{{lockTooltip}}">
+  <h1 class='js-chat-name' title="{{ lockTooltip }}">
     {{#if githubLink}}
-      <a href="{{githubLink}}" target="_blank">{{troupeName}}</a>
+      <a href="{{ githubLink }}" target="_blank">{{ troupeName }}</a>
     {{else}}
-      {{troupeName}}
+      {{ troupeName }}
+    {{/if}}
+    {{#if isPrivate}}
+      <i class='octicon octicon-lock'></i>
     {{/if}}
   </h1>
-
   <p class="js-chat-topic">
     {{#unless oneToOne}}
       {{troupeTopic}}

@@ -91,12 +91,20 @@ module.exports = (function() {
   };
 
   var ChatInputView = Marionette.ItemView.extend({
+
     template: template,
+
     behaviors: {
       Widgets: {}
     },
+
+    ui: {
+      composeToggle: '.js-toggle-compose-mode',
+      mdHelp: '.js-md-help'
+    },
+
     events: {
-      'click .compose-mode-toggle': 'toggleComposeMode'
+      'click @ui.composeToggle': 'toggleComposeMode'
     },
 
     keyboardEvents: {
@@ -105,6 +113,7 @@ module.exports = (function() {
     },
 
     initialize: function(options) {
+      this.bindUIElements();
       this.rollers = options.rollers;
       this.chatCollectionView = options.chatCollectionView;
       this.composeMode = new ComposeMode();
@@ -170,10 +179,10 @@ module.exports = (function() {
         value: $textarea.val()
       });
 
-
       this.inputBox = inputBox;
+      this.ui.composeToggle.tooltip({ placement: 'left' });
+      this.ui.mdHelp.tooltip({ placement: 'left' });
 
-      this.$el.find('.compose-mode-toggle, .md-help').tooltip({placement: 'left'});
       var userCollection = this.userCollection;
 
 
@@ -320,14 +329,14 @@ module.exports = (function() {
       this.composeMode.toggle();
       var isComposeModeEnabled = this.composeMode.isEnabled();
 
-      this.$el.find('.compose-mode-toggle')
-        .toggleClass('active', isComposeModeEnabled)
+      this.ui.composeToggle
         .attr('title', this.getComposeModeTitle())
         .tooltip('fixTitle')
         .tooltip('hide');
 
       var placeholder = isComposeModeEnabled ? PLACEHOLDER_COMPOSE_MODE : PLACEHOLDER;
       this.$el.find('textarea').attr('placeholder', placeholder).focus();
+      this.render();
     },
 
     /**
