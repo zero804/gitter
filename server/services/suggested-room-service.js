@@ -6,6 +6,7 @@ var GithubRepo      = require("./github/github-repo-service");
 var persistence     = require("./persistence-service");
 var Q               = require('q');
 var _               = require('underscore');
+var suggestedRoomCache = require('./suggested-room-service-cache');
 
 var HILIGHTED_ROOMS = [
   {
@@ -213,22 +214,35 @@ function getSuggestedRepoMap(user) {
     });
 }
 
-function addHighlightedRooms(suggestionMap) {
-  HILIGHTED_ROOMS.forEach(function(room) {
-    if(!suggestionMap[room.uri]) {
-      suggestionMap[room.uri] = {
-        uri: room.uri,
-        language: room.language,
-        githubType: room.githubType
-      };
-    }
-    suggestionMap[room.uri].localeLanguage = room.localeLanguage;
-    suggestionMap[room.uri].highlighted = true;
-  });
+function addHighlightedRooms(suggestionMap, user) {
+  return Q.all(HILIGHTED_ROOMS.map(function(room) {
+      var uri = room.uri;
 
-  return suggestionMap;
+      if(!suggestionMap[uri]) {
+        suggestionMap[uri] = {
+          uri: uri,
+          language: room.language,
+          githubType: room.githubType
+        };
+      }
+      suggestionMap[uri].localeLanguage = room.localeLanguage;
+      suggestionMap[uri].highlighted = true;
+
+      if (suggestionMap.channel) return;
+
+      return suggestedRoomCache(user, uri)
+        .then(function(result) {
+          if(result) {
+            if(suggestionMap[uri]) {
+              suggestionMap[uri].repo = result;
+            }
+          }
+      });
+    }))
+    .thenResolve(suggestionMap);
 }
 
+/* Deprecated */
 function addMissingGithubData(suggestionMap, user) {
   var ghRepo = new GithubRepo(user);
 
@@ -275,8 +289,9 @@ function getSuggestions(user, localeLanguage) {
 
   return getSuggestedRepoMap(user)
     .then(function(suggestionMap) {
-      suggestionMap = addHighlightedRooms(suggestionMap);
-
+      return addHighlightedRooms(suggestionMap, user);
+    })
+    .then(function(suggestionMap) {
       return addMissingGithubData(suggestionMap, user);
     })
     .then(function(suggestionMap) {
