@@ -1,11 +1,11 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 'use strict';
 
-var GitterCat = require('gittercat');
+var Tentacles = require('tentacles');
 var request = require('./request-wrapper');
 var badCredentialsCheck = require('./bad-credentials-check');
 
-var gittercat = new GitterCat({
+var tentacles = new Tentacles({
   request: request,
   headers: {
     Accept: 'application/vnd.github.moondragon+json'
@@ -14,4 +14,4 @@ var gittercat = new GitterCat({
 });
 
 
-module.exports = gittercat;
+module.exports = tentacles;

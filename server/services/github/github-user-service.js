@@ -2,7 +2,7 @@
 "use strict";
 
 var wrap = require('./github-cache-wrapper');
-var gittercat = require('./gittercat-client');
+var gittercat = require('./tentacles-client');
 var userTokenSelector = require('./user-token-selector').user;
 
 function GitHubUserService(user) {
