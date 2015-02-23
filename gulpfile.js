@@ -24,6 +24,7 @@ var mkdirp = require('mkdirp');
 var gulpif = require('gulp-if');
 var sourcemaps = require('gulp-sourcemaps');
 var shell = require('gulp-shell');
+var del = require('del');
 
 /* Don't do clean in gulp, use make */
 var DEV_MODE = !!process.env.DEV_MODE;
@@ -106,6 +107,28 @@ gulp.task('localtest', function() {
     .pipe(mocha({
       reporter: 'spec',
       timeout: 10000,
+      env: {
+        SKIP_BADGER_TESTS: 1,
+        DISABLE_CONSOLE_LOGGING: 1,
+        Q_DEBUG: 1
+      }
+    }));
+});
+
+gulp.task('clean:coverage', function (cb) {
+  del([
+    'output/coverage-reports'
+  ], cb);
+});
+
+gulp.task('localtest-coverage', ['clean:coverage'], function() {
+  return gulp.src(['./test/integration/**/*.js', './test/public-js/**/*.js'], { read: false })
+    .pipe(mocha({
+      reporter: 'spec',
+      timeout: 10000,
+      istanbul: {
+        dir: 'output/coverage-reports/'
+      },
       env: {
         SKIP_BADGER_TESTS: 1,
         DISABLE_CONSOLE_LOGGING: 1,

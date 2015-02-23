@@ -1,31 +1,19 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var Q = require('q');
 var wrap = require('./github-cache-wrapper');
-var createClient = require('./github-client');
-var badCredentialsCheck = require('./bad-credentials-check');
+var gittercat = require('./tentacles-client');
+var userTokenSelector = require('./user-token-selector').full;
 
 function GitHubIssueStateService(user) {
   this.user = user;
-  this.client = createClient.full(user);
+  this.accessToken = userTokenSelector(user);
 }
 
 GitHubIssueStateService.prototype.getIssueState = function(repo, issueNumber) {
-  var d = Q.defer();
-
-  var ghissue = this.client.issue(repo, issueNumber);
-  ghissue.info(createClient.makeResolver(d));
-
-  return d.promise
+  return gittercat.issue.get(repo, issueNumber, { accessToken: this.accessToken })
     .then(function(issue) {
-      if(!issue) return '';
+      if (!issue) return '';
       return issue.state;
-    })
-    .fail(badCredentialsCheck)
-    .fail(function(err) {
-      if(err.statusCode === 404) return '';
-      throw err;
     });
 };
 

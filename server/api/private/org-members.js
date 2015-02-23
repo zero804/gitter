@@ -1,11 +1,23 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
+var GitHubMeService   = require('../../services/github/github-me-service');
 var GitHubOrgService   = require('../../services/github/github-org-service');
 var restSerializer     = require("../../serializers/rest-serializer");
 var userService        = require('../../services/user-service');
 var StatusError        = require('statuserror');
 var Q                  = require('q');
+
+function listOrgMembers(user, uri) {
+  var ghMe = new GitHubMeService(user);
+  return ghMe.isOrgAdmin(uri)
+    .then(function(isAdmin) {
+      if (!isAdmin) throw new StatusError(403);
+
+      var ghOrg = new GitHubOrgService(user);
+      return ghOrg.members(uri);
+    });
+}
 
 /* Only org owners get to call this service */
 module.exports = function(req, res, next) {
@@ -19,22 +31,11 @@ module.exports = function(req, res, next) {
         return userService.findById(req.query.on_behalf_of)
           .then(function(user) {
             if(!user) throw new StatusError(404);
-
-            var ghOrg = new GitHubOrgService(user);
-            return ghOrg.members(uri);
+            return listOrgMembers(user, uri);
           });
       }
 
-      var ghOrg = new GitHubOrgService(req.user);
-      return ghOrg.getOwners(uri)
-        .then(function(owners) {
-          // If the user requesting the members list happens to be one of the owners  we'll return a
-          // list of the org members that are also Gitter users, just that intersection.
-          if (!owners.some(function(owner) { return owner.login === user.username; }))
-            throw new StatusError(403);
-
-          return ghOrg.members(uri);
-        });
+      return listOrgMembers(req.user, uri);
     })
     .then(function(orgMembers) {
       var usernames = orgMembers.map(function(user) { return user.login; });
