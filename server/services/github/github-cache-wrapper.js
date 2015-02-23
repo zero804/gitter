@@ -27,7 +27,7 @@ function getKeys(method, contextValues, args) {
 }
 
 function wrap(service, contextFunction, options) {
-  winston.warn('github-cache-wrapper deprecated, use cache-wrapper instead');
+  winston.verbose('github-cache-wrapper deprecated, use cache-wrapper instead');
 
   if(!config.get('github:caching')) return service;
   if(!options) options = {};

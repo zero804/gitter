@@ -2,7 +2,8 @@
 "use strict";
 
 var GithubRepoService = require('./github-repo-service');
-var GithubOrgService = require('./github-org-service');
+var GithubMeService   = require('./github-me-service');
+var GithubOrgService  = require('./github-org-service');
 var Q = require('q');
 
 function getRepoMembers(uri, instigatingUser) {
@@ -38,10 +39,24 @@ function getMembers(uri, githubType, instigatingUser) {
 module.exports.getMembers = getMembers;
 
 function isMember(username, uri, githubType, instigatingUser) {
-  return getMembers(uri, githubType, instigatingUser)
-    .then(function(members) {
-      return members.indexOf(username) >= 0;
-    });
+  if(githubType === 'REPO') {
+    /* Is the user a collaborator on the repo? */
+    var ghRepo = new GithubRepoService(instigatingUser);
+    return ghRepo.isCollaborator(uri, username);
+
+  } else if(githubType === 'ORG') {
+    if (username === instigatingUser.username) {
+      /* Is the current user a member of the org? */
+      var ghMe = new GithubMeService(instigatingUser);
+      return ghMe.isOrgMember(uri);
+    } else {
+      /* Is the specified user a member of the org? */
+      var ghOrg = new GithubOrgService(instigatingUser);
+      return ghOrg.member(uri, username);
+    }
+  } else {
+    return Q.reject(new Error('unknown githubType "'+githubType+'"'));
+  }
 }
 
 module.exports.isMember = isMember;

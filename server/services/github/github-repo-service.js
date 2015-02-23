@@ -1,15 +1,12 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var Q = require('q');
 var wrap = require('./github-cache-wrapper');
-var createClient = require('./github-client');
-var badCredentialsCheck = require('./bad-credentials-check');
+var gittercat = require('./tentacles-client');
+var userTokenSelector = require('./user-token-selector').full;
 
 function GitHubRepoService(user) {
   this.user = user;
-  this.client = createClient.full(user);
-  this.firstPageClient = createClient.full(user, { firstPageOnly: true });
+  this.accessToken = userTokenSelector(user);
 }
 
 
@@ -18,46 +15,28 @@ function GitHubRepoService(user) {
  * @return the promise of information about a repo
  */
  GitHubRepoService.prototype.getRepo = function(repo) {
-  var ghrepo = this.client.repo(repo);
-  var d = Q.defer();
-  ghrepo.info(createClient.makeResolver(d));
-  return d.promise
-    .fail(badCredentialsCheck)
-    .fail(function(err) {
-      if(err.statusCode == 404) return;
-      throw err;
-    });
+  return gittercat.repo.get(repo, { accessToken: this.accessToken });
+};
+
+/**
+ *
+ */
+GitHubRepoService.prototype.isCollaborator = function(repo, username) {
+  return gittercat.repoCollaborator.checkForUser(repo, username, { accessToken: this.accessToken });
 };
 
 /**
  *
  */
  GitHubRepoService.prototype.getCollaborators = function(repo) {
-  var ghrepo = this.client.repo(repo);
-  var d = Q.defer();
-  ghrepo.collaborators(createClient.makeResolver(d));
-  return d.promise
-    .fail(badCredentialsCheck)
-    .fail(function(err) {
-      if(err.statusCode == 404) return;
-      throw err;
-    });
+  return gittercat.repoCollaborator.list(repo, { accessToken: this.accessToken });
 };
 
 /**
- * 
+ *
  */
- GitHubRepoService.prototype.getCommits = function(repo, options) {
-  options = options || {};
-  var ghrepo = (options.firstPage ? this.firstPageClient : this.client).repo(repo, options);
-  var d = Q.defer();
-  ghrepo.commits(createClient.makeResolver(d));
-  return d.promise
-    .fail(badCredentialsCheck)
-    .fail(function(err) {
-      if(err.statusCode == 404) return;
-      throw err;
-    });
+GitHubRepoService.prototype.getCommits = function(repo, options) {
+  return gittercat.repoCommit.list(repo, { firstPageOnly: options.firstPage, accessToken: this.accessToken });
 };
 
 
@@ -65,100 +44,42 @@ function GitHubRepoService(user) {
  *  Returns repo stargazers
  */
  GitHubRepoService.prototype.getStargazers = function(repo) {
-  var ghrepo = this.client.repo(repo);
-  var d = Q.defer();
-  ghrepo.stargazers(createClient.makeResolver(d));
-  return d.promise
-    .fail(badCredentialsCheck)
-    .fail(function(err) {
-      if(err.statusCode == 404) return;
-      throw err;
-    });
+  return gittercat.starring.listForRepo(repo, { accessToken: this.accessToken });
 };
-
-
-
-function getIssuesWithState(repo, state) {
-  var d = Q.defer();
-
-  repo.issues({ state: state }, function(err, body) {
-    if(err) return d.reject(err);
-
-    d.resolve(body);
-  });
-
-  return d.promise
-    .fail(badCredentialsCheck);
-}
 
 /**
  * Returns a promise of the issues for a repo
  */
- GitHubRepoService.prototype.getIssues = function(repoName) {
-  var repo = this.client.repo(repoName);
-  return Q.all([
-    getIssuesWithState(repo, 'open'),
-    getIssuesWithState(repo, 'closed')
-    ]).spread(function(openIssues, closedIssues) {
+GitHubRepoService.prototype.getIssues = function(repo) {
+  return gittercat.issues.get(repo, { query: { state: 'all' }, accessToken: this.accessToken })
+    .then(function(returnedIssues) {
       var issues = [];
-      openIssues.forEach(function(issue) {
-        issues[issue.number] = issue;
-      });
-      closedIssues.forEach(function(issue) {
+      returnedIssues.forEach(function(issue) {
         issues[issue.number] = issue;
       });
       return issues;
-    })
-    .fail(badCredentialsCheck);
-
+    });
 };
 
 
 GitHubRepoService.prototype.getRecentlyStarredRepos = function() {
-  var d = Q.defer();
-
-  var ghme = this.firstPageClient.me();
-  ghme.starred(createClient.makeResolver(d));
-
-  return d.promise
-    .fail(badCredentialsCheck);
-
+  return gittercat.starring.listForAuthUser({ firstPageOnly: true, query: { per_page: 100 }, accessToken: this.accessToken });
 };
 
 GitHubRepoService.prototype.getWatchedRepos = function() {
-  var d = Q.defer();
-
-  var ghme = this.client.me();
-  ghme.watched(createClient.makeResolver(d));
-
-  return d.promise
-    .fail(badCredentialsCheck);
+  return gittercat.watching.listForAuthUser({ accessToken: this.accessToken });
 };
 
-GitHubRepoService.prototype.getRepos = function() {
-  var d = Q.defer();
-
-  var ghme = this.client.me();
-  ghme.repos(createClient.makeResolver(d));
-
-  return d.promise
-    .fail(badCredentialsCheck);
+GitHubRepoService.prototype.getAllReposForAuthUser = function() {
+  return gittercat.repo.listForAuthUser({ accessToken: this.accessToken });
 };
 
-
+/** TODO: deprecated */
 GitHubRepoService.prototype.getReposForUser = function(username, options) {
-  var d = Q.defer();
-  options = options || {};
-
-  var ghme = (options.firstPage ? this.firstPageClient : this.client).user(username);
-  ghme.repos(createClient.makeResolver(d));
-
-  return d.promise
-    .fail(badCredentialsCheck);
+  return gittercat.repo.listForUser(username, { firstPageOnly: options && options.firstPage,  accessToken: this.accessToken });
 };
 
 
-// module.exports = GitHubRepoService;
 module.exports = wrap(GitHubRepoService, function() {
-  return [this.user && (this.user.githubToken || this.user.githubUserToken) || ''];
+  return [this.accessToken || ''];
 });

@@ -1,8 +1,6 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var GithubMe        = require("./github/github-me-service");
-var GithubOrg       = require("./github/github-org-service");
 var GithubRepo      = require("./github/github-repo-service");
 var persistence     = require("./persistence-service");
 var Q               = require('q');
@@ -23,20 +21,10 @@ function getReposForUser(user, options) {
   if(!options) options = {};
   var adminAccessOnly = 'adminAccessOnly' in options ? options.adminAccessOnly : false;
 
-  var gHuser  = new GithubMe(user);
   var ghRepo  = new GithubRepo(user);
-  var gHorg   = new GithubOrg(user);
 
-  // Fetch all user repos and repos of the orgs he belongs to.
-  return Q.all([
-      ghRepo.getRepos(),
-      gHuser.getOrgs()
-        .then(function(orgs) {
-          return Q.all(orgs.map(function(org) {
-            return gHorg.getRepos(org.login);
-          }));
-        })
-    ]).spread(function(userRepos, orgsWithRepos) {
+  return ghRepo.getAllReposForAuthUser()
+    .then(function(userRepos) {
       var repoFilters = [];
 
       if(adminAccessOnly) {
@@ -45,12 +33,6 @@ function getReposForUser(user, options) {
 
       // Filter out what needs filtering out
       var filteredUserRepos = applyFilters(userRepos, repoFilters);
-
-      var orgRepos = orgsWithRepos.reduce(function(memo, org) { memo.push.apply(memo, org); return memo; }, []);
-      var filteredOrgRepos = applyFilters(orgRepos, repoFilters);
-
-      filteredUserRepos.push.apply(filteredUserRepos, filteredOrgRepos);
-
       filteredUserRepos.sort(function(a,b) { return Date.parse(b.pushed_at) - Date.parse(a.pushed_at); });
 
       return filteredUserRepos;
