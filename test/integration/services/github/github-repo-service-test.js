@@ -24,4 +24,12 @@ describe('github-repo-service #slow', function() {
       .nodeify(done);
   });
 
+  it('should list the commits for a repo', function(done) {
+    ghRepo.getCommits('faye/faye', { firstPage: true })
+      .then(function(commits) {
+        assert(commits.length >= 1);
+      })
+      .nodeify(done);
+  });
+
 });

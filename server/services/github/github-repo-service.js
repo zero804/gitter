@@ -35,8 +35,8 @@ GitHubRepoService.prototype.isCollaborator = function(repo, username) {
 /**
  *
  */
- GitHubRepoService.prototype.getCommits = function(repo, options) {
-  return gittercat.repoCommits.list(repo, { firstPageOnly: options.firstPage, accessToken: this.accessToken });
+GitHubRepoService.prototype.getCommits = function(repo, options) {
+  return gittercat.repoCommit.list(repo, { firstPageOnly: options.firstPage, accessToken: this.accessToken });
 };
 
 
