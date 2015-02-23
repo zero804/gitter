@@ -1,18 +1,6 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-function setAvatarSize(url, size) {
-  var sizeText;
-  if(!url || typeof url !== "string") return null;
-  if(size=='m') sizeText="s=128";
-  if(size=='s') sizeText="s=60";
-
-  if(url.indexOf('?') >= 0) {
-    return url + '&' + sizeText;
-  }
-
-  return url + '?' + sizeText;
-}
+var resolveAvatarUrl  = require('../../../shared/avatars/resolve-avatar-url');
 
 function UserStrategy(options) {
   options = options ? options : {};
@@ -28,8 +16,8 @@ function UserStrategy(options) {
       id: user.id,
       username: user.username,
       displayName: user.getDisplayName(),
-      avatarUrlSmall: setAvatarSize(user.gravatarImageUrl,'s'),
-      avatarUrlMedium: setAvatarSize(user.gravatarImageUrl,'m'),
+      avatarUrlSmall: resolveAvatarUrl({ username: user.username, version: user.gravatarVersion, size: 60 }),
+      avatarUrlMedium: resolveAvatarUrl({ username: user.username, version: user.gravatarVersion, size: 128 })
     };
   };
 }

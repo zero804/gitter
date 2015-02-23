@@ -30,54 +30,17 @@
 
   &__content {
     display: flex;
-    
+
     /* Give the avatar some space to the right */
     .trpDisplayPicture {
       margin-right: 8px;
     }
-    
+
     > * {
       align-self: center;
     }
-    
-    
-    
-/*
-    p {
-      margin-bottom: 0;
-      padding-left: 24px !important;
-
-      a {
-        text-decoration: underline;
-      }
-
-      &.added {
-        .prepend-octicon('\f03a');
-
-        &::before {
-          color: hsl(100, 60%, 70%);
-        }
-      }
-
-      &.invited {
-        .prepend-octicon('\f03c');
-
-        &::before {
-          color: hsl(0, 0%, 75%);
-        }
-      }
-
-      &.unreachable {
-        .prepend-octicon('\f081');
-
-        &::before {
-          color: hsl(0, 60%, 70%);
-        }
-      }
-    }
-    */
   }
-  
+
   &__input {
     flex-grow: 1;
     margin-right: 8px;
@@ -97,10 +60,9 @@
 
   .remove {
     float: right;
-    .prepend-icon-clear();
     cursor: pointer;
     opacity: 0.6;
-    .transition300ms;
+    .transition300ms(opacity);
   }
 
   .remove:before {

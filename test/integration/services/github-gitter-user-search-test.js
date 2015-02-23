@@ -109,6 +109,25 @@ describe('github-gitter-user-search', function() {
 
   });
 
+  describe('end-to-end #slow', function() {
+    var search, user;
+    beforeEach(function() {
+      search = testRequire('./services/github-gitter-user-search');
+      user = { id: '54eb53c202281dd5f26fa58f', username: 'gittertestbot', githubToken: '***REMOVED***'};
+
+    });
+
+    it('should find users', function(done) {
+      return search('Andrew Newdigate', user)
+        .then(function(data) {
+          assert(data.results.some(function(user) {
+            return user.username == 'suprememoocow';
+          }));
+        })
+        .nodeify(done);
+    });
+  });
+
 });
 
 function createSearchWithStubData(data) {

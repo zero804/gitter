@@ -1,31 +1,20 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var Q = require('q');
 var wrap = require('./github-cache-wrapper');
-var createClient = require('./github-client');
-var badCredentialsCheck = require('./bad-credentials-check');
+var gittercat = require('./tentacles-client');
+var userTokenSelector = require('./user-token-selector').user;
 
 function GitHubUserService(user) {
   this.user = user;
-  this.client = createClient.user(user);
+  this.accessToken = userTokenSelector(user);
 }
 
 GitHubUserService.prototype.getUser = function(user) {
-  var d = Q.defer();
-
-  var ghuser = this.client.user(user);
-  ghuser.info(createClient.makeResolver(d));
-
-  return d.promise
-    .fail(badCredentialsCheck)
-    .fail(function(err) {
-      if(err.statusCode === 404) return null;
-      throw err;
-    });
+  return gittercat.user.get(user, { accessToken: this.accessToken });
 };
 
 module.exports = wrap(GitHubUserService, function() {
-  return [this.user && (this.user.githubUserToken || this.user.githubToken) || ''];
+  return [this.accessToken || ''];
 });
 

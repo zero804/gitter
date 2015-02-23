@@ -1,7 +1,12 @@
 verbose: false
 instrumentation:
+    root: .
+    excludes:
+        - node_modules/
+        - public/js/
     save-baseline: true
-    baseline-file: ./output/coverage/coverage-baseline.json
+    # Won't get deleted when we recreate the coverage
+    baseline-file: ./output/coverage-baseline.json
 reporting:
     print: summary
     reports:

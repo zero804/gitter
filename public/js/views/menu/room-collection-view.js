@@ -207,6 +207,7 @@ module.exports = (function() {
 
         onDrag: function (item, position) {
           $(".placeholder").html(item.html());
+          $('.placeholder').addClass(item.attr('class'));
           item.css(position);
         },
 

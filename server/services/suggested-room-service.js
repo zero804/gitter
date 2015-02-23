@@ -6,6 +6,7 @@ var GithubRepo      = require("./github/github-repo-service");
 var persistence     = require("./persistence-service");
 var Q               = require('q');
 var _               = require('underscore');
+var suggestedRoomCache = require('./suggested-room-service-cache');
 
 var HILIGHTED_ROOMS = [
   {
@@ -97,12 +98,13 @@ var CATEGORIES = {
     return item.localeLanguage === context.localeLanguage ? 1 : 0;
   },
   highlighted: function(item) {
-    return item.highlighted ? 0 : 1;
+    return item.highlighted ? 1 : 0;
   }
 };
 
 var CATEGORY_COEFFICIENTS = {
   // use this to apply a multiplier to a category
+  highlighted: 1.1
 };
 
 function processCategory(name, items, context) {
@@ -154,12 +156,19 @@ function removeUselessSuggestions(suggestions, user) {
 
     // dont suggest forks as when the urls are shortened in the client,
     // they look identical to the originals and people get angry
-    if(suggestion.repo && suggestion.repo.fork) return false;
+    if(suggestion.repo && suggestion.repo.fork) {
+      return false;
+    }
+
 
     if(suggestion.room) {
       // it's not a good room suggestion if the user is already in the room
       return !suggestion.room.containsUserId(user.id);
     } else if(suggestion.repo) {
+      if (suggestion.highlighted) {
+        return true;
+      }
+
       // if no room exists but a repo exists, then the user must be the repo admin to create that repo room
       return suggestion.repo.permissions && suggestion.repo.permissions.admin;
     } else {
@@ -183,6 +192,7 @@ function getPreferredComputerLanguages(suggestions) {
 
 function getSuggestedRepoMap(user) {
   var ghRepo  = new GithubRepo(user);
+
   return Q.all([
       ghRepo.getRecentlyStarredRepos(),
       ghRepo.getWatchedRepos(),
@@ -207,27 +217,39 @@ function getSuggestedRepoMap(user) {
       starredRepos.forEach(addSuggestion('is_starred_by_user'));
       watchedRepos.forEach(addSuggestion('is_watched_by_user'));
       ownedRepos.forEach(addSuggestion('is_owned_by_user'));
-
       return suggestions;
     });
 }
 
-function addHighlightedRooms(suggestionMap) {
-  HILIGHTED_ROOMS.forEach(function(room) {
-    if(!suggestionMap[room.uri]) {
-      suggestionMap[room.uri] = {
-        uri: room.uri,
-        language: room.language,
-        githubType: room.githubType
-      };
-    }
-    suggestionMap[room.uri].localeLanguage = room.localeLanguage;
-    suggestionMap[room.uri].highlighted = true;
-  });
+function addHighlightedRooms(suggestionMap, user) {
+  return Q.all(HILIGHTED_ROOMS.map(function(room) {
+      var uri = room.uri;
 
-  return suggestionMap;
+      if(!suggestionMap[uri]) {
+        suggestionMap[uri] = {
+          uri: uri,
+          language: room.language,
+          githubType: room.githubType
+        };
+      }
+      suggestionMap[uri].localeLanguage = room.localeLanguage;
+      suggestionMap[uri].highlighted = true;
+
+      if (room.channel) return;
+
+      return suggestedRoomCache(user, uri)
+        .then(function(result) {
+          if(result) {
+            if(suggestionMap[uri]) {
+              suggestionMap[uri].repo = result;
+            }
+          }
+      });
+    }))
+    .thenResolve(suggestionMap);
 }
 
+/* Deprecated */
 function addMissingGithubData(suggestionMap, user) {
   var ghRepo = new GithubRepo(user);
 
@@ -274,10 +296,11 @@ function getSuggestions(user, localeLanguage) {
 
   return getSuggestedRepoMap(user)
     .then(function(suggestionMap) {
-      suggestionMap = addHighlightedRooms(suggestionMap);
-
-      return addMissingGithubData(suggestionMap, user);
+      return addHighlightedRooms(suggestionMap, user);
     })
+    // .then(function(suggestionMap) {
+    //   return addMissingGithubData(suggestionMap, user);
+    // })
     .then(function(suggestionMap) {
       return addMissingGitterData(suggestionMap);
     })

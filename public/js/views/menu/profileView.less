@@ -1,5 +1,6 @@
 .menu-header {
   .trpBodyMedium;
+  font-size: 16px;
   width: 92%;
   margin: 10px auto 0;
   padding: 0.3125em;
@@ -83,10 +84,16 @@ body.hover .menu-header--expanded {
   list-style: none;
 }
 
+.profile-menu__icon {
+  display: inline-block;
+  width: 20px;
+  text-align: center;
+}
+
 .profile-menu__link {
   display: inline-block;
   width: 100%;
-  padding-left: 10px;
+  padding-left: 5px;
 
   color: white;
   text-decoration: none;
@@ -95,20 +102,4 @@ body.hover .menu-header--expanded {
     border-radius: 4px;
     background-color: rgba(255,255,255,0.2);
   }
-}
-
-.profile-menu__home {
-  .prepend-home-icon();
-}
-
-.profile-menu__logout {
-  .prepend-home-logout();
-}
-
-.profile-menu__apps {
-  .prepend-home-apps();
-}
-
-.profile-menu__billing {
-  .prepend-billing();
 }

@@ -61,7 +61,7 @@ module.exports = (function() {
       });
 
       new SearchInputView({
-        el: $('#search-input'),
+        el: $('.js-search'),
         model: searchState
       }).render();
 

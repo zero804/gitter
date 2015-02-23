@@ -15,6 +15,7 @@ var UserSchema = new Schema({
   username: { type: String, required: true },
   confirmationCode: {type: String },
   gravatarImageUrl: { type: String },
+  gravatarVersion: { type: String },
   lastTroupe: ObjectId,
   googleRefreshToken: String,
   githubToken: { type: String },

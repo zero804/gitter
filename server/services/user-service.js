@@ -9,6 +9,7 @@ var uriLookupService          = require('./uri-lookup-service');
 var Q                         = require('q');
 var githubUserService         = require('./github/github-user-service');
 var mongooseUtils             = require('../utils/mongoose-utils');
+var extractGravatarVersion    = require('../utils/extract-gravatar-version');
 
 /** FIXME: the insert fields should simply extend from options or a key in options.
  * Creates a new user
@@ -26,6 +27,7 @@ function newUser(options) {
     githubToken:        options.githubToken,
     githubScopes:       options.githubScopes,
     gravatarImageUrl:   options.gravatarImageUrl,
+    gravatarVersion:    options.gravatarVersion,
     username:           options.username,
     invitedByUser:      options.invitedByUser,
     invitedToRoom:      options.invitedToRoom,
@@ -87,7 +89,8 @@ var userService = {
         var gitterUser = {
           username:           githubUser.login,
           displayName:        githubUser.name || githubUser.login,
-          gravatarImageUrl:   githubUser.avatar_url,
+          gravatarImageUrl:   githubUser.avatar_url, // TODO: remove, deprecated
+          gravatarVersion:    extractGravatarVersion(githubUser.avatar_url),
           githubId:           githubUser.id,
           invitedByUser:      user && user._id,
           invitedToRoom:      roomId,
