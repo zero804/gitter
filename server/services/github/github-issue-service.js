@@ -10,7 +10,7 @@ function GitHubIssueService(user) {
 }
 
  GitHubIssueService.prototype.getIssue = function(repo, issueNumber) {
-  return gittercat.issues.get(repo, issueNumber, { accessToken: this.accessToken });
+  return gittercat.issue.get(repo, issueNumber, { accessToken: this.accessToken });
 };
 
 
