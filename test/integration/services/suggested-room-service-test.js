@@ -8,8 +8,8 @@ var FAKE_USER = { username: 'gittertestbot', githubToken: '8e8ec7658e8a3bc645cfb
 
 var suggestionService = testRequire("./services/suggested-room-service");
 
-describe.skip('suggested-room-service', function() {
-  it('should get 8 suggestions', function(done) {
+describe('suggested-room-service', function() {
+  it('should get 8 suggestions #slow', function(done) {
     return suggestionService.getSuggestions(FAKE_USER)
       .then(function(suggestions) {
         assert(suggestions.length, 8);
