@@ -415,7 +415,6 @@ module.exports = (function() {
       }.bind(this));
 
       this.listenTo(this.model, 'change:active', function (m, active) {
-        this.$el.toggleClass('active', !!active);
 
         if (active) {
           this.triggerMethod('search:expand');

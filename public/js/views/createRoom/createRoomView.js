@@ -403,13 +403,13 @@ module.exports = (function() {
 
 
         if(animated === false) {
-          arrayToJq(true).show();
-          arrayToJq(false).hide();
+          arrayToJq(true).removeClass('hide');
+          arrayToJq(false).addClass('hide');
           self.ui.roomNameInput.attr('placeholder', placeholder);
           self.ui.parentNameLabel.text(parentName);
         } else {
-          arrayToJq(true).filter(':hidden').slideDown("fast");
-          arrayToJq(false).filter(':visible').slideUp("fast");
+          arrayToJq(true).filter(':hidden').removeClass('hide'); //.slideDown('fast').css('display','flex');
+          arrayToJq(false).filter(':visible').addClass('hide');//.slideUp('fast').css('display','flex');
 
           self.ui.parentNameLabel.text(parentName);
           self.ui.roomNameInput.attr('placeholder', placeholder);

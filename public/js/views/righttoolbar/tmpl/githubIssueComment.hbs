@@ -1,4 +1,5 @@
 <div class="github-comment">
+  <i class="octicon octicon-comment"></i>
   <div class="activity-time">{{widget "timeago" time=sent compact=true position="left"}}</div>
 
   <span class="gtrActivityItemText"><span class='mention' data-link-type="mention" data-screen-name="{{payload.sender.login}}">{{payload.sender.login}}</span> commented <span class="issue {{payload.issue.state}}" data-link-type="issue" data-issue="{{payload.issue.number}}" data-issue-repo="{{payload.repository.full_name}}">#{{payload.issue.number}}</span></span>
