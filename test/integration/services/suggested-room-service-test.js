@@ -4,7 +4,7 @@
 
 var testRequire = require('../test-require');
 var assert = require('assert');
-var FAKE_USER = { username: 'gittertestbot', githubToken: '8e8ec7658e8a3bc645cfbff9aa5d168131844f36'};
+var FAKE_USER = { username: 'suprememoocow', githubToken: 'bec1f59c0c69d92caca2d8905a7e4c3561d2dbe5'};
 
 var suggestionService = testRequire("./services/suggested-room-service");
 

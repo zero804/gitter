@@ -98,12 +98,13 @@ var CATEGORIES = {
     return item.localeLanguage === context.localeLanguage ? 1 : 0;
   },
   highlighted: function(item) {
-    return item.highlighted ? 0 : 1;
+    return item.highlighted ? 1 : 0;
   }
 };
 
 var CATEGORY_COEFFICIENTS = {
   // use this to apply a multiplier to a category
+  highlighted: 1.1
 };
 
 function processCategory(name, items, context) {
@@ -155,12 +156,19 @@ function removeUselessSuggestions(suggestions, user) {
 
     // dont suggest forks as when the urls are shortened in the client,
     // they look identical to the originals and people get angry
-    if(suggestion.repo && suggestion.repo.fork) return false;
+    if(suggestion.repo && suggestion.repo.fork) {
+      return false;
+    }
+
 
     if(suggestion.room) {
       // it's not a good room suggestion if the user is already in the room
       return !suggestion.room.containsUserId(user.id);
     } else if(suggestion.repo) {
+      if (suggestion.highlighted) {
+        return true;
+      }
+
       // if no room exists but a repo exists, then the user must be the repo admin to create that repo room
       return suggestion.repo.permissions && suggestion.repo.permissions.admin;
     } else {
@@ -209,7 +217,6 @@ function getSuggestedRepoMap(user) {
       starredRepos.forEach(addSuggestion('is_starred_by_user'));
       watchedRepos.forEach(addSuggestion('is_watched_by_user'));
       ownedRepos.forEach(addSuggestion('is_owned_by_user'));
-
       return suggestions;
     });
 }
@@ -228,7 +235,7 @@ function addHighlightedRooms(suggestionMap, user) {
       suggestionMap[uri].localeLanguage = room.localeLanguage;
       suggestionMap[uri].highlighted = true;
 
-      if (suggestionMap.channel) return;
+      if (room.channel) return;
 
       return suggestedRoomCache(user, uri)
         .then(function(result) {
@@ -291,9 +298,9 @@ function getSuggestions(user, localeLanguage) {
     .then(function(suggestionMap) {
       return addHighlightedRooms(suggestionMap, user);
     })
-    .then(function(suggestionMap) {
-      return addMissingGithubData(suggestionMap, user);
-    })
+    // .then(function(suggestionMap) {
+    //   return addMissingGithubData(suggestionMap, user);
+    // })
     .then(function(suggestionMap) {
       return addMissingGitterData(suggestionMap);
     })
