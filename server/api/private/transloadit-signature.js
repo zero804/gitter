@@ -60,7 +60,7 @@ module.exports =  function(req, res) {
   var shortToken = randomString(4);
 
   // Host for Transloadit callback. In dev env you'll need to use localtunnel
-  var host = (nodeEnv === 'dev') ? 'https://eplukeiooz.localtunnel.me' : nconf.get('web:basepath');
+  var host = (nodeEnv === 'dev') ? 'https://grwzkpxsle.localtunnel.me' : nconf.get('web:basepath');
 
   var templateId = nconf.get('transloadit:template_id');
   if(req.query.type === 'image') {

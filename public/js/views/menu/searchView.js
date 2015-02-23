@@ -12,7 +12,6 @@ var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 
 module.exports = (function() {
 
-
   var View = RoomCollectionView.extend({
 
     keyboardEvents: {

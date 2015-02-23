@@ -294,9 +294,8 @@ module.exports = (function() {
       }
 
       formData.append('numberOfFiles', files.length);
-
       apiClient.priv.get('/generate-signature', {
-          room_uri: context.troupe().get('uri'),
+          room_uri: context.troupe().get('oneToOne') ? context.user().get('username') : context.troupe().get('uri'),
           room_id: context.getTroupeId(),
           type: type
         })
