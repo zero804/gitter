@@ -10,8 +10,15 @@ module.exports = exports = function(request) {
   return function requestWrapper(options, callback) {
 
     var uri = options.uri;
-    var p = url.parse(uri, true);
-    var accessToken = p.query.access_token;
+    var accessToken;
+    if (options.headers) {
+      accessToken = options.headers.Authorization || options.headers.authorization;
+    }
+
+    if (!accessToken) {
+      var p = url.parse(uri, true);
+      accessToken = p.query.access_token;
+    }
 
     if(!accessToken) {
       /* Load this jit so that we can add additional values and SIGHUP
@@ -19,11 +26,10 @@ module.exports = exports = function(request) {
       var accessTokenPool = nconf.get('github:publicAccessTokens');
 
       accessToken = accessTokenPool[count++ % accessTokenPool.length];
-      p.query.access_token = accessToken;
-
-      delete p.search;
-      uri = url.format(p);
-      options.uri = uri;
+      if (!options.headers) {
+        options.headers = {};
+      }
+      options.headers.Authorization = 'token ' + accessToken;
     }
 
     request(options, callback);
