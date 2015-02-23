@@ -3,7 +3,6 @@
 "use strict";
 
 var testRequire = require('../test-require');
-var userService = testRequire('./services/user-service');
 var assert = require("assert");
 var Q = require('q');
 
@@ -112,17 +111,10 @@ describe('github-gitter-user-search', function() {
 
   describe('end-to-end #slow', function() {
     var search, user;
-
-    before(function(done) {
-      userService.findByUsername('gittertestbot')
-        .then(function(u) {
-          user = u;
-        })
-        .nodeify(done);
-    });
-
     beforeEach(function() {
       search = testRequire('./services/github-gitter-user-search');
+      user = { id: '54eb53c202281dd5f26fa58f', username: 'gittertestbot', githubToken: '***REMOVED***'};
+
     });
 
     it('should find users', function(done) {
