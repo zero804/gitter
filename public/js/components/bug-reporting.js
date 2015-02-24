@@ -36,8 +36,12 @@ module.exports = (function() {
             if(data.culprit) {
               data.culprit = normalise(data.culprit);
             }
+
+            appEvents.trigger('stats.event', 'error');
+
           } catch(e) {
           }
+
 
           return data;
         }
@@ -47,22 +51,6 @@ module.exports = (function() {
     Raven.setUser({
       username: user && user.get('username')
     });
-
-    window.onerror = function (message, filename, lineno, colno, error) {
-      try {
-        logUnhandledError(message, filename, lineno, colno, error);
-        appEvents.trigger('stats.event', 'error');
-
-        if(error instanceof Error) {
-          Raven.captureException(error, { message: message, filename: filename, lineno: lineno, colno: colno });
-        } else {
-          Raven.captureMessage(message, { message: message, filename: filename, lineno: lineno, colno: colno });
-        }
-      } catch(e) {
-        window.onerror = null;
-        throw e;
-      }
-    };
 
     appEvents.on('bugreport', function(description, data) {
       if(description instanceof Error) {
