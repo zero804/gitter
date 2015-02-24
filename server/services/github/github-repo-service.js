@@ -51,7 +51,7 @@ GitHubRepoService.prototype.getCommits = function(repo, options) {
  * Returns a promise of the issues for a repo
  */
 GitHubRepoService.prototype.getIssues = function(repo) {
-  return gittercat.issues.get(repo, { query: { state: 'all' }, accessToken: this.accessToken })
+  return gittercat.issue.listForRepo(repo, { query: { state: 'all' }, accessToken: this.accessToken })
     .then(function(returnedIssues) {
       var issues = [];
       returnedIssues.forEach(function(issue) {
