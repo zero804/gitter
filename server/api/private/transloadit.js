@@ -74,7 +74,7 @@ module.exports = function (req, res, next) {
             }
 
             if (!transloadit.results[':original']) {
-              throw new StatusError(500, 'Transloadit upload failed.');
+              throw new StatusError(500, 'Transloadit upload failed' + transloadit.message ? ': ' + transloadit.message : '. AssemblyID: ' + transloadit.assembly_id);
             }
 
             // Generate a message for each uploaded file.
