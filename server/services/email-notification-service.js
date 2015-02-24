@@ -3,7 +3,6 @@
 
 var env                 = require('../utils/env');
 var config              = env.config;
-
 var logger              = env.logger;
 var mailerService       = require("./mailer-service");
 var crypto              = require('crypto');

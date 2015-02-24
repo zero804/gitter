@@ -1,15 +1,23 @@
 /* jshint node:true, unused:strict */
 "use strict";
 
-var userSearchService = require("./user-search-service");
-var userService = require("./user-service");
-var githubSearchService = require("./github/github-fast-search");
+var env                    = require('../utils/env');
+var logger                 = env.logger;
+var userSearchService      = require("./user-search-service");
+var userService            = require("./user-service");
+var githubSearchService    = require("./github/github-fast-search");
 var extractGravatarVersion = require('../utils/extract-gravatar-version');
 
 var Q = require('q');
 var _ = require('underscore');
 
+function cleanQuery(query) {
+  query = query ? ('' + query).trim() : '';
+  return query.replace(/\b(AND|OR)\b/i, "'$1'");
+}
+
 function searchGithubUsers(query, user, callback) {
+  query = cleanQuery(query);
   var search = new githubSearchService(user);
   return search.findUsers(query)
     .then(function(users) {
@@ -24,6 +32,10 @@ function searchGithubUsers(query, user, callback) {
       });
 
       return results;
+    })
+    .catch(function(err) {
+      logger.info('Github user search failed:' + err, { exception: err });
+      return [];
     })
     .nodeify(callback);
 }
