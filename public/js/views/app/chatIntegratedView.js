@@ -36,10 +36,21 @@ module.exports = (function() {
   };
 
   var standardEvents = {
-    "click .js-favourite-button":          "toggleFavourite",
+    "click .js-favourite-button": "toggleFavourite",
     'paste': 'handlePaste',
-    'click @ui.scrollToBottom': appEvents.trigger.bind(appEvents, 'chatCollectionView:scrollToBottom')
+    'click @ui.scrollToBottom': appEvents.trigger.bind(appEvents, 'chatCollectionView:scrollToBottom'),
+
+    /* Drag drop events */
+    'dragenter': 'onDragEnter',
+    'dragleave': 'onDragLeave',
+    'dragover': 'onDragOver',
+    'drop': 'onDrop'
   };
+
+  function ignoreEvent(e) {
+    e.stopPropagation();
+    e.preventDefault();
+  }
 
   var ChatLayout = Marionette.Layout.extend({
 
@@ -57,6 +68,11 @@ module.exports = (function() {
       'backspace': 'onKeyBackspace',
       'quote': 'onKeyQuote'
     },
+
+    /**
+     * IMPORTANT: when dragging moving over child nodes will cause dragenter and dragleave, so we need to keep this count, if it's zero means that we should hide the overlay. WC.
+     */
+    dragCount: 0,
 
     initialize: function() {
 
@@ -117,8 +133,6 @@ module.exports = (function() {
         $(".js-chat-input-container").addClass("scrollpush");
         $("#room-content").addClass("scroller");
       }
-
-      this.setupDragAndDrop();
     },
 
     onKeyBackspace: function(e) {
@@ -189,39 +203,56 @@ module.exports = (function() {
       this.resetProgressBar();
     },
 
-    setupDragAndDrop: function() {
-      var dragOverlay = this.ui.dragOverlay;
-      var counter = 0; // IMPORTANT: when dragging moving over child nodes will cause dragenter and dragleave, so we need to keep this count, if it's zero means that we should hide the overlay. WC.
-      var self = this;
-
-      function ignoreEvent(e) {
-        e.stopPropagation();
-        e.preventDefault();
+    isTextDrag: function(e) {
+      var dt = e.dataTransfer;
+      if (dt.files.length > 0) {
+        return false;
       }
 
-      function dropEvent(e) {
-        counter = 0; // reset the counter
-        dragOverlay.toggleClass('hide', true);
-        ignoreEvent(e);
-        e = e.originalEvent;
-        var files = e.dataTransfer.files;
-        self.upload(files);
+      var items = dt.items;
+      for (var i = 0; i < items.length; i++) {
+        var kind = items[i].kind;
+        if (kind !== 'string') {
+          return false;
+        }
       }
 
-      this.$el.on('dragenter', function(e) {
-        counter++;
-        dragOverlay.toggleClass('hide', false);
-        ignoreEvent(e);
-      });
+      return true;
+    },
 
-      this.$el.on('dragleave', function(e) {
-        counter--;
-        dragOverlay.toggleClass('hide', counter === 0);
-        ignoreEvent(e);
-      });
+    onDragEnter: function(e) {
+      if (e.originalEvent) e = e.originalEvent;
+      if (this.isTextDrag(e)) return;
+      this.dragCounter++;
+      this.ui.dragOverlay.toggleClass('hide', false);
+      ignoreEvent(e);
+    },
 
-      this.$el.on('dragover', ignoreEvent);
-      this.$el.on('drop', dropEvent.bind(this));
+    onDragLeave: function(e) {
+      if (e.originalEvent) e = e.originalEvent;
+      if (this.isTextDrag(e)) return;
+
+      this.dragCounter--;
+      this.ui.dragOverlay.toggleClass('hide', this.dragCounter === 0);
+      ignoreEvent(e);
+    },
+
+    onDragOver: function(e) {
+      if (e.originalEvent) e = e.originalEvent;
+      if (this.isTextDrag(e)) return;
+      ignoreEvent(e);
+    },
+
+    onDrop: function(e) {
+      if (e.originalEvent) e = e.originalEvent;
+      if (this.isTextDrag(e)) return;
+
+      this.dragCounter = 0; // reset the counter
+      this.ui.dragOverlay.toggleClass('hide', true);
+      ignoreEvent(e);
+
+      var files = e.dataTransfer.files;
+      this.upload(files);
     },
 
     isImage: function(blob) {
@@ -252,6 +283,8 @@ module.exports = (function() {
     },
 
     upload: function(files) {
+      if (!files.length) return;
+
       this.ui.progressBar.show();
 
       this.updateProgressBar({
