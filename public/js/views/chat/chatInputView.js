@@ -334,6 +334,11 @@ module.exports = (function() {
         .tooltip('fixTitle')
         .tooltip('hide');
 
+      var $icon = this.ui.composeToggle.find('i');
+      // remove all classes from icon
+      $icon.removeClass();
+      $icon.addClass(isComposeModeEnabled ? 'icon-keyboard-1' : 'icon-chat-alt');
+
       var placeholder = isComposeModeEnabled ? PLACEHOLDER_COMPOSE_MODE : PLACEHOLDER;
       this.$el.find('textarea').attr('placeholder', placeholder).focus();
     },

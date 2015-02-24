@@ -12,10 +12,6 @@ module.exports = {
         // No auth
         require('./health-check-full.js'));
 
-    // app.get(apiRoot + '/private/user_email',
-    //     authMiddleware,
-    //     require('./user-email'));
-
     app.get(apiRoot + '/private/gh/repos/*',
         authMiddleware,
         require('./github-mirror/repos-mirror'));
@@ -23,10 +19,6 @@ module.exports = {
     app.get(apiRoot + '/private/gh/users/*',
         authMiddleware,
         require('./github-mirror/users-mirror'));
-
-    app.get(apiRoot + '/private/gh/user/repos',
-        authMiddleware,
-        require('./github-mirror/user-repos-mirror'));
 
     app.get(apiRoot + '/private/gh/search/users',
         authMiddleware,
