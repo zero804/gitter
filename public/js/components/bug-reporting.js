@@ -1,7 +1,7 @@
 "use strict";
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
-var Raven = require('raven');
+var Raven = require('raven-js');
 var log = require('utils/log');
 
 module.exports = (function() {
