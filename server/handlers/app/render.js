@@ -15,6 +15,7 @@ var userSort           = require('../../../public/js/utils/user-sort');
 var roomSort           = require('../../../public/js/utils/room-sort');
 var roomNameTrimmer    = require('../../../public/js/utils/room-name-trimmer');
 var isolateBurst       = require('../../../shared/burst/isolate-burst-array');
+var mongoUtils         = require('../../utils/mongo-utils');
 var url                =  require('url');
 
 var avatar   = require('../../utils/avatar');
@@ -89,11 +90,24 @@ function getPermalinkChatForRoom(troupe, chatId) {
     });
 }
 
+/**
+ * Fixes bad links, like when a browser sends this though
+ * /PrismarineJS/node-minecraft-protocol?at=54ea6fcecadb3f7525792ba9)I
+ */
+function fixBadLinksOnId(value) {
+  value = value ? '' + value : '';
+  if (value.length > 24) {
+    value = value.substring(0, 24);
+  }
+
+  return mongoUtils.isLikeObjectId(value) ? value : '';
+}
+
 function renderMainFrame(req, res, next, frame) {
 
   var user = req.user;
   var userId = user && user.id;
-  var aroundId = req.query.at;
+  var aroundId = fixBadLinksOnId(req.query.at);
 
   var selectedRoomId = req.troupe && req.troupe.id;
 
@@ -171,7 +185,7 @@ function renderMainFrame(req, res, next, frame) {
 
 function renderChat(req, res, options, next) {
   var troupe = req.uriContext.troupe;
-  var aroundId = req.query.at;
+  var aroundId = fixBadLinksOnId(req.query.at);
   var script = options.script;
   var user = req.user;
   var userId = user && user.id;
