@@ -2,9 +2,9 @@
 "use strict";
 
 var RepoService =  require('../../services/github/github-repo-service');
+var GitHubIssueService =  require('../../services/github/github-issue-service');
 var processChat = require('../../utils/markdown-processor');
-var winston = require('../../utils/winston');
-var _ = require('underscore');
+var StatusError = require('statuserror');
 
 function getEightSuggestedIssues(issues) {
   var suggestedIssues = [];
@@ -34,7 +34,7 @@ function trimDownIssue(issue) {
 
 module.exports = {
   id: 'issue',
-  index: function(req, res) {
+  index: function(req, res, next) {
     var query = req.query || {};
     var repoName = query.repoName || (req.troupe.githubType === 'REPO' && req.troupe.uri);
 
@@ -48,29 +48,20 @@ module.exports = {
         var matches = issueNumber.length ? getTopEightMatchingIssues(issues, issueNumber) : getEightSuggestedIssues(issues);
         res.send(matches);
       })
-      .fail(function(err) {
-        winston.err('failed to find issues for ' + repoName, err);
-        res.send([]);
-      });
+      .fail(next);
   },
 
-  show: function(req, res) {
+  show: function(req, res, next) {
     if(req.troupe.githubType != 'REPO') return res.send(404);
 
     var issueNumber = req.params.issue;
-    var service = new RepoService(req.user);
     var repoName = req.troupe.uri;
 
-    service.getIssues(repoName)
-      .then(function(issues) {
-        // TODO: this needs urgent fixing!
-        var issue = _.find(issues, function(issue) {
-          return issue && '' + issue.number === issueNumber;
-        });
-
+    var issueService = new GitHubIssueService(req.user);
+    issueService.getIssue(repoName, issueNumber)
+      .then(function(issue) {
         if(!issue) {
-          res.send(404);
-          return;
+          throw new StatusError(404);
         }
 
         if(req.query.renderMarkdown && issue.body) {
@@ -84,9 +75,6 @@ module.exports = {
         res.send(issue);
 
       })
-      .fail(function(err) {
-        winston.err('failed to issue '+issueNumber+' for '+repoName, err);
-        res.send(404);
-      });
+      .fail(next);
   }
 };
