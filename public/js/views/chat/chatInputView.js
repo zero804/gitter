@@ -336,7 +336,6 @@ module.exports = (function() {
 
       var placeholder = isComposeModeEnabled ? PLACEHOLDER_COMPOSE_MODE : PLACEHOLDER;
       this.$el.find('textarea').attr('placeholder', placeholder).focus();
-      this.render();
     },
 
     /**
