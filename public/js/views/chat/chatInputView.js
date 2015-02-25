@@ -472,10 +472,12 @@ module.exports = (function() {
         var val = this.ui.textarea.val();
         var el = this.ui.textarea[0];
 
-        var caretPos = el.selectionStart;
-        el.value = val.substring(0, caretPos) + markdown + val.substring(caretPos);
+        var selectionStart = el.selectionStart;
+        var selectionEnd = el.selectionEnd;
 
-        el.selectionStart = el.selectionEnd = caretPos + markdown.length;
+        el.value = val.substring(0, selectionStart) + markdown + val.substring(selectionEnd);
+
+        el.selectionStart = el.selectionEnd = selectionStart + markdown.length;
         e.preventDefault();
       }
     }
