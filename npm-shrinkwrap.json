@@ -1,6 +1,6 @@
 {
   "name": "gitter-webapp",
-  "version": "9.1.1",
+  "version": "9.2.3",
   "dependencies": {
     "apn": {
       "version": "1.4.4",
@@ -1091,7 +1091,7 @@
       }
     },
     "gitter-env": {
-      "version": "0.20.4",
+      "version": "0.20.5",
       "from": "gitter-env@latest",
       "dependencies": {
         "async": {
