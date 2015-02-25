@@ -12,11 +12,59 @@ require('views/behaviors/infinite-scroll');
 
 module.exports = (function() {
 
-
   /** @const */
   var PAGE_SIZE = 20;
 
   var SCROLL_ELEMENT = "#content-frame";
+
+  function getModelsInRange(collectionView, startElement, endElement) {
+    var models = [];
+    var i = 0;
+    var child, children = collectionView.children;
+
+    /* Find the start element */
+    while(i < children.length) {
+      child = children.findByIndex(i);
+      if (child.el === startElement) {
+        break;
+      }
+      i++;
+    }
+
+    /* Find the end element */
+    while(i < children.length) {
+      child = children.findByIndex(i);
+      models.push(child.model);
+      if (child.el === endElement) {
+        return models;
+      }
+      i++;
+    }
+    /* Didn't find the end */
+    return [];
+  }
+
+  function renderMarkdown(models) {
+    var text = models.map(function(model) {
+      var text;
+
+      if (models.length > 1 && model.get('burstStart')) {
+        var user = model.get('fromUser');
+        var username = user && user.username;
+        if (username) username = "@" + username;
+        text = username + '\n' + model.get('text');
+      } else {
+        text = model.get('text');
+      }
+      if (!text) return '';
+      if (text.charAt(text.length - 1) !== '\n') text = text + '\n';
+      return text;
+    }).join('');
+
+    if (text.charAt(text.length -1) === '\n') return text.substring(0, text.length - 1);
+
+    return text;
+  }
 
   /*
    * View
@@ -29,6 +77,10 @@ module.exports = (function() {
         scrollElementSelector: SCROLL_ELEMENT,
         contentWrapper: '#chat-container'
       }
+    },
+
+    events: {
+      "copy": "onCopy"
     },
 
     itemView: chatItemView.ChatItemView,
@@ -260,7 +312,49 @@ module.exports = (function() {
     /* Expands the most recent chat with embedded media */
     expandChats: function() {
       this.setLastCollapsibleChat(false);
-    }
+    },
+
+    onCopy: function(e) {
+      if (!window.getSelection /* ios8 */) return;
+
+      if (e.originalEvent) e = e.originalEvent;
+      var selection = window.getSelection();
+      if (!selection || !selection.baseNode || !selection.rangeCount) {
+        /* Just use the default */
+        return;
+      }
+
+      var range = selection.getRangeAt(0);
+      var start = $(range.startContainer).parents('.chat-item')[0];
+      var end = $(range.endContainer).parents('.chat-item')[0];
+      if (!start || !end) {
+        /* Selection outside of chat items */
+        return;
+      }
+
+      var startText = $(range.startContainer).parents('.js-chat-item-text')[0];
+      var endText = $(range.endContainer).parents('.js-chat-item-text')[0];
+
+      if (startText && endText && startText === endText) {
+        /* Partial selection */
+        if(range.startOffset > 0 || range.endOffset < range.endContainer.textContent.length) return;
+
+        var startSelection = range.startContainer;
+        var endSelection = range.endContainer;
+        while (!startSelection.previousSibling && startSelection !== startText) startSelection = startSelection.parentElement;
+        while (!endSelection.nextSibling && endSelection !== startText) endSelection = endSelection.parentElement;
+        if (startSelection !== startText || endSelection !== startText) return;
+      }
+
+      var models = getModelsInRange(this, start, end);
+      if (!models.length) return;
+      if (range.startContainer.textContent.length === range.startOffset) models.shift();
+      if (range.endOffset === 0) models.pop();
+      var text = renderMarkdown(models);
+      e.clipboardData.setData('text/plain', '' + selection);
+      e.clipboardData.setData('text/x-markdown', text);
+      e.preventDefault();
+    },
 
   });
   cocktail.mixin(ChatCollectionView, TroupeViews.SortableMarionetteView);
