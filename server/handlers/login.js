@@ -204,7 +204,7 @@ module.exports = {
     app.get(
       '/login/callback',
       /* 4-nary error handler for /login/callback */
-      function(err, req, res, /* DO NOT DELETE THIS */ next /* DO NOT DELETE THIS! */) {  // jshint unused:true
+      function(err, req, res, /* DO NOT DELETE THIS --> */ next /* <-- DO NOT DELETE THIS! */) {  // jshint unused:false
         logger.error("OAuth failed: " + err);
         if(err.stack) {
           logger.error("OAuth failure callback", err.stack);

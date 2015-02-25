@@ -210,6 +210,7 @@ module.exports = (function() {
       }
 
       var items = dt.items;
+      if (!items) return true;
       for (var i = 0; i < items.length; i++) {
         var kind = items[i].kind;
         if (kind !== 'string') {

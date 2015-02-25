@@ -318,13 +318,16 @@ module.exports = (function() {
       if (!window.getSelection /* ios8 */) return;
 
       if (e.originalEvent) e = e.originalEvent;
+
       var selection = window.getSelection();
-      if (!selection || !selection.baseNode || !selection.rangeCount) {
+      if (!selection || !selection.rangeCount || !selection.getRangeAt) {
         /* Just use the default */
         return;
       }
 
       var range = selection.getRangeAt(0);
+      var plainText ='' + selection;
+
       var start = $(range.startContainer).parents('.chat-item')[0];
       var end = $(range.endContainer).parents('.chat-item')[0];
       if (!start || !end) {
@@ -351,7 +354,7 @@ module.exports = (function() {
       if (range.startContainer.textContent.length === range.startOffset) models.shift();
       if (range.endOffset === 0) models.pop();
       var text = renderMarkdown(models);
-      e.clipboardData.setData('text/plain', '' + selection);
+      e.clipboardData.setData('text/plain', plainText);
       e.clipboardData.setData('text/x-markdown', text);
       e.preventDefault();
     },
