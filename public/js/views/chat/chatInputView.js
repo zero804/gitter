@@ -100,11 +100,13 @@ module.exports = (function() {
 
     ui: {
       composeToggle: '.js-toggle-compose-mode',
+      textarea: '#chat-input-textarea',
       mdHelp: '.js-md-help'
     },
 
     events: {
-      'click @ui.composeToggle': 'toggleComposeMode'
+      'click @ui.composeToggle': 'toggleComposeMode',
+      'paste': 'onPaste'
     },
 
     keyboardEvents: {
@@ -163,7 +165,7 @@ module.exports = (function() {
     },
 
     onRender: function() {
-      var $textarea = this.$el.find('#chat-input-textarea');
+      var $textarea = this.ui.textarea;
 
       // firefox only respects the "autofocus" attr if it is present on source html
       // also, dont show keyboard right away on mobile
@@ -460,6 +462,25 @@ module.exports = (function() {
       if(!chatItemView) return;
 
       chatItemView.toggleEdit();
+    },
+
+    onPaste: function(e) {
+      if (e.originalEvent) e = e.originalEvent;
+      if (!e.clipboardData) return;
+      var markdown = e.clipboardData.getData('text/x-markdown');
+
+      if (markdown) {
+        var val = this.ui.textarea.val();
+        var el = this.ui.textarea[0];
+
+        var selectionStart = el.selectionStart;
+        var selectionEnd = el.selectionEnd;
+
+        el.value = val.substring(0, selectionStart) + markdown + val.substring(selectionEnd);
+
+        el.selectionStart = el.selectionEnd = selectionStart + markdown.length;
+        e.preventDefault();
+      }
     }
   });
 
@@ -630,6 +651,7 @@ module.exports = (function() {
     hasVisibleText: function() {
       return !this.$el.val().match(/^\s+$/);
     }
+
   });
 
   cocktail.mixin(ChatInputBoxView, KeyboardEventsMixin);

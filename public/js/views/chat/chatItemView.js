@@ -43,12 +43,13 @@ module.exports = (function() {
     'click .js-chat-item-time':       'permalink',
     'mouseover .js-chat-item-readby': 'showReadByIntent',
     'click .webhook':                 'expandActivity',
-    'click':                          'chatSelected'
+    'click':                          'onClick',
+    'dblclick':                       'onDblClick'
   };
 
   var touchEvents = {
     'click .js-chat-item-edit':       'toggleEdit',
-    "click":                          'chatSelected'
+    "click":                          'onTouchClick'
   };
 
   var ChatItemView = Marionette.ItemView.extend({
@@ -92,6 +93,7 @@ module.exports = (function() {
       });
 
       this._oneToOne = context.inOneToOneTroupeContext();
+      this.isPermalinkable = !this._oneToOne;
 
       this.userCollection = options.userCollection;
 
@@ -130,6 +132,7 @@ module.exports = (function() {
       if(!data.html) {
         data.html = _.escape(data.text);
       }
+      data.isPermalinkable = this.isPermalinkable;
       return data;
     },
 
@@ -554,12 +557,9 @@ module.exports = (function() {
       appEvents.trigger('input.append', mention);
     },
 
-    chatSelected: function() {
-      // this calls onSelected
-      this.triggerMethod('selected', this.model);
-    },
-
     permalink: function(e) {
+      if(!this.isPermalinkable) return;
+
       /* Holding the Alt key down while clicking adds the permalink to the chat input */
       appEvents.trigger('permalink.requested', 'chat', this.model, { appendInput: !!e.altKey });
     },
@@ -570,6 +570,29 @@ module.exports = (function() {
       setTimeout(function() {
         self.$el.removeClass('chat-item__highlighted');
       }, 5000);
+    },
+    onTouchClick: function() {
+      // this calls onSelected
+      this.triggerMethod('selected', this.model);
+    },
+
+    onClick: function() {
+      // this calls onSelected
+      this.triggerMethod('selected', this.model);
+
+      if (!window.getSelection) return;
+      if (this.dblClickTimer) {
+        clearTimeout(this.dblClickTimer);
+        this.dblClickTimer = null;
+        window.getSelection().selectAllChildren(this.el);
+      }
+    },
+    onDblClick: function() {
+      if (!window.getSelection) return;
+      var self = this;
+      self.dblClickTimer = setTimeout(function () {
+        self.dblClickTimer = null;
+      }, 200);
     }
   });
 

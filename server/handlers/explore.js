@@ -7,7 +7,7 @@ var Q = require('q');
 var langs = require('langs');
 
 // @const
-var DEFAULT_TAGS = ['javascript', 'ruby', 'php'].sort();
+var DEFAULT_TAGS = ['javascript', 'php', 'ruby'];
 
 function trim(str) {
   return str.trim();
