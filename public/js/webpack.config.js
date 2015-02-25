@@ -29,7 +29,6 @@ var webpackConfig = {
     "router-embed-chat": path.resolve(path.join(__dirname, "./router-embed-chat")),
     "homepage": path.resolve(path.join(__dirname, "./homepage")),
     "apps": path.resolve(path.join(__dirname, "./apps.js")),
-    // "faye-diagnostics": path.resolve(path.join(__dirname, "./faye-diagnostics")),
     vendor: [
       'utils/webpack',
       'utils/context',
@@ -43,7 +42,7 @@ var webpackConfig = {
       'backbone.babysitter',
       'handlebars/runtime',
       'gitter-faye',
-      'raven',
+      'raven-js',
       'keymaster',
       'moment'
       ]
@@ -73,16 +72,12 @@ var webpackConfig = {
       "template": path.resolve(path.join(__dirname, "./template")),
       "bootstrap_tooltip": path.resolve(path.join(__dirname, "./utils/tooltip.js")),
       "jquery": path.resolve(path.join(__dirname, "../repo/jquery/jquery.js")),
-      "raven": path.resolve(path.join(__dirname, "../repo/raven/raven.js")),
       "marionette": path.resolve(path.join(__dirname, "../repo/marionette/marionette.js")),
       "mutant": path.resolve(path.join(__dirname, "../repo/mutant/mutant.js")),
       "backbone.wreqr": path.resolve(path.join(__dirname, "../repo/backbone.wreqr/backbone.wreqr.js")),
       "backbone.babysitter": path.resolve(path.join(__dirname, "../repo/backbone.babysitter/backbone.babysitter.js")),
       "backbone": path.resolve(path.join(__dirname, "../repo/backbone/backbone.js")),
       "cocktail": path.resolve(path.join(__dirname, "../repo/cocktail/cocktail.js")),
-      // Faye uses the standard faye module
-      // "faye": '/Users/andrewn/code/opensource/faye/javascript/browser.js',
-      //"faye": path.resolve(path.join(__dirname, "../repo/faye/fayeclient.js")),
       "keymaster": path.resolve(path.join(__dirname, "../repo/keymaster/keymaster.js")),
       "filtered-collection": path.resolve(path.join(__dirname, "../repo/filtered-collection/filtered-collection.js")),
       "emojify": path.resolve(path.join(__dirname, "../repo/emojify/emojify.js")),
@@ -98,8 +93,6 @@ var webpackConfig = {
       "jquery-hammer": path.resolve(path.join(__dirname, "../repo/hammerjs/jquery.hammer.js")),
       "cal-heatmap": path.resolve(path.join(__dirname, "../repo/cal-heatmap/cal-heatmap.js")),
       "d3": path.resolve(path.join(__dirname, "../repo/d3/d3.js")),
-      // "underscore": path.resolve(path.join(__dirname, "../repo/underscore/underscore.js")),
-      //"moment": path.resolve(path.join(__dirname, "../repo/moment/moment"))
     },
   },
   plugins: [

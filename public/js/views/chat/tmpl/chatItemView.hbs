@@ -12,7 +12,15 @@
     {{/if}}
     <div class='chat-item__details js-chat-item-details'>
       <div class='chat-item__from js-chat-item-from'>{{username}}</div>
-      <div class='chat-item__time js-chat-item-time'>{{widget "timeago" time=sent lang=lang locale=locale tooltipFormat='LLL [<br>(Alt-click to quote)]'}}</div>
+      {{#if isPermalinkable}}
+        <div class='chat-item__time js-chat-item-time chat-item__time--permalinkable'>
+          {{widget "timeago" time=sent lang=lang locale=locale tooltipFormat='LLL [<br>(Alt-click to quote)]'}}
+        </div>
+      {{else}}
+        <div class='chat-item__time js-chat-item-time'>
+          {{widget "timeago" time=sent lang=lang locale=locale tooltipFormat='LLL'}}
+        </div>
+      {{/if}}
       {{#if readByText}}
         {{#if compactView}}
           <span class="chat-item__icon--read  js-chat-item-readby"></span>
