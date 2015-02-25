@@ -205,7 +205,7 @@ module.exports = (function() {
 
     isTextDrag: function(e) {
       var dt = e.dataTransfer;
-      if (dt.files.length > 0) {
+      if (!dt.files && dt.files.length > 0) {
         return false;
       }
 

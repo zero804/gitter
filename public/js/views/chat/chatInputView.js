@@ -468,6 +468,7 @@ module.exports = (function() {
       if (e.originalEvent) e = e.originalEvent;
       if (!e.clipboardData) return;
       var markdown = e.clipboardData.getData('text/x-markdown');
+
       if (markdown) {
         var val = this.ui.textarea.val();
         var el = this.ui.textarea[0];

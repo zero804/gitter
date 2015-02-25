@@ -43,12 +43,13 @@ module.exports = (function() {
     'click .js-chat-item-time':       'permalink',
     'mouseover .js-chat-item-readby': 'showReadByIntent',
     'click .webhook':                 'expandActivity',
-    'click':                          'chatSelected'
+    'click':                          'onClick',
+    'dblclick':                       'onDblClick'
   };
 
   var touchEvents = {
     'click .js-chat-item-edit':       'toggleEdit',
-    "click":                          'chatSelected'
+    "click":                          'onTouchClick'
   };
 
   var ChatItemView = Marionette.ItemView.extend({
@@ -556,11 +557,6 @@ module.exports = (function() {
       appEvents.trigger('input.append', mention);
     },
 
-    chatSelected: function() {
-      // this calls onSelected
-      this.triggerMethod('selected', this.model);
-    },
-
     permalink: function(e) {
       if(!this.isPermalinkable) return;
 
@@ -574,6 +570,29 @@ module.exports = (function() {
       setTimeout(function() {
         self.$el.removeClass('chat-item__highlighted');
       }, 5000);
+    },
+    onTouchClick: function() {
+      // this calls onSelected
+      this.triggerMethod('selected', this.model);
+    },
+
+    onClick: function() {
+      // this calls onSelected
+      this.triggerMethod('selected', this.model);
+
+      if (!window.getSelection) return;
+      if (this.dblClickTimer) {
+        clearTimeout(this.dblClickTimer);
+        this.dblClickTimer = null;
+        window.getSelection().selectAllChildren(this.el);
+      }
+    },
+    onDblClick: function() {
+      if (!window.getSelection) return;
+      var self = this;
+      self.dblClickTimer = setTimeout(function () {
+        self.dblClickTimer = null;
+      }, 200);
     }
   });
 
