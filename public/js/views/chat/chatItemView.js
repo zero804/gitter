@@ -92,6 +92,7 @@ module.exports = (function() {
       });
 
       this._oneToOne = context.inOneToOneTroupeContext();
+      this.isPermalinkable = !this._oneToOne;
 
       this.userCollection = options.userCollection;
 
@@ -130,6 +131,7 @@ module.exports = (function() {
       if(!data.html) {
         data.html = _.escape(data.text);
       }
+      data.isPermalinkable = this.isPermalinkable;
       return data;
     },
 
@@ -560,6 +562,8 @@ module.exports = (function() {
     },
 
     permalink: function(e) {
+      if(!this.isPermalinkable) return;
+
       /* Holding the Alt key down while clicking adds the permalink to the chat input */
       appEvents.trigger('permalink.requested', 'chat', this.model, { appendInput: !!e.altKey });
     },
