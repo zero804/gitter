@@ -1091,8 +1091,9 @@
       }
     },
     "gitter-env": {
-      "version": "0.20.5",
-      "from": "gitter-env@latest",
+      "version": "0.20.3",
+      "from": "gitter-env@0.20.3",
+      "resolved": "http://beta-internal:4873/gitter-env/-/gitter-env-0.20.3.tgz",
       "dependencies": {
         "async": {
           "version": "0.8.0",
@@ -1241,20 +1242,10 @@
           "resolved": "http://beta-internal:4873/node-statsd/-/node-statsd-0.1.1.tgz"
         },
         "raven": {
-          "version": "0.7.2",
-          "from": "raven@>=0.7.2 <0.8.0",
-          "resolved": "http://beta-internal:4873/raven/-/raven-0.7.2.tgz",
+          "version": "0.6.3",
+          "from": "raven@>=0.6.3 <0.7.0",
+          "resolved": "http://beta-internal:4873/raven/-/raven-0.6.3.tgz",
           "dependencies": {
-            "cookie": {
-              "version": "0.1.0",
-              "from": "cookie@0.1.0",
-              "resolved": "http://beta-internal:4873/cookie/-/cookie-0.1.0.tgz"
-            },
-            "lsmod": {
-              "version": "0.0.3",
-              "from": "lsmod@>=0.0.3 <0.1.0",
-              "resolved": "http://beta-internal:4873/lsmod/-/lsmod-0.0.3.tgz"
-            },
             "node-uuid": {
               "version": "1.4.2",
               "from": "node-uuid@>=1.4.1 <1.5.0",
@@ -1264,6 +1255,16 @@
               "version": "0.0.7",
               "from": "stack-trace@0.0.7",
               "resolved": "http://beta-internal:4873/stack-trace/-/stack-trace-0.0.7.tgz"
+            },
+            "lsmod": {
+              "version": "0.0.3",
+              "from": "lsmod@>=0.0.3 <0.1.0",
+              "resolved": "http://beta-internal:4873/lsmod/-/lsmod-0.0.3.tgz"
+            },
+            "cookie": {
+              "version": "0.1.0",
+              "from": "cookie@0.1.0",
+              "resolved": "http://beta-internal:4873/cookie/-/cookie-0.1.0.tgz"
             }
           }
         },
