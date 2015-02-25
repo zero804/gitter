@@ -360,6 +360,7 @@ module.exports = (function() {
       var startText = $(range.startContainer).parents('.js-chat-item-text')[0];
       var endText = $(range.endContainer).parents('.js-chat-item-text')[0];
 
+      /* Has a single chat been selected? If so, only use markdown if the WHOLE chat has been selected, and not a partial selection */
       if (startText && endText && startText === endText) {
         /* Partial selection */
         if(range.startOffset > 0 || range.endOffset < range.endContainer.textContent.length) return;
@@ -370,9 +371,16 @@ module.exports = (function() {
       }
 
       var models = getModelsInRange(this, start, end);
-      if (!models.length) return;
-      if (range.startContainer.textContent.length === range.startOffset) models.shift();
+
+      /* If the offset is the end of the start container */
+      if (range.startContainer.textContent.length && range.startContainer.textContent.length === range.startOffset) models.shift();
+
+      /* ... or the beginning of the end container */
       if (range.endOffset === 0) models.pop();
+
+      /* Nothing to render?*/
+      if (!models.length) return;
+
       var text = renderMarkdown(models);
       e.clipboardData.setData('text/plain', plainText);
       e.clipboardData.setData('text/x-markdown', text);
