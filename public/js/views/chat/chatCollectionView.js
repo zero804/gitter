@@ -12,6 +12,28 @@ require('views/behaviors/infinite-scroll');
 
 module.exports = (function() {
 
+  function isFirstElementInParent(element) {
+    var prev = element.previousSibling;
+    if (!prev) return true;
+    return prev.nodeType === 3 /* TEXT */ && !prev.previousSibling && prev.textContent.match(/^[\s\n\r]*$/); /* Whitespace */
+  }
+
+  function isLastElementInParent(element) {
+    var next = element.nextSibling;
+    if (!next) return true;
+    return next.nodeType === 3 /* TEXT */ && !next.nextSibling && next.textContent.match(/^[\s\n\r]*$/); /* Whitespace */
+  }
+
+  function isAtStartOfParent(parent, element) {
+    while (isFirstElementInParent(element) && element !== parent) element = element.parentElement;
+    return element === parent;
+  }
+
+  function isAtEndOfParent(parent, element) {
+    while (isLastElementInParent(element) && element !== parent) element = element.parentElement;
+    return element === parent;
+  }
+
   /** @const */
   var PAGE_SIZE = 20;
 
@@ -342,11 +364,9 @@ module.exports = (function() {
         /* Partial selection */
         if(range.startOffset > 0 || range.endOffset < range.endContainer.textContent.length) return;
 
-        var startSelection = range.startContainer;
-        var endSelection = range.endContainer;
-        while (!startSelection.previousSibling && startSelection !== startText) startSelection = startSelection.parentElement;
-        while (!endSelection.nextSibling && endSelection !== startText) endSelection = endSelection.parentElement;
-        if (startSelection !== startText || endSelection !== startText) return;
+        var atStart = isAtStartOfParent(startText, range.startContainer);
+        var atEnd = isAtEndOfParent(startText, range.endContainer);
+        if (!atStart || !atEnd) return;
       }
 
       var models = getModelsInRange(this, start, end);
