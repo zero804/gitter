@@ -28,6 +28,14 @@ require('transloadit');
 
 var PROGRESS_THRESHOLD = 62.5;
 
+function contains(domStringsList, item) {
+  if (!domStringsList) return false;
+  for (var i = 0; i < domStringsList.length; i++) {
+    if (domStringsList[i] === item) return true;
+  }
+  return false;
+}
+
 module.exports = (function() {
 
   var touchEvents = {
@@ -205,6 +213,7 @@ module.exports = (function() {
 
     isTextDrag: function(e) {
       var dt = e.dataTransfer;
+      if (contains(dt.types, 'Files')) return false;
       if (!dt.files && dt.files.length > 0) {
         return false;
       }
