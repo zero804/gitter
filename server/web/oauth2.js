@@ -195,7 +195,7 @@ exports.token = [
     stats.event('oauth.exchange');
     next();
   },
-  passport.authenticate([/*'basic', */'oauth2-client-password'], { session: false }),
+  passport.authenticate([/*'basic', */'oauth2-client-password'], { session: false, failWithError: true }),
   server.token(),
   server.errorHandler()
 ];
