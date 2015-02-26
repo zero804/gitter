@@ -19,7 +19,7 @@ function ensureLoggedIn(req, res, next) {
 }
 
 module.exports = [
-  passport.authenticate('bearer', { session: false }),
+  passport.authenticate('bearer', { session: false, failWithError: true }),
   ensureLoggedIn,
   rateLimiter
 ];
