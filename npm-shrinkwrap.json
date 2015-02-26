@@ -1392,55 +1392,33 @@
       }
     },
     "gitter-passport-github": {
-      "version": "0.1.8-e",
-      "from": "http://beta-internal:4873/gitter-passport-github/-/gitter-passport-github-0.1.8-e.tgz",
-      "resolved": "http://beta-internal:4873/gitter-passport-github/-/gitter-passport-github-0.1.8-e.tgz",
+      "version": "0.1.8-f",
+      "from": "gitter-passport-github@0.1.8-f",
+      "resolved": "http://beta-internal:4873/gitter-passport-github/-/gitter-passport-github-0.1.8-f.tgz",
       "dependencies": {
         "gitter-passport-oauth": {
-          "version": "1.0.0-e",
-          "from": "http://beta-internal:4873/gitter-passport-oauth/-/gitter-passport-oauth-1.0.0-e.tgz",
-          "resolved": "http://beta-internal:4873/gitter-passport-oauth/-/gitter-passport-oauth-1.0.0-e.tgz",
+          "version": "1.0.0-f",
+          "from": "gitter-passport-oauth@>=1.0.0-f <2.0.0",
+          "resolved": "http://beta-internal:4873/gitter-passport-oauth/-/gitter-passport-oauth-1.0.0-f.tgz",
           "dependencies": {
-            "gitter-passport-oauth2": {
-              "version": "1.1.2-a",
-              "from": "http://beta-internal:4873/gitter-passport-oauth2/-/gitter-passport-oauth2-1.1.2-a.tgz",
-              "resolved": "http://beta-internal:4873/gitter-passport-oauth2/-/gitter-passport-oauth2-1.1.2-a.tgz",
-              "dependencies": {
-                "passport-strategy": {
-                  "version": "1.0.0",
-                  "from": "http://beta-internal:4873/passport-strategy/-/passport-strategy-1.0.0.tgz",
-                  "resolved": "http://beta-internal:4873/passport-strategy/-/passport-strategy-1.0.0.tgz"
-                },
-                "oauth": {
-                  "version": "0.9.12",
-                  "from": "http://beta-internal:4873/oauth/-/oauth-0.9.12.tgz",
-                  "resolved": "http://beta-internal:4873/oauth/-/oauth-0.9.12.tgz"
-                },
-                "uid2": {
-                  "version": "0.0.3",
-                  "from": "http://beta-internal:4873/uid2/-/uid2-0.0.3.tgz",
-                  "resolved": "http://beta-internal:4873/uid2/-/uid2-0.0.3.tgz"
-                }
-              }
-            },
             "passport-oauth1": {
               "version": "1.0.1",
-              "from": "http://beta-internal:4873/passport-oauth1/-/passport-oauth1-1.0.1.tgz",
+              "from": "passport-oauth1@>=1.0.0 <2.0.0",
               "resolved": "http://beta-internal:4873/passport-oauth1/-/passport-oauth1-1.0.1.tgz",
               "dependencies": {
                 "passport-strategy": {
                   "version": "1.0.0",
-                  "from": "http://beta-internal:4873/passport-strategy/-/passport-strategy-1.0.0.tgz",
+                  "from": "passport-strategy@>=1.0.0 <2.0.0",
                   "resolved": "http://beta-internal:4873/passport-strategy/-/passport-strategy-1.0.0.tgz"
                 },
                 "oauth": {
                   "version": "0.9.12",
-                  "from": "http://beta-internal:4873/oauth/-/oauth-0.9.12.tgz",
+                  "from": "oauth@>=0.9.0 <0.10.0",
                   "resolved": "http://beta-internal:4873/oauth/-/oauth-0.9.12.tgz"
                 },
                 "utils-merge": {
                   "version": "1.0.0",
-                  "from": "http://beta-internal:4873/utils-merge/-/utils-merge-1.0.0.tgz",
+                  "from": "utils-merge@>=1.0.0 <2.0.0",
                   "resolved": "http://beta-internal:4873/utils-merge/-/utils-merge-1.0.0.tgz"
                 }
               }
@@ -1449,7 +1427,7 @@
         },
         "pkginfo": {
           "version": "0.2.3",
-          "from": "http://beta-internal:4873/pkginfo/-/pkginfo-0.2.3.tgz",
+          "from": "pkginfo@>=0.2.0 <0.3.0",
           "resolved": "http://beta-internal:4873/pkginfo/-/pkginfo-0.2.3.tgz"
         }
       }
@@ -1463,6 +1441,28 @@
           "version": "1.0.0",
           "from": "http://beta-internal:4873/passport-strategy/-/passport-strategy-1.0.0.tgz",
           "resolved": "http://beta-internal:4873/passport-strategy/-/passport-strategy-1.0.0.tgz"
+        }
+      }
+    },
+    "gitter-passport-oauth2": {
+      "version": "1.1.2-b",
+      "from": "gitter-passport-oauth2@latest",
+      "resolved": "http://beta-internal:4873/gitter-passport-oauth2/-/gitter-passport-oauth2-1.1.2-b.tgz",
+      "dependencies": {
+        "passport-strategy": {
+          "version": "1.0.0",
+          "from": "passport-strategy@>=1.0.0 <2.0.0",
+          "resolved": "http://beta-internal:4873/passport-strategy/-/passport-strategy-1.0.0.tgz"
+        },
+        "oauth": {
+          "version": "0.9.12",
+          "from": "oauth@>=0.9.0 <0.10.0",
+          "resolved": "http://beta-internal:4873/oauth/-/oauth-0.9.12.tgz"
+        },
+        "uid2": {
+          "version": "0.0.3",
+          "from": "uid2@>=0.0.0 <0.1.0",
+          "resolved": "http://beta-internal:4873/uid2/-/uid2-0.0.3.tgz"
         }
       }
     },
