@@ -46,12 +46,16 @@ module.exports = (function() {
 
   function continuous(cb, ms) {
     var until = Date.now() + ms;
-    var timer = setInterval(function() {
-      if(Date.now() >= until) {
-        clearInterval(timer);
-      }
+
+    function next() {
       cb();
-    }, 20);
+
+      if(Date.now() < until) {
+        RAF(next);
+      }
+    }
+
+    RAF(next);
   }
 
   Rollers.prototype = {
@@ -82,13 +86,17 @@ module.exports = (function() {
       }
     },
 
-    stable: function() {
+    stable: function(stableElement) {
       var target = this._target;
 
       this._nopass = null;
       this._mode = STABLE;
 
-      this._stableElement = this.getBottomMostVisibleElement();
+      if (stableElement) {
+        this._stableElement = stableElement;
+      } else {
+        this._stableElement = this.getBottomMostVisibleElement();
+      }
 
       // TODO: check that the element is within the targets DOM heirachy
       var scrollBottom = target.scrollTop + target.clientHeight;
@@ -189,8 +197,7 @@ module.exports = (function() {
         target.scrollTop = scrollTop;
       });
 
-      this.stable();
-      // this.trackUntil(element, true/*force*/);
+      this.stable(element);
     },
 
     /*
