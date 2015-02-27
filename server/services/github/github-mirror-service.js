@@ -6,8 +6,8 @@ var StatusError = require('statuserror');
 
 var nconf = require('../../utils/config');
 
-var anonymousClientId = nconf.get('github:anonymous_app:user_client_id');
-var anonymousClientSecret = nconf.get('github:anonymous_app:user_client_secret');
+var anonymousClientId = nconf.get('github:anonymous_app:client_id');
+var anonymousClientSecret = nconf.get('github:anonymous_app:client_secret');
 
 function repoTokenFirst(user) {
   return user && (user.githubToken || user.githubUserToken)  || '';

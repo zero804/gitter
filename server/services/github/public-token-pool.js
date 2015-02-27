@@ -6,8 +6,8 @@ var nconf = require('../../utils/config');
 var env = require('../../utils/env');
 var stats = env.stats;
 
-var anonymousClientId = nconf.get('github:anonymous_app:user_client_id');
-var anonymousClientSecret = nconf.get('github:anonymous_app:user_client_secret');
+var anonymousClientId = nconf.get('github:anonymous_app:client_id');
+var anonymousClientSecret = nconf.get('github:anonymous_app:client_secret');
 
 module.exports = exports = function(request) {
   return function requestWrapper(options, callback) {
