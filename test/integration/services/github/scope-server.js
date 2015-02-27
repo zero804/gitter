@@ -83,7 +83,7 @@ app.use(passport.initialize());
 app.get('/auth',
   function(req, res, next) {
     req.session.currentScope = req.query.scope;
-    passport.authorize('github_' + req.query.scope, { scope: req.query.scope })(req, res, next);
+    passport.authorize('github_' + req.query.scope, { scope: req.query.scope, failWithError: true })(req, res, next);
   });
 
 // Welcome GitHub users.
@@ -91,7 +91,7 @@ app.get(
   '/login/callback',
   function(req, res, next) {
     var scope = req.session.currentScope;
-    passport.authorize('github_' + scope)(req, res, next);
+    passport.authorize('github_' + scope, { failWithError: true })(req, res, next);
   },
   function(req, res, next) {
     res.redirect('/');

@@ -27,7 +27,7 @@ exports.serializeTroupesForUser = function(userId, callback) {
         mapUsers: false
       });
 
-      return restSerializer.serializeQ(troupeIds, strategy);
+      return restSerializer.serializeExcludeNulls(troupeIds, strategy);
     })
     .nodeify(callback);
 };
@@ -53,7 +53,7 @@ exports.serializeChatsForTroupe = function(troupeId, userId, options, callback) 
         disableLimitReachedMessage: options.disableLimitReachedMessage
       });
 
-      return restSerializer.serialize(chatMessages, strategy);
+      return restSerializer.serializeExcludeNulls(chatMessages, strategy);
     })
     .nodeify(callback);
 
@@ -94,7 +94,7 @@ exports.serializeReadBysForChat = function(troupeId, chatId, callback) {
     .then(function(chatMessage) {
       var strategy = new restSerializer.UserIdStrategy({});
 
-      return restSerializer.serialize(chatMessage.readBy, strategy);
+      return restSerializer.serializeExcludeNulls(chatMessage.readBy, strategy);
     })
     .nodeify(callback);
 
@@ -104,7 +104,7 @@ exports.serializeEventsForTroupe = function(troupeId, userId, callback) {
   return eventService.findEventsForTroupe(troupeId, {})
     .then(function(events) {
       var strategy = new restSerializer.EventStrategy({ currentUserId: userId, troupeId: troupeId });
-      return restSerializer.serialize(events, strategy);
+      return restSerializer.serializeExcludeNulls(events, strategy);
     })
     .nodeify(callback);
 };
@@ -118,7 +118,7 @@ exports.serializeOrgsForUser = function(user, options) {
     .then(function(ghOrgs) {
       var strategy = new restSerializer.GithubOrgStrategy(strategyOptions);
 
-      return restSerializer.serialize(ghOrgs, strategy);
+      return restSerializer.serializeExcludeNulls(ghOrgs, strategy);
     });
 };
 
