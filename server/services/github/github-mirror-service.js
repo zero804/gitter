@@ -4,6 +4,11 @@
 var url = require('url');
 var StatusError = require('statuserror');
 
+var nconf = require('../../utils/config');
+
+var anonymousClientId = nconf.get('github:anonymous_app:user_client_id');
+var anonymousClientSecret = nconf.get('github:anonymous_app:user_client_secret');
+
 function repoTokenFirst(user) {
   return user && (user.githubToken || user.githubUserToken)  || '';
 }
@@ -36,7 +41,12 @@ module.exports = function(tokenPriority) {
     var d = Q.defer();
 
     var u = url.parse(uri, true);
-    u.query.access_token = this.token;
+    if (this.token) {
+      u.query.access_token = this.token;
+    } else {
+      u.query.client_id = anonymousClientId;
+      u.query.client_secret = anonymousClientSecret;
+    }
     u.protocol = 'https';
     u.hostname = 'api.github.com';
     var options = {

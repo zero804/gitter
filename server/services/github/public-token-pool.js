@@ -3,35 +3,45 @@
 
 var url = require('url');
 var nconf = require('../../utils/config');
+var env = require('../../utils/env');
+var stats = env.stats;
 
-var count = 0;
+var anonymousClientId = nconf.get('github:anonymous_app:user_client_id');
+var anonymousClientSecret = nconf.get('github:anonymous_app:user_client_secret');
 
 module.exports = exports = function(request) {
   return function requestWrapper(options, callback) {
 
-    var uri = options.uri;
     var accessToken;
     if (options.headers) {
       accessToken = options.headers.Authorization || options.headers.authorization;
     }
 
+    var parsed;
     if (!accessToken) {
-      var p = url.parse(uri, true);
-      accessToken = p.query.access_token;
+      parsed = url.parse(options.uri || options.url, true);
+      accessToken = parsed.query.access_token;
     }
 
     if(!accessToken) {
-      /* Load this jit so that we can add additional values and SIGHUP
-       * the process if we need to */
-      var accessTokenPool = nconf.get('github:publicAccessTokens');
+      stats.eventHF('github.anonymous.access');
 
-      accessToken = accessTokenPool[count++ % accessTokenPool.length];
-      if (!options.headers) {
-        options.headers = {};
+      if (!parsed) parsed = url.parse(options.uri || options.url, true);
+
+      /* Only GET requests thanks */
+      parsed.query.client_id = anonymousClientId;
+      parsed.query.client_secret = anonymousClientSecret;
+      delete parsed.query.access_token;
+      delete parsed.search;
+
+      var uri = url.format(parsed);
+
+      if(options.uri) {
+        options.uri = uri;
+      } else if(options.url) {
+        options.url = uri;
       }
-      options.headers.Authorization = 'token ' + accessToken;
     }
-
     request(options, callback);
   };
 };
