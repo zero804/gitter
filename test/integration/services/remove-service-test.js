@@ -17,7 +17,7 @@ var mockito = require('jsmockito').JsMockito;
 
 Q.longStackSupport = true;
 
-describe('remove-service', function() {
+describe('remove-service #slow', function() {
 
   beforeEach(fixtureLoader(fixture, {
     troupeCanRemove: {

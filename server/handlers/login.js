@@ -5,6 +5,7 @@ var env              = require('../utils/env');
 var stats            = env.stats;
 var logger           = env.logger;
 var config           = env.config;
+var errorReporter    = env.errorReporter;
 
 var passport         = require('passport');
 var client           = require("../utils/redis").getClient();
@@ -67,7 +68,7 @@ module.exports = {
         }
         next();
       },
-      passport.authorize('github_user', { scope: 'user:email,read:org' })
+      passport.authorize('github_user', { scope: 'user:email,read:org', failWithError: true })
     );
 
     app.get(
@@ -124,7 +125,7 @@ module.exports = {
           var requestedScopes = Object.keys(existing).filter(function(f) { return !!f; });
           req.session.githubScopeUpgrade = true;
 
-          passport.authorize('github_upgrade', { scope: requestedScopes })(req, res, next);
+          passport.authorize('github_upgrade', { scope: requestedScopes, failWithError: true })(req, res, next);
         }
       );
 
@@ -148,32 +149,50 @@ module.exports = {
       function(req, res, next) {
         var code = req.query.code;
         lock("oalock:" + code, function(done) {
-
             var handler;
             var upgrade = req.session && req.session.githubScopeUpgrade;
             if(upgrade) {
-              handler = passport.authorize('github_upgrade');
+              handler = passport.authorize('github_upgrade', { failWithError: true });
             } else {
-              handler = passport.authorize('github_user');
+              handler = passport.authorize('github_user', { failWithError: true });
             }
 
             handler(req, res, function(err) {
-              done();
+              done(function() {
 
-              if(err) {
-                if(upgrade) {
-                  res.redirect('/login/upgrade-failed');
-                } else {
-                  if(err.message) {
-                    res.redirect('/login/failed?message=' + encodeURIComponent(err.message));
+                if(err) {
+                  errorReporter(err, {
+                    githubCallbackFailed: "failed",
+                    username: req.user && req.user.username,
+                    url: req.url,
+                    userHasSession: !!req.session
+                  });
+
+                  if(upgrade) {
+                    res.redirect('/login/upgrade-failed');
                   } else {
-                    res.redirect('/login/failed');
-                  }
-                }
-                return;
-              }
+                    /* For some reason, the user is now logged in, just continue as normal */
+                    var user = req.user;
+                    if(user) {
+                      if(req.session && req.session.returnTo) {
+                        res.redirect(req.session.returnTo);
+                      } else {
+                        res.redirect('/' + user.username);
+                      }
+                      return;
+                    }
 
-              next();
+                    if(err.message) {
+                      res.redirect('/login/failed?message=' + encodeURIComponent(err.message));
+                    } else {
+                      res.redirect('/login/failed');
+                    }
+                  }
+                  return;
+                }
+
+                next();
+              });
             });
 
         });
@@ -200,18 +219,6 @@ module.exports = {
           res.redirect('/');
         }
       });
-
-    app.get(
-      '/login/callback',
-      /* 4-nary error handler for /login/callback */
-      function(err, req, res, /* DO NOT DELETE THIS --> */ next /* <-- DO NOT DELETE THIS! */) {  // jshint unused:false
-        logger.error("OAuth failed: " + err);
-        if(err.stack) {
-          logger.error("OAuth failure callback", err.stack);
-        }
-        res.redirect("/");
-      });
-
 
     // ----------------------------------------------------------
     // OAuth for our own clients

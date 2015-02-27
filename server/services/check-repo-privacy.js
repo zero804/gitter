@@ -5,12 +5,9 @@
 
 var GithubRepoService = require('./github/github-repo-service');
 var roomService = require('./room-service');
-var nconf = require('../utils/config');
-
-var token = nconf.get('github:noaccesstoken');
 
 function checkRepoPrivacy(uri) {
-  var repoService = new GithubRepoService({ githubToken: token });
+  var repoService = new GithubRepoService();
   return repoService.getRepo(uri)
     .then(function(repo) {
       if(!repo || repo.private) {
