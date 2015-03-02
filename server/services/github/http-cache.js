@@ -2,6 +2,7 @@
 'use strict';
 
 var env = require('../../utils/env');
+var _ = require('lodash');
 var config = env.config;
 var logger = env.logger;
 // TODO: add stats
@@ -15,7 +16,9 @@ var Wreck = require('wreck');
 
 var zlib = require('zlib');
 var url = require('url');
-var redisClient = env.redis.createClient(config.get("redis_http_caching"));
+var redisClient = env.redis.createClient(config.get("http_caching:redis"));
+var httpCacheTTL = config.get("http_caching:ttl");
+
 var fs = require('fs');
 var Schema = require('protobuf').Schema;
 var schema = new Schema(fs.readFileSync(__dirname + '/http-cache-message.desc'));
@@ -98,7 +101,11 @@ function store(key, statusCode, etag, expiry, headers, body, callback) {
         bodyCompressed: null
       });
 
-      redisClient.hmset(key, EXPIRY_HASH_KEY, expiry, ETAG_HASH_KEY, etag, CONTENT_HASH_KEY, proto, callback);
+      var multi = redisClient.multi();
+
+      multi.hmset(key, EXPIRY_HASH_KEY, expiry, ETAG_HASH_KEY, etag, CONTENT_HASH_KEY, proto);
+      multi.expire(key, httpCacheTTL);
+      multi.exec(callback);
 
     } catch(err) {
       return callback(err);
@@ -123,7 +130,11 @@ function store(key, statusCode, etag, expiry, headers, body, callback) {
         })
       });
 
-      redisClient.hmset(key, EXPIRY_HASH_KEY, expiry, ETAG_HASH_KEY, etag, CONTENT_HASH_KEY, proto, callback);
+
+      var multi = redisClient.multi();
+      multi.hmset(key, EXPIRY_HASH_KEY, expiry, ETAG_HASH_KEY, etag, CONTENT_HASH_KEY, proto);
+      multi.expire(key, httpCacheTTL);
+      multi.exec(callback);
 
     } catch(err) {
       return callback(err);
@@ -133,7 +144,10 @@ function store(key, statusCode, etag, expiry, headers, body, callback) {
 
 function updateExpiry(key, expiry, callback) {
   /* TODO: check that the key hasn't just been removed */
-  redisClient.hmset(key, EXPIRY_HASH_KEY, expiry, callback);
+  var multi = redisClient.multi();
+  multi.hmset(key, EXPIRY_HASH_KEY, expiry);
+  multi.expire(key, httpCacheTTL);
+  multi.exec(callback);
 }
 
 function makeResponse(cachedContent) {
@@ -161,29 +175,32 @@ function doSuccessCallback(options, cachedContent, callback) {
 module.exports = exports = function(request) {
   function makeRequest(requestUrl, accessToken, options, key, etagExpiry, callback) {
     var etag = etagExpiry && etagExpiry.etag;
+    var originalOptions = options;
 
     /* If we have an etag, always use it */
     if (etag) {
-      if (!options.headers) {
-        options.headers = {};
-      }
-      options.headers['If-None-Match'] = etag;
+      /* Clone the options so not to modify the original */
+      options = _.extend({}, options);
+      options.headers = _.extend({}, options.headers, {
+        'If-None-Match': etag
+      });
     }
 
     request(options, function(err, response, body) {
       if (err) {
         if (etagExpiry) {
           logger.warn('http.cache upstream failure. Using cached response: ' + err, { exception: err});
-          return lookupContent(key, function(err2, cachedContent) {
-            if (err2) {
-              logger.warn('Error looking up cache content: ' + err2, { exception: err2 });
+          return lookupContent(key, function(_err, cachedContent) {
+            if (_err) {
+              logger.warn('Error looking up cache content: ' + _err, { exception: _err });
             }
 
-            if (err2 || !cachedContent) return callback(err, response, body); // Unable to lookup content
+            if (_err || !cachedContent) return callback(err, response, body); // Unable to lookup content
 
             return doSuccessCallback(options, cachedContent, function(_err, _response, _body) {
               if (_err) {
-                logger.warn('Error parsing cache content: ' + err2, { exception: err2 });
+                logger.warn('Error parsing cache content: ' + _err, { exception: _err });
+                /* Return with the original error, response, body */
                 return callback(err, response, body);
               }
 
@@ -199,13 +216,17 @@ module.exports = exports = function(request) {
 
       if (etag && response.statusCode === 304) {
         return lookupContent(key, function(err, cachedContent) {
+          if (err) {
+            logger.warn('Error looking up content: ' + err, { exception: err });
+          }
+
           /* Corrupted data - reissue the request without the cache */
-          if (err || !cachedContent) return makeRequest(requestUrl, accessToken, options, key, null, callback);
+          if (err || !cachedContent) return makeRequest(requestUrl, accessToken, originalOptions, key, null, callback);
 
           return doSuccessCallback(options, cachedContent, function(err, _response, _body) {
             if (err) {
               logger.warn('Error parsing cache content: ' + err, { exception: err });
-              return makeRequest(requestUrl, accessToken, options, key, null, callback);
+              return makeRequest(requestUrl, accessToken, originalOptions, key, null, callback);
             }
 
             if (response.headers['cache-control']) {
@@ -221,7 +242,6 @@ module.exports = exports = function(request) {
                 }
               });
             }
-
 
             return callback(null, _response, _body);
           });
@@ -245,9 +265,7 @@ module.exports = exports = function(request) {
             }
           });
         }
-
       }
-
 
       callback(null, response, body);
     });
@@ -257,7 +275,7 @@ module.exports = exports = function(request) {
     var method = options.method ? options.method.toUpperCase() : 'GET'; /* default is GET */
 
     /* Only for GET */
-    if (method !== 'GET') {
+    if (method !== 'GET' || options.disableCache) {
       return request(options, callback);
     }
 
@@ -292,6 +310,9 @@ module.exports = exports = function(request) {
       if (etagExpiry) {
         var fresh = etagExpiry.expiry && etagExpiry.expiry >= Date.now();
 
+        /**
+         * If the content is fresh, return it immediately without hitting the endpoint
+         */
         if (fresh) {
           return lookupContent(redisKey, function(err2, cachedContent) {
             if (err2) {
