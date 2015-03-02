@@ -15,7 +15,7 @@ var Wreck = require('wreck');
 
 var zlib = require('zlib');
 var url = require('url');
-var redisClient = env.redis.createClient(config.get("redis_http_cache"));
+var redisClient = env.redis.createClient(config.get("redis_http_caching"));
 var fs = require('fs');
 var Schema = require('protobuf').Schema;
 var schema = new Schema(fs.readFileSync(__dirname + '/http-cache-message.desc'));
