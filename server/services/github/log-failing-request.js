@@ -1,7 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 'use strict';
 
-var winston    = require('../../utils/winston');
+var winston = require('../../utils/winston');
 
 module.exports = exports = function(request) {
   return function requestWrapper(options, callback) {

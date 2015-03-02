@@ -1092,7 +1092,7 @@
     },
     "gitter-env": {
       "version": "0.20.3",
-      "from": "gitter-env@0.20.3",
+      "from": "http://beta-internal:4873/gitter-env/-/gitter-env-0.20.3.tgz",
       "resolved": "http://beta-internal:4873/gitter-env/-/gitter-env-0.20.3.tgz",
       "dependencies": {
         "async": {
@@ -1393,32 +1393,32 @@
     },
     "gitter-passport-github": {
       "version": "0.1.8-f",
-      "from": "gitter-passport-github@0.1.8-f",
+      "from": "http://beta-internal:4873/gitter-passport-github/-/gitter-passport-github-0.1.8-f.tgz",
       "resolved": "http://beta-internal:4873/gitter-passport-github/-/gitter-passport-github-0.1.8-f.tgz",
       "dependencies": {
         "gitter-passport-oauth": {
           "version": "1.0.0-f",
-          "from": "gitter-passport-oauth@>=1.0.0-f <2.0.0",
+          "from": "http://beta-internal:4873/gitter-passport-oauth/-/gitter-passport-oauth-1.0.0-f.tgz",
           "resolved": "http://beta-internal:4873/gitter-passport-oauth/-/gitter-passport-oauth-1.0.0-f.tgz",
           "dependencies": {
             "passport-oauth1": {
               "version": "1.0.1",
-              "from": "passport-oauth1@>=1.0.0 <2.0.0",
+              "from": "http://beta-internal:4873/passport-oauth1/-/passport-oauth1-1.0.1.tgz",
               "resolved": "http://beta-internal:4873/passport-oauth1/-/passport-oauth1-1.0.1.tgz",
               "dependencies": {
                 "passport-strategy": {
                   "version": "1.0.0",
-                  "from": "passport-strategy@>=1.0.0 <2.0.0",
+                  "from": "http://beta-internal:4873/passport-strategy/-/passport-strategy-1.0.0.tgz",
                   "resolved": "http://beta-internal:4873/passport-strategy/-/passport-strategy-1.0.0.tgz"
                 },
                 "oauth": {
                   "version": "0.9.12",
-                  "from": "oauth@>=0.9.0 <0.10.0",
+                  "from": "http://beta-internal:4873/oauth/-/oauth-0.9.12.tgz",
                   "resolved": "http://beta-internal:4873/oauth/-/oauth-0.9.12.tgz"
                 },
                 "utils-merge": {
                   "version": "1.0.0",
-                  "from": "utils-merge@>=1.0.0 <2.0.0",
+                  "from": "http://beta-internal:4873/utils-merge/-/utils-merge-1.0.0.tgz",
                   "resolved": "http://beta-internal:4873/utils-merge/-/utils-merge-1.0.0.tgz"
                 }
               }
@@ -1427,7 +1427,7 @@
         },
         "pkginfo": {
           "version": "0.2.3",
-          "from": "pkginfo@>=0.2.0 <0.3.0",
+          "from": "http://beta-internal:4873/pkginfo/-/pkginfo-0.2.3.tgz",
           "resolved": "http://beta-internal:4873/pkginfo/-/pkginfo-0.2.3.tgz"
         }
       }
@@ -2411,6 +2411,18 @@
       "from": "http://beta-internal:4873/permessage-deflate/-/permessage-deflate-0.1.2.tgz",
       "resolved": "http://beta-internal:4873/permessage-deflate/-/permessage-deflate-0.1.2.tgz"
     },
+    "protobuf": {
+      "version": "0.11.0",
+      "from": "protobuf@*",
+      "resolved": "http://beta-internal:4873/protobuf/-/protobuf-0.11.0.tgz",
+      "dependencies": {
+        "nan": {
+          "version": "1.0.0",
+          "from": "nan@>=1.0.0 <1.1.0",
+          "resolved": "http://beta-internal:4873/nan/-/nan-1.0.0.tgz"
+        }
+      }
+    },
     "q": {
       "version": "1.0.1",
       "from": "http://beta-internal:4873/q/-/q-1.0.1.tgz",
@@ -3017,6 +3029,23 @@
       "version": "0.0.4",
       "from": "http://beta-internal:4873/winston-logstash-udp/-/winston-logstash-udp-0.0.4.tgz",
       "resolved": "http://beta-internal:4873/winston-logstash-udp/-/winston-logstash-udp-0.0.4.tgz"
+    },
+    "wreck": {
+      "version": "5.2.0",
+      "from": "wreck@*",
+      "resolved": "http://beta-internal:4873/wreck/-/wreck-5.2.0.tgz",
+      "dependencies": {
+        "hoek": {
+          "version": "2.11.0",
+          "from": "hoek@>=2.0.0 <3.0.0",
+          "resolved": "https://registry.npmjs.org/hoek/-/hoek-2.11.0.tgz"
+        },
+        "boom": {
+          "version": "2.6.1",
+          "from": "boom@>=2.0.0 <3.0.0",
+          "resolved": "https://registry.npmjs.org/boom/-/boom-2.6.1.tgz"
+        }
+      }
     },
     "xml2js": {
       "version": "0.2.2",
