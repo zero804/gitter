@@ -243,7 +243,7 @@ gulp.task('compress-images', function() {
 });
 
 gulp.task('css-ios', function () {
-  gulp.src([
+  return gulp.src([
     'public/less/mobile-native-chat.less',
     'public/less/mobile-native-userhome.less'
     ])
@@ -267,7 +267,7 @@ gulp.task('css-ios', function () {
 });
 
 gulp.task('css-mobile', function () {
-  gulp.src([
+  return gulp.src([
     'public/less/mobile-login.less',
     'public/less/mobile-app.less',
     'public/less/mobile-nli-app.less',
@@ -297,7 +297,7 @@ gulp.task('css-mobile', function () {
 });
 
 gulp.task('css-web', function () {
-  gulp.src([
+  return gulp.src([
     'public/less/signup.less',
     'public/less/trpAppsPage.less',
     'public/less/oauth-error-page.less',
