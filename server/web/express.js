@@ -106,7 +106,7 @@ module.exports = {
         httpOnly: true,
         maxAge: 14400000,
         domain: config.get("web:cookieDomain"),
-        secure: false /*config.get("web:secureCookies")*/ // TODO: fix this!!
+        secure: config.get("web:secureCookies")
       }
     }));
 
