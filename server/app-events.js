@@ -217,26 +217,6 @@ function bind(on) {
       on('troupeDeleted', callback);
     },
 
-    chatMessage: function(data) {
-      emit('chatMessage', data);
-    },
-
-    hookEvent: function(data) {
-      emit('hookEvent', data);
-    },
-
-    userJoined: function(data) {
-      emit('userJoined', data);
-    },
-
-    onUserJoined: function(callback) {
-      on('userJoined', callback);
-    },
-
-    userLeft: function(data) {
-      emit('userLeft', data);
-    },
-
     repoPermissionsChangeDetected: function(uri, isPrivate) {
       emit('repo_perm_change', {
         uri: uri,

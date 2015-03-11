@@ -2,7 +2,6 @@
 
 var persistence   = require("./persistence-service");
 var processChat   = require('../utils/markdown-processor');
-var appEvents     = require("../app-events");
 var ObjectID      = require('mongodb').ObjectID;
 var Q             = require('q');
 var StatusError   = require('statuserror');
@@ -27,12 +26,7 @@ exports.newEventToTroupe = function(troupe, user, text, meta, payload, callback)
       event.meta       = meta;
       event.payload    = payload;
 
-      return event.saveQ()
-        .then(function() {
-          appEvents.hookEvent({ username: 'gitter', room: troupe.uri, text: text });
-          return event;
-        });
-
+      return event.saveQ();
     })
     .nodeify(callback);
 };
