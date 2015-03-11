@@ -15,7 +15,6 @@ var searchTemplate = require('./tmpl/search.hbs');
 var resultTemplate = require('./tmpl/result.hbs');
 var noResultsTemplate = require('./tmpl/no-results.hbs');
 var noRoomResultsTemplate = require('./tmpl/no-room-results.hbs');
-var upgradeTemplate = require('./tmpl/upgrade.hbs');
 var textFilter = require('utils/text-filter');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 
