@@ -10,7 +10,6 @@ var collections          = require("../utils/collections");
 var troupeService        = require("./troupe-service");
 var userService          = require("./user-service");
 var processChat          = require('../utils/markdown-processor');
-var appEvents            = require('../app-events');
 var Q                    = require('q');
 var mongoUtils           = require('../utils/mongo-utils');
 var moment               = require('moment');
@@ -165,19 +164,6 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
         }, data.stats);
 
         stats.event("new_chat", statMetadata);
-
-        var _msg;
-        if (troupe.oneToOne) {
-          var toUserId;
-          troupe.users.forEach(function(_user) {
-            if (_user.userId.toString() !== user.id.toString()) toUserId = _user.userId;
-          });
-          _msg = {oneToOne: true, username: user.username, toUserId: toUserId, text: data.text, id: chatMessage.id, toTroupeId: troupe.id };
-        } else {
-          _msg = {oneToOne: false, username: user.username, room: troupe.uri, text: data.text, id: chatMessage.id, toTroupeId: troupe.id };
-        }
-
-        appEvents.chatMessage(_msg);
 
         return chatMessage;
       });

@@ -326,9 +326,6 @@ function ensureAccessControl(user, troupe, access) {
 
       troupe.addUserById(user.id);
 
-      // IRC -- these should be centralised - in troupe.addUserById perhaps?
-      appEvents.userJoined({user: user, room: troupe});
-
       return troupe.saveQ().thenResolve(troupe);
 
     } else {
@@ -336,9 +333,6 @@ function ensureAccessControl(user, troupe, access) {
       if(!troupe.containsUserId(user.id)) return Q.resolve(null);
 
       troupe.removeUserById(user.id);
-
-      // IRC -- these should be centralised - in troupe.addUserById perhaps?
-      appEvents.userLeft({user: user, room: troupe});
 
       return troupe.saveQ().thenResolve(null);
     }
