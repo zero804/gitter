@@ -437,23 +437,13 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
 };
 
 exports.findChatMessagesForTroupeForDateRange = function(troupeId, startDate, endDate) {
-  return roomCapabilities.getMaxHistoryMessageDate(troupeId)
-    .then(function(maxHistoryDate) {
-      var q = ChatMessage
-              .where('toTroupeId', troupeId)
-              .where('sent').gte(startDate)
-              .where('sent').lte(endDate)
-              .sort({ sent: 'asc' });
+  var q = ChatMessage
+          .where('toTroupeId', troupeId)
+          .where('sent').gte(startDate)
+          .where('sent').lte(endDate)
+          .sort({ sent: 'asc' });
 
-      return q.execQ()
-        .then(function(results) {
-          if (maxHistoryDate > startDate) {
-            return [[], true];
-          }
-
-          return [results, false];
-        });
-    });
+  return q.execQ();
 };
 
 exports.findDatesForChatMessages = function(troupeId, callback) {
