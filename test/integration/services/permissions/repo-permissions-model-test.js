@@ -451,8 +451,6 @@ describe('repo-permissions', function() {
 
       var permissionsModel;
       var getRepoMethodMock = mockito.mockFunction();
-      var premiumOrThrowMock = mockito.mockFunction();
-      var ownerIsEarlyAdopterMock = mockito.mockFunction();
       var userIsInRoomMock = mockito.mockFunction();
 
       ORG = 'ORG';
@@ -461,8 +459,6 @@ describe('repo-permissions', function() {
 
       permissionsModel = testRequire.withProxies("./services/permissions/repo-permissions-model", {
         '../github/github-repo-service': createMockGitHubRepoService(getRepoMethodMock),
-        './premium-or-throw': premiumOrThrowMock,
-        '../owner-is-early-adopter': ownerIsEarlyAdopterMock,
         '../user-in-room': userIsInRoomMock
       });
 
@@ -472,26 +468,6 @@ describe('repo-permissions', function() {
         }
 
         assert(false, 'Unexpected call to userIsInRoom: ' + uri + ', ' + user);
-      });
-
-      mockito.when(premiumOrThrowMock)().then(function(uri, callback) {
-        return Q.fcall(function() {
-          if(uri === USER.username) {
-            if(meta.premiumUser) return true;
-
-            throw new StatusError(402, 'Fail');
-          }
-
-          if(uri === ORG) {
-            if(meta.premiumOrg) return true;
-
-            throw new StatusError(402, 'Fail');
-          }
-
-          assert(false, 'Unknown uri ' + uri);
-
-        })
-        .nodeify(callback);
       });
 
       mockito.when(getRepoMethodMock)().then(function(uri) {
@@ -504,11 +480,6 @@ describe('repo-permissions', function() {
         }
 
         return Q.resolve(meta.repo);
-      });
-
-      mockito.when(ownerIsEarlyAdopterMock)().then(function(uri) {
-        assert.strictEqual(uri, URI);
-        return Q.resolve(!!meta.ownerIsEarlyAdopter);
       });
 
       permissionsModel(USER, RIGHT, URI, SECURITY)
