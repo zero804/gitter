@@ -300,7 +300,7 @@ gulp.task('css-web', function () {
   return gulp.src([
     'public/less/signup.less',
     'public/less/trpAppsPage.less',
-    'public/less/oauth-error-page.less',
+    'public/less/error-page.less',
     'public/less/generic-layout.less',
     'public/less/trpHooks.less',
     'public/less/login.less',
