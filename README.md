@@ -73,6 +73,11 @@ Deletes a room and kicks users out. Requires a room uri.
 
 e.g `./scripts/utils/delete-room.js --uri trevorah/noembed`
 
+### remove-user.js
+Removes a user from all room and destroys their auth tokens. Requires a username.
+
+e.g `./scripts/utils/remove-user.js --username trevorah`
+
 ### migrate-messages.js
 Migrates all chat messages from one room to another. Requires two rooms.
 
