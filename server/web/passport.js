@@ -13,6 +13,8 @@ var userService            = require('../services/user-service');
 var passport               = require('passport');
 var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
 var BearerStrategy         = require('gitter-passport-http-bearer').Strategy;
+var TokenStateProvider     = require('gitter-passport-oauth2').TokenStateProvider;
+
 var oauthService           = require('../services/oauth-service');
 var mixpanel               = require('../web/mixpanelUtils');
 var useragentTagger        = require('../utils/user-agent-tagger');
@@ -312,7 +314,7 @@ function install() {
       clientID:          config.get('github:user_client_id'),
       clientSecret:      config.get('github:user_client_secret'),
       callbackURL:       config.get('web:basepath') + '/login/callback',
-      state:             true,
+      stateProvider:     new TokenStateProvider({ passphrase: config.get('github:statePassphrase') }),
       skipUserProfile:   true,
       passReqToCallback: true
     }, githubOauthCallback);
@@ -323,7 +325,7 @@ function install() {
       clientID:          config.get('github:client_id'),
       clientSecret:      config.get('github:client_secret'),
       callbackURL:       config.get('web:basepath') + '/login/callback',
-      state:             true,
+      stateProvider:     new TokenStateProvider({ passphrase: config.get('github:statePassphrase') }),
       skipUserProfile:   true,
       passReqToCallback: true
     }, githubOauthCallback);
