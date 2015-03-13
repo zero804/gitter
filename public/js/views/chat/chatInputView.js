@@ -9,7 +9,7 @@ var apiClient = require('components/apiClient');
 var template = require('./tmpl/chatInputView.hbs');
 var listItemTemplate = require('./tmpl/typeaheadListItem.hbs');
 var emojiListItemTemplate = require('./tmpl/emojiTypeaheadListItem.hbs');
-var moment = require('utils/momentWrapper');
+var moment = require('moment');
 var hasScrollBars = require('utils/scrollbar-detect');
 var isMobile = require('utils/is-mobile');
 var emoji = require('utils/emoji');
@@ -659,4 +659,3 @@ module.exports = (function() {
   return { ChatInputView: ChatInputView, ChatInputBoxView: ChatInputBoxView };
 
 })();
-
