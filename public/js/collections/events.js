@@ -1,75 +1,66 @@
 "use strict";
+
 var _ = require('underscore');
 var apiClient = require('components/apiClient');
-var TroupeCollections = require('./base');
-var moment = require('../utils/momentWrapper');
-var cocktail = require('cocktail');
+var moment = require('moment');
+var LiveCollection = require('gitter-realtime-client').LiveCollection;
+var realtime = require('components/realtime');
+var Backbone = require('backbone');
+var SyncMixin = require('./sync-mixin');
 
-module.exports = (function() {
-
-
-  var EventModel = TroupeCollections.Model.extend({
-    idAttribute: "id",
-    parse: function(message) {
-      if(message.sent) {
-        message.sent = moment(message.sent, moment.defaultFormat);
-      }
-
-      return message;
-    },
-
-    toJSON: function() {
-      var d = _.clone(this.attributes);
-      var sent = this.get('sent');
-      if(sent) {
-        // Turn the moment sent value into a string
-        d.sent = sent.format();
-      }
-
-      // No need to send html back to the server
-      delete d.html;
-
-      return d;
+var EventModel = Backbone.Model.extend({
+  idAttribute: "id",
+  parse: function(message) {
+    if(message.sent) {
+      message.sent = moment(message.sent, moment.defaultFormat);
     }
 
-  });
+    return message;
+  },
 
-  var EventCollection = TroupeCollections.LiveCollection.extend({
-    model: EventModel,
-    initialize: function() {
-      this.on('add reset', this.trim, this);
-    },
-    trim: function() {
-      while (this.length > 20) { this.pop(); }
-    },
-    modelName: 'event',
-    url: apiClient.room.channelGenerator('/events'),
-    initialSortBy: "-sent",
-    sortByMethods: {
-      'sent': function(event) {
-        var offset = event.id ? 0 : 300000;
-
-        var sent = event.get('sent');
-
-        if(!sent) return offset;
-        return sent.valueOf() + offset;
-      }
-    },
-
-    findModelForOptimisticMerge: function(newModel) {
-      var optimisticModel = this.find(function(model) {
-        return !model.id && model.get('text') === newModel.get('text');
-      });
-
-      return optimisticModel;
+  toJSON: function() {
+    var d = _.clone(this.attributes);
+    var sent = this.get('sent');
+    if(sent) {
+      // Turn the moment sent value into a string
+      d.sent = sent.format();
     }
-  });
-  cocktail.mixin(EventCollection, TroupeCollections.ReversableCollectionBehaviour);
 
-  return {
-    EventModel: EventModel,
-    EventCollection: EventCollection
-  };
+    // No need to send html back to the server
+    delete d.html;
 
-})();
+    return d;
+  }
 
+});
+
+var EventCollection = LiveCollection.extend({
+  model: EventModel,
+  initialize: function() {
+    this.listenTo(this, 'add reset', this.trim);
+  },
+  client: function() {
+    return realtime.getClient();
+  },
+  trim: function() {
+    while (this.length > 20) { this.pop(); }
+  },
+  modelName: 'event',
+  url: apiClient.room.channelGenerator('/events'),
+  comparator: function(e1, e2) {
+    var s1 = e1.get('sent');
+    var s2 = e2.get('sent');
+    if (!s1) {
+      if (!s2) return 0;
+      return 1; // null > value
+    }
+    if (!s2) return -1;
+    return s1.valueOf() - s2.valueOf();
+  },
+  sync: SyncMixin.sync
+});
+
+module.exports = {
+  EventModel: EventModel,
+  EventCollection: EventCollection
+};

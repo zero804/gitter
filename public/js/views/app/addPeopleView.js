@@ -2,7 +2,6 @@
 var Marionette = require('marionette');
 var Backbone = require('backbone');
 var cocktail = require('cocktail');
-var TroupeViews = require('views/base');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var template = require('./tmpl/addPeople.hbs');
@@ -249,4 +248,3 @@ module.exports = (function() {
 
 
 })();
-

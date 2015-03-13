@@ -3,7 +3,7 @@ define([
   'backbone',
   'assert',
   'utils/log',
-  'utils/momentWrapper',
+  'moment',
   'utils/burst-calculator',
   'collections/chat',
 ], function (Backbone, assert, log, moment, bc, chatModels) {

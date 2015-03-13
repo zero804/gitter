@@ -28,6 +28,7 @@
     "gitter-passport-github": "^0.1.8-f",
     "gitter-passport-http-bearer": "^1.1.0",
     "gitter-passport-oauth2": "^1.1.2-b",
+    "gitter-realtime-client": "^0.1.11",
     "gitter-redis-scripto": "^0.2.2",
     "gitter-services": "git+ssh://git@github.com:gitterHQ/services.git#1.9.0",
     "handlebars": "^2.0.0",
@@ -99,6 +100,7 @@
   },
   "devDependencies": {
     "autoprefixer-core": "^3.1.2",
+    "backbone": "^1.1.2",
     "better-assert": "1.0.0",
     "callsite": "1.0.0",
     "css-loader": "^0.9.0",
