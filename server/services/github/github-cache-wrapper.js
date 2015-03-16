@@ -11,10 +11,17 @@
 
 var SnappyCache = require('snappy-cache');
 var Q = require('q');
-var redis = require('../../utils/redis');
-var config = require('../../utils/config');
+var env = require('../../utils/env');
+var config = env.config;
 var winston = require('../../utils/winston');
 var _ = require('underscore');
+
+var redisClient;
+function getRedisCachingClient() {
+  if (redisClient) return redisClient;
+  redisClient = env.redis.createClient(config.get("redis_caching"));
+  return redisClient;
+}
 
 function getKeys(method, contextValues, args) {
   var arr = [method]
@@ -34,7 +41,7 @@ function wrap(service, contextFunction, options) {
 
   var sc = new SnappyCache(_.defaults(options, {
     prefix: 'sc:',
-    redis: redis.getClient(),
+    redis: getRedisCachingClient(),
     ttl: config.get('github:cache-timeout')
   }));
 
