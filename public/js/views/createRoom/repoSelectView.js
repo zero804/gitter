@@ -1,5 +1,5 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
 var TroupeViews = require('views/base');
 var loadingMixins = require('collections/loading-mixins');
@@ -39,7 +39,7 @@ module.exports = (function() {
     ui: {
       search: "input#search"
     },
-    itemView: ItemView,
+    childView: ItemView,
     emptyView: EmptyView,
     template: template,
     onRender: function() {
@@ -65,7 +65,7 @@ module.exports = (function() {
     return c;
   };
 
-  cocktail.mixin(View, TroupeViews.LoadingCollectionMixin, SelectableMixin, TroupeViews.SortableMarionetteView);
+  cocktail.mixin(View, TroupeViews.LoadingCollectionMixin, SelectableMixin);
 
   return View;
 

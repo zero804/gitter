@@ -1,7 +1,7 @@
 "use strict";
 var $ = require('jquery');
 var _ = require('underscore');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var TroupeViews = require('./base');
 var Mutant = require('mutant');
 var popoverTemplate = require('./tmpl/popover.hbs');

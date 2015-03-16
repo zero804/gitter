@@ -1,7 +1,7 @@
 "use strict";
 var $ = require('jquery');
 var Backbone = require('backbone');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var context = require('utils/context');
 var itemCollections = require('collections/instances/integrated-items');
 var PeopleCollectionView = require('views/people/peopleCollectionView');

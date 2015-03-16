@@ -1,5 +1,5 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
 var NeverEndingStory = require('utils/never-ending-story');
 

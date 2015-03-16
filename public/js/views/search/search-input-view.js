@@ -1,6 +1,6 @@
 "use strict";
 
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var RAF = require('utils/raf');
 var template = require('./tmpl/search-input.hbs');
 

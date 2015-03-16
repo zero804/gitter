@@ -1,5 +1,5 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var context = require('utils/context');
 var TroupeViews = require('views/base');
 var AvatarView = require('views/widgets/avatar');
@@ -12,7 +12,7 @@ module.exports = (function() {
   var PeopleCollectionView = Marionette.CollectionView.extend({
     tagName: 'ul',
     className: 'roster',
-    itemView: AvatarView,
+    childView: AvatarView,
     childViewOptions: function() {
       return { tagName: 'li', showStatus: true, tooltipPlacement: 'left' };
     },
@@ -104,4 +104,3 @@ module.exports = (function() {
 
 
 })();
-

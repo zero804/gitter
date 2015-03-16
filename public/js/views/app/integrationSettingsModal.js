@@ -1,5 +1,5 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var context = require('utils/context');
 var TroupeViews = require('views/base');
 var template = require('./tmpl/integrationSettingsTemplate.hbs');

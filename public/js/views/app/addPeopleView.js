@@ -1,8 +1,7 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var TroupeViews = require('views/base');
 var Backbone = require('backbone');
-var cocktail = require('cocktail');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var template = require('./tmpl/addPeople.hbs');
@@ -89,7 +88,7 @@ module.exports = (function() {
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
     },
 
-    onChildviewInviteError: function(itemView, message) { // jshint unused:true
+    onChildviewInviteError: function(childView, message) { // jshint unused:true
       this.ui.loading.toggleClass('hide', true);
       this.showValidationMessage(message);
     },
@@ -220,8 +219,6 @@ module.exports = (function() {
   if(context.troupe().get('security') !== 'PRIVATE') {
     modalButtons.push({ action: "share", text: "Share this room", className: "trpBtnBlue trpBtnRight"});
   }
-
-  cocktail.mixin(View, TroupeViews.SortableMarionetteView);
 
   return TroupeViews.Modal.extend({
     disableAutoFocus: true,

@@ -1,5 +1,5 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var TroupeViews = require('views/base');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');

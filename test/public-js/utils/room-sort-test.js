@@ -4,7 +4,7 @@
 'use strict';
 
 var roomSort = require('../../../public/js/utils/room-sort');
-var Backbone = require('../../../public/repo/backbone/backbone');
+var Backbone = require('backbone');
 var assert = require('assert');
 
 var VERY_VERY_OLD = new Date('1066-10-29T12:00:20.250Z');

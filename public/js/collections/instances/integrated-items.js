@@ -7,7 +7,6 @@ var appEvents = require('utils/appevents');
 var context = require('utils/context');
 var unreadItemsClient = require('components/unread-items-client');
 require('components/realtime-troupe-listener');
-var realtime = require('components/realtime');
 
 module.exports = (function() {
   var chatCollection          = new chatModels.ChatCollection(null, { listen: true });

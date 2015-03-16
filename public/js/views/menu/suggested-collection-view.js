@@ -1,7 +1,7 @@
 "use strict";
 var roomNameTrimmer = require('utils/room-name-trimmer');
 var resolveIconClass = require('utils/resolve-icon-class');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var template = require('./tmpl/suggested-list-item.hbs');
 
 module.exports = (function() {
@@ -30,7 +30,7 @@ module.exports = (function() {
   return Marionette.CollectionView.extend({
     tagName: 'ul',
     className: 'room-list',
-    itemView: SuggestedItemView
+    childView: SuggestedItemView
   });
 
 

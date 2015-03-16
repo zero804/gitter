@@ -1,7 +1,7 @@
 "use strict";
 
 var repoInfoTemplate = require('./tmpl/repoInfo.hbs');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 
 module.exports = Marionette.ItemView.extend({
   template: repoInfoTemplate,

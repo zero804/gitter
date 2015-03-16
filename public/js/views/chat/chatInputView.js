@@ -1,7 +1,7 @@
 "use strict";
 var log = require('utils/log');
 var Backbone = require('backbone');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var $ = require('jquery');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');

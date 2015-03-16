@@ -1,6 +1,6 @@
 "use strict";
 var $ = require('jquery');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var modalRegion = require('components/modal-region');
 var hasScrollBars = require('utils/scrollbar-detect');
 

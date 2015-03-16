@@ -1,5 +1,5 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var platformKeys = require('utils/platform-keys');
 var TroupeViews = require('views/base');
 var markdownTemplate = require('./tmpl/markdownTemplate.hbs');
