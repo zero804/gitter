@@ -77,17 +77,15 @@ var FIXTURES = [{
       },
       tests: [
 
-        { userIsInRoom: true, ownerIsEarlyAdopter: true, premiumOwner: true, expectedResult: true,
+        { userIsInRoom: true, premiumOwner: true, expectedResult: true,
           tests: [{ right: 'view' }, { right: 'join' }] },
-        { userIsInRoom: true, ownerIsEarlyAdopter: true, premiumOwner: false, expectedResult: true,
-          tests: [{ right: 'view' }, { right: 'join' }] },
-        { userIsInRoom: true, ownerIsEarlyAdopter: false, premiumOwner: true, expectedResult: true,
+        { userIsInRoom: true, premiumOwner: false, expectedResult: true,
           tests: [{ right: 'view' }, { right: 'join' }] },
 
-        { userIsInRoom: true, ownerIsEarlyAdopter: false, premiumOwner: false, expectedResult: 'throw', expectedErrStatus: 402,
-          tests: [{ right: 'view' }, { right: 'join' }] },
+        // { userIsInRoom: true, premiumOwner: false, expectedResult: 'throw', expectedErrStatus: 402,
+          // tests: [{ right: 'view' }, { right: 'join' }] },
 
-        { userIsInRoom: false, ownerIsEarlyAdopter: false, premiumOwner: false, expectedResult: false,
+        { userIsInRoom: false, premiumOwner: false, expectedResult: false,
           tests: [{ right: 'view' }, { right: 'join' }] },
 
       ]
@@ -136,13 +134,11 @@ describe('user-channel-permissions', function() {
 
       var premiumOrThrowMock = mockito.mockFunction();
       var userIsInRoomMock = mockito.mockFunction();
-      var ownerIsEarlyAdopterMock = mockito.mockFunction();
 
 
       var permissionsModel = testRequire.withProxies("./services/permissions/user-channel-permissions-model", {
         './premium-or-throw': premiumOrThrowMock,
-        '../user-in-room': userIsInRoomMock,
-        '../owner-is-early-adopter': ownerIsEarlyAdopterMock
+        '../user-in-room': userIsInRoomMock
       });
 
       mockito.when(premiumOrThrowMock)().then(function() {
@@ -157,11 +153,6 @@ describe('user-channel-permissions', function() {
         assert.strictEqual(uri, URI);
         assert.strictEqual(user, USER);
         return Q.resolve(!!meta.userIsInRoom);
-      });
-
-      mockito.when(ownerIsEarlyAdopterMock)().then(function(uri) {
-        assert.strictEqual(uri, URI);
-        return Q.resolve(!!meta.ownerIsEarlyAdopter);
       });
 
       permissionsModel(USER, RIGHT, URI, SECURITY)

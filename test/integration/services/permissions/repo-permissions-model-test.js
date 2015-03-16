@@ -108,41 +108,6 @@ var FIXTURES = [{
       }]
     },
     {
-      name: 'in private user repos (from early adopters)',
-      meta: {
-        security: 'PRIVATE'
-      },
-      tests: [{
-        name: 'with push access',
-        meta: {
-          repo: { private: true, permissions: { push: true }, owner: { login: USERNAME, type: 'User' } },
-          ownerIsEarlyAdopter: true,
-          expectedResult: true // Users with push access have full rights
-        },
-        tests: [
-          { right: 'create',  expectedResult: 'throw', expectedErrStatus: 402 },
-          { right: 'join',    expectedResult: true  },
-          { right: 'admin',   expectedResult: true },
-          { right: 'adduser', expectedResult: true },
-          { right: 'view',    expectedResult: true  }
-        ]
-      }, {
-        name: 'with no permissions',
-        meta: {
-          repo: { private: true, owner: { login: USERNAME, type: 'User' }  },
-          ownerIsEarlyAdopter: true,
-          expectedResult: false
-        },
-        tests: [
-          { right: 'create',  expectedResult: false },
-          { right: 'join',    expectedResult: true  },
-          { right: 'admin',   expectedResult: false },
-          { right: 'adduser', expectedResult: true },
-          { right: 'view',    expectedResult: true  }
-        ]
-      }]
-    },
-    {
       name: 'in private user repos',
       meta: {
         security: 'PRIVATE'
@@ -151,7 +116,6 @@ var FIXTURES = [{
         name: 'with push access',
         meta: {
           repo: { private: true, permissions: { push: true }, owner: { login: USERNAME, type: 'User' } },
-          ownerIsEarlyAdopter: false,
           expectedResult: true // Users with push access have full rights
         },
         tests: [
@@ -165,7 +129,6 @@ var FIXTURES = [{
         name: 'with no permissions',
         meta: {
           repo: { private: true, owner: { login: USERNAME, type: 'User' }  },
-          ownerIsEarlyAdopter: false,
           expectedResult: false
         },
         tests: [
@@ -258,41 +221,6 @@ var FIXTURES = [{
         premiumOrg: false
       },
       tests: [
-
-        {
-        name: 'in private repos (early adopters)',
-        meta: {
-          security: 'PRIVATE'
-        },
-        tests: [{
-          name: 'with push access',
-          meta: {
-            repo: { private: true, permissions: { push: true }, owner: { login: ORG, type: 'Organization' } },
-            ownerIsEarlyAdopter: true
-          },
-          tests: [
-            { right: 'create',  expectedResult: 'throw', expectedErrStatus: 402  }, // Cannot create a private room in a free org
-            { right: 'join',    expectedResult: true  },
-            { right: 'admin',   expectedResult: true  },
-            { right: 'adduser', expectedResult: true  },
-            { right: 'view',    expectedResult: true  }
-          ]
-        }, {
-          name: 'with no permissions',
-          meta: {
-            repo: { private: true, owner: { type: 'Organization', login: ORG } },
-            ownerIsEarlyAdopter: true
-          },
-          tests: [
-            { right: 'create',  expectedResult: false },
-            { right: 'join',    expectedResult: true  },
-            { right: 'admin',   expectedResult: false },
-            { right: 'adduser', expectedResult: true  },
-            { right: 'view',    expectedResult: true  }
-          ]
-        }]
-      },
-
         {
         name: 'in private repos',
         meta: {
@@ -302,7 +230,6 @@ var FIXTURES = [{
           name: 'with push access',
           meta: {
             repo: { private: true, permissions: { push: true }, owner: { login: ORG, type: 'Organization' } },
-            ownerIsEarlyAdopter: false
           },
           tests: [
             { right: 'create',  expectedResult: 'throw', expectedErrStatus: 402  }, // Cannot create a private room in a free org
@@ -315,7 +242,6 @@ var FIXTURES = [{
           name: 'with no permissions',
           meta: {
             repo: { private: true, owner: { type: 'Organization', login: ORG } },
-            ownerIsEarlyAdopter: false
           },
           tests: [
             { right: 'create',  expectedResult: false },
@@ -332,18 +258,6 @@ var FIXTURES = [{
     }]
   }]
 }, {
-  name: 'security has changed to private (early adopter)',
-  meta: {
-    repo: { private: true, owner: { type: 'Organization', login: ORG } },
-    security: 'PUBLIC',
-    user: true,
-    premiumOrg: false,
-    premiumUser: false,
-    right: 'join',
-    ownerIsEarlyAdopter: true,
-    expectedResult: true
-  }
-}, {
   name: 'security has changed to private',
   meta: {
     repo: { private: true, owner: { type: 'Organization', login: ORG } },
@@ -352,7 +266,6 @@ var FIXTURES = [{
     premiumOrg: false,
     premiumUser: false,
     right: 'join',
-    ownerIsEarlyAdopter: false,
     expectedResult: 'throw',
     expectedErrStatus: 402
   }
