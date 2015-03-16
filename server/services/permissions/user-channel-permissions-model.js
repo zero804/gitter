@@ -38,7 +38,7 @@ module.exports = function userChannelPermissionsModel(user, right, uri, security
           return userIsInRoom(uri, user).then(function(inRoom) {
             if (!inRoom) return Q.resolve(false);
 
-            return true;
+            return Q.resolve(true);
           });
 
         /* No inherited security for user channels */
@@ -66,7 +66,7 @@ module.exports = function userChannelPermissionsModel(user, right, uri, security
           return Q.resolve(true);
 
         case 'PRIVATE':
-          return true;
+          return Q.resolve(true);
 
         default:
           throw new Error('Illegal state');

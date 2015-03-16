@@ -58,10 +58,8 @@ var FIXTURES = [{
     user: true
   },
   tests: [{
-    name: 'free users',
-    meta: {
-      premiumUser: false
-    },
+    name: 'users',
+    meta: {},
     tests: [{
       name: 'in public repos',
       meta: {
@@ -119,11 +117,11 @@ var FIXTURES = [{
           expectedResult: true // Users with push access have full rights
         },
         tests: [
-          { right: 'create',  expectedResult: 'throw', expectedErrStatus: 402 },
-          { right: 'join',    expectedResult: 'throw', expectedErrStatus: 402 },
+          { right: 'create',  expectedResult: true },
+          { right: 'join',    expectedResult: true },
           { right: 'admin',   expectedResult: true },
           { right: 'adduser', expectedResult: true },
-          { right: 'view',    expectedResult: 'throw', expectedErrStatus: 402 }
+          { right: 'view',    expectedResult: true }
         ]
       }, {
         name: 'with no permissions',
@@ -133,128 +131,12 @@ var FIXTURES = [{
         },
         tests: [
           { right: 'create',  expectedResult: false },
-          { right: 'join',    expectedResult: 'throw', expectedErrStatus: 402},
+          { right: 'join',    expectedResult: true },
           { right: 'admin',   expectedResult: false },
           { right: 'adduser', expectedResult: true },
-          { right: 'view',    expectedResult: 'throw', expectedErrStatus: 402}
+          { right: 'view',    expectedResult: true }
         ]
       }]
-    }]
-  }, {
-    name: 'premium users',
-    meta: {
-      premiumUser: true
-    },
-    tests: [{
-      name: 'in public repos',
-      meta: {
-        security: 'PUBLIC'
-      },
-      tests: [{
-        name: 'with push access',
-        meta: {
-          repo: { permissions: { push: true } },
-          expectedResult: true // Users with push access have full rights
-        },
-        tests: ALL_RIGHTS_TESTS
-      }, {
-        name: 'with admin access',
-        meta: {
-          repo: { permissions: { admin: true } },
-          expectedResult: true // Users with push access have full rights
-        },
-        tests: ALL_RIGHTS_TESTS
-      }, {
-        name: 'with no access',
-        meta: {
-          repo: { },
-        },
-        tests: [
-          { right: 'create',  expectedResult: false },
-          { right: 'join',    expectedResult: true  },
-          { right: 'admin',   expectedResult: false },
-          { right: 'adduser', expectedResult: true  },
-          { right: 'view',    expectedResult: true  }
-        ]
-      }]
-    },{
-      name: 'in premium orgs',
-      meta: {
-        premiumOrg: true
-      },
-      tests: [{
-        name: 'in private repos',
-        meta: {
-          security: 'PRIVATE'
-        },
-        tests: [{
-          name: 'with push access',
-          meta: {
-            repo: { private: true, permissions: { push: true }, owner: { login: ORG, type: 'Organization' } },
-            expectedResult: true // Users with push access have full rights
-          },
-          tests: ALL_RIGHTS_TESTS
-        }, {
-          name: 'with admin access',
-          meta: {
-            repo: { private: true, permissions: { admin: true }, owner: { login: ORG, type: 'Organization' } },
-            expectedResult: true // Users with push access have full rights
-          },
-          tests: ALL_RIGHTS_TESTS
-        }, {
-          name: 'with no access',
-          meta: {
-            repo: { private: true, owner: { type: 'Organization', login: ORG } },
-          },
-          tests: [
-            { right: 'create',  expectedResult: false },
-            { right: 'join',    expectedResult: true  },
-            { right: 'admin',   expectedResult: false },
-            { right: 'adduser', expectedResult: true  },
-            { right: 'view',    expectedResult: true  }
-          ]
-        }]
-      }]
-    },{
-      name: 'in free orgs',
-      meta: {
-        premiumOrg: false
-      },
-      tests: [
-        {
-        name: 'in private repos',
-        meta: {
-          security: 'PRIVATE'
-        },
-        tests: [{
-          name: 'with push access',
-          meta: {
-            repo: { private: true, permissions: { push: true }, owner: { login: ORG, type: 'Organization' } },
-          },
-          tests: [
-            { right: 'create',  expectedResult: 'throw', expectedErrStatus: 402  }, // Cannot create a private room in a free org
-            { right: 'join',    expectedResult: 'throw', expectedErrStatus: 402  },
-            { right: 'admin',   expectedResult: true  },
-            { right: 'adduser', expectedResult: true  },
-            { right: 'view',    expectedResult: 'throw', expectedErrStatus: 402  }
-          ]
-        }, {
-          name: 'with no permissions',
-          meta: {
-            repo: { private: true, owner: { type: 'Organization', login: ORG } },
-          },
-          tests: [
-            { right: 'create',  expectedResult: false },
-            { right: 'join',    expectedResult: 'throw', expectedErrStatus: 402  },
-            { right: 'admin',   expectedResult: false },
-            { right: 'adduser', expectedResult: true  },
-            { right: 'view',    expectedResult: 'throw', expectedErrStatus: 402  },
-          ]
-        }]
-      }
-
-
-      ]
     }]
   }]
 }, {
@@ -263,11 +145,8 @@ var FIXTURES = [{
     repo: { private: true, owner: { type: 'Organization', login: ORG } },
     security: 'PUBLIC',
     user: true,
-    premiumOrg: false,
-    premiumUser: false,
     right: 'join',
-    expectedResult: 'throw',
-    expectedErrStatus: 402
+    expectedResult: true
   }
 
 }, {
@@ -276,8 +155,6 @@ var FIXTURES = [{
     repo: { private: false, owner: { type: 'Organization', login: ORG } },
     security: 'PRIVATE',
     user: true,
-    premiumOrg: false,
-    premiumUser: false,
     right: 'join',
     expectedResult: true
   }
@@ -287,16 +164,12 @@ var FIXTURES = [{
     repo: { private: true, owner: { type: 'Super Furry Animal', login: ORG } },
     security: 'PRIVATE',
     user: true,
-    premiumOrg: false,
-    premiumUser: false,
     right: 'create',
     expectedResult: false
   }
 },{
   name: 'test github api call failure',
   meta: {
-    premiumOrg: false,
-    premiumUser: false,
     githubApiCallFailure: true,
     user: true,
   },
