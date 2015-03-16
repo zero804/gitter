@@ -53,7 +53,7 @@ module.exports = (function() {
       $mentions.on('click', clickMention);
       $mentions.on('mouseover', hoverIntent);
 
-      chatItemView.once('close', function() {
+      chatItemView.once('destroy', function() {
         $mentions.off('click', clickMention);
         $mentions.off('mouseover', hoverIntent);
       });

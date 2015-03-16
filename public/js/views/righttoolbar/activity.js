@@ -216,7 +216,7 @@ module.exports = (function() {
 
   var ActivityView = Marionette.CompositeView.extend({
     template: compositeTemplate,
-    itemViewContainer: 'ul#activity-events',
+    childViewContainer: 'ul#activity-events',
     itemView: ActivityItemView,
 
     initialize: function() {

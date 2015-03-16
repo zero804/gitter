@@ -13,7 +13,7 @@ module.exports = (function() {
     tagName: 'ul',
     className: 'roster',
     itemView: AvatarView,
-    itemViewOptions: function() {
+    childViewOptions: function() {
       return { tagName: 'li', showStatus: true, tooltipPlacement: 'left' };
     },
     initialize: function() {
@@ -60,7 +60,7 @@ module.exports = (function() {
     }
   });
 
-  var ExpandableRosterView = Marionette.Layout.extend({
+  var ExpandableRosterView = Marionette.LayoutView.extend({
     template: collectionTemplate,
 
     regions: {

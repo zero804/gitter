@@ -5,7 +5,7 @@ module.exports = (function() {
 
 
   function getContainer(self) {
-    if(self.$itemViewContainer) return self.$itemViewContainer;
+    if(self.$childViewContainer) return self.$childViewContainer;
     return self.$el;
   }
 
@@ -81,7 +81,7 @@ module.exports = (function() {
         e.stopPropagation();
       }
     },
-    onAfterItemAdded: function(itemView) {
+    onAddChild: function(itemView) {
       if(this.selectedModel && itemView.model.id && itemView.model.id == this.selectedModel.id) {
         itemView.$el.addClass('selected');
       }

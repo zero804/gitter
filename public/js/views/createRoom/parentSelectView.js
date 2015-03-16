@@ -153,8 +153,8 @@ module.exports = (function() {
       }
     },
 
-    onClose: function() {
-      this.typeahead.close();
+    onDestroy: function() {
+      this.typeahead.destroy();
     },
 
     focus: function() {

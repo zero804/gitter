@@ -18,7 +18,7 @@ module.exports = (function() {
   // Nobody knows why this is here. Delete it
   // $('.trpDisplayPicture').tooltip('destroy');
 
-  var ChatLayout = Marionette.Layout.extend({
+  var ChatLayout = Marionette.LayoutView.extend({
     el: 'body',
     leftmenu: false,
     rightpanel: false,

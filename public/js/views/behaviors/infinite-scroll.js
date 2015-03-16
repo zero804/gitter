@@ -43,7 +43,7 @@ module.exports = (function() {
       this.scroll = scroll;
     },
 
-    onClose: function() {
+    onDestroy: function() {
       this.scroll.disable();
     }
   });

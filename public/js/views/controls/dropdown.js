@@ -88,7 +88,7 @@ module.exports = (function() {
       'click li a': 'clicked'
     },
 
-    itemViewOptions: function() {
+    childViewOptions: function() {
       var options = {};
       if(this.options.itemTemplate) {
         options.template = this.options.itemTemplate;
@@ -120,7 +120,7 @@ module.exports = (function() {
       this.el.style.zIndex = zIndex;
     },
 
-    onClose: function() {
+    onDestroy: function() {
       if(this.mutant) this.mutant.disconnect();
     },
 
@@ -145,7 +145,7 @@ module.exports = (function() {
       return true;
     },
 
-    onAfterItemAdded: function() {
+    onAddChild: function() {
       setTimeout(function() {
         if(!this.active() && this.showWhenItems && this.hasItems()) {
           this.show();
@@ -153,7 +153,7 @@ module.exports = (function() {
       }.bind(this), 10);
     },
 
-    onItemRemoved: function() {
+    onRemoveChild: function() {
       setTimeout(function() {
         if(!this.hasItems()) {
           this.hide();

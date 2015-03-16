@@ -63,8 +63,8 @@ module.exports = (function() {
   });
 
   var View = Marionette.CompositeView.extend({
-    itemViewContainer: ".gtrPeopleAddRoster",
-    itemView: RowView,
+    childViewContainer: ".gtrPeopleAddRoster",
+    childView: RowView,
     template: template,
     ui: {
       input: 'input.gtrInput',
@@ -89,7 +89,7 @@ module.exports = (function() {
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
     },
 
-    onItemviewInviteError: function(itemView, message) { // jshint unused:true
+    onChildviewInviteError: function(itemView, message) { // jshint unused:true
       this.ui.loading.toggleClass('hide', true);
       this.showValidationMessage(message);
     },
@@ -206,9 +206,9 @@ module.exports = (function() {
       this.listenTo(this.typeahead, 'selected', this.selected);
     },
 
-    onClose: function() {
+    onDestroy: function() {
       if(this.typeahead) {
-        this.typeahead.close();
+        this.typeahead.destroy();
       }
     }
   });

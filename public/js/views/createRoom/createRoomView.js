@@ -13,7 +13,7 @@ var appEvents = require('utils/appevents');
 module.exports = (function() {
 
 
-  var View = Marionette.Layout.extend({
+  var View = Marionette.LayoutView.extend({
     template: template,
 
     ui: {

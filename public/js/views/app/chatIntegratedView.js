@@ -60,7 +60,7 @@ module.exports = (function() {
     e.preventDefault();
   }
 
-  var ChatLayout = Marionette.Layout.extend({
+  var ChatLayout = Marionette.LayoutView.extend({
 
     el: 'body',
 

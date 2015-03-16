@@ -63,9 +63,9 @@ module.exports = (function() {
       this.listenTo(this.dropdown, 'selected', this.selected);
     },
 
-    onClose: function() {
+    onDestroy: function() {
       if(this.dropdown) {
-        this.dropdown.close();
+        this.dropdown.destroy();
         this.dropdown = null;
       }
     },

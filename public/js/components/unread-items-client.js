@@ -127,7 +127,7 @@ module.exports = (function() {
       this.trigger('itemMarkedRead', itemType, itemId, mentioned);
     },
 
-    _onItemRemoved: function() {
+    _onRemoveChild: function() {
       // Recount soon
       this._recountLimited();
     },

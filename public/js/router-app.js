@@ -317,7 +317,7 @@ onready(function () {
     },
 
     hideModal: function() {
-      appView.dialogRegion.close();
+      appView.dialogRegion.destroy();
     },
 
     createroom: function() {
