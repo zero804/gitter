@@ -54,10 +54,8 @@ var FIXTURES = [{
         tests: [
           { name: 'allow create of a public channel',
             security: 'PUBLIC', expectedResult: true },
-          { name: 'deny create of a private channel for free user',
-            security: 'PRIVATE', expectedResult: 'throw', expectedErrStatus: 402, premiumOwner: false },
-          { name: 'allow create of a private channel for premium user',
-            security: 'PRIVATE', expectedResult: true, premiumOwner: true },
+          { name: 'allow create of a private channel for user',
+            security: 'PRIVATE', expectedResult: true, },
         ]
       }
     ]
@@ -77,15 +75,13 @@ var FIXTURES = [{
       },
       tests: [
 
-        { userIsInRoom: true, premiumOwner: true, expectedResult: true,
-          tests: [{ right: 'view' }, { right: 'join' }] },
-        { userIsInRoom: true, premiumOwner: false, expectedResult: true,
+        { userIsInRoom: true, expectedResult: true,
           tests: [{ right: 'view' }, { right: 'join' }] },
 
         // { userIsInRoom: true, premiumOwner: false, expectedResult: 'throw', expectedErrStatus: 402,
           // tests: [{ right: 'view' }, { right: 'join' }] },
 
-        { userIsInRoom: false, premiumOwner: false, expectedResult: false,
+        { userIsInRoom: false, expectedResult: false,
           tests: [{ right: 'view' }, { right: 'join' }] },
 
       ]
@@ -132,21 +128,11 @@ describe('user-channel-permissions', function() {
       var SECURITY = meta.security;
       var URI = meta.ownChannel ? USERNAME + '/channel' : 'someoneelse/channel';
 
-      var premiumOrThrowMock = mockito.mockFunction();
       var userIsInRoomMock = mockito.mockFunction();
 
 
       var permissionsModel = testRequire.withProxies("./services/permissions/user-channel-permissions-model", {
-        './premium-or-throw': premiumOrThrowMock,
         '../user-in-room': userIsInRoomMock
-      });
-
-      mockito.when(premiumOrThrowMock)().then(function() {
-        return Q.fcall(function() {
-          if (meta.premiumOwner) return true;
-          throw new StatusError(402, 'Fail');
-        });
-
       });
 
       mockito.when(userIsInRoomMock)().then(function(uri, user) {
