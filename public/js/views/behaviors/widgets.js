@@ -23,9 +23,9 @@ module.exports = (function() {
     this._widgets.push(widget);
   };
 
-  WidgetManager.prototype.close = function() {
+  WidgetManager.prototype.destroy = function() {
     _.each(this._widgets, function(item) {
-      item.close();
+      item.destroy();
     });
     this._widgets = [];
   };
@@ -104,7 +104,7 @@ module.exports = (function() {
     },
     onBeforeClose: function() {
       if(this.widgetManager) {
-        this.widgetManager.close();
+        this.widgetManager.destroy();
         this.widgetManager = null;
       }
     }

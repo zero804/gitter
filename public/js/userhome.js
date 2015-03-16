@@ -35,7 +35,7 @@ onready(function() {
         modalRegion.show(new confirmRepoRoomView.Modal({ uri: uri }));
       },
       '': function() {
-        modalRegion.close();
+        modalRegion.destroy();
       }
     }
   });

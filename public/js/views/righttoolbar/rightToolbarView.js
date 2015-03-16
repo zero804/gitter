@@ -14,7 +14,7 @@ var ActivityStream = require('./activity');
 module.exports = (function() {
 
 
-  var RightToolbarLayout = Marionette.Layout.extend({
+  var RightToolbarLayout = Marionette.LayoutView.extend({
 
     regions: {
       search: '#search-results',

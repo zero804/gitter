@@ -31,7 +31,7 @@ module.exports = (function () {
   });
 
   // wraps a view to give us more control of when to display it or not
-  var CollectionWrapperView = Marionette.Layout.extend({
+  var CollectionWrapperView = Marionette.LayoutView.extend({
 
     ui: {
       hide: '.js-hide',

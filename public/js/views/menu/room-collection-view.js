@@ -173,7 +173,7 @@ module.exports = (function() {
 
     itemView: RoomListItemView,
 
-    itemViewOptions: function (item) {
+    childViewOptions: function (item) {
       var options = {};
       if (item && item.id) {
         options.el = this.$el.find('.room-list-item[data-id="' + item.id + '"]')[0];

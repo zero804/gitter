@@ -606,7 +606,7 @@ module.exports = (function() {
       c.loading = true;
       this.collection = c;
     },
-    onClose: function(){
+    onDestroy: function(){
       this.collection.unlisten();
     }
   });

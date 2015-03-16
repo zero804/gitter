@@ -107,7 +107,7 @@ module.exports = (function() {
 
     itemView: chatItemView.ChatItemView,
 
-    itemViewOptions: function(item) {
+    childViewOptions: function(item) {
       var options = {
         userCollection: this.userCollection,
         decorators: this.decorators,
@@ -236,7 +236,7 @@ module.exports = (function() {
       return this.rollers.isScrolledToBottom();
     },
 
-    onAfterItemAdded: function() {
+    onAddChild: function() {
       if(this.collection.length === 1) {
         this.adjustTopPadding();
       }

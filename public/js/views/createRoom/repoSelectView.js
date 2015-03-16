@@ -43,7 +43,7 @@ module.exports = (function() {
     emptyView: EmptyView,
     template: template,
     onRender: function() {
-      this.itemViewContainer = this.$el.find('#list');
+      this.childViewContainer = this.$el.find('#list');
       liveSearch(this, this.ui.search, 'searchTextChanged', { shortDebounce: 50, longDebounce: 200 });
     },
     searchTextChanged: function(text) {

@@ -154,7 +154,7 @@ module.exports = (function() {
         $issue.on('click', showPopover);
         $issue.on('mouseover', showPopoverLater);
 
-        view.once('close', function() {
+        view.once('destroy', function() {
           $issue.off('click', showPopover);
           $issue.off('mouseover', showPopoverLater);
         });

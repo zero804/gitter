@@ -54,7 +54,7 @@ module.exports = (function() {
       } else {
         // // Unfortunately we can't use listenTo with jquery events
         // $(document).on('avatar:change', avatarChange);
-        // this.once('close', function() {
+        // this.once('destroy', function() {
         //   $(document).off('avatar:change', avatarChange);
         // });
       }

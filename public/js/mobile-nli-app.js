@@ -47,7 +47,7 @@ onready(function() {
     },
 
     hideModal: function() {
-      modalRegion.close();
+      modalRegion.destroy();
     },
   });
 

@@ -71,7 +71,7 @@ module.exports = (function() {
 
       this.$targetElement.on('mouseenter', this.enter);
       this.$targetElement.on('mouseleave', this.leave);
-      this.once('close', function() {
+      this.once('destroy', function() {
         if(this.mutant) this.mutant.disconnect();
       });
     },
@@ -127,14 +127,14 @@ module.exports = (function() {
       }, self.options.delay);
     },
 
-    onClose: function() {
+    onDestroy: function() {
       this.$el.off('mouseenter', this.enter);
       this.$el.off('mouseleave', this.leave);
 
       this.$targetElement.off('mouseenter', this.enter);
       this.$targetElement.off('mouseleave', this.leave);
 
-      this.view.close();
+      this.view.destroy();
     },
 
     show: function () {
@@ -319,7 +319,7 @@ module.exports = (function() {
 
       $e.trigger('hidden');
       this.trigger('hide');
-      this.close();
+      this.destroy();
 
       return this;
     },

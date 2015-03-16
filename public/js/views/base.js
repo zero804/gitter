@@ -130,8 +130,8 @@ module.exports = (function() {
       $s.hide();
     },
 
-    onClose: function() {
-      this.view.close();
+    onDestroy: function() {
+      this.view.destroy();
       this.view.dialog = null;
       this.$el.find('.close').off('click');
     },
@@ -273,7 +273,7 @@ module.exports = (function() {
       this.backdrop();
 
       if(this.options.autoRemove) {
-        this.close();
+        this.destroy();
       }
     },
 
@@ -362,7 +362,7 @@ module.exports = (function() {
     onBeforeRenderSort: function() {
       this.isRendering = true;
 
-      // set footerElement before rendering, used by appendHtml()
+      // set footerElement before rendering, used by.attachHtml()
       if(this.footer) {
         // Use .children, not .find as we're only searching directly
         // underneath
@@ -378,8 +378,8 @@ module.exports = (function() {
 
     appendHtml: function(collectionView, itemView, index) {
       var footerElement = this.footerElement;
-      var el = collectionView.itemViewContainer || collectionView.el;
-      var $el = collectionView.itemViewContainer ? $(collectionView.itemViewContainer) : collectionView.$el;
+      var el = collectionView.childViewContainer || collectionView.el;
+      var $el = collectionView.childViewContainer ? $(collectionView.childViewContainer) : collectionView.$el;
 
       // Shortcut - just place at the end!
       if (this.isRendering) {
@@ -496,9 +496,9 @@ module.exports = (function() {
         var v = this.children.findByModel(this.loadingModel);
 
         if (LoadingView && !v) {
-          this.addItemView(this.loadingModel, LoadingView, 0);
+          this.addChild(this.loadingModel, LoadingView, 0);
           this.listenToOnce(this.collection, 'loaded', function() {
-            this.removeItemView(this.loadingModel);
+            this.removeChildView(this.loadingModel);
 
             if(this.collection.length === 0) {
               this.constructor.prototype.showEmptyView.call(this);

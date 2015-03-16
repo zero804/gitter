@@ -175,7 +175,7 @@ module.exports = (function() {
       this.rollers = new Rollers(target, this.el, { doNotTrack: true });
     },
 
-    getItemView: function (item) {
+    getChildView: function (item) {
 
       if (item.get('limitReached')) {
         return UpgradeView;
@@ -383,7 +383,7 @@ module.exports = (function() {
     }
   });
 
-  var SearchView = Marionette.Layout.extend({
+  var SearchView = Marionette.LayoutView.extend({
     template: searchTemplate,
 
     regions: {

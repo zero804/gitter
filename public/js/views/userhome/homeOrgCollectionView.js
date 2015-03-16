@@ -35,7 +35,7 @@ module.exports = (function() {
     ui: {
       header: '#org-list-header'
     },
-    itemViewContainer: "#org-list-items",
+    childViewContainer: "#org-list-items",
     // tagName: 'ul',
     // className: 'suggested-room-list',
     template: orgTemplate,

@@ -130,11 +130,11 @@ module.exports = (function() {
 
   var View = Marionette.CompositeView.extend({
 
-    itemViewContainer: '.js-container',
+    childViewContainer: '.js-container',
     itemView: ItemView,
     emptyView: EmptyView,
 
-    itemViewOptions: function() {
+    childViewOptions: function() {
       if (!this.collection.length) {
         return {
           githubType: context.troupe().get('githubType'),
