@@ -1,10 +1,18 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 'use strict';
 
+var env = require('./env');
+var config = env.config;
+
 var SnappyCache = require('snappy-cache');
-var redis = require('../utils/redis');
 var Q = require('q');
 var assert = require('assert');
+
+var redisClient;
+function getRedisCachingClient() {
+  if (redisClient) return redisClient;
+  redisClient = env.redis.createClient(config.get("redis_caching"));
+  return redisClient;
+}
 
 function generateKey(moduleName, instanceId, propertyName, args) {
   var parts = [
@@ -63,7 +71,7 @@ module.exports = function(moduleName, module, options) {
 
   var cache = new SnappyCache({
     prefix: 'sc:',
-    redis: redis.getClient(),
+    redis: getRedisCachingClient(),
     ttl: options && options.ttl || 0
   });
 
