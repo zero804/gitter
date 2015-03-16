@@ -4,7 +4,7 @@ var _ = require('underscore');
 var context = require('utils/context');
 var chatModels = require('collections/chat');
 var AvatarView = require('views/widgets/avatar');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var TroupeViews = require('views/base');
 var uiVars = require('views/app/uiVars');
 var Popover = require('views/popover');
@@ -599,7 +599,7 @@ module.exports = (function() {
   cocktail.mixin(ChatItemView, KeyboardEventMixins);
 
   var ReadByView = Marionette.CollectionView.extend({
-    itemView: AvatarView,
+    childView: AvatarView,
     className: 'popoverReadBy',
     initialize: function(options) {
       var c = new chatModels.ReadByCollection(null, { listen: true, chatMessageId: this.model.id, userCollection: options.userCollection });
@@ -627,4 +627,3 @@ module.exports = (function() {
 
 
 })();
-

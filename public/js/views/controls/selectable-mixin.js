@@ -81,9 +81,9 @@ module.exports = (function() {
         e.stopPropagation();
       }
     },
-    onAddChild: function(itemView) {
-      if(this.selectedModel && itemView.model.id && itemView.model.id == this.selectedModel.id) {
-        itemView.$el.addClass('selected');
+    onAddChild: function(childView) {
+      if(this.selectedModel && childView.model.id && childView.model.id == this.selectedModel.id) {
+        childView.$el.addClass('selected');
       }
     },
     setSelected: function(model) {

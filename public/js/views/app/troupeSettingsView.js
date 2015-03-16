@@ -1,5 +1,5 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var $ = require('jquery');
 var _ = require('underscore');
 var context = require('utils/context');
@@ -18,7 +18,7 @@ module.exports = (function() {
     template: troupeSettingsTemplate,
     events: {
       'click #save-troupe-settings': 'saveSettings',
-      'click #close-settings' : 'closeSettings',
+      'click #close-settings' : 'destroySettings',
       'click #enable-lurk-mode' : 'enableLurkMode',
       'change #notification-options' : 'formChange',
       'change #unread-checkbox' : 'formChange'
@@ -50,7 +50,7 @@ module.exports = (function() {
       this.$el.find('#notification-options').val("mention");
       this.$el.find('#unread-checkbox').prop('checked', true);
       this.saveSettings();
-      this.closeSettings();
+      this.destroySettings();
     },
 
     setShowUnreadBadgeValue: function() {
@@ -69,7 +69,7 @@ module.exports = (function() {
       }
     },
 
-    closeSettings : function () {
+    destroySettings : function () {
       this.dialog.hide();
       this.dialog = null;
     },

@@ -1,6 +1,6 @@
 "use strict";
 
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var TroupeViews = require('views/base');
 var template = require('./tmpl/chooseRoom.hbs');
 

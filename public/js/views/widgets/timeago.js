@@ -1,5 +1,5 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var moment = require('moment');
 var context = require('utils/context');
 var locale = require('utils/locale');

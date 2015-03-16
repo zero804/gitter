@@ -4,11 +4,9 @@ var context = require('utils/context');
 var resolveIconClass = require('utils/resolve-icon-class');
 var apiClient = require('components/apiClient');
 var roomNameTrimmer = require('utils/room-name-trimmer');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var roomListItemTemplate = require('./tmpl/room-list-item.hbs');
 var appEvents = require('utils/appevents');
-var TroupeViews = require('views/base');
-var cocktail = require('cocktail');
 var dataset = require('utils/dataset-shim');
 require('jquery-sortable');
 require('bootstrap_tooltip');
@@ -171,7 +169,7 @@ module.exports = (function() {
 
   var CollectionView = Marionette.CollectionView.extend({
 
-    itemView: RoomListItemView,
+    childView: RoomListItemView,
 
     childViewOptions: function (item) {
       var options = {};
@@ -268,10 +266,7 @@ module.exports = (function() {
     },
   });
 
-  cocktail.mixin(CollectionView, TroupeViews.SortableMarionetteView);
-
   return CollectionView;
 
 
 })();
-

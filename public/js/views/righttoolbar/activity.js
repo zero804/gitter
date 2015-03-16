@@ -1,6 +1,6 @@
 "use strict";
 var _ = require('underscore');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var appEvents = require('utils/appevents');
 var TroupeViews = require('views/base');
 var issueDecorator = require('views/chat/decorators/issueDecorator');
@@ -24,7 +24,6 @@ var travisTemplate = require('./tmpl/travis.hbs');
 var sprintlyTemplate = require('./tmpl/sprintly.hbs');
 var trelloTemplate = require('./tmpl/trello.hbs');
 var prerenderedTemplate = require('./tmpl/prerendered.hbs');
-var cocktail = require('cocktail');
 var compositeTemplate = require('./tmpl/composite.hbs');
 require('views/widgets/timeago');
 require('views/behaviors/widgets');
@@ -217,15 +216,13 @@ module.exports = (function() {
   var ActivityView = Marionette.CompositeView.extend({
     template: compositeTemplate,
     childViewContainer: 'ul#activity-events',
-    itemView: ActivityItemView,
+    childView: ActivityItemView,
 
     initialize: function() {
       this.listenTo(this.collection, 'snapshot', this.render);
     }
   });
-  cocktail.mixin(ActivityView, TroupeViews.SortableMarionetteView);
 
   return ActivityView;
 
 })();
-

@@ -58,7 +58,6 @@ var ChatModel = Backbone.Model.extend({
 
   },
   parse: function (message) {
-
     if (message.sent) {
       message.sent = moment(message.sent, moment.defaultFormat);
     }
@@ -123,7 +122,8 @@ var ChatCollection = LiveCollection.extend({
     }
     if (!id2) return -1; // value < null = -1
     if (id1 == id2) return 0;
-    if (id1 < id2) return
+    if (id1 < id2) return -1;
+    return 1;
   },
   initialize: function() {
     this.listenTo(this, 'add remove', function (model, collection) {
@@ -184,7 +184,7 @@ var ChatCollection = LiveCollection.extend({
         log.warn('Clock skew is ' + diff + 'ms');
       }
 
-      this.trigger('clock.skew', diff);
+      // this.trigger('clock.skew', diff);
     }
   },
   sync: SyncMixin.sync

@@ -1,8 +1,7 @@
 "use strict";
 var $ = require('jquery');
 var _ = require('underscore');
-var Marionette = require('marionette');
-var TroupeViews = require('views/base');
+var Marionette = require('backbone.marionette');
 var cocktail = require('cocktail');
 var Mutant = require('mutant');
 var SelectableMixin = require('./selectable-mixin');
@@ -77,7 +76,7 @@ module.exports = (function() {
   };
 
   var DropdownMenuView = Marionette.CollectionView.extend({
-    itemView: DropdownItemView,
+    childView: DropdownItemView,
     tagName: 'ul',
     className: 'dropdown dropdown-hidden selectable',
     ui: {
@@ -303,8 +302,7 @@ module.exports = (function() {
       e.stopPropagation();
     }
   });
-  cocktail.mixin(DropdownMenuView, TroupeViews.SortableMarionetteView, SelectableMixin);
+  cocktail.mixin(DropdownMenuView, SelectableMixin);
   return DropdownMenuView;
 
 })();
-

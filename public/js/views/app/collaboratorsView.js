@@ -1,6 +1,6 @@
 "use strict";
 var $ = require('jquery');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var context = require('utils/context');
 var social = require('utils/social');
 var apiClient = require('components/apiClient');
@@ -131,7 +131,7 @@ module.exports = (function() {
   var View = Marionette.CompositeView.extend({
 
     childViewContainer: '.js-container',
-    itemView: ItemView,
+    childView: ItemView,
     emptyView: EmptyView,
 
     childViewOptions: function() {
@@ -191,4 +191,3 @@ module.exports = (function() {
   return View;
 
 })();
-

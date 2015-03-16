@@ -3,7 +3,7 @@ var $ = require('jquery');
 var _ = require('underscore');
 
 var context = require('utils/context');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var appEvents = require('utils/appevents');
 var apiClient = require('components/apiClient');
 var uiVars = require('views/app/uiVars');
@@ -61,7 +61,7 @@ module.exports = (function() {
   }
 
   var ChatLayout = Marionette.LayoutView.extend({
-
+    template: false,
     el: 'body',
 
     ui: {
@@ -84,16 +84,14 @@ module.exports = (function() {
 
     initialize: function() {
 
-      this.bindUIElements();
-
       // Setup the ChatView - this is instantiated once for the application, and shared between many views
       var chatCollectionView = new ChatCollectionView({
+        template: false,
         el: '#chat-container',
         collection: itemCollections.chats,
         userCollection: itemCollections.users,
         decorators: [issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
-      });
-      chatCollectionView.bindUIElements();
+      }).render();
 
       this.listenTo(itemCollections.chats, 'atBottomChanged', function(isBottom) {
         this.ui.scrollToBottom.toggleClass('u-scale-zero', isBottom);
@@ -359,4 +357,3 @@ module.exports = (function() {
   return ChatLayout;
 
 })();
-

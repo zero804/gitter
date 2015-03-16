@@ -1,6 +1,6 @@
 "use strict";
 var context = require('utils/context');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var appEvents = require('utils/appevents');
 var isMobile = require('utils/is-mobile');
 var isNative = require('utils/is-native');

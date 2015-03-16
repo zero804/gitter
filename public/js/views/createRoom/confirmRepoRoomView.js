@@ -1,6 +1,6 @@
 "use strict";
 var Backbone = require('backbone');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var apiClient = require('components/apiClient');
 var appEvents = require('utils/appevents');
 var TroupeViews = require('views/base');

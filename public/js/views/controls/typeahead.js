@@ -1,6 +1,6 @@
 "use strict";
 var Backbone = require('backbone');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var Dropdown = require('./dropdown');
 var liveSearch = require('./live-search');
 

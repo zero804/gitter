@@ -6,7 +6,7 @@ var appEvents = require('utils/appevents');
 var Rollers = require('utils/rollers');
 var resolveAvatarUrl = require('shared/avatars/resolve-avatar-url');
 var Backbone = require('backbone');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var _ = require('underscore');
 var cocktail = require('cocktail');
 var itemCollections = require('collections/instances/integrated-items');
@@ -153,7 +153,7 @@ module.exports = (function() {
   });
 
   var RoomsCollectionView = Marionette.CollectionView.extend({
-    itemView: RoomResultItemView,
+    childView: RoomResultItemView,
 
     emptyView: EmptyRoomResultsView,
 

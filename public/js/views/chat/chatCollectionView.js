@@ -2,12 +2,10 @@
 var $ = require('jquery');
 var _ = require('underscore');
 var log = require('utils/log');
-var Marionette = require('marionette');
-var TroupeViews = require('views/base');
+var Marionette = require('backbone.marionette');
 var appEvents = require('utils/appevents');
 var chatItemView = require('./chatItemView');
 var Rollers = require('utils/rollers');
-var cocktail = require('cocktail');
 require('views/behaviors/infinite-scroll');
 
 module.exports = (function() {
@@ -92,6 +90,8 @@ module.exports = (function() {
    * View
    */
   var ChatCollectionView = Marionette.CollectionView.extend({
+    template: false,
+    reorderOnSort: true,
 
     behaviors: {
       InfiniteScroll: {
@@ -105,7 +105,7 @@ module.exports = (function() {
       "copy": "onCopy"
     },
 
-    itemView: chatItemView.ChatItemView,
+    childView: chatItemView.ChatItemView,
 
     childViewOptions: function(item) {
       var options = {
@@ -144,7 +144,8 @@ module.exports = (function() {
       this.adjustTopPadding();
       var self = this;
       var resizer;
-
+      this.firstRender = true;
+      this.viewComparator = this.collection.comparator;
       $(window).resize(function(){
         clearTimeout(resizer);
         resizer = setTimeout(self.adjustTopPadding, 100);
@@ -388,7 +389,6 @@ module.exports = (function() {
     },
 
   });
-  cocktail.mixin(ChatCollectionView, TroupeViews.SortableMarionetteView);
 
   return ChatCollectionView;
 

@@ -1,5 +1,5 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var TroupeMenuView = require('views/menu/troupeMenu');
 var modalRegion = require('components/modal-region');
 

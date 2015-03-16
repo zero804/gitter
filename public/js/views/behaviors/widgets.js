@@ -1,7 +1,7 @@
 "use strict";
 var $ = require('jquery');
 var _ = require('underscore');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
 
 module.exports = (function() {

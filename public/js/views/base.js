@@ -2,7 +2,7 @@
 var $ = require('jquery');
 var _ = require('underscore');
 var Backbone = require('backbone');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var modalTemplate = require('./tmpl/modal.hbs');
 var loadingTemplate = require('./tmpl/loading.hbs');
 var log = require('utils/log');
@@ -211,7 +211,7 @@ module.exports = (function() {
       this.hideInternal();
     },
 
-    /* Called after navigation to close an navigable dialog box */
+    /* Called after navigation to destroy an navigable dialog box */
     navigationalHide: function() {
       this.options.fade = false;
       this.hideInternal();
@@ -352,168 +352,6 @@ module.exports = (function() {
     return Modal;
   };
 
-  /* This is a mixin for Marionette.CollectionView */
-  TroupeViews.SortableMarionetteView = {
-    initialize: function() {
-      this.listenTo(this, 'before:render', this.onBeforeRenderSort);
-      this.listenTo(this, 'render', this.onRenderSort);
-    },
-
-    onBeforeRenderSort: function() {
-      this.isRendering = true;
-
-      // set footerElement before rendering, used by.attachHtml()
-      if(this.footer) {
-        // Use .children, not .find as we're only searching directly
-        // underneath
-        this.footerElement = this.$el.children(this.footer)[0];
-      } else {
-        this.footerElement = null;
-      }
-    },
-
-    onRenderSort: function() {
-      delete this.isRendering;
-    },
-
-    appendHtml: function(collectionView, itemView, index) {
-      var footerElement = this.footerElement;
-      var el = collectionView.childViewContainer || collectionView.el;
-      var $el = collectionView.childViewContainer ? $(collectionView.childViewContainer) : collectionView.$el;
-
-      // Shortcut - just place at the end!
-      if (this.isRendering) {
-        // if this is during rendering, then the views always come in sort order,
-        // so just append
-        if(footerElement) {
-          itemView.$el.insertBefore(footerElement);
-        } else {
-          $el.append(itemView.el);
-        }
-        return;
-      }
-
-      // we are inserting views after rendering, find the adjacent view if there
-      // is one already
-      var adjView;
-
-      if (index === 0) {
-        // find the view that comes after the first one (sometimes there will be a
-        // non view that is the first child so we can't prepend)
-        adjView = findViewAfter(0);
-
-        if (adjView) {
-          itemView.$el.insertBefore(adjView.el);
-        } else {
-          // there are no existing views after the first,
-          // we append (keeping the place of non-view children already present in the
-          // container)
-          if(footerElement) {
-            itemView.$el.insertBefore(footerElement);
-          } else {
-            itemView.$el.appendTo(el);
-          }
-        }
-
-        return;
-      }
-
-      if(index == collectionView.collection.length - 1) {
-        if(footerElement) {
-          itemView.$el.insertBefore(footerElement);
-        } else {
-          itemView.$el.appendTo(el);
-        }
-        return;
-      }
-
-      // find the view that comes before this one
-      adjView = findViewAtPos(index - 1);
-      if(adjView) {
-        itemView.$el.insertAfter(adjView.$el);
-      } else {
-        // It could be the case that n-1 has not yet been inserted,
-        // so we try find whatever is at n+1 and insert before
-        adjView = findViewAfter(index);
-
-        if(adjView) {
-          itemView.$el.insertBefore(adjView.el);
-        } else {
-          log.info("Inserting *after* the bottom for collection ", collectionView.collection.url, adjView, itemView);
-          /* in this case, the itemViews are not coming in any sequential order  */
-          // We can't find an item before, we can't find an item after,
-          // just give up and insert at the end. (hopefully this will never happen eh?)
-          //
-          if(footerElement) {
-            itemView.$el.insertBefore(footerElement);
-          } else {
-            itemView.$el.appendTo(el);
-          }
-        }
-      }
-
-      function findViewAfter(i) {
-        var nearestI = 1;
-        var adjView = findViewAtPos(i + 1);
-
-        // find the nearest view that comes after this view
-        while (!adjView && ((i + nearestI + 1) < collectionView.collection.length)) {
-          nearestI += 1;
-          adjView = findViewAtPos(i + nearestI);
-        }
-
-        return adjView;
-      }
-
-      function findViewAtPos(i) {
-        if (i >= collectionView.collection.length)
-          return;
-
-        var view = collectionView.children.findByModel(collectionView.collection.at(i));
-        return view;
-      }
-    }
-  };
-
-  TroupeViews.LoadingView = Marionette.ItemView.extend({
-    template: loadingTemplate
-  });
-
-  // Mixin for Marionette.CollectionView classes
-  TroupeViews.LoadingCollectionMixin = {
-    loadingView: TroupeViews.LoadingView,
-    initialize: function() {
-      this.showEmptyView = this.showLoadingView;
-    },
-    showLoadingView: function() {
-      if(this.collection.loading) {
-        var LoadingView = Marionette.getOption(this, "loadingView");
-
-        if(!this.loadingModel) {
-          this.loadingModel = new Backbone.Model();
-        }
-
-        var v = this.children.findByModel(this.loadingModel);
-
-        if (LoadingView && !v) {
-          this.addChild(this.loadingModel, LoadingView, 0);
-          this.listenToOnce(this.collection, 'loaded', function() {
-            this.removeChildView(this.loadingModel);
-
-            if(this.collection.length === 0) {
-              this.constructor.prototype.showEmptyView.call(this);
-              return true;
-            }
-          });
-        }
-        return true;
-      }
-
-      this.constructor.prototype.showEmptyView.call(this);
-      return true;
-    }
-  };
-
   TroupeViews.DelayedShowLayoutMixin = {
 
     show: function(regionName, view) {
@@ -587,4 +425,3 @@ module.exports = (function() {
   return TroupeViews;
 
 })();
-

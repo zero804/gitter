@@ -195,6 +195,8 @@ onready(function () {
   });
 
   var appView = new ChatIntegratedView({ el: 'body' });
+  appView.render();
+
   new HeaderView({ model: context.troupe(), el: '#header' });
 
   // This may require a better home
@@ -368,4 +370,3 @@ onready(function () {
 
   Backbone.history.start();
 });
-

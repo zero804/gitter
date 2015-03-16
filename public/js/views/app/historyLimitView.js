@@ -1,7 +1,7 @@
 "use strict";
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 var $ = require('jquery');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var context = require('utils/context');
 var template = require('./tmpl/limitBannerTemplate.hbs');
 

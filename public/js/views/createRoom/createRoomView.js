@@ -1,7 +1,7 @@
 "use strict";
 var $ = require('jquery');
 var _ = require('underscore');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var troupeCollections = require('collections/instances/troupes');
 var TroupeViews = require('views/base');
 var context = require('utils/context');

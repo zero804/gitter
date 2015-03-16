@@ -1,6 +1,6 @@
 "use strict";
 var $ = require('jquery');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
