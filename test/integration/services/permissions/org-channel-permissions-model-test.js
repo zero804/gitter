@@ -10,7 +10,6 @@ var mockito = require('jsmockito').JsMockito;
 
 var user;
 var permissionsModel;
-var premiumOrThrowMock;
 var userIsInRoomMock;
 var orgPermissionsMock;
 
@@ -23,13 +22,8 @@ describe('ORG_CHANNEL', function() {
   beforeEach(function() {
     user = { username: 'gitterbob' };
 
-    premiumOrThrowMock = mockito.mockFunction();
     userIsInRoomMock = mockito.mockFunction();
     orgPermissionsMock = mockito.mockFunction();
-
-    mockito.when(premiumOrThrowMock)().then(function() {
-      return Q.resolve(true);
-    });
 
     mockito.when(orgPermissionsMock)().then(function() {
       assert(false, 'THIS MOCK STILL NEEDS TO BE CONFIGURED');
@@ -37,7 +31,6 @@ describe('ORG_CHANNEL', function() {
 
     permissionsModel = testRequire.withProxies("./services/permissions/org-channel-permissions-model", {
       './org-permissions-model': orgPermissionsMock,
-      './premium-or-throw': premiumOrThrowMock,
       '../user-in-room': userIsInRoomMock
     });
 
