@@ -53,7 +53,7 @@ function makeRoomAssertions(room, usersAllowedIn, usersNotAllowedIn) {
   });
 }
 
-describe('room-service', function() {
+describe('room-service #slow', function() {
   before(fixtureLoader(fixture, {
     user1: { },
     user2: { },
