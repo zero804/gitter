@@ -9,17 +9,27 @@ module.exports = (function () {
   var BACKSPACE = 8;
 
   var AppIntegratedLayout = Marionette.ItemView.extend({
-
+    template: false, // Always server prerendered
     el: 'body',
 
     events: {
       "keydown": "onKeyDown"
     },
 
+    ui: {
+      menu: '#menu'
+    },
+
     initialize: function () {
-      this.bindUIElements();
-      this.menu = new TroupeMenuView({ el: this.$el.find('#menu') }).show();
       this.dialogRegion = modalRegion;
+    },
+
+    onRender: function() {
+      this.menu = new TroupeMenuView({
+          template: false, // Server render here, just attach
+          el: this.ui.menu
+        })
+        .render();
     },
 
     onKeyDown: function(e) {
@@ -36,4 +46,3 @@ module.exports = (function () {
   return AppIntegratedLayout;
 
 })();
-

@@ -1,18 +1,4 @@
-<div id="left-menu-profile" class="menu-header {{#if showExapandedHeader}}menu-header--expanded{{/if}}">
-  <div class="menu-header__profile">
-    {{ widget "avatar" model=user size='s' }}
-    <div class="menu-header__name"><p>{{ user.displayName }}</p></div>
-    {{#unless isMobile}}
-      <div class="menu-header__state">
-        {{#if menuHeaderExpanded}}
-          <i class="octicon octicon-chevron-up"></i>
-        {{else}}
-          <i class="octicon octicon-chevron-down"></i>
-        {{/if}}
-      </div>
-    {{/unless}}
-  </div>
-</div>
+{{{ prerenderView "js/views/menu/tmpl/profile" wrap="div" className="menu-header" id="left-menu-profile"}}}
 <div class="nano  menu-content" id="left-menu-scroll">
   <div class="content  nano-content  menu-content__wrapper" style="outline: none">
     <div class="menu-list" id="list-mega">
@@ -39,10 +25,6 @@
       </div>
       <div class='menu-list__item' id="left-menu-list-suggested"></div>
       <div class='menu-list__item' id="left-menu-list-orgs">
-        <div class="menu-list__section--orgs" id="list">
-          <div class="menu-list__header">Your Organizations</div>
-          <ul class="room-list">{{#each orgs}}<li class="room-list-item">{{{ prerenderOrgListItem this }}}</li>{{/each}}</ul>
-        </div>
       </div>
     </div>
   </div>

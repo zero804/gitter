@@ -1,9 +1,9 @@
 <div class="menu-header__profile">
   <div class='menu-header__avatar'>
-    {{ widget "avatar" model=user size='s' }}
+    {{ widget "avatar" user=user size='s' }}
   </div>
   <div class="menu-header__name">
-    <p>{{ displayName }}</p>
+    <p>{{ user.displayName }}</p>
   </div>
   {{#unless isMobile}}
     <div class="menu-header__state">

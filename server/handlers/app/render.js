@@ -112,12 +112,11 @@ function renderMainFrame(req, res, next, frame) {
   var selectedRoomId = req.troupe && req.troupe.id;
 
   Q.all([
-    contextGenerator.generateNonChatContext(req),
-    restful.serializeTroupesForUser(userId),
-    restful.serializeOrgsForUserId(userId),
-    aroundId && getPermalinkChatForRoom(req.troupe, aroundId)
-  ])
-    .spread(function (troupeContext, rooms, orgs, permalinkChat) {
+      contextGenerator.generateNonChatContext(req),
+      restful.serializeTroupesForUser(userId),
+      aroundId && getPermalinkChatForRoom(req.troupe, aroundId)
+    ])
+    .spread(function (troupeContext, rooms, permalinkChat) {
       var chatAppQuery = {};
       if (aroundId) {
         chatAppQuery.at = aroundId;
@@ -176,8 +175,7 @@ function renderMainFrame(req, res, next, frame) {
           recents: rooms
             .filter(roomSort.recents.filter)
             .sort(roomSort.recents.sort)
-        },
-        orgs: orgs
+        }
       });
     })
     .fail(next);
