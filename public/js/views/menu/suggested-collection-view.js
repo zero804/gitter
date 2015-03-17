@@ -1,23 +1,18 @@
 "use strict";
-var roomNameTrimmer = require('utils/room-name-trimmer');
-var resolveIconClass = require('utils/resolve-icon-class');
+var roomNameTrimmer = require('utils/room-name-trimmer'); // TODO: move this to shared
+var resolveIconClass = require('utils/resolve-icon-class'); // TODO: move this to shared
 var Marionette = require('backbone.marionette');
 var template = require('./tmpl/suggested-list-item.hbs');
 
 module.exports = (function() {
 
   var SuggestedItemView = Marionette.ItemView.extend({
-
     tagName: 'li',
-
     className: 'room-list-item',
-
     template: template,
-
     modelEvents: {
       change: 'render',
     },
-
     serializeData: function() {
       var data = this.model.toJSON();
       data.uri = roomNameTrimmer(data.uri);
@@ -35,4 +30,3 @@ module.exports = (function() {
 
 
 })();
-

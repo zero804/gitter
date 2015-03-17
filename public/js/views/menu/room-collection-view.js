@@ -183,8 +183,6 @@ module.exports = (function() {
     },
 
     initialize: function (options) {
-      this.bindUIElements();
-
       if (options.draggable) {
         this.makeDraggable(options.dropTarget);
       }

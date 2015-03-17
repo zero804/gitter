@@ -13,7 +13,7 @@ module.exports = (function () {
 
   return Marionette.ItemView.extend({
     template: template,
-
+    className: 'menu-header',
     events: {
       "click #link-home": 'homeClicked',
       "click #link-logout": 'logoutClicked'
@@ -28,16 +28,13 @@ module.exports = (function () {
     },
 
     serializeData: function () {
-      var user = context.getUser();
-      var userModel = context.user();
-
+      var userModel = context.user().toJSON();
       var isMobileResult = isMobile();
       var isNativeResult = isNative();
 
       return {
         menuHeaderExpanded: this.model.get('menuHeaderExpanded'),
         isMobile: isMobileResult,
-        displayName: user.displayName || user.username,
         user: userModel,
         billingUrl: context.env('billingUrl'),
         showBilling: !isMobileResult,

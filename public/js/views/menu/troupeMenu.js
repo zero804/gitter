@@ -48,11 +48,8 @@ module.exports = (function () {
     template: CollectionWrapperViewTemplate,
 
     initialize: function (options) {
-      this.bindUIElements();
-
       this.collectionView = options.collectionView;
       this.collection = this.collectionView.collection;
-      this.listenTo(this.collection, 'sync', this.render);
       this.listenTo(this.collection, 'sync add reset remove', this.display);
       this.handleHide = options.handleHide;
     },
@@ -70,7 +67,8 @@ module.exports = (function () {
       } else {
         this.$el.hide();
       }
-      this.list.show(this.collectionView);
+
+      this.showChildView('list', this.collectionView);
 
       if (this.handleHide) {
         var hideIcon = this.ui.hide;
@@ -122,7 +120,7 @@ module.exports = (function () {
     },
 
     initialize: function () {
-      this.bindUIElements();
+      // this.bindUIElements();
       // this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
       this.repoList = false;
 
@@ -197,7 +195,7 @@ module.exports = (function () {
     getIndexForId: function(id) {
       if (!id) return;
       var els = $('#recentTroupesList li');
-      for (var i = 0, el; el = els[i]; i++) {
+      for (var i = 0, el; el = els[i]; i++) { // wtf?
         if ($(el).data('id') === id) return i;
       }
     },
@@ -262,29 +260,29 @@ module.exports = (function () {
 
       // mega-list: recent troupe view
       new RoomCollectionView({
+        template: false,
         collection: troupeCollections.favourites,
-        rerenderOnSort: true,
         draggable: true,
         dropTarget: true,
         roomsCollection: troupeCollections.troupes,
         el: ui.favs
-      });
+      }).render();
 
       new RoomCollectionView({
+        template: false,
         collection: troupeCollections.recentRoomsNonFavourites,
-        rerenderOnSort: true,
         draggable: true,
         dropTarget: true,
         roomsCollection: troupeCollections.troupes,
         el: ui.recent
-      });
+      }).render();
 
       // Organizations collection view
       new CollectionWrapperView({
         collectionView: new OrgCollectionView({ collection: troupeCollections.orgs }),
         header: 'Your Organizations',
         el: ui.orgs
-      });
+      }).render();
 
       // Suggested repos
       new CollectionWrapperView({
@@ -302,7 +300,7 @@ module.exports = (function () {
               log.error(err);
             });
         }
-      });
+      }).render();
     },
 
     onRender: function () {

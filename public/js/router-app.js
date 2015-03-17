@@ -119,7 +119,10 @@ onready(function () {
      });
   }
 
-  var appView = new AppIntegratedView({ });
+  var appView = new AppIntegratedView({
+      el: 'body'
+    });
+  appView.render();
 
   var allRoomsCollection = troupeCollections.troupes;
   allRoomsCollection.on("remove", function(model) {
@@ -400,4 +403,3 @@ onready(function () {
     });
   }
 });
-
