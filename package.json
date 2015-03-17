@@ -8,7 +8,6 @@
     "batch-stream": "^0.1.0",
     "cld": "^2.2.0",
     "connect-redis": "~1.4.6",
-    "consolidate": "~0.10.0",
     "cors": "^2.4.2",
     "csprng": "^0.1.1",
     "diskspace": "0.1.5",

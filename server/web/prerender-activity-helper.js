@@ -1,9 +1,8 @@
-/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
-var compileTemplate = require('../utils/compile-template');
+
+var compileTemplate = require('./compile-web-template');
 var prerenderedTemplate = compileTemplate('/js/views/righttoolbar/tmpl/prerendered');
 var _             = require('underscore');
-var widgetHelpers = require('./widget-prerenderers');
 
 var serviceTemplates = {
   bitbucket:  'bitbucket',
