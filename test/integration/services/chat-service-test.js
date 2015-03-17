@@ -33,17 +33,6 @@ describe('chatService', function() {
     }
   }));
 
-  describe('findChatMessagesForTroupe for non-premium orgs', function() {
-    it('should return messages not older than 2 weeks', function (done) {
-      chatService.findChatMessagesForTroupe(fixture.troupe1, {})
-        .spread(function(chatMessages, limitReached) {
-          assert.strictEqual(1, chatMessages.length);
-          assert.strictEqual(true, limitReached);
-        })
-        .nodeify(done);
-    });
-  });
-
   describe('updateChatMessage', function() {
     it('should update a recent chat message sent by the same user', function(done) {
 
@@ -121,8 +110,7 @@ describe('chatService', function() {
 
     it('should find messages using aroundId', function(done) {
       return chatService.findChatMessagesForTroupe(fixture.troupe1.id, { aroundId: chat2 })
-        .then(function(result) {
-          var chats = result[0];
+        .then(function(chats) {
           assert(chats.length >= 3);
           assert.strictEqual(chats.filter(function(f) { return f.id == chat1; }).length, 1);
           assert.strictEqual(chats.filter(function(f) { return f.id == chat2; }).length, 1);
@@ -133,8 +121,7 @@ describe('chatService', function() {
 
     it('should find messages using beforeId', function(done) {
       return chatService.findChatMessagesForTroupe(fixture.troupe1.id, { beforeId: chat2 })
-        .then(function(result) {
-          var chats = result[0];
+        .then(function(chats) {
           assert(chats.length >= 1);
           assert.strictEqual(chats.filter(function(f) { return f.id == chat1; }).length, 1);
           assert.strictEqual(chats.filter(function(f) { return f.id == chat2; }).length, 0);
@@ -145,8 +132,7 @@ describe('chatService', function() {
 
     it('should find messages using beforeInclId', function(done) {
       return chatService.findChatMessagesForTroupe(fixture.troupe1.id, { beforeInclId: chat2 })
-        .then(function(result) {
-          var chats = result[0];
+        .then(function(chats) {
           assert(chats.length >= 2);
           assert.strictEqual(chats.filter(function(f) { return f.id == chat1; }).length, 1);
           assert.strictEqual(chats.filter(function(f) { return f.id == chat2; }).length, 1);
@@ -157,8 +143,7 @@ describe('chatService', function() {
 
     it('should find messages using afterId', function(done) {
       return chatService.findChatMessagesForTroupe(fixture.troupe1.id, { afterId: chat2 })
-        .then(function(result) {
-          var chats = result[0];
+        .then(function(chats) {
           assert(chats.length >= 1);
           assert.strictEqual(chats.filter(function(f) { return f.id == chat1; }).length, 0);
           assert.strictEqual(chats.filter(function(f) { return f.id == chat2; }).length, 0);
