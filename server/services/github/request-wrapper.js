@@ -33,7 +33,7 @@ module.exports = requestExt({
     publicTokenPool,
     fetchAllPages,
     logFailingRequest,
-    httpRequestCache.extension,
+    // httpRequestCache.extension,
     requestWithRetry({ maxRetries: 3 }),
     logRateLimit
   ]
@@ -46,7 +46,7 @@ module.exports.fastRequest = requestExt({
   extensions: [
     publicTokenPool,
     logFailingRequest,
-    httpRequestCache.extension,
+    // httpRequestCache.extension,
     logRateLimit
   ]
 });
@@ -58,7 +58,7 @@ module.exports.fastRequest = requestExt({
    extensions: [
      publicTokenPool,
      logFailingRequest,
-     httpRequestCache.extension,
+    //  httpRequestCache.extension,
      requestWithRetry({ maxRetries: 3 }),
      logRateLimit
    ]
