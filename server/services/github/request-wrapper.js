@@ -26,7 +26,7 @@ function createRedisClient() {
 var httpRequestCache = new RequestHttpCache({
   backend: 'redis',
   redisClient: createRedisClient(),
-  stats: env.createStatsClient({ prefix: 'github.cache' })
+  stats: env.createStatsClient({ prefix: 'github.cache.' })
 });
 
 module.exports = requestExt({
