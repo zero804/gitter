@@ -258,7 +258,7 @@ module.exports = (function () {
 
       var ui = this.ui;
 
-      new ProfileView({ el: ui.profile, state: this.state });
+      new ProfileView({ el: ui.profile, model: this.state }).render();
 
       // mega-list: recent troupe view
       new RoomCollectionView({

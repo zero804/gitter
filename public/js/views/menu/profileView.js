@@ -23,10 +23,8 @@ module.exports = (function () {
       Widgets: {}
     },
 
-    initialize: function (options) {
-      this.state = options.state;
-      this.listenTo(this.state, 'change', this.render);
-      this.render();
+    modelEvents: {
+      'change': 'render'
     },
 
     serializeData: function () {
@@ -37,7 +35,7 @@ module.exports = (function () {
       var isNativeResult = isNative();
 
       return {
-        menuHeaderExpanded: this.state.get('menuHeaderExpanded'),
+        menuHeaderExpanded: this.model.get('menuHeaderExpanded'),
         isMobile: isMobileResult,
         displayName: user.displayName || user.username,
         user: userModel,
@@ -62,4 +60,3 @@ module.exports = (function () {
   });
 
 })();
-
