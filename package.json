@@ -75,7 +75,7 @@
     "redis-lock": "0.0.8",
     "request": "~2.40.0",
     "request-extensible": "^0.1.1",
-    "request-http-cache": "^0.3.1",
+    "request-http-cache": "^0.3.2",
     "restler-q": "0.0.3",
     "sanitizer": "0.0.15",
     "scriptjs": "^2.5.7",
