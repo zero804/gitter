@@ -1,28 +1,24 @@
-/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var winston    = require('../utils/winston');
-var nconf      = require('../utils/config');
-var path       = require('path');
-var handlebars = require('consolidate').handlebars;
-var _          = require('underscore');
-var widgetHelpers = require('./widget-prerenderers');
+var compileTemplate = require('./compile-web-template');
 
-var HELPERS = _.extend(widgetHelpers, {
-  'pluralize': require('./hbs-helpers').pluralize,
-  'prerenderRoomListItem': require('./prerender-room-item-helper'),
-  'prerenderOrgListItem': require('./prerender-org-item-helper'),
-});
+var PRERENDERED_VIEWS = [
+  "js/views/archive/tmpl/archive-navigation-view",
+  "js/views/app/tmpl/headerViewTemplate",
+  "js/views/menu/tmpl/troupeMenu",
+  "js/views/menu/tmpl/troupeMenu",
+  "js/views/app/tmpl/headerViewTemplate",
+  "js/views/chat/tmpl/chatInputView",
+  "js/views/search/tmpl/search-input",
+  "js/views/search/tmpl/search",
+  'js/views/people/tmpl/peopleCollectionView'
+].reduce(function(memo, v) {
+  memo[v] = compileTemplate(v + ".hbs");
+  return memo;
+}, {});
 
-var baseDir = path.normalize(__dirname + '/../../' + nconf.get('web:staticContent') + '/');
-
-module.exports = exports = function (template, callback) {
-  handlebars(baseDir + template + '.hbs', _.extend({}, this, { helpers: HELPERS, cache: nconf.get('web:cacheTemplates') }), function (err, result) {
-    if (err) {
-      winston.error("Unable to prerender: " + err, { exception: err });
-      return callback("");
-    }
-
-    callback(result);
-  });
+module.exports = exports = function (templateFile) {
+  var template = PRERENDERED_VIEWS[templateFile];
+  if (!template) throw new Error('Template ' + template + ' has not been precompiled.');
+  return template(this);
 };
