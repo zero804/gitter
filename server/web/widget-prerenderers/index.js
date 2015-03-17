@@ -1,34 +1,22 @@
-/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var nconf      = require('../../utils/config');
-var path       = require('path');
-var fs         = require('fs');
 var winston    = require('../../utils/winston');
-var syncHandlebars = require('handlebars');
-var SafeString = syncHandlebars.SafeString;
-
-var baseDir = path.normalize(__dirname + '../../../../' + nconf.get('web:staticContent') + '/');
-var widgetDir = path.normalize(baseDir + '/js/views/widgets/tmpl/');
+var compileTemplate = require('../compile-web-template');
+var safeTemplateWrapper = require('../safe-template-wrapper');
 
 var widgetHelpers = ['avatar','timeago'].reduce(function(memo, v) {
   var widgetTemplate;
   var handlerConstructor = require('./' + v);
   var handler;
 
-
   if(handlerConstructor.length === 1) {
-    var buffer = fs.readFileSync(widgetDir + v + '.hbs');
-    widgetTemplate = syncHandlebars.compile(buffer.toString());
+    widgetTemplate = compileTemplate('/js/views/widgets/tmpl/' + v);
     handler = handlerConstructor(widgetTemplate);
   } else {
     handler = handlerConstructor();
   }
 
-  memo[v] = function() {
-    var result = handler.apply(null, arguments);
-    return new SafeString(result);
-  };
+  memo[v] = safeTemplateWrapper(handler);
   return memo;
   }, {});
 
