@@ -1280,38 +1280,38 @@
     },
     "gitter-realtime-client": {
       "version": "0.1.12",
-      "from": "gitter-realtime-client@>=0.1.12 <0.2.0",
+      "from": "gitter-realtime-client@0.1.12",
       "dependencies": {
         "backbone-sorted-collection": {
           "version": "0.3.9",
-          "from": "backbone-sorted-collection@git://github.com/gitterhq/backbone-sorted-collection.git#79ce522",
+          "from": "backbone-sorted-collection@git://github.com/gitterhq/backbone-sorted-collection.git#79ce5228344e26a64f2d5b648698a9349c9030dd",
           "resolved": "git://github.com/gitterhq/backbone-sorted-collection.git#79ce5228344e26a64f2d5b648698a9349c9030dd",
           "dependencies": {
             "backbone-collection-proxy": {
               "version": "0.2.5",
-              "from": "backbone-collection-proxy@>=0.2.0 <0.3.0",
+              "from": "http://beta-internal:4873/backbone-collection-proxy/-/backbone-collection-proxy-0.2.5.tgz",
               "resolved": "http://beta-internal:4873/backbone-collection-proxy/-/backbone-collection-proxy-0.2.5.tgz"
             }
           }
         },
         "gitter-faye": {
           "version": "1.1.0-g",
-          "from": "gitter-faye@1.1.0-g",
+          "from": "http://beta-internal:4873/gitter-faye/-/gitter-faye-1.1.0-g.tgz",
           "resolved": "http://beta-internal:4873/gitter-faye/-/gitter-faye-1.1.0-g.tgz",
           "dependencies": {
             "faye-websocket": {
               "version": "0.9.1",
-              "from": "faye-websocket@0.9.1",
+              "from": "http://beta-internal:4873/faye-websocket/-/faye-websocket-0.9.1.tgz",
               "resolved": "http://beta-internal:4873/faye-websocket/-/faye-websocket-0.9.1.tgz",
               "dependencies": {
                 "websocket-driver": {
                   "version": "0.5.3",
-                  "from": "websocket-driver@>=0.5.1",
+                  "from": "http://beta-internal:4873/websocket-driver/-/websocket-driver-0.5.3.tgz",
                   "resolved": "http://beta-internal:4873/websocket-driver/-/websocket-driver-0.5.3.tgz",
                   "dependencies": {
                     "websocket-extensions": {
                       "version": "0.1.1",
-                      "from": "websocket-extensions@>=0.1.1",
+                      "from": "http://beta-internal:4873/websocket-extensions/-/websocket-extensions-0.1.1.tgz",
                       "resolved": "http://beta-internal:4873/websocket-extensions/-/websocket-extensions-0.1.1.tgz"
                     }
                   }
@@ -1320,19 +1320,19 @@
             },
             "tunnel-agent": {
               "version": "0.4.0",
-              "from": "tunnel-agent@*",
+              "from": "http://beta-internal:4873/tunnel-agent/-/tunnel-agent-0.4.0.tgz",
               "resolved": "http://beta-internal:4873/tunnel-agent/-/tunnel-agent-0.4.0.tgz"
             }
           }
         },
         "moment": {
           "version": "2.9.0",
-          "from": "moment@>=2.9.0 <3.0.0",
+          "from": "http://beta-internal:4873/moment/-/moment-2.9.0.tgz",
           "resolved": "http://beta-internal:4873/moment/-/moment-2.9.0.tgz"
         },
         "underscore": {
           "version": "1.8.2",
-          "from": "underscore@>=1.7.0 <2.0.0",
+          "from": "http://beta-internal:4873/underscore/-/underscore-1.8.2.tgz",
           "resolved": "http://beta-internal:4873/underscore/-/underscore-1.8.2.tgz"
         }
       }
@@ -2594,42 +2594,59 @@
       }
     },
     "request-http-cache": {
-      "version": "0.2.1",
-      "from": "request-http-cache@0.2.1",
+      "version": "0.3.2",
+      "from": "request-http-cache@>=0.3.2 <0.4.0",
       "dependencies": {
         "debug": {
-          "version": "2.1.2",
-          "from": "http://beta-internal:4873/debug/-/debug-2.1.2.tgz",
-          "resolved": "http://beta-internal:4873/debug/-/debug-2.1.2.tgz",
+          "version": "2.1.3",
+          "from": "debug@>=2.1.2 <3.0.0",
+          "resolved": "http://beta-internal:4873/debug/-/debug-2.1.3.tgz",
           "dependencies": {
             "ms": {
               "version": "0.7.0",
-              "from": "http://beta-internal:4873/ms/-/ms-0.7.0.tgz",
+              "from": "ms@0.7.0",
               "resolved": "http://beta-internal:4873/ms/-/ms-0.7.0.tgz"
             }
           }
         },
         "lodash": {
           "version": "3.5.0",
-          "from": "http://beta-internal:4873/lodash/-/lodash-3.5.0.tgz",
+          "from": "lodash@>=3.3.1 <4.0.0",
           "resolved": "http://beta-internal:4873/lodash/-/lodash-3.5.0.tgz"
         },
         "protobuf": {
           "version": "0.11.0",
-          "from": "http://beta-internal:4873/protobuf/-/protobuf-0.11.0.tgz",
+          "from": "protobuf@>=0.11.0 <0.12.0",
           "resolved": "http://beta-internal:4873/protobuf/-/protobuf-0.11.0.tgz",
           "dependencies": {
             "nan": {
               "version": "1.0.0",
-              "from": "http://beta-internal:4873/nan/-/nan-1.0.0.tgz",
+              "from": "nan@>=1.0.0 <1.1.0",
               "resolved": "http://beta-internal:4873/nan/-/nan-1.0.0.tgz"
             }
           }
         },
         "redis": {
           "version": "0.12.1",
-          "from": "http://beta-internal:4873/redis/-/redis-0.12.1.tgz",
+          "from": "redis@>=0.12.1 <0.13.0",
           "resolved": "http://beta-internal:4873/redis/-/redis-0.12.1.tgz"
+        },
+        "snappy": {
+          "version": "3.0.8",
+          "from": "snappy@>=3.0.8 <4.0.0",
+          "resolved": "http://beta-internal:4873/snappy/-/snappy-3.0.8.tgz",
+          "dependencies": {
+            "bindings": {
+              "version": "1.1.1",
+              "from": "bindings@>=1.1.1 <1.2.0",
+              "resolved": "http://beta-internal:4873/bindings/-/bindings-1.1.1.tgz"
+            },
+            "nan": {
+              "version": "1.7.0",
+              "from": "nan@1.7.0",
+              "resolved": "http://beta-internal:4873/nan/-/nan-1.7.0.tgz"
+            }
+          }
         }
       }
     },
