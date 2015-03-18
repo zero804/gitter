@@ -15,7 +15,6 @@ var searchTemplate = require('./tmpl/search.hbs');
 var resultTemplate = require('./tmpl/result.hbs');
 var noResultsTemplate = require('./tmpl/no-results.hbs');
 var noRoomResultsTemplate = require('./tmpl/no-room-results.hbs');
-var upgradeTemplate = require('./tmpl/upgrade.hbs');
 var textFilter = require('utils/text-filter');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 
@@ -91,35 +90,6 @@ module.exports = (function() {
     }
   });
 
-  var UpgradeView = ResultItemView.extend({
-    className: 'result result-upgrade',
-    template: upgradeTemplate,
-
-    getOrgName: function(troupe) {
-      if (troupe.get('oneToOne')) return false;
-      return troupe.get('uri').split('/')[0];
-    },
-
-    serializeData: function() {
-      var orgName = this.getOrgName(context.troupe());
-      var billingUrl;
-      if (!orgName) {
-        billingUrl=context.env('billingUrl');
-      } else {
-        billingUrl=context.env('billingUrl') + "/orgs/" + orgName;
-      }
-
-      return {
-        billingUrl: billingUrl,
-        orgName: orgName
-      };
-    },
-
-    selectItem: function () {
-      // FIXME: Do nothing for now.
-    }
-  });
-
   var MessageResultItemView = ResultItemView.extend({
 
     behaviors: {
@@ -176,11 +146,6 @@ module.exports = (function() {
     },
 
     getChildView: function (item) {
-
-      if (item.get('limitReached')) {
-        return UpgradeView;
-      }
-
       return MessageResultItemView;
     },
 

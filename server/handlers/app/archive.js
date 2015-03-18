@@ -9,7 +9,6 @@ var contextGenerator = require('../../web/context-generator');
 var Q = require('q');
 var roomService = require('../../services/room-service');
 var env              = require('../../utils/env');
-var roomCapabilities = require('../../services/room-capabilities');
 var burstCalculator   = require('../../utils/burst-calculator');
 var roomPermissionsModel = require('../../services/room-permissions-model');
 
@@ -102,7 +101,7 @@ exports.chatArchive = [
         }
 
         return chatService.findChatMessagesForTroupeForDateRange(troupeId, startDate.toDate(), endDate.toDate())
-          .spread(function(chatMessages, limitReached) {
+          .then(function(chatMessages) {
 
             var strategy = new restSerializer.ChatStrategy({
               unread: false, // All chats are read in the archive
@@ -111,11 +110,10 @@ exports.chatArchive = [
 
             return Q.all([
                 contextGenerator.generateTroupeContext(req),
-                restSerializer.serializeQ(chatMessages, strategy),
-                limitReached
+                restSerializer.serializeQ(chatMessages, strategy)
               ]);
           })
-          .spread(function(troupeContext, serialized, limitReached) {
+          .spread(function(troupeContext, serialized) {
             troupeContext.archive = {
               archiveDate: startDate,
               nextDate: nextDate,
@@ -157,41 +155,34 @@ exports.chatArchive = [
             var avatarUrl = "https://avatars.githubusercontent.com/" + troupe.uri.split('/')[0];
             var isPrivate = troupe.security !== "PUBLIC";
 
-            return roomCapabilities.getPlanType(troupe.id).then(function(plan) {
-              var historyHorizon = roomCapabilities.getMessageHistory(plan);
+            return res.render('chat-archive-template', {
+              layout: 'archive',
+              archives: true,
+              archiveChats: true,
+              isRepo: troupe.githubType === 'REPO',
+              bootScriptName: 'router-archive-chat',
+              cssFileName: 'styles/router-archive-chat.css',
+              githubLink: '/' + req.uriContext.uri,
+              user: user,
+              troupeContext: troupeContext,
+              troupeName: req.uriContext.uri,
+              troupeTopic: troupe.topic,
+              chats: burstCalculator(serialized),
+              billingUrl: billingUrl,
+              noindex: troupe.noindex,
+              roomUrl: roomUrl,
+              accessToken: req.accessToken,
+              avatarUrl: avatarUrl,
+              isPrivate: isPrivate,
 
-              return res.render('chat-archive-template', {
-                layout: 'archive',
-                archives: true,
-                archiveChats: true,
-                isRepo: troupe.githubType === 'REPO',
-                bootScriptName: 'router-archive-chat',
-                cssFileName: 'styles/router-archive-chat.css',
-                githubLink: '/' + req.uriContext.uri,
-                user: user,
-                troupeContext: troupeContext,
-                troupeName: req.uriContext.uri,
-                troupeTopic: troupe.topic,
-                chats: burstCalculator(serialized),
-                limitReached: limitReached,
-                historyHorizon: historyHorizon,
-                billingUrl: billingUrl,
-                noindex: troupe.noindex,
-                roomUrl: roomUrl,
-                accessToken: req.accessToken,
-                avatarUrl: avatarUrl,
-                isPrivate: isPrivate,
-
-                /* For prerendered archive-navigation-view */
-                previousDate: previousDateFormatted,
-                dayName: dayNameFormatted,
-                dayOrdinal: dayOrdinalFormatted,
-                previousDateLink: previousDateLink,
-                nextDate: nextDateFormatted,
-                nextDateLink: nextDateLink,
-                monthYearFormatted: monthYearFormatted
-              });
-
+              /* For prerendered archive-navigation-view */
+              previousDate: previousDateFormatted,
+              dayName: dayNameFormatted,
+              dayOrdinal: dayOrdinalFormatted,
+              previousDateLink: previousDateLink,
+              nextDate: nextDateFormatted,
+              nextDateLink: nextDateLink,
+              monthYearFormatted: monthYearFormatted
             });
 
           });

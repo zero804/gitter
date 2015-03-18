@@ -8,8 +8,6 @@ var getVersion        = require('../get-model-version');
 var UserIdStrategy    = require('./user-id-strategy');
 var TroupeIdStrategy  = require('./troupe-id-strategy');
 
-var LIMIT_REACHED_MESSAGE = "You have more messages in your history. Upgrade your plan to see them";
-
 function formatDate(d) {
   return d ? d.toISOString() : null;
 }
@@ -150,19 +148,6 @@ function ChatStrategy(options)  {
     };
 
   };
-
-  if(options.limitReached && !options.disableLimitReachedMessage) {
-    this.post = function(serialized) {
-      // Push a fake message
-      serialized.unshift({
-        limitReached: true,
-        text: LIMIT_REACHED_MESSAGE,
-        html: LIMIT_REACHED_MESSAGE
-      });
-
-      return serialized;
-    };
-  }
 }
 
 ChatStrategy.prototype = {

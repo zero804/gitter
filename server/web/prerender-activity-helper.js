@@ -157,7 +157,7 @@ module.exports = function(model) {
    };
 
    var extra = model.meta.prerendered ? {} : getExtraRenderData(model.meta, model.payload);
-   var templateData = _.extend({}, core, extra, widgetHelpers);
+   var templateData = _.extend({}, core, extra);
 
   return template(templateData);
 };

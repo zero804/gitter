@@ -195,7 +195,6 @@ function renderChat(req, res, options, next) {
   };
 
   var serializerOptions = _.defaults({
-    disableLimitReachedMessage: true,
     lean: true
   }, snapshotOptions);
 
