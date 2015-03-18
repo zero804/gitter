@@ -123,7 +123,8 @@ var ChatCollection = LiveCollection.extend({
     }
     if (!id2) return -1; // value < null = -1
     if (id1 == id2) return 0;
-    if (id1 < id2) return
+    if (id1 < id2) return -1;
+    return 1;
   },
   initialize: function() {
     this.listenTo(this, 'add remove', function (model, collection) {
