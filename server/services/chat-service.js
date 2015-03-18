@@ -13,7 +13,6 @@ var processChat          = require('../utils/markdown-processor');
 var Q                    = require('q');
 var mongoUtils           = require('../utils/mongo-utils');
 var moment               = require('moment');
-var roomCapabilities     = require('./room-capabilities');
 var StatusError          = require('statuserror');
 var unreadItemService    = require('./unread-item-service');
 var _                    = require('underscore');
@@ -283,14 +282,6 @@ function findFirstUnreadMessageId(troupeId, userId) {
   return unreadItemService.getFirstUnreadItem(userId, troupeId);
 }
 
-function historyForTroupeExceedsDate(troupeId, maxHistoryDate) {
-  return getDateOfFirstMessageInRoom(troupeId)
-    .then(function(firstMessageSent) {
-      return !!(firstMessageSent && firstMessageSent < maxHistoryDate);
-    });
-}
-
-
 /**
  * Mongo timestamps have a resolution down to the second, whereas
  * sent times have a resolution down to the milliseond.
@@ -306,23 +297,21 @@ function sentAfter(objectId) {
 }
 
 /**
- * Returns a promise of
- * [ messages, limitReached]
+ * Returns a promise of messages
  */
 exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
   var findMarker;
   if(options.marker === 'first-unread' && options.userId) {
     findMarker = findFirstUnreadMessageId(troupeId, options.userId);
+  } else {
+    findMarker = Q.resolve(null);
   }
 
   var limit = options.limit || 50;
   var skip = options.skip || 0;
 
-  return Q.all([
-      roomCapabilities.getMaxHistoryMessageDate(troupeId),
-      findMarker
-    ])
-    .spread(function(maxHistoryDate, markerId) {
+  return findMarker
+    .then(function(markerId) {
       if(!markerId && !options.aroundId) {
         var q = ChatMessage
           .where('toTroupeId', troupeId);
@@ -357,28 +346,19 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
           q.hint({ toTroupeId: 1, sent: -1 });
         }
 
-        if (maxHistoryDate) {
-          q = q.where('sent').gte(maxHistoryDate);
-        }
-
         return q.sort(options.sort || { sent: sentOrder })
           .limit(limit)
           .skip(skip)
           .lean()
           .execQ()
           .then(function(results) {
-            var limitReached = false;
-
             mongooseUtils.addIdToLeanArray(results);
 
             if(sentOrder === 'desc') {
               results.reverse();
-              if(maxHistoryDate && results.length < limit) {
-                limitReached = historyForTroupeExceedsDate(troupeId, maxHistoryDate);
-              }
             }
 
-            return [results, limitReached];
+            return results;
           });
       }
 
@@ -407,10 +387,6 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
         q2.hint({ toTroupeId: 1, sent: -1 });
       }
 
-      if (maxHistoryDate) {
-        q1 = q1.where('sent').gte(maxHistoryDate);
-        q2 = q2.where('sent').gte(maxHistoryDate);
-      }
 
       /* Around case */
       return Q.all([
@@ -418,17 +394,10 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
         q2.execQ(),
         ])
         .spread(function(a, b) {
-          var limitReached = false;
-
           mongooseUtils.addIdToLeanArray(a);
           mongooseUtils.addIdToLeanArray(b);
 
-          // Got back less results than we were expecting?
-          if(maxHistoryDate && a.length < halfLimit) {
-            limitReached = historyForTroupeExceedsDate(troupeId, maxHistoryDate);
-          }
-
-          return [[].concat(a.reverse(), b), limitReached];
+          return [].concat(a.reverse(), b);
         });
     })
     .nodeify(callback);
@@ -437,23 +406,13 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
 };
 
 exports.findChatMessagesForTroupeForDateRange = function(troupeId, startDate, endDate) {
-  return roomCapabilities.getMaxHistoryMessageDate(troupeId)
-    .then(function(maxHistoryDate) {
-      var q = ChatMessage
-              .where('toTroupeId', troupeId)
-              .where('sent').gte(startDate)
-              .where('sent').lte(endDate)
-              .sort({ sent: 'asc' });
+  var q = ChatMessage
+          .where('toTroupeId', troupeId)
+          .where('sent').gte(startDate)
+          .where('sent').lte(endDate)
+          .sort({ sent: 'asc' });
 
-      return q.execQ()
-        .then(function(results) {
-          if (maxHistoryDate > startDate) {
-            return [[], true];
-          }
-
-          return [results, false];
-        });
-    });
+  return q.execQ();
 };
 
 exports.findDatesForChatMessages = function(troupeId, callback) {
@@ -536,13 +495,13 @@ exports.findDailyChatActivityForRoom = function(troupeId, start, end, callback) 
 /**
  * Search for messages in a room using a full-text index.
  *
- * Returns promise [messages, limitReached]
+ * Returns promise messages
  */
 exports.searchChatMessagesForRoom = function(troupeId, textQuery, options) {
   return chatSearchService.searchChatMessagesForRoom(troupeId, textQuery, options)
-    .spread(function(searchResults, limitReached) {
+    .then(function(searchResults) {
       // We need to maintain the order of the original results
-      if(searchResults.length === 0) return [[], limitReached];
+      if(searchResults.length === 0) return [];
 
       var ids = searchResults.map(function(result) {
         return result.id;
@@ -565,7 +524,7 @@ exports.searchChatMessagesForRoom = function(troupeId, textQuery, options) {
               return !!f;
             });
 
-          return [chatsOrdered, limitReached];
+          return chatsOrdered;
         });
     });
 

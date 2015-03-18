@@ -3,11 +3,10 @@
 
 var url = require('url');
 var StatusError = require('statuserror');
-
-var nconf = require('../../utils/config');
-
-var anonymousClientId = nconf.get('github:anonymous_app:client_id');
-var anonymousClientSecret = nconf.get('github:anonymous_app:client_secret');
+var Q = require('q');
+var wrap = require('./github-cache-wrapper');
+var badCredentialsCheck = require('./bad-credentials-check');
+var request = require('./request-wrapper');
 
 function repoTokenFirst(user) {
   return user && (user.githubToken || user.githubUserToken)  || '';
@@ -26,11 +25,6 @@ module.exports = function(tokenPriority) {
       throw new Error('Unknown token priority ' + tokenPriority);
   }
 
-  var Q = require('q');
-  var wrap = require('./github-cache-wrapper');
-  var badCredentialsCheck = require('./bad-credentials-check');
-  var request = require('./request-wrapper');
-
   function Mirror(user) {
     var token = tokenStrategy(user);
     this.token = token;
@@ -41,15 +35,11 @@ module.exports = function(tokenPriority) {
     var d = Q.defer();
 
     var u = url.parse(uri, true);
-    if (this.token) {
-      u.query.access_token = this.token;
-    } else {
-      u.query.client_id = anonymousClientId;
-      u.query.client_secret = anonymousClientSecret;
-    }
+
     u.protocol = 'https';
     u.hostname = 'api.github.com';
     var options = {
+      method: 'GET',
       uri: url.format(u),
       headers: {
         'Content-Type': 'application/json',
@@ -57,6 +47,10 @@ module.exports = function(tokenPriority) {
       },
       json: true
     };
+
+    if (this.token) {
+      options.headers.Authorization = 'token ' + this.token;
+    }
 
     request(options, d.makeNodeResolver());
 
@@ -66,6 +60,7 @@ module.exports = function(tokenPriority) {
       }
 
       if(response.statusCode !== 200) {
+        /* This is pretty dodgy.... */
         return response.statusCode;
       } else {
         return body;
