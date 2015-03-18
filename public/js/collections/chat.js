@@ -149,20 +149,6 @@ var ChatCollection = LiveCollection.extend({
   },
 
   parse: function (collection) {
-    if(collection.length && collection[0].limitReached) {
-      collection.shift();
-      this.trigger('limitReached', true);
-      var atTopChanged = function(atTop) {
-
-        if(!atTop) {
-          this.trigger('limitReached', false);
-          this.stopListening(this, 'atTopChanged', atTopChanged);
-        }
-      }.bind(this);
-
-      this.listenTo(this, 'atTopChanged', atTopChanged);
-    }
-
     return burstCalculator.parse(collection);
   },
 
@@ -183,8 +169,6 @@ var ChatCollection = LiveCollection.extend({
       if (diff > 20000) {
         log.warn('Clock skew is ' + diff + 'ms');
       }
-
-      // this.trigger('clock.skew', diff);
     }
   },
   sync: SyncMixin.sync

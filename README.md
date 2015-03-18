@@ -13,7 +13,7 @@ Redis 2.8 (Sentinel 2 is shipped with Redis 2.8) & MongoDB 2.4 must be installed
 Getting Started
 ---------------
 1.  `npm install`
-2.  `grunt css`
+2.  `gulp css`
 3.  `./mongodb.sh`
 4.  `./redis.sh`
 5.  `./scripts/mongo/init-dev-mongo.sh`

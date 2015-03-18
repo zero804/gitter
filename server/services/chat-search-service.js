@@ -1,7 +1,6 @@
 "use strict";
 
 var Q                    = require('q');
-var roomCapabilities     = require('./room-capabilities');
 var _                    = require('underscore');
 var languageDetector     = require('../utils/language-detector');
 var languageAnalyzerMapper = require('../utils/language-analyzer-mapper');
@@ -105,19 +104,8 @@ function getElasticSearchQuery(troupeId, parsedQuery) {
   return query;
 }
 
-function performQuery(troupeId, parsedQuery, maxHistoryDate, options) {
+function performQuery(troupeId, parsedQuery, options) {
   var query = getElasticSearchQuery(troupeId, parsedQuery);
-
-  // Add the max-date term
-  if(maxHistoryDate) {
-    query.bool.must.push({
-      range: {
-        sent: {
-          "gte" : maxHistoryDate,
-        }
-      }
-    });
-  }
 
   var queryRequest = {
     size: options.limit || 10,
@@ -156,35 +144,10 @@ function performQuery(troupeId, parsedQuery, maxHistoryDate, options) {
     });
 }
 
-function performQueryForInaccessibleResults(troupeId, parsedQuery, maxHistoryDate)  {
-  var query = getElasticSearchQuery(troupeId, parsedQuery);
-  query.bool.must.push({
-    range: {
-      sent: {
-        "lt" : maxHistoryDate,
-      }
-    }
-  });
-
-  var countRequest = {
-    timeout: 500,
-    index: 'gitter-primary',
-    type: 'chat',
-    body: {
-      query: query,
-    }
-  };
-
-  return Q(client.count(countRequest))
-    .then(function(result) {
-      return result && result.count || 0;
-    });
-}
-
 /**
  * Search for messages in a room using a full-text index.
  *
- * Returns promise [messages, limitReached]
+ * Returns promise messages
  */
 exports.searchChatMessagesForRoom = function(troupeId, textQuery, options) {
   if(!options) options = {};
@@ -196,23 +159,9 @@ exports.searchChatMessagesForRoom = function(troupeId, textQuery, options) {
 
   return parseQuery(textQuery, options.lang)
     .then(function(parsedQuery) {
+      // TODO: deal with limit and skip
+      var searchResults = performQuery(troupeId, parsedQuery, options);
 
-        return roomCapabilities.getMaxHistoryMessageDate(troupeId)
-          .then(function(maxHistoryDate) {
-            var findInaccessibleResults;
-
-            // TODO: deal with limit and skip
-            var searchResults = performQuery(troupeId, parsedQuery, maxHistoryDate, options);
-
-            if(maxHistoryDate) {
-             findInaccessibleResults = performQueryForInaccessibleResults(troupeId, parsedQuery, maxHistoryDate);
-            }
-
-            return Q.all([searchResults, findInaccessibleResults]);
-          })
-          .spread(function(results, inaccessibleCount) {
-            return [results, !!inaccessibleCount];
-          });
+      return searchResults;
     });
-
 };

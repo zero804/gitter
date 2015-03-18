@@ -20,7 +20,6 @@ var mentionDecorator = require('views/chat/decorators/mentionDecorator');
 var embedDecorator = require('views/chat/decorators/embedDecorator');
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var UnreadBannerView = require('views/app/unreadBannerView');
-var HistoryLimitView = require('views/app/historyLimitView');
 var unreadItemsClient = require('components/unread-items-client');
 var RightToolbarView = require('views/righttoolbar/rightToolbarView');
 
@@ -122,12 +121,6 @@ module.exports = (function() {
       new UnreadBannerView.Bottom({
         el: '#bottom-unread-banner',
         model: unreadChatsModel,
-        chatCollectionView: chatCollectionView
-      }).render();
-
-      new HistoryLimitView({
-        el: '#limit-banner',
-        collection: itemCollections.chats,
         chatCollectionView: chatCollectionView
       }).render();
 
