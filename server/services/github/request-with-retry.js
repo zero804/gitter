@@ -5,11 +5,11 @@ var env = require('../../utils/env');
 var logger = env.logger;
 var stats = env.stats;
 
-module.exports = exports = function(options, request) {
+module.exports = exports = function(options) {
   var maxRetries = options.maxRetries || 4;
   var exponentialBackoffFactor = options.exponentialBackoffFactor || 1;
 
-  return function requestWrapper(options, callback) {
+  return function(options, callback, request) {
     /* Allow callers to disable retry */
     if (options.noRetry) {
       return request(options, callback);

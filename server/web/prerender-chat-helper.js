@@ -1,4 +1,3 @@
-/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
 /* Would be nice if we could just fold this into prerender-helper, but at the moment
@@ -6,12 +5,10 @@
  * Also, this way is much faster, so it's not so bad
  */
 
-var compileTemplate = require('../utils/compile-template');
+var compileTemplate = require('./compile-web-template');
 var _               = require('underscore');
-var syncHandlebars  = require('handlebars');
-var widgetHelpers   = require('./widget-prerenderers');
 
-var chatWrapper = syncHandlebars.compile('<div class="chat-item model-id-{{id}} {{burstClass}} {{unreadClass}} {{deletedClass}}">{{{inner}}}</div>');
+var chatWrapper = compileTemplate.compileString('<div class="chat-item model-id-{{id}} {{burstClass}} {{unreadClass}} {{deletedClass}}">{{{inner}}}</div>');
 
 var chatItemTemplate = compileTemplate('/js/views/chat/tmpl/chatItemView.hbs');
 var statusItemTemplate = compileTemplate('/js/views/chat/tmpl/statusItemView.hbs');
@@ -24,7 +21,6 @@ module.exports = exports = function(model, params) {
   var displayName;
   var username;
   var deletedClass;
-
 
   //data.readByText = this.getReadByText(data.readBy);
   //
@@ -44,7 +40,7 @@ module.exports = exports = function(model, params) {
     html: html,
     lang: lang,
     locale: locale
-  }, widgetHelpers);
+  });
 
   var result;
 

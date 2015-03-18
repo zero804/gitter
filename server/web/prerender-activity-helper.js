@@ -1,9 +1,8 @@
-/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
-var compileTemplate = require('../utils/compile-template');
+
+var compileTemplate = require('./compile-web-template');
 var prerenderedTemplate = compileTemplate('/js/views/righttoolbar/tmpl/prerendered');
 var _             = require('underscore');
-var widgetHelpers = require('./widget-prerenderers');
 
 var serviceTemplates = {
   bitbucket:  'bitbucket',
@@ -158,7 +157,7 @@ module.exports = function(model) {
    };
 
    var extra = model.meta.prerendered ? {} : getExtraRenderData(model.meta, model.payload);
-   var templateData = _.extend({}, core, extra, widgetHelpers);
+   var templateData = _.extend({}, core, extra);
 
   return template(templateData);
 };
