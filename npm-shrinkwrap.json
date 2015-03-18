@@ -2595,7 +2595,7 @@
     },
     "request-http-cache": {
       "version": "0.3.2",
-      "from": "request-http-cache@>=0.3.2 <0.4.0",
+      "from": "request-http-cache@latest",
       "dependencies": {
         "debug": {
           "version": "2.1.3",
