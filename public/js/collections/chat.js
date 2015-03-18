@@ -161,7 +161,6 @@ var ChatCollection = LiveCollection.extend({
   },
 
   checkClientClockSkew: function(model) {
-  checkClientClockSkew: function(model) {
     var sent = model.attributes.sent;
     var previousSent = model.previousAttributes().sent;
 
