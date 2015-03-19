@@ -17,19 +17,12 @@ require('jquery-sortable');
 
 module.exports = (function() {
 
-  var PopoverBodyView = Marionette.View.extend({
+  var PopoverBodyView = Marionette.ItemView.extend({
     className: 'commit-popover-body',
+    template: popoverTemplate,
     events: {
       'click .js-close-button': 'onItemClose',
       'click .js-leave-button': 'onItemLeave'
-    },
-    initialize: function() {
-      this.listenTo(this.model, 'change', this.render);
-    },
-    render: function() {
-      var data = this.model.toJSON();
-      this.$el.html(popoverTemplate(data));
-      return this;
     },
     onItemClose: function(e) {
       e.stopPropagation(); // no navigation
@@ -301,4 +294,3 @@ module.exports = (function() {
 
 
 })();
-
