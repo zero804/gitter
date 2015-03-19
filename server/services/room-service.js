@@ -159,7 +159,7 @@ function makeRoomTypeCreationFilterFunction(creationFilter) {
  * Assuming that oneToOne uris have been handled already,
  * Figure out what this troupe is for
  *
- * @returns Promise of a troupe if the user is able to join/create the troupe
+ * @returns Promise of [troupe, hasJoinPermission] if the user is able to join/create the troupe
  */
 function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
   if(!options) options = {};
