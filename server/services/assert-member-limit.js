@@ -67,12 +67,12 @@ function userWithinFreeOrgLimit(user, org) {
   ]).then(function(members) {
 
     var memberIds = members.map(function(member) {
-      return member.id;
+      return member._id.toString();
     });
 
     // if user is already counted as a member, then
     // adding them wont increase the org private member count
-    if(user && memberIds.indexOf(user.id) >= 0) return true;
+    if(user && user.id && memberIds.indexOf(user.id.toString()) >= 0) return true;
 
     return memberIds.length < MAX_FREE_MEMBER_COUNT;
   });

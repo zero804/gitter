@@ -83,7 +83,7 @@ describe('assert-member-limit:', function() {
 
     it('allows existing org user to join private room with 25 people in the org', function(done) {
       orgMembers = createArray(24);
-      orgMembers.push({ id: FAKE_USER.id });
+      orgMembers.push({ _id: FAKE_USER.id });
 
       assertMemberLimit('org/room', 'PRIVATE', FAKE_USER).nodeify(done);
     });
@@ -114,7 +114,7 @@ describe('assert-member-limit:', function() {
 function createArray(userCount) {
   var array = [];
   for (var i = 0; i < userCount; i++) {
-    array.push({ id: 'user' + i });
+    array.push({ _id: 'user' + i });
   }
 
   return array;
