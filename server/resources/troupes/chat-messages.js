@@ -44,22 +44,17 @@ module.exports = {
     }
 
     return query
-      .spread(function(chatMessages, limitReached) {
+      .then(function(chatMessages) {
         var userId = req.user && req.user.id;
         var strategy = new restSerializer.ChatStrategy({
           currentUserId: userId,
           troupeId: req.troupe.id,
-          initialId: aroundId,
-          limitReached: limitReached
+          initialId: aroundId
         });
 
-        return [restSerializer.serialize(chatMessages, strategy), limitReached];
+        return restSerializer.serialize(chatMessages, strategy);
       })
-      .spread(function(serialized, limitReached) {
-        if(limitReached) {
-          res.status(206); // Partial content
-        }
-
+      .then(function(serialized) {
         res.send(serialized);
       })
       .fail(next);

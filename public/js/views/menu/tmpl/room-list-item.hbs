@@ -5,14 +5,7 @@
     <i class='{{ iconClass }}'></i>
   </div>
   <span class="room-list-item__name" title="{{title}}">{{ name }}</span>
-  {{#unless oneToOne}}
-    {{#unless mentions}}
-      <i class="room-list-item__action js-leave-button icon-logout" data-id="{{ id }}" title="Leave"></i>
-    {{/unless}}
-  {{/unless}}
-  {{#unless lurk}}
-    <i class="room-list-item__action js-close-button icon-cancel-circle" data-id="{{ id }}" title="Hide"></i>
-  {{/unless}}
+  <i class="room-list-item__action js-close-button icon-cancel-circle" data-id="{{ id }}"></i>
   {{#if unreadItems}}
     <span class="js-unread-badge room-list-item__unread-badge">{{ unreadItems }}</span>
   {{/if}}

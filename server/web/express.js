@@ -7,37 +7,21 @@ var config          = env.config;
 var express        = require('express');
 var passport       = require('passport');
 var expressHbs     = require('express-hbs');
-var path           = require('path');
 var rememberMe     = require('./middlewares/rememberme-middleware');
 var cors           = require('cors');
-
+var resolveStatic  = require('./resolve-static');
 
 var devMode        = config.get('dev-mode');
 
 // Naughty naughty naught, install some extra methods on the express prototype
 require('./http');
 
-var staticContentDir = path.join(__dirname, '..', '..', config.get('web:staticContent'));
-
 module.exports = {
   /**
    * Configure express for the full web application
    */
   installFull: function(app, server, sessionStore) {
-    expressHbs.registerHelper('cdn', require('./hbs-helpers').cdn);
-    expressHbs.registerHelper('bootScript', require('./hbs-helpers').bootScript);
-    expressHbs.registerHelper('isMobile', require('./hbs-helpers').isMobile);
-    expressHbs.registerHelper('generateEnv', require('./hbs-helpers').generateEnv);
-    expressHbs.registerHelper('generateTroupeContext', require('./hbs-helpers').generateTroupeContext);
-    expressHbs.registerAsyncHelper('prerenderView', require('./prerender-helper'));
-    expressHbs.registerHelper('chatItemPrerender', require('./prerender-chat-helper'));
-    expressHbs.registerHelper('activityItemPrerender', require('./prerender-activity-helper'));
-    expressHbs.registerHelper('pluralize', require('./hbs-helpers').pluralize);
-    expressHbs.registerHelper('toLowerCase', require('./hbs-helpers').toLowerCase);
-    expressHbs.registerHelper('typewriter', require('./hbs-helpers').typewriter);
-    expressHbs.registerHelper('formatNumber', require('./hbs-helpers').formatNumber);
-    expressHbs.registerHelper('githubTypeToClass', require('./hbs-helpers').githubTypeToClass);
-    expressHbs.registerHelper('getRoomName', require('./hbs-helpers').getRoomName);
+    require('./register-helpers')(expressHbs);
 
     app.locals({
       googleTrackingId: config.get("stats:ga:key"),
@@ -46,14 +30,14 @@ module.exports = {
     });
 
     app.engine('hbs', expressHbs.express3({
-      partialsDir: staticContentDir + '/templates/partials',
-      layoutsDir: staticContentDir + '/layouts',
+      partialsDir: resolveStatic('/templates/partials'),
+      layoutsDir: resolveStatic('/layouts'),
       contentHelperName: 'content'
     }));
 
     app.disable('x-powered-by');
     app.set('view engine', 'hbs');
-    app.set('views', staticContentDir + '/templates');
+    app.set('views', resolveStatic('/templates'));
     app.set('trust proxy', true);
 
     if(config.get('express:viewCache')) {
@@ -82,7 +66,7 @@ module.exports = {
         maxAge: 0
       }));
 
-      app.use('/_s/l', express.static(staticContentDir, {
+      app.use('/_s/l', express.static(resolveStatic(), {
         maxAge: 0
       }));
     }
