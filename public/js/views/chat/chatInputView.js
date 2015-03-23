@@ -556,7 +556,8 @@ module.exports = (function() {
         chatResizer.resizeInput();
       });
 
-      this.drafty = drafty(this.el);
+      
+      if (!this.options.editMode) this.drafty = drafty(this.el);
 
       chatResizer.resetInput(true);
 
@@ -619,7 +620,7 @@ module.exports = (function() {
     reset: function() {
       $('#chatInputForm').trigger('reset');
       this.el.value = '';
-      this.drafty.reset();
+      if (this.drafty) this.drafty.reset(); // Drafty is disabled in editMode
       this.chatResizer.resetInput();
     },
 
