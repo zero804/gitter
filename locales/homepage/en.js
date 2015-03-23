@@ -64,5 +64,8 @@
 	"Blog": "Blog",
 	"Twitter": "Twitter",
 	"Gitter &mdash; Where developers come to talk.": "Gitter &mdash; Where developers come to talk.",
-	"Translated By": "-"
+	"Translated By": "-",
+	"Pro": "Pro",
+	"<b>25</b> org members": "<b>25</b> org members",
+	"<b>Unlimited</b> org members": "<b>Unlimited</b> org members"
 }
