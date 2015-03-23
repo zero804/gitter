@@ -8,26 +8,47 @@ var Q = require('q');
 
 var MAX_FREE_MEMBER_COUNT = 25;
 
-function assertMemberLimit(uri, security, user) {
-  if (security === 'PUBLIC') return Q.resolve();
+function assertMemberLimit(room, user) {
+  // public room? you dont need to pay.
+  if (room.security === 'PUBLIC') return Q.resolve();
 
-  var owner = uri.split('/')[0];
+  // already in the room? you dont need to pay.
+  if (checkUserInRoom(user, room)) return Q.resolve();
 
-  return checkIfOrg(owner)
+  // room has space to add 1 person and stay under the free limit? you dont need to pay.
+  var userCount = room.users && room.users.length || 0;
+  if (userCount < MAX_FREE_MEMBER_COUNT) return Q.resolve();
+
+  var lcOwner = room.lcOwner;
+
+  return checkIfOrg(lcOwner)
     .then(function(isOrg) {
+      // not owned by an org? you dont need to pay.
       if (!isOrg) return;
 
-      var org = owner;
+      var lcOrg = lcOwner;
 
-      return userWithinOrgLimit(user, org)
-        .then(function(withinLimit) {
-          if (withinLimit) return;
+      return checkIfProOrg(lcOrg)
+        .then(function(isPro) {
+          // org already paid? you dont need to pay.
+          if (isPro) return;
 
-          var err = new StatusError(402, 'org has reached its global limit for private members');
-          err.uri = uri;
+          // you need to pay to proceed. PAY ME!
+          var err = new StatusError(402, 'org has reached its limit for private members');
+          err.uri = room.uri;
           throw err;
         });
     }); 
+}
+
+function checkUserInRoom(user, room) {
+  if (!user || !user.id || !room.users) return false;
+
+  var memberIds = room.users.map(function(member) {
+    return member.userId.toString();
+  });
+
+  return memberIds.indexOf(user.id.toString()) >= 0;
 }
 
 function checkIfOrg(owner) {
@@ -35,7 +56,6 @@ function checkIfOrg(owner) {
   // we will assume that all orgs have an org root room, even though this
   // wont catch org repo rooms (+ repo channels) that dont have an org root room.
   // better to let people get stuff for free than overcharge them...
-
   return troupeService.findByUri(owner)
     .then(function(room) {
       if (!room) return false;
@@ -44,41 +64,7 @@ function checkIfOrg(owner) {
     });
 }
 
-
-function userWithinOrgLimit(user, org) {
-  return orgIsPro(org)
-    .then(function(isPro) {
-
-    return isPro || userWithinFreeOrgLimit(user, org);
-  });
-}
-
-function userWithinFreeOrgLimit(user, org) {
-  var lcOrg = org.toLowerCase();
-
-  return persistence.Troupe.aggregateQ([
-    // find all non public rooms for org
-    { $match: { lcOwner: lcOrg, security: { $in: [ 'PRIVATE', 'INHERITED' ] } } },
-    // turn each room doc with X users into X room docs with 1 user
-    { $unwind: '$users' },
-    // create list of distinct users
-    { $group: { _id: '$users.userId' } }
-
-  ]).then(function(members) {
-
-    var memberIds = members.map(function(member) {
-      return member._id.toString();
-    });
-
-    // if user is already counted as a member, then
-    // adding them wont increase the org private member count
-    if(user && user.id && memberIds.indexOf(user.id.toString()) >= 0) return true;
-
-    return memberIds.length < MAX_FREE_MEMBER_COUNT;
-  });
-}
-
-function orgIsPro(org) {
+function checkIfProOrg(org) {
   var lcUri = org.toLowerCase();
 
   return persistence.Subscription.findOneQ({
