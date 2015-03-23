@@ -1,7 +1,14 @@
-<input class="gtrInput" autofocus placeholder="Search for people you know...">
+{{#if isOverLimit}}
+<p><b>You've reached the limit of users in a <i>private</i> room.</b></p>
+<p>To add someone else <a href="{{billingUrl}}">go Pro &rarr;</b></p>
+{{/if}}
+
+<input class="gtrInput" autofocus {{#if isOverLimit}}disabled{{/if}} placeholder="Search for people you know...">
+
 <div class="gtrPeopleAddRoster">
   <div class='gtrPeopleAddRoster__adding js-add-roster-loading hide'><p><i class='isLoading pulse'></i> Adding...</p></div>
   {{!-- Added items will be here --}}
 </div>
+
 <div class="trpModalFailure" id="modal-failure" style="display:none"></div>
 <div class="trpModalSuccess" id="modal-success" style="display:none"></div>

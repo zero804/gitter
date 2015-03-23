@@ -15,10 +15,10 @@ var ALLOWED_SECURITY_VALUES = {
  *
  * Commom code for `org-channel-permissions-model` and `repo-channel-permissions-model`
  *
- * `userIsInRoom` and `premiumOrThrow` MUST BE required from the original module,
+ * `userIsInRoom` MUST BE required from the original module,
  * otherwise the tests will fail because `proxyquire` will not apply its replacements
  */
-module.exports = function(delegatePermissionsModel, userIsInRoom, premiumOrThrow, ownerIsEarlyAdopter) {
+module.exports = function(delegatePermissionsModel, userIsInRoom) {
 
   return function commonChannelPermissionsModel(user, right, uri, security) {
     if(!ALLOWED_SECURITY_VALUES.hasOwnProperty(security)) {
@@ -47,13 +47,7 @@ module.exports = function(delegatePermissionsModel, userIsInRoom, premiumOrThrow
             return userIsInRoom(uri, user)
               .then(function(inRoom) {
                 if (!inRoom) return false;
-
-                return ownerIsEarlyAdopter(uri)
-                  .then(function(isEarlyAdopter) {
-                    if (isEarlyAdopter) return true;
-
-                    return premiumOrThrow(uriFirstPart);
-                  });
+                return true;
               });
 
 
@@ -99,7 +93,7 @@ module.exports = function(delegatePermissionsModel, userIsInRoom, premiumOrThrow
               .then(function(access) {
                 if(!access) return false;
 
-                return premiumOrThrow(uriFirstPart);
+                return true;
               });
           default:
             throw new Error('Unknown security: ' + security);
