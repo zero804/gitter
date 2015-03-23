@@ -1,0 +1,9 @@
+{{#unless oneToOne}}
+  {{#unless mentions}}
+    <a class="popover-button js-leave-button"><i class="icon-logout" data-id="{{ id }}"></i>Leave</a>
+  {{/unless}}
+{{/unless}}
+
+{{#unless lurk}}
+  <a class="popover-button js-close-button"><i class="icon-cancel-circle" data-id="{{ id }}"></i>Hide</a>
+{{/unless}}
