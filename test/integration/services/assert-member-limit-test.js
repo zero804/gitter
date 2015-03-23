@@ -140,7 +140,7 @@ describe('assert-member-limit:', function() {
         });
     });
 
-    it('throws when user tries to join room undefined security with 25 other people inside', function(done) {
+    it('throws when user tries to join room with undefined security with 25 other people inside', function(done) {
       var room = {
         uri: 'org/room',
         lcOwner: 'org',
