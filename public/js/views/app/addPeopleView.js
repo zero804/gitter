@@ -193,6 +193,17 @@ module.exports = (function() {
         });
     },
 
+    serializeData: function() {
+      var isOverLimit = context.troupe().get('userCount') > 0;
+      var org = context.troupe().get('uri').split('/')[0];
+      var billingUrl = context.env('billingUrl') + '/create/' + org + '/pro?r=' + window.location.pathname;
+
+      return {
+        isOverLimit: isOverLimit,
+        billingUrl: billingUrl
+      };
+    },
+
     onRender: function () {
       var self = this;
 
