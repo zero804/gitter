@@ -205,73 +205,29 @@
 
       <section id="pricing-panel">
         <div class="wrap">
-          <div class="half">
-            <h1>{{ __ "Personal pricing" }}</h1>
+            <h1>{{ __ "Organisation pricing"}}</h1>
 
-            <article class="price ghost">
+            <article class="price mix">
               <header>
                 <b>{{ __ "Free" }}</b>
 
                 <h1>
                   $0
-                  <b>{{ __ "Forever"}}</b>
-                </h1>
-              </header>
-
-              <ul>
-                <li>{{{ __ "<b>Unlimited</b> public rooms"}}}</li>
-                <li>{{{ __ "<b>1</b> private room"}}}*</li>
-                <li>{{{ __ "<b>2 weeks’</b> chat history" }}}</li>
-              </ul>
-
-              <a class="btn signup full" href="/login/github?action=signup&source=pricing.free">{{{ __ "<b>Get started</b> for free"}}}</a>
-            </article>
-
-            <article class="price purple">
-              <header>
-                <b>{{ __ "Individual"}}</b>
-
-                <h1>
-                  $2
-                  <b>{{ __ "monthly"}}</b>
-                </h1>
-              </header>
-
-              <ul>
-                <li>{{{ __ "<b>Unlimited</b> public rooms"}}}</li>
-                <li>{{{ __ "<b>Unlimited</b> private rooms"}}}**</li>
-                <li>{{{ __ "<b>Unlimited</b> chat history"}}}</li>
-              </ul>
-
-              <a class="btn signup full" href="{{billingBaseUrl}}/plan/personal">{{{ __ "<b>Purchase</b> now" }}}</a>
-            </article>
-          </div>
-
-          <div class="half">
-            <h1>{{ __ "Organisation pricing"}}</h1>
-
-            <article class="price mix">
-              <header>
-                <b>{{ __ "Bronze" }}</b>
-
-                <h1>
-                  $2
                   <b>{{ __ "per user/month" }}</b>
                 </h1>
               </header>
 
               <ul>
                 <li>{{{ __ "<b>Unlimited</b> public rooms" }}} </li>
-                <li>{{{ __ "<b>Unlimited</b> private rooms" }}} ***</li>
-                <li>{{{ __ "<b>6 months’</b> chat history" }}}</li>
+                <li>{{{ __ "<b>Unlimited</b> private rooms" }}} </li>
+                <li>{{{ __ "<b>Unlimited</b> chat history" }}}</li>
+                <li>{{{ __ "<b>25</b> org members" }}}</li>
               </ul>
-
-              <a class="btn signup full" href="{{billingBaseUrl}}/plan/bronze">{{{ __ "<b>Purchase</b> now" }}}</a>
             </article>
 
             <article class="price orange">
               <header>
-                <b>{{ __ "Silver"}}</b>
+                <b>{{ __ "Pro"}}</b>
 
                 <h1>
                   $5
@@ -281,22 +237,19 @@
 
               <ul>
                 <li>{{{ __ "<b>Unlimited</b> public rooms" }}}</li>
-                <li>{{{ __ "<b>Unlimited</b> private rooms" }}}***</li>
+                <li>{{{ __ "<b>Unlimited</b> private rooms" }}}</li>
                 <li>{{{ __ "<b>Unlimited</b> chat history" }}}</li>
+                <li>{{{ __ "<b>Unlimited</b> org members" }}}</li>
               </ul>
 
-              <a class="btn signup full" href="{{billingBaseUrl}}/plan/silver">{{{ __ "<b>Purchase</b> now" }}}</a>
+              <a class="btn signup full" href="{{billingBaseUrl}}/plan/pro">{{{ __ "<b>Purchase</b> now" }}}</a>
             </article>
           </div>
           <div class="wrap fine-print">
-            <p>* {{ __ "Our free plan includes one private room per organisation you belong to on GitHub"}}</p>
-            <p>** {{ __ "Our Individual plan allows you to create private rooms using your personal account as the owner" }}</p>
-            <p>*** {{ __ "Our organisation plans allow you to create private rooms using your GitHub organisation as the owner"}}</p>
             <div class="legal">
               {{{ __ "Prices may be subject to VAT. By signing up you agree to our <a %s>Terms and Conditions</a>." "href='https://gitter.zendesk.com/hc/en-us/sections/200274872-Legal-documentation' target='_blank'" }}}
             </div>
           </div>
-        </div>
       </section>
 
       <section id="apps-panel">
