@@ -67,5 +67,8 @@
 	"Translated By": "-",
 	"Pro": "Pro",
 	"<b>25</b> org members": "<b>25</b> org members",
-	"<b>Unlimited</b> org members": "<b>Unlimited</b> org members"
+	"<b>Unlimited</b> org members": "<b>Unlimited</b> org members",
+	"<b>Unlimited</b> integrations": "<b>Unlimited</b> integrations",
+	"Limited to 25 users per private room": "Limited to 25 users per private room",
+	"<b>Unlimited</b> users per private room": "<b>Unlimited</b> users per private room"
 }
