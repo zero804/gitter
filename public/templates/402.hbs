@@ -1,12 +1,30 @@
-{{!< error-layout}}
-<a href="{{homeUrl}}"><img class="image" src="{{cdn 'images/icon-logo-red-64@2x.png'}}" width="64" title="The sad face"></a>
-<div class="error">
-  Gitter<br>
-  <input id="error-text" class="error-input" size="55" value="This action requires a paid plan."><br><br>
-  {{!-- <h1>Payment Required</h1> --}}
-  <p><a href="{{ billingUrl }}" target='blank'>Upgrade now</a>.</p>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Payment Required</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  {{#if stack}}
-    <pre style="font-size:small">{{{stack}}}</pre>
-  {{/if}}
-</div>
+    <link href="{{ cdn 'styles/error-page.css' }}" rel="stylesheet">
+    <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon-normal.ico' }}">
+  </head>
+
+  <body>
+    <div class="center-panel">
+      <h1>402 - Payment Required</h1>
+      <p>
+        You cannot join {{room}} because the {{org}} organisation has exceeed its global limit for private members.
+        <br/>
+        Please <a href="{{ billingUrl }}" target='blank'>upgrade</a>.
+      </p>
+      <p>
+        If you can't resolve this issue, please <a href="http://support.gitter.im" target="_blank">contact support</a>.
+      </p>
+    </div>
+
+    <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
+    <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+  </body>
+</html>
