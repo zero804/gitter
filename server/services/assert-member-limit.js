@@ -34,7 +34,7 @@ function assertMemberLimit(room, user) {
           if (isPro) return;
 
           // you need to pay to proceed. PAY ME!
-          var err = new StatusError(402, 'org has reached its limit for private members');
+          var err = new StatusError(402, room.uri + ' has reached its limit for private members');
           err.uri = room.uri;
           throw err;
         });
