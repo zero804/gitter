@@ -169,7 +169,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
 
   if(troupe) {
     logger.verbose('Does user ' + (user && user.username || '~anon~') + ' have access to ' + uri + '?');
-    return assertMemberLimit(uri, troupe.security, user)
+    return assertMemberLimit(troupe, user)
       .then(function() {
         return Q.all([
           troupe,
@@ -227,87 +227,84 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
 
           /* This will load a cached copy */
           return securityPromise.then(function(security) {
-            return assertMemberLimit(uri, security, user)
-              .then(function() {
 
-                var nonce = Math.floor(Math.random() * 100000);
+            var nonce = Math.floor(Math.random() * 100000);
 
-                return persistence.Troupe.findOneAndUpdateQ(
-                  { lcUri: lcUri, githubType: githubType },
-                  {
-                    $setOnInsert: {
-                      lcUri: lcUri,
-                      lcOwner: lcUri.split('/')[0],
-                      uri: officialUri,
-                      _nonce: nonce,
-                      githubType: githubType,
-                      topic: topic || "",
-                      security: security,
-                      dateLastSecurityCheck: new Date(),
-                      users:  user ? [{
-                        _id: new ObjectID(),
-                        userId: user._id
-                      }] : [],
-                      userCount: user ? 1 : 0
-                    }
-                  },
-                  {
-                    upsert: true
-                  })
-                  .then(function(troupe) {
-                    var hookCreationFailedDueToMissingScope;
+            return persistence.Troupe.findOneAndUpdateQ(
+              { lcUri: lcUri, githubType: githubType },
+              {
+                $setOnInsert: {
+                  lcUri: lcUri,
+                  lcOwner: lcUri.split('/')[0],
+                  uri: officialUri,
+                  _nonce: nonce,
+                  githubType: githubType,
+                  topic: topic || "",
+                  security: security,
+                  dateLastSecurityCheck: new Date(),
+                  users:  user ? [{
+                    _id: new ObjectID(),
+                    userId: user._id
+                  }] : [],
+                  userCount: user ? 1 : 0
+                }
+              },
+              {
+                upsert: true
+              })
+              .then(function(troupe) {
+                var hookCreationFailedDueToMissingScope;
 
-                    if(nonce == troupe._nonce) {
-                      serializeCreateEvent(troupe);
+                if(nonce == troupe._nonce) {
+                  serializeCreateEvent(troupe);
 
-                      /* Created here */
-                      var requiredScope = "public_repo";
-                      /* TODO: Later we'll need to handle private repos too */
-                      var hasScope = user.hasGitHubScope(requiredScope);
+                  /* Created here */
+                  var requiredScope = "public_repo";
+                  /* TODO: Later we'll need to handle private repos too */
+                  var hasScope = user.hasGitHubScope(requiredScope);
 
-                      if(hasScope) {
-                        logger.verbose('Upgrading requirements');
+                  if(hasScope) {
+                    logger.verbose('Upgrading requirements');
 
-                        if(githubType === 'REPO') {
-                          /* Do this asynchronously */
-                          applyAutoHooksForRepoRoom(user, troupe)
-                            .catch(function(err) {
-                              logger.error("Unable to apply hooks for new room", { exception: err });
-                            });
-                        }
-
-                      } else {
-                        if(githubType === 'REPO') {
-                          logger.verbose('Skipping hook creation. User does not have permissions');
-                          hookCreationFailedDueToMissingScope = true;
-                        }
-                      }
-
-                      if(githubType === 'REPO' && security === 'PUBLIC') {
-                        if(badgerEnabled && options.addBadge) {
-                          /* Do this asynchronously (don't chain the promise) */
-                          userSettingsService.getUserSettings(user.id, 'badger_optout')
-                            .then(function(badgerOptOut) {
-                              // If the user has opted out never send the pull request
-                              if(badgerOptOut) return;
-
-                              // Badgers Go!
-                              return badger.sendBadgePullRequest(uri, user);
-                            })
-                            .catch(function(err) {
-                              errorReporter(err, { uri: uri, user: user.username });
-                              logger.error('Unable to send pull request for new room', { exception: err });
-                            });
-                        }
-                      }
+                    if(githubType === 'REPO') {
+                      /* Do this asynchronously */
+                      applyAutoHooksForRepoRoom(user, troupe)
+                        .catch(function(err) {
+                          logger.error("Unable to apply hooks for new room", { exception: err });
+                        });
                     }
 
-                    return [troupe, true, hookCreationFailedDueToMissingScope, true];
-                  });
+                  } else {
+                    if(githubType === 'REPO') {
+                      logger.verbose('Skipping hook creation. User does not have permissions');
+                      hookCreationFailedDueToMissingScope = true;
+                    }
+                  }
 
+                  if(githubType === 'REPO' && security === 'PUBLIC') {
+                    if(badgerEnabled && options.addBadge) {
+                      /* Do this asynchronously (don't chain the promise) */
+                      userSettingsService.getUserSettings(user.id, 'badger_optout')
+                        .then(function(badgerOptOut) {
+                          // If the user has opted out never send the pull request
+                          if(badgerOptOut) return;
+
+                          // Badgers Go!
+                          return badger.sendBadgePullRequest(uri, user);
+                        })
+                        .catch(function(err) {
+                          errorReporter(err, { uri: uri, user: user.username });
+                          logger.error('Unable to send pull request for new room', { exception: err });
+                        });
+                    }
+                  }
+                }
+
+                return [troupe, true, hookCreationFailedDueToMissingScope, true];
               });
+
           });
-        });
+      });
     });
 }
 
@@ -793,7 +790,7 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
     .then(function (existingUser) {
       if (existingUser && room.containsUserId(existingUser.id)) throw new StatusError(409, usernameToAdd + ' is already in this room.');
 
-      return assertMemberLimit(room.uri, room.security, existingUser)
+      return assertMemberLimit(room, existingUser)
         .then(function() {
           var isNewUser = !existingUser;
 
