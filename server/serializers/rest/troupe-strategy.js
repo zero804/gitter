@@ -157,7 +157,7 @@ function RoomPlanStrategy() {
     return billingService.findActivePlans(uris)
       .then(function(subscriptions) {
         subscriptions.forEach(function(subscription) {
-          premium[subscription.uri] = subscription.plan; // true;
+          premium[subscription.uri.toLowerCase()] = subscription.plan;
         });
 
         return true;
@@ -167,7 +167,7 @@ function RoomPlanStrategy() {
 
   this.map = function(troupe) {
     if (!troupe || !troupe.uri) return undefined;
-    var orgOrUser = getOrgOrUserFromURI(troupe.uri);
+    var orgOrUser = getOrgOrUserFromURI(troupe.uri).toLowerCase();
     return premium[orgOrUser];
   };
 }
