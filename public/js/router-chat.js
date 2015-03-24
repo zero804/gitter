@@ -29,6 +29,7 @@ require('views/widgets/avatar');
 require('views/widgets/timeago');
 require('components/ping');
 
+var PRIVATE_ROOM_LIMIT = 0;
 
 onready(function () {
 
@@ -266,9 +267,19 @@ onready(function () {
     },
 
     addPeople: function() {
-      require.ensure(['views/app/addPeopleView'], function(require) {
-        var AddPeopleViewModal = require('views/app/addPeopleView');
-        appView.dialogRegion.show(new AddPeopleViewModal({}));
+      require.ensure(['views/app/addPeopleView', 'views/app/getProView'], function(require) {
+        var room = context().troupe;
+        var isOverLimit = (room.security === 'PRIVATE' || room.githubType === 'ORG')
+                          && !room.premium
+                          && context().troupe.userCount > PRIVATE_ROOM_LIMIT;
+
+        if (isOverLimit) {
+          var GetProViewModal = require('views/app/getProView');
+          appView.dialogRegion.show(new GetProViewModal({}));
+        } else {
+          var AddPeopleViewModal = require('views/app/addPeopleView');
+          appView.dialogRegion.show(new AddPeopleViewModal({}));
+        }
       });
 
     },
