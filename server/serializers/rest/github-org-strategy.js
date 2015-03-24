@@ -15,7 +15,7 @@ function OrgPlanStrategy() {
     return billingService.findActiveOrgPlans(orgUris)
       .then(function(subscriptions) {
         orgsWithPlans = subscriptions.reduce(function(memo, s) {
-          memo[s.uri] = s.plan;
+          memo[s.uri.toLowerCase()] = s.plan;
           return memo;
         }, {});
 
@@ -25,7 +25,7 @@ function OrgPlanStrategy() {
   };
 
   this.map = function(orgUri) {
-    return orgsWithPlans[orgUri];
+    return orgsWithPlans[orgUri.toLowerCase()];
   };
 }
 
