@@ -680,10 +680,6 @@ function createCustomChildRoom(parentTroupe, user, options, callback) {
       .then(function(clash) {
         if(clash) throw new StatusError(409, 'There is already a channel at ' + uri);
 
-        return assertMemberLimit(uri, security, user);
-      })
-      .then(function() {
-
         var nonce = Math.floor(Math.random() * 100000);
 
         return persistence.Troupe.findOneAndUpdateQ(

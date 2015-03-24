@@ -19,16 +19,16 @@ function assertMemberLimit(room, user) {
   var userCount = room.users && room.users.length || 0;
   if (userCount < MAX_FREE_MEMBER_COUNT) return Q.resolve();
 
-  var lcOwner = room.lcOwner;
+  var owner = room.uri.split('/')[0];
 
-  return checkIfOrg(lcOwner)
+  return checkIfOrg(owner)
     .then(function(isOrg) {
       // not owned by an org? you dont need to pay.
       if (!isOrg) return;
 
-      var lcOrg = lcOwner;
+      var org = owner;
 
-      return checkIfProOrg(lcOrg)
+      return checkIfProOrg(org)
         .then(function(isPro) {
           // org already paid? you dont need to pay.
           if (isPro) return;
