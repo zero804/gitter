@@ -6,20 +6,19 @@
     <title>Payment Required</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link href="{{ cdn 'styles/error-page.css' }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{cdn 'styles/payment-required.css' }}">
     <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon-normal.ico' }}">
   </head>
 
   <body>
     <div class="center-panel">
-      <h1>402 - Payment Required</h1>
-      <p>
-        You cannot join {{room}} because the {{org}} organisation has exceeed its global limit for private members.
-        <br/>
-        Please <a href="{{ billingUrl }}" target='blank'>upgrade</a>.
-      </p>
-      <p>
-        If you can't resolve this issue, please <a href="http://support.gitter.im" target="_blank">contact support</a>.
+      <h1>Upgrade to Pro</h1>
+      <p>Shucks! The room <b>{{room}}</b> has reached the maximum number of users allowed on our free plan.</p>
+      <p>You will need to upgrade <b>{{org}}</b> to our Pro plan to join this room. Please note This requires Admin access to the Organisation.</p>
+      <p>You can visit our <a href="//billing.gitter.im" target="_blank">billing page for more details.</p>
+      <a href="{{ billingUrl }}" target='blank' class="btn--primary green">Upgrade now</a>
+      <br><br>
+      <p>If you need help please feel free to <a href="http://support.gitter.im" target="_blank">contact support</a>.
       </p>
     </div>
 
