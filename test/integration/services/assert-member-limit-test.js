@@ -37,7 +37,6 @@ describe('assert-member-limit:', function() {
     it('allows user to join public room', function(done) {
       var room = {
         uri: 'user/room',
-        lcOwner: 'user',
         security: 'PUBLIC',
         users: createArray(100)
       };
@@ -48,7 +47,6 @@ describe('assert-member-limit:', function() {
     it('allows user to join private room', function(done) {
       var room = {
         uri: 'user/room',
-        lcOwner: 'user',
         security: 'PRIVATE',
         users: createArray(100)
       };
@@ -63,7 +61,6 @@ describe('assert-member-limit:', function() {
     it('allows user to join public room', function(done) {
       var room = {
         uri: 'org/room',
-        lcOwner: 'org',
         security: 'PUBLIC',
         users: createArray(26)
       };
@@ -74,7 +71,6 @@ describe('assert-member-limit:', function() {
     it('allows user to join private room with 0 people in the org', function(done) {
       var room = {
         uri: 'org/room',
-        lcOwner: 'org',
         security: 'PRIVATE',
         users: createArray(0)
       };
@@ -85,7 +81,6 @@ describe('assert-member-limit:', function() {
     it('allows undefined user to join private room with 10 people inside', function(done) {
       var room = {
         uri: 'org/room',
-        lcOwner: 'org',
         security: 'PRIVATE',
         users: createArray(10)
       };
@@ -96,7 +91,6 @@ describe('assert-member-limit:', function() {
     it('allows user to join private room with 24 people inside', function(done) {
       var room = {
         uri: 'org/room',
-        lcOwner: 'org',
         security: 'PRIVATE',
         users: createArray(24)
       };
@@ -107,7 +101,6 @@ describe('assert-member-limit:', function() {
     it('throws when user tries to join private room with 25 other people inside', function(done) {
       var room = {
         uri: 'org/room',
-        lcOwner: 'org',
         security: 'PRIVATE',
         users: createArray(25)
       };
@@ -125,7 +118,6 @@ describe('assert-member-limit:', function() {
     it('throws when user tries to join inherited room with 25 other people inside', function(done) {
       var room = {
         uri: 'org/room',
-        lcOwner: 'org',
         security: 'INHERITED',
         users: createArray(25)
       };
@@ -143,7 +135,6 @@ describe('assert-member-limit:', function() {
     it('throws when user tries to join room with undefined security with 25 other people inside', function(done) {
       var room = {
         uri: 'org/room',
-        lcOwner: 'org',
         users: createArray(25)
       };
 
@@ -163,7 +154,6 @@ describe('assert-member-limit:', function() {
 
       var room = {
         uri: 'org/room',
-        lcOwner: 'org',
         security: 'PRIVATE',
         users: users
       };
@@ -176,7 +166,6 @@ describe('assert-member-limit:', function() {
 
       var room = {
         uri: 'org/room',
-        lcOwner: 'org',
         security: 'PRIVATE',
         users: createArray(25)
       };
@@ -191,7 +180,6 @@ describe('assert-member-limit:', function() {
     it('allows user to join public room', function(done) {
       var room = {
         uri: 'xxx/room',
-        lcOwner: 'xxx',
         security: 'PUBLIC',
         users: createArray(100)
       };
@@ -202,7 +190,6 @@ describe('assert-member-limit:', function() {
     it('allows user to join private room', function(done) {
       var room = {
         uri: 'xxx/room',
-        lcOwner: 'xxx',
         security: 'PRIVATE',
         users: createArray(100)
       };
