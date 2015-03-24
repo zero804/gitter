@@ -1,9 +1,4 @@
-{{#if isOverLimit}}
-<p><b>You've reached the limit of users in a <i>private</i> room.</b></p>
-<p>To add someone else <a href="{{billingUrl}}">go Pro &rarr;</b></p>
-{{/if}}
-
-<input class="gtrInput" autofocus {{#if isOverLimit}}disabled{{/if}} placeholder="Search for people you know...">
+<input class="gtrInput" autofocus placeholder="Search for people you know...">
 
 <div class="gtrPeopleAddRoster">
   <div class='gtrPeopleAddRoster__adding js-add-roster-loading hide'><p><i class='isLoading pulse'></i> Adding...</p></div>
