@@ -8,6 +8,8 @@ var crypto           = require("crypto");
 var roomPermissionsModel = require('../services/room-permissions-model');
 var userSettingsService = require('../services/user-settings-service');
 var isNative         = require('../../public/js/utils/is-native');
+var nconf            = require('../utils/config');
+
 
 var assert           = require("assert");
 var Q                = require('q');
@@ -173,6 +175,7 @@ function createTroupeContext(req, options) {
   if (events) { req.session.events = []; }
 
   return _.extend({
+    freeMembersLimit: nconf.get('freeMembersLimit'),
     user: options.user,
     troupe: options.troupe,
     homeUser: options.homeUser,
