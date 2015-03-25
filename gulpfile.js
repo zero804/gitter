@@ -317,7 +317,7 @@ gulp.task('css-web', function () {
     'public/less/router-archive-home.less',
     'public/less/router-archive-chat.less',
     'public/less/userhome.less',
-    'public/less/payment-required.less'
+    'public/less/402.less'
     ])
     .pipe(gulpif(DEV_MODE, sourcemaps.init()))
     .pipe(less({
