@@ -4,38 +4,52 @@
 var StatusError  = require('statuserror');
 var troupeService = require('./troupe-service');
 var persistence = require('./persistence-service');
+var verbose = require('../utils/env').logger.verbose;
 var Q = require('q');
 
 var MAX_FREE_MEMBER_COUNT = 25;
 
 function assertMemberLimit(room, user) {
-  // public room? you dont need to pay.
-  if (room.security === 'PUBLIC') return Q.resolve();
+  var username = user && user.username;
+  var uri = room && room.uri;
 
-  // already in the room? you dont need to pay.
-  if (checkUserInRoom(user, room)) return Q.resolve();
+  if (room.security === 'PUBLIC') {
+    verbose(uri + ' is a public room. you dont need to pay.');
+    return Q.resolve();
+  }
 
-  // room has space to add 1 person and stay under the free limit? you dont need to pay.
+  if (checkUserInRoom(user, room)) {
+    verbose(username + ' is already in ' + uri + '. you dont need to pay.');
+    return Q.resolve();
+  }
+
   var userCount = room.users && room.users.length || 0;
-  if (userCount < MAX_FREE_MEMBER_COUNT) return Q.resolve();
+  if (userCount < MAX_FREE_MEMBER_COUNT) {
+    verbose(uri + ' has space to add 1 person and stay under the free limit. you dont need to pay.');
+    return Q.resolve();
+  }
 
   var owner = room.uri.split('/')[0];
 
   return checkIfOrg(owner)
     .then(function(isOrg) {
-      // not owned by an org? you dont need to pay.
-      if (!isOrg) return;
+      if (!isOrg) {
+        verbose(uri + ' is not owned by an org. you dont need to pay.');
+        return;
+      }
 
       var org = owner;
 
       return checkIfProOrg(org)
         .then(function(isPro) {
-          // org already paid? you dont need to pay.
-          if (isPro) return;
+          if (isPro) {
+            verbose(uri + ' is covered by an pro org plan. you dont need to pay.');
+            return;
+          }
 
           // you need to pay to proceed. PAY ME!
-          var err = new StatusError(402, room.uri + ' has reached its limit for private members');
-          err.uri = room.uri;
+          var err = new StatusError(402, uri + ' has reached its limit for private members');
+          err.uri = uri;
           throw err;
         });
     }); 
