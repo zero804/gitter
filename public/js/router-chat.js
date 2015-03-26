@@ -272,7 +272,7 @@ onready(function () {
         var isOverLimit = room.security !== 'PUBLIC' &&
                           room.githubType.indexOf('ORG') >= 0 &&
                           !room.premium &&
-                          context().troupe.userCount >= maxFreeMembers;
+                          itemCollections.users.length >= maxFreeMembers;
 
         if (isOverLimit) {
           var GetProViewModal = require('views/app/upgradeToProView');
