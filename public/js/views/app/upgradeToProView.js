@@ -16,7 +16,7 @@ module.exports = (function() {
 
     billingUrl: function() {
       var orgName = context.troupe().get('uri').split('/')[0];
-      var billingUrl = context.env('billingUrl') + '/create/' + orgName + '/pro?r=' + window.location.pathname;
+      var billingUrl = context.env('billingUrl') + '/create/' + orgName + '/pro?r=' + context.troupe().get('url');
       return billingUrl;
     },
 
@@ -33,7 +33,7 @@ module.exports = (function() {
 
     serializeData: function() {
       var orgName = context.troupe().get('uri').split('/')[0];
-      var billingUrl = context.env('billingUrl') + '/create/' + orgName + '/pro?r=' + window.location.pathname;
+      var billingUrl = context.env('billingUrl') + '/create/' + orgName + '/pro?r=' + context.troupe().get('url');
 
       return {
         orgName: orgName,
@@ -53,6 +53,6 @@ module.exports = (function() {
         { action: "cancel", text: "Close", className: "trpBtnLightGrey" },
       ]
     });
-  
+
 })();
 
