@@ -277,7 +277,7 @@ h1:after, h2:after {
   border-radius: 6px;
 
   background: #45cba1;
-  color: #fff !important;
+  color: #fff;
 }
 
 .btn img {
@@ -997,7 +997,8 @@ h1:after, h2:after {
 }
 
 .pricing-panel__price-plans {
-  margin: -20px -20px 70-20px;
+  // negative margins to counteract price-plans margins on the outside edge
+  margin: -20px -20px 70-20px -20px;
 
   display: flex;
   flex-wrap: wrap;
@@ -1009,6 +1010,10 @@ h1:after, h2:after {
 
   color: #b2aaad;
   text-align: center;
+}
+
+.price-plan b {
+  color: #fff;
 }
 
 .price-plan__header {
@@ -1066,13 +1071,14 @@ h1:after, h2:after {
   letter-spacing: 2px;
 }
 
-.price-plan__body b {
-  color: #fff;
-}
-
 .price-plan__button {
   margin-top: 40px;
   width: 100%;
+}
+
+.price-plan__button--free {
+  background: #4f484b;
+  color: #c2b9bd
 }
 
 .pricing-panel__fine-print {
