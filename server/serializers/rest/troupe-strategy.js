@@ -133,10 +133,10 @@ LurkTroupeForUserStrategy.prototype = {
 };
 
 
-function RoomPlanStrategy() {
-  var premium = {};
+function ProOrgStrategy() {
+  var proOrgs = {};
 
-  var getOrgOrUserFromURI = function (uri) {
+  var getOwner = function (uri) {
     return uri.split('/', 1).shift();
   };
 
@@ -144,17 +144,17 @@ function RoomPlanStrategy() {
 
     var uris = troupes.map(function(troupe) {
       if(!troupe.uri) return; // one-to-one
-      return getOrgOrUserFromURI(troupe.uri);
+      return getOwner(troupe.uri);
     }).filter(function(room) {
       return !!room; // this removes the `undefined` left behind (one-to-ones)
     });
 
     uris = _.uniq(uris);
 
-    return billingService.findActivePlans(uris)
+    return billingService.findActiveOrgPlans(uris)
       .then(function(subscriptions) {
         subscriptions.forEach(function(subscription) {
-          premium[subscription.uri.toLowerCase()] = subscription.plan;
+          proOrgs[subscription.uri.toLowerCase()] = !!subscription;
         });
 
         return true;
@@ -164,12 +164,12 @@ function RoomPlanStrategy() {
 
   this.map = function(troupe) {
     if (!troupe || !troupe.uri) return undefined;
-    var orgOrUser = getOrgOrUserFromURI(troupe.uri).toLowerCase();
-    return premium[orgOrUser];
+    var owner = getOwner(troupe.uri).toLowerCase();
+    return proOrgs[owner];
   };
 }
-RoomPlanStrategy.prototype = {
-  name: 'RoomPlanStrategy'
+ProOrgStrategy.prototype = {
+  name: 'ProOrgStrategy'
 };
 
 function TroupeStrategy(options) {
@@ -183,7 +183,7 @@ function TroupeStrategy(options) {
   var favouriteStrategy = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
   var lurkStrategy = currentUserId ? new LurkTroupeForUserStrategy(options) : null;
   var userIdStategy = new UserIdStrategy(options);
-  var roomPlanStrategy = new RoomPlanStrategy(options);
+  var proOrgStrategy = new ProOrgStrategy(options);
 
   this.preload = function(items, callback) {
 
@@ -219,7 +219,7 @@ function TroupeStrategy(options) {
     }
 
     strategies.push({
-      strategy: roomPlanStrategy,
+      strategy: proOrgStrategy,
       data: items
     });
 
@@ -260,9 +260,9 @@ function TroupeStrategy(options) {
   var shownWarning = false;
 
   this.map = function(item) {
-    var troupeName, troupeUrl, otherUser, plan;
+    var troupeName, troupeUrl, otherUser, isPro;
 
-    plan = roomPlanStrategy.map(item);
+    isPro = proOrgStrategy.map(item);
 
     if(item.oneToOne) {
       if(currentUserId) {
@@ -306,8 +306,7 @@ function TroupeStrategy(options) {
       url: troupeUrl,
       githubType: item.githubType,
       security: item.security,
-      premium: !!plan,
-      plan: plan,
+      premium: isPro,
       noindex: item.noindex,
       v: getVersion(item)
     };
