@@ -5,9 +5,10 @@ var StatusError  = require('statuserror');
 var troupeService = require('./troupe-service');
 var persistence = require('./persistence-service');
 var verbose = require('../utils/env').logger.verbose;
+var nconf = require('../utils/config');
 var Q = require('q');
 
-var MAX_FREE_MEMBER_COUNT = 25;
+var maxFreeOrgRoomMembers = nconf.get('maxFreeOrgRoomMembers');
 
 function assertMemberLimit(room, user) {
   var username = user && user.username;
@@ -24,7 +25,7 @@ function assertMemberLimit(room, user) {
   }
 
   var userCount = room.users && room.users.length || 0;
-  if (userCount < MAX_FREE_MEMBER_COUNT) {
+  if (userCount < maxFreeOrgRoomMembers) {
     verbose(uri + ' has space to add 1 person and stay under the free limit. you dont need to pay.');
     return Q.resolve();
   }

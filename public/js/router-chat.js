@@ -268,7 +268,7 @@ onready(function () {
     addPeople: function() {
       require.ensure(['views/app/addPeopleView', 'views/app/upgradeToProView'], function(require) {
         var room = context().troupe;
-        var membersLimit = context().freeMembersLimit;
+        var membersLimit = context.env('maxFreeOrgRoomMembers');
         var isOverLimit = (room.security === 'PRIVATE' || room.githubType === 'ORG')
                           && !room.premium
                           && context().troupe.userCount > membersLimit;
