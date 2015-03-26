@@ -11,9 +11,6 @@ var execPreloads      = require('../exec-preloads');
 var getVersion        = require('../get-model-version');
 var UserIdStrategy    = require('./user-id-strategy');
 
-var env               = require('../../utils/env');
-var premiumDisabled   = env.config.get('premium:disabled');
-
 /**
  *
  */
@@ -309,7 +306,7 @@ function TroupeStrategy(options) {
       url: troupeUrl,
       githubType: item.githubType,
       security: item.security,
-      premium: premiumDisabled ? true : !!plan,
+      premium: !!plan,
       plan: plan,
       noindex: item.noindex,
       v: getVersion(item)
