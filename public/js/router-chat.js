@@ -268,10 +268,11 @@ onready(function () {
     addPeople: function() {
       require.ensure(['views/app/addPeopleView', 'views/app/upgradeToProView'], function(require) {
         var room = context().troupe;
-        var membersLimit = context.env('maxFreeOrgRoomMembers');
-        var isOverLimit = (room.security === 'PRIVATE' || room.githubType === 'ORG')
-                          && !room.premium
-                          && context().troupe.userCount > membersLimit;
+        var maxFreeMembers = context.env('maxFreeOrgRoomMembers');
+        var isOverLimit = room.security !== 'PUBLIC' &&
+                          room.githubType.indexOf('ORG') >= 0 &&
+                          !room.premium &&
+                          context().troupe.userCount >= maxFreeMembers;
 
         if (isOverLimit) {
           var GetProViewModal = require('views/app/upgradeToProView');
