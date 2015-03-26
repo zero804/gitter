@@ -55,7 +55,6 @@ function GitHubOrgStrategy(options) {
       avatar_url: item.avatar_url,
       room: troupeUriStrategy.map(item.login),
       premium: !!plan,
-      plan: plan
     };
   };
 }
