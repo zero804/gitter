@@ -5,7 +5,7 @@
 	"Existing user login": "Existing user login",
 	"login": "login",
 	"Chat, for GitHub.": "Chat, for GitHub.",
-	"Get unlimited public rooms and one-to-one chats, free forever. Private team plans start from $2 per user per month. No credit card required.": "Get unlimited public rooms and one-to-one chats, free forever. Private team plans start from $2 per user per month. No credit card required.",
+	"Get unlimited public rooms and one-to-one chats, free forever. Private team plans start from $5 per user per month. No credit card required.": "Get unlimited public rooms and one-to-one chats, free forever. Private team plans start from $5 per user per month. No credit card required.",
 	"Sign up free with Github": "Sign up free with Github",
 	"Sign up with Github": "Sign up with Github",
 	"By signing up you agree to our <a %s>Terms and Conditions</a>": "By signing up you agree to our <a %s>Terms and Conditions</a>",
