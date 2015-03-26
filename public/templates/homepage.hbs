@@ -44,7 +44,7 @@
         <div class="wrap">
           <div class="map"><img class="bg" src="{{cdn 'images/home/map.png'}}" alt="There should be a map here"></div>
           <h1>{{ __ "Chat, for GitHub."}}</h1>
-          <p>{{ __ "Get unlimited public rooms and one-to-one chats, free forever. Private team plans start from $2 per user per month. No credit card required." }}</p>
+          <p>{{ __ "Get unlimited public rooms and one-to-one chats, free forever. Private team plans start from $5 per user per month. No credit card required." }}</p>
 
           <a class="btn signup" href="/login/github?action=signup&source=intro-signup">
             <img src="{{cdn 'images/home/github.png'}}"> <b><span class='desktopOnly'>{{  __ "Sign up free with Github" }}</span><span class='exceptDesktop'>{{ __ "Sign up with Github"}}</span></b>
@@ -222,6 +222,9 @@
                   {{{ __ "<b>Unlimited</b> private rooms" }}}<br/>
                   {{{ __ "Limited to 25 users per private room" }}}<br/>
                 </div>
+
+                <a class="btn price-plan__button price-plan__button--free" href="/login/github?action=signup&source=pricing.free">{{{ __ "<b>Get started</b> for free" }}}</a>
+
               </article>
 
               <article class="price-plan">
