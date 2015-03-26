@@ -37,7 +37,8 @@ module.exports = (function() {
 
       return {
         orgName: orgName,
-        billingUrl: billingUrl
+        billingUrl: billingUrl,
+        maxMemberCount: context.env('maxFreeOrgRoomMembers')
       };
     },
   });
