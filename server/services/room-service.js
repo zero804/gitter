@@ -942,7 +942,7 @@ function canBanInRoom(room) {
   return true;
 }
 
-function banUserFromRoom(room, username, requestingUser, callback) {
+function banUserFromRoom(room, username, requestingUser, options, callback) {
   if(!room) return Q.reject(new StatusError(400, 'Room required')).nodeify(callback);
   if(!username) return Q.reject(new StatusError(400, 'Username required')).nodeify(callback);
   if(!requestingUser) return Q.reject(new StatusError(401, 'Not authenticated')).nodeify(callback);
@@ -977,9 +977,21 @@ function banUserFromRoom(room, username, requestingUser, callback) {
 
             return room.saveQ()
               .then(function() {
+                if (options && options.removeMessages) {
+                  return persistence.ChatMessage.findQ({ toTroupeId: room.id, fromUserId: user.id })
+                    .then(function(messages) {
+                      console.log(messages);
+                      return Q.all(messages.map(function(message) {
+                        return message.removeQ();
+                      }));
+                    });
+
+                }
+              })
+              .then(function() {
                 return eventService.newEventToTroupe(
                   room, requestingUser,
-                  "User @" + requestingUser.username + " banned @" + username + " from this room",
+                  "@" + requestingUser.username + " banned @" + username,
                   {
                     service: 'bans',
                     event: 'banned',
@@ -987,6 +999,7 @@ function banUserFromRoom(room, username, requestingUser, callback) {
                     prerendered: true,
                     performingUser: requestingUser.username
                   }, {}, function(err) {
+
                   if(err) logger.error("Unable to create an event in troupe: " + err, { exception: err });
                 });
               })
