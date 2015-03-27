@@ -29,8 +29,9 @@ module.exports = {
 
   create: function(req, res, next) {
     var username = req.body.username;
+    var removeMessages = !!req.body.removeMessages;
 
-    return roomService.banUserFromRoom(req.troupe, username, req.user, function(err, ban) {
+    return roomService.banUserFromRoom(req.troupe, username, req.user, { removeMessages: removeMessages }, function(err, ban) {
       if(err) return next(err);
 
       serialize(ban, function(err, serialized) {
