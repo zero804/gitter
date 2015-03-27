@@ -345,8 +345,8 @@ var server = new faye.NodeAdapter({
   ping: nconf.get('ws:fayePing'),
   engine: {
     type: fayeRedis,
-    client: env.redis.getClient(),
-    subscriberClient: env.redis.createClient(), // Subscribe. Needs new client
+    client: env.redis.createClient(nconf.get("redis_nopersist")),
+    subscriberClient: env.redis.createClient(nconf.get("redis_nopersist")), // Subscribe. Needs new client
     interval: nconf.get('ws:fayeInterval'),
     includeSequence: true,
     namespace: 'fr:',
