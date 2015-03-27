@@ -1064,7 +1064,7 @@ describe('room-service #slow', function() {
         .then(function(banned) {
           assert(!banned);
 
-          return roomService.banUserFromRoom(fixture.troupeBan, fixture.userBan.username, {}, fixture.userBanAdmin)
+          return roomService.banUserFromRoom(fixture.troupeBan, fixture.userBan.username, fixture.userBanAdmin, {})
             .then(function(ban) {
               assert.equal(ban.userId, fixture.userBan.id);
               assert.equal(ban.bannedBy, fixture.userBanAdmin.id);
@@ -1111,7 +1111,7 @@ describe('room-service #slow', function() {
       });
 
 
-      return roomService.banUserFromRoom(fixture.troupeBan, fixture.userBan.username, {}, fixture.userBanAdmin)
+      return roomService.banUserFromRoom(fixture.troupeBan, fixture.userBan.username, fixture.userBanAdmin, {})
         .then(function() {
           assert(false, 'Expected to fail as user is not an admin');
         })
