@@ -15,7 +15,13 @@ describe('start', function() {
       if (err) return done(err);
 
       var redis = env.redis.getClient();
-      redis.info(done);
+      var noPersistRedis = env.redis.createClient(env.config.get("redis_nopersist"));
+
+      redis.info(function(err) {
+        if(err) return done(err);
+
+        noPersistRedis.info(done);
+      });
     });
 
   });
