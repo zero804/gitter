@@ -340,13 +340,13 @@ var adviseAdjuster = {
 
 
 var server = new faye.NodeAdapter({
-  mount: '/faye',
+  mount: '/faye_transition',
   timeout: nconf.get('ws:fayeTimeout'),
   ping: nconf.get('ws:fayePing'),
   engine: {
     type: fayeRedis,
-    client: env.redis.createClient(nconf.get("redis_nopersist")),
-    subscriberClient: env.redis.createClient(nconf.get("redis_nopersist")), // Subscribe. Needs new client
+    client: env.redis.getClient(),
+    subscriberClient: env.redis.createClient(), // Subscribe. Needs new client
     interval: nconf.get('ws:fayeInterval'),
     includeSequence: true,
     namespace: 'fr:',
@@ -380,60 +380,14 @@ server._server._makeResponse = function(message) {
   return response;
 };
 
-
 var client = server.getClient();
-
-var STATS_FREQUENCY = 0.01;
-
-/* This function is used a lot, this version excludes try-catch so that it can be optimised */
-function stringifyInternal(object) {
-  if(typeof object !== 'object') return JSON.stringify(object);
-
-  var string = JSON.stringify(object);
-
-  // Over cautious
-  stats.eventHF('bayeux.message.count', 1, STATS_FREQUENCY);
-
-  if(string) {
-    stats.gaugeHF('bayeux.message.size', string.length, STATS_FREQUENCY);
-  } else {
-    stats.gaugeHF('bayeux.message.size', 0, STATS_FREQUENCY);
-  }
-
-  return string;
-}
-
-faye.stringify = function(object) {
-  try {
-    return stringifyInternal(object);
-  } catch(e) {
-    stats.event('bayeux.message.serialization_error');
-
-    logger.error('Error while serializing JSON message', { exception: e });
-    throw e;
-  }
-};
-
-/* TEMPORARY DEBUGGING SOLUTION */
-faye.logger = {
-};
-
-var fayeLoggingLevel = nconf.get('ws:fayeLogging');
-var logLevels = ['fatal', 'error', 'warn'];
-if(fayeLoggingLevel === 'info') logLevels.push('info');
-if(fayeLoggingLevel === 'debug') logLevels.push('info', 'debug');
-
-logLevels.forEach(function(level) {
-  faye.logger[level] = function(msg) { logger[level]('faye: ' + msg.substring(0,180)); };
-});
-
 
 module.exports = {
   server: server,
   engine: server._server._engine,
   client: client,
   destroyClient: destroyClient,
-  attach: function(httpServer) {
+  attach: function() {
 
     // Attach event handlers
     server.addExtension(logging);
@@ -453,29 +407,6 @@ module.exports = {
 
     client.addExtension(superClient);
 
-    if (fayeLoggingLevel === 'debug') {
-      ['connection:open', 'connection:close'].forEach(function(event) {
-        server._server._engine.bind(event, function(clientId) {
-          logger.verbose("faye-engine: Client " + clientId + ": " + event);
-        });
-      });
-
-      /** Some logging */
-      ['handshake', 'disconnect'].forEach(function(event) {
-        server.bind(event, function(clientId) {
-          logger.verbose("faye-server: Client " + clientId + ": " + event);
-        });
-      });
-
-      server.bind('disconnect', function(clientId) {
-        // Warning, this event is called simulateously on
-        // all the servers that are connected to the same redis/faye
-        // connection
-        logger.verbose("Client " + clientId + " disconnected");
-      });
-
-    }
-
     server.bind('disconnect', function(clientId) {
       // Warning, this event is called simulateously on
       // all the servers that are connected to the same redis/faye
@@ -493,6 +424,5 @@ module.exports = {
       setTimeout(callback, 1000);
     });
 
-    server.attach(httpServer);
   }
 };

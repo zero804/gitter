@@ -3,6 +3,7 @@
 
 var winston           = require('../utils/winston');
 var appEvents         = require("../app-events");
+var bayeuxTransition  = require('./bayeux-transition');
 var bayeux            = require('./bayeux');
 var ent               = require('ent');
 var presenceService   = require("../services/presence-service");
@@ -23,14 +24,17 @@ function findFailbackChannel(channel) {
 
 exports.install = function() {
   var bayeuxClient = bayeux.client;
+  var bayeuxTransitionClient = bayeuxTransition.client;
 
   function publish(channel, message) {
     bayeuxClient.publish(channel, message);
+    bayeuxTransitionClient.publish(channel, message);
 
     var failbackChannel = findFailbackChannel(channel);
 
     if(failbackChannel) {
       bayeuxClient.publish(failbackChannel, message);
+      bayeuxTransitionClient.publish(failbackChannel, message);
     }
   }
 
@@ -250,4 +254,3 @@ exports.install = function() {
 
   });
 };
-
