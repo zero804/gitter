@@ -257,7 +257,7 @@ function renderChat(req, res, options, next) {
           placeholder: 'Click here to type a chat message. Supports GitHub flavoured markdown.'
         }, troupeContext && {
           troupeTopic: troupeContext.troupe.topic,
-          plan: troupeContext.troupe.plan,
+          premium: troupeContext.troupe.premium,
           troupeFavourite: troupeContext.troupe.favourite,
           avatarUrl: avatar(troupeContext.troupe),
           isAdmin: troupeContext.permissions.admin,
