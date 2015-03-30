@@ -175,7 +175,6 @@ function createTroupeContext(req, options) {
   if (events) { req.session.events = []; }
 
   return _.extend({
-    freeMembersLimit: nconf.get('freeMembersLimit'),
     user: options.user,
     troupe: options.troupe,
     homeUser: options.homeUser,

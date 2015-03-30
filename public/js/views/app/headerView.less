@@ -1,6 +1,6 @@
 @import "base-zindex-levels";
 @import "../controls/dropdown";
-@import "colors";
+@import "colors.less";
 
 .chat-header {
 
@@ -240,25 +240,21 @@ body.banner-top {
 
     border-radius: 4px;
   }
+}
 
-  .faux-border(@bg) {
-    &:after {
-      position: absolute;
-      display: inline-block;
-      content: '';
-      background: @bg;
-      height: 4px;
-      border-top: 1px solid rgba(255, 255, 255, 1);
-      bottom: 0px;
-      width: 100%;
-      left: 0;
-      border-radius: 0 0 4px 4px;
-    }
+.chat-header__avatar--pro {
+  &:after {
+    position: absolute;
+    display: inline-block;
+    content: '';
+    background: @pro;
+    height: 4px;
+    border-top: 1px solid rgba(255, 255, 255, 1);
+    bottom: 0px;
+    width: 100%;
+    left: 0;
+    border-radius: 0 0 4px 4px;
   }
-
-  &.personal { .faux-border(@personal); }
-  &.bronze { .faux-border(@bronze); }
-  &.silver { .faux-border(@silver); }
 }
 
 // stop the header from covering the first chat message
