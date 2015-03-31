@@ -7,7 +7,6 @@ var apiClient = require('components/apiClient');
 var template = require('./tmpl/collaboratorsView.hbs');
 var itemTemplate = require('./tmpl/collaboratorsItemView.hbs');
 var emptyViewTemplate = require('./tmpl/collaboratorsEmptyView.hbs');
-var inviteOutcomeTemplate = require('./tmpl/inviteOutcomeTemplate.hbs');
 var appEvents = require('utils/appevents');
 
 module.exports = (function() {
