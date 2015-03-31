@@ -5,9 +5,6 @@ var execPreloads      = require('../exec-preloads');
 var TroupeUriStrategy = require('./troupe-uri-strategy');
 var billingService    = require('../../services/billing-service');
 
-var env               = require('../../utils/env');
-var premiumDisabled   = env.config.get('premium:disabled');
-
 function OrgPlanStrategy() {
   var orgsWithPlans;
 
@@ -57,8 +54,7 @@ function GitHubOrgStrategy(options) {
       name: item.login,
       avatar_url: item.avatar_url,
       room: troupeUriStrategy.map(item.login),
-      premium: premiumDisabled ? true : !!plan, // TODO remove when premium goes live
-      plan: plan
+      premium: !!plan,
     };
   };
 }
