@@ -6,7 +6,7 @@
 	"Existing user login": "существующие пользователи",
 	"login": "существующие пользователи",
 	"Chat, for GitHub.": "Где общаются разработчики",
-	"Get unlimited public rooms and one-to-one chats, free forever. Private team plans start from $2 per user per month. No credit card required.": "У нас размещаются тысячи публичных сообществ, в которых разработчики со всего мира собираются, чтобы обговорить будущее программирования, создавать лучшие продукты и поделиться лучшими картинками котов.",
+	"Get unlimited public rooms and one-to-one chats, free forever. Private team plans start from $5 per user per month. No credit card required.": "У нас размещаются тысячи публичных сообществ, в которых разработчики со всего мира собираются, чтобы обговорить будущее программирования, создавать лучшие продукты и поделиться лучшими картинками котов.",
 	"Sign up free with Github": "Зарегистрируйтесь с GitHub",
 	"Sign up with Github": "Зарегистрируйтесь с GitHub",
 	"By signing up you agree to our <a %s>Terms and Conditions</a>": "<a %s>Регистрируясь, вы соглашаетесь с условиями пользовательского соглашения.</a>",

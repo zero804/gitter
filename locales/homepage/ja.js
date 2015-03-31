@@ -5,7 +5,6 @@
 	"Existing user login": "既存のユーザーログイン",
 	"login": "ログイン",
 	"Chat, for GitHub.": "開発者が話をする場所",
-	"Get unlimited public rooms and one-to-one chats, free forever. Private team plans start from $2 per user per month. No credit card required.": "私たちは世界中の開発者が集まりプログラミングの未来や、より良い製品の構築、ネコのGIFなどについて話し合うパブリックなコミュニティを数多く主催しています。",
 	"Sign up free with Github": "GitHubで登録",
 	"Sign up with Github": "GitHubで登録",
 	"By signing up you agree to our <a %s>Terms and Conditions</a>": "<a %s>登録することにより当社利用条件に同意したものとみなします。</a>",
@@ -64,5 +63,10 @@
 	"Blog": "ブログ",
 	"Twitter": "Twitter",
 	"Gitter &mdash; Where developers come to talk.": "Gitter &mdash; 開発者が話をする場所",
-	"Translated By": "-"
+	"Translated By": "-",
+	"<b>Unlimited</b> integrations": "<b>Unlimited</b> integrations",
+	"Limited to 25 users per private room": "Limited to 25 users per private room",
+	"Pro": "Pro",
+	"<b>Unlimited</b> users per private room": "<b>Unlimited</b> users per private room",
+	"Get unlimited public rooms and one-to-one chats, free forever. Private team plans start from $5 per user per month. No credit card required.": "Get unlimited public rooms and one-to-one chats, free forever. Private team plans start from $5 per user per month. No credit card required."
 }
