@@ -45,7 +45,8 @@ var troupeEnv = {
     basepath: nconf.get('embed:basepath'),
     cacheBuster: nconf.get('embed:cacheBuster')
   },
-  billingUrl: nconf.get('web:billingBaseUrl')
+  billingUrl: nconf.get('web:billingBaseUrl'),
+  maxFreeOrgRoomMembers: nconf.get('maxFreeOrgRoomMembers')
 };
 
 exports.cdn = function(url, parameters) {

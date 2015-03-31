@@ -100,9 +100,13 @@ module.exports = function(err, req, res, next) {
     template = status.toString();
     stack = null;
 
+    var room = err.uri;
+    var org = room.split('/')[0];
+
     extraTemplateValues = {
+      room: room,
+      org: org,
       billingUrl: config.get('web:billingBaseUrl')  + '/bill/' + err.uri,
-      title: 'Payment Required'
     };
 
     stats.event('client_error_402', { userId: userId });

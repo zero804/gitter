@@ -79,7 +79,8 @@
   margin: 0.625em;
   border-radius: 4px;
   display: flex;
-  width: 250px;
+  width: 175px;
+  max-width: 350px;
 
   &:hover {
     background-color: #ccc;
@@ -106,6 +107,9 @@
     p {
       margin: 0;
       height: 40px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     span {
