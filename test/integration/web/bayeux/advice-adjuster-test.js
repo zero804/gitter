@@ -34,21 +34,27 @@ describe("advice-adjuster", function() {
   });
 
   [
-    { avg: 30, timeout: 45, interval: 1 },
-    { avg: 5000, timeout: 45, interval: 1 },
-    { avg: 10000, timeout: 53, interval: 3 },
-    { avg: 40000, timeout: 101, interval: 15 },
-    { avg: 80000, timeout: 165, interval: 31 },
-    { avg: 160000, timeout: 293, interval: 63 },
+    { avg: 30, timeout: 45, interval: 1, hits: 20 },
+    { avg: 5000, timeout: 45, interval: 1, hits: 30 },
+    { avg: 10000, timeout: 53, interval: 3, hits: 30 },
+    { avg: 40000, timeout: 101, interval: 15, hits: 30 },
+    { avg: 80000, timeout: 165, interval: 31, hits: 200 },
+    { avg: 160000, timeout: 293, interval: 63, hits: 200 },
   ].forEach(function(item) {
 
       it("should handle average of " + item.avg, function() {
-        _.range(30).forEach(function() {
+        _.range(item.hits).forEach(function() {
           adviceAdjuster._pushProcessingTime(item.avg);
         });
 
         assert.strictEqual(adviceAdjuster.getFayeTimeout(), item.timeout);
         assert.strictEqual(adviceAdjuster.getFayeInterval(), item.interval);
+
+        // Calling these values a second time will test the cached value
+        assert.strictEqual(adviceAdjuster.getFayeTimeout(), item.timeout);
+        assert.strictEqual(adviceAdjuster.getFayeInterval(), item.interval);
+
+        assert(adviceAdjuster.processingTimeStats.length <= 100);
       });
   });
 
