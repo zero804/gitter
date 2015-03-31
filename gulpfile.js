@@ -300,7 +300,7 @@ gulp.task('css-web', function () {
   return gulp.src([
     'public/less/signup.less',
     'public/less/trpAppsPage.less',
-    'public/less/oauth-error-page.less',
+    'public/less/error-page.less',
     'public/less/generic-layout.less',
     'public/less/trpHooks.less',
     'public/less/login.less',
@@ -316,7 +316,8 @@ gulp.task('css-web', function () {
     'public/less/chat-card.less',
     'public/less/router-archive-home.less',
     'public/less/router-archive-chat.less',
-    'public/less/userhome.less'
+    'public/less/userhome.less',
+    'public/less/402.less'
     ])
     .pipe(gulpif(DEV_MODE, sourcemaps.init()))
     .pipe(less({

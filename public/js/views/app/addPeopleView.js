@@ -117,11 +117,21 @@ module.exports = (function() {
       });
     },
 
+    billingUrl: function() {
+      var orgName = context.troupe().get('uri').split('/')[0];
+      var billingUrl = context.env('billingUrl') + '/create/' + orgName + '/pro?r=' + context.troupe().get('url');
+      return billingUrl;
+    },
+
     menuItemClicked: function (button) {
       switch (button) {
         case 'share':
           this.dialog.hide();
           window.location.hash = "#share";
+          break;
+
+        case 'get-pro':
+          window.open(this.billingUrl());
           break;
 
         case 'done':
@@ -140,7 +150,7 @@ module.exports = (function() {
       setTimeout(function () {
         el.slideUp('fast');
         return;
-      }, 3000);
+      }, 10000);
     },
 
     showValidationMessage: function(message) {
@@ -188,6 +198,7 @@ module.exports = (function() {
           var json = xhr.responseJSON;
           self.ui.loading.toggleClass('hide');
           var m = json && json.message || 'Error';
+          if (m.match(/has reached its limit/)) self.dialog.showPremium();
           self.showValidationMessage(m);
           self.typeahead.clear();
         });
@@ -226,7 +237,8 @@ module.exports = (function() {
   });
 
   var modalButtons = [
-    { action: "done", text: "Done", className: "trpBtnLightGrey"}
+    { action: "done", text: "Done", className: "trpBtnLightGrey"},
+    { action: "get-pro", text: "Upgrade to Pro", className: "trpBtnGreen premium hidden"}
   ];
 
   if(context.troupe().get('security') !== 'PRIVATE') {

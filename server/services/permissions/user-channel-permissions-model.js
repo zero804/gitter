@@ -3,8 +3,6 @@
 
 var Q                     = require('q');
 var userIsInRoom          = require('../user-in-room');
-var premiumOrThrow        = require('./premium-or-throw');
-var ownerIsEarlyAdopter   = require('../owner-is-early-adopter');
 
 var ALLOWED_USER_CHANNEL_SECURITY_VALUES = {
   PRIVATE: 1,
@@ -40,11 +38,8 @@ module.exports = function userChannelPermissionsModel(user, right, uri, security
           return userIsInRoom(uri, user).then(function(inRoom) {
             if (!inRoom) return Q.resolve(false);
 
-            return ownerIsEarlyAdopter(uri).then(function(isEarlyAdopter) {
-              if (isEarlyAdopter) return Q.resolve(true);
-              return premiumOrThrow(userUri);
-            });
-          })
+            return Q.resolve(true);
+          });
 
         /* No inherited security for user channels */
         default:
@@ -71,7 +66,7 @@ module.exports = function userChannelPermissionsModel(user, right, uri, security
           return Q.resolve(true);
 
         case 'PRIVATE':
-          return premiumOrThrow(userUri);
+          return Q.resolve(true);
 
         default:
           throw new Error('Illegal state');
