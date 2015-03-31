@@ -50,7 +50,9 @@ require('./services/kue-workers').startWorkers();
 
 // APIS
 var auth = require('./web/middlewares/ensure-logged-in-or-get');
-require('./api/').install(app, '/api', auth);
+if (nconf.get("web:startApiInPrimaryApp")) {
+  require('./api/').install(app, '/api', auth);
+}
 
 /* This should be second last */
 require('./handlers/app').install(app);
@@ -66,5 +68,3 @@ onMongoConnect(function() {
     winston.info("Listening on " + port);
   });
 });
-
-
