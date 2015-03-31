@@ -22,7 +22,7 @@ AdviceAdjuster.prototype = {
 
     // Only keep the last 100 values others oom
     while (this.processingTimeStats.length > 100) {
-      this.processingTimeStats.unshift();
+      this.processingTimeStats.shift();
     }
   },
 
