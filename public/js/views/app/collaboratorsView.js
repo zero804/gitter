@@ -80,10 +80,14 @@ module.exports = (function() {
           }
         })
         .fail(function(xhr) {
-          if (xhr.status === 409) {
+          if (xhr.status === 402) {
+            // money required, let the add modal explain it.
+            window.location.href = '#add';
+
+            // reset the state so the user can try again after paying.
+            self.stateModel.set('state', 'initial');
+          } else if (xhr.status === 409) {
             self.stateModel.set('state', 'fail_409');
-          } else if (xhr.status === 402) {
-            self.stateModel.set('state', 'fail_402');
           } else {
             self.stateModel.set('state', 'fail');
           }
@@ -100,7 +104,6 @@ module.exports = (function() {
         added: { text: username + ' added' },
         invited: { text: username + ' invited' },
         fail: { text: 'Unable to add ' + username },
-        fail_402: { text: 'Unable to add, free plan limit reached' },
         fail_409: { text: 'Unable to add person already in room' },
         email_address_required: { text: 'Enter ' + username + "'s email", showEmailForm: true },
         inviting: { text: 'Inviting…' }
