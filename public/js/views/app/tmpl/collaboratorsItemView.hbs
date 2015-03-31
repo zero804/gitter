@@ -1,27 +1,19 @@
-<img src='{{ avatar_url }}'>
-<div class='content js-content'>
-  {{#if loading}}
-    <p>Adding…</p>
+<img src="{{ avatar_url }}">
+<div class="content">
+  {{#if showEmailForm }}
+  <form>
+    <p>
+      <input class="js-invite-email" type="email" placeholder="{{ text }}" required />
+      <input type="submit" value="Invite" class="trpButton trpBtnGreen" />
+    </p>
+  </form>
   {{else}}
-    {{#if done}}
-      <p><span class='limit'>{{ name }}</span> <span><b>{{ feedback }}</b></span></p>
-    {{else}}
-      {{#if unreachable}}
-        <form>
-          <p><input type='email' placeholder="Enter {{ login }}'s email" required><input type='submit' value='Invite' href='#' class='trpButton trpBtnGreen js-invite' /></p>
-        </form>
-      {{else}}
-        <p>{{ login }}</p>
-      {{/if}}
-    {{/if}}
+  <p>{{ text }}</p>
   {{/if}}
 </div>
-{{#unless loading}}
-  <div class='action js-action'>
-    {{#unless unreachable}}
-      {{#unless done}}
-        <a href='#' class='trpButton trpBtnGreen js-add'>Add</a>
-      {{/unless}}
-    {{/unless}}
-  </div>
-{{/unless}}
+
+{{#if showAddButton}}
+<div class="action">
+  <a class="trpButton trpBtnGreen js-add">Add</a>
+</div>
+{{/if}}
