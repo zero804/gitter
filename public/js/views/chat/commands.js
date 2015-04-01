@@ -10,7 +10,7 @@ module.exports = (function() {
   var commandsList = [
     {
       command: 'ban @username',
-      description: 'Ban somebody from the room',
+      description: 'Ban somebody from the room.',
       criteria: function() {
         var isOrgRoom = false;
         if (context.troupe().get("githubType") == "ORG") isOrgRoom = true;
@@ -19,11 +19,12 @@ module.exports = (function() {
       completion: 'ban @',
       regexp: /^\/ban/,
       action: function(view) {
-        var userMatch = view.$el.val().match(/\/ban @([\w\-]+)/);
+        var userMatch = view.$el.val().match(/\/ban @([\w\-]+)(\s+(removemsgs))?/);
         if (!userMatch) return;
         var user = userMatch[1];
+        var removeMessages = !!userMatch[3];
 
-        apiClient.room.post('/bans', { username: user })
+        apiClient.room.post('/bans', { username: user, removeMessages: removeMessages })
           .then(function() {
             view.reset();
           })
@@ -295,4 +296,3 @@ module.exports = (function() {
 
 
 })();
-

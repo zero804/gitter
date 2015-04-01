@@ -380,6 +380,7 @@ describe('room-service #slow', function() {
       });
 
       var troupe = {
+        uri: 'user/room',
         containsUserId: function() { return false; },
         addUserById: function(id) {
           assert.equal(id, 'test-user-id');
@@ -402,6 +403,7 @@ describe('room-service #slow', function() {
       });
 
       var troupe = {
+        uri: 'user/room',
         containsUserId: function() { return false; },
         addUserById: function() {},
         saveQ: function() {
@@ -422,6 +424,7 @@ describe('room-service #slow', function() {
       });
 
       var troupe = {
+        uri: 'user/room',
         containsUserId: function() { return false; },
         addUserById: function() {},
         saveQ: function() {
@@ -453,6 +456,7 @@ describe('room-service #slow', function() {
       });
 
       var troupe = {
+        uri: 'user/room',
         containsUserId: function() { return false; },
         addUserById: function() {},
         saveQ: function() {
@@ -473,6 +477,7 @@ describe('room-service #slow', function() {
       });
 
       var troupe = {
+        uri: 'user/room',
         containsUserId: function() { return false; },
         addUserById: function() {},
         saveQ: function() {}
@@ -493,6 +498,7 @@ describe('room-service #slow', function() {
       });
 
       var troupe = {
+        uri: 'user/room',
         containsUserId: function() { return true; },
         addUserById: function() {},
         saveQ: function() {}
@@ -513,6 +519,7 @@ describe('room-service #slow', function() {
       });
 
       var troupe = {
+        uri: 'user/room',
         containsUserId: function() { return true; },
         addUserById: function() {},
         saveQ: function() {}
@@ -1057,7 +1064,7 @@ describe('room-service #slow', function() {
         .then(function(banned) {
           assert(!banned);
 
-          return roomService.banUserFromRoom(fixture.troupeBan, fixture.userBan.username, fixture.userBanAdmin)
+          return roomService.banUserFromRoom(fixture.troupeBan, fixture.userBan.username, fixture.userBanAdmin, {})
             .then(function(ban) {
               assert.equal(ban.userId, fixture.userBan.id);
               assert.equal(ban.bannedBy, fixture.userBanAdmin.id);
@@ -1104,7 +1111,7 @@ describe('room-service #slow', function() {
       });
 
 
-      return roomService.banUserFromRoom(fixture.troupeBan, fixture.userBan.username, fixture.userBanAdmin)
+      return roomService.banUserFromRoom(fixture.troupeBan, fixture.userBan.username, fixture.userBanAdmin, {})
         .then(function() {
           assert(false, 'Expected to fail as user is not an admin');
         })
