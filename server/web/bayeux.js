@@ -18,7 +18,12 @@ var StatusError       = require('statuserror');
 var bayeuxExtension   = require('./bayeux/extension');
 var clientUsageStats  = require('../utils/client-usage-stats');
 var zlib              = require('zlib');
+var AdviceAdjuster    = require('./bayeux/advice-adjuster');
+
+
 var version = appVersion.getVersion();
+
+var STATS_FREQUENCY = 0.01;
 
 var superClientPassword = nconf.get('ws:superClientPassword');
 
@@ -185,14 +190,16 @@ var pushOnlyServer = bayeuxExtension({
   },
 });
 
-var hidePassword = bayeuxExtension({
-  name: 'hidePassword',
+var hidePrivate = {
   outgoing: function(message, req, callback) {
-    if (message.ext) delete message.ext.password;
-    callback(null, message);
-  }
-});
+    if (message.ext) {
+      delete message.ext.password;
+      delete message._private;
+    }
 
+    callback(message);
+  }
+};
 
 var pingResponder = bayeuxExtension({
   channel: '/api/v1/ping2',
@@ -246,21 +253,10 @@ var logging = {
     switch(message.channel) {
       case '/meta/handshake':
         stats.eventHF('bayeux.handshake');
-
-        /* Rate is for the last full 10s period */
-        var connType = message.ext && message.ext.connType;
-        var handshakeRate = message.ext && message.ext.rate;
-        logger.silly("bayeux: " + message.channel , { ip: getClientIp(req), connType: connType, rate: handshakeRate });
         break;
 
       case '/meta/connect':
         stats.eventHF('bayeux.connect');
-
-        /* Rate is for the last full 10s period */
-        var connectRate = message.ext && message.ext.rate;
-        if(connectRate && connectRate > 1) {
-          logger.silly("bayeux: connect" , { ip: getClientIp(req), clientId: message.clientId, rate: connectRate });
-        }
         break;
 
       case '/meta/subscribe':
@@ -283,71 +279,17 @@ var logging = {
   }
 };
 
-var adviseAdjuster = {
-  outgoing: function(message, req, callback) {
-    delete message._private;
-
-    var error = message.error;
-
-    if(error) {
-      var errorCode = error.split(/::/)[0];
-      if(errorCode) errorCode = parseInt(errorCode, 10);
-
-      if(errorCode === 401) {
-        var reconnect;
-
-        // Consider whether to put this back....
-        //
-        // if(message.clientId) {
-        //   logger.info('Destroying client', { clientId: message.clientId });
-        //   // We've told the person to go away, destroy their faye client
-        //   destroyClient(message.clientId);
-        // }
-
-        if(message.channel === '/meta/handshake') {
-          // Handshake failing, go away
-          reconnect = 'none';
-        } else {
-          // Rehandshake
-          reconnect = 'handshake';
-        }
-
-        message.advice = {
-          reconnect: reconnect,
-          interval: 1000
-        };
-      }
-
-      logger.info('bayeux: error', message);
-    } else {
-      if(message.channel === '/meta/handshake') {
-        // * Already know there is no error. Reset the advice
-        if(!message.advice) {
-          message.advice = {
-            reconnect: 'retry',
-            interval:  1000 * nconf.get('ws:fayeInterval'),
-            timeout:   1000 * nconf.get('ws:fayeTimeout')
-          };
-        }
-
-
-      }
-    }
-
-    callback(message);
-  }
-};
-
+var adviceAdjuster = new AdviceAdjuster();
 
 var server = new faye.NodeAdapter({
   mount: '/faye',
-  timeout: nconf.get('ws:fayeTimeout'),
+  timeout: adviceAdjuster.getFayeTimeout(),
   ping: nconf.get('ws:fayePing'),
   engine: {
     type: fayeRedis,
     client: env.redis.getClient(),
     subscriberClient: env.redis.createClient(), // Subscribe. Needs new client
-    interval: nconf.get('ws:fayeInterval'),
+    interval: adviceAdjuster.getFayeInterval(),
     includeSequence: true,
     namespace: 'fr:',
     statsDelegate: function(category, event) {
@@ -355,6 +297,9 @@ var server = new faye.NodeAdapter({
     }
   }
 });
+
+adviceAdjuster.monitor(server);
+
 
 if(nconf.get('ws:fayePerMessageDeflate')) {
   /* Add permessage-deflate extension to Faye */
@@ -382,8 +327,6 @@ server._server._makeResponse = function(message) {
 
 
 var client = server.getClient();
-
-var STATS_FREQUENCY = 0.01;
 
 /* This function is used a lot, this version excludes try-catch so that it can be optimised */
 function stringifyInternal(object) {
@@ -436,6 +379,7 @@ module.exports = {
   attach: function(httpServer) {
 
     // Attach event handlers
+    server.addExtension(adviceAdjuster.timingStartExtension());
     server.addExtension(logging);
     server.addExtension(authenticator);
     server.addExtension(noConnectForUnknownClients);
@@ -447,10 +391,13 @@ module.exports = {
     server.addExtension(require('./bayeux/authorisor'));
 
     server.addExtension(pushOnlyServer);
-    server.addExtension(hidePassword);
     server.addExtension(pingResponder);
-    server.addExtension(adviseAdjuster);
 
+    server.addExtension(adviceAdjuster.timingEndExtension());
+    server.addExtension(adviceAdjuster.adviceExtension());
+    server.addExtension(hidePrivate);
+
+    // Configure the client as a superclient
     client.addExtension(superClient);
 
     if (fayeLoggingLevel === 'debug') {
