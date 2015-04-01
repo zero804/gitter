@@ -5,7 +5,7 @@
 	"Existing user login": "Iniciar sesión",
 	"login": "Iniciar sesión",
 	"Chat, for GitHub.": "Chat, para GitHub.",
-	"Get unlimited public rooms and one-to-one chats, free forever. Private team plans start from $2 per user per month. No credit card required.": "Salas públicas y conversaciones uno-a-uno ilimitadas, para siempre. Planes para equipos desde $2 por usuario por mes. No requiere tarjeta de crédito.",
+	"Get unlimited public rooms and one-to-one chats, free forever. Private team plans start from $5 per user per month. No credit card required.": "Salas públicas y conversaciones uno-a-uno ilimitadas, para siempre. Planes para equipos desde $5 por usuario por mes. No requiere tarjeta de crédito.",
 	"Sign up free with Github": "Regístrate gratis con Github",
 	"Sign up with Github": "Regístrate con Github",
 	"By signing up you agree to our <a %s>Terms and Conditions</a>": "Registrándote aceptas nuestros <a %s>Términos y Condiciones</a>",
@@ -64,5 +64,8 @@
 	"Blog": "Blog",
 	"Twitter": "Twitter",
 	"Gitter &mdash; Where developers come to talk.": "Gitter &mdash; Donde los desarrolladores vienen a conversar.",
-	"Translated By": "-"
+	"Translated By": "-",
+	"Pro": "Pro",
+	"<b>25</b> org members": "<b>25</b> miembros de la Organización",
+	"<b>Unlimited</b> org members": "Miembros de la organización <b>ilimitados</b>"
 }

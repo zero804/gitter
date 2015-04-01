@@ -44,7 +44,7 @@
         <div class="wrap">
           <div class="map"><img class="bg" src="{{cdn 'images/home/map.png'}}" alt="There should be a map here"></div>
           <h1>{{ __ "Chat, for GitHub."}}</h1>
-          <p>{{ __ "Get unlimited public rooms and one-to-one chats, free forever. Private team plans start from $2 per user per month. No credit card required." }}</p>
+          <p>{{ __ "Get unlimited public rooms and one-to-one chats, free forever. Private team plans start from $5 per user per month. No credit card required." }}</p>
 
           <a class="btn signup" href="/login/github?action=signup&source=intro-signup">
             <img src="{{cdn 'images/home/github.png'}}"> <b><span class='desktopOnly'>{{  __ "Sign up free with Github" }}</span><span class='exceptDesktop'>{{ __ "Sign up with Github"}}</span></b>
@@ -203,100 +203,58 @@
         </div>
       </section>
 
-      <section id="pricing-panel">
-        <div class="wrap">
-          <div class="half">
-            <h1>{{ __ "Personal pricing" }}</h1>
+      <section class="pricing-panel">
+        <div class="pricing-panel__content">
+            <h1 class="pricing-panel__heading">{{ __ "Organisation pricing"}}</h1>
 
-            <article class="price ghost">
-              <header>
-                <b>{{ __ "Free" }}</b>
+            <div class="pricing-panel__price-plans">
 
-                <h1>
-                  $0
-                  <b>{{ __ "Forever"}}</b>
-                </h1>
-              </header>
+              <article class="price-plan">
+                <header class="price-plan__header price-plan__header--free">
+                  <p class="price-plan__name">{{ __ "Free" }}</p>
+                  <p class="price-plan__price">$0</p>
+                  <p class="price-plan__units">{{ __ "Forever" }}</p>
+                </header>
+                <div class="price-plan__body">
+                  {{{ __ "<b>Unlimited</b> chat history" }}}<br/>
+                  {{{ __ "<b>Unlimited</b> integrations" }}}<br/>
+                  <br/>
+                  {{{ __ "<b>Unlimited</b> public rooms" }}}<br/>
+                  {{{ __ "<b>Unlimited</b> private rooms" }}}<br/>
+                  <br/>
+                  {{{ __ "Limited to 25 users per private room" }}}<br/>
+                </div>
 
-              <ul>
-                <li>{{{ __ "<b>Unlimited</b> public rooms"}}}</li>
-                <li>{{{ __ "<b>1</b> private room"}}}*</li>
-                <li>{{{ __ "<b>2 weeks’</b> chat history" }}}</li>
-              </ul>
+                <a class="btn price-plan__button price-plan__button--free" href="/login/github?action=signup&source=pricing.free">{{{ __ "<b>Get started</b> for free" }}}</a>
 
-              <a class="btn signup full" href="/login/github?action=signup&source=pricing.free">{{{ __ "<b>Get started</b> for free"}}}</a>
-            </article>
+              </article>
 
-            <article class="price purple">
-              <header>
-                <b>{{ __ "Individual"}}</b>
+              <article class="price-plan">
+                <header class="price-plan__header price-plan__header--pro">
+                  <p class="price-plan__name">{{ __ "Pro" }}</p>
+                  <p class="price-plan__price">$5</p>
+                  <p class="price-plan__units">{{ __ "per user/month" }}</p>
+                </header>
+                <div class="price-plan__body">
+                  {{{ __ "<b>Unlimited</b> chat history" }}}<br/>
+                  {{{ __ "<b>Unlimited</b> integrations" }}}<br/>
+                  <br/>
+                  {{{ __ "<b>Unlimited</b> public rooms" }}}<br/>
+                  {{{ __ "<b>Unlimited</b> private rooms" }}}<br/>
+                  <br/>
+                  {{{ __ "<b>Unlimited</b> users per private room" }}}</li>
+                </div>
 
-                <h1>
-                  $2
-                  <b>{{ __ "monthly"}}</b>
-                </h1>
-              </header>
+                <a class="btn price-plan__button" href="{{billingBaseUrl}}/plan/pro">{{{ __ "<b>Purchase</b> now" }}}</a>
 
-              <ul>
-                <li>{{{ __ "<b>Unlimited</b> public rooms"}}}</li>
-                <li>{{{ __ "<b>Unlimited</b> private rooms"}}}**</li>
-                <li>{{{ __ "<b>Unlimited</b> chat history"}}}</li>
-              </ul>
+              </article>
 
-              <a class="btn signup full" href="{{billingBaseUrl}}/plan/personal">{{{ __ "<b>Purchase</b> now" }}}</a>
-            </article>
-          </div>
-
-          <div class="half">
-            <h1>{{ __ "Organisation pricing"}}</h1>
-
-            <article class="price mix">
-              <header>
-                <b>{{ __ "Bronze" }}</b>
-
-                <h1>
-                  $2
-                  <b>{{ __ "per user/month" }}</b>
-                </h1>
-              </header>
-
-              <ul>
-                <li>{{{ __ "<b>Unlimited</b> public rooms" }}} </li>
-                <li>{{{ __ "<b>Unlimited</b> private rooms" }}} ***</li>
-                <li>{{{ __ "<b>6 months’</b> chat history" }}}</li>
-              </ul>
-
-              <a class="btn signup full" href="{{billingBaseUrl}}/plan/bronze">{{{ __ "<b>Purchase</b> now" }}}</a>
-            </article>
-
-            <article class="price orange">
-              <header>
-                <b>{{ __ "Silver"}}</b>
-
-                <h1>
-                  $5
-                  <b>{{ __ "per user/month"}}</b>
-                </h1>
-              </header>
-
-              <ul>
-                <li>{{{ __ "<b>Unlimited</b> public rooms" }}}</li>
-                <li>{{{ __ "<b>Unlimited</b> private rooms" }}}***</li>
-                <li>{{{ __ "<b>Unlimited</b> chat history" }}}</li>
-              </ul>
-
-              <a class="btn signup full" href="{{billingBaseUrl}}/plan/silver">{{{ __ "<b>Purchase</b> now" }}}</a>
-            </article>
-          </div>
-          <div class="wrap fine-print">
-            <p>* {{ __ "Our free plan includes one private room per organisation you belong to on GitHub"}}</p>
-            <p>** {{ __ "Our Individual plan allows you to create private rooms using your personal account as the owner" }}</p>
-            <p>*** {{ __ "Our organisation plans allow you to create private rooms using your GitHub organisation as the owner"}}</p>
-            <div class="legal">
-              {{{ __ "Prices may be subject to VAT. By signing up you agree to our <a %s>Terms and Conditions</a>." "href='https://gitter.zendesk.com/hc/en-us/sections/200274872-Legal-documentation' target='_blank'" }}}
             </div>
+            <p class="pricing-panel__fine-print">
+              {{{ __ "Prices may be subject to VAT. By signing up you agree to our <a %s>Terms and Conditions</a>." "href='https://gitter.zendesk.com/hc/en-us/sections/200274872-Legal-documentation' target='_blank'" }}}
+            </p>
+
           </div>
-        </div>
       </section>
 
       <section id="apps-panel">

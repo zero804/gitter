@@ -5,9 +5,6 @@ var execPreloads      = require('../exec-preloads');
 var TroupeUriStrategy = require('./troupe-uri-strategy');
 var billingService    = require('../../services/billing-service');
 
-var env               = require('../../utils/env');
-var premiumDisabled   = env.config.get('premium:disabled');
-
 function OrgPlanStrategy() {
   var orgsWithPlans;
 
@@ -15,7 +12,7 @@ function OrgPlanStrategy() {
     return billingService.findActiveOrgPlans(orgUris)
       .then(function(subscriptions) {
         orgsWithPlans = subscriptions.reduce(function(memo, s) {
-          memo[s.uri] = s.plan;
+          memo[s.uri.toLowerCase()] = s.plan;
           return memo;
         }, {});
 
@@ -25,7 +22,7 @@ function OrgPlanStrategy() {
   };
 
   this.map = function(orgUri) {
-    return orgsWithPlans[orgUri];
+    return orgsWithPlans[orgUri.toLowerCase()];
   };
 }
 
@@ -57,8 +54,7 @@ function GitHubOrgStrategy(options) {
       name: item.login,
       avatar_url: item.avatar_url,
       room: troupeUriStrategy.map(item.login),
-      premium: premiumDisabled ? true : !!plan, // TODO remove when premium goes live
-      plan: plan
+      premium: !!plan,
     };
   };
 }
