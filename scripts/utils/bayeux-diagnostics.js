@@ -28,9 +28,8 @@ function send() {
   }
   console.log('SENDING...', sentCount);
   var message = { number: sentCount };
-  bayeux.client.publish('/api/private/diagnostics', message);
+  bayeux.publish('/api/private/diagnostics', message);
   setTimeout(send, opts.wait);
 }
 
 send();
-
