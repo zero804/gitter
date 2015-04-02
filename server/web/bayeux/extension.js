@@ -70,16 +70,11 @@ module.exports = function(options) {
         return callback(incomingMessage);
       }
 
-      var timeout = setTimeout(function() {
-        logger.error("Incoming extension took too long to process!", { name: name, message: incomingMessage });
-      }, 1000);
-
       if(privateState) {
         if(!incomingMessage._private) incomingMessage._private = { };
       }
 
       incoming(incomingMessage, req, function(err, outgoingMessage) {
-        clearTimeout(timeout);
         if(!outgoingMessage) outgoingMessage = incomingMessage;
 
         if(err) {
@@ -129,12 +124,7 @@ module.exports = function(options) {
         return callback(incomingMessage);
       }
 
-      var timeout = setTimeout(function() {
-        logger.error("Outgoing extension took too long to process!", { name: name, message: incomingMessage });
-      }, 1000);
-
       outgoing(incomingMessage, req, function(err, outgoingMessage) {
-        clearTimeout(timeout);
         if(!outgoingMessage) outgoingMessage = incomingMessage;
 
         if(err) {
