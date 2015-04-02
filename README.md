@@ -135,7 +135,7 @@ Once you are sure the above is done, preform the following:
 [2014-10-20 22:04:27,307][INFO ][org.elasticsearch.river.mongodb.Slurper] Number documents indexed: 21541
 ```
 
-10. Log into HQ: http://localhost:9200/_plugin/HQ -> Connect 
+10. Log into HQ: http://localhost:9200/_plugin/HQ -> Connect
+
 
 11. Check that there are lots of documents under the Gitter index.
-
