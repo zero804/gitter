@@ -6,10 +6,6 @@ module.exports = {
 
     require('./private').install(app, apiRoot + '/v1/private', authMiddleware);
 
-    // app.post(apiRoot + '/v1/location',
-    //     authMiddleware,
-    //     require('./location.js'));
-
     // APN has no auth requirement as user may not have authenticated
     // and this is used for devices without users
     app.post(apiRoot + '/v1/apn',
@@ -24,10 +20,6 @@ module.exports = {
     app.post(apiRoot + '/v1/eyeballs',
         authMiddleware,
         require('./eyeballs.js'));
-
-    app.get(apiRoot + '/v1/ping',
-        authMiddleware,
-        require('./ping.js'));
 
     app.delete(apiRoot + '/v1/sockets/:socketId',
       require('./sockets.js'));
