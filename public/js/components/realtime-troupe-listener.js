@@ -19,8 +19,7 @@ module.exports = (function() {
       // raw faye client
       var client = realtime.getClient();
 
-      // raw faye client doesnt add the prefix like realtime.subscribe does
-      var url = '/api' + apiClient.room.channel();
+      var url = apiClient.room.channel();
 
       subscription = client.subscribe(url, function(message) {
         if(message.notification === 'presence') {
@@ -39,4 +38,3 @@ module.exports = (function() {
 
 
 })();
-
