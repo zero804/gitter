@@ -183,6 +183,9 @@ var ReadByModel = Backbone.Model.extend({
 var ReadByCollection = LiveCollection.extend({
   model: ReadByModel,
   modelName: 'chatReadBy',
+  client: function() {
+    return realtime.getClient();
+  },
   initialize: function(models, options) { // jshint unused:true
     var userCollection = options.userCollection;
     if(userCollection) {
