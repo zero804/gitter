@@ -7,7 +7,7 @@ var Marionette = require('marionette');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var appEvents = require('utils/appevents');
-var moment = require('utils/momentWrapper');
+var moment = require('moment');
 var Popover = require('views/popover');
 var bodyTemplate = require('./tmpl/issuePopover.hbs');
 var titleTemplate = require('./tmpl/issuePopoverTitle.hbs');
@@ -166,4 +166,3 @@ module.exports = (function() {
 
 
 })();
-
