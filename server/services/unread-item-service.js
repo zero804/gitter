@@ -110,6 +110,7 @@ function ensureAllItemsRead(userId, troupeId) {
 
     });
 }
+exports.ensureAllItemsRead = ensureAllItemsRead;
 
 /**
  * Returns a hash of hash {user:troupe:ids} of users who have

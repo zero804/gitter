@@ -14,7 +14,8 @@ describe("User Troupe Settings Service", function() {
   before(fixtureLoader(fixture, {
     user1: { },
     user2: { },
-    troupe1: { users: ['user1', 'user2'] }
+    user3: { },
+    troupe1: { users: ['user1', 'user2', 'user3'] }
   }));
 
   after(function() {
@@ -72,25 +73,58 @@ describe("User Troupe Settings Service", function() {
       .nodeify(done);
   });
 
+  it('should be able to fetch keys for multiple usertroupes', function(done) {
+    var user1Id = fixture.user1.id;
+    var user2Id = fixture.user2.id;
+    var troupeId = fixture.troupe1.id;
 
-it('should be able to fetch keys for multiple usertroupes', function(done) {
-  var user1Id = fixture.user1.id;
-  var user2Id = fixture.user2.id;
-  var troupeId = fixture.troupe1.id;
+    return userTroupeSettingsService.setUserSettings(user1Id, troupeId, 'test3', { bob: 1 })
+      .then(function() {
+        return userTroupeSettingsService.setUserSettings(user2Id, troupeId, 'test3', { bob: 2 });
+      })
+      .then(function() {
+        return userTroupeSettingsService.getMultiUserTroupeSettings([ { userId: user1Id, troupeId: troupeId }, { userId: user2Id, troupeId: troupeId } ], 'test3');
+      })
+      .then(function(results) {
+        assert.equal(Object.keys(results).length, 2);
+        assert.equal(results[user1Id + ':' + troupeId].bob, 1);
+        assert.equal(results[user2Id + ':' + troupeId].bob, 2);
+      })
+      .nodeify(done);
+  });
 
-  return userTroupeSettingsService.setUserSettings(user1Id, troupeId, 'test3', { bob: 1 })
-    .then(function() {
-      return userTroupeSettingsService.setUserSettings(user2Id, troupeId, 'test3', { bob: 2 });
-    })
-    .then(function() {
-      return userTroupeSettingsService.getMultiUserTroupeSettings([ { userId: user1Id, troupeId: troupeId }, { userId: user2Id, troupeId: troupeId } ], 'test3');
-    })
-    .then(function(results) {
-      assert.equal(Object.keys(results).length, 2);
-      assert.equal(results[user1Id + ':' + troupeId].bob, 1);
-      assert.equal(results[user2Id + ':' + troupeId].bob, 2);
-    })
-    .nodeify(done);
-});
+  it('should be able to update settings for multiple users in a troupe', function(done) {
+    var user1Id = fixture.user1.id;
+    var user2Id = fixture.user2.id;
+    var user3Id = fixture.user3.id;
+    var troupeId = fixture.troupe1.id;
+
+    return userTroupeSettingsService.setUserSettings(user1Id, troupeId, 'test4', { bob: 1 })
+      .then(function() {
+        return userTroupeSettingsService.setUserSettings(user2Id, troupeId, 'test4B', { mary: 1 })
+      })
+      .then(function() {
+        return userTroupeSettingsService.setUserSettingsForUsersInTroupe(troupeId, [user1Id, user2Id, user3Id], 'test4', { bob: 2 });
+      })
+      .then(function() {
+        return userTroupeSettingsService.getMultiUserTroupeSettings([
+          { userId: user1Id, troupeId: troupeId },
+          { userId: user2Id, troupeId: troupeId },
+          { userId: user3Id, troupeId: troupeId },
+        ], 'test4');
+      })
+      .then(function(results) {
+        assert.equal(Object.keys(results).length, 3);
+        assert.equal(results[user1Id + ':' + troupeId].bob, 2);
+        assert.equal(results[user2Id + ':' + troupeId].bob, 2);
+        assert.equal(results[user3Id + ':' + troupeId].bob, 2);
+
+        return userTroupeSettingsService.getUserSettings(user2Id, troupeId, 'test4B');
+      })
+      .then(function(value) {
+        assert.deepEqual(value, { mary: 1 });
+      })
+      .nodeify(done);
+  });
 
 });
