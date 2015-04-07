@@ -10,8 +10,7 @@ var shutdown = require('shutdown');
 
 var start = Date.now();
 
-var engine = bayeux.engine;
-presenceService.collectGarbage(engine, function(err) {
+presenceService.collectGarbage(bayeux, function(err) {
   if(err) {
     winston.error('presence-gc failed: ' + err, { exception: err });
   }
@@ -20,5 +19,3 @@ presenceService.collectGarbage(engine, function(err) {
   winston.info('presence-gc completed in ' + timeTaken + 'ms');
   shutdown.shutdownGracefully(err ? 1 : 0);
 });
-
-
