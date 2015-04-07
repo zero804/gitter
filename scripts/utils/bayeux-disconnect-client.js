@@ -15,10 +15,9 @@ var opts = require("nomnom")
    })
    .parse();
 
-bayeux.server._server._engine.destroyClient(opts.socketId, function(err) {
+bayeux.destroyClient(opts.socketId, function(err) {
   if(err) winston.error('Error disconnecting socket' + err, { exception: err });
 
   shutdown.shutdownGracefully();
 
 });
-
