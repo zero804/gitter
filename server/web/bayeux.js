@@ -213,17 +213,27 @@ exports.publish = function(channel, message) {
 /**
  * Destroy a client
  */
-exports.destroyClient = function(clientId) {
-  if(!clientId) return;
+exports.destroyClient = function(clientId, callback) {
+  if (!clientId) return;
 
   logger.info('bayeux: client ' + clientId + ' intentionally destroyed.');
 
   setImmediate(function() {
+    var count = 0;
+
+    // Wait for both callbacks
+    function done() {
+      count++;
+      if (count === 2) {
+        if (callback) return callback();
+      }
+    }
+
     var engineNew = serverNew._server._engine;
-    engineNew.destroyClient(clientId, function() { });
+    engineNew.destroyClient(clientId, done);
 
     var engineLegacy = serverLegacy._server._engine;
-    engineLegacy.destroyClient(clientId, function() { });
+    engineLegacy.destroyClient(clientId, done);
   });
 };
 
