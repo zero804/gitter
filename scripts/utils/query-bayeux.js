@@ -31,11 +31,11 @@ env.installUncaughtExceptionHandler();
   function checkEngineExistence(socketIds, callback) {
     async.parallel(socketIds.map(function(socketId) {
       return function(cb) {
-        bayeux.engine.clientExists(socketId, function(exists) {
+        bayeux.clientExists(socketId, function(exists) {
           return cb(null, exists);
         });
       };
-    }), function(err, existence) {
+    }), 10, function(err, existence) {
       if(err) return callback(err);
 
       var result = socketIds.reduce(function(result, socketId, index) {
@@ -116,5 +116,3 @@ env.installUncaughtExceptionHandler();
   }
 
 // });
-
-
