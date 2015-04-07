@@ -334,6 +334,96 @@ describe('unread-item-service', function() {
     });
   });
 
+  describe('generateMentionDeltaSet', function() {
+    var unreadItemService;
+
+    beforeEach(function() {
+      unreadItemService = testRequire("./services/unread-item-service");
+    });
+
+    it('should not return empty delta when the list of mentions is empty before and after', function() {
+      var originalMentions = [];
+      var parsedChat = {
+        mentionUserIds: [],
+        notifyNewRoomUserIds: [],
+      };
+
+      var delta = unreadItemService.testOnly.generateMentionDeltaSet(parsedChat, originalMentions);
+      assert.deepEqual(delta.add, []);
+      assert.deepEqual(delta.remove, []);
+      assert.deepEqual(delta.addNewRoom, []);
+    });
+
+    it('should not an empty delta when the list of mentions does not change', function() {
+      var userId1 = mongoUtils.getNewObjectIdString();
+      var userId2 = mongoUtils.getNewObjectIdString();
+
+      var originalMentions = [{ userId: userId1 }, { userIds: [userId2] }];
+      var parsedChat = {
+        mentionUserIds: [userId1, userId2],
+        notifyNewRoomUserIds: [userId1],
+      };
+
+      var delta = unreadItemService.testOnly.generateMentionDeltaSet(parsedChat, originalMentions);
+      assert.deepEqual(delta.add, []);
+      assert.deepEqual(delta.remove, []);
+      assert.deepEqual(delta.addNewRoom, []);
+    });
+
+
+    it('should not an add delta when the list of mentions is empty before and has items after', function() {
+      var userId1 = mongoUtils.getNewObjectIdString();
+      var userId2 = mongoUtils.getNewObjectIdString();
+
+      var originalMentions = [];
+      var parsedChat = {
+        mentionUserIds: [userId1, userId2],
+        notifyNewRoomUserIds: [userId1],
+      };
+
+      var delta = unreadItemService.testOnly.generateMentionDeltaSet(parsedChat, originalMentions);
+      assert.deepEqual(delta.add, ['' + userId1, '' + userId2]);
+      assert.deepEqual(delta.remove, []);
+      assert.deepEqual(delta.addNewRoom, ['' + userId1]);
+    });
+
+    it('should not an remove delta when the list of mentions is empty before and has items after', function() {
+      var userId1 = mongoUtils.getNewObjectIdString();
+      var userId2 = mongoUtils.getNewObjectIdString();
+
+      var originalMentions = [{ userId: userId1 }, { userIds: [userId2] }];
+      var parsedChat = {
+        mentionUserIds: [],
+        notifyNewRoomUserIds: [],
+      };
+
+      var delta = unreadItemService.testOnly.generateMentionDeltaSet(parsedChat, originalMentions);
+
+      assert.deepEqual(delta.add, []);
+      assert.deepEqual(delta.remove, ['' + userId1, '' + userId2]);
+      assert.deepEqual(delta.addNewRoom, []);
+    });
+
+    it('should deal with adds, removes and new users all in one', function() {
+      var userId1 = mongoUtils.getNewObjectIdString();
+      var userId2 = mongoUtils.getNewObjectIdString();
+      var userId3 = mongoUtils.getNewObjectIdString();
+
+      var originalMentions = [{ userId: userId1 }, { userIds: [userId2] }];
+      var parsedChat = {
+        mentionUserIds: [userId1, userId3],
+        notifyNewRoomUserIds: [userId3],
+      };
+
+      var delta = unreadItemService.testOnly.generateMentionDeltaSet(parsedChat, originalMentions);
+
+      assert.deepEqual(delta.add, ['' + userId3]);
+      assert.deepEqual(delta.remove, ['' + userId2]);
+      assert.deepEqual(delta.addNewRoom, ['' + userId3]);
+    });
+
+  });
+
   describe('createChatUnreadItems', function() {
     var chatId;
     var troupeId;
@@ -640,16 +730,31 @@ describe('unread-item-service', function() {
       });
     });
 
-    it('should handle updates that add mentions to a message with no mentions', function(done) {
+    it('should handle updates that add no mentions to a message with no mentions', function(done) {
       unreadItemService.updateChatUnreadItems(fromUserId, troupeNoLurkers, chatWithNoMentions, [])
+        .then(function() {
+          mockito.verify(appEvents, never()).newUnreadItem();
+          mockito.verify(appEvents, never()).troupeUnreadCountsChange();
+        })
+        .nodeify(done);
+    });
+
+    it('should handle updates that add mentions to a message with no mentions', function(done) {
+      unreadItemService.updateChatUnreadItems(fromUserId, troupeNoLurkers, chatWithSingleMention, [])
         .then(function() {
           mockito.verify(appEvents, never()).newUnreadItem(fromUserId, anything(), anything());
           mockito.verify(appEvents).newUnreadItem(userId1, troupeId, hasMember("chat", [chatId]));
-          mockito.verify(appEvents).newUnreadItem(userId2, troupeId, hasMember("chat", [chatId]));
 
           mockito.verify(appEvents, never()).troupeUnreadCountsChange(hasMember('userId', fromUserId));
-          mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId1, troupeId: troupeId, total: 1, mentions: undefined }));
-          mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId2, troupeId: troupeId, total: 1, mentions: undefined  }));
+          mockito.verify(appEvents).troupeUnreadCountsChange(deep({userId: userId1, troupeId: troupeId, total: 1, mentions: 1 }));
+        })
+        .nodeify(done);
+    });
+
+    it('should handle updates that remove mentions from a message with mentions', function(done) {
+      unreadItemService.updateChatUnreadItems(fromUserId, troupeNoLurkers, chatWithNoMentions, [{ userId: userId1 }])
+        .then(function() {
+          mockito.verify(appEvents, never()).newUnreadItem();
         })
         .nodeify(done);
     });
