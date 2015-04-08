@@ -29,13 +29,13 @@ function makeServer(endpoint, redisClient, redisSubscribeClient) {
 
   var server = new faye.NodeAdapter({
     mount: endpoint,
-    timeout: adviceAdjuster.getFayeTimeout(),
+    timeout: nconf.get('ws:fayeTimeout'),
     ping: nconf.get('ws:fayePing'),
     engine: {
       type: fayeRedis,
       client: redisClient,
       subscriberClient: redisSubscribeClient, // Subscribe. Needs new client
-      interval: adviceAdjuster.getFayeInterval(),
+      interval: nconf.get('ws:fayeInterval'),
       includeSequence: true,
       namespace: 'fr:',
       statsDelegate: function(category, event) {
@@ -44,7 +44,7 @@ function makeServer(endpoint, redisClient, redisSubscribeClient) {
     }
   });
 
-  adviceAdjuster.monitor(server);
+  // adviceAdjuster.monitor(server);
 
   if(nconf.get('ws:fayePerMessageDeflate')) {
     /* Add permessage-deflate extension to Faye */
@@ -87,15 +87,11 @@ function makeServer(endpoint, redisClient, redisSubscribeClient) {
       });
     });
 
-    server.bind('disconnect', function(clientId) {
-      // Warning, this event is called simulateously on
-      // all the servers that are connected to the same redis/faye
-      // connection
-      logger.verbose("Client " + clientId + " disconnected");
-    });
   }
 
   server.bind('disconnect', function(clientId) {
+    logger.info("Client " + clientId + " disconnected");
+
     // Warning, this event is called simulateously on
     // all the servers that are connected to the same redis/faye
     // connection
@@ -134,14 +130,14 @@ function makeServer(endpoint, redisClient, redisSubscribeClient) {
 /**
  * Create the servers
  */
-var serverNew = makeServer('/faye2', env.redis.createClient(nconf.get("redis_nopersist")), env.redis.createClient(nconf.get("redis_nopersist"))); // Subscribe. Needs new client
+// var serverNew = makeServer('/faye2', env.redis.createClient(nconf.get("redis_nopersist")), env.redis.createClient(nconf.get("redis_nopersist"))); // Subscribe. Needs new client
 var serverLegacy = makeServer('/faye', env.redis.getClient(), env.redis.createClient()); // Subscribe. Needs new client
 
 /**
  * Create the clients
  */
-var clientNew = serverNew.getClient();
-clientNew.addExtension(superClientExtension);
+// var clientNew = serverNew.getClient();
+// clientNew.addExtension(superClientExtension);
 
 var clientLegacy = serverLegacy.getClient();
 clientLegacy.addExtension(superClientExtension);
@@ -192,21 +188,21 @@ logLevels.forEach(function(level) {
 /** Returns callback(exists) to match faye */
 exports.clientExists = function(clientId, callback) {
   // Try the new server first
-  serverNew._server._engine.clientExists(clientId, function(exists) {
-    if (exists) return callback(true);
+  // serverNew._server._engine.clientExists(clientId, function(exists) {
+  //   if (exists) return callback(true);
 
     // Try the legacy server next
     serverLegacy._server._engine.clientExists(clientId, function(exists) {
       return callback(exists);
     });
-  });
+  // });
 };
 
 /**
  * Publish a message on Faye
  */
 exports.publish = function(channel, message) {
-  clientNew.publish(channel, message);
+  // clientNew.publish(channel, message);
   clientLegacy.publish(channel, message);
 };
 
@@ -218,29 +214,32 @@ exports.destroyClient = function(clientId, callback) {
 
   logger.info('bayeux: client ' + clientId + ' intentionally destroyed.');
 
-  setImmediate(function() {
-    var count = 0;
+  var engineLegacy = serverLegacy._server._engine;
+  engineLegacy.destroyClient(clientId, callback);
 
-    // Wait for both callbacks
-    function done() {
-      count++;
-      if (count === 2) {
-        if (callback) return callback();
-      }
-    }
-
-    var engineNew = serverNew._server._engine;
-    engineNew.destroyClient(clientId, done);
-
-    var engineLegacy = serverLegacy._server._engine;
-    engineLegacy.destroyClient(clientId, done);
-  });
+  // setImmediate(function() {
+  //   var count = 0;
+  //
+  //   // Wait for both callbacks
+  //   function done() {
+  //     count++;
+  //     if (count === 2) {
+  //       if (callback) return callback();
+  //     }
+  //   }
+  //
+  //   var engineNew = serverNew._server._engine;
+  //   engineNew.destroyClient(clientId, done);
+  //
+  //   var engineLegacy = serverLegacy._server._engine;
+  //   engineLegacy.destroyClient(clientId, done);
+  // });
 };
 
 /**
  * Attach the faye instance to the server
  */
 exports.attach = function(httpServer) {
-  serverNew.attach(httpServer);
+  // serverNew.attach(httpServer);
   serverLegacy.attach(httpServer);
 };
