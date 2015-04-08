@@ -435,7 +435,7 @@ function toString(f) {
 }
 /**
  * Given a set of original mentions and a chat message, returns
- * { add: [userIds], remove: [userIds], addNewRoom: [userIds] }
+ * { addNotify: [userIds], addMentions: [userIds], remove: [userIds], addNewRoom: [userIds] }
  * Which consist of users no longer mentioned in a message and
  * new users who are now mentioned in the message, who were not
  * previously.
@@ -458,17 +458,24 @@ function generateMentionDeltaSet(parsedChat, originalMentions) {
 
   var mentionUserIds = parsedChat.mentionUserIds.map(toString);
 
+
   var addMentions = _.without.apply(null, [mentionUserIds].concat(originalMentionUserIds));
   var removeMentions = _.without.apply(null, [originalMentionUserIds].concat(mentionUserIds));
+
+  // List of users who should get unread items, who were previously mentioned by no longer are
+  var forNotifyWithRemoveMentions = _.intersection(parsedChat.notifyUserIds.map(toString), removeMentions);
+
+  // Everyone who was added via a mention, plus everyone who was no longer mentioned but is not lurking
+  var addNotify = forNotifyWithRemoveMentions.concat(addMentions);
 
   // Users who are newly mentioned but not currently in the room
   var addNewRoom = _.intersection(addMentions, parsedChat.notifyNewRoomUserIds.map(toString));
 
-  return { add: addMentions, addNewRoom: addNewRoom, remove: removeMentions };
+  return { addNotify: addNotify, addMentions: addMentions, addNewRoom: addNewRoom, remove: removeMentions };
 }
 
-function addMentionsForUpdatedChat(troupeId, chatId, addMentionIds, addMentionsInNewRoom) {
-  return engine.newItemWithMentions(troupeId, chatId, addMentionIds, addMentionIds)
+function addUnreadItemsForUpdatedChat(troupeId, chatId, addNotifyUserIds, addMentionUserIds, addMentionsInNewRoom) {
+  return engine.newItemWithMentions(troupeId, chatId, addNotifyUserIds, addMentionUserIds)
     .then(function(results) {
 
       // Firstly, notify all the notifyNewRoomUserIds with room creation messages
@@ -477,7 +484,7 @@ function addMentionsForUpdatedChat(troupeId, chatId, addMentionIds, addMentionsI
       });
 
       // Next, notify all the users with unread count changes
-      addMentionIds.forEach(function(userId) {
+      addNotifyUserIds.forEach(function(userId) {
         var unreadCount = results[userId] && results[userId].unreadCount;
         var mentionCount = results[userId] && results[userId].mentionCount;
 
@@ -525,11 +532,12 @@ function updateChatUnreadItems(fromUserId, troupe, chat, originalMentions) {
     .then(function(parsedChat) {
       var delta = generateMentionDeltaSet(parsedChat, originalMentions);
 
-      return Q.all([
-        delta.add.length && addMentionsForUpdatedChat(troupeId, chat.id, delta.add, delta.addNewRoom),
-        delta.remove.length && removeMentionsForUpdatedChat(troupeId, chat.id, delta.remove)
-      ]);
-
+      // Remove first
+      return [delta, delta.remove.length && removeMentionsForUpdatedChat(troupeId, chat.id, delta.remove)];
+    })
+    .spread(function(delta) {
+      // Add second
+      return delta.addNotify.length && addUnreadItemsForUpdatedChat(troupeId, chat.id, delta.addNotify, delta.addMentions, delta.addNewRoom);
     });
 }
 exports.updateChatUnreadItems = updateChatUnreadItems;
