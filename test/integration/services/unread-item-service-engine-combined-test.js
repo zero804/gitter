@@ -4,7 +4,7 @@ var testRequire = require('../test-require');
 var Q = require('q');
 var assert = require('assert');
 var mongoUtils = testRequire('./utils/mongo-utils');
-var srand = require('srand');
+var randomSeed = require('random-seed');
 var qlimit = require('qlimit');
 var limit = qlimit(3);
 var _ = require('underscore');
@@ -91,7 +91,7 @@ describe('unread-item-service-engine-combined #slow', function() {
       var unreadItems = {};
       var mentionItems = {};
 
-      srand.seed(seed);
+      var rand = randomSeed.create('' + seed);
 
       function enforceLimit() {
         var u = Object.keys(unreadItems);
@@ -152,7 +152,7 @@ describe('unread-item-service-engine-combined #slow', function() {
         count++;
         if(count > TEST_ITERATIONS) return done();
 
-        var nextOperation = Math.floor(srand.random() * 4);
+        var nextOperation = rand(3);
         [
           /* 0 */
           function addMention(cb) {
@@ -172,7 +172,7 @@ describe('unread-item-service-engine-combined #slow', function() {
           },
           /* 1 */
           function addItem(cb) {
-            var numberOfItems = Math.floor(srand.random() * 10) + 1;
+            var numberOfItems = rand(10) + 1;
             // console.log('Add ' + numberOfItems + ' items');
 
             return _.range(numberOfItems).reduce(function(memo) {
@@ -200,9 +200,9 @@ describe('unread-item-service-engine-combined #slow', function() {
           },
           /* 2 */
           function markItemRead(cb) {
-            var largeMarkAsRead = srand.random() > 0.80;
+            var largeMarkAsRead = rand(10) > 8;
 
-            var percentageOfItems = Math.round(srand.random() * (largeMarkAsRead ? 100 : 30) / 100);
+            var percentageOfItems = rand(largeMarkAsRead ? 100 : 30) / 100;
 
             var i = Object.keys(unreadItems);
 
@@ -227,7 +227,7 @@ describe('unread-item-service-engine-combined #slow', function() {
           },
           /* 3 */
           function markAllItemsRead(cb) {
-            if(Math.floor(srand.random() * 3) !== 0) return cb();
+            if(rand(3) !== 0) return cb();
             // console.log('Mark all items read');
             return ensureAllItemsRead(userId1, troupeId1)
               .then(function(result) {
