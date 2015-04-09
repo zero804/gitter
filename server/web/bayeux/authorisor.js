@@ -273,14 +273,15 @@ module.exports = bayeuxExtension({
 
     populator({ userId: userId, match: m, snapshot: snapshot })
       .then(function(snapshot) {
+        if (!snapshot) return message;
+
         stats.responseTime('bayeux.snapshot.time', Date.now() - startTime);
         stats.responseTime('bayeux.snapshot.time.' + snapshot.type, Date.now() - startTime);
 
-        if(snapshot) {
-          if(!message.ext) message.ext = {};
-          message.ext.snapshot = snapshot.data;
-          message.ext.snapshot_meta = snapshot.meta;
-        }
+        if(!message.ext) message.ext = {};
+        message.ext.snapshot = snapshot.data;
+        message.ext.snapshot_meta = snapshot.meta;
+
         return message;
       })
       .nodeify(callback);
