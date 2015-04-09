@@ -15,7 +15,9 @@ var zlib              = require('zlib');
 var AdviceAdjuster    = require('./bayeux/advice-adjuster');
 var authenticatorExtension = require('./bayeux/authenticator');
 var loggingExtension = require('./bayeux/logging');
-var createDoormanExtension = require('./bayeux/doorman');
+
+/* Disabled after the outage 8 April 2015 XXX investigate further */
+// var createDoormanExtension = require('./bayeux/doorman');
 var createPingResponderExtension = require('./bayeux/ping-responder');
 var superClientExtension = require('./bayeux/super-client');
 var pushOnlyServerExtension = require('./bayeux/push-only');
@@ -29,13 +31,13 @@ function makeServer(endpoint, redisClient, redisSubscribeClient) {
 
   var server = new faye.NodeAdapter({
     mount: endpoint,
-    timeout: nconf.get('ws:fayeTimeout'),
-    ping: nconf.get('ws:fayePing'),
+    timeout: nconf.get('ws:fayeTimeout'), // Time before an inactive client is timed out
+    ping: nconf.get('ws:fayePing'),       // Time between pings from the server to the client
     engine: {
       type: fayeRedis,
       client: redisClient,
       subscriberClient: redisSubscribeClient, // Subscribe. Needs new client
-      interval: nconf.get('ws:fayeInterval'),
+      interval: nconf.get('ws:fayeInterval'), // Faye GC interval
       includeSequence: true,
       namespace: 'fr:',
       statsDelegate: function(category, event) {
@@ -58,7 +60,9 @@ function makeServer(endpoint, redisClient, redisSubscribeClient) {
   server.addExtension(adviceAdjuster.timingStartExtension());
   server.addExtension(loggingExtension);
   server.addExtension(authenticatorExtension);
-  server.addExtension(createDoormanExtension(server));
+
+  /* Disabled after the outage 8 April 2015 XXX investigate further */
+  // server.addExtension(createDoormanExtension(server));
 
   // Authorisation Extension - decides whether the user
   // is allowed to connect to the subscription channel
