@@ -96,9 +96,8 @@ function makeServer(endpoint, redisClient, redisSubscribeClient) {
   server.bind('disconnect', function(clientId) {
     logger.info("Client " + clientId + " disconnected");
 
-    // Warning, this event is called simulateously on
-    // all the servers that are connected to the same redis/faye
-    // connection
+    // Warning, this event may be called on a different Faye engine from
+    // where the socket is residing
     presenceService.socketDisconnected(clientId, function(err) {
       if(err && err.status !== 404) {
         logger.error("bayeux: Error while attempting disconnection of socket " + clientId + ": " + err,  { exception: err });
