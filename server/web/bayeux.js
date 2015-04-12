@@ -12,7 +12,7 @@ var deflate           = require('permessage-deflate');
 var presenceService   = require('../services/presence-service');
 var shutdown          = require('shutdown');
 var zlib              = require('zlib');
-var AdviceAdjuster    = require('./bayeux/advice-adjuster');
+var adviceAdjuster    = require('./bayeux/advice-adjuster');
 var authenticatorExtension = require('./bayeux/authenticator');
 var loggingExtension = require('./bayeux/logging');
 
@@ -27,8 +27,6 @@ var hidePrivateExtension = require('./bayeux/hide-private');
 var STATS_FREQUENCY = 0.01;
 
 function makeServer(endpoint, redisClient, redisSubscribeClient) {
-  var adviceAdjuster = new AdviceAdjuster();
-
   var server = new faye.NodeAdapter({
     mount: endpoint,
     timeout: nconf.get('ws:fayeTimeout'), // Time before an inactive client is timed out
@@ -37,7 +35,6 @@ function makeServer(endpoint, redisClient, redisSubscribeClient) {
       type: fayeRedis,
       client: redisClient,
       subscriberClient: redisSubscribeClient, // Subscribe. Needs new client
-      interval: nconf.get('ws:fayeInterval'), // Faye GC interval
       includeSequence: true,
       namespace: 'fr:',
       statsDelegate: function(category, event) {
@@ -45,8 +42,6 @@ function makeServer(endpoint, redisClient, redisSubscribeClient) {
       }
     }
   });
-
-  // adviceAdjuster.monitor(server);
 
   if(nconf.get('ws:fayePerMessageDeflate')) {
     /* Add permessage-deflate extension to Faye */
@@ -57,7 +52,6 @@ function makeServer(endpoint, redisClient, redisSubscribeClient) {
   }
 
   // Attach event handlers
-  server.addExtension(adviceAdjuster.timingStartExtension());
   server.addExtension(loggingExtension);
   server.addExtension(authenticatorExtension);
 
@@ -72,8 +66,7 @@ function makeServer(endpoint, redisClient, redisSubscribeClient) {
   server.addExtension(pushOnlyServerExtension);
   server.addExtension(createPingResponderExtension(server));
 
-  server.addExtension(adviceAdjuster.timingEndExtension());
-  server.addExtension(adviceAdjuster.adviceExtension());
+  server.addExtension(adviceAdjuster);
   server.addExtension(hidePrivateExtension);
 
 
