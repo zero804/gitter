@@ -35,7 +35,6 @@ function makeServer(endpoint, redisClient, redisSubscribeClient) {
       type: fayeRedis,
       client: redisClient,
       subscriberClient: redisSubscribeClient, // Subscribe. Needs new client
-      interval: nconf.get('ws:fayeGcInterval'), // Faye GC interval
       includeSequence: true,
       namespace: 'fr:',
       statsDelegate: function(category, event) {

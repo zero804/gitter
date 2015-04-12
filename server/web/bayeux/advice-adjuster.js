@@ -25,7 +25,7 @@ module.exports = {
 
         if (!message.advice) {
           message.advice = {
-            interval: config.get('ws:fayeRetry')
+            interval: config.get('ws:fayeRetry') * 1000
           };
         }
 
