@@ -1,5 +1,4 @@
 "use strict";
-var log = require('utils/log');
 var Backbone = require('backbone');
 var Marionette = require('marionette');
 var $ = require('jquery');
@@ -26,9 +25,6 @@ module.exports = (function() {
 
   /** @const */
   var MAX_TYPEAHEAD_SUGGESTIONS = isMobile() ? 3 : 10;
-
-  /** @const */
-  var EXTRA_PADDING = 20;
 
   /* This value is also in chatItemView and in chat-service on the server*/
   /** @const */
