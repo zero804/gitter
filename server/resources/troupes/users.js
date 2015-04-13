@@ -7,7 +7,6 @@ var roomService        = require('../../services/room-service');
 var emailAddressService = require('../../services/email-address-service');
 var userService        = require("../../services/user-service");
 var restSerializer     = require("../../serializers/rest-serializer");
-var appEvents          = require("../../app-events");
 var _                  = require("underscore");
 
 module.exports = {
@@ -21,6 +20,19 @@ module.exports = {
 
     restful.serializeUsersForTroupe(req.troupe.id, req.user, options)
       .then(function (data) {
+        data = data || [];
+
+        if (req.query.q) {
+          var lowerTerm = req.query.q.toLowerCase();
+
+          data = data.filter(function(user) {
+            var username = user.username.toLowerCase();
+            var displayName = (user.displayName || '').toLowerCase();
+
+            return (username.indexOf(lowerTerm) === 0 || displayName.indexOf(lowerTerm) === 0);
+          });
+        }
+
         res.send(data);
       })
       .catch(function (err) {
