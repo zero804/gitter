@@ -2,7 +2,7 @@
 @import "bootstrap/bootstrap";
 
 @import "colors";
-@import "trpFonts";
+@import "typography";
 
 @import "trpModals";
 @import "trp3Common";
@@ -85,11 +85,6 @@ a {
 	color: #333;
 }
 
-h2 {
-  font-family: @fontSans;
-  font-weight: 400;
-}
-
 p {
   font-family: inherit;
   font-size: inherit;
@@ -105,7 +100,6 @@ label {
 }
 
 .hidden-input input {
-  .trpBodyMedium;
   outline: 0;
   box-shadow: none;
   width: 320px;
@@ -118,8 +112,6 @@ label {
 
 .gtrInput {
   box-sizing: border-box;
-  .trpBodyMedium;
-
   width: 100%;
   height: 32px;
   padding: 0px 10px;
@@ -141,7 +133,6 @@ label {
 
 
 .modal textarea.hidden-input {
-  .trpBodyMedium;
   outline: 0;
   box-shadow: none;
   width: 320px;
@@ -263,7 +254,6 @@ a:hover {
 
     p {
       width: 400px;
-      font-family: @fontSans;
       font-size: 32px;
       color: white;
       line-height: 1.3em;
@@ -313,7 +303,6 @@ a:hover {
 
 .trpLeftMenuWrapper {
   display: inline-block;
-	.trpBodyMedium;
 	overflow-y: auto;
 	overflow-x: hidden;
   font-weight: 300;
@@ -348,15 +337,6 @@ a:hover {
 .disabled {
   color: #CCC;
   cursor: not-allowed;
-}
-
-.gtrActivityItemText .mention {
-  border: 1px solid transparent;
-  background-color: fade(@trpGrey,20%);
-  border-radius: 2px;
-  padding: 0 4px;
-  font-size: 11px;
-  cursor: pointer;
 }
 
 body.dragging, body.dragging * {
@@ -616,7 +596,6 @@ ul.roster {
 	padding: 8px;
 	background: @trpGreen;
 	color: white;
-	.trpBodyMedium;
 	text-align: left;
 	margin: 1px;
   opacity: 0.95;
@@ -632,14 +611,6 @@ ul.roster {
 
 .notification a:hover {
 	text-decoration: none;
-}
-
-.notification-header {
-	.trpBodyMedium;
-}
-
-.notification-text {
-	.trpBodySmall;
 }
 
 .notification-error {
@@ -695,7 +666,6 @@ ul.roster {
 }
 
 .trpActionsMenuLabel {
-  .trpBodyMedium;
   display: inline-block;
   vertical-align: middle;
   @media @mid {

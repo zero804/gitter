@@ -4,7 +4,7 @@
   100% { box-shadow: 0 0 0px #1bee82; color: #1bee82;  }
 }
 
-@room-list-item-height: 30px;
+@room-list-item-height: 32px;
 
 .room-list-item {
   align-items: center;
@@ -14,6 +14,9 @@
   cursor: pointer;
   line-height: @room-list-item-height;
   padding: 0 0 0 4px;
+  color: rgba(255,255,255,0.9);
+  font-size: 18px;
+  line-height: 20px;
 }
 
 .room-list-item__icon {
@@ -64,6 +67,7 @@ body.hover .room-list-item:hover:not(.room-list-item--current-room),
 .room-list-item.selected:not(.room-list-item--current-room) {
   border-radius: 4px 0 0 4px;
   background-color: rgba(255,255,255,0.2);
+  color: rgba(255,255,255,1);
 
   &.chatting:after {
     display: none;
