@@ -104,6 +104,17 @@ var accessTokenFailureExtension = {
   }
 };
 
+var timer = {
+  incoming: function(msg, cb) {
+    var t = Date.now();
+    if (msg.ext && msg.ext.snapshot) {
+      console.debug('snapshot', t-T, msg.subscription, msg.ext.snapshot);
+    }
+    cb(msg);
+  }
+};
+
+
 var BRIDGE_NOTIFICATIONS = {
   user_notification: 1,
   activity: 1
@@ -122,7 +133,8 @@ function getOrCreateClient() {
     websocketsDisabled: isMobile(),
     extensions: [
         handshakeExtension,
-        accessTokenFailureExtension
+        accessTokenFailureExtension,
+        timer
       ]
   });
 
