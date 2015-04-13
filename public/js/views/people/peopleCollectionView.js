@@ -6,8 +6,8 @@ var AvatarView = require('views/widgets/avatar');
 var collectionTemplate = require('./tmpl/peopleCollectionView.hbs');
 var remainingTempate = require('./tmpl/remainingView.hbs');
 
-module.exports = (function() {
 
+module.exports = (function() {
 
   var PeopleCollectionView = Marionette.CollectionView.extend({
     tagName: 'ul',
@@ -34,26 +34,26 @@ module.exports = (function() {
 
     initialize: function(options) {
       this.rosterCollection = options.rosterCollection;
-      this.userCollection = options.userCollection;
       this.listenTo(this.rosterCollection, 'add remove reset', this.render);
-      this.listenTo(this.userCollection, 'add remove reset', this.render);
     },
 
     serializeData: function() {
-      var remainingCount = this.userCollection.length - this.rosterCollection.length;
-      return {
+      var userCount = context.troupe().get('userCount');
+      var data = {
         showAddBadge: context.isLoggedIn() && !context.inOneToOneTroupeContext(),
-        remainingCount: remainingCount,
-        plural: remainingCount > 1
+        userCount: userCount,
+        plural: userCount > 1
       };
+
+      return data;
     },
 
     onRender: function() {
-      var remainingCount = this.userCollection.length - this.rosterCollection.length;
+      var userCount = context.troupe().get('userCount');
       this.ui.showMore.hide();
       this.$el.toggleClass('showMid', this.rosterCollection.length > 10);
 
-      if (remainingCount > 0) {
+      if (userCount > 25) {
         this.ui.showMore.show();
         this.$el.toggleClass('showFull');
       }
@@ -70,20 +70,16 @@ module.exports = (function() {
 
     initialize: function(options) {
       this.rosterCollection = options.rosterCollection;
-      this.userCollection = options.userCollection;
       this.listenTo(this.rosterCollection, 'all', this.render);
-      this.listenTo(this.userCollection, 'all', this.render);
     },
 
     onRender: function() {
-
       this.roster.show(new PeopleCollectionView({
         collection: this.rosterCollection
       }));
 
       this.remaining.show(new RemainingView({
         rosterCollection: this.rosterCollection,
-        userCollection: this.userCollection
       }));
     }
   });

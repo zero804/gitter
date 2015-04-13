@@ -23,7 +23,9 @@ var _                 = require('underscore');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
-var USER_COLLECTION_FOLD = 21;
+
+// DEPRECATED
+//var USER_COLLECTION_FOLD = 21;
 
 var stagingText, stagingLink;
 var dnsPrefetch = (nconf.get('cdn:hosts') || []).concat([
@@ -204,12 +206,13 @@ function renderChat(req, res, options, next) {
       options.generateContext === false ? null : contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, permalinkChatId: aroundId }),
       restful.serializeChatsForTroupe(troupe.id, userId, serializerOptions),
       options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
-      options.fetchUsers === false ? null :restful.serializeUsersForTroupe(troupe.id, userId, serializerOptions)
+      options.fetchUsers === false ? null :restful.serializeRosterForTroupe(troupe.id, userId, serializerOptions)
     ]).spread(function (troupeContext, chats, activityEvents, users) {
       var initialChat = _.find(chats, function(chat) { return chat.initial; });
       var initialBottom = !initialChat;
       var githubLink;
       var classNames = options.classNames || [];
+
 
       if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
         githubLink = 'https://github.com/' + req.uriContext.uri;
@@ -226,8 +229,6 @@ function renderChat(req, res, options, next) {
         integrationsUrl = '#integrations';
       }
 
-      var cutOff = users ? users.length - USER_COLLECTION_FOLD : 0;
-      var remainingCount = (cutOff > 0) ? cutOff : 0;
       var cssFileName = options.stylesheet ? "styles/" + options.stylesheet + ".css" : "styles/" + script + ".css"; // css filename matches bootscript
 
       var chatsWithBurst = burstCalculator(chats);
@@ -251,8 +252,8 @@ function renderChat(req, res, options, next) {
           dnsPrefetch: dnsPrefetch,
           isPrivate: isPrivate,
           activityEvents: activityEvents,
-          users: users && users.sort(userSort).slice(0, USER_COLLECTION_FOLD),
-          remainingCount: remainingCount,
+          users: users  && users.sort(userSort),
+          userCount: troupe.userCount,
           integrationsUrl: integrationsUrl,
           placeholder: 'Click here to type a chat message. Supports GitHub flavoured markdown.'
         }, troupeContext && {

@@ -12,7 +12,7 @@ var realtime = require('components/realtime');
 module.exports = (function() {
   var chatCollection          = new chatModels.ChatCollection(null, { listen: true });
   var userCollection          = new userModels.UserCollection(null, { listen: true });
-  var rosterCollection        = new userModels.RosterCollection(null, { users: userCollection, limit: 21 });
+  var rosterCollection        = new userModels.RosterCollection(null, { listen: true });
   var sortedUserCollection    = new userModels.SortedUserCollection(null, { users: userCollection});
   var eventCollection         = new eventModels.EventCollection(null,  { listen: true, snapshot: true });
 

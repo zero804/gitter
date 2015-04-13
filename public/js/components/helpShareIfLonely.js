@@ -10,7 +10,7 @@ module.exports = (function() {
   }
 
   function getUserCount(cb) {
-    var users = itemCollections.users;
+    var users = context.troupe().userCount;
     if(users.length) {
       cb(users.length);
     } else {

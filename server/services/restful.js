@@ -73,6 +73,24 @@ exports.serializeUsersForTroupe = function(troupeId, userId, options, callback) 
     .nodeify(callback);
 };
 
+exports.serializeRosterForTroupe = function(troupeId, userId, options, callback) {
+  return troupeService.findUserIdsForTroupe(troupeId)
+    .then(function (userIds) {
+      userIds = userIds.slice(0, 25);
+
+      var strategy = new restSerializer.UserIdStrategy({
+        showPresenceForTroupeId: troupeId,
+        includeRolesForTroupeId: troupeId,
+        currentUserId: userId,
+        lean: !!options.lean
+      });
+
+      return restSerializer.serializeExcludeNulls(userIds, strategy);
+    })
+    .nodeify(callback);
+};
+
+
 exports.serializeUnreadItemsForTroupe = function(troupeId, userId, callback) {
   return Q.all([
       isUserLurkingInRoom(userId, troupeId),
