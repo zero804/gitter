@@ -129,7 +129,7 @@ function populateSubTroupeCollection(options) {
         .then(arrayToSnapshot('room.chatMessages'));
 
     case "users": 
-      return restful.serializeRosterForTroupe(troupeId, userId, snapshot)
+      return restful.serializeUsersForTroupe(troupeId, userId, snapshot)
       .then(arrayToSnapshot('room.users'));
 
     case "roster": 
