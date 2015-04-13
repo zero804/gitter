@@ -222,7 +222,6 @@ onready(function () {
 
   var Router = Backbone.Router.extend({
     routes: {
-      // TODO: get rid of the pipes
       "": "hideModal",
       "share": "share",
       "people": "people",
