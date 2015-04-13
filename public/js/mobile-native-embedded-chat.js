@@ -3,7 +3,6 @@ var $ = require('jquery');
 var context = require('utils/context');
 var cordovaNav = require('components/cordova-navigate');
 var chatModels = require('collections/chat');
-var userModels = require('collections/users');
 var ChatCollectionView = require('views/chat/chatCollectionView');
 var chatInputView = require('views/chat/chatInputView');
 var unreadItemsClient = require('components/unread-items-client');
@@ -39,8 +38,6 @@ onready(function() {
   var chatCollection = new chatModels.ChatCollection(null, { listen: true });
   cacheSync.install(chatCollection);
 
-  var userCollection = new userModels.UserCollection(null, { listen: true });
-
   var chatCollectionView = new ChatCollectionView({
     el: $('#chat-container'),
     collection: chatCollection,
@@ -57,7 +54,6 @@ onready(function() {
     el: $('#chat-input'),
     collection: chatCollection,
     rollers: chatCollectionView.rollers,
-    userCollection: userCollection,
     compactView: true
   }).render();
 

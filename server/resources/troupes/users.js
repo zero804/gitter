@@ -20,6 +20,19 @@ module.exports = {
 
     restful.serializeUsersForTroupe(req.troupe.id, req.user, options)
       .then(function (data) {
+        data = data || [];
+
+        if (req.query.q) {
+          var lowerTerm = req.query.q.toLowerCase();
+
+          data = data.filter(function(user) {
+            var username = user.username.toLowerCase();
+            var displayName = (user.displayName || '').toLowerCase();
+
+            return (username.indexOf(lowerTerm) === 0 || displayName.indexOf(lowerTerm) === 0);
+          });
+        }
+
         res.send(data);
       })
       .catch(function (err) {
