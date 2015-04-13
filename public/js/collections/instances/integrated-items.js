@@ -11,23 +11,23 @@ var realtime = require('components/realtime');
 
 module.exports = (function() {
   var chatCollection          = new chatModels.ChatCollection(null, { listen: true });
-  var userCollection          = new userModels.UserCollection(null, { listen: true });
+  //var userCollection          = new userModels.UserCollection(null, { listen: true, snapshot: false });
   var rosterCollection        = new userModels.RosterCollection(null, { listen: true });
-  var sortedUserCollection    = new userModels.SortedUserCollection(null, { users: userCollection});
+  //var sortedUserCollection    = new userModels.SortedUserCollection(null, { users: userCollection});
   var eventCollection         = new eventModels.EventCollection(null,  { listen: true, snapshot: true });
 
   // update online status of user models
-  appEvents.on('userLoggedIntoTroupe', updateUserStatus);
-  appEvents.on('userLoggedOutOfTroupe', updateUserStatus);
+  //appEvents.on('userLoggedIntoTroupe', updateUserStatus);
+  //appEvents.on('userLoggedOutOfTroupe', updateUserStatus);
 
-  function updateUserStatus(data) {
-    var user = userCollection.get(data.userId);
-    if (user) {
-      // the backbone models have not always come through before the presence events,
-      // but they will come with an accurate online status so we can just ignore the presence event
-      user.set('online', (data.status === 'in') ? true : false);
-    }
-  }
+  //function updateUserStatus(data) {
+  //  var user = userCollection.get(data.userId);
+  //  if (user) {
+  //    // the backbone models have not always come through before the presence events,
+  //    // but they will come with an accurate online status so we can just ignore the presence event
+  //    user.set('online', (data.status === 'in') ? true : false);
+  //  }
+  //}
 
   // send out a change event to avatar widgets that are not necessarily connected to a model object.
   /*
@@ -48,8 +48,8 @@ module.exports = (function() {
 
   var collections = {
     chats: chatCollection,
-    users: userCollection,
-    sortedUsers: sortedUserCollection,
+    //users: userCollection,
+    //sortedUsers: sortedUserCollection,
     roster: rosterCollection,
     events: eventCollection
   };
