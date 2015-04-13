@@ -5,6 +5,7 @@ var Backbone = require('backbone');
 var context = require('utils/context');
 var ChatNliIntegratedView = require('views/app/chatNliIntegratedView');
 var itemCollections = require('collections/instances/integrated-items');
+var userModels = require('collections/users');
 var RightToolbarView = require('views/righttoolbar/rightToolbarView');
 var peopleCollectionView = require('views/people/peopleCollectionView');
 var HeaderView = require('views/app/headerView');
@@ -47,7 +48,10 @@ onready(function() {
     },
 
     people: function() {
-      appView.dialogRegion.show(new peopleCollectionView.Modal({ collection: itemCollections.sortedUsers }));
+      var userCollection = new userModels.UserCollection();
+      userCollection.fetch();
+
+      appView.dialogRegion.show(new peopleCollectionView.Modal({ collection: userCollection }));
     },
 
   });

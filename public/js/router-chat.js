@@ -237,9 +237,13 @@ onready(function () {
     },
 
     people: function() {
-      require.ensure(['views/people/peopleCollectionView'], function(require) {
+      require.ensure(['views/people/peopleCollectionView', 'collections/users'], function(require) {
         var peopleCollectionView = require('views/people/peopleCollectionView');
-        appView.dialogRegion.show(new peopleCollectionView.Modal({ collection: itemCollections.sortedUsers }));
+        var userModels = require('collections/users');
+        var userCollection = new userModels.UserCollection();
+        userCollection.fetch();
+
+        appView.dialogRegion.show(new peopleCollectionView.Modal({ collection: userCollection }));
       });
     },
 
