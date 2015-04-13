@@ -7,7 +7,6 @@ var roomService        = require('../../services/room-service');
 var emailAddressService = require('../../services/email-address-service');
 var userService        = require("../../services/user-service");
 var restSerializer     = require("../../serializers/rest-serializer");
-var appEvents          = require("../../app-events");
 var _                  = require("underscore");
 
 module.exports = {
