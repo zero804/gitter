@@ -198,27 +198,22 @@ onready(function () {
   new HeaderView({ model: context.troupe(), el: '#header' });
 
   // This may require a better home
-  //itemCollections.users.once('sync', function() {
-  //  if(context().permissions.admin) {
-  //    if (itemCollections.users.length === 1) { //itemCollections.chats.length === 0)
-
-  //      require.ensure([
-  //        'views/app/collaboratorsView',
-  //        'collections/collaborators'],
-  //        function(require) {
-  //          var CollaboratorsView = require('views/app/collaboratorsView');
-  //          var collaboratorsModels = require('collections/collaborators');
-  //          var collaborators = new collaboratorsModels.CollabCollection();
-  //          collaborators.fetch();
-  //          collaborators.once('sync', function() {
-  //            var collaboratorsView = new CollaboratorsView({ collection: collaborators });
-  //            $('#content-frame').prepend(collaboratorsView.render().el);
-  //          });
-  //      });
-
-  //    }
-  //  }
-  //});
+  if (context().permissions.admin) {
+    if (context.troupe().get('userCount') > 1) return;
+    require.ensure([
+      'views/app/collaboratorsView',
+      'collections/collaborators'],
+      function(require) {
+        var CollaboratorsView = require('views/app/collaboratorsView');
+        var collaboratorsModels = require('collections/collaborators');
+        var collaborators = new collaboratorsModels.CollabCollection();
+        collaborators.fetch();
+        collaborators.once('sync', function() {
+          var collaboratorsView = new CollaboratorsView({ collection: collaborators });
+          $('#content-frame').prepend(collaboratorsView.render().el);
+        });
+    });
+  }
 
   var Router = Backbone.Router.extend({
     routes: {
