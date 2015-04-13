@@ -1,5 +1,4 @@
 "use strict";
-var Backbone = require('backbone');
 var Marionette = require('marionette');
 var $ = require('jquery');
 var context = require('utils/context');
@@ -115,7 +114,6 @@ module.exports = (function() {
       this.rollers = options.rollers;
       this.chatCollectionView = options.chatCollectionView;
       this.composeMode = new ComposeMode();
-      this.userCollection = options.userCollection;
       this.compactView = options.compactView;
 
       this.listenTo(appEvents, 'input.append', function(text, options) {
@@ -181,9 +179,6 @@ module.exports = (function() {
       this.ui.composeToggle.tooltip({ placement: 'left' });
       this.ui.mdHelp.tooltip({ placement: 'left' });
 
-      var userCollection = this.userCollection;
-
-
       if(!isMobile()) {
         // textcomplete on mobile safari ios 8 causes the keyboard to
         // immediately hide on focus.
@@ -222,36 +217,35 @@ module.exports = (function() {
             match: /(^|\s)@(\/?[a-zA-Z0-9_\-]*)$/,
             maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
             search: function (term, callback) {
-              var lowerTerm = term.toLowerCase();
-              var loggedInUsername = context.user().get('username').toLowerCase();
+              apiClient.room.get('/users', { q: term })
+                .then(function(users) {
+                  var lowerTerm = term.toLowerCase();
+                  var loggedInUsername = context.user().get('username').toLowerCase();
 
-              var matches = userCollection && userCollection.filter(function (user) {
-                var username = user.get('username').toLowerCase();
+                  users = users.filter(function(user) {
+                    // do not include the current user in the matches
+                    return user.username !== loggedInUsername;
+                  });
 
-                if (username === loggedInUsername) return false; // do not include the current user in the matches
+                  if(context().permissions.admin && !lowerTerm || '/all'.indexOf(lowerTerm) === 0) {
+                    // This is a bit of a hack for now
+                    users.unshift({ username: '/all', displayName: 'Group' });
+                  }
 
-                var displayName = (user.get('displayName') || '').toLowerCase();
-
-                return (username.indexOf(lowerTerm) === 0 || displayName.indexOf(lowerTerm) === 0);
-              });
-
-              if(!lowerTerm || '/all'.indexOf(lowerTerm) === 0) {
-                if(context().permissions.admin) {
-                  // This is a bit of a hack for now
-                  matches.unshift(new Backbone.Model({ username: '/all', displayName: 'Group' }));
-                }
-              }
-
-              callback(matches);
+                  callback(users);
+                })
+                .fail(function() {
+                  callback([]);
+                });
             },
             template: function(user) {
               return listItemTemplate({
-                name: user.get('username'),
-                description: user.get('displayName')
+                name: user.username,
+                description: user.displayName
               });
             },
             replace: function(user) {
-                return '$1@' + user.get('username') + ' ';
+                return '$1@' + user.username + ' ';
             }
           },
           {
