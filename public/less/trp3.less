@@ -736,15 +736,19 @@ ul.trpUserDetails {
     max-width: 100%;
     padding: 2px 0;
     overflow-x: hidden;
-    font-size: 14px;
     text-overflow: ellipsis;
+    margin-left: 0;
   }
 }
 
 .trpUserDetails__icon {
-  display: inline-block;
+  float: left;
   width: 20px;
   text-align: center;
+}
+
+.trpUserDetails__text {
+  margin-left: 26px
 }
 
 .trpUserDetailActions {
@@ -758,4 +762,5 @@ ul.trpUserDetails {
   border-bottom: 1px solid #eee;
   padding: 4px 2px;
   margin-bottom: 4px;
+  margin-top: 10px;
 }
