@@ -1,7 +1,7 @@
 <div id="left-menu-profile" class="menu-header {{#if showExapandedHeader}}menu-header--expanded{{/if}}">
   <div class="menu-header__profile">
     {{ widget "avatar" model=user size='s' }}
-    <div class="menu-header__name"><p>{{ user.displayName }}</p></div>
+    <div class="menu-header__name">{{ user.displayName }}</div>
     {{#unless isMobile}}
       <div class="menu-header__state">
         {{#if menuHeaderExpanded}}
