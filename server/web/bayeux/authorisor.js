@@ -134,7 +134,7 @@ function populateSubTroupeCollection(options) {
 
     case "roster": 
       return restful.serializeRosterForTroupe(troupeId, userId, snapshot)
-      .then(arrayToSnapshot('room.roster'));
+      .then(arrayToSnapshot('room.users')); // Use the same snapshot type to track improvements
 
     case "events":
       return restful.serializeEventsForTroupe(troupeId, userId)
