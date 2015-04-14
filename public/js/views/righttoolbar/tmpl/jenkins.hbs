@@ -1,7 +1,7 @@
 <div class="build-{{build_status}}">
   <div class="activity-time">{{widget "timeago" time=sent compact=true position="left"}}</div>
 
-  <span class="gtrActivityItemText">Jenkins <a href="{{payload.build.full_url}}" target="_blank">{{payload.name}}</a> {{build_status}}</span>
+  <div class="gtrActivityItemText">Jenkins <a href="{{payload.build.full_url}}" target="_blank">{{payload.name}}</a> {{build_status}}</div>
 
   <div style="clear: both;"></div>
 </div>
