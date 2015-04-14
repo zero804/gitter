@@ -29,7 +29,7 @@ module.exports = (function() {
 
   return Marionette.CollectionView.extend({
     tagName: 'ul',
-    className: 'room-list',
+    className: 'room-list u-font-larger',
     itemView: SuggestedItemView
   });
 

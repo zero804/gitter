@@ -18,9 +18,9 @@
     <div class="menu-list" id="list-mega">
       {{!-- `#recentTroupesList` & `#OrgsList` need to be checked for JS hooks, if so replace with `js-*` --}}
       <div class='menu-list__item' id="recentTroupesList">
-        <div class="menu-list__header">All Conversations</div>
+        <h5 class="menu-list__header">All Conversations</h5>
         <div class="list-favourites  menu-list__section--fav" id="list-favs">
-          <ul class="room-list">
+          <ul class="room-list u-font-larger">
           {{!-- put filtered favourites in here --}}
             {{#each rooms.favourites}}
               <li class="room-list-item  {{#if selected}}room-list-item--current-room{{/if}}" data-id="{{ this.id }}">{{{ prerenderRoomListItem this }}}</li>
@@ -29,7 +29,7 @@
         </div>
         <div class="list-recents  menu-list__section--recent" id="list-recents">
           {{!-- put filtered recents in here. remember also that notifications will appear in here if they aren't in favourites --}}
-          <ul class="room-list">
+          <ul class="room-list u-font-larger">
             {{#each rooms.recents}}
               <li class="room-list-item {{#if selected}}room-list-item--current-room{{/if}}" data-id="{{ this.id }}">
               {{{ prerenderRoomListItem this }}}
@@ -40,8 +40,8 @@
       <div class='menu-list__item' id="left-menu-list-suggested"></div>
       <div class='menu-list__item' id="left-menu-list-orgs">
         <div class="menu-list__section--orgs" id="list">
-          <div class="menu-list__header">Your Organizations</div>
-          <ul class="room-list">{{#each orgs}}<li class="room-list-item">{{{ prerenderOrgListItem this }}}</li>{{/each}}</ul>
+          <h5 class="menu-list__header">Your Organizations</h5>
+          <ul class="room-list u-font-larger">{{#each orgs}}<li class="room-list-item">{{{ prerenderOrgListItem this }}}</li>{{/each}}</ul>
         </div>
       </div>
     </div>

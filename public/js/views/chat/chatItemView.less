@@ -15,7 +15,7 @@
 }
 
 .chat-container .chat-item:last-child {
-  padding-bottom: 8px;
+  padding-bottom: 1em;
 }
 
 .chat-item {
@@ -58,7 +58,7 @@
   /* this handles all styles for burst continuation */
   &.burstContinued {
 
-    padding-top: 8px;
+    padding-top: 0.5em;
     .chat-item__container {
       padding: 0px 30px 0px 30px;
     }
@@ -123,7 +123,7 @@
   }
 
   &:last-child {
-    &.burstStart { padding-bottom: 10px; }
+    &.burstStart { padding-bottom: 1em; }
   }
 
   @media @mid {
@@ -277,13 +277,24 @@
 }
 
 .chat-item__text {
-
   margin: 0;
   padding: 0;
   word-wrap: break-word;
   user-select: text;
   a.link {
     color: @trpLightBlue;
+  }
+
+  p {
+    margin-bottom: 0.5em;
+  }
+
+  p:first-child {
+    margin-top: 0;
+  }
+
+  p:last-child {
+    margin-bottom: 0;
   }
 
   .trpChatInput {

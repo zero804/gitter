@@ -10,13 +10,13 @@
   <div id="toolbar-top-content" class="right-toolbar__body">
     <div id="people-list">
       <div class="trpToolbarHeader" id="top-header">
-        <div class="trpToolbarHeaderItem selected" id="people-header">
+        <h5 class="trpToolbarHeaderItem selected" id="people-header">
           People
-        </div>
+        </h5>
         {{#isRepo}}
-          <div class="trpToolbarHeaderItem" id="info-header">
+          <h5 class="trpToolbarHeaderItem" id="info-header">
             Repo info
-          </div>
+          </h5>
         {{/isRepo}}
       </div>
       <div class="trpToolbarList">
@@ -26,7 +26,7 @@
           </div>
         </div>
         <div class="trpToolbarListContent" id="repo-info" style="display: none"></div>
-        <div class="trpToolbarHeader" id="activity-header">ACTIVITY</div>
+        <h5 class="trpToolbarHeader" id="activity-header">Activity</h5>
       </div>
     </div>
 
@@ -40,7 +40,7 @@
       {{/unless}}
 
       <div class="trpTroupeRelatedContentHolder" id="activity">
-        <ul class="gtrActivityList">
+        <ul class="gtrActivityList u-font-smaller">
           {{#each activityEvents}}
             <li>{{{ activityItemPrerender this }}}</li>
           {{/each}}
