@@ -100,7 +100,7 @@ module.exports = (function() {
         name: displayName
       });
 
-      ghModel.url = '/private/gh/users/' + username;
+      ghModel.url = '/api/private/gh/users/' + username;
       ghModel.fetch();
 
       options.footerView = new UserPopoverFooterView({ model: ghModel });
