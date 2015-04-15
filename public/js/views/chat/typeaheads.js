@@ -6,6 +6,7 @@ var apiClient = require('components/apiClient');
 var listItemTemplate = require('./tmpl/typeaheadListItem.hbs');
 var emojiListItemTemplate = require('./tmpl/emojiTypeaheadListItem.hbs');
 var context = require('utils/context');
+var emoji = require('utils/emoji');
 var commands = require('./commands');
 var cdn = require('utils/cdn');
 var chatCollection = require('collections/instances/integrated-items').chats;
@@ -92,7 +93,7 @@ var userMentions = {
   }
 };
 
-var emoji = {
+var emojiTypeahead = {
   match: /(^|\s):([\-+\w]*)$/,
   maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
   search: function(term, callback) {
@@ -144,4 +145,4 @@ function isNotCurrentUser(user) {
   return user.username !== currentLowercaseUsername;
 }
 
-module.exports = [ issues, userMentions, emoji, inputCommands ];
+module.exports = [ issues, userMentions, emojiTypeahead, inputCommands ];
