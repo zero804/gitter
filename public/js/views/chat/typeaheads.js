@@ -1,5 +1,6 @@
 "use strict";
 
+var _ = require('underscore');
 var isMobile = require('utils/is-mobile');
 var apiClient = require('components/apiClient');
 var listItemTemplate = require('./tmpl/typeaheadListItem.hbs');
@@ -7,9 +8,12 @@ var emojiListItemTemplate = require('./tmpl/emojiTypeaheadListItem.hbs');
 var context = require('utils/context');
 var commands = require('./commands');
 var cdn = require('utils/cdn');
+var chatCollection = require('collections/instances/integrated-items').chats;
 
 var MAX_TYPEAHEAD_SUGGESTIONS = isMobile() ? 3 : 10;
 var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];
+
+var currentLowercaseUsername = context.user().get('username').toLowerCase();
 
 var issues = {
   match: /(^|\s)(([\w-_]+\/[\w-_]+)?#(\d*))$/,
@@ -42,22 +46,32 @@ var issues = {
   }
 };
 
-var users = {
+var userMentions = {
   match: /(^|\s)@(\/?[a-zA-Z0-9_\-]*)$/,
   maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
   search: function (term, callback) {
+
+    if (term.length === 0) {
+      var users = getRecentMessageSenders();
+
+      users = users.filter(isNotCurrentUser);
+
+      if (context().permissions.admin) {
+        // make sure that '@/all' is last
+        users = users.slice(0, MAX_TYPEAHEAD_SUGGESTIONS - 1);
+        users.push({ username: '/all', displayName: 'Group' });
+      }
+
+      return callback(users);
+    }
+
     apiClient.room.get('/users', { q: term })
       .then(function(users) {
         var lowerTerm = term.toLowerCase();
-        var loggedInUsername = context.user().get('username').toLowerCase();
 
-        users = users.filter(function(user) {
-          // do not include the current user in the matches
-          return user.username !== loggedInUsername;
-        });
+        users = users.filter(isNotCurrentUser);
 
-        if(context().permissions.admin && !lowerTerm || '/all'.indexOf(lowerTerm) === 0) {
-          // This is a bit of a hack for now
+        if (context().permissions.admin && '/all'.indexOf(lowerTerm) === 0) {
           users.unshift({ username: '/all', displayName: 'Group' });
         }
 
@@ -118,4 +132,16 @@ var inputCommands = {
   }
 };
 
-module.exports = [ issues, users, emoji, inputCommands ];
+function getRecentMessageSenders() {
+  var users = chatCollection.map(function(message) {
+    return message.get('fromUser');
+  });
+
+  return _.unique(users, function(user) { return user.id }).reverse();
+}
+
+function isNotCurrentUser(user) {
+  return user.username !== currentLowercaseUsername;
+}
+
+module.exports = [ issues, userMentions, emoji, inputCommands ];
