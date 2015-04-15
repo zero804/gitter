@@ -108,7 +108,7 @@ var timer = {
   incoming: function(msg, cb) {
     var t = Date.now();
     if (msg.ext && msg.ext.snapshot) {
-      console.debug('snapshot', t-T, msg.subscription, msg.ext.snapshot);
+      if (window.T) console.debug('snapshot', msg.subscription, msg.ext.snapshot.length, t - window.T);
     }
     cb(msg);
   }
