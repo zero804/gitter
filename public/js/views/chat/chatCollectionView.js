@@ -35,7 +35,7 @@ module.exports = (function() {
   }
 
   /** @const */
-  var PAGE_SIZE = 20;
+  var PAGE_SIZE = 100;
 
   var SCROLL_ELEMENT = "#content-frame";
 
