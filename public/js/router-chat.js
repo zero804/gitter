@@ -206,8 +206,7 @@ onready(function () {
   new HeaderView({ model: context.troupe(), el: '#header' });
 
   // This may require a better home
-  if (context().permissions.admin) {
-    if (context.troupe().get('userCount') > 1) return;
+  if (context().permissions.admin && context.troupe().get('userCount') === 1) {
     require.ensure([
       'views/app/collaboratorsView',
       'collections/collaborators'],
