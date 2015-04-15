@@ -41,6 +41,7 @@ var RosterCollection = LiveCollection.extend({
 
 module.exports = {
   RosterCollection: RosterCollection, //SmartUserCollection.SortedAndLimited,
+  SortedRosterCollection: SmartUserCollection.SortedAndLimited,
   SortedUserCollection: SmartUserCollection.Sorted,
   UserCollection: UserCollection,
   UserModel: UserModel

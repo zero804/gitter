@@ -50,6 +50,12 @@ exports.install = function() {
 
         publish(url, message);
 
+        // Keeps the roster live with the user events
+        if (data.url.match(/^\/rooms\/\w+\/users$/)) {
+          var rosterUrl = '/api/v1' + data.url.replace('users', 'roster');
+          publish(rosterUrl, message);
+        }
+
         break;
       default:
         winston.error('Unknown operation', { operation: operation });
