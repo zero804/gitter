@@ -18,6 +18,7 @@ module.exports = (function() {
     this.scrollRateLimited = _.throttle(this.scrollRate.bind(this), 100, { leading: false });
     this._contentWrapper = options && options.contentWrapper;
     this.enable();
+    this.timer = null;
   }
   _.extend(NeverEndingStory.prototype, Backbone.Events, {
     scroll: function() {
@@ -62,6 +63,16 @@ module.exports = (function() {
 
     scrollRate: function() {
       var target = this._target;
+      var wrapper = this._contentWrapper;
+
+      clearTimeout(this.timer);
+      if (!wrapper.classList.contains('disable-hover')) {
+        wrapper.classList.add('disable-hover');
+      }
+
+      this.timer = setTimeout(function() {
+        wrapper.classList.remove('disable-hover');
+      }, 300);
 
       var now = Date.now();
       var scrollTop = target.scrollTop;
