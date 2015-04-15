@@ -22,7 +22,7 @@ var avatar   = require('../../utils/avatar');
 var _                 = require('underscore');
 
 /* How many chats to send back */
-var INITIAL_CHAT_COUNT = 50;
+var INITIAL_CHAT_COUNT = 250;
 var USER_COLLECTION_FOLD = 21;
 
 var stagingText, stagingLink;
