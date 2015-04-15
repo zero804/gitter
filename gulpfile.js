@@ -307,7 +307,6 @@ gulp.task('css-web', function () {
     'public/less/login.less',
     'public/less/homepage.less',
     'public/less/explore.less',
-    'public/less/not-found.less',
     'public/less/about.less',
     'public/less/router-chat.less',
     'public/less/router-app.less',
