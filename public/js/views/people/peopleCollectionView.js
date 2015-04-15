@@ -49,14 +49,14 @@ module.exports = (function() {
     },
 
     onRender: function() {
-      var userCount = context.troupe().get('userCount');
-      this.ui.showMore.hide();
-      this.$el.toggleClass('showMid', this.rosterCollection.length > 10);
+      //var userCount = context.troupe().get('userCount');
+      //this.ui.showMore.hide();
+      //this.$el.toggleClass('showMid', this.rosterCollection.length > 10);
 
-      if (userCount > 25) {
-        this.ui.showMore.show();
-        this.$el.toggleClass('showFull');
-      }
+      //if (userCount > 25) {
+      //  this.ui.showMore.show();
+      //  this.$el.toggleClass('showFull');
+      //}
     }
   });
 

@@ -14,6 +14,7 @@ var highlightPermalinkChats = require('./utils/highlight-permalink-chats');
 var apiClient = require('components/apiClient');
 var HeaderView = require('views/app/headerView');
 var frameUtils = require('./utils/frame-utils');
+var userModels = require('collections/users');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -179,19 +180,26 @@ onready(function () {
     });
   };
 
+  // FIXME This is very inneficient, it was kind of ok before because it was 
+  // using the users live collection but that is gone now
   appEvents.on('command.room.remove', function(username) {
-    var user = itemCollections.users.findWhere({username: username});
-    if (user) {
-      apiClient.room.delete("/users/" + user.id, "")
-        .then(function() {
-          itemCollections.users.remove(user);
-        })
-        .fail(function(xhr) {
-          if (xhr.status < 500) notifyRemoveError(xhr.responseJSON.error);
-          else notifyRemoveError('');
-      });
-    }
-    else notifyRemoveError('User '+ username +' was not found in this room.');
+    var userCollection = new userModels.UserCollection();
+    userCollection.fetch();
+    userCollection.once('sync', function() {
+      var user = userCollection.findWhere({username: username});
+
+      if (user) {
+        apiClient.room.delete("/users/" + user.id, "")
+          .then(function() {
+            userCollection.remove(user);
+          })
+          .fail(function(xhr) {
+            if (xhr.status < 500) notifyRemoveError(xhr.responseJSON.error);
+            else notifyRemoveError('');
+        });
+      }
+      else notifyRemoveError('User '+ username +' was not found in this room.');
+    });
   });
 
   var appView = new ChatIntegratedView({ el: 'body' });
