@@ -448,7 +448,6 @@ module.exports = (function() {
       }
     },
 
-
     onKeyUp: function() {
       this.chatResizer.resizeInput();
     },
