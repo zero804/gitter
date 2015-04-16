@@ -14,6 +14,8 @@ var currentLowercaseUsername = context.user().get('username').toLowerCase();
 function getRecentMessageSenders() {
   var users = chatCollection.map(function(message) {
     return message.get('fromUser');
+  }).filter(function(user) {
+    return !!user;
   });
 
   return _.unique(users, function(user) { return user.id }).reverse();
