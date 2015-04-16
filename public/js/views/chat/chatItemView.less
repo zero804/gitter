@@ -10,12 +10,14 @@
 @import "../repo/katex/katex";
 @import "../repo/katex/fonts";
 
+@chat-spacing: 0.444em;
+
 .trpChatContainer .isViewers:last-child .chat-item__details .chat-item__icon--read {
   visibility: visible;
 }
 
 .chat-container .chat-item:last-child {
-  padding-bottom: 1em;
+  padding-bottom: @chat-spacing*2;
 }
 
 .chat-item {
@@ -51,12 +53,12 @@
   }
 
   &.burstStart {
-    padding-bottom: 0.5em;
+    padding-bottom: @chat-spacing;
   }
 
   &.burstContinued {
 
-    padding: 0.5em 0;
+    padding: @chat-spacing 0;
     .chat-item__container {
       padding: 0px 30px 0px 30px;
     }
@@ -69,8 +71,6 @@
     .chat-item__details {
       float: left;
       margin: 0;
-      height: 19px;
-      line-height: 19px;
 
       .hover .chat-item:hover > & {
         margin-left: 2px;
@@ -121,7 +121,7 @@
   }
 
   &:last-child {
-    &.burstStart { padding-bottom: 1em; }
+    &.burstStart { padding-bottom: @chat-spacing*2; }
   }
 
   @media @mid {
@@ -284,15 +284,16 @@
   }
 
   p {
-    margin-bottom: 0.5em;
+    padding: @chat-spacing 0;
+    margin: 0;
   }
 
   p:first-child {
-    margin-top: 0;
+    padding-top: 0;
   }
 
   p:last-child {
-    margin-bottom: 0;
+    padding-bottom: 0;
   }
 
 /*  p:last-child {
