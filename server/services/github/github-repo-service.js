@@ -1,7 +1,7 @@
 "use strict";
 
 var wrap = require('./github-cache-wrapper');
-var gittercat = require('./tentacles-client');
+var tentacles = require('./tentacles-client');
 var userTokenSelector = require('./user-token-selector').full;
 
 function GitHubRepoService(user) {
@@ -15,28 +15,28 @@ function GitHubRepoService(user) {
  * @return the promise of information about a repo
  */
  GitHubRepoService.prototype.getRepo = function(repo) {
-  return gittercat.repo.get(repo, { accessToken: this.accessToken });
+  return tentacles.repo.get(repo, { accessToken: this.accessToken });
 };
 
 /**
  *
  */
 GitHubRepoService.prototype.isCollaborator = function(repo, username) {
-  return gittercat.repoCollaborator.checkForUser(repo, username, { accessToken: this.accessToken });
+  return tentacles.repoCollaborator.checkForUser(repo, username, { accessToken: this.accessToken });
 };
 
 /**
  *
  */
  GitHubRepoService.prototype.getCollaborators = function(repo) {
-  return gittercat.repoCollaborator.list(repo, { accessToken: this.accessToken });
+  return tentacles.repoCollaborator.list(repo, { accessToken: this.accessToken });
 };
 
 /**
  *
  */
 GitHubRepoService.prototype.getCommits = function(repo, options) {
-  return gittercat.repoCommit.list(repo, { firstPageOnly: options.firstPage, accessToken: this.accessToken });
+  return tentacles.repoCommit.list(repo, { firstPageOnly: options.firstPage, accessToken: this.accessToken });
 };
 
 
@@ -44,14 +44,14 @@ GitHubRepoService.prototype.getCommits = function(repo, options) {
  *  Returns repo stargazers
  */
  GitHubRepoService.prototype.getStargazers = function(repo) {
-  return gittercat.starring.listForRepo(repo, { accessToken: this.accessToken });
+  return tentacles.starring.listForRepo(repo, { accessToken: this.accessToken });
 };
 
 /**
  * Returns a promise of the issues for a repo
  */
 GitHubRepoService.prototype.getIssues = function(repo) {
-  return gittercat.issue.listForRepo(repo, { query: { state: 'all' }, accessToken: this.accessToken })
+  return tentacles.issue.listForRepo(repo, { query: { state: 'all' }, accessToken: this.accessToken })
     .then(function(returnedIssues) {
       var issues = [];
       returnedIssues.forEach(function(issue) {
@@ -63,20 +63,20 @@ GitHubRepoService.prototype.getIssues = function(repo) {
 
 
 GitHubRepoService.prototype.getRecentlyStarredRepos = function() {
-  return gittercat.starring.listForAuthUser({ firstPageOnly: true, query: { per_page: 100 }, accessToken: this.accessToken });
+  return tentacles.starring.listForAuthUser({ firstPageOnly: true, query: { per_page: 100 }, accessToken: this.accessToken });
 };
 
 GitHubRepoService.prototype.getWatchedRepos = function() {
-  return gittercat.watching.listForAuthUser({ accessToken: this.accessToken });
+  return tentacles.watching.listForAuthUser({ accessToken: this.accessToken });
 };
 
 GitHubRepoService.prototype.getAllReposForAuthUser = function() {
-  return gittercat.repo.listForAuthUser({ accessToken: this.accessToken });
+  return tentacles.repo.listForAuthUser({ accessToken: this.accessToken });
 };
 
 /** TODO: deprecated */
 GitHubRepoService.prototype.getReposForUser = function(username, options) {
-  return gittercat.repo.listForUser(username, { firstPageOnly: options && options.firstPage,  accessToken: this.accessToken });
+  return tentacles.repo.listForUser(username, { firstPageOnly: options && options.firstPage,  accessToken: this.accessToken });
 };
 
 
