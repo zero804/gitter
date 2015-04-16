@@ -10,7 +10,7 @@ describe('user-typeahead', function() {
 
   it('suggests the latest message senders, most recent first', function() {
     var typeahead = generateTypeahead({
-      chatSenders: ['1-oldest', '2', '3', '4', '5', '6', '7', '8', '9', '10-newest']
+      chatSenders: [user('1-oldest'), user('2'), user('3'), user('4'), user('5'), user('6'), user('7'), user('8'), user('9'), user('10-newest')]
     });
 
     typeahead.search('', function(results) {
@@ -21,11 +21,21 @@ describe('user-typeahead', function() {
   it('suggests @/all to the admin', function() {
     var typeahead = generateTypeahead({
       isAdmin: true,
-      chatSenders: ['1-oldest', '2', '3', '4', '5', '6', '7', '8', '9', '10-newest']
+      chatSenders: [user('1-oldest'), user('2'), user('3'), user('4'), user('5'), user('6'), user('7'), user('8'), user('9'), user('10-newest')]
     });
 
     typeahead.search('', function(results) {
       assert.deepEqual(usernames(results), ['10-newest','9','8','7','6','5','4','3','2','/all']);
+    });
+  });
+
+  it('ignores null users', function() {
+    var typeahead = generateTypeahead({
+      chatSenders: [user('tina'), user('bradley'), user('jon'), null, user('rachel')]
+    });
+
+    typeahead.search('', function(results) {
+      assert.deepEqual(usernames(results), ['rachel','jon','bradley','tina']);
     });
   });
 
@@ -36,10 +46,7 @@ function generateTypeahead(options) {
   var chats = (options.chatSenders || []).map(function(sender) {
     return {
       get: function() {
-        return {
-          id: sender,
-          username: sender
-        };
+        return sender;
       }
     };
   });
@@ -65,4 +72,12 @@ function usernames(users) {
   return users.map(function(user) {
     return user.username;
   });
+}
+
+function user(username) {
+  return {
+    id: username,
+    username: username,
+    displayName: username
+  };
 }
