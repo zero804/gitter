@@ -50,12 +50,12 @@ var EventCollection = LiveCollection.extend({
   comparator: function(e1, e2) {
     var s1 = e1.get('sent');
     var s2 = e2.get('sent');
-    if (!s1) {
-      if (!s2) return 0;
+    if (!s2) {
+      if (!s1) return 0;
       return 1; // null > value
     }
-    if (!s2) return -1;
-    return s1.valueOf() - s2.valueOf();
+    if (!s1) return -1;
+    return s2.valueOf() - s1.valueOf();
   },
   sync: SyncMixin.sync
 });
