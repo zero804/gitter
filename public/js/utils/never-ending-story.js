@@ -59,30 +59,24 @@ module.exports = (function() {
 
       var wrapper = this._contentWrapper;
 
-      clearTimeout(this.timer);
-      if (!wrapper.classList.contains('disable-hover')) {
-        wrapper.classList.add('disable-hover');
-      }
+      // Disable pointer events while scrolling
+      if (wrapper) {
+        clearTimeout(this.timer);
 
-      this.timer = setTimeout(function() {
-        wrapper.classList.remove('disable-hover');
-      }, 250);
+        if (!wrapper.classList.contains('disable-hover')) {
+          wrapper.classList.add('disable-hover');
+        }
+
+        this.timer = setTimeout(function() {
+          wrapper.classList.remove('disable-hover');
+        }, 250);
+      }
 
       this.scrollRate();
     },
 
     scrollRate: function() {
       var target = this._target;
-      var wrapper = this._contentWrapper;
-
-      clearTimeout(this.timer);
-      if (!wrapper.classList.contains('disable-hover')) {
-        wrapper.classList.add('disable-hover');
-      }
-
-      this.timer = setTimeout(function() {
-        wrapper.classList.remove('disable-hover');
-      }, 300);
 
       var now = Date.now();
       var scrollTop = target.scrollTop;
