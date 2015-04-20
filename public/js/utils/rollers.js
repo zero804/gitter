@@ -1,6 +1,7 @@
 "use strict";
 var Mutant = require('mutant');
 var RAF = require('utils/raf');
+var _ = require('underscore');
 
 module.exports = (function() {
 
@@ -38,7 +39,10 @@ module.exports = (function() {
 
     this.mutant = new Mutant(target, adjustScroll, { transitions: true, observers: { attributes: true, characterData: true  } } );
 
-    target.addEventListener('scroll', this.trackLocation.bind(this), false);
+    var _tracking = _.throttle(this.trackLocation.bind(this), 100);
+    target.addEventListener('scroll', _tracking, false);
+
+    //target.addEventListener('scroll', this.trackLocation.bind(this), false);
     window.addEventListener('resize', adjustScroll, false);
     window.addEventListener('focusin', adjustScroll, false);
     window.addEventListener('focusout', adjustScroll, false);
