@@ -254,6 +254,7 @@ function renderChat(req, res, options, next) {
           activityEvents: activityEvents,
           users: users  && users.sort(userSort),
           userCount: troupe.userCount,
+          hasHiddenMembers: troupe.userCount > 25,
           integrationsUrl: integrationsUrl,
           placeholder: 'Click here to type a chat message. Supports GitHub flavoured markdown.'
         }, troupeContext && {
