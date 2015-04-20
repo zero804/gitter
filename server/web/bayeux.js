@@ -12,10 +12,12 @@ var deflate           = require('permessage-deflate');
 var presenceService   = require('../services/presence-service');
 var shutdown          = require('shutdown');
 var zlib              = require('zlib');
-var AdviceAdjuster    = require('./bayeux/advice-adjuster');
+var adviceAdjuster    = require('./bayeux/advice-adjuster');
 var authenticatorExtension = require('./bayeux/authenticator');
 var loggingExtension = require('./bayeux/logging');
-var createDoormanExtension = require('./bayeux/doorman');
+
+/* Disabled after the outage 8 April 2015 XXX investigate further */
+// var createDoormanExtension = require('./bayeux/doorman');
 var createPingResponderExtension = require('./bayeux/ping-responder');
 var superClientExtension = require('./bayeux/super-client');
 var pushOnlyServerExtension = require('./bayeux/push-only');
@@ -25,17 +27,14 @@ var hidePrivateExtension = require('./bayeux/hide-private');
 var STATS_FREQUENCY = 0.01;
 
 function makeServer(endpoint, redisClient, redisSubscribeClient) {
-  var adviceAdjuster = new AdviceAdjuster();
-
   var server = new faye.NodeAdapter({
     mount: endpoint,
-    timeout: nconf.get('ws:fayeTimeout'),
-    ping: nconf.get('ws:fayePing'),
+    timeout: nconf.get('ws:fayeTimeout'), // Time before an inactive client is timed out
+    ping: nconf.get('ws:fayePing'),       // Time between pings from the server to the client
     engine: {
       type: fayeRedis,
       client: redisClient,
       subscriberClient: redisSubscribeClient, // Subscribe. Needs new client
-      interval: nconf.get('ws:fayeInterval'),
       includeSequence: true,
       namespace: 'fr:',
       statsDelegate: function(category, event) {
@@ -43,8 +42,6 @@ function makeServer(endpoint, redisClient, redisSubscribeClient) {
       }
     }
   });
-
-  // adviceAdjuster.monitor(server);
 
   if(nconf.get('ws:fayePerMessageDeflate')) {
     /* Add permessage-deflate extension to Faye */
@@ -55,10 +52,11 @@ function makeServer(endpoint, redisClient, redisSubscribeClient) {
   }
 
   // Attach event handlers
-  server.addExtension(adviceAdjuster.timingStartExtension());
   server.addExtension(loggingExtension);
   server.addExtension(authenticatorExtension);
-  server.addExtension(createDoormanExtension(server));
+
+  /* Disabled after the outage 8 April 2015 XXX investigate further */
+  // server.addExtension(createDoormanExtension(server));
 
   // Authorisation Extension - decides whether the user
   // is allowed to connect to the subscription channel
@@ -68,8 +66,7 @@ function makeServer(endpoint, redisClient, redisSubscribeClient) {
   server.addExtension(pushOnlyServerExtension);
   server.addExtension(createPingResponderExtension(server));
 
-  server.addExtension(adviceAdjuster.timingEndExtension());
-  server.addExtension(adviceAdjuster.adviceExtension());
+  server.addExtension(adviceAdjuster);
   server.addExtension(hidePrivateExtension);
 
 
@@ -92,9 +89,8 @@ function makeServer(endpoint, redisClient, redisSubscribeClient) {
   server.bind('disconnect', function(clientId) {
     logger.info("Client " + clientId + " disconnected");
 
-    // Warning, this event is called simulateously on
-    // all the servers that are connected to the same redis/faye
-    // connection
+    // Warning, this event may be called on a different Faye engine from
+    // where the socket is residing
     presenceService.socketDisconnected(clientId, function(err) {
       if(err && err.status !== 404) {
         logger.error("bayeux: Error while attempting disconnection of socket " + clientId + ": " + err,  { exception: err });
