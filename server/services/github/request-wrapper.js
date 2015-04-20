@@ -39,28 +39,3 @@ module.exports = requestExt({
     logRateLimit
   ]
 });
-
-/**
- * @deprecated
- */
-module.exports.fastRequest = requestExt({
-  extensions: [
-    publicTokenPool,
-    logFailingRequest,
-    httpRequestCache.extension,
-    logRateLimit
-  ]
-});
-
-/**
- * @deprecated
- */
- module.exports.firstPageOnlyRequest = requestExt({
-   extensions: [
-     publicTokenPool,
-     logFailingRequest,
-     httpRequestCache.extension,
-     requestWithRetry({ maxRetries: 3 }),
-     logRateLimit
-   ]
- });

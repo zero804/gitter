@@ -2,7 +2,7 @@
 "use strict";
 
 var wrap = require('./github-cache-wrapper');
-var gittercat = require('./tentacles-client');
+var tentacles = require('./tentacles-client');
 var userTokenSelector = require('./user-token-selector').user;
 
 function GitHubUserService(user) {
@@ -11,7 +11,7 @@ function GitHubUserService(user) {
 }
 
 GitHubUserService.prototype.getUser = function(user) {
-  return gittercat.user.get(user, { accessToken: this.accessToken });
+  return tentacles.user.get(user, { accessToken: this.accessToken });
 };
 
 module.exports = wrap(GitHubUserService, function() {

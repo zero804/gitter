@@ -1,7 +1,7 @@
 "use strict";
 
 var wrap = require('./github-cache-wrapper');
-var gittercat = require('./tentacles-client');
+var tentacles = require('./tentacles-client');
 var userTokenSelector = require('./user-token-selector').full;
 
 function GitHubContributorService(user) {
@@ -11,7 +11,7 @@ function GitHubContributorService(user) {
 
 /** Returns an array of usernames of all contributors to a repo */
 GitHubContributorService.prototype.getContributors = function(repo) {
-  return gittercat.repo.listContributors(repo, { accessToken: this.accessToken });
+  return tentacles.repo.listContributors(repo, { accessToken: this.accessToken });
 };
 
 module.exports = wrap(GitHubContributorService, function() {
