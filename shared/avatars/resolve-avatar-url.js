@@ -13,7 +13,7 @@ function hash(str) {
     f = ((f << 5) + f) + str.charCodeAt(i); /* hash * 33 + c */
   }
 
-  return (f > 0 ? f : -f) % 6; // defaults to 5 buckets;
+  return (f > 0 ? f : -f) % 3; // defaults to 4 buckets;
 }
 
 function build(spec) {
