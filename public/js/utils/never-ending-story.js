@@ -14,8 +14,7 @@ module.exports = (function() {
     this._prevScrollTime = Date.now();
     this._nearTop = false;
     this._nearBottom = false;
-    this._scrollHandler = this.scroll.bind(this);
-    this.scrollRateLimited = _.throttle(this.scrollRate.bind(this), 100, { leading: false });
+    this._scrollHandler = _.throttle(this.scroll.bind(this), 100);
     this._contentWrapper = options && options.contentWrapper;
     this.enable();
     this.timer = null;
@@ -58,11 +57,6 @@ module.exports = (function() {
         this.trigger('near.bottom.changed', nearBottom);
       }
 
-      this.scrollRateLimited();
-    },
-
-    scrollRate: function() {
-      var target = this._target;
       var wrapper = this._contentWrapper;
 
       clearTimeout(this.timer);
@@ -72,7 +66,13 @@ module.exports = (function() {
 
       this.timer = setTimeout(function() {
         wrapper.classList.remove('disable-hover');
-      }, 300);
+      }, 250);
+
+      this.scrollRate();
+    },
+
+    scrollRate: function() {
+      var target = this._target;
 
       var now = Date.now();
       var scrollTop = target.scrollTop;
