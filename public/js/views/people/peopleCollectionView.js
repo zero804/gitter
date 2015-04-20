@@ -11,52 +11,47 @@ module.exports = (function() {
 
   var PeopleCollectionView = Marionette.CollectionView.extend({
     tagName: 'ul',
+
     className: 'roster',
+
     itemView: AvatarView,
-    itemViewOptions: function() {
-      return { tagName: 'li', showStatus: true, tooltipPlacement: 'left' };
-    },
-    initialize: function() {
-      this.listenTo(this.collection, 'sort reset', this.render);
+
+    itemViewOptions: function(item) {
+      var options = {
+        tagName: 'li',
+        showStatus: true,
+        tooltipPlacement: 'left'
+      };
+
+      if(item && item.id) {
+        var prerenderedUserEl = this.$el.find('.js-model-id-' + item.id)[0];
+        if (prerenderedUserEl) {
+          options.el = prerenderedUserEl;
+        }
+      }
+
+      return options;
     }
   });
 
   var RemainingView = Marionette.ItemView.extend({
-
-    ui: {
-      showMore: '.js-show-more',
-      addMore: '.js-add-more'
-    },
-
     className: 'remaining',
 
     template: remainingTempate,
 
-    initialize: function(options) {
-      this.rosterCollection = options.rosterCollection;
-      this.listenTo(this.rosterCollection, 'add remove reset', this.render);
+    modelEvents: {
+      'change:userCount': 'render'
     },
 
     serializeData: function() {
-      var userCount = context.troupe().get('userCount');
+      var userCount = this.model.get('userCount');
       var data = {
         showAddBadge: context.isLoggedIn() && !context.inOneToOneTroupeContext(),
         userCount: userCount,
-        plural: userCount > 1
+        hasHiddenMembers: userCount > 25
       };
 
       return data;
-    },
-
-    onRender: function() {
-      //var userCount = context.troupe().get('userCount');
-      //this.ui.showMore.hide();
-      //this.$el.toggleClass('showMid', this.rosterCollection.length > 10);
-
-      //if (userCount > 25) {
-      //  this.ui.showMore.show();
-      //  this.$el.toggleClass('showFull');
-      //}
     }
   });
 
@@ -64,23 +59,26 @@ module.exports = (function() {
     template: collectionTemplate,
 
     regions: {
-      roster: "#roster",
-      remaining: "#remaining"
+      rosterRegion: "#roster-region",
+      remainingRegion: "#remaining-region"
     },
 
     initialize: function(options) {
-      this.rosterCollection = options.rosterCollection;
-      this.listenTo(this.rosterCollection, 'all', this.render);
-    },
+      var prerenderedRosterEl = this.$el.find('#roster-view')[0];
+      var rosterView = new PeopleCollectionView({
+        el: prerenderedRosterEl,
+        collection: options.rosterCollection
+      });
 
-    onRender: function() {
-      this.roster.show(new PeopleCollectionView({
-        collection: this.rosterCollection
-      }));
+      var prerenderedRemainingEl = this.$el.find('#remaining-view')[0];
+      var remainingView = new RemainingView({
+        el: prerenderedRemainingEl,
+        model: context.troupe()
+      });
 
-      this.remaining.show(new RemainingView({
-        rosterCollection: this.rosterCollection,
-      }));
+      // attach without emptying existing regions
+      this.rosterRegion.attachView(rosterView);
+      this.remainingRegion.attachView(remainingView);
     }
   });
 
