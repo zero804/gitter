@@ -1,6 +1,5 @@
 "use strict";
 /* jshint unused:strict, browser:true, strict:true */
-/* global define:false */
 var $ = require('jquery');
 var Backbone = require('backbone');
 var Marionette = require('marionette');
@@ -12,6 +11,7 @@ var Popover = require('views/popover');
 var bodyTemplate = require('./tmpl/issuePopover.hbs');
 var titleTemplate = require('./tmpl/issuePopoverTitle.hbs');
 var footerTemplate = require('./tmpl/commitPopoverFooter.hbs');
+var SyncMixin = require('collections/sync-mixin');
 
 module.exports = (function() {
 
@@ -99,7 +99,8 @@ module.exports = (function() {
     urlRoot: function() {
       var repo = this.get('repo');
       return '/private/gh/repos/' + repo + '/issues/';
-    }
+    },
+    sync: SyncMixin.sync
   });
 
   var decorator = {
