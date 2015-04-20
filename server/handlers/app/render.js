@@ -23,6 +23,7 @@ var _                 = require('underscore');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
+var ROSTER_SIZE = 25;
 
 // DEPRECATED
 //var USER_COLLECTION_FOLD = 21;
@@ -198,15 +199,20 @@ function renderChat(req, res, options, next) {
     unread: options.unread // Unread can be true, false or undefined
   };
 
-  var serializerOptions = _.defaults({
+  var chatSerializerOptions = _.defaults({
     lean: true
+  }, snapshotOptions);
+
+  var userSerializerOptions = _.defaults({
+    lean: true,
+    limit: ROSTER_SIZE
   }, snapshotOptions);
 
   Q.all([
       options.generateContext === false ? null : contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, permalinkChatId: aroundId }),
-      restful.serializeChatsForTroupe(troupe.id, userId, serializerOptions),
+      restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
       options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
-      options.fetchUsers === false ? null :restful.serializeRosterForTroupe(troupe.id, userId, serializerOptions)
+      options.fetchUsers === false ? null :restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions)
     ]).spread(function (troupeContext, chats, activityEvents, users) {
       var initialChat = _.find(chats, function(chat) { return chat.initial; });
       var initialBottom = !initialChat;

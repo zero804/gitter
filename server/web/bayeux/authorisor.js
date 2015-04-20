@@ -119,22 +119,18 @@ function populateSubUserCollection(options) {
 function populateSubTroupeCollection(options) {
   var userId = options.userId;
   var match = options.match;
-  var snapshot = options.snapshot || {}; // Details of the snapshot
+  var snapshotOptions = options.snapshot || {}; // Details of the snapshot
   var troupeId = match[1];
   var collection = match[2];
 
   switch(collection) {
     case "chatMessages":
-      return restful.serializeChatsForTroupe(troupeId, userId, snapshot)
+      return restful.serializeChatsForTroupe(troupeId, userId, snapshotOptions)
         .then(arrayToSnapshot('room.chatMessages'));
 
     case "users": 
-      return restful.serializeUsersForTroupe(troupeId, userId, snapshot)
+      return restful.serializeUsersForTroupe(troupeId, userId, snapshotOptions)
       .then(arrayToSnapshot('room.users'));
-
-    case "roster": 
-      return restful.serializeRosterForTroupe(troupeId, userId, snapshot)
-      .then(arrayToSnapshot('room.users')); // Use the same snapshot type to track improvements
 
     case "events":
       return restful.serializeEventsForTroupe(troupeId, userId)
