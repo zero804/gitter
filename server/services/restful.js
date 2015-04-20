@@ -61,22 +61,9 @@ exports.serializeUsersForTroupe = function(troupeId, userId, options, callback) 
   return troupeService.findUserIdsForTroupe(troupeId)
     .then(function (userIds) {
 
-      var strategy = new restSerializer.UserIdStrategy({
-        showPresenceForTroupeId: troupeId,
-        includeRolesForTroupeId: troupeId,
-        currentUserId: userId,
-        lean: !!options.lean
-      });
-
-      return restSerializer.serializeExcludeNulls(userIds, strategy);
-    })
-    .nodeify(callback);
-};
-
-exports.serializeRosterForTroupe = function(troupeId, userId, options, callback) {
-  return troupeService.findUserIdsForTroupe(troupeId)
-    .then(function (userIds) {
-      userIds = userIds.slice(0, 25);
+      if (options.limit) {
+        userIds = userIds.slice(0, options.limit);
+      }
 
       var strategy = new restSerializer.UserIdStrategy({
         showPresenceForTroupeId: troupeId,

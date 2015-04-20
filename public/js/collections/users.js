@@ -28,9 +28,9 @@ var UserCollection = LiveCollection.extend({
 var RosterCollection = LiveCollection.extend({
   model: UserModel,
   modelName: 'user',
-  url: apiClient.room.channelGenerator('/roster'),
+  url: apiClient.room.channelGenerator('/users'),
   getSnapshotState: function () {
-    return { lean: true };
+    return { lean: true, limit: 25 };
   },
   client: function() {
     return realtime.getClient();
