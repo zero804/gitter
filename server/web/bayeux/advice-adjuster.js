@@ -23,13 +23,11 @@ module.exports = {
           reconnect = 'handshake';
         }
 
-        if (!message.advice) {
-          message.advice = {
-            interval: config.get('ws:fayeRetry') * 1000
-          };
-        }
+        if (!message.advice) message.advice = { };
 
         message.advice.reconnect = reconnect;
+        message.advice.interval = config.get('ws:fayeRetry') * 1000;
+
       }
     }
 

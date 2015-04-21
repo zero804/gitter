@@ -27,7 +27,7 @@ module.exports = (function() {
         break;
       case 'REPO_CHANNEL':
         var repoName = troupe.get('uri').split('/')[1];
-        var repoRealm = troupe.get('security') === 'PRIVATE' ? 'Only invited users' : 'Anyone in' + repoName;
+        var repoRealm = troupe.get('security') === 'PRIVATE' ? 'Only invited users' : 'Anyone in ' + repoName;
         tooltip = repoRealm + ' can join';
         break;
       case 'ORG_CHANNEL':

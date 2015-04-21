@@ -1,7 +1,7 @@
 "use strict";
 
 var wrap = require('./github-cache-wrapper');
-var gittercat = require('./tentacles-client');
+var tentacles = require('./tentacles-client');
 var userTokenSelector = require('./user-token-selector').user;
 
 function GitHubMeService(user) {
@@ -10,11 +10,11 @@ function GitHubMeService(user) {
 }
 
 GitHubMeService.prototype.getUser = function() {
-  return gittercat.user.getAuthUser({ accessToken: this.accessToken });
+  return tentacles.user.getAuthUser({ accessToken: this.accessToken });
 };
 
 GitHubMeService.prototype.getEmail = function() {
-  return gittercat.userEmail.listForAuthUser({
+  return tentacles.userEmail.listForAuthUser({
       accessToken: this.accessToken,
       headers: { Accept: 'application/json' } // Override the default. Remove once default is back to original
     })
@@ -31,11 +31,11 @@ GitHubMeService.prototype.getEmail = function() {
 
 // TODO: evaluate with upcoming changes
 GitHubMeService.prototype.getOrgs = function() {
-  return gittercat.org.listForAuthUser({ accessToken: this.accessToken });
+  return tentacles.org.listForAuthUser({ accessToken: this.accessToken });
 };
 
 GitHubMeService.prototype.getOrgMembership = function(org) {
-  return gittercat.orgMember.getMembershipForAuthUser(org, { accessToken: this.accessToken });
+  return tentacles.orgMember.getMembershipForAuthUser(org, { accessToken: this.accessToken });
 };
 
 GitHubMeService.prototype.isOrgAdmin = function(org) {
@@ -66,7 +66,7 @@ GitHubMeService.prototype.isOrgMember = function(org) {
 
 /* TODO: this will be affected by scope issues? */
 GitHubMeService.prototype.getRepos = function() {
-  return gittercat.repo.listForAuthUser({ accessToken: this.accessToken });
+  return tentacles.repo.listForAuthUser({ accessToken: this.accessToken });
 };
 
 // module.exports = GitHubMeService;
