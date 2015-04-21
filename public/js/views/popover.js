@@ -91,8 +91,10 @@ module.exports = (function() {
 
       if(this.titleView) {
         $e.find('.popover-title').append(this.titleView.render().el);
-      } else {
+      } else if(this.title) {
         $e.find('.popover-title').text(this.title);
+      } else {
+        $e.find('.popover-title').hide();
       }
 
       $e.find('.popover-content').append(this.view.render().el);

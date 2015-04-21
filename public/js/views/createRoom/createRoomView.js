@@ -4,7 +4,6 @@ var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var troupeCollections = require('collections/instances/troupes');
 var TroupeViews = require('views/base');
-var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var ParentSelectView = require('./parentSelectView');
 var template = require('./tmpl/createRoom.hbs');
@@ -30,7 +29,6 @@ module.exports = (function() {
       roomNameInput: '#room-name',
       dropDownButton: '#dd-button',
       permissionsLabel: '#permissions-label',
-      premiumRequired: '#premium-required'
     },
 
     events: {
@@ -55,11 +53,6 @@ module.exports = (function() {
       this.bindUIElements();
     },
 
-    billingUrl: function() {
-      var userOrOrg = this.selectedModel.get('uri').split('/')[0];
-      return context.env('billingUrl') + '/bill/' + userOrOrg + '?r=' + window.location.pathname;
-    },
-
     menuItemClicked: function(button) {
       switch(button) {
         case 'create':
@@ -72,10 +65,6 @@ module.exports = (function() {
 
         case 'cancel':
           this.dialog.hide();
-          break;
-
-        case 'get-plan':
-          window.open(this.billingUrl());
           break;
       }
     },
@@ -114,11 +103,6 @@ module.exports = (function() {
 
       var permissions = self.$el.find('input[type=radio]:visible:checked').val();
       var channelName = self.ui.roomNameInput.val().trim();
-      var url;
-
-      if(self.selectedOptionsRequireUpgrade()) {
-        return;
-      }
 
       var payload = { security: permissions && permissions.toUpperCase(), name: channelName };
 
@@ -205,58 +189,8 @@ module.exports = (function() {
     },
 
     parentSelected: function(model, animated) {
-
-      if (this.selectedModel) {
-        this.stopListening(this.selectedModel, 'change:premium', this.selectedModelPremiumChanged);
-      }
-
       this.selectedModel = model;
-
-      if (this.selectedModel) {
-        this.listenTo(this.selectedModel, 'change:premium', this.selectedModelPremiumChanged);
-      }
-
       this.recalcView(animated);
-    },
-
-    selectedModelPremiumChanged: function() {
-      this.recalcView(true);
-    },
-
-    selectedOptionsRequireUpgrade: function() {
-      var userIsPremium = context.user().get('premium');
-
-      var ownerModel = this.selectedModel;
-      if(!ownerModel) return false;
-
-      var ownerIsPremium = ownerModel.get('premium');
-
-      var permissions = this.$el.find('input[type=radio]:visible:checked').val();
-      if(permissions === 'public' || !permissions) return false;
-
-      switch(ownerModel.get('type')) {
-        case 'user':
-          return !userIsPremium;
-
-        case 'repo':
-
-          if(permissions === 'inherited') {
-            if(ownerModel.get('security') === 'PUBLIC') {
-              return false; // No need to upgrade, but this would be odd.
-            }
-
-            return !ownerIsPremium;
-          }
-
-          /* private */
-          return !ownerIsPremium;
-
-        case 'org':
-          /* private or inherited */
-          return !ownerIsPremium;
-      }
-
-      return false;
     },
 
     recalcView: function (animated) {
@@ -271,7 +205,6 @@ module.exports = (function() {
         'permPrivate': false,
         'permInheritedOrg': false,
         'permInheritedRepo': false,
-        'premiumRequired': false,
         'existing': false,
         'permissionsLabel': true
       };
@@ -336,11 +269,6 @@ module.exports = (function() {
           checkForRepo = null;
         }
       }
-      showHide.premiumRequired = this.selectedOptionsRequireUpgrade();
-
-      if (showHide.premiumRequired) {
-        createButtonEnabled = !showHide.premiumRequired;
-      }
 
       if (checkForRepo) {
         createButtonEnabled = false;
@@ -393,13 +321,7 @@ module.exports = (function() {
         }
 
 
-        if (showHide.premiumRequired) {
-          self.dialog.hideActions();
-          self.dialog.showPremium();
-        } else {
-          self.dialog.showActions();
-          self.dialog.hidePremium();
-        }
+        self.dialog.showActions();
 
 
         if(animated === false) {
@@ -463,8 +385,7 @@ module.exports = (function() {
     menuItems: [
       { action: "create", text: "Create", className: "trpBtnGreen action" },
       { action: "back", text: "Back", className: "trpBtnLightGrey action" },
-      { action: "cancel", text: "Cancel", className: "trpBtnLightGrey action"},
-      { action: "get-plan", text: "Get Premium", className: "trpBtnGreen premium hidden"}
+      { action: "cancel", text: "Cancel", className: "trpBtnLightGrey action"}
     ]
   });
 

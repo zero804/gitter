@@ -268,9 +268,21 @@ onready(function () {
     },
 
     addPeople: function() {
-      require.ensure(['views/app/addPeopleView'], function(require) {
-        var AddPeopleViewModal = require('views/app/addPeopleView');
-        appView.dialogRegion.show(new AddPeopleViewModal({}));
+      require.ensure(['views/app/addPeopleView', 'views/app/upgradeToProView'], function(require) {
+        var room = context().troupe;
+        var maxFreeMembers = context.env('maxFreeOrgRoomMembers');
+        var isOverLimit = room.security !== 'PUBLIC' &&
+                          room.githubType.indexOf('ORG') >= 0 &&
+                          !room.premium &&
+                          itemCollections.users.length >= maxFreeMembers;
+
+        if (isOverLimit) {
+          var GetProViewModal = require('views/app/upgradeToProView');
+          appView.dialogRegion.show(new GetProViewModal({}));
+        } else {
+          var AddPeopleViewModal = require('views/app/addPeopleView');
+          appView.dialogRegion.show(new AddPeopleViewModal({}));
+        }
       });
 
     },

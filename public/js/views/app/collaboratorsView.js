@@ -1,105 +1,120 @@
 "use strict";
-var $ = require('jquery');
+
 var Marionette = require('backbone.marionette');
+var Backbone = require('backbone');
 var context = require('utils/context');
 var social = require('utils/social');
 var apiClient = require('components/apiClient');
 var template = require('./tmpl/collaboratorsView.hbs');
 var itemTemplate = require('./tmpl/collaboratorsItemView.hbs');
 var emptyViewTemplate = require('./tmpl/collaboratorsEmptyView.hbs');
-var inviteOutcomeTemplate = require('./tmpl/inviteOutcomeTemplate.hbs');
 var appEvents = require('utils/appevents');
 
 module.exports = (function() {
 
-
   var ItemView = Marionette.ItemView.extend({
-
-    modelEvents: {
-      "change": "render"
-    },
 
     events: {
       'submit form': 'inviteUser',
-      'click .js-add': 'addUserToRoom',
+      'click .js-add': 'addUser',
     },
-
-    tagName: 'div',
 
     className: 'welcome-modal__collaborator',
 
     template: itemTemplate,
 
-    toggleLoading: function () {
-      var model = this.model;
-      var isLoading = model.get('loading');
-      model.set('loading', !isLoading);
+    initialize: function(options) {
+      this.userModel = options.model;
+      this.stateModel = new Backbone.Model({
+        state: 'initial',
+        emailRequiredUserId: null
+      });
+
+      this.listenTo(this.userModel, 'change', this.render);
+      this.listenTo(this.stateModel, 'change', this.render);
     },
 
-    done: function (feedback, email) {
-      var m = this.model;
-      this.toggleLoading();
-      m.set('done', true);
-      m.set('name', email || m.get('login'));
-      m.set('feedback', feedback);
-    },
-
-    inviteUser: function (e) {
+    inviteUser: function() {
       var self = this;
-      e.preventDefault();
-
-      var inputEmail = self.$('input')[0];
-      var email = inputEmail.value;
 
       var data = {
-        userId: self.user.id,
-        email: email,
+        userId: this.stateModel.get('emailRequiredUserId'),
+        email: this.$el.find('.js-invite-email').val(),
         roomId: context.getTroupeId()
       };
 
-      self.toggleLoading();
+      this.stateModel.set('state', 'inviting');
 
       apiClient.priv.post('/invite-user', data)
-        .then(function(){
-          self.done('was invited.', email);
+        .then(function() {
+          self.stateModel.set('state', 'invited');
+        })
+        .fail(function() {
+          self.stateModel.set('state', 'fail');
         });
+
+      // stop the page reloading
+      return false;
     },
 
-    /**
-     * addUserToRoom() sends request and handles reponse of adding an user to a room
-     *
-     * m    BackboneModel - the user to be added to the room
-     */
-    addUserToRoom: function (e) {
+    addUser: function() {
       var self = this;
-      e.stopPropagation();
-      e.preventDefault();
 
-      var m = this.model;
+      var githubUser = this.userModel;
 
       appEvents.triggerParent('track-event', 'welcome-add-user-click');
 
-      this.toggleLoading();
-
-      apiClient.room.post('/users', { username: m.get('login') })
+      this.stateModel.set('state', 'adding');
+      apiClient.room.post('/users', { username: githubUser.get('login') })
         .then(function(res) {
           var user = res.user;
-          self.user = user;
 
           if (!user.invited) {
-            self.done('was added.');
+            self.stateModel.set('state', 'added');
           } else if (user.invited && user.email) {
-            self.done('was invited.', user.email);
+            self.stateModel.set('state', 'invited');
           } else {
-            self.toggleLoading(); // stop loading
-            m.set('unreachable', true);
+            self.stateModel.set({
+              emailRequiredUserId: user.id,
+              state: 'email_address_required'
+            });
           }
         })
         .fail(function(xhr) {
-          if (xhr.status === 409) return self.done('already in room.');
-          self.done("Unable to add user to room.", '');
+          if (xhr.status === 402) {
+            // money required, let the add modal explain it.
+            window.location.href = '#add';
+
+            // reset the state so the user can try again after paying.
+            self.stateModel.set('state', 'initial');
+          } else if (xhr.status === 409) {
+            self.stateModel.set('state', 'fail_409');
+          } else {
+            self.stateModel.set('state', 'fail');
+          }
         });
     },
+
+    serializeData: function() {
+      var state = this.stateModel.get('state');
+      var username = this.userModel.get('login');
+
+      var states = {
+        initial: { text: username, showAddButton: true },
+        adding: { text: 'Adding…' },
+        added: { text: username + ' added' },
+        invited: { text: username + ' invited' },
+        fail: { text: 'Unable to add ' + username },
+        fail_409: { text: 'Unable to add person already in room' },
+        email_address_required: { text: 'Enter ' + username + "'s email", showEmailForm: true },
+        inviting: { text: 'Inviting…' }
+      };
+
+      var data = states[state] || states.initial;
+      data.avatar_url = this.userModel.get('avatar_url');
+
+      return data;
+    }
   });
 
   var EmptyView = Marionette.ItemView.extend({

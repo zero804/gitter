@@ -69,24 +69,24 @@ describe("User Settings Service", function() {
       .nodeify(done);
   });
 
+  it('should be able to fetch keys for multiple usertroupes', function(done) {
+    var user1Id = fixture.user1.id;
+    var user2Id = fixture.user2.id;
 
-it('should be able to fetch keys for multiple usertroupes', function(done) {
-  var user1Id = fixture.user1.id;
-  var user2Id = fixture.user2.id;
+    return userSettingsService.setUserSettings(user1Id, 'test3', { bob: 1 })
+      .then(function() {
+        return userSettingsService.setUserSettings(user2Id, 'test3', { bob: 2 });
+      })
+      .then(function() {
+        return userSettingsService.getMultiUserSettings([user1Id, user2Id], 'test3');
+      })
+      .then(function(results) {
+        assert.equal(Object.keys(results).length, 2);
+        assert.equal(results[user1Id].bob, 1);
+        assert.equal(results[user2Id].bob, 2);
+      })
+      .nodeify(done);
+  });
 
-  return userSettingsService.setUserSettings(user1Id, 'test3', { bob: 1 })
-    .then(function() {
-      return userSettingsService.setUserSettings(user2Id, 'test3', { bob: 2 });
-    })
-    .then(function() {
-      return userSettingsService.getMultiUserSettings([user1Id, user2Id], 'test3');
-    })
-    .then(function(results) {
-      assert.equal(Object.keys(results).length, 2);
-      assert.equal(results[user1Id].bob, 1);
-      assert.equal(results[user2Id].bob, 2);
-    })
-    .nodeify(done);
-});
 
 });

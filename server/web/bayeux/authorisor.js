@@ -203,6 +203,9 @@ function authorizeSubscribe(message, callback) {
     var m = match.match;
 
     validator({ userId: userId, match: m, message: message, clientId: clientId })
+      .then(function(allowed) {
+        return { userId: userId, allowed: allowed };
+      })
       .nodeify(callback);
   });
 
@@ -221,15 +224,19 @@ module.exports = bayeuxExtension({
   privateState: true,
   incoming: function(message, req, callback) {
     // Do we allow this user to connect to the requested channel?
-    authorizeSubscribe(message, function(err, allowed) {
+    authorizeSubscribe(message, function(err, subscribeAuth) {
       if(err) return callback(err);
+
+      var allowed = subscribeAuth.allowed;
+      var userId = subscribeAuth.userId;
 
       if(!allowed) {
         return callback(new StatusError(403, "Authorisation denied."));
       }
 
       message._private.authorisor = {
-        snapshot: message.ext && message.ext.snapshot
+        snapshot: message.ext && message.ext.snapshot,
+        userId: userId
       };
 
       return callback(null, message);
@@ -242,6 +249,7 @@ module.exports = bayeuxExtension({
 
     var state = message._private && message._private.authorisor;
     var snapshot = state && state.snapshot;
+    var userId = state && state.userId;
 
     var match = null;
 
@@ -261,29 +269,22 @@ module.exports = bayeuxExtension({
     /* The populator is all about generating the snapshot for the client */
     if(!clientId || !populator || snapshot === false) return callback(null, message);
 
-    presenceService.lookupUserIdForSocket(clientId, function(err, userId, exists) {
-      if(err) callback(err);
+    var startTime = Date.now();
 
-      if(!exists) return callback(new StatusError(401, "Snapshot failed. Socket not associated"));
+    populator({ userId: userId, match: m, snapshot: snapshot })
+      .then(function(snapshot) {
+        if (!snapshot) return message;
 
-      var startTime = Date.now();
+        stats.responseTime('bayeux.snapshot.time', Date.now() - startTime);
+        stats.responseTime('bayeux.snapshot.time.' + snapshot.type, Date.now() - startTime);
 
-      populator({ userId: userId, match: m, snapshot: snapshot })
-        .then(function(snapshot) {
-          stats.responseTime('bayeux.snapshot.time', Date.now() - startTime);
-          stats.responseTime('bayeux.snapshot.time.' + snapshot.type, Date.now() - startTime);
+        if(!message.ext) message.ext = {};
+        message.ext.snapshot = snapshot.data;
+        message.ext.snapshot_meta = snapshot.meta;
 
-          if(snapshot) {
-            if(!message.ext) message.ext = {};
-            message.ext.snapshot = snapshot.data;
-            message.ext.snapshot_meta = snapshot.meta;
-          }
-          return message;
-        })
-        .nodeify(callback);
-
-    });
+        return message;
+      })
+      .nodeify(callback);
 
   }
 });
-

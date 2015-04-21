@@ -113,11 +113,11 @@ module.exports = (function() {
 
   return TroupeViews.Modal.extend({
       initialize: function(options) {
-        options.title = "Settings";
+        options.title = "Notification Settings";
         TroupeViews.Modal.prototype.initialize.apply(this, arguments);
         this.view = new View({ });
       }
     });
-  
+
 })();
 
