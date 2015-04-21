@@ -2,7 +2,7 @@
   <div id="room-owner-and-name" class="gtrRoomName">
     <dl class="owner" style="float: left">
       <dt>
-        <label for="owner"><strong>Owner</strong></label>
+        <label for="owner"><h5>Owner</h5></label>
       </dt>
       <dd id="owner-region">
         <div class="gtrInput gtrOwnerDD">
@@ -12,7 +12,7 @@
     <div class="gtrSlash">/</div>
      <dl class="owner" style="float: left">
       <dt>
-        <label for="room"><strong>Room name</strong></label>
+        <label for="room"><h5>Room name</h5></label>
       </dt>
       <dd>
         <input class="gtrInput room" id="room-name" autofocus/>
@@ -20,8 +20,8 @@
       </dd>
     </dl>
   </div>
-  <div id="permissions">
-    <h3>Permissions</h3>
+  <div class="permissions" id="permissions">
+    <h5>Permissions</h5>
     <div id="perm-select-public" class="permission">
       <div class='permission__input'>
         <input name="permissions" id="perm-select-public-input"  type="radio" value="public">
@@ -31,8 +31,8 @@
           <i class="octicon octicon-globe"></i>
         </div>
         <div class='permission__details'>
-          <span><strong>Public</strong></span>
-          <p>Anyone in the world can join.</p>
+          <strong>Public</strong><br>
+          <div>Anyone in the world can join.</div>
         </div>
       </label>
     </div>
@@ -46,8 +46,8 @@
           <i class="octicon octicon-organization"></i>
         </div>
         <div class='permission__details'>
-          <span><strong>Organisation</strong></span>
-          <p>Anyone in <strong id="parent-name">orgName</strong> can join. </p>
+          <strong>Organisation</strong><br>
+          Anyone in <strong id="parent-name">orgName</strong> can join.
         </div>
       </label>
     </div>
@@ -61,8 +61,8 @@
           <i class="octicon octicon-repo"></i>
         </div>
         <div class='permission__details'>
-          <span><strong>Repository</strong></span>
-          <p>Anyone in <strong id="parent-name">repoName</strong> can join. </p>
+          <strong>Repository</strong><br>
+          Anyone in <strong id="parent-name">repoName</strong> can join.
         </div>
       </label>
     </div>
@@ -76,8 +76,8 @@
           <i class="octicon octicon-lock"></i>
         </div>
         <div class='permission__details'>
-          <span><strong>Private</strong></span>
-          <p>Only people added to the room can join. </p>
+          <strong>Private</strong><br>
+          Only people added to the room can join.
         </div>
       </label>
     </div>
