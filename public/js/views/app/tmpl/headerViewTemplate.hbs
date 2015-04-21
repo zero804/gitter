@@ -16,16 +16,16 @@
 {{/if}}
 </div>
 <div class="chat-header__content">
-  <h1 class='js-chat-name' title="{{ lockTooltip }}">
+  <h2 class='js-chat-name' title="{{ lockTooltip }}">
     {{#if githubLink}}
-      <a href="{{ githubLink }}" target="_blank">{{ troupeName }}</a>
+      <a href="{{ githubLink }}" class="chat-header__title" target="_blank">{{ troupeName }}</a>
     {{else}}
       {{ troupeName }}
     {{/if}}
     {{#if isPrivate}}
-      <i class='octicon octicon-lock'></i>
+      <i class='octicon octicon-lock chat-header__permission-icon'></i>
     {{/if}}
-  </h1>
+  </h2>
   <p class="js-chat-topic">
     {{#unless oneToOne}}
       {{troupeTopic}}

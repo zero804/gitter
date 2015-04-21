@@ -92,7 +92,7 @@ module.exports = (function() {
       command: 'leave',
       description: 'Leave the room',
       completion: 'leave ',
-      regexp: /^\/leave/,
+      regexp: /^\/leave|\/part/,
       criteria: function() {
         return !context.inOneToOneTroupeContext();
       },

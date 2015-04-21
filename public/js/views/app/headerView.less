@@ -76,7 +76,6 @@ body.banner-top {
         right: 0;
         left: 0;
         width: 100%;
-        .trpBodyMedium;
         text-align: left;
         padding: 10px;
         border-radius: 0 0 4px 4px;
@@ -87,7 +86,6 @@ body.banner-top {
         top: 0;
         bottom: 0;
         right: 0;
-        .trpBodySmall;
         border-left-width: 2px;
         border-left-color: darken(@trpGreen, 5%);
         border-radius: 0 0 4px 0;
@@ -149,21 +147,15 @@ body.banner-top {
 
   .topic-input {
     width: 95%;
-    font-size: 13px;
-    line-height: 120%;
     margin-bottom: 10px;
     resize: none;
   }
 
-  h1 {
+  h2 {
     white-space: nowrap;
     text-overflow: ellipsis;
-    font-family: @fontSans;
-    font-weight: 300;
-    font-size: 22px;
     color: #333;
     display: inline;
-    line-height: 22px;
     margin-right: 10px;
     padding-right: 10px;
 
@@ -175,12 +167,11 @@ body.banner-top {
   p {
     white-space: normal;
     word-wrap: break-word;
-    font-family: @fontSans;
-    font-size: 13px;
     color: #777;
-    min-height: 1em;
-    margin: 3px 0px;
+    margin: 0 0 0 1px;
     user-select: text;
+    min-height: 27px;
+    line-height: 1.3;
 
     a {
       color: #666;
@@ -203,6 +194,11 @@ body.banner-top {
 .chat-header__content .icon-lock {
   font-size: 16px;
 }
+
+.chat-header__permission-icon, .chat-header__title {
+  vertical-align: middle;
+}
+
 
 .chat-header__buttons {
   float: right;

@@ -1,8 +1,5 @@
 <div class="modal-content">
   <form id="troupeSettings">
-    <div class="trpBodyMedium" style="margin-bottom: 6px;">
-        Notification Settings
-    </div>
 
     <select class="trpInput" style="width: 306px; height: 36px" id="notification-options">
       <option value="all">Notify me for all messages</option>
@@ -10,13 +7,13 @@
       <option value="mute">Don't notify me at all</option>
     </select>
     <br>
-    <label for="unread-checkbox" class="trpBodyMedium" style="color: black;">
+    <label for="unread-checkbox" style="color: black;">
       <input type="checkbox" id="unread-checkbox" name="lurk" value="1" style="display:inline" {{#if lurk}}checked{{/if}}/>
       Hide unread message badge
     </label>
-
     <br>
-    <div class="trpBodySmall" style="color: #999">
+    <br>
+    <div class="u-font-smaller" style="color: #999">
       Notification settings only apply to you and not to other users.
       <br>
       {{#if notificationsBlocked}}
