@@ -229,6 +229,13 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
             .catch(function(err) {
               errorReporter(err, { operation: 'unreadItemService.updateChatUnreadItems', chat: chatMessage });
             });
+
+          stats.event("edit_chat", {
+            userId: user.id,
+            troupeId: troupe.id,
+            username: user.username
+          });
+
         })
         .thenResolve(chatMessage);
     })
@@ -534,4 +541,3 @@ exports.testOnly = {
     useHints = value;
   }
 };
-

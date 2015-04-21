@@ -4,10 +4,8 @@
 var GitHubRepoService    = require('../github/github-repo-service');
 var winston              = require('../../utils/winston');
 var Q                    = require('q');
-var premiumOrThrow       = require('./premium-or-throw');
 var appEvents            = require('../../app-events');
 var userIsInRoom         = require('../user-in-room');
-var ownerIsEarlyAdopter  = require('../owner-is-early-adopter');
 
 
 function githubFailurePermissionsModel(user, right, uri, security) {
@@ -76,12 +74,7 @@ module.exports = function repoPermissionsModel(user, right, uri, security) {
         case 'view':
         case 'join':
           if(!repoInfo.private) return true;
-
-          return ownerIsEarlyAdopter(uri)
-            .then(function(isEarlyAdopter) {
-              if (isEarlyAdopter) return true;
-              return premiumOrThrow(repoInfo.owner.login);
-            });
+          return true;  
 
         case 'adduser':
           return true;
@@ -94,10 +87,10 @@ module.exports = function repoPermissionsModel(user, right, uri, security) {
           /* Private rooms. What to do... */
           switch(ownerType) {
             case 'Organization': // American spelling because GitHub
-              return premiumOrThrow(repoInfo.owner.login);
+              return true;
 
             case 'User':
-              return premiumOrThrow(repoInfo.owner.login);
+              return true;
 
             default:
               winston.error("Unknown owner type " + ownerType, { repo: repoInfo, user: user });

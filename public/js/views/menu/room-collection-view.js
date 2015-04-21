@@ -1,17 +1,54 @@
 "use strict";
 var $ = require('jquery');
+var Popover = require('views/popover');
 var context = require('utils/context');
 var resolveIconClass = require('utils/resolve-icon-class');
 var apiClient = require('components/apiClient');
 var roomNameTrimmer = require('utils/room-name-trimmer');
 var Marionette = require('backbone.marionette');
 var roomListItemTemplate = require('./tmpl/room-list-item.hbs');
+var popoverTemplate = require('./tmpl/leave-buttons.hbs');
 var appEvents = require('utils/appevents');
 var dataset = require('utils/dataset-shim');
 require('jquery-sortable');
-require('bootstrap_tooltip');
+
 
 module.exports = (function() {
+
+  var PopoverBodyView = Marionette.ItemView.extend({
+    className: 'commit-popover-body',
+    template: popoverTemplate,
+    events: {
+      'click .js-close-button': 'onItemClose',
+      'click .js-leave-button': 'onItemLeave'
+    },
+    onItemClose: function(e) {
+      e.stopPropagation(); // no navigation
+
+      // We can't use the userRoom as the room might not be the current one
+      apiClient.user.delete("/rooms/" + this.model.id)
+        .then(function() {
+          this.parentPopover.hide();
+        }.bind(this));
+    },
+    onItemLeave: function(e) {
+      e.stopPropagation(); // no navigation
+
+      // We can't use the room resource as the room might not be the current one
+      apiClient
+        .delete('/v1/rooms/' + this.model.id + '/users/' + context.getUserId())
+        .then(function () {
+          // leaving the room that you are in should take you home
+          if (this.model.get('url') === window.location.pathname) {
+            appEvents.trigger('navigation', context.getUser().url, 'home', '');
+          }
+        }.bind(this))
+        .then(function() {
+          this.parentPopover.hide();
+        }.bind(this));
+    }
+  });
+
 
   /* @const */
   var MAX_UNREAD = 99;
@@ -28,8 +65,18 @@ module.exports = (function() {
     },
     events: {
       'click': 'clicked',
-      'click .js-close-button': 'onItemClose',
-      'click .js-leave-button': 'onItemLeave'
+      'click .js-close-button': 'showPopover'
+    },
+    showPopover: function(e) {
+      e.stopPropagation(); // no navigation
+
+      var popover = new Popover({
+        view: new PopoverBodyView({model: this.model}),
+        targetElement: e.target,
+        placement: 'horizontal'
+      });
+      popover.show();
+      Popover.singleton(this, popover);
     },
     initialize: function() {
       this.updateCurrentRoom();
@@ -60,30 +107,6 @@ module.exports = (function() {
       data.iconClass = resolveIconClass(this.model);
       return data;
     },
-    onItemClose: function(e) {
-      e.stopPropagation(); // no navigation
-
-      // We can't use the userRoom as the room might not be the current one
-      apiClient.user.delete("/rooms/" + this.model.id);
-    },
-
-    onItemLeave: function(e) {
-      e.stopPropagation(); // no navigation
-
-      // We can't use the room resource as the room might not be the current one
-      apiClient
-        .delete('/v1/rooms/' + this.model.id + '/users/' + context.getUserId())
-        .then(function () {
-          // leaving the room that you are in should take you home
-          if (this.model.get('url') === window.location.pathname) {
-            appEvents.trigger('navigation', context.getUser().url, 'home', '');
-          }
-        }.bind(this))
-        .fail(function () {
-          // provide feedback to the user?
-        });
-    },
-
     onRender: function() {
       var self = this;
       this.$el.toggleClass('room-list-item--current-room', !!this.isCurrentRoom);
@@ -145,9 +168,6 @@ module.exports = (function() {
         // Not lurking
         e.removeClass('chatting chatting-now');
       }
-
-      this.$el.find('.js-close-button').tooltip({placement: 'left'});
-      this.$el.find('.js-leave-button').tooltip({placement: 'left'});
 
     },
     clearSearch: function() {

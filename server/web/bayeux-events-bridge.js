@@ -22,15 +22,13 @@ function findFailbackChannel(channel) {
 }
 
 exports.install = function() {
-  var bayeuxClient = bayeux.client;
-
   function publish(channel, message) {
-    bayeuxClient.publish(channel, message);
+    bayeux.publish(channel, message);
 
     var failbackChannel = findFailbackChannel(channel);
 
     if(failbackChannel) {
-      bayeuxClient.publish(failbackChannel, message);
+      bayeux.publish(failbackChannel, message);
     }
   }
 
@@ -69,7 +67,7 @@ exports.install = function() {
 
       socketIds.forEach(function(clientId) {
 
-        bayeux.engine.destroyClient(clientId, function() {
+        bayeux.destroyClient(clientId, function() {
           winston.info("Destroyed client " + clientId + " as user was disconnected from troupe");
         });
 
@@ -250,4 +248,3 @@ exports.install = function() {
 
   });
 };
-

@@ -7,6 +7,7 @@ var template = require('./tmpl/userPopoverView.hbs');
 var footerTemplate = require('./tmpl/userPopoverFooterView.hbs');
 var appEvents = require('utils/appevents');
 var context = require('utils/context');
+var SyncMixin = require('collections/sync-mixin');
 
 module.exports = (function() {
 
@@ -99,7 +100,7 @@ module.exports = (function() {
         login: username,
         name: displayName
       });
-
+      ghModel.sync = SyncMixin.sync; // XXX This is less than ideal
       ghModel.url = '/private/gh/users/' + username;
       ghModel.fetch();
 
@@ -113,4 +114,3 @@ module.exports = (function() {
   return UserPopoverView;
 
 })();
-

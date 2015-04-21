@@ -72,6 +72,11 @@ describe('room-service #slow', function() {
       githubType: 'REPO',
       users: ['userBan', 'userBanAdmin']
     },
+    troupeBulkLurk: {
+      security: 'PUBLIC',
+      githubType: 'REPO',
+      users: ['user1', 'user2', 'user3']
+    },
     userBan: { },
     userBanAdmin: {},
     troupeCanRemove: {
@@ -94,6 +99,25 @@ describe('room-service #slow', function() {
   });
 
   describe('classic functionality #slow', function() {
+    it('should allow users to be lurked in bulk', function (done) {
+
+      var roomService = testRequire('./services/room-service');
+      return roomService.bulkLurkUsers(fixture.troupeBulkLurk.id, [fixture.user1.id, fixture.user2.id])
+        .then(function() {
+          return persistence.Troupe.findByIdQ(fixture.troupeBulkLurk.id)
+            .then(function(troupe) {
+              var lurkForUsers = troupe.users.reduce(function(memo, troupeUser) {
+                memo[troupeUser.userId] = troupeUser.lurk;
+                return memo;
+              }, {});
+
+              assert(lurkForUsers[fixture.user1.id]);
+              assert(lurkForUsers[fixture.user2.id]);
+              assert(!lurkForUsers[fixture.user3.id]);
+            });
+        })
+        .nodeify(done);
+    });
 
     it('should fail to create a room for an org', function (done) {
       var permissionsModelMock = mockito.mockFunction();
@@ -380,6 +404,7 @@ describe('room-service #slow', function() {
       });
 
       var troupe = {
+        uri: 'user/room',
         containsUserId: function() { return false; },
         addUserById: function(id) {
           assert.equal(id, 'test-user-id');
@@ -402,6 +427,7 @@ describe('room-service #slow', function() {
       });
 
       var troupe = {
+        uri: 'user/room',
         containsUserId: function() { return false; },
         addUserById: function() {},
         saveQ: function() {
@@ -422,6 +448,7 @@ describe('room-service #slow', function() {
       });
 
       var troupe = {
+        uri: 'user/room',
         containsUserId: function() { return false; },
         addUserById: function() {},
         saveQ: function() {
@@ -453,6 +480,7 @@ describe('room-service #slow', function() {
       });
 
       var troupe = {
+        uri: 'user/room',
         containsUserId: function() { return false; },
         addUserById: function() {},
         saveQ: function() {
@@ -473,6 +501,7 @@ describe('room-service #slow', function() {
       });
 
       var troupe = {
+        uri: 'user/room',
         containsUserId: function() { return false; },
         addUserById: function() {},
         saveQ: function() {}
@@ -493,6 +522,7 @@ describe('room-service #slow', function() {
       });
 
       var troupe = {
+        uri: 'user/room',
         containsUserId: function() { return true; },
         addUserById: function() {},
         saveQ: function() {}
@@ -513,6 +543,7 @@ describe('room-service #slow', function() {
       });
 
       var troupe = {
+        uri: 'user/room',
         containsUserId: function() { return true; },
         addUserById: function() {},
         saveQ: function() {}
@@ -1057,7 +1088,7 @@ describe('room-service #slow', function() {
         .then(function(banned) {
           assert(!banned);
 
-          return roomService.banUserFromRoom(fixture.troupeBan, fixture.userBan.username, fixture.userBanAdmin)
+          return roomService.banUserFromRoom(fixture.troupeBan, fixture.userBan.username, fixture.userBanAdmin, {})
             .then(function(ban) {
               assert.equal(ban.userId, fixture.userBan.id);
               assert.equal(ban.bannedBy, fixture.userBanAdmin.id);
@@ -1104,7 +1135,7 @@ describe('room-service #slow', function() {
       });
 
 
-      return roomService.banUserFromRoom(fixture.troupeBan, fixture.userBan.username, fixture.userBanAdmin)
+      return roomService.banUserFromRoom(fixture.troupeBan, fixture.userBan.username, fixture.userBanAdmin, {})
         .then(function() {
           assert(false, 'Expected to fail as user is not an admin');
         })

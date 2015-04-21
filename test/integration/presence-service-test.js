@@ -2,12 +2,8 @@
 
 var testRequire     = require('./test-require');
 var assert          = require('assert');
-var Q               = require("q");
-
 var presenceService = testRequire('./services/presence-service');
 var redis           = testRequire("./utils/redis");
-var winston         = testRequire("./utils/winston");
-var Fiber           = testRequire("./utils/fiber");
 
 var fakeEngine = {
   clientExists: function(clientId, callback) { callback(!clientId.match(/^TEST/)); }

@@ -34,6 +34,8 @@ var mongoUtils         = require('../utils/mongo-utils');
 var badger             = require('./badger-service');
 var userSettingsService = require('./user-settings-service');
 var roomSearchService  = require('./room-search-service');
+var assertMemberLimit  = require('./assert-member-limit');
+var qlimit             = require('qlimit');
 
 var badgerEnabled      = nconf.get('autoPullRequest:enabled');
 
@@ -159,7 +161,7 @@ function makeRoomTypeCreationFilterFunction(creationFilter) {
  * Assuming that oneToOne uris have been handled already,
  * Figure out what this troupe is for
  *
- * @returns Promise of a troupe if the user is able to join/create the troupe
+ * @returns Promise of [troupe, hasJoinPermission] if the user is able to join/create the troupe
  */
 function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
   if(!options) options = {};
@@ -168,11 +170,13 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
 
   if(troupe) {
     logger.verbose('Does user ' + (user && user.username || '~anon~') + ' have access to ' + uri + '?');
-
-    return Q.all([
-        troupe,
-        roomPermissionsModel(user, 'join', troupe)
-      ]);
+    return assertMemberLimit(troupe, user)
+      .then(function() {
+        return Q.all([
+          troupe,
+          roomPermissionsModel(user, 'join', troupe)
+        ]);
+      });
   }
 
   var lcUri = uri.toLowerCase();
@@ -224,83 +228,84 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
 
           /* This will load a cached copy */
           return securityPromise.then(function(security) {
-              var nonce = Math.floor(Math.random() * 100000);
 
-              return persistence.Troupe.findOneAndUpdateQ(
-                { lcUri: lcUri, githubType: githubType },
-                {
-                  $setOnInsert: {
-                    lcUri: lcUri,
-                    lcOwner: lcUri.split('/')[0],
-                    uri: officialUri,
-                    _nonce: nonce,
-                    githubType: githubType,
-                    topic: topic || "",
-                    security: security,
-                    dateLastSecurityCheck: new Date(),
-                    users:  user ? [{
-                      _id: new ObjectID(),
-                      userId: user._id
-                    }] : [],
-                    userCount: user ? 1 : 0
-                  }
-                },
-                {
-                  upsert: true
-                })
-                .then(function(troupe) {
-                  var hookCreationFailedDueToMissingScope;
+            var nonce = Math.floor(Math.random() * 100000);
 
-                  if(nonce == troupe._nonce) {
-                    serializeCreateEvent(troupe);
+            return persistence.Troupe.findOneAndUpdateQ(
+              { lcUri: lcUri, githubType: githubType },
+              {
+                $setOnInsert: {
+                  lcUri: lcUri,
+                  lcOwner: lcUri.split('/')[0],
+                  uri: officialUri,
+                  _nonce: nonce,
+                  githubType: githubType,
+                  topic: topic || "",
+                  security: security,
+                  dateLastSecurityCheck: new Date(),
+                  users:  user ? [{
+                    _id: new ObjectID(),
+                    userId: user._id
+                  }] : [],
+                  userCount: user ? 1 : 0
+                }
+              },
+              {
+                upsert: true
+              })
+              .then(function(troupe) {
+                var hookCreationFailedDueToMissingScope;
 
-                    /* Created here */
-                    var requiredScope = "public_repo";
-                    /* TODO: Later we'll need to handle private repos too */
-                    var hasScope = user.hasGitHubScope(requiredScope);
+                if(nonce == troupe._nonce) {
+                  serializeCreateEvent(troupe);
 
-                    if(hasScope) {
-                      logger.verbose('Upgrading requirements');
+                  /* Created here */
+                  var requiredScope = "public_repo";
+                  /* TODO: Later we'll need to handle private repos too */
+                  var hasScope = user.hasGitHubScope(requiredScope);
 
-                      if(githubType === 'REPO') {
-                        /* Do this asynchronously */
-                        applyAutoHooksForRepoRoom(user, troupe)
-                          .catch(function(err) {
-                            logger.error("Unable to apply hooks for new room", { exception: err });
-                          });
-                      }
+                  if(hasScope) {
+                    logger.verbose('Upgrading requirements');
 
-                    } else {
-                      if(githubType === 'REPO') {
-                        logger.verbose('Skipping hook creation. User does not have permissions');
-                        hookCreationFailedDueToMissingScope = true;
-                      }
+                    if(githubType === 'REPO') {
+                      /* Do this asynchronously */
+                      applyAutoHooksForRepoRoom(user, troupe)
+                        .catch(function(err) {
+                          logger.error("Unable to apply hooks for new room", { exception: err });
+                        });
                     }
 
-                    if(githubType === 'REPO' && security === 'PUBLIC') {
-                      if(badgerEnabled && options.addBadge) {
-                        /* Do this asynchronously (don't chain the promise) */
-                        userSettingsService.getUserSettings(user.id, 'badger_optout')
-                          .then(function(badgerOptOut) {
-                            // If the user has opted out never send the pull request
-                            if(badgerOptOut) return;
-
-                            // Badgers Go!
-                            return badger.sendBadgePullRequest(uri, user);
-                          })
-                          .catch(function(err) {
-                            errorReporter(err, { uri: uri, user: user.username });
-                            logger.error('Unable to send pull request for new room', { exception: err });
-                          });
-                      }
+                  } else {
+                    if(githubType === 'REPO') {
+                      logger.verbose('Skipping hook creation. User does not have permissions');
+                      hookCreationFailedDueToMissingScope = true;
                     }
                   }
 
-                  return [troupe, true, hookCreationFailedDueToMissingScope, true];
-                });
+                  if(githubType === 'REPO' && security === 'PUBLIC') {
+                    if(badgerEnabled && options.addBadge) {
+                      /* Do this asynchronously (don't chain the promise) */
+                      userSettingsService.getUserSettings(user.id, 'badger_optout')
+                        .then(function(badgerOptOut) {
+                          // If the user has opted out never send the pull request
+                          if(badgerOptOut) return;
 
-            });
-        });
+                          // Badgers Go!
+                          return badger.sendBadgePullRequest(uri, user);
+                        })
+                        .catch(function(err) {
+                          errorReporter(err, { uri: uri, user: user.username });
+                          logger.error('Unable to send pull request for new room', { exception: err });
+                        });
+                    }
+                  }
+                }
+
+                return [troupe, true, hookCreationFailedDueToMissingScope, true];
+              });
+
+          });
+      });
     });
 }
 
@@ -776,14 +781,18 @@ function addUserToRoom(room, instigatingUser, usernameToAdd) {
   ]).spread(function (canInvite, canJoin) {
       if (!canInvite) throw new StatusError(403, 'You do not have permission to add people to this room.');
       if (!canJoin)   throw new StatusError(403, usernameToAdd + ' does not have permission to join this room.');
+
       return userService.findByUsername(usernameToAdd);
     })
     .then(function (existingUser) {
       if (existingUser && room.containsUserId(existingUser.id)) throw new StatusError(409, usernameToAdd + ' is already in this room.');
 
-      var isNewUser = !existingUser;
+      return assertMemberLimit(room, existingUser)
+        .then(function() {
+          var isNewUser = !existingUser;
 
-      return [existingUser || userService.createInvitedUser(usernameToAdd, instigatingUser, room._id), isNewUser];
+          return [existingUser || userService.createInvitedUser(usernameToAdd, instigatingUser, room._id), isNewUser];
+        });
     })
     .spread(function (invitedUser, isNewUser) {
       room.addUserById(invitedUser.id);
@@ -934,7 +943,7 @@ function canBanInRoom(room) {
   return true;
 }
 
-function banUserFromRoom(room, username, requestingUser, callback) {
+function banUserFromRoom(room, username, requestingUser, options, callback) {
   if(!room) return Q.reject(new StatusError(400, 'Room required')).nodeify(callback);
   if(!username) return Q.reject(new StatusError(400, 'Username required')).nodeify(callback);
   if(!requestingUser) return Q.reject(new StatusError(401, 'Not authenticated')).nodeify(callback);
@@ -969,9 +978,21 @@ function banUserFromRoom(room, username, requestingUser, callback) {
 
             return room.saveQ()
               .then(function() {
+                if (options && options.removeMessages) {
+                  return persistence.ChatMessage.findQ({ toTroupeId: room.id, fromUserId: user.id })
+                    .then(function(messages) {
+                      console.log(messages);
+                      return Q.all(messages.map(function(message) {
+                        return message.removeQ();
+                      }));
+                    });
+
+                }
+              })
+              .then(function() {
                 return eventService.newEventToTroupe(
                   room, requestingUser,
-                  "User @" + requestingUser.username + " banned @" + username + " from this room",
+                  "@" + requestingUser.username + " banned @" + username,
                   {
                     service: 'bans',
                     event: 'banned',
@@ -979,6 +1000,7 @@ function banUserFromRoom(room, username, requestingUser, callback) {
                     prerendered: true,
                     performingUser: requestingUser.username
                   }, {}, function(err) {
+
                   if(err) logger.error("Unable to create an event in troupe: " + err, { exception: err });
                 });
               })
@@ -1054,6 +1076,45 @@ function updateTroupeLurkForUserId(userId, troupeId, lurk) {
   });
 }
 exports.updateTroupeLurkForUserId = updateTroupeLurkForUserId;
+
+var bulkUnreadItemLimit = qlimit(5);
+
+function bulkLurkUsers(troupeId, userIds) {
+  var userHash = userIds.reduce(function(memo, userId) {
+    memo[userId] = true;
+    return memo;
+  }, {});
+
+  return persistence.Troupe.findByIdQ(troupeId)
+    .then(function(troupe) {
+      troupe.users.forEach(function(troupeUser) {
+        if (userHash[troupeUser.userId]) {
+          troupeUser.lurk = true;
+        }
+      });
+      troupe._skipTroupeMiddleware = true; // Don't send out an update
+      return troupe.saveQ();
+    })
+    .then(function() {
+      return Q.all(userIds.map(bulkUnreadItemLimit(function(userId) {
+        return unreadItemService.ensureAllItemsRead(userId, troupeId);
+      })));
+    });
+
+    // Odd, user not found
+    // if(!count) return;
+
+    // Don't send updates for now
+    //appEvents.userTroupeLurkModeChange({ userId: userId, troupeId: troupeId, lurk: lurk });
+    // TODO: in future get rid of this but this collection is used by the native clients
+    //appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lurk: lurk });
+
+    // Delete all the chats in Redis for this person too
+}
+exports.bulkLurkUsers = bulkLurkUsers;
+
+
+
 
 function searchRooms(userId, queryText, options) {
 

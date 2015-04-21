@@ -7,7 +7,6 @@
 
 .trpButton {
   color: @trpDarkGrey;
-  .trpBodySmall;
   padding: 5px 10px 5px 10px;
   display: inline-block;
   border-radius:0px;
@@ -16,12 +15,15 @@
   border-radius: 3px;
 }
 
+.trpButton:hover {
+  text-decoration: none;
+}
+
 .trpButtonMedium {
   border-radius:2px;
   padding: 11px 12px;
   text-align: center;
   min-width: 76px;
-  .trpBodySmall;
   text-decoration: none;
   border: none;
   display: inline-block;
@@ -38,12 +40,12 @@
   padding: 5px 9px;
   text-align: center;
   min-width: 65px;
-  .trpBodyTiny;
   text-decoration: none;
   border: none;
   display: inline-block;
   vertical-align: top;
   cursor: pointer;
+  font-size: 14px;
 }
 
 .trpButtonBig {
@@ -51,7 +53,6 @@
   padding: 20px 12px;
   text-align: center;
   min-width: 120px;
-  .trpBodyMedium;
   text-decoration: none;
   border: none;
   display: inline-block;
@@ -61,7 +62,6 @@
 .trpButtonHuge {
   // .trpButtonBig;
   padding: 30px 60px 20px 60px;
-  .trpH2;
   border-radius: 4px;
 }
 
@@ -193,7 +193,6 @@
   display: inline-block;
   background-color: @trpDarkCream;
   text-align: center;
-  .trpBodySmall;
   color: white;
   position: relative;
   min-height: 32px;
