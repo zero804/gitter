@@ -1,6 +1,7 @@
 @import 'colors';
 @import 'buttons';
 @import 'pills';
+@import 'typography';
 
 // if you change this, make sure to change the image url "s" param.
 // it has to be double to support retina displays.
@@ -20,26 +21,14 @@ body {
 }
 
 * {
-  font-family: proxima-nova-alt, "Proxima Nova Alt", sans-serif;
   smoothing: antialiased;
   font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5 {
-  margin: 0;
-  font-weight: 400;
-}
-
 p {
-  font-weight: 300;
-
   &:last-child {
     margin-bottom: 0;
   }
-}
-
-p, ul {
-  margin: 0.625em;
 }
 
 a {
