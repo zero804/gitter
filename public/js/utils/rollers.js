@@ -197,9 +197,9 @@ module.exports = (function() {
 
       if(scrollTop < 0) scrollTop = 0;
 
-      RAF(function () {
+      //RAF(function () {
         target.scrollTop = scrollTop;
-      });
+      //});
 
       this.stable(element);
     },

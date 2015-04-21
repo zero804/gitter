@@ -60,3 +60,4 @@ test/redis-lua/luacov.stats.out
 luacov.report.out
 sentinel.dev.conf
 numbers.csv
+newrelic_agent.log

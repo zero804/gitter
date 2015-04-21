@@ -15,14 +15,15 @@ var userSort           = require('../../../public/js/utils/user-sort');
 var roomSort           = require('../../../public/js/utils/room-sort');
 var roomNameTrimmer    = require('../../../public/js/utils/room-name-trimmer');
 var isolateBurst       = require('../../../shared/burst/isolate-burst-array');
+var unreadItemService  = require('../../services/unread-item-service');
 var mongoUtils         = require('../../utils/mongo-utils');
-var url                =  require('url');
+var url                = require('url');
 
 var avatar   = require('../../utils/avatar');
 var _                 = require('underscore');
 
 /* How many chats to send back */
-var INITIAL_CHAT_COUNT = 250;
+var INITIAL_CHAT_COUNT = 50;
 var USER_COLLECTION_FOLD = 21;
 
 var stagingText, stagingLink;
@@ -190,22 +191,29 @@ function renderChat(req, res, options, next) {
   var user = req.user;
   var userId = user && user.id;
 
-  var snapshotOptions = {
-    limit: options.limit || INITIAL_CHAT_COUNT,
-    aroundId: aroundId,
-    unread: options.unread // Unread can be true, false or undefined
-  };
+  // It's ok if there's no user (logged out), unreadItems will be 0
+  return unreadItemService.getUnreadItemsForUser(userId, troupe.id)
+  .then(function(unreadItems) {
+    var limit = unreadItems.chat.length > INITIAL_CHAT_COUNT ? unreadItems.chat.length + 20 : INITIAL_CHAT_COUNT;
 
-  var serializerOptions = _.defaults({
-    lean: true
-  }, snapshotOptions);
+    var snapshotOptions = {
+      limit: limit, //options.limit || INITIAL_CHAT_COUNT,
+      aroundId: aroundId,
+      unread: options.unread // Unread can be true, false or undefined
+    };
 
-  Q.all([
-      options.generateContext === false ? null : contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, permalinkChatId: aroundId }),
-      restful.serializeChatsForTroupe(troupe.id, userId, serializerOptions),
-      options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
-      options.fetchUsers === false ? null :restful.serializeUsersForTroupe(troupe.id, userId, serializerOptions)
-    ]).spread(function (troupeContext, chats, activityEvents, users) {
+    var serializerOptions = _.defaults({
+      lean: true,
+    }, snapshotOptions);
+
+    return Q.all([
+        options.generateContext === false ? null : contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, permalinkChatId: aroundId }),
+        restful.serializeChatsForTroupe(troupe.id, userId, serializerOptions),
+        options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
+        options.fetchUsers === false ? null :restful.serializeUsersForTroupe(troupe.id, userId, serializerOptions)
+      ]);
+  })
+  .spread(function (troupeContext, chats, activityEvents, users) {
       var initialChat = _.find(chats, function(chat) { return chat.initial; });
       var initialBottom = !initialChat;
       var githubLink;

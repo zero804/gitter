@@ -56,6 +56,7 @@
     "mongoose": "^3.8.24",
     "mongoose-number": "git://github.com/gitterHQ/mongoose-number#74e1653b3fd33427cca93fb325d0b289cbce08c4",
     "mongoose-q": "0.0.13",
+    "newrelic": "^1.18.3",
     "node-gcm": "^0.9.12",
     "node-resque": "^0.8.3",
     "node-statsd": "0.0.7",
