@@ -15,4 +15,5 @@ module.exports = function(hbs) {
   hbs.registerHelper('widget', require('./widget-prerenderers').widget);
   hbs.registerHelper('prerenderRoomListItem', require('./prerender-room-item-helper'));
   hbs.registerHelper('prerenderOrgListItem', require('./prerender-org-item-helper'));
+  hbs.registerHelper('newrelic', require('./newrelic-helper'));
 };
