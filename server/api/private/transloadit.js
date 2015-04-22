@@ -38,7 +38,7 @@ module.exports = function (req, res, next) {
 
     var transloadit;
     try {
-      transloadit = req.body.transloadit || {};
+      transloadit = req.body.transloadit;
 
       if (typeof transloadit === 'string') {
         transloadit = JSON.parse(req.body.transloadit);
@@ -47,7 +47,7 @@ module.exports = function (req, res, next) {
       return next(new Error('Transloadit json parse error: ' + e.message));
     }
 
-    if (transloadit.ok !== 'ASSEMBLY_COMPLETED') {
+    if (!transloadit || transloadit.ok !== 'ASSEMBLY_COMPLETED') {
       return next(new Error('Transload did not return ASSEMBLY_COMPLETED.'));
     }
 
