@@ -5,7 +5,7 @@ var appEvents   = require('../app-events');
 var roomService = require('../services/room-service');
 
 exports.install = function() {
-  appEvents.localOnly.onRepoPermissionsChangeDetected(function(data) {
+  appEvents.onRepoPermissionsChangeDetected(function(data) {
     var uri = data.uri;
     var isPrivate = data.isPrivate;
 
