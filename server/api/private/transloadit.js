@@ -38,7 +38,7 @@ module.exports = function (req, res, next) {
 
     var transloadit;
     try {
-      transloadit = req.body.transloadit;
+      transloadit = req.body.transloadit || {};
 
       if (typeof transloadit === 'string') {
         transloadit = JSON.parse(req.body.transloadit);
