@@ -201,6 +201,10 @@ var userService = {
     return mongooseUtils.findByIds(persistence.User, ids, callback);
   },
 
+  findByIdsLean: function(ids, select) {
+    return mongooseUtils.findByIdsLean(persistence.User, ids, select);
+  },
+
   findByUsernames: function(usernames, callback) {
     if(!usernames || !usernames.length) return Q.resolve([]).nodeify(callback);
 
