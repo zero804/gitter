@@ -214,7 +214,7 @@ function indexTroupesByUserIdTroupeId(troupes, userId) {
  * Candidate for redis caching potentially?
  */
 function findUserIdsForTroupe(troupeId, callback) {
-  return persistence.Troupe.findByIdQ(troupeId, 'users')
+  return persistence.Troupe.findByIdQ(troupeId, 'users.userId', { lean: true })
     .then(function(troupe) {
       return troupe.users.map(function(m) { return m.userId; });
     })
