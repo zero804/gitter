@@ -892,7 +892,7 @@
     },
     "gitter-env": {
       "version": "0.20.9",
-      "resolved": "https://registry.npmjs.org/gitter-env/-/gitter-env-0.20.9.tgz",
+      "resolved": "http://beta-internal:4873/gitter-env/-/gitter-env-0.20.9.tgz",
       "dependencies": {
         "async": {
           "version": "0.8.0",
