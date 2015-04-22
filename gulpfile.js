@@ -159,6 +159,7 @@ gulp.task('copy-app-files', function() {
       'websockets.js',
       'package.json',
       'npm-shrinkwrap.json',
+      'newrelic.js',
       'config/**',
       'public/templates/**',
       'public/layouts/**',
