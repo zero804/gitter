@@ -44,7 +44,7 @@ module.exports = {
       return callback(users);
     }
 
-    apiClient.room.get('/users', { q: term })
+    apiClient.room.get('/users', { q: term, limit: MAX_TYPEAHEAD_SUGGESTIONS })
       .then(function(users) {
         var lowerTerm = term.toLowerCase();
 

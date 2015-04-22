@@ -15,24 +15,13 @@ module.exports = {
   index: function(req, res, next) {
 
     var options = {
-      lean: !!req.query.lean
+      lean: !!req.query.lean,
+      limit: req.query.limit,
+      searchTerm: req.query.q
     };
 
-    restful.serializeUsersForTroupe(req.troupe.id, req.user, options)
+    restful.serializeUsersForTroupe(req.troupe.id, req.user.id, options)
       .then(function (data) {
-        data = data || [];
-
-        if (req.query.q) {
-          var lowerTerm = req.query.q.toLowerCase();
-
-          data = data.filter(function(user) {
-            var username = user.username.toLowerCase();
-            var displayName = (user.displayName || '').toLowerCase();
-
-            return (username.indexOf(lowerTerm) === 0 || displayName.indexOf(lowerTerm) === 0);
-          });
-        }
-
         res.send(data);
       })
       .catch(function (err) {
