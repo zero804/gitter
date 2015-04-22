@@ -32,6 +32,10 @@ function findByIds(ids, callback) {
   return mongooseUtils.findByIds(persistence.Troupe, ids, callback);
 }
 
+function findByIdsLean(ids, select) {
+  return mongooseUtils.findByIdsLean(persistence.Troupe, ids, select);
+}
+
 function findById(id, callback) {
   assert(mongoUtils.isLikeObjectId(id));
 
@@ -580,6 +584,7 @@ module.exports = {
   findByUri: findByUri,
   findById: findById,
   findByIds: findByIds,
+  findByIdsLean: findByIdsLean,
   findAllTroupesForUser: findAllTroupesForUser,
   findAllTroupesIdsForUser: findAllTroupesIdsForUser,
   validateTroupeEmail: validateTroupeEmail,
