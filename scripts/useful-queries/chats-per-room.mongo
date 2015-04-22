@@ -1,6 +1,6 @@
 rs.slaveOk();
 
-var start = new Date('2014-11-01T00:00:00Z');
+var start = new Date('2014-09-01T00:00:00Z');
 
 var a = db.chatmessages.aggregate([
   { $match: { sent: { $gt: start } } },
