@@ -73,7 +73,7 @@ function sanitiseUserSearchTerm(term) {
   // remove non username chars
   return term.replace(/[^0-9a-z\-]/ig, '')
     // escape dashes
-    .replace(/\-/ig, '\\-')
+    .replace(/\-/ig, '\\-');
 }
 
 var userService = {
