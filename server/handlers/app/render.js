@@ -18,9 +18,6 @@ var isolateBurst       = require('../../../shared/burst/isolate-burst-array');
 var mongoUtils         = require('../../utils/mongo-utils');
 var url                =  require('url');
 
-if (nconf.get('newrelic:enabled')) var newrelic = require('newrelic');
-
-
 var avatar   = require('../../utils/avatar');
 var _                 = require('underscore');
 
