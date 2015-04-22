@@ -60,3 +60,5 @@ test/redis-lua/luacov.stats.out
 luacov.report.out
 sentinel.dev.conf
 numbers.csv
+config/config.beta.user-overrides.json
+config/config.prod.user-overrides.json
