@@ -1,7 +1,7 @@
 "use strict";
 
 var wrap = require('./github-cache-wrapper');
-var gittercat = require('./tentacles-client');
+var tentacles = require('./tentacles-client');
 var userTokenSelector = require('./user-token-selector').user;
 
 var Search = function(user) {
@@ -10,7 +10,7 @@ var Search = function(user) {
 };
 
 Search.prototype.findUsers = function(searchString, callback) {
-  return gittercat.search.users(searchString + ' type:user', {
+  return tentacles.search.users(searchString + ' type:user', {
       accessToken: this.accessToken,
       firstPageOnly: true,
       noRetry: true

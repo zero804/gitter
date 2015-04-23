@@ -2,7 +2,6 @@
 var $ = require('jquery');
 var _ = require('underscore');
 var Marionette = require('marionette');
-var TroupeViews = require('./base');
 var Mutant = require('mutant');
 var popoverTemplate = require('./tmpl/popover.hbs');
 
@@ -165,6 +164,10 @@ module.exports = (function() {
         var $e = this.$el;
         var e = this.el;
         var pos = this.getTargetPosition();
+        if (pos.top === 0 && pos.left === 0 && pos.height === 0 && pos.width === 0) {
+          /* Do not reposition */
+          return;
+        }
 
         var actualWidth = e.offsetWidth;
         var actualHeight = e.offsetHeight;
@@ -225,7 +228,7 @@ module.exports = (function() {
       return 'bottom';
     },
 
-    selectBestHorizontalPlacement: function(div, target) {
+    selectBestHorizontalPlacement: function(div, target) { // jshint unused:true
       // var $target = $(target);
 
       var bounds = target.getBoundingClientRect();
@@ -369,4 +372,3 @@ module.exports = (function() {
   return Popover;
 
 })();
-

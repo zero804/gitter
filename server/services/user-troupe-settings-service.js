@@ -3,6 +3,7 @@
 
 var persistence = require('./persistence-service');
 var mongoUtils = require('../utils/mongo-utils');
+var onMongoConnect = require('../utils/on-mongo-connect');
 var assert = require('assert');
 var Q = require('q');
 
@@ -103,6 +104,29 @@ exports.setUserSettings = function(userId, troupeId, settingsKey, settings) {
       });
 
   return d.promise;
+};
+
+exports.setUserSettingsForUsersInTroupe = function(troupeId, userIds, settingsKey, settings) {
+  if (!userIds.length) return Q.resolve();
+
+  return onMongoConnect()
+    .then(function() {
+      var bulk = persistence.UserTroupeSettings.collection.initializeUnorderedBulkOp();
+
+      var setOperation = { $set: { } };
+      setOperation.$set['settings.' + settingsKey] = settings;
+
+      troupeId = mongoUtils.asObjectID(troupeId);
+
+      userIds.forEach(function(userId) {
+        userId = mongoUtils.asObjectID(userId);
+        bulk.find({ userId: userId, troupeId: troupeId }).upsert().updateOne(setOperation);
+      });
+
+      var d = Q.defer();
+      bulk.execute(d.makeNodeResolver());
+      return d.promise;
+    });
 };
 
 

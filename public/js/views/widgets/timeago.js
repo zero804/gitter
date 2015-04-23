@@ -1,6 +1,6 @@
 "use strict";
 var Marionette = require('marionette');
-var moment = require('utils/momentWrapper');
+var moment = require('moment');
 var context = require('utils/context');
 var locale = require('utils/locale');
 var widgets = require('views/behaviors/widgets');
@@ -77,4 +77,3 @@ module.exports = (function() {
 
 
 })();
-

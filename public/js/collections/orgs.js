@@ -1,23 +1,25 @@
 "use strict";
+
 var apiClient = require('components/apiClient');
-var TroupeCollections = require('./base');
+var Backbone = require('backbone');
+var LiveCollection = require('gitter-realtime-client').LiveCollection;
+var realtime = require('components/realtime');
+var SyncMixin = require('./sync-mixin');
 
-module.exports = (function() {
+var OrgModel = Backbone.Model.extend({
+  idAttribute: 'name' // Unusual...
+});
 
+var OrgCollection = LiveCollection.extend({
+  model: OrgModel,
+  url: apiClient.user.channelGenerator('/orgs'),
+  client: function() {
+    return realtime.getClient();
+  },
+  sync: SyncMixin.sync
+});
 
-  var OrgModel = TroupeCollections.Model.extend({
-    idAttribute: 'name' // Unusual...
-  });
-
-  var OrgCollection = TroupeCollections.LiveCollection.extend({
-    model: OrgModel,
-    url: apiClient.user.channelGenerator('/orgs')
-  });
-
-  return {
-    OrgCollection:    OrgCollection,
-    OrgModel:         OrgModel
-  };
-
-})();
-
+module.exports = {
+  OrgCollection:    OrgCollection,
+  OrgModel:         OrgModel
+};

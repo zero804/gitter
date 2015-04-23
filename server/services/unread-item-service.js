@@ -110,6 +110,7 @@ function ensureAllItemsRead(userId, troupeId) {
 
     });
 }
+exports.ensureAllItemsRead = ensureAllItemsRead;
 
 /**
  * Returns a hash of hash {user:troupe:ids} of users who have
@@ -428,48 +429,115 @@ function createChatUnreadItems(fromUserId, troupe, chat) {
 }
 exports.createChatUnreadItems = createChatUnreadItems;
 
-function updateChatUnreadItems(fromUserId, troupe, chat, originalMentions) {
-  var troupeId = troupe.id;
-
+function toString(f) {
+  if (!f) return '';
+  return '' + f;
+}
+/**
+ * Given a set of original mentions and a chat message, returns
+ * { addNotify: [userIds], addMentions: [userIds], remove: [userIds], addNewRoom: [userIds] }
+ * Which consist of users no longer mentioned in a message and
+ * new users who are now mentioned in the message, who were not
+ * previously.
+ */
+function generateMentionDeltaSet(parsedChat, originalMentions) {
   var originalMentionUserIds = originalMentions
     .map(function(mention) {
-      if(mention.userIds.length) return mention.userIds;
+      if(mention.userIds && mention.userIds.length) return mention.userIds;
       return mention.userId;
     })
     .filter(function(m) {
       return !!m;
-    });
+    })
+    .map(toString);    // Make sure that everything is a string, because underscore
+
 
   /* Arg. Underscore. We need lazy evaluation! */
   originalMentionUserIds = _.flatten(originalMentionUserIds);
   originalMentionUserIds = _.uniq(originalMentionUserIds);
 
-  return parseChat(fromUserId, troupe, chat.mentions)
-    .then(function(parsed) {
-      /* No mentions in the original message? Skip the removal */
-      if(!originalMentionUserIds.length) return parsed;
+  var mentionUserIds = parsedChat.mentionUserIds.map(toString);
 
-      var removeUserIds = _.union(parsed.notifyUserIds, originalMentionUserIds);
-      return engine.removeItem(troupeId, chat.id, removeUserIds)
-        .then(function(results) {
 
-          results.forEach(function(result) {
-            if(result.unreadCount >= 0 || result.mentionCount >= 0) {
-              // Notify the user
-              appEvents.troupeUnreadCountsChange({
-                userId: result.userId,
-                troupeId: troupeId,
-                total: result.unreadCount,
-                mentions: result.mentionCount
-              });
-            }
+  var addMentions = _.without.apply(null, [mentionUserIds].concat(originalMentionUserIds));
+  var removeMentions = _.without.apply(null, [originalMentionUserIds].concat(mentionUserIds));
+
+  // List of users who should get unread items, who were previously mentioned by no longer are
+  var forNotifyWithRemoveMentions = _.intersection(parsedChat.notifyUserIds.map(toString), removeMentions);
+
+  // Everyone who was added via a mention, plus everyone who was no longer mentioned but is not lurking
+  var addNotify = forNotifyWithRemoveMentions.concat(addMentions);
+
+  // Users who are newly mentioned but not currently in the room
+  var addNewRoom = _.intersection(addMentions, parsedChat.notifyNewRoomUserIds.map(toString));
+
+  return { addNotify: addNotify, addMentions: addMentions, addNewRoom: addNewRoom, remove: removeMentions };
+}
+
+function addUnreadItemsForUpdatedChat(troupeId, chatId, addNotifyUserIds, addMentionUserIds, addMentionsInNewRoom) {
+  return engine.newItemWithMentions(troupeId, chatId, addNotifyUserIds, addMentionUserIds)
+    .then(function(results) {
+
+      // Firstly, notify all the notifyNewRoomUserIds with room creation messages
+      addMentionsInNewRoom.forEach(function(userId) {
+        appEvents.userMentionedInNonMemberRoom({ troupeId: troupeId, userId: userId });
+      });
+
+      // Next, notify all the users with unread count changes
+      addNotifyUserIds.forEach(function(userId) {
+        var unreadCount = results[userId] && results[userId].unreadCount;
+        var mentionCount = results[userId] && results[userId].mentionCount;
+
+        // Not lurking, send them the full update
+        appEvents.newUnreadItem(userId, troupeId, { chat: [chatId] });
+
+        if(unreadCount >= 0 || mentionCount >= 0) {
+          // Notify the user
+          appEvents.troupeUnreadCountsChange({
+            userId: userId,
+            troupeId: troupeId,
+            total: unreadCount,
+            mentions: mentionCount
           });
+        }
+      });
 
-          return parsed;
-        });
+    });
+
+}
+
+function removeMentionsForUpdatedChat(troupeId, chatId, removeUserIds) {
+  return engine.removeItem(troupeId, chatId, removeUserIds)
+    .then(function(results) {
+      results.forEach(function(result) {
+        if(result.unreadCount >= 0 || result.mentionCount >= 0) {
+          // Notify the user
+          appEvents.troupeUnreadCountsChange({
+            userId: result.userId,
+            troupeId: troupeId,
+            total: result.unreadCount,
+            mentions: result.mentionCount
+          });
+        }
+      });
+    });
+}
+
+/**
+ * Updates the mentions for an edited message
+ */
+function updateChatUnreadItems(fromUserId, troupe, chat, originalMentions) {
+  var troupeId = troupe.id;
+  return parseChat(fromUserId, troupe, chat.mentions)
+    .then(function(parsedChat) {
+      var delta = generateMentionDeltaSet(parsedChat, originalMentions);
+
+      // Remove first
+      return [delta, delta.remove.length && removeMentionsForUpdatedChat(troupeId, chat.id, delta.remove)];
     })
-    .then(function(parsed) {
-      return createNewItemsForParsedChat(troupeId, chat.id, parsed);
+    .spread(function(delta) {
+      // Add second
+      return delta.addNotify.length && addUnreadItemsForUpdatedChat(troupeId, chat.id, delta.addNotify, delta.addMentions, delta.addNewRoom);
     });
 }
 exports.updateChatUnreadItems = updateChatUnreadItems;
@@ -479,5 +547,6 @@ exports.testOnly = {
   sinceFilter: sinceFilter,
   removeItem: removeItem,
   getTroupeIdsCausingBadgeCount: getTroupeIdsCausingBadgeCount,
-  parseChat: parseChat
+  parseChat: parseChat,
+  generateMentionDeltaSet: generateMentionDeltaSet
 };

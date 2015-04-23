@@ -5,43 +5,39 @@ var apiClient = require('components/apiClient');
 var cocktail = require('cocktail');
 var context = require('utils/context');
 var InfiniteCollectionMixin = require('./infinite-mixin');
+var SyncMixin = require('./sync-mixin');
 
-module.exports = (function() {
+var ChatSearchCollection = Backbone.Collection.extend({
+  model: chatModels.ChatModel,
 
+  modelName: 'chat',
+  url: apiClient.room.channelGenerator('/chatMessages'),
+  queryText: '',
 
-  var ChatSearchCollection = Backbone.Collection.extend({
-    model: chatModels.ChatModel,
+  getQuery: function() {
+    return { q: this.queryText, lang: context.lang() };
+  },
 
-    modelName: 'chat',
-    url: apiClient.room.channelGenerator('/chatMessages'),
-    queryText: '',
+  parse: function(collection) {
+    // Why?
+    collection.forEach(function(chat) {
+      chat.burstFinal = true;
+      chat.burstStart = true;
+    });
 
-    getQuery: function() {
-      return { q: this.queryText, lang: context.lang() };
-    },
+    return collection;
+  },
 
-    parse: function(collection) {
-      // Why?
-      collection.forEach(function(chat) {
-        chat.burstFinal = true;
-        chat.burstStart = true;
-      });
+  fetchSearch: function(queryText, callback, context) {
+    this.queryText = queryText;
+    this.atBottom = false; // TODO: make this nicer
+    this.fetchLatest({ }, callback, context);
+  },
+  sync: SyncMixin.sync
+});
 
-      return collection;
-    },
+cocktail.mixin(ChatSearchCollection, InfiniteCollectionMixin);
 
-    fetchSearch: function(queryText, callback, context) {
-      this.queryText = queryText;
-      this.atBottom = false; // TODO: make this nicer
-      this.fetchLatest({ }, callback, context);
-    }
-  });
-
-  cocktail.mixin(ChatSearchCollection, InfiniteCollectionMixin);
-
-  return {
-    ChatSearchCollection: ChatSearchCollection
-  };
-
-})();
-
+module.exports = {
+  ChatSearchCollection: ChatSearchCollection
+};
