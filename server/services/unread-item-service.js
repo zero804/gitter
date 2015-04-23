@@ -49,12 +49,11 @@ function reject(msg) {
  * @return {promise} promise of nothing
  */
 function removeItem(troupeId, itemId) {
-  if(!troupeId) return reject("newitem failed. Troupe cannot be null");
-  if(!itemId) return reject("newitem failed. itemId cannot be null");
+  if(!troupeId) return reject("removeItem failed. Troupe cannot be null");
+  if(!itemId) return reject("removeItem failed. itemId cannot be null");
 
   return troupeService.findUserIdsForTroupeWithLurk(troupeId)
-    .then(function(troupe) {
-      var userIdsWithLurk = troupe.users;
+    .then(function(userIdsWithLurk) {
       var userIds = Object.keys(userIdsWithLurk);
 
       // Publish out an unread item removed event
@@ -264,13 +263,8 @@ function getTroupeIdsCausingBadgeCount(userId) {
   return engine.getRoomsCausingBadgeCount(userId);
 }
 
-function parseMentions(fromUserId, troupe, mentions) {
+function parseMentions(fromUserId, troupe, userIdsWithLurk, mentions) {
   var creatorUserId = fromUserId && "" + fromUserId;
-
-  var usersHash = troupe.users.reduce(function(memo, troupeUser) {
-    memo[troupeUser.userId] = 1;
-    return memo;
-  }, {});
 
   var uniqueUserIds = {};
   mentions.forEach(function(mention) {
@@ -295,7 +289,7 @@ function parseMentions(fromUserId, troupe, mentions) {
     /* Don't be mentioning yourself yo */
     if(userId == creatorUserId) return;
 
-    if(usersHash[userId]) {
+    if(userIdsWithLurk.hasOwnProperty(userId)) {
       memberUserIds.push(userId);
       return;
     }
@@ -338,50 +332,54 @@ function parseMentions(fromUserId, troupe, mentions) {
 }
 
 function parseChat(fromUserId, troupe, mentions) {
-  var creatorUserId = fromUserId && "" + fromUserId;
 
-  var nonActive = [];
-  var active = [];
+  return troupeService.findUserIdsForTroupeWithLurk(troupe._id)
+    .then(function(userIdsWithLurk) {
+      var creatorUserId = fromUserId && "" + fromUserId;
 
-  troupe.users.forEach(function(troupeUser) {
-    var userId = troupeUser.userId;
+      var nonActive = [];
+      var active = [];
 
-    if (creatorUserId && ("" + userId) === creatorUserId) return;
+      Object.keys(userIdsWithLurk).forEach(function(userId) {
+        if (creatorUserId && userId === creatorUserId) return;
 
-    if (troupeUser.lurk) {
-      nonActive.push(userId);
-    } else {
-      active.push(userId);
-    }
+        var lurk = userIdsWithLurk[userId];
 
-  });
-
-  if(!mentions || !mentions.length) {
-    return Q.resolve({
-      notifyUserIds: active,
-      mentionUserIds: [],
-      activityOnlyUserIds: nonActive,
-      notifyNewRoomUserIds: []
-    });
-  }
-
-  /* Add the mentions into the mix */
-  return parseMentions(fromUserId, troupe, mentions)
-    .then(function(parsedMentions) {
-      var notifyUserIdsHash = {};
-      active.forEach(function(userId) { notifyUserIdsHash[userId] = 1; });
-      parsedMentions.mentionUserIds.forEach(function(userId) { notifyUserIdsHash[userId] = 1; });
-
-      var nonActiveLessMentions = nonActive.filter(function(userId) {
-        return !notifyUserIdsHash[userId];
+        if (lurk) {
+          nonActive.push(userId);
+        } else {
+          active.push(userId);
+        }
       });
 
-      return {
-        notifyUserIds: Object.keys(notifyUserIdsHash),
-        mentionUserIds: parsedMentions.mentionUserIds,
-        activityOnlyUserIds: nonActiveLessMentions,
-        notifyNewRoomUserIds: parsedMentions.nonMemberUserIds
-      };
+      if(!mentions || !mentions.length) {
+        return Q.resolve({
+          notifyUserIds: active,
+          mentionUserIds: [],
+          activityOnlyUserIds: nonActive,
+          notifyNewRoomUserIds: []
+        });
+      }
+
+      /* Add the mentions into the mix */
+      return parseMentions(fromUserId, troupe, userIdsWithLurk, mentions)
+        .then(function(parsedMentions) {
+          var notifyUserIdsHash = {};
+          active.forEach(function(userId) { notifyUserIdsHash[userId] = 1; });
+          parsedMentions.mentionUserIds.forEach(function(userId) { notifyUserIdsHash[userId] = 1; });
+
+          var nonActiveLessMentions = nonActive.filter(function(userId) {
+            return !notifyUserIdsHash[userId];
+          });
+
+          return {
+            notifyUserIds: Object.keys(notifyUserIdsHash),
+            mentionUserIds: parsedMentions.mentionUserIds,
+            activityOnlyUserIds: nonActiveLessMentions,
+            notifyNewRoomUserIds: parsedMentions.nonMemberUserIds
+          };
+        });
+
     });
 }
 
