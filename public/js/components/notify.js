@@ -18,7 +18,7 @@ module.exports = (function() {
         // style
         n.show();
         n.css({ position: 'relative', left: -1 * n.outerWidth() });
-        n.animate({ left: 250 });
+        n.animate({ left: 260 });
       }
       // restart hide timeout
       n.data('notification-hide-timeout').restart();

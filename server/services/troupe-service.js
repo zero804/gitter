@@ -32,6 +32,10 @@ function findByIds(ids, callback) {
   return mongooseUtils.findByIds(persistence.Troupe, ids, callback);
 }
 
+function findByIdsLean(ids, select) {
+  return mongooseUtils.findByIdsLean(persistence.Troupe, ids, select);
+}
+
 function findById(id, callback) {
   assert(mongoUtils.isLikeObjectId(id));
 
@@ -210,7 +214,7 @@ function indexTroupesByUserIdTroupeId(troupes, userId) {
  * Candidate for redis caching potentially?
  */
 function findUserIdsForTroupe(troupeId, callback) {
-  return persistence.Troupe.findByIdQ(troupeId, 'users')
+  return persistence.Troupe.findByIdQ(troupeId, 'users.userId', { lean: true })
     .then(function(troupe) {
       return troupe.users.map(function(m) { return m.userId; });
     })
@@ -580,6 +584,7 @@ module.exports = {
   findByUri: findByUri,
   findById: findById,
   findByIds: findByIds,
+  findByIdsLean: findByIdsLean,
   findAllTroupesForUser: findAllTroupesForUser,
   findAllTroupesIdsForUser: findAllTroupesIdsForUser,
   validateTroupeEmail: validateTroupeEmail,

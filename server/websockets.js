@@ -1,6 +1,8 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+require('./utils/diagnostics');
+
 var express    = require('express');
 var nconf      = require('./utils/config');
 var winston    = require('./utils/winston');
@@ -12,7 +14,6 @@ var shutdown      = require('shutdown');
 var serverStats   = require('./utils/server-stats');
 var onMongoConnect = require('./utils/on-mongo-connect');
 
-require('./utils/diagnostics');
 
 winston.info("Starting http/ws service");
 
