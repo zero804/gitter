@@ -36,7 +36,7 @@ var iframelyProviders = ["youtube.com",
   "dribbble.com",
   "vimeo.com",
   "www.flickr.com",
-  // "www.twitch.tv", disable this until autoplay can be disabled
+  "www.twitch.tv", 
   "flic.kr",
   "500px.com" /*,
   /https?:\/\/www.google\.\w{2,3}(\.\w{2,3})?\/maps/ */
