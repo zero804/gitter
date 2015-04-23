@@ -1,15 +1,10 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var recentRoomService  = require('../../services/recent-room-service');
 var roomService        = require('../../services/room-service');
-var troupeService      = require("../../services/troupe-service");
 var userService        = require("../../services/user-service");
 var restSerializer     = require("../../serializers/rest-serializer");
-var appEvents          = require("../../app-events");
 var _                  = require("underscore");
-var Q                  = require("q");
-
 
 function serialize(bans, callback) {
   var strategy = new restSerializer.TroupeBanStrategy({ });
