@@ -5,15 +5,15 @@ var mongoose = require('mongoose');
 var Q = require('q');
 
 module.exports = function onMongoConnect(callback) {
-  var d;
+  var promise;
 
   if(mongoose.connection.readyState === 1) {
-    setImmediate(callback);
-    d = Q.resolve();
+    promise = Q.resolve();
   } else {
-    d = Q.defer();
+    var d = Q.defer();
+    promise = d.promise;
     mongoose.connection.once('open', d.makeNodeResolver());
   }
 
-  return d.promise.nodeify(callback);
+  return promise.nodeify(callback);
 };

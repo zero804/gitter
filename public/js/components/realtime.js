@@ -1,223 +1,96 @@
 "use strict";
 
-var _ = require('underscore');
 var context = require('utils/context');
-var Faye = require('gitter-faye');
 var appEvents = require('utils/appevents');
 var log = require('utils/log');
 var logout = require('utils/logout');
+var RealtimeClient = require('gitter-realtime-client').RealtimeClient;
 
-module.exports = (function() {
+function isMobile() {
+  return navigator.userAgent.indexOf('Mobile/') >= 0;
+}
 
-  /* @const */
-  var FAYE_PREFIX = '/api';
+var eyeballState = true;
 
-  Faye.logger = {};
-  var logLevels = ['fatal', 'error', 'warn', 'info', 'debug'];
-  logLevels.forEach(function(level) {
-    var llevel = level == 'fatal' ? 'error' : level;
-    Faye.logger[level] = function(msg) { log[llevel]('faye: ' + msg.substring(0, 100)); };
+appEvents.on('eyeballStateChange', function (state) {
+  log.info('rt: Switching eyeball state to ', state);
+  eyeballState = state;
+});
+
+function authProvider(callback) {
+  context.getAccessToken(function (accessToken) {
+    var mobile = isMobile();
+
+    return callback({
+      token: accessToken,
+      version: context.env('version'),
+      troupeId: context.getTroupeId(),
+      connType: mobile ? 'mobile' : 'online',
+      client: mobile ? 'mobweb' : 'web',
+      eyeballs: eyeballState ? 1 : 0
+    });
+
   });
+}
 
-  var clientId = null;
+var updateTimers;
+var handshakeExtension = {
+  incoming: function (message, callback) {
+    if (message.channel !== '/meta/handshake') return callback(message);
 
-  function isMobile() {
-    return navigator.userAgent.indexOf('Mobile/') >= 0;
-  }
-
-  var eyeballState = true;
-
-  appEvents.on('eyeballStateChange', function(state) {
-    log.info('rt: Switching eyeball state to ', state);
-    eyeballState = state;
-  });
-
-  var ErrorLogger = function() {};
-  ErrorLogger.prototype.incoming = function(message, callback) {
-    if(message.error) {
-      log.error('rt: Bayeux error', message);
-    }
-
-    callback(message);
-  };
-
-  var ClientAuth = function() {};
-  ClientAuth.prototype.outgoing = function(message, callback) {
-    if(message.channel !== '/meta/handshake') return callback(message);
-
-    clientId = null;
-    log.info("rt: Rehandshaking realtime connection");
-
-    context.getAccessToken(function(accessToken) {
-      if(!message.ext) message.ext = {};
-        var ext = message.ext;
-        var mobile = isMobile();
-
-        ext.token      = accessToken;
-        ext.version    = context.env('version');
-        ext.troupeId   = context.getTroupeId();
-        ext.connType   = mobile ? 'mobile' : 'online';
-        ext.client     = mobile ? 'mobweb' : 'web';
-        ext.eyeballs   = eyeballState ? 1 : 0;
-
-        callback(message);
-     });
-  };
-
-  var updateTimers;
-
-  ClientAuth.prototype.incoming = function(message, callback) {
-    if(message.channel !== '/meta/handshake') return callback(message);
-
-    if(message.successful) {
+    if (message.successful) {
       var ext = message.ext;
-      if(ext) {
-        if(ext.appVersion && ext.appVersion !== context.env('version')) {
+      if (ext) {
+        if (ext.appVersion && ext.appVersion !== context.env('version')) {
 
           log.info('rt: Application version mismatch');
-          if(!updateTimers) {
+          if (!updateTimers) {
             // Give the servers time to complete the upgrade
-            updateTimers = [setTimeout(function() {
+            updateTimers = [setTimeout(function () {
               /* 10 minutes */
               appEvents.trigger('app.version.mismatch');
               appEvents.trigger('stats.event', 'reload.warning.10m');
-            }, 10 * 60000), setTimeout(function() {
+            }, 10 * 60000), setTimeout(function () {
               /* 1 hour */
               appEvents.trigger('app.version.mismatch');
               appEvents.trigger('stats.event', 'reload.warning.1hr');
-            }, 60 * 60000), setTimeout(function() {
+            }, 60 * 60000), setTimeout(function () {
               /* 6 hours */
               appEvents.trigger('stats.event', 'reload.forced');
-              setTimeout(function() {
+              setTimeout(function () {
                 window.location.reload(true);
               }, 30000); // Give the stat time to send
 
             }, 360 * 60000)];
           }
 
-        } else if(updateTimers) {
-          updateTimers.forEach(function(t) {
+        } else if (updateTimers) {
+          updateTimers.forEach(function (t) {
             clearTimeout(t);
           });
           updateTimers = null;
         }
 
-        if(ext.context) {
+        if (ext.context) {
           var c = ext.context;
-          if(c.troupe) context.setTroupe(c.troupe);
-          if(c.user) context.setUser(c.user);
+          if (c.troupe) context.setTroupe(c.troupe);
+          if (c.user) context.setUser(c.user);
         }
-      }
-
-      // New clientId?
-      if(clientId !== message.clientId) {
-        clientId = message.clientId;
-        log.info("rt: Realtime reestablished. New id is " + clientId);
-        appEvents.trigger('realtime:newConnectionEstablished');
-      }
-
-      // Clear any transport problem indicators
-      transportUp();
-    }
-
-    callback(message);
-  };
-
-  var SnapshotExtension = function() {
-    this._listeners = {};
-    this._stateProvider = {};
-  };
-
-  var subscribeOptions = {};
-  var subscribeTimers = {};
-  SnapshotExtension.prototype.outgoing = function(message, callback) {
-    if(message.channel == '/meta/subscribe') {
-      subscribeTimers[message.subscription] = Date.now();           // Record start time
-
-      if(!message.ext) { message.ext = {}; }
-
-      message.ext.eyeballs = eyeballState ? 1 : 0;
-
-      var stateProvider = this._stateProvider[message.subscription];
-      if(stateProvider) {
-        var snapshotState = stateProvider();
-        if(snapshotState) {
-          if(!message.ext) message.ext = {};
-          message.ext.snapshot = snapshotState;
-        }
-      }
-
-      // These are temporary options to overlay
-      var options = subscribeOptions[message.subscription];
-      if(options) {
-        message.ext = _.extend(message.ext, options);
-        delete subscribeOptions[message.channel];
-      }
-
-
-    }
-
-    callback(message);
-  };
-
-  SnapshotExtension.prototype.incoming = function(message, callback) {
-    if(message.channel == '/meta/subscribe' && message.ext && message.ext.snapshot) {
-
-      // Add some statistics into the mix
-      var startTime = subscribeTimers[message.subscription];
-      if(startTime) {
-        delete subscribeTimers[message.subscription];
-        var totalTime = Date.now() - startTime;
-
-        if(totalTime > 400) {
-          var lastPart = message.subscription.split(/\//).pop();
-          appEvents.trigger('stats.time', 'faye.subscribe.time.' + lastPart, totalTime);
-
-          log.info('rt: Subscription to ' + message.subscription + ' took ' + totalTime + 'ms');
-        }
-      }
-
-      var listeners = this._listeners[message.subscription];
-      var snapshot = message.ext.snapshot;
-
-      if(listeners) {
-        for(var i = 0; i < listeners.length; i++) { listeners[i](snapshot); }
       }
     }
 
     callback(message);
-  };
+  }
+};
 
-  SnapshotExtension.prototype.registerForSnapshots = function(channel, listener, stateProvider) {
-    channel = FAYE_PREFIX + channel;
 
-    var list = this._listeners[channel];
-    if(list) {
-      list.push(listener);
-    } else {
-      list = [listener];
-      this._listeners[channel] = list;
-    }
+var terminating = false;
 
-    if(stateProvider) {
-      if(this._stateProvider[channel]) {
-        log.warn('rt: a stateprovider already exists for ' + channel);
-      }
-
-      this._stateProvider[channel] = stateProvider;
-    }
-  };
-
-  var snapshotExtension = new SnapshotExtension();
-
-  var terminating = false;
-
-  var AccessTokenFailureExtension = function() {};
-
-  AccessTokenFailureExtension.prototype.incoming = function(message, callback) {
-    if(message.error && message.advice && message.advice.reconnect === 'none') {
+var accessTokenFailureExtension = {
+  incoming: function (message, callback) {
+    if (message.error && message.advice && message.advice.reconnect === 'none') {
       // advice.reconnect == 'none': the server has effectively told us to go away for good
-      if(!terminating) {
+      if (!terminating) {
         terminating = true;
         // More needs to be done here!
         log.error('rt: Access denied', message);
@@ -228,255 +101,114 @@ module.exports = (function() {
     }
 
     callback(message);
-  };
-
-  var SequenceGapDetectorExtension = function() {
-    this._seq = 0;
-    appEvents.on('realtime:newConnectionEstablished', this.reset, this);
-  };
-
-  SequenceGapDetectorExtension.prototype = {
-    incoming: function(message, callback) {
-      var c = message.ext && message.ext.c;
-      var channel = message.channel;
-      if(c && channel && channel.indexOf('/meta') !== 0) {
-
-        var current = this._seq;
-        this._seq = c;
-
-        if (c !== current + 1) {
-          log.warn('rt: Message on channel ' + channel + ' out of sequence. Expected ' + (current + 1) + ' got ' + c);
-          appEvents.trigger('stats.event', 'faye.sequence');
-          reset(clientId);
-        }
-
-      }
-      callback(message);
-    },
-
-    reset: function() {
-      this._seq = 0;
-    }
-  };
-
-
-  var BRIDGE_NOTIFICATIONS = {
-    user_notification: 1,
-    activity: 1
-  };
-
-  function createClient() {
-    var c = context.env('websockets');
-    var client = new Faye.Client(c.fayeUrl, c.options);
-
-    if(websocketsDisabled) {
-      /* Testing no websockets */
-      client.disable('websocket');
-    }
-
-    client.addExtension(new ClientAuth());
-    client.addExtension(snapshotExtension);
-    client.addExtension(new AccessTokenFailureExtension());
-    client.addExtension(new SequenceGapDetectorExtension());
-    client.addExtension(new ErrorLogger());
-
-    var userSubscription;
-
-    context.user().watch('change:id', function(user) {
-      if(userSubscription) {
-        userSubscription.cancel();
-        userSubscription = null;
-      }
-
-      if(user.id) {
-        userSubscription = client.subscribe(FAYE_PREFIX + '/v1/user/' + user.id, function(message) {
-          if(message.operation === 'patch' && message.model && message.model.id === user.id) {
-            // Patch the updates onto the user
-            user.set(message.model);
-          }
-
-          if(BRIDGE_NOTIFICATIONS[message.notification]) {
-            appEvents.trigger(message.notification, message);
-          }
-        });
-      }
-
-    });
-
-    return client;
   }
+};
 
-  var client;
-  var connectionFailureTimeout;
-  var persistentOutage;
-  var websocketsDisabled = isMobile();
-  var persistentOutageStartTime;
+var BRIDGE_NOTIFICATIONS = {
+  user_notification: 1,
+  activity: 1
+};
 
-  function transportDown(persistentOutageTimeout, initialConnection) {
-    var c = context.env('websockets');
-    var timeout = persistentOutageTimeout || c.options && c.options.timeout * 1.2 || 60;
+var client;
 
-    if(!connectionFailureTimeout) {
-      connectionFailureTimeout = setTimeout(function() {
-        if(!persistentOutage) {
-          persistentOutageStartTime = Date.now();
-          persistentOutage = true;
-          log.info('rt: persistent outage');
-          appEvents.trigger('connectionFailure');
+function getOrCreateClient() {
+  if (client) return client;
 
-          // Don't disable websockets on the initial connection
-          if(!initialConnection && !websocketsDisabled) {
-            log.info('rt: disabling websockets');
-            client.disable('websockets');
-          }
-        }
-      }, timeout * 1000);
-    }
-  }
-
-  function transportUp() {
-    if(connectionFailureTimeout) {
-      clearTimeout(connectionFailureTimeout);
-      connectionFailureTimeout = null;
-    }
-
-    if(persistentOutage) {
-      appEvents.trigger('stats.event', 'faye.outage.restored');
-      appEvents.trigger('stats.time', 'faye.outage.restored.time', Date.now() - persistentOutageStartTime);
-      persistentOutage = false;
-      persistentOutageStartTime = null;
-      log.info('rt: persistent outage restored');
-      appEvents.trigger('connectionRestored');
-    }
-  }
-
-  function getOrCreateClient() {
-    if(client) return client;
-    client = createClient();
-
-    // Initially, the transport is down
-    transportDown(10 /* seconds */, true /* initial connection */);
-
-    client.on('transport:down', function() {
-      log.info('rt: transport down');
-      transportDown();
-    });
-
-    client.on('transport:up', function() {
-      log.info('rt: transport up');
-      transportUp();
-    });
-
-    return client;
-  }
-
-  appEvents.on('eyeballsInvalid', function(originalClientId) {
-    log.info('rt: Resetting connection after invalid eyeballs');
-    reset(originalClientId);
+  var c = context.env('websockets');
+  client = new RealtimeClient({
+    fayeUrl: c.fayeUrl,
+    authProvider: authProvider,
+    fayeOptions: c.options,
+    websocketsDisabled: isMobile(),
+    extensions: [
+        handshakeExtension,
+        accessTokenFailureExtension
+      ]
   });
 
-  appEvents.on('reawaken', function() {
-    log.info('rt: Recycling connection after reawaken');
-    reset(clientId);
-  });
+  client.on('stats', function (type, statName, value) {
+    appEvents.trigger('stats.' + type, statName, value);
+  })
 
-  // Cordova events.... doesn't matter if IE8 doesn't handle them
-  if(document.addEventListener) {
-    document.addEventListener("deviceReady", function() {
-      document.addEventListener("online", function() {
-        log.info('rt: online');
-        testConnection('device_ready');
-      }, false);
-    }, false);
-  }
+  var userSubscription;
 
-  var pingResponseOutstanding = false;
-
-  function testConnection(reason) {
-    /* Only test the connection if one has already been established */
-    if(!client) return;
-
-    /* Wait until the connection is established before attempting the test */
-    if(!clientId) return;
-
-    if(pingResponseOutstanding) return;
-
-    if(reason !== 'ping') {
-      appEvents.trigger('realtime.testConnection', reason);
-      log.info('rt: Testing connection due to ' + reason);
+  context.user().watch('change:id', function (user) {
+    if (userSubscription) {
+      userSubscription.cancel();
+      userSubscription = null;
     }
 
-    pingResponseOutstanding = true;
-    var originalClientId = clientId;
-    /* Only hold back pings for 30s, then retry is neccessary */
-    setTimeout(function() {
-      if(pingResponseOutstanding) {
-        appEvents.trigger('stats.event', 'faye.ping.reset');
+    if (user.id) {
+      userSubscription = client.subscribe('/v1/user/' + user.id, function (message) {
+        if (message.operation === 'patch' && message.model && message.model.id === user.id) {
+          // Patch the updates onto the user
+          user.set(message.model);
+        }
 
-        pingResponseOutstanding = false;
-
-        reset(originalClientId);
-      }
-    }, 30000);
-
-    client.publish(FAYE_PREFIX + '/v1/ping2', { reason: reason })
-      .then(function() {
-
-        pingResponseOutstanding = false;
-        log.info('rt: Server ping succeeded');
-      }, function(error) {
-        log.warn('rt: Server ping failed: ', error);
-        appEvents.trigger('stats.event', 'faye.ping.reset');
-
-        pingResponseOutstanding = false;
-        reset(originalClientId);
+        if (BRIDGE_NOTIFICATIONS[message.notification]) {
+          appEvents.trigger(message.notification, message);
+        }
       });
-  }
-
-  function reset(clientIdOnPing) {
-    if(!client) return;
-    if(clientIdOnPing === clientId) {
-      log.info("rt: Client reset requested");
-      clientId = null;
-      client.reset();
-    } else {
-      log.info("rt: Ignoring reset request as clientId has changed.");
-    }
-  }
-
-  return {
-    getClientId: function() {
-      return clientId;
-    },
-
-    subscribe: function(channel, callback, context, options) {
-      channel = FAYE_PREFIX + channel;
-      log.info('rt: Subscribing to ' + channel);
-
-      // Temporary options to pass onto the subscription message
-      subscribeOptions[channel] = options;
-
-      return getOrCreateClient().subscribe(channel, callback, context);
-    },
-
-    /**
-     * Gets Faye to do something that will invoke the connection
-     * Useful when we think the connection may be down, but Faye
-     * may not have realised it yet.
-     */
-    testConnection: testConnection,
-
-    reset: reset,
-
-    getClient: function() {
-      return getOrCreateClient();
-    },
-
-    registerForSnapshots: function(channel, listener, stateProvider) {
-      return snapshotExtension.registerForSnapshots(channel, listener, stateProvider);
     }
 
-  };
+  });
 
-})();
+  return client;
+}
 
+appEvents.on('eyeballsInvalid', function (originalClientId) {
+  log.info('rt: Resetting connection after invalid eyeballs');
+  reset(originalClientId);
+});
+
+appEvents.on('reawaken', function () {
+  log.info('rt: Recycling connection after reawaken');
+  reset(getClientId());
+});
+
+// Cordova events.... doesn't matter if IE8 doesn't handle them
+if (document.addEventListener) {
+  document.addEventListener("deviceReady", function () {
+    document.addEventListener("online", function () {
+      log.info('rt: online');
+      testConnection('device_ready');
+    }, false);
+  }, false);
+}
+
+function getClientId() {
+  return client && client.getClientId();
+}
+
+function reset(clientId) {
+  getOrCreateClient().reset(clientId);
+}
+
+function testConnection(reason) {
+  getOrCreateClient().testConnection(reason);
+}
+
+module.exports = {
+  getClientId: getClientId,
+
+  subscribe: function (channel, callback, context, options) {
+    return getOrCreateClient().subscribe(channel, callback, context, options);
+  },
+
+  testConnection: testConnection,
+
+  reset: reset,
+
+  getClient: function () {
+    return getOrCreateClient();
+  },
+
+  registerForSnapshots: function (channel, listener, stateProvider) {
+    // TODO: refactor callers to handle registerSnapshotHandler
+    return getOrCreateClient().registerSnapshotHandler(channel, {
+      handleSnapshot: listener,
+      getSnapshotState: stateProvider
+    });
+  }
+
+};

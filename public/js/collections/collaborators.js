@@ -1,24 +1,20 @@
 "use strict";
+
 var apiClient = require('components/apiClient');
-var TroupeCollections = require('./base');
 var Backbone = require('backbone');
+var SyncMixin = require('./sync-mixin');
 
-module.exports = (function() {
+var CollabModel = Backbone.Model.extend({
+  idAttribute: 'id'
+});
 
+var CollabCollection = Backbone.Collection.extend({
+  model: CollabModel,
+  url: apiClient.room.channelGenerator("/collaborators"),
+  sync: SyncMixin.sync
+});
 
-  var CollabModel = TroupeCollections.Model.extend({
-    idAttribute: 'id'
-  });
-
-  var CollabCollection = Backbone.Collection.extend({
-    model: CollabModel,
-    url: apiClient.room.channelGenerator("/collaborators")
-  });
-
-  return {
-    CollabCollection: CollabCollection,
-    CollabModel: CollabModel
-  };
-
-})();
-
+module.exports = {
+  CollabCollection: CollabCollection,
+  CollabModel: CollabModel
+};
