@@ -1,7 +1,6 @@
 @import "../widgets/avatar";
 @import "../popover";
 @import "chatInputView";
-@import "../behaviors/unread-items";
 
 // Other items required by this library
 @import "highlight.less";
@@ -58,9 +57,9 @@
 
   &.burstContinued {
 
-    padding: @chat-spacing 0;
+    margin: @chat-spacing 0;
     .chat-item__container {
-      padding: 0px 30px 0px 30px;
+      margin: 0px 30px;
     }
 
     .chat-item__content {
@@ -115,9 +114,9 @@
     }
   }
 
-  &.unread, &.reading {
-    background-color: fade(@trpGreen, 20%);
-    // border-top: 1px solid fade(@trpGreen, 25%);
+  &.unread .chat-item__container {
+    border-right: 2px solid @trpGreen;
+    transition: 1s border linear;
   }
 
   &:last-child {
@@ -136,11 +135,11 @@
 
 .chat-item__container {
   box-sizing: border-box;
-  padding: 14px 30px 0px 44px;
-  display: inline-block;
+  border-right: 2px solid transparent;
+  margin: 14px 30px 0px 44px;
   text-align: left;
-  width: 100%;
-  clear: left;
+  transition: 1s border linear;
+
   &.syncerror {
     background-color: #edb2bd;
 
@@ -178,11 +177,8 @@
   vertical-align: middle;
   display: inline-block;
   opacity: 0.8;
-  color: #aaa;
-
-  &:before {
-    content: '\0020\2022\0020';
-  }
+  color: #ddd;
+  float: right;
 }
 
 .chat-item__time--permalinkable {
