@@ -1,6 +1,7 @@
 "use strict";
 
 var mongoose = require('../../utils/mongoose-q');
+var userScopes = require('../../utils/models/user-scopes');
 var Schema   = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
 var assert   = require('assert');
@@ -35,87 +36,21 @@ UserSchema.index({ username: 1 }, { unique: true /*, sparse: true */});
 UserSchema.index({ stripeCustomerId: 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';
 
-var LEGACY_DEFAULT_SCOPE = {'user': 1, 'user:email': 1, 'user:follow':1, 'repo':1, 'public_repo': 1};
-
 UserSchema.methods.hasGitHubScope = function(scope) {
-  var githubToken = this.githubToken;
-  var githubScopes = this.githubScopes;
-  var githubUserToken = this.githubUserToken;
-
-  if(!githubUserToken && !githubToken) {
-    return false;
-  }
-
-  // Get the simple case out the way
-  if(githubUserToken && (scope === 'user' ||
-             scope === 'user:email'||
-             scope === 'user:follow')) {
-    return true;
-  }
-
-  function hasScope() {
-    for(var i = 0; i < arguments.length; i++) {
-      if(githubScopes[arguments[i]]) return true;
-    }
-    return false;
-  }
-
-  if(!githubScopes) {
-    if(githubToken) {
-      return !!LEGACY_DEFAULT_SCOPE[scope];
-    }
-    // Legacy users will need to reauthenticate unfortunately
-    return false;
-  }
-
-  // Crazy github rules codified here....
-  switch(scope) {
-    case 'notifications': return hasScope('notifications', 'repo');
-    case 'user:follow': return hasScope('user:follow', 'user');
-    case 'user:email': return hasScope('user:email', 'user');
-    case 'public_repo': return hasScope('public_repo', 'repo');
-    case 'repo:status': return hasScope('repo:status', 'repo');
-  }
-
-  // The less crazy case
-  return !!githubScopes[scope];
+  return userScopes.hasGitHubScope(this, scope);
 };
 
 UserSchema.methods.getGitHubScopes = function() {
-  if(!this.githubScopes) {
-    if(this.githubUserToken) {
-      return Object.keys(LEGACY_DEFAULT_SCOPE);
-    } else {
-      return [];
-    }
-  }
-
-  var scopes = Object.keys(this.githubScopes);
-  if(!this.githubUserToken) {
-    return scopes;
-  }
-
-  return scopes.concat(['user', 'user:email', 'user:follow']);
+  return userScopes.getGitHubScopes(this);
 };
 
 UserSchema.methods.getGitHubToken = function(scope) {
-  if(!scope) return this.githubToken || this.githubUserToken;
-
-  switch(scope) {
-    case 'user':
-    case 'user:email':
-    case 'user:follow':
-      return this.githubUserToken || this.githubToken;
-  }
-
-  return this.githubToken || this.githubUserToken;
+  return userScopes.getGitHubToken(this, scope);
 };
-
 
 UserSchema.methods.isMissingTokens = function() {
-  return !this.githubToken && !this.githubUserToken;
+  return userScopes.isMissingTokens(this);
 };
-
 
 UserSchema.methods.destroyTokens = function() {
   this.githubToken = null;
@@ -125,9 +60,10 @@ UserSchema.methods.destroyTokens = function() {
 
 
 UserSchema.methods.getDisplayName = function() {
-  return this.displayName || this.username || "Unknown";
+  return this.displayName || this.username;
 };
 
+/* TODO: deprecate */
 UserSchema.methods.getFirstName = function() {
   if(this.displayName) {
     var firstName = this.displayName.split(/\s+/)[0];
@@ -150,12 +86,8 @@ UserSchema.methods.getAllEmails = function() {
   return [this.email].concat(this.emails);
 };
 
-UserSchema.methods.getHomeUri = function() {
-  return this.username ? this.username : "one-one/" + this.id;
-};
-
 UserSchema.methods.getHomeUrl = function() {
-  return '/' + this.getHomeUri();
+  return '/' +  this.username;
 };
 
 UserSchema.methods.isConfirmed = function() {

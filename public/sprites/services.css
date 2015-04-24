@@ -1,9 +1,9 @@
 .service-sprite {
   background: url( 'services.png' ) no-repeat;
-  background-size: 96px 96px;
+  background-size: 112px 96px;
 }
 
-.service-sprite.huboard-logo {
+.service-sprite.gitlab-logo {
   width: 16px;
   height: 16px;
   background-position: 0 0;
@@ -51,154 +51,178 @@
   background-position: -16px -32px;
 }
 
-.service-sprite.custom-error {
+.service-sprite.coveralls-down {
   width: 16px;
   height: 16px;
   background-position: -32px -32px;
 }
 
-.service-sprite.custom-logo {
+.service-sprite.coveralls-logo {
   width: 16px;
   height: 16px;
   background-position: -48px 0;
 }
 
-.service-sprite.dockerhub-logo {
+.service-sprite.coveralls-neutral {
   width: 16px;
   height: 16px;
   background-position: -48px -16px;
 }
 
-.service-sprite.drone-frown {
+.service-sprite.coveralls-up {
   width: 16px;
   height: 16px;
   background-position: -48px -32px;
 }
 
-.service-sprite.drone-logo {
+.service-sprite.custom-error {
   width: 16px;
   height: 16px;
   background-position: 0 -48px;
 }
 
-.service-sprite.drone-smile {
+.service-sprite.custom-logo {
   width: 16px;
   height: 16px;
   background-position: -16px -48px;
 }
 
-.service-sprite.gitlab-logo {
+.service-sprite.dockerhub-logo {
   width: 16px;
   height: 16px;
   background-position: -32px -48px;
 }
 
-.service-sprite.heroku-logo {
+.service-sprite.drone-frown {
   width: 16px;
   height: 16px;
   background-position: -48px -48px;
 }
 
-.service-sprite.appveyor-logo {
+.service-sprite.drone-logo {
   width: 16px;
   height: 16px;
   background-position: -64px 0;
 }
 
-.service-sprite.jenkins-frown {
+.service-sprite.drone-smile {
   width: 16px;
   height: 16px;
   background-position: -64px -16px;
 }
 
-.service-sprite.jenkins-logo {
+.service-sprite.appveyor-logo {
   width: 16px;
   height: 16px;
   background-position: -64px -32px;
 }
 
-.service-sprite.jenkins-meh {
+.service-sprite.heroku-logo {
   width: 16px;
   height: 16px;
   background-position: -64px -48px;
 }
 
-.service-sprite.jenkins-smile {
+.service-sprite.huboard-logo {
   width: 16px;
   height: 16px;
   background-position: 0 -64px;
 }
 
-.service-sprite.logentries-error {
+.service-sprite.jenkins-frown {
   width: 16px;
   height: 16px;
   background-position: -16px -64px;
 }
 
-.service-sprite.logentries-logo {
+.service-sprite.jenkins-logo {
   width: 16px;
   height: 16px;
   background-position: -32px -64px;
 }
 
-.service-sprite.pagerduty-logo {
+.service-sprite.jenkins-meh {
   width: 16px;
   height: 16px;
   background-position: -48px -64px;
 }
 
-.service-sprite.pivotaltracker-logo {
+.service-sprite.jenkins-smile {
   width: 16px;
   height: 16px;
   background-position: -64px -64px;
 }
 
-.service-sprite.sentry-error {
+.service-sprite.logentries-error {
   width: 16px;
   height: 16px;
   background-position: -80px 0;
 }
 
-.service-sprite.sentry-logo {
+.service-sprite.logentries-logo {
   width: 16px;
   height: 16px;
   background-position: -80px -16px;
 }
 
-.service-sprite.sprintly-columns {
+.service-sprite.pagerduty-logo {
   width: 16px;
   height: 16px;
   background-position: -80px -32px;
 }
 
-.service-sprite.sprintly-logo {
+.service-sprite.pivotaltracker-logo {
   width: 16px;
   height: 16px;
   background-position: -80px -48px;
 }
 
-.service-sprite.travis-frown {
+.service-sprite.sentry-error {
   width: 16px;
   height: 16px;
   background-position: -80px -64px;
 }
 
-.service-sprite.travis-logo {
+.service-sprite.sentry-logo {
   width: 16px;
   height: 16px;
   background-position: 0 -80px;
 }
 
-.service-sprite.travis-meh {
+.service-sprite.sprintly-columns {
   width: 16px;
   height: 16px;
   background-position: -16px -80px;
 }
 
-.service-sprite.travis-smile {
+.service-sprite.sprintly-logo {
   width: 16px;
   height: 16px;
   background-position: -32px -80px;
+}
+
+.service-sprite.travis-frown {
+  width: 16px;
+  height: 16px;
+  background-position: -48px -80px;
+}
+
+.service-sprite.travis-logo {
+  width: 16px;
+  height: 16px;
+  background-position: -64px -80px;
+}
+
+.service-sprite.travis-meh {
+  width: 16px;
+  height: 16px;
+  background-position: -80px -80px;
+}
+
+.service-sprite.travis-smile {
+  width: 16px;
+  height: 16px;
+  background-position: -96px 0;
 }
 
 
@@ -209,7 +233,7 @@
 (min-device-pixel-ratio: 2) {
 .service-sprite {
   background: url( 'services@2x.png' ) no-repeat;
-  background-size: 96px 96px;
+  background-size: 112px 96px;
 }
 
 }

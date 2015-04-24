@@ -1,9 +1,9 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var mongoose      = require('../../utils/mongoose-q');
-var Schema        = mongoose.Schema;
-var ObjectId      = Schema.ObjectId;
+var mongoose       = require('../../utils/mongoose-q');
+var Schema         = mongoose.Schema;
+var ObjectId       = Schema.ObjectId;
 var winston        = require('../../utils/winston');
 var assert         = require("assert");
 var Q              = require('q');
@@ -12,7 +12,7 @@ var appEvents      = require("../../app-events");
 var _              = require("underscore");
 var tagger         = require('../../utils/room-tagger');
 var RepoService    = require('../github/github-repo-service');
-
+var troupeUtils    = require('../../utils/models/troupes');
 
 function serializeEvent(url, operation, model, callback) {
   winston.verbose("Serializing " + operation + " to " + url);
@@ -139,31 +139,19 @@ module.exports = {
     });
 
     TroupeSchema.methods.getUserIds = function() {
-      return this.users.map(function(troupeUser) { return troupeUser.userId; });
+      return troupeUtils.getUserIds(this);
     };
 
     TroupeSchema.methods.findTroupeUser = function(userId) {
-      var user = _.find(this.users, function(troupeUser) {
-        return "" + troupeUser.userId == "" + userId;
-      });
-
-      return user;
+      return troupeUtils.findTroupeUser(this, userId);
     };
 
-
     TroupeSchema.methods.containsUserId = function(userId) {
-      return !!this.findTroupeUser(userId);
+      return troupeUtils.containsUserId(this, userId);
     };
 
     TroupeSchema.methods.getOtherOneToOneUserId = function(knownUserId) {
-      assert(this.oneToOne, 'getOtherOneToOneUserId should only be called on oneToOne troupes');
-      assert(knownUserId, 'knownUserId required');
-
-      var troupeUser = _.find(this.users, function(troupeUser) {
-        return "" + troupeUser.userId != "" + knownUserId;
-      });
-
-      return troupeUser && troupeUser.userId;
+      return troupeUtils.getOtherOneToOneUserId(this, knownUserId);
     };
 
     TroupeSchema.methods.addUserBan = function(options) {
