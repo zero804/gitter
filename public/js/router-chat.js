@@ -242,7 +242,9 @@ onready(function () {
       require.ensure(['views/people/peopleCollectionView', 'collections/users'], function(require) {
         var peopleCollectionView = require('views/people/peopleCollectionView');
         var userModels = require('collections/users');
-        var userCollection = new userModels.UserCollection();
+
+        // seed the collection with the roster while wait for the full list to load
+        var userCollection = new userModels.UserCollection(itemCollections.roster.models);
         userCollection.fetch();
 
         appView.dialogRegion.show(new peopleCollectionView.Modal({ collection: userCollection }));
