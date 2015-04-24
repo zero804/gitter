@@ -9,6 +9,7 @@ var readByService    = require("./readby-service");
 var userService      = require("./user-service");
 var roomPermissionsModel = require('./room-permissions-model');
 var appEvents        = require("../app-events");
+var presenceService  = require("./presence-service");
 var _                = require("underscore");
 var mongoUtils       = require('../utils/mongo-utils');
 var RedisBatcher     = require('../utils/redis-batcher').RedisBatcher;
@@ -386,6 +387,10 @@ function parseChat(fromUserId, troupe, mentions) {
 function createNewItemsForParsedChat(troupeId, chatId, parsed) {
   return engine.newItemWithMentions(troupeId, chatId, parsed.notifyUserIds, parsed.mentionUserIds)
     .then(function(results) {
+      var allUserIds = parsed.notifyUserIds.concat(parsed.activityOnlyUserIds);
+      return [results, presenceService.categorizeUsersByOnlineStatus(allUserIds)];
+    })
+    .spread(function(results, online) {
 
       // Firstly, notify all the notifyNewRoomUserIds with room creation messages
       parsed.notifyNewRoomUserIds.forEach(function(userId) {
@@ -394,11 +399,15 @@ function createNewItemsForParsedChat(troupeId, chatId, parsed) {
 
       // Next, notify all the users with unread count changes
       parsed.notifyUserIds.forEach(function(userId) {
+        var isOnline = online[userId];
         var unreadCount = results[userId] && results[userId].unreadCount;
         var mentionCount = results[userId] && results[userId].mentionCount;
 
         // Not lurking, send them the full update
-        appEvents.newUnreadItem(userId, troupeId, { chat: [chatId] });
+        appEvents.newUnreadItem(userId, troupeId, { chat: [chatId] }, isOnline);
+
+        // Only send out troupeUnreadCountsChange events for online users
+        if (!isOnline) return;
 
         if(unreadCount >= 0 || mentionCount >= 0) {
           // Notify the user
@@ -413,6 +422,8 @@ function createNewItemsForParsedChat(troupeId, chatId, parsed) {
 
       // Next, notify all the lurkers
       parsed.activityOnlyUserIds.forEach(function(userId) {
+        if (!online[userId]) return;
+
         appEvents.newLurkActivity({ userId: userId, troupeId: troupeId });
       });
 
@@ -475,6 +486,9 @@ function generateMentionDeltaSet(parsedChat, originalMentions) {
 function addUnreadItemsForUpdatedChat(troupeId, chatId, addNotifyUserIds, addMentionUserIds, addMentionsInNewRoom) {
   return engine.newItemWithMentions(troupeId, chatId, addNotifyUserIds, addMentionUserIds)
     .then(function(results) {
+      return [results, presenceService.categorizeUsersByOnlineStatus(addNotifyUserIds)];
+    })
+    .spread(function(results, online) {
 
       // Firstly, notify all the notifyNewRoomUserIds with room creation messages
       addMentionsInNewRoom.forEach(function(userId) {
@@ -485,9 +499,12 @@ function addUnreadItemsForUpdatedChat(troupeId, chatId, addNotifyUserIds, addMen
       addNotifyUserIds.forEach(function(userId) {
         var unreadCount = results[userId] && results[userId].unreadCount;
         var mentionCount = results[userId] && results[userId].mentionCount;
+        var isOnline = online[userId];
 
         // Not lurking, send them the full update
-        appEvents.newUnreadItem(userId, troupeId, { chat: [chatId] });
+        appEvents.newUnreadItem(userId, troupeId, { chat: [chatId] }, isOnline);
+
+        if (!isOnline) return; // No need to send out updates to non-online users
 
         if(unreadCount >= 0 || mentionCount >= 0) {
           // Notify the user

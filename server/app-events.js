@@ -66,11 +66,12 @@ function bind(on) {
     },
 
 
-    newUnreadItem: function(userId, troupeId, items) {
+    newUnreadItem: function(userId, troupeId, items, online) {
       emit('newUnreadItem', {
         userId: userId,
         troupeId: troupeId,
-        items: items
+        items: items,
+        online: online
       });
     },
 
