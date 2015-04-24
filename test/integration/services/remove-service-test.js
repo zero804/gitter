@@ -46,7 +46,7 @@ describe('remove-service #slow', function() {
     fixture.cleanup();
   });
 
-  describe('#removeFavourite', function() {
+  describe('removeFavourite', function() {
 
     var removeService = testRequire('./services/remove-service');
 
@@ -68,15 +68,18 @@ describe('remove-service #slow', function() {
 
     // Create an event listener with expected parameters
     // If the test keeps pending, it means no event is emitted with these parameters
-    var addListenner = function(expected) {
+    var addListener = function(expected) {
       var dfd = Q.defer();
       appEvents.onDataChange2(function(res) {
         // First filter by url and operation, as other events may have been emitted
         if (expected.url && expected.url !== res.url) return;
         if (expected.operation && expected.operation !== res.operation) return;
         // Check model with deepEqual
-        if (expected.model) dfd.resolve(assert.deepEqual(res.model, expected.model));
-        else dfd.resolve();
+
+        console.log('onDataChange returned: ', res);
+        console.log('onDataChange expected: ', expected.model);
+        // if (expected.model) assert.deepEqual(res.model, expected.model);
+        dfd.resolve();
       });
       return function() {
         return dfd.promise;
@@ -84,23 +87,26 @@ describe('remove-service #slow', function() {
     };
 
     it('should remove favourite', function(done) {
-      var checkEvent = addListenner({
-        url: '/user/' + fixture.userFavourite.id + '/rooms',
-        operation: 'patch',
-        model: {
-          id: fixture.troupeCanRemove.id,
-          favourite: null,
-          lastAccessTime: null,
-          mentions: 0,
-          unreadItems: 0
-        }
-      });
-
       createFav()
       .then(function() {
-        return removeService.removeRecentRoomForUser(fixture.troupeCanRemove, fixture.userFavourite.id);
+        var d = Q.defer();
+        appEvents.onDataChange2(function(res) {
+          // First filter by url and operation, as other events may have been emitted
+          if (res.url !== '/user/' + fixture.userFavourite.id + '/rooms') return;
+          if (res.operation !== 'patch') return;
+          assert.deepEqual(res.model, {
+              id: fixture.troupeCanRemove.id,
+              favourite: null,
+              lastAccessTime: null,
+              mentions: 0,
+              unreadItems: 0
+          });
+          d.resolve();
+        });
+
+        return removeService.removeRecentRoomForUser(fixture.troupeCanRemove, fixture.userFavourite.id)
+          .then(d.promise);
       })
-      .then(checkEvent) // Ensure event was emitted
       .then(getFavs)
       .then(function(favs) {
         assert(!favs[fixture.troupeCanRemove.id]); // Favourite is removed
@@ -135,7 +141,7 @@ describe('remove-service #slow', function() {
     });
 
     it('should check if the proper event is emitted when the favourite is removed', function(done) {
-      var checkEvent = addListenner({
+      var checkEvent = addListener({
         url: '/user/' + fixture.userFavourite.id + '/rooms',
         operation: 'remove',
         model: {id: fixture.troupeEmpty.id}
