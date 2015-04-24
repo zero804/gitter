@@ -11,7 +11,10 @@ Q.longStackSupport = true;
 
 var TOTAL_USERS = 10000;
 
-describe('unread-item-service-large-room #slow', function() {
+/**
+ * Unfortunately this has some knock on effects
+ */
+describe.skip('unread-item-service-large-room #slow', function() {
   // this.timeout(15000);
 
   var chatId;

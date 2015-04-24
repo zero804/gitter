@@ -355,6 +355,7 @@ describe('unread-item-service', function() {
       var userService;
       var roomPermissionsModel;
       var unreadItemService;
+      var presenceService;
       var troupeNoLurkers;
       var troupeSomeLurkers;
       var troupeAllLurkers;
@@ -436,6 +437,15 @@ describe('unread-item-service', function() {
         userService = mockito.mock(testRequire('./services/user-service'));
         appEvents = mockito.mock(testRequire('./app-events'));
         roomPermissionsModel = mockito.mockFunction();
+        presenceService = {
+          categorizeUsersByOnlineStatus: function(userIds) {
+            /* Always return all users as online */
+            return Q.resolve(userIds.reduce(function(memo, userId) {
+              memo[userId] = 'online';
+              return memo;
+            }, {}));
+          }
+        };
 
         mockito.when(troupeService).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupeNoLurkersUserHash));
         mockito.when(troupeService).findUserIdsForTroupeWithLurk(troupeId2).thenReturn(Q.resolve(troupeSomeLurkersUserHash));
@@ -444,6 +454,7 @@ describe('unread-item-service', function() {
         unreadItemService = testRequire.withProxies("./services/unread-item-service", {
           './troupe-service': troupeService,
           './user-service': userService,
+          './presence-service': presenceService,
           '../app-events': appEvents,
           './room-permissions-model': roomPermissionsModel,
         });
@@ -560,6 +571,7 @@ describe('unread-item-service', function() {
       var appEvents;
       var userService;
       var roomPermissionsModel;
+      var presenceService;
       var unreadItemService;
       var troupeNoLurkers;
       var troupeSomeLurkers;
@@ -642,6 +654,15 @@ describe('unread-item-service', function() {
         userService = mockito.mock(testRequire('./services/user-service'));
         appEvents = mockito.mock(testRequire('./app-events'));
         roomPermissionsModel = mockito.mockFunction();
+        presenceService = {
+          categorizeUsersByOnlineStatus: function(userIds) {
+            /* Always return all users as online */
+            return Q.resolve(userIds.reduce(function(memo, userId) {
+              memo[userId] = 'online';
+              return memo;
+            }, {}));
+          }
+        };
 
         mockito.when(troupeService).findUserIdsForTroupeWithLurk(troupeId).thenReturn(Q.resolve(troupeNoLurkersUserHash));
         mockito.when(troupeService).findUserIdsForTroupeWithLurk(troupeId2).thenReturn(Q.resolve(troupeSomeLurkersUserHash));
@@ -650,6 +671,7 @@ describe('unread-item-service', function() {
         unreadItemService = testRequire.withProxies("./services/unread-item-service", {
           './troupe-service': troupeService,
           './user-service': userService,
+          './presence-service': presenceService,
           '../app-events': appEvents,
           './room-permissions-model': roomPermissionsModel,
         });
