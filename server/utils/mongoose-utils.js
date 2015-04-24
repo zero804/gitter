@@ -110,6 +110,32 @@ exports.findByIds = function(Model, ids, callback) {
   }).nodeify(callback);
 };
 
+/**
+ * Returns a promise of lean documents
+ */
+exports.findByIdsLean = function(Model, ids, select) {
+  return Q.fcall(function() {
+    if (!ids || !ids.length) return [];
+
+    /* Special case for a single ID */
+    if (ids.length === 1) {
+      return Model.findByIdQ(ids[0], select, { lean: true })
+        .then(function(doc) {
+          if (doc) return [doc];
+          return [];
+        });
+    }
+
+    /* Usual case */
+    return Model.where('_id')
+      .in(mongoUtils.asObjectIDs(collections.idsIn(ids)))
+      .select(select)
+      .lean()
+      .execQ();
+
+  });
+};
+
 exports.findByFieldInValue = function(Model, field, values, callback) {
   return Q.fcall(function() {
     if (!values || !values.length) return [];

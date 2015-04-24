@@ -208,6 +208,10 @@ var userService = {
     return mongooseUtils.findByIds(persistence.User, ids, callback);
   },
 
+  findByIdsLean: function(ids, select) {
+    return mongooseUtils.findByIdsLean(persistence.User, ids, select);
+  },
+
   findByIdsAndSearchTerm: function(ids, searchTerm, limit, callback) {
     if(!ids || !ids.length || !searchTerm || !searchTerm.length) {
       return Q.resolve([]).nodeify(callback);

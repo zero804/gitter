@@ -1,12 +1,9 @@
-/*jslint node: true */
-/*global describe:true, it: true, before:true, afterEach:true */
 "use strict";
 
 var testRequire = require('../test-require');
 var assert = require('assert');
 
 var loginUtils = testRequire('./web/login-utils');
-var persistence = testRequire('./services/persistence-service');
 var fixtureLoader = require('../test-fixtures');
 var fixture = {};
 
@@ -19,7 +16,7 @@ describe('login-utils', function() {
       return loginUtils.whereToNext(fixture.user3)
         .then(function(url) {
           assert(url.indexOf(fixture.user3.username) == 1,'URL should contain username');
-          assert.equal(url, fixture.user3.getHomeUrl());
+          assert.equal(url, '/' + fixture.user3.username);
         })
         .nodeify(done);
     });
