@@ -19,7 +19,7 @@ CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/
 endif
 PATH := ./node_modules/.bin:$(PATH)
 
-.PHONY: build clean test npm sprites
+.PHONY: build clean test npm sprites npm-quick npm-full
 
 build: clean npm
 	gulp
@@ -30,8 +30,17 @@ clean:
 test:
 	gulp test
 
-npm:
+npm-quick:
+	npm prune
 	npm install
+
+npm-full:
+	npm cache clean
+	rm -rf node_modules/
+	npm install
+
+npm:
+	make npm-quick || make npm-full
 
 sprites:
 	@mkdir -p output/temp-sprites
@@ -70,4 +79,3 @@ embedded-chat:
 # make-jquery:
 # 	npm install
 # 	./node_modules/.bin/jquery-builder -v 2.0.3 -e deprecated -m > public/repo/jquery/jquery.js
-
