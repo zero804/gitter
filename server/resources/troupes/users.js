@@ -27,10 +27,12 @@ module.exports = {
   index: function(req, res, next) {
 
     var options = {
-      lean: !!req.query.lean
+      lean: !!req.query.lean,
+      limit: req.query.limit,
+      searchTerm: req.query.q
     };
 
-    restful.serializeUsersForTroupe(req.troupe.id, req.user, options)
+    restful.serializeUsersForTroupe(req.troupe.id, req.user.id, options)
       .then(function (data) {
         res.send(data);
       })
