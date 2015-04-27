@@ -86,6 +86,8 @@ module.exports = {
     // Switch a lean troupe object for a full mongoose object
     return troupeService.findById(req.troupe.id)
       .then(function(troupe) {
+        if(!troupe) throw new StatusError(404);
+
         var promises = [];
 
         if(updatedTroupe.autoConfigureHooks) {
