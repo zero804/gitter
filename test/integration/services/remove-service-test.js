@@ -90,10 +90,14 @@ describe('remove-service #slow', function() {
       createFav()
       .then(function() {
         var d = Q.defer();
+        var count = 0;
+
         appEvents.onDataChange2(function(res) {
+          if (count > 0) return;
           // First filter by url and operation, as other events may have been emitted
           if (res.url !== '/user/' + fixture.userFavourite.id + '/rooms') return;
           if (res.operation !== 'patch') return;
+          count++;
           assert.deepEqual(res.model, {
               id: fixture.troupeCanRemove.id,
               favourite: null,
