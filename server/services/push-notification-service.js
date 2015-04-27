@@ -110,11 +110,11 @@ exports.registerAndroidDevice = function(deviceId, deviceName, registrationId, a
 };
 
 exports.registerUser = function(deviceId, userId, callback) {
-  PushNotificationDevice.findOneAndUpdate(
+  return PushNotificationDevice.findOneAndUpdateQ(
     { deviceId: deviceId },
     { deviceId: deviceId, userId: userId, timestamp: new Date() },
-    { upsert: true },
-    callback);
+    { upsert: true })
+    .nodeify(callback);
 };
 
 exports.findDevicesForUser = function(userId, callback) {
@@ -135,12 +135,14 @@ function getCachedUsersWithDevices() {
       }, {});
 
       // Expire the cache after 60 seconds
-      setTimeout(function() {
-        usersWithDevicesCache = null;
-      }, 60000);
+      setTimeout(expireCachedUsersWithDevices, 60000);
 
       return usersWithDevicesCache;
     });
+}
+
+function expireCachedUsersWithDevices() {
+  usersWithDevicesCache = null;
 }
 
 exports.findUsersWithDevices = function(userIds, callback) {
@@ -234,3 +236,7 @@ exports.canUnlockForNotification = function (userId, troupeId, notificationNumbe
     return callback(null, result ? parseInt(result, 10) : 0);
   });
 };
+
+exports.testOnly = {
+  expireCachedUsersWithDevices: expireCachedUsersWithDevices
+}
