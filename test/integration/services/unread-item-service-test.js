@@ -37,6 +37,13 @@ function deep(object) {
 Q.longStackSupport = true;
 
 describe('unread-item-service', function() {
+  var unreadItemService;
+
+  before(function() {
+    /* Don't send batches out */
+    unreadItemService = testRequire("./services/unread-item-service");
+    unreadItemService.testOnly.setSendBadgeUpdates(false);
+  });
 
   var blockTimer = require('../block-timer');
   before(blockTimer.on);
@@ -44,8 +51,6 @@ describe('unread-item-service', function() {
 
   describe('getOldestId', function() {
     it('getOldestId', function() {
-      var unreadItemService = testRequire("./services/unread-item-service");
-
       var ids = ['51262ec7b1b16e01c800000e', '5124c3a95e5e661947000005'];
       var oldest = unreadItemService.testOnly.getOldestId(ids);
       assert(oldest === '5124c3a95e5e661947000005', 'Expected the older date stamp to be returned');
@@ -65,8 +70,6 @@ describe('unread-item-service', function() {
 
   describe('since-filter', function() {
     it('should do what it says on the tin', function() {
-      var unreadItemService = testRequire("./services/unread-item-service");
-
       var underTest = unreadItemService.testOnly.sinceFilter;
       var ids = ['51adc86e010285b469000005'];
       var since = 1370343534500;
@@ -160,6 +163,8 @@ describe('unread-item-service', function() {
           './user-service': userService,
           './room-permissions-model': roomPermissionsModel,
         });
+        unreadItemService.testOnly.setSendBadgeUpdates(false);
+
       });
 
       it('should parse messages with no mentions, no lurkers', function(done) {
@@ -313,7 +318,7 @@ describe('unread-item-service', function() {
           './troupe-service': troupeServiceMock,
           '../app-events': appEvents
         });
-
+        unreadItemService.testOnly.setSendBadgeUpdates(false);
 
         var usersWithLurkHash = {};
         usersWithLurkHash[userId1] = false;
@@ -458,6 +463,8 @@ describe('unread-item-service', function() {
           '../app-events': appEvents,
           './room-permissions-model': roomPermissionsModel,
         });
+        unreadItemService.testOnly.setSendBadgeUpdates(false);
+
       });
 
       it('should create messages with no mentions, no lurkers', function(done) {
@@ -675,6 +682,8 @@ describe('unread-item-service', function() {
           '../app-events': appEvents,
           './room-permissions-model': roomPermissionsModel,
         });
+        unreadItemService.testOnly.setSendBadgeUpdates(false);
+
       });
 
       it('should handle updates that add no mentions to a message with no mentions', function(done) {
@@ -718,6 +727,7 @@ describe('unread-item-service', function() {
 
     beforeEach(function() {
       unreadItemService = testRequire("./services/unread-item-service");
+      unreadItemService.testOnly.setSendBadgeUpdates(false);
     });
 
     it('should not return empty delta when the list of mentions is empty before and after', function() {
