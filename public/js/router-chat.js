@@ -239,9 +239,8 @@ onready(function () {
     },
 
     people: function() {
-      require.ensure(['views/people/peopleCollectionView', 'collections/users'], function(require) {
+      require.ensure(['views/people/peopleCollectionView'], function(require) {
         var peopleCollectionView = require('views/people/peopleCollectionView');
-        var userModels = require('collections/users');
 
         // seed the collection with the roster while wait for the full list to load
         var userCollection = new userModels.UserCollection(itemCollections.roster.models);
