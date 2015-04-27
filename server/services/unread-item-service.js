@@ -15,7 +15,9 @@ var RedisBatcher     = require('../utils/redis-batcher').RedisBatcher;
 var Q                = require('q');
 var badgeBatcher     = new RedisBatcher('badge', 300);
 
+var sendBadgeUpdates = true;
 engine.on('badge.update', function(userId) {
+  if (!sendBadgeUpdates) return;
   badgeBatcher.add('queue', userId);
 });
 
@@ -541,6 +543,9 @@ function updateChatUnreadItems(fromUserId, troupe, chat, originalMentions) {
 exports.updateChatUnreadItems = updateChatUnreadItems;
 
 exports.testOnly = {
+  setSendBadgeUpdates: function(value) {
+    sendBadgeUpdates = value;
+  },
   getOldestId: getOldestId,
   sinceFilter: sinceFilter,
   removeItem: removeItem,
