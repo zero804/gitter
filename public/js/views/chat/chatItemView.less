@@ -9,7 +9,7 @@
 @import "../repo/katex/katex";
 @import "../repo/katex/fonts";
 
-@chat-spacing: 0.444em;
+@chat-spacing: 0.222em;
 
 .trpChatContainer .isViewers:last-child .chat-item__details .chat-item__icon--read {
   visibility: visible;
@@ -136,7 +136,8 @@
 .chat-item__container {
   box-sizing: border-box;
   border-right: 2px solid transparent;
-  margin: 14px 30px 0px 44px;
+  margin: 0.888em 30px 0px 44px;
+  display: inline-block;
   text-align: left;
   transition: 1s border linear;
 
@@ -275,8 +276,13 @@
   padding: 0;
   word-wrap: break-word;
   user-select: text;
+  line-height: 1.38em;
   a.link {
     color: @trpLightBlue;
+  }
+
+  .issue, .commit {
+    padding-bottom: 2px;
   }
 
   p {
@@ -290,6 +296,10 @@
 
   p:last-child {
     padding-bottom: 0;
+  }
+
+  h1 {
+    margin: 0;
   }
 
 /*  p:last-child {
@@ -314,8 +324,7 @@
     border: 1px solid fade(@trpGrey,40%);
     background-color: fade(@trpGrey,20%);
     border-radius: 2px;
-    padding: 0 4px;
-    font-size: 13px;
+    padding: 0 4px 2px;
     cursor: pointer;
   }
 
