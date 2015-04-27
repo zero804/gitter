@@ -1,41 +1,26 @@
 "use strict";
-var log = require('utils/log');
-var Backbone = require('backbone');
 var Marionette = require('marionette');
 var $ = require('jquery');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
-var apiClient = require('components/apiClient');
 var template = require('./tmpl/chatInputView.hbs');
-var listItemTemplate = require('./tmpl/typeaheadListItem.hbs');
-var emojiListItemTemplate = require('./tmpl/emojiTypeaheadListItem.hbs');
 var moment = require('moment');
 var hasScrollBars = require('utils/scrollbar-detect');
 var isMobile = require('utils/is-mobile');
-var emoji = require('utils/emoji');
 var drafty = require('components/drafty');
-var cdn = require('utils/cdn');
 var commands = require('./commands');
 var cocktail = require('cocktail');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var platformKeys = require('utils/platform-keys');
+var typeaheads = require('./typeaheads');
 require('bootstrap_tooltip');
 require('jquery-textcomplete');
 
 module.exports = (function() {
 
-  /** @const */
-  var MAX_TYPEAHEAD_SUGGESTIONS = isMobile() ? 3 : 10;
-
-  /** @const */
-  var EXTRA_PADDING = 20;
-
   /* This value is also in chatItemView and in chat-service on the server*/
   /** @const */
   var EDIT_WINDOW = 1000 * 60 * 10; // 10 minutes
-
-  /** @const */
-  var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];
 
   /** @const */
   var MOBILE_PLACEHOLDER = 'Touch here to type a chat message.';
@@ -119,7 +104,6 @@ module.exports = (function() {
       this.rollers = options.rollers;
       this.chatCollectionView = options.chatCollectionView;
       this.composeMode = new ComposeMode();
-      this.userCollection = options.userCollection;
       this.compactView = options.compactView;
 
       this.listenTo(appEvents, 'input.append', function(text, options) {
@@ -185,118 +169,10 @@ module.exports = (function() {
       this.ui.composeToggle.tooltip({ placement: 'left' });
       this.ui.mdHelp.tooltip({ placement: 'left' });
 
-      var userCollection = this.userCollection;
-
-
       if(!isMobile()) {
         // textcomplete on mobile safari ios 8 causes the keyboard to
         // immediately hide on focus.
-        $textarea.textcomplete([
-          {
-            match: /(^|\s)(([\w-_]+\/[\w-_]+)?#(\d*))$/,
-            maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
-            search: function (term, callback) {
-              var terms = term.split('#');
-              var repoName = terms[0];
-              var issueNumber = terms[1];
-              var query = {};
-
-              if(repoName) query.repoName = repoName;
-              if(issueNumber) query.issueNumber = issueNumber;
-
-              apiClient.room.get('/issues', query)
-                .then(function(resp) {
-                  callback(resp);
-                })
-                .fail(function() {
-                  callback([]);
-                });
-            },
-            template: function(issue) {
-              return listItemTemplate({
-                name: issue.number,
-                description: issue.title
-              });
-            },
-            replace: function(issue) {
-              return '$1$3#' + issue.number + ' ';
-            }
-          },
-          {
-            match: /(^|\s)@(\/?[a-zA-Z0-9_\-]*)$/,
-            maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
-            search: function (term, callback) {
-              var lowerTerm = term.toLowerCase();
-              var loggedInUsername = context.user().get('username').toLowerCase();
-
-              var matches = userCollection && userCollection.filter(function (user) {
-                var username = user.get('username').toLowerCase();
-
-                if (username === loggedInUsername) return false; // do not include the current user in the matches
-
-                var displayName = (user.get('displayName') || '').toLowerCase();
-
-                return (username.indexOf(lowerTerm) === 0 || displayName.indexOf(lowerTerm) === 0);
-              });
-
-              if(!lowerTerm || '/all'.indexOf(lowerTerm) === 0) {
-                if(context().permissions.admin) {
-                  // This is a bit of a hack for now
-                  matches.unshift(new Backbone.Model({ username: '/all', displayName: 'Group' }));
-                }
-              }
-
-              callback(matches);
-            },
-            template: function(user) {
-              return listItemTemplate({
-                name: user.get('username'),
-                description: user.get('displayName')
-              });
-            },
-            replace: function(user) {
-                return '$1@' + user.get('username') + ' ';
-            }
-          },
-          {
-            match: /(^|\s):([\-+\w]*)$/,
-            maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
-            search: function(term, callback) {
-              if(term.length < 1) return callback(SUGGESTED_EMOJI);
-
-              var matches = emoji.named.filter(function(emoji) {
-                return emoji.indexOf(term) === 0;
-              });
-              callback(matches);
-            },
-            template: function(emoji) {
-              return emojiListItemTemplate({
-                emoji: emoji,
-                emojiUrl: cdn('images/emoji/' + emoji + '.png')
-              });
-            },
-            replace: function (value) {
-              return '$1:' + value + ': ';
-            }
-          },
-          {
-            match: /(^)\/(\w*)$/,
-            maxCount: commands.size,
-            search: function(term, callback) {
-              var matches = commands.getSuggestions(term);
-              callback(matches);
-            },
-            template: function(cmd) {
-              return listItemTemplate({
-                name: cmd.command,
-                description: cmd.description
-              });
-            },
-            replace: function (cmd) {
-              return '$1/' + cmd.completion;
-            }
-          }
-        ]);
+        $textarea.textcomplete(typeaheads);
       }
 
       // Use 'on' and 'off' instead of proper booleans as attributes are strings
@@ -571,7 +447,6 @@ module.exports = (function() {
         this.processInput();
       }
     },
-
 
     onKeyUp: function() {
       this.chatResizer.resizeInput();

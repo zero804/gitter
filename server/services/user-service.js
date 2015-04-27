@@ -69,6 +69,13 @@ function newUser(options) {
     });
 }
 
+function sanitiseUserSearchTerm(term) {
+  // remove non username chars
+  return term.replace(/[^0-9a-z\-]/ig, '')
+    // escape dashes
+    .replace(/\-/ig, '\\-');
+}
+
 var userService = {
 
   /**
@@ -203,6 +210,23 @@ var userService = {
 
   findByIdsLean: function(ids, select) {
     return mongooseUtils.findByIdsLean(persistence.User, ids, select);
+  },
+
+  findByIdsAndSearchTerm: function(ids, searchTerm, limit, callback) {
+    if(!ids || !ids.length || !searchTerm || !searchTerm.length) {
+      return Q.resolve([]).nodeify(callback);
+    }
+
+    var searchPattern = '^' + sanitiseUserSearchTerm(searchTerm);
+    return persistence.User.find({
+      _id: { $in: ids },
+      $or: [
+        { username: { $regex: searchPattern, $options: 'i' } },
+        { displayName: { $regex: searchPattern, $options: 'i' } }
+      ]
+    }).limit(limit)
+      .execQ()
+      .nodeify(callback);
   },
 
   findByUsernames: function(usernames, callback) {
