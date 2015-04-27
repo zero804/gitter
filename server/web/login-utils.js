@@ -18,14 +18,14 @@ exports.whereToNext = function(user, callback) {
         .then(promiseUtils.required);
     })
     .fail(function() {
-      return user.hasUsername() ? user.getHomeUrl() : '/home';
+      /* Fall back to userhome */
+      return user.username ? '/' + user.username : '/home';
     })
     .nodeify(callback);
 
 };
 
 exports.redirectUserToDefaultTroupe = function(req, res, next) {
-
   return exports.whereToNext(req.user)
     .then(function(url) {
       return res.relativeRedirect(url);

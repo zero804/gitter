@@ -4,6 +4,8 @@
 /* Listen for SIGUSR1 signals to start/stop profiling */
 // require('./utils/profiler');
 
+require('./utils/diagnostics');
+
 var env      = require('./utils/env');
 
 /* Configure winston before all else! */
@@ -16,7 +18,6 @@ var domainWrapper = require('./utils/domain-wrapper');
 var serverStats = require('./utils/server-stats');
 var onMongoConnect = require('./utils/on-mongo-connect');
 
-require('./utils/diagnostics');
 
 /* Load express-resource */
 require('express-resource');

@@ -1,7 +1,7 @@
 <div id="left-menu-profile" class="menu-header {{#if showExapandedHeader}}menu-header--expanded{{/if}}">
   <div class="menu-header__profile">
     {{ widget "avatar" model=user size='s' }}
-    <div class="menu-header__name"><p>{{ user.displayName }}</p></div>
+    <div class="menu-header__name u-font-larger">{{ user.displayName }}</div>
     {{#unless isMobile}}
       <div class="menu-header__state">
         {{#if menuHeaderExpanded}}
@@ -18,7 +18,7 @@
     <div class="menu-list" id="list-mega">
       {{!-- `#recentTroupesList` & `#OrgsList` need to be checked for JS hooks, if so replace with `js-*` --}}
       <div class='menu-list__item' id="recentTroupesList">
-        <div class="menu-list__header">All Conversations</div>
+        <h5 class="menu-list__header">All Conversations</h5>
         <div class="list-favourites  menu-list__section--fav" id="list-favs">
           <ul class="room-list">
           {{!-- put filtered favourites in here --}}
@@ -40,7 +40,7 @@
       <div class='menu-list__item' id="left-menu-list-suggested"></div>
       <div class='menu-list__item' id="left-menu-list-orgs">
         <div class="menu-list__section--orgs" id="list">
-          <div class="menu-list__header">Your Organizations</div>
+          <h5 class="menu-list__header">Your Organizations</h5>
           <ul class="room-list">{{#each orgs}}<li class="room-list-item">{{{ prerenderOrgListItem this }}}</li>{{/each}}</ul>
         </div>
       </div>
