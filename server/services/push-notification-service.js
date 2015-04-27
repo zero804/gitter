@@ -121,9 +121,36 @@ exports.findDevicesForUser = function(userId, callback) {
   PushNotificationDevice.find({ userId: userId }, callback);
 };
 
+var usersWithDevicesCache = null;
+function getCachedUsersWithDevices() {
+  if (usersWithDevicesCache) {
+    return Q.resolve(usersWithDevicesCache);
+  }
+
+  return PushNotificationDevice.distinctQ('userId')
+    .then(function(userIds) {
+      usersWithDevicesCache = userIds.reduce(function(memo, userId) {
+        memo[userId] = true;
+        return memo;
+      }, {});
+
+      // Expire the cache after 60 seconds
+      setTimeout(function() {
+        usersWithDevicesCache = null;
+      }, 60000);
+
+      return usersWithDevicesCache;
+    });
+}
+
 exports.findUsersWithDevices = function(userIds, callback) {
-  userIds = _.uniq(userIds);
-  PushNotificationDevice.distinct('userId', { userId: { $in: userIds } }, callback);
+  return getCachedUsersWithDevices()
+    .then(function(usersWithDevices) {
+      return userIds.filter(function(userId) {
+        return usersWithDevices[userId]; // Only true if the user has a device...
+      });
+    })
+    .nodeify(callback);
 };
 
 exports.findDevicesForUsers = function(userIds, callback) {
@@ -207,4 +234,3 @@ exports.canUnlockForNotification = function (userId, troupeId, notificationNumbe
     return callback(null, result ? parseInt(result, 10) : 0);
   });
 };
-
