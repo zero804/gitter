@@ -11,6 +11,7 @@ var cocktail = require('cocktail');
 var unreadItemsClient = require('components/unread-items-client');
 
 require('views/behaviors/infinite-scroll');
+require('views/behaviors/smooth-scroll');
 
 module.exports = (function() {
 
@@ -98,6 +99,10 @@ module.exports = (function() {
     behaviors: {
       InfiniteScroll: {
         reverseScrolling: true,
+        scrollElementSelector: SCROLL_ELEMENT,
+        contentWrapper: '#chat-container'
+      },
+      SmoothScroll: {
         scrollElementSelector: SCROLL_ELEMENT,
         contentWrapper: '#chat-container'
       }
@@ -230,6 +235,13 @@ module.exports = (function() {
         self.rollers.scrollToElement(firstUnreadView.el);
       });
 
+    },
+
+    onTrackViewportCenter: function() {
+      if (!this.isScrolledToBottom()) {
+        var el = this.rollers.getMostCenteredElement();
+        this.rollers.stable(el);
+      }
     },
 
     scrollToFirstUnreadBelow: function() {

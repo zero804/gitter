@@ -17,7 +17,6 @@ module.exports = (function() {
     this._scrollHandler = _.throttle(this.scroll.bind(this), 100);
     this._contentWrapper = options && options.contentWrapper;
     this.enable();
-    this.timer = null;
   }
   _.extend(NeverEndingStory.prototype, Backbone.Events, {
     scroll: function() {
@@ -55,21 +54,6 @@ module.exports = (function() {
       if(this._nearBottom != nearBottom) {
         this._nearBottom = nearBottom;
         this.trigger('near.bottom.changed', nearBottom);
-      }
-
-      var wrapper = this._contentWrapper;
-
-      // Disable pointer events while scrolling
-      if (wrapper) {
-        clearTimeout(this.timer);
-
-        if (!wrapper.classList.contains('disable-hover')) {
-          wrapper.classList.add('disable-hover');
-        }
-
-        this.timer = setTimeout(function() {
-          wrapper.classList.remove('disable-hover');
-        }, 250);
       }
 
       this.scrollRate();

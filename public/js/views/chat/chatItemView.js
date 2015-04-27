@@ -21,17 +21,6 @@ require('views/behaviors/sync-status');
 require('views/behaviors/highlight');
 require('bootstrap_tooltip');
 
-// Helper function
-function isElementInViewport (el) {
-  var rect = el.getBoundingClientRect();
-  return (
-    rect.top >= 0 &&
-    rect.left >= 0 &&
-    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-  );
-}
-
 module.exports = (function() {
 
 
@@ -123,6 +112,12 @@ module.exports = (function() {
         var oldInMS = this.model.get('sent').valueOf() + OLD_TIMEOUT - Date.now();
         setTimeout(timeChange, oldInMS + 50);
       }
+
+      this.listenToOnce(this, 'decorate', function() {
+        _.each(this.decorators, function(decorator) {
+          decorator.decorate(this);
+        }.bind(this));
+      }.bind(this));
     },
 
     template: function(data) {
@@ -211,22 +206,28 @@ module.exports = (function() {
         collapseIcon.tooltip({ container: 'body', title: this.getCollapseTooltip.bind(this) });
       }
 
-      var self = this;
-      var decorateIfVisible = function() {
-        var inViewport = isElementInViewport(self.$el[0]);
-        if (!inViewport || self.decorated) return;
+      //var self = this;
+      //var decorateIfVisible = function() {
+      //  var inViewport = isElementInViewport(self.$el[0]);
+      //  if (!inViewport || self.decorated) return;
 
-        self.decorated = true;
-        _.each(self.decorators, function(decorator) {
-          decorator.decorate(self);
-        });
-      };
+      //  self.decorated = true;
+      //  _.each(self.decorators, function(decorator) {
+      //    decorator.decorate(self);
+      //  });
+      //};
 
-      var lazyDecorator = _.debounce(decorateIfVisible, 500);
-      document.querySelector('#content-frame').addEventListener('scroll', lazyDecorator, false);
-
-      setTimeout(decorateIfVisible, 100);
+      //var lazyDecorator = _.debounce(decorateIfVisible, 500);
+      //document.querySelector('#content-frame').addEventListener('scroll', lazyDecorator, false);
+      //setTimeout(decorateIfVisible, 100);
     },
+
+    //onDecorate: function() {
+    //  var self = this;
+    //  _.each(self.decorators, function(decorator) {
+    //    decorator.decorate(self);
+    //  });
+    //},
 
     timeChange: function() {
       this.$el.toggleClass('isEditable', this.isInEditablePeriod());
