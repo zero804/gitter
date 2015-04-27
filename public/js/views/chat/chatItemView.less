@@ -10,18 +10,19 @@
 @import "../repo/katex/katex";
 @import "../repo/katex/fonts";
 
+@chat-spacing: 0.222em;
+
 .trpChatContainer .isViewers:last-child .chat-item__details .chat-item__icon--read {
   visibility: visible;
+}
+
+.chat-container .chat-item:last-child {
+  padding-bottom: @chat-spacing*2;
 }
 
 .chat-item {
   transition: background-color 0.5s linear;
   // border-top: 1px solid transparent;
-
-  /* this handles all styles for burst start */
-  &.burstStart {
-    padding-bottom: 2px;
-  }
 
   &.chat-item__highlighted {
     background-color: @permalink-highlight-bg;
@@ -51,9 +52,13 @@
     color: #888;
   }
 
-  /* this handles all styles for burst continuation */
+  &.burstStart {
+    padding-bottom: @chat-spacing;
+  }
+
   &.burstContinued {
 
+    padding: @chat-spacing 0;
     .chat-item__container {
       padding: 0px 30px 0px 30px;
     }
@@ -66,8 +71,6 @@
     .chat-item__details {
       float: left;
       margin: 0;
-      height: 19px;
-      line-height: 19px;
 
       .hover .chat-item:hover > & {
         margin-left: 2px;
@@ -118,7 +121,7 @@
   }
 
   &:last-child {
-    &.burstStart { padding-bottom: 10px; }
+    &.burstStart { padding-bottom: @chat-spacing*2; }
   }
 
   @media @mid {
@@ -133,7 +136,7 @@
 
 .chat-item__container {
   box-sizing: border-box;
-  padding: 14px 30px 0px 44px;
+  padding: 0.888em 30px 0px 44px;
   display: inline-block;
   text-align: left;
   width: 100%;
@@ -155,7 +158,6 @@
 .chat-item__details {
   margin: -4px 0 0px 0;
   padding: 0;
-  font-size: 12px;
   display: block;
   color: #999;
 }
@@ -188,7 +190,6 @@
 }
 
 .chat-item__icon {
-  .trpBodyTiny;
   cursor: pointer;
   transition: opacity 0.2s ease;
   display: inline-block;
@@ -274,20 +275,44 @@
 }
 
 .chat-item__text {
-
   margin: 0;
   padding: 0;
   word-wrap: break-word;
   user-select: text;
+  line-height: 1.38em;
   a.link {
     color: @trpLightBlue;
   }
+
+  .issue, .commit {
+    padding-bottom: 2px;
+  }
+
+  p {
+    padding: @chat-spacing 0;
+    margin: 0;
+  }
+
+  p:first-child {
+    padding-top: 0;
+  }
+
+  p:last-child {
+    padding-bottom: 0;
+  }
+
+  h1 {
+    margin: 0;
+  }
+
+/*  p:last-child {
+    margin-bottom: 0;
+  }*/
 
   .trpChatInput {
     display: block;
     width: 100%;
     outline: none;
-    .trpBodyMedium;
     padding-left: 5px;
     border: 0px;
     resize: none;
@@ -295,14 +320,14 @@
     box-shadow: none;
     height: 44px;
     outline: 1px solid @trpLightBlue;
+    line-height: 1.5;
   }
 
   .mention {
     border: 1px solid fade(@trpGrey,40%);
     background-color: fade(@trpGrey,20%);
     border-radius: 2px;
-    padding: 0 4px;
-    font-size: 13px;
+    padding: 0 4px 2px;
     cursor: pointer;
   }
 
@@ -311,7 +336,6 @@
     background-color: fade(@trpLightBlue,10%);
     border-radius: 2px;
     padding: 0 4px;
-    font-size: 13px;
     cursor: pointer;
   }
 
@@ -333,15 +357,11 @@
 }
 
 .chat-item__content {
-
-  .trpBodyMedium;
-
   padding: 0 10px 0 20px;
   border-radius: 5px;
   margin-left: 30px;
   vertical-align: top;
   min-height: 1.5em;
-  line-height: 140%;
 
   pre {
     margin: 4px 0 0 0;
