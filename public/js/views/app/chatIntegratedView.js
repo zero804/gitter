@@ -111,7 +111,6 @@ module.exports = (function() {
       var unreadChatsModel = unreadItemsClient.acrossTheFold();
 
       itemCollections.chats.once('sync', function() {
-        console.debug('itemCollections chats:', itemCollections.chats.length);
         unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
       });
 
