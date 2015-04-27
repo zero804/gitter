@@ -62,6 +62,8 @@ describe('unread-item-service-large-room #slow', function() {
       '../app-events': appEvents,
       './room-permissions-model': roomPermissionsModel,
     });
+    unreadItemService.testOnly.setSendBadgeUpdates(false);
+
   });
 
   it('should create messages in rooms with very large mentions', function(done) {
