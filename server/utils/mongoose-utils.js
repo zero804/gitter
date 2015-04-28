@@ -121,7 +121,7 @@ exports.findByIdsLean = function(Model, ids, select) {
     if (ids.length === 1) {
       return Model.findByIdQ(ids[0], select, { lean: true })
         .then(function(doc) {
-          if (doc) return [doc];
+          if (doc) return [mongoUtils.setId(doc)];
           return [];
         });
     }
@@ -131,7 +131,8 @@ exports.findByIdsLean = function(Model, ids, select) {
       .in(mongoUtils.asObjectIDs(collections.idsIn(ids)))
       .select(select)
       .lean()
-      .execQ();
+      .execQ()
+      .then(mongoUtils.setIds);
 
   });
 };

@@ -52,7 +52,7 @@ UserSchema.methods.isMissingTokens = function() {
   return userScopes.isMissingTokens(this);
 };
 
-UserSchema.methods.destroyTokens = function() {
+UserSchema.methods.clearTokens = function() {
   this.githubToken = null;
   this.githubScopes = { };
   this.githubUserToken = null;
