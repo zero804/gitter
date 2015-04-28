@@ -81,7 +81,6 @@
 
     .chat-item__icon--read {
       opacity: 0;
-      transition: 0.2s opacity linear;
     }
 
     &:hover .chat-item__icon--read {
@@ -204,23 +203,27 @@
   cursor: pointer;
   vertical-align: middle;
   color: #ddd;
-  visibility: hidden;
-  overflow: hidden;
+  transition: 0.2s opacity linear;
 }
 
 .chat-item__icon--read {
   .chat-item__icon;
   float: left;
   font-size: 0.8em;
+  opacity: 0;
 
   .chat-item:hover & {
-    visibility: visible;
     opacity: 1;
   }
 
   .isViewers & {
-    visibility: visible;
+    opacity: 1;
   }
+
+  @media @mobile {
+    display: none;
+  }
+
 }
 
 .chat-item__icon--collapse {
