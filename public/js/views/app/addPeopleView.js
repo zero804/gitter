@@ -185,7 +185,9 @@ module.exports = (function() {
         .fail(function (xhr) {
           var json = xhr.responseJSON;
           self.ui.loading.toggleClass('hide');
-          var m = json && json.message || 'Error';
+          var m = json && (json.error || json.message) || 'Error';
+
+          // XXX: why not use the payment required status code for this?
           if (m.match(/has reached its limit/)) self.dialog.showPremium();
           self.showValidationMessage(m);
           self.typeahead.clear();

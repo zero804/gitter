@@ -2,8 +2,6 @@
 "use strict";
 
 var permissionsModel   = require('./permissions-model');
-var StatusError        = require('statuserror');
-var Q                  = require('q');
 
 /**
  * Main entry point

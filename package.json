@@ -177,7 +177,7 @@
   "scripts": {
     "start": "nodemon web.js",
     "dev": "nodemon & gulp watch",
-    "test": "mocha test/integration/ --recursive -R spec"
+    "test": "gulp localtest"
   },
   "git": {
     "scripts": {
