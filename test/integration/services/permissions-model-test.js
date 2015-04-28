@@ -7,6 +7,9 @@ var assert = require('assert');
 var Q = require('q');
 
 var mockito = require('jsmockito').JsMockito;
+var times = mockito.Verifiers.times;
+var once = times(1);
+
 var USER;
 var URI;
 var SECURITY;
@@ -17,6 +20,8 @@ var oneToOnePermissionsModelMock;
 var orgChannelPermissionsModelMock;
 var repoChannelPermissionsModelMock;
 var userChannelPermissionsModelMock;
+var userServiceMock;
+var destroyTokensForUserIdMock;
 var permissionsModel;
 var permissionMocks;
 var fixtures;
@@ -33,6 +38,7 @@ describe('permissions-model', function() {
     URI = 'uri';
     SECURITY = 'SECURITAAAAAI'; // Always just passed through
     userBannedFromRoomMock = mockito.mockFunction();
+    destroyTokensForUserIdMock = mockito.mockFunction();
 
     permissionMocks = [
       repoPermissionsModelMock = mockito.mockFunction(),
@@ -52,8 +58,13 @@ describe('permissions-model', function() {
       'USER_CHANNEL': userChannelPermissionsModelMock
     };
 
+    userServiceMock = {
+      destroyTokensForUserId: destroyTokensForUserIdMock
+    }
+
     permissionsModel = testRequire.withProxies("./services/permissions-model", {
       './user-banned-from-room': userBannedFromRoomMock,
+      './user-service': userServiceMock,
       './permissions/repo-permissions-model': repoPermissionsModelMock,
       './permissions/org-permissions-model': orgPermissionsModelMock,
       './permissions/one-to-one-permissions-model': oneToOnePermissionsModelMock,
@@ -73,6 +84,7 @@ describe('permissions-model', function() {
   describe('token rejection', function() {
     beforeEach(function() {
       mockito.when(userBannedFromRoomMock)().then(function() { return Q.resolve(false); });
+      mockito.when(destroyTokensForUserIdMock)().then(function() { return Q.resolve(); });
       mockito.when(orgPermissionsModelMock)().then(function() {
         var error = new Error();
         error.gitterAction = 'logout_destroy_user_tokens';
@@ -82,25 +94,40 @@ describe('permissions-model', function() {
 
     it('destroys the user token', function(done) {
       var user = {
-        username: 'gitterbob',
-        destroyTokens: function() {
-          done();
-        }
+        _id: 'x',
+        username: 'gitterbob'
       };
 
-      permissionsModel(user, 'join', 'uri', 'ORG', 'PUBLIC');
+      permissionsModel(user, 'join', 'uri', 'ORG', 'PUBLIC')
+        .then(function() {
+          assert(false, 'should have failed');
+        }, function(err) {
+          assert.strictEqual(err.gitterAction, 'logout_destroy_user_tokens');
+        })
+        .finally(function() {
+          mockito.verify(destroyTokensForUserIdMock, once)('x');
+        })
+        .nodeify(done);
+
     });
 
     it('saves the destruction of the user token', function(done) {
       var user = {
-        username: 'gitterbob',
-        destroyTokens: function() {},
-        saveQ: function() {
-          done();
-        }
+        _id: 'y',
+        username: 'gitterbob'
       };
 
-      permissionsModel(user, 'join', 'uri', 'ORG', 'PUBLIC');
+      permissionsModel(user, 'join', 'uri', 'ORG', 'PUBLIC')
+        .then(function() {
+          assert(false, 'should have failed');
+        }, function(err) {
+          assert.strictEqual(err.gitterAction, 'logout_destroy_user_tokens');
+        })
+        .finally(function() {
+          mockito.verify(destroyTokensForUserIdMock, once)('y');
+        })
+        .nodeify(done);
+
     });
 
   });
