@@ -5,199 +5,200 @@ var events = require('events');
 var localEventEmitter = new events.EventEmitter();
 
 module.exports =  {
-  unreadRecalcRequired: function() {
+    unreadRecalcRequired: function() {
     localEventEmitter.emit('unreadRecalcRequired', true);
-  },
+    },
 
-  onUnreadRecalcRequired: function(callback) {
+    onUnreadRecalcRequired: function(callback) {
     localEventEmitter('unreadRecalcRequired', callback);
-  },
+    },
 
 
-  newUnreadItem: function(userId, troupeId, items) {
-    localEventEmitter.emit('newUnreadItem', {
-      userId: userId,
-      troupeId: troupeId,
-      items: items
-    });
-  },
+    newUnreadItem: function(userId, troupeId, items, online) {
+      localEventEmitter.emit('newUnreadItem', {
+        userId: userId,
+        troupeId: troupeId,
+        items: items,
+        online: online
+      });
+    },
 
-  onNewUnreadItem: function(callback) {
+    onNewUnreadItem: function(callback) {
     localEventEmitter.on('newUnreadItem', callback);
-  },
+    },
 
 
-  unreadItemsRemoved: function(userId, troupeId, items) {
+    unreadItemsRemoved: function(userId, troupeId, items) {
     localEventEmitter.emit('unreadItemRemoved', {
-      userId: userId,
-      troupeId: troupeId,
-      items: items
-    });
-  },
+        userId: userId,
+        troupeId: troupeId,
+        items: items
+      });
+    },
 
-  onUnreadItemsRemoved: function(callback) {
+    onUnreadItemsRemoved: function(callback) {
     localEventEmitter.on('unreadItemRemoved', callback);
-  },
+    },
 
-  troupeUnreadCountsChange: function(data) {
+    troupeUnreadCountsChange: function(data) {
     localEventEmitter.emit('troupeUnreadCountsChange', data);
-  },
+    },
 
-  onTroupeUnreadCountsChange: function(callback) {
+    onTroupeUnreadCountsChange: function(callback) {
     localEventEmitter.on('troupeUnreadCountsChange', callback);
-  },
+    },
 
-  troupeMentionCountsChange: function(data) {
+    troupeMentionCountsChange: function(data) {
     localEventEmitter.emit('troupeMentionCountsChange', data);
-  },
+    },
 
-  onTroupeMentionCountsChange: function(callback) {
+    onTroupeMentionCountsChange: function(callback) {
     localEventEmitter.on('troupeMentionCountsChange', callback);
-  },
+    },
 
-  userMentionedInNonMemberRoom: function(data) {
+    userMentionedInNonMemberRoom: function(data) {
     localEventEmitter.emit('userMentionedInNonMemberRoom', data);
-  },
+    },
 
-  onUserMentionedInNonMemberRoom: function(callback) {
+    onUserMentionedInNonMemberRoom: function(callback) {
     localEventEmitter.on('userMentionedInNonMemberRoom', callback);
-  },
+    },
 
-  userLoggedIntoTroupe: function(userId, troupeId) {
+    userLoggedIntoTroupe: function(userId, troupeId) {
     localEventEmitter.emit('userLoggedIntoTroupe', { troupeId: troupeId, userId: userId });
-  },
+    },
 
-  onUserLoggedIntoTroupe: function(callback) {
+    onUserLoggedIntoTroupe: function(callback) {
     localEventEmitter.on('userLoggedIntoTroupe', callback);
-  },
+    },
 
-  userLoggedOutOfTroupe: function(userId, troupeId) {
+    userLoggedOutOfTroupe: function(userId, troupeId) {
     localEventEmitter.emit('userLoggedOutOfTroupe', { troupeId: troupeId, userId: userId });
-  },
+    },
 
-  onUserLoggedOutOfTroupe: function(callback) {
+    onUserLoggedOutOfTroupe: function(callback) {
     localEventEmitter.on('userLoggedOutOfTroupe', callback);
-  },
+    },
 
-  // Deprecated
-  newNotification: function(troupeId, userId, notificationText, notificationLink) {
+    // Deprecated
+    newNotification: function(troupeId, userId, notificationText, notificationLink) {
     localEventEmitter.emit('newNotification', {
-      troupeId: troupeId,
-      userId: userId,
-      notificationText: notificationText,
-      notificationLink: notificationLink
-    });
-  },
+        troupeId: troupeId,
+        userId: userId,
+        notificationText: notificationText,
+        notificationLink: notificationLink
+      });
+    },
 
-  // Deprecated
-  onNewNotification: function(callback) {
+    // Deprecated
+    onNewNotification: function(callback) {
     localEventEmitter.on('newNotification', callback);
-  },
+    },
 
-  userNotification: function(options) {
+    userNotification: function(options) {
     localEventEmitter.emit('userNotification',options);
-  },
+    },
 
-  // Deprecated
-  onUserNotification: function(callback) {
+    // Deprecated
+    onUserNotification: function(callback) {
     localEventEmitter.on('userNotification', callback);
-  },
+    },
 
-  dataChange2: function(url, operation, model) {
+    dataChange2: function(url, operation, model) {
     localEventEmitter.emit('dataChange2', {
-      url: url,
-      operation: operation,
-      model: model
-    });
-  },
+        url: url,
+        operation: operation,
+        model: model
+      });
+    },
 
-  onDataChange2: function(callback) {
+    onDataChange2: function(callback) {
     localEventEmitter.on('dataChange2', callback);
-  },
+    },
 
-  chat: function(operation, troupeId, model) {
+    chat: function(operation, troupeId, model) {
     localEventEmitter.emit('chat', {
-      operation: operation,
-      troupeId: troupeId,
-      model: model
-    });
-  },
+        operation: operation,
+        troupeId: troupeId,
+        model: model
+      });
+    },
 
-  onChat: function(callback) {
+    onChat: function(callback) {
     localEventEmitter.on('chat', callback);
-  },
+    },
 
-  eyeballSignal: function(userId, troupeId, signal) {
+    eyeballSignal: function(userId, troupeId, signal) {
     localEventEmitter.emit('eyeballSignal', {
-      userId: userId,
-      troupeId: troupeId,
-      signal: signal
-    });
-  },
+        userId: userId,
+        troupeId: troupeId,
+        signal: signal
+      });
+    },
 
-  onEyeballSignal: function(callback) {
+    onEyeballSignal: function(callback) {
     localEventEmitter.on('eyeballSignal', function(event) {
-      return callback(event.userId, event.troupeId, event.signal);
-    });
-  },
+        return callback(event.userId, event.troupeId, event.signal);
+      });
+    },
 
-  userRemovedFromTroupe: function(options) {
+    userRemovedFromTroupe: function(options) {
     localEventEmitter.emit('userRemovedFromTroupe', options);
-  },
+    },
 
-  onUserRemovedFromTroupe: function(callback) {
+    onUserRemovedFromTroupe: function(callback) {
     localEventEmitter.on('userRemovedFromTroupe', callback);
-  },
+    },
 
-  batchUserBadgeCountUpdate: function(data) {
+    batchUserBadgeCountUpdate: function(data) {
     localEventEmitter.emit('batchUserBadgeCountUpdate', data);
-  },
+    },
 
-  onBatchUserBadgeCountUpdate: function(callback) {
+    onBatchUserBadgeCountUpdate: function(callback) {
     localEventEmitter.on('batchUserBadgeCountUpdate', callback);
-  },
+    },
 
-  troupeDeleted: function(options) {
+    troupeDeleted: function(options) {
     localEventEmitter.emit('troupeDeleted', options);
-  },
+    },
 
-  onTroupeDeleted: function(callback) {
+    onTroupeDeleted: function(callback) {
     localEventEmitter.on('troupeDeleted', callback);
-  },
+    },
 
-  repoPermissionsChangeDetected: function(uri, isPrivate) {
+    repoPermissionsChangeDetected: function(uri, isPrivate) {
     localEventEmitter.emit('repo_perm_change', {
-      uri: uri,
-      isPrivate: isPrivate
-    });
-  },
+        uri: uri,
+        isPrivate: isPrivate
+      });
+    },
 
-  onRepoPermissionsChangeDetected: function(callback) {
+    onRepoPermissionsChangeDetected: function(callback) {
     localEventEmitter.on('repo_perm_change', callback);
-  },
+    },
 
-  userTroupeLurkModeChange: function(data) {
+    userTroupeLurkModeChange: function(data) {
     localEventEmitter.emit('user_troupe_lurk_mode_change', data);
-  },
+    },
 
-  onUserTroupeLurkModeChange: function(callback) {
+    onUserTroupeLurkModeChange: function(callback) {
     localEventEmitter.on('user_troupe_lurk_mode_change', callback);
-  },
+    },
 
-  newLurkActivity: function(data) {
+    newLurkActivity: function(data) {
     localEventEmitter.emit('new_lurk_activity', data);
-  },
+    },
 
-  onNewLurkActivity: function(callback) {
+    onNewLurkActivity: function(callback) {
     localEventEmitter.on('new_lurk_activity', callback);
-  },
+    },
 
-  markAllRead: function(data) {
+    markAllRead: function(data) {
     localEventEmitter.emit('mark_all_read', data);
-  },
+    },
 
-  onMarkAllRead: function(callback) {
+    onMarkAllRead: function(callback) {
     localEventEmitter.on('mark_all_read', callback);
-  }
+    }
 
-};
+  };

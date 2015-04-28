@@ -42,6 +42,7 @@ exports.install = function(persistenceService) {
 
   var schemas = persistenceService.schemas;
   var mongooseUtils = require("../utils/mongoose-utils");
+  var presenceService = require('./presence-service');
 
   /** */
   function attachNotificationListenersToSchema(schema, name, extractor) {
@@ -164,8 +165,6 @@ exports.install = function(persistenceService) {
 
       var strategy = new restSerializer.TroupeStrategy({ currentUserId: currentUserId });
 
-
-
       restSerializer.serialize(troupe, strategy, function(err, serializedModel) {
         if(err) return logger.error('Error while serializing oneToOne troupe: ' + err, { exception: err });
 
@@ -173,6 +172,28 @@ exports.install = function(persistenceService) {
       });
 
     });
+  }
+
+  function serializeTroupeEventForUsers(troupeUsers, operation, model, next) {
+    var userIds = troupeUsers.map(function(troupeUser) { return troupeUser.userId; });
+
+    return presenceService.categorizeUsersByOnlineStatus(userIds)
+      .then(function(online) {
+        var urls = userIds.filter(function(userId) {
+            return !!online[userId];
+          }).map(function(userId) {
+            return '/user/' + userId + '/rooms';
+          });
+
+        serializeEvent(urls, 'create', model);
+      })
+      .catch(function(err) {
+        logger.error('Error while serializing non-oneToOne troupe: ' + err, { exception: err });
+      })
+      .finally(function() {
+        if(next) next();
+      });
+
   }
 
   mongooseUtils.attachNotificationListenersToSchema(schemas.TroupeSchema, {
@@ -183,9 +204,7 @@ exports.install = function(persistenceService) {
         return next();
       }
 
-      var urls = model.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/rooms'; });
-      serializeEvent(urls, 'create', model);
-      next();
+      serializeTroupeEventForUsers(model.users, 'create', model, next);
     },
 
     onUpdate: function onTroupeUpdate(model, next) {
@@ -195,9 +214,7 @@ exports.install = function(persistenceService) {
         return next();
       }
 
-      var urls = model.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/rooms'; });
-      serializeEvent(urls, 'update', model);
-      next();
+      serializeTroupeEventForUsers(model.users, 'update', model, next);
     },
 
     onRemove: function onTroupeRemove(model) {
@@ -207,8 +224,7 @@ exports.install = function(persistenceService) {
         return;
       }
 
-      var urls = model.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/rooms'; });
-      serializeEvent(urls, 'remove', model);
+      serializeTroupeEventForUsers(model.users, 'remove', model);
     }
   });
 

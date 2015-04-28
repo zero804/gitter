@@ -246,6 +246,10 @@ describe('unread-item-service', function() {
 
 
     describe('listTroupeUsersForEmailNotifications', function() {
+      before(function(done) {
+        unreadItemServiceEngine.testOnly.removeAllEmailNotifications()
+          .nodeify(done);
+      });
 
       it('should list users for email notifications #slow', function(done) {
         unreadItemServiceEngine.newItemWithMentions(troupeId1, itemId1, userIds, [])

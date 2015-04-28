@@ -7,7 +7,19 @@ var roomService        = require('../../services/room-service');
 var emailAddressService = require('../../services/email-address-service');
 var userService        = require("../../services/user-service");
 var restSerializer     = require("../../serializers/rest-serializer");
-var _                  = require("underscore");
+var mongoUtils         = require('../../utils/mongo-utils');
+var troupeService      = require("../../services/troupe-service");
+var StatusError        = require('statuserror');
+
+function maskEmail(email) {
+  return email
+    .split('@')
+    .map(function (item, index) {
+      if (index === 0) return item.slice(0, 4) + '****';
+      return item;
+    })
+    .join('@');
+}
 
 module.exports = {
   id: 'resourceTroupeUser',
@@ -31,20 +43,16 @@ module.exports = {
 
   create: function(req, res, next) {
     var username = req.body.username;
+    var troupeId = req.troupe.id;
 
-    function maskEmail(email) {
-      return email
-        .split('@')
-        .map(function (item, index) {
-          if (index === 0) return item.slice(0, 4) + '****';
-          return item;
-        })
-        .join('@');
-    }
+    // Switch a lean troupe object for a full mongoose object
+    return troupeService.findById(troupeId)
+      .then(function(troupe) {
+        if(!troupe) throw new StatusError(404);
 
-    return roomService.addUserToRoom(req.troupe, req.user, username)
-      .then(function (addedUser) {
-
+        return roomService.addUserToRoom(troupe, req.user, username);
+      })
+      .then(function(addedUser) {
         var strategy = new restSerializer.UserStrategy();
 
         return [
@@ -53,25 +61,28 @@ module.exports = {
         ];
       })
       .spread(function(serializedUser, email) {
-
         if (serializedUser.invited && email) {
           serializedUser.email = maskEmail(email);
         }
 
         res.send(200, { success: true, user: serializedUser });
       })
-      .catch(function (err) {
-        res.send(err.status, err);
-      })
-      .fail(next);
+      .catch(next);
   },
 
   destroy: function(req, res, next){
     var user = req.resourceTroupeUser;
+    var troupeId = req.troupe.id;
 
-    return roomService.removeUserFromRoom(req.troupe, user, req.user)
+    // Switch a lean troupe object for a full mongoose object
+    return troupeService.findById(troupeId)
+      .then(function(troupe) {
+        if(!troupe) throw new StatusError(404);
+
+        return roomService.removeUserFromRoom(troupe, user, req.user);
+      })
       .then(function() {
-        recentRoomService.removeRecentRoomForUser(user.id, req.troupe.id);
+        recentRoomService.removeRecentRoomForUser(user.id, troupeId);
       })
       .then(function() {
         res.send({ success: true });
@@ -79,9 +90,16 @@ module.exports = {
       .catch(next);
   },
 
-  load: function(req, id, callback) {
-    var userInTroupeId = _.find(req.troupe.getUserIds(), function(v) { return v == id;} );
-    userService.findById(userInTroupeId, callback);
+  load: function(req, userId, callback) {
+    if(!mongoUtils.isLikeObjectId(userId)) return callback();
+
+    return troupeService.findByIdLeanWithAccess(req.troupe.id, userId)
+      .spread(function(troupe, access) {
+        if (!access) return;
+
+        return userService.findById(userId);
+      })
+      .nodeify(callback);
   }
 
 };

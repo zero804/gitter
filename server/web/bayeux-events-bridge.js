@@ -199,12 +199,11 @@ exports.install = function() {
     var userId = data.userId;
     var troupeId = data.troupeId;
     var items = data.items;
+    var isOnline = data.online;
 
-    // This should only be for lurking users
-    // publish("/api/v1/user/" + userId, {
-    //   notification: "activity",
-    //   troupeId: troupeId
-    // });
+    // This event gets triggered for offline users too,
+    // but we can ignore them
+    if (!isOnline) return;
 
     publish("/api/v1/user/" + userId + '/rooms/' + troupeId + '/unreadItems', {
       notification: "unread_items",
