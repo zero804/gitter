@@ -432,7 +432,7 @@ module.exports = (function() {
         chatResizer.resizeInput();
       });
 
-      
+
       if (!this.options.editMode) this.drafty = drafty(this.el);
 
       chatResizer.resetInput(true);

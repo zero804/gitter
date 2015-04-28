@@ -42,6 +42,11 @@
   align-content: center;
   color: @color;
   transition: transform 0.1s cubic-bezier(0.17, 0.67, 0.83, 0.67), color 0.25s ease-in, border-color 0.25s ease-in;
+
+  @media @mobile {
+    display: none;
+  }
+
 }
 
 .scrollHelper:hover {
