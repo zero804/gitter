@@ -99,6 +99,7 @@ function fieldInPredicate(fieldName, values, additionalClauses) {
 }
 
 function setId(model) {
+  if (!model) return model;
   model.id = serializeObjectId(model._id);
   return model;
 }
@@ -106,6 +107,7 @@ exports.setId = setId;
 
 function setIds(array) {
   array.forEach(function(f) {
+    if (!f) return;
     f.id = serializeObjectId(f._id);
   });
   return array;
