@@ -50,7 +50,7 @@ module.exports = {
       .then(function(troupe) {
         if(!troupe) throw new StatusError(404);
 
-        return roomService.addUserToRoom(req.troupe, req.user, username);
+        return roomService.addUserToRoom(troupe, req.user, username);
       })
       .then(function(addedUser) {
         var strategy = new restSerializer.UserStrategy();
@@ -67,7 +67,7 @@ module.exports = {
 
         res.send(200, { success: true, user: serializedUser });
       })
-      .fail(next);
+      .catch(next);
   },
 
   destroy: function(req, res, next){
