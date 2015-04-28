@@ -3,7 +3,7 @@ var Backbone = require('backbone');
 var _ = require('underscore');
 var usersSort = require('utils/user-sort');
 
-var MegaCollection = Backbone.Collection.extend({
+var SortedCollection = Backbone.Collection.extend({
   initialize: function(models, options) { // jshint unused:true
     var userList = options.users;
 
@@ -36,9 +36,9 @@ var MegaCollection = Backbone.Collection.extend({
   comparator: usersSort
 });
 
-var LimitedCollection = Backbone.Collection.extend({
+var SortedAndLimitedCollection = Backbone.Collection.extend({
   initialize: function(models, options) { // jshint unused:true
-    var collection = new MegaCollection([], { users: options.users });
+    var collection = new SortedCollection([], { users: options.users });
 
     this.underlying = collection;
     this.limit = options.limit || 10;
@@ -139,6 +139,6 @@ var LimitedCollection = Backbone.Collection.extend({
 });
 
 module.exports = {
-  SortedAndLimited: LimitedCollection,
-  Sorted: MegaCollection
+  SortedAndLimited: SortedAndLimitedCollection,
+  Sorted: SortedCollection
 };
