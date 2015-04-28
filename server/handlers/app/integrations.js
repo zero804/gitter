@@ -137,7 +137,7 @@ module.exports = {
           adminAccessCheck,
           getIntegrations);
 
-        app.del(uri,
+        app.delete(uri,
           ensureLoggedIn,
           uriContextResolverMiddleware({ create: false }),
           adminAccessCheck,
