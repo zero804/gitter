@@ -37,7 +37,7 @@ exports.removeByUsername = function(username) {
           user.state = 'REMOVED';
           user.email = undefined;
           user.invitedEmail = undefined;
-          user.destroyTokens();
+          user.clearTokens();
 
           return user.saveQ();
         });

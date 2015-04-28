@@ -116,26 +116,28 @@ module.exports = {
         return next();
       }
 
-      if(this.githubType === 'REPO') {
+      /* Don't tag test repos */
+      if(this.githubType === 'REPO' && this.uri.indexOf("_test_") !== 0) {
         var repoService = new RepoService(this.users[0]);
         var self = this;
 
-        repoService.getRepo(this.uri)
+        return repoService.getRepo(this.uri)
           .then(function(repo) {
             assert(repo, 'repo lookup failed');
 
             self.tags = tagger(self, repo);
           })
           .catch(function(err) {
-            winston.warn('repo lookup or tagging failed, skipping tagging for now', { exception: err });
+            winston.warn('repo lookup or tagging failed for ' + this.uri + ' , skipping tagging for now', { exception: err });
           })
           .finally(function() {
             next();
           });
-      } else {
-        this.tags = tagger(this);
-        next();
+
       }
+
+      this.tags = tagger(this);
+      next();
     });
 
     TroupeSchema.methods.getUserIds = function() {

@@ -9,6 +9,8 @@ var suggestedRoomService = require('../../services/suggested-room-service');
 var roomService          = require('../../services/room-service');
 var removeService        = require('../../services/remove-service');
 var Q                    = require('q');
+var mongoUtils           = require('../../utils/mongo-utils');
+var StatusError          = require('statuserror');
 
 module.exports = {
   id: 'userTroupe',
@@ -50,38 +52,45 @@ module.exports = {
   },
 
   update: function(req, res, next) {
-    var troupe = req.userTroupe;
-    var updatedTroupe = req.body;
     var userId = req.user.id;
-    var troupeId = troupe.id;
-    var promises = [];
 
-    if('favourite' in updatedTroupe) {
-      var fav = updatedTroupe.favourite;
+    // Switch a lean troupe object for a full mongoose object
+    return troupeService.findById(req.userTroupe.id)
+      .then(function(troupe) {
+        if (!troupe) throw new StatusError(404);
 
-      if(!fav || troupeService.userHasAccessToTroupe(req.resourceUser, troupe)) {
-        promises.push(recentRoomService.updateFavourite(userId, troupeId, fav));
-      } else {
-        // The user has added a favourite that they don't belong to
-        // Add them to the room first
-        promises.push(
-          roomService.findOrCreateRoom(req.resourceUser, troupe.uri)
-            .then(function() {
-              return recentRoomService.updateFavourite(userId, troupeId, updatedTroupe.favourite);
-            })
-          );
-      }
-    }
+        var updatedTroupe = req.body;
+        var troupeId = troupe.id;
+        var promises = [];
 
-    if('lurk' in updatedTroupe) {
-      promises.push(roomService.updateTroupeLurkForUserId(userId, troupeId, updatedTroupe.lurk));
-    }
+        if('favourite' in updatedTroupe) {
+          var fav = updatedTroupe.favourite;
 
-    return Q.all(promises)
-      .then(function() {
-        var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
+          if(!fav || troupeService.userHasAccessToTroupe(req.resourceUser, troupe)) {
+            promises.push(recentRoomService.updateFavourite(userId, troupeId, fav));
+          } else {
+            // The user has added a favourite that they don't belong to
+            // Add them to the room first
+            promises.push(
+              roomService.findOrCreateRoom(req.resourceUser, troupe.uri)
+                .then(function() {
+                  return recentRoomService.updateFavourite(userId, troupeId, updatedTroupe.favourite);
+                })
+              );
+          }
+        }
 
-        return restSerializer.serializeQ(troupeId, strategy);
+        if('lurk' in updatedTroupe) {
+          promises.push(roomService.updateTroupeLurkForUserId(userId, troupeId, updatedTroupe.lurk));
+        }
+
+        return Q.all(promises)
+          .thenResolve(troupe);
+      })
+      .then(function(troupe) {
+        var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
+
+        return restSerializer.serializeQ(troupe, strategy);
       })
       .then(function(troupe) {
         res.send(troupe);
@@ -90,10 +99,15 @@ module.exports = {
   },
 
   destroy: function(req, res, next) {
-    var troupe = req.userTroupe;
     var userId = req.user.id;
 
-    return removeService.removeRecentRoomForUser(troupe, userId)
+    // Switch a lean troupe object for a full mongoose object
+    return troupeService.findById(req.userTroupe.id)
+      .then(function(troupe) {
+        if (!troupe) throw new StatusError(404);
+
+        return removeService.removeRecentRoomForUser(troupe, userId);
+      })
       .then(function() {
         res.send({ success: true });
       })
@@ -101,20 +115,31 @@ module.exports = {
   },
 
   load: function(req, id, callback) {
-    troupeService.findById(id, function(err, troupe) {
-      if(err) return callback(err);
+    /* Invalid id? Return 404 */
+    if(!mongoUtils.isLikeObjectId(id)) return callback();
 
-      if(!troupe) return callback();
+    return troupeService.findByIdLeanWithAccess(id, req.user && req.user._id)
+      .spread(function(troupe, access) {
+        if(!troupe) throw new StatusError(404);
 
-      var nonMembersAllowed = req.method === 'DELETE' || req.method === 'POST';
+        if(troupe.status === 'DELETED') throw new StatusError(404);
 
-      /* Some strangeness here as the user may be mentioned */
-      if(!(nonMembersAllowed || troupeService.userHasAccessToTroupe(req.resourceUser, troupe))) {
-        return callback(403);
-      }
+        if(troupe.security === 'PUBLIC' && req.method === 'GET') {
+          return troupe;
+        }
 
-      return callback(null, troupe);
-    });
+        /* From this point forward we need a user */
+        if(!req.user) {
+          throw new StatusError(401);
+        }
+
+        if(!access) {
+          throw new StatusError(403);
+        }
+
+        return troupe;
+      })
+      .nodeify(callback);
   }
 
 };

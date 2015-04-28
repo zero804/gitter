@@ -3,7 +3,7 @@
 var Q = require('q');
 var assert = require('assert');
 var roomPermissionsModel = require('./room-permissions-model');
-
+var troupeService = require('./troupe-service');
 /**
  * Return a value or a promise of the team members
  */
@@ -17,9 +17,7 @@ function resolveTeam(room, user, groupName) {
       .then(function(access) {
         if(!access) return [];
 
-        return room.users.map(function(troupeUser) {
-          return troupeUser.userId;
-        });
+        return troupeService.findUserIdsForTroupe(room.id);
       });
   }
 

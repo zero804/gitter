@@ -125,7 +125,7 @@ exports.install = function() {
 
 
   // Listen for onNewUnreadItem events generated locally
-  appEvents.localOnly.onNewUnreadItem(function(data) {
+  appEvents.onNewUnreadItem(function(data) {
     var troupeId = '' + data.troupeId;
     var userId = '' + data.userId;
     var items = data.items;
@@ -136,13 +136,13 @@ exports.install = function() {
   });
 
   // /* Update badges for apps */
-  appEvents.localOnly.onBatchUserBadgeCountUpdate(function(data) {
+  appEvents.onBatchUserBadgeCountUpdate(function(data) {
     var userIds = data.userIds;
     winston.info('Publishing badge count updates for ' + userIds.length + ' users.');
     pushNotificationGateway.sendUsersBadgeUpdates(userIds);
   });
 
-  appEvents.localOnly.onEyeballSignal(function(userId, troupeId, eyeballSignal) {
+  appEvents.onEyeballSignal(function(userId, troupeId, eyeballSignal) {
     if(eyeballSignal) {
       pushNotificationService.resetNotificationsForUserTroupe(userId, troupeId, function(err) {
         if(err) winston.error('Error while calling resetNotificationsForUserTroupe. Silently ignoring. ' + err, { exception: err });

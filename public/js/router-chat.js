@@ -14,6 +14,7 @@ var highlightPermalinkChats = require('./utils/highlight-permalink-chats');
 var apiClient = require('components/apiClient');
 var HeaderView = require('views/app/headerView');
 var frameUtils = require('./utils/frame-utils');
+var userModels = require('collections/users');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -179,50 +180,50 @@ onready(function () {
     });
   };
 
+  // FIXME This is very inneficient, it was kind of ok before because it was 
+  // using the users live collection but that is gone now
   appEvents.on('command.room.remove', function(username) {
-    var user = itemCollections.users.findWhere({username: username});
-    if (user) {
-      apiClient.room.delete("/users/" + user.id, "")
-        .then(function() {
-          itemCollections.users.remove(user);
-        })
-        .fail(function(xhr) {
-          if (xhr.status < 500) notifyRemoveError(xhr.responseJSON.error);
-          else notifyRemoveError('');
-      });
-    }
-    else notifyRemoveError('User '+ username +' was not found in this room.');
+    var userCollection = new userModels.UserCollection();
+    userCollection.fetch();
+    userCollection.once('sync', function() {
+      var user = userCollection.findWhere({username: username});
+
+      if (user) {
+        apiClient.room.delete("/users/" + user.id, "")
+          .then(function() {
+            userCollection.remove(user);
+          })
+          .fail(function(xhr) {
+            if (xhr.status < 500) notifyRemoveError(xhr.responseJSON.error);
+            else notifyRemoveError('');
+        });
+      }
+      else notifyRemoveError('User '+ username +' was not found in this room.');
+    });
   });
 
   var appView = new ChatIntegratedView({ el: 'body' });
   new HeaderView({ model: context.troupe(), el: '#header' });
 
   // This may require a better home
-  itemCollections.users.once('sync', function() {
-    if(context().permissions.admin) {
-      if (itemCollections.users.length === 1) { //itemCollections.chats.length === 0)
-
-        require.ensure([
-          'views/app/collaboratorsView',
-          'collections/collaborators'],
-          function(require) {
-            var CollaboratorsView = require('views/app/collaboratorsView');
-            var collaboratorsModels = require('collections/collaborators');
-            var collaborators = new collaboratorsModels.CollabCollection();
-            collaborators.fetch();
-            collaborators.once('sync', function() {
-              var collaboratorsView = new CollaboratorsView({ collection: collaborators });
-              $('#content-frame').prepend(collaboratorsView.render().el);
-            });
+  if (context().permissions.admin && context.troupe().get('userCount') === 1) {
+    require.ensure([
+      'views/app/collaboratorsView',
+      'collections/collaborators'],
+      function(require) {
+        var CollaboratorsView = require('views/app/collaboratorsView');
+        var collaboratorsModels = require('collections/collaborators');
+        var collaborators = new collaboratorsModels.CollabCollection();
+        collaborators.fetch();
+        collaborators.once('sync', function() {
+          var collaboratorsView = new CollaboratorsView({ collection: collaborators });
+          $('#content-frame').prepend(collaboratorsView.render().el);
         });
-
-      }
-    }
-  });
+    });
+  }
 
   var Router = Backbone.Router.extend({
     routes: {
-      // TODO: get rid of the pipes
       "": "hideModal",
       "share": "share",
       "people": "people",
@@ -240,7 +241,12 @@ onready(function () {
     people: function() {
       require.ensure(['views/people/peopleCollectionView'], function(require) {
         var peopleCollectionView = require('views/people/peopleCollectionView');
-        appView.dialogRegion.show(new peopleCollectionView.Modal({ collection: itemCollections.sortedUsers }));
+
+        // seed the collection with the roster while wait for the full list to load
+        var userCollection = new userModels.UserCollection(itemCollections.roster.models);
+        userCollection.fetch();
+
+        appView.dialogRegion.show(new peopleCollectionView.Modal({ collection: userCollection }));
       });
     },
 
@@ -267,12 +273,12 @@ onready(function () {
 
     addPeople: function() {
       require.ensure(['views/app/addPeopleView', 'views/app/upgradeToProView'], function(require) {
-        var room = context().troupe;
+        var room = context.troupe();
         var maxFreeMembers = context.env('maxFreeOrgRoomMembers');
-        var isOverLimit = room.security !== 'PUBLIC' &&
-                          room.githubType.indexOf('ORG') >= 0 &&
-                          !room.premium &&
-                          itemCollections.users.length >= maxFreeMembers;
+        var isOverLimit = room.get('security') !== 'PUBLIC' &&
+                          room.get('githubType').indexOf('ORG') >= 0 &&
+                          !room.get('premium') &&
+                          room.get('userCount') >= maxFreeMembers;
 
         if (isOverLimit) {
           var GetProViewModal = require('views/app/upgradeToProView');
