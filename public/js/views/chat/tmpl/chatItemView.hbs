@@ -1,34 +1,34 @@
 {{!-- NOTE: this is wrapped by <div class='chat-item'> --}}
 <div class='chat-item__container'>
   <div class='chat-item__aside'>
+    {{#if readByText}}
+    <div class="chat-item__icon--read  js-chat-item-readby"></div>
+    {{/if}}
+    <div class="chat-item__avatar">
     {{#if fromUser}}
       {{ widget "avatar" user=fromUser }}
     {{/if}}
+    </div>
+  </div>
+  <div class="chat-item__actions js-chat-item-actions">
+    <i class="icon-ellipsis"></i>
   </div>
   <div class='chat-item__content'>
     {{#if initial}}
       {{! This is a way of forcing the browser to open at the bottom of the screen }}
       <div id='initial' style="position:relative;top:-120px; left: 0; height:0;width:0;overflow:hidden"><a name="initial"/>_</a></div>
     {{/if}}
-    <div class='chat-item__details js-chat-item-details'>
+    <div class='chat-item__details'>
       <div class='chat-item__from js-chat-item-from'>{{username}}</div>
       {{#if isPermalinkable}}
-        <div class='chat-item__time js-chat-item-time chat-item__time--permalinkable'>
-          {{widget "timeago" time=sent lang=lang locale=locale tooltipFormat='LLL [<br>(Alt-click to quote)]'}}
-        </div>
+      <div class='chat-item__time js-chat-item-time chat-item__time--permalinkable'>
+        {{widget "timeago" time=sent lang=lang locale=locale tooltipFormat='LLL [<br>(Alt-click to quote)]'}}
+      </div>
       {{else}}
-        <div class='chat-item__time js-chat-item-time'>
-          {{widget "timeago" time=sent lang=lang locale=locale tooltipFormat='LLL'}}
-        </div>
+      <div class='chat-item__time js-chat-item-time'>
+        {{widget "timeago" time=sent lang=lang locale=locale tooltipFormat='LLL'}}
+      </div>
       {{/if}}
-      {{#if readByText}}
-        {{#if compactView}}
-          <span class="chat-item__icon--read  js-chat-item-readby"></span>
-        {{else}}
-          <div class="chat-item__icon--read  js-chat-item-readby"></div>
-        {{/if}}
-      {{/if}}
-      <div class='chat-item__icon--edit  js-chat-item-edit'></div>
     </div>
     <div class='chat-item__text  js-chat-item-text'>
       {{{ html }}}
