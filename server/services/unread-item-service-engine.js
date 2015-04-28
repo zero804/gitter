@@ -360,6 +360,10 @@ function listTroupeUsersForEmailNotifications(horizonTime, emailLatchExpiryTimeS
     });
 }
 
+function removeAllEmailNotifications() {
+  return Q.ninvoke(redisClient, "del", EMAIL_NOTIFICATION_HASH_KEY);
+}
+
 function getUserUnreadCounts(userId, troupeId) {
   var key = "unread:chat:" + userId + ":" + troupeId;
   return runScript('unread-item-count', [key], [])
@@ -550,6 +554,7 @@ engine.getRoomsCausingBadgeCount = getRoomsCausingBadgeCount;
 
 engine.testOnly = {
   getNewItemBatches: getNewItemBatches,
-  UNREAD_BATCH_SIZE: UNREAD_BATCH_SIZE
+  UNREAD_BATCH_SIZE: UNREAD_BATCH_SIZE,
+  removeAllEmailNotifications: removeAllEmailNotifications
 };
 module.exports = engine;
