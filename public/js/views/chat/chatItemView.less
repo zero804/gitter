@@ -95,8 +95,19 @@
   }
 
   &.unread .chat-item__container {
-    border-right: 2px solid @trpGreen;
+    border-right: 2px solid @green;
     transition: 1s border linear;
+  }
+
+  &.unread.mention .chat-item__container {
+    border-right: 2px solid @orange;
+    transition: 2s border linear;
+  }
+
+  &.mention .chat-item__text .mention {
+    border: 1px solid fade(@orange,40%);
+    background-color: fade(@orange,10%);
+    color: @orange;
   }
 
   &:last-child {
@@ -124,6 +135,7 @@
   opacity: 0;
   color: #ddd;
   transition: 0.2s opacity linear;
+  cursor: pointer;
 }
 
 .chat-item:hover .chat-item__actions {
@@ -134,7 +146,7 @@
 .chat-item__container {
   box-sizing: border-box;
   border-right: 2px solid transparent;
-  margin: 0.888em 30px 0px 12px;
+  margin: 0.888em 12px 0px;
   text-align: left;
   transition: 1s border linear;
 
@@ -343,7 +355,6 @@
   .chat-item__from {
     color: #aaa;
   }
-
 }
 
 .trpDisplayPicture--left {
