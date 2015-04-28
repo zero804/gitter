@@ -22,6 +22,8 @@ var Behavior = Marionette.Behavior.extend({
 
     this.scrollHandler = this.smoothScroll.bind(this);
     this.scrollElement.addEventListener('scroll', this.scrollHandler, false);
+
+    setTimeout(this.decorateIfVisible.bind(this), 100);
   },
 
   decorateIfVisible: function() {
