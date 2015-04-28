@@ -337,7 +337,6 @@ function renderNotFound(req, res, next) {
     })
     .then(function (rooms) {
       res.render('not-found', {
-        cssFileName: "styles/not-found.css",
         org: org,
         rooms: rooms
       });
