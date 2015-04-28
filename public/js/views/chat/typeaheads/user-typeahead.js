@@ -18,7 +18,7 @@ function getRecentMessageSenders() {
     return !!user;
   });
 
-  return _.unique(users, function(user) { return user.id }).reverse();
+  return _.unique(users.reverse(), function(user) { return user.id });
 }
 
 function isNotCurrentUser(user) {
