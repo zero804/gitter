@@ -121,14 +121,14 @@ function findByIdLeanWithAccess(troupeId, userId) {
 
     return persistence.Troupe
       .findOneQ({ _id: troupeId }, projection, { lean: true })
-      .then(function(result) {
-        if (!result) return [null, false];
+      .then(function(leanTroupe) {
+        if (!leanTroupe) return [null, false];
 
-        var access = !!(result.users && result.users.length);
-        result.id = mongoUtils.serializeObjectId(result._id);
-        delete result.users; // Delete the user from the lean object
+        var access = !!(leanTroupe.users && leanTroupe.users.length);
+        leanTroupe.id = mongoUtils.serializeObjectId(leanTroupe._id);
+        delete leanTroupe.users; // Delete the user from the lean object
 
-        return [result, access];
+        return [leanTroupe, access];
       });
   }
 
