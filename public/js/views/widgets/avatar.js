@@ -11,7 +11,8 @@ require('bootstrap_tooltip');
 module.exports = (function() {
 
   var AvatarWidget = Marionette.ItemView.extend({
-    tagName: 'span',
+    tagName: 'div',
+    className: 'avatar',
     template: template,
     events: {
       'mouseover': 'showDetailIntent',
