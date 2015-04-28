@@ -85,7 +85,6 @@
 
     &:hover .chat-item__icon--read {
       opacity: 1;
-      transition: 0.2s opacity linear;
     }
 
     .chat-item__details,
@@ -153,9 +152,7 @@
 .chat-item__actions {
   float: right;
   opacity: 0;
-  color: #ddd;
-  transition: 0.2s opacity linear;
-  cursor: pointer;
+  clear: right;
 
   @media @mobile {
     display: none;
@@ -203,11 +200,14 @@
   cursor: pointer;
   vertical-align: middle;
   color: #ddd;
-  transition: 0.2s opacity linear;
+  transition: opacity 0.3s linear, color 0.3s linear;
+}
+
+.chat-item__icon:hover {
+  color: @blue;
 }
 
 .chat-item__icon--read {
-  .chat-item__icon;
   float: left;
   font-size: 0.8em;
   opacity: 0;
@@ -337,6 +337,7 @@
   padding: 0 10px 0 20px;
   border-radius: 5px;
   margin-left: 64px;
+  margin-right: 20px;
   vertical-align: top;
   min-height: 1.5em;
 
