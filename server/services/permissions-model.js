@@ -12,6 +12,8 @@ var orgChannelPermissionsModel  = require('./permissions/org-channel-permissions
 var repoChannelPermissionsModel = require('./permissions/repo-channel-permissions-model');
 var userChannelPermissionsModel = require('./permissions/user-channel-permissions-model');
 
+var userService                 = require('./user-service');
+
 function checkBan(user, uri) {
   if(!user) return Q.resolve(false);
   if(!uri) return Q.resolve(false);
@@ -73,9 +75,8 @@ function permissionsModel(user, right, uri, roomType, security) {
         .fail(function(err) {
           if(err && err.gitterAction === 'logout_destroy_user_tokens') {
             winston.warn('User tokens have been revoked. Destroying tokens');
-
-            user.destroyTokens();
-            return user.saveQ()
+            
+            userService.destroyTokensForUserId(user._id)
               .thenReject(err);
           }
 

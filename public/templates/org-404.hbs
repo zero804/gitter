@@ -1,5 +1,5 @@
 <head>
-  <link rel='stylesheet' type='text/css' href='{{ cdn cssFileName }}'>
+  <link rel='stylesheet' type='text/css' href="{{ cdn 'styles/org-404.css' }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/2.0.2/octicons.min.css">
 </head>
 <body>
@@ -8,7 +8,6 @@
     <h1>{{ org }}</h1>
   </header>
   <div class='content'>
-    {{!-- <h2><span class="mega-octicon octicon-alert"></span> You've tried to access <strong>{{ org }}'s private</strong> organization room!</h2> --}}
     <p>You've tried to access <strong>{{ org }}'s private</strong> organization room and you do not belong to this organization.</p>
     {{#if rooms}}
       <p>But you can still chat by simply selecting one of the public rooms below.</p>
@@ -17,16 +16,12 @@
     {{/if}}
     {{#each rooms}}
       <a target='_top' href='/{{ uri }}' class='room'>
-        <h2><i class='mega-octicon {{ githubTypeToClass githubType }}'></i> {{ getRoomName name }}</h2>
+        <h1><i class='mega-octicon {{ githubTypeToClass githubType }}'></i> {{ getRoomName name }}</h1>
         <div class='room__details'>
           <small><i class="octicon octicon-organization"></i> {{ formatNumber userCount }} {{ pluralize userCount 'person' 'people'}}</small>
         </div>
-        <p><small>{{ topic }}</small></p>
       </a>
     {{/each}}
-    <footer>
-      <div class='logo'>{{> logo }}</div> Gitter &mdash; Where developers come to talk.
-    </footer>
   </div>
   {{> load_font_css}}
 </body>
