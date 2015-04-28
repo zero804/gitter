@@ -333,7 +333,7 @@ function renderMobileNotLoggedInChat(req, res, next) {
   }, next);
 }
 
-function renderNotFound(req, res, next) {
+function renderOrg404Page(req, res, next) {
   var org = req.uriContext && req.uriContext.uri;
   var strategy = new restSerializer.TroupeStrategy();
 
@@ -344,7 +344,7 @@ function renderNotFound(req, res, next) {
       return new Q(restSerializer.serialize(rooms, strategy));
     })
     .then(function (rooms) {
-      res.render('not-found', {
+      res.render('org-404', {
         org: org,
         rooms: rooms
       });
@@ -450,7 +450,7 @@ module.exports = exports = {
   renderHomePage: renderHomePage,
   renderChatPage: renderChatPage,
   renderMainFrame: renderMainFrame,
-  renderNotFound: renderNotFound,
+  renderOrg404Page: renderOrg404Page,
   renderMobileChat: renderMobileChat,
   renderMobileUserHome: renderMobileUserHome,
   renderEmbeddedChat: renderEmbeddedChat,
