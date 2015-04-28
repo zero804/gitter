@@ -354,7 +354,7 @@ function findOnlineUsersForTroupe(troupeId, callback) {
 // callback(err, status)
 // with status[userId] = 'online' / <missing>
 function categorizeUsersByOnlineStatus(userIds, callback) {
-  if(!userIds || userIds.length === 0) return callback(null, {});
+  if(!userIds || userIds.length === 0) return Q.resolve({}).nodeify(callback);
 
   var time = process.hrtime();
   var seconds = time[0];
