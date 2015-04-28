@@ -79,6 +79,16 @@
       }
     }
 
+    .chat-item__icon--read {
+      opacity: 0;
+      transition: 0.2s opacity linear;
+    }
+
+    &:hover .chat-item__icon--read {
+      opacity: 1;
+      transition: 0.2s opacity linear;
+    }
+
     .chat-item__details,
     .chat-item__avatar {
       display: none;
@@ -192,32 +202,16 @@
 
 .chat-item__icon {
   cursor: pointer;
-  transition: opacity 0.2s ease;
-  display: inline-block;
-  text-align: right;
-  width: 16px;
-  height: 16px;
-  line-height: 9px;
   vertical-align: middle;
-  opacity: 0.5;
+  color: #ddd;
   visibility: hidden;
   overflow: hidden;
-  background-size: cover;
-  background-repeat: no-repeat;
-
-  @media @mobile {
-    display: none;
-    width: 24px;
-    height: 24px;
-    float: right;
-    margin-right: -16px;
-  }
 }
 
 .chat-item__icon--read {
   .chat-item__icon;
   float: left;
-  background-image: url('../images/icon-read.png');
+  font-size: 0.8em;
 
   .chat-item:hover & {
     visibility: visible;
@@ -226,10 +220,6 @@
 
   .isViewers & {
     visibility: visible;
-  }
-
-  @media @retina {
-    background-image: url('../images/icon-read@2x.png');
   }
 }
 
