@@ -60,10 +60,7 @@ module.exports = {
 
         res.send(200, { success: true, user: serializedUser });
       })
-      .catch(function (err) {
-        res.send(err.status, err);
-      })
-      .fail(next);
+      .catch(next);
   },
 
   destroy: function(req, res, next){
