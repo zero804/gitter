@@ -39,6 +39,16 @@ describe('user-typeahead', function() {
     });
   });
 
+  it('doesnt suggest the same user twice', function() {
+    var typeahead = generateTypeahead({
+      chatSenders: [user('jon'), user('tina'), user('jon'),]
+    });
+
+    typeahead.search('', function(results) {
+      assert.deepEqual(usernames(results), ['jon','tina']);
+    });
+  });
+
 });
 
 function generateTypeahead(options) {
