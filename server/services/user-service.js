@@ -261,6 +261,10 @@ var userService = {
 
   deleteAllUsedInvitesForUser: function(user) {
     persistence.Invite.remove({ userId: user.id, status: "USED" });
+  },
+
+  destroyTokensForUserId: function(userId) {
+    return persistence.User.updateQ({ _id: userId }, { $set: { githubToken: null, githubScopes: { }, githubUserToken: null } });
   }
 
 };

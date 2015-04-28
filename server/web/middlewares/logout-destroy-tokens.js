@@ -7,6 +7,7 @@ var stats = env.stats;
 
 var logout = require('./logout');
 var oauthService = require('../../services/oauth-service');
+var userService = require('../../services/user-service');
 
 module.exports = function(req, res, next) {
   var user = req.user;
@@ -46,16 +47,20 @@ module.exports = function(req, res, next) {
     if(err) logger.warn('Unable to log user out');
 
     if(!user) return send(req, res, next);
+    var userId = user._id;
 
-    user.destroyTokens();
-    user.save(function(err) {
-      if(err) logger.error('Unable to save user: ' + err, { exception: err });
-
-      oauthService.removeAllAccessTokensForUser(userId, function(err) {
-        if(err) { logger.error('Unable to remove access tokens: ' + err, { exception: err }); }
-
+    userService.destroyTokensForUserId(userId)
+      .catch(function(err) {
+        logger.error('Unable to destroy tokens for user: ' + err, { exception: err });
+      })
+      .then(function() {
+        return oauthService.removeAllAccessTokensForUser(userId);
+      })
+      .catch(function(err) {
+          logger.error('Unable to remove access tokens: ' + err, { exception: err });
+      }).
+      then(function() {
         return send(req, res, next);
       });
-    });
   }
 };
