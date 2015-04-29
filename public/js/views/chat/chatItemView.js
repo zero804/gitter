@@ -15,6 +15,8 @@ var appEvents = require('utils/appevents');
 var cocktail = require('cocktail');
 var chatCollapse = require('utils/collapsed-item-client');
 var KeyboardEventMixins = require('views/keyboard-events-mixin');
+var apiClient = require('components/apiClient');
+
 require('views/behaviors/unread-items');
 require('views/behaviors/widgets');
 require('views/behaviors/sync-status');
@@ -113,11 +115,18 @@ module.exports = (function() {
         setTimeout(timeChange, oldInMS + 50);
       }
 
-      this.listenToOnce(this, 'decorate', function() {
+      this.listenToOnce(this, 'messageInViewport', function() {
         _.each(this.decorators, function(decorator) {
           decorator.decorate(this);
         }.bind(this));
+        this.markAsRead();
       }.bind(this));
+    },
+
+    markAsRead: function() {
+      if (this.model.get('unread')) {
+        apiClient.userRoom.post('/unreadItems', {chat: [this.model.get('id')]});
+      }
     },
 
     template: function(data) {
@@ -205,29 +214,8 @@ module.exports = (function() {
         editIcon.tooltip({ container: 'body', title: this.getEditTooltip.bind(this) });
         collapseIcon.tooltip({ container: 'body', title: this.getCollapseTooltip.bind(this) });
       }
-
-      //var self = this;
-      //var decorateIfVisible = function() {
-      //  var inViewport = isElementInViewport(self.$el[0]);
-      //  if (!inViewport || self.decorated) return;
-
-      //  self.decorated = true;
-      //  _.each(self.decorators, function(decorator) {
-      //    decorator.decorate(self);
-      //  });
-      //};
-
-      //var lazyDecorator = _.debounce(decorateIfVisible, 500);
-      //document.querySelector('#content-frame').addEventListener('scroll', lazyDecorator, false);
-      //setTimeout(decorateIfVisible, 100);
     },
 
-    //onDecorate: function() {
-    //  var self = this;
-    //  _.each(self.decorators, function(decorator) {
-    //    decorator.decorate(self);
-    //  });
-    //},
 
     timeChange: function() {
       this.$el.toggleClass('isEditable', this.isInEditablePeriod());
