@@ -115,6 +115,26 @@ gulp.task('localtest', function() {
     }));
 });
 
+
+/**
+ * test
+ */
+gulp.task('test-perf-mocha', function() {
+  mkdirp.sync('output/perf-reports/');
+
+  return gulp.src(['./test/performance/**/*.js'], { read: false })
+    .pipe(mocha({
+      reporter: 'xunit-file',
+      timeout: 100000,
+      env: {
+        XUNIT_FILE: 'output/perf-reports/integration.xml',
+        NODE_ENV: 'test'
+      }
+    }));
+});
+
+gulp.task('test-perf', ['test-perf-mocha']);
+
 gulp.task('clean:coverage', function (cb) {
   del([
     'output/coverage-reports'
