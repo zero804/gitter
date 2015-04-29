@@ -105,25 +105,14 @@ var ChatCollection = LiveCollection.extend({
   },
   url: apiClient.room.channelGenerator('/chatMessages'),
   comparator: function(chat1, chat2) {
-    var id1 = chat1.id;
-    var id2 = chat2.id;
-    if (!id1) {
-      if (!id2) {
-        var s1 = chat1.get('sent');
-        var s2 = chat2.get('sent');
-        if (!s1) {
-          if (!s2) return 0;
-          return -1; // null < value
-        }
-        if (!s2) return 1;
-        return s1.valueOf() - s2.valueOf();
-      }
-      return 1; // null > value (-1)
+    var s1 = chat1.get('sent');
+    var s2 = chat2.get('sent');
+    if (!s1) {
+      if (!s2) return 0; // null === null
+      return -1; // null < s2
     }
-    if (!id2) return -1; // value < null = -1
-    if (id1 == id2) return 0;
-    if (id1 < id2) return -1;
-    return 1;
+    if (!s2) return 1; // s1 > null
+    return s1.valueOf() - s2.valueOf();
   },
   initialize: function() {
     this.listenTo(this, 'add remove', function (model, collection) {

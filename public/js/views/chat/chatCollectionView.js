@@ -109,7 +109,6 @@ module.exports = (function() {
 
     childViewOptions: function(item) {
       var options = {
-        userCollection: this.userCollection,
         decorators: this.decorators,
         rollers: this.rollers
       };
@@ -179,7 +178,6 @@ module.exports = (function() {
       var contentFrame = document.querySelector(SCROLL_ELEMENT);
       this.rollers = new Rollers(contentFrame, this.el);
 
-      this.userCollection = options.userCollection;
       this.decorators     = options.decorators || [];
 
       /* Scroll to the bottom when the user sends a new chat */

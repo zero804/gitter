@@ -11,6 +11,7 @@ var assert        = require("assert");
 var mockito       = require('jsmockito').JsMockito;
 var ObjectID      = require('mongodb').ObjectID;
 var persistence   = testRequire("./services/persistence-service");
+var mongoUtils    = testRequire("./utils/mongo-utils");
 var times         = mockito.Verifiers.times;
 var once          = times(1);
 var times         = mockito.Verifiers.times;
@@ -224,6 +225,56 @@ describe('troupe-service', function() {
 
   });
 
+  describe('#findByIdLeanWithAccess', function() {
+    var troupeService = testRequire('./services/troupe-service');
+
+    it('should find a room which exists and the user has access', function(done) {
+      troupeService.findByIdLeanWithAccess(fixture.troupe1.id, fixture.user1.id)
+        .spread(function(room, access) {
+          assert.strictEqual(room.id, fixture.troupe1.id);
+          assert.strictEqual(access, true);
+        })
+        .nodeify(done);
+    });
+
+    it('should find a room which exists and the does not have access', function(done) {
+      troupeService.findByIdLeanWithAccess(fixture.troupe2.id, fixture.user1.id)
+        .spread(function(room, access) {
+          assert(room);
+          assert.strictEqual(room.id, fixture.troupe2.id);
+          assert.strictEqual(access, false);
+        })
+        .nodeify(done);
+
+    });
+
+    it('should not find a room which does not exist, for a user', function(done) {
+      troupeService.findByIdLeanWithAccess(mongoUtils.getNewObjectIdString(), fixture.user1.id)
+        .spread(function(room, access) {
+          assert(!room);
+          assert(!access);
+        })
+        .nodeify(done);
+    });
+
+    it('should find a room which exists and for anon', function(done) {
+      troupeService.findByIdLeanWithAccess(fixture.troupe2.id, null)
+        .spread(function(room, access) {
+          assert(room);
+          assert(!access);
+        })
+        .nodeify(done);
+    });
+
+    it('should not find a room which does not exist for anon', function(done) {
+      troupeService.findByIdLeanWithAccess(mongoUtils.getNewObjectIdString(), null)
+        .spread(function(room, access) {
+          assert(!room);
+          assert(!access);
+        })
+        .nodeify(done);
+    });
+  });
 
   before(fixtureLoader(fixture, {
     user1: {

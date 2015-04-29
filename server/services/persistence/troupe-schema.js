@@ -1,9 +1,9 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var mongoose      = require('../../utils/mongoose-q');
-var Schema        = mongoose.Schema;
-var ObjectId      = Schema.ObjectId;
+var mongoose       = require('../../utils/mongoose-q');
+var Schema         = mongoose.Schema;
+var ObjectId       = Schema.ObjectId;
 var winston        = require('../../utils/winston');
 var assert         = require("assert");
 var Q              = require('q');
@@ -12,7 +12,7 @@ var appEvents      = require("../../app-events");
 var _              = require("underscore");
 var tagger         = require('../../utils/room-tagger');
 var RepoService    = require('../github/github-repo-service');
-
+var troupeUtils    = require('../../utils/models/troupes');
 
 function serializeEvent(url, operation, model, callback) {
   winston.verbose("Serializing " + operation + " to " + url);
@@ -116,54 +116,44 @@ module.exports = {
         return next();
       }
 
-      if(this.githubType === 'REPO') {
+      /* Don't tag test repos */
+      if(this.githubType === 'REPO' && this.uri.indexOf("_test_") !== 0) {
         var repoService = new RepoService(this.users[0]);
         var self = this;
 
-        repoService.getRepo(this.uri)
+        return repoService.getRepo(this.uri)
           .then(function(repo) {
             assert(repo, 'repo lookup failed');
 
             self.tags = tagger(self, repo);
           })
           .catch(function(err) {
-            winston.warn('repo lookup or tagging failed, skipping tagging for now', { exception: err });
+            winston.warn('repo lookup or tagging failed for ' + this.uri + ' , skipping tagging for now', { exception: err });
           })
           .finally(function() {
             next();
           });
-      } else {
-        this.tags = tagger(this);
-        next();
+
       }
+
+      this.tags = tagger(this);
+      next();
     });
 
     TroupeSchema.methods.getUserIds = function() {
-      return this.users.map(function(troupeUser) { return troupeUser.userId; });
+      return troupeUtils.getUserIds(this);
     };
 
     TroupeSchema.methods.findTroupeUser = function(userId) {
-      var user = _.find(this.users, function(troupeUser) {
-        return "" + troupeUser.userId == "" + userId;
-      });
-
-      return user;
+      return troupeUtils.findTroupeUser(this, userId);
     };
 
-
     TroupeSchema.methods.containsUserId = function(userId) {
-      return !!this.findTroupeUser(userId);
+      return troupeUtils.containsUserId(this, userId);
     };
 
     TroupeSchema.methods.getOtherOneToOneUserId = function(knownUserId) {
-      assert(this.oneToOne, 'getOtherOneToOneUserId should only be called on oneToOne troupes');
-      assert(knownUserId, 'knownUserId required');
-
-      var troupeUser = _.find(this.users, function(troupeUser) {
-        return "" + troupeUser.userId != "" + knownUserId;
-      });
-
-      return troupeUser && troupeUser.userId;
+      return troupeUtils.getOtherOneToOneUserId(this, knownUserId);
     };
 
     TroupeSchema.methods.addUserBan = function(options) {

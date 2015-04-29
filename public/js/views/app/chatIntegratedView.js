@@ -88,7 +88,6 @@ module.exports = (function() {
         template: false,
         el: '#chat-container',
         collection: itemCollections.chats,
-        userCollection: itemCollections.users,
         decorators: [issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
       }).render();
 
@@ -102,7 +101,6 @@ module.exports = (function() {
         el: '#chat-input',
         collection: itemCollections.chats,
         chatCollectionView: chatCollectionView,
-        userCollection: itemCollections.users,
         rollers: chatCollectionView.rollers
       }).render();
 

@@ -23,7 +23,10 @@ var _                 = require('underscore');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
-var USER_COLLECTION_FOLD = 21;
+var ROSTER_SIZE = 25;
+
+// DEPRECATED
+//var USER_COLLECTION_FOLD = 21;
 
 var stagingText, stagingLink;
 var dnsPrefetch = (nconf.get('cdn:hosts') || []).concat([
@@ -194,20 +197,26 @@ function renderChat(req, res, options, next) {
     unread: options.unread // Unread can be true, false or undefined
   };
 
-  var serializerOptions = _.defaults({
+  var chatSerializerOptions = _.defaults({
     lean: true
+  }, snapshotOptions);
+
+  var userSerializerOptions = _.defaults({
+    lean: true,
+    limit: ROSTER_SIZE
   }, snapshotOptions);
 
   Q.all([
       options.generateContext === false ? null : contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, permalinkChatId: aroundId }),
-      restful.serializeChatsForTroupe(troupe.id, userId, serializerOptions),
+      restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
       options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
-      options.fetchUsers === false ? null :restful.serializeUsersForTroupe(troupe.id, userId, serializerOptions)
+      options.fetchUsers === false ? null :restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions)
     ]).spread(function (troupeContext, chats, activityEvents, users) {
       var initialChat = _.find(chats, function(chat) { return chat.initial; });
       var initialBottom = !initialChat;
       var githubLink;
       var classNames = options.classNames || [];
+
 
       if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
         githubLink = 'https://github.com/' + req.uriContext.uri;
@@ -224,8 +233,6 @@ function renderChat(req, res, options, next) {
         integrationsUrl = '#integrations';
       }
 
-      var cutOff = users ? users.length - USER_COLLECTION_FOLD : 0;
-      var remainingCount = (cutOff > 0) ? cutOff : 0;
       var cssFileName = options.stylesheet ? "styles/" + options.stylesheet + ".css" : "styles/" + script + ".css"; // css filename matches bootscript
 
       var chatsWithBurst = burstCalculator(chats);
@@ -249,8 +256,9 @@ function renderChat(req, res, options, next) {
           dnsPrefetch: dnsPrefetch,
           isPrivate: isPrivate,
           activityEvents: activityEvents,
-          users: users && users.sort(userSort).slice(0, USER_COLLECTION_FOLD),
-          remainingCount: remainingCount,
+          users: users  && users.sort(userSort),
+          userCount: troupe.userCount,
+          hasHiddenMembers: troupe.userCount > 25,
           integrationsUrl: integrationsUrl,
           placeholder: 'Click here to type a chat message. Supports GitHub flavoured markdown.'
         }, troupeContext && {
@@ -323,7 +331,7 @@ function renderMobileNotLoggedInChat(req, res, next) {
   }, next);
 }
 
-function renderNotFound(req, res, next) {
+function renderOrg404Page(req, res, next) {
   var org = req.uriContext && req.uriContext.uri;
   var strategy = new restSerializer.TroupeStrategy();
 
@@ -334,8 +342,7 @@ function renderNotFound(req, res, next) {
       return new Q(restSerializer.serialize(rooms, strategy));
     })
     .then(function (rooms) {
-      res.render('not-found', {
-        cssFileName: "styles/not-found.css",
+      res.render('org-404', {
         org: org,
         rooms: rooms
       });
@@ -441,7 +448,7 @@ module.exports = exports = {
   renderHomePage: renderHomePage,
   renderChatPage: renderChatPage,
   renderMainFrame: renderMainFrame,
-  renderNotFound: renderNotFound,
+  renderOrg404Page: renderOrg404Page,
   renderMobileChat: renderMobileChat,
   renderMobileUserHome: renderMobileUserHome,
   renderEmbeddedChat: renderEmbeddedChat,

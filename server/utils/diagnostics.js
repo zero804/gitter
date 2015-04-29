@@ -4,6 +4,8 @@
 var nconf = require('./config');
 var winston = require('./winston');
 
+if (nconf.get('newrelic:enabled')) require('newrelic');
+
 /* Heapdump and nodemon don't play nicely together */
 
 if(!process.env.NODEMON) {
