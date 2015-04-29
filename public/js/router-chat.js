@@ -180,26 +180,14 @@ onready(function () {
     });
   };
 
-  // FIXME This is very inneficient, it was kind of ok before because it was 
-  // using the users live collection but that is gone now
   appEvents.on('command.room.remove', function(username) {
-    var userCollection = new userModels.UserCollection();
-    userCollection.fetch();
-    userCollection.once('sync', function() {
-      var user = userCollection.findWhere({username: username});
+    if (!username) return;
 
-      if (user) {
-        apiClient.room.delete("/users/" + user.id, "")
-          .then(function() {
-            userCollection.remove(user);
-          })
-          .fail(function(xhr) {
-            if (xhr.status < 500) notifyRemoveError(xhr.responseJSON.error);
-            else notifyRemoveError('');
-        });
-      }
-      else notifyRemoveError('User '+ username +' was not found in this room.');
-    });
+    apiClient.room.delete("/users/" + username + '?type=username', "")
+      .fail(function(xhr) {
+        if (xhr.status < 500) notifyRemoveError(xhr.responseJSON.error);
+        else notifyRemoveError('');
+      });
   });
 
   var appView = new ChatIntegratedView({ el: 'body' });
