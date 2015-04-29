@@ -25,9 +25,23 @@ var UserCollection = LiveCollection.extend({
   sync: SyncMixin.sync
 });
 
+var RosterCollection = LiveCollection.extend({
+  model: UserModel,
+  modelName: 'user',
+  url: apiClient.room.channelGenerator('/users'),
+  getSnapshotState: function () {
+    return { lean: true, limit: 25 };
+  },
+  client: function() {
+    return realtime.getClient();
+  },
+  sync: SyncMixin.sync
+});
+
+
 module.exports = {
-  RosterCollection: SmartUserCollection.SortedAndLimited,
-  SortedUserCollection: SmartUserCollection.Sorted,
+  RosterCollection: RosterCollection,
+  SortedRosterCollection: SmartUserCollection.SortedAndLimited,
   UserCollection: UserCollection,
   UserModel: UserModel
 };

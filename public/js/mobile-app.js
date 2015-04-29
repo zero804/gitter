@@ -2,7 +2,6 @@
 var $ = require('jquery');
 var appEvents = require('utils/appevents');
 var chatModels = require('collections/chat');
-var userModels = require('collections/users');
 var ChatCollectionView = require('views/chat/chatCollectionView');
 var chatInputView = require('views/chat/chatInputView');
 var unreadItemsClient = require('components/unread-items-client');
@@ -39,7 +38,6 @@ onready(function() {
 
 
   var chatCollection = new chatModels.ChatCollection(null, { listen: true });
-  var userCollection = new userModels.UserCollection(null, { listen: true, limit: 21 });
 
   var chatCollectionView = new ChatCollectionView({
     el: $('#chat-container'),
@@ -52,7 +50,6 @@ onready(function() {
   new chatInputView.ChatInputView({
     el: $('#chat-input'),
     collection: chatCollection,
-    userCollection: userCollection,
     rollers: chatCollectionView.rollers
   }).render();
 

@@ -98,6 +98,22 @@ function fieldInPredicate(fieldName, values, additionalClauses) {
   return _.defaults(predicate, additionalClauses);
 }
 
+function setId(model) {
+  if (!model) return model;
+  model.id = serializeObjectId(model._id);
+  return model;
+}
+exports.setId = setId;
+
+function setIds(array) {
+  array.forEach(function(f) {
+    if (!f) return;
+    f.id = serializeObjectId(f._id);
+  });
+  return array;
+}
+exports.setIds = setIds;
+
 exports.isLikeObjectId = isLikeObjectId;
 exports.asObjectID = asObjectID;
 exports.asObjectIDs = asObjectIDs;

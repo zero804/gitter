@@ -6,6 +6,9 @@ var chatService = require('../../server/services/chat-service');
 var loremIpsum = require('lorem-ipsum');
 var dictionary = require('lorem-ipsum/lib/dictionary').words;
 
+require('../../server/utils/event-listeners').installLocalEventListeners();
+require('../../server/services/kue-workers').startWorkers();
+
 var opts = require("nomnom")
 .option('room', {
   abbr: 'r',
@@ -39,7 +42,12 @@ Q.all([
       return chatService.newChatMessageToTroupe(room, user, { text: loremIpsum({
             count: Math.round(Math.random() * 5) + 1,
             unit: 'paragraph',
-            words: dictionary.concat('![Cat](http://thecatapi.com/api/images/get?format=src&type=gif&cb=' + Date.now() + ')'),
+            words: dictionary.concat(dictionary, dictionary, dictionary,
+              // '![Cat](http://thecatapi.com/api/images/get?format=src&type=gif&cb=' + Date.now() + ')',
+              'http://thecatapi.com/api/images/get?format=src&type=gif&cb=' + (Date.now() + 1 + '&file=.gif'),
+              'https://www.youtube.com/watch?v=XLaoiNUhDeQ',
+              'https://vine.co/v/eWEXAwIx7Dp',
+              'https://vimeo.com/105930659'),
             sentenceLowerBound: 1,
             sentenceUpperBound: 15,
             paragraphLowerBound: 1,
@@ -51,7 +59,7 @@ Q.all([
         });
     })));
   })
-  .delay(1000)
+  .delay(10000)
   .then(function() {
     process.exit();
   })
