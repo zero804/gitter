@@ -264,6 +264,17 @@ function findUserIdsForTroupe(troupeId, callback) {
 }
 
 /**
+ * Find usersIds for a troupe, with a limit.
+ * Defaults to sort with non-lurk first, then join date
+ */
+function findUsersIdForTroupeWithLimit(troupeId, limit) {
+  return persistence.Troupe.findByIdQ(troupeId, { "users": { $slice: limit } }, { lean: true })
+    .then(function(troupe) {
+      return troupe.users.map(function(m) { return m.userId; });
+    });
+}
+
+/**
  * Returns a hash of users in the troupe their lurk status as the value
  */
 function findUserIdsForTroupeWithLurk(troupeId, callback) {
@@ -643,6 +654,7 @@ module.exports = {
   findAllUserIdsForTroupe: findAllUserIdsForTroupe,
   findUserIdsForTroupeWithLurk: findUserIdsForTroupeWithLurk,
   findUserIdsForTroupe: findUserIdsForTroupe,
+  findUsersIdForTroupeWithLimit: findUsersIdForTroupeWithLimit,
 
   updateTroupeName: updateTroupeName,
   findOneToOneTroupe: findOneToOneTroupe,
