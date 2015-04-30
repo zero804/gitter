@@ -3,6 +3,8 @@ var csv = require('fast-csv');
 var metrics = require('datadog-metrics');
 metrics.init({ prefix: 'build.benchmarks.' });
 
+var os = require("os");
+
 csv
  .fromStream(process.stdin, { headers : ["date", "suite", "benchmark", "total", "iterations"] })
  .on("data", function(data) {
@@ -10,7 +12,7 @@ csv
    if (!benchmark) return; // Ignore bad lines
 
    var tag = benchmark.replace(/^.*#/,'');
-   var tags = [];
+   var tags = ['host:' + os.hostname()];
 
    if(process.env.GIT_COMMIT) tags.push("commit:" + process.env.GIT_COMMIT);
    if(process.env.GIT_BRANCH) tags.push("branch:" + process.env.GIT_BRANCH);
