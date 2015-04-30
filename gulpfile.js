@@ -125,6 +125,10 @@ gulp.task('test-perf-matcha', shell.task([
 
 gulp.task('test-perf', ['test-perf-matcha']);
 
+gulp.task('benchmark-local', shell.task([
+  './node_modules/.bin/matcha --logging:level error test/benchmarks/*',
+]));
+
 gulp.task('clean:coverage', function (cb) {
   del([
     'output/coverage-reports'
