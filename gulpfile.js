@@ -117,23 +117,13 @@ gulp.task('localtest', function() {
 
 
 /**
- * test
+ * Matcha tests, submitted to datadog
  */
-gulp.task('test-perf-mocha', function() {
-  mkdirp.sync('output/perf-reports/');
+gulp.task('test-perf-matcha', shell.task([
+  'NODE_ENV=test ./node_modules/.bin/matcha -R csv test/benchmarks/* | node test/submit-benchmarks-to-datadog.js',
+]));
 
-  return gulp.src(['./test/performance/**/*.js'], { read: false })
-    .pipe(mocha({
-      reporter: 'xunit-file',
-      timeout: 100000,
-      env: {
-        XUNIT_FILE: 'output/perf-reports/integration.xml',
-        NODE_ENV: 'test'
-      }
-    }));
-});
-
-gulp.task('test-perf', ['test-perf-mocha']);
+gulp.task('test-perf', ['test-perf-matcha']);
 
 gulp.task('clean:coverage', function (cb) {
   del([
