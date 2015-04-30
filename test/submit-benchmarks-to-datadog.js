@@ -12,7 +12,7 @@ csv
    if (!benchmark) return; // Ignore bad lines
 
    var tag = benchmark.replace(/^.*#/,'');
-   var tags = ['host:' + os.hostname()];
+   var tags = ['benchmark_host:' + os.hostname()]; // Can't use host
 
    if(process.env.GIT_COMMIT) tags.push("commit:" + process.env.GIT_COMMIT);
    if(process.env.GIT_BRANCH) tags.push("branch:" + process.env.GIT_BRANCH);
