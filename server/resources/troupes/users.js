@@ -49,7 +49,7 @@ module.exports = {
 
     var options = {
       lean: !!req.query.lean,
-      limit: req.query.limit,
+      limit: req.query.limit && parseInt(req.query.limit, 10) || undefined,
       searchTerm: req.query.q
     };
 
