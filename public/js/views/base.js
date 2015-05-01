@@ -176,7 +176,7 @@ module.exports = (function() {
       this.backdrop(function () {
 
         if(!that.$el.parent().length) {
-          that.$el.appendTo(document.body); //don't move modals dom position
+          that.$el.appendTo(that.$backdrop); //don't move modals dom position
         }
 
         that.$el.show();
@@ -264,7 +264,9 @@ module.exports = (function() {
 
         if (this.options.backdrop != 'static' && !this.options.disableClose) {
           var bd = this.$backdrop;
-          this.$backdrop.click(function() {
+          this.$backdrop.click(function(e) {
+            if( e.target !== this ) return;
+
             bd.modal.hide();
           });
         }
