@@ -375,6 +375,16 @@ function findAllRoomsIdsForUserIncludingMentions(userId, callback) {
 }
 exports.findAllRoomsIdsForUserIncludingMentions = findAllRoomsIdsForUserIncludingMentions;
 
+function updateRoomWithGithubId(user, troupe) {
+  var repoService = new GitHubRepoService(user);
+  return repoService.getRepo(troupe.uri)
+    .then(function(repo) {
+      if (!repo) throw new StatusError(404, 'Repo ' + troupe.uri + ' not found');
+      var githubId = repo.id;
+      return persistence.Troupe.updateQ({ _id: troupe._id }, { $set: { githubId: githubId } });
+    });
+}
+
 /**
  * Add a user to a room.
  * - If the room does not exist, will create the room if the user has permission
@@ -392,7 +402,7 @@ function findOrCreateRoom(user, uri, options) {
    * this function returns an object containing accessDenied, which is used by the middlewares to allow the display
    * of public rooms instead of the standard 404
    */
-  var denyAccess = function (uriLookup) {
+  function denyAccess(uriLookup) {
     if (!uriLookup) return null;
     if (!uriLookup.troupe) return null;
 
@@ -404,7 +414,7 @@ function findOrCreateRoom(user, uri, options) {
         uri: troupe && troupe.uri
       }
     };
-  };
+  }
 
 
   /* First off, try use local data to figure out what this url is for */
@@ -423,10 +433,12 @@ function findOrCreateRoom(user, uri, options) {
         }
 
         if(uriLookup.troupe) {
-          return roomPermissionsModel(null, 'view', uriLookup.troupe)
+          var troupe = uriLookup.troupe;
+
+          return roomPermissionsModel(null, 'view', troupe)
             .then(function (access) {
               if (!access) return denyAccess(uriLookup); // please see comment about denyAccess
-              return { troupe: uriLookup.troupe };
+              return { troupe: troupe };
             });
         }
 
@@ -480,6 +492,23 @@ function findOrCreateRoom(user, uri, options) {
           return ensureAccessControl(user, troupe, access)
             .then(function (troupe) {
               if (!access) return denyAccess(uriLookup); // please see comment about denyAccess
+
+              /*
+               * Room created before early May 2015 didn't have the githubId
+               * and so we were unable to track renames to these rooms.
+               * This lazily updates the githubId on those rooms. New rooms
+               * will be created with a githubId
+               */
+              if (troupe.githubType === 'REPO' && !troupe.githubId) {
+                logger.verbose('Updading room with githubId', { uri: troupe.uri });
+
+                /* Async */
+                updateRoomWithGithubId(user, troupe)
+                  .catch(function(err) {
+                    logger.error('Unable to update repo room with githubId: ' + err, { uri: troupe.uri, exception: err });
+                  });
+              }
+
               return {
                 oneToOne: false,
                 troupe: troupe,
@@ -997,7 +1026,6 @@ function banUserFromRoom(room, username, requestingUser, options, callback) {
                 if (options && options.removeMessages) {
                   return persistence.ChatMessage.findQ({ toTroupeId: room.id, fromUserId: user.id })
                     .then(function(messages) {
-                      console.log(messages);
                       return Q.all(messages.map(function(message) {
                         return message.removeQ();
                       }));
