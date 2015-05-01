@@ -110,20 +110,49 @@ exports.registerAndroidDevice = function(deviceId, deviceName, registrationId, a
 };
 
 exports.registerUser = function(deviceId, userId, callback) {
-  PushNotificationDevice.findOneAndUpdate(
+  return PushNotificationDevice.findOneAndUpdateQ(
     { deviceId: deviceId },
     { deviceId: deviceId, userId: userId, timestamp: new Date() },
-    { upsert: true },
-    callback);
+    { upsert: true })
+    .nodeify(callback);
 };
 
 exports.findDevicesForUser = function(userId, callback) {
   PushNotificationDevice.find({ userId: userId }, callback);
 };
 
+var usersWithDevicesCache = null;
+function getCachedUsersWithDevices() {
+  if (usersWithDevicesCache) {
+    return Q.resolve(usersWithDevicesCache);
+  }
+
+  return PushNotificationDevice.distinctQ('userId')
+    .then(function(userIds) {
+      usersWithDevicesCache = userIds.reduce(function(memo, userId) {
+        memo[userId] = true;
+        return memo;
+      }, {});
+
+      // Expire the cache after 60 seconds
+      setTimeout(expireCachedUsersWithDevices, 60000);
+
+      return usersWithDevicesCache;
+    });
+}
+
+function expireCachedUsersWithDevices() {
+  usersWithDevicesCache = null;
+}
+
 exports.findUsersWithDevices = function(userIds, callback) {
-  userIds = _.uniq(userIds);
-  PushNotificationDevice.distinct('userId', { userId: { $in: userIds } }, callback);
+  return getCachedUsersWithDevices()
+    .then(function(usersWithDevices) {
+      return userIds.filter(function(userId) {
+        return usersWithDevices[userId]; // Only true if the user has a device...
+      });
+    })
+    .nodeify(callback);
 };
 
 exports.findDevicesForUsers = function(userIds, callback) {
@@ -208,3 +237,6 @@ exports.canUnlockForNotification = function (userId, troupeId, notificationNumbe
   });
 };
 
+exports.testOnly = {
+  expireCachedUsersWithDevices: expireCachedUsersWithDevices
+}

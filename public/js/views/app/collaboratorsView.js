@@ -177,10 +177,6 @@ module.exports = (function() {
       });
     },
 
-    //onRender: function() {
-    //  if (context.troupe().get('security') == 'PUBLIC') this.$el.find('.js-share-button').show();
-    //},
-
     events: {
       'click .js-close': 'dismiss',
       'click #add-button' : 'clickAddButton',

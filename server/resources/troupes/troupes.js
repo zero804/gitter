@@ -51,9 +51,9 @@ module.exports = {
     var strategyOptions = { currentUserId: req.user && req.user.id };
 
     if (req.query.include_users) strategyOptions.mapUsers = true;
-    var strategy = new restSerializer.TroupeStrategy(strategyOptions);
+    var strategy = new restSerializer.TroupeIdStrategy(strategyOptions);
 
-    return restSerializer.serialize(req.troupe, strategy)
+    return restSerializer.serialize(req.troupe.id, strategy)
       .then(function(serialized) {
         res.send(serialized);
       })
@@ -81,37 +81,37 @@ module.exports = {
   },
 
   update: function(req, res, next) {
-    var troupe = req.troupe;
     var updatedTroupe = req.body;
 
-    var promises = [];
+    // Switch a lean troupe object for a full mongoose object
+    return troupeService.findById(req.troupe.id)
+      .then(function(troupe) {
+        if(!troupe) throw new StatusError(404);
 
-    if(updatedTroupe.autoConfigureHooks) {
-      promises.push(roomService.applyAutoHooksForRepoRoom(req.user, troupe));
-    }
+        var promises = [];
 
-    if(updatedTroupe.hasOwnProperty('topic')) {
-      promises.push(troupeService.updateTopic(req.user, troupe, updatedTroupe.topic));
-    }
+        if(updatedTroupe.autoConfigureHooks) {
+          promises.push(roomService.applyAutoHooksForRepoRoom(req.user, troupe));
+        }
 
-    if(updatedTroupe.hasOwnProperty('noindex')) {
-      promises.push(troupeService.toggleSearchIndexing(req.user, troupe, updatedTroupe.noindex));
-    }
+        if(updatedTroupe.hasOwnProperty('topic')) {
+          promises.push(troupeService.updateTopic(req.user, troupe, updatedTroupe.topic));
+        }
 
-    Q.all(promises)
-      .then(function() {
-        troupeService.findById(troupe.id, function(err, troupe) {
+        if(updatedTroupe.hasOwnProperty('noindex')) {
+          promises.push(troupeService.toggleSearchIndexing(req.user, troupe, updatedTroupe.noindex));
+        }
 
-          var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: false });
+        return Q.all(promises)
+          .then(function() {
+            var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: false });
 
-          restSerializer.serialize(troupe, strategy, function(err, serialized) {
-            if(err) return next(err);
+            restSerializer.serialize(troupe, strategy, function(err, serialized) {
+              if(err) return next(err);
 
-            res.send(serialized);
+              res.send(serialized);
+            });
           });
-
-        });
-
       })
       .catch(next);
   },
@@ -120,27 +120,28 @@ module.exports = {
     /* Invalid id? Return 404 */
     if(!mongoUtils.isLikeObjectId(id)) return callback();
 
-    troupeService.findById(id, function(err, troupe) {
-      if(err) return callback(new StatusError(500));
-      if(!troupe) return callback(new StatusError(404));
+    troupeService.findByIdLeanWithAccess(id, req.user && req.user._id)
+      .spread(function(troupe, access) {
+        if(!troupe) throw new StatusError(404);
 
-      if(troupe.status != 'ACTIVE') return callback(new StatusError(404));
+        if(troupe.status === 'DELETED') throw new StatusError(404);
 
-      if(troupe.security === 'PUBLIC' && req.method === 'GET') {
-        return callback(null, troupe);
-      }
+        if(troupe.security === 'PUBLIC' && req.method === 'GET') {
+          return troupe;
+        }
 
-      /* From this point forward we need a user */
-      if(!req.user) {
-        return callback(new StatusError(401));
-      }
+        /* From this point forward we need a user */
+        if(!req.user) {
+          throw new StatusError(401);
+        }
 
-      if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
-        return callback(new StatusError(403));
-      }
+        if(!access) {
+          throw new StatusError(403);
+        }
 
-      return callback(null, troupe);
-    });
+        return troupe;
+      })
+      .nodeify(callback);
   }
 
 };

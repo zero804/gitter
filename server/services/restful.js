@@ -58,8 +58,21 @@ exports.serializeChatsForTroupe = function(troupeId, userId, options, callback) 
 };
 
 exports.serializeUsersForTroupe = function(troupeId, userId, options, callback) {
-  return troupeService.findUserIdsForTroupe(troupeId)
-    .then(function (userIds) {
+  var limit = options && options.limit;
+
+  return (limit ?
+        troupeService.findUsersIdForTroupeWithLimit(troupeId, limit) :
+        troupeService.findUserIdsForTroupe(troupeId))
+    .then(function(userIds) {
+
+      if(options.searchTerm) {
+        var searchTerm = options.searchTerm;
+        return userService.findByIdsAndSearchTerm(userIds, searchTerm, limit || 30)
+          .then(function(users) {
+            var strategy = new restSerializer.UserStrategy();
+            return restSerializer.serializeExcludeNulls(users, strategy);
+          });
+      }
 
       var strategy = new restSerializer.UserIdStrategy({
         showPresenceForTroupeId: troupeId,
@@ -72,6 +85,7 @@ exports.serializeUsersForTroupe = function(troupeId, userId, options, callback) 
     })
     .nodeify(callback);
 };
+
 
 exports.serializeUnreadItemsForTroupe = function(troupeId, userId, callback) {
   return Q.all([

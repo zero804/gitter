@@ -32,7 +32,7 @@ var mainFrameMiddlewarePipeline = [
     if(req.isPhone) {
       if(!req.user) {
         if (req.uriContext.accessDenied) {
-          return appRender.renderNotFound(req, res, next);
+          return appRender.renderOrg404Page(req, res, next);
         }
         appRender.renderMobileNotLoggedInChat(req, res, next);
         return;
@@ -60,7 +60,7 @@ var chatMiddlewarePipeline = [
   function (req, res, next) {
 
     if (req.uriContext.accessDenied) {
-      return appRender.renderNotFound(req, res, next);
+      return appRender.renderOrg404Page(req, res, next);
     }
 
     if(!req.uriContext.troupe) return next(404);

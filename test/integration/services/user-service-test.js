@@ -12,7 +12,8 @@ describe("User Service", function() {
 
   before(fixtureLoader(fixture2, {
     user1: { username: true },
-    user2: { }
+    user2: { },
+    user3: { }
   }));
 
   it('should allow two users with the same githubId to be created at the same moment, but only create a single account', function(done) {
@@ -50,6 +51,36 @@ describe("User Service", function() {
         return userService.findOrCreateUserForGithubId({ githubId: -1, username: '__test__gitter_007' });
       })
       .nodeify(done);
+  });
+
+  it('should destroy tokens for users', function(done) {
+    var userService = testRequire("./services/user-service");
+
+    return userService.findOrCreateUserForGithubId({
+        githubId: -Date.now(),
+        username: fixture2.generateUsername(),
+        githubToken: 'x',
+        githubUserToken: 'y',
+        githubScopes: { 'user:email': 1 }
+      })
+      .then(function(user) {
+        console.log('USER: ', user);
+        assert(user.githubToken);
+        assert(user.githubUserToken);
+        assert(user.githubScopes['user:email']);
+
+        return [user, userService.destroyTokensForUserId(user.id)];
+      })
+      .spread(function(user) {
+        return userService.findById(user.id);
+      })
+      .then(function(user) {
+        assert(!user.githubToken);
+        assert(!user.githubUserToken);
+        assert.deepEqual(user.githubScopes, {});
+      })
+      .nodeify(done);
+
   });
 
 
