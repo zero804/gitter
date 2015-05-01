@@ -6,6 +6,7 @@ var chatModels = require('collections/chat');
 var AvatarView = require('views/widgets/avatar');
 var Marionette = require('marionette');
 var TroupeViews = require('views/base');
+var moment = require('moment');
 var uiVars = require('views/app/uiVars');
 var Popover = require('views/popover');
 var chatItemTemplate = require('./tmpl/chatItemView.hbs');
@@ -25,7 +26,6 @@ module.exports = (function() {
 
 
   /* @const */
-  var OLD_TIMEOUT = 3600000; /*1 hour*/
   var MAX_HEIGHT = 640; /* This value also in chatItemView.less */
   // This needs to be adjusted in chatInputView as well as chat-server on the server
   /* @const */
@@ -104,13 +104,9 @@ module.exports = (function() {
       var timeChange = this.timeChange.bind(this);
       if (this.isInEditablePeriod()) {
         // update once the message is not editable
-        var notEditableInMS = this.model.get('sent').valueOf() + EDIT_WINDOW - Date.now();
+        var sent = this.model.get('sent');
+        var notEditableInMS = sent ? sent.valueOf() - Date.now() + EDIT_WINDOW : EDIT_WINDOW;
         setTimeout(timeChange, notEditableInMS + 50);
-      }
-
-      if (!this.isOld()) {
-        var oldInMS = this.model.get('sent').valueOf() + OLD_TIMEOUT - Date.now();
-        setTimeout(timeChange, oldInMS + 50);
       }
     },
 
@@ -128,6 +124,12 @@ module.exports = (function() {
       if (data.fromUser) {
         data.username = data.fromUser.username;
       }
+
+      // No sent time, use the current time as the message has just been sent
+      if (!data.sent) {
+        data.sent = moment();
+      }
+
       data.readByText = this.getReadByText(data.readBy);
       if(!data.html) {
         data.html = _.escape(data.text);
@@ -209,7 +211,6 @@ module.exports = (function() {
       this.$el.toggleClass('isEditable', this.isInEditablePeriod());
       this.$el.toggleClass('canEdit', this.canEdit());
       this.$el.toggleClass('cantEdit', !this.canEdit());
-      this.$el.toggleClass('isOld', this.isOld());
     },
 
     updateRender: function(changes) {
@@ -344,17 +345,15 @@ module.exports = (function() {
     },
 
     isInEditablePeriod: function() {
-      var age = Date.now() - this.model.get('sent').valueOf();
+      var sent = this.model.get('sent');
+
+      if (!sent) return true; // No date means the message has not been sent
+      var age = Date.now() - sent.valueOf();
       return age <= EDIT_WINDOW;
     },
 
     isEmbedded: function () {
       return context().embedded;
-    },
-
-    isOld: function() {
-      var age = Date.now() - this.model.get('sent').valueOf();
-      return age >= OLD_TIMEOUT;
     },
 
     canEdit: function() {
@@ -627,4 +626,3 @@ module.exports = (function() {
 
 
 })();
-

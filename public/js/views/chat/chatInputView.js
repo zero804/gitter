@@ -4,7 +4,6 @@ var $ = require('jquery');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
 var template = require('./tmpl/chatInputView.hbs');
-var moment = require('moment');
 var hasScrollBars = require('utils/scrollbar-detect');
 var isMobile = require('utils/is-mobile');
 var drafty = require('components/drafty');
@@ -275,7 +274,7 @@ module.exports = (function() {
         var newMessage = {
           text: val,
           fromUser: context.getUser(),
-          sent: moment(),
+          sent: null,
         };
 
         /* if it is a status message add a key `status` to the Object created above with value `true` */
@@ -432,7 +431,7 @@ module.exports = (function() {
         chatResizer.resizeInput();
       });
 
-      
+
       if (!this.options.editMode) this.drafty = drafty(this.el);
 
       chatResizer.resetInput(true);
