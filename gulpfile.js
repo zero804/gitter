@@ -393,7 +393,7 @@ gulp.task('package', ['prepare-app', 'prepare-assets']);
 /**
  * default
  */
-gulp.task('default', ['test', 'package']);
+gulp.task('default', ['validate', 'test', 'package']);
 
 
 
