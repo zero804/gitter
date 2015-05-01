@@ -14,12 +14,9 @@
   left: 0;
   z-index: 1050;
   background-color: black;
-  // Fade for backdrop
-  &.fade { opacity: 0; }
 }
 
-.modal-backdrop,
-.modal-backdrop.fade.in {
+.modal-backdrop {
   .opacity(80);
 }
 
@@ -40,12 +37,6 @@
   .background-clip(padding-box);
   // Remove focus outline from opened modal
   outline: none;
-
-  &.fade {
-    .transition(e('opacity .3s linear, top .3s ease-out'));
-    top: -25%;
-  }
-  &.fade.in { top: 10%; }
 }
 
 /*.iframe .modal {
@@ -113,7 +104,7 @@
   display: inline;
 }
 
-.modal-backdrop, .modal-backdrop.fade.in {
+.modal-backdrop {
   opacity: 0.2;
 }
 
