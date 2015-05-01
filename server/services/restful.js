@@ -57,23 +57,29 @@ exports.serializeChatsForTroupe = function(troupeId, userId, options, callback) 
 
 };
 
-exports.serializeUsersForTroupe = function(troupeId, userId, options, callback) {
-  var limit = options && options.limit;
+exports.serializeUsersForTroupe = function(troupeId, userId, options) {
+  if (!options) options = {};
 
-  return (limit ?
-        troupeService.findUsersIdForTroupeWithLimit(troupeId, limit) :
-        troupeService.findUserIdsForTroupe(troupeId))
-    .then(function(userIds) {
+  var limit = options.limit;
+  var searchTerm = options.searchTerm;
 
-      if(options.searchTerm) {
-        var searchTerm = options.searchTerm;
+  if(searchTerm) {
+    /* The limit must only be applied post findUserIdsForTroupe */
+    return troupeService.findUserIdsForTroupe(troupeId)
+      .then(function(userIds) {
+
         return userService.findByIdsAndSearchTerm(userIds, searchTerm, limit || 30)
           .then(function(users) {
             var strategy = new restSerializer.UserStrategy();
             return restSerializer.serializeExcludeNulls(users, strategy);
           });
-      }
+      });
+  }
 
+  return (limit ?
+        troupeService.findUsersIdForTroupeWithLimit(troupeId, limit) :
+        troupeService.findUserIdsForTroupe(troupeId))
+    .then(function(userIds) {
       var strategy = new restSerializer.UserIdStrategy({
         showPresenceForTroupeId: troupeId,
         includeRolesForTroupeId: troupeId,
@@ -82,8 +88,7 @@ exports.serializeUsersForTroupe = function(troupeId, userId, options, callback) 
       });
 
       return restSerializer.serializeExcludeNulls(userIds, strategy);
-    })
-    .nodeify(callback);
+    });
 };
 
 
