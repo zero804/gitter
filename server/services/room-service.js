@@ -220,7 +220,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
           if(!access) return [null, access];
 
           var securityPromise;
-          var githubId;
+          var githubId = null;
 
           if(githubType === 'REPO') {
             var repoService = new GitHubRepoService(user);
