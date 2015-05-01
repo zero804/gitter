@@ -1,5 +1,4 @@
-/* jshint -W014 */
-/* jshint -W004 */
+/* jshint -W014, -W004, -W030, -W033 */
 "use strict";
 
 var jQuery = require('jquery');
@@ -413,4 +412,3 @@ module.exports = (function() {
 return jQuery;
 
 })();
-
