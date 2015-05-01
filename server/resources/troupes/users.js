@@ -53,7 +53,7 @@ module.exports = {
       searchTerm: req.query.q
     };
 
-    restful.serializeUsersForTroupe(req.troupe.id, req.user.id, options)
+    restful.serializeUsersForTroupe(req.troupe.id, req.user && req.user.id, options)
       .then(function (data) {
         res.send(data);
       })
