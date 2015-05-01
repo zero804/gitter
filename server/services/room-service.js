@@ -42,10 +42,10 @@ var badgerEnabled      = nconf.get('autoPullRequest:enabled');
 function localUriLookup(uri, opts) {
   return uriLookupService.lookupUri(uri)
     .then(function (uriLookup) {
-
-      if(!uriLookup) return null;
+      if (!uriLookup) return;
 
       if(uriLookup.userId) {
+        /* One to one */
         return userService.findById(uriLookup.userId)
           .then(function(user) {
             if(!user) {
@@ -67,6 +67,7 @@ function localUriLookup(uri, opts) {
       }
 
       if(uriLookup.troupeId) {
+        // TODO: get rid of this findById, make it lean, etc
         return troupeService.findById(uriLookup.troupeId)
           .then(function (troupe) {
             if(!troupe) {
@@ -76,11 +77,18 @@ function localUriLookup(uri, opts) {
                                       .thenResolve(null);
             }
 
-            if(!opts.ignoreCase &&
-                troupe.uri != uri &&
-                troupe.uri.toLowerCase() === uri.toLowerCase()) {
-              logger.info('Incorrect case for room: ' + uri + ' redirecting to ' + troupe.uri);
-              throw { redirect: '/' + troupe.uri };
+            if (troupe.uri != uri) {
+              if(troupe.uri.toLowerCase() === uri.toLowerCase()) {
+                /* Only the case is wrong.... */
+                if(!opts.ignoreCase) {
+                  logger.info('Incorrect case for room: ' + uri + ' redirecting to ' + troupe.uri);
+                  throw { redirect: '/' + troupe.uri };
+                }
+                /* Otherwise, continue */
+              } else {
+                // The name is completely different (due to a rename), always redirect
+                throw { redirect: '/' + troupe.uri };
+              }
             }
 
             return { troupe: troupe };
@@ -212,6 +220,8 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
           if(!access) return [null, access];
 
           var securityPromise;
+          var githubId;
+
           if(githubType === 'REPO') {
             var repoService = new GitHubRepoService(user);
             securityPromise = repoService.getRepo(uri)
@@ -219,6 +229,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
                 if(!repoInfo) throw new Error('Unable to find repo ' + uri);
 
                 var security = repoInfo.private ? 'PRIVATE' : 'PUBLIC';
+                githubId = parseInt(repoInfo.id, 10) || undefined;
                 return security;
               });
 
@@ -240,6 +251,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
                   uri: officialUri,
                   _nonce: nonce,
                   githubType: githubType,
+                  githubId: githubId,
                   topic: topic || "",
                   security: security,
                   dateLastSecurityCheck: new Date(),
@@ -1114,8 +1126,6 @@ function bulkLurkUsers(troupeId, userIds) {
 exports.bulkLurkUsers = bulkLurkUsers;
 
 
-
-
 function searchRooms(userId, queryText, options) {
 
   return persistence.Troupe
@@ -1144,3 +1154,46 @@ function searchRooms(userId, queryText, options) {
     });
 }
 exports.searchRooms = searchRooms;
+
+/**
+ * Rename a REPO room to a new URI
+ */
+function renameUri(oldUri, newUri, instigatingUser) {
+  if (oldUri === newUri) return Q.resolve();
+
+  return troupeService.findByUri(oldUri)
+    .then(function(room) {
+      if (!room) throw new StatusError(404, 'Room ' + oldUri + ' does not exist');
+      if (room.githubType !== 'REPO') throw new StatusError(400, 'Only repo rooms can be renamed');
+      if (room.uri === newUri) return; // Case change, and it's already happened
+
+      var repoService = new GitHubRepoService(instigatingUser);
+      return repoService.getRepo(newUri)
+        .then(function(repoInfo) {
+          if(!repoInfo) throw new StatusError(404, 'Unable to find repo ' + newUri);
+
+          var originalLcUri = room.lcUri;
+          var githubId = parseInt(repoInfo.id, 10) || undefined;
+
+          var officialUri = repoInfo.full_name;
+          var lcUri = officialUri.toLowerCase();
+
+          room.githubId = githubId;
+          room.uri = repoInfo.full_name;
+          room.lcUri = lcUri;
+          room.lcOwner = lcUri.split('/')[0];
+
+          /* Only add if it's not a case change */
+          if (originalLcUri !== lcUri) {
+            room.renamedLcUris.push(originalLcUri);
+          }
+
+          return room.saveQ()
+            .then(function() {
+              return uriLookupService.reserveUriForTroupeId(room.id, lcUri);
+            });
+        });
+
+    });
+}
+exports.renameUri = renameUri;
