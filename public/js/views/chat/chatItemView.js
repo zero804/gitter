@@ -16,6 +16,7 @@ var appEvents = require('utils/appevents');
 var cocktail = require('cocktail');
 var chatCollapse = require('utils/collapsed-item-client');
 var KeyboardEventMixins = require('views/keyboard-events-mixin');
+var RAF = require('utils/raf');
 require('views/behaviors/unread-items');
 require('views/behaviors/widgets');
 require('views/behaviors/sync-status');
@@ -106,8 +107,13 @@ module.exports = (function() {
         // update once the message is not editable
         var sent = this.model.get('sent');
         var notEditableInMS = sent ? sent.valueOf() - Date.now() + EDIT_WINDOW : EDIT_WINDOW;
-        setTimeout(timeChange, notEditableInMS + 50);
+        this.timeChangeTimeout = setTimeout(timeChange, notEditableInMS + 50);
       }
+    },
+
+    /** XXX TODO NB: change this to onClose once we've moved to Marionette 2!!!! */
+    onClose: function() {
+      clearTimeout(this.timeChangeTimeout);
     },
 
     template: function(data) {
@@ -242,9 +248,10 @@ module.exports = (function() {
           if(readByCount) {
            readByLabel = $(document.createElement('div')).addClass('chat-item__icon--read js-chat-item-readby');
            readByLabel.insertBefore(this.$el.find('.js-chat-item-edit'));
-           setTimeout(function() {
+
+           RAF(function() {
              readByLabel.addClass('readBySome');
-           }, 10);
+           });
           }
         } else {
           if((oldValue === 0) !== (readByCount === 0)) {
@@ -465,7 +472,7 @@ module.exports = (function() {
       self.expandFunction = function(embed) {
         embed.addClass('animateOut');
 
-        setTimeout(function() {
+        RAF(function() {
 
           if(self.rollers) {
             self.rollers.startTransition(embed, 500);
@@ -473,7 +480,7 @@ module.exports = (function() {
 
           embed.removeClass('animateOut');
           adjustMaxHeight(embed);
-        }, 10);
+        });
       };
 
       self.renderText();
@@ -515,10 +522,10 @@ module.exports = (function() {
 
       var textarea = chatInputText.find('textarea').val(unsafeText);
 
-      setTimeout(function() {
+      RAF(function() {
         textarea.focus();
         textarea.val("").val(unsafeText);
-      }, 10);
+      });
 
       this.inputBox = new chatInputView.ChatInputBoxView({ el: textarea, editMode: true });
       this.listenTo(this.inputBox, 'save', this.saveChat);
