@@ -1,6 +1,4 @@
 "use strict";
-/* jshint unused:true, browser:true,  strict:true */
-/* global define:false */
 var emoji = require('utils/emoji');
 
 module.exports = (function() {
@@ -18,4 +16,3 @@ module.exports = (function() {
 
 
 })();
-

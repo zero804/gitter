@@ -39,13 +39,10 @@ gulp.task('validate-client-source', function() {
       unused: false,
       laxbreak: true,
       laxcomma: true,
-      "-W098": "", // Remove this later
       "-W069": "",
       "-W033": "",
-      "-W030": "",
-      "-W040": "",
       "-W093": "",
-      "-W084": "",
+      // "-W084": "",
       predef: ["module", "require"]
      }))
     .pipe(jshint.reporter('default', { verbose: true }))
@@ -61,7 +58,6 @@ gulp.task('validate-server-source', function() {
       devel: false,
       unused: false,
       "-W064": "", // Missing 'new' prefix when invoking a constructor
-      "-W098": "", // Currently allow unused vars. Remove later
       "-W069": "", // [..] is better written in dot notation.
       "-W033": "", // Missing semicolon.
       "-W032": "", // Unnecessary semicolon.

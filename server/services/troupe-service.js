@@ -50,17 +50,6 @@ function findByIdRequired(id) {
     .then(promiseUtils.required);
 }
 
-/**
- * Like model.createQ, but invokes mongoose middleware
- */
-function createQ(ModelType, options) {
-  var m = new ModelType(options);
-  return m.saveQ()
-    .then(function() {
-      return m;
-    });
-}
-
 function findMemberEmails(id, callback) {
   findById(id, function(err,troupe) {
     if(err) callback(err);

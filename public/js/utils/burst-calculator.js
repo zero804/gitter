@@ -1,5 +1,6 @@
+/* jshint -W040 */
 "use strict";
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
+
 var _ = require('underscore');
 var Backbone = require('backbone');
 

@@ -53,7 +53,7 @@ module.exports = [
       next(e);
     }
   },
-  function(err, req, res, next) {
+  function(err, req, res, next) { // jshint unused:false
     logger.error('Health check failed: ' + err, { exception: err });
     errorReporter(err, { health_check_full: "failed" });
     res.status(500).send('Failed: ' + err);

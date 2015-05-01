@@ -321,16 +321,20 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
     });
 }
 
-function determineDefaultNotifyForRoom(user, troupe) {
-  var repoService = new GitHubRepoService(user);
-  return repoService.getRepo(troupe.uri)
-    .then(function(repoInfo) {
-      if(!repoInfo || !repoInfo.permissions) return 0;
 
-      /* Admin or push? Notify */
-      return repoInfo.permissions.admin || repoInfo.permissions.push ? 1 : 0;
-    });
-}
+/* Keep this in as one day it'll probably be useful */
+
+// function determineDefaultNotifyForRoom(user, troupe) {
+//   var repoService = new GitHubRepoService(user);
+//   return repoService.getRepo(troupe.uri)
+//     .then(function(repoInfo) {
+//       if(!repoInfo || !repoInfo.permissions) return 0;
+//
+//       /* Admin or push? Notify */
+//       return repoInfo.permissions.admin || repoInfo.permissions.push ? 1 : 0;
+//     });
+// }
+
 /**
  * Grant or remove the users access to a room
  * Makes the troupe reflect the users access to a room
