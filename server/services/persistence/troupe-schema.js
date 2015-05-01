@@ -85,7 +85,7 @@ module.exports = {
       dateDeleted: { type: Date },
       dateLastSecurityCheck: { type: Date },
       noindex: { type: Boolean, 'default': false},
-      githubId: { type: Number },
+      githubId: { type: Number, default: null },
       renamedLcUris: [String],
       _nonce: { type: Number },
       _tv: { type: 'MongooseNumber', 'default': 0 }
