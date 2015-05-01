@@ -83,6 +83,10 @@ describe('remove-service #slow', function() {
       };
     };
 
+    beforeEach(function(done) {
+      createFav().nodeify(done);
+    });
+
     it('should remove favourite', function(done) {
       var checkEvent = addListenner({
         url: '/user/' + fixture.userFavourite.id + '/rooms',
@@ -96,10 +100,7 @@ describe('remove-service #slow', function() {
         }
       });
 
-      createFav()
-      .then(function() {
-        return removeService.removeRecentRoomForUser(fixture.troupeCanRemove, fixture.userFavourite.id);
-      })
+      removeService.removeRecentRoomForUser(fixture.troupeCanRemove, fixture.userFavourite.id)
       .then(checkEvent) // Ensure event was emitted
       .then(getFavs)
       .then(function(favs) {
@@ -113,10 +114,8 @@ describe('remove-service #slow', function() {
     });
 
     it('should remove user from the room if lurking', function(done) {
-      createFav()
-      .then(function() { // Set user as lurking
-        return roomService.updateTroupeLurkForUserId(fixture.userFavourite.id, fixture.troupeCanRemove.id, true);
-      })
+      // Set user as lurking
+      roomService.updateTroupeLurkForUserId(fixture.userFavourite.id, fixture.troupeCanRemove.id, true)
       .then(function() { // Get updated troupe
         return troupeService.findById(fixture.troupeCanRemove.id);
       })
@@ -141,10 +140,7 @@ describe('remove-service #slow', function() {
         model: {id: fixture.troupeEmpty.id}
       });
 
-      createFav()
-      .then(function() {
-        return userIsInRoom(fixture.troupeEmpty.uri, fixture.userFavourite);
-      })
+      userIsInRoom(fixture.troupeEmpty.uri, fixture.userFavourite)
       .then(function(here) {
         assert(!here); // Check that user is not in the room
       })

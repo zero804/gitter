@@ -89,7 +89,6 @@ module.exports = (function() {
       var chatCollectionView = new ChatCollectionView({
         el: '#chat-container',
         collection: itemCollections.chats,
-        userCollection: itemCollections.users,
         decorators: [issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
       });
       chatCollectionView.bindUIElements();
@@ -104,7 +103,6 @@ module.exports = (function() {
         el: '#chat-input',
         collection: itemCollections.chats,
         chatCollectionView: chatCollectionView,
-        userCollection: itemCollections.users,
         rollers: chatCollectionView.rollers
       }).render();
 

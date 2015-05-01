@@ -7,6 +7,7 @@ var _ = require('underscore');
 
 var NotificationCollector = function (options) {
   this.collection = {};
+  this.itemCount = 0;
   this.userCategorisationStrategy = options.userCategorisationStrategy;
   this.collect = _.throttle(this.collectTimeout.bind(this), options.collectionTime || 500, { leading: false });
 };
@@ -25,17 +26,29 @@ NotificationCollector.prototype.incomingNotification = function (userId, itemTyp
     var i = this.collection[key];
     i.items = i.items.concat(itemsMapped);
   }
+  this.itemCount++;
 
-  this.collect();
+  if (this.collectSoon) return;
+
+  if (this.itemCount > 2000) {
+    this.collectSoon = true;
+    // Performing immediate collection
+    setTimeout(this.collectTimeout.bind(this), 1);
+  } else {
+    this.collect();
+  }
 };
 
 NotificationCollector.prototype.collectTimeout = function () {
   var collection = this.collection;
   this.collection = {};
-
+  this.itemCount = 0;
   var self = this;
+  delete this.collectSoon;
 
   var userTroupes = Object.keys(collection).map(function (key) { return collection[key]; });
+
+  if (userTroupes.length === 0) return;
 
   this.userCategorisationStrategy(userTroupes, function (err, categories) {
 

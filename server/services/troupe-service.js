@@ -100,6 +100,48 @@ function findAllTroupesIdsForUser(userId, callback) {
     .nodeify(callback);
 }
 
+var findByIdLeanWithAccessFieldsNoUserId = Object.keys(persistence.Troupe.schema.paths)
+  .filter(function(f) { return f !== 'users' && f !== '_nonce'; })
+  .reduce(function(memo, key) {
+    memo[key] = 1;
+    return memo;
+  }, {});
+
+/**
+ * [{troupe without users}, userIsInRoom:boolean]
+ */
+function findByIdLeanWithAccess(troupeId, userId) {
+  troupeId = mongoUtils.asObjectID(troupeId);
+  if (userId) {
+    userId = mongoUtils.asObjectID(userId);
+
+    var projection = _.extend({
+      users: { $elemMatch: { userId: userId } }
+    }, findByIdLeanWithAccessFieldsNoUserId);
+
+    return persistence.Troupe
+      .findOneQ({ _id: troupeId }, projection, { lean: true })
+      .then(function(leanTroupe) {
+        if (!leanTroupe) return [null, false];
+
+        var access = !!(leanTroupe.users && leanTroupe.users.length);
+        leanTroupe.id = mongoUtils.serializeObjectId(leanTroupe._id);
+        delete leanTroupe.users; // Delete the user from the lean object
+
+        return [leanTroupe, access];
+      });
+  }
+
+  // Query without userId
+  return persistence.Troupe
+    .findOneQ({ _id: troupeId }, findByIdLeanWithAccessFieldsNoUserId, { lean: true })
+    .then(function(result) {
+      if (!result) return [null, false];
+      result.id = mongoUtils.serializeObjectId(result._id);
+      return [result, false];
+    });
+}
+
 function userHasAccessToTroupe(user, troupe) {
   if(!user) return false;
   return troupe.containsUserId(user.id);
@@ -222,20 +264,28 @@ function findUserIdsForTroupe(troupeId, callback) {
 }
 
 /**
- * Returns a promise of the users hashed by lurk status
- * and githubType
+ * Find usersIds for a troupe, with a limit.
+ * Defaults to sort with non-lurk first, then join date
  */
-function findUserIdsForTroupeWithLurk(troupeId) {
-  return leanTroupeDao.findByIdRequired(troupeId, 'users githubType uri security')
+function findUsersIdForTroupeWithLimit(troupeId, limit) {
+  return persistence.Troupe.findByIdQ(troupeId, { "users": { $slice: limit } }, { lean: true })
     .then(function(troupe) {
-      var users = troupe.users.reduce(function(memo, v) {
+      return troupe.users.map(function(m) { return m.userId; });
+    });
+}
+
+/**
+ * Returns a hash of users in the troupe their lurk status as the value
+ */
+function findUserIdsForTroupeWithLurk(troupeId, callback) {
+  return persistence.Troupe.findByIdQ(troupeId, { '_id': 0, 'users.userId': 1, 'users.lurk' : 1 }, { lean: true })
+    .then(function(troupe) {
+      return troupe.users.reduce(function(memo, v) {
         memo[v.userId] = !!v.lurk;
         return memo;
       }, {});
-
-      troupe.users = users;
-      return troupe;
-    });
+    })
+    .nodeify(callback);
 }
 
 function updateTroupeName(troupeId, troupeName, callback) {
@@ -585,6 +635,7 @@ module.exports = {
   findById: findById,
   findByIds: findByIds,
   findByIdsLean: findByIdsLean,
+  findByIdLeanWithAccess: findByIdLeanWithAccess,
   findAllTroupesForUser: findAllTroupesForUser,
   findAllTroupesIdsForUser: findAllTroupesIdsForUser,
   validateTroupeEmail: validateTroupeEmail,
@@ -603,6 +654,7 @@ module.exports = {
   findAllUserIdsForTroupe: findAllUserIdsForTroupe,
   findUserIdsForTroupeWithLurk: findUserIdsForTroupeWithLurk,
   findUserIdsForTroupe: findUserIdsForTroupe,
+  findUsersIdForTroupeWithLimit: findUsersIdForTroupeWithLimit,
 
   updateTroupeName: updateTroupeName,
   findOneToOneTroupe: findOneToOneTroupe,
