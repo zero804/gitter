@@ -51,7 +51,7 @@ module.exports = function (req, res, next) {
       return next(new Error('Transload did not return ASSEMBLY_COMPLETED.'));
     }
 
-    troupeService.findByIdLeanWithAccess(id, req.user && req.user._id)
+    troupeService.findByIdLeanWithAccess(metadata.room_id, metadata.user_id)
       .spread(function(room, access) {
         if(!room) throw new StatusError(404, 'Unable to find room ' + metadata.room_id);
         if(!access) throw new StatusError(403);
