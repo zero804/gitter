@@ -45,18 +45,21 @@ function createBaseFixture() {
     generateGithubId: generateGithubId,
     generateGithubToken: generateGithubToken,
 
-    cleanup: function() {
-      //persistence.User.removeQ();
-      //persistence.Troupe.removeQ();
-      //persistence.ChatMessage.removeQ();
-
+    cleanup: function(callback) {
       var self = this;
-      Object.keys(this).forEach(function(key) {
-        var o = self[key];
-        if(o.removeQ) {
-          o.removeQ();
-        }
-      });
+
+      var count = 0;
+      return Q.all(Object.keys(this).map(function(key) {
+          var o = self[key];
+          if(o.removeQ) {
+            count++;
+            return o.removeQ();
+          }
+        }))
+        .then(function() {
+          winston.verbose('Removed ' + count + ' items');
+        })
+        .nodeify(callback);
     }
   };
 }

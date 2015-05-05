@@ -103,9 +103,9 @@ module.exports = (function() {
       };
     },
     onBeforeClose: function() {
-      if(this.widgetManager) {
-        this.widgetManager.close();
-        this.widgetManager = null;
+      if(this.view.widgetManager) {
+        this.view.widgetManager.close();
+        this.view.widgetManager = null;
       }
     }
   });
@@ -124,4 +124,3 @@ module.exports = (function() {
 
 
 })();
-

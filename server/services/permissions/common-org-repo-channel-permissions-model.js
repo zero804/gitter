@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var Q = require('q');
@@ -35,7 +34,6 @@ module.exports = function(delegatePermissionsModel, userIsInRoom) {
 
     var uriParts = uri.split('/');
     var uriLastPart = uriParts.slice(0, -1).join('/');
-    var uriFirstPart = uriParts[0];
 
 
     switch(right) {
