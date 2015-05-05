@@ -1,3 +1,5 @@
+/* jshint -W040 */
+
 "use strict";
 var Handlebars = require('handlebars/runtime').default;
 
@@ -12,4 +14,3 @@ module.exports = (function() {
   Handlebars.registerHelper('isMobile', isMobile);
   return isMobile;
 })();
-
