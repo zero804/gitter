@@ -44,10 +44,15 @@ module.exports = (function() {
 
         if(timeToNextRefresh < 100) timeToNextRefresh = 1000;
 
-        window.setTimeout(rerender, timeToNextRefresh);
+        self.timer = window.setTimeout(rerender, timeToNextRefresh);
       }
 
       rerender();
+    },
+
+    /** XXX TODO NB: change this to onDestroy once we've moved to Marionette 2!!!! */
+    onClose: function() {
+      clearTimeout(this.timer);
     },
 
     render: function(duration) {
