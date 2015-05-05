@@ -11,25 +11,43 @@ var MAX_TYPEAHEAD_SUGGESTIONS = isMobile() ? 3 : 10;
 
 var lcUsername = (context.user() && context.user().get('username') || '').toLowerCase();
 
-function getRecentMessageSenders() {
+function getRecentMessageSenders(lowerTerm) {
   var users = chatCollection.map(function(message) {
     return message.get('fromUser');
   }).filter(function(user) {
-    return !!user;
-  });
+    return user && (
+             user.username.toLowerCase().indexOf(lowerTerm) === 0 ||
+             ( user.displayName && user.displayName.toLowerCase().indexOf(lowerTerm) === 0 )
+           );
 
-  return _.unique(users.reverse(), function(user) { return user.id });
+  }).reverse();
+  return unique(users);
 }
 
 function isNotCurrentUser(user) {
   return user.username.toLowerCase() !== lcUsername;
 }
 
+function unique(users) {
+  return _.unique(users, function(user) {
+    return user.id;
+  });
+}
+
+function appendServerSearchResults(localUsers, lowerTerm, callback) {
+  userSearchDebounced(lowerTerm, function(serverUsers) {
+    serverUsers = serverUsers.filter(isNotCurrentUser);
+    var users = unique(localUsers.concat(serverUsers));
+
+    callback(users);
+  });
+}
+
 var lastTerm;
 var lastCallback;
 var debounceCallback;
 
-// the textcomplete library requires *all* async
+// jquery.textcomplete requires *all* async
 // functions to call their callback.
 //
 // So debouncing has to be custom.
@@ -62,14 +80,6 @@ function userSearchDebounced(term, callback) {
 function userSearch(term, callback) {
   apiClient.room.get('/users', { q: term, limit: MAX_TYPEAHEAD_SUGGESTIONS })
     .then(function(users) {
-      var lowerTerm = term.toLowerCase();
-
-      users = users.filter(isNotCurrentUser);
-
-      if (context().permissions.admin && '/all'.indexOf(lowerTerm) === 0) {
-        users.unshift({ username: '/all', displayName: 'Group' });
-      }
-
       callback(users);
     })
     .fail(function() {
@@ -81,22 +91,32 @@ module.exports = {
   match: /(^|\s)@(\/?[a-zA-Z0-9_\-]*)$/,
   maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
   search: function (term, callback) {
+    var lowerTerm = term.toLowerCase();
 
-    if (term.length === 0) {
-      var users = getRecentMessageSenders();
+    var users = getRecentMessageSenders(lowerTerm)
+      .filter(isNotCurrentUser);
 
-      users = users.filter(isNotCurrentUser);
+    if (users.length) {
+      // give instant feedback
+      // (jquery.textcomplete supports multiple callbacks)
+      callback(users, true);
+    }
 
-      if (context().permissions.admin) {
-        // make sure that '@/all' is last
-        users = users.slice(0, MAX_TYPEAHEAD_SUGGESTIONS - 1);
-        users.push({ username: '/all', displayName: 'Group' });
-      }
+    if ('/all'.indexOf(lowerTerm) === 0 && context().permissions.admin) {
+      users = users.slice(0, MAX_TYPEAHEAD_SUGGESTIONS - 1);
+      users.push({ username: '/all', displayName: 'Group' });
 
+      // there will be no server results for '/all', so return now.
       return callback(users);
     }
 
-    userSearchDebounced(term, callback);
+    if (term.length === 0) {
+      // server results wont improve anything, so return now.
+      return callback(users);
+    }
+
+    // lets get some server results!
+    return appendServerSearchResults(users, lowerTerm, callback);
   },
   template: function(user) {
     return template({
