@@ -11,17 +11,23 @@ var MAX_TYPEAHEAD_SUGGESTIONS = isMobile() ? 3 : 10;
 
 var lcUsername = (context.user() && context.user().get('username') || '').toLowerCase();
 
-function getRecentMessageSenders(lowerTerm) {
+function getRecentMessageSenders() {
   var users = chatCollection.map(function(message) {
     return message.get('fromUser');
   }).filter(function(user) {
+    return !!user;
+  }).reverse();
+  return unique(users);
+}
+
+function filterWithTerm(term) {
+  var lowerTerm = term.toLowerCase();
+  return function(user) {
     return user && (
              user.username.toLowerCase().indexOf(lowerTerm) === 0 ||
              ( user.displayName && user.displayName.toLowerCase().indexOf(lowerTerm) === 0 )
            );
-
-  }).reverse();
-  return unique(users);
+  };
 }
 
 function isNotCurrentUser(user) {
@@ -87,14 +93,29 @@ function userSearch(term, callback) {
     });
 }
 
+var lcPrevTerm = '';
+var prevResults = [];
+
 module.exports = {
   match: /(^|\s)@(\/?[a-zA-Z0-9_\-]*)$/,
   maxCount: MAX_TYPEAHEAD_SUGGESTIONS,
-  search: function (term, callback) {
-    var lowerTerm = term.toLowerCase();
+  search: function(term, callback) {
+    var lcTerm = term.toLowerCase();
 
-    var users = getRecentMessageSenders(lowerTerm)
-      .filter(isNotCurrentUser);
+    var users = [];
+
+    if (lcTerm.indexOf(lcPrevTerm) === 0) {
+      users = prevResults;
+    }
+
+    users = users.concat(getRecentMessageSenders());
+
+    users = unique(users)
+      .filter(isNotCurrentUser)
+      .filter(filterWithTerm(term));
+
+    lcPrevTerm = lcTerm;
+    prevResults = users;
 
     if (users.length) {
       // give instant feedback
@@ -102,7 +123,7 @@ module.exports = {
       callback(users, true);
     }
 
-    if ('/all'.indexOf(lowerTerm) === 0 && context().permissions.admin) {
+    if ('/all'.indexOf(lcTerm) === 0 && context().permissions.admin) {
       users = users.slice(0, MAX_TYPEAHEAD_SUGGESTIONS - 1);
       users.push({ username: '/all', displayName: 'Group' });
 
@@ -116,7 +137,16 @@ module.exports = {
     }
 
     // lets get some server results!
-    return appendServerSearchResults(users, lowerTerm, callback);
+    return userSearchDebounced(term, function(serverUsers) {
+      serverUsers = serverUsers.filter(isNotCurrentUser);
+      users = unique(users.concat(serverUsers));
+
+      if (lcTerm === lcPrevTerm) {
+        prevResults = users;
+      }
+
+      callback(users);
+    });
   },
   template: function(user) {
     return template({
