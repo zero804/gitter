@@ -11,7 +11,13 @@ var SuggestedTroupeCollection = Backbone.Collection.extend({
   sync: SyncMixin.sync
 });
 
+var RoomModel = gitterRealtimeClient.RoomModel.extend({
+  sync: SyncMixin.sync
+});
+
 var TroupeCollection = gitterRealtimeClient.RoomCollection.extend({
+  model: RoomModel,
+  url: apiClient.user.channelGenerator("/rooms"),
   client: function() {
     return realtime.getClient();
   },
@@ -21,5 +27,5 @@ var TroupeCollection = gitterRealtimeClient.RoomCollection.extend({
 module.exports = {
   SuggestedTroupeCollection: SuggestedTroupeCollection,
   TroupeCollection: TroupeCollection,
-  TroupeModel:      gitterRealtimeClient.RoomModel
+  TroupeModel:      RoomModel
 };
