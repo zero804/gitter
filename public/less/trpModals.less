@@ -14,30 +14,26 @@
   left: 0;
   z-index: 1050;
   background-color: rgba(0,0,0,0.2);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
 }
 
 // Base modal
 .modal {
-  position: fixed;
-  top: 10%;
-  left: 50%;
   z-index: @zindexModal;
   width: 560px;
-  margin-left: -280px;
+  max-width: 95%;
+
   background-color: @white;
-  border: 1px solid #999;
-  border: 1px solid rgba(0,0,0,.3);
-  *border: 1px solid #999; /* IE6-7 */
   .border-radius(6px);
   .box-shadow(0 3px 7px rgba(0,0,0,0.3));
   .background-clip(padding-box);
   // Remove focus outline from opened modal
   outline: none;
 }
-
-/*.iframe .modal {
-  margin-left: -405px;
-}*/
 
 .modal-header {
   padding: 9px 15px;
@@ -221,26 +217,6 @@
   display: none;
 }
 
-.modal {
-  border: 0;
-  max-height: 90%;
-  overflow: hidden;
-
-  @media screen and (max-width: 720px) {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    margin-top: 0px;
-    margin-left: 0px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    max-height: 100%;
-    height: 100%;
-  }
-
-}
-
 body.modal-open {
     overflow: hidden;
 }
@@ -261,14 +237,12 @@ body.modal-open {
 }
 
 .modal-header {
-  border-radius: 0px;
   padding: 0;
   display: block;
   background-color: fade(@trpDarkBlue, 5%);
 }
 
 .modal-footer {
-  border-radius: 0px;
   text-align: left;
 }
 
