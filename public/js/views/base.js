@@ -41,7 +41,6 @@ module.exports = (function() {
       this.options = {
         keyboard: true,
         backdrop: true,
-        fade: true,
         autoRemove: true,
         menuItems: [],
         disableClose: false,
@@ -175,30 +174,15 @@ module.exports = (function() {
 
       this.escape();
       this.backdrop(function () {
-        var transition = $.support.transition && that.$el.hasClass('fade');
 
         if(!that.$el.parent().length) {
-          that.$el.appendTo(document.body); //don't move modals dom position
+          that.$el.appendTo(that.$backdrop); //don't move modals dom position
         }
 
         that.$el.show();
-
-        if (transition) {
-          var o = that.$el[0].offsetWidth; // force reflow
-          o++;
-        }
-
         that.$el.addClass('in');
-
-        if(transition) {
-          that.$el.one($.support.transition.end, function () {
-            that.$el.trigger('shown');
-            that.trigger('shown');
-           });
-        } else {
-          that.$el.trigger('shown');
-          that.trigger('shown');
-        }
+        that.$el.trigger('shown');
+        that.trigger('shown');
       });
     },
 
@@ -213,7 +197,6 @@ module.exports = (function() {
 
     /* Called after navigation to close an navigable dialog box */
     navigationalHide: function() {
-      this.options.fade = false;
       this.hideInternal();
     },
 
@@ -232,11 +215,7 @@ module.exports = (function() {
 
       this.trigger('hide');
 
-      if($.support.transition && this.options.fade) {
-        this.hideWithTransition(this);
-      } else {
-        this.hideModal();
-      }
+      this.hideModal();
     },
 
     transitionTo: function(newDialog) {
@@ -278,40 +257,28 @@ module.exports = (function() {
     },
 
     backdrop: function( callback ) {
-      var animate = this.options.fade ? 'fade' : '';
-
       if (this.isShown && this.options.backdrop) {
-        var doAnimate = $.support.transition && animate;
 
-        this.$backdrop = $('<div class="modal-backdrop ' + animate + '" />')
+        this.$backdrop = $('<div class="modal-backdrop" />')
           .appendTo(document.body);
 
         if (this.options.backdrop != 'static' && !this.options.disableClose) {
           var bd = this.$backdrop;
-          this.$backdrop.click(function() {
+          this.$backdrop.click(function(e) {
+            if( e.target !== this ) return;
+
             bd.modal.hide();
           });
         }
         this.$backdrop.modal = this;
-
-        if (doAnimate) { var x = this.$backdrop[0].offsetWidth; x++; } // force reflow
-
         this.$backdrop.addClass('in');
 
-        if(doAnimate) {
-          this.$backdrop.one($.support.transition.end, callback);
-        } else {
-          callback();
-        }
+        callback();
 
       } else if (!this.isShown && this.$backdrop) {
         this.$backdrop.removeClass('in');
 
-        if($.support.transition && this.options.fade) {
-          this.$backdrop.one($.support.transition.end, $.proxy(this.removeBackdrop, this));
-        } else {
-          this.removeBackdrop();
-        }
+        this.removeBackdrop();
 
       } else if (callback) {
         callback();

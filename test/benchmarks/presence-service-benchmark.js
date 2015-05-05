@@ -117,7 +117,10 @@ function doTest(iterations, done) {
   }, done).fail(done);
 }
 
-describe('presenceService', function() {
+suite('presence-service', function() {
+  set('iterations', 2);
+  set('type', 'adaptive');
+
   function cleanup(done) {
     presenceService.collectGarbage(fakeEngine, function(err) {
       if(err) return done(err);
@@ -126,21 +129,21 @@ describe('presenceService', function() {
     });
   }
 
-  beforeEach(cleanup);
-  afterEach(cleanup);
-
-  it('should warmup', function(done) {
+  before(function(done) {
     var userId = 'TESTUSER1' + Date.now();
     var socketId = 'TESTSOCKET1' + Date.now();
     var troupeId = 'TESTTROUPE1' + Date.now();
-    var c = new FakeClient(socketId, userId, troupeId, [0,1,1,1,1,1,1,1,1,2], done);
+    var c = new FakeClient(socketId, userId, troupeId, [0,1,1,1,1,1,1,1,1,2], function() {
+      cleanup(done);
+    });
     c.next();
   });
 
-  it('should handle 100 clients', function(done) {
+  after(cleanup);
+
+  bench('eyeballs-benchmark', function(done) {
     doTest(100, done);
   });
 
 
 });
-

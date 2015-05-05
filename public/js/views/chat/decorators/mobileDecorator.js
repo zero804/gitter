@@ -1,6 +1,4 @@
 "use strict";
-/* jshint unused:strict, browser:true, strict:true */
-/* global define:false */
 var $ = require('jquery');
 var context = require('utils/context');
 var link = require('./tmpl/link.hbs');
@@ -68,4 +66,3 @@ module.exports = (function() {
 
 
 })();
-
