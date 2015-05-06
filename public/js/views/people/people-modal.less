@@ -1,7 +1,6 @@
 .people-modal {
   display: flex;
   flex-direction: column;
-  height: 400px;
 }
 
 .people-modal__input {
@@ -12,6 +11,7 @@
 .people-modal__results {
   margin: 0;
   overflow: auto;
+  height: 390px;
 }
 
 .people-modal-result {
@@ -34,4 +34,13 @@
   display: inline;
   float: left;
   margin-right: 0.5em;
+}
+
+.people-modal-empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  height: 100%;
+  padding-bottom: 4em;
 }

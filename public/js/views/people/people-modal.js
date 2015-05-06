@@ -16,6 +16,7 @@ var RESULT_LIMIT = 25;
 
 var UserCollection = Backbone.Collection.extend({
   searchTerm: '',
+  isFetched: false,
   limit: RESULT_LIMIT,
   url: apiClient.room.channelGenerator('/users'),
   sync: SyncMixin.sync,
@@ -36,10 +37,15 @@ var UserCollection = Backbone.Collection.extend({
     this.fetchWithLimit();
   },
   fetchWithLimit: function() {
+    var self = this;
+
     this.fetch({
       data: {
         limit: this.limit,
         q: this.searchTerm
+      },
+      success: function() {
+        self.isFetched = true;
       }
     });
   }
@@ -57,6 +63,13 @@ var UserView = Marionette.ItemView.extend({
   }
 });
 
+var EmptyView = Marionette.ItemView.extend({
+  className: 'people-modal-empty',
+  template: function() {
+    return '<h3>Nope, nothing :(</h3>';
+  }
+});
+
 var View = Marionette.CompositeView.extend({
   className: 'people-modal',
   template: template,
@@ -66,6 +79,7 @@ var View = Marionette.CompositeView.extend({
   },
   itemViewContainer: '@ui.results',
   itemView: UserView,
+  emptyView: EmptyView,
   events: {
     'input @ui.search': 'debouncedSearch'
   },
@@ -80,6 +94,10 @@ var View = Marionette.CompositeView.extend({
     this.once('render', function() {
       new InfiniteScrollBehavior({ scrollElement: this.ui.results[0] }, this);
     }, this);
+  },
+  isEmpty: function(collection) {
+    // dont show the empty view until fetch finishes
+    return collection.isFetched && collection.length === 0;
   }
 });
 
