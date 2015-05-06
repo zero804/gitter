@@ -227,14 +227,10 @@ onready(function () {
     },
 
     people: function() {
-      require.ensure(['views/people/peopleCollectionView'], function(require) {
-        var peopleCollectionView = require('views/people/peopleCollectionView');
+      require.ensure(['views/people/people-modal'], function(require) {
+        var PeopleModal = require('views/people/people-modal');
 
-        // seed the collection with the roster while wait for the full list to load
-        var userCollection = new userModels.UserCollection(itemCollections.roster.models);
-        userCollection.fetch();
-
-        appView.dialogRegion.show(new peopleCollectionView.Modal({ collection: userCollection }));
+        appView.dialogRegion.show(new PeopleModal());
       });
     },
 
