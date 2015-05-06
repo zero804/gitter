@@ -1,3 +1,4 @@
+/* jshint -W033, -W030*/
 "use strict";
 var context = require('utils/context');
 
@@ -47,4 +48,3 @@ module.exports = (function() {
     }
 
 })();
-

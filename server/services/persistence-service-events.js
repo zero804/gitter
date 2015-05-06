@@ -185,7 +185,7 @@ exports.install = function(persistenceService) {
             return '/user/' + userId + '/rooms';
           });
 
-        serializeEvent(urls, 'create', model);
+        serializeEvent(urls, operation, model);
       })
       .catch(function(err) {
         logger.error('Error while serializing non-oneToOne troupe: ' + err, { exception: err });
@@ -197,6 +197,7 @@ exports.install = function(persistenceService) {
   }
 
   mongooseUtils.attachNotificationListenersToSchema(schemas.TroupeSchema, {
+    ignoredPaths: ['bans', 'githubId'],
     onCreate: function onTroupeCreate(model, next) {
       if(model.oneToOne) {
         // Because the troupe needs the currentUserId to be set!

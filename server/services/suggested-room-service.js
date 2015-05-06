@@ -249,30 +249,6 @@ function addHighlightedRooms(suggestionMap, user) {
     .thenResolve(suggestionMap);
 }
 
-/* Deprecated */
-function addMissingGithubData(suggestionMap, user) {
-  var ghRepo = new GithubRepo(user);
-
-  // Find suggestions that a) are not channels but b) don't have repos
-  var missingUris = _.values(suggestionMap).filter(function(item) {
-    return !item.channel && !item.repo;
-  }).map(function(item) {
-    return item.uri;
-  });
-
-  return Q.all(missingUris.map(function(uri) {
-      return ghRepo.getRepo(uri)
-        .then(function(result) {
-          if(result) {
-            if(suggestionMap[uri]) {
-              suggestionMap[uri].repo = result;
-            }
-          }
-        });
-    }))
-    .thenResolve(suggestionMap);
-}
-
 function addMissingGitterData(suggestionMap) {
   var uris = Object.keys(suggestionMap);
 

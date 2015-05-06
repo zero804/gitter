@@ -21,6 +21,27 @@ function maskEmail(email) {
     .join('@');
 }
 
+function getTroupeUserFromId(troupeId, userId) {
+  return troupeService.findByIdLeanWithAccess(troupeId, userId)
+    .spread(function(troupe, access) {
+      if (!access) return;
+
+      return userService.findById(userId);
+    });
+}
+
+function getTroupeUserFromUsername(troupeId, username) {
+  return userService.findByUsername(username)
+    .then(function(user) {
+      return troupeService.findByIdLeanWithAccess(troupeId, user.id)
+        .spread(function(troupe, access) {
+          if (!access) return;
+
+          return user;
+        });
+      });
+}
+
 module.exports = {
   id: 'resourceTroupeUser',
 
@@ -28,11 +49,11 @@ module.exports = {
 
     var options = {
       lean: !!req.query.lean,
-      limit: req.query.limit,
+      limit: req.query.limit && parseInt(req.query.limit, 10) || undefined,
       searchTerm: req.query.q
     };
 
-    restful.serializeUsersForTroupe(req.troupe.id, req.user.id, options)
+    restful.serializeUsersForTroupe(req.troupe.id, req.user && req.user.id, options)
       .then(function (data) {
         res.send(data);
       })
@@ -90,16 +111,26 @@ module.exports = {
       .catch(next);
   },
 
-  load: function(req, userId, callback) {
-    if(!mongoUtils.isLikeObjectId(userId)) return callback();
+  // identifier can be an id or a username. id by default
+  // e.g /troupes/:id/users/123456
+  // e.g /troupes/:id/users/steve?type=username
+  load: function(req, identifier, callback) {
+    var troupeId = req.troupe.id;
 
-    return troupeService.findByIdLeanWithAccess(req.troupe.id, userId)
-      .spread(function(troupe, access) {
-        if (!access) return;
+    if (req.query.type === 'username') {
+      var username = identifier;
+      return getTroupeUserFromUsername(troupeId, username)
+        .nodeify(callback);
+    }
 
-        return userService.findById(userId);
-      })
-      .nodeify(callback);
+    if (mongoUtils.isLikeObjectId(identifier)) {
+      var userId = identifier;
+      return getTroupeUserFromId(troupeId, userId)
+        .nodeify(callback);
+    }
+
+    // calls back undefined to throw a 404
+    return callback();
   }
 
 };
