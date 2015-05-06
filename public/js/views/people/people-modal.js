@@ -75,13 +75,15 @@ var View = Marionette.CompositeView.extend({
   template: template,
   ui: {
     search: 'input',
+    clear: '.js-people-modal-search-clear',
     results: 'ul'
   },
   itemViewContainer: '@ui.results',
   itemView: UserView,
   emptyView: EmptyView,
   events: {
-    'input @ui.search': 'debouncedSearch'
+    'input @ui.search': 'onSearchInput',
+    'click @ui.clear': 'clearSearch'
   },
   initialize: function() {
     var self = this;
@@ -98,6 +100,19 @@ var View = Marionette.CompositeView.extend({
   isEmpty: function(collection) {
     // dont show the empty view until fetch finishes
     return collection.isFetched && collection.length === 0;
+  },
+  onSearchInput: function() {
+    if (this.ui.search.val()) {
+      this.ui.clear.show();
+    } else {
+      this.ui.clear.hide();
+    }
+
+    this.debouncedSearch();
+  },
+  clearSearch: function() {
+    this.ui.search.val('');
+    this.collection.search('');
   }
 });
 
