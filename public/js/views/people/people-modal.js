@@ -113,6 +113,7 @@ var View = Marionette.CompositeView.extend({
   clearSearch: function() {
     this.ui.search.val('');
     this.collection.search('');
+    this.ui.clear.hide();
   }
 });
 
