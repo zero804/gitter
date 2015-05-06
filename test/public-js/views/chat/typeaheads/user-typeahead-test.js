@@ -13,7 +13,8 @@ describe('user-typeahead', function() {
       chatSenders: [user('1-oldest'), user('2'), user('3'), user('4'), user('5'), user('6'), user('7'), user('8'), user('9'), user('10-newest')]
     });
 
-    typeahead.search('', function(results) {
+    typeahead.search('', function(results, ignore) {
+      if (ignore) return;
       assert.deepEqual(usernames(results), ['10-newest','9','8','7','6','5','4','3','2','1-oldest']);
     });
   });
@@ -24,7 +25,8 @@ describe('user-typeahead', function() {
       chatSenders: [user('1-oldest'), user('2'), user('3'), user('4'), user('5'), user('6'), user('7'), user('8'), user('9'), user('10-newest')]
     });
 
-    typeahead.search('', function(results) {
+    typeahead.search('', function(results, ignore) {
+      if (ignore) return;
       assert.deepEqual(usernames(results), ['10-newest','9','8','7','6','5','4','3','2','/all']);
     });
   });
@@ -34,7 +36,8 @@ describe('user-typeahead', function() {
       chatSenders: [user('tina'), user('bradley'), user('jon'), null, user('rachel')]
     });
 
-    typeahead.search('', function(results) {
+    typeahead.search('', function(results, ignore) {
+      if (ignore) return;
       assert.deepEqual(usernames(results), ['rachel','jon','bradley','tina']);
     });
   });
@@ -44,7 +47,8 @@ describe('user-typeahead', function() {
       chatSenders: [user('jon'), user('tina'), user('jon'),]
     });
 
-    typeahead.search('', function(results) {
+    typeahead.search('', function(results, ignore) {
+      if (ignore) return;
       assert.deepEqual(usernames(results), ['jon','tina']);
     });
   });
