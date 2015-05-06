@@ -8,13 +8,11 @@ var liveContext = require('components/live-context');
 var appEvents = require('utils/appevents');
 var log = require('utils/log');
 var ChatIntegratedView = require('views/app/chatIntegratedView');
-var itemCollections = require('collections/instances/integrated-items');
 var onready = require('./utils/onready');
 var highlightPermalinkChats = require('./utils/highlight-permalink-chats');
 var apiClient = require('components/apiClient');
 var HeaderView = require('views/app/headerView');
 var frameUtils = require('./utils/frame-utils');
-var userModels = require('collections/users');
 
 require('components/statsc');
 require('views/widgets/preload');
