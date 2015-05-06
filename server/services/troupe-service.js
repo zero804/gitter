@@ -50,17 +50,6 @@ function findByIdRequired(id) {
     .then(promiseUtils.required);
 }
 
-/**
- * Like model.createQ, but invokes mongoose middleware
- */
-function createQ(ModelType, options) {
-  var m = new ModelType(options);
-  return m.saveQ()
-    .then(function() {
-      return m;
-    });
-}
-
 function findMemberEmails(id, callback) {
   findById(id, function(err,troupe) {
     if(err) callback(err);
@@ -261,6 +250,17 @@ function findUserIdsForTroupe(troupeId, callback) {
       return troupe.users.map(function(m) { return m.userId; });
     })
     .nodeify(callback);
+}
+
+/**
+ * Find usersIds for a troupe, with a limit.
+ * Defaults to sort with non-lurk first, then join date
+ */
+function findUsersIdForTroupeWithLimit(troupeId, limit) {
+  return persistence.Troupe.findByIdQ(troupeId, { "users": { $slice: limit } }, { lean: true })
+    .then(function(troupe) {
+      return troupe.users.map(function(m) { return m.userId; });
+    });
 }
 
 /**
@@ -643,6 +643,7 @@ module.exports = {
   findAllUserIdsForTroupe: findAllUserIdsForTroupe,
   findUserIdsForTroupeWithLurk: findUserIdsForTroupeWithLurk,
   findUserIdsForTroupe: findUserIdsForTroupe,
+  findUsersIdForTroupeWithLimit: findUsersIdForTroupeWithLimit,
 
   updateTroupeName: updateTroupeName,
   findOneToOneTroupe: findOneToOneTroupe,

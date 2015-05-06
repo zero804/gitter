@@ -1,0 +1,12 @@
+{
+    "undef": true,
+    "node": true,
+    "unused": true,
+    "predef": [
+      "set"
+      "before",
+      "after",
+      "suite",
+      "bench"
+    ]
+}
