@@ -9,6 +9,7 @@ var template = require('./tmpl/people-modal.hbs');
 var rosterCollection = require('collections/instances/integrated-items').roster;
 var SyncMixin = require('collections/sync-mixin');
 var InfiniteScrollBehavior = require('views/behaviors/infinite-scroll');
+var context = require('utils/context');
 require('views/behaviors/widgets');
 
 var RESULT_LIMIT = 25;
@@ -87,11 +88,15 @@ var Modal = TroupeViews.Modal.extend({
     options = options || {};
     options.title = "People";
 
-    var collection = new UserCollection(rosterCollection.models);
-    collection.fetchWithLimit();
+    var room = context.troupe();
+
+    var users = new UserCollection(rosterCollection.models);
+    users.fetchWithLimit();
+    // make the user collection seem live
+    users.listenTo(room, 'change:userCount', users.fetchWithLimit);
 
     TroupeViews.Modal.prototype.initialize.call(this, options);
-    this.view = new View({ collection: collection });
+    this.view = new View({ collection: users });
   }
 });
 
