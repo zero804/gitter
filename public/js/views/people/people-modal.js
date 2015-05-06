@@ -48,6 +48,9 @@ var UserView = Marionette.ItemView.extend({
   tagName: 'li',
   className: 'people-modal-result',
   template: itemTemplate,
+  modelEvents: {
+    change: 'render'
+  },
   behaviors: {
     Widgets: {}
   }
