@@ -61,7 +61,7 @@ module.exports = (function() {
 
     // Turn the text into a DOM
     var dom = $($.parseHTML(generatedText));
-    dom.addClass("view"); // TODO: drop this class in future
+    // dom.addClass("view"); // TODO: drop this class in future
 
     var widgets = dom.find('view');
     var widgetManager = view.widgetManager;
@@ -80,15 +80,8 @@ module.exports = (function() {
       var CachedWidget = cachedWidgets[attrs.widgetName];
       if(CachedWidget) {
         replaceElementWithWidget(this, CachedWidget, widgetManager, attrs);
-      }/*else {
-        NO LONG do async load
-        require(['views/widgets/' + attrs.widgetName], function(Widget) {
-          cachedWidgets[attrs.widgetName] = Widget;
-          replaceElementWithWidget(self, Widget, widgetManager, attrs);
-        });
-      }*/
+      }
     });
-
 
     return dom;
   }
@@ -102,7 +95,7 @@ module.exports = (function() {
         return { _view: this };
       };
     },
-    onBeforeClose: function() {
+    onClose: function() {
       if(this.view.widgetManager) {
         this.view.widgetManager.close();
         this.view.widgetManager = null;

@@ -20,7 +20,7 @@ module.exports = (function() {
       this.tooltipFormat = options.tooltipFormat || 'LLL';
       var self = this;
 
-      function rerender() {
+      function rerenderOnTimeout() {
 
         var duration = moment.duration(Date.now() - self.time.valueOf());
         self.render(duration);
@@ -44,19 +44,19 @@ module.exports = (function() {
 
         if(timeToNextRefresh < 100) timeToNextRefresh = 1000;
 
-        self.timer = window.setTimeout(rerender, timeToNextRefresh);
+        self.timer = window.setTimeout(rerenderOnTimeout, timeToNextRefresh);
       }
 
-      rerender();
+      rerenderOnTimeout();
     },
 
     /** XXX TODO NB: change this to onDestroy once we've moved to Marionette 2!!!! */
     onClose: function() {
       clearTimeout(this.timer);
+      this.removeTooltip();
     },
 
     render: function(duration) {
-      this.$el.find('[title]').tooltip('destroy');
       if(!duration) duration = moment.duration(Date.now() - this.time.valueOf());
 
       var v;
@@ -68,9 +68,43 @@ module.exports = (function() {
       }
 
       var fullTime = this.time.format(this.tooltipFormat, { lang: lang });
-      this.$el.html("<span title='" + fullTime + "'>" + v + "</span>");
+      this.el.innerText = v;
+      this.el.setAttribute('title', fullTime);
+
       if (!window._troupeCompactView) {
-        this.$el.find('[title]').tooltip({ container: 'body', placement: this.position, html: true });
+        /* Lazy setup the tooltip on mouseover. This means a much faster render (~20%)*/
+        this.setupTooltip();
+      }
+    },
+
+    setupTooltip: function() {
+      if (this.ttSetup) return;
+      if (this.waitMouseOver) return;
+
+      var self = this;
+      this.waitMouseOver = {
+        handleEvent: function() {
+          self.ttSetup = true;
+          self.el.removeEventListener('mouseover', self.waitMouseOver, false);
+          delete this.waitMouseOver;
+
+          self.$el.tooltip({ container: 'body', placement: this.position, html: true });
+          self.$el.tooltip('show');
+        }
+      };
+
+      this.el.addEventListener('mouseover', this.waitMouseOver, false);
+    },
+
+    removeTooltip: function() {
+      if (this.ttSetup) {
+        this.$el.tooltip('destroy');
+        delete this.ttSetup;
+      }
+
+      if (this.waitMouseOver) {
+        this.el.removeEventListener('mouseover', this.waitMouseOver, false);
+        delete this.waitMouseOver;
       }
     }
 
