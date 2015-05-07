@@ -1,20 +1,17 @@
 "use strict";
 
-
-var testRequire = require('../test-require');
+var testRequire = require('../integration/test-require');
 var mockito = require('jsmockito').JsMockito;
 
 var Q = require('q');
 var mongoUtils = testRequire('./utils/mongo-utils');
-
-Q.longStackSupport = true;
 
 var TOTAL_USERS = 10000;
 
 /**
  * Unfortunately this has some knock on effects
  */
-describe.skip('unread-item-service-large-room #slow', function() {
+ suite('unread-item-service', function() {
   // this.timeout(15000);
 
   var chatId;
@@ -30,7 +27,7 @@ describe.skip('unread-item-service-large-room #slow', function() {
   var troupe;
   var troupeLurkersUserHash;
 
-  beforeEach(function() {
+  before(function() {
     troupeId = mongoUtils.getNewObjectIdString() + "";
     chatId = mongoUtils.getNewObjectIdString() + "";
     fromUserId = mongoUtils.getNewObjectIdString() + "";
@@ -69,7 +66,7 @@ describe.skip('unread-item-service-large-room #slow', function() {
 
   });
 
-  it('should create messages in rooms with very large mentions', function(done) {
+  bench('createChatUnreadItems#largeRoom', function(done) {
     unreadItemService.createChatUnreadItems(fromUserId, troupe, chatWithNoMentions)
       .nodeify(done);
   });

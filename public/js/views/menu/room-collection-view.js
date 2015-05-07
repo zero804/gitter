@@ -61,7 +61,7 @@ module.exports = (function() {
     className: 'room-list-item',
     template: roomListItemTemplate,
     modelEvents: {
-      'change:unreadItems change:lurk change:activity change:mentions': 'render'
+      'change:unreadItems change:lurk change:activity change:mentions change:name': 'render'
     },
     events: {
       'click': 'clicked',

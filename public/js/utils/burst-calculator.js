@@ -1,5 +1,6 @@
+/* jshint -W040 */
 "use strict";
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
+
 var _ = require('underscore');
 var Backbone = require('backbone');
 
@@ -83,7 +84,7 @@ module.exports = (function() {
     var fromUser = chat.get('fromUser');
     var sent = chat.get('sent');
     var user = fromUser && fromUser.username;
-    var time = sent && new Date(sent).valueOf();
+    var time = sent && new Date(sent).valueOf() || Date.now();
 
     if (chat.get('status')) {
       state.burstStart = true;
@@ -166,4 +167,3 @@ module.exports = (function() {
   };
 
 })();
-

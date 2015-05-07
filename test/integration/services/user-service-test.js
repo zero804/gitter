@@ -64,7 +64,6 @@ describe("User Service", function() {
         githubScopes: { 'user:email': 1 }
       })
       .then(function(user) {
-        console.log('USER: ', user);
         assert(user.githubToken);
         assert(user.githubUserToken);
         assert(user.githubScopes['user:email']);

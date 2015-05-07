@@ -1,5 +1,7 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
+
+var winston            = require('../../utils/winston');
 var nconf              = require('../../utils/config');
 var Q                  = require('q');
 var contextGenerator   = require('../../web/context-generator');
@@ -15,8 +17,9 @@ var userSort           = require('../../../public/js/utils/user-sort');
 var roomSort           = require('../../../public/js/utils/room-sort');
 var roomNameTrimmer    = require('../../../public/js/utils/room-name-trimmer');
 var isolateBurst       = require('../../../shared/burst/isolate-burst-array');
+var unreadItemService  = require('../../services/unread-item-service');
 var mongoUtils         = require('../../utils/mongo-utils');
-var url                =  require('url');
+var url                = require('url');
 
 var avatar   = require('../../utils/avatar');
 var _                 = require('underscore');
@@ -117,9 +120,14 @@ function renderMainFrame(req, res, next, frame) {
   Q.all([
       contextGenerator.generateNonChatContext(req),
       restful.serializeTroupesForUser(userId),
+      restful.serializeOrgsForUserId(userId).catch(function(err) {
+        // Workaround for GitHub outage
+        winston.error('Failed to serialize orgs:' + err, { exception: err });
+        return [];
+      }),
       aroundId && getPermalinkChatForRoom(req.troupe, aroundId)
     ])
-    .spread(function (troupeContext, rooms, permalinkChat) {
+    .spread(function (troupeContext, rooms, orgs, permalinkChat) {
       var chatAppQuery = {};
       if (aroundId) {
         chatAppQuery.at = aroundId;
@@ -178,7 +186,8 @@ function renderMainFrame(req, res, next, frame) {
           recents: rooms
             .filter(roomSort.recents.filter)
             .sort(roomSort.recents.sort)
-        }
+        },
+        orgs: orgs
       });
     })
     .fail(next);
@@ -191,8 +200,13 @@ function renderChat(req, res, options, next) {
   var user = req.user;
   var userId = user && user.id;
 
+  // It's ok if there's no user (logged out), unreadItems will be 0
+  return unreadItemService.getUnreadItemsForUser(userId, troupe.id)
+  .then(function(unreadItems) {
+    var limit = unreadItems.chat.length > INITIAL_CHAT_COUNT ? unreadItems.chat.length + 20 : INITIAL_CHAT_COUNT;
+
   var snapshotOptions = {
-    limit: options.limit || INITIAL_CHAT_COUNT,
+      limit: limit, //options.limit || INITIAL_CHAT_COUNT,
     aroundId: aroundId,
     unread: options.unread // Unread can be true, false or undefined
   };
@@ -270,8 +284,8 @@ function renderChat(req, res, options, next) {
           isNativeDesktopApp: troupeContext.isNativeDesktopApp
         }, options.extras);
 
-      res.render(options.template, renderOptions);
-
+        res.render(options.template, renderOptions);
+      });
     })
     .fail(next);
 }

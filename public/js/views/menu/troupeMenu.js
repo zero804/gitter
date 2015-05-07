@@ -195,7 +195,7 @@ module.exports = (function () {
     getIndexForId: function(id) {
       if (!id) return;
       var els = $('#recentTroupesList li');
-      for (var i = 0, el; el = els[i]; i++) { // wtf?
+      for (var i = 0, el; el = els[i] /* jshint -W084 */; i++) {  // wtf?
         if ($(el).data('id') === id) return i;
       }
     },
