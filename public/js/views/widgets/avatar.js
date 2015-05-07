@@ -6,7 +6,7 @@ var template = require('./tmpl/avatar.hbs');
 var UserPopoverView = require('views/people/userPopoverView');
 var widgets = require('views/behaviors/widgets');
 var resolveAvatarUrl = require('shared/avatars/resolve-avatar-url');
-require('bootstrap_tooltip');
+require('views/behaviors/tooltip');
 
 module.exports = (function() {
 
@@ -23,6 +23,17 @@ module.exports = (function() {
     modelEvents: {
       change: 'update'
     },
+    behaviors: function() {
+      var options = this.options;
+
+      if (options.showTooltip !== false) {
+        return {
+          Tooltip: {
+            ':first-child': { titleFn: 'getTooltip', placement: options.tooltipPlacement || 'vertical' },
+          }
+        };
+      }
+    },
     initialize: function (options) {
       // TODO: is it necessary to listen for updates to the invite status?
 
@@ -31,17 +42,9 @@ module.exports = (function() {
       this.showBadge = options.showBadge;
       this.showStatus = options.showStatus;
       this.avatarSize = options.size ? options.size : 's';
-      this.showTooltip = options.showTooltip !== false;
-      this.tooltipPlacement = options.tooltipPlacement || 'vertical';
-    },
-
-    /** NOTE: this must change to onDestroy when moving to Marionette 2 */
-    onClose: function() {
-      this.removeTooltip();
     },
 
     showDetailIntent: function(e) {
-      this.setupTooltip();
       UserPopoverView.hoverTimeout(e, function() {
         this.showDetail(e);
       }, this);
@@ -69,7 +72,6 @@ module.exports = (function() {
       var data = this.serializeData();
       this.updatePresence(data);
       this.updateAvatar(data);
-      this.updateTooltip(data);
     },
 
     updatePresence: function(data) {
@@ -81,12 +83,6 @@ module.exports = (function() {
 
     updateAvatar: function(data) {
       this.$el.find('.trpDisplayPicture').css({ 'background-image': "url('" + data.avatarUrl + "')" });
-    },
-
-    updateTooltip: function(data) {
-      if (this.showTooltip) {
-        this.$el.find('.trpDisplayPicture').attr('data-original-title', data.tooltip);
-      }
     },
 
     getUserId: function() {
@@ -118,7 +114,6 @@ module.exports = (function() {
         userDisplayName: user.displayName,
         avatarUrl: avatarUrl,
         avatarSize: this.avatarSize,
-        showTooltip: this.showTooltip,
         presenceClass: presenceClass,
         online: online,
         offline: !online,
@@ -129,31 +124,12 @@ module.exports = (function() {
       };
     },
 
-    onRender: function() {
-      var displayName;
+    getTooltip: function() {
       if (this.model) {
-        displayName = this.model.get('displayName');
+        return this.model.get('displayName');
       } else if (this.user) {
-        displayName = this.user.displayName;
+        return this.user.displayName;
       }
-      if (!this.showTooltip || window._troupeCompactView || !displayName) return;
-    },
-
-    setupTooltip: function() {
-      if (this.ttSetup) return;
-      this.ui.tooltip.tooltip({
-        html: false,
-        placement : this.tooltipPlacement,
-        container: "body"
-      });
-      this.ui.tooltip.tooltip('show');
-      this.ttSetup = true;
-    },
-
-    removeTooltip: function() {
-      if (!this.ttSetup) return;
-      this.ui.tooltip.tooltip('destroy');
-      delete this.ttSetup;
     }
 
   });
