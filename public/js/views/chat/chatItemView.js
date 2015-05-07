@@ -22,7 +22,7 @@ require('views/behaviors/unread-items');
 require('views/behaviors/widgets');
 require('views/behaviors/sync-status');
 require('views/behaviors/highlight');
-require('bootstrap_tooltip');
+require('views/behaviors/tooltip');
 
 module.exports = (function() {
 
@@ -60,11 +60,16 @@ module.exports = (function() {
     },
 
     ui: {
-      collapse: '.js-chat-item-collapse'
+      collapse: '.js-chat-item-collapse',
+      text: '.js-chat-item-text'
     },
 
     behaviors: {
       Widgets: {},
+      Tooltip: {
+        '.js-chat-item-edit': { titleFn: 'getEditTooltip' },
+        '.js-chat-item-collapse': { titleFn: 'getCollapseTooltip' }
+      },
       UnreadItems: {
         unreadItemType: 'chat',
       },
@@ -190,16 +195,10 @@ module.exports = (function() {
     },
 
     renderText: function() {
-      // We need to parse the text a little to hyperlink known links and escape html to prevent injection
-      // var links = this.model.get('urls') || [];
-      // var mentions = this.model.get('mentions') || [];
-      var issues = [];
-      if (context.troupe().get('githubType') === 'REPO') {
-        issues = this.model.get('issues') || [];
-      }
+      var model = this.model;
 
       // Will only use the text when a value hasn't been returned from the server
-      var html = this.model.get('html') || _.escape(this.model.get('text'));
+      var html = model.get('html') || _.escape(model.get('text'));
 
       // Handle empty messages as deleted
       if (html.length === 0) {
@@ -207,20 +206,15 @@ module.exports = (function() {
         this.$el.addClass('deleted');
       }
 
-      this.$el.find('.js-chat-item-text').html(html);
+      // This needs to be fast. innerHTML is much faster than .html()
+      // by an order of magnitude
+      this.ui.text[0].innerHTML = html;
     },
 
     onRender: function () {
       this.renderText();
       this.updateRender();
       this.timeChange();
-
-      if (!this.compactView) {
-        var editIcon = this.$el.find('.js-chat-item-edit');
-        var collapseIcon = this.$el.find('.js-chat-item-collapse');
-        editIcon.tooltip({ container: 'body', title: this.getEditTooltip.bind(this) });
-        collapseIcon.tooltip({ container: 'body', title: this.getCollapseTooltip.bind(this) });
-      }
     },
 
 
@@ -284,8 +278,9 @@ module.exports = (function() {
 
       if(!changes || 'isCollapsible' in changes) {
         var isCollapsible = this.model.get('isCollapsible');
+        var $collapse = this.$el.find('.js-chat-item-collapse');
         if(isCollapsible) {
-          if (this.$el.find('.js-chat-item-collapse').length) return;
+          if ($collapse.length) return;
 
           var collapseElement = $(document.createElement('div'));
           var icon = $(document.createElement('i'));
@@ -304,11 +299,9 @@ module.exports = (function() {
 
           this.$el.find('.js-chat-item-details').append(collapseElement);
         } else {
-          this.$el.find('.js-chat-item-collapse').remove();
+          $collapse.remove();
         }
       }
-
-
     },
 
     getEditTooltip: function() {
@@ -440,7 +433,7 @@ module.exports = (function() {
       icon.addClass('octicon-unfold');
 
       if(self.rollers) {
-        embeds.each(function(i, e) {
+        embeds.each(function(i, e) { // jshint unused:true
           self.rollers.startTransition(e, 500);
         });
       }
@@ -468,7 +461,7 @@ module.exports = (function() {
 
       function adjustMaxHeight(embeds) {
         setTimeout(function() {
-          embeds.each(function(i, e) {
+          embeds.each(function(i, e) { // jshint unused:true
             var h = $(e).height();
             if(h <= MAX_HEIGHT) {
               $(e).css("max-height", h + "px");
@@ -501,7 +494,7 @@ module.exports = (function() {
         var embeds = self.$el.find('.embed');
 
         if(self.rollers) {
-          embeds.each(function(i, e) {
+          embeds.each(function(i, e) {  // jshint unused:true
             self.rollers.startTransition(e, 500);
           });
         }
@@ -524,7 +517,7 @@ module.exports = (function() {
 
     showInput: function() {
       //var isAtBottom = this.scrollDelegate.isAtBottom();
-      var chatInputText = this.$el.find('.js-chat-item-text');
+      var chatInputText = this.ui.text;
 
       // create inputview
       chatInputText.html("<textarea class='trpChatInput'></textarea>");
@@ -604,6 +597,7 @@ module.exports = (function() {
         window.getSelection().selectAllChildren(this.el);
       }
     },
+
     onDblClick: function() {
       if (!window.getSelection) return;
       var self = this;
@@ -611,6 +605,7 @@ module.exports = (function() {
         self.dblClickTimer = null;
       }, 200);
     }
+
   });
 
   cocktail.mixin(ChatItemView, KeyboardEventMixins);

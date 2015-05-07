@@ -1,5 +1,7 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
+
+var winston            = require('../../utils/winston');
 var nconf              = require('../../utils/config');
 var Q                  = require('q');
 var contextGenerator   = require('../../web/context-generator');
@@ -118,7 +120,11 @@ function renderMainFrame(req, res, next, frame) {
   Q.all([
     contextGenerator.generateNonChatContext(req),
     restful.serializeTroupesForUser(userId),
-    restful.serializeOrgsForUserId(userId),
+    restful.serializeOrgsForUserId(userId).catch(function(err) {
+      // Workaround for GitHub outage
+      winston.error('Failed to serialize orgs:' + err, { exception: err });
+      return [];
+    }),
     aroundId && getPermalinkChatForRoom(req.troupe, aroundId)
   ])
     .spread(function (troupeContext, rooms, orgs, permalinkChat) {
