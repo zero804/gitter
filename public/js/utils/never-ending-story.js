@@ -14,8 +14,7 @@ module.exports = (function() {
     this._prevScrollTime = Date.now();
     this._nearTop = false;
     this._nearBottom = false;
-    this._scrollHandler = this.scroll.bind(this);
-    this.scrollRateLimited = _.throttle(this.scrollRate.bind(this), 100, { leading: false });
+    this._scrollHandler = _.throttle(this.scroll.bind(this), 100);
     this._contentWrapper = options && options.contentWrapper;
     this.enable();
   }
@@ -57,7 +56,7 @@ module.exports = (function() {
         this.trigger('near.bottom.changed', nearBottom);
       }
 
-      this.scrollRateLimited();
+      this.scrollRate();
     },
 
     scrollRate: function() {

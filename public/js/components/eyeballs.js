@@ -4,6 +4,7 @@ var apiClient = require('components/apiClient');
 var realtime = require('./realtime');
 var log = require('utils/log');
 var appEvents = require('utils/appevents');
+var _ = require('underscore');
 
 module.exports = (function() {
 
@@ -155,9 +156,11 @@ module.exports = (function() {
   // $(document).on('mousemove', updateLastUserInteraction);
   // $(window).on('scroll', updateLastUserInteraction);
 
-  document.addEventListener("keydown", updateLastUserInteraction, false);
-  document.addEventListener("mousemove", updateLastUserInteraction, false);
-  window.addEventListener("scroll", updateLastUserInteraction, false);
+  var debouncedInteractionTracking = _.debounce(updateLastUserInteraction, 500);
+
+  document.addEventListener("keydown",    debouncedInteractionTracking, false);
+  document.addEventListener("mousemove",  debouncedInteractionTracking, false);
+  window.addEventListener("scroll",       debouncedInteractionTracking, false);
 
 
   startInactivityPoller();
