@@ -130,8 +130,7 @@ module.exports = (function() {
       }
     },
 
-    /** XXX TODO NB: change this to onClose once we've moved to Marionette 2!!!! */
-    onClose: function() {
+    onDestroy: function() {
       clearTimeout(this.timeChangeTimeout);
     },
 

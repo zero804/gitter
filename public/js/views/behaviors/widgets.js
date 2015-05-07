@@ -86,7 +86,7 @@ module.exports = (function() {
         return { _view: this };
       };
     },
-    onClose: function() {
+    onDestroy: function() {
       if(this.view.widgetManager) {
         this.view.widgetManager.close();
         this.view.widgetManager = null;
