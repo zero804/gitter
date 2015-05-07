@@ -27,8 +27,7 @@ module.exports = (function() {
       this.calculateNextTimeout();
     },
 
-    /** XXX TODO NB: change this to onDestroy once we've moved to Marionette 2!!!! */
-    onClose: function() {
+    onDestroy: function() {
       clearTimeout(this.timer);
     },
 

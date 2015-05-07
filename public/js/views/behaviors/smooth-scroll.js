@@ -88,7 +88,7 @@ var Behavior = Marionette.Behavior.extend({
     this.lazyUnreadItems();
   },
 
-  onClose: function() {
+  onDestroy: function() {
     this.scrollElement.removeEventListener('scroll', this.scrollHandler, false);
   }
 });

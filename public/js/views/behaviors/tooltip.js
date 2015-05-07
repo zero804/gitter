@@ -72,7 +72,7 @@ var Behavior = Marionette.Behavior.extend({
 
   },
 
-  onClose: function() {
+  onDestroy: function() {
     var handlers = this.handlers;
     delete this.handlers;
 
