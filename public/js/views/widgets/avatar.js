@@ -17,6 +17,9 @@ module.exports = (function() {
       'mouseover': 'showDetailIntent',
       'click':     'showDetail'
     },
+    ui: {
+      tooltip: ':first-child'
+    },
     modelEvents: {
       change: 'update'
     },
@@ -30,38 +33,15 @@ module.exports = (function() {
       this.avatarSize = options.size ? options.size : 's';
       this.showTooltip = options.showTooltip !== false;
       this.tooltipPlacement = options.tooltipPlacement || 'vertical';
+    },
 
-      // once this widget has the id of the user,
-      // it will listen to changes on the global user collection,
-      // so that it knows when to update.
-      /*
-      var avatarChange = _.bind(function(e, user) {
-        if (user.id !== self.getUserId()) return;
-
-        if (self.user) {
-          self.user = user;
-        }
-
-        // re-rendering every avatar when the presence changes is excessive, especially for the viewer's own avatars
-        self.update();
-      }, this);
-
-      var isModel = !!this.model;
-      if (isModel) {
-        this.listenTo(this.model, 'change', function(model) {
-          avatarChange({}, model);
-        });
-      } else {
-        // // Unfortunately we can't use listenTo with jquery events
-        // $(document).on('avatar:change', avatarChange);
-        // this.once('close', function() {
-        //   $(document).off('avatar:change', avatarChange);
-        // });
-      }
-      */
+    /** NOTE: this must change to onDestroy when moving to Marionette 2 */
+    onClose: function() {
+      this.removeTooltip();
     },
 
     showDetailIntent: function(e) {
+      this.setupTooltip();
       UserPopoverView.hoverTimeout(e, function() {
         this.showDetail(e);
       }, this);
@@ -73,7 +53,7 @@ module.exports = (function() {
 
       if (this.popover) return;
 
-      this.$el.find(':first-child').tooltip('hide');
+      this.ui.tooltip.tooltip('hide');
 
       var model = this.model || new Backbone.Model(this.user);
       var popover = new UserPopoverView({
@@ -149,7 +129,6 @@ module.exports = (function() {
       };
     },
 
-    // TODO: use base classes render() method
     onRender: function() {
       var displayName;
       if (this.model) {
@@ -157,13 +136,24 @@ module.exports = (function() {
       } else if (this.user) {
         displayName = this.user.displayName;
       }
-
       if (!this.showTooltip || window._troupeCompactView || !displayName) return;
-      this.$el.find(':first-child').tooltip({
+    },
+
+    setupTooltip: function() {
+      if (this.ttSetup) return;
+      this.ui.tooltip.tooltip({
         html: false,
         placement : this.tooltipPlacement,
         container: "body"
       });
+      this.ui.tooltip.tooltip('show');
+      this.ttSetup = true;
+    },
+
+    removeTooltip: function() {
+      if (!this.ttSetup) return;
+      this.ui.tooltip.tooltip('destroy');
+      delete this.ttSetup;
     }
 
   });
@@ -172,4 +162,3 @@ module.exports = (function() {
   return AvatarWidget;
 
 })();
-
