@@ -1,6 +1,5 @@
 "use strict";
-/* jshint unused:true, browser:true,  strict:true */
-/* global define:false */
+
 var context = require('utils/context');
 var UserPopoverView = require('views/people/userPopoverView');
 var dataset = require('utils/dataset-shim');
@@ -67,4 +66,3 @@ module.exports = (function() {
 
 
 })();
-

@@ -53,8 +53,10 @@ var ChatModel = Backbone.Model.extend({
       setStatus('syncerror');
     });
 
-    // TODO: unlisten on remove from collection
-    // to stop memory leaks
+    /* When the chat is removed from the collection, stop listening to events */
+    this.listenTo(this, 'remove', function() {
+      // this.stopListening(this);
+    });
 
   },
   parse: function (message) {
@@ -109,9 +111,9 @@ var ChatCollection = LiveCollection.extend({
     var s2 = chat2.get('sent');
     if (!s1) {
       if (!s2) return 0; // null === null
-      return -1; // null < s2
+      return 1; // null > s2
     }
-    if (!s2) return 1; // s1 > null
+    if (!s2) return -1; // s1 < null
     return s1.valueOf() - s2.valueOf();
   },
   initialize: function() {

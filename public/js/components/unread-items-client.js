@@ -216,8 +216,12 @@ module.exports = (function() {
           });
       }, self);
 
-    }
+    },
 
+    getFirstItemOfType: function(type) { 
+      var items = this._getItemsOfType(type);
+      return items.sort()[0];
+    }
 
   });
 
@@ -645,6 +649,11 @@ module.exports = (function() {
     monitorViewForUnreadItems: function($el) {
       var unreadItemStore = getUnreadItemStoreReq();
       return new TroupeUnreadItemsViewportMonitor($el, unreadItemStore);
+    },
+
+    getFirstUnreadItem: function() {
+      var unreadItemStore = getUnreadItemStoreReq();
+      return unreadItemStore.getFirstItemOfType('chat');
     }
   };
 
