@@ -4,16 +4,6 @@ var _ = require('underscore');
 var Marionette = require('marionette');
 var behaviourLookup = require('./lookup');
 
-var total = 0;
-var tick = 0;
-setInterval(function(f) {
-  if (total > 0) {
-    console.log('time taken: ', total / ++tick);
-    total = 0;
-  }
-}, 1000);
-
-
 module.exports = (function() {
   var cachedWidgets = {};
 
@@ -56,7 +46,6 @@ module.exports = (function() {
     var view = data._view;
 
     if(!data.renderViews || !view) return generatedText;
-    var t0 = performance.now();
 
     // Turn the text into a DOM
     var dom = $($.parseHTML(generatedText));
@@ -86,10 +75,6 @@ module.exports = (function() {
 
       return widget;
     });
-
-    var t1 = performance.now();
-    total += t1 - t0;
-
 
     return dom;
   }
