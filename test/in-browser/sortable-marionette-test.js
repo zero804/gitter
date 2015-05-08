@@ -8,7 +8,7 @@ define([
   'collections/base',
   'backbone',
   'cocktail',
-  'utils/momentWrapper'
+  'moment'
 ], function($, _, assert, TroupeViews, marionette, TroupeCollections, Backbone, cocktail, moment) {
   "use strict";
 

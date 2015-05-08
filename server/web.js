@@ -4,19 +4,20 @@
 /* Listen for SIGUSR1 signals to start/stop profiling */
 // require('./utils/profiler');
 
+require('./utils/diagnostics');
+
+var env      = require('./utils/env');
+
 /* Configure winston before all else! */
 var winston  = require('./utils/winston');
 winston.info('Starting server/web.js');
-
 var express  = require('express');
 var http     = require('http');
 var nconf    = require('./utils/config');
-var redis    = require('./utils/redis');
 var domainWrapper = require('./utils/domain-wrapper');
 var serverStats = require('./utils/server-stats');
 var onMongoConnect = require('./utils/on-mongo-connect');
 
-require('./utils/diagnostics');
 
 /* Load express-resource */
 require('express-resource');
@@ -29,7 +30,7 @@ require('./web/graceful-shutdown').install(server, app);
 
 var RedisStore = require('connect-redis')(express);
 var sessionStore = new RedisStore({
-  client: redis.getClient(),
+  client: env.redis.createClient(nconf.get("redis_nopersist")),
   ttl: nconf.get('web:sessionTTL')
 });
 

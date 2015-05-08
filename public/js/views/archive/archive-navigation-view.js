@@ -1,7 +1,7 @@
 'use strict';
-/* jshint unused:true, browser:true,  strict:true *//* global define:false */
+
 var Marionette = require('marionette');
-var moment = require('utils/momentWrapper');
+var moment = require('moment');
 var context = require('utils/context');
 var template = require('./tmpl/archive-navigation-view.hbs');
 var CalHeatMap = require('cal-heatmap');
@@ -88,4 +88,3 @@ module.exports = (function() {
 
 
 })();
-

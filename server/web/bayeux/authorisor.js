@@ -119,18 +119,18 @@ function populateSubUserCollection(options) {
 function populateSubTroupeCollection(options) {
   var userId = options.userId;
   var match = options.match;
-  var snapshot = options.snapshot || {}; // Details of the snapshot
+  var snapshotOptions = options.snapshot || {}; // Details of the snapshot
   var troupeId = match[1];
   var collection = match[2];
 
   switch(collection) {
     case "chatMessages":
-      return restful.serializeChatsForTroupe(troupeId, userId, snapshot)
+      return restful.serializeChatsForTroupe(troupeId, userId, snapshotOptions)
         .then(arrayToSnapshot('room.chatMessages'));
 
-    case "users":
-      return restful.serializeUsersForTroupe(troupeId, userId, snapshot)
-        .then(arrayToSnapshot('room.users'));
+    case "users": 
+      return restful.serializeUsersForTroupe(troupeId, userId, snapshotOptions)
+      .then(arrayToSnapshot('room.users'));
 
     case "events":
       return restful.serializeEventsForTroupe(troupeId, userId)
@@ -273,14 +273,15 @@ module.exports = bayeuxExtension({
 
     populator({ userId: userId, match: m, snapshot: snapshot })
       .then(function(snapshot) {
+        if (!snapshot) return message;
+
         stats.responseTime('bayeux.snapshot.time', Date.now() - startTime);
         stats.responseTime('bayeux.snapshot.time.' + snapshot.type, Date.now() - startTime);
 
-        if(snapshot) {
-          if(!message.ext) message.ext = {};
-          message.ext.snapshot = snapshot.data;
-          message.ext.snapshot_meta = snapshot.meta;
-        }
+        if(!message.ext) message.ext = {};
+        message.ext.snapshot = snapshot.data;
+        message.ext.snapshot_meta = snapshot.meta;
+
         return message;
       })
       .nodeify(callback);

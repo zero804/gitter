@@ -1,11 +1,9 @@
 "use strict";
 var Marionette = require('marionette');
-var $ = require('jquery');
 var _ = require('underscore');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var TroupeViews = require('views/base');
-var itemCollections = require('collections/instances/integrated-items');
 var troupeSettingsTemplate = require('./tmpl/troupeSettingsTemplate.hbs');
 var log = require('utils/log');
 var notifications = require('components/notifications');
@@ -26,7 +24,6 @@ module.exports = (function() {
 
     initialize: function() {
       this.model = context.troupe();
-      this.userCollection = itemCollections.users;
 
       this.listenTo(this.model, 'change:lurk', this.setShowUnreadBadgeValue);
       var self = this;
@@ -113,11 +110,11 @@ module.exports = (function() {
 
   return TroupeViews.Modal.extend({
       initialize: function(options) {
-        options.title = "Settings";
+        options.title = "Notification Settings";
         TroupeViews.Modal.prototype.initialize.apply(this, arguments);
         this.view = new View({ });
       }
     });
-  
+
 })();
 

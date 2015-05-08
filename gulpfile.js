@@ -39,13 +39,10 @@ gulp.task('validate-client-source', function() {
       unused: false,
       laxbreak: true,
       laxcomma: true,
-      "-W098": "", // Remove this later
       "-W069": "",
       "-W033": "",
-      "-W030": "",
-      "-W040": "",
       "-W093": "",
-      "-W084": "",
+      // "-W084": "",
       predef: ["module", "require"]
      }))
     .pipe(jshint.reporter('default', { verbose: true }))
@@ -61,7 +58,6 @@ gulp.task('validate-server-source', function() {
       devel: false,
       unused: false,
       "-W064": "", // Missing 'new' prefix when invoking a constructor
-      "-W098": "", // Currently allow unused vars. Remove later
       "-W069": "", // [..] is better written in dot notation.
       "-W033": "", // Missing semicolon.
       "-W032": "", // Unnecessary semicolon.
@@ -115,6 +111,20 @@ gulp.task('localtest', function() {
     }));
 });
 
+
+/**
+ * Matcha tests, submitted to datadog
+ */
+gulp.task('test-perf-matcha', shell.task([
+  'NODE_ENV=test ./node_modules/.bin/matcha -R csv test/benchmarks/* | node test/submit-benchmarks-to-datadog.js',
+]));
+
+gulp.task('test-perf', ['test-perf-matcha']);
+
+gulp.task('benchmark-local', shell.task([
+  './node_modules/.bin/matcha --logging:level error test/benchmarks/*',
+]));
+
 gulp.task('clean:coverage', function (cb) {
   del([
     'output/coverage-reports'
@@ -159,6 +169,7 @@ gulp.task('copy-app-files', function() {
       'websockets.js',
       'package.json',
       'npm-shrinkwrap.json',
+      'newrelic.js',
       'config/**',
       'public/templates/**',
       'public/layouts/**',
@@ -301,12 +312,12 @@ gulp.task('css-web', function () {
     'public/less/signup.less',
     'public/less/trpAppsPage.less',
     'public/less/error-page.less',
+    'public/less/error-layout.less',
     'public/less/generic-layout.less',
     'public/less/trpHooks.less',
     'public/less/login.less',
     'public/less/homepage.less',
     'public/less/explore.less',
-    'public/less/not-found.less',
     'public/less/about.less',
     'public/less/router-chat.less',
     'public/less/router-app.less',
@@ -317,7 +328,8 @@ gulp.task('css-web', function () {
     'public/less/router-archive-home.less',
     'public/less/router-archive-chat.less',
     'public/less/userhome.less',
-    'public/less/402.less'
+    'public/less/402.less',
+    'public/less/org-404.less'
     ])
     .pipe(gulpif(DEV_MODE, sourcemaps.init()))
     .pipe(less({
@@ -377,7 +389,7 @@ gulp.task('package', ['prepare-app', 'prepare-assets']);
 /**
  * default
  */
-gulp.task('default', ['test', 'package']);
+gulp.task('default', ['validate', 'test', 'package']);
 
 
 

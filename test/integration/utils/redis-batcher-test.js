@@ -9,7 +9,7 @@ var uuid = require('node-uuid');
 
 describe('redis-batcher', function() {
   // queue takes a while to start up
-  this.timeout(10000);
+  this.timeout(30000);
 
   before(function() {
     workerQueue.startScheduler();

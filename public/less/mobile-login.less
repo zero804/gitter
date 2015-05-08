@@ -1,12 +1,11 @@
 @import "colors.less";
-@import "trpFonts.less";
+@import "typography.less";
 @import "trpButtons.less";
 
 body {
   margin: 0px;
   height: 100%;
   min-height: 300px;
-  font-family: @fontSans;
   color: white;
   overflow: hidden;
 }
@@ -50,7 +49,6 @@ html {
   bottom: -200px;
   width: 100%;
   background-color: @trpRed;
-  .trpH3;
   padding: 20px 0px 20px 0px;
   color: white;
   margin-top: 20px;
@@ -73,9 +71,7 @@ html {
 	display: inline-block;
 }
 
-.mtrpLoginFormItem {
-	.trpBodyText;
-	display: block;
+.mtrpLoginFormItem {	display: block;
 	height: 40px;
 	width: 200px;
   border: none;
@@ -166,7 +162,6 @@ border-left: 1px solid @trpLightGrey;
   width: 100%;
   height: 100%;
   position: relative;
-  .trpH2;
   color: #333;
 /*    -webkit-transition: left 1s linear;*/
 }

@@ -55,7 +55,7 @@ module.exports = (function() {
 
 
   /* @const */
-  var DEFAULT_TIMEOUT = 15 * 1000;
+  var DEFAULT_TIMEOUT = 60 * 1000;
 
   /* @const */
   var JSON_MIME_TYPE = "application/json";
@@ -285,4 +285,3 @@ module.exports = (function() {
 
 
 })();
-

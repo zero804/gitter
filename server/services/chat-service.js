@@ -114,7 +114,10 @@ function resolveMentions(troupe, user, parsedMessage) {
 }
 
 /**
- * Create a new chat and return a promise of the chat
+ * Create a new chat and return a promise of the chat.
+ *
+ * NB: it is the callers responsibility to ensure that the user has permission
+ * to chat in the room
  */
 exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
   return Q.fcall(function() {
@@ -123,8 +126,6 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
     /* You have to have text */
     if(!data.text && data.text !== "" /* Allow empty strings for now */) throw new StatusError(400, 'Text is required');
     if(data.text.length > MAX_CHAT_MESSAGE_LENGTH) throw new StatusError(400, 'Message exceeds maximum size');
-
-    if(!troupeService.userHasAccessToTroupe(user, troupe)) throw new StatusError(403, 'Access denied');
 
     // TODO: validate message
     return processChat(data.text);
@@ -183,6 +184,9 @@ exports.getRecentPublicChats = function() {
 
 };
 
+/**
+ * NB: It is the callers responsibility to ensure that the user has access to the room!
+ */
 exports.updateChatMessage = function(troupe, chatMessage, user, newText, callback) {
   return Q.fcall(function() {
       var age = (Date.now() - chatMessage.sent.valueOf()) / 1000;
@@ -195,11 +199,6 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
       }
 
       if(chatMessage.fromUserId != user.id) {
-        throw new StatusError(403, "Permission to edit this chat message is denied.");
-      }
-
-      // If the user has been kicked out of the troupe...
-      if(!troupeService.userHasAccessToTroupe(user, troupe)) {
         throw new StatusError(403, "Permission to edit this chat message is denied.");
       }
 
@@ -229,6 +228,13 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
             .catch(function(err) {
               errorReporter(err, { operation: 'unreadItemService.updateChatUnreadItems', chat: chatMessage });
             });
+
+          stats.event("edit_chat", {
+            userId: user.id,
+            troupeId: troupe.id,
+            username: user.username
+          });
+
         })
         .thenResolve(chatMessage);
     })
@@ -534,4 +540,3 @@ exports.testOnly = {
     useHints = value;
   }
 };
-

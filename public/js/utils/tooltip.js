@@ -1,5 +1,4 @@
-/* jshint -W014 */
-/* jshint -W004 */
+/* jshint -W014, -W004, -W030, -W033 */
 "use strict";
 
 var jQuery = require('jquery');
@@ -324,8 +323,7 @@ module.exports = (function() {
         , $e = this.$element
         , o = this.options
 
-      title = $e.attr('data-original-title')
-        || (typeof o.title == 'function' ? o.title.call($e[0]) :  o.title)
+      title = (typeof o.title == 'function' ? o.title.call($e[0]) :  o.title)
 
       return title
     }
@@ -413,4 +411,3 @@ module.exports = (function() {
 return jQuery;
 
 })();
-

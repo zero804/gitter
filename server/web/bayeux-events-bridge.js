@@ -22,19 +22,17 @@ function findFailbackChannel(channel) {
 }
 
 exports.install = function() {
-  var bayeuxClient = bayeux.client;
-
   function publish(channel, message) {
-    bayeuxClient.publish(channel, message);
+    bayeux.publish(channel, message);
 
     var failbackChannel = findFailbackChannel(channel);
 
     if(failbackChannel) {
-      bayeuxClient.publish(failbackChannel, message);
+      bayeux.publish(failbackChannel, message);
     }
   }
 
-  appEvents.localOnly.onDataChange2(function(data) {
+  appEvents.onDataChange2(function(data) {
 
     var operation = data.operation;
     var model = data.model;
@@ -58,7 +56,7 @@ exports.install = function() {
     }
   });
 
-  appEvents.localOnly.onUserRemovedFromTroupe(function(options) {
+  appEvents.onUserRemovedFromTroupe(function(options) {
     var userId = options.userId;
     var troupeId = options.troupeId;
 
@@ -69,7 +67,7 @@ exports.install = function() {
 
       socketIds.forEach(function(clientId) {
 
-        bayeux.engine.destroyClient(clientId, function() {
+        bayeux.destroyClient(clientId, function() {
           winston.info("Destroyed client " + clientId + " as user was disconnected from troupe");
         });
 
@@ -79,7 +77,7 @@ exports.install = function() {
 
   });
 
-  appEvents.localOnly.onUserNotification(function(data) {
+  appEvents.onUserNotification(function(data) {
       var userId = data.userId;
       var title = data.title;
       var text = data.text;
@@ -101,7 +99,7 @@ exports.install = function() {
       publish(url, message);
   });
 
-  appEvents.localOnly.onUserLoggedIntoTroupe(function(data) {
+  appEvents.onUserLoggedIntoTroupe(function(data) {
     var troupeId = data.troupeId;
     var userId = data.userId;
 
@@ -113,7 +111,7 @@ exports.install = function() {
 
   });
 
-  appEvents.localOnly.onUserLoggedOutOfTroupe(function(data) {
+  appEvents.onUserLoggedOutOfTroupe(function(data) {
     var troupeId = data.troupeId;
     var userId = data.userId;
 
@@ -127,7 +125,7 @@ exports.install = function() {
 
   ////////////////////
 
-  appEvents.localOnly.onTroupeUnreadCountsChange(function(data) {
+  appEvents.onTroupeUnreadCountsChange(function(data) {
     var userId = data.userId;
     var troupeId = data.troupeId;
     var total = data.total;
@@ -166,7 +164,7 @@ exports.install = function() {
 
   });
 
-  appEvents.localOnly.onUserMentionedInNonMemberRoom(function(data) {
+  appEvents.onUserMentionedInNonMemberRoom(function(data) {
     var troupeId = data.troupeId;
     var userId = data.userId;
 
@@ -186,7 +184,7 @@ exports.install = function() {
       });
   });
 
-  appEvents.localOnly.onNewLurkActivity(function(data) {
+  appEvents.onNewLurkActivity(function(data) {
     var userId = data.userId;
     var troupeId = data.troupeId;
 
@@ -197,16 +195,15 @@ exports.install = function() {
 
   });
 
-  appEvents.localOnly.onNewUnreadItem(function(data) {
+  appEvents.onNewUnreadItem(function(data) {
     var userId = data.userId;
     var troupeId = data.troupeId;
     var items = data.items;
+    var isOnline = data.online;
 
-    // This should only be for lurking users
-    // publish("/api/v1/user/" + userId, {
-    //   notification: "activity",
-    //   troupeId: troupeId
-    // });
+    // This event gets triggered for offline users too,
+    // but we can ignore them
+    if (!isOnline) return;
 
     publish("/api/v1/user/" + userId + '/rooms/' + troupeId + '/unreadItems', {
       notification: "unread_items",
@@ -215,7 +212,7 @@ exports.install = function() {
 
   });
 
-  appEvents.localOnly.onUnreadItemsRemoved(function(data) {
+  appEvents.onUnreadItemsRemoved(function(data) {
     var userId = data.userId;
     var troupeId = data.troupeId;
     var items = data.items;
@@ -227,7 +224,7 @@ exports.install = function() {
 
   });
 
-  appEvents.localOnly.onUserTroupeLurkModeChange(function(data) {
+  appEvents.onUserTroupeLurkModeChange(function(data) {
     var userId = data.userId;
     var troupeId = data.troupeId;
     var lurk = data.lurk;
@@ -240,7 +237,7 @@ exports.install = function() {
   });
 
 
-  appEvents.localOnly.onMarkAllRead(function(data) {
+  appEvents.onMarkAllRead(function(data) {
     var userId = data.userId;
     var troupeId = data.troupeId;
 
@@ -250,4 +247,3 @@ exports.install = function() {
 
   });
 };
-

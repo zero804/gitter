@@ -8,16 +8,10 @@ local user_email_latch_key = KEYS[6];
 local troupe_id = table.remove(ARGV, 1)
 local user_id = table.remove(ARGV, 1)
 
-local key_type = redis.call("TYPE", user_troupe_key)["ok"];
-
 local flag = 0
 
-if redis.call("DEL", user_troupe_key) > 0 then
+if redis.call("DEL", user_troupe_key, user_troupe_mention_key) > 0 then
   flag = flag + 1
-end
-
-if redis.call("DEL", user_troupe_mention_key) > 0 then
-  flag = flag + 2
 end
 
 if redis.call("ZREM", user_badge_key, troupe_id) > 0 then
@@ -27,7 +21,6 @@ end
 if redis.call("SREM", user_mention_key, troupe_id) > 0 then
   flag = flag + 8
 end
-
 
 redis.call("DEL", user_email_latch_key);
 redis.call("HDEL", email_hash_key, troupe_id..':'..user_id)

@@ -354,7 +354,7 @@ function findOnlineUsersForTroupe(troupeId, callback) {
 // callback(err, status)
 // with status[userId] = 'online' / <missing>
 function categorizeUsersByOnlineStatus(userIds, callback) {
-  if(!userIds || userIds.length === 0) return callback(null, {});
+  if(!userIds || userIds.length === 0) return Q.resolve({}).nodeify(callback);
 
   var time = process.hrtime();
   var seconds = time[0];
@@ -624,10 +624,10 @@ function clientEyeballSignal(userId, socketId, eyeballsOn, callback) {
 }
 
 
-function collectGarbage(engine, callback) {
+function collectGarbage(bayeux, callback) {
   var start = Date.now();
 
-  validateActiveSockets(engine, function(err, invalidSocketCount) {
+  validateActiveSockets(bayeux, function(err, invalidSocketCount) {
     if(err) {
       winston.error('Error while validating active sockets: ' + err, { exception: err });
       return callback(err);
@@ -647,7 +647,7 @@ function collectGarbage(engine, callback) {
 
 }
 
-function validateActiveSockets(engine, callback) {
+function validateActiveSockets(bayeux, callback) {
   redisClient.smembers(ACTIVE_SOCKETS_KEY, function(err, sockets) {
     if(!sockets.length) {
       winston.verbose('presence: Validation: No active sockets.');
@@ -663,7 +663,7 @@ function validateActiveSockets(engine, callback) {
       var d = Q.defer();
       promises.push(d.promise);
 
-      engine.clientExists(socketId, function(exists) {
+      bayeux.clientExists(socketId, function(exists) {
         if(exists) return d.resolve(); /* All good */
 
         invalidCount++;

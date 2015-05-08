@@ -1,86 +1,35 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var events = require('events');
 
-var winston = require('./utils/winston');
-var redis = require('./utils/redis');
-var client = redis.createClient(); // Needs it's own client
-var pubClient = redis.getClient();
-var eventEmitter = new events.EventEmitter();
 var localEventEmitter = new events.EventEmitter();
-var shutdown = require('shutdown');
 
-var subscriptions = {};
-
-client.on("message", function (channel, message) {
-  eventEmitter.emit(channel, JSON.parse(message));
-});
-
-function emit(event, data) {
-  localEventEmitter.emit(event, data);
-  pubClient.publish(event, JSON.stringify(data));
-}
-
-function logError(e) {
-  //Error.captureStackTrace(e);
-  winston.error("Appevent handler failed with error: " + e, { exception: e });
-}
-
-// Listen for system-wide events
-function onRemote(event, callback) {
-  if(!subscriptions[event]) {
-    client.subscribe(event);
-
-    subscriptions[event] = true;
-  }
-
-  eventEmitter.on(event, function(message) {
-    try {
-      callback(message);
-    } catch(e) {
-      logError(e);
-    }
-  });
-}
-
-// Listen to local-events only
-function onLocalOnly(event, callback) {
-  localEventEmitter.on(event, function(message) {
-    try {
-      callback(message);
-    } catch(e) {
-      logError(e);
-    }
-  });
-}
-
-function bind(on) {
-  return {
+module.exports =  {
     unreadRecalcRequired: function() {
-      emit('unreadRecalcRequired', true);
+    localEventEmitter.emit('unreadRecalcRequired', true);
     },
 
     onUnreadRecalcRequired: function(callback) {
-      on('unreadRecalcRequired', callback);
+    localEventEmitter('unreadRecalcRequired', callback);
     },
 
 
-    newUnreadItem: function(userId, troupeId, items) {
-      emit('newUnreadItem', {
+    newUnreadItem: function(userId, troupeId, items, online) {
+      localEventEmitter.emit('newUnreadItem', {
         userId: userId,
         troupeId: troupeId,
-        items: items
+        items: items,
+        online: online
       });
     },
 
     onNewUnreadItem: function(callback) {
-      on('newUnreadItem', callback);
+    localEventEmitter.on('newUnreadItem', callback);
     },
 
 
     unreadItemsRemoved: function(userId, troupeId, items) {
-      emit('unreadItemRemoved', {
+    localEventEmitter.emit('unreadItemRemoved', {
         userId: userId,
         troupeId: troupeId,
         items: items
@@ -88,52 +37,52 @@ function bind(on) {
     },
 
     onUnreadItemsRemoved: function(callback) {
-      on('unreadItemRemoved', callback);
+    localEventEmitter.on('unreadItemRemoved', callback);
     },
 
     troupeUnreadCountsChange: function(data) {
-      emit('troupeUnreadCountsChange', data);
+    localEventEmitter.emit('troupeUnreadCountsChange', data);
     },
 
     onTroupeUnreadCountsChange: function(callback) {
-      on('troupeUnreadCountsChange', callback);
+    localEventEmitter.on('troupeUnreadCountsChange', callback);
     },
 
     troupeMentionCountsChange: function(data) {
-      emit('troupeMentionCountsChange', data);
+    localEventEmitter.emit('troupeMentionCountsChange', data);
     },
 
     onTroupeMentionCountsChange: function(callback) {
-      on('troupeMentionCountsChange', callback);
+    localEventEmitter.on('troupeMentionCountsChange', callback);
     },
 
     userMentionedInNonMemberRoom: function(data) {
-      emit('userMentionedInNonMemberRoom', data);
+    localEventEmitter.emit('userMentionedInNonMemberRoom', data);
     },
 
     onUserMentionedInNonMemberRoom: function(callback) {
-      on('userMentionedInNonMemberRoom', callback);
+    localEventEmitter.on('userMentionedInNonMemberRoom', callback);
     },
 
     userLoggedIntoTroupe: function(userId, troupeId) {
-      emit('userLoggedIntoTroupe', { troupeId: troupeId, userId: userId });
+    localEventEmitter.emit('userLoggedIntoTroupe', { troupeId: troupeId, userId: userId });
     },
 
     onUserLoggedIntoTroupe: function(callback) {
-      on('userLoggedIntoTroupe', callback);
+    localEventEmitter.on('userLoggedIntoTroupe', callback);
     },
 
     userLoggedOutOfTroupe: function(userId, troupeId) {
-      emit('userLoggedOutOfTroupe', { troupeId: troupeId, userId: userId });
+    localEventEmitter.emit('userLoggedOutOfTroupe', { troupeId: troupeId, userId: userId });
     },
 
     onUserLoggedOutOfTroupe: function(callback) {
-      on('userLoggedOutOfTroupe', callback);
+    localEventEmitter.on('userLoggedOutOfTroupe', callback);
     },
 
     // Deprecated
     newNotification: function(troupeId, userId, notificationText, notificationLink) {
-      emit('newNotification', {
+    localEventEmitter.emit('newNotification', {
         troupeId: troupeId,
         userId: userId,
         notificationText: notificationText,
@@ -143,20 +92,20 @@ function bind(on) {
 
     // Deprecated
     onNewNotification: function(callback) {
-      on('newNotification', callback);
+    localEventEmitter.on('newNotification', callback);
     },
 
     userNotification: function(options) {
-      emit('userNotification',options);
+    localEventEmitter.emit('userNotification',options);
     },
 
     // Deprecated
     onUserNotification: function(callback) {
-      on('userNotification', callback);
+    localEventEmitter.on('userNotification', callback);
     },
 
     dataChange2: function(url, operation, model) {
-      emit('dataChange2', {
+    localEventEmitter.emit('dataChange2', {
         url: url,
         operation: operation,
         model: model
@@ -164,11 +113,11 @@ function bind(on) {
     },
 
     onDataChange2: function(callback) {
-      on('dataChange2', callback);
+    localEventEmitter.on('dataChange2', callback);
     },
 
     chat: function(operation, troupeId, model) {
-      emit('chat', {
+    localEventEmitter.emit('chat', {
         operation: operation,
         troupeId: troupeId,
         model: model
@@ -176,11 +125,11 @@ function bind(on) {
     },
 
     onChat: function(callback) {
-      on('chat', callback);
+    localEventEmitter.on('chat', callback);
     },
 
     eyeballSignal: function(userId, troupeId, signal) {
-      emit('eyeballSignal', {
+    localEventEmitter.emit('eyeballSignal', {
         userId: userId,
         troupeId: troupeId,
         signal: signal
@@ -188,76 +137,68 @@ function bind(on) {
     },
 
     onEyeballSignal: function(callback) {
-      on('eyeballSignal', function(event) {
+    localEventEmitter.on('eyeballSignal', function(event) {
         return callback(event.userId, event.troupeId, event.signal);
       });
     },
 
     userRemovedFromTroupe: function(options) {
-      emit('userRemovedFromTroupe', options);
+    localEventEmitter.emit('userRemovedFromTroupe', options);
     },
 
     onUserRemovedFromTroupe: function(callback) {
-      on('userRemovedFromTroupe', callback);
+    localEventEmitter.on('userRemovedFromTroupe', callback);
     },
 
     batchUserBadgeCountUpdate: function(data) {
-      emit('batchUserBadgeCountUpdate', data);
+    localEventEmitter.emit('batchUserBadgeCountUpdate', data);
     },
 
     onBatchUserBadgeCountUpdate: function(callback) {
-      on('batchUserBadgeCountUpdate', callback);
+    localEventEmitter.on('batchUserBadgeCountUpdate', callback);
     },
 
     troupeDeleted: function(options) {
-      emit('troupeDeleted', options);
+    localEventEmitter.emit('troupeDeleted', options);
     },
 
     onTroupeDeleted: function(callback) {
-      on('troupeDeleted', callback);
+    localEventEmitter.on('troupeDeleted', callback);
     },
 
     repoPermissionsChangeDetected: function(uri, isPrivate) {
-      emit('repo_perm_change', {
+    localEventEmitter.emit('repo_perm_change', {
         uri: uri,
         isPrivate: isPrivate
       });
     },
 
     onRepoPermissionsChangeDetected: function(callback) {
-      on('repo_perm_change', callback);
+    localEventEmitter.on('repo_perm_change', callback);
     },
 
     userTroupeLurkModeChange: function(data) {
-      emit('user_troupe_lurk_mode_change', data);
+    localEventEmitter.emit('user_troupe_lurk_mode_change', data);
     },
 
     onUserTroupeLurkModeChange: function(callback) {
-      on('user_troupe_lurk_mode_change', callback);
+    localEventEmitter.on('user_troupe_lurk_mode_change', callback);
     },
 
     newLurkActivity: function(data) {
-      emit('new_lurk_activity', data);
+    localEventEmitter.emit('new_lurk_activity', data);
     },
 
     onNewLurkActivity: function(callback) {
-      on('new_lurk_activity', callback);
+    localEventEmitter.on('new_lurk_activity', callback);
     },
 
     markAllRead: function(data) {
-      emit('mark_all_read', data);
+    localEventEmitter.emit('mark_all_read', data);
     },
 
     onMarkAllRead: function(callback) {
-      on('mark_all_read', callback);
+    localEventEmitter.on('mark_all_read', callback);
     }
 
   };
-}
-
-shutdown.addHandler('appevents', 2, function(callback) {
-  pubClient.unsubscribe('*', callback);
-});
-
-module.exports = bind(onRemote);
-module.exports.localOnly = bind(onLocalOnly);

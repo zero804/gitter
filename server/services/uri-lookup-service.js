@@ -33,11 +33,12 @@ function lookupUri(uri) {
       var repoStyle = uri.indexOf('/') >= 0;
 
       return Q.all([
-        repoStyle ? null : persistence.User.findOneQ({ username: uri }, 'username'),
-        persistence.Troupe.findOneQ({ lcUri: lcUri }, 'uri')
+        repoStyle ? null : persistence.User.findOneQ({ username: uri }, 'username', { lean: true }),
+        persistence.Troupe.findOneQ({ lcUri: lcUri }, 'uri', { lean: true })
       ]).spread(function(user, troupe) {
         winston.verbose('Found user? ' + !!user + ' found troupe? ' + !!troupe);
 
+        /* Found user. Add to cache and continue */
         if(user) {
           return persistence.UriLookup.findOneAndUpdateQ(
             { $or: [{ uri: lcUri }, { userId: user._id }] },
@@ -45,6 +46,7 @@ function lookupUri(uri) {
             { upsert: true });
         }
 
+        /* Found a room. Add to cache and continue */
         if(troupe) {
           return persistence.UriLookup.findOneAndUpdateQ(
             { $or: [{ uri: lcUri }, { troupeId: troupe._id }] },
@@ -52,7 +54,16 @@ function lookupUri(uri) {
             { upsert: true });
         }
 
-        return null;
+        /* Last ditch attempt. Look for a room that has been renamed */
+        /* TODO: look for users who have been renamed too */
+        return persistence.Troupe.findOneQ({ renamedLcUris: lcUri }, { uri: 1, lcUri: 1 }, { lean: true })
+          .then(function(renamedTroupe) {
+            if (!renamedTroupe) return null;
+            winston.verbose('Room ' + lcUri + ' has been renamed to ' + renamedTroupe.lcUri);
+
+            /* Don't save this lookup */
+            return { uri: renamedTroupe.lcUri, troupeId: renamedTroupe._id };
+          });
       });
   });
 }
