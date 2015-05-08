@@ -41,7 +41,7 @@ var webpackConfig = {
       'backbone.wreqr',
       'backbone.babysitter',
       'handlebars/runtime',
-      'gitter-faye',
+      'gitter-realtime-client',
       'raven-js',
       'keymaster',
       'moment'
@@ -76,7 +76,6 @@ var webpackConfig = {
       "mutant": path.resolve(path.join(__dirname, "../repo/mutant/mutant.js")),
       "backbone.wreqr": path.resolve(path.join(__dirname, "../repo/backbone.wreqr/backbone.wreqr.js")),
       "backbone.babysitter": path.resolve(path.join(__dirname, "../repo/backbone.babysitter/backbone.babysitter.js")),
-      "backbone": path.resolve(path.join(__dirname, "../repo/backbone/backbone.js")),
       "cocktail": path.resolve(path.join(__dirname, "../repo/cocktail/cocktail.js")),
       "keymaster": path.resolve(path.join(__dirname, "../repo/keymaster/keymaster.js")),
       "filtered-collection": path.resolve(path.join(__dirname, "../repo/filtered-collection/filtered-collection.js")),
@@ -93,6 +92,11 @@ var webpackConfig = {
       "jquery-hammer": path.resolve(path.join(__dirname, "../repo/hammerjs/jquery.hammer.js")),
       "cal-heatmap": path.resolve(path.join(__dirname, "../repo/cal-heatmap/cal-heatmap.js")),
       "d3": path.resolve(path.join(__dirname, "../repo/d3/d3.js")),
+
+      // Prevent duplicates
+      "moment": path.resolve(path.join(__dirname, "utils/moment-wrapper")),
+      "underscore": path.resolve(path.join(__dirname, "utils/underscore-wrapper")),
+      "backbone": path.resolve(path.join(__dirname, "../../node_modules/backbone")),
     },
   },
   plugins: [
@@ -105,7 +109,7 @@ var webpackConfig = {
 
 if(devMode) {
   // See http://webpack.github.io/docs/configuration.html#devtool
-  webpackConfig.devtool = 'sourcemap';
+  webpackConfig.devtool = 'cheap-module-eval-source-map';
   webpackConfig.cache = true;
 } else {
   // webpackConfig.plugins.push(new DedupePlugin());

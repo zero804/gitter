@@ -37,8 +37,7 @@ var troupeEnv = {
     fayeUrl: nconf.get('ws:fayeUrl'),
     options: {
       timeout: nconf.get('ws:fayeTimeout'),
-      retry: nconf.get('ws:fayeRetry'),
-      interval: nconf.get('ws:fayeInterval')
+      retry: nconf.get('ws:fayeRetry')
     }
   },
   embed: {

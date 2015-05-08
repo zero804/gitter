@@ -1,8 +1,6 @@
 <div class="github-issue github-issue-{{payload.action}}">
-  <i class='octicon octicon-issue-opened'></i>
+  <i class='octicon octicon-issue-opened activity-item__icon'></i>
   <div class="activity-time">{{widget "timeago" time=sent compact=true position="left"}}</div>
 
-  <span class="gtrActivityItemText"><span class='mention' data-link-type="mention" data-screen-name="{{payload.sender.login}}">{{payload.sender.login}}</span> {{payload.action}} <span class="issue {{payload.issue.state}}" data-link-type="issue" data-issue="{{payload.issue.number}}" data-issue-repo="{{payload.repository.full_name}}">#{{payload.issue.number}}</span></span>
-
-  <div style="clear: both;"></div>
+  <div class="gtrActivityItemText"><span class='mention' data-link-type="mention" data-screen-name="{{payload.sender.login}}">{{payload.sender.login}}</span> {{payload.action}} <span class="issue {{payload.issue.state}}" data-link-type="issue" data-issue="{{payload.issue.number}}" data-issue-repo="{{payload.repository.full_name}}">#{{payload.issue.number}}</span></div>
 </div>

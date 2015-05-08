@@ -8,12 +8,11 @@ var stats = env.stats;
 var presenceService = require('../../services/presence-service');
 var bayeux = require('../../web/bayeux');
 
-
 module.exports =  function(req, res, next) {
   var socketId = req.body.socketId;
   var on = parseInt(req.body.on, 10);
 
-  bayeux.engine.clientExists(socketId, function(exists) {
+  bayeux.clientExists(socketId, function(exists) {
     if(!exists) {
       stats.eventHF('eyeballs.failed');
       stats.eventHF('eyeballs.failed.invalid.socket');
@@ -55,4 +54,3 @@ module.exports =  function(req, res, next) {
   });
 
 };
-

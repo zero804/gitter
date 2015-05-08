@@ -1,30 +1,18 @@
 "use strict";
 var Marionette = require('marionette');
+var TroupeViews = require('views/base');
 var Backbone = require('backbone');
 var cocktail = require('cocktail');
-var TroupeViews = require('views/base');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var template = require('./tmpl/addPeople.hbs');
 var userSearchItemTemplate = require('./tmpl/userSearchItem.hbs');
 var itemTemplate = require('./tmpl/addPeopleItemView.hbs');
 var Typeahead = require('views/controls/typeahead');
+var userSearchModels = require('collections/user-search');
 require('views/behaviors/widgets');
 
 module.exports = (function() {
-
-
-  var UserSearchModel = Backbone.Model.extend({
-    idAttribute: "id",
-  });
-
-  var UserSearchCollection = Backbone.Collection.extend({
-    url: '/v1/user',
-    model: UserSearchModel,
-    parse: function (response) {
-      return response.results;
-    }
-  });
 
   var RowView = Marionette.ItemView.extend({
     events: {
@@ -101,7 +89,7 @@ module.exports = (function() {
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
     },
 
-    onItemviewInviteError: function(itemView, message) {
+    onItemviewInviteError: function(itemView, message) { // jshint unused:true
       this.ui.loading.toggleClass('hide', true);
       this.showValidationMessage(message);
     },
@@ -112,7 +100,7 @@ module.exports = (function() {
     },
 
     strTemplate: function (str, o) {
-      return str.replace(/{{([a-z_$]+)}}/gi, function (m, k) {
+      return str.replace(/{{([a-z_$]+)}}/gi, function (m, k) { // jshint unused:true
           return (typeof o[k] !== 'undefined' ? o[k] : '');
       });
     },
@@ -163,8 +151,8 @@ module.exports = (function() {
       this.showMessage(this.ui.success);
     },
 
-    handleError: function (res, status, message) {
-
+    handleError: function (/*res, status, message */) {
+      // TODO: what should go here?
     },
 
     /**
@@ -197,7 +185,9 @@ module.exports = (function() {
         .fail(function (xhr) {
           var json = xhr.responseJSON;
           self.ui.loading.toggleClass('hide');
-          var m = json && json.message || 'Error';
+          var m = json && (json.error || json.message) || 'Error';
+
+          // XXX: why not use the payment required status code for this?
           if (m.match(/has reached its limit/)) self.dialog.showPremium();
           self.showValidationMessage(m);
           self.typeahead.clear();
@@ -212,7 +202,7 @@ module.exports = (function() {
       }, 10);
 
       this.typeahead = new Typeahead({
-        collection: new UserSearchCollection(),
+        collection: new userSearchModels.Collection(),
         itemTemplate: userSearchItemTemplate,
         el: this.ui.input[0],
         autoSelector: function(input) {
@@ -261,4 +251,3 @@ module.exports = (function() {
 
 
 })();
-

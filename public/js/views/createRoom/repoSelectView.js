@@ -2,7 +2,7 @@
 var Marionette = require('marionette');
 var Backbone = require('backbone');
 var TroupeViews = require('views/base');
-var TroupeCollections = require('collections/base');
+var loadingMixins = require('collections/loading-mixins');
 var template = require('./tmpl/repoSelectView.hbs');
 var itemTemplate = require('./tmpl/repoItemView.hbs');
 var emptyTemplate = require('./tmpl/repoEmptyView.hbs');
@@ -18,7 +18,7 @@ module.exports = (function() {
 
   // TODO: put this somewhere else
   var FilteredLoadingCollection = Backbone.FilteredCollection.extend({ });
-  cocktail.mixin(FilteredLoadingCollection, TroupeCollections.UnderlyingLoadingMixin);
+  cocktail.mixin(FilteredLoadingCollection, loadingMixins.UnderlyingLoadingMixin);
 
   var ItemView = Marionette.ItemView.extend({
     template: itemTemplate,
@@ -71,4 +71,3 @@ module.exports = (function() {
 
 
 })();
-

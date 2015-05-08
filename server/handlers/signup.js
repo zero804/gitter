@@ -49,14 +49,14 @@ module.exports = {
           });
         });
 
-      app.get('/about', function(req, res, next) {
+      app.get('/about', function(req, res) {
         res.render('about', {
           socialMetadata: social.getMetadata(),
           billingBaseUrl: nconf.get('web:billingBaseUrl')
         });
       });
 
-      app.get('/about/teams', function(req, res, next) {
+      app.get('/about/teams', function(req, res) {
         res.render('teams', {
           socialMetadata: social.getMetadata(),
           billingBaseUrl: nconf.get('web:billingBaseUrl')

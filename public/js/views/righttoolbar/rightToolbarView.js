@@ -7,9 +7,9 @@ var itemCollections = require('collections/instances/integrated-items');
 var PeopleCollectionView = require('views/people/peopleCollectionView');
 var SearchView = require('views/search/searchView');
 var SearchInputView = require('views/search/search-input-view');
-var repoInfo = require('./repoInfo');
+var RepoInfoView = require('./repoInfo');
+var RepoInfoModel = require('collections/repo-info');
 var ActivityStream = require('./activity');
-var hasScrollBars = require('utils/scrollbar-detect');
 
 module.exports = (function() {
 
@@ -36,15 +36,15 @@ module.exports = (function() {
       // People View
       new PeopleCollectionView.ExpandableRosterView({
         rosterCollection: itemCollections.roster,
-        userCollection: itemCollections.sortedUsers,
         el: $('#people-roster')
       });
 
       // Repo info
       if (context.troupe().get('githubType') === 'REPO') {
-        var repo = new repoInfo.model();
+        var repo = new RepoInfoModel();
         repo.fetch({ data: { repo: context.troupe().get('uri') } });
-        this.repo_info.show(new repoInfo.view({ model: repo }));
+        
+        this.repo_info.show(new RepoInfoView({ model: repo }));
       }
 
       // Activity
@@ -122,4 +122,3 @@ module.exports = (function() {
 
 
 })();
-

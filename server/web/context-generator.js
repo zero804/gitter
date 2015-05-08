@@ -8,8 +8,6 @@ var crypto           = require("crypto");
 var roomPermissionsModel = require('../services/room-permissions-model');
 var userSettingsService = require('../services/user-settings-service');
 var isNative         = require('../../public/js/utils/is-native');
-var nconf            = require('../utils/config');
-
 
 var assert           = require("assert");
 var Q                = require('q');

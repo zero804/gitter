@@ -1,7 +1,6 @@
 "use strict";
 var $ = require('jquery');
 var Marionette = require('marionette');
-var backbone = require('backbone');
 var context = require('utils/context');
 var troupeCollections = require('collections/instances/troupes');
 var userHomeTemplate = require('./tmpl/userHomeTemplate.hbs');
@@ -9,12 +8,11 @@ var OrgCollectionView = require('./homeOrgCollectionView');
 var SuggestedCollectionView = require('./suggested-room-collection-view');
 var isMobile = require('utils/is-mobile');
 var isNative = require('utils/is-native');
+var TroupeCollections = require('collections/troupes');
 
 module.exports = (function() {
 
-
-  var suggestedRoomCollection = new backbone.Collection();
-  suggestedRoomCollection.url = '/v1/user/' + context.getUserId() + '/rooms?suggested=1';
+  var suggestedRoomCollection = new TroupeCollections.SuggestedTroupeCollection();
   suggestedRoomCollection.fetch();
 
   return Marionette.Layout.extend({
@@ -81,4 +79,3 @@ module.exports = (function() {
 
 
 })();
-
