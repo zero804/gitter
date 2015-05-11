@@ -39,7 +39,7 @@ Utility Scripts
 ---------------
 These are scripts that can help you answer questions like "What's this user's eyeball state?" and "What's the userId for mydigitalself?". They can be found in `scripts/utils`.
 
-If you want to run against production, ssh into app-00X and run with the NODE_ENV varible set.
+If you want to run against production, ssh into app-00X and run with the `NODE_ENV` varible set.
 
 e.g `NODE_ENV=prod /opt/gitter/gitter-webapp/scripts/utils/unread.js trevorah`
 
@@ -139,5 +139,6 @@ Once you are sure the above is done, preform the following:
 
 
 11. Check that there are lots of documents under the Gitter index.
+
 
 
