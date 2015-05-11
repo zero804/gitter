@@ -8,7 +8,10 @@ var appEvents = require('utils/appevents');
 var chatItemView = require('./chatItemView');
 var Rollers = require('utils/rollers');
 var cocktail = require('cocktail');
+var unreadItemsClient = require('components/unread-items-client');
+
 require('views/behaviors/infinite-scroll');
+require('views/behaviors/smooth-scroll');
 
 module.exports = (function() {
 
@@ -35,7 +38,7 @@ module.exports = (function() {
   }
 
   /** @const */
-  var PAGE_SIZE = 20;
+  var PAGE_SIZE = 100;
 
   var SCROLL_ELEMENT = "#content-frame";
 
@@ -98,6 +101,10 @@ module.exports = (function() {
         reverseScrolling: true,
         scrollElementSelector: SCROLL_ELEMENT,
         contentWrapperSelector: '#chat-container'
+      },
+      SmoothScroll: {
+        scrollElementSelector: SCROLL_ELEMENT,
+        contentWrapper: '#chat-container'
       }
     },
 
@@ -201,14 +208,38 @@ module.exports = (function() {
 
     scrollToFirstUnread: function() {
       var self = this;
-      this.collection.fetchFromMarker('first-unread', {}, function() {
-        var firstUnread = self.collection.findWhere({ unread: true });
-        if(!firstUnread) return;
-        var firstUnreadView = self.children.findByModel(firstUnread);
+
+      //this.collection.fetchFromMarker('first-unread', {}, function() {
+      //  var firstUnread = self.collection.findWhere({ unread: true });
+      //  if(!firstUnread) return;
+      //  var firstUnreadView = self.children.findByModel(firstUnread);
+      //  if(!firstUnreadView) return;
+      //  self.rollers.scrollToElement(firstUnreadView.el);
+      //});
+
+      var id = unreadItemsClient.getFirstUnreadItem();
+      var model = self.collection.get(id);
+
+      if (model) {
+        var firstUnreadView = self.children.findByModel(model);
+        self.rollers.scrollToElement(firstUnreadView.el);
+        return;
+      }
+
+      this.collection.ensureLoaded(id, function() {
+        var model = self.collection.get(id);
+        var firstUnreadView = self.children.findByModel(model);
         if(!firstUnreadView) return;
         self.rollers.scrollToElement(firstUnreadView.el);
       });
 
+    },
+
+    onTrackViewportCenter: function() {
+      if (!this.isScrolledToBottom()) {
+        var el = this.rollers.getMostCenteredElement();
+        this.rollers.stable(el);
+      }
     },
 
     scrollToFirstUnreadBelow: function() {
