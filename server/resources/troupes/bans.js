@@ -2,9 +2,7 @@
 "use strict";
 
 var roomService        = require('../../services/room-service');
-var userService        = require("../../services/user-service");
 var restSerializer     = require("../../serializers/rest-serializer");
-var _                  = require("underscore");
 
 function serialize(bans, callback) {
   var strategy = new restSerializer.TroupeBanStrategy({ });
