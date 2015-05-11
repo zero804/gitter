@@ -2,10 +2,10 @@
 
 @import "colors.less";
 /*@import "trpWebFonts.less";*/
-@import "trpFonts.less";
 @import "trpButtons.less";
 @import "trp3Common.less";
 @import "trpModals.less";
+@import "typography.less";
 
 body {
   margin: 0;
@@ -18,7 +18,6 @@ html {
 }
 
 h1 {
-  .trpH1;
   margin: 0;
 }
 
@@ -70,7 +69,6 @@ a {
 }
 
 .trpJobSpec p {
-  .trpH2;
   padding-bottom: 12px;
 }
 
@@ -89,7 +87,6 @@ a {
   display: inline-block;
   padding-right: 26px;
   padding-left: 26px;
-  .trpBodyEm;
   font-weight: lighter;
   color: white;
   background-color: rgba(255,255,255, 0.2);
@@ -145,7 +142,6 @@ a {
   max-width: 380px;
   padding-right: 20px;
   padding-top: 40px;
-  font-family: @fontSans;
   font-size: 32px;
   color: white;
   text-align: left;
@@ -190,7 +186,6 @@ a {
 }
 
 .trpMidStrip {
-  font-family: @fontSans;
   font-size: 28px;
   color: @trpDarkGrey;
   padding-top: 10px;
@@ -248,14 +243,12 @@ a {
 }
 
 .trpFeatureHead {
-  .trpH2;
   padding-top: 16px;
   padding-bottom: 6px;
   color: @trpDarkGrey;
 }
 
 .trpFeatureBody {
-  .trpBodyText;
   font-weight: lighter;
   color: @trpDarkGrey;
   line-height: 1.4em;
@@ -275,8 +268,6 @@ a {
 }
 
 .trpHomeVideo {
-  .trpHomeHero;
-  font-family: @fontSans;
   font-size: 30px;
   color: white;
   text-align: center;
@@ -284,7 +275,6 @@ a {
 }
 
 .trpHomeVideoSubtext {
-  font-family: @fontSans;
   font-size: 16px;
   padding-top: 40px;
   font-weight: normal;
@@ -299,7 +289,6 @@ a {
 }
 
 .trpHomeAppStrip {
-  .trpMidStrip;
   padding-top: 10px;
   color: white;
 }
@@ -315,7 +304,6 @@ a {
   max-width: 600px;
   padding-right: 20px;
   padding-top: 40px;
-  font-family: @fontThin;
   font-size: 24px;
   color: white;
   text-align: left;
@@ -327,7 +315,6 @@ a {
   max-width: 600px;
   padding-right: 20px;
   padding-bottom: 20px;
-  font-family: @fontThin;
   font-size: 16px;
   color: white;
   text-align: left;
@@ -355,7 +342,6 @@ a {
   float: left;
   max-width: 900px;
   padding-right: 20px;
-  font-family: @fontThin;
   font-size: 24px;
   color: white;
   text-align: left;
@@ -367,7 +353,6 @@ a {
   max-width: 900px;
   padding-right: 20px;
   padding-bottom: 20px;
-  font-family: @fontThin;
   font-size: 16px;
   color: @trpDarkGrey;
   text-align: left;
@@ -393,7 +378,6 @@ a {
 }
 
 .trpAppText {
-  .trpBodyText;
   font-weight: lighter;
   color: @trpDarkGrey;
 }
@@ -408,7 +392,6 @@ a {
 }
 
 .trpFooterStrip {
-  .trpH3;
   color: @trpDarkerGrey;
   padding-top: 10px;
 }
@@ -500,7 +483,6 @@ a {
 
 }
 
-@media screen and (min-device-width: 768px) and (orientation: portrait) {
   .trpHomeTopStrip {
     max-width: 750px;
     min-width: 750px;
@@ -519,4 +501,3 @@ a {
   }
 
 
-  }
