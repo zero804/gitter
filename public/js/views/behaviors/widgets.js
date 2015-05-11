@@ -88,7 +88,7 @@ module.exports = (function() {
     },
     onDestroy: function() {
       if(this.view.widgetManager) {
-        this.view.widgetManager.close();
+        this.view.widgetManager.destroy();
         this.view.widgetManager = null;
       }
     }
