@@ -309,7 +309,6 @@ gulp.task('css-mobile', function () {
 
 gulp.task('css-web', function () {
   return gulp.src([
-    'public/less/signup.less',
     'public/less/trpAppsPage.less',
     'public/less/error-page.less',
     'public/less/error-layout.less',
