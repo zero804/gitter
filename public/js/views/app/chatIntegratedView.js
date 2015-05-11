@@ -21,7 +21,8 @@ var embedDecorator = require('views/chat/decorators/embedDecorator');
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var UnreadBannerView = require('views/app/unreadBannerView');
 var RightToolbarView = require('views/righttoolbar/rightToolbarView');
-var unreadBannerModel = require('./unreadBannerModel');
+var unreadBannerModel = require('collections/unread-banner');
+var unreadItemsClient = require('components/unread-items-client');
 
 require('transloadit');
 
@@ -106,15 +107,21 @@ module.exports = (function() {
         rollers: chatCollectionView.rollers
       }).render();
 
+      var unreadChatsModel = unreadItemsClient.acrossTheFold();    
+   
+      itemCollections.chats.once('sync', function() {    
+        unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));    
+      });
+
       new UnreadBannerView.Top({
         el: '#unread-banner',
-        model: unreadBannerModel,
+        model: unreadChatsModel,
         chatCollectionView: chatCollectionView
       }).render();
 
       new UnreadBannerView.Bottom({
         el: '#bottom-unread-banner',
-        model: unreadBannerModel,
+        model: unreadChatsModel,
         chatCollectionView: chatCollectionView
       }).render();
 
