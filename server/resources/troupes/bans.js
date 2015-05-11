@@ -2,9 +2,7 @@
 "use strict";
 
 var roomService        = require('../../services/room-service');
-var userService        = require("../../services/user-service");
 var restSerializer     = require("../../serializers/rest-serializer");
-var _                  = require("underscore");
 
 function serialize(bans, callback) {
   var strategy = new restSerializer.TroupeBanStrategy({ });
@@ -53,17 +51,16 @@ module.exports = {
   },
 
   load: function(req, id, callback) {
-    /* id of a ban is the username of the banned user */
+    return roomService.findBanByUsername(req.troupe.id, id)
+      .then(function(banAndUser) {
+        if(!banAndUser) return;
 
-    return userService.findByUsername(id, function(err, user) {
-      if(err) return callback(err);
-      if(!user) return callback();
+        /* Bit nasty */
+        req.troupeBanUser = banAndUser.user;
 
-      req.troupeBanUser = user;
-
-      var ban = _.find(req.troupe.bans, function(ban) { return ban.userId == user.id;} );
-      return callback(null, ban);
-    });
+        return banAndUser.ban;
+      })
+      .nodeify(callback);
   }
 
 };
