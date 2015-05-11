@@ -16,7 +16,6 @@ var appEvents = require('utils/appevents');
 var cocktail = require('cocktail');
 var chatCollapse = require('utils/collapsed-item-client');
 var KeyboardEventMixins = require('views/keyboard-events-mixin');
-var apiClient = require('components/apiClient');
 var RAF = require('utils/raf');
 require('views/behaviors/unread-items');
 require('views/behaviors/widgets');
@@ -117,17 +116,10 @@ module.exports = (function() {
       }
 
       this.listenToOnce(this, 'messageInViewport', function() {
-        _.each(this.decorators, function(decorator) {
+        this.decorators.forEach(function(decorator) {
           decorator.decorate(this);
-        }.bind(this));
-        //this.markAsRead();
-      }.bind(this));
-    },
-
-    markAsRead: function() {
-      if (this.model.get('unread')) {
-        apiClient.userRoom.post('/unreadItems', {chat: [this.model.get('id')]});
-      }
+        }, this);
+      });
     },
 
     /** XXX TODO NB: change this to onClose once we've moved to Marionette 2!!!! */
