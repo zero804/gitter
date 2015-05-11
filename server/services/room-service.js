@@ -1009,22 +1009,26 @@ function banUserFromRoom(room, username, requestingUser, options, callback) {
         .then(function(bannedUserIsAdmin) {
           if(bannedUserIsAdmin) throw new StatusError(400, 'User ' + username + ' is an admin in this room.');
 
-          var existingBan = _.find(room.bans, function(ban) { return ban.userId == user.id;} );
+          // Load the full object
+          return persistence.Troupe.findByIdQ(room.id);
+        })
+        .then(function(roomForUpdate) {
+          var existingBan = _.find(roomForUpdate.bans, function(ban) { return ban.userId == user.id;} );
 
           if(existingBan) {
             return existingBan;
           } else {
-            var ban = room.addUserBan({
+            var ban = roomForUpdate.addUserBan({
               userId: user.id,
               bannedBy: requestingUser.id
             });
 
-            room.removeUserById(user.id);
+            roomForUpdate.removeUserById(user.id);
 
-            return room.saveQ()
+            return roomForUpdate.saveQ()
               .then(function() {
                 if (options && options.removeMessages) {
-                  return persistence.ChatMessage.findQ({ toTroupeId: room.id, fromUserId: user.id })
+                  return persistence.ChatMessage.findQ({ toTroupeId: roomForUpdate.id, fromUserId: user.id })
                     .then(function(messages) {
                       return Q.all(messages.map(function(message) {
                         return message.removeQ();
@@ -1065,14 +1069,23 @@ function unbanUserFromRoom(room, troupeBan, username, requestingUser, callback) 
 
   if(!canBanInRoom(room)) return Q.reject(new StatusError(400, 'This room does not support bans')).nodeify(callback);
 
+
+  var troupeId = room.id;
+
   /* Does the requesting user have admin rights to this room? */
   return roomPermissionsModel(requestingUser, 'admin', room)
     .then(function(access) {
       if(!access) throw new StatusError(403, 'You do not have permission to unban people. Admin permission is needed.');
 
-      room.bans.pull({ _id: troupeBan._id });
-
-      return room.saveQ();
+      return persistence.Troupe.updateQ({
+          _id: mongoUtils.asObjectID(troupeId)
+        }, {
+          $pull: { 
+            bans: {
+              userId: troupeBan.userId
+            }
+          }
+        });
     })
     .then(function() {
       return eventService.newEventToTroupe(
@@ -1091,6 +1104,30 @@ function unbanUserFromRoom(room, troupeBan, username, requestingUser, callback) 
     .nodeify(callback);
 }
 exports.unbanUserFromRoom = unbanUserFromRoom;
+
+/**
+ * If the ban is found, returns { ban: troupeBan, user: user}, else returns null
+ */
+function findBanByUsername(troupeId, bannedUsername) {
+  return userService.findByUsername(bannedUsername)
+    .then(function(user) {
+      if (!user) return;
+
+      return persistence.Troupe.findOneQ({
+        _id: mongoUtils.asObjectID(troupeId),
+        'bans.userId': user._id },
+        { _id: 0, 'bans.$': 1 },
+        { lean: true })
+        .then(function(troupe) {
+          if (!troupe || !troupe.bans || !troupe.bans.length) return;
+
+          return { ban: troupe.bans[0], user: user };
+        });
+
+    });
+}
+exports.findBanByUsername = findBanByUsername;
+
 
 function updateTroupeLurkForUserId(userId, troupeId, lurk) {
   lurk = !!lurk; // Force boolean
