@@ -120,7 +120,7 @@ module.exports = (function() {
         _.each(this.decorators, function(decorator) {
           decorator.decorate(this);
         }.bind(this));
-        this.markAsRead();
+        //this.markAsRead();
       }.bind(this));
     },
 

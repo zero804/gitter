@@ -2,7 +2,7 @@
 var Marionette = require('marionette');
 var behaviourLookup = require('./lookup');
 var _ = require('underscore');
-var unreadBannerModel = require('../app/unreadBannerModel');
+var unreadBannerModel = require('collections/unread-banner');
 var context = require('utils/context');
 var realtime = require('components/realtime');
 
@@ -20,21 +20,21 @@ var Behavior = Marionette.Behavior.extend({
     this.wrapper = wrapperSelector ? this.scrollElement.querySelector(wrapperSelector) : null;
 
     // Make sure every time the collectionView renders it decorates its childs and updates the banners
-    this.view.on('render', this.decorateIfVisible.bind(this));
-    this.view.on('render', this.updateUnreadBanners.bind(this));
+    this.listenTo(this.view, 'render', this.decorateIfVisible);
+    //this.view.on('render', this.updateUnreadBanners.bind(this));
 
     // Debounced actions for improved performance
     this.lazyDecorator      = _.debounce(this.decorateIfVisible.bind(this), 500);
     this.lazyTracker        = _.debounce(this.trackViewport.bind(this), 500);
     this.lazyPointerEvents  = _.debounce(this.enablePointerEvents.bind(this), 250);
-    this.lazyUnreadItems    = _.throttle(this.updateUnreadBanners.bind(this), 250);
+    //this.lazyUnreadItems    = _.throttle(this.updateUnreadBanners.bind(this), 250);
 
     this.scrollHandler = this.smoothScroll.bind(this);
     this.scrollElement.addEventListener('scroll', this.scrollHandler, false);
 
     // Listen for events such as mark all as read, etc.
-    var subscription = '/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId() + '/unreadItems';
-    realtime.subscribe(subscription, this.updateUnreadBanners.bind(this));
+    //var subscription = '/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId() + '/unreadItems';
+    //realtime.subscribe(subscription, this.updateUnreadBanners.bind(this));
   },
 
   // Trigger an event on the child of it's currently on screen
@@ -85,7 +85,7 @@ var Behavior = Marionette.Behavior.extend({
     this.lazyDecorator();
     this.lazyTracker();
     this.lazyPointerEvents();
-    this.lazyUnreadItems();
+    //this.lazyUnreadItems();
   },
 
   onClose: function() {
