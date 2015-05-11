@@ -100,7 +100,7 @@ module.exports = (function() {
       InfiniteScroll: {
         reverseScrolling: true,
         scrollElementSelector: SCROLL_ELEMENT,
-        contentWrapper: '#chat-container'
+        contentWrapperSelector: '#chat-container'
       },
       SmoothScroll: {
         scrollElementSelector: SCROLL_ELEMENT,
