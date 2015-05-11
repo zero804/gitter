@@ -1,6 +1,7 @@
 "use strict";
 var Mutant = require('mutant');
 var RAF = require('utils/raf');
+var _ = require('underscore');
 
 module.exports = (function() {
 
@@ -38,7 +39,8 @@ module.exports = (function() {
 
     this.mutant = new Mutant(target, adjustScroll, { transitions: true, observers: { attributes: true, characterData: true  } } );
 
-    target.addEventListener('scroll', this.trackLocation.bind(this), false);
+    var _trackLocation = _.throttle(this.trackLocation.bind(this), 100);
+    target.addEventListener('scroll', _trackLocation, false);
     window.addEventListener('resize', adjustScroll, false);
     window.addEventListener('focusin', adjustScroll, false);
     window.addEventListener('focusout', adjustScroll, false);
@@ -193,9 +195,9 @@ module.exports = (function() {
 
       if(scrollTop < 0) scrollTop = 0;
 
-      RAF(function () {
+      //RAF(function () {
         target.scrollTop = scrollTop;
-      });
+      //});
 
       this.stable(element);
     },
@@ -301,6 +303,24 @@ module.exports = (function() {
       for(var i = children.length - 1; i >= 0; i--) {
         var child = children[i];
         if(child.offsetTop < max) {
+          return child;
+        }
+      }
+
+      return;
+    },
+
+    getMostCenteredElement: function() {
+      var scrollTop = this._target.scrollTop;
+      var clientHeight = this._target.clientHeight;
+      var max = scrollTop + clientHeight;
+      var children = this._childContainer.children;
+
+      for(var i = children.length - 1; i >= 0; i--) {
+        var child = children[i];
+        var middle = clientHeight / 2;
+        var pos = max - child.offsetTop;
+        if (pos > middle) {
           return child;
         }
       }
