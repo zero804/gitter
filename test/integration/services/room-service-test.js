@@ -1094,17 +1094,32 @@ describe('room-service #slow', function() {
               assert.equal(ban.bannedBy, fixture.userBanAdmin.id);
               assert(ban.dateBanned);
 
-              assert(!fixture.troupeBan.containsUserId(fixture.userBan.id));
+              return persistence.Troupe.findByIdQ(fixture.troupeBan.id);
+            })
+            .then(function(troupe) {
+              assert(!troupe.containsUserId(fixture.userBan.id));
+
+              return roomService.findBanByUsername(troupe.id, fixture.userBan.username);
+            })
+            .then(function(banAndUser) {
+              assert(banAndUser);
+              assert(banAndUser.user);
+              assert(banAndUser.ban);
 
               return userBannedFromRoom(fixture.troupeBan.uri, fixture.userBan)
                 .then(function(banned) {
                   assert(banned);
 
-                  return roomService.unbanUserFromRoom(fixture.troupeBan, ban, fixture.userBan.username, fixture.userBanAdmin)
+                  return roomService.unbanUserFromRoom(fixture.troupeBan, banAndUser.ban, fixture.userBan.username, fixture.userBanAdmin)
                     .then(function() {
                       return userBannedFromRoom(fixture.troupeBan.uri, fixture.userBan)
                         .then(function(banned) {
                           assert(!banned);
+
+                          return roomService.findBanByUsername(fixture.troupeBan.id, fixture.userBan.username);
+                        })
+                        .then(function(banAndUser) {
+                          assert(!banAndUser);
                         });
                     });
                 });
