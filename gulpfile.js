@@ -11,6 +11,7 @@ var istanbul = require('gulp-istanbul');
 var mocha = require('gulp-spawn-mocha');
 var using = require('gulp-using');
 var tar = require('gulp-tar');
+var expect = require('gulp-expect-file');
 var shrinkwrap = require('gulp-shrinkwrap');
 var git = require('gulp-git');
 var fs = require('fs');
@@ -308,7 +309,7 @@ gulp.task('css-mobile', function () {
 });
 
 gulp.task('css-web', function () {
-  return gulp.src([
+  var lessFiles = [
     'public/less/trpAppsPage.less',
     'public/less/error-page.less',
     'public/less/error-layout.less',
@@ -328,7 +329,10 @@ gulp.task('css-web', function () {
     'public/less/userhome.less',
     'public/less/402.less',
     'public/less/org-404.less'
-    ])
+  ];
+
+  return gulp.src(lessFiles)
+    .pipe(expect({ errorOnFailure: true }, lessFiles))
     .pipe(gulpif(DEV_MODE, sourcemaps.init()))
     .pipe(less({
       paths: ['public/less'],
