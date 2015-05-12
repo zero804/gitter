@@ -1,17 +1,16 @@
 "use strict";
 var Marionette = require('backbone.marionette');
 var context = require('utils/context');
-var TroupeViews = require('views/base');
+var ModalView = require('views/modal');
 var AvatarView = require('views/widgets/avatar');
 var collectionTemplate = require('./tmpl/peopleCollectionView.hbs');
 var remainingTempate = require('./tmpl/remainingView.hbs');
+require('views/behaviors/isomorphic');
 
 module.exports = (function() {
   var PeopleCollectionView = Marionette.CollectionView.extend({
     tagName: 'ul',
-
     className: 'roster',
-
     childView: AvatarView,
 
     childViewOptions: function(item) {
@@ -56,35 +55,28 @@ module.exports = (function() {
   var ExpandableRosterView = Marionette.LayoutView.extend({
     template: collectionTemplate,
 
+    behaviors: {
+      Isomorphic: {}
+    },
+
     regions: {
       rosterRegion: "#roster-region",
       remainingRegion: "#remaining-region"
     },
 
-    initialize: function(options) {
-      var prerenderedRosterEl = this.$el.find('#roster-view')[0];
-      var rosterView = new PeopleCollectionView({
-        el: prerenderedRosterEl,
-        collection: options.rosterCollection
-      });
-
-      var prerenderedRemainingEl = this.$el.find('#remaining-view')[0];
-      var remainingView = new RemainingView({
-        el: prerenderedRemainingEl,
-        model: context.troupe()
-      });
-
-      // attach without emptying existing regions
-      this.rosterRegion.attachView(rosterView);
-      this.remainingRegion.attachView(remainingView);
+    initRegions: function(optionsForRegion) {
+      return {
+        rosterRegion: new PeopleCollectionView(optionsForRegion('rosterRegion', { collection: this.options.rosterCollection })),
+        remainingRegion: new RemainingView(optionsForRegion('remainingRegion', { model: context.troupe() }))
+      };
     }
   });
 
-  var AllUsersModal = TroupeViews.Modal.extend({
+  var AllUsersModal = ModalView.extend({
     initialize: function(options) {
       options = options || {};
       options.title = "People";
-      TroupeViews.Modal.prototype.initialize.call(this, options);
+      ModalView.prototype.initialize.call(this, options);
       this.view = new PeopleCollectionView(options);
     }
   });

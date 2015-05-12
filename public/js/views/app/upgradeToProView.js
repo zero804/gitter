@@ -1,8 +1,8 @@
 "use strict";
 var context = require('utils/context');
 var Marionette = require('backbone.marionette');
-var TroupeViews = require('views/base');
 var template = require('./tmpl/upgradeToProTemplate.hbs');
+var ModalView = require('views/modal');
 
 module.exports = (function() {
 
@@ -43,10 +43,10 @@ module.exports = (function() {
     },
   });
 
-  return TroupeViews.Modal.extend({
+  return ModalView.extend({
       initialize: function(options) {
         options.title = "Upgrade to Pro";
-        TroupeViews.Modal.prototype.initialize.apply(this, arguments);
+        ModalView.prototype.initialize.apply(this, arguments);
         this.view = new View({ });
       },
       menuItems: [

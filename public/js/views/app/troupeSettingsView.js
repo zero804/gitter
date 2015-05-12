@@ -3,7 +3,7 @@ var Marionette = require('backbone.marionette');
 var _ = require('underscore');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
-var TroupeViews = require('views/base');
+var ModalView = require('views/modal');
 var troupeSettingsTemplate = require('./tmpl/troupeSettingsTemplate.hbs');
 var log = require('utils/log');
 var notifications = require('components/notifications');
@@ -108,13 +108,12 @@ module.exports = (function() {
     }
   });
 
-  return TroupeViews.Modal.extend({
+  return ModalView.extend({
       initialize: function(options) {
         options.title = "Notification Settings";
-        TroupeViews.Modal.prototype.initialize.apply(this, arguments);
+        ModalView.prototype.initialize.apply(this, arguments);
         this.view = new View({ });
       }
     });
 
 })();
-

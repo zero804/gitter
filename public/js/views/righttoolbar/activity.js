@@ -2,7 +2,6 @@
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var appEvents = require('utils/appevents');
-var TroupeViews = require('views/base');
 var issueDecorator = require('views/chat/decorators/issueDecorator');
 var commitDecorator = require('views/chat/decorators/commitDecorator');
 var mentionDecorator = require('views/chat/decorators/mentionDecorator');
@@ -25,6 +24,7 @@ var sprintlyTemplate = require('./tmpl/sprintly.hbs');
 var trelloTemplate = require('./tmpl/trello.hbs');
 var prerenderedTemplate = require('./tmpl/prerendered.hbs');
 var compositeTemplate = require('./tmpl/composite.hbs');
+
 require('views/widgets/timeago');
 require('views/behaviors/widgets');
 
@@ -53,7 +53,7 @@ module.exports = (function() {
   };
 
   var decorators = {
-    trello: function(meta, payload) {
+    trello: function(meta, payload) { // jshint unused:true
       var trello_actions = {
         updateCard:   'updated',
         createCard:   'created',
@@ -62,7 +62,7 @@ module.exports = (function() {
       };
       return {trello_action: trello_actions[payload.action.type]};
     },
-    sprintly: function(meta, payload) {
+    sprintly: function(meta, payload) { // jshint unused:true
       var extra = {};
 
       if (payload.model == "Item") {
@@ -116,11 +116,11 @@ module.exports = (function() {
       }
       return extra;
     },
-    jenkins: function(meta, payload) {
+    jenkins: function(meta, payload) { // jshint unused:true
       var status = payload.build.status ? payload.build.status.toLowerCase() : payload.build.phase.toLowerCase();
       return { build_status: status };
     },
-    travis: function(meta, payload) {
+    travis: function(meta, payload) { // jshint unused:true
       var extra = {};
       var status = payload.status_message ? payload.status_message.toLowerCase() : '';
       extra.build_status = (status === 'still failing') ? 'failing' : status;
@@ -164,8 +164,6 @@ module.exports = (function() {
     behaviors: {
       Widgets: {}
     },
-
-
     initialize: function() {
       var meta = this.model.get('meta');
       var service = meta.service;
@@ -213,9 +211,10 @@ module.exports = (function() {
     }
   });
 
-  var ActivityView = Marionette.CompositeView.extend({
-    template: compositeTemplate,
-    childViewContainer: 'ul#activity-events',
+  var ActivityView = Marionette.CollectionView.extend({
+    tagName: 'ul',
+    // template: compositeTemplate,
+    // childViewContainer: 'ul#activity-events',
     childView: ActivityItemView,
 
     initialize: function() {

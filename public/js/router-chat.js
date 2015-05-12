@@ -190,7 +190,7 @@ onready(function () {
       });
   });
 
-  var appView = new ChatIntegratedView({ el: 'body' });
+  var appView = new ChatIntegratedView({ template: false, el: 'body' });
   appView.render();
 
   new HeaderView({ model: context.troupe(), el: '#header' });

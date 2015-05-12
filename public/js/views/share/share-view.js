@@ -5,7 +5,7 @@ var Marionette = require('backbone.marionette');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var social = require('utils/social');
-var TroupeViews = require('views/base');
+var ModalView = require('views/modal');
 var cdn = require('utils/cdn');
 var template = require('./tmpl/share.hbs');
 var ZeroClipboard = require('zeroclipboard');
@@ -112,12 +112,12 @@ module.exports = (function() {
     }
   });
 
-  var Modal = TroupeViews.Modal.extend({
+  var Modal = ModalView.extend({
     initialize: function(options) {
       options = options || {};
       options.title = options.title || "Share this chat room";
 
-      TroupeViews.Modal.prototype.initialize.call(this, options);
+      ModalView.prototype.initialize.call(this, options);
       this.view = new View(options);
     },
     menuItems: [
@@ -133,4 +133,3 @@ module.exports = (function() {
 
 
 })();
-

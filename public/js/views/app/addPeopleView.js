@@ -1,6 +1,6 @@
 "use strict";
 var Marionette = require('backbone.marionette');
-var TroupeViews = require('views/base');
+var ModalView = require('views/modal');
 var Backbone = require('backbone');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
@@ -234,13 +234,13 @@ module.exports = (function() {
     modalButtons.push({ action: "share", text: "Share this room", className: "trpBtnBlue trpBtnRight"});
   }
 
-  return TroupeViews.Modal.extend({
+  return ModalView.extend({
     disableAutoFocus: true,
     initialize: function(options) {
       options = options || {};
       options.title = options.title || "Add people to this room";
 
-      TroupeViews.Modal.prototype.initialize.call(this, options);
+      ModalView.prototype.initialize.call(this, options);
       this.view = new View(options);
     },
     menuItems: modalButtons

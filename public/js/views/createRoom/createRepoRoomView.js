@@ -1,6 +1,6 @@
 "use strict";
 var Marionette = require('backbone.marionette');
-var TroupeViews = require('views/base');
+var ModalView = require('views/modal');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var RepoSelectView = require('./repoSelectView');
@@ -74,13 +74,13 @@ module.exports = (function() {
 
   });
 
-  var Modal = TroupeViews.Modal.extend({
+  var Modal = ModalView.extend({
     disableAutoFocus: true,
     initialize: function(options) {
       options = options || {};
       options.title = options.title || "Create a repository chat room";
 
-      TroupeViews.Modal.prototype.initialize.call(this, options);
+      ModalView.prototype.initialize.call(this, options);
       this.view = new View(options);
     },
     menuItems: [
@@ -96,4 +96,3 @@ module.exports = (function() {
 
 
 })();
-

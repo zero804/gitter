@@ -30,7 +30,7 @@ module.exports = (function() {
     this._widgets = [];
   };
 
-  function render(template, data) {
+  function render(template, data, view) {
     if (!template) {
      throw new Error("Cannot render the template since it's false, null or undefined.");
     }
@@ -43,9 +43,7 @@ module.exports = (function() {
     }
 
     var generatedText = templateFunc(data);
-    var view = data._view;
-
-    if(!data.renderViews || !view) return generatedText;
+    if(!data.renderViews || !view || !data.renderViews.length) return generatedText; 
 
     // Turn the text into a DOM
     var dom = $($.parseHTML(generatedText));
