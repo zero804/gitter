@@ -22,6 +22,7 @@ var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var UnreadBannerView = require('views/app/unreadBannerView');
 var RightToolbarView = require('views/righttoolbar/rightToolbarView');
 var unreadBannerModel = require('./unreadBannerModel');
+require('views/behaviors/isomorphic');
 
 require('transloadit');
 
@@ -63,6 +64,10 @@ module.exports = (function() {
     template: false,
     el: 'body',
 
+    behaviors: {
+      Isomorphic: {}
+    },
+
     ui: {
       scrollToBottom: '.js-scroll-to-bottom',
       progressBar: '#file-progress-bar',
@@ -81,49 +86,56 @@ module.exports = (function() {
      */
     dragCount: 0,
 
+    regions: {
+      toolbar: "#right-toolbar-layout",
+      chat: '#chat-container',
+      input: '#chat-input',
+      bannerTop: '#unread-banner',
+      bannerBottom: '#bottom-unread-banner'
+    },
+
     initialize: function() {
-
       // Setup the ChatView - this is instantiated once for the application, and shared between many views
-      var chatCollectionView = new ChatCollectionView({
-        template: false,
-        el: '#chat-container',
-        collection: itemCollections.chats,
-        decorators: [issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
-      }).render();
-
       this.listenTo(itemCollections.chats, 'atBottomChanged', function(isBottom) {
         this.ui.scrollToBottom.toggleClass('u-scale-zero', isBottom);
-      }.bind(this));
+      });
 
-      this.rightToolbar = new RightToolbarView({ el: "#right-toolbar-layout" });
-
-      this.chatInputView = new chatInputView.ChatInputView({
-        el: '#chat-input',
-        collection: itemCollections.chats,
-        chatCollectionView: chatCollectionView,
-        rollers: chatCollectionView.rollers
-      }).render();
-
-      new UnreadBannerView.Top({
-        el: '#unread-banner',
-        model: unreadBannerModel,
-        chatCollectionView: chatCollectionView
-      }).render();
-
-      new UnreadBannerView.Bottom({
-        el: '#bottom-unread-banner',
-        model: unreadBannerModel,
-        chatCollectionView: chatCollectionView
-      }).render();
-
-      this.chatCollectionView = chatCollectionView;
+      // this.chatCollectionView = chatCollectionView;
       this.dialogRegion = modalRegion;
+    },
 
+    initRegions: function(optionsForRegion) {
+      /* TODO: Give this stuff a proper home */
       if (hasScrollBars()) {
         $(".primary-scroll").addClass("scroller");
         $(".js-chat-input-container").addClass("scrollpush");
         $("#room-content").addClass("scroller");
       }
+
+      var chatCollectionView = new ChatCollectionView(optionsForRegion('chat', {
+        collection: itemCollections.chats,
+        decorators: [issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
+      }));
+
+      var inputRegion = new chatInputView.ChatInputView(optionsForRegion('input', {
+        collection: itemCollections.chats,
+        chatCollectionView: chatCollectionView,
+        rollers: chatCollectionView.rollers
+      }));
+
+      return {
+        chat: chatCollectionView,
+        input: inputRegion,
+        toolbar: new RightToolbarView(optionsForRegion('toolbar')),
+        bannerTop: new UnreadBannerView.Top({
+          model: unreadBannerModel,
+          chatCollectionView: this.chatCollectionView
+        }),
+        bannerBottom: new UnreadBannerView.Bottom({
+          model: unreadBannerModel,
+          chatCollectionView: this.chatCollectionView
+        })
+      };
     },
 
     onKeyBackspace: function(e) {

@@ -6,9 +6,11 @@
         {{#if oneToOneInvited}}
           {{> chat_invited}}
         {{else}}
+          <div>
           {{#each chats}}
             {{{ chatItemPrerender this lang=../lang locale=../locale}}}
           {{/each}}
+        </div>
         {{/if}}
       </div>
       {{#if initialBottom}}

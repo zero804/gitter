@@ -1,5 +1,4 @@
 "use strict";
-var $ = require('jquery');
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var context = require('utils/context');
@@ -10,15 +9,22 @@ var SearchInputView = require('views/search/search-input-view');
 var RepoInfoView = require('./repoInfo');
 var RepoInfoModel = require('collections/repo-info');
 var ActivityStream = require('./activity');
+require('views/behaviors/isomorphic');
 
 module.exports = (function() {
 
-
   var RightToolbarLayout = Marionette.LayoutView.extend({
+    className: 'right-toolbar right-toolbar--collapsible',
+    behaviors: {
+      Isomorphic: {}
+    },
 
     regions: {
       search: '#search-results',
-      repo_info: "#repo-info"
+      searchInput: '.js-search',
+      repo_info: "#repo-info",
+      activity: '#activity',
+      roster: '#people-roster'
     },
 
     events: {
@@ -33,87 +39,83 @@ module.exports = (function() {
     },
 
     initialize: function () {
-      // People View
-      new PeopleCollectionView.ExpandableRosterView({
-        rosterCollection: itemCollections.roster,
-        el: $('#people-roster')
-      });
-
-      // Repo info
-      if (context.troupe().get('githubType') === 'REPO') {
-        var repo = new RepoInfoModel();
-        repo.fetch({ data: { repo: context.troupe().get('uri') } });
-        
-        this.repo_info.show(new RepoInfoView({ model: repo }));
-      }
-
-      // Activity
-      new ActivityStream({
-        el: $('#activity'),
-        collection: itemCollections.events
-      });
-
       // Search
-      var searchState = new Backbone.Model({
+      this.searchState = new Backbone.Model({
         searchTerm: '',
         active: false,
         isLoading: false
       });
 
-      new SearchInputView({
-        el: $('.js-search'),
-        model: searchState
-      }).render();
-
-      var searchView = new SearchView({
-        el: $('#search-results'),
-        model: searchState
-      }).render();
-
-      searchView.on('search:expand', function () {
-        $('.right-toolbar').addClass('right-toolbar--expanded');
-      });
-
-      searchView.on('search:collapse', function () {
-        $('.right-toolbar').removeClass('right-toolbar--expanded');
-      });
-
-      searchView.on('search:show', function () {
-        $('#toolbar-top-content').hide();
-        $('#zendesk-footer').hide();
-      }.bind(this));
-
-      searchView.on('search:hide', function () {
-        $('#toolbar-top-content').show();
-        $('#zendesk-footer').show();
-      }.bind(this));
-
-      itemCollections.events.on('add reset sync', function() {
-
-        if (itemCollections.events.length >0) {
+      // TODO: use a CompositeView and get rid of this stuff
+      this.listenTo(itemCollections.events, 'add reset sync', function() {
+        if (itemCollections.events.length) {
           this.$el.find('#activity-header').show();
           itemCollections.events.off('add reset sync', null, this);
         } else {
           if (context().permissions.admin) {
             this.$el.find('#activity-header').show();
           }
-
         }
-      }, this);
+      });
+    },
+
+    initRegions: function(optionsForRegion) {
+      // Repo info
+      var repoInfoView;
+      if (context.troupe().get('githubType') === 'REPO') {
+        var repo = new RepoInfoModel();
+        repo.fetch({ data: { repo: context.troupe().get('uri') } });
+
+        repoInfoView = new RepoInfoView(optionsForRegion('repo_info', { model: repo }));
+      }
+
+      var searchView = new SearchView(optionsForRegion('search', { model: this.searchState }));
+      // TODO: use region events for this stuff......
+      this.listenTo(searchView, 'search:expand', function () {
+        // TODO: use this.UI
+        this.$el.addClass('right-toolbar--expanded');
+      });
+
+      this.listenTo(searchView, 'search:collapse', function () {
+        // TODO: use this.UI
+        this.$el.removeClass('right-toolbar--expanded');
+      });
+
+      this.listenTo(searchView, 'search:show', function () {
+        // TODO: use this.UI
+        this.$el.find('#toolbar-top-content').hide();
+        this.$el.find('#zendesk-footer').hide();
+      });
+
+      this.listenTo(searchView, 'search:hide', function () {
+        // TODO: use this.UI
+        this.$el.find('#toolbar-top-content').show();
+        this.$el.find('#zendesk-footer').show();
+      });
+
+      return {
+        search: searchView,
+        searchInput: new SearchInputView(optionsForRegion('searchInput', { model: this.searchState })),
+        repo_info: repoInfoView,
+        activity: new ActivityStream(optionsForRegion('activity', { collection: itemCollections.events })),
+        roster: new PeopleCollectionView.ExpandableRosterView(optionsForRegion('roster', {
+          rosterCollection: itemCollections.roster
+        }))
+      };
     },
 
     showPeopleList: function() {
-      $('#repo-info').hide();
-      $('#people-roster').show();
-      $('#people-header').addClass('selected');
-      $('#info-header').removeClass('selected');
+      this.$el.find('#repo-info').hide();
+      this.$el.find('#people-roster').show();
+      this.$el.find('#people-header').addClass('selected');
+      this.$el.find('#info-header').removeClass('selected');
     },
 
     showRepoInfo: function() {
-      $('#people-roster').hide();
-      $('#repo-info').show();
-      $('#people-header').removeClass('selected');
-      $('#info-header').addClass('selected');
+      this.$el.find('#people-roster').hide();
+      this.$el.find('#repo-info').show();
+      this.$el.find('#people-header').removeClass('selected');
+      this.$el.find('#info-header').addClass('selected');
     }
 
   });

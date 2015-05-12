@@ -5,7 +5,6 @@ var context = require('utils/context');
 var chatModels = require('collections/chat');
 var AvatarView = require('views/widgets/avatar');
 var Marionette = require('backbone.marionette');
-var TroupeViews = require('views/base');
 var moment = require('moment');
 var uiVars = require('views/app/uiVars');
 var Popover = require('views/popover');
@@ -16,6 +15,7 @@ var appEvents = require('utils/appevents');
 var cocktail = require('cocktail');
 var chatCollapse = require('utils/collapsed-item-client');
 var KeyboardEventMixins = require('views/keyboard-events-mixin');
+var LoadingCollectionMixin = require('views/loading-mixin');
 var apiClient = require('components/apiClient');
 var RAF = require('utils/raf');
 require('views/behaviors/unread-items');
@@ -621,7 +621,7 @@ module.exports = (function() {
       this.collection.unlisten();
     }
   });
-  cocktail.mixin(ReadByView, TroupeViews.LoadingCollectionMixin);
+  cocktail.mixin(ReadByView, LoadingCollectionMixin);
 
   var ReadByPopover = Popover.extend({
     initialize: function(options) {
