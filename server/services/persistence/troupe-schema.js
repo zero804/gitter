@@ -85,6 +85,8 @@ module.exports = {
       dateDeleted: { type: Date },
       dateLastSecurityCheck: { type: Date },
       noindex: { type: Boolean, 'default': false},
+      githubId: { type: Number, default: null },
+      renamedLcUris: [String],
       _nonce: { type: Number },
       _tv: { type: 'MongooseNumber', 'default': 0 }
     });
@@ -97,6 +99,8 @@ module.exports = {
     // Ideally we should never search against URI, only lcURI
     TroupeSchema.index({ uri: 1 }, { unique: true, sparse: true });
     TroupeSchema.index({ lcUri: 1 }, { unique: true, sparse: true });
+    TroupeSchema.index({ githubId: 1 }, { /* XXX we cannot make this unique as there may be duplicates in existing data unfortunately */ });
+    TroupeSchema.index({ renamedLcUris: 1 });
     TroupeSchema.index({ parentId: 1 });
     TroupeSchema.index({ lcOwner: 1 });
     TroupeSchema.index({ ownerUserId: 1 });

@@ -1,4 +1,6 @@
+/* jshint -W069, -W030, -W033 */
 "use strict";
+
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
 require('./mixpanel');
@@ -54,7 +56,7 @@ module.exports = (function() {
   function trackPageView(routeName) {
     if (window.mixpanel) {
 
-      if (context.getUserId()) 
+      if (context.getUserId())
         window.mixpanel.register({ userStatus: 'ACTIVE'});
 
       var username = context().user && context().user.username;
@@ -109,7 +111,3 @@ module.exports = (function() {
   };
 
 })();
-
-
-
-

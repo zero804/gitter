@@ -19,7 +19,7 @@ CLEAN_FILES = $(shell echo output/ coverage/ cobertura-coverage.xml html-report/
 endif
 PATH := ./node_modules/.bin:$(PATH)
 
-.PHONY: build clean test npm sprites npm-quick npm-full
+.PHONY: build clean test npm sprites npm-quick npm-full performance-tests
 
 build: clean npm
 	gulp
@@ -61,6 +61,9 @@ post-test-maintain-data:
 	MODIFY=true ./scripts/datamaintenance/execute.sh || true
 
 continuous-integration: build
+
+performance-tests: clean npm
+	gulp test-perf
 
 clean-embedded-chat:
 	rm -rf output/embedded output/embedded.tgz
