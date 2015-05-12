@@ -112,12 +112,12 @@
   }
 
   &.unread .chat-item__container {
-    border-right: 2px solid @green;
+    border-left: 2px solid @green;
     transition: 1s border linear;
   }
 
   &.unread.mention .chat-item__container {
-    border-right: 2px solid @orange;
+    border-left: 2px solid @orange;
     transition: 2s border linear;
   }
 
@@ -141,10 +141,11 @@
 
 .chat-item__aside {
   float: left;
+  margin-left: 0.4em;
 }
 
 .chat-item__avatar {
-  margin-left: 2em;
+  margin-left: 1.6em;
 
   @media @mobile {
     margin-left: 0;
@@ -171,7 +172,7 @@
 
 .chat-item__container {
   box-sizing: border-box;
-  border-right: 2px solid transparent;
+  border-left: 2px solid transparent;
   margin: 0.888em 12px 0px;
   text-align: left;
   transition: 1s border linear;
@@ -357,14 +358,8 @@
 }
 
 .chat-item__status {
-  .chat-item__from {
+  .chat-item__text {
     color: #aaa;
-  }
-
-  .chat-item__time {
-    @media @mobile {
-      display: none;
-    }
   }
 }
 
