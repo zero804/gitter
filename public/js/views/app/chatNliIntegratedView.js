@@ -42,7 +42,7 @@ module.exports = (function() {
       this.userCollection = options.userCollection;
 
       this.listenTo(this.chatCollection, 'atBottomChanged', function (isBottom) {
-        this.ui.scrollToBottom.toggleClass('u-scale-zero', isBottom);
+        this.ui.scrollToBottom.toggleClass('scrollHelper--hidden', isBottom);
       });
 
       var chatCollectionView = new ChatCollectionView({

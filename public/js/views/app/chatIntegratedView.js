@@ -94,7 +94,7 @@ module.exports = (function() {
       chatCollectionView.bindUIElements();
 
       this.listenTo(itemCollections.chats, 'atBottomChanged', function(isBottom) {
-        this.ui.scrollToBottom.toggleClass('u-scale-zero', isBottom);
+        this.ui.scrollToBottom.toggleClass('scrollHelper--hidden', isBottom);
       }.bind(this));
 
       this.rightToolbar = new RightToolbarView({ el: "#right-toolbar-layout" });
