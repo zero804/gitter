@@ -30,18 +30,6 @@ module.exports = (function() {
     this._widgets = [];
   };
 
-  function replaceElementWithWidget(element, Widget, widgetManager, options) {
-    var widget = new Widget(options.model);
-    widget.render();
-
-    $(element).replaceWith(widget.el);
-
-    // Create a region
-    widgetManager.add(widget);
-
-    return widget;
-  }
-
   function render(template, data) {
     if (!template) {
      throw new Error("Cannot render the template since it's false, null or undefined.");
@@ -61,7 +49,7 @@ module.exports = (function() {
 
     // Turn the text into a DOM
     var dom = $($.parseHTML(generatedText));
-    dom.addClass("view"); // TODO: drop this class in future
+    // dom.addClass("view"); // TODO: drop this class in future
 
     var widgets = dom.find('view');
     var widgetManager = view.widgetManager;
@@ -76,19 +64,17 @@ module.exports = (function() {
       var id = this.getAttribute('data-id'),
       attrs = data.renderViews[id];
 
-      // var self = this;
-      var CachedWidget = cachedWidgets[attrs.widgetName];
-      if(CachedWidget) {
-        replaceElementWithWidget(this, CachedWidget, widgetManager, attrs);
-      }/*else {
-        NO LONG do async load
-        require(['views/widgets/' + attrs.widgetName], function(Widget) {
-          cachedWidgets[attrs.widgetName] = Widget;
-          replaceElementWithWidget(self, Widget, widgetManager, attrs);
-        });
-      }*/
-    });
+      var Widget = cachedWidgets[attrs.widgetName];
+      var widget = new Widget(attrs.model);
+      widget.render();
 
+      this.parentNode.replaceChild(widget.el, this);
+
+      // Create a region
+      widgetManager.add(widget);
+
+      return widget;
+    });
 
     return dom;
   }
@@ -102,10 +88,10 @@ module.exports = (function() {
         return { _view: this };
       };
     },
-    onBeforeClose: function() {
-      if(this.widgetManager) {
-        this.widgetManager.close();
-        this.widgetManager = null;
+    onClose: function() {
+      if(this.view.widgetManager) {
+        this.view.widgetManager.close();
+        this.view.widgetManager = null;
       }
     }
   });
@@ -124,4 +110,3 @@ module.exports = (function() {
 
 
 })();
-

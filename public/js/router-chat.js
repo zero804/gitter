@@ -8,13 +8,11 @@ var liveContext = require('components/live-context');
 var appEvents = require('utils/appevents');
 var log = require('utils/log');
 var ChatIntegratedView = require('views/app/chatIntegratedView');
-var itemCollections = require('collections/instances/integrated-items');
 var onready = require('./utils/onready');
 var highlightPermalinkChats = require('./utils/highlight-permalink-chats');
 var apiClient = require('components/apiClient');
 var HeaderView = require('views/app/headerView');
 var frameUtils = require('./utils/frame-utils');
-var userModels = require('collections/users');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -180,26 +178,14 @@ onready(function () {
     });
   };
 
-  // FIXME This is very inneficient, it was kind of ok before because it was 
-  // using the users live collection but that is gone now
   appEvents.on('command.room.remove', function(username) {
-    var userCollection = new userModels.UserCollection();
-    userCollection.fetch();
-    userCollection.once('sync', function() {
-      var user = userCollection.findWhere({username: username});
+    if (!username) return;
 
-      if (user) {
-        apiClient.room.delete("/users/" + user.id, "")
-          .then(function() {
-            userCollection.remove(user);
-          })
-          .fail(function(xhr) {
-            if (xhr.status < 500) notifyRemoveError(xhr.responseJSON.error);
-            else notifyRemoveError('');
-        });
-      }
-      else notifyRemoveError('User '+ username +' was not found in this room.');
-    });
+    apiClient.room.delete("/users/" + username + '?type=username', "")
+      .fail(function(xhr) {
+        if (xhr.status < 500) notifyRemoveError(xhr.responseJSON.error);
+        else notifyRemoveError('');
+      });
   });
 
   var appView = new ChatIntegratedView({ el: 'body' });
@@ -239,14 +225,10 @@ onready(function () {
     },
 
     people: function() {
-      require.ensure(['views/people/peopleCollectionView'], function(require) {
-        var peopleCollectionView = require('views/people/peopleCollectionView');
+      require.ensure(['views/people/people-modal'], function(require) {
+        var PeopleModal = require('views/people/people-modal');
 
-        // seed the collection with the roster while wait for the full list to load
-        var userCollection = new userModels.UserCollection(itemCollections.roster.models);
-        userCollection.fetch();
-
-        appView.dialogRegion.show(new peopleCollectionView.Modal({ collection: userCollection }));
+        appView.dialogRegion.show(new PeopleModal());
       });
     },
 

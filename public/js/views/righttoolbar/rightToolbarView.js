@@ -34,7 +34,7 @@ module.exports = (function() {
 
     initialize: function () {
       // People View
-      new PeopleCollectionView.ExpandableRosterView({
+      new PeopleCollectionView({
         rosterCollection: itemCollections.roster,
         el: $('#people-roster')
       });

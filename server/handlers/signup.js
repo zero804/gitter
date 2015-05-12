@@ -49,18 +49,14 @@ module.exports = {
           });
         });
 
-      app.get('/about', function(req, res, next) {
-        res.render('about', {
-          socialMetadata: social.getMetadata(),
-          billingBaseUrl: nconf.get('web:billingBaseUrl')
-        });
+      // old campaign that still gets some hits
+      app.get('/about', function(req, res) {
+        res.redirect(nconf.get('web:homeurl'));
       });
 
-      app.get('/about/teams', function(req, res, next) {
-        res.render('teams', {
-          socialMetadata: social.getMetadata(),
-          billingBaseUrl: nconf.get('web:billingBaseUrl')
-        });
+      // old campaign that still gets some hits
+      app.get('/about/teams', function(req, res) {
+        res.redirect(nconf.get('web:homeurl'));
       });
 
       if (nconf.get('web:homeurl') !== '/') {
