@@ -31,7 +31,6 @@
     "gitter-services": "git+ssh://git@github.com:gitterHQ/services.git#1.10.1",
     "handlebars": "^2.0.0",
     "heapdump": "^0.2.9",
-    "highlight.js": "git://github.com/gitterHQ/highlight.js#6523cbb6e3f2a9374ea96e82f977ef57ef8cdf59",
     "i18n": "~0.4.1",
     "i18n-2": "^0.4.6",
     "imagemagick": "0.1.2",
