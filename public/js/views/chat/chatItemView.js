@@ -17,6 +17,7 @@ var cocktail = require('cocktail');
 var chatCollapse = require('utils/collapsed-item-client');
 var KeyboardEventMixins = require('views/keyboard-events-mixin');
 var RAF = require('utils/raf');
+var toggle = require('utils/toggle');
 require('views/behaviors/unread-items');
 require('views/behaviors/widgets');
 require('views/behaviors/sync-status');
@@ -273,7 +274,7 @@ module.exports = (function() {
       if(!changes || 'isCollapsible' in changes) {
         var isCollapsible = !!this.model.get('isCollapsible');
         var $collapse = this.ui.collapse;
-        $collapse.toggle(isCollapsible);
+        toggle($collapse[0], isCollapsible);
       }
     },
 
@@ -462,7 +463,7 @@ module.exports = (function() {
 
       self.renderText();
       self.decorate();
-      
+
       // Give the browser a second to load the content
       self.embedTimeout = setTimeout(function() {
         var embeds = self.$el.find('.embed');
