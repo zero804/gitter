@@ -2,7 +2,7 @@
 var $ = require('jquery');
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
-var Mutant = require('mutant');
+var Mutant = require('mutantjs');
 var popoverTemplate = require('./tmpl/popover.hbs');
 
 module.exports = (function() {

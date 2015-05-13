@@ -80,7 +80,6 @@ module.exports = (function() {
       this.view = new PeopleCollectionView(options);
     }
   });
-
   return {
     ExpandableRosterView: ExpandableRosterView,
     Modal: AllUsersModal

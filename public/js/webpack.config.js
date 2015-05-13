@@ -109,7 +109,7 @@ var webpackConfig = {
 
 if(devMode) {
   // See http://webpack.github.io/docs/configuration.html#devtool
-  webpackConfig.devtool = 'cheap-module-eval-source-map';
+  webpackConfig.devtool = 'source-map';
   webpackConfig.cache = true;
 } else {
   // webpackConfig.plugins.push(new DedupePlugin());
