@@ -157,6 +157,7 @@
     "mocha": "^2.1.0",
     "mocha-istanbul": "0.2.0",
     "mocha-phantomjs": "~3.1.6",
+    "mutantjs": "^0.2.0",
     "node-spritesheet": "trevorah/node-spritesheet",
     "postcss": "3.0.0",
     "proxyquire": "0.4.0",
