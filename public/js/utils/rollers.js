@@ -1,5 +1,5 @@
 "use strict";
-var Mutant = require('mutant');
+var Mutant = require('mutantjs');
 var RAF = require('utils/raf');
 var _ = require('underscore');
 
@@ -37,7 +37,19 @@ module.exports = (function() {
 
     var adjustScroll = this.adjustScroll.bind(this);
 
-    this.mutant = new Mutant(target, adjustScroll, { transitions: true, observers: { attributes: true, characterData: true  } } );
+    this.mutant = new Mutant(target, adjustScroll, {
+      transitions: true,
+      observers: { attributes: false, characterData: false },
+      ignoreTransitions: ['opacity'], // Opacity will never trigger a reflow...
+      //ignoreFilter: function(mutationRecords) {
+      //  var filter = mutationRecords.reduce(function(accum, r) {
+      //    var v = r.type === 'attributes' && r.attributeName === 'class' && r.target.id === 'chat-container';
+      //    accum = accum && v;
+      //    return accum;
+      //  }, true);
+      //  return filter;
+      //}
+    });
 
     var _trackLocation = _.throttle(this.trackLocation.bind(this), 100);
     target.addEventListener('scroll', _trackLocation, false);
