@@ -7,11 +7,10 @@ module.exports = (function() {
 
 
   /** @const */ var TRACK_BOTTOM = 1;
-  /** @const */ var TRACK_NO_PASS = 2;
   /** @const */ var STABLE = 3;
 
   /** Number of pixels we need to be within before we say we're at the bottom */
-  /** @const */ var BOTTOM_MARGIN = 5;
+  /** @const */ var BOTTOM_MARGIN = 10;
   /** Number of pixels to show above a message that we scroll to. Context FTW!
   /** @const */ var TOP_OFFSET = 300;
 
@@ -23,10 +22,8 @@ module.exports = (function() {
     this._childContainer = childContainer || target;
     this._mutationHandlers = {};
     this._mutationHandlers[TRACK_BOTTOM] = this.updateTrackBottom.bind(this);
-    this._mutationHandlers[TRACK_NO_PASS] = this.updateTrackNoPass.bind(this);
     this._mutationHandlers[STABLE] = this.updateStableTracking.bind(this);
 
-    this._nopass = null;
     this._stableElement = null;
 
     if (options.doNotTrack) {
@@ -83,14 +80,6 @@ module.exports = (function() {
       continuous(this.adjustScroll.bind(this), ms);
     },
 
-    /* Specify an element that should not be scrolled past */
-    trackUntil: function(element, force) {
-      if(force || this._mode != STABLE) {
-        this._nopass = element;
-        this._mode = TRACK_NO_PASS;
-      }
-    },
-
     initTrackingMode: function() {
       if(this.isScrolledToBottom()) {
         this._mode = TRACK_BOTTOM;
@@ -102,8 +91,6 @@ module.exports = (function() {
 
     stable: function(stableElement) {
       var target = this._target;
-
-      this._nopass = null;
       this._mode = STABLE;
 
       if (stableElement) {
@@ -127,17 +114,8 @@ module.exports = (function() {
       }
     },
 
-    cancelTrackUntil: function() {
-      if(!this._nopass) return;
-
-      this._nopass = null;
-
-      this.initTrackingMode();
-    },
-
     disableTrackBottom: function() {
       this.disableTrackBottom = true;
-
     },
 
     enableTrackBottom: function() {
@@ -178,7 +156,6 @@ module.exports = (function() {
       var scrollTop = target.scrollHeight - target.clientHeight;
       target.scrollTop = scrollTop;
 
-      delete this._nopass;
       delete this._stableElement;
       delete this._stableElementFromBottom;
       this._mode = TRACK_BOTTOM;
@@ -221,34 +198,6 @@ module.exports = (function() {
       continuous(this.scrollToBottom.bind(this), ms);
     },
 
-    updateTrackNoPass: function() {
-      var target = this._target;
-      var targetScrollHeight = target.scrollHeight;
-      var targetClientHeight = target.clientHeight;
-
-      // How far down are we?
-      var scrollTop = targetScrollHeight - targetClientHeight;
-
-      // Get the offset of the element that we should not pass
-      var nopassOffset = this._nopass.offsetTop - target.offsetTop;
-      if(scrollTop < nopassOffset - TOP_OFFSET) {
-        target.scrollTop = scrollTop;
-      } else {
-        target.scrollTop = nopassOffset;
-        this._nopass = null;
-        this._mode = STABLE;
-
-        this._stableElement = this.getBottomMostVisibleElement();
-
-        // TODO: check that the element is within the targets DOM heirachy
-        var scrollBottom = target.scrollTop + target.clientHeight;
-        var stableElementTop = this._stableElement.offsetTop - target.offsetTop;
-
-        // Calculate an record the distance of the stable element to the bottom of the view
-        this._stableElementFromBottom = scrollBottom - stableElementTop;
-      }
-    },
-
     updateStableTracking: function() {
       if(!this._stableElement) return;
       var target = this._target;
@@ -268,15 +217,8 @@ module.exports = (function() {
 
       if(!this.modeLocked) {
         if(atBottom) {
-          if(this._nopass) {
-            if(this._mode != TRACK_NO_PASS) {
-              this._mode = TRACK_NO_PASS;
-
-            }
-          } else {
-            if(this._mode != TRACK_BOTTOM) {
-              this._mode = TRACK_BOTTOM;
-            }
+          if(this._mode != TRACK_BOTTOM) {
+            this._mode = TRACK_BOTTOM;
           }
         } else {
           if(this._mode != STABLE) {
@@ -344,4 +286,3 @@ module.exports = (function() {
   return Rollers;
 
 })();
-
