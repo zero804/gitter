@@ -1,7 +1,6 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
-var RAF = require('utils/raf');
 var template = require('./tmpl/search-input.hbs');
 
 var SearchInputView = Marionette.ItemView.extend({
@@ -47,11 +46,11 @@ var SearchInputView = Marionette.ItemView.extend({
     this.model.set('searchTerm', e.target.value.trim());
   },
 
-  onResultsLoading: function(model, isLoading) {
+  onResultsLoading: function(model, isLoading) { // jshint unused:true
     this.ui.searchIcon.toggleClass('fetching', isLoading);
   },
 
-  onActiveChange: function(model, isActive) {
+  onActiveChange: function(model, isActive) { // jshint unused:true
     this.$el.toggleClass('active', isActive);
 
     var $input = this.ui.input;

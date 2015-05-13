@@ -1,8 +1,8 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
 var _ = require('underscore');
-var TroupeViews = require('views/base');
+var ModalView = require('views/modal');
 var itemTemplate = require('./tmpl/people-modal-result.hbs');
 var apiClient = require('components/apiClient');
 var template = require('./tmpl/people-modal.hbs');
@@ -78,8 +78,8 @@ var View = Marionette.CompositeView.extend({
     clear: '.js-people-modal-search-clear',
     results: 'ul'
   },
-  itemViewContainer: '@ui.results',
-  itemView: UserView,
+  childViewContainer: '@ui.results',
+  childView: UserView,
   emptyView: EmptyView,
   events: {
     'input @ui.search': 'onSearchInput',
@@ -117,7 +117,7 @@ var View = Marionette.CompositeView.extend({
   }
 });
 
-var Modal = TroupeViews.Modal.extend({
+var Modal = ModalView.extend({
   initialize: function(options) {
     options = options || {};
     options.title = "People";
@@ -129,7 +129,7 @@ var Modal = TroupeViews.Modal.extend({
     // make the user collection seem live
     users.listenTo(room, 'change:userCount', users.fetchWithLimit);
 
-    TroupeViews.Modal.prototype.initialize.call(this, options);
+    ModalView.prototype.initialize.call(this, options);
     this.view = new View({ collection: users });
   }
 });
