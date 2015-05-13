@@ -11,7 +11,7 @@ module.exports = (function() {
   /** @const */ var STABLE = 3;
 
   /** Number of pixels we need to be within before we say we're at the bottom */
-  /** @const */ var BOTTOM_MARGIN = 30;
+  /** @const */ var BOTTOM_MARGIN = 5;
   /** Number of pixels to show above a message that we scroll to. Context FTW!
   /** @const */ var TOP_OFFSET = 300;
 
