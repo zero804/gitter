@@ -17,11 +17,12 @@ var cocktail = require('cocktail');
 var chatCollapse = require('utils/collapsed-item-client');
 var KeyboardEventMixins = require('views/keyboard-events-mixin');
 var RAF = require('utils/raf');
+var toggle = require('utils/toggle');
 require('views/behaviors/unread-items');
 require('views/behaviors/widgets');
 require('views/behaviors/sync-status');
 require('views/behaviors/highlight');
-require('bootstrap_tooltip');
+require('views/behaviors/tooltip');
 
 module.exports = (function() {
 
@@ -59,11 +60,16 @@ module.exports = (function() {
     },
 
     ui: {
-      collapse: '.js-chat-item-collapse'
+      collapse: '.js-chat-item-collapse',
+      text: '.js-chat-item-text'
     },
 
     behaviors: {
       Widgets: {},
+      Tooltip: {
+        '.js-chat-item-edit': { titleFn: 'getEditTooltip' },
+        '.js-chat-item-collapse': { titleFn: 'getCollapseTooltip' }
+      },
       UnreadItems: {
         unreadItemType: 'chat',
       },
@@ -109,6 +115,8 @@ module.exports = (function() {
         var notEditableInMS = sent ? sent.valueOf() - Date.now() + EDIT_WINDOW : EDIT_WINDOW;
         this.timeChangeTimeout = setTimeout(timeChange, notEditableInMS + 50);
       }
+
+      this.listenToOnce(this, 'messageInViewport', this.decorate);
     },
 
     /** XXX TODO NB: change this to onClose once we've moved to Marionette 2!!!! */
@@ -176,16 +184,10 @@ module.exports = (function() {
     },
 
     renderText: function() {
-      // We need to parse the text a little to hyperlink known links and escape html to prevent injection
-      // var links = this.model.get('urls') || [];
-      // var mentions = this.model.get('mentions') || [];
-      var issues = [];
-      if (context.troupe().get('githubType') === 'REPO') {
-        issues = this.model.get('issues') || [];
-      }
+      var model = this.model;
 
       // Will only use the text when a value hasn't been returned from the server
-      var html = this.model.get('html') || _.escape(this.model.get('text'));
+      var html = model.get('html') || _.escape(model.get('text'));
 
       // Handle empty messages as deleted
       if (html.length === 0) {
@@ -193,9 +195,13 @@ module.exports = (function() {
         this.$el.addClass('deleted');
       }
 
-      this.$el.find('.js-chat-item-text').html(html);
+      // This needs to be fast. innerHTML is much faster than .html()
+      // by an order of magnitude
+      this.ui.text[0].innerHTML = html;
+    },
 
-      _.each(this.decorators, function (decorator) {
+    decorate: function() {
+      this.decorators.forEach(function(decorator) {
         decorator.decorate(this);
       }, this);
     },
@@ -204,14 +210,8 @@ module.exports = (function() {
       this.renderText();
       this.updateRender();
       this.timeChange();
-
-      if (!this.compactView) {
-        var editIcon = this.$el.find('.js-chat-item-edit');
-        var collapseIcon = this.$el.find('.js-chat-item-collapse');
-        editIcon.tooltip({ container: 'body', title: this.getEditTooltip.bind(this) });
-        collapseIcon.tooltip({ container: 'body', title: this.getCollapseTooltip.bind(this) });
-      }
     },
+
 
     timeChange: function() {
       this.$el.toggleClass('isEditable', this.isInEditablePeriod());
@@ -272,32 +272,10 @@ module.exports = (function() {
       }
 
       if(!changes || 'isCollapsible' in changes) {
-        var isCollapsible = this.model.get('isCollapsible');
-        if(isCollapsible) {
-          if (this.$el.find('.js-chat-item-collapse').length) return;
-
-          var collapseElement = $(document.createElement('div'));
-          var icon = $(document.createElement('i'));
-          icon.addClass('octicon');
-
-          collapseElement.append(icon);
-          collapseElement.addClass('js-chat-item-collapse');
-
-          if(this.model.get('collapsed')) {
-            icon.addClass('octicon-unfold');
-            collapseElement.addClass('chat-item__icon--expand');
-          } else {
-            collapseElement.addClass('chat-item__icon--collapse');
-            icon.addClass('octicon-fold');
-          }
-
-          this.$el.find('.js-chat-item-details').append(collapseElement);
-        } else {
-          this.$el.find('.js-chat-item-collapse').remove();
-        }
+        var isCollapsible = !!this.model.get('isCollapsible');
+        var $collapse = this.ui.collapse;
+        toggle($collapse[0], isCollapsible);
       }
-
-
     },
 
     getEditTooltip: function() {
@@ -416,7 +394,7 @@ module.exports = (function() {
     },
 
     collapseEmbeds: function() {
-      this.bindUIElements();
+      // this.bindUIElements();
       var self = this;
       var embeds = self.$el.find('.embed');
       var icon = this.ui.collapse.find('i');
@@ -429,7 +407,7 @@ module.exports = (function() {
       icon.addClass('octicon-unfold');
 
       if(self.rollers) {
-        embeds.each(function(i, e) {
+        embeds.each(function(i, e) { // jshint unused:true
           self.rollers.startTransition(e, 500);
         });
       }
@@ -445,7 +423,7 @@ module.exports = (function() {
     },
 
     expandEmbeds: function() {
-      this.bindUIElements();
+      // this.bindUIElements();
       var self = this;
       clearTimeout(self.embedTimeout);
       var icon = this.ui.collapse.find('i');
@@ -457,7 +435,7 @@ module.exports = (function() {
 
       function adjustMaxHeight(embeds) {
         setTimeout(function() {
-          embeds.each(function(i, e) {
+          embeds.each(function(i, e) { // jshint unused:true
             var h = $(e).height();
             if(h <= MAX_HEIGHT) {
               $(e).css("max-height", h + "px");
@@ -484,13 +462,14 @@ module.exports = (function() {
       };
 
       self.renderText();
+      self.decorate();
 
       // Give the browser a second to load the content
       self.embedTimeout = setTimeout(function() {
         var embeds = self.$el.find('.embed');
 
         if(self.rollers) {
-          embeds.each(function(i, e) {
+          embeds.each(function(i, e) {  // jshint unused:true
             self.rollers.startTransition(e, 500);
           });
         }
@@ -513,7 +492,7 @@ module.exports = (function() {
 
     showInput: function() {
       //var isAtBottom = this.scrollDelegate.isAtBottom();
-      var chatInputText = this.$el.find('.js-chat-item-text');
+      var chatInputText = this.ui.text;
 
       // create inputview
       chatInputText.html("<textarea class='trpChatInput'></textarea>");
@@ -593,6 +572,7 @@ module.exports = (function() {
         window.getSelection().selectAllChildren(this.el);
       }
     },
+
     onDblClick: function() {
       if (!window.getSelection) return;
       var self = this;
@@ -600,6 +580,7 @@ module.exports = (function() {
         self.dblClickTimer = null;
       }, 200);
     }
+
   });
 
   cocktail.mixin(ChatItemView, KeyboardEventMixins);
