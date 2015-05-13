@@ -77,7 +77,7 @@ module.exports = (function() {
       }
 
       var fullTime = this.time.format("LLL", { lang: lang });
-      this.el.innerText = v;
+      this.el.textContent = v;
       this.el.setAttribute('title', fullTime);
 
       this.triggerMethod("render", this);

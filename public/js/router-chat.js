@@ -8,13 +8,11 @@ var liveContext = require('components/live-context');
 var appEvents = require('utils/appevents');
 var log = require('utils/log');
 var ChatIntegratedView = require('views/app/chatIntegratedView');
-var itemCollections = require('collections/instances/integrated-items');
 var onready = require('./utils/onready');
 var highlightPermalinkChats = require('./utils/highlight-permalink-chats');
 var apiClient = require('components/apiClient');
 var HeaderView = require('views/app/headerView');
 var frameUtils = require('./utils/frame-utils');
-var userModels = require('collections/users');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -229,14 +227,10 @@ onready(function () {
     },
 
     people: function() {
-      require.ensure(['views/people/peopleCollectionView'], function(require) {
-        var peopleCollectionView = require('views/people/peopleCollectionView');
+      require.ensure(['views/people/people-modal'], function(require) {
+        var PeopleModal = require('views/people/people-modal');
 
-        // seed the collection with the roster while wait for the full list to load
-        var userCollection = new userModels.UserCollection(itemCollections.roster.models);
-        userCollection.fetch();
-
-        appView.dialogRegion.show(new peopleCollectionView.Modal({ collection: userCollection }));
+        appView.dialogRegion.show(new PeopleModal());
       });
     },
 
