@@ -477,14 +477,6 @@ module.exports = (function() {
       }
     },
 
-    onKeyPageUp: function() {
-      console.log('pageup');
-    },
-
-    onKeyPageDown: function() {
-      appEvents.trigger('chatCollectionView:pageDown');
-    },
-
     processInput: function() {
       var cmd = commands.findMatch(this.$el.val());
       if(cmd && cmd.action) {
