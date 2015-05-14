@@ -9,6 +9,7 @@ var SuggestedCollectionView = require('./suggested-room-collection-view');
 var isMobile = require('utils/is-mobile');
 var isNative = require('utils/is-native');
 var TroupeCollections = require('collections/troupes');
+require('views/behaviors/isomorphic');
 
 module.exports = (function() {
 
@@ -28,12 +29,19 @@ module.exports = (function() {
       suggestedRooms: "#suggested-room-list"
     },
 
+    behaviors: {
+      Isomorphic: {}
+    },
+
+    initRegions: function(optionsForRegion) {
+      return {
+        orgs: new OrgCollectionView(optionsForRegion('orgs', { collection: troupeCollections.orgs })),
+        suggestedRooms: new SuggestedCollectionView(optionsForRegion('suggestedRooms', { collection: suggestedRoomCollection }))
+      };
+    },
+
     onRender: function() {
-      $('#header-wrapper').hide();
-      this.orgs.show(new OrgCollectionView({
-        collection: troupeCollections.orgs
-      }));
-      this.suggestedRooms.show(new SuggestedCollectionView({ collection: suggestedRoomCollection }));
+      $('#header-wrapper').hide(); // Why?
     },
 
     getUserTimestamp: function(id) {

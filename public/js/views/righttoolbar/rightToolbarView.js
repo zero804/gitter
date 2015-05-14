@@ -19,6 +19,13 @@ module.exports = (function() {
       Isomorphic: {}
     },
 
+    ui: {
+      header: '#toolbar-top-content',
+      footer: '#zendesk-footer',
+      rosterHeader: '#people-header',
+      repoInfoHeader: '#info-header'
+    },
+
     regions: {
       search: '#search-results',
       searchInput: '.js-search',
@@ -28,10 +35,17 @@ module.exports = (function() {
     },
 
     events: {
-      'click #upgrade-auth': 'onUpgradeAuthClick',
-      'click #people-header' : 'showPeopleList',
-      'click #info-header' : 'showRepoInfo',
-      'submit #upload-form': 'upload'
+      'click #upgrade-auth':  'onUpgradeAuthClick',
+      'click #people-header': 'showPeopleList',
+      'click #info-header':   'showRepoInfo',
+      'submit #upload-form':  'upload'
+    },
+
+    childEvents: {
+      'search:expand': 'expandSearch',
+      'search:collapse': 'collapseSearch',
+      'search:show': 'showSearch',
+      'search:hide': 'hideSearch'
     },
 
     toggleSearch: function () {
@@ -70,28 +84,7 @@ module.exports = (function() {
       }
 
       var searchView = new SearchView(optionsForRegion('search', { model: this.searchState }));
-      // TODO: use region events for this stuff......
-      this.listenTo(searchView, 'search:expand', function () {
-        // TODO: use this.UI
-        this.$el.addClass('right-toolbar--expanded');
-      });
 
-      this.listenTo(searchView, 'search:collapse', function () {
-        // TODO: use this.UI
-        this.$el.removeClass('right-toolbar--expanded');
-      });
-
-      this.listenTo(searchView, 'search:show', function () {
-        // TODO: use this.UI
-        this.$el.find('#toolbar-top-content').hide();
-        this.$el.find('#zendesk-footer').hide();
-      });
-
-      this.listenTo(searchView, 'search:hide', function () {
-        // TODO: use this.UI
-        this.$el.find('#toolbar-top-content').show();
-        this.$el.find('#zendesk-footer').show();
-      });
 
       return {
         search: searchView,
@@ -104,18 +97,38 @@ module.exports = (function() {
       };
     },
 
+    expandSearch: function() {
+      this.$el.addClass('right-toolbar--expanded');
+    },
+
+    collapseSearch: function() {
+      this.$el.removeClass('right-toolbar--expanded');
+    },
+
+    showSearch: function() {
+      this.search.$el.show();
+      this.ui.header.hide();
+      this.ui.footer.hide();
+    },
+
+    hideSearch: function() {
+      this.search.$el.hide();
+      this.ui.header.show();
+      this.ui.footer.show();
+    },
+
     showPeopleList: function() {
-      this.$el.find('#repo-info').hide();
-      this.$el.find('#people-roster').show();
-      this.$el.find('#people-header').addClass('selected');
-      this.$el.find('#info-header').removeClass('selected');
+      this.repo_info.$el.hide();
+      this.roster.$el.show();
+      this.ui.rosterHeader.addClass('selected');
+      this.ui.repoInfoHeader.removeClass('selected');
     },
 
     showRepoInfo: function() {
-      this.$el.find('#people-roster').hide();
-      this.$el.find('#repo-info').show();
-      this.$el.find('#people-header').removeClass('selected');
-      this.$el.find('#info-header').addClass('selected');
+      this.roster.$el.hide();
+      this.repo_info.$el.show();
+      this.ui.rosterHeader.removeClass('selected');
+      this.ui.repoInfoHeader.addClass('selected');
     }
 
   });

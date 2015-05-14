@@ -5,7 +5,7 @@ var template = require('./tmpl/search-input.hbs');
 
 var SearchInputView = Marionette.ItemView.extend({
   template: template,
-
+  className: 'search-input', // Mirrrored in chat_toolbar.hbs
   ui: {
     input: '.js-search-input',
     clearIcon: '.js-search-clear-icon',

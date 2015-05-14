@@ -2,11 +2,11 @@
   <div class="right-toolbar right-toolbar--collapsible">
     <header class="right-toolbar__header">
       <div class="search js-search">
-        {{{ prerenderView "js/views/search/tmpl/search-input" wrap="div" }}}
+        {{{ prerenderView "js/views/search/tmpl/search-input" wrap="div" className="search-input" }}}
       </div>
     </header>
     <div id="search-results" class="right-toolbar__body search-results" style="display: none;">
-      {{!-- not prerendered {{{ prerenderView "js/views/search/tmpl/search" wrap="div" } } } --}}
+       {{{ prerenderView "js/views/search/tmpl/search" wrap="div" className="right-toolbar right-toolbar--collapsible" }}}
     </div>
     <div id="toolbar-top-content" class="right-toolbar__body">
       <div id="people-list">

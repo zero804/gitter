@@ -6,6 +6,7 @@ var apiClient = require('components/apiClient');
 var RepoSelectView = require('./repoSelectView');
 var template = require('./tmpl/createRepoRoom.hbs');
 var appEvents = require('utils/appevents');
+require('views/behaviors/isomorphic');
 
 module.exports = (function() {
 
@@ -22,10 +23,22 @@ module.exports = (function() {
       repoSelectRegion: '#repo-select',
     },
 
+    behaviors: {
+      Isomorphic: {}
+    },
+
+    childEvents: {
+      'selected': 'repoSelected'
+    },
+
     initialize: function() {
-      this.repoSelectView = new RepoSelectView({ collection: RepoSelectView.createCollection() });
-      this.listenTo(this.repoSelectView, 'selected', this.repoSelected);
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
+    },
+
+    initRegions: function(optionsForRegion) {
+      return {
+        repoSelectRegion: new RepoSelectView(optionsForRegion('repoSelectRegion', { collection: RepoSelectView.createCollection() }))
+      };
     },
 
     repoSelected: function(r) {
@@ -64,12 +77,6 @@ module.exports = (function() {
       return {
         privateRepoScope: !!context.getUser().scopes.private_repo
       };
-    },
-
-    onRender: function() {
-      if(!this.repoSelectRegion.currentView) {
-        this.repoSelectRegion.show(this.repoSelectView);
-      }
     }
 
   });
