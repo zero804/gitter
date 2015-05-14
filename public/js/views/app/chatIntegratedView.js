@@ -21,8 +21,6 @@ var RightToolbarView = require('views/righttoolbar/rightToolbarView');
 var unreadItemsClient = require('components/unread-items-client');
 require('views/behaviors/isomorphic');
 
-require('transloadit');
-
 module.exports = (function() {
 
   var ChatLayout = Marionette.LayoutView.extend({
