@@ -1,7 +1,6 @@
 "use strict";
 var Marionette = require('marionette');
 var context = require('utils/context');
-var TroupeViews = require('views/base');
 var AvatarView = require('views/widgets/avatar');
 var collectionTemplate = require('./tmpl/peopleCollectionView.hbs');
 var remainingTempate = require('./tmpl/remainingView.hbs');
@@ -82,20 +81,7 @@ module.exports = (function() {
     }
   });
 
-  var AllUsersModal = TroupeViews.Modal.extend({
-    initialize: function(options) {
-      options = options || {};
-      options.title = "People";
-      TroupeViews.Modal.prototype.initialize.call(this, options);
-      this.view = new PeopleCollectionView(options);
-    }
-  });
-
-  return {
-    ExpandableRosterView: ExpandableRosterView,
-    Modal: AllUsersModal
-  };
-
+  return ExpandableRosterView;
 
 })();
 

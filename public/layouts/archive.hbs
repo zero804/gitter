@@ -25,7 +25,6 @@
   <link rel="stylesheet" href='{{cdn "sprites/services.css" }}'>
   <link rel="stylesheet" href='{{cdn cssFileName }}'>
   <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon.ico' }}">
-  {{>load_font_css}}
 </head>
 <body class="logged-out">
   <div class="chat-and-toolbar-wrapper">
@@ -104,7 +103,7 @@
   {{#if troupeContext}}
     {{{ generateTroupeContext troupeContext }}}
   {{/if}}
-  
+
   {{#if bootScriptName}}
     {{{bootScript bootScriptName }}}
   {{/if}}
