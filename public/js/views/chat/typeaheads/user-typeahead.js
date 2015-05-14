@@ -9,8 +9,6 @@ var _ = require('underscore');
 
 var MAX_TYPEAHEAD_SUGGESTIONS = isMobile() ? 3 : 10;
 
-var lcUsername = (context.user() && context.user().get('username') || '').toLowerCase();
-
 function getRecentMessageSenders() {
   var users = chatCollection.map(function(message) {
     return message.get('fromUser');
@@ -31,6 +29,7 @@ function filterWithTerm(term) {
 }
 
 function isNotCurrentUser(user) {
+  var lcUsername = (context.user() && context.user().get('username') || '').toLowerCase();
   return user.username.toLowerCase() !== lcUsername;
 }
 
