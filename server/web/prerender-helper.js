@@ -1,7 +1,7 @@
 "use strict";
 
 var compileTemplate = require('./compile-web-template');
-var prerenderWrapper = compileTemplate.compileString('<{{wrap}} {{#if id}}id="{{id}}"{{/if}} {{#if className}}class="{{className}}"{{/if}}>{{{inner}}}</{{wrap}}>');
+var prerenderWrapper = require('./prerender-wrapper');
 
 var PRERENDERED_VIEWS = [
   "js/views/archive/tmpl/archive-navigation-view",
@@ -27,11 +27,12 @@ module.exports = exports = function (templateFile, options) {
   var template = PRERENDERED_VIEWS[templateFile];
   if (!template) throw new Error('Template ' + templateFile + ' has not been precompiled.');
 
+  var inner = template(this);
   var wrap = hash.wrap;
+  if (!wrap) return inner;
+
   var className = hash.className;
   var id = hash.id;
-  var inner = template(this);
-  if (!hash.wrap) return inner;
 
   return prerenderWrapper({
     className: className,

@@ -65,7 +65,7 @@ module.exports = (function() {
       if (hasScrollBars()) {
         $(".primary-scroll").addClass("scroller");
         $(".js-chat-input-container").addClass("scrollpush");
-        $("#room-content").addClass("scroller");
+        // $("#room-content").addClass("scroller");
       }
     }
   });
