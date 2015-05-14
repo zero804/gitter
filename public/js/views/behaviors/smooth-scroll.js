@@ -2,9 +2,6 @@
 var Marionette = require('marionette');
 var behaviourLookup = require('./lookup');
 var _ = require('underscore');
-var unreadBannerModel = require('../app/unreadBannerModel');
-var context = require('utils/context');
-var realtime = require('components/realtime');
 
 var Behavior = Marionette.Behavior.extend({
   defaults: {
@@ -20,21 +17,15 @@ var Behavior = Marionette.Behavior.extend({
     this.wrapper = wrapperSelector ? this.scrollElement.querySelector(wrapperSelector) : null;
 
     // Make sure every time the collectionView renders it decorates its childs and updates the banners
-    this.view.on('render', this.decorateIfVisible.bind(this));
-    this.view.on('render', this.updateUnreadBanners.bind(this));
+    this.listenTo(this.view, 'render', this.decorateIfVisible);
 
     // Debounced actions for improved performance
     this.lazyDecorator      = _.debounce(this.decorateIfVisible.bind(this), 500);
     this.lazyTracker        = _.debounce(this.trackViewport.bind(this), 500);
     this.lazyPointerEvents  = _.debounce(this.enablePointerEvents.bind(this), 250);
-    this.lazyUnreadItems    = _.throttle(this.updateUnreadBanners.bind(this), 250);
 
     this.scrollHandler = this.smoothScroll.bind(this);
     this.scrollElement.addEventListener('scroll', this.scrollHandler, false);
-
-    // Listen for events such as mark all as read, etc.
-    var subscription = '/v1/user/' + context.getUserId() + '/rooms/' + context.getTroupeId() + '/unreadItems';
-    realtime.subscribe(subscription, this.updateUnreadBanners.bind(this));
   },
 
   // Trigger an event on the child of it's currently on screen
@@ -42,18 +33,6 @@ var Behavior = Marionette.Behavior.extend({
     this.view.children.each(function(child) {
       if (this.viewportStatus(child.el) === 'visible') child.trigger('messageInViewport');
     }.bind(this));
-  },
-
-  // Update the singleton collection that populates the unread banners based on element visibility
-  updateUnreadBanners: function() {
-    var items = {'visible': 0, 'above': 0, 'below': 0};
-    this.view.children.each(function(child) {
-      var pos = this.viewportStatus(child.el);
-      if (child.model.get('unread')) items[pos] += 1;
-    }.bind(this));
-
-    unreadBannerModel.set('unreadAbove', items.above);
-    unreadBannerModel.set('unreadBelow', items.below);
   },
 
   // Give an element tells you if it's on screen or above/below the fold
@@ -85,7 +64,6 @@ var Behavior = Marionette.Behavior.extend({
     this.lazyDecorator();
     this.lazyTracker();
     this.lazyPointerEvents();
-    this.lazyUnreadItems();
   },
 
   onClose: function() {
