@@ -23,7 +23,11 @@ var travisTemplate = require('./tmpl/travis.hbs');
 var sprintlyTemplate = require('./tmpl/sprintly.hbs');
 var trelloTemplate = require('./tmpl/trello.hbs');
 var prerenderedTemplate = require('./tmpl/prerendered.hbs');
-var compositeTemplate = require('./tmpl/composite.hbs');
+var activityTemplate = require('./tmpl/activity-composite.hbs');
+var activityEmptyTemplate = require('./tmpl/activity-empty.hbs');
+var context = require('utils/context');
+var cocktail = require('cocktail');
+var LoadingCollectionMixin = require('views/loading-mixin');
 
 require('views/widgets/timeago');
 require('views/behaviors/widgets');
@@ -211,16 +215,46 @@ module.exports = (function() {
     }
   });
 
-  var ActivityView = Marionette.CollectionView.extend({
-    tagName: 'ul',
-    // template: compositeTemplate,
-    // childViewContainer: 'ul#activity-events',
-    childView: ActivityItemView,
+  var ActivityEmptyItemView = Marionette.ItemView.extend({
+    tagName: 'li',
+    className: 'activity-tip',
+    template: activityEmptyTemplate,
+    serializeData: function() {
+      var isNativeDesktopApp = context().isNativeDesktopApp;
+      var integrationsUrl = (isNativeDesktopApp ? '/' + context.troupe().get('url') : '') + '#integrations';
 
-    initialize: function() {
-      this.listenTo(this.collection, 'snapshot', this.render);
+      return {
+        integrationsUrl: integrationsUrl,
+        isNativeDesktopApp: isNativeDesktopApp
+      };
     }
   });
+
+  var ActivityView = Marionette.CompositeView.extend({
+    template: activityTemplate,
+    childViewContainer: '#activity-list',
+    childView: ActivityItemView,
+    getEmptyView: function() {
+      // Admins see "Configure your integrations" empty
+      if (context().permissions.admin) return ActivityEmptyItemView;
+    },
+    ui: {
+      header: '#activity-header'
+    },
+    collectionEvents: {
+      'add reset sync reset': '_showHideHeader'
+    },
+    onRender: function() {
+      this._showHideHeader();
+    },
+    _showHideHeader: function() {
+      // Admins see the header when the collection is empty
+      // so that they get to
+      var headerVisible = !!(context().permissions.admin || this.collection.length);
+      this.ui.header.toggle(headerVisible);
+    }
+  });
+  // cocktail.mixin(ActivityView, LoadingCollectionMixin);
 
   return ActivityView;
 

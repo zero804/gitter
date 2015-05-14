@@ -8,7 +8,8 @@ var SearchView = require('views/search/searchView');
 var SearchInputView = require('views/search/search-input-view');
 var RepoInfoView = require('./repoInfo');
 var RepoInfoModel = require('collections/repo-info');
-var ActivityStream = require('./activity');
+var ActivityCompositeView = require('./activityCompositeView');
+var hasScrollBars = require('utils/scrollbar-detect');
 require('views/behaviors/isomorphic');
 
 module.exports = (function() {
@@ -30,7 +31,7 @@ module.exports = (function() {
       search: '#search-results',
       searchInput: '.js-search',
       repo_info: "#repo-info",
-      activity: '#activity',
+      activity: '#activity-region',
       roster: '#people-roster'
     },
 
@@ -60,17 +61,6 @@ module.exports = (function() {
         isLoading: false
       });
 
-      // TODO: use a CompositeView and get rid of this stuff
-      this.listenTo(itemCollections.events, 'add reset sync', function() {
-        if (itemCollections.events.length) {
-          this.$el.find('#activity-header').show();
-          itemCollections.events.off('add reset sync', null, this);
-        } else {
-          if (context().permissions.admin) {
-            this.$el.find('#activity-header').show();
-          }
-        }
-      });
     },
 
     initRegions: function(optionsForRegion) {
@@ -84,17 +74,23 @@ module.exports = (function() {
       }
 
       var searchView = new SearchView(optionsForRegion('search', { model: this.searchState }));
-
+      var oneToOne = context.inOneToOneTroupeContext();
 
       return {
         search: searchView,
         searchInput: new SearchInputView(optionsForRegion('searchInput', { model: this.searchState })),
         repo_info: repoInfoView,
-        activity: new ActivityStream(optionsForRegion('activity', { collection: itemCollections.events })),
+        activity: oneToOne ? null : new ActivityCompositeView(optionsForRegion('activity', { collection: itemCollections.events })),
         roster: new PeopleCollectionView.ExpandableRosterView(optionsForRegion('roster', {
           rosterCollection: itemCollections.roster
         }))
       };
+    },
+
+    onRender: function() {
+      if (hasScrollBars()) {
+        this.activity.$el.addClass("scroller");
+      }
     },
 
     expandSearch: function() {
