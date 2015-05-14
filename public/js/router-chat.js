@@ -190,7 +190,7 @@ onready(function () {
       });
   });
 
-  var appView = new ChatToolbarInputLayout({ template: false, el: 'body', chatCollection: itemCollections.chat });
+  var appView = new ChatToolbarInputLayout({ template: false, el: 'body', chatCollection: itemCollections.chats });
   appView.render();
 
   /* Drag and drop */
