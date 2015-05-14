@@ -1,4 +1,5 @@
 "use strict";
+
 var $ = require('jquery');
 var apiClient = require('components/apiClient');
 var context = require('utils/context');
@@ -11,7 +12,6 @@ var _ = require('underscore');
 var cocktail = require('cocktail');
 var itemCollections = require('collections/instances/integrated-items');
 var ChatSearchModels = require('collections/chat-search');
-var searchTemplate = require('./tmpl/search.hbs');
 var resultTemplate = require('./tmpl/result.hbs');
 var noResultsTemplate = require('./tmpl/no-results.hbs');
 var noRoomResultsTemplate = require('./tmpl/no-room-results.hbs');
@@ -20,6 +20,7 @@ var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 
 require('views/behaviors/widgets');
 require('views/behaviors/highlight');
+require('views/behaviors/isomorphic');
 
 module.exports = (function() {
 
@@ -124,7 +125,6 @@ module.exports = (function() {
 
   var RoomsCollectionView = Marionette.CollectionView.extend({
     childView: RoomResultItemView,
-
     emptyView: EmptyRoomResultsView,
 
     initialize: function (/*options*/) {
@@ -139,14 +139,11 @@ module.exports = (function() {
 
   var MessagesCollectionView = Marionette.CollectionView.extend({
     emptyView: EmptyResultsView,
+    childView: MessageResultItemView,
 
     initialize: function() {
       var target = document.querySelector("#search-results");
       this.rollers = new Rollers(target, this.el, { doNotTrack: true });
-    },
-
-    getChildView: function (item) {
-      return MessageResultItemView;
     },
 
     scrollTo: function (v) {
@@ -349,8 +346,10 @@ module.exports = (function() {
   });
 
   var SearchView = Marionette.LayoutView.extend({
-    template: searchTemplate,
-
+    // template: searchTemplate, SearchView is prerendered
+    behaviors: {
+      Isomorphic: {}
+    },
     regions: {
       roomsRegion: '.js-search-rooms',
       messagesRegion: '.js-search-messages',
@@ -377,10 +376,9 @@ module.exports = (function() {
 
       this.listenTo(this.model, 'change:searchTerm', function () {
         debouncedRun();
-      }.bind(this));
+      });
 
-      this.listenTo(this.model, 'change:active', function (m, active) {
-
+      this.listenTo(this.model, 'change:active', function (m, active) {  // jshint unused:true
         if (active) {
           this.triggerMethod('search:expand');
 
@@ -420,26 +418,31 @@ module.exports = (function() {
 
       this.listenTo(this.search, 'cache:clear', function () {
         masterCollection.reset();
-      }.bind(this));
+      });
 
       this.listenTo(this.search, 'loaded:rooms', function (data) {
         var toRemove = this.rooms.models.filter(function (item) {
           return item.get('query') !== this.model.get('searchTerm');
-        }.bind(this));
+        }, this);
+
         masterCollection.remove(toRemove);
         masterCollection.add(data);
         this.rooms.resetWith(masterCollection);
-      }.bind(this));
+      });
 
       this.listenTo(this.search, 'loaded:messages', function (data) {
         masterCollection.remove(this.chats.models); // we must remove the old chats before adding new ones
         masterCollection.set(data, { remove: false });
         this.chats.resetWith(masterCollection);
-      }.bind(this));
+      });
 
-      // initialize the views
-      this.roomsView = new RoomsCollectionView({ collection: this.rooms });
-      this.messagesView = new MessagesCollectionView({ collection: this.chats });
+    },
+
+    initRegions: function(optionsForRegion) {
+      return {
+        roomsRegion: new RoomsCollectionView(optionsForRegion('roomsRegion', { collection: this.rooms })),
+        messagesRegion: new MessagesCollectionView(optionsForRegion('messagesRegion', { collection: this.chats }))
+      };
     },
 
     isSearchTermEmpty: function () {
@@ -456,7 +459,6 @@ module.exports = (function() {
 
     hide: function () {
       this.triggerMethod('search:hide');
-      this.$el.hide();
       this.search.clearCache();
     },
 
@@ -477,12 +479,6 @@ module.exports = (function() {
 
       this.showResults();
       this.triggerMethod('search:show'); // hide top toolbar content
-    },
-
-    showResults: function () {
-      this.$el.show();
-      this.roomsRegion.show(this.roomsView); // local rooms
-      this.messagesRegion.show(this.messagesView); // server chat messages
     },
 
     handlePrev: function (e) {
@@ -518,4 +514,3 @@ module.exports = (function() {
   return SearchView;
 
 })();
-

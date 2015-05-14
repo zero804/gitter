@@ -22,6 +22,9 @@ var Behavior = Marionette.Behavior.extend({
       var region = view.getRegion(regionName);
 
       var regionEl = region.$el[0];
+      if (!regionEl) 
+        throw new Error('Region ' + regionName + ' does not exist.');
+
       var regionElChildLen = regionEl.children.length;
 
       var baseOptions;
@@ -41,7 +44,7 @@ var Behavior = Marionette.Behavior.extend({
     Object.keys(result).forEach(function(regionName) {
       var childView = result[regionName];
       if (childView) {
-        view.showChildView(regionName, childView);        
+        view.showChildView(regionName, childView);
       }
     });
 
