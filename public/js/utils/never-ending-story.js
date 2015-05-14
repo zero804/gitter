@@ -113,6 +113,22 @@ module.exports = (function() {
       } else {
         target.scrollTop = 0;
       }
+
+      this._scrollHandler();
+    },
+
+    pageUp: function() {
+      var target = this._target;
+      var scrollTop = target.scrollTop;
+      var pageHeight = Math.floor(target.offsetHeight * 0.8);
+      target.scrollTop = scrollTop - pageHeight;
+    },
+
+    pageDown: function() {
+      var target = this._target;
+      var scrollTop = target.scrollTop;
+      var pageHeight = Math.floor(target.offsetHeight * 0.8);
+      target.scrollTop = scrollTop + pageHeight;
     },
 
     enable: function() {
@@ -149,4 +165,3 @@ module.exports = (function() {
   return NeverEndingStory;
 
 })();
-

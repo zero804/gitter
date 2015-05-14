@@ -205,6 +205,9 @@ module.exports = (function() {
 
       this.listenTo(appEvents, 'command.collapse.chat', this.collapseChats);
       this.listenTo(appEvents, 'command.expand.chat', this.expandChats);
+
+      this.listenTo(appEvents, 'chatCollectionView:pageUp', this.pageUp);
+      this.listenTo(appEvents, 'chatCollectionView:pageDown', this.pageDown);
     },
 
     scrollToFirstUnread: function() {
@@ -273,20 +276,11 @@ module.exports = (function() {
     },
 
     pageUp: function() {
-      var scrollFromTop = this.$el.scrollTop();
-      var pageHeight = Math.floor(this.$el.height() * 0.8);
-      this.$el.scrollTop(scrollFromTop - pageHeight);
-
-      // page up doesnt trigger scroll events
-      if(scrollFromTop === 0) {
-        this.scroll.trigger('approaching.end');
-      }
+      this.scroll.pageUp();
     },
 
     pageDown: function() {
-      var scrollFromTop = this.$el.scrollTop();
-      var pageHeight = Math.floor(this.$el.height() * 0.8);
-      this.$el.scrollTop(scrollFromTop + pageHeight);
+      this.scroll.pageDown();
     },
 
     scrollToChat: function (chat) {

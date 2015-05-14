@@ -41,6 +41,7 @@ module.exports = (function() {
       });
 
       this.scroll = scroll;
+      this.view.scroll = scroll;
     },
 
     onDestroy: function() {
@@ -53,4 +54,3 @@ module.exports = (function() {
   return Behavior;
 
 })();
-
