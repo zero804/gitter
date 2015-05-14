@@ -7,13 +7,14 @@ var context = require('utils/context');
 var liveContext = require('components/live-context');
 var appEvents = require('utils/appevents');
 var log = require('utils/log');
-var ChatIntegratedView = require('views/app/chatIntegratedView');
+var ChatToolbarInputLayout = require('views/layouts/chat-toolbar-input');
 var DropTargetView = require('views/app/dropTargetView');
 var onready = require('./utils/onready');
 var highlightPermalinkChats = require('./utils/highlight-permalink-chats');
 var apiClient = require('components/apiClient');
 var HeaderView = require('views/app/headerView');
 var frameUtils = require('./utils/frame-utils');
+var itemCollections = require('collections/instances/integrated-items');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -189,7 +190,7 @@ onready(function () {
       });
   });
 
-  var appView = new ChatIntegratedView({ template: false, el: 'body' });
+  var appView = new ChatToolbarInputLayout({ template: false, el: 'body', chatCollection: itemCollections.chat });
   appView.render();
 
   /* Drag and drop */

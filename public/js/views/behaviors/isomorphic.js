@@ -17,12 +17,12 @@ var Behavior = Marionette.Behavior.extend({
 
     var view = this.view;
 
-    var initRegionsFn = view.initRegions;
-    var result = initRegionsFn.call(view, function(regionName, options) {
+
+    function optionsForRegion(regionName, options) {
       var region = view.getRegion(regionName);
 
       var regionEl = region.$el[0];
-      if (!regionEl) 
+      if (!regionEl)
         throw new Error('Region ' + regionName + ' does not exist.');
 
       var regionElChildLen = regionEl.children.length;
@@ -37,10 +37,29 @@ var Behavior = Marionette.Behavior.extend({
       }
 
       return _.extend(baseOptions, options);
-    });
+    }
 
-    if (!result) return;
+    var initRegionsFn = view.initRegions;
+    var result;
+    if (initRegionsFn) {
+      /* initRegions method */
+      result = initRegionsFn.call(view, optionsForRegion);
 
+      if (!result) return;
+    } else {
+      /* non initRegions method */
+
+      result = {};
+      Object.keys(view.regions).forEach(function(regionName) {
+        var initMethodName = 'init' + regionName.charAt(0).toUpperCase() + regionName.slice(1) + 'Region';
+        var initMethod = view[initMethodName];
+        if (initMethod)  {
+          result[regionName] = initMethod.call(view, optionsForRegion);
+        }
+      });
+    }
+
+    // Attach!
     Object.keys(result).forEach(function(regionName) {
       var childView = result[regionName];
       if (childView) {
