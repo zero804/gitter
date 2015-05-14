@@ -22,9 +22,6 @@ module.exports = (function() {
   var EDIT_WINDOW = 1000 * 60 * 10; // 10 minutes
 
   /** @const */
-  var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];
-
-  /** @const */
   var MOBILE_PLACEHOLDER = 'Touch here to type a chat message.';
 
   /** @const */
@@ -104,7 +101,6 @@ module.exports = (function() {
     initialize: function(options) {
       this.bindUIElements(); // TODO: use regions
       this.rollers = options.rollers;
-      this.chatCollectionView = options.chatCollectionView;
       this.composeMode = new ComposeMode();
       this.compactView = options.compactView;
 
@@ -161,7 +157,6 @@ module.exports = (function() {
       var inputBox = new ChatInputBoxView({
         el: $textarea,
         rollers: this.rollers,
-        chatCollectionView: this.chatCollectionView,
         composeMode: this.composeMode,
         autofocus: !this.compactView,
         value: $textarea.val()
@@ -238,7 +233,7 @@ module.exports = (function() {
         this.listenToOnce(this.inputBox, 'save', this.toggleComposeMode.bind(this, null)); // if we were in chat mode make sure that we set the state back to chat mode
       }
 
-      inputBox.val(function (index, val) {
+      inputBox.val(function (index, val) { // jshint unused:true
         return val + '\n\n```'; // 1. create the code block
       });
 
@@ -301,16 +296,7 @@ module.exports = (function() {
         return fromUser && fromUser.id === context.getUserId();
       });
 
-      usersChats.sort(function(a, b) {
-        var as = a.get('sent');
-        as = as ? as.valueOf() : 0;
-        var bs = b.get('sent');
-        bs = bs ? bs.valueOf() : 0;
-
-        return bs - as;
-      });
-
-      return usersChats[0];
+      return usersChats[usersChats.length - 1];
     },
 
     subst: function(search, replace, global) {
@@ -331,15 +317,9 @@ module.exports = (function() {
     },
 
     editLast: function() {
-      if(!this.chatCollectionView) return;
-
       var lastChat =  this.getLastEditableMessage();
       if(!lastChat) return;
-
-      var chatItemView = this.chatCollectionView.children.findByModel(lastChat);
-      if(!chatItemView) return;
-
-      chatItemView.toggleEdit();
+      appEvents.trigger('chatCollectionView:editChat', lastChat);
     },
 
     onPaste: function(e) {
@@ -433,12 +413,10 @@ module.exports = (function() {
         chatResizer.resizeInput();
       });
 
-
       if (!this.options.editMode) this.drafty = drafty(this.el);
 
       chatResizer.resetInput(true);
 
-      this.chatCollectionView = options.chatCollectionView;
       this.composeMode = options.composeMode;
       this.chatResizer.resizeInput();
     },

@@ -37,7 +37,6 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
     var chatCollectionView = this.chatCollectionView; // Initialized in chat.js
     return new chatInputView.ChatInputView(optionsForRegion('input', {
       collection: itemCollections.chats,
-      chatCollectionView: chatCollectionView,
       rollers: chatCollectionView.rollers
     }));
   },
