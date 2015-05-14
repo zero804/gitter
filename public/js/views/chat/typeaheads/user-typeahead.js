@@ -40,15 +40,6 @@ function unique(users) {
   });
 }
 
-function appendServerSearchResults(localUsers, lowerTerm, callback) {
-  userSearchDebounced(lowerTerm, function(serverUsers) {
-    serverUsers = serverUsers.filter(isNotCurrentUser);
-    var users = unique(localUsers.concat(serverUsers));
-
-    callback(users);
-  });
-}
-
 var lastTerm;
 var lastCallback;
 var debounceCallback;
