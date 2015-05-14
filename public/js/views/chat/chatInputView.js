@@ -102,7 +102,7 @@ module.exports = (function() {
     },
 
     initialize: function(options) {
-      this.bindUIElements();
+      this.bindUIElements(); // TODO: use regions
       this.rollers = options.rollers;
       this.chatCollectionView = options.chatCollectionView;
       this.composeMode = new ComposeMode();

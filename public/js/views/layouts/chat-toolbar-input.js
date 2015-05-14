@@ -9,7 +9,6 @@ var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var unreadItemsClient = require('components/unread-items-client');
 var UnreadBannerView = require('views/app/unreadBannerView');
 var ChatToolbarLayout = require('./chat-toolbar');
-var hasScrollBars = require('utils/scrollbar-detect');
 
 var ChatToolbarInputLayout = ChatToolbarLayout.extend({
   keyboardEvents: {
@@ -35,11 +34,6 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
   },
 
   initInputRegion: function(optionsForRegion) {
-    /* TODO: Give this stuff a proper home */
-    if (hasScrollBars()) {
-      this.ui.input.addClass("scrollpush");
-    }
-
     var chatCollectionView = this.chatCollectionView; // Initialized in chat.js
     return new chatInputView.ChatInputView(optionsForRegion('input', {
       collection: itemCollections.chats,

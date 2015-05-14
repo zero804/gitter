@@ -50,7 +50,6 @@ var ChatLayout = Marionette.LayoutView.extend({
     /* TODO: Give this stuff a proper home */
     if (hasScrollBars()) {
       $(".primary-scroll").addClass("scroller");
-      $(".js-chat-input-container").addClass("scrollpush");
     }
 
     var chatCollectionView = this.chatCollectionView = new ChatCollectionView(optionsForRegion('chat', {
