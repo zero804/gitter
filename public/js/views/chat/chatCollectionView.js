@@ -208,6 +208,7 @@ module.exports = (function() {
 
       this.listenTo(appEvents, 'chatCollectionView:pageUp', this.pageUp);
       this.listenTo(appEvents, 'chatCollectionView:pageDown', this.pageDown);
+      this.listenTo(appEvents, 'chatCollectionView:editChat', this.editChat);
     },
 
     scrollToFirstUnread: function() {
@@ -410,6 +411,13 @@ module.exports = (function() {
       e.clipboardData.setData('text/x-markdown', text);
       e.preventDefault();
     },
+
+    editChat: function(chat) {
+      var chatItemView = this.children.findByModel(chat);
+      if(!chatItemView) return;
+
+      chatItemView.toggleEdit();
+    }
 
   });
 
