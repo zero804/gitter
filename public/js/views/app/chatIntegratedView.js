@@ -115,10 +115,9 @@ module.exports = (function() {
       if (hasScrollBars()) {
         $(".primary-scroll").addClass("scroller");
         $(".js-chat-input-container").addClass("scrollpush");
-        $("#room-content").addClass("scroller");
       }
 
-      var chatCollectionView = new ChatCollectionView(optionsForRegion('chat', {
+      var chatCollectionView = this.chatCollectionView = new ChatCollectionView(optionsForRegion('chat', {
         collection: itemCollections.chats,
         decorators: [issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
       }));

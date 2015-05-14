@@ -27,27 +27,11 @@
             </div>
           </div>
           <div class="trpToolbarListContent" id="repo-info" style="display: none"></div>
-          <h5 class="trpToolbarHeader" id="activity-header">Activity</h5>
         </div>
       </div>
 
-      <div class="trpTroupeRelatedContent" id="room-content">
-        {{#unless activityEvents}}
-          {{#if isAdmin}}
-          <div id="activity-tip">
-            <p>We haven't seen any activity yet. <a href="{{integrationsUrl}}" {{#if isNativeDesktopApp}}data-disable-routing="1" target="_blank"{{/if}}>Configure your integrations &rarr;</a></p>
-          </div>
-          {{/if}}
-        {{/unless}}
-
-        <div class="trpTroupeRelatedContentHolder" id="activity">
-          <ul class="gtrActivityList u-font-smaller">
-            {{#each activityEvents}}
-              <li>{{{ activityItemPrerender this }}}</li>
-            {{/each}}
-          </ul>
-        </div>
-
+      <div class="trpTroupeRelatedContent" id="activity-region">
+        {{!-- Activity region --}}
       </div>
     </div>
 
