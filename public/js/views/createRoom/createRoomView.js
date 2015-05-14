@@ -20,7 +20,6 @@ module.exports = (function() {
       permPublic: "#perm-select-public",
       permPrivate: "#perm-select-private",
       permInheritedOrg: "#perm-select-inherited-org",
-      permInheritedRepo: "#perm-select-inherited-repo",
       validation: '#modal-failure',
       selectParentRequired: "#perm-select-required",
       existing: '#existing',
@@ -204,7 +203,6 @@ module.exports = (function() {
         'permPublic': false,
         'permPrivate': false,
         'permInheritedOrg': false,
-        'permInheritedRepo': false,
         'existing': false,
         'permissionsLabel': true
       };
@@ -228,7 +226,7 @@ module.exports = (function() {
             break;
 
           case 'repo':
-            [/*'autoJoin', */'permPublic', 'permPrivate', 'permInheritedRepo'].forEach(function (f) { showHide[f] = true; });
+            [/*'autoJoin', */'permPublic', 'permPrivate'].forEach(function (f) { showHide[f] = true; });
             placeholder = "Required";
             break;
 
@@ -262,7 +260,6 @@ module.exports = (function() {
             'permPublic': false,
             'permPrivate': false,
             'permInheritedOrg': false,
-            'permInheritedRepo': false,
             'permissionsLabel': false,
             'existing': true
           };
@@ -282,7 +279,6 @@ module.exports = (function() {
               'permPublic': false,
               'permPrivate': false,
               'permInheritedOrg': false,
-              'permInheritedRepo': false,
               'permissionsLabel': false,
               'existing': false
             };
