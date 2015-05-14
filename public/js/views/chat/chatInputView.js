@@ -403,15 +403,14 @@ module.exports = (function() {
 
   var ChatInputBoxView = Marionette.ItemView.extend({
     events: {
-      "keyup":    "onKeyUp",
+      "keyup": "onKeyUp",
+      "keydown": "onKeyDown",
       "blur": "onBlur"
     },
 
     keyboardEvents: {
       "chat.edit.openLast": "onKeyEditLast",
-      "chat.send": "onKeySend",
-      "pageUp": "onKeyPageUp",
-      "pageDown": "onKeyPageDown"
+      "chat.send": "onKeySend"
     },
 
     // pass in the textarea as el for ChatInputBoxView
@@ -449,7 +448,13 @@ module.exports = (function() {
         this.processInput();
       }
     },
-
+    onKeyDown: function(e) {
+      if (e.keyCode === 33 || e.keyCode === 34) {
+        appEvents.trigger(e.keyCode === 33 ? 'chatCollectionView:pageUp' : 'chatCollectionView:pageDown');
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    },
     onKeyUp: function() {
       this.chatResizer.resizeInput();
     },
@@ -473,11 +478,11 @@ module.exports = (function() {
     },
 
     onKeyPageUp: function() {
-      if(this.chatCollectionView) this.chatCollectionView.pageUp();
+      console.log('pageup');
     },
 
     onKeyPageDown: function() {
-      if(this.chatCollectionView) this.chatCollectionView.pageDown();
+      appEvents.trigger('chatCollectionView:pageDown');
     },
 
     processInput: function() {
