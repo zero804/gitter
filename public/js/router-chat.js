@@ -8,6 +8,7 @@ var liveContext = require('components/live-context');
 var appEvents = require('utils/appevents');
 var log = require('utils/log');
 var ChatIntegratedView = require('views/app/chatIntegratedView');
+var DropTargetView = require('views/app/dropTargetView');
 var onready = require('./utils/onready');
 var highlightPermalinkChats = require('./utils/highlight-permalink-chats');
 var apiClient = require('components/apiClient');
@@ -190,6 +191,9 @@ onready(function () {
 
   var appView = new ChatIntegratedView({ template: false, el: 'body' });
   appView.render();
+
+  /* Drag and drop */
+  new DropTargetView({ template: false, el: 'body' }).render();
 
   new HeaderView({ model: context.troupe(), el: '#header' });
 
