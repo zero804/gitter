@@ -14,10 +14,6 @@ var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 
 module.exports = (function() {
 
-
-  // Nobody knows why this is here. Delete it
-  // $('.trpDisplayPicture').tooltip('destroy');
-
   var ChatLayout = Marionette.LayoutView.extend({
     el: 'body',
     leftmenu: false,
