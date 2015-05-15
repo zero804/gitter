@@ -229,13 +229,11 @@ module.exports = (function() {
 
         getDropTarget: function($el) {
           var a = $el.data('dropTarget') || $el.parents('[data-drop-target]').data('dropTarget');
-          if (!a) debugger;
           return a;
         },
 
         isValidTarget: function(item, container) { // jshint unused:true
           var droppedAt = this.getDropTarget(container.el);
-          console.log('target is ' + droppedAt);
           if (droppedAt === 'favs') {
             $('.dragged').hide();
             $('.placeholder').show();
