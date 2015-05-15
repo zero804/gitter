@@ -227,26 +227,37 @@ module.exports = (function() {
           item.css(position);
         },
 
-        isValidTarget: function(item, container) {
-          var droppedAt = container.el.parent().attr('id');
-          if (droppedAt === 'list-favs') {
+        getDropTarget: function($el) {
+          var a = $el.data('dropTarget') || $el.parents('[data-drop-target]').data('dropTarget');
+          if (!a) debugger;
+          return a;
+        },
+
+        isValidTarget: function(item, container) { // jshint unused:true
+          var droppedAt = this.getDropTarget(container.el);
+          console.log('target is ' + droppedAt);
+          if (droppedAt === 'favs') {
             $('.dragged').hide();
             $('.placeholder').show();
+            return true;
           }
-          else if (droppedAt === 'list-recents') {
+
+          if (droppedAt === 'recents') {
             $('.dragged').show();
             $('.placeholder').hide();
+            return true;
           }
-          return true;
+
+          return false;
         },
 
         onDrop: function (item, container, _super) {
           var position;
           var el = item[0];
           var model = self.roomsCollection.get(dataset.get(el, 'id'));
-          var droppedAt = container.el.parent().attr('id');
+          var droppedAt = this.getDropTarget(container.el);
           if (!cancelDrop) {
-            if (droppedAt === 'list-favs') {
+            if (droppedAt === 'favs') {
               var previousElement = el.previousElementSibling;
 
               if (!previousElement) {
@@ -257,7 +268,7 @@ module.exports = (function() {
               }
               model.set('favourite', position);
               model.save();
-            } else if (droppedAt === 'list-recents') {
+            } else if (droppedAt === 'recents') {
               model.set('favourite', null);
               model.save();
             }

@@ -21,7 +21,7 @@ var Behavior = Marionette.Behavior.extend({
     function optionsForRegion(regionName, options) {
       var region = view.getRegion(regionName);
 
-      var regionEl = region.$el[0];
+      var regionEl = region.$el[0] || view.$el.find(region.options.el)[0];
       if (!regionEl)
         throw new Error('Region ' + regionName + ' does not exist.');
 
