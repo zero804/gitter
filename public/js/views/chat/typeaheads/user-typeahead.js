@@ -9,8 +9,6 @@ var _ = require('underscore');
 
 var MAX_TYPEAHEAD_SUGGESTIONS = isMobile() ? 3 : 10;
 
-var lcUsername = (context.user() && context.user().get('username') || '').toLowerCase();
-
 function getRecentMessageSenders() {
   var users = chatCollection.map(function(message) {
     return message.get('fromUser');
@@ -31,21 +29,13 @@ function filterWithTerm(term) {
 }
 
 function isNotCurrentUser(user) {
+  var lcUsername = (context.user() && context.user().get('username') || '').toLowerCase();
   return user.username.toLowerCase() !== lcUsername;
 }
 
 function unique(users) {
   return _.unique(users, function(user) {
     return user.id;
-  });
-}
-
-function appendServerSearchResults(localUsers, lowerTerm, callback) {
-  userSearchDebounced(lowerTerm, function(serverUsers) {
-    serverUsers = serverUsers.filter(isNotCurrentUser);
-    var users = unique(localUsers.concat(serverUsers));
-
-    callback(users);
   });
 }
 
