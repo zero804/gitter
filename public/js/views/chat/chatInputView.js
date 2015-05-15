@@ -168,11 +168,7 @@ module.exports = (function() {
       this.ui.composeToggle.tooltip({ placement: 'left' });
       this.ui.mdHelp.tooltip({ placement: 'left' });
 
-      if(!isMobile()) {
-        // textcomplete on mobile safari ios 8 causes the keyboard to
-        // immediately hide on focus.
-        $textarea.textcomplete(typeaheads);
-      }
+      $textarea.textcomplete(typeaheads);
 
       // Use 'on' and 'off' instead of proper booleans as attributes are strings
       $textarea.on('textComplete:show', function() {
@@ -225,7 +221,9 @@ module.exports = (function() {
      */
     composeModeAutoFillCodeBlock: function (event) {
       var inputBox = this.inputBox.$el;
-      if (inputBox.val() !== '```') return; // only continue if the content is '```'
+      var val = inputBox.val();
+      var m = val.match(/^```([\w\-]+)?$/);
+      if (!m) return; // only continue if the content is '```'
       var wasInChatMode = !this.composeMode.isEnabled();
 
       event.preventDefault(); // shouldn't allow the creation of a new line
@@ -239,7 +237,7 @@ module.exports = (function() {
         return val + '\n\n```'; // 1. create the code block
       });
 
-      setCaretPosition(inputBox[0], 4); // 2. move caret inside the block (textarea)
+      setCaretPosition(inputBox[0], m[0].length + 1); // 2. move caret inside the block (textarea)
     },
 
     /**
