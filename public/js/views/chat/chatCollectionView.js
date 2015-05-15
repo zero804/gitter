@@ -209,6 +209,7 @@ module.exports = (function() {
       this.listenTo(appEvents, 'chatCollectionView:pageUp', this.pageUp);
       this.listenTo(appEvents, 'chatCollectionView:pageDown', this.pageDown);
       this.listenTo(appEvents, 'chatCollectionView:editChat', this.editChat);
+      this.listenTo(appEvents, 'chatCollectionView:viewportResize', this.viewportResize);
     },
 
     scrollToFirstUnread: function() {
@@ -417,6 +418,14 @@ module.exports = (function() {
       if(!chatItemView) return;
 
       chatItemView.toggleEdit();
+    },
+
+    viewportResize: function(animated) {
+      if(animated) {
+        this.rollers.adjustScrollContinuously(500);
+      } else {
+        this.rollers.adjustScroll(500);
+      }
     }
 
   });
