@@ -100,7 +100,6 @@ module.exports = (function() {
 
     initialize: function(options) {
       this.bindUIElements(); // TODO: use regions
-      this.rollers = options.rollers;
       this.composeMode = new ComposeMode();
       this.compactView = options.compactView;
 
@@ -156,7 +155,6 @@ module.exports = (function() {
 
       var inputBox = new ChatInputBoxView({
         el: $textarea,
-        rollers: this.rollers,
         composeMode: this.composeMode,
         autofocus: !this.compactView,
         value: $textarea.val()
@@ -345,8 +343,6 @@ module.exports = (function() {
   cocktail.mixin(ChatInputView, KeyboardEventsMixin);
 
   var ChatCollectionResizer = function(options) {
-    var rollers = options.rollers;
-
     var el = options.el;
     var $el = $(el);
 
@@ -372,12 +368,9 @@ module.exports = (function() {
     };
 
     function adjustScroll(initial) {
-      if(!rollers) return;
-      if(initial) {
-        rollers.adjustScroll(500);
-      } else {
-        rollers.adjustScrollContinuously(500);
-      }
+      /* Tell the chatCollectionView that the viewport will resize
+       * the argument is whether the resize is animated */
+      appEvents.trigger('chatCollectionView:viewportResize', !initial);
     }
   };
 
@@ -403,8 +396,7 @@ module.exports = (function() {
       }
 
       var chatResizer = new ChatCollectionResizer({
-        el: this.el,
-        rollers: options.rollers
+        el: this.el
       });
 
       this.chatResizer = chatResizer;

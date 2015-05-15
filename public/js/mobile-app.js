@@ -49,8 +49,7 @@ onready(function() {
 
   new chatInputView.ChatInputView({
     el: $('#chat-input'),
-    collection: chatCollection,
-    rollers: chatCollectionView.rollers
+    collection: chatCollection
   }).render();
 
   var Router = Backbone.Router.extend({
