@@ -526,7 +526,7 @@ module.exports = (function() {
       var popover = new ReadByPopover({
         model: this.model,
         userCollection: this.userCollection,
-        scroller: this.$el.parents('.primary-scroll'),
+        scroller: this.$el.parents('.primary-scroll'), // TODO: make nice
         placement: 'vertical',
         minHeight: '88px',
         width: '300px',

@@ -369,9 +369,5 @@ onready(function () {
     setTimeout(promptForHook, 1500);
   }
 
-  if (context().permalinkChatId) {
-    highlightPermalinkChats(appView.chatCollectionView, context().permalinkChatId);
-  }
-
   Backbone.history.start();
 });
