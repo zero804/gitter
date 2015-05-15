@@ -14,6 +14,7 @@ var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var CollectionWrapperViewTemplate = require('./tmpl/collection-wrapper-view.hbs');
 var ProfileView = require('./profileView');
 var OrgCollectionView = require('./orgCollectionView');
+require('views/behaviors/isomorphic');
 
 var apiClient = require('components/apiClient');
 
@@ -44,13 +45,23 @@ module.exports = (function () {
       list: "#list"
     },
 
+    behaviors: {
+      Isomorphic: {}
+    },
+
     template: CollectionWrapperViewTemplate,
 
+    collectionEvents: {
+      'sync add reset remove': 'display'
+    },
+
     initialize: function (options) {
-      this.collectionView = options.collectionView;
-      this.collection = this.collectionView.collection;
-      this.listenTo(this.collection, 'sync add reset remove', this.display);
       this.handleHide = options.handleHide;
+    },
+
+    initListRegion: function(optionsForRegion) {
+      // Construct an instance of the childView
+      return new this.options.childView(optionsForRegion('list', { collection: this.collection }));
     },
 
     serializeData: function () {
@@ -61,13 +72,7 @@ module.exports = (function () {
     },
 
     onRender: function () {
-      if (this.collection.length) {
-        this.$el.show();
-      } else {
-        this.$el.hide();
-      }
-
-      this.showChildView('list', this.collectionView);
+      this.display();
 
       if (this.handleHide) {
         var hideIcon = this.ui.hide;
@@ -76,35 +81,24 @@ module.exports = (function () {
     },
 
     display: function () {
-      if (this.collection.length > 0) {
-        this.$el.show();
-      } else {
-        this.$el.hide();
-      }
+      this.$el.toggle(this.collection.length > 0);
     }
   });
 
-  var View = Marionette.ItemView.extend({
+  var View = Marionette.LayoutView.extend({
     className: 'menu',
     selectedListIcon: "icon-troupes",
 
     ui: {
       nano: '.nano',
-      profile: '#left-menu-profile',
-      recent: '#list-recents ul',
-      favs: '#list-favs ul',
-      orgs: '#left-menu-list-orgs',
-      suggested: '#left-menu-list-suggested'
     },
 
-    events: function () {
-      var events = {};
+    events: function() {
+      if (isMobile()) return;
 
-      if (!isMobile()) {
-        events['click #left-menu-profile'] = 'toggleHeaderExpansion';
-      }
-
-      return events;
+      return {
+        'click #left-menu-profile': 'toggleHeaderExpansion'
+      };
     },
 
     keyboardEvents: {
@@ -117,12 +111,24 @@ module.exports = (function () {
       'room.1 room.2 room.3 room.4 room.5 room.6 room.7 room.8 room.9 room.10': 'navigateToRoom'
     },
 
+    behaviors: {
+      Isomorphic: {}
+    },
+
+    regions: {
+      profile: "#profile-region",
+      favs: "#favs-region",
+      recents: "#recents-region",
+      orgs: "#orgs-region",
+      suggested: "#suggested-region",
+    },
+
     initialize: function () {
       // this.bindUIElements();
       // this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
       this.repoList = false;
 
-      this.state = new Backbone.Model({
+      this.model = new Backbone.Model({
         menuHeaderExpanded: false
       });
 
@@ -162,6 +168,55 @@ module.exports = (function () {
           this.getSuggestedRooms();
         }.bind(this));
       }
+    },
+
+    initProfileRegion: function(optionsForRegion) {
+      return new ProfileView(optionsForRegion('profile', { model: this.model }));
+    },
+
+    initFavsRegion: function(optionsForRegion) {
+      return new RoomCollectionView(optionsForRegion('favs', {
+        collection: troupeCollections.favourites,
+        draggable: true,
+        dropTarget: true,
+        roomsCollection: troupeCollections.troupes
+      }));
+    },
+
+    initRecentsRegion: function(optionsForRegion) {
+      return new RoomCollectionView(optionsForRegion('recents', {
+        collection: troupeCollections.recentRoomsNonFavourites,
+        draggable: true,
+        dropTarget: true,
+        roomsCollection: troupeCollections.troupes,
+      }));
+    },
+
+    initOrgsRegion: function(optionsForRegion) {
+      return new CollectionWrapperView(optionsForRegion('orgs', {
+        collection: troupeCollections.orgs,
+        childView: OrgCollectionView,
+        header: 'Your Organizations',
+      }));
+    },
+
+    initSuggestedRegion: function(optionsForRegion) {
+      return new CollectionWrapperView(optionsForRegion('suggested', {
+        collection: troupeCollections.suggested,
+        childView: SuggestedCollectionView,
+        header: 'Suggested Rooms',
+        // a little bit messy sorry
+        handleHide: function () {
+          apiClient.user
+            .put('/settings/suggestedRoomsHidden', { value: true })
+            .then(function () {
+              troupeCollections.suggested.reset();
+            })
+            .fail(function (err) {
+              log.error(err);
+            });
+        }
+      }));
     },
 
     getSuggestedRooms: function () {
@@ -249,64 +304,14 @@ module.exports = (function () {
       };
     },
 
-    show: function () {
-      this.setupNanoScroller(troupeCollections.troupes);
-
-      var ui = this.ui;
-
-      new ProfileView({ el: ui.profile, model: this.state }).render();
-
-      // mega-list: recent troupe view
-      new RoomCollectionView({
-        template: false,
-        collection: troupeCollections.favourites,
-        draggable: true,
-        dropTarget: true,
-        roomsCollection: troupeCollections.troupes,
-        el: ui.favs
-      }).render();
-
-      new RoomCollectionView({
-        template: false,
-        collection: troupeCollections.recentRoomsNonFavourites,
-        draggable: true,
-        dropTarget: true,
-        roomsCollection: troupeCollections.troupes,
-        el: ui.recent
-      }).render();
-
-      // Organizations collection view
-      new CollectionWrapperView({
-        collectionView: new OrgCollectionView({ collection: troupeCollections.orgs }),
-        header: 'Your Organizations',
-        el: ui.orgs
-      }).render();
-
-      // Suggested repos
-      new CollectionWrapperView({
-        collectionView: new SuggestedCollectionView({ collection: troupeCollections.suggested }),
-        header: 'Suggested Rooms',
-        el: ui.suggested,
-        // a little bit messy sorry
-        handleHide: function () {
-          apiClient.user
-            .put('/settings/suggestedRoomsHidden', { value: true })
-            .then(function () {
-              troupeCollections.suggested.reset();
-            })
-            .fail(function (err) {
-              log.error(err);
-            });
-        }
-      }).render();
-    },
-
     onRender: function () {
-      this.show();
+      this.setupNanoScroller(troupeCollections.troupes);
     },
 
     toggleHeaderExpansion: function() {
-      this.state.set('menuHeaderExpanded', !this.state.get('menuHeaderExpanded'));
+      this.model.set('menuHeaderExpanded', !this.model.get('menuHeaderExpanded'));
+
+      // TODO: fix
       $('#left-menu-profile').toggleClass('menu-header--expanded');
     }
   });
