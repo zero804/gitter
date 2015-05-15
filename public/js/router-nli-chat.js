@@ -9,7 +9,6 @@ var itemCollections = require('collections/instances/integrated-items');
 var PeopleModal = require('views/people/people-modal');
 var HeaderView = require('views/app/headerView');
 var onready = require('./utils/onready');
-var highlightPermalinkChats = require('./utils/highlight-permalink-chats');
 var ChatToolbarLayout = require('views/layouts/chat-toolbar');
 
 require('views/widgets/preload');
@@ -60,9 +59,5 @@ onready(function() {
   // liveContext.syncRoom();
 
   Backbone.history.start();
-
-  if (context().permalinkChatId) {
-    highlightPermalinkChats(appView.chatCollectionView, context().permalinkChatId);
-  }
 
 });

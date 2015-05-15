@@ -11,7 +11,6 @@ var SuggestedCollectionView = require('./suggested-collection-view');
 var log = require('utils/log');
 var cocktail = require('cocktail');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
-var template = require('./tmpl/troupeMenu.hbs');
 var CollectionWrapperViewTemplate = require('./tmpl/collection-wrapper-view.hbs');
 var ProfileView = require('./profileView');
 var OrgCollectionView = require('./orgCollectionView');
@@ -25,7 +24,7 @@ var SUGGESTED_ROOMS_THRESHOLD = 10; // non inclusive
 module.exports = (function () {
 
   // Reply back to the child iframe - used in search
-  appEvents.on('troupeRequest', function (payload, evt) {
+  appEvents.on('troupeRequest', function (payload, evt) { // jshint unused:true
     var msg = { child_window_event: ['troupesResponse', troupeCollections.troupes] };
     evt.source.postMessage(JSON.stringify(msg), evt.origin);
   });
@@ -87,7 +86,6 @@ module.exports = (function () {
 
   var View = Marionette.ItemView.extend({
     className: 'menu',
-    template: template,
     selectedListIcon: "icon-troupes",
 
     ui: {
@@ -235,7 +233,7 @@ module.exports = (function () {
       }
     },
 
-    navigateToRoom: function (e, handler) {
+    navigateToRoom: function (e, handler) { //jshint unused:true
       var keys = handler.key.split('+');
       var key = keys[ keys.length - 1 ];
       if (key === '0') return this.navigateTo(9);
