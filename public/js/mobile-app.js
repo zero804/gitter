@@ -20,7 +20,6 @@ onready(function() {
   });
 
   var chatCollection = new chatModels.ChatCollection(null, { listen: true });
-
   var appView = new MobileLayout({ template: false, el: 'body', chatCollection: chatCollection });
   appView.render();
 
