@@ -1,5 +1,6 @@
 "use strict";
 var $ = require('jquery');
+var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
 var context = require('utils/context');
@@ -238,10 +239,12 @@ module.exports = (function () {
 
       initScroller(); // initalise on startup
 
+      if(this.nanoListenerSetup) return;
+
+      var initScrollerThrottled = _.throttle(initScroller, 100, { leading: false });
       // listening to events that can affect height, therefore scroll
-      this.listenTo(collection, 'add remove', function () {
-        setTimeout(initScroller, 100); // FIXME: requestAnimation frame does not work here :(
-      });
+      this.listenTo(collection, 'add remove', initScrollerThrottled);
+      this.nanoListenerSetup = true;
     },
 
     // FIXME: WARNING -> THIS METHOD IS UNSAFE.
