@@ -13,8 +13,18 @@ require('views/behaviors/isomorphic');
 
 module.exports = (function() {
 
-  var suggestedRoomCollection = new TroupeCollections.SuggestedTroupeCollection();
-  suggestedRoomCollection.fetch();
+  var user = context.getUser();
+  var prettyWelcome = (parseInt(user.id.slice(-1), 16) % 2) === 0;
+
+  var hash = window.location.hash;
+  // manual override
+  if (hash.match(/pretty/)) {
+    prettyWelcome = true;
+  }
+
+  if (hash.match(/personality/)) {
+    prettyWelcome = false;
+  }
 
   return Marionette.LayoutView.extend({
     template: userHomeTemplate,
@@ -34,6 +44,11 @@ module.exports = (function() {
     },
 
     initRegions: function(optionsForRegion) {
+      if (prettyWelcome) return {};
+
+      var suggestedRoomCollection = new TroupeCollections.SuggestedTroupeCollection();
+      suggestedRoomCollection.fetch();
+
       return {
         orgs: new OrgCollectionView(optionsForRegion('orgs', { collection: troupeCollections.orgs })),
         suggestedRooms: new SuggestedCollectionView(optionsForRegion('suggestedRooms', { collection: suggestedRoomCollection }))
@@ -49,19 +64,8 @@ module.exports = (function() {
     },
 
     serializeData: function() {
-
       var user = context.getUser();
       var hasPrivateRepoScope = !!user.scopes.private_repo;
-      var prettyWelcome = (parseInt(user.id.slice(-1), 16) % 2) === 0;
-
-      // manual override
-      if (window.location.hash.match(/pretty/)) {
-        prettyWelcome = true;
-      }
-
-      if (window.location.hash.match(/personality/)) {
-        prettyWelcome = false;
-      }
 
       return {
         basePath: context.env('basePath'),

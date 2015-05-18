@@ -14,7 +14,8 @@ require('views/widgets/timeago');
 require('components/ping');
 
 onready(function() {
-  new UserHomeView({ el: '#userhome' }).render();
+  var appView = new UserHomeView({ el: '#userhome' });
+  appView.render();
 
   require('components/link-handler').installLinkHandler();
 
@@ -43,4 +44,3 @@ onready(function() {
   new Router();
   Backbone.history.start();
 });
-
