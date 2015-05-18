@@ -163,12 +163,14 @@ module.exports = (function () {
       var hasItems = troupeCollections.troupes && !!(troupeCollections.troupes.length);
 
       if (hasItems) {
-        this.getSuggestedRooms();
+        this.showSuggestedRooms();
       } else {
         this.listenToOnce(troupeCollections.troupes, 'sync', function() {
-          this.getSuggestedRooms();
-        }.bind(this));
+          this.showSuggestedRooms();
+        });
       }
+
+      this.initNanoScrollerThrottled = _.throttle(this.initNanoScroller, 100, { leading: false });
     },
 
     initProfileRegion: function(optionsForRegion) {
@@ -176,6 +178,9 @@ module.exports = (function () {
     },
 
     initFavsRegion: function(optionsForRegion) {
+      // This listener affects favs and recents...
+      this.listenTo(troupeCollections.troupes, 'add remove', this.initNanoScrollerThrottled);
+
       return new RoomCollectionView(optionsForRegion('favs', {
         collection: troupeCollections.favourites,
         draggable: true,
@@ -194,6 +199,8 @@ module.exports = (function () {
     },
 
     initOrgsRegion: function(optionsForRegion) {
+      this.listenTo(troupeCollections.orgs, 'add remove', this.initNanoScrollerThrottled);
+
       return new CollectionWrapperView(optionsForRegion('orgs', {
         collection: troupeCollections.orgs,
         childView: OrgCollectionView,
@@ -201,8 +208,17 @@ module.exports = (function () {
       }));
     },
 
-    initSuggestedRegion: function(optionsForRegion) {
-      return new CollectionWrapperView(optionsForRegion('suggested', {
+    showSuggestedRooms: function() {
+      if (this.suggested.hasView()) return;
+
+      var suggestedRoomsHidden = context().suggestedRoomsHidden;
+
+      if (suggestedRoomsHidden || troupeCollections.troupes.length >= SUGGESTED_ROOMS_THRESHOLD) return;
+
+      this.listenTo(troupeCollections.suggested, 'add remove', this.initNanoScrollerThrottled);
+      troupeCollections.suggested.fetch();
+
+      var suggestedWrapperView = new CollectionWrapperView({
         collection: troupeCollections.suggested,
         childView: SuggestedCollectionView,
         header: 'Suggested Rooms',
@@ -217,34 +233,16 @@ module.exports = (function () {
               log.error(err);
             });
         }
-      }));
+      });
+      this.showChildView('suggested', suggestedWrapperView);
     },
 
-    getSuggestedRooms: function () {
-      var suggestedRoomsHidden = context().suggestedRoomsHidden;
-
-      if (!suggestedRoomsHidden && troupeCollections.troupes.length < SUGGESTED_ROOMS_THRESHOLD) {
-        troupeCollections.suggested.fetch();
-      }
-    },
-
-    setupNanoScroller: function (collection) {
+    initNanoScroller: function() {
       var ui = this.ui;
       var target = ui.nano[0];
       if (!target) return;
 
-      var initScroller = function () {
-        $(target).nanoScroller({ iOSNativeScrolling: true });
-      };
-
-      initScroller(); // initalise on startup
-
-      if(this.nanoListenerSetup) return;
-
-      var initScrollerThrottled = _.throttle(initScroller, 100, { leading: false });
-      // listening to events that can affect height, therefore scroll
-      this.listenTo(collection, 'add remove', initScrollerThrottled);
-      this.nanoListenerSetup = true;
+      $(target).nanoScroller({ iOSNativeScrolling: true });
     },
 
     // FIXME: WARNING -> THIS METHOD IS UNSAFE.
@@ -308,7 +306,7 @@ module.exports = (function () {
     },
 
     onRender: function () {
-      this.setupNanoScroller(troupeCollections.troupes);
+      this.initNanoScroller();
     },
 
     toggleHeaderExpansion: function() {
