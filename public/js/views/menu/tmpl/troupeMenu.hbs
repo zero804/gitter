@@ -31,6 +31,16 @@
       </div>
       <div class='menu-list__item' id="suggested-region"></div>
       <div class='menu-list__item' id="orgs-region">
+        <div>
+          <div class="menu-list__header">
+            <h5>Your Organizations</h5>
+          </div>
+          <div class='menu-list__section' id="list">
+            <ul>
+            {{#each orgs}}<li class="room-list-item">{{{ prerenderOrgListItem this }}}</li>{{/each}}
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   </div>
