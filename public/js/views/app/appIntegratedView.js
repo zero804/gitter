@@ -1,35 +1,37 @@
 "use strict";
 var Marionette = require('backbone.marionette');
-var TroupeMenuView = require('views/menu/troupeMenu');
+var TroupeMenu = require('views/menu/troupeMenu');
 var modalRegion = require('components/modal-region');
+
+require('views/behaviors/isomorphic');
 
 module.exports = (function () {
 
   /** @const */
   var BACKSPACE = 8;
 
-  var AppIntegratedLayout = Marionette.ItemView.extend({
-    template: false, // Always server prerendered
+  var AppIntegratedLayout = Marionette.LayoutView.extend({
+    template: false,
     el: 'body',
+
+    behaviors: {
+      Isomorphic: {}
+    },
 
     events: {
       "keydown": "onKeyDown"
     },
 
-    ui: {
-      menu: '#menu'
+    regions: {
+      menu: "#menu-region"
     },
 
     initialize: function () {
       this.dialogRegion = modalRegion;
     },
 
-    onRender: function() {
-      this.menu = new TroupeMenuView({
-          template: false, // Server render here, just attach
-          el: this.ui.menu
-        })
-        .render();
+    initMenuRegion: function(optionsForRegion) {
+      return new TroupeMenu(optionsForRegion('menu'));
     },
 
     onKeyDown: function(e) {
