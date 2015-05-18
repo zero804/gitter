@@ -133,31 +133,14 @@ module.exports = (function () {
         menuHeaderExpanded: false
       });
 
-      var self = this;
-
-      var showMenu = function () {
-        self.$el.removeClass('menu--collapsed');
-      };
-
-      appEvents.on('menu:hide', function () {
-        self.$el.addClass('menu--collapsed');
-      });
-
-      appEvents.on('menu:show', showMenu);
-      appEvents.on('navigation', showMenu);
-      appEvents.on('troupeUnreadTotalChange', function(values) {
-        var unreadText = values.overall || ' ';
-        self.$el.find('#menu-tab-unread-count').text(unreadText);
-      });
-
       this.selectedIndex = 0;
 
-      // Keep track of conversation change to select the proper element
-      appEvents.on('context.troupeId', function(id) {
-        $('#recentTroupesList li').removeClass('selected');
-        var index = self.getIndexForId(id);
-        if (index) self.selectedIndex = index;
-      });
+      // TODO: build a behavior to handle this declaratively
+      this.listenTo(appEvents, 'menu:hide', this.hideMenu);
+      this.listenTo(appEvents, 'menu:show', this.showMenu);
+      this.listenTo(appEvents, 'navigation', this.showMenu);
+      this.listenTo(appEvents, 'troupeUnreadTotalChange', this.updateUnread);
+      this.listenTo(appEvents, 'context.troupeId', this.troupeContextChanged);
 
       // determining whether we should show the suggested rooms or not
       var hasItems = troupeCollections.troupes && !!(troupeCollections.troupes.length);
@@ -243,6 +226,25 @@ module.exports = (function () {
       if (!target) return;
 
       $(target).nanoScroller({ iOSNativeScrolling: true });
+    },
+
+    showMenu: function() {
+      this.$el.removeClass('menu--collapsed');
+    },
+
+    hideMenu: function() {
+      this.$el.addClass('menu--collapsed');
+    },
+
+    updateUnread: function(values) {
+      var unreadText = values.overall || ' ';
+      this.$el.find('#menu-tab-unread-count').text(unreadText);
+    },
+
+    troupeContextChanged: function(id) {
+      $('#recentTroupesList li').removeClass('selected'); // TODO: so nasty. Fix
+      var index = this.getIndexForId(id);
+      if (index) this.selectedIndex = index;
     },
 
     // FIXME: WARNING -> THIS METHOD IS UNSAFE.
