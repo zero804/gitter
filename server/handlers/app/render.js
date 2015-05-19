@@ -62,7 +62,7 @@ function renderHomePage(req, res, next) {
       var page, bootScriptName;
 
       if(req.isPhone) {
-        page = 'mobile/mobile-app';
+        page = 'mobile/mobile-userhome';
         bootScriptName = 'mobile-userhome';
       } else {
         page = 'userhome-template';
