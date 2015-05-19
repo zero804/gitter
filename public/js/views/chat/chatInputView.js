@@ -168,11 +168,7 @@ module.exports = (function() {
       this.ui.composeToggle.tooltip({ placement: 'left' });
       this.ui.mdHelp.tooltip({ placement: 'left' });
 
-      if(!isMobile()) {
-        // textcomplete on mobile safari ios 8 causes the keyboard to
-        // immediately hide on focus.
-        $textarea.textcomplete(typeaheads);
-      }
+      $textarea.textcomplete(typeaheads);
 
       // Use 'on' and 'off' instead of proper booleans as attributes are strings
       $textarea.on('textComplete:show', function() {
