@@ -3,6 +3,7 @@
 
 var jQuery = require('jquery');
 var uiVars = require('views/app/uiVars');
+var detectCompact = require('utils/detect-compact');
 
 module.exports = (function() {
 
@@ -373,7 +374,11 @@ module.exports = (function() {
 
   var old = $.fn.tooltip
 
+  var compact = detectCompact();
+
   $.fn.tooltip = function ( option ) {
+    if (compact) return; // Do nothing if compact
+
     return this.each(function () {
       var $this = $(this)
         , data = $this.data('tooltip')

@@ -1,5 +1,5 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var context = require('utils/context');
 var template = require('./tmpl/parentSelectView.hbs');
 var itemTemplate = require('./tmpl/parentItemView.hbs');
@@ -153,8 +153,8 @@ module.exports = (function() {
       }
     },
 
-    onClose: function() {
-      this.typeahead.close();
+    onDestroy: function() {
+      this.typeahead.destroy();
     },
 
     focus: function() {

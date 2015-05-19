@@ -7,12 +7,14 @@ var context = require('utils/context');
 var liveContext = require('components/live-context');
 var appEvents = require('utils/appevents');
 var log = require('utils/log');
-var ChatIntegratedView = require('views/app/chatIntegratedView');
+var ChatToolbarInputLayout = require('views/layouts/chat-toolbar-input');
+var DropTargetView = require('views/app/dropTargetView');
 var onready = require('./utils/onready');
 var highlightPermalinkChats = require('./utils/highlight-permalink-chats');
 var apiClient = require('components/apiClient');
 var HeaderView = require('views/app/headerView');
 var frameUtils = require('./utils/frame-utils');
+var itemCollections = require('collections/instances/integrated-items');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -24,8 +26,6 @@ require('components/bug-reporting');
 require('components/focus-events');
 
 // Preload widgets
-require('views/widgets/avatar');
-require('views/widgets/timeago');
 require('components/ping');
 
 
@@ -188,7 +188,12 @@ onready(function () {
       });
   });
 
-  var appView = new ChatIntegratedView({ el: 'body' });
+  var appView = new ChatToolbarInputLayout({ template: false, el: 'body', chatCollection: itemCollections.chats });
+  appView.render();
+
+  /* Drag and drop */
+  new DropTargetView({ template: false, el: 'body' }).render();
+
   new HeaderView({ model: context.troupe(), el: '#header' });
 
   // This may require a better home
@@ -221,7 +226,7 @@ onready(function () {
     },
 
     hideModal: function() {
-      appView.dialogRegion.close();
+      appView.dialogRegion.destroy();
     },
 
     people: function() {
@@ -362,10 +367,5 @@ onready(function () {
     setTimeout(promptForHook, 1500);
   }
 
-  if (context().permalinkChatId) {
-    highlightPermalinkChats(appView.chatCollectionView, context().permalinkChatId);
-  }
-
   Backbone.history.start();
 });
-

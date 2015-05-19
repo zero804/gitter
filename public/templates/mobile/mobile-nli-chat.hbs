@@ -15,7 +15,7 @@
 
   {{{ generateTroupeContext troupeContext }}}
   {{{bootScript bootScriptName }}}
-  
+
   <link rel="apple-touch-icon" href='{{ cdn "images/touch-icon-iphone.png" }}'>
   <link rel="shortcut icon" href='{{ cdn "images/favicon5.png"}}'>
   {{#each dnsPrefetch}}
@@ -33,14 +33,12 @@
 
   <div id="mainPage" class="chat-app">
     <header>
-      <div id="showTroupesButton">
-        <img src='{{cdn "images/icon-more@2x.png" }}' width="16" height="16" id="menu-toggle" style="margin-left: 8px">
-      </div>
       <span class="trpTitle">{{troupeName}}</span>
     </header>
     {{> chat_content}}
     <footer id="login-footer" style="flex-shrink: 0;"></footer>
   </div>
   {{>live_reload}}
+  {{>set_initial_position}}
 </body>
 </html>

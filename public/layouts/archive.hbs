@@ -28,66 +28,68 @@
 </head>
 <body class="logged-out">
   <div class="chat-and-toolbar-wrapper">
-    <div class="right-toolbar" style="overflow: scroll">
-      <div class="gtrArchiveToolbarWrapper">
-        {{#if isHomePage}}
-          <div class="gtrArchiveInfoContainer" style="height: 325px;">
-              <div class="gtrArchiveLogo">
-                <div class="logo-container"></div>
-              </div>
-              <div class="gtrArchiveInfo" style="padding-top: 40px">
-                <p>These are chat archives for <strong>{{troupeName}}</strong></p><br>
-                <p>Click on a coloured date box to view message archives for a given day.</p>
-              </div>
-          </div>
-          {{#if user}}
-          <div class="trpLeftMenuSignup">
-            <a class="trpButtonMedium trpBtnGreen gtrCreateRoomButton" href="/{{troupeName}}">Go to live room</a>
-          </div>
-
-            {{#if isAdmin}}
-              {{#if public}}
-                <div class="trpTroupeActions" style="text-align: center;">
-                  <p><small id='noindexStatus'></small></p>
-                  <input id='noindex' type='checkbox' name='noindex' {{#unless noindex}} checked {{/unless}}>
-                  <small>Room indexed by search engines.</small>
-                </div>
-              {{/if}}
-            {{/if}}
-
-          {{else}}
-          <div class="trpLeftMenuSignup">
-            <a href="/login/github?action=login&amp;button=leftmenu-1" class="trpButtonBig trpBtnGreen gtrCreateRoomButton">Login with GitHub to start talking</a>
-          </div>
-          {{/if}}
-          {{else}}
-            {{^user}}
-            <div class="gtrArchiveInfoContainer">
+    <div class="right-toolbar-region">      
+      <div class="right-toolbar" style="overflow: auto">
+        <div class="gtrArchiveToolbarWrapper">
+          {{#if isHomePage}}
+            <div class="gtrArchiveInfoContainer" style="height: 325px;">
                 <div class="gtrArchiveLogo">
                   <div class="logo-container"></div>
                 </div>
-                <div class="gtrArchiveInfo">
-                  <p>These are chat archives for <strong>{{troupeName}}</strong></p>
+                <div class="gtrArchiveInfo" style="padding-top: 40px">
+                  <p>These are chat archives for <strong>{{troupeName}}</strong></p><br>
+                  <p>Click on a coloured date box to view message archives for a given day.</p>
                 </div>
             </div>
-            {{/user}}
-          {{/if}}
-        <div id="archive-navigation" class="gtrArchiveNavigationWrapper">
-          {{#if archiveChats}}
-            {{{ prerenderView "js/views/archive/tmpl/archive-navigation-view" }}}
-          {{/if}}
+            {{#if user}}
+            <div class="trpLeftMenuSignup">
+              <a class="trpButtonMedium trpBtnGreen gtrCreateRoomButton" href="/{{troupeName}}">Go to live room</a>
+            </div>
+
+              {{#if isAdmin}}
+                {{#if public}}
+                  <div class="trpTroupeActions" style="text-align: center;">
+                    <p><small id='noindexStatus'></small></p>
+                    <input id='noindex' type='checkbox' name='noindex' {{#unless noindex}} checked {{/unless}}>
+                    <small>Room indexed by search engines.</small>
+                  </div>
+                {{/if}}
+              {{/if}}
+
+            {{else}}
+            <div class="trpLeftMenuSignup">
+              <a href="/login/github?action=login&amp;button=leftmenu-1" class="trpButtonBig trpBtnGreen gtrCreateRoomButton">Login with GitHub to start talking</a>
+            </div>
+            {{/if}}
+            {{else}}
+              {{^user}}
+              <div class="gtrArchiveInfoContainer">
+                  <div class="gtrArchiveLogo">
+                    <div class="logo-container"></div>
+                  </div>
+                  <div class="gtrArchiveInfo">
+                    <p>These are chat archives for <strong>{{troupeName}}</strong></p>
+                  </div>
+              </div>
+              {{/user}}
+            {{/if}}
+          <div id="archive-navigation" class="gtrArchiveNavigationWrapper">
+            {{#if archiveChats}}
+              {{{ prerenderView "js/views/archive/tmpl/archive-navigation-view" }}}
+            {{/if}}
+          </div>
+          {{#unless isHomePage}}
+            {{#if user}}
+            <div class="trpLeftMenuSignup">
+              <a class="trpButtonMedium trpBtnGreen gtrCreateRoomButton" href="/{{troupeName}}">Go to live room</a>
+            </div>
+            {{else}}
+            <div class="trpLeftMenuSignup">
+              <a href="/login/github?action=login&amp;button=archive-login" class="trpButtonBig trpBtnGreen gtrCreateRoomButton">Login with GitHub to start talking</a>
+            </div>
+            {{/if}}
+          {{/unless}}
         </div>
-        {{#unless isHomePage}}
-          {{#if user}}
-          <div class="trpLeftMenuSignup">
-            <a class="trpButtonMedium trpBtnGreen gtrCreateRoomButton" href="/{{troupeName}}">Go to live room</a>
-          </div>
-          {{else}}
-          <div class="trpLeftMenuSignup">
-            <a href="/login/github?action=login&amp;button=archive-login" class="trpButtonBig trpBtnGreen gtrCreateRoomButton">Login with GitHub to start talking</a>
-          </div>
-          {{/if}}
-        {{/unless}}
       </div>
     </div>
     <div class="chat-app">

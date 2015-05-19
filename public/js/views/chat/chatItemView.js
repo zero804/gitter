@@ -4,8 +4,7 @@ var _ = require('underscore');
 var context = require('utils/context');
 var chatModels = require('collections/chat');
 var AvatarView = require('views/widgets/avatar');
-var Marionette = require('marionette');
-var TroupeViews = require('views/base');
+var Marionette = require('backbone.marionette');
 var moment = require('moment');
 var uiVars = require('views/app/uiVars');
 var Popover = require('views/popover');
@@ -16,6 +15,9 @@ var appEvents = require('utils/appevents');
 var cocktail = require('cocktail');
 var chatCollapse = require('utils/collapsed-item-client');
 var KeyboardEventMixins = require('views/keyboard-events-mixin');
+var LoadingCollectionMixin = require('views/loading-mixin');
+
+
 var RAF = require('utils/raf');
 var toggle = require('utils/toggle');
 require('views/behaviors/unread-items');
@@ -119,8 +121,7 @@ module.exports = (function() {
       this.listenToOnce(this, 'messageInViewport', this.decorate);
     },
 
-    /** XXX TODO NB: change this to onClose once we've moved to Marionette 2!!!! */
-    onClose: function() {
+    onDestroy: function() {
       clearTimeout(this.timeChangeTimeout);
     },
 
@@ -275,7 +276,7 @@ module.exports = (function() {
         var isCollapsible = !!this.model.get('isCollapsible');
         var $collapse = this.ui.collapse;
         toggle($collapse[0], isCollapsible);
-      }
+          }
     },
 
     getEditTooltip: function() {
@@ -525,7 +526,7 @@ module.exports = (function() {
       var popover = new ReadByPopover({
         model: this.model,
         userCollection: this.userCollection,
-        scroller: this.$el.parents('.primary-scroll'),
+        scroller: this.$el.parents('.primary-scroll'), // TODO: make nice
         placement: 'vertical',
         minHeight: '88px',
         width: '300px',
@@ -586,18 +587,18 @@ module.exports = (function() {
   cocktail.mixin(ChatItemView, KeyboardEventMixins);
 
   var ReadByView = Marionette.CollectionView.extend({
-    itemView: AvatarView,
+    childView: AvatarView,
     className: 'popoverReadBy',
     initialize: function(options) {
       var c = new chatModels.ReadByCollection(null, { listen: true, chatMessageId: this.model.id, userCollection: options.userCollection });
       c.loading = true;
       this.collection = c;
     },
-    onClose: function(){
+    onDestroy: function(){
       this.collection.unlisten();
     }
   });
-  cocktail.mixin(ReadByView, TroupeViews.LoadingCollectionMixin);
+  cocktail.mixin(ReadByView, LoadingCollectionMixin);
 
   var ReadByPopover = Popover.extend({
     initialize: function(options) {

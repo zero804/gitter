@@ -7,6 +7,8 @@
 @import "trp3Common";
 @import "trpButtons";
 
+@import "./pulse-animations.less";
+
 @import "base-transition-mixins";
 
 @keyframes pulsey {
@@ -56,14 +58,6 @@
     -webkit-transform: rotate(360deg);
     transform: rotate(360deg);
   }
-}
-
-.pulse {
-  animation: pulsey 2s linear infinite;
-}
-
-.pulse--fast {
-  animation: pulsey 1s linear infinite;
 }
 
 html {
@@ -382,12 +376,6 @@ ul li.placeholder:before {
   margin-left: 22px;
   margin-bottom: -2px;
   display: inline-block;
-}
-
-.trpFramePanel {
-  height: 100%;
-  position: relative;
-  flex-grow: 1;
 }
 
 .loading-frame {

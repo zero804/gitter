@@ -60,7 +60,6 @@ var ChatModel = Backbone.Model.extend({
 
   },
   parse: function (message) {
-
     if (message.sent) {
       message.sent = moment(message.sent, moment.defaultFormat);
     }

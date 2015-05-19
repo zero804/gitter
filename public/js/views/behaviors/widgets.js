@@ -1,7 +1,7 @@
 "use strict";
 var $ = require('jquery');
 var _ = require('underscore');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
 
 module.exports = (function() {
@@ -23,14 +23,14 @@ module.exports = (function() {
     this._widgets.push(widget);
   };
 
-  WidgetManager.prototype.close = function() {
+  WidgetManager.prototype.destroy = function() {
     _.each(this._widgets, function(item) {
-      item.close();
+      item.destroy();
     });
     this._widgets = [];
   };
 
-  function render(template, data) {
+  function render(template, data, view) {
     if (!template) {
      throw new Error("Cannot render the template since it's false, null or undefined.");
     }
@@ -43,9 +43,7 @@ module.exports = (function() {
     }
 
     var generatedText = templateFunc(data);
-    var view = data._view;
-
-    if(!data.renderViews || !view) return generatedText;
+    if(!data.renderViews || !view || !data.renderViews.length) return generatedText; 
 
     // Turn the text into a DOM
     var dom = $($.parseHTML(generatedText));
@@ -72,8 +70,6 @@ module.exports = (function() {
 
       // Create a region
       widgetManager.add(widget);
-
-      return widget;
     });
 
     return dom;
@@ -88,9 +84,9 @@ module.exports = (function() {
         return { _view: this };
       };
     },
-    onClose: function() {
+    onDestroy: function() {
       if(this.view.widgetManager) {
-        this.view.widgetManager.close();
+        this.view.widgetManager.destroy();
         this.view.widgetManager = null;
       }
     }

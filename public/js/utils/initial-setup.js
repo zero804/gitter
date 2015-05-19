@@ -1,6 +1,6 @@
 'use strict';
 var Backbone = require('backbone');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 
 module.exports = (function () {
   if (window.__agent) {
