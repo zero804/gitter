@@ -1,13 +1,11 @@
 "use strict";
-var UserHomeView = require('views/userhome/userHomeView');
 var $ = require('jquery');
 var appEvents = require('utils/appevents');
 var Backbone = require('backbone');
-var TroupeMenu = require('views/menu/troupeMenu');
-var MobileAppView = require('views/app/mobileAppView');
 var confirmRepoRoomView = require('views/createRoom/confirmRepoRoomView');
 var modalRegion = require('components/modal-region');
 var onready = require('./utils/onready');
+var MobileUserhomeLayout = require('views/layouts/mobile-userhome');
 
 // Preload widgets
 require('views/widgets/avatar');
@@ -20,16 +18,9 @@ onready(function() {
     window.location.href = url;
   });
 
-  new MobileAppView({
-    el: $('#mainPage')
-  });
-
-  new TroupeMenu({
-    el: $('#troupeList')
-  }).render();
-
-  new UserHomeView({
-    el: $('#userhome')
+  new MobileUserhomeLayout({
+    template: false,
+    el: 'body'
   }).render();
 
   var Router = Backbone.Router.extend({
