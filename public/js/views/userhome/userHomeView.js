@@ -53,7 +53,7 @@ module.exports = (function() {
       var suggestedRoomCollection = new TroupeCollections.SuggestedTroupeCollection();
       suggestedRoomCollection.fetch();
 
-      new SuggestedCollectionView(optionsForRegion({ collection: suggestedRoomCollection }));
+      return new SuggestedCollectionView(optionsForRegion({ collection: suggestedRoomCollection }));
     },
 
     onRender: function() {
