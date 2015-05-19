@@ -90,14 +90,6 @@ module.exports = (function () {
       nano: '.nano',
     },
 
-    events: function() {
-      if (isMobile()) return;
-
-      return {
-        'click #left-menu-profile': 'toggleHeaderExpansion'
-      };
-    },
-
     keyboardEvents: {
       'room.up': 'selectPrev',
       'room.down': 'selectNext',
@@ -113,7 +105,7 @@ module.exports = (function () {
         profile: {
           el: "#profile-region",
           init: function(optionsForRegion) {
-            return new ProfileView(optionsForRegion({ model: this.model }, { rerender: true }));
+            return new ProfileView(optionsForRegion({ rerender: true }));
           }
         },
         favs: {
@@ -164,11 +156,6 @@ module.exports = (function () {
       // this.bindUIElements();
       // this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
       this.repoList = false;
-
-      this.model = new Backbone.Model({
-        menuHeaderExpanded: false
-      });
-
       this.selectedIndex = 0;
 
       // TODO: build a behavior to handle this declaratively
@@ -310,13 +297,6 @@ module.exports = (function () {
 
     onRender: function () {
       this.initNanoScroller();
-    },
-
-    toggleHeaderExpansion: function() {
-      this.model.set('menuHeaderExpanded', !this.model.get('menuHeaderExpanded'));
-
-      // TODO: fix
-      $('#left-menu-profile').toggleClass('menu-header--expanded');
     }
   });
 
