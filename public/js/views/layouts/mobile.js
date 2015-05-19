@@ -22,7 +22,7 @@ module.exports = Marionette.LayoutView.extend({
   behaviors: {
     Isomorphic: {
       chat: { el: '#content-wrapper', init: 'initChatRegion' },
-      menu: { el: '#troupeList', init: 'initMenuRegion' },
+      menu: { el: '#menu-region', init: 'initMenuRegion' },
       input: { el: '#chat-input', init: 'initInputRegion' },
     }
   },
