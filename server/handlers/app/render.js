@@ -62,7 +62,7 @@ function renderHomePage(req, res, next) {
       var page, bootScriptName;
 
       if(req.isPhone) {
-        page = 'mobile/mobile-app';
+        page = 'mobile/mobile-userhome';
         bootScriptName = 'mobile-userhome';
       } else {
         page = 'userhome-template';
@@ -300,12 +300,11 @@ function renderChatPage(req, res, next) {
 function renderMobileUserHome(req, res, next) {
   contextGenerator.generateNonChatContext(req)
     .then(function(troupeContext) {
-      res.render('mobile/mobile-app', {
-        bootScriptName: 'mobile-userhome',
+      res.render('mobile/mobile-userhome', {
         troupeName: req.uriContext.uri,
         troupeContext: troupeContext,
         agent: req.headers['user-agent'],
-        isUserhome: true,
+        user: req.user,
         dnsPrefetch: dnsPrefetch
       });
     })
