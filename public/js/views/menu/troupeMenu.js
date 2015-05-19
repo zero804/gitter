@@ -113,7 +113,7 @@ module.exports = (function () {
         profile: {
           el: "#profile-region",
           init: function(optionsForRegion) {
-            return new ProfileView(optionsForRegion({ model: this.model }));
+            return new ProfileView(optionsForRegion({ model: this.model }, { rerender: true }));
           }
         },
         favs: {
