@@ -34,25 +34,26 @@ module.exports = (function() {
       'click #upgrade-auth': 'onUpgradeAuthClick',
     },
 
-    regions: {
-      orgs: "#org-list",
-      suggestedRooms: "#suggested-room-list"
-    },
-
     behaviors: {
-      Isomorphic: {}
+      Isomorphic: {
+        orgs: { el: "#org-list", init: 'initOrgsRegion' },
+        suggestedRooms: { el: "#suggested-room-list", init: 'initSuggestedRoomsRegion' },
+      }
     },
 
-    initRegions: function(optionsForRegion) {
-      if (prettyWelcome) return {};
+    initOrgsRegion: function(optionsForRegion) {
+      if (prettyWelcome) return;
+
+      return new OrgCollectionView(optionsForRegion({ collection: troupeCollections.orgs }));
+    },
+
+    initSuggestedRoomsRegion: function(optionsForRegion) {
+      if (prettyWelcome) return;
 
       var suggestedRoomCollection = new TroupeCollections.SuggestedTroupeCollection();
       suggestedRoomCollection.fetch();
 
-      return {
-        orgs: new OrgCollectionView(optionsForRegion('orgs', { collection: troupeCollections.orgs })),
-        suggestedRooms: new SuggestedCollectionView(optionsForRegion('suggestedRooms', { collection: suggestedRoomCollection }))
-      };
+      new SuggestedCollectionView(optionsForRegion({ collection: suggestedRoomCollection }));
     },
 
     onRender: function() {

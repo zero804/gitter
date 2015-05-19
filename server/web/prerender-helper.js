@@ -13,9 +13,9 @@ var PRERENDERED_VIEWS = [
   "js/views/search/tmpl/search-input",
   "js/views/search/tmpl/search",
   'js/views/people/tmpl/peopleCollectionView',
-
   /* new */
-  "js/views/menu/tmpl/profile"
+  "js/views/menu/tmpl/profile",
+  "js/views/menu/tmpl/org-list-item",
 ].reduce(function(memo, v) {
   memo[v] = compileTemplate(v + ".hbs");
   return memo;
@@ -33,10 +33,12 @@ module.exports = exports = function (templateFile, options) {
 
   var className = hash.className;
   var id = hash.id;
+  var dataId = hash.dataId && this.id;
 
   return prerenderWrapper({
     className: className,
     id: id,
+    dataId: dataId,
     wrap: wrap,
     inner: inner
   });

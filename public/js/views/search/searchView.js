@@ -348,11 +348,10 @@ module.exports = (function() {
   var SearchView = Marionette.LayoutView.extend({
     // template: searchTemplate, SearchView is prerendered
     behaviors: {
-      Isomorphic: {}
-    },
-    regions: {
-      roomsRegion: '.js-search-rooms',
-      messagesRegion: '.js-search-messages',
+      Isomorphic: {
+        roomsRegion: { el: '.js-search-rooms', init: 'initRoomsRegion' },
+        messagesRegion: { el: '.js-search-messages', init: 'initMessagesRegion' },
+      }
     },
 
     // the shortcuts need to be handled at the top level component
@@ -438,11 +437,12 @@ module.exports = (function() {
 
     },
 
-    initRegions: function(optionsForRegion) {
-      return {
-        roomsRegion: new RoomsCollectionView(optionsForRegion('roomsRegion', { collection: this.rooms })),
-        messagesRegion: new MessagesCollectionView(optionsForRegion('messagesRegion', { collection: this.chats }))
-      };
+    initRoomsRegion: function(optionsForRegion) {
+      return new RoomsCollectionView(optionsForRegion({ collection: this.rooms }));
+    },
+
+    initMessagesRegion: function(optionsForRegion) {
+      return new MessagesCollectionView(optionsForRegion({ collection: this.chats }));
     },
 
     isSearchTermEmpty: function () {
@@ -477,7 +477,6 @@ module.exports = (function() {
         .then(finishedLoading)
         .fail(finishedLoading);
 
-      this.showResults();
       this.triggerMethod('search:show'); // hide top toolbar content
     },
 
