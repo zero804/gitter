@@ -35,8 +35,8 @@
           <div class="menu-list__header">
             <h5>Your Organizations</h5>
           </div>
-          <div class='' id="list">
-            <ul>
+          <div id="list">
+            <ul class="room-list">
               {{#each orgs}}
               {{{ prerenderView "js/views/menu/tmpl/org-list-item" wrap="li" dataId=true className="room-list-item" }}}
               {{/each}}
