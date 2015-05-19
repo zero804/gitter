@@ -5,7 +5,7 @@ var appEvents = require('utils/appevents');
 var context = require('utils/context');
 var Backbone = require('backbone');
 var _ = require('underscore');
-var AppLayout = require('views/app/appLayout');
+var AppLayout = require('views/layouts/app-layout');
 var troupeCollections = require('collections/instances/troupes');
 var TitlebarUpdater = require('components/titlebar');
 var realtime = require('components/realtime');
@@ -119,9 +119,7 @@ onready(function () {
      });
   }
 
-  var appLayout = new AppLayout({
-      el: 'body'
-    });
+  var appLayout = new AppLayout({ template: false, el: 'body' });
   appLayout.render();
 
   var allRoomsCollection = troupeCollections.troupes;
