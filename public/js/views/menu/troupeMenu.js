@@ -105,7 +105,7 @@ module.exports = (function () {
         profile: {
           el: "#profile-region",
           init: function(optionsForRegion) {
-            return new ProfileView(optionsForRegion());
+            return new ProfileView(optionsForRegion({ rerender: true }));
           }
         },
         favs: {
