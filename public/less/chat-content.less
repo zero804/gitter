@@ -25,28 +25,27 @@
 
 .scrollHelper {
   z-index: 1000;
-  text-align: center;
   @color: rgb(200, 200, 200);
   position: absolute;
   bottom: 20px;
   right: 20px;
   height: @scrollHelperSize;
   width: @scrollHelperSize;
-  line-height: @scrollHelperSize;
   border: 3px solid @color;
   border-radius: @scrollHelperSize / 1.5;
   background-color: rgba(255, 255, 255, 0.5);
   cursor: pointer;
   display: flex;
   justify-content: center;
-  align-content: center;
   color: @color;
-  transition: transform 0.1s cubic-bezier(0.17, 0.67, 0.83, 0.67), color 0.25s ease-in, border-color 0.25s ease-in;
 
   @media @mobile {
     display: none;
   }
 
+  transition: transform 100ms cubic-bezier(0.17, 0.67, 0.83, 0.67),
+              color 250ms ease-in,
+              border-color 250ms ease-in;
 }
 
 .scrollHelper:hover {
@@ -55,9 +54,13 @@
   border-color: @color;
 }
 
+.scrollHelper--hidden {
+  transform: scale(0);
+}
+
 .scrollHelper .octicon {
-  margin-top: 13px;
   font-size: 24px;
+  line-height: @scrollHelperSize;
 }
 
 .trpContentPanel {
