@@ -8,7 +8,7 @@
   overflow: hidden;
   border-radius: 4px;
 
-  transition: max-height 200ms; // TODO: specify property
+  transition: max-height 200ms;
 
   .trpDisplayPicture {
     float: left;
@@ -24,13 +24,19 @@
   // css animations dont work for height: auto,
   // but we can use a rough max-height instead.
   max-height: 200px;
-  transition: max-height 400ms; // TODO: specify property
+  transition: max-height 400ms;
 }
 
 body.hover .menu-header:hover,
 body.hover .menu-header--expanded {
   background-color: rgba(255, 255, 255, 0.2);
 }
+
+// changing toggle chevron without rerendering the whole view
+.menu-header .octicon-chevron-up { display: none; }
+.menu-header--expanded .octicon-chevron-up { display: inline-block; }
+.menu-header .octicon-chevron-down { display: inline-block; }
+.menu-header--expanded .octicon-chevron-down { display: none; }
 
 .menu-header__profile {
   display: flex;

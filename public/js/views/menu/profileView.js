@@ -9,14 +9,20 @@ var logout = require('utils/logout');
 
 require('views/behaviors/widgets');
 
+var isMobileResult = isMobile();
+
 module.exports = (function () {
 
   return Marionette.ItemView.extend({
     template: template,
-    className: 'menu-header',
+    className: function() {
+      // expanded by default for mobile
+      return isMobileResult ? 'menu-header menu-header--expanded' : 'menu-header';
+    },
     events: {
-      "click #link-home": 'homeClicked',
-      "click #link-logout": 'logoutClicked'
+      'click': 'toggleExpanded',
+      'click #link-home': 'homeClicked',
+      'click #link-logout': 'logoutClicked'
     },
 
     behaviors: {
@@ -29,7 +35,6 @@ module.exports = (function () {
 
     serializeData: function () {
       var userModel = context.user().toJSON();
-      var isMobileResult = isMobile();
       var isNativeResult = isNative();
 
       return {
@@ -41,6 +46,13 @@ module.exports = (function () {
         showGetApps: !isMobileResult && !isNativeResult,
         showSignout: !isNativeResult
       };
+    },
+
+    toggleExpanded: function() {
+      // stay expanded on mobile
+      if (isMobileResult) return;
+
+      this.$el.toggleClass('menu-header--expanded');
     },
 
     homeClicked: function (e) {
