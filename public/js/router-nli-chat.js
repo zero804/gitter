@@ -34,8 +34,8 @@ onready(function() {
   var appView = new ChatToolbarLayout({ template: false, el: 'body', chatCollection: itemCollections.chats });
   appView.render();
 
+  // TODO: add this to the appView
   new HeaderView({ model: context.troupe(), el: '#header' });
-  // new RightToolbarView({ el: "#right-toolbar-layout" });
 
   var Router = Backbone.Router.extend({
     routes: {
