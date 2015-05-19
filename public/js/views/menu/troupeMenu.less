@@ -1,12 +1,15 @@
-@import "base-zindex-levels";
-@import "base-transition-mixins";
+@import (reference) "../../../less/colors.less";
+@import (reference) "../../../less/trp3Vars.less";
+
+@import "../../../less/base-zindex-levels";
+@import "../../../less/base-transition-mixins";
 
 /* Imports for child views */
-@import "room-list";
-@import "room-list-item";
-@import "profileView";
-@import "orgCollectionView";
-@import "nanoScroller";
+@import "./room-list";
+@import "./room-list-item";
+@import "./profileView";
+@import "./orgCollectionView";
+@import "../../../less/nanoScroller.less";
 
 .selected {
   opacity: 1;

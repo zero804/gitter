@@ -21,6 +21,7 @@ var postcss = require('gulp-postcss');
 var autoprefixer = require('autoprefixer-core');
 var mqpacker = require('css-mqpacker');
 var csswring = require('csswring');
+var cssnano = require('gulp-cssnano');
 var mkdirp = require('mkdirp');
 var gulpif = require('gulp-if');
 var sourcemaps = require('gulp-sourcemaps');
@@ -272,8 +273,9 @@ gulp.task('css-ios', function () {
         cascade: false
       }),
       mqpacker,
-      csswring
+      // csswring
     ]))
+    .pipe(cssnano())
     .pipe(gulpif(DEV_MODE, sourcemaps.write('output/assets/styles')))
     .pipe(gulp.dest('output/assets/styles'));
 });
@@ -302,8 +304,9 @@ gulp.task('css-mobile', function () {
         cascade: false
       }),
       mqpacker,
-      csswring
+      // csswring
     ]))
+    .pipe(cssnano())
     .pipe(gulpif(DEV_MODE, sourcemaps.write('output/assets/styles')))
     .pipe(gulp.dest('output/assets/styles'));
 });
@@ -350,8 +353,9 @@ gulp.task('css-web', function () {
         cascade: false
       }),
       mqpacker,
-      csswring
+      // csswring
     ]))
+    .pipe(cssnano())
     .pipe(gulpif(DEV_MODE, sourcemaps.write('output/assets/styles')))
     .pipe(gulp.dest('output/assets/styles'));
 });
