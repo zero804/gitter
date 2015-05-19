@@ -28,7 +28,7 @@ var Behavior = Marionette.Behavior.extend({
 
       if(!initMethod) return;
 
-      function optionsForRegion(options) {
+      function optionsForRegion(options, config) {
         var regionEl = region.$el[0];
         if (!regionEl)
           throw new Error('Region ' + regionName + ' does not exist.');
@@ -39,7 +39,11 @@ var Behavior = Marionette.Behavior.extend({
         if (regionElChildLen === 0) {
           baseOptions = {};
         } else if (regionElChildLen === 1) {
-          baseOptions = { template: false, el: regionEl.children[0] };
+          if (config && config.rerender) {
+            baseOptions = { el: regionEl.children[0] };            
+          } else {
+            baseOptions = { template: false, el: regionEl.children[0] };
+          }
         } else {
           throw new Error('Region can have zero or one elements, but not more. Region ' + regionName + " has " + regionElChildLen + ". Are you sure you wrapped the region with a parent?");
         }
