@@ -36,7 +36,7 @@ module.exports = Marionette.LayoutView.extend({
 
   regions: {
     chat: '#content-wrapper',
-    menu: '#troupeList',
+    menu: '#menu-region',
     input: '#chat-input'
   },
 
