@@ -56,20 +56,20 @@ module.exports = (function() {
     template: collectionTemplate,
 
     behaviors: {
-      Isomorphic: {}
+      Isomorphic: {
+        rosterRegion: { el: "#roster-region", init: 'initRosterRegion' },
+        remainingRegion: { el: "#remaining-region", init: 'initRemainingRegion' }
+      }
     },
 
-    regions: {
-      rosterRegion: "#roster-region",
-      remainingRegion: "#remaining-region"
+    initRosterRegion: function(optionsForRegion) {
+      return new PeopleCollectionView(optionsForRegion({ collection: this.options.rosterCollection }));
     },
 
-    initRegions: function(optionsForRegion) {
-      return {
-        rosterRegion: new PeopleCollectionView(optionsForRegion('rosterRegion', { collection: this.options.rosterCollection })),
-        remainingRegion: new RemainingView(optionsForRegion('remainingRegion', { model: context.troupe() }))
-      };
-    }
+    initRemainingRegion: function(optionsForRegion) {
+      return new RemainingView(optionsForRegion({ model: context.troupe() }));
+    },
+
   });
 
   var AllUsersModal = ModalView.extend({

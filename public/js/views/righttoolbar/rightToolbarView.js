@@ -17,7 +17,13 @@ module.exports = (function() {
   var RightToolbarLayout = Marionette.LayoutView.extend({
     className: 'right-toolbar right-toolbar--collapsible',
     behaviors: {
-      Isomorphic: {}
+      Isomorphic: {
+        search: { el: '#search-results', init: 'initSearchRegion' },
+        searchInput: { el: '.js-search', init: 'initSearchInputRegion' },
+        repo_info: { el: '#repo-info', init: 'initRepo_infoRegion' },
+        activity: { el: '#activity-region', init: 'initActivityRegion' },
+        roster: { el: '#people-roster', init: 'initRosterRegion' },
+      }
     },
 
     ui: {
@@ -25,14 +31,6 @@ module.exports = (function() {
       footer: '#zendesk-footer',
       rosterHeader: '#people-header',
       repoInfoHeader: '#info-header'
-    },
-
-    regions: {
-      search: '#search-results',
-      searchInput: '.js-search',
-      repo_info: "#repo-info",
-      activity: '#activity-region',
-      roster: '#people-roster'
     },
 
     events: {
@@ -63,34 +61,38 @@ module.exports = (function() {
 
     },
 
-    initRegions: function(optionsForRegion) {
-      // Repo info
-      var repoInfoView;
-      if (context.troupe().get('githubType') === 'REPO') {
-        var repo = new RepoInfoModel();
-        repo.fetch({ data: { repo: context.troupe().get('uri') } });
-
-        repoInfoView = new RepoInfoView(optionsForRegion('repo_info', { model: repo }));
-      }
-
-      var searchView = new SearchView(optionsForRegion('search', { model: this.searchState }));
-      var oneToOne = context.inOneToOneTroupeContext();
-
-      return {
-        search: searchView,
-        searchInput: new SearchInputView(optionsForRegion('searchInput', { model: this.searchState })),
-        repo_info: repoInfoView,
-        activity: oneToOne ? null : new ActivityCompositeView(optionsForRegion('activity', { collection: itemCollections.events })),
-        roster: new PeopleCollectionView.ExpandableRosterView(optionsForRegion('roster', {
-          rosterCollection: itemCollections.roster
-        }))
-      };
+    initSearchRegion: function(optionsForRegion) {
+      return new SearchView(optionsForRegion({ model: this.searchState }));
     },
 
-    onRender: function() {
+    initSearchInputRegion: function(optionsForRegion) {
+      return new SearchInputView(optionsForRegion({ model: this.searchState }));
+    },
+
+    initRepo_infoRegion: function(optionsForRegion) {
+      // Repo info
+      if (context.troupe().get('githubType') !== 'REPO') return;
+
+      var repo = new RepoInfoModel();
+      repo.fetch({ data: { repo: context.troupe().get('uri') } });
+
+      return new RepoInfoView(optionsForRegion({ model: repo }));
+    },
+
+    initActivityRegion: function(optionsForRegion, region) {
       if (hasScrollBars()) {
-        this.activity.$el.addClass("scroller");
+        region.$el.addClass("scroller");
       }
+
+      var oneToOne = context.inOneToOneTroupeContext();
+
+      return oneToOne ? null : new ActivityCompositeView(optionsForRegion({ collection: itemCollections.events }));
+    },
+
+    initRosterRegion: function(optionsForRegion) {
+      return new PeopleCollectionView.ExpandableRosterView(optionsForRegion({
+        rosterCollection: itemCollections.roster
+      }));
     },
 
     expandSearch: function() {

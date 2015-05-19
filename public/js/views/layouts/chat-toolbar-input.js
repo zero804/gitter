@@ -9,6 +9,7 @@ var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var unreadItemsClient = require('components/unread-items-client');
 var UnreadBannerView = require('views/app/unreadBannerView');
 var ChatToolbarLayout = require('./chat-toolbar');
+require('views/behaviors/isomorphic');
 
 var ChatToolbarInputLayout = ChatToolbarLayout.extend({
   keyboardEvents: {
@@ -16,12 +17,34 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
     'quote': 'onKeyQuote'
   },
 
-  /* Extend the regions from ChatToolbarLayout */
-  regions: _.extend({}, ChatToolbarLayout.prototype.regions, {
-    input: '#chat-input',
-    bannerTop: '#unread-banner',
-    bannerBottom: '#bottom-unread-banner'
-  }),
+  behaviors: {
+    Isomorphic: {
+      chat: {
+        el: '#content-wrapper',
+        init: 'initChatRegion' // Declared in super
+      },
+
+      toolbar: {
+        el: "#right-toolbar-layout",
+        init: 'initToolbarRegion'  // Declared in super
+      },
+
+      input: {
+        el: '#chat-input',
+        init: 'initInputRegion'
+      },
+
+      bannerTop: {
+        el: '#unread-banner',
+        init: 'initBannerTopRegion'
+      },
+
+      bannerBottom: {
+        el: '#bottom-unread-banner',
+        init: 'initBannerBottomRegion'
+      }
+    }
+  },
 
   initialize: function(options) {
     ChatToolbarLayout.prototype.initialize.call(this, options);
@@ -34,7 +57,7 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
   },
 
   initInputRegion: function(optionsForRegion) {
-    return new chatInputView.ChatInputView(optionsForRegion('input', {
+    return new chatInputView.ChatInputView(optionsForRegion({
       collection: itemCollections.chats
     }));
   },

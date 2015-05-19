@@ -10,7 +10,6 @@ require('views/behaviors/isomorphic');
 
 module.exports = (function() {
 
-
   var View = Marionette.LayoutView.extend({
     template: template,
 
@@ -19,12 +18,15 @@ module.exports = (function() {
       'addBadge': '.js-add-badge'
     },
 
-    regions: {
-      repoSelectRegion: '#repo-select',
-    },
-
     behaviors: {
-      Isomorphic: {}
+      Isomorphic: {
+        repoSelectRegion: {
+          el: '#repo-select',
+          init: function(optionsForRegion) {
+            return new RepoSelectView(optionsForRegion({ collection: RepoSelectView.createCollection() }));
+          }
+        }
+      }
     },
 
     childEvents: {
@@ -33,12 +35,6 @@ module.exports = (function() {
 
     initialize: function() {
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
-    },
-
-    initRegions: function(optionsForRegion) {
-      return {
-        repoSelectRegion: new RepoSelectView(optionsForRegion('repoSelectRegion', { collection: RepoSelectView.createCollection() }))
-      };
     },
 
     repoSelected: function(r) {

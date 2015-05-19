@@ -20,7 +20,11 @@ module.exports = Marionette.LayoutView.extend({
   el: 'body',
 
   behaviors: {
-    Isomorphic: {}
+    Isomorphic: {
+      chat: { el: '#content-wrapper', init: 'initChatRegion' },
+      menu: { el: '#troupeList', init: 'initMenuRegion' },
+      input: { el: '#chat-input', init: 'initInputRegion' },
+    }
   },
 
   ui: {
@@ -34,12 +38,6 @@ module.exports = Marionette.LayoutView.extend({
     'tap @ui.showTroupesButton': 'showHideTroupes'
   },
 
-  regions: {
-    chat: '#content-wrapper',
-    menu: '#troupeList',
-    input: '#chat-input'
-  },
-
   initialize: function(options) {
     this.chatCollection = options.chatCollection;
     this.dialogRegion = modalRegion;
@@ -51,18 +49,18 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initChatRegion: function(optionsForRegion) {
-    return new ChatContainerView(optionsForRegion('chat', {
+    return new ChatContainerView(optionsForRegion({
       collection: this.options.chatCollection,
       decorators: [emojiDecorator, mobileDecorator]
     }));
   },
 
   initMenuRegion: function(optionsForRegion) {
-    return new TroupeMenu(optionsForRegion('menu'));
+    return new TroupeMenu(optionsForRegion());
   },
 
   initInputRegion: function(optionsForRegion) {
-    return new chatInputView.ChatInputView(optionsForRegion('input', {
+    return new chatInputView.ChatInputView(optionsForRegion({
       collection: this.options.chatCollection,
     }));
   },

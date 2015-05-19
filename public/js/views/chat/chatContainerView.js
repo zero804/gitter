@@ -11,7 +11,23 @@ require('views/behaviors/isomorphic');
 
 module.exports = Marionette.LayoutView.extend({
   behaviors: {
-    Isomorphic: {}
+    Isomorphic: {
+      chat: {
+        el: '#chat-container',
+        init: function(optionsForRegion) {
+          var chatCollectionView = this.chatCollectionView = new ChatCollectionView(optionsForRegion({
+            collection: this.collection,
+            decorators: this.options.decorators
+          }));
+
+          if (context().permalinkChatId) {
+            highlightPermalinkChats(chatCollectionView, context().permalinkChatId);
+          }
+
+          return chatCollectionView;
+        }
+      }
+    }
   },
 
   ui: {
@@ -23,28 +39,10 @@ module.exports = Marionette.LayoutView.extend({
     'click @ui.scrollToBottom': appEvents.trigger.bind(appEvents, 'chatCollectionView:scrollToBottom')
   },
 
-  regions: {
-    chat: '#chat-container',
-  },
-
   collectionEvents: {
     atBottomChanged: function(isBottom) {
       this.ui.scrollToBottom.toggleClass('scrollHelper--hidden', isBottom);
     }
-  },
-
-  initChatRegion: function(optionsForRegion) {
-
-    var chatCollectionView = this.chatCollectionView = new ChatCollectionView(optionsForRegion('chat', {
-      collection: this.collection,
-      decorators: this.options.decorators
-    }));
-
-    if (context().permalinkChatId) {
-      highlightPermalinkChats(chatCollectionView, context().permalinkChatId);
-    }
-
-    return chatCollectionView;
   },
 
   onRender: function() {

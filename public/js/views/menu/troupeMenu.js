@@ -42,12 +42,15 @@ module.exports = (function () {
       'click @ui.hide': 'handleHide'
     },
 
-    regions: {
-      list: "#list"
-    },
-
     behaviors: {
-      Isomorphic: {}
+      Isomorphic: {
+        list: {
+          el: "#list",
+          init: function(optionsForRegion) {
+            return new this.options.childView(optionsForRegion({ collection: this.collection }));
+          }
+        }
+      }
     },
 
     template: CollectionWrapperViewTemplate,
@@ -60,11 +63,6 @@ module.exports = (function () {
       this.handleHide = options.handleHide;
     },
 
-    initListRegion: function(optionsForRegion) {
-      // Construct an instance of the childView
-      return new this.options.childView(optionsForRegion('list', { collection: this.collection }));
-    },
-
     serializeData: function () {
       return {
         canHide: typeof this.handleHide === 'function',
@@ -73,8 +71,6 @@ module.exports = (function () {
     },
 
     onRender: function () {
-      this.display();
-
       if (this.handleHide) {
         var hideIcon = this.ui.hide;
         hideIcon.tooltip({ container: 'body', title: 'Hide forever' });
@@ -113,15 +109,55 @@ module.exports = (function () {
     },
 
     behaviors: {
-      Isomorphic: {}
-    },
+      Isomorphic: {
+        profile: {
+          el: "#profile-region",
+          init: function(optionsForRegion) {
+            return new ProfileView(optionsForRegion({ model: this.model }));
+          }
+        },
+        favs: {
+          el: "#favs-region",
+          init: function(optionsForRegion) {
+            // This listener affects favs and recents...
+            this.listenTo(troupeCollections.troupes, 'add remove', this.initNanoScrollerThrottled);
 
-    regions: {
-      profile: "#profile-region",
-      favs: "#favs-region",
-      recents: "#recents-region",
-      orgs: "#orgs-region",
-      suggested: "#suggested-region",
+            return new RoomCollectionView(optionsForRegion({
+              collection: troupeCollections.favourites,
+              draggable: true,
+              dropTarget: true,
+              roomsCollection: troupeCollections.troupes
+            }));
+          }
+        },
+        recents: {
+          el: "#recents-region",
+          init: function(optionsForRegion) {
+            return new RoomCollectionView(optionsForRegion({
+              collection: troupeCollections.recentRoomsNonFavourites,
+              draggable: true,
+              dropTarget: true,
+              roomsCollection: troupeCollections.troupes,
+            }));
+          }
+        },
+        orgs: {
+          el: "#orgs-region",
+          init: function(optionsForRegion) {
+            this.listenTo(troupeCollections.orgs, 'add remove', this.initNanoScrollerThrottled);
+
+            return new CollectionWrapperView(optionsForRegion({
+              collection: troupeCollections.orgs,
+              childView: OrgCollectionView,
+              header: 'Your Organizations',
+            }));
+
+          }
+        },
+        suggested: {
+          el: "#suggested-region"
+        },
+      }
     },
 
     initialize: function () {
@@ -156,39 +192,12 @@ module.exports = (function () {
       this.initNanoScrollerThrottled = _.throttle(this.initNanoScroller, 100, { leading: false });
     },
 
-    initProfileRegion: function(optionsForRegion) {
-      return new ProfileView(optionsForRegion('profile', { model: this.model }));
-    },
+    initNanoScroller: function() {
+      var ui = this.ui;
+      var target = ui.nano[0];
+      if (!target) return;
 
-    initFavsRegion: function(optionsForRegion) {
-      // This listener affects favs and recents...
-      this.listenTo(troupeCollections.troupes, 'add remove', this.initNanoScrollerThrottled);
-
-      return new RoomCollectionView(optionsForRegion('favs', {
-        collection: troupeCollections.favourites,
-        draggable: true,
-        dropTarget: true,
-        roomsCollection: troupeCollections.troupes
-      }));
-    },
-
-    initRecentsRegion: function(optionsForRegion) {
-      return new RoomCollectionView(optionsForRegion('recents', {
-        collection: troupeCollections.recentRoomsNonFavourites,
-        draggable: true,
-        dropTarget: true,
-        roomsCollection: troupeCollections.troupes,
-      }));
-    },
-
-    initOrgsRegion: function(optionsForRegion) {
-      this.listenTo(troupeCollections.orgs, 'add remove', this.initNanoScrollerThrottled);
-
-      return new CollectionWrapperView(optionsForRegion('orgs', {
-        collection: troupeCollections.orgs,
-        childView: OrgCollectionView,
-        header: 'Your Organizations',
-      }));
+      $(target).nanoScroller({ iOSNativeScrolling: true });
     },
 
     showSuggestedRooms: function() {
@@ -218,14 +227,6 @@ module.exports = (function () {
         }
       });
       this.showChildView('suggested', suggestedWrapperView);
-    },
-
-    initNanoScroller: function() {
-      var ui = this.ui;
-      var target = ui.nano[0];
-      if (!target) return;
-
-      $(target).nanoScroller({ iOSNativeScrolling: true });
     },
 
     showMenu: function() {

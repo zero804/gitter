@@ -17,11 +17,12 @@ var ChatLayout = Marionette.LayoutView.extend({
   el: 'body',
 
   behaviors: {
-    Isomorphic: {}
-  },
-
-  regions: {
-    chat: '#content-wrapper',
+    Isomorphic: {
+      chat: {
+        el: '#content-wrapper',
+        init: 'initChatRegion'
+      }
+    }
   },
 
   initialize: function(options) {
@@ -30,7 +31,7 @@ var ChatLayout = Marionette.LayoutView.extend({
   },
 
   initChatRegion: function(optionsForRegion) {
-    return new ChatContainerView(optionsForRegion('chat', {
+    return new ChatContainerView(optionsForRegion({
       collection: this.chatCollection,
       decorators: [issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
     }));

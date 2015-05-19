@@ -29,15 +29,17 @@
           </div>
         </div>
       </div>
-      <div class='menu-list__item' id="suggested-region"></div>
-      <div class='menu-list__item' id="orgs-region">
+      <div class='menu-list__section' id="suggested-region"></div>
+      <div class='menu-list__section' id="orgs-region">
         <div>
           <div class="menu-list__header">
             <h5>Your Organizations</h5>
           </div>
-          <div class='menu-list__section' id="list">
+          <div class='' id="list">
             <ul>
-            {{#each orgs}}<li class="room-list-item">{{{ prerenderOrgListItem this }}}</li>{{/each}}
+              {{#each orgs}}
+              {{{ prerenderView "js/views/menu/tmpl/org-list-item" wrap="li" dataId=true className="room-list-item" }}}
+              {{/each}}
             </ul>
           </div>
         </div>
