@@ -254,7 +254,7 @@ exports.sendOnlineNotifications = function (notifications, callback) {
                 text: message.text,
                 link: message.link,
                 sound: message.sound,
-                chatId: chat.id
+                chatId: message.data.id
               };
 
               winston.silly("Online notifications: ", n);
