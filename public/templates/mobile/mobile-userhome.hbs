@@ -7,14 +7,10 @@
 
   <title>{{troupeName}}</title>
 
-  {{#if isUserhome}}
   <link rel="stylesheet" href='{{ cdn "styles/mobile-userhome.css"}}'>
-  {{else}}
-  <link rel="stylesheet" href='{{ cdn "styles/mobile-app.css"}}'>
-  {{/if}}
 
   {{{ generateTroupeContext troupeContext }}}
-  {{{bootScript bootScriptName }}}
+  {{{ bootScript "mobile-userhome" }}}
   
   <link rel="apple-touch-icon" href='{{ cdn "images/touch-icon-iphone.png" }}'>
   <link rel="shortcut icon" href='{{ cdn "images/favicon5.png"}}'>
