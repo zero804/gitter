@@ -5,7 +5,7 @@ var appEvents = require('utils/appevents');
 var context = require('utils/context');
 var Backbone = require('backbone');
 var _ = require('underscore');
-var AppIntegratedView = require('views/app/appIntegratedView');
+var AppLayout = require('views/app/appLayout');
 var troupeCollections = require('collections/instances/troupes');
 var TitlebarUpdater = require('components/titlebar');
 var realtime = require('components/realtime');
@@ -119,10 +119,10 @@ onready(function () {
      });
   }
 
-  var appView = new AppIntegratedView({
+  var appLayout = new AppLayout({
       el: 'body'
     });
-  appView.render();
+  appLayout.render();
 
   var allRoomsCollection = troupeCollections.troupes;
   allRoomsCollection.on("remove", function(model) {
@@ -320,13 +320,13 @@ onready(function () {
     },
 
     hideModal: function() {
-      appView.dialogRegion.destroy();
+      appLayout.dialogRegion.destroy();
     },
 
     createroom: function() {
       require.ensure(['views/createRoom/chooseRoomView'], function(require) {
         var chooseRoomView = require('views/createRoom/chooseRoomView');
-        appView.dialogRegion.show(new chooseRoomView.Modal());
+        appLayout.dialogRegion.show(new chooseRoomView.Modal());
       });
     },
 
@@ -348,7 +348,7 @@ onready(function () {
       function showWithOptions(options) {
         require.ensure(['views/createRoom/createRoomView'], function(require) {
           var createRoomView = require('views/createRoom/createRoomView');
-          appView.dialogRegion.show(new createRoomView.Modal(options));
+          appLayout.dialogRegion.show(new createRoomView.Modal(options));
         });
       }
 
@@ -378,14 +378,14 @@ onready(function () {
     createreporoom: function() {
       require.ensure(['views/createRoom/createRepoRoomView'], function(require) {
         var createRepoRoomView = require('views/createRoom/createRepoRoomView');
-        appView.dialogRegion.show(new createRepoRoomView.Modal());
+        appLayout.dialogRegion.show(new createRepoRoomView.Modal());
       });
     },
 
     confirmRoom: function(uri) {
       require.ensure(['views/createRoom/confirmRepoRoomView'], function(require) {
         var confirmRepoRoomView = require('views/createRoom/confirmRepoRoomView');
-        appView.dialogRegion.show(new confirmRepoRoomView.Modal({ uri: uri }));
+        appLayout.dialogRegion.show(new confirmRepoRoomView.Modal({ uri: uri }));
       });
     }
   });
