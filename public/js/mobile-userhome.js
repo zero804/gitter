@@ -10,6 +10,7 @@ var MobileUserhomeLayout = require('views/layouts/mobile-userhome');
 // Preload widgets
 require('views/widgets/avatar');
 require('components/ping');
+require('template/helpers/all');
 
 onready(function() {
 
@@ -39,4 +40,3 @@ onready(function() {
 
   $('html').removeClass('loading');
 });
-
