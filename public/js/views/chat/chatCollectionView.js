@@ -2,12 +2,10 @@
 var $ = require('jquery');
 var _ = require('underscore');
 var log = require('utils/log');
-var Marionette = require('marionette');
-var TroupeViews = require('views/base');
+var Marionette = require('backbone.marionette');
 var appEvents = require('utils/appevents');
 var chatItemView = require('./chatItemView');
 var Rollers = require('utils/rollers');
-var cocktail = require('cocktail');
 var unreadItemsClient = require('components/unread-items-client');
 
 require('views/behaviors/infinite-scroll');
@@ -95,6 +93,8 @@ module.exports = (function() {
    * View
    */
   var ChatCollectionView = Marionette.CollectionView.extend({
+    template: false,
+    reorderOnSort: true,
 
     behaviors: {
       InfiniteScroll: {
@@ -112,9 +112,9 @@ module.exports = (function() {
       "copy": "onCopy"
     },
 
-    itemView: chatItemView.ChatItemView,
+    childView: chatItemView.ChatItemView,
 
-    itemViewOptions: function(item) {
+    childViewOptions: function(item) {
       var options = {
         decorators: this.decorators,
         rollers: this.rollers
@@ -150,7 +150,8 @@ module.exports = (function() {
       this.adjustTopPadding();
       var self = this;
       var resizer;
-
+      this.firstRender = true;
+      this.viewComparator = this.collection.comparator;
       $(window).resize(function(){
         clearTimeout(resizer);
         resizer = setTimeout(self.adjustTopPadding, 100);
@@ -204,6 +205,11 @@ module.exports = (function() {
 
       this.listenTo(appEvents, 'command.collapse.chat', this.collapseChats);
       this.listenTo(appEvents, 'command.expand.chat', this.expandChats);
+
+      this.listenTo(appEvents, 'chatCollectionView:pageUp', this.pageUp);
+      this.listenTo(appEvents, 'chatCollectionView:pageDown', this.pageDown);
+      this.listenTo(appEvents, 'chatCollectionView:editChat', this.editChat);
+      this.listenTo(appEvents, 'chatCollectionView:viewportResize', this.viewportResize);
     },
 
     scrollToFirstUnread: function() {
@@ -265,27 +271,18 @@ module.exports = (function() {
       return this.rollers.isScrolledToBottom();
     },
 
-    onAfterItemAdded: function() {
+    onAddChild: function() {
       if(this.collection.length === 1) {
         this.adjustTopPadding();
       }
     },
 
     pageUp: function() {
-      var scrollFromTop = this.$el.scrollTop();
-      var pageHeight = Math.floor(this.$el.height() * 0.8);
-      this.$el.scrollTop(scrollFromTop - pageHeight);
-
-      // page up doesnt trigger scroll events
-      if(scrollFromTop === 0) {
-        this.scroll.trigger('approaching.end');
-      }
+      this.scroll.pageUp();
     },
 
     pageDown: function() {
-      var scrollFromTop = this.$el.scrollTop();
-      var pageHeight = Math.floor(this.$el.height() * 0.8);
-      this.$el.scrollTop(scrollFromTop + pageHeight);
+      this.scroll.pageDown();
     },
 
     scrollToChat: function (chat) {
@@ -416,8 +413,22 @@ module.exports = (function() {
       e.preventDefault();
     },
 
+    editChat: function(chat) {
+      var chatItemView = this.children.findByModel(chat);
+      if(!chatItemView) return;
+
+      chatItemView.toggleEdit();
+    },
+
+    viewportResize: function(animated) {
+      if(animated) {
+        this.rollers.adjustScrollContinuously(500);
+      } else {
+        this.rollers.adjustScroll(500);
+      }
+    }
+
   });
-  cocktail.mixin(ChatCollectionView, TroupeViews.SortableMarionetteView);
 
   return ChatCollectionView;
 

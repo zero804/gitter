@@ -1,8 +1,7 @@
 "use strict";
-var Marionette = require('marionette');
-var TroupeViews = require('views/base');
+var Marionette = require('backbone.marionette');
+var ModalView = require('views/modal');
 var Backbone = require('backbone');
-var cocktail = require('cocktail');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var template = require('./tmpl/addPeople.hbs');
@@ -63,8 +62,8 @@ module.exports = (function() {
   });
 
   var View = Marionette.CompositeView.extend({
-    itemViewContainer: ".gtrPeopleAddRoster",
-    itemView: RowView,
+    childViewContainer: ".gtrPeopleAddRoster",
+    childView: RowView,
     template: template,
     ui: {
       input: 'input.gtrInput',
@@ -89,7 +88,7 @@ module.exports = (function() {
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
     },
 
-    onItemviewInviteError: function(itemView, message) { // jshint unused:true
+    onChildviewInviteError: function(childView, message) { // jshint unused:true
       this.ui.loading.toggleClass('hide', true);
       this.showValidationMessage(message);
     },
@@ -219,9 +218,9 @@ module.exports = (function() {
       this.listenTo(this.typeahead, 'selected', this.selected);
     },
 
-    onClose: function() {
+    onDestroy: function() {
       if(this.typeahead) {
-        this.typeahead.close();
+        this.typeahead.destroy();
       }
     }
   });
@@ -235,15 +234,13 @@ module.exports = (function() {
     modalButtons.push({ action: "share", text: "Share this room", className: "trpBtnBlue trpBtnRight"});
   }
 
-  cocktail.mixin(View, TroupeViews.SortableMarionetteView);
-
-  return TroupeViews.Modal.extend({
+  return ModalView.extend({
     disableAutoFocus: true,
     initialize: function(options) {
       options = options || {};
       options.title = options.title || "Add people to this room";
 
-      TroupeViews.Modal.prototype.initialize.call(this, options);
+      ModalView.prototype.initialize.call(this, options);
       this.view = new View(options);
     },
     menuItems: modalButtons

@@ -1,9 +1,9 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var _ = require('underscore');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
-var TroupeViews = require('views/base');
+var ModalView = require('views/modal');
 var troupeSettingsTemplate = require('./tmpl/troupeSettingsTemplate.hbs');
 var log = require('utils/log');
 var notifications = require('components/notifications');
@@ -16,7 +16,7 @@ module.exports = (function() {
     template: troupeSettingsTemplate,
     events: {
       'click #save-troupe-settings': 'saveSettings',
-      'click #close-settings' : 'closeSettings',
+      'click #close-settings' : 'destroySettings',
       'click #enable-lurk-mode' : 'enableLurkMode',
       'change #notification-options' : 'formChange',
       'change #unread-checkbox' : 'formChange'
@@ -47,7 +47,7 @@ module.exports = (function() {
       this.$el.find('#notification-options').val("mention");
       this.$el.find('#unread-checkbox').prop('checked', true);
       this.saveSettings();
-      this.closeSettings();
+      this.destroySettings();
     },
 
     setShowUnreadBadgeValue: function() {
@@ -66,7 +66,7 @@ module.exports = (function() {
       }
     },
 
-    closeSettings : function () {
+    destroySettings : function () {
       this.dialog.hide();
       this.dialog = null;
     },
@@ -108,13 +108,12 @@ module.exports = (function() {
     }
   });
 
-  return TroupeViews.Modal.extend({
+  return ModalView.extend({
       initialize: function(options) {
         options.title = "Notification Settings";
-        TroupeViews.Modal.prototype.initialize.apply(this, arguments);
+        ModalView.prototype.initialize.apply(this, arguments);
         this.view = new View({ });
       }
     });
 
 })();
-

@@ -3,13 +3,13 @@
 var appEvents = require('utils/appevents');
 var Backbone = require('backbone');
 var context = require('utils/context');
-var ChatNliIntegratedView = require('views/app/chatNliIntegratedView');
+// var ChatNliIntegratedView = require('views/app/chatNliIntegratedView');
 var itemCollections = require('collections/instances/integrated-items');
-var RightToolbarView = require('views/righttoolbar/rightToolbarView');
+// var RightToolbarView = require('views/righttoolbar/rightToolbarView');
 var PeopleModal = require('views/people/people-modal');
 var HeaderView = require('views/app/headerView');
 var onready = require('./utils/onready');
-var highlightPermalinkChats = require('./utils/highlight-permalink-chats');
+var ChatToolbarLayout = require('views/layouts/chat-toolbar');
 
 require('views/widgets/preload');
 require('filtered-collection');
@@ -31,10 +31,11 @@ onready(function() {
     window.parent.location.href = url;
   });
 
-  var appView = new ChatNliIntegratedView({ el: 'body', chatCollection: itemCollections.chats, userCollection: itemCollections.users });
+  var appView = new ChatToolbarLayout({ template: false, el: 'body', chatCollection: itemCollections.chats });
+  appView.render();
 
+  // TODO: add this to the appView
   new HeaderView({ model: context.troupe(), el: '#header' });
-  new RightToolbarView({ el: "#right-toolbar-layout" });
 
   var Router = Backbone.Router.extend({
     routes: {
@@ -43,7 +44,7 @@ onready(function() {
     },
 
     hideModal: function() {
-      appView.dialogRegion.close();
+      appView.dialogRegion.destroy();
     },
 
     people: function() {
@@ -58,9 +59,5 @@ onready(function() {
   // liveContext.syncRoom();
 
   Backbone.history.start();
-
-  if (context().permalinkChatId) {
-    highlightPermalinkChats(appView.chatCollectionView, context().permalinkChatId);
-  }
 
 });

@@ -1,5 +1,5 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
 var NeverEndingStory = require('utils/never-ending-story');
 
@@ -41,9 +41,10 @@ module.exports = (function() {
       });
 
       this.scroll = scroll;
+      this.view.scroll = scroll;
     },
 
-    onClose: function() {
+    onDestroy: function() {
       this.scroll.disable();
     }
   });
@@ -53,4 +54,3 @@ module.exports = (function() {
   return Behavior;
 
 })();
-
