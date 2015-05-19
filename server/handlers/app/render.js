@@ -306,6 +306,7 @@ function renderMobileUserHome(req, res, next) {
         troupeContext: troupeContext,
         agent: req.headers['user-agent'],
         isUserhome: true,
+        user: req.user,
         dnsPrefetch: dnsPrefetch
       });
     })
