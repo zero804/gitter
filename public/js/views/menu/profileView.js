@@ -38,7 +38,6 @@ module.exports = (function () {
       var isNativeResult = isNative();
 
       return {
-        menuHeaderExpanded: this.model.get('menuHeaderExpanded'),
         isMobile: isMobileResult,
         user: userModel,
         billingUrl: context.env('billingUrl'),
@@ -46,6 +45,12 @@ module.exports = (function () {
         showGetApps: !isMobileResult && !isNativeResult,
         showSignout: !isNativeResult
       };
+    },
+
+    onRender: function() {
+      if (isMobileResult) {
+        this.$el.addClass('menu-header--expanded');
+      }
     },
 
     toggleExpanded: function() {
