@@ -15,15 +15,13 @@ module.exports = (function () {
     el: 'body',
 
     behaviors: {
-      Isomorphic: {}
+      Isomorphic: {
+        menu: { el: "#menu-region", init: 'initMenuRegion' }
+      }
     },
 
     events: {
       "keydown": "onKeyDown"
-    },
-
-    regions: {
-      menu: "#menu-region"
     },
 
     initialize: function () {
@@ -31,7 +29,7 @@ module.exports = (function () {
     },
 
     initMenuRegion: function(optionsForRegion) {
-      return new TroupeMenu(optionsForRegion('menu'));
+      return new TroupeMenu(optionsForRegion());
     },
 
     onKeyDown: function(e) {
