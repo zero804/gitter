@@ -12,6 +12,7 @@ var MobileLayout = require('views/layouts/mobile');
 require('views/widgets/avatar');
 require('views/widgets/timeago');
 require('components/ping');
+require('template/helpers/all');
 
 onready(function() {
   require('components/link-handler').installLinkHandler();
