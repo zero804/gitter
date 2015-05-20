@@ -4,16 +4,6 @@ var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
 
-var totalTime = 0;
-var totalCalls = 0;
-
-setInterval(function() {
-  if (totalCalls === 0) return;
-  console.log('TTO', totalTime / totalCalls);
-  totalTime = 0;
-  totalCalls = 0;
-}, 5000);
-
 module.exports = (function() {
   var cachedWidgets = {};
 
@@ -41,8 +31,6 @@ module.exports = (function() {
   };
 
   function render(template, data, view) {
-    var time = performance.now();
-    try {
     if (!template) {
      throw new Error("Cannot render the template since it's false, null or undefined.");
     }
@@ -55,7 +43,7 @@ module.exports = (function() {
     }
 
     var generatedText = templateFunc(data);
-    if(!data.renderViews || !view || !data.renderViews.length) return generatedText;
+    if(!data.renderViews || !view || !data.renderViews.length) return generatedText; 
 
     // Turn the text into a DOM
     var dom = $($.parseHTML(generatedText));
@@ -85,10 +73,6 @@ module.exports = (function() {
     });
 
     return dom;
-  } finally {
-    totalTime += (performance.now() - time);
-    totalCalls++;
-  }
   }
 
   var Behavior = Marionette.Behavior.extend({
