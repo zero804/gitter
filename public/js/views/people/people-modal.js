@@ -65,8 +65,12 @@ var UserView = Marionette.ItemView.extend({
 
 var EmptyView = Marionette.ItemView.extend({
   className: 'people-modal-empty',
-  template: function() {
-    return '<h3>Nope, nothing :(</h3>';
+  serializeData: function() {
+    return { isFetched: this.collection.isFetched };
+  },
+  template: function(data) {
+    // wait until results come back to give negative feedback
+    return data.isFetched ? '<h3>Nope, nothing :(</h3>' : '';
   }
 });
 
@@ -98,9 +102,8 @@ var View = Marionette.CompositeView.extend({
       new InfiniteScrollBehavior({ scrollElement: this.ui.results[0] }, this);
     }, this);
   },
-  isEmpty: function(collection) {
-    // dont show the empty view until fetch finishes
-    return collection.isFetched && collection.length === 0;
+  emptyViewOptions: function() {
+    return { collection: this.collection };
   },
   onSearchInput: function() {
     if (this.ui.search.val()) {
