@@ -652,8 +652,9 @@ module.exports = (function() {
       'click .js-chat-action-collapse': 'toggleCollapse',
       'click .js-chat-action-expand': 'toggleCollapse',
       'click .js-chat-action-edit': 'edit',
-      'click .js-chat-action-mention': 'mention',
-      'click .js-chat-action-quote': 'quote'
+      'click .js-chat-action-reply': 'reply',
+      'click .js-chat-action-quote': 'quote',
+      'click .js-chat-action-delete': 'delete'
     },
     toggleCollapse: function() {
       this.chatItemView.toggleCollapse();
@@ -661,19 +662,30 @@ module.exports = (function() {
     edit: function() {
       this.chatItemView.toggleEdit();
     },
-    mention: function() {
+    reply: function() {
       this.chatItemView.mentionUser();
     },
     quote: function() {
       appEvents.trigger('input.append', "> " + this.model.get('text'), { newLine: true });
     },
+    delete: function() {
+      this.model.set('text', '');
+      this.model.save();
+    },
     serializeData: function() {
-      var data = {actions: []};
-      data.actions.push({name: 'mention', description: 'Mention ' + this.model.get('fromUser').username});
-      data.actions.push({name: 'quote', description: 'Quote'});
+      var deleted = !this.model.get('text');
+      var data = {actions: [
+        {name: 'reply', description: 'Reply'}
+      ]};
 
-      if (this.chatItemView.canEdit()) data.actions.push({name: 'edit', description: 'Edit'});
-      if (this.model.get('isCollapsible')) {
+      if (!deleted) data.actions.push({name: 'quote', description: 'Quote'});
+
+      if (!deleted && this.chatItemView.canEdit()) {
+        data.actions.push({name: 'edit', description: 'Edit'});
+        data.actions.push({name: 'delete', description: 'Delete'});
+      }
+
+      if (!deleted && this.model.get('isCollapsible')) {
         var action = this.model.get('collapsed') ? {name: 'expand', description: 'Expand'} : {name: 'collapse', description: 'Collapse'};
         data.actions.push(action);
       }
