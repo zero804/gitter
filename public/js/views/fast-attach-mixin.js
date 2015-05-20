@@ -1,15 +1,15 @@
 'use strict';
 
+function isWhitespace(char) {
+  return char === '\n' || char === ' ' || char === '\t';
+}
+
 module.exports = {
-  attachElContent: function(html) {
+  attachElContent: function fastAttachElContent(html) {
       var el = this.el;
       if (typeof html === 'string') {
         el.innerHTML = html;
         return this;
-      }
-
-      function isWhitespace(char) {
-        return char === '\n' || char === ' ' || char === '\t';
       }
 
       if (html.length) {
@@ -24,6 +24,13 @@ module.exports = {
         return this;
       }
 
+      if(html.nodeType === 1) {
+        el.innerHTML = '';
+        el.appendChild(html);
+        return this;
+      }
+
+      console.log('DEFAULTING')
       this.$el.html(html);
       return this;
   }

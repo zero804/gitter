@@ -87,6 +87,10 @@ module.exports = (function() {
     attachElContent: FastAttachMixin.attachElContent
   });
 
+  TimeagoWidget.getPrerendered = function(model, id) { // jshint unused:true
+    return "<span class='widget' data-widget-id='" + id + "'></span>";
+  };
+
   widgets.register({ timeago: TimeagoWidget });
 
   return TimeagoWidget;
