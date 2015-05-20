@@ -7,6 +7,7 @@ var appEvents = require('utils/appevents');
 var chatItemView = require('./chatItemView');
 var Rollers = require('utils/rollers');
 var unreadItemsClient = require('components/unread-items-client');
+var isolateBurst = require('shared/burst/isolate-burst-bb');
 
 require('views/behaviors/infinite-scroll');
 require('views/behaviors/smooth-scroll');
@@ -177,10 +178,13 @@ module.exports = (function() {
         this.highlighted = model;
 
         // finally scroll to it
-        this.scrollToChatId(model);
+        this.scrollToChat(model);
       });
 
-      this.listenTo(appEvents, 'chatCollectionView:clearHighlight', this.clearHighlight.bind(this));
+      // Similar to selectedChat, but will force a load if the item is not in the collection
+      this.listenTo(appEvents, 'chatCollectionView:permalinkHighlight', this.highlightPermalinkChat);
+
+      this.listenTo(appEvents, 'chatCollectionView:clearHighlight', this.clearHighlight);
 
       var contentFrame = document.querySelector(SCROLL_ELEMENT);
       this.rollers = new Rollers(contentFrame, this.el);
@@ -426,6 +430,25 @@ module.exports = (function() {
       } else {
         this.rollers.adjustScroll(500);
       }
+    },
+
+    highlightPermalinkChat: function (id) {
+      var self = this;
+      this.collection.ensureLoaded(id, function(err, model) {
+        if (err) return; // Log this?
+
+        if (!model) return;
+
+        var models = isolateBurst(self.collection, model);
+        models.forEach(function(model) {
+          var view = self.children.findByModel(model);
+          if (view) {
+            view.highlight();
+          }
+        });
+
+        self.scrollToChat(models[0]);
+      });
     }
 
   });
