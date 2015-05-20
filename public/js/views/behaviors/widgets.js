@@ -73,11 +73,12 @@ module.exports = (function() {
 
       var Widget = cachedWidgets[attrs.widgetName];
       var model = attrs.model;
-      model.el = widgetEl;
-      model.template = false;
+      model.el = widgetEl; // Existing element
+      model.template = false; // No template (attach)
 
       // Attach the widget to the prerendered content
-      var widget = new Widget(model).render();
+      var widget = new Widget(model);
+      widget.render();
 
       // Add the widget to the widget manager
       widgetManager.add(widget);

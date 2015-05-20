@@ -30,7 +30,6 @@ module.exports = {
         return this;
       }
 
-      console.log('DEFAULTING')
       this.$el.html(html);
       return this;
   }
