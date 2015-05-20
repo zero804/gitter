@@ -1,7 +1,7 @@
 "use strict";
 
 var context = require('utils/context');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var orgListItemTemplate = require('./tmpl/org-list-item.hbs');
 var appEvents = require('utils/appevents');
 
@@ -39,9 +39,17 @@ module.exports = (function() {
   return Marionette.CollectionView.extend({
     tagName: 'ul',
     className: 'room-list',
-    itemView: OrgItemView
+    childView: OrgItemView,
+    childViewOptions: function (item) {
+      var options = {};
+      if (item) {
+        var id = item.get('id'); // NB ID attribute is not the id!
+        options.el = this.$el.find('.room-list-item[data-id="' + id + '"]')[0];
+      }
+      return options;
+    },
+
   });
 
 
 })();
-

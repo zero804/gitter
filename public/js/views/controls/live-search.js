@@ -48,7 +48,7 @@ module.exports = (function() {
 
     $el.on('change cut paste input', change);
 
-    view.on('close', function() {
+    view.on('destroy', function() {
       $el.off('change cut paste input', change);
     });
   };

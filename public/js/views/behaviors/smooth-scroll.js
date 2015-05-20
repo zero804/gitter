@@ -1,5 +1,5 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
 var _ = require('underscore');
 
@@ -66,7 +66,7 @@ var Behavior = Marionette.Behavior.extend({
     this.lazyPointerEvents();
   },
 
-  onClose: function() {
+  onDestroy: function() {
     this.scrollElement.removeEventListener('scroll', this.scrollHandler, false);
   }
 });

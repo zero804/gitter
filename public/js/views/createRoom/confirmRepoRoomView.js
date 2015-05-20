@@ -1,9 +1,9 @@
 "use strict";
 var Backbone = require('backbone');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var apiClient = require('components/apiClient');
 var appEvents = require('utils/appevents');
-var TroupeViews = require('views/base');
+var ModalView = require('views/modal');
 var template = require('./tmpl/confirmRepoRoom.hbs');
 
 module.exports = (function() {
@@ -59,12 +59,12 @@ module.exports = (function() {
 
   });
 
-  var Modal = TroupeViews.Modal.extend({
+  var Modal = ModalView.extend({
     initialize: function(options) {
       options = options || {};
       options.title = options.title || "Create Room for " + options.uri;
 
-      TroupeViews.Modal.prototype.initialize.call(this, options);
+      ModalView.prototype.initialize.call(this, options);
       this.view = new View(options);
     },
     menuItems: [
@@ -80,4 +80,3 @@ module.exports = (function() {
 
 
 })();
-

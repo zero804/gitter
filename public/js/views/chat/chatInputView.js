@@ -1,5 +1,5 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var $ = require('jquery');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
@@ -99,9 +99,7 @@ module.exports = (function() {
     },
 
     initialize: function(options) {
-      this.bindUIElements();
-      this.rollers = options.rollers;
-      this.chatCollectionView = options.chatCollectionView;
+      this.bindUIElements(); // TODO: use regions
       this.composeMode = new ComposeMode();
       this.compactView = options.compactView;
 
@@ -157,8 +155,6 @@ module.exports = (function() {
 
       var inputBox = new ChatInputBoxView({
         el: $textarea,
-        rollers: this.rollers,
-        chatCollectionView: this.chatCollectionView,
         composeMode: this.composeMode,
         autofocus: !this.compactView,
         value: $textarea.val()
@@ -231,7 +227,7 @@ module.exports = (function() {
         this.listenToOnce(this.inputBox, 'save', this.toggleComposeMode.bind(this, null)); // if we were in chat mode make sure that we set the state back to chat mode
       }
 
-      inputBox.val(function (index, val) {
+      inputBox.val(function (index, val) { // jshint unused:true
         return val + '\n\n```'; // 1. create the code block
       });
 
@@ -294,16 +290,7 @@ module.exports = (function() {
         return fromUser && fromUser.id === context.getUserId();
       });
 
-      usersChats.sort(function(a, b) {
-        var as = a.get('sent');
-        as = as ? as.valueOf() : 0;
-        var bs = b.get('sent');
-        bs = bs ? bs.valueOf() : 0;
-
-        return bs - as;
-      });
-
-      return usersChats[0];
+      return usersChats[usersChats.length - 1];
     },
 
     subst: function(search, replace, global) {
@@ -324,15 +311,9 @@ module.exports = (function() {
     },
 
     editLast: function() {
-      if(!this.chatCollectionView) return;
-
       var lastChat =  this.getLastEditableMessage();
       if(!lastChat) return;
-
-      var chatItemView = this.chatCollectionView.children.findByModel(lastChat);
-      if(!chatItemView) return;
-
-      chatItemView.toggleEdit();
+      appEvents.trigger('chatCollectionView:editChat', lastChat);
     },
 
     onPaste: function(e) {
@@ -358,8 +339,6 @@ module.exports = (function() {
   cocktail.mixin(ChatInputView, KeyboardEventsMixin);
 
   var ChatCollectionResizer = function(options) {
-    var rollers = options.rollers;
-
     var el = options.el;
     var $el = $(el);
 
@@ -385,26 +364,22 @@ module.exports = (function() {
     };
 
     function adjustScroll(initial) {
-      if(!rollers) return;
-      if(initial) {
-        rollers.adjustScroll(500);
-      } else {
-        rollers.adjustScrollContinuously(500);
-      }
+      /* Tell the chatCollectionView that the viewport will resize
+       * the argument is whether the resize is animated */
+      appEvents.trigger('chatCollectionView:viewportResize', !initial);
     }
   };
 
   var ChatInputBoxView = Marionette.ItemView.extend({
     events: {
-      "keyup":    "onKeyUp",
+      "keyup": "onKeyUp",
+      "keydown": "onKeyDown",
       "blur": "onBlur"
     },
 
     keyboardEvents: {
       "chat.edit.openLast": "onKeyEditLast",
-      "chat.send": "onKeySend",
-      "pageUp": "onKeyPageUp",
-      "pageDown": "onKeyPageDown"
+      "chat.send": "onKeySend"
     },
 
     // pass in the textarea as el for ChatInputBoxView
@@ -417,8 +392,7 @@ module.exports = (function() {
       }
 
       var chatResizer = new ChatCollectionResizer({
-        el: this.el,
-        rollers: options.rollers
+        el: this.el
       });
 
       this.chatResizer = chatResizer;
@@ -427,12 +401,10 @@ module.exports = (function() {
         chatResizer.resizeInput();
       });
 
-
       if (!this.options.editMode) this.drafty = drafty(this.el);
 
       chatResizer.resetInput(true);
 
-      this.chatCollectionView = options.chatCollectionView;
       this.composeMode = options.composeMode;
       this.chatResizer.resizeInput();
     },
@@ -442,7 +414,13 @@ module.exports = (function() {
         this.processInput();
       }
     },
-
+    onKeyDown: function(e) {
+      if (e.keyCode === 33 || e.keyCode === 34) {
+        appEvents.trigger(e.keyCode === 33 ? 'chatCollectionView:pageUp' : 'chatCollectionView:pageDown');
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    },
     onKeyUp: function() {
       this.chatResizer.resizeInput();
     },
@@ -463,14 +441,6 @@ module.exports = (function() {
         event.preventDefault();
         return false;
       }
-    },
-
-    onKeyPageUp: function() {
-      if(this.chatCollectionView) this.chatCollectionView.pageUp();
-    },
-
-    onKeyPageDown: function() {
-      if(this.chatCollectionView) this.chatCollectionView.pageDown();
     },
 
     processInput: function() {

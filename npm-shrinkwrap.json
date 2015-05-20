@@ -26,7 +26,7 @@
       "dependencies": {
         "readable-stream": {
           "version": "1.0.33",
-          "from": "readable-stream@>=1.0.26 <1.1.0",
+          "from": "readable-stream@>=1.0.2 <1.1.0",
           "resolved": "http://beta-internal:4873/readable-stream/-/readable-stream-1.0.33.tgz",
           "dependencies": {
             "core-util-is": {
@@ -37,7 +37,7 @@
             "isarray": {
               "version": "0.0.1",
               "from": "isarray@0.0.1",
-              "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
+              "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
             },
             "string_decoder": {
               "version": "0.10.31",
@@ -72,7 +72,7 @@
       "dependencies": {
         "redis": {
           "version": "0.10.3",
-          "from": "redis@>=0.10.0 <0.11.0",
+          "from": "redis@>=0.10.1 <0.11.0",
           "resolved": "http://beta-internal:4873/redis/-/redis-0.10.3.tgz"
         },
         "debug": {
@@ -125,7 +125,7 @@
       "dependencies": {
         "redis": {
           "version": "0.10.3",
-          "from": "redis@>=0.10.0 <0.11.0",
+          "from": "redis@>=0.10.1 <0.11.0",
           "resolved": "http://beta-internal:4873/redis/-/redis-0.10.3.tgz"
         }
       }
@@ -214,9 +214,9 @@
       "resolved": "http://beta-internal:4873/ent/-/ent-0.1.0.tgz"
     },
     "express": {
-      "version": "3.20.2",
+      "version": "3.20.3",
       "from": "express@>=3.16.7 <4.0.0",
-      "resolved": "http://beta-internal:4873/express/-/express-3.20.2.tgz",
+      "resolved": "http://beta-internal:4873/express/-/express-3.20.3.tgz",
       "dependencies": {
         "basic-auth": {
           "version": "1.0.0",
@@ -224,9 +224,9 @@
           "resolved": "http://beta-internal:4873/basic-auth/-/basic-auth-1.0.0.tgz"
         },
         "connect": {
-          "version": "2.29.1",
-          "from": "connect@2.29.1",
-          "resolved": "http://beta-internal:4873/connect/-/connect-2.29.1.tgz",
+          "version": "2.29.2",
+          "from": "connect@2.29.2",
+          "resolved": "http://beta-internal:4873/connect/-/connect-2.29.2.tgz",
           "dependencies": {
             "basic-auth-connect": {
               "version": "1.0.0",
@@ -235,21 +235,9 @@
             },
             "body-parser": {
               "version": "1.12.4",
-              "from": "body-parser@>=1.12.2 <1.13.0",
+              "from": "body-parser@>=1.12.4 <1.13.0",
               "resolved": "http://beta-internal:4873/body-parser/-/body-parser-1.12.4.tgz",
               "dependencies": {
-                "debug": {
-                  "version": "2.2.0",
-                  "from": "debug@>=2.2.0 <2.3.0",
-                  "resolved": "http://beta-internal:4873/debug/-/debug-2.2.0.tgz",
-                  "dependencies": {
-                    "ms": {
-                      "version": "0.7.1",
-                      "from": "ms@0.7.1",
-                      "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
-                    }
-                  }
-                },
                 "iconv-lite": {
                   "version": "0.4.8",
                   "from": "iconv-lite@0.4.8",
@@ -266,11 +254,6 @@
                       "resolved": "http://beta-internal:4873/ee-first/-/ee-first-1.1.0.tgz"
                     }
                   }
-                },
-                "qs": {
-                  "version": "2.4.2",
-                  "from": "qs@2.4.2",
-                  "resolved": "http://beta-internal:4873/qs/-/qs-2.4.2.tgz"
                 },
                 "raw-body": {
                   "version": "2.0.1",
@@ -298,12 +281,12 @@
             },
             "compression": {
               "version": "1.4.4",
-              "from": "compression@>=1.4.3 <1.5.0",
+              "from": "compression@>=1.4.4 <1.5.0",
               "resolved": "http://beta-internal:4873/compression/-/compression-1.4.4.tgz",
               "dependencies": {
                 "accepts": {
                   "version": "1.2.7",
-                  "from": "accepts@>=1.2.6 <1.3.0",
+                  "from": "accepts@>=1.2.7 <1.3.0",
                   "resolved": "https://registry.npmjs.org/accepts/-/accepts-1.2.7.tgz",
                   "dependencies": {
                     "mime-types": {
@@ -332,20 +315,8 @@
                   "dependencies": {
                     "mime-db": {
                       "version": "1.9.1",
-                      "from": "mime-db@>=1.9.1 <1.10.0",
+                      "from": "mime-db@>=1.1.2 <2.0.0",
                       "resolved": "https://registry.npmjs.org/mime-db/-/mime-db-1.9.1.tgz"
-                    }
-                  }
-                },
-                "debug": {
-                  "version": "2.2.0",
-                  "from": "debug@>=2.2.0 <2.3.0",
-                  "resolved": "http://beta-internal:4873/debug/-/debug-2.2.0.tgz",
-                  "dependencies": {
-                    "ms": {
-                      "version": "0.7.1",
-                      "from": "ms@0.7.1",
-                      "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
                     }
                   }
                 }
@@ -353,14 +324,9 @@
             },
             "connect-timeout": {
               "version": "1.6.2",
-              "from": "connect-timeout@>=1.6.1 <1.7.0",
+              "from": "connect-timeout@>=1.6.2 <1.7.0",
               "resolved": "http://beta-internal:4873/connect-timeout/-/connect-timeout-1.6.2.tgz",
               "dependencies": {
-                "debug": {
-                  "version": "2.2.0",
-                  "from": "debug@>=2.2.0 <2.3.0",
-                  "resolved": "http://beta-internal:4873/debug/-/debug-2.2.0.tgz"
-                },
                 "ms": {
                   "version": "0.7.1",
                   "from": "ms@0.7.1",
@@ -411,12 +377,12 @@
             },
             "errorhandler": {
               "version": "1.3.6",
-              "from": "errorhandler@>=1.3.5 <1.4.0",
+              "from": "errorhandler@>=1.3.6 <1.4.0",
               "resolved": "http://beta-internal:4873/errorhandler/-/errorhandler-1.3.6.tgz",
               "dependencies": {
                 "accepts": {
                   "version": "1.2.7",
-                  "from": "accepts@>=1.2.6 <1.3.0",
+                  "from": "accepts@>=1.2.7 <1.3.0",
                   "resolved": "https://registry.npmjs.org/accepts/-/accepts-1.2.7.tgz",
                   "dependencies": {
                     "mime-types": {
@@ -450,6 +416,18 @@
                   "from": "crc@3.2.1",
                   "resolved": "http://beta-internal:4873/crc/-/crc-3.2.1.tgz"
                 },
+                "debug": {
+                  "version": "2.1.3",
+                  "from": "debug@>=2.1.3 <2.2.0",
+                  "resolved": "http://beta-internal:4873/debug/-/debug-2.1.3.tgz",
+                  "dependencies": {
+                    "ms": {
+                      "version": "0.7.0",
+                      "from": "ms@0.7.0",
+                      "resolved": "http://beta-internal:4873/ms/-/ms-0.7.0.tgz"
+                    }
+                  }
+                },
                 "uid-safe": {
                   "version": "1.1.0",
                   "from": "uid-safe@1.1.0",
@@ -470,9 +448,9 @@
               }
             },
             "finalhandler": {
-              "version": "0.3.4",
-              "from": "finalhandler@0.3.4",
-              "resolved": "http://beta-internal:4873/finalhandler/-/finalhandler-0.3.4.tgz",
+              "version": "0.3.6",
+              "from": "finalhandler@0.3.6",
+              "resolved": "http://beta-internal:4873/finalhandler/-/finalhandler-0.3.6.tgz",
               "dependencies": {
                 "on-finished": {
                   "version": "2.2.1",
@@ -507,44 +485,18 @@
             },
             "method-override": {
               "version": "2.3.3",
-              "from": "method-override@>=2.3.2 <2.4.0",
-              "resolved": "http://beta-internal:4873/method-override/-/method-override-2.3.3.tgz",
-              "dependencies": {
-                "debug": {
-                  "version": "2.2.0",
-                  "from": "debug@>=2.2.0 <2.3.0",
-                  "resolved": "http://beta-internal:4873/debug/-/debug-2.2.0.tgz",
-                  "dependencies": {
-                    "ms": {
-                      "version": "0.7.1",
-                      "from": "ms@0.7.1",
-                      "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
-                    }
-                  }
-                }
-              }
+              "from": "method-override@>=2.3.3 <2.4.0",
+              "resolved": "http://beta-internal:4873/method-override/-/method-override-2.3.3.tgz"
             },
             "morgan": {
               "version": "1.5.3",
-              "from": "morgan@>=1.5.2 <1.6.0",
+              "from": "morgan@>=1.5.3 <1.6.0",
               "resolved": "http://beta-internal:4873/morgan/-/morgan-1.5.3.tgz",
               "dependencies": {
                 "basic-auth": {
                   "version": "1.0.1",
                   "from": "basic-auth@>=1.0.1 <1.1.0",
                   "resolved": "http://beta-internal:4873/basic-auth/-/basic-auth-1.0.1.tgz"
-                },
-                "debug": {
-                  "version": "2.2.0",
-                  "from": "debug@>=2.2.0 <2.3.0",
-                  "resolved": "http://beta-internal:4873/debug/-/debug-2.2.0.tgz",
-                  "dependencies": {
-                    "ms": {
-                      "version": "0.7.1",
-                      "from": "ms@0.7.1",
-                      "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
-                    }
-                  }
                 },
                 "on-finished": {
                   "version": "2.2.1",
@@ -578,7 +530,7 @@
                     "isarray": {
                       "version": "0.0.1",
                       "from": "isarray@0.0.1",
-                      "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
+                      "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
                     },
                     "string_decoder": {
                       "version": "0.10.31",
@@ -605,18 +557,18 @@
               "resolved": "http://beta-internal:4873/on-headers/-/on-headers-1.0.0.tgz"
             },
             "qs": {
-              "version": "2.4.1",
-              "from": "qs@2.4.1",
-              "resolved": "http://beta-internal:4873/qs/-/qs-2.4.1.tgz"
+              "version": "2.4.2",
+              "from": "qs@2.4.2",
+              "resolved": "http://beta-internal:4873/qs/-/qs-2.4.2.tgz"
             },
             "response-time": {
-              "version": "2.3.0",
-              "from": "response-time@>=2.3.0 <2.4.0",
-              "resolved": "http://beta-internal:4873/response-time/-/response-time-2.3.0.tgz"
+              "version": "2.3.1",
+              "from": "response-time@>=2.3.1 <2.4.0",
+              "resolved": "http://beta-internal:4873/response-time/-/response-time-2.3.1.tgz"
             },
             "serve-favicon": {
               "version": "2.2.1",
-              "from": "serve-favicon@>=2.2.0 <2.3.0",
+              "from": "serve-favicon@>=2.2.1 <2.3.0",
               "resolved": "http://beta-internal:4873/serve-favicon/-/serve-favicon-2.2.1.tgz",
               "dependencies": {
                 "etag": {
@@ -640,7 +592,7 @@
             },
             "serve-index": {
               "version": "1.6.4",
-              "from": "serve-index@>=1.6.3 <1.7.0",
+              "from": "serve-index@>=1.6.4 <1.7.0",
               "resolved": "http://beta-internal:4873/serve-index/-/serve-index-1.6.4.tgz",
               "dependencies": {
                 "accepts": {
@@ -660,18 +612,6 @@
                   "from": "batch@0.5.2",
                   "resolved": "http://beta-internal:4873/batch/-/batch-0.5.2.tgz"
                 },
-                "debug": {
-                  "version": "2.2.0",
-                  "from": "debug@>=2.2.0 <2.3.0",
-                  "resolved": "http://beta-internal:4873/debug/-/debug-2.2.0.tgz",
-                  "dependencies": {
-                    "ms": {
-                      "version": "0.7.1",
-                      "from": "ms@0.7.1",
-                      "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
-                    }
-                  }
-                },
                 "mime-types": {
                   "version": "2.0.11",
                   "from": "mime-types@>=2.0.11 <2.1.0",
@@ -687,13 +627,13 @@
               }
             },
             "serve-static": {
-              "version": "1.9.2",
-              "from": "serve-static@>=1.9.2 <1.10.0",
-              "resolved": "https://registry.npmjs.org/serve-static/-/serve-static-1.9.2.tgz"
+              "version": "1.9.3",
+              "from": "serve-static@>=1.9.3 <1.10.0",
+              "resolved": "http://beta-internal:4873/serve-static/-/serve-static-1.9.3.tgz"
             },
             "type-is": {
               "version": "1.6.2",
-              "from": "type-is@>=1.6.1 <1.7.0",
+              "from": "type-is@>=1.6.2 <1.7.0",
               "resolved": "https://registry.npmjs.org/type-is/-/type-is-1.6.2.tgz",
               "dependencies": {
                 "media-typer": {
@@ -708,7 +648,7 @@
                   "dependencies": {
                     "mime-db": {
                       "version": "1.9.1",
-                      "from": "mime-db@>=1.9.1 <1.10.0",
+                      "from": "mime-db@>=1.1.2 <2.0.0",
                       "resolved": "https://registry.npmjs.org/mime-db/-/mime-db-1.9.1.tgz"
                     }
                   }
@@ -753,20 +693,20 @@
           "resolved": "http://beta-internal:4873/cookie-signature/-/cookie-signature-1.0.6.tgz"
         },
         "debug": {
-          "version": "2.1.3",
-          "from": "debug@>=2.1.3 <2.2.0",
-          "resolved": "http://beta-internal:4873/debug/-/debug-2.1.3.tgz",
+          "version": "2.2.0",
+          "from": "debug@>=2.2.0 <2.3.0",
+          "resolved": "http://beta-internal:4873/debug/-/debug-2.2.0.tgz",
           "dependencies": {
             "ms": {
-              "version": "0.7.0",
-              "from": "ms@0.7.0",
-              "resolved": "http://beta-internal:4873/ms/-/ms-0.7.0.tgz"
+              "version": "0.7.1",
+              "from": "ms@0.7.1",
+              "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
             }
           }
         },
         "depd": {
           "version": "1.0.1",
-          "from": "depd@>=1.0.0 <1.1.0",
+          "from": "depd@>=1.0.1 <1.1.0",
           "resolved": "https://registry.npmjs.org/depd/-/depd-1.0.1.tgz"
         },
         "escape-html": {
@@ -820,7 +760,7 @@
         },
         "proxy-addr": {
           "version": "1.0.8",
-          "from": "proxy-addr@>=1.0.7 <1.1.0",
+          "from": "proxy-addr@>=1.0.8 <1.1.0",
           "resolved": "https://registry.npmjs.org/proxy-addr/-/proxy-addr-1.0.8.tgz",
           "dependencies": {
             "forwarded": {
@@ -841,28 +781,40 @@
           "resolved": "http://beta-internal:4873/range-parser/-/range-parser-1.0.2.tgz"
         },
         "send": {
-          "version": "0.12.2",
-          "from": "send@0.12.2",
-          "resolved": "http://beta-internal:4873/send/-/send-0.12.2.tgz",
+          "version": "0.12.3",
+          "from": "send@0.12.3",
+          "resolved": "http://beta-internal:4873/send/-/send-0.12.3.tgz",
           "dependencies": {
             "destroy": {
               "version": "1.0.3",
               "from": "destroy@1.0.3",
               "resolved": "http://beta-internal:4873/destroy/-/destroy-1.0.3.tgz"
             },
+            "etag": {
+              "version": "1.6.0",
+              "from": "etag@>=1.6.0 <1.7.0",
+              "resolved": "http://beta-internal:4873/etag/-/etag-1.6.0.tgz",
+              "dependencies": {
+                "crc": {
+                  "version": "3.2.1",
+                  "from": "crc@3.2.1",
+                  "resolved": "http://beta-internal:4873/crc/-/crc-3.2.1.tgz"
+                }
+              }
+            },
             "mime": {
               "version": "1.3.4",
               "from": "mime@1.3.4",
-              "resolved": "http://beta-internal:4873/mime/-/mime-1.3.4.tgz"
+              "resolved": "https://registry.npmjs.org/mime/-/mime-1.3.4.tgz"
             },
             "ms": {
-              "version": "0.7.0",
-              "from": "ms@0.7.0",
-              "resolved": "http://beta-internal:4873/ms/-/ms-0.7.0.tgz"
+              "version": "0.7.1",
+              "from": "ms@0.7.1",
+              "resolved": "http://beta-internal:4873/ms/-/ms-0.7.1.tgz"
             },
             "on-finished": {
               "version": "2.2.1",
-              "from": "on-finished@>=2.2.0 <2.3.0",
+              "from": "on-finished@>=2.2.1 <2.3.0",
               "resolved": "https://registry.npmjs.org/on-finished/-/on-finished-2.2.1.tgz",
               "dependencies": {
                 "ee-first": {
@@ -1304,9 +1256,9 @@
                   "resolved": "http://beta-internal:4873/passport-strategy/-/passport-strategy-1.0.0.tgz"
                 },
                 "oauth": {
-                  "version": "0.9.12",
+                  "version": "0.9.13",
                   "from": "oauth@>=0.9.0 <0.10.0",
-                  "resolved": "http://beta-internal:4873/oauth/-/oauth-0.9.12.tgz"
+                  "resolved": "http://beta-internal:4873/oauth/-/oauth-0.9.13.tgz"
                 },
                 "utils-merge": {
                   "version": "1.0.0",
@@ -1347,9 +1299,9 @@
           "resolved": "http://beta-internal:4873/passport-strategy/-/passport-strategy-1.0.0.tgz"
         },
         "oauth": {
-          "version": "0.9.12",
+          "version": "0.9.13",
           "from": "oauth@>=0.9.0 <0.10.0",
-          "resolved": "http://beta-internal:4873/oauth/-/oauth-0.9.12.tgz"
+          "resolved": "http://beta-internal:4873/oauth/-/oauth-0.9.13.tgz"
         },
         "uid2": {
           "version": "0.0.3",
@@ -1695,9 +1647,9 @@
       "resolved": "http://beta-internal:4873/loglevel/-/loglevel-1.2.0.tgz"
     },
     "lru-cache": {
-      "version": "2.6.2",
+      "version": "2.6.3",
       "from": "lru-cache@>=2.5.0 <3.0.0",
-      "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-2.6.2.tgz"
+      "resolved": "http://beta-internal:4873/lru-cache/-/lru-cache-2.6.3.tgz"
     },
     "mandrill-api": {
       "version": "1.0.45",
@@ -1761,7 +1713,7 @@
             "isarray": {
               "version": "0.0.1",
               "from": "isarray@0.0.1",
-              "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
+              "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
             },
             "string_decoder": {
               "version": "0.10.31",
@@ -1851,7 +1803,7 @@
                 "isarray": {
                   "version": "0.0.1",
                   "from": "isarray@0.0.1",
-                  "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
+                  "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
                 },
                 "string_decoder": {
                   "version": "0.10.31",
@@ -2174,7 +2126,7 @@
             "isarray": {
               "version": "0.0.1",
               "from": "isarray@0.0.1",
-              "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
+              "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
             },
             "inherits": {
               "version": "2.0.1",
@@ -2419,7 +2371,7 @@
                     "isarray": {
                       "version": "0.0.1",
                       "from": "isarray@0.0.1",
-                      "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
+                      "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
                     },
                     "string_decoder": {
                       "version": "0.10.31",
@@ -2805,7 +2757,7 @@
                     "isarray": {
                       "version": "0.0.1",
                       "from": "isarray@0.0.1",
-                      "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
+                      "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
                     },
                     "string_decoder": {
                       "version": "0.10.31",
@@ -2976,7 +2928,7 @@
                       "dependencies": {
                         "ansi-regex": {
                           "version": "1.1.1",
-                          "from": "ansi-regex@>=1.1.0 <2.0.0",
+                          "from": "ansi-regex@>=1.0.0 <2.0.0",
                           "resolved": "http://beta-internal:4873/ansi-regex/-/ansi-regex-1.1.1.tgz"
                         },
                         "get-stdin": {
@@ -2993,7 +2945,7 @@
                       "dependencies": {
                         "ansi-regex": {
                           "version": "1.1.1",
-                          "from": "ansi-regex@>=1.1.0 <2.0.0",
+                          "from": "ansi-regex@>=1.0.0 <2.0.0",
                           "resolved": "http://beta-internal:4873/ansi-regex/-/ansi-regex-1.1.1.tgz"
                         }
                       }
@@ -3018,9 +2970,9 @@
                   }
                 },
                 "is-my-json-valid": {
-                  "version": "2.11.0",
+                  "version": "2.12.0",
                   "from": "is-my-json-valid@>=2.10.1 <3.0.0",
-                  "resolved": "http://beta-internal:4873/is-my-json-valid/-/is-my-json-valid-2.11.0.tgz",
+                  "resolved": "http://beta-internal:4873/is-my-json-valid/-/is-my-json-valid-2.12.0.tgz",
                   "dependencies": {
                     "generate-function": {
                       "version": "2.0.0",
@@ -3028,9 +2980,9 @@
                       "resolved": "http://beta-internal:4873/generate-function/-/generate-function-2.0.0.tgz"
                     },
                     "generate-object-property": {
-                      "version": "1.1.1",
+                      "version": "1.2.0",
                       "from": "generate-object-property@>=1.1.0 <2.0.0",
-                      "resolved": "http://beta-internal:4873/generate-object-property/-/generate-object-property-1.1.1.tgz",
+                      "resolved": "http://beta-internal:4873/generate-object-property/-/generate-object-property-1.2.0.tgz",
                       "dependencies": {
                         "is-property": {
                           "version": "1.0.2",
@@ -3238,7 +3190,7 @@
                             "isarray": {
                               "version": "0.0.1",
                               "from": "isarray@0.0.1",
-                              "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
+                              "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
                             },
                             "string_decoder": {
                               "version": "0.10.31",
@@ -3296,7 +3248,7 @@
                             "isarray": {
                               "version": "0.0.1",
                               "from": "isarray@0.0.1",
-                              "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
+                              "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
                             },
                             "string_decoder": {
                               "version": "0.10.31",
@@ -3593,9 +3545,9 @@
           "resolved": "http://beta-internal:4873/lodash/-/lodash-3.8.0.tgz"
         },
         "q": {
-          "version": "1.4.0",
+          "version": "1.4.1",
           "from": "q@>=1.2.0 <2.0.0",
-          "resolved": "http://beta-internal:4873/q/-/q-1.4.0.tgz"
+          "resolved": "http://beta-internal:4873/q/-/q-1.4.1.tgz"
         },
         "request": {
           "version": "2.55.0",
@@ -3620,7 +3572,7 @@
                     "isarray": {
                       "version": "0.0.1",
                       "from": "isarray@0.0.1",
-                      "resolved": "http://beta-internal:4873/isarray/-/isarray-0.0.1.tgz"
+                      "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
                     },
                     "string_decoder": {
                       "version": "0.10.31",
@@ -3833,9 +3785,9 @@
                   }
                 },
                 "is-my-json-valid": {
-                  "version": "2.11.0",
+                  "version": "2.12.0",
                   "from": "is-my-json-valid@>=2.10.1 <3.0.0",
-                  "resolved": "http://beta-internal:4873/is-my-json-valid/-/is-my-json-valid-2.11.0.tgz",
+                  "resolved": "http://beta-internal:4873/is-my-json-valid/-/is-my-json-valid-2.12.0.tgz",
                   "dependencies": {
                     "generate-function": {
                       "version": "2.0.0",
@@ -3843,9 +3795,9 @@
                       "resolved": "http://beta-internal:4873/generate-function/-/generate-function-2.0.0.tgz"
                     },
                     "generate-object-property": {
-                      "version": "1.1.1",
+                      "version": "1.2.0",
                       "from": "generate-object-property@>=1.1.0 <2.0.0",
-                      "resolved": "http://beta-internal:4873/generate-object-property/-/generate-object-property-1.1.1.tgz",
+                      "resolved": "http://beta-internal:4873/generate-object-property/-/generate-object-property-1.2.0.tgz",
                       "dependencies": {
                         "is-property": {
                           "version": "1.0.2",

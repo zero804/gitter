@@ -1,6 +1,6 @@
 "use strict";
 var $ = require('jquery');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var context = require('utils/context');
 var troupeCollections = require('collections/instances/troupes');
 var userHomeTemplate = require('./tmpl/userHomeTemplate.hbs');
@@ -9,13 +9,24 @@ var SuggestedCollectionView = require('./suggested-room-collection-view');
 var isMobile = require('utils/is-mobile');
 var isNative = require('utils/is-native');
 var TroupeCollections = require('collections/troupes');
+require('views/behaviors/isomorphic');
 
 module.exports = (function() {
 
-  var suggestedRoomCollection = new TroupeCollections.SuggestedTroupeCollection();
-  suggestedRoomCollection.fetch();
+  var user = context.getUser();
+  var prettyWelcome = (parseInt(user.id.slice(-1), 16) % 2) === 0;
 
-  return Marionette.Layout.extend({
+  var hash = window.location.hash;
+  // manual override
+  if (hash.match(/pretty/)) {
+    prettyWelcome = true;
+  }
+
+  if (hash.match(/personality/)) {
+    prettyWelcome = false;
+  }
+
+  return Marionette.LayoutView.extend({
     template: userHomeTemplate,
     tagName: 'div',
 
@@ -23,17 +34,30 @@ module.exports = (function() {
       'click #upgrade-auth': 'onUpgradeAuthClick',
     },
 
-    regions: {
-      orgs: "#org-list",
-      suggestedRooms: "#suggested-room-list"
+    behaviors: {
+      Isomorphic: {
+        orgs: { el: "#org-list", init: 'initOrgsRegion' },
+        suggestedRooms: { el: "#suggested-room-list", init: 'initSuggestedRoomsRegion' },
+      }
+    },
+
+    initOrgsRegion: function(optionsForRegion) {
+      if (prettyWelcome) return;
+
+      return new OrgCollectionView(optionsForRegion({ collection: troupeCollections.orgs }));
+    },
+
+    initSuggestedRoomsRegion: function(optionsForRegion) {
+      if (prettyWelcome) return;
+
+      var suggestedRoomCollection = new TroupeCollections.SuggestedTroupeCollection();
+      suggestedRoomCollection.fetch();
+
+      return new SuggestedCollectionView(optionsForRegion({ collection: suggestedRoomCollection }));
     },
 
     onRender: function() {
-      $('#header-wrapper').hide();
-      this.orgs.show(new OrgCollectionView({
-        collection: troupeCollections.orgs
-      }));
-      this.suggestedRooms.show(new SuggestedCollectionView({ collection: suggestedRoomCollection }));
+      $('#header-wrapper').hide(); // Why?
     },
 
     getUserTimestamp: function(id) {
@@ -41,19 +65,8 @@ module.exports = (function() {
     },
 
     serializeData: function() {
-
       var user = context.getUser();
       var hasPrivateRepoScope = !!user.scopes.private_repo;
-      var prettyWelcome = (parseInt(user.id.slice(-1), 16) % 2) === 0;
-
-      // manual override
-      if (window.location.hash.match(/pretty/)) {
-        prettyWelcome = true;
-      }
-
-      if (window.location.hash.match(/personality/)) {
-        prettyWelcome = false;
-      }
 
       return {
         basePath: context.env('basePath'),
