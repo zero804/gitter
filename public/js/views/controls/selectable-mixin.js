@@ -103,7 +103,7 @@ module.exports = (function() {
         var selectedView = this.children.findByModel(model);
         selectedView.$el.addClass('selected');
       }
-      this.trigger('selected', model);
+      this.triggerMethod('selected', model);
     },
     getActive: function() {
       var $c = getContainer(this);
@@ -161,4 +161,3 @@ module.exports = (function() {
 
 
 })();
-

@@ -37,7 +37,7 @@ module.exports = (function() {
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
     },
 
-    repoSelected: function(r) {
+    repoSelected: function(child, r) { // jshint unused:true
       if(!r) return;
       var self = this;
       var uri = r.get('uri');
