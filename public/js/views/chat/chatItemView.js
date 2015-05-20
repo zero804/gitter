@@ -17,13 +17,12 @@ var cocktail = require('cocktail');
 var chatCollapse = require('utils/collapsed-item-client');
 var KeyboardEventMixins = require('views/keyboard-events-mixin');
 var LoadingCollectionMixin = require('views/loading-mixin');
-
+var FastAttachMixin = require('views/fast-attach-mixin');
 
 var RAF = require('utils/raf');
 var toggle = require('utils/toggle');
 require('views/behaviors/unread-items');
 require('views/behaviors/widgets');
-require('views/behaviors/sync-status');
 require('views/behaviors/highlight');
 require('views/behaviors/tooltip');
 
@@ -62,7 +61,6 @@ module.exports = (function() {
     attributes: {
       class: 'chat-item'
     },
-
     ui: {
       collapse: '.js-chat-item-collapse',
       text: '.js-chat-item-text'
@@ -77,8 +75,11 @@ module.exports = (function() {
       UnreadItems: {
         unreadItemType: 'chat',
       },
-      SyncStatus: {},
       Highlight: {}
+    },
+
+    modelEvents: {
+      syncStatusChange: 'onSyncStatusChange'
     },
 
     isEditing: false,
@@ -108,6 +109,7 @@ module.exports = (function() {
 
       this.userCollection = options.userCollection;
 
+      this.decorated = false;
       this.decorators = options.decorators;
 
       this.listenTo(this.model, 'change', this.onChange);
@@ -201,9 +203,15 @@ module.exports = (function() {
       // This needs to be fast. innerHTML is much faster than .html()
       // by an order of magnitude
       this.ui.text[0].innerHTML = html;
+
+      /* If the content has already been decorated, re-perform the decoration */
+      if (this.decorated) {
+        this.decorate();
+      }
     },
 
     decorate: function() {
+      this.decorated = true;
       this.decorators.forEach(function(decorator) {
         decorator.decorate(this);
       }, this);
@@ -599,7 +607,16 @@ module.exports = (function() {
       self.dblClickTimer = setTimeout(function () {
         self.dblClickTimer = null;
       }, 200);
-    }
+    },
+
+    onSyncStatusChange: function(newState) {
+      this.$el
+        .toggleClass('synced', newState == 'synced')
+        .toggleClass('syncing', newState == 'syncing')
+        .toggleClass('syncerror', newState == 'syncerror');
+    },
+
+    attachElContent: FastAttachMixin.attachElContent
 
   });
 
