@@ -16,13 +16,12 @@ var cocktail = require('cocktail');
 var chatCollapse = require('utils/collapsed-item-client');
 var KeyboardEventMixins = require('views/keyboard-events-mixin');
 var LoadingCollectionMixin = require('views/loading-mixin');
-
+var FastAttachMixin = require('views/fast-attach-mixin');
 
 var RAF = require('utils/raf');
 var toggle = require('utils/toggle');
 require('views/behaviors/unread-items');
 require('views/behaviors/widgets');
-require('views/behaviors/sync-status');
 require('views/behaviors/highlight');
 require('views/behaviors/tooltip');
 
@@ -60,7 +59,6 @@ module.exports = (function() {
     attributes: {
       class: 'chat-item'
     },
-
     ui: {
       collapse: '.js-chat-item-collapse',
       text: '.js-chat-item-text'
@@ -75,8 +73,11 @@ module.exports = (function() {
       UnreadItems: {
         unreadItemType: 'chat',
       },
-      SyncStatus: {},
       Highlight: {}
+    },
+
+    modelEvents: {
+      syncStatusChange: 'onSyncStatusChange'
     },
 
     isEditing: false,
@@ -587,7 +588,16 @@ module.exports = (function() {
       self.dblClickTimer = setTimeout(function () {
         self.dblClickTimer = null;
       }, 200);
-    }
+    },
+
+    onSyncStatusChange: function(newState) {
+      this.$el
+        .toggleClass('synced', newState == 'synced')
+        .toggleClass('syncing', newState == 'syncing')
+        .toggleClass('syncerror', newState == 'syncerror');
+    },
+
+    attachElContent: FastAttachMixin.attachElContent
 
   });
 
