@@ -366,7 +366,7 @@ module.exports = (function() {
     serializeData: function() {
       return {
         isOneToOne: context.troupe().get('oneToOne'),
-        roomName: context.troupe().get('name')
+        troupeName: context.troupe().get('name')
       };
     },
 
