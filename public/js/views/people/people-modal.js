@@ -85,6 +85,7 @@ var View = Marionette.CompositeView.extend({
     'input @ui.search': 'onSearchInput',
     'click @ui.clear': 'clearSearch'
   },
+  reorderOnSort: true,
   initialize: function() {
     var self = this;
 
