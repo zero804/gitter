@@ -1,8 +1,7 @@
 "use strict";
-var $ = require('jquery');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var platformKeys = require('utils/platform-keys');
-var TroupeViews = require('views/base');
+var ModalView = require('views/modal');
 var keyboardTemplate = require('./tmpl/keyboardTemplate.hbs');
 
 module.exports = (function() {
@@ -37,10 +36,10 @@ module.exports = (function() {
     },
   });
 
-  return TroupeViews.Modal.extend({
+  return ModalView.extend({
       initialize: function(options) {
         options.title = "Keyboard Shortcuts";
-        TroupeViews.Modal.prototype.initialize.apply(this, arguments);
+        ModalView.prototype.initialize.apply(this, arguments);
         this.view = new View({ });
       },
       menuItems: [
@@ -48,6 +47,5 @@ module.exports = (function() {
         { action: "showMarkdownHelp", text: "Markdown Help ("+ platformKeys.cmd +" + "+ platformKeys.gitter +" + m)", className: "trpBtnBlue trpBtnRight"}
       ]
     });
-  
-})();
 
+})();

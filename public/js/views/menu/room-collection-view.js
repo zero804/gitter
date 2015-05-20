@@ -5,12 +5,10 @@ var context = require('utils/context');
 var resolveIconClass = require('utils/resolve-icon-class');
 var apiClient = require('components/apiClient');
 var roomNameTrimmer = require('utils/room-name-trimmer');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var roomListItemTemplate = require('./tmpl/room-list-item.hbs');
 var popoverTemplate = require('./tmpl/leave-buttons.hbs');
 var appEvents = require('utils/appevents');
-var TroupeViews = require('views/base');
-var cocktail = require('cocktail');
 var dataset = require('utils/dataset-shim');
 require('jquery-sortable');
 
@@ -191,9 +189,9 @@ module.exports = (function() {
 
   var CollectionView = Marionette.CollectionView.extend({
 
-    itemView: RoomListItemView,
+    childView: RoomListItemView,
 
-    itemViewOptions: function (item) {
+    childViewOptions: function (item) {
       var options = {};
       if (item && item.id) {
         options.el = this.$el.find('.room-list-item[data-id="' + item.id + '"]')[0];
@@ -205,8 +203,6 @@ module.exports = (function() {
     },
 
     initialize: function (options) {
-      this.bindUIElements();
-
       if (options.draggable) {
         this.makeDraggable(options.dropTarget);
       }
@@ -231,26 +227,35 @@ module.exports = (function() {
           item.css(position);
         },
 
-        isValidTarget: function(item, container) {
-          var droppedAt = container.el.parent().attr('id');
-          if (droppedAt === 'list-favs') {
+        getDropTarget: function($el) {
+          var a = $el.data('dropTarget') || $el.parents('[data-drop-target]').data('dropTarget');
+          return a;
+        },
+
+        isValidTarget: function(item, container) { // jshint unused:true
+          var droppedAt = this.getDropTarget(container.el);
+          if (droppedAt === 'favs') {
             $('.dragged').hide();
             $('.placeholder').show();
+            return true;
           }
-          else if (droppedAt === 'list-recents') {
+
+          if (droppedAt === 'recents') {
             $('.dragged').show();
             $('.placeholder').hide();
+            return true;
           }
-          return true;
+
+          return false;
         },
 
         onDrop: function (item, container, _super) {
           var position;
           var el = item[0];
           var model = self.roomsCollection.get(dataset.get(el, 'id'));
-          var droppedAt = container.el.parent().attr('id');
+          var droppedAt = this.getDropTarget(container.el);
           if (!cancelDrop) {
-            if (droppedAt === 'list-favs') {
+            if (droppedAt === 'favs') {
               var previousElement = el.previousElementSibling;
 
               if (!previousElement) {
@@ -261,7 +266,7 @@ module.exports = (function() {
               }
               model.set('favourite', position);
               model.save();
-            } else if (droppedAt === 'list-recents') {
+            } else if (droppedAt === 'recents') {
               model.set('favourite', null);
               model.save();
             }
@@ -287,8 +292,6 @@ module.exports = (function() {
       });
     },
   });
-
-  cocktail.mixin(CollectionView, TroupeViews.SortableMarionetteView);
 
   return CollectionView;
 

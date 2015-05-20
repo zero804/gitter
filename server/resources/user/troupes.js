@@ -122,8 +122,6 @@ module.exports = {
       .spread(function(troupe, access) {
         if(!troupe) throw new StatusError(404);
 
-        if(troupe.status === 'DELETED') throw new StatusError(404);
-
         if(troupe.security === 'PUBLIC' && req.method === 'GET') {
           return troupe;
         }

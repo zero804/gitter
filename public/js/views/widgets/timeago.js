@@ -1,5 +1,5 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var moment = require('moment');
 var context = require('utils/context');
 var locale = require('utils/locale');
@@ -27,8 +27,7 @@ module.exports = (function() {
       this.calculateNextTimeout();
     },
 
-    /** XXX TODO NB: change this to onDestroy once we've moved to Marionette 2!!!! */
-    onClose: function() {
+    onDestroy: function() {
       clearTimeout(this.timer);
     },
 
