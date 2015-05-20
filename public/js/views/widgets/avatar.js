@@ -7,6 +7,7 @@ var UserPopoverView = require('views/people/userPopoverView');
 var widgets = require('views/behaviors/widgets');
 var resolveAvatarUrl = require('shared/avatars/resolve-avatar-url');
 require('views/behaviors/tooltip');
+var FastAttachMixin = require('views/fast-attach-mixin');
 
 module.exports = (function() {
 
@@ -130,7 +131,9 @@ module.exports = (function() {
       } else if (this.user) {
         return this.user.displayName;
       }
-    }
+    },
+    
+    attachElContent: FastAttachMixin.attachElContent
 
   });
 

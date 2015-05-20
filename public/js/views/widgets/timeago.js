@@ -4,6 +4,7 @@ var moment = require('moment');
 var context = require('utils/context');
 var locale = require('utils/locale');
 var widgets = require('views/behaviors/widgets');
+var FastAttachMixin = require('views/fast-attach-mixin');
 require('views/behaviors/tooltip');
 
 module.exports = (function() {
@@ -83,6 +84,7 @@ module.exports = (function() {
       this.triggerMethod("render", this);
     },
 
+    attachElContent: FastAttachMixin.attachElContent
   });
 
   widgets.register({ timeago: TimeagoWidget });
