@@ -5,7 +5,6 @@ var appEvents = require('utils/appevents');
 var hasScrollBars = require('utils/scrollbar-detect');
 var ChatCollectionView = require('views/chat/chatCollectionView');
 var context = require('utils/context');
-var highlightPermalinkChats = require('utils/highlight-permalink-chats');
 
 require('views/behaviors/isomorphic');
 
@@ -20,8 +19,10 @@ module.exports = Marionette.LayoutView.extend({
             decorators: this.options.decorators
           }));
 
-          if (context().permalinkChatId) {
-            highlightPermalinkChats(chatCollectionView, context().permalinkChatId);
+          var c = context();
+          if (c.permalinkChatId) {
+            chatCollectionView.highlightPermalinkChat(c.permalinkChatId);
+            delete c.permalinkChatId;
           }
 
           return chatCollectionView;

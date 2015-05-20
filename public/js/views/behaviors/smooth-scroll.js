@@ -2,6 +2,7 @@
 var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
 var _ = require('underscore');
+var rafUtils = require('utils/raf-utils');
 
 var Behavior = Marionette.Behavior.extend({
   defaults: {
@@ -12,6 +13,7 @@ var Behavior = Marionette.Behavior.extend({
   initialize: function() {
     var selector = this.options.scrollElementSelector;
     var wrapperSelector = this.options.contentWrapper;
+    this.queue = [];
 
     this.scrollElement = selector ? document.querySelector(selector) : this.view.el;
     this.wrapper = wrapperSelector ? this.scrollElement.querySelector(wrapperSelector) : null;
@@ -21,6 +23,8 @@ var Behavior = Marionette.Behavior.extend({
 
     // Debounced actions for improved performance
     this.lazyDecorator      = _.debounce(this.decorateIfVisible.bind(this), 500);
+    this.lazyDecoratorQueue = rafUtils.debounce(this.decorateQueue, this);
+
     this.lazyTracker        = _.debounce(this.trackViewport.bind(this), 500);
     this.lazyPointerEvents  = _.debounce(this.enablePointerEvents.bind(this), 250);
 
@@ -33,6 +37,20 @@ var Behavior = Marionette.Behavior.extend({
     this.view.children.each(function(child) {
       if (this.viewportStatus(child.el) === 'visible') child.trigger('messageInViewport');
     }.bind(this));
+  },
+
+  onAddChild: function(child) {
+    this.queue.push(child);
+    this.lazyDecoratorQueue();
+  },
+
+  decorateQueue: function() {
+    var queue = this.queue;
+    this.queue = [];
+
+    queue.forEach(function(child) {
+      if (this.viewportStatus(child.el) === 'visible') child.trigger('messageInViewport');
+    }, this);
   },
 
   // Give an element tells you if it's on screen or above/below the fold

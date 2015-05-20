@@ -7,6 +7,7 @@ var UserPopoverView = require('views/people/userPopoverView');
 var widgets = require('views/behaviors/widgets');
 var resolveAvatarUrl = require('shared/avatars/resolve-avatar-url');
 require('views/behaviors/tooltip');
+var FastAttachMixin = require('views/fast-attach-mixin');
 
 module.exports = (function() {
 
@@ -36,13 +37,16 @@ module.exports = (function() {
       }
     },
     initialize: function (options) {
-      // TODO: is it necessary to listen for updates to the invite status?
-
-      this.user = options.user ? options.user : {};
-      this.showEmail = options.showEmail || {};
-      this.showBadge = options.showBadge;
-      this.showStatus = options.showStatus;
-      this.avatarSize = options.size ? options.size : 's';
+      if (options.user) {
+        this.model = new Backbone.Model(options.user);
+      }
+      // // TODO: is it necessary to listen for updates to the invite status?
+      //
+      // this.user = options.user ? options.user : {};
+      // this.showEmail = options.showEmail || {};
+      // this.showBadge = options.showBadge;
+      // this.showStatus = options.showStatus;
+      // this.avatarSize = options.size ? options.size : 's';
     },
 
     showDetailIntent: function(e) {
@@ -59,7 +63,7 @@ module.exports = (function() {
 
       this.ui.tooltip.tooltip('hide');
 
-      var model = this.model || new Backbone.Model(this.user);
+      var model = this.model;
       var popover = new UserPopoverView({
         model: model,
         targetElement: e.target
@@ -87,53 +91,57 @@ module.exports = (function() {
     },
 
     getUserId: function() {
-      if (this.model) return this.model.id;
-      if (this.user) return this.user.id;
-      return null;
+      return this.model.id;
     },
 
     serializeData: function() {
-      var currentUserId = context.getUserId();
-
-      var user = this.model ? this.model.toJSON() : this.user;
-
-      var avatarUrl = resolveAvatarUrl({ username: user.username, version: user.gv, size: (this.avatarSize == 'm' ? 60 : 32) });
-
-      var online = user.id === currentUserId || !!user.online; // only the people view tries to show avatar status so there is a model object, it won't necessarily work in other cases
-
-      var presenceClass;
-      if (this.showStatus) {
-        presenceClass = online ? 'online' : 'offline';
-      } else {
-        presenceClass = "";
-      }
-
-      return {
-        id: user.id,
-        showBadge: this.showBadge,
-        showStatus: this.showStatus,
-        userDisplayName: user.displayName,
-        avatarUrl: avatarUrl,
-        avatarSize: this.avatarSize,
-        presenceClass: presenceClass,
-        online: online,
-        offline: !online,
-        role: user.role,
-        invited: user.invited,
-        removed: user.removed,
-        inactive: user.removed || user.invited
-      };
+      var options = this.options || {};
+      var user = this.model && this.model.toJSON();
+      return serializeData(user, options);
     },
 
     getTooltip: function() {
-      if (this.model) {
-        return this.model.get('displayName');
-      } else if (this.user) {
-        return this.user.displayName;
-      }
-    }
+      return this.model.get('displayName');
+    },
+
+    attachElContent: FastAttachMixin.attachElContent
 
   });
+
+  function serializeData(user, options) {
+    if (!user) user = options.user || {};
+    var currentUserId = context.getUserId();
+    var avatarUrl = resolveAvatarUrl({ username: user.username, version: user.gv, size: (options.avatarSize == 'm' ? 60 : 32) });
+
+    var online = user.id === currentUserId || !!user.online; // only the people view tries to show avatar status so there is a model object, it won't necessarily work in other cases
+
+    var presenceClass;
+    if (options.showStatus) {
+      presenceClass = online ? 'online' : 'offline';
+    } else {
+      presenceClass = "";
+    }
+
+    return {
+      id: user.id,
+      showBadge: options.showBadge,
+      showStatus: options.showStatus,
+      userDisplayName: user.displayName,
+      avatarUrl: avatarUrl,
+      avatarSize: options.avatarSize || 's',
+      presenceClass: presenceClass,
+      online: online,
+      offline: !online,
+      role: user.role,
+      invited: user.invited,
+      removed: user.removed,
+      inactive: user.removed || user.invited
+    };
+  }
+
+  AvatarWidget.getPrerendered = function(model, id) {
+    return "<span class='widget' data-widget-id='" + id + "'>" + template(serializeData(null, model)) + "</span>";
+  };
 
   widgets.register({ avatar: AvatarWidget });
   return AvatarWidget;

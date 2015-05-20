@@ -1,8 +1,9 @@
 "use strict";
-var $ = require('jquery');
+
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
+var unsafeParseHtml = require('utils/unsafe-parse-html');
 
 module.exports = (function() {
   var cachedWidgets = {};
@@ -43,36 +44,52 @@ module.exports = (function() {
     }
 
     var generatedText = templateFunc(data);
-    if(!data.renderViews || !view || !data.renderViews.length) return generatedText; 
 
-    // Turn the text into a DOM
-    var dom = $($.parseHTML(generatedText));
-    // dom.addClass("view"); // TODO: drop this class in future
+    var prerenderedViews = data.prerenderedViews;
 
-    var widgets = dom.find('view');
+    // No widgets? Just return the text
+    if(!prerenderedViews) return generatedText;
+
+    var dom = unsafeParseHtml(generatedText);
     var widgetManager = view.widgetManager;
 
-    if(widgets.length && !widgetManager) {
-      // Create a region manager
+    var widgetsRendered = dom.querySelectorAll('.widget');
+    var widgetsRenderedLen = widgetsRendered.length;
+
+    if(widgetsRenderedLen && !widgetManager) {
+      // Create a region manager if one doesn't already exist
       widgetManager = new WidgetManager();
       view.widgetManager = widgetManager;
     }
 
-    widgets.each(function () {
-      var id = this.getAttribute('data-id'),
-      attrs = data.renderViews[id];
+    for (var i = 0; i < widgetsRenderedLen; i++) {
+      var widgetEl = widgetsRendered[i];
+      var id = widgetEl.getAttribute('data-widget-id');
+      if (!id) continue;
+      var attrs = prerenderedViews[id];
+      if (!attrs) continue;
+
+      widgetEl.removeAttribute('data-widget-id');
 
       var Widget = cachedWidgets[attrs.widgetName];
-      var widget = new Widget(attrs.model);
+      var model = attrs.model;
+      model.el = widgetEl; // Existing element
+      model.template = false; // No template (attach)
+
+      // Attach the widget to the prerendered content
+      var widget = new Widget(model);
       widget.render();
 
-      this.parentNode.replaceChild(widget.el, this);
-
-      // Create a region
+      // Add the widget to the widget manager
       widgetManager.add(widget);
-    });
+    }
 
     return dom;
+  }
+
+  function getPrerendered(widgetName, model, id) {
+    var Widget = cachedWidgets[widgetName];
+    return Widget.getPrerendered(model, id);
   }
 
   var Behavior = Marionette.Behavior.extend({
@@ -81,7 +98,10 @@ module.exports = (function() {
       if(this.view.templateHelpers) throw new Error('Cannot use templateHelpers with Widgets');
       this.view.templateHelpers = function() {
         // TODO: add global template helpers
-        return { _view: this };
+        return {
+          _view: this,
+          getPrerendered: getPrerendered
+        };
       };
     },
     onDestroy: function() {
