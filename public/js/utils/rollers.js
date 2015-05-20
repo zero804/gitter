@@ -93,11 +93,10 @@ module.exports = (function() {
       var target = this._target;
       this._mode = STABLE;
 
-      if (stableElement) {
-        this._stableElement = stableElement;
-      } else {
-        this._stableElement = this.getBottomMostVisibleElement();
-      }
+      this._stableElement = stableElement || this.getBottomMostVisibleElement();
+
+      // nothing to stabilize (no content)
+      if (!this._stableElement) return;
 
       // TODO: check that the element is within the targets DOM heirachy
       var scrollBottom = target.scrollTop + target.clientHeight;
