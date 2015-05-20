@@ -292,7 +292,6 @@ module.exports = (function() {
     },
 
     scrollToChatId: function (id) {
-      console.log('scrollToChatId', id);
       var model = this.collection.get(id);
       if (model) return this.scrollToChat(model);
       var self = this;
