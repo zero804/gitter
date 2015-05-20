@@ -11,6 +11,7 @@ var uiVars = require('views/app/uiVars');
 var Popover = require('views/popover');
 var chatItemTemplate = require('./tmpl/chatItemView.hbs');
 var statusItemTemplate = require('./tmpl/statusItemView.hbs');
+var actionsTemplate = require('./tmpl/actionsView.hbs');
 var chatInputView = require('views/chat/chatInputView');
 var appEvents = require('utils/appevents');
 var cocktail = require('cocktail');
@@ -46,7 +47,8 @@ module.exports = (function() {
     'mouseover .js-chat-item-readby': 'showReadByIntent',
     'click .webhook':                 'expandActivity',
     'click':                          'onClick',
-    'dblclick':                       'onDblClick'
+    'dblclick':                       'onDblClick',
+    'click .js-chat-item-actions':    'showActions'
   };
 
   var touchEvents = {
@@ -393,7 +395,7 @@ module.exports = (function() {
       this.setCollapse(!collapsed);
     },
 
-    collapseEmbeds: function() {
+    onCollapseEmbeds: function() {
       // this.bindUIElements();
       var self = this;
       var embeds = self.$el.find('.embed');
@@ -537,6 +539,23 @@ module.exports = (function() {
       ReadByPopover.singleton(this, popover);
     },
 
+    showActions: function(e) {
+      e.preventDefault();
+      if(this.popover) return;
+      e.preventDefault();
+
+      var actions = new ActionsPopover({
+        model: this.model,
+        parentView: this,
+        targetElement: e.target,
+        placement: 'horizontal',
+        width: '200px'
+      });
+
+      actions.show();
+      ReadByPopover.singleton(this, actions);
+    },
+
     mentionUser: function () {
       var mention = "@" + this.model.get('fromUser').username + " ";
       appEvents.trigger('input.append', mention);
@@ -606,10 +625,33 @@ module.exports = (function() {
     }
   });
 
+  var ActionsView = Marionette.ItemView.extend({
+    template: actionsTemplate,
+    initialize: function(options) {
+      this.parentView = options.parentView;
+    },
+    events: {
+      'click .js-chat-action-collapse': 'collapse'
+    },
+    collapse: function() {
+      console.debug('collapsing embeds');
+      this.parentView.triggerMethod('collapseEmbeds');
+    }
+  });
+
+  var ActionsPopover = Popover.extend({
+    initialize: function(options) {
+      Popover.prototype.initialize.apply(this, arguments);
+      this.view = new ActionsView({ model: this.model, parentView: options.parentView });
+    }
+  });
+
   return {
     ChatItemView: ChatItemView,
     ReadByView: ReadByView,
-    ReadByPopover: ReadByPopover
+    ReadByPopover: ReadByPopover,
+    ActionsView: ActionsView,
+    ActionsPopover: ActionsPopover
   };
 
 
