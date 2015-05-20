@@ -218,7 +218,7 @@ module.exports = (function() {
 
     },
 
-    getFirstItemOfType: function(type) { 
+    getFirstItemOfType: function(type) {
       var items = this._getItemsOfType(type);
       return items.sort()[0];
     }
@@ -481,8 +481,7 @@ module.exports = (function() {
       var chats = this._store._getItemsOfType('chat');
       if(!chats.length) {
         // If there are no unread items, save the effort.
-        acrossTheFoldModel.set('unreadAbove', 0);
-        acrossTheFoldModel.set('unreadBelow', 0);
+        acrossTheFoldModel.set({ unreadAbove: 0, unreadBelow: 0, belowItemId: null });
         return;
       }
 
@@ -514,16 +513,19 @@ module.exports = (function() {
       });
 
       var chatBelowView = allItems[chatBelowIndex];
+      var belowItemId = null;
       if(chatBelowView) {
-        var belowItemId = dataset.get(chatBelowView, 'itemId');
+        belowItemId = dataset.get(chatBelowView, 'itemId');
         if(belowItemId) {
           chats.forEach(function(chatId) {
-            if(chatId >= belowItemId) below++;
+            if(chatId >= belowItemId) {
+              below++;
+            }
           });
         }
       }
-      acrossTheFoldModel.set('unreadAbove', above);
-      acrossTheFoldModel.set('unreadBelow', below);
+
+      acrossTheFoldModel.set({ unreadAbove: above, unreadBelow: below, belowItemId: belowItemId });
     },
 
     _scheduleMarkRead: function() {

@@ -1,6 +1,5 @@
 "use strict";
 var $ = require('jquery');
-var _ = require('underscore');
 var appEvents = require('utils/appevents');
 var chatInputView = require('views/chat/chatInputView');
 var itemCollections = require('collections/instances/integrated-items');
@@ -62,18 +61,16 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
     }));
   },
 
-  initBannerTopRegion: function() {
-    return new UnreadBannerView.Top({
-      model: unreadItemsClient.acrossTheFold(),
-      chatCollectionView: this.chatCollectionView
-    });
+  initBannerTopRegion: function(optionsForRegion) {
+    return new UnreadBannerView.Top(optionsForRegion({
+      model: unreadItemsClient.acrossTheFold()
+    }));
   },
 
-  initBannerBottomRegion: function() {
-    return new UnreadBannerView.Bottom({
-      model: unreadItemsClient.acrossTheFold(),
-      chatCollectionView: this.chatCollectionView
-    });
+  initBannerBottomRegion: function(optionsForRegion) {
+    return new UnreadBannerView.Bottom(optionsForRegion({
+      model: unreadItemsClient.acrossTheFold()
+    }));
   },
 
   onKeyBackspace: function(e) {
