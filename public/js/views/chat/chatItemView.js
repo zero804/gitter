@@ -652,7 +652,8 @@ module.exports = (function() {
       'click .js-chat-action-collapse': 'toggleCollapse',
       'click .js-chat-action-expand': 'toggleCollapse',
       'click .js-chat-action-edit': 'edit',
-      'click .js-chat-action-mention': 'mention'
+      'click .js-chat-action-mention': 'mention',
+      'click .js-chat-action-quote': 'quote'
     },
     toggleCollapse: function() {
       this.chatItemView.toggleCollapse();
@@ -663,9 +664,13 @@ module.exports = (function() {
     mention: function() {
       this.chatItemView.mentionUser();
     },
+    quote: function() {
+      appEvents.trigger('input.append', "> " + this.model.get('text'), { newLine: true });
+    },
     serializeData: function() {
       var data = {actions: []};
       data.actions.push({name: 'mention', description: 'Mention ' + this.model.get('fromUser').username});
+      data.actions.push({name: 'quote', description: 'Quote'});
 
       if (this.chatItemView.canEdit()) data.actions.push({name: 'edit', description: 'Edit'});
       if (this.model.get('isCollapsible')) {
