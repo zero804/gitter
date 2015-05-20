@@ -3,7 +3,7 @@
 /* Parse an HTML string into a DOM Element */
 module.exports = function(html) {
   var d = document.createElement('DIV');
-  d.innerHTML = html;
+  d.innerHTML = html.trim();
   var children = d.children;
   var len = children.length;
   if (len === 1) return children[0];
