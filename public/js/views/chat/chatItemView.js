@@ -396,7 +396,7 @@ module.exports = (function() {
       this.setCollapse(!collapsed);
     },
 
-    onCollapseEmbeds: function() {
+    collapseEmbeds: function() {
       // this.bindUIElements();
       var self = this;
       var embeds = self.$el.find('.embed');
@@ -547,7 +547,7 @@ module.exports = (function() {
 
       var actions = new ActionsPopover({
         model: this.model,
-        parentView: this,
+        chatItemView: this,
         targetElement: e.target,
         placement: 'horizontal',
         width: '200px'
@@ -629,21 +629,44 @@ module.exports = (function() {
   var ActionsView = Marionette.ItemView.extend({
     template: actionsTemplate,
     initialize: function(options) {
-      this.parentView = options.parentView;
+      this.chatItemView = options.chatItemView;
     },
     events: {
-      'click .js-chat-action-collapse': 'collapse'
+      'click .js-chat-action-collapse': 'toggleCollapse',
+      'click .js-chat-action-expand': 'toggleCollapse',
+      'click .js-chat-action-edit': 'edit',
+      'click .js-chat-action-mention': 'mention'
     },
-    collapse: function() {
-      console.debug('collapsing embeds');
-      this.parentView.triggerMethod('collapseEmbeds');
+    toggleCollapse: function() {
+      this.chatItemView.toggleCollapse();
+    },
+    edit: function() {
+      this.chatItemView.toggleEdit();
+    },
+    mention: function() {
+      this.chatItemView.mentionUser();
+    },
+    serializeData: function() {
+      var data = {actions: []};
+      data.actions.push({name: 'mention', description: 'Mention ' + this.model.get('fromUser').username});
+
+      if (this.chatItemView.canEdit()) data.actions.push({name: 'edit', description: 'Edit'});
+      if (this.model.get('isCollapsible')) {
+        var action = this.model.get('collapsed') ? {name: 'expand', description: 'Expand'} : {name: 'collapse', description: 'Collapse'};
+        data.actions.push(action);
+      }
+
+      return data;
     }
   });
 
   var ActionsPopover = Popover.extend({
     initialize: function(options) {
       Popover.prototype.initialize.apply(this, arguments);
-      this.view = new ActionsView({ model: this.model, parentView: options.parentView });
+      this.view = new ActionsView({ model: this.model, chatItemView: options.chatItemView });
+    },
+    events: {
+      'click': 'hide'
     }
   });
 

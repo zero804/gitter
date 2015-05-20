@@ -1,3 +1,5 @@
-<div class="js-chat-action-collapse">
-  collapse
-</div>
+{{#each actions}}
+  <div class="chat-item__action js-chat-action-{{name}}">
+    {{description}}
+  </div>
+{{/each}}
