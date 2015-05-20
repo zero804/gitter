@@ -106,6 +106,7 @@ module.exports = (function() {
 
       this.userCollection = options.userCollection;
 
+      this.decorated = false;
       this.decorators = options.decorators;
 
       this.listenTo(this.model, 'change', this.onChange);
@@ -199,9 +200,15 @@ module.exports = (function() {
       // This needs to be fast. innerHTML is much faster than .html()
       // by an order of magnitude
       this.ui.text[0].innerHTML = html;
+
+      /* If the content has already been decorated, re-perform the decoration */
+      if (this.decorated) {
+        this.decorate();
+      }
     },
 
     decorate: function() {
+      this.decorated = true;
       this.decorators.forEach(function(decorator) {
         decorator.decorate(this);
       }, this);
