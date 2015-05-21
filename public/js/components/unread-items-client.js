@@ -513,19 +513,29 @@ module.exports = (function() {
       });
 
       var chatBelowView = allItems[chatBelowIndex];
+
       var belowItemId = null;
+      var firstUnreadItemBelowId = null;
       if(chatBelowView) {
         belowItemId = dataset.get(chatBelowView, 'itemId');
         if(belowItemId) {
           chats.forEach(function(chatId) {
-            if(chatId >= belowItemId) {
+            if (chatId >= belowItemId) {
               below++;
+
+              if (!firstUnreadItemBelowId) {
+                firstUnreadItemBelowId = chatId;
+              } else {
+                if (firstUnreadItemBelowId > chatId) {
+                  firstUnreadItemBelowId = chatId; // Get the lowest number
+                }
+              }
             }
           });
         }
       }
 
-      acrossTheFoldModel.set({ unreadAbove: above, unreadBelow: below, belowItemId: belowItemId });
+      acrossTheFoldModel.set({ unreadAbove: above, unreadBelow: below, belowItemId: firstUnreadItemBelowId });
     },
 
     _scheduleMarkRead: function() {

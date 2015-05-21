@@ -8,7 +8,8 @@ var unreadItemsClient = require('components/unread-items-client');
 var TopBannerView = Marionette.ItemView.extend({
   template: template,
   ui: {
-    bannerMessage: '#banner-message'
+    bannerMessage: '#banner-message',
+    buttons: 'button'
   },
   className: 'banner slide-away',
   events: {
@@ -46,7 +47,11 @@ var TopBannerView = Marionette.ItemView.extend({
   },
 
   updateDisplay: function() {
-    this.$el.toggleClass('slide-away', !this.getUnreadCount());
+    var noMoreItems = !this.getUnreadCount();
+    if (noMoreItems) {
+      this.ui.buttons.blur();
+    }
+    this.$el.toggleClass('slide-away', noMoreItems);
     this.ui.bannerMessage.text(this.getMessage());
   },
 
