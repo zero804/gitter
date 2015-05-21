@@ -4,8 +4,7 @@ var _ = require('underscore');
 var context = require('utils/context');
 var chatModels = require('collections/chat');
 var AvatarView = require('views/widgets/avatar');
-var Marionette = require('marionette');
-var TroupeViews = require('views/base');
+var Marionette = require('backbone.marionette');
 var moment = require('moment');
 var uiVars = require('views/app/uiVars');
 var Popover = require('views/popover');
@@ -16,11 +15,13 @@ var appEvents = require('utils/appevents');
 var cocktail = require('cocktail');
 var chatCollapse = require('utils/collapsed-item-client');
 var KeyboardEventMixins = require('views/keyboard-events-mixin');
+var LoadingCollectionMixin = require('views/loading-mixin');
+var FastAttachMixin = require('views/fast-attach-mixin');
+
 var RAF = require('utils/raf');
 var toggle = require('utils/toggle');
 require('views/behaviors/unread-items');
 require('views/behaviors/widgets');
-require('views/behaviors/sync-status');
 require('views/behaviors/highlight');
 require('views/behaviors/tooltip');
 
@@ -58,7 +59,6 @@ module.exports = (function() {
     attributes: {
       class: 'chat-item'
     },
-
     ui: {
       collapse: '.js-chat-item-collapse',
       text: '.js-chat-item-text'
@@ -73,8 +73,11 @@ module.exports = (function() {
       UnreadItems: {
         unreadItemType: 'chat',
       },
-      SyncStatus: {},
       Highlight: {}
+    },
+
+    modelEvents: {
+      syncStatusChange: 'onSyncStatusChange'
     },
 
     isEditing: false,
@@ -104,6 +107,7 @@ module.exports = (function() {
 
       this.userCollection = options.userCollection;
 
+      this.decorated = false;
       this.decorators = options.decorators;
 
       this.listenTo(this.model, 'change', this.onChange);
@@ -119,8 +123,7 @@ module.exports = (function() {
       this.listenToOnce(this, 'messageInViewport', this.decorate);
     },
 
-    /** XXX TODO NB: change this to onClose once we've moved to Marionette 2!!!! */
-    onClose: function() {
+    onDestroy: function() {
       clearTimeout(this.timeChangeTimeout);
     },
 
@@ -198,9 +201,15 @@ module.exports = (function() {
       // This needs to be fast. innerHTML is much faster than .html()
       // by an order of magnitude
       this.ui.text[0].innerHTML = html;
+
+      /* If the content has already been decorated, re-perform the decoration */
+      if (this.decorated) {
+        this.decorate();
+      }
     },
 
     decorate: function() {
+      this.decorated = true;
       this.decorators.forEach(function(decorator) {
         decorator.decorate(this);
       }, this);
@@ -275,7 +284,7 @@ module.exports = (function() {
         var isCollapsible = !!this.model.get('isCollapsible');
         var $collapse = this.ui.collapse;
         toggle($collapse[0], isCollapsible);
-      }
+          }
     },
 
     getEditTooltip: function() {
@@ -525,7 +534,7 @@ module.exports = (function() {
       var popover = new ReadByPopover({
         model: this.model,
         userCollection: this.userCollection,
-        scroller: this.$el.parents('.primary-scroll'),
+        scroller: this.$el.parents('.primary-scroll'), // TODO: make nice
         placement: 'vertical',
         minHeight: '88px',
         width: '300px',
@@ -579,25 +588,34 @@ module.exports = (function() {
       self.dblClickTimer = setTimeout(function () {
         self.dblClickTimer = null;
       }, 200);
-    }
+    },
+
+    onSyncStatusChange: function(newState) {
+      this.$el
+        .toggleClass('synced', newState == 'synced')
+        .toggleClass('syncing', newState == 'syncing')
+        .toggleClass('syncerror', newState == 'syncerror');
+    },
+
+    attachElContent: FastAttachMixin.attachElContent
 
   });
 
   cocktail.mixin(ChatItemView, KeyboardEventMixins);
 
   var ReadByView = Marionette.CollectionView.extend({
-    itemView: AvatarView,
+    childView: AvatarView,
     className: 'popoverReadBy',
     initialize: function(options) {
       var c = new chatModels.ReadByCollection(null, { listen: true, chatMessageId: this.model.id, userCollection: options.userCollection });
       c.loading = true;
       this.collection = c;
     },
-    onClose: function(){
+    onDestroy: function(){
       this.collection.unlisten();
     }
   });
-  cocktail.mixin(ReadByView, TroupeViews.LoadingCollectionMixin);
+  cocktail.mixin(ReadByView, LoadingCollectionMixin);
 
   var ReadByPopover = Popover.extend({
     initialize: function(options) {

@@ -1,5 +1,5 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
 var resolveAvatarUrl = require('shared/avatars/resolve-avatar-url');
 var Popover = require('views/popover');

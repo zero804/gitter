@@ -7,14 +7,10 @@
 
   <title>{{troupeName}}</title>
 
-  {{#if isUserhome}}
   <link rel="stylesheet" href='{{ cdn "styles/mobile-userhome.css"}}'>
-  {{else}}
-  <link rel="stylesheet" href='{{ cdn "styles/mobile-app.css"}}'>
-  {{/if}}
 
   {{{ generateTroupeContext troupeContext }}}
-  {{{bootScript bootScriptName }}}
+  {{{ bootScript "mobile-userhome" }}}
   
   <link rel="apple-touch-icon" href='{{ cdn "images/touch-icon-iphone.png" }}'>
   <link rel="shortcut icon" href='{{ cdn "images/favicon5.png"}}'>
@@ -30,8 +26,10 @@
   </style>
 </head>
 <body class="with-sideMenu">
-
-  <div id="troupeList" class="menu menu--mobile">
+  <div id="menu-region" class="menu-region">
+    <nav class="menu menu--mobile">
+      {{{ prerenderView "js/views/menu/tmpl/troupeMenu" }}}
+    </nav>
   </div>
 
   <div id="mainPage" class="chat-app">
@@ -42,7 +40,7 @@
       <span class="trpTitle">{{troupeName}}</span>
     </header>
 
-    <div id="userhome"></div>
+    <div id="userhome-region"></div>
   </div>
   {{>live_reload}}
 </body>

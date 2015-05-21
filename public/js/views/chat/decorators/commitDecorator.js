@@ -167,7 +167,7 @@ module.exports = (function() {
         $commit.on('click', showPopover);
         $commit.on('mouseover', showPopoverLater);
 
-        view.once('close', function() {
+        view.once('destroy', function() {
           $commit.off('click', showPopover);
           $commit.off('mouseover', showPopoverLater);
         });

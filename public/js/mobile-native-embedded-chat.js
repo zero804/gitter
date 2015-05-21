@@ -53,7 +53,6 @@ onready(function() {
   new chatInputView.ChatInputView({
     el: $('#chat-input'),
     collection: chatCollection,
-    rollers: chatCollectionView.rollers,
     compactView: true
   }).render();
 

@@ -1,21 +1,19 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var context = require('utils/context');
+var ModalView = require('views/modal');
 var AvatarView = require('views/widgets/avatar');
 var collectionTemplate = require('./tmpl/peopleCollectionView.hbs');
 var remainingTempate = require('./tmpl/remainingView.hbs');
-
+require('views/behaviors/isomorphic');
 
 module.exports = (function() {
-
   var PeopleCollectionView = Marionette.CollectionView.extend({
     tagName: 'ul',
-
     className: 'roster',
+    childView: AvatarView,
 
-    itemView: AvatarView,
-
-    itemViewOptions: function(item) {
+    childViewOptions: function(item) {
       var options = {
         tagName: 'li',
         showStatus: true,
@@ -51,37 +49,41 @@ module.exports = (function() {
       };
 
       return data;
-    }
+      }
   });
 
-  var ExpandableRosterView = Marionette.Layout.extend({
+  var ExpandableRosterView = Marionette.LayoutView.extend({
     template: collectionTemplate,
 
-    regions: {
-      rosterRegion: "#roster-region",
-      remainingRegion: "#remaining-region"
+    behaviors: {
+      Isomorphic: {
+        rosterRegion: { el: "#roster-region", init: 'initRosterRegion' },
+        remainingRegion: { el: "#remaining-region", init: 'initRemainingRegion' }
+      }
     },
 
-    initialize: function(options) {
-      var prerenderedRosterEl = this.$el.find('#roster-view')[0];
-      var rosterView = new PeopleCollectionView({
-        el: prerenderedRosterEl,
-        collection: options.rosterCollection
-      });
+    initRosterRegion: function(optionsForRegion) {
+      return new PeopleCollectionView(optionsForRegion({ collection: this.options.rosterCollection }));
+    },
 
-      var prerenderedRemainingEl = this.$el.find('#remaining-view')[0];
-      var remainingView = new RemainingView({
-        el: prerenderedRemainingEl,
-        model: context.troupe()
-      });
+    initRemainingRegion: function(optionsForRegion) {
+      return new RemainingView(optionsForRegion({ model: context.troupe() }));
+    },
 
-      // attach without emptying existing regions
-      this.rosterRegion.attachView(rosterView);
-      this.remainingRegion.attachView(remainingView);
-    }
   });
 
-  return ExpandableRosterView;
+  var AllUsersModal = ModalView.extend({
+    initialize: function(options) {
+      options = options || {};
+      options.title = "People";
+      ModalView.prototype.initialize.call(this, options);
+      this.view = new PeopleCollectionView(options);
+    }
+  });
+  return {
+    ExpandableRosterView: ExpandableRosterView,
+    Modal: AllUsersModal
+  };
+
 
 })();
-

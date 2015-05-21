@@ -1,6 +1,6 @@
 "use strict";
 var Backbone = require('backbone');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var Dropdown = require('./dropdown');
 var liveSearch = require('./live-search');
 
@@ -63,9 +63,9 @@ module.exports = (function() {
       this.listenTo(this.dropdown, 'selected', this.selected);
     },
 
-    onClose: function() {
+    onDestroy: function() {
       if(this.dropdown) {
-        this.dropdown.close();
+        this.dropdown.destroy();
         this.dropdown = null;
       }
     },

@@ -1,6 +1,9 @@
-@import "base-zindex-levels";
+@import (reference) "../../../less/base-zindex-levels";
+@import (reference) "../../../less/colors.less";
+@import (reference) "../../../less/trp3Vars.less";
+@import (reference) "../../../less/trpButtons.less";
+
 @import "../controls/dropdown";
-@import "colors.less";
 
 .chat-header {
 
@@ -51,8 +54,10 @@ body.banner-top {
     right: 0;
     height: @banner-height;
 
+    transition: top .2s ease-in-out;
+
     &.slide-away {
-      top: (-@banner-height);
+      top: -100%;
     }
 
     button {
@@ -97,12 +102,16 @@ body.banner-top {
 .banner-wrapper.bottom {
   bottom: auto;
   top: -41px;
+
   .banner {
     top: auto;
     bottom: 0;
+
+    transition: bottom .2s ease-in-out;
+
     &.slide-away {
       top: auto;
-      bottom: -35px;
+      bottom: -100%;
     }
     button.main {
       border-radius: 4px 4px 0 0;
