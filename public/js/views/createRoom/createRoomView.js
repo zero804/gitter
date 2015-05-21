@@ -145,7 +145,7 @@ module.exports = (function() {
           }
 
 
-          promise = apiClient.post("/v1/rooms/" + ownerModel.get('id') + '/channels', payload);
+          promise = apiClient.post("/v1/rooms/" + ownerModel.get('roomId') + '/channels', payload);
       }
 
       promise
