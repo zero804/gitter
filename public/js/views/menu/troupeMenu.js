@@ -2,7 +2,6 @@
 var $ = require('jquery');
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
-var Backbone = require('backbone');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
 var isMobile = require('utils/is-mobile');
@@ -15,6 +14,7 @@ var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var CollectionWrapperViewTemplate = require('./tmpl/collection-wrapper-view.hbs');
 var ProfileView = require('./profileView');
 var OrgCollectionView = require('./orgCollectionView');
+var dataSet = require('utils/dataset-shim');
 require('views/behaviors/isomorphic');
 
 var apiClient = require('components/apiClient');
@@ -88,6 +88,7 @@ module.exports = (function () {
 
     ui: {
       nano: '.nano',
+      recentListItems: '#recentTroupesList li' // TODO: this is nasty!
     },
 
     keyboardEvents: {
@@ -180,11 +181,7 @@ module.exports = (function () {
     },
 
     initNanoScroller: function() {
-      var ui = this.ui;
-      var target = ui.nano[0];
-      if (!target) return;
-
-      $(target).nanoScroller({ iOSNativeScrolling: true });
+      this.ui.nano.nanoScroller({ iOSNativeScrolling: true });
     },
 
     showSuggestedRooms: function() {
@@ -230,7 +227,7 @@ module.exports = (function () {
     },
 
     troupeContextChanged: function(id) {
-      $('#recentTroupesList li').removeClass('selected'); // TODO: so nasty. Fix
+      this.ui.recentListItems.removeClass('selected'); // TODO: so nasty. Fix
       var index = this.getIndexForId(id);
       if (index) this.selectedIndex = index;
     },
@@ -238,9 +235,9 @@ module.exports = (function () {
     // FIXME: WARNING -> THIS METHOD IS UNSAFE.
     getIndexForId: function(id) {
       if (!id) return;
-      var els = $('#recentTroupesList li');
-      for (var i = 0, el; el = els[i] /* jshint -W084 */; i++) {  // wtf?
-        if ($(el).data('id') === id) return i;
+      var els = this.ui.recentListItems;
+      for (var i = 0; i < els.length; i++) {
+        if (dataSet.get(els[i], 'id') === id) return i;
       }
     },
 
@@ -257,25 +254,25 @@ module.exports = (function () {
     },
 
     select: function(i) {
-      var itemElements = $('#recentTroupesList li');
+      var itemElements = this.ui.recentListItems;
       if (i >= 0 && i < itemElements.length) {
         this.selectedIndex = i;
         itemElements.removeClass('selected');
-        $(itemElements[this.selectedIndex]).addClass('selected');
+        $(itemElements[this.selectedIndex]).addClass('selected'); // TODO: send a message to the control!
       }
     },
 
     navigateToCurrent: function () {
-      var itemElements = $('#recentTroupesList li');
+      var itemElements = this.ui.recentListItems;
       itemElements.removeClass('selected');
-      $(itemElements[this.selectedIndex]).click();
+      $(itemElements[this.selectedIndex]).click(); // TODO: send a message to the control!
     },
 
     navigateTo: function (i) {
-      var itemElements = $('#recentTroupesList li');
+      var itemElements = this.ui.recentListItems;
       if (i >= 0 && i < itemElements.length) {
         this.selectedIndex = i;
-        $(itemElements[i]).click();
+        $(itemElements[i]).click(); // TODO: send a message to the control!
       }
     },
 
