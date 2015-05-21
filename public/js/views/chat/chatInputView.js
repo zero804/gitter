@@ -217,7 +217,9 @@ module.exports = (function() {
      */
     composeModeAutoFillCodeBlock: function (event) {
       var inputBox = this.inputBox.$el;
-      if (inputBox.val() !== '```') return; // only continue if the content is '```'
+      var val = inputBox.val();
+      var m = val.match(/^```([\w\-]+)?$/);
+      if (!m) return; // only continue if the content is '```'
       var wasInChatMode = !this.composeMode.isEnabled();
 
       event.preventDefault(); // shouldn't allow the creation of a new line
@@ -231,7 +233,7 @@ module.exports = (function() {
         return val + '\n\n```'; // 1. create the code block
       });
 
-      setCaretPosition(inputBox[0], 4); // 2. move caret inside the block (textarea)
+      setCaretPosition(inputBox[0], m[0].length + 1); // 2. move caret inside the block (textarea)
     },
 
     /**
