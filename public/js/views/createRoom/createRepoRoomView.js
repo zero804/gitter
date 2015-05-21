@@ -1,16 +1,16 @@
 "use strict";
-var Marionette = require('marionette');
-var TroupeViews = require('views/base');
+var Marionette = require('backbone.marionette');
+var ModalView = require('views/modal');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var RepoSelectView = require('./repoSelectView');
 var template = require('./tmpl/createRepoRoom.hbs');
 var appEvents = require('utils/appevents');
+require('views/behaviors/isomorphic');
 
 module.exports = (function() {
 
-
-  var View = Marionette.Layout.extend({
+  var View = Marionette.LayoutView.extend({
     template: template,
 
     ui: {
@@ -18,17 +18,26 @@ module.exports = (function() {
       'addBadge': '.js-add-badge'
     },
 
-    regions: {
-      repoSelectRegion: '#repo-select',
+    behaviors: {
+      Isomorphic: {
+        repoSelectRegion: {
+          el: '#repo-select',
+          init: function(optionsForRegion) {
+            return new RepoSelectView(optionsForRegion({ collection: RepoSelectView.createCollection() }));
+          }
+        }
+      }
+    },
+
+    childEvents: {
+      'selected': 'repoSelected'
     },
 
     initialize: function() {
-      this.repoSelectView = new RepoSelectView({ collection: RepoSelectView.createCollection() });
-      this.listenTo(this.repoSelectView, 'selected', this.repoSelected);
       this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
     },
 
-    repoSelected: function(r) {
+    repoSelected: function(child, r) { // jshint unused:true
       if(!r) return;
       var self = this;
       var uri = r.get('uri');
@@ -64,23 +73,17 @@ module.exports = (function() {
       return {
         privateRepoScope: !!context.getUser().scopes.private_repo
       };
-    },
-
-    onRender: function() {
-      if(!this.repoSelectRegion.currentView) {
-        this.repoSelectRegion.show(this.repoSelectView);
-      }
     }
 
   });
 
-  var Modal = TroupeViews.Modal.extend({
+  var Modal = ModalView.extend({
     disableAutoFocus: true,
     initialize: function(options) {
       options = options || {};
       options.title = options.title || "Create a repository chat room";
 
-      TroupeViews.Modal.prototype.initialize.call(this, options);
+      ModalView.prototype.initialize.call(this, options);
       this.view = new View(options);
     },
     menuItems: [
@@ -96,4 +99,3 @@ module.exports = (function() {
 
 
 })();
-

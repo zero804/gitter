@@ -1,6 +1,6 @@
 "use strict";
 
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var template = require('./tmpl/suggested-room-list-item.hbs');
 
 module.exports = (function() {
@@ -30,7 +30,7 @@ module.exports = (function() {
   return Marionette.CollectionView.extend({
     tagName: 'ul',
     className: 'suggested-room-list',
-    itemView: SuggestedRoomItemView
+    childView: SuggestedRoomItemView
   });
 
 

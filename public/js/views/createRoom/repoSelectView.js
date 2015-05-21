@@ -1,7 +1,6 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
-var TroupeViews = require('views/base');
 var loadingMixins = require('collections/loading-mixins');
 var template = require('./tmpl/repoSelectView.hbs');
 var itemTemplate = require('./tmpl/repoItemView.hbs');
@@ -9,6 +8,7 @@ var emptyTemplate = require('./tmpl/repoEmptyView.hbs');
 var repoModels = require('collections/repos');
 var cocktail = require('cocktail');
 var SelectableMixin = require('views/controls/selectable-mixin');
+var LoadingCollectionMixin = require('views/loading-mixin');
 var liveSearch = require('views/controls/live-search');
 var dataset = require('utils/dataset-shim');
 require('filtered-collection');
@@ -39,11 +39,11 @@ module.exports = (function() {
     ui: {
       search: "input#search"
     },
-    itemView: ItemView,
+    childView: ItemView,
     emptyView: EmptyView,
     template: template,
+    childViewContainer: '#list',
     onRender: function() {
-      this.itemViewContainer = this.$el.find('#list');
       liveSearch(this, this.ui.search, 'searchTextChanged', { shortDebounce: 50, longDebounce: 200 });
     },
     searchTextChanged: function(text) {
@@ -65,7 +65,7 @@ module.exports = (function() {
     return c;
   };
 
-  cocktail.mixin(View, TroupeViews.LoadingCollectionMixin, SelectableMixin, TroupeViews.SortableMarionetteView);
+  cocktail.mixin(View, LoadingCollectionMixin, SelectableMixin);
 
   return View;
 

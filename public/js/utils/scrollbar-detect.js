@@ -1,37 +1,23 @@
 "use strict";
 
+var hasScrollBars;
 
-module.exports = (function() {
+// Some innovative scrollbar measuring stuff
+function detect() {
+  var scrollDiv = document.createElement("div");
+  scrollDiv.className = "scrollbar-measure";
+  document.body.appendChild(scrollDiv);
 
+  // Get the scrollbar width
+  var scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
 
-  // Some innovative scrollbar measuring stuff
-  function detect() {
-    var scrollDiv = document.createElement("div");
-    scrollDiv.className = "scrollbar-measure";
-    document.body.appendChild(scrollDiv);
+  document.body.removeChild(scrollDiv);
 
-    // Get the scrollbar width
-    var scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
+  return scrollbarWidth > 0;
+}
 
-    document.body.removeChild(scrollDiv);
-
-    return scrollbarWidth > 0;
-  }
-
-  var detected = false;
-  var hasScrollBars;
-
-  return function() {
-    if(detected) {
-      return hasScrollBars;
-    }
-
-    detected = true;
-    hasScrollBars = detect();
-    return hasScrollBars;
-  };
-
-
-
-})();
-
+module.exports = function scrollbarDetect() {
+  if (hasScrollBars !== undefined) return hasScrollBars;
+  
+  return (hasScrollBars = detect());
+};

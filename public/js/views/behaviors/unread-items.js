@@ -1,6 +1,6 @@
 "use strict";
 var context = require('utils/context');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var unreadItemsClient = require('components/unread-items-client');
 var appEvents = require('utils/appevents');
 var dataset = require('utils/dataset-shim');
