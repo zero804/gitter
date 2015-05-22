@@ -6,7 +6,9 @@ var appEvents = require('utils/appevents');
 var unreadItemsClient = require('components/unread-items-client');
 
 var TopBannerView = Marionette.ItemView.extend({
+  arrowChar: '￪',
   template: template,
+  hidden: true,
   ui: {
     bannerMessage: '#banner-message',
     buttons: 'button'
@@ -17,9 +19,9 @@ var TopBannerView = Marionette.ItemView.extend({
     'click button.side': 'onSideButtonClick'
   },
   modelEvents: {
-    'change:unreadAbove': 'updateDisplay'
+    'change:unreadAbove': 'updateDisplay',
+    'change:hasUnreadAbove': 'updateVisibility'
   },
-
   getUnreadCount: function() {
     return this.model.get('unreadAbove');
   },
@@ -36,23 +38,52 @@ var TopBannerView = Marionette.ItemView.extend({
     }
 
     if(unreadCount === 1) {
-      return '1 unread message';
+      return this.arrowChar + ' 1 unread message';
     }
 
     if(unreadCount > 99) {
-      return '99+ unread messages';
+      return this.arrowChar + '99+ unread messages';
     }
 
-    return unreadCount + ' unread messages';
+    return this.arrowChar + ' ' + unreadCount + ' unread messages';
+  },
+
+  getVisible: function() {
+    return !!this.model.get('hasUnreadAbove');
   },
 
   updateDisplay: function() {
-    var noMoreItems = !this.getUnreadCount();
-    if (noMoreItems) {
-      this.ui.buttons.blur();
-    }
-    this.$el.toggleClass('slide-away', noMoreItems);
+    // var noMoreItems = !this.getUnreadCount();
     this.ui.bannerMessage.text(this.getMessage());
+  },
+
+  updateVisibility: function() {
+    var requiredVisiblity = this.getVisible();
+    var visible = !this.hidden;
+    if (requiredVisiblity === visible) return; // Nothing to do here
+    if (visible) {
+      // Hide
+      this.$el.addClass('slide-away');
+
+      this.ui.buttons.blur();
+      if (this.hideTimeout) return;
+
+      this.hideTimeout = setTimeout(function() {
+        delete this.hideTimeout;
+        this.hidden = true;
+        this.$el.parent().hide();
+      }.bind(this), 500);
+
+    } else {
+      // Show
+      this.$el.parent().show();
+      this.$el.removeClass('slide-away');
+      this.hidden = false;
+      if (this.hideTimeout) {
+        clearTimeout(this.hideTimeout);
+        delete this.hideTimeout;
+      }
+    }
   },
 
   onRender: function() {
@@ -69,11 +100,17 @@ var TopBannerView = Marionette.ItemView.extend({
 });
 
 var BottomBannerView = TopBannerView.extend({
+  arrowChar: '￬',
   modelEvents: {
-    'change:unreadBelow': 'updateDisplay'
+    'change:unreadBelow': 'updateDisplay',
+    'change:hasUnreadBelow': 'updateVisibility'
   },
   getUnreadCount: function() {
     return this.model.get('unreadBelow');
+  },
+
+  getVisible: function() {
+    return !!this.model.get('hasUnreadBelow');
   },
 
   onMainButtonClick: function() {

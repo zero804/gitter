@@ -444,7 +444,7 @@ module.exports = (function() {
 
             $e.removeClass('unread').addClass('reading');
             this._addToMarkReadQueue($e);
-            timeout = timeout + 150;
+            timeout = timeout + 100;
           } else if(top > bottomBound) {
             // This item is below the bottom fold
             below++;
@@ -481,7 +481,13 @@ module.exports = (function() {
       var chats = this._store._getItemsOfType('chat');
       if(!chats.length) {
         // If there are no unread items, save the effort.
-        acrossTheFoldModel.set({ unreadAbove: 0, unreadBelow: 0, belowItemId: null });
+        acrossTheFoldModel.set({
+          unreadAbove: 0,
+          unreadBelow: 0,
+          belowItemId: null,
+          hasUnreadBelow: false,
+          hasUnreadAbove: false
+        });
         return;
       }
 
@@ -535,7 +541,13 @@ module.exports = (function() {
         }
       }
 
-      acrossTheFoldModel.set({ unreadAbove: above, unreadBelow: below, belowItemId: firstUnreadItemBelowId });
+      acrossTheFoldModel.set({
+        unreadAbove: above,
+        unreadBelow: below,
+        hasUnreadAbove: above > 0,
+        hasUnreadBelow: below > 0,
+        belowItemId: firstUnreadItemBelowId
+      });
     },
 
     _scheduleMarkRead: function() {
@@ -621,7 +633,10 @@ module.exports = (function() {
   var acrossTheFoldModel = new Backbone.Model({
     defaults: {
       unreadAbove: 0,
-      unreadBelow: 0
+      unreadBelow: 0,
+      hasUnreadBelow: false,
+      hasUnreadAbove: false,
+      belowItemId: null
     }
   });
 
