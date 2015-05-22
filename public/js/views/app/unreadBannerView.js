@@ -53,7 +53,8 @@ var TopBannerView = Marionette.ItemView.extend({
   },
 
   updateDisplay: function() {
-    // var noMoreItems = !this.getUnreadCount();
+    var noMoreItems = !this.getUnreadCount();
+    if (noMoreItems) return; // Don't change the text as it slides down as it's distracting
     this.ui.bannerMessage.text(this.getMessage());
   },
 
