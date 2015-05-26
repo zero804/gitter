@@ -12,7 +12,6 @@
     "csprng": "^0.1.1",
     "diskspace": "0.1.5",
     "dolph": "^0.1.0",
-    "easynexmo": "~0.3.1",
     "elasticsearch": "^2.4.3",
     "email-validator": "^1.0.0",
     "ent": "~0.1.0",
