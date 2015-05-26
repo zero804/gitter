@@ -72,9 +72,10 @@ module.exports = (function() {
       if(duration >= 86400000 /* One day */) {
         v = this.compact ? this.time.format("MMM DD", { lang: lang }) : this.time.format("LL", { lang: lang });
       } else {
-        var momentDuration = moment.duration(duration);
-
-        v = this.compact ? this.time.format("H:mm", { lang: lang }) : locale("%s ago", momentDuration.humanize());
+        //var momentDuration = moment.duration(duration);
+        //v = this.compact ? this.time.format("H:mm", { lang: lang }) : locale("%s ago", momentDuration.humanize());
+        var t = this.time.format("H:mm", { lang: lang });
+        v = this.compact ?  t : 'Today at ' + t;
       }
 
       var fullTime = this.time.format("LLL", { lang: lang });
