@@ -10,7 +10,7 @@ var uiVars = require('views/app/uiVars');
 var Popover = require('views/popover');
 var chatItemTemplate = require('./tmpl/chatItemView.hbs');
 var statusItemTemplate = require('./tmpl/statusItemView.hbs');
-var chatInputView = require('views/chat/chatInputView');
+var ChatInputBoxView = require('views/chat/chat-input-box-view');
 var appEvents = require('utils/appevents');
 var cocktail = require('cocktail');
 var chatCollapse = require('utils/collapsed-item-client');
@@ -515,7 +515,7 @@ module.exports = (function() {
         textarea.val("").val(unsafeText);
       });
 
-      this.inputBox = new chatInputView.ChatInputBoxView({ el: textarea, editMode: true });
+      this.inputBox = new ChatInputBoxView({ el: textarea, editMode: true });
       this.listenTo(this.inputBox, 'save', this.saveChat);
     },
 
