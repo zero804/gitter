@@ -24,7 +24,6 @@ var toggle = require('utils/toggle');
 require('views/behaviors/unread-items');
 require('views/behaviors/widgets');
 require('views/behaviors/highlight');
-require('views/behaviors/tooltip');
 
 module.exports = (function() {
 
@@ -68,10 +67,6 @@ module.exports = (function() {
 
     behaviors: {
       Widgets: {},
-      Tooltip: {
-        '.js-chat-item-edit': { titleFn: 'getEditTooltip' },
-        '.js-chat-item-collapse': { titleFn: 'getCollapseTooltip' }
-      },
       UnreadItems: {
         unreadItemType: 'chat',
       },
@@ -289,36 +284,6 @@ module.exports = (function() {
           }
     },
 
-    getEditTooltip: function() {
-      if (this.isEmbedded()) return "You can't edit on embedded chats.";
-
-      if(this.hasBeenEdited()) {
-        return "Edited shortly after being sent";
-      }
-
-      if(this.canEdit()) {
-        return "Edit within " + msToMinutes(EDIT_WINDOW) + " minutes of sending";
-      }
-
-      if(this.isOwnMessage()) {
-        return "It's too late to edit this message.";
-      }
-
-      return  "You can't edit someone else's message";
-    },
-
-    getCollapseTooltip: function() {
-      if (this.model.get('collapsed')) {
-        return  "Show media.";
-      }
-      return "Hide media.";
-    },
-
-    getCollapsedTooltip: function() {
-      // also for expanded
-      return  "Displaying message, click here to collapse.";
-    },
-
     focusInput: function() {
       $("#chat-input-textarea").focus();
     },
@@ -364,6 +329,10 @@ module.exports = (function() {
       return !!this.model.get('readBy');
     },
 
+    onToggleEdit: function() {
+      this.toggleEdit();
+    },
+
     toggleEdit: function() {
       if (this.isEditing) {
         this.isEditing = false;
@@ -396,6 +365,10 @@ module.exports = (function() {
         chatCollapse.collapse(chatId);
       }
       this.model.set('collapsed', !collapsed);
+    },
+
+    onToggleCollapse: function() {
+      this.toggleCollapse();
     },
 
     // deals with collapsing images and embeds
@@ -558,17 +531,17 @@ module.exports = (function() {
         chatItemView: this,
         targetElement: e.target,
         placement: 'horizontal',
-        width: '200px'
+        width: '150px'
       });
 
       actions.show();
       ReadByPopover.singleton(this, actions);
     },
 
-    mentionUser: function () {
-      var mention = "@" + this.model.get('fromUser').username + " ";
-      appEvents.trigger('input.append', mention);
-    },
+    //mentionUser: function () {
+    //  var mention = "@" + this.model.get('fromUser').username + " ";
+    //  appEvents.trigger('input.append', mention);
+    //},
 
     permalink: function(e) {
       if(!this.isPermalinkable) return;
@@ -657,13 +630,14 @@ module.exports = (function() {
       'click .js-chat-action-delete': 'delete'
     },
     toggleCollapse: function() {
-      this.chatItemView.toggleCollapse();
+      this.chatItemView.triggerMethod('toggleCollapse');
     },
     edit: function() {
-      this.chatItemView.toggleEdit();
+      this.chatItemView.triggerMethod('toggleEdit');
     },
     reply: function() {
-      this.chatItemView.mentionUser();
+      var mention = "@" + this.model.get('fromUser').username + " ";
+      appEvents.trigger('input.append', mention);
     },
     quote: function() {
       appEvents.trigger('input.append', "> " + this.model.get('text'), { newLine: true });
@@ -680,10 +654,15 @@ module.exports = (function() {
 
       if (!deleted) data.actions.push({name: 'quote', description: 'Quote'});
 
+      // FIXME Can't really use a triggerMethod here, maybe move the logic of canEdit() to this view?
       if (!deleted && this.chatItemView.canEdit()) {
         data.actions.push({name: 'edit', description: 'Edit'});
         data.actions.push({name: 'delete', description: 'Delete'});
+      } else {
+        data.actions.push({name: 'edit', description: 'Edit', disabled: true});
+        data.actions.push({name: 'delete', description: 'Delete', disabled: true});
       }
+
 
       if (!deleted && this.model.get('isCollapsible')) {
         var action = this.model.get('collapsed') ? {name: 'expand', description: 'Expand'} : {name: 'collapse', description: 'Collapse'};

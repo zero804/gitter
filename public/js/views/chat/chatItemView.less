@@ -170,8 +170,24 @@
   transition: 0.2s opacity linear;
 }
 
-.chat-item__action {
+.chat-item__action, .chat-item__action-disabled {
+  border-radius: 4px;
+  padding: 0px 5px;
+}
+
+.chat-item__action:hover {
   cursor: pointer;
+  background: #08c;
+  color: white;
+}
+
+.chat-item__action-disabled {
+  color: #CCC;
+}
+
+.chat-item__action-disabled:hover {
+  background: #08c;
+  cursor: default;
 }
 
 .chat-item__container {
