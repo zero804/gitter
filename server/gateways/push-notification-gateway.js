@@ -12,9 +12,6 @@ var apns = require('apn');
 var workerQueue = require('../utils/worker-queue');
 var androidGateway = require('./android-notification-gateway');
 
-var nexmo = require('easynexmo/lib/nexmo');
-nexmo.initialize('0b93c6bc', '483931e4');
-
 var errorDescriptions = {
   0: 'No errors encountered',
   1: 'Processing error',
@@ -189,9 +186,6 @@ function sendNotificationToDevice(notification, badge, device) {
     }
 
     sent = true;
-  } else if(device.deviceType === 'SMS') {
-    sendSMSMessage(device.mobileNumber, notification.smsText);
-    sent = true;
   } else if(device.deviceType === 'ANDROID') {
     androidGateway.sendNotificationToDevice(notification, badge, device, function(err, data) {
       if(err) return logger.error('android push notification failed', { err: err });
@@ -214,12 +208,6 @@ function sendNotificationToDevice(notification, badge, device) {
     });
   }
 
-}
-
-function sendSMSMessage(mobileNumber, message) {
-  nexmo.sendTextMessage('Troupe',mobileNumber,message, function(err) {
-    if(err) logger.error('Unable to send SMS message: ' + err, { exception: err });
-  });
 }
 
 var queue = workerQueue.queue('push-notification', {}, function() {
