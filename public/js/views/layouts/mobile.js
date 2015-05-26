@@ -61,6 +61,7 @@ module.exports = Marionette.LayoutView.extend({
 
   initInputRegion: function(optionsForRegion) {
     return new ChatInputView(optionsForRegion({
+      compactView: true,
       collection: this.options.chatCollection,
     }));
   },
