@@ -31,6 +31,9 @@ module.exports = {
 
     app.engine('hbs', expressHbs.express3({
       partialsDir: resolveStatic('/templates/partials'),
+      onCompile: function(exhbs, source) {
+         return exhbs.handlebars.compile(source, {preventIndent: true});
+      },
       layoutsDir: resolveStatic('/layouts'),
       contentHelperName: 'content'
     }));
