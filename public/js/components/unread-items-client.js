@@ -218,7 +218,7 @@ module.exports = (function() {
 
     },
 
-    getFirstItemOfType: function(type) { 
+    getFirstItemOfType: function(type) {
       var items = this._getItemsOfType(type);
       return items.sort()[0];
     }
@@ -444,7 +444,7 @@ module.exports = (function() {
 
             $e.removeClass('unread').addClass('reading');
             this._addToMarkReadQueue($e);
-            timeout = timeout + 150;
+            timeout = timeout + 100;
           } else if(top > bottomBound) {
             // This item is below the bottom fold
             below++;
@@ -481,8 +481,13 @@ module.exports = (function() {
       var chats = this._store._getItemsOfType('chat');
       if(!chats.length) {
         // If there are no unread items, save the effort.
-        acrossTheFoldModel.set('unreadAbove', 0);
-        acrossTheFoldModel.set('unreadBelow', 0);
+        acrossTheFoldModel.set({
+          unreadAbove: 0,
+          unreadBelow: 0,
+          belowItemId: null,
+          hasUnreadBelow: false,
+          hasUnreadAbove: false
+        });
         return;
       }
 
@@ -514,16 +519,35 @@ module.exports = (function() {
       });
 
       var chatBelowView = allItems[chatBelowIndex];
+
+      var belowItemId = null;
+      var firstUnreadItemBelowId = null;
       if(chatBelowView) {
-        var belowItemId = dataset.get(chatBelowView, 'itemId');
+        belowItemId = dataset.get(chatBelowView, 'itemId');
         if(belowItemId) {
           chats.forEach(function(chatId) {
-            if(chatId >= belowItemId) below++;
+            if (chatId >= belowItemId) {
+              below++;
+
+              if (!firstUnreadItemBelowId) {
+                firstUnreadItemBelowId = chatId;
+              } else {
+                if (firstUnreadItemBelowId > chatId) {
+                  firstUnreadItemBelowId = chatId; // Get the lowest number
+                }
+              }
+            }
           });
         }
       }
-      acrossTheFoldModel.set('unreadAbove', above);
-      acrossTheFoldModel.set('unreadBelow', below);
+
+      acrossTheFoldModel.set({
+        unreadAbove: above,
+        unreadBelow: below,
+        hasUnreadAbove: above > 0,
+        hasUnreadBelow: below > 0,
+        belowItemId: firstUnreadItemBelowId
+      });
     },
 
     _scheduleMarkRead: function() {
@@ -609,7 +633,10 @@ module.exports = (function() {
   var acrossTheFoldModel = new Backbone.Model({
     defaults: {
       unreadAbove: 0,
-      unreadBelow: 0
+      unreadBelow: 0,
+      hasUnreadBelow: false,
+      hasUnreadAbove: false,
+      belowItemId: null
     }
   });
 

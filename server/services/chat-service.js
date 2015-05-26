@@ -25,16 +25,6 @@ var markdownMajorVersion = require('gitter-markdown-processor').version.split('.
 
 var useHints = true;
 
-/*
- * Hey Trouper!
- * This is a changelog of sorts for changes to message processing & metadata.
- * Since version 7, processing is done by a seperate (versioned) module.
- * so check github.com/gitterHQ/gitter-markdown-processor to see what changes at every major version
- */
-var VERSION_SWITCH_TO_SERVER_SIDE_RENDERING = 5;
-var VERSION_KATEX = 6;
-var VERSION_EXTERNAL_GITTER_MARKDOWN_PROCESSOR = 7;
-
 var MAX_CHAT_MESSAGE_LENGTH = 4096;
 
 var CURRENT_META_DATA_VERSION = markdownMajorVersion;

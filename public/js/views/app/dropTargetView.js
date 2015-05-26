@@ -170,7 +170,7 @@ var DropTargetView = Marionette.ItemView.extend({
 
   upload: function(files) {
     if (!files.length) return;
-
+    var self = this;
     this.ui.progressBar.show();
 
     this.updateProgressBar({
@@ -221,7 +221,7 @@ var DropTargetView = Marionette.ItemView.extend({
       .then(function(res) {
         formData.append("signature", res.sig);
 
-        var form = this.ui.uploadForm;
+        var form = self.ui.uploadForm;
         form.find('input[name="params"]').attr('value', res.params);
         form.unbind('submit.transloadit');
         form.transloadit(_.extend(DEFAULT_OPTIONS, { formData: formData }));

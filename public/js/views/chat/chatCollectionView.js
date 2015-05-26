@@ -214,18 +214,12 @@ module.exports = (function() {
       this.listenTo(appEvents, 'chatCollectionView:pageDown', this.pageDown);
       this.listenTo(appEvents, 'chatCollectionView:editChat', this.editChat);
       this.listenTo(appEvents, 'chatCollectionView:viewportResize', this.viewportResize);
+      this.listenTo(appEvents, 'chatCollectionView:scrollToFirstUnread', this.scrollToFirstUnread);
+      this.listenTo(appEvents, 'chatCollectionView:scrollToChatId', this.scrollToChatId);
     },
 
     scrollToFirstUnread: function() {
       var self = this;
-
-      //this.collection.fetchFromMarker('first-unread', {}, function() {
-      //  var firstUnread = self.collection.findWhere({ unread: true });
-      //  if(!firstUnread) return;
-      //  var firstUnreadView = self.children.findByModel(firstUnread);
-      //  if(!firstUnreadView) return;
-      //  self.rollers.scrollToElement(firstUnreadView.el);
-      //});
 
       var id = unreadItemsClient.getFirstUnreadItem();
       var model = self.collection.get(id);
@@ -253,6 +247,7 @@ module.exports = (function() {
     },
 
     scrollToFirstUnreadBelow: function() {
+      // TODO: this won't work if we're not at the bottom
       var contentFrame = document.querySelector(SCROLL_ELEMENT);
 
       var unreadItems = contentFrame.querySelectorAll('.unread');
@@ -298,8 +293,12 @@ module.exports = (function() {
 
     scrollToChatId: function (id) {
       var model = this.collection.get(id);
-      if (!model) return;
-      this.scrollToChat(model);
+      if (model) return this.scrollToChat(model);
+      var self = this;
+      this.collection.ensureLoaded(id, function() {
+        var model = self.collection.get(id);
+        if (model) return this.scrollToChat(model);
+      });
     },
 
     // used to highlight and "dim" chat messages, the behaviour Highlight responds to these changes.

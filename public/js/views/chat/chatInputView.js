@@ -12,8 +12,8 @@ var cocktail = require('cocktail');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var platformKeys = require('utils/platform-keys');
 var typeaheads = require('./typeaheads');
-require('bootstrap_tooltip');
 require('jquery-textcomplete');
+require('views/behaviors/tooltip');
 
 module.exports = (function() {
 
@@ -79,13 +79,17 @@ module.exports = (function() {
     template: template,
 
     behaviors: {
-      Widgets: {}
+      Widgets: {},
+      Tooltip: {
+        '.js-toggle-compose-mode': { titleFn: 'getComposeModeTitle' },
+        '.js-md-help': { titleFn: 'getShowMarkdownTitle' }
+      },
+
     },
 
     ui: {
       composeToggle: '.js-toggle-compose-mode',
       textarea: '#chat-input-textarea',
-      mdHelp: '.js-md-help'
     },
 
     events: {
@@ -122,6 +126,10 @@ module.exports = (function() {
       return 'Switch to '+ mode +' mode ('+ platformKeys.cmd +' + /)';
     },
 
+    getShowMarkdownTitle: function() {
+      return 'Markdown help ('+ platformKeys.cmd +' + '+ platformKeys.gitter +' + m)';
+    },
+
     serializeData: function() {
       var isComposeModeEnabled = this.composeMode.isEnabled();
       var placeholder;
@@ -140,7 +148,7 @@ module.exports = (function() {
         placeholder: placeholder,
         autofocus: !this.compactView,
         composeModeToggleTitle: this.getComposeModeTitle(),
-        showMarkdownTitle: 'Markdown help ('+ platformKeys.cmd +' + '+ platformKeys.gitter +' + m)',
+        showMarkdownTitle: this.getShowMarkdownTitle(),
         value: $("#chat-input-textarea").val()
       };
     },
@@ -161,9 +169,6 @@ module.exports = (function() {
       });
 
       this.inputBox = inputBox;
-      this.ui.composeToggle.tooltip({ placement: 'left' });
-      this.ui.mdHelp.tooltip({ placement: 'left' });
-
       $textarea.textcomplete(typeaheads);
 
       // Use 'on' and 'off' instead of proper booleans as attributes are strings
@@ -198,11 +203,6 @@ module.exports = (function() {
       this.composeMode.toggle();
       var isComposeModeEnabled = this.composeMode.isEnabled();
 
-      this.ui.composeToggle
-        .attr('title', this.getComposeModeTitle())
-        .tooltip('fixTitle')
-        .tooltip('hide');
-
       var $icon = this.ui.composeToggle.find('i');
       // remove all classes from icon
       $icon.removeClass();
@@ -217,7 +217,9 @@ module.exports = (function() {
      */
     composeModeAutoFillCodeBlock: function (event) {
       var inputBox = this.inputBox.$el;
-      if (inputBox.val() !== '```') return; // only continue if the content is '```'
+      var val = inputBox.val();
+      var m = val.match(/^```([\w\-]+)?$/);
+      if (!m) return; // only continue if the content is '```'
       var wasInChatMode = !this.composeMode.isEnabled();
 
       event.preventDefault(); // shouldn't allow the creation of a new line
@@ -231,7 +233,7 @@ module.exports = (function() {
         return val + '\n\n```'; // 1. create the code block
       });
 
-      setCaretPosition(inputBox[0], 4); // 2. move caret inside the block (textarea)
+      setCaretPosition(inputBox[0], m[0].length + 1); // 2. move caret inside the block (textarea)
     },
 
     /**
