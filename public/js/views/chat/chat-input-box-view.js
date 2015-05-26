@@ -7,6 +7,7 @@ var isMobile = require('utils/is-mobile');
 var drafty = require('components/drafty');
 var cocktail = require('cocktail');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
+var RAF = require('utils/raf');
 require('jquery-textcomplete');
 require('views/behaviors/tooltip');
 
@@ -82,8 +83,6 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   // pass in the textarea as el for ChatInputBoxView
   // pass in a scroll delegate
   initialize: function(options) {
-    this.autofocus = options.autofocus;
-
     if(hasScrollBars()) {
       this.$el.addClass("scroller");
     }
@@ -104,6 +103,40 @@ var ChatInputBoxView = Marionette.ItemView.extend({
 
     this.composeMode = options.composeMode;
     this.chatResizer.resizeInput();
+  },
+
+  onRender: function() {
+    if (this.options.autofocus) {
+      var self = this;
+      RAF(function() {
+        // firefox only respects the "autofocus" attr if it is present on source html
+        // also, dont show keyboard right away on mobile
+        // Also, move the cursor to the end of the textarea text
+
+        self.setCaretPosition(self.$el.val().length);
+        self.el.focus();
+      });
+    }
+  },
+
+  /**
+   * setCaretPosition() moves the caret on a given text element
+   * credits to http://blog.vishalon.net/index.php/javascript-getting-and-setting-caret-position-in-textarea/
+   */
+  setCaretPosition: function(position) {
+    var el = this.el;
+    if (el.setSelectionRange) {
+      el.focus();
+      el.setSelectionRange(position,position);
+      return;
+    } else if (el.createTextRange) {
+      var range = el.createTextRange();
+      range.collapse(true);
+      range.moveEnd('character', position);
+      range.moveStart('character', position);
+      range.select();
+      return;
+    }
   },
 
   onBlur: function() {

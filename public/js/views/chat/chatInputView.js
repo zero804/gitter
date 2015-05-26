@@ -33,25 +33,6 @@ module.exports = (function() {
     this.disabled = JSON.parse(stringBoolean);
   };
 
-  /**
-   * setCaretPosition() moves the caret on a given text element
-   * credits to http://blog.vishalon.net/index.php/javascript-getting-and-setting-caret-position-in-textarea/
-   */
-  var setCaretPosition = function (el, pos) {
-    if (el.setSelectionRange) {
-      el.focus();
-      el.setSelectionRange(pos,pos);
-      return;
-    } else if (el.createTextRange) {
-      var range = el.createTextRange();
-      range.collapse(true);
-      range.moveEnd('character', pos);
-      range.moveStart('character', pos);
-      range.select();
-      return;
-    }
-  };
-
   ComposeMode.prototype.toggle = function() {
     this.disabled = !this.disabled;
     var stringBoolean = JSON.stringify(this.disabled);
@@ -144,18 +125,15 @@ module.exports = (function() {
     onRender: function() {
       var $textarea = this.ui.textarea;
 
-      // firefox only respects the "autofocus" attr if it is present on source html
-      // also, dont show keyboard right away on mobile
-      // Also, move the cursor to the end of the textarea text
-      if (!this.compactView) setCaretPosition($textarea[0], $textarea.val().length);
-
       var inputBox = new ChatInputBoxView({
         el: $textarea,
         composeMode: this.composeMode,
         autofocus: !this.compactView,
         value: $textarea.val(),
-        commands: commands
+        commands: commands,
+        template: false
       });
+      inputBox.render();
 
       this.inputBox = inputBox;
       $textarea.textcomplete(typeaheads);
@@ -222,7 +200,7 @@ module.exports = (function() {
         return val + '\n\n```'; // 1. create the code block
       });
 
-      setCaretPosition(inputBox[0], m[0].length + 1); // 2. move caret inside the block (textarea)
+      this.inputBox.setCaretPosition(m[0].length + 1); // 2. move caret inside the block (textarea)
     },
 
     /**
