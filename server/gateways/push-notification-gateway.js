@@ -250,15 +250,3 @@ exports.sendUsersBadgeUpdates = function(userIds, callback) {
 
   queue.invoke({ userIds: userIds },callback);
 };
-
-
-exports.sendDeviceNotification = function(deviceId, notification, callback) {
-  pushNotificationService.findDeviceForDeviceId(deviceId, function(err, device) {
-    if(err) return callback(err);
-    if(!device) return callback(404);
-
-    sendNotificationToDevice(notification, undefined, device);
-
-    callback();
-  });
-};
