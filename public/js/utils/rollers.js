@@ -180,7 +180,6 @@ module.exports = (function() {
      * Scroll to the bottom and switch the mode to TRACK_BOTTOM
      */
     scrollToBottomContinuously: function(ms) {
-      console.log('scroll to element');
       rafUtils.intervalUntil(this.scrollToBottom.bind(this), ms);
     },
 
