@@ -1,7 +1,7 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var context = require('utils/context');
-var TroupeViews = require('views/base');
+var ModalView = require('views/modal');
 var template = require('./tmpl/integrationSettingsTemplate.hbs');
 
 module.exports = (function() {
@@ -15,13 +15,12 @@ module.exports = (function() {
     }
   });
 
-  return TroupeViews.Modal.extend({
+  return ModalView.extend({
       initialize: function(options) {
         options.title = "Integration Settings";
-        TroupeViews.Modal.prototype.initialize.apply(this, arguments);
+        ModalView.prototype.initialize.apply(this, arguments);
         this.view = new View({ });
       }
     });
-  
-})();
 
+})();

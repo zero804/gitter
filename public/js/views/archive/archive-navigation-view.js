@@ -1,6 +1,6 @@
 'use strict';
 
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var moment = require('moment');
 var context = require('utils/context');
 var template = require('./tmpl/archive-navigation-view.hbs');

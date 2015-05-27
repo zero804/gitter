@@ -1,19 +1,17 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var $ = require('jquery');
 var context = require('utils/context');
 var appEvents = require('utils/appevents');
 var template = require('./tmpl/chatInputView.hbs');
-var hasScrollBars = require('utils/scrollbar-detect');
-var isMobile = require('utils/is-mobile');
-var drafty = require('components/drafty');
 var commands = require('./commands');
 var cocktail = require('cocktail');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var platformKeys = require('utils/platform-keys');
 var typeaheads = require('./typeaheads');
-require('bootstrap_tooltip');
+var ChatInputBoxView = require('./chat-input-box-view');
 require('jquery-textcomplete');
+require('views/behaviors/tooltip');
 
 module.exports = (function() {
 
@@ -30,38 +28,9 @@ module.exports = (function() {
   /** @const */
   var PLACEHOLDER_COMPOSE_MODE = PLACEHOLDER+' '+ platformKeys.cmd +'+Enter to send.';
 
-  function calculateMaxHeight() {
-    // TODO: this sucks. normalise everything to HEADER
-    var header = $("#header-wrapper");
-    if(!header.length) header = $("header");
-
-    var headerHeight = header.height();
-
-    return $(document).height() - headerHeight - 140;
-  }
-
   var ComposeMode = function() {
     var stringBoolean = window.localStorage.getItem('compose_mode_enabled') || 'false';
     this.disabled = JSON.parse(stringBoolean);
-  };
-
-  /**
-   * setCaretPosition() moves the caret on a given text element
-   * credits to http://blog.vishalon.net/index.php/javascript-getting-and-setting-caret-position-in-textarea/
-   */
-  var setCaretPosition = function (el, pos) {
-    if (el.setSelectionRange) {
-      el.focus();
-      el.setSelectionRange(pos,pos);
-      return;
-    } else if (el.createTextRange) {
-      var range = el.createTextRange();
-      range.collapse(true);
-      range.moveEnd('character', pos);
-      range.moveStart('character', pos);
-      range.select();
-      return;
-    }
   };
 
   ComposeMode.prototype.toggle = function() {
@@ -79,13 +48,17 @@ module.exports = (function() {
     template: template,
 
     behaviors: {
-      Widgets: {}
+      Widgets: {},
+      Tooltip: {
+        '.js-toggle-compose-mode': { titleFn: 'getComposeModeTitle' },
+        '.js-md-help': { titleFn: 'getShowMarkdownTitle' }
+      },
+
     },
 
     ui: {
       composeToggle: '.js-toggle-compose-mode',
       textarea: '#chat-input-textarea',
-      mdHelp: '.js-md-help'
     },
 
     events: {
@@ -99,9 +72,7 @@ module.exports = (function() {
     },
 
     initialize: function(options) {
-      this.bindUIElements();
-      this.rollers = options.rollers;
-      this.chatCollectionView = options.chatCollectionView;
+      this.bindUIElements(); // TODO: use regions
       this.composeMode = new ComposeMode();
       this.compactView = options.compactView;
 
@@ -124,6 +95,10 @@ module.exports = (function() {
       return 'Switch to '+ mode +' mode ('+ platformKeys.cmd +' + /)';
     },
 
+    getShowMarkdownTitle: function() {
+      return 'Markdown help ('+ platformKeys.cmd +' + '+ platformKeys.gitter +' + m)';
+    },
+
     serializeData: function() {
       var isComposeModeEnabled = this.composeMode.isEnabled();
       var placeholder;
@@ -142,7 +117,7 @@ module.exports = (function() {
         placeholder: placeholder,
         autofocus: !this.compactView,
         composeModeToggleTitle: this.getComposeModeTitle(),
-        showMarkdownTitle: 'Markdown help ('+ platformKeys.cmd +' + '+ platformKeys.gitter +' + m)',
+        showMarkdownTitle: this.getShowMarkdownTitle(),
         value: $("#chat-input-textarea").val()
       };
     },
@@ -150,24 +125,17 @@ module.exports = (function() {
     onRender: function() {
       var $textarea = this.ui.textarea;
 
-      // firefox only respects the "autofocus" attr if it is present on source html
-      // also, dont show keyboard right away on mobile
-      // Also, move the cursor to the end of the textarea text
-      if (!this.compactView) setCaretPosition($textarea[0], $textarea.val().length);
-
       var inputBox = new ChatInputBoxView({
         el: $textarea,
-        rollers: this.rollers,
-        chatCollectionView: this.chatCollectionView,
         composeMode: this.composeMode,
         autofocus: !this.compactView,
-        value: $textarea.val()
+        value: $textarea.val(),
+        commands: commands,
+        template: false
       });
+      inputBox.render();
 
       this.inputBox = inputBox;
-      this.ui.composeToggle.tooltip({ placement: 'left' });
-      this.ui.mdHelp.tooltip({ placement: 'left' });
-
       $textarea.textcomplete(typeaheads);
 
       // Use 'on' and 'off' instead of proper booleans as attributes are strings
@@ -202,11 +170,6 @@ module.exports = (function() {
       this.composeMode.toggle();
       var isComposeModeEnabled = this.composeMode.isEnabled();
 
-      this.ui.composeToggle
-        .attr('title', this.getComposeModeTitle())
-        .tooltip('fixTitle')
-        .tooltip('hide');
-
       var $icon = this.ui.composeToggle.find('i');
       // remove all classes from icon
       $icon.removeClass();
@@ -233,11 +196,11 @@ module.exports = (function() {
         this.listenToOnce(this.inputBox, 'save', this.toggleComposeMode.bind(this, null)); // if we were in chat mode make sure that we set the state back to chat mode
       }
 
-      inputBox.val(function (index, val) {
+      inputBox.val(function (index, val) { // jshint unused:true
         return val + '\n\n```'; // 1. create the code block
       });
 
-      setCaretPosition(inputBox[0], m[0].length + 1); // 2. move caret inside the block (textarea)
+      this.inputBox.setCaretPosition(m[0].length + 1); // 2. move caret inside the block (textarea)
     },
 
     /**
@@ -296,16 +259,7 @@ module.exports = (function() {
         return fromUser && fromUser.id === context.getUserId();
       });
 
-      usersChats.sort(function(a, b) {
-        var as = a.get('sent');
-        as = as ? as.valueOf() : 0;
-        var bs = b.get('sent');
-        bs = bs ? bs.valueOf() : 0;
-
-        return bs - as;
-      });
-
-      return usersChats[0];
+      return usersChats[usersChats.length - 1];
     },
 
     subst: function(search, replace, global) {
@@ -326,15 +280,9 @@ module.exports = (function() {
     },
 
     editLast: function() {
-      if(!this.chatCollectionView) return;
-
       var lastChat =  this.getLastEditableMessage();
       if(!lastChat) return;
-
-      var chatItemView = this.chatCollectionView.children.findByModel(lastChat);
-      if(!chatItemView) return;
-
-      chatItemView.toggleEdit();
+      appEvents.trigger('chatCollectionView:editChat', lastChat);
     },
 
     onPaste: function(e) {
@@ -359,176 +307,6 @@ module.exports = (function() {
 
   cocktail.mixin(ChatInputView, KeyboardEventsMixin);
 
-  var ChatCollectionResizer = function(options) {
-    var rollers = options.rollers;
-
-    var el = options.el;
-    var $el = $(el);
-
-    this.resetInput = function(initial) {
-      $el.css({ height: '', 'overflow-y': '' });
-
-      adjustScroll(initial);
-    };
-
-    this.resizeInput = function() {
-      var maxHeight = calculateMaxHeight();
-      var scrollHeight = el.scrollHeight;
-      var height = scrollHeight > maxHeight ? maxHeight : scrollHeight;
-      var offsetHeight = el.offsetHeight;
-
-      if(offsetHeight == height) {
-        return;
-      }
-
-      $el.height(height);
-
-      adjustScroll();
-    };
-
-    function adjustScroll(initial) {
-      if(!rollers) return;
-      if(initial) {
-        rollers.adjustScroll(500);
-      } else {
-        rollers.adjustScrollContinuously(500);
-      }
-    }
-  };
-
-  var ChatInputBoxView = Marionette.ItemView.extend({
-    events: {
-      "keyup":    "onKeyUp",
-      "blur": "onBlur"
-    },
-
-    keyboardEvents: {
-      "chat.edit.openLast": "onKeyEditLast",
-      "chat.send": "onKeySend",
-      "pageUp": "onKeyPageUp",
-      "pageDown": "onKeyPageDown"
-    },
-
-    // pass in the textarea as el for ChatInputBoxView
-    // pass in a scroll delegate
-    initialize: function(options) {
-      this.autofocus = options.autofocus;
-
-      if(hasScrollBars()) {
-        this.$el.addClass("scroller");
-      }
-
-      var chatResizer = new ChatCollectionResizer({
-        el: this.el,
-        rollers: options.rollers
-      });
-
-      this.chatResizer = chatResizer;
-
-      this.listenTo(this, 'change', function() {
-        chatResizer.resizeInput();
-      });
-
-
-      if (!this.options.editMode) this.drafty = drafty(this.el);
-
-      chatResizer.resetInput(true);
-
-      this.chatCollectionView = options.chatCollectionView;
-      this.composeMode = options.composeMode;
-      this.chatResizer.resizeInput();
-    },
-
-    onBlur: function() {
-      if(isMobile() && !this.isTypeaheadShowing()) {
-        this.processInput();
-      }
-    },
-
-    onKeyUp: function() {
-      this.chatResizer.resizeInput();
-    },
-
-    onKeyEditLast: function() {
-      if(!this.$el.val()) this.trigger('editLast');
-    },
-
-    onKeySend: function(event, handler) {
-      var isComposeModeEnabled = this.composeMode && this.composeMode.isEnabled();
-      // Has a modifier or not in compose mode
-      var shouldHandle = handler.mods.length || !isComposeModeEnabled;
-      // Need to test behaviour with typeahead
-      if(!this.isTypeaheadShowing() && shouldHandle) {
-        if(this.hasVisibleText()) {
-          this.processInput();
-        }
-        event.preventDefault();
-        return false;
-      }
-    },
-
-    onKeyPageUp: function() {
-      if(this.chatCollectionView) this.chatCollectionView.pageUp();
-    },
-
-    onKeyPageDown: function() {
-      if(this.chatCollectionView) this.chatCollectionView.pageDown();
-    },
-
-    processInput: function() {
-      var cmd = commands.findMatch(this.$el.val());
-      if(cmd && cmd.action) {
-        cmd.action(this);
-      } else {
-        this.send();
-      }
-    },
-
-    send: function() {
-      this.trigger('save', this.$el.val());
-      this.reset();
-    },
-
-    reset: function() {
-      $('#chatInputForm').trigger('reset');
-      this.el.value = '';
-      if (this.drafty) this.drafty.reset(); // Drafty is disabled in editMode
-      this.chatResizer.resetInput();
-    },
-
-    append: function(text, options) {
-      var current = this.$el.val();
-      var start = current.length;
-      if(!current || current.match(/\s+$/)) {
-        current = current + text;
-      } else {
-        if(options && options.newLine) {
-          start++;
-          current = current + '\n' + text;
-        } else {
-          current = current + ' ' + text;
-        }
-      }
-      this.chatResizer.resizeInput();
-      this.$el.val(current);
-      this.el.setSelectionRange(current.length, current.length);
-      this.el.focus();
-
-      this.el.scrollTop = this.el.clientHeight;
-    },
-
-    isTypeaheadShowing: function() {
-      return this.$el.parent().find('.dropdown-menu').is(":visible");
-    },
-
-    hasVisibleText: function() {
-      return !this.$el.val().match(/^\s+$/);
-    }
-
-  });
-
-  cocktail.mixin(ChatInputBoxView, KeyboardEventsMixin);
-
-  return { ChatInputView: ChatInputView, ChatInputBoxView: ChatInputBoxView };
+  return ChatInputView;
 
 })();

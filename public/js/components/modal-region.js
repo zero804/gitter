@@ -14,7 +14,7 @@ module.exports = (function() {
       view.navigable = true;
       view.show();
     },
-    close: function() {
+    destroy: function() {
       if(this.currentView) {
         this.currentView.navigationalHide();
         this.currentView = null;

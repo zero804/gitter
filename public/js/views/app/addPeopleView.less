@@ -1,4 +1,6 @@
-@import "base-avatar";
+@import "../../../less/base-avatar.less";
+@import "../../../less/pulse-animations.less";
+@import (reference) "../../../less/colors.less";
 
 @import "../controls/dropdown";
 @import "../controls/typeahead";
@@ -60,7 +62,7 @@
     float: right;
     cursor: pointer;
     opacity: 0.6;
-    .transition300ms(opacity);
+    transition: opacity 300ms;
   }
 
   .remove:before {
