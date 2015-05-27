@@ -77,7 +77,8 @@ module.exports = (function() {
     },
 
     modelEvents: {
-      syncStatusChange: 'onSyncStatusChange'
+      'syncStatusChange': 'onSyncStatusChange',
+      'change': 'onChange'
     },
 
     isEditing: false,
@@ -96,28 +97,18 @@ module.exports = (function() {
     initialize: function(options) {
       this.rollers = options.rollers;
 
-      this.listenToOnce(this.model, 'change:unread', function() {
-        if (!this.model.get('unread')) {
-          this.$el.removeClass('unread');
-        }
-      });
-
       this._oneToOne = context.inOneToOneTroupeContext();
       this.isPermalinkable = !this._oneToOne;
 
       this.userCollection = options.userCollection;
 
       this.decorated = false;
-      this.decorators = options.decorators;
 
-      this.listenTo(this.model, 'change', this.onChange);
-
-      var timeChange = this.timeChange.bind(this);
       if (this.isInEditablePeriod()) {
         // update once the message is not editable
         var sent = this.model.get('sent');
         var notEditableInMS = sent ? sent.valueOf() - Date.now() + EDIT_WINDOW : EDIT_WINDOW;
-        this.timeChangeTimeout = setTimeout(timeChange, notEditableInMS + 50);
+        this.timeChangeTimeout = setTimeout(this.timeChange.bind(this), notEditableInMS + 50);
       }
 
       this.listenToOnce(this, 'messageInViewport', this.decorate);
@@ -163,12 +154,6 @@ module.exports = (function() {
     },
 
     onChange: function() {
-      var changed = this.model.changed;
-
-      if ('html' in changed) {
-        this.renderText();
-      }
-
       this.updateRender(this.model.changed);
     },
 
@@ -210,53 +195,63 @@ module.exports = (function() {
 
     decorate: function() {
       this.decorated = true;
-      this.decorators.forEach(function(decorator) {
+      this.options.decorators.forEach(function(decorator) {
         decorator.decorate(this);
       }, this);
     },
 
     onRender: function () {
-      this.renderText();
       this.updateRender();
       this.timeChange();
     },
 
-
     timeChange: function() {
+      var canEdit = this.canEdit();
       this.$el.toggleClass('isEditable', this.isInEditablePeriod());
-      this.$el.toggleClass('canEdit', this.canEdit());
-      this.$el.toggleClass('cantEdit', !this.canEdit());
+      this.$el.toggleClass('canEdit', canEdit);
+      // this.$el.toggleClass('cantEdit', !canEdit);
     },
 
     updateRender: function(changes) {
+      var model = this.model;
+      var $el = this.$el;
+
+      if (!changes || 'html' in changes || 'text' in changes) {
+        this.renderText();
+      }
+
+      if (!changes || 'unread' in changes) {
+        $el.toggleClass('unread', !!model.get('unread'));
+      }
+
       if(!changes || 'fromUser' in changes) {
-        this.$el.toggleClass('isViewers', this.isOwnMessage());
+        $el.toggleClass('isViewers', this.isOwnMessage());
       }
 
       if(!changes || 'editedAt' in changes) {
-        this.$el.toggleClass('hasBeenEdited', this.hasBeenEdited());
+        $el.toggleClass('hasBeenEdited', this.hasBeenEdited());
       }
 
       if(!changes || 'burstStart' in changes) {
-        this.$el.toggleClass('burstStart', this.model.get('burstStart'));
-        this.$el.toggleClass('burstContinued', !this.model.get('burstStart'));
+        $el.toggleClass('burstStart', !!model.get('burstStart'));
+        $el.toggleClass('burstContinued', !model.get('burstStart'));
       }
 
       if (!changes || 'burstFinal' in changes) {
-        this.$el.toggleClass('burstFinal', this.model.get('burstFinal'));
+        $el.toggleClass('burstFinal', !!model.get('burstFinal'));
       }
 
       /* Don't run on the initial (changed=undefined) as its done in the template */
       if (changes && 'readBy' in changes) {
-        var readByCount = this.model.get('readBy');
-        var oldValue = this.model.previous('readBy');
+        var readByCount = model.get('readBy');
+        var oldValue = model.previous('readBy');
 
-        var readByLabel = this.$el.find('.js-chat-item-readby');
+        var readByLabel = $el.find('.js-chat-item-readby');
 
         if(readByLabel.length === 0) {
           if(readByCount) {
            readByLabel = $(document.createElement('div')).addClass('chat-item__icon--read js-chat-item-readby');
-           readByLabel.insertBefore(this.$el.find('.js-chat-item-edit'));
+           readByLabel.insertBefore($el.find('.js-chat-item-edit'));
 
            RAF(function() {
              readByLabel.addClass('readBySome');
@@ -271,7 +266,7 @@ module.exports = (function() {
       }
 
       if(changes && 'collapsed' in changes) {
-        var collapsed = this.model.get('collapsed');
+        var collapsed = model.get('collapsed');
         if(collapsed) {
           this.collapseEmbeds();
         } else {
@@ -281,10 +276,10 @@ module.exports = (function() {
       }
 
       if(!changes || 'isCollapsible' in changes) {
-        var isCollapsible = !!this.model.get('isCollapsible');
+        var isCollapsible = !!model.get('isCollapsible');
         var $collapse = this.ui.collapse;
         toggle($collapse[0], isCollapsible);
-          }
+      }
     },
 
     getEditTooltip: function() {
@@ -471,7 +466,6 @@ module.exports = (function() {
       };
 
       self.renderText();
-      self.decorate();
 
       // Give the browser a second to load the content
       self.embedTimeout = setTimeout(function() {
