@@ -7,7 +7,6 @@ var stats = env.stats;
 
 var pushNotificationService = require("../services/push-notification-service");
 var unreadItemService = require("../services/unread-item-service");
-var workerQueue = require('../utils/worker-queue');
 var androidGateway = require('./android-notification-gateway');
 var appleGateway = require('./apple-notification-gateway');
 
@@ -43,43 +42,36 @@ function sendNotificationToDevice(notification, badge, device) {
   }
 }
 
-var queue = workerQueue.queue('push-notification', {}, function() {
+function directSendUserNotification(userIds, notification, callback) {
+  pushNotificationService.findEnabledDevicesForUsers(userIds, function(err, devices) {
+    if(err) return callback(err);
+    if(!devices.length) return callback();
 
-  function directSendUserNotification(userIds, notification, callback) {
-    pushNotificationService.findEnabledDevicesForUsers(userIds, function(err, devices) {
-      if(err) return callback(err);
-      if(!devices.length) return callback();
+    var usersWithDevices = devices.map(function(device) { return device.userId; });
 
-      var usersWithDevices = devices.map(function(device) { return device.userId; });
+    unreadItemService.getBadgeCountsForUserIds(usersWithDevices, function(err, counts) {
+      logger.verbose("push-gateway: Sending to " + devices.length + " potential devices for " + userIds.length + " users");
 
-      unreadItemService.getBadgeCountsForUserIds(usersWithDevices, function(err, counts) {
-        logger.verbose("push-gateway: Sending to " + devices.length + " potential devices for " + userIds.length + " users");
-
-        devices.forEach(function(device) {
-          var badge = counts[device.userId];
-          sendNotificationToDevice(notification, badge, device);
-        });
-
-        callback();
-
+      devices.forEach(function(device) {
+        var badge = counts[device.userId];
+        sendNotificationToDevice(notification, badge, device);
       });
 
-    });
-  }
+      callback();
 
-  return function(data, done) {
-    directSendUserNotification(data.userIds, data.notification, done);
-  };
-});
+    });
+
+  });
+}
 
 exports.sendUserNotification = function(userIds, notification, callback) {
   if(!Array.isArray(userIds)) userIds = [userIds];
 
-  queue.invoke({ userIds: userIds, notification: notification },callback);
+  directSendUserNotification(userIds, notification, callback);
 };
 
 exports.sendUsersBadgeUpdates = function(userIds, callback) {
   if(!Array.isArray(userIds)) userIds = [userIds];
 
-  queue.invoke({ userIds: userIds },callback);
+  directSendUserNotification(userIds, callback);
 };
