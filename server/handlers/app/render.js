@@ -20,6 +20,7 @@ var isolateBurst       = require('../../../shared/burst/isolate-burst-array');
 var unreadItemService  = require('../../services/unread-item-service');
 var mongoUtils         = require('../../utils/mongo-utils');
 var url                = require('url');
+var cdn                = require("../../web/cdn");
 
 var avatar   = require('../../utils/avatar');
 var _                 = require('underscore');
@@ -28,8 +29,22 @@ var _                 = require('underscore');
 var INITIAL_CHAT_COUNT = 50;
 var ROSTER_SIZE = 25;
 
-// DEPRECATED
-//var USER_COLLECTION_FOLD = 21;
+
+function cdnSubResources(resources) {
+  return ['vendor'].concat(resources).map(function(f) {
+    return cdn('js/' + f + '.js');
+  }).concat(cdn('fonts/sourcesans/SourceSansPro-Regular.otf.woff'));
+}
+
+var SUBRESOURCES = {
+  'router-app': cdnSubResources(['router-app', 'router-chat']),
+  'mobile-nli-app': cdnSubResources(['mobile-nli-app', 'router-nli-chat']),
+  'mobile-userhome': cdnSubResources(['mobile-userhome']),
+  'userhome': cdnSubResources(['userhome']),
+  'router-chat': cdnSubResources(['router-chat']),
+  'router-nli-chat': cdnSubResources(['router-nli-chat']),
+  'mobile-app': cdnSubResources(['mobile-app'])
+};
 
 var stagingText, stagingLink;
 var dnsPrefetch = (nconf.get('cdn:hosts') || []).concat([
@@ -175,6 +190,7 @@ function renderMainFrame(req, res, next, frame) {
         stagingText: stagingText,
         stagingLink: stagingLink,
         dnsPrefetch: dnsPrefetch,
+        subresources: SUBRESOURCES[bootScriptName],
         showFooterButtons: true,
         showUnreadTab: true,
         menuHeaderExpanded: false,
@@ -267,6 +283,7 @@ function renderChat(req, res, options, next) {
           chats: chatsWithBurst,
           classNames: classNames.join(' '),
           agent: req.headers['user-agent'],
+          subresources: SUBRESOURCES[script],
           dnsPrefetch: dnsPrefetch,
           isPrivate: isPrivate,
           activityEvents: activityEvents,
