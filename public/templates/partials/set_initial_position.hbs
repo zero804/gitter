@@ -1,10 +1,6 @@
 <script type="text/javascript">
-  var isIE = "ActiveXObject" in window;
-  var isHashSet = window.location.hash.length > 1;
-  if(isIE || isHashSet) {
     var s = document.querySelector('#initial');
-    if(s) s.scrollIntoView();    
-  } else {
-    window.location = '#initial';
-  }
+    if(s) setTimeout(function() {
+      s.scrollIntoView();
+    }, 16) ;
 </script>
