@@ -1,164 +1,180 @@
 // Base
-@import "base-avatar";
+@import "../../../less/base-avatar.less";
 
 // Required views
 @import "../people/peopleCollectionView";
 @import "../search/searchView";
 @import "activity.less";
 
-.right-toolbar {
+.right-toolbar-region {
   position: relative;
   color: #333;
   display: inline-block;
   flex-shrink: 0;
   order: 2;
   height: 100%;
-  width: @rightMarginFull;
+  // width: @rightMarginFull;
   text-align: left;
   vertical-align: top;
   right: 0;
   top: 0;
   bottom: 0;
-  background-color: fade(@light,20%);
   z-index: 100;
 
-  transition: width 200ms ease-in-out;
-
-  p {
-    margin: 0px 0px 5px;
-  }
-
-  .trpToolbarHeader {
-    text-transform: uppercase;
-    padding-bottom: 8px;
-    padding-left: 14px;
-    cursor: pointer;
-  }
-
-  .trpToolbarList {
-    min-height: 40px;
-    overflow: auto;
-
-    ul {
-      list-style: none;
-      margin: 0px;
-    }
-  }
-
-  .oneToOne {
-    max-height: 300px;
-  }
-
-  @media @mid {
-    #activity-header {
-    opacity: 0;
-    }
-
-    #people-header, #top-header, #repo-info, #activity-tip {
-      display: none;
-    }
-
-    #people-list .trpToolbarListContent
-    {
-      margin-left: 6px;
-      padding-top: 16px;
-      padding-right: 20px;
-      padding-left: 14px;
-    }
-  }
-
-  .trpRepoInfoContainer {
-    padding-left: 5px;
-
-    & li {
-      width: 100%;
-      overflow-x: hidden;
-      text-overflow: ellipsis;
-      list-style: none;
-    }
-
-    .vcard-stats {
-      border-top: 1px solid fade(@trpGrey, 20%);
-      border-bottom: 1px solid fade(@trpGrey, 20%);
-      padding: 4px 0;
-      margin: 8px 0;
-    }
-
-    ul {
-      display: inline-block;
-      border: 1px 0 solid @trpGrey;
-
-    }
-
-    h1 {
-      word-wrap: break-word;
-    }
-  }
-}
-
-// if the toolbar is collapsable and viewport is mid size or smaller, then collapse.
-// ...Unless the toolbar has been expanded (like if search has been activated).
-.right-toolbar--collapsible:not(.right-toolbar--expanded) {
-  @media @mid {
-    width: 70px;
-    padding-right: 0px;
-  }
-}
-
-.right-toolbar {
-
-  @media @mid {
-    .trpToolbarList {
-      max-height: 40%;
-    }
-
-  }
-}
-
-// this is bad, but until the margins/padding is done properly
-// for all <h1>, <p> etc tags in the toolbar, we have to style
-// the individual elements :(
-#activity-header {
-  padding-top: 16px;
-}
-
-.right-toolbar {
-  display: flex;
-  flex-direction: column;
-}
-
-.right-toolbar__header {
-  height: 76px;
-  border-bottom: 1px solid rgb(240, 240, 240);
-  flex-shrink: 0;
-  display: flex;
-  align-items: stretch;
-}
-
-.right-toolbar__body {
-  height: 100%;
-  flex-shrink: 1;
-  overflow: auto;
-  padding-top: 10px;
-}
-
-.right-toolbar__footer {
-  flex-shrink: 0;
-  width: 100%;
-}
-
-.support {
-  box-sizing: border-box;
-  text-align: center;
-  border-top: 1px solid rgba(0, 0, 0, .05);
-  padding: 20px 10px 26px;
-  @media @mid {
+  .right-toolbar {
+    position: relative;
+    color: #333;
     display: inline-block;
-    width: 100%;
-    opacity: 0.6;
-  }
-}
+    flex-shrink: 0;
+    order: 2;
+    height: 100%;
+    width: @rightMarginFull;
+    text-align: left;
+    vertical-align: top;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: fade(@light,20%);
+    z-index: 100;
 
-.support:hover {
-  background-color: rgba(241,240,237,.4);
+    transition: width 200ms ease-in-out;
+
+    p {
+      margin: 0px 0px 5px;
+    }
+
+    .trpToolbarHeader {
+      text-transform: uppercase;
+      padding-bottom: 8px;
+      padding-left: 14px;
+      cursor: pointer;
+    }
+
+    .trpToolbarList {
+      min-height: 40px;
+      overflow: auto;
+
+      ul {
+        list-style: none;
+        margin: 0px;
+      }
+    }
+
+    .oneToOne {
+      max-height: 300px;
+    }
+
+    @media @mid {
+      #activity-header {
+      opacity: 0;
+      }
+
+      #people-header, #top-header, #repo-info, #activity-tip {
+        display: none;
+      }
+
+      #people-list .trpToolbarListContent
+      {
+        margin-left: 6px;
+        padding-top: 16px;
+        padding-right: 20px;
+        padding-left: 14px;
+      }
+    }
+
+    .trpRepoInfoContainer {
+      padding-left: 5px;
+
+      & li {
+        width: 100%;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+        list-style: none;
+      }
+
+      .vcard-stats {
+        border-top: 1px solid fade(@trpGrey, 20%);
+        border-bottom: 1px solid fade(@trpGrey, 20%);
+        padding: 4px 0;
+        margin: 8px 0;
+      }
+
+      ul {
+        display: inline-block;
+        border: 1px 0 solid @trpGrey;
+
+      }
+
+      h1 {
+        word-wrap: break-word;
+      }
+    }
+  }
+
+  // if the toolbar is collapsable and viewport is mid size or smaller, then collapse.
+  // ...Unless the toolbar has been expanded (like if search has been activated).
+  .right-toolbar--collapsible:not(.right-toolbar--expanded) {
+    @media @mid {
+      width: 70px;
+      padding-right: 0px;
+    }
+  }
+
+  .right-toolbar {
+
+    @media @mid {
+      .trpToolbarList {
+        max-height: 40%;
+      }
+
+    }
+  }
+
+  // this is bad, but until the margins/padding is done properly
+  // for all <h1>, <p> etc tags in the toolbar, we have to style
+  // the individual elements :(
+  #activity-header {
+    padding-top: 16px;
+  }
+
+  .right-toolbar {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .right-toolbar__header {
+    height: 76px;
+    border-bottom: 1px solid rgb(240, 240, 240);
+    flex-shrink: 0;
+    display: flex;
+    align-items: stretch;
+  }
+
+  .right-toolbar__body {
+    height: 100%;
+    flex-shrink: 1;
+    overflow: auto;
+    padding-top: 10px;
+  }
+
+  .right-toolbar__footer {
+    flex-shrink: 0;
+    width: 100%;
+  }
+
+  .support {
+    box-sizing: border-box;
+    text-align: center;
+    border-top: 1px solid rgba(0, 0, 0, .05);
+    padding: 20px 10px 26px;
+    @media @mid {
+      display: inline-block;
+      width: 100%;
+      opacity: 0.6;
+    }
+  }
+
+  .support:hover {
+    background-color: rgba(241,240,237,.4);
+  }
 }

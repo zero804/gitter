@@ -8,12 +8,15 @@ var cordovaNavigate = require('components/cordova-navigate');
 var confirmRepoRoomView = require('views/createRoom/confirmRepoRoomView');
 var modalRegion = require('components/modal-region');
 var onready = require('./utils/onready');
+var FastClick = require('fastclick');
 
 // Preload widgets
 require('views/widgets/avatar');
 require('components/ping');
 
 onready(function() {
+  FastClick.attach(document.body);
+
   require('components/link-handler').installLinkHandler();
   appEvents.on('navigation', function(url) {
     if(window.cordova) {
@@ -56,7 +59,7 @@ onready(function() {
         modalRegion.show(new confirmRepoRoomView.Modal({ uri: uri }));
       },
       '': function() {
-        modalRegion.close();
+        modalRegion.destroy();
       }
     }
   });
@@ -64,4 +67,3 @@ onready(function() {
   new Router();
   Backbone.history.start();
 });
-

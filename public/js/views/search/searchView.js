@@ -1,4 +1,5 @@
 "use strict";
+
 var $ = require('jquery');
 var apiClient = require('components/apiClient');
 var context = require('utils/context');
@@ -6,12 +7,11 @@ var appEvents = require('utils/appevents');
 var Rollers = require('utils/rollers');
 var resolveAvatarUrl = require('shared/avatars/resolve-avatar-url');
 var Backbone = require('backbone');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var _ = require('underscore');
 var cocktail = require('cocktail');
 var itemCollections = require('collections/instances/integrated-items');
 var ChatSearchModels = require('collections/chat-search');
-var searchTemplate = require('./tmpl/search.hbs');
 var resultTemplate = require('./tmpl/result.hbs');
 var noResultsTemplate = require('./tmpl/no-results.hbs');
 var noRoomResultsTemplate = require('./tmpl/no-room-results.hbs');
@@ -20,6 +20,7 @@ var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 
 require('views/behaviors/widgets');
 require('views/behaviors/highlight');
+require('views/behaviors/isomorphic');
 
 module.exports = (function() {
 
@@ -123,8 +124,7 @@ module.exports = (function() {
   });
 
   var RoomsCollectionView = Marionette.CollectionView.extend({
-    itemView: RoomResultItemView,
-
+    childView: RoomResultItemView,
     emptyView: EmptyRoomResultsView,
 
     initialize: function (/*options*/) {
@@ -139,14 +139,11 @@ module.exports = (function() {
 
   var MessagesCollectionView = Marionette.CollectionView.extend({
     emptyView: EmptyResultsView,
+    childView: MessageResultItemView,
 
     initialize: function() {
       var target = document.querySelector("#search-results");
       this.rollers = new Rollers(target, this.el, { doNotTrack: true });
-    },
-
-    getItemView: function (item) {
-      return MessageResultItemView;
     },
 
     scrollTo: function (v) {
@@ -348,12 +345,13 @@ module.exports = (function() {
     }
   });
 
-  var SearchView = Marionette.Layout.extend({
-    template: searchTemplate,
-
-    regions: {
-      roomsRegion: '.js-search-rooms',
-      messagesRegion: '.js-search-messages',
+  var SearchView = Marionette.LayoutView.extend({
+    // template: searchTemplate, SearchView is prerendered
+    behaviors: {
+      Isomorphic: {
+        roomsRegion: { el: '.js-search-rooms', init: 'initRoomsRegion' },
+        messagesRegion: { el: '.js-search-messages', init: 'initMessagesRegion' },
+      }
     },
 
     // the shortcuts need to be handled at the top level component
@@ -368,7 +366,7 @@ module.exports = (function() {
     serializeData: function() {
       return {
         isOneToOne: context.troupe().get('oneToOne'),
-        roomName: context.troupe().get('name')
+        troupeName: context.troupe().get('name')
       };
     },
 
@@ -377,10 +375,9 @@ module.exports = (function() {
 
       this.listenTo(this.model, 'change:searchTerm', function () {
         debouncedRun();
-      }.bind(this));
+      });
 
-      this.listenTo(this.model, 'change:active', function (m, active) {
-
+      this.listenTo(this.model, 'change:active', function (m, active) {  // jshint unused:true
         if (active) {
           this.triggerMethod('search:expand');
 
@@ -420,26 +417,32 @@ module.exports = (function() {
 
       this.listenTo(this.search, 'cache:clear', function () {
         masterCollection.reset();
-      }.bind(this));
+      });
 
       this.listenTo(this.search, 'loaded:rooms', function (data) {
         var toRemove = this.rooms.models.filter(function (item) {
           return item.get('query') !== this.model.get('searchTerm');
-        }.bind(this));
+        }, this);
+
         masterCollection.remove(toRemove);
         masterCollection.add(data);
         this.rooms.resetWith(masterCollection);
-      }.bind(this));
+      });
 
       this.listenTo(this.search, 'loaded:messages', function (data) {
         masterCollection.remove(this.chats.models); // we must remove the old chats before adding new ones
         masterCollection.set(data, { remove: false });
         this.chats.resetWith(masterCollection);
-      }.bind(this));
+      });
 
-      // initialize the views
-      this.roomsView = new RoomsCollectionView({ collection: this.rooms });
-      this.messagesView = new MessagesCollectionView({ collection: this.chats });
+    },
+
+    initRoomsRegion: function(optionsForRegion) {
+      return new RoomsCollectionView(optionsForRegion({ collection: this.rooms }));
+    },
+
+    initMessagesRegion: function(optionsForRegion) {
+      return new MessagesCollectionView(optionsForRegion({ collection: this.chats }));
     },
 
     isSearchTermEmpty: function () {
@@ -456,7 +459,6 @@ module.exports = (function() {
 
     hide: function () {
       this.triggerMethod('search:hide');
-      this.$el.hide();
       this.search.clearCache();
     },
 
@@ -475,14 +477,7 @@ module.exports = (function() {
         .then(finishedLoading)
         .fail(finishedLoading);
 
-      this.showResults();
       this.triggerMethod('search:show'); // hide top toolbar content
-    },
-
-    showResults: function () {
-      this.$el.show();
-      this.roomsRegion.show(this.roomsView); // local rooms
-      this.messagesRegion.show(this.messagesView); // server chat messages
     },
 
     handlePrev: function (e) {
@@ -518,4 +513,3 @@ module.exports = (function() {
   return SearchView;
 
 })();
-

@@ -20,6 +20,7 @@ var isolateBurst       = require('../../../shared/burst/isolate-burst-array');
 var unreadItemService  = require('../../services/unread-item-service');
 var mongoUtils         = require('../../utils/mongo-utils');
 var url                = require('url');
+var cdn                = require("../../web/cdn");
 
 var avatar   = require('../../utils/avatar');
 var _                 = require('underscore');
@@ -28,8 +29,22 @@ var _                 = require('underscore');
 var INITIAL_CHAT_COUNT = 50;
 var ROSTER_SIZE = 25;
 
-// DEPRECATED
-//var USER_COLLECTION_FOLD = 21;
+
+function cdnSubResources(resources) {
+  return ['vendor'].concat(resources).map(function(f) {
+    return cdn('js/' + f + '.js');
+  }).concat(cdn('fonts/sourcesans/SourceSansPro-Regular.otf.woff'));
+}
+
+var SUBRESOURCES = {
+  'router-app': cdnSubResources(['router-app', 'router-chat']),
+  'mobile-nli-app': cdnSubResources(['mobile-nli-app', 'router-nli-chat']),
+  'mobile-userhome': cdnSubResources(['mobile-userhome']),
+  'userhome': cdnSubResources(['userhome']),
+  'router-chat': cdnSubResources(['router-chat']),
+  'router-nli-chat': cdnSubResources(['router-nli-chat']),
+  'mobile-app': cdnSubResources(['mobile-app'])
+};
 
 var stagingText, stagingLink;
 var dnsPrefetch = (nconf.get('cdn:hosts') || []).concat([
@@ -62,7 +77,7 @@ function renderHomePage(req, res, next) {
       var page, bootScriptName;
 
       if(req.isPhone) {
-        page = 'mobile/mobile-app';
+        page = 'mobile/mobile-userhome';
         bootScriptName = 'mobile-userhome';
       } else {
         page = 'userhome-template';
@@ -118,15 +133,15 @@ function renderMainFrame(req, res, next, frame) {
   var selectedRoomId = req.troupe && req.troupe.id;
 
   Q.all([
-    contextGenerator.generateNonChatContext(req),
-    restful.serializeTroupesForUser(userId),
-    restful.serializeOrgsForUserId(userId).catch(function(err) {
-      // Workaround for GitHub outage
-      winston.error('Failed to serialize orgs:' + err, { exception: err });
-      return [];
-    }),
-    aroundId && getPermalinkChatForRoom(req.troupe, aroundId)
-  ])
+      contextGenerator.generateNonChatContext(req),
+      restful.serializeTroupesForUser(userId),
+      restful.serializeOrgsForUserId(userId).catch(function(err) {
+        // Workaround for GitHub outage
+        winston.error('Failed to serialize orgs:' + err, { exception: err });
+        return [];
+      }),
+      aroundId && getPermalinkChatForRoom(req.troupe, aroundId)
+    ])
     .spread(function (troupeContext, rooms, orgs, permalinkChat) {
       var chatAppQuery = {};
       if (aroundId) {
@@ -175,6 +190,7 @@ function renderMainFrame(req, res, next, frame) {
         stagingText: stagingText,
         stagingLink: stagingLink,
         dnsPrefetch: dnsPrefetch,
+        subresources: SUBRESOURCES[bootScriptName],
         showFooterButtons: true,
         showUnreadTab: true,
         menuHeaderExpanded: false,
@@ -205,89 +221,91 @@ function renderChat(req, res, options, next) {
   .then(function(unreadItems) {
     var limit = unreadItems.chat.length > INITIAL_CHAT_COUNT ? unreadItems.chat.length + 20 : INITIAL_CHAT_COUNT;
 
-    var snapshotOptions = {
+  var snapshotOptions = {
       limit: limit, //options.limit || INITIAL_CHAT_COUNT,
-      aroundId: aroundId,
-      unread: options.unread // Unread can be true, false or undefined
-    };
+    aroundId: aroundId,
+    unread: options.unread // Unread can be true, false or undefined
+  };
 
-    var chatSerializerOptions = _.defaults({
-      lean: true
-    }, snapshotOptions);
+  var chatSerializerOptions = _.defaults({
+    lean: true
+  }, snapshotOptions);
 
-    var userSerializerOptions = _.defaults({
-      lean: true,
-      limit: ROSTER_SIZE
-    }, snapshotOptions);
+  var userSerializerOptions = _.defaults({
+    lean: true,
+    limit: ROSTER_SIZE
+  }, snapshotOptions);
 
-    Q.all([
-        options.generateContext === false ? null : contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, permalinkChatId: aroundId }),
-        restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
-        options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
-        options.fetchUsers === false ? null :restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions)
-      ]).spread(function (troupeContext, chats, activityEvents, users) {
-        var initialChat = _.find(chats, function(chat) { return chat.initial; });
-        var initialBottom = !initialChat;
-        var githubLink;
-        var classNames = options.classNames || [];
+  Q.all([
+      options.generateContext === false ? null : contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, permalinkChatId: aroundId }),
+      restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
+      options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
+      options.fetchUsers === false ? null :restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions)
+    ]).spread(function (troupeContext, chats, activityEvents, users) {
+      var initialChat = _.find(chats, function(chat) { return chat.initial; });
+      var initialBottom = !initialChat;
+      var githubLink;
+      var classNames = options.classNames || [];
 
 
-        if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
-          githubLink = 'https://github.com/' + req.uriContext.uri;
-        }
+      if(troupe.githubType === 'REPO' || troupe.githubType === 'ORG') {
+        githubLink = 'https://github.com/' + req.uriContext.uri;
+      }
 
-        if (!user) classNames.push("logged-out");
+      if (!user) classNames.push("logged-out");
 
-        var isPrivate = troupe.security !== "PUBLIC";
-        var integrationsUrl;
+      var isPrivate = troupe.security !== "PUBLIC";
+      var integrationsUrl;
 
-        if (troupeContext && troupeContext.isNativeDesktopApp) {
-           integrationsUrl = nconf.get('web:basepath') + '/' + troupeContext.troupe.uri + '#integrations';
-        } else {
-          integrationsUrl = '#integrations';
-        }
+      if (troupeContext && troupeContext.isNativeDesktopApp) {
+         integrationsUrl = nconf.get('web:basepath') + '/' + troupeContext.troupe.uri + '#integrations';
+      } else {
+        integrationsUrl = '#integrations';
+      }
 
-        var cssFileName = options.stylesheet ? "styles/" + options.stylesheet + ".css" : "styles/" + script + ".css"; // css filename matches bootscript
+      var cssFileName = options.stylesheet ? "styles/" + options.stylesheet + ".css" : "styles/" + script + ".css"; // css filename matches bootscript
 
-        var chatsWithBurst = burstCalculator(chats);
-        if (options.filterChats) {
-          chatsWithBurst = options.filterChats(chatsWithBurst);
-        }
+      var chatsWithBurst = burstCalculator(chats);
+      if (options.filterChats) {
+        chatsWithBurst = options.filterChats(chatsWithBurst);
+      }
 
-        var renderOptions = _.extend({
-            isRepo: troupe.githubType === 'REPO',
-            bootScriptName: script,
-            cssFileName: cssFileName,
-            githubLink: githubLink,
-            troupeName: req.uriContext.uri,
-            oneToOne: troupe.oneToOne,
-            user: user,
-            troupeContext: troupeContext,
-            initialBottom: initialBottom,
-            chats: chatsWithBurst,
-            classNames: classNames.join(' '),
-            agent: req.headers['user-agent'],
-            dnsPrefetch: dnsPrefetch,
-            isPrivate: isPrivate,
-            activityEvents: activityEvents,
-            users: users  && users.sort(userSort),
-            userCount: troupe.userCount,
-            hasHiddenMembers: troupe.userCount > 25,
-            integrationsUrl: integrationsUrl,
-            placeholder: 'Click here to type a chat message. Supports GitHub flavoured markdown.'
-          }, troupeContext && {
-            troupeTopic: troupeContext.troupe.topic,
-            premium: troupeContext.troupe.premium,
-            troupeFavourite: troupeContext.troupe.favourite,
-            avatarUrl: avatar(troupeContext.troupe),
-            isAdmin: troupeContext.permissions.admin,
-            isNativeDesktopApp: troupeContext.isNativeDesktopApp
-          }, options.extras);
+      var renderOptions = _.extend({
+          isRepo: troupe.githubType === 'REPO',
+          bootScriptName: script,
+          cssFileName: cssFileName,
+          githubLink: githubLink,
+          troupeName: req.uriContext.uri,
+          oneToOne: troupe.oneToOne,
+          user: user,
+          troupeContext: troupeContext,
+          initialBottom: initialBottom,
+          chats: chatsWithBurst,
+          classNames: classNames.join(' '),
+          agent: req.headers['user-agent'],
+          subresources: SUBRESOURCES[script],
+          dnsPrefetch: dnsPrefetch,
+          isPrivate: isPrivate,
+          activityEvents: activityEvents,
+          users: users  && users.sort(userSort),
+          userCount: troupe.userCount,
+          hasHiddenMembers: troupe.userCount > 25,
+          integrationsUrl: integrationsUrl,
+          inputAutoFocus: !options.mobile,
+          placeholder: 'Click here to type a chat message. Supports GitHub flavoured markdown.'
+        }, troupeContext && {
+          troupeTopic: troupeContext.troupe.topic,
+          premium: troupeContext.troupe.premium,
+          troupeFavourite: troupeContext.troupe.favourite,
+          avatarUrl: avatar(troupeContext.troupe),
+          isAdmin: troupeContext.permissions.admin,
+          isNativeDesktopApp: troupeContext.isNativeDesktopApp
+        }, options.extras);
 
         res.render(options.template, renderOptions);
       });
-  })
-  .fail(next);
+    })
+    .fail(next);
 }
 
 function renderChatPage(req, res, next) {
@@ -300,12 +318,11 @@ function renderChatPage(req, res, next) {
 function renderMobileUserHome(req, res, next) {
   contextGenerator.generateNonChatContext(req)
     .then(function(troupeContext) {
-      res.render('mobile/mobile-app', {
-        bootScriptName: 'mobile-userhome',
+      res.render('mobile/mobile-userhome', {
         troupeName: req.uriContext.uri,
         troupeContext: troupeContext,
         agent: req.headers['user-agent'],
-        isUserhome: true,
+        user: req.user,
         dnsPrefetch: dnsPrefetch
       });
     })
@@ -315,12 +332,14 @@ function renderMobileUserHome(req, res, next) {
 function renderMobileChat(req, res, next) {
   return renderChat(req, res, {
     template: 'mobile/mobile-chat',
-    script: 'mobile-app'
+    script: 'mobile-app',
+    mobile: true
   }, next);
 }
 
 function renderMobileNativeEmbeddedChat(req, res) {
   res.render('mobile/native-embedded-chat-app', {
+    mobile: true,
     troupeContext: {}
   });
 }
@@ -341,7 +360,8 @@ function renderMobileNotLoggedInChat(req, res, next) {
     script: 'mobile-nli-app',
     unread: false, // Not logged in users see chats as read
     fetchEvents: false,
-    fetchUsers: false
+    fetchUsers: false,
+    mobile: true
   }, next);
 }
 

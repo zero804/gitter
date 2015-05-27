@@ -55,7 +55,7 @@ module.exports = (function() {
         delete this._data[itemType];
       }
 
-      if(this._onItemRemoved) this._onItemRemoved(itemType, itemId);
+      if(this._onRemoveChild) this._onRemoveChild(itemType, itemId);
 
       return true;
     },

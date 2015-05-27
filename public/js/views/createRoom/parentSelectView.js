@@ -1,5 +1,5 @@
 "use strict";
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var context = require('utils/context');
 var template = require('./tmpl/parentSelectView.hbs');
 var itemTemplate = require('./tmpl/parentItemView.hbs');
@@ -60,7 +60,8 @@ module.exports = (function() {
   function modelFromRepoTroupe(m) {
     return new ItemModel(m, function(m) {
       return {
-        id: m.get('id'),
+        id: m.get('name'),
+        roomId: m.get('id'),
         uri: m.get('uri'),
         name: m.get('name'),
         premium: m.get('premium'),
@@ -73,6 +74,7 @@ module.exports = (function() {
   function modelFromUser(m) {
     return new ItemModel(m, function(m) {
       return {
+        id: m.get('name'),
         uri: m.get('username'),
         name: m.get('username'),
         avatarUrl: m.get('avatarUrlSmall'),
@@ -87,7 +89,8 @@ module.exports = (function() {
   function modelFromOrg(m) {
     return new ItemModel(m, function(m) {
       return {
-        id: m.get('room').id,
+        id: m.get('name'),
+        roomId: m.get('room').id,
         uri: m.get('room').uri,
         premium: m.get('premium'),
         name: m.get('name'),
@@ -113,8 +116,7 @@ module.exports = (function() {
       this.orgsCollection = options.orgsCollection;
       this.troupesCollection = options.troupesCollection;
 
-      this.dropdownItems = new Backbone.Collection({ });
-      // this.dropdownItems.comparator =
+      this.dropdownItems = new Backbone.Collection();
 
       this.listenTo(this.orgsCollection, 'add remove change reset sync', this.reset);
       this.listenTo(this.troupesCollection, 'add remove change reset sync', this.reset);
@@ -153,8 +155,8 @@ module.exports = (function() {
       }
     },
 
-    onClose: function() {
-      this.typeahead.close();
+    onDestroy: function() {
+      this.typeahead.destroy();
     },
 
     focus: function() {
@@ -228,18 +230,24 @@ module.exports = (function() {
 
       results.sort(comparator);
 
+      var dividerCount = 0;
+      // Add dividers between the items
       for(var type, i = results.length - 1; i >= 0; i--) {
+        var currentType = results[i].get('type');
+
         if(!type) {
-          type = results[i].get('type');
+          type = currentType;
         } else {
-          if(type !== results[i].get('type')) {
-            type = results[i].get('type');
-            results.splice(i + 1, 0, new Backbone.Model({ divider: true }));
+          if(type !== currentType) {
+            type = currentType;
+            /* Insert a divider after the current item */
+            results.splice(i + 1, 0, new Backbone.Model({ id: "divider" + dividerCount++, divider: true }));
           }
         }
       }
 
       collection.set(results, { add: true, remove: true, merge: true });
+
       if(success) success();
 
       function defaultResults() {
@@ -254,4 +262,3 @@ module.exports = (function() {
 
 
 })();
-

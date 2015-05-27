@@ -859,56 +859,6 @@
       "version": "0.8.4",
       "resolved": "http://beta-internal:4873/express-hbs/-/express-hbs-0.8.4.tgz",
       "dependencies": {
-        "handlebars": {
-          "version": "3.0.3",
-          "resolved": "http://beta-internal:4873/handlebars/-/handlebars-3.0.3.tgz",
-          "dependencies": {
-            "optimist": {
-              "version": "0.6.1",
-              "resolved": "http://beta-internal:4873/optimist/-/optimist-0.6.1.tgz",
-              "dependencies": {
-                "minimist": {
-                  "version": "0.0.10",
-                  "resolved": "http://beta-internal:4873/minimist/-/minimist-0.0.10.tgz"
-                },
-                "wordwrap": {
-                  "version": "0.0.3",
-                  "resolved": "http://beta-internal:4873/wordwrap/-/wordwrap-0.0.3.tgz"
-                }
-              }
-            },
-            "source-map": {
-              "version": "0.1.43",
-              "resolved": "http://beta-internal:4873/source-map/-/source-map-0.1.43.tgz",
-              "dependencies": {
-                "amdefine": {
-                  "version": "0.1.0",
-                  "resolved": "http://beta-internal:4873/amdefine/-/amdefine-0.1.0.tgz"
-                }
-              }
-            },
-            "uglify-js": {
-              "version": "2.3.6",
-              "resolved": "http://beta-internal:4873/uglify-js/-/uglify-js-2.3.6.tgz",
-              "dependencies": {
-                "async": {
-                  "version": "0.2.10",
-                  "resolved": "http://beta-internal:4873/async/-/async-0.2.10.tgz"
-                },
-                "optimist": {
-                  "version": "0.3.7",
-                  "resolved": "http://beta-internal:4873/optimist/-/optimist-0.3.7.tgz",
-                  "dependencies": {
-                    "wordwrap": {
-                      "version": "0.0.3",
-                      "resolved": "http://beta-internal:4873/wordwrap/-/wordwrap-0.0.3.tgz"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
         "js-beautify": {
           "version": "1.5.4",
           "resolved": "http://beta-internal:4873/js-beautify/-/js-beautify-1.5.4.tgz",
@@ -1210,8 +1160,8 @@
       }
     },
     "gitter-markdown-processor": {
-      "version": "7.2.0",
-      "resolved": "http://beta-internal:4873/gitter-markdown-processor/-/gitter-markdown-processor-7.2.0.tgz",
+      "version": "8.0.0",
+      "resolved": "http://beta-internal:4873/gitter-markdown-processor/-/gitter-markdown-processor-8.0.0.tgz",
       "dependencies": {
         "gitter-marked": {
           "version": "0.9.0",
@@ -1222,8 +1172,8 @@
           "resolved": "http://beta-internal:4873/htmlencode/-/htmlencode-0.0.4.tgz"
         },
         "katex": {
-          "version": "0.1.0",
-          "resolved": "http://beta-internal:4873/katex/-/katex-0.1.0.tgz"
+          "version": "0.3.0",
+          "resolved": "http://beta-internal:4873/katex/-/katex-0.3.0.tgz"
         },
         "underscore": {
           "version": "1.8.3",

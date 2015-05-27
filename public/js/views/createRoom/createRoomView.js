@@ -1,9 +1,9 @@
 "use strict";
 var $ = require('jquery');
 var _ = require('underscore');
-var Marionette = require('marionette');
+var Marionette = require('backbone.marionette');
 var troupeCollections = require('collections/instances/troupes');
-var TroupeViews = require('views/base');
+var ModalView = require('views/modal');
 var apiClient = require('components/apiClient');
 var ParentSelectView = require('./parentSelectView');
 var template = require('./tmpl/createRoom.hbs');
@@ -12,7 +12,7 @@ var appEvents = require('utils/appevents');
 module.exports = (function() {
 
 
-  var View = Marionette.Layout.extend({
+  var View = Marionette.LayoutView.extend({
     template: template,
 
     ui: {
@@ -145,7 +145,7 @@ module.exports = (function() {
           }
 
 
-          promise = apiClient.post("/v1/rooms/" + ownerModel.get('id') + '/channels', payload);
+          promise = apiClient.post("/v1/rooms/" + ownerModel.get('roomId') + '/channels', payload);
       }
 
       promise
@@ -369,13 +369,13 @@ module.exports = (function() {
     }
   });
 
-  var Modal = TroupeViews.Modal.extend({
+  var Modal = ModalView.extend({
     disableAutoFocus: true,
     initialize: function(options) {
       options = options || {};
       options.title = options.title || "Create a channel";
 
-      TroupeViews.Modal.prototype.initialize.call(this, options);
+      ModalView.prototype.initialize.call(this, options);
       this.view = new View(options);
     },
     menuItems: [
@@ -392,4 +392,3 @@ module.exports = (function() {
 
 
 })();
-

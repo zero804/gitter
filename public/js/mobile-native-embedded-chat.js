@@ -12,6 +12,7 @@ var mobileDecorator = require('views/chat/decorators/mobileDecorator');
 var log = require('utils/log');
 var onready = require('./utils/onready');
 var appEvents = require('./utils/appevents');
+var FastClick = require('fastclick');
 
 require('components/eyeballs');
 require('components/ping');
@@ -22,6 +23,8 @@ require('views/widgets/timeago');
 
 
 onready(function() {
+  FastClick.attach(document.body);
+
   appEvents.on('app.version.mismatch', function() {
     try {
       if(window.applicationCache.status == 1) {
@@ -53,7 +56,6 @@ onready(function() {
   new chatInputView.ChatInputView({
     el: $('#chat-input'),
     collection: chatCollection,
-    rollers: chatCollectionView.rollers,
     compactView: true
   }).render();
 

@@ -1,6 +1,7 @@
 "use strict";
+
+var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
-var Marionette = require('marionette');
 var context = require('utils/context');
 var social = require('utils/social');
 var apiClient = require('components/apiClient');
@@ -144,11 +145,11 @@ module.exports = (function() {
 
   var View = Marionette.CompositeView.extend({
 
-    itemViewContainer: '.js-container',
-    itemView: ItemView,
+    childViewContainer: '.js-container',
+    childView: ItemView,
     emptyView: EmptyView,
 
-    itemViewOptions: function() {
+    childViewOptions: function() {
       if (!this.collection.length) {
         return {
           githubType: context.troupe().get('githubType'),
@@ -201,4 +202,3 @@ module.exports = (function() {
   return View;
 
 })();
-
