@@ -48,6 +48,11 @@ Prints the current online state for a user. Requires a username.
 
 e.g `./scripts/utils/online-state.js trevorah`
 
+### mobile-notify-user.js
+Sends a test push notification to all devices registered by user. Requires a username.
+
+e.g `./scripts/utils/mobile-notify-user.js trevorah`
+
 ### unread.js
 Lists out why a user has an unread badge. Requires a username.
 
