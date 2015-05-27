@@ -1,7 +1,7 @@
 "use strict";
 var $ = require('jquery');
 var appEvents = require('utils/appevents');
-var chatInputView = require('views/chat/chatInputView');
+var ChatInputView = require('views/chat/chatInputView');
 var itemCollections = require('collections/instances/integrated-items');
 var cocktail = require('cocktail');
 var KeyboardEventsMixin = require('views/keyboard-events-mixin');
@@ -56,7 +56,7 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
   },
 
   initInputRegion: function(optionsForRegion) {
-    return new chatInputView.ChatInputView(optionsForRegion({
+    return new ChatInputView(optionsForRegion({
       collection: itemCollections.chats
     }));
   },
