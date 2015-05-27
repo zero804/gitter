@@ -28,7 +28,23 @@ function throttle(fn, context) {
   };
 }
 
+/* Perform an operation on each animation frame for the specified duration */
+function intervalUntil(fn, ms) {
+  var until = Date.now() + ms;
+
+  function next() {
+    fn();
+
+    if(Date.now() < until) {
+      raf(next);
+    }
+  }
+
+  raf(next);
+}
+
 module.exports = {
   debounce: debounce,
-  throttle: throttle
+  throttle: throttle,
+  intervalUntil: intervalUntil
 };
