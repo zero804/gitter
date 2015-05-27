@@ -681,7 +681,13 @@ module.exports = (function() {
     getFirstUnreadItem: function() {
       var unreadItemStore = getUnreadItemStoreReq();
       return unreadItemStore.getFirstItemOfType('chat');
+    },
+
+    getFirstUnreadMention: function() {
+      var unreadItemStore = getUnreadItemStoreReq();
+      return unreadItemStore.getFirstItemOfType('mention');
     }
+
   };
 
   // Mainly useful for testing
