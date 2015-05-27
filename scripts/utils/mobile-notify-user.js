@@ -26,8 +26,7 @@ userService.findByUsername(opts.username, function(err, id) {
     roomName: 'fake-room',
     message: 'fake-room \nfake-user: youve got a test push notification!',
     sound: 'notify.caf',
-    link: '/mobile/chat#000000000000000000000000',
-    badge: 99
+    link: '/mobile/chat#000000000000000000000000'
   };
 
   return pushNotificationGateway.sendUserNotification([id], notification, function(err) {
