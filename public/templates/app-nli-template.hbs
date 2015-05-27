@@ -10,6 +10,10 @@
   {{/each}}
   <link rel="stylesheet" href='{{cdn cssFileName }}'>
   <link id="favicon" rel="shortcut icon" href='{{cdn "images/favicon5.png" }}'>
+  {{#each subresources}}
+  <link rel="subresource" href="{{ this }}">
+  {{/each}}
+
   {{#each dnsPrefetch}}
   <link rel="dns-prefetch" href="{{ this }}">
   {{/each}}
