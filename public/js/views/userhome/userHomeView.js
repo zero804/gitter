@@ -13,19 +13,6 @@ require('views/behaviors/isomorphic');
 
 module.exports = (function() {
 
-  var user = context.getUser();
-  var prettyWelcome = (parseInt(user.id.slice(-1), 16) % 2) === 0;
-
-  var hash = window.location.hash;
-  // manual override
-  if (hash.match(/pretty/)) {
-    prettyWelcome = true;
-  }
-
-  if (hash.match(/personality/)) {
-    prettyWelcome = false;
-  }
-
   return Marionette.LayoutView.extend({
     template: userHomeTemplate,
     tagName: 'div',
@@ -42,14 +29,10 @@ module.exports = (function() {
     },
 
     initOrgsRegion: function(optionsForRegion) {
-      if (prettyWelcome) return;
-
       return new OrgCollectionView(optionsForRegion({ collection: troupeCollections.orgs }));
     },
 
     initSuggestedRoomsRegion: function(optionsForRegion) {
-      if (prettyWelcome) return;
-
       var suggestedRoomCollection = new TroupeCollections.SuggestedTroupeCollection();
       suggestedRoomCollection.fetch();
 
@@ -70,8 +53,7 @@ module.exports = (function() {
 
       return {
         basePath: context.env('basePath'),
-        showUpgradeAuthLink: !isMobile() && !hasPrivateRepoScope,
-        prettyWelcome: !isMobile() && !isNative() && prettyWelcome
+        showUpgradeAuthLink: !isMobile() && !hasPrivateRepoScope
       };
     },
 
