@@ -1,7 +1,6 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-
 var apn = require('apn');
 var env = require('../utils/env');
 var Q = require('q');
@@ -22,21 +21,19 @@ var ERROR_DESCRIPTIONS = {
   255: 'None (unknown)'
 };
 
-logger.info('Starting APN');
 var connections = {
-  'APPLE': createConnection('Prod'),
+  'APPLE': createConnection('Prod', true),
   'APPLE-DEV': createConnection('Dev'),
-  'APPLE-BETA': createConnection('Beta'),
+  'APPLE-BETA': createConnection('Beta', true),
   'APPLE-BETA-DEV': createConnection('BetaDev')
 };
 
-// setup feedback listeners
-createFeedbackListener('Prod');
+createFeedbackListener('Prod', true);
 createFeedbackListener('Dev');
-createFeedbackListener('Beta');
+createFeedbackListener('Beta', true);
 createFeedbackListener('BetaDev');
 
-var sendNotificationToDevice = function(notification, badge, device) {
+function sendNotificationToDevice(notification, badge, device) {
   var appleNotification = createAppleNotification(notification, badge);
 
   var deviceToken = new apn.Device(device.appleToken);
@@ -56,66 +53,57 @@ var sendNotificationToDevice = function(notification, badge, device) {
   }, 1000);
 
   return deferred.promise;
-};
+}
 
-function createConnection(suffix) {
+function createConnection(suffix, isProduction) {
+  logger.info('ios push notification gateway (' + suffix + ') starting');
+
   var connection = new apn.Connection({
     cert: rootDirname + '/' + config.get('apn:cert' + suffix),
     key: rootDirname + '/' + config.get('apn:key' + suffix),
-    gateway: config.get('apn:gateway' + suffix),
-    enhanced: true,
-    errorCallback: function(errCode, notification) {
-      try {
-        var errorDescription = ERROR_DESCRIPTIONS[errCode];
-
-        if(errCode === 8 && notification.pushDevice) {
-          logger.error('Removing invalid device ', {
-            deviceName: notification.pushDevice.deviceName,
-            deviceId: notification.pushDevice.deviceId
-          });
-
-          notification.pushDevice.remove();
-          return;
-        }
-
-        logger.error('APN error', {
-          exception: errCode,
-          errorDescription: errorDescription,
-          notification: notification ? notification.payload : null
-        });
-      } catch (e) {
-        logger.error('Error while handling APN error:' + e, {exception: e});
-      }
-    },
+    production: isProduction,
     connectionTimeout: 60000
   });
 
   connection.on('error', function(err) {
-    logger.error('APN service (' + suffix + ') experienced an error', { error: err.message });
+    logger.error('ios push notification gateway (' + suffix + ') experienced an error', { error: err.message });
+  });
+
+  connection.on('socketError', function(err) {
+    logger.error('ios push notification gateway (' + suffix + ') experienced a socketError', { error: err.message });
+  });
+
+  connection.on('transmissionError', function(errCode) {
+    logger.error('ios push notification gateway (' + suffix + ') experienced a transmissionError', { error: ERROR_DESCRIPTIONS[errCode] });
   });
 
   return connection;
 }
 
-function createFeedbackListener(suffix) {
+function createFeedbackListener(suffix, isProduction) {
   try {
+    logger.info('ios push notification feedback listener (' + suffix + ') starting');
 
     var feedback = new apn.Feedback({
-        cert: rootDirname+'/'+config.get('apn:cert' + suffix),
-        key: rootDirname+'/'+config.get('apn:key' + suffix),
-        gateway: config.get('apn:feedback' + suffix),
-        interval: config.get('apn:feedbackInterval' + suffix),
-        batchFeedback: true
+      cert: rootDirname+'/'+config.get('apn:cert' + suffix),
+      key: rootDirname+'/'+config.get('apn:key' + suffix),
+      interval: config.get('apn:feedbackInterval'),
+      batchFeedback: true,
+      production: isProduction
     });
 
     feedback.on('feedback', function(devices) {
       if(devices.length) {
-        logger.error('Failed delivery (' + suffix + '). Need to remove the following devices', { deviceCount: devices.length });
+        logger.error('ios push notification delivery failed (' + suffix + '). Need to remove the following devices', { deviceCount: devices.length });
       }
     });
 
     feedback.on('error', function(err) {
-      logger.error('Feedback service (' + suffix + ') experienced an error', { error: err.message });
+      logger.error('ios push notification feedback (' + suffix + ') experienced an error', { error: err.message });
+    });
+
+    feedback.on('feedbackError', function(err) {
+      logger.error('ios push notification feedback (' + suffix + ') experienced a feedbackError', { error: err.message });
     });
 
   } catch(e) {
@@ -142,9 +130,6 @@ function createAppleNotification(notification, badge) {
   }
 
   if(link) {
-    /* For IOS7 push notifications */
-    note.contentAvailable = true;
-
     note.payload = { 'l': link };
   }
   return note;
