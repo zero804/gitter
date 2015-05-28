@@ -139,7 +139,9 @@ exports.install = function() {
   appEvents.onBatchUserBadgeCountUpdate(function(data) {
     var userIds = data.userIds;
     winston.info('Publishing badge count updates for ' + userIds.length + ' users.');
-    pushNotificationGateway.sendUsersBadgeUpdates(userIds);
+    pushNotificationGateway.sendUsersBadgeUpdates(userIds, function(err) {
+      if(err) winston.error('Error while calling sendUsersBadgeUpdates. Silently ignoring. ' + err, { exception: err });
+    });
   });
 
   appEvents.onEyeballSignal(function(userId, troupeId, eyeballSignal) {
