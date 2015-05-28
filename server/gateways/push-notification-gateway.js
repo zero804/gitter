@@ -5,7 +5,6 @@ var env = require('../utils/env');
 var Q = require('q');
 var logger = env.logger;
 var stats = env.stats;
-
 var pushNotificationService = require("../services/push-notification-service");
 var unreadItemService = require("../services/unread-item-service");
 var androidGateway = require('./android-notification-gateway');

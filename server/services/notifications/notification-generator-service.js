@@ -10,6 +10,7 @@ var NotificationCollector              = require('../../utils/notification-colle
 var onlineNotificationGeneratorService = require('./online-notification-generator-service');
 var pushNotificationPostbox            = require('./push-notification-postbox');
 var mongoUtils                         = require('../../utils/mongo-utils');
+var errorReporter                      = require('../../utils/env').errorReporter;
 
 function getStartTimeForItems(items) {
   if(!items.length) return null;
@@ -140,7 +141,10 @@ exports.install = function() {
     var userIds = data.userIds;
     winston.info('Publishing badge count updates for ' + userIds.length + ' users.');
     pushNotificationGateway.sendUsersBadgeUpdates(userIds, function(err) {
-      if(err) winston.error('Error while calling sendUsersBadgeUpdates. Silently ignoring. ' + err, { exception: err });
+      if(err) {
+        winston.error('Error while calling sendUsersBadgeUpdates. Silently ignoring. ' + err, { exception: err });
+        errorReporter(err, { users: userIds });
+      }
     });
   });
 

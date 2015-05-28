@@ -6,6 +6,8 @@ var env = require('../utils/env');
 var Q = require('q');
 var logger = env.logger;
 var config = env.config;
+var errorReporter = env.errorReporter;
+
 var rootDirname = __dirname+'/../..';
 
 var ERROR_DESCRIPTIONS = {
@@ -67,14 +69,18 @@ function createConnection(suffix, isProduction) {
 
   connection.on('error', function(err) {
     logger.error('ios push notification gateway (' + suffix + ') experienced an error', { error: err.message });
+    errorReporter(err, { apnEnv: suffix });
   });
 
   connection.on('socketError', function(err) {
     logger.error('ios push notification gateway (' + suffix + ') experienced a socketError', { error: err.message });
+    errorReporter(err, { apnEnv: suffix });
   });
 
   connection.on('transmissionError', function(errCode) {
-    logger.error('ios push notification gateway (' + suffix + ') experienced a transmissionError', { error: ERROR_DESCRIPTIONS[errCode] });
+    var err = new Error('apn transmission error ' + errCode +': ' + ERROR_DESCRIPTIONS[errCode]);
+    logger.error('ios push notification gateway (' + suffix + ')', { error: err.message });
+    errorReporter(err, { apnEnv: suffix });
   });
 
   return connection;
@@ -94,20 +100,23 @@ function createFeedbackListener(suffix, isProduction) {
 
     feedback.on('feedback', function(devices) {
       if(devices.length) {
-        logger.error('ios push notification delivery failed (' + suffix + '). Need to remove the following devices', { deviceCount: devices.length });
+        logger.warn('ios push notification feedback received (' + suffix + '). Need to remove the following devices sometime:', { deviceCount: devices.length });
       }
     });
 
     feedback.on('error', function(err) {
       logger.error('ios push notification feedback (' + suffix + ') experienced an error', { error: err.message });
+      errorReporter(err, { apnEnv: suffix });
     });
 
     feedback.on('feedbackError', function(err) {
       logger.error('ios push notification feedback (' + suffix + ') experienced a feedbackError', { error: err.message });
+      errorReporter(err, { apnEnv: suffix });
     });
 
   } catch(e) {
     logger.error('Unable to start feedback service (' + suffix + ')', { exception: e });
+    errorReporter(e, { apnEnv: suffix });
   }
 }
 
