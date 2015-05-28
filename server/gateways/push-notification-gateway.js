@@ -9,7 +9,7 @@ var stats = env.stats;
 var pushNotificationService = require("../services/push-notification-service");
 var unreadItemService = require("../services/unread-item-service");
 var androidGateway = require('./android-notification-gateway');
-var appleGateway = require('./apple-notification-gateway');
+var iosGateway = require('./ios-notification-gateway');
 
 function sendNotificationToDevice(notification, badge, device) {
   var notificationPromise;
@@ -20,7 +20,7 @@ function sendNotificationToDevice(notification, badge, device) {
   }
 
   if (device.deviceType.indexOf('APPLE') === 0 && device.appleToken) {
-    notificationPromise = appleGateway.sendNotificationToDevice(notification, badge, device);
+    notificationPromise = iosGateway.sendNotificationToDevice(notification, badge, device);
   } else if (device.deviceType === 'ANDROID') {
     notificationPromise = androidGateway.sendNotificationToDevice(notification, badge, device)
       .then(function(data) {
