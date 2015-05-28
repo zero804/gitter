@@ -8,8 +8,6 @@ var MobileLoginButton = require('views/mobile/mobileLoginButton');
 /* Decorators */
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var mobileDecorator = require('views/chat/decorators/mobileDecorator');
-var chatInputView = require('views/chat/chatInputView');
-
 require('jquery-hammerjs');
 
 require('views/behaviors/isomorphic');
@@ -23,17 +21,6 @@ module.exports = Marionette.LayoutView.extend({
       chat: { el: '#content-wrapper', init: 'initChatRegion' },
       login: { el: '#login-footer', init: 'initLoginRegion' }
     }
-  },
-
-  ui: {
-    // mainPage: '#mainPage',
-    // showTroupesButton: '#showTroupesButton'
-  },
-
-  events: {
-    // 'tap': 'tap',
-    // 'touch @ui.showTroupesButton': 'stopClickEvents',
-    // 'tap @ui.showTroupesButton': 'showHideTroupes'
   },
 
   initialize: function(options) {
