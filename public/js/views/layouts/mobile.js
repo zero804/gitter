@@ -8,7 +8,7 @@ var ChatContainerView = require('views/chat/chatContainerView');
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
 var TroupeMenu = require('views/menu/troupeMenu');
 var mobileDecorator = require('views/chat/decorators/mobileDecorator');
-var chatInputView = require('views/chat/chatInputView');
+var ChatInputView = require('views/chat/chatInputView');
 
 var $ = require('jquery');
 require('jquery-hammerjs');
@@ -60,7 +60,8 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initInputRegion: function(optionsForRegion) {
-    return new chatInputView.ChatInputView(optionsForRegion({
+    return new ChatInputView(optionsForRegion({
+      compactView: true,
       collection: this.options.chatCollection,
     }));
   },

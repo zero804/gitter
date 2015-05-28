@@ -19,6 +19,10 @@
     </style>
     <base target="_parent">
 
+    {{#each subresources}}
+    <link rel="subresource" href="{{ this }}">
+    {{/each}}
+    
     <link rel="stylesheet" href='{{cdn "sprites/services.css" }}'>
     <link rel="stylesheet" href='{{cdn cssFileName }}'>
     <link id="favicon" rel="shortcut icon" href='{{cdn "images/favicon-normal.ico" }}'><!-- Le fav and touch icons -->

@@ -1,7 +1,7 @@
 "use strict";
 var Mutant = require('mutantjs');
-var RAF = require('utils/raf');
 var _ = require('underscore');
+var rafUtils = require('utils/raf-utils');
 
 module.exports = (function() {
 
@@ -55,20 +55,6 @@ module.exports = (function() {
     window.addEventListener('focusout', adjustScroll, false);
   }
 
-  function continuous(cb, ms) {
-    var until = Date.now() + ms;
-
-    function next() {
-      cb();
-
-      if(Date.now() < until) {
-        RAF(next);
-      }
-    }
-
-    RAF(next);
-  }
-
   Rollers.prototype = {
     adjustScroll: function() {
       this._mutationHandlers[this._mode]();
@@ -77,7 +63,7 @@ module.exports = (function() {
     },
 
     adjustScrollContinuously: function(ms) {
-      continuous(this.adjustScroll.bind(this), ms);
+      rafUtils.intervalUntil(this.adjustScroll.bind(this), ms);
     },
 
     initTrackingMode: function() {
@@ -194,9 +180,10 @@ module.exports = (function() {
      * Scroll to the bottom and switch the mode to TRACK_BOTTOM
      */
     scrollToBottomContinuously: function(ms) {
-      continuous(this.scrollToBottom.bind(this), ms);
+      rafUtils.intervalUntil(this.scrollToBottom.bind(this), ms);
     },
 
+    /* Update the scrollTop to adjust for reflow when in STABLE mode */
     updateStableTracking: function() {
       if(!this._stableElement) return;
       var target = this._target;
@@ -206,6 +193,7 @@ module.exports = (function() {
       target.scrollTop = top;
     },
 
+    /* Track current position */
     trackLocation: function() {
       var target = this._target;
       if(this._postMutateTop === target.scrollTop) {
@@ -242,11 +230,13 @@ module.exports = (function() {
       return true;
     },
 
+    /* Get the Y coordinate of the bottom of the viewport */
     getScrollBottom: function() {
       var scrollTop = this._target.scrollTop;
       return this._target.clientHeight + scrollTop;
     },
 
+    /* Get the element at the bottom of the viewport */
     getBottomMostVisibleElement: function() {
       var scrollTop = this._target.scrollTop;
       var clientHeight = this._target.clientHeight;
@@ -263,6 +253,7 @@ module.exports = (function() {
       return;
     },
 
+    /* Get the element in the centre of the viewport */
     getMostCenteredElement: function() {
       var scrollTop = this._target.scrollTop;
       var clientHeight = this._target.clientHeight;
