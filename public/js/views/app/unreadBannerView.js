@@ -6,7 +6,7 @@ var appEvents = require('utils/appevents');
 var unreadItemsClient = require('components/unread-items-client');
 
 var TopBannerView = Marionette.ItemView.extend({
-  arrowChar: '￪',
+  octicon: 'octicon-chevron-up',
   template: template,
   hidden: true,
   ui: {
@@ -27,7 +27,7 @@ var TopBannerView = Marionette.ItemView.extend({
   },
 
   serializeData: function() {
-    return { message: this.getMessage() };
+    return { message: this.getMessage(), octicon: this.octicon };
   },
 
   getMessage: function() {
@@ -38,14 +38,14 @@ var TopBannerView = Marionette.ItemView.extend({
     }
 
     if(unreadCount === 1) {
-      return this.arrowChar + ' 1 unread message';
+      return '1 unread';
     }
 
     if(unreadCount > 99) {
-      return this.arrowChar + '99+ unread messages';
+      return ' 99+ unread';
     }
 
-    return this.arrowChar + ' ' + unreadCount + ' unread messages';
+    return ' ' + unreadCount + ' unread';
   },
 
   getVisible: function() {
@@ -101,7 +101,7 @@ var TopBannerView = Marionette.ItemView.extend({
 });
 
 var BottomBannerView = TopBannerView.extend({
-  arrowChar: '￬',
+  octicon: 'octicon-chevron-down',
   modelEvents: {
     'change:unreadBelow': 'updateDisplay',
     'change:hasUnreadBelow': 'updateVisibility'
