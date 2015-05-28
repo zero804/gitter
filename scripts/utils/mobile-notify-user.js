@@ -13,28 +13,21 @@ var opts = require("nomnom").option('username', {
   help: "username to look up e.g trevorah"
 }).parse();
 
-var fail = function(err) {
-  console.error(err.stack);
-  shutdown.shutdownGracefully();
-};
+userService.findByUsername(opts.username)
+  .then(function(user) {
+    var notification = {
+      roomId: '000000000000000000000000',
+      roomName: 'fake-room',
+      message: 'fake-room \nfake-user: youve got a test push notification!',
+      sound: 'notify.caf',
+      link: '/mobile/chat#000000000000000000000000'
+    };
 
-userService.findByUsername(opts.username, function(err, id) {
-  if (err) fail(err);
-
-  var notification = {
-    roomId: '000000000000000000000000',
-    roomName: 'fake-room',
-    message: 'fake-room \nfake-user: youve got a test push notification!',
-    sound: 'notify.caf',
-    link: '/mobile/chat#000000000000000000000000'
-  };
-
-  return pushNotificationGateway.sendUserNotification([id], notification, function(err) {
-    if (err) fail(err);
-
-    console.log('waiting for queue to finish...');
-    setTimeout(function() {
-      shutdown.shutdownGracefully();
-    }, 5000);
+    return pushNotificationGateway.sendUserNotification(user.id, notification);
+  })
+  .fail(function(err) {
+    console.error(err.stack);
+  })
+  .fin(function() {
+    shutdown.shutdownGracefully();
   });
-});

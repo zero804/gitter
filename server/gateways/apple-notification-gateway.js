@@ -4,6 +4,7 @@
 
 var apn = require('apn');
 var env = require('../utils/env');
+var Q = require('q');
 var logger = env.logger;
 var config = env.config;
 var rootDirname = __dirname+'/../..';
@@ -35,18 +36,26 @@ createFeedbackListener('Dev');
 createFeedbackListener('Beta');
 createFeedbackListener('BetaDev');
 
-var sendNotificationToDevice = function(notification, badge, device, callback) {
+var sendNotificationToDevice = function(notification, badge, device) {
   var appleNotification = createAppleNotification(notification, badge);
 
   var deviceToken = new apn.Device(device.appleToken);
 
   var connection = connections[device.deviceType];
 
-  if (!connection) return callback(new Error('unknown device type: ' + device.deviceType));
+  if (!connection) return Q.reject(new Error('unknown device type: ' + device.deviceType));
 
   connection.pushNotification(appleNotification, deviceToken);
 
-  return callback();
+  var deferred = Q.defer();
+  // timout needed to ensure that the push notification packet is sent.
+  // if we dont, SIGINT will kill notifications before they have left.
+  // until apn uses proper callbacks, we have to guess that it takes a second.
+  setTimeout(function() {
+    deferred.resolve();
+  }, 1000);
+
+  return deferred.promise;
 };
 
 function createConnection(suffix) {
@@ -101,16 +110,16 @@ function createFeedbackListener(suffix) {
 
     feedback.on('feedback', function(devices) {
       if(devices.length) {
-        logger.error('Failed delivery. Need to remove the following devices', { deviceCount: devices.length });
+        logger.error('Failed delivery (' + suffix + '). Need to remove the following devices', { deviceCount: devices.length });
       }
     });
 
     feedback.on('error', function(err) {
-      logger.error('Feedback service experienced an error', { error: err.message });
+      logger.error('Feedback service (' + suffix + ') experienced an error', { error: err.message });
     });
 
   } catch(e) {
-    logger.error('Unable to start feedback service ', { exception: e });
+    logger.error('Unable to start feedback service (' + suffix + ')', { exception: e });
   }
 }
 
