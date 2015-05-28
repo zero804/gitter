@@ -15,7 +15,10 @@ var CollectionWrapperViewTemplate = require('./tmpl/collection-wrapper-view.hbs'
 var ProfileView = require('./profileView');
 var OrgCollectionView = require('./orgCollectionView');
 var dataSet = require('utils/dataset-shim');
+var toggle = require('utils/toggle');
+
 require('views/behaviors/isomorphic');
+require('views/behaviors/tooltip');
 
 var apiClient = require('components/apiClient');
 
@@ -34,23 +37,34 @@ module.exports = (function () {
   // wraps a view to give us more control of when to display it or not
   var CollectionWrapperView = Marionette.LayoutView.extend({
 
+    behaviors: function(){
+      var result ={
+        Isomorphic: {
+          list: {
+            el: "#list",
+            init: function(optionsForRegion) {
+              return new this.options.childView(optionsForRegion({ collection: this.collection }));
+            }
+          }
+        }
+      };
+
+      if (this.options.handleHide) {
+        /* Tack a tooltip on too */
+        result.Tooltip = {
+            '.js-hide': { title: 'Hide forever' }
+        };
+      }
+
+      return result;
+    },
+
     ui: {
       hide: '.js-hide',
     },
 
     events: {
-      'click @ui.hide': 'handleHide'
-    },
-
-    behaviors: {
-      Isomorphic: {
-        list: {
-          el: "#list",
-          init: function(optionsForRegion) {
-            return new this.options.childView(optionsForRegion({ collection: this.collection }));
-          }
-        }
-      }
+      'click @ui.hide': 'onHideClicked'
     },
 
     template: CollectionWrapperViewTemplate,
@@ -59,26 +73,25 @@ module.exports = (function () {
       'sync add reset remove': 'display'
     },
 
-    initialize: function (options) {
-      this.handleHide = options.handleHide;
-    },
-
     serializeData: function () {
+      var options = this.options;
       return {
-        canHide: typeof this.handleHide === 'function',
-        header: this.options.header
+        canHide: typeof options.handleHide === 'function',
+        header: options.header
       };
     },
 
-    onRender: function () {
-      if (this.handleHide) {
-        var hideIcon = this.ui.hide;
-        hideIcon.tooltip({ container: 'body', title: 'Hide forever' });
-      }
+    onRender: function() {
+      this.display();
+    },
+
+    onHideClicked: function() {
+      if (this.options.handleHide) this.options.handleHide();
     },
 
     display: function () {
-      this.$el.toggle(this.collection.length > 0);
+      /* Only display when there are items */
+      toggle(this.el, !!this.collection.length);
     }
   });
 
