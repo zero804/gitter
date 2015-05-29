@@ -143,6 +143,15 @@ module.exports = (function() {
       this.trigger('unreadItemRemoved', itemId);
     },
 
+    _mentionRemoved: function(itemId) {
+      if (arguments.length !== 1) throw new Error(); // TODO: remove
+
+      if (!this._items.hasOwnProperty(itemId)) return; // Does not exist
+      this._items[itemId] = false;
+      this.notifyCountLimited();
+      this.trigger('change:status', itemId, false);
+    },
+
     _markItemRead: function(itemId) {
       if (arguments.length !== 1) throw new Error(); // TODO: remove
 
@@ -171,14 +180,33 @@ module.exports = (function() {
     },
 
     // via Realtime
-    _unreadItemsRemoved: function(items) {
+    _unreadItemsRemoved: function(incoming) {
       if (arguments.length !== 1) throw new Error(); // TODO: remove
 
-      // TODO: XXX handle mention changes
+      function hashArray(array) {
+        if (!array) return {};
 
-      _iteratePreload(items, function(itemId) {
-        this._unreadItemRemoved(itemId);
-      }, this);
+        return array.reduce(function(memo, value) {
+          memo[value] = true;
+          return memo;
+        }, {});
+      }
+
+      var chats = hashArray(incoming.chat);
+      var mentions = hashArray(incoming.mention);
+      var all = _.extend({}, chats, mentions);
+      var self = this;
+      Object.keys(all).forEach(function(itemId) {
+        var removeChat = chats[itemId];
+
+        if (removeChat) {
+          self._unreadItemRemoved(itemId);
+        } else {
+          // remove mention from chat
+          self._mentionRemoved(itemId);
+        }
+      });
+
     },
 
     notifyCount: function() {
