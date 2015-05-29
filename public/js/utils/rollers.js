@@ -37,7 +37,7 @@ module.exports = (function() {
     this.mutant = new Mutant(target, adjustScroll, {
       transitions: true,
       observers: { attributes: false, characterData: false },
-      ignoreTransitions: ['opacity'], // Opacity will never trigger a reflow...
+      ignoreTransitions: ['opacity', 'background-color'], // Opacity will never trigger a reflow...
       //ignoreFilter: function(mutationRecords) {
       //  var filter = mutationRecords.reduce(function(accum, r) {
       //    var v = r.type === 'attributes' && r.attributeName === 'class' && r.target.id === 'chat-container';
