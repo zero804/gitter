@@ -3,7 +3,6 @@
 var Marionette = require('backbone.marionette');
 var modalRegion = require('components/modal-region');
 var ChatContainerView = require('views/chat/chatContainerView');
-var unreadItemsClient = require('components/unread-items-client');
 
 /* Decorators */
 var emojiDecorator = require('views/chat/decorators/emojiDecorator');
@@ -19,6 +18,7 @@ require('views/behaviors/isomorphic');
 module.exports = Marionette.LayoutView.extend({
   template: false,
   el: 'body',
+  dialogRegion: modalRegion,
   behaviors: {
     Isomorphic: {
       chat: { el: '#content-wrapper', init: 'initChatRegion' },
