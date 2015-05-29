@@ -86,7 +86,7 @@ module.exports = (function() {
   // * newcountvalue: (length)
   // * unreadItemRemoved: (itemId)
   // * change:status: (itemId, mention)
-  // * itemMarkedRead: (itemId)
+  // * itemMarkedRead: (itemId, mention, lurkMode)
   // * add (itemId, mention)
   // -----------------------------------------------------
   var UnreadItemStore = function() {
@@ -155,19 +155,25 @@ module.exports = (function() {
     _markItemRead: function(itemId) {
       if (arguments.length !== 1) throw new Error(); // TODO: remove
 
-      if (!this._items.hasOwnProperty(itemId)) return; // Does not exist
+      var inStore = this._items.hasOwnProperty(itemId);
+      var lurkMode = this._lurkMode;
+
+      if (!inStore) {
+        /* Special case for lurk mode, still send the itemMarkedAsRead event
+         * so that the model gets updated (even though its not actually unread)
+         */
+        if (lurkMode) {
+          this.trigger('itemMarkedRead', itemId, false, true);
+        }
+        return;
+      }
+
       var mentioned = this._items[itemId];
 
       delete this._items[itemId];
       this.length--;
       this.notifyCountLimited();
-
-      if(this._lurkMode && !mentioned) {
-        // Lurk mode, but no mention, don't mark as read
-        return;
-      }
-
-      this.trigger('itemMarkedRead', itemId);
+      this.trigger('itemMarkedRead', itemId, mentioned, lurkMode);
     },
 
     // via Realtime
@@ -222,15 +228,7 @@ module.exports = (function() {
       if (arguments.length !== 0) throw new Error(); // TODO: remove
 
       this._lurkMode = true;
-
-      Object.keys(this._items).forEach(function(itemId) {
-        // Notify that all are read
-        this.trigger('itemMarkedRead', itemId);
-      }, this);
-
-      this._items = {};
-      this.length = 0;
-      this.notifyCountLimited();
+      this.markAllReadNotification();
     },
 
     disableLurkMode: function() {
@@ -244,7 +242,8 @@ module.exports = (function() {
 
       Object.keys(this._items).forEach(function(itemId) {
         // Notify that all are read
-        this.trigger('itemMarkedRead', itemId);
+        var mention = this._items[itemId];
+        this.trigger('itemMarkedRead', itemId, mention, this._lurkMode);
       }, this);
 
       this._items = {};
@@ -290,7 +289,10 @@ module.exports = (function() {
   };
 
   ReadItemSender.prototype = {
-    _onItemMarkedRead: function(itemId) {
+    _onItemMarkedRead: function(itemId, mention, lurkMode) {
+      // Don't sent unread items back to the server in lurk mode unless its a mention
+      if (lurkMode && !mention) return;
+
       // All items marked as read are send back to the server
       // as chats
       this._buffer[itemId] = true;
@@ -556,15 +558,15 @@ module.exports = (function() {
     // * newcountvalue: (length)
     // * unreadItemRemoved: (itemId)
     // * change:status: (itemId, mention)
-    // * itemMarkedRead: (itemId)
+    // * itemMarkedRead: (itemId, mention, lurkMode)
     // * add (itemId, mention)
      */
     store.on('unreadItemRemoved', function(itemId) {
       collection.patch(itemId, { unread: false, mentioned: false });
     });
 
-    store.on('itemMarkedRead', function(itemId) {
-      collection.patch(itemId, { unread: false, mentioned: false });
+    store.on('itemMarkedRead', function(itemId, mention) {
+      collection.patch(itemId, { unread: false, mentioned: mention });
     });
 
     store.on('change:status', function(itemId, mention) {

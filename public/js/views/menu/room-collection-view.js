@@ -61,7 +61,7 @@ module.exports = (function() {
     className: 'room-list-item',
     template: roomListItemTemplate,
     modelEvents: {
-      'change:unreadItems change:lurk change:activity change:mentions change:name': 'render'
+      'change:unreadItems change:lurk change:activity change:mentions change:name change:currentRoom': 'render',
     },
     events: {
       'click': 'clicked',
@@ -78,29 +78,6 @@ module.exports = (function() {
       popover.show();
       Popover.singleton(this, popover);
     },
-    initialize: function() {
-      this.updateCurrentRoom();
-
-      this.listenTo(appEvents, 'navigation', function(url) {
-        // strip off query params etc
-        var parser = document.createElement('a');
-        parser.href = url;
-
-        this.updateCurrentRoom(parser.pathname);
-      });
-    },
-
-    updateCurrentRoom: function (newUrl) {
-      var url = newUrl || window.location.pathname;
-      var isCurrentRoom = this.model.get('url') === url;
-
-      if(this.isCurrentRoom !== isCurrentRoom) {
-        // cannot be stored on the model as it will get wiped by faye
-        this.isCurrentRoom = isCurrentRoom;
-        this.render();
-      }
-    },
-
     serializeData: function() {
       var data = this.model.toJSON();
       data.name = roomNameTrimmer(data.name, MAX_NAME_LENGTH);
@@ -109,7 +86,7 @@ module.exports = (function() {
     },
     onRender: function() {
       var self = this;
-      this.$el.toggleClass('room-list-item--current-room', !!this.isCurrentRoom);
+      this.$el.toggleClass('room-list-item--current-room', !!this.model.get('currentRoom'));
 
       var m = self.model;
       dataset.set(self.el, 'id', m.id);
@@ -168,7 +145,6 @@ module.exports = (function() {
         // Not lurking
         e.removeClass('chatting chatting-now');
       }
-
     },
     clearSearch: function() {
       $('#list-search-input').val('');

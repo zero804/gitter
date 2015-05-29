@@ -7,6 +7,8 @@ var TroupeSettingsView = require('views/app/troupeSettingsView');
 var onready = require('./utils/onready');
 var MobileLayout = require('views/layouts/mobile');
 var FastClick = require('fastclick');
+var RoomCollectionTracker = require('components/room-collection-tracker');
+var troupeCollections = require('collections/instances/troupes');
 
 // Preload widgets
 require('views/widgets/avatar');
@@ -22,6 +24,8 @@ onready(function() {
     window.location.href = url;
   });
 
+  new RoomCollectionTracker(troupeCollections.troupes);
+
   var chatCollection = new chatModels.ChatCollection(null, { listen: true });
   var appView = new MobileLayout({ template: false, el: 'body', chatCollection: chatCollection });
   appView.render();
@@ -36,11 +40,11 @@ onready(function() {
     },
 
     hideModal: function() {
-      appView.modalRegion.destroy();
+      appView.dialogRegion.destroy();
     },
 
     notifications: function() {
-      appView.modalRegion.show(new TroupeSettingsView({}));
+      appView.dialogRegion.show(new TroupeSettingsView({}));
     }
   });
 
