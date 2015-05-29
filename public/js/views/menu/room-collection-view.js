@@ -10,6 +10,9 @@ var roomListItemTemplate = require('./tmpl/room-list-item.hbs');
 var popoverTemplate = require('./tmpl/leave-buttons.hbs');
 var appEvents = require('utils/appevents');
 var dataset = require('utils/dataset-shim');
+var toggle = require('utils/toggle');
+var toggleClass = require('utils/toggle-class');
+
 require('jquery-sortable');
 
 
@@ -61,11 +64,14 @@ module.exports = (function() {
     className: 'room-list-item',
     template: roomListItemTemplate,
     modelEvents: {
-      'change:unreadItems change:lurk change:activity change:mentions change:name change:currentRoom': 'render',
+      'change:unreadItems change:lurk change:activity change:mentions change:name change:currentRoom': 'updateRender',
     },
     events: {
       'click': 'clicked',
       'click .js-close-button': 'showPopover'
+    },
+    ui: {
+      unreadBadge: '#unread-badge'
     },
     showPopover: function(e) {
       e.stopPropagation(); // no navigation
@@ -78,78 +84,110 @@ module.exports = (function() {
       popover.show();
       Popover.singleton(this, popover);
     },
+
     serializeData: function() {
       var data = this.model.toJSON();
       data.name = roomNameTrimmer(data.name, MAX_NAME_LENGTH);
       data.iconClass = resolveIconClass(this.model);
       return data;
     },
+
     onRender: function() {
-      var self = this;
-      this.$el.toggleClass('room-list-item--current-room', !!this.model.get('currentRoom'));
+      this.updateRender(null); // Null means its the initial render
+    },
 
-      var m = self.model;
-      dataset.set(self.el, 'id', m.id);
-      var e = self.$el;
+    updateRender: function(model) {
+      var changed = model && model.changed;
+      var attributes = model && model.attributes || this.model.attributes;
 
-      var first = !self.initialRender;
-      self.initialRender = true;
-
-      if(!!first && !m.changed) return;
-
-      var unreadBadge = e.find('.js-unread-badge');
-      var lurk = self.model.get('lurk');
-      var mentions = self.model.get('mentions');
-      var ui = self.model.get('unreadItems');
-      var activity = self.model.get('activity');
-
-      function getBadgeText() {
-        if(mentions) return "@";
-
-        if(lurk) return;
-
-        if(ui) {
-          if(ui > MAX_UNREAD) return "99+";
-          return ui;
-        }
+      function hasChanged(property) {
+        return changed && changed.hasOwnProperty(property);
       }
 
+      var el = this.el;
+      var m = this.model;
 
-      var text = getBadgeText() || "";
-      unreadBadge.text(text);
-      unreadBadge.toggleClass('shown', !!text);
-      unreadBadge.toggleClass('mention', !!mentions);
+      if (!changed || hasChanged('currentRoom')) {
+        toggleClass(el, 'room-list-item--current-room', attributes.currentRoom);
+      }
 
-      if(lurk && !mentions) {
-        e.toggleClass('chatting', !!activity);
+      if (!changed) { // Only on first render
+        dataset.set(el, 'id', m.id);
+      }
 
-        if(activity && 'activity' in m.changed) {
-          e.addClass('chatting-now');
+      if (changed && hasChanged('name')) {
+        this.ui.roomName.text(roomNameTrimmer(attributes.name, MAX_NAME_LENGTH));
+      }
+
+      if (!changed || (hasChanged('mentions') || hasChanged('activity') || hasChanged('unreadItems') || hasChanged('lurk'))) {
+        var switches = this.getActivitySwitches(attributes, changed);
+
+        var unreadBadgeEl = this.ui.unreadBadge[0];
+        unreadBadgeEl.textContent = switches.badgeText;
+        toggle(unreadBadgeEl, switches.badge);
+        toggleClass(unreadBadgeEl, 'mention', switches.mention);
+        toggleClass(el, 'chatting', switches.chatting);
+        toggleClass(el, 'chatting-now', switches.chattingNow);
+
+        if (switches.chattingNow) {
+          clearTimeout(this.timeout);
+          this.timeout = setTimeout(this.stopActivityPulse.bind(this), 1600);
         }
 
-        if(self.timeout) {
-          clearTimeout(self.timeout);
-        }
+      }
 
-        self.timeout = setTimeout(function() {
-          delete self.timeout;
-          if(self.model.id === context.getTroupeId()) {
-            e.removeClass('chatting chatting-now');
-          } else {
-            e.removeClass('chatting-now');
-          }
+    },
 
-        }, 1600);
+    stopActivityPulse: function() {
+      delete this.timeout;
+      var el = this.el;
 
+      if(this.model.id === context.getTroupeId()) {
+        toggleClass(el, 'chatting', false);
+        toggleClass(el, 'chatting-now', false);
       } else {
-        // Not lurking
-        e.removeClass('chatting chatting-now');
+        toggleClass(el, 'chatting-now', false);
       }
     },
-    clearSearch: function() {
-      $('#list-search-input').val('');
-      $('#list-search').hide();
-      $('#list-mega').show();
+
+    /**
+     * Choose the first rule which applies
+     * 1. `mentions > 0`: badge=visible mentionsClass=1 chatting=0
+     * 2. `unreadItems > 0`: badge=visible mentionsClass=0 chatting=0
+     * 3. `lurk`:
+     *     1: `activity+changed`: badge=hidden mentionsClass=0 chatting=1 + chatting now
+     *     2: `activity`: badge=hidden mentionsClass=0 chatting=1
+     * 4. Otherwise: badge=hidden mentionsClass=0 chatting=0 chattingNow=0
+     */
+    getActivitySwitches: function(attributes, changed) {
+      var result = {
+        badge: false,
+        mention: false,
+        badgeText: "",
+        chatting: false,
+        chattingNow: false
+      };
+
+      if (attributes.mentions) {
+        result.badge = true;
+        result.mention = true;
+        result.badgeText = "@";
+        return result;
+      }
+
+      var unreadItems = attributes.unreadItems;
+      if (unreadItems) {
+        result.badge = true;
+        result.badgeText = unreadItems > MAX_UNREAD ? "99+" : unreadItems;
+        return result;
+      }
+
+      if (attributes.lurk && attributes.activity) {
+        result.chatting = true;
+        result.chattingNow = changed && changed.hasOwnProperty('activity');
+      }
+
+      return result;
     },
     clicked: function() {
       var model = this.model;
