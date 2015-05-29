@@ -412,10 +412,11 @@ function createNewItemsForParsedChat(troupeId, chatId, parsed) {
         if (mentionsHash[userId]) {
           updateMessage.mention = [chatId];
         }
+
+        /* We need to do this for all users as it's used for mobile notifications */
         appEvents.newUnreadItem(userId, troupeId, updateMessage, isOnline);
 
         // Only send out troupeUnreadCountsChange events for online users
-        // TODO: XXX: consider not sending the newUnreadItem if the user is not online
         if (!isOnline) return;
 
         if(unreadCount >= 0 || mentionCount >= 0) {
@@ -466,12 +467,11 @@ function generateMentionDeltaSet(parsedChat, originalMentions) {
     })
     .filter(function(m) {
       return !!m;
-    })
-    .map(toString);    // Make sure that everything is a string, because underscore
+    });
 
 
   /* Arg. Underscore. We need lazy evaluation! */
-  originalMentionUserIds = _.flatten(originalMentionUserIds);
+  originalMentionUserIds = _.flatten(originalMentionUserIds).map(toString);
   originalMentionUserIds = _.uniq(originalMentionUserIds);
 
   var mentionUserIds = parsedChat.mentionUserIds.map(toString);
@@ -498,6 +498,7 @@ function addUnreadItemsForUpdatedChat(troupeId, chatId, addNotifyUserIds, addMen
       return [results, presenceService.categorizeUsersByOnlineStatus(addNotifyUserIds)];
     })
     .spread(function(results, online) {
+      var mentionsHash = collections.hashArray(addMentionUserIds);
 
       // Firstly, notify all the notifyNewRoomUserIds with room creation messages
       addMentionsInNewRoom.forEach(function(userId) {
@@ -511,7 +512,13 @@ function addUnreadItemsForUpdatedChat(troupeId, chatId, addNotifyUserIds, addMen
         var isOnline = online[userId];
 
         // Not lurking, send them the full update
-        appEvents.newUnreadItem(userId, troupeId, { chat: [chatId] }, isOnline);
+        var updateMessage = { chat: [chatId] };
+        if (mentionsHash[userId]) {
+          updateMessage.mention = [chatId];
+        }
+
+        // Not lurking, send them the full update
+        appEvents.newUnreadItem(userId, troupeId, updateMessage, isOnline);
 
         if (!isOnline) return; // No need to send out updates to non-online users
 
@@ -534,6 +541,10 @@ function removeMentionsForUpdatedChat(troupeId, chatId, removeUserIds) {
   return engine.removeItem(troupeId, chatId, removeUserIds)
     .then(function(results) {
       results.forEach(function(result) {
+        // Remove the mention for the user
+        // TODO: only for only users
+        appEvents.unreadItemsRemoved(result.userId, troupeId, { mention: [chatId] });
+
         if(result.unreadCount >= 0 || result.mentionCount >= 0) {
           // Notify the user
           appEvents.troupeUnreadCountsChange({
