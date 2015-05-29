@@ -5,6 +5,8 @@
 var userService = require('../../server/services/user-service');
 var troupeService = require('../../server/services/troupe-service');
 var unreadService = require('../../server/services/unread-item-service');
+var restful = require("../../server/services/restful");
+
 var shutdown = require('shutdown');
 
 var opts = require("nomnom").option('username', {
@@ -27,10 +29,14 @@ function getBadgeTroupeNames(userId) {
     });
 }
 
-function getUnreadTroupeNames(userId) {
-  return unreadService.testOnly.getTroupeIdsWithUnreadChats(userId)
-    .then(function(troupeIds) {
-      return getNamesForTroupeIds(troupeIds, userId);
+function getLeftMenuUnreadTroupeNames(userId) {
+  return restful.serializeTroupesForUser(userId)
+    .then(function(rooms) {
+      return rooms.filter(function(room) {
+        return room.unreadItems || room.mentions;
+      }).map(function(room) {
+        return room.name;
+      });
     });
 }
 
@@ -48,12 +54,12 @@ userService.findByUsername(opts.username)
     return user._id;
   })
   .then(function(userId) {
-    return [getBadgeCount(userId), getBadgeTroupeNames(userId), getUnreadTroupeNames(userId)];
+    return [getBadgeCount(userId), getBadgeTroupeNames(userId), getLeftMenuUnreadTroupeNames(userId)];
   })
-  .spread(function(badgeNumber, badgeTroupeNames, unreadTroupeNames) {
+  .spread(function(badgeNumber, badgeTroupeNames, leftMenuUnreadTroupeNames) {
     console.log('Unread badge number:', badgeNumber);
     console.log('Rooms causing badge number:', badgeTroupeNames);
-    console.log('Rooms with unread messages:', unreadTroupeNames);
+    console.log('Left menu unread rooms:', leftMenuUnreadTroupeNames);
   })
   .delay(1000)
   .fail(function(err) {
