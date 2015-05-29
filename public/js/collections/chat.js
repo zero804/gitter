@@ -14,51 +14,34 @@ var SyncMixin = require('./sync-mixin');
 
 var userId = context.getUserId();
 
-function mentionsUser(message) {
-  if(!userId) return false;
-
-  var m = message.mentions;
-  if (!m) return false;
-
-  for (var i = 0; i < m.length; i++) {
-    var mention = m[i];
-    if(!mention.group && mention.userId === userId) return true;
-    if(mention.group && mention.userIds && mention.userIds.indexOf(userId) >= 0) return true;
-  }
-
-  return false;
-}
-
 var ChatModel = Backbone.Model.extend({
   idAttribute: "id",
   initialize: function() {
-    var t = this;
 
-    function setStatus(s) {
-      t.syncStatus = s;
-      t.trigger('syncStatusChange', s);
-    }
-
-    this.syncStatus = null;
-
-    this.listenTo(this, 'sync', function() {
-      setStatus('synced');
-    });
-
-    this.listenTo(this, 'request', function() {
-      setStatus('syncing');
-    });
-
-    this.listenTo(this, 'error', function() {
-      setStatus('syncerror');
-    });
+    this.listenTo(this, 'sync', this.triggerSynced);
+    this.listenTo(this, 'request', this.triggerSyncing);
+    this.listenTo(this, 'error', this.triggerSyncError);
 
     /* When the chat is removed from the collection, stop listening to events */
     this.listenTo(this, 'remove', function() {
-      // this.stopListening(this);
+      this.stopListening(this);
     });
 
   },
+
+  triggerSynced: function() {
+    this.trigger('syncStatusChange', 'synced');
+  },
+
+  /* Gunter: Help! I am syncing! William: What are you syncing about? */
+  triggerSyncing: function() {
+    this.trigger('syncStatusChange', 'syncing');
+  },
+
+  triggerSyncError: function() {
+    this.trigger('syncStatusChange', 'syncerror');
+  },
+
   parse: function (message) {
     if (message.sent) {
       message.sent = moment(message.sent, moment.defaultFormat);
@@ -73,12 +56,6 @@ var ChatModel = Backbone.Model.extend({
       if (message.fromUser.id === userId) {
         message.unread = false;
       }
-    }
-
-    if (mentionsUser(message)) {
-      message.mentioned = true;
-    } else {
-      message.mentioned = false;
     }
 
     return message;
