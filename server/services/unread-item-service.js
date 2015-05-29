@@ -13,6 +13,7 @@ var presenceService  = require("./presence-service");
 var _                = require("underscore");
 var mongoUtils       = require('../utils/mongo-utils');
 var RedisBatcher     = require('../utils/redis-batcher').RedisBatcher;
+var collections      = require('../utils/collections');
 var Q                = require('q');
 var badgeBatcher     = new RedisBatcher('badge', 300);
 
@@ -393,6 +394,7 @@ function createNewItemsForParsedChat(troupeId, chatId, parsed) {
       return [results, presenceService.categorizeUsersByOnlineStatus(allUserIds)];
     })
     .spread(function(results, online) {
+      var mentionsHash = collections.hashArray(parsed.mentionUserIds);
 
       // Firstly, notify all the notifyNewRoomUserIds with room creation messages
       parsed.notifyNewRoomUserIds.forEach(function(userId) {
@@ -406,9 +408,14 @@ function createNewItemsForParsedChat(troupeId, chatId, parsed) {
         var mentionCount = results[userId] && results[userId].mentionCount;
 
         // Not lurking, send them the full update
-        appEvents.newUnreadItem(userId, troupeId, { chat: [chatId] }, isOnline);
+        var updateMessage = { chat: [chatId] };
+        if (mentionsHash[userId]) {
+          updateMessage.mention = [chatId];
+        }
+        appEvents.newUnreadItem(userId, troupeId, updateMessage, isOnline);
 
         // Only send out troupeUnreadCountsChange events for online users
+        // TODO: XXX: consider not sending the newUnreadItem if the user is not online
         if (!isOnline) return;
 
         if(unreadCount >= 0 || mentionCount >= 0) {
@@ -473,7 +480,7 @@ function generateMentionDeltaSet(parsedChat, originalMentions) {
   var addMentions = _.without.apply(null, [mentionUserIds].concat(originalMentionUserIds));
   var removeMentions = _.without.apply(null, [originalMentionUserIds].concat(mentionUserIds));
 
-  // List of users who should get unread items, who were previously mentioned by no longer are
+  // List of users who should get unread items, who were previously mentioned but no longer are
   var forNotifyWithRemoveMentions = _.intersection(parsedChat.notifyUserIds.map(toString), removeMentions);
 
   // Everyone who was added via a mention, plus everyone who was no longer mentioned but is not lurking

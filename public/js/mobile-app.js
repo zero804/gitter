@@ -2,7 +2,6 @@
 var $ = require('jquery');
 var appEvents = require('utils/appevents');
 var chatModels = require('collections/chat');
-var unreadItemsClient = require('components/unread-items-client');
 var Backbone = require('backbone');
 var TroupeSettingsView = require('views/app/troupeSettingsView');
 var onready = require('./utils/onready');
@@ -26,9 +25,6 @@ onready(function() {
   var chatCollection = new chatModels.ChatCollection(null, { listen: true });
   var appView = new MobileLayout({ template: false, el: 'body', chatCollection: chatCollection });
   appView.render();
-
-  unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
-
 
   var Router = Backbone.Router.extend({
     routes: {
