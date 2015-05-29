@@ -63,3 +63,4 @@ numbers.csv
 config/config.beta.user-overrides.json
 config/config.prod.user-overrides.json
 newrelic_agent.log
+scroll-debug.patch

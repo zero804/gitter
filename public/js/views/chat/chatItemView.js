@@ -70,9 +70,7 @@ module.exports = (function() {
         '.js-chat-item-edit': { titleFn: 'getEditTooltip' },
         '.js-chat-item-collapse': { titleFn: 'getCollapseTooltip' }
       },
-      UnreadItems: {
-        unreadItemType: 'chat',
-      },
+      UnreadItems: { },
       Highlight: {}
     },
 
@@ -213,15 +211,12 @@ module.exports = (function() {
     },
 
     updateRender: function(changes) {
+      /* NB: `unread` updates occur in the behaviour */
       var model = this.model;
       var $el = this.$el;
 
       if (!changes || 'html' in changes || 'text' in changes) {
         this.renderText();
-      }
-
-      if (!changes || 'unread' in changes) {
-        $el.toggleClass('unread', !!model.get('unread'));
       }
 
       if(!changes || 'fromUser' in changes) {
