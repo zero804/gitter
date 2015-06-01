@@ -1269,3 +1269,66 @@ function renameUri(oldUri, newUri, instigatingUser) {
     });
 }
 exports.renameUri = renameUri;
+
+/**
+ * Rename a REPO room to a new URI
+ */
+function renameRepo(oldUri, newUri) {
+  if (oldUri === newUri) return Q.resolve();
+
+  return troupeService.findByUri(oldUri)
+    .then(function(room) {
+      if (!room) return;
+      if (room.githubType !== 'REPO') throw new StatusError(400, 'Only repo rooms can be renamed');
+      if (room.uri === newUri) return; // Case change, and it's already happened
+
+      var originalLcUri = room.lcUri;
+      var lcUri = newUri.toLowerCase();
+      var lcOwner = lcUri.split('/')[0];
+
+      room.uri = newUri;
+      room.lcUri = lcUri;
+      room.lcOwner = lcOwner;
+
+      /* Only add if it's not a case change */
+      if (originalLcUri !== lcUri) {
+        room.renamedLcUris.addToSet(originalLcUri);
+      }
+
+      return room.saveQ()
+        .then(function() {
+          return uriLookupService.removeBadUri(oldUri);
+        })
+        .then(function() {
+          return uriLookupService.reserveUriForTroupeId(room.id, lcUri);
+        })
+        .then(function() {
+          return persistence.Troupe.findQ({ parentId: room._id });
+        })
+        .then(function(channels) {
+          return Q.all(channels.map(function(channel) {
+            var originalLcUri = channel.lcUri;
+            var newChannelUri = newUri + '/' + channel.uri.split('/')[2];
+            var newChannelLcUri = newChannelUri.toLowerCase();
+
+            channel.lcUri = newChannelLcUri;
+            channel.uri = newChannelUri;
+            channel.lcOwner = lcOwner;
+
+            return channel.saveQ()
+              .then(function() {
+                return uriLookupService.removeBadUri(originalLcUri);
+              })
+              .then(function() {
+                return uriLookupService.reserveUriForTroupeId(channel.id, newChannelLcUri);
+              });
+
+
+          }));
+
+        });
+
+      });
+
+}
+exports.renameRepo = renameRepo;

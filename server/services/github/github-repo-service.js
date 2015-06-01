@@ -3,6 +3,8 @@
 var wrap = require('./github-cache-wrapper');
 var tentacles = require('./tentacles-client');
 var userTokenSelector = require('./user-token-selector').full;
+var githubMediaTypes = require('./github-media-types');
+var appEvents = require('../../app-events');
 
 function GitHubRepoService(user) {
   this.user = user;
@@ -15,7 +17,14 @@ function GitHubRepoService(user) {
  * @return the promise of information about a repo
  */
  GitHubRepoService.prototype.getRepo = function(repo) {
-  return tentacles.repo.get(repo, { accessToken: this.accessToken });
+  return tentacles.repo.get(repo, { accessToken: this.accessToken })
+    .then(function(result) {
+      if (!result) return result;
+      if (result.full_name && result.full_name !== repo) {
+        appEvents.repoRenameDetected(repo,result.full_name);
+      }
+      return result;
+    });
 };
 
 /**
@@ -71,12 +80,16 @@ GitHubRepoService.prototype.getWatchedRepos = function() {
 };
 
 GitHubRepoService.prototype.getAllReposForAuthUser = function() {
-  return tentacles.repo.listForAuthUser({ accessToken: this.accessToken });
+  return tentacles.repo.listForAuthUser({ accessToken: this.accessToken, headers: { Accept: githubMediaTypes.MOONDRAGON } });
 };
 
 /** TODO: deprecated */
 GitHubRepoService.prototype.getReposForUser = function(username, options) {
-  return tentacles.repo.listForUser(username, { firstPageOnly: options && options.firstPage,  accessToken: this.accessToken });
+  return tentacles.repo.listForUser(username, {
+    firstPageOnly: options && options.firstPage,
+    accessToken: this.accessToken,
+    headers: { Accept: githubMediaTypes.MOONDRAGON }
+  });
 };
 
 
