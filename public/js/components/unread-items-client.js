@@ -49,37 +49,6 @@ module.exports = (function() {
     }
   }
 
-  var ADD_TIMEOUT = 500;
-  var REMOVE_TIMEOUT = 600000; // 10 minutes
-
-  //
-  // // -----------------------------------------------------
-  // // A doublehash which slows things down
-  // // -----------------------------------------------------
-  //
-  // var Tarpit = function(timeout, onDequeue) {
-  //   DoubleHash.call(this);
-  //   this._timeout = timeout;
-  //   this._onDequeue = onDequeue;
-  // };
-  //
-  // _.extend(Tarpit.prototype, DoubleHash.prototype, {
-  //   _onItemAdded: function(itemType, itemId) {
-  //     var self = this;
-  //     window.setTimeout(function() {
-  //       self._promote(itemType, itemId);
-  //     }, this._timeout);
-  //   },
-  //
-  //   _promote: function(itemType, itemId) {
-  //     // Has this item already been deleted?
-  //     if(!this._contains(itemType, itemId)) return;
-  //
-  //     this._remove(itemType, itemId);
-  //     if(this._onDequeue) this._onDequeue(itemType, itemId);
-  //   }
-  // });
-
   // -----------------------------------------------------
   // The main component of the unread-items-store
   // Events:
@@ -93,20 +62,12 @@ module.exports = (function() {
     this.length = 0;
     this._lurkMode = false;
     this._items = {};
-    //
-    // this._maxItems = 100;
-    // this._lurkMode = false;
-    //
-    // this._addTarpit = new Tarpit(ADD_TIMEOUT, _.bind(this._promote, this));
-    // this._deleteTarpit = new Tarpit(REMOVE_TIMEOUT);
+
     this.notifyCountLimited = limit(this.notifyCount, this, 30);
-    // this._currentCountValue = undefined;
   };
 
   _.extend(UnreadItemStore.prototype, Backbone.Events, {
     _unreadItemAdded: function(itemId, mention) {
-      if (arguments.length !== 2) throw new Error(); // TODO: remove
-
       // Three options here:
       // 1 - new item
       // 2 - item exists and has the same mention status as before (nullop)
@@ -132,8 +93,6 @@ module.exports = (function() {
     },
 
     _unreadItemRemoved: function(itemId) {
-      if (arguments.length !== 1) throw new Error(); // TODO: remove
-
       if (!this._items.hasOwnProperty(itemId)) return; // Does not exist
 
       delete this._items[itemId];
@@ -144,8 +103,6 @@ module.exports = (function() {
     },
 
     _mentionRemoved: function(itemId) {
-      if (arguments.length !== 1) throw new Error(); // TODO: remove
-
       if (!this._items.hasOwnProperty(itemId)) return; // Does not exist
       this._items[itemId] = false;
       this.notifyCountLimited();
@@ -153,8 +110,6 @@ module.exports = (function() {
     },
 
     _markItemRead: function(itemId) {
-      if (arguments.length !== 1) throw new Error(); // TODO: remove
-
       var inStore = this._items.hasOwnProperty(itemId);
       var lurkMode = this._lurkMode;
 
@@ -178,8 +133,6 @@ module.exports = (function() {
 
     // via Realtime
     _unreadItemsAdded: function(items) {
-      if (arguments.length !== 1) throw new Error(); // TODO: remove
-
       _iteratePreload(items, function(itemId, mention) {
         this._unreadItemAdded(itemId, mention);
       }, this);
@@ -187,8 +140,6 @@ module.exports = (function() {
 
     // via Realtime
     _unreadItemsRemoved: function(incoming) {
-      if (arguments.length !== 1) throw new Error(); // TODO: remove
-
       function hashArray(array) {
         if (!array) return {};
 
@@ -225,21 +176,15 @@ module.exports = (function() {
     },
 
     enableLurkMode: function() {
-      if (arguments.length !== 0) throw new Error(); // TODO: remove
-
       this._lurkMode = true;
       this.markAllReadNotification();
     },
 
     disableLurkMode: function() {
-      if (arguments.length !== 0) throw new Error(); // TODO: remove
-
       this._lurkMode = false;
     },
 
     markAllReadNotification: function() {
-      if (arguments.length !== 0) throw new Error(); // TODO: remove
-
       Object.keys(this._items).forEach(function(itemId) {
         // Notify that all are read
         var mention = this._items[itemId];
@@ -252,8 +197,6 @@ module.exports = (function() {
     },
 
     markAllRead: function() {
-      if (arguments.length !== 0) throw new Error(); // TODO: remove
-
       var self = this;
       onceUserIdSet(function() {
         apiClient.userRoom.delete("/unreadItems/all")
@@ -265,8 +208,6 @@ module.exports = (function() {
     },
 
     getFirstItem: function() {
-      if (arguments.length !== 0) throw new Error(); // TODO: remove
-
       var items = Object.keys(this._items);
       return items.sort()[0]; // TODO: make this O(n) instead of (n log n)
     }
@@ -629,16 +570,6 @@ module.exports = (function() {
     acrossTheFold: function() {
       return acrossTheFoldModel;
     },
-    //
-    // hasItemBeenMarkedAsRead: function(itemType, itemId) {
-    //   var unreadItemStore = getUnreadItemStoreReq();
-    //
-    //   if(!unreadItemStore) {
-    //     return false;
-    //   }
-    //
-    //   return unreadItemStore._hasItemBeenMarkedAsRead(itemType, itemId);
-    // },
 
     markAllRead: function() {
       var unreadItemStore = getUnreadItemStoreReq();
