@@ -4,11 +4,12 @@
 var Tentacles = require('tentacles');
 var request = require('./request-wrapper');
 var badCredentialsCheck = require('./bad-credentials-check');
+var githubMediaTypes = require('./github-media-types');
 
 var tentacles = new Tentacles({
   request: request,
   headers: {
-    Accept: 'application/vnd.github.moondragon+json'
+    Accept: githubMediaTypes.QUICKSILVER
   },
   errorHandler: badCredentialsCheck
 });
