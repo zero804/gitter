@@ -37,6 +37,9 @@ var roomSearchService  = require('./room-search-service');
 var assertMemberLimit  = require('./assert-member-limit');
 var qlimit             = require('qlimit');
 
+var client             = require("../utils/redis").getClient();
+var renameLock         = require("redis-lock")(client);
+
 var badgerEnabled      = nconf.get('autoPullRequest:enabled');
 
 function localUriLookup(uri, opts) {
@@ -1276,59 +1279,69 @@ exports.renameUri = renameUri;
 function renameRepo(oldUri, newUri) {
   if (oldUri === newUri) return Q.resolve();
 
-  return troupeService.findByUri(oldUri)
-    .then(function(room) {
-      if (!room) return;
-      if (room.githubType !== 'REPO') throw new StatusError(400, 'Only repo rooms can be renamed');
-      if (room.uri === newUri) return; // Case change, and it's already happened
+  // Only allow one repo rename to go through at a time
+  renameLock("lock:rename:" + oldUri, function(lockComplete) {
 
-      var originalLcUri = room.lcUri;
-      var lcUri = newUri.toLowerCase();
-      var lcOwner = lcUri.split('/')[0];
+    return troupeService.findByUri(oldUri)
+      .then(function(room) {
+        if (!room) return;
+        if (room.githubType !== 'REPO') throw new StatusError(400, 'Only repo rooms can be renamed');
+        if (room.uri === newUri) return; // Case change, and it's already happened
 
-      room.uri = newUri;
-      room.lcUri = lcUri;
-      room.lcOwner = lcOwner;
+        var originalLcUri = room.lcUri;
+        var lcUri = newUri.toLowerCase();
+        var lcOwner = lcUri.split('/')[0];
 
-      /* Only add if it's not a case change */
-      if (originalLcUri !== lcUri) {
-        room.renamedLcUris.addToSet(originalLcUri);
-      }
+        room.uri = newUri;
+        room.lcUri = lcUri;
+        room.lcOwner = lcOwner;
 
-      return room.saveQ()
-        .then(function() {
-          return uriLookupService.removeBadUri(oldUri);
-        })
-        .then(function() {
-          return uriLookupService.reserveUriForTroupeId(room.id, lcUri);
-        })
-        .then(function() {
-          return persistence.Troupe.findQ({ parentId: room._id });
-        })
-        .then(function(channels) {
-          return Q.all(channels.map(function(channel) {
-            var originalLcUri = channel.lcUri;
-            var newChannelUri = newUri + '/' + channel.uri.split('/')[2];
-            var newChannelLcUri = newChannelUri.toLowerCase();
+        /* Only add if it's not a case change */
+        if (originalLcUri !== lcUri) {
+          room.renamedLcUris.addToSet(originalLcUri);
+        }
 
-            channel.lcUri = newChannelLcUri;
-            channel.uri = newChannelUri;
-            channel.lcOwner = lcOwner;
+        return room.saveQ()
+          .then(function() {
+            return uriLookupService.removeBadUri(oldUri);
+          })
+          .then(function() {
+            return uriLookupService.reserveUriForTroupeId(room.id, lcUri);
+          })
+          .then(function() {
+            return persistence.Troupe.findQ({ parentId: room._id });
+          })
+          .then(function(channels) {
+            return Q.all(channels.map(function(channel) {
+              var originalLcUri = channel.lcUri;
+              var newChannelUri = newUri + '/' + channel.uri.split('/')[2];
+              var newChannelLcUri = newChannelUri.toLowerCase();
 
-            return channel.saveQ()
-              .then(function() {
-                return uriLookupService.removeBadUri(originalLcUri);
-              })
-              .then(function() {
-                return uriLookupService.reserveUriForTroupeId(channel.id, newChannelLcUri);
-              });
+              channel.lcUri = newChannelLcUri;
+              channel.uri = newChannelUri;
+              channel.lcOwner = lcOwner;
+
+              return channel.saveQ()
+                .then(function() {
+                  return uriLookupService.removeBadUri(originalLcUri);
+                })
+                .then(function() {
+                  return uriLookupService.reserveUriForTroupeId(channel.id, newChannelLcUri);
+                });
 
 
-          }));
+            }));
 
-        });
+          });
 
+      })
+      .finally(function() {
+        var d = Q.defer();
+        lockComplete(d.makeNodeResolver());
+        return d.promise;
       });
+
+  });
 
 }
 exports.renameRepo = renameRepo;
