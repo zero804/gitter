@@ -36,9 +36,7 @@ var userSettingsService = require('./user-settings-service');
 var roomSearchService  = require('./room-search-service');
 var assertMemberLimit  = require('./assert-member-limit');
 var qlimit             = require('qlimit');
-
-var client             = require("../utils/redis").getClient();
-var renameLock         = require("redis-lock")(client);
+var redisLockPromise   = require("../utils/redis-lock-promise");
 
 var badgerEnabled      = nconf.get('autoPullRequest:enabled');
 
@@ -1279,9 +1277,7 @@ exports.renameUri = renameUri;
 function renameRepo(oldUri, newUri) {
   if (oldUri === newUri) return Q.resolve();
 
-  // Only allow one repo rename to go through at a time
-  renameLock("lock:rename:" + oldUri, function(lockComplete) {
-
+  return redisLockPromise("lock:rename:" + oldUri, function() {
     return troupeService.findByUri(oldUri)
       .then(function(room) {
         if (!room) return;
@@ -1328,17 +1324,10 @@ function renameRepo(oldUri, newUri) {
                 .then(function() {
                   return uriLookupService.reserveUriForTroupeId(channel.id, newChannelLcUri);
                 });
-
-
             }));
 
           });
 
-      })
-      .finally(function() {
-        var d = Q.defer();
-        lockComplete(d.makeNodeResolver());
-        return d.promise;
       });
 
   });
