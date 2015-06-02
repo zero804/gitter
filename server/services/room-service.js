@@ -1228,52 +1228,6 @@ exports.searchRooms = searchRooms;
 /**
  * Rename a REPO room to a new URI
  */
-function renameUri(oldUri, newUri, instigatingUser) {
-  if (oldUri === newUri) return Q.resolve();
-
-  return troupeService.findByUri(oldUri)
-    .then(function(room) {
-      if (!room) throw new StatusError(404, 'Room ' + oldUri + ' does not exist');
-      if (room.githubType !== 'REPO') throw new StatusError(400, 'Only repo rooms can be renamed');
-      if (room.uri === newUri) return; // Case change, and it's already happened
-
-      var repoService = new GitHubRepoService(instigatingUser);
-      return repoService.getRepo(newUri)
-        .then(function(repoInfo) {
-          if(!repoInfo) throw new StatusError(404, 'Unable to find repo ' + newUri);
-
-          var originalLcUri = room.lcUri;
-          var githubId = parseInt(repoInfo.id, 10) || undefined;
-
-          var officialUri = repoInfo.full_name;
-          var lcUri = officialUri.toLowerCase();
-
-          room.githubId = githubId;
-          room.uri = repoInfo.full_name;
-          room.lcUri = lcUri;
-          room.lcOwner = lcUri.split('/')[0];
-
-          /* Only add if it's not a case change */
-          if (originalLcUri !== lcUri) {
-            room.renamedLcUris.push(originalLcUri);
-          }
-
-          return room.saveQ()
-            .then(function() {
-              return uriLookupService.removeBadUri(oldUri);
-            })
-            .then(function() {
-              return uriLookupService.reserveUriForTroupeId(room.id, lcUri);
-            });
-        });
-
-    });
-}
-exports.renameUri = renameUri;
-
-/**
- * Rename a REPO room to a new URI
- */
 function renameRepo(oldUri, newUri) {
   if (oldUri === newUri) return Q.resolve();
 
