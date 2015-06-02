@@ -70,9 +70,7 @@ module.exports = (function() {
         '.js-chat-item-edit': { titleFn: 'getEditTooltip' },
         '.js-chat-item-collapse': { titleFn: 'getCollapseTooltip' }
       },
-      UnreadItems: {
-        unreadItemType: 'chat',
-      },
+      UnreadItems: { },
       Highlight: {}
     },
 
@@ -213,32 +211,43 @@ module.exports = (function() {
     },
 
     updateRender: function(changes) {
+      /* NB: `unread` updates occur in the behaviour */
       var model = this.model;
       var $el = this.$el;
+      var classList = this.el.classList;
+
+
+      function toggleClass(className, state) {
+        if(state) {
+          classList.add(className);
+        } else {
+          classList.remove(className);
+        }
+      }
 
       if (!changes || 'html' in changes || 'text' in changes) {
         this.renderText();
       }
 
-      if (!changes || 'unread' in changes) {
-        $el.toggleClass('unread', !!model.get('unread'));
+      if(!changes || 'mentioned' in changes) {
+        toggleClass('mentioned', model.get('mentioned'));
       }
 
       if(!changes || 'fromUser' in changes) {
-        $el.toggleClass('isViewers', this.isOwnMessage());
+        toggleClass('isViewers', this.isOwnMessage());
       }
 
       if(!changes || 'editedAt' in changes) {
-        $el.toggleClass('hasBeenEdited', this.hasBeenEdited());
+        toggleClass('hasBeenEdited', this.hasBeenEdited());
       }
 
       if(!changes || 'burstStart' in changes) {
-        $el.toggleClass('burstStart', !!model.get('burstStart'));
-        $el.toggleClass('burstContinued', !model.get('burstStart'));
+        toggleClass('burstStart', !!model.get('burstStart'));
+        toggleClass('burstContinued', !model.get('burstStart'));
       }
 
       if (!changes || 'burstFinal' in changes) {
-        $el.toggleClass('burstFinal', !!model.get('burstFinal'));
+        toggleClass('burstFinal', !!model.get('burstFinal'));
       }
 
       /* Don't run on the initial (changed=undefined) as its done in the template */

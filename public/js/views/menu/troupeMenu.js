@@ -198,7 +198,7 @@ module.exports = (function () {
     },
 
     showSuggestedRooms: function() {
-      if (this.suggested.hasView()) return;
+      if (this.suggested && this.suggested.hasView()) return;
 
       var suggestedRoomsHidden = context().suggestedRoomsHidden;
 
