@@ -1,5 +1,5 @@
 "use strict";
-var $ = require('jquery');
+
 var appEvents = require('utils/appevents');
 var ChatInputView = require('views/chat/chatInputView');
 var itemCollections = require('collections/instances/integrated-items');
@@ -8,9 +8,11 @@ var KeyboardEventsMixin = require('views/keyboard-events-mixin');
 var unreadItemsClient = require('components/unread-items-client');
 var UnreadBannerView = require('views/app/unreadBannerView');
 var ChatToolbarLayout = require('./chat-toolbar');
+
 require('views/behaviors/isomorphic');
 
 var ChatToolbarInputLayout = ChatToolbarLayout.extend({
+  monitorUnreadItems: true,
   keyboardEvents: {
     'backspace': 'onKeyBackspace',
     'quote': 'onKeyQuote'
@@ -46,16 +48,6 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
         init: 'initBannerBottomRegion'
       }
     }
-  },
-
-  initialize: function(options) {
-    ChatToolbarLayout.prototype.initialize.call(this, options);
-
-    // TODO: fix this
-    itemCollections.chats.once('sync', function() {
-      /* Why is this on sync only? */
-      unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
-    });
   },
 
   initInputRegion: function(optionsForRegion) {
