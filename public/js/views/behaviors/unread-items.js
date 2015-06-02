@@ -1,57 +1,67 @@
 "use strict";
+
 var context = require('utils/context');
 var Marionette = require('backbone.marionette');
-var unreadItemsClient = require('components/unread-items-client');
 var appEvents = require('utils/appevents');
-var dataset = require('utils/dataset-shim');
 var behaviourLookup = require('./lookup');
 
-module.exports = (function() {
+var loggedIn = context.isLoggedIn();
 
+var transitionQueue = [];
+var highwaterMark = 0;
 
-  var loggedIn = context.isLoggedIn();
+function queueTransition(el) {
+  transitionQueue.push(el);
+  if (transitionQueue.length === 1) {
+    setTimeout(dequeueTransition, 500);
+  }
+}
 
-  var Behavior = Marionette.Behavior.extend({
-    onRender: function() {
-      if(!loggedIn) return;
+function dequeueTransition() {
+  var el = transitionQueue.shift();
+  if (!el) return;
 
-      var model = this.view.model;
-      var unreadItemType = this.options.unreadItemType;
-      if(!model) return;
+  if (highwaterMark < transitionQueue.length) {
+    highwaterMark = transitionQueue.length;
+  }
 
-      var id = model.get('id') || model.cid;
+  var classList = el.classList;
+  classList.remove('unread');
 
-      var $e = this.$el;
-      var e = $e[0];
+  if (transitionQueue.length) {
+    var time = highwaterMark > 10 ? 60 : 70;
+    setTimeout(dequeueTransition, time);
+  } else {
+    highwaterMark = 0;
+  }
+}
 
-      $e.addClass('model-id-' + id);
+var Behavior = Marionette.Behavior.extend({
+  modelEvents: {
+    'change:unread': 'unreadChanged'
+  },
 
-      var unread = model.get('unread');
-      var mentioned = model.get('mentioned');
+  onRender: function() {
+    if(!loggedIn) return;
 
-      if(unread) {
-        if(unreadItemsClient.hasItemBeenMarkedAsRead(unreadItemType, id)) {
-          unread = false;
-        }
-      }
+    var model = this.view.model;
+    if(!model) return;
 
-      $e.toggleClass('mention', mentioned);
+    var unread = model.get('unread');
+    if(unread) {
+      this.el.classList.add('unread');
 
-      dataset.set(e, 'itemId', id);
-      dataset.set(e, 'mentioned', mentioned);
-      dataset.set(e, 'itemType', unreadItemType);
-
-      if(unread) {
-        $e.addClass('unread');
-
-        appEvents.trigger('unreadItemDisplayed');
-      }
+      appEvents.trigger('unreadItemDisplayed');
     }
-  });
+  },
 
-  behaviourLookup.register('UnreadItems', Behavior);
-  return Behavior;
+  unreadChanged: function(model) {
+    if (model.get('unread')) return; // Changed to read? Don't know how to handle that yet...
+    var previous = model.previous('unread');
+    if (!previous) return; // On send, unread is undefined. Ignore changes from undefined to false
+    queueTransition(this.el);
+  }
+});
 
-
-})();
-
+behaviourLookup.register('UnreadItems', Behavior);
+module.exports = Behavior;
