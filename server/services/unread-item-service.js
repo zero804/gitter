@@ -13,6 +13,7 @@ var presenceService  = require("./presence-service");
 var _                = require("underscore");
 var mongoUtils       = require('../utils/mongo-utils');
 var RedisBatcher     = require('../utils/redis-batcher').RedisBatcher;
+var collections      = require('../utils/collections');
 var Q                = require('q');
 var badgeBatcher     = new RedisBatcher('badge', 300);
 
@@ -393,6 +394,7 @@ function createNewItemsForParsedChat(troupeId, chatId, parsed) {
       return [results, presenceService.categorizeUsersByOnlineStatus(allUserIds)];
     })
     .spread(function(results, online) {
+      var mentionsHash = collections.hashArray(parsed.mentionUserIds);
 
       // Firstly, notify all the notifyNewRoomUserIds with room creation messages
       parsed.notifyNewRoomUserIds.forEach(function(userId) {
@@ -406,7 +408,13 @@ function createNewItemsForParsedChat(troupeId, chatId, parsed) {
         var mentionCount = results[userId] && results[userId].mentionCount;
 
         // Not lurking, send them the full update
-        appEvents.newUnreadItem(userId, troupeId, { chat: [chatId] }, isOnline);
+        var updateMessage = { chat: [chatId] };
+        if (mentionsHash[userId]) {
+          updateMessage.mention = [chatId];
+        }
+
+        /* We need to do this for all users as it's used for mobile notifications */
+        appEvents.newUnreadItem(userId, troupeId, updateMessage, isOnline);
 
         // Only send out troupeUnreadCountsChange events for online users
         if (!isOnline) return;
@@ -459,12 +467,11 @@ function generateMentionDeltaSet(parsedChat, originalMentions) {
     })
     .filter(function(m) {
       return !!m;
-    })
-    .map(toString);    // Make sure that everything is a string, because underscore
+    });
 
 
   /* Arg. Underscore. We need lazy evaluation! */
-  originalMentionUserIds = _.flatten(originalMentionUserIds);
+  originalMentionUserIds = _.flatten(originalMentionUserIds).map(toString);
   originalMentionUserIds = _.uniq(originalMentionUserIds);
 
   var mentionUserIds = parsedChat.mentionUserIds.map(toString);
@@ -473,7 +480,7 @@ function generateMentionDeltaSet(parsedChat, originalMentions) {
   var addMentions = _.without.apply(null, [mentionUserIds].concat(originalMentionUserIds));
   var removeMentions = _.without.apply(null, [originalMentionUserIds].concat(mentionUserIds));
 
-  // List of users who should get unread items, who were previously mentioned by no longer are
+  // List of users who should get unread items, who were previously mentioned but no longer are
   var forNotifyWithRemoveMentions = _.intersection(parsedChat.notifyUserIds.map(toString), removeMentions);
 
   // Everyone who was added via a mention, plus everyone who was no longer mentioned but is not lurking
@@ -491,6 +498,7 @@ function addUnreadItemsForUpdatedChat(troupeId, chatId, addNotifyUserIds, addMen
       return [results, presenceService.categorizeUsersByOnlineStatus(addNotifyUserIds)];
     })
     .spread(function(results, online) {
+      var mentionsHash = collections.hashArray(addMentionUserIds);
 
       // Firstly, notify all the notifyNewRoomUserIds with room creation messages
       addMentionsInNewRoom.forEach(function(userId) {
@@ -504,7 +512,13 @@ function addUnreadItemsForUpdatedChat(troupeId, chatId, addNotifyUserIds, addMen
         var isOnline = online[userId];
 
         // Not lurking, send them the full update
-        appEvents.newUnreadItem(userId, troupeId, { chat: [chatId] }, isOnline);
+        var updateMessage = { chat: [chatId] };
+        if (mentionsHash[userId]) {
+          updateMessage.mention = [chatId];
+        }
+
+        // Not lurking, send them the full update
+        appEvents.newUnreadItem(userId, troupeId, updateMessage, isOnline);
 
         if (!isOnline) return; // No need to send out updates to non-online users
 
@@ -527,6 +541,10 @@ function removeMentionsForUpdatedChat(troupeId, chatId, removeUserIds) {
   return engine.removeItem(troupeId, chatId, removeUserIds)
     .then(function(results) {
       results.forEach(function(result) {
+        // Remove the mention for the user
+        // TODO: only for only users
+        appEvents.unreadItemsRemoved(result.userId, troupeId, { mention: [chatId] });
+
         if(result.unreadCount >= 0 || result.mentionCount >= 0) {
           // Notify the user
           appEvents.troupeUnreadCountsChange({

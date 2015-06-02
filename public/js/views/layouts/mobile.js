@@ -18,7 +18,7 @@ require('views/behaviors/isomorphic');
 module.exports = Marionette.LayoutView.extend({
   template: false,
   el: 'body',
-
+  dialogRegion: modalRegion,
   behaviors: {
     Isomorphic: {
       chat: { el: '#content-wrapper', init: 'initChatRegion' },
@@ -29,7 +29,8 @@ module.exports = Marionette.LayoutView.extend({
 
   ui: {
     mainPage: '#mainPage',
-    showTroupesButton: '#showTroupesButton'
+    showTroupesButton: '#showTroupesButton',
+    scroll: '#content-frame'
   },
 
   events: {
@@ -49,10 +50,13 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initChatRegion: function(optionsForRegion) {
-    return new ChatContainerView(optionsForRegion({
+    var chatCollectionView = new ChatContainerView(optionsForRegion({
       collection: this.options.chatCollection,
-      decorators: [emojiDecorator, mobileDecorator]
+      decorators: [emojiDecorator, mobileDecorator],
+      monitorScrollPane: this.ui.scroll // Monitor the scroll region for unread items
     }));
+
+    return chatCollectionView;
   },
 
   initMenuRegion: function(optionsForRegion) {

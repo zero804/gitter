@@ -15,7 +15,10 @@ require('views/behaviors/isomorphic');
 var ChatLayout = Marionette.LayoutView.extend({
   template: false,
   el: 'body',
-
+  dialogRegion: modalRegion,
+  ui: {
+    scroll: '#content-frame'
+  },
   behaviors: {
     Isomorphic: {
       chat: {
@@ -25,15 +28,13 @@ var ChatLayout = Marionette.LayoutView.extend({
     }
   },
 
-  initialize: function(options) {
-    this.chatCollection = options.chatCollection;
-    this.dialogRegion = modalRegion;
-  },
-
   initChatRegion: function(optionsForRegion) {
+    var monitorUnreadItems = Marionette.getOption(this, "monitorUnreadItems");
+
     return new ChatContainerView(optionsForRegion({
-      collection: this.chatCollection,
-      decorators: [issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator]
+      collection: this.options.chatCollection,
+      decorators: [issueDecorator, commitDecorator, mentionDecorator, embedDecorator, emojiDecorator],
+      monitorScrollPane: monitorUnreadItems && this.ui.scroll // Monitor the scroll region for unread items
     }));
   }
 
