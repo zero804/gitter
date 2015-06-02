@@ -128,7 +128,7 @@ function getOrCreateClient() {
 
   client.on('stats', function (type, statName, value) {
     appEvents.trigger('stats.' + type, statName, value);
-  })
+  });
 
   var userSubscription;
 
