@@ -8,9 +8,15 @@ function validateOrgUri(user, uri) {
   var orgService = new GitHubOrgService(user);
   return orgService.getOrg(uri)
     .then(function(org) {
-      if(org) return ['ORG', org.login, org.name];
+      if(!org) return;
 
-      return [];
+      return {
+        type: 'ORG',
+        uri: org.login,
+        description: org.name,
+        githubId: parseInt(org.id, 10) || undefined
+      };
+
     });
 }
 
@@ -18,9 +24,15 @@ function validateRepoUri(user, uri) {
   var repoService = new GitHubRepoService(user);
   return repoService.getRepo(uri)
     .then(function(repo) {
-      if(repo) return ['REPO', repo.full_name, repo.description];
+      if (!repo) return;
 
-      return [];
+      return {
+        type: 'REPO',
+        uri: repo.full_name,
+        description: repo.description,
+        githubId: parseInt(repo.id, 10) || undefined,
+        security: repo.private ? 'PRIVATE' : 'PUBLIC'
+      };
     });
 }
 
@@ -42,6 +54,7 @@ function validateUri(user, uri) {
 
   if(parts.length == 2) {
     /* Its a repo or a channel */
+    // TODO: figure out what this is all about....
     if(parts[1].indexOf('*') !== 0) {
       return validateRepoUri(user, uri);
     }
