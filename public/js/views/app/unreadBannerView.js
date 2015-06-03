@@ -13,17 +13,34 @@ var TopBannerView = Marionette.ItemView.extend({
     bannerMessage: '#banner-message',
     buttons: 'button'
   },
-  className: 'banner slide-away',
+  //className: 'banner slide-away',
+  className: 'banner-wrapper',
   events: {
     'click button.main': 'onMainButtonClick',
     'click button.side': 'onSideButtonClick'
   },
+
+  // TODO all other change events for mentions
   modelEvents: {
     'change:unreadAbove': 'updateDisplay',
-    'change:hasUnreadAbove': 'updateVisibility'
+    'change:hasUnreadAbove': 'updateVisibility',
+    'change:hasMentionsAbove': 'updateMentionClass'
   },
+
+  hasMentions: function() {
+    return (this.model.get('mentionsAbove') > 0);
+  },
+
+  updateMentionClass: function() {
+    this.hasMentions() ? this.ui.buttons.addClass('mention') : this.ui.buttons.removeClass('mention');
+  },
+
   getUnreadCount: function() {
     return this.model.get('unreadAbove');
+  },
+
+  getMentionsCount: function() {
+    return this.model.get('mentionsAbove');
   },
 
   serializeData: function() {
@@ -32,13 +49,23 @@ var TopBannerView = Marionette.ItemView.extend({
 
   getMessage: function() {
     var unreadCount = this.getUnreadCount();
+    var mentionsCount = this.getMentionsCount();
 
     if(!unreadCount) {
       return 'No unread messages';
     }
 
+    if (mentionsCount === 1) {
+      return ' 1 mention';
+    }
+
+    if (mentionsCount > 1) {
+      return ' ' + mentionsCount + '  mentions';
+    }
+
+
     if(unreadCount === 1) {
-      return '1 unread';
+      return ' 1 unread';
     }
 
     if(unreadCount > 99) {
@@ -92,7 +119,9 @@ var TopBannerView = Marionette.ItemView.extend({
   },
 
   onMainButtonClick: function() {
-    appEvents.trigger('chatCollectionView:scrollToFirstUnread');
+    //appEvents.trigger('chatCollectionView:scrollToFirstUnread');
+    var itemId = this.model.get('oldestUnreadItemId');
+    if (itemId) appEvents.trigger('chatCollectionView:scrollToChatId', itemId);
   },
 
   onSideButtonClick: function() {
@@ -102,12 +131,21 @@ var TopBannerView = Marionette.ItemView.extend({
 
 var BottomBannerView = TopBannerView.extend({
   octicon: 'octicon-chevron-down',
+  className: 'banner-wrapper bottom',
   modelEvents: {
     'change:unreadBelow': 'updateDisplay',
-    'change:hasUnreadBelow': 'updateVisibility'
+    'change:hasUnreadBelow': 'updateVisibility',
+    'change:hasMentionsBelow': 'updateMentionClass'
   },
+  hasMentions: function() {
+    return (this.model.get('mentionsBelow') > 0);
+  },
+
   getUnreadCount: function() {
     return this.model.get('unreadBelow');
+  },
+  getMentionsCount: function() {
+    return this.model.get('mentionsBelow');
   },
 
   getVisible: function() {
@@ -115,10 +153,11 @@ var BottomBannerView = TopBannerView.extend({
   },
 
   onMainButtonClick: function() {
-    var belowItemId = this.model.get('belowItemId');
-    if (belowItemId) {
-      appEvents.trigger('chatCollectionView:scrollToChatId', belowItemId);
-    }
+    var mentionId = this.model.get('mostRecentMentionId');
+    if (mentionId) return appEvents.trigger('chatCollectionView:scrollToChatId', mentionId);
+
+    var itemId = this.model.get('mostRecentUnreadItemId');
+    if (itemId) return appEvents.trigger('chatCollectionView:scrollToChatId', itemId);
   },
 
   onSideButtonClick: function() {
