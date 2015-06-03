@@ -438,7 +438,7 @@ module.exports = (function() {
       if (childCollection.models.length === cv.children.length) {
         models = childCollection.models;
       } else {
-        log("Mismatch between childCollection.models.length and cv.children.length resorting to oddness");
+        log.info("Mismatch between childCollection.models.length and cv.children.length resorting to oddness");
 
         models = childCollection.models.filter(function(model) {
           return cv.children.findByModelCid(model.cid);
