@@ -10,6 +10,7 @@
     "connect-redis": "~1.4.6",
     "cors": "^2.4.2",
     "csprng": "^0.1.1",
+    "debug": "^2.2.0",
     "diskspace": "0.1.5",
     "dolph": "^0.1.0",
     "easynexmo": "~0.3.1",
