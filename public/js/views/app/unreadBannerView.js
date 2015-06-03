@@ -22,16 +22,16 @@ var TopBannerView = Marionette.ItemView.extend({
 
   // TODO all other change events for mentions
   modelEvents: {
-    'change:unreadAbove': 'updateDisplay',
+    'change:unreadAbove': 'updateVisibility',
     'change:hasUnreadAbove': 'updateVisibility',
-    'change:hasMentionsAbove': 'updateMentionClass'
+    'change:hasMentionsAbove': 'updateVisibility'
   },
 
   hasMentions: function() {
     return (this.model.get('mentionsAbove') > 0);
   },
 
-  updateMentionClass: function() {
+  highlightIfHasMentions: function() {
     if (this.hasMentions()) {
       this.ui.buttons.addClass('mention');
     } else {
@@ -79,21 +79,32 @@ var TopBannerView = Marionette.ItemView.extend({
     return ' ' + unreadCount + ' unread';
   },
 
-  getVisible: function() {
-    return !!this.model.get('hasUnreadAbove');
+  //getVisible: function() {
+  //  return !!this.model.get('hasUnreadAbove');
+  //},
+
+  shouldBeVisible: function() {
+    return (this.model.get('hasUnreadAbove') && this.model.get('hasMentionsAbove'));
   },
 
-  updateDisplay: function() {
+  updateMessage: function() {
     var noMoreItems = !this.getUnreadCount();
     if (noMoreItems) return; // Don't change the text as it slides down as it's distracting
     this.ui.bannerMessage.text(this.getMessage());
   },
 
   updateVisibility: function() {
-    var requiredVisiblity = this.getVisible();
-    var visible = !this.hidden;
-    if (requiredVisiblity === visible) return; // Nothing to do here
-    if (visible) {
+
+    this.highlightIfHasMentions();
+    this.updateMessage();
+
+    //var requiredVisiblity = this.getVisible();
+    //var visible = !this.hidden;
+    //if (requiredVisiblity === visible) return; // Nothing to do here
+
+    if (this.shouldBeVisible() && !this.hidden) return;
+
+    if (!this.hidden) {
       // Hide
       this.$el.addClass('slide-away');
 
@@ -119,7 +130,7 @@ var TopBannerView = Marionette.ItemView.extend({
   },
 
   onRender: function() {
-    this.updateDisplay();
+    this.updateVisibility();
   },
 
   onMainButtonClick: function() {
@@ -135,12 +146,19 @@ var TopBannerView = Marionette.ItemView.extend({
 
 var BottomBannerView = TopBannerView.extend({
   octicon: 'octicon-chevron-down',
+
   className: 'banner-wrapper bottom',
+
   modelEvents: {
-    'change:unreadBelow': 'updateDisplay',
+    'change:unreadBelow': 'updateVisibility',
     'change:hasUnreadBelow': 'updateVisibility',
-    'change:hasMentionsBelow': 'updateMentionClass'
+    'change:hasMentionsBelow': 'updateVisibility'
   },
+
+  shouldBeVisible: function() {
+    return (this.model.get('hasUnreadBelow') && this.model.get('hasMentionsBelow'));
+  },
+
   hasMentions: function() {
     return (this.model.get('mentionsBelow') > 0);
   },
@@ -148,13 +166,14 @@ var BottomBannerView = TopBannerView.extend({
   getUnreadCount: function() {
     return this.model.get('unreadBelow');
   },
+
   getMentionsCount: function() {
     return this.model.get('mentionsBelow');
   },
 
-  getVisible: function() {
-    return !!this.model.get('hasUnreadBelow');
-  },
+  //getVisible: function() {
+  //  return !!this.model.get('hasUnreadBelow');
+  //},
 
   onMainButtonClick: function() {
     var mentionId = this.model.get('mostRecentMentionId');
