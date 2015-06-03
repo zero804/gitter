@@ -2,7 +2,6 @@
 var $ = require('jquery');
 var Popover = require('views/popover');
 var context = require('utils/context');
-var resolveIconClass = require('utils/resolve-icon-class');
 var apiClient = require('components/apiClient');
 var roomNameTrimmer = require('utils/room-name-trimmer');
 var Marionette = require('backbone.marionette');
@@ -88,7 +87,7 @@ module.exports = (function() {
     serializeData: function() {
       var data = this.model.toJSON();
       data.name = roomNameTrimmer(data.name, MAX_NAME_LENGTH);
-      data.iconClass = resolveIconClass(this.model);
+      data.userOrOrg = data.url.split('/')[1];
       return data;
     },
 
