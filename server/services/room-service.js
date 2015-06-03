@@ -37,10 +37,12 @@ var roomSearchService  = require('./room-search-service');
 var assertMemberLimit  = require('./assert-member-limit');
 var qlimit             = require('qlimit');
 var redisLockPromise   = require("../utils/redis-lock-promise");
-
+var debug              = require('debug')('room-service');
 var badgerEnabled      = nconf.get('autoPullRequest:enabled');
 
 function localUriLookup(uri, opts) {
+  debug("localUriLookup %s", uri);
+
   return uriLookupService.lookupUri(uri)
     .then(function (uriLookup) {
       if (!uriLookup) return;
@@ -173,6 +175,8 @@ function makeRoomTypeCreationFilterFunction(creationFilter) {
  * @returns Promise of [troupe, hasJoinPermission] if the user is able to join/create the troupe
  */
 function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
+  debug("findOrCreateNonOneToOneRoom: %s", uri);
+
   if(!options) options = {};
 
   var roomTypeCreationFilterFunction = makeRoomTypeCreationFilterFunction(options.creationFilter);
@@ -1226,7 +1230,7 @@ function searchRooms(userId, queryText, options) {
 exports.searchRooms = searchRooms;
 
 /**
- * Rename a REPO room to a new URI
+ * Rename a REPO room to a new URI.
  */
 function renameRepo(oldUri, newUri) {
   if (oldUri === newUri) return Q.resolve();

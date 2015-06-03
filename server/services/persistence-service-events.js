@@ -1,11 +1,11 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var env = require('../utils/env');
-var logger = env.logger;
-var Q = require('q');
-
-var appEvents = require("../app-events");
+var env            = require('../utils/env');
+var logger         = env.logger;
+var Q              = require('q');
+var debug          = require('debug')('persistence-service-events');
+var appEvents      = require("../app-events");
 var restSerializer = require("../serializers/rest-serializer");
 
 // --------------------------------------------------------------------
@@ -16,7 +16,7 @@ var restSerializer = require("../serializers/rest-serializer");
 function serializeEvent(url, operation, model, callback) {
   if(!url) { return Q.resolve().nodeify(callback); }
 
-  logger.verbose("Serializing " + operation + " to " + url);
+  debug("Serializing %s to %s", operation, url);
 
   // TODO: consider swapping out the HEAVY WEIGHT restSerializer here for the
   // light weight notification-serializer as it is much more effeicent. Obviously
