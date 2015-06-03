@@ -418,7 +418,7 @@ function getUserMentionsForRooms(userId, troupeIds, options) {
 
   troupeIds.forEach(function(troupeId) {
     var key = "m:" + userId + ":" + troupeId;
-    options.onlyCounts ? multi.scard(key) : multi.smembers(key);
+    if (options.onlyCounts) { multi.scard(key); } else { multi.smembers(key); }
   });
 
   var d = Q.defer();
