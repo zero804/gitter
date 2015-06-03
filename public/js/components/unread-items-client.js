@@ -530,9 +530,6 @@ module.exports = (function() {
         oldestMentionId: oldestMentionId,
         mostRecentMentionId: mostRecentMentionId
       });
-
-      console.log('store._items', this._store._items);
-      console.log('acrossTheFoldModel', acrossTheFoldModel);
     },
     _eyeballStateChange: function(newState) {
       this._inFocus = newState;
