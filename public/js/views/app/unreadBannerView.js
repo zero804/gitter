@@ -32,7 +32,11 @@ var TopBannerView = Marionette.ItemView.extend({
   },
 
   updateMentionClass: function() {
-    this.hasMentions() ? this.ui.buttons.addClass('mention') : this.ui.buttons.removeClass('mention');
+    if (this.hasMentions()) {
+      this.ui.buttons.addClass('mention');
+    } else {
+      this.ui.buttons.removeClass('mention');
+    }
   },
 
   getUnreadCount: function() {
