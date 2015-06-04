@@ -2,45 +2,32 @@
 /*jslint node: true */
 "use strict";
 
-var pushNotificationGateway = require('../../server/gateways/push-notification-gateway');
-var winston = require('../../server/utils/winston');
+var userService = require('../../server/services/user-service');
+var assert = require('assert');
 var shutdown = require('shutdown');
+var pushNotificationGateway = require('../../server/gateways/push-notification-gateway');
 
-var opts = require("nomnom")
-  .option('user', {
-    abbr: 'u',
-    list: true,
-    required: true,
-    help: 'Send message to userId'
-  })
-  .option('message', {
-    abbr: 'm',
-    required: false,
-    help: 'Message to send'
-  })
-  .option('link', {
-    abbr: 'l',
-    required: false,
-    help: 'Link'
-  })
-  .option('sound', {
-    abbr: 's',
-    help: 'Sound to send'
-  })
-  .parse();
+var opts = require("nomnom").option('username', {
+  position: 0,
+  required: true,
+  help: "username to look up e.g trevorah"
+}).parse();
 
-var data = null;
-if(opts.message || opts.sound || opts.link) {
-  data = {
-    message: opts.message,
-    sound: opts.sound,
-    link: opts.link
-  };
-}
+userService.findByUsername(opts.username)
+  .then(function(user) {
+    var notification = {
+      roomId: '000000000000000000000000',
+      roomName: 'fake-room',
+      message: 'fake-room \nfake-user: youve got a test push notification!',
+      sound: 'notify.caf',
+      link: '/mobile/chat#000000000000000000000000'
+    };
 
-pushNotificationGateway.sendUserNotification(opts.user, data,
-  function() {
-    setTimeout(function() {
-      shutdown.shutdownGracefully();
-    });
+    return pushNotificationGateway.sendUserNotification(user.id, notification);
+  })
+  .fail(function(err) {
+    console.error(err.stack);
+  })
+  .fin(function() {
+    shutdown.shutdownGracefully();
   });
