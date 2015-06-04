@@ -1,8 +1,11 @@
 {{#if ethereal}}
-  <span class="room-list-item__name {{ iconClass }}" title="{{ title }}" id="room-name">{{ name }}</span>
+  <div class="room-list-item__icon">
+    <img src="https://avatars.githubusercontent.com/{{ userOrOrg }}?s=30">
+  </div>
+  <span id="room-name" class="room-list-item__name" title="{{title}}">{{ name }}</span>
 {{else}}
   <div class="room-list-item__icon">
-    <i class='{{ iconClass }}'></i>
+    <img src="https://avatars.githubusercontent.com/{{ userOrOrg }}?s=30">
   </div>
   <span id="room-name" class="room-list-item__name" title="{{title}}">{{ name }}</span>
   <i class="room-list-item__action js-close-button icon-cancel-circle" data-id="{{ id }}"></i>
