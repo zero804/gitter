@@ -54,3 +54,4 @@ GitHubOrgService.prototype.getMembership = function(org, username) {
 module.exports = wrap(GitHubOrgService, function() {
   return [this.accessToken || ''];
 });
+module.exports.raw = GitHubOrgService;
