@@ -13,8 +13,8 @@ var SnappyCache = require('snappy-cache');
 var Q = require('q');
 var env = require('../../utils/env');
 var config = env.config;
-var winston = require('../../utils/winston');
 var _ = require('underscore');
+var util = require("util");
 
 var redisClient;
 function getRedisCachingClient() {
@@ -33,10 +33,8 @@ function getKeys(method, contextValues, args) {
           .join(':');
 }
 
-function wrap(service, contextFunction, options) {
-  winston.verbose('github-cache-wrapper deprecated, use cache-wrapper instead');
-
-  if(!config.get('github:caching')) return service;
+function wrap(Service, contextFunction, options) {
+  if(!config.get('github:caching')) return Service;
   if(!options) options = {};
 
   var sc = new SnappyCache(_.defaults(options, {
@@ -45,10 +43,17 @@ function wrap(service, contextFunction, options) {
     ttl: config.get('github:cache-timeout')
   }));
 
-  Object.keys(service.prototype).forEach(function(value) {
-    var v = service.prototype[value];
+  var ServiceWrapper = function() {
+    Service.apply(this, arguments);
+  };
 
-    if(typeof v !== 'function') return;
+  util.inherits(ServiceWrapper, Service);
+
+  Object.keys(Service.prototype).forEach(function(value) {
+    var method = Service.prototype[value];
+
+    /* Only create prototypes for methods... */
+    if(typeof method !== 'function') return;
 
     var wrapped = function() {
       var self = this;
@@ -57,24 +62,18 @@ function wrap(service, contextFunction, options) {
 
       var key = getKeys(value, contextValues, args);
       var d = Q.defer();
-
       sc.lookup(key, function(cb) {
-        var promise = v.apply(self, args);
-
+        var promise = method.apply(self, args);
         promise.nodeify(cb);
       }, d.makeNodeResolver());
-
-      d.promise.then(function(x) {
-        return x;
-      });
 
       return d.promise;
     };
 
-    service.prototype[value] = wrapped;
+    ServiceWrapper.prototype[value] = wrapped;
   }, {});
 
-  return service;
+  return ServiceWrapper;
 }
 
 module.exports = exports = wrap;

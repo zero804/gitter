@@ -60,7 +60,7 @@ function validateUri(user, uri) {
     }
   }
 
-  return Q.resolve([]);
+  return Q.resolve();
 }
 
 module.exports = validateUri;
