@@ -7,44 +7,52 @@ var unreadItemsClient = require('components/unread-items-client');
 
 var TopBannerView = Marionette.ItemView.extend({
   octicon: 'octicon-chevron-up',
+  postfix: 'Above',
   template: template,
   hidden: true,
+  //className: 'banner slide-away',
+  className: 'banner-wrapper',
+  actAsScrollHelper: false,
+
   ui: {
     bannerMessage: '#banner-message',
     buttons: 'button'
   },
-  //className: 'banner slide-away',
-  className: 'banner-wrapper',
+
   events: {
     'click button.main': 'onMainButtonClick',
     'click button.side': 'onSideButtonClick'
   },
 
-  // TODO all other change events for mentions
-  modelEvents: {
-    'change:unreadAbove': 'updateVisibility',
-    'change:hasUnreadAbove': 'updateVisibility',
-    'change:hasMentionsAbove': 'updateVisibility'
+  modelEvents: function() {
+    var events = {};
+    events['change:unread' + this.postfix]      = 'updateVisibility';
+    events['change:hasUnread' + this.postfix]   = 'updateVisibility';
+    events['change:hasMentions' + this.postfix] = 'updateVisibility';
+
+    return events;
   },
 
-  hasMentions: function() {
-    return (this.model.get('mentionsAbove') > 0);
-  },
-
-  highlightIfHasMentions: function() {
-    if (this.hasMentions()) {
+  applyStyles: function() {
+    if (!!this.getMentionsCount()) {
+      this.ui.buttons.removeClass('unread');
       this.ui.buttons.addClass('mention');
-    } else {
-      this.ui.buttons.removeClass('mention');
+      return;
     }
+    if (!!this.getUnreadCount()) {
+      this.ui.buttons.addClass('unread');
+      return;
+    }
+    this.ui.buttons.removeClass('unread');
+    this.ui.buttons.removeClass('mention');
   },
 
   getUnreadCount: function() {
-    return this.model.get('unreadAbove');
+    return this.model.get('unread' + this.postfix);
   },
 
   getMentionsCount: function() {
-    return this.model.get('mentionsAbove');
+    return this.model.get('mentions' + this.postfix);
   },
 
   serializeData: function() {
@@ -55,77 +63,32 @@ var TopBannerView = Marionette.ItemView.extend({
     var unreadCount = this.getUnreadCount();
     var mentionsCount = this.getMentionsCount();
 
-    if(!unreadCount) {
-      return 'No unread messages';
-    }
-
-    if (mentionsCount === 1) {
-      return ' 1 mention';
-    }
-
-    if (mentionsCount > 1) {
-      return ' ' + mentionsCount + '  mentions';
-    }
-
-
-    if(unreadCount === 1) {
-      return ' 1 unread';
-    }
-
-    if(unreadCount > 99) {
-      return ' 99+ unread';
-    }
-
-    return ' ' + unreadCount + ' unread';
+    if (!unreadCount && !mentionsCount) return 'bottom';
+    if (mentionsCount === 1)            return '1 mention';
+    if (mentionsCount > 1)              return mentionsCount + '  mentions';
+    if (unreadCount === 1)              return '1 unread';
+    if (unreadCount > 99)               return '99+ unread';
+    return unreadCount + ' unread';
   },
 
-  //getVisible: function() {
-  //  return !!this.model.get('hasUnreadAbove');
-  //},
-
   shouldBeVisible: function() {
-    return (this.model.get('hasUnreadAbove') && this.model.get('hasMentionsAbove'));
+    return (!!this.getMentionsCount() || !!this.getUnreadCount() || !!this.actAsScrollHelper);
   },
 
   updateMessage: function() {
-    var noMoreItems = !this.getUnreadCount();
-    if (noMoreItems) return; // Don't change the text as it slides down as it's distracting
     this.ui.bannerMessage.text(this.getMessage());
   },
 
   updateVisibility: function() {
-
-    this.highlightIfHasMentions();
+    this.applyStyles();
     this.updateMessage();
 
-    //var requiredVisiblity = this.getVisible();
-    //var visible = !this.hidden;
-    //if (requiredVisiblity === visible) return; // Nothing to do here
-
-    if (this.shouldBeVisible() && !this.hidden) return;
-
-    if (!this.hidden) {
-      // Hide
-      this.$el.addClass('slide-away');
-
-      this.ui.buttons.blur();
-      if (this.hideTimeout) return;
-
-      this.hideTimeout = setTimeout(function() {
-        delete this.hideTimeout;
-        this.hidden = true;
-        this.$el.parent().hide();
-      }.bind(this), 500);
-
-    } else {
-      // Show
+    // TODO Add some fancy transitions
+    if (this.shouldBeVisible()) {
       this.$el.parent().show();
-      this.$el.removeClass('slide-away');
-      this.hidden = false;
-      if (this.hideTimeout) {
-        clearTimeout(this.hideTimeout);
-        delete this.hideTimeout;
-      }
+    } else {
+      this.ui.buttons.blur();
+      this.$el.parent().hide();
     }
   },
 
@@ -134,7 +97,9 @@ var TopBannerView = Marionette.ItemView.extend({
   },
 
   onMainButtonClick: function() {
-    //appEvents.trigger('chatCollectionView:scrollToFirstUnread');
+    var mentionId = this.model.get('oldestMentionId');
+    if (mentionId) return appEvents.trigger('chatCollectionView:scrollToChatId', mentionId);
+
     var itemId = this.model.get('oldestUnreadItemId');
     if (itemId) appEvents.trigger('chatCollectionView:scrollToChatId', itemId);
   },
@@ -146,34 +111,18 @@ var TopBannerView = Marionette.ItemView.extend({
 
 var BottomBannerView = TopBannerView.extend({
   octicon: 'octicon-chevron-down',
-
+  postfix: 'Below',
   className: 'banner-wrapper bottom',
+  actAsScrollHelper: false,
 
-  modelEvents: {
-    'change:unreadBelow': 'updateVisibility',
-    'change:hasUnreadBelow': 'updateVisibility',
-    'change:hasMentionsBelow': 'updateVisibility'
+  initialize: function() {
+    this.listenTo(appEvents, 'atBottomChanged', this.toggleScrollHelper);
   },
 
-  shouldBeVisible: function() {
-    return (this.model.get('hasUnreadBelow') && this.model.get('hasMentionsBelow'));
+  toggleScrollHelper: function(atBottom) {
+    this.actAsScrollHelper = !atBottom;
+    this.updateVisibility();
   },
-
-  hasMentions: function() {
-    return (this.model.get('mentionsBelow') > 0);
-  },
-
-  getUnreadCount: function() {
-    return this.model.get('unreadBelow');
-  },
-
-  getMentionsCount: function() {
-    return this.model.get('mentionsBelow');
-  },
-
-  //getVisible: function() {
-  //  return !!this.model.get('hasUnreadBelow');
-  //},
 
   onMainButtonClick: function() {
     var mentionId = this.model.get('mostRecentMentionId');
@@ -181,11 +130,14 @@ var BottomBannerView = TopBannerView.extend({
 
     var itemId = this.model.get('mostRecentUnreadItemId');
     if (itemId) return appEvents.trigger('chatCollectionView:scrollToChatId', itemId);
+
+    if (this.actAsScrollHelper) {
+      this.toggleScrollHelper(true);
+      appEvents.trigger('chatCollectionView:scrollToBottom');
+    }
   },
 
-  onSideButtonClick: function() {
-  }
-
+  onSideButtonClick: function() {}
 });
 
 module.exports = {
