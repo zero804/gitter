@@ -298,7 +298,7 @@ module.exports = (function() {
       this.collection.ensureLoaded(id, function() {
         var model = self.collection.get(id);
         if (model) return this.scrollToChat(model);
-      });
+      }.bind(this));
     },
 
     // used to highlight and "dim" chat messages, the behaviour Highlight responds to these changes.
