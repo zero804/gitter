@@ -27,6 +27,10 @@
     background-color: @permalink-highlight-bg;
   }
 
+  &:hover {
+    background-color: rgba(240,240,240,0.3);
+  }
+
   &.synced {
     opacity: 1.0;
     transform: translate3d(0,0,0);
@@ -141,6 +145,7 @@
 .chat-item__aside {
   float: left;
   margin-left: 0.4em;
+  margin-top: 6px;
 }
 
 .chat-item__avatar {
@@ -223,7 +228,7 @@
 .chat-item__icon {
   cursor: pointer;
   vertical-align: middle;
-  color: #ddd;
+  color: #aaa;
   transition: opacity 0.3s linear, color 0.3s linear;
 }
 
