@@ -431,13 +431,33 @@ module.exports = (function() {
       var cv = this._collectionView;
 
       var childCollection = cv.collection;
-      var topIndex = _.sortedIndex(childCollection.models, viewportTop, function(model) {
+      /* Get the children with models */
+
+      /* TEMP TEMP TEMP TEMP TEMP */
+      var models;
+      if (childCollection.models.length === cv.children.length) {
+        models = childCollection.models;
+      } else {
+        log.info("Mismatch between childCollection.models.length and cv.children.length resorting to oddness");
+
+        models = childCollection.models.filter(function(model) {
+          return cv.children.findByModelCid(model.cid);
+        });
+      }
+      /* TEMP TEMP TEMP TEMP TEMP */
+
+      var topIndex = _.sortedIndex(models, viewportTop, function(model) {
         if(typeof model === 'number') return model;
         var view = cv.children.findByModelCid(model.cid);
         return view.el.offsetTop;
-      }) + 1;
+      });
 
-      var remainingChildren = childCollection.slice(topIndex);
+      var remainingChildren = models.slice(topIndex);
+      if (viewportBottom === Number.POSITIVE_INFINITY) {
+        /* Thats the whole lot */
+        return remainingChildren;
+      }
+
       var bottomIndex = _.sortedIndex(remainingChildren, viewportBottom, function(model) {
         if(typeof model === 'number') return model;
         var view = cv.children.findByModelCid(model.cid);
@@ -466,6 +486,10 @@ module.exports = (function() {
 
       var topBound = this._scrollElement.scrollTop;
       var bottomBound = topBound + this._scrollElement.clientHeight;
+      if (bottomBound >= this._scrollElement.scrollHeight - 10) {
+        /* At the bottom? */
+        bottomBound =  Number.POSITIVE_INFINITY;
+      }
 
       var modelsInRange = this.findModelsInViewport(topBound, bottomBound);
       var first = modelsInRange[0];
@@ -485,6 +509,7 @@ module.exports = (function() {
         hasUnreadBelow: below > 0,
         belowItemId: last.id
       });
+
     },
     _eyeballStateChange: function(newState) {
       this._inFocus = newState;

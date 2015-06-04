@@ -236,10 +236,14 @@ exports.getFirstUnreadItem = function(userId, troupeId) {
 };
 
 exports.getUnreadItemsForUser = function(userId, troupeId, callback) {
-  return exports.getUnreadItems(userId, troupeId)
-    .then(function(results) {
+  return Q.all([
+      engine.getUnreadItems(userId, troupeId),
+      engine.getMentions(userId, troupeId)
+    ])
+    .spread(function(chats, mentions) {
       return {
-        chat: results
+        chat: chats,
+        mention: mentions
       };
     })
     .nodeify(callback);
