@@ -3,7 +3,7 @@
   "version": "9.9.0",
   "private": true,
   "dependencies": {
-    "apn": "~1.4.4",
+    "apn": "~1.7.3",
     "async": "~0.9.0",
     "batch-stream": "^0.1.0",
     "cld": "^2.2.0",
@@ -12,7 +12,6 @@
     "csprng": "^0.1.1",
     "diskspace": "0.1.5",
     "dolph": "^0.1.0",
-    "easynexmo": "~0.3.1",
     "elasticsearch": "^2.4.3",
     "email-validator": "^1.0.0",
     "ent": "~0.1.0",

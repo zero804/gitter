@@ -9,6 +9,7 @@ var serializer                   = require("../../serializers/notification-seria
 var notificationMessageGenerator = require('../../utils/notification-message-generator');
 var unreadItemService            = require('../unread-item-service');
 var Q                            = require('q');
+var errorReporter                = require('../../utils/env').errorReporter;
 var basePath                     = nconf.get('web:basepath');
 
 function filterUnreadItemsForUserByMention(userId, items) {
@@ -127,7 +128,10 @@ function sendUserTroupeNotification(userTroupe, notificationNumber, userSetting,
     }
 
     notifyUserOfActivitySince(userTroupe.userId, userTroupe.troupeId, startTime, notificationNumber, userSetting, function(err) {
-      if(err) winston.error('Failed to send notifications: ' + err + '. Failing silently.', { exception: err });
+      if(err) {
+        winston.error('Failed to send notifications: ' + err + '. Failing silently.', { exception: err });
+        errorReporter(err, { userId: userTroupe.userId, troupeId: userTroupe.troupeId });
+      }
 
       return callback();
     });
