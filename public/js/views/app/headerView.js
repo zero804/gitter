@@ -115,6 +115,8 @@ module.exports = (function() {
           } else {
             menuItems.push({ title: 'Integrations', href: '#integrations' });
           }
+
+          menuItems.push({ title: 'Delete Room', href: '#delete' });
         }
 
         menuItems.push({ divider: true });
