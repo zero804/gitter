@@ -116,7 +116,7 @@ module.exports = (function() {
             menuItems.push({ title: 'Integrations', href: '#integrations' });
           }
 
-          menuItems.push({ title: 'Delete Room', href: '#delete' });
+          menuItems.push({ title: 'Delete this room', href: '#delete' });
         }
 
         menuItems.push({ divider: true });
