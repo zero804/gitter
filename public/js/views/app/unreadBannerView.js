@@ -125,16 +125,15 @@ var BottomBannerView = TopBannerView.extend({
   },
 
   onMainButtonClick: function() {
+    this.toggleScrollHelper(true);
+
     var mentionId = this.model.get('mostRecentMentionId');
     if (mentionId) return appEvents.trigger('chatCollectionView:scrollToChatId', mentionId);
 
     var itemId = this.model.get('mostRecentUnreadItemId');
     if (itemId) return appEvents.trigger('chatCollectionView:scrollToChatId', itemId);
 
-    if (this.actAsScrollHelper) {
-      this.toggleScrollHelper(true);
-      appEvents.trigger('chatCollectionView:scrollToBottom');
-    }
+    appEvents.trigger('chatCollectionView:scrollToBottom');
   },
 
   onSideButtonClick: function() {}
