@@ -1,12 +1,11 @@
 'use strict';
 
 var _ = require('underscore');
-var resolveIconClass = require('../../public/js/utils/resolve-icon-class');
 var template = require('./compile-web-template')('/js/views/menu/tmpl/room-list-item');
 
 module.exports = function (model) {
   var data = _.extend(model, {
-    iconClass: resolveIconClass(model)
+    userOrOrg: model.url.split('/')[1]
   });
   return template(data);
 };
