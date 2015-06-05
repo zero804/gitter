@@ -1,19 +1,17 @@
 .issue {
-  border: 1px solid fade(@trpGrey,40%);
-  background-color: fade(@trpGrey,20%);
-  border-radius: 2px;
-  padding: 0 4px;
-  white-space: nowrap;
+  border-bottom: 1px dotted;
   cursor: pointer;
+  padding: 0 2px;
+  border-radius: 2px;
 }
 
 .commit {
-  border: 1px solid fade(@trpAsbestos,30%);
-  background-color: fade(@trpAsbestos,20%);
-  border-radius: 2px;
-  padding: 0 4px;
-  white-space: nowrap;
+  border-bottom: 1px dotted;
   cursor: pointer;
+  padding: 0 2px;
+  background-color: lighten(@purple, 50%);
+  border-radius: 2px;
+  color: @purple;
 }
 
 .commit-popover-title {
@@ -67,31 +65,18 @@
   }
 }
 
-.commit:hover {
-  text-decoration: none;
-  background-color: fade(@trpAsbestos, 40%);
-}
-
 a.issue:hover {
   text-decoration: none;
 }
 
 .issue.open {
-  border: 1px solid fade(@trpGreen, 20%);
-  background-color: fade(@trpGreen, 20%);
-}
-
-.issue.open:hover {
-  background-color: fade(@trpGreen, 40%);
+  color: @trpGreen;
+  background-color: lighten(@trpGreen, 45%);
 }
 
 .issue.closed {
-  border: 1px solid fade(@trpRed, 20%);
-  background-color: fade(@trpRed, 20%);
-}
-
-.issue.closed:hover {
-  background-color: fade(@trpRed, 40%)
+  color: @trpRed;
+  background-color: lighten(@trpRed, 35%);
 }
 
 .issue-popover-body {
