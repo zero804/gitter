@@ -80,12 +80,12 @@ exports.cloneSchema = function(schema) {
 };
 
 /*
- * Returns a promise [document, numAffected, raw]
+ * Returns a promise [document, updatedExisting]
  */
 exports.upsert = function(schema, query, setOperation) {
   return schema.updateQ(query, setOperation, { upsert: true })
     .spread(function(numAffected, raw) {
-      return [schema.findOneQ(query), numAffected, raw];
+      return [schema.findOneQ(query), !!raw.updatedExisting];
     });
 };
 
