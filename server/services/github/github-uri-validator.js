@@ -1,10 +1,12 @@
 "use strict";
 
-var GitHubOrgService = require('./github-org-service');
+var GitHubOrgService  = require('./github-org-service');
 var GitHubRepoService = require('./github-repo-service');
-var Q = require('q');
+var Q                 = require('q');
+var debug             = require('debug')('gitter:github-uri-validator');
 
 function validateOrgUri(user, uri) {
+  debug("validateOrgUri: %s", uri);
   var orgService = new GitHubOrgService(user);
   return orgService.getOrg(uri)
     .then(function(org) {
@@ -21,6 +23,8 @@ function validateOrgUri(user, uri) {
 }
 
 function validateRepoUri(user, uri) {
+  debug("validateRepoUri: %s", uri);
+
   var repoService = new GitHubRepoService(user);
   return repoService.getRepo(uri)
     .then(function(repo) {
@@ -41,6 +45,8 @@ function validateRepoUri(user, uri) {
  * @returns promise of ORG / REPO or null
  */
 function validateUri(user, uri) {
+  debug("validateUri: %s", uri);
+
   var parts = uri.split('/');
   if(parts.length == 1) {
     /** Its a user or org.

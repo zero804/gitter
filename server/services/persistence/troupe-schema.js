@@ -13,7 +13,7 @@ var _              = require("underscore");
 var tagger         = require('../../utils/room-tagger');
 var RepoService    = require('../github/github-repo-service');
 var troupeUtils    = require('../../utils/models/troupes');
-var debug          = require('debug')('troupe-schema');
+var debug          = require('debug')('gitter:troupe-schema');
 
 function serializeEvent(url, operation, model, callback) {
   debug("Serializing %s to %s", operation, url);
