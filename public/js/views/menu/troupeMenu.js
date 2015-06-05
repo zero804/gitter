@@ -159,11 +159,12 @@ module.exports = (function () {
             }));
 
           }
-        },
-        suggested: {
-          el: "#suggested-region"
-        },
+        }
       }
+    },
+
+    regions: {
+      suggested: "#suggested-region"
     },
 
     initialize: function () {
@@ -223,6 +224,7 @@ module.exports = (function () {
             });
         }
       });
+      
       this.showChildView('suggested', suggestedWrapperView);
     },
 
