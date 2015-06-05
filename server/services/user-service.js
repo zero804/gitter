@@ -49,7 +49,7 @@ function newUser(options) {
   return mongooseUtils.upsert(persistence.User, { githubId: githubId }, {
       $setOnInsert: insertFields
     })
-    .spread(function(user/*, numAffected, raw*/) {
+    .spread(function(user/*, updateExisting*/) {
       //if(raw.updatedExisting) return user;
 
       // New record was inserted

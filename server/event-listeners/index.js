@@ -2,7 +2,9 @@
 "use strict";
 
 exports.install = function() {
-  ['./room-permissions-change-listener'].forEach(function(module) {
-    require(module).install();
-  });
+  ['./room-permissions-change-listener',
+   './repo-rename-detected-listener']
+    .forEach(function(module) {
+      require(module).install();
+    });
 };

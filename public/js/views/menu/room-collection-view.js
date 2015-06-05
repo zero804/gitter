@@ -71,7 +71,8 @@ module.exports = (function() {
       'click .js-close-button': 'showPopover'
     },
     ui: {
-      unreadBadge: '#unread-badge'
+      unreadBadge: '#unread-badge',
+      roomName: '#room-name'
     },
     showPopover: function(e) {
       e.stopPropagation(); // no navigation
