@@ -208,8 +208,11 @@ module.exports = (function() {
     },
 
     getFirstItem: function() {
-      var items = Object.keys(this._items);
-      return items.sort()[0]; // TODO: make this O(n) instead of (n log n)
+      return Object.keys(this._items).reduce(function(memo, value) {
+        /* min */
+        if (memo === null) return value;
+        return memo < value ? memo : value;
+      }, null);
     }
   });
 
@@ -614,7 +617,7 @@ module.exports = (function() {
 
     getFirstUnreadItem: function() {
       var unreadItemStore = getUnreadItemStoreReq();
-      return unreadItemStore.getFirstItemOfType('chat');
+      return unreadItemStore.getFirstItem();
     }
   };
 
