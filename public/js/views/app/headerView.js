@@ -103,20 +103,19 @@ module.exports = (function() {
         ];
 
         var c = context();
+        var isAdmin = c.permissions && c.permissions.admin;
         var url = this.model.get('url');
 
         menuItems.push({ title: 'Share this chat room', href: '#share' });
         menuItems.push({ divider: true });
         menuItems.push({ title: 'Notifications', href: '#notifications' });
 
-        if(c.permissions && c.permissions.admin) {
+        if(isAdmin) {
           if(c.isNativeDesktopApp) {
             menuItems.push({ title: 'Integrations', href: context.env('basePath') + url + '#integrations', target: '_blank', dataset: { disableRouting: 1 } });
           } else {
             menuItems.push({ title: 'Integrations', href: '#integrations' });
           }
-
-          menuItems.push({ title: 'Delete this room', href: '#delete' });
         }
 
         menuItems.push({ divider: true });
@@ -126,6 +125,12 @@ module.exports = (function() {
         var githubType = this.model.get('githubType');
         if(githubType === 'REPO' || githubType === 'ORG') {
           menuItems.push({ title: 'Open in GitHub', href: 'https://www.github.com' + url, target: '_blank' });
+        }
+
+        menuItems.push({ divider: true });
+
+        if (isAdmin) {
+          menuItems.push({ title: 'Delete this room', href: '#delete' });
         }
 
         menuItems.push({ title: 'Leave this room', href: '#leave' });
