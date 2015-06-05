@@ -470,17 +470,21 @@ module.exports = (function() {
       return remainingChildren.slice(0, bottomIndex);
     },
 
+    _resetFoldModel: function() {
+      // If there are no unread items, save the effort.
+      acrossTheFoldModel.set({
+        unreadAbove: 0,
+        unreadBelow: 0,
+        belowItemId: null,
+        hasUnreadBelow: false,
+        hasUnreadAbove: false
+      });
+    },
+
     _foldCount: function() {
       var chats = this._store.getItems();
       if(!chats.length) {
-        // If there are no unread items, save the effort.
-        acrossTheFoldModel.set({
-          unreadAbove: 0,
-          unreadBelow: 0,
-          belowItemId: null,
-          hasUnreadBelow: false,
-          hasUnreadAbove: false
-        });
+        this._resetFoldModel();
         return;
       }
 
@@ -495,6 +499,11 @@ module.exports = (function() {
       }
 
       var modelsInRange = this.findModelsInViewport(topBound, bottomBound);
+      if (!modelsInRange.length) {
+        this._resetFoldModel();
+        return;
+      }
+
       var first = modelsInRange[0];
       var last = modelsInRange[modelsInRange.length - 1];
       var firstItemId = first.id;
