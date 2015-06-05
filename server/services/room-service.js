@@ -39,7 +39,7 @@ var roomSearchService  = require('./room-search-service');
 var assertMemberLimit  = require('./assert-member-limit');
 var qlimit             = require('qlimit');
 var redisLockPromise   = require("../utils/redis-lock-promise");
-var debug              = require('debug')('room-service');
+var debug              = require('debug')('gitter:room-service');
 var badgerEnabled      = nconf.get('autoPullRequest:enabled');
 
 function localUriLookup(uri, opts) {
@@ -282,6 +282,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
                 /* Do we need to rename the old uri? */
                 if (troupe.uri !== officialUri) {
 
+                  // TODO: deal with ORG renames too!
                   if (githubType === 'REPO') {
                     debug('Attempting to rename room %s to %s', uri, officialUri);
 
@@ -298,7 +299,6 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
                           });
                       });
                   }
-                  // TODO: deal with ORG renames too!
                 }
 
                 return {
@@ -324,6 +324,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
                   applyAutoHooksForRepoRoom(user, troupe)
                     .catch(function(err) {
                       logger.error("Unable to apply hooks for new room", { exception: err });
+                      errorReporter(err, { uri: uri, user: user.username });
                     });
                 }
 
@@ -451,8 +452,6 @@ function updateRoomWithGithubId(user, troupe) {
  */
 function updateRoomWithGithubIdIfRequired(user, troupe) {
   if (!troupe.githubId && (troupe.githubType === 'REPO' || troupe.githubType === 'ORG')) {
-    debug('Updating room %s with githubId');
-
     return updateRoomWithGithubId(user, troupe)
       .catch(function(err) {
         logger.error('Unable to update repo room with githubId: ' + err, { uri: troupe.uri, exception: err });
@@ -533,7 +532,13 @@ function findOrCreateRoom(user, uri, options) {
         if(otherUser.id == userId) {
           debug("localUriLookup returned own user for uri=%s", uri);
 
-          return { ownUrl: true };
+          return {
+            ownUrl: true,
+            oneToOne: false,
+            troupe: null,
+            didCreate: false,
+            uri: otherUser.username
+          };
         }
 
         debug("localUriLookup returned user for uri=%s. Finding or creating one-to-one", uri);

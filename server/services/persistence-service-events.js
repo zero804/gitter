@@ -4,7 +4,7 @@
 var env            = require('../utils/env');
 var logger         = env.logger;
 var Q              = require('q');
-var debug          = require('debug')('persistence-service-events');
+var debug          = require('debug')('gitter:persistence-service-events');
 var appEvents      = require("../app-events");
 var restSerializer = require("../serializers/rest-serializer");
 

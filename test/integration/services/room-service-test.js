@@ -294,32 +294,46 @@ describe('room-service #slow', function() {
         .nodeify(done);
     });
 
-  it('should redirect a user when a URI is in the wrong case and the room is to be created', function(done) {
-    return persistence.Troupe.findOneAndRemoveQ({ lcUri: 'gitterhq/sandbox' })
-      .then(function() {
-        var permissionsModelMock = mockito.mockFunction();
-        var roomService = testRequire.withProxies("./services/room-service", {
-          './permissions-model': permissionsModelMock
-        });
+    it('should detect when a user hits their own userhome', function(done) {
+        var roomService = testRequire("./services/room-service");
 
-        mockito.when(permissionsModelMock)().then(function(user, right, uri, githubType) {
-          assert.equal(user.username, fixture.user1.username);
-          assert.equal(right, 'create');
-          assert.equal(uri, 'gitterHQ/sandbox');
-          assert.equal(githubType, 'REPO');
+        return roomService.findOrCreateRoom(fixture.user1, fixture.user1.username)
+          .then(function(context) {
+            assert(context.ownUrl);
+            assert(!context.oneToOne);
+            assert(!context.troupe);
+            assert(!context.didCreate);
+            assert.strictEqual(context.uri, fixture.user1.username);
+          })
+          .nodeify(done);
+    });
 
-          return Q.resolve(true);
-        });
-
-        return roomService.findOrCreateRoom(fixture.user1, 'gitterhq/sandbox')
-          .then(function() {
-            assert(false, 'Expected redirect');
-          }, function(err) {
-            assert(err.redirect, 'gitterHQ/sandbox');
+    it('should redirect a user when a URI is in the wrong case and the room is to be created', function(done) {
+      return persistence.Troupe.findOneAndRemoveQ({ lcUri: 'gitterhq/sandbox' })
+        .then(function() {
+          var permissionsModelMock = mockito.mockFunction();
+          var roomService = testRequire.withProxies("./services/room-service", {
+            './permissions-model': permissionsModelMock
           });
-      })
-      .nodeify(done);
-  });
+
+          mockito.when(permissionsModelMock)().then(function(user, right, uri, githubType) {
+            assert.equal(user.username, fixture.user1.username);
+            assert.equal(right, 'create');
+            assert.equal(uri, 'gitterHQ/sandbox');
+            assert.equal(githubType, 'REPO');
+
+            return Q.resolve(true);
+          });
+
+          return roomService.findOrCreateRoom(fixture.user1, 'gitterhq/sandbox')
+            .then(function() {
+              assert(false, 'Expected redirect');
+            }, function(err) {
+              assert(err.redirect, 'gitterHQ/sandbox');
+            });
+        })
+        .nodeify(done);
+    });
 
     it('should handle an invalid url correctly', function(done) {
       var roomService = testRequire("./services/room-service");

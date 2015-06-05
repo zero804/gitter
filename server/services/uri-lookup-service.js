@@ -10,7 +10,7 @@
 var persistence = require("./persistence-service");
 var Q           = require('q');
 var mongoUtils  = require('../utils/mongo-utils');
-var debug       = require('debug')('uri-lookup-service');
+var debug       = require('debug')('gitter:uri-lookup-service');
 
 
 /**
