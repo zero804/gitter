@@ -83,6 +83,13 @@ Migrates all chat messages from one room to another. Requires two rooms.
 
 e.g `./scripts/utils/migrate-messages.js --from trevorah/oldroom --to trevorah/newroom`
 
+### node hellban.js <username> [options]
+
+username     username to hellban e.g trevorah
+
+Options:
+   -u, --unban   unban user from hell
+
 Upgrading gitter-services to add support for more services
 ----------------------------------------------------------
 Recently merged a pull request for [gitter-services](https://github.com/gitterHQ/services)? then read on…
