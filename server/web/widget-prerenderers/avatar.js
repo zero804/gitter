@@ -6,7 +6,7 @@ var resolveAvatarUrl = require('../../../shared/avatars/resolve-avatar-url');
 module.exports = exports = function(template) {
   return function avatarWidgetHandler(params) {
     var hash = params.hash;
-    var user = hash.model || hash.user;
+    var user = hash.model || hash.user || {};
 
     var avatarSize = hash.avatarSize || 's';
     var showBadge = hash.showBadge;
