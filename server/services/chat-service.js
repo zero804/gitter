@@ -138,6 +138,10 @@ exports.newChatMessageToTroupe = function(troupe, user, data, callback) {
       _md:        parsedMessage.markdownProcessingFailed ? -CURRENT_META_DATA_VERSION : CURRENT_META_DATA_VERSION
     });
 
+    // hellban for users
+    // dont write message to db, just fake it for the troll / asshole
+    if (user.hellbanned) return chatMessage;
+
     return chatMessage.saveQ()
       .then(function() {
         // Async add unread items
