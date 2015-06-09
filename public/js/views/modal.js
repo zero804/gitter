@@ -11,6 +11,7 @@ var ModalView = Marionette.ItemView.extend({
   className: "modal",
 
   events: {
+    'click .close': 'hide',
     'click .button': 'onMenuItemClicked'
   },
 
@@ -19,7 +20,6 @@ var ModalView = Marionette.ItemView.extend({
       menuItems: [],
       title: null
     };
-    _.bindAll(this, 'hide', 'onMenuItemClicked');
     _.extend(this.options, options);
 
     this.view = this.options.view || this.view;
@@ -49,7 +49,6 @@ var ModalView = Marionette.ItemView.extend({
 
     var modalBody = this.$el.find('.modal-body');
     modalBody.append(this.view.render().el);
-    this.$el.find('.close').on('click', this.hide);
 
     if(!isCompact() && !this.disableAutoFocus) {
       window.setTimeout(function() {
@@ -101,7 +100,6 @@ var ModalView = Marionette.ItemView.extend({
   onDestroy: function() {
     this.view.destroy();
     this.view.dialog = null;
-    this.$el.find('.close').off('click');
   },
 
   prepare: function() {
