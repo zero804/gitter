@@ -25,6 +25,7 @@ var UserSchema = new Schema({
   permissions: {
     createRoom: { type: Boolean, 'default': true }
   },
+  hellbanned: { type: Boolean }, // to troll the trolls
   githubScopes: { type: Schema.Types.Mixed },
   state: { type: String },
   stripeCustomerId: { type: String },
