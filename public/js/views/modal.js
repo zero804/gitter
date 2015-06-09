@@ -28,7 +28,6 @@ var ModalView = Marionette.ItemView.extend({
   serializeData: function() {
     var menuItems = this.menuItems || this.options.menuItems;
     return {
-      customTitle: !!this.options.title,
       title: this.options.title,
       hasMenuItems: !!menuItems.length,
       menuItems: menuItems
