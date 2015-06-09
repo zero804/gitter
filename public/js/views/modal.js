@@ -6,13 +6,17 @@ var modalTemplate = require('./tmpl/modal.hbs');
 var isCompact = require('utils/detect-compact');
 require('../template/helpers/all');
 
-var ModalView = Marionette.ItemView.extend({
+var ModalView = Marionette.LayoutView.extend({
   template: modalTemplate,
   className: "modal",
 
   events: {
     'click .close': 'hide',
     'click .button': 'onMenuItemClicked'
+  },
+
+  regions: {
+    'modalBody': '#modal-body-region'
   },
 
   initialize: function(options) {
@@ -46,8 +50,7 @@ var ModalView = Marionette.ItemView.extend({
     var self = this;
     this.$el.hide();
 
-    var modalBody = this.$el.find('.modal-body');
-    modalBody.append(this.view.render().el);
+    this.modalBody.show(this.view);
 
     if(!isCompact() && !this.disableAutoFocus) {
       window.setTimeout(function() {
