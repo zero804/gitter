@@ -9,7 +9,7 @@
 @import "../repo/katex/katex";
 @import "../repo/katex/fonts";
 
-@chat-spacing: 0.222em;
+@chat-spacing: 0.2em;
 
 .trpChatContainer .isViewers:last-child .chat-item__details .chat-item__icon--read {
   visibility: visible;
@@ -132,10 +132,10 @@
     transition: 2s border linear, 2s background-color linear;
   }
 
-  &.mention .chat-item__text .mention {
-    border: 1px solid fade(@orange,40%);
-    background-color: fade(@orange,10%);
+  &.mentioned .chat-item__text .mention {
     color: @orange;
+    background-color: lighten(@orange, 40%);
+    border-radius: 2px;
   }
 
   &:last-child {
@@ -296,14 +296,9 @@
   padding: 0;
   word-wrap: break-word;
   user-select: text;
-  line-height: 1.58em;
 
   a {
     color: @blue;
-  }
-
-  .issue, .commit {
-    padding-bottom: 2px;
   }
 
   p {
@@ -342,11 +337,9 @@
   }
 
   .mention {
-    border: 1px solid fade(@trpGrey,40%);
-    background-color: fade(@trpGrey,20%);
-    border-radius: 2px;
-    padding: 0 4px 2px;
+    border-bottom: 1px dotted;
     cursor: pointer;
+    padding: 0 2px;
   }
 
   .groupmention {
