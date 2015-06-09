@@ -16,14 +16,8 @@ var ModalView = Marionette.ItemView.extend({
 
   initialize: function(options) {
     this.options = {
-      keyboard: true,
-      backdrop: true,
-      autoRemove: true,
       menuItems: [],
-      disableClose: false,
-      hideHeader: false,
-      title: null,
-      navigable: false
+      title: null
     };
     _.bindAll(this, 'hide', 'onMenuItemClicked');
     _.extend(this.options, options);
@@ -34,12 +28,10 @@ var ModalView = Marionette.ItemView.extend({
   serializeData: function() {
     var menuItems = this.menuItems || this.options.menuItems;
     return {
-      hideHeader: this.options.hideHeader,
       customTitle: !!this.options.title,
       title: this.options.title,
       hasMenuItems: !!menuItems.length,
-      menuItems: menuItems,
-      disableClose: this.options.disableClose
+      menuItems: menuItems
     };
   },
 
@@ -187,25 +179,21 @@ var ModalView = Marionette.ItemView.extend({
     this.trigger('hidden');
     this.backdrop();
 
-    if(this.options.autoRemove) {
-      this.destroy();
-    }
+    this.destroy();
   },
 
   backdrop: function( callback ) {
-    if (this.isShown && this.options.backdrop) {
+    if (this.isShown) {
 
       this.$backdrop = $('<div class="modal-backdrop" />')
         .appendTo(document.body);
 
-      if (this.options.backdrop != 'static' && !this.options.disableClose) {
-        var bd = this.$backdrop;
-        this.$backdrop.click(function(e) {
-          if( e.target !== this ) return;
+      var bd = this.$backdrop;
+      this.$backdrop.click(function(e) {
+        if( e.target !== this ) return;
 
-          bd.modal.hide();
-        });
-      }
+        bd.modal.hide();
+      });
       this.$backdrop.modal = this;
       this.$backdrop.addClass('in');
 
@@ -227,9 +215,8 @@ var ModalView = Marionette.ItemView.extend({
   },
 
   escape: function () {
-    if(this.options.disableClose) return;
     var that = this;
-    if (this.isShown && this.options.keyboard) {
+    if (this.isShown) {
       $(document).on('keydown', keydown);
     } else if (!this.isShown) {
       $(document).off('keydown', keydown);
