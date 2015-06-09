@@ -119,22 +119,6 @@ var ModalView = Marionette.ItemView.extend({
     }
   },
 
-  setTitle: function(title) {
-    this.options.title = title;
-    // cant seem to call render() twice...
-    this.$el.find('.trpModalTitleHeader').text(title);
-  },
-
-  supportsModelReplacement: function() {
-    return this.view &&
-            this.view.supportsModelReplacement &&
-            this.view.supportsModelReplacement();
-  },
-
-  replaceModel: function(model) {
-    return this.view.replaceModel(model);
-  },
-
   show: function() {
     this.view.dialog = this;
 
@@ -193,31 +177,6 @@ var ModalView = Marionette.ItemView.extend({
     this.trigger('hide');
 
     this.hideModal();
-  },
-
-  transitionTo: function(newDialog) {
-    newDialog.options.backdrop = false;
-    var backdrop = this.$backdrop;
-    this.$backdrop = null;
-    this.hide();
-    backdrop.modal = newDialog;
-    newDialog.show();
-    newDialog.$backdrop = backdrop;
-
-  },
-
-  /* Modal private methods */
-  hideWithTransition: function() {
-    var that = this;
-    var timeout = setTimeout(function () {
-          that.$el.off($.support.transition.end);
-          that.hideModal();
-        }, 500);
-
-    this.$el.one($.support.transition.end, function() {
-      clearTimeout(timeout);
-      that.hideModal();
-    });
   },
 
   hideModal: function () {
@@ -282,18 +241,5 @@ var ModalView = Marionette.ItemView.extend({
 
   }
 });
-
-ModalView.wrapView = function(View, customisations) {
-  var Modal = ModalView.extend(customisations);
-
-  Modal.prototype.initialize = function(options) {
-    options = options || {};
-    // todo let the caller to wrapView specify their own initialize which is called instead of below
-    ModalView.prototype.initialize.apply(this, arguments);
-    this.view = new View(options);
-  };
-
-  return Modal;
-};
 
 module.exports = ModalView;
