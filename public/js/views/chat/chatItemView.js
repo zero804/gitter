@@ -61,6 +61,7 @@ module.exports = (function() {
       class: 'chat-item'
     },
     ui: {
+      actions: '.js-chat-item-actions',
       collapse: '.js-chat-item-collapse',
       text: '.js-chat-item-text'
     },
@@ -536,6 +537,14 @@ module.exports = (function() {
         placement: 'horizontal',
         width: '150px'
       });
+
+      this.listenTo(actions, 'render', function() {
+        this.ui.actions.addClass('selected');
+      }.bind(this));
+
+      this.listenTo(actions, 'destroy', function() {
+        this.ui.actions.removeClass('selected');
+      }.bind(this));
 
       actions.show();
       ReadByPopover.singleton(this, actions);
