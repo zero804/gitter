@@ -36,7 +36,8 @@ var View = Marionette.ItemView.extend({
 var DelayLock = Backbone.Model.extend({
   defaults: {
     locked: true,
-    secondsLeft: 3
+    // give enough time to read the warnings
+    secondsLeft: 8
   },
   initialize: function() {
     this.tick();
