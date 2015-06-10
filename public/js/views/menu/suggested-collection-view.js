@@ -16,7 +16,7 @@ module.exports = (function() {
       var data = this.model.toJSON();
       data.uri = roomNameTrimmer(data.uri);
       data.linkUrl = data.exists ? '/' + this.model.get('uri') : '#confirm/' + this.model.get('uri');
-      data.userOrOrg = data.url.split('/')[1];
+      data.userOrOrg = this.model.get('uri').split('/')[0];
       return data;
     }
   });
