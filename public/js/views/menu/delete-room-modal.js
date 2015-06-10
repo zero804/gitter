@@ -1,20 +1,23 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
+var Backbone = require('backbone');
 var ModalView = require('views/modal');
 var context = require('utils/context');
 var apiClient = require('components/apiClient');
 var appEvents = require('utils/appevents');
+var template = require('./tmpl/delete-room-modal.hbs');
 
 var View = Marionette.ItemView.extend({
   tagName: 'p',
   attributes: { style: 'padding-bottom: 15px' },
+  modelEvents: {
+    'change': 'render'
+  },
   initialize: function() {
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
   },
-  template: function() {
-    return 'Are you sure you want to delete this room and all of its contents?';
-  },
+  template: template,
   menuItemClicked: function(button) {
     if (button !== 'delete') return;
 
@@ -24,16 +27,53 @@ var View = Marionette.ItemView.extend({
   }
 });
 
+var DelayLock = Backbone.Model.extend({
+  defaults: {
+    locked: true,
+    secondsLeft: 3
+  },
+  initialize: function() {
+    this.tick();
+  },
+  tick: function() {
+    var self = this;
+    if (!this.get('locked')) return;
+
+    setTimeout(function() {
+      var seconds = self.get('secondsLeft') - 1;
+      self.set('secondsLeft', seconds);
+
+      if (seconds <= 0) {
+        self.set('locked', false);
+      } else {
+        self.tick();
+      }
+    }, 1000);
+  }
+});
+
 var Modal = ModalView.extend({
   initialize: function(options) {
     options = options || {};
     options.title = 'Careful Now...';
     var roomName = context.troupe().get('uri');
-    options.menuItems = [{ action: 'delete', text: 'Delete "' + roomName + '"', className: 'trpBtnRed trpBtnRight' }];
+    options.menuItems = [{
+      disabled: true,
+      action: 'delete',
+      text: 'Delete "' + roomName + '"',
+      className: 'trpBtnRed trpBtnRight'
+    }];
 
+    var lock = new DelayLock();
+
+    this.listenTo(lock, 'change:locked', function() {
+      this.setButtonState('delete', true);
+    });
 
     ModalView.prototype.initialize.call(this, options);
-    this.view = new View();
+    this.view = new View({
+      model: lock
+    });
   }
 });
 
