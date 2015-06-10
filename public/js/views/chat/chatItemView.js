@@ -249,6 +249,7 @@ module.exports = (function() {
       }
 
       /* Don't run on the initial (changed=undefined) as its done in the template */
+      // FIXME this is whole thing is pretty ugly, could do with a refactor
       if (changes && 'readBy' in changes) {
         var readByCount = model.get('readBy');
         var oldValue = model.previous('readBy');
@@ -257,8 +258,9 @@ module.exports = (function() {
 
         if(readByLabel.length === 0) {
           if(readByCount) {
-           readByLabel = $(document.createElement('div')).addClass('chat-item__icon--read js-chat-item-readby');
-           readByLabel.insertBefore($el.find('.js-chat-item-edit'));
+           // FIXME this specially
+           readByLabel = $(document.createElement('div')).addClass('chat-item__icon chat-item__icon--read icon-check js-chat-item-readby');
+           readByLabel.appendTo($el.find('.chat-item__actions'));
 
            RAF(function() {
              readByLabel.addClass('readBySome');
