@@ -214,6 +214,7 @@ module.exports = (function() {
         return memo < value ? memo : value;
       }, null);
     }
+
   });
 
   // -----------------------------------------------------
@@ -366,8 +367,10 @@ module.exports = (function() {
 
     appEvents.on('unreadItemDisplayed', this._getBounds);
 
-    unreadItemStore.on('add', foldCountLimited);
-    unreadItemStore.on('unreadItemRemoved', foldCountLimited);
+    var storeEvents = ['newcountvalue', 'unreadItemRemoved', 'change:status', 'itemMarkedRead', 'add'];
+    storeEvents.forEach(function(evt) {
+      unreadItemStore.on(evt, foldCountLimited);
+    });
 
     // When the UI changes, rescan
     // appEvents.on('appNavigation', this._getBounds);
