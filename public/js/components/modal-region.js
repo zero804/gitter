@@ -7,7 +7,6 @@ module.exports = (function() {
     currentView: null,
     show: function(view) {
       if(this.currentView) {
-        this.currentView.fade = false;
         this.currentView.hideInternal();
       }
       this.currentView = view;
