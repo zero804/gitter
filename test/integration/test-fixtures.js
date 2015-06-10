@@ -1,10 +1,10 @@
 "use strict";
 
 var testRequire = require('./test-require');
-
-var Q = require("q");
+var Q           = require("q");
 var persistence = testRequire("./services/persistence-service");
-var winston = testRequire("./utils/winston");
+var debug       = require('debug')('gitter:test-fixtures');
+
 var counter = 0;
 
 function generateEmail() {
@@ -57,7 +57,7 @@ function createBaseFixture() {
           }
         }))
         .then(function() {
-          winston.verbose('Removed ' + count + ' items');
+          debug('Removed %s items', count);
         })
         .nodeify(callback);
     }
@@ -105,7 +105,7 @@ function load(expected, done) {
 function createExpectedFixtures(expected, done) {
   function createUser(fixtureName, f) {
 
-    winston.verbose('Creating ' + fixtureName);
+    debug('Creating %s', fixtureName);
 
     // A username of true means generate one
     var username = f.username === true ? generateUsername() : f.username;
@@ -124,7 +124,7 @@ function createExpectedFixtures(expected, done) {
   }
 
   function createContact(fixtureName, f) {
-    winston.verbose('Creating ' + fixtureName);
+    debug('Creating %s', fixtureName);
 
     return persistence.Contact.createQ({
       name:          f.name    || 'John Doe',
@@ -146,7 +146,7 @@ function createExpectedFixtures(expected, done) {
 
     var security = f.security || undefined;
 
-    winston.verbose('Creating ' + fixtureName);
+    debug('Creating %s', fixtureName);
 
     var uri;
     var githubType = f.githubType || 'ORG';
@@ -159,6 +159,8 @@ function createExpectedFixtures(expected, done) {
     return persistence.Troupe.createQ({
       name: f.name || '~~~TEST~~~ ' + fixtureName,
       uri: uri,
+      lcUri: uri.toLowerCase(),
+      githubId: f.githubId === true ? generateGithubId() : f.githubId || null,
       status: f.status || 'ACTIVE',
       oneToOne: f.oneToOne,
       security: security,
@@ -169,7 +171,7 @@ function createExpectedFixtures(expected, done) {
   }
 
   function createInvite(fixtureName, f) {
-    winston.verbose('Creating ' + fixtureName);
+    debug('Creating %s', fixtureName);
 
     return persistence.Invite.createQ({
       fromUserId:   f.fromUserId,
@@ -183,7 +185,7 @@ function createExpectedFixtures(expected, done) {
   }
 
   function createMessage(fixtureName, f) {
-    winston.verbose('Creating ' + fixtureName);
+    debug('Creating %s', fixtureName);
 
     return persistence.ChatMessage.createQ({
       fromUserId:   f.fromUserId,

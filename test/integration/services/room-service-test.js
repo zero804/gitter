@@ -294,32 +294,46 @@ describe('room-service #slow', function() {
         .nodeify(done);
     });
 
-  it('should redirect a user when a URI is in the wrong case and the room is to be created', function(done) {
-    return persistence.Troupe.findOneAndRemoveQ({ lcUri: 'gitterhq/sandbox' })
-      .then(function() {
-        var permissionsModelMock = mockito.mockFunction();
-        var roomService = testRequire.withProxies("./services/room-service", {
-          './permissions-model': permissionsModelMock
-        });
+    it('should detect when a user hits their own userhome', function(done) {
+        var roomService = testRequire("./services/room-service");
 
-        mockito.when(permissionsModelMock)().then(function(user, right, uri, githubType) {
-          assert.equal(user.username, fixture.user1.username);
-          assert.equal(right, 'create');
-          assert.equal(uri, 'gitterHQ/sandbox');
-          assert.equal(githubType, 'REPO');
+        return roomService.findOrCreateRoom(fixture.user1, fixture.user1.username)
+          .then(function(context) {
+            assert(context.ownUrl);
+            assert(!context.oneToOne);
+            assert(!context.troupe);
+            assert(!context.didCreate);
+            assert.strictEqual(context.uri, fixture.user1.username);
+          })
+          .nodeify(done);
+    });
 
-          return Q.resolve(true);
-        });
-
-        return roomService.findOrCreateRoom(fixture.user1, 'gitterhq/sandbox')
-          .then(function() {
-            assert(false, 'Expected redirect');
-          }, function(err) {
-            assert(err.redirect, 'gitterHQ/sandbox');
+    it('should redirect a user when a URI is in the wrong case and the room is to be created', function(done) {
+      return persistence.Troupe.findOneAndRemoveQ({ lcUri: 'gitterhq/sandbox' })
+        .then(function() {
+          var permissionsModelMock = mockito.mockFunction();
+          var roomService = testRequire.withProxies("./services/room-service", {
+            './permissions-model': permissionsModelMock
           });
-      })
-      .nodeify(done);
-  });
+
+          mockito.when(permissionsModelMock)().then(function(user, right, uri, githubType) {
+            assert.equal(user.username, fixture.user1.username);
+            assert.equal(right, 'create');
+            assert.equal(uri, 'gitterHQ/sandbox');
+            assert.equal(githubType, 'REPO');
+
+            return Q.resolve(true);
+          });
+
+          return roomService.findOrCreateRoom(fixture.user1, 'gitterhq/sandbox')
+            .then(function() {
+              assert(false, 'Expected redirect');
+            }, function(err) {
+              assert(err.redirect, 'gitterHQ/sandbox');
+            });
+        })
+        .nodeify(done);
+    });
 
     it('should handle an invalid url correctly', function(done) {
       var roomService = testRequire("./services/room-service");
@@ -1234,6 +1248,133 @@ describe('room-service #slow', function() {
         })
         .done(done);
     });
+
+  });
+
+  describe('renames', function() {
+    var originalUrl = 'moo/cow-' + Date.now();
+    var renamedUrl = 'bob/renamed-cow-' + Date.now();
+
+    var originalUrl2 = 'moo2/cow-' + Date.now();
+    var renamedUrl2 = 'bob2/renamed-cow-' + Date.now();
+
+    var originalUrl3 = 'moo3/cow-' + Date.now();
+    var renamedUrl3 = 'bob3/renamed-cow-' + Date.now();
+
+    var permissionsModelMock, roomPermissionsModelMock, roomValidatorMock, roomService;
+
+    var fixture = {};
+    before(fixtureLoader(fixture, {
+      user1: { },
+      user2: { },
+      troupeRepo: {
+        uri: originalUrl,
+        lcUri: originalUrl,
+        githubType: 'REPO',
+        githubId: true,
+        users: ['user1', 'user2']
+      },
+      troupeRepo2: {
+        uri: renamedUrl2,
+        lcUri: renamedUrl2,
+        githubType: 'REPO',
+        githubId: true,
+        users: ['user1', 'user2']
+      }
+    }));
+
+    after(function() {
+      fixture.cleanup();
+    });
+
+    beforeEach(function() {
+      permissionsModelMock = mockito.mockFunction();
+      roomPermissionsModelMock = mockito.mockFunction();
+      roomValidatorMock = mockito.mockFunction();
+      roomService = testRequire.withProxies('./services/room-service', {
+        './permissions-model': permissionsModelMock,
+        './room-permissions-model': roomPermissionsModelMock,
+        './github/github-uri-validator': roomValidatorMock
+      });
+    });
+
+    it('should rename a room if a user attempts to create a new room with an existing githubId', function(done) {
+      mockito.when(roomValidatorMock)().then(function() {
+        return Q.resolve({
+          type: 'REPO',
+          uri: renamedUrl,
+          description: 'renamed',
+          githubId: fixture.troupeRepo.githubId,
+          security: 'PUBLIC'
+        });
+      });
+
+      mockito.when(permissionsModelMock)().thenReturn(Q.resolve(true));
+      mockito.when(roomPermissionsModelMock)().thenReturn(Q.resolve(true));
+
+      return roomService.findOrCreateRoom(fixture.user1, renamedUrl, {})
+        .then(function(result) {
+          assert.strictEqual(result.uri, renamedUrl);
+
+          assert.strictEqual(result.didCreate, false);
+          assert.strictEqual(result.troupe.uri, renamedUrl);
+          assert.strictEqual(result.troupe.lcUri, renamedUrl);
+          assert.strictEqual(result.troupe.renamedLcUris[0], originalUrl);
+        })
+        .nodeify(done);
+    });
+
+    it('should rename a room if a user attempts to create an old room with an existing githubId', function(done) {
+      mockito.when(roomValidatorMock)().then(function() {
+        return Q.resolve({
+          type: 'REPO',
+          uri: renamedUrl2,
+          description: 'renamed',
+          githubId: fixture.troupeRepo2.githubId,
+          security: 'PUBLIC'
+        });
+      });
+
+      mockito.when(permissionsModelMock)().thenReturn(Q.resolve(true));
+      mockito.when(roomPermissionsModelMock)().thenReturn(Q.resolve(true));
+
+      return roomService.findOrCreateRoom(fixture.user1, originalUrl2, {})
+        .then(function(result) {
+          assert.strictEqual(result.uri, renamedUrl2);
+
+          assert.strictEqual(result.didCreate, false);
+          assert.strictEqual(result.troupe.uri, renamedUrl2);
+          assert.strictEqual(result.troupe.lcUri, renamedUrl2);
+        })
+        .nodeify(done);
+    });
+
+    it('should rename a room if a user attempts to create a new room with an old uri that does not exist', function(done) {
+      mockito.when(roomValidatorMock)().then(function() {
+        return Q.resolve({
+          type: 'REPO',
+          uri: renamedUrl3,
+          description: 'renamed',
+          githubId: fixture.generateGithubId(),
+          security: 'PUBLIC'
+        });
+      });
+
+      mockito.when(permissionsModelMock)().thenReturn(Q.resolve(true));
+      mockito.when(roomPermissionsModelMock)().thenReturn(Q.resolve(true));
+
+      return roomService.findOrCreateRoom(fixture.user1, originalUrl3, {})
+        .then(function(result) {
+          assert.strictEqual(result.uri, renamedUrl3);
+
+          assert.strictEqual(result.didCreate, true);
+          assert.strictEqual(result.troupe.uri, renamedUrl3);
+          assert.strictEqual(result.troupe.lcUri, renamedUrl3);
+          // assert.strictEqual(result.troupe.renamedLcUris[0], originalUrl);
+        })
+        .nodeify(done);
+    });
+
 
   });
 

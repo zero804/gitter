@@ -2,6 +2,7 @@
 "use strict";
 
 var apn = require('apn');
+var debug = require('debug')('gitter:ios-notification-gateway');
 var env = require('../utils/env');
 var Q = require('q');
 var logger = env.logger;
@@ -58,7 +59,7 @@ function sendNotificationToDevice(notification, badge, device) {
 }
 
 function createConnection(suffix, isProduction) {
-  logger.info('ios push notification gateway (' + suffix + ') starting');
+  debug('ios push notification gateway (%s) starting', suffix);
 
   var connection = new apn.Connection({
     cert: rootDirname + '/' + config.get('apn:cert' + suffix),
@@ -88,7 +89,7 @@ function createConnection(suffix, isProduction) {
 
 function createFeedbackListener(suffix, isProduction) {
   try {
-    logger.info('ios push notification feedback listener (' + suffix + ') starting');
+    debug('ios push notification feedback listener (%s) starting', suffix);
 
     var feedback = new apn.Feedback({
       cert: rootDirname+'/'+config.get('apn:cert' + suffix),
