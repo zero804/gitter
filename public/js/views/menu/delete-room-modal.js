@@ -19,11 +19,17 @@ var View = Marionette.ItemView.extend({
   },
   template: template,
   menuItemClicked: function(button) {
-    if (button !== 'delete') return;
+    switch(button) {
+      case 'delete':
+        apiClient.room.delete().then(function() {
+          appEvents.trigger('navigation', context.getUser().url, 'home', '');
+        });
+        break;
 
-    apiClient.room.delete().then(function() {
-      appEvents.trigger('navigation', context.getUser().url, 'home', '');
-    });
+      case 'cancel':
+        this.dialog.hide();
+        break;
+    }
   }
 });
 
@@ -57,7 +63,9 @@ var Modal = ModalView.extend({
     options = options || {};
     options.title = 'Careful Now...';
     var roomName = context.troupe().get('uri');
-    options.menuItems = [{
+    options.menuItems = [
+    { action: "cancel", text: "Close", className: "trpBtnLightGrey" },
+    {
       disabled: true,
       action: 'delete',
       text: 'Delete "' + roomName + '"',
