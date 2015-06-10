@@ -211,6 +211,7 @@ module.exports = (function() {
       var items = Object.keys(this._items);
       return items.sort()[0]; // TODO: make this O(n) instead of (n log n)
     }
+
   });
 
   // -----------------------------------------------------
@@ -363,8 +364,10 @@ module.exports = (function() {
 
     appEvents.on('unreadItemDisplayed', this._getBounds);
 
-    unreadItemStore.on('add', foldCountLimited);
-    unreadItemStore.on('unreadItemRemoved', foldCountLimited);
+    var storeEvents = ['newcountvalue', 'unreadItemRemoved', 'change:status', 'itemMarkedRead', 'add'];
+    storeEvents.forEach(function(evt) {
+      unreadItemStore.on(evt, foldCountLimited);
+    });
 
     // When the UI changes, rescan
     // appEvents.on('appNavigation', this._getBounds);
@@ -614,7 +617,7 @@ module.exports = (function() {
 
     getFirstUnreadItem: function() {
       var unreadItemStore = getUnreadItemStoreReq();
-      return unreadItemStore.getFirstItemOfType('chat');
+      return unreadItemStore.getFirstItem();
     }
   };
 
