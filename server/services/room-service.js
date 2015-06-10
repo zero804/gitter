@@ -20,6 +20,7 @@ var roomPermissionsModel = require('./room-permissions-model');
 var userService        = require('./user-service');
 var troupeService      = require('./troupe-service');
 var GitHubRepoService  = require('./github/github-repo-service');
+var GitHubOrgService   = require('./github/github-org-service');
 var unreadItemService  = require('./unread-item-service');
 var appEvents          = require("../app-events");
 var serializeEvent     = require('./persistence-service-events').serializeEvent;
@@ -31,15 +32,19 @@ var emailNotificationService = require('./email-notification-service');
 var canUserBeInvitedToJoinRoom = require('./invited-permissions-service');
 var emailAddressService = require('./email-address-service');
 var mongoUtils         = require('../utils/mongo-utils');
+var mongooseUtils      = require('../utils/mongoose-utils');
 var badger             = require('./badger-service');
 var userSettingsService = require('./user-settings-service');
 var roomSearchService  = require('./room-search-service');
 var assertMemberLimit  = require('./assert-member-limit');
 var qlimit             = require('qlimit');
-
+var redisLockPromise   = require("../utils/redis-lock-promise");
+var debug              = require('debug')('gitter:room-service');
 var badgerEnabled      = nconf.get('autoPullRequest:enabled');
 
 function localUriLookup(uri, opts) {
+  debug("localUriLookup %s", uri);
+
   return uriLookupService.lookupUri(uri)
     .then(function (uriLookup) {
       if (!uriLookup) return;
@@ -172,151 +177,192 @@ function makeRoomTypeCreationFilterFunction(creationFilter) {
  * @returns Promise of [troupe, hasJoinPermission] if the user is able to join/create the troupe
  */
 function findOrCreateNonOneToOneRoom(user, troupe, uri, options) {
+  debug("findOrCreateNonOneToOneRoom: %s", uri);
+
   if(!options) options = {};
 
   var roomTypeCreationFilterFunction = makeRoomTypeCreationFilterFunction(options.creationFilter);
 
   if(troupe) {
-    logger.verbose('Does user ' + (user && user.username || '~anon~') + ' have access to ' + uri + '?');
+    /* The troupe exists. Ensure it's not past the max limit and the user can join */
     return assertMemberLimit(troupe, user)
       .then(function() {
-        return Q.all([
-          troupe,
-          roomPermissionsModel(user, 'join', troupe)
-        ]);
+        return roomPermissionsModel(user, 'join', troupe)
+          .then(function(access) {
+            debug('Does user %s have access to existing room? %s', (user && user.username || '~anon~'), access);
+
+            return {
+              troupe: troupe,
+              access: access,
+              didCreate: false
+            };
+          });
       });
   }
 
-  var lcUri = uri.toLowerCase();
-
   /* From here on we're going to be doing a create */
   return validateUri(user, uri)
-    .spread(function(githubType, officialUri, topic) {
+    .then(function(githubInfo) {
+      debug("GitHub information for %s is %j", uri, githubInfo);
+
+      /* If we can't determine the type, skip it */
+      if(!githubInfo) {
+        return {
+          troupe: null,
+          access: false,
+          didCreate: false
+        };
+      }
+
+      var githubType = githubInfo.type;
+      var officialUri = githubInfo.uri;
+      var lcUri = officialUri.toLowerCase();
+      var security = githubInfo.security || null;
+      var githubId = githubInfo.githubId || null;
+      var topic = githubInfo.description;
 
       /* Are we going to allow users to create this type of room? */
       if(!roomTypeCreationFilterFunction(githubType)) {
-        return [null, false];
+        /* Don't allow creation */
+        return {
+          troupe: null,
+          access: false,
+          didCreate: false
+        };
       }
 
-      logger.verbose('URI validation ' + uri + ' returned ', { type: githubType, uri: officialUri });
-
-      /* If we can't determine the type, skip it */
-      if(!githubType) return [null, false];
+      debug('URI validation %s returned type=%s uri=%s', uri, githubType, officialUri);
 
       if(!options.ignoreCase &&
         officialUri !== uri &&
         officialUri.toLowerCase() === uri.toLowerCase()) {
 
-        logger.verbose('Redirecting client from ' + uri + ' to official uri ' + officialUri);
+        debug('Redirecting client from %s to official uri %s', uri, officialUri);
 
         throw { redirect: '/' + officialUri };
       }
 
-      logger.verbose('Checking if user has permission to create a room at ' + uri);
-
       /* Room does not yet exist */
       return permissionsModel(user, 'create', officialUri, githubType, null) // Parent rooms always have security == null
         .then(function(access) {
-          if(!access) return [null, access];
+          debug('Does the user have access to create room %s? %s', uri, access);
 
-          var securityPromise;
-          var githubId = null;
-
-          if(githubType === 'REPO') {
-            var repoService = new GitHubRepoService(user);
-            securityPromise = repoService.getRepo(uri)
-              .then(function(repoInfo) {
-                if(!repoInfo) throw new Error('Unable to find repo ' + uri);
-
-                var security = repoInfo.private ? 'PRIVATE' : 'PUBLIC';
-                githubId = parseInt(repoInfo.id, 10) || undefined;
-                return security;
-              });
-
-          } else {
-            securityPromise = Q.resolve(null);
+          if(!access) {
+            /* Access denied */
+            return {
+              troupe: null,
+              access: false,
+              didCreate: false
+            };
           }
 
-          /* This will load a cached copy */
-          return securityPromise.then(function(security) {
+          var queryTerm = githubId ?
+                { githubId: githubId, githubType: githubType } :
+                { lcUri: lcUri, githubType: githubType };
 
-            var nonce = Math.floor(Math.random() * 100000);
+          return mongooseUtils.upsert(persistence.Troupe, queryTerm, {
+              $setOnInsert: {
+                lcUri: lcUri,
+                lcOwner: lcUri.split('/')[0],
+                uri: officialUri,
+                githubType: githubType,
+                githubId: githubId,
+                topic: topic || "",
+                security: security,
+                dateLastSecurityCheck: new Date(),
+                users:  user ? [{
+                  _id: new ObjectID(),
+                  userId: user._id
+                }] : [],
+                userCount: user ? 1 : 0
+              }
+            })
+            .spread(function(troupe, updateExisting) {
+              if (updateExisting) {
+                /* Do we need to rename the old uri? */
+                if (troupe.uri !== officialUri) {
 
-            return persistence.Troupe.findOneAndUpdateQ(
-              { lcUri: lcUri, githubType: githubType },
-              {
-                $setOnInsert: {
-                  lcUri: lcUri,
-                  lcOwner: lcUri.split('/')[0],
-                  uri: officialUri,
-                  _nonce: nonce,
-                  githubType: githubType,
-                  githubId: githubId,
-                  topic: topic || "",
-                  security: security,
-                  dateLastSecurityCheck: new Date(),
-                  users:  user ? [{
-                    _id: new ObjectID(),
-                    userId: user._id
-                  }] : [],
-                  userCount: user ? 1 : 0
-                }
-              },
-              {
-                upsert: true
-              })
-              .then(function(troupe) {
-                var hookCreationFailedDueToMissingScope;
+                  // TODO: deal with ORG renames too!
+                  if (githubType === 'REPO') {
+                    debug('Attempting to rename room %s to %s', uri, officialUri);
 
-                if(nonce == troupe._nonce) {
-                  serializeCreateEvent(troupe);
-
-                  /* Created here */
-                  var requiredScope = "public_repo";
-                  /* TODO: Later we'll need to handle private repos too */
-                  var hasScope = user.hasGitHubScope(requiredScope);
-
-                  if(hasScope) {
-                    logger.verbose('Upgrading requirements');
-
-                    if(githubType === 'REPO') {
-                      /* Do this asynchronously */
-                      applyAutoHooksForRepoRoom(user, troupe)
-                        .catch(function(err) {
-                          logger.error("Unable to apply hooks for new room", { exception: err });
-                        });
-                    }
-
-                  } else {
-                    if(githubType === 'REPO') {
-                      logger.verbose('Skipping hook creation. User does not have permissions');
-                      hookCreationFailedDueToMissingScope = true;
-                    }
-                  }
-
-                  if(githubType === 'REPO' && security === 'PUBLIC') {
-                    if(badgerEnabled && options.addBadge) {
-                      /* Do this asynchronously (don't chain the promise) */
-                      userSettingsService.getUserSettings(user.id, 'badger_optout')
-                        .then(function(badgerOptOut) {
-                          // If the user has opted out never send the pull request
-                          if(badgerOptOut) return;
-
-                          // Badgers Go!
-                          return badger.sendBadgePullRequest(uri, user);
-                        })
-                        .catch(function(err) {
-                          errorReporter(err, { uri: uri, user: user.username });
-                          logger.error('Unable to send pull request for new room', { exception: err });
-                        });
-                    }
+                    return renameRepo(troupe.uri, officialUri)
+                      .then(function() {
+                        /* Refetch the troupe */
+                        return troupeService.findById(troupe.id)
+                          .then(function(refreshedTroupe) {
+                            return {
+                              troupe: refreshedTroupe,
+                              access: true,
+                              didCreate: false
+                            };
+                          });
+                      });
                   }
                 }
 
-                return [troupe, true, hookCreationFailedDueToMissingScope, true];
-              });
+                return {
+                  troupe: troupe,
+                  access: true,
+                  didCreate: false
+                };
+              }
 
-          });
+              /* The room was created atomically */
+              serializeCreateEvent(troupe);
+
+              /* Created here */
+              /* TODO: Later we'll need to handle private repos too */
+              var hasScope = user.hasGitHubScope("public_repo");
+              var hookCreationFailedDueToMissingScope;
+
+              if(hasScope) {
+                debug('Upgrading requirements');
+
+                if(githubType === 'REPO') {
+                  /* Do this asynchronously */
+                  applyAutoHooksForRepoRoom(user, troupe)
+                    .catch(function(err) {
+                      logger.error("Unable to apply hooks for new room", { exception: err });
+                      errorReporter(err, { uri: uri, user: user.username });
+                    });
+                }
+
+              } else {
+                if(githubType === 'REPO') {
+                  debug('Skipping hook creation. User does not have permissions');
+                  hookCreationFailedDueToMissingScope = true;
+                }
+              }
+
+              if(githubType === 'REPO' && security === 'PUBLIC') {
+                if(badgerEnabled && options.addBadge) {
+                  /* Do this asynchronously (don't chain the promise) */
+                  userSettingsService.getUserSettings(user.id, 'badger_optout')
+                    .then(function(badgerOptOut) {
+                      // If the user has opted out never send the pull request
+                      if(badgerOptOut) return;
+
+                      // Badgers Go!
+                      return badger.sendBadgePullRequest(uri, user);
+                    })
+                    .catch(function(err) {
+                      errorReporter(err, { uri: uri, user: user.username });
+                      logger.error('Unable to send pull request for new room', { exception: err });
+                    });
+                }
+              }
+
+              return {
+                troupe: troupe,
+                access: true,
+                didCreate: true,
+                hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope
+              };
+
+            });
+
+
       });
     });
 }
@@ -376,13 +422,42 @@ function findAllRoomsIdsForUserIncludingMentions(userId, callback) {
 exports.findAllRoomsIdsForUserIncludingMentions = findAllRoomsIdsForUserIncludingMentions;
 
 function updateRoomWithGithubId(user, troupe) {
-  var repoService = new GitHubRepoService(user);
-  return repoService.getRepo(troupe.uri)
-    .then(function(repo) {
-      if (!repo) throw new StatusError(404, 'Repo ' + troupe.uri + ' not found');
-      var githubId = repo.id;
-      return persistence.Troupe.updateQ({ _id: troupe._id }, { $set: { githubId: githubId } });
+  var promise;
+
+  if (troupe.githubType === 'ORG') {
+    promise = new GitHubRepoService(user).getRepo(troupe.uri);
+  } else if (troupe.githubType === 'REPO') {
+    promise = new GitHubOrgService(user).getOrg(troupe.uri);
+  }
+
+  if (promise) return Q.resolve();
+
+  return promise.then(function(underlying) {
+      if (!underlying) throw new StatusError(404, 'Unable to find ' + troupe.uri + ' on GitHub.');
+      var githubId = underlying.id;
+
+      return persistence.Troupe.updateQ({
+          _id: troupe._id
+        }, {
+          $set: { githubId: githubId }
+        });
     });
+}
+
+/*
+ * Room created before early May 2015 didn't have the githubId
+ * and so we were unable to track renames to these rooms.
+ * This lazily updates the githubId on those rooms. New rooms
+ * will be created with a githubId
+ */
+function updateRoomWithGithubIdIfRequired(user, troupe) {
+  if (!troupe.githubId && (troupe.githubType === 'REPO' || troupe.githubType === 'ORG')) {
+    return updateRoomWithGithubId(user, troupe)
+      .catch(function(err) {
+        logger.error('Unable to update repo room with githubId: ' + err, { uri: troupe.uri, exception: err });
+      });
+  }
+
 }
 
 /**
@@ -394,6 +469,8 @@ function updateRoomWithGithubId(user, troupe) {
  * @return The promise of a troupe or nothing.
  */
 function findOrCreateRoom(user, uri, options) {
+  debug("findOrCreateRoom %s %s %j", user && user.username, uri, options);
+
   var userId = user && user.id;
   options = options || {};
   validate.expect(uri, 'uri required');
@@ -416,46 +493,55 @@ function findOrCreateRoom(user, uri, options) {
     };
   }
 
-
   /* First off, try use local data to figure out what this url is for */
   return localUriLookup(uri, options)
     .then(function (uriLookup) {
-      logger.verbose('URI Lookup returned ', { uri: uri, isUser: !!(uriLookup && uriLookup.user), isTroupe: !!(uriLookup && uriLookup.troupe) });
-
       /* Deal with the case of the nonloggedin user first */
       if(!user) {
-
         if(!uriLookup) return null;
 
         if(uriLookup.user) {
+          debug("localUriLookup returned user for uri=%s", uri);
+
           // TODO: figure out what we do for nonloggedin users viewing
           // user profiles
         }
 
         if(uriLookup.troupe) {
+          debug("localUriLookup returned troupe for uri=%s", uri);
+
           var troupe = uriLookup.troupe;
 
           return roomPermissionsModel(null, 'view', troupe)
             .then(function (access) {
               if (!access) return denyAccess(uriLookup); // please see comment about denyAccess
-              return { troupe: troupe };
+              return {
+                troupe: troupe,
+                uri: troupe.uri
+              };
             });
         }
 
         return null;
       }
 
-      // IF THE URI HAS A USER THEN ONE-TO-ONE
+      // If the Uri Lookup returned a user, do a one-to-one
       if(uriLookup && uriLookup.user) {
         var otherUser = uriLookup.user;
 
         if(otherUser.id == userId) {
-          logger.verbose('URI Lookup is our own');
+          debug("localUriLookup returned own user for uri=%s", uri);
 
-          return { ownUrl: true };
+          return {
+            ownUrl: true,
+            oneToOne: false,
+            troupe: null,
+            didCreate: false,
+            uri: otherUser.username
+          };
         }
 
-        logger.verbose('Finding or creating a one to one chat');
+        debug("localUriLookup returned user for uri=%s. Finding or creating one-to-one", uri);
 
         var roomTypeCreationFilterFunction = makeRoomTypeCreationFilterFunction(options.creationFilter);
 
@@ -469,16 +555,25 @@ function findOrCreateRoom(user, uri, options) {
             if(!access) return null;
             return troupeService.findOrCreateOneToOneTroupeIfPossible(userId, otherUser.id)
               .spread(function(troupe, otherUser) {
-                return { oneToOne: true, troupe: troupe, otherUser: otherUser };
+                return {
+                  oneToOne: true,
+                  troupe: troupe,
+                  otherUser: otherUser,
+                  uri: otherUser.username
+                };
               });
           });
       }
 
-      logger.verbose('Attempting to access room ' + uri);
+      debug("localUriLookup returned room %s for uri=%s. Finding or creating room", uriLookup && uriLookup.troupe && uriLookup.troupe.uri, uri);
 
       // need to check for the rooms
       return findOrCreateNonOneToOneRoom(user, uriLookup && uriLookup.troupe, uri, options)
-        .spread(function (troupe, access, hookCreationFailedDueToMissingScope, didCreate) {
+        .then(function(findOrCreateResult) {
+          var troupe = findOrCreateResult.troupe;
+          var access = findOrCreateResult.access;
+          var hookCreationFailedDueToMissingScope = findOrCreateResult.hookCreationFailedDueToMissingScope;
+          var didCreate = findOrCreateResult.didCreate;
 
           // if the user has been granted access to the room, send join stats for the cases of being the owner or just joining the room
           if(access && (didCreate || !troupe.containsUserId(user.id))) {
@@ -493,40 +588,25 @@ function findOrCreateRoom(user, uri, options) {
             .then(function (troupe) {
               if (!access) return denyAccess(uriLookup); // please see comment about denyAccess
 
-              /*
-               * Room created before early May 2015 didn't have the githubId
-               * and so we were unable to track renames to these rooms.
-               * This lazily updates the githubId on those rooms. New rooms
-               * will be created with a githubId
-               */
-              if (troupe.githubType === 'REPO' && !troupe.githubId) {
-                logger.verbose('Updading room with githubId', { uri: troupe.uri });
-
-                /* Async */
-                updateRoomWithGithubId(user, troupe)
-                  .catch(function(err) {
-                    logger.error('Unable to update repo room with githubId: ' + err, { uri: troupe.uri, exception: err });
-                  });
-              }
+              /* Async */
+              updateRoomWithGithubIdIfRequired(user, troupe);
 
               return {
                 oneToOne: false,
                 troupe: troupe,
                 hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope,
-                didCreate: didCreate
+                didCreate: didCreate,
+                uri: troupe.uri
               };
             });
         });
     })
     .then(function(uriLookup) {
-      if(uriLookup) {
-        uriLookup.uri = uri;
-        if(uriLookup.didCreate) {
-          stats.event("create_room", {
-            userId: user.id,
-            roomType: "github-room"
-          });
-        }
+      if(uriLookup && uriLookup.didCreate) {
+        stats.event("create_room", {
+          userId: user.id,
+          roomType: "github-room"
+        });
       }
 
       return uriLookup;
@@ -1225,47 +1305,65 @@ function searchRooms(userId, queryText, options) {
 exports.searchRooms = searchRooms;
 
 /**
- * Rename a REPO room to a new URI
+ * Rename a REPO room to a new URI.
  */
-function renameUri(oldUri, newUri, instigatingUser) {
+function renameRepo(oldUri, newUri) {
   if (oldUri === newUri) return Q.resolve();
 
-  return troupeService.findByUri(oldUri)
-    .then(function(room) {
-      if (!room) throw new StatusError(404, 'Room ' + oldUri + ' does not exist');
-      if (room.githubType !== 'REPO') throw new StatusError(400, 'Only repo rooms can be renamed');
-      if (room.uri === newUri) return; // Case change, and it's already happened
+  return redisLockPromise("lock:rename:" + oldUri, function() {
+    return troupeService.findByUri(oldUri)
+      .then(function(room) {
+        if (!room) return;
+        if (room.githubType !== 'REPO') throw new StatusError(400, 'Only repo rooms can be renamed');
+        if (room.uri === newUri) return; // Case change, and it's already happened
 
-      var repoService = new GitHubRepoService(instigatingUser);
-      return repoService.getRepo(newUri)
-        .then(function(repoInfo) {
-          if(!repoInfo) throw new StatusError(404, 'Unable to find repo ' + newUri);
+        var originalLcUri = room.lcUri;
+        var lcUri = newUri.toLowerCase();
+        var lcOwner = lcUri.split('/')[0];
 
-          var originalLcUri = room.lcUri;
-          var githubId = parseInt(repoInfo.id, 10) || undefined;
+        room.uri = newUri;
+        room.lcUri = lcUri;
+        room.lcOwner = lcOwner;
 
-          var officialUri = repoInfo.full_name;
-          var lcUri = officialUri.toLowerCase();
+        /* Only add if it's not a case change */
+        if (originalLcUri !== lcUri) {
+          room.renamedLcUris.addToSet(originalLcUri);
+        }
 
-          room.githubId = githubId;
-          room.uri = repoInfo.full_name;
-          room.lcUri = lcUri;
-          room.lcOwner = lcUri.split('/')[0];
+        return room.saveQ()
+          .then(function() {
+            return uriLookupService.removeBadUri(oldUri);
+          })
+          .then(function() {
+            return uriLookupService.reserveUriForTroupeId(room.id, lcUri);
+          })
+          .then(function() {
+            return persistence.Troupe.findQ({ parentId: room._id });
+          })
+          .then(function(channels) {
+            return Q.all(channels.map(function(channel) {
+              var originalLcUri = channel.lcUri;
+              var newChannelUri = newUri + '/' + channel.uri.split('/')[2];
+              var newChannelLcUri = newChannelUri.toLowerCase();
 
-          /* Only add if it's not a case change */
-          if (originalLcUri !== lcUri) {
-            room.renamedLcUris.push(originalLcUri);
-          }
+              channel.lcUri = newChannelLcUri;
+              channel.uri = newChannelUri;
+              channel.lcOwner = lcOwner;
 
-          return room.saveQ()
-            .then(function() {
-              return uriLookupService.removeBadUri(oldUri);
-            })
-            .then(function() {
-              return uriLookupService.reserveUriForTroupeId(room.id, lcUri);
-            });
-        });
+              return channel.saveQ()
+                .then(function() {
+                  return uriLookupService.removeBadUri(originalLcUri);
+                })
+                .then(function() {
+                  return uriLookupService.reserveUriForTroupeId(channel.id, newChannelLcUri);
+                });
+            }));
 
-    });
+          });
+
+      });
+
+  });
+
 }
-exports.renameUri = renameUri;
+exports.renameRepo = renameRepo;
