@@ -64,7 +64,7 @@ var Modal = ModalView.extend({
     options.title = 'Careful Now...';
     var roomName = context.troupe().get('uri');
     options.menuItems = [
-    { action: "cancel", text: "Close", className: "trpBtnLightGrey" },
+    { action: "cancel", text: "Cancel", className: "trpBtnLightGrey" },
     {
       disabled: true,
       action: 'delete',
