@@ -4,6 +4,7 @@ var Marionette = require('backbone.marionette');
 var template = require('./tmpl/unreadBannerTemplate.hbs');
 var appEvents = require('utils/appevents');
 var unreadItemsClient = require('components/unread-items-client');
+require('views/behaviors/tooltip');
 
 var TopBannerView = Marionette.ItemView.extend({
   octicon: 'octicon-chevron-up',
@@ -18,6 +19,13 @@ var TopBannerView = Marionette.ItemView.extend({
     bannerMessage: '#banner-message',
     buttons: 'button'
   },
+
+  behaviors: {
+    Tooltip: {
+      'button.side': { title: 'Mark as read', placement: 'top' },
+    }
+  },
+
 
   events: {
     'click button.main': 'onMainButtonClick',
