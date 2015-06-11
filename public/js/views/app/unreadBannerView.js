@@ -71,7 +71,7 @@ var TopBannerView = Marionette.ItemView.extend({
     var unreadCount = this.getUnreadCount();
     var mentionsCount = this.getMentionsCount();
 
-    if (!unreadCount && !mentionsCount) return 'bottom';
+    if (!unreadCount && !mentionsCount) return 'Go to bottom';
     if (mentionsCount === 1)            return '1 mention';
     if (mentionsCount > 1)              return mentionsCount + '  mentions';
     if (unreadCount === 1)              return '1 unread';
