@@ -159,11 +159,12 @@ module.exports = (function () {
             }));
 
           }
-        },
-        suggested: {
-          el: "#suggested-region"
-        },
+        }
       }
+    },
+
+    regions: {
+      suggested: "#suggested-region"
     },
 
     initialize: function () {
@@ -198,7 +199,7 @@ module.exports = (function () {
     },
 
     showSuggestedRooms: function() {
-      if (this.suggested.hasView()) return;
+      if (this.suggested && this.suggested.hasView()) return;
 
       var suggestedRoomsHidden = context().suggestedRoomsHidden;
 
@@ -223,6 +224,7 @@ module.exports = (function () {
             });
         }
       });
+      
       this.showChildView('suggested', suggestedWrapperView);
     },
 

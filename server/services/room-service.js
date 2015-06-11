@@ -1080,7 +1080,7 @@ function unbanUserFromRoom(room, troupeBan, username, requestingUser, callback) 
       return persistence.Troupe.updateQ({
           _id: mongoUtils.asObjectID(troupeId)
         }, {
-          $pull: { 
+          $pull: {
             bans: {
               userId: troupeBan.userId
             }
@@ -1258,6 +1258,9 @@ function renameUri(oldUri, newUri, instigatingUser) {
           }
 
           return room.saveQ()
+            .then(function() {
+              return uriLookupService.removeBadUri(oldUri);
+            })
             .then(function() {
               return uriLookupService.reserveUriForTroupeId(room.id, lcUri);
             });
