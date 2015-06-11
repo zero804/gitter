@@ -90,7 +90,8 @@ function wrapContent(inner, options) {
 }
 
 module.exports = function renderCollection(collection, options) {
-  var innerContent = collection.map(renderItem).join('');
+  var innerContent = collection ? collection.map(renderItem).join('') : '';
+
   return wrapContent(compositeTemplate({
     _prerender_inner: innerContent
   }), options);
