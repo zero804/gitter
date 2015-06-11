@@ -54,7 +54,7 @@ return troupeService.findByUri(opts.uri)
   })
   .fail(function(err) {
     console.error('Error: ' + err, err);
+    console.log(err.stack);
     shutdown.shutdownGracefully(1);
   })
   .done();
-

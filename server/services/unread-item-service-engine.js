@@ -427,6 +427,10 @@ function getUnreadItems(userId, troupeId) {
     });
 }
 
+function getMentions(userId, troupeId) {
+  return redisClient_smembers("m:" + userId + ":" + troupeId);
+}
+
 /**
  * Returns a hash of unread items for user troupes
  *
@@ -545,6 +549,7 @@ engine.getUserMentionCounts = getUserMentionCounts;
 engine.getUserMentionCountsForRooms = getUserMentionCountsForRooms;
 
 engine.getUnreadItems = getUnreadItems;
+engine.getMentions = getMentions;
 engine.getUnreadItemsForUserTroupes = getUnreadItemsForUserTroupes;
 
 engine.getAllUnreadItemCounts = getAllUnreadItemCounts;

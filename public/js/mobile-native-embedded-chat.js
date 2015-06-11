@@ -51,7 +51,7 @@ onready(function() {
     'chat': chatCollection
   });
 
-  unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
+  unreadItemsClient.monitorViewForUnreadItems($('#content-frame'), chatCollectionView);
 
   new chatInputView.ChatInputView({
     el: $('#chat-input'),

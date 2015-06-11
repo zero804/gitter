@@ -14,6 +14,7 @@ var onready = require('./utils/onready');
 var $ = require('jquery');
 var urlParser = require('utils/url-parser');
 var RAF = require('utils/raf');
+var RoomCollectionTracker = require('components/room-collection-tracker');
 
 require('components/statsc');
 require('views/widgets/preload');
@@ -118,11 +119,13 @@ onready(function () {
       document.querySelector('#content-frame').contentWindow.location.replace(iframeUrl + hash);
      });
   }
+  
+  var allRoomsCollection = troupeCollections.troupes;
+  new RoomCollectionTracker(allRoomsCollection);
 
   var appLayout = new AppLayout({ template: false, el: 'body' });
   appLayout.render();
 
-  var allRoomsCollection = troupeCollections.troupes;
   allRoomsCollection.on("remove", function(model) {
     if(model.id == context.getTroupeId()) {
       var username = context.user().get('username');
@@ -133,6 +136,7 @@ onready(function () {
       updateContent(newFrame);
     }
   });
+
 
   // Called from the OSX native client for faster page loads
   // when clicking on a chat notification
