@@ -6,26 +6,24 @@ var modalTemplate = require('./tmpl/modal.hbs');
 var isCompact = require('utils/detect-compact');
 require('../template/helpers/all');
 
-var ModalView = Marionette.ItemView.extend({
+var ModalView = Marionette.LayoutView.extend({
   template: modalTemplate,
   className: "modal",
 
   events: {
+    'click .close': 'hide',
     'click .button': 'onMenuItemClicked'
+  },
+
+  regions: {
+    'modalBody': '#modal-body-region'
   },
 
   initialize: function(options) {
     this.options = {
-      keyboard: true,
-      backdrop: true,
-      autoRemove: true,
       menuItems: [],
-      disableClose: false,
-      hideHeader: false,
-      title: null,
-      navigable: false
+      title: null
     };
-    _.bindAll(this, 'hide', 'onMenuItemClicked');
     _.extend(this.options, options);
 
     this.view = this.options.view || this.view;
@@ -34,12 +32,9 @@ var ModalView = Marionette.ItemView.extend({
   serializeData: function() {
     var menuItems = this.menuItems || this.options.menuItems;
     return {
-      hideHeader: this.options.hideHeader,
-      customTitle: !!this.options.title,
       title: this.options.title,
       hasMenuItems: !!menuItems.length,
-      menuItems: menuItems,
-      disableClose: this.options.disableClose
+      menuItems: menuItems
     };
   },
 
@@ -55,9 +50,7 @@ var ModalView = Marionette.ItemView.extend({
     var self = this;
     this.$el.hide();
 
-    var modalBody = this.$el.find('.modal-body');
-    modalBody.append(this.view.render().el);
-    this.$el.find('.close').on('click', this.hide);
+    this.modalBody.show(this.view);
 
     if(!isCompact() && !this.disableAutoFocus) {
       window.setTimeout(function() {
@@ -109,7 +102,6 @@ var ModalView = Marionette.ItemView.extend({
   onDestroy: function() {
     this.view.destroy();
     this.view.dialog = null;
-    this.$el.find('.close').off('click');
   },
 
   prepare: function() {
@@ -117,22 +109,6 @@ var ModalView = Marionette.ItemView.extend({
       this.render();
       this.rendered = true;
     }
-  },
-
-  setTitle: function(title) {
-    this.options.title = title;
-    // cant seem to call render() twice...
-    this.$el.find('.trpModalTitleHeader').text(title);
-  },
-
-  supportsModelReplacement: function() {
-    return this.view &&
-            this.view.supportsModelReplacement &&
-            this.view.supportsModelReplacement();
-  },
-
-  replaceModel: function(model) {
-    return this.view.replaceModel(model);
   },
 
   show: function() {
@@ -195,31 +171,6 @@ var ModalView = Marionette.ItemView.extend({
     this.hideModal();
   },
 
-  transitionTo: function(newDialog) {
-    newDialog.options.backdrop = false;
-    var backdrop = this.$backdrop;
-    this.$backdrop = null;
-    this.hide();
-    backdrop.modal = newDialog;
-    newDialog.show();
-    newDialog.$backdrop = backdrop;
-
-  },
-
-  /* Modal private methods */
-  hideWithTransition: function() {
-    var that = this;
-    var timeout = setTimeout(function () {
-          that.$el.off($.support.transition.end);
-          that.hideModal();
-        }, 500);
-
-    this.$el.one($.support.transition.end, function() {
-      clearTimeout(timeout);
-      that.hideModal();
-    });
-  },
-
   hideModal: function () {
     this.$el
       .hide()
@@ -228,25 +179,21 @@ var ModalView = Marionette.ItemView.extend({
     this.trigger('hidden');
     this.backdrop();
 
-    if(this.options.autoRemove) {
-      this.destroy();
-    }
+    this.destroy();
   },
 
   backdrop: function( callback ) {
-    if (this.isShown && this.options.backdrop) {
+    if (this.isShown) {
 
       this.$backdrop = $('<div class="modal-backdrop" />')
         .appendTo(document.body);
 
-      if (this.options.backdrop != 'static' && !this.options.disableClose) {
-        var bd = this.$backdrop;
-        this.$backdrop.click(function(e) {
-          if( e.target !== this ) return;
+      var bd = this.$backdrop;
+      this.$backdrop.click(function(e) {
+        if( e.target !== this ) return;
 
-          bd.modal.hide();
-        });
-      }
+        bd.modal.hide();
+      });
       this.$backdrop.modal = this;
       this.$backdrop.addClass('in');
 
@@ -268,9 +215,8 @@ var ModalView = Marionette.ItemView.extend({
   },
 
   escape: function () {
-    if(this.options.disableClose) return;
     var that = this;
-    if (this.isShown && this.options.keyboard) {
+    if (this.isShown) {
       $(document).on('keydown', keydown);
     } else if (!this.isShown) {
       $(document).off('keydown', keydown);
@@ -282,18 +228,5 @@ var ModalView = Marionette.ItemView.extend({
 
   }
 });
-
-ModalView.wrapView = function(View, customisations) {
-  var Modal = ModalView.extend(customisations);
-
-  Modal.prototype.initialize = function(options) {
-    options = options || {};
-    // todo let the caller to wrapView specify their own initialize which is called instead of below
-    ModalView.prototype.initialize.apply(this, arguments);
-    this.view = new View(options);
-  };
-
-  return Modal;
-};
 
 module.exports = ModalView;
