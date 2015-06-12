@@ -26,22 +26,16 @@ module.exports = exports = function() {
 
     time = moment(time);
 
-    var duration = moment.duration(Date.now() - time.valueOf());
+    var messageAge = moment.duration(Date.now() - time.valueOf());
 
-    if (options.compact) {
-      if (duration.asDays() >= maxDaysBeforeDateDisplay) {
-        return time.format("MMM DD");
-      } else {
-        return time.format("H:mm");
-      }
-    }
-
-    if(duration.asDays() >= maxDaysBeforeDateDisplay) {
-      return time.format("LL", { lang: lang });
+    if (messageAge.asDays() >= maxDaysBeforeDateDisplay) {
+      return options.compact ? time.format("MMM DD") : time.format("MMM DD H:mm");
+    } else {
+      return time.format("H:mm");
     }
 
     var v = useLanguage(lang, function() {
-      return duration.humanize();
+      return messageAge.humanize();
     });
 
     /* This should never happen... */

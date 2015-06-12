@@ -7,6 +7,8 @@ var widgets = require('views/behaviors/widgets');
 var FastAttachMixin = require('views/fast-attach-mixin');
 require('views/behaviors/tooltip');
 
+var ONEDAY = 86400000;
+
 module.exports = (function() {
 
   var lang = context.lang();
@@ -66,20 +68,19 @@ module.exports = (function() {
     },
 
     render: function() {
-      var duration = Date.now() - this.time.valueOf();
+      var messageAge = Date.now() - this.time.valueOf();
 
-      var v;
-      if(duration >= 86400000 /* One day */) {
-        v = this.compact ? this.time.format("MMM DD", { lang: lang }) : this.time.format("LL", { lang: lang });
+      var shortFormat;
+      if (messageAge >= ONEDAY) {
+        shortFormat = this.compact ? this.time.format("MMM DD", { lang: lang }) : this.time.format("MMM DD H:mm", { lang: lang });
       } else {
-        var momentDuration = moment.duration(duration);
-
-        v = this.compact ? this.time.format("H:mm", { lang: lang }) : locale("%s ago", momentDuration.humanize());
+        shortFormat = this.time.format("H:mm", { lang: lang });
       }
 
-      var fullTime = this.time.format("LLL", { lang: lang });
-      this.el.textContent = v;
-      this.el.setAttribute('title', fullTime);
+      this.el.textContent = shortFormat;
+
+      var longFormat = this.time.format("LLL", { lang: lang });
+      this.el.setAttribute('title', longFormat);
 
       this.triggerMethod("render", this);
     },

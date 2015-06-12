@@ -14,17 +14,12 @@
 @media screen and (-webkit-min-device-pixel-ratio:0) {
   @font-face {
     font-family: 'fontello';
-    src: url('../font/fontello.svg?17864783#fontello') format('svg');
+    src: url('../fonts/fontello/font/fontello.svg?94590384#fontello') format('svg');
   }
 }
 */
 
  [class^="icon-"]:before, [class*=" icon-"]:before {
-
-  text-rendering: auto;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
   font-family: "fontello";
   font-style: normal;
   font-weight: normal;
@@ -51,6 +46,10 @@
   /* you can be more comfortable with increased icons size */
   /* font-size: 120%; */
 
+  /* Font smoothing. That was taken from TWBS */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
   /* Uncomment for 3D effect */
   /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
 }
@@ -66,3 +65,5 @@
 .icon-download:before { content: '\e8b8'; } /* '' */
 .icon-chat-alt:before { content: '\e8b9'; } /* '' */
 .icon-keyboard-1:before { content: '\e8ba'; } /* '' */
+.icon-ellipsis:before { content: '\e8bb'; } /* '' */
+.icon-check:before { content: '\e8bc'; } /* '' */
