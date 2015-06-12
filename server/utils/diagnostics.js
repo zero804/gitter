@@ -20,7 +20,7 @@ if(!process.env.NODEMON) {
 }
 
 if(nconf.get('diagnostics:heapdump')) {
-  var memwatch = require('memwatch');
+  var memwatch = require('memwatch-next');
   memwatch.on('leak', function(info) {
     winston.warn('memwatch: leak: ' + info.reason);
   });

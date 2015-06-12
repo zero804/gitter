@@ -1,14 +1,15 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var troupeService     = require("../../services/troupe-service");
-var roomService       = require("../../services/room-service");
-var restful           = require("../../services/restful");
-var restSerializer    = require("../../serializers/rest-serializer");
-var Q                 = require('q');
-var mongoUtils        = require('../../utils/mongo-utils');
-var StatusError       = require('statuserror');
-
+var troupeService        = require("../../services/troupe-service");
+var roomService          = require("../../services/room-service");
+var restful              = require("../../services/restful");
+var restSerializer       = require("../../serializers/rest-serializer");
+var Q                    = require('q');
+var mongoUtils           = require('../../utils/mongo-utils');
+var StatusError          = require('statuserror');
+var roomDeletionService  = require('../../services/room-deletion-service');
+var roomPermissionsModel = require('../../services/room-permissions-model');
 
 function searchRooms(req, res, next) {
   var user = req.user;
@@ -114,6 +115,24 @@ module.exports = {
           });
       })
       .catch(next);
+  },
+
+  destroy: function(req, res, next) {
+    var user = req.user;
+    var troupe = req.troupe;
+
+    if (!troupe.uri) return next(new StatusError(400, 'cannot delete one to one rooms'));
+
+    return roomPermissionsModel(user, 'admin', troupe)
+      .then(function(isAdmin) {
+        if (!isAdmin) throw new StatusError(403, 'admin permissions required');
+
+       return roomDeletionService.removeByUri(troupe.uri);
+      })
+      .then(function() {
+        res.send(200);
+      })
+      .fail(next);
   },
 
   load: function(req, id, callback) {

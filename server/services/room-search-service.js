@@ -89,8 +89,6 @@ exports.searchRooms = function(queryText, userId, privateRoomIds, options) {
     }
   };
 
-  // console.log(JSON.stringify(queryRequest, null, '  '));
-
   return Q(client.search(queryRequest))
     .then(function(response) {
       return response.hits.hits.map(function(hit) {
@@ -98,4 +96,3 @@ exports.searchRooms = function(queryText, userId, privateRoomIds, options) {
       });
     });
 };
-

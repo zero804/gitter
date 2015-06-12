@@ -216,6 +216,7 @@ onready(function () {
     routes: {
       "": "hideModal",
       "share": "share",
+      "delete": "delete",
       "people": "people",
       "notifications": "notifications",
       "markdown": "markdown",
@@ -294,6 +295,14 @@ onready(function () {
         var shareView = require('views/share/share-view');
 
         appView.dialogRegion.show(new shareView.Modal({}));
+      });
+    },
+
+    delete: function() {
+      require.ensure(['views/menu/delete-room-modal'], function(require) {
+        var DeleteModal = require('views/menu/delete-room-modal');
+
+        appView.dialogRegion.show(new DeleteModal({}));
       });
     }
 

@@ -4,6 +4,7 @@
 var roomService = require('../../services/room-service');
 var isPhone     = require('../../web/is-phone');
 var url         = require('url');
+var debug       = require('debug')('gitter:app-middleware');
 
 function normaliseUrl(params) {
   if(params.roomPart3) {
@@ -30,6 +31,8 @@ function uriContextResolverMiddleware(options) {
   return function(req, res, next) {
     var uri = normaliseUrl(req.params);
     var tracking = { source: req.query.source };
+
+    debug("Looking up normalised uri %s", uri);
 
     var creationFilter = {
       all: false
