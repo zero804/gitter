@@ -11,6 +11,7 @@ var oneToOnePermissionsModel    = require('./permissions/one-to-one-permissions-
 var orgChannelPermissionsModel  = require('./permissions/org-channel-permissions-model');
 var repoChannelPermissionsModel = require('./permissions/repo-channel-permissions-model');
 var userChannelPermissionsModel = require('./permissions/user-channel-permissions-model');
+var debug                       = require('debug')('gitter:permissions-model');
 
 var userService                 = require('./user-service');
 
@@ -34,7 +35,7 @@ var ALL_RIGHTS = {
  */
 function permissionsModel(user, right, uri, roomType, security) {
   function log(x) {
-    winston.verbose('Permission', { user: user && user.username, uri: uri, roomType: roomType, granted: x, right: right });
+    debug("Permission: user=%s, uri=%s, roomType=%s, granted=%s, right=%s",  user && user.username, uri, roomType, x, right);
     return x;
   }
 
@@ -75,7 +76,7 @@ function permissionsModel(user, right, uri, roomType, security) {
         .fail(function(err) {
           if(err && err.gitterAction === 'logout_destroy_user_tokens') {
             winston.warn('User tokens have been revoked. Destroying tokens');
-            
+
             userService.destroyTokensForUserId(user._id)
               .thenReject(err);
           }
