@@ -35,11 +35,14 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
         init: 'initInputRegion'
       },
 
+      // TODO Move to chat-toolbar layout and
+      // decide how are they gonna look like in mobile
       bannerTop: {
         el: '#unread-banner',
         init: 'initBannerTopRegion'
       },
 
+      // TODO same ^^^
       bannerBottom: {
         el: '#bottom-unread-banner',
         init: 'initBannerBottomRegion'

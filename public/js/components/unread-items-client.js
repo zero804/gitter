@@ -175,6 +175,13 @@ module.exports = (function() {
       return Object.keys(this._items);
     },
 
+    getMentions: function() {
+      return Object.keys(this._items).reduce(function(accum, itemId) {
+        if (this._items[itemId]) accum.push(itemId);
+        return accum;
+      }.bind(this), []);
+    },
+
     enableLurkMode: function() {
       this._lurkMode = true;
       this.markAllReadNotification();
@@ -425,7 +432,6 @@ module.exports = (function() {
         self._store._markItemRead(model.id);
       });
 
-      // TODO: do we need to do this?
       this._foldCount();
     },
 
@@ -474,14 +480,21 @@ module.exports = (function() {
     },
 
     _resetFoldModel: function() {
-      // If there are no unread items, save the effort.
-      acrossTheFoldModel.set({
-        unreadAbove: 0,
-        unreadBelow: 0,
-        belowItemId: null,
-        hasUnreadBelow: false,
-        hasUnreadAbove: false
-      });
+       acrossTheFoldModel.set({
+          unreadAbove: 0,
+          unreadBelow: 0,
+          hasUnreadBelow: false,
+          hasUnreadAbove: false,
+          oldestUnreadItemId: null,
+          mostRecentUnreadItemId: null,
+
+          mentionsAbove: 0,
+          mentionsBelow: 0,
+          hasMentionsAbove: false,
+          hasMentionsBelow: false,
+          oldestMentionId: null,
+          mostRecentMentionId: null
+        });
     },
 
     _foldCount: function() {
@@ -493,6 +506,9 @@ module.exports = (function() {
 
       var above = 0;
       var below = 0;
+
+      var mentionsAbove = 0;
+      var mentionsBelow = 0;
 
       var topBound = this._scrollElement.scrollTop;
       var bottomBound = topBound + this._scrollElement.clientHeight;
@@ -512,17 +528,44 @@ module.exports = (function() {
       var firstItemId = first.id;
       var lastItemId = last.id;
 
+      var oldestUnreadItemId = null;
+      var mostRecentUnreadItemId = null;
+      var oldestMentionId = null;
+      var mostRecentMentionId = null;
+      
       chats.forEach(function(itemId) {
-        if(itemId < firstItemId) above++;
-        if(itemId > lastItemId) below++;
-      });
+        if (itemId < firstItemId) {
+          above++;
+          if (!oldestUnreadItemId) oldestUnreadItemId = itemId;
+          if (this._store._items[itemId])  {
+            mentionsAbove++;
+            oldestMentionId = itemId;
+          }
+        }
+        if (itemId > lastItemId) {
+          below++;
+          if (!mostRecentUnreadItemId) mostRecentUnreadItemId = itemId;
+          if (this._store._items[itemId]) {
+            mentionsBelow++;
+            if (!mostRecentMentionId) mostRecentMentionId = itemId;
+          }
+        }
+      }.bind(this));
 
       acrossTheFoldModel.set({
         unreadAbove: above,
         unreadBelow: below,
         hasUnreadAbove: above > 0,
         hasUnreadBelow: below > 0,
-        belowItemId: last.id
+        oldestUnreadItemId: oldestUnreadItemId,
+        mostRecentUnreadItemId: mostRecentUnreadItemId,
+
+        mentionsAbove: mentionsAbove,
+        mentionsBelow: mentionsBelow,
+        hasMentionsAbove: mentionsAbove > 0,
+        hasMentionsBelow: mentionsBelow > 0,
+        oldestMentionId: oldestMentionId,
+        mostRecentMentionId: mostRecentMentionId
       });
 
     },
@@ -629,8 +672,16 @@ module.exports = (function() {
 
     getFirstUnreadItem: function() {
       var unreadItemStore = getUnreadItemStoreReq();
+      //return unreadItemStore.getFirstItemOfType('chat');
+      return unreadItemStore.getFirstItem();
+    },
+
+    getFirstUnreadMention: function() {
+      var unreadItemStore = getUnreadItemStoreReq();
+      //return unreadItemStore.getFirstItemOfType('mention');
       return unreadItemStore.getFirstItem();
     }
+
   };
 
   // Mainly useful for testing

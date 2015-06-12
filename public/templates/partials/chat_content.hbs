@@ -1,6 +1,10 @@
 <div class="trpContentPanel" id="content-wrapper">{{!-- Region--}}
   <div>
     <div class="trpChatPanel">
+
+      <div id="unread-banner" style="display:none"></div>
+      <div id="bottom-unread-banner" style="display:none"></div>
+  
       <div class="trpChatContainer primary-scroll chat-container" id="content-frame">
         <div id="chat-container">
           {{#if oneToOneInvited}}
@@ -18,9 +22,6 @@
           <div id='initial' style="height:0;width:0;overflow:hidden"><a name="initial"/>_</a></div>
         {{/if}}
       </div>
-    </div>
-    <div class="scrollHelper js-scroll-to-bottom scrollHelper--hidden">
-      <i class="octicon octicon-chevron-down"></i>
     </div>
   </div>
 </div>

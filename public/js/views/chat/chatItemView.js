@@ -10,6 +10,7 @@ var uiVars = require('views/app/uiVars');
 var Popover = require('views/popover');
 var chatItemTemplate = require('./tmpl/chatItemView.hbs');
 var statusItemTemplate = require('./tmpl/statusItemView.hbs');
+var actionsTemplate = require('./tmpl/actionsView.hbs');
 var ChatInputBoxView = require('views/chat/chat-input-box-view');
 var appEvents = require('utils/appevents');
 var cocktail = require('cocktail');
@@ -23,7 +24,6 @@ var toggle = require('utils/toggle');
 require('views/behaviors/unread-items');
 require('views/behaviors/widgets');
 require('views/behaviors/highlight');
-require('views/behaviors/tooltip');
 
 module.exports = (function() {
 
@@ -47,7 +47,8 @@ module.exports = (function() {
     'mouseover .js-chat-item-readby': 'showReadByIntent',
     'click .webhook':                 'expandActivity',
     'click':                          'onClick',
-    'dblclick':                       'onDblClick'
+    'dblclick':                       'onDblClick',
+    'click .js-chat-item-actions':    'showActions'
   };
 
   var touchEvents = {
@@ -60,16 +61,13 @@ module.exports = (function() {
       class: 'chat-item'
     },
     ui: {
+      actions: '.js-chat-item-actions',
       collapse: '.js-chat-item-collapse',
       text: '.js-chat-item-text'
     },
 
     behaviors: {
       Widgets: {},
-      Tooltip: {
-        '.js-chat-item-edit': { titleFn: 'getEditTooltip' },
-        '.js-chat-item-collapse': { titleFn: 'getCollapseTooltip' }
-      },
       UnreadItems: { },
       Highlight: {}
     },
@@ -251,6 +249,7 @@ module.exports = (function() {
       }
 
       /* Don't run on the initial (changed=undefined) as its done in the template */
+      // FIXME this is whole thing is pretty ugly, could do with a refactor
       if (changes && 'readBy' in changes) {
         var readByCount = model.get('readBy');
         var oldValue = model.previous('readBy');
@@ -259,8 +258,9 @@ module.exports = (function() {
 
         if(readByLabel.length === 0) {
           if(readByCount) {
-           readByLabel = $(document.createElement('div')).addClass('chat-item__icon--read js-chat-item-readby');
-           readByLabel.insertBefore($el.find('.js-chat-item-edit'));
+           // FIXME this specially
+           readByLabel = $(document.createElement('div')).addClass('chat-item__icon chat-item__icon--read icon-check js-chat-item-readby');
+           readByLabel.appendTo($el.find('.chat-item__actions'));
 
            RAF(function() {
              readByLabel.addClass('readBySome');
@@ -289,36 +289,6 @@ module.exports = (function() {
         var $collapse = this.ui.collapse;
         toggle($collapse[0], isCollapsible);
       }
-    },
-
-    getEditTooltip: function() {
-      if (this.isEmbedded()) return "You can't edit on embedded chats.";
-
-      if(this.hasBeenEdited()) {
-        return "Edited shortly after being sent";
-      }
-
-      if(this.canEdit()) {
-        return "Edit within " + msToMinutes(EDIT_WINDOW) + " minutes of sending";
-      }
-
-      if(this.isOwnMessage()) {
-        return "It's too late to edit this message.";
-      }
-
-      return  "You can't edit someone else's message";
-    },
-
-    getCollapseTooltip: function() {
-      if (this.model.get('collapsed')) {
-        return  "Show media.";
-      }
-      return "Hide media.";
-    },
-
-    getCollapsedTooltip: function() {
-      // also for expanded
-      return  "Displaying message, click here to collapse.";
     },
 
     focusInput: function() {
@@ -366,6 +336,10 @@ module.exports = (function() {
       return !!this.model.get('readBy');
     },
 
+    onToggleEdit: function() {
+      this.toggleEdit();
+    },
+
     toggleEdit: function() {
       if (this.isEditing) {
         this.isEditing = false;
@@ -398,6 +372,10 @@ module.exports = (function() {
         chatCollapse.collapse(chatId);
       }
       this.model.set('collapsed', !collapsed);
+    },
+
+    onToggleCollapse: function() {
+      this.toggleCollapse();
     },
 
     // deals with collapsing images and embeds
@@ -549,9 +527,34 @@ module.exports = (function() {
       ReadByPopover.singleton(this, popover);
     },
 
+    showActions: function(e) {
+      e.preventDefault();
+      if(this.popover) return;
+      e.preventDefault();
+
+      var actions = new ActionsPopover({
+        model: this.model,
+        chatItemView: this,
+        targetElement: e.target,
+        placement: 'horizontal',
+        width: '150px'
+      });
+
+      this.listenTo(actions, 'render', function() {
+        this.ui.actions.addClass('selected');
+      }.bind(this));
+
+      this.listenTo(actions, 'destroy', function() {
+        this.ui.actions.removeClass('selected');
+      }.bind(this));
+
+      actions.show();
+      ReadByPopover.singleton(this, actions);
+    },
+
     mentionUser: function () {
-      var mention = "@" + this.model.get('fromUser').username + " ";
-      appEvents.trigger('input.append', mention);
+     var mention = "@" + this.model.get('fromUser').username + " ";
+     appEvents.trigger('input.append', mention);
     },
 
     permalink: function(e) {
@@ -627,10 +630,79 @@ module.exports = (function() {
     }
   });
 
+  var ActionsView = Marionette.ItemView.extend({
+    template: actionsTemplate,
+    initialize: function(options) {
+      this.chatItemView = options.chatItemView;
+    },
+    events: {
+      'click .js-chat-action-collapse': 'toggleCollapse',
+      'click .js-chat-action-expand': 'toggleCollapse',
+      'click .js-chat-action-edit': 'edit',
+      'click .js-chat-action-reply': 'reply',
+      'click .js-chat-action-quote': 'quote',
+      'click .js-chat-action-delete': 'delete'
+    },
+    toggleCollapse: function() {
+      this.chatItemView.triggerMethod('toggleCollapse');
+    },
+    edit: function() {
+      this.chatItemView.triggerMethod('toggleEdit');
+    },
+    reply: function() {
+      var mention = "@" + this.model.get('fromUser').username + " ";
+      appEvents.trigger('input.append', mention);
+    },
+    quote: function() {
+      appEvents.trigger('input.append', "> " + this.model.get('text'), { newLine: true });
+    },
+    delete: function() {
+      this.model.set('text', '');
+      this.model.save();
+    },
+    serializeData: function() {
+      var deleted = !this.model.get('text');
+      var data = {actions: [
+        {name: 'reply', description: 'Reply'}
+      ]};
+
+      if (!deleted) data.actions.push({name: 'quote', description: 'Quote'});
+
+      // FIXME Can't really use a triggerMethod here, maybe move the logic of canEdit() to this view?
+      if (!deleted && this.chatItemView.canEdit()) {
+        data.actions.push({name: 'edit', description: 'Edit'});
+        data.actions.push({name: 'delete', description: 'Delete'});
+      } else {
+        data.actions.push({name: 'edit', description: 'Edit', disabled: true});
+        data.actions.push({name: 'delete', description: 'Delete', disabled: true});
+      }
+
+
+      if (!deleted && this.model.get('isCollapsible')) {
+        var action = this.model.get('collapsed') ? {name: 'expand', description: 'Expand'} : {name: 'collapse', description: 'Collapse'};
+        data.actions.push(action);
+      }
+
+      return data;
+    }
+  });
+
+  var ActionsPopover = Popover.extend({
+    initialize: function(options) {
+      Popover.prototype.initialize.apply(this, arguments);
+      this.view = new ActionsView({ model: this.model, chatItemView: options.chatItemView });
+    },
+    events: {
+      'click': 'hide'
+    }
+  });
+
   return {
     ChatItemView: ChatItemView,
     ReadByView: ReadByView,
-    ReadByPopover: ReadByPopover
+    ReadByPopover: ReadByPopover,
+    ActionsView: ActionsView,
+    ActionsPopover: ActionsPopover
   };
 
 

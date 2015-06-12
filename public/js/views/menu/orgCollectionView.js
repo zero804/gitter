@@ -23,13 +23,6 @@ module.exports = (function() {
       click: 'clicked'
     },
 
-    serializeData: function() {
-      var data = {};
-      data.org = this.model.toJSON();
-      data.user = context.getUser();
-      return data;
-    },
-
     clicked: function(e) {
       e.preventDefault();
       appEvents.trigger('navigation', '/' + this.model.get('name'), 'chat', this.model.get('name'), null);
