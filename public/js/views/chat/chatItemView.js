@@ -552,10 +552,10 @@ module.exports = (function() {
       ReadByPopover.singleton(this, actions);
     },
 
-    //mentionUser: function () {
-    //  var mention = "@" + this.model.get('fromUser').username + " ";
-    //  appEvents.trigger('input.append', mention);
-    //},
+    mentionUser: function () {
+     var mention = "@" + this.model.get('fromUser').username + " ";
+     appEvents.trigger('input.append', mention);
+    },
 
     permalink: function(e) {
       if(!this.isPermalinkable) return;
