@@ -13,9 +13,10 @@ var _              = require("underscore");
 var tagger         = require('../../utils/room-tagger');
 var RepoService    = require('../github/github-repo-service');
 var troupeUtils    = require('../../utils/models/troupes');
+var debug          = require('debug')('gitter:troupe-schema');
 
 function serializeEvent(url, operation, model, callback) {
-  winston.verbose("Serializing " + operation + " to " + url);
+  debug("Serializing %s to %s", operation, url);
 
   return restSerializer.serializeModel(model)
     .then(function(serializedModel) {
@@ -199,7 +200,7 @@ module.exports = {
     TroupeSchema.methods.removeUserById = function(userId) {
       assert(userId);
 
-      winston.verbose("Troupe.removeUserById", { userId: userId, troupeId: this.id });
+      debug("Troupe.removeUserById userId=%s troupeId=%s", userId, this.id);
 
       // TODO: disable this methods for one-to-one troupes
       var troupeUser = _.find(this.users, function(troupeUser){ return troupeUser.userId == userId; });
@@ -243,7 +244,7 @@ module.exports = {
       assert(userId);
       assert(this.oneToOne);
 
-      winston.verbose("Troupe.reactivateUserById", { userId: userId, troupeId: this.id });
+      debug("Troupe.reactivateUserById userId=%s troupeId=%s", userId, this.id);
 
       // TODO: disable this methods for one-to-one troupes
       var troupeUser = _.find(this.users, function(troupeUser){ return troupeUser.userId == userId; });

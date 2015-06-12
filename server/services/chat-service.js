@@ -7,7 +7,6 @@ var errorReporter        = env.errorReporter;
 
 var ChatMessage          = require("./persistence-service").ChatMessage;
 var collections          = require("../utils/collections");
-var troupeService        = require("./troupe-service");
 var userService          = require("./user-service");
 var processChat          = require('../utils/markdown-processor');
 var Q                    = require('q');
