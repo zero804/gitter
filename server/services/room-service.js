@@ -484,12 +484,13 @@ function findOrCreateRoom(user, uri, options) {
     if (!uriLookup.troupe) return null;
 
     var troupe = uriLookup.troupe;
+    var uri = troupe && troupe.uri;
 
     return {
       accessDenied: {
-        githubType: troupe && troupe.githubType,
-        uri: troupe && troupe.uri
-      }
+        githubType: troupe && troupe.githubType
+      },
+      uri: uri
     };
   }
 
@@ -570,6 +571,8 @@ function findOrCreateRoom(user, uri, options) {
       // need to check for the rooms
       return findOrCreateNonOneToOneRoom(user, uriLookup && uriLookup.troupe, uri, options)
         .then(function(findOrCreateResult) {
+          debug("findOrCreateNonOneToOneRoom returned %j", findOrCreateResult);
+
           var troupe = findOrCreateResult.troupe;
           var access = findOrCreateResult.access;
           var hookCreationFailedDueToMissingScope = findOrCreateResult.hookCreationFailedDueToMissingScope;
