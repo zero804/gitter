@@ -345,6 +345,27 @@ describe('room-service #slow', function() {
         .nodeify(done);
     });
 
+    it('should return an accessDenied if a user attempts to access an org which they dont have access to', function(done) {
+      var roomPermissionsModelMock = mockito.mockFunction();
+
+      var roomService = testRequire.withProxies("./services/room-service", {
+        './room-permissions-model': roomPermissionsModelMock
+      });
+
+      mockito.when(roomPermissionsModelMock)().then(function(user, perm, incomingRoom) {
+        assert.equal(perm, 'join');
+        assert.equal(incomingRoom.id, fixture.troupeOrg1.id);
+        return Q.resolve(false);
+      });
+
+      return roomService.findOrCreateRoom(fixture.user3, fixture.troupeOrg1.uri)
+        .then(function(result) {
+          assert(result.accessDenied);
+          assert.strictEqual(result.accessDenied.githubType, 'ORG');
+          assert.strictEqual(result.uri, fixture.troupeOrg1.uri);
+        })
+        .nodeify(done);
+    });
   });
 
   describe('user revalidation', function() {
