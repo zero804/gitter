@@ -8,10 +8,9 @@ require('views/behaviors/tooltip');
 
 var TopBannerView = Marionette.ItemView.extend({
   octicon: 'octicon-chevron-up',
-  postfix: 'Above',
+  position: 'Above',
   template: template,
   hidden: true,
-  //className: 'banner slide-away',
   className: 'banner-wrapper',
   actAsScrollHelper: false,
 
@@ -34,9 +33,9 @@ var TopBannerView = Marionette.ItemView.extend({
 
   modelEvents: function() {
     var events = {};
-    events['change:unread' + this.postfix]      = 'updateVisibility';
-    events['change:hasUnread' + this.postfix]   = 'updateVisibility';
-    events['change:hasMentions' + this.postfix] = 'updateVisibility';
+    events['change:unread' + this.position]      = 'updateVisibility';
+    events['change:hasUnread' + this.position]   = 'updateVisibility';
+    events['change:hasMentions' + this.position] = 'updateVisibility';
 
     return events;
   },
@@ -56,11 +55,11 @@ var TopBannerView = Marionette.ItemView.extend({
   },
 
   getUnreadCount: function() {
-    return this.model.get('unread' + this.postfix);
+    return this.model.get('unread' + this.position);
   },
 
   getMentionsCount: function() {
-    return this.model.get('mentions' + this.postfix);
+    return this.model.get('mentions' + this.position);
   },
 
   serializeData: function() {
@@ -119,7 +118,7 @@ var TopBannerView = Marionette.ItemView.extend({
 
 var BottomBannerView = TopBannerView.extend({
   octicon: 'octicon-chevron-down',
-  postfix: 'Below',
+  position: 'Below',
   className: 'banner-wrapper bottom',
   actAsScrollHelper: false,
 
