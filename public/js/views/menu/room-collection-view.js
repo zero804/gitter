@@ -88,7 +88,7 @@ module.exports = (function() {
     serializeData: function() {
       var data = this.model.toJSON();
       data.name = roomNameTrimmer(data.name, MAX_NAME_LENGTH);
-      data.userOrOrg = data.url.split('/')[1];
+      data.owner = data.url.split('/')[1];
       return data;
     },
 

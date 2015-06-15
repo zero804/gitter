@@ -5,7 +5,7 @@ var template = require('./compile-web-template')('/js/views/menu/tmpl/room-list-
 
 module.exports = function (model) {
   var data = _.extend(model, {
-    userOrOrg: model.url.split('/')[1]
+    owner: model.url.split('/')[1]
   });
   return template(data);
 };
