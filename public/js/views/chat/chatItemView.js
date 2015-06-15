@@ -533,7 +533,7 @@ module.exports = (function() {
         chatItemView: this,
         targetElement: e.target,
         placement: 'horizontal',
-        width: '150px'
+        width: '100px'
       });
 
       this.listenTo(actions, 'render', function() {

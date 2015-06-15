@@ -79,7 +79,8 @@ module.exports = (function() {
       var popover = new Popover({
         view: new PopoverBodyView({model: this.model}),
         targetElement: e.target,
-        placement: 'horizontal'
+        placement: 'horizontal',
+        width: '100px'
       });
       popover.show();
       Popover.singleton(this, popover);
