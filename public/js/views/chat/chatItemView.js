@@ -34,10 +34,6 @@ module.exports = (function() {
   /* @const */
   var EDIT_WINDOW = 1000 * 60 * 10; // 10 minutes
 
-  var msToMinutes = function (ms) {
-    return ms / (60 * 1000);
-  };
-
   var mouseEvents = {
     'click .js-chat-item-edit':       'toggleEdit',
     'click .js-chat-item-collapse':   'toggleCollapse',
