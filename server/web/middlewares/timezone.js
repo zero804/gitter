@@ -35,7 +35,7 @@ function parseTimezoneCookie(value) {
   return { offset: offset, abbr: abbr, iana: iana };
 }
 
-function saveTzInfo(user, timezoneInfo) {
+function updateUserTzInfo(user, timezoneInfo) {
   debug("Saving timezone information for user %s: %j", user.username, timezoneInfo);
   userService.updateTzInfo(user._id, timezoneInfo)
     .catch(function(err) {
@@ -45,8 +45,7 @@ function saveTzInfo(user, timezoneInfo) {
 }
 
 module.exports = function(req, res, next) {
-  // If the user has sent the cookie, and is authenticated,
-  // compare the timezones and update accordingly
+  /** Parse the cookie if one exists */
   var parsed = parseTimezoneCookie(req.cookies.gitter_tz);
   var userTz = req.user && req.user.tz;
 
@@ -54,45 +53,38 @@ module.exports = function(req, res, next) {
 
   if (parsed) {
     if (userTz) {
-      // Its possible that the users browser can't do IANA,
-      // so just used the saved value if possible
-
+      /* Its possible that the users browser can't do IANA,
+       * so just used the saved value if possible */
       if (userTz.offset === parsed.offset && userTz.abbr === parsed.abbr) {
         if (userTz.iana && !parsed.iana) {
           parsed.iana = userTz.iana;
         }
       }
 
-      // Save the timezone information it has changed
+      /* Has the user presented us with new timezone information? If so, update */
       if (userTz.offset !== parsed.offset || userTz.abbr !== parsed.abbr ||  userTz.iana !== parsed.iana) {
-        saveTzInfo(req.user, parsed);
+        updateUserTzInfo(req.user, parsed);
       }
 
     } else if (req.user) {
-      // The user doesn't have the tz information yet, so save it, async
-      saveTzInfo(req.user, parsed);
+      /* First time we've got timezone information from this user, so save it */
+      updateUserTzInfo(req.user, parsed);
     }
-
 
     res.locals.tz = parsed;
     res.locals.tzOffset = parsed.offset;
-
   } else {
-    // No cookie, try the users' saved state
+    /* The user did not present a cookie.
+     * Do we have some saved state for the user? If so, let's use that */
     if (userTz) {
-      // Compare the user value to cookie value
-
       res.locals.tz = userTz;
       res.locals.tzOffset = userTz.offset;
-
     } else {
-      // No cookie, no saved state
+      /* No cookie, no saved state, default to UTC */
       res.locals.tzOffset = 0;
     }
 
   }
 
-  // If the user has not sent the cookie, check if we know their timezone and use
-  // that
   next();
 };
