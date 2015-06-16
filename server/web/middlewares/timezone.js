@@ -37,7 +37,7 @@ function parseTimezoneCookie(value) {
 
 function saveTzInfo(user, timezoneInfo) {
   debug("Saving timezone information for user %s: %j", user.username, timezoneInfo);
-  userService.saveTzInfo(user._id, timezoneInfo)
+  userService.updateTzInfo(user._id, timezoneInfo)
     .catch(function(err) {
       logger.error("Unable to save timezone info for user", { exception: err });
       errorReporter(err, { user: user.username });
