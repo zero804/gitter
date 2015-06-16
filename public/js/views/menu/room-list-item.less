@@ -26,7 +26,6 @@
   flex-shrink: 0;
   text-align: center;
   align-self: flex-start;
-  background-color: white;
   margin: 8px 10px 5px 5px;
   border-radius: 4px;
   width: 16px;
@@ -34,7 +33,19 @@
   img {
     display: block;
     border-radius: 2px;
+    // stop avatars with alpha showing the dark background
+    background-color: white;
   }
+  position: relative;
+  z-index: 0;
+}
+
+.room-list-item__icon--favourite {
+  color: #526b75;
+  position: absolute;
+  z-index: -1;
+  margin-top: -9px;
+  margin-left: -4px;
 }
 
 .room-list-item__name {
@@ -137,10 +148,13 @@ body.hover .room-list-item:hover:not(.room-list-item--current-room),
 
 .popover-button {
   display: block;
-  margin: 5px 5px;
+  padding: 0px 5px;
   cursor: pointer;
 }
 
 .popover-button:hover {
   text-decoration: none;
+  color: white;
+  background-color: @blue;
+  border-radius: 4px;
 }
