@@ -2,6 +2,7 @@
 var _ = require('underscore');
 var utils = require('../utils/utils');
 var context = require('../utils/context');
+var appEvents = require('utils/appevents');
 
 module.exports = (function() {
 
@@ -298,6 +299,7 @@ module.exports = (function() {
       if(!!value === !!this.atBottom) return; // jshint ignore:line
       this.atBottom = !!value;
       this.trigger('atBottomChanged', this.atBottom);
+      appEvents.trigger('atBottomChanged', this.atBottom);
     }
   };
 

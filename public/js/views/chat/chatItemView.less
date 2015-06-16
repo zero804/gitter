@@ -1,7 +1,6 @@
 @import "../widgets/avatar";
 @import "../popover";
 @import "chatInputView";
-@import "../behaviors/unread-items";
 
 // Other items required by this library
 @import "../../../less/highlight.less";
@@ -10,7 +9,7 @@
 @import "../repo/katex/katex";
 @import "../repo/katex/fonts";
 
-@chat-spacing: 0.222em;
+@chat-spacing: 0.2em;
 
 .trpChatContainer .isViewers:last-child .chat-item__details .chat-item__icon--read {
   visibility: visible;
@@ -27,6 +26,10 @@
 
   &.chat-item__highlighted {
     background-color: @permalink-highlight-bg;
+  }
+
+  &:hover {
+    background-color: rgba(240,240,240,0.3);
   }
 
   &.synced {
@@ -54,37 +57,33 @@
 
   &.burstStart {
     padding-bottom: @chat-spacing;
+
+    .chat-item__aside {
+      margin-top: 6px;
+    }
+
+
+    .chat-item__actions {
+      margin-top: 2px;
+    }
+
   }
 
   &.burstContinued {
+    padding-top: @chat-spacing;
+    padding-bottom: @chat-spacing;
 
-    padding: @chat-spacing 0;
     .chat-item__container {
-      padding: 0px 30px 0px 30px;
+      margin-top: 0px;
+      margin-bottom: 0px;
     }
+
 
     .chat-item__content {
-      margin: 0;
-      padding: 0 10px 0 0;
-    }
-
-    .chat-item__details {
-      float: left;
-      margin: 0;
-
-      .hover .chat-item:hover > & {
-        margin-left: 2px;
-        display: inline-block;
-      }
-    }
-
-    .chat-item__icon--read,
-    .chat-item__icon--edit {
-      visibility: hidden;
-    }
-
-    .chat-item__text {
-      margin-left: 64px;
+      margin-top: 0;
+      margin-bottom: 0;
+      padding-top: 0;
+      padding-bottom: 0;
     }
 
     .chat-item__time {
@@ -94,13 +93,20 @@
       }
     }
 
-    .chat-item__from,
-    .chat-item__aside {
+    .chat-item__icon--read {
+      opacity: 0;
+    }
+
+    &:hover .chat-item__icon--read {
+      opacity: 1;
+    }
+
+    .chat-item__details,
+    .chat-item__avatar {
       display: none;
     }
 
     @media @mobile {
-      .chat-item__container { padding: 0px 30px 0px 44px }
       .chat-item__details { display: none; }
       .chat-item__text {
         margin: 0;
@@ -115,74 +121,103 @@
     }
   }
 
-  &.unread, &.reading {
-    background-color: fade(@trpGreen, 20%);
-    // border-top: 1px solid fade(@trpGreen, 25%);
+  &.unread .chat-item__container {
+    border-right: 2px solid @green;
+    background-color: rgba(46, 204, 113,0.03);
+    transition: 1s border linear, 1s background-color linear;
+  }
+
+  &.unread.mentioned .chat-item__container {
+    border-right: 2px solid @orange;
+    background-color: rgba(230, 126, 34,0.03);
+    transition: 2s border linear, 2s background-color linear;
+  }
+
+  &.mentioned .chat-item__text .mention {
+    color: @orange;
+    background-color: lighten(@orange, 40%);
+    border-radius: 2px;
   }
 
   &:last-child {
     &.burstStart { padding-bottom: @chat-spacing*2; }
   }
-
-  @media @mid {
-    .avatar-s {
-      width: 24px;
-      height: 24px;
-    }
-  }
 }
 
-.chat-item__aside { float: left; }
+.chat-item__aside {
+  float: left;
+  margin-left: 0.4em;
+  margin-top: 2px;
+}
+
+.chat-item__avatar {
+  margin-left: 1.6em;
+}
+
+.chat-item__actions {
+  float: right;
+  text-align: right;
+  opacity: 0;
+  width: 40px;
+
+  @media @mobile {
+    display: none;
+  }
+
+}
+
+.chat-item:hover .chat-item__actions {
+  opacity: 1;
+  transition: 0.2s opacity linear;
+}
+
+.chat-item__action, .chat-item__action-disabled {
+  border-radius: 4px;
+  padding: 0px 5px;
+}
+
+.chat-item__action:hover {
+  cursor: pointer;
+  background: #08c;
+  color: white;
+}
+
+.chat-item__action-disabled {
+  color: #CCC;
+}
+
+.chat-item__action-disabled:hover {
+  background: #08c;
+  cursor: default;
+}
 
 .chat-item__container {
   box-sizing: border-box;
-  padding: 0.888em 30px 0px 44px;
-  display: inline-block;
+  border-right: 2px solid transparent;
+  margin: 0.888em 12px 0px;
   text-align: left;
-  width: 100%;
-  clear: left;
+  transition: 1s border linear;
+
   &.syncerror {
     background-color: #edb2bd;
-
-    .chat-item__from,
-    .chat-item__time {
-      color: #888;
-    }
   }
-
-  @media @mobile {
-    padding: 8px 10px 1px;
-  }
-}
-
-.chat-item__details {
-  margin: -4px 0 0px 0;
-  padding: 0;
-  display: block;
-  color: #999;
 }
 
 .chat-item__from {
   vertical-align: middle;
   display: inline-block;
   cursor: pointer;
-
-  @media @mobile {
-    max-width: 50%;
-    overflow: hidden;
-    white-space: nowrap;
-  }
+  font-weight: 600;
+  margin-top: 2px;
+  opacity: 0.5;
 }
 
 .chat-item__time {
   vertical-align: middle;
   display: inline-block;
-  opacity: 0.8;
-  color: #aaa;
-
-  &:before {
-    content: '\0020\2022\0020';
-  }
+  color: #ddd;
+  float: right;
+  margin-top: 2px;
 }
 
 .chat-item__time--permalinkable {
@@ -191,62 +226,32 @@
 
 .chat-item__icon {
   cursor: pointer;
-  transition: opacity 0.2s ease;
-  display: inline-block;
-  text-align: right;
-  width: 16px;
-  height: 16px;
-  line-height: 9px;
-  vertical-align: middle;
-  opacity: 0.5;
-  visibility: hidden;
-  overflow: hidden;
-  background-size: cover;
-  background-repeat: no-repeat;
+  color: #aaa;
+  transition: opacity 0.3s linear, color 0.3s linear;
+}
 
-  @media @mobile {
-    display: none;
-    width: 24px;
-    height: 24px;
-    float: right;
-    margin-right: -16px;
-  }
+.chat-item__icon:hover {
+  color: @blue;
 }
 
 .chat-item__icon--read {
-  .chat-item__icon;
-  background-image: url('../images/icon-read.png');
+  float: left;
+  font-size: 0.7em;
+  opacity: 0;
+  margin-top: 3px;
 
   .chat-item:hover & {
-    visibility: visible;
     opacity: 1;
   }
 
   .isViewers & {
-    visibility: visible;
-  }
-
-  @media @retina {
-    background-image: url('../images/icon-read@2x.png');
-  }
-}
-
-.chat-item__icon--edit {
-
-  .chat-item__icon;
-  display: none; // if it isn't the viewers message should not show at all
-
-  .isViewers.chat-item:hover & {
-    display: inline-block;
-    visibility: visible;
     opacity: 1;
   }
 
-  background-image: url('../images/icon-edit.png');
-
-  @media @retina {
-    background-image: url('../images/icon-edit@2x.png');
+  @media @mobile {
+    display: none;
   }
+
 }
 
 .chat-item__icon--collapse {
@@ -279,13 +284,9 @@
   padding: 0;
   word-wrap: break-word;
   user-select: text;
-  line-height: 1.58em;
-  a.link {
-    color: @trpLightBlue;
-  }
 
-  .issue, .commit {
-    padding-bottom: 2px;
+  a {
+    color: @blue;
   }
 
   p {
@@ -323,20 +324,16 @@
     line-height: 1.5;
   }
 
-  .mention {
-    border: 1px solid fade(@trpGrey,40%);
-    background-color: fade(@trpGrey,20%);
-    border-radius: 2px;
-    padding: 0 4px 2px;
+  .mention,
+  .groupmention {
+    border-bottom: 1px dotted;
     cursor: pointer;
+    padding: 0 2px;
   }
 
   .groupmention {
-    border: 1px solid fade(@trpLightBlue,20%);
-    background-color: fade(@trpLightBlue,10%);
-    border-radius: 2px;
-    padding: 0 4px;
-    cursor: pointer;
+    color: @blue;
+    background-color: lighten(@blue, 45%);
   }
 
   .embed {
@@ -359,45 +356,19 @@
 .chat-item__content {
   padding: 0 10px 0 20px;
   border-radius: 5px;
-  margin-left: 30px;
+  margin-left: 64px;
+  margin-right: 34px;
   vertical-align: top;
   min-height: 1.5em;
 
   pre {
     margin: 4px 0 0 0;
   }
-
-  @media @mobile {
-    margin-left: 24px;
-    padding: 0 10px 0 10px;
-  }
 }
 
-.chat-item__container--status {
-  .chat-item__container;
-  @status_bg: hsl(220, 65%, 97%);
-
-  background-color: @status_bg;
-  border: 2px solid darken(@status_bg, 1%);
-  width: 89.5%;
-  margin: 1em 5.25% 0.3125em;
-  padding: 0.625em;
-  border-radius: 3px;
-
-  .chat-item__time {
-    display: block;
-  }
-
-  .chat-item__content {
-    margin: 0;
-    padding: 0;
-    text-align: center;
-
-    .chat-item__details .chat-item__time {
-      &:before {
-        display: none;
-      }
-    }
+.chat-item__status {
+  .chat-item__text {
+    color: #aaa;
   }
 }
 

@@ -1,0 +1,11 @@
+{{#each actions}}
+  {{#if disabled}}
+    <div class="chat-item__action-disabled">
+      {{description}}
+    </div>
+  {{else}}
+    <div class="chat-item__action js-chat-action-{{name}}">
+      {{description}}
+    </div>
+  {{/if}}
+{{/each}}

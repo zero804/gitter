@@ -4,95 +4,111 @@ var Marionette = require('backbone.marionette');
 var template = require('./tmpl/unreadBannerTemplate.hbs');
 var appEvents = require('utils/appevents');
 var unreadItemsClient = require('components/unread-items-client');
+require('views/behaviors/tooltip');
 
 var TopBannerView = Marionette.ItemView.extend({
-  arrowChar: '￪',
+  octicon: 'octicon-chevron-up',
+  position: 'Above',
   template: template,
   hidden: true,
+  className: 'banner-wrapper',
+  actAsScrollHelper: false,
+
   ui: {
     bannerMessage: '#banner-message',
     buttons: 'button'
   },
-  className: 'banner slide-away',
+
+  behaviors: {
+    Tooltip: {
+      'button.side': { title: 'Mark as read', placement: 'top' },
+    }
+  },
+
+
   events: {
     'click button.main': 'onMainButtonClick',
     'click button.side': 'onSideButtonClick'
   },
-  modelEvents: {
-    'change:unreadAbove': 'updateDisplay',
-    'change:hasUnreadAbove': 'updateVisibility'
+
+  modelEvents: function() {
+    var events = {};
+    events['change:unread' + this.position]      = 'updateVisibility';
+    events['change:hasUnread' + this.position]   = 'updateVisibility';
+    events['change:hasMentions' + this.position] = 'updateVisibility';
+
+    return events;
   },
+
+  applyStyles: function() {
+    if (!!this.getMentionsCount()) {
+      this.ui.buttons.removeClass('unread');
+      this.ui.buttons.addClass('mention');
+      return;
+    }
+    if (!!this.getUnreadCount()) {
+      this.ui.buttons.addClass('unread');
+      return;
+    }
+    this.ui.buttons.removeClass('unread');
+    this.ui.buttons.removeClass('mention');
+  },
+
   getUnreadCount: function() {
-    return this.model.get('unreadAbove');
+    return this.model.get('unread' + this.position);
+  },
+
+  getMentionsCount: function() {
+    return this.model.get('mentions' + this.position);
   },
 
   serializeData: function() {
-    return { message: this.getMessage() };
+    return { message: this.getMessage(), octicon: this.octicon };
   },
 
   getMessage: function() {
     var unreadCount = this.getUnreadCount();
+    var mentionsCount = this.getMentionsCount();
 
-    if(!unreadCount) {
-      return 'No unread messages';
-    }
-
-    if(unreadCount === 1) {
-      return this.arrowChar + ' 1 unread message';
-    }
-
-    if(unreadCount > 99) {
-      return this.arrowChar + '99+ unread messages';
-    }
-
-    return this.arrowChar + ' ' + unreadCount + ' unread messages';
+    if (!unreadCount && !mentionsCount) return 'Go to bottom';
+    if (mentionsCount === 1)            return '1 mention';
+    if (mentionsCount > 1)              return mentionsCount + '  mentions';
+    if (unreadCount === 1)              return '1 unread';
+    if (unreadCount > 99)               return '99+ unread';
+    return unreadCount + ' unread';
   },
 
-  getVisible: function() {
-    return !!this.model.get('hasUnreadAbove');
+  shouldBeVisible: function() {
+    return (!!this.getMentionsCount() || !!this.getUnreadCount() || !!this.actAsScrollHelper);
   },
 
-  updateDisplay: function() {
-    var noMoreItems = !this.getUnreadCount();
-    if (noMoreItems) return; // Don't change the text as it slides down as it's distracting
+  updateMessage: function() {
     this.ui.bannerMessage.text(this.getMessage());
   },
 
   updateVisibility: function() {
-    var requiredVisiblity = this.getVisible();
-    var visible = !this.hidden;
-    if (requiredVisiblity === visible) return; // Nothing to do here
-    if (visible) {
-      // Hide
-      this.$el.addClass('slide-away');
+    this.applyStyles();
+    this.updateMessage();
 
-      this.ui.buttons.blur();
-      if (this.hideTimeout) return;
-
-      this.hideTimeout = setTimeout(function() {
-        delete this.hideTimeout;
-        this.hidden = true;
-        this.$el.parent().hide();
-      }.bind(this), 500);
-
-    } else {
-      // Show
+    // TODO Add some fancy transitions
+    if (this.shouldBeVisible()) {
       this.$el.parent().show();
-      this.$el.removeClass('slide-away');
-      this.hidden = false;
-      if (this.hideTimeout) {
-        clearTimeout(this.hideTimeout);
-        delete this.hideTimeout;
-      }
+    } else {
+      this.ui.buttons.blur();
+      this.$el.parent().hide();
     }
   },
 
   onRender: function() {
-    this.updateDisplay();
+    this.updateVisibility();
   },
 
   onMainButtonClick: function() {
-    appEvents.trigger('chatCollectionView:scrollToFirstUnread');
+    var mentionId = this.model.get('oldestMentionId');
+    if (mentionId) return appEvents.trigger('chatCollectionView:scrollToChatId', mentionId);
+
+    var itemId = this.model.get('oldestUnreadItemId');
+    if (itemId) appEvents.trigger('chatCollectionView:scrollToChatId', itemId);
   },
 
   onSideButtonClick: function() {
@@ -101,29 +117,33 @@ var TopBannerView = Marionette.ItemView.extend({
 });
 
 var BottomBannerView = TopBannerView.extend({
-  arrowChar: '￬',
-  modelEvents: {
-    'change:unreadBelow': 'updateDisplay',
-    'change:hasUnreadBelow': 'updateVisibility'
-  },
-  getUnreadCount: function() {
-    return this.model.get('unreadBelow');
+  octicon: 'octicon-chevron-down',
+  position: 'Below',
+  className: 'banner-wrapper bottom',
+  actAsScrollHelper: false,
+
+  initialize: function() {
+    this.listenTo(appEvents, 'atBottomChanged', this.toggleScrollHelper);
   },
 
-  getVisible: function() {
-    return !!this.model.get('hasUnreadBelow');
+  toggleScrollHelper: function(atBottom) {
+    this.actAsScrollHelper = !atBottom;
+    this.updateVisibility();
   },
 
   onMainButtonClick: function() {
-    var belowItemId = this.model.get('belowItemId');
-    if (belowItemId) {
-      appEvents.trigger('chatCollectionView:scrollToChatId', belowItemId);
-    }
+    this.toggleScrollHelper(true);
+
+    var mentionId = this.model.get('mostRecentMentionId');
+    if (mentionId) return appEvents.trigger('chatCollectionView:scrollToChatId', mentionId);
+
+    var itemId = this.model.get('mostRecentUnreadItemId');
+    if (itemId) return appEvents.trigger('chatCollectionView:scrollToChatId', itemId);
+
+    appEvents.trigger('chatCollectionView:scrollToBottom');
   },
 
-  onSideButtonClick: function() {
-  }
-
+  onSideButtonClick: function() {}
 });
 
 module.exports = {
