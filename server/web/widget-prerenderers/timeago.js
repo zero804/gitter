@@ -16,31 +16,36 @@ function useLanguage(language, callback) {
 
 module.exports = exports = function() {
   return function timeagoWidgetHandler(params) {
-    var options = params.hash || {};
+    return '';
 
-    var time    = options.time;
-    var lang    = options.lang;
-    var locale  = options.locale;
+    // FIXME Temporarily disable until we find a nice
+    // way to render user's timezone server-side
 
-    if (!options || !time) return '';
+    //var options = params.hash || {};
 
-    time = moment(time);
+    //var time    = options.time;
+    //var lang    = options.lang;
+    //var locale  = options.locale;
 
-    var messageAge = moment.duration(Date.now() - time.valueOf());
+    //if (!options || !time) return '';
 
-    if (messageAge.asDays() >= maxDaysBeforeDateDisplay) {
-      return options.compact ? time.format("MMM DD") : time.format("MMM DD H:mm");
-    } else {
-      return time.format("H:mm");
-    }
+    //time = moment(time);
 
-    var v = useLanguage(lang, function() {
-      return messageAge.humanize();
-    });
+    //var messageAge = moment.duration(Date.now() - time.valueOf());
 
-    /* This should never happen... */
-    if(!locale) return v + " ago";
+    //if (messageAge.asDays() >= maxDaysBeforeDateDisplay) {
+    //  return options.compact ? time.format("MMM DD") : time.format("MMM DD H:mm");
+    //} else {
+    //  return time.format("H:mm");
+    //}
 
-    return locale.__("%s ago", v);
+    //var v = useLanguage(lang, function() {
+    //  return messageAge.humanize();
+    //});
+
+    ///* This should never happen... */
+    //if(!locale) return v + " ago";
+
+    //return locale.__("%s ago", v);
   };
 };
