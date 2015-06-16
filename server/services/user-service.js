@@ -267,7 +267,8 @@ var userService = {
     return persistence.User.updateQ({ _id: userId }, { $set: { githubToken: null, githubScopes: { }, githubUserToken: null } });
   },
 
-  saveTzInfo: function(userId, timezoneInfo) {
+  /* Update the timezone information for a user */
+  updateTzInfo: function(userId, timezoneInfo) {
     var update = {};
 
     function setUnset(key, value) {
