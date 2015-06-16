@@ -41,6 +41,11 @@
   box-sizing: border-box;
   margin-top: 10px;
   margin-left: 44px;
+  margin-bottom: 10px;
+
+  @media @mobile {
+    margin-left: 12px;
+  }
 }
 
 .chat-input__area {
@@ -78,8 +83,16 @@
 }
 
 .chat-input__box {
-  margin: 0 52px;
+  @avatarWidth: 30px;
+  margin-left: @avatarWidth + 22px;
+  margin-right: 52px;
+  margin-bottom: 0;
   vertical-align: top;
+
+  @media @mobile {
+    margin-left: @avatarWidth + 12px;
+    margin-right: 12px;
+  }
 }
 
 .chat-input__text-area {
