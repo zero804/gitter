@@ -29,6 +29,6 @@ module.exports = function(req, res, next) {
   /* i18n stuff */
   res.locals.locale = req.i18n;
   res.locals.lang = req.i18n && req.i18n.locale || 'en';
-
+  
   next();
 };
