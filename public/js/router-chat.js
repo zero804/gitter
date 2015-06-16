@@ -15,6 +15,7 @@ var HeaderView = require('views/app/headerView');
 var frameUtils = require('./utils/frame-utils');
 var itemCollections = require('collections/instances/integrated-items');
 
+/* Set the timezone cookie */
 require('components/timezone-cookie');
 
 require('components/statsc');
