@@ -214,29 +214,7 @@ module.exports = (function() {
       this.listenTo(appEvents, 'chatCollectionView:pageDown', this.pageDown);
       this.listenTo(appEvents, 'chatCollectionView:editChat', this.editChat);
       this.listenTo(appEvents, 'chatCollectionView:viewportResize', this.viewportResize);
-      this.listenTo(appEvents, 'chatCollectionView:scrollToFirstUnread', this.scrollToFirstUnread);
       this.listenTo(appEvents, 'chatCollectionView:scrollToChatId', this.scrollToChatId);
-    },
-
-    scrollToFirstUnread: function() {
-      var self = this;
-
-      var id = unreadItemsClient.getFirstUnreadItem();
-      var model = self.collection.get(id);
-
-      if (model) {
-        var firstUnreadView = self.children.findByModel(model);
-        self.rollers.scrollToElement(firstUnreadView.el);
-        return;
-      }
-
-      this.collection.ensureLoaded(id, function() {
-        var model = self.collection.get(id);
-        var firstUnreadView = self.children.findByModel(model);
-        if(!firstUnreadView) return;
-        self.rollers.scrollToElement(firstUnreadView.el);
-      });
-
     },
 
     onTrackViewportCenter: function() {
@@ -298,7 +276,7 @@ module.exports = (function() {
       this.collection.ensureLoaded(id, function() {
         var model = self.collection.get(id);
         if (model) return this.scrollToChat(model);
-      });
+      }.bind(this));
     },
 
     // used to highlight and "dim" chat messages, the behaviour Highlight responds to these changes.

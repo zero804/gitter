@@ -43,13 +43,6 @@
   margin-top: 10px;
   display: block;
   text-align: center;
-
-  @media @mid {
-    .avatar-s {
-      width: 24px;
-      height: 24px;
-    }
-  }
 }
 
 .chat-input__area {
@@ -59,19 +52,6 @@
   display: inline-block;
   width: 100%;
   padding: 0 0px 4px 44px;
-
-  @media @mid {
-    // padding: 0 32px;
-    padding-right: 42px;
-  }
-
-  @media @small {
-    padding: 0 42px 0 44px;
-  }
-
-  @media @mobile {
-    padding: 3px 10px;
-  }
 }
 
 .chat-input__buttons {
@@ -110,18 +90,8 @@
   padding: 0 52px 0 20px;
   display: block;
   background-color: white;
-  // height: 58px;
   vertical-align: top;
   border-radius: 5px 5px 5px 5px;
-
-  @media @mid {
-    margin-left: 40px;
-    padding: 0;
-  }
-
-  @media @mobile {
-    margin-left: 34px;
-  }
 }
 
 .chat-input__text-area {
@@ -145,4 +115,8 @@
   &:focus {
     outline: none;
   }
+}
+
+.selected {
+  opacity: 1 !important;
 }

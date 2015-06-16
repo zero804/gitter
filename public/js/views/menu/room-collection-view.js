@@ -2,7 +2,6 @@
 var $ = require('jquery');
 var Popover = require('views/popover');
 var context = require('utils/context');
-var resolveIconClass = require('utils/resolve-icon-class');
 var apiClient = require('components/apiClient');
 var roomNameTrimmer = require('utils/room-name-trimmer');
 var Marionette = require('backbone.marionette');
@@ -80,7 +79,8 @@ module.exports = (function() {
       var popover = new Popover({
         view: new PopoverBodyView({model: this.model}),
         targetElement: e.target,
-        placement: 'horizontal'
+        placement: 'horizontal',
+        width: '100px'
       });
       popover.show();
       Popover.singleton(this, popover);
@@ -89,7 +89,7 @@ module.exports = (function() {
     serializeData: function() {
       var data = this.model.toJSON();
       data.name = roomNameTrimmer(data.name, MAX_NAME_LENGTH);
-      data.iconClass = resolveIconClass(this.model);
+      data.owner = data.url.split('/')[1];
       return data;
     },
 

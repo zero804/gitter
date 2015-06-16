@@ -12,7 +12,8 @@ var FastAttachMixin = require('views/fast-attach-mixin');
 module.exports = (function() {
 
   var AvatarWidget = Marionette.ItemView.extend({
-    tagName: 'span',
+    tagName: 'div',
+    className: 'avatar',
     template: template,
     events: {
       'mouseover': 'showDetailIntent',

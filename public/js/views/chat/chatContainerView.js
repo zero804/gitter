@@ -1,7 +1,6 @@
 "use strict";
 
 var Marionette = require('backbone.marionette');
-var appEvents = require('utils/appevents');
 var hasScrollBars = require('utils/scrollbar-detect');
 var ChatCollectionView = require('views/chat/chatCollectionView');
 var context = require('utils/context');
@@ -41,17 +40,6 @@ module.exports = Marionette.LayoutView.extend({
 
   ui: {
     primaryScroll: '.primary-scroll',
-    scrollToBottom: '.js-scroll-to-bottom',
-  },
-
-  events: {
-    'click @ui.scrollToBottom': appEvents.trigger.bind(appEvents, 'chatCollectionView:scrollToBottom')
-  },
-
-  collectionEvents: {
-    atBottomChanged: function(isBottom) {
-      this.ui.scrollToBottom.toggleClass('scrollHelper--hidden', isBottom);
-    }
   },
 
   onRender: function() {
