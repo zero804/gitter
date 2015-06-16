@@ -79,7 +79,8 @@ module.exports = (function() {
       var popover = new Popover({
         view: new PopoverBodyView({model: this.model}),
         targetElement: e.target,
-        placement: 'horizontal'
+        placement: 'horizontal',
+        width: '100px'
       });
       popover.show();
       Popover.singleton(this, popover);
@@ -88,7 +89,7 @@ module.exports = (function() {
     serializeData: function() {
       var data = this.model.toJSON();
       data.name = roomNameTrimmer(data.name, MAX_NAME_LENGTH);
-      data.userOrOrg = data.url.split('/')[1];
+      data.owner = data.url.split('/')[1];
       return data;
     },
 

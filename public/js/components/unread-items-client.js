@@ -668,20 +668,7 @@ module.exports = (function() {
     monitorViewForUnreadItems: function($el, collectionView) {
       var unreadItemStore = getUnreadItemStoreReq();
       return new TroupeUnreadItemsViewportMonitor($el, unreadItemStore, collectionView);
-    },
-
-    getFirstUnreadItem: function() {
-      var unreadItemStore = getUnreadItemStoreReq();
-      //return unreadItemStore.getFirstItemOfType('chat');
-      return unreadItemStore.getFirstItem();
-    },
-
-    getFirstUnreadMention: function() {
-      var unreadItemStore = getUnreadItemStoreReq();
-      //return unreadItemStore.getFirstItemOfType('mention');
-      return unreadItemStore.getFirstItem();
     }
-
   };
 
   // Mainly useful for testing

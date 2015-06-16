@@ -142,13 +142,6 @@
   &:last-child {
     &.burstStart { padding-bottom: @chat-spacing*2; }
   }
-
-  @media @mid {
-    .avatar-s {
-      width: 24px;
-      height: 24px;
-    }
-  }
 }
 
 .chat-item__aside {
@@ -159,12 +152,6 @@
 
 .chat-item__avatar {
   margin-left: 1.6em;
-
-  @media @mobile {
-    margin-left: 0;
-    margin-top: 5px;
-  }
-
 }
 
 .chat-item__actions {
@@ -222,12 +209,12 @@
   cursor: pointer;
   font-weight: 600;
   margin-top: 2px;
+  opacity: 0.5;
 }
 
 .chat-item__time {
   vertical-align: middle;
   display: inline-block;
-  opacity: 0.8;
   color: #ddd;
   float: right;
   margin-top: 2px;
@@ -337,18 +324,16 @@
     line-height: 1.5;
   }
 
-  .mention {
+  .mention,
+  .groupmention {
     border-bottom: 1px dotted;
     cursor: pointer;
     padding: 0 2px;
   }
 
   .groupmention {
-    border: 1px solid fade(@trpLightBlue,20%);
-    background-color: fade(@trpLightBlue,10%);
-    border-radius: 2px;
-    padding: 0 4px;
-    cursor: pointer;
+    color: @blue;
+    background-color: lighten(@blue, 45%);
   }
 
   .embed {
@@ -378,12 +363,6 @@
 
   pre {
     margin: 4px 0 0 0;
-  }
-
-  @media @mobile {
-    margin-left: 18px;
-    margin-right: 0px;
-    padding: 0 0 0 10px;
   }
 }
 
