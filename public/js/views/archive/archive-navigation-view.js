@@ -21,7 +21,7 @@ module.exports = (function() {
       var p = this.options.previousDate && moment(this.options.previousDate).utc();
       var n = this.options.nextDate && moment(this.options.nextDate).utc();
 
-      var archiveDate = moment(this.options.archiveDate).locale(language);
+      var archiveDate = moment(this.options.archiveDate).utc().locale(language);
 
       var ordinalDate = archiveDate.format('Do');
       var numericDate = archiveDate.format('D');
@@ -53,15 +53,19 @@ module.exports = (function() {
         range = 3;
       }
 
-      var start = moment(a).subtract('months', 1);
+      var start = moment(a).subtract(1, 'months');
       var troupeId = context.getTroupeId();
+
+      // Get the date **in the local timezone** so that the highlighted
+      // date does not display incorrectly for west-of-the-meridian locations
+      var highlightDate = new Date(a.year(), a.month(), a.date());
 
       var cal = new CalHeatMap();
       cal.init({
         itemSelector: this.ui.navigation[0],
         start: start.toDate(),
         maxDate: new Date(),
-        highlight: [new Date(this.options.archiveDate)],
+        highlight: [highlightDate],
         minDate: new Date(2013, 10, 1), // 1 November 2013
         range: range,
         domain: "month",
