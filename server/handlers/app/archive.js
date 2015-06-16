@@ -131,8 +131,12 @@ exports.chatArchive = [
             var n = nextDate && moment(nextDate);
             var uri = req.uriContext.uri;
 
-            var ordinalDate = moment(startDate).format('Do', { lang: language });
-            var numericDate = moment(startDate).format('D', { lang: language });
+            var startDateLocale = moment(startDate).locale(language);
+
+            var ordinalDate = startDateLocale.format('Do');
+            var numericDate = startDateLocale.format('D');
+
+
 
             var ordinalPart;
             if(ordinalDate.indexOf('' + numericDate) === 0) {
@@ -141,13 +145,13 @@ exports.chatArchive = [
               ordinalPart = '';
             }
 
-            var previousDateFormatted = p && p.format('Do MMM YYYY', { lang: language });
+            var previousDateFormatted = p && p.locale(language).format('Do MMM YYYY');
             var dayNameFormatted = numericDate;
             var dayOrdinalFormatted = ordinalPart;
-            var previousDateLink = p && '/' + uri + '/archives/' + p.format('YYYY/MM/DD', { lang: 'en' });
-            var nextDateFormatted = n && moment(n.valueOf()).lang(language).format('Do MMM YYYY', { lang: language });
-            var nextDateLink = n && '/' + uri + '/archives/' + n.format('YYYY/MM/DD', { lang: 'en' });
-            var monthYearFormatted = moment(startDate).format('MMM YYYYY', { lang: language });
+            var previousDateLink = p && '/' + uri + '/archives/' + p.format('YYYY/MM/DD');
+            var nextDateFormatted = n && moment(n.valueOf()).locale(language).format('Do MMM YYYY');
+            var nextDateLink = n && '/' + uri + '/archives/' + n.format('YYYY/MM/DD');
+            var monthYearFormatted = startDateLocale.format('MMM YYYYY');
 
             var billingUrl = env.config.get('web:billingBaseUrl') + '/bill/' + req.uriContext.uri.split('/')[0];
             var roomUrl = '/api/v1/rooms/' + troupe.id;

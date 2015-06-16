@@ -29,6 +29,11 @@ var UserSchema = new Schema({
   githubScopes: { type: Schema.Types.Mixed },
   state: { type: String },
   stripeCustomerId: { type: String },
+  tz: {
+    offset: Number,
+    abbr: String,
+    iana: String
+  },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 

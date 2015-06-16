@@ -1,18 +1,7 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var moment = require('moment');
-var maxDaysBeforeDateDisplay = 1;
-
-function useLanguage(language, callback) {
-  if(!language) return callback();
-  moment.lang(language);
-  try {
-    return callback();
-  } finally {
-    moment.lang('en-GB');
-  }
-}
+var timeFormat = require('../../../shared/time/time-format');
 
 module.exports = exports = function() {
   return function timeagoWidgetHandler(params) {
@@ -20,27 +9,7 @@ module.exports = exports = function() {
 
     var time    = options.time;
     var lang    = options.lang;
-    var locale  = options.locale;
 
-    if (!options || !time) return '';
-
-    time = moment(time);
-
-    var messageAge = moment.duration(Date.now() - time.valueOf());
-
-    if (messageAge.asDays() >= maxDaysBeforeDateDisplay) {
-      return options.compact ? time.format("MMM DD") : time.format("MMM DD H:mm");
-    } else {
-      return time.format("H:mm");
-    }
-
-    var v = useLanguage(lang, function() {
-      return messageAge.humanize();
-    });
-
-    /* This should never happen... */
-    if(!locale) return v + " ago";
-
-    return locale.__("%s ago", v);
+    return timeFormat(time, { lang: lang, tzOffset: params.data.root.tzOffset, compact: options.compact });
   };
 };
