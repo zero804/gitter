@@ -29,6 +29,11 @@ var UserSchema = new Schema({
   githubScopes: { type: Schema.Types.Mixed },
   state: { type: String },
   stripeCustomerId: { type: String },
+  tz: {
+    offset: Number, // Offset in minutes as provided by `Date.prototype.getTimezoneOffset()`
+    abbr: String,   // Abbreviation, like PDT (note that these are NOT globally unique)
+    iana: String    // Timezone IANA description, eg `Europe/London` or `America/Los_Angeles`
+  },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 
