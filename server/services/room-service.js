@@ -571,8 +571,6 @@ function findOrCreateRoom(user, uri, options) {
       // need to check for the rooms
       return findOrCreateNonOneToOneRoom(user, uriLookup && uriLookup.troupe, uri, options)
         .then(function(findOrCreateResult) {
-          debug("findOrCreateNonOneToOneRoom returned %j", findOrCreateResult);
-
           var troupe = findOrCreateResult.troupe;
           var access = findOrCreateResult.access;
           var hookCreationFailedDueToMissingScope = findOrCreateResult.hookCreationFailedDueToMissingScope;

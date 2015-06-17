@@ -412,10 +412,14 @@ module.exports = (function() {
 
   function CollectionSync(store, collection) {
     collection.on('add', function(model) {
-      if (model.get('unread')) {
-
+      /* Prevents a race-condition when something has already been marked as deleted */
+      if (!model.id || !model.get('unread')) return;
+      if (store.isMarkedAsRead(model.id)) {
+        log('uic: item already marked as read');
+        model.set('unread', false);
       }
-    })
+    });
+
     /*
     // * newcountvalue: (length)
     // * unreadItemRemoved: (itemId)

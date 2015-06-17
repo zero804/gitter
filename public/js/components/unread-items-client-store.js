@@ -69,12 +69,11 @@ DeletePit.prototype = {
 // * itemMarkedRead: (itemId, mention, lurkMode)
 // * add (itemId, mention)
 // -----------------------------------------------------
-var UnreadItemStore = function(appEvents) {
+var UnreadItemStore = function() {
   this.length = 0;
   this._lurkMode = false;
   this._items = {};
   this._read = new DeletePit();
-  this._appEvents = appEvents;
 
   this.notifyCountLimited = limit(this.notifyCount, this, 30);
 };
@@ -92,12 +91,10 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
       this.length++;
       this.notifyCountLimited();
 
-      if (mention) {
-        // Since the item may already have been read BEFORE
-        // the user was mentioned, remove the item from
-        // the tarpit
-        this._read.remove(itemId);
-      }
+      // Since the item may already have been read BEFORE
+      // the user was mentioned, remove the item from
+      // the tarpit
+      this._read.remove(itemId);
 
       this.trigger('add', itemId, mention);
     } else {
@@ -233,6 +230,10 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
       if (memo === null) return value;
       return memo < value ? memo : value;
     }, null);
+  },
+
+  isMarkedAsRead: function(itemId) {
+    return this._read.contains(itemId);
   }
 
 });
