@@ -4,6 +4,9 @@ var ChatLayout = require('views/layouts/chat');
 var chatModels = require('collections/chat');
 var onready = require('./utils/onready');
 
+/* Set the timezone cookie */
+require('components/timezone-cookie');
+
 require('components/statsc');
 require('views/widgets/preload');
 require('components/dozy');

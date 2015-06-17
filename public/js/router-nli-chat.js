@@ -3,13 +3,14 @@
 var appEvents = require('utils/appevents');
 var Backbone = require('backbone');
 var context = require('utils/context');
-// var ChatNliIntegratedView = require('views/app/chatNliIntegratedView');
 var itemCollections = require('collections/instances/integrated-items');
-// var RightToolbarView = require('views/righttoolbar/rightToolbarView');
 var PeopleModal = require('views/people/people-modal');
 var HeaderView = require('views/app/headerView');
 var onready = require('./utils/onready');
 var ChatToolbarLayout = require('views/layouts/chat-toolbar');
+
+/* Set the timezone cookie */
+require('components/timezone-cookie');
 
 require('views/widgets/preload');
 require('filtered-collection');

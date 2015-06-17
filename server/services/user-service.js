@@ -265,6 +265,27 @@ var userService = {
 
   destroyTokensForUserId: function(userId) {
     return persistence.User.updateQ({ _id: userId }, { $set: { githubToken: null, githubScopes: { }, githubUserToken: null } });
+  },
+
+  /* Update the timezone information for a user */
+  updateTzInfo: function(userId, timezoneInfo) {
+    var update = {};
+
+    function setUnset(key, value) {
+      if (value) {
+        if (!update.$set) update.$set = {};
+        update.$set['tz.' + key] = value;
+      } else {
+        if (!update.$unset) update.$unset = {};
+        update.$unset['tz.' + key] = true;
+      }
+    }
+
+    setUnset('offset', timezoneInfo.offset);
+    setUnset('abbr', timezoneInfo.abbr);
+    setUnset('iana', timezoneInfo.iana);
+
+    return persistence.User.updateQ({ _id: userId }, update);
   }
 
 };
