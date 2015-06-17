@@ -1,6 +1,4 @@
-<a href="{{html_url}}" target="_blank">
-  {{#if pull_request.html_url}}Pull Request{{else}}Issue{{/if}} {{number}}{{#if title}}: {{title}}{{/if}}
-</a>
+<a href="{{html_url}}" target="_blank">#{{number}}{{#if title}}: {{title}}{{/if}}</a>
 {{#if state}}
 <span class="issuePopoverLabel issue {{state}}">{{state}}</span>
 {{/if}}

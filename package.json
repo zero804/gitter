@@ -48,7 +48,7 @@
     "mandrill-api": "~1.0.40",
     "memwatch-next": "^0.2.6",
     "mixpanel": "~0.0.19",
-    "moment": "git://github.com/gitterHQ/moment#440d7889d9c0c8540cdc7711819f546cc99584a8",
+    "moment": "^2.10.3",
     "mongodb": "^1.4.32",
     "mongodb-arbiter-discovery": "^0.1.1",
     "mongodb-connection-string": "^0.1.1",
