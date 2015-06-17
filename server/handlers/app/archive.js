@@ -1,16 +1,17 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var moment = require('moment');
-var appMiddleware = require('./middleware');
-var chatService = require('../../services/chat-service');
-var restSerializer = require('../../serializers/rest-serializer');
-var contextGenerator = require('../../web/context-generator');
-var Q = require('q');
-var roomService = require('../../services/room-service');
-var env              = require('../../utils/env');
-var burstCalculator   = require('../../utils/burst-calculator');
+var moment               = require('moment');
+var appMiddleware        = require('./middleware');
+var chatService          = require('../../services/chat-service');
+var restSerializer       = require('../../serializers/rest-serializer');
+var contextGenerator     = require('../../web/context-generator');
+var Q                    = require('q');
+var roomService          = require('../../services/room-service');
+var env                  = require('../../utils/env');
+var burstCalculator      = require('../../utils/burst-calculator');
 var roomPermissionsModel = require('../../services/room-permissions-model');
+var timezoneMiddleware   = require('../../web/middlewares/timezone');
 
 exports.datesList = [
   appMiddleware.uriContextResolverMiddleware({ create: false }),
@@ -67,6 +68,7 @@ exports.datesList = [
 
 exports.chatArchive = [
   appMiddleware.uriContextResolverMiddleware({ create: false }),
+  timezoneMiddleware,
   function(req, res, next) {
     var user = req.user;
     var troupe = req.uriContext.troupe;
@@ -186,7 +188,9 @@ exports.chatArchive = [
               previousDateLink: previousDateLink,
               nextDate: nextDateFormatted,
               nextDateLink: nextDateLink,
-              monthYearFormatted: monthYearFormatted
+              monthYearFormatted: monthYearFormatted,
+
+              showDatesWithoutTimezone: true // Timeago widget will render whether or not we know the users timezone
             });
 
           });
