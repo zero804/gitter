@@ -26,7 +26,6 @@
   flex-shrink: 0;
   text-align: center;
   align-self: flex-start;
-  background-color: white;
   margin: 8px 10px 5px 5px;
   border-radius: 4px;
   width: 16px;
@@ -34,13 +33,15 @@
   img {
     display: block;
     border-radius: 2px;
+    // stop avatars with alpha showing the dark background
+    background-color: white;
   }
   position: relative;
   z-index: 0;
 }
 
 .room-list-item__icon--favourite {
-  color: #6B8C9B;
+  color: #526b75;
   position: absolute;
   z-index: -1;
   margin-top: -9px;
