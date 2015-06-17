@@ -84,6 +84,7 @@ exports.install = function() {
       var link = data.link;
       var troupeId = data.troupeId;
       var sound = data.sound;
+      var chatId = data.chatId;
 
       var url = "/api/v1/user/" + userId;
       var message = {
@@ -92,7 +93,8 @@ exports.install = function() {
          text: ent.decode(text),
          link: link,
          troupeId: troupeId,
-         sound: sound
+         sound: sound,
+         chatId: chatId
       };
       winston.verbose("Notification to " + url, message);
 
