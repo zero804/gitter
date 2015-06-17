@@ -11,7 +11,7 @@
 
 @chat-spacing: 0.2em;
 
-.trpChatContainer .isViewers:last-child .chat-item__details .chat-item__icon--read {
+.trpChatContainer .isViewers:last-child .chat-item__details {
   visibility: visible;
 }
 
@@ -91,14 +91,6 @@
       &:before {
         content: none;
       }
-    }
-
-    .chat-item__icon--read {
-      opacity: 0;
-    }
-
-    &:hover .chat-item__icon--read {
-      opacity: 1;
     }
 
     .chat-item__details,
@@ -235,14 +227,12 @@
 }
 
 .chat-item__icon--read {
+  visibility: hidden;
+  opacity: 0;
+
   float: left;
   font-size: 0.7em;
-  opacity: 0;
   margin-top: 3px;
-
-  .chat-item:hover & {
-    opacity: 1;
-  }
 
   .isViewers & {
     opacity: 1;
@@ -252,6 +242,13 @@
     display: none;
   }
 
+}
+
+.chat-item__icon--read-by-some {
+  .chat-item:hover & {
+    visibility: visible;
+    opacity: 1;
+  }
 }
 
 .chat-item__icon--collapse {

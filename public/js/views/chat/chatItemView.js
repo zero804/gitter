@@ -69,7 +69,7 @@ module.exports = (function() {
     },
 
     modelEvents: {
-      'syncStatusChange': 'onSyncStatusChange',
+      //'syncStatusChange': 'onSyncStatusChange',
       'change': 'onChange'
     },
 
@@ -246,26 +246,23 @@ module.exports = (function() {
 
       /* Don't run on the initial (changed=undefined) as its done in the template */
       // FIXME this is whole thing is pretty ugly, could do with a refactor
+      // First iteration: we're not appending the read icon here, just adding a class to display it
       if (changes && 'readBy' in changes) {
         var readByCount = model.get('readBy');
         var oldValue = model.previous('readBy');
-
         var readByLabel = $el.find('.js-chat-item-readby');
+        var className = "chat-item__icon--read-by-some";
 
         if(readByLabel.length === 0) {
           if(readByCount) {
-           // FIXME this specially
-           readByLabel = $(document.createElement('div')).addClass('chat-item__icon chat-item__icon--read icon-check js-chat-item-readby');
-           readByLabel.appendTo($el.find('.chat-item__actions'));
-
-           RAF(function() {
-             readByLabel.addClass('readBySome');
-           });
+            RAF(function() {
+              readByLabel.addClass(className);
+            });
           }
         } else {
           if((oldValue === 0) !== (readByCount === 0)) {
             // Things have changed
-            readByLabel.toggleClass('readBySome', !!readByCount);
+            readByLabel.toggleClass(className, !!readByCount);
           }
         }
       }
