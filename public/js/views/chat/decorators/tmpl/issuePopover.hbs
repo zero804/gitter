@@ -3,16 +3,10 @@
   Issue not found. It may not exist or you may not have access to it.
 </div>
 {{else}}
-<div class="trpChatAvatar">
-  <span>
-    <div class="trpDisplayPicture--left avatar-s" style="background-image: url({{user.avatar_url}});">
-   </div>
-  </span>
-</div>
+<div class="trpDisplayPicture--left avatar-s" style="background-image: url({{user.avatar_url}});"></div>
 <div class='chat-item__content'>
   <div class="chat-item__details">
     <div class="chat-item__from">{{user.login}}</div>
-    <div class="chat-item__time">{{date}}</div>
   </div>
   {{#if body_html}}
     <div class="chat-item__text">{{{body_html}}}</div>
@@ -24,7 +18,10 @@
   <div style="float: right;
   margin-top: 5px;
   ">
-  <div class="trpDisplayPicture--left avatar-xxs" style="background-image: url({{assignee.avatar_url}}); vertical-align: middle"></div>
+  <div class="trpDisplayPicture--left avatar-xxs" style="background-image: url({{assignee.avatar_url}});
+                                                         vertical-align: middle;
+                                                         margin-top: 0.25em;
+                                                         margin-right: 0.25em;"></div>
     <span style="
     font-size: smaller;
     vertical-align: middle;
