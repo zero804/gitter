@@ -8,7 +8,7 @@ module.exports = exports = function() {
     var options = params.hash;
     var root = params.data.root;
 
-    var time, lang, compact, alwaysShow;
+    var time, lang, compact;
 
     if (options) {
       time = options.time;
