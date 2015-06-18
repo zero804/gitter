@@ -10,7 +10,7 @@ var execPreloads      = require('../exec-preloads');
 var getVersion        = require('../get-model-version');
 var billingService    = require('../../services/billing-service');
 var leanUserDao       = require('../../services/daos/user-dao').full;
-var resolveAvatarUrl  = require('../../../shared/avatars/resolve-avatar-url');
+var resolveAvatarUrl  = require('gitter-web-shared/avatars/resolve-avatar-url');
 
 function UserPremiumStatusStrategy() {
   var usersWithPlans;

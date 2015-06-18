@@ -29,6 +29,7 @@
     "gitter-realtime-client": "^0.1.15",
     "gitter-redis-scripto": "^0.2.2",
     "gitter-services": "git+ssh://git@github.com:gitterHQ/services.git#1.10.1",
+    "gitter-web-shared": "file:shared",
     "handlebars": "~3.0.3",
     "heapdump": "^0.2.9",
     "highlight.js": "^8.6.0",

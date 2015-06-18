@@ -1,0 +1,12 @@
+{
+  "name": "gitter-web-shared",
+  "version": "1.0.0",
+  "description": "Gitter Web Shared Components",
+  "main": " ",
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "author": "Andrew Newdigate <andrewn@datatribe.net> (http://about.me/andrewnewdigate)",
+  "license": "MIT",
+  "private": true
+}

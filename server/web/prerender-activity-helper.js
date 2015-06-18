@@ -2,7 +2,7 @@
 
 var _                   = require('underscore');
 var compileTemplate     = require('./compile-web-template');
-var activityDecorators  = require('../../shared/activity/activity-decorators');
+var activityDecorators  = require('gitter-web-shared/activity/activity-decorators');
 var prerenderWrapper    = require('./prerender-wrapper');
 
 function compile(template) {
