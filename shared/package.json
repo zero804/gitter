@@ -6,7 +6,5 @@
   "scripts": {
     "test": "mocha test/"
   },
-  "author": "Andrew Newdigate <andrewn@datatribe.net> (http://about.me/andrewnewdigate)",
-  "license": "MIT",
   "private": true
 }

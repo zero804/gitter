@@ -1617,6 +1617,10 @@
         }
       }
     },
+    "gitter-web-shared": {
+      "version": "1.0.0",
+      "resolved": "file:shared"
+    },
     "handlebars": {
       "version": "3.0.3",
       "from": "handlebars@http://beta-internal:4873/handlebars/-/handlebars-3.0.3.tgz",
@@ -1938,6 +1942,7 @@
     },
     "moment": {
       "version": "2.10.3",
+      "from": "moment@http://beta-internal:4873/moment/-/moment-2.10.3.tgz",
       "resolved": "http://beta-internal:4873/moment/-/moment-2.10.3.tgz"
     },
     "mongodb": {
