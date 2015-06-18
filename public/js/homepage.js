@@ -5,7 +5,7 @@ var appEvents = require('utils/appevents');
 var context = require('utils/context');
 var mapMessageTemplate = require('./map-message.hbs');
 var roomNameTrimmer = require('utils/room-name-trimmer');
-var resolveAvatarUrl = require('shared/avatars/resolve-avatar-url');
+var resolveAvatarUrl = require('gitter-web-shared/avatars/resolve-avatar-url');
 var apiClient = require('components/apiClient');
 var onready = require('./utils/onready');
 
@@ -244,4 +244,3 @@ onready(function() {
     appEvents.trigger('stats.event', 'apps.windows.download');
   });
 });
-
