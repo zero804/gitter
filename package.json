@@ -196,7 +196,7 @@
     "dev": "nodemon & gulp watch",
     "test": "gulp localtest",
     "link": "linklocal link -r",
-    "prepublish": "npm run link"
+    "XXXprepublish": "npm run link"
   },
   "git": {
     "scripts": {
