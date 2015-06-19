@@ -72,7 +72,7 @@ gulp.task('validate-client-source', function() {
 
 gulp.task('validate-server-source', function() {
   /* This is a very lax jshint, only looking for major problems */
-  return gulp.src(['server/**/*.js', 'shared/**/*.js', '!server/web/faye-node.js'])
+  return gulp.src(['server/**/*.js', 'shared/**/*.js', 'modules/**/lib/**/*.js'])
     .pipe(jshint({
       node: true,
       // globalstrict: true, // ENABLE
@@ -195,7 +195,8 @@ gulp.task('copy-app-files', function() {
       'scripts/**',
       'server/**',
       'shared/**',
-      'redis-lua/**'
+      'redis-lua/**',
+      'modules/**'
     ], { "base" : "." })
     .pipe(gulp.dest('output/app'));
 });

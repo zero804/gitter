@@ -196,7 +196,8 @@
     "dev": "nodemon & gulp watch",
     "test": "gulp localtest",
     "link": "linklocal link -r",
-    "XXXprepublish": "npm run link"
+    "unlink": "linklocal unlink -r",
+    "shrinkwrap": "npm run unlink && npm prune && npm install && npm shrinkwrap"
   },
   "git": {
     "scripts": {
