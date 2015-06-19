@@ -1315,7 +1315,9 @@ describe('room-service #slow', function() {
       roomService = testRequire.withProxies('./services/room-service', {
         './permissions-model': permissionsModelMock,
         './room-permissions-model': roomPermissionsModelMock,
-        './github/github-uri-validator': roomValidatorMock
+        'gitter-web-github': {
+          GitHubUriValidator: roomValidatorMock
+        }
       });
     });
 

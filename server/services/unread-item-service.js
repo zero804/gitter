@@ -1,14 +1,14 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var env              = require('../utils/env');
+var env              = require('gitter-web-env');
 var logger           = env.logger;
 var engine           = require('./unread-item-service-engine');
 var troupeService    = require("./troupe-service");
 var readByService    = require("./readby-service");
 var userService      = require("./user-service");
 var roomPermissionsModel = require('./room-permissions-model');
-var appEvents        = require("../app-events");
+var appEvents        = require('gitter-web-appevents');
 var presenceService  = require("./presence-service");
 var _                = require("underscore");
 var mongoUtils       = require('../utils/mongo-utils');

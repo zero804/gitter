@@ -1,11 +1,11 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var env            = require('../utils/env');
+var env            = require('gitter-web-env');
 var logger         = env.logger;
 var Q              = require('q');
 var debug          = require('debug')('gitter:persistence-service-events');
-var appEvents      = require("../app-events");
+var appEvents      = require('gitter-web-appevents');
 var restSerializer = require("../serializers/rest-serializer");
 
 // --------------------------------------------------------------------

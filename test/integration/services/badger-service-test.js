@@ -8,7 +8,7 @@ var USER = { username: 'gittertestbot' };
 var badgerService = testRequire('./services/badger-service');
 var client = badgerService.testOnly.client;
 
-describe('badger-service', function() {
+describe('badger-service #slow', function() {
   // Skip tests in the automated test as they create too much noise
   if(process.env.NODE_ENV === 'test' || process.env.SKIP_BADGER_TESTS) return;
 
@@ -79,4 +79,3 @@ describe('badger-service', function() {
 
 
 });
-
