@@ -9,7 +9,7 @@ var serializer                   = require("../../serializers/notification-seria
 var notificationMessageGenerator = require('../../utils/notification-message-generator');
 var unreadItemService            = require('../unread-item-service');
 var Q                            = require('q');
-var errorReporter                = require('../../utils/env').errorReporter;
+var errorReporter                = require('gitter-web-env').errorReporter;
 var basePath                     = nconf.get('web:basepath');
 
 function filterUnreadItemsForUserByMention(userId, items) {

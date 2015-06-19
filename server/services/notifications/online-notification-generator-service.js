@@ -6,7 +6,7 @@ var Q                         = require('q');
 var handlebars                = require('handlebars');
 var userTroupeSettingsService = require('../user-troupe-settings-service');
 var userService               = require('../user-service');
-var appEvents                 = require('../../app-events');
+var appEvents                 = require('gitter-web-appevents');
 var serializer                = require('../../serializers/notification-serializer');
 var collections               = require('../../utils/collections');
 

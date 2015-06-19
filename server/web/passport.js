@@ -1,7 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var env                    = require('../utils/env');
+var env                    = require('gitter-web-env');
 var logger                 = env.logger;
 var errorReporter          = env.errorReporter;
 var config                 = env.config;
@@ -19,7 +19,7 @@ var oauthService           = require('../services/oauth-service');
 var mixpanel               = require('../web/mixpanelUtils');
 var useragentTagger        = require('../utils/user-agent-tagger');
 var GitHubStrategy         = require('gitter-passport-github').Strategy;
-var GitHubMeService        = require('../services/github/github-me-service');
+var GitHubMeService        = require('gitter-web-github').GitHubMeService;
 var gaCookieParser         = require('../utils/ga-cookie-parser');
 var extractGravatarVersion = require('../utils/extract-gravatar-version');
 var emailAddressService    = require('../services/email-address-service');

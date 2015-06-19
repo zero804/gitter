@@ -2,7 +2,7 @@
 "use strict";
 
 var dolph       = require('dolph');
-var env         = require('./env');
+var env         = require('gitter-web-env');
 var stats       = env.stats;
 var redisClient =  env.redis.getClient();
 

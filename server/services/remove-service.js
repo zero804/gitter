@@ -3,7 +3,7 @@
 
 var Q                  = require('q');
 var StatusError        = require('statuserror');
-var appEvents          = require('../app-events');
+var appEvents          = require('gitter-web-appevents');
 var recentRoomService  = require('./recent-room-service');
 var roomPermissionsModel = require('./room-permissions-model');
 var unreadItemService = require('./unread-item-service');

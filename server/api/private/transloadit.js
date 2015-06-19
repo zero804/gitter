@@ -7,7 +7,7 @@ var nconf         = require('../../utils/config');
 var Q             = require('q');
 var StatusError   = require('statuserror');
 
-var env           = require('../../utils/env');
+var env           = require('gitter-web-env');
 var stats         = env.stats;
 var logger        = env.logger;
 

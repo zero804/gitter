@@ -1,7 +1,7 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var env              = require('../utils/env');
+var env              = require('gitter-web-env');
 var stats            = env.stats;
 var logger           = env.logger;
 var config           = env.config;
@@ -17,7 +17,7 @@ var oauth2           = require('../web/oauth2');
 var mixpanel         = require('../web/mixpanelUtils');
 var rememberMe       = require('../web/middlewares/rememberme-middleware');
 var ensureLoggedIn   = require('../web/middlewares/ensure-logged-in');
-var GithubMeService  = require("../services/github/github-me-service");
+var GithubMeService  = require('gitter-web-github').GitHubMeService;
 
 /** TODO move onto its own method once we find the need for it elsewhere
  * isRelativeURL() checks if the URL is relative

@@ -1,6 +1,6 @@
 "use strict";
 
-var env               = require('../../utils/env');
+var env               = require('gitter-web-env');
 var logger            = env.logger;
 var config            = env.config;
 var stats             = env.stats;

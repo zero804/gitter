@@ -1,6 +1,6 @@
 "use strict";
 
-var env                  = require('../utils/env');
+var env                  = require('gitter-web-env');
 var stats                = env.stats;
 var config               = env.config;
 var errorReporter        = env.errorReporter;
@@ -16,7 +16,7 @@ var StatusError          = require('statuserror');
 var unreadItemService    = require('./unread-item-service');
 var _                    = require('underscore');
 var mongooseUtils        = require('../utils/mongoose-utils');
-var cacheWrapper         = require('../utils/cache-wrapper');
+var cacheWrapper         = require('gitter-web-cache-wrapper');
 var groupResolver        = require('./group-resolver');
 var chatSearchService    = require('./chat-search-service');
 var unreadItemService    = require('./unread-item-service');

@@ -1,10 +1,10 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var env                  = require('../../utils/env');
+var env                  = require('gitter-web-env');
 var logger               = env.logger;
 
-var GitHubOrgService     = require('../github/github-org-service');
+var GitHubOrgService     = require('gitter-web-github').GitHubOrgService;
 var userIsInRoom         = require('../user-in-room');
 var Q                    = require('q');
 

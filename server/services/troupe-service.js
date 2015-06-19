@@ -2,13 +2,13 @@
 /*global require: true, module: true */
 "use strict";
 
-var env                      = require('../utils/env');
+var env                      = require('gitter-web-env');
 var logger                   = env.logger;
 var stats                    = env.stats;
 
-var persistence              = require("./persistence-service");
-var userService              = require("./user-service");
-var appEvents                = require("../app-events");
+var appEvents                = require('gitter-web-appevents');
+var userService              = require('./user-service');
+var persistence              = require('./persistence-service');
 var assert                   = require("assert");
 var collections              = require("../utils/collections");
 var mongoUtils               = require("../utils/mongo-utils");

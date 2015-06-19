@@ -1,7 +1,7 @@
 "use strict";
 
 var WEB_INTERNAL_CLIENT_KEY = 'web-internal';
-var env    = require('../utils/env');
+var env    = require('gitter-web-env');
 var nconf  = env.config;
 var logger = env.logger;
 

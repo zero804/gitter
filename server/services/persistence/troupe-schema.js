@@ -8,10 +8,10 @@ var winston        = require('../../utils/winston');
 var assert         = require("assert");
 var Q              = require('q');
 var restSerializer = require('../../serializers/rest-serializer');
-var appEvents      = require("../../app-events");
+var appEvents      = require('gitter-web-appevents');
 var _              = require("underscore");
 var tagger         = require('../../utils/room-tagger');
-var RepoService    = require('../github/github-repo-service');
+var RepoService    = require('gitter-web-github').GitHubRepoService;
 var troupeUtils    = require('../../utils/models/troupes');
 var debug          = require('debug')('gitter:troupe-schema');
 

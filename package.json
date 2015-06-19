@@ -29,6 +29,10 @@
     "gitter-realtime-client": "^0.1.15",
     "gitter-redis-scripto": "^0.2.2",
     "gitter-services": "git+ssh://git@github.com:gitterHQ/services.git#1.10.1",
+    "gitter-web-appevents": "file:modules/appevents",
+    "gitter-web-cache-wrapper": "file:modules/cache-wrapper",
+    "gitter-web-env": "file:modules/env",
+    "gitter-web-github": "file:modules/github",
     "gitter-web-shared": "file:shared",
     "handlebars": "~3.0.3",
     "heapdump": "^0.2.9",
@@ -42,6 +46,7 @@
     "langs": "^1.0.1",
     "languagedetect": "^1.1.1",
     "lazy.js": "~0.2.1",
+    "linklocal": "^2.5.2",
     "locale": "0.0.17",
     "lodash": "~3.2.0",
     "loglevel": "^1.2.0",
@@ -189,7 +194,9 @@
   "scripts": {
     "start": "nodemon web.js",
     "dev": "nodemon & gulp watch",
-    "test": "gulp localtest"
+    "test": "gulp localtest",
+    "link": "linklocal link -r",
+    "prepublish": "npm run link"
   },
   "git": {
     "scripts": {
