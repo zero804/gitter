@@ -1,86 +1,58 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var repoService     = require('./repo-service');
-var GithubRepo      = require('gitter-web-github').GitHubRepoService;
 var persistence     = require('./persistence-service');
 var Q               = require('q');
 var _               = require('underscore');
-var suggestedRoomCache = require('./suggested-room-service-cache');
+var collections     = require('../utils/collections');
 
-var HILIGHTED_ROOMS = [
-  {
-    uri: 'gitterHQ/gitter',
-    githubType: 'REPO',
-    localeLanguage: 'en'
-  }, {
-    uri: 'marionettejs/backbone.marionette',
-    language: 'JavaScript',
-    githubType: 'REPO',
-    localeLanguage: 'en'
-  },{
-    uri: 'LaravelRUS/chat',
-    channel: true,
-    language: 'PHP',
-    githubType: 'REPO',
-    localeLanguage: 'ru'
-  }, {
-    uri: 'gitterHQ/nodejs',
-    channel: true,
-    language: 'JavaScript',
-    githubType: 'ORG_CHANNEL',
-    localeLanguage: 'en'
-  },{
-    uri: 'rom-rb/chat',
-    channel: true,
-    language: 'Ruby',
-    githubType: 'REPO',
-    localeLanguage: 'en'
-  }, {
-    uri: 'webpack/webpack',
-    language: 'JavaScript',
-    githubType: 'REPO',
-    localeLanguage: 'en'
-  }, {
-    uri: 'ruby-vietnam/chat',
-    channel: true,
-    language: 'Ruby',
-    githubType: 'ORG_CHANNEL',
-    localeLanguage: 'vi'
-  }, {
-    uri: 'angular-ui/ng-grid',
-    language: 'JavaScript',
-    githubType: 'REPO',
-    localeLanguage: 'en'
+var recommendations = require('./recommendations');
+
+var MAX_RECOMMENDATIONS = 20;
+
+function indexOf(value) {
+  var buckets = Array.prototype.slice.call(arguments, 1);
+  var totalBuckets = buckets.length;
+  for (var i = 0; i < buckets.length; i++) {
+    if (value > buckets[i]) return totalBuckets - i;
   }
-];
-
+  return 0;
+}
 var CATEGORIES = {
   pushTime: function(item) {
-    var repo = item.repo;
+    var repo = item.githubRepo;
     if(!repo) return;
     if(!repo.pushed_at) return;
-    return new Date(repo.pushed_at).valueOf();
+    var daysSincePush = (Date.now() - new Date(repo.pushed_at).valueOf()) / 86400000;
+    if (daysSincePush < 7) { return 5; }
+    if (daysSincePush < 31) { return 4; }
+    if (daysSincePush < 90) { return 3; }
+    if (daysSincePush < 180) { return 2; }
+    if (daysSincePush < 365) { return 1; }
+    return 0;
   },
   forks: function(item) {
-    var repo = item.repo;
+    var repo = item.githubRepo;
     if(!repo) return;
-    return repo.forks_count;
+    // return repo.forks_count;
+    return indexOf(repo.forks_count, 1000, 500, 100, 50, 20, 1);
   },
   watchers: function(item) {
-    var repo = item.repo;
+    var repo = item.githubRepo;
     if(!repo) return;
-    return repo.watchers_count;
+    return indexOf(repo.watchers_count, 1000, 500, 100, 50, 20, 1);
+    // return repo.watchers_count;
   },
   starGazers: function(item) {
-    var repo = item.repo;
+    var repo = item.githubRepo;
     if(!repo) return;
-    return repo.stargazers_count;
+    // return repo.stargazers_count;
+    return indexOf(repo.stargazers_count, 1000, 500, 100, 50, 20, 1);
   },
   userCount: function(item) {
     var room = item.room;
     if(!room) return 0;
-    return room.users.length;
+    return room.userCount || 0;
   },
   isWatchedByUser: function(item) {
     return item.is_watched_by_user ? 1 : 0;
@@ -89,22 +61,35 @@ var CATEGORIES = {
     return item.is_starred_by_user ? 1 : 0;
   },
   programmingLanguage: function(item, context) {
-    var language = item.repo && item.repo.language || item.language;
+    var language = item.githubRepo && item.githubRepo.language || item.language;
     if(!language) return;
     return context.preferredComputerLanguages[language] || 0;
   },
   userLanguage: function(item, context) {
-    if(!context.localeLanguage || !item.localeLanguage) return;
-    return item.localeLanguage === context.localeLanguage ? 1 : 0;
+    var language = item.room && item.room.lang || item.localeLanguage;
+    if(!context.localeLanguage || !language) return;
+    return language === context.localeLanguage ? 1 : 0;
   },
   highlighted: function(item) {
     return item.highlighted ? 1 : 0;
+  },
+  similarTagsScore: function(item) {
+    return item.similarTagsScore || 0;
+  },
+  siblingScore: function(item) {
+    return item.roomSibling ? 1 : 0;
   }
 };
 
 var CATEGORY_COEFFICIENTS = {
   // use this to apply a multiplier to a category
-  highlighted: 1.1
+  pushTime: 0.5,
+  highlighted: 0.2,
+  siblingScore: 0.7,
+  userCount: 2,
+  isWatchedByUser: 1.2,
+  isStarredByUser: 2,
+  programmingLanguage: 2
 };
 
 function processCategory(name, items, context) {
@@ -135,54 +120,14 @@ function processCategory(name, items, context) {
     item.score = item.score ? item.score + rank : rank;
     item.categories = item.categories ? item.categories + 1 : 1;
   });
-}
 
-
-/* This seems to be a very badly performing query! */
-function findRooms(uriList) {
-  if(uriList.length === 0) return Q.resolve([]);
-
-  var uris = uriList.map(function(r) {
-    return r && r.toLowerCase();
-  });
-
-  return persistence.Troupe.findQ({
-      lcUri: { $in: uris }
-    }, { uri: 1, users: 1 });
-}
-
-function removeUselessSuggestions(suggestions, user) {
-  return suggestions.filter(function(suggestion) {
-
-    // dont suggest forks as when the urls are shortened in the client,
-    // they look identical to the originals and people get angry
-    if(suggestion.repo && suggestion.repo.fork) {
-      return false;
-    }
-
-
-    if(suggestion.room) {
-      // it's not a good room suggestion if the user is already in the room
-      return !suggestion.room.containsUserId(user.id);
-    } else if(suggestion.repo) {
-      if (suggestion.highlighted) {
-        return true;
-      }
-
-      // if no room exists but a repo exists, then the user must be the repo admin to create that repo room
-      return suggestion.repo.permissions && suggestion.repo.permissions.admin;
-    } else {
-      // if no room exists and the user cannot create it, then its an impossible suggestion
-      return false;
-    }
-  });
 }
 
 function getPreferredComputerLanguages(suggestions) {
   var result = {};
   suggestions.forEach(function(item) {
-    if(!item.is_starred_by_user || !item.is_watched_by_user || !item.is_owned_by_user) return;
-    var repo = item.repo;
+    if(!item.is_starred_by_user && !item.is_watched_by_user && !item.is_owned_by_user) return;
+    var repo = item.githubRepo;
     if(!repo || !repo.language) return;
     result[repo.language] = result[repo.language] ? result[repo.language] + 1 : 1;
   });
@@ -190,99 +135,58 @@ function getPreferredComputerLanguages(suggestions) {
   return result;
 }
 
-function getSuggestedRepoMap(user) {
-  var ghRepo  = new GithubRepo(user);
+/**
+ * If room does not exist:
+ *   -> If the user has push access: -> true
+ *   -> Otherwise false
+ * If the room exists
+ *   -> If the user is already in the room -> false
+ *   -> Otherwise true
+ */
+function filterRecommendations(recommendations, userId) {
+  if(recommendations.length === 0) return Q.resolve([]);
 
-  return Q.all([
-      ghRepo.getRecentlyStarredRepos(),
-      ghRepo.getWatchedRepos(),
-      repoService.getReposForUser(user)
-    ])
-    .spread(function(starredRepos, watchedRepos, ownedRepos) {
-      var suggestions = {};
+  var uris = recommendations.map(function(r) { return r.uri.toLowerCase(); });
 
-      function addSuggestion(flag) {
-        return function(repo) {
-          if(!suggestions[repo.full_name]) {
-            suggestions[repo.full_name] = {
-              uri: repo.full_name,
-              repo: repo,
-              githubType: 'REPO'
-            };
-          }
-          suggestions[repo.full_name][flag] = true;
-        };
-      }
+  return persistence.Troupe.findQ({
+      lcUri: { $in: uris }
+    }, {
+      _id: 1,
+      uri: 1,
+      userCount: 1,
+      users: {
+        $elemMatch: { userId: userId }
+      },
+      lang: 1
+    })
+    .then(function(rooms) {
+      var roomsHash = collections.indexByProperty(rooms, 'uri');
 
-      starredRepos.forEach(addSuggestion('is_starred_by_user'));
-      watchedRepos.forEach(addSuggestion('is_watched_by_user'));
-      ownedRepos.forEach(addSuggestion('is_owned_by_user'));
-      return suggestions;
+      return recommendations.filter(function(recommendation) {
+        var room = roomsHash[recommendation.uri];
+
+        if (room) {
+          recommendation.room = room;
+
+          // Room exists, but user is not in room
+          return !room.users || !room.users.length;
+        }
+
+        var repo = recommendation.repo;
+        if (!repo) return false;
+
+        // Room does not exist.. only recommend it if the user can create it
+        return repo && repo.permissions &&
+          (repo.permissions.admin || repo.permissions.push);
+      });
+
     });
 }
 
-function addHighlightedRooms(suggestionMap, user) {
-  return Q.all(HILIGHTED_ROOMS.map(function(room) {
-      var uri = room.uri;
-
-      if(!suggestionMap[uri]) {
-        suggestionMap[uri] = {
-          uri: uri,
-          language: room.language,
-          githubType: room.githubType
-        };
-      }
-      suggestionMap[uri].localeLanguage = room.localeLanguage;
-      suggestionMap[uri].highlighted = true;
-
-      if (room.channel) return;
-
-      return suggestedRoomCache(user, uri)
-        .then(function(result) {
-          if(result) {
-            if(suggestionMap[uri]) {
-              suggestionMap[uri].repo = result;
-            }
-          }
-      });
-    }))
-    .thenResolve(suggestionMap);
-}
-
-function addMissingGitterData(suggestionMap) {
-  var uris = Object.keys(suggestionMap);
-
-  return findRooms(uris)
-    .then(function(rooms) {
-      rooms.forEach(function(room) {
-
-        // this lookup fails if the repo has been renamed
-        // this is a bad fix, as it means that we dont attach the room data to a suggestion
-        // so a user could be told to create a room that already exists.
-        if(!suggestionMap[room.uri]) return;
-
-        suggestionMap[room.uri].room = room;
-      });
-    })
-    .thenResolve(suggestionMap);
-}
-
-
 function getSuggestions(user, localeLanguage) {
-
-  return getSuggestedRepoMap(user)
-    .then(function(suggestionMap) {
-      return addHighlightedRooms(suggestionMap, user);
-    })
-    // .then(function(suggestionMap) {
-    //   return addMissingGithubData(suggestionMap, user);
-    // })
-    .then(function(suggestionMap) {
-      return addMissingGitterData(suggestionMap);
-    })
-    .then(function(suggestionMap) {
-      var suggestions = _.values(suggestionMap);
-      return removeUselessSuggestions(suggestions, user);
+  return recommendations(user, 'marionettejs/backbone.marionette')
+    .then(function(recommendations) {
+      return filterRecommendations(recommendations, user._id);
     })
     .then(function(suggestions) {
       var preferredComputerLanguages = getPreferredComputerLanguages(suggestions);
@@ -306,7 +210,7 @@ function getSuggestions(user, localeLanguage) {
         return b.score - a.score;
       });
 
-      return suggestions.slice(0, 8);
+      return suggestions.slice(0, MAX_RECOMMENDATIONS);
     });
 }
 
