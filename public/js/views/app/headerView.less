@@ -76,8 +76,8 @@
     color: #777;
     margin: 0 0 0 1px;
     user-select: text;
-    min-height: 27px;
     line-height: 1.3;
+    min-height: 40px;
 
     a {
       color: #666;
@@ -87,6 +87,22 @@
       color: @trpLightBlue;
     }
   }
+
+  .line-clamp {
+    height: 40px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .line-clamp:hover {
+    height: auto;
+    overflow: auto;
+    -webkit-line-clamp: inherit;
+    -webkit-box-orient: inherit;
+  }
+
 }
 
 .chat-header__content h1 .octicon-lock:before {
