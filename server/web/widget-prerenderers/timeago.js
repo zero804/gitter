@@ -1,54 +1,37 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-//var moment = require('moment');
-//var maxDaysBeforeDateDisplay = 1;
-//
-//function useLanguage(language, callback) {
-//  if(!language) return callback();
-//  moment.lang(language);
-//  try {
-//    return callback();
-//  } finally {
-//    moment.lang('en-GB');
-//  }
-//}
-//
-//module.exports = exports = function() {
-//  return function timeagoWidgetHandler(params) {
-//    var options = params.hash || {};
-//
-//    var time    = options.time;
-//    var lang    = options.lang;
-//    var locale  = options.locale;
-//
-//    if (!options || !time) return '';
-//
-//    time = moment(time);
-//
-//    var messageAge = moment.duration(Date.now() - time.valueOf());
-//
-//    if (messageAge.asDays() >= maxDaysBeforeDateDisplay) {
-//      return options.compact ? time.format("MMM DD") : time.format("MMM DD H:mm");
-//    } else {
-//      return time.format("H:mm");
-//    }
-//
-//    var v = useLanguage(lang, function() {
-//      return messageAge.humanize();
-//    });
-//
-//    /* This should never happen... */
-//    if(!locale) return v + " ago";
-//
-//    return locale.__("%s ago", v);
-//  };
-//};
+var timeFormat = require('../../../shared/time/time-format');
 
-// FIXME Temporarily disable until we find a nice
-// way to render user's timezone server-side
 module.exports = exports = function() {
-  return function timeagoWidgetHandler() {
-    return '';
+  return function timeagoWidgetHandler(params) {
+    var options = params.hash;
+    var root = params.data.root;
+
+    var time, lang, compact;
+
+    if (options) {
+      time = options.time;
+      lang = options.lang;
+      compact = options.compact;
+    }
+
+    var tzOffset = root.tzOffset;
+    var tz = root.tz;
+    var alwaysShow = root.showDatesWithoutTimezone;
+
+    /* In the chat environment, we don't want to prerender the time
+     * when we don't know what timezone the user is in: we'll just wait
+     * until the javascript kicks in and render it then.
+     *
+     * However, in the archive environment, we don't want to do this
+     * for SEO and also because the chats are not re-rendered, so no
+     * times will be shown.
+     */
+    if (!tz && !alwaysShow) {
+      return '';
+    }
+
+    return timeFormat(time, { lang: lang, tzOffset: tzOffset, compact: compact });
   };
 };

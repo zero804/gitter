@@ -5,6 +5,9 @@ var HeaderView = require('views/app/headerView');
 var ArchiveNavigationView = require('views/archive/archive-navigation-view');
 var onready = require('./utils/onready');
 
+/* Set the timezone cookie */
+require('components/timezone-cookie');
+
 require('views/widgets/preload');
 require('filtered-collection');
 require('components/dozy');

@@ -8,7 +8,6 @@ var CalHeatMap = require('cal-heatmap');
 
 module.exports = (function() {
 
-
   var language = context.lang();
 
   return Marionette.ItemView.extend({
@@ -22,10 +21,10 @@ module.exports = (function() {
       var p = this.options.previousDate && moment(this.options.previousDate).utc();
       var n = this.options.nextDate && moment(this.options.nextDate).utc();
 
-      var archiveDate = moment(this.options.archiveDate);
+      var archiveDate = moment(this.options.archiveDate).utc().locale(language);
 
-      var ordinalDate = archiveDate.format('Do', { lang: language });
-      var numericDate = archiveDate.format('D', { lang: language });
+      var ordinalDate = archiveDate.format('Do');
+      var numericDate = archiveDate.format('D');
 
       var ordinalPart;
       if(ordinalDate.indexOf('' + numericDate) === 0) {
@@ -33,15 +32,15 @@ module.exports = (function() {
       } else {
         ordinalPart = '';
       }
-      var monthYearFormatted = archiveDate.format('MMMM YYYY', { lang: language });
+      var monthYearFormatted = archiveDate.format('MMMM YYYY');
 
       return {
-        previousDate: p && p.format('Do MMM YYYY', { lang: language }),
+        previousDate: p && p.locale(language).format('Do MMM YYYY'),
         dayName: numericDate,
         dayOrdinal: ordinalPart,
-        previousDateLink: p && '/' + uri + '/archives/' + p.format('YYYY/MM/DD', { lang: 'en' }),
-        nextDate: n && n.format('Do MMM YYYY', { lang: language }),
-        nextDateLink: n && '/' + uri + '/archives/' + n.format('YYYY/MM/DD', { lang: 'en' }),
+        previousDateLink: p && '/' + uri + '/archives/' + p.format('YYYY/MM/DD'),
+        nextDate: n && n.locale(language).format('Do MMM YYYY'),
+        nextDateLink: n && '/' + uri + '/archives/' + n.format('YYYY/MM/DD'),
         monthYearFormatted: monthYearFormatted
       };
     },
@@ -54,15 +53,19 @@ module.exports = (function() {
         range = 3;
       }
 
-      var start = moment(a).subtract('months', 1);
+      var start = moment(a).subtract(1, 'months');
       var troupeId = context.getTroupeId();
+
+      // Get the date **in the local timezone** so that the highlighted
+      // date does not display incorrectly for west-of-the-meridian locations
+      var highlightDate = new Date(a.year(), a.month(), a.date());
 
       var cal = new CalHeatMap();
       cal.init({
         itemSelector: this.ui.navigation[0],
         start: start.toDate(),
         maxDate: new Date(),
-        highlight: [new Date(this.options.archiveDate)],
+        highlight: [highlightDate],
         minDate: new Date(2013, 10, 1), // 1 November 2013
         range: range,
         domain: "month",
