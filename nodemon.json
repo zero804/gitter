@@ -3,6 +3,7 @@
   "watch": ["server", "shared"],
   "ext": "js",
   "env": {
-    "NODEMON": "1"
+    "NODEMON": "1",
+    "TZ": "UTC"
   }
 }

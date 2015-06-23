@@ -25,7 +25,7 @@ describe('prerenderChatHelper', function() {
       }
     };
 
-    var result = prerenderChatHelper(chat, {});
+    var result = prerenderChatHelper(chat, { data: { root: { } }});
     parser.parseComplete(result);
 
     var avatar = select(handler.dom, ".chat-item__aside .chat-item__avatar"); // Check that the avatar renders

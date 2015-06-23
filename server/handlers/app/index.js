@@ -1,11 +1,12 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var ensureLoggedIn    = require('../../web/middlewares/ensure-logged-in');
-var appRender         = require('./render');
-var appMiddleware     = require('./middleware');
-var recentRoomService = require('../../services/recent-room-service');
-var isPhone     = require('../../web/is-phone');
+var ensureLoggedIn     = require('../../web/middlewares/ensure-logged-in');
+var appRender          = require('./render');
+var appMiddleware      = require('./middleware');
+var recentRoomService  = require('../../services/recent-room-service');
+var isPhone            = require('../../web/is-phone');
+var timezoneMiddleware = require('../../web/middlewares/timezone');
 
 function saveRoom(req) {
   var userId = req.user && req.user.id;
@@ -19,6 +20,7 @@ function saveRoom(req) {
 var mainFrameMiddlewarePipeline = [
   appMiddleware.uriContextResolverMiddleware({ create: 'not-repos' }),
   appMiddleware.isPhoneMiddleware,
+  timezoneMiddleware,
   function (req, res, next) {
     if (req.uriContext.ownUrl) {
       if (req.isPhone) {
@@ -57,6 +59,7 @@ var mainFrameMiddlewarePipeline = [
 var chatMiddlewarePipeline = [
   appMiddleware.uriContextResolverMiddleware({ create: 'not-repos'}),
   appMiddleware.isPhoneMiddleware,
+  timezoneMiddleware,
   function (req, res, next) {
 
     if (req.uriContext.accessDenied) {
@@ -88,6 +91,7 @@ var chatMiddlewarePipeline = [
 var embedMiddlewarePipeline = [
   appMiddleware.uriContextResolverMiddleware({ create: false }),
   appMiddleware.isPhoneMiddleware,
+  timezoneMiddleware,
   function (req, res, next) {
     if(!req.uriContext.troupe) return next(404);
     appRender.renderEmbeddedChat(req, res, next);
@@ -96,6 +100,7 @@ var embedMiddlewarePipeline = [
 
 var cardMiddlewarePipeline = [
   appMiddleware.uriContextResolverMiddleware({ create: false }),
+  timezoneMiddleware,
   function (req, res, next) {
     if(!req.uriContext.troupe) return next(404);
     if(req.uriContext.troupe.security !== 'PUBLIC') return next(403);
