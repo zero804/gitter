@@ -8,10 +8,10 @@ var mongoUtils         = require('../utils/mongo-utils');
 var persistence        = require('./persistence-service');
 var assert             = require('assert');
 var appEvents          = require('../app-events');
-var winston            = require('../utils/winston');
 var moment             = require('moment');
 var _                  = require('underscore');
 var unreadItemsService = require('./unread-item-service');
+var debug              = require('debug')('gitter:recent-room-service');
 
 /* const */
 var LEGACY_FAV_POSITION = 1000;
@@ -198,7 +198,7 @@ function findFavouriteTroupesForUser(userId, callback) {
  * Internal call
  */
 function clearLastVisitedTroupeforUserId(userId, troupeId) {
-  winston.verbose("recent-rooms: Clearing last visited Troupe for user: " + userId+ " to troupe " + troupeId);
+  debug("recent-rooms: Clearing last visited Troupe for user: %s to troupe %s", userId, troupeId);
 
   var setOp = {};
   setOp['troupes.' + troupeId] = 1;
