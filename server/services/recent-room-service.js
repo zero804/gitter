@@ -58,14 +58,14 @@ function generateRoomListForUser(userId) {
 /**
  * Called when the user removes a room from the left hand menu.
  */
-function removeRecentRoomForUser(userId, roomId, isMember) {
+function removeRecentRoomForUser(userId, roomId) {
   assert(mongoUtils.isLikeObjectId(userId));
   assert(mongoUtils.isLikeObjectId(roomId));
 
   return Q.all([
       clearFavourite(userId, roomId),
       clearLastVisitedTroupeforUserId(userId, roomId),
-      unreadItemsService.markAllChatsRead(userId, roomId, { member: !!isMember })
+      unreadItemsService.markAllChatsRead(userId, roomId)
     ]);
 }
 
