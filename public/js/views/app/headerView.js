@@ -59,7 +59,6 @@ module.exports = (function() {
       'click @ui.cog': 'showDropdown',
       'click #leave-room': 'leaveRoom',
       'click @ui.favourite': 'toggleFavourite',
-      'click @ui.topic': 'showFullTopic',
       'dblclick @ui.topic': 'showInput',
       'keydown textarea': 'detectKeys',
     },
@@ -192,10 +191,6 @@ module.exports = (function() {
         // found escape, cancel edit
         this.cancelEditTopic();
       }
-    },
-
-    showFullTopic: function() {
-      this.ui.topic.toggleClass('line-clamp');
     },
 
     showInput: function() {
