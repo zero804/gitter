@@ -112,18 +112,15 @@ describe('recent-room-service', function() {
     it('should add a troupe to favourites',function(done) {
 
       function fav(val, callback) {
-        recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe1.id, val)
-          .nodeify(function(err) {
-            if(err) return done(err);
-
-            recentRoomService.findFavouriteTroupesForUser(fixture.user1.id, function(err, favs) {
-              if(err) return done(err);
-
-              var isInTroupe = !!favs[fixture.troupe1.id];
-              assert(isInTroupe === val, 'Troupe should ' + (val? '': 'not ') + 'be a favourite');
-              callback();
-            });
-          });
+        return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe1.id, val)
+          .then(function() {
+            return recentRoomService.findFavouriteTroupesForUser(fixture.user1.id);
+          })
+          .then(function(favs) {
+            var isInTroupe = !!favs[fixture.troupe1.id];
+            assert(isInTroupe === val, 'Troupe should ' + (val? '': 'not ') + 'be a favourite');
+          })
+          .nodeify(callback);
       }
 
       fav(true, function() {

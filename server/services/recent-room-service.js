@@ -175,7 +175,7 @@ function updateFavourite(userId, troupeId, favouritePosition) {
 
 }
 
-function findFavouriteTroupesForUser(userId, callback) {
+function findFavouriteTroupesForUser(userId) {
   return persistence.UserTroupeFavourites.findOneQ({ userId: userId }, { favs: 1 }, { lean: true })
     .then(function(userTroupeFavourites) {
       if(!userTroupeFavourites || !userTroupeFavourites.favs) return {};
@@ -188,8 +188,7 @@ function findFavouriteTroupesForUser(userId, callback) {
                 return a;
               })
               .toObject();
-    })
-    .nodeify(callback);
+    });
 }
 
 
@@ -267,28 +266,29 @@ function getTroupeLastAccessTimesForUser(userId) {
  * that hasn't been deleted
  * @return promise of a troupe (or null)
  */
-function findLastAccessedTroupeForUser(user, callback) {
-  return persistence.Troupe.findQ({ 'users.userId': user.id, 'status': 'ACTIVE' }).then(function(activeTroupes) {
-    if (!activeTroupes || activeTroupes.length === 0) return null;
+function findLastAccessedTroupeForUser(user) {
+  return persistence.Troupe.findQ({ 'users.userId': user.id, 'status': 'ACTIVE' })
+    .then(function(activeTroupes) {
+      if (!activeTroupes || activeTroupes.length === 0) return null;
 
-    return getTroupeLastAccessTimesForUser(user.id)
-      .then(function(troupeAccessTimes) {
-        activeTroupes.forEach(function(troupe) {
-          troupe.lastAccessTime = troupeAccessTimes[troupe._id];
+      return getTroupeLastAccessTimesForUser(user.id)
+        .then(function(troupeAccessTimes) {
+          activeTroupes.forEach(function(troupe) {
+            troupe.lastAccessTime = troupeAccessTimes[troupe._id];
+          });
+
+          var troupes = _.sortBy(activeTroupes, function(t) {
+            return (t.lastAccessTime) ? t.lastAccessTime : 0;
+          }).reverse();
+
+          var troupe = _.find(troupes, function(troupe) {
+            return troupeService.userHasAccessToTroupe(user, troupe);
+          });
+
+          return troupe;
         });
 
-        var troupes = _.sortBy(activeTroupes, function(t) {
-          return (t.lastAccessTime) ? t.lastAccessTime : 0;
-        }).reverse();
-
-        var troupe = _.find(troupes, function(troupe) {
-          return troupeService.userHasAccessToTroupe(user, troupe);
-        });
-
-        return troupe;
-      });
-
-  }).nodeify(callback);
+    });
 
 }
 
@@ -306,6 +306,7 @@ function findBestTroupeForUser(user) {
   // any valid troupes, it returns an error.
   //
   if (user.lastTroupe) {
+    // TODO: make this lean
     return troupeService.findById(user.lastTroupe)
       .then(function(troupe) {
 
