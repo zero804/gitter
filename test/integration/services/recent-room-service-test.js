@@ -5,6 +5,7 @@
 var testRequire = require('../test-require');
 var assert = require('assert');
 var fixtureLoader = require('../test-fixtures');
+var Q = require('q');
 
 var recentRoomService = testRequire("./services/recent-room-service");
 var persistenceService = testRequire("./services/persistence-service");
@@ -229,4 +230,49 @@ describe('recent-room-service', function() {
     });
 
   });
+
+  describe('#findLastAccessTimesForUsersInRoom', function() {
+    var fixture = {};
+
+    before(fixtureLoader(fixture, {
+      user1: { },
+      user2: { },
+      troupe1: { users: ['user1'] }
+    }));
+
+    after(function() {
+      fixture.cleanup();
+    });
+
+    it('should handle default values', function(done) {
+      return recentRoomService.findLastAccessTimesForUsersInRoom(fixture.troupe1.id, [fixture.user1.id, fixture.user2._id])
+        .then(function(result) {
+          assert(result[fixture.user1.id]);
+          assert(result[fixture.user2.id]);
+        })
+        .nodeify(done);
+    });
+
+    it('should handle non default values', function(done) {
+      return Q.all([
+          recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id),
+          recentRoomService.saveLastVisitedTroupeforUserId(fixture.user2.id, fixture.troupe1.id)
+        ])
+        .then(function() {
+          return recentRoomService.findLastAccessTimesForUsersInRoom(fixture.troupe1.id, [fixture.user1.id, fixture.user2._id]);
+        })
+        .then(function(result) {
+          var d1 = Date.now() - result[fixture.user1.id];
+          var d2 = Date.now() - result[fixture.user2.id];
+          assert(d1 >= 0);
+          assert(d1 < 5000);
+
+          assert(d2 >= 0);
+          assert(d2 < 5000);
+        })
+        .nodeify(done);
+    });
+
+  });
+
 });
