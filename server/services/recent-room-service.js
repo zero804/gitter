@@ -15,6 +15,7 @@ var debug              = require('debug')('gitter:recent-room-service');
 
 /* const */
 var LEGACY_FAV_POSITION = 1000;
+var DEFAULT_LAST_ACCESS_TIME = new Date('2015-07-01T00:00:00Z');
 
 function generateRoomListForUser(userId) {
   return Q.all([
@@ -54,6 +55,7 @@ function generateRoomListForUser(userId) {
     });
 
 }
+exports.generateRoomListForUser = generateRoomListForUser;
 
 /**
  * Called when the user removes a room from the left hand menu.
@@ -68,6 +70,7 @@ function removeRecentRoomForUser(userId, roomId) {
       unreadItemsService.markAllChatsRead(userId, roomId)
     ]);
 }
+exports.removeRecentRoomForUser = removeRecentRoomForUser
 
 /**
  * Internal call
@@ -174,6 +177,7 @@ function updateFavourite(userId, troupeId, favouritePosition) {
   });
 
 }
+exports.updateFavourite = updateFavourite;
 
 function findFavouriteTroupesForUser(userId) {
   return persistence.UserTroupeFavourites.findOneQ({ userId: userId }, { favs: 1 }, { lean: true })
@@ -190,7 +194,7 @@ function findFavouriteTroupesForUser(userId) {
               .toObject();
     });
 }
-
+exports.findFavouriteTroupesForUser = findFavouriteTroupesForUser;
 
 
 /**
@@ -246,6 +250,7 @@ function saveLastVisitedTroupeforUserId(userId, troupeId) {
       appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() });
     });
 }
+exports.saveLastVisitedTroupeforUserId = saveLastVisitedTroupeforUserId;
 
 /**
  * Get the last access times for a user
@@ -259,6 +264,7 @@ function getTroupeLastAccessTimesForUser(userId) {
       return userTroupeLastAccess.troupes;
     });
 }
+exports.getTroupeLastAccessTimesForUser = getTroupeLastAccessTimesForUser;
 
 
 /**
@@ -320,18 +326,35 @@ function findBestTroupeForUser(user) {
 
   return findLastAccessedTroupeForUser(user);
 }
+exports.findBestTroupeForUser = findBestTroupeForUser;
 
 /**
- * EXPORTS
+ * Returns a hash of the last access times for an array of userIds for a given room
  */
-[
-  generateRoomListForUser,
-  removeRecentRoomForUser,
-  findFavouriteTroupesForUser,
-  updateFavourite,
-  getTroupeLastAccessTimesForUser,
-  saveLastVisitedTroupeforUserId,
-  findBestTroupeForUser
-].forEach(function(e) {
-  exports[e.name] = e;
-});
+function findLastAccessTimesForUsersInRoom(roomId, userIds) {
+  if (!userIds.length) return Q.resolve({});
+
+  var key = 'troupes.' +  roomId;
+
+  var query = { userId: { $in: userIds } };
+  query[key] = { $exists: true };
+
+  var select = { userId: 1, _id: 0 };
+  select[key] = 1;
+
+  return persistence.UserTroupeLastAccess.findQ(query, select, { lean: true })
+    .then(function(lastAccessTimes) {
+      var lastAccessTimesHash = lastAccessTimes.reduce(function(memo, item) {
+        memo[item.userId] = item.troupes && item.troupes[roomId];
+        return memo;
+      }, {});
+
+      return userIds.reduce(function(memo, userId) {
+        memo[userId] = lastAccessTimesHash[userId] || DEFAULT_LAST_ACCESS_TIME;
+        return memo;
+      }, {});
+
+    });
+
+}
+exports.findLastAccessTimesForUsersInRoom = findLastAccessTimesForUsersInRoom;
