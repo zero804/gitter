@@ -18,9 +18,8 @@ function checkParameters(room, user) {
 
 // Base removal functions
 
-function removeFavourite(room, userId, isMember) {
-  if (typeof isMember === 'undefined') isMember = !!room.findTroupeUser(userId);
-  return recentRoomService.removeRecentRoomForUser(userId, room.id, isMember);
+function removeFavourite(room, userId) {
+  return recentRoomService.removeRecentRoomForUser(userId, room.id);
 }
 
 function removeFromRoom(room, userId) {
@@ -38,7 +37,7 @@ function removeFromRoomAndFavouriteAndUnread(room, userId) {
     return removeUnreadCounts(room, userId);
   })
   .then(function() {
-    return removeFavourite(room, userId, false);
+    return removeFavourite(room, userId);
   });
 }
 
@@ -57,10 +56,11 @@ function removeRecentRoomForUser(room, userId) {
     var roomId = room.id;
     var user = room.findTroupeUser(userId);
 
-    return removeFavourite(room, userId, !!user)
+    return removeFavourite(room, userId)
     .then(function() {
       if (user) {
         if (user.lurk) return removeFromRoom(room, userId);
+
         // TODO: in future get rid of this but this collection is used by the native clients
         appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: roomId, favourite: null, lastAccessTime: null, mentions: 0, unreadItems: 0 });
         return;
