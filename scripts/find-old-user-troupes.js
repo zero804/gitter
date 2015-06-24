@@ -10,13 +10,7 @@ var userTroupeSettingsService = require('../server/services/user-troupe-settings
 var collections = require('../server/utils/collections');
 var shutdown = require('shutdown');
 
-// require('../server/utils/event-listeners').installLocalEventListeners();
-
-var Q = require('q');
-var qlimit = require('qlimit');
-
-var limit = qlimit(1);
-
+require('../server/utils/event-listeners').installLocalEventListeners();
 
 var opts = require("nomnom")
    .option('room', {

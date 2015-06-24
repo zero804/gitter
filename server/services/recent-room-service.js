@@ -203,13 +203,11 @@ function clearLastVisitedTroupeforUserId(userId, troupeId) {
   var setOp = {};
   setOp['troupes.' + troupeId] = 1;
 
-  return Q.all([
-      // Update UserTroupeLastAccess
-      persistence.UserTroupeLastAccess.updateQ(
+  // Update UserTroupeLastAccess
+  return persistence.UserTroupeLastAccess.updateQ(
          { userId: userId },
          { $unset: setOp },
-         { upsert: true })
-    ]);
+         { upsert: true });
 }
 
 /**
@@ -232,7 +230,7 @@ function saveUserTroupeLastAccessWithLimit(userId, troupeId) {
  * Update the last visited troupe for the user, sending out appropriate events
  * Returns a promise of nothing
  */
-function saveLastVisitedTroupeforUserId(userId, troupeId, callback) {
+function saveLastVisitedTroupeforUserId(userId, troupeId) {
   var lastAccessTime = new Date();
 
   var setOp = {};
@@ -247,20 +245,20 @@ function saveLastVisitedTroupeforUserId(userId, troupeId, callback) {
       // XXX: lastAccessTime should be a date but for some bizarre reason it's not
       // serializing properly
       appEvents.dataChange2('/user/' + userId + '/rooms', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() });
-    })
-    .nodeify(callback);
+    });
 }
 
 /**
  * Get the last access times for a user
  * @return promise of a hash of { troupeId1: accessDate, troupeId2: accessDate ... }
  */
-function getTroupeLastAccessTimesForUser(userId, callback) {
-  return persistence.UserTroupeLastAccess.findOneQ({ userId: userId }).then(function(userTroupeLastAccess) {
-    if(!userTroupeLastAccess || !userTroupeLastAccess.troupes) return {};
+function getTroupeLastAccessTimesForUser(userId) {
+  return persistence.UserTroupeLastAccess.findOneQ({ userId: userId })
+    .then(function(userTroupeLastAccess) {
+      if(!userTroupeLastAccess || !userTroupeLastAccess.troupes) return {};
 
-    return userTroupeLastAccess.troupes;
-  }).nodeify(callback);
+      return userTroupeLastAccess.troupes;
+    });
 }
 
 
@@ -299,7 +297,7 @@ function findLastAccessedTroupeForUser(user, callback) {
  * Find the best troupe for a user to access
  * @return promise of a troupe or null
  */
-function findBestTroupeForUser(user, callback) {
+function findBestTroupeForUser(user) {
   //
   // This code is invoked when a user's lastAccessedTroupe is no longer valid (for the user)
   // or the user doesn't have a last accessed troupe. It looks for all the troupes that the user
@@ -307,9 +305,8 @@ function findBestTroupeForUser(user, callback) {
   // If the user has a troupe, it takes them to the last one they accessed. If the user doesn't have
   // any valid troupes, it returns an error.
   //
-  var op;
   if (user.lastTroupe) {
-     op = troupeService.findById(user.lastTroupe)
+    return troupeService.findById(user.lastTroupe)
       .then(function(troupe) {
 
         if(!troupe || troupe.status == 'DELETED' || !troupeService.userHasAccessToTroupe(user, troupe)) {
@@ -318,12 +315,9 @@ function findBestTroupeForUser(user, callback) {
 
         return troupe;
       });
-
-  } else {
-    op = findLastAccessedTroupeForUser(user);
   }
 
-  return op.nodeify(callback);
+  return findLastAccessedTroupeForUser(user);
 }
 
 /**

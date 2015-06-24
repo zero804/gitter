@@ -70,11 +70,11 @@ function LastTroupeAccessTimesForUserStrategy(options) {
   var timesIndexed;
 
   this.preload = function(data, callback) {
-    recentRoomService.getTroupeLastAccessTimesForUser(userId, function(err, times) {
-      if(err) return callback(err);
-      timesIndexed = times;
-      callback();
-    });
+    return recentRoomService.getTroupeLastAccessTimesForUser(userId)
+      .then(function(times) {
+        timesIndexed = times;
+      })
+      .nodeify(callback);
   };
 
   this.map = function(id) {
