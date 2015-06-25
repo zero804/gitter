@@ -2,7 +2,6 @@
 "use strict";
 
 var env               = require('../../utils/env');
-var logger            = env.logger;
 var stats             = env.stats;
 var debug             = require('debug')('gitter:faye-logging');
 
