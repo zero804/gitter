@@ -82,7 +82,34 @@ describe("User Service", function() {
 
   });
 
+  it('should allow timezone information to be updated', function() {
+    var userService = testRequire("./services/user-service");
 
+    return userService.updateTzInfo(fixture2.user1.id, { offset: 60, abbr: 'CST', iana: 'Europe/Paris' })
+      .then(function() {
+        return userService.findById(fixture2.user1.id);
+      })
+      .then(function(user) {
+        var tz = user.tz;
+        assert(tz);
+        assert.strictEqual(tz.offset, 60);
+        assert.strictEqual(tz.abbr, 'CST');
+        assert.strictEqual(tz.iana, 'Europe/Paris');
+
+        return userService.updateTzInfo(fixture2.user1.id, { });
+      })
+      .then(function() {
+        return userService.findById(fixture2.user1.id);
+      })
+      .then(function(user) {
+        var tz = user.tz;
+
+        assert(!tz || !tz.offset);
+        assert(!tz || !tz.abbr);
+        assert(!tz || !tz.iana);
+      });
+
+  });
 
   after(function() {
     fixture2.cleanup();

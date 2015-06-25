@@ -10,6 +10,9 @@ var FastClick = require('fastclick');
 var RoomCollectionTracker = require('components/room-collection-tracker');
 var troupeCollections = require('collections/instances/troupes');
 
+/* Set the timezone cookie */
+require('components/timezone-cookie');
+
 // Preload widgets
 require('views/widgets/avatar');
 require('views/widgets/timeago');
